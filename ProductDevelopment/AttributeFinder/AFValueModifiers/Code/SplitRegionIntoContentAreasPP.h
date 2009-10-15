@@ -69,6 +69,7 @@ private:
 	ATLControls::CButton	m_chkIncludeOCRAsTrueSpatialString;
 	ATLControls::CEdit		m_editAttributeName;
 	ATLControls::CEdit		m_editDefaultAttributeText;
+	ATLControls::CEdit		m_editRequiredHorizontalSeparation;
 
 	/////////////
 	// Methods

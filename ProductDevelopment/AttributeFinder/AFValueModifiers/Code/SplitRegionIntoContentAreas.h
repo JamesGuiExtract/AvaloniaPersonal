@@ -102,6 +102,8 @@ public:
 	STDMETHOD(put_ReOCRWithHandwriting)(VARIANT_BOOL newVal);
 	STDMETHOD(get_IncludeOCRAsTrueSpatialString)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_IncludeOCRAsTrueSpatialString)(VARIANT_BOOL newVal);
+	STDMETHOD(get_RequiredHorizontalSeparation)(long *pVal);
+	STDMETHOD(put_RequiredHorizontalSeparation)(long newVal);
 
 // IAttributeModifyingRule
 	STDMETHOD(raw_ModifyValue)(IAttribute *pAttribute, IAFDocument *pOriginInput,
@@ -224,16 +226,14 @@ private:
 	class ContentAreaInfo : public CRect
 	{
 	public:
-		// Creates an area based on a spatial string. If the specified spatial string doesn't
-		// contain spatial information, the area's rect will be set to NULL (0, 0, 0, 0)
-		ContentAreaInfo(ISpatialStringPtr ipString);
+		// Creates an area based on a spatial string and the specified page infos. If the specified
+		// spatial string doesn't contain spatial information, the area's rect will be set to
+		// NULL (0, 0, 0, 0).
+		ContentAreaInfo(const ISpatialStringPtr &ipString,
+			const ILongToObjectMapPtr &pSpatialPageInfos);
 
 		// Creates an area based on the specified bounds of the currently loaded document page.
 		ContentAreaInfo(const CRect &rect);
-
-		// The size of the average character in this sub-attribute result.  Will only be set
-		// if m_dOCRConfidence is sufficiently high.
-		CSize m_sizeAvgChar;
 
 		// Returns the total area in pixels;
 		int getArea() { return (Width() * Height()); }
@@ -301,6 +301,10 @@ private:
 	// If true, create a grandchild attribute with the original spatial string as the result
 	// (may not occupy the entire region returned by the primary result)
 	bool m_bIncludeOCRAsTrueSpatialString;
+
+	// The horizontal separation (measured in average character width for the page)
+	// required to delineate separate content areas on the same line.
+	long m_nRequiredHorizontalSeparation;
 
 	// The current document being processed
 	IAFDocumentPtr m_ipCurrentDoc;
@@ -433,6 +437,10 @@ private:
 	// for a content area.
 	bool hasEnoughPixels(const CRect &rect);
 
+	// Returns true if the specified content area meets configured specifications to be included
+	// in output.
+	bool areaMeetsSpecifications(const ContentAreaInfo &area);
+
 	// Returns true if the given point on an image has been excluded from further processing.
 	// If true, rpoint will be changed to indicate the last pixel in the excluded area.
 	bool isExcluded(CPoint &rpoint);
@@ -445,9 +453,6 @@ private:
 
 	// Returns true if rect1 lies above rect2. (used to sort the results of the rule).
 	static bool isAreaAbove(const CRect &rect1, const CRect &rect2);
-
-	// Calculates average char size by reducing the average line height somewhat.
-	static CSize getAvgCharSize(int nAvgCharWidth, int nAvgLineHeight);
 
 	// Creates a new attribute based on the provided rect.  If the rect contains
 	// any OCR data, a spatial string is returned consisting of the OCR result plus a spatial

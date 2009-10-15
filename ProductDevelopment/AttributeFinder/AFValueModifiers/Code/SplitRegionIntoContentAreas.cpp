@@ -16,7 +16,7 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion				= 3;
+const unsigned long gnCurrentVersion				= 4;
 const unsigned int gnDEFAULT_CHAR_WIDTH_PIXELS		= 25;
 const unsigned int gnDEFAULT_CHAR_HEIGHT_PIXELS		= 60;
 const double gnDEFAULT_CHAR_WIDTH_IN				= .08;
@@ -496,6 +496,42 @@ STDMETHODIMP CSplitRegionIntoContentAreas::put_IncludeOCRAsTrueSpatialString(VAR
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22547")
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSplitRegionIntoContentAreas::get_RequiredHorizontalSeparation(long *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI28020", pVal != NULL);
+
+		validateLicense();
+
+		*pVal = m_nRequiredHorizontalSeparation;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28021")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSplitRegionIntoContentAreas::put_RequiredHorizontalSeparation(long newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI28022", newVal >= 0);
+
+		validateLicense();
+
+		m_nRequiredHorizontalSeparation = newVal;
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28023")
+}
 
 //--------------------------------------------------------------------------------------------------
 // IAttributeModifyingRule
@@ -619,6 +655,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::raw_CopyFrom(IUnknown *pObject)
 		m_bUseLines							= asCppBool(ipCopyThis->UseLines);
 		m_bReOCRWithHandwriting				= asCppBool(ipCopyThis->ReOCRWithHandwriting);
 		m_bIncludeOCRAsTrueSpatialString	= asCppBool(ipCopyThis->IncludeOCRAsTrueSpatialString);
+		m_nRequiredHorizontalSeparation		= ipCopyThis->RequiredHorizontalSeparation;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22075");
 
@@ -696,6 +733,9 @@ STDMETHODIMP CSplitRegionIntoContentAreas::IsDirty(void)
 //
 // Version 3: 
 // Added m_bIncludeOCRAsTrueSpatialString
+//
+// Version 4:
+// Added m_nRequiredHorizontalSeparation;
 STDMETHODIMP CSplitRegionIntoContentAreas::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -761,6 +801,11 @@ STDMETHODIMP CSplitRegionIntoContentAreas::Load(IStream *pStream)
 			dataReader >> m_bIncludeOCRAsTrueSpatialString;
 		}
 
+		if (nDataVersion >= 4)
+		{
+			dataReader >> m_nRequiredHorizontalSeparation;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 
@@ -800,6 +845,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::Save(IStream *pStream, BOOL fClearDir
 		dataWriter << m_bUseLines;
 		dataWriter << m_bReOCRWithHandwriting;
 		dataWriter << m_bIncludeOCRAsTrueSpatialString;
+		dataWriter << m_nRequiredHorizontalSeparation;
 
 		dataWriter.flushToByteStream();
 
@@ -1041,7 +1087,8 @@ int CSplitRegionIntoContentAreas::PixelContentSearcher::processPixel(int x, int 
 
 						for (size_t i = 0; i < m_parent.m_vecContentAreas.size(); i++)
 						{
-							if (m_parent.m_vecContentAreas[i].PtInRect(ptCenter))
+							if (m_parent.m_vecContentAreas[i].PtInRect(ptCenter) ||
+								rect.PtInRect(m_parent.m_vecContentAreas[i].CenterPoint()))
 							{
 								bFoundExisting = true;
 
@@ -1181,12 +1228,12 @@ int CSplitRegionIntoContentAreas::PixelEraser::processPixel(int x, int y)
 //--------------------------------------------------------------------------------------------------
 // ContentAreaInfo
 //--------------------------------------------------------------------------------------------------
-CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(ISpatialStringPtr ipString) 
+CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const ISpatialStringPtr &ipString,
+													const ILongToObjectMapPtr &ipSpatialPageInfos) 
 : CRect()
 , m_dOCRConfidence(0)
 , m_eTopBoundaryState(kNotFound)
 , m_eBottomBoundaryState(kNotFound)
-, m_sizeAvgChar(0, 0)
 {
 	try
 	{
@@ -1194,40 +1241,45 @@ CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(ISpatialStringPtr
 
 		if (asCppBool(ipString->HasSpatialInfo()))
 		{
-			// If this spatial string has spatial information, use it to set the area bounds.
-			ILongRectanglePtr ipRect = ipString->GetOriginalImageBounds();
+			// If this spatial string has spatial information, use it to set the area bounds.	
+			// Get the bounds in terms of the specified page infos not the spatial string's
+			// page infos since previous rule objects may have modified the spatial infos of
+			// specific attributes so that they no longer match the page.
+			ILongRectanglePtr ipRect = ipString->GetTranslatedImageBounds(ipSpatialPageInfos);
+
 			ASSERT_RESOURCE_ALLOCATION("ELI22174", ipRect != NULL);
 			long lLeft, lTop, lRight, lBottom;
 			ipRect->GetBounds(&lLeft, &lTop, &lRight, &lBottom);
 
 			SetRect(lLeft, lTop, lRight, lBottom);
 
-			// Score the word to indicate how likely this string is to represent reasonable OCR
-			// data.  Do this by multiplying the average letter confidence value by a logrithmic
-			// number that approaches 1 as the number of characters goes to infinity. This will 
-			// produce a fraction of the average confidence that is smaller the fewer letters
-			// there are.
-			CPPLetter* pLetters = NULL;
-			long nLetterCount = -1;
-			ipString->GetOCRImageLetterArray(&nLetterCount, (void**)&pLetters);
-			ASSERT_RESOURCE_ALLOCATION("ELI25965", pLetters != NULL);
-
-			for (long i = 0; i < nLetterCount; i++)
+			if (ipString->GetMode() == kHybridMode)
 			{
-				const CPPLetter& letter = pLetters[i];
-
-				m_dOCRConfidence += ((double) letter.m_ucCharConfidence / 100.0);
+				// If a content area is based on a hybrid string, there is no confidence that can
+				// be attributed to the OCR.
+				m_dOCRConfidence = 0;
 			}
-
-			m_dOCRConfidence /= nLetterCount;
-			m_dOCRConfidence *= (1 - 1 / pow(1.5, nLetterCount));
-
-			// If this area is based on well-OCR'd content, use its content for average
-			// character size rather than the parent page's or attribute's average.
-			if (m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE)
+			else
 			{
-				m_sizeAvgChar = getAvgCharSize(ipString->GetAverageCharWidth(),
-											   ipString->GetAverageLineHeight());
+				// Score the word to indicate how likely this string is to represent reasonable OCR
+				// data.  Do this by multiplying the average letter confidence value by a logrithmic
+				// number that approaches 1 as the number of characters goes to infinity. This will 
+				// produce a fraction of the average confidence that is smaller the fewer letters
+				// there are.
+				CPPLetter* pLetters = NULL;
+				long nLetterCount = -1;
+				ipString->GetOCRImageLetterArray(&nLetterCount, (void**)&pLetters);
+				ASSERT_RESOURCE_ALLOCATION("ELI25965", pLetters != NULL);
+
+				for (long i = 0; i < nLetterCount; i++)
+				{
+					const CPPLetter& letter = pLetters[i];
+
+					m_dOCRConfidence += ((double) letter.m_ucCharConfidence / 100.0);
+				}
+
+				m_dOCRConfidence /= nLetterCount;
+				m_dOCRConfidence *= (1 - 1 / pow(1.5, nLetterCount));
 			}
 		}
 		else
@@ -1247,7 +1299,6 @@ CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const CRect &rect
 , m_dOCRConfidence(0)
 , m_eTopBoundaryState(kNotFound)
 , m_eBottomBoundaryState(kNotFound)
-, m_sizeAvgChar(0, 0)
 {
 }
 
@@ -1286,46 +1337,11 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 		ISpatialStringPtr ipDocText = ipDoc->Text;
 		ASSERT_RESOURCE_ALLOCATION("ELI22114", ipDocText != NULL);
 
+		ILongToObjectMapPtr ipSpatialPageInfos = ipDocText->SpatialPageInfos;
+		ASSERT_RESOURCE_ALLOCATION("ELI28052", ipSpatialPageInfos != NULL);
+
 		IIUnknownVectorPtr ipAttributeLines = ipValue->GetLines();
 		ASSERT_RESOURCE_ALLOCATION("ELI22228", ipAttributeLines != NULL);
-
-		// -----------------------------------------------------------------------------------
-		// Clone the spatial page info maps so that the rotations can be cleared (since all of
-		// the content regions that we will compute are tied to the displayed orientation of
-		// the image NOT the OCR'd orientation of the image). [FlexIDSCore #3527]
-		// -----------------------------------------------------------------------------------
-		// Get the spatial page infos
-		ILongToObjectMapPtr ipOriginalSpatialInfo = ipDocText->SpatialPageInfos;
-		ASSERT_RESOURCE_ALLOCATION("ELI25608", ipOriginalSpatialInfo != NULL);
-
-		// Create a new map to hold the copied page infos
-		ILongToObjectMapPtr ipCloneSpatialInfos(CLSID_LongToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI25609", ipCloneSpatialInfos != NULL);
-
-		// Get the keys to the page infos so that we can clone them in a loop
-		IVariantVectorPtr ipKeys = ipOriginalSpatialInfo->GetKeys();
-		ASSERT_RESOURCE_ALLOCATION("ELI25610", ipKeys != NULL);
-
-		// Clone each spatial page info, clear the rotation, and store the cloned
-		// page info in the new map
-		long lSize = ipKeys->Size;
-		for (long i=0; i < lSize; i++)
-		{
-			// Get the current key
-			long lKey = ipKeys->Item[i].lVal;
-
-			// Get the spatial page info as a copyable object
-			ICopyableObjectPtr ipOldInfo = ipOriginalSpatialInfo->GetValue(lKey);
-			ASSERT_RESOURCE_ALLOCATION("ELI25611", ipOldInfo != NULL);
-
-			// Clone the spatial page info
-			ISpatialPageInfoPtr ipInfo = ipOldInfo->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI25612", ipInfo != NULL);
-
-			// Clear the rotation and store the new copy in the map
-			ipInfo->Orientation = kRotNone;
-			ipCloneSpatialInfos->Set(lKey, ipInfo);
-		}
 
 		// Process the attribute line-by-line if there is more than 1 so that
 		// all pages of a given attribute are processed.
@@ -1357,7 +1373,11 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 				// words will be included, but for now we want this text for clues on processing.
 				ipSearcher->SetIncludeDataOnBoundary(VARIANT_TRUE);
 
-				ILongRectanglePtr ipRect = ipAttributeLine->GetOriginalImageBounds();
+				// Get the bounds in terms of the specified page infos not the spatial string's
+				// page infos since previous rule objects may have modified the spatial infos of
+				// specific attributes so that they no longer match the page.
+				ILongRectanglePtr ipRect =
+					ipAttributeLine->GetTranslatedImageBounds(ipSpatialPageInfos);
 				ASSERT_RESOURCE_ALLOCATION("ELI22107", ipRect != NULL);
 
 				CRect rectRegion;
@@ -1368,25 +1388,19 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 				ISpatialStringPtr ipText = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
 				ASSERT_RESOURCE_ALLOCATION("ELI22101", ipText != NULL);
 
-				if (ipText->Size > gnMIN_CHARS_NEEDED_FOR_SIZE)
+				if (m_ipCurrentPageText->Size > gnMIN_CHARS_NEEDED_FOR_SIZE)
 				{
-					// Set the average character height using the text in this region if possible
-					m_sizeAvgChar = getAvgCharSize(ipText->GetAverageCharWidth(), 
-						ipText->GetAverageLineHeight());
-				}
-				else if (m_ipCurrentPageText->Size > gnMIN_CHARS_NEEDED_FOR_SIZE)
-				{
-					// Otherwise attempt to set the average char size using the entire page's text.
-					m_sizeAvgChar = getAvgCharSize(m_ipCurrentPageText->GetAverageCharWidth(), 
-						m_ipCurrentPageText->GetAverageLineHeight());
+					// Set the average character height using the page text if possible
+					m_sizeAvgChar = CSize(m_ipCurrentPageText->GetAverageCharWidth(), 
+										  m_ipCurrentPageText->GetAverageCharHeight());
 				}
 				else 
 				{
-					// Not enough text in the region or page. Set m_sizeAvgChar to the default size.
+					// Not enough text in the page. Set m_sizeAvgChar to the default size.
 					m_sizeAvgChar.cx = 
-						(int) (gnDEFAULT_CHAR_WIDTH_IN * m_apPageBitmap->m_FileInfo.XResolution);
+						(int) (gnDEFAULT_CHAR_WIDTH_IN * m_apPageBitmap->m_hBitmap.XResolution);
 					m_sizeAvgChar.cy = 
-						(int) (gnDEFAULT_CHAR_HEIGHT_IN * m_apPageBitmap->m_FileInfo.YResolution);
+						(int) (gnDEFAULT_CHAR_HEIGHT_IN * m_apPageBitmap->m_hBitmap.YResolution);
 				}
 
 				// Get a vector of the lines of text from the region.
@@ -1405,7 +1419,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 					ISpatialStringPtr ipLine = ipLines->At(i);
 					ASSERT_RESOURCE_ALLOCATION("ELI22102", ipLine != NULL);
 
-					ContentAreaInfo area(ipLine);
+					ContentAreaInfo area(ipLine, ipSpatialPageInfos);
 					if (!area.IsRectNull())
 					{
 						if (expandHorizontally(area, rectRegion))
@@ -1427,7 +1441,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 				for each (ContentAreaInfo area in m_vecContentAreas)
 				{
 					IAttributePtr ipNewSubAttribute = createResult(ipDoc, nPage, area,
-						ipCloneSpatialInfos);
+						ipSpatialPageInfos);
 					ASSERT_RESOURCE_ALLOCATION("ELI22230", ipNewSubAttribute != NULL);
 
 					ipSubAttributes->PushBack(ipNewSubAttribute);
@@ -1447,6 +1461,9 @@ void CSplitRegionIntoContentAreas::splitLineFragments(IIUnknownVectorPtr ipLines
 		IIUnknownVectorPtr ipReturnValue(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI22179", ipReturnValue != NULL);
 
+		// The maximum distance one character can be from another
+		int maxGapBetweenChars = m_nRequiredHorizontalSeparation * m_sizeAvgChar.cx;
+
 		// Cycle through each line and split it into multiple lines if appropriate.
 		long nLineCount = ipLines->Size();
 		for (int i = 0; i < nLineCount; i++)
@@ -1460,76 +1477,74 @@ void CSplitRegionIntoContentAreas::splitLineFragments(IIUnknownVectorPtr ipLines
 				continue;
 			}
 
-			// Use GetSplitLines to try to split this line at whitespace gaps.
-			IIUnknownVectorPtr ipSplitLines = ipLine->GetSplitLines(gnMIN_CHAR_SEPARATION_OF_LINES);
+			long nLetterCount = -1;
+			CPPLetter* pLetters = NULL;
 
-			// Sometimes the vertical positioning of characters in a "line" is off such that the
-			// characters really shouldn't be considered in the same line.  Attempt to find
-			// such cases.
-			int nSplitLineCount = ipSplitLines->Size();
-			for (int j = 0; j < nSplitLineCount; j++)
+			if (ipLine->GetMode() == kHybridMode)
 			{
-				ISpatialStringPtr ipSplitLine = ipSplitLines->At(j);
-				ASSERT_RESOURCE_ALLOCATION("ELI22197", ipSplitLine != NULL);
-
-				CPPLetter* pLetters = NULL;
-				long nLetterCount = -1;
-				ipSplitLine->GetOCRImageLetterArray(&nLetterCount, (void**)&pLetters);
+				// If the line is hybrid, there is no way to split it-- just add it to the result set.
+				ipReturnValue->PushBack(ipLine);
+			}
+			else
+			{
+				// If the line is true-spatial, use the letters to split the line as appropriate.
+				ipLine->GetOCRImageLetterArray(&nLetterCount, (void**)&pLetters);
 				ASSERT_RESOURCE_ALLOCATION("ELI22198", pLetters != NULL);
+			}
 
-				// Cycle through each letter of the line and make sure it is vertically in-line
-				// with the others.
-				CRect rectBounds(0, 0, 0, 0);
-				for (long k = 0; k < nLetterCount; k++)
+			// Cycle through each letter of the line and make sure it within maxGapBetweenChars of
+			// the previous character and is vertically in-line with the others.
+			CRect rectBounds(0, 0, 0, 0);
+			for (long k = 0; k < nLetterCount; k++)
+			{
+				const CPPLetter& letter = pLetters[k];
+				if (!letter.m_bIsSpatial)
 				{
-					const CPPLetter& letter = pLetters[k];
-					if (!letter.m_bIsSpatial)
-					{
-						continue;
-					}
+					continue;
+				}
 
-					CRect rectLetter(letter.m_usLeft, letter.m_usTop,
-						letter.m_usRight, letter.m_usBottom);
-					if (rectLetter.IsRectEmpty())
-					{
-						continue;
-					}
+				CRect rectLetter(letter.m_usLeft, letter.m_usTop,
+					letter.m_usRight, letter.m_usBottom);
+				if (rectLetter.IsRectEmpty())
+				{
+					continue;
+				}
 
-					if (rectBounds.IsRectNull())
+				if (rectBounds.IsRectNull())
+				{
+					// rectBounds keeps running track of the line bounds.  If it isn't yet set,
+					// start with the current letter.
+					rectBounds = rectLetter;
+				}
+				else
+				{
+					// If this letter is too far from the previous letter or its bounds don't
+					// conform with the current bounds, spawn a new spatial string and add it to
+					// the result vector.
+					if (rectLetter.left - rectBounds.right > maxGapBetweenChars ||
+						rectLetter.top > rectBounds.bottom || rectLetter.bottom < rectBounds.top)
 					{
-						// rectBounds keeps running track of the line bounds.  If it isn't yet set,
-						// start with the current letter.
+						ISpatialStringPtr ipBegin = ipLine->GetSubString(0, k - 1);
+						ASSERT_RESOURCE_ALLOCATION("ELI22199", ipBegin != NULL);
+						ipReturnValue->PushBack(ipBegin);
+
+						// Start over with the remaining characters in the line.
+						ipLine = ipLine->GetSubString(k, nLetterCount - 1);
+						ASSERT_RESOURCE_ALLOCATION("ELI22200", ipLine != NULL);
+						nLetterCount -= k;
+						k = 1;
+
 						rectBounds = rectLetter;
 					}
 					else
 					{
-						// If this letter's bounds don't conform with the current bounds,
-						// spawn a new spatial string and add it to the result vector.
-						if (rectLetter.top > rectBounds.bottom
-							|| rectLetter.bottom < rectBounds.top)
-						{
-							ISpatialStringPtr ipBegin = ipSplitLine->GetSubString(0, k - 1);
-							ASSERT_RESOURCE_ALLOCATION("ELI22199", ipBegin != NULL);
-							ipReturnValue->PushBack(ipBegin);
-
-							// Start over with the remaining characters in the line.
-							ipSplitLine = ipSplitLine->GetSubString(k, nLetterCount - 1);
-							ASSERT_RESOURCE_ALLOCATION("ELI22200", ipSplitLine != NULL);
-							nLetterCount -= k;
-							k = 1;
-
-							rectBounds = rectLetter;
-						}
-						else
-						{
-							// Update the total bounds of the line thus far.
-							rectBounds.UnionRect(&rectLetter, &rectBounds);
-						}
+						// Update the total bounds of the line thus far.
+						rectBounds.UnionRect(&rectLetter, &rectBounds);
 					}
 				}
-
-				ipReturnValue->PushBack(ipSplitLine);
 			}
+
+			ipReturnValue->PushBack(ipLine);
 		}
 
 		// Reset ipLines with the return value we've accumulated.
@@ -1705,28 +1720,10 @@ void CSplitRegionIntoContentAreas::finalizeContentAreas(const CRect& rectRegion)
 		// kept.
 		for (size_t i = 0; i < m_vecContentAreas.size(); i++)
 		{
-			if (!m_bIncludeGoodOCR && 
-				m_vecContentAreas[i].m_dOCRConfidence >= (double) m_nOCRThreshold / 100.0)
+			if (!areaMeetsSpecifications(m_vecContentAreas[i]))
 			{
 				m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
 				i--;
-				continue;
-			}
-			else if (!m_bIncludePoorOCR && 
-				m_vecContentAreas[i].m_dOCRConfidence < (double) m_nOCRThreshold / 100.0)
-			{
-				m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
-				i--;
-				continue;
-			}
-
-			// Make sure the area still meets size and pixel content requirements, remove those that 
-			// don't.
-			if (!hasEnoughPixels(m_vecContentAreas[i]) || !isBigEnough(m_vecContentAreas[i]))
-			{
-				m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
-				i--;
-				continue;
 			}
 		}
 
@@ -1743,7 +1740,7 @@ void CSplitRegionIntoContentAreas::mergeAreas()
 		for (size_t i = 0; i < m_vecContentAreas.size(); i++)
 		{
 			ContentAreaInfo areaIPadded(m_vecContentAreas[i]);
-			areaIPadded.InflateRect(gnMIN_CHAR_SEPARATION_OF_LINES * m_sizeAvgChar.cx, 0);
+			areaIPadded.InflateRect(m_nRequiredHorizontalSeparation * m_sizeAvgChar.cx, 0);
 
 			// Compare to all areas before this in the vector.
 			for (size_t j = 0; j < i; j++)
@@ -1787,49 +1784,59 @@ void CSplitRegionIntoContentAreas::mergeAreas()
 						bMerge = true;
 					}
 
-					// If area i shares mostly the same vertical positioning as area j and not based 
-					// on confidently OCR'd text, merge them as two pieces of the same line of content.
-					if (dHeightIOverlap > gdDUPLICATE_OVERLAP && 
-						m_vecContentAreas[i].m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
+					if (!bMerge)
 					{
-						bMerge = true;
-					}
-
-					// If area j shares mostly the same vertical positioning as area i and not based
-					// on confidently OCR'd text, merge them as two pieces of the same line of content.
-					if (dHeightJOverlap > gdDUPLICATE_OVERLAP && 
-						m_vecContentAreas[j].m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
-					{
-						bMerge = true;
-					}
-
-					// If both areas share mostly the same vertical spacing as the other, merge them
-					// regardless of whether either is based on confidently OCR'd text.
-					if (dHeightIOverlap > gdDUPLICATE_OVERLAP && dHeightJOverlap > gdDUPLICATE_OVERLAP)
-					{
-						bMerge = true;
+						// If area i shares mostly the same vertical positioning as area j and not based 
+						// on confidently OCR'd text, merge them as two pieces of the same line of content.
+						if (dHeightIOverlap > gdDUPLICATE_OVERLAP && 
+							m_vecContentAreas[i].m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
+						{
+							bMerge = true;
+						}
+						// If area j shares mostly the same vertical positioning as area i and not based
+						// on confidently OCR'd text, merge them as two pieces of the same line of content.
+						else if (dHeightJOverlap > gdDUPLICATE_OVERLAP && 
+							m_vecContentAreas[j].m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
+						{
+							bMerge = true;
+						}
+						// If both areas share mostly the same vertical spacing as the other, merge them
+						// regardless of whether either is based on confidently OCR'd text.
+						else if (dHeightIOverlap > gdDUPLICATE_OVERLAP &&
+								 dHeightJOverlap > gdDUPLICATE_OVERLAP)
+						{
+							bMerge = true;
+						}
 					}
 
 					if (bMerge)
 					{
+						ContentAreaInfo mergedArea = m_vecContentAreas[i];
+
 						// These areas qualify to be merged.  Set m_vecContentAreas[j] to the union
-						// of the two areas, and remove m_vecContentAreas[i]
-						m_vecContentAreas[i].UnionRect(&m_vecContentAreas[i], &m_vecContentAreas[j]);
-						m_vecContentAreas[i].m_dOCRConfidence = 
-							max(m_vecContentAreas[i].m_dOCRConfidence, m_vecContentAreas[j].m_dOCRConfidence);
+						// of the two areas, and remove m_vecContentAreas[i].
+						mergedArea.UnionRect(&mergedArea, &m_vecContentAreas[j]);
+						mergedArea.m_dOCRConfidence = 
+							max(mergedArea.m_dOCRConfidence, m_vecContentAreas[j].m_dOCRConfidence);
 
-						// Recalculate the horizontally padded version of area i.
-						areaIPadded = m_vecContentAreas[i];
-						areaIPadded.InflateRect(gnMIN_CHAR_SEPARATION_OF_LINES * m_sizeAvgChar.cx, 0);
+						// Ensure the resulting area meets the specified size requirements.
+						if (areaMeetsSpecifications(mergedArea))
+						{
+							m_vecContentAreas[i] = mergedArea;
 
-						// Remove the duplicate area j
-						m_vecContentAreas.erase(m_vecContentAreas.begin() + j);
+							// Recalculate the horizontally padded version of area i.
+							areaIPadded = m_vecContentAreas[i];
+							areaIPadded.InflateRect(m_nRequiredHorizontalSeparation * m_sizeAvgChar.cx, 0);
 
-						// Reset counter i to force this area to be re-compared to all other zones
-						// now that it has been altered.
-						i -= 2;
-						j = 0;
-						break;
+							// Remove the duplicate area j
+							m_vecContentAreas.erase(m_vecContentAreas.begin() + j);
+
+							// Reset counter i to force this area to be re-compared to all other zones
+							// now that it has been altered.
+							i -= 2;
+							j = 0;
+							break;
+						}
 					}
 				}
 			}
@@ -1978,7 +1985,7 @@ bool CSplitRegionIntoContentAreas::expandHorizontally(CRect &rrect, const CRect 
 		{
 			CRect rectExpansionArea(0, rrect.top, m_sizeAvgChar.cx, rrect.bottom);
 
-			int nExpansionCuttoff = gnMIN_CHAR_SEPARATION_OF_LINES * m_sizeAvgChar.cx;
+			int nExpansionCuttoff = m_nRequiredHorizontalSeparation * m_sizeAvgChar.cx;
 
 			// Expand right
 			rectExpansionArea.OffsetRect(rrect.right - rectExpansionArea.right, 0);
@@ -2332,7 +2339,8 @@ bool CSplitRegionIntoContentAreas::attemptMerge(ContentAreaInfo &area, bool bUp,
 						// overlapping impressionable areas.
 						if (bRecurse)
 						{
-							attemptMerge(*pConfidentArea, !bUp, rvecAreasToAdd, false);
+							bool bMergeUp = (bUp == (pConfidentArea == m_vecContentAreas[i]));
+							attemptMerge(*pConfidentArea, bMergeUp, rvecAreasToAdd, false);
 						}
 
 						// If the area based on confidently OCR'd text extends sufficiently beyond the 
@@ -2479,8 +2487,8 @@ void CSplitRegionIntoContentAreas::makeFlushWithLines(ContentAreaInfo &area)
 			// The following code to allow an area to be divided by a vertical line seems to expose a bug in 
 			// the spatial string searcher on one of the documents (9519303_001.TIF). Commenting out for the
 			// time being.
-			//		else if (line.LinePosition() >= area.left + (m_sizeAvgChar.cx * gnMIN_CHAR_SEPARATION_OF_LINES) &&
-			//				 line.LinePosition() <= area.right - (m_sizeAvgChar.cx * gnMIN_CHAR_SEPARATION_OF_LINES))
+			//		else if (line.LinePosition() >= area.left + (m_sizeAvgChar.cx * m_nRequiredHorizontalSeparation) &&
+			//				 line.LinePosition() <= area.right - (m_sizeAvgChar.cx * m_nRequiredHorizontalSeparation))
 			//		{
 			//			// This line appears to split the current area with a sufficient amount of leftover on
 			//			// either side.  If the vertical overlap is sufficient, allow this area to be be
@@ -2537,21 +2545,13 @@ bool CSplitRegionIntoContentAreas::ensureRectInPage(CRect &rrect, bool bThrowExc
 bool CSplitRegionIntoContentAreas::isBigEnough(const ContentAreaInfo &area, 
 											   bool bCheckHeightOnly/* = false*/)
 {
-	CSize sizeAvgChar = area.m_sizeAvgChar;
-	if (sizeAvgChar == CSize(0, 0))
-	{
-		// If this area doesn't have an average character size, use the average char size of the 
-		// parent attribute of page.
-		sizeAvgChar = m_sizeAvgChar;
-	}
-
 	if (!bCheckHeightOnly && 
-		area.Width() + 1 < (int) ((double) sizeAvgChar.cx * m_dMinimumWidth - 0.5))
+		area.Width() + 1 < (int) ((double) m_sizeAvgChar.cx * m_dMinimumWidth - 0.5))
 	{
 		// Ensure the width of the area is at least the width of the number of chars specified.
 		return false;
 	}
-	else if (area.Height() < (int) ((double) sizeAvgChar.cy * m_dMinimumHeight))
+	else if (area.Height() < (int) ((double) m_sizeAvgChar.cy * m_dMinimumHeight))
 	{
 		// Ensure the height of the area is at least the height of the number of chars specified.
 		return false;
@@ -2584,6 +2584,34 @@ bool CSplitRegionIntoContentAreas::hasEnoughPixels(const CRect &rect)
 		return (dPercent > gdMIN_PIXEL_PERCENT_OF_AREA);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26618");
+}
+//--------------------------------------------------------------------------------------------------
+bool CSplitRegionIntoContentAreas::areaMeetsSpecifications(const ContentAreaInfo &area)
+{
+	// If not including areas based on well-OCR'd text, ensure the area is not based on well OCR'd
+	// text.
+	if (!m_bIncludeGoodOCR && area.m_dOCRConfidence >= (double) m_nOCRThreshold / 100.0)
+	{
+		return false;
+	}
+	// If not including areas based on poorly-OCR'd text, ensure the area is based on well OCR'd
+	// text.
+	else if (!m_bIncludePoorOCR && area.m_dOCRConfidence < (double) m_nOCRThreshold / 100.0)
+	{
+		return false;
+	}
+	// Ensure the area meets the required size.
+	else if (!isBigEnough(area))
+	{
+		return false;
+	}
+	// Make sure the area has enough pixels
+	else if (!hasEnoughPixels(area))
+	{
+		return false;
+	}
+
+	return true;
 }
 //--------------------------------------------------------------------------------------------------
 bool CSplitRegionIntoContentAreas::isExcluded(CPoint &rpoint)
@@ -2642,21 +2670,6 @@ bool CSplitRegionIntoContentAreas::isAreaAbove(const CRect &rect1, const CRect &
 	}
 }
 //--------------------------------------------------------------------------------------------------
-CSize CSplitRegionIntoContentAreas::getAvgCharSize(int nAvgCharWidth, int nAvgLineHeight)
-{
-	// The line height is greater that the average character height. Therefore, reduce the line  
-	// height value so it more closely approximates average character height rather than maximum
-	// character height. (In experimentation, 2 / 3 of the line height seemed to be a decent
-	// approximation)
-	CSize sizeAvgChar(nAvgCharWidth, nAvgLineHeight * 2 / 3);
-	
-	// In case we are dealing with poor OCR results, make sure the average height is never more 
-	// than 3 times the width.
-	sizeAvgChar.cy = min(sizeAvgChar.cx * 3, sizeAvgChar.cy);
-
-	return sizeAvgChar;
-}
-//--------------------------------------------------------------------------------------------------
 IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, long nPage,
 														 ContentAreaInfo area,
 														 ILongToObjectMapPtr ipSpatialInfos)
@@ -2697,7 +2710,7 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 
 		// Create a ContentAreaInfo based on the found text in order to assess the OCR confidence
 		// of the text.
-		ContentAreaInfo result(ipValue);
+		ContentAreaInfo result(ipValue, ipSpatialInfos);
 
 		// If OCR quality of the text this area is based off of or the OCR quality of text in the
 		// final area is poor, re-OCR the text using handwriting recognition if so specified.
@@ -2718,7 +2731,7 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 						VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, NULL);
 
 					// Create a new area based on the OCR'd text to score the OCR confidence.
-					ContentAreaInfo areaReOCRd(ipZoneText);
+					ContentAreaInfo areaReOCRd(ipZoneText, ipSpatialInfos);
 
 					// Update to use the handwritten result if confidence is higher.
 					if (areaReOCRd.m_dOCRConfidence > result.m_dOCRConfidence)
@@ -2844,11 +2857,23 @@ bool CSplitRegionIntoContentAreas::loadPageBitmap(IAFDocumentPtr ipDoc, long nPa
 			ISpatialPageInfoPtr ipPageInfo = ipPageText->GetPageInfo(nPage);
 			ASSERT_RESOURCE_ALLOCATION("ELI22125", ipPageInfo != NULL);
 
+			double dRotation = ipPageInfo->Deskew;
+
+			// Determine which way to orient the search based on the page text orientation.
+			switch (ipPageInfo->Orientation)
+			{
+				case kRotNone: dRotation += 0; break;
+				case kRotLeft: dRotation += 90; break;
+				case kRotDown: dRotation += 180; break;
+				case kRotRight: dRotation += 270; break;
+			}
+
 			m_apPageBitmap.reset(new LeadToolsBitmap(asString(ipPageText->SourceDocName), nPage, 
-				-ipPageInfo->Deskew));
+				-dRotation));
 			ASSERT_RESOURCE_ALLOCATION("ELI22124", m_apPageBitmap.get() != NULL);
 
-			m_rectCurrentPage.SetRect(0, 0, ipPageInfo->Width, ipPageInfo->Height);
+			m_rectCurrentPage.SetRect(0, 0,
+				m_apPageBitmap->m_hBitmap.Width, m_apPageBitmap->m_hBitmap.Height);
 
 			// Reset any existing line data and attempt to find lines on this page
 			m_vecHorizontalLines.clear();
@@ -2876,7 +2901,7 @@ bool CSplitRegionIntoContentAreas::loadPageBitmap(IAFDocumentPtr ipDoc, long nPa
 				}
 			}
 		}
-
+		
 		return true;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26620");
@@ -2955,6 +2980,7 @@ void CSplitRegionIntoContentAreas::reset()
 	m_bUseLines = true;
 	m_bReOCRWithHandwriting = false;
 	m_bIncludeOCRAsTrueSpatialString = false;
+	m_nRequiredHorizontalSeparation = gnMIN_CHAR_SEPARATION_OF_LINES;
 }
 //-------------------------------------------------------------------------------------------------
 void CSplitRegionIntoContentAreas::validateHandwritingLicense()

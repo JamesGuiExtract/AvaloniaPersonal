@@ -1105,6 +1105,35 @@ library UCLID_RASTERANDOCRMGMTLib
 		[id(90), helpstring("method InsertString")]
 			HRESULT InsertString([in] long nPos, [in] BSTR bstrString);
 		//-----------------------------------------------------------------------------------------
+		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
+		//			pPageInfoMap contains an entry for each page on which the spatial sting is present.
+		// PURPOSE: Returns a vector of IRasterZones that represent the spatial string relative to
+		//			the specified page infos.
+		//			If GetMode() == kSpatialMode, raster zones are computed and returned for each line of this
+		//			spatial string.
+		//			If GetMode() == kHybridMode, a *COPY* of all raster zones artificially associated
+		//			with this spatial string will be returned.
+		[id(91), helpstring("method GetTranslatedImageRasterZones")]
+			HRESULT GetTranslatedImageRasterZones([in] ILongToObjectMap* pPageInfoMap, 
+				[out, retval] IIUnknownVector** ppRasterZones);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
+		//			IsMultiPage == VARIANT_FALSE
+		///			pPageInfoMap contains an entry the page the spatial string is on.
+		// PROMISE: To return an ILongRectangle containing the bounds of the spatial string relative
+		//			to the specified page info.
+		// PURPOSE: Will return the smallest possible top, left, bottom, right bounding box that covers 
+		//			all the raster zones or letters vector entries completely.
+		[id(92), helpstring("method GetTranslatedImageBounds")]
+			HRESULT GetTranslatedImageBounds([in] ILongToObjectMap* pPageInfoMap,
+											  [out, retval] ILongRectangle** ppBounds);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PURPOSE:	Return a good approximation of the height (in pixels) of an average character.
+		// NOTE:	This value will be smaller than the result of GetAverageLineHeight which
+		//			measures average the distance between lines.
+		[id(93), helpstring("method GetAverageCharHeight")] HRESULT GetAverageCharHeight(
+			[out, retval] long* lpHeight);	
 	};
 
 	[

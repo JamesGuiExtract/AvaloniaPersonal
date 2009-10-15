@@ -62,6 +62,7 @@ LRESULT CSplitRegionIntoContentAreasPP::OnInitDialog(UINT uMsg, WPARAM wParam, L
 		m_chkIncludeOCRAsTrueSpatialString	= GetDlgItem(IDC_CHECK_OCR_AS_SUBATTRIBUTE);
 		m_editAttributeName					= GetDlgItem(IDC_EDIT_SUBATTRIBUTE_NAME);
 		m_editDefaultAttributeText			= GetDlgItem(IDC_EDIT_DEFAULT_TEXT);
+		m_editRequiredHorizontalSeparation	= GetDlgItem(IDC_EDIT_REQD_HORZ_SEPARATION);
 
 		// Load the rule values into the property page.
 		m_editMinimumWidth.SetWindowText(asString(ipRule->MinimumWidth, 2).c_str());
@@ -77,6 +78,8 @@ LRESULT CSplitRegionIntoContentAreasPP::OnInitDialog(UINT uMsg, WPARAM wParam, L
 			asBSTChecked(ipRule->IncludeOCRAsTrueSpatialString));
 		m_editAttributeName.SetWindowText(asString(ipRule->AttributeName).c_str());
 		m_editDefaultAttributeText.SetWindowText(asString(ipRule->DefaultAttributeText).c_str());
+		m_editRequiredHorizontalSeparation.SetWindowText(
+			asString(ipRule->RequiredHorizontalSeparation).c_str());
 		
 		SetDirty(FALSE);
 
@@ -172,6 +175,11 @@ STDMETHODIMP CSplitRegionIntoContentAreasPP::Apply(void)
 
 			ipRule->IncludeOCRAsTrueSpatialString = 
 				asVariantBool(m_chkIncludeOCRAsTrueSpatialString.GetCheck() == BST_CHECKED);
+
+			ipRule->RequiredHorizontalSeparation = verifyControlValueAsLong(
+				m_editRequiredHorizontalSeparation, 0, 9999999, 
+				"The character width to determine whether content areas be merged must be >= 0", 4,
+				"Please specify the character width to determine whether content areas be merged.");
 
 			// Retrieve the specified attribute name
 			CComBSTR bstrAttributeName;

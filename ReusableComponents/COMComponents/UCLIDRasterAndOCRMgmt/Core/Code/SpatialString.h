@@ -93,6 +93,7 @@ public:
 	STDMETHOD(GetPages)( IIUnknownVector **pvecPages);
 	STDMETHOD(GetAverageLineHeight)( long *lpHeight);
 	STDMETHOD(GetAverageCharWidth)( long* lpWidth);
+	STDMETHOD(GetAverageCharHeight)( long *lpHeight);
 	STDMETHOD(GetRelativePages)( long nStartPageNum,  long nEndPageNum,  ISpatialString** ppResultString);
 	STDMETHOD(GetSplitLines)( long nMaxSpace,  IIUnknownVector** ppResultVector);
 	STDMETHOD(CreateFromLines)( IIUnknownVector* pLines);
@@ -152,6 +153,9 @@ public:
 		IVariantVector** ppZoneOCRConfidenceTiers, IIUnknownVector** ppRasterZones);
 	STDMETHOD(GetOCRImageBounds)(ILongRectangle** ppBounds);
 	STDMETHOD(InsertString)(long nPos, BSTR bstrText);
+	STDMETHOD(GetTranslatedImageRasterZones)(ILongToObjectMap* pPageInfoMap,
+		IIUnknownVector** ppRasterZones);
+	STDMETHOD(GetTranslatedImageBounds)(ILongToObjectMap* pPageInfoMap, ILongRectangle** ppBounds);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);
@@ -390,6 +394,30 @@ private:
 	UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr translateToOriginalImageZone(
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone);
 	//----------------------------------------------------------------------------------------------
+	// REQUIRE: GetMode != kNonSpatialMode, ipPageInfoMap contains an entry the page the spatial
+	//			string is on.
+	// PURPOSE: Adjusts the coordinates of the raster zone so they are relative to the specified
+	//			spatial page info. (rather than that of the page or OCR coordinates or that of the
+	//			image itself) If ipNewPageInfoMap is NULL, the coordinates returned will be relative
+	//			to the original image coordinates.
+	UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr translateToNewPageInfo(
+		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone,
+		ILongToObjectMapPtr ipNewPageInfoMap = NULL);
+	//----------------------------------------------------------------------------------------------
+	// PURPOSE: Adjusts the specified coordinates so they are relative to the specified spatial page
+	//			info. If ipNewPageInfoMap is NULL, the coordinates returned will be relative to the
+	//			original image coordinates.
+	UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr translateToNewPageInfo(long lStartX, long lStartY,
+		long lEndX, long lEndY, long lHeight, int nPage,
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo = NULL);
+	//----------------------------------------------------------------------------------------------
+	// PURPOSE: Given an image of the specified width and height, returns the center point (with
+	//			x and y coordinates inverted if specified.
+	CPoint getImageCenterPoint(int nImageWidth, int nImageHeight, bool invertCoordinates);
+	//----------------------------------------------------------------------------------------------
+	// PURPOSE: Obtains the angle represented by the combination of the specified orientation and skew.
+	double getTheta(UCLID_RASTERANDOCRMGMTLib::EOrientation eOrient, double deskew);
+	//----------------------------------------------------------------------------------------------
 	// REQUIRE: HasSpatialInfo() == true
 	// PURPOSE: To return a vector of raster zones in the OCR coordinate system
 	vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> getOCRImageRasterZones();
@@ -401,6 +429,12 @@ private:
 	// REQUIRE: HasSpatialInfo() == true
 	// PURPOSE: To return an IUknownVector of raster zones in the Original image coordinate system
 	IIUnknownVectorPtr getOriginalImageRasterZones();
+	//----------------------------------------------------------------------------------------------
+	// REQUIRE: HasSpatialInfo() == true,  ipNewPageInfoMap contains an entry for the page the
+	//			specified raster zone is on.
+	// PURPOSE: To return an IUknownVector of raster zones in the coordinate system of the specified
+	//			page infos.
+	IIUnknownVectorPtr getTranslatedImageRasterZones(ILongToObjectMapPtr ipNewPageInfoMap);
 	//----------------------------------------------------------------------------------------------
 	// REQUIRE: GetMode == kSpatialMode
 	// PURPOSE: Returns a vector of IRasterZones that represent the spatial string where the
@@ -476,6 +510,12 @@ private:
 	// REQUIRE: m_eMode == kSpatialMode
 	// PURPOSE: To compute the average character width for the spatial string
 	long getAverageCharWidth();
+	//----------------------------------------------------------------------------------------------
+	// REQUIRE: m_eMode == kSpatialMode
+	// PURPOSE: To compute the average character height for the spatial string
+	// NOTE:	This value will be smaller than the result of GetAverageLineHeight which
+	//			measures average the distance between lines.
+	long getAverageCharHeight();
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: To remove the characters in the specified range (will downgrade the string
 	//			if necessary after removing the characters)

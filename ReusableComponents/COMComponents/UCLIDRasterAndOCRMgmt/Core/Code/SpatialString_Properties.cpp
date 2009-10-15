@@ -32,10 +32,10 @@ STDMETHODIMP CSpatialString::get_String(BSTR *pVal)
 		// For all modes the member variable string should be set to the strings value
 		// there should never be a time when it is out of synch, just return that string
 		*pVal = _bstr_t(m_strString.c_str()).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05842")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::get_Size(long *pVal)
@@ -52,10 +52,10 @@ STDMETHODIMP CSpatialString::get_Size(long *pVal)
 		// return the size of the string, which is available
 		// regardless of whether the string is spatial or not
 		*pVal = m_strString.length();
+		
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06439")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::get_SourceDocName(BSTR *pVal)
@@ -71,10 +71,10 @@ STDMETHODIMP CSpatialString::get_SourceDocName(BSTR *pVal)
 
 		// return the current value of the source-doc-name attribute
 		*pVal = _bstr_t(m_strSourceDocName.c_str()).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06804");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::put_SourceDocName(BSTR newVal)
@@ -91,10 +91,10 @@ STDMETHODIMP CSpatialString::put_SourceDocName(BSTR newVal)
 
 		// set the dirty flag to true since a modification was made
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06805");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::get_SpatialPageInfos(ILongToObjectMap** pVal)
@@ -121,10 +121,10 @@ STDMETHODIMP CSpatialString::get_SpatialPageInfos(ILongToObjectMap** pVal)
 		ASSERT_RESOURCE_ALLOCATION("ELI26005", ipShallowCopy != NULL);
 
 		*pVal = ipShallowCopy.Detach();
+		
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09134")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetOCRImageLetter(long nIndex, ILetter **pLetter)
@@ -159,10 +159,10 @@ STDMETHODIMP CSpatialString::GetOCRImageLetter(long nIndex, ILetter **pLetter)
 		
 		// return the reference to the specific letter object
 		*pLetter = (ILetter*) ipLetter.Detach();
+		
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06438")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetChar(long nIndex, long *pChar)
@@ -181,10 +181,10 @@ STDMETHODIMP CSpatialString::GetChar(long nIndex, long *pChar)
 
 		// get the letter object at the specified index
 		*pChar = m_strString[nIndex];
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19461")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::SetChar(long nIndex, long nChar)
@@ -224,10 +224,10 @@ STDMETHODIMP CSpatialString::SetChar(long nIndex, long nChar)
 
 		// set the dirty flag to true since a modification was made
 		m_bDirty = true;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06865");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetOCRImageLetterArray(long* pnNumLetters, void** ppLetters)
@@ -247,10 +247,10 @@ STDMETHODIMP CSpatialString::GetOCRImageLetterArray(long* pnNumLetters, void** p
 
 		*pnNumLetters = m_vecLetters.size();
 		*ppLetters = &(m_vecLetters[0]);
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10463")
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetOriginalImageBounds(ILongRectangle **pBounds)
@@ -335,10 +335,10 @@ STDMETHODIMP CSpatialString::GetWords(IIUnknownVector **pvecWords)
 
 		// Return the vector of word strings
 		*pvecWords = ipWords.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06436")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetLines(IIUnknownVector **pvecLines)
@@ -358,10 +358,10 @@ STDMETHODIMP CSpatialString::GetLines(IIUnknownVector **pvecLines)
 
 		// Return the vector of line  strings
 		*pvecLines = ipLines.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06435")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetParagraphs(IIUnknownVector **pvecParagraphs)
@@ -394,10 +394,10 @@ STDMETHODIMP CSpatialString::GetParagraphs(IIUnknownVector **pvecParagraphs)
 
 		// Return the vector of paragraph strings
 		*pvecParagraphs = ipParagraphs.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06434")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPageNum, 
@@ -834,10 +834,10 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 
 		// Return the vector of zone strings
 		*pvecPages = ipPages.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07481");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetAverageLineHeight(long *lpHeight)
@@ -1026,10 +1026,10 @@ STDMETHODIMP CSpatialString::GetAverageLineHeight(long *lpHeight)
 			}
 			*lpHeight = totalHeight / numLines;
 		}
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07793");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetAverageCharWidth(long *lpWidth)
@@ -1044,9 +1044,28 @@ STDMETHODIMP CSpatialString::GetAverageCharWidth(long *lpWidth)
 		validateLicense();
 
 		*lpWidth = getAverageCharWidth();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07805");
-	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::GetAverageCharHeight(long *lpHeight)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI28047", lpHeight != NULL);
+
+		// Check license
+		validateLicense();
+
+		*lpHeight = getAverageCharHeight();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28048");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetSplitLines(long nMaxSpace, IIUnknownVector** ppResultVector)
@@ -1181,9 +1200,10 @@ STDMETHODIMP CSpatialString::GetSplitLines(long nMaxSpace, IIUnknownVector** ppR
 			}
 		}
 		*ppResultVector = ipNewLines.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08817");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetJustifiedBlocks(long nMinLines, IIUnknownVector** ppResultVector)
@@ -1338,9 +1358,10 @@ STDMETHODIMP CSpatialString::GetJustifiedBlocks(long nMinLines, IIUnknownVector*
 			vecTmpLines.clear();
 		}
 		*ppResultVector = ipNewBlocks.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08850");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetBlocks(long nMinLines, IIUnknownVector** ppResultVector)
@@ -1465,9 +1486,10 @@ STDMETHODIMP CSpatialString::GetBlocks(long nMinLines, IIUnknownVector** ppResul
 			vecTmpLines.clear();
 		}
 		*ppResultVector = ipNewBlocks.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08851");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetNextOCRImageSpatialLetter(long nStartPos, ILetter** pLetter, long* pIndex)
@@ -1551,9 +1573,10 @@ STDMETHODIMP CSpatialString::GetNextNonSpatialLetter(long nStartPos, ILetter** p
 			}
 		}
 		*pIndex = lIndex;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08969");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetIsEndOfWord(long nIndex, VARIANT_BOOL* pbIsEnd)
@@ -1570,9 +1593,10 @@ STDMETHODIMP CSpatialString::GetIsEndOfWord(long nIndex, VARIANT_BOOL* pbIsEnd)
 		verifyValidIndex(nIndex);
 		
 		*pbIsEnd = asVariantBool( getIsEndOfWord(nIndex) );
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08984");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetIsEndOfLine(long nIndex, VARIANT_BOOL* pbIsEnd)
@@ -1589,9 +1613,10 @@ STDMETHODIMP CSpatialString::GetIsEndOfLine(long nIndex, VARIANT_BOOL* pbIsEnd)
 		verifyValidIndex(nIndex);
 		
 		*pbIsEnd = asVariantBool( getIsEndOfLine(nIndex) );
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08985");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetPageInfo(long nPageNum, ISpatialPageInfo** ppPageInfo)
@@ -1624,9 +1649,10 @@ STDMETHODIMP CSpatialString::GetPageInfo(long nPageNum, ISpatialPageInfo** ppPag
 			m_ipPageInfoMap->GetValue(nPageNum);
 		ASSERT_RESOURCE_ALLOCATION("ELI09125", ipPageInfo != NULL);
 		*ppPageInfo = (ISpatialPageInfo*)ipPageInfo.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11227");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::SetPageInfo(long nPageNum, ISpatialPageInfo* pPageInfo)
@@ -1656,6 +1682,8 @@ STDMETHODIMP CSpatialString::SetPageInfo(long nPageNum, ISpatialPageInfo* pPageI
 		}
 		 
 		getPageInfoMap()->Set(nPageNum, (IUnknown*)pPageInfo);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09124");
 }
@@ -1674,6 +1702,8 @@ STDMETHODIMP CSpatialString::GetOCRImageRasterZones(IIUnknownVector** ppRasterZo
 		ASSERT_RESOURCE_ALLOCATION("ELI25880", ipZones != NULL);
 
 		*ppRasterZones = ipZones.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25881");
 }
@@ -1706,6 +1736,38 @@ STDMETHODIMP CSpatialString::GetOriginalImageRasterZones(IIUnknownVector** ppRas
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09123");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::GetTranslatedImageRasterZones(ILongToObjectMap* pPageInfoMap,
+														   IIUnknownVector** ppRasterZones)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	try
+	{
+		ASSERT_ARGUMENT("ELI28033", ppRasterZones != NULL);
+		
+		ILongToObjectMapPtr ipPageInfoMap(pPageInfoMap);
+		ASSERT_ARGUMENT("ELI28034", ipPageInfoMap != NULL);
+
+		// Check license
+		validateLicense();
+
+		// This operation requires that this object has spatial information
+		if( m_eMode == kNonSpatialMode )
+		{
+			UCLIDException ue( "ELI28035", "GetRasterZones() requires a spatial string!");
+			throw ue;
+		}
+
+		// This vector will hold the raster zones and be returned to the caller
+		IIUnknownVectorPtr ipZones = getTranslatedImageRasterZones(ipPageInfoMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI28036", ipZones != NULL);
+
+		// Detach the created vector of RasterZones and return.
+		*ppRasterZones = ipZones.Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28037");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetFirstPageNumber(long* pRet)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1717,9 +1779,10 @@ STDMETHODIMP CSpatialString::GetFirstPageNumber(long* pRet)
 		validateLicense();
 
 		*pRet = getFirstPageNumber();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19467");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetLastPageNumber(long* pRet)
@@ -1733,9 +1796,10 @@ STDMETHODIMP CSpatialString::GetLastPageNumber(long* pRet)
 		validateLicense();
 
 		*pRet = getLastPageNumber();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09179");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetCharConfidence(long* pnMinConfidence, long* pnMaxConfidence, 
@@ -1816,10 +1880,10 @@ STDMETHODIMP CSpatialString::GetCharConfidence(long* pnMinConfidence, long* pnMa
 		{
 			*pnAvgConfidence = nAvgConfidence;
 		}
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10625")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetFontSizeDistribution(ILongToLongMap** ppMap)
@@ -1864,10 +1928,10 @@ STDMETHODIMP CSpatialString::GetFontSizeDistribution(ILongToLongMap** ppMap)
 		}
 
 		*ppMap = ipMap.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10658");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetFontInfo(long nMinPercentage, VARIANT_BOOL* pbItalic, 
@@ -1981,10 +2045,10 @@ STDMETHODIMP CSpatialString::GetFontInfo(long nMinPercentage, VARIANT_BOOL* pbIt
 		{
 			checkForFontInfo( pbSubScript, nNumSubScript, nNumSpatialChars, nMinPercentage);
 		}
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10686");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetMode(/*[out, retval]*/ ESpatialStringMode *pVal)
@@ -1999,9 +2063,10 @@ STDMETHODIMP CSpatialString::GetMode(/*[out, retval]*/ ESpatialStringMode *pVal)
 		validateLicense();
 
 		*pVal = m_eMode;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14774");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::HasSpatialInfo(VARIANT_BOOL *pbValue)
@@ -2016,10 +2081,10 @@ STDMETHODIMP CSpatialString::HasSpatialInfo(VARIANT_BOOL *pbValue)
 		validateLicense();
 
 		*pbValue = asVariantBool(m_eMode != kNonSpatialMode);
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14812")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::IsMultiPage(VARIANT_BOOL* pbRet)
@@ -2033,9 +2098,10 @@ STDMETHODIMP CSpatialString::IsMultiPage(VARIANT_BOOL* pbRet)
 		validateLicense();
 
 		*pbRet = asVariantBool(isMultiPage());
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09178");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::IsEmpty(VARIANT_BOOL *pvbIsEmpty)
@@ -2049,10 +2115,10 @@ STDMETHODIMP CSpatialString::IsEmpty(VARIANT_BOOL *pvbIsEmpty)
 		validateLicense();
 
 		*pvbIsEmpty = asVariantBool( m_strString.empty() );
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16806");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetWordLengthDist(long* plTotalWords, ILongToLongMap** ppWordLengthMap)
@@ -2119,10 +2185,10 @@ STDMETHODIMP CSpatialString::GetWordLengthDist(long* plTotalWords, ILongToLongMa
 		}
 
 		*ppWordLengthMap = ipMapLngthToCount.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI20620");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetOCRImageRasterZonesGroupedByConfidence(
@@ -2155,9 +2221,10 @@ STDMETHODIMP CSpatialString::GetOCRImageRasterZonesGroupedByConfidence(
 		// zone.
 		*ppZoneOCRConfidenceTiers = ipZoneOCRConfidenceTiers.Detach();
 		*ppRasterZones = ipZones.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25368");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetOriginalImageRasterZonesGroupedByConfidence(
@@ -2190,9 +2257,10 @@ STDMETHODIMP CSpatialString::GetOriginalImageRasterZonesGroupedByConfidence(
 		// zone.
 		*ppZoneOCRConfidenceTiers = ipZoneOCRConfidenceTiers.Detach();
 		*ppRasterZones = ipZones.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25710");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetOCRImageBounds(ILongRectangle** ppBounds)
@@ -2249,5 +2317,65 @@ STDMETHODIMP CSpatialString::GetOCRImageBounds(ILongRectangle** ppBounds)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25718")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::GetTranslatedImageBounds(ILongToObjectMap* pPageInfoMap,
+													  ILongRectangle** ppBounds)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI28038", ppBounds != NULL);
+
+		ILongToObjectMapPtr ipPageInfoMap(pPageInfoMap);
+		ASSERT_ARGUMENT("ELI28039", ipPageInfoMap != NULL);
+
+		// Check license
+		validateLicense();
+
+		// this operation requires that this string is a string with spatial info associated with it
+		if( m_eMode == kNonSpatialMode)
+		{
+			UCLIDException ue("ELI28040", "Unable to get bounds on a non-spatial string!");
+			throw ue;
+		}
+
+		// This operation also requires that IsMultiPage == VARIANT_FALSE
+		if(isMultiPage())
+		{
+			UCLIDException ue("ELI28041", "Spatial String must not be multi-page for GetBounds!");
+			throw ue;
+		}
+
+		// Declare the long rectangle to hold the return value
+		ILongRectanglePtr ipLongRectangle = NULL;
+
+		// Get the Raster zones for this spatial string
+		IIUnknownVectorPtr ipZones = getTranslatedImageRasterZones(ipPageInfoMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI28042", ipZones != NULL);
+		if (ipZones->Size() > 0)
+		{
+			// Get the first raster zone
+			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipZones->At(0);
+			ASSERT_RESOURCE_ALLOCATION("ELI28043", ipZone != NULL);
+
+			// Get a bounding rectangle for the raster zones (do not restrict the rectangle)
+			ipLongRectangle = ipZone->GetBoundsFromMultipleRasterZones(ipZones, NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28044", ipLongRectangle != NULL);
+		}
+		else
+		{
+			// There are no raster zones, just return an empty rectangle
+			ipLongRectangle.CreateInstance(CLSID_LongRectangle);
+			ASSERT_RESOURCE_ALLOCATION("ELI28045", ipLongRectangle != NULL);
+		}
+
+		// return the long rectangle
+		*ppBounds = ipLongRectangle.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28046")
 }
 //-------------------------------------------------------------------------------------------------

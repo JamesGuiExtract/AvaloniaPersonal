@@ -56,11 +56,34 @@ LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ul
 	// If the specified rotation is >= gnMIN_ROTATION, rotate the image as requested 
 	if (abs(nRotation) >= gnMIN_ROTATION)
 	{
-		// Rotate the bitmap.  Do not use ROTATE_RESIZE parameter: if we change the 
-		// dimensions of the page we are working on, it may cause problems.
-		nRet = L_RotateBitmap(&m_hBitmap, nRotation, 0, RGB(255, 255, 255));
+		// Determine if the image is to be rotated such that it is to be closer to perpendicular
+		// to the original orientation than parallel.
+		bool perpendicular = (round(dRotation / 90) % 2 != 0);
+		CSize sizeOrig(m_hBitmap.Width, m_hBitmap.Height);
+
+		// Rotate the bitmap.
+		// Allow resizing of the image if it is to be rotated perpendicular to the original
+		// orientation-- otherwise unless the image is square, text is likely to extend out of the
+		// image bounds in one direction while there will be empty whitespace at either end in the
+		// other direction.
+		nRet = L_RotateBitmap(&m_hBitmap, nRotation, perpendicular ? ROTATE_RESIZE : 0, 
+			RGB(255, 255, 255));
 		throwExceptionIfNotSuccess(nRet, "ELI22117", 
 			"Internal error: Unable to apply rotation to image!", m_strImageFileName);
+
+		// If the image was rotated and allowed to resized, it needs to be trimmed back to the
+		// original page dimensions so that OCR coordinates remain valid. (Otherwise they will
+		// be offset by the amount of space that was added to the left & top edges of the image.
+		if (perpendicular)
+		{
+			int	nXTrimAmount = (m_hBitmap.Width - sizeOrig.cy) / 2;
+			int	nYTrimAmount = (m_hBitmap.Height - sizeOrig.cx) / 2;
+
+			nRet = L_TrimBitmap(&m_hBitmap, nXTrimAmount, nYTrimAmount,
+				m_hBitmap.Width - (2 * nXTrimAmount), m_hBitmap.Height - (2 * nYTrimAmount));
+			throwExceptionIfNotSuccess(nRet, "ELI27740", 
+				"Internal error: Unable to trim rotated image!", m_strImageFileName);
+		}
 	}
 
 	// Set the image palette to white, black to ensure consistency in reading image data

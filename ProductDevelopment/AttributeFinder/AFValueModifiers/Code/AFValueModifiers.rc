@@ -372,7 +372,7 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON,175,66,140,11
 END
 
-IDD_SPLITREGIONINTOCONTENTAREASPP DIALOGEX 0, 0, 388, 243
+IDD_SPLITREGIONINTOCONTENTAREASPP DIALOGEX 0, 0, 388, 278
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -391,18 +391,22 @@ BEGIN
     LTEXT           "Treat text as well OCRed if the character confidence is at least:",IDC_STATIC,18,82,204,8
     EDITTEXT        IDC_EDIT_OCR_THRESHOLD,224,80,24,14,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,251,83,8,8
-    GROUPBOX        "Result properties",IDC_STATIC,6,105,375,132
+    GROUPBOX        "Result merging",IDC_STATIC,6,102,375,30
+    LTEXT           "Combine two results on the same line separated by less than the width of",IDC_STATIC,18,114,236,8
+    EDITTEXT        IDC_EDIT_REQD_HORZ_SEPARATION,258,112,18,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "average characters",IDC_STATIC,282,114,66,8
+    GROUPBOX        "Result properties",IDC_STATIC,6,138,375,132
     CONTROL         "Exclude pixel content of lines from content areas",IDC_CHECK_USE_LINES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,117,180,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,150,180,10
     CONTROL         "If the text in the final area is not OCR'd well, attempt to re-OCR the area with handwriting recognition.",IDC_CHECK_RE_OCR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,133,342,10
-	LTEXT           "(May yield better results versus re-OCRing the original attribute's spatial region as a whole)",IDC_STATIC,28,144,296,8
-	CONTROL         "Include the area's OCR'd text as a true spatial sting in a grandchild attribute.",IDC_CHECK_OCR_AS_SUBATTRIBUTE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,159,342,10
-    EDITTEXT        IDC_EDIT_SUBATTRIBUTE_NAME,18,188,196,12,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_DEFAULT_TEXT,18,217,196,12,ES_AUTOHSCROLL
-    LTEXT           "Default content text value:",IDC_STATIC,18,206,114,8
-    LTEXT           "Sub-attribute name:",IDC_STATIC,18,176,114,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,166,342,10
+    LTEXT           "(May yield better results versus re-OCRing the original attribute's spatial region as a whole)",IDC_STATIC,28,177,296,8
+    CONTROL         "Include the area's OCR'd text as a true spatial sting in a grandchild attribute.",IDC_CHECK_OCR_AS_SUBATTRIBUTE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,191,342,10
+    EDITTEXT        IDC_EDIT_SUBATTRIBUTE_NAME,18,221,196,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DEFAULT_TEXT,18,250,196,12,ES_AUTOHSCROLL
+    LTEXT           "Default content text value:",IDC_STATIC,18,239,114,8
+    LTEXT           "Sub-attribute name:",IDC_STATIC,18,209,114,8
 END
 
 
@@ -475,7 +479,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 381
         TOPMARGIN, 7
-        BOTTOMMARGIN, 235
+        BOTTOMMARGIN, 270
     END
 END
 #endif    // APSTUDIO_INVOKED

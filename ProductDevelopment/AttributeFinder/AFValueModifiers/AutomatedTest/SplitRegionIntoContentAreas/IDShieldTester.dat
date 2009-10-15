@@ -14,13 +14,13 @@
 // Splitter, Signature line, text overlaps handwritten attribute
 <TESTFOLDER>;.\Test03.rsd;.\AutomatedTestFiles\Images\MDOT_LIR_003\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test03.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test03.voa
 
-// Splitter, Signature line, text overlaps handwritten attribute, exclude < 11 chars
+// Splitter, Signature line, text overlaps handwritten attribute, exclude < 20 chars
 <TESTFOLDER>;.\Test04.rsd;.\AutomatedTestFiles\Images\MDOT_LIR_003\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test04.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test04.voa
 
 // Splitter, Signature line, text overlaps handwritten attribute, exclude > 60% OCR
 <TESTFOLDER>;.\Test05.rsd;.\AutomatedTestFiles\Images\MDOT_LIR_003\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test05.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test05.voa
 
-// Splitter, Signature line, text overlaps handwritten attribute, include only > 85% OCR
+// Splitter, Signature line, text overlaps handwritten attribute, include only > 60% OCR
 <TESTFOLDER>;.\Test06.rsd;.\AutomatedTestFiles\Images\MDOT_LIR_003\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test06.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test06.voa
 
 // Splitter, Signature line, text overlaps handwritten attribute, exclude > 60% OCR, UseLines off
@@ -41,7 +41,7 @@
 // Modifier, Tests that handwriting OCR improves recognition enough to find driver's license numbers
 <TESTFOLDER>;.\Test12.rsd;.\AutomatedTestFiles\Images\0092001408\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test12.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test12.voa
 
-// Modifier, Tests requiring content areas to be at least 2 avg char sizes tall
+// Modifier, Tests requiring content areas to be at least 5 avg char sizes tall
 <TESTFOLDER>;.\Test13.rsd;.\AutomatedTestFiles\Images\O--1992-12-31-1-00957\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test13.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test13.voa
 
 // Modifier, Tests eliminating results of type "Probable Text"
@@ -52,3 +52,6 @@
 
 // Modifier, Tests using SelectPageRegion Preprocesser that excludes first page
 <TESTFOLDER>;.\Test16.rsd;.\AutomatedTestFiles\Images\LabRecord\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test16.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test16.voa
+
+// Modifier, Signature areas, multi-page, exclude > 60% OCR, Merge areas less than 8 chars apart, areas > 10 wide (Derivative of test 2)
+<TESTFOLDER>;.\Test17.rsd;.\AutomatedTestFiles\Images\LineArea\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test17.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test17.voa

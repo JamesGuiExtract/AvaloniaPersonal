@@ -1929,10 +1929,47 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToOriginalIma
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI25704", m_eMode != kNonSpatialMode);
-
 		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo = m_ipPageInfoMap->GetValue(nPage);
 		ASSERT_RESOURCE_ALLOCATION("ELI25363", ipPageInfo != NULL);
+
+		return translateToNewPageInfo(lStartX, lStartY, lEndX, lEndY, lHeight, nPage);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25823");
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo(
+	UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone, ILongToObjectMapPtr ipNewPageInfoMap/*= NULL*/)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI28025", m_eMode != kNonSpatialMode);
+		ASSERT_ARGUMENT("ELI28026", ipZone != NULL);
+
+		// Get the data from the raster zone
+		long lStartX, lStartY, lEndX, lEndY, lHeight, lPageNum;
+		ipZone->GetData(&lStartX, &lStartY, &lEndX, &lEndY, &lHeight, &lPageNum);
+		
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo = NULL;
+		if (ipNewPageInfoMap != NULL)
+		{
+			ipNewPageInfo = ipNewPageInfoMap->GetValue(lPageNum);
+			ASSERT_RESOURCE_ALLOCATION("ELI28027", ipNewPageInfo != NULL);
+		}
+
+		// Return the a new raster zone containing the translated data
+		return translateToNewPageInfo(lStartX, lStartY, lEndX, lEndY, lHeight, lPageNum,
+			ipNewPageInfo);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25822");
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo(
+	long lStartX, long lStartY, long lEndX, long lEndY, long lHeight, int nPage,
+	UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI25704", m_eMode != kNonSpatialMode);
 
 		// Now build the raster zone for this page
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipNewZone(CLSID_RasterZone);
@@ -1955,55 +1992,113 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToOriginalIma
 		double p2X = (double)lEndX;
 		double p2Y = (double)lEndY;
 
+		// Obtain the original page info associated with this spatial string.
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipOrigPageInfo =
+			m_ipPageInfoMap->GetValue(nPage);
+		ASSERT_RESOURCE_ALLOCATION("ELI28028", ipOrigPageInfo != NULL);
+
 		// Get the page information
 		long lOriginalHeight, lOriginalWidth;
 		UCLID_RASTERANDOCRMGMTLib::EOrientation eOrient;
 		double deskew;
-		ipPageInfo->GetPageInfo(&lOriginalWidth, &lOriginalHeight, &eOrient, &deskew);
+		ipOrigPageInfo->GetPageInfo(&lOriginalWidth, &lOriginalHeight, &eOrient, &deskew);
 
 		// Define the center of the image relative to the 
 		// top-left coordinate system of the rotated image.
-		// NOTE: ipPageInfo's height and width are relative to the original image.
+		// NOTE: ipOrigPageInfo's height and width are relative to the original image.
 		// The bounding box's coordinates are relative to the rotated image.
-		double cx = 0;
-		double cy = 0;
-		switch (eOrient)
-		{
-		case kRotNone:
-		case kRotDown:
-			{
-				// the original and rotated image share the same height and width
-				cx = lOriginalWidth / 2.0;
-				cy = lOriginalHeight / 2.0;
-			}
-			break;
-
-		case kRotLeft:
-		case kRotRight:
-			{
-				// the original width and height were transposed in the rotated image
-				cy = lOriginalWidth / 2.0;
-				cx = lOriginalHeight / 2.0;
-			}
-			break;
-
-		default:
-			THROW_LOGIC_ERROR_EXCEPTION("ELI16752");
-		}
+		// The original image coordinates need to be inverted to obtain the center point of an image
+		// that has been rotated to the left or right.
+		bool invertOrigCoordinates = (eOrient == kRotLeft || eOrient == kRotRight);
+		CPoint pointCenter = getImageCenterPoint(lOriginalWidth, lOriginalHeight,
+			invertOrigCoordinates);
 
 		// Translate the center of the page to the origin
 		// (ie. convert bounding box's coordinates to Cartesian 
 		// coordinate system with center of image at the origin).
-		p1X -= cx;
-		p1Y = cy - p1Y;
-		p2X -= cx;
-		p2Y = cy - p2Y;
+		p1X -= pointCenter.x;
+		p1Y = pointCenter.y - p1Y;
+		p2X -= pointCenter.x;
+		p2Y = pointCenter.y - p2Y;
 
+		// The angle associated with the current coordinate system.
+		double dOrigTheta = getTheta(eOrient, deskew);
+
+		// The angle associated with the coordinate system we are converting to.
+		double dNewTheta = (ipNewPageInfo == NULL) ? 0 :
+			getTheta(ipNewPageInfo->Orientation, ipNewPageInfo->Deskew);
+
+		// The angle difference between the new and old coordinate systems.
+		double theta = dNewTheta - dOrigTheta;
+
+		// rotate the start and end point counter-clockwise about the origin
+		double sintheta = sin(theta);
+		double costheta = cos(theta);
+		double np1X = p1X*costheta - p1Y*sintheta;
+		double np1Y = p1X*sintheta + p1Y*costheta;
+		double np2X = p2X*costheta - p2Y*sintheta;
+		double np2Y = p2X*sintheta + p2Y*costheta;
+
+		// In order to move the coordinate system origin back to the top-left of the image we will
+		// need to invert the x and y coordinates of the center if the new image coordinate system is
+		// rotated to the left or right.
+		bool invertFinalCoordinates = false;
+		if (ipNewPageInfo != NULL)
+		{
+			invertFinalCoordinates =
+					(ipNewPageInfo->Orientation == kRotLeft || 
+					 ipNewPageInfo->Orientation == kRotRight);
+		}
+
+		// translate the center of the page back
+		// (ie. convert to original image's top-left coordinate system)
+		// NOTE: If the original image was skewed, it is possible that
+		// one of more of these two points exists in the deskewed image
+		// but are outside the boundaries of the original skewed image.
+		// In this case, we will need to make sure the points are contained
+		// within the original image.
+		pointCenter =
+				getImageCenterPoint(lOriginalWidth, lOriginalHeight, invertFinalCoordinates);
+
+		// ensure that the points fit within the bounds of the original image
+		fitPointsWithinBounds(np1X, np1Y, np2X, np2Y, pointCenter.x, pointCenter.y);
+
+		// convert coordinates from Cartesian coordinate system to
+		// original image's top-left coordinate system
+		np1X += pointCenter.x;
+		np1Y = pointCenter.y - np1Y;
+		np2X += pointCenter.x;
+		np2Y = pointCenter.y - np2Y;
+		
+		// create the zone
+		ipNewZone->CreateFromData((long) np1X, (long) np1Y, (long) np2X, (long) np2Y,
+			lHeight, nPage);
+
+		return ipNewZone;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28029");
+}
+//-------------------------------------------------------------------------------------------------
+CPoint CSpatialString::getImageCenterPoint(int nImageWidth, int nImageHeight, bool invertCoordinates)
+{
+	CPoint pointCenter(nImageWidth / 2, nImageHeight / 2);
+
+	if (invertCoordinates)
+	{
+		pointCenter = CPoint(pointCenter.y, pointCenter.x);
+	}
+
+	return pointCenter;
+}
+//-------------------------------------------------------------------------------------------------
+double CSpatialString::getTheta(UCLID_RASTERANDOCRMGMTLib::EOrientation eOrient, double deskew)
+{
+	try
+	{
 		// determine theta (ie. rotation + deskew)
 		// NOTE: A positive deskew means the original image was rotated 
-		// counter-clockwise. We will be rotating counter-clockwise, so 
-		// to reverse the deskew we need to reverse the sign of the deskew.
-		double theta = -deskew;
+		// counter-clockwise.
+		double theta = deskew;
 		switch (eOrient)
 		{
 		case kRotNone:
@@ -2013,17 +2108,17 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToOriginalIma
 			}
 		case kRotRight:
 			{
-				theta += 90;
+				theta -= 90;
 				break;
 			}
 		case kRotDown:
 			{
-				theta += 180;
+				theta -= 180;
 				break;
 			}
 		case kRotLeft:
 			{
-				theta -= 90;
+				theta -= 270;
 				break;
 			}
 		case kRotFlipped:
@@ -2038,70 +2133,9 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToOriginalIma
 		}
 
 		// convert theta to radians
-		theta = convertDegreesToRadians(theta);
-
-		// rotate the start and end point counter-clockwise about the origin
-		double sintheta = sin(theta);
-		double costheta = cos(theta);
-		double np1X = p1X*costheta - p1Y*sintheta;
-		double np1Y = p1X*sintheta + p1Y*costheta;
-		double np2X = p2X*costheta - p2Y*sintheta;
-		double np2Y = p2X*sintheta + p2Y*costheta;
-
-		// translate the center of the page back
-		// (ie. convert to original image's top-left coordinate system)
-		// NOTE: If the original image was skewed, it is possible that
-		// one of more of these two points exists in the deskewed image
-		// but are outside the boundaries of the original skewed image.
-		// In this case, we will need to make sure the points are contained
-		// within the original image.
-		switch (eOrient)
-		{
-		case kRotNone:
-		case kRotDown:
-			{
-				// ensure that the points fit within the bounds of the original image
-				fitPointsWithinBounds(np1X, np1Y, np2X, np2Y, cx, cy);
-
-				// convert coordinates from Cartesian coordinate system to
-				// original image's top-left coordinate system
-				np1X += cx;
-				np1Y = cy - np1Y;
-				np2X += cx;
-				np2Y = cy - np2Y;
-			}
-			break;
-
-		case kRotLeft:
-		case kRotRight:
-			{
-				// the width and height were transposed when the image was rotated,
-				// so we must transpose them again to convert these coordinates
-				// relative to the original document.
-
-				// ensure that the points fit within the bounds of the original image
-				fitPointsWithinBounds(np1X, np1Y, np2X, np2Y, cy, cx);
-
-				// convert coordinates from Cartesian coordinate system to
-				// original image's top-left coordinate system
-				np1X += cy;
-				np1Y = cx - np1Y;
-				np2X += cy;
-				np2Y = cx - np2Y;
-			}
-			break;
-
-		default:
-			THROW_LOGIC_ERROR_EXCEPTION("ELI16753");
-		}
-
-		// create the zone
-		ipNewZone->CreateFromData((long) np1X, (long) np1Y, (long) np2X, (long) np2Y,
-			lHeight, nPage);
-
-		return ipNewZone;
+		return convertDegreesToRadians(theta);
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25823");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28030");
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialString::downgradeToHybrid()
@@ -2486,6 +2520,48 @@ IIUnknownVectorPtr CSpatialString::getParagraphs()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25835");
 }
 //-------------------------------------------------------------------------------------------------
+long CSpatialString::getAverageCharHeight()
+{
+	try
+	{
+		// Make sure this string is spatial
+		verifySpatialness();
+
+		// Keep track of the width of all the characters put together
+		// and the number of character in order to calculate the mean width
+		long totalCharHeight = 0;
+		long numChars = 0;
+
+		// Default the return value to 0
+		long lReturnVal = 0;
+
+		// Get the average width of all the spatial characters in the string(don't worry about 
+		// space between chars)
+		for (unsigned int uiLetter = 0; uiLetter < m_vecLetters.size(); uiLetter++)
+		{	
+			CPPLetter& letter = m_vecLetters[uiLetter];
+
+			if(!letter.m_bIsSpatial)
+			{
+				continue;
+			}
+
+			totalCharHeight += letter.m_usBottom - letter.m_usTop;
+			numChars++;
+		}
+
+		// Check for characters found
+		if (numChars > 0)
+		{
+			// Calculate the average height of the chars.
+			lReturnVal = (long)(totalCharHeight / numChars);
+		}
+
+		return lReturnVal;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28031");
+}
+//-------------------------------------------------------------------------------------------------
 long CSpatialString::getAverageCharWidth()
 {
 	try
@@ -2730,6 +2806,41 @@ IIUnknownVectorPtr CSpatialString::getOriginalImageRasterZones()
 			ASSERT_RESOURCE_ALLOCATION("ELI25849", ipZone != NULL);
 			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipNewZone =
 				translateToOriginalImageZone(ipZone);
+			ASSERT_RESOURCE_ALLOCATION("ELI25850", ipNewZone != NULL);
+
+			ipZones->PushBack(ipNewZone);
+		}
+
+		return ipZones;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25851");
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CSpatialString::getTranslatedImageRasterZones(
+															ILongToObjectMapPtr ipNewPageInfoMap)
+{
+	try
+	{
+		// Ensure the string is spatial
+		if (m_eMode == kNonSpatialMode)
+		{
+			UCLIDException ue("ELI28032", "Cannot get raster zones from a non-spatial string!");
+			throw ue;
+		}
+
+		IIUnknownVectorPtr ipZones(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI28024", ipZones != NULL);
+
+		// Get the OCR image raster zones
+		vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> vecZones = getOCRImageRasterZones();
+		for (vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr>::iterator it = vecZones.begin();
+			it != vecZones.end(); it++)
+		{
+			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone(*it);
+			ASSERT_RESOURCE_ALLOCATION("ELI25849", ipZone != NULL);
+
+			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipNewZone =
+				translateToNewPageInfo(ipZone, ipNewPageInfoMap);
 			ASSERT_RESOURCE_ALLOCATION("ELI25850", ipNewZone != NULL);
 
 			ipZones->PushBack(ipNewZone);

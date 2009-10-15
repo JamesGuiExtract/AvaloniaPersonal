@@ -205,14 +205,15 @@
 #define IDC_CHECK_USE_LINES             314
 #define IDC_EDIT_SUBATTRIBUTE_NAME      315
 #define IDC_CHECK_OCR_AS_SUBATTRIBUTE   316
+#define IDC_EDIT_REQD_HORZ_SEPARATION   317
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        317
+#define _APS_NEXT_RESOURCE_VALUE        318
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         317
+#define _APS_NEXT_CONTROL_VALUE         318
 #define _APS_NEXT_SYMED_VALUE           186
 #endif
 #endif

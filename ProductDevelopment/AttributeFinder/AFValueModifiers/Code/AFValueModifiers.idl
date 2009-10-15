@@ -411,6 +411,11 @@ library UCLID_AFVALUEMODIFIERSLib
 		// as a subattribute to the primary result.
 		[propget, id(14), helpstring("property IncludeOCRAsTrueSpatialString")] HRESULT IncludeOCRAsTrueSpatialString([out, retval] VARIANT_BOOL *pVal);
 		[propput, id(14), helpstring("property IncludeOCRAsTrueSpatialString")] HRESULT IncludeOCRAsTrueSpatialString([in] VARIANT_BOOL newVal);		
+
+		// Specifies the horizontal separation (measured in average character width for the page)
+		// required to delineate separate content areas on the same line.
+		[propget, id(15), helpstring("property RequiredHorizontalSeparation")] HRESULT RequiredHorizontalSeparation([out, retval] long *pVal);
+		[propput, id(15), helpstring("property RequiredHorizontalSeparation")] HRESULT RequiredHorizontalSeparation([in] long newVal);
 	};
 
 	//////////////////
