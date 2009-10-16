@@ -1,7 +1,7 @@
 <html>
 
 <HEAD>
-<TITLE>RuleSet Editor - Loop Preprocessor - Testing Checklist</TITLE>
+<TITLE>Loop Preprocessor Testing Checklist</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 <style>
 <!--
@@ -10,12 +10,12 @@
 </HEAD>
 
 <body>
-<h1>Ruleset Editor - Document Preprocessors - Loop Preprocessor<br>
+<h1>Ruleset Editor - Document Preprocessors<br>Loop Preprocessor<br>
 	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
 
-<h2><b>Do Loop type</b></h2>
+<h3><b>Do Loop type</b></h3>
 <ul>
    	<li>Select the <b>Do</b> radio button in the <b>Loop type</b> group box.
    	<li>Confirm that the <b>Loop setup</b> group box contains a label with <br><b>Do<br>{</b>
@@ -126,7 +126,7 @@
       	</ul>
 </ul>
 <p>
-<h2><b>While Loop type</b></h2>
+<h3><b>While Loop type</b></h3>
 <ul>
    	<li>Select the <b>While</b> radio button in the <b>Loop type</b> group box.
    	<li>Confirm that the <b>Loop setup</b> group box contains a label with <b>While this condition is</b>
@@ -238,7 +238,7 @@
       	</ul>
 </ul>
 <p>
-<h2><b>For Loop type</b></h2>
+<h3><b>For Loop type</b></h3>
 <ul>
    	<li>Select the <b>For</b> radio button in the <b>Loop type</b> group box.
    	<li>Confirm that the <b>Loop setup</b> group box contains a label with <br><b>Execute the following 
@@ -303,32 +303,38 @@
 		than zero.
           	<li>Confirm that the <b>Number of iterations</b> edit box accepts only numbers.
       	</ul>
-      		</ul>
+</ul>
 <p>
-      	<li><b>[FlexIDSCore #3196]</b> Loop Preprocessor exceptions</li>
-      		<ul>
-      			<li>Exercise the <b>Loop Preprocessor</b> such that an exception is thrown by one of the components. One possibility is 
-      			to include an invalid regular expression.</li>
-      			<li>Confirm that descriptive exception information is provided.</li>
-      			<li>Create an RSD file test.rsd with a <b>Loop Preprocessor</b> configured such that it will reach the maximum number of iterations
-      			before its condition is fulfilled. Make sure that the option to throw an exception if it reaches the maximum number of iterations is
-      			checked.</li>
-      			<li>Configure another RSD file to find from test.rsd and test it on an image.</li>
-      			<li>Confirm that an exception is thrown and that it contains information about the rsd file containing the loop and the 
-      			input file that was being processed when the exception was thrown.</li>
-      		</ul>
+<h3><b>Miscellaneous</b></h3>
+<ul>
+	<li><b>[FlexIDSCore #3196]</b> Loop Preprocessor exceptions</li>
+	<ul>
+		<li>Exercise the <b>Loop Preprocessor</b> such that an exception is thrown 
+		by one of the components. One possibility is to include an invalid regular 
+		expression.</li>
+      		<li>Confirm that descriptive exception information is provided.</li>
+      		<li>Create an RSD file test.rsd with a <b>Loop Preprocessor</b> configured such 
+		that it will reach the maximum number of iterations before its condition is 
+		fulfilled.  Make sure that the option to throw an exception if it reaches the 
+		maximum number of iterations is checked.</li>
+      		<li>Configure another RSD file to find from test.rsd and test it on an image.</li>
+      		<li>Confirm that an exception is thrown and that it contains information about 
+		the RSD file containing the loop and the input file that was being processed when 
+		the exception was thrown.</li>
+      	</ul>
 <p>
-		<li><b>[FlexIDSCore #3191]</b> Loop Preprocessor UI should open config on doubleclick</li>
-		<ul>
-			<li>Open a new RuleSet Editor window.</li>
-			<li>Create a Loop Preprocessor.</li>
-			<li>Configure it with a preprocessor and condition.</li>
-			<li>Confirm that double-clicking on the read-only text boxes (<b>Execute Preprocessor</b>,
-			or <b>while this condition is</b>) opens the corresponding <b>Configure</b> dialog.</li>
-			<li>Confirm that double-clicking on them while holding the <b>&lt;Ctrl&gt;</b> key opens the corresponding <b>Select</b>
-			dialog.</li>
-			<li>Confirm that double-clicking on them while holding the <b>&lt;Alt&gt;</b> key opens te corresponding <b>Configure
-			Description</b> dialog.</li>
-		</ul>
+	<li><b>[FlexIDSCore #3191]</b> Loop Preprocessor UI should open config on doubleclick</li>
+	<ul>
+		<li>Open a new RuleSet Editor window.</li>
+		<li>Create a Loop Preprocessor.</li>
+		<li>Configure it with a preprocessor and condition.</li>
+		<li>Confirm that double-clicking on the read-only text boxes (<b>Execute Preprocessor</b>,
+		or <b>while this condition is</b>) opens the corresponding <b>Configure</b> dialog.</li>
+		<li>Confirm that double-clicking on them while holding the <b>&lt;Ctrl&gt;</b> key 
+		opens the corresponding <b>Select</b> dialog.</li>
+		<li>Confirm that double-clicking on them while holding the <b>&lt;Alt&gt;</b> key 
+		opens the corresponding <b>Configure Description</b> dialog.</li>
+	</ul>
+</ul>
 </body>
 </html>
