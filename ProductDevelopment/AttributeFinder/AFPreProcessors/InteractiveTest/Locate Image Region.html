@@ -1,7 +1,7 @@
 <html>
 
 <HEAD>
-<TITLE>FlexIndex Menu Items Testing Checklist</TITLE>
+<TITLE>Locate Image Region Testing Checklist</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 <style>
 <!--
@@ -10,15 +10,15 @@
 </HEAD>
 
 <body>
-<h1>Ruleset Editor - Document Preprocessor - <br />Locate Image Region<br />
+<h1>Ruleset Editor - Document Preprocessor<br>Locate Image Region<br>
 	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
-<h2><b>Locate Image Region Dialog</b></h2>
+<h3><b>Locate Image Region Dialog</b></h3>
 <ul>
-   	<li>&nbsp;<b>Find</b> combo box works
+   	<li><b>Find</b> combo box works
       	<ul>
-          	<li><b>Text</b> is listed.
+        	<li><b>Text</b> is listed.
 		<ul>
 			<li>Selecting <b>Text</b> enables the  <b>Inside</b> or <b>Outside</b> 
 			selection combo box.
@@ -26,11 +26,13 @@
 				<li><b>Inside</b> is listed.</li>
 				<li><b>Outside</b> is listed.</li>
 				<ul>
-					<li><b>[FlexIDSCore #2076]</b> LIR PP: Text Outside of Region can be found on all pages.</li>
+					<li><b>[FlexIDSCore #2076]</b> Locate Image Region PP: 
+					Text Outside of Region can be found on all pages.</li>
 					<ul>
-						<li>Open 'I:\Common\Testing\PVCS_Testing\FlexIDSCore\2076\findtextoutsideregion.rsd'</li>
-						<li>Run the ruleset on 'I:\Common\Testing\PVCS_Testing\FlexIDSCore\2076\00053.tif'</li>
-						<li>Ensure that the text from page 2 is included in the found attribute.</li>
+						<li>Open <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2076\findtextoutsideregion.rsd</b></li>
+						<li>Run the ruleset on <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2076\00053.tif</b></li>
+						<li>Ensure that the text from page 2 is included in 
+						the found attribute.</li>
 					</ul>
 				</ul>
 			</ul>
@@ -43,21 +45,17 @@
 		<ul>
 			<li>Selecting <b>Image Region</b> disables the  <b>Inside</b> 
 			or <b>Outside</b> selection combo box.
-			<ul>
-				<li>The combo box is populated with <b>Inside</b>.</li>
-			</ul>
-			</li>
+			<li>The combo box is populated with <b>Inside</b>.</li>
 			<li>Selecting <b>Image Region</b> enables the <b>Assign text to 
 			the following region</b> edit box.
-			<ul>
-				<li><b>Assign text to the following region</b> edit box is editable.</li>
-			</ul>
-			</li>
+			<li><b>Assign text to the following region</b> edit box is editable.</li>
 			<li><b>[FlexIDSCore #2335]</b> Image region created outside of image.</li>
 			<ul>
-				<li>Obtain the ruleset located at '$/Engineering/AttributeFinder/IndustrySpecific/Redaction/CustomerRules/NM - Chaves - PDS/Rules'</li>
-				<li>Run the 'Master.rsd' on 'I:\Common\Testing\PVCS_Testing\FlexIDSCore\2335\562.374.pg1.tif'.</li>
-				<li>Ensure that an image region outside the image itself (see 'I:\Common\Testing\PVCS_Testing\FlexIDSCore\2335\imageregionoffpage.jpg' for an example) is NOT created.</li>
+				<li>Obtain the ruleset located at <b>$/Engineering/Rules/IDShield/NM 
+				- Chaves - PDS/Rules</b></li>
+				<li>Run <b>Master.rsd</b> on <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2335\562.374.pg1.tif</b>.</li>
+				<li>Ensure that an image region outside the image itself (see <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2335\imageregionoffpage.jpg</b> for an example) 
+				is NOT created.</li>
 			</ul>
 		</ul>
           	</li>
@@ -98,212 +96,204 @@
 	label displays the balloon help.</li>
       	<li><b>Add</b> button displays <b>Text</b> dialog</li>
 </ul>
-	<h3>Text Dialog</h3>
-      	<ul>
-          	<li><b>Specify the text</b> edit box is editable.</li>
-      		<li><b>OK</b> button saves changes and exits dialog.
-        	<ul>
-          		<li>Text entered appears in <b>Define the clue text(s):</b>
-            		list box.</li>
-          		<li><b>Clue List #</b> graphic changes from a red X to 
-			an almost filled blue circle.</li>
-        	</ul>
-          	</li>
-      		<li><b>Cancel</b> button ignores changes and exits dialog.</li>
-      		<li><b>X</b> button ignores changes and exits dialog.</li>
-      		<li>Highlighting an existing clue in the list box entry activates <b>Remove</b> 
-        	and <b>Modify</b>.</li>
-      		<li><b>Remove</b> button displays a <b>Confirm Delete</b> dialog.</li>
-        	<h5>Confirm Delete Dialog</h5>
-        	<ul>
-			<li><b>YES</b> button deletes the clue text and exits dialog.</li>
-    			<li><b>NO</b> button ignores delete request and exits dialog.</li>
-		</ul>
-    	</ul>
-<p>
-     	<h3>Behavior of a File Name entry</h3>
-     	<ul>
-          	<li>Clear the <b>Define the Clue Text(s)</b> list box and specify a file
-            	name beginning with <b>file://</b> inside the <b>Text</b> dialog and click 
-		the <b>OK</b> button.
-            	<ul>
-              		<li>Confirm that the <b>Add</b> button is disabled.</li>
-              		<li>Confirm that the <b>Save List...</b> button is disabled.</li>
-              		<li>Click <b>Remove</b> to delete the current file name entry and 
-			confirm that the <b>Add</b> and <b>Save List...</b> buttons 
-			are enabled.</li>
-            	</ul>
-		</li>
-          	<li>Add several entries inside <b>Define the Clue Text(s)</b> list box 
-		(do not include a file name entry) and double click one of the entries 
-	 	to bring up the <b>Text</b> dialog. Modify the text in the edit box to a 
-		file name (including the file:// header) and click the <b>OK</b> button.
-            	<ul>
-              		<li>Confirm that a message box is displayed to remind the user 
-			that a file name must be the only entry inside the list box.
-                	<ul>
-                  		<li>Confirm that clicking <b>YES</b> on the message 
-				box will clear all the other entries inside the list box 
-				and display the newly modified file name as the first 
-				entry in the list box.</li>
-                  		<li>Confirm that clicking <b>NO</b> on the message box 
-				will do nothing to the list box.</li>
-                	</ul>
-              		</li>
-            	</ul>
-          	</li>
-      		<li>Confirm that the <b>Modify</b> button displays a pre-populated 
-		<b>Text</b> dialog.
-        	<ul>
-          		<li>Changes made are persistent.</li>
-        	</ul>
-      		</li>
-      		<li>Graphical <b>UP</b> arrow button moves the selected item
-        	up in the list box.</li>
-      		<li>Graphical <b>DOWN</b> arrow button moves the selected item
-        	down in the list box.</li>
-      		<li>Graphical <b>UP</b> and <b>DOWN</b> arrow
-        	buttons become inactive when reaching top or bottom of the list.</li>
-	  	<li><b>Load List</b> button opens a file open dialog and correctly
-		loads the list. </li>
-	  	<li><b>Save List...</b> button opens a file open dialog and correctly
-		saves the list. </li>	  
-      		<li><b>Case sensitive</b> check box is checkable.</li>
-      		<li><b>Above clues will be treated as regular expressions</b>
-        	check box is checkable.</li>
-      		<li><b>Restrict search to region defined by the results from clue
-        	list</b> check box is inactive if there are no previously defined
-        	clue lists.
-        	<ul>
-          		<li><b>Restrict search to region defined by the results from
-            		clue list</b> check box is active in a <b>Clue List</b>
-            		if a lesser numbered clue list contains clues.</li>
-        	</ul>
-      		</li>
-    	</ul>
-<p>
- 	<h3>Region Boundary - Top</h3>
-    	<ul>
-      		<li><b>Define the TOP of the region as the</b> combo box is working.
-        	<ul>
-          		<li><b>Top</b> is listed.</li>
-          		<li><b>Bottom</b> is listed.</li>
-        	</ul>
-      		</li>
-      		<li><b>of</b> combo box is working.
-        	<ul>
-          		<li><b>Clue Lists 1-4</b> are listed.</li>
-          		<li><b>Page Containing Clues</b> is listed.</li>
-        	</ul>
-      		</li>
-      		<li><b>Expand</b> combo box works.
-        	<ul>
-          		<li><b>Up</b> is listed.</li>
- 	  		<li><b>Up</b> is selected by default.</li>
-          		<li><b>Down</b> is listed.</li>
-        	</ul>
-      		</li>
-      		<li><b>Spatial lines</b> edit box is editable.
-        	<ul>
-          		<li><b>Spatial lines</b> edit box is populated with <b>0</b> by default.</li>
-          		<li><b>Spatial lines</b> entry must be a positive number.</li>
-          		<li><b>[P16 #2976]</b> Spatial lines entry can be a decimal number 
-			( i.e. 1.5 ).</li>
-        	</ul>
-      		</li>
-    	</ul>
-<p>
-    	<h3>Region Boundary - Bottom</h3>
-    	<ul>
-      		<li><b>Define the BOTTOM of the region as the</b> combo box is working.
-        	<ul>
-          		<li><b>Top</b> is listed.</li>
-			<li><b>Bottom</b> is listed.</li>
- 	  		<li><b>Bottom</b> is selected by default.</li>
-        	</ul>
-      		</li>
-      		<li><b>of</b> combo box is working.
-        	<ul>
-          		<li><b>Clue Lists 1-4</b> are listed.</li>
-          		<li><b>Page Containing Clues</b> is listed.</li>
-        	</ul>
-      		</li>
-      		<li><b>Expand</b> combo box works.
-        	<ul>
-          		<li><b>Down</b> is listed.</li>
-	  		<li><b>Down</b> is selected by default.</li>
-          		<li><b>Up</b> is listed.</li>
-        	</ul>
-      		</li>
-      		<li><b>Spatial lines</b> edit box is editable.
-        	<ul>
-          		<li><b>Spatial lines</b> edit box is populated with <b>0</b> by default.</li>
-          		<li><b>Spatial lines</b> entry must be a positive number.</li> 
-          		<li><b>[P16 #2976]</b> Spatial lines entry can be a decimal number 
-			( i.e. 1.5 ).</li>
-        	</ul>
-      		</li>
-    	</ul>
-<p>
-    	<h3>Region Boundary - Left</h3>
-    	<ul>
-      		<li><b>Define the LEFT of the region as the</b> combo box is working.
-        	<ul>
-          		<li><b>Left</b> is listed.</li>
-	  		<li><b>Left</b> is selected by default.</li>
-          		<li><b>Right</b> is listed.</li>
-        	</ul>
-      		</li>
-      		<li><b>of</b> combo box is working.
-        	<ul>
-          		<li><b>Clue Lists 1-4</b> are listed.</li>
-          		<li><b>Page Containing Clues</b> is listed.</li>
-        	</ul>
-      		</li>
-      		<li><b>Expand</b> combo box works.
-		<ul>
-          		<li><b>Left</b> is listed.</li>
-	  		<li><b>Left</b> is selected by default.</li>
-          		<li><b>Right</b> is listed.</li>
-        	</ul>
-      		</li>
-      		<li><b>Characters</b> edit box is editable.
-        	<ul>
-          		<li><b>Characters</b> edit box is populated with <b>0</b> by default.</li>
-          		<li><b>Characters</b> edit box restricts input to numbers.</li> 
-        	</ul>
-      		</li>
-    	</ul>
-<p>
-    	<h3>Region Boundary - Right</h3>
-    	<ul>
-      		<li><b>Define the RIGHT of the region as the</b> combo box is working.
-        	<ul>
-          		<li><b>Left</b> is listed.</li>
-          		<li><b>Right</b> is listed.</li>
-	  		<li><b>Right</b> is selected by default.</li>
-        	</ul>
-      		</li>
-      		<li><b>of</b> combo box is working.
-        	<ul>
-          		<li><b>Clue Lists 1-4</b> are listed.</li>
-          		<li><b>Page Containing Clues</b> is listed.</li>
-        	</ul>
-      		</li>
-      		<li><b>Expand</b> combo box works.
-        	<ul>
-          		<li><b>Right</b> is listed.</li>
-	  		<li><b>Right</b> is selected by default.</li>
-          		<li><b>Left</b> is listed.</li>
-        	</ul>
-      		</li>
-      		<li><b>Characters</b> edit box is editable.
-        	<ul>
-          		<li><b>Characters</b> edit box is populated with <b>0</b> by default.</li>
-          		<li><b>Characters</b> edit box restricts input to numbers.</li> 
-        	</ul>
-      		</li>
-    	</ul>
+<h3>Text Dialog</h3>
+<ul>
+       	<li><b>Specify the text</b> edit box is editable.</li>
+	<li><b>OK</b> button saves changes and exits dialog.
+       	<ul>
+       		<li>Text entered appears in <b>Define the clue text(s):</b> list box.</li>
+       		<li><b>Clue List #</b> graphic changes from a red X to an almost filled 
+		blue circle.</li>
+        </ul>
+        </li>
+      	<li><b>Cancel</b> button ignores changes and exits dialog.</li>
+      	<li><b>X</b> button ignores changes and exits dialog.</li>
+      	<li>Highlighting an existing clue in the list box entry activates <b>Remove</b> 
+        and <b>Modify</b>.</li>
+      	<li><b>Remove</b> button displays a <b>Confirm Delete</b> dialog.</li>
+        <ul>
+		<li><b>YES</b> button deletes the clue text and exits dialog.</li>
+		<li><b>NO</b> button ignores delete request and exits dialog.</li>
+	</ul>
+</ul>
+<h3>Behavior of a File Name entry</h3>
+<ul>
+       	<li>Clear the <b>Define the Clue Text(s)</b> list box and specify a file
+       	name beginning with <b>file://</b> inside the <b>Text</b> dialog and click 
+	the <b>OK</b> button.
+       	<ul>
+       		<li>Confirm that the <b>Add</b> button is disabled.</li>
+       		<li>Confirm that the <b>Save List...</b> button is disabled.</li>
+       		<li>Click <b>Remove</b> to delete the current file name entry and 
+		confirm that the <b>Add</b> and <b>Save List...</b> buttons 
+		are enabled.</li>
+        </ul>
+	</li>
+        <li>Add several entries inside <b>Define the Clue Text(s)</b> list box 
+	(do not include a file name entry) and double click one of the entries 
+	to bring up the <b>Text</b> dialog. Modify the text in the edit box to a 
+	file name (including the file:// header) and click the <b>OK</b> button.
+        <ul>
+        	<li>Confirm that a message box is displayed to remind the user 
+		that a file name must be the only entry inside the list box.
+               	<ul>
+               		<li>Confirm that clicking <b>YES</b> on the message 
+			box will clear all the other entries inside the list box 
+			and display the newly modified file name as the first 
+			entry in the list box.</li>
+               		<li>Confirm that clicking <b>NO</b> on the message box 
+			will do nothing to the list box.</li>
+               	</ul>
+        	</li>
+        </ul>
+        </li>
+      	<li>Confirm that the <b>Modify</b> button displays a pre-populated 
+	<b>Text</b> dialog.
+        <ul>
+        	<li>Changes made are persistent.</li>
+        </ul>
+      	</li>
+      	<li>Graphical <b>UP</b> arrow button moves the selected item
+        up in the list box.</li>
+      	<li>Graphical <b>DOWN</b> arrow button moves the selected item
+        down in the list box.</li>
+      	<li>Graphical <b>UP</b> and <b>DOWN</b> arrow
+        buttons become inactive when reaching top or bottom of the list.</li>
+	<li><b>Load List</b> button opens a file open dialog and correctly
+	loads the list. </li>
+	<li><b>Save List...</b> button opens a file open dialog and correctly
+	saves the list. </li>	  
+      	<li><b>Case sensitive</b> check box is checkable.</li>
+      	<li><b>Above clues will be treated as regular expressions</b>
+        check box is checkable.</li>
+      	<li><b>Restrict search to region defined by the results from clue
+        list</b> check box is inactive if there are no previously defined
+        clue lists.
+        <ul>
+        	<li><b>Restrict search to region defined by the results from
+        	clue list</b> check box is active in a <b>Clue List</b>
+        	if a lesser numbered clue list contains clues.</li>
+        </ul>
+      	</li>
+</ul>
+<h3>Region Boundary - Top</h3>
+<ul>
+	<li><b>Define the TOP of the region as the</b> combo box is working.
+       	<ul>
+       		<li><b>Top</b> is listed.</li>
+       		<li><b>Bottom</b> is listed.</li>
+       	</ul>
+	</li>
+ 	<li><b>of</b> combo box is working.
+        <ul>
+        	<li><b>Clue Lists 1-4</b> are listed.</li>
+        	<li><b>Page Containing Clues</b> is listed.</li>
+        </ul>
+      	</li>
+      	<li><b>Expand</b> combo box works.
+        <ul>
+        	<li><b>Up</b> is listed.</li>
+ 		<li><b>Up</b> is selected by default.</li>
+        	<li><b>Down</b> is listed.</li>
+        </ul>
+      	</li>
+      	<li><b>Spatial lines</b> edit box is editable.
+        <ul>
+      		<li><b>Spatial lines</b> edit box is populated with <b>0</b> by default.</li>
+       		<li><b>Spatial lines</b> entry must be a positive number.</li>
+       		<li><b>[FlexIDSCore #2976]</b> Spatial lines entry can be a decimal number 
+		( i.e. 1.5 ).</li>
+       	</ul>
+	</li>
+</ul>
+<h3>Region Boundary - Bottom</h3>
+<ul>
+	<li><b>Define the BOTTOM of the region as the</b> combo box is working.
+       	<ul>
+       		<li><b>Top</b> is listed.</li>
+		<li><b>Bottom</b> is listed.</li>
+  		<li><b>Bottom</b> is selected by default.</li>
+       	</ul>
+	</li>
+	<li><b>of</b> combo box is working.
+       	<ul>
+       		<li><b>Clue Lists 1-4</b> are listed.</li>
+       		<li><b>Page Containing Clues</b> is listed.</li>
+       	</ul>
+	</li>
+	<li><b>Expand</b> combo box works.
+       	<ul>
+       		<li><b>Down</b> is listed.</li>
+  		<li><b>Down</b> is selected by default.</li>
+       		<li><b>Up</b> is listed.</li>
+       	</ul>
+	</li>
+	<li><b>Spatial lines</b> edit box is editable.
+       	<ul>
+      		<li><b>Spatial lines</b> edit box is populated with <b>0</b> by default.</li>
+       		<li><b>Spatial lines</b> entry must be a positive number.</li> 
+       		<li><b>[FlexIDSCore #2976]</b> Spatial lines entry can be a decimal number 
+		( i.e. 1.5 ).</li>
+       	</ul>
+	</li>
+</ul>
+<h3>Region Boundary - Left</h3>
+<ul>
+	<li><b>Define the LEFT of the region as the</b> combo box is working.
+       	<ul>
+      		<li><b>Left</b> is listed.</li>
+  		<li><b>Left</b> is selected by default.</li>
+       		<li><b>Right</b> is listed.</li>
+       	</ul>
+	</li>
+	<li><b>of</b> combo box is working.
+       	<ul>
+      		<li><b>Clue Lists 1-4</b> are listed.</li>
+       		<li><b>Page Containing Clues</b> is listed.</li>
+       	</ul>
+	</li>
+	<li><b>Expand</b> combo box works.
+	<ul>
+      		<li><b>Left</b> is listed.</li>
+  		<li><b>Left</b> is selected by default.</li>
+       		<li><b>Right</b> is listed.</li>
+       	</ul>
+	</li>
+	<li><b>Characters</b> edit box is editable.
+       	<ul>
+       		<li><b>Characters</b> edit box is populated with <b>0</b> by default.</li>
+       		<li><b>Characters</b> edit box restricts input to numbers.</li> 
+       	</ul>
+	</li>
+</ul>
+<h3>Region Boundary - Right</h3>
+<ul>
+	<li><b>Define the RIGHT of the region as the</b> combo box is working.
+       	<ul>
+       		<li><b>Left</b> is listed.</li>
+       		<li><b>Right</b> is listed.</li>
+ 		<li><b>Right</b> is selected by default.</li>
+       	</ul>
+	</li>
+	<li><b>of</b> combo box is working.
+       	<ul>
+       		<li><b>Clue Lists 1-4</b> are listed.</li>
+       		<li><b>Page Containing Clues</b> is listed.</li>
+       	</ul>
+	</li>
+	<li><b>Expand</b> combo box works.
+       	<ul>
+       		<li><b>Right</b> is listed.</li>
+ 		<li><b>Right</b> is selected by default.</li>
+       		<li><b>Left</b> is listed.</li>
+       	</ul>
+	</li>
+	<li><b>Characters</b> edit box is editable.
+       	<ul>
+       		<li><b>Characters</b> edit box is populated with <b>0</b> by default.</li>
+       		<li><b>Characters</b> edit box restricts input to numbers.</li> 
+       	</ul>
+	</li>
 </ul>
 </body>
 </html>
