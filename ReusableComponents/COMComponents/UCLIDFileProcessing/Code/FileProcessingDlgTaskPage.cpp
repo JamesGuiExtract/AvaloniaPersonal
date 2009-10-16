@@ -14,6 +14,7 @@
 #include "FPCategories.h"
 #include "FileProcessingUtils.h"
 #include "FileProcessingDlg.h"
+#include "ScheduleDialog.h"
 
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
@@ -52,11 +53,14 @@ FileProcessingDlgTaskPage::FileProcessingDlgTaskPage()
   m_bInitialized(false),
   m_bLogErrorDetails(FALSE),
   m_bExecuteErrorTask(FALSE),
-  m_pFPM(NULL)
+  m_pFPM(NULL),
+  m_bLimitProcessingTimes(FALSE)
 {
 	//{{AFX_DATA_INIT(FileProcessingDlgTaskPage)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
+
+	m_vecSchedule.resize(giNUMBER_OF_HOURS_IN_WEEK, true);
 }
 //-------------------------------------------------------------------------------------------------
 FileProcessingDlgTaskPage::~FileProcessingDlgTaskPage()
@@ -121,6 +125,10 @@ void FileProcessingDlgTaskPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_PROCESS_SKIPPED_FILES, m_radioProcessSkipped);
 	DDX_Control(pDX, IDC_COMBO_SKIPPED_SCOPE, m_comboSkipped);
 	DDX_Control(pDX, IDC_STATIC_SKIPPED, m_staticSkipped);
+	DDX_Control(pDX, IDC_STATIC_PROCESSING_SCHEDULE, m_groupProcessingSchedule);
+	DDX_Check(pDX, IDC_CHECK_LIMIT_PROCESSING, m_bLimitProcessingTimes);
+	DDX_Control(pDX, IDC_BUTTON_SET_SCHEDULE, m_btnSetSchedule);
+	DDX_Control(pDX, IDC_CHECK_LIMIT_PROCESSING, m_checkLimitProcessing);
 	//}}AFX_DATA_MAP 
 }
 //-------------------------------------------------------------------------------------------------
@@ -157,6 +165,8 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_BN_CLICKED(IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
 	ON_BN_CLICKED(IDC_RADIO_PROCESS_SKIPPED_FILES, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
 	ON_CBN_SELCHANGE(IDC_COMBO_SKIPPED_SCOPE, &FileProcessingDlgTaskPage::OnComboSkippedChange)
+	ON_BN_CLICKED(IDC_CHECK_LIMIT_PROCESSING, &FileProcessingDlgTaskPage::OnBtnClickedCheckLimitProcessing)
+	ON_BN_CLICKED(IDC_BUTTON_SET_SCHEDULE, &FileProcessingDlgTaskPage::OnBnClickedButtonSetSchedule)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -682,6 +692,7 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		CRect rectProcessScopeGrp, rectProcessAll, rectProcessSkipped, rectComboSkippedScope, rectSkippedText;
 		CRect rectContinuousGrp, rectKeepProc, rectStopProc;
 		CRect rectThreadGrp, rectMaxThreadOption, rectThreadOption, rectEditThreads, rectThreadTxt, rectSpinBtn;
+		CRect rectScheduleGrp, rectLimitCheck, rectScheduleBtn;
 
 		// Get positions of list and buttons
 		getDlgItemWindowRect(IDC_LIST_FP, rectList);
@@ -726,6 +737,14 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		ScreenToClient(&rectComboSkippedScope);
 		getDlgItemWindowRect(IDC_STATIC_SKIPPED, rectSkippedText);
 		ScreenToClient(&rectSkippedText);
+
+		// Get positions of the Processing schedule group
+		getDlgItemWindowRect(IDC_STATIC_PROCESSING_SCHEDULE, rectScheduleGrp);
+		ScreenToClient(&rectScheduleGrp);
+		getDlgItemWindowRect(IDC_CHECK_LIMIT_PROCESSING, rectLimitCheck);
+		ScreenToClient(&rectLimitCheck);
+		getDlgItemWindowRect(IDC_BUTTON_SET_SCHEDULE, rectScheduleBtn);
+		ScreenToClient(&rectScheduleBtn);
 
 		// Get positions of Continuous Processing group items
 		getDlgItemWindowRect(IDC_STATIC_CONTINUOUS_GROUP, rectContinuousGrp);
@@ -849,7 +868,7 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		nGroupHeight = rectProcessScopeGrp.Height();
 		rectProcessScopeGrp.bottom = rectThreadGrp.top - nLen4;
 		rectProcessScopeGrp.top = rectProcessScopeGrp.bottom - nGroupHeight;
-		rectProcessScopeGrp.right = rectList.right;
+		rectProcessScopeGrp.right = rectList.right - (rectThreadGrp.Width() + nLen4);
 
 		nHeight = rectProcessAll.Height();
 		nSpace = rectProcessSkipped.top - rectProcessAll.bottom;
@@ -860,6 +879,29 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		rectSkippedText.top = rectProcessSkipped.top;
 		rectSkippedText.bottom = rectSkippedText.top + nHeight;
 		
+		// Resize the processing schedule controls
+		rectScheduleGrp.top = rectProcessScopeGrp.top;
+		rectScheduleGrp.bottom = rectProcessScopeGrp.bottom;
+		rectScheduleGrp.right = rectList.right;
+		rectScheduleGrp.left = rectThreadGrp.left;
+
+		nWidth = rectLimitCheck.Width();
+		nHeight = rectLimitCheck.Height();
+		rectLimitCheck.left = rectScheduleGrp.left + nLen5;
+		rectLimitCheck.right = rectLimitCheck.left + nWidth;
+		rectLimitCheck.top = rectScheduleGrp.top + nLen5;
+		rectLimitCheck.bottom = rectLimitCheck.top + nHeight;
+		
+		// Width of the line used for the group box
+		static const int nGROUPBOX_LINE_WIDTH = 2;
+
+		nWidth = rectScheduleBtn.Width();
+		nHeight = rectScheduleBtn.Height();
+		rectScheduleBtn.top = rectLimitCheck.bottom + nSpace;
+		rectScheduleBtn.bottom = rectScheduleBtn.top + nHeight;
+		rectScheduleBtn.right = rectScheduleGrp.right - nLen2 - nGROUPBOX_LINE_WIDTH;
+		rectScheduleBtn.left = rectScheduleBtn.right - nWidth;
+
 		// Move the combo box
 		nHeight = rectComboSkippedScope.Height();
 		nWidth = rectComboSkippedScope.Width();
@@ -874,8 +916,6 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		rectSkippedText.right = rectSkippedText.left + nWidth;
  
 		// Resize Error group items
-		// Width of the line used for the group box
-		static const int nGROUPBOX_LINE_WIDTH = 2;
 		int nButtonToEditVerticalAdjustment = rectEditErrorLog.top - rectBrowse.top;
 		nGroupHeight = rectErrorGrp.Height();
 		nSpace = rectEditErrorLog.top - rectErrorGrp.top;
@@ -963,6 +1003,11 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		m_editThreads.MoveWindow(&rectEditThreads);
 		GetDlgItem(IDC_STATIC_THREADS)->MoveWindow(&rectThreadTxt);
 		m_SpinThreads.MoveWindow(&rectSpinBtn);
+
+		// Move process schedule items
+		m_groupProcessingSchedule.MoveWindow(&rectScheduleGrp);
+		m_checkLimitProcessing.MoveWindow(&rectLimitCheck);
+		m_btnSetSchedule.MoveWindow(&rectScheduleBtn);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13509")
 }
@@ -1533,6 +1578,38 @@ void FileProcessingDlgTaskPage::OnComboSkippedChange()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26923");
 }
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgTaskPage::OnBtnClickedCheckLimitProcessing()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		UpdateData(TRUE);
+
+		// Enable / disable controls as appropriate
+		setButtonStates();
+		updateUI();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28053");
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgTaskPage::OnBnClickedButtonSetSchedule()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		ScheduleDialog schedDlg;
+		schedDlg.SetScheduledHours(m_vecSchedule);
+
+		if (schedDlg.DoModal() == IDOK )
+		{
+			schedDlg.GetScheduledHours(m_vecSchedule);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28063");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Public methods
@@ -1658,6 +1735,10 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 		m_btnExecuteErrorTask.EnableWindow(FALSE);
 		m_btnSelectErrorTask.EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_EXECUTE_TASK)->EnableWindow(FALSE);
+
+		// Processing schedule controls
+		m_checkLimitProcessing.EnableWindow(FALSE);
+		m_btnSetSchedule.EnableWindow(FALSE);
 	}
 	else
 	{
@@ -1679,6 +1760,8 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 		m_radioProcessAll.EnableWindow(TRUE);
 		m_radioProcessSkipped.EnableWindow(TRUE);
 		m_staticSkipped.EnableWindow(TRUE);
+
+		m_checkLimitProcessing.EnableWindow(TRUE);
 
 		// Set the button states that depend on settings
 		setButtonStates();
@@ -1964,6 +2047,8 @@ void FileProcessingDlgTaskPage::setButtonStates()
 	// Enable / disable error task controls
 	GetDlgItem(IDC_EDIT_EXECUTE_TASK)->EnableWindow(m_bExecuteErrorTask);
 	m_btnSelectErrorTask.EnableWindow(m_bExecuteErrorTask);
+
+	m_btnSetSchedule.EnableWindow(m_bLimitProcessingTimes);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::updateUI()

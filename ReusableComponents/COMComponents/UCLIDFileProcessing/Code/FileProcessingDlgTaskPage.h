@@ -8,6 +8,8 @@
 #include "afxwin.h"
 #include <ImageButtonWithStyle.h>
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // FileProcessingDlgTaskPage dialog
 
@@ -71,6 +73,10 @@ public:
 	CButton m_radioProcessSkipped;
 	CComboBox m_comboSkipped;
 	CStatic m_staticSkipped;
+	CStatic m_groupProcessingSchedule;
+	BOOL m_bLimitProcessingTimes;
+	CButton m_checkLimitProcessing;
+	CButton m_btnSetSchedule;
 	//}}AFX_DATA
 
 // Overrides
@@ -116,6 +122,8 @@ protected:
 	afx_msg void OnStnDblClkEditExecuteTask();
 	afx_msg void OnBtnProcessAllOrSkipped();
 	afx_msg void OnComboSkippedChange();
+	afx_msg void OnBtnClickedCheckLimitProcessing();
+	afx_msg void OnBnClickedButtonSetSchedule();
 	//}}AFX_MSG
 	
 	DECLARE_MESSAGE_MAP()
@@ -200,6 +208,9 @@ private:
 	// before OnInitDialog() will be skipped, then it will be set to true inside 
 	// OnInitDialog()
 	bool m_bInitialized;
+
+	// Vector to hold the hourly schedule
+	vector<bool>  m_vecSchedule;
 };
 
 //{{AFX_INSERT_LOCATION}}

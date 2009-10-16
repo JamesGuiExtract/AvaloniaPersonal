@@ -343,6 +343,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\ScheduleGrid.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
@@ -426,6 +430,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ScheduleGrid.h"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.h"
 				>
 			</File>
@@ -441,5 +449,9 @@
 		</Filter>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="RWUtils.rc"
+		/>
 	</Globals>
 </VisualStudioProject>

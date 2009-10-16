@@ -1791,7 +1791,7 @@ void FileProcessingDlg::createPropertyPages()
 
 	// Set minimum size (this is the minimum size for the processing tab
 	// to fit all of the settings on the screen)
-	m_sizeMinimumPropPage.SetSize(620, 350);
+	m_sizeMinimumPropPage.SetSize(660, 350);
 	
 	// Set the FPM pointer for the prop pages
 	m_propActionPage.setFPMgr(m_pFileProcMgr);

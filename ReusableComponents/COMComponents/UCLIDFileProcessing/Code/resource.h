@@ -157,12 +157,12 @@
 #define IDC_BUTTON_PROGRESS_DETAILS     344
 #define IDC_BUTTON_EXCEPTION_DETAILS    345
 #define IDC_BUTTON_QUEUE_EXCEPTION_DETAILS 346
-#define IDC_STATIC_STATS_THIS_RUN		347
-#define IDC_STATIC_FPSCOPE_GROUP		348
-#define IDC_RADIO_PROCESS_ALL_FILES_PRIORITY	349
-#define IDC_RADIO_PROCESS_SKIPPED_FILES	350
-#define IDC_COMBO_SKIPPED_SCOPE			351
-#define IDC_STATIC_SKIPPED				352
+#define IDC_STATIC_STATS_THIS_RUN       347
+#define IDC_STATIC_FPSCOPE_GROUP        348
+#define IDC_RADIO_PROCESS_ALL_FILES_PRIORITY 349
+#define IDC_RADIO_PROCESS_SKIPPED_FILES 350
+#define IDC_COMBO_SKIPPED_SCOPE         351
+#define IDC_STATIC_SKIPPED              352
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
 // These ID's are defined int FAMUtils
@@ -173,9 +173,16 @@
 #define IDD_DATABASEPAGE                1004
 #define IDC_BUTTON_REFRESH              1005
 #define IDC_BUTTON_SQL_SERVER_BROWSE    1006
-#define IDC_BUTTON_LAST_USED_DB			1007
+#define IDC_BUTTON_LAST_USED_DB         1007
 // End Database Page ID's
 #define IDR_FILEPROCESSINGTASKEXECUTOR  2000
+#define IDC_CHECK_LIMIT_PROCESSING      2001
+#define IDC_BUTTON_SET_SCHEDULE         2002
+#define IDC_STATIC_PROCESSING_SCHEDULE  2003
+#define IDC_LIST_SCHEDULE               2004
+#define IDD_DIALOG_SET_SCHEDULE         2005
+#define IDC_BUTTON_SELECT_ALL           2007
+#define IDC_BUTTON_SELECT_NONE          2008
 #define IDC_BTN_RUN                     32768
 #define IDC_BTN_STOP                    32769
 #define IDC_BTN_AUTO_SCROLL             32770
@@ -208,9 +215,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2001
+#define _APS_NEXT_RESOURCE_VALUE        2006
 #define _APS_NEXT_COMMAND_VALUE         32803
-#define _APS_NEXT_CONTROL_VALUE         2001
+#define _APS_NEXT_CONTROL_VALUE         2009
 #define _APS_NEXT_SYMED_VALUE           2001
 #endif
 #endif

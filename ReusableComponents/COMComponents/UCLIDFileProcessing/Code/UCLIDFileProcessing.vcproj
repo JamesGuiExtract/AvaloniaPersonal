@@ -503,6 +503,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ScheduleDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SelectActionDlg.cpp"
 				>
 			</File>
@@ -749,6 +753,10 @@
 			</File>
 			<File
 				RelativePath="Resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ScheduleDialog.h"
 				>
 			</File>
 			<File
