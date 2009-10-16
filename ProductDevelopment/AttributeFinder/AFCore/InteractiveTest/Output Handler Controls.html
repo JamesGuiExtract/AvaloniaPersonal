@@ -1,12 +1,8 @@
 <html>
 
 <HEAD>
-<TITLE>RuleSet Editor - File Menu - File Menu Items - Testing Checklist</TITLE>
+<TITLE>RuleSet Editor Output Handler Controls Checklist</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
-<style>
-<!--
--->
-</style>
 </HEAD>
 
 <body>
@@ -15,7 +11,7 @@
 </h1>
 <hr>
 
-<h2>Select Output Handler</h2>
+<h3>Select Output Handler</h3>
 <ul>
    	<li>Displays description and type of output handler correctly.</li>
 	<li>Checkbox is present
@@ -25,13 +21,13 @@
 		<li>Checkbox setting is persistent.</li>
 	</ul>
 	</li>
-      	<li><b>[P16 #966]</b> Double-click on defined output handler displays configuration dialog.
-      	<li><b>[P16 #966]</b> Ctrl + Double-click on defined output handler displays the <b>Select 
+      	<li><b>[FlexIDSCore #966]</b> Double-click on defined output handler displays configuration dialog.
+      	<li><b>[FlexIDSCore #966]</b> Ctrl + Double-click on defined output handler displays the <b>Select 
 	Output Handler</b> dialog.
-      	<li><b>[P16 #966]</b> Alt + Double-click on defined output handler displays the <b>Configure 
+      	<li><b>[FlexIDSCore #966]</b> Alt + Double-click on defined output handler displays the <b>Configure 
 	description</b> dialog.
 	<li>Right click displays context menu.
-    	<h3>Context Menu Options</h3>
+    	<h2>Context Menu Options</h2>
      	<ul>
           	<li><b>Cut</b> exists.
             	<ul>
@@ -66,46 +62,52 @@
           	</li>
         </ul>
       	</li>
+</ul>
+</li>
 <p>
-    	<li><b>Select</b> button displays <b>Select Output Handler Dialog</b>.</li>
-	<h3>Select Output Handler Dialog</h3>
-  	<ul>
-    		<li><b>Output Handler Description</b> edit box is editable.</li>
-    		<li><b>Select Output Handler</b> combo box is selectable.
-      		<ul>
-        		<li><b>&lt;None&gt;</b> is listed.</li>
-        		<li><b>Change Case</b> is listed.</li>
-        		<li><b>Conditionally Handle Output</b> is listed.</li>
-        		<li><b>Eliminate Duplicates</b> is listed.</li>
-        		<li><b>Modify Attributes</b> is listed.</li>
-        		<li><b>Move and Modify Attributes</b> is listed.</li>
-        		<li><b>Output Data to VOA file</b> is listed.</li>
-        		<li><b>Output Data to XML file</b> is listed.</li>
-        		<li><b>Reformat Person Names</b> is listed.</li>
-        		<li><b>Remove Attributes</b> is listed.</li>
-        		<li><b>Remove Characters</b> is listed.</li>
-        		<li><b>Remove Entries from List</b> is listed.</li>
-        		<li><b>Remove Invalid Entries</b> is listed.</li>
-        		<li><b>Remove Spatial Info</b> is listed.</li>
-        		<li><b>Replace Strings</b> is listed.</li>
-        		<li><b>RunObjectOnQuery</b> is listed.</li>
-        		<li><b>Select Multiple Output Handlers</b> is listed.</li>
-        		<li><b>Select Only Unique Attributes</b> is listed.</li>
-        		<li><b>Select Using Majority</b> is listed.</li>
-        		<li><b>Select with UI</b> is listed.</li>
-        		<li><b>Translate Values or Types</b> is listed.</li>
-      		</ul>
-    		</li>
-<br>
-    		<li><b>&lt;None&gt;</b> clears the existing output handler and description.</li>
-    		<li><b>Configure</b> button displays appropriate output handler dialog.</li>
-    		<li><b>Configure</b> button is only active when output handler
-      		has a property page.</li>
-    		<li><b>OK</b> button saves changes and exits the dialog.</li>
-    		<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
-    		<li><b>X</b> button ignores changes and exits the dialog.</li>
-  	</ul>
+<h3>Select Output Handler Dialog</h3>
+<ul>
+ 	<li><b>Select</b> button displays <b>Select Output handler</b> dialog.</li>
+	<li><b>Output Handler Description</b> edit box is editable.</li>
+	<li><b>Select Output Handler</b> combo box is selectable.
+	<ul>
+       		<li><b>&lt;None&gt;</b> is listed.</li>
+       		<li><b>Change case</b> is listed.</li>
+       		<li><b>Conditionally handle output</b> is listed.</li>
+       		<li><b>Eliminate duplicates</b> is listed.</li>
+       		<li><b>Merge attribute trees</b> is listed.</li>
+       		<li><b>Merge attributes</b> is listed.</li>
+       		<li><b>Modify attributes</b> is listed.</li>
+       		<li><b>Move and modify attributes</b> is listed.</li>
+       		<li><b>Output data to VOA file</b> is listed.</li>
+       		<li><b>Output data to XML file</b> is listed.</li>
+       		<li><b>Reformat person names</b> is listed.</li>
+       		<li><b>Remove attributes</b> is listed.</li>
+       		<li><b>Remove characters</b> is listed.</li>
+       		<li><b>Remove entries from list</b> is listed.</li>
+       		<li><b>Remove invalid entries</b> is listed.</li>
+       		<li><b>Remove spatial information</b> is listed.</li>
+       		<li><b>Replace strings</b> is listed.</li>
+       		<li><b>Run object on query</b> is listed.</li>
+       		<li><b>Select multiple output handlers</b> is listed.</li>
+       		<li><b>Select only unique attributes</b> is listed.</li>
+       		<li><b>Select using majority</b> is listed.</li>
+       		<li><b>Select with UI</b> is listed.</li>
+       		<li><b>Translate values or types</b> is listed.</li>
+	</ul>
+	</li>
 <p>
+	<li><b>&lt;None&gt;</b> clears the existing output handler and description.</li>
+	<li><b>Configure</b> button displays appropriate output handler dialog.</li>
+	<li><b>Configure</b> button is only active when output handler
+	has a property page.</li>
+	<li><b>OK</b> button saves changes and exits the dialog.</li>
+	<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
+	<li><b>X</b> button ignores changes and exits the dialog.</li>
+</ul>
+<p>
+<h3>Miscellaneous</h3>
+<ul>
   	<li><b>Use the following Output Handler</b> edit box is not editable.</li>
   	<li><b>Use the following Output Handler</b> edit box displays 
     	selected output handler and corresponding description.</li>
