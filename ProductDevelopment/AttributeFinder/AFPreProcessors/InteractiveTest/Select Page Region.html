@@ -1,7 +1,7 @@
 <html>
 
 <HEAD>
-<TITLE>FlexIndex Menu Items Testing Checklist</TITLE>
+<TITLE>Select Page Region Testing Checklist</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 <style>
 <!--
@@ -10,115 +10,120 @@
 </HEAD>
 
 <body>
-<h1>Ruleset Editor - Document Preprocessor - Select Page Region
+<h1>Ruleset Editor - Document Preprocessor<br>Select Page Region<br>
 	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
-<h2><b>Select Page Region Dialog</b></h2>
 <ul>
-    	<li><b>Region defined as follows</b> combo box works.
-       	<ul>
-          	<li><b>Include</b> exists.</li>
-          	<li><b>Exclude</b> exists.</li>
-      	</ul>
-      	</li>
-      	<li><b>All Pages</b> radio button is selectable.</li>
-      	<li><b>Specific Pages</b> radio button is selectable.
-      	<ul>
-          	<li>Selection activates related edit box.</li>
-          	<li>Exception is thrown if invalid pages are defined.</li>
-      	</ul>
-      	</li>
+	<li><h2><b>Select Page Region Dialog</b></h2>
+	<ul>
+	    	<li><b>Region defined as follows</b> combo box works.
+       		<ul>
+          		<li><b>Include</b> exists.</li>
+	          	<li><b>Exclude</b> exists.</li>
+      		</ul>
+	      	</li>
+      		<li><b>All Pages</b> radio button is selectable.</li>
+	      	<li><b>Specific Pages</b> radio button is selectable.
+      		<ul>
+          		<li>Selection activates related edit box.</li>
+	          	<li>Exception is thrown if invalid pages are defined.</li>
+      		</ul>
+	      	</li>
 <p>
-      	<li><b>_____ Pages that contain</b> radio button is selectable.
-      	<ul>
-          	<li>Selection enables the related combo box.
-            	<ul>
-              		<li><b>All</b> exists.</li>
-              		<li><b>Leading</b> exists.</li>
-              		<li><b>Trailing</b> exists.</li>
-            	</ul>
-          	</li>
-          	<li>Selection enables the related edit box.
-            	<ul>
-              		<li>Edit box is editable.</li>
-            	</ul>
-          	</li>
-          	<li>Selection enables <b>Regular Expression</b> check box.
-            	<ul>
-              		<li><b>Regular Expression</b> check box is checkable.</li>
-            	</ul>
-          	</li>
-          	<li>Selection enables <b>Case Sensitive</b> check box.
-            	<ul>
-              		<li><b>Case Sensitive</b> check box is checkable.</li>
-            	</ul>
-          	</li>
+   	   	<li><b>_____ Pages that contain</b> radio button is selectable.
+      		<ul>
+          		<li>Selection enables the related combo box.
+	            	<ul>
+        	      		<li><b>All</b> exists.</li>
+              			<li><b>Leading</b> exists.</li>
+              			<li><b>Trailing</b> exists.</li>
+	            	</ul>
+        	  	</li>
+          		<li>Selection enables the related edit box.
+	            	<ul>
+        	      		<li>Edit box is editable.</li>
+            		</ul>
+	          	</li>
+        	  	<li>Selection enables <b>Regular Expression</b> check box.
+            		<ul>
+              			<li><b>Regular Expression</b> check box is checkable.</li>
+	            	</ul>
+        	  	</li>
+          		<li>Selection enables <b>Case Sensitive</b> check box.
+	            	<ul>
+        	      		<li><b>Case Sensitive</b> check box is checkable.</li>
+            		</ul>
+	          	</li>
+     		</ul>
+	      	</li>
+<p>
+	      	<li><b>Restrict page horizontally</b> check box is checkable.
+     		<ul>
+          		<li>Selection enables <b>Start at</b> and <b>End at</b> edit boxes.
+	            	<ul>
+        	      		<li><b>Start at</b> and <b>End at</b> edit
+                		box is editable and allows only numbers as input.
+                		<ul>
+                  			<li>Exception is thrown when value entered is &gt;= 100.</li>
+	                  		<li>Exception is thrown when value is &gt;= <b>End at</b>
+        	            		value.</li>
+                		</ul>
+              			</li>
+	            	</ul>
+        	  	</li>
+	     	</ul>
+      		</li>
+<p>
+	      	<li><b>Restrict page vertically</b> check box is checkable.
+      		<ul>
+          		<li>Selection enables <b>Start at</b> and <b>End at</b> edit boxes.
+	            	<ul>
+        	      		<li><b>Start at</b> and <b>End at</b> edit
+                		box is editable and allows only numbers as input.
+                		<ul>
+                  			<li>Exception is thrown when value entered is &gt;= 100.</li>
+	                  		<li>Exception is thrown when value is &gt;= <b>End at</b>
+        	            		value.</li>
+                		</ul>
+              			</li>
+	            	</ul>
+        	  	</li>
+	     	</ul>
+      		</li>
+<p>
+	      	<li><b>OCR the included text</b> check box is checkable.
+      		<ul>
+          		<li>Selection enables <b>Rotate _____ degrees</b> edit box.</li>
+	          	<li><b>Rotate _____ degrees</b> edit box is editable and allows only 
+			numbers as input.</li>
+          		<li>Exception is thrown when value entered != {0,90,180,270}.</li>
+	     	</ul>
+      		</li>
      	</ul>
-      	</li>
+	</li>
 <p>
-      	<li><b>Restrict page horizontally</b> check box is checkable.
-     	<ul>
-          	<li>Selection enables <b>Start at</b> and <b>End at</b> edit boxes.
-            	<ul>
-              		<li><b>Start at</b> and <b>End at</b> edit
-                	box is editable and allows only numbers as input.
-                	<ul>
-                  		<li>Exception is thrown when value entered is &gt;= 100.</li>
-                  		<li>Exception is thrown when value is &gt;= <b>End at</b>
-                    		value.</li>
-                	</ul>
-              		</li>
-            	</ul>
-          	</li>
-     	</ul>
-      	</li>
-<p>
-      	<li><b>Restrict page vertically</b> check box is checkable.
+	<li><h2><b>Functional Test For Rotation</b></h2>
       	<ul>
-          	<li>Selection enables <b>Start at</b> and <b>End at</b> edit boxes.
-            	<ul>
-              		<li><b>Start at</b> and <b>End at</b> edit
-                	box is editable and allows only numbers as input.
-                	<ul>
-                  		<li>Exception is thrown when value entered is &gt;= 100.</li>
-                  		<li>Exception is thrown when value is &gt;= <b>End at</b>
-                    		value.</li>
-                	</ul>
-              		</li>
-            	</ul>
-          	</li>
-     	</ul>
-      	</li>
-<p>
-      	<li><b>OCR the included text</b> check box is checkable.
-      	<ul>
-          	<li>Selection enables <b>Rotate _____ degrees</b> edit box.</li>
-          	<li><b>Rotate _____ degrees</b> edit box is editable and allows only 
-		numbers as input.</li>
-          	<li>Exception is thrown when value entered != {0,90,180,270}.</li>
-     	</ul>
-<p>
-      	<li><b>Functional Test For Rotation</b></li>
-      	<ul>
-          	<li>Exercise the following rule sets using the <b>Rule Tester</b> utility.
-          	<li>The <b>RotateTest.rsd</b> file contains 5 attributes that exercise the 
-              	rotation capabilities with an included region.  The rules are tuned for 
+        	<li>Exercise the following rule sets using the <b>Rule Tester</b> utility.
+	        <li>The <b>RotateTest.rsd</b> file contains 5 attributes that exercise the 
+        	rotation capabilities with an included region.  The rules are tuned for 
               	the <b>Rotated2.tif</b> image.
-          	<li>Recognize the text via <b>Process Current Page</b>.
-          	<li>Confirm that the <b>Test90</b> attribute finds &quot;This text is rotated 
-              	90 degrees clockwise&quot; and that the correct area is highlighted.
-          	<li>Confirm that the <b>Test270</b> attribute finds &quot;This text is rotated 
-              	270 degrees clockwise&quot; and that the correct area is highlighted.
+	        <li>Recognize the text via <b>Process Current Page</b>.
+        	<li>Confirm that the <b>Test90</b> attribute finds <b>This text is rotated 
+              	90 degrees clockwise</b> and that the correct area is highlighted.
+        	<li>Confirm that the <b>Test270</b> attribute finds <b>This text is rotated 
+	        270 degrees clockwise</b> and that the correct area is highlighted.
           	<li>Confirm that the <b>Test180</b> attribute finds <b>one</b> &quot;UPSIDE DOWN&quot; 
-              	attribute and that the correct area (top center) is highlighted.
+       	      	attribute and that the correct area (top center) is highlighted.
           	<li>Confirm that the <b>Test180b</b> attribute finds <b>one</b> &quot;UPSIDE DOWN&quot; 
-              	attribute and that the correct area (bottom center) is highlighted.
-          	<li>Confirm that the <b>TestAll</b> attribute finds the regular paragraph text 
+       		attribute and that the correct area (bottom center) is highlighted.
+       	  	<li>Confirm that the <b>TestAll</b> attribute finds the regular paragraph text 
               	from the center area of the image plus the incorrectly recognized text from the 
-              	UPSIDE DOWN areas.  Also confirm that the entire center text area is highlighted 
-              	along with small portions of the side text.
+       		UPSIDE DOWN areas.  Also confirm that the entire center text area is highlighted 
+	       	along with small portions of the side text.
      	</ul>
+	</li>
 <p>
         <ul>
           	<li>The <b>RotateTest3.rsd</b> file contains 4 attributes that exercise the 
@@ -182,11 +187,16 @@
       	</ul>
       	</li>
 <p>
+	<li><h2><b>Miscellaneous</b></h2>
+      	<ul>
 		<li><b>[FlexIDSCore #3063]</b> Throws exception when no text to operate on.</li>
-	<ul>
-		<li>Open 'I:\Common\Testing\PVCS_Testing\FlexIDSCore\3063\spr.rsd'</li>
-		<li>Run the ruleset on 'I:\Common\Testing\PVCS_Testing\FlexIDSCore\3063\00008879_00001.tif'</li>
-		<li>Ensure that a <b>System error: Unable to allocate necessary resources.</b> exception is not logged.</li>
+		<ul>
+			<li>Open <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3063\spr.rsd</b></li>
+			<li>Run the ruleset on 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3063\00008879_00001.tif</b></li>
+			<li>Ensure that a <b>System error: Unable to allocate necessary 
+			resources.</b> exception is not logged.</li>
+		</ul>
 	</ul>
 </ul>
 </body>
