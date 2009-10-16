@@ -36,9 +36,9 @@ BEGIN_MSG_MAP(CAFEngineFileProcessorPP)
 	CHAIN_MSG_MAP(IPropertyPageImpl<CAFEngineFileProcessorPP>)
 	MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 	COMMAND_HANDLER(IDC_BTN_BROWSE_AFE, BN_CLICKED, OnClickedBtnBrowse)
-	COMMAND_HANDLER(IDC_CHK_CREATE_USS, BN_CLICKED, OnClickedCheckCreateUSS)
 	COMMAND_HANDLER(IDC_RADIO_OCR_ALL, BN_CLICKED, OnClickedRadioAllPages)
 	COMMAND_HANDLER(IDC_RADIO_OCR_SPECIFIED, BN_CLICKED, OnClickedRadioSpecificPages)
+	COMMAND_HANDLER(IDC_RADIO_OCR_NONE, BN_CLICKED, OnClickedRadioOcrNone)
 	COMMAND_HANDLER(IDC_BTN_DOCTAGS_AFE, BN_CLICKED, OnClickedBtnRulesFileDocTags)
 	// REFLECT_NOTIFICATIONS needed by ImageButtonWithSytle
 	REFLECT_NOTIFICATIONS()
@@ -54,9 +54,9 @@ END_MSG_MAP()
 	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnClickedBtnBrowse(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedBtnRulesFileDocTags(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
-	LRESULT OnClickedCheckCreateUSS(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedRadioAllPages(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedRadioSpecificPages(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedRadioOcrNone(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 
@@ -66,17 +66,16 @@ private:
 	ATLControls::CEdit m_editRuleFileName;
 	CImageButtonWithStyle m_btnRuleFileSelectTag;
 	ATLControls::CButton m_chkReadUSS;
-	ATLControls::CButton m_chkCreateUSS;
+	ATLControls::CButton m_chkSaveOcrResults;
+	ATLControls::CButton m_chkUseCleanedImage;
 	ATLControls::CButton m_radioAllPages;
 	ATLControls::CButton m_radioSpecificPages;
+	ATLControls::CButton m_radioOcrNone;
 	ATLControls::CEdit m_editSpecificPages;
 
 	///////////
 	// Methods
 	///////////
-	bool storeRuleFileName(UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipAFEFileProc);
-	bool storeOCRPages(UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipAFEFileProc);
-
 	// ensure that this component is licensed
 	void validateLicense();
 };

@@ -284,9 +284,6 @@ private:
 	//			which should contain SRW.exe when installed the software is installed
 	string getPathToSpotRecognitionWindowExe();
 	//----------------------------------------------------------------------------------------------
-	// PURPOSE: To build the default clean image file name from the input file name
-	string getCleanImageName(const string& strImageFileName);
-	//----------------------------------------------------------------------------------------------
 	// PURPOSE: To store the page range settings from the scope dialog box to the
 	//			ImageCleanupSettingsObject.  If a range has been left blank will
 	//			warn the user and return false.

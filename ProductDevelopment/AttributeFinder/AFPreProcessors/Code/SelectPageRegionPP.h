@@ -40,7 +40,9 @@ BEGIN_MSG_MAP(CSelectPageRegionPP)
 	COMMAND_HANDLER(IDC_CHECK_REGEXP, BN_CLICKED, OnClickedChkRegExp)
 	COMMAND_HANDLER(IDC_CHECK_CASE_SENSITIVE, BN_CLICKED, OnClickedChkCaseSensitive)
 	COMMAND_HANDLER(IDC_RADIO_REGEXP_PAGE, BN_CLICKED, OnClickedRadioRegExpPages)
-	COMMAND_HANDLER(IDC_CHECK_OCR, BN_CLICKED, OnClickedChkOCRRegion)
+	COMMAND_HANDLER(IDC_RADIO_RETURN_TEXT, BN_CLICKED, OnClickedRadioReturnType)
+	COMMAND_HANDLER(IDC_RADIO_REOCR, BN_CLICKED, OnClickedRadioReturnType)
+	COMMAND_HANDLER(IDC_RADIO_RETURN_REGION, BN_CLICKED, OnClickedRadioReturnType)
 	
 END_MSG_MAP()
 // Handler prototypes:
@@ -60,7 +62,7 @@ END_MSG_MAP()
 	LRESULT OnClickedChkRegExp(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedChkCaseSensitive(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedRadioRegExpPages(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
-	LRESULT OnClickedChkOCRRegion(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedRadioReturnType(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	///////////
@@ -86,8 +88,13 @@ private:
 	ATLControls::CButton m_radioRegExpPages;
 	ATLControls::CEdit m_editRegExp;
 
-	ATLControls::CButton m_chkOCRRegion;
+	ATLControls::CButton m_radioReturnText;
+	ATLControls::CComboBox m_cmbIncludeExcludeIntersect;
+	ATLControls::CComboBox m_cmbIntersectType;
+	ATLControls::CButton m_radioReOcr;
 	ATLControls::CEdit m_editRegionRotation;
+	ATLControls::CButton m_radioReturnRegion;
+	ATLControls::CEdit m_editReturnText;
 
 	CXInfoTip m_infoTip;
 
@@ -98,5 +105,8 @@ private:
 
 	bool saveRestrictions(UCLID_AFPREPROCESSORSLib::ISelectPageRegionPtr ipSelectPageRegion);
 
-	bool saveOCRItems(UCLID_AFPREPROCESSORSLib::ISelectPageRegionPtr ipSelectPageRegion);
+	bool saveReturnItems(UCLID_AFPREPROCESSORSLib::ISelectPageRegionPtr ipSelectPageRegion);
+
+	// Enables/disables the controls based on the radio button states
+	void updateReturnControls();
 };

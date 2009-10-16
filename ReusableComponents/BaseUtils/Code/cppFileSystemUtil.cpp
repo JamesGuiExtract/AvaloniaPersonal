@@ -2234,3 +2234,22 @@ void setFileAttributes(const string& strFileName, DWORD dwFileAttributes,
 	}
 }
 //--------------------------------------------------------------------------------------------------
+string getCleanImageName(const string& strImageFileName)
+{
+	// e.g. "D:\test image\test\123.tif" = "D:\test image\test\123.clean.tif"
+	string strCleanImageName = getDirectoryFromFullPath(strImageFileName) + "\\"
+		+ getFileNameWithoutExtension(strImageFileName) + ".clean"
+		+ getExtensionFromFullPath(strImageFileName);
+
+	return strCleanImageName;
+}
+//-------------------------------------------------------------------------------------------------
+string getCleanImageNameIfExists(const string& strImageFileName)
+{
+	// get the clean image name
+	string strCleanImageName = getCleanImageName(strImageFileName);
+
+	// if it exists return the clean image, otherwise return the original
+	return isValidFile(strCleanImageName) ? strCleanImageName : strImageFileName;
+}
+//--------------------------------------------------------------------------------------------------

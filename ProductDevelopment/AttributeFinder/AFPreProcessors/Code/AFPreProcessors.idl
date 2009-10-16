@@ -18,6 +18,7 @@ library UCLID_AFPREPROCESSORSLib
 	importlib("stdole2.tlb");
 	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
 	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
 	importlib("..\..\AFCore\Code\AFCore.tlb");
 
 	//----------------------------------------------------------------------------------------------
@@ -57,6 +58,17 @@ library UCLID_AFPREPROCESSORSLib
 		kForLoop
 		
 	} ELoopType;
+	typedef
+	[
+		uuid(B112C0E1-753F-4618-B3B8-F3EAB447D82A),
+		helpstring("Select Page Region Return Types")
+	]
+	enum
+	{
+		kReturnText = 0,
+		kReturnReOcr = 1,
+		kReturnImageRegion = 2
+	} ESelectPageRegionReturnType;
 
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -----------------------------------------------------------------------------------
@@ -72,12 +84,7 @@ library UCLID_AFPREPROCESSORSLib
 	{
 		[propget, id(1), helpstring("property IncludeRegionDefined")] HRESULT IncludeRegionDefined([out, retval] VARIANT_BOOL *pVal);
 		[propput, id(1), helpstring("property IncludeRegionDefined")] HRESULT IncludeRegionDefined([in] VARIANT_BOOL newVal);
-		// if bSpecificPages == true, strSpecificPages shall not be empty
-		// if bSpecificPages == false, strSpecificPages must be empty, and it means all pages will be selected
-		[id(2), helpstring("method SelectPages")] HRESULT SelectPages([in] VARIANT_BOOL bSpecificPages, [in] BSTR strSpecificPages);
-		// return the page selections
-		[id(3), helpstring("method GetPageSelections")] HRESULT GetPageSelections([in, out] VARIANT_BOOL *pbSpecificPages, [in, out] BSTR *pstrSpecificPages);
-		// nStartPercentage and nEndPercentage must be 0 ~ 100
+
 		[id(4), helpstring("method SetHorizontalRestriction")] HRESULT SetHorizontalRestriction([in] long nStartPercentage, [in] long nEndPercentage);
 		[id(5), helpstring("method GetHorizontalRestriction")] HRESULT GetHorizontalRestriction([in, out] long* pnStartPercentage, [in, out] long* pnEndPercentage);
 		[id(6), helpstring("method SetVerticalRestriction")] HRESULT SetVerticalRestriction([in] long nStartPercentage, [in] long nEndPercentage);
@@ -98,11 +105,40 @@ library UCLID_AFPREPROCESSORSLib
 		[propget, id(12), helpstring("property RegExpPageSelectionType")] HRESULT RegExpPageSelectionType([out, retval] ERegExpPageSelectionType *pVal);
 		[propput, id(12), helpstring("property RegExpPageSelectionType")] HRESULT RegExpPageSelectionType([in] ERegExpPageSelectionType newVal);
 
-		[propget, id(13), helpstring("property OCRSelectedRegion")] HRESULT OCRSelectedRegion([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(13), helpstring("property OCRSelectedRegion")] HRESULT OCRSelectedRegion([in] VARIANT_BOOL newVal);
-
+		// This property only applies if the select page region return type is kReturnReOcr
 		[propget, id(14), helpstring("property SelectedRegionRotation")] HRESULT SelectedRegionRotation([out, retval] long* pVal);
 		[propput, id(14), helpstring("property SelectedRegionRotation")] HRESULT SelectedRegionRotation([in] long newVal);
+
+		// Specifies the return type for the select page region object
+		[propget, id(15), helpstring("property SelectPageRegionReturnType")] HRESULT SelectPageRegionReturnType(
+			[out, retval] ESelectPageRegionReturnType* pReturnType);
+		[propput, id(15), helpstring("property SelectPageRegionReturnType")] HRESULT SelectPageRegionReturnType(
+			[in] ESelectPageRegionReturnType returnType);
+
+		// This property only applies if the select page region return type is kReturnText
+		[propget, id(16), helpstring("property IncludeIntersectingText")] HRESULT IncludeIntersectingText(
+			[out, retval] VARIANT_BOOL* pVal);
+		[propput, id(16), helpstring("property IncludeIntersectingText")] HRESULT IncludeIntersectingText(
+			[in] VARIANT_BOOL newVal);
+
+		// This property only applies if the select page region return type is kReturnText
+		[propget, id(17), helpstring("property TextIntersectionType")] HRESULT TextIntersectionType(
+			[out, retval] ESpatialEntity* pIntersectionType);
+		[propput, id(17), helpstring("property TextIntersectionType")] HRESULT TextIntersectionType(
+			[in] ESpatialEntity intersectionType);
+
+		// This property only applies if the select page region return type is kReturnImageRegion
+		[propget, id(18), helpstring("property TextToAssignToRegion")] HRESULT TextToAssignToRegion(
+			[out, retval] BSTR* pbstrTextToAssignToRegion);
+		[propput, id(18), helpstring("property TextToAssignToRegion")] HRESULT TextToAssignToRegion(
+			[in] BSTR bstrTextToAssignToRegion);
+
+		// This property replaces the old GetPageSelections and SelectPages methods that required
+		// a VARIANT_BOOL (which was being ignored) and a BSTR
+		[propget, id(19), helpstring("property SpecificPages")] HRESULT SpecificPages(
+			[out, retval] BSTR* pbstrSpecificPages);
+		[propput, id(19), helpstring("property SpecificPages")] HRESULT SpecificPages(
+			[in] BSTR bstrSpecificPages);
 	};
 
 	[

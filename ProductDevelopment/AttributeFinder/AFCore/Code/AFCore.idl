@@ -437,6 +437,10 @@ library UCLID_AFCORELib
 		//					the ruleset is to be loaded), or must be of either IUnknown * type
 		//					or IDispatch * type (in which case the object passed in is expected
 		//					to also have implemented IRuleSet)
+		//			vbUseAFDocText - If VARIANT_TRUE then the SpatialString (pDoc->Text) contained
+		//					in the IAFDocument object will be used for running rules (even if it
+		//					is blank).  No OCR will be run and even if strSrcDocFileName is a
+		//					USS file or text file, it will not be loaded.
 		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
 		[id(6), helpstring("method FindAttributes")] HRESULT FindAttributes(
 			[in] IAFDocument *pDoc,
@@ -444,6 +448,7 @@ library UCLID_AFCORELib
 			[in] long nNumOfPagesToRecognize,
 			[in] VARIANT varRuleSet, // see important note about this argument
 			[in] IVariantVector* pvecAttributeNames,
+			[in] VARIANT_BOOL vbUseAFDocText,
 			[in] IProgressStatus *pProgressStatus,
 			[out, retval] IIUnknownVector** pAttributes);
 		//-----------------------------------------------------------------------------------------

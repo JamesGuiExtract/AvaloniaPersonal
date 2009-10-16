@@ -481,6 +481,13 @@ EXPORT_BaseUtils void waitForFileToBeReadable(const string& strFileName,
 //			ignored.
 EXPORT_BaseUtils void setFileAttributes(const string& strFileName, DWORD dwFileAttributes,
 										bool bThrowExceptionIfNotSuccess = true);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: Returns the cleaned image name corresponding to strImageFileName
+EXPORT_BaseUtils string getCleanImageName(const string& strImageFileName);
+//---------------------------------------------------------------------------------------------
+// PURPOSE: If the cleaned image exists returns the clean image name corresponding to 
+//          strImageFileName, otherwise returns strImageFileName.
+EXPORT_BaseUtils string getCleanImageNameIfExists(const string& strImageFileName);
 
 //-------------------------------------------------------------------------------------------------
 // Char Operations 

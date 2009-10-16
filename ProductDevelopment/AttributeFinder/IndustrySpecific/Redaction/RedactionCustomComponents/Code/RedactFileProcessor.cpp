@@ -270,7 +270,7 @@ STDMETHODIMP CRedactFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long n
 
 			// Problem: License error if pass image file works, can't initialize OCREngine
 			ipFoundAttr = ipAttrFinder->FindAttributes( ipAFDoc, strInputFile.c_str(),
-				-1, _varRuleSet, m_ipAttributeNames, VARIANT_FALSE );
+				-1, _varRuleSet, m_ipAttributeNames, VARIANT_FALSE, NULL );
 			_lastCodePos = "230";
 
 			// Calculate the counts from the found attributes

@@ -18,7 +18,11 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version history:
+// 1 - First version of this object
+// 2 - Added m_bUseCleanedImage option to object
+//     Also added support for ocr type: kNoOCR
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CAFEngineFileProcessor
@@ -36,6 +40,13 @@ CAFEngineFileProcessor::~CAFEngineFileProcessor()
 {
 	try
 	{
+		// Release COM objects
+		m_ipOCRUtils = NULL;
+		m_ipOCREngine = NULL;
+		m_ipAFEngine = NULL;
+
+		// Clear the rule set cache (releases the internal COM object)
+		m_ipRuleSet.Clear();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20388");
 }
@@ -110,41 +121,38 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName, long 
 		validateFileOrFolderExistence(strInputFile, "ELI26659");
 		validateFileOrFolderExistence(strRulesFile, "ELI26660");
 
-		// By default, the file to be processed is the input file name
-		string strFileToBeProcessed(strInputFile);
-
-		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
+		// Create a new AFDoc pointer
+		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
 		ASSERT_RESOURCE_ALLOCATION("ELI19455", ipAFDoc != NULL);
 
-		bool bNeedToRunOCR = false;
-
-		// Check for the file type
-		EFileType eFileType = getFileType(strInputFile);
-		string strUSSFileName = strInputFile + ".uss";
-		if (eFileType == kImageFile)
+		// If reading the USS file from disk, check for USS file
+		// default the need to OCR to true
+		bool bNeedToRunOCR = true;
+		if (m_bReadUSSFileIfExist)
 		{
-			// Get the USS file name, assume that the USS file is in
-			// the same folder as the image file.
-			if (::isFileOrFolderValid(strUSSFileName))
+			EFileType eFileType = getFileType(strInputFile);
+			string strSpatialStringFile = "";
+			if (eFileType == kImageFile)
 			{
-				// If input file is an image and if its associated USS file exists
-				if (m_bReadUSSFileIfExist)
-				{
-					// If it's a valid file
-					strFileToBeProcessed = strUSSFileName;
-				}
+				// Add USS extension
+				strSpatialStringFile = strInputFile + ".uss";
 			}
-			else	// uss file doesn't exist
+			else if (eFileType == kUSSFile || eFileType == kTXTFile)
 			{
-				// user chooses to create the uss file
-				if (m_bCreateUssFileIfNonExist)
-				{
-					// The spatial string can be directly loaded from AFDocument.
-					// No need for the source doc any more.
-					strFileToBeProcessed = "";
+				// File is uss or text, just load from input file
+				strSpatialStringFile = strInputFile;
+			}
 
-					bNeedToRunOCR = true;
-				}
+			if (!strSpatialStringFile.empty() && isValidFile(strSpatialStringFile))
+			{
+				ISpatialStringPtr ipText = ipAFDoc->Text;
+				ASSERT_RESOURCE_ALLOCATION("ELI28088", ipText != NULL);
+
+				// Load the spatial string from the file
+				ipText->LoadFrom(strSpatialStringFile.c_str(), VARIANT_FALSE);
+
+				// Set the need to OCR flag to false
+				bNeedToRunOCR = false;
 			}
 		}
 
@@ -195,29 +203,44 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName, long 
 				ipProgressStatus->StartNextItemGroup("Performing OCR...", nNUM_PROGRESS_ITEMS_OCR);
 			}
 
+			// Get the name of the file to OCR
+			string strFileToOCR =
+				m_bUseCleanedImage ? getCleanImageNameIfExists(strInputFile) : strInputFile;
+
 			// Perform the OCR as configured by the user
 			switch (m_eOCRPagesType)
 			{
 			case kOCRAllPages:
 				{
 					// Recognize the image file and put the spatial string in ipAFDoc
-					ipAFDoc->Text = getOCRUtils()->RecognizeTextInImageFile( get_bstr_t(strInputFile), 
+					ipAFDoc->Text = getOCRUtils()->RecognizeTextInImageFile( strFileToOCR.c_str(), 
 						-1, getOCREngine(), ipProgressStatusToUseForSubTasks);
 				}
 				break;
 			case kOCRCertainPages:
 				{
-					ipAFDoc->Text = getOCREngine()->RecognizeTextInImage2( get_bstr_t(strInputFile), 
-						get_bstr_t(m_strSpecificPages), VARIANT_TRUE, ipProgressStatusToUseForSubTasks);
+					ipAFDoc->Text = getOCREngine()->RecognizeTextInImage2( strFileToOCR.c_str(), 
+						m_strSpecificPages.c_str(), VARIANT_TRUE, ipProgressStatusToUseForSubTasks);
 				}
 				break;
 			}
 
-			// Output the spatial string to a USS file
-			ISpatialStringPtr ipText = ipAFDoc->Text;
-			ASSERT_RESOURCE_ALLOCATION("ELI15524", ipText != NULL);
-			ipText->SaveTo(get_bstr_t(strUSSFileName.c_str()), 
-				VARIANT_TRUE, VARIANT_TRUE);
+			// Ensure the appropriate source doc name is in the spatial string
+			if (m_bUseCleanedImage || m_eOCRPagesType == kNoOCR)
+			{
+				ISpatialStringPtr ipText = ipAFDoc->Text;
+				ASSERT_RESOURCE_ALLOCATION("ELI28151", ipText != NULL);
+
+				ipText->SourceDocName = strInputFile.c_str();
+			}
+
+			if (m_bCreateUssFileIfNonExist && m_eOCRPagesType != kNoOCR)
+			{
+				// Output the spatial string to a USS file
+				ISpatialStringPtr ipText = ipAFDoc->Text;
+				ASSERT_RESOURCE_ALLOCATION("ELI15524", ipText != NULL);
+				ipText->SaveTo(get_bstr_t(strInputFile + ".uss"), VARIANT_TRUE, VARIANT_TRUE);
+			}
 		}
 
 		// Update the progress status to indicate that the next item group
@@ -230,16 +253,14 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName, long 
 		// Make sure the rule set file exists.
 		// The rule set is saved in this object so that it can be passed in to AFEngine
 		// and so that it need not be loaded each time this method is called.
-		IRuleSetPtr ipRules( NULL );
-		ipRules = getRuleSet(strRulesFile);
+		IRuleSetPtr ipRules = getRuleSet(strRulesFile);
 
 		IUnknownPtr ipUnknown = ipRules;
 		_variant_t _varRuleSet = (IUnknown *) ipUnknown;
 
 		// Execute the rule set
-		CComQIPtr<IAFDocument> ipDoc(ipAFDoc);
-		getAFEngine()->FindAttributes(ipDoc, strFileToBeProcessed.c_str(), -1, 
-			_varRuleSet, NULL, ipProgressStatusToUseForSubTasks);
+		getAFEngine()->FindAttributes(ipAFDoc, strInputFile.c_str(), 0, 
+			_varRuleSet, NULL, VARIANT_TRUE, ipProgressStatusToUseForSubTasks);
 
 		// Update the progress status to indicate that rule running is complete.
 		if (ipProgressStatus && nTOTAL_PROGRESS_ITEMS > 1)
@@ -434,6 +455,47 @@ STDMETHODIMP CAFEngineFileProcessor::put_OCRCertainPages(BSTR strSpecificPages)
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFEngineFileProcessor::get_UseCleanedImage(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28070", pVal != NULL);
+
+		*pVal = asVariantBool(m_bUseCleanedImage);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28071")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFEngineFileProcessor::put_UseCleanedImage(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Get the new value
+		bool bNewVal = asCppBool(newVal);
+
+		// If the new value is not the same as the original value then
+		// set the new value and set the dirty flag
+		if (bNewVal != m_bUseCleanedImage)
+		{
+			m_bUseCleanedImage = bNewVal;
+			m_bDirty = true;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28072")
+}
 
 //-------------------------------------------------------------------------------------------------
 // ICategorizedComponent
@@ -473,10 +535,14 @@ STDMETHODIMP CAFEngineFileProcessor::raw_CopyFrom(IUnknown *pObject)
 		m_bCreateUssFileIfNonExist = ipSource->CreateUSSFile == VARIANT_TRUE;
 		m_eOCRPagesType = (EOCRPagesType)ipSource->OCRPagesType;
 		m_strSpecificPages = ipSource->OCRCertainPages;
+		m_bUseCleanedImage = ipSource->UseCleanedImage == VARIANT_TRUE;
+
+		// Set dirty flag since this object has changed
+		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10990");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAFEngineFileProcessor::raw_Clone(IUnknown* *pObject)
@@ -515,14 +581,13 @@ STDMETHODIMP CAFEngineFileProcessor::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		// Check license
 		validateLicense();
 
-		bool bConfigured = !m_strRuleFileNameForFileProcessing.empty();
+		// Object is configured if:
+		// 1. The rules file name is not empty
+		// 2. The ocr type is not Certain pages OR the specific pages string is not empty
+		bool bConfigured = !m_strRuleFileNameForFileProcessing.empty()
+			&& (m_eOCRPagesType != kOCRCertainPages || !m_strSpecificPages.empty());
 
-		if (m_bCreateUssFileIfNonExist && m_eOCRPagesType == kOCRCertainPages)
-		{
-			bConfigured = bConfigured && !m_strSpecificPages.empty();
-		}
-
-		*pbValue = bConfigured ? VARIANT_TRUE : VARIANT_FALSE;
+		*pbValue = asVariantBool(bConfigured);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10994");
 
@@ -625,6 +690,11 @@ STDMETHODIMP CAFEngineFileProcessor::Load(IStream *pStream)
 
 		dataReader >> m_strSpecificPages;
 
+		if (nDataVersion >= 2)
+		{
+			dataReader >> m_bUseCleanedImage;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -658,6 +728,8 @@ STDMETHODIMP CAFEngineFileProcessor::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << (long)m_eOCRPagesType;
 
 		dataWriter << m_strSpecificPages;
+
+		dataWriter << m_bUseCleanedImage;
 		
 		dataWriter.flushToByteStream();
 
@@ -694,6 +766,7 @@ void CAFEngineFileProcessor::clear()
 	m_bCreateUssFileIfNonExist = false;
 	m_eOCRPagesType = kOCRAllPages;
 	m_strSpecificPages = "";
+	m_bUseCleanedImage = true;
 }
 //-------------------------------------------------------------------------------------------------
 void CAFEngineFileProcessor::validateLicense()

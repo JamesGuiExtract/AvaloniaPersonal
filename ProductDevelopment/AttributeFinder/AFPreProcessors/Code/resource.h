@@ -32,11 +32,16 @@
 #define IDC_EDIT_END_VERTICAL           213
 #define IDC_HELP_SPECIFIC_PAGE          214
 #define IDC_RADIO_REGEXP_PAGE           215
-#define IDC_CHECK_OCR                   216
+#define IDC_RADIO_REOCR                 216
 #define IDC_EDIT_ROTATION               217
 #define IDC_EDIT_REGEXP_PAGE            218
 #define IDC_CHECK_REGEXP                219
 #define IDC_CHECK_CASE_SENSITIVE        220
+#define IDC_RADIO_RETURN_TEXT			221
+#define IDC_COMBO_INCLUDE_EXCLUDE_INTERSECTING	222
+#define IDC_COMBO_INTERSECT_TYPE		223
+#define IDC_RADIO_RETURN_REGION			224
+#define IDC_EDIT_RETURN_TEXT			225
 #define IDC_RADIO_DO                    441
 #define IDC_RADIO_WHILE                 442
 #define IDC_RADIO_FOR                   443
@@ -61,7 +66,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        462
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         221
+#define _APS_NEXT_CONTROL_VALUE         226
 #define _APS_NEXT_SYMED_VALUE           182
 #endif
 #endif

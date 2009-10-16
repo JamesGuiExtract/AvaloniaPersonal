@@ -9,6 +9,9 @@
 #include <afxmt.h>
 
 #include <map>
+#include <string>
+
+using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 // CFeedbackMgr
@@ -46,11 +49,12 @@ END_COM_MAP()
 	STDMETHOD(raw_RecordCorrectData)(BSTR strRuleExecutionID, IIUnknownVector* pData);
 
 // IFeedbackMgrInternals
-	STDMETHOD(raw_RecordFoundData)(BSTR strRuleExecutionID, IIUnknownVector * pData);
-	STDMETHOD(raw_RecordException)(BSTR strRuleExecutionID, BSTR strException);
-	STDMETHOD(raw_RecordRuleExecution)(IAFDocument *pAFDoc, BSTR strRSDFileName, BSTR * pstrRuleExecutionID);
+	STDMETHOD(raw_RecordFoundData)(BSTR bstrRuleExecutionID, IIUnknownVector * pData);
+	STDMETHOD(raw_RecordException)(BSTR bstrRuleExecutionID, BSTR bstrException);
+	STDMETHOD(raw_RecordRuleExecution)(IAFDocument *pAFDoc, BSTR bstrRSDFileName,
+		BSTR* pbstrRuleExecutionID);
 	STDMETHOD(raw_ClearFeedbackData)(VARIANT_BOOL bShowPrompt);
-	STDMETHOD(raw_GetFeedbackRecords)(IUnknown ** pFeedbackRecords);
+	STDMETHOD(raw_GetFeedbackRecords)(IUnknown** ppFeedbackRecords);
 	STDMETHOD(raw_CloseConnection)();
 
 private:
@@ -59,8 +63,8 @@ private:
 	//////////////
 
 	// Handles settings persistence
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	std::auto_ptr<PersistenceMgr> ma_pCfgFeedbackMgr;
+	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	auto_ptr<PersistenceMgr> ma_pCfgFeedbackMgr;
 
 	// DB Connection is open
 	bool		m_bConnectionOpen;
@@ -69,7 +73,7 @@ private:
 	_ConnectionPtr	m_ipConnection;
 
 	// Map of Duration timers
-	std::map<long, StopWatch>	m_mapDurationTimers;
+	map<long, StopWatch>	m_mapDurationTimers;
 
 	// Static variable to indicate that connection failed and 
 	// Feedback will not be collected
@@ -87,24 +91,22 @@ private:
 
 	// Opens connection to database.
 	// Returns false only if a connection to the database could not be created.
-	bool	openDBConnection(std::string strFeedbackFolder);
+	bool	openDBConnection(const string& strFeedbackFolder);
 
 	// Updates the Computer field for the specified database record
-	void	writeComputerName(long lRuleID, std::string strName);
+	void	writeComputerName(long lRuleID, const string& strName);
 
 	// Updates the CorrectTime field for the specified database record
-//	void	writeCorrectTime(long lRuleID, DWORD dwTime);
 	void	writeCorrectTime(long lRuleID, __time64_t t64Time);
 
 	// Updates the Duration field for the specified database record
 	void	writeDuration(long lRuleID, double dSeconds);
 
 	// Adds a new record to the database and sets Start Time as specified
-//	long	writeNewStartTime(DWORD dwTime);
 	long	writeNewStartTime(__time64_t t64Time);
 
 	// Updates the RSD File field for the specified database record
-	void	writeRSDFileName(long lRuleID, std::string strRSDFileName);
+	void	writeRSDFileName(long lRuleID, const string& strRSDFileName);
 
 	// Checks license state
 	void	validateLicense();

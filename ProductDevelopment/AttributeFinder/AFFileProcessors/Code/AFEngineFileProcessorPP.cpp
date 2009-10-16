@@ -6,8 +6,10 @@
 #include "Common.h"
 
 #include <FileDialogEx.h>
+#include <ComUtils.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
+#include <Misc.h>
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
 
@@ -78,21 +80,76 @@ STDMETHODIMP CAFEngineFileProcessorPP::Apply(void)
 			UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipAFEFileProc = m_ppUnk[i];
 			ASSERT_RESOURCE_ALLOCATION("ELI09018", ipAFEFileProc != NULL);
 
-			if (!storeRuleFileName(ipAFEFileProc))
+			_bstr_t bstrRulesFileName;
+			m_editRuleFileName.GetWindowText(bstrRulesFileName.GetAddress());
+
+			// Ensure the rule file name is long enough (at least 8 characters - c:\a.rsd)
+			if (bstrRulesFileName.length() < 8)
 			{
+				MessageBox("Rules file name must be at least 8 characters.", "Invalid Rules File",
+					MB_OK | MB_ICONERROR);
 				m_editRuleFileName.SetSel(0, -1);
 				m_editRuleFileName.SetFocus();
 				return S_FALSE;
 			}
 
-			ipAFEFileProc->ReadUSSFile = m_chkReadUSS.GetCheck()==1 ? VARIANT_TRUE : VARIANT_FALSE;
+			// Set the default OCR to all pages
+			EOCRPagesType ocrType = kOCRAllPages;
 
-			if (!storeOCRPages(ipAFEFileProc))
+			// Check if OCRing specified pages, and if so ensure that the pages string is not empty
+			if (m_radioSpecificPages.GetCheck() == BST_CHECKED)
 			{
-				m_editSpecificPages.SetSel(0, -1);
-				m_editSpecificPages.SetFocus();
-				return S_FALSE;
+				_bstr_t bstrSpecifiedPages;
+				m_editSpecificPages.GetWindowText(bstrSpecifiedPages.GetAddress());
+
+				if (bstrSpecifiedPages.length() == 0)
+				{
+					MessageBox("Cannot leave specified pages blank.", "Blank Page Range",
+						MB_OK | MB_ICONERROR);
+					m_editSpecificPages.SetSel(0, -1);
+					m_editSpecificPages.SetFocus();
+					return S_FALSE;
+				}
+				else
+				{
+					// Validate the page numbers
+					try
+					{
+						validatePageNumbers(asString(bstrSpecifiedPages));
+					}
+					catch(UCLIDException& uex)
+					{
+						uex.display();
+						m_editSpecificPages.SetSel(0, -1);
+						m_editSpecificPages.SetFocus();
+						return S_FALSE;
+					}
+				}
+
+				// Store the specific pages
+				ipAFEFileProc->OCRCertainPages = bstrSpecifiedPages;
+
+				// Set the ocr type to certain pages
+				ocrType = kOCRCertainPages;
 			}
+			else if (m_radioOcrNone.GetCheck() == BST_CHECKED)
+			{
+				// Set the ocr type to none
+				ocrType = kNoOCR;
+			}
+
+			// Store the rules file name
+			ipAFEFileProc->RuleSetFileName = bstrRulesFileName;
+
+			// Store the OCR type
+			ipAFEFileProc->OCRPagesType = (UCLID_AFFILEPROCESSORSLib::EOCRPagesType) ocrType;
+
+			// Store the check box settings
+			ipAFEFileProc->ReadUSSFile = asVariantBool(m_chkReadUSS.GetCheck() == BST_CHECKED);
+			ipAFEFileProc->CreateUSSFile =
+				asVariantBool(m_chkSaveOcrResults.GetCheck() == BST_CHECKED);
+			ipAFEFileProc->UseCleanedImage =
+				asVariantBool(m_chkUseCleanedImage.GetCheck() == BST_CHECKED);
 		}
 
 		SetDirty(FALSE);
@@ -116,9 +173,11 @@ LRESULT CAFEngineFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 	{
 		m_editRuleFileName = GetDlgItem(IDC_EDIT_RULE_FILE);
 		m_chkReadUSS = GetDlgItem(IDC_CHK_FROM_USS);
-		m_chkCreateUSS = GetDlgItem(IDC_CHK_CREATE_USS);
+		m_chkSaveOcrResults = GetDlgItem(IDC_CHK_SAVE_RESULTS);
+		m_chkUseCleanedImage = GetDlgItem(IDC_CHK_USE_CLEAN_IMAGE);
 		m_radioAllPages = GetDlgItem(IDC_RADIO_OCR_ALL);
 		m_radioSpecificPages = GetDlgItem(IDC_RADIO_OCR_SPECIFIED);
+		m_radioOcrNone = GetDlgItem(IDC_RADIO_OCR_NONE);
 		m_editSpecificPages = GetDlgItem(IDC_EDIT_PAGES);
 		m_btnRuleFileSelectTag.SubclassDlgItem(IDC_BTN_DOCTAGS_AFE, CWnd::FromHandle(m_hWnd));
 		m_btnRuleFileSelectTag.SetIcon(::LoadIcon(_Module.m_hInstResource,
@@ -127,34 +186,51 @@ LRESULT CAFEngineFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 		UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipAFEFileProc = m_ppUnk[0];
 		if (ipAFEFileProc)
 		{
-			string strRuleFileName = ipAFEFileProc->RuleSetFileName;
+			// Get the rules file name and set the edit box
+			string strRuleFileName = asString(ipAFEFileProc->RuleSetFileName);
 			m_editRuleFileName.SetWindowText(strRuleFileName.c_str());
 
-			bool bCheck = ipAFEFileProc->ReadUSSFile == VARIANT_TRUE;
-			m_chkReadUSS.SetCheck(bCheck);
+			// Set the check box states
+			m_chkReadUSS.SetCheck(asBSTChecked(ipAFEFileProc->ReadUSSFile));
+			m_chkSaveOcrResults.SetCheck(asBSTChecked(ipAFEFileProc->CreateUSSFile));
+			m_chkUseCleanedImage.SetCheck(asBSTChecked(ipAFEFileProc->UseCleanedImage));
 
-			bCheck = ipAFEFileProc->CreateUSSFile == VARIANT_TRUE;
-			m_chkCreateUSS.SetCheck(bCheck);
-
-			// if create uss file is checked, update the radio buttons
-			m_radioAllPages.SetCheck(1);
-			m_radioAllPages.EnableWindow(bCheck);
-			m_radioSpecificPages.EnableWindow(bCheck);
-			m_editSpecificPages.EnableWindow(FALSE);
-			if (bCheck)
+			// Get the ocr type, set the radio buttons states and edit controls
+			// based on the ocr type setting
+			EOCRPagesType eType = (EOCRPagesType)ipAFEFileProc->OCRPagesType;
+			int nCheckAll = BST_UNCHECKED;
+			int nCheckSpecific = BST_UNCHECKED;
+			int nCheckNoOcr = BST_UNCHECKED;
+			BOOL bEnableSpecificPages = FALSE;
+			switch(eType)
 			{
-				EOCRPagesType eType = (EOCRPagesType)ipAFEFileProc->OCRPagesType;
-				if (eType == kOCRCertainPages)
+			case kOCRAllPages:
+				nCheckAll = BST_CHECKED;
+				break;
+
+			case kOCRSpecifiedPages:
 				{
-					m_radioAllPages.SetCheck(0);
-					m_radioSpecificPages.SetCheck(1);
-					m_editSpecificPages.EnableWindow(TRUE);
-					string strSpecificPages = ipAFEFileProc->OCRCertainPages;
-					m_editSpecificPages.SetWindowText(strSpecificPages.c_str());
+					nCheckSpecific = BST_CHECKED;
+					bEnableSpecificPages = TRUE;
+					string strPages = asString(ipAFEFileProc->OCRCertainPages);
+					m_editSpecificPages.SetWindowText(strPages.c_str());
 				}
+				break;
+
+			case kNoOCR:
+				nCheckNoOcr = BST_CHECKED;
+				break;
+
+			default:
+				THROW_LOGIC_ERROR_EXCEPTION("ELI28089");
 			}
+
+			m_editSpecificPages.EnableWindow(bEnableSpecificPages);
+			m_radioAllPages.SetCheck(nCheckAll);
+			m_radioSpecificPages.SetCheck(nCheckSpecific);
+			m_radioOcrNone.SetCheck(nCheckNoOcr);
 		}
-	
+
 		SetDirty(FALSE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09015");
@@ -189,22 +265,6 @@ LRESULT CAFEngineFileProcessorPP::OnClickedBtnBrowse(WORD wNotifyCode,
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
-LRESULT CAFEngineFileProcessorPP::OnClickedCheckCreateUSS(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		BOOL bEnable = m_chkCreateUSS.GetCheck() == 1;
-		m_radioAllPages.EnableWindow(bEnable);
-		m_radioSpecificPages.EnableWindow(bEnable);
-		m_editSpecificPages.EnableWindow(bEnable && m_radioSpecificPages.GetCheck() == 1);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10291");
-
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
 LRESULT CAFEngineFileProcessorPP::OnClickedRadioAllPages(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -225,10 +285,21 @@ LRESULT CAFEngineFileProcessorPP::OnClickedRadioSpecificPages(WORD wNotifyCode, 
 	try
 	{
 		m_editSpecificPages.EnableWindow(TRUE);
-		m_editSpecificPages.SetFocus();
-		m_editSpecificPages.SetSel(0, -1);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10290");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CAFEngineFileProcessorPP::OnClickedRadioOcrNone(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		m_editSpecificPages.EnableWindow(FALSE);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28090");
 
 	return 0;
 }
@@ -258,50 +329,6 @@ LRESULT CAFEngineFileProcessorPP::OnClickedBtnRulesFileDocTags(WORD wNotifyCode,
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
-//-------------------------------------------------------------------------------------------------
-bool CAFEngineFileProcessorPP::storeRuleFileName(UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipAFEFileProc)
-{
-	try
-	{
-		CComBSTR bstrFileName;
-		GetDlgItemText(IDC_EDIT_RULE_FILE, bstrFileName.m_str);
-
-		ipAFEFileProc->RuleSetFileName = _bstr_t(bstrFileName);
-
-		return true;
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09017");
-
-	return false;
-}
-//-------------------------------------------------------------------------------------------------
-bool CAFEngineFileProcessorPP::storeOCRPages(UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipAFEFileProc)
-{
-	try
-	{
-		bool bCreateUSS = m_chkCreateUSS.GetCheck()==1;
-		ipAFEFileProc->CreateUSSFile = bCreateUSS ? VARIANT_TRUE : VARIANT_FALSE;
-
-		if (bCreateUSS)
-		{
-			bool bOCRAll = m_radioAllPages.GetCheck() == 1;
-			EOCRPagesType eType = bOCRAll ? kOCRAllPages : kOCRCertainPages;
-
-			ipAFEFileProc->OCRPagesType = (UCLID_AFFILEPROCESSORSLib::EOCRPagesType)eType;
-			if (eType == kOCRCertainPages)
-			{
-				CComBSTR bstrPages;
-				GetDlgItemText(IDC_EDIT_PAGES, bstrPages.m_str);
-				ipAFEFileProc->OCRCertainPages = _bstr_t(bstrPages);
-			}
-		}
-
-		return true;
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10296");
-
-	return false;
-}
 //-------------------------------------------------------------------------------------------------
 void CAFEngineFileProcessorPP::validateLicense()
 {

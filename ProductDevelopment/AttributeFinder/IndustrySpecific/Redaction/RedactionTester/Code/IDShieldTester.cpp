@@ -842,7 +842,7 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			{
 				// Get the attributes by running the rules on the OCR'd document.
 				ipFoundAttributes = m_ipAttrFinderEngine->FindAttributes(ipAFDoc, strSourceDoc.c_str(), 
-					-1, strRulesFile.c_str(), NULL, VARIANT_FALSE);
+					-1, strRulesFile.c_str(), NULL, VARIANT_FALSE, NULL);
 				ASSERT_RESOURCE_ALLOCATION("ELI15204", ipFoundAttributes != NULL);
 
 				// This flag means that the AFDoc contains the document types for this file.

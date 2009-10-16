@@ -5,8 +5,12 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <MiscLeadUtils.h>
+
 #include <string>
 #include <vector>
+
+using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 // CSelectPageRegion
@@ -64,8 +68,8 @@ public:
 	STDMETHOD(SetVerticalRestriction)(/*[in]*/ long nStartPercentage, /*[in]*/ long nEndPercentage);
 	STDMETHOD(GetHorizontalRestriction)(/*[in, out]*/ long* pnStartPercentage, /*[in, out]*/ long* pnEndPercentage);
 	STDMETHOD(SetHorizontalRestriction)(/*[in]*/ long nStartPercentage, /*[in]*/ long nEndPercentage);
-	STDMETHOD(SelectPages)(/*[in]*/ VARIANT_BOOL bSpecificPages, /*[in]*/ BSTR strSpecificPages);
-	STDMETHOD(GetPageSelections)(/*[in, out]*/ VARIANT_BOOL *pbSpecificPages, /*[in, out]*/ BSTR *pstrSpecificPages);
+	STDMETHOD(get_SpecificPages)(BSTR* pbstrSpecificPages);
+	STDMETHOD(put_SpecificPages)(BSTR bstrSpecificPages);
 	STDMETHOD(get_IncludeRegionDefined)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_IncludeRegionDefined)(/*[in]*/ VARIANT_BOOL newVal);
 
@@ -83,10 +87,19 @@ public:
 
 	STDMETHOD(get_RegExpPageSelectionType)(/*[out, retval]*/ ERegExpPageSelectionType *pVal);
 	STDMETHOD(put_RegExpPageSelectionType)(/*[in]*/ ERegExpPageSelectionType newVal);
-	STDMETHOD(get_OCRSelectedRegion)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_OCRSelectedRegion)(/*[in]*/ VARIANT_BOOL newVal);
+
+	STDMETHOD(get_SelectPageRegionReturnType)(ESelectPageRegionReturnType* pReturnType);
+	STDMETHOD(put_SelectPageRegionReturnType)(ESelectPageRegionReturnType returnType);
+
+	// Properties related to the return type
 	STDMETHOD(get_SelectedRegionRotation)(/*[out, retval]*/ long *pVal);
 	STDMETHOD(put_SelectedRegionRotation)(/*[in]*/ long newVal);
+	STDMETHOD(get_IncludeIntersectingText)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_IncludeIntersectingText)(VARIANT_BOOL newVal);
+	STDMETHOD(get_TextIntersectionType)(ESpatialEntity* pIntersectionType);
+	STDMETHOD(put_TextIntersectionType)(ESpatialEntity intersectionType);
+	STDMETHOD(get_TextToAssignToRegion)(BSTR* pbstrTextToAssignToRegion);
+	STDMETHOD(put_TextToAssignToRegion)(BSTR bstrTextToAssignToRegion);
 
 // IAttributeFindingRule
 	STDMETHOD(raw_ParseText)(IAFDocument* pAFDoc, IProgressStatus *pProgressStatus,
@@ -126,7 +139,7 @@ private:
 	bool m_bIncludeRegion;
 
 	// if select specific pages, what are they
-	std::string m_strSpecificPages;
+	string m_strSpecificPages;
 
 	// horizontal restriction
 	long m_nHorizontalStartPercentage;
@@ -144,7 +157,7 @@ private:
 
 	// For regular expression searching
 	// The string to match which may or may not be a regular expression
-	std::string m_strPattern;
+	string m_strPattern;
 	// true if m_strSearch is to be treated as a regular expression
 	bool m_bIsRegExp;
 	// true if m_strSearch is to be treated as case sensitive
@@ -153,11 +166,24 @@ private:
 
 	ERegExpPageSelectionType m_eRegExpPageSelectionType;
 
-	// OCR the selected region
-	bool m_bOCRSelectedRegion;
+	// The return type for this select page region object
+	ESelectPageRegionReturnType m_eReturnType;
 
 	// Rotation in degrees for OCR of selected region
 	long m_nRegionRotation;
+
+	// If m_eReturnType == kReturnText then these values indicate how to handle
+	// text which intersects the region
+	bool m_bIncludeIntersectingText;
+	ESpatialEntity m_eTextIntersectionType;
+
+	// If m_eReturnType == kReturnImageRegion then this value is the
+	// text that will be assigned to that region
+	string m_strTextToAssign;
+
+	// Brush and pen collections used when excluding regions and re-ocring
+	BrushCollection m_brushes;
+	PenCollection m_pens;
 
 	////////////
 	// Methods
@@ -168,7 +194,7 @@ private:
 	// is 9, and it is set to include region defined, then the return vector
 	// shall contain 2,3 and 5. If it is set to exclude region defined, then 
 	// the return vector shall contain 1,4,6,7,8,9
-	std::vector<int> getActualPageNumbers(int nLastPageNumber, ISpatialStringPtr ipInputText, IAFDocumentPtr ipAFDoc);
+	vector<int> getActualPageNumbers(int nLastPageNumber, ISpatialStringPtr ipInputText, IAFDocumentPtr ipAFDoc);
 
 	// return actual page content based on the restriction defined
 	ISpatialStringPtr getIndividualPageContent(ISpatialStringPtr ipOriginPage);
@@ -183,6 +209,15 @@ private:
 	bool isRestrictionDefined();
 
 	void validateLicense();
+
+	// Draws a white box of the specified size on the specified page of the source image and
+	// saves it to the temporary image.
+	// Note: The temporary image will only contain 1 page.
+	void excludeImageZone(const string& strSourceImage, const string& strTempImage,
+		long nPageNumber, long nLeft, long nTop, long nRight, long nBottom);
+
+	IIUnknownVectorPtr buildRasterZonesForExcludedRegion(long nLeft, long nTop, long nRight,
+		long nBottom, long nWidth, long nHeight, long nPageNum);
 
 	// make sure start and end percentages are well within 0 ~ 100
 	void validateStartEndPercentage(long nStartPercentage, long nEndPercentage);

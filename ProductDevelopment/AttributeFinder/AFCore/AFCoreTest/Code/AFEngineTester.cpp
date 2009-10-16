@@ -340,26 +340,26 @@ void CAFEngineTester::runTest(ETestType eTestType, const string& strRSDFile,
 		case kAutoFile: 
 			ipFoundAttr = m_ipAttrFinderEngine->FindAttributes( ipAFDoc, 
 				get_bstr_t( strInputFileName.c_str() ), -1, get_bstr_t( strRSDFile.c_str() ), 
-				ipAttributeNames, VARIANT_FALSE );
+				ipAttributeNames, VARIANT_FALSE, NULL );
 			break;
 
 		case kImageFile:
 			ipFoundAttr = m_ipAttrFinderEngine->FindAttributes( ipAFDoc, 
 				get_bstr_t( strInputFileName.c_str() ), nPagesToRecognize, 
 				get_bstr_t( strRSDFile.c_str() ), ipAttributeNames, 
-				VARIANT_FALSE );
+				VARIANT_FALSE, NULL );
 			break;
 
 		case kTextFile:
 			ipFoundAttr = m_ipAttrFinderEngine->FindAttributes( ipAFDoc, 
 				get_bstr_t( strInputFileName.c_str() ), 0, get_bstr_t( strRSDFile.c_str() ), 
-				ipAttributeNames, VARIANT_FALSE );
+				ipAttributeNames, VARIANT_FALSE, NULL );
 			break;
 
 		case kUSSFile:
 			ipFoundAttr = m_ipAttrFinderEngine->FindAttributes( ipAFDoc, 
 				get_bstr_t( strInputFileName.c_str() ), 0, get_bstr_t( strRSDFile.c_str() ), 
-				ipAttributeNames, VARIANT_FALSE );
+				ipAttributeNames, VARIANT_FALSE, NULL );
 			break;
 
 		case kText:
@@ -370,7 +370,7 @@ void CAFEngineTester::runTest(ETestType eTestType, const string& strRSDFile,
 
 				ipFoundAttr = m_ipAttrFinderEngine->FindAttributes( ipAFDoc, 
 					get_bstr_t( "" ), 0, get_bstr_t( strRSDFile.c_str() ), 
-					ipAttributeNames, VARIANT_FALSE );
+					ipAttributeNames, VARIANT_TRUE, NULL );
 			}
 			break;
 		default:

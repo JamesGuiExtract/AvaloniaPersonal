@@ -69,6 +69,8 @@ END_CATEGORY_MAP()
 	STDMETHOD(put_OCRPagesType)(/*[in]*/ EOCRPagesType newVal);
 	STDMETHOD(get_OCRCertainPages)(/*[out, retval]*/ BSTR *strSpecificPages);
 	STDMETHOD(put_OCRCertainPages)(/*[in]*/ BSTR strSpecificPages);
+	STDMETHOD(get_UseCleanedImage)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_UseCleanedImage)(VARIANT_BOOL newVal);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -121,6 +123,8 @@ private:
 	IAttributeFinderEnginePtr m_ipAFEngine;
 
 	CachedObjectFromFile<IRuleSetPtr, RuleSetLoader> m_ipRuleSet;
+
+	bool m_bUseCleanedImage;
 
 	bool m_bDirty;
 

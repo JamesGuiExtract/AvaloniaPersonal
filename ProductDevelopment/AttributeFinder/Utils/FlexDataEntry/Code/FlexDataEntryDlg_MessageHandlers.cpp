@@ -888,13 +888,13 @@ void CFlexDataEntryDlg::OnBtnFind()
 					{
 						// Find Attributes from the USS file
 						ipAttributes = m_ipEngine->FindAttributes( ipDoc, strUSS.c_str(), -1, 
-							strRSD.c_str(), NULL, NULL );
+							strRSD.c_str(), NULL, VARIANT_FALSE, NULL );
 					}
 					else
 					{
 						// Find Attributes from the image file
 						ipAttributes = m_ipEngine->FindAttributes( ipDoc, strFile.c_str(), -1, 
-							strRSD.c_str(), NULL, NULL );
+							strRSD.c_str(), NULL, VARIANT_FALSE, NULL );
 					}
 
 					// Pass Attributes to grids
@@ -903,10 +903,8 @@ void CFlexDataEntryDlg::OnBtnFind()
 					// Enable the Find button and enable the Save button, if present
 					if (!isSaveHidden())
 					{
-//						m_apToolBar->GetToolBarCtrl().EnableButton( IDC_BTN_SAVE, TRUE );
 						enableButton( IDC_BTN_SAVE, true );
 					}
-//					m_apToolBar->GetToolBarCtrl().EnableButton( IDC_BTN_FIND, TRUE );
 					enableButton( IDC_BTN_FIND, true );
 
 					// Select first cell

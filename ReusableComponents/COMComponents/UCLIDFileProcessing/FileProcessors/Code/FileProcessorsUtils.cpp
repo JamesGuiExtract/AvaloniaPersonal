@@ -98,25 +98,6 @@ const std::string CFileProcessorsUtils::ExpandTagsAndTFE(IFAMTagManager *pFAMTM,
 
 	return strExpandedFile;
 }
-//-------------------------------------------------------------------------------------------------
-const string CFileProcessorsUtils::getCleanImageName(const std::string& strImageFileName)
-{
-	// e.g. "D:\test image\test\123.tif" = "D:\test image\test\123.clean.tif"
-	string strCleanImageName = getDirectoryFromFullPath(strImageFileName) + "\\";
-	strCleanImageName += getFileNameWithoutExtension(strImageFileName) + ".clean";
-	strCleanImageName += getExtensionFromFullPath(strImageFileName);
-
-	return strCleanImageName;
-}
-//-------------------------------------------------------------------------------------------------
-const string CFileProcessorsUtils::getCleanImageNameIfExists(const string& strImageFileName)
-{
-	// get the clean image name
-	string strCleanImageName = getCleanImageName(strImageFileName);
-
-	// if it exists return the clean image, otherwise return the original
-	return isFileOrFolderValid(strCleanImageName) ? strCleanImageName : strImageFileName;
-}
 
 //-------------------------------------------------------------------------------------------------
 // Private Methods

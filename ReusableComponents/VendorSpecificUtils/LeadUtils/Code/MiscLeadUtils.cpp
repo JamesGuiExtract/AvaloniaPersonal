@@ -147,19 +147,14 @@ void calculateFontThatFits(HDC hDC, const PageRasterZone& zone, int iVerticalDpi
 void validateRedactionZones(const vector<PageRasterZone>& vecZones, long nNumberOfPages);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To apply the specified text (if any) to the annotation rectangle
-void applyAnnotationText(const PageRasterZone& rZone, BITMAPHANDLE& hBitmap, HANNOBJECT& hContainer,
-						 HDC& hDC, int iYResolution, ANNRECT& rect);
-//-------------------------------------------------------------------------------------------------
-// PURPOSE: To create a device context and assign it to hDC.  If hDC is not NULL no new context
-//			will be created.
-void createLeadDC(HDC& hDC, BITMAPHANDLE& hBitmap);
+void applyAnnotationText(const PageRasterZone& rZone, HANNOBJECT& hContainer,
+						 HDC hDC, int iYResolution, ANNRECT& rect);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To return true if leftZone.m_nPage < rightZone.m_nPage
 bool compareZoneByPage(const PageRasterZone& leftZone, const PageRasterZone& rightZone);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To convert the specified page zone into an Annotation Rectangle (ANNRECT)
 void pageZoneToAnnRect(const PageRasterZone& rZone, ANNRECT& rect);
-
 //-------------------------------------------------------------------------------------------------
 // Exported DLL Functions
 //-------------------------------------------------------------------------------------------------
@@ -205,6 +200,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 {
 	vector<PageRasterZone> vecZones;
 	PageRasterZone zone;
+	zone.m_nPage = nPage;
 	zone.m_nStartX = nLeft;
 	zone.m_nEndX = nRight;
 	zone.m_nStartY = zone.m_nEndY = (nBottom - nTop) / 2;
@@ -279,6 +275,10 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		// Validate each zone
 		validateRedactionZones(rvecZones, nNumberOfPages);
 
+		// Create the brush and pen collections
+		BrushCollection brushes;
+		PenCollection pens;
+
 		// loop to allow for multiple attempts to fill an image area (P16 #2593)
 		bool bSuccessful = false;
 		bool bAnnotationsAppliedToDocument = false;
@@ -296,7 +296,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 
 			// Declare objects outside of try scope so that they can be released if an exception
 			// is thrown
-			HDC hDC = NULL; // Windows DC for drawing functions
 			HANNOBJECT hContainer = NULL; // Annotation container for redactions
 			_lastCodePos = "50";
 			try
@@ -314,10 +313,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 					nRet = L_GetDefaultSaveFileOption(&sfOptions, sizeof(sfOptions));
 					throwExceptionIfNotSuccess(nRet, "ELI27299", "Unable to get default save options!");
 					_lastCodePos = "60";
-
-					// Create the brush and pen collections
-					BrushCollection brushes;
-					PenCollection pens;
 
 					// Get the pointer to the first raster zone (we will remember the
 					// last zone applied so that the entire collection does not need
@@ -427,6 +422,9 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						}
 						_lastCodePos = "70_C_Page#" + strPageNumber;
 
+						// Create a new device context manager for this page
+						LeadtoolsDCManager ltDC;
+
 						// Check each zone
 						for (; it != rvecZones.end(); it++)
 						{
@@ -442,6 +440,12 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 							// Handle this zone if it is on this page
 							else if (nZonePage == i)
 							{
+								// Create the device context if it has not been created yet
+								if (ltDC.m_hDC == NULL)
+								{
+									ltDC.createFromBitmapHandle(hBitmap);
+								}
+
 								_lastCodePos = "70_D_Page#" + strPageNumber;
 								if (bApplyAsAnnotations)
 								{
@@ -480,46 +484,21 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 										"Could not insert redaction annotation object.");
 
 									// Apply annotation text
-									applyAnnotationText((*it), hBitmap, hContainer, hDC,
+									applyAnnotationText((*it), hContainer, ltDC.m_hDC,
 										fileInfo.YResolution, rect);
 
 									bAnnotationsAppliedToPage = true;
 								}
 								else
 								{
-									// Create the device context
-									createLeadDC(hDC, hBitmap);
-
-									// Set the appropriate brush and pen
-									SelectObject(hDC, brushes.getColoredBrush(it->m_crFillColor));
-									SelectObject(hDC, pens.getColoredPen(it->m_crBorderColor));
-
-									// Convert the Zone to rectangle corner points
-									POINT aPoints[4];
-									pageZoneToPoints( *it, aPoints[0], aPoints[1],
-										aPoints[2], aPoints[3]);
-
-									// Draw the Polygon
-									Polygon(hDC, (POINT *) &aPoints, 4);
-
-									// If there is text to add, add it
-									if ( it->m_strText.size() > 0 )
-									{
-										addTextToImage(hDC, *it, fileInfo.YResolution);
-									}
+									// Draw the redaction
+									drawRedactionZone(ltDC.m_hDC, *it,
+										fileInfo.YResolution, brushes, pens);
 								}
 								_lastCodePos = "70_E_Page#" + strPageNumber;
 							} // end if this zone is on this page
 						} // end for each zone
 						_lastCodePos = "70_F_Page#" + strPageNumber;
-
-						// Delete the Device Context
-						if (hDC != NULL)
-						{
-							L_DeleteLeadDC( hDC );
-							hDC = NULL;
-						}
-						_lastCodePos = "70_G_Page#" + strPageNumber;
 
 						// Set the page number for save options
 						sfOptions.PageNumber = i;
@@ -596,13 +575,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						ex.log();
 					}
 					hContainer = NULL;
-				}
-
-				// Need to delete the device context if it is not NULL
-				if (hDC != NULL)
-				{
-					L_DeleteLeadDC( hDC );
-					hDC = NULL;
 				}
 
 				throw uex;
@@ -1364,6 +1336,16 @@ void loadImagePage(const string& strImageFileName, unsigned long ulPage, BITMAPH
 		// Get initialized FILEINFO struct
 		FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 
+		loadImagePage(strImageFileName, ulPage, rBitmap, fileInfo, bChangeViewPerspective);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27279");
+}
+//-------------------------------------------------------------------------------------------------
+void loadImagePage(const string& strImageFileName, unsigned long ulPage, BITMAPHANDLE &rBitmap,
+				   FILEINFO& rflInfo, bool bChangeViewPerspective)
+{
+	try
+	{
 		// Get initialized LOADFILEOPTION struct. 
 		// IgnoreViewPerspective to avoid a black region at the bottom of the image
 		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
@@ -1376,9 +1358,9 @@ void loadImagePage(const string& strImageFileName, unsigned long ulPage, BITMAPH
 		// Wrap the input image in PDF manager
 		PDFInputOutputMgr inputFile(strImageFileName, true);
 
-		loadImagePage(inputFile, rBitmap, fileInfo, lfo, bChangeViewPerspective);
+		loadImagePage(inputFile, rBitmap, rflInfo, lfo, bChangeViewPerspective);
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27279");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28126");
 }
 //-------------------------------------------------------------------------------------------------
 void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap,
@@ -1788,17 +1770,13 @@ void validateRedactionZones(const vector<PageRasterZone>& vecZones, long nNumber
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27293");
 }
 //-------------------------------------------------------------------------------------------------
-void applyAnnotationText(const PageRasterZone& rZone, BITMAPHANDLE& hBitmap,
-						 HANNOBJECT& hContainer, HDC& hDC, int iYResolution, ANNRECT& rect)
+void applyAnnotationText(const PageRasterZone& rZone, HANNOBJECT& hContainer, HDC hDC, int iYResolution, ANNRECT& rect)
 {
 	try
 	{
 		// Check if any text was specified
 		if (!rZone.m_strText.empty())
 		{
-			// Get the device context
-			createLeadDC(hDC, hBitmap);
-
 			int iFontSize = getFontSizeThatFits(hDC, rZone, iYResolution);
 
 			// Get the current annotation options
@@ -1874,6 +1852,15 @@ void createLeadDC(HDC& hDC, BITMAPHANDLE& hBitmap)
 	}
 }
 //-------------------------------------------------------------------------------------------------
+void deleteLeadDC(HDC& hDC)
+{
+	if (hDC != NULL)
+	{
+		L_DeleteLeadDC(hDC);
+		hDC = NULL;
+	}
+}
+//-------------------------------------------------------------------------------------------------
 bool compareZoneByPage(const PageRasterZone& leftZone, const PageRasterZone& rightZone)
 {
 	return leftZone.m_nPage < rightZone.m_nPage;
@@ -1890,5 +1877,38 @@ void pageZoneToAnnRect(const PageRasterZone &rZone, ANNRECT& rRect)
 	rRect.left = min(p1.x, min(p2.x, min(p3.x, p4.x)));
 	rRect.bottom = max(p1.y, max(p2.y, max(p3.y, p4.y)));
 	rRect.right = max(p1.x, max(p2.x, max(p3.x, p4.x)));
+}
+//-------------------------------------------------------------------------------------------------
+void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution)
+{
+	BrushCollection brushes;
+	PenCollection pens;
+	drawRedactionZone(hDC, rZone, nYResolution, brushes, pens);
+}
+//-------------------------------------------------------------------------------------------------
+void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution,
+					   BrushCollection& rBrushes, PenCollection& rPens)
+{
+	try
+	{
+		// Set the appropriate brush and pen
+		SelectObject(hDC, rBrushes.getColoredBrush(rZone.m_crFillColor));
+		SelectObject(hDC, rPens.getColoredPen(rZone.m_crBorderColor));
+
+		// Convert the Zone to rectangle corner points
+		POINT aPoints[4];
+		pageZoneToPoints( rZone, aPoints[0], aPoints[1],
+			aPoints[2], aPoints[3]);
+
+		// Draw the Polygon
+		Polygon(hDC, (POINT *) &aPoints, 4);
+
+		// If there is text to add, add it
+		if ( rZone.m_strText.size() > 0 )
+		{
+			addTextToImage(hDC, rZone, nYResolution);
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28128");
 }
 //-------------------------------------------------------------------------------------------------

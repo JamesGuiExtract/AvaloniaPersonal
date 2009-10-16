@@ -69,6 +69,11 @@ CAttributeFinderEngine::~CAttributeFinderEngine()
 {
 	try
 	{
+		// Release COM objects
+		m_ipOCREngine = NULL;
+		m_ipOCRUtils = NULL;
+		m_ipInternals = NULL;
+		ma_pUserCfgMgr.reset();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16300");
 }
@@ -102,8 +107,9 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 													long nNumOfPagesToRecognize,
 													VARIANT varRuleSet,
 													IVariantVector *pvecAttributeNames,
+													VARIANT_BOOL vbUseAFDocText,
 													IProgressStatus *pProgressStatus,
-													IIUnknownVector* *pAttributes)
+													IIUnknownVector** ppAttributes)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	TemporaryResourceOverride rcOverride(_Module.m_hInstResource);
@@ -116,6 +122,8 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 		validateLicense();
 		_lastCodePos = "1";
 
+		ASSERT_ARGUMENT("ELI28077", ppAttributes != NULL);
+
 		// Convert the source document name from a BSTR to a STL string
 		string strInputFile = asString(strSrcDocFileName);
 
@@ -123,15 +131,12 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pDoc);
 		ASSERT_ARGUMENT("ELI09173", ipAFDoc != NULL);
 
-		// get the text associated with the document
-		ISpatialStringPtr ipInputText = ipAFDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI07829", ipInputText != NULL);
 		_lastCodePos = "2";
 
-		// Check source document name
+		// Check source document name (only if vbUseAFDocText == FALSE)
 		bool bLoadFromFile = false;
 		bool bNeedToOCR = false;
-		if (!strInputFile.empty())
+		if (vbUseAFDocText == VARIANT_FALSE && !strInputFile.empty())
 		{
 			// verify validity of input file
 			validateFileOrFolderExistence(strInputFile);
@@ -197,6 +202,10 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 			}
 			_lastCodePos = "11";
 	
+			// Get the spatial string from the document and load it from the file
+			ISpatialStringPtr ipInputText = ipAFDoc->Text;
+			ASSERT_RESOURCE_ALLOCATION("ELI07829", ipInputText != NULL);
+
 			// Load the file
 			ipInputText->LoadFrom(strSrcDocFileName, VARIANT_FALSE);
 		}
@@ -254,24 +263,15 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 		// Get Rule Execution ID for Feedback
 		/////////////////////////////////////
 
-		if (m_ipInternals == NULL)
-		{
-			_lastCodePos = "19";
-			// Get Feedback Manager interface
-			UCLID_AFCORELib::IFeedbackMgrPtr ipManager = getThisAsCOMPtr()->FeedbackManager;
-
-			// Get Internals interface
-			m_ipInternals = ipManager;
-			ASSERT_RESOURCE_ALLOCATION( "ELI09054", m_ipInternals != NULL );
-		}
-		_lastCodePos = "20";
+		UCLID_AFCORELib::IFeedbackMgrInternalsPtr ipInternals = getInternals();
+		ASSERT_RESOURCE_ALLOCATION("ELI28078", ipInternals != NULL);
 
 		// Get RSD File from Rule Set
 		_bstr_t _bstrRSD = ipRuleSet->FileName;
 		_lastCodePos = "21";
 
 		// Get next ID
-		_bstr_t	bstrID = m_ipInternals->RecordRuleExecution(ipAFDoc, _bstrRSD);
+		_bstr_t	bstrID = ipInternals->RecordRuleExecution(ipAFDoc, _bstrRSD);
 		_lastCodePos = "22";
 
 		// Add string tag if ID is defined
@@ -284,7 +284,7 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 			ASSERT_RESOURCE_ALLOCATION("ELI09062", ipStringTags != NULL);
 
 			// Add Rule ID tag to AFDocument
-			ipStringTags->Set(get_bstr_t(gstrRULE_EXEC_ID_TAG_NAME.c_str()), bstrID);
+			ipStringTags->Set(gstrRULE_EXEC_ID_TAG_NAME.c_str(), bstrID);
 		}
 		_lastCodePos = "24";
 
@@ -302,16 +302,18 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 			NULL : ipProgressStatus->SubProgressStatus;
 		_lastCodePos = "27";
 
-		// Find the Attributes
-		findAttributesInText(pDoc, ipRuleSet, pvecAttributeNames, ipSubProgressStatus, pAttributes);
-		_lastCodePos = "28";
+		// Find the Attributes (wrap the attribute names vector in smart pointer)
+		IVariantVectorPtr ipvecAttributeNames(pvecAttributeNames);
+		IIUnknownVectorPtr ipAttributes =  findAttributesInText(ipAFDoc, ipRuleSet,
+			ipvecAttributeNames, ipSubProgressStatus);
+		ASSERT_RESOURCE_ALLOCATION("ELI28079", ipAttributes != NULL);
 
 		// Provide Found Data to Feedback
-		if (m_ipInternals)
-		{
-			_lastCodePos = "29";
-			m_ipInternals->RecordFoundData(bstrID, *pAttributes);
-		}
+		ipInternals->RecordFoundData(bstrID, ipAttributes);
+		_lastCodePos = "28";
+
+		// Set the return value for the attributes
+		*ppAttributes = ipAttributes.Detach();
 		_lastCodePos = "30";
 
 		// Update progress status to indicate that we are done executing rules
@@ -320,10 +322,10 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 			_lastCodePos = "31";
 			ipProgressStatus->CompleteCurrentItemGroup();
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07820");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeFinderEngine::get_FeedbackManager(IFeedbackMgr **pVal)
@@ -335,38 +337,11 @@ STDMETHODIMP CAttributeFinderEngine::get_FeedbackManager(IFeedbackMgr **pVal)
 		// Check licensing
 		validateLicense();
 
-		// Default to NULL return
-		*pVal = NULL;
+		ASSERT_ARGUMENT("ELI28080", pVal != NULL);
 
-		// Create the object if it has not yet been created
-		if (m_ipFeedbackMgr == NULL)
-		{
-			// Retrieve ProgID from Registry
-			RegistryPersistenceMgr	rpm( HKEY_LOCAL_MACHINE, 
-				gstrAF_REG_UTILS_FOLDER_PATH );
-
-			string strProgID = rpm.getKeyValue( gstrAF_REG_FEEDBACK_FOLDER, 
-				gstrAF_FEEDBACK_PROGID_KEY );
-
-			if (strProgID.length() > 2)
-			{
-				m_ipFeedbackMgr.CreateInstance( strProgID.c_str() );
-				if (m_ipFeedbackMgr == NULL)
-				{
-					UCLIDException ue( "ELI11111", "Failed to create Feedback Manager." );
-					ue.addDebugInfo( "Prog ID", strProgID );
-					throw ue;
-				}
-			}
-			else
-			{
-				UCLIDException ue( "ELI11110", "ProgID for Feedback Manager not found." );
-				throw ue;
-			}
-		}
-
-		CComQIPtr<IFeedbackMgr> ipManager( m_ipFeedbackMgr );
-		ipManager.CopyTo( pVal );
+		// Get the feedback manager and return it
+		UCLID_AFCORELib::IFeedbackMgrPtr ipManager = getFeedbackManager();
+		*pVal = (IFeedbackMgr*) ipManager.Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09052")
 
@@ -440,38 +415,33 @@ STDMETHODIMP CAttributeFinderEngine::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	return S_OK;
 }
-//-------------------------------------------------------------------------------------------------
-// Public functions
-//-------------------------------------------------------------------------------------------------
-void CAttributeFinderEngine::findAttributesInText(IAFDocument* pAFDoc,
-												  UCLID_AFCORELib::IRuleSetPtr ipRuleSet, 
-												  IVariantVector *pvecAttributeNames, 
-												  IProgressStatus *pProgressStatus,
-												  IIUnknownVector* *pAttributes)
-{
-	CWaitCursor waitCursor;
-	
-	if (ipRuleSet != NULL)
-	{		
-		// find all attributes' values through current rule set
-		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
-		IIUnknownVectorPtr ipAttributes = ipRuleSet->ExecuteRulesOnText(ipAFDoc, 
-			pvecAttributeNames, pProgressStatus);
-
-		// return the attributes to the caller
-		*pAttributes = ipAttributes.Detach();
-	}
-}
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
 //-------------------------------------------------------------------------------------------------
-UCLID_AFCORELib::IAttributeFinderEnginePtr CAttributeFinderEngine::getThisAsCOMPtr()
+IIUnknownVectorPtr CAttributeFinderEngine::findAttributesInText(
+	const UCLID_AFCORELib::IAFDocumentPtr& ipAFDoc, const UCLID_AFCORELib::IRuleSetPtr& ipRuleSet,
+	const IVariantVectorPtr& ipvecAttributeNames, const IProgressStatusPtr& ipProgressStatus)
 {
-	UCLID_AFCORELib::IAttributeFinderEnginePtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16962", ipThis != NULL);
+	try
+	{
+		IIUnknownVectorPtr ipAttributes = NULL;
+		if (ipRuleSet != NULL)
+		{		
+			// find all attributes' values through current rule set
+			ipAttributes = ipRuleSet->ExecuteRulesOnText(ipAFDoc, 
+				ipvecAttributeNames, ipProgressStatus);
+		}
+		else
+		{
+			// Just create an empty vector
+			ipAttributes.CreateInstance(CLSID_IUnknownVector);
+		}
+		ASSERT_RESOURCE_ALLOCATION("ELI28081", ipAttributes != NULL);
 
-	return ipThis;
+		return ipAttributes;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28082");
 }
 //-------------------------------------------------------------------------------------------------
 IOCREnginePtr CAttributeFinderEngine::getOCREngine()
@@ -548,6 +518,57 @@ void CAttributeFinderEngine::getComponentDataFolder(string& rFolder)
 		ue.addWin32ErrorInfo();
 		throw ue;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_AFCORELib::IFeedbackMgrPtr CAttributeFinderEngine::getFeedbackManager()
+{
+	try
+	{
+		if (m_ipFeedbackMgr == NULL)
+		{
+			// Retrieve ProgID from Registry
+			RegistryPersistenceMgr	rpm( HKEY_LOCAL_MACHINE, 
+				gstrAF_REG_UTILS_FOLDER_PATH );
+
+			string strProgID = rpm.getKeyValue( gstrAF_REG_FEEDBACK_FOLDER, 
+				gstrAF_FEEDBACK_PROGID_KEY );
+
+			if (strProgID.length() > 2)
+			{
+				m_ipFeedbackMgr.CreateInstance( strProgID.c_str() );
+				if (m_ipFeedbackMgr == NULL)
+				{
+					UCLIDException ue( "ELI28083", "Failed to create Feedback Manager." );
+					ue.addDebugInfo( "Prog ID", strProgID );
+					throw ue;
+				}
+			}
+			else
+			{
+				UCLIDException ue( "ELI28084", "ProgID for Feedback Manager not found." );
+				throw ue;
+			}
+		}
+
+		return m_ipFeedbackMgr;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28085");
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_AFCORELib::IFeedbackMgrInternalsPtr CAttributeFinderEngine::getInternals()
+{
+	try
+	{
+		if (m_ipInternals == NULL)
+		{
+			// Get Internals interface from the feedback manager
+			m_ipInternals = getFeedbackManager();
+			ASSERT_RESOURCE_ALLOCATION( "ELI28086", m_ipInternals != NULL );
+		}
+
+		return m_ipInternals;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28087");
 }
 //-------------------------------------------------------------------------------------------------
 void CAttributeFinderEngine::validateLicense()

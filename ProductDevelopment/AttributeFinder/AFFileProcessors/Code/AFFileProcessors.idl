@@ -57,12 +57,15 @@ library UCLID_AFFILEPROCESSORSLib
 		// name of the rule set file name (encrypted or not)
 		[propget, id(3), helpstring("property RuleSetFileName")] HRESULT RuleSetFileName([out, retval] BSTR *pVal);
 		[propput, id(3), helpstring("property RuleSetFileName")] HRESULT RuleSetFileName([in] BSTR newVal);
-		// OCR all pages or only OCR specific pages
+		// OCR all pages or only OCR specific pages or Don't OCR any pages
 		[propget, id(4), helpstring("property OCRPagesType")] HRESULT OCRPagesType([out, retval] EOCRPagesType *pVal);
 		[propput, id(4), helpstring("property OCRPagesType")] HRESULT OCRPagesType([in] EOCRPagesType newVal);
 		// If OCRPageRange = kOCRPages, this property specifies certain page numbers in a string
 		[propget, id(5), helpstring("property OCRCertainPages")] HRESULT OCRCertainPages([out, retval] BSTR *strSpecificPages);
 		[propput, id(5), helpstring("property OCRCertainPages")] HRESULT OCRCertainPages([in] BSTR strSpecificPages);
+		// If a cleaned image should be used for OCR (if available)
+		[propget, id(6), helpstring("property UseCleanedImage")] HRESULT UseCleanedImage([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(6), helpstring("property UseCleanedImage")] HRESULT UseCleanedImage([in] VARIANT_BOOL newVal);
 	};
 
 	[

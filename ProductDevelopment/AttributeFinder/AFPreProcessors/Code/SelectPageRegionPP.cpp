@@ -48,7 +48,7 @@ STDMETHODIMP CSelectPageRegionPP::Apply(void)
 				}
 
 				// save OCR items
-				if (!saveOCRItems( ipSelectPageRegion ))
+				if (!saveReturnItems( ipSelectPageRegion ))
 				{
 					return S_FALSE;
 				}
@@ -82,8 +82,8 @@ LRESULT CSelectPageRegionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			m_cmbIncludeExclude = GetDlgItem(IDC_CMB_INCLUDE_EXCLUDE);
 			m_cmbIncludeExclude.AddString("Include");
 			m_cmbIncludeExclude.AddString("Exclude");
-			bool bExclude = ipSelectPageRegion->IncludeRegionDefined == VARIANT_FALSE;
-			m_cmbIncludeExclude.SetCurSel(bExclude);
+			m_cmbIncludeExclude.SetCurSel(
+				asCppBool(ipSelectPageRegion->IncludeRegionDefined) ? 0 : 1);
 
 			// initialize the controls
 			m_radioAllPages = GetDlgItem(IDC_RADIO_ALL_PAGES);
@@ -116,10 +116,7 @@ LRESULT CSelectPageRegionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			}
 			else if (ePageSelectionType == UCLID_AFPREPROCESSORSLib::kSelectSpecified)
 			{
-				CComBSTR bstrSpecificPages;
-				VARIANT_BOOL bTmp;
-				ipSelectPageRegion->GetPageSelections(&bTmp, &bstrSpecificPages);
-				string strSpecificPages = asString(bstrSpecificPages);
+				string strSpecificPages = asString(ipSelectPageRegion->SpecificPages);
 				m_radioSpecificPages.SetCheck(1);
 				m_editSpecificPages.SetWindowText(strSpecificPages.c_str());
 
@@ -159,7 +156,7 @@ LRESULT CSelectPageRegionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			ipSelectPageRegion->GetHorizontalRestriction(&nStartPercent, &nEndPercent);
 			if (nStartPercent >= 0 && nEndPercent > 0)
 			{
-				m_chkHorizontalRestriction.SetCheck(1);
+				m_chkHorizontalRestriction.SetCheck(BST_CHECKED);
 				SetDlgItemInt(IDC_EDIT_START_HORIZON, nStartPercent, FALSE);
 				SetDlgItemInt(IDC_EDIT_END_HORIZON, nEndPercent, FALSE);
 				m_editHorizontalStart.EnableWindow(TRUE);
@@ -167,7 +164,7 @@ LRESULT CSelectPageRegionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			}
 			else
 			{
-				m_chkHorizontalRestriction.SetCheck(0);
+				m_chkHorizontalRestriction.SetCheck(BST_UNCHECKED);
 				m_editHorizontalStart.EnableWindow(FALSE);
 				m_editHorizontalEnd.EnableWindow(FALSE);
 			}
@@ -178,7 +175,7 @@ LRESULT CSelectPageRegionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			ipSelectPageRegion->GetVerticalRestriction(&nStartPercent, &nEndPercent);
 			if (nStartPercent >= 0 && nEndPercent > 0)
 			{
-				m_chkVerticalRestriction.SetCheck(1);
+				m_chkVerticalRestriction.SetCheck(BST_CHECKED);
 				SetDlgItemInt(IDC_EDIT_START_VERTICAL, nStartPercent, FALSE);
 				SetDlgItemInt(IDC_EDIT_END_VERTICAL, nEndPercent, FALSE);
 				m_editVerticalStart.EnableWindow(TRUE);
@@ -186,33 +183,74 @@ LRESULT CSelectPageRegionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			}
 			else
 			{
-				m_chkVerticalRestriction.SetCheck(0);
+				m_chkVerticalRestriction.SetCheck(BST_UNCHECKED);
 				m_editVerticalStart.EnableWindow(FALSE);
 				m_editVerticalEnd.EnableWindow(FALSE);
 			}
 
-			// Define OCR items
-			m_chkOCRRegion = GetDlgItem( IDC_CHECK_OCR );
+			// Get and configure return items
+			int nReturnTextChecked = BST_UNCHECKED;
+			int nReOcrChecked = BST_UNCHECKED;
+			int nReturnRegionChecked = BST_UNCHECKED;
+			m_radioReturnText = GetDlgItem(IDC_RADIO_RETURN_TEXT);
+			m_radioReOcr = GetDlgItem( IDC_RADIO_REOCR );
+			m_radioReturnRegion = GetDlgItem(IDC_RADIO_RETURN_REGION);
+			m_cmbIncludeExcludeIntersect = GetDlgItem(IDC_COMBO_INCLUDE_EXCLUDE_INTERSECTING);
+			m_cmbIncludeExcludeIntersect.AddString("Include");
+			m_cmbIncludeExcludeIntersect.AddString("Exclude");
+			m_cmbIncludeExcludeIntersect.SetCurSel(0);
+			m_cmbIncludeExcludeIntersect.EnableWindow(FALSE);
+			m_cmbIntersectType = GetDlgItem(IDC_COMBO_INTERSECT_TYPE);
+			m_cmbIntersectType.AddString("characters");
+			m_cmbIntersectType.AddString("words");
+			m_cmbIntersectType.AddString("lines");
+			m_cmbIntersectType.SetCurSel(0);
+			m_cmbIntersectType.EnableWindow(FALSE);
 			m_editRegionRotation = GetDlgItem( IDC_EDIT_ROTATION );
+			m_editRegionRotation.EnableWindow(FALSE);
+			m_editReturnText = GetDlgItem(IDC_EDIT_RETURN_TEXT);
+			m_editReturnText.EnableWindow(FALSE);
 
-			// Initialize settings for OCR items
-			bool bDoOCR = (ipSelectPageRegion->GetOCRSelectedRegion() == VARIANT_TRUE) ? 
-				true : false;
-			m_chkOCRRegion.SetCheck( (bDoOCR == true) ? 1 : 0 );
-			if (bDoOCR)
+			// Initialize settings for return items
+			switch(ipSelectPageRegion->SelectPageRegionReturnType)
 			{
-				// Enable edit box
-				m_editRegionRotation.EnableWindow( TRUE );
+			case kReturnText:
+				{
+					nReturnTextChecked = BST_CHECKED;
+					m_cmbIncludeExcludeIntersect.EnableWindow(TRUE);
+					m_cmbIncludeExcludeIntersect.SetCurSel(
+						asCppBool(ipSelectPageRegion->IncludeIntersectingText) ? 0 : 1);
+					m_cmbIntersectType.EnableWindow(TRUE);
+					m_cmbIntersectType.SetCurSel(((int) ipSelectPageRegion->TextIntersectionType) - 1);
+				}
+				break;
 
-				// Set value
-				long nRotation = ipSelectPageRegion->GetSelectedRegionRotation();
-				SetDlgItemInt( IDC_EDIT_ROTATION, nRotation, FALSE );
+			case kReturnReOcr:
+				{
+					nReOcrChecked = BST_CHECKED;
+					m_editRegionRotation.EnableWindow(TRUE);
+					m_editRegionRotation.SetWindowText(
+						asString(ipSelectPageRegion->SelectedRegionRotation).c_str());
+				}
+				break;
+
+			case kReturnImageRegion:
+				{
+					_bstr_t temp;
+					nReturnRegionChecked = BST_CHECKED;
+					m_editReturnText.EnableWindow(TRUE);
+					m_editReturnText.SetWindowText(
+						(const char*)ipSelectPageRegion->TextToAssignToRegion);
+				}
+				break;
+
+			default:
+				THROW_LOGIC_ERROR_EXCEPTION("ELI28122");
 			}
-			else
-			{
-				// Disable edit box
-				m_editRegionRotation.EnableWindow( FALSE );
-			}
+
+			m_radioReturnText.SetCheck(nReturnTextChecked);
+			m_radioReOcr.SetCheck(nReOcrChecked);
+			m_radioReturnRegion.SetCheck(nReturnRegionChecked);
 		}
 		
 		SetDirty(FALSE);
@@ -266,7 +304,7 @@ LRESULT CSelectPageRegionPP::OnClickedChkRestrictHorizon(WORD wNotifyCode, WORD 
 
 	try
 	{
-		BOOL bEnable = m_chkHorizontalRestriction.GetCheck() == 1;
+		BOOL bEnable = m_chkHorizontalRestriction.GetCheck() == BST_CHECKED;
 		m_editHorizontalStart.EnableWindow(bEnable);
 		m_editHorizontalEnd.EnableWindow(bEnable);
 
@@ -287,14 +325,14 @@ LRESULT CSelectPageRegionPP::OnClickedChkRestrictVertical(WORD wNotifyCode, WORD
 
 	try
 	{
-		BOOL bEnable = m_chkVerticalRestriction.GetCheck() == 1;
+		BOOL bEnable = m_chkVerticalRestriction.GetCheck() == BST_CHECKED;
 		m_editVerticalStart.EnableWindow(bEnable);
 		m_editVerticalEnd.EnableWindow(bEnable);
 
 		if (bEnable)
 		{
 			m_editVerticalStart.SetFocus();
-			m_editVerticalEnd.SetSel(0 , -1);
+			m_editVerticalStart.SetSel(0 , -1);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08038");
@@ -336,7 +374,7 @@ LRESULT CSelectPageRegionPP::OnClickedChkRegExp(WORD wNotifyCode, WORD wID, HWND
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	try
 	{
-		BOOL bEnable = m_chkRegExp.GetCheck() == 1;
+		BOOL bEnable = m_chkRegExp.GetCheck() == BST_CHECKED;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09358");
 
@@ -348,7 +386,7 @@ LRESULT CSelectPageRegionPP::OnClickedChkCaseSensitive(WORD wNotifyCode, WORD wI
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	try
 	{
-		BOOL bEnable = m_chkCaseSensitive.GetCheck() == 1;
+		BOOL bEnable = m_chkCaseSensitive.GetCheck() == BST_CHECKED;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09359");
 
@@ -360,8 +398,6 @@ LRESULT CSelectPageRegionPP::OnClickedRadioRegExpPages(WORD wNotifyCode, WORD wI
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	try
 	{
-		BOOL bEnable = m_radioRegExpPages.GetCheck() == 1;
-
 		m_editSpecificPages.EnableWindow(FALSE);
 
 		m_cmbRegExpPages.EnableWindow(TRUE);
@@ -375,25 +411,15 @@ LRESULT CSelectPageRegionPP::OnClickedRadioRegExpPages(WORD wNotifyCode, WORD wI
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
-LRESULT CSelectPageRegionPP::OnClickedChkOCRRegion(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+LRESULT CSelectPageRegionPP::OnClickedRadioReturnType(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		bool bEnable = (m_chkOCRRegion.GetCheck() == 1);
-		if (bEnable)
-		{
-			// Enable edit box
-			m_editRegionRotation.EnableWindow( TRUE );
-		}
-		else
-		{
-			// Disable edit box
-			m_editRegionRotation.EnableWindow( FALSE );
-		}
+		updateReturnControls();
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12631");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28145");
 
 	return 0;
 }
@@ -403,17 +429,17 @@ LRESULT CSelectPageRegionPP::OnClickedChkOCRRegion(WORD wNotifyCode, WORD wID, H
 //-------------------------------------------------------------------------------------------------
 bool CSelectPageRegionPP::savePageSelections(UCLID_AFPREPROCESSORSLib::ISelectPageRegionPtr ipSelectPageRegion)
 {
-	bool bSpecificPages = m_radioSpecificPages.GetCheck() == 1;
-	bool bAllPages = m_radioAllPages.GetCheck() == 1;
-	bool bRegExpPages = m_radioRegExpPages.GetCheck() == 1;
+	bool bSpecificPages = m_radioSpecificPages.GetCheck() == BST_CHECKED;
+	bool bAllPages = m_radioAllPages.GetCheck() == BST_CHECKED;
+	bool bRegExpPages = m_radioRegExpPages.GetCheck() == BST_CHECKED;
 	try
 	{
-		CComBSTR bstrSpecificPages;
 		if (bSpecificPages)
 		{
-			m_editSpecificPages.GetWindowText(&bstrSpecificPages);
-			ipSelectPageRegion->SelectPages(VARIANT_TRUE, _bstr_t(bstrSpecificPages));
-			ipSelectPageRegion->PutPageSelectionType(UCLID_AFPREPROCESSORSLib::kSelectSpecified);
+			_bstr_t bstrSpecificPages;
+			m_editSpecificPages.GetWindowText(bstrSpecificPages.GetAddress());
+			ipSelectPageRegion->SpecificPages = bstrSpecificPages;
+			ipSelectPageRegion->PageSelectionType = UCLID_AFPREPROCESSORSLib::kSelectSpecified;
 		}
 		else if (bAllPages)
 		{
@@ -421,24 +447,15 @@ bool CSelectPageRegionPP::savePageSelections(UCLID_AFPREPROCESSORSLib::ISelectPa
 		}
 		else if (bRegExpPages)
 		{
-			ipSelectPageRegion->PutPageSelectionType(UCLID_AFPREPROCESSORSLib::kSelectWithRegExp);
-			ipSelectPageRegion->PutIsRegExp(m_chkRegExp.GetCheck() == 1 ? VARIANT_TRUE : VARIANT_FALSE);
-			ipSelectPageRegion->PutIsCaseSensitive(m_chkCaseSensitive.GetCheck() == 1 ? VARIANT_TRUE : VARIANT_FALSE);
-			CComBSTR bstrPattern;
-			m_editRegExp.GetWindowText(&bstrPattern);
-			ipSelectPageRegion->Pattern = _bstr_t(bstrPattern);
-			if (m_cmbRegExpPages.GetCurSel() == 0)
-			{
-				ipSelectPageRegion->PutRegExpPageSelectionType(UCLID_AFPREPROCESSORSLib::kSelectAllPagesWithRegExp);
-			}
-			if (m_cmbRegExpPages.GetCurSel() == 1)
-			{
-				ipSelectPageRegion->PutRegExpPageSelectionType(UCLID_AFPREPROCESSORSLib::kSelectLeadingPagesWithRegExp);
-			}
-			if (m_cmbRegExpPages.GetCurSel() == 2)
-			{
-				ipSelectPageRegion->PutRegExpPageSelectionType(UCLID_AFPREPROCESSORSLib::kSelectTrailingPagesWithRegExp);
-			}
+			ipSelectPageRegion->PageSelectionType = UCLID_AFPREPROCESSORSLib::kSelectWithRegExp;
+			ipSelectPageRegion->IsRegExp = asVariantBool(m_chkRegExp.GetCheck() == BST_CHECKED);
+			ipSelectPageRegion->IsCaseSensitive = asVariantBool(m_chkCaseSensitive.GetCheck());
+			_bstr_t bstrPattern;
+			m_editRegExp.GetWindowText(bstrPattern.GetAddress());
+			ipSelectPageRegion->Pattern = bstrPattern;
+
+			ipSelectPageRegion->RegExpPageSelectionType =
+				(UCLID_AFPREPROCESSORSLib::ERegExpPageSelectionType) m_cmbRegExpPages.GetCurSel();
 		}
 		
 		return true;
@@ -467,7 +484,7 @@ bool CSelectPageRegionPP::saveRestrictions(UCLID_AFPREPROCESSORSLib::ISelectPage
 		int nStartPercent, nEndPercent;
 		try
 		{
-			if (m_chkHorizontalRestriction.GetCheck() == 1)
+			if (m_chkHorizontalRestriction.GetCheck() == BST_CHECKED)
 			{
 				nStartPercent = GetDlgItemInt(IDC_EDIT_START_HORIZON, NULL, FALSE);
 				nEndPercent = GetDlgItemInt(IDC_EDIT_END_HORIZON, NULL, FALSE);
@@ -486,7 +503,7 @@ bool CSelectPageRegionPP::saveRestrictions(UCLID_AFPREPROCESSORSLib::ISelectPage
 		
 		try
 		{
-			if (m_chkVerticalRestriction.GetCheck() == 1)
+			if (m_chkVerticalRestriction.GetCheck() == BST_CHECKED)
 			{
 				nStartPercent = GetDlgItemInt(IDC_EDIT_START_VERTICAL, NULL, FALSE);
 				nEndPercent = GetDlgItemInt(IDC_EDIT_END_VERTICAL, NULL, FALSE);
@@ -522,30 +539,51 @@ bool CSelectPageRegionPP::saveRestrictions(UCLID_AFPREPROCESSORSLib::ISelectPage
 	return bRet;
 }
 //-------------------------------------------------------------------------------------------------
-bool CSelectPageRegionPP::saveOCRItems(UCLID_AFPREPROCESSORSLib::ISelectPageRegionPtr ipSelectPageRegion)
+bool CSelectPageRegionPP::saveReturnItems(UCLID_AFPREPROCESSORSLib::ISelectPageRegionPtr ipSelectPageRegion)
 {
 	bool bRet = true;
 	try
 	{
 		try
 		{
-			if (m_chkOCRRegion.GetCheck() == 1)
+			ESelectPageRegionReturnType eReturnType = kReturnText;
+			if (m_radioReturnText.GetCheck() == BST_CHECKED)
 			{
-				// Set flag
-				ipSelectPageRegion->PutOCRSelectedRegion( VARIANT_TRUE );
+				// Set whether to include/exclude the text intersection
+				ipSelectPageRegion->IncludeIntersectingText =
+					asVariantBool(m_cmbIncludeExcludeIntersect.GetCurSel() == 0);
+
+				// Set the intersection type
+				ipSelectPageRegion->TextIntersectionType =
+					(ESpatialEntity)(m_cmbIntersectType.GetCurSel() + 1);
+			}
+			else if (m_radioReOcr.GetCheck() == BST_CHECKED)
+			{
+				// Set return type to re-ocr
+				eReturnType = kReturnReOcr;
 
 				// Set rotation
-				long nRotation = GetDlgItemInt( IDC_EDIT_ROTATION, NULL, FALSE );
-				ipSelectPageRegion->PutSelectedRegionRotation( nRotation );
+				ipSelectPageRegion->SelectedRegionRotation =
+					GetDlgItemInt( IDC_EDIT_ROTATION, NULL, FALSE );
+			}
+			else if (m_radioReturnRegion.GetCheck() == BST_CHECKED)
+			{
+				// Set the return type to image region
+				eReturnType = kReturnImageRegion;
+
+				// Set the text to assign to the region
+				_bstr_t bstrTextToAssign;
+				m_editReturnText.GetWindowText(bstrTextToAssign.GetAddress());
+				ipSelectPageRegion->TextToAssignToRegion = bstrTextToAssign;
 			}
 			else
 			{
-				// Clear flag
-				ipSelectPageRegion->PutOCRSelectedRegion( VARIANT_FALSE );
-
-				// Clear rotation
-				ipSelectPageRegion->PutSelectedRegionRotation( 0 );
+				THROW_LOGIC_ERROR_EXCEPTION("ELI28156");
 			}
+
+			// Set the return type
+			ipSelectPageRegion->SelectPageRegionReturnType =
+				(UCLID_AFPREPROCESSORSLib::ESelectPageRegionReturnType) eReturnType;
 		}
 		catch (...)
 		{
@@ -556,5 +594,19 @@ bool CSelectPageRegionPP::saveOCRItems(UCLID_AFPREPROCESSORSLib::ISelectPageRegi
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12632");
 	
 	return bRet;
+}
+//-------------------------------------------------------------------------------------------------
+void CSelectPageRegionPP::updateReturnControls()
+{
+	// Enable/disable the return text controls
+	BOOL bEnableTextControls = asMFCBool(m_radioReturnText.GetCheck() == BST_CHECKED);
+	m_cmbIncludeExcludeIntersect.EnableWindow(bEnableTextControls);
+	m_cmbIntersectType.EnableWindow(bEnableTextControls);
+
+	// Enable/disable the re ocr edit control
+	m_editRegionRotation.EnableWindow(asMFCBool(m_radioReOcr.GetCheck() == BST_CHECKED));
+
+	// Enable/disable the region edit control
+	m_editReturnText.EnableWindow(asMFCBool(m_radioReturnRegion.GetCheck() == BST_CHECKED));
 }
 //-------------------------------------------------------------------------------------------------

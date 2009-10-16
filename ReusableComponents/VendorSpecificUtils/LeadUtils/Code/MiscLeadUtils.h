@@ -41,7 +41,7 @@ public:
           m_nEndX(0),
           m_nEndY(0),
           m_nHeight(0),
-          m_nPage(1),
+          m_nPage(0),
           m_strText(""),
           m_crFillColor(0),
           m_crBorderColor(0),
@@ -265,11 +265,17 @@ LEADUTILS_API void getImagePixelHeightAndWidth(const string& strImageFileName, i
 LEADUTILS_API void loadImagePage(const string& strImageFileName, unsigned long ulPage, 
 								 BITMAPHANDLE &rBitmap, bool bChangeViewPerspective = true);
 //-------------------------------------------------------------------------------------------------
+// PROMISE: To return the handle of a bitmap for the given page in the file
+// the bitmap will have to be free'd by caller, the rflInfo will be filled
+// with file information after this call
+LEADUTILS_API void loadImagePage(const string& strImageFileName, unsigned long ulPage,
+								 BITMAPHANDLE &rBitmap, FILEINFO& rflInfo, bool bChangeViewPerspective = true);
+//-------------------------------------------------------------------------------------------------
 // PROMISE: To return the handle of a bitmap for the specified file loaded based upon
 //			the provided LOADFILEOPTION (will load the page set in the lfo.PageNumber field)
 //			the bitmap will have to be free'd by caller
 LEADUTILS_API void loadImagePage(const string& strImageFileName, BITMAPHANDLE &rBitmap,
-								 FILEINFO& flInfo, LOADFILEOPTION& lfo,
+								 FILEINFO& rflInfo, LOADFILEOPTION& lfo,
 								 bool bChangeViewPerspective = true);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the handle of a bitmap for the specified file loaded based upon
@@ -277,7 +283,7 @@ LEADUTILS_API void loadImagePage(const string& strImageFileName, BITMAPHANDLE &r
 //			the bitmap will have to be free'd by caller
 // REQUIRE:	inputFile is in input mode
 LEADUTILS_API void loadImagePage(PDFInputOutputMgr& inputFile, BITMAPHANDLE& rBitmap,
-								 FILEINFO& flInfo, LOADFILEOPTION& lfo,
+								 FILEINFO& rflInfo, LOADFILEOPTION& lfo,
 								 bool bChangeViewPerspective = true);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To save the bitmap to the specified image at the specified page number
@@ -357,6 +363,71 @@ LEADUTILS_API bool hasAnnotations(const string& strFilename, int iPageNumber);
 //			value in the registry.
 LEADUTILS_API int getCompressionFactor(const string& strFormat);
 LEADUTILS_API int getCompressionFactor(int nFormat);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To draw the specified redaction zone on the specified device context
+LEADUTILS_API void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution,
+									 BrushCollection& rBrushes, PenCollection& rPens);
+LEADUTILS_API void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To create a device context and assign it to hDC.  If hDC is not NULL no new context
+//			will be created.
+LEADUTILS_API void createLeadDC(HDC& hDC, BITMAPHANDLE& hBitmap);
+//-------------------------------------------------------------------------------------------------
+LEADUTILS_API void deleteLeadDC(HDC& hDC);
+
+//-------------------------------------------------------------------------------------------------
+// Class used to manage a lead tools device context object
+class LeadtoolsDCManager
+{
+public:
+	// The device context that this class is managing
+	HDC m_hDC;
+
+	LeadtoolsDCManager() : m_hDC(NULL)
+	{
+	}
+
+	LeadtoolsDCManager(BITMAPHANDLE& hBitmap)
+	{
+		try
+		{
+			createLeadDC(m_hDC, hBitmap);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28153");
+	}
+
+	void createFromBitmapHandle(BITMAPHANDLE& hBitmap)
+	{
+		try
+		{
+			// Delete any existing handle
+			deleteLeadDC(m_hDC);
+
+			// Create the new handle
+			createLeadDC(m_hDC, hBitmap);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28154");
+	}
+
+	void deleteDC()
+	{
+		try
+		{
+			deleteLeadDC(m_hDC);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28155");
+	}
+
+	~LeadtoolsDCManager()
+	{
+		try
+		{
+			deleteLeadDC(m_hDC);
+		}
+		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28129");
+	}
+};
+
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To initialize a LeadTools sized struct.
 // ARGS:	The value to which the Flags parameter should be initialized

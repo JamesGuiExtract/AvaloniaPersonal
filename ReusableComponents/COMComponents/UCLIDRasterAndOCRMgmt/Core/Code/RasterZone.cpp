@@ -433,16 +433,23 @@ STDMETHODIMP CRasterZone::CreateFromLongRectangle(ILongRectangle *pRectangle, lo
 
 		// validate arguments
 		ILongRectanglePtr ipLongRectangle(pRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI06571", ipLongRectangle != NULL);
+		ASSERT_ARGUMENT("ELI06571", ipLongRectangle != NULL);
+
+		long lLeft(-1), lTop(-1), lRight(-1), lBottom(-1);
+		ipLongRectangle->GetBounds(&lLeft, &lTop, &lRight, &lBottom);
 
 		// copy data as specified
-		m_nStartX = ipLongRectangle->Left;
-		m_nStartY = (ipLongRectangle->Top + ipLongRectangle->Bottom) / 2;
-		m_nEndX = ipLongRectangle->Right;
+		m_nStartX = lLeft;
+		m_nStartY = (lTop + lBottom) / 2;
+		m_nEndX = lRight;
 		m_nEndY = m_nStartY;
-		m_nHeight = abs(ipLongRectangle->Top - ipLongRectangle->Bottom);
+		m_nHeight = abs(lTop - lBottom);
+
+		// Ensure height is odd
 		if (m_nHeight % 2 == 0)
+		{
 			m_nHeight++;
+		}
 
 		m_nPage = nPageNum;
 

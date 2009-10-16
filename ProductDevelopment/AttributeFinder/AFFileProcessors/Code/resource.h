@@ -20,7 +20,7 @@
 #define IDC_OUTPUT_IMAGE_HELP           206
 #define IDC_EDIT_RULE_FILE              208
 #define IDC_BTN_BROWSE_AFE              209
-#define IDC_CHK_CREATE_USS              210
+#define IDC_CHK_SAVE_RESULTS			210
 #define IDC_CHK_FROM_USS                211
 #define IDC_BTN_RULEFILE_BROWSE         212
 #define IDC_RADIO_OCR_ALL               213
@@ -35,14 +35,16 @@
 #define IDC_BTN_BROWSE_XML_FILE			223
 #define IDC_BTN_CONFIGURE_XML_OUTPUT	224
 #define IDC_BTN_DOCTAGS_AFE				225
+#define IDC_RADIO_OCR_NONE				226
+#define IDC_CHK_USE_CLEAN_IMAGE			227
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        226
+#define _APS_NEXT_RESOURCE_VALUE        228
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         226
+#define _APS_NEXT_CONTROL_VALUE         228
 #define _APS_NEXT_SYMED_VALUE           117
 #endif
 #endif

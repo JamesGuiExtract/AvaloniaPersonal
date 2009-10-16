@@ -107,12 +107,6 @@ private:
 	// Methods
 	void validateLicense();
 	//----------------------------------------------------------------------------------------------
-	// PURPOSE:	To build the cleaned image name from the given image file name
-	//
-	// PROMISE:	To return a cleaned image name of the form filename.clean.ext
-	//			(i.e. "123.tif" as "123.clean.tif")
-	string getCleanImageName(const string& strImageFileName);
-	//----------------------------------------------------------------------------------------------
 	// PURPOSE: To return the image cleanup engine if it exists.  if it does not exist then to
 	//			create it and return it
 	IImageCleanupEnginePtr getImageCleanupEngine();

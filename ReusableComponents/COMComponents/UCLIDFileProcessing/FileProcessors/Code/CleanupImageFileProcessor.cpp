@@ -141,7 +141,7 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, 
 		validateFileOrFolderExistence(strSettingsFileName);
 
 		// get output file name
-		string strOutputFileName = CFileProcessorsUtils::getCleanImageName(strImageFileName);
+		string strOutputFileName = getCleanImageName(strImageFileName);
 
 		// get a pointer to an ImageCleanupEngine Object
 		IImageCleanupEnginePtr ipICEngine = getImageCleanupEngine();

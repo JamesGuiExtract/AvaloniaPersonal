@@ -2518,16 +2518,6 @@ std::string CImageCleanupSettingsEditorDlg::getPathToSpotRecognitionWindowExe()
 	return m_strImageViewerExePath;
 }
 //-------------------------------------------------------------------------------------------------
-string CImageCleanupSettingsEditorDlg::getCleanImageName(const std::string &strImageFileName)
-{
-	// e.g. "D:\test image\test\123.tif" = "D:\test image\test\123.clean.tif"
-	string strCleanImageName = getDirectoryFromFullPath(strImageFileName) + "\\";
-	strCleanImageName += getFileNameWithoutExtension(strImageFileName) + ".clean";
-	strCleanImageName += getExtensionFromFullPath(strImageFileName);
-
-	return strCleanImageName;
-}
-//-------------------------------------------------------------------------------------------------
 bool CImageCleanupSettingsEditorDlg::storePageRangeSettings()
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );

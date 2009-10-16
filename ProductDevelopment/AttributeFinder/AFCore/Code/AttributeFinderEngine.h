@@ -8,6 +8,8 @@
 #include <memory>
 #include <string>
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CAttributeFinderEngine
 class ATL_NO_VTABLE CAttributeFinderEngine : 
@@ -43,6 +45,7 @@ public:
 							  /*[in]*/ long nNumOfPagesToRecognize,
 							  /*[in]*/ VARIANT varRuleSet,
 							  /*[in]*/ IVariantVector* pvecAttributeNames,
+							  /*[in]*/ VARIANT_BOOL vbUseAFDocText,
 							  /*[in]*/ IProgressStatus *pProgressStatus,
 							  /*[out, retval]*/ IIUnknownVector** pAttributes);
 	STDMETHOD(get_FeedbackManager)(/*[out, retval]*/ IFeedbackMgr **pVal);
@@ -51,14 +54,6 @@ public:
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
-
-// Misc
-	void findAttributesInText(/*[in]*/ IAFDocument* pAFDoc, 
-							  /*[in]*/ UCLID_AFCORELib::IRuleSetPtr ipRuleSet, 
-							  /*[in]*/ IVariantVector *pvecAttributeNames, 
-							  /*[in]*/ IProgressStatus *pProgressStatus,
-							  /*[out, retval]*/ IIUnknownVector* *pAttributes);
-
 private:
 	//////////////
 	// Variables
@@ -68,23 +63,29 @@ private:
 	IOCRUtilsPtr m_ipOCRUtils;
 
 	// Feedback objects
-	UCLID_AFCORELib::IFeedbackMgrPtr			m_ipFeedbackMgr;
+	UCLID_AFCORELib::IFeedbackMgrPtr m_ipFeedbackMgr;
 	UCLID_AFCORELib::IFeedbackMgrInternalsPtr	m_ipInternals;
 
 	// Handles registry settings
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 
 	//////////////
 	// Methods
 	//////////////
 	//----------------------------------------------------------------------------------------------
-	UCLID_AFCORELib::IAttributeFinderEnginePtr getThisAsCOMPtr();
+	IIUnknownVectorPtr findAttributesInText(const UCLID_AFCORELib::IAFDocumentPtr& ipAFDoc,
+		const UCLID_AFCORELib::IRuleSetPtr& ipRuleSet, const IVariantVectorPtr& ipvecAttributeNames,
+		const IProgressStatusPtr& ipProgressStatus);
 	//----------------------------------------------------------------------------------------------
 	IOCREnginePtr getOCREngine();
 	//----------------------------------------------------------------------------------------------
 	IOCRUtilsPtr getOCRUtils();
 	//----------------------------------------------------------------------------------------------
-	void getComponentDataFolder(std::string& rFolder);
+	void getComponentDataFolder(string& rFolder);
+	//----------------------------------------------------------------------------------------------
+	UCLID_AFCORELib::IFeedbackMgrPtr getFeedbackManager();
+	//----------------------------------------------------------------------------------------------
+	UCLID_AFCORELib::IFeedbackMgrInternalsPtr getInternals();
 	//----------------------------------------------------------------------------------------------
 	void validateLicense();
 };

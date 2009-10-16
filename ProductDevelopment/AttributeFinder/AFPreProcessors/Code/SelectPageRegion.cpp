@@ -14,13 +14,17 @@
 #include <Misc.h>
 #include <TemporaryFileName.h>
 #include <MiscLeadUtils.h>
+#include <LeadtoolsBitmapFreeer.h>
 #include <ComponentLicenseIDs.h>
 
 #include <algorithm>
 #include <math.h>
 
 // current version
-const unsigned long gnCurrentVersion = 3;
+// Version 4 - Added ability to choose what is returned, whether it be the existing
+//			   text, text from a ReOCR of the region, or just the spatial region with
+//			   specified text assigned to it.
+const unsigned long gnCurrentVersion = 4;
 
 // add license management password function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -42,7 +46,10 @@ CSelectPageRegion::CSelectPageRegion()
   m_bIsRegExp(false),
   m_bIsCaseSensitive(false),
   m_eRegExpPageSelectionType(kSelectAllPagesWithRegExp),
-  m_bOCRSelectedRegion(false),
+  m_eReturnType(kReturnText),
+  m_bIncludeIntersectingText(true),
+  m_eTextIntersectionType(kCharacter),
+  m_strTextToAssign(""),
   m_nRegionRotation(-1)
 {
 	m_ipAFUtility.CreateInstance(CLSID_AFUtility);
@@ -53,6 +60,7 @@ CSelectPageRegion::~CSelectPageRegion()
 {
 	try
 	{
+		m_ipSpatialStringSearcher = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16326");
 }
@@ -115,7 +123,7 @@ STDMETHODIMP CSelectPageRegion::put_IncludeRegionDefined(VARIANT_BOOL newVal)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSelectPageRegion::SelectPages(VARIANT_BOOL bSpecificPages, BSTR strSpecificPages)
+STDMETHODIMP CSelectPageRegion::get_SpecificPages(BSTR *pbstrSpecificPages)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -123,35 +131,35 @@ STDMETHODIMP CSelectPageRegion::SelectPages(VARIANT_BOOL bSpecificPages, BSTR st
 	{
 		validateLicense();
 
-		
-		string strPages = asString(strSpecificPages);
+		ASSERT_ARGUMENT("ELI28104", pbstrSpecificPages != NULL);
+
+		*pbstrSpecificPages = _bstr_t(m_strSpecificPages.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28105");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSelectPageRegion::put_SpecificPages(BSTR bstrSpecificPages)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		string strPages = asString(bstrSpecificPages);
+
 		// validate the string format
 		::validatePageNumbers(strPages);
 
 		m_strSpecificPages = strPages;
-		
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08001");
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSelectPageRegion::GetPageSelections(VARIANT_BOOL *pbSpecificPages, 
-												  BSTR *pstrSpecificPages)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-
-		*pstrSpecificPages = _bstr_t(m_strSpecificPages.c_str()).Detach();
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08031");
-
-	return S_OK;
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28106");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::SetHorizontalRestriction(long nStartPercentage, long nEndPercentage)
@@ -168,10 +176,10 @@ STDMETHODIMP CSelectPageRegion::SetHorizontalRestriction(long nStartPercentage, 
 		m_nHorizontalEndPercentage = nEndPercentage;
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08002");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::GetHorizontalRestriction(long *pnStartPercentage, long *pnEndPercentage)
@@ -181,13 +189,15 @@ STDMETHODIMP CSelectPageRegion::GetHorizontalRestriction(long *pnStartPercentage
 	try
 	{
 		validateLicense();
+		ASSERT_ARGUMENT("ELI28107", pnStartPercentage != NULL);
+		ASSERT_ARGUMENT("ELI28108", pnEndPercentage != NULL);
 
 		*pnStartPercentage = m_nHorizontalStartPercentage;
 		*pnEndPercentage = m_nHorizontalEndPercentage;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08003");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::SetVerticalRestriction(long nStartPercentage, long nEndPercentage)
@@ -204,10 +214,10 @@ STDMETHODIMP CSelectPageRegion::SetVerticalRestriction(long nStartPercentage, lo
 		m_nVerticalEndPercentage = nEndPercentage;
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08004");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::GetVerticalRestriction(long *pnStartPercentage, long *pnEndPercentage)
@@ -217,13 +227,15 @@ STDMETHODIMP CSelectPageRegion::GetVerticalRestriction(long *pnStartPercentage, 
 	try
 	{
 		validateLicense();
+		ASSERT_ARGUMENT("ELI28109", pnStartPercentage != NULL);
+		ASSERT_ARGUMENT("ELI28110", pnEndPercentage != NULL);
 
 		*pnStartPercentage = m_nVerticalStartPercentage;
 		*pnEndPercentage = m_nVerticalEndPercentage;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08005");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::get_PageSelectionType(EPageSelectionType *pVal)
@@ -233,12 +245,13 @@ STDMETHODIMP CSelectPageRegion::get_PageSelectionType(EPageSelectionType *pVal)
 	try
 	{
 		validateLicense();
+		ASSERT_ARGUMENT("ELI28111", pVal != NULL);
 
 		*pVal = m_ePageSelectionType;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09364");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::put_PageSelectionType(EPageSelectionType newVal)
@@ -252,10 +265,10 @@ STDMETHODIMP CSelectPageRegion::put_PageSelectionType(EPageSelectionType newVal)
 		m_ePageSelectionType = newVal;
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09365");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::get_Pattern(BSTR *pVal)
@@ -266,11 +279,13 @@ STDMETHODIMP CSelectPageRegion::get_Pattern(BSTR *pVal)
 	{
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI28112", pVal != NULL);
+
 		*pVal = _bstr_t(m_strPattern.c_str()).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09366");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::put_Pattern(BSTR newVal)
@@ -291,10 +306,10 @@ STDMETHODIMP CSelectPageRegion::put_Pattern(BSTR newVal)
 		m_strPattern = strPattern;
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09368");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::get_IsRegExp(VARIANT_BOOL *pVal)
@@ -305,11 +320,13 @@ STDMETHODIMP CSelectPageRegion::get_IsRegExp(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI28113", pVal != NULL);
+
 		*pVal = asVariantBool(m_bIsRegExp);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09369");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::put_IsRegExp(VARIANT_BOOL newVal)
@@ -323,10 +340,10 @@ STDMETHODIMP CSelectPageRegion::put_IsRegExp(VARIANT_BOOL newVal)
 		m_bIsRegExp = asCppBool(newVal);
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09370");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::get_IsCaseSensitive(VARIANT_BOOL *pVal)
@@ -336,12 +353,13 @@ STDMETHODIMP CSelectPageRegion::get_IsCaseSensitive(VARIANT_BOOL *pVal)
 	try
 	{
 		validateLicense();
+		ASSERT_ARGUMENT("ELI28114", pVal != NULL);
 
 		*pVal = asVariantBool(m_bIsCaseSensitive);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09371");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::put_IsCaseSensitive(VARIANT_BOOL newVal)
@@ -355,10 +373,10 @@ STDMETHODIMP CSelectPageRegion::put_IsCaseSensitive(VARIANT_BOOL newVal)
 		m_bIsCaseSensitive = asCppBool(newVal);
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09372");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::get_RegExpPageSelectionType(ERegExpPageSelectionType *pVal)
@@ -369,11 +387,13 @@ STDMETHODIMP CSelectPageRegion::get_RegExpPageSelectionType(ERegExpPageSelection
 	{
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI28115", pVal != NULL);
+
 		*pVal = m_eRegExpPageSelectionType;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09375");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::put_RegExpPageSelectionType(ERegExpPageSelectionType newVal)
@@ -387,47 +407,44 @@ STDMETHODIMP CSelectPageRegion::put_RegExpPageSelectionType(ERegExpPageSelection
 		m_eRegExpPageSelectionType = newVal;
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09374");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSelectPageRegion::get_OCRSelectedRegion(VARIANT_BOOL *pVal)
+STDMETHODIMP CSelectPageRegion::get_SelectPageRegionReturnType(ESelectPageRegionReturnType* pReturnType)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		// Check license
 		validateLicense();
 
-		// Provide setting
-		*pVal = asVariantBool(m_bOCRSelectedRegion);
+		ASSERT_ARGUMENT("ELI28116", pReturnType != NULL);
+
+		*pReturnType = m_eReturnType;
+
+		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12627");
-
-	return S_OK;
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28117");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSelectPageRegion::put_OCRSelectedRegion(VARIANT_BOOL newVal)
+STDMETHODIMP CSelectPageRegion::put_SelectPageRegionReturnType(ESelectPageRegionReturnType returnType)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		// Check license
 		validateLicense();
 
-		// Save setting
-		m_bOCRSelectedRegion = asCppBool(newVal);
+		m_eReturnType = returnType;
 
-		// Set flag
 		m_bDirty = true;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12628");
 
-	return S_OK;
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28118");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::get_SelectedRegionRotation(long *pVal)
@@ -439,12 +456,14 @@ STDMETHODIMP CSelectPageRegion::get_SelectedRegionRotation(long *pVal)
 		// Check license
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI28119", pVal != NULL);
+
 		// Provide setting
 		*pVal = m_nRegionRotation;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12629");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSelectPageRegion::put_SelectedRegionRotation(long newVal)
@@ -470,10 +489,112 @@ STDMETHODIMP CSelectPageRegion::put_SelectedRegionRotation(long newVal)
 
 		// Set flag
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12630");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSelectPageRegion::get_IncludeIntersectingText(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	return S_OK;
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28093", pVal != NULL);
+
+		*pVal = asVariantBool(m_bIncludeIntersectingText);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28094");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSelectPageRegion::put_IncludeIntersectingText(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bIncludeIntersectingText = asCppBool(newVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28095");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSelectPageRegion::get_TextIntersectionType(ESpatialEntity* pIntersectionType)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28096", pIntersectionType != NULL);
+
+		*pIntersectionType = m_eTextIntersectionType;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28097");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSelectPageRegion::put_TextIntersectionType(ESpatialEntity intersectionType)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_eTextIntersectionType = intersectionType;
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28098");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSelectPageRegion::get_TextToAssignToRegion(BSTR* pbstrTextToAssign)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28099", pbstrTextToAssign != NULL);
+
+		*pbstrTextToAssign = _bstr_t(m_strTextToAssign.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28100");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSelectPageRegion::put_TextToAssignToRegion(BSTR bstrTextToAssign)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_strTextToAssign = asString(bstrTextToAssign);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28101");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -503,6 +624,8 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 		// Create collection of Attributes to return
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI18451", ipAttributes != NULL);
+
+		// TODO: Allow working on empty spatial string
 
 		// Only perform selection if the string is spatial
 		if (ipInputText->GetMode() == kSpatialMode)
@@ -581,6 +704,8 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 		// get the spatial string
 		ISpatialStringPtr ipInputText = ipAFDoc->Text;
 		ASSERT_RESOURCE_ALLOCATION("ELI08020", ipInputText != NULL);
+
+		// TODO: Allow working on empty spatial string
 
 		// if the string is not in kSpatialMode return immediately
 		if (ipInputText->GetMode() != kSpatialMode)
@@ -687,8 +812,11 @@ STDMETHODIMP CSelectPageRegion::Load(IStream *pStream)
 		m_bIsCaseSensitive = false;
 		m_eRegExpPageSelectionType = kSelectAllPagesWithRegExp;
 
-		m_bOCRSelectedRegion = false;
+		m_eReturnType = kReturnText;
+		m_bIncludeIntersectingText = true;
+		m_eTextIntersectionType = kCharacter;
 		m_nRegionRotation = -1;
+		m_strTextToAssign = "";
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -710,7 +838,7 @@ STDMETHODIMP CSelectPageRegion::Load(IStream *pStream)
 			ue.addDebugInfo("Version to Load", nDataVersion);
 			throw ue;
 		}
-		
+
 		dataReader >> m_bIncludeRegion;
 		if (nDataVersion < 2)
 		{
@@ -758,10 +886,49 @@ STDMETHODIMP CSelectPageRegion::Load(IStream *pStream)
 		validateStartEndPercentage(m_nVerticalStartPercentage, m_nVerticalEndPercentage);
 
 		// Read OCR of region and associated rotation amount
-		if (nDataVersion >= 3)
+		if (nDataVersion == 3)
 		{
-			dataReader >> m_bOCRSelectedRegion;
+			bool bTemp;
+			dataReader >> bTemp;
 			dataReader >> m_nRegionRotation;
+
+			if (bTemp)
+			{
+				m_eReturnType = kReturnReOcr;
+			}
+		}
+		else if (nDataVersion >= 4)
+		{
+			// Read the return type
+			long tmp;
+			dataReader >> tmp;
+			m_eReturnType = (ESelectPageRegionReturnType) tmp;
+
+			switch(m_eReturnType)
+			{
+			case kReturnText:
+				{
+					dataReader >> m_bIncludeIntersectingText;
+					dataReader >> tmp;
+					m_eTextIntersectionType = (ESpatialEntity) tmp;
+				}
+				break;
+
+			case kReturnReOcr:
+				{
+					dataReader >> m_nRegionRotation;
+				}
+				break;
+
+			case kReturnImageRegion:
+				{
+					dataReader >> m_strTextToAssign;
+				}
+				break;
+
+			default:
+				THROW_LOGIC_ERROR_EXCEPTION("ELI28102");
+			}
 		}
 
 		// Clear the dirty flag as we've loaded a fresh object
@@ -802,9 +969,32 @@ STDMETHODIMP CSelectPageRegion::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_nVerticalStartPercentage;
 		dataWriter << m_nVerticalEndPercentage;
 
-		// Write OCR of region and associated rotation amount
-		dataWriter << m_bOCRSelectedRegion;
-		dataWriter << m_nRegionRotation;
+		// Write return type and data associated with the return type
+		dataWriter << (long)m_eReturnType;
+		switch(m_eReturnType)
+		{
+		case kReturnText:
+			{
+				dataWriter << m_bIncludeIntersectingText;
+				dataWriter << (long)m_eTextIntersectionType;
+			}
+			break;
+
+		case kReturnReOcr:
+			{
+				dataWriter << m_nRegionRotation;
+			}
+			break;
+
+		case kReturnImageRegion:
+			{
+				dataWriter << m_strTextToAssign;
+			}
+			break;
+
+		default:
+			THROW_LOGIC_ERROR_EXCEPTION("ELI28103");
+		}
 
 		dataWriter.flushToByteStream();
 
@@ -886,21 +1076,35 @@ STDMETHODIMP CSelectPageRegion::raw_IsConfigured(VARIANT_BOOL *pbValue)
 			bConfigured = false;
 		}
 
-		// Check requirements based on OCR Of Selected Region
-		if (m_bOCRSelectedRegion)
+		// Only need to check return type settings if the object is properly
+		// configured up to this point
+		if (bConfigured)
 		{
-			// Region Rotation must be between 0 and 360 degrees
-			if ((m_nRegionRotation < 0) || (m_nRegionRotation > 360))
+			switch(m_eReturnType)
 			{
-				bConfigured = false;
+			case kReturnReOcr:
+				{
+					// Region Rotation must be between 0 and 360 degrees
+					if ((m_nRegionRotation < 0) || (m_nRegionRotation > 360))
+					{
+						bConfigured = false;
+					}
+				}
+				break;
+
+			case kReturnImageRegion:
+				{
+					bConfigured = !m_strTextToAssign.empty();
+				}
+				break;
 			}
 		}
 
 		*pbValue = asVariantBool(bConfigured);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07986");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -941,33 +1145,50 @@ STDMETHODIMP CSelectPageRegion::raw_CopyFrom(IUnknown *pObject)
 		UCLID_AFPREPROCESSORSLib::ISelectPageRegionPtr ipSource(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI08322", ipSource!=NULL);
 
-		m_bIncludeRegion = asCppBool( ipSource->GetIncludeRegionDefined() );
-
-		CComBSTR bstrTmp;
-		VARIANT_BOOL bTmp;
-		ipSource->GetPageSelections(&bTmp, &bstrTmp);
-		m_strSpecificPages = asString(bstrTmp);
-
-		m_ePageSelectionType = (EPageSelectionType)ipSource->GetPageSelectionType();
-		m_bIsRegExp = asCppBool( ipSource->GetIsRegExp() );
-		m_bIsCaseSensitive = asCppBool( ipSource->GetIsCaseSensitive() );
-		m_strPattern = ipSource->Pattern;
-
+		// Copy the values from the other object
+		m_bIncludeRegion = asCppBool( ipSource->IncludeRegionDefined );
+		m_strSpecificPages = asString(ipSource->SpecificPages);
+		m_ePageSelectionType = (EPageSelectionType)ipSource->PageSelectionType;
+		m_bIsRegExp = asCppBool( ipSource->IsRegExp );
+		m_bIsCaseSensitive = asCppBool( ipSource->IsCaseSensitive );
+		m_strPattern = asString(ipSource->Pattern);
 		ipSource->GetHorizontalRestriction(&m_nHorizontalStartPercentage, &m_nHorizontalEndPercentage);
 		ipSource->GetVerticalRestriction(&m_nVerticalStartPercentage, &m_nVerticalEndPercentage);
+		m_eRegExpPageSelectionType = (ERegExpPageSelectionType)ipSource->RegExpPageSelectionType;
+		m_eReturnType = (ESelectPageRegionReturnType)ipSource->SelectPageRegionReturnType;
 
-		m_eRegExpPageSelectionType = (ERegExpPageSelectionType)ipSource->GetRegExpPageSelectionType();
+		// Get the appropriate values for the return type
+		switch(m_eReturnType)
+		{
+		case kReturnText:
+			{
+				m_bIncludeIntersectingText = asCppBool(ipSource->IncludeIntersectingText);
+				m_eTextIntersectionType = (ESpatialEntity)ipSource->TextIntersectionType;
+			}
+			break;
 
-		// Copy OCR flag and Rotation amount
-		m_bOCRSelectedRegion = asCppBool( ipSource->GetOCRSelectedRegion() );
-		m_nRegionRotation = ipSource->GetSelectedRegionRotation();
+		case kReturnReOcr:
+			{
+				m_nRegionRotation = ipSource->SelectedRegionRotation;
+			}
+			break;
+
+		case kReturnImageRegion:
+			{
+				m_strTextToAssign = asString(ipSource->TextToAssignToRegion);
+			}
+			break;
+
+		default:
+			THROW_LOGIC_ERROR_EXCEPTION("ELI28120");
+		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08323");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSelectPageRegion::raw_Clone(IUnknown* *pObject)
+STDMETHODIMP CSelectPageRegion::raw_Clone(IUnknown** ppObject)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -976,6 +1197,8 @@ STDMETHODIMP CSelectPageRegion::raw_Clone(IUnknown* *pObject)
 		// validate license first
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI28121", ppObject != NULL);
+
 		ICopyableObjectPtr ipObjCopy(CLSID_SelectPageRegion);
 		ASSERT_RESOURCE_ALLOCATION("ELI08338", ipObjCopy != NULL);
 		
@@ -983,11 +1206,11 @@ STDMETHODIMP CSelectPageRegion::raw_Clone(IUnknown* *pObject)
 		ipObjCopy->CopyFrom(ipUnk);
 
 		// return the new variant vector to the caller
-		*pObject = ipObjCopy.Detach();
+		*ppObject = ipObjCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07988");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1207,8 +1430,6 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(ISpatialStringPtr 
 		{
 			m_ipSpatialStringSearcher.CreateInstance(CLSID_SpatialStringSearcher);
 			ASSERT_RESOURCE_ALLOCATION("ELI08022", m_ipSpatialStringSearcher != NULL);
-			m_ipSpatialStringSearcher->SetIncludeDataOnBoundary(VARIANT_TRUE);
-			m_ipSpatialStringSearcher->SetBoundaryResolution(kCharacter);
 		}
 
 		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipOriginPage);
@@ -1232,42 +1453,54 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(ISpatialStringPtr 
 		// Get the width and height of the page
 		ipPageInfo->GetWidthAndHeight(&nWidth, &nHeight);
 
-		// get current page's boundary
-		ILongRectanglePtr ipRect( CLSID_LongRectangle );
-		ASSERT_RESOURCE_ALLOCATION("ELI08021", ipRect != NULL);
-		ipRect->SetBounds(0, 0, nWidth, nHeight);
+		// Compute current page's boundary
+		long nLeft(0), nTop(0), nRight(nWidth), nBottom(nHeight);
 
 		// if left and right boundaries are defined
 		if (m_nHorizontalStartPercentage >= 0 && m_nHorizontalEndPercentage >= 0)
 		{
 			// record the left most boundary
-			ipRect->Left = (long)floor((double)nWidth * (double)m_nHorizontalStartPercentage/100.0 + 0.5);
-			ipRect->Right = (long)floor((double)nWidth * (double)m_nHorizontalEndPercentage/100.0 + 0.5);
+			nLeft = (long)floor((double)nWidth * (double)m_nHorizontalStartPercentage/100.0 + 0.5);
+			nRight = (long)floor((double)nWidth * (double)m_nHorizontalEndPercentage/100.0 + 0.5);
 		}
 
 		// if top and bottom boundaries are defined
 		if (m_nVerticalStartPercentage >= 0 && m_nVerticalEndPercentage >= 0)
 		{
 			// record top most boundary
-			ipRect->Top = (long)floor((double)nHeight * (double)m_nVerticalStartPercentage/100.0 + 0.5);
-			ipRect->Bottom = (long)floor((double)nHeight * (double)m_nVerticalEndPercentage/100.0 + 0.5);
+			nTop = (long)floor((double)nHeight * (double)m_nVerticalStartPercentage/100.0 + 0.5);
+			nBottom = (long)floor((double)nHeight * (double)m_nVerticalEndPercentage/100.0 + 0.5);
 		}
+		// Set a long rectangle with the boundaries
+		ILongRectanglePtr ipRect( CLSID_LongRectangle );
+		ASSERT_RESOURCE_ALLOCATION("ELI08021", ipRect != NULL);
+		ipRect->SetBounds(nLeft, nTop, nRight, nBottom);
 
 		// Get extension of source file
 		string strPath = asString( ipOriginPage->SourceDocName );
 		string strExt = getExtensionFromFullPath( strPath.c_str() );
 
 		// calculate the region
-		if (m_bIncludeRegion)
+		switch(m_eReturnType)
 		{
-			// Search the previously OCR'd text
-			if (!m_bOCRSelectedRegion)
+		case kReturnText:
 			{
-				// Rotate the rectangle per OCR results
-				ipResult = m_ipSpatialStringSearcher->GetDataInRegion( ipRect, VARIANT_TRUE );
+				m_ipSpatialStringSearcher->SetIncludeDataOnBoundary(asVariantBool(m_bIncludeIntersectingText));
+				m_ipSpatialStringSearcher->SetBoundaryResolution(m_eTextIntersectionType);
+				if (m_bIncludeRegion)
+				{
+					// Rotate the rectangle per OCR results
+					ipResult = m_ipSpatialStringSearcher->GetDataInRegion( ipRect, VARIANT_TRUE );
+				}
+				else
+				{
+					ipResult = m_ipSpatialStringSearcher->GetDataOutOfRegion(ipRect);
+				}
+				ASSERT_RESOURCE_ALLOCATION( "ELI28124", ipResult != NULL );
 			}
-			// Do new OCR after rotation
-			else
+			break;
+
+		case kReturnReOcr:
 			{
 				// Handle 0 degree rotation in special way
 				int nActualRotation = m_nRegionRotation;
@@ -1279,49 +1512,83 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(ISpatialStringPtr 
 					nActualRotation = 360;
 				}
 
-				// Get the text from specified area after rotation
-				ipResult = getOCREngine()->RecognizeTextInImageZone(strPath.c_str(), 
-					nPageNum, nPageNum, ipRect, nActualRotation, kNoFilter, "", VARIANT_FALSE, 
-					VARIANT_FALSE, VARIANT_TRUE, NULL );
-				ASSERT_RESOURCE_ALLOCATION( "ELI12698", ipResult != NULL );
-			}
-		}
-		else
-		{
-			// Search the previously OCR'd text
-			if (!m_bOCRSelectedRegion)
-			{
-				ipResult = m_ipSpatialStringSearcher->GetDataOutOfRegion(ipRect);
-			}
-			else
-			{
-				// Whiten the specified zone on this page - to a temporary file
-				TemporaryFileName tmpFile2( NULL, strExt.c_str(), true );
-				string strTempFileName2 = tmpFile2.getName();
-				string strSource = asString( ipOriginPage->GetSourceDocName() );
-				long nLeft(-1), nTop(-1), nRight(-1), nBottom(-1);
-				ipRect->GetBounds(&nLeft, &nTop, &nRight, &nBottom);
-				fillImageArea(strSource.c_str(), strTempFileName2.c_str(), nLeft, nTop, 
-					nRight, nBottom, nPageNum, RGB(255,255,255), true, false);
-
-				// Handle 0 degree rotation in special way
-				int nActualRotation = m_nRegionRotation;
-				if (nActualRotation == 0)
+				if (m_bIncludeRegion)
 				{
-					// RecognizeTextInImageZone() interprets 
-					//		  0 = automatic rotation
-					//		360 = no rotation
-					nActualRotation = 360;
+					// Get the text from specified area after rotation
+					ipResult = getOCREngine()->RecognizeTextInImageZone(strPath.c_str(), 
+						nPageNum, nPageNum, ipRect, nActualRotation, kNoFilter, "", VARIANT_FALSE, 
+						VARIANT_FALSE, VARIANT_TRUE, NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI12698", ipResult != NULL );
 				}
+				else
+				{
+					// Whiten the specified zone on this page - to a temporary file
+					TemporaryFileName tmpFile2( NULL, strExt.c_str(), true );
+					string strTempFileName2 = tmpFile2.getName();
+					excludeImageZone(strPath, strTempFileName2, nPageNum, nLeft, nTop, nRight, nBottom);
 
-				// Get the text from entire remaining area
-				ipResult = getOCREngine()->RecognizeTextInImageZone(strTempFileName2.c_str(), 1, -1, 
-					NULL, nActualRotation, kNoFilter, "", VARIANT_FALSE, VARIANT_FALSE, VARIANT_TRUE, 
-					NULL);
+					// Get the text from entire remaining area on the page
+					ipResult = getOCREngine()->RecognizeTextInImageZone(strTempFileName2.c_str(), 1, 1, 
+						NULL, nActualRotation, kNoFilter, "", VARIANT_FALSE, VARIANT_FALSE, VARIANT_TRUE, 
+						NULL);
+					ASSERT_RESOURCE_ALLOCATION( "ELI28127", ipResult != NULL );
 
-				// Assign original filename to Spatial String
-				ipResult->SourceDocName = strPath.c_str();
+					// Assign original filename to Spatial String
+					ipResult->SourceDocName = strPath.c_str();
+
+				}
 			}
+			break;
+
+		case kReturnImageRegion:
+			{
+				// Create the new spatial string
+				ipResult.CreateInstance(CLSID_SpatialString);
+				ASSERT_RESOURCE_ALLOCATION( "ELI28125", ipResult != NULL );
+
+				// Clone the page infos for the original object
+				ICopyableObjectPtr ipCopier = ipOriginPage->SpatialPageInfos;
+				ASSERT_RESOURCE_ALLOCATION("ELI28134", ipCopier != NULL);
+				ILongToObjectMapPtr ipPageInfos = ipCopier->Clone();
+				ASSERT_RESOURCE_ALLOCATION("ELI28135", ipPageInfos != NULL);
+				if (m_bIncludeRegion)
+				{
+					// Create a pseudo-spatial string
+					IRasterZonePtr ipZone(CLSID_RasterZone);
+					ASSERT_RESOURCE_ALLOCATION("ELI28136", ipZone != NULL);
+					ipZone->CreateFromLongRectangle(ipRect, nPageNum);
+					ipResult->CreatePseudoSpatialString(ipZone, m_strTextToAssign.c_str(),
+						strPath.c_str(), ipPageInfos);
+				}
+				else
+				{
+					IIUnknownVectorPtr ipZones = buildRasterZonesForExcludedRegion(nLeft,
+						nTop, nRight, nBottom, nWidth, nHeight, nPageNum);
+					ASSERT_RESOURCE_ALLOCATION("ELI28137", ipZones != NULL);
+
+					// If only 1 zone create a pseudo-spatial string
+					long lSize = ipZones->Size();
+					if (lSize == 1)
+					{
+						IRasterZonePtr ipZone = ipZones->At(0);
+						ASSERT_RESOURCE_ALLOCATION("ELI28162", ipZone != NULL);
+						ipResult->CreatePseudoSpatialString(ipZone,
+							m_strTextToAssign.c_str(), strPath.c_str(), ipPageInfos);
+					}
+					// Create a hybrid string if there is more than 1 zone
+					else if (lSize > 1)
+					{
+						// Create a new hybrid string
+						ipResult->CreateHybridString(ipZones, m_strTextToAssign.c_str(),
+							strPath.c_str(), ipPageInfos);
+					}
+					// Leave the string empty if there are no zones
+				}
+			}
+			break;
+
+		default:
+			THROW_LOGIC_ERROR_EXCEPTION("ELI28123");
 		}
 
 		return ipResult;
@@ -1446,5 +1713,99 @@ void CSelectPageRegion::validateStartEndPercentage(long nStartPercentage, long n
 		ue.addDebugInfo("End Percentage", nEndPercentage);
 		throw ue;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+void CSelectPageRegion::excludeImageZone(const string& strSourceImage, const string& strTempImage,
+										 long nPageNumber, long nLeft, long nTop, long nRight,
+										 long nBottom)
+{
+	try
+	{
+		// Build the page raster zone
+		PageRasterZone zone;
+		zone.m_nPage = nPageNumber;
+		zone.m_nStartX = nLeft;
+		zone.m_nEndX = nRight;
+		zone.m_nStartY = zone.m_nEndY = (nBottom - nTop) / 2;
+		zone.m_nHeight = nBottom - nTop;
+		zone.m_crFillColor = zone.m_crBorderColor = RGB(255,255,255);
+
+		// Load the specified page of the image into a bitmap handle
+		FILEINFO info = GetLeadToolsSizedStruct<FILEINFO>(0);
+		BITMAPHANDLE hBitmap = {0};
+		LeadToolsBitmapFreeer freer(hBitmap);
+		loadImagePage(strSourceImage, nPageNumber, hBitmap, info);
+
+		// Create a device context for the page to draw on
+		LeadtoolsDCManager ltDC(hBitmap);
+
+		// Draw the white box
+		drawRedactionZone(ltDC.m_hDC, zone, hBitmap.YResolution, m_brushes, m_pens); 
+
+		// Save the image page
+		saveImagePage(hBitmap, strTempImage, info, 1);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28131");
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CSelectPageRegion::buildRasterZonesForExcludedRegion(long nTop, long nLeft,
+																	   long nRight, long nBottom,
+																	   long nWidth, long nHeight,
+																	   long nPageNum)
+{
+	try
+	{
+		// Deduct one from width and height so that zones are within bounds of the image
+		nWidth--;
+		nHeight--;
+
+		// Vector of zones to be returned
+		IIUnknownVectorPtr ipZones(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI28138", ipZones != NULL);
+
+		// Need to build raster zones surrounding the excluded region
+		ILongRectanglePtr ipZoneRect(CLSID_LongRectangle);
+		ASSERT_RESOURCE_ALLOCATION("ELI28139", ipZoneRect != NULL);
+
+		// Build the top rectangle
+		if (nTop > 0)
+		{
+			ipZoneRect->SetBounds(0, 0, nWidth, nTop);
+			IRasterZonePtr ipZone(CLSID_RasterZone);
+			ASSERT_RESOURCE_ALLOCATION("ELI28140", ipZone != NULL);
+			ipZone->CreateFromLongRectangle(ipZoneRect, nPageNum);
+			ipZones->PushBack(ipZone);
+		}
+		// Build the bottom rectangle
+		if (nBottom < nHeight)
+		{
+			ipZoneRect->SetBounds(0, nBottom, nWidth, nHeight);
+			IRasterZonePtr ipZone(CLSID_RasterZone);
+			ASSERT_RESOURCE_ALLOCATION("ELI28141", ipZone != NULL);
+			ipZone->CreateFromLongRectangle(ipZoneRect, nPageNum);
+			ipZones->PushBack(ipZone);
+		}
+		// Build the left rectangle
+		if (nLeft > 0)
+		{
+			ipZoneRect->SetBounds(0, nTop, nLeft, nBottom);
+			IRasterZonePtr ipZone(CLSID_RasterZone);
+			ASSERT_RESOURCE_ALLOCATION("ELI28142", ipZone != NULL);
+			ipZone->CreateFromLongRectangle(ipZoneRect, nPageNum);
+			ipZones->PushBack(ipZone);
+		}
+		// Build the right rectangle
+		if (nRight < nWidth)
+		{
+			ipZoneRect->SetBounds(nRight, nTop, nWidth, nBottom);
+			IRasterZonePtr ipZone(CLSID_RasterZone);
+			ASSERT_RESOURCE_ALLOCATION("ELI28143", ipZone != NULL);
+			ipZone->CreateFromLongRectangle(ipZoneRect, nPageNum);
+			ipZones->PushBack(ipZone);
+		}
+
+		return ipZones;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28144");
 }
 //-------------------------------------------------------------------------------------------------

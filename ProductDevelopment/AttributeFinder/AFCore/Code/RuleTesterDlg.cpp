@@ -450,7 +450,7 @@ void RuleTesterDlg::OnButtonExecute()
 		_variant_t varRuleSet = (IUnknown *) ipUnknown;
 
 		m_ipAttributes = getAFEngine()->FindAttributes( ipAFDoc, get_bstr_t( "" ), 
-			-1, varRuleSet, ipVecAttributeNames, NULL );
+			-1, varRuleSet, ipVecAttributeNames, VARIANT_TRUE, NULL );
 
 		// Refresh the list to display latest results
 		updateList(ipAFDoc);

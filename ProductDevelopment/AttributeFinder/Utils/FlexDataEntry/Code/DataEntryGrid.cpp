@@ -544,7 +544,7 @@ int CDataEntryGrid::HandleRubberband(ISpatialStringPtr ipInput)
 			ASSERT_RESOURCE_ALLOCATION("ELI10956", ipEngine != NULL);
 
 			ipAttributes = ipEngine->FindAttributes( ipDoc, "", -1, 
-				strPath.c_str(), NULL, NULL );
+				strPath.c_str(), NULL, VARIANT_TRUE, NULL );
 		}
 		else
 		{
@@ -711,7 +711,7 @@ int CDataEntryGrid::HandleSwipe(std::string strInput)
 				ASSERT_RESOURCE_ALLOCATION("ELI10937", ipEngine != NULL);
 
 				ipAttributes = ipEngine->FindAttributes( ipDoc, "", -1, 
-					strPath.c_str(), NULL, NULL );
+					strPath.c_str(), NULL, VARIANT_TRUE, NULL );
 			}
 			else
 			{

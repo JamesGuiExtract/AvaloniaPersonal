@@ -96,15 +96,18 @@ STDMETHODIMP CFeedbackMgr::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IFeedbackMgr
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFeedbackMgr::raw_RecordCorrectData(BSTR strRuleExecutionID, IIUnknownVector* pData)
+STDMETHODIMP CFeedbackMgr::raw_RecordCorrectData(BSTR bstrRuleExecutionID, IIUnknownVector* pData)
 {
 	try
 	{
 		// Check licensing
 		validateLicense();
 
+		// Convert RuleID to number
+		string	strID = asString( bstrRuleExecutionID );
+
 		// Just return if Rule ID is empty string
-		if (_bstr_t( strRuleExecutionID ).length() == 0)
+		if (strID.empty())
 		{
 			return S_OK;
 		}
@@ -117,19 +120,15 @@ STDMETHODIMP CFeedbackMgr::raw_RecordCorrectData(BSTR strRuleExecutionID, IIUnkn
 			return S_FALSE;
 		}
 
-		// Convert RuleID to number
-		string	strID = asString( strRuleExecutionID );
 		long lRuleID = asLong( strID );
 
 		// Retrieve CorrectData submit time
 		SYSTEMTIME	st;
 		GetSystemTime( &st );
 		CTime	t( st );
-//		DWORD dwTime = t.GetTime();
 		__time64_t t64Time = t.GetTime();
 
 		// Update this record
-//		writeCorrectTime( lRuleID, dwTime );
 		writeCorrectTime( lRuleID, t64Time );
 
 		///////////////////////////////////
@@ -146,25 +145,27 @@ STDMETHODIMP CFeedbackMgr::raw_RecordCorrectData(BSTR strRuleExecutionID, IIUnkn
 		ASSERT_RESOURCE_ALLOCATION( "ELI08785", ipData != NULL );
 
 		// Write the vector of results to the file
-		ipData->SaveTo(get_bstr_t(strFile), VARIANT_TRUE);
+		ipData->SaveTo(strFile.c_str(), VARIANT_TRUE);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07942")
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
 // IFeedbackMgrInternals
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFeedbackMgr::raw_RecordFoundData(BSTR strRuleExecutionID, IIUnknownVector * pData)
+STDMETHODIMP CFeedbackMgr::raw_RecordFoundData(BSTR bstrRuleExecutionID, IIUnknownVector * pData)
 {
 	try
 	{
 		// Check licensing
 		validateLicense();
 
+		string strRuleExecutionID = asString(bstrRuleExecutionID);
+
 		// Just return if Rule ID is empty string
-		if (_bstr_t( strRuleExecutionID ).length() == 0)
+		if (strRuleExecutionID.empty())
 		{
 			return S_OK;
 		}
@@ -178,7 +179,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordFoundData(BSTR strRuleExecutionID, IIUnknow
 		}
 
 		// Get numeric Rule ID
-		long lRuleID = asLong( _bstr_t( strRuleExecutionID ).operator const char *() );
+		long lRuleID = asLong(strRuleExecutionID);
 
 		// Get associated Duration timer
 		StopWatch Watch;
@@ -213,22 +214,24 @@ STDMETHODIMP CFeedbackMgr::raw_RecordFoundData(BSTR strRuleExecutionID, IIUnknow
 		ASSERT_RESOURCE_ALLOCATION( "ELI08786", ipData != NULL );
 
 		// Write the vector of results to the file
-		ipData->SaveTo(get_bstr_t(strFile), VARIANT_TRUE);
+		ipData->SaveTo(strFile.c_str(), VARIANT_FALSE);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08787")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFeedbackMgr::raw_RecordException(BSTR strRuleExecutionID, BSTR strException)
+STDMETHODIMP CFeedbackMgr::raw_RecordException(BSTR bstrRuleExecutionID, BSTR bstrException)
 {
 	try
 	{
 		// Check licensing
 		validateLicense();
 
+		string strRuleID = asString(bstrRuleExecutionID);
+
 		// Just return if Rule ID is empty string
-		if (_bstr_t( strRuleExecutionID ).length() == 0)
+		if (strRuleID.empty())
 		{
 			return S_OK;
 		}
@@ -242,7 +245,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordException(BSTR strRuleExecutionID, BSTR str
 		}
 
 		// Get numeric Rule ID
-		long lRuleID = asLong( _bstr_t( strRuleExecutionID ).operator const char *() );
+		long lRuleID = asLong(strRuleID);
 
 		///////////////////////////////////
 		// Store specified data in UEX file
@@ -257,18 +260,18 @@ STDMETHODIMP CFeedbackMgr::raw_RecordException(BSTR strRuleExecutionID, BSTR str
 
 		// Create UCLID Exception object
 		UCLIDException ue;
-		ue.createFromString( "ELI08789", asString( strException ) );
+		ue.createFromString( "ELI08789", asString( bstrException ) );
 
 		// Write the UCLID Exception to the file
 		ue.saveTo( strFile );
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19357")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR strRSDFileName, 
-												   BSTR * pstrRuleExecutionID)
+STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR bstrRSDFileName, 
+												   BSTR* pbstrRuleExecutionID)
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
 	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
@@ -279,10 +282,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 		validateLicense();
 
 		// Check parameter
-		if (pstrRuleExecutionID == NULL)
-		{
-			return E_POINTER;
-		}
+		ASSERT_ARGUMENT("ELI28091", pbstrRuleExecutionID != NULL);
 
 		////////////////////////////////////////////
 		// Default Rule Execution ID to empty string
@@ -295,7 +295,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 		if (ms_bDisableSessionFeedback)
 		{
 			// Just return the empty string
-			*pstrRuleExecutionID = bstrID.copy();
+			*pbstrRuleExecutionID = bstrID.Detach();
 			return S_OK;
 		}
 
@@ -303,7 +303,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 		if (!ma_pCfgFeedbackMgr->getFeedbackEnabled())
 		{
 			// Just return the empty string
-			*pstrRuleExecutionID = bstrID.copy();
+			*pbstrRuleExecutionID = bstrID.Detach();
 			return S_OK;
 		}
 
@@ -312,7 +312,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 		if (strFeedbackFolder.empty() || !isFileOrFolderValid( strFeedbackFolder ))
 		{
 			// Just return the empty string
-			*pstrRuleExecutionID = bstrID.copy();
+			*pbstrRuleExecutionID = bstrID.Detach();
 			return S_OK;
 		}
 
@@ -346,7 +346,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 					if (tmNow >= tmStop)
 					{
 						// Just return the empty string
-						*pstrRuleExecutionID = bstrID.copy();
+						*pbstrRuleExecutionID = bstrID.Detach();
 						return S_OK;
 					}
 				}
@@ -378,7 +378,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 				"Warning", MB_OK|MB_ICONINFORMATION );
 
 			// Just return the empty string
-			*pstrRuleExecutionID = bstrID.copy();
+			*pbstrRuleExecutionID = bstrID.Detach();
 
 			return S_OK;
 		}
@@ -387,13 +387,12 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 		if (bCheckCount)
 		{
 			// Retrieve rule execution records from database
-			CString	zQuery;
-			zQuery.Format( "SELECT * FROM RuleExecution" );
+			_variant_t vtQuery = "SELECT * FROM RuleExecution";
 
 			// Retrieve recordset
 			_RecordsetPtr	ipRS( __uuidof(Recordset) );
-			ipRS->Open( LPCTSTR(zQuery) , 
-				m_ipConnection.GetInterfacePtr(),
+			ipRS->Open( vtQuery , 
+				_variant_t((IDispatch *)m_ipConnection),
 				adOpenKeyset,
 				adLockPessimistic,
 				adCmdText);
@@ -410,7 +409,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 			if (lCollectionCount >= lTurnOffCount)
 			{
 				// Just return the empty string
-				*pstrRuleExecutionID = bstrID.copy();
+				*pbstrRuleExecutionID = bstrID.Detach();
 				return S_OK;
 			}
 		}
@@ -420,13 +419,12 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 		if (lConfigSkipCount > 0)
 		{
 			// Retrieve pending skip count from database
-			CString	zQuery;
-			zQuery.Format( "SELECT * FROM Counter WHERE CounterName = 'SkipCount'" );
+			_variant_t vtQuery("SELECT * FROM Counter WHERE CounterName = 'SkipCount'");
 
 			// Retrieve recordset
 			_RecordsetPtr	ipRS( __uuidof(Recordset) );
-			ipRS->Open( LPCTSTR(zQuery) , 
-				m_ipConnection.GetInterfacePtr(),
+			ipRS->Open( vtQuery , 
+				_variant_t((IDispatch *)m_ipConnection),
 				adOpenKeyset,
 				adLockPessimistic,
 				adCmdText);
@@ -461,7 +459,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 				if (lSkipCount != 0)
 				{
 					// Just return the empty string
-					*pstrRuleExecutionID = bstrID.copy();
+					*pbstrRuleExecutionID = bstrID.Detach();
 					return S_OK;
 				}
 			}
@@ -471,18 +469,16 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 		SYSTEMTIME	st;
 		GetSystemTime( &st );
 		CTime	t( st );
-//		DWORD dwTime = t.GetTime();
 		__time64_t t64Time = t.GetTime();
 
 		// Add the new record and retrieve associated Rule ID
-//		long lNewRuleID = writeNewStartTime( dwTime );
 		long lNewRuleID = writeNewStartTime( t64Time );
 
 		// Handle Source Document and database field
 		handleSourceDoc( lNewRuleID, pAFDoc );
 
 		// Write RSD File name
-		string	strRSDFile = asString( strRSDFileName );
+		string	strRSDFile = asString( bstrRSDFileName );
 		writeRSDFileName( lNewRuleID, strRSDFile );
 
 		// Write Computer name
@@ -497,11 +493,11 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR str
 		// Return Rule ID to caller
 		CString zID;
 		zID.Format( "%ld", lNewRuleID );
-		*pstrRuleExecutionID = _bstr_t( LPCTSTR(zID) ).copy();
+		*pbstrRuleExecutionID = _bstr_t( LPCTSTR(zID) ).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08477")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFeedbackMgr::raw_ClearFeedbackData(VARIANT_BOOL bShowPrompt)
@@ -542,13 +538,12 @@ STDMETHODIMP CFeedbackMgr::raw_ClearFeedbackData(VARIANT_BOOL bShowPrompt)
 					getAllSubDirsAndDeleteAllFiles( strFeedbackFolder, vecSubDirs );
 
 					// Clear RuleExecution
-					CString	zQuery;
-					zQuery.Format( "SELECT * FROM RuleExecution" );
+					_variant_t vtQuery( "SELECT * FROM RuleExecution" );
 
 					// Retrieve recordset
 					_RecordsetPtr	ipRS( __uuidof(Recordset) );
-					ipRS->Open( LPCTSTR(zQuery) , 
-						m_ipConnection.GetInterfacePtr(),
+					ipRS->Open( vtQuery , 
+						_variant_t((IDispatch *)m_ipConnection),
 						adOpenDynamic,
 						adLockPessimistic,
 						adCmdText);
@@ -565,11 +560,11 @@ STDMETHODIMP CFeedbackMgr::raw_ClearFeedbackData(VARIANT_BOOL bShowPrompt)
 					ipRS->Close();
 
 					// Define query
-					zQuery.Format( "SELECT * FROM Counter WHERE CounterName = 'SkipCount'" );
+					vtQuery.SetString("SELECT * FROM Counter WHERE CounterName = 'SkipCount'");
 
 					// Retrieve recordset
-					ipRS->Open( LPCTSTR(zQuery) , 
-						m_ipConnection.GetInterfacePtr(),
+					ipRS->Open( vtQuery , 
+						_variant_t((IDispatch *)m_ipConnection),
 						adOpenDynamic,
 						adLockPessimistic,
 						adCmdText);
@@ -592,13 +587,13 @@ STDMETHODIMP CFeedbackMgr::raw_ClearFeedbackData(VARIANT_BOOL bShowPrompt)
 				}
 			}
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09121")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFeedbackMgr::raw_GetFeedbackRecords(IUnknown ** pFeedbackRecords)
+STDMETHODIMP CFeedbackMgr::raw_GetFeedbackRecords(IUnknown** ppFeedbackRecords)
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
 	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
@@ -608,8 +603,10 @@ STDMETHODIMP CFeedbackMgr::raw_GetFeedbackRecords(IUnknown ** pFeedbackRecords)
 		// Check licensing
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI28092", ppFeedbackRecords != NULL);
+
 		// Default to NULL Recordset
-		*pFeedbackRecords = NULL;
+		*ppFeedbackRecords = NULL;
 
 		//////////////////////////////////////////////
 		// Retrieve all records in RuleExecution table
@@ -620,13 +617,12 @@ STDMETHODIMP CFeedbackMgr::raw_GetFeedbackRecords(IUnknown ** pFeedbackRecords)
 			if (openDBConnection( strFeedbackFolder ))
 			{
 				// Construct query to retrieve specified records
-				CString	zQuery;
-				zQuery.Format( "SELECT * FROM RuleExecution" );
+				_variant_t vtQuery( "SELECT * FROM RuleExecution" );
 
 				// Retrieve recordset
 				_RecordsetPtr	ipRS( __uuidof(Recordset) );
-				ipRS->Open( LPCTSTR(zQuery) , 
-					m_ipConnection.GetInterfacePtr(),
+				ipRS->Open( vtQuery , 
+					_variant_t((IDispatch *)m_ipConnection),
 					adOpenStatic,
 					adLockPessimistic,
 					adCmdText);
@@ -634,14 +630,14 @@ STDMETHODIMP CFeedbackMgr::raw_GetFeedbackRecords(IUnknown ** pFeedbackRecords)
 				if (ipRS->adoEOF == VARIANT_FALSE)
 				{
 					// Provide this Recordset to the caller
-					*pFeedbackRecords = ipRS.Detach();
+					*ppFeedbackRecords = ipRS.Detach();
 				}
 			}
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10185")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFeedbackMgr::raw_CloseConnection()
@@ -661,10 +657,10 @@ STDMETHODIMP CFeedbackMgr::raw_CloseConnection()
 			m_ipConnection->Close();
 			m_bConnectionOpen = false;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10240")
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -784,7 +780,7 @@ void CFeedbackMgr::handleSourceDoc(long lRuleID, IAFDocument *pAFDoc)
 	// Retrieve single-item recordset with this Rule ID
 	_RecordsetPtr	ipRS( __uuidof(Recordset) );
 	ipRS->Open( LPCTSTR(zQuery) , 
-		m_ipConnection.GetInterfacePtr(),
+		_variant_t((IDispatch *)m_ipConnection),
 		adOpenKeyset,
 		adLockPessimistic,
 		adCmdText);
@@ -817,7 +813,7 @@ void CFeedbackMgr::handleSourceDoc(long lRuleID, IAFDocument *pAFDoc)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool CFeedbackMgr::openDBConnection(std::string strFeedbackFolder)
+bool CFeedbackMgr::openDBConnection(const string& strFeedbackFolder)
 {
 	// Just return if connection is already open
 	if (m_bConnectionOpen)
@@ -941,7 +937,7 @@ bool CFeedbackMgr::openDBConnection(std::string strFeedbackFolder)
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-void CFeedbackMgr::writeComputerName(long lRuleID, std::string strName)
+void CFeedbackMgr::writeComputerName(long lRuleID, const string& strName)
 {
 	// Just return if connection is not already open
 	if (!m_bConnectionOpen || (m_ipConnection == NULL))
@@ -956,7 +952,7 @@ void CFeedbackMgr::writeComputerName(long lRuleID, std::string strName)
 	// Retrieve single-item recordset with this Rule ID
 	_RecordsetPtr	ipRS( __uuidof(Recordset) );
 	ipRS->Open( LPCTSTR(zQuery) , 
-		m_ipConnection.GetInterfacePtr(),
+		_variant_t((IDispatch *)m_ipConnection),
 		adOpenKeyset,
 		adLockPessimistic,
 		adCmdText);
@@ -964,11 +960,7 @@ void CFeedbackMgr::writeComputerName(long lRuleID, std::string strName)
 	// Update the fields in this record
 	if (ipRS->adoEOF == VARIANT_FALSE)
 	{
-		_variant_t	vtValue;
-		vtValue.vt = VT_BSTR;
-
-		// Set the Computer Name
-		vtValue.bstrVal = _bstr_t( strName.c_str() ).copy();
+		_variant_t	vtValue(strName.c_str());
 		ipRS->PutCollect( gstrComputerField, vtValue );
 
 		// Apply the updated record to the database
@@ -976,7 +968,6 @@ void CFeedbackMgr::writeComputerName(long lRuleID, std::string strName)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-//void CFeedbackMgr::writeCorrectTime(long lRuleID, DWORD dwTime)
 void CFeedbackMgr::writeCorrectTime(long lRuleID, __time64_t t64Time)
 {
 	// Just return if connection is not already open
@@ -989,10 +980,11 @@ void CFeedbackMgr::writeCorrectTime(long lRuleID, __time64_t t64Time)
 	CString	zQuery;
 	zQuery.Format( "SELECT * FROM RuleExecution WHERE RuleID = %ld", lRuleID );
 
+
 	// Retrieve single-item recordset with this Rule ID
 	_RecordsetPtr	ipRS( __uuidof(Recordset) );
-	ipRS->Open( LPCTSTR(zQuery) , 
-		m_ipConnection.GetInterfacePtr(),
+	ipRS->Open( LPCTSTR(zQuery), 
+		_variant_t((IDispatch *)m_ipConnection),
 		adOpenKeyset,
 		adLockPessimistic,
 		adCmdText);
@@ -1000,12 +992,9 @@ void CFeedbackMgr::writeCorrectTime(long lRuleID, __time64_t t64Time)
 	// Update the fields in this record
 	if (ipRS->adoEOF == VARIANT_FALSE)
 	{
-		_variant_t	vtValue;
-//		vtValue.vt = VT_I4;
-		vtValue.vt = VT_I8;
-
 		// Set the CorrectTime
-//		vtValue.lVal = dwTime;
+		_variant_t	vtValue;
+		vtValue.vt = VT_I8;
 		vtValue.llVal = t64Time;
 		ipRS->PutCollect( gstrCorrectTimeField, vtValue );
 
@@ -1029,7 +1018,7 @@ void CFeedbackMgr::writeDuration(long lRuleID, double dSeconds)
 	// Retrieve single-item recordset with this Rule ID
 	_RecordsetPtr	ipRS( __uuidof(Recordset) );
 	ipRS->Open( LPCTSTR(zQuery) , 
-		m_ipConnection.GetInterfacePtr(),
+		_variant_t((IDispatch *)m_ipConnection),
 		adOpenKeyset,
 		adLockPessimistic,
 		adCmdText);
@@ -1037,11 +1026,8 @@ void CFeedbackMgr::writeDuration(long lRuleID, double dSeconds)
 	// Update the fields in this record
 	if (ipRS->adoEOF == VARIANT_FALSE)
 	{
-		_variant_t	vtValue;
-		vtValue.vt = VT_R8;
-
 		// Set the Duration
-		vtValue.dblVal = dSeconds;
+		_variant_t vtValue(dSeconds);
 		ipRS->PutCollect( gstrDurationField, vtValue );
 
 		// Apply the updated record to the database
@@ -1064,7 +1050,7 @@ long CFeedbackMgr::writeNewStartTime(__time64_t t64Time)
 	// Open the recordset as an Table operation
 	// NOTE: Must use adOpenKeyset to have RuleID available after ipRS->Update()
 	ipRS->Open( "RuleExecution", 
-		m_ipConnection.GetInterfacePtr(), 
+		_variant_t((IDispatch *)m_ipConnection),
 		adOpenKeyset, 
 		adLockPessimistic,
 		adCmdTable );
@@ -1074,8 +1060,6 @@ long CFeedbackMgr::writeNewStartTime(__time64_t t64Time)
 
 	// Set the Start Time field
 	_variant_t	vtValue;
-//	vtValue.vt = VT_I4;
-//	vtValue.lVal = dwTime;
 	vtValue.vt = VT_I8;
 	vtValue.llVal = t64Time;
 	ipRS->PutCollect( gstrStartTimeField, vtValue );
@@ -1094,7 +1078,7 @@ long CFeedbackMgr::writeNewStartTime(__time64_t t64Time)
 	return lNewRuleID;
 }
 //-------------------------------------------------------------------------------------------------
-void CFeedbackMgr::writeRSDFileName(long lRuleID, std::string strRSDFileName)
+void CFeedbackMgr::writeRSDFileName(long lRuleID, const string& strRSDFileName)
 {
 	// Just return if connection is not already open
 	if (!m_bConnectionOpen || (m_ipConnection == NULL))
@@ -1109,7 +1093,7 @@ void CFeedbackMgr::writeRSDFileName(long lRuleID, std::string strRSDFileName)
 	// Retrieve single-item recordset with this Rule ID
 	_RecordsetPtr	ipRS( __uuidof(Recordset) );
 	ipRS->Open( LPCTSTR(zQuery) , 
-		m_ipConnection.GetInterfacePtr(),
+		_variant_t((IDispatch *)m_ipConnection),
 		adOpenKeyset,
 		adLockPessimistic,
 		adCmdText);
@@ -1117,11 +1101,8 @@ void CFeedbackMgr::writeRSDFileName(long lRuleID, std::string strRSDFileName)
 	// Update the fields in this record
 	if (ipRS->adoEOF == VARIANT_FALSE)
 	{
-		_variant_t	vtValue;
-		vtValue.vt = VT_BSTR;
-
 		// Set the RSD File Name
-		vtValue.bstrVal = _bstr_t( strRSDFileName.c_str() ).copy();
+		_variant_t	vtValue(strRSDFileName.c_str());
 		ipRS->PutCollect( gstrRSDFileField, vtValue );
 
 		// Apply the updated record to the database
