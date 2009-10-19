@@ -194,15 +194,18 @@ private:
 	// is 9, and it is set to include region defined, then the return vector
 	// shall contain 2,3 and 5. If it is set to exclude region defined, then 
 	// the return vector shall contain 1,4,6,7,8,9
-	vector<int> getActualPageNumbers(int nLastPageNumber, ISpatialStringPtr ipInputText, IAFDocumentPtr ipAFDoc);
+	vector<int> getActualPageNumbers(int nLastPageNumber, const ISpatialStringPtr& ipInputText,
+		const IAFDocumentPtr& ipAFDoc);
 
 	// return actual page content based on the restriction defined
-	ISpatialStringPtr getIndividualPageContent(ISpatialStringPtr ipOriginPage);
+	ISpatialStringPtr getIndividualPageContent(const ISpatialStringPtr& ipOriginPage,
+		long nPageNum, long nWidth, long nHeight);
 
 	IOCREnginePtr getOCREngine();
 
 	// based on the specific page and selection, get the actual string out
-	ISpatialStringPtr getRegionContent(ISpatialStringPtr ipPageText, bool bPageSpecified);
+	ISpatialStringPtr getRegionContent(const ISpatialStringPtr& ipPageText, bool bPageSpecified,
+		bool bRestrictionDefined, long nPageNum=0, long nWidth=-1, long nHeight=-1);
 
 	// check the horizontal and vertical restrictions to see if at least one
 	// of them is defined.

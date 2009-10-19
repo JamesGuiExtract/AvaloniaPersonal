@@ -864,19 +864,17 @@ void getImagePixelHeightAndWidth(const string& strImageFileName, int& riHeight, 
 	// Get initialized FILEINFO struct
 	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 
-	// Convert a PDF input image to a temporary TIF
-	PDFInputOutputMgr ltPDF( strImageFileName, true );
-
 	// Get initialized LOADFILEOPTION struct. 
 	LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(0);
 	lfo.PageNumber = nPageNum;
 
-	LeadToolsPDFLoadLocker ltLocker(false);
+	// Provide thread safety when dealing with PDF's
+	LeadToolsPDFLoadLocker ltLocker(strImageFileName);
 
 	// Get File Information
-	throwExceptionIfNotSuccess(L_FileInfo( (char*)( ltPDF.getFileName().c_str() ), &fileInfo, 
-		sizeof(FILEINFO), FILEINFO_TOTALPAGES, &lfo), 
-		"ELI20247", "Could not obtain image info!", ltPDF.getFileNameInformationString());
+	throwExceptionIfNotSuccess(L_FileInfo( (char*)( strImageFileName.c_str() ), &fileInfo, 
+		sizeof(FILEINFO), 0, &lfo), 
+		"ELI20247", "Could not obtain image info!", strImageFileName);
 
 	riHeight = fileInfo.Height;
 	riWidth = fileInfo.Width;
