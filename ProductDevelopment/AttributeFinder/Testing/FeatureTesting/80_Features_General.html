@@ -1,7 +1,7 @@
 <HTML>
 
 <HEAD>
-<TITLE>FLEX Index 8.0 Feature Testing</TITLE>
+<TITLE>FLEX Index 8.0 General Testing</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 
@@ -25,7 +25,10 @@
 		gracefully.  This implementation will <b>not</b> separate the file processing engine 
 		from the user interface.
   	   	<LI><b>Main Checklists Updated:</b> TBD
-  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
 	      		<li>TBD
@@ -71,7 +74,10 @@
 			notes updated on 9/11/09.
 	       	</ul>
   	   	<LI><b>Main Checklists Updated:</b> TBD
-  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
 	      		<li>Confirm that the property page UI works as expected.
@@ -91,40 +97,72 @@
 <p>
 	<LI><h2>Automatic Detection/Correction Of Stuck Files (#8)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>SCRs:</b> LegacyRC #5467, #5468, #5469, #5470, #5471, #5500
   	   	<LI><b>Details:</b> The goal of this feature is to automatically determine 
 		when one or more processing files are stuck.  The File Action Manager shall 
 		automatically revert a stuck file to its previous status.
   	   	<LI><b>Main Checklists Updated:</b> TBD
-  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
-			<b>AutoRevertLockedFiles</b> with a default of <b>1</b>.
-	      		<li>Confirm that with <b>AutoRevertLockedFiles = 1</b>, stuck 
-			files are automatically reverted to their previous status.
-	      		<li>Confirm that with <b>AutoRevertLockedFiles = 0</b>, stuck 
-			files are not automatically reverted to their previous status.
+	      		<li><u><b>Setup</b></u>
+			<ul> 
+		      		<li>Prepare a collection of files for processing with 
+				<b>Execute rules</b>.
+		      		<li>Use Task Manager to kill <b>ProcessFiles.exe</b> 
+				while documents are being processed.
+		      		<li>Use <b>DB Admin</b> to confirm that some files 
+				are stuck in <b>Processing</b>.
+		      		<li>Use <b>DB Admin</b> after auto-reversion to confirm that 
+				the files are back in <b>Pending</b> mode.
 <p>
-	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
-			<b>AutoRevertTimeOutInMinutes</b> with a default of <b>60</b>.
-	      		<li>Confirm that the minimum value for <b>AutoRevertTimeOutInMinutes</b> 
-			is <b>5</b>.
-	      		<li>Confirm that automatic reversion of stuck files is based on 
-			the timeout value.
+		      		<li>Prepare a collection of files for processing with 
+				<b>Verify redactions two</b>.
+				<li>Verify some files and make sure to skip some of the files.
+				<li>Stop processing and modify the FPS file to process 
+				skipped images.
+		      		<li>Use Task Manager to kill <b>ProcessFiles.exe</b> 
+				while documents are being processed and before all of 
+				the previously skipped images had been processed.
+		      		<li>Use <b>DB Admin</b> to confirm that some files 
+				are stuck in <b>Processing</b>.
+		      		<li>Use <b>DB Admin</b> after auto-reversion to confirm that 
+				the files are back in <b>Skipped</b> mode.
+			</ul> 
+	      		<li><u><b>Functionality</b></u>
+			<ul> 
+		      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+				<b>AutoRevertLockedFiles</b> with a default of <b>1</b>.
+	      			<li>Confirm that with <b>AutoRevertLockedFiles = 1</b>, stuck 
+				files are automatically reverted to their previous status.
+		      		<li>Confirm that with <b>AutoRevertLockedFiles = 0</b>, stuck 
+				files are not automatically reverted to their previous status.
 <p>
-	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
-			<b>AutoRevertNotifyEmailList</b> with a default of <b>an empty 
-			string</b>.
-	      		<li>Confirm that automatic reversion of stuck files sends emails 
-			to the addresses given in <b>AutoRevertNotifyEmailList</b>.
+		      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+				<b>AutoRevertTimeOutInMinutes</b> with a default of <b>60</b>.
+	      			<li>Confirm that the minimum value for <b>AutoRevertTimeOutInMinutes</b> 
+				is <b>5</b>.
+		      		<li>Confirm that automatic reversion of stuck files is based on 
+				the timeout value.
+		      		<li>Confirm that an exception is logged and the timeout value is 
+				automatically adjusted if a value less than 5 is provided.
 <p>
-	      		<li>Confirm that an exception is logged if one or more files are 
-			reverted from being stuck.
-	      		<li>Confirm that the exception includes the number of minutes 
-			elapsed before reversion, the count of files that were reverted, 
-			the file status to which a file was reverted, and the associated 
-			action name.
+		      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+				<b>AutoRevertNotifyEmailList</b> with a default of <b>an empty 
+				string</b>.
+		      		<li>Confirm that automatic reversion of stuck files sends emails 
+				to the addresses given in <b>AutoRevertNotifyEmailList</b>.
+<p>
+		      		<li>Confirm that an exception is logged if one or more files are 
+				reverted from being stuck.
+	      			<li>Confirm that the exception includes the number of minutes 
+				elapsed before reversion, the count of files that were reverted, 
+				the file status to which a file was reverted, and the associated 
+				action name.
+			</ul> 
 	       	</ul>
        	</ul>
 <p>
@@ -134,7 +172,10 @@
   	   	<LI><b>Details:</b> The DemoShield installation app currently installs SQL Server 2005. 
 		For 8.0, SQL Server 2008 should be installed.
   	   	<LI><b>Main Checklists Updated:</b> Yes
-  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
 	      		<li>Confirm that the installation page includes SQL Server 2008 Express.
@@ -150,7 +191,10 @@
   	   	<LI><b>SCRs:</b> N/A
   	   	<LI><b>Details:</b> Exercise the <b>Large-scale</b> Endurance test checklist for ID Shield.
   	   	<LI><b>Main Checklists Updated:</b> N/A
-  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
 	      		<li>Use the existing <b>Endurance Test</b> checklist.
@@ -164,10 +208,13 @@
 		#5443, #5444, #5445, #5446
   	   	<LI><b>Details:</b> This feature allows the user to specify a relative priority 
 		for processing of files.  The expected situation is for a customer to process 
-		backfile images with a lower priority than dayforward images.  Any time a 
+		back file images with a lower priority than day forward images.  Any time a 
 		dayforward image is available it gets bumped to the head of the queue.
   	   	<LI><b>Main Checklists Updated:</b> TBD
-  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
 	      		<li><u><b>File Action Manager</b></u>
@@ -229,7 +276,10 @@
   	   	<LI><b>SCRs:</b> TBD
   	   	<LI><b>Details:</b> TBD
   	   	<LI><b>Main Checklists Updated:</b> TBD
-  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
 	      		<li><u><b>File Action Manager</b></u>
