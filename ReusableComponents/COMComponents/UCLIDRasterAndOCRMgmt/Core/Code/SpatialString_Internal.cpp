@@ -1960,7 +1960,7 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
 		return translateToNewPageInfo(lStartX, lStartY, lEndX, lEndY, lHeight, lPageNum,
 			ipNewPageInfo);
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25822");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28178");
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo(
@@ -2837,18 +2837,18 @@ IIUnknownVectorPtr CSpatialString::getTranslatedImageRasterZones(
 			it != vecZones.end(); it++)
 		{
 			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone(*it);
-			ASSERT_RESOURCE_ALLOCATION("ELI25849", ipZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28179", ipZone != NULL);
 
 			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipNewZone =
 				translateToNewPageInfo(ipZone, ipNewPageInfoMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI25850", ipNewZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28180", ipNewZone != NULL);
 
 			ipZones->PushBack(ipNewZone);
 		}
 
 		return ipZones;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25851");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28181");
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialString::remove(long nStart, long nEnd)

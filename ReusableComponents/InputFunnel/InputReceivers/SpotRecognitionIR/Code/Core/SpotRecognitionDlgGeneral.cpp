@@ -2125,11 +2125,7 @@ ISpatialStringPtr SpotRecognitionDlg::recognizeParagraphTextInImage(
 	{
 		ILongRectanglePtr ipRect(CLSID_LongRectangle);
 		ASSERT_RESOURCE_ALLOCATION("ELI10667", ipRect != NULL);
-
-		ipRect->Left = pRect->left;
-		ipRect->Top = pRect->top;
-		ipRect->Right = pRect->right;
-		ipRect->Bottom = pRect->bottom;
+		ipRect->SetBounds(pRect->left, pRect->top, pRect->right, pRect->bottom);
 
 		ipText = m_ipOCREngine->RecognizeTextInImageZone(_bstr_t(strImageFileName.c_str()), 
 			lStartPage, lEndPage, ipRect, 0, kNoFilter, "", VARIANT_FALSE, VARIANT_FALSE, 
@@ -2954,11 +2950,6 @@ void SpotRecognitionDlg::createTemporaryHighlightsForLines(IIUnknownVectorPtr ip
 			continue;
 		}
 
-		// get current line's page number
-		if (ipLine->IsMultiPage() == VARIANT_TRUE)
-		{
-			continue;
-		}
 		long nPage = ipLine->GetFirstPageNumber();
 
 		// Get the raster Zone(s) for this line

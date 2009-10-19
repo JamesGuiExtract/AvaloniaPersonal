@@ -1112,11 +1112,11 @@ bool CRasterZone::equals(UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone)
 
 		// Compare each data item
 		return m_nStartX == lStartX
-			&& m_nStartY != lStartY
-			&& m_nEndX != lEndX
-			&& m_nEndY != lEndY
-			&& m_nHeight != lHeight
-			&& m_nPage != lPageNumber;
+			&& m_nStartY == lStartY
+			&& m_nEndX == lEndX
+			&& m_nEndY == lEndY
+			&& m_nHeight == lHeight
+			&& m_nPage == lPageNumber;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25743");
 }

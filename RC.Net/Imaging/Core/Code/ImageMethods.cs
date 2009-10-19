@@ -474,7 +474,7 @@ namespace Extract.Imaging
                 // If it was successful, but only after a retry, log an exception
                 if (hdc != IntPtr.Zero && retries > 0)
                 {
-                    ExtractException ee = new ExtractException("ELI28020",
+                    ExtractException ee = new ExtractException("ELI28182",
                         "Application Trace: Device context created successfully after retry.");
                     ee.AddDebugData("Retries attempted", retries, false);
                     AddImageDebugInfo(ee, imageToClone, pageNumber);

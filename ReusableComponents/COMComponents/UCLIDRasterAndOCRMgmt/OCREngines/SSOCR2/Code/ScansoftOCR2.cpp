@@ -241,12 +241,10 @@ STDMETHODIMP CScansoftOCR2::RecognizeText(BSTR bstrImageFileName, IVariantVector
 		{
 			// get a smart pointer
 			ILongRectanglePtr ipRect(pZone);
-	
-			rect.top = ipRect->Top;
-			rect.left = ipRect->Left;
-			rect.bottom = ipRect->Bottom;
-			rect.right = ipRect->Right;
 
+			// Store the bounds in the rectandle
+			ipRect->GetBounds(&rect.left, &rect.top, &rect.right, &rect.bottom);
+	
 			lpRect = &rect;
 
 			// a decomposition sequence is necessary to help identify the locations of handwritten 
