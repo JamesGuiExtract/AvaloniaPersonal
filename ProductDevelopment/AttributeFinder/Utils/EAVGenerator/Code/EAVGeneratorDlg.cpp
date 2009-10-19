@@ -987,11 +987,8 @@ void CEAVGeneratorDlg::saveAttributesToEAV(const CString& zFileName)
 			strOutputLine += (LPCTSTR)zType;
 		}
 		
-		// Just skip adding this line to the EAV file if Value is empty
-		if (!zValue.IsEmpty())
-		{
-			ofs << strOutputLine << endl;
-		}
+		// Save the item to the eav file
+		ofs << strOutputLine << endl;
 	}
 
 	// Close file and wait for file to be readable

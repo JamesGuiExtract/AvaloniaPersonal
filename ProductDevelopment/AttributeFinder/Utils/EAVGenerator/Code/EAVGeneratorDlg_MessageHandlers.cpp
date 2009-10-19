@@ -321,6 +321,10 @@ void CEAVGeneratorDlg::OnBtnAdd()
 		// set the item data to be the empty attribute
 		m_listAttributes.SetItemData(nNewItemIndex, (DWORD_PTR)pipNewAttrib);
 
+		// set the spatialness column to non-spatial
+		m_listAttributes.SetItemText(nNewItemIndex, SPATIALNESS_COLUMN,
+			getModeAsString(kNonSpatialMode).c_str());
+
 		// Select the new record
 		selectListItem(nNewItemIndex);
 		setModified(true);

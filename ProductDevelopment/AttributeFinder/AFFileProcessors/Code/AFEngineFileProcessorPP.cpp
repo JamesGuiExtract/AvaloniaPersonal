@@ -218,7 +218,12 @@ LRESULT CAFEngineFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 				break;
 
 			case kNoOCR:
-				nCheckNoOcr = BST_CHECKED;
+				{
+					// Clear and disable save OCR results if no OCR [FlexIDSCore #3715]
+					m_chkSaveOcrResults.SetCheck(BST_UNCHECKED);
+					m_chkSaveOcrResults.EnableWindow(FALSE);
+					nCheckNoOcr = BST_CHECKED;
+				}
 				break;
 
 			default:
@@ -272,6 +277,9 @@ LRESULT CAFEngineFileProcessorPP::OnClickedRadioAllPages(WORD wNotifyCode, WORD 
 	try
 	{
 		m_editSpecificPages.EnableWindow(FALSE);
+
+		// Ensure the save OCR results check box is enabled
+		m_chkSaveOcrResults.EnableWindow(TRUE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10289");
 
@@ -285,6 +293,9 @@ LRESULT CAFEngineFileProcessorPP::OnClickedRadioSpecificPages(WORD wNotifyCode, 
 	try
 	{
 		m_editSpecificPages.EnableWindow(TRUE);
+
+		// Ensure the save OCR results check box is enabled
+		m_chkSaveOcrResults.EnableWindow(TRUE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10290");
 
@@ -298,6 +309,10 @@ LRESULT CAFEngineFileProcessorPP::OnClickedRadioOcrNone(WORD wNotifyCode, WORD w
 	try
 	{
 		m_editSpecificPages.EnableWindow(FALSE);
+
+		// Clear and disable the Save OCR results checkbox [FlexIDSCore #3715]
+		m_chkSaveOcrResults.SetCheck(BST_UNCHECKED);
+		m_chkSaveOcrResults.EnableWindow(FALSE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28090");
 
