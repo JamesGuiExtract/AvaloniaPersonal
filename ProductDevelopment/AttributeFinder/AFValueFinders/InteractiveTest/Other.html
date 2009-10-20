@@ -1,16 +1,12 @@
 <html>
 
 <HEAD>
-<TITLE>RuleSet Editor - File Menu - File Menu Items - Testing Checklist</TITLE>
+<TITLE>Other Value Finders Testing Checklist</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
-<style>
-<!--
--->
-</style>
 </HEAD>
 
 <body>
-<h1>Ruleset Editor - Other - Value Finders<br>
+<h1>Ruleset Editor - Value Finders<br>Other<br>
 	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
@@ -19,17 +15,17 @@
     	<ul>
     		<li>Confirm that the <b>Configure</b> button is inactive.</li>
 <p>
-	  	   	<LI><b>[FlexIDSCore #3072]</b> Return Address Finder
-		       	<ul>
-		      		<li>Exercise the RSD file and samples attached to the SCR.
-		      		<li>Confirm that no <b>Invalid index!</b> exceptions are generated.
-		       	</ul>
-		    <li><b>[FlexIDSCore #3246]</b> Licensing for Address Finder and Return Address Finder</li>
-		    <ul>
+  	   	<LI><b>[FlexIDSCore #3072]</b> Return Address Finder
+	       	<ul>
+	      		<li>Exercise the RSD file and samples attached to the SCR.
+	      		<li>Confirm that no <b>Invalid index!</b> exceptions are generated.
+	       	</ul>
+	    	<li><b>[FlexIDSCore #3246]</b> Licensing for Address Finder and Return Address Finder</li>
+		<ul>
 		    	<li>Confirm that only an <b>ID Shield Server</b> license file is present.</li>
 		    	<li>Check for new components.</li>
 		    	<li>Confirm that an RSD file using <b>Address Finder</b> runs without error.</li>
-		    </ul>
+		</ul>
     	</ul>
   	</li>
 <p>
@@ -41,7 +37,7 @@
 <p>
   	<li><h2><b>Create Value Rule</b></h2>
     	<ul>
-      		<li><b>Configure</b> button displays <b>Configure Create Value Rule</b> dialog.</li>
+      		<li><b>Configure</b> button displays <b>Configure Create value rule</b> dialog.</li>
       		<li><b>Set attribute Value to:</b> edit box is editable.</li>
 	  	<ul>
 		 	<li>If left blank, throws an exception.</li>
@@ -94,14 +90,15 @@
       		<li><b>Extract each line (excluding line breaks) as a unique value for the 
 		current attribute</b> radio button is working.</li>
 		<li><b>[FlexIDSCore #3181]</b> Confirm that <b>Extract lines</b> returns nothing 
-		if extracting a nonexistent line</li>
+		if extracting a nonexistent line.</li>
 		<ul>
 			<li>Open a new Rule Set Editor window.</li>
-			<li>Create an attribute (any name) and a <b>Conditionally Find Value</b> rule. 
-			Use <b>Extract lines</b> as the finding rule condition; configure it to extract 
-			line 15. As the rule to be run, select a [\s\S]* regular expression rule.</li>
-			<li>Open the rule tester and select <b>Text from manual input</b>. Enter 10 
-			lines of input.</li>
+			<li>Create an attribute (any name) and a <b>Conditionally Find Value</b> 
+			rule.  Use <b>Extract lines</b> as the finding rule condition; configure 
+			it to extract line 15. As the rule to be run, select a [\s\S]* regular 
+			expression rule.</li>
+			<li>Open the <b>Rule Tester</b> and select <b>Text from manual 
+			input</b>. Enter 10 lines of input.</li>
 			<li>Run the test; confirm that no value is returned.</li>
 		</ul>
     	</ul>
@@ -140,41 +137,42 @@
 <p>
   	<li><h2><b>Find image region with lines</b></h2>
     	<ul>
-      		<li><b>Configure</b> button displays <b>Configure Find image region with lines</b> dialog.</li>
-			<li><b>Region Dimensions</b></li>
+      		<li><b>Configure</b> button displays <b>Configure Find image region with lines</b> 
+		dialog.</li>
+		<li><b>Region Dimensions</b></li>
+		<ul>
+			<li><b>Rows Minimum</b> and <b>Maximum</b> combo boxes work.</li>
+			<li><b>Columns Minimum</b> and <b>Maximum</b> combo boxes work.</li>
+			<li><b>Columns width Minimum</b> and <b>Maximum</b> edit boxes are editable.</li>
+			<li><b>Line spacing Minimum</b> and <b>Maximum</b> edit boxes are editable.</li>
+			<li><b>Column spacing Maximum</b> edit box is editable.</li>
+			<li>Leaving edit boxes blank does not throw an exception.</li>
+		</ul>
+		<li><b>Search Scope</b></li>
+		<ul>
+			<li><b>All pages</b> radio button is selectable.</li>
+			<li><b>First</b> &lt;blank&gt; <b>pages</b> radio button is selectable.</li>
 			<ul>
-				<li><b>Rows Minimum</b> and <b>Maximum</b> combo boxes work.</li>
-				<li><b>Columns Minimum</b> and <b>Maximum</b> combo boxes work.</li>
-				<li><b>Columns width Minimum</b> and <b>Maximum</b> edit boxes are editable.</li>
-				<li><b>Line spacing Minimum</b> and <b>Maximum</b> edit boxes are editable.</li>
-				<li><b>Column spacing Maximum</b> edit box is editable.</li>
-				<li>Leaving edit boxes blank does not throw an exception.</li>
+				<li>The corresponding edit box is editable when the radio 
+				button is selected.</li>
 			</ul>
-			<li><b>Search Scope</b></li>
+			<li><b>Last</b> &lt;blank&gt; <b>pages</b> radio button is selectable.</li>
 			<ul>
-				<li><b>All pages</b> radio button is selectable.</li>
-				<li><b>First</b> &lt;blank&gt; <b>pages</b> radio button is selectable.</li>
-				<ul>
-					<li>The corresponding edit box is editable when the radio 
-					button is selected.</li>
-				</ul>
-				<li><b>Last</b> &lt;blank&gt; <b>pages</b> radio button is selectable.</li>
-				<ul>
-					<li>The corresponding edit box is editable when the radio button 
-					is selected.</li>
-				</ul>
-				<li><b>Specified pages</b> radio button is selectable.</li>
-				<ul>
-					<li>The corresponding edit box is editable when the radio button 
-					is selected.</li>
-				</ul>
+				<li>The corresponding edit box is editable when the radio button 
+				is selected.</li>
 			</ul>
-			<li><b>Attribute</b></li>
+			<li><b>Specified pages</b> radio button is selectable.</li>
 			<ul>
-				<li><b>Assign the following text to any regions that are found:</b> 
-				edit box is editable.</li>
-				<li><b>Output lines in attribute (debug)</b> check box is enabled.</li>
-			</ul>			
+				<li>The corresponding edit box is editable when the radio button 
+				is selected.</li>
+			</ul>
+		</ul>
+		<li><b>Attribute</b></li>
+		<ul>
+			<li><b>Assign the following text to any regions that are found:</b> 
+			edit box is editable.</li>
+			<li><b>Output lines in attribute (debug)</b> check box is enabled.</li>
+		</ul>			
       		<li><b>OK</b> button saves changes and exits the dialog.</li>
       		<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
       		<li><b>X</b> button ignores changes and exits the dialog.</li>
@@ -213,20 +211,20 @@
 <p>
   	<li><h2><b>Locate Image Region</b></h2>
     	<ul>
-      		<li><b>Configure</b> button displays <b>Configure Locate Image Region</b> dialog.</li>
       		<li>See <b>Document Preprocessor - Locate Image Region</b>.</li>
     	</ul>
   	</li>
 <p>
   	<li><h2><b>MICR Finder</b></h2>
     	<ul>
-      		<li>Confirm that the <b>Configure</b> button displays the <b>Configure MICR finder</b> dialog.</li>
+      		<li>Confirm that the <b>Configure</b> button displays the <b>Configure MICR 
+		finder</b> dialog.</li>
       		<li>Confirm that checkboxes are present for the following items</li>
   		<ul>
-	 		<li>Routing number - default state is checked</li>
-	 		<li>Account number - default state is checked</li>
-	 		<li>Check number - default state is unchecked</li>
-	 		<li>Amount - default state is unchecked</li>
+	 		<li>Routing number - default state is checked.</li>
+	 		<li>Account number - default state is checked.</li>
+	 		<li>Check number - default state is unchecked.</li>
+	 		<li>Amount - default state is unchecked.</li>
   		</ul>
 	  	<li>Confirm that settings are persistent.</li>
 <p>
@@ -252,8 +250,10 @@
   		</ul>
   		<li><b>[FlexIDSCore #3289]</b> MICR Finder - bad parameter exception
   		<ul>
-  			<li>Create an RSD file and an FPS file configured to run a MICR finder rule.
-  			<li>Exercise it against the images in St Johns\Set002. Plan on this taking more than one day.
+  			<li>Create an RSD file and an FPS file configured to run a MICR 
+			finder rule.
+  			<li>Exercise it against the images in St Johns\Set002. Plan on 
+			this taking more than one day.
   			<li>Confirm that no unusual exceptions are thrown.
   		</ul>
   		<li><b>[FlexIDSCore #3490]</b> MICR Finder - registry control for speed / accuracy
@@ -303,7 +303,8 @@
         	</ul>
       		</li>
       		<li><b>Case sensitive</b> check box is checkable.</li>
-			<li><b>[FlexIDSCore #3091] Create sub-attributes for named group matches</b> check box is checkable.</li>
+		<li><b>[FlexIDSCore #3091] Create sub-attributes for named group matches</b> check 
+		box is checkable.</li>
       		<li><b>OK</b> button saves changes and exits the dialog.
         	<ul>
 		  	<li><b>OK</b> button displays <b>Please provide non-empty regular 
@@ -329,9 +330,9 @@
 	  	<li><b>Cancel</b> button does not save changes.</li>
 	  	<li><b>X</b> button does not save changes.</li>
 <p>
-	  	<li><b>[P16 #2943]</b> Use the Return Address Finder on the following document 
-		and confirm that the <b>Spatial String must not be multi-page for GetBounds.</b> 
-		error is not logged.</li>
+	  	<li><b>[FlexIDSCore #2943]</b> Use the Return Address Finder on the following 
+		document and confirm that the <b>Spatial String must not be multi-page for 
+		GetBounds.</b> error is not logged.</li>
 	  	<li>K:\Common\Engineering\Sample Files\AtPac\OR -
 		Washington\Set007\Images\BYLAWS\2007-028700.tif.uss</li>
 <p>
