@@ -1,0 +1,256 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.1.1.57 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.1.1.57 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[DotNet #337]</b> Image Viewer to load one page at a time
+	       	<ul>
+	      		<li>Prepare a large, multi-page image for verification.
+	      		<li>Verify the image.
+	      		<li>Confirm that image load time is approximately the same as 
+			for a single-page image.
+	      		<li>Confirm that the user can navigate to other pages in 
+			the image. 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3144, #3439, #3441, #3467, #3611]</b> Split Region
+		Into Content Areas
+	       	<ul>
+	      		<li>Exercise the <b>splitregion.rsd</b> rules against 
+			<b>I:\Common\Testing\Rotated_Images\Image152_VP6.tif</b>.
+			<li>Confirm that the appropriate highlights are displayed.
+	      		<li>Exercise the <b>test.rsd</b> rules against the test image 
+			(both) found in <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3439</b>.
+			<li>Confirm that a content region is found even when the 
+			<b>Exclude pixel content of lines from content areas</b> 
+			setting is true.
+			<li>Confirm that a property page setting is available for 
+			<b>Minimum width of areas to be returned</b>.
+			<li>Confirm that the default setting is <b>3</b> in units 
+			of average character width.
+			<li>Confirm that all of the <b>Split region into content area</b> 
+			automated tests pass.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3677, #3678, #3705, #3706]</b> Redaction Of 
+		Fixed Locations On Documents
+	       	<ul>
+	      		<li>Exercise the <b>Redaction Of Fixed Locations On Document 
+			(#3)</b> feature on the <b>ID Shield 8.0 Other Features 
+			Testing</b> checklist.
+	      		<li>Confirm that effective rules can be written to redact 
+			fixed locations on documents without requiring OCR.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3697]</b> Verification Display Wrong Redactions
+	       	<ul>
+	  	   	<LI>Verify several documents with redactions in different places.
+      			<li>Quickly navigate between documents.
+			<li>Confirm that the proper redactions are displayed for 
+			each image.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3699]</b> File Action Comment Written To DB
+	       	<ul>
+	  	   	<LI>Verify several documents and provide comments for 
+			some.
+      			<li>Use <b>SQL Management Studio</b> to review the 
+			appropriate database table.
+			<li>Confirm that the comments are saved for each image.
+			<li>Confirm that comments changed during navigation of 
+			historical documents.
+			<li>Confirm that the <b>ID Shield detailed report for 
+			specific document</b> report includes the most recent 
+			comment text.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3700]</b> Output Final Stats Only
+	       	<ul>
+	  	   	<LI>Extract <b>test.tcl</b> from the RAR file attached to the SCR.
+      			<li>Set <b>OutputFinalStatsOnly = 0</b> and confirm that 21 of 
+			30 tests pass.
+      			<li>Set <b>OutputFinalStatsOnly = 1</b> and confirm that 21 of 
+			30 tests pass.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3704]</b> Update ID Shield Data Table After Navigation
+	       	<ul>
+	  	   	<LI>Prepare several documents for verification.
+	  	   	<LI>Verify some of the documents taking different amounts of time 
+			for each image.  Do not stop verification.
+      			<li>Use the <b>ID Shield verification times and rates (by user)</b> 
+			report and note the screen verification time and screen verification 
+			rate totals.
+			<li>Navigate through the verification history and spend some time 
+			on each previously completed image.
+      			<li>Use the <b>ID Shield verification times and rates (by user)</b> 
+			report and note the screen verification time and screen verification 
+			rate totals.
+			<li>Confirm that the totals have changed due to the review of history 
+			documents.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3708, #3709, #3710]</b> VOA Viewer
+	       	<ul>
+	  	   	<LI>Open a VOA file using the <b>VOA Viewer</b>.
+      			<li>Add a new attribute.
+      			<li>Confirm that the <b>Spatialness</b> column is populated 
+			immediately.
+			<li>Create a new attribute with a <b>Name</b> and a <b>Type</b> 
+			but without a <b>Value</b>.
+      			<li>Confirm that the results can be saved to a <b>VOA</b> file and that 
+			the new attribute is included.
+      			<li>Confirm that the results can be saved to an <b>EAV</b> file and that 
+			the new attribute is included.
+			<li>Open a VOA file and select the <b>Name</b> edit box.
+			<li>Confirm that ENTER does not create a new attribute.
+			<li>Select the <b>Type</b> edit box.
+			<li>Confirm that ENTER does not create a new attribute.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3715]</b> Execute Rules Property Page
+	       	<ul>
+	  	   	<LI>Confirm that the <b>Save OCR results to speed up re-processing</b> 
+			check box is cleared disabled if the <b>Do not OCR any of the pages</b> 
+			radio button is selected.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3716]</b> Rule Tester Support For Empty USS FIles
+	       	<ul>
+	  	   	<LI>Confirm that the <b>Input</b> tab contains a <b>Perform OCR on 
+			input file if it is an image</b> checkbox.
+	  	   	<LI>Confirm that the checkbox is <b>checked</b> by default. 
+	  	   	<LI>Confirm that rules run as expected when the checkbox is unchecked. 
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5464]</b> Apply Bates Number
+	       	<ul>
+	      		<li>Exercise the <b>Support Bates Numbers In Automated, Verification 
+			And Hybrid Redaction (#20)</b> feature on the <b>ID Shield 8.0 
+			Other Features Testing</b> checklist.
+	      		<li>Confirm that <b>Bates numbers</b> can be appropriately applied 
+			for an automated redaction workflow.
+	      		<li>Confirm that <b>Bates numbers</b> can be appropriately applied 
+			for a redaction verification workflow.
+	      		<li>Confirm that <b>Bates numbers</b> can be appropriately applied 
+			for a hybrid redaction workflow.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5467, #5468, #5469, #5470, #5471, #5500]</b> Automatic 
+		Reversion Of Stuck Files
+	       	<ul>
+	      		<li>Exercise the <b>Automatic Detection/Correction Of Stuck Files 
+			(#8)</b> feature on the <b>FLEX Index 8.0 General Testing</b> 
+			checklist.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5472]</b> Reset Status For Skipped Files
+	       	<ul>
+	  	   	<LI>Verify several documents and <b>Skip</b> some.
+	      		<li>Confirm that <b>DB Admin</b> can reset the status of the 
+			Skipped files without an <b>ELI27041: Incorrect syntax near ')'.</b> 
+			exception. 
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5473]</b> Processing Manually Skipped Files
+	       	<ul>
+	  	   	<LI>Prepare several documents for verification.
+	      		<li>Use <b>DB Admin</b> to manually set the staus of some of 
+			the files to <b>Skipped</b>.
+	  	   	<LI>Modify the FPS file to verify <b>Skipped</b> files.
+	  	   	<LI>Confirm that the manually <b>Skipped</b> files can be 
+			processed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5494]</b> UI For Scheduled Processing
+	       	<ul>
+	  	   	<LI>Confirm that the <b>Processing Setup</b> includes a 
+			<b>Processing schedule</b> group box.
+	  	   	<LI>Confirm that the group box contains a <b>Limit processing 
+			to certain days/times</b> check box.
+	  	   	<LI>Confirm that the check box is <b>unchecked</b> by default.
+	  	   	<LI>Confirm that the group box contains a <b>Set schedule...</b> 
+			button.
+	  	   	<LI>Confirm that the button is enabled only when the check box 
+			is checked.
+<p>
+	  	   	<LI>Confirm that clicking the button displays a <b>Set 
+			Processing Schedule</b> dialog.
+	  	   	<LI>Confirm that the <b>Set Processing Schedule</b> dialog 
+			includes a multi-column grid with hours and days of the week.
+	  	   	<LI>Confirm that the <b>Set Processing Schedule</b> dialog 
+			includes <b>OK</b> and <b>Cancel</b> buttons.
+	  	   	<LI>Confirm that the <b>Set Processing Schedule</b> dialog 
+			includes <b>Select all</b> and <b>Select none</b> buttons.
+	  	   	<LI>Confirm that <b>Select all</b> changes all of the grid 
+			cells to green.
+	  	   	<LI>Confirm that <b>Select none</b> changes all of the grid 
+			cells to red.
+	  	   	<LI>Confirm that clicking in a grid cell toggles the color 
+			between red and green.
+<p>
+	  	   	<LI>Confirm that schedule settings are loaded and saved correctly.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
