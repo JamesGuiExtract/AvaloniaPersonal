@@ -782,8 +782,8 @@ library UCLID_COMUTILSLib
 			[in] long nAngleInDegrees);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To get the bounds of the rectangle via a single call
-		[id(10), helpstring("method GetBounds")] HRESULT GetBounds([in] long* plLeft,
-			[in] long* plTop, [in] long* plRight, [in] long* plBottom);
+		[id(10), helpstring("method GetBounds")] HRESULT GetBounds([out] long* plLeft,
+			[out] long* plTop, [out] long* plRight, [out] long* plBottom);
 	};
 
 	[

@@ -69,8 +69,8 @@ namespace Extract.AttributeFinder
             LongRectangle yBounds = yFirstPage.GetOriginalImageBounds();
             int xLeft = 0, xTop = 0, xRight = 0, xBottom = 0;
             int yLeft = 0, yTop = 0, yRight = 0, yBottom = 0;
-            xBounds.GetBounds(ref xLeft, ref xTop, ref xRight, ref xBottom);
-            yBounds.GetBounds(ref yLeft, ref yTop, ref yRight, ref yBottom);
+            xBounds.GetBounds(out xLeft, out xTop, out xRight, out xBottom);
+            yBounds.GetBounds(out yLeft, out yTop, out yRight, out yBottom);
 
             // If the bounds don't overlap horizontally, the higher attribute comes first
             if (xBottom < yTop)
