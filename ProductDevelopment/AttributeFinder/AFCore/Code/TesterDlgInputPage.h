@@ -35,6 +35,10 @@ public:
 	CComboBox	m_comboInput;
 	CEdit	m_editInput;
 	CEdit	m_editFile;
+	CButton m_checkOCR;
+	CButton m_btnBrowse;
+	CStatic m_labelInput;
+	CStatic m_labelFileName;
 	//}}AFX_DATA
 
 

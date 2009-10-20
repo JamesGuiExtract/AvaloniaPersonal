@@ -64,6 +64,10 @@ void TesterDlgInputPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_INPUT, m_comboInput);
 	DDX_Control(pDX, IDC_EDIT_TESTINPUT, m_editInput);
 	DDX_Control(pDX, IDC_EDIT_FILE, m_editFile);
+	DDX_Control(pDX, IDC_CHECK_PERFORM_OCR, m_checkOCR);
+	DDX_Control(pDX, ID_BROWSE, m_btnBrowse);
+	DDX_Control(pDX, IDC_STATIC_INPUT, m_labelInput);
+	DDX_Control(pDX, IDC_STATIC_FILENAME, m_labelFileName);
 	//}}AFX_DATA_MAP
 }
 //-------------------------------------------------------------------------------------------------
@@ -96,10 +100,10 @@ void TesterDlgInputPage::resizeControls()
 		
 		// resize the input static label
 		CRect rectInputLabel;
-		GetDlgItem(IDC_STATIC_INPUT)->GetWindowRect(&rectInputLabel);
+		m_labelInput.GetWindowRect(&rectInputLabel);
 		ScreenToClient(&rectInputLabel);
 		CRect rectCombo;
-		GetDlgItem(IDC_COMBO_INPUT)->GetWindowRect(&rectCombo);
+		m_comboInput.GetWindowRect(&rectCombo);
 		ScreenToClient(&rectCombo);
 		long nInputLabelWidth = rectInputLabel.Width();
 		long nComboHeight = rectCombo.Height();
@@ -107,14 +111,14 @@ void TesterDlgInputPage::resizeControls()
 		rectInputLabel.top = giCONTROL_SPACING;
 		rectInputLabel.right = rectInputLabel.left + nInputLabelWidth;
 		rectInputLabel.bottom = rectInputLabel.top + nComboHeight;
-		GetDlgItem(IDC_STATIC_INPUT)->MoveWindow(&rectInputLabel);
+		m_labelInput.MoveWindow(&rectInputLabel);
 
 		// resize the combo box
 		rectCombo.left = rectInputLabel.right + giCONTROL_SPACING;
 		rectCombo.top = giCONTROL_SPACING;
 		rectCombo.right = rectDlg.right - giCONTROL_SPACING;
 		rectCombo.bottom = rectCombo.top + nComboHeight;
-		GetDlgItem(IDC_COMBO_INPUT)->MoveWindow(&rectCombo);
+		m_comboInput.MoveWindow(&rectCombo);
 
 		// the top of the edit control will be different
 		// depending upon whether we are displaying the filename
@@ -126,7 +130,7 @@ void TesterDlgInputPage::resizeControls()
 		{
 			// resize the "select file (browse)" button
 			CRect rectBrowseButton;
-			GetDlgItem(ID_BROWSE)->GetWindowRect(&rectBrowseButton);
+			m_btnBrowse.GetWindowRect(&rectBrowseButton);
 			ScreenToClient(&rectBrowseButton);
 			long nBrowseButtonWidth = rectBrowseButton.Width();
 			long nBrowseButtonHeight = rectBrowseButton.Height();
@@ -134,12 +138,12 @@ void TesterDlgInputPage::resizeControls()
 			rectBrowseButton.left = rectBrowseButton.right - nBrowseButtonWidth;
 			rectBrowseButton.top = rectCombo.bottom + giCONTROL_SPACING;
 			rectBrowseButton.bottom = rectBrowseButton.top + nBrowseButtonHeight;
-			GetDlgItem(ID_BROWSE)->MoveWindow(&rectBrowseButton);
-			GetDlgItem(ID_BROWSE)->ShowWindow(TRUE);
+			m_btnBrowse.MoveWindow(&rectBrowseButton);
+			m_btnBrowse.ShowWindow(TRUE);
 
 			// resize the filename static label
 			CRect rectFileNameLabel;
-			GetDlgItem(IDC_STATIC_FILENAME)->GetWindowRect(&rectFileNameLabel);
+			m_labelFileName.GetWindowRect(&rectFileNameLabel);
 			ScreenToClient(&rectFileNameLabel);
 			long nLabelHeight = rectFileNameLabel.Height();
 			long nLabelWidth = rectFileNameLabel.Width();
@@ -147,42 +151,56 @@ void TesterDlgInputPage::resizeControls()
 			rectFileNameLabel.top = rectCombo.bottom + giCONTROL_SPACING;
 			rectFileNameLabel.right = rectFileNameLabel.left + nLabelWidth;
 			rectFileNameLabel.bottom = rectBrowseButton.bottom;
-			GetDlgItem(IDC_STATIC_FILENAME)->MoveWindow(&rectFileNameLabel);
-			GetDlgItem(IDC_STATIC_FILENAME)->ShowWindow(TRUE);
+			m_labelFileName.MoveWindow(&rectFileNameLabel);
+			m_labelFileName.ShowWindow(TRUE);
 
 			// resize the filename editbox
 			CRect rectFileName;
-			GetDlgItem(IDC_EDIT_FILE)->GetWindowRect(&rectFileName);
+			m_editFile.GetWindowRect(&rectFileName);
 			ScreenToClient(&rectFileName);
 			long nFileNameHeight = rectFileName.Height();
 			rectFileName.left = rectFileNameLabel.right + giCONTROL_SPACING;
 			rectFileName.top = rectCombo.bottom + giCONTROL_SPACING;
 			rectFileName.right = rectBrowseButton.left - giCONTROL_SPACING;
 			rectFileName.bottom = rectFileName.top + nFileNameHeight;
-			GetDlgItem(IDC_EDIT_FILE)->MoveWindow(&rectFileName);
-			GetDlgItem(IDC_EDIT_FILE)->ShowWindow(TRUE);
+			m_editFile.MoveWindow(&rectFileName);
+			m_editFile.ShowWindow(TRUE);
 
-			nTopOfEditControl = rectFileName.bottom + giCONTROL_SPACING;
+			// resize the perform OCR checkbox
+			CRect rectPerformOCR;
+			m_checkOCR.GetWindowRect(&rectPerformOCR);
+			ScreenToClient(&rectPerformOCR);
+			long nPerformOCRHeight = rectPerformOCR.Height();
+			long nPerformOCRWidth = rectPerformOCR.Width();
+			rectPerformOCR.left = giCONTROL_SPACING;
+			rectPerformOCR.top = rectFileName.bottom + giCONTROL_SPACING;
+			rectPerformOCR.right = rectPerformOCR.left + nPerformOCRWidth;
+			rectPerformOCR.bottom = rectPerformOCR.top + nPerformOCRHeight;
+			m_checkOCR.MoveWindow(&rectPerformOCR);
+			m_checkOCR.ShowWindow(TRUE);
+
+			nTopOfEditControl = rectPerformOCR.bottom + giCONTROL_SPACING;
 		}
 		else
 		{
 			// there are no filename related controls.  The edit
 			// box appears directly underneath the combo box
-			GetDlgItem(IDC_STATIC_FILENAME)->ShowWindow(FALSE);
-			GetDlgItem(IDC_EDIT_FILE)->ShowWindow(FALSE);
-			GetDlgItem(ID_BROWSE)->ShowWindow(FALSE);
+			m_checkOCR.ShowWindow(FALSE);
+			m_labelFileName.ShowWindow(FALSE);
+			m_editFile.ShowWindow(FALSE);
+			m_btnBrowse.ShowWindow(FALSE);
 			nTopOfEditControl = rectCombo.bottom + giCONTROL_SPACING;
 		}
 
 		// resize the input edit box 
 		CRect rectEdit;
-		GetDlgItem(IDC_EDIT_TESTINPUT)->GetWindowRect(&rectEdit);
+		m_editInput.GetWindowRect(&rectEdit);
 		ScreenToClient(&rectEdit);
 		rectEdit.left = giCONTROL_SPACING;
 		rectEdit.top = nTopOfEditControl;
 		rectEdit.right = rectDlg.right - giCONTROL_SPACING;
 		rectEdit.bottom = rectDlg.bottom - giCONTROL_SPACING;
-		GetDlgItem(IDC_EDIT_TESTINPUT)->MoveWindow(&rectEdit);
+		m_editInput.MoveWindow(&rectEdit);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -275,6 +293,9 @@ BOOL TesterDlgInputPage::OnInitDialog()
 	{
 		CPropertyPage::OnInitDialog();
 	
+		// By default set the Perform OCR checkbox to checked
+		m_checkOCR.SetCheck(BST_CHECKED);
+
 		// Add items to combo box
 		m_comboInput.AddString( TesterConfigMgr::gstrTEXTFROMIMAGEWINDOW.c_str() );
 		m_comboInput.AddString( TesterConfigMgr::gstrTEXTFROMFILE.c_str() );
@@ -400,19 +421,30 @@ ISpatialStringPtr TesterDlgInputPage::openFile(const string& strFileName)
 	// the three digits represent the number of pages in the image)
 	if (isImageFileExtension(strExtension ) || isThreeDigitExtension(strExtension))
 	{
-		// if the tif file already has an associated uss file then we will use that 
-		// otherwise we will re ocr
-		string strUssFileName = strFileName + ".uss";
-		if (isFileOrFolderValid(strUssFileName))
+		// If perform OCR is checked, then try to either load the USS file or perform
+		// the OCR on the image
+		if (m_checkOCR.GetCheck() == BST_CHECKED)
 		{
-			ipText->LoadFrom(get_bstr_t(strUssFileName), VARIANT_FALSE);
+			// if the tif file already has an associated uss file then we will use that 
+			// otherwise we will re ocr
+			string strUssFileName = strFileName + ".uss";
+			if (isFileOrFolderValid(strUssFileName))
+			{
+				ipText->LoadFrom(get_bstr_t(strUssFileName), VARIANT_FALSE);
+			}
+			else
+			{
+				ipText = getOCREngine()->RecognizeTextInImage(
+					strFileName.c_str(), 1, -1, UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
+					UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, NULL); 
+			}
 		}
 		else
 		{
-			ipText = getOCREngine()->RecognizeTextInImage(
-				strFileName.c_str(), 1, -1, UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
-				UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, NULL); 
+			// Just return an empty non-spatial string
+			ipText->CreateNonSpatialString("", strFileName.c_str());
 		}
+
 		return ipText;
 	}
 

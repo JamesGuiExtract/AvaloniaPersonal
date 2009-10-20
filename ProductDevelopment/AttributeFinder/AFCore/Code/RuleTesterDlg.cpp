@@ -374,7 +374,9 @@ void RuleTesterDlg::OnButtonExecute()
 		ISpatialStringPtr ipInputText = m_testerDlgInputPage.getText();
 
 		// if no input text is available, clear the results grid, and return
-		if (ipInputText == NULL || ipInputText->IsEmpty() == VARIANT_TRUE)
+		// Allow processing even if ipInputText->IsEmpty() == VARIANT_TRUE
+		// [FlexIDSCore #3716]
+		if (ipInputText == NULL)
 		{
 			OnButtonClear();
 			return;
