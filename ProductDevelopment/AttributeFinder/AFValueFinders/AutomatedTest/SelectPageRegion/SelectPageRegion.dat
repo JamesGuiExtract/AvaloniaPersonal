@@ -222,3 +222,13 @@
 // The testcase include rotation angle of 90, 180, 270 degrees.
 // Rotation is excercised in greater detail in the interactive tests
 <TESTCASE>;RotateTest.rsd;Rotated2.tif.uss;;RotateTest.voa
+
+//*********************************************************************************
+// Test Return Image Region
+//*********************************************************************************
+
+// Include Image Region With No OCR
+<TESTCASE>;IncludeImageRegionNoOcr.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.noocr.uss;;IncludeImageRegionNoOcr.voa
+
+// Exclude Image Region With No OCR
+<TESTCASE>;ExcludeImageRegionNoOcr.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.noocr.uss;;ExcludeImageRegionNoOcr.voa
