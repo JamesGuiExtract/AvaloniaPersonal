@@ -1,7 +1,7 @@
 <html>
 
 <HEAD>
-<TITLE>RuleSet Editor - File Menu - File Menu Items - Testing Checklist</TITLE>
+<TITLE>Value Modifiers Testing Checklist</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 <style>
 <!--
@@ -15,19 +15,19 @@
 </h1>
 <hr>
 <ol>
-	<li><h2>Advanced Replace String Dialog</h2>
+	<li><h2>Advanced replace string</h2>
     	<ul>
-      		<li>See <b>Document Preprocessor - Advanced Replace String</b> checklist></li>
+      		<li>See <b>Document Preprocessor - Advanced Replace String</b> checklist.</li>
     	</ul>
   	</li>
 <p>
-  	<li><h2>Block Finder Rule Dialog</h2>
+  	<li><h2>Block finder</h2>
     	<ul>
       		<li>See <b>Value Finder - Block Finder Rule</b> checklist.</li>
     	</ul>
   	</li>
 <p>
-  	<li><h2>Change Case Dialog</h2>
+  	<li><h2>Change case</h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Change case</b> dialog.</li>
       		<li><b>Do not change case</b> radio button is selectable.</li>
@@ -40,13 +40,13 @@
     	</ul>
   	</li>
 <p>
-  	<li><h2>Conditionally Modify Attribute</h2>
+  	<li><h2>Conditionally modify attribute</h2>
 	<ul>
 		<li>See <b>Ruleset Editor - Document Preprocessor - Other</b> checklist.</li>
 	</ul>
   	</li>
 <p>
-  	<li><h2>Extract or Remove Leftmost Characters Dialog</h2>
+  	<li><h2>Extract or remove leftmost characters</h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Extract or Remove 
 		Leftmost Characters</b> dialog.</li>
@@ -65,7 +65,7 @@
     	</ul>
   	</li>
 <p>
-  	<li><h2>Extract or Remove Middle Characters Dialog</h2>
+  	<li><h2>Extract or remove middle characters</h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Extract or Remove 
 		Middle Characters</b> dialog.</li>
@@ -93,7 +93,7 @@
     	</ul>
   	</li>
 <p>
-  	<li><h2>Extract or Remove Rightmost Characters Dialog</h2>
+  	<li><h2>Extract or remove rightmost characters</h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Extract or Remove 
 		Rightmost Characters</b> dialog.</li>
@@ -113,13 +113,13 @@
     	</ul>
   	</li>
 <p>
-  	<li><h2>Find Company or Person(s) Dialog</h2>
+  	<li><h2>Find company or person(s)</h2>
     	<ul>
       		<li><b>Configure</b> button is inactive.</li>
     	</ul>
   	</li>
 <p>
-  	<li><h2>Find SSNs within Image Area</h2>
+  	<li><h2>Find SSNs within image area</h2>
 	<ul>
 		<li>Confirm that <b>Configure</b> button displays <b>Configure Find SSNs within image area</b> 
 		dialog.
@@ -140,7 +140,7 @@
 	</ul>
   	</li>
 <p>
-  	<li><h2>Insert Characters Dialog</h2>
+  	<li><h2>Insert characters</h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Insert Characters</b> dialog.</li>
       		<li><b>Characters to insert:</b> edit box is editable.</li>
@@ -176,19 +176,19 @@
     	</ul>
   	</li>
 <p>
-  	<li><h2>Locate Image Region Dialog</h2>
+  	<li><h2>Locate image region</h2>
     	<ul>
       		<li>See <b>Document Preprocessor - Locate Image Region</b> checklist.</li>
     	</ul>
   	</li>
 <p>
-  	<li><h2>MERS Modifier Dialog</h2>
+  	<li><h2>MERS modifier</h2>
     	<ul>
       		<li><b>Configure</b> button is inactive.</li>
     	</ul>
   	</li>
 <p>
-  	<li><h2>OCR Image Area</h2>
+  	<li><h2>OCR image area</h2>
 	<ul>
 		<li>Confirm that <b>Configure</b> button displays <b>Configure OCR image area</b> 
 		dialog.
@@ -217,23 +217,26 @@
 <p>
 		<li><b>[FlexIDSCore #3021]</b> OCR Image Area throws an exception when OCRing white space</li>
 		<ul>
-			<li>Open a RuleSet Editor window and configure a locate image region rule to find the image region within 1.5 lines above
-			and	17 characters in either direction of a regular expression clue [S5]{2}N</li>
-			<li>Add an OCR Image Region value modifier. Configure it to filter digits, hyphen, and underscore, look for machine-printed
-			text, and discard attributes if no text is found.</li>
-			<li>Run the rule on this image: K:\Common\Engineering\Sample Files\LoganSystems\VA - Judgments\Set001\Images\02340241.tif</li>
+			<li>Open a RuleSet Editor window and configure a locate image region rule 
+			to find the image region within 1.5 lines above	and 17 characters in either 
+			direction of a regular expression clue [S5]{2}N</li>
+			<li>Add an OCR Image Region value modifier. Configure it to filter digits, 
+			hyphen, and underscore, look for machine-printed text, and discard attributes 
+			if no text is found.</li>
+			<li>Run the rule on this image: 
+			K:\Common\Engineering\Sample Files\LoganSystems\VA - Judgments\Set001\Images\02340241.tif</li>
 			<li>Confirm that no exceptions were logged.</li>
 		</ul>
 	</ul>
   	</li>
 <p>
-  	<li><h2>Pad Value Dialog</h2>
+  	<li><h2>Pad value</h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Pad Value</b> dialog.</li>
       		<li><b>Required</b> edit box is editable.
 		<ul>
 			<li>Exception is thrown if <b>Required</b> is empty.</li>
-			<li><b>[P16 #3044]</b> Input is restricted to numbers.</li>
+			<li><b>[FlexIDSCore #3044]</b> Input is restricted to numbers.</li>
 		</ul>
       		</li>
       		<li><b>Padding</b> edit box is editable.
@@ -246,22 +249,16 @@
       		<li><b>OK</b> button saves changes and exits the dialog.</li>
       		<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
       		<li><b>X</b> button ignores changes and exits the dialog.</li>
-<p>
-  	   	<LI><b>[FlexIDSCore #3044]</b> PadValue VM accepts only digits
-	       	<ul>
-	      		<li>Confirm that the <b>Required</b> edit box accepts only digit characters.
-	       	</ul>
-			
     	</ul>
   	</li>
 <p>
-  	<li><h2>Regular Expression Rule Dialog</h2>
+  	<li><h2>Regular expression rule</h2>
     	<ul>
       		<li>See <b>Value Finders - Regular Expression Rule</b> checklist.</li>
     	</ul>
   	</li>
 <p>
-  	<li><h2>Remove Characters Dialog</h2>
+  	<li><h2>Remove characters</h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Remove
         	Characters</b> dialog.</li>
@@ -295,16 +292,16 @@
     	</ul>
   	</li>
 <p>
-  	<li><h2>Remove Spatial Info Dialog</h2>
+  	<li><h2>Remove spatial information</h2>
     	<ul>
       		<li>Configure button is disabled.</li>
     	</ul>
   	</li>
 <p>
-  	<li><h2>Replace Strings Dialog</h2>
+  	<li><h2>Replace strings</h2>
     	<ul>
       		<li>See <b>Document Preprocessor - Replace Strings</b> checklist.</li>
-      		<li><b>[P16 #2318]</b> Use of VM loses spatial information
+      		<li><b>[FlexIDSCore #2318]</b> Use of VM loses spatial information
 		<ul>
 			<li>Create a simple RSD file with a Regular Expression rule that finds 
 			a five-digit zip code ( for Image1.tif.uss, <b>(?:\D)9\d{4}</b> is effective ).
@@ -321,7 +318,7 @@
 	</ul>
   	</li>
 <p>
-  	<li><h2>String Tokenizer Dialog</h2>
+  	<li><h2>String tokenizer</h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure String
         	Tokenizer</b> dialog.</li>
@@ -329,8 +326,8 @@
         	box is editable.
 		<ul>
 			<li>Input is limited to one character.
-			<li><b>[P16 #1950]</b> A special character such as <b>š</b> can be used even though 
-			it is displayed as a thick vertical bar.
+			<li><b>[FlexIDSCore #1950]</b> A special character such as <b>š</b> can 
+			be used even though it is displayed as a thick vertical bar.
 		</ul>
       		</li>
       		<li><b>Result expression defined</b> edit box is editable.</li>
@@ -357,12 +354,12 @@
     	</ul>
   	</li>
 <p>
-  	<li><h2>Translate to Closest Value in List Dialog</h2>
+  	<li><h2>Translate to closest value in list</h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure
         	Translate to Closest Value in List</b> dialog.</li>
       		<li><b>Add</b> button displays <b>Text</b> dialog.
-        	<h3>Text Dialog</h3>
+        	<h2>Text</h2>
         	<ul>
           		<li><b>Specify the text</b> edit box is editable.</li>
           		<li><b>OK</b> button saves changes and exits dialog.
@@ -376,7 +373,7 @@
         	</ul>
       		</li>
       		<li><b>Remove</b> button displays <b>Confirm Delete</b> dialog.
-        	<h3>Confirm Delete Dialog</h3>
+        	<h2>Confirm Delete</h2>
         	<ul>
           		<li><b>YES</b> button deletes the finding rule and exits the dialog.</li>
           		<li><b>NO</b> button ignores delete request and exits the dialog.</li>
@@ -410,7 +407,7 @@
 		box when no replacements are specified.
         	<ul>
           		<li><b>Save List</b> button displays <b>Save</b> dialog.
-            		<h3>Save Dialog</h3>
+            		<h2>Save</h2>
             		<ul>
               			<li><b>Specify the file name:</b> edit box is editable.
                 		<ul>
@@ -431,7 +428,7 @@
     	</ul>
   	</li>
 <p>
-  	<li><h2>Translate Values or Types Dialog</h2>
+  	<li><h2>Translate values or types</h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Translate Values 
 		or Types</b> dialog.</li>
@@ -452,7 +449,7 @@
       		</li>
       		<li><b>Remove</b> and <b>Modify</b> buttons are enabled if a Value is selected.</li>
       		<li><b>Remove</b> button displays <b>Confirm Delete</b> dialog.
-        	<h3>Confirm Delete Dialog</h3>
+        	<h2>Confirm Delete</h2>
         	<ul>
           		<li><b>YES</b> button deletes the replacement string and exits the dialog.</li>
           		<li><b>NO</b> button ignores delete request and exits the dialog.</li>
@@ -465,7 +462,7 @@
         	</ul>
       		</li>
       		<li><b>Load List</b> button displays <b>Open</b> dialog.
-        	<h3>Open Dialog</h3>
+        	<h2>Open</h2>
         	<ul>
           		<li><b>Specify the file name:</b> edit box is editable.
             		<ul>
@@ -486,7 +483,7 @@
       		<li><b>Save List</b> button displays <b>Configuration</b> message 
 		box when no replacements are specified.</li>
       		<li><b>Save List</b> button displays <b>Save</b> dialog.
-        	<h3>Save Dialog</h3>
+        	<h2>Save</h2>
         	<ul>
           		<li><b>Specify the file name:</b> edit box is editable.
             		<ul>
@@ -517,7 +514,6 @@
 			<li>Confirm that it is possible to translate from blank values and types.
 		</ul>
     	</ul>
-
   	</li>
 </ol>
 </body>
