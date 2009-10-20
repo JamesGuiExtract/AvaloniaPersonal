@@ -193,27 +193,20 @@ STDMETHODIMP CTagCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProc
 		IVariantVectorPtr ipTagsOnFile = ipFPDB->GetTagsOnFile(nFileID);
 		ASSERT_RESOURCE_ALLOCATION("ELI27534", ipTagsOnFile != NULL);
 
-		// Default the found value to true
-		bool bFound = true;
 
 		// Iterate through all of the tags
 		long lSize = m_ipVecTags->Size;
+		bool bFound = false;
 		for (long i=0; i < lSize; i++)
 		{
 			// Check if the file contains the tag
-			if (ipTagsOnFile->Contains(m_ipVecTags->Item[i]) == VARIANT_TRUE)
+			bFound = asCppBool(ipTagsOnFile->Contains(m_ipVecTags->Item[i]));
+
+			// Break from loop if bFound == m_bAnyTags
+			// 1. Found and Any Tags
+			// 2. Not Found and All Tags
+			if (bFound == m_bAnyTags)
 			{
-				// If any tags, then just break from loop
-				if (m_bAnyTags)
-				{
-					break;
-				}
-			}
-			// If tag is not found and all tags are required set found
-			// to false and break from the loop
-			else if (!m_bAnyTags)
-			{
-				bFound = false;
 				break;
 			}
 		}
