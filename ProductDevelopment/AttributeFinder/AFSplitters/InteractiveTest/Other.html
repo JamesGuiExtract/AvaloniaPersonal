@@ -1,11 +1,7 @@
 <html>
 <HEAD>
-<TITLE>RuleSet Editor - File Menu - File Menu Items - Testing Checklist</TITLE>
+<TITLE>Attribute Splitters Testing Checklist</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
-<style>
-<!--
--->
-</style>
 </HEAD>
  
 <body>
@@ -84,7 +80,7 @@
 			<li>Balloon help is functional.</li>
             		<li><b>Add</b> button displays <b>Specify Sub-Attribute name 
 			&amp; token expression</b> dialog.
-        		<h3><b>Specify Sub-Attribute name &amp; token expression</b></h3>
+        		<h2>Specify Sub-Attribute name &amp; token expression</h2>
         		<ul>
           			<li><b>Sub-Attribute Name</b> edit box is editable.</li>
 		  		<li>An exception is raised when using invalid characters 
@@ -101,7 +97,7 @@
             		<li>Highlighting an existing replace string list box entry activates
         		<b>Remove</b> and <b>Modify</b> buttons.</li>
             		<li><b>Remove</b> button displays <b>Confirm Delete</b> dialog.
-        		<h3>Confirm Delete Dialog</h3>
+        		<h2>Confirm Delete Dialog</h2>
         		<ul>
    		   		<li><b>YES</b> button deletes the replacement string and 
 				exits the dialog.</li>
@@ -131,7 +127,7 @@
       		<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
       		<li><b>X</b> button ignores changes and exits the dialog.</li>
 <p>
-      		<li><b>[P16 #2699]</b> Splitter Retains Spatial Information
+      		<li><b>[FlexIDSCore #2699]</b> Splitter Retains Spatial Information
       		<ul>
 	      		<li>Open <b>splitusingtoken.rsd</b> attached to the SCR.  Use the 
 			fourth attached file instead of the second file without the update.
@@ -186,13 +182,13 @@
       		<li><b>Cancel</b> button ignores changes and exits dialog.</li>
       		<li><b>X</b> button ignores changes and exits dialog.</li>
 <p>
-      		<li><b>[P16 #2507]</b> Date Splitter kills Spatial Information
+      		<li><b>[FlexIDSCore #2507]</b> Date Splitter kills Spatial Information
 		<ul>
 			<li>Use the scanner to create <b>DateSplitterTest.tif</b> from 
 			<b>DateSplitterTest.rtf</b>.
 			<li>Use the Rule Tester to exercise <b>DateSplitterTest.tif</b> using 
 			<b>Spatial1.rsd</b>.
-	      		<li><b>[P16 #2826]</b> Add an XML Output Handler to the RSD file.  No 
+	      		<li><b>[FlexIDSCore #2826]</b> Add an XML Output Handler to the RSD file.  No 
 			error should be seen while performing the following tests.
 			<li>Exercise various Date Splitter settings in the RSD file for 
 			month name and number, day of week, and formatted output.
@@ -221,28 +217,28 @@
 		<ul>
 			<li><b>Minimum width of areas to be returned</b> edit box is editable.</li>
 			<ul>
-				<li>Default value is '3.00'.</li>
+				<li>Default value is <b>3.00</b>.</li>
 			</ul>
 			<li><b>Minimum height of areas to be returned</b> edit box is editable.</li>
 			<ul>
-				<li>Default value is '0.50'.</li>
+				<li>Default value is <b>0.50</b>.</li>
 			</ul>
 			<li><b>Include areas based on well OCR'd text with this attribute type:</b> check 
 			box is enabled.</li>
 			<ul>
 				<li>Associated edit box is editable when the check box is checked.</li>
-				<li><b>[FlexIDSCore #3171]</b> Associated edit box is not editable 								when the check box is unchecked.</li>
-				<li>Default value is 'ProbableText'.</li>
+				<li><b>[FlexIDSCore #3171]</b> Associated edit box is not editable 							when the check box is unchecked.</li>
+				<li>Default value is <b>ProbableText</b>.</li>
 			</ul>
 			<li><b>Include areas based on poorly OCR'd text or un-OCR'd markings with this 						type:</b> check box is selectable.</li>
 			<ul>
 				<li>Associated edit box is editable when the check box is checked.</li>
-				<li><b>[FlexIDSCore #3171]</b> Associated edit box is not editable 								when the check box is unchecked.</li>
-				<li>Default value is 'ProbableHandwriting'.</li>
+				<li><b>[FlexIDSCore #3171]</b> Associated edit box is not editable 							when the check box is unchecked.</li>
+				<li>Default value is <b>ProbableHandwriting</b>.</li>
 			</ul>
-			<li><b>Treat text as well OCRed if the character confidence is at least:</b> edit box 						is editable.</li>
+			<li><b>Treat text as well OCRed if the character confidence is at least:</b> edit box 					is editable.</li>
 			<ul>
-				<li>Default value is '60'.</li>
+				<li>Default value is <b>60</b>.</li>
 			</ul>
 		</ul>
       		<li>Result properties</li>
@@ -252,13 +248,17 @@
 			<li><b>Include the area's OCR'd text as a true spatial string in a grandchild 						attribute</b> check box is enabled.</li>
 			<li><b>Sub-attribute name:</b> edit box is editable.</li>
 			<ul>
-				<li>Default value is 'Content'.</li>
+				<li>Default value is <b>Content</b>.</li>
 			</ul>
 			<li><b>Default content text value:</b> edit box is editable.</li>
 			<ul>
-				<li>Default value is '[unrecognized]'.</li>
+				<li>Default value is <b>[unrecognized]</b>.</li>
 			</ul>
 		</ul>
+<p>
+      		<li><b>OK</b> button saves changes and exits the dialog.</li>
+      		<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
+      		<li><b>X</b> button ignores changes and exits the dialog.</li>
 <p>
 		<li><b>[FlexIDSCore #3144]</b> Split Regions - doesn't account for view perspective, 
 		highlights wrong text</li>
@@ -269,10 +269,6 @@
 			<li>Ensure that highlights are over text and rotated correctly. 						<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3144\screenshot.bmp</b>
 			is an example of incorrect behavior.</li>
 		</ul>
-<p>
-      		<li><b>OK</b> button saves changes and exits the dialog.</li>
-      		<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
-      		<li><b>X</b> button ignores changes and exits the dialog.</li>
  	</ul>
 </ol>
 </body>
