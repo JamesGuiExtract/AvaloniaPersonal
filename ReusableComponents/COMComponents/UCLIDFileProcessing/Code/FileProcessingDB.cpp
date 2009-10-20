@@ -3780,19 +3780,32 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 		// Lock the database
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
 
-		// Set the transaction guard
-		TransactionGuard tg(ipConnection);
-
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
-		// Recordset to modify priority for
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		// Recordset for the FAMFile table
+		_RecordsetPtr ipFAMFile(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI28185", ipFAMFile != NULL );
+
+		// Get the recordset for the FAMFile table
+		ipFAMFile->Open("SELECT FAMFile.ID, FAMFile.Priority FROM FAMFile",
+			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
+		if (ipFAMFile->adoEOF == VARIANT_TRUE)
+		{
+			// Just return as there are no file records
+			return S_OK;
+		}
+
+		// Recordset to search for file IDs
 		_RecordsetPtr ipFileSet(__uuidof( Recordset ));
 		ASSERT_RESOURCE_ALLOCATION("ELI27711", ipFileSet != NULL );
 
 		// Get the recordset for the specified select query
-		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
+			adLockReadOnly, adCmdText );
 
 		// Setup the counter for the number of records
 		long nNumRecords = 0;
@@ -3804,11 +3817,23 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 		{
 			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", NULL) == VARIANT_TRUE)
 			{
-				// Update the priority
-				setLongField(ipFileSet->Fields, "Priority", nPriority);
-				ipFileSet->Update();
+				// Get the file ID
+				long nFileID = getLongField(ipFileSet->Fields, "ID");
 
-				// increment the number of records
+				// Find the record in the FAMFile recordset
+				ipFAMFile->MoveFirst();
+				string strFindString = "ID = " + asString(nFileID);
+				ipFAMFile->Find(strFindString.c_str(), 0, adSearchForward);
+				if (ipFAMFile->adoEOF == VARIANT_TRUE)
+				{
+					UCLIDException ue("ELI28186", "File ID was not found.");
+					ue.addDebugInfo("File ID To Find", nFileID);
+					throw ue;
+				}
+
+				// Update the record in the FAMFile table
+				setLongField(ipFAMFile->Fields, "Priority", nPriority);
+				ipFAMFile->Update();
 				nNumRecords++;
 			}
 
