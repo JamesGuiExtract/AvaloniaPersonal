@@ -1162,6 +1162,15 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(12), helpstring("property SkippedForAnyUser")] HRESULT SkippedForAnyUser(
 			[in] VARIANT_BOOL bNewVal);
 		//-----------------------------------------------------------------------------------------
+		[propget, id(13), helpstring("property ProcessingSchedule")] HRESULT ProcessingSchedule(
+			[out, retval] IVariantVector** ppHoursSchedule );
+		[propput, id(13), helpstring("property ProcessingSchedule")] HRESULT ProcessingSchedule(
+			[in] IVariantVector* pHoursSchedule );
+		//-----------------------------------------------------------------------------------------
+		[propget, id(14), helpstring("property LimitProcessingToSchedule")] 
+			HRESULT LimitProcessingToSchedule([out, retval] VARIANT_BOOL* pbVal );
+		[propput, id(14), helpstring("property LimitProcessingToSchedule")] 
+			HRESULT LimitProcessingToSchedule([in] VARIANT_BOOL bVal );
 	};
 
 	[

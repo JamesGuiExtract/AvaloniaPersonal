@@ -1587,6 +1587,9 @@ void FileProcessingDlgTaskPage::OnBtnClickedCheckLimitProcessing()
 	{
 		UpdateData(TRUE);
 
+		// Set the Limit processing to scheduled flag
+		getFPMgmtRole()->LimitProcessingToSchedule = asVariantBool(m_bLimitProcessingTimes);
+
 		// Enable / disable controls as appropriate
 		setButtonStates();
 		updateUI();
@@ -1605,7 +1608,23 @@ void FileProcessingDlgTaskPage::OnBnClickedButtonSetSchedule()
 
 		if (schedDlg.DoModal() == IDOK )
 		{
+			// Get the new schedule
 			schedDlg.GetScheduledHours(m_vecSchedule);
+
+			// Create the variant vector to pass the new schedule to the FPMgmt role
+			IVariantVectorPtr ipSchedule(CLSID_VariantVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI28163", ipSchedule != NULL);
+			
+			// Put the schedule in the variant vector
+			int nSize = m_vecSchedule.size();
+			for (int i = 0; i < nSize; i++)
+			{
+				variant_t v(m_vecSchedule[i]);
+				ipSchedule->PushBack(v);
+			}
+			
+			// Update the FPMgmtRoll schedule
+			getFPMgmtRole()->ProcessingSchedule = ipSchedule;
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28063");
@@ -1689,6 +1708,37 @@ void FileProcessingDlgTaskPage::refresh()
 	m_radioProcessAll.SetCheck(asBSTChecked(!bProcessSkipped));
 	m_radioProcessSkipped.SetCheck(asBSTChecked(bProcessSkipped));
 	m_comboSkipped.SetCurSel(ipMgmtRole->SkippedForAnyUser == VARIANT_FALSE ? 0 : 1);
+
+	// Get the limit processing times flag
+	m_bLimitProcessingTimes = asMFCBool(ipMgmtRole->LimitProcessingToSchedule);
+
+	m_vecSchedule.clear();
+	m_vecSchedule.reserve(giNUMBER_OF_HOURS_IN_WEEK);
+
+	// If limiting the processing get the schedule
+	if (asCppBool(m_bLimitProcessingTimes))
+	{
+		// Get the schedule
+		IVariantVectorPtr ipSchedule = ipMgmtRole->ProcessingSchedule;
+		ASSERT_RESOURCE_ALLOCATION("ELI28164", ipSchedule != NULL);
+
+		// Copy the schedule to the local vector
+		nSize = ipSchedule->Size;
+		for (i = 0; i < nSize; i++)
+		{
+			variant_t v(ipSchedule->Item[i]);
+			if (v.vt == VT_BOOL)
+			{
+				m_vecSchedule.push_back(asCppBool(v.boolVal));
+			}
+			else
+			{
+				UCLIDException ue("ELI28183", "Unexpected variant type.");
+				ue.addDebugInfo("VariantType", v.vt);
+				throw ue;
+			}
+		}
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::setFPMgr(UCLID_FILEPROCESSINGLib::IFileProcessingManager* pFPMgr)

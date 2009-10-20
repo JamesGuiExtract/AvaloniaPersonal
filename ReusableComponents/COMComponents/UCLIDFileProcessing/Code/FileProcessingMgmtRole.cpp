@@ -11,11 +11,12 @@
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
 #include <ThreadSafeLogFile.h>
+#include <ScheduleGrid.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 4;
+const unsigned long gnCurrentVersion = 5;
 
 // Strings associated with logging errors to a text file
 const string gstrERROR_SUMMARY_HEADER = "****Error Summary****";
@@ -928,6 +929,8 @@ STDMETHODIMP CFileProcessingMgmtRole::IsDirty(void)
 //   Added persistence for error logging items and error handling items
 // Version 4:
 //	 Added persistence for skipped file processing
+// Version 5:
+//	 Added persistence for the processing schedule
 STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -992,6 +995,24 @@ STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 
 			// Read in skipped for any user value
 			dataReader >> m_bSkippedForAnyUser;
+		}
+
+		// Load Schedule data
+		if (nDataVersion > 4)
+		{
+			dataReader >> m_bLimitProcessingToSchedule;
+			if (m_bLimitProcessingToSchedule)
+			{
+				// Read the schedule from the stream
+				long nSize;
+				dataReader >> nSize;
+				for (int i = 0; i < nSize; i++)
+				{
+					bool bTemp;
+					dataReader >> bTemp;
+					m_vecScheduledHours[i] = bTemp;
+				}
+			}
 		}
 
 		// Error handling task
@@ -1060,6 +1081,19 @@ STDMETHODIMP CFileProcessingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bProcessSkippedFiles;
 		dataWriter << m_bSkippedForAnyUser;
 
+		// Write the processing schedule info
+		dataWriter << m_bLimitProcessingToSchedule;
+		if (m_bLimitProcessingToSchedule)
+		{
+			// Write the schedule to the stream
+			long nSize = m_vecScheduledHours.size();
+			dataWriter << nSize;
+			for (int i = 0; i < nSize; i++)
+			{
+				dataWriter << m_vecScheduledHours[i];
+			}
+		}
+
 		// Write these items to the byte stream
 		dataWriter.flushToByteStream();
 
@@ -1100,6 +1134,116 @@ STDMETHODIMP CFileProcessingMgmtRole::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	return E_NOTIMPL;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::get_ProcessingSchedule(IVariantVector** ppHoursSchedule)
+{	
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28157", ppHoursSchedule != NULL);
+
+		// Create the return variant vector
+		IVariantVectorPtr ipHours(CLSID_VariantVector);
+		ASSERT_ARGUMENT("ELI28159", ipHours != NULL);
+
+		// Copy data from the STL vector to the variant vector
+		int nSize = m_vecScheduledHours.size();
+		for ( int i = 0; i < nSize; i++)
+		{
+			variant_t v(m_vecScheduledHours[i]);
+			ipHours->PushBack(v);
+		}
+
+		// Return the hours
+		*ppHoursSchedule = ipHours.Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28158");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::put_ProcessingSchedule(IVariantVector* pHoursSchedule)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		IVariantVectorPtr ipHoursSchedule(pHoursSchedule);
+		ASSERT_ARGUMENT("ELI28160", ipHoursSchedule != NULL);
+
+		// Clear the scheduled hours vector
+		m_vecScheduledHours.clear();
+		m_vecScheduledHours.reserve(giNUMBER_OF_HOURS_IN_WEEK);
+
+		// Copy values for the schedule
+		int nSize = ipHoursSchedule->Size;
+		for ( int i = 0; i < nSize; i++ )
+		{
+			variant_t v(ipHoursSchedule->Item[i]);
+			if (v.vt == VT_BOOL)
+			{
+				m_vecScheduledHours.push_back(asCppBool(v.boolVal));
+			}
+			else
+			{
+				UCLIDException ue("ELI28184", "Unexpected variant type.");
+				ue.addDebugInfo("VariantType", v.vt);
+				throw ue;
+			}
+		}
+
+		// Set dirty flag
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26918");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::get_LimitProcessingToSchedule(VARIANT_BOOL *pbVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI28177", pbVal != NULL);
+
+		*pbVal = asVariantBool(m_bLimitProcessingToSchedule);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28175");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::put_LimitProcessingToSchedule(VARIANT_BOOL bVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Don't set the dirty flag if the state does not change
+		bool bNewValue = asCppBool(bVal);
+		if ( m_bLimitProcessingToSchedule == bNewValue)
+		{
+			return S_OK;
+		}
+
+		// Set the new value
+		m_bLimitProcessingToSchedule = bNewValue;
+
+		// If the schedule is turned on, initialize the vector of scheduled hours
+		if (!m_bLimitProcessingToSchedule)
+		{
+			m_vecScheduledHours.clear();
+			m_vecScheduledHours.resize(giNUMBER_OF_HOURS_IN_WEEK, true);
+		}
+
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28176");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1545,6 +1689,13 @@ void CFileProcessingMgmtRole::clear()
 
 	m_bProcessSkippedFiles = false;
 	m_bSkippedForAnyUser = false;
+
+	// Reset the Processing schedule info
+	m_bLimitProcessingToSchedule = false;
+	m_vecScheduledHours.clear();
+
+	// Default the schedule to all on
+	m_vecScheduledHours.resize(giNUMBER_OF_HOURS_IN_WEEK, true);
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingMgmtRole::getFPMDB()

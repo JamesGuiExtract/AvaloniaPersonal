@@ -108,6 +108,10 @@ public:
 	STDMETHOD(put_ProcessSkippedFiles)(VARIANT_BOOL bNewVal);
 	STDMETHOD(get_SkippedForAnyUser)(VARIANT_BOOL* pbVal);
 	STDMETHOD(put_SkippedForAnyUser)(VARIANT_BOOL bNewVal);
+	STDMETHOD(get_ProcessingSchedule)(IVariantVector** ppHoursSchedule);
+	STDMETHOD(put_ProcessingSchedule)(IVariantVector* pHoursSchedule);
+	STDMETHOD(get_LimitProcessingToSchedule)(VARIANT_BOOL *pbVal);
+	STDMETHOD(put_LimitProcessingToSchedule)(VARIANT_BOOL bVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -206,6 +210,13 @@ private:
 	// Settings for processing skipped files
 	bool m_bProcessSkippedFiles;
 	bool m_bSkippedForAnyUser;
+
+	// Flag to indicate that the processing should be limited by the scheduled hours in the
+	// m_vecScheduledHours vector;
+	bool m_bLimitProcessingToSchedule;
+
+	// Vector that contains the schedule
+	vector<bool> m_vecScheduledHours;
 
 	///////////
 	// Methods
