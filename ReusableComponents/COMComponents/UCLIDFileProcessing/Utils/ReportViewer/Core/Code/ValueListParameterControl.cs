@@ -90,11 +90,20 @@ namespace Extract.ReportViewer
             {
                 base.OnLoad(e);
 
-                if (_parameterValue != null)
+                if (_valueListParameter != null)
                 {
                     // Set the drop down style based on whether other values are allowed
                     _parameterValue.DropDownStyle = _valueListParameter.AllowOtherValues ?
                         ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList;
+
+                    // Attempt to select the default value (if there is one)
+                    int index = -1;
+                    if (!string.IsNullOrEmpty(_valueListParameter.ParameterValue))
+                    {
+                        index = _parameterValue.FindStringExact(_valueListParameter.ParameterValue);
+                    }
+
+                    _parameterValue.SelectedIndex = index != -1 ? index : 0;
                 }
                 else
                 {

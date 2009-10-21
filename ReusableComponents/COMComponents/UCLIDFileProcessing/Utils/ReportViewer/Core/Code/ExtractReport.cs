@@ -3,6 +3,8 @@ using CrystalDecisions.Shared;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -53,7 +55,7 @@ namespace Extract.ReportViewer
         /// <summary>
         /// The current version of the <see cref="ExtractReport"/> object.
         /// </summary>
-        private static readonly int _VERSION = 1;
+        private static readonly int _VERSION = 2;
 
         /// <summary>
         /// The root node of the XML data contained in the parameter file associated
@@ -789,27 +791,40 @@ namespace Extract.ReportViewer
 
                             case "ValueListParameter":
                                 {
-                                    // Get the list values
-                                    xmlReader.MoveToAttribute("Values");
-                                    ExtractException.Assert("ELI23857",
-                                        "Value list missing 'Values' attribute!",
-                                        xmlReader.Name.Equals("Values", StringComparison.Ordinal),
-                                        "Parameter Name", paramName);
-                                    string[] values = xmlReader.Value.Split(new string[] {","},
-                                        StringSplitOptions.RemoveEmptyEntries);
+                                    string[] values = null;
+                                    bool allowOtherValues = false;
 
-                                    // Get the editable attribute
-                                    xmlReader.MoveToAttribute("Editable");
-                                    ExtractException.Assert("ELI23858",
-                                        "Value list missing 'Editable' attribute!",
-                                        xmlReader.Name.Equals("Editable", StringComparison.Ordinal),
-                                        "Parameter Name", paramName);
-                                    bool allowOtherValues;
-                                    if (!bool.TryParse(xmlReader.Value, out allowOtherValues))
+                                    // Check if the value list parameter is using a value list
+                                    // or a query
+                                    if (xmlReader.MoveToAttribute("Query"))
                                     {
-                                        ExtractException ee = new ExtractException("ELI23729",
-                                            "Editable attribute has invalid value!");
-                                        ee.AddDebugData("Attribute Value", xmlReader.Value, false);
+                                        string query = xmlReader.Value;
+                                        values = BuildValueListFromQuery(query);
+                                    }
+                                    else if (xmlReader.MoveToAttribute("Values"))
+                                    {
+                                        // Get the list values
+                                        values = xmlReader.Value.Split(new string[] { "," },
+                                            StringSplitOptions.RemoveEmptyEntries);
+
+                                        // Get the editable attribute
+                                        ExtractException.Assert("ELI23858",
+                                            "Value list missing 'Editable' attribute!",
+                                            xmlReader.MoveToAttribute("Editable"),
+                                            "Parameter Name", paramName);
+                                        if (!bool.TryParse(xmlReader.Value, out allowOtherValues))
+                                        {
+                                            ExtractException ee = new ExtractException("ELI23729",
+                                                "Editable attribute has invalid value!");
+                                            ee.AddDebugData("Attribute Value", xmlReader.Value, false);
+                                            throw ee;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ExtractException ee = new ExtractException("ELI28200",
+                                            "Value list must contain either a 'Values' or 'Query' setting.");
+                                        ee.AddDebugData("Parameter Name", paramName, false);
                                         throw ee;
                                     }
 
@@ -838,6 +853,65 @@ namespace Extract.ReportViewer
                         ee.AddDebugData("Parameter Value", defaultVal, false);
                         throw ee;
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Builds the value list by running the specified query on the database and
+        /// filling a string array with the results.
+        /// </summary>
+        /// <param name="query">The query to run.</param>
+        /// <returns>A collection of strings.</returns>
+        string[] BuildValueListFromQuery(string query)
+        {
+            SqlConnection connection = null;
+            SqlDataAdapter adapter = null;
+            DataTable table = null;
+            try
+            {
+                // Create a new table
+                table = new DataTable();
+                table.Locale = CultureInfo.InvariantCulture;
+
+                // Open the connection
+                connection = new SqlConnection("server=" + _serverName + ";database="
+                    + _databaseName + ";connection timeout=30;Integrated Security=true");
+
+                // Run the query and use it to fill a data table
+                adapter = new SqlDataAdapter(query, connection);
+                adapter.Fill(table);
+
+                // Iterate through each row adding the first columns value to the list
+                List<string> values = new List<string>(table.Rows.Count);
+                foreach (DataRow row in table.Rows)
+                {
+                    values.Add(row[0].ToString());
+                }
+
+                // Return the string array
+                return values.ToArray();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI28201", ex);
+                ee.AddDebugData("SQL Query", query, false);
+                throw ee;
+            }
+            finally
+            {
+                // Ensure items are cleaned up
+                if (table != null)
+                {
+                    table.Dispose();
+                }
+                if (adapter != null)
+                {
+                    adapter.Dispose();
+                }
+                if (connection != null)
+                {
+                    connection.Dispose();
                 }
             }
         }
