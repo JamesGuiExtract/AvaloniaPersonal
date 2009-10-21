@@ -29,7 +29,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 16;
+const long glFAMDBSchemaVersion = 17;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -269,7 +269,7 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 						// Update the UPIID so to current process so it will be not be selected
 						// again as a skipped file for the current process
 						executeCmdQuery(ipConnection, "Update SkippedFile Set UPIID = " + 
-							asString(m_nUPIID) + " WHERE FileID = " + asString(nFileID));
+							asString(m_nUPIID) + ", DateTimeStamp = GETDATE() WHERE FileID = " + asString(nFileID));
 					}
 				}
 			}
@@ -2209,7 +2209,7 @@ void CFileProcessingDB::addSkipFileRecord(const ADODB::_ConnectionPtr &ipConnect
 			adOpenDynamic, adLockOptimistic, adCmdText);
 
 		// Ensure no records returned
-		if (ipSkippedSet->BOF == VARIANT_FALSE)
+		if (ipSkippedSet->adoEOF == VARIANT_FALSE)
 		{
 			UCLIDException uex("ELI26806", "File has already been skipped for this action!");
 			uex.addDebugInfo("Action ID", nActionID);
