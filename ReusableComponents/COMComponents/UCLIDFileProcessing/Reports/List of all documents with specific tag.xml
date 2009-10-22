@@ -1,0 +1,5 @@
+<ExtractReportParameterData Version="2">
+	<ReportParameters>
+		<ValueListParameter Name="TagName" Query="Select Tag.TagName FROM Tag" Default="" />
+	</ReportParameters>
+</ExtractReportParameterData>
