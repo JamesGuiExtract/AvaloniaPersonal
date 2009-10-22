@@ -92,12 +92,27 @@
 	     	</ul>
       		</li>
 <p>
-	      	<li><b>OCR the included text</b> check box is checkable.
+	      	<li><b>Select what should be returned</b>
       		<ul>
-          		<li>Selection enables <b>Rotate _____ degrees</b> edit box.</li>
-	          	<li><b>Rotate _____ degrees</b> edit box is editable and allows only 
-			numbers as input.</li>
+          		<li>Includes a <b>Return text</b> radio button.</li>
+			<li>Includes two associated combo boxes.
+			<ul>
+				<li>First combo box contains <b>Include</b> and <b>Exclude</b>.
+				<li>Second combo box contains <b>characters</b>, <b>words</b> 
+				and <b>lines</b>.
+			</ul>
+			<li>The two associated combo boxes are enabled only when the radio button 
+			is selected.
+<p>
+          		<li>Includes a <b>Re-OCR and return text</b> radio button.</li>
+	          	<li><b>Rotate image  _____ degrees clockwise</b> edit box is editable 
+			and allows only numbers as input.</li>
           		<li>Exception is thrown when value entered != {0,90,180,270}.</li>
+			<li>The edit box is enabled only when the radio button is selected.
+<p>
+          		<li>Includes a <b>Return image region</b> radio button.</li>
+	          	<li><b>Assign the following text:</b> edit box is enabled only when the 
+			radio button is selected.
 	     	</ul>
       		</li>
      	</ul>
@@ -196,6 +211,8 @@
 			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3063\00008879_00001.tif</b></li>
 			<li>Ensure that a <b>System error: Unable to allocate necessary 
 			resources.</b> exception is not logged.</li>
+			<li><b>[FlexIDSCore #3726]</b> Confirm that an <b>ELI04164: COM exception 
+			caught.</b> exception is not logged.</li>
 		</ul>
 	</ul>
 </ul>
