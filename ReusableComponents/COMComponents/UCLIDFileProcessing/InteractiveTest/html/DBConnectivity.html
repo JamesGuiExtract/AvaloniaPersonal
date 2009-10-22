@@ -114,6 +114,22 @@
        		<li>Confirm that <b>USB counter</b> is not affected.
     	</ul> 
 <p>
+<ul>
+    	<li><b>[LegacyRC #5076]</b> Testing file processing timeout
+    	<ul> 
+       		<li>Prepare a <b>Scenario 1</b> testing setup.
+       		<li>Modify the <b>ConnectionRetryTimeout</b> setting in the <b>DBInfo</b> table to 30.
+       		<li>Modify the <b>NumberOfConnectionRetries</b> setting in the <b>DBInfo</b> table to 1.
+       		<li>Start queuing and processing.
+       		<li>Manually stop network connection from the command line using "ipconfig/release".
+<p>
+       		<li>Confirm that after processing times out, the files are automatically moved to the 
+		<b>failed</b> grid on the Processing Log page.
+		<br>Note: It may take up to 5 or more minutes for the files to be moved to the <b>failed</b> grid.
+    	</ul> 
+</ul> 
+
+<p>
     	<li><b>Scenario 2</b> :  Remote images, local database, local processing - 2 PCs
     	<ul> 
        		<li>Create a local database for the test images.
@@ -194,21 +210,5 @@
 		<b>SQL Server 2008</b> database located on a different computer.
     	</ul> 
 </ul>
-<p>
-<h3><u>Miscellaneous</u></h3>
-<ul>
-    	<li><b>[LegacyRC #5076]</b> Testing file processing timeout
-    	<ul> 
-       		<li>Prepare a <b>Scenario 1</b> testing setup.
-       		<li>Modify the <b>ConnectionRetryTimeout</b> setting in the <b>DBInfo</b> table to 30.
-       		<li>Modify the <b>NumberOfConnectionRetries</b> setting in the <b>DBInfo</b> table to 1.
-       		<li>Start queuing and processing.
-       		<li>Manually stop network connection from the command line using "ipconfig/release".
-<p>
-       		<li>Confirm that after processing times out, the files are automatically moved to the 
-		<b>failed</b> grid on the Processing Log page.
-		<br>Note: It may take up to 5 or more minutes for the files to be moved to the <b>failed</b> grid.
-    	</ul> 
-</ul> 
 </body> 
 </html>
