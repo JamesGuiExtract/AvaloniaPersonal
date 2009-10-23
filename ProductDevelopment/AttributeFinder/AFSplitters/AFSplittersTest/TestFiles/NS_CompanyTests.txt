@@ -455,9 +455,9 @@ Names|Great Lakes Savings and Loan Association
 Names|LVNV Funding
 .Company|LVNV Funding
 
-<TESTCASE>|Company Name with Products|Singletary Concrete Products
-Names|Singletary Concrete Products
-.Company|Singletary Concrete Products
+<TESTCASE>|Company Name with Products|Sungletary Concrete Products
+Names|Sungletary Concrete Products
+.Company|Sungletary Concrete Products
 
 <TESTCASE>|Company Name with Loan|Priority Home Loan
 Names|Priority Home Loan
