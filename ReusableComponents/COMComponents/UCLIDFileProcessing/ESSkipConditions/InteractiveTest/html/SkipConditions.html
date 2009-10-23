@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>FAM Conditions</title>
 <link type="text/css" rel="stylesheet" href="../../../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 <body>
@@ -8,292 +9,392 @@
 </h1>
 <hr>
 <ul>
-   	<li>Get the <b>FPS</b> and <b>Images</b> folders for the FAM Condition tests from SourceSafe. 
-       $/Engineering/ReusableComponents/COM Components/UCLIDFileProcessing/ESSkipConditions/InteractiveTest</li> 
-   	<li>The FPS files use <b>(local)</b> and <b>FAM_Condition</b> as the database server and 
-	database name, respectively.</li> 
-   	<li><b>[P13 #4285]</b> For this testing checklist, use only a <b>Server</b> license file, 
-	not an <b>RDT</b> license file.</li> 
-   	<li>Start a blank <b>File Action Manager</b>.</li> 
-   	<li>Select a database server and database.  Select an action, then check the 
-	<b>Queue files for this action</b> checkbox.</li> 
-   	<li>Confirm that pressing the <b>Commands &gt;</b> button for Select Skip Condition in 
-	the Queue Setup tab of the File Action Manager brings up a drop-down menu with 
-	<b>Select Skip Condition...</b> and then brings up the dialog.</li> 
-   	<li>Confirm that the <b>Select Skip Condition</b> dialog has three active buttons: 
-       	Configure..., OK, Cancel.  There should also be an edit box for <i>FAM Condition 
-       	description</i>, and a droplist for <i>Select Skip Condition</i>.</li>
-   	<ul> 
-      		<li>Confirm the droplist for the Select Skip Condition includes: <b>None</b>.</li>
-      		<ul> 
-         		<li>Confirm that when <b>None</b> is selected, it disables the Configure button  
-             		in the Select Skip Condition dialog.</li> 
-         		<li>Clear the database, then double-click on <b>Skip_None.fps</b> in FPS folder. 
-			Confirm that an <b>Action not Found</b> error message is displayed.</li> 
-         		<li>Add action <b>skip_basedonnone</b> to the database.</li> 
-         		<li>Select the action <b>skip_basedonnone</b> in the Action tab of the
-             		File Action Manager for Skip_None.fps.
-         		<li>Press the <b>Start processing</b> button.
-         		<li>Confirm that the Name column of the <i>Files added or updated in the queue 
-             		recently</i> display area of Queue Log shows <b>TestImage.tif</b>, 
-			<b>TestImage005.tif</b>, <b>TestImage009.tif</b>, <b>TestImage015.tif</b>,
-			<b>TestImage020.tif</b>, and <b>TestImageB.tif</b>, each in a separate row.
-      		</ul>
-<p>
-     		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
-          	<b>AND multiple conditions</b>.
-      		<ul> 
-         		<li>Confirm when <b>AND multiple conditions</b> is selected, and the Configure 
-			button is pressed, it brings up the <b>Configure AND multiple conditions</b> 
-			dialog.
-         		<ul> 
-            			<li>Confirm that the <b>Configure AND multiple conditions</b> dialog 
-				has <b>Add...</b>, <b>Delete</b>, <b>Command &gt;</b> buttons, an <b>Up</b> 
-				arrow, a <b>Down</b> arrow, an <b>OK</b> button and a <b>Cancel</b> button. 
-        	    		<li>Confirm that only the <b>Add...</b> button is initially enabled.
-        	    		<li>Confirm that pressing the <b>Add...</b> button brings up a <b>Select 
-				FAM Condition</b> dialog.
-            			<li>Insert several skip conditions into the <b>Configure AND multiple 
-				conditions</b> dialog. 
-        	    		<li>Confirm that the initial state for all the FAM conditions has the 
-				<b>Enabled</b> checkbox checked.
-            			<li>Confirm that when none of the FAM conditions are highlighted, 
-				the <b>Delete</b> button, <b>Command &gt;</b> button, <b>Up</b> arrow and 
-				<b>Down</b> arrow are all disabled.
-            			<li>Confirm that highlighting a FAM condition activates the <b>Delete</b> 
-				and <b>Command &gt;</b> buttons.
-	            		<li>Confirm that <b>CTRL+Left Click</b> allows for multiple selection of 
-				list box items.
-            			<li>Confirm that <b>SHIFT+Left Click</b> allows for multiple selections of 
-				list box items.
-	            		<li>Confirm that pressing the <b>Delete</b> button brings up the <b>Confirm 
-				Delete</b> dialog. Confirm that pressing the <b>Yes</b> button deletes 
-				the selected item(s), pressing the <b>No</b> button ignores the delete 
-				request and exits the dialog.
-        	    		<li>Confirm that the <b>Delete</b> button can delete multiple selected 
-				list box items. 
-            			<li>Confirm that the <b>Command &gt;</b> button displays a popup menu with 
-				<b>Select Skip Condition...</b>, <b>Configure FAM Condition...</b>,  
-				<b>Configure description...</b> and <b>Cancel</b>items. 
-        	    		<li>Confirm that the <b>Up</b> arrow button moves the selected item up 
-				in the list box.
-            			<li>Confirm that the <b>Down</b> arrow button moves the selected item 
-				down in the list box.
-        	    		<li>Confirm that the <b>Up</b> and <b>Down</b> arrow buttons become inactive 
-				when reaching the top or bottom of the list, respectively.
-            			<li>Confirm that the <b>OK</b> button saves changes and exits the dialog.
-	            		<li>Confirm that the <b>Cancel</b> button ignores changes and exits the dialog.
-        	    		<li>Confirm that right clicking on the list box displays the context menu.
-            			<li><b>Context Menu Options</b>
-				<ul>
-					<li>Confirm that <b>Cut</b> exists.
-					<li>Confirm items can be successfully cut to the clipboard.
-					<li>Confirm clicking on <b>Cut</b> brings up the <b>Confirm Delete</b> 
-					dialog.
-					<li>Confirm that <b>Cut</b> can successfully cut multiple selected items.
-					<li>Confirm that <b>Copy</b> exists.</li> 
-					<li>Confirm items can be successfully copied to the clipboard.
-					<li>Confirm that <b>Copy</b> can successfully copy multiple selected items.
-					<li>Confirm that <b>Paste</b> exists.
-					<li>Confirm that items can be successfully pasted from the clipboard.
-					<li>Confirm that <b>Paste</b> can successfully paste multiple cut or 
-					copied items.
-					<li>Confirm that <b>Delete</b> exists.
-					<li>Confirm that an item can be deleted successfully.
-					<li>Confirm that clicking on <b>Delete</b> brings up the <b>Confirm 
-					Delete</b> dialog.
-					<li>Confirm that <b>Delete</b> can successfully delete multiple 
-					selected items.
-					<li>Confirm that <b>Cancel</b> exists.
-					<li>Confirm that <b>Cancel</b> exits the context menu.
-				</ul>
-          		</ul>
-<p>
-	         	<li>Clear the database, then double click on <b>Skip_AND.fps</b> in the FPS folder. 
-         		<li>Add action <b>skip_basedonand</b> to the database.
-	         	<li>Select action skip_basedonand in the Action tab of the File Action Manager 
-			for Skip_AND.fps.</li> 
-         		<li>Press the Start button.</li> 
-	         	<li>Confirm the Name column of the <i>Files added or updated in the queue 
-			recently</i> display area of Queue Log shows only TestImage.tif, 
-			TestImage015.tif, TestImage020.tif, and TestImageB.tif, each in a separate row.</li> 
-	         	<li>Confirm TestImage05.tif and TestImage09.tif do not show up in the Name 
-			column of the <i>Files added or updated in the queue recently</i> display area.</li>
-      		</ul>
-<p>
-      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
-		<b>Exactly ONE in multiple conditions</b>.</li> 
-      		<ul>
-         		<li>Confirm when the Configure button in Select Skip Condition 
-             		is pressed, it brings up the <b>Configure Exactly one in multiple 
-             		conditions</b> dialog.</li> 
-         		<li>Clear the database, then double click on <b>Skip_ExactlyOne.fps</b> 
-             		in the FPS folder.</li> 
-         		<li>Add action <b>skip_basedonexactlyone</b> to the database. 
-	         	<li>Select action <b>skip_basedonexactlyone</b> in the Action tab of 
-			the File Action Manager for Skip_ExactlyOne.fps</li> 
-         		<li>Press the Start button.</li> 
-         		<li>Confirm that the Name column of the <b>Files added or updated in 
-			the queue recently</b> display area of Queue Log shows only 
-			TestImage.tif, TestImage005.tif, TestImage009.tif, and TestImageB.tif, 
-			each in a separate row.</li> 
-         		<li>Confirm TestImage015.tif and TestImage020.tif do not show up in 
-			the Name column of the <b>Files added or updated in the queue recently</b> 
-			display area.</li>
-      		</ul>
-<p> 
-      		<li>Confirm the droplist for the Select Skip Condition includes: 
-          	<b>NONE in multiple conditions</b>.</li> 
-      		<ul>
-         		<li>Confirm that when the Configure button in Select Skip Condition 
-             		is pressed, it brings up the <b>Configure NONE in multiple 
-			conditions</b> dialog.</li> 
-         		<li>Clear the database, then double click on <b>Skip_NoneInMultiple.fps</b> 
-             		in the FPS folder.</li> 
-         		<li>Add action <b>skip_basedonnoneinmultiple</b> to the database.</li> 
-         		<li>Select action <b>skip_basedonnoneinmultiple</b> in the Action tab of 
-			the File Action Manager for Skip_NonInMultiple.fps.</li> 
-         		<li>Press the Start button.</li> 
-         		<li>Confirm the Name column of the <b>Files added or updated in the queue 
-             		recently</b> display area of Queue Log shows only TestImage005.tif, 
-             		TestImage009.tif, TestImage015.tif. and TestImage020.tif, each in 
-			a separate row.</li> 
-         		<li>Confirm that TestImage.tif and TestImageB.tif do not show up in 
-			the Name column of the <b>Files added or updated in the queue recently</b> 
-			display area.</li>
-      		</ul> 
-<p>
-      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
-          	<b>OR multiple conditions</b>.</li>
-      		<ul> 
-         		<li>Confirm when the Configure button in Select Skip Condition 
-             		is pressed, it brings up <b>Configure OR multiple conditions</b> 
-			dialog.</li> 
-         		<li>Clear the database, then double click on <b>Skip_OR.fps</b> in 
-			the FPS folder. You should get an <b>Action not Found</b> error 
-			message.</li> 
-         		<li>Add action <b>skip_basedonor</b> to the database.</li> 
-         		<li>Select action <b>skip_basedonor</b> in the Action tab of the 
-			File Action Manager for Skip_OR.fps.</li> 
-         		<li>Press the Start button.</li> 
-         		<li>Confirm the Name column of the <b>Files added or updated in 
-			the queue recently display</b> area of Queue Log shows only 
-			TestImage.tif and TestImageB.tif, each in a separate row.</li> 
-         		<li>Confirm that TestImage005.tif, TestImage009.tif, TestImage015.tif, 
-			and TestImage020.tif do not show up in the Name column of the 
-             		<b>Files added or updated in the queue recently</b> display area.</li>
-      		</ul> 
-<p>
-      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
-          	<b>Match based upon file existence</b>.</li>
-      		<ul> 
-         		<li>Confirm clicking on the Configure button brings up the <b>Configure  
-			Match based upon file existence</b> dialog.
-            		<li>Confirm that the dialog has a droplist with entries of <b>does</b> 
-			and <b>does not</b> as the fill-in text for <b>Skip processing 
-                	if the file does|does not exist</b>. 
-            		<li>Confirm that the dialog has an edit box with an associated 
-			<b>Tag Selector</b> button and <b>Browse</b> button.
-            		<li>Confirm that the <b>Tag Selector</b> button displays a context 
-                	menu to the immediate right of the button.
-            		<li>Confirm that the items in the context menu include <b>&ltSourceDocName&gt</b>,
-                	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.
-            		<li>Confirm that when an item is chosen it either inserts text at 
-			the cursor position or replaces the highlighted text in the edit box. 
-            		<li>Confirm that the <b>...</b> ( Browse ) button brings up 
-                	a File - Open dialog. 
-            		<li>Confirm that a file selected in the File - Open file dialog replaces 
-			the text in the edit box.</li>
-<p>
-         		<li>Clear the database, then double click on <b>Skip_FileExistence.fps</b>
-             		in the FPS folder. An <b>Action not Found</b> error message should be 
-			displayed.</li> 
-         		<li>Add action <b>skip_basedonfileexistence</b> to the database.</li> 
-         		<li>Select action <b>skip_basedonfileexistence</b> in the Action tab of 
-			the File Action Manager for Skip_FileExistence.fps</li> 
-         		<li>Press the Start button.</li> 
-         		<li>Confirm that the Name column of the <b>Files added or updated in 
-			the queue recently</b> display area of Queue Log shows only TestImage.tif,  
-			TestImage015.tif, TestImage020.tif, and TestImageB.tif, each in a 
-			separate row.</li> 
-         		<li>Confirm that TestImage005.tif and TestImage009.tif do not show up 
-			in the Name column of the <b>Files added or updated in the queue 
-			recently</b> display area.</li>
-      		</ul>
-<p>
-      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
-          	<b>Match based upon filename pattern</b>.</li>
-      		<ul>
-         		<li>Confirm that pressing the Configure button in the Select Skip Condition 
-             		dialog brings up the <b>Configure Match based upon filename pattern</b> dialog.</li>
-            		<li>Confirm there is an edit box with an associated Tag Selector button.</li> 
-            		<li><b>[P13 #4781]</b> Confirm that the default filename in the edit box is 			<b>&lt;SourceDocName&gt;</b>.
-            		<li>Confirm that the Tag Selector button brings up a context menu.</li>
-            		<li>Confirm that the context menu includes <b>&ltSourceDocName&gt</b>,
-                	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.  
-            		<li>Confirm that when an item is chosen, it either inserts text at 
-			the current cursor position or replaces the highlighted text in the 
-			edit box.</li> 
-            		<li>Confirm that the dialog contains two combo boxes under the 
-                	edit box. Confirm that the first combo box contains <b>does</b> and 
-			<b>does not</b>, and the other contains <b>contain</b> and <b>exactly 
-			match</b>.</li> 
-            		<li>Confirm that the default combo box settings are <b>does contain</b>.
-<p>
-            		<li>Confirm that the <b>Skip based upon file name pattern</b> dialog 
-			has a <b>Read regular expression from file</b> radio button and an 
-                	associated edit box.</li> 
-            		<li>Confirm that the edit box is enabled only when the radio button 
-                	is selected.</li> 
-            		<li>Confirm that the edit box includes an associated Tag Selector 
-                	and Browse button.</li> 
-            		<li>Confirm that the <b>Tag Selector</b> opens a context menu.
-            		<li>Confirm that the context menu includes <b>&ltSourceDocName&gt</b>,
-                	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.  
-            		<li>Confirm that when an item is chosen it either inserts text at 
-			the current cursor position or replaces highlighted text in the 
-			edit box.</li> 
-            		<li>Confirm that the <b>Browse</b> button brings up a File - Open dialog, 
-			and that selecting a file replaces the text in the edit box.</li> 
-<p>
-            		<li>Confirm there is a radio button associated with <b>Specify regular 
-                	expression:</b> in the dialog.</li> 
-            		<li>Confirm that this radio button is selected by default.</li> 
-            		<li>Confirm that the regular expression edit box is enabled only when 
-			the radio button is selected.</li> 
-            		<li>Confirm there is an associated <b>Case sensitive</b> checkbox.</li> 
-            		<li>Confirm that the checkbox is enabled and unselected by default.</li>
-<p>
-         		<li>Clear the database, then double click on <b>Skip_NamePattern.fps</b> 
-			in the FPS folder. Confirm that an <b>Action not Found</b> error 
-			message is displayed.</li> 
-         		<li>Add action <b>skip_basedonnamepattern</b> to the database.</li> 
-         		<li>Select action <b>skip_basedonnamepattern</b> in the Action tab of 
-			the File Action Manager for Skip_NamePattern.fps.</li> 
-         		<li>Press the Start button. 
-         		<li>Confirm that the Name column of the <b>Files added or updated in 
-			the queue recently</b> display area of Queue Log shows only 
-			TestImage.tif and TestImageB.tif, each in a separate row. 
-         		<li>Confirm that TestImage005.tif, TestImage009.tif, TestImage015.tif, 
-			and TestImage020.tif do not show up in the Name column of the <b>Files 
-			added or updated in the queue recently</b> display area.
-     		</ul>
+   	<li><h3>Test Setup</h3>
+	<ul>
+	   	<li>Get the <b>FPS</b> and <b>Images</b> folders for the FAM Condition tests from 
+		source control. <br>
+       		<b>$/Engineering/ReusableComponents/COM 
+		Components/UCLIDFileProcessing/ESSkipConditions/InteractiveTest</b></li> 
+   		<li>The FPS files use <b>(local)</b> and <b>FAM_Condition</b> as the database server and 
+		database name, respectively.</li> 
+   		<li><b>[LegacyRC #4285]</b> For this testing checklist, use only a <b>Server</b> 
+		license file, not an <b>RDT</b> license file.</li> 
 	</ul>
 <p>
-	<li><b>[P13 #4791]</b> FAM Condition still executes after being removed.
+   	<li><h3>Functionality</h3>
 	<ul>
-	   	<li>Open an existing <b>FPS</b> file.  Confirm that it properly executes files. 
-	   	<li> Configure a skip condition that will always be true (i.e. <b>File 
-		Existence</b> on <b>&lt;SourceDocName&gt;</b>).
-	   	<li><b>[P13 #4316]</b> Confirm that <b>Double-click</b> of the Skip Condition edit 
-		box displays the <b>configuration</b> dialog.
-	   	<li><b>[P13 #4316]</b> Confirm that <b>Alt+Double-click</b> of the Skip Condition edit 
-		box displays the <b>Configure description</b> dialog.
-	   	<li><b>[P13 #4316]</b> Confirm that <b>Ctrl+Double-click</b> of the Skip Condition edit 
-		box displays the <b>Select SKip condition</b> dialog.
-	   	<li>Reselect a skip condition of <b>&lt;NONE&gt;</b>.
-	   	<li>Run the <b>FPS</b> file.
-	   	<li>Confirm that <b>all</b> files are added to the queue.
+	   	<li>Start a blank <b>File Action Manager</b>.</li> 
+   		<li>Select a database server and database.  Select an action, then check the 
+		<b>Queue files for this action</b> checkbox.</li> 
+   		<li>Confirm that pressing the <b>Commands &gt;</b> button for Select Skip Condition in 
+		the Queue Setup tab of the File Action Manager brings up a drop-down menu with 
+		<b>Select Skip Condition...</b> and then brings up the dialog.</li> 
+   		<li>Confirm that the <b>Select Skip Condition</b> dialog has three active buttons: 
+       		Configure..., OK, Cancel.  There should also be an edit box for <i>FAM Condition 
+       		description</i>, and a droplist for <i>Select Skip Condition</i>.</li>
+   		<ul> 
+      			<li>Confirm the droplist for the Select Skip Condition includes: <b>None</b>.</li>
+	      		<ul> 
+        	 		<li>Confirm that when <b>None</b> is selected, it disables the Configure 
+				button  in the Select Skip Condition dialog.</li> 
+         			<li>Clear the database, then double-click on <b>Skip_None.fps</b> in 
+				the FPS folder. 
+				Confirm that an <b>Action not Found</b> error message is displayed.</li> 
+        	 		<li>Add action <b>skip_basedonnone</b> to the database.</li> 
+         			<li>Select the action <b>skip_basedonnone</b> in the Action tab of the
+             			File Action Manager for Skip_None.fps.
+	         		<li>Press the <b>Start processing</b> button.
+        	 		<li>Confirm that the Name column of the <i>Files added or updated in the 
+				queue recently</i> display area of Queue Log shows <b>TestImage.tif</b>, 
+				<b>TestImage005.tif</b>, <b>TestImage009.tif</b>, <b>TestImage015.tif</b>,
+				<b>TestImage020.tif</b>, and <b>TestImageB.tif</b>, each in a separate row.
+      			</ul>
+<p>
+	     		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+        	  	<b>AND multiple conditions</b>.
+      			<ul> 
+         			<li>Confirm when <b>AND multiple conditions</b> is selected, and the 
+				Configure button is pressed, it brings up the <b>Configure AND multiple 
+				conditions</b> dialog.
+         			<ul> 
+            				<li>Confirm that the <b>Configure AND multiple conditions</b> 
+					dialog has <b>Add...</b>, <b>Delete</b>, <b>Command &gt;</b> 
+					buttons, an <b>Up</b> arrow, a <b>Down</b> arrow, an <b>OK</b> 
+					button and a <b>Cancel</b> button. 
+        		    		<li>Confirm that only the <b>Add...</b> button is initially enabled.
+      		  	    		<li>Confirm that pressing the <b>Add...</b> button brings up a 
+					<b>Select FAM Condition</b> dialog.
+            				<li>Insert several skip conditions into the <b>Configure AND 
+					multiple conditions</b> dialog. 
+	        	    		<li>Confirm that the initial state for all the FAM conditions has the 
+					<b>Enabled</b> checkbox checked.
+            				<li>Confirm that when none of the FAM conditions are highlighted, 
+					the <b>Delete</b> button, <b>Command &gt;</b> button, <b>Up</b> 
+					arrow and <b>Down</b> arrow are all disabled.
+	            			<li>Confirm that highlighting a FAM condition activates the 
+					<b>Delete</b> and <b>Command &gt;</b> buttons.
+	        	    		<li>Confirm that <b>CTRL+Left Click</b> allows for multiple selection 
+					of list box items.
+            				<li>Confirm that <b>SHIFT+Left Click</b> allows for multiple 
+					selections of list box items.
+		            		<li>Confirm that pressing the <b>Delete</b> button brings up the 
+					<b>Confirm Delete</b> dialog. Confirm that pressing the <b>Yes</b> 
+					button deletes the selected item(s), pressing the <b>No</b> button 
+					ignores the delete request and exits the dialog.
+	        	    		<li>Confirm that the <b>Delete</b> button can delete multiple selected 
+					list box items. 
+            				<li>Confirm that the <b>Command &gt;</b> button displays a popup menu 
+					with <b>Select Skip Condition...</b>, <b>Configure FAM Condition...</b>,  
+					<b>Configure description...</b> and <b>Cancel</b>items. 
+	        	    		<li>Confirm that the <b>Up</b> arrow button moves the selected item up 
+					in the list box.
+	            			<li>Confirm that the <b>Down</b> arrow button moves the selected item 
+					down in the list box.
+        		    		<li>Confirm that the <b>Up</b> and <b>Down</b> arrow buttons become 
+					inactive when reaching the top or bottom of the list, respectively.
+            				<li>Confirm that the <b>OK</b> button saves changes and exits 
+					the dialog.
+		            		<li>Confirm that the <b>Cancel</b> button ignores changes and exits 
+					the dialog.
+	        	    		<li>Confirm that right clicking on the list box displays a context 
+					menu.
+        	    			<li><b>Context Menu Options</b>
+					<ul>
+						<li>Confirm that <b>Cut</b> exists.
+						<li>Confirm items can be successfully cut to the clipboard.
+						<li>Confirm clicking on <b>Cut</b> brings up the <b>Confirm 
+						Delete</b> dialog.
+						<li>Confirm that <b>Cut</b> can successfully cut multiple 
+						selected items.
+						<li>Confirm that <b>Copy</b> exists.</li> 
+						<li>Confirm items can be successfully copied to the 
+						clipboard.
+						<li>Confirm that <b>Copy</b> can successfully copy multiple 
+						selected items.
+						<li>Confirm that <b>Paste</b> exists.
+						<li>Confirm that items can be successfully pasted from 
+						the clipboard.
+						<li>Confirm that <b>Paste</b> can successfully paste 
+						multiple cut or copied items.
+						<li>Confirm that <b>Delete</b> exists.
+						<li>Confirm that an item can be deleted successfully.
+						<li>Confirm that clicking on <b>Delete</b> brings up the 
+						<b>Confirm Delete</b> dialog.
+						<li>Confirm that <b>Delete</b> can successfully delete 
+						multiple selected items.
+						<li>Confirm that <b>Cancel</b> exists.
+						<li>Confirm that <b>Cancel</b> exits the context menu.
+					</ul>
+          			</ul>
+<p>
+		         	<li>Clear the database, then double click on <b>Skip_AND.fps</b> in the 
+				FPS folder. 
+        	 		<li>Add action <b>skip_basedonand</b> to the database.
+	        	 	<li>Select action <b>skip_basedonand</b> in the Action tab of the File 
+				Action Manager for Skip_AND.fps.</li> 
+	         		<li>Press the <b>Start processing</b> button.</li> 
+		         	<li>Confirm that the Name column of the <i>Files added or updated in 
+				the queue recently</i> display area of Queue Log shows only TestImage.tif, 
+				TestImage015.tif, TestImage020.tif, and TestImageB.tif, each in a 
+				separate row.</li> 
+		         	<li>Confirm TestImage05.tif and TestImage09.tif do not show up in the 
+				<b>Name</b> column of the <i>Files added or updated in the queue 
+				recently</i> display area.</li>
+      			</ul>
+<p>
+	      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+			<b>Exactly ONE in multiple conditions</b>.</li> 
+      			<ul>
+         			<li>Confirm when the Configure button in Select Skip Condition 
+	             		is pressed, it brings up the <b>Configure Exactly one in multiple 
+        	     		conditions</b> dialog.</li> 
+         			<li>Clear the database, then double click on <b>Skip_ExactlyOne.fps</b> 
+             			in the FPS folder.</li> 
+	         		<li>Add action <b>skip_basedonexactlyone</b> to the database. 
+		         	<li>Select action <b>skip_basedonexactlyone</b> in the Action tab of 
+				the File Action Manager for Skip_ExactlyOne.fps</li> 
+         			<li>Press the <b>Start processing</b> button.</li> 
+	         		<li>Confirm that the <b>Name</b> column of the <b>Files added or updated in 
+				the queue recently</b> display area of Queue Log shows only 
+				TestImage.tif, TestImage005.tif, TestImage009.tif, and TestImageB.tif, 
+				each in a separate row.</li> 
+	         		<li>Confirm TestImage015.tif and TestImage020.tif do not show up in 
+				the <b>Name</b> column of the <b>Files added or updated in the queue 
+				recently</b> display area.</li>
+	      		</ul>
+<p> 
+	      		<li>Confirm the droplist for the Select Skip Condition includes: 
+        	  	<b>NONE in multiple conditions</b>.</li> 
+      			<ul>
+         			<li>Confirm that when the Configure button in Select Skip Condition 
+	             		is pressed, it brings up the <b>Configure NONE in multiple 
+				conditions</b> dialog.</li> 
+         			<li>Clear the database, then double click on <b>Skip_NoneInMultiple.fps</b> 
+             			in the FPS folder.</li> 
+	         		<li>Add action <b>skip_basedonnoneinmultiple</b> to the database.</li> 
+        	 		<li>Select action <b>skip_basedonnoneinmultiple</b> in the Action tab of 
+				the File Action Manager for Skip_NonInMultiple.fps.</li> 
+         			<li>Press the <b>Start processing</b> button.</li> 
+	         		<li>Confirm the Name column of the <b>Files added or updated in the queue 
+        	     		recently</b> display area of Queue Log shows only TestImage005.tif, 
+             			TestImage009.tif, TestImage015.tif. and TestImage020.tif, each in 
+				a separate row.</li> 
+	         		<li>Confirm that TestImage.tif and TestImageB.tif do not show up in 
+				the <b>Name</b> column of the <b>Files added or updated in the queue 
+				recently</b> display area.</li>
+	      		</ul> 
+<p>
+   	   		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+        	  	<b>OR multiple conditions</b>.</li>
+      			<ul> 
+         			<li>Confirm when the Configure button in Select Skip Condition 
+	             		is pressed, it brings up <b>Configure OR multiple conditions</b> 
+				dialog.</li> 
+         			<li>Clear the database, then double click on <b>Skip_OR.fps</b> in 
+				the FPS folder. 
+				<li>Confirm display of an <b>Action not Found</b> error 
+				message.</li> 
+	         		<li>Add action <b>skip_basedonor</b> to the database.</li> 
+        	 		<li>Select action <b>skip_basedonor</b> in the Action tab of the 
+				File Action Manager for Skip_OR.fps.</li> 
+         			<li>Press the <b>Start processing</b> button.</li> 
+	         		<li>Confirm the Name column of the <b>Files added or updated in 
+				the queue recently display</b> area of Queue Log shows only 
+				TestImage.tif and TestImageB.tif, each in a separate row.</li> 
+         			<li>Confirm that TestImage005.tif, TestImage009.tif, TestImage015.tif, 
+				and TestImage020.tif do not show up in the Name column of the 
+        	     		<b>Files added or updated in the queue recently</b> display area.</li>
+      			</ul> 
+<p>
+	      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+        	  	<b>Match based upon file existence</b>.</li>
+      			<ul> 
+         			<li>Confirm clicking on the Configure button brings up the <b>Configure  
+				Match based upon file existence</b> dialog.
+        	    		<li>Confirm that the dialog has a droplist with entries of <b>does</b> 
+				and <b>does not</b> as the fill-in text for <b>Skip processing 
+                		if the file does|does not exist</b>. 
+	            		<li>Confirm that the dialog has an edit box with an associated 
+				<b>Tag Selector</b> button and <b>Browse</b> button.
+            			<li>Confirm that the <b>Tag Selector</b> button displays a context 
+                		menu to the immediate right of the button.
+	            		<li>Confirm that the items in the context menu include <b>&ltSourceDocName&gt</b>,
+        	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.
+            			<li>Confirm that when an item is chosen it either inserts text at 
+				the cursor position or replaces the highlighted text in the edit box. 
+	            		<li>Confirm that the <b>...</b> ( Browse ) button brings up 
+        	        	a File - Open dialog. 
+            			<li>Confirm that a file selected in the File - Open file dialog replaces 
+				the text in the edit box.</li>
+<p>
+	         		<li>Clear the database, then double click on <b>Skip_FileExistence.fps</b>
+        	     		in the FPS folder. 
+				<li>Confirm that an <b>Action not Found</b> error message is  
+				displayed.</li> 
+	         		<li>Add action <b>skip_basedonfileexistence</b> to the database.</li> 
+        	 		<li>Select action <b>skip_basedonfileexistence</b> in the Action tab of 
+				the File Action Manager for Skip_FileExistence.fps</li> 
+         			<li>Press the <b>Start processing</b> button.</li> 
+	         		<li>Confirm that the Name column of the <b>Files added or updated in 
+				the queue recently</b> display area of Queue Log shows only TestImage.tif,  
+				TestImage015.tif, TestImage020.tif, and TestImageB.tif, each in a 
+				separate row.</li> 
+	         		<li>Confirm that TestImage005.tif and TestImage009.tif do not show up 
+				in the Name column of the <b>Files added or updated in the queue 
+				recently</b> display area.</li>
+	      		</ul>
+<p>
+   	   		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+        	  	<b>Match based upon filename pattern</b>.</li>
+      			<ul>
+         			<li>Confirm that pressing the Configure button in the Select Skip 
+				Condition dialog brings up the <b>Configure Match based upon filename 
+				pattern</b> dialog.</li>
+        	    		<li>Confirm there is an edit box with an associated <b>Tag Selector</b> 
+				button.</li> 
+            			<li><b>[LegacyRC #4781]</b> Confirm that the default filename in the 
+				edit box is <b>&lt;SourceDocName&gt;</b>.
+	            		<li>Confirm that the <b>Tag Selector</b> button brings up a context 
+				menu.</li>
+	            		<li>Confirm that the context menu includes <b>&ltSourceDocName&gt</b>,
+        	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.  
+            			<li>Confirm that when an item is chosen, it either inserts text at 
+				the current cursor position or replaces the highlighted text in the 
+				edit box.</li> 
+        	    		<li>Confirm that the dialog contains two combo boxes under the 
+                		edit box. Confirm that the first combo box contains <b>does</b> and 
+				<b>does not</b>, and the other contains <b>contain</b> and <b>exactly 
+				match</b>.</li> 
+        	    		<li>Confirm that the default combo box settings are <b>does contain</b>.
+<p>
+	            		<li>Confirm that the <b>Skip based upon file name pattern</b> dialog 
+				has a <b>Read regular expression from file</b> radio button and an 
+                		associated edit box.</li> 
+	            		<li>Confirm that the edit box is enabled only when the radio button 
+        	        	is selected.</li> 
+            			<li>Confirm that the edit box includes an associated Tag Selector 
+                		and Browse button.</li> 
+	            		<li>Confirm that the <b>Tag Selector</b> opens a context menu.
+        	    		<li>Confirm that the context menu includes <b>&ltSourceDocName&gt</b>,
+                		<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.  
+            			<li>Confirm that when an item is chosen it either inserts text at 
+				the current cursor position or replaces highlighted text in the 
+				edit box.</li> 
+            			<li>Confirm that the <b>Browse</b> button brings up a File - Open dialog, 
+				and that selecting a file replaces the text in the edit box.</li> 
+<p>
+	            		<li>Confirm there is a radio button associated with <b>Specify regular 
+        	        	expression:</b> in the dialog.</li> 
+            			<li>Confirm that this radio button is selected by default.</li> 
+            			<li>Confirm that the regular expression edit box is enabled only when 
+				the radio button is selected.</li> 
+        	    		<li>Confirm there is an associated <b>Case sensitive</b> checkbox.</li> 
+            			<li>Confirm that the checkbox is enabled and unselected by default.</li>
+<p>
+	         		<li>Clear the database, then double click on <b>Skip_NamePattern.fps</b> 
+				in the FPS folder. Confirm that an <b>Action not Found</b> error 
+				message is displayed.</li> 
+         			<li>Add action <b>skip_basedonnamepattern</b> to the database.</li> 
+	         		<li>Select action <b>skip_basedonnamepattern</b> in the Action tab of 
+				the File Action Manager for Skip_NamePattern.fps.</li> 
+         			<li>Press the Start button. 
+         			<li>Confirm that the Name column of the <b>Files added or updated in 
+				the queue recently</b> display area of Queue Log shows only 
+				TestImage.tif and TestImageB.tif, each in a separate row. 
+         			<li>Confirm that TestImage005.tif, TestImage009.tif, TestImage015.tif, 
+				and TestImage020.tif do not show up in the Name column of the <b>Files 
+				added or updated in the queue recently</b> display area.
+      			</ul> 
+<p>
+	      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+        	  	<b>Tag condition</b>.</li>
+      			<ul> 
+         			<li>Confirm that pressing the Configure button in the Select Skip 
+				Condition dialog brings up the <b>Configure Tag condition</b> 
+				dialog.</li>
+        	    		<li>Confirm that there is a combo box for the condition being 
+				considered <b>met</b> or <b>unmet</b>.</li> 
+        	    		<li>Confirm that there is a combo box about different combinations 
+				of the following tags including:
+				<ul>
+					<li>all
+					<li>any
+					<li><b>[LegacyRC #5492]</b> none
+				</ul>
+	            		<li>Confirm that there is a list box with check boxes containing 
+				each tag defined in the database.
+	            		<li>Confirm that each check boxes is initially unchecked.
+        	    		<li>Confirm that settings are persistent.</li> 
+<p>
+				<li>Exercise different combinations of tags and confirm proper 
+				behavior of the following settings.
+				<ul>
+					<li>Condition <b>met</b> with <b>all</b> of the following tags.
+					<li>Condition <b>unmet</b> with <b>all</b> of the following tags.
+					<li>Condition <b>met</b> with <b>any</b> of the following tags.
+					<li>Condition <b>unmet</b> with <b>any</b> of the following tags.
+					<li>Condition <b>met</b> with <b>none</b> of the following tags.
+					<li>Condition <b>unmet</b> with <b>none</b> of the following tags.
+				</ul>
+     			</ul>
+<p>
+	      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+        	  	<b>Task condition</b>.</li>
+      			<ul> 
+         			<li>Confirm that pressing the Configure button in the Select Skip 
+				Condition dialog brings up the <b>Configure Task condition</b> 
+				dialog.</li>
+        	    		<li>Confirm that there is a label about the condition being 
+				considered met.</li> 
+        	    		<li>Confirm that there is a combo box containing different 
+				<b>FAM task</b> objects.</li> 
+	            		<li>Confirm that there is an associated <b>Configure...</b> button 
+				that brings up the appropriate property page.</li>
+        	    		<li>Confirm that there is a <b>Log exceptions generated by the 
+				selected task</b> check box.</li> 
+        	    		<li>Confirm that the check box is <b>checked</b> by default.</li> 
+        	    		<li>Confirm that settings are persistent.</li> 
+<p>
+				<li>Confirm that the <b>Task condition</b> can be both met and 
+				not met for each task object.
+				<ul>
+					<li>Add watermark
+					<li>Archive or restore associated file
+					<li>Cleanup image
+					<li>Conditionally execute task(s)
+					<li>Convert to searchable PDF
+					<li>Convert VOA to XML
+					<li>Copy, move or delete file
+					<li>Execute rules
+					<li>Filter ID Shield data file - ID Shield only
+					<li>Manage tags
+					<li>OCR document
+					<li>Redact images (no verification) - ID Shield only
+					<li>Set file action status in database
+					<li>Verify extracted data - LabDE only
+					<li>Verify redactions - ID Shield only
+				</ul>
+     			</ul>
+		</ul>
+	</ul>
+<p>
+   	<li><h3>Miscellaneous</h3>
+	<ul>
+		<li><b>[LegacyRC #4791]</b> FAM Condition still executes after being removed.
+		<ul>
+		   	<li>Open an existing <b>FPS</b> file.  Confirm that it properly executes files. 
+		   	<li> Configure a skip condition that will always be true (i.e. <b>File 
+			Existence</b> on <b>&lt;SourceDocName&gt;</b>).
+		   	<li><b>[LegacyRC #4316]</b> Confirm that <b>Double-click</b> of the Skip Condition edit 
+			box displays the <b>configuration</b> dialog.
+	   		<li><b>[LegacyRC #4316]</b> Confirm that <b>Alt+Double-click</b> of the Skip Condition edit 
+			box displays the <b>Configure description</b> dialog.
+		   	<li><b>[LegacyRC #4316]</b> Confirm that <b>Ctrl+Double-click</b> of the Skip Condition edit 
+			box displays the <b>Select SKip condition</b> dialog.
+		   	<li>Reselect a skip condition of <b>&lt;NONE&gt;</b>.
+		   	<li>Run the <b>FPS</b> file.
+	   		<li>Confirm that <b>all</b> files are added to the queue.
+		</ul>
 	</ul>
 </ul>
 </body>
