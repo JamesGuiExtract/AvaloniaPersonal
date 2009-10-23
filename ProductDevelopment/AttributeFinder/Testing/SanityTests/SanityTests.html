@@ -7,7 +7,7 @@
 
 <body>
 
-<h1>File Action Manager NEW Sanity Test<br>
+<h1>FLEX Index / ID Shield FAM Sanity Test<br>
 <img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
@@ -83,8 +83,17 @@
 		<ul>
 			<li>Open <b>Verify.fps</b> and start processing.
 			<li>Verify a few files and add several manual redactions.
+			<li>Confirm that redactions can be deleted.
+			<li>Confirm that redactions can be rotated.
 			<li>Navigate to previously verified documents and add additional manual redactions.
 			<li>Confirm that the latest manual redactions are properly saved. 
+			<li>Skip a few files during verification.
+			<li>Tag some files during verification.
+			<li>Provide comments for some files during verification.
+			<li>Confirm that reports correctly indicate which files were <b>skipped</b>.
+			<li>Confirm that reports correctly indicate which files were <b>tagged</b>.
+			<li>Confirm that reports correctly indicate which files were <b>commented</b>.
+			<li>Modify the FPS file to process the skipped files.
 			<li>Finish verifying the sensitive documents and confirm that the verification UI 
 			automatically closes.
 		</ul>
@@ -112,6 +121,61 @@
 		</ul>
 	</ul>
 <p>
+	<li><h2>New Features</h2>
+	<ul>
+		<li><b>Automatic detection and handling of stuck files</b>
+		<ul>
+	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+			<b>AutoRevertLockedFiles</b> set to <b>1</b>.
+	      		<li>Prepare a collection of files for processing with 
+			<b>Execute rules</b>.
+	      		<li>Use Task Manager to kill <b>ProcessFiles.exe</b> 
+			while documents are being processed.
+	      		<li>Use <b>DB Admin</b> to confirm that some files 
+			are stuck in <b>Processing</b>.
+	      		<li>Use <b>DB Admin</b> after auto-reversion to confirm that 
+			the files are back in <b>Pending</b> mode.
+		</ul>
+		<li><b>Find and redact user text or regular expression</b>
+		<ul>
+	      		<li>Prepare a collection of files for <b>verification</b>.
+	      		<li>Process the images.
+			<li>Confirm that redactions can be created from user-specified 
+			<b>text</b>.
+			<li>Confirm that redactions can be created from user-specified 
+			<b>regular expressions</b>.
+			<li>Confirm that VOA files show the expected redactions. 
+		</ul>
+		<li><b>Scheduled processing</b>
+		<ul>
+	      		<li>Use <b>DB Admin</b> to add a user counter.
+	      		<li>Prepare a collection of files for processing with 
+			<b>Execute rules</b>.
+	      		<li>Configure the FPS file to use a processing schedule 
+			<ul>
+				<li>Configure processing to not start immediately.
+				<li>Configure processing to stop before all 
+				documents are finished.
+			</ul>
+	      		<li>Process the images.
+	      		<li>Confirm that processing starts and stops on schedule.
+		</ul>
+		<li><b>Support for applying Bates numbers</b>
+		<ul>
+	      		<li>Use <b>DB Admin</b> to add a user counter.
+	      		<li>Prepare a collection of files for processing with 
+			<b>Redact images</b>.
+	      		<li>Add and configure an <b>Apply Bates number task</b>.
+	      		<li>Process the images.
+	      		<li>Confirm that <b>Bates numbers</b> appear on the output 
+			images as expected.
+		</ul>
+		<li><b>Test ID Shield accuracy</b>
+		<ul>
+	      		<li><b>TBD</b>.
+		</ul>
+	</ul>
+<p>
 	<li><h2>General Tools</h2>
 	<ul>
 		<li><b>Database Administration</b>
@@ -131,11 +195,22 @@
 			<li>Confirm that an action can be <b>renamed</b> in the database.
 			<li>Confirm that action status can be <b>modified</b>.
 <p>
+			<li>Confirm that a tag can be <b>added</b> to the database.
+			<li>Confirm that a tag can be <b>modified</b> in the database.
+			<li>Confirm that a tag can be <b>deleted</b> from the database.
+<p>
+			<li>Confirm that a user counter can be <b>added</b> to the database.
+			<li>Confirm that a user counter can be <b>deleted</b> from the database.
+			<li>Confirm that a user counter can be <b>renamed</b> in the database.
+			<li>Confirm that the value of a user counter can be <b>modified</b> 
+			in the database.
+<p>
 			<li>Confirm that the <b>Summary</b> tab displays current counts for the actions 
 			defined in the selected database.
 			<li>Confirm that the <b>Refresh</b> button updates the current counts.
 <p>
 			<li>Confirm that a file list can be <b>exported</b>.
+			<li>Confirm that file processing priority can be <b>modified</b>.
 			<li>Confirm that the <b>File Action Manager</b> can be started from the Tools 
 			menu and that the active database is preselected.
 			<li>Confirm that each available <b>Report</b> can be generated.
@@ -161,25 +236,28 @@
 <p>
 		<li><b>User License</b>
 		<ul>
-			<li>Confirm that the <b>User License</b> application when selected from the start menu starts with empty 
-			<b>Name</b>, <b>Company Name</b>, <b>Phone Number</b> and <b>Email</b> fields.
+			<li>Confirm that the <b>User License</b> application when selected from the 
+			Start menu starts with empty <b>Name</b>, <b>Company Name</b>, <b>Phone 
+			Number</b> and <b>Email</b> fields.
 			<li>Confirm that the <b>User License Key</b> field is populated and read-only.
 			<li>Confirm that one or more of the Extract Systems software products is 
 			available for selection.
 			<li>Confirm that the selected software product includes the appropriate 
 			version number.
-			<li>Confirm that when <b>Name</b>, <b>Company Name</b>, <b>Phone Number</b>, and <b>Email</b> fields and
-			<b>Product</b>, <b>Version</b>, and <b>Type</b> drop-boxes are populated, the<b>
-              &lt;Next&gt;</b> button becomes active.
-          <li>Confirm that selecting the "<b>I use a desktop email application...</b>" radio button and pressing <b>&lt;Next&gt;</b>
-          takes you to step three.
+			<li>Confirm that when <b>Name</b>, <b>Company Name</b>, <b>Phone Number</b>, 
+			and <b>Email</b> fields and <b>Product</b>, <b>Version</b>, and <b>Type</b> 
+			combo boxes are populated, the <b>&lt;Next&gt;</b> button becomes active.
+          		<li>Confirm that selecting the "<b>I use a desktop email application...</b>" 
+			radio button and pressing <b>&lt;Next&gt;</b> takes you to step three.
 			<li>Confirm that <b>here</b> displays an email message to 
 			the specified email address.  Note that email setup can be skipped since the email 
 			will not actually be sent.
-			<li>Confirm that <b>&lt;Show manual license request instructions&gt;</b> takes you to the correct page.
-			<li>Confirm that the earlier "<b>I use web based email on this machine</b>" option also takes you to the manual license request
-			instructions.
-			<li>Confirm that the three buttons copy the appropriate information onto the clipboard.
+			<li>Confirm that <b>&lt;Show manual license request instructions&gt;</b> 
+			takes you to the correct page.
+			<li>Confirm that the earlier "<b>I use web based email on this machine</b>" 
+			option also takes you to the manual license request instructions.
+			<li>Confirm that the three buttons copy the appropriate information onto 
+			the clipboard.
 		</ul>
 	</ul>
 <p>
@@ -211,6 +289,7 @@
 				<li>Confirm that an angular swipe of text OCRs properly.
 				<li>Confirm that a rectangular swipe of text OCRs properly.
 				<li>Confirm that a highlight can be deleted.
+				<li>Confirm that thumbnails are available for a multi-page image.
 			</ul>
 <p>
 			<li><b>PDF image</b>
@@ -221,6 +300,7 @@
 				<li>Confirm that an angular swipe of text OCRs properly.
 				<li>Confirm that a rectangular swipe of text OCRs properly.
 				<li>Confirm that a highlight can be deleted.
+				<li>Confirm that thumbnails are available for a multi-page image.
 			</ul>
 		</ul>
 <p>
@@ -248,6 +328,8 @@
 			<li>Confirm that the <b>UEX Viewer</b> opens the current exception log.
 			<li>Confirm that if older UEX files are present, the file navigation buttons 
 			successfully open other UEX files.
+			<li>Confirm that debug information can be exported to a user-specified 
+			text file.
 		</ul>
 <p>
 		<li><b>VOA Viewer</b>
