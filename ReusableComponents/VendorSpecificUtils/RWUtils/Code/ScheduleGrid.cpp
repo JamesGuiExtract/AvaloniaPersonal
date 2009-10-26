@@ -175,7 +175,7 @@ void ScheduleGrid::PrepareGrid()
 		SetColCount(8);
 
 		SetColWidth(1, 8, 50);
-		for( int i = 1; i <= vecCol.size(); i++)
+		for (unsigned int i = 1; i <= vecCol.size(); i++)
 		{
 			SetStyleRange(CGXRange( 0, i ),
 				ColHeaderStyle()
@@ -186,7 +186,7 @@ void ScheduleGrid::PrepareGrid()
 		}
 
 		// Set row Header labels
-		for (int j = 1; j <= vecRow.size(); j++)
+		for (unsigned int j = 1; j <= vecRow.size(); j++)
 		{
 			SetStyleRange(CGXRange( j, 1 ),
 				RowHeaderStyle()
