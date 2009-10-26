@@ -223,8 +223,11 @@
 <p>
 	<LI><h2>Support For Deleting Redactions During Verification (#11)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>SCRs:</b> N/A
+  	   	<LI><b>Details:</b> Current verification customers must turn off an unwanted 
+		redaction but it remains in the grid view.  The preferred behavior is for the 
+		user to be able to select one or more redactions and delete them.  Deletion 
+		should be possible both from the grid view and from the Image Viewer.
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
@@ -232,14 +235,33 @@
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
+	      		<li>Prepare some files for verification.
+	      		<li>Verify the files, and add some manual redactions.
+	      		<li>Confirm that each of the following can be deleted via the <b>grid</b>. 
+			<ul>
+		      		<li>Sensitive items found by the rules on the active document.
+		      		<li>Manual redactions on the active document.
+		      		<li>Sensitive items found by the rules on a previous document.
+		      		<li>Manual redactions on a previous document.
+			</ul>
+	      		<li>Confirm that each of the following can be deleted via the <b>Image 
+			Viewer</b>. 
+			<ul>
+		      		<li>Sensitive items found by the rules on the active document.
+		      		<li>Manual redactions on the active document.
+		      		<li>Sensitive items found by the rules on a previous document.
+		      		<li>Manual redactions on a previous document.
+			</ul>
 	       	</ul>
        	</ul>
 <p>
 	<LI><h2>Add Support For Rotating Redactions (#16)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>SCRs:</b> N/A
+  	   	<LI><b>Details:</b> Current verification customers must turn off a redaction 
+		that is in the wrong place or is the wrong size. These redactions remain in the 
+		grid view.  The preferred behavior is for the user to be able to select a 
+		redaction and move, resize or rotate it.
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
@@ -247,7 +269,29 @@
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
+	      		<li>Prepare some files for verification.
+	      		<li>Verify the files, and add some manual redactions.
+	      		<li>Confirm that each of the following can be <b>moved</b>. 
+			<ul>
+		      		<li>Sensitive items found by the rules on the active document.
+		      		<li>Manual redactions on the active document.
+		      		<li>Sensitive items found by the rules on a previous document.
+		      		<li>Manual redactions on a previous document.
+			</ul>
+	      		<li>Confirm that each of the following can be <b>resized</b>. 
+			<ul>
+		      		<li>Sensitive items found by the rules on the active document.
+		      		<li>Manual redactions on the active document.
+		      		<li>Sensitive items found by the rules on a previous document.
+		      		<li>Manual redactions on a previous document.
+			</ul>
+	      		<li>Confirm that each of the following can be <b>rotated</b>. 
+			<ul>
+		      		<li>Sensitive items found by the rules on the active document.
+		      		<li>Manual redactions on the active document.
+		      		<li>Sensitive items found by the rules on a previous document.
+		      		<li>Manual redactions on a previous document.
+			</ul>
 	       	</ul>
        	</ul>
 <p>
