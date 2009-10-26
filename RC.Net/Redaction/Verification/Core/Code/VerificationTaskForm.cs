@@ -6,6 +6,7 @@ using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Security.Permissions;
@@ -52,9 +53,19 @@ namespace Extract.Redaction.Verification
         readonly InitializationSettings _iniSettings = new InitializationSettings();
 
         /// <summary>
+        /// The file corresponding to the currently open vector of attributes (VOA) file.
+        /// </summary>
+        readonly VerificationFile _currentVoa;
+
+        /// <summary>
         /// The file processing database.
         /// </summary>
-        FileProcessingDB _database;
+        FileProcessingDB _fileDatabase;
+
+        /// <summary>
+        /// Wrapper around <see cref="_fileDatabase"/> for ID Shield specific functionality.
+        /// </summary>
+        IDShieldProductDBMgr _idShieldDatabase;
 
         /// <summary>
         /// The settings for the user interface.
@@ -71,6 +82,16 @@ namespace Extract.Redaction.Verification
         /// changes have been made to the currently processing document.
         /// </summary>
         VerificationMemento _unsavedMemento;
+
+        /// <summary>
+        /// The time the current displayed image was first displayed.
+        /// </summary>
+        DateTime _screenTimeStart;
+
+        /// <summary>
+        /// The duration of time that has passed since <see cref="_screenTimeStart"/>.
+        /// </summary>
+        Stopwatch _screenTime;
 
         /// <summary>
         /// <see langword="true"/> if the currently processing document has been modified; 
@@ -151,6 +172,8 @@ namespace Extract.Redaction.Verification
                 _imageViewer.DefaultRedactionFillColor = _iniSettings.OutputRedactionColor;
 
                 _options = VerificationOptions.ReadFrom(_iniSettings);
+
+                _currentVoa = new VerificationFile(_iniSettings.ConfidenceLevels);
 
                 // Subscribe to layer object events
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
@@ -239,9 +262,10 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void Commit()
         {
-            SaveRedactionCounts();
+            TimeInterval screenTime = StopScreenTime();
+            Save(screenTime);
 
-            Save();
+            SaveRedactionCounts(screenTime);
 
             AdvanceToNextDocument();
         }
@@ -249,26 +273,53 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Saves the ID Shield redaction counts to the ID Shield database.
         /// </summary>
-        void SaveRedactionCounts()
+        void SaveRedactionCounts(TimeInterval screenTime)
         {
-            // Get the screen time for the current document
-            VerificationMemento memento = GetCurrentDocument();
-            double elapsedSeconds = memento.StopScreenTime();
-
             // Check for null database manager (only add counts to database if it is not null)
             // [FlexIDSCore #3627]
-            if (_database != null)
+            if (_idShieldDatabase != null)
             {
-                // Get the redaction counts
+                // Get all necessary information for the FAM database
+                VerificationMemento memento = GetCurrentDocument();
                 RedactionCounts counts = _redactionGridView.GetRedactionCounts();
 
-                // Create the IDShieldDB manager and add the data
-                IDShieldProductDBMgrClass idShieldDB = new IDShieldProductDBMgrClass();
-                idShieldDB.FAMDB = _database;
-                idShieldDB.AddIDShieldData(memento.FileId, true, elapsedSeconds, counts.HighConfidence,
-                    counts.MediumConfidence, counts.LowConfidence, counts.Clues, counts.Total,
-                    counts.Manual);
+                // Add the data to the database
+                AddDatabaseData(memento.FileId, counts, screenTime);
             }
+        }
+
+        /// <summary>
+        /// Adds IDShield data to the File Action Manager database.
+        /// </summary>
+        /// <param name="fileId">The unique file ID for the data being added.</param>
+        /// <param name="counts">The counts of redaction categories.</param>
+        /// <param name="screenTime">The time the user spent verifying the redactions.</param>
+        void AddDatabaseData(int fileId, RedactionCounts counts, TimeInterval screenTime)
+        {
+            _idShieldDatabase.AddIDShieldData(fileId, true, screenTime.ElapsedSeconds, 
+                counts.HighConfidence, counts.MediumConfidence, counts.LowConfidence, 
+                counts.Clues, counts.Total, counts.Manual);
+        }
+
+        /// <summary>
+        /// Starts the screen verification time clock.
+        /// </summary>
+        void StartScreenTime()
+        {
+            _screenTimeStart = DateTime.Now;
+            _screenTime = new Stopwatch();
+            _screenTime.Start();
+        }
+
+        /// <summary>
+        /// Stops the screen verification time clock.
+        /// </summary>
+        /// <returns>The total elapsed time of screen verification.</returns>
+        TimeInterval StopScreenTime()
+        {
+            _screenTime.Stop();
+            double elapsedSeconds = _screenTime.ElapsedMilliseconds/1000.0;
+            return new TimeInterval(_screenTimeStart, elapsedSeconds);
         }
 
         /// <summary>
@@ -288,7 +339,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Saves the currently viewed voa file.
         /// </summary>
-        void Save()
+        void Save(TimeInterval screenTime)
         {
             // Collect feedback if necessary
 	        if (ShouldCollectFeedback())
@@ -298,8 +349,8 @@ namespace Extract.Redaction.Verification
 
             // Save the voa
             VerificationMemento memento = GetSavedMemento();
-            _redactionGridView.SaveTo(memento.AttributesFile);
-            
+            SaveAttributesTo(memento.AttributesFile, screenTime);
+
             // Clear the unsaved state
             if (!IsInHistory)
             {
@@ -308,6 +359,19 @@ namespace Extract.Redaction.Verification
 
             // Update visited pages and rows
             UpdateMemento();
+        }
+
+        /// <summary>
+        /// Saves the current vector of attributes file to the specified location.
+        /// </summary>
+        /// <param name="fileName">The location for saved attributes.</param>
+        /// <param name="screenTime">The duration of time spent verifying the document.</param>
+        void SaveAttributesTo(string fileName, TimeInterval screenTime)
+        {
+            string sourceDocument = _imageViewer.ImageFile;
+            VerificationFileChanges changes = _redactionGridView.SaveChanges(sourceDocument);
+
+            _currentVoa.SaveTo(fileName, changes, screenTime, _settings);
         }
 
         /// <summary>
@@ -361,13 +425,15 @@ namespace Extract.Redaction.Verification
                     File.Copy(originalImage, feedbackImage, true);
                 }
 
+                // TODO: Feedback collection should move to separate task
                 // Create a VOA file relative to the image collected for feedback
-                _redactionGridView.SaveTo(feedbackImage + ".voa", feedbackImage);
+                //_redactionGridView.SaveTo(feedbackImage + ".voa", feedbackImage);
             }
             else
             {
+                // TODO: Feedback collection should move to separate task
                 // Create a VOA file relative to the original image
-                _redactionGridView.SaveTo(feedbackImage + ".voa");
+                //_redactionGridView.SaveTo(feedbackImage + ".voa");
             }
         }
 
@@ -526,7 +592,8 @@ namespace Extract.Redaction.Verification
                             return true;
                         }
 
-                        Save();
+                        TimeInterval screenTime = StopScreenTime();
+                        Save(screenTime);
                     }
                 }
             }
@@ -939,9 +1006,12 @@ namespace Extract.Redaction.Verification
                 bool inHistory = IsInHistory;
                 if (!inHistory || !WarnIfDirty())
                 {
-                    SaveRedactionCounts();
-
-                    if (!inHistory)
+                    TimeInterval screenTime = StopScreenTime();
+                    if (inHistory)
+                    {
+                        SaveRedactionCounts(screenTime);
+                    }
+                    else
                     {
                         // Preserve the currently processing document
                         if (_unsavedMemento == null)
@@ -951,8 +1021,8 @@ namespace Extract.Redaction.Verification
 
                         // Save the state of the current document before moving back
                         _dirty = _redactionGridView.Dirty;
-                        _redactionGridView.SaveTo(_unsavedMemento.AttributesFile);
-
+                        SaveAttributesTo(_unsavedMemento.AttributesFile, screenTime);
+                        
                         UpdateMemento();
                     }
 
@@ -977,7 +1047,8 @@ namespace Extract.Redaction.Verification
 
                 if (!WarnIfDirty())
                 {
-                    SaveRedactionCounts();
+                    TimeInterval screenTime = StopScreenTime();
+                    SaveRedactionCounts(screenTime);
 
                     AdvanceToNextDocument();
                 }
@@ -1002,7 +1073,6 @@ namespace Extract.Redaction.Verification
 
                 _skipProcessingToolStripMenuItem.Enabled = !IsInHistory;
                 _saveToolStripMenuItem.Enabled = !IsInHistory;
-
             }
             else
             {
@@ -1025,12 +1095,12 @@ namespace Extract.Redaction.Verification
         /// <param name="memento">The verification user interface state to load.</param>
         void LoadMemento(VerificationMemento memento)
         {
-            string voaFile = memento.AttributesFile;
-            if (File.Exists(voaFile))
-            {
-                 _redactionGridView.LoadFrom(voaFile, memento.VisitedRedactions);
-                 _pageSummaryView.SetVisitedPages(memento.VisitedPages);
-            }
+            // Load the voa
+            _currentVoa.LoadFrom(memento.AttributesFile, _imageViewer.ImageFile);
+
+            // Set the controls
+            _redactionGridView.LoadFrom(_currentVoa, memento.VisitedRedactions);
+            _pageSummaryView.SetVisitedPages(memento.VisitedPages);
         }
 
         /// <summary>
@@ -1038,11 +1108,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void CommitComment()
         {
-            if (_commentChanged && _database != null)
+            if (_commentChanged && _fileDatabase != null)
             {
                 VerificationMemento memento = GetCurrentDocument();
                 string comment = _commentsTextBox.Text;
-                _database.SetFileActionComment(memento.FileId, memento.ActionId, comment);
+                _fileDatabase.SetFileActionComment(memento.FileId, memento.ActionId, comment);
                 _commentChanged = false;
             }
         }
@@ -1053,8 +1123,30 @@ namespace Extract.Redaction.Verification
         /// <param name="memento">The memento for which to retrieve a comment.</param>
         string GetFileActionComment(VerificationMemento memento)
         {
-            return _database == null ? 
-                "" : _database.GetFileActionComment(memento.FileId, memento.ActionId);
+            return _fileDatabase == null ? 
+                "" : _fileDatabase.GetFileActionComment(memento.FileId, memento.ActionId);
+        }
+
+        /// <summary>
+        /// Stores the current file processing database.
+        /// </summary>
+        /// <param name="database">The file processing database to store.</param>
+        void StoreDatabase(FileProcessingDB database)
+        {
+            if (_fileDatabase != database)
+            {
+                if (_fileDatabase != null)
+                {
+                    throw new ExtractException("ELI27972", "File processing database mismatch.");
+                }
+
+                // Store the file processing database
+                _fileDatabase = database;
+
+                // Create the IDShield database wrapper
+                _idShieldDatabase = new IDShieldProductDBMgrClass();
+                _idShieldDatabase.FAMDB = _fileDatabase;
+            }
         }
 
         #endregion VerificationTaskForm Methods
@@ -1084,9 +1176,6 @@ namespace Extract.Redaction.Verification
                 // Next/previous redaction shortcut keys
                 _imageViewer.Shortcuts[Keys.Tab] = SelectNextRedaction;
                 _imageViewer.Shortcuts[Keys.Tab | Keys.Shift] = SelectPreviousRedaction;
-
-                // Set confidence levels
-                _redactionGridView.ConfidenceLevels = _iniSettings.ConfidenceLevels;
             }
             catch (Exception ex)
             {
@@ -1239,7 +1328,10 @@ namespace Extract.Redaction.Verification
                 {
                     _redactionGridView.CommitChanges();
 
-                    Save();
+                    TimeInterval screenTime = StopScreenTime();
+                    Save(screenTime);
+
+                    SaveRedactionCounts(screenTime);
                 }
             }
             catch (Exception ex)
@@ -1265,6 +1357,9 @@ namespace Extract.Redaction.Verification
 
                 if (!WarnIfDirty())
                 {
+                    TimeInterval screenTime = StopScreenTime();
+                    SaveRedactionCounts(screenTime);
+
                     CommitComment();
 
                     OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSkipped));
@@ -1589,7 +1684,7 @@ namespace Extract.Redaction.Verification
                     }
 
                     // Start recording the screen time
-                    memento.StartScreenTime();
+                    StartScreenTime();
                 }
             }
             catch (Exception ex)
@@ -1696,14 +1791,7 @@ namespace Extract.Redaction.Verification
                 }
 
                 // Store the file processing database
-                if (_database == null)
-                {
-                    _database = fileProcessingDB;
-                }
-                else if (_database != fileProcessingDB)
-                {
-                    throw new ExtractException("ELI27972", "File processing database mismatch.");
-                }
+                StoreDatabase(fileProcessingDB);
 
                 // Get the full path of the source document
                 string fullPath = Path.GetFullPath(fileName);
