@@ -2,13 +2,11 @@ using Extract.Drawing;
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Schema;
@@ -32,35 +30,34 @@ namespace Extract.Imaging.Forms
         /// The shortest distance between the layer object and the center point of the link arrow 
         /// in physical (client) pixels.
         /// </summary>
-        static readonly int _LINK_ARROW_DISTANCE = 13;
+        const int _LINK_ARROW_DISTANCE = 13;
 
         /// <summary>
         /// Half the length of one side of a link arrow in physical (client) pixels.
         /// </summary>
-        static readonly int _HALF_LINK_ARROW_SIDE = 8;
+        const int _HALF_LINK_ARROW_SIDE = 8;
 
         /// <summary>
         /// The distance to expand the bounds of a layer object to encapsulate a link arrow on one 
         /// side in physical (client) coordinates.
         /// </summary>
-        static readonly int _LINK_ARROW_EXPAND_DISTANCE = 
+        const int _LINK_ARROW_EXPAND_DISTANCE = 
             _LINK_ARROW_DISTANCE + _HALF_LINK_ARROW_SIDE;
 
         /// <summary>
         /// Half the length of one side of a grip handle in physical (client) pixels.
         /// </summary>
-        private static readonly int _HALF_GRIP_HANDLE_SIDE = 4;
+        const int _HALF_GRIP_HANDLE_SIDE = 4;
 
         /// <summary>
         /// The minimum height and width of a layer object in logical (image) pixels.
         /// </summary>
-        private static readonly Size _MIN_SIZE = new Size(1, 1);
+        static readonly Size _MIN_SIZE = new Size(1, 1);
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(LayerObject).ToString();
+        static readonly string _OBJECT_NAME = typeof(LayerObject).ToString();
 
         #endregion LayerObject Constants
 
@@ -135,7 +132,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The tags applied to the layer object.
         /// </summary>
-        List<string> _tags = new List<string>();
+        readonly List<string> _tags = new List<string>();
 
         /// <summary>
         /// <see langword="true"/> if the layer object is visible; <see langword="false"/> if this
@@ -165,7 +162,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// License cache for validating the license.
         /// </summary>
-        static LicenseStateCache _licenseCache =
+        static readonly LicenseStateCache _licenseCache =
             new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
 
         #endregion LayerObject Fields
@@ -245,21 +242,6 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="imageViewer">The <see cref="ImageViewer"/> that this
         /// <see cref="LayerObject"/> is associated with.</param>
-        /// <param name="pageNumber">The one-based page number where this <see cref="LayerObject"/>
-        /// is found.</param>
-        /// <param name="tags">A <see cref="IEnumerable{T}"/> of tags associated with this
-        /// <see cref="LayerObject"/>.</param>
-        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
-        protected LayerObject(ImageViewer imageViewer, int pageNumber, IEnumerable<string> tags)
-            : this(imageViewer, pageNumber, tags, "")
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LayerObject"/> class.
-        /// </summary>
-        /// <param name="imageViewer">The <see cref="ImageViewer"/> that this
-        /// <see cref="LayerObject"/> is associated with.</param>
         /// <param name="pageNumber">The page that this <see cref="LayerObject"/> is on.</param>
         /// <param name="tags">A <see cref="IEnumerable{T}"/> of tags associated with this
         /// <see cref="LayerObject"/>.</param>
@@ -301,7 +283,6 @@ namespace Extract.Imaging.Forms
         /// Gets or sets the revision number of the layer object.
         /// </summary>
         /// <value>The revision number of the layer object.</value>
-        /// <returns>The revision number of the layer object.</returns>
         [Category("Modifications")]
         [Description("The number of times this object has been revised.")]
         public int Revision
@@ -341,7 +322,7 @@ namespace Extract.Imaging.Forms
                     _dirty = value;
 
                     // Raise the LayerObjectChanged event if necessary
-                    if (_dirty == true && _imageViewer != null)
+                    if (_dirty && _imageViewer != null)
                     {
                         _imageViewer.LayerObjects.RaiseLayerObjectChangedEvent(this);
                     }
@@ -509,9 +490,9 @@ namespace Extract.Imaging.Forms
                 _isSelectable = value;
 
                 // Unselect the layer object if it is now unselectable
-                if (_isSelectable == false && _isSelected)
+                if (!_isSelectable && _isSelected)
                 {
-                    this.Selected = false;
+                    Selected = false;
                 }
             }
         }
@@ -694,7 +675,7 @@ namespace Extract.Imaging.Forms
         /// Gets the next unique id for an object.
         /// </summary>
         /// <returns>The next unique id for an object.</returns>
-        static internal long GetNextId()
+        static long GetNextId()
         {
             return _nextId++;
         }
@@ -711,6 +692,7 @@ namespace Extract.Imaging.Forms
         public static void ResetNextId()
         {
             _nextId = 1;
+
         }
 
         /// <overloads>Paints the layer object using the specified <see cref="Graphics"/> object.
@@ -780,7 +762,7 @@ namespace Extract.Imaging.Forms
         /// </param>
         /// <returns><see langword="true"/> if the point is close to the layer object or one of 
         /// its link arrows; <see langword="false"/> otherwise.</returns>
-        public virtual bool HitLinkAreaTest(Point point)
+        public bool HitLinkAreaTest(Point point)
         {
             try
             {
@@ -853,12 +835,12 @@ namespace Extract.Imaging.Forms
         /// coordinates.</param>
         /// <returns>The zero-based link arrow id that contains the specified point or -1 if no 
         /// link arrow contains the specified point.</returns>
-        public virtual int GetLinkArrowId(Point point)
+        public int GetLinkArrowId(Point point)
         {
             try
             {
                 // Ensure the layer object is linked
-                if (!this.IsLinked)
+                if (!IsLinked)
                 {
                     return -1;
                 }
@@ -873,7 +855,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Check if the mouse is over the previous link arrow
-                if (this.PreviousLink != null &&
+                if (PreviousLink != null &&
                     Math.Abs(linkArrows[0].X - point.X) <= _HALF_LINK_ARROW_SIDE &&
                     Math.Abs(linkArrows[0].Y - point.Y) <= _HALF_LINK_ARROW_SIDE)
                 {
@@ -881,7 +863,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Check if the mouse is over the next link arrow
-                if (this.NextLink != null &&
+                if (NextLink != null &&
                     Math.Abs(linkArrows[1].X - point.X) <= _HALF_LINK_ARROW_SIDE &&
                     Math.Abs(linkArrows[1].Y - point.Y) <= _HALF_LINK_ARROW_SIDE)
                 {
@@ -1013,7 +995,7 @@ namespace Extract.Imaging.Forms
                     }
 
                     // Start the tracking event
-                    this.TrackingData = new TrackingData(_imageViewer, mouse[0].X, mouse[0].Y,
+                    TrackingData = new TrackingData(_imageViewer, mouse[0].X, mouse[0].Y,
                         _imageViewer.GetTransformedRectangle(_imageViewer.GetVisibleImageArea(), true));
 
                     // Store the spatial data associated with the layer object
@@ -1076,10 +1058,10 @@ namespace Extract.Imaging.Forms
             UpdateTracking(mouseX, mouseY);
 
             // Set the dirty flag
-            this.Dirty = true;
+            Dirty = true;
 
             // Reset the tracking data
-            this.TrackingData = null;
+            TrackingData = null;
         }
 
         /// <summary>
@@ -1166,7 +1148,7 @@ namespace Extract.Imaging.Forms
                 // Iterate through each grip center
                 for (int i = 0; i < gripPoints.Length; i++)
                 {
-                    LayerObject.DrawGripHandle(graphics, gripPoints[i]);
+                    DrawGripHandle(graphics, gripPoints[i]);
                 }
             }
             catch (Exception ex)
@@ -1180,7 +1162,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="graphics">The graphics with which to draw. Cannot be 
         /// <see langword="null"/>.</param>
-        public virtual void DrawLinkArrows(Graphics graphics)
+        public void DrawLinkArrows(Graphics graphics)
         {
             try
             {
@@ -1255,7 +1237,7 @@ namespace Extract.Imaging.Forms
         public virtual void CancelTracking()
         {
             Restore();
-            this.TrackingData = null;
+            TrackingData = null;
         }
 
         /// <summary>
@@ -1276,7 +1258,7 @@ namespace Extract.Imaging.Forms
         /// (client) coordinates.</returns>
         // This method performs a calculation, so is better suited as a method.
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public virtual Rectangle GetLinkArea()
+        public Rectangle GetLinkArea()
         {
             try
             {
@@ -1292,14 +1274,14 @@ namespace Extract.Imaging.Forms
                 }
 
                 // If the there is previous link arrow, expand to the left
-                if (this.PreviousLink != null)
+                if (PreviousLink != null)
                 {
                     linkArea.Offset(-_LINK_ARROW_EXPAND_DISTANCE, 0);
                     linkArea.Width += _LINK_ARROW_EXPAND_DISTANCE;
                 }
 
                 // If there is a next link arrow, expand to the right
-                if (this.NextLink != null)
+                if (NextLink != null)
                 {
                     linkArea.Width += _LINK_ARROW_EXPAND_DISTANCE;
                 }
@@ -1328,7 +1310,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Get the bounding rectangle
-                Rectangle bounds = this.GetBounds();
+                Rectangle bounds = GetBounds();
 
                 // Get the top left of the rectangle
                 Point centerPoint = bounds.Location;
@@ -1389,8 +1371,8 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Returns true iff the object is visible and on the currently visible page
-                return this.Visible && _imageViewer != null
-                    && _imageViewer.PageNumber == this.PageNumber;
+                return Visible && _imageViewer != null
+                    && _imageViewer.PageNumber == PageNumber;
             }
             catch (Exception ex)
             {
@@ -1408,14 +1390,13 @@ namespace Extract.Imaging.Forms
         /// <returns><see langword="true"/> if this <see cref="LayerObject"/> is completely
         /// contained within <paramref name="rectangle"/> on <paramref name="pageNumber"/> and
         /// <see langword="false"/> otherwise.</returns>
-        public virtual bool IsContained(Rectangle rectangle, int pageNumber)
+        public bool IsContained(Rectangle rectangle, int pageNumber)
         {
             try
             {
                 // Return true if this object is completely contained by the specified rectangle
                 // on the specified page
-                return this.PageNumber == pageNumber
-                    && rectangle.Contains(this.GetBounds());
+                return PageNumber == pageNumber && rectangle.Contains(GetBounds());
             }
             catch (Exception ex)
             {
@@ -1433,7 +1414,7 @@ namespace Extract.Imaging.Forms
         /// <see langword="null"/>.</exception>
         /// <exception cref="ExtractException">If <paramref name="newLayerObject"/>
         /// <see cref="LayerObject.Id"/> equals this <see cref="LayerObject.Id"/>.</exception>
-        public virtual void AddLink(LayerObject newLayerObject)
+        public void AddLink(LayerObject newLayerObject)
         {
             try
             {
@@ -1443,7 +1424,7 @@ namespace Extract.Imaging.Forms
 
                 // Ensure not a self reference
                 ExtractException.Assert("ELI22526", "Object cannot link to itself!",
-                    this.Id != newLayerObject.Id);
+                    Id != newLayerObject.Id);
 
                 // Get the first linked object connected to the new layer object
                 LayerObject firstObject = newLayerObject;
@@ -1458,7 +1439,7 @@ namespace Extract.Imaging.Forms
                 while (firstObject != null)
                 {
                     // Ensure we don't try to add a self-reference
-                    if (firstObject.Id != this.Id)
+                    if (firstObject.Id != Id)
                     {
                         objectsToLink.Add(firstObject);
                     }
@@ -1560,7 +1541,7 @@ namespace Extract.Imaging.Forms
         /// After remove B: A &lt;-&gt; C and
         /// <see langword="null"/> &lt;-&gt; B &lt;-&gt; <see langword="null"/>.
         /// </summary>
-        public virtual void RemoveLinks()
+        public void RemoveLinks()
         {
             try
             {
@@ -1582,7 +1563,7 @@ namespace Extract.Imaging.Forms
                 // Set both the next and previous links to null
                 _nextLink = null;
                 _previousLink = null;
-                this.Dirty = true;
+                Dirty = true;
             }
             catch (Exception ex)
             {
@@ -1595,10 +1576,10 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="layerObject">The <see cref="LayerObject"/> to set as the
         /// <see cref="NextLink"/>.</param>
-        private void SetNextLink(LayerObject layerObject)
+        void SetNextLink(LayerObject layerObject)
         {
             _nextLink = layerObject;
-            this.Dirty = true;
+            Dirty = true;
         }
 
         /// <summary>
@@ -1606,10 +1587,10 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="layerObject">The <see cref="LayerObject"/> to set as the
         /// <see cref="PreviousLink"/>.</param>
-        private void SetPreviousLink(LayerObject layerObject)
+        void SetPreviousLink(LayerObject layerObject)
         {
             _previousLink = layerObject;
-            this.Dirty = true;
+            Dirty = true;
         }
 
         #endregion LayerObject Methods
@@ -1659,7 +1640,7 @@ namespace Extract.Imaging.Forms
         public virtual int CompareTo(LayerObject other)
         {
             // Check the page number of this object
-            int returnVal = this.PageNumber.CompareTo(other.PageNumber);
+            int returnVal = PageNumber.CompareTo(other.PageNumber);
 
             // 0 indicates they are on the same page
             if (returnVal == 0)
@@ -1669,25 +1650,25 @@ namespace Extract.Imaging.Forms
                 if (HorizontallyOverlap(other))
                 {
                     // Check the left point
-                    returnVal = this.Location.X.CompareTo(other.Location.X);
+                    returnVal = Location.X.CompareTo(other.Location.X);
 
                     // 0 indicates the X values are the same
                     if (returnVal == 0)
                     {
                         // Check the top point
-                        returnVal = this.Location.Y.CompareTo(other.Location.Y);
+                        returnVal = Location.Y.CompareTo(other.Location.Y);
                     }
                 }
                 else
                 {
                     // Check the Top point
-                    returnVal = this.Location.Y.CompareTo(other.Location.Y);
+                    returnVal = Location.Y.CompareTo(other.Location.Y);
 
                     // 0 indicates the Y value is the same
                     if (returnVal == 0)
                     {
                         // Check the Left point
-                        returnVal = this.Location.X.CompareTo(other.Location.X);
+                        returnVal = Location.X.CompareTo(other.Location.X);
                     }
                 }
             }
@@ -1696,7 +1677,7 @@ namespace Extract.Imaging.Forms
             if (returnVal == 0)
             {
                 // Compare the center points
-                Point thisCenter = this.GetCenterPoint();
+                Point thisCenter = GetCenterPoint();
                 Point otherCenter = other.GetCenterPoint();
 
                 // Compare top point first
@@ -1714,7 +1695,7 @@ namespace Extract.Imaging.Forms
             if (returnVal == 0)
             {
                 // Compare the unique ID's
-                returnVal = this.Id.CompareTo(other.Id);
+                returnVal = Id.CompareTo(other.Id);
             }
 
             return returnVal;
@@ -1776,7 +1757,7 @@ namespace Extract.Imaging.Forms
         /// <see langword="false"/> otherwise.</returns>
         public static bool operator ==(LayerObject layerObject1, LayerObject layerObject2)
         {
-            if (object.ReferenceEquals(layerObject1, layerObject2))
+            if (ReferenceEquals(layerObject1, layerObject2))
             {
                 return true;
             }
