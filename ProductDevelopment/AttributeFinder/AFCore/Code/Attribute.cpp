@@ -316,7 +316,7 @@ STDMETHODIMP CAttribute::put_Type(BSTR newVal)
 		for (unsigned int ui = 0; ui < vecTypes.size(); ui++)
 		{
 			// Get the Type
-			string strThisType = vecTypes[ui];
+			const string& strThisType = vecTypes[ui];
 
 			// Check length
 			if (strThisType.length() == 0)
@@ -326,10 +326,6 @@ STDMETHODIMP CAttribute::put_Type(BSTR newVal)
 				ue.addDebugInfo( "Type", strValue );
 				throw ue;
 			}
-
-			// Check that Type is a valid Identifier
-			// since Names must be storable in the Type field
-			validateIdentifier( strThisType );
 		}
 
 		// Type must be valid
