@@ -1,4 +1,3 @@
-using Extract.AttributeFinder;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using System;
@@ -6,15 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Security.Permissions;
-using System.Text;
 using System.Windows.Forms;
-using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
@@ -26,7 +19,7 @@ namespace Extract.Redaction.Verification
     /// <summary>
     /// Represents a <see cref="DataGridView"/> that displays information about redactions.
     /// </summary>
-    public partial class RedactionGridView : UserControl, IImageViewerControl
+    public sealed partial class RedactionGridView : UserControl, IImageViewerControl
     {
         #region RedactionGridView Enums
 
@@ -71,7 +64,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Directory where exemption code xml files are stored.
         /// </summary>
-        static readonly string _EXEMPTION_DIRECTORY =
+        const string _EXEMPTION_DIRECTORY =
 #if DEBUG
             "..\\..\\ProductDevelopment\\AttributeFinder\\IndustrySpecific\\Redaction\\RedactionCustomComponents\\ExemptionCodes";
 #else
@@ -107,7 +100,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Each row of the <see cref="RedactionGridView"/> which represents a redaction.
         /// </summary>
-        BindingList<RedactionGridViewRow> _redactions = new BindingList<RedactionGridViewRow>();
+        readonly BindingList<RedactionGridViewRow> _redactions = new BindingList<RedactionGridViewRow>();
 
         /// <summary>
         /// A dialog that allows the user to select exemption codes.
@@ -132,20 +125,14 @@ namespace Extract.Redaction.Verification
         string _lastType = "";
 
         /// <summary>
-        /// The confidence levels of attributes in the <see cref="RedactionGridView"/>.
-        /// </summary>
-        ConfidenceLevelsCollection _levels;
-
-        /// <summary>
-        /// COM attributes that are not displayed in the redaction grid but are carried forward 
-        /// when the vector of attributes is saved.
-        /// </summary>
-        List<ComAttribute> _undisplayedAttributes;
-
-        /// <summary>
         /// Keeps track of the count of categories of deleted redactions.
         /// </summary>
-        int[] _deleted = new int[_CATEGORIES.Length];
+        readonly int[] _deletedCategoryCounts = new int[_CATEGORIES.Length];
+
+        /// <summary>
+        /// The attributes corresponding to rows deleted since the last save.
+        /// </summary>
+        readonly List<ComAttribute> _deletedAttributes = new List<ComAttribute>();
 
         /// <summary>
         /// The tool to automatically select after a redaction has been created.
@@ -335,38 +322,6 @@ namespace Extract.Redaction.Verification
             get
             {
                 return _redactions.Count > 0;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the levels of confidence associated with attributes in the 
-        /// <see cref="RedactionGridView"/>.
-        /// </summary>
-        /// <value>The levels of confidence associated with attributes in the 
-        /// <see cref="RedactionGridView"/>.</value>
-        /// <returns>The levels of confidence associated with attributes in the 
-        /// <see cref="RedactionGridView"/>.</returns>
-        // ConfidenceLevelsCollection IS a read only collection.
-        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ConfidenceLevelsCollection ConfidenceLevels
-        {
-            get
-            {
-                return _levels;
-            }
-            set
-            {
-                try
-                {
-                    _levels = value;
-                }
-                catch (Exception ex)
-                {
-                    throw new ExtractException("ELI27273",
-                        "Unable to set data confidence level.", ex);
-                }
             }
         }
 
@@ -606,12 +561,21 @@ namespace Extract.Redaction.Verification
         /// <param name="row">The row that is being deleted.</param>
         void AddToDeletedCount(RedactionGridViewRow row)
         {
-            // Check if this category of redaction should be tracked
-            // Note: Deleted manual redactions are not tracked
             int index = GetCategoryIndex(row);
-            if (index >= 0 && index != (int)CategoryIndex.Manual)
+            if (index >= 0)
             {
-                _deleted[index]++;
+                // Store this deleted attribute if it was created in a previous session
+                if (!row.IsNew)
+                {
+                    _deletedAttributes.Add(row.ComAttribute);
+                }
+
+                // Check if this category of redaction should be counted
+                // Note: Deleted manual redactions are not counted
+                if (index != (int) CategoryIndex.Manual)
+                {
+                    _deletedCategoryCounts[index]++;
+                }
             }
         }
 
@@ -623,8 +587,7 @@ namespace Extract.Redaction.Verification
         /// <paramref name="row"/> does not correspond to a <see cref="CategoryIndex"/>.</returns>
         static int GetCategoryIndex(RedactionGridViewRow row)
         {
-            return Array.BinarySearch<string>(_CATEGORIES, row.Category, 
-                StringComparer.OrdinalIgnoreCase);
+            return Array.BinarySearch(_CATEGORIES, row.Category, StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -818,8 +781,8 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="pageNumber">The page on which the selected layer objects appear.</param>
         /// <returns>The smallest bounding rectangle around all selected layer objects on 
-        /// <paramref name="page"/>; or <see cref="Rectangle.Empty"/> if no layer objects are 
-        /// selected on <paramref name="page"/>.</returns>
+        /// <paramref name="pageNumber"/>; or <see cref="Rectangle.Empty"/> if no layer objects 
+        /// are selected on <paramref name="pageNumber"/>.</returns>
         Rectangle GetSelectedBoundsOnPage(int pageNumber)
         {
             // Iterate over each layer object on the page
@@ -949,10 +912,10 @@ namespace Extract.Redaction.Verification
         /// Loads the rows of the <see cref="RedactionGridView"/> based on the specified vector of 
         /// attributes file.
         /// </summary>
-        /// <param name="fileName">A file containing a vector of attributes.</param>
+        /// <param name="file">A file containing a vector of attributes.</param>
         /// <param name="visitedRows">The rows to mark as visited; or <see langword="null"/> if 
         /// all rows should be marked as visited.</param>
-        public void LoadFrom(string fileName, VisitedItemsCollection visitedRows)
+        public void LoadFrom(VerificationFile file, VisitedItemsCollection visitedRows)
         {
             try
             {
@@ -970,23 +933,14 @@ namespace Extract.Redaction.Verification
                     // Reset the attributes
                     _redactions.Clear();
                     _imageViewer.LayerObjects.Clear();
-                    _undisplayedAttributes = new List<ComAttribute>();
-                    for (int i = 0; i < _deleted.Length; i++)
+                    _deletedAttributes.Clear();
+                    for (int i = 0; i < _deletedCategoryCounts.Length; i++)
                     {
-                        _deleted[i] = 0;
+                        _deletedCategoryCounts[i] = 0;
                     }
 
-                    // Load the attributes from the file
-                    IUnknownVector attributes = new IUnknownVector();
-                    attributes.LoadFrom(fileName, false);
-
-                    // Query and add attributes at each confidence level
-                    AFUtility utility = new AFUtility();
-                    foreach (ConfidenceLevel level in _levels)
-                    {
-                        IUnknownVector vector = utility.QueryAttributes(attributes, level.Query, true);
-                        AddAttributes(vector, level);
-                    }
+                    // Add attributes at each confidence level
+                    AddAttributesFromFile(file);
 
                     // Sort the redactions spatially
                     ArrayList adapter = ArrayList.Adapter(_redactions);
@@ -1005,14 +959,6 @@ namespace Extract.Redaction.Verification
 
                             MarkAsVisited(rows[i]);
                         }
-                    }
-
-                    // Add any remaining attributes as undisplayed attributes
-                    int count = attributes.Size();
-                    for (int i = 0; i < count; i++)
-                    {
-                        ComAttribute attribute = (ComAttribute)attributes.At(i);
-                        _undisplayedAttributes.Add(attribute);
                     }
 
                     // Clear the selection
@@ -1037,118 +983,63 @@ namespace Extract.Redaction.Verification
             {
                 ExtractException ee = new ExtractException("ELI26761",
                     "Unable to load VOA file.", ex);
-                ee.AddDebugData("Voa file", fileName, false);
+                ee.AddDebugData("Voa file", file == null ? "null object" : file.FileName, false);
                 throw ee;
             }
         }
 
         /// <summary>
-        /// Adds the specified attributes to the <see cref="RedactionGridView"/>.
+        /// Adds attributes from the specified file to the <see cref="RedactionGridView"/>.
         /// </summary>
-        /// <param name="attributes">The attributes to add.</param>
-        /// <param name="level">The confidence level of the <paramref name="attributes"/>.</param>
-        void AddAttributes(IUnknownVector attributes, ConfidenceLevel level)
+        /// <param name="file">The file containing the attributes to add.</param>
+        void AddAttributesFromFile(VerificationFile file)
         {
             // Iterate over the attributes
-            int count = attributes.Size();
-            for (int i = 0; i < count; i++)
+            foreach (VerificationItem item in file.Items)
             {
-                ComAttribute attribute = (ComAttribute)attributes.At(i);
-
                 // Add each attribute
-                RedactionGridViewRow row =
-                    RedactionGridViewRow.FromComAttribute(attribute, _imageViewer, MasterCodes, level);
-                if (row == null)
-                {
-                    _undisplayedAttributes.Add(attribute);
-                }
-                else
-                {
-                    Add(row);
+                RedactionGridViewRow row = 
+                    RedactionGridViewRow.FromVerificationItem(item, _imageViewer, MasterCodes);
+                Add(row);
 
-                    foreach (LayerObject layerObject in row.LayerObjects)
-                    {
-                        _imageViewer.LayerObjects.Add(layerObject);
-                    }
+                foreach (LayerObject layerObject in row.LayerObjects)
+                {
+                    _imageViewer.LayerObjects.Add(layerObject);
                 }
             }
         }
 
-        /// <overloads>Saves the rows of the <see cref="RedactionGridView"/>.</overloads>
         /// <summary>
-        /// Saves the rows of the <see cref="RedactionGridView"/> to the specified vector of 
-        /// attributes file.
+        /// Saves the current uncommitted changes to the verification file.
         /// </summary>
-        /// <param name="fileName">A file to contain a vector of attributes.</param>
-        public void SaveTo(string fileName)
-        {
-            SaveTo(fileName, null);
-        }
-
-        /// <summary>
-        /// Saves the rows of the <see cref="RedactionGridView"/> to the specified vector of 
-        /// attributes file relative to the specified source document.
-        /// </summary>
-        /// <param name="fileName">A file to contain a vector of attributes.</param>
-        /// <param name="sourceDocument">The source document to which the attributes are relative; 
-        /// if <see langword="null"/> the currently viewed source document is used.</param>
-        public void SaveTo(string fileName, string sourceDocument)
+        /// <param name="sourceDocument">The source document to use for changed attributes.</param>
+        /// <returns>The changes saved to the verification file.</returns>
+        public VerificationFileChanges SaveChanges(string sourceDocument)
         {
             try
             {
-                // Get the image information
-                string sourceDocName = sourceDocument ?? _imageViewer.ImageFile;
+                List<ComAttribute> added = new List<ComAttribute>();
+                List<ComAttribute> modified = new List<ComAttribute>();
                 LongToObjectMap pageInfoMap = GetPageInfoMap();
 
-                // Add the undisplayed attributes
-                IUnknownVector attributes = new IUnknownVector();
-                if (_undisplayedAttributes != null)
+                foreach (RedactionGridViewRow row in _redactions)
                 {
-                    foreach (ComAttribute attribute in _undisplayedAttributes)
+                    if (row.IsNew)
                     {
-                        SetSourceDocument(attribute, sourceDocName);
-                        attributes.PushBack(attribute);
+                        added.Add(row.SaveComAttribute(sourceDocument, pageInfoMap));
+                    }
+                    else if (row.IsModified)
+                    {
+                        modified.Add(row.SaveComAttribute(sourceDocument, pageInfoMap));
                     }
                 }
 
-                // Create an attribute for each row
-                foreach (RedactionGridViewRow row in _redactions)
-                {
-                    ComAttribute attribute = row.ToComAttribute(sourceDocName, pageInfoMap);
-                    attributes.PushBack(attribute);
-                }
-
-                // Save the attributes
-                attributes.SaveTo(fileName, false);
-
-                _dirty = false;
+                return new VerificationFileChanges(added, _deletedAttributes, modified);
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI26950",
-                    "Unable to save VOA file.", ex);
-                ee.AddDebugData("Voa file", fileName, false);
-                throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Sets the source document of the specified attribute and its sub attributes.
-        /// </summary>
-        /// <param name="attribute">The attribute that contains the source document to change.</param>
-        /// <param name="sourceDocument">The full path to the new source document.</param>
-        void SetSourceDocument(ComAttribute attribute, string sourceDocument)
-        {
-            attribute.Value.SourceDocName = sourceDocument;
-
-            IIUnknownVector subattributes = attribute.SubAttributes;
-            if (subattributes != null)
-            {
-                int count = subattributes.Size();
-                for (int i = 0; i < count; i++)
-			    {
-                    SetSourceDocument((ComAttribute) subattributes.At(i), sourceDocument);
-			    }
+                throw new ExtractException("ELI28187",
+                    "Unable to calculate file changes.", ex);
             }
         }
 
@@ -1192,6 +1083,7 @@ namespace Extract.Redaction.Verification
         /// <returns>The page info map for the currently open image.</returns>
         LongToObjectMap GetPageInfoMap()
         {
+            // TODO: SetPageNumber is inefficient and should be removed from ImageViewer
             int page = _imageViewer.PageNumber;
             try
             {
@@ -1231,7 +1123,7 @@ namespace Extract.Redaction.Verification
             try
             {
                 // Start with the deleted counts
-                int[] counts = (int[])_deleted.Clone();
+                int[] counts = (int[])_deletedCategoryCounts.Clone();
                 int total = 0;
 
                 // Add counts for categories that still exist
@@ -1594,7 +1486,7 @@ namespace Extract.Redaction.Verification
                 // Sort a copy of the grid rows
                 RedactionGridViewRow[] rows = new RedactionGridViewRow[_redactions.Count];
                 _redactions.CopyTo(rows, 0);
-                Array.Sort<RedactionGridViewRow>(rows, new RedactionGridViewRowComparer());
+                Array.Sort(rows, new RedactionGridViewRowComparer());
 
                 // Construct a visited rows collection from the sorted rows
                 VisitedItemsCollection items = new VisitedItemsCollection(rows.Length);
@@ -1640,7 +1532,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="ExemptionsApplied"/> 
         /// event.</param>
-        protected virtual void OnExemptionsApplied(ExemptionsAppliedEventArgs e)
+        void OnExemptionsApplied(ExemptionsAppliedEventArgs e)
         {
             if (ExemptionsApplied != null)
             {

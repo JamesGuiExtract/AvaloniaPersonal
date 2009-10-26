@@ -4,8 +4,6 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Text;
 using UCLID_COMUTILSLib;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
@@ -105,8 +103,8 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Initializes a new instance of the <see cref="RedactionGridViewRow"/> class.
         /// </summary>
-        RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text, string category, 
-            string type, ComAttribute attribute, ExemptionCodeList exemptions)
+        RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text, 
+            string category, string type, ComAttribute attribute, ExemptionCodeList exemptions)
         {
             _attribute = attribute;
             _layerObjects = new List<LayerObject>(layerObjects);
@@ -275,6 +273,32 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Gets whether the row has been added since the last save.
+        /// </summary>
+        /// <value><see langword="true"/> if the row has been added since the last save;
+        /// <see langword="false"/> if the row existed prior to the last save.</value>
+        public bool IsNew
+        {
+            get
+            {
+                return _attribute == null;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the row has been modified since the last save.
+        /// </summary>
+        /// <value><see langword="true"/> if the row has been modified since the last save;
+        /// <see langword="false"/> if the row has not been modified since the last save.</value>
+        public bool IsModified
+        {
+            get
+            {
+                return _exemptionsDirty || _layerObjectsDirty || _typeDirty;
+            }
+        }
+
         #endregion RedactionGridViewRow Properties
 
         #region RedactionGridViewRow Methods
@@ -352,32 +376,31 @@ namespace Extract.Redaction.Verification
 
         /// <summary>
         /// Creates a <see cref="RedactionGridViewRow"/> with information from the specified 
-        /// attribute.
+        /// <see cref="VerificationItem"/>.
         /// </summary>
-        /// <param name="attribute">The attribute from which to create a 
+        /// <param name="item">The verification item from which to create a 
         /// <see cref="RedactionGridViewRow"/>.</param>
-        /// <param name="imageViewer">The image viewer on which layer objects should be added.</param>
-        /// <param name="masterCodes">The master list of valid exemption codes and categories.</param>
-        /// <param name="level">The confidence level of <paramref name="attribute"/>.</param>
+        /// <param name="imageViewer">The image viewer used for creating layer objects.</param>
+        /// <param name="masterCodes">The list of valid exemption codes.</param>
         /// <returns>A <see cref="RedactionGridViewRow"/> with information from the specified 
-        /// <paramref name="attribute"/> or <see langword="null"/> if the attribute does not 
-        /// contain spatial information.</returns>
-        [CLSCompliant(false)]
-        public static RedactionGridViewRow FromComAttribute(ComAttribute attribute,
-            ImageViewer imageViewer, MasterExemptionCodeList masterCodes, ConfidenceLevel level)
+        /// <paramref name="item"/>.</returns>
+        public static RedactionGridViewRow FromVerificationItem(VerificationItem item, 
+            ImageViewer imageViewer, MasterExemptionCodeList masterCodes)
         {
             try
             {
                 // Can only create row for spatial attribute
+                ComAttribute attribute = item.Attribute;
                 SpatialString value = attribute.Value;
                 if (!value.HasSpatialInfo())
                 {
-                    return null;
+                    throw new ExtractException("ELI28073",
+                        "Cannot create row from non-spatial attribute.");
                 }
 
                 // Get the data for the row from the attribute
                 List<LayerObject> layerObjects = 
-                    GetLayerObjectsFromSpatialString(value, imageViewer, level);
+                    GetLayerObjectsFromSpatialString(value, imageViewer, item.Level);
                 string text = StringMethods.ConvertLiteralToDisplay(value.String);
                 string category = attribute.Name;
                 string type = attribute.Type;
@@ -418,50 +441,25 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <returns>A COM attribute created from the <see cref="RedactionGridViewRow"/>.</returns>
         [CLSCompliant(false)]
-        public ComAttribute ToComAttribute(string sourceDocName, LongToObjectMap pageInfoMap)
+        public ComAttribute SaveComAttribute(string sourceDocument, LongToObjectMap pageInfoMap)
         {
             try
             {
+                // Create a new attribute or update the existing one.
                 if (_attribute == null)
                 {
-                    // Create the spatial string
-                    SpatialString value = GetSpatialString(sourceDocName, pageInfoMap);
-
                     // Create the attribute
-                    ComAttribute attribute = new ComAttribute();
-                    attribute.Value = value;
-                    attribute.Name = _category;
-                    attribute.Type = _type;
-                    
-                    // Set exemptions
-                    SetExemptions(attribute, sourceDocName);
+                    _attribute = CreateComAttribute(sourceDocument, pageInfoMap);
 
-                    _attribute = attribute;
+                    ResetDirtyFlag();
                 }
-                else
+                else if (IsModified)
                 {
-                    if (_layerObjectsDirty)
-                    {
-                        _attribute.Value = GetSpatialString(sourceDocName, pageInfoMap);
-                    }
-                    else
-                    {
-                        _attribute.Value.SourceDocName = sourceDocName;
-                    }
-                    if (_typeDirty)
-                    {
-                        _attribute.Type = _type;
-                    }
-                    if (_exemptionsDirty)
-                    {
-                        // Set exemptions
-                        SetExemptions(_attribute, sourceDocName);
-                    }
-                }
+                    // Update the attribute
+                    _attribute = GetUpdatedComAttribute(sourceDocument, pageInfoMap);
 
-                _layerObjectsDirty = false;
-                _typeDirty = false;
-                _exemptionsDirty = false;
+                    ResetDirtyFlag();
+                }
 
                 return _attribute;
             }
@@ -473,12 +471,79 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Creates a new COM attribute that corresponds to the row.
+        /// </summary>
+        /// <param name="sourceDocument">The source document to use for the new attribute.</param>
+        /// <param name="pageInfoMap">The page infomation map to use for the new attribute.</param>
+        /// <returns>A new COM attribute that corresponds to the row.</returns>
+        ComAttribute CreateComAttribute(string sourceDocument, LongToObjectMap pageInfoMap)
+        {
+            // Create the attribute
+            ComAttribute attribute = new ComAttribute();
+            attribute.Value = GetSpatialString(sourceDocument, pageInfoMap);
+            attribute.Name = _category;
+            attribute.Type = _type;
+                    
+            // Set exemptions
+            SetExemptions(attribute, sourceDocument);
+
+            return attribute;
+        }
+
+        /// <summary>
+        /// Creates a COM attribute from the current row and <see cref="_attribute"/>.
+        /// </summary>
+        /// <param name="sourceDocument">The source document to use for the new attribute.</param>
+        /// <param name="pageInfoMap">The page infomation map to use for the new attribute.</param>
+        /// <returns>A new COM attribute that corresponds to the row.</returns>
+        ComAttribute GetUpdatedComAttribute(string sourceDocument, LongToObjectMap pageInfoMap)
+        {
+            // Don't modify the original attribute as it may be in use elsewhere
+            ICopyableObject copy = (ICopyableObject)_attribute;
+            ComAttribute attribute = (ComAttribute)copy.Clone();
+
+            // Update the value
+            if (_layerObjectsDirty)
+            {
+                attribute.Value = GetSpatialString(sourceDocument, pageInfoMap);
+            }
+            else
+            {
+                attribute.Value.SourceDocName = sourceDocument;
+            }
+
+            // Update the type
+            if (_typeDirty)
+            {
+                attribute.Type = _type;
+            }
+
+            // Update the exemption codes
+            if (_exemptionsDirty)
+            {
+                SetExemptions(attribute, sourceDocument);
+            }
+
+            return attribute;
+        }
+
+        /// <summary>
+        /// Marks the <see cref="RedactionGridViewRow"/> attribute as unmodified since the last save.
+        /// </summary>
+        void ResetDirtyFlag()
+        {
+            _layerObjectsDirty = false;
+            _typeDirty = false;
+            _exemptionsDirty = false;
+        }
+
+        /// <summary>
         /// Creates a spatial string from the <see cref="RedactionGridViewRow"/>.
         /// </summary>
-        /// <param name="sourceDocName">The source document name of the spatial string.</param>
+        /// <param name="sourceDocument">The source document name of the spatial string.</param>
         /// <param name="pageInfoMap">The map of pages to spatial information for the string.</param>
         /// <returns>A spatial string created from the <see cref="RedactionGridViewRow"/>.</returns>
-        SpatialString GetSpatialString(string sourceDocName, LongToObjectMap pageInfoMap)
+        SpatialString GetSpatialString(string sourceDocument, LongToObjectMap pageInfoMap)
         {
             // Gets the raster zones and text for the attribute
             IUnknownVector rasterZones = GetRasterZones();
@@ -486,7 +551,7 @@ namespace Extract.Redaction.Verification
 
             // Create the spatial string
             SpatialString value = new SpatialString();
-            value.CreateHybridString(rasterZones, text, sourceDocName, pageInfoMap);
+            value.CreateHybridString(rasterZones, text, sourceDocument, pageInfoMap);
             return value;
         }
 
@@ -518,8 +583,8 @@ namespace Extract.Redaction.Verification
         /// Sets the exemption codes for the specified COM attribute.
         /// </summary>
         /// <param name="attribute">The COM attribute to assign exemption codes.</param>
-        /// <param name="sourceDocName">The name of the source document.</param>
-        void SetExemptions(ComAttribute attribute, string sourceDocName)
+        /// <param name="sourceDocument">The name of the source document.</param>
+        void SetExemptions(ComAttribute attribute, string sourceDocument)
         {
             // If there are no exemption codes to assign, just remove the exemption codes attribute.
             if (_exemptions.IsEmpty)
@@ -541,7 +606,7 @@ namespace Extract.Redaction.Verification
             
             // Set the exemption codes
             SpatialString value = new SpatialString();
-            value.CreateNonSpatialString(_exemptions.ToString(), sourceDocName);
+            value.CreateNonSpatialString(_exemptions.ToString(), sourceDocument);
             exemptionsAttribute.Value = value;
             exemptionsAttribute.Type = _exemptions.Category;
         }
@@ -592,11 +657,11 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Creates layer objects that correspond to the specified spatial string.
         /// </summary>
-        /// <param name="spatialString">The spatial string from which to create the layer object.
+        /// <param name="spatialString">The spatial string from which to create the layer objects.
         /// </param>
         /// <param name="imageViewer">The image viewer on which the spatial string appears.</param>
         /// <param name="level">The confidence level of the layer objects to create.</param>
-        /// <returns>A layer object that corresponds to <paramref name="value"/>.</returns>
+        /// <returns>Layer objects that correspond to <paramref name="spatialString"/>.</returns>
         static List<LayerObject> GetLayerObjectsFromSpatialString(SpatialString spatialString,
             ImageViewer imageViewer, ConfidenceLevel level)
         {
@@ -647,16 +712,15 @@ namespace Extract.Redaction.Verification
         /// Creates a <see cref="LayerObject"/> for each page of <see cref="RasterZone"/>s in
         /// <paramref name="pagesToZones"/>.
         /// </summary>
-        /// <param name="pagesToZones">Pages of raster zones for which to create 
+        /// <param name="pagesToZones">Raster zones indexed by page from which to create 
         /// <see cref="LayerObject"/>s.</param>
         /// <param name="imageViewer">The image viewer to which each <see cref="LayerObject"/> 
         /// will be associated.</param>
         /// <param name="level">The confidence level of the layer objects to create.</param>
         /// <returns>A <see cref="List{T}"/> of <see cref="LayerObject"/> created from the 
         /// specified raster zones, one for each page of <paramref name="pagesToZones"/>.</returns>
-        static List<LayerObject> CreateLayerObjects(
-            Dictionary<int, List<RasterZone>> pagesToZones, ImageViewer imageViewer, 
-            ConfidenceLevel level)
+        static List<LayerObject> CreateLayerObjects(Dictionary<int, List<RasterZone>> pagesToZones,
+            ImageViewer imageViewer, ConfidenceLevel level)
         {
             // Iterate over each raster zone
             LayerObject previous = null;
@@ -668,6 +732,7 @@ namespace Extract.Redaction.Verification
                     pair.Key, new string[] { "Redaction" }, pair.Value);
                 redaction.Color = level.Color;
                 redaction.CanRender = level.Output;
+
                 layerObjects.Add(redaction);
 
                 // If necessary, link to the previous page

@@ -1,6 +1,6 @@
 namespace Extract.Redaction.Verification
 {
-    partial class RedactionGridView
+    sealed partial class RedactionGridView
     {
         /// <summary>
         /// Required designer variable.
