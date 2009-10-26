@@ -24,7 +24,6 @@ extern CComModule _Module;
 #include <atlctl.h>
 #include "..\..\..\..\..\ReusableComponents\APIs\Microsoft Visual Studio\VC98\ATL\Include\atlcontrols.h"
 
-
 #import "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
 using namespace UCLID_COMLMLib;
 
@@ -35,11 +34,11 @@ using namespace UCLID_COMUTILSLib;
 	rename("LoadImage", "LoadRasterImage")
 using namespace UCLID_RASTERANDOCRMGMTLib;
 
-#import "..\..\..\IFCore\Code\IFCore.tlb" named_guids 
-using namespace UCLID_INPUTFUNNELLib;
-
 #import "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" named_guids 
 using namespace UCLID_TESTINGFRAMEWORKINTERFACESLib;
+
+#import "..\..\..\IFCore\Code\IFCore.tlb" named_guids 
+using namespace UCLID_INPUTFUNNELLib;
 
 #import "RegExprIV.tlb"
 
