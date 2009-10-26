@@ -243,13 +243,45 @@
 	<li><h2>Miscellaneous</h2>
 	<ul>
    		<LI><b>[LegacyRC #5071]</b> Disable Auto-Fitting for VOA Viewer
-		<li>Confirm that highlighting multi-line text while holding the <b>Ctrl</b> 
-		key does not create a multi-zone attribute in the VOA Viewer application.
+		<ul>
+			<li>Confirm that highlighting multi-line text while holding the 
+			<b>Ctrl</b> key does not create a multi-zone attribute in the VOA 
+			Viewer application.
+		</ul>
 <p>
 		<li><b>[FlexIDSCore #3336]</b> Changing names of subattributes
-		<li>Use the <b>VOA Viewer</b> to open any EAV or VOA that has subattributes.
-		<li>Choose a subattribute and append a letter to the end of the name.
-		<li>Confirm that no exception is thrown.
+		<ul>
+			<li>Use the <b>VOA Viewer</b> to open any EAV or VOA that has subattributes.
+			<li>Choose a subattribute and append a letter to the end of the name.
+			<li>Confirm that no exception is thrown.
+		</ul>
+<p>
+      		<li><b>[FlexIDSCore #3669, #3708]</b> Spatialness column
+		<ul>
+			<li>Confirm that the attribute list in the <b>VOA Viewer</b> includes a 
+			<b>Spatialness</b> column.
+			<li>Confirm that <b>Spatial</b> attributes are properly displayed and copied.
+			<li>Confirm that <b>Hybrid</b> attributes are properly displayed and copied.
+			<li>Confirm that <b>Non-spatial</b> attributes are properly displayed 
+			and copied.
+			<li>Open a VOA file and create a new attribute.
+			<li>Confirm that the <b>Spatialness</b> column is populated 
+			immediately.
+		</ul>
+<p>
+      		<li><b>[FlexIDSCore #3709, #3710]</b> Various tweaks
+		<ul>
+			<li>Open a VOA file and create a new attribute with a <b>Name</b> and 
+			a <b>Type</b> but without a <b>Value</b>.
+			<li>Confirm that the results can be saved to a <b>VOA</b> file and that 
+			the new attribute is included.
+			<li>Confirm that the results can be saved to an <b>EAV</b> file and that 
+			the new attribute is included.
+			<li>Open a VOA file and select the <b>Name</b> edit box.
+			<li>Confirm that ENTER does not create a new attribute.
+			<li>Select the <b>Type</b> edit box.
+			<li>Confirm that ENTER does not create a new attribute.
+		</ul>
 	</ul>		
 </OL>
 </BODY>
