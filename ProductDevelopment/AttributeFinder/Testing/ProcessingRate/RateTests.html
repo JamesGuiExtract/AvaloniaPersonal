@@ -1,265 +1,93 @@
 <html>
 
 <head>
-<title>File Action Manager Processing Rate Tests</title>
+<title>File Action Manager Benchmark Testing</title>
 <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </head>
 
 <body>
 
-<h1>FAM Processing Rate Tests (Test ID 4 &amp; 5 &amp; 7)<br>
+<h1>FLEX Index / ID Shield Benchmark Tests<br>
 <img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
-<h2>NOTE: Test results should be archived under I:\Common\Testing\Product Testing\FLEX_Index_60\ProcessingRateTests</h2>
 <ol>
-<li><h2>Testing Goals</h2>
+	<li><h2>Testing Goals</h2>
 	<ol>
-		<li>To compute a processing rate for both FLEX Index and ID Shield using 
-		different numbers of processing machines.
-		<li>To graph the processing performance of both FLEX Index and ID Shield 
-		using various numbers of threads-of-execution on a server-class machine.
+		<li>To compute a processing rate for ID Shield using a server-class 
+		machine (<b>UltraTester</b>).
+		<li>To compare processing rates for a broad representation of customers.
 	</ol>
 <p>
-<li><h2>Dataset and Database Preparation for Multiple Machine Testing</h2>
+	<li><h2>Software Setup</h2>
 	<ul>
-		<li>Select a server to serve as image file host and database host.
-		<li>Collect local copies of relevant image files.  Note that copies of image 
-		sets can be used if necessary.
-		<li>Create a mapped drive ( <b>Q:</b> ) at the root of the image file location. 
-		This allows for external machines to process the images that have been 
-		supplied via the mapped drive.
-		<li>Use the FAM DB Admin utility to create a database.  Appropriate database 
-		names include <b>FLEXINDEX_RATE</b> and <b>IDSHIELD_RATE</b>.  Add <b>Test</b> 
-		as an action name.
-		<li>Create an FPS file to supply the images.
-		<li>Create a local folder for the ruleset to be exercised.
+		<li>Start with a clean installation of the relevant <b>ID Shield</b> build.
+		<li>Install <b>SQL Server 2008 Express Edition</b>.
+		<li>Install <b>Extract Systems LM</b>.
+		<li>Create an <b>ID Shield Server</b> license file with <b>FLEX Index / ID 
+		Shield Utilities</b> items and include <b>Disable USB Key Serial Numbers</b>.
+	</ul>
+<p>
+	<li><h2>Database, Image and Rules Preparation</h2>
+	<ul>
+		<li>Use the FAM DB Admin utility to create an <b>IDSHIELD_RATE</b> database.  
+		Add <b>Test</b> as an action name.
+		<li>Copy relevant image files to a working folder.  Note that copies of image 
+		sets can be used if necessary.  Enough images for at least 12 hours of processing 
+		should be available.
+		<li>The following ID Shield Analysis projects are recommended for 
+		<b>Benchmark</b> testing
 		<ul>
-			<li>For Indexing: <b>MN - Scott - Trimin</b> is a good representative ruleset.
-			<li>For Redaction: <b>TX - Panola - ACS</b> is a good representative ruleset.
-			<li>Extract the selected rules from the most recent <b>Deliveries</b> folder.  
-			The basic path is 
-<b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\Customer Specific Files\</b>.
+			<li>CA - Districts - ACS
+			<li>CO - Secretary of State
+			<li>IL - Lake - Cott
+			<li>IN - Districts - CSI
+			<li>LA - State Rules - Cott
+			<li>MA - Executive Office of Transportation
+			<li>NY - Secretary of State - eBiz
+			<li>OH - Montgomery Clerk
+			<li>PA - Mercer - Cott
+			<li>St Johns
+			<li>UT - Department of Commerce - UCC
+			<li>VA - Judgments - Logan
+		</ul>
+		<li>Create a <b>Queue.fps</b> file to supply the images.
+		<li>Create a local folder for the rule set to be exercised and select one of 
+		the following:
+		<ul>
+			<li>Use a relevant rules delivery _________________
+			<li>Use a labeled rule set from source control _________________
 		</ul>
 	</ul>
 <p>
-<li><h2>Prepare Test Baseline</h2>
+	<li><h2>Test Execution</h2>
 	<ul>
-		<li>Create a multiple-thread <b>Process.fps</b> file with one task.  
-		<ul>
-			<li>For an Indexing test, create an FPS file with one 
-			<b>Execute Rules</b> task for processing.  
-			<li>For a Redaction test, create an FPS file with a 
-			<b>Redact images (no verification)</b> task.
-		</ul>
-		<li>Identify five quad-core test machines to be used for the baseline test.  For 
-		each machine:
-		<ul>
-			<li>Install and license the latest build of <b>FLEX Index</b> or 
-			<b>ID Shield</b>.
-			<li>Create a drive mapping ( <b>Q:</b> ) to the images folder on 
-			the server.
-			<li>Open a command window and run <b>LogProcessStats processfiles 
-			5m .\Stats /el</b> to watch memory and handle usage.  It may be necessary 
-			to update the system path to include <b>I:\Common\Engineering\Tools\Utils</b>.
-			<li>Open <b>Process.fps</b> and prepare to start processing.
-			<li>Start processing on each machine.
-			<li>Continue processing on each machine for approximately <b>12</b> hours.  
-			If a different test duration is desired, note that a shorter duration will 
-			not yield results as accurate when using more machines.  Also, a longer 
-			duration will result in a very long time to exercise the test using only 
-			one machine.
-		</ul>
-		<li>Reset the database using <b>SQL Server Management Studio</b> after initial test
-		<ul>
-			<li>Remove the single record in the <b>ActionStatistics</b> table.
-			<li>Create a new query to delete the records in the 
-			<b>FileActionStateTransition</b> table.
-			<li>Create a new query to delete the records in the <b>FAMFile</b> table 
-			that have not been processed.  Note that if processing continued beyond 
-			the desired duration, the most recently completed files should also be 
-			deleted such that the remaining files were all processed within the 
-			desired duration.
-			<li>Create a new query to update the records remaining in the <b>FAMFile</b> 
-			table to <b>P</b> for Pending.
-		</ul>
-		<li>The reset database can be backed up if desired although repeated resets are 
-		also effective after execution of each test.
+		<li>Delete any USS files that exist in the <b>Images</b> folder.
+		<li>Create a multiple-thread <b>Process.fps</b> file with one <b>Redact images 
+		(no verification)</b> task.
+		<li>Open a command window and run <b>LogProcessStats.exe 		ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,CleanupImage.exe 5m \.Stats /el</b> 
+		to watch memory and handle usage.  It may be necessary to update the system path to 
+		include <b>I:\Common\Engineering\Tools\Utils</b>.
+		<li>Open <b>Queue.fps</b> and start supplying.
+		<li>Open <b>Process.fps</b> and start processing.
+		<li>Continue processing for at least <b>12</b> hours.  If a different test duration 
+		is desired, the results may not be accurate.
 	</ul>
 <p>
-<li><h2>Test Execution</h2>
+	<li><h2>Reviewing and Saving Test Results</h2>
 	<ul>
-		<li>The following steps are required before each test described in the table below.
+		<li>Data will be stored in 
+		<b>I:\Common\Testing\Product Testing\FLEX_Index_80\BenchmarkTests</b>.
+		<li>Make sure to document the following:
 		<ul>
-			<li>Confirm that information from the previous test have been copied to the 
-			appropriate folder under I:\Common\Testing\Product 
-			Testing\Flex_Index_NN\ProcessingRateTests.
-			<ul>
-				<li>Statistics 
-				<li>Any interesting errors 
-				<li>A backup of the database if it would be useful in diagnosing 
-				a problem.
-			</ul>
-			<li>Reset the database as described above.
-			<li>For each processing machine involved in the new test:
-			<ul>
-				<li>Confirm that the desired drive mapping exists.
-				<li>Confirm that a USB key is available and has sufficient counts.
-				<li>Confirm that the <b>Master RSD</b> file is available.
-				<li>Confirm that a local <b>Process_MT.fps</b> file is available 
-				if running a multi-threaded test.
-				<li>Confirm that a local <b>Process_ST.fps</b> file is available 
-				if running a single-threaded test.
-				<li>Confirm that the system path includes 
-				<b>I:\Common\Engineering\Tools\Utils</b>.
-				<li>Open a command window and prepare <b>LogProcessStats processfiles 
-				5m .\Stats /el</b> to watch memory and handle usage.
-				<li>Open one instance of <b>Process_MT.fps</b> if running a 
-				multi-threaded test.
-				<li>Open 4 instances of <b>Process_ST.fps</b> if running a 
-				single-threaded test.
-				<li>Start processing.
-			</ul>
+			<li>Rules delivery or source control label
+			<li>Number of pages queued
+			<li>Number of pages processed
+			<li>Processing start time
+			<li>Processing end time
+			<li>Any unusual situation or error noticed during processing
+			<li>LogProcessStats results with or without memory leaks
 		</ul>
-	<p>
-	<table border=1 cellpadding="5" cellspacing="0">
-	<tr>
-		<th><font size="2">Product / Num Machines</font></th>
-		<th><font size="2">FLEX Index : single-threaded</font></th>
-		<th><font size="2">FLEX Index : multi-threaded</font></th>
-		<th><font size="2">ID Shield : single-threaded</font></th>
-		<th><font size="2">ID Shield : multi-threaded</font></th>
-	</tr>
-	<tr align="center">
-		<th><font size="2">1 Processing Machine</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">2 Processing Machine</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">3 Processing Machines</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">5 Processing Machines</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">8 Processing Machines</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	</table>
-	</ul>
-<p>
-<li><h2>Multiple Thread Testing</h2>
-	<ul>
-		<li>Prepare a <b>new database</b> following the instructions given above.
-		<li>Prepare a <b>test baseline</b> as specified above.  Instead of preparing and 
-		using five quad-core machines, use a single server-class machine and use 
-		approximately half of the normal number of available threads.
-		<li><b>Test execution</b> should follow the instructions given above.  The table 
-		below assumes that the server machine has 8 threads of execution available.
-	<p>
-	<table border=1 cellpadding="5" cellspacing="0">
-	<tr>
-		<th><font size="2">Product / Num Threads</font></th>
-		<th><font size="2">FLEX Index</font></th>
-		<th><font size="2">ID Shield</font></th>
-	</tr>
-	<tr align="center">
-		<th><font size="2">1 Thread</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">2 Threads</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">3 Threads</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">4 Threads</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">5 Threads</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">6 Threads</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">7 Threads</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">8 Threads</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">9 Threads</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">10 Threads</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">11 Threads</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	<tr align="center">
-		<th><font size="2">12 Threads</font></th>
-		<td><font size="2"><li></li></font></td>
-		<td><font size="2"><li></li></font></td>
-	</tr>
-	</table>
-	</ul>
-<p>
-<li><h2>Saving Test Results</h2>
-	<ul>
-		<li>Data will be stored in subfolders under 
-		I:\Common\Testing\Product Testing\FLEX_Index_60\ProcessingRateTests.
-		<li>Subfolders exist for:
-		<ul>
-			<li>FLEXIndex
-			<li>IDShield
-		</ul>
-		<li>Each of the subfolders should contain <b>Test_Nx</b> subfolders and a 
-		<b>Thread</b> subfolder to store results for either the machine-specific or 
-		the thread-specific tests.
-		<li>The root <b>ProcessingRateTests</b> folder should contain spreadsheets 
-		for tracking performance of the machine-specific and the thread-specific tests.
 	</ul>
 </ol>
 
