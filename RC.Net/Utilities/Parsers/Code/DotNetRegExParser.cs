@@ -423,6 +423,9 @@ namespace Extract.Utilities.Parsers
             // if internal variable is null, create a new parser with the pattern and options.
             if (_regexParser == null)
             {
+                // TODO: Remove this GC.Collect call, this is here for testing purposes
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+                GC.WaitForPendingFinalizers();
                 _regexParser = new Regex(_pattern, GetOptions());
             }
             return _regexParser;
