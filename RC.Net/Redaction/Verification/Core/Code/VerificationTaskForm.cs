@@ -254,7 +254,7 @@ namespace Extract.Redaction.Verification
                 }
             }
 
-            return "";
+            return "Uncategorized";
         }
 
         /// <summary>
@@ -1176,6 +1176,9 @@ namespace Extract.Redaction.Verification
                 // Next/previous redaction shortcut keys
                 _imageViewer.Shortcuts[Keys.Tab] = SelectNextRedaction;
                 _imageViewer.Shortcuts[Keys.Tab | Keys.Shift] = SelectPreviousRedaction;
+
+                // Use redaction tool
+                _imageViewer.Shortcuts[Keys.H] = _imageViewer.ToggleRedactionTool;
             }
             catch (Exception ex)
             {
