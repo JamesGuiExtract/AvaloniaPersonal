@@ -48,6 +48,10 @@ typedef struct _ASTAT_
 	NAME_BUFFER    NameBuff [30];
 }	ASTAT, *PASTAT;
 
+// Valid identifier characters
+const string gstrVALID_IDENTIFIER_CHARS = 
+	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
+
 //-------------------------------------------------------------------------------------------------
 unsigned char getValueOfHexChar(unsigned char ucChar)
 {
@@ -770,108 +774,57 @@ bool isValidIdentifier(const string& strName)
 //-------------------------------------------------------------------------------------------------
 void validateIdentifier(const string& strName)
 {
-	bool foundFirstLetter = false;
-	for (unsigned int i = 0; i < strName.size(); i++)
+	// Identifier cannot be empty
+	if (strName.empty())
 	{
-		if (!foundFirstLetter)
-		{
-			char c = strName.at(i);
-			if(	(c >= 'a' && c <= 'z') ||
-				(c >= 'A' && c <= 'Z') )
-			{
-				foundFirstLetter = true;
-			}
-			else if( c == '_')
-			{
-			}
-			else
-			{
-				// Create and throw exception
-				UCLIDException ue( "ELI09528", "Invalid Initial Character for Identifier!" );
-				ue.addDebugInfo( "Identifier", strName );
-				ue.addDebugInfo( "Valid Initial Characters", 
-					"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" );
-				throw ue;
-			}
-		}
-		else
-		{
-			char c = strName.at(i);
-			if(	(c >= 'a' && c <= 'z') ||
-				(c >= 'A' && c <= 'Z') ||
-				(c >= '0' && c <= '9') ||
-				c == '_')
-			{
-			}
-			else
-			{
-				// Create and throw exception
-				UCLIDException ue( "ELI09529", "Invalid Character for Identifier!" );
-				ue.addDebugInfo( "Identifier", strName );
-				ue.addDebugInfo( "Valid Characters", 
-					"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789" );
-				throw ue;
-			}
-		}
+		throw UCLIDException("ELI09530", "Identifier cannot be empty.");
 	}
 
-	// Check for zero-length identifier
-	if (!foundFirstLetter)
+	// Identifier cannot start with a digit
+	if (isDigitChar(strName[0]))
 	{
 		// Create and throw exception
-		throw UCLIDException( "ELI09530", "Identifier Cannot be Empty!" );
+		UCLIDException ue("ELI28221", "First character of identifier cannot be a digit.");
+		ue.addDebugInfo("Identifier", strName);
+		ue.addDebugInfo("Valid initial characters", 
+			"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
+		throw ue;
+	}
+
+	// Identifier must consist of letters, numbers, or underscores
+	size_t iFirstNot = strName.find_first_not_of(gstrVALID_IDENTIFIER_CHARS);
+	if (iFirstNot != string::npos)
+	{
+		// Create and throw exception
+		UCLIDException ue("ELI09529", "Invalid character for identifier.");
+		ue.addDebugInfo("Identifier", strName);
+		ue.addDebugInfo("Valid characters", gstrVALID_IDENTIFIER_CHARS);
+		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------
 long getIdentifierEndPos(const string& strText, long nStartPos)
 {
-	bool foundFirstLetter = false;
-	long nEndPos = string::npos;
-	for (unsigned int i = nStartPos; i < strText.size(); i++)
+	// Check if start position is out of range or initial character is a digit
+	if (nStartPos < 0 || ((ULONG)nStartPos) >= strText.length() || isDigitChar(strText[nStartPos]))
 	{
-		if (!foundFirstLetter)
-		{
-			char c = strText.at(i);
-			if(	(c >= 'a' && c <= 'z') ||
-				(c >= 'A' && c <= 'Z') )
-			{
-				foundFirstLetter = true;
-			}
-			else if( c == '_')
-			{
-			}
-			else
-			{
-				// there is no valid identifier
-				nEndPos = string::npos;
-				break;
-			}
-		}
-		else
-		{
-			char c = strText.at(i);
-			if(	(c >= 'a' && c <= 'z') ||
-				(c >= 'A' && c <= 'Z') ||
-				(c >= '0' && c <= '9') ||
-				c == '_')
-			{
-				nEndPos = i+1;
-			}
-			else
-			{
-				nEndPos = i;
-				break;
-			}
-		}
+		return string::npos;
 	}
 
-	// Check for zero-length identifier
-	if (!foundFirstLetter)
+	// Return the first invalid identifier character
+	size_t iFirstNot = strText.find_first_not_of(gstrVALID_IDENTIFIER_CHARS, nStartPos);
+	if (iFirstNot == nStartPos)
 	{
-		// there is no valid identifier
-		nEndPos = string::npos;
+		// The first character is invalid
+		return string::npos;
 	}
-	return nEndPos;
+	else if (iFirstNot == string::npos)
+	{
+		// The rest of the string are valid identifier characters
+		return strText.length();
+	}
+
+	return iFirstNot;
 }
 //-------------------------------------------------------------------------------------------------
 long getCloseScopePos(const string& strText, long nStartPos, char cScopeOpen, char cScopeClose)
