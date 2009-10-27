@@ -386,7 +386,7 @@ namespace Extract.Redaction.Verification
         /// <param name="attribute">The attribute to which the id attribute should be added.</param>
         void AddIdAttribute(ComAttribute attribute)
         {
-            ComAttribute revisionId = CreateComAttribute("_IDAndRevision", _nextId, "1");
+            ComAttribute revisionId = CreateComAttribute("_IDAndRevision", _nextId, "_1");
 
             attribute.SubAttributes.PushBack(revisionId);
 
@@ -675,9 +675,29 @@ namespace Extract.Redaction.Verification
         /// <param name="attribute">The attribute whose revision should be incremented.</param>
         static void IncrementRevision(ComAttribute attribute)
         {
+            // Get the ID attribute
             ComAttribute idAttribute = GetIdAttribute(attribute);
-            int revision = 1 + int.Parse(idAttribute.Type, CultureInfo.CurrentCulture);
-            idAttribute.Type = revision.ToString(CultureInfo.CurrentCulture);
+
+            // Get the revision number incremented by one
+            int revision = 1 + GetRevisionFromIdAttribute(idAttribute);
+
+            // Store the new revision number.
+            // Prepend underscore because type must start with underscore or alphabetic character.
+            idAttribute.Type = "_" + revision.ToString(CultureInfo.CurrentCulture);
+        }
+
+        /// <summary>
+        /// Retrieves the revision number from the specified _IDAndRevision attribute.
+        /// </summary>
+        /// <param name="idAttribute">The _IDAndRevision attribute.</param>
+        /// <returns>The revisiion number of the <paramref name="idAttribute"/>.</returns>
+        static int GetRevisionFromIdAttribute(ComAttribute idAttribute)
+        {
+            // Drop the initial underscore from the ID attribute
+            string revisionString = idAttribute.Type.Substring(1);
+
+            // Parse the string
+            return int.Parse(revisionString, CultureInfo.CurrentCulture);
         }
 
         /// <summary>
