@@ -76,7 +76,7 @@
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
-			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+			<li>Doug, 7.1.1.58, 10/22/2009
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
@@ -104,7 +104,11 @@
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
-			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+			<li>Doug, 7.1.1.58, 10/26/2009
+		       	<ul>
+				<li><b>[LegacyRC #5500]</b> Use minimum for 
+				<b>AutoRevertTimeOutInMinutes</b>.
+		       	</ul>
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
@@ -229,7 +233,10 @@
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
-			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+			<li>Doug, 7.1.1.58, 10/26/2009
+		       	<ul>
+				<li>Updated reports not implemented yet.
+		       	</ul>
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
@@ -289,8 +296,14 @@
 <p>
 	<LI><h2>Support FAM Processing During Specified Times Of Day Or Week (#21)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>SCRs:</b> LegacyRC #5494, #5495, #5513
+  	   	<LI><b>Details:</b> Modify the <b>Processing Setup</b> tab to add the ability 
+		to schedule processing with a one-hour granularity.  When processing is active 
+		and the inactive time is reached, the currently processing documents should 
+		finish processing and no more documents should start.  Documents currently in 
+		<b>Processing</b> status should revert to their previous status.  When processing 
+		is inactive and the active time is reached, processing should automatically 
+		begin.  This feature does not apply to file supplying.
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
