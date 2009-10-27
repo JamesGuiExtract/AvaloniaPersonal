@@ -326,6 +326,9 @@ STDMETHODIMP CAttribute::put_Type(BSTR newVal)
 				ue.addDebugInfo( "Type", strValue );
 				throw ue;
 			}
+
+			// Type must be a valid identifier [FIDSC #3690]
+			validateIdentifier(strThisType);
 		}
 
 		// Type must be valid
