@@ -764,48 +764,51 @@ void CSpatialStringSearcher::rotateRectangle(ILongRectanglePtr ipRect)
 	// Validate smart pointer
 	ASSERT_ARGUMENT("ELI16739", ipRect != NULL);
 
-	// Get first page number of the SpatialString
-	// and associated SpatialPageInfo
-	long nPageNum = m_ipSpatialString->GetFirstPageNumber();
-	UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipInfo = m_ipSpatialString->GetPageInfo(nPageNum);
-	ASSERT_RESOURCE_ALLOCATION("ELI16740", ipInfo != NULL);
-
-	// Get the page info
-	UCLID_RASTERANDOCRMGMTLib::EOrientation eOrientation;
-	long nWidth(-1), nHeight(-1);
-	double dDeskew(0.0);
-	ipInfo->GetPageInfo(&nWidth, &nHeight, &eOrientation, &dDeskew);
-
-	// Rotate the rectangle based on orientation of SpatialString data member
-	switch (eOrientation)
+	if (m_ipSpatialString->HasSpatialInfo())
 	{
-	case kRotNone:
-		// Do nothing to the rectangle
-		break;
+		// Get first page number of the SpatialString
+		// and associated SpatialPageInfo
+		long nPageNum = m_ipSpatialString->GetFirstPageNumber();
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipInfo = m_ipSpatialString->GetPageInfo(nPageNum);
+		ASSERT_RESOURCE_ALLOCATION("ELI16740", ipInfo != NULL);
 
-	case kRotLeft:
-		// Rotate the rectangle 90 degrees counterclockwise
-		ipRect->Rotate( nWidth, nHeight, -90 );
-		break;
+		// Get the page info
+		UCLID_RASTERANDOCRMGMTLib::EOrientation eOrientation;
+		long nWidth(-1), nHeight(-1);
+		double dDeskew(0.0);
+		ipInfo->GetPageInfo(&nWidth, &nHeight, &eOrientation, &dDeskew);
 
-	case kRotDown:
-		// Rotate the rectangle 180 degrees
-		ipRect->Rotate( nWidth, nHeight, 180 );
-		break;
-
-	case kRotRight:
-		// Rotate the rectangle 90 degrees clockwise
-		ipRect->Rotate( nWidth, nHeight, 90 );
-		break;
-
-	default:
+		// Rotate the rectangle based on orientation of SpatialString data member
+		switch (eOrientation)
 		{
-			// Unsupported orientation
-			UCLIDException ue("ELI16741", "Unsupported orientation!");
-			ue.addDebugInfo("Orientation", eOrientation);
-			throw ue;
+		case kRotNone:
+			// Do nothing to the rectangle
+			break;
+
+		case kRotLeft:
+			// Rotate the rectangle 90 degrees counterclockwise
+			ipRect->Rotate( nWidth, nHeight, -90 );
+			break;
+
+		case kRotDown:
+			// Rotate the rectangle 180 degrees
+			ipRect->Rotate( nWidth, nHeight, 180 );
+			break;
+
+		case kRotRight:
+			// Rotate the rectangle 90 degrees clockwise
+			ipRect->Rotate( nWidth, nHeight, 90 );
+			break;
+
+		default:
+			{
+				// Unsupported orientation
+				UCLIDException ue("ELI16741", "Unsupported orientation!");
+				ue.addDebugInfo("Orientation", eOrientation);
+				throw ue;
+			}
+			break;
 		}
-		break;
 	}
 }
 //-------------------------------------------------------------------------------------------------

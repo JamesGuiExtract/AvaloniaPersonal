@@ -1854,7 +1854,14 @@ void deleteLeadDC(HDC& hDC)
 {
 	if (hDC != NULL)
 	{
-		L_DeleteLeadDC(hDC);
+		if (L_DeleteLeadDC(hDC) == L_FALSE)
+		{
+			// Still set this to NULL, even if we failed
+			hDC = NULL;
+			UCLIDException ue("ELI28230", "Failed to delete device context.");
+			throw ue;
+		}
+
 		hDC = NULL;
 	}
 }
@@ -1890,8 +1897,18 @@ void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution,
 	try
 	{
 		// Set the appropriate brush and pen
-		SelectObject(hDC, rBrushes.getColoredBrush(rZone.m_crFillColor));
-		SelectObject(hDC, rPens.getColoredPen(rZone.m_crBorderColor));
+		if (SelectObject(hDC, rBrushes.getColoredBrush(rZone.m_crFillColor)) == NULL)
+		{
+			UCLIDException ue("ELI28227", "Failed to set fill color.");
+			ue.addWin32ErrorInfo();
+			throw ue;
+		}
+		if (SelectObject(hDC, rPens.getColoredPen(rZone.m_crBorderColor)) == NULL)
+		{
+			UCLIDException ue("ELI28228", "Failed to set border color.");
+			ue.addWin32ErrorInfo();
+			throw ue;
+		}
 
 		// Convert the Zone to rectangle corner points
 		POINT aPoints[4];
@@ -1899,7 +1916,12 @@ void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution,
 			aPoints[2], aPoints[3]);
 
 		// Draw the Polygon
-		Polygon(hDC, (POINT *) &aPoints, 4);
+		if (Polygon(hDC, (POINT *) &aPoints, 4) == FALSE)
+		{
+			UCLIDException ue("ELI28229", "Failed to draw redaction zone.");
+			ue.addWin32ErrorInfo();
+			throw ue;
+		}
 
 		// If there is text to add, add it
 		if ( rZone.m_strText.size() > 0 )

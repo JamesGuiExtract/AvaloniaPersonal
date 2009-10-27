@@ -1812,7 +1812,7 @@ void CSelectPageRegion::excludeImageZone(const string& strSourceImage, const str
 		zone.m_nPage = nPageNumber;
 		zone.m_nStartX = nLeft;
 		zone.m_nEndX = nRight;
-		zone.m_nStartY = zone.m_nEndY = (nBottom - nTop) / 2;
+		zone.m_nStartY = zone.m_nEndY = nTop + ((nBottom - nTop) / 2);
 		zone.m_nHeight = nBottom - nTop;
 		zone.m_crFillColor = zone.m_crBorderColor = RGB(255,255,255);
 

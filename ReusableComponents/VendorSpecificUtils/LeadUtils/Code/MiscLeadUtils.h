@@ -387,7 +387,7 @@ public:
 	{
 	}
 
-	LeadtoolsDCManager(BITMAPHANDLE& hBitmap)
+	LeadtoolsDCManager(BITMAPHANDLE& hBitmap) : m_hDC(NULL)
 	{
 		try
 		{
