@@ -38,6 +38,8 @@ CConditionalPreprocessor::~CConditionalPreprocessor()
 {
 	try
 	{
+		m_ipCondition = NULL;
+		m_ipRule = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16323");
 }
