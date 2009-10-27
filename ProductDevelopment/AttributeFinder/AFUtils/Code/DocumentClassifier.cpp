@@ -12,8 +12,6 @@
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
 
-#include <io.h>
-
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------
@@ -27,7 +25,8 @@ const unsigned long gnCurrentVersion = 1;
 CDocumentClassifier::CDocumentClassifier()
 : m_bDirty(false),
   m_strIndustryCategoryName(""),
-  m_ipAFUtility(NULL)
+  m_ipAFUtility(NULL),
+  m_ipRegExpr(NULL)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -35,8 +34,27 @@ CDocumentClassifier::~CDocumentClassifier()
 {
 	try
 	{
+		// Ensure COM objects are released
+		m_ipAFUtility = NULL;
+		m_ipRegExpr = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16330");
+}
+//-------------------------------------------------------------------------------------------------
+HRESULT CDocumentClassifier::FinalConstruct()
+{
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+void CDocumentClassifier::FinalRelease()
+{
+	try
+	{
+		// Ensure COM objects are released
+		m_ipAFUtility = NULL;
+		m_ipRegExpr = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28217");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -432,7 +450,7 @@ STDMETHODIMP CDocumentClassifier::GetSpecialDocTypeTags(IVariantVector** ppTags)
 		validateLicense();
 
 		// Get special tags
-		std::vector<std::string>	vecSpecial;
+		vector<string>	vecSpecial;
 		appendSpecialTags( vecSpecial );
 
 		// Create the VariantVector to contain tags
@@ -475,7 +493,7 @@ STDMETHODIMP CDocumentClassifier::GetDocumentTypes(BSTR strIndustry, IVariantVec
 		ASSERT_RESOURCE_ALLOCATION("ELI11920", ipVec != NULL);
 
 		// Retrieve the industry-specific collection of document types
-		std::vector<std::string>	vecTypes = m_mapNameToVecDocTypes[strName];
+		vector<string>	vecTypes = m_mapNameToVecDocTypes[strName];
 
 		// Add each doc type name to vector
 		for (unsigned int ui = 0; ui < vecTypes.size(); ui++)
@@ -515,10 +533,10 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 		ASSERT_RESOURCE_ALLOCATION("ELI11925", ipVec != NULL);
 
 		// Retrieve the industry-specific collection of document types
-		std::vector<std::string>	vecTypes = m_mapNameToVecDocTypes[strName];
+		vector<string>	vecTypes = m_mapNameToVecDocTypes[strName];
 
 		// Add special type tags
-		std::vector<std::string>	vecSpecial;
+		vector<string>	vecSpecial;
 		int n;
 		if ( asCppBool(bAllowSpecialTags) )
 		{
@@ -548,7 +566,7 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 		if (dlg.DoModal() == IDOK)
 		{
 			// Retrieve selection from dialog
-			std::vector<std::string>	vecFinal = dlg.getChosenTypes();
+			vector<string>	vecFinal = dlg.getChosenTypes();
 
 			// Add each doc type name to vector
 			long lSize = vecFinal.size();
@@ -578,7 +596,7 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 //-------------------------------------------------------------------------------------------------
 // private / helper methods
 //-------------------------------------------------------------------------------------------------
-void CDocumentClassifier::appendSpecialTags(std::vector<std::string>& rvecTags)
+void CDocumentClassifier::appendSpecialTags(vector<string>& rvecTags)
 {
 	// Add each special tag
 	rvecTags.push_back( gstrSPECIAL_ANY_UNIQUE );
@@ -600,7 +618,7 @@ void CDocumentClassifier::createDocTags(IAFDocument* pAFDoc, const string& strSp
 		throw ue;
 	}
 
-	vector<DocTypeInterpreter> vecDocTypeInterpreters = itMap->second;
+	vector<DocTypeInterpreter>& vecDocTypeInterpreters = itMap->second;
 
 	IAFDocumentPtr ipAFDoc(pAFDoc);
 	ASSERT_RESOURCE_ALLOCATION("ELI05886", ipAFDoc != NULL);
@@ -628,8 +646,10 @@ void CDocumentClassifier::createDocTags(IAFDocument* pAFDoc, const string& strSp
 	// string for component name and its associated prog id
 	for (unsigned int ui = 0; ui < vecDocTypeInterpreters.size(); ui++)
 	{
+		DocTypeInterpreter& dtiInterp = vecDocTypeInterpreters[ui];
+
 		// confidence level for each doc type
-		int nCurrentLevel = vecDocTypeInterpreters[ui].getDocConfidenceLevel(ipAFDoc->Text, cache);
+		int nCurrentLevel = dtiInterp.getDocConfidenceLevel(ipAFDoc->Text, cache);
 		if (nConfidenceLevel > nCurrentLevel)
 		{
 			// skip this type
@@ -649,10 +669,10 @@ void CDocumentClassifier::createDocTags(IAFDocument* pAFDoc, const string& strSp
 		if (nConfidenceLevel > 0)
 		{
 			// Retrieve main Document Type
-			string strDocTypeName = vecDocTypeInterpreters[ui].m_strDocTypeName;
+			string strDocTypeName = dtiInterp.m_strDocTypeName;
 
 			// Check for defined sub-type
-			string strSubType = vecDocTypeInterpreters[ui].m_strDocSubType;
+			string strSubType = dtiInterp.m_strDocSubType;
 			if (strSubType.length() > 0)
 			{
 				// Append to doc type
@@ -660,16 +680,12 @@ void CDocumentClassifier::createDocTags(IAFDocument* pAFDoc, const string& strSp
 				strDocTypeName += strSubType.c_str();
 			}
 
-			// Retrieve the Block ID and rule ID
-			string strBlockID = vecDocTypeInterpreters[ui].m_strBlockID;
-			string strRuleID = vecDocTypeInterpreters[ui].m_strRuleID;
-
 			// store the doc type in the vector
-			ipVecDocTypes->PushBack( get_bstr_t(strDocTypeName) );
+			ipVecDocTypes->PushBack( strDocTypeName.c_str() );
 
 			// Store the Block ID and Rule ID in the vectors
-			ipVecBlockIDs->PushBack( get_bstr_t(strBlockID) );
-			ipVecRuleIDs->PushBack( get_bstr_t(strRuleID) );
+			ipVecBlockIDs->PushBack( dtiInterp.m_strBlockID.c_str() );
+			ipVecRuleIDs->PushBack( dtiInterp.m_strRuleID.c_str() );
 		}
 	}
 	

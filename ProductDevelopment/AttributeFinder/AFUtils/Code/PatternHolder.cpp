@@ -10,7 +10,7 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // PatternHolder
 //-------------------------------------------------------------------------------------------------
-PatternHolder::PatternHolder(IRegularExprParserPtr ipRegExpr)
+PatternHolder::PatternHolder(const IRegularExprParserPtr& ipRegExpr)
 : m_eConfidenceLevel(kZero),
   m_bIsAndRelationship(false),
   m_dStartingRange(0.0),
@@ -58,11 +58,21 @@ PatternHolder& PatternHolder::operator=(const PatternHolder& objToAssign)
 
 	return *this;
 }
+//-------------------------------------------------------------------------------------------------
+PatternHolder::~PatternHolder()
+{
+	try
+	{
+		// Ensure COM object is released
+		m_ipRegExpr = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28218");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Public methods
 //-------------------------------------------------------------------------------------------------
-bool PatternHolder::foundPatternsInText(ISpatialStringPtr ipInputText, DocPageCache& cache)
+bool PatternHolder::foundPatternsInText(const ISpatialStringPtr& ipInputText, DocPageCache& cache)
 {
 	ASSERT_RESOURCE_ALLOCATION("ELI07425", m_ipRegExpr != NULL);
 	ASSERT_ARGUMENT("ELI07423", ipInputText != NULL);
@@ -103,7 +113,7 @@ bool PatternHolder::foundPatternsInText(ISpatialStringPtr ipInputText, DocPageCa
 	for (unsigned int ui = 0; ui < m_vecPatterns.size(); ui++)
 	{
 		// Retrieve pattern plus optional Rule ID
-		string strIDPlusPattern = m_vecPatterns[ui];
+		string& strIDPlusPattern = m_vecPatterns[ui];
 
 		// Separate pattern and rule ID
 		string strPattern;
@@ -125,12 +135,11 @@ bool PatternHolder::foundPatternsInText(ISpatialStringPtr ipInputText, DocPageCa
 		}
 
 		// Provide pattern to parser
-		m_ipRegExpr->Pattern = _bstr_t(strPattern.c_str());
+		m_ipRegExpr->Pattern = strPattern.c_str();
 		
 		// whether or not this pattern is found in the input text
 		//bool bFound = false;
-		bool bFound = m_ipRegExpr->StringContainsPattern( 
-			_bstr_t(strInputWithinRange.c_str())) == VARIANT_TRUE;
+		bool bFound = asCppBool(m_ipRegExpr->StringContainsPattern(strInputWithinRange.c_str()));
 		
 		if (bFound && !m_bIsAndRelationship)
 		{
@@ -154,47 +163,37 @@ bool PatternHolder::foundPatternsInText(ISpatialStringPtr ipInputText, DocPageCa
 	return m_bIsAndRelationship;
 }
 //-------------------------------------------------------------------------------------------------
-bool PatternHolder::isUniqueRuleID(std::string strIDPlusPattern)
+bool PatternHolder::isUniqueRuleID(const string& strIDPlusPattern)
 {
 	// Extract Rule ID from input text
-	string strRuleID;
 	long lLength = strIDPlusPattern.length();
 	long lPos = strIDPlusPattern.find( '=', 0 );
 	if ((lPos == string::npos) || (lPos == lLength - 1))
 	{
-		// No defined Rule ID, return false
+		// No defined Rule ID, return true
 		return true;
 	}
 	else
 	{
 		// Rule ID is before EQUAL sign
-		strRuleID = strIDPlusPattern.substr( 0, lPos );
+		string strRuleID = strIDPlusPattern.substr( 0, lPos );
 
-		// Examine previous Rule ID strings
-		long lCount = m_vecRuleIDs.size();
-		for (int i = 0; i < lCount; i++)
+		if (m_setRuleIDs.find(strRuleID) != m_setRuleIDs.end())
 		{
-			// Retrieve this ID
-			string strID = m_vecRuleIDs[i];
-
-			// Compare
-			if (strID.compare( strRuleID ) == 0)
-			{
 				// Match found, return false
 				return false;
-			}
 		}
-	}
 
-	// No match found, return true
-	m_vecRuleIDs.push_back( strRuleID );
-	return true;
+		// No match found, return true
+		m_setRuleIDs.insert(strRuleID);
+		return true;
+	}
 }
 
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-std::string PatternHolder::getInputText(ISpatialStringPtr ipInputText, DocPageCache& cache)
+std::string PatternHolder::getInputText(const ISpatialStringPtr& ipInputText, DocPageCache& cache)
 {
 	// if the range is thge full document
 	string strInputText;

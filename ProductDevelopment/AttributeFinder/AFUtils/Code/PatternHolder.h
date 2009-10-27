@@ -2,16 +2,21 @@
 
 #include <string>
 #include <vector>
+#include <set>
 #include "DocPageCache.h"
+
+using namespace std;
 
 enum EConfidenceLevel{kZero = 0, kMaybe, kProbable, kSure};
 
 class PatternHolder
 {
 public:
-	PatternHolder(IRegularExprParserPtr ipRegExpr);
+	PatternHolder(const IRegularExprParserPtr& ipRegExpr);
 	PatternHolder(const PatternHolder& objToCopy);
 	PatternHolder& operator=(const PatternHolder& objToAssign);
+
+	~PatternHolder();
 
 	////////////
 	// Methods
@@ -19,12 +24,12 @@ public:
 	// Based on given variables, if one or more of
 	// patterns from vec is found, then return true, 
 	// otherwise return false.
-	bool foundPatternsInText(ISpatialStringPtr ipInputText, DocPageCache& cache);
+	bool foundPatternsInText(const ISpatialStringPtr& ipInputText, DocPageCache& cache);
 
 	// Returns true if Rule ID portion of strIdPlusPattern is not found within 
-	// m_vecRuleIDs, false otherwise.  Returns false if Rule ID is not found
+	// m_setRuleIDs, false otherwise.  Returns true if Rule ID is not found
 	// within strIdPlusPattern.
-	bool isUniqueRuleID(std::string strIDPlusPattern);
+	bool isUniqueRuleID(const string& strIDPlusPattern);
 
 	//////////////
 	// Variables
@@ -36,7 +41,7 @@ public:
 	bool m_bIsAndRelationship;
 
 	// vector of patterns
-	std::vector<std::string> m_vecPatterns;
+	vector<string> m_vecPatterns;
 
 	// search scope
 	double m_dStartingRange, m_dEndingRange;
@@ -48,20 +53,20 @@ public:
 	int m_nStartPage, m_nEndPage;
 
 	// NEW FORMAT: Block ID
-	std::string	m_strBlockID;
+	string	m_strBlockID;
 
 	// NEW FORMAT: Sub-Type
-	std::string	m_strSubType;
+	string	m_strSubType;
 
 	// NEW FORMAT: Rule ID
-	std::string	m_strRuleID;
+	string	m_strRuleID;
 
 private:
 
 	// vector of Rule IDs associated with m_vecPatterns
-	std::vector<std::string> m_vecRuleIDs;
+	set<string> m_setRuleIDs;
 
-	std::string getInputText(ISpatialStringPtr ipInputText, DocPageCache& cache);
+	string getInputText(const ISpatialStringPtr& ipInputText, DocPageCache& cache);
 
 	IRegularExprParserPtr m_ipRegExpr;
 };

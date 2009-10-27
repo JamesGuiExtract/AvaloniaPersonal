@@ -11,6 +11,8 @@
 #include <vector>
 #include <map>
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CDocumentClassifier
 class ATL_NO_VTABLE CDocumentClassifier : 
@@ -34,6 +36,9 @@ public:
 DECLARE_REGISTRY_RESOURCEID(IDR_DOCUMENTCLASSIFIER)
 
 DECLARE_PROTECT_FINAL_CONSTRUCT()
+
+	HRESULT FinalConstruct();
+	void FinalRelease();
 
 BEGIN_COM_MAP(CDocumentClassifier)
 	COM_INTERFACE_ENTRY(IDocumentClassifier)
@@ -110,7 +115,7 @@ private:
 	/////////////
 	bool m_bDirty;
 
-	std::string m_strIndustryCategoryName;
+	string m_strIndustryCategoryName;
 
 	UCLID_AFUTILSLib::IAFUtilityPtr m_ipAFUtility;
 
@@ -118,10 +123,10 @@ private:
 	// Each interpreter loads individual doc type file, interpret 
 	// the contents and is able to tell a confidence level
 	// given the input text (document)
-	std::map<std::string, std::vector<DocTypeInterpreter> > m_mapNameToVecInterpreters;
+	map<string, vector<DocTypeInterpreter> > m_mapNameToVecInterpreters;
 
 	// Each industry name associated with a vector of DocType names
-	std::map<std::string, std::vector<std::string> > m_mapNameToVecDocTypes;
+	map<string, vector<string> > m_mapNameToVecDocTypes;
 
 	IRegularExprParserPtr m_ipRegExpr;
 
@@ -129,17 +134,17 @@ private:
 	// Methods
 	//////////
 	// Adds special document type tags to rvecTags
-	void	appendSpecialTags(std::vector<std::string>& rvecTags);
+	void	appendSpecialTags(vector<string>& rvecTags);
 
 	// create document probability and confidence level in pAFDoc
-	void createDocTags(IAFDocument* pAFDoc, const std::string& strSpecificIndustryName);
+	void createDocTags(IAFDocument* pAFDoc, const string& strSpecificIndustryName);
 
 	// load DocTypes.idx file, which contains all available document
 	// types for specified industry category. Based on these type names,
 	// find doc type file with exactly same name and load the file into each
 	// DocTypeInterpreter from m_vecDocTypeInterpreters.
 	// strSpecificIndustryName - ex, County Documents, etc.
-	void loadDocTypeFiles(const std::string& strSpecificIndustryName);
+	void loadDocTypeFiles(const string& strSpecificIndustryName);
 
 	void validateLicense();
 };

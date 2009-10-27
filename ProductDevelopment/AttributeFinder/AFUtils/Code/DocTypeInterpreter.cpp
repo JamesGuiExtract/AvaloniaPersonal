@@ -40,25 +40,36 @@ const string DocTypeInterpreter::SCOPEEndTag = "SCOPE_END";
 // DocTypeInterpreter
 //-------------------------------------------------------------------------------------------------
 DocTypeInterpreter::DocTypeInterpreter(IRegularExprParserPtr ipRegExpr)
-: m_ipRegExpr(ipRegExpr)
+: m_ipRegExpr(ipRegExpr),
+m_ipUtils(NULL)
 {
 }
 //-------------------------------------------------------------------------------------------------
 DocTypeInterpreter::DocTypeInterpreter(const DocTypeInterpreter& objToCopy)
 {
-	CSingleLock lg( &m_mutex, TRUE );
 	m_strDocTypeName = objToCopy.m_strDocTypeName;
 	m_strDocSubType = objToCopy.m_strDocSubType;
 	m_ipUtils = objToCopy.m_ipUtils;
+	m_ipRegExpr = objToCopy.m_ipRegExpr;
 	m_vecPatternHolders = objToCopy.m_vecPatternHolders;
+}
+//-------------------------------------------------------------------------------------------------
+DocTypeInterpreter::~DocTypeInterpreter()
+{
+	try
+	{
+		m_ipRegExpr = NULL;
+		m_ipUtils = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28219");
 }
 //-------------------------------------------------------------------------------------------------
 DocTypeInterpreter& DocTypeInterpreter::operator=(const DocTypeInterpreter& objToAssign)
 {
-	CSingleLock lg( &m_mutex, TRUE );
 	m_strDocTypeName = objToAssign.m_strDocTypeName;
 	m_strDocSubType = objToAssign.m_strDocSubType;
 	m_ipUtils = objToAssign.m_ipUtils;
+	m_ipRegExpr = objToAssign.m_ipRegExpr;
 	m_vecPatternHolders = objToAssign.m_vecPatternHolders;
 
 	return *this;
@@ -67,22 +78,21 @@ DocTypeInterpreter& DocTypeInterpreter::operator=(const DocTypeInterpreter& objT
 //-------------------------------------------------------------------------------------------------
 // Public Methods
 //-------------------------------------------------------------------------------------------------
-int DocTypeInterpreter::getDocConfidenceLevel(ISpatialStringPtr ipInputText, DocPageCache& cache)
+int DocTypeInterpreter::getDocConfidenceLevel(const ISpatialStringPtr& ipInputText, DocPageCache& cache)
 {
-	CSingleLock lg( &m_mutex, TRUE );
 	EConfidenceLevel eConfidenceLevel = kZero;
 
 	// go through all PatternHolders
 	for (unsigned int ui = 0; ui < m_vecPatternHolders.size(); ui++)
 	{
-		PatternHolder patternHolder = m_vecPatternHolders[ui];
+		PatternHolder& patternHolder = m_vecPatternHolders[ui];
 
 		// find match
 		bool bFound = patternHolder.foundPatternsInText(ipInputText, cache);
 		if (bFound)
 		{
 			// Retrieve Block ID
-			string strBlockID = patternHolder.m_strBlockID;
+			string& strBlockID = patternHolder.m_strBlockID;
 
 			bool	bFoundMatch = false;
 			if (strBlockID.length() > 0)
@@ -90,7 +100,7 @@ int DocTypeInterpreter::getDocConfidenceLevel(ISpatialStringPtr ipInputText, Doc
 				unsigned long ulCount = m_vecBlockIDs.size();
 				for (unsigned int ui = 0; ui < ulCount; ui++)
 				{
-					string strTest = m_vecBlockIDs[ui];
+					string& strTest = m_vecBlockIDs[ui];
 					if (strBlockID.compare( strTest ) == 0)
 					{
 						bFoundMatch = true;
@@ -143,92 +153,89 @@ void DocTypeInterpreter::loadDocTypeFile(const string& strDocTypeFile, bool bCle
 {
 	try
 	{
-		CSingleLock lg( &m_mutex, TRUE );
-		if (m_ipUtils == NULL)
+		try
 		{
-			// Instantiate the AF Utils object
-			m_ipUtils.CreateInstance(CLSID_MiscUtils);
-			ASSERT_RESOURCE_ALLOCATION("ELI07624", m_ipUtils != NULL);
-		}
-
-		// before loading the file, if AutoEncrypt is on, and the file has
-		// .etf extension, encrypt the base file
-		m_ipUtils->AutoEncryptFile( _bstr_t(strDocTypeFile.c_str()),
-			_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
-
-		// if asked to clear the vec of patterns
-		if (bClearPatterns)
-		{
-			m_vecPatternHolders.clear();
-		}
-		// make sure doc type file exists
-		if (!isValidFile(strDocTypeFile))
-		{
-			UCLIDException ue("ELI07093", "Doc Type file doesn't exist.");
-			ue.addDebugInfo("File", strDocTypeFile);
-			ue.addWin32ErrorInfo();
-			throw ue;
-		}
-
-		vector<string> vecLines = convertToLines(strDocTypeFile);
-
-		// Provide the input lines to the file reader
-		CommentedTextFileReader fileReader(vecLines, "//", true);
-		string strLine("");
-		
-		// Process each line in the Rules file
-		while (!fileReader.reachedEndOfStream())
-		{ 
-			// Retrieve this line
-			strLine = fileReader.getLineText();
-			if (strLine.empty())
+			if (m_ipUtils == NULL)
 			{
-				continue;
+				// Instantiate the AF Utils object
+				m_ipUtils.CreateInstance(CLSID_MiscUtils);
+				ASSERT_RESOURCE_ALLOCATION("ELI07624", m_ipUtils != NULL);
 			}
 
-			// look at the tag at the very beginning of the line
-			// to tell if its an import or a pattern or a var
-			if (strLine.find(ImportTag) == 0)
-			{
-				string strFileToImport = getImportFileName(strLine, strDocTypeFile);
+			// before loading the file, if AutoEncrypt is on, and the file has
+			// .etf extension, encrypt the base file
+			m_ipUtils->AutoEncryptFile( _bstr_t(strDocTypeFile.c_str()),
+				_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
 
-				// call this function, do not clear the vec of patterns
-				loadDocTypeFile(strFileToImport, false);
-			}
-			else if (strLine.find(ZeroBeginTag) != string::npos)
+			// if asked to clear the vec of patterns
+			if (bClearPatterns)
 			{
-				loadConfidenceLevelBlocks(fileReader, kZero);
+				m_vecPatternHolders.clear();
 			}
-			else if (strLine.find(SureBeginTag) != string::npos)
+			// make sure doc type file exists
+			if (!isValidFile(strDocTypeFile))
 			{
-				loadConfidenceLevelBlocks(fileReader, kSure);
-			}
-			else if (strLine.find(ProbableBeginTag) != string::npos)
-			{
-				loadConfidenceLevelBlocks(fileReader, kProbable);
-			}
-			else if (strLine.find(MaybeBeginTag) != string::npos)
-			{
-				loadConfidenceLevelBlocks(fileReader, kMaybe);
-			}
-			else
-			{
-				// this is an invalid line
-				UCLIDException ue("ELI07095", "This line is not an acceptable format.");
-				ue.addDebugInfo("LineText", strLine);
+				UCLIDException ue("ELI07093", "Doc Type file doesn't exist.");
+				ue.addDebugInfo("File", strDocTypeFile);
+				ue.addWin32ErrorInfo();
 				throw ue;
 			}
+
+			vector<string> vecLines = convertToLines(strDocTypeFile);
+
+			// Provide the input lines to the file reader
+			CommentedTextFileReader fileReader(vecLines, "//", true);
+			string strLine("");
+
+			// Process each line in the Rules file
+			while (!fileReader.reachedEndOfStream())
+			{ 
+				// Retrieve this line
+				strLine = fileReader.getLineText();
+				if (strLine.empty())
+				{
+					continue;
+				}
+
+				// look at the tag at the very beginning of the line
+				// to tell if its an import or a pattern or a var
+				if (strLine.find(ImportTag) == 0)
+				{
+					string strFileToImport = getImportFileName(strLine, strDocTypeFile);
+
+					// call this function, do not clear the vec of patterns
+					loadDocTypeFile(strFileToImport, false);
+				}
+				else if (strLine.find(ZeroBeginTag) != string::npos)
+				{
+					loadConfidenceLevelBlocks(fileReader, kZero);
+				}
+				else if (strLine.find(SureBeginTag) != string::npos)
+				{
+					loadConfidenceLevelBlocks(fileReader, kSure);
+				}
+				else if (strLine.find(ProbableBeginTag) != string::npos)
+				{
+					loadConfidenceLevelBlocks(fileReader, kProbable);
+				}
+				else if (strLine.find(MaybeBeginTag) != string::npos)
+				{
+					loadConfidenceLevelBlocks(fileReader, kMaybe);
+				}
+				else
+				{
+					// this is an invalid line
+					UCLIDException ue("ELI07095", "This line is not an acceptable format.");
+					ue.addDebugInfo("LineText", strLine);
+					throw ue;
+				}
+			}
 		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28220");
 	}
 	catch (UCLIDException& ue)
 	{
-		ue.addDebugInfo("File", strDocTypeFile);
-		throw ue;
-	}
-	catch (...)
-	{
-		UCLIDException ue("ELI11051", "Unexpected exception caught!");
-		ue.addDebugInfo("File", strDocTypeFile);
+		ue.addDebugInfo("Doc Type File", strDocTypeFile);
 		throw ue;
 	}
 }

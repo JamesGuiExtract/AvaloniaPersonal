@@ -3,13 +3,16 @@
 #include <map>
 #include <string>
 
+using namespace std;
+
 class DocPageCache
 {
 public:
 	DocPageCache();
+	~DocPageCache();
 	
 	// Add the ipSS which contains pages nStartPage through nEndPage to the cache
-	void add(long nStartPage, long nEndPage, ISpatialStringPtr ipSS);
+	void add(long nStartPage, long nEndPage, const ISpatialStringPtr& ipSS);
 
 	// return the cache entry for the specifies page range if one exists
 	// otherwise NULL is returned
@@ -19,10 +22,10 @@ private:
 	//////////////
 	// Variables
 	//////////////
-	std::map<std::string, ISpatialStringPtr> m_mapCache;
+	map<string, ISpatialStringPtr> m_mapCache;
 	
 	//////////////
 	// Methods
 	//////////////
-	std::string getKey(long nStartPage, long nEndPage);
+	string getKey(long nStartPage, long nEndPage);
 };
