@@ -30,7 +30,7 @@
 const unsigned long gnCurrentVersion = 1;
 
 // component description
-const string gstrADD_WATERMARK_COMPONENT_DESCRIPTION = "Add watermark";
+const string gstrADD_WATERMARK_COMPONENT_DESCRIPTION = "Core: Add watermark";
 
 const string gstrDEFAULT_INPUT_IMAGE_FILENAME = "";
 

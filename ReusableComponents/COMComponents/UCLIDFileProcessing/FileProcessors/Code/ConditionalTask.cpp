@@ -137,9 +137,9 @@ STDMETHODIMP CConditionalTask::raw_GetComponentDescription(BSTR * pstrComponentD
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19611", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19611", pstrComponentDescription != NULL);
 
-		*pstrComponentDescription = _bstr_t("Conditionally execute task(s)").Detach();
+		*pstrComponentDescription = _bstr_t("Core: Conditionally execute task(s)").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16112")
 

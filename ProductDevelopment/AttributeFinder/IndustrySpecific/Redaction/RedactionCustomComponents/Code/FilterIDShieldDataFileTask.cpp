@@ -234,7 +234,8 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_GetComponentDescription(BSTR * pbs
 	try
 	{
 		ASSERT_ARGUMENT("ELI24797", pbstrComponentDescription);
-		*pbstrComponentDescription = _bstr_t("Filter ID Shield data file").Detach();
+
+		*pbstrComponentDescription = _bstr_t("Redaction: Filter ID Shield data file").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI24798");
 

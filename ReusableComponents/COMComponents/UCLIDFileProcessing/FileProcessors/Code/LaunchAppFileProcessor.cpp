@@ -202,9 +202,9 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_GetComponentDescription(BSTR * pstrCom
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19613", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19613", pstrComponentDescription != NULL);
 
-		*pstrComponentDescription = _bstr_t("Launch application").Detach();
+		*pstrComponentDescription = _bstr_t("Core: Launch application").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12202")
 

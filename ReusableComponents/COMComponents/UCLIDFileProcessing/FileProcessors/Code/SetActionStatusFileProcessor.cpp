@@ -300,9 +300,9 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_GetComponentDescription(BSTR *ps
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19615", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19615", pstrComponentDescription != NULL);
 
-		*pstrComponentDescription = _bstr_t("Set file-action status in database").Detach();
+		*pstrComponentDescription = _bstr_t("Core: Set file-action status in database").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15106")
 

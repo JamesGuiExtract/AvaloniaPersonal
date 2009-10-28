@@ -29,7 +29,7 @@
 const unsigned long gnCurrentVersion = 1;
 
 // component description
-const string gstrARCHIVE_RESTORE_COMPONENT_DESCRIPTION = "Archive or restore associated file";
+const string gstrARCHIVE_RESTORE_COMPONENT_DESCRIPTION = "Core: Archive or restore associated file";
 
 // The number of digits in an archive folder name
 const int giARCHIVE_FOLDER_DIGIT_COUNT = 8;

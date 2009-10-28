@@ -237,9 +237,9 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_GetComponentDescription(BSTR * pstrComp
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26272", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI26272", pstrComponentDescription != NULL);
 
-		*pstrComponentDescription = _bstr_t("Convert VOA to XML").Detach();
+		*pstrComponentDescription = _bstr_t("Core: Convert VOA to XML").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26273");
 

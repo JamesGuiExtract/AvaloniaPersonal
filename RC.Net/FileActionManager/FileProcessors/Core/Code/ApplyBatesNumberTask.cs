@@ -40,7 +40,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The description to be displayed in the categorized component selection list.
         /// </summary>
-        static readonly string _COMPONENT_DESCRIPTION = "Apply Bates number";
+        static readonly string _COMPONENT_DESCRIPTION = "Core: Apply Bates number";
 
         /// <summary>
         /// The total number of times the apply bates number task will retry applying the

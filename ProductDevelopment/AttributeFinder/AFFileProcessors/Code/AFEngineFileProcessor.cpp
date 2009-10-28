@@ -506,9 +506,9 @@ STDMETHODIMP CAFEngineFileProcessor::raw_GetComponentDescription(BSTR * pstrComp
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19540", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19540", pstrComponentDescription != NULL);
 
-		*pstrComponentDescription = _bstr_t("Execute rules").Detach();
+		*pstrComponentDescription = _bstr_t("Core: Execute rules").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12809");
 

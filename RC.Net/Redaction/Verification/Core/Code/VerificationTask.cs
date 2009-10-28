@@ -24,7 +24,7 @@ namespace Extract.Redaction.Verification
     {
         #region VerificationTask Constants
 
-        const string _COMPONENT_DESCRIPTION = "Verify redactions two";
+        const string _COMPONENT_DESCRIPTION = "Redaction: Verify sensitive data";
 
         const int _CURRENT_VERSION = 1;
         

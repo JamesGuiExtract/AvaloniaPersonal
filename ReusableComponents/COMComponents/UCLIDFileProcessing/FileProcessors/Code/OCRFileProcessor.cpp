@@ -236,9 +236,9 @@ STDMETHODIMP COCRFileProcessor::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19614", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19614", pstrComponentDescription != NULL);
 
-		*pstrComponentDescription = _bstr_t("OCR document").Detach();
+		*pstrComponentDescription = _bstr_t("Core: OCR document").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11031")
 

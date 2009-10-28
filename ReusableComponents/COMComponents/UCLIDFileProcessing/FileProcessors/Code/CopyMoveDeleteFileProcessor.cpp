@@ -305,9 +305,9 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_GetComponentDescription(BSTR * ps
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19612", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19612", pstrComponentDescription != NULL);
 
-		*pstrComponentDescription = _bstr_t("Copy, move or delete file").Detach();
+		*pstrComponentDescription = _bstr_t("Core: Copy, move or delete file").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12160")
 

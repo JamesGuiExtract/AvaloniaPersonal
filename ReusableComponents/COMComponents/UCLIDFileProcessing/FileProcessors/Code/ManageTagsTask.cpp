@@ -29,7 +29,7 @@
 const unsigned long gnCurrentVersion = 1;
 
 // component description
-const string gstrMANAGE_TAGS_COMPONENT_DESCRIPTION = "Manage tags";
+const string gstrMANAGE_TAGS_COMPONENT_DESCRIPTION = "Core: Manage tags";
 
 //--------------------------------------------------------------------------------------------------
 // CManageTagsTask

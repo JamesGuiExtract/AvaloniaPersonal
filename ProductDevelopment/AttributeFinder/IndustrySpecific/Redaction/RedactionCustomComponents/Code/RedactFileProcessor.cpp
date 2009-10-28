@@ -95,7 +95,8 @@ STDMETHODIMP CRedactFileProcessor::raw_Init()
 	
 	try
 	{
-		// nothing to do
+		/*throw UCLIDException("ELI28225", 
+			"Legacy redaction task no longer supported. Use create redacted image task instead.");*/
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17789");
 
@@ -111,6 +112,9 @@ STDMETHODIMP CRedactFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long n
 
 	try
 	{
+		/*throw UCLIDException("ELI28226", 
+			"Legacy redaction task no longer supported. Use create redacted image task instead.");*/
+
 		// Check license
 		validateLicense();
 		_lastCodePos = "10";
@@ -457,7 +461,9 @@ STDMETHODIMP CRedactFileProcessor::raw_GetComponentDescription(BSTR * pstrCompon
 
 	try
 	{
-		*pstrComponentDescription = _bstr_t("Redact images (no verification)").Detach();
+		ASSERT_ARGUMENT("ELI28222", pstrComponentDescription != NULL);
+
+		*pstrComponentDescription = _bstr_t("Redaction: Redact image without verification (legacy)").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12813");
 

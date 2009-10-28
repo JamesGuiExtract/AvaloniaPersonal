@@ -18,7 +18,7 @@
 const unsigned long gnCurrentVersion = 2;
 
 // component description
-const string gstrCONVERT_TO_PDF_COMPONENT_DESCRIPTION = "Convert to searchable PDF";
+const string gstrCONVERT_TO_PDF_COMPONENT_DESCRIPTION = "Core: Convert to searchable PDF";
 
 // default input image filename
 // NOTE: this constant is duplicated in RedactionCCConstants.h of RedactionCustomComponents.
