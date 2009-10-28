@@ -12,7 +12,7 @@
 </h1>
 <hr>
 <h2>NOTE: This utility is designed to convert pre-5.0 FPS files to the current standard.</h2>
-<h2>NOTE: Referenced FPS files are located at .\UCLIDFileProcessing\Utils\InteractiveTest.</h2>
+<h2>NOTE: Referenced FPS files are located at .\UCLIDFileProcessing\Utils\ConvertFPSFile\InteractiveTest.</h2>
 <hr>
 
 <ol>
@@ -28,7 +28,7 @@
     		<li>Confirm that an error message is displayed if the input FPS file is newer than 
 		version 10.</li>
   	</ul>
-<br>
+<p>
   	<li><h2>Convert Version 2 FPS File</h2></li>
   	<ul>
     		<li>Confirm that an error message is displayed when opening this FPS file 
@@ -40,7 +40,7 @@
     		<li>Confirm that the new version includes one <b>OCR document</b> file processor.</li>
     		<li><b>[LegacyRC #5288]</b> Confirm that the application closes without error.</li>
   	</ul>
-<br>
+<p>
   	<li><h2>Convert Version 5 FPS File</h2></li>
   	<ul>
     		<li>Confirm that an error message is displayed when opening this FPS file 
@@ -51,7 +51,7 @@
 		Images from <b>C:\RedactionDemo\Images\4 Mix</b>.</li>
     		<li>Confirm that the new version includes one <b>Verify Redactions</b> file processor.</li>
   	</ul>
-<br>
+<p>
   	<li><h2>Convert Version 6 FPS Files</h2></li>
   	<ul>
     		<li>Confirm that an error message is displayed when opening this FPS file 
@@ -70,7 +70,7 @@
 		<b>File Existence</b> skip condition.</li>
     		<li>Confirm that the new version includes one <b>OCR document</b> file processor.</li>
   	</ul>
-<br>
+<p>
   	<li><h2>Convert Version 7 FPS File</h2></li>
   	<ul>
     		<li>Confirm that an error message is displayed when opening this FPS file 
@@ -81,7 +81,7 @@
     		<li>Confirm that the new version includes one <b>Copy, Move or Delete File</b> 
 		file processor.</li>
   	</ul>
-<br>
+<p>
   	<li><h2>Convert Version 8 FPS File</h2></li>
   	<ul>
     		<li>Confirm that an error message is displayed when opening this FPS file 
@@ -94,7 +94,7 @@
 		with both flags set and the other with neither flag set.</li>
     		<li>Confirm that the new version includes three <b>OCR document</b> file processors.</li>
   	</ul>
-<br>
+<p>
 	<li><h2>Convert Version 9 FPS File</h2></li>
 	<ul>
     		<li>Confirm that an error message is displayed when opening this FPS file 
@@ -106,7 +106,7 @@
     		<li>Confirm that the new version includes a <b>File Existence</b> skip condition.</li>
     		<li>Confirm that the new version includes one <b>OCR document</b> file processor.</li>
   	</ul>
-<br>
+<p>
   	<li><h2>Convert Version 10 FPS File</h2></li>
   	<ul>
     		<li>Confirm that an error message is displayed when opening this FPS file 
@@ -117,6 +117,67 @@
     		<li>Confirm that the new version includes a <b>Static list</b> file supplier 
 		providing 3 TIF Images.</li>
     		<li>Confirm that the new version includes one <b>OCR document</b> file processor.</li>
+  	</ul>
+<p>
+  	<li><h2>FLEX Index 6.0 FPS File</h2></li>
+  	<ul>
+    		<li>Create a <b>6_0_Test</b> database on the test machine.</li>
+    		<li>Add <b>a</b> and <b>b</b> as actions.</li>
+    		<li>Confirm that <b>no</b> error message is displayed when opening <b>FLEX_60.fps</b> 
+		in the FAM.</li>
+    		<li>Confirm that the FPS file uses the <b>a</b> action in the <b>6_0_Test</b> 
+		database.</li>
+    		<li>Confirm that the FPS file <b>does not</b> includes a file supplier.</li>
+    		<li>Confirm that the FPS file includes the following processing tasks
+	  	<ul>
+			<li><b>OCR document</b> - for all pages and using a cleaned image
+			<li><b>Execute rules</b> - for I:\users\Art_Jones\Public\a.rsd 
+			and using the USS file
+			<li><b>Copy, move or delete file</b> - to copy &lt;SourceDocName&gt; 
+			to &lt;FPSFileDir&gt;\&lt;SourceDocName&gt;.copied
+			<li><b>Set file-action status in database</b> - to set b to Failed
+			<li><b>Verify redactions</b> - with the following settings
+			<ul>
+				<li>Include all pages in redaction review
+				<li>Require users to specify redaction type
+				<li>Enable collection of redaction accuracy feedback for 
+				all verified documents, saving the original document and with 
+				$DirOf(&lt;SourceDocName&gt)\ExpectedRedactions as the 
+				feedback data folder
+				<li>Default settings for the ID Shield data file location
+				<li>Create output image only for documents that 
+				contain redactions
+				<li>Create metadata for all documents
+				<li>Redaction text and color settings use &lt;ExemptionCode&gt 
+				with 8pt Times New Roman plus Black border and fill
+			</ul>
+	  	</ul>
+  	</ul>
+<p>
+  	<li><h2>ID Shield 7.0 FPS File</h2></li>
+  	<ul>
+    		<li>Confirm that the standard <b>Demo_IDShield</b> database exists on the 
+		test machine.</li>
+    		<li>Confirm that <b>no</b> error message is displayed when opening <b>IDShield_70.fps</b> 
+		in the FAM.</li>
+    		<li>Confirm that the FPS file uses the <b>Compute</b> action in the 
+		<b>Demo_IDShield</b> database.</li>
+    		<li>Confirm that the FPS file includes a <b>Files from folder</b> file supplier 
+		providing TIF images from <b>C:\Demo_IDShield\Input</b>.</li>
+    		<li>Confirm that the FPS file includes a <b>Match based upon file name pattern</b> 
+		skip condition to skip files containing <b>redaction</b>.</li>
+    		<li>Confirm that the FPS file includes the following processing tasks
+	  	<ul>
+			<li><b>OCR document</b> - for all pages and using a cleaned image
+			<li><b>Execute rules</b> - for C:\Demo_IDShield\Rules\Master.rsd.etf 
+			and using the USS file
+			<li><b>Filter ID Shield data file</b> - to select only SSN items and 
+			save to &lt;SourceDocName&gt;.ssn.voa
+			<li><b>Launch application</b> - to open notepad.exe
+			<li><b>Set file-action status in database</b> - to set Verify to Pending
+			<li><b>Archive or restore associated file</b> - to archive and then 
+			delete &lt;SourceDocName&gt;.voa
+	  	</ul>
   	</ul>
 </ol>
 </body>
