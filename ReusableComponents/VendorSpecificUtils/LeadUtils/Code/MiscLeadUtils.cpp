@@ -783,6 +783,8 @@ int getNumberOfPagesInImage( const string& strImageFileName )
 
 	try
 	{
+		validateFileOrFolderExistence(strImageFileName, "ELI28231");
+
 		// Get initialized FILEINFO struct
 		FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 

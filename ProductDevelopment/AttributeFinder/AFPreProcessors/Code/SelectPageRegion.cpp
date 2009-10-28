@@ -74,6 +74,7 @@ STDMETHODIMP CSelectPageRegion::InterfaceSupportsErrorInfo(REFIID riid)
 	{
 		&IID_ISelectPageRegion,
 		&IID_IDocumentPreprocessor,
+		&IID_IAttributeFindingRule,
 		&IID_IPersistStream,
 		&IID_ICategorizedComponent,
 		&IID_ICopyableObject,
@@ -624,12 +625,22 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 		// Get the source document name from the spatial string
 		string strSourceDoc = asString(ipInputText->SourceDocName);
 
+		// Get the spatial mode of the string
+		ESpatialStringMode eMode = ipInputText->GetMode();
+
+		// Ensure there is a source doc name if the string is non-spatial
+		// (if a string is non-spatial then image dimensions and page counts
+		// will be retrieved from the source document)
+		if (eMode == kNonSpatialMode && strSourceDoc.empty())
+		{
+			UCLIDException uex("ELI28232",
+				"This rule object requires either a spatial string or a source document.");
+			throw uex;
+		}
+
 		// Create collection of Attributes to return
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI18451", ipAttributes != NULL);
-
-		// Get the spatial mode of the string
-		ESpatialStringMode eMode = ipInputText->GetMode();
 
 		// Get the last page number
 		long nLastPageNumber = eMode == kNonSpatialMode ?
@@ -747,6 +758,16 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 
 		// Get the spatial mode of the string
 		ESpatialStringMode eMode = ipInputText->GetMode();
+
+		// Ensure there is a source doc name if the string is non-spatial
+		// (if a string is non-spatial then image dimensions and page counts
+		// will be retrieved from the source document)
+		if (eMode == kNonSpatialMode && strSourceDoc.empty())
+		{
+			UCLIDException uex("ELI28233",
+				"This rule object requires either a spatial string or a source document.");
+			throw uex;
+		}
 
 		// Get the last page number
 		long nLastPageNumber = eMode == kNonSpatialMode ?
