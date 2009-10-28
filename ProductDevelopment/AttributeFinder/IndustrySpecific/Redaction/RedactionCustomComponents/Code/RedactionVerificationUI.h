@@ -3,12 +3,10 @@
 #pragma once
 
 #include "resource.h"       // main symbols
-#include "..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\FPCategories.h"
 #include "RVUIThread.h"
 #include "RedactionUISettings.h"
 
-#include <memory>
-#include <afxmt.h>
+#include <FPCategories.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CRedactionVerificationUI
@@ -138,28 +136,9 @@ private:
 
 	RedactionUISettings m_UISettings;
 
-	// Default wait time from registry for receiving a new file
-	unsigned long	m_ulDefaultWaitTimeMilliseconds;
-
-	// There should only one UI thread that is shared among instances.  Make
-	// the thread and the varibles used to control it static
-	static CMutex ms_mutex;
-	static std::auto_ptr<RVUIThread>	ms_apThread;
-	static LONG ms_nInitializationCount;
-
 	//////////////
 	// Methods
 	//////////////
-
-	// Notify thread that file is ready for processing
-	// with provision for single retry
-	void processTheFile(string strFile, bool bIsRetry, IFAMTagManagerPtr ipFAMTagManager, 
-		IFileProcessingDBPtr ipFAMDB);
-
-	// Computes wait time in milliseconds for specified file.  Wait time is one millisecond per byte 
-	// for the associated VOA file.  If the VOA file cannot be found, the returned time will be the 
-	// default value from the registry.
-	unsigned long	getWaitTime(string strFile);
 
 	void			validateLicense();
 };

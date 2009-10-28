@@ -5,71 +5,26 @@
 #include "RedactionCCConstants.h"
 
 // For registry path information
-#include "..\..\..\..\AFCore\Code\Common.h"
-
+#include <Common.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <cpputil.h>
 #include <COMUtils.h>
 #include <ComponentLicenseIDs.h>
-#include <RegistryPersistenceMgr.h>
-
-#ifdef _VERIFICATION_LOGGING
-#include <ThreadSafeLogFile.h>
-#endif
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
 const unsigned long gnCurrentVersion = 4;
 
-// String constants for registry key
-const std::string gstrREDACTIONCC_PATH = gstrAF_REG_ROOT_FOLDER_PATH + std::string("\\IndustrySpecific\\Redaction\\RedactionCustomComponents");
-const std::string gstrIDSHIELD_FOLDER = "\\IDShield";
-const std::string gstrWAIT_TIME_MS = "NewFileWaitTimeMilliseconds";
-const long gnDEFAULT_WAIT_TIME_MS = 10000;
-
-//-------------------------------------------------------------------------------------------------
-// CRedactionVerificationUI static members
-//-------------------------------------------------------------------------------------------------
-CMutex CRedactionVerificationUI::ms_mutex;
-std::auto_ptr<RVUIThread> CRedactionVerificationUI::ms_apThread;
-LONG CRedactionVerificationUI::ms_nInitializationCount = 0;
-
 //-------------------------------------------------------------------------------------------------
 // CRedactionVerificationUI
 //-------------------------------------------------------------------------------------------------
 CRedactionVerificationUI::CRedactionVerificationUI()
-: m_bDirty(false), 
-  m_ulDefaultWaitTimeMilliseconds(gnDEFAULT_WAIT_TIME_MS)
+: m_bDirty(false)
 {
 	try
 	{
-		// Create a persistence manager
-		RegistryPersistenceMgr rpm( HKEY_CURRENT_USER, gstrREDACTIONCC_PATH );
-
-		// Make sure that the key exists
-		if (!rpm.keyExists( gstrIDSHIELD_FOLDER, gstrWAIT_TIME_MS ))
-		{
-			// Store default value into registry
-			rpm.setKeyValue( gstrIDSHIELD_FOLDER, gstrWAIT_TIME_MS, 
-				asString( gnDEFAULT_WAIT_TIME_MS ).c_str(), true );
-		}
-
-		// Retrieve wait time
-		string strWaitTime = rpm.getKeyValue( gstrIDSHIELD_FOLDER, gstrWAIT_TIME_MS );
-		if (strWaitTime.length() > 0)
-		{
-			// Use the registry value for wait time
-			m_ulDefaultWaitTimeMilliseconds = asLong( strWaitTime );
-		}
-		else
-		{
-			// Empty key exists, use the default value and update the registry
-			m_ulDefaultWaitTimeMilliseconds = gnDEFAULT_WAIT_TIME_MS;
-			rpm.setKeyValue( gstrIDSHIELD_FOLDER, gstrWAIT_TIME_MS, 
-				asString( gnDEFAULT_WAIT_TIME_MS ).c_str(), true );
-		}
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI11275")
 }
@@ -80,8 +35,6 @@ CRedactionVerificationUI::~CRedactionVerificationUI()
 
 	try
 	{
-		// Clean up thread
-		ms_apThread.reset();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI11156")
 }
@@ -991,44 +944,8 @@ STDMETHODIMP CRedactionVerificationUI::raw_Init()
 
 	try
 	{
-		// Protect access to this method
-		CSingleLock lg(&ms_mutex, TRUE);
-
-		// Check license
-		validateLicense();
-
-		if (ms_nInitializationCount == 0)
-		{
-			// Start my UI thread (Suspended) - without Auto-delete 
-			ms_apThread = auto_ptr<RVUIThread>((RVUIThread *) AfxBeginThread(RUNTIME_CLASS(RVUIThread), 
-				THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED, NULL));
-			ms_apThread->m_bAutoDelete = FALSE;
-
-			// Set the UI settings this must be done before the thread is resumed
-			ms_apThread->m_UISettings = m_UISettings;
-
-			// Resume thread processing
-			ms_apThread->ResumeThread();
-
-			// Wait until Thread is ready
-			ms_apThread->WaitForThreadInitialized();
-
-#ifdef _VERIFICATION_LOGGING
-			// Add entry to default log file
-			ThreadSafeLogFile tslf;
-			tslf.writeLine("Thread Init SUCCESS from NotifyProcessingAboutToStart()");
-#endif
-
-			// Check results
-			if (ms_apThread->m_bExceptionThrown)
-			{
-				throw ms_apThread->m_ue;
-			}
-		}
-
-		// Increment initialization count. No need for InterlockedIncrement since all 
-		// manipulation of ms_nInitializationCount is protected via ms_mutex
-		ms_nInitializationCount ++;
+		throw UCLIDException("ELI28223", 
+			"Legacy verification task no longer supported. Use verify image task instead.");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11240")
 
@@ -1043,71 +960,8 @@ STDMETHODIMP CRedactionVerificationUI::raw_ProcessFile(BSTR bstrFileFullName, lo
 
 	try
 	{
-		// Protect access to this method
-		CSingleLock lg(&ms_mutex, TRUE);
-
-		// Check license
- 		validateLicense();
-
-		ASSERT_ARGUMENT("ELI17931", bstrFileFullName != NULL);
-		ASSERT_ARGUMENT("ELI17932", pResult != NULL);
-
-		// Default to user cancelling
-		*pResult = kProcessingCancelled;
-
-		if (asCppBool(bCancelRequested))
-		{
-			// A cancel has been requested... no need to execute the task, just report the task was cancelled.
-			return S_OK;
-		}
-
-		if (ms_nInitializationCount == 0)
-		{
-			UCLIDException ue("ELI17832", "Processing failure: Redaction Verification UI task has not been initialized!");
-			ue.addDebugInfo("Source Filename", asString(bstrFileFullName));
-			throw ue;
-		}
-
-		// Local input file for processing
-		string strInputFile = asString(bstrFileFullName);
-
-		// Create a smart FAM Tag Manager pointer
-		IFAMTagManagerPtr ipFAMTagManager = pTagManager;
-		ASSERT_RESOURCE_ALLOCATION("ELI15011", ipFAMTagManager != NULL);
-
-		// If terminated by user, all the threads except the 
-		// first one will be handled here because the first 
-		// thread set m_bTerminationRequested to true
-		if (ms_apThread->m_bTerminationRequested)
-		{
-			return S_OK;
-		}
-
-		// Validate file existence
-		validateFileOrFolderExistence(strInputFile);
-
-		// Call local method to process the file
-		// allowing for a retry if the processing failed
-		processTheFile(strInputFile, false, ipFAMTagManager, pDB);
-
-		// Check if the user chose to stop
-		if (ms_apThread->m_bTerminationRequested)
-		{
-			// Log this.
-			UCLIDException ue("ELI11402", "Application trace: Verification terminated by the user.");
-			ue.log();
-
-			return S_OK;
-		}
-
-		// Check for error during processing
-		if (ms_apThread->m_bExceptionThrown)
-		{
-			throw ms_apThread->m_ue;
-		}
-
-		// If we reached this point, processing was successful
-		*pResult = kProcessingSuccessful;
+		throw UCLIDException("ELI28224", 
+			"Legacy verification task no longer supported. Use verify image task instead.");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11243")
 
@@ -1120,15 +974,6 @@ STDMETHODIMP CRedactionVerificationUI::raw_Cancel()
 
 	try
 	{
-		// Don't lock this method with ms_mutex... doing so will prevent the
-		// termination request from being posted (assuming ProcessFiles
-		// currenly has ms_mutex locked).  Since this is not doing anything except posting
-		// a message to the thread, it should be inherently thread-safe
-
-		if (ms_nInitializationCount > 0)
-		{
-			ms_apThread->RequestTermination();
-		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11403")
 
@@ -1141,30 +986,6 @@ STDMETHODIMP CRedactionVerificationUI::raw_Close()
 
 	try
 	{
-		// Protect access to this method
-		CSingleLock lg(&ms_mutex, TRUE);
-
-		// Check license
-		validateLicense();
-
-		// Decrement initialization count. If the count is > 0, no need to hold up
-		// the current thread with ms_mutex; just return
-		ms_nInitializationCount --;
-		if (ms_nInitializationCount > 0)
-		{
-			return S_OK;
-		}
-
-#ifdef _VERIFICATION_LOGGING
-		// Add entry to default log file
-		ThreadSafeLogFile tslf;
-		tslf.writeLine("Ready to Post WM_QUIT from Close()");
-#endif
-
-		// Stop the thread
-		ms_apThread->PostThreadMessage(WM_QUIT, 0, 0);
-		WaitForSingleObject(ms_apThread->m_hThread, INFINITE);
-		ms_apThread.reset();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11239")
 
@@ -1180,7 +1001,7 @@ STDMETHODIMP CRedactionVerificationUI::raw_GetComponentDescription(BSTR * pstrCo
 
 	try
 	{
-		*pstrComponentDescription = _bstr_t("Verify redactions").Detach();
+		*pstrComponentDescription = _bstr_t("Redaction: Verify and redact image (legacy)").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12865");
 
@@ -1387,131 +1208,6 @@ STDMETHODIMP CRedactionVerificationUI::GetSizeMax(ULARGE_INTEGER *pcbSize)
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
-//-------------------------------------------------------------------------------------------------
-void CRedactionVerificationUI::processTheFile(string strFile, bool bIsRetry, 
-		IFAMTagManagerPtr ipFAMTagManager, IFileProcessingDBPtr ipFAMDB)
-{
-#ifdef _VERIFICATION_LOGGING
-	// Add entry to default log file
-	ThreadSafeLogFile tslf;
-	string strText;
-	if (bIsRetry)
-	{
-		strText = "Retrying post WM_NEW_FILE_READY for ";
-	}
-	else
-	{
-		strText = "Trying post WM_NEW_FILE_READY for ";
-	}
-	strText += strFile.c_str();
-	strText += " from processTheFile()";
-	tslf.writeLine( strText.c_str() );
-#endif
-
-	// Determine wait time for this file
-	unsigned long ulWaitTime = getWaitTime( strFile );
-
-	// Provide this input file to the thread
-	ms_apThread->m_strFileName = strFile;
-
-	// Provide the FAM tag mananger to the thread
-	ms_apThread->m_ipFAMTagManager = ipFAMTagManager;
-
-	// Provide the FAM DB manager
-	ms_apThread->m_ipFAMDB = ipFAMDB;
-
-	ms_apThread->PostThreadMessage(WM_NEW_FILE_READY, 0, 0);
-
-#ifdef _VERIFICATION_LOGGING
-	// Add entry to default log file
-	strText = "Posted WM_NEW_FILE_READY for ";
-	strText += asString(ms_apThread->m_nThreadID);
-	strText += ", next is WaitForFileComplete()";
-	tslf.writeLine( strText.c_str() );
-#endif
-
-	// Make thread wait until dialog completes processing
-	bool bSuccess = ms_apThread->WaitForFileComplete(ulWaitTime);
-	if (!bSuccess)
-	{
-#ifdef _VERIFICATION_LOGGING
-		// Add entry to default log file
-		if (bIsRetry)
-		{
-			strText = "Second FileComplete timeout for ";
-		}
-		else
-		{
-			strText = "Initial FileComplete timeout for ";
-		}
-		strText += strFile.c_str();
-		strText += " from processTheFile()";
-		tslf.writeLine( strText.c_str() );
-#endif
-
-		// Is this a second failure
-		if (bIsRetry)
-		{
-			// Create and throw an exception to indicate failure
-			UCLIDException ue("ELI14298", "Redaction Verification timeout.");
-			ue.addDebugInfo("Verified File", strFile);
-			throw ue;
-		}
-		// Processing has only failed once
-		else
-		{
-			// Try it again - invisible to the user
-			processTheFile(strFile, true, ipFAMTagManager, ipFAMDB);
-		}
-	}
-	else
-	{
-#ifdef _VERIFICATION_LOGGING
-		// Add entry to default log file
-		strText = "Notification of FileComplete received for ";
-		strText += strFile.c_str();
-		strText += " from processTheFile()";
-		tslf.writeLine( strText.c_str() );
-#endif
-	}
-}
-//-------------------------------------------------------------------------------------------------
-unsigned long CRedactionVerificationUI::getWaitTime(string strFile)
-{
-	// Use registry value as default
-	unsigned long ulWaitTimeMs = m_ulDefaultWaitTimeMilliseconds;
-
-	// Check for VOA file
-	string strVOAFile = strFile.c_str();
-	string	strExt = getExtensionFromFullPath( strFile, true );
-	if (strExt != ".voa")
-	{
-		// Try appending .voa
-		strVOAFile += ".voa";
-	}
-
-	// Get file size if file is present
-	if (isFileOrFolderValid( strVOAFile ))
-	{
-		
-		unsigned long ulSizeInBytes = 0;
-
-		// Catch and log any exceptions in case getSizeOfFile call fails
-		// (It would be better to give the task a chance to work using default
-		// registry value than fail the file because of an error reading VOA file size).
-		// [FlexIDSCore #3495]
-		try
-		{
-			ulSizeInBytes = (unsigned long)getSizeOfFile( strVOAFile );
-		}
-		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI25502");
-
-		// Use larger of file size or registry setting
-		ulWaitTimeMs = max( ulSizeInBytes, ulWaitTimeMs );
-	}
-
-	return ulWaitTimeMs;
-}
 //-------------------------------------------------------------------------------------------------
 void CRedactionVerificationUI::validateLicense()
 {
