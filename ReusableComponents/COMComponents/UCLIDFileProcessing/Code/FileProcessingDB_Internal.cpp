@@ -451,49 +451,39 @@ void CFileProcessingDB::addFileActionStateTransition ( ADODB::_ConnectionPtr ipC
 													  const string &strFromState, 
 													  const string &strToState, 
 													  const string &strException, 
-													  const string &strComment )
+													  const string &strComment)
 {
-	// check if updates to FileActionStateTransition table are required
-	if ( !m_bUpdateFASTTable || strToState == strFromState )
+	string strInsertQuery = "";
+	try
 	{
-		// nothing to do
-		return;
+		try
+		{
+			// check if updates to FileActionStateTransition table are required
+			if ( !m_bUpdateFASTTable || strToState == strFromState )
+			{
+				// nothing to do
+				return;
+			}
+
+			// Build the insert query for adding the new row
+			strInsertQuery = "INSERT INTO " + gstrFILE_ACTION_STATE_TRANSITION
+				+ " (FileID, ActionID, ASC_From, ASC_To, DateTimeStamp, FAMUserID, MachineID, "
+				"Exception, Comment) VALUES (" + asString(nFileID) + ", " + asString(nActionID)
+				+ ", '" + strFromState + "', '" + strToState + "', GETDATE(), "
+				+ asString(getFAMUserID(ipConnection)) + ", " + asString(getMachineID(ipConnection)) + ", "
+				+ (strException.empty() ? "NULL" : ("'" + strException + "'")) + ", "
+				+ (strComment.empty() ? "NULL" : ("'" + strComment + "'")) + ")";
+
+			// Run the query
+			executeCmdQuery(ipConnection, strInsertQuery);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28236");
 	}
-	_RecordsetPtr ipActionTransitionSet( __uuidof( Recordset ));
-	ASSERT_RESOURCE_ALLOCATION("ELI13593", ipActionTransitionSet != NULL );
-
-	// Open the transition table
-	ipActionTransitionSet->Open( "FileActionStateTransition", 
-		_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-		adLockOptimistic, adCmdTableDirect );
-
-	// Add a new record
-	ipActionTransitionSet->AddNew();
-
-	// Get the fields pointer
-	FieldsPtr ipFields = ipActionTransitionSet->Fields;
-	ASSERT_RESOURCE_ALLOCATION("ELI26868", ipFields != NULL);
-
-	// set the records fields
-	setLongField( ipFields, "FileID", nFileID );
-	setLongField( ipFields, "ActionID", nActionID );
-	setStringField( ipFields, "ASC_From", strFromState );
-	setStringField( ipFields, "ASC_To", strToState );
-	setStringField( ipFields, "DateTimeStamp", getSQLServerDateTime(ipConnection));
-	setLongField( ipFields, "FAMUserID", getFAMUserID(ipConnection));
-	setLongField( ipFields, "MachineID", getMachineID(ipConnection));
-
-	// if a transition to failed add the exception
-	if ( strToState == "F" )
+	catch(UCLIDException& ue)
 	{
-		setStringField( ipFields, "Exception", strException, true );
+		ue.addDebugInfo("SQL Query", strInsertQuery);
+		throw ue;
 	}
-	
-	// save Comment
-	setStringField( ipFields, "Comment", strComment, true );
-
-	// update the table
-	ipActionTransitionSet->Update();
 }
 //--------------------------------------------------------------------------------------------------
 long CFileProcessingDB::getFileID(ADODB::_ConnectionPtr ipConnection, string& rstrFileName)

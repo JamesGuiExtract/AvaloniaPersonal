@@ -1238,6 +1238,9 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 		
 		// Get the action ID and update the strActionName to stored value
 		long nActionID = getActionID(ipConnection, strActionName);
+		string strActionID = asString(nActionID);
+
+		string strUPIID = asString(m_nUPIID);
 
 		// Action Column to change
 		string strActionCol = "ASC_" + strActionName;
@@ -1247,7 +1250,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 		if (bGetSkippedFiles == VARIANT_TRUE)
 		{
 			strWhere = " INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID "
-				"WHERE ( SkippedFile.ActionID = " + asString(nActionID)
+				"WHERE ( SkippedFile.ActionID = " + strActionID
 				+ " AND FAMFile." + strActionCol + " = 'S'";
 
 			string strUserName = asString(bstrSkippedForUserName);
@@ -1259,7 +1262,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 			}
 
 			// Only get files that have not been skipped by the current process
-			strWhere += " AND SkippedFile.UPIID <> " + asString(m_nUPIID);
+			strWhere += " AND SkippedFile.UPIID <> " + strUPIID;
 
 			strWhere += " )";
 		}
@@ -1278,16 +1281,6 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 		string strSelectSQL = "SELECT " + strTop
 			+ " FAMFile.ID, FileName, Pages, FileSize, Priority, " + strActionCol + " " + strFrom;
 
-		// Create the query to update the status to processing
-		string strUpdateSQL = "UPDATE FAMFile SET " + strActionCol + " = 'R' FROM (SELECT "
-			+ strTop + " FAMFile.ID AS ID2 FROM FAMFile " + strWhere
-			+ ") AS Temp INNER JOIN FAMFile ON Temp.ID2 = FAMFile.ID";
-
-		// Create query to create records in the LockedFile table
-		string strLockedTableSQL = "INSERT INTO LockedFile SELECT ID, " + asString(nActionID) +
-			" AS ActionID, " + asString(m_nUPIID) + " AS UPIID, " + strActionCol + " FROM ( " +
-			strSelectSQL + ") AS Processing";
-
 		// IUnknownVector to hold the FileRecords to return
 		IIUnknownVectorPtr ipFiles( CLSID_IUnknownVector );
 		ASSERT_RESOURCE_ALLOCATION("ELI19504", ipFiles != NULL );
@@ -1300,35 +1293,80 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 			revertTimedOutProcessingFAMs(ipConnection);
 		}
 
+		// Get the from state for the queries
+		string strFromState = bGetSkippedFiles ? "S" : "P";
+
+		// Get the machine and user ID
+		string strMachineID = asString(getMachineID(ipConnection));
+		string strUserID = asString(getFAMUserID(ipConnection));
+
+		// Create query to create records in the LockedFile table
+		string strLockedTableSQL =
+			"INSERT INTO LockedFile (FileID, ActionID, UPIID, StatusBeforeLock) SELECT FAMFile.ID, "
+			+ strActionID + ", " + strUPIID + ", '" + strFromState + "' FROM FAMFile WHERE "
+			" FAMFile.ID IN (";
+
 		// Recordset to contain the files to process
 		_RecordsetPtr ipFileSet(__uuidof( Recordset ));
 		ASSERT_RESOURCE_ALLOCATION("ELI13573", ipFileSet != NULL );
 
 		// get the recordset with the top nMaxFiles 
-		ipFileSet->Open(strSelectSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-			adLockReadOnly, adCmdText );
+		ipFileSet->Open(strSelectSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockPessimistic, adCmdText );
 
-		// Fill the ipFiles collection
+		// Fill the ipFiles collection, also update the FAMFile table and build
+		// the queries to update both the FAST table and the Locked file table
+		string strFileIDIn = "";
 		while ( ipFileSet->adoEOF == VARIANT_FALSE )
 		{
+			FieldsPtr ipFields = ipFileSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI28234", ipFields != NULL);
+
+			// Set the record to processing and update the recordset
+			setStringField(ipFields, strActionCol, "R");
+			ipFileSet->Update();
+
 			// Get the file Record from the fields
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
-				getFileRecordFromFields(ipFileSet->Fields);
+				getFileRecordFromFields(ipFields);
+			ASSERT_RESOURCE_ALLOCATION("ELI28235", ipFileRecord != NULL);
 
 			// Put record in list of records to return
 			ipFiles->PushBack(ipFileRecord);
 
+			// Add the file ID to the list of ID's
+			if (!strFileIDIn.empty())
+			{
+				strFileIDIn += ", ";
+			}
+			strFileIDIn += asString(ipFileRecord->FileID);
+
 			// move to the next record in the recordset
 			ipFileSet->MoveNext();
 		}
-		// Add transition records for the state change to Processing
-		addASTransFromSelect( ipConnection, strActionName, nActionID, "R", "", "", strWhere, strTop );
 
-		// Update the LockedFile table
-		executeCmdQuery(ipConnection, strLockedTableSQL);
+		// Check whether any file IDs have been added to the string
+		if (!strFileIDIn.empty())
+		{
+			strFileIDIn += ")";
 
-		// Update the status of the selected FAMFiles records
-		executeCmdQuery(ipConnection, strUpdateSQL);
+			// Update the FAST table if necessary
+			if (m_bUpdateFASTTable)
+			{
+				// Create query to update the FAST table
+				string strFASTSql =
+					"INSERT INTO " + gstrFILE_ACTION_STATE_TRANSITION + " (FileID, ActionID, "
+					"ASC_From, ASC_To, DateTimeStamp, FAMUserID, MachineID, Exception, "
+					"Comment) SELECT FAMFile.ID, " + strActionID + ", '" + strFromState
+					+ "', 'R', GETDATE(), " + strUserID + ", " + strMachineID
+					+ ", NULL, NULL FROM FAMFile WHERE FAMFile.ID IN (" + strFileIDIn;
+
+				executeCmdQuery(ipConnection, strFASTSql);
+			}
+
+			// Update the lock table
+			executeCmdQuery(ipConnection, strLockedTableSQL + strFileIDIn);
+		}
 
 		// Commit the changes to the database
 		tg.CommitTrans();

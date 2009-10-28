@@ -618,7 +618,7 @@ void CDocumentClassifier::createDocTags(IAFDocument* pAFDoc, const string& strSp
 		throw ue;
 	}
 
-	vector<DocTypeInterpreter>& vecDocTypeInterpreters = itMap->second;
+	vector<DocTypeInterpreter> vecDocTypeInterpreters = itMap->second;
 
 	IAFDocumentPtr ipAFDoc(pAFDoc);
 	ASSERT_RESOURCE_ALLOCATION("ELI05886", ipAFDoc != NULL);
