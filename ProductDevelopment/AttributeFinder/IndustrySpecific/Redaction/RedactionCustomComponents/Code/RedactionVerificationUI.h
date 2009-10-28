@@ -3,7 +3,6 @@
 #pragma once
 
 #include "resource.h"       // main symbols
-#include "RVUIThread.h"
 #include "RedactionUISettings.h"
 
 #include <FPCategories.h>

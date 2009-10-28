@@ -4,8 +4,6 @@
 #include "FilterIDShieldDataFileTask.h"
 #include "RedactionCCUtils.h"
 #include "RedactionCCConstants.h"
-#include "IDShieldData.h"
-#include "Settings.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>

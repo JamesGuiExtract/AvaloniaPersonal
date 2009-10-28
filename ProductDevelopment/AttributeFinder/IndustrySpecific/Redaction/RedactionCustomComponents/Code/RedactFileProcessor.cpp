@@ -5,16 +5,13 @@
 #include "RedactionCCUtils.h"
 #include "RedactionCCConstants.h"
 #include "IDShieldData.h"
-#include "Settings.h"
 
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <StopWatch.h>
-#include <INIFilePersistenceMgr.h>
 #include <MiscLeadUtils.h>
 
 #include <string>

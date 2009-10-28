@@ -47,12 +47,6 @@ using namespace UCLID_SSOCRLib;
 #import "..\..\..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" named_guids
 using namespace UCLID_INPUTFUNNELLib;
 
-#import "..\..\..\..\..\..\ReusableComponents\OcxAndDlls\UCLIDGenericDisplay2\Code\UCLIDGenericDisplay.tlb" named_guids
-using namespace UCLIDGENERICDISPLAYLib;
-
-#import "..\..\..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.tlb" named_guids
-using namespace UCLID_SPOTRECOGNITIONIRLib;
-
 #import "c:\Program Files\Common Files\System\ADO\msado27.tlb" \
 	rename ("EOF", "adoEOF")
 using namespace ADODB;

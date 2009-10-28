@@ -26,7 +26,6 @@
 #include <AFAboutDlg.h>
 #include <UCLIDException.h>
 #include <UCLIDExceptionDlg.h>
-#include <RWUtils.h>
 #include <cpputil.h>
 
 CComModule _Module;
@@ -127,18 +126,6 @@ BOOL CRedactionCustomComponentsApp::InitInstance()
 		static UCLIDExceptionDlg exceptionDlg;
 		UCLIDException::setExceptionHandler(&exceptionDlg);
 		UCLIDException::setApplication( getAttributeFinderEngineVersion( kIDShieldHelpAbout ) );
-
-		// Initialize the Rogue Wave Utils library
-		RWInitializer	rwInit;
-
-		// Load the ImageEdit OCX to ensure that LeadTools support is licensed
-		HMODULE hModuleImageEdit = ::LoadLibrary("ImageEdit.ocx");
-		if (hModuleImageEdit == NULL)
-		{
-			// Create and log an exception
-			UCLIDException ue("ELI14614", "Failed to load ImageEdit.ocx.");
-			ue.log();
-		}
 	}
 	catch(...)
 	{
@@ -150,15 +137,6 @@ BOOL CRedactionCustomComponentsApp::InitInstance()
 int CRedactionCustomComponentsApp::ExitInstance()
 {
     _Module.Term();
-
-	try
-	{
-		// Cleanup the Rogue Wave Utils library
-		RWCleanup	rwClean;
-	}
-	catch(...)
-	{
-	}
 
     return CWinApp::ExitInstance();
 }
