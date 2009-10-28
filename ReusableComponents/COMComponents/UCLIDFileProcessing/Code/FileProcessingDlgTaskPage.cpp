@@ -48,7 +48,9 @@ IMPLEMENT_DYNCREATE(FileProcessingDlgTaskPage, CPropertyPage)
 //-------------------------------------------------------------------------------------------------
 FileProcessingDlgTaskPage::FileProcessingDlgTaskPage() 
 : CPropertyPage(FileProcessingDlgTaskPage::IDD), 
+  m_ipClipboardMgr(NULL),
   m_ipMiscUtils(NULL),
+  m_dwSel(0),
   m_bEnabled(true),
   m_bInitialized(false),
   m_bLogErrorDetails(FALSE),
@@ -56,17 +58,14 @@ FileProcessingDlgTaskPage::FileProcessingDlgTaskPage()
   m_pFPM(NULL),
   m_bLimitProcessingTimes(FALSE)
 {
-	//{{AFX_DATA_INIT(FileProcessingDlgTaskPage)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
-
-	m_vecSchedule.resize(giNUMBER_OF_HOURS_IN_WEEK, true);
 }
 //-------------------------------------------------------------------------------------------------
 FileProcessingDlgTaskPage::~FileProcessingDlgTaskPage()
 {
 	try
 	{
+		m_ipClipboardMgr = NULL;
+		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16529");
 }
@@ -1713,7 +1712,7 @@ void FileProcessingDlgTaskPage::refresh()
 	m_bLimitProcessingTimes = asMFCBool(ipMgmtRole->LimitProcessingToSchedule);
 
 	m_vecSchedule.clear();
-	m_vecSchedule.reserve(giNUMBER_OF_HOURS_IN_WEEK);
+	m_vecSchedule.resize(giNUMBER_OF_HOURS_IN_WEEK, true);
 
 	// If limiting the processing get the schedule
 	if (asCppBool(m_bLimitProcessingTimes))
@@ -1729,7 +1728,7 @@ void FileProcessingDlgTaskPage::refresh()
 			variant_t v(ipSchedule->Item[i]);
 			if (v.vt == VT_BOOL)
 			{
-				m_vecSchedule.push_back(asCppBool(v.boolVal));
+				m_vecSchedule[i] = asCppBool(v.boolVal);
 			}
 			else
 			{
