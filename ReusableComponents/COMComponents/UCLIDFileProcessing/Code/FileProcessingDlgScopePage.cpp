@@ -1055,7 +1055,7 @@ void FileProcessingDlgScopePage::setStatus(int iRow,
 	}
 
 	// Set the new status value
-	m_wndGrid.SetStyleRange(CGXRange( iRow, 4 ),
+	m_wndGrid.SetStyleRange(CGXRange( iRow, 5 ),
 							CGXStyle()
 								.SetValue( strNewStatus.c_str() )
 					);

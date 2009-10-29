@@ -9,7 +9,6 @@
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 #include <INIFilePersistenceMgr.h>
-#include <Settings.h>
 #include <RedactionCCConstants.h>
 
 #ifdef _DEBUG
