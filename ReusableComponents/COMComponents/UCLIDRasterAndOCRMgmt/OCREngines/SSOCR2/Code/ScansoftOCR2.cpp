@@ -71,6 +71,9 @@ const double gdMAX_HORIZONTAL_LINE_SLOPE = 0.02;
 // maximum number of pixels for zones to be considered overlapping
 const int giMAX_ZONE_OVERLAP = 8;
 
+// Constant for storing the OCR engine version [#5512]
+const string gstrOCR_ENGINE_VERSION = "Nuance 16.0";
+
 //-------------------------------------------------------------------------------------------------
 // Macros
 //-------------------------------------------------------------------------------------------------
@@ -794,6 +797,9 @@ void CScansoftOCR2::storeResultAsSpatialString(const string& strFileName,
 		// update just the text alone.
 		m_ipSpatialString->CreateNonSpatialString(strText.c_str(), pszTemp);
 	}
+
+	// Store the OCR engine version [LRCAU #5512]
+	m_ipSpatialString->OCREngineVersion = gstrOCR_ENGINE_VERSION.c_str();
 
 	// Trim the spaces from the front and the back of the OCR'text.
 	// P16 2286

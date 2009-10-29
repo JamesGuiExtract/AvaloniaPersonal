@@ -10,7 +10,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 11;
+const unsigned long gnCurrentVersion = 12;
 
 //-------------------------------------------------------------------------------------------------
 // ISupportsErrorInfo
@@ -277,6 +277,7 @@ STDMETHODIMP CSpatialString::IsDirty(void)
 // Version 9 - Size of CPPLetter object changed for m_usPageNumber
 // Version 10 - Added m_bIsForcedRotation
 // Version 11 - Removed m_bIsForcedRotation
+// Version 12 - Added OCR Engine Version information
 STDMETHODIMP CSpatialString::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -316,6 +317,12 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 		if (nDataVersion >= 2)
 		{
 			dataReader >> m_strSourceDocName;
+		}
+
+		string strOCREngineVersion = "";
+		if (nDataVersion >= 12)
+		{
+			dataReader >> strOCREngineVersion;
 		}
 
 		// Read spatialness setting
@@ -726,6 +733,9 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 			}
 		}
 
+		// Save the OCR engine version
+		m_strOCREngineVersion = strOCREngineVersion;
+
 		// clear the dirty flag as we just loaded a fresh object
 		m_bDirty = false;
 	}
@@ -753,6 +763,9 @@ STDMETHODIMP CSpatialString::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write the source document name
 		dataWriter << m_strSourceDocName;
+
+		// Write the OCR Engine version
+		dataWriter << m_strOCREngineVersion;
 		
 		// Write the current mode
 		// Changed for Version 8. 

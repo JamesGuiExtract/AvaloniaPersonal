@@ -8,14 +8,17 @@
 #include <string>
 #include <map>
 
+using namespace std;
+
 // USSProperty dialog
 class USSPropertyDlg : public CDialog
 {
 	DECLARE_DYNAMIC(USSPropertyDlg)
 
 public:
-	USSPropertyDlg(std::string strSrc, std::string strOrig, std::string strFile,
-		const ILongToObjectMapPtr& ripISpatialPageInfoCollection, CWnd* pParent = NULL);
+	USSPropertyDlg(const string& strSrc, const string& strOrig, const string& strFile,
+		const string& strOCREngineVersion, const ILongToObjectMapPtr& ipISpatialPageInfoCollection,
+		CWnd* pParent = NULL);
 	virtual ~USSPropertyDlg();
 
 // Dialog Data
@@ -25,9 +28,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	// Generated message map functions
-	//{{AFX_MSG(FindRegExDlg)
 	virtual BOOL OnInitDialog();
-	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -35,11 +36,14 @@ private:
 	// Variables
 	////////////
 	// The uss file name
-	std::string m_USSFileName;
+	string m_USSFileName;
 
 	// the source and original information about the file
-	std::string m_strMsgSrc;
-	std::string m_strMsgOrig;
+	string m_strMsgSrc;
+	string m_strMsgOrig;
+
+	// The OCR engine version
+	string m_strOCREngineVersion;
 
 	// collection of SpatialPageInfo objects
 	ILongToObjectMapPtr m_ipSpatialPageInfoCollection;
@@ -59,9 +63,9 @@ private:
 	void populateListControl();
 	
 	// converts the deskew from radians to degrees and returns as a string
-	std::string getDeskewInDegrees(const double& rdDeskewInRadians);
+	string getDeskewInDegrees(const double& rdDeskewInRadians);
 
 	// process the orientation enum and convert it to a string
-	std::string getOrientationString(const EOrientation& reOrientation);
+	string getOrientationString(const EOrientation& reOrientation);
 };
 //-------------------------------------------------------------------------------------------------

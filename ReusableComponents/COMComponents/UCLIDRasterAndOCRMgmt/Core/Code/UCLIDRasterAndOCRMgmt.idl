@@ -1134,6 +1134,13 @@ library UCLID_RASTERANDOCRMGMTLib
 		//			measures average the distance between lines.
 		[id(93), helpstring("method GetAverageCharHeight")] HRESULT GetAverageCharHeight(
 			[out, retval] long* lpHeight);	
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get/set the OCR engine version that created this spatial string
+		// NOTE:	This should only be set by the OCR engine.
+		[propget, id(94), helpstring("property OCREngineVersion")] HRESULT OCREngineVersion(
+			[out, retval] BSTR* pbstrOCRVersion);
+		[propput, id(94), helpstring("property OCREngineVersion")] HRESULT OCREngineVersion(
+			[in] BSTR bstrOCRVersion);
 	};
 
 	[

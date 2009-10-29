@@ -40,14 +40,16 @@ LPSTR gstrORIENTATION_HEADER = "Orientation";
 //-------------------------------------------------------------------------------------------------
 IMPLEMENT_DYNAMIC(USSPropertyDlg, CDialog)
 //-------------------------------------------------------------------------------------------------
-USSPropertyDlg::USSPropertyDlg(string strSrc, string strOrig, string strFile, 
-							   const ILongToObjectMapPtr& ripISpatialPageInfoCollection,
+USSPropertyDlg::USSPropertyDlg(const string& strSrc, const string& strOrig, const string& strFile, 
+							   const string& strOCREngineVersion,
+							   const ILongToObjectMapPtr& ipISpatialPageInfoCollection,
 							   CWnd* pParent /*=NULL*/)
 : CDialog(USSPropertyDlg::IDD, pParent),
 m_strMsgSrc(strSrc),
 m_strMsgOrig(strOrig),
+m_strOCREngineVersion(strOCREngineVersion),
 m_USSFileName(strFile),
-m_ipSpatialPageInfoCollection(ripISpatialPageInfoCollection)
+m_ipSpatialPageInfoCollection(ipISpatialPageInfoCollection)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -55,6 +57,7 @@ USSPropertyDlg::~USSPropertyDlg()
 {
 	try
 	{
+		m_ipSpatialPageInfoCollection = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16495");
 }
@@ -82,6 +85,8 @@ BOOL USSPropertyDlg::OnInitDialog()
 		// Set the source and original doc name in the edit boxes
 		GetDlgItem(IDC_EDIT_SOURCE)->SetWindowText(m_strMsgSrc.c_str());
 		GetDlgItem(IDC_EDIT_ORIGINAL)->SetWindowText(m_strMsgOrig.c_str());
+		GetDlgItem(IDC_EDIT_OCR_VERSION)->SetWindowText(
+			m_strOCREngineVersion.empty() ? "Unknown" : m_strOCREngineVersion.c_str());
 
 		setUpListControl();
 		populateListControl();

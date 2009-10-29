@@ -534,7 +534,7 @@ void CSpatialStringViewerDlg::OnFileProperties()
 	try
 	{
 		// Retrieve the source document information
-		string strSourceDocName = m_ipSpatialString->SourceDocName;
+		string strSourceDocName = asString(m_ipSpatialString->SourceDocName);
 
 		// display the source document information
 		if (strSourceDocName.empty())
@@ -559,7 +559,8 @@ void CSpatialStringViewerDlg::OnFileProperties()
 
 			// Display the property dialog box
 			USSPropertyDlg dlg(strSourceDocName, m_strOriginalSourceDoc, 
-				m_strUSSFileName, ipCollOfPageInfo, this);
+				m_strUSSFileName, asString(m_ipSpatialString->OCREngineVersion),
+				ipCollOfPageInfo, this);
 			dlg.DoModal();
 		}
 	}

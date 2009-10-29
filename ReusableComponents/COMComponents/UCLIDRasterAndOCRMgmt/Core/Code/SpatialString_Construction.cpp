@@ -21,7 +21,8 @@ const _bstr_t gbstrSPATIAL_STRING_STREAM_NAME("SpatialString");
 CSpatialString::CSpatialString()
 : m_strString(""), 
   m_eMode(kNonSpatialMode), 
-  m_strSourceDocName("")
+  m_strSourceDocName(""),
+  m_strOCREngineVersion("")
 {
 }
 //-------------------------------------------------------------------------------------------------

@@ -1098,6 +1098,7 @@ void CSpatialString::reset(bool bResetSourceDocName, bool bResetPageInfoMap)
 		// clear all its contents
 		m_strString = "";
 		m_vecLetters.clear();
+		m_strOCREngineVersion = "";
 
 		m_vecRasterZones.clear();
 
@@ -3192,6 +3193,9 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
 		
 		// copy the source document name
 		validateAndMergeSourceDocName(asString(ipSource->SourceDocName));
+
+		// Copy the OCR Engine version
+		m_strOCREngineVersion = asString(ipSource->OCREngineVersion);
 
 		// copy the spatial page info map
 		if (eSourceMode != kNonSpatialMode)

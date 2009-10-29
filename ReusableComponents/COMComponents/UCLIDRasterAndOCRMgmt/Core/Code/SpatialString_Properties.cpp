@@ -2379,3 +2379,35 @@ STDMETHODIMP CSpatialString::GetTranslatedImageBounds(ILongToObjectMap* pPageInf
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28046")
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::get_OCREngineVersion(BSTR *pbstrOCREngine)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI28308", pbstrOCREngine != NULL);
+
+		*pbstrOCREngine = _bstr_t(m_strOCREngineVersion.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28309");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::put_OCREngineVersion(BSTR bstrOCREngine)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_strOCREngineVersion = asString(bstrOCREngine);
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28310");
+}
+//-------------------------------------------------------------------------------------------------

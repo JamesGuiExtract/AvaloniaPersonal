@@ -156,6 +156,8 @@ public:
 	STDMETHOD(GetTranslatedImageRasterZones)(ILongToObjectMap* pPageInfoMap,
 		IIUnknownVector** ppRasterZones);
 	STDMETHOD(GetTranslatedImageBounds)(ILongToObjectMap* pPageInfoMap, ILongRectangle** ppBounds);
+	STDMETHOD(get_OCREngineVersion)(BSTR* pbstrOCREngine);
+	STDMETHOD(put_OCREngineVersion)(BSTR bstrOCREngine);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);
@@ -183,6 +185,9 @@ private:
 
 	// source document's name
 	string m_strSourceDocName;
+
+	// The OCR engine version
+	string m_strOCREngineVersion;
 
 	// A Vector of letters containing spatial information about each letter in the string
 	// This only necessarily exists when m_bIsSpatial == true
