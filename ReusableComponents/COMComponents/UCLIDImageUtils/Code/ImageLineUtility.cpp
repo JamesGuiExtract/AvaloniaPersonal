@@ -163,9 +163,9 @@ STDMETHODIMP CImageLineUtility::FindLineRegions(BSTR bstrImageFileName, long nPa
 			if (m_LineGrouper.groupLines(vecLineRects, vecGroupRects, 
 										 rectPageBounds, &vecSubLineRects) == false)
 			{
-				UCLIDException ue("ELI21526", "Line image region search aborted! Too many "
-											  "potential line groupings found; results may not be "
-											  "accurate.");
+				UCLIDException ue("ELI21526", "Application trace: Line image region search aborted! "
+											  "Too many potential line groupings found; results may "
+											  "not be accurate.");
 				ue.addDebugInfo("Filename", strImageFileName);
 				ue.addDebugInfo("Page", nPageNum);
 				ue.log();
