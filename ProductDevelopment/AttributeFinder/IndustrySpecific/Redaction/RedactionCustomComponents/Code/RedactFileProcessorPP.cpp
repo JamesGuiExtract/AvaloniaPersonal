@@ -722,8 +722,6 @@ void CRedactFileProcessorPP::updateVOAGroup()
 //-------------------------------------------------------------------------------------------------
 void CRedactFileProcessorPP::validateLicense()
 {
-	static const unsigned long FP_PP_COMPONENT_ID = gnIDSHIELD_AUTOREDACTION_OBJECT;
-
-	VALIDATE_LICENSE( FP_PP_COMPONENT_ID, "ELI11531", "Redaction File Processor PP" );
+	VALIDATE_LICENSE(gnIDSHIELD_AUTOREDACTION_OBJECT, "ELI11531", "Legacy Redaction File Processor PP");
 }
 //-------------------------------------------------------------------------------------------------

@@ -6,10 +6,11 @@
 #include "RedactionAppearanceDlg.h"
 
 #include <FPCategories.h>
-#include <CachedObjectFromFile.h>
-#include "..\..\..\..\AFCore\Code\RuleSetLoader.h"
 
 #include <set>
+#include <string>
+
+using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 // CRedactFileProcessor
@@ -18,7 +19,7 @@ class ATL_NO_VTABLE CRedactFileProcessor :
 	public CComCoClass<CRedactFileProcessor, &CLSID_RedactFileProcessor>,
 	public ISupportErrorInfo,
 	public IPersistStream,
-	public IDispatchImpl<IRedactFileProcessor, &IID_IRedactFileProcessor, &LIBID_UCLID_AFUTILSLib>,
+	public IDispatchImpl<IRedactFileProcessor, &IID_IRedactFileProcessor, &LIBID_UCLID_REDACTIONCUSTOMCOMPONENTSLib>,
 	public IDispatchImpl<IFileProcessingTask, &IID_IFileProcessingTask, &LIBID_UCLID_FILEPROCESSINGLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
@@ -130,9 +131,9 @@ private:
 	//////////////
 
 	// Rules File Name
-	std::string m_strRuleFileName;
+	string m_strRuleFileName;
 	// Output File Name: can contain Tags
-	std::string m_strOutputFileName;
+	string m_strOutputFileName;
 	// Flag to indicate if a USS file should be used instead of and image file if the USS file exists
 	bool m_bReadFromUSS;
 	// Flag to indicate if output file should be created
@@ -140,31 +141,22 @@ private:
 	//   1 : Create output file only if redactable data was found
 	long m_lCreateIfRedact;
 
-	// Pointer to AFUtility
-	UCLID_AFUTILSLib::IAFUtilityPtr	m_ipAFUtility;
-
-	// Contains the currently loaded Rules file
-	CachedObjectFromFile<IRuleSetPtr, RuleSetLoader> m_ipRuleSet;
-
 	// Contains the names of the attributes to find
 	IVariantVectorPtr m_ipAttributeNames;
 
 	// Set contains the same names as m_ipAttributeNames
-	std::set<std::string> m_setAttributeNames;
+	set<string> m_setAttributeNames;
 
 	bool m_bDirty;
 
 	// Flag to indicate use of voa file instead of rule results
 	bool m_bUseVOA;
 
-	std::string m_strVOAFileName;
+	string m_strVOAFileName;
 
 	// Flags to indicate use of annotations
 	bool m_bCarryForwardAnnotations;
 	bool m_bApplyRedactionsAsAnnotations;
-
-	// Pointer to the IDShield database manager
-	UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr m_ipIDShieldDB;
 
 	// Whether to use the previously redacted image (true) or the original image (false)
 	bool m_bUseRedactedImage;
@@ -178,9 +170,6 @@ private:
 
 	// Sets properties to their default state
 	void clear();
-
-	// Returns m_ipAFUtility, after initializing it if necessary
-	UCLID_AFUTILSLib::IAFUtilityPtr getAFUtility();
 
 	// Returns m_ipRuleSet, after initializing it if necessary
 	// The ruleset will also be loaded using the m_strRuleFileName if it hasn't been already
