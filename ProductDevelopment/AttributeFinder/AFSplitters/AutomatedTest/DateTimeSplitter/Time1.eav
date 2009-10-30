@@ -16,3 +16,15 @@ Time|11:12:13
 .AMPM|AM
 .Minute|12
 .Second|13
+Time|4:03:59
+.Formatted|04:03 AM
+.Hour|4
+.AMPM|AM
+.Minute|3
+.Second|59
+Time|10:59:10
+.Formatted|10:59 AM
+.Hour|10
+.AMPM|AM
+.Minute|59
+.Second|10

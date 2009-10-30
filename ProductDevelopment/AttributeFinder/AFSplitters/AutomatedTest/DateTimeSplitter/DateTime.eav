@@ -34,3 +34,21 @@ Date|12/5/2006 1:45:12 PM
 .AMPM|PM
 .Minute|45
 .Second|12
+Date|10/01/2008 1:59:10 PM
+.Month|10
+.Day|01
+.Year|2008
+.Formatted|10/01/2008 01:59 PM
+.Hour|1
+.AMPM|PM
+.Minute|59
+.Second|10
+Date|1/1/2007 8:10:59 AM
+.Month|01
+.Day|01
+.Year|2007
+.Formatted|01/01/2007 08:10 AM
+.Hour|8
+.AMPM|AM
+.Minute|10
+.Second|59

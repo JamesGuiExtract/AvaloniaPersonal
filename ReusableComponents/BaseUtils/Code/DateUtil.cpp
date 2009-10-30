@@ -623,7 +623,7 @@ bool isValidTime(const string& strWord, long* lHour, long* lMinute, long* lSecon
 				// Use value as Minute
 				else if (lLocalMinute == -1)
 				{
-					if ((lValue >= 0) && (lValue < 59))
+					if ((lValue >= 0) && (lValue <= 59))
 					{
 						lLocalMinute = lValue;
 					}
@@ -635,7 +635,7 @@ bool isValidTime(const string& strWord, long* lHour, long* lMinute, long* lSecon
 				// Use value as Second
 				else if (lLocalSecond == -1)
 				{
-					if ((lValue >= 0) && (lValue < 59))
+					if ((lValue >= 0) && (lValue <= 59))
 					{
 						lLocalSecond = lValue;
 					}
