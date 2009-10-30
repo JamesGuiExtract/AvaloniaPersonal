@@ -397,6 +397,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\RedactionTask.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RedactionTaskPP.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\RedactionUISettings.cpp"
 				>
 			</File>
@@ -424,28 +432,6 @@
 			</File>
 			<File
 				RelativePath="RedactionVerificationUIPP.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\..\..\AFCore\Code\RuleSetLoader.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -572,6 +558,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RedactionTask.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RedactionTaskPP.h"
+				>
+			</File>
+			<File
 				RelativePath=".\RedactionUISettings.h"
 				>
 			</File>
@@ -666,6 +660,14 @@
 			</File>
 			<File
 				RelativePath="RedactFileProcessorPP.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\RedactionTask.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\RedactionTaskPP.rgs"
 				>
 			</File>
 			<File

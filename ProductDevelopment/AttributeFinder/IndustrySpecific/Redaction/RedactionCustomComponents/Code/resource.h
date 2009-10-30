@@ -10,17 +10,18 @@
 #define IDR_REDACTIONVERIFICATIONUIPP   106
 #define IDD_REDACTIONVERIFICATIONUIPP   107
 #define IDD_FEEDBACK_DLG                108
+#define IDR_REDACTIONTASK               111
 #define IDR_REDACTFILEPROCESSOR         112
 #define IDS_TITLERedactFileProcessorPP  113
 #define IDS_HELPFILERedactFileProcessorPP 114
 #define IDS_DOCSTRINGRedactFileProcessorPP 115
 #define IDR_REDACTFILEPROCESSORPP       116
+#define IDR_REDACTIONTASKPP             117
 #define IDC_RULES_FILENAME              118
 #define IDC_OUTPUT_FILENAME             119
 #define IDC_ATTRIBUTES                  120
 #define IDC_VOA_FILENAME                121
 #define IDD_DIALOG_EXEMPTION_CODES      122
-#define IDR_MAINFRAME                   128
 #define IDR_IDSHIELDVOAFILECONTENTSCONDITION 129
 #define IDR_IDSHIELDVOAFILECONTENTSCONDITIONPP 130
 #define IDD_IDSHIELDVOAFILECONTENTSCONDITIONPP 131
@@ -40,23 +41,13 @@
 #define IDR_FILTERIDSHIELD              151
 #define IDR_FILTERIDSHIELDPP            152
 #define IDD_FILTERIDSHIELDPP            153
+#define IDC_CHK_MANUAL                  154
 #define IDD_PROPPAGE_SSNFINDER          200
-#define IDD_DATA_AREA_DLG               201
-#define IDC_STATIC_TYPE                 202
-#define IDC_EDIT_DOCTYPE                203
-#define IDR_DATAAREA_TOOLBAR            204
-#define IDC_STATIC_DATA                 205
 #define IDC_LIST_DATA                   206
 #define IDB_BITMAP_REDACT               207
-#define IDC_STATIC_SUMMARY              208
 #define IDB_BITMAP_NOREDACT             209
 #define IDC_LIST_SUMMARY                210
 #define IDB_BITMAP_NA                   211
-#define IDC_DATA_GRID                   212
-#define IDI_ICON_REDACT                 214
-#define IDI_ICON_NOREDACT               215
-#define IDI_ICON_NA                     216
-#define IDC_SUMMARY_GRID                217
 #define IDC_CHECK_INCLUDE_PAGES         218
 #define IDD_RVUI_GENERAL_PROP           219
 #define IDC_CHECK_AUTOZOOM              220
@@ -67,6 +58,7 @@
 #define IDI_ICON_SELECT_DOC_TAG         226
 #define IDC_BUTTON_IMG_BROWSE           227
 #define IDD_REDACTFILEPROCESSORPP       227
+#define IDD_REDACTIONTASKPP             228
 #define IDC_RADIO_META_OUT_ALL          229
 #define IDC_RADIO_META_OUT_ONLY         230
 #define IDC_EDIT_META_OUT               231
@@ -77,7 +69,6 @@
 #define IDC_BTN_BROWSE_INI              236
 #define IDD_SELECT_DOCTYPES             238
 #define IDC_LIST_DOCTYPES               243
-#define IDI_ICON_SELECT_TAG             244
 #define IDC_ALL_ATTRIBUTES              245
 #define IDC_SELECT_ATTRIBUTES           246
 #define IDC_OUTPUT_ALWAYS               247
@@ -99,7 +90,6 @@
 #define IDC_RADIO_CREATE_IMAGE_REDACTED 265
 #define IDC_BUTTON_SELECT_META_TAG      266
 #define IDC_USE_REDACTED_IMAGE          267
-#define IDC_EDIT_DOC_NAME               271
 #define IDC_CHECK_CARRY_ANNOTATIONS     272
 #define IDC_CHECK_REDACTIONS_AS_ANNOTATIONS 274
 #define IDC_CHECK_COLLECT_FEEDBACK      275
@@ -184,19 +174,6 @@
 #define IDC_COMBO_CONTAINS              356
 #define IDC_COMBO_AUTO_TOOL             357
 #define IDC_CHECK_AUTO_TOOL             358
-#define ID_BUTTON_PREVIOUS_ITEM         32768
-#define ID_BUTTON_NEXT_ITEM             32769
-#define ID_BUTTON_SAVE                  32770
-#define ID_BUTTON_TOGGLE_REDACTION      32771
-#define ID_BUTTON_ZOOM_TO_ITEM          32772
-#define ID_BUTTON_OPTIONS               32773
-#define ID_BUTTON_ABOUT_ID_SHIELD       32774
-#define ID_BUTTON_PREVIOUS              32775
-#define ID_BUTTON_NEXT                  32776
-#define ID_BUTTON_STOP                  32777
-#define ID_BUTTON_APPLY_EXEMPTION       32778
-#define ID_BUTTON_LAST_EXEMPTION        32779
-#define ID_BUTTON_ALL_EXEMPTION         32780
 
 // Next default values for new objects
 // 
@@ -205,6 +182,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         32781
 #define _APS_NEXT_CONTROL_VALUE         359
-#define _APS_NEXT_SYMED_VALUE           154
+#define _APS_NEXT_SYMED_VALUE           155
 #endif
 #endif
