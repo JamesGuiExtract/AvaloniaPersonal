@@ -62,7 +62,7 @@ BOOL CImageOutputDlg::OnInitDialog()
 		// Initialize the document tag
 		m_btnSelectImgTag.SubclassDlgItem(IDC_BUTTON_SELECT_IMAGE_TAG, CWnd::FromHandle(m_hWnd));
 		m_btnSelectImgTag.SetIcon(::LoadIcon(_Module.m_hInstResource, 
-				MAKEINTRESOURCE(IDI_ICON_SELECT_TAG)));
+				MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 
 		m_editOutputImageName.SetWindowTextA(m_options.strOutputFile.c_str());
 

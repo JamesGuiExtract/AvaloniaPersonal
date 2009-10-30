@@ -59,7 +59,7 @@ BOOL CMetadataDlg::OnInitDialog()
 		// Initialize the document tag button
 		m_btnSelectMetaTag.SubclassDlgItem(IDC_BUTTON_SELECT_META_TAG, CWnd::FromHandle(m_hWnd));
 		m_btnSelectMetaTag.SetIcon(::LoadIcon(_Module.m_hInstResource, 
-			MAKEINTRESOURCE(IDI_ICON_SELECT_TAG)));
+			MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 
 		// Store metadata output file name
 		m_editMetaOutputName.SetWindowText(m_metadata.strOutputFile.c_str());

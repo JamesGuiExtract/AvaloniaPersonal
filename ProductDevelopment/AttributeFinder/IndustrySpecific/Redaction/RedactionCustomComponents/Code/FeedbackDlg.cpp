@@ -120,7 +120,7 @@ BOOL CFeedbackDlg::OnInitDialog()
 		m_btnFeedbackFolderTag.SubclassDlgItem(IDC_BUTTON_SELECT_FEEDBACK_FOLDER_TAG, 
 			CWnd::FromHandle(m_hWnd));
 		m_btnFeedbackFolderTag.SetIcon(::LoadIcon(_Module.m_hInstResource, 
-			MAKEINTRESOURCE(IDI_ICON_SELECT_TAG)));
+			MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 
 		// Set feedback data storage options
 		m_editFeedbackFolder.SetWindowText(m_options.strDataFolder.c_str());
