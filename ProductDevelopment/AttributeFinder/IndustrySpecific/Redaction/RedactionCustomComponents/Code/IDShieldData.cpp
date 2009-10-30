@@ -51,17 +51,10 @@ void IDShieldData::calculateFromVector(IIUnknownVectorPtr ipAttributes, const se
 		string strName = asString(ipAttr->Name);
 
 		// Determine if the redaction totals should be updated
-		bool bAddToTotals = strName == gstrMANUAL_LABEL || setRedactLabels.find(strName) != setRedactLabels.end();
+		bool bAddToTotals = setRedactLabels.find(strName) != setRedactLabels.end();
 
 		// Count as redacted or not redacted
-		if ( bAddToTotals )
-		{
-			countRedacted(ipAttr);
-		}
-		else
-		{
-			countNotRedacted(ipAttr);
-		}
+		addToCounts(strName, bAddToTotals);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -121,13 +114,13 @@ void IDShieldData::addToCounts(const string& strLabel, bool bAddToTotals)
 	{
 		m_lNumCluesFound++;
 	}
-	else if (strLabel == gstrMANUAL_LABEL && bAddToTotals)
+	else if (strLabel == gstrMANUAL_LABEL)
 	{
 		m_lTotalManualRedactions++;
 	}
 
 	// Check for add to totals
-	if ( bAddToTotals )
+	if (bAddToTotals)
 	{
 		m_lTotalRedactions++;
 	}
