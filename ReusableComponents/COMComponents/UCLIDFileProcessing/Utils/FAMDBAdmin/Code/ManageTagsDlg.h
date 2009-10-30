@@ -58,7 +58,9 @@ private:
 		virtual ~CAddModifyTagsDlg();
 
 		string getTagName() { return m_strTagName; }
+		void setTagName(const string& strTagName) { m_strTagName = strTagName; }
 		string getDescription() { return m_strDescription; }
+		void setDescription(const string& strDescription) { m_strDescription = strDescription; }
 
 	protected:
 		virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

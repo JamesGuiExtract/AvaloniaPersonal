@@ -239,33 +239,56 @@ void CManageTagsDlg::OnBtnAdd()
 
 	try
 	{
+		string strTagName = "";
+		string strDescription = "";
+
+
 		CAddModifyTagsDlg dlg;
-		
-		if (dlg.DoModal() == IDOK)
+		while (true)
 		{
-			// Show the wait cursor while updating the dialog
-			CWaitCursor wait;
+			if (dlg.DoModal() == IDOK)
+			{
+				// Show the wait cursor while updating the dialog
+				CWaitCursor wait;
 
-			// Get the tag name and description from the dialog
-			string strTagName = dlg.getTagName();
-			string strDescription = dlg.getDescription();
+				// Get the tag name and description from the dialog
+				// (trim leading and trailing whitespace [LRCAU #5516])
+				string strTagName = trim(dlg.getTagName(), " \t", " \t");
+				string strDescription = trim(dlg.getDescription(), " \t", " \t");
 
-			// Add the new tag
-			m_ipFAMDB->AddTag(strTagName.c_str(), strDescription.c_str());
+				try
+				{
+					try
+					{
+						// Add the new tag
+						m_ipFAMDB->AddTag(strTagName.c_str(), strDescription.c_str());
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28311");
+				}
+				catch(UCLIDException& uex)
+				{
+					// Display the error and clear the tag name
+					uex.display();
+					dlg.setTagName("");
+					continue;
+				}
 
-			// Log an application trace about the database change
-			UCLIDException uex("ELI28017", "Application trace: Database change");
-			uex.addDebugInfo("Change", "Add file tag");
-			uex.addDebugInfo("User Name", getCurrentUserName());
-			uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
-			uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
-			uex.addDebugInfo("Tag Name", strTagName);
-			uex.addDebugInfo("Tag Description",
-				strDescription.empty() ? "<Empty>" : strDescription);
-			uex.log();
+				// Log an application trace about the database change
+				UCLIDException uex("ELI28017", "Application trace: Database change");
+				uex.addDebugInfo("Change", "Add file tag");
+				uex.addDebugInfo("User Name", getCurrentUserName());
+				uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
+				uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
+				uex.addDebugInfo("Tag Name", strTagName);
+				uex.addDebugInfo("Tag Description",
+					strDescription.empty() ? "<Empty>" : strDescription);
+				uex.log();
 
-			// Refresh list for new tag
-			refreshTagList();
+				// Refresh list for new tag
+				refreshTagList();
+			}
+
+			break;
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27394");
@@ -288,39 +311,58 @@ void CManageTagsDlg::OnBtnModify()
 		if (iIndex != -1)
 		{
 			// Get the strings from the current selection
-			CString zTagName = m_listTags.GetItemText(iIndex, giTAG_COLUMN);
-			CString zDescription = m_listTags.GetItemText(iIndex, giDESCRIPTION_COLUMN);
+			string strTagName = (LPCTSTR) m_listTags.GetItemText(iIndex, giTAG_COLUMN);
+			string strDescription = (LPCTSTR) m_listTags.GetItemText(iIndex, giDESCRIPTION_COLUMN);
 
-			CAddModifyTagsDlg dlg((LPCTSTR)zTagName, (LPCTSTR) zDescription);
+			CAddModifyTagsDlg dlg(strTagName, strDescription);
 
-			if (dlg.DoModal() == IDOK)
+			while (true)
 			{
-				// Show the wait cursor while updating the dialog
-				CWaitCursor wait;
+				if (dlg.DoModal() == IDOK)
+				{
+					// Show the wait cursor while updating the dialog
+					CWaitCursor wait;
 
-				string strNewTagName = dlg.getTagName();
-				string strNewDescription = dlg.getDescription();
+					string strNewTagName = dlg.getTagName();
+					string strNewDescription = dlg.getDescription();
 
-				// Modify the existing tag
-				m_ipFAMDB->ModifyTag((LPCTSTR)zTagName, strNewTagName.c_str(),
-					strNewDescription.c_str());
+					try
+					{
+						try
+						{
+							// Modify the existing tag
+							m_ipFAMDB->ModifyTag(strTagName.c_str(), strNewTagName.c_str(),
+								strNewDescription.c_str());
+						}
+						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28312");
+					}
+					catch(UCLIDException& uex)
+					{
+						// The reason for failure is most likely invalid tag name, set the name
+						// back to the original
+						dlg.setTagName(strTagName);
+						uex.display();
+						continue;
+					}
 
-				// Log an application trace about the database change
-				UCLIDException uex("ELI27701", "Application trace: Database change");
-				uex.addDebugInfo("Change", "Modify file tag");
-				uex.addDebugInfo("User Name", getCurrentUserName());
-				uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
-				uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
-				uex.addDebugInfo("Original Tag Name", (LPCTSTR) zTagName);
-				uex.addDebugInfo("Original Tag Description",
-					zDescription.IsEmpty() ? "<Empty>" : (LPCTSTR) zDescription);
-				uex.addDebugInfo("New Tag Name", strNewTagName);
-				uex.addDebugInfo("New Tag Description", 
-					strNewDescription.empty() ? "<Empty>" : strNewDescription);
-				uex.log();
+					// Log an application trace about the database change
+					UCLIDException uex("ELI27701", "Application trace: Database change");
+					uex.addDebugInfo("Change", "Modify file tag");
+					uex.addDebugInfo("User Name", getCurrentUserName());
+					uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
+					uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
+					uex.addDebugInfo("Original Tag Name", strTagName);
+					uex.addDebugInfo("Original Tag Description",
+						strDescription.empty() ? "<Empty>" : strDescription);
+					uex.addDebugInfo("New Tag Name", strNewTagName);
+					uex.addDebugInfo("New Tag Description", 
+						strNewDescription.empty() ? "<Empty>" : strNewDescription);
+					uex.log();
 
-				// Refresh list for modified tag
-				refreshTagList();
+					// Refresh list for modified tag
+					refreshTagList();
+				}
+				break;
 			}
 		}
 	}

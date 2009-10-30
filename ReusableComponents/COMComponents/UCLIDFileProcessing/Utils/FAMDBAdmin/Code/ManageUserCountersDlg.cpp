@@ -290,7 +290,8 @@ void CManageUserCountersDlg::OnBtnAdd()
 			CWaitCursor wait;
 
 			// Get the counter name and value from the dialog
-			string strCounterName = dlg.getCounterName();
+			// (Trim leading and trailing whitespace from the name [LRCAU #5516])
+			string strCounterName = trim(dlg.getCounterName(), " \t", " \t");
 			long nValue = dlg.getValue();
 
 			// Add the new counter

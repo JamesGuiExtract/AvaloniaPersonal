@@ -41,6 +41,9 @@ const long	glENABLED_WIDTH = 50;
 // Index of "Anyone" from the skipped file scope combo box
 const int giCOMBO_INDEX_ANYONE = 1;
 
+// The upper bound for the threads dialog box
+const int giTHREADS_UPPER_RANGE = 100;
+
 //-------------------------------------------------------------------------------------------------
 // FileProcessingDlgTaskPage property page
 //-------------------------------------------------------------------------------------------------
@@ -97,7 +100,6 @@ BOOL FileProcessingDlgTaskPage::PreTranslateMessage(MSG* pMsg)
 void FileProcessingDlgTaskPage::DoDataExchange(CDataExchange* pDX)
 {
 	CPropertyPage::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(FileProcessingDlgTaskPage)
 	DDX_Control(pDX, IDC_BTN_ADD, m_btnAdd);
 	DDX_Control(pDX, IDC_BTN_MODIFY, m_btnModify);
 	DDX_Control(pDX, IDC_BTN_REMOVE, m_btnRemove);
@@ -128,11 +130,9 @@ void FileProcessingDlgTaskPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_LIMIT_PROCESSING, m_bLimitProcessingTimes);
 	DDX_Control(pDX, IDC_BUTTON_SET_SCHEDULE, m_btnSetSchedule);
 	DDX_Control(pDX, IDC_CHECK_LIMIT_PROCESSING, m_checkLimitProcessing);
-	//}}AFX_DATA_MAP 
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
-	//{{AFX_MSG_MAP(FileProcessingDlgTaskPage)
 	ON_BN_CLICKED(IDC_BTN_ADD, OnBtnAdd)
 	ON_BN_CLICKED(IDC_BTN_REMOVE, OnBtnRemove)
 	ON_BN_CLICKED(IDC_BTN_MODIFY, OnBtnModify)
@@ -151,7 +151,6 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_BN_CLICKED(IDC_BTN_BROWSE_LOG, OnBtnBrowseErrorLog)
 	ON_BN_CLICKED(IDC_CHECK_EXECUTE_TASK, OnCheckExecuteErrorTask)
 	ON_BN_CLICKED(IDC_BTN_SELECT_ERROR_TASK, OnBtnAddErrorTask)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_THREADS, &FileProcessingDlgTaskPage::OnDeltaposSpinThreads)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_FP, &FileProcessingDlgTaskPage::OnNMDblclkListFp)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_FP, &FileProcessingDlgTaskPage::OnNMRclickListFp)
 	ON_COMMAND(ID_CONTEXT_CUT, &FileProcessingDlgTaskPage::OnContextCut)
@@ -166,7 +165,6 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_CBN_SELCHANGE(IDC_COMBO_SKIPPED_SCOPE, &FileProcessingDlgTaskPage::OnComboSkippedChange)
 	ON_BN_CLICKED(IDC_CHECK_LIMIT_PROCESSING, &FileProcessingDlgTaskPage::OnBtnClickedCheckLimitProcessing)
 	ON_BN_CLICKED(IDC_BUTTON_SET_SCHEDULE, &FileProcessingDlgTaskPage::OnBnClickedButtonSetSchedule)
-	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -193,6 +191,7 @@ BOOL FileProcessingDlgTaskPage::OnInitDialog()
 		CEdit *pEdit;
 		pEdit = (CEdit *)GetDlgItem( IDC_EDIT_THREADS );
 		m_SpinThreads.SetBuddy(pEdit);
+		m_SpinThreads.SetRange32(0, giTHREADS_UPPER_RANGE);
 
 		// Enable full row selection plus grid lines and checkboxes
 		m_fileProcessorList.SetExtendedStyle( LVS_EX_GRIDLINES | 
@@ -1071,44 +1070,6 @@ void FileProcessingDlgTaskPage::OnBtnStopProcessingWithEmptyQueue()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15953");
 }
 //-------------------------------------------------------------------------------------------------
-BOOL FileProcessingDlgTaskPage::OnSetActive()
-{
-	AFX_MANAGE_STATE(AfxGetModuleState());
-
-	try
-	{
-		/*
-		if(!m_bEnabled)
-		{
-			return 0;
-		}
-		else
-		{
-			return CPropertyPage::OnSetActive();
-		}
-		*/
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18046");
-
-	return CPropertyPage::OnSetActive();
-}
-//-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnDeltaposSpinThreads(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	AFX_MANAGE_STATE(AfxGetModuleState());
-
-	try
-	{
-		LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-
-		//Makes the up arrow increase the number and down arrow decrease the number
-		pNMUpDown->iDelta = pNMUpDown->iDelta * -1;
-
-		*pResult = 0;
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18047");
-}
-//-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::OnNMDblclkListFp(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -1830,7 +1791,36 @@ int FileProcessingDlgTaskPage::getNumThreads()
 			string strNumThreads = zNumThreads;
 			if ( strNumThreads != "" )
 			{
-				nNewValue = asLong( strNumThreads );
+				bool bUpdateText = false;
+				try
+				{
+					// Get the value
+					nNewValue = asLong( strNumThreads );
+
+					// Check that it is in the acceptable range
+					if (nNewValue > giTHREADS_UPPER_RANGE)
+					{
+						bUpdateText = true;
+						nNewValue = giTHREADS_UPPER_RANGE;
+					}
+					else if (nNewValue < 0)
+					{
+						bUpdateText = true;
+						nNewValue = 0;
+					}
+
+				}
+				catch(...)
+				{
+					// Set the value to 1
+					nNewValue = 1;
+					bUpdateText = true;
+				}
+
+				if (bUpdateText)
+				{
+					m_editThreads.SetWindowText(asString(nNewValue).c_str());
+				}
 			}
 			else
 			{
