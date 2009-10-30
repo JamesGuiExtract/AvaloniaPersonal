@@ -1,5 +1,5 @@
 REM Clean Source folder
-call Clean.bat
+call Clean.bat Test_1
 
 REM Supply Numbered Files for 4 hours
 START CopyNumberedFiles "Date1.txt" ".\Source" 400ms -h4
