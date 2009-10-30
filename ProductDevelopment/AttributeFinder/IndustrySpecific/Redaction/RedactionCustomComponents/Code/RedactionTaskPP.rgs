@@ -1,0 +1,23 @@
+HKCR
+{
+	RedactionCustomComponents.RedactionTaskPP.1 = s 'RedactionTaskPP Class'
+	{
+		CLSID = s '{FC033951-2DBF-44ff-9394-E0D120DCB618}'
+	}
+	RedactionCustomComponents.RedactionTaskPP = s 'RedactionTaskPP Class'
+	{
+		CLSID = s '{FC033951-2DBF-44ff-9394-E0D120DCB618}'
+		CurVer = s 'RedactionCustomComponents.RedactionTaskPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {FC033951-2DBF-44ff-9394-E0D120DCB618} = s 'RedactionTaskPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

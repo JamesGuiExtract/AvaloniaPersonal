@@ -1,0 +1,26 @@
+HKCR
+{
+	RedactionCustomComponents.RedactionTask.1 = s 'RedactionTask Class'
+	{
+		CLSID = s '{36D14C41-CE3D-4950-AC47-2664563340B1}'
+	}
+	RedactionCustomComponents.RedactionTask = s 'RedactionTask Class'
+	{
+		CLSID = s '{36D14C41-CE3D-4950-AC47-2664563340B1}'
+		CurVer = s 'RedactionCustomComponents.RedactionTask.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {36D14C41-CE3D-4950-AC47-2664563340B1} = s 'RedactionTask Class'
+		{
+			ProgID = s 'RedactionCustomComponents.RedactionTask.1'
+			VersionIndependentProgID = s 'RedactionCustomComponents.RedactionTask'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{18CF5BEC-2929-43DD-86E0-7D50F152663A}'
+		}
+	}
+}

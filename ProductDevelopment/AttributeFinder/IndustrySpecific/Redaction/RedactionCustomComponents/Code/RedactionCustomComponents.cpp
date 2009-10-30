@@ -15,6 +15,8 @@
 #include "RedactionVerificationUIPP.h"
 #include "RedactFileProcessor.h"
 #include "RedactFileProcessorPP.h"
+#include "RedactionTask.h"
+#include "RedactionTaskPP.h"
 #include "IDShieldVOAFileContentsCondition.h"
 #include "IDShieldVOAFileContentsConditionPP.h"
 #include "SelectTargetFileUI.h"
@@ -35,6 +37,8 @@ OBJECT_ENTRY(CLSID_RedactionVerificationUI, CRedactionVerificationUI)
 OBJECT_ENTRY(CLSID_RedactionVerificationUIPP, CRedactionVerificationUIPP)
 OBJECT_ENTRY(CLSID_RedactFileProcessor, CRedactFileProcessor)
 OBJECT_ENTRY(CLSID_RedactFileProcessorPP, CRedactFileProcessorPP)
+OBJECT_ENTRY(CLSID_RedactionTask, CRedactionTask)
+OBJECT_ENTRY(CLSID_RedactionTaskPP, CRedactionTaskPP)
 OBJECT_ENTRY(CLSID_IDShieldVOAFileContentsCondition, CIDShieldVOAFileContentsCondition)
 OBJECT_ENTRY(CLSID_IDShieldVOAFileContentsConditionPP, CIDShieldVOAFileContentsConditionPP)
 OBJECT_ENTRY(CLSID_SelectTargetFileUI, CSelectTargetFileUI)
