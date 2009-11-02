@@ -77,8 +77,20 @@ void FPRecordManager::discardProcessingQueue()
 {
 	ASSERT_ARGUMENT("ELI14002", m_ipFPMDB != NULL);
 
+	// If the queue has already been discarded just return [FlexIDSCore #3738]
+	if (processingQueueIsDiscarded())
+	{
+		return;
+	}
+
 	// lock the DBLoad so that the queue will not be added to while setting to discard and cleaning up
 	CSingleLock lockDBLoad(&m_LoadDBLock, TRUE );
+
+	// If the queue has already been discarded just return [FlexIDSCore #3738]
+	if (processingQueueIsDiscarded())
+	{
+		return;
+	}
 
 	// set event to indicate the queue has been discared
 	m_queueDiscardedEvent.signal();
@@ -102,6 +114,10 @@ void FPRecordManager::discardProcessingQueue()
 			m_ipFPMDB->SetFileStatusToPending( l, bstrAction);
 		}
 	}
+
+	// Ensure the queue is cleared since we have now reverted the state of all files
+	// [FlexIDSCore #3738]
+	m_queTaskIds.clear();
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::updateTask(FileProcessingRecord& task)
@@ -146,6 +162,13 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 		
 		// Need to make sure that the the queue gets loaded from the db if it is empty but only from one thread at a time
 		CSingleLock lockDBLoad(&m_LoadDBLock, TRUE );
+
+		// if the queue is discarded, then return false immediately
+		if (processingQueueIsDiscarded())
+		{
+			return false;
+		}
+
 
 		// Determine the number of files to get from the database
 		long nNumberToLoad = m_nMaxFilesFromDB;
