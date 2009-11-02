@@ -191,7 +191,7 @@ BOOL CRedactionAppearanceDlg::OnInitDialog()
 		// Initialize the document tag button
 		m_buttonTextTag.SubclassDlgItem(IDC_BUTTON_SELECT_META_TAG, CWnd::FromHandle(m_hWnd));
 		m_buttonTextTag.SetIcon(::LoadIcon(_Module.m_hInstResource, 
-			MAKEINTRESOURCE(IDI_ICON_SELECT_TAG)));
+			MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 
 		// Fill combo boxes
 		for (int i=0; i < giNUM_REDACTION_TEXT_DEFAULTS; i++)
