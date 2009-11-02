@@ -30,6 +30,10 @@ public:
 	//			Subsequent calls to processingQueueIsDiscarded() will return false.
 	void clear(bool bClearUI);
 	//---------------------------------------------------------------------------------------------
+	// Resets the Win32Events that are indicating the queue is discarded and closed
+	// 
+	void clearEvents();
+	//---------------------------------------------------------------------------------------------
 	// REQUIRE: Nothing
 	// PROMISE: If processingQueueIsOpen() == true, then the specified task will be added to the 
 	//			back of the queue and the appropriate messages will be sent to the dialog, and true

@@ -80,5 +80,16 @@ enum EDatabaseWrapperObjectStatus
 	kConnectionBusy
 };
 
-const UINT FP_DB_STATUS_UPDATE = WM_USER + 2012;
+const UINT FP_DB_STATUS_UPDATE = WM_USER + 2013;
 //---------------------------------------------------------------------------------------------
+// PURPOSE: To notify a window that the file processing is in a scheduled inactive state
+// WPARAM:	0
+// LPARAM:	0
+const UINT FP_SCHEDULE_INACTIVE = WM_USER + 2014;
+//---------------------------------------------------------------------------------------------
+// PURPOSE: To notify a window that the file processing is in a scheduled run state
+// WPARAM:	0
+// LPARAM:	0
+const UINT FP_SCHEDULE_ACTIVE = WM_USER + 2015;
+//---------------------------------------------------------------------------------------------
+

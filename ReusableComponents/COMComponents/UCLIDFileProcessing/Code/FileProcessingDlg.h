@@ -116,6 +116,8 @@ protected:
 	afx_msg LRESULT OnSupplierStatusChange(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnQueueEvent(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnScheduleInactive(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnScheduleActive(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnFileExit();
 	afx_msg void OnFileNew();
 	afx_msg void OnFileOpen();
@@ -252,6 +254,11 @@ private:
 
 	// This flag is set if running as a service
 	bool m_bRunningAsService;
+
+	// String to contain processing state string 
+	// if processing active it will be empty
+	// if processing is inactive by the schedule it will contain "Processing Inactive"
+	string m_strProcessingStateString;
 
 	////////////
 	// Methods

@@ -148,154 +148,54 @@ STDMETHODIMP CFileProcessingMgmtRole::raw_IsLicensed(VARIANT_BOOL * pbValue)
 STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB *pDB, BSTR bstrAction, long hWndOfUI, 
 											IFAMTagManager *pTagManager, IRoleNotifyFAM *pRoleNotifyFAM)
 {
-	// Obtain this lock since both semaphores are needed
-	CSingleLock lockThread(&m_threadLock, TRUE );
-
-	// Aquire both semaphore counts since the thread data will be 
-	// created in this method
-	CSingleLock guard( &m_threadDataSemaphore, TRUE );
-	CSingleLock guard2( &m_threadDataSemaphore, TRUE );
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		try
+		validateLicense();
+
+		// check pre-conditions
+		ASSERT_ARGUMENT("ELI14296", m_bEnabled == true);
+		ASSERT_ARGUMENT("ELI14301", m_ipFileProcessingTasks != NULL);
+		ASSERT_ARGUMENT("ELI14302", m_ipFileProcessingTasks->Size() > 0);
+		ASSERT_ARGUMENT("ELI14344", m_pRecordMgr != NULL);
+
+		// Before starting the processManager thread, make sure it is not already started
+		if (m_eventProcessManagerStarted.isSignaled() && !m_eventProcessManagerExited.isSignaled())
 		{
-			validateLicense();
-
-			// check pre-conditions
-			ASSERT_ARGUMENT("ELI14296", m_bEnabled == true);
-			ASSERT_ARGUMENT("ELI14301", m_ipFileProcessingTasks != NULL);
-			ASSERT_ARGUMENT("ELI14302", m_ipFileProcessingTasks->Size() > 0);
-			ASSERT_ARGUMENT("ELI14344", m_pRecordMgr != NULL);
-
-			// Set the File Action manager pointer
-			m_ipRoleNotifyFAM = pRoleNotifyFAM;
-			ASSERT_RESOURCE_ALLOCATION("ELI14531", m_ipRoleNotifyFAM != NULL );
-
-			// Kick off the thread which will wait for all file processing threads
-			// to complete and then update the UI
-			// By putting this kick-off this early in this method, we can benefit from 
-			// the fact that all the sitations related to processing ending
-			// (due to errors or due to successful processing) can be handled in one
-			// place (i.e. this thread function).
-			AfxBeginThread(fileProcessingThreadsWatcherThread, this);
-
-			// store the pointer to the DB so that subsequent calls to getFPDB() will work correctly
-			m_pDB = pDB;
-
-			// remember the action name
-			m_strAction = asString(bstrAction);
-
-			// Set action ID to the record manager
-			m_pRecordMgr->setActionID(getActionID(m_strAction));
-
-			// Signal Not Paused event so that processing will continue
-			m_eventResume.signal();
-
-			// store the pointer to the TagManager so that subsequent calls to getFPMTagManager() will work
-			m_pFAMTagManager = pTagManager;
-
-			// remember the handle of the UI so that messages can be sent to it
-			m_hWndOfUI = (HWND) hWndOfUI;
-
-			// if there is a dialog set it to receive status updates
-			if(m_hWndOfUI)
-			{
-				m_pRecordMgr->setDlg(m_hWndOfUI);
-			}
-
-			// clear all the records in the file processing record manager
-			// (i.e. clear the queue of files to process)
-			m_pRecordMgr->clear(true);
-
-			// Set whether processing skipped files or not
-			m_pRecordMgr->setProcessSkippedFiles(m_bProcessSkippedFiles);
-			m_pRecordMgr->setSkippedForCurrentUser(!m_bSkippedForAnyUser);
-
-			// Set the KeepProcssingAsAdded for the record manager
-			// but only if it is ok to stop when queue is empty
-			if ( m_bOkToStopWhenQueueIsEmpty )
-			{
-				m_pRecordMgr->setKeepProcessingAsAdded(m_bKeepProcessingAsAdded);
-			}
-			else
-			{
-				// This tells the record manager to keep trying to get
-				// files to process from the database
-				m_pRecordMgr->setKeepProcessingAsAdded(true);
-			}
-
-			// create the data structs for each of the threads
-			// Note: that an auto_ptr cannot be used here because an
-			// array must be deleted specially with delete []
-			// Note: a vector cannot be used here because all the members of
-			// ProcessingThreadData do not have correct copy -constructors and
-			// assignments operators namely Win32Event
-
-			// a value of 0 means use one thread per processor
-			long nNumThreads = m_nNumThreads;
-			if (nNumThreads == 0)
-			{
-				nNumThreads = getNumLogicalProcessors();
-			}
-
-			// Create all the file processors for the threads and 
-			// notify them that processing is about to begin
-			for (int i = 0; i < nNumThreads; i++)
-			{
-				m_vecProcessingThreadData.push_back(new ProcessingThreadData());
-				// We'll work with rThreadData here instead of tmp
-				// because rThreadData is the actual ProcessingThreadData stored in
-				// the array which is a copy of tmp;
-				// get a reference to the thread data struct and update data members
-				ProcessingThreadData* pThreadData = m_vecProcessingThreadData[i];
-				ASSERT_RESOURCE_ALLOCATION("ELI17948", pThreadData != NULL);
-
-				UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
-					pThreadData->m_ipTaskExecutor;
-				ASSERT_RESOURCE_ALLOCATION("ELI17949", ipExecutor != NULL);
-
-				pThreadData->m_pFPMgmtRole = this;
-				
-				// Initialize executor with a new copy of the file processors for the thread
-				ipExecutor->Init(copyFileProcessingTasks(m_ipFileProcessingTasks),
-					getFPMDB(), getFAMTagManager());
-			}
-
-			// start the processing
-			m_bProcessing = true;
-
-			// Register this processing FAM for auto revert
-			m_pDB->RegisterProcessingFAM();
-			
-			// begin the threads to process files in parallel
-			for (int i = 0; i < nNumThreads; i++)
-			{
-				ProcessingThreadData* pThreadData = m_vecProcessingThreadData[i];
-
-				// begin the thread
-				pThreadData->m_pThread = AfxBeginThread(fileProcessingThreadProc, m_vecProcessingThreadData[i]);
-				ASSERT_RESOURCE_ALLOCATION("ELI11075", pThreadData->m_pThread != NULL);
-
-				// wait for the thread to start
-				pThreadData->m_threadStartedEvent.wait();
-			}
+			UCLIDException ue("ELI28320", "Manager thread is currently running.");
+			throw ue;
 		}
-		catch (...)
-		{
-			// Don't want to throw any exceptions here but should log any from these methods
-			try
-			{
-				// do the stop
-				getThisAsCOMPtr()->Stop();
-			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16212");
 
-			// The exception should be rethrown
-			// if any threads had started processing there should be a ProcessingCompleted message sent when
-			// they stop
-			throw;
-		}
+		// Set the File Action manager pointer
+		m_ipRoleNotifyFAM = pRoleNotifyFAM;
+		ASSERT_RESOURCE_ALLOCATION("ELI14531", m_ipRoleNotifyFAM != NULL );
+
+		// store the pointer to the DB so that subsequent calls to getFPDB() will work correctly
+		m_pDB = pDB;
+
+		// store the pointer to the TagManager so that subsequent calls to getFPMTagManager() will work
+		m_pFAMTagManager = pTagManager;
+
+		// remember the handle of the UI so that messages can be sent to it
+		m_hWndOfUI = (HWND) hWndOfUI;
+
+		// remember the action name
+		m_strAction = asString(bstrAction);
+
+		// Reset all of the events required managing the processing
+		m_eventManualStopProcessing.reset();
+		m_eventProcessManagerExited.reset();
+		m_eventProcessManagerStarted.reset();
+		m_eventWatcherThreadExited.reset();
+		m_eventPause.reset();
+		m_eventResume.reset();
+
+		// Initialice the current running state to normal stop.
+		m_eCurrentRunningState = kNormalStop;
+
+		// start the processing thread
+		AfxBeginThread(processManager, this);	
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09825");
 	
@@ -309,19 +209,9 @@ STDMETHODIMP CFileProcessingMgmtRole::Stop(void)
 	try
 	{
 		validateLicense();
-
-		// check pre-conditions
-		ASSERT_ARGUMENT("ELI14303", m_bEnabled == true);
-		ASSERT_ARGUMENT("ELI14316", m_ipFileProcessingTasks != NULL);
-		ASSERT_ARGUMENT("ELI14317", m_ipFileProcessingTasks->Size() > 0);
-		ASSERT_ARGUMENT("ELI14345", m_pRecordMgr != NULL);
-
-		// Notify the FAM that processing is cancelling
-		m_ipRoleNotifyFAM->NotifyProcessingCancelling();
-
-		// The Processing needs to be stopped asynchronously
-		// to keep the UI from being blocked
-		AfxBeginThread(handleStopRequestAsynchronously, this);
+		
+		// Signal to the manager thread that processing should stop
+		m_eventManualStopProcessing.signal();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14308");
 
@@ -336,8 +226,8 @@ STDMETHODIMP CFileProcessingMgmtRole::Pause(void)
 	{
 		validateLicense();
 
-		// Cause processing to wait until this m_eventResume is signaled
-		m_eventResume.reset();
+		// Cause processing to wait until this m_eventPause is signaled
+		m_eventPause.signal();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14322");
 
@@ -1315,70 +1205,74 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void *pData)
 		ASSERT_ARGUMENT("ELI14348", pFPM->m_pRecordMgr != NULL);
 		ASSERT_ARGUMENT("ELI14532", pFPM->m_ipRoleNotifyFAM != NULL );
 
-		// This thread needs to be blocked until all thread data has been created
-		// so it needs to wait until there is a semaphore available
-		CSingleLock guard( &pFPM->m_threadDataSemaphore, TRUE );
-
-		CoInitializeEx(NULL, COINIT_MULTITHREADED);
-		
 		try
 		{
-			// wait for each of the threads to complete their work
-			vector<ProcessingThreadData *>& rvecProcessingThreadData = pFPM->m_vecProcessingThreadData;
-			unsigned long ulNumThreads = rvecProcessingThreadData.size();
-			for (unsigned long i = 0; i < ulNumThreads; i++)
+			// This thread needs to be blocked until all thread data has been created
+			// so it needs to wait until there is a semaphore available
+			CSingleLock guard( &pFPM->m_threadDataSemaphore, TRUE );
+
+			CoInitializeEx(NULL, COINIT_MULTITHREADED);
+			try
 			{
-				// Before waiting for the thread to complete need to make sure it started
-				if ( !rvecProcessingThreadData[i]->m_threadStartedEvent.isSignaled() )
+				try
 				{
-					// thread was not started 
-					UCLIDException ue("ELI16215", "Processing thread was not started!");
-					ue.addDebugInfo("Thread #", i);
-					// Log the exceptions and continue for remaining threads
-					ue.log();
-  				}
-				else
-				{
-					// Wait for processing to finish for that thread
-					rvecProcessingThreadData[i]->m_threadEndedEvent.wait();
+					// wait for each of the threads to complete their work
+					vector<ProcessingThreadData *>& rvecProcessingThreadData = pFPM->m_vecProcessingThreadData;
+					unsigned long ulNumThreads = rvecProcessingThreadData.size();
+					for (unsigned long i = 0; i < ulNumThreads; i++)
+					{
+						// Before waiting for the thread to complete need to make sure it started
+						if ( !rvecProcessingThreadData[i]->m_threadStartedEvent.isSignaled() )
+						{
+							// thread was not started 
+							UCLIDException ue("ELI16215", "Processing thread was not started!");
+							ue.addDebugInfo("Thread #", i);
+							// Log the exceptions and continue for remaining threads
+							ue.log();
+						}
+						else
+						{
+							// Wait for processing to finish for that thread
+							rvecProcessingThreadData[i]->m_threadEndedEvent.wait();
+						}
+					}
+
+					// Inform file processing task executor that processing has ended
+					for (unsigned long i = 0; i < ulNumThreads; i++)
+					{
+						ProcessingThreadData* pThreadData = rvecProcessingThreadData[i];
+						ASSERT_RESOURCE_ALLOCATION("ELI17950", pThreadData != NULL);
+
+						UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
+							pThreadData->m_ipTaskExecutor;
+						ASSERT_RESOURCE_ALLOCATION("ELI17951", ipExecutor != NULL);
+
+						ipExecutor->Close();
+					}
 				}
+				CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14527");
+
+				// Semaphore needs to be released so that the releaseProcessingThreadDataObjects will be
+				// able to get the semaphore counts to delete the data
+				guard.Unlock();
+
+				// Release the memory for the Thread objects since they will not be needed
+				// This should be done before the notification that processing is complete
+				pFPM->releaseProcessingThreadDataObjects();
+
+				// Unregister Processing FAM to reset file back to previous state if any remaining
+				pFPM->getFPMDB()->UnregisterProcessingFAM();
+
+				CoUninitialize();
 			}
-
-			// Inform file processing task executor that processing has ended
-			for (unsigned long i = 0; i < ulNumThreads; i++)
-			{
-				ProcessingThreadData* pThreadData = rvecProcessingThreadData[i];
-				ASSERT_RESOURCE_ALLOCATION("ELI17950", pThreadData != NULL);
-
-				UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
-					pThreadData->m_ipTaskExecutor;
-				ASSERT_RESOURCE_ALLOCATION("ELI17951", ipExecutor != NULL);
-
-				ipExecutor->Close();
-			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28323")
 		}
-		CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14527");
-
-		// Semaphore needs to be released so that the releaseProcessingThreadDataObjects will be
-		// able to get the semaphore counts to delete the data
-		guard.Unlock();
-
-		// Release the memory for the Thread objects since they will not be needed
-		// This should be done before the notification that processing is complete
-		pFPM->releaseProcessingThreadDataObjects();
-
-		// Unregister Processing FAM to reset file back to previous state if any remaining
-		pFPM->getFPMDB()->UnregisterProcessingFAM();
-
-		// Set the processing flag to false
-		pFPM->m_bProcessing = false;
-
-		// Notify the FAM that processing is complete
-		UCLID_FILEPROCESSINGLib::IRoleNotifyFAMPtr ipRoleNotifyFAM = pFPM->m_ipRoleNotifyFAM;
-		ASSERT_RESOURCE_ALLOCATION("ELI25249", ipRoleNotifyFAM != NULL);
-		ipRoleNotifyFAM->NotifyProcessingCompleted();
-
-		CoUninitialize();
+		catch(UCLIDException &ue)
+		{
+			pFPM->m_eventWatcherThreadExited.signal();
+			throw ue;
+		}
+		pFPM->m_eventWatcherThreadExited.signal();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13892")
 
@@ -1423,9 +1317,6 @@ void CFileProcessingMgmtRole::processFiles2(ProcessingThreadData *pThreadData)
 
 		try
 		{
-			// If Paused this will be signaled so wait until it is not signaled
-			m_eventResume.wait();
-
 			if (!m_pRecordMgr->pop(task))
 			{
 				return;
@@ -1860,5 +1751,440 @@ void CFileProcessingMgmtRole::notifyFileProcessingTasksOfStopRequest()
 		}
 		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16209")
 	}
+}
+//-------------------------------------------------------------------------------------------------
+UINT CFileProcessingMgmtRole::processManager(void *pData)
+{
+	try
+	{
+		// Cast the argument to FileProcessingMgmtRole
+		CFileProcessingMgmtRole *pFPM = static_cast<CFileProcessingMgmtRole *>(pData);
+
+		// Validate that the FPM is setup properly
+		ASSERT_RESOURCE_ALLOCATION("ELI28202", pFPM != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28203", pFPM->m_pRecordMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28204", pFPM->m_ipRoleNotifyFAM != NULL );
+
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+		// Set up array of handles to be used for waiting that control the states
+		HANDLE lpHandles[4];
+		lpHandles[0] = pFPM->m_eventManualStopProcessing.getHandle();
+		lpHandles[1] = pFPM->m_eventWatcherThreadExited.getHandle();
+		lpHandles[2] = pFPM->m_eventPause.getHandle();
+		lpHandles[3] = pFPM->m_eventResume.getHandle();
+
+		try
+		{
+			// Signal that the process manager has started.
+			pFPM->m_eventProcessManagerStarted.signal();
+			
+			ERunningState eNextRunningState;
+			
+			pFPM->timeTillNextProcessingChange(eNextRunningState);
+
+			bool bExit = false;
+
+			// Set up what the current running state should be
+			if (pFPM->m_bLimitProcessingToSchedule)
+			{
+				switch (eNextRunningState)
+				{
+				case kNormalStop: 
+					// no processing at all
+					bExit = true;
+					break;
+				case kNormalRun:
+					// always process
+					break;
+				case kScheduleRun:
+					eNextRunningState = kScheduleStop;
+					break;
+				case kScheduleStop:
+					eNextRunningState = kScheduleRun;
+					break;
+				}
+			}
+				
+			pFPM->m_eCurrentRunningState = eNextRunningState;
+
+			if (!bExit)
+			{
+				// Start processing, if should not be processing this will put the UI in the state
+				// that will look like it is not processing because it is not scheduled to process
+				pFPM->startProcessing(eNextRunningState == kScheduleStop);
+
+				// Post Schedule Inactive messag to the UI
+				if ( eNextRunningState == kScheduleStop && pFPM->m_hWndOfUI != NULL)
+				{
+					::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_INACTIVE, 0, 0);
+				}
+			}
+
+			while(!bExit)
+			{
+				// Wait on all the events that cause a change in the processing state
+				DWORD rtnValue = WaitForMultipleObjects(4, lpHandles, FALSE, 
+					pFPM->timeTillNextProcessingChange(eNextRunningState));
+				
+				// Save the previous state
+				ERunningState ePreviousState = pFPM->m_eCurrentRunningState;
+
+				// Determine the next state
+				switch ( rtnValue )
+				{
+				case WAIT_TIMEOUT:
+					// If the wait timed out need to change to the next running state
+					// retrurned by the timeTillNextProcessingChange function
+					// Only change the state if it is not paused
+					if (ePreviousState != kPaused)
+					{
+						pFPM->m_eCurrentRunningState = eNextRunningState;
+					}
+					break;
+				case WAIT_OBJECT_0:
+				case WAIT_OBJECT_0 + 1:
+					// Manual stop or stop due to watcher thread exit after no further files to 
+					// process
+					pFPM->m_eCurrentRunningState = kNormalStop;
+					break;
+				case WAIT_OBJECT_0 + 2:
+					// Processing should be paused
+					pFPM->m_eCurrentRunningState = kPaused;
+					pFPM->m_eventPause.reset();
+					break;
+				case WAIT_OBJECT_0 + 3:
+					// Resume processing after a pause
+					// If the processing is being limited to a schedule need to set it to the
+					// correct processing state
+					if (pFPM->m_bLimitProcessingToSchedule)
+					{
+						// eNextRunningState is the state that will be changed to if the wait
+						// for the events timed out so if eNextRunningState is ScheduleRun then 
+						// processing should be stopped otherwise it should be running
+						pFPM->m_eCurrentRunningState = (eNextRunningState == kScheduleRun) ? 
+							kScheduleStop : kScheduleRun;
+					}
+					else
+					{
+						// Processing should be running
+						pFPM->m_eCurrentRunningState = kNormalRun;
+					}
+					// Reset the Pause and resume events
+					pFPM->m_eventPause.reset();
+					pFPM->m_eventResume.reset();
+					break;
+				default:
+					THROW_LOGIC_ERROR_EXCEPTION("ELI28347");
+					break;
+				}
+					
+				// Change the processing state
+				switch (pFPM->m_eCurrentRunningState)
+				{
+				case kPaused:
+				case kScheduleStop:
+				case kNormalStop:
+					// Need to stop the processing if previously running 
+					if (ePreviousState == kScheduleRun || ePreviousState == kNormalRun)
+					{
+						// Stop the processing
+						pFPM->stopProcessing();
+
+						// Wait for the watcher thread
+						pFPM->m_eventWatcherThreadExited.wait();
+
+						// Reset watcher thread exited event
+						pFPM->m_eventWatcherThreadExited.reset();
+
+						// Notify UI that processing is inactive if not a normal stop
+						if (pFPM->m_eCurrentRunningState != kNormalStop && pFPM->m_hWndOfUI != NULL)
+						{
+							::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_INACTIVE, 0, 0);
+						}
+					}
+					break;
+				case kScheduleRun:
+				case kNormalRun:
+					// Start processing
+					if (ePreviousState == kPaused || ePreviousState == kScheduleStop)
+					{
+						pFPM->startProcessing();
+
+						// Notify UI that processing is running
+						if (pFPM->m_hWndOfUI != NULL)
+						{
+							::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_ACTIVE, 0, 0);
+						}
+					}
+					break;
+				}
+
+				// If this a normal stop exit loop
+				if (pFPM->m_eCurrentRunningState == kNormalStop)
+				{
+					bExit = true;
+				}
+			}
+
+			// Set the processing flag to false
+			pFPM->m_bProcessing = false;
+
+			// Post message to UI that the schedule is active so the Processing Inactive 
+			// message is removed
+			if (pFPM->m_hWndOfUI != NULL)
+			{
+				::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_ACTIVE, 0, 0);
+			}
+
+			// Notify the FAM that processing is complete
+			UCLID_FILEPROCESSINGLib::IRoleNotifyFAMPtr ipRoleNotifyFAM = pFPM->m_ipRoleNotifyFAM;
+			ASSERT_RESOURCE_ALLOCATION("ELI28315", ipRoleNotifyFAM != NULL);
+			ipRoleNotifyFAM->NotifyProcessingCompleted();
+
+			pFPM->m_eventProcessManagerExited.signal();
+		}
+		catch(...)
+		{
+			pFPM->m_eventProcessManagerExited.signal();
+			throw;
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28205");
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
+{
+	// Obtain this lock since both semaphores are needed
+	CSingleLock lockThread(&m_threadLock, TRUE );
+
+	// Aquire both semaphore counts since the thread data will be 
+	// created in this method
+	CSingleLock guard( &m_threadDataSemaphore, TRUE );
+	CSingleLock guard2( &m_threadDataSemaphore, TRUE );
+
+	try
+	{
+		try
+		{
+			m_eventWatcherThreadExited.reset();
+
+			// If not starting off the threads don't start the thread watcher.
+			if (!bDontStartThreads)
+			{
+				// Kick off the thread which will wait for all file processing threads
+				// to complete and then update the UI
+				// By putting this kick-off this early in this method, we can benefit from 
+				// the fact that all the sitations related to processing ending
+				// (due to errors or due to successful processing) can be handled in one
+				// place (i.e. this thread function).
+				AfxBeginThread(fileProcessingThreadsWatcherThread, this);
+			}
+
+			// Set action ID to the record manager
+			m_pRecordMgr->setActionID(getActionID(m_strAction));
+
+			// Signal Not Paused event so that processing will continue
+			m_eventPause.reset();
+
+			// if there is a dialog set it to receive status updates
+			if(m_hWndOfUI)
+			{
+				m_pRecordMgr->setDlg(m_hWndOfUI);
+			}
+
+			// clear all the records in the file processing record manager
+			// (i.e. clear the queue of files to process)
+			m_pRecordMgr->clear(m_eCurrentRunningState != kScheduleRun);
+
+			// Set whether processing skipped files or not
+			m_pRecordMgr->setProcessSkippedFiles(m_bProcessSkippedFiles);
+			m_pRecordMgr->setSkippedForCurrentUser(!m_bSkippedForAnyUser);
+
+			// Set the KeepProcssingAsAdded for the record manager
+			// but only if it is ok to stop when queue is empty
+			if ( m_bOkToStopWhenQueueIsEmpty )
+			{
+				m_pRecordMgr->setKeepProcessingAsAdded(m_bKeepProcessingAsAdded);
+			}
+			else
+			{
+				// This tells the record manager to keep trying to get
+				// files to process from the database
+				m_pRecordMgr->setKeepProcessingAsAdded(true);
+			}
+
+			// create the data structs for each of the threads
+			// Note: that an auto_ptr cannot be used here because an
+			// array must be deleted specially with delete []
+			// Note: a vector cannot be used here because all the members of
+			// ProcessingThreadData do not have correct copy -constructors and
+			// assignments operators namely Win32Event
+
+			// a value of 0 means use one thread per processor
+			long nNumThreads = m_nNumThreads;
+			if (nNumThreads == 0)
+			{
+				nNumThreads = getNumLogicalProcessors();
+			}
+
+			if (!bDontStartThreads)
+			{
+				// Create all the file processors for the threads and 
+				// notify them that processing is about to begin
+				for (int i = 0; i < nNumThreads; i++)
+				{
+					m_vecProcessingThreadData.push_back(new ProcessingThreadData());
+					// We'll work with rThreadData here instead of tmp
+					// because rThreadData is the actual ProcessingThreadData stored in
+					// the array which is a copy of tmp;
+					// get a reference to the thread data struct and update data members
+					ProcessingThreadData* pThreadData = m_vecProcessingThreadData[i];
+					ASSERT_RESOURCE_ALLOCATION("ELI17948", pThreadData != NULL);
+
+					UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
+						pThreadData->m_ipTaskExecutor;
+					ASSERT_RESOURCE_ALLOCATION("ELI17949", ipExecutor != NULL);
+
+					pThreadData->m_pFPMgmtRole = this;
+
+					// Initialize executor with a new copy of the file processors for the thread
+					ipExecutor->Init(copyFileProcessingTasks(m_ipFileProcessingTasks),
+						getFPMDB(), getFAMTagManager());
+				}
+			}
+
+			// start the processing
+			m_bProcessing = true;
+
+			// Register this processing FAM for auto revert
+			m_pDB->RegisterProcessingFAM();
+			
+			if (!bDontStartThreads)
+			{
+				// begin the threads to process files in parallel
+				for (int i = 0; i < nNumThreads; i++)
+				{
+					ProcessingThreadData* pThreadData = m_vecProcessingThreadData[i];
+
+					// begin the thread
+					pThreadData->m_pThread = AfxBeginThread(fileProcessingThreadProc, m_vecProcessingThreadData[i]);
+					ASSERT_RESOURCE_ALLOCATION("ELI11075", pThreadData->m_pThread != NULL);
+
+					// wait for the thread to start
+					pThreadData->m_threadStartedEvent.wait();
+				}
+			}
+		}
+		catch (...)
+		{
+			// Don't want to throw any exceptions here but should log any from these methods
+			try
+			{
+				// do the stop
+				getThisAsCOMPtr()->Stop();
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16212");
+
+			// The exception should be rethrown
+			// if any threads had started processing there should be a ProcessingCompleted message sent when
+			// they stop
+			throw;
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28206");
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingMgmtRole::stopProcessing()
+{
+	try
+	{
+		// check pre-conditions
+		ASSERT_ARGUMENT("ELI28207", m_bEnabled == true);
+		ASSERT_ARGUMENT("ELI28208", m_ipFileProcessingTasks != NULL);
+		ASSERT_ARGUMENT("ELI28209", m_ipFileProcessingTasks->Size() > 0);
+		ASSERT_ARGUMENT("ELI28210", m_pRecordMgr != NULL);
+
+		// Notify the FAM that processing is cancelling
+		if (m_eCurrentRunningState == kNormalStop)
+		{
+			m_ipRoleNotifyFAM->NotifyProcessingCancelling();
+		}
+
+		// The Processing needs to be stopped asynchronously
+		// to keep the UI from being blocked
+		AfxBeginThread(handleStopRequestAsynchronously, this);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28211");
+}
+//-------------------------------------------------------------------------------------------------
+unsigned long CFileProcessingMgmtRole::timeTillNextProcessingChange( ERunningState &eNextRunningState )
+{
+	// If not limiting to a schedule running state should always be kNormalRun
+	if (!m_bLimitProcessingToSchedule)
+	{
+		eNextRunningState = kNormalRun; // should be running now and never change to not running
+		return INFINITE;
+	}
+
+	// Get the current time
+	CTime timeCurrent = CTime::GetCurrentTime();
+
+	// Determine the current hour of the week to be an index into the vector
+	long nHourOfWeek = ((long) timeCurrent.GetDayOfWeek() - 1) * 24 + timeCurrent.GetHour();
+
+	// Make sure nHourOfWeek is in the correct range
+	if (nHourOfWeek < 0 || nHourOfWeek >= giNUMBER_OF_HOURS_IN_WEEK)
+	{
+		UCLIDException ue("ELI28316", "Hour of week is out of range.");
+		ue.addDebugInfo("HourOfWeek", nHourOfWeek);
+		throw ue;
+	}
+	
+	// The next state should be the opposite of the state for the current hour
+	eNextRunningState = (m_vecScheduledHours[nHourOfWeek]) ? kScheduleStop : kScheduleRun;
+
+	// Calculate the time that the state will change
+
+	// Set to dwTimeTilNextChange to the number of milliseconds left in the current hour
+	DWORD dwTimeTilNextChange = ((59 - timeCurrent.GetMinute()) * 60 + 60 - timeCurrent.GetSecond()) * 1000;
+	
+	long n;
+
+	// The next change state to look for
+	bool bNextChangeRun = eNextRunningState == kScheduleRun;
+
+	// To calculate the time till next change, step through vector starting from the next hour
+	// until either the expected transition or until all of the Hours have been checked
+	for ( n = nHourOfWeek + 1; n < nHourOfWeek + giNUMBER_OF_HOURS_IN_WEEK; n++)
+	{
+		// If the run state is the one we are looking for break out of the loop
+		if (m_vecScheduledHours[n % giNUMBER_OF_HOURS_IN_WEEK] == bNextChangeRun)
+		{
+			break;
+		}
+
+		// Add the number of milliseconds in an hour
+		dwTimeTilNextChange += 3600000;
+	}
+	
+	// Check to see if there was no transition
+	if ( n >= nHourOfWeek + giNUMBER_OF_HOURS_IN_WEEK )
+	{
+		// If the next running state is Run then the schedule is all stop
+		if (eNextRunningState == kScheduleRun)
+		{
+			eNextRunningState = kNormalStop;
+			return 0;
+		}
+		else if ( eNextRunningState == kScheduleStop)
+		{
+			// The schedule is all run so return kNormalRun with INFINITE wait
+			eNextRunningState = kNormalRun;
+			return INFINITE;
+		}
+	}
+	return dwTimeTilNextChange;
 }
 //-------------------------------------------------------------------------------------------------

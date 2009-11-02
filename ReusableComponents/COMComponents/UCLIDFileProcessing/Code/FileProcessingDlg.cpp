@@ -184,6 +184,8 @@ BEGIN_MESSAGE_MAP(FileProcessingDlg, CDialog)
 	ON_MESSAGE(FP_SUPPLIER_STATUS_CHANGE, OnSupplierStatusChange)
 	ON_MESSAGE(FP_QUEUE_EVENT, OnQueueEvent)
 	ON_MESSAGE(FP_STATISTICS_UPDATE, OnStatsUpdateMessage)
+	ON_MESSAGE(FP_SCHEDULE_INACTIVE, OnScheduleInactive)
+	ON_MESSAGE(FP_SCHEDULE_ACTIVE, OnScheduleActive)
 	ON_COMMAND(ID_FILE_EXIT, OnFileExit)
 	ON_COMMAND(ID_FILE_NEW, OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, OnFileOpen)
@@ -1180,6 +1182,38 @@ LRESULT FileProcessingDlg::OnProcessingCancelling(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
+LRESULT FileProcessingDlg::OnScheduleInactive(WPARAM wParam, LPARAM lParam)
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
+
+	try
+	{
+		m_strProcessingStateString = "Processing Inactive";
+		setCurrFPSFile(m_strCurrFPSFilename);
+		updateUI();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28343");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT FileProcessingDlg::OnScheduleActive(WPARAM wParam, LPARAM lParam)
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
+
+	try
+	{
+		m_strProcessingStateString = "";
+		setCurrFPSFile(m_strCurrFPSFilename);
+		updateUI();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28342");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::OnFileNew() 
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -1951,13 +1985,20 @@ void FileProcessingDlg::updateUI()
 			zFailed, zPending, zSkipped, zTotal;
 	if(m_bRunning)
 	{
-		if(m_nNumCurrentlyProcessing <= 0)
+		if (m_strProcessingStateString.empty())
 		{
-			zStatusText = "Waiting";
+			if(m_nNumCurrentlyProcessing <= 0)
+			{
+				zStatusText = "Waiting";
+			}
+			else
+			{
+				zStatusText = "Processing";
+			}
 		}
 		else
 		{
-			zStatusText = "Processing";
+			zStatusText = m_strProcessingStateString.c_str();
 		}
 	}
 	else
@@ -2223,6 +2264,12 @@ void FileProcessingDlg::setCurrFPSFile(std::string strFileName)
 	{
 		string strFile = getFileNameFromFullPath(strFileName);
 		szTitle.Format("%s - File Action Manager", strFile.c_str());
+	}
+
+	// Add the Processing state string if 
+	if (!m_strProcessingStateString.empty())
+	{
+		szTitle.Format("%s (%s)", szTitle, m_strProcessingStateString.c_str());
 	}
 	SetWindowText(szTitle);
 }

@@ -136,6 +136,15 @@ private:
 	// Thread procedure which initiates the stopping of processing asynchronously
 	static UINT handleStopRequestAsynchronously(void *pData);
 
+	// Thread procedure to handle starting and stopping of the processing. 
+	// If scheduling is on, it will start and stop processing based on the schedule
+	// otherwise it will start processing and wait for the event to stop processing.  
+	// It also stops the processing on pause and restarts on resume.
+	// If processing is ending because there are no more files to process or a manual stop
+	// has been initiated the UI will be notified that processing is complete or stopped and then
+	// this function will return.
+	static UINT processManager(void *pData);
+
 	/////////////
 	// Variables
 	/////////////
@@ -143,8 +152,11 @@ private:
 	// a flag to indicate the process in on going
 	volatile bool m_bProcessing;
 
-	// processing should wait until this is signaled
+	// Event used to signal that processing should be resumed after a pause
 	Win32Event m_eventResume;
+
+	// Event used to signal that processing should be paused
+	Win32Event m_eventPause;
 
 	// list of file processors
 	IIUnknownVectorPtr m_ipFileProcessingTasks;
@@ -211,12 +223,34 @@ private:
 	bool m_bProcessSkippedFiles;
 	bool m_bSkippedForAnyUser;
 
+	// Enum used to indicate the current state of processing
+	enum ERunningState{
+		kNormalRun,
+		kScheduleRun,
+		kScheduleStop,
+		kNormalStop,
+		kPaused
+	};
+	
 	// Flag to indicate that the processing should be limited by the scheduled hours in the
 	// m_vecScheduledHours vector;
 	bool m_bLimitProcessingToSchedule;
 
 	// Vector that contains the schedule
 	vector<bool> m_vecScheduledHours;
+
+	// Variable to indicate the current running state of processing
+	volatile ERunningState m_eCurrentRunningState;
+
+	// Events used to indicate that the process manager thread has been started or it has exited
+	Win32Event m_eventProcessManagerStarted;
+	Win32Event m_eventProcessManagerExited;
+
+	// Event to indicate that the processing is being stopped manually
+	Win32Event m_eventManualStopProcessing;
+
+	// Event to indicate that the thread watcher thread has exited.
+	Win32Event m_eventWatcherThreadExited;
 
 	///////////
 	// Methods
@@ -290,6 +324,27 @@ private:
 
 	// Calls NotifyStopRequested for all of the processors
 	void notifyFileProcessingTasksOfStopRequest();
+
+	// Method used to start processing, used by processManager 
+	// if bDontStartThreads is false the processing threads are started
+	// if it is true everything is setup as if it was running but the threads are not started
+	void startProcessing(bool bDontStartThreads = false);
+
+	// Method stops the processing threads but does not send any notification to the UI that 
+	// processing is complete or stopped (that is handled in processManager method)
+	void stopProcessing();
+
+	// Returns the number of milliseconds that should pass before the next change from 
+	// running to stopped or stopped to running.  
+	// The argument eNextRunningState will be:
+	//		kNormalRun - if not limiting to schedule or all scheduled times are running, 
+	//			returns INFINITE
+	//		kNormalStop - if all scheduled times are stopped, returns 0
+	//		kScheduleRun - if next schedule change is to running, returns number of milliseconds
+	//			to wait for that change
+	//		kScheduleStop - if next schedule change is to stopped, returns number of milliseconds
+	//			to wait for that change
+	unsigned long timeTillNextProcessingChange(ERunningState &eNextRunningState);
 
 	void validateLicense();
 };

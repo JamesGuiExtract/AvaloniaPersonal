@@ -95,6 +95,9 @@ void FPRecordManager::discardProcessingQueue()
 	// set event to indicate the queue has been discared
 	m_queueDiscardedEvent.signal();
 
+	// Close the queue
+	closeProcessingQueue();
+
 	// For all of the remaining files re-mark them as pending in the database
 	CSingleLock lockGuard(&m_objLock, TRUE);
 
@@ -214,6 +217,10 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 			// is false exit and return false
 			if (nNumFromDB == 0 && (!processingQueueIsOpen() || !m_bKeepProcessingAsAdded))
 			{
+				// Discard processing queue so that once one thread exits because no files to process
+				// all threads will exit even if more files get supplied.
+				// FlexIDSCore #3717
+				discardProcessingQueue();
 				return false;
 			}
 		}
@@ -251,6 +258,13 @@ void FPRecordManager::clear(bool bClearUI)
 	m_queTaskIds.clear();
 	m_queFinishedTasks.clear();
 	
+	clearEvents();
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::clearEvents()
+{
+	CSingleLock lockGuard(&m_objLock, TRUE);
+
 	m_queueClosedEvent.reset();
 	m_queueDiscardedEvent.reset();
 }

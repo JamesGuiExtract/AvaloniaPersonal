@@ -296,8 +296,6 @@ STDMETHODIMP CFileProcessingManager::StopProcessing()
 
 	try
 	{
-		validateLicense();
-
 		// If we are already cancelling, we are done.
 		if (m_bCancelling)
 		{
