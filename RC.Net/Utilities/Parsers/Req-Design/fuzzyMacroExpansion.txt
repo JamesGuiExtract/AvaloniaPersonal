@@ -111,10 +111,11 @@ METHOD=BETTER_FIT:
             | (?'-__initial_error_stack<i>')(?'__initial_missed_stack<i>')(?'__final_error_stack<i>')
             | (?>.
                 (
-                  (?'-__initial_missed_stack<i>')
-                  | (?'-__initial_error_stack<i>')(?'__final_error_stack<i>')
-                    (?'__allowable_lookahead_stack<i>')
+                    (?'-__initial_missed_stack<i>')
+                  | (?'-__initial_error_stack<i>')
                 )
+                (?'__final_error_stack<i>')
+                (?'__allowable_lookahead_stack<i>')
               )+?
               search_token
           )
@@ -125,10 +126,11 @@ METHOD=BETTER_FIT:
               search_token
             | (?>.
                 (
-                  (?'-__initial_missed_stack<i>')
-                  | (?'-__initial_error_stack<i>')(?'__final_error_stack<i>')
-                    (?'__allowable_lookahead_stack<i>')
+                    (?'-__initial_missed_stack<i>')
+                  | (?'-__initial_error_stack<i>')
                 )
+                (?'__final_error_stack<i>')
+                (?'__allowable_lookahead_stack<i>')
               )+?
               ((?'-__initial_extra_space_stack<i>')(?'__final_extra_space_stack<i>')\s)*?
               search_token
@@ -141,10 +143,11 @@ METHOD=BETTER_FIT:
             | (?'-__initial_error_stack<i>')(?'__initial_missed_stack<i>')(?'__final_error_stack<i>')
             | (?>.
                 (
-                  (?'-__initial_missed_stack<i>')
-                  | (?'-__initial_error_stack<i>')(?'__final_error_stack<i>')
-                    (?'__allowable_lookahead_stack<i>')
+                    (?'-__initial_missed_stack<i>')
+                  | (?'-__initial_error_stack<i>')
                 )
+                (?'__final_error_stack<i>')
+                (?'__allowable_lookahead_stack<i>')
               )+?
               ((?'-__initial_extra_space_stack<i>')(?'__final_extra_space_stack<i>')\s)*?
               search_token
