@@ -1544,12 +1544,18 @@ void FileProcessingDlg::OnToolsFAMDBAdmin()
 			strEXEPath = strEXEPath2;
 		}
 
+		string strParameters = "";
+
 		// Get the Server and database name
 		string strServer = asString(getDBPointer()->DatabaseServer);
-		string strDatabase = asString(getDBPointer()->DatabaseName);
+		if (!strServer.empty())
+		{
+			strParameters = "\"" + strServer + "\" \""
+				+ asString(getDBPointer()->DatabaseName) + "\"";
+		}
 
 		// Start the File Action Manager
-		runEXE(strEXEPath, "\"" + strServer + "\" \"" + strDatabase + "\"");
+		runEXE(strEXEPath, strParameters);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17611");
 }
