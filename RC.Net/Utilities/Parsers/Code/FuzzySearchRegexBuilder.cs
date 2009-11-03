@@ -259,8 +259,8 @@ namespace Extract.Utilities.Parsers
                         @".+?" +
                         @"(?<=[^\\]([\\]{2})*)\]" +
                     // Treat any escaped closing paren as part of the search string.
-                    @"|(?<=([\\]{2})*[\\])[)]" +
-                     // Treat any other non-paren as part of the search string.
+                    @"|(?<=[^\\]([\\]{2})*[\\])[)]" +
+                    // Treat any other non-paren as part of the search string.
                     @"|[^)]" +
                 @")*?" +
             @")" +
@@ -281,8 +281,8 @@ namespace Extract.Utilities.Parsers
                 @"|\\c\S" +
                 @"|\\x[0-9a-eA-E]{2}" +
                 @"|\\u[0-9a-eA-E]{4}" +
-                @"|\\\S" +
-                @"|." +
+                @"|\\[\s\S]" +
+                @"|[\s\S]" +
             @")" +
             // Look for specification of many times to repeat token.
             @"(" +
@@ -306,7 +306,7 @@ namespace Extract.Utilities.Parsers
 		/// (
         /// 	(?&lt;=(^|[^\\])([\\]{2})*)\[.+?
 		/// 		(?&lt;=[^\\]([\\]{2})*)\]
-		/// 	|(?&lt;=([\\]{2})*[\\])[)]
+        /// 	|(?&lt;=[^\\]([\\]{2})*[\\])[)]
 		/// 	|[^)]
 		/// )*?
 	    /// )
@@ -400,13 +400,13 @@ namespace Extract.Utilities.Parsers
                     for (int i = 0; i < searchTokens.Count; i++)
                     {
                         string searchToken = searchTokens[i];
+                        bool zeroWidthAssertion = isZeroWidthAssertion(searchToken);
 
                         // Allow substitution except in the case where better fit method is being
-                        // used and the first token is not a word character (is whitespace or a word
-                        // boundary char.
+                        // used and the first token is a zero width assertion.
                         bool allowSubstitution =
                             (options.SearchMethod != FuzzySearchOptions.Method.BetterFit ||
-                            i != 0 || isWordCharacterToken(searchToken));
+                            i != 0 || !zeroWidthAssertion);
 
                         bool lastTerm = (i == (searchTokens.Count - 1));
 
@@ -414,9 +414,9 @@ namespace Extract.Utilities.Parsers
                             options.SearchMethod == FuzzySearchOptions.Method.BetterFit,
                             allowSubstitution, allowLeadingSpace, lastTerm);
 
-                        // Allow leading whitespace except for the first token following a non-
-                        // wordbreak metachar.
-                        allowLeadingSpace |= !searchToken.Equals(@"\b", StringComparison.Ordinal);
+                        // Allow leading whitespace starting with the first token following a
+                        // non zero width assertion token.
+                        allowLeadingSpace |= !zeroWidthAssertion;
                     }
 
                     // If using better fit method, create another set of token search terms that
@@ -449,13 +449,20 @@ namespace Extract.Utilities.Parsers
                         {
                             string searchToken = searchTokens[i];
                             bool lastTerm = (i == (searchTokens.Count - 1));
+                            bool zeroWidthAssertion = isZeroWidthAssertion(searchToken);
+
+                            // Allow substitution except in the case where better fit method is being
+                            // used and the first token is a zero width assertion.
+                            bool allowSubstitution =
+                                (options.SearchMethod != FuzzySearchOptions.Method.BetterFit ||
+                                i != 0 || !zeroWidthAssertion);
 
                             AddTokenSearchTerm(expandedSearchString, searchToken, stackNames,
-                                false, true, allowLeadingSpace, lastTerm);
+                                false, allowSubstitution, allowLeadingSpace, lastTerm);
 
-                            // Allow leading whitespace except for the first token following a non-
-                            // wordbreak metachar.
-                            allowLeadingSpace |= !searchToken.Equals(@"\b", StringComparison.Ordinal);
+                            // Allow leading whitespace starting with the first token following a
+                            // non zero width assertion token.
+                            allowLeadingSpace |= !zeroWidthAssertion;
                         }
 
                         // End the lookahead term.
@@ -486,33 +493,23 @@ namespace Extract.Utilities.Parsers
         }
 
         /// <summary>
-        /// Determines if the specified search token represents a word character
+        /// Determines if the specified search token is a zero-width assertion.
         /// </summary>
         /// <param name="token">The token to test.</param>
-        /// <returns><see langword="true"/> if the token represents a word character,
+        /// <returns><see langword="true"/> if the token is a zero-witch assertion,
         /// <see langword="false"/> otherwise</returns>
-        static bool isWordCharacterToken(string token)
+        static bool isZeroWidthAssertion(string token)
         {
-            // TODO: This method is covering most likely cases, but it would still be possible to
-            // have tokens that do not represent a word char return true from this method.
-
-            // If the token is either the word boundary metachar or whitespace char class it is not
-            // a word character token.
-            if (token.Equals(@"\b", StringComparison.Ordinal) ||
-                token.Equals(@"\s", StringComparison.Ordinal))
+            if (token.Equals(@"^", StringComparison.Ordinal) ||
+                token.Equals(@"$", StringComparison.Ordinal) ||
+                token.Equals(@"\b", StringComparison.OrdinalIgnoreCase) ||
+                token.Equals(@"\z", StringComparison.OrdinalIgnoreCase) ||
+                token.Equals(@"\A", StringComparison.Ordinal))
             {
-                return false;
+                return true;
             }
 
-            // If the unescaped token is whitespace it is not a word character token.
-            string unescapedToken = Regex.Unescape(token).Trim();
-            if (string.IsNullOrEmpty(unescapedToken))
-            {
-                return false;
-            }
-
-            // Otherwise the token does not represent a word char.
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -582,8 +579,13 @@ namespace Extract.Utilities.Parsers
                 regEx.Append(searchToken);
                 regEx.Append(@")");
 
-                // Allow for space chars after matching the search token.
-                AddExtraSpaceTerm(regEx, stackNames, initialBetterFitTerm);
+                // Allow for space chars after matching the search token except if substitution is
+                // not being allowed (in which case allowing a space is more or less like allowing
+                // a substituion).
+                if (allowSubstitution)
+                {
+                    AddExtraSpaceTerm(regEx, stackNames, initialBetterFitTerm);
+                }
             }
         }
 

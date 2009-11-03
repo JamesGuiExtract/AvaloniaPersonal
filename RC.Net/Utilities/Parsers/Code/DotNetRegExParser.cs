@@ -419,21 +419,34 @@ namespace Extract.Utilities.Parsers
         /// <returns>Regex parser with the pattern and options set.</returns>
         private Regex GetRegexParser()
         {
-            // if internal variable is null, create a new parser with the pattern and options.
-            if (_regexParser == null)
+            string expandedPattern = "";
+
+            try
             {
-		        // TODO: Remove this GC.Collect call, this is here for testing purposes
-		        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-		        GC.WaitForPendingFinalizers();
+                // if internal variable is null, create a new parser with the pattern and options.
+                if (_regexParser == null)
+                {
+                    // TODO: Remove this GC.Collect call, this is here for testing purposes
+                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+                    GC.WaitForPendingFinalizers();
 
-                // Expand any fuzzy search terms into the equivalent regular expression.
-		        string expandedPattern =
-                    FuzzySearchRegexBuilder.ExpandFuzzySearchExpressions(_pattern);
+                    // Expand any fuzzy search terms into the equivalent regular expression.
+                    expandedPattern = FuzzySearchRegexBuilder.ExpandFuzzySearchExpressions(_pattern);
 
-		        _regexParser = new Regex(expandedPattern, GetOptions());
+                    _regexParser = new Regex(expandedPattern, GetOptions());
+                }
+
+                return _regexParser;
             }
-
-            return _regexParser;
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI28437",
+                    "Unable to initialize regular expression parser!");
+                ee.AddDebugData("Error", ex.Message, true);
+                ee.AddDebugData("Pattern", _pattern, true);
+                ee.AddDebugData("Expanded pattern", expandedPattern, true);
+                throw ee;
+            }
         }
 
         /// <summary>
