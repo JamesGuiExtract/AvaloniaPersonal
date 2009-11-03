@@ -61,6 +61,33 @@ RedactionAppearanceOptions::RedactionAppearanceOptions()
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI24750")
 }
 //-------------------------------------------------------------------------------------------------
+string RedactionAppearanceOptions::getFontAsString()
+{
+	string strFont = m_lgFont.lfFaceName;
+	strFont += " ";
+	strFont += asString(m_iPointSize);
+	strFont += "pt";
+
+	// Append the font style
+	bool bBold = m_lgFont.lfWeight >= 700;
+	bool bItalic = m_lgFont.lfItalic == gucIS_ITALIC;
+	if (bBold || bItalic)
+	{
+		strFont += "; ";
+
+		if (bBold)
+		{
+			strFont += "Bold ";
+		}
+		if (bItalic)
+		{
+			strFont += "Italic";
+		}
+	}
+
+	return strFont;
+}
+//-------------------------------------------------------------------------------------------------
 void RedactionAppearanceOptions::reset()
 {
 	m_strText = "";
@@ -115,27 +142,7 @@ int CRedactionAppearanceDlg::getIndexFromColor(COLORREF crColor)
 void CRedactionAppearanceDlg::updateFontDescription()
 {
 	// Append the font name and size
-	string strFont = m_options.m_lgFont.lfFaceName;
-	strFont += " ";
-	strFont += asString(m_options.m_iPointSize);
-	strFont += "pt";
-
-	// Append the font style
-	bool bBold = m_options.m_lgFont.lfWeight >= 700;
-	bool bItalic = m_options.m_lgFont.lfItalic == gucIS_ITALIC;
-	if (bBold || bItalic)
-	{
-		strFont += "; ";
-
-		if (bBold)
-		{
-			strFont += "Bold ";
-		}
-		if (bItalic)
-		{
-			strFont += "Italic";
-		}
-	}
+	string strFont = m_options.getFontAsString();
 
 	// Set font description
 	m_editFontDescription.SetWindowText(strFont.c_str());

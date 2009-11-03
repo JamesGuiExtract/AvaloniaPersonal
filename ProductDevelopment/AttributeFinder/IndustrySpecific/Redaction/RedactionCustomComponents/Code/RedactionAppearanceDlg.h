@@ -22,6 +22,9 @@ struct RedactionAppearanceOptions
 	// Default constructor
 	RedactionAppearanceOptions();
 
+	// Creates a string containing the font family, size, and style
+	string getFontAsString();
+
 	// Reset all values to their defaults
 	void reset();
 };
