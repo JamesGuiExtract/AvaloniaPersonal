@@ -1,5 +1,5 @@
 REM Clean Source folder
-call Clean.bat
+call Clean.bat Test_1
 
 REM Supply numbered file sets every 10 minutes for 8 hours
 START CopyNumberedSets AutomatedTestFiles\Images\AllImages MemoryTestArea 600 8
