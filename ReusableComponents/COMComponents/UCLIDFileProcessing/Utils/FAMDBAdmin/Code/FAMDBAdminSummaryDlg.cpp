@@ -180,10 +180,25 @@ BOOL CFAMDBAdminSummaryDlg::PreTranslateMessage(MSG* pMsg)
 
 	try
 	{
-		// Want any accelerator keys handled by the parent of the property sheet that 
-		// contains this page.
+		// If this is an accelerator key, check for F5 first, otherwise
+		// pass the message off to the parent form to handle the keypress
 		if ( pMsg->message == WM_KEYDOWN)
 		{
+			// If the key is the F5 key then refresh the summary grid
+			if (pMsg->wParam == VK_F5)
+			{
+				// Refresh the grid
+				populatePage();
+
+				// Need to "Set" the mouse position to clear the wait cursor
+				POINT point;
+				GetCursorPos(&point);
+				SetCursorPos(point.x, point.y);
+
+				// Return TRUE to indicate the message was handled
+				return TRUE;
+			}
+
 			// Get the parent
 			CWnd *pWnd = GetParent();
 			if (pWnd)
@@ -209,9 +224,6 @@ void CFAMDBAdminSummaryDlg::OnBnClickedRefreshSummary()
 
 	try
 	{
-		// set the wait cursor
-		CWaitCursor wait;
-
 		populatePage();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19797");
@@ -285,6 +297,9 @@ void CFAMDBAdminSummaryDlg::populatePage()
 {
 	// ensure we have a database object
 	ASSERT_ARGUMENT("ELI19806", m_ipFAMDB != NULL);
+
+	// Set the wait cursor
+	CWaitCursor wait;
 
 	// clear the list control first
 	m_listActions.DeleteAllItems();
