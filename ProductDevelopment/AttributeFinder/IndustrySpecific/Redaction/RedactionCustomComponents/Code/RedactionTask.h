@@ -170,5 +170,62 @@ private:
 	// Allocates m_ipIDShieldDB pointer if it does not exist and returns m_ipIDShieldDB
 	UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr getIDShieldDBPtr();
 
+	// Adds a metadata attribute to the specified voa file using the specified information
+	void storeMetaData(const string& strVoaFile, IIUnknownVectorPtr ipAttributes, 
+		IIUnknownVectorPtr ipRedactedAttributes, CTime tStartTime, double dSeconds, 
+		const string& strSourceDocument, const string& strRedactedImage, bool bOverwroteOutput);
+
+	// Gets next attribute id from the specified attributes
+	long getNextId(IIUnknownVectorPtr ipAttributes);
+
+	// Gets the unique id from the specified attribute; or -1 if it doesn't have an id
+	long getAttributeId(IAttributePtr ipAttribute);
+
+	// Gets the id attribute from the specified attribute
+	IAttributePtr getIdAttribute(IAttributePtr ipAttribute);
+
+	// Assigns unique ids to any attributes that don't have them
+	void assignIds(IIUnknownVectorPtr ipAttributes, long llNextId, const string& strSourceDocument);
+
+	// Create an id attribute with the specified value
+	IAttributePtr createIdAttribute(const string& strSourceDocument, long lId);
+
+	// Gets the next automated redaction session id from the specified attributes
+	long getNextSessionId(IIUnknownVectorPtr ipAttributes);
+
+	// Creates a metadata attribute using the specified information
+	IAttributePtr createMetaDataAttribute(long lSession, const string& strVoaFile, 
+		IIUnknownVectorPtr ipRedactedAttributes, CTime tStartTime, double dElapsedSeconds, 
+		const string& strSourceDocument, const string& strRedactedImage, bool bOverwroteOutput);
+
+	// Creates the user info attribute
+	IAttributePtr createUserInfoAttribute(const string& strSourceDocument);
+
+	// Creates the time info attribute
+	IAttributePtr createTimeInfoAttribute(const string& strSourceDocument, CTime tStartTime, 
+		double dElapsedSeconds);
+
+	// Creates the redacted categories attribute
+	IAttributePtr createRedactedCategoriesAttribute(const string& strSourceDocument);
+
+	// Creates the output options attribute
+	IAttributePtr createOptionsAttribute(const string& strSourceDocument, bool bOverwroteOutput);
+
+	// Creates the redaction text and color settings attribute
+	IAttributePtr createRedactionAppearanceAttribute(const string& strSourceDocument);
+
+	// Creates the redacted entries attribute
+	IAttributePtr createRedactedEntriesAttribute(const string& strSourceDocument, 
+		IIUnknownVectorPtr ipRedactedAttributes);
+
+	// Creates an attribute with the specified name, non-spatial value, and type
+	IAttributePtr createAttribute(const string& strSourceDocument, const string& strName, 
+		const string& strValue = "");
+	IAttributePtr createAttribute(const string& strSourceDocument, const string& strName, 
+		const string& strValue, const string& strType);
+
+	// Returns either "Black" or "White"
+	string getColorAsString(COLORREF crColor);
+
 	void validateLicense();
 };
