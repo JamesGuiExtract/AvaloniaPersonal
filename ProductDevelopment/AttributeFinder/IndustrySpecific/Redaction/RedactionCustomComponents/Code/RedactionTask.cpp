@@ -176,7 +176,8 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 		string strImageToRedact = strImageName;
 
 		// Use redacted image as backdrop if option is specified
-		if (m_bUseRedactedImage && isFileOrFolderValid(strOutputName))
+		bool bOutputFileExists = isFileOrFolderValid(strOutputName);
+		if (m_bUseRedactedImage && bOutputFileExists)
 		{
 			strImageToRedact = strOutputName;
 		}
@@ -199,11 +200,8 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 		// Create Found attributes vector
 		IIUnknownVectorPtr ipFoundAttr (CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI08997", ipFoundAttr != NULL);
-
-		// Initialize the idShield data class
-		IDShieldData idsData;
-
 		_lastCodePos = "120";
+
 		IIUnknownVectorPtr ipVOAAttr(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI12718", ipVOAAttr != NULL);
 
@@ -225,7 +223,17 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 		ipVOAAttr->LoadFrom(strVOAFileName.c_str(), VARIANT_FALSE);
 
 		// Calculate the counts from the loaded voa file
-		idsData.calculateFromVector(ipVOAAttr, m_setAttributeNames);
+		IDShieldData idsData;
+		if (m_ipAttributeNames == NULL)
+		{
+			// Count all the attributes
+			idsData.calculateFromVector(ipVOAAttr);
+		}
+		else
+		{
+			// Count the selected attributes
+			idsData.calculateFromVector(ipVOAAttr, m_setAttributeNames);
+		}
 		_lastCodePos = "150";
 
 		// check to see if all of the loaded attributes will be used
@@ -254,8 +262,6 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 			_lastCodePos = "190";
 			ipFoundAttr = ipVOAAttr;
 		}
-
-
 		_lastCodePos = "200";
 
 		// Get the text color
@@ -347,12 +353,18 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 			m_bCarryForwardAnnotations, m_bApplyRedactionsAsAnnotations);
 		_lastCodePos = "400";
 
+		// Stop the stop watch
+		swProcessingTime.stop();
+		CTime tStartTime = swProcessingTime.getBeginTime();
+		double dElapsedSeconds = swProcessingTime.getElapsedTime();
+
+		// Add a metadata attribute to the VOA file
+		storeMetaData(strVOAFileName, ipVOAAttr, ipFoundAttr, tStartTime, dElapsedSeconds, 
+			strImageName, strOutputName, bOutputFileExists);
+
 		// Set the FAMDB pointer
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipIDSDB = getIDShieldDBPtr();
 		ipIDSDB->FAMDB = ipFAMDB;
-
-		// Stop the stop watch
-		swProcessingTime.stop();
 
 		// Add the IDShieldData record to the database
 		ipIDSDB->AddIDShieldData(nFileID, VARIANT_FALSE, swProcessingTime.getElapsedTime(), 
@@ -1268,6 +1280,562 @@ IAFUtilityPtr CRedactionTask::getAFUtility()
 		ASSERT_RESOURCE_ALLOCATION("ELI09877", m_ipAFUtility != NULL);
 	}
 	return m_ipAFUtility;
+}
+//-------------------------------------------------------------------------------------------------
+void CRedactionTask::storeMetaData(const string& strVoaFile, IIUnknownVectorPtr ipAttributes, 
+	IIUnknownVectorPtr ipRedactedAttributes, CTime tStartTime, double dSeconds, 
+	const string& strSourceDocument, const string& strRedactedImage, bool bOverwroteOutput)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI28429", ipAttributes != NULL);
+
+		// Calculate the next id
+		long lNextId = getNextId(ipAttributes);
+		assignIds(ipRedactedAttributes, lNextId, strSourceDocument);
+
+		// Calculate the next redaction session
+		long lNextSession = getNextSessionId(ipAttributes);
+
+		// Create and append the metadata attribute
+		IAttributePtr ipMetaData = createMetaDataAttribute(lNextSession, strVoaFile, 
+			ipRedactedAttributes, tStartTime, dSeconds, strSourceDocument, strRedactedImage, 
+			bOverwroteOutput);
+		ASSERT_RESOURCE_ALLOCATION("ELI28349", ipMetaData != NULL);
+		ipAttributes->PushBack(ipMetaData);
+
+		// Save the voa with the new metadata
+		ipAttributes->SaveTo(strVoaFile.c_str(), false);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28350")
+}
+//-------------------------------------------------------------------------------------------------
+long CRedactionTask::getNextId(IIUnknownVectorPtr ipAttributes)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI28430", ipAttributes != NULL);
+
+		// Iterate over each attribute, looking for the largest id
+		long lMaxId = 0;
+		int count = ipAttributes->Size();
+		for	(int i = 0; i < count; i++)
+		{
+			IAttributePtr ipAttribute = ipAttributes->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI28355", ipAttribute != NULL);
+
+			string strName = asString(ipAttribute->Name);
+			makeUpperCase(strName);
+
+			// Check for the old revisions attribute
+			long lCurrentId = 0;
+			if (strName == "_OLDREVISIONS")
+			{
+				// Find the largest id of the old revisions
+				lCurrentId = getNextId(ipAttribute->SubAttributes) - 1;
+			}
+			else
+			{
+				// Get the id of this attribute
+				lCurrentId = getAttributeId(ipAttribute);
+			}
+
+			// If this the largest id thus far, store it
+			if (lMaxId < lCurrentId)
+			{
+				lMaxId = lCurrentId;
+			}
+		}
+
+		// The next id is the largest plus 1
+		return lMaxId + 1;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28351")
+}
+//-------------------------------------------------------------------------------------------------
+long CRedactionTask::getAttributeId(IAttributePtr ipAttribute)
+{
+	try
+	{
+		// -1 indicates no id found
+		long lId = -1;
+		
+		// Get the value of the id attribute if it exists
+		IAttributePtr ipIdAttribute = getIdAttribute(ipAttribute);
+		if (ipIdAttribute != NULL)
+		{
+			ISpatialStringPtr ipValue = ipIdAttribute->Value;
+			ASSERT_RESOURCE_ALLOCATION("ELI28358", ipValue != NULL);
+			
+			string strId = asString(ipValue->String);
+			lId = asLong(strId);
+		}
+
+		return lId;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28356")
+}
+//-------------------------------------------------------------------------------------------------
+IAttributePtr CRedactionTask::getIdAttribute(IAttributePtr ipAttribute)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI28431", ipAttribute != NULL);
+
+		IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
+		ASSERT_RESOURCE_ALLOCATION("ELI28360", ipSubAttributes != NULL);
+
+		// Iterate over the sub attributes of the attribute
+		int count = ipSubAttributes->Size();
+		for (int i = 0; i < count; i++)
+		{
+			IAttributePtr ipSubAttribute = ipSubAttributes->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI28361", ipSubAttribute != NULL);
+
+			string strName = asString(ipSubAttribute->Name);
+			makeUpperCase(strName);
+
+			// Check if this is the ID and revision attribute
+			if (strName == "_IDANDREVISION")
+			{
+				return ipSubAttribute;
+			}
+		}
+
+		// The attribute was not found
+		return NULL;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28359")
+}
+//-------------------------------------------------------------------------------------------------
+void CRedactionTask::assignIds(IIUnknownVectorPtr ipAttributes, long lNextId, 
+							   const string& strSourceDocument)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI28432", ipAttributes != NULL);
+
+		// Iterate over each attribute
+		int count = ipAttributes->Size();
+		for (int i = 0; i < count; i++)
+		{
+			IAttributePtr ipAttribute = ipAttributes->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI28362", ipAttribute);
+
+			// Check if this attribute already has an attribute id
+			IAttributePtr ipIdAttribute = getIdAttribute(ipAttribute);
+			if (ipIdAttribute == NULL)
+			{
+				// Create an attribute id for this attribute
+				ipIdAttribute = createIdAttribute(strSourceDocument, lNextId);
+				ASSERT_RESOURCE_ALLOCATION("ELI28421", ipIdAttribute != NULL)
+				
+				// Add the id attribute
+				IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
+				ASSERT_RESOURCE_ALLOCATION("ELI28423", ipSubAttributes != NULL);
+				ipSubAttributes->PushBack(ipIdAttribute);
+
+				// Increment the next id
+				lNextId++;
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28352")
+}
+//-------------------------------------------------------------------------------------------------
+IAttributePtr CRedactionTask::createIdAttribute(const string& strSourceDocument, long lId)
+{
+	try
+	{
+		// Get the id as a string
+		string strId = asString(lId);
+
+		// Create the id attribute
+		IAttributePtr ipIdAttribute = 
+			createAttribute(strSourceDocument, "_IDAndRevision", strId, "_1");
+		ASSERT_RESOURCE_ALLOCATION("ELI28422", ipIdAttribute != NULL);
+
+		return ipIdAttribute;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28353")
+}
+//-------------------------------------------------------------------------------------------------
+long CRedactionTask::getNextSessionId(IIUnknownVectorPtr ipAttributes)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI28433", ipAttributes != NULL);
+
+		// Iterate over each attribute, looking for the largest redaction session id
+		long lMaxSession = 0;
+		int count = ipAttributes->Size();
+		for	(int i = 0; i < count; i++)
+		{
+			IAttributePtr ipAttribute = ipAttributes->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI28355", ipAttribute != NULL);
+
+			string strName = asString(ipAttribute->Name);
+			makeUpperCase(strName);
+
+			// Check for the redaction session attribute
+			long lCurrentSession = 0;
+			if (strName == "_REDACTEDFILEOUTPUTSESSION")
+			{
+				// Get the session id from the attribute
+				ISpatialStringPtr ipValue = ipAttribute->Value;
+				ASSERT_RESOURCE_ALLOCATION("ELI28365", ipValue);
+
+				string strSession = asString(ipValue->String);
+				lCurrentSession = asLong(strSession);
+			}
+
+			// If this is the largest session thus far, store it
+			if (lMaxSession < lCurrentSession)
+			{
+				lMaxSession = lCurrentSession;
+			}
+		}
+
+		// The next session is the largest session plus 1
+		return lMaxSession + 1;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28353")
+}
+//-------------------------------------------------------------------------------------------------
+IAttributePtr CRedactionTask::createMetaDataAttribute(long lSession, const string& strVoaFile,
+	IIUnknownVectorPtr ipRedactedAttributes, CTime tStartTime, double dElapsedSeconds, 
+	const string& strSourceDocument, const string& strRedactedImage, bool bOverwroteOutput)
+{
+	try
+	{
+		// User information
+		IAttributePtr ipUserInfo = createUserInfoAttribute(strSourceDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI28369", ipUserInfo != NULL);
+
+		// Time and duration
+		IAttributePtr ipTimeInfo = 
+			createTimeInfoAttribute(strSourceDocument, tStartTime, dElapsedSeconds);
+		ASSERT_RESOURCE_ALLOCATION("ELI28370", ipTimeInfo != NULL);
+
+		// Source document
+		IAttributePtr ipSourceDocument = 
+			createAttribute(strSourceDocument, "_SourceDocName", strSourceDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI28371", ipSourceDocument != NULL);
+
+		// Data file (VOA)
+		IAttributePtr ipDataFile = 
+			createAttribute(strSourceDocument, "_IDShieldDataFile", strVoaFile);
+		ASSERT_RESOURCE_ALLOCATION("ELI28372", ipDataFile != NULL);
+
+		// Output image
+		IAttributePtr ipOutputFile = 
+			createAttribute(strSourceDocument, "_OutputFile", strRedactedImage);
+		ASSERT_RESOURCE_ALLOCATION("ELI28373", ipOutputFile != NULL);
+
+		// Attribute types redacted
+		IAttributePtr ipRedactedCategories = createRedactedCategoriesAttribute(strSourceDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI28374", ipRedactedCategories != NULL);
+
+		// Output options
+		IAttributePtr ipOptions = createOptionsAttribute(strSourceDocument, bOverwroteOutput);
+		ASSERT_RESOURCE_ALLOCATION("ELI28375", ipOptions != NULL); 
+
+		// Attributes redacted
+		IAttributePtr ipRedactedEntries = 
+			createRedactedEntriesAttribute(strSourceDocument, ipRedactedAttributes);
+		ASSERT_RESOURCE_ALLOCATION("ELI28376", ipRedactedEntries != NULL);
+
+		// Metadata attribute
+		string strValue = asString(lSession);
+		IAttributePtr ipMetaData = 
+			createAttribute(strSourceDocument, "_RedactedFileOutputSession", strValue);
+		ASSERT_RESOURCE_ALLOCATION("ELI28377", ipMetaData != NULL);
+
+		IIUnknownVectorPtr ipSubAttributes = ipMetaData->SubAttributes;
+		ASSERT_RESOURCE_ALLOCATION("ELI28424", ipSubAttributes != NULL);
+
+		// Append the attributes that belong to the metadata attribute
+		ipSubAttributes->PushBack(ipUserInfo);
+		ipSubAttributes->PushBack(ipTimeInfo);
+		ipSubAttributes->PushBack(ipSourceDocument);
+		ipSubAttributes->PushBack(ipDataFile);
+		ipSubAttributes->PushBack(ipOutputFile);
+		ipSubAttributes->PushBack(ipRedactedCategories);
+		ipSubAttributes->PushBack(ipOptions);
+		ipSubAttributes->PushBack(ipRedactedEntries);
+
+		return ipMetaData;		
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28354")
+}
+//-------------------------------------------------------------------------------------------------
+IAttributePtr CRedactionTask::createUserInfoAttribute(const string& strSourceDocument)
+{
+	try
+	{
+		// User name
+		string strUserName = getCurrentUserName();
+		IAttributePtr ipLogin = createAttribute(strSourceDocument, "_LoginID", strUserName);
+		ASSERT_RESOURCE_ALLOCATION("ELI28386", ipLogin != NULL);
+
+		// Computer name
+		string strComputerName = getComputerName();
+		IAttributePtr ipComputer = createAttribute(strSourceDocument, "_Computer", strComputerName);
+		ASSERT_RESOURCE_ALLOCATION("ELI28387", ipComputer != NULL);
+
+		// User information
+		IAttributePtr ipUserInfo = createAttribute(strSourceDocument, "_UserInfo");
+		ASSERT_RESOURCE_ALLOCATION("ELI28389", ipUserInfo != NULL);
+
+		IIUnknownVectorPtr ipSubAttributes = ipUserInfo->SubAttributes;
+		ASSERT_RESOURCE_ALLOCATION("ELI28425", ipUserInfo != NULL);
+
+		// Append subattributes
+		ipSubAttributes->PushBack(ipLogin);
+		ipSubAttributes->PushBack(ipComputer);
+
+		return ipUserInfo;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28381")
+}
+//-------------------------------------------------------------------------------------------------
+IAttributePtr CRedactionTask::createTimeInfoAttribute(const string& strSourceDocument, 
+													  CTime tStartTime, double dElapsedSeconds)
+{
+	try
+	{
+		// Start date
+		string strDate = tStartTime.Format("%m/%d/%Y");
+		IAttributePtr ipDate = createAttribute(strSourceDocument, "_Date", strDate);
+		ASSERT_RESOURCE_ALLOCATION("ELI28390", ipDate != NULL);
+
+		// Start time
+		string strTimeStarted = tStartTime.Format("%H:%M:%S");
+		IAttributePtr ipTime = createAttribute(strSourceDocument, "_TimeStarted", strTimeStarted);
+		ASSERT_RESOURCE_ALLOCATION("ELI28391", ipTime != NULL);
+
+		// Elapsed seconds
+		string strSeconds = asString(dElapsedSeconds);
+		IAttributePtr ipSeconds = createAttribute(strSourceDocument, "_TotalSeconds", strSeconds);
+		ASSERT_RESOURCE_ALLOCATION("ELI28392", ipSeconds != NULL);
+
+		// Time info attribute
+		IAttributePtr ipTimeInfo = createAttribute(strSourceDocument, "_TimeInfo");
+		ASSERT_RESOURCE_ALLOCATION("ELI28393", ipTimeInfo != NULL);
+
+		IIUnknownVectorPtr ipSubAttributes = ipTimeInfo->SubAttributes;
+		ASSERT_RESOURCE_ALLOCATION("ELI28426", ipSubAttributes != NULL);
+
+		// Append subattributes
+		ipSubAttributes->PushBack(ipDate);
+		ipSubAttributes->PushBack(ipTime);
+		ipSubAttributes->PushBack(ipSeconds);
+
+		return ipTimeInfo;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28382")
+}
+//-------------------------------------------------------------------------------------------------
+IAttributePtr CRedactionTask::createRedactedCategoriesAttribute(const string& strSourceDocument)
+{
+	try
+	{
+		// Iterate over each attribute name
+		string strNames = "";
+		for each (string strName in m_setAttributeNames)
+		{
+			// Append them in a comma separated list
+			if (!strNames.empty())
+			{
+				strNames += ",";
+			}
+			strNames += strName;
+		}
+
+		// Create categories redacted attribute
+		IAttributePtr ipCategories = 
+			createAttribute(strSourceDocument, "_AttributesToRedact", strNames);
+
+		return ipCategories;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28383")
+}
+//-------------------------------------------------------------------------------------------------
+IAttributePtr CRedactionTask::createOptionsAttribute(const string& strSourceDocument,
+	bool bOverwroteOutput)
+{
+	try
+	{
+		// Retain redactions
+		string strRetainRedactions = m_bUseRedactedImage ? "Yes" : "No";
+		IAttributePtr ipRetainRedactions = createAttribute(strSourceDocument, 
+			"_RetainExistingRedactionsInOutputFile", strRetainRedactions);
+		ASSERT_RESOURCE_ALLOCATION("ELI28394", ipRetainRedactions != NULL);
+
+		// Overwrote output file
+		string strOverwrote = bOverwroteOutput ? "Yes" : "No";
+		IAttributePtr ipOverwrote = createAttribute(strSourceDocument, 
+			"_OutputFileExistedPriorToOutputOperation", strOverwrote);
+		ASSERT_RESOURCE_ALLOCATION("ELI28395", ipOverwrote != NULL);
+
+		// Retain annotations
+		string strRetainAnnotations = m_bCarryForwardAnnotations ? "Yes" : "No";
+		IAttributePtr ipRetainAnnotations = 
+			createAttribute(strSourceDocument, "_RetainExistingAnnotations", strRetainAnnotations);
+		ASSERT_RESOURCE_ALLOCATION("ELI28396", ipRetainAnnotations != NULL);
+
+		// Apply as annotations
+		string strApplyAsAnnotations = m_bApplyRedactionsAsAnnotations ? "Yes" : "No";
+		IAttributePtr ipApplyAsAnnotations = createAttribute(strSourceDocument, 
+			"_ApplyRedactionsAsAnnotations", strApplyAsAnnotations);
+		ASSERT_RESOURCE_ALLOCATION("ELI28397", ipApplyAsAnnotations != NULL);
+
+		// Redaction appearance settings
+		IAttributePtr ipRedactionAppearance = createRedactionAppearanceAttribute(strSourceDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI28398", ipRedactionAppearance != NULL);
+
+		// Output options
+		IAttributePtr ipOutputOptions = createAttribute(strSourceDocument, "_OutputOptions");
+		ASSERT_RESOURCE_ALLOCATION("ELI28400", ipOutputOptions != NULL);
+
+		IIUnknownVectorPtr ipSubAttributes = ipOutputOptions->SubAttributes;
+		ASSERT_RESOURCE_ALLOCATION("ELI28427", ipSubAttributes != NULL);
+
+		// Append sub attributes
+		ipSubAttributes->PushBack(ipRetainRedactions);
+		ipSubAttributes->PushBack(ipOverwrote);
+		ipSubAttributes->PushBack(ipRetainAnnotations);
+		ipSubAttributes->PushBack(ipApplyAsAnnotations);
+		ipSubAttributes->PushBack(ipRedactionAppearance);
+
+		return ipOutputOptions;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28384")
+}
+//-------------------------------------------------------------------------------------------------
+IAttributePtr CRedactionTask::createRedactionAppearanceAttribute(const string& strSourceDocument)
+{
+	try
+	{
+		// Text format
+		IAttributePtr ipTextFormat = 
+			createAttribute(strSourceDocument, "_TextFormat", m_redactionAppearance.m_strText);
+		ASSERT_RESOURCE_ALLOCATION("ELI28411", ipTextFormat != NULL);
+
+		// Fill color
+		string strFillColor = getColorAsString(m_redactionAppearance.m_crFillColor);
+		IAttributePtr ipFillColor = 
+			createAttribute(strSourceDocument, "_FillColor", strFillColor);
+		ASSERT_RESOURCE_ALLOCATION("ELI28412", ipFillColor != NULL);
+
+		// Border color
+		string strBorderColor = getColorAsString(m_redactionAppearance.m_crBorderColor);
+		IAttributePtr ipBorderColor = 
+			createAttribute(strSourceDocument, "_BorderColor", strBorderColor);
+		ASSERT_RESOURCE_ALLOCATION("ELI28413", ipBorderColor != NULL);
+
+		// Font
+		string strFont = m_redactionAppearance.getFontAsString();
+		IAttributePtr ipFont = createAttribute(strSourceDocument, "_Font", strFont);
+		ASSERT_RESOURCE_ALLOCATION("ELI28414", ipFont != NULL);
+
+		// Redaction appearance attribute
+		IAttributePtr ipRedactionAppearance = 
+			createAttribute(strSourceDocument, "_RedactionTextAndColorSettings");
+		ASSERT_RESOURCE_ALLOCATION("ELI28415", ipRedactionAppearance != NULL);
+
+		IIUnknownVectorPtr ipSubAttributes = ipRedactionAppearance->SubAttributes;
+		ASSERT_RESOURCE_ALLOCATION("ELI28428", ipSubAttributes != NULL);
+
+		// Append sub attributes
+		ipSubAttributes->PushBack(ipTextFormat);
+		ipSubAttributes->PushBack(ipFillColor);
+		ipSubAttributes->PushBack(ipBorderColor);
+		ipSubAttributes->PushBack(ipFont);
+
+		return ipRedactionAppearance;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28399")
+}
+//-------------------------------------------------------------------------------------------------
+IAttributePtr CRedactionTask::createRedactedEntriesAttribute(const string& strSourceDocument, 
+	IIUnknownVectorPtr ipRedactedAttributes)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI28434", ipRedactedAttributes != NULL);
+
+		// Redacted entries attribute
+		IAttributePtr ipRedacted = createAttribute(strSourceDocument, "_EntriesRedacted");
+		ASSERT_RESOURCE_ALLOCATION("ELI28416", ipRedacted != NULL);
+
+		IIUnknownVectorPtr ipSubAttributes = ipRedacted->SubAttributes;
+		ASSERT_RESOURCE_ALLOCATION("ELI28419", ipSubAttributes != NULL);
+
+		// Iterate over each redacted attribute
+		int count = ipRedactedAttributes->Size();
+		for (int i = 0; i < count; i++)
+		{
+			IAttributePtr ipAttribute = ipRedactedAttributes->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI28417", ipAttribute != NULL);
+
+			IAttributePtr ipIdAttribute = getIdAttribute(ipAttribute);
+			ASSERT_RESOURCE_ALLOCATION("ELI28418", ipIdAttribute != NULL);
+
+			// Append the ID attribute
+			ipSubAttributes->PushBack(ipIdAttribute);
+		}
+
+		return ipRedacted;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28385")
+}
+//-------------------------------------------------------------------------------------------------
+IAttributePtr CRedactionTask::createAttribute(const string& strSourceDocument, 
+	const string& strName, const string& strValue)
+{
+	try
+	{
+		// Create a non spatial string to represent the value
+		ISpatialStringPtr ipValue(CLSID_SpatialString);
+		ASSERT_RESOURCE_ALLOCATION("ELI28363", ipValue != NULL);
+		ipValue->CreateNonSpatialString(strValue.c_str(), strSourceDocument.c_str());
+
+		// Create an attribute with the specified name and value
+		IAttributePtr ipAttribute(CLSID_Attribute);
+		ASSERT_RESOURCE_ALLOCATION("ELI28364", ipAttribute != NULL);
+		ipAttribute->Name = strName.c_str();
+		ipAttribute->Value = ipValue;
+
+		return ipAttribute;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28366")
+}
+//-------------------------------------------------------------------------------------------------
+IAttributePtr CRedactionTask::createAttribute(const string& strSourceDocument, 
+	const string& strName, const string& strValue, const string& strType)
+{
+	try
+	{
+		// Create an attribute with the specified name and value
+		IAttributePtr ipAttribute = createAttribute(strSourceDocument, strName, strValue);
+		ASSERT_RESOURCE_ALLOCATION("ELI28368", ipAttribute);
+
+		// Also set the type
+		ipAttribute->Type = strType.c_str();
+
+		return ipAttribute;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28367")
+}
+//-------------------------------------------------------------------------------------------------
+string CRedactionTask::getColorAsString(COLORREF crColor)
+{
+	try
+	{
+		return crColor == RGB(255, 255, 255) ? "White" : "Black";
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28420")
 }
 //-------------------------------------------------------------------------------------------------
 void CRedactionTask::validateLicense()
