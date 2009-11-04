@@ -1,0 +1,24 @@
+HKCR
+{
+	FAMProcess.FileProcessingManagerProce.1 = s 'FileProcessingManagerProcess Class'
+	{
+		CLSID = s '{21296131-B9D3-42D2-9850-76C474B9D0AF}'
+	}
+	FAMProcess.FileProcessingManagerProcess = s 'FileProcessingManagerProcess Class'
+	{
+		CLSID = s '{21296131-B9D3-42D2-9850-76C474B9D0AF}'
+		CurVer = s 'FAMProcess.FileProcessingManagerProce.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {21296131-B9D3-42D2-9850-76C474B9D0AF} = s 'FileProcessingManagerProcess Class'
+		{
+			ProgID = s 'FAMProcess.FileProcessingManagerProce.1'
+			VersionIndependentProgID = s 'FAMProcess.FileProcessingManagerProcess'
+			ForceRemove 'Programmable'
+			LocalServer32 = s '%MODULE%'
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{70C83EF4-87D0-49DA-85EA-F29549EEEB7A}'
+		}
+	}
+}

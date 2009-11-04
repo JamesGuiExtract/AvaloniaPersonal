@@ -1,0 +1,58 @@
+// FAMProcess.idl : IDL source for FAMProcess
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (FAMProcess.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(E5591219-3561-4428-B33B-92107F22D026),
+	dual,
+	nonextensible,
+	helpstring("IFileProcessingManagerProcess Interface"),
+	pointer_default(unique)
+]
+interface IFileProcessingManagerProcess : IDispatch
+{
+	//----------------------------------------------------------------------------------------------
+	// Pings the FAMProcess.exe to ensure it is still alive
+	[id(1), helpstring("method Ping")] HRESULT Ping();
+	//----------------------------------------------------------------------------------------------
+	// Starts processing the specified FPS file
+	[id(2), helpstring("method Start")] HRESULT Start([in] BSTR bstrFPSFile);
+	//----------------------------------------------------------------------------------------------
+	// Stops the processing.  If no processing is being done, does nothing.
+	[id(3), helpstring("method Stop")] HRESULT Stop();
+	//----------------------------------------------------------------------------------------------
+	[id(4), helpstring("method GetCounts")] HRESULT GetCounts([out] LONG* plNumFilesProcessed,
+		[out] LONG* plNumProcessingErrors, [out] LONG* plNumFilesSupplied,
+		[out] LONG* plNumeSupplyingErrors);
+	//----------------------------------------------------------------------------------------------
+	// Gets the current process ID
+	[propget, id(5), helpstring("property ProcessID")] HRESULT ProcessID([out, retval] LONG* plID);
+	//----------------------------------------------------------------------------------------------
+};
+
+[
+	uuid(70C83EF4-87D0-49DA-85EA-F29549EEEB7A),
+	version(1.0),
+	helpstring("FAMProcess 1.0 Type Library")
+]
+library FAMProcessLib
+{
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+
+	[
+		uuid(21296131-B9D3-42D2-9850-76C474B9D0AF),
+		helpstring("FileProcessingManagerProcess Class")
+	]
+	coclass FileProcessingManagerProcess
+	{
+		[default] interface IFileProcessingManagerProcess;
+		interface ILicensedComponent;
+	};
+};
