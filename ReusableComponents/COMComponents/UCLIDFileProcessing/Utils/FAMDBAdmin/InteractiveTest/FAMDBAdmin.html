@@ -60,6 +60,14 @@
 	<li>Confirm that browsing for databases on this machine provokes 
 	<b>ELI21061 - Login failed for user</b>.
 	<li>Confirm that Exception details include the <b>ConnectionString</b> text.
+<p>
+   	<LI><b>[LegacyRC #5486]</b> Open DB Admin without database
+       	<ul>
+  	   	<LI>Open a new instance of the FAM without connecting to a database.
+  	   	<LI>Select <b>Tools - Database Administration Utility...</b>.
+  	   	<LI>Confirm that the <b>Select database to administer</b> dialog 
+		is displayed without error.
+       	</ul>
 </ul>
 
 <h2>Database Creation</h2>
@@ -154,6 +162,7 @@
 		<li>Confirm that <b>Ctrl + H</b> works for <b>Change Password</b>.
 		<li>Confirm that <b>Ctrl + M</b> works for <b>Manually Set Action Status</b>.
 	</ul>
+	<li><b>[LegacyRC #5518]</b> Confirm that the <b>Summary</b> tab is refreshed using <b>F5</b>.
 </ul>
 
 <h2>Database Menu</h2>
@@ -381,6 +390,40 @@
 		the latest after an action status is manually set.
 		<li><b>[LegacyRC #5106]</b>Confirm that "Status of Action" radio button can 
 		be selected by using Tab and Arrow key.
+<p>
+  	   	<LI><b>[LegacyRC #5392]</b> Manually set action status
+	       	<ul>
+	      		<li>Confirm that the dialog now supports setting <b>ActionA</b> files to 
+			status of <b>ActionB</b> for all files in which <b>ActionC</b> has a 
+			particular status.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5459]</b> Error with Set Status
+	       	<ul>
+			<li>Use <b>DB Admin</b> to set one action's status from the 
+			status of another action by using a query for file selection.
+			<li>Confirm that the operation succeeds without an <b>ELI15290: 
+			Item cannot be found in the collection corresponding to the 
+			requested name or ordinal</b> exception.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5472]</b> Reset status for Skipped files
+	       	<ul>
+	  	   	<LI>Verify several documents and <b>Skip</b> some.
+	      		<li>Confirm that <b>DB Admin</b> can reset the status of the 
+			Skipped files without an <b>ELI27041: Incorrect syntax near ')'.</b> 
+			exception. 
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5473]</b> Processing manually skipped files
+	       	<ul>
+	  	   	<LI>Prepare several documents for verification.
+	      		<li>Use <b>DB Admin</b> to manually set the staus of some of 
+			the files to <b>Skipped</b>.
+	  	   	<LI>Modify the FPS file to verify <b>Skipped</b> files.
+	  	   	<LI>Confirm that the manually <b>Skipped</b> files can be 
+			processed.
+	       	</ul>
 	</ul>
 <p>
 	<li><b>[LegacyRC #5052]</b> Confirm that <b>Application trace</b> exceptions are logged 
@@ -445,6 +488,27 @@
       		<li>Confirm that tags must begin with a letter, number or underscore 
 		character.
       		<li>Confirm that tags can contain spaces allowing for multiple-word strings.
+<p>
+		<li><b>[LegacyRC #5453]</b> Log exception when tags are changed
+		<ul>
+			<li>Confirm that <b>DB Admin</b> logs an <b>Application 
+			trace:</b> exception when a tag is added to the database.
+			<li>Confirm that <b>DB Admin</b> logs an <b>Application 
+			trace:</b> exception when a tag is modified in the database.
+			<li>Confirm that <b>DB Admin</b> logs an <b>Application 
+			trace:</b> exception when a tag is removed from the database.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5515]</b> Invalid tag name
+	       	<ul>
+	      		<li>Open the <b>Manage Tags</b> dialog from <b>FAM DB Admin</b>.
+	  	   	<LI>Add an invalid tag such as <b>#32r</b>.
+			<li>Confirm that an <b>ELI27383: Invalid tag name!</b> exception 
+			is displayed.
+	      		<li>Close the expection.
+	  	   	<LI>Confirm that the <b>Add Tag</b> dialog is still open.
+	  	   	<LI>Confirm that existing description text has been retained.
+	       	</ul>
 	</ul>
 <p>
 	<li><b>Manage counters...</b>
@@ -549,6 +613,26 @@
 		radio button for <b>All files that have the file processing priority 
 		of</b> and an associated spinner control.
       		<li>Confirm that file selection is properly based on file priority.
+<p>
+  	   	<LI><b>[LegacyRC #5454]</b> Set priority based on tags
+	       	<ul>
+			<li>From the <b>Manually Set File Processing Priority</b> 
+			dialog, use the <b>Select Files</b> dialog to choose some files 
+			based on tags.
+			<li>Confirm that file priority can be set on the selected files.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5496]</b> Set file priority based on two or more tags
+	       	<ul>
+	      		<li>Create a database and some tags.
+	      		<li>Use the FAM to apply a tag to some of the files.
+	      		<li>Configure the DB Admin <b>Manually set file processing priority</b> 
+			dialog to select files associated with any of the following tags and 
+			select <b>two or more</b> tags including at least one that has been 
+			applied to some files.
+	      		<li>Click OK to set the priority.
+	      		<li>Confirm that file processing priority is set as specified.
+	       	</ul>
 	</ul>
 <p>
 	<li><b>File Action Manager</b>
