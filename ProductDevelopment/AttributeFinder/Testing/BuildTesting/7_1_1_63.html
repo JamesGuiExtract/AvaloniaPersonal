@@ -1,0 +1,500 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.1.1.63 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.1.1.63 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3587]</b> Processing 0-byte USS files
+	       	<ul>
+	      		<li>Create a USS file with <b>0</b> bytes.
+			<li>Exercise the USS file.
+			<li>Confirm that an <b>Unable to decompress</b> exception is not seen.
+			<li>Confirm that a meaningful exception is presented.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3595]</b> Date Time Splitter errors with :59
+	       	<ul>
+	      		<li>Exercise the <b>Date Time Splitter</b> with test strings 
+			that contain 59 minutes and/or 59 seconds.
+	      		<li>Confirm that the strings are split properly.
+	      		<li>Confirm that the automated tests for the <b>Date Time Splitter</b> 
+			work properly.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3687]</b> Uncategorized document type during verification
+	       	<ul>
+	  	   	<LI>Prepare several documents for verification.
+      			<li>During verification, confirm that the <b>Document type</b> field 
+			is populated correctly.
+			<li>Confirm that for a document with an unknown document type, the 
+			displayed text is <b>Uncategorized</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3690]</b> Attribute Name and Type should each be 
+		valid identifiers
+	       	<ul>
+	  	   	<LI>Open a VOA file in the <b>VOA Viewer</b>.
+      			<li>Modify a <b>Name</b> entry and confirm that the text must match the 
+			following regular expression
+			<ul>
+				<li><b>[_A-Za-z][_A-Za-z0-9]*</b>
+			</ul>
+      			<li>Modify a <b>Type</b> entry and confirm that the text must match the 
+			following regular expression
+			<ul>
+				<li><b>[_A-Za-z][_A-Za-z0-9]*</b>
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3711]</b> 'H' toggles redaction tool
+	       	<ul>
+	  	   	<LI>Prepare several documents for verification.
+      			<li>During verification, confirm that <b>H</b> toggles the selected 
+			redaction tool.
+			<li>Confirm that manual redactions created from the above redaction 
+			tools are saved as spatial attributes.
+			<li>Confirm that manual redactions created from the above redaction 
+			tools are printed with the color specified in <b>IDShield.ini</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3717, #3740]</b> Scheduled processing
+	       	<ul>
+	      		<li>Exercise the <b>Support FAM Processing During Specified Times 
+			Of Day Or Week (#21)</b> feature on the <b>FLEX Index 8.0 
+			General Testing</b> checklist.
+			<li>Confirm that for a new or existing FPS file with <b>Limit 
+			processing schedule</b> disabled, a processing schedule can be 
+			configured without error.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3720, #3725, #3726, #3733]</b> Select page region
+	       	<ul>
+	  	   	<LI>Confirm that on the Select Page Region property page, the first 
+			radio button for <b>3)</b> includes the text <b>that intersect region 
+			boundaries</b> after the two combo boxes.
+<p>
+      			<li>Exercise the <b>RotateTest3.rsd</b> portion of the Select Page 
+			Region preprocessor checklist.
+      			<li>Confirm that the proper image regions are returned.
+<p>
+      			<li>Exercise the rules from <b>[FlexIDSCore #3063]</b> on an image 
+			and on manually entered text.
+      			<li>Confirm that an <b>ELI04164: COM Exception caught</b> exception 
+			is not seen in either case.
+<p>
+      			<li>Create a rule set with a <b>Select page region</b> preprocessor 
+			configured to return text from all pages with restricted scope.
+      			<li>Exercise the rule set on a blank USS file.
+      			<li>Confirm that a <b>GetFirstPageNumber() requires spatial or hybrid 
+			mode</b> exception is not seen.
+      			<li>Modify the preprocessor to return text from all pages containing 
+			particular text.
+      			<li>Confirm that a <b>GetPages is not valid for a non-spatial string</b> 
+			exception is not seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3730]</b> .NET verification
+	       	<ul>
+	  	   	<LI>Verify some documents and confirm that the task works as expected.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3735]</b> Metadata attributes added to post-verification 
+		VOA file
+	       	<ul>
+	  	   	<LI>Prepare some files for verification.
+      			<li>Verify some files.  Make sure to make some modifications via the 
+			verification history.
+      			<li>Review the post-verification VOA files and confirm presence of the 
+			following items (as appropriate) in each VOA file:
+			<ul>
+				<li>Information about each verification session.
+				<li>Information about revisions to attributes made in 
+				each session.
+				<li>Information about the verification options used.
+				<li>Information about the user and machine that performed 
+				the verification.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3738]</b> Incorrect file status with multiple verifiers
+	       	<ul>
+	  	   	<LI>Modify the <b>HKCU\Software\Extract Systems\ReusableComponents\
+			COMComponents\UCLIDFileProcessing\FPRecordManager\MaxFilesFromDB</b> 
+			registry setting to retrieve <b>1000</b> files at a time from the 
+			database.
+			<li>Prepare several thousand files for verification.
+			<li>Create two separate FPS files to verify images.  The two FAMs 
+			can run on the same test machine.
+			<li>Open a <b>DB Admin</b> instance and navigate to the Summary tab.
+			<li>Start processing with the first FAM.
+			<li>Confirm that <b>1000</b> files are in <b>Processing</b> mode. 
+			<li>Verify some files and <b>Stop processing</b>.
+			<li>Confirm that <b>&lt; 1000</b> files are in <b>Processing</b> 
+			mode and that the number continues to decrease. 
+			<li>While the first FAM is stopping, start processing with the second 
+			FAM.  
+			<li>Confirm that the number of <b>Processing</b> files is between 
+			1000 and 2000.
+			<li>Confirm that the number of files in <b>Processing</b> mode 
+			continues to decrease to 1000. 
+			<li>Verify some files.
+			<li>Confirm that <b>&lt; 1000</b> files are in <b>Processing</b> 
+			mode. 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3739]</b> Renamed processing tasks
+	       	<ul>
+	  	   	<LI>Check for new components from the FAM.
+	  	   	<LI>Confirm that the <b>ID Shield</b> tasks are prefaced with 
+			<b>Redaction: </b>. 
+	  	   	<LI>Confirm that the <b>General</b> tasks are prefaced with 
+			<b>Core: </b>. 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3741]</b> Legacy verification
+	       	<ul>
+	  	   	<LI>Confirm that the <b>Redaction: Verify and redact image 
+			(legacy)</b> task will not execute.
+	  	   	<LI>Confirm that a meaningful exception is presented.
+	  	   	<LI>Confirm that the FAM can be stopped gracefully.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3753]</b> New redaction task
+	       	<ul>
+	  	   	<LI>Confirm that the <b>Redaction: Create redacted image</b> task 
+			is available.
+	  	   	<LI>Confirm that the task includes complete settings by default.
+	  	   	<LI>Confirm that the configuration dialog includes a <b>Data 
+			categories to redact</b> group box.
+	  	   	<LI>Confirm that the group box includes an <b>All</b> radio 
+			button.
+	  	   	<LI>Confirm that the group box includes a <b>Selected</b> radio 
+			button.
+	  	   	<LI>Confirm that the <b>Selected</b> radio button includes the 
+			following associated check boxes
+			<ul>
+				<li>High confidence data - selected by default
+				<li>Medium confidence data - selected by default
+				<li>Low confidence data - selected by default
+				<li>Manual redactions - selected by default
+				<li>Other (separate names with commas) - unselected 
+				by default with an edit box
+			</ul>
+	  	   	<LI>Confirm that the check and edit boxes are enabled only when 
+			the <b>Selected</b> radio button is selected.
+<p>
+	  	   	<LI>Confirm that the configuration dialog includes an <b>ID 
+			Shield data file location</b> group box.
+	  	   	<LI>Confirm that the group box (by default) includes text 
+			describing default settings.
+	  	   	<LI>Confirm that the group box text changes when the settings 
+			are changed.
+	  	   	<LI>Confirm that the group box includes a <b>Customize...</b> 
+			button.
+	  	   	<LI>Confirm that clicking the <b>Customize...</b> button 
+			displays a <b>Specify ID Shield data file path</b> dialog.
+	  	   	<LI>Confirm that the dialog includes an edit box for the path.
+	  	   	<LI>Confirm that the default path is <b>&lt;SourceDocName&gt;.voa</b>.
+	  	   	<LI>Confirm that the dialog includes an associated <b>Tag 
+			selector</b> button.
+	  	   	<LI>Confirm that the dialog includes an associated <b>...</b> 
+			(browse) button.
+	  	   	<LI>Confirm that the <b>Tag selector</b> button displays a 
+			drop-down list of tags including:
+			<ul>
+				<li>&lt;SourceDocName&gt;
+				<li>&lt;FPSFileDir&gt;
+				<li>$DirNoDriveOf()
+				<li>$DirOf()
+				<li>$DriveOf()
+				<li>$ExtOf()
+				<li>$FileNoExtOf()
+				<li>$FileOf()
+				<li>$InsertBeforeExt()
+				<li>$Offset()
+				<li>$PadValue()
+				<li>$Replace()
+				<li>$TrimAndConsolidateWS()
+			</ul>
+	  	   	<LI>Confirm that the browse button displays an Open dialog to 
+			select a <b>VOA</b> file.
+	  	   	<LI>Confirm that the dialog includes a <b>Reset</b> button.
+	  	   	<LI>Confirm that the <b>Reset</b> button modifies the data file 
+			path back to the default.
+<p>
+	  	   	<LI>Confirm that the configuration dialog includes an <b>Output 
+			file</b> group box.
+	  	   	<LI>Confirm that the group box includes an edit box for the path.
+	  	   	<LI>Confirm that the default path is
+			<b>$InsertBeforeExt(&lt;SourceDocName&gt;,.redacted)</b>.
+	  	   	<LI>Confirm that the group box includes an associated <b>Tag 
+			selector</b> button.
+	  	   	<LI>Confirm that the group box includes an associated <b>...</b> 
+			(browse) button.
+	  	   	<LI>Confirm that the <b>Tag selector</b> button displays a 
+			drop-down list of tags including:
+			<ul>
+				<li>&lt;SourceDocName&gt;
+				<li>&lt;FPSFileDir&gt;
+				<li>$DirNoDriveOf()
+				<li>$DirOf()
+				<li>$DriveOf()
+				<li>$ExtOf()
+				<li>$FileNoExtOf()
+				<li>$FileOf()
+				<li>$InsertBeforeExt()
+				<li>$Offset()
+				<li>$PadValue()
+				<li>$Replace()
+				<li>$TrimAndConsolidateWS()
+			</ul>
+	  	   	<LI>Confirm that the browse button displays an Open dialog to 
+			select a <b>TIF</b> or <b>PDF</b> file.
+	  	   	<LI>Confirm that the group box includes a <b>Retain any previously 
+			existing redactions in the output file</b> radio button.
+	  	   	<LI>Confirm that the group box includes an <b>Output only 
+			redactions from this session</b> radio button.
+	  	   	<LI>Confirm that the <b>Output only ...</b> radio button is 
+			selected by default.
+	  	   	<LI>Confirm that the group box includes a <b>Retain existing 
+			annotations in output file (tiff only)</b> check box.
+	  	   	<LI>Confirm that the group box includes an <b>Apply redactions as  
+			annotations in output file (tiff only)</b> check box.
+	  	   	<LI>Confirm that the check boxes are unchecked by default.
+<p>
+	  	   	<LI>Confirm that the configuration dialog includes a <b>Redaction 
+			text and color settings...</b> group box.
+	      		<li>Confirm that the <b>Redaction text and color settings</b> dialog 
+			includes the following elements.
+		       	<ul>
+		      		<li>A group box for <b>Text to place in redaction zones</b>.
+		      		<li>A pre-populated combo box for <b>Redaction text</b>.
+		      		<li>An associated <b>tag selector</b>.
+		      		<li>An associated read-only edit box for <b>Sample text that uses 
+				the above pattern</b>.
+		      		<li>A group box for <b>Redaction colors</b>.
+		      		<li>A pre-populated combo box for <b>Border color</b>.
+		      		<li>A pre-populated combo box for <b>Fill color</b>.
+		      		<li>Color support for <b>Black</b> and <b>White</b>.
+		      		<li>A group box for <b>Preferred text size and font</b>.
+		      		<li>An associated read-only edit box that displays the font name and size.
+		      		<li>An associated <b>...</b> (Browse) button that displays a 
+				Font selection dialog.
+		      		<li>An associated label with <b>If text is too large to fit inside 
+				redaction zone, it will automatically be scaled to fit</b>.
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5324, #5330, #5360, #5415, #5416, #5417, #5418, #5427, #5428, 
+		#5429, #5430, #5432, #5446, #5509]</b> FAM reports
+	       	<ul>
+	      		<li>Exercise the <b>Summary of actions and associated document counts</b> 
+			report.
+	      		<li>Confirm that the <b>Total number of files referenced in the 
+			database</b> label is not too long for the following numeric cell.
+	      		<li>Confirm that the report contains a column for <b>Skipped</b> counts.
+	      		<li>Confirm that the value for <b>total files</b> is correct and not 
+			just the sum of the totals for each action.
+	      		<li>Confirm that the report format and contents are correct.
+<p>
+	      		<li>Exercise the <b>Summary of actions and associated document page 
+			counts</b> report.
+	      		<li>Confirm that the final <b>Total</b> field includes commas as needed.
+	      		<li>Confirm that the value for <b>total files</b> is correct and not 
+			just the sum of the totals for each action.
+<p>
+	      		<li>Exercise the <b>Detailed report for specific document</b> report 
+			for a document that <b>was not</b> processed by the FAM.
+	      		<li>Confirm that the report template does not contain any unexpected 
+			<b>N/A</b> elements.
+	      		<li>Exercise the <b>Detailed report for specific document</b> report 
+			for a document that <b>was</b> processed by the FAM.
+	      		<li>Confirm that the report includes <b>File Action Comment</b> data.
+	      		<li>Confirm that the report includes <b>Tag</b> data.
+	      		<li>Confirm that the report includes <b>File Priority</b> data.
+	      		<li>Confirm that the report format and contents are correct.
+<p>
+	      		<li>Exercise the following new reports.  Confirm proper format and data.
+			<ul>
+	      			<li><b>List of all skipped documents in the project</b>
+	      			<li><b>List of all file action comments in the project</b>
+	      			<li><b>List of all tags in the project</b>
+	      			<li><b>List of all documents with specific tag</b>
+				<ul>
+					<li>Confirm that the <b>ValueListParameter</b> query works 
+					as expected.
+				</ul>
+	      			<li><b>List of all tagged documents in the project (by tag)</b>
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5419]</b> Cancel at password prompt
+	       	<ul>
+	      		<li>Prepare an FPS file to process files skipped by <b>all users</b>.
+			<li>At the prompt for the DB Admin password, press <b>Cancel</b>.
+			<li>Confirm that a meaningful message that is not <b>Invalid password...</b> 
+			is presented.
+			<li>Confirm that processing files skipped by all users is not allowed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5478]</b> Processing all skipped files when only queuing
+	       	<ul>
+	      		<li>Prepare an FPS file to queue files and to process files skipped by 
+			<b>all users</b>.
+			<li>Uncheck the <b>Process files</b> box on the <b>Action</b> tab.
+			<li>Start queuing files.
+			<li>Confirm that the <b>DB Login</b> <b>is not</b> presented.
+			<li>Confirm that queuing files is allowed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5482]</b> Image Cleanup Settings Editor
+	       	<ul>
+	  	   	<LI>Open the <b>Image Cleanup Settings Editor</b>.
+	      		<li>Open the <b>About box</b>.
+	  	   	<LI>Confirm that the version number is fully visible.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5486]</b> Open DB Admin without database
+	       	<ul>
+	  	   	<LI>Open a new instance of the FAM without connecting to a database.
+	  	   	<LI>Select <b>Tools - Database Administration Utility...</b>.
+	  	   	<LI>Confirm that the <b>Select database to administer</b> dialog 
+			is displayed without error.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5491]</b> Limit number of threads in the FAM
+	       	<ul>
+	      		<li>Confirm that the <b>Processing Setup</b> tab allows no more than 
+			<b>100</b> threads via the spinner control.
+	      		<li>Confirm that the <b>Processing Setup</b> tab allows no more than 
+			<b>100</b> threads via the associated edit box.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5496]</b> Set file priority based on two or more tags
+	       	<ul>
+	      		<li>Create a database and some tags.
+	      		<li>Use the FAM to apply a tag to some of the files.
+	      		<li>Configure the DB Admin <b>Manually set file processing priority</b> 
+			dialog to select files associated with any of the following tags and 
+			select <b>two or more</b> tags including at least one that has been 
+			applied to some files.
+	      		<li>Click OK to set the priority.
+	      		<li>Confirm that file processing priority is set as specified.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5497]</b> Any tag condition is always true
+	       	<ul>
+	      		<li>Prepare some files for processing such that some files have tags 
+			and some do not have tags.
+			<li>Prepare an FPS file with a conditional task and Tag condition to 
+			OCR the document if the document is tagged with <b>any</b> tag.  No task 
+			should be run against the document if the document is not tagged.
+			<li>Delete any existing USS files.
+			<li>Process the documents.
+	      		<li>Confirm that only the tagged documents have USS files.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5498]</b> Description and Status columns in Queue Setup tab
+	       	<ul>
+	      		<li>Open an FPS file and confirm that the <b>Queue Setup</b> correctly 
+			displays Description and Status information.
+			<li>Process some files.
+	      		<li>Confirm that the <b>Queue Setup</b> still correctly displays 
+			Description and Status information.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5512]</b> OCR engine version in USS file
+	       	<ul>
+	  	   	<LI>OCR an image.
+	      		<li>Open the USS file in the <b>USS File Viewer</b>.
+	  	   	<LI>Confirm that the <b>OCR engine version</b> information is included 
+			in the Properties dialog.
+	      		<li>Open an older USS file in the <b>USS File Viewer</b>.
+	  	   	<LI>Confirm that the <b>OCR engine version</b> information is provided 
+			as <b>Unknown</b> in the Properties dialog.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5515]</b> Invalid tag name
+	       	<ul>
+	      		<li>Open the <b>Manage Tags</b> dialog from <b>FAM DB Admin</b>.
+	  	   	<LI>Add an invalid tag such as <b>#32r</b>.
+			<li>Confirm that an <b>ELI27383: Invalid tag name!</b> exception 
+			is displayed.
+	      		<li>Close the expection.
+	  	   	<LI>Confirm that the <b>Add Tag</b> dialog is still open.
+	  	   	<LI>Confirm that existing description text has been retained.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5516]</b> Trim whitespace from counter names
+	       	<ul>
+	      		<li>Open the <b>Manage User Counters</b> dialog from <b>FAM DB Admin</b>.
+	  	   	<LI>Add a counter without leading or trailing whitespace.
+	  	   	<LI>Add the same counter but with leading whitespace.
+			<li>Confirm that the counter is not added.
+	  	   	<LI>Add a new counter but with leading whitespace.
+			<li>Confirm that the leading whitespace is trimmed.
+	  	   	<LI>Add a new counter but with trailing whitespace.
+			<li>Confirm that the trailing whitespace is trimmed.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
