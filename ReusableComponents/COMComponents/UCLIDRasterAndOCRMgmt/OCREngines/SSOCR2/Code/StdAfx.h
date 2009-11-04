@@ -18,6 +18,12 @@
 
 #include <atlbase.h>
 
+// [Added 11/04/2009 - JDS] NOTE: This is an older way of working around
+// the issue related to including both afxwin.h and atlbase.h (including
+// both restricts access to some of the ATL template classes, in particular
+// CAtlExeModuleT).  For a newer implementation example see the FAMProcess.cpp
+// in the FAMProcess project.
+//
 //You may derive a class from CComModule and use it if you want to override
 //something, but do not change the name of _Module
 class CExeModule : public CComModule
