@@ -89,11 +89,13 @@ Sub HandleScriptError_Internal(strELI,strText,strName1,strValue1,strName2,strVal
         Exit Sub
     End If
 
-    ' Create script exception from string
-    ExceptionObject.CreateFromString "ELI15737", "Script Exception"
+    ' Create inner exception object
+    Dim InnerExceptionObject
+    Set InnerExceptionObject = CreateObject("UCLIDExceptionMgmt.COMUCLIDException")
+    InnerExceptionObject.CreateFromString strELI, strText
 
-    ' Add a history record with provided information
-    ExceptionObject.AddHistoryRecord strELI, strText
+    ' Create script exception with the inner exception
+    ExceptionObject.CreateWithInnerException "ELI15737", "Script Exception", InnerExceptionObject
 
     ' Add debug records with error number and description
     ExceptionObject.AddDebugInfo "Err.Number", CStr(Err.number)
@@ -171,11 +173,13 @@ End Sub
 Sub LogScriptError_Internal(strELI,strText,strName1,strValue1,strName2,strValue2,strName3,strValue3)
     ' Do not define error handler
 
-    ' Create script exception from string
-    ExceptionObject.CreateFromString "ELI20331", "Logged Script Exception"
+    ' Create inner exception object
+    Dim InnerExceptionObject
+    Set InnerExceptionObject = CreateObject("UCLIDExceptionMgmt.COMUCLIDException")
+    InnerExceptionObject.CreateFromString strELI, strText
 
-    ' Add a history record with provided information
-    ExceptionObject.AddHistoryRecord strELI, strText
+    ' Create script exception with the inner exception
+    ExceptionObject.CreateWithInnerException "ELI20331", "Logged Script Exception", InnerExceptionObject
 
     ' Add debug record for first name/value pair
     If strName1 <> "" Then
