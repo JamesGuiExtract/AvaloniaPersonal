@@ -98,7 +98,7 @@ STDMETHODIMP CStrToStrMap::GetValue(BSTR key, BSTR *pValue)
 		map<string, string>::iterator it = m_mapKeyToValue.find(stdstrKey);
 		if (it != m_mapKeyToValue.end())
 		{
-			*pValue = _bstr_t(it->second.c_str()).copy();
+			*pValue = _bstr_t(it->second.c_str()).Detach();
 		}
 		else
 		{
@@ -120,15 +120,11 @@ STDMETHODIMP CStrToStrMap::Contains(BSTR key, VARIANT_BOOL *bFound)
 	{
 		validateLicense();
 		
-		*bFound = VARIANT_FALSE;
+		ASSERT_ARGUMENT("ELI28401", bFound != NULL);
 
 		string stdstrKey = asString( key );
 
-		map<string, string>::iterator it = m_mapKeyToValue.find(stdstrKey);
-		if (it != m_mapKeyToValue.end())
-		{
-			*bFound = VARIANT_TRUE;
-		}
+		*bFound = asVariantBool(m_mapKeyToValue.find(stdstrKey) != m_mapKeyToValue.end());
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04255");
 
@@ -166,9 +162,7 @@ STDMETHODIMP CStrToStrMap::Clear()
 	{
 		validateLicense();
 
-		m_mapKeyToValue.clear();
-
-		m_bDirty = true;
+		clear();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04257");
 
@@ -182,6 +176,8 @@ STDMETHODIMP CStrToStrMap::GetKeys(IVariantVector **pKeys)
 	try
 	{
 		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28402", pKeys != NULL);
 		
 		UCLID_COMUTILSLib::IVariantVectorPtr ipKeys(CLSID_VariantVector);
 		if (ipKeys == NULL)
@@ -192,11 +188,10 @@ STDMETHODIMP CStrToStrMap::GetKeys(IVariantVector **pKeys)
 		map<string, string>::iterator it = m_mapKeyToValue.begin();
 		for (; it != m_mapKeyToValue.end(); it++)
 		{
-			ipKeys->PushBack(_bstr_t(it->first.c_str()));
+			ipKeys->PushBack(it->first.c_str());
 		}
 
-		CComQIPtr<IVariantVector> ipVec(ipKeys);
-		*pKeys = ipVec.Detach();
+		*pKeys = (IVariantVector*) ipKeys.Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04258");
 
@@ -210,6 +205,8 @@ STDMETHODIMP CStrToStrMap::get_Size(long *pVal)
 	try
 	{
 		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28403", pVal != NULL);
 		
 		*pVal = m_mapKeyToValue.size();
 	}
@@ -226,6 +223,9 @@ STDMETHODIMP CStrToStrMap::GetKeyValue(long nIndex, BSTR *pstrKey, BSTR *pstrVal
 	{
 		// validate the license first
 		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28404", pstrKey != NULL);
+		ASSERT_ARGUMENT("ELI28405", pstrValue != NULL);
 		
 		// ensure that the index is valid
 		if ((unsigned long) nIndex >= m_mapKeyToValue.size())
@@ -243,8 +243,8 @@ STDMETHODIMP CStrToStrMap::GetKeyValue(long nIndex, BSTR *pstrKey, BSTR *pstrVal
 			iter++;
 		}
 
-		*pstrKey = _bstr_t(iter->first.c_str()).copy();
-		*pstrValue = _bstr_t(iter->second.c_str()).copy();
+		*pstrKey = _bstr_t(iter->first.c_str()).Detach();
+		*pstrValue = _bstr_t(iter->second.c_str()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04476");
 
@@ -386,6 +386,8 @@ STDMETHODIMP CStrToStrMap::Load(IStream *pStream)
 	{
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI28406", pStream != NULL);
+
 		// clear the internal map
 		m_mapKeyToValue.clear();
 		
@@ -450,6 +452,8 @@ STDMETHODIMP CStrToStrMap::Save(IStream *pStream, BOOL fClearDirty)
 	{
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI28407", pStream != NULL);
+
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
 		ByteStreamManipulator dataWriter(ByteStreamManipulator::kWrite, data);
@@ -510,10 +514,10 @@ STDMETHODIMP CStrToStrMap::CopyFrom(IUnknown * pObject)
 		UCLID_COMUTILSLib::IStrToStrMapPtr ipSource(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI19349", ipSource != NULL);
 
-		Clear();
+		clear();
 
-		int i = 0;
-		for(i = 0; i < ipSource->GetSize(); i++)
+		long lSize = ipSource->Size;
+		for(long i = 0; i < lSize; i++)
 		{
 			CComBSTR bstrKey, bstrValue;
 			ipSource->GetKeyValue(i, &bstrKey, &bstrValue);
@@ -559,6 +563,8 @@ void CStrToStrMap::mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValu
 	string strKey = asString(bstrKey);
 	ASSERT_ARGUMENT("ELI20191", !strKey.empty());
 
+	string strValue = asString(bstrValue);
+
 	switch (eMergeMethod)
 	{
 	case kKeepOriginal:
@@ -566,7 +572,7 @@ void CStrToStrMap::mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValu
 			// Only add the new mapping if there is not already a value at this key
 			if (m_mapKeyToValue.find(strKey) == m_mapKeyToValue.end())
 			{
-				m_mapKeyToValue[strKey] = asString(bstrValue);
+				m_mapKeyToValue[strKey] = strValue;
 			}
 		}
 		break;
@@ -574,14 +580,12 @@ void CStrToStrMap::mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValu
 	case kOverwriteOriginal:
 		{
 			// Always add the new mapping regardless of whether there is already a value at this key
-			m_mapKeyToValue[strKey] = asString(bstrValue);
+			m_mapKeyToValue[strKey] = strValue;
 		}
 		break;
 
 	case kAppend:
 		{
-			string strValue = asString(bstrValue);
-
 			// Create a string to represent the base name of the key (excludes anything 
 			// this function appends to the keyname)
 			string strKeyBase(strKey);
@@ -598,17 +602,26 @@ void CStrToStrMap::mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValu
 
 			// If there is already a member at this key, append _[i] to the key name,
 			// where i is iterated until we find a key that is not already in the map 
-			for (int i = 1; 
-				i < gnMAX_MERGE_COUNT && m_mapKeyToValue.find(strKey) != m_mapKeyToValue.end(); 
-				i++)
+			for (int i = 1; i < gnMAX_MERGE_COUNT; i++)
 			{
+				// Search the map for the key
+				map<string, string>::iterator it = m_mapKeyToValue.find(strKey);
+
+				// If we didn't find the key then we can break from the loop and set the
+				// value
+				if (it == m_mapKeyToValue.end())
+				{
+					break;
+				}
+
 				// If we already have a derivative of strKeyBase in the map whose value
 				// matches the incoming value, we can go ahead and just return
-				if (m_mapKeyToValue[strKey] == strValue)
+				if (it->second == strValue)
 				{
 					return;
 				}
 
+				// Value doesn't match, create the new key and recheck
 				strKey = strKeyBase + "_" + asString(i);
 			}
 
@@ -617,6 +630,13 @@ void CStrToStrMap::mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValu
 		}
 		break;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+void CStrToStrMap::clear()
+{
+	m_mapKeyToValue.clear();
+
+	m_bDirty = true;
 }
 //-------------------------------------------------------------------------------------------------
 void CStrToStrMap::validateLicense()

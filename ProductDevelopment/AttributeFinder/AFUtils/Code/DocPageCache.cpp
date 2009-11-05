@@ -13,33 +13,26 @@ DocPageCache::~DocPageCache()
 {
 	try
 	{
-		// Release COM objects
-		for(map<string, ISpatialStringPtr>::iterator it = m_mapCache.begin();
-			it != m_mapCache.end(); it++)
-		{
-			it->second = NULL;
-		}
 		m_mapCache.clear();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28216");
 }
 //-------------------------------------------------------------------------------------------------
-void DocPageCache::add(long nStartPage, long nEndPage, const ISpatialStringPtr& ipSS)
+void DocPageCache::add(long nStartPage, long nEndPage, const string& strText)
 {
-	m_mapCache[getKey(nStartPage, nEndPage)] = ipSS;
+	m_mapCache[getKey(nStartPage, nEndPage)] = strText;
 }
 //-------------------------------------------------------------------------------------------------
-ISpatialStringPtr DocPageCache::find(long nStartPage, long nEndPage)
+bool DocPageCache::find(long nStartPage, long nEndPage, string& rstrText)
 {
-	map<string, ISpatialStringPtr>::iterator it = m_mapCache.find(getKey(nStartPage, nEndPage));
-	if(it == m_mapCache.end())
+	map<string, string>::iterator it = m_mapCache.find(getKey(nStartPage, nEndPage));
+	if(it != m_mapCache.end())
 	{
-		return NULL;
+		rstrText = it->second;
+		return true;
 	}
-	else
-	{
-		return it->second;
-	}
+
+	return false;
 }
 //-------------------------------------------------------------------------------------------------
 // Private Methods

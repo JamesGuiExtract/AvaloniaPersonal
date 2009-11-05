@@ -195,30 +195,28 @@ bool PatternHolder::isUniqueRuleID(const string& strIDPlusPattern)
 //-------------------------------------------------------------------------------------------------
 std::string PatternHolder::getInputText(const ISpatialStringPtr& ipInputText, DocPageCache& cache)
 {
-	// if the range is thge full document
-	string strInputText;
-	if (m_nStartPage == 1 && m_nEndPage == -1)
+	// If the range is the full document or the string is non-spatial, just return the
+	// entire document text [FlexIDSCore #3758]
+	if ((m_nStartPage == 1 && m_nEndPage == -1) || ipInputText->GetMode() == kNonSpatialMode)
 	{
-		strInputText = asString(ipInputText->String);
-		return strInputText;
+		return asString(ipInputText->String);
 	}
 
-	// if the page range is cached
-	ISpatialStringPtr ipInputOnPages = cache.find(m_nStartPage, m_nEndPage);
-	if(ipInputOnPages != NULL)
+	// Check if the page range is cached
+	string strInputText;
+	if (cache.find(m_nStartPage, m_nEndPage, strInputText))
 	{
-		strInputText = asString(ipInputOnPages->String);
 		return strInputText;
 	}
 	
 	// The page range is not cached
 	// get input text from the specified range of pages
-	ipInputOnPages = ipInputText->GetRelativePages(m_nStartPage, m_nEndPage);
+	ISpatialStringPtr ipInputOnPages = ipInputText->GetRelativePages(m_nStartPage, m_nEndPage);
 	ASSERT_RESOURCE_ALLOCATION("ELI07424", ipInputOnPages != NULL);
 	strInputText = asString(ipInputOnPages->String);
 
 	// add the page range to the cache
-	cache.add(m_nStartPage, m_nEndPage, ipInputOnPages);
+	cache.add(m_nStartPage, m_nEndPage, strInputText);
 	return strInputText;
 }
 //-------------------------------------------------------------------------------------------------

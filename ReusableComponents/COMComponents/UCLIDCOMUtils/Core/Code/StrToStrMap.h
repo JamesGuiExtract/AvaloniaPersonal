@@ -85,6 +85,9 @@ private:
 	// Add the specified key/value pair to the map using the provided method
 	void mergeKeyValue(const _bstr_t &bstrKey, const _bstr_t &bstrValue, EMergeMethod eMergeMethod);
 
+	// Internal clear method
+	void clear();
+
 	// check license
 	void validateLicense();
 };

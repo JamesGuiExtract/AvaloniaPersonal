@@ -37,6 +37,10 @@ CDocumentClassifier::~CDocumentClassifier()
 		// Ensure COM objects are released
 		m_ipAFUtility = NULL;
 		m_ipRegExpr = NULL;
+
+		// Clear the maps
+		m_mapNameToVecDocTypes.clear();
+		m_mapNameToVecInterpreters.clear();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16330");
 }
@@ -53,6 +57,10 @@ void CDocumentClassifier::FinalRelease()
 		// Ensure COM objects are released
 		m_ipAFUtility = NULL;
 		m_ipRegExpr = NULL;
+
+		// Clear the maps
+		m_mapNameToVecDocTypes.clear();
+		m_mapNameToVecInterpreters.clear();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28217");
 }
@@ -231,7 +239,7 @@ STDMETHODIMP CDocumentClassifier::raw_CopyFrom(IUnknown *pObject)
 		ASSERT_RESOURCE_ALLOCATION("ELI08240", ipSource != NULL );
 
 		// Copy industry category name
-		m_strIndustryCategoryName = ipSource->GetIndustryCategoryName();
+		m_strIndustryCategoryName = asString(ipSource->IndustryCategoryName);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08241");
 
@@ -660,9 +668,11 @@ void CDocumentClassifier::createDocTags(IAFDocument* pAFDoc, const string& strSp
 			// if current level is higher, then 
 			// replace the nConfidenceLevel
 			nConfidenceLevel = nCurrentLevel;
+
 			// clear the vectors
 			ipVecDocTypes->Clear();
 			ipVecBlockIDs->Clear();
+			ipVecRuleIDs->Clear();
 		}
 		
 		// as long as the confidence level is above kZeroLevel
@@ -694,30 +704,27 @@ void CDocumentClassifier::createDocTags(IAFDocument* pAFDoc, const string& strSp
 	// let's update the AFDocument
 	// store the confidence level in StringTags
 	IStrToStrMapPtr ipStringTags(ipAFDoc->StringTags);
-	if (ipStringTags)
+	if (ipStringTags != NULL)
 	{
 		CString zConfidenceLevel("");
 		zConfidenceLevel.Format("%d", nConfidenceLevel);
 		ipStringTags->Set( get_bstr_t(DOC_PROBABILITY), get_bstr_t(zConfidenceLevel) );
 	}
 
-	// store the doc types in ObjectTags 
 	IStrToObjectMapPtr ipObjectTags(ipAFDoc->ObjectTags);
-	if (ipObjectTags != NULL && ipVecDocTypes->Size > 0)
+	if (ipObjectTags != NULL)
 	{
-		ipObjectTags->Set( get_bstr_t(DOC_TYPE), ipVecDocTypes );
-	}
-
-	// Store the block IDs in ObjectTags 
-	if (ipObjectTags != NULL && ipVecBlockIDs->Size > 0)
-	{
-		ipObjectTags->Set( get_bstr_t(DCC_BLOCK_ID_TAG), ipVecBlockIDs );
-	}
-
-	// Store the rule IDs in ObjectTags 
-	if (ipObjectTags != NULL && ipVecRuleIDs->Size > 0)
-	{
-		ipObjectTags->Set( get_bstr_t(DCC_RULE_ID_TAG), ipVecRuleIDs );
+		// Store the doc types, block IDs, and rule IDs in ObjectTags 
+		// An assumption is made here that since we add to each vector
+		// as a block than it is significant enough to check that one
+		// of the vectors has a size > 0 and if one of the vectors
+		// satisfies this condition then all vectors satisfy this condition.
+		if (ipVecDocTypes->Size > 0)
+		{
+			ipObjectTags->Set( get_bstr_t(DOC_TYPE), ipVecDocTypes );
+			ipObjectTags->Set( get_bstr_t(DCC_BLOCK_ID_TAG), ipVecBlockIDs );
+			ipObjectTags->Set( get_bstr_t(DCC_RULE_ID_TAG), ipVecRuleIDs );
+		}
 	}
 }
 //-------------------------------------------------------------------------------------------------

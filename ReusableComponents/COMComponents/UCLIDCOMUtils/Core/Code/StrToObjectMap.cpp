@@ -36,6 +36,12 @@ CStrToObjectMap::~CStrToObjectMap()
 {
 	try
 	{
+		// Set each IUnknownPtr in the map to NULL
+		for (map<stringCSIS, IUnknownPtr>::iterator it = m_mapKeyToValue.begin();
+			it != m_mapKeyToValue.end(); it++)
+		{
+			it->second = NULL;
+		}
 		m_mapKeyToValue.clear();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16518");
@@ -49,8 +55,10 @@ STDMETHODIMP CStrToObjectMap::InterfaceSupportsErrorInfo(REFIID riid)
 	static const IID* arr[] = 
 	{
 		&IID_IStrToObjectMap,
+		&IID_ICopyableObject,
 		&IID_IShallowCopyable,
-		&IID_ILicensedComponent
+		&IID_ILicensedComponent,
+		&IID_IPersistStream
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -115,6 +123,8 @@ STDMETHODIMP CStrToObjectMap::Load(IStream *pStream)
 	{
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI28408", pStream != NULL);
+
 		// clear the internal map
 		m_mapKeyToValue.clear();
 
@@ -167,8 +177,7 @@ STDMETHODIMP CStrToObjectMap::Load(IStream *pStream)
 			readObjectFromStream(ipObj, pStream, "ELI09982");
 
 			// write the name/value pair to the map
-			_bstr_t _bstrKey = get_bstr_t(bstrName.m_str);
-			stringCSIS stdstrKey( asString( _bstrKey ), m_bCaseSensitive);
+			stringCSIS stdstrKey( asString(bstrName), m_bCaseSensitive);
 			m_mapKeyToValue[stdstrKey] = ipObj;
 		}
 
@@ -187,6 +196,8 @@ STDMETHODIMP CStrToObjectMap::Save(IStream *pStream, BOOL fClearDirty)
 	try
 	{
 		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28409", pStream != NULL);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -277,9 +288,10 @@ STDMETHODIMP CStrToObjectMap::GetValue(BSTR key, IUnknown **pObject)
 		// validate license
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI28410", pObject != NULL);
+
 		// get value of specified entry in map
-		_bstr_t _bstrKey(key);
-		stringCSIS stdstrKey ( asString ( _bstrKey ), m_bCaseSensitive );
+		stringCSIS stdstrKey ( asString ( key ), m_bCaseSensitive );
 
 		map<stringCSIS, IUnknownPtr>::iterator it = m_mapKeyToValue.find(stdstrKey);
 		if (it != m_mapKeyToValue.end())
