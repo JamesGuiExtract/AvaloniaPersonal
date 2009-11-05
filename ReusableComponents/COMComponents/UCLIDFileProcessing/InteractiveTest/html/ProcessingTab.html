@@ -69,17 +69,10 @@
 		box displays the Configure description dialog.
    	</ul> 
 <p>
-   	<li>Confirm the Processing Setup tab has a <b>Continuous processing</b> groupbox with two 
-	radio buttons.</li>
-   	<ul> 
-      		<li>Confirm the default setting is <b>Stop processing once the queue is empty</b>.</li>
-      		<li>Confirm the setting of the radio button is persistent.</li>
-   	</ul>
    	<li>Confirm the Processing Setup tab has a <b>File processing scope</b> groupbox with two
 	radio buttons.
 	<ul>
-		<li>Confirm that the default setting is <b>Process all files in the queue (in order of
-		priority)</b>
+		<li>Confirm that the default setting is <b>Process all files in the queue</b>
 		<li>Confirm that with the default setting, the drop-down box is <b>disabled</b>.
 		<li>Confirm that selecting the <b>Process all files that skipped</b> radio button enables
 		the drop-down box.
@@ -98,6 +91,42 @@
 			to process all skipped files.
 	       	</ul>
 	</ul>
+<p>
+   	<li>Confirm the Processing Setup tab has a <b>Processing schedule</b> groupbox with a 
+	check box and a button.</li>
+   	<ul> 
+  	   	<LI>Confirm that the group box contains a <b>Limit processing 
+		to certain days/times</b> check box.
+  	   	<LI>Confirm that the check box is <b>unchecked</b> by default.
+  	   	<LI>Confirm that the group box contains a <b>Set schedule...</b> 
+		button.
+  	   	<LI>Confirm that the button is enabled only when the check box 
+		is checked.
+<p>
+  	   	<LI>Confirm that clicking the button displays a <b>Set 
+		Processing Schedule</b> dialog.
+  	   	<LI>Confirm that the <b>Set Processing Schedule</b> dialog 
+		includes a multi-column grid with hours and days of the week.
+  	   	<LI>Confirm that the <b>Set Processing Schedule</b> dialog 
+		includes <b>OK</b> and <b>Cancel</b> buttons.
+  	   	<LI>Confirm that the <b>Set Processing Schedule</b> dialog 
+		includes <b>Select all</b> and <b>Select none</b> buttons.
+  	   	<LI>Confirm that <b>Select all</b> changes all of the grid 
+		cells to green.
+  	   	<LI>Confirm that <b>Select none</b> changes all of the grid 
+		cells to red.
+  	   	<LI>Confirm that clicking in a grid cell toggles the color 
+		between red and green.
+<p>
+  	   	<LI>Confirm that schedule settings are loaded and saved correctly.
+	</ul>
+<p>
+   	<li>Confirm the Processing Setup tab has a <b>Continuous processing</b> groupbox with two 
+	radio buttons.</li>
+   	<ul> 
+      		<li>Confirm the default setting is <b>Stop processing once the queue is empty</b>.</li>
+      		<li>Confirm the setting of the radio button is persistent.</li>
+   	</ul>
 <p>
    	<li>Confirm the Processing Setup tab has a <b>Threads for processing</b> groupbox with two 
 	radio buttons.</li>
@@ -224,7 +253,8 @@
        	being processed, Files that completed processing recently, Files that failed 
        	processing recently.</li> 
    	<li>Confirm that the <b>Files currently being processed</b> grid has columns for 
-       	Date, Start Time, FileID, Filename, Pages, Current Task, Current Task Progress, Folder.</li>
+       	Date, Start Time, FileID, Filename, Pages, Current Task, Current Task Progress, Priority, 
+	Folder.</li>
    	<ul> 
       		<li>Confirm the <b>Date</b> column displays the date of the files currently being 
           	processed in the format of mm/dd.</li> 
@@ -239,13 +269,15 @@
           	on the files.</li> 
       		<li>Confirm the <b>Current Task Progress</b> column displays the overall progress  
           	as a numeric progress indicator.  Confirm that units are in 0.01%.</li> 
+      		<li>Confirm the <b>Priority</b> column displays the priority of the file being 
+		processed.</li>
       		<li>Confirm the <b>Folder</b> column displays the name of the folder containing the 
           	file being processed.</li>
    	</ul> 
 <p>
    	<li>Confirm the <b>Files that completed processing recently</b> grid 
        	has columns for Date, Start Time, FileID, Filename, Pages, Total Time(s), 
-       	Folder.</li>
+       	Priority, Folder.</li>
    	<ul> 
       		<li>Confirm the <b>Date</b> column displays the date of the files that completed 
       		processing in the last run in the format of mm/dd.</li> 
@@ -256,12 +288,14 @@
       		<li>Confirm the <b>Pages</b> column displays the number of pages in the file.</li> 
       		<li>Confirm the <b>Total Time(s)</b> column displays the amount of time it takes 
           	to finish performing the task on each file in seconds with 10-millisecond precision. 
+      		<li>Confirm the <b>Priority</b> column displays the priority of the file that 
+		processed.</li>
       		<li>Confirm the <b>Folder</b> column displays the name of the folder containing the 
-          	file being processed.</li>
+          	file that processed.</li>
    	</ul>  
    	<li>Confirm the <b>Files that failed processing recently</b> grid has columns 
        	for Date, Start Time, FileID, Filename, Pages, Total Time(s), Error, 
-       	Folder.</li>
+       	Priority, Folder.</li>
    	<ul> 
       		<li>Confirm the <b>Date</b> column displays the date of the files that failed 
           	processing in the last run in the format of mm/dd.</li> 
@@ -277,6 +311,8 @@
           	Exception dialog that gives the details of the Error. 
       		<li><b>[LegacyRC #4436]</b> Select an entry in the failed list.  Confirm that clicking the 
 		<b>Error details...</b> button brings up an Exception dialog that gives the details 
+      		<li>Confirm the <b>Priority</b> column displays the priority of the file that failed 
+		processing.</li>
       		<li>Confirm the <b>Folder</b> column displays the name of the folder containing the 
           	failed file.</li>
    	</ul>
@@ -320,18 +356,20 @@
 
 <p>
 	<LI><b>[FlexIDSCore #3046]</b> Retaining existing annotations
-		<ul>
-			<li>Confirm that auto-redaction successfully retains existing annotations.
-		</ul>
+	<ul>
+		<li>Confirm that auto-redaction successfully retains existing annotations.
+	</ul>
 <p>
-	<li><b>[LegacyRCAndUtils #5080]</b> FAM - threads exiting with exception leave task in processing list on UI
+	<li><b>[LegacyRC #5080]</b> FAM - threads exiting with exception leave task in processing 
+	list on UI
 	<ul>
 		<li>Configure an FPS file to process some files.
-		<li>Exercise the FPS file in such a way that threads exit with exceptions. One way to do this is to use the
-		DBAdmin utility to change the name of the relevant action while the FPS file is processing.
-		<li>Confirm that after the threads exit, the files are listed under "Files that recently failed processing."
+		<li>Exercise the FPS file in such a way that threads exit with exceptions. One way to 
+		do this is to use the DBAdmin utility to change the name of the relevant action while 
+		the FPS file is processing.
+		<li>Confirm that after the threads exit, the files are listed under <b>Files that recently 
+		failed processing</b>.
 	</ul>
 </ul>
 </body>
 </html>
-  
