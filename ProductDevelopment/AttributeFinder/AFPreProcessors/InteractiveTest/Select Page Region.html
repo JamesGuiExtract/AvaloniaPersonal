@@ -214,6 +214,19 @@
 			<li><b>[FlexIDSCore #3726]</b> Confirm that an <b>ELI04164: COM exception 
 			caught.</b> exception is not logged.</li>
 		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3733]</b> Select page region
+	       	<ul>
+      			<li>Create a rule set with a <b>Select page region</b> preprocessor 
+			configured to return text from all pages with restricted scope.
+      			<li>Exercise the rule set on a blank USS file.
+      			<li>Confirm that a <b>GetFirstPageNumber() requires spatial or hybrid 
+			mode</b> exception is not seen.
+      			<li>Modify the preprocessor to return text from all pages containing 
+			particular text.
+      			<li>Confirm that a <b>GetPages is not valid for a non-spatial string</b> 
+			exception is not seen.
+	       	</ul>
 	</ul>
 </ul>
 </body>
