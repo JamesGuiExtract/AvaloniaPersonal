@@ -128,6 +128,7 @@
 		is selected.
 		<li>Confirm that <b>Delete Attribute</b> removes the currently selected attribute from
 		the list.
+  	   	<LI><b>[FlexIDSCore #3512]</b> Confirm that the confirmation dialog is modal.
 <p>
 		<li>Confirm that the <b>Split Attribute...</b> button is inactive by default.
 		<li>Confirm that the <b>Split Attribute..."</b> button becomes active when an 
@@ -147,6 +148,21 @@
 		Values.
 		<li>Confirm that merging attributes prompts a <b>Save File?</b> message when the 
 		application is closed.
+  	   	<LI><b>[FlexIDSCore #3493]</b> Merge attributes
+	       	<ul>
+	      		<li>Open the <b>VOA Viewer</b> and a VOA file with multiple spatial attributes.
+	      		<li>Select two of the attributes and merge them.
+	      		<li>Confirm that the merged attribute shows only the combined spatial 
+			areas and not a large bounding rectangle.
+	       	</ul>
+  	   	<LI><b>[FlexIDSCore #3497]</b> Merge attributes
+	       	<ul>
+	      		<li>Move an existing VOA file and its image to a noew folder.
+	      		<li>Open the VOA file.
+	      		<li>Swipe text to create a new attribute in the VOA Viewer.
+	      		<li>Merge one old attribute with the new attribute.
+	      		<li>Confirm that merge works properly.
+	       	</ul>
 <p>
 		<li>Confirm that the <b>Up Arrow</b> button is inactive by default.
 		<li>Confirm that the <b>Up Arrow</b> button becomes active when an attribute that 
