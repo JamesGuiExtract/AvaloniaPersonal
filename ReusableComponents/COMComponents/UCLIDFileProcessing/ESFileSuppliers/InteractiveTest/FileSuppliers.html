@@ -1,10 +1,10 @@
 <html>
 <head>
-<title>FAM Queuing and File Suppliers</title>
+<title>FAM Queuing and File Suppliers Checklist</title>
 <link type="text/css" rel="stylesheet" href="../../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 <body>
-<h1>Queueing and File Suppliers<br>
+<h1>FAM Queuing and File Suppliers<br>
 <IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
@@ -19,9 +19,19 @@
 <p>
 <b>Queue Setup Tab</b>
 <ul> 
+   	<li>Confirm that the Queue Setup tab includes a <b>Select file suppliers</b> list box. 
+   	<li>Confirm that the list box includes the following columns: 
+   	<ul> 
+      		<li>Enabled</li> 
+      		<li>Force Processing</li> 
+      		<li>Priority</li> 
+      		<li>Description</li> 
+      		<li>Status</li> 
+   	</ul> 
+   	<li>Confirm that the Queue Setup tab includes a <b>Select skip condition</b> edit box. 
    	<li>Confirm that in Queue Setup tab, the initial states of <b>Add</b> button is enabled, 
        	<b>Remove</b> and <b>Configure</b> buttons are disabled.  <b>Commands &gt;</b> button for Select 
-	FAM condition is enabled.</li> 
+	skip condition is enabled.</li> 
    	<li>Confirm once processing starts, the <b>Add</b>, <b>Remove</b> and <b>Configure</b> buttons,    
        	and <b>Commands &gt;</b> button for Select FAM condition are all disabled in Queue Setup tab.</li>
    	<li>Press the <b>Add</b> button in Queue Setup tab.
@@ -38,10 +48,27 @@
           	and cleared, and the settings are persistent.</li> 
       		<li>Confirm the <b>Force Processing</b> checkbox for a file supplier can be checked 
           	and cleared and the setting is persistent.</li>
-   		<li><b>[P13 #4732]</b> Confirm that adding suppliers adds the new suppliers 
+      		<li>Confirm that the default setting for <b>Priority</b> is <b>Normal</b>.</li> 
+      		<li>Confirm that the following <b>Priority</b> settings are available: 
+		<ul>
+			<li>Low
+			<li>Below Normal
+			<li>Normal
+			<li>Above Normal
+			<li>High
+		</ul>
+   		<li><b>[LegacyRC #4732]</b> Confirm that adding suppliers adds the new suppliers 
 		below the first selected file supplier.</li> 
-   		<li><b>[P13 #4732]</b> Confirm that adding suppliers adds the new suppliers 
+   		<li><b>[LegacyRC #4732]</b> Confirm that adding suppliers adds the new suppliers 
 		at the bottom of the list if no file suppliers are selected.</li> 
+   	</ul>
+   	<li>Press the <b>Commands &gt;</b> button in Queue Setup tab.
+   	<ul> 
+      		<li>Confirm it brings up a drop-down menu.</li> 
+      		<li>Confirm that <b>Select Skip Condition...</b> is enabled.</li> 
+      		<li>Confirm that <b>Configure Skip Condition...</b> is disabled.</li> 
+      		<li>Confirm that <b>Configure description...</b> is disabled.</li> 
+      		<li>Confirm that <b>Cancel</b> is enabled.</li> 
    	</ul>
 </ul>
 <p>
@@ -89,7 +116,7 @@
           	File Supplier, Folder.</li> 
       		<li>Confirm that double clicking on an Error entry brings up a exception dialog 
           	with information about the Error of that row.</li>
-      		<li><b>[P13 #4880]</b> Confirm that double clicking on an <b>empty</b> 
+      		<li><b>[LegacyRC #4880]</b> Confirm that double clicking on an <b>empty</b> 
 		Error row does nothing.</li> 
    	</ul>
    	<li>Perform the following steps to confirm that the setting of Already Existed flag in
