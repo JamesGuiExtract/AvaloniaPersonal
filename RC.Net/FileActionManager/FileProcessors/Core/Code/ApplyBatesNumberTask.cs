@@ -5,14 +5,12 @@ using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using Leadtools;
-using Leadtools.Codecs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -40,7 +38,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The description to be displayed in the categorized component selection list.
         /// </summary>
-        static readonly string _COMPONENT_DESCRIPTION = "Core: Apply Bates number";
+        const string _COMPONENT_DESCRIPTION = "Core: Apply Bates number";
 
         /// <summary>
         /// The total number of times the apply bates number task will retry applying the
@@ -55,7 +53,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// License cache for validating the license.
         /// </summary>
-        static LicenseStateCache _licenseCache =
+        static readonly LicenseStateCache _licenseCache =
             new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _COMPONENT_DESCRIPTION);
 
         /// <summary>
@@ -74,9 +72,14 @@ namespace Extract.FileActionManager.FileProcessors
         bool _dirty;
 
         /// <summary>
-        /// Indicates whether the raster codecs have been started or not
+        /// Image codecs for encoding and decoding images.
         /// </summary>
-        bool _codecsStarted;
+        volatile ImageCodecs _codecs;
+
+        /// <summary>
+        /// Protects <see cref="_codecs"/>.
+        /// </summary>
+        readonly object _lock = new object();
 
         #endregion Fields
 
@@ -141,15 +144,9 @@ namespace Extract.FileActionManager.FileProcessors
                         // Show the dialog and return whether the settings where modified or not
                         if (dialog.ShowDialog() == DialogResult.OK)
                         {
-                            // Dispose of the existing format
-                            if (_format != null)
-                            {
-                                _format.Dispose();
-                            }
-
                             // Get the new format and file name from the dialog
-                            _format = dialog.BatesNumberGenerator.Format;
-                            _fileName = dialog.FileName;
+                            Format = dialog.BatesNumberGenerator.Format;
+                            FileName = dialog.FileName;
 
                             _dirty = true;
 
@@ -282,11 +279,16 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                if (_codecsStarted)
+                if (_codecs != null)
                 {
-                    // Shutdown the raster codecs
-                    RasterCodecs.Shutdown();
-                    _codecsStarted = false;
+                    lock (_lock)
+                    {
+                        if (_codecs != null)
+                        {
+                            _codecs.Dispose();
+                            _codecs = null;
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -309,11 +311,15 @@ namespace Extract.FileActionManager.FileProcessors
                     throw ee;
                 }
 
-                if (!_codecsStarted)
+                if (_codecs == null)
                 {
-                    // Start the raster codecs
-                    RasterCodecs.Startup();
-                    _codecsStarted = true;
+                    lock (_lock)
+                    {
+                        if (_codecs == null)
+                        {
+                            _codecs = new ImageCodecs();
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -414,7 +420,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// return.</param>
         public void GetClassID(out Guid classID)
         {
-            classID = this.GetType().GUID;
+            classID = GetType().GUID;
         }
 
         /// <summary>
@@ -479,7 +485,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     // Serialize the settings
                     writer.Write(_fileName);
-                    writer.WriteObject<BatesNumberFormat>(_format);
+                    writer.WriteObject(_format);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -549,155 +555,98 @@ namespace Extract.FileActionManager.FileProcessors
             ExtractException.Assert("ELI27988", "File no longer exists.", File.Exists(fileName),
                 "Image File Name", fileName);
 
-            // Get the file extension from the file name
-            string extension = Path.GetExtension(fileName);
-
-            using (ExtractPdfManager inputFile = new ExtractPdfManager(fileName, true))
+            // Ensure IDisposable objects are disposed
+            ExtractPdfManager inputFile = null;
+            ImageReader reader = null;
+            ExtractPdfManager outputFile = null;
+            ImageWriter writer = null;
+            int pageCount = 0;
+            List<string> batesNumbers = null;
+            try
             {
-                int retryCount = 0;
-                int pageCount = 0;
-                List<string> batesNumbers = null;
-                CodecsImageInfo info = null;
-                RasterCodecs codecs = null;
-                try
+                inputFile = new ExtractPdfManager(fileName, true);
+
+                // Get the file info along with the page information
+                reader = _codecs.CreateReader(inputFile.FileName);
+
+                // Get the image information
+                pageCount = reader.PageCount;
+                RasterImageFormat format = reader.Format;
+
+                if (progressStatus != null)
                 {
-                    // Get a new raster codecs object
-                    codecs = new RasterCodecs();
-
-                    // Get the file info along with the page information
-                    info = codecs.GetInformation(inputFile.FileName, true);
-
-                    // Get the image information
-                    pageCount = info.TotalPages;
-                    int bitsPerPixel = info.BitsPerPixel;
-                    RasterImageFormat format = info.Format;
-
-                    if (progressStatus != null)
-                    {
-                        progressStatus.InitProgressStatus("Applying Bates numbers...", 0,
-                            (pageCount / 4) + 1, true);
-                    }
-
-                    bool success = false;
-                    while (retryCount < _MAX_RETRIES)
-                    {
-                        TemporaryFile tempFile = null;
-                        ExtractPdfManager outFile = null;
-                        try
-                        {
-                            retryCount++;
-
-                            // Create a temporary file to apply the Bates number to
-                            // and wrap it in a PDF manager
-                            tempFile = new TemporaryFile(extension);
-                            outFile = new ExtractPdfManager(tempFile.FileName, false);
-
-                            // If the bates numbers have not been generated yet, generate them
-                            if (batesNumbers == null)
-                            {
-                                batesNumbers = new List<string>(
-                                    generator.GetNextNumberStrings(info.TotalPages));
-                            }
-
-                            // Apply the bates number to each page
-                            for (int i = 1; i <= pageCount; i++)
-                            {
-                                // Start a new progress status group every 4 pages
-                                if (progressStatus != null && i % 4 == 1)
-                                {
-                                    progressStatus.StartNextItemGroup("", 1);
-                                }
-
-                                ApplyBatesNumberToPage(batesNumbers[i - 1], i, codecs, bitsPerPixel,
-                                    format, inputFile, outFile);
-                            }
-
-                            // Ensure if progress status is being updated
-                            // that the last item is completed
-                            if (progressStatus != null && progressStatus.NumItemsInCurrentGroup > 0)
-                            {
-                                progressStatus.CompleteCurrentItemGroup();
-                            }
-
-                            // Ensure the page counts are the same for both images
-                            if (ImageMethods.GetImagePageCount(outFile.FileName) == pageCount)
-                            {
-                                // Dispose of the out file so that the image is written to the temp
-                                // file location, then copy the temp file to the actual destination
-                                outFile.Dispose();
-                                outFile = null;
-                                File.Copy(tempFile.FileName, fileName, true);
-
-                                // Set success to true and break from loop
-                                success = true;
-                                break;
-                            }
-                        }
-                        finally
-                        {
-                            if (tempFile != null)
-                            {
-                                tempFile.Dispose();
-                                tempFile = null;
-                            }
-                            if (outFile != null)
-                            {
-                                outFile.Dispose();
-                                outFile = null;
-                            }
-                        }
-
-                        // Page counts did not match, sleep and retry
-                        if (retryCount < _MAX_RETRIES)
-                        {
-                            // Update the progress status if retrying
-                            if (progressStatus != null)
-                            {
-                                progressStatus.InitProgressStatus("Retry Applying Bates numbers...",
-                                    0, (pageCount / 4) + 1, true);
-                            }
-
-                            System.Threading.Thread.Sleep(100);
-                        }
-                    }
-
-                    if (!success)
-                    {
-                        ExtractException ee = new ExtractException("ELI27989",
-                            "Unable to apply Bates number to image.");
-                        throw ee;
-                    }
-
-                    // Update the progress status
-                    if (progressStatus != null)
-                    {
-                        progressStatus.CompleteCurrentItemGroup();
-                    }
+                    progressStatus.InitProgressStatus("Applying Bates numbers...", 0,
+                        (pageCount / 4) + 1, true);
                 }
-                catch (Exception ex)
+
+                // Create a temporary file to apply the Bates number to
+                // and wrap it in a PDF manager
+                outputFile = new ExtractPdfManager(fileName, false);
+
+                // Generate bates numbers
+                batesNumbers = new List<string>(generator.GetNextNumberStrings(pageCount));
+
+                // Apply the bates number to each page
+                writer = _codecs.CreateWriter(outputFile.FileName, format);
+                for (int i = 1; i <= pageCount; i++)
                 {
-                    ExtractException ee = ExtractException.AsExtractException("ELI27990", ex);
-                    ee.AddDebugData("PDF Manager File Information",
-                        inputFile.FileNameInformationString, false);
-                    ee.AddDebugData("Total Pages", pageCount, false);
-                    if (batesNumbers != null)
+                    // Start a new progress status group every 4 pages
+                    if (progressStatus != null && i % 4 == 1)
                     {
-                        ee.AddDebugData("Last Bates Number", generator.LastBatesNumber, false);
+                        progressStatus.StartNextItemGroup("", 1);
                     }
-                    throw ee;
+                    
+                    ApplyBatesNumberToPage(batesNumbers[i - 1], i, inputFile, reader, writer);
                 }
-                finally
+                reader.Dispose();
+                reader = null;
+                writer.Commit(true);
+
+                // Ensure if progress status is being updated
+                // that the last item is completed
+                if (progressStatus != null && progressStatus.NumItemsInCurrentGroup > 0)
                 {
-                    if (info != null)
-                    {
-                        info.Dispose();
-                        info = null;
-                    }
-                    if (codecs != null)
-                    {
-                        codecs.Dispose();
-                        codecs = null;
-                    }
+                    progressStatus.CompleteCurrentItemGroup();
+                }
+
+                // Update the progress status
+                if (progressStatus != null)
+                {
+                    progressStatus.CompleteCurrentItemGroup();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27990", ex);
+                if (inputFile != null)
+                {
+		            ee.AddDebugData("PDF Manager File Information",
+                       inputFile.FileNameInformationString, false);
+	            }
+                ee.AddDebugData("Total Pages", pageCount, false);
+                if (batesNumbers != null)
+                {
+                    ee.AddDebugData("Last Bates Number", generator.LastBatesNumber, false);
+                }
+                throw ee;
+            }
+            finally
+            {
+                if (inputFile != null)
+                {
+                    inputFile.Dispose();
+                }
+                if (reader != null)
+                {
+                    reader.Dispose();
+                }
+                if (outputFile != null)
+                {
+                    outputFile.Dispose();
+                }
+                if (writer != null)
+                {
+                    writer.Dispose();
                 }
             }
         }
@@ -707,20 +656,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="batesNumber">The Bates number string to apply.</param>
         /// <param name="pageNumber">The page to apply the string on.</param>
-        /// <param name="codecs">The <see cref="RasterCodecs"/> to use to load 
-        /// and save the page.</param>
-        /// <param name="bitsPerPixel">The bits per pixel for the image.</param>
-        /// <param name="format">The <see cref="RasterImageFormat"/> for the image.</param>
         /// <param name="inputFile">The input file to load.</param>
-        /// <param name="outputFile">The file to write the modified image page to.</param>
-        void ApplyBatesNumberToPage(string batesNumber, int pageNumber, RasterCodecs codecs,
-            int bitsPerPixel, RasterImageFormat format, ExtractPdfManager inputFile,
-            ExtractPdfManager outputFile)
+        /// <param name="reader">The reader from which to read the page.</param>
+        /// <param name="writer">The writer to which to write the bates number.</param>
+        void ApplyBatesNumberToPage(string batesNumber, int pageNumber, 
+            ExtractPdfManager inputFile, ImageReader reader, ImageWriter writer)
         {
-            // Get the input and output file names
-            string inFile = inputFile.FileName;
-            string outFile = outputFile.FileName;
-
             int retryCount = 0;
             while (retryCount < _MAX_RETRIES)
             {
@@ -735,16 +676,14 @@ namespace Extract.FileActionManager.FileProcessors
                 try
                 {
                     // Load the image page
-                    image = codecs.Load(inFile, bitsPerPixel, CodecsLoadByteOrder.BgrOrGray,
-                        pageNumber, pageNumber);
+                    image = reader.ReadPage(pageNumber);
 
                     // Compute the anchor point for the text
                     Point anchorPoint = GetAnchorPoint(_format.PageAnchorAlignment,
                         _format.HorizontalInches, _format.VerticalInches, image);
 
                     // Load the existing annotation objects
-                    RasterTagMetadata tag = codecs.ReadTag(inFile, pageNumber,
-                        RasterTagMetadata.AnnotationTiff);
+                    RasterTagMetadata tag = reader.ReadTagOnPage(pageNumber);
 
                     // Compute the appropriate font size
                     pixelFont = FontMethods.ConvertFontToUnits(_format.Font,
@@ -788,13 +727,12 @@ namespace Extract.FileActionManager.FileProcessors
                         pixelFont, 0, 0F, bounds, null, null);
 
                     // Save the image page (use append to add it to the end of the file)
-                    codecs.Save(clonedPage, outFile, format, bitsPerPixel, 1, 1, pageNumber,
-                        CodecsSavePageMode.Append);
+                    writer.AppendImage(clonedPage);
 
                     // If there were annotation tags, save those as well
                     if (tag != null)
                     {
-                        codecs.WriteTag(outFile, pageNumber, tag);
+                        writer.WriteTagOnPage(tag, pageNumber);
                     }
 
                     // Successfully completed, break from loop
@@ -998,7 +936,7 @@ namespace Extract.FileActionManager.FileProcessors
                     }
 
                     // If file names are different, store the value and set the dirty flag
-                    if (!value.Equals(_fileName, StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(value, _fileName, StringComparison.OrdinalIgnoreCase))
                     {
                         _fileName = value;
                         _dirty = true;
@@ -1034,10 +972,10 @@ namespace Extract.FileActionManager.FileProcessors
         {
             if (disposing)
             {
-                if (_codecsStarted)
+                if (_codecs != null)
                 {
-                    RasterCodecs.Shutdown();
-                    _codecsStarted = false;
+                    _codecs.Dispose();
+                    _codecs = null;
                 }
                 if (_format != null)
                 {
