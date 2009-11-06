@@ -1,16 +1,12 @@
-using Extract;
 using Extract.Drawing;
 using Extract.Licensing;
 using Extract.Utilities;
 using Leadtools;
-using Leadtools.Codecs;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
-using System.Text;
 using UCLID_RASTERANDOCRMGMTLib;
 using UCLID_SSOCRLib;
 using UCLID_COMUTILSLib;
@@ -27,7 +23,7 @@ namespace Extract.Imaging
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(SynchronousOcrManager).ToString();
+        static readonly string _OBJECT_NAME = typeof(SynchronousOcrManager).ToString();
 
         #endregion Constants
 
@@ -42,18 +38,18 @@ namespace Extract.Imaging
         /// Holds an instance of the ScansoftOcrClass so that we can use the same
         /// COM object throughout the life of the <see cref="SynchronousOcrManager"/> class.
         /// </summary>
-        private ScansoftOCRClass _ssocr;
+        ScansoftOCRClass _ssocr;
 
         /// <summary>
-        /// Holds an instance of the RasterCodecs so that we can use the same instance throughout 
-        /// the life of the <see cref="SynchronousOcrManager"/> class.
+        /// Holds an instance of the <see cref="ImageCodecs"/> so that we can use the same 
+        /// instance throughout the life of the <see cref="SynchronousOcrManager"/> class.
         /// </summary>
-        RasterCodecs _codecs;
+        ImageCodecs _codecs;
 
         /// <summary>
         /// License cache for validating the license.
         /// </summary>
-        static LicenseStateCache _licenseCache =
+        static readonly LicenseStateCache _licenseCache =
             new LicenseStateCache(LicenseIdName.OcrOnClientFeature, _OBJECT_NAME);
 
         #endregion Fields
@@ -177,11 +173,10 @@ namespace Extract.Imaging
         public SpatialString GetOcrText(string fileName, RasterZone rasterZone,
             double thresholdAngle)
         {
-            // Declare raster images and temporary filename outside the try scope to enable 
-            // disposal via the finally block.
-            RasterImage sourceImage = null;
+            // Declare raster images outside the try scope to enable disposal via the finally block.
+            RasterImage page = null;
             RasterImage rasterZoneImage = null;
-            string rasterZoneImageFileName = "";
+            TemporaryFile tempFile = null;
 
             try
             {
@@ -193,9 +188,9 @@ namespace Extract.Imaging
                 }
 
                 // Calculate the skew of the raster zone.
-                double skew = (double)GeometryMethods.GetAngle(
-                        new Point(rasterZone.StartX, rasterZone.StartY),
-                        new Point(rasterZone.EndX, rasterZone.EndY));
+                double skew = GeometryMethods.GetAngle(
+                    new Point(rasterZone.StartX, rasterZone.StartY),
+                    new Point(rasterZone.EndX, rasterZone.EndY));
 
                 // Convert to degrees
                 skew *= (180.0 / Math.PI);
@@ -204,27 +199,34 @@ namespace Extract.Imaging
                 // use the smallest bounding rectangle.
                 if (Math.Abs(skew) <= thresholdAngle)
                 {
-                    return  GetOcrText(fileName, rasterZone.PageNumber, rasterZone.PageNumber,
+                    return GetOcrText(fileName, rasterZone.PageNumber, rasterZone.PageNumber,
                         rasterZone.GetRectangularBounds());
                 }
 
                 // To compensate for an angled raster zone, load the image for manipulation.
-                sourceImage = this.Codecs.Load(fileName);
+                using (ImageReader reader = Codecs.CreateReader(fileName))
+                {
+                    page = reader.ReadPage(rasterZone.PageNumber);
+                }
 
                 // Extract the raster zone as a separate image oriented in terms of the raster
                 // zone's angle.
                 Size offset;
                 int orientation;
-                rasterZoneImage = ImageMethods.ExtractImageRasterZone(sourceImage, rasterZone,
+                rasterZoneImage = ImageMethods.ExtractZoneFromPage(rasterZone, page, 
                     out orientation, out skew, out offset);
 
                 // Save the raster zone to a temporary file.
-                rasterZoneImageFileName = FileSystemMethods.GetTemporaryFileName();
-                this.Codecs.Save(rasterZoneImage, rasterZoneImageFileName, 
-                    RasterImageFormat.CcittGroup4, 0, 1, -1, 1, CodecsSavePageMode.Overwrite);
+                tempFile = new TemporaryFile();
+                using (ImageWriter writer = 
+                    Codecs.CreateWriter(tempFile.FileName, RasterImageFormat.CcittGroup4))
+                {
+                    writer.AppendImage(rasterZoneImage);
+                    writer.Commit(true);
+                }
 
                 // Recognize the text from the raster zone image, then delete the temporary file.
-                SpatialString ocrText = GetOcrText(rasterZoneImageFileName, 1, 1, null);
+                SpatialString ocrText = GetOcrText(tempFile.FileName, 1, 1, null);
 
                 // If OCR text was found, its spatial information needs to be converted to match
                 // the location of the raster zone in the original image using the coordinate system
@@ -239,14 +241,14 @@ namespace Extract.Imaging
                     // If the string cannot be positioned as a true spatial string because of
                     // coordinate issues, position it as a hybrid string.
                     if (!PositionAsTrueSpatialString(ref positionedOcrText, 
-                        sourceImage, orientation, skew, offset))
+                        page, orientation, skew, offset))
                     {
                         // Use the original value so that changes to the string in a failed
                         // PositionAsTrueSpatialString attempt don't affect PositionAsHybrid.
                         positionedOcrText = ocrText;
 
                         PositionAsHybridSpatialString(
-                            ref positionedOcrText, sourceImage, orientation, skew, offset);
+                            ref positionedOcrText, page, orientation, skew, offset);
                     }
 
                     // Set the correct page for the OCR'd text.
@@ -272,13 +274,13 @@ namespace Extract.Imaging
             }
             finally
             {
-                if (!string.IsNullOrEmpty(rasterZoneImageFileName))
+                if (tempFile != null)
                 {
-                    FileSystemMethods.TryDeleteFile(rasterZoneImageFileName);
+                    tempFile.Dispose();
                 }
-                if (sourceImage != null)
+                if (page != null)
                 {
-                    sourceImage.Dispose();
+                    page.Dispose();
                 }
                 if (rasterZoneImage != null)
                 {
@@ -301,8 +303,6 @@ namespace Extract.Imaging
         public SpatialString GetOcrText(string fileName, int startPage, int endPage, 
             Rectangle? imageArea)
         {
-            SpatialString ocrText = null;
-
             try
             {
                 // Ensure that a valid file name has been passed in.
@@ -311,27 +311,30 @@ namespace Extract.Imaging
                 ExtractException.Assert("ELI24045", "File is not valid!",
                     File.Exists(fileName), "Ocr File Name", fileName);
 
+                SpatialString ocrText;
                 if (imageArea == null)
                 {
                     // If imageArea has not been specified, OCR the entire area each page.
-                    ocrText = this.SSOCR.RecognizeTextInImage(fileName, startPage, endPage,
-                        EFilterCharacters.kNoFilter, "", (EOcrTradeOff)this._tradeoff, true, null);
+                    ocrText = SSOCR.RecognizeTextInImage(fileName, startPage, endPage,
+                        EFilterCharacters.kNoFilter, "", (EOcrTradeOff)_tradeoff, true, null);
                 }
                 else
                 {
                     // If imageArea has been specified, OCR only the area within this logical area 
-                    // of this rectangle on each page. [LegacyRCAndUtils:5033] TODO: This currently does 
-                    // not respect this.Tradeoff.
-                    LongRectangleClass zonalOCRRectangle = new LongRectangleClass();
-                    zonalOCRRectangle.SetBounds(imageArea.Value.Left,
+                    // of this rectangle on each page. [LegacyRCAndUtils:5033] 
+                    // TODO: This currently does not respect this.Tradeoff.
+                    LongRectangleClass zonalOcrRectangle = new LongRectangleClass();
+                    zonalOcrRectangle.SetBounds(imageArea.Value.Left,
                                                 imageArea.Value.Top,
                                                 imageArea.Value.Right,
                                                 imageArea.Value.Bottom);
 
-                    ocrText = this.SSOCR.RecognizeTextInImageZone(fileName, startPage, endPage,
-                        zonalOCRRectangle, 0, EFilterCharacters.kNoFilter, "", false, false,
+                    ocrText = SSOCR.RecognizeTextInImageZone(fileName, startPage, endPage,
+                        zonalOcrRectangle, 0, EFilterCharacters.kNoFilter, "", false, false,
                         true, null);
                 }
+
+                return ocrText;
             }
             catch (Exception ex)
             {
@@ -343,7 +346,6 @@ namespace Extract.Imaging
                 throw ee;
             }
 
-            return ocrText;
         }
 
         #endregion Methods
@@ -374,6 +376,7 @@ namespace Extract.Imaging
                 if (_codecs != null)
                 {
                     _codecs.Dispose();
+                    _codecs = null;
                 }
             }
 
@@ -382,14 +385,14 @@ namespace Extract.Imaging
 
         #endregion IDisposable Members
 
-        #region Priviate Methods
+        #region Private Methods
 
         /// <summary>
         /// Gets the private license code for licensing the OCR engine.
         /// </summary>
-        /// <returns>A <see cref="string"/> containing the private license
+        /// <returns>A <see cref="string"/> containing the license
         /// key for licensing the OCR engine.</returns>
-        private static string GetSpecialOcrValue()
+        static string GetSpecialOcrValue()
         {
             return LicenseUtilities.GetMapLabelValue(new MapLabel());
         }
@@ -398,7 +401,7 @@ namespace Extract.Imaging
         /// Obtains (and creates if necessary) the SSOCR an instance to be used throughout the
         /// the life of the <see cref="SynchronousOcrManager"/> class.
         /// </summary>
-        private ScansoftOCRClass SSOCR
+        ScansoftOCRClass SSOCR
         {
             get
             {
@@ -409,7 +412,7 @@ namespace Extract.Imaging
                         // Get a new ScanSoftOCR class object
                         _ssocr = new ScansoftOCRClass();
 
-                        // Init the private license
+                        // Init the license
                         _ssocr.InitPrivateLicense(GetSpecialOcrValue());
                     }
 
@@ -423,12 +426,12 @@ namespace Extract.Imaging
         }
 
         /// <summary>
-        /// Gets an instance of <see cref="RasterCodecs"/> to use throughout the lifetime of this
+        /// Gets an instance of <see cref="ImageCodecs"/> to use throughout the lifetime of this
         /// <see cref="SynchronousOcrManager"/> instance.
         /// </summary>
-        /// <returns>An instance of <see cref="RasterCodecs"/> to use throughout the lifetime of 
+        /// <returns>An instance of <see cref="ImageCodecs"/> to use throughout the lifetime of 
         /// this <see cref="SynchronousOcrManager"/> instance.</returns>
-        private RasterCodecs Codecs
+        ImageCodecs Codecs
         {
             get
             {
@@ -436,22 +439,7 @@ namespace Extract.Imaging
                 {
                     if (_codecs == null)
                     {
-                        // Initialize a new RasterCodecs object
-                        _codecs = new RasterCodecs();
-                        _codecs.Options.Tiff.Load.IgnoreViewPerspective = true;
-                        _codecs.Options.Pdf.Save.UseImageResolution = true;
-
-                        // Leadtools does not support anti-aliasing for non-bitonal pdfs.
-                        // If anti-aliasing is set, load pdfs as a bitonal image with high dpi.
-                        if (!RasterSupport.IsLocked(RasterSupportType.Bitonal))
-                        {
-                            // Load as bitonal for anti-aliasing
-                            _codecs.Options.Pdf.Load.DisplayDepth = 1;
-
-                            // Use high dpi to preserve image quality
-                            _codecs.Options.Pdf.Load.XResolution = 300;
-                            _codecs.Options.Pdf.Load.YResolution = 300;
-                        }
+                        _codecs = new ImageCodecs();
                     }
 
                     return _codecs;
@@ -485,7 +473,7 @@ namespace Extract.Imaging
         /// spatialString.</param>
         /// <param name="offset">The amount spatialString needs to be offset to be placed into
         /// sourceImage's coordinate system.</param>
-        private static void PositionAsHybridSpatialString(ref SpatialString spatialString,
+        static void PositionAsHybridSpatialString(ref SpatialString spatialString,
             RasterImage sourceImage, int orientation, double skew, Size offset)
         {
             SpatialPageInfo pageInfo = spatialString.GetPageInfo(1);
@@ -496,7 +484,7 @@ namespace Extract.Imaging
             {
                 // Apply the skew by rotating the coordinates about the center of the image.
                 PointF imageCenter =
-                    new PointF(sourceImage.Width / 2, sourceImage.Height / 2);
+                    new PointF(sourceImage.Width / 2F, sourceImage.Height / 2F);
                 transform.RotateAt((float)skew, imageCenter);
 
                 // Shift the coordinates as necessary to account for a different corner of the
@@ -580,7 +568,7 @@ namespace Extract.Imaging
         /// <returns><see langword="true"/> if the string was properly positioned as a true spatial
         /// string, <see langword="false"/> if the string was not able to be positioned as a true
         /// spatial string.</returns>
-        private static bool PositionAsTrueSpatialString(ref SpatialString spatialString,
+        static bool PositionAsTrueSpatialString(ref SpatialString spatialString,
             RasterImage sourceImage, int orientation, double skew, Size offset)
         {
             // [DataEntry:144]
@@ -666,7 +654,7 @@ namespace Extract.Imaging
                     // coordinates of the center point in a coordinate system that take both into
                     // account.
                     Point[] transformedResultCenterPoint = { resultCenterPoint };
-                    PointF imageCenterPoint = new PointF(pageInfo.Width / 2, pageInfo.Height / 2);
+                    PointF imageCenterPoint = new PointF(pageInfo.Width / 2F, pageInfo.Height / 2F);
                     transform.RotateAt((float)-(skew + ocrDeskew + orientation), imageCenterPoint);
                     transform.TransformPoints(transformedResultCenterPoint);
                     resultCenterPoint = transformedResultCenterPoint[0];
