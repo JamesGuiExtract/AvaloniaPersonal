@@ -1,5 +1,5 @@
+using Extract.Licensing;
 using Leadtools;
-using Leadtools.Codecs;
 using System;
 using System.Drawing;
 using System.Threading;
@@ -11,7 +11,7 @@ namespace Extract.Imaging.Forms
     /// </summary>
     public sealed class ThumbnailWorker : IDisposable
     {
-        #region ThumbnailWorker Constants
+        #region Constants
 
         /// <summary>
         /// The maximum amount of time to wait in the Dispose method for the worker to cancel.
@@ -23,19 +23,16 @@ namespace Extract.Imaging.Forms
         /// </summary>
         const int _TIMEOUT_INTERVAL = 250;
 
-        #endregion ThumbnailWorker Constants
+        static readonly string _OBJECT_NAME = typeof(ThumbnailWorker).ToString();
 
-        #region ThumbnailWorker Fields
+        #endregion Constants
+
+        #region Fields
 
         /// <summary>
         /// The thread in which the loading is performed.
         /// </summary>
         readonly Thread _thread;
-
-        /// <summary>
-        /// The name of the file from which to load thumbnails.
-        /// </summary>
-        readonly string _fileName;
 
         /// <summary>
         /// The number of the pages in the file from which to load thumbnails.
@@ -60,7 +57,12 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Codecs for loading thumbnails.
         /// </summary>
-        RasterCodecs _codecs;
+        ImageCodecs _codecs = new ImageCodecs();
+
+        /// <summary>
+        /// Decodes the image thumbnails from disk.
+        /// </summary>
+        ImageReader _reader;
 
         /// <summary>
         /// An array of loaded thumbnail images. A null element indicates the thumbnail has not 
@@ -91,31 +93,35 @@ namespace Extract.Imaging.Forms
         /// </summary>
         readonly object _lock = new object();
 
-        #endregion ThumbnailWorker Fields
+        /// <summary>
+        /// Extract licensing.
+        /// </summary>
+        static readonly LicenseStateCache _license =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
 
-        #region ThumbnailWorker Constructors
+        #endregion Fields
+
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ThumbnailWorker"/> class.
         /// </summary>
-        public ThumbnailWorker(string fileName, int pageCount, Size thumbnailSize)
+        public ThumbnailWorker(string fileName, Size thumbnailSize)
         {
-            _fileName = fileName;
-            _pageCount = pageCount;
+            _license.Validate("ELI28489");
+
+            _reader = _codecs.CreateReader(fileName);
+            _pageCount = _reader.PageCount;
             _thumbnailSize = thumbnailSize;
             _thumbnails = new RasterImage[_pageCount];
             _priorityEndPage = _pageCount;
 
             _thread = new Thread(LoadThumbnails);
-
-            RasterCodecs.Startup();
-            _codecs = new RasterCodecs();
-            _codecs.Options.Tiff.Load.IgnoreViewPerspective = true;
         }
 
-        #endregion ThumbnailWorker Constructors
+        #endregion Constructors
 
-        #region ThumbnailWorker Properties
+        #region Properties
 
         /// <summary>
         /// Gets whether the <see cref="ThumbnailWorker"/> is loading thumbnails.
@@ -130,9 +136,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion ThumbnailWorker Properties
+        #endregion Properties
 
-        #region ThumbnailWorker Methods
+        #region Methods
 
         /// <summary>
         /// Cancels the pending background operation, waiting up to the specified number of 
@@ -293,34 +299,6 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Creates a high quality thumbnail for the specified page of the image.
-        /// </summary>
-        /// <param name="page">The page from which to create a thumbnail.</param>
-        /// <returns>A high quality thumbnail for the specified page of the image.</returns>
-        RasterImage CreateThumbnail(int page)
-        {
-            // Get the dimensions of this page.
-            int width;
-            int height;
-            using (CodecsImageInfo info = _codecs.GetInformation(_fileName, false, page))
-            {
-                width = info.Width;
-                height = info.Height;
-            }
-
-            // Calculate how far from the desired size the original image is
-            double scale = Math.Min(_thumbnailSize.Width / (double)width,
-                _thumbnailSize.Height / (double)height);
-
-            // Set the desired width and height, maintaining aspect ratio
-            width = (int)(width * scale);
-            height = (int)(height * scale);
-
-            return _codecs.Load(_fileName, width, height, 24, RasterSizeFlags.Bicubic,
-                CodecsLoadByteOrder.BgrOrGray, page, page);
-        }
-
-        /// <summary>
         /// Asynchronously starts loading thumbnail images.
         /// </summary>
         public void BeginLoading()
@@ -343,7 +321,7 @@ namespace Extract.Imaging.Forms
                 while (page > 0)
                 {
                     // Load the thumbnail for this page
-                    RasterImage thumbnail = CreateThumbnail(page);
+                    RasterImage thumbnail = _reader.ReadPageAsThumbnail(page, _thumbnailSize);
                     lock (_lock)
                     {
                         _thumbnails[page - 1] = thumbnail;
@@ -370,7 +348,7 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion ThumbnailWorker Methods
+        #endregion Methods
 
         #region IDisposable Members
 
@@ -415,11 +393,15 @@ namespace Extract.Imaging.Forms
                     }
                     _thumbnails = null;
                 }
+                if (_reader != null)
+                {
+                    _reader.Dispose();
+                    _reader = null;
+                }
                 if (_codecs != null)
                 {
                     _codecs.Dispose();
                     _codecs = null;
-                    RasterCodecs.Shutdown();
                 }
             }
 
