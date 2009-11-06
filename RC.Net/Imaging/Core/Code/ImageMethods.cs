@@ -4,11 +4,9 @@ using Leadtools;
 using Leadtools.Codecs;
 using Leadtools.ImageProcessing;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Text;
 
 namespace Extract.Imaging
 {
@@ -22,7 +20,7 @@ namespace Extract.Imaging
         /// <summary>
         /// License cache object used to validate the license
         /// </summary>
-        static LicenseStateCache _licenseCache =
+        static readonly LicenseStateCache _licenseCache =
             new LicenseStateCache(LicenseIdName.ExtractCoreObjects, typeof(ImageMethods).ToString());
 
         #endregion Fields
@@ -159,7 +157,6 @@ namespace Extract.Imaging
                 if (thumbnail != null)
                 {
                     thumbnail.Dispose();
-                    thumbnail = null;
                 }
 
                 throw ExtractException.AsExtractException("ELI23773", ex);
@@ -171,9 +168,10 @@ namespace Extract.Imaging
         /// The extracted image will be oriented with the <see cref="RasterZone"/> so that the start
         /// and end point lie along a horizontal line that bisects the resulting image.
         /// </summary>
-        /// <param name="image">The <see cref="RasterImage"/> from which the <see cref="RasterZone"/> 
-        /// is to be extracted.</param>
-        /// <param name="rasterZone">The <see cref="RasterZone"/> to be extracted as a separate 
+        /// <param name="page">The <see cref="RasterImage"/> from which the 
+        /// <see cref="RasterZone"/> is to be extracted. The zone will be extracted from the 
+        /// currently active page.</param>
+        /// <param name="zone">The <see cref="RasterZone"/> to be extracted as a separate 
         /// <see cref="RasterImage"/>.</param>
         /// <param name="orientation">A value indicating the image orientation that comes closest
         /// to allowing <see paramref="rasterZone"/> to be vertical.
@@ -194,21 +192,18 @@ namespace Extract.Imaging
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "3#")]
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "4#")]
-        public static RasterImage ExtractImageRasterZone(RasterImage image,
-            RasterZone rasterZone, out int orientation, out double skew, out Size offset)
+        public static RasterImage ExtractZoneFromPage(RasterZone zone, RasterImage page, 
+            out int orientation, out double skew, out Size offset)
         {
             try
             {
                 // Validate the license
                 _licenseCache.Validate("ELI28013");
 
-                // Move to the raster zone's page.
-                image.Page = rasterZone.PageNumber;
-
                 // Calculate the skew of the raster zone.
-                skew = (double)GeometryMethods.GetAngle(
-                        new Point(rasterZone.StartX, rasterZone.StartY),
-                        new Point(rasterZone.EndX, rasterZone.EndY));
+                skew = GeometryMethods.GetAngle(
+                    new Point(zone.StartX, zone.StartY),
+                    new Point(zone.EndX, zone.EndY));
 
                 // Convert to degrees
                 skew *= (180.0 / Math.PI);
@@ -216,9 +211,9 @@ namespace Extract.Imaging
                 // Calculate whether the start and end points of the raster zone fall within the
                 // image page.  If either are off the image page, find a start and end point
                 // along the raster zone's plane that are within the image to work with.
-                Rectangle pageArea = new Rectangle(0, 0, image.Width, image.Height);
-                Point startPoint = new Point(rasterZone.StartX, rasterZone.StartY);
-                Point endPoint = new Point(rasterZone.EndX, rasterZone.EndY);
+                Rectangle pageArea = new Rectangle(0, 0, page.Width, page.Height);
+                Point startPoint = new Point(zone.StartX, zone.StartY);
+                Point endPoint = new Point(zone.EndX, zone.EndY);
 
                 if (!pageArea.Contains(startPoint))
                 {
@@ -233,15 +228,15 @@ namespace Extract.Imaging
                 // zone defined by the (possibly clipped) raster zone.  Note this bounding rectangle
                 // may extend offpage.
                 Rectangle boundingRectangle = GeometryMethods.GetBoundingRectangle(
-                    startPoint, endPoint, rasterZone.Height);
+                    startPoint, endPoint, zone.Height);
 
                 // Create a destination image where the raster zone content will be copied to.  It is
                 // important that it is the same size as the bounding rectangle since the raster zone
                 // is centered in the bounding rectangle and we will be rotating the destination 
                 // raster zone about it's center.
                 RasterImage rasterZoneImage = new RasterImage(RasterMemoryFlags.Conventional, 
-                    boundingRectangle.Width, boundingRectangle.Height, image.BitsPerPixel, 
-                    RasterByteOrder.Rgb, image.ViewPerspective, image.GetPalette(), IntPtr.Zero, 0);
+                    boundingRectangle.Width, boundingRectangle.Height, page.BitsPerPixel, 
+                    RasterByteOrder.Rgb, page.ViewPerspective, page.GetPalette(), IntPtr.Zero, 0);
 
                 // Initialize the destination image to all white.
                 FillCommand fillCommand = new FillCommand();
@@ -269,7 +264,7 @@ namespace Extract.Imaging
                 CombineFastCommand combineCommand = new CombineFastCommand(rasterZoneImage, 
                     adjustedBoundingRectangle, sourcePoint, CombineFastCommandFlags.SourceCopy);
                 combineCommand.DestinationImage = rasterZoneImage;
-                combineCommand.Run(image);
+                combineCommand.Run(page);
 
                 // Since the center point of the raster zone's on-page content is at the exact 
                 // center of the destination image, we can rotate the raster zone image so that
@@ -289,10 +284,10 @@ namespace Extract.Imaging
                     Math.Pow(endPoint.X - startPoint.X, 2) + 
                     Math.Pow(endPoint.Y - startPoint.Y, 2));
                 int xOffset = (rasterZoneImage.Width - finalImageAreaWidth) / 2;
-                int yOffset = (rasterZoneImage.Height - rasterZone.Height) / 2;
+                int yOffset = (rasterZoneImage.Height - zone.Height) / 2;
 
                 Rectangle finalImageArea = new Rectangle(xOffset, yOffset, finalImageAreaWidth,
-                    rasterZone.Height);
+                    zone.Height);
 
                 // Crop off any excess content leaving only the content from the raster zone itself.
                 CropCommand cropCommand = new CropCommand();
@@ -326,15 +321,15 @@ namespace Extract.Imaging
                     switch (orientation)
                     {
                         case 0: break;
-                        case 90: transform.Translate(-image.Width, 0); break;
-                        case 180: transform.Translate(-image.Width, -image.Height); break;
-                        case 270: transform.Translate(0, -image.Height); break;
+                        case 90: transform.Translate(-page.Width, 0); break;
+                        case 180: transform.Translate(-page.Width, -page.Height); break;
+                        case 270: transform.Translate(0, -page.Height); break;
                     }
 
                     // Account for the skew by rotating about the center of the image. At this point
                     // all steps nessary to move a point from the original image's coordinate system
                     // into the coordinate system of the extracted image have been completed.
-                    PointF imageCenter = new PointF((float)image.Width / 2, (float)image.Height / 2);
+                    PointF imageCenter = new PointF((float)page.Width / 2, (float)page.Height / 2);
                     transform.RotateAt((float)-skew, imageCenter);
 
                     // Apply the transform to the point at the center of the on-screen portion of the
@@ -354,53 +349,6 @@ namespace Extract.Imaging
                 ExtractException ee = new ExtractException("ELI24087",
                     "Failed to extract raster zone image!", ex);
                 throw ee;
-            }
-        }
-
-        /// <overloads>Gets the total count of pages from the specified image file.</overloads>
-        /// <summary>
-        /// Gets the total count of pages from the specified image file.
-        /// <para><b>Require:</b></para>
-        /// This method requires that RasterCodecs.Startup() has been called.
-        /// </summary>
-        /// <param name="fileName">The name of the image file to get the page count for.</param>
-        /// <returns>The page count for the specified image.</returns>
-        public static int GetImagePageCount(string fileName)
-        {
-            try
-            {
-                using (RasterCodecs codecs = new RasterCodecs())
-                {
-                    return GetImagePageCount(fileName, codecs);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI27967", ex);
-            }
-        }
-
-        /// <summary>
-        /// Gets the total count of pages from the specified image file.
-        /// </summary>
-        /// <param name="fileName">The name of the image file to get the page count for.</param>
-        /// <param name="codecs">The raster codecs to use to get the page count.</param>
-        /// <returns>The page count for the specified image.</returns>
-        public static int GetImagePageCount(string fileName, RasterCodecs codecs)
-        {
-            try
-            {
-                // Validate the license
-                _licenseCache.Validate("ELI28014");
-
-                using (CodecsImageInfo info = codecs.GetInformation(fileName, true))
-                {
-                    return info.TotalPages;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI27968", ex);
             }
         }
 
@@ -508,7 +456,6 @@ namespace Extract.Imaging
                 if (page != null)
                 {
                     page.Dispose();
-                    page = null;
                 }
 
                 throw ExtractException.AsExtractException("ELI28051", ex);
