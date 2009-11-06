@@ -1,3 +1,4 @@
+using Extract.Licensing;
 using Leadtools;
 using Leadtools.WinForms;
 using System;
@@ -25,6 +26,8 @@ namespace Extract.Imaging.Forms
         /// </summary>
         static readonly RasterImage _LOADING_IMAGE = GetLoadingImage();
 
+        static readonly string _OBJECT_NAME = typeof(ThumbnailViewer).ToString();
+
         #endregion ThumbnailViewer Constants
 
         #region ThumbnailViewer Fields
@@ -39,6 +42,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         ThumbnailWorker _worker;
 
+        /// <summary>
+        /// Extract licensing.
+        /// </summary>
+        static readonly LicenseStateCache _license =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion ThumbnailViewer Fields
 
         #region ThumbnailViewer Constructors
@@ -49,6 +58,8 @@ namespace Extract.Imaging.Forms
         public ThumbnailViewer()
         {
             InitializeComponent();
+
+            _license.Validate("ELI28488");
 
             // Turn on anti-aliasing
             RasterSupport.Unlock(RasterSupportType.Document, _DOCUMENT_SUPPORT_KEY);
@@ -151,8 +162,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         void StartThumbnailWorker()
         {
-            _worker = new ThumbnailWorker(_imageViewer.ImageFile, _imageViewer.PageCount, 
-                                          _imageList.ItemImageSize);
+            _worker = new ThumbnailWorker(_imageViewer.ImageFile, _imageList.ItemImageSize);
 
             _worker.BeginLoading();
 
