@@ -2,7 +2,7 @@ using Leadtools.Codecs;
 
 namespace Extract.Imaging.Forms
 {
-    partial class ImageViewer
+    sealed partial class ImageViewer
     {
         /// <summary> 
         /// Required designer variable.
@@ -22,16 +22,6 @@ namespace Extract.Imaging.Forms
                 if (components != null)
                 {
                     components.Dispose();
-                }
-                if (_codecs != null)
-                {
-                    _codecs.Dispose();
-                    _codecs = null;
-                }
-                if (_codecsStarted)
-                {
-                    RasterCodecs.Shutdown();
-                    _codecsStarted = false;
                 }
                 if (_layerObjects != null)
                 {
@@ -63,12 +53,16 @@ namespace Extract.Imaging.Forms
                     _printDocument.Dispose();
                     _printDocument = null;
                 }
-                if (_currentOpenFile != null)
+                if (_reader != null)
                 {
-                    _currentOpenFile.Dispose();
-                    _currentOpenFile = null;
+                    _reader.Dispose();
+                    _reader = null;
                 }
-
+                if (_codecs != null)
+                {
+                    _codecs.Dispose();
+                    _codecs = null;
+                }
             }
             base.Dispose(disposing);
         }

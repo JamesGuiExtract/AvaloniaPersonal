@@ -1,10 +1,8 @@
 using Extract.Drawing;
 using Extract.Licensing;
-using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Leadtools;
 using Leadtools.Annotations;
-using Leadtools.Codecs;
 using Leadtools.ImageProcessing;
 using Leadtools.WinForms;
 using System;
@@ -23,7 +21,7 @@ using System.Windows.Forms;
 
 namespace Extract.Imaging.Forms
 {
-    partial class ImageViewer
+    sealed partial class ImageViewer
     {
         #region Image Viewer Methods
 
@@ -195,7 +193,7 @@ namespace Extract.Imaging.Forms
 
                 // Close the currently open image without raising
                 // the image file changed event.
-                if (base.IsImageAvailable && !CloseImage(false))
+                if (IsImageAvailable && !CloseImage(false))
                 {
                     return;
                 }
@@ -206,22 +204,6 @@ namespace Extract.Imaging.Forms
                 // Refresh the image viewer before opening the new image
                 RefreshImageViewerAndParent();
 
-                if (!FileSystemMethods.TryOpenExclusive(fileName,
-                    out _currentOpenFile))
-                {
-                    MessageBox.Show("The file \"" + fileName + "\" is currently open by another program"
-                        + " on this machine, or by another user on a different machine."
-                        + Environment.NewLine + Environment.NewLine
-                        + "To allow efficient operation in a multi-user environment "
-                        + Application.ProductName + " has been designed to only open files it can"
-                        + " obtain exclusive access to.", "File Is Locked", MessageBoxButtons.OK,
-                        MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
-
-                    // Raise the image file changed event and return
-                    OnImageFileChanged(new ImageFileChangedEventArgs(""));
-                    return;
-                }
-
                 using (new TemporaryWaitCursor())
                 {
                     // Suspend the paint event until after all changes have been made
@@ -231,14 +213,11 @@ namespace Extract.Imaging.Forms
                         // Reset the valid annotations flag
                         _validAnnotations = true;
 
-                        // Initialize a new RasterCodecs object
-                        _codecs = GetCodecs();
+                        // Initialize reader
+                        _reader = Codecs.CreateReader(fileName);
 
                         // Get the page count
-                        using (CodecsImageInfo info = _codecs.GetInformation(_currentOpenFile, true))
-                        {
-                            _pageCount = info.TotalPages;
-                        }
+                        _pageCount = _reader.PageCount;
 
                         // Create the page data for this image
                         _imagePages = new List<ImagePageData>(_pageCount);
@@ -272,10 +251,10 @@ namespace Extract.Imaging.Forms
                     }
                     catch (Exception ex)
                     {
-                        if (_currentOpenFile != null)
+                        if (_reader != null)
                         {
-                            _currentOpenFile.Dispose();
-                            _currentOpenFile = null;
+                            _reader.Dispose();
+                            _reader = null;
                         }
 
                         throw ExtractException.AsExtractException("ELI23376", ex);
@@ -343,53 +322,6 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Gets the codecs used to manipulate images.
-        /// </summary>
-        /// <value>The codecs used to manipulate images.</value>
-        RasterCodecs GetCodecs()
-        {
-            // Start up the raster codecs if necessary.
-            if (!_codecsStarted)
-            {
-                RasterCodecs.Startup();
-                _codecsStarted = true;
-            }
-
-            // Load the codecs
-            RasterCodecs codecs = null;
-            try
-            {
-                codecs = new RasterCodecs();
-                codecs.Options.Tiff.Load.IgnoreViewPerspective = true;
-                codecs.Options.Pdf.Save.UseImageResolution = true;
-                codecs.Options.Pdf.InitialPath = GetPdfInitializationDirectory();
-
-                // Leadtools does not support anti-aliasing for non-bitonal pdfs.
-                // If anti-aliasing is set, load pdfs as a bitonal image with high dpi.
-                if (_useAntiAliasing)
-                {
-                    // Load as bitonal for anti-aliasing
-                    codecs.Options.Pdf.Load.DisplayDepth = 1;
-
-                    // Use high dpi to preserve image quality
-                    codecs.Options.Pdf.Load.XResolution = 300;
-                    codecs.Options.Pdf.Load.YResolution = 300;
-                }
-            }
-            catch (Exception)
-            {
-                if (codecs != null)
-                {
-                    codecs.Dispose();
-                }
-
-                throw;
-            }
-
-            return codecs;
-        }
-
-        /// <summary>
         /// Closes the currently open image and raises the
         /// <see cref="ImageFileChanged"/> event.
         /// <para><b>Requirement:</b></para>
@@ -402,7 +334,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Ensure an image is open
-                if (base.IsImageAvailable)
+                if (IsImageAvailable)
                 {
                     CloseImage(true);
                 }
@@ -430,7 +362,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 ExtractException.Assert("ELI22337", "An image must be open.",
-                    base.IsImageAvailable);
+                    IsImageAvailable);
 
                 // If there is an open image, raise the image file closing event
                 if (!string.IsNullOrEmpty(_imageFile))
@@ -453,21 +385,14 @@ namespace Extract.Imaging.Forms
                     // Dispose of all layer objects
                     _layerObjects.Clear();
 
-                    // Dispose of any previously held codecs
-                    if (_codecs != null)
-                    {
-                        _codecs.Dispose();
-                        _codecs = null;
-                    }
-
                     // Set Image to null
                     base.Image = null;
 
-                    // Dispose the open file stream (if it is not null)
-                    if (_currentOpenFile != null)
+                    // Dispose of the image reader
+                    if (_reader != null)
                     {
-                        _currentOpenFile.Dispose();
-                        _currentOpenFile = null;
+                        _reader.Dispose();
+                        _reader = null;
                     }
 
                     // Set image file name to empty string
@@ -511,11 +436,11 @@ namespace Extract.Imaging.Forms
         public void SaveImage(string fileName, RasterImageFormat format)
         {
             TemporaryWaitCursor waitCursor = null;
-            RasterImage image = null;
             int originalPage = _pageNumber;
             Matrix transform = null;
             IntPtr hdc = IntPtr.Zero;
             Graphics graphics = null;
+            ImageWriter writer = Codecs.CreateWriter(fileName, format);
             try
             {
                 // Ensure not saving to the currently open image
@@ -530,22 +455,21 @@ namespace Extract.Imaging.Forms
 
                 // Check if annotations will be stored as tiff tags
                 AnnCodecs annCodecs = null;
-                Dictionary<int, RasterTagMetadata> tags = null;
                 if (_displayAnnotations && isTiff)
                 {
                     // Prepare to store tiff tags
                     annCodecs = new AnnCodecs();
-                    tags = new Dictionary<int, RasterTagMetadata>(_pageCount);
                 }
 
                 // Iterate through each page of the image
                 ColorResolutionCommand command = GetSixteenBppConverter(); // Used to change bpp of image
                 for (int i = 1; i <= _pageCount; i++)
                 {
+                    // TODO: This could be reworked to go directly to disk without changing page number
                     // Go to the specified page
                     SetPageNumber(i, false, false);
 
-                    RasterImage page = null;
+                    RasterImage page;
                     hdc = ImageMethods.GetLeadDCWithRetries(base.Image, _SAVE_RETRY_COUNT,
                         command, i, out page);
 
@@ -556,6 +480,7 @@ namespace Extract.Imaging.Forms
                     transform = GetRotatedMatrix(graphics.Transform, false);
 
                     // Render the annotations
+                    RasterTagMetadata tag = null;
                     if (_annotations != null)
                     {
                         // Rotate the annotations
@@ -566,9 +491,7 @@ namespace Extract.Imaging.Forms
                         if (annCodecs != null)
                         {
                             // Save annotations in a tiff tag
-                            RasterTagMetadata tag =
-                                annCodecs.SaveToTag(_annotations, AnnCodecsTagFormat.Tiff);
-                            tags.Add(i, tag);
+                            tag = annCodecs.SaveToTag(_annotations, AnnCodecsTagFormat.Tiff);
                         }
                         else
                         {
@@ -602,32 +525,15 @@ namespace Extract.Imaging.Forms
                     graphics.Dispose();
 
                     // Add the page to the resultant image
-                    if (image == null)
-                    {
-                        image = page;
-                    }
-                    else
-                    {
-                        image.AddPage(page);
-                    }
+                    writer.AppendImage(page);
+                    writer.WriteTagOnPage(tag, i);
                 }
                 transform = null;
                 hdc = IntPtr.Zero;
                 graphics = null;
 
                 // Save the file
-                _codecs.Save(image, fileName, format, isTiff ? 0 : 1, 1, -1, 1,
-                    CodecsSavePageMode.Overwrite);
-
-                // Check if tiff annotation tags should be added
-                if (tags != null)
-                {
-                    // Write each tag to its respective page
-                    foreach (KeyValuePair<int, RasterTagMetadata> pageToTag in tags)
-                    {
-                        _codecs.WriteTag(fileName, pageToTag.Key, pageToTag.Value);
-                    }
-                }
+                writer.Commit(true);
             }
             catch (Exception ex)
             {
@@ -639,10 +545,6 @@ namespace Extract.Imaging.Forms
                 SetPageNumber(originalPage, false, false);
 
                 // Dispose of the resources
-                if (image != null)
-                {
-                    image.Dispose();
-                }
                 if (waitCursor != null)
                 {
                     waitCursor.Dispose();
@@ -659,40 +561,10 @@ namespace Extract.Imaging.Forms
                 {
                     graphics.Dispose();
                 }
-            }
-        }
-
-        /// <summary>
-        /// Adds additional debug information about an image.
-        /// </summary>
-        /// <param name="ee">The exception to which to add debug information.</param>
-        /// <param name="image">The image for which to add debug information.</param>
-        /// <param name="pageNumber">The page number of <paramref name="image"/>.</param>
-        void AddImageDebugInfo(ExtractException ee, RasterImage image, int pageNumber)
-        {
-            try
-            {
-                ee.AddDebugData("Image file name", _imageFile, false);
-                ee.AddDebugData("Current page", pageNumber, false);
-
-                // Add info about current image if available
-                if (base.Image != null)
+                if (writer != null)
                 {
-                    ee.AddDebugData("Total pages", _pageCount, false);
-                    ee.AddDebugData("Original bpp", base.Image.BitsPerPixel, false);
+                    writer.Dispose();
                 }
-
-                // Add info about image parameter if available
-                if (image != null)
-                {
-                    ee.AddDebugData("Current bpp", image.BitsPerPixel, false);
-                    ee.AddDebugData("Page width", image.Width, false);
-                    ee.AddDebugData("Page height", image.Height, false);
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Log("ELI26955", ex);
             }
         }
 
@@ -858,7 +730,7 @@ namespace Extract.Imaging.Forms
 
                 // Determine the distance in physical (client) coordinates between 
                 // the left side of the viewing tile and the left edge of the image.
-                Rectangle imageArea = base.PhysicalViewRectangle;
+                Rectangle imageArea = PhysicalViewRectangle;
                 int deltaX = tileArea.Left - imageArea.Left;
 
                 // Suspend paint events until the next tile is shown
@@ -886,7 +758,7 @@ namespace Extract.Imaging.Forms
                             SetPageNumber(_pageNumber - 1, false, true);
 
                             // Move the tile area to the bottom right of new page
-                            imageArea = base.PhysicalViewRectangle;
+                            imageArea = PhysicalViewRectangle;
                             tileArea.Offset(imageArea.Right, imageArea.Bottom);
                         }
                         else
@@ -939,7 +811,7 @@ namespace Extract.Imaging.Forms
 
                 // Determine the distance in physical (client) coordinates between 
                 // the right side of the viewing tile and the right edge of the image.
-                Rectangle imageArea = base.PhysicalViewRectangle;
+                Rectangle imageArea = PhysicalViewRectangle;
                 int deltaX = imageArea.Right - tileArea.Right;
 
                 // Suspend paint events until the next tile is shown
@@ -967,7 +839,7 @@ namespace Extract.Imaging.Forms
                             SetPageNumber(_pageNumber + 1, false, true);
 
                             // Move the tile area to the top-left of the new page
-                            tileArea.Offset(base.PhysicalViewRectangle.Location);
+                            tileArea.Offset(PhysicalViewRectangle.Location);
                         }
                         else
                         {
@@ -1004,7 +876,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Ensure it is possible to go to the next layer object.
-                if (base.IsImageAvailable && CanGoToNextLayerObject)
+                if (IsImageAvailable && CanGoToNextLayerObject)
                 {
                     // Go to the next layer object.
                     GoToNextVisibleLayerObject(true);
@@ -1058,7 +930,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Ensure it is possible to go to the Previous layer object.
-                if (base.IsImageAvailable && CanGoToPreviousLayerObject)
+                if (IsImageAvailable && CanGoToPreviousLayerObject)
                 {
                     // Go to the previous layer object.
                     GoToPreviousVisibleLayerObject(true);
@@ -1736,7 +1608,7 @@ namespace Extract.Imaging.Forms
                     _transform.TransformPoints(center);
 
                     // Center at the same point as prior to rotation
-                    base.CenterAtPoint(center[0]);
+                    CenterAtPoint(center[0]);
                 }
                 finally
                 {
@@ -2269,14 +2141,10 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// <para>Loads annotations from the currently open <see cref="_imageFile"/>.</para>
-        /// <para><b>Requirements</b></para>
-        /// <para>An image must be open.</para>
-        /// <para><see cref="_imageFile"/> must exist on disk.</para>
-        /// <para><see cref="_codecs"/> cannot be <see langword="null"/>.</para>
+        /// Loads annotations from the currently open <see cref="_imageFile"/>.
+        /// </summary>
         /// <remarks>If the <see cref="_displayAnnotations"/> is <see langword="false"/>. 
         /// Annotations will be cleared and no annotations will be displayed.</remarks>
-        /// </summary>
         private void UpdateAnnotations()
         {
             // Dispose of the annotations if they exist
@@ -2288,7 +2156,7 @@ namespace Extract.Imaging.Forms
 
             // If annotations shouldn't be displayed or there is no open image file
             // we are done.
-            if (!_displayAnnotations || _currentOpenFile == null || !_validAnnotations)
+            if (!_displayAnnotations || _reader == null || !_validAnnotations)
             {
                 return;
             }
@@ -2296,8 +2164,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Load annotations from file
-                RasterTagMetadata tag = _codecs.ReadTag(_currentOpenFile, _pageNumber,
-                    RasterTagMetadata.AnnotationTiff);
+                RasterTagMetadata tag = _reader.ReadTagOnPage(_pageNumber);
                 if (tag != null)
                 {
                     // Initialize a new annotations container and associate it with the image viewer.
@@ -2344,14 +2211,6 @@ namespace Extract.Imaging.Forms
 
                 // Set the valid annotations flag to false
                 _validAnnotations = false;
-            }
-            finally
-            {
-                // After loading the tags the position will be moved, set it back to 0
-                if (_currentOpenFile != null && _currentOpenFile.Position != 0)
-                {
-                    _currentOpenFile.Position = 0;
-                }
             }
         }
 
@@ -2697,7 +2556,7 @@ namespace Extract.Imaging.Forms
                 if (zoomInfo.FitMode == FitMode.None)
                 {
                     // Set the new scale factor for this page
-                    base.ScaleFactor = zoomInfo.ScaleFactor;
+                    ScaleFactor = zoomInfo.ScaleFactor;
                 }
 
                 // Get the side of the link from which the new view 
@@ -2841,7 +2700,7 @@ namespace Extract.Imaging.Forms
 
                 case CursorTool.SelectLayerObject:
 
-                    if (base.Cursor == Cursors.Default)
+                    if (Cursor == Cursors.Default)
                     {
                         // This is a click and drag multiple layer objects event
 
@@ -2976,7 +2835,7 @@ namespace Extract.Imaging.Forms
         private void EndSelectLayerObject(int mouseX, int mouseY, bool cancel)
         {
             // Check if this is a click and drag to select multiple highlights
-            if (!cancel && base.Cursor == Cursors.Default)
+            if (!cancel && Cursor == Cursors.Default)
             {
                 // Convert the rectangle from client to image coordinates
                 Rectangle rectangle =
@@ -3051,7 +2910,7 @@ namespace Extract.Imaging.Forms
             Invalidate();
 
             // Reset the selection cursor
-            base.Cursor = GetSelectionCursor(mouseX, mouseY);
+            Cursor = GetSelectionCursor(mouseX, mouseY);
         }
 
         /// <summary>
@@ -3408,7 +3267,7 @@ namespace Extract.Imaging.Forms
         private ZoomInfo GetZoomInfo()
         {
             // Return the ZoomInfo
-            return new ZoomInfo(GetVisibleImageCenter(), base.ScaleFactor, _fitMode);
+            return new ZoomInfo(GetVisibleImageCenter(), ScaleFactor, _fitMode);
         }
 
         /// <summary>
@@ -3441,7 +3300,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public Rectangle GetVisibleImageArea()
         {
-            return Rectangle.Intersect(base.PhysicalViewRectangle, ClientRectangle);
+            return Rectangle.Intersect(PhysicalViewRectangle, ClientRectangle);
         }
 
         /// <summary>
@@ -3539,7 +3398,7 @@ namespace Extract.Imaging.Forms
                     try
                     {
                         base.SizeMode = RasterPaintSizeMode.FitAlways;
-                        base.ScaleFactor = _DEFAULT_SCALE_FACTOR;
+                        ScaleFactor = _DEFAULT_SCALE_FACTOR;
                     }
                     finally
                     {
@@ -3554,7 +3413,7 @@ namespace Extract.Imaging.Forms
                     try
                     {
                         base.SizeMode = RasterPaintSizeMode.FitWidth;
-                        base.ScaleFactor = _DEFAULT_SCALE_FACTOR;
+                        ScaleFactor = _DEFAULT_SCALE_FACTOR;
                     }
                     finally
                     {
@@ -3563,7 +3422,7 @@ namespace Extract.Imaging.Forms
                     break;
 
                 case FitMode.None:
-                    base.ZoomToRectangle(base.DisplayRectangle);
+                    base.ZoomToRectangle(DisplayRectangle);
                     break;
 
                 default:
@@ -3610,7 +3469,7 @@ namespace Extract.Imaging.Forms
                     }
 
                     // Set the new scale factor
-                    base.ScaleFactor = zoomInfo.ScaleFactor;
+                    ScaleFactor = zoomInfo.ScaleFactor;
                 }
 
                 // Convert the center point to client coordinates
@@ -3618,7 +3477,7 @@ namespace Extract.Imaging.Forms
                 _transform.TransformPoints(center);
 
                 // Center at the specified point
-                base.CenterAtPoint(center[0]);
+                CenterAtPoint(center[0]);
             }
             finally
             {
@@ -4177,7 +4036,7 @@ namespace Extract.Imaging.Forms
         public void RestoreScrollPosition()
         {
             // Restore to previously saved scroll position [DNRCAU #262 - JDS]
-            base.ScrollPosition = _scrollPosition;
+            ScrollPosition = _scrollPosition;
 
             // Refresh the image viewer
             Invalidate();
@@ -4211,7 +4070,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 return rectangle.Left >= 0 && rectangle.Top >= 0 &&
-            rectangle.Right <= ImageWidth && rectangle.Bottom <= ImageHeight;
+                    rectangle.Right <= ImageWidth && rectangle.Bottom <= ImageHeight;
             }
             catch (Exception ex)
             {
@@ -5318,27 +5177,8 @@ namespace Extract.Imaging.Forms
             }
             else
             {
-                base.Refresh();
+                Refresh();
             }
-        }
-
-        /// <summary>
-        /// Gets the PDF initialization directory (the directory that contains
-        /// the Lib, Resource, and Fonts directories).
-        /// </summary>
-        /// <returns>The PDF initialization directory.</returns>
-        private static string GetPdfInitializationDirectory()
-        {
-#if DEBUG
-            string pdfInitDir = Path.GetDirectoryName(Application.ExecutablePath)
-                + @"\..\..\ReusableComponents\APIs\LeadTools_16.5\PDF";
-#else
-            string pdfInitDir = Path.GetDirectoryName(Application.ExecutablePath)
-                + @"\..\..\CommonComponents\pdf";
-#endif
-            pdfInitDir = Path.GetFullPath(pdfInitDir);
-
-            return pdfInitDir;
         }
 
         #endregion

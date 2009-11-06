@@ -1,14 +1,12 @@
 using Leadtools;
 using Leadtools.WinForms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace Extract.Imaging.Forms
 {
-    partial class ImageViewer
+    sealed partial class ImageViewer
     {
         #region Obsoleted Leadtools Methods and Properties
 
@@ -109,7 +107,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveCenterAt(RasterViewerPointEventArgs e)
+        new void OnInteractiveCenterAt(RasterViewerPointEventArgs e)
         {
             throw new ExtractException("ELI21157",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -125,7 +123,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveFloater(RasterViewerPointEventArgs e)
+        new void OnInteractiveFloater(RasterViewerPointEventArgs e)
         {
             throw new ExtractException("ELI21158",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -141,7 +139,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveMagnifyGlass(RasterViewerLineEventArgs e)
+        new void OnInteractiveMagnifyGlass(RasterViewerLineEventArgs e)
         {
             throw new ExtractException("ELI21159",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -157,7 +155,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveModeChanged(EventArgs e)
+        new void OnInteractiveModeChanged(EventArgs e)
         {
             throw new ExtractException("ELI21160",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -173,7 +171,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveModeEnded(EventArgs e)
+        new void OnInteractiveModeEnded(EventArgs e)
         {
             throw new ExtractException("ELI21161",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -189,7 +187,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractivePage(RasterViewerLineEventArgs e)
+        new void OnInteractivePage(RasterViewerLineEventArgs e)
         {
             throw new ExtractException("ELI21162",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -205,7 +203,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractivePan(RasterViewerLineEventArgs e)
+        new void OnInteractivePan(RasterViewerLineEventArgs e)
         {
             throw new ExtractException("ELI21163",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -221,7 +219,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveRegionCombineModeChanged(EventArgs e)
+        new void OnInteractiveRegionCombineModeChanged(EventArgs e)
         {
             throw new ExtractException("ELI21164",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -237,7 +235,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveRegionEllipse(RasterViewerRectangleEventArgs e)
+        new void OnInteractiveRegionEllipse(RasterViewerRectangleEventArgs e)
         {
             throw new ExtractException("ELI21165",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -253,7 +251,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveRegionFreehand(RasterViewerPointsEventArgs e)
+        new void OnInteractiveRegionFreehand(RasterViewerPointsEventArgs e)
         {
             throw new ExtractException("ELI21166",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -269,7 +267,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveRegionRectangle(RasterViewerRectangleEventArgs e)
+        new void OnInteractiveRegionRectangle(RasterViewerRectangleEventArgs e)
         {
             throw new ExtractException("ELI21167",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -285,7 +283,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveRegionTypeChanged(EventArgs e)
+        new void OnInteractiveRegionTypeChanged(EventArgs e)
         {
             throw new ExtractException("ELI21168",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -301,7 +299,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveScale(RasterViewerLineEventArgs e)
+        new void OnInteractiveScale(RasterViewerLineEventArgs e)
         {
             throw new ExtractException("ELI21169",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -317,7 +315,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnInteractiveZoomTo(RasterViewerRectangleEventArgs e)
+        new void OnInteractiveZoomTo(RasterViewerRectangleEventArgs e)
         {
             throw new ExtractException("ELI21170",
                 "This method has been replaced by the OnCursorToolChanged method.");
@@ -362,7 +360,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "e")]
         // Don't mark this method as static or else the designer will serialize it.
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        protected new void OnSizeModeChanged(EventArgs e)
+        new void OnSizeModeChanged(EventArgs e)
         {
             throw new ExtractException("ELI21173",
                 "This method has been replaced by the OnFitModeChanged method.");

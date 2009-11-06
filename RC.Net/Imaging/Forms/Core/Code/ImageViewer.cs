@@ -3,7 +3,6 @@ using Extract.Imaging.Utilities;
 using Extract.Utilities.Forms;
 using Leadtools;
 using Leadtools.Annotations;
-using Leadtools.Codecs;
 using Leadtools.WinForms;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
-using System.IO;
 using System.Security.Permissions;
 using System.Windows.Forms;
 
@@ -290,9 +288,9 @@ namespace Extract.Imaging.Forms
     /// Represents a control that can display and interact with image files.
     /// </summary>
     [ToolboxBitmap(typeof(ImageViewer), ToolStripButtonConstants._IMAGE_VIEWER_ICON_IMAGE)]
-    public partial class ImageViewer : RasterImageViewer
+    public sealed partial class ImageViewer : RasterImageViewer
     {
-        #region Image Viewer Private Structs
+        #region Private Structs
 
         /// <summary>
         /// Represents a collection of mouse cursors associated with a particular
@@ -348,9 +346,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion
+        #endregion Private Structs
 
-        #region Image Viewer Constants
+        #region Constants
 
         /// <summary>
         /// Image file types constant for the open file dialog.
@@ -452,26 +450,44 @@ namespace Extract.Imaging.Forms
         /// </summary>
         static readonly int _SAVE_RETRY_COUNT = RegistryManager.SaveRetries;
 
-        #endregion
-
-        #region Image Viewer Static Fields
-
-        /// <summary>
-        /// Contains the <see cref="ImageViewerCursors"/> for each <see cref="CursorTool"/>.
-        /// </summary>
-        static Dictionary<CursorTool, ImageViewerCursors> _cursorsForCursorTools =
-            LoadCursorsForCursorTools();
-
         /// <summary>
         /// One-based index of the default image file type. This value corresponds to the all 
         /// image files option.
         /// </summary>
         /// <seealso cref="_IMAGE_FILE_TYPES"/>
-        static readonly int _IMAGE_FILE_TYPE_DEFAULT_INDEX = 9;
+        const int _IMAGE_FILE_TYPE_DEFAULT_INDEX = 9;
 
-        #endregion
+        #endregion Constants
 
-        #region Image Viewer Fields
+        #region Static Fields
+
+        /// <summary>
+        /// Contains the <see cref="ImageViewerCursors"/> for each <see cref="CursorTool"/>.
+        /// </summary>
+        static readonly Dictionary<CursorTool, ImageViewerCursors> _cursorsForCursorTools =
+            LoadCursorsForCursorTools();
+
+        /// <summary>
+        /// License cache for validating the core license.
+        /// </summary>
+        static readonly LicenseStateCache _licenseCore =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
+        /// <summary>
+        /// License cache for validating the annotation license.
+        /// </summary>
+        static readonly LicenseStateCache _licenseAnnotation =
+            new LicenseStateCache(LicenseIdName.AnnotationFeature, "Annotation Objects");
+
+        /// <summary>
+        /// License cache for validating the anti-alias license.
+        /// </summary>
+        static readonly LicenseStateCache _licenseAntiAlias =
+            new LicenseStateCache(LicenseIdName.AntiAliasingFeature, "Anti-aliasing Component");
+
+        #endregion Static Fields
+
+        #region Fields
 
         /// <summary>
         /// File name of the currently open image file.
@@ -629,13 +645,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <remarks>For performance reasons, the codecs are started once for each instance of the 
         /// <see cref="ImageViewer"/> and shutdown in the <see cref="Dispose"/> method.</remarks>
-        RasterCodecs _codecs;
-
-        /// <summary>
-        /// <see langword="true"/> if the codecs have been started; <see langword="false"/> if 
-        /// they have not yet been started.
-        /// </summary>
-        bool _codecsStarted;
+        ImageCodecs _codecs;
 
         /// <summary>
         /// Collection of annotation objects.
@@ -719,9 +729,9 @@ namespace Extract.Imaging.Forms
         string _defaultStatusMessage = "";
 
         /// <summary>
-        /// The file stream for the currently open image.
+        /// The image reader for the currently open image.
         /// </summary>
-        FileStream _currentOpenFile;
+        ImageReader _reader;
 
         /// <summary>
         /// Specifies whether the context menu should be prevented from opening.
@@ -733,25 +743,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         bool _allowBandedSelection = true;
 
-        /// <summary>
-        /// License cache for validating the core license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseCore =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
-        /// <summary>
-        /// License cache for validating the annotation license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseAnnotation =
-            new LicenseStateCache(LicenseIdName.AnnotationFeature, "Annotation Objects");
-
-        /// <summary>
-        /// License cache for validating the anti-alias license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseAntiAlias =
-            new LicenseStateCache(LicenseIdName.AntiAliasingFeature, "Anti-aliasing Component");
-
-        #endregion
+        #endregion Fields
 
         #region Image Viewer Events
 
@@ -876,9 +868,9 @@ namespace Extract.Imaging.Forms
                 else
                 {
                     // Turn on anti-aliasing
-                    RasterPaintProperties properties = base.PaintProperties;
+                    RasterPaintProperties properties = PaintProperties;
                     properties.PaintDisplayMode |= RasterPaintDisplayModeFlags.ScaleToGray;
-                    base.PaintProperties = properties;
+                    PaintProperties = properties;
                 }
 
                 // Set the fit mode
@@ -898,7 +890,7 @@ namespace Extract.Imaging.Forms
 
         #endregion
 
-        #region Image Viewer Properties
+        #region Properties
 
         /// <summary>
         /// Gets the name of the currently open image file.
@@ -1203,17 +1195,17 @@ namespace Extract.Imaging.Forms
                             _licenseAntiAlias.Validate("ELI21921");
 
                             // Turn on anti-aliasing
-                            RasterPaintProperties properties = base.PaintProperties;
+                            RasterPaintProperties properties = PaintProperties;
                             properties.PaintDisplayMode |= RasterPaintDisplayModeFlags.ScaleToGray;
-                            base.PaintProperties = properties;
+                            PaintProperties = properties;
                         }
                     }
                     else if (_useAntiAliasing)
                     {
                         // Turn off anti-aliasing
-                        RasterPaintProperties properties = base.PaintProperties;
+                        RasterPaintProperties properties = PaintProperties;
                         properties.PaintDisplayMode &= ~RasterPaintDisplayModeFlags.ScaleToGray;
-                        base.PaintProperties = properties;
+                        PaintProperties = properties;
                     }
 
                     _useAntiAliasing = value;
@@ -1247,7 +1239,7 @@ namespace Extract.Imaging.Forms
                 Rectangle tileArea = GetVisibleImageArea();
 
                 // Get the viewing rectangle in physical (client) coordinates
-                Rectangle imageArea = base.PhysicalViewRectangle;
+                Rectangle imageArea = PhysicalViewRectangle;
 
                 // Determine whether the bottom right point of 
                 // tile area is within the margin of error.
@@ -1275,7 +1267,7 @@ namespace Extract.Imaging.Forms
                 Rectangle tileArea = GetVisibleImageArea();
 
                 // Get the viewing rectangle in physical (client) coordinates
-                Rectangle imageArea = base.PhysicalViewRectangle;
+                Rectangle imageArea = PhysicalViewRectangle;
 
                 // Determine whether the bottom right point of 
                 // tile area is within the margin of error.
@@ -1514,7 +1506,7 @@ namespace Extract.Imaging.Forms
                             {
                                 // This is the first time the page is viewed, show the top of the page
                                 // [DotNetRCAndUtils #202]
-                                base.ScrollPosition = Point.Empty;
+                                ScrollPosition = Point.Empty;
                             }
                         }
                         else
@@ -1594,8 +1586,7 @@ namespace Extract.Imaging.Forms
             RasterImage image = null;
             try
             {
-                image = _codecs.Load(_currentOpenFile, 0, CodecsLoadByteOrder.BgrOrGray, 
-                    pageNumber, pageNumber);
+                image = _reader.ReadPage(pageNumber);
 
                 int rotation = _imagePages[pageNumber - 1].Orientation;
                 RotateImageByDegrees(image, rotation);
@@ -1619,8 +1610,8 @@ namespace Extract.Imaging.Forms
         void ShowFitToPage()
         {
             base.SizeMode = RasterPaintSizeMode.FitAlways;
-            base.ScaleFactor = _DEFAULT_SCALE_FACTOR;
-            base.ZoomToRectangle(base.DisplayRectangle);
+            ScaleFactor = _DEFAULT_SCALE_FACTOR;
+            base.ZoomToRectangle(DisplayRectangle);
         }
 
         /// <summary>
@@ -1631,8 +1622,8 @@ namespace Extract.Imaging.Forms
         void ShowFitToWidth()
         {
             base.SizeMode = RasterPaintSizeMode.FitWidth;
-            base.ScaleFactor = _DEFAULT_SCALE_FACTOR;
-            base.ZoomToRectangle(base.DisplayRectangle);
+            ScaleFactor = _DEFAULT_SCALE_FACTOR;
+            base.ZoomToRectangle(DisplayRectangle);
         }
 
 
@@ -2094,9 +2085,26 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Gets the codecs used to encode and decode images.
+        /// </summary>
+        /// <value>The codecs used to encode and decode images.</value>
+        public ImageCodecs Codecs
+        {
+            get 
+            { 
+                if (_codecs == null)
+                {
+                    _codecs = new ImageCodecs();
+                }
 
-        #region Image Viewer OnEvents
+                return _codecs;
+            }
+        }
+
+        #endregion Properties
+
+        #region OnEvents
 
         /// <summary>
         /// Raises the <see cref="Control.OnKeyDown"/> event.
@@ -2111,7 +2119,7 @@ namespace Extract.Imaging.Forms
                 if (_trackingData == null && _cursorTool == CursorTool.SelectLayerObject)
                 {
                     // Upate the mouse cursor
-                    base.Cursor = GetSelectionCursor(PointToClient(MousePosition));
+                    Cursor = GetSelectionCursor(PointToClient(MousePosition));
                 }
             }
             catch (Exception ex)
@@ -2135,7 +2143,7 @@ namespace Extract.Imaging.Forms
                 if (_trackingData == null && _cursorTool == CursorTool.SelectLayerObject)
                 {
                     // Update the mouse cursor
-                    base.Cursor = GetSelectionCursor(PointToClient(MousePosition));
+                    Cursor = GetSelectionCursor(PointToClient(MousePosition));
                 }
             }
             catch (Exception ex)
@@ -2236,7 +2244,7 @@ namespace Extract.Imaging.Forms
                     Cursor cursor = GetSelectionCursor(e.X, e.Y);
 
                     // Set the cursor
-                    base.Cursor = cursor;
+                    Cursor = cursor;
                 }
             }
             catch (Exception ex)
@@ -2716,7 +2724,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">An <see cref="ImageFileChangedEventArgs"/> that contains the event 
         /// data.</param>
-        protected virtual void OnImageFileChanged(ImageFileChangedEventArgs e)
+        void OnImageFileChanged(ImageFileChangedEventArgs e)
         {
             if (ImageFileChanged != null)
             {
@@ -2729,7 +2737,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">An <see cref="ImageFileClosingEventArgs"/> that contains
         /// the event data.</param>
-        protected virtual void OnImageFileClosing(ImageFileClosingEventArgs e)
+        void OnImageFileClosing(ImageFileClosingEventArgs e)
         {
             if (ImageFileClosing != null)
             {
@@ -2742,7 +2750,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">A <see cref="ZoomChangedEventArgs"/> that contains the event data.
         /// </param>
-        protected virtual void OnZoomChanged(ZoomChangedEventArgs e)
+        void OnZoomChanged(ZoomChangedEventArgs e)
         {
             if (ZoomChanged != null)
             {
@@ -2755,7 +2763,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">An <see cref="OrientationChangedEventArgs"/> that contains the event 
         /// data.</param>
-        protected virtual void OnOrientationChanged(OrientationChangedEventArgs e)
+        void OnOrientationChanged(OrientationChangedEventArgs e)
         {
             if (OrientationChanged != null)
             {
@@ -2768,7 +2776,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">An <see cref="CursorToolChangedEventArgs"/> that contains the event 
         /// data.</param>
-        protected virtual void OnCursorToolChanged(CursorToolChangedEventArgs e)
+        void OnCursorToolChanged(CursorToolChangedEventArgs e)
         {
             if (CursorToolChanged != null)
             {
@@ -2781,7 +2789,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">A <see cref="FitModeChangedEventArgs"/> that contains the event data.
         /// </param>
-        protected virtual void OnFitModeChanged(FitModeChangedEventArgs e)
+        void OnFitModeChanged(FitModeChangedEventArgs e)
         {
             if (FitModeChanged != null)
             {
@@ -2794,7 +2802,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">A <see cref="PageChangedEventArgs"/> that contains the event data.
         /// </param>
-        protected virtual void OnPageChanged(PageChangedEventArgs e)
+        void OnPageChanged(PageChangedEventArgs e)
         {
             if (PageChanged != null)
             {
@@ -2807,7 +2815,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">A <see cref="OpeningImageEventArgs"/> that contains the
         /// event data.</param>
-        protected virtual void OnOpeningImage(OpeningImageEventArgs e)
+        void OnOpeningImage(OpeningImageEventArgs e)
         {
             if (OpeningImage != null)
             {
@@ -2820,7 +2828,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">A <see cref="LoadingNewImageEventArgs"/> that contains
         /// the event data.</param>
-        protected virtual void OnLoadingNewImage(LoadingNewImageEventArgs e)
+        void OnLoadingNewImage(LoadingNewImageEventArgs e)
         {
             if (LoadingNewImage != null)
             {
@@ -2833,7 +2841,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="DisplayingPrintDialog"/> 
         /// event.</param>
-        protected virtual void OnDisplayingPrintDialog(DisplayingPrintDialogEventArgs e)
+        void OnDisplayingPrintDialog(DisplayingPrintDialogEventArgs e)
         {
             if (DisplayingPrintDialog != null)
             {
@@ -2846,7 +2854,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="FileOpenError"/> event.
         /// </param>
-        protected virtual void OnFileOpenError(FileOpenErrorEventArgs e)
+        void OnFileOpenError(FileOpenErrorEventArgs e)
         {
             if (FileOpenError != null)
             {
@@ -2859,7 +2867,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="LayerObjectEventArgs"/> 
         /// event.</param>
-        protected virtual void OnSelectionToolEnteredLayerObject(LayerObjectEventArgs e)
+        void OnSelectionToolEnteredLayerObject(LayerObjectEventArgs e)
         {
             if (SelectionToolEnteredLayerObject != null)
             {
@@ -2872,7 +2880,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="LayerObjectEventArgs"/> 
         /// event.</param>
-        protected virtual void OnSelectionToolLeftLayerObject(LayerObjectEventArgs e)
+        void OnSelectionToolLeftLayerObject(LayerObjectEventArgs e)
         {
             if (SelectionToolLeftLayerObject != null)
             {
@@ -2922,9 +2930,9 @@ namespace Extract.Imaging.Forms
 
                                 // Adjust the scroll so that the mouse is 
                                 // over the same point on the image
-                                Point scroll = base.ScrollPosition;
+                                Point scroll = ScrollPosition;
                                 scroll.Offset(mousePosition[0].X - e.X, mousePosition[0].Y - e.Y);
-                                base.ScrollPosition = scroll;
+                                ScrollPosition = scroll;
                             }
                             finally
                             {
@@ -2939,10 +2947,10 @@ namespace Extract.Imaging.Forms
                             if (HScroll)
                             {
                                 // Scroll horizontally
-                                Point scroll = base.ScrollPosition;
-                                scroll.X += base.AutoScrollSmallChange.Width * (e.Delta > 0 ?
+                                Point scroll = ScrollPosition;
+                                scroll.X += AutoScrollSmallChange.Width * (e.Delta > 0 ?
                                     -_MOUSEWHEEL_SCROLL_FACTOR : _MOUSEWHEEL_SCROLL_FACTOR);
-                                base.ScrollPosition = scroll;
+                                ScrollPosition = scroll;
                             }
                             break;
 
@@ -2953,10 +2961,10 @@ namespace Extract.Imaging.Forms
                             if (VScroll)
                             {
                                 // Scroll vertically
-                                Point scroll = base.ScrollPosition;
-                                scroll.Y += base.AutoScrollSmallChange.Height * (e.Delta > 0 ?
+                                Point scroll = ScrollPosition;
+                                scroll.Y += AutoScrollSmallChange.Height * (e.Delta > 0 ?
                                     -_MOUSEWHEEL_SCROLL_FACTOR : _MOUSEWHEEL_SCROLL_FACTOR);
-                                base.ScrollPosition = scroll;
+                                ScrollPosition = scroll;
                             }
                             break;
                     }
@@ -3061,9 +3069,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion
+        #endregion OnEvents
 
-        #region ImageViewer Event Handlers
+        #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="PrintDocument.BeginPrint"/> event.
@@ -3276,9 +3284,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion ImageViewer Event Handlers
+        #endregion Event Handlers
 
-        #region RasterImageViewer Overrides
+        #region Overrides
 
         /// <summary>
         /// Prevents <see cref="ImageViewer"/> from being drawn until <see cref="EndUpdate"/> is 
@@ -3320,6 +3328,6 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion
+        #endregion Overrides
     }
 }
