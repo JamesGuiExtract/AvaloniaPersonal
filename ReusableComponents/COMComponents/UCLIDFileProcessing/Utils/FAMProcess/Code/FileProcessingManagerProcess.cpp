@@ -12,15 +12,55 @@
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
 //--------------------------------------------------------------------------------------------------
+// Constants
+//--------------------------------------------------------------------------------------------------
+static const long gnSTOP_PROCESSING_TIMEOUT = 60000;
+
+//--------------------------------------------------------------------------------------------------
 // CFileProcessingManagerProcess
 //--------------------------------------------------------------------------------------------------
-CFileProcessingManagerProcess::CFileProcessingManagerProcess() : m_pUnkMarshaler(NULL)
+CFileProcessingManagerProcess::CFileProcessingManagerProcess() :
+m_pUnkMarshaler(NULL)
 {
 	try
 	{
 		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28441");
+}
+//--------------------------------------------------------------------------------------------------
+HRESULT CFileProcessingManagerProcess::FinalConstruct()
+{
+	try
+	{
+		m_ipFPM.CreateInstance(CLSID_FileProcessingManager);
+		ASSERT_RESOURCE_ALLOCATION("ELI28463", m_ipFPM != NULL);
+
+		return CoCreateFreeThreadedMarshaler(
+			GetControllingUnknown(), &m_pUnkMarshaler.p);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28464");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingManagerProcess::FinalRelease()
+{
+	try
+	{
+		if (m_ipFPM != NULL && m_ipFPM->ProcessingStarted == VARIANT_TRUE)
+		{
+			m_ipFPM->StopProcessing();
+			long nCount = 0;
+			while (nCount < gnSTOP_PROCESSING_TIMEOUT && m_ipFPM->ProcessingStarted == VARIANT_TRUE)
+			{
+				Sleep(100);
+				nCount += 100;
+			}
+		}
+			
+		m_ipFPM = NULL;
+		m_pUnkMarshaler.Release();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28465");
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -84,12 +124,40 @@ STDMETHODIMP CFileProcessingManagerProcess::Ping()
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28444");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManagerProcess::Start(BSTR bstrFPSFile)
+STDMETHODIMP CFileProcessingManagerProcess::Start()
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 	try
 	{
 		validateLicense();
+
+		// Check if already running
+		if (m_ipFPM->ProcessingStarted == VARIANT_TRUE)
+		{
+			UCLIDException uex("ELI28469", "This object is already running.");
+			throw uex;
+		}
+
+		// Ensure the FPS file is valid
+		if (!isValidFile(m_strFPSFile))
+		{
+			UCLIDException uex("ELI28470", "Cannot process, the specified FPS file cannot be found.");
+			uex.addDebugInfo("FPS File", m_strFPSFile);
+			throw uex;
+		}
+
+		// Load the FPS file into the File processing manager
+		m_ipFPM->LoadFrom(m_strFPSFile.c_str(), VARIANT_FALSE);
+
+		if (m_ipFPM->IsDBPasswordRequired == VARIANT_TRUE)
+		{
+			UCLIDException uex("ELI28475",
+				"DB Admin password required for current configuration, cannot process as a service.");
+			throw uex;
+		}
+
+		// Start the processing
+		m_ipFPM->StartProcessing();
 
 		return S_OK;
 	}
@@ -101,9 +169,40 @@ STDMETHODIMP CFileProcessingManagerProcess::Stop()
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 	try
 	{
+		// Only call stop processing if we have started
+		if (m_ipFPM->ProcessingStarted == VARIANT_TRUE)
+		{
+			m_ipFPM->StopProcessing();
+
+			// Wait for processing to complete
+			// Note: This may take a long time if processing a large document
+			while (m_ipFPM->ProcessingStarted == VARIANT_TRUE)
+			{
+				Sleep(100);
+			}
+		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28446");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManagerProcess::GetCounts(LONG *plNumFilesProcessed,
+													  LONG *plNumProcessingErrors,
+													  LONG *plNumFilesSupplied,
+													  LONG *plNumSupplyingErrors)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	try
+	{
+		validateLicense();
+
+		// Get the counts from the File processing manager
+		m_ipFPM->GetCounts(plNumFilesProcessed, plNumProcessingErrors, plNumFilesSupplied,
+			plNumSupplyingErrors);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28449");
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingManagerProcess::get_ProcessID(LONG* plPID)
@@ -122,19 +221,59 @@ STDMETHODIMP CFileProcessingManagerProcess::get_ProcessID(LONG* plPID)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28448");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManagerProcess::GetCounts(LONG *plNumFilesProcessed,
-													  LONG *plNumProcessingErrors,
-													  LONG *plNumFilesSupplied,
-													  LONG *plNumSupplyingErrors)
+STDMETHODIMP CFileProcessingManagerProcess::get_IsRunning(VARIANT_BOOL* pvbRunning)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 	try
 	{
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI28458", pvbRunning != NULL);
+
+		*pvbRunning = m_ipFPM->ProcessingStarted;
+
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28449");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28459");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManagerProcess::get_FPSFile(BSTR* pbstrFPSFile)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28460", pbstrFPSFile != NULL);
+
+		*pbstrFPSFile = _bstr_t(m_strFPSFile.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28461");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManagerProcess::put_FPSFile(BSTR bstrFPSFile)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	try
+	{
+		validateLicense();
+
+		string strFPSFile = asString(bstrFPSFile);
+		if (m_ipFPM->ProcessingStarted == VARIANT_TRUE)
+		{
+			UCLIDException uex("ELI28471", "Cannot change FPS file while actively running.");
+			uex.addDebugInfo("Current FPS File", m_strFPSFile);
+			uex.addDebugInfo("New FPS File", strFPSFile);
+			throw uex;
+		}
+
+		m_strFPSFile = strFPSFile;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28462");
 }
 
 //--------------------------------------------------------------------------------------------------

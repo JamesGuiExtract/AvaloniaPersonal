@@ -22,7 +22,10 @@ FPRecordManager::FPRecordManager()
   m_ipFPMDB(NULL),
   m_bKeepProcessingAsAdded(true),
   m_bProcessSkippedFiles(false),
-  m_bSkippedFilesForCurrentUser(true)
+  m_bSkippedFilesForCurrentUser(true),
+  m_nNumberOfFilesProcessed(0),
+  m_nNumberOfFilesProcessedSuccessfully(0),
+  m_nNumberOfFilesFailed(0)
 {
 	try
 	{
@@ -350,6 +353,16 @@ void FPRecordManager::setSkippedForCurrentUser(bool bSkippedForCurrentUser)
 {
 	m_bSkippedFilesForCurrentUser = bSkippedForCurrentUser;
 }
+//-------------------------------------------------------------------------------------------------
+long FPRecordManager::getNumberOfFilesProcessed()
+{
+	return m_nNumberOfFilesProcessedSuccessfully;
+}
+//-------------------------------------------------------------------------------------------------
+long FPRecordManager::getNumberOfFilesFailed()
+{
+	return m_nNumberOfFilesFailed;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private Methods
@@ -484,17 +497,21 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 					_lastCodePos = "210";
 					// Notify the DB that the file was processed
 					m_ipFPMDB->NotifyFileProcessed(nTaskID, m_strAction.c_str());
+					m_nNumberOfFilesProcessedSuccessfully++;
 				}
 				else if ( eNewStatus == kRecordFailed )
 				{
 					_lastCodePos = "220";
 					// Notify the DB that the file failed to process
 					m_ipFPMDB->NotifyFileFailed(nTaskID, m_strAction.c_str(), task.m_strException.c_str());
+
+					m_nNumberOfFilesFailed++;
 				}
 				else if ( eNewStatus == kRecordSkipped )
 				{
 					_lastCodePos = "225";
 					m_ipFPMDB->NotifyFileSkipped(nTaskID, m_nActionID);
+					m_nNumberOfFilesProcessedSuccessfully++;
 				}
 
 				_lastCodePos = "230";
@@ -726,6 +743,8 @@ void FPRecordManager::setNumberOfFilesToProcess(long nNumberOfFiles)
 {
 	m_nNumberOfFilesToProcess = nNumberOfFiles;
 	m_nNumberOfFilesProcessed = 0;
+	m_nNumberOfFilesProcessedSuccessfully = 0;
+	m_nNumberOfFilesFailed = 0;
 }
 //-------------------------------------------------------------------------------------------------
 bool FPRecordManager::removeTaskIfNotPendingOrCurrent(long nTaskID)

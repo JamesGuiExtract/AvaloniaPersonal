@@ -536,10 +536,9 @@ STDMETHODIMP CFileProcessingManager::PauseProcessing()
 			ipProcessingActionMgmtRole->Pause();
 		}
 
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12729")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingManager::get_ProcessingStarted(/*[out, retval]*/ VARIANT_BOOL *pbValue)
@@ -549,12 +548,14 @@ STDMETHODIMP CFileProcessingManager::get_ProcessingStarted(/*[out, retval]*/ VAR
 	try
 	{
 		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28476", pbValue != NULL);
 	
-		*pbValue = (m_bProcessing || m_bSupplying) ? VARIANT_TRUE : VARIANT_FALSE;
+		*pbValue = asVariantBool(m_bProcessing || m_bSupplying);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12730")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingManager::get_ProcessingPaused(/*[out, retval]*/ VARIANT_BOOL *pbValue)
@@ -875,6 +876,69 @@ STDMETHODIMP CFileProcessingManager::put_DatabaseName(/*[in]*/ BSTR newVal)
 	
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::GetCounts(long *plNumFilesProcessed, long *plNumProcessingErrors,
+											   long *plNumFilesSupplied, long *plNumSupplyingErrors)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		if (plNumFilesProcessed != NULL)
+		{
+			*plNumFilesProcessed = m_recordMgr.getNumberOfFilesProcessed();
+		}
+		if (plNumProcessingErrors != NULL)
+		{
+			*plNumProcessingErrors = m_recordMgr.getNumberOfFilesFailed();
+		}
+
+		// Check if there is a supplying manager
+		if (m_ipFSMgmtRole != NULL)
+		{
+			m_ipFSMgmtRole->GetSupplyingCounts(plNumFilesSupplied, plNumSupplyingErrors);
+		}
+		else
+		{
+			// No supplying manager so set supplying values to 0
+			if (plNumFilesSupplied != NULL)
+			{
+				plNumFilesSupplied = 0;
+			}
+			if (plNumSupplyingErrors != NULL)
+			{
+				plNumSupplyingErrors = 0;
+			}
+		}
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28468")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::get_IsDBPasswordRequired(VARIANT_BOOL* pvbIsDBPasswordRequired)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI28473", pvbIsDBPasswordRequired != NULL);
+
+		// Password is required if:
+		// 1. File processing is enabled [LRCAU #5478]
+		// 2. Skipped files are being processed
+		// 3. Processing skipped files for any user
+		// 4. DBInfo setting requires password to process skipped files for any user
+		*pvbIsDBPasswordRequired = asVariantBool(
+			getActionMgmtRole(m_ipFPMgmtRole)->Enabled == VARIANT_TRUE
+			&& m_ipFPMgmtRole->ProcessSkippedFiles == VARIANT_TRUE
+			&& m_ipFPMgmtRole->SkippedForAnyUser == VARIANT_TRUE
+			&& asString(getFPMDB()->GetDBInfoSetting(gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED.c_str())) == "1");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28474")
+}
 
 //-------------------------------------------------------------------------------------------------
 // IRoleNotifyFAM Methods
@@ -891,7 +955,11 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCompleted(void)
 		EStartStopStatus eStatus = kEndStop;
 		logStatusInfo(eStatus);
 
-		::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
+		// Only post a message to the dialog if it exists
+		if (m_apDlg.get() != NULL)
+		{
+			::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
+		}
 	}
 
 	return S_OK;
@@ -909,7 +977,11 @@ STDMETHODIMP CFileProcessingManager::NotifySupplyingCompleted(void)
 		EStartStopStatus eStatus = kEndStop;
 		logStatusInfo(eStatus);
 
-		::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
+		// Only post a message to the dialog if it exists
+		if (m_apDlg.get() != NULL)
+		{
+			::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
+		}
 	}
 	else
 	{
@@ -925,7 +997,11 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCancelling()
 
 	StopProcessing();
 
-	::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_CANCELLING, 0, 0);
+	// Only post a message to the dialog if it exists
+	if (m_apDlg.get() != NULL)
+	{
+		::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_CANCELLING, 0, 0);
+	}
 
 	return S_OK;
 }

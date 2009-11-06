@@ -377,6 +377,15 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(46), helpstring("property DatabaseName")] HRESULT DatabaseName([in] BSTR newVal);		
 		[propget, id(46), helpstring("property DatabaseName")] HRESULT DatabaseName([out, retval] BSTR *pVal);		
 		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get the number of files that processed, failed, where queued and failed to
+		//			queue since StartProcessing was called.
+		[id(47), helpstring("method GetCounts")] HRESULT GetCounts([out] long* plNumProcessed,
+			[out] long* plNumProcessingErrors, [out] long* plNumSupplied, [out] long* plNumSupplyingErrors);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets whether the DB password is required to perform processing.
+		[propget, id(48), helpstring("property IsDBPasswordRequired")] HRESULT IsDBPasswordRequired(
+			[out, retval] VARIANT_BOOL* pvbIsDBPasswordRequired);
+		//-----------------------------------------------------------------------------------------
 	};
 
 	[
@@ -1087,7 +1096,11 @@ library UCLID_FILEPROCESSINGLib
 		//			does not know how to read itself out of the FPS file stream.  Since the stream
 		//			is read from/written to at the outer scope, the outer scope needs to be able to
 		//			set the state of the dirty flag.
-		[id(3), helpstring("method SetDirty")] HRESULT SetDirty(VARIANT_BOOL newVal);
+		[id(3), helpstring("method SetDirty")] HRESULT SetDirty([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get the number of files that have been supplied and number of supplying errors
+		[id(4), helpstring("method GetSupplyingCounts")] HRESULT GetSupplyingCounts([out] long* plNumSupplied,
+			[out] long* plNumSupplyingErrors);
 		//-----------------------------------------------------------------------------------------
 	};
 

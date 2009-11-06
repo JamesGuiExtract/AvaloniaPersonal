@@ -133,6 +133,14 @@ public:
 	//			current user if bSkippedForCurrentUser == true, and process files skipped
 	//			by any user if bSkippedForCurrentUser == false
 	void setSkippedForCurrentUser(bool bSkippedForCurrentUser = true);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To return the number of files that have been processed successfully (this includes
+	// the number of skipped files).
+	long getNumberOfFilesProcessed();
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To return the number of files that have failed processing
+	long getNumberOfFilesFailed();
+	//---------------------------------------------------------------------------------------------
 
 private:
 
@@ -204,6 +212,12 @@ private:
 	// Value contains the number of files processed in the current run if m_nNumberOfFilesToProcess
 	// is > 0 otherwise this value is not updated.
 	long m_nNumberOfFilesProcessed;
+
+	// Value contains the number of files that processed successfully in the current run
+	long m_nNumberOfFilesProcessedSuccessfully;
+
+	// Value contains the number of files that failed to process in the current run
+	long m_nNumberOfFilesFailed;
 
 	// Values for determining if processing pending files or skipped files and if processing
 	// skipped files whether to process those skipped by all users or just current user

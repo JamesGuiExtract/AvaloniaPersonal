@@ -21,8 +21,9 @@ interface IFileProcessingManagerProcess : IDispatch
 	// Pings the FAMProcess.exe to ensure it is still alive
 	[id(1), helpstring("method Ping")] HRESULT Ping();
 	//----------------------------------------------------------------------------------------------
-	// Starts processing the specified FPS file
-	[id(2), helpstring("method Start")] HRESULT Start([in] BSTR bstrFPSFile);
+	// Starts processing the FPS File
+	// REQUIRES: FPS file has been set
+	[id(2), helpstring("method Start")] HRESULT Start();
 	//----------------------------------------------------------------------------------------------
 	// Stops the processing.  If no processing is being done, does nothing.
 	[id(3), helpstring("method Stop")] HRESULT Stop();
@@ -33,6 +34,15 @@ interface IFileProcessingManagerProcess : IDispatch
 	//----------------------------------------------------------------------------------------------
 	// Gets the current process ID
 	[propget, id(5), helpstring("property ProcessID")] HRESULT ProcessID([out, retval] LONG* plID);
+	//----------------------------------------------------------------------------------------------
+	// Gets whether the current instance is actively processing or not
+	[propget, id(6), helpstring("property IsRunning")] HRESULT IsRunning(
+		[out, retval] VARIANT_BOOL* pvbProcessing);
+	//----------------------------------------------------------------------------------------------
+	// Gets/sets the FPS file to process.
+	// Put requires that CurrentlyProcessing == VARIANT_FALSE
+	[propget, id(7), helpstring("property FPSFile")] HRESULT FPSFile([out, retval] BSTR* pbstrFileName);
+	[propput, id(7), helpstring("property FPSFile")] HRESULT FPSFile([in] BSTR bstrFileName);
 	//----------------------------------------------------------------------------------------------
 };
 

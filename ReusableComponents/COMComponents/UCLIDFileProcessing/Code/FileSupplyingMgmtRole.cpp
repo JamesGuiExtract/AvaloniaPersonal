@@ -36,6 +36,7 @@ const unsigned long gnCurrentVersion = 1;
 #define FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS(strELI, eFSRecordType) \
 	catch (UCLIDException& ue) \
 	{ \
+		m_nSupplyingErrors++; \
 		ue.addDebugInfo("CatchID", strELI); \
 		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
 		if ( stopSupplingIfDBNotConnected() ) \
@@ -50,6 +51,7 @@ const unsigned long gnCurrentVersion = 1;
 	} \
 	catch (_com_error& e) \
 	{ \
+		m_nSupplyingErrors++; \
 		UCLIDException ue; \
 		_bstr_t _bstrDescription = e.Description(); \
 		char *pszDescription = _bstrDescription; \
@@ -73,6 +75,7 @@ const unsigned long gnCurrentVersion = 1;
 	} \
 	catch (COleDispatchException *pEx) \
 	{ \
+		m_nSupplyingErrors++; \
 		UCLIDException ue; \
 		ue.createFromString(strELI, (LPCTSTR) pEx->m_strDescription); \
 		ue.addDebugInfo("Error Code", pEx->m_wCode); \
@@ -91,6 +94,7 @@ const unsigned long gnCurrentVersion = 1;
 	} \
 	catch (COleDispatchException& ex) \
 	{ \
+		m_nSupplyingErrors++; \
 		UCLIDException ue; \
 		ue.createFromString(strELI, (LPCTSTR) ex.m_strDescription); \
 		ue.addDebugInfo("Error Code", ex.m_wCode); \
@@ -108,7 +112,8 @@ const unsigned long gnCurrentVersion = 1;
 	} \
 	catch (COleException& ex) \
 	{ \
-		char pszCause[256]; \
+		m_nSupplyingErrors++; \
+		char pszCause[256] = {0}; \
 		ex.GetErrorMessage(pszCause, 255); \
 		UCLIDException ue; \
 		ue.createFromString(strELI, pszCause); \
@@ -127,7 +132,8 @@ const unsigned long gnCurrentVersion = 1;
 	} \
 	catch (CException* pEx) \
 	{ \
-		char pszCause[256]; \
+		m_nSupplyingErrors++; \
+		char pszCause[256] = {0}; \
 		pEx->GetErrorMessage(pszCause, 255); \
 		pEx->Delete(); \
 		UCLIDException ue; \
@@ -146,6 +152,7 @@ const unsigned long gnCurrentVersion = 1;
 	} \
 	catch (...) \
 	{ \
+		m_nSupplyingErrors++; \
 		UCLIDException ue(strELI, "Unexpected exception caught."); \
 		ue.addDebugInfo("CatchID", strELI); \
 		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
@@ -738,6 +745,28 @@ STDMETHODIMP CFileSupplyingMgmtRole::SetDirty(VARIANT_BOOL newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19428")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileSupplyingMgmtRole::GetSupplyingCounts(long *plNumSupplied, long *plNumSupplyingErrors)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Not validating license since this call is just grabbing statistics
+
+		if (plNumSupplied != NULL)
+		{
+			*plNumSupplied = m_nFilesSupplied;
+		}
+		if (plNumSupplyingErrors != NULL)
+		{
+			*plNumSupplyingErrors = m_nSupplyingErrors;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28472")
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileSupplierTarget
@@ -795,12 +824,15 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 			}
 			
 			// Add the file to the database
-			VARIANT_BOOL bAlreadyExists;
+			VARIANT_BOOL vbAlreadyExists;
+			VARIANT_BOOL vbForceProcessing = ipFSData->ForceProcessing;
 			UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
 			ipFileRecord = getFPMDB()->AddFile(bstrSimplifiedName, m_strAction.c_str(), 
-				ePriority, ipFSData->ForceProcessing, VARIANT_FALSE,
-				UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );	
+				ePriority, vbForceProcessing, VARIANT_FALSE,
+				UCLID_FILEPROCESSINGLib::kActionPending, &vbAlreadyExists, &easPrev );	
+
+			bool bAlreadyExists = asCppBool(vbAlreadyExists);
 
 			// Create and fill the FileSupplyingRecord to be passed to PostMessage
 			// Using an auto pointer in order to prevent a memory leak due to exceptions
@@ -811,9 +843,17 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 			apFileSupRec->m_ulFileID = asUnsignedLong(asString(ipFileRecord->FileID));
 			apFileSupRec->m_ePreviousActionStatus = easPrev;
 			apFileSupRec->m_ulNumPages = ipFileRecord->Pages;
-			apFileSupRec->m_bAlreadyExisted = (bAlreadyExists == VARIANT_TRUE);
+			apFileSupRec->m_bAlreadyExisted = bAlreadyExists;
 			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
 			apFileSupRec->m_strPriority = strPriority;
+
+			// Increment the number of files supplied if:
+			// 1. The file did not already exist OR
+			// 2. The file existed and ForceProcessing is on
+			if (!bAlreadyExists || vbForceProcessing == VARIANT_TRUE)
+			{
+				m_nFilesSupplied++;
+			}
 
 			// Post the message which will be handled by the FPDlg's OnQueueEvent method
 			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
@@ -1675,6 +1715,10 @@ UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr CFileSupplyingMgmtRole::getFAMTagMana
 //-------------------------------------------------------------------------------------------------
 void CFileSupplyingMgmtRole::clear()
 {
+	// Reset the files supplies and failed counts
+	m_nFilesSupplied = 0;
+	m_nSupplyingErrors = 0;
+
 	m_pDB = NULL;
 
 	m_ipFAMCondition = NULL;

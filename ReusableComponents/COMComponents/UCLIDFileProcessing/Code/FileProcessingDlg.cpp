@@ -389,19 +389,11 @@ void FileProcessingDlg::OnBtnRun()
 		m_bProcessingSkippedFiles = asCppBool(ipRole->ProcessSkippedFiles);
 
 		// Check if authentication is needed for processing skipped files [LRCAU #5413]
-		// Only prompt if the processing log page is visible [LRCAU #5478]
-		if (iProcLogIndex > 0
-			&& m_bProcessingSkippedFiles
-			&& ipRole->SkippedForAnyUser == VARIANT_TRUE)
+		if (ipFPM->IsDBPasswordRequired == VARIANT_TRUE)
 		{
-			// Get whether the password is required [LRCAU #5415]
-			string strRequirePass = asString(getDBPointer()->GetDBInfoSetting(
-				gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED.c_str()));
-
 			// Show the DB login prompt (if password is required)
 			VARIANT_BOOL vbCancelled;
-			if (strRequirePass == "1"
-				&& getDBPointer()->ShowAdminLogin(&vbCancelled) == VARIANT_FALSE)
+			if (getDBPointer()->ShowAdminLogin(&vbCancelled) == VARIANT_FALSE)
 			{
 				// Check if the user cancelled, only warn about invalid password
 				// if they didn't cancel [LRCAU #5419]

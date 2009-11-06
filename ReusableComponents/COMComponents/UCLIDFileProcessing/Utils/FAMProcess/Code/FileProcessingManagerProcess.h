@@ -5,6 +5,10 @@
 
 #include "FAMProcess.h"
 
+#include <string>
+
+using namespace std;
+
 // CFileProcessingManagerProcess
 
 class ATL_NO_VTABLE CFileProcessingManagerProcess :
@@ -31,16 +35,9 @@ END_COM_MAP()
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 	DECLARE_GET_CONTROLLING_UNKNOWN()
-	HRESULT FinalConstruct()
-	{
-		return CoCreateFreeThreadedMarshaler(
-			GetControllingUnknown(), &m_pUnkMarshaler.p);
-	}
 
-	void FinalRelease()
-	{
-		m_pUnkMarshaler.Release();
-	}
+	HRESULT FinalConstruct();
+	void FinalRelease();
 
 	//----------------------------------------------------------------------------------------------
 	// ISupportsErrorInfo
@@ -56,17 +53,26 @@ END_COM_MAP()
 	// IFileProcessingManagerProcess
 	//----------------------------------------------------------------------------------------------
 	STDMETHOD(Ping)();
-	STDMETHOD(Start)(BSTR bstrFPSFile);
+	STDMETHOD(Start)();
 	STDMETHOD(Stop)();
 	STDMETHOD(GetCounts)(LONG* plNumFilesProcessed, LONG* plNumProcessingErrors,
 		LONG* plNumFilesSupplied, LONG* plNumSupplyingErrors);
 	STDMETHOD(get_ProcessID)(LONG* plPID);
+	STDMETHOD(get_IsRunning)(VARIANT_BOOL* pvbRunning);
+	STDMETHOD(get_FPSFile)(BSTR* pbstrFPSFile);
+	STDMETHOD(put_FPSFile)(BSTR bstrFPSFile);
 
 private:
 	//----------------------------------------------------------------------------------------------
 	// Variables
 	//----------------------------------------------------------------------------------------------
 	CComPtr<IUnknown> m_pUnkMarshaler;
+
+	// The FPS file to process
+	string m_strFPSFile;
+
+	// The File processing manager used to perform processing
+	IFileProcessingManagerPtr m_ipFPM;
 
 	//----------------------------------------------------------------------------------------------
 	// Methods

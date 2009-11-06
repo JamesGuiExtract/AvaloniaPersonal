@@ -84,6 +84,9 @@ public:
 	STDMETHOD(put_DatabaseServer)(/*[in]*/ BSTR newVal);
 	STDMETHOD(get_DatabaseName)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(put_DatabaseName)(/*[in]*/ BSTR newVal);
+	STDMETHOD(GetCounts)(long* plNumFilesProcessed, long* plNumProcessingErrors,
+		long* plNumFilesSupplied, long* plNumSupplyingErrors);
+	STDMETHOD(get_IsDBPasswordRequired)(VARIANT_BOOL* pvbIsDBPasswordRequired);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);

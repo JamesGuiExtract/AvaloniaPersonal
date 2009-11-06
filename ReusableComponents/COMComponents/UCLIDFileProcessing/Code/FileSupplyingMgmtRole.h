@@ -94,6 +94,7 @@ public:
 	STDMETHOD(get_FAMCondition)(IObjectWithDescription ** pVal);
 	STDMETHOD(put_FAMCondition)(IObjectWithDescription * newVal);
 	STDMETHOD(SetDirty)(VARIANT_BOOL newVal);
+	STDMETHOD(GetSupplyingCounts)(long* plNumSupplied, long* plNumSupplyingErrors);
 
 // IFileSupplierTarget Methods
 	STDMETHOD(NotifyFileAdded)( BSTR bstrFile,  IFileSupplier * pSupplier);
@@ -155,6 +156,10 @@ private:
 
 	// Keep track of the number of suppliers that have been enabled
 	long m_nEnabledSupplierCount;
+
+	// Stores the count of files that have been supplied and that have failed supplying
+	volatile long m_nFilesSupplied;
+	volatile long m_nSupplyingErrors;
 
 	CMutex m_mutex;
 
