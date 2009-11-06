@@ -1,0 +1,214 @@
+using System;
+using System.IO;
+using Extract.Licensing;
+using Extract.Utilities;
+using Leadtools;
+using Leadtools.Codecs;
+
+namespace Extract.Imaging
+{
+    /// <summary>
+    /// Represents a writer that can write image files.
+    /// </summary>
+    public sealed class ImageWriter : IDisposable
+    {
+        #region Constants
+
+        static readonly string _OBJECT_NAME = typeof(ImageWriter).ToString();
+
+        #endregion Constants
+
+        #region Fields
+
+        /// <summary>
+        /// The name of the file to write.
+        /// </summary>
+        readonly string _fileName;
+
+        /// <summary>
+        /// Used to encode the image file.
+        /// </summary>
+        RasterCodecs _codecs;
+
+        /// <summary>
+        /// A temporary file used to store the image file until it is ready to <see cref="Commit"/>.
+        /// </summary>
+        TemporaryFile _tempFile;
+
+        /// <summary>
+        /// The number of pages written so far.
+        /// </summary>
+        int _pageCount;
+
+        /// <summary>
+        /// The file format of the output image.
+        /// </summary>
+        readonly RasterImageFormat _format;
+
+        /// <summary>
+        /// Extract licensing.
+        /// </summary>
+        static readonly LicenseStateCache _license =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
+        #endregion Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageWriter"/> class.
+        /// </summary>
+        /// <param name="fileName">The name of the file to output.</param>
+        /// <param name="codecs">The codecs used to encode the image.</param>
+        /// <param name="format">The output file format.</param>
+        internal ImageWriter(string fileName, RasterCodecs codecs, RasterImageFormat format)
+        {
+            _license.Validate("ELI28487");
+
+            _fileName = fileName;
+            _codecs = codecs;
+            _tempFile = new TemporaryFile();
+            _format = format;
+        }
+
+        #endregion Constructors
+
+        #region Methods
+
+        /// <summary>
+        /// Appends the specified image to the output image.
+        /// </summary>
+        /// <param name="image">The image to append to the output image.</param>
+        public void AppendImage(RasterImage image)
+        {
+            try
+            {
+                int count = image.PageCount;
+
+                _codecs.Save(image, _tempFile.FileName, _format, image.BitsPerPixel, 1, count,
+                    _pageCount + 1, CodecsSavePageMode.Append);
+
+                _pageCount += count;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI28466",
+                    "Unable to append page.", ex);
+                ee.AddDebugData("Destination file", _fileName, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Writes the specified tag to the specified page of the output image.
+        /// </summary>
+        /// <param name="tag">The tag to write.</param>
+        /// <param name="pageNumber">The page number on which the tag should appear.</param>
+        public void WriteTagOnPage(RasterTagMetadata tag, int pageNumber)
+        {
+            try
+            {
+                _codecs.WriteTag(_tempFile.FileName, pageNumber, tag);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI28483",
+                    "Unable to write tag.", ex);
+                ee.AddDebugData("Destination file", _fileName, false);
+                ee.AddDebugData("Page number", pageNumber, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Commits the image to disk.
+        /// </summary>
+        /// <param name="overwrite"><see langword="true"/> if the output file should be 
+        /// overwritten; <see langword="false"/> if an exception should be thrown if the 
+        /// destination file exists.</param>
+        public void Commit(bool overwrite)
+        {
+            try
+            {
+                // Attempt move first if possible, since this is fastest
+                if (!File.Exists(_fileName))
+                {
+                    try
+                    {
+                        File.Move(_tempFile.FileName, _fileName);
+                        _tempFile.Dispose();
+                        _tempFile = null;
+                        return;
+                    }
+                    catch (IOException)
+                    {
+                        // The destination file exists. Ignore for now. 
+                        // Later either an exception will be thrown or the file will be copied by force.
+                    }
+                }
+
+                // The file already exists. If not overwriting, throw an exception.
+                if (!overwrite)
+                {
+                    ExtractException ee = new ExtractException("ELI28454",
+                        "Destination file already exists.");
+                    throw ee;
+                }
+
+                // Attempt to overwrite the file. This is a little slower than moving the file.
+                File.Copy(_tempFile.FileName, _fileName, true);
+                _tempFile.Dispose();
+                _tempFile = null;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI28484",
+                    "Unable to write to file.", ex);
+                ee.AddDebugData("Destination file", _fileName, false);
+                ee.AddDebugData("Overwrite", overwrite, false);
+                throw ee;
+            }
+        }
+
+        #endregion Methods
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="ImageWriter"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <overloads>Releases resources used by the <see cref="ImageWriter"/>.</overloads>
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="ImageWriter"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>		
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Dispose of managed objects
+                if (_codecs != null)
+                {
+                    _codecs.Dispose();
+                    _codecs = null;
+                }
+                if (_tempFile != null)
+                {
+                    _tempFile.Dispose();
+                    _tempFile = null;
+                }
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable Members
+    }
+}
