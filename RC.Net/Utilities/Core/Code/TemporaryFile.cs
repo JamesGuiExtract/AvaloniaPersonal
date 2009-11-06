@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.IO;
 
 namespace Extract.Utilities
@@ -18,7 +15,7 @@ namespace Extract.Utilities
     /// } // The temporary file will be deleted no matter how the using statement is exited
     /// </code>
     /// </example>
-    public class TemporaryFile : IDisposable
+    public sealed class TemporaryFile : IDisposable
     {
         #region Fields
 
@@ -77,7 +74,7 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="fileInfo">A <see cref="FileInfo"/> object for the file to be managed
         /// by the <see cref="TemporaryFile"/> object.</param>
-        public TemporaryFile(FileInfo fileInfo)
+        public TemporaryFile(FileSystemInfo fileInfo)
         {
             try
             {
@@ -99,9 +96,6 @@ namespace Extract.Utilities
         /// LabResultsCustomComponents.OrderMapper may not have their dispose method called, this
         /// ensures files don't get left behind.
         /// </summary>
-        // I'm not calling Dispose(false) because so Dispose can log failures. Since logging
-        // failures allocates memory, I don't want to do that logging here.
-        [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
         ~TemporaryFile()
         {
             Dispose(false);
@@ -144,7 +138,7 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        protected virtual void Dispose(bool disposing)
+        void Dispose(bool disposing)
         {
             if (disposing)
             {
