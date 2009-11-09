@@ -160,6 +160,52 @@
 			<li>Confirm that ENTER does not create a new attribute.
 	       	</ul>
        	</ul>
+<p>
+	<LI><h2>Split Multi-Page Image</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> LegacyRC #5519
+  	   	<LI><b>Details:</b> This utility shall divide either a folder of TIF images or 
+		a specific TIF image into associated single-page images.  Single page files 
+		shall be named using a three-digit file extension such as 123.001, 123.002, etc. 
+		The single required command-line argument is either a folder name or a file name.
+		Optional arguments include: 
+		<ul>
+			<li><b>/ef &lt;LogFile&gt;</b> - to write exceptions to the specified 
+			log file
+			<li><b>/d</b> - to delete the multi-page image after splitting pages
+			<li><b>/o</b> - to overwrite the output files if necessary
+		</ul>
+		Annotations should be retained if annotation support is licensed.  Failure during 
+		processing of a single image should retain any previously split pages.  Failure 
+		during processing of a folder of images should retain previously split images.
+  	   	<LI><b>Main Checklists Updated:</b> Yes
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Confirm that a single-page TIF image is successfully split.
+	      		<li>Confirm that a multiple-page TIF image is successfully split.
+	      		<li>Confirm that a folder with a combination of single- and multiple-page 
+			TIF images is successfully split.
+	      		<li>Confirm that attempting to process a PDF image provides a meaningful 
+			error message.
+	      		<li>Confirm that a processing a folder with a combination of TIF and PDF 
+			successfully processes TIFs until the first PDF image is found.
+			<li>Confirm that a meaningful error message is presented.
+<p>
+			<li>Confirm that using the <b>/ef &lt;LogFile&gt;</b> option is 
+			effective.
+			<li>Confirm that using the <b>/d</b> option is effective.
+			<li>Confirm that using the <b>/o</b> option is effective.
+			<li>Confirm that without using the <b>/o</b> option, an error occurs 
+			if the output files already exist.
+<p>
+			<li>Confirm that the utility can be used with the FAM to process 
+			individual images via the <b>Core: Launch external application</b> task.
+	       	</ul>
+       	</ul>
 </OL>
 </BODY>
 </HTML>
