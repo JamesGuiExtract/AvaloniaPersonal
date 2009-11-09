@@ -32,6 +32,11 @@ namespace Extract.Utilities
                "Extract Systems");
 
         /// <summary>
+        /// Contains the list of invalid path characters.
+        /// </summary>
+        static readonly char[] _invalidPathCharacters = Path.GetInvalidPathChars();
+
+        /// <summary>
         /// Gets the full path to the Extract Systems program files directory.
         /// </summary>
         /// <returns>The full path to the Extract Systems program files directory.</returns>
@@ -695,6 +700,82 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI27312", ex);
+            }
+        }
+
+        /// <summary>
+        /// Combines the list of strings into a single path.
+        /// <para><b>Note:</b></para>
+        /// This method does not check the path for existence but will validate
+        /// each string for invalid path characters.
+        /// </summary>
+        /// <param name="list">The list of strings to combine. Must not
+        /// be <see langword="null"/> and <see cref="Array.Length"/> must be
+        /// &gt;= 2.</param>
+        /// <returns>The combined path string.</returns>
+        public static string PathCombine(params string[] list)
+        {
+            try
+            {
+                if (list == null || list.Length < 2)
+                {
+                    ExtractException ee = new ExtractException("ELI28503",
+                        "List must contain at least 2 items.");
+                    ee.AddDebugData("List Size", list != null ?
+                        list.Length.ToString(CultureInfo.CurrentCulture) : "<Null>", false);
+                    throw ee;
+                }
+
+                // Validate the first path string
+                ValidatePathString(list[0]);
+
+                // Iterate the list of strings and append each one to the path
+                // adding directory separators as needed
+                StringBuilder sb = new StringBuilder(list[0]);
+                for (int i = 1; i < list.Length; i++)
+                {
+                    // Validate this path string
+                    ValidatePathString(list[i]);
+
+                    // Get the last character of the current "Path" string
+                    char ch = sb[sb.Length-1];
+
+                    // Check if a directory separator is needed
+                    if (ch != Path.DirectorySeparatorChar
+                        && ch != Path.AltDirectorySeparatorChar)
+                    {
+                        // Add the directory separator
+                        sb.Append(Path.DirectorySeparatorChar);
+                    }
+
+                    // Append the next piece
+                    sb.Append(list[i]);
+                }
+
+                // Return the new path
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28504", ex);
+            }
+        }
+
+        /// <summary>
+        /// Checks the provided path for invalid path characters and throws an exception
+        /// if any invalid characters are found.
+        /// </summary>
+        /// <param name="path">The path to check for invalid characters.</param>
+        static void ValidatePathString(string path)
+        {
+            int index = path.IndexOfAny(_invalidPathCharacters);
+            if (index != -1)
+            {
+                ExtractException ee =
+                    new ExtractException("ELI28501", "Path contains an invalid character.");
+                ee.AddDebugData("Invalid Path String", path, false);
+                ee.AddDebugData("Index Of Invalid Character", index, false);
+                throw ee;
             }
         }
     }
