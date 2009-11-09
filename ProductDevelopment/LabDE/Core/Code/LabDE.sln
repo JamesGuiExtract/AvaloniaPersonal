@@ -725,12 +725,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactImporter", "..\..
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Imaging.Utilities", "..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcproj", "{E610E652-0891-40D4-B5CA-A622B87C7979}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 65
+		ProjectCount = 66
 		ProjectRelativeDiskPath1 = ..\..\DEPs\StandardLabDE\Core\Code\StandardLabDE.csproj
 		ProjectRelativeDiskPath2 = ..\..\..\..\RC.Net\DataEntry\Core\Code\Extract.DataEntry.csproj
 		ProjectRelativeDiskPath3 = LabDE.sln
@@ -796,6 +802,7 @@ Global
 		ProjectRelativeDiskPath63 = LabDE.sln
 		ProjectRelativeDiskPath64 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
 		ProjectRelativeDiskPath65 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
+		ProjectRelativeDiskPath66 = ..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1709,6 +1716,21 @@ Global
 		{DEDE4275-343B-40C2-B336-040D3D182A44}.Testing|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{DEDE4275-343B-40C2-B336-040D3D182A44}.Testing|Mixed Platforms.Build.0 = Release|Any CPU
 		{DEDE4275-343B-40C2-B336-040D3D182A44}.Testing|Win32.ActiveCfg = Release|Any CPU
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Debug|Win32.Build.0 = Debug|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Release|Any CPU.ActiveCfg = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Release|Win32.ActiveCfg = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Release|Win32.Build.0 = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Testing|Any CPU.ActiveCfg = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Testing|Mixed Platforms.ActiveCfg = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Testing|Mixed Platforms.Build.0 = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Testing|Win32.ActiveCfg = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Testing|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1725,6 +1747,7 @@ Global
 		{F3314BBE-B008-488D-A2E0-351C49D914D7} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{6DD0855C-6031-49F4-874C-667F3A576345} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
+		{E610E652-0891-40D4-B5CA-A622B87C7979} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
 		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}

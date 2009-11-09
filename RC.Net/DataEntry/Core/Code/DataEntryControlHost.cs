@@ -4425,8 +4425,8 @@ namespace Extract.DataEntry
                     if (valueOnPage != null && valueOnPage.HasSpatialInfo())
                     {
                         LongRectangle rectangle = valueOnPage.GetOCRImageBounds();
-                        int left = 0, top = 0, right = 0, bottom = 0;
-                        rectangle.GetBounds(ref left, ref top, ref right, ref bottom);
+                        int left, top, right, bottom;
+                        rectangle.GetBounds(out left, out top, out right, out bottom);
 
                         attributeBoundingZones[attribute] =
                             new RasterZone(Rectangle.FromLTRB(left, top, right, bottom),
