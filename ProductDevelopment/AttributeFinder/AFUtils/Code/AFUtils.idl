@@ -492,6 +492,10 @@ library UCLID_AFUTILSLib
 		[id(29), helpstring("method ExpandTagsAndFunctions")] HRESULT ExpandTagsAndFunctions(
 			[in] BSTR bstrInput, [in] IAFDocument *pDoc, [out, retval] BSTR *pbstrOutput);
 		//-----------------------------------------------------------------------------------------
+		// Removes all metadata attributes from the provided IIUnknownVector
+		[id(30), helpstring("method RemoveMetadataAttributes")] HRESULT RemoveMetadataAttributes(
+			[in] IIUnknownVector* pvecAttributes);
+		//-----------------------------------------------------------------------------------------
 	};
 	[
 		object,

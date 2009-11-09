@@ -9,6 +9,8 @@
 #include <map>
 #include <utility>
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CAutomatedRuleSetTester
 class ATL_NO_VTABLE CAutomatedRuleSetTester : 
@@ -60,10 +62,12 @@ private:
 	// used to expand the tags for the voa and eav files
 	IFAMTagManagerPtr			m_ipFAMTagManager;
 
+	IAFUtilityPtr				m_ipAFUtility;
+
 	// Map objects to track the total of individual values found
-	std::map<std::string, long> m_mapTotalExpected;
-	std::map<std::string, long> m_mapTotalCorrectFound;
-	std::map<std::string, long> m_mapTotalIncorrectlyFound;
+	map<string, long> m_mapTotalExpected;
+	map<string, long> m_mapTotalCorrectFound;
+	map<string, long> m_mapTotalIncorrectlyFound;
 
 	// When true attribute comparisons will be case sensitive
 	bool m_bCaseSensitive;
@@ -80,20 +84,20 @@ private:
 	// get attribute name/value/type and all its sub attributes in to a string
 	// nLevel -- top level attribute is at level 0. its sub attribute is level 1,
 	//			 and so on.
-	std::string attributeAsString(IAttributePtr ipAttribute, int nLevel);
+	string attributeAsString(IAttributePtr ipAttribute, int nLevel);
 
 	//========================================================================================
 	// get a compare string containing all of the attributes in the specified vector
-	std::string getAttributesCompareString(IIUnknownVectorPtr ipAttributes);
+	string getAttributesCompareString(IIUnknownVectorPtr ipAttributes);
 
 	//========================================================================================
 	// gets the qualified attribute name for the specified attribute
-	std::string getQualifiedName(IAttributePtr ipAttribute, const std::string& strQualifiedAttrName,
-		const std::string& strSeparator);
+	string getQualifiedName(IAttributePtr ipAttribute, const string& strQualifiedAttrName,
+		const string& strSeparator);
 	
 	//========================================================================================
 	// get the attribute as a string with the following format 'Name|Value|Type'
-	std::string getTopLevelAttributeString(IAttributePtr ipAttribute);
+	string getTopLevelAttributeString(IAttributePtr ipAttribute);
 
 	//========================================================================================
 	// returns the total number of 'lines' (attribute/subattribute/subsubattribute/etc)
@@ -120,7 +124,7 @@ private:
 	//								..Status|Good		-1 (false positive since did not match anything)
 	//								..Units|ng/ML		1
 	//								..Value|5.2			1
-	std::pair<long, bool> computeScore(IAttributePtr ipExpected, IAttributePtr ipFound);
+	pair<long, bool> computeScore(IAttributePtr ipExpected, IAttributePtr ipFound);
 
 	//========================================================================================
 	// Compare the current found attributes with expected attributes
@@ -131,25 +135,24 @@ private:
 	// Read input file, which is a text file for testing a rule set.
 	// Each rule set file will have its own input text file.
 	// This method will read in all line and concatenate them into a string
-	std::string fileAsString(const std::string& strInputFileName);
+	string fileAsString(const string& strInputFileName);
 
 	//========================================================================================
 	// Get current document classification info, such as the type of the
 	// document and the confidence level (Sure, Probable, Maybe)
-	std::string getDocumentClassificationInfo(IAFDocumentPtr ipAFDoc);
+	string getDocumentClassificationInfo(IAFDocumentPtr ipAFDoc);
 
 	//========================================================================================
 	// Get document probability using Sure, Probable, Maybe or Zero
-	std::string getDocumentProbabilityString(const std::string& strProbability);
+	string getDocumentProbabilityString(const string& strProbability);
 
 	//========================================================================================
-	// parse the file that contains all expected attributes and return them in
-	// an IIUnknownVector of IAttributes
-	IIUnknownVectorPtr getExpectedAttributes(const std::string& strExpectedAttrFileName);
+	// Parse the specified file and return all non-metadata attributes in an IUnknownVector
+	IIUnknownVectorPtr getAttributesFromFile(const string& strAttrFileName);
 
 	//========================================================================================
 	// Get the rule id for the rule that actually extracts the attributes
-	std::string getRuleID(IAFDocumentPtr ipAFDoc);
+	string getRuleID(IAFDocumentPtr ipAFDoc);
 
 	//========================================================================================
 	// interpret the line of text to see if it contains another dat file
@@ -157,8 +160,8 @@ private:
 	// strCurrentDatFileName -- current .dat file that's been processed
 	// nItemNumber -- each actual line number (exclude any empty lines) in the 
 	//				  current .dat file
-	void interpretLine(const std::string& strLineText,
-		const std::string& strCurrentDatFileName, const std::string& strCaseNum);
+	void interpretLine(const string& strLineText,
+		const string& strCurrentDatFileName, const string& strCaseNum);
 
 	//========================================================================================
 	// process the line that has another .dat file that requires further parsing
@@ -171,30 +174,31 @@ private:
 	//			  any empty or commented lines). Second '1' indicates where in its parent dat 
 	//			  file this dat file(2) is located. '3' indicates the actual test case's location
 	//			  in the aforementioned dat file(2).
-	void processDatFile(const std::string& strDatFileName, const std::string& strCaseNumPrefix = "");
+	void processDatFile(const string& strDatFileName, const string& strCaseNumPrefix = "");
 
 	//========================================================================================
 	// process the line that has three columns of info. They are .rsd file, 
 	// input text file (.txt, .uss), and expected output attribute value file (.eav)
 	// As a type of <TESTCASE>, each line can have 3-4 tokens 
 	// for rsd file, input text file,  and eav file 
-	void processTestCase(const std::string& strRSDFile, 
-		const std::string& strInputTextFile,
-		const std::string& strVOAFile,
-		const std::string& strEAVFile,
-		const std::string& strTestCaseTitle,
-		const std::string& strTestCaseNo);
+	void processTestCase(const string& strRSDFile,
+		const string& strInputImageFile,
+		const string& strInputTextFile,
+		const string& strVOAFile,
+		const string& strEAVFile,
+		const string& strTestCaseTitle,
+		const string& strTestCaseNo);
 
 	//========================================================================================
 	// process the line that has three columns of info. They are .rsd file, 
 	// input text files' folder
 	// As a type of <TESTFOLDER>, each line can have 2 tokens (excluding the tag)
-	void processTestFolder(const std::string& strRSDFile,
-		const std::string& strTestFolder,
-		const std::string& strVOAFilesExpression,
-		const std::string& strEAVFilesExpression,
-		const std::string& strDatFileName,
-		const std::string& strTestCaseNo);
+	void processTestFolder(const string& strRSDFile,
+		const string& strTestFolder,
+		const string& strVOAFilesExpression,
+		const string& strEAVFilesExpression,
+		const string& strDatFileName,
+		const string& strTestCaseNo);
 
 	//---------------------------------------------------------------------------------------------
 	// PROMISE:	To throw an exception if this object is not licensed to run
@@ -202,13 +206,13 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return the full path to the master test file.  The path is 
 	//			computed differently in debug and release builds.
-	const std::string getMasterTestFileName(IVariantVectorPtr ipParams, const std::string &strTCLFile) const;
+	const string getMasterTestFileName(IVariantVectorPtr ipParams, const string &strTCLFile) const;
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To compute and return the absolute path from the specified parent
 	//			file and relative file names.  If the computed absolute path is
 	//			does not exist, an exception will be thrown
-	const std::string getAndValidateAbsolutePath(
-		const std::string& strParentFile, const std::string& strRelativeFile);
+	const string getAndValidateAbsolutePath(
+		const string& strParentFile, const string& strRelativeFile);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To compare the values of the found and expected attributes and return 
 	//			true if an exact match and false otherwise.  Also compares each individual 
@@ -223,7 +227,7 @@ private:
 	//			strQualifiedAttrName is the Qualified name of the previously handled
 	//				attribute/sub attribute
 	bool compareResultVectors(IIUnknownVectorPtr ipFound, IIUnknownVectorPtr ipExpected,
-		const std::string& strQualifiedAttrName = "");
+		const string& strQualifiedAttrName = "");
 	//---------------------------------------------------------------------------------------------
 	// Adds a Test case containing the results of the attribute/sub attributes totals generated by 
 	// compareResultVectors
@@ -232,14 +236,14 @@ private:
 	// PROMISE: To return a vector of attributes from an "*" delimited string
 	//			Will replace all \n references in the string with an actual newline
 	// ARGS:	strInlineEAV - string containing a "*" delimited EAV style attribute list
-	IIUnknownVectorPtr processInlineEAVString(const std::string &strInlineEAV);
+	IIUnknownVectorPtr processInlineEAVString(const string &strInlineEAV);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return a string with the tags expanded as specified in strInput using
 	//			the strSourcDocName as the source
-	const std::string expandTagsAndTFE(const std::string &strInput, std::string &strSourceDocName);
+	const string expandTagsAndTFE(const string &strInput, string &strSourceDocName);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To count each of the expected attributes as well as its sub attributes
 	void countExpectedAttributes(IIUnknownVectorPtr ipExpected,
-		const std::string& strQualifiedAttrName = "");
+		const string& strQualifiedAttrName = "");
 	//---------------------------------------------------------------------------------------------
 };

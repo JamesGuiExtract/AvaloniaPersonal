@@ -11,7 +11,7 @@
 //-------------------------------------------------------------------------------------------------
 const unsigned long gnCurrentVersion = 11;
 const string gstrDEFAULT_META_FILE_NAME = "<SourceDocName>.xml";
-const string gstrDEFAULT_FEEDBACK_FOLDER = "$DirOf(<SourceDocName>)\\ExpectedRedactions";
+const string gstrDEFAULT_FEEDBACK_FOLDER = "$DirOf(<SourceDocName>)\\FeedbackData";
 const string gstrDEFAULT_REDACTION_TEXT = gstrEXEMPTION_CODES_TAG;
 
 //-------------------------------------------------------------------------------------------------

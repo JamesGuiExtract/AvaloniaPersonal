@@ -38,7 +38,7 @@ const string gstrOVER_REDACTION_ERAP_DEFAULT_VALUE = "30";
 const string gstrDOCTYPEQUERY = "DocumentType";
 
 //-------------------------------------------------------------------------------------------------
-// These output files will be written to "$DirOf(tcl file)\\OutputFiles - (Timestamp)"
+// These output files will be written to "$DirOf(tcl file)\\Analysis - (Timestamp)"
 //-------------------------------------------------------------------------------------------------
 // Files output in handleTestCase
 const string gstrFILES_WITH_EXPECTED_REDACTIONS = "\\SensitiveFiles_All.txt";
@@ -355,9 +355,9 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 				throw ue;
 			}	
 
-			// Determine the OutputFiles folder to create the log files in and create it
+			// Determine the Analysis folder to create the log files in and create it
 			m_strOutputFileDirectory = getDirectoryFromFullPath( strTestRuleSetsFile ) 
-				+ "\\OutputFiles - " + getTimeStamp();
+				+ "\\Analysis - " + getTimeStamp();
 			createDirectory( m_strOutputFileDirectory );
 
 			// Process the DAT file
@@ -713,40 +713,52 @@ void CIDShieldTester::handleTestFolder(const string& strRulesFile, const string&
 	// ensure the folder of images exists
 	validateFileOrFolderExistence(strAbsoluteImageDir);
 
-	// Get a list of the .tif files in the directory
+	// Get a list of the .tif or .uss files in the directory in order to find images based on the
+	// presense of either a tif file or a uss file (but not require a uss file).
 	vector<string> vecDirListing;
-	getFilesInDir( vecDirListing, strAbsoluteImageDir, "*.uss", false );
+	getFilesInDir(vecDirListing, strAbsoluteImageDir, "*.uss", false);
+	getFilesInDir(vecDirListing, strAbsoluteImageDir, "*.tif", false);
 
-	// Get the number of .uss files in the directory
-	int iNumFilesInDir = static_cast<int> ( vecDirListing.size() );
+	// If the directory contains tif and uss files, there will be duplicates. Extract the image name
+	// from each listing and add it to a set to eliminate duplicates.
+	set<string> setImageFilesToTest;
+	for each(string strFileName in vecDirListing)
+	{
+		EFileType eFileType = getFileType(strFileName);
+		if (eFileType == kUSSFile)
+		{
+			strFileName = getPathAndFileNameWithoutExtension(strFileName);
+		}
+		setImageFilesToTest.insert(strFileName);
+	}
 	
 	// Process each file in the folder
-	for( int i = 0; i < iNumFilesInDir; i++ )
+	int nTestCastNum = 1;
+	for each (string strImageFileName in setImageFilesToTest)
 	{
 		// Items to replace in the full path
 		string strFoundVOAFileWithTags = strFoundVOAFile;
 		string strExpectedVOAFileWithTags = strExpectedVOAFile;
-		string strImageFile = "";
-		string strSourceDoc = "";
-
-		// Get the filename from the directory listing (remove the .uss suffix)
-		strImageFile = getPathAndFileNameWithoutExtension(vecDirListing[i]);
 
 		// Get the .uss file name from the directory listing
-		strSourceDoc = vecDirListing[i];
+		string strOCRResults = strImageFileName + ".uss";
+		if (!isFileOrFolderValid(strOCRResults))
+		{
+			strOCRResults = strImageFileName;
+		}
 		
 		// Replace <SourceDocName> with the image file name for the ExpectedVOA and FoundVOA files
-		replaceVariable(strFoundVOAFileWithTags, "<SourceDocName>", strImageFile);
-		replaceVariable(strExpectedVOAFileWithTags, "<SourceDocName>", strImageFile);
+		replaceVariable(strFoundVOAFileWithTags, "<SourceDocName>", strImageFileName);
+		replaceVariable(strExpectedVOAFileWithTags, "<SourceDocName>", strImageFileName);
 
 		// Run a TextFunctionExpander to replace the remaining $DirOf style tags
 		TextFunctionExpander tfe;
 		string strFoundVOAFileWithExpandedTags = tfe.expandFunctions( strFoundVOAFileWithTags );
 		string strExpectedVOAFileWithExpandedTags = tfe.expandFunctions( strExpectedVOAFileWithTags );
 
-		// Execute the test case. i+1 starts the test file count at 1 instead of 0.
-		handleTestCase( strAbsoluteRulesFile, strImageFile, strSourceDoc, 
-			strFoundVOAFileWithExpandedTags, strExpectedVOAFileWithExpandedTags, i+1 , 
+		// Execute the test case.
+		handleTestCase( strAbsoluteRulesFile, strImageFileName, strOCRResults, 
+			strFoundVOAFileWithExpandedTags, strExpectedVOAFileWithExpandedTags, nTestCastNum++, 
 			strCurrentDatFileName);
 	}// end for
 }
@@ -769,8 +781,11 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			// Add the image file as an executable (via double click) note
 			m_ipResultLogger->AddTestCaseFile( strImageFile.c_str() );
 
-			// Add the file name note
-			m_ipResultLogger->AddTestCaseFile( strSourceDoc.c_str() );
+			// Add the strSourceDoc if it differs from the image file 
+			if (strSourceDoc != strImageFile)
+			{
+				m_ipResultLogger->AddTestCaseFile( strSourceDoc.c_str() );
+			}
 
 			// the expected VOA file must always be there
 			if (strExpectedVOAFile.empty())
@@ -799,6 +814,12 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			if( ::isFileOrFolderValid( strExpectedVOAFile ) )
 			{
 				ipExpectedAttributes->LoadFrom( strExpectedVOAFile.c_str(), VARIANT_FALSE );
+
+				// Don't include metadata, clues or DocumentType attributes from the expected
+				// voa file as expected redactions.
+				m_ipAFUtility->RemoveMetadataAttributes(ipExpectedAttributes);
+				m_ipAFUtility->QueryAttributes(ipExpectedAttributes, "Clues|DocumentType",
+					VARIANT_TRUE);
 			}
 			// If the file does not exist, there are no expected values, throw an exception
 			else
@@ -833,6 +854,9 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			{
 				// VOA file exists - so read found attributes from VOA file
 				ipFoundAttributes->LoadFrom( strFoundVOAFile.c_str(), VARIANT_FALSE);
+
+				// Do not include metadata attributes in any test.
+				m_ipAFUtility->RemoveMetadataAttributes(ipFoundAttributes);
 
 				// Increment the number of files that read from an existing VOA.
 				m_iNumFilesWithExistingVOA++;

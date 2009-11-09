@@ -113,16 +113,12 @@ namespace Extract.Redaction.Verification
             // 
             // _dataFolderBrowseButton
             // 
-            this._dataFolderBrowseButton.DefaultFilterIndex = -1;
-            this._dataFolderBrowseButton.FileFilter = null;
-            this._dataFolderBrowseButton.FileOrFolderPath = null;
             this._dataFolderBrowseButton.FolderBrowser = true;
             this._dataFolderBrowseButton.Location = new System.Drawing.Point(335, 37);
             this._dataFolderBrowseButton.Name = "_dataFolderBrowseButton";
             this._dataFolderBrowseButton.Size = new System.Drawing.Size(27, 20);
             this._dataFolderBrowseButton.TabIndex = 3;
             this._dataFolderBrowseButton.Text = "...";
-            this._dataFolderBrowseButton.TextControl = null;
             this._dataFolderBrowseButton.UseVisualStyleBackColor = true;
             this._dataFolderBrowseButton.PathSelected += new System.EventHandler<Extract.Utilities.Forms.PathSelectedEventArgs>(this.HandleDataFolderBrowseButtonPathSelected);
             // 
@@ -222,9 +218,9 @@ namespace Extract.Redaction.Verification
             this._collectRedactedCheckBox.AutoSize = true;
             this._collectRedactedCheckBox.Location = new System.Drawing.Point(9, 43);
             this._collectRedactedCheckBox.Name = "_collectRedactedCheckBox";
-            this._collectRedactedCheckBox.Size = new System.Drawing.Size(240, 17);
+            this._collectRedactedCheckBox.Size = new System.Drawing.Size(308, 17);
             this._collectRedactedCheckBox.TabIndex = 1;
-            this._collectRedactedCheckBox.Text = "All verified documents that contain redactions";
+            this._collectRedactedCheckBox.Text = "All verified documents that have (or had) redactions or clues";
             this._collectRedactedCheckBox.UseVisualStyleBackColor = true;
             // 
             // _collectAllCheckBox

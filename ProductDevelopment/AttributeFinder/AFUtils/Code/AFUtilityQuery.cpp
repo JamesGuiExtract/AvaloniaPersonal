@@ -362,6 +362,24 @@ STDMETHODIMP CAFUtility::IsValidQuery(BSTR bstrQuery, VARIANT_BOOL* pRetVal)
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAFUtility::RemoveMetadataAttributes(IIUnknownVector *pvecAttributes)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		IIUnknownVectorPtr ipAttributeVector(pvecAttributes);
+		ASSERT_ARGUMENT("ELI28439", ipAttributeVector != NULL);
+
+		removeMetadataAttributes(ipAttributeVector);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28440");
+}
 
 //-------------------------------------------------------------------------------------------------
 // private  methods related to querying
@@ -717,5 +735,34 @@ IAttributePtr CAFUtility::getAttributeParent(const IIUnknownVectorPtr& ipAttribu
 		return ipParent;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26434");
+}
+//-------------------------------------------------------------------------------------------------
+void CAFUtility::removeMetadataAttributes(const IIUnknownVectorPtr &ripAttributeVector)
+{
+	try
+	{
+		long lSize = ripAttributeVector->Size();
+		for (long i = 0; i < lSize; i++)
+		{
+			IAttributePtr ipAttribute = ripAttributeVector->At(i);
+			ASSERT_ARGUMENT("ELI28451", ipAttribute != NULL);
+
+			// Per discussion with Arvind, assume any attribute whose name begins with an underscore
+			// is metadata.
+			string strAttributeName = asString(ipAttribute->Name);
+			if (!strAttributeName.empty() && strAttributeName[0] == '_')
+			{
+				ripAttributeVector->Remove(i);
+				lSize--;
+				i--;
+			}
+			// Search for and remove any child metadata attributes.
+			else
+			{
+				removeMetadataAttributes(ipAttribute->SubAttributes);
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28493");
 }
 //-------------------------------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 using Extract.Imaging.Forms;
+using System.IO;
 
 namespace Extract.Redaction.Verification
 {
@@ -40,6 +41,22 @@ namespace Extract.Redaction.Verification
         readonly string _feedbackImage;
 
         /// <summary>
+        /// The fully expanded path to the destination found attributes voa file.
+        /// </summary>
+        readonly string _foundAttributesFileName;
+
+        /// <summary>
+        /// The fully expanded path to the destination expected attributes voa file.
+        /// </summary>
+        readonly string _expectedAttributesFileName;
+
+        /// <summary>
+        /// Indicates whether redactions have been loaded or saved as part of this memento whether
+        /// or not the memento presently contains redactions.
+        /// </summary>
+        bool _hasContainedRedactions;
+
+        /// <summary>
         /// A collection of the visited 0-based page numbers.
         /// </summary>
         VisitedItemsCollection _visitedPages;
@@ -65,6 +82,12 @@ namespace Extract.Redaction.Verification
             _voaFile = attributesFile;
             _documentType = documentType;
             _feedbackImage = feedbackImage;
+
+            // Initialize the destination found and expected voa files using the destination
+            // feedbackImage filename as a base.
+            int extentionPos = feedbackImage.Length - Path.GetExtension(feedbackImage).Length;
+            _foundAttributesFileName = feedbackImage.Substring(0, extentionPos) + ".found.voa";
+            _expectedAttributesFileName = feedbackImage.Substring(0, extentionPos) + ".expected.voa";
         }
 
         #endregion VerificationMemento Constructors
@@ -140,6 +163,53 @@ namespace Extract.Redaction.Verification
             get
             {
                 return _feedbackImage;
+            }
+        }
+
+        /// <summary>
+        /// Gets the filename that should be used to save found attributes for feedback.
+        /// </summary>
+        /// <returns>The filename that should be used to save found attributes for feedback.
+        /// </returns>
+        public string FoundAttributesFileName
+        {
+            get
+            {
+                return _foundAttributesFileName;
+            }
+        }
+
+        /// <summary>
+        /// Gets the filename that should be used to save expected attributes for feedback.
+        /// </summary>
+        /// <returns>The filename that should be used to save expected attributes for feedback.
+        /// </returns>
+        public string ExpectedAttributesFileName
+        {
+            get
+            {
+                return _expectedAttributesFileName;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether redactions have been loaded or saved as part of this memento
+        /// whether or not the memento presently contains redactions.
+        /// </summary>
+        /// <value><see langword="true"/> if the memento is known to have been loaded or saved with
+        /// redactions present; <see langword="false"/> otherwise.</value>
+        /// <returns><see langword="true"/> if the memento is known to have been loaded or saved with
+        /// redactions present; <see langword="false"/> otherwise.</returns>
+        public bool HasContainedRedactions
+        {
+            get
+            {
+                return _hasContainedRedactions;
+            }
+
+            set
+            {
+                _hasContainedRedactions = value;
             }
         }
 

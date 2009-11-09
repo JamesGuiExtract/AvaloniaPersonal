@@ -129,6 +129,7 @@ public:
 	STDMETHOD(get_ShouldCacheRSD)(
 		/*[out, retval]*/ VARIANT_BOOL *pvbCacheRSD);
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, IAFDocument *pDoc, BSTR *pbstrOutput);
+	STDMETHOD(RemoveMetadataAttributes)(IIUnknownVector* pvecAttributes);
 
 private:
 	//////////////////
@@ -261,6 +262,10 @@ private:
 	unsigned int getAttributeLevel(const string& strName);
 	//---------------------------------------------------------------------------------------------
 	void removeDots(string& rstrName);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Removes all metadata attributes from the vector (as indicated by attribute names
+	//			that begin with an underscore).
+	void removeMetadataAttributes(const IIUnknownVectorPtr &ripAttributeVector);
 	//---------------------------------------------------------------------------------------------
 
 	/////////////

@@ -25,8 +25,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-using namespace std;
-
 //-------------------------------------------------------------------------------------------------
 // Local structs
 //-------------------------------------------------------------------------------------------------
@@ -167,13 +165,15 @@ CAutomatedRuleSetTester::CAutomatedRuleSetTester()
   m_ipCurrentAttributes( CLSID_IUnknownVector ),
   m_bCaseSensitive(true),
   m_bEAVMustExist(false),
-  m_ipFAMTagManager(CLSID_FAMTagManager)
+  m_ipFAMTagManager(CLSID_FAMTagManager),
+  m_ipAFUtility(CLSID_AFUtility)
 {
 	try
 	{
 		ASSERT_RESOURCE_ALLOCATION("ELI07427", m_ipAttrFinderEngine != NULL);
 		ASSERT_RESOURCE_ALLOCATION("ELI07429", m_ipCurrentAttributes != NULL);
 		ASSERT_RESOURCE_ALLOCATION("ELI15211", m_ipFAMTagManager != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI28477", m_ipAFUtility != NULL);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07430")
 }
@@ -182,6 +182,10 @@ CAutomatedRuleSetTester::~CAutomatedRuleSetTester()
 {
 	try
 	{
+		m_ipAttrFinderEngine = NULL;
+		m_ipCurrentAttributes = NULL;
+		m_ipFAMTagManager = NULL;
+		m_ipAFUtility = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16307");
 }
@@ -228,7 +232,7 @@ STDMETHODIMP CAutomatedRuleSetTester::raw_RunAutomatedTests(IVariantVector* pPar
 			// Default to displaying entries for each test case
 			m_ipResultLogger->AddEntriesToTestLogger = VARIANT_TRUE;
 
-			std::string strTCLFilename = asString(strTCLFile);
+			string strTCLFilename = asString(strTCLFile);
 
 			// find the master test file
 			string strTestRuleSetsFile = getMasterTestFileName(pParams, strTCLFilename);
@@ -751,15 +755,15 @@ string CAutomatedRuleSetTester::getDocumentProbabilityString(const string& strPr
 	return strDescriptions[nIndex];
 }
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CAutomatedRuleSetTester::getExpectedAttributes(const string& strExpectedAttrFileName)
+IIUnknownVectorPtr CAutomatedRuleSetTester::getAttributesFromFile(const string& strAttrFileName)
 {
 
-	int iPos = strExpectedAttrFileName.find('|');
+	int iPos = strAttrFileName.find('|');
 	
-	if(iPos == std::string::npos)
+	if(iPos == string::npos)
 	{
-		// if the file is not found that means there are no expected attributes
-		if(!isFileOrFolderValid(strExpectedAttrFileName))
+		// if the file is not found that means there are no attributes
+		if(!isFileOrFolderValid(strAttrFileName))
 		{
 			IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI09711", ipAttributes != NULL);
@@ -767,15 +771,19 @@ IIUnknownVectorPtr CAutomatedRuleSetTester::getExpectedAttributes(const string& 
 		}
 		else
 		{
-			IAFUtilityPtr ipAFUtility(CLSID_AFUtility);
-			ASSERT_RESOURCE_ALLOCATION("ELI09541", ipAFUtility != NULL);
-		
-			return ipAFUtility->GetAttributesFromFile(get_bstr_t(strExpectedAttrFileName.c_str()));
+			IIUnknownVectorPtr ipAttributes =
+				m_ipAFUtility->GetAttributesFromFile(get_bstr_t(strAttrFileName.c_str()));
+			ASSERT_RESOURCE_ALLOCATION("ELI28452", ipAttributes != NULL);
+
+			// Metadata attributes should not be considered in any test; remove them from the vector.
+			m_ipAFUtility->RemoveMetadataAttributes(ipAttributes);
+
+			return ipAttributes;
 		}
 	}
 	else
 	{
-		return processInlineEAVString(strExpectedAttrFileName);
+		return processInlineEAVString(strAttrFileName);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -873,9 +881,10 @@ void CAutomatedRuleSetTester::interpretLine(const string& strLineText,
 		}
 		bool bProcess = true;
 
-
 		string strRSDFile;
 		string strInputFile;
+		string strImageFile;
+		string strTextFile;
 		string strEAVFile;
 		string strVOAFile;
 
@@ -884,6 +893,18 @@ void CAutomatedRuleSetTester::interpretLine(const string& strLineText,
 			// these 2 items are fully qualified paths
 			strRSDFile = getAndValidateAbsolutePath(strCurrentDatFileName, vecTokens[1]);
 			strInputFile = getAndValidateAbsolutePath(strCurrentDatFileName, vecTokens[2]);
+
+			EFileType eFileType = getFileType(strInputFile);
+			if (eFileType == kUSSFile || eFileType == kTXTFile)
+			{
+				strImageFile = getPathAndFileNameWithoutExtension(strInputFile);
+				strTextFile = strInputFile;
+			}
+			else
+			{
+				strImageFile = strInputFile;
+				strTextFile = "";
+			}
 
 			// These 2 items may contain tags and will be expanded below
 			strVOAFile = vecTokens[3];
@@ -900,10 +921,10 @@ void CAutomatedRuleSetTester::interpretLine(const string& strLineText,
 		{
 			string strEAVFileName;
 			// check for inline attributes
-			if(strEAVFile.find("|") == std::string::npos)
+			if(strEAVFile.find("|") == string::npos)
 			{
 				// Expand any tags in the EAV file expresion to get the file name
-				strEAVFileName = expandTagsAndTFE(strEAVFile, strInputFile );
+				strEAVFileName = expandTagsAndTFE(strEAVFile, strInputFile);
 
 				// If there is no long path present, attach the current dat file's directory path
 				// as a prefix to the EAV file. This allows the user to specify "Test1.eav"
@@ -915,7 +936,7 @@ void CAutomatedRuleSetTester::interpretLine(const string& strLineText,
 			}
 
 			// Expand tags to get the VOA file name
-			string strVOAFileName = expandTagsAndTFE(strVOAFile, strInputFile );
+			string strVOAFileName = expandTagsAndTFE(strVOAFile, strInputFile);
 
 			// If there is no long path present, attach the current dat file's directory path
 			// as a prefix to the VOA file. This allows the user to specify "Test1.voa"
@@ -932,8 +953,8 @@ void CAutomatedRuleSetTester::interpretLine(const string& strLineText,
 			}
 			
 			// process this test case
-			processTestCase(strRSDFile, strInputFile, strVOAFileName, strEAVFileName, 
-				strCurrentDatFileName, strCaseNum);
+			processTestCase(strRSDFile, strImageFile, strTextFile, strVOAFileName,
+				strEAVFileName, strCurrentDatFileName, strCaseNum);
 		}
 	}
 	else if (strTag == "<TESTFOLDER>")
@@ -1110,7 +1131,8 @@ void CAutomatedRuleSetTester::processDatFile(const string& strDatFileName,
 }
 //-------------------------------------------------------------------------------------------------
 void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile, 
-											  const string& strInputTextFile,
+											  const string& strImageFile,
+											  const string& strTextFile,
 											  const string& strVOAFile,
 											  const string& strEAVFile,
 											  const string& strTestCaseTitle,
@@ -1133,21 +1155,47 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 
 			// Add note for RSD file plus input filename
 			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strRSDFile.c_str()));
-			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strInputTextFile.c_str()));
 
-			string strFolderName = ::getDirectoryFromFullPath(strInputTextFile.c_str()) + "\\";
-			string strImageFileName = ::getFileNameWithoutExtension(strInputTextFile);
+			string strInputFile;
+			string strBaseFileName;
 
-			// Add note for image File
-			string strImageFileWithPath = strFolderName + strImageFileName;
-			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strImageFileWithPath.c_str()));
+			if (!strTextFile.empty())
+			{
+				// If a text or uss file is provided, add it as a test case file and use it to
+				// derive strBaseFileName
+				m_ipResultLogger->AddTestCaseFile(get_bstr_t(strTextFile.c_str()));
+				strBaseFileName = getFileNameWithoutExtension(strTextFile);
+
+				// The input file to use for FindAttributes is the text file.
+				strInputFile = strTextFile;
+			}
+			else
+			{
+				// If a text file was not provided, ensure a valid image file was.
+				if ( strImageFile.empty())
+				{
+					THROW_LOGIC_ERROR_EXCEPTION("ELI28492");
+				}
+
+				// Use the image file sans the full path as strBaseFileName
+				strBaseFileName = getFileNameFromFullPath(strImageFile);
+
+				// The input file to use for FindAttributes is the image file.
+				strInputFile = strImageFile;
+			}
+
+			// Add the image name as a test case file if it is specified and available.
+			if (!strImageFile.empty() && isValidFile(strImageFile))
+			{
+				m_ipResultLogger->AddTestCaseFile(get_bstr_t(strImageFile.c_str()));
+			}
 
 			// Add note for EAV File
 			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strEAVFile.c_str()));
 
 			// Add note for .nte file
 			string strEAVFileDir = ::getDirectoryFromFullPath( strEAVFile.c_str()) + "\\";
-			strNoteFile = strEAVFileDir + strImageFileName + ".nte";
+			strNoteFile = strEAVFileDir + strBaseFileName + ".nte";
 			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strNoteFile.c_str()));
 
 			// make sure current Attributes Vector is empty
@@ -1162,7 +1210,7 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 
 				// find all attributes in the text file
 				m_ipCurrentAttributes = m_ipAttrFinderEngine->FindAttributes( ipAFDoc, 
-					get_bstr_t(strInputTextFile.c_str()), -1, get_bstr_t(strRSDFile.c_str()), 
+					get_bstr_t(strInputFile.c_str()), -1, get_bstr_t(strRSDFile.c_str()), 
 					NULL, VARIANT_FALSE, NULL);
 
 				// add document classification information
@@ -1187,7 +1235,7 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 				m_ipResultLogger->AddTestCaseFile(get_bstr_t(strVOAFile.c_str()));
 
 				// VOA file exists so load the expected attributes from the voa file
-				m_ipCurrentAttributes = getExpectedAttributes(strVOAFile);
+				m_ipCurrentAttributes = getAttributesFromFile(strVOAFile);
 			}
 
 		}
@@ -1211,7 +1259,7 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 			}
 
 			// get expected attributes from the file
-			IIUnknownVectorPtr ipExpectedAttributes = getExpectedAttributes(strEAVFile);
+			IIUnknownVectorPtr ipExpectedAttributes = getAttributesFromFile(strEAVFile);
 			ASSERT_RESOURCE_ALLOCATION("ELI25295", ipExpectedAttributes != NULL);
 
 			if(!m_bCaseSensitive)
@@ -1296,28 +1344,57 @@ void CAutomatedRuleSetTester::processTestFolder(const string& strRSDFile,
 												const string& strDatFileName,
 												const string& strTestCaseNo)
 {
-	// get all .txt file from the folder
-	vector<string> vecTextFiles;
-	::getFilesInDir(vecTextFiles, strTestFolder, "*.uss", true);
-	if (vecTextFiles.size() == 0)
+	// Get all .txt and .uss files from the folder
+	vector<string> vecSourceFiles;
+	::getFilesInDir(vecSourceFiles, strTestFolder, "*.txt", true);
+	::getFilesInDir(vecSourceFiles, strTestFolder, "*.uss", true);
+
+	// Compile a map of unique image file names (given the files in vecSourceFiles) to their
+	// associated source file.
+	map<string, string> mapImageFileToSourceFile;
+	for each (string strFileName in vecSourceFiles)
 	{
-		// if there's no uss file at all, get .txt files
-		::getFilesInDir(vecTextFiles, strTestFolder, "*.txt", true);
+		// If source document is a text or uss file, the image file name is the source doc name
+		// minus the extension.
+		string strImageFileName = getPathAndFileNameWithoutExtension(strFileName);
+		mapImageFileToSourceFile[strImageFileName] = strFileName;
 	}
 
-	for (unsigned int ui = 0; ui < vecTextFiles.size(); ui++)
+	// get all .tif files from the folder
+	vecSourceFiles.clear();
+	::getFilesInDir(vecSourceFiles, strTestFolder, "*.tif", true);
+
+	// Update the map of unique image file names to their associated source file with any images
+	// that don't have an associated txt or uss file.
+	for each (string strFileName in vecSourceFiles)
 	{
-		// Get the input file name
-		string strInputTextFileName = vecTextFiles[ui];
+		// The source doc is an image file.  If a uss or txt file has already been associated
+		// with the image file there is nothing to do. Otherwire 
+		if (mapImageFileToSourceFile.find(strFileName) == mapImageFileToSourceFile.end())
+		{
+			mapImageFileToSourceFile[strFileName] = strFileName;
+		}
+	}
+
+	int nTestCastNum = 1;
+	for each (pair<string, string> pairImageFileToSourceFile in mapImageFileToSourceFile)
+	{
+		// Get the input image and source file name.
+		string strImageFileName = pairImageFileToSourceFile.first;
+		string strSourceFileName = pairImageFileToSourceFile.second;
+
+		// If the source filename differs from the image filename, it is the text filename;
+		// otherwise there is no text filename.
+		string strTextFileName = (strImageFileName != strSourceFileName) ? strSourceFileName : "";
 
 		// Expand the eav file name
-		string strEAVFileName = expandTagsAndTFE( strEAVFilesExpression, strInputTextFileName);
+		string strEAVFileName = expandTagsAndTFE( strEAVFilesExpression, strSourceFileName);
 
 		// Add the path relative to the dat file if necessary
 		strEAVFileName = getAbsoluteFileName( strDatFileName, strEAVFileName );
 
 		// Expand the voa file name
-		string strVOAFileName = expandTagsAndTFE(strVOAFilesExpression, strInputTextFileName);
+		string strVOAFileName = expandTagsAndTFE(strVOAFilesExpression, strSourceFileName);
 
 		// if not empty add the path relative to the dat file
 		if ( !strVOAFileName.empty() )
@@ -1335,9 +1412,9 @@ void CAutomatedRuleSetTester::processTestFolder(const string& strRSDFile,
 		if (!m_bEAVMustExist || isValidFile(strEAVFileName))
 		{
 			CString zCaseNo("");
-			zCaseNo.Format("%s_%d", strTestCaseNo.c_str(), ui + 1);
-			processTestCase(strRSDFile, strInputTextFileName, strVOAFileName, strEAVFileName, 
-				strDatFileName, (LPCTSTR)zCaseNo);
+			zCaseNo.Format("%s_%d", strTestCaseNo.c_str(), nTestCastNum++);
+			processTestCase(strRSDFile, strImageFileName, strTextFileName, strVOAFileName,
+				strEAVFileName, strDatFileName, (LPCTSTR)zCaseNo);
 		}
 	}
 }
@@ -1347,7 +1424,7 @@ void CAutomatedRuleSetTester::validateLicense()
 	VALIDATE_LICENSE(gnFLEXINDEX_RULE_WRITING_OBJECTS, "ELI07287", "Automated Rule Set Tester" );
 }
 //-------------------------------------------------------------------------------------------------
-const std::string CAutomatedRuleSetTester::getMasterTestFileName(IVariantVectorPtr ipParams, const std::string &strTCLFile) const
+const string CAutomatedRuleSetTester::getMasterTestFileName(IVariantVectorPtr ipParams, const string &strTCLFile) const
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
@@ -1674,26 +1751,23 @@ void CAutomatedRuleSetTester::addAttributeResultCase()
 	m_ipResultLogger->EndTestCase(bErrorFree ? VARIANT_TRUE : VARIANT_FALSE);
 }
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CAutomatedRuleSetTester::processInlineEAVString(const std::string &strInlineEAV)
+IIUnknownVectorPtr CAutomatedRuleSetTester::processInlineEAVString(const string &strInlineEAV)
 {
-	std::vector<std::string> vecTokens;
-	std::string strEAV(strInlineEAV);
+	vector<string> vecTokens;
+	string strEAV(strInlineEAV);
 	int iNewLinePos = strEAV.find("\\n");
 		
 	// Replace all "\n" in the string with an actual carriage return and new line
-	while(iNewLinePos != std::string::npos)
+	while(iNewLinePos != string::npos)
 	{
 		strEAV.replace(iNewLinePos, 2, "\r\n");
 		iNewLinePos = strEAV.find("\\n");
 	}
 
-	IAFUtilityPtr ipAFUtility(CLSID_AFUtility);
-	ASSERT_RESOURCE_ALLOCATION("ELI19124", ipAFUtility != NULL);
-		
-	return ipAFUtility->GetAttributesFromDelimitedString(get_bstr_t(strEAV.c_str()), get_bstr_t("*"));
+	return m_ipAFUtility->GetAttributesFromDelimitedString(get_bstr_t(strEAV.c_str()), get_bstr_t("*"));
 }
 //-------------------------------------------------------------------------------------------------
-const string CAutomatedRuleSetTester::expandTagsAndTFE(const std::string &strInput, std::string &strSourceDocName)
+const string CAutomatedRuleSetTester::expandTagsAndTFE(const string &strInput, string &strSourceDocName)
 {
 	string strExpanded = m_ipFAMTagManager->ExpandTags( strInput.c_str(), strSourceDocName.c_str());
 

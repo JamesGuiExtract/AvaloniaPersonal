@@ -93,7 +93,7 @@ namespace Extract.Redaction.Verification
             bool collectOriginalDocument, bool useOriginalFileNames, CollectionTypes collectionTypes)
         {
             _collectFeedback = collectFeedback;
-            _dataFolder = dataFolder ?? @"$DirOf(<SourceDocName>)\ExpectedRedactions";
+            _dataFolder = dataFolder ?? @"$DirOf(<SourceDocName>)\FeedbackData";
             _collectOriginalDocument = collectOriginalDocument;
             _useOriginalFileNames = useOriginalFileNames;
             _collectionTypes = collectionTypes;

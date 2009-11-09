@@ -13,6 +13,7 @@ using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
 using TD.SandDock;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_REDACTIONCUSTOMCOMPONENTSLib;
 
@@ -341,15 +342,24 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void Save(TimeInterval screenTime)
         {
-            // Collect feedback if necessary
-	        if (ShouldCollectFeedback())
-	        {
-                CollectFeedback();
-	        }
+            bool collectFeedback = ShouldCollectFeedback();
+
+            // Collect original image and found data feedback if necessary (regardless of what
+            // reason the file is being saved).
+            if (collectFeedback)
+            {
+                CollectFeedback(true);
+            }
 
             // Save the voa
             VerificationMemento memento = GetSavedMemento();
-            SaveAttributesTo(memento.AttributesFile, screenTime);
+            SaveAttributesTo(memento, screenTime);
+
+            // Collect expected data feedback if necessary
+            if (collectFeedback)
+            {
+                CollectFeedback(false);
+            }
 
             // Clear the unsaved state
             if (!IsInHistory)
@@ -364,14 +374,19 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Saves the current vector of attributes file to the specified location.
         /// </summary>
-        /// <param name="fileName">The location for saved attributes.</param>
+        /// <param name="memento">The <see cref="VerificationMemento"/> that specifies the file the
+        /// attributes should be saved to.</param>
         /// <param name="screenTime">The duration of time spent verifying the document.</param>
-        void SaveAttributesTo(string fileName, TimeInterval screenTime)
+        void SaveAttributesTo(VerificationMemento memento, TimeInterval screenTime)
         {
             string sourceDocument = _imageViewer.ImageFile;
             VerificationFileChanges changes = _redactionGridView.SaveChanges(sourceDocument);
 
-            _currentVoa.SaveTo(fileName, changes, screenTime, _settings);
+            _currentVoa.SaveTo(memento.AttributesFile, changes, screenTime, _settings);
+
+            // Ensure HasContainedRedactions is set to true if the _redactionGridView was saved with
+            // redactions present.
+            memento.HasContainedRedactions |= _redactionGridView.HasRedactions;
         }
 
         /// <summary>
@@ -395,10 +410,20 @@ namespace Extract.Redaction.Verification
                     // Collect because user corrections were made
                     return true;
                 }
-                else if ((types & CollectionTypes.Redacted) > 0 && _redactionGridView.HasRedactions)
+                else if ((types & CollectionTypes.Redacted) > 0)
                 {
-                    // Collect because document contains redactions
-                    return true;
+                    // If there are any redactions currently in the grid, collect feedback.
+                    if (_redactionGridView.HasRedactions )
+                    {
+                        return true;
+                    }
+
+                    // If this memento has ever contained redactions, collect feedback
+                    VerificationMemento memento = GetSavedMemento();
+                    if (memento.HasContainedRedactions)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -408,32 +433,60 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Collects the feedback about the currently viewed document.
         /// </summary>
-        void CollectFeedback()
+        /// <param name="found"><see langword="true"/> if found attribute feedback should be
+        /// collected; <see langword="false"/> if expected attribute feedback should be collected.
+        /// </param>
+        void CollectFeedback(bool found)
         {
             // Get the destination for the feedback image
-            VerificationMemento memento = GetCurrentDocument();
+            VerificationMemento memento = GetSavedMemento();
             string feedbackImage = memento.FeedbackImage;
 
-            // Check if the original document is being collected
-            if (_settings.Feedback.CollectOriginalDocument)
+            if (found)
             {
-                // Copy the file if the source and destination differ
-                string originalImage = _imageViewer.ImageFile;
-                if (!originalImage.Equals(feedbackImage, StringComparison.OrdinalIgnoreCase))
+                // If collecting found data, check to if the original document is being collected.
+                if (_settings.Feedback.CollectOriginalDocument)
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(feedbackImage));   
-                    File.Copy(originalImage, feedbackImage, true);
+                    // Copy the file if the source and destination differ
+                    string originalImage = _imageViewer.ImageFile;
+                    if (!originalImage.Equals(feedbackImage, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(feedbackImage));
+
+                        // Copy the image to feedback if it hasn't already been copied.
+                        if (!File.Exists(feedbackImage))
+                        {
+                            File.Copy(originalImage, feedbackImage, false);
+                        }
+                    }
                 }
 
-                // TODO: Feedback collection should move to separate task
-                // Create a VOA file relative to the image collected for feedback
-                //_redactionGridView.SaveTo(feedbackImage + ".voa", feedbackImage);
+                // Copy the found data file only if it doesn't already exists (otherwise we will
+                // likely be copying verified data, not the data the rules found).
+                if (!File.Exists(memento.FoundAttributesFileName))
+                {
+                    // Create the destination directory if necessary.
+                    Directory.CreateDirectory(Path.GetDirectoryName(memento.FoundAttributesFileName));
+
+                    // Copy the existing voa file as the found data if it exists
+                    if (File.Exists(memento.AttributesFile))
+                    {
+                        File.Copy(memento.AttributesFile, memento.FoundAttributesFileName, false);
+                    }
+                    // Otherwise save a new empty voa file as the found data to ensure we don't
+                    // save verified data as found data at a later point in time.
+                    else
+                    {
+                        IUnknownVector emptyVector = new IUnknownVector();
+                        emptyVector.SaveTo(memento.FoundAttributesFileName, false);
+                    }
+                }
             }
             else
             {
-                // TODO: Feedback collection should move to separate task
-                // Create a VOA file relative to the original image
-                //_redactionGridView.SaveTo(feedbackImage + ".voa");
+                // If collecting expected data, the image will have already been collected and we
+                // we want to overwite any existing expected data file.
+                File.Copy(memento.AttributesFile, memento.ExpectedAttributesFileName, true);
             }
         }
 
@@ -1021,7 +1074,7 @@ namespace Extract.Redaction.Verification
 
                         // Save the state of the current document before moving back
                         _dirty = _redactionGridView.Dirty;
-                        SaveAttributesTo(_unsavedMemento.AttributesFile, screenTime);
+                        SaveAttributesTo(_unsavedMemento, screenTime);
                         
                         UpdateMemento();
                     }
@@ -1101,6 +1154,10 @@ namespace Extract.Redaction.Verification
             // Set the controls
             _redactionGridView.LoadFrom(_currentVoa, memento.VisitedRedactions);
             _pageSummaryView.SetVisitedPages(memento.VisitedPages);
+
+            // Ensure HasContainedRedactions is set to true if the _redactionGridView was loaded
+            // with redactions present.
+            memento.HasContainedRedactions |= _redactionGridView.HasRedactions;
         }
 
         /// <summary>
