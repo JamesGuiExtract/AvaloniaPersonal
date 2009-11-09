@@ -517,8 +517,6 @@ void CFileProcessingTaskExecutor::close()
 {
 	try
 	{
-		verifyInitialization();
-
 		// Set initialized flag to false immediately; cannot guarantee initialization beyond this point
 		m_bInitialized = false;
 
