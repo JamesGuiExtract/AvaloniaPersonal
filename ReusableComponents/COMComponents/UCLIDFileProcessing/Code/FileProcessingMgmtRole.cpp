@@ -64,9 +64,10 @@ ProcessingThreadData::~ProcessingThreadData()
 // CFileProcessingMgmtRole
 //-------------------------------------------------------------------------------------------------
 CFileProcessingMgmtRole::CFileProcessingMgmtRole()
-:m_pRecordMgr(NULL),
-	m_ipRoleNotifyFAM(NULL),
-	m_threadDataSemaphore(2,2)
+: m_pRecordMgr(NULL),
+  m_ipRoleNotifyFAM(NULL),
+  m_threadDataSemaphore(2,2),
+  m_bProcessing(false)
 {
 	try
 	{
@@ -1261,7 +1262,10 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void *pData)
 				pFPM->releaseProcessingThreadDataObjects();
 
 				// Unregister Processing FAM to reset file back to previous state if any remaining
-				pFPM->getFPMDB()->UnregisterProcessingFAM();
+				if (pFPM->m_bProcessing)
+				{
+					pFPM->getFPMDB()->UnregisterProcessingFAM();
+				}
 
 				CoUninitialize();
 			}
@@ -1810,9 +1814,16 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 
 			if (!bExit)
 			{
-				// Start processing, if should not be processing this will put the UI in the state
-				// that will look like it is not processing because it is not scheduled to process
-				pFPM->startProcessing(eNextRunningState == kScheduleStop);
+				// A failure in startProcessing signals the processing to stop. The signal is 
+				// handled later in this method. If an exception occurs, display it and continue.
+				// [FIDSC #3742]
+				try
+				{
+					// Start processing, if should not be processing this will put the UI in the state
+					// that will look like it is not processing because it is not scheduled to process
+					pFPM->startProcessing(eNextRunningState == kScheduleStop);
+				}
+				CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28507")
 
 				// Post Schedule Inactive messag to the UI
 				if ( eNextRunningState == kScheduleStop && pFPM->m_hWndOfUI != NULL)
