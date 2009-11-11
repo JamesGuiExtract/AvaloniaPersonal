@@ -1,7 +1,5 @@
 using Extract.Interop;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Extract.Redaction.Verification
 {
@@ -10,7 +8,7 @@ namespace Extract.Redaction.Verification
     /// </summary>
     public class VerificationSettings
     {
-        #region VerificationSettings Fields
+        #region Fields
 
         /// <summary>
         /// General settings associated with verification.
@@ -27,19 +25,14 @@ namespace Extract.Redaction.Verification
         /// </summary>
         readonly string _inputFile;
 
-        /// <summary>
-        /// Settings associated with verification metadata xml.
-        /// </summary>
-        readonly MetadataSettings _metadataSettings;
+        #endregion Fields
 
-        #endregion VerificationSettings Fields
-
-        #region VerificationSettings Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class.
         /// </summary>
-        public VerificationSettings() : this(null, null, null, null)
+        public VerificationSettings() : this(null, null, null)
         {
 
         }
@@ -48,18 +41,16 @@ namespace Extract.Redaction.Verification
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class with the 
         /// specified settings.
         /// </summary>
-        public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback,
-            string inputFile, MetadataSettings metadata)
+        public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback, string inputFile)
         {
             _generalSettings = general ?? new GeneralVerificationSettings();
             _feedbackSettings = feedback ?? new FeedbackSettings();
             _inputFile = inputFile ?? @"<SourceDocName>.voa";
-            _metadataSettings = metadata ?? new MetadataSettings();
         }
 
-        #endregion VerificationSettings Constructors
+        #endregion Constructors
 
-        #region VerificationSettings Properties
+        #region Properties
 
         /// <summary>
         /// Gets the general settings associated with verification.
@@ -98,21 +89,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        /// <summary>
-        /// Gets the settings associated with verification metadata xml.
-        /// </summary>
-        /// <returns>The settings associated with verification metadata xml.</returns>
-        public MetadataSettings Metadata
-        {
-            get
-            {
-                return _metadataSettings;
-            }
-        }
+        #endregion Properties
 
-        #endregion VerificationSettings Properties
-
-        #region VerificationSettings Methods
+        #region Methods
 
         /// <summary>
         /// Creates a <see cref="VerificationSettings"/> from the specified 
@@ -129,9 +108,15 @@ namespace Extract.Redaction.Verification
                 GeneralVerificationSettings general = GeneralVerificationSettings.ReadFrom(reader);
                 FeedbackSettings feedback = FeedbackSettings.ReadFrom(reader);
                 string inputFile = reader.ReadString();
-                MetadataSettings metadata = MetadataSettings.ReadFrom(reader);
 
-                return new VerificationSettings(general, feedback, inputFile, metadata);
+                if (reader.Version < 2)
+                {
+                    // Ignore obsolete metadata settings
+                    reader.ReadBoolean();
+                    reader.ReadString();
+                }
+
+                return new VerificationSettings(general, feedback, inputFile);
             }
             catch (Exception ex)
             {
@@ -153,7 +138,6 @@ namespace Extract.Redaction.Verification
                 _generalSettings.WriteTo(writer);
                 _feedbackSettings.WriteTo(writer);
                 writer.Write(_inputFile);
-                _metadataSettings.WriteTo(writer);
             }
             catch (Exception ex)
             {
@@ -162,6 +146,6 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion VerificationSettings Methods
+        #endregion Methods
     }
 }

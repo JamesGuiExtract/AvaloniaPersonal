@@ -1,12 +1,6 @@
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
-using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.Redaction.Verification
 {
@@ -16,7 +10,7 @@ namespace Extract.Redaction.Verification
     /// </summary>
     public partial class VerificationSettingsDialog : Form
     {
-        #region VerificationSettingsDialog Fields
+        #region Fields
 
         /// <summary>
         /// The verification feedback settings.
@@ -28,9 +22,9 @@ namespace Extract.Redaction.Verification
         /// </summary>
         VerificationSettings _settings;
 
-        #endregion VerificationSettingsDialog Fields
+        #endregion Fields
 
-        #region VerificationSettingsDialog Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="VerificationSettingsDialog"/> class.
@@ -51,9 +45,9 @@ namespace Extract.Redaction.Verification
             _settings = settings ?? new VerificationSettings();
         }
 
-        #endregion VerificationSettingsDialog Constructors
+        #endregion Constructors
 
-        #region VerificationSettingsDialog Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets the verification settings.
@@ -72,9 +66,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion VerificationSettingsDialog Properties
+        #endregion Properties
 
-        #region VerificationSettingsDialog Methods
+        #region Methods
 
         /// <summary>
         /// Gets the <see cref="VerificationSettings"/> from the user interface.
@@ -86,9 +80,8 @@ namespace Extract.Redaction.Verification
             GeneralVerificationSettings general = GetGeneralSettings();
             FeedbackSettings feedback = GetFeedbackSettings();
             string dataFile = _dataFileTextBox.Text;
-            MetadataSettings metadata = GetMetaDataSettings();
 
-            return new VerificationSettings(general, feedback, dataFile, metadata);
+            return new VerificationSettings(general, feedback, dataFile);
         }
 
         /// <summary>
@@ -125,19 +118,6 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets the <see cref="MetadataSettings"/> from the user interface.
-        /// </summary>
-        /// <returns>The <see cref="MetadataSettings"/> from the user interface.</returns>
-        MetadataSettings GetMetaDataSettings()
-        {
-            // Get the settings
-            bool alwaysOutputMetadata = _alwaysOutputMetadataRadioButton.Checked;
-            string metadataFile = _metadataFileTextBox.Text;
-
-            return new MetadataSettings(alwaysOutputMetadata, metadataFile);
-        }
-
-        /// <summary>
         /// Updates the enabled state of the controls.
         /// </summary>
         void UpdateControls()
@@ -145,9 +125,27 @@ namespace Extract.Redaction.Verification
             _feedbackSettingsButton.Enabled = _collectFeedbackCheckBox.Checked;
         }
 
-        #endregion VerificationSettingsDialog Methods
+        /// <summary>
+        /// Displays a warning message if the user specified settings are invalid.
+        /// </summary>
+        /// <returns><see langword="true"/> if the settings are invalid; <see langword="false"/> if 
+        /// the settings are valid.</returns>
+        bool WarnIfInvalid()
+        {
+            bool isEmpty = string.IsNullOrEmpty(_dataFileTextBox.Text);
+            if (isEmpty)
+            {
+                MessageBox.Show("Please enter the ID Shield data file", "Invalid ID Shield data file",
+                    MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                _dataFileTextBox.Focus();
+            }
 
-        #region VerificationSettingsDialog Overrides
+            return isEmpty;
+        }
+
+        #endregion Methods
+
+        #region Overrides
 
         /// <summary>
         /// Raises the <see cref="Form.Load"/> event.
@@ -172,17 +170,6 @@ namespace Extract.Redaction.Verification
                 // ID Shield data file
                 _dataFileTextBox.Text = _settings.InputFile;
 
-                // Metadata settings
-                if (_settings.Metadata.AlwaysOutputMetadata)
-                {
-                    _alwaysOutputMetadataRadioButton.Checked = true;
-                }
-                else
-                {
-                    _onlyRedactionsRadioButton.Checked = true;
-                }
-                _metadataFileTextBox.Text = _settings.Metadata.MetadataFile;
-
                 // Update the UI
                 UpdateControls();
             }
@@ -192,9 +179,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion VerificationSettingsDialog Overrides
+        #endregion Overrides
 
-        #region VerificationSettingsDialog Event Handlers
+        #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="CheckBox.CheckedChanged"/> event.
@@ -287,48 +274,6 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        void HandleMetadataPathTagsButtonTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _metadataFileTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI26308", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="BrowseButton.PathSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="BrowseButton.PathSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="BrowseButton.PathSelected"/> event.</param>
-        void HandleMetadataBrowseButtonPathSelected(object sender, PathSelectedEventArgs e)
-        {
-            try
-            {
-                _metadataFileTextBox.Text = e.Path;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI26309", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="Control.Click"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
@@ -339,17 +284,15 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // Ensure the ID Shield data and metadata paths are specified
-                bool isEmpty = WarnIfEmpty(_dataFileTextBox, "ID Shield data file") ||
-                    WarnIfEmpty(_metadataFileTextBox, "metadata output file");
-                if (isEmpty)
+                // Ensure the settings are valid
+                if (WarnIfInvalid())
                 {
                     return;
                 }
 
                 // Store settings
                 _settings = GetVerificationSettings();
-                this.DialogResult = DialogResult.OK;
+                DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
             {
@@ -359,26 +302,6 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        /// <summary>
-        /// Displays a warning message to the user if the specified textbox is empty.
-        /// </summary>
-        /// <param name="textBox">The textbox to check.</param>
-        /// <param name="name">Short description of the text that the textbox should contain.
-        /// </param>
-        /// <returns><see langword="true"/> if <paramref name="textBox"/> is empty; 
-        /// <see langword="false"/> if <paramref name="textBox"/> contains any text.</returns>
-        static bool WarnIfEmpty(TextBox textBox, string name)
-        {
-            bool isEmpty = string.IsNullOrEmpty(textBox.Text);
-            if (isEmpty)
-            {
-                MessageBox.Show("Please enter the " + name, "Invalid " + name, 
-                    MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-                textBox.Focus();
-            }
-            return isEmpty;
-        }
-
-        #endregion VerificationSettingsDialog Event Handlers
+        #endregion Event Handlers
     }
 }

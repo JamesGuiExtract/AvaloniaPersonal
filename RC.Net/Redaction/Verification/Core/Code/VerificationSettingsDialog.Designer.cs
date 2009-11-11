@@ -38,43 +38,38 @@ namespace Extract.Redaction.Verification
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.GroupBox groupBox1;
+            System.Windows.Forms.GroupBox groupBox2;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VerificationSettingsDialog));
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._feedbackSettingsButton = new System.Windows.Forms.Button();
             this._collectFeedbackCheckBox = new System.Windows.Forms.CheckBox();
             this._requireExemptionsCheckBox = new System.Windows.Forms.CheckBox();
             this._requireTypeCheckBox = new System.Windows.Forms.CheckBox();
             this._verifyAllPagesCheckBox = new System.Windows.Forms.CheckBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this._dataFilePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._dataFileBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._dataFileTextBox = new System.Windows.Forms.TextBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this._metadataPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._metadataBrowseButton = new Extract.Utilities.Forms.BrowseButton();
-            this._metadataFileTextBox = new System.Windows.Forms.TextBox();
-            this._onlyRedactionsRadioButton = new System.Windows.Forms.RadioButton();
-            this._alwaysOutputMetadataRadioButton = new System.Windows.Forms.RadioButton();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
-            this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
+            groupBox1 = new System.Windows.Forms.GroupBox();
+            groupBox2 = new System.Windows.Forms.GroupBox();
+            groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this._feedbackSettingsButton);
-            this.groupBox1.Controls.Add(this._collectFeedbackCheckBox);
-            this.groupBox1.Controls.Add(this._requireExemptionsCheckBox);
-            this.groupBox1.Controls.Add(this._requireTypeCheckBox);
-            this.groupBox1.Controls.Add(this._verifyAllPagesCheckBox);
-            this.groupBox1.Location = new System.Drawing.Point(12, 12);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(368, 121);
-            this.groupBox1.TabIndex = 0;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "General";
+            groupBox1.Controls.Add(this._feedbackSettingsButton);
+            groupBox1.Controls.Add(this._collectFeedbackCheckBox);
+            groupBox1.Controls.Add(this._requireExemptionsCheckBox);
+            groupBox1.Controls.Add(this._requireTypeCheckBox);
+            groupBox1.Controls.Add(this._verifyAllPagesCheckBox);
+            groupBox1.Location = new System.Drawing.Point(12, 12);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new System.Drawing.Size(368, 121);
+            groupBox1.TabIndex = 0;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "General";
             // 
             // _feedbackSettingsButton
             // 
@@ -129,15 +124,15 @@ namespace Extract.Redaction.Verification
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this._dataFilePathTagsButton);
-            this.groupBox2.Controls.Add(this._dataFileBrowseButton);
-            this.groupBox2.Controls.Add(this._dataFileTextBox);
-            this.groupBox2.Location = new System.Drawing.Point(12, 140);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(368, 50);
-            this.groupBox2.TabIndex = 1;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "ID Shield data file location";
+            groupBox2.Controls.Add(this._dataFilePathTagsButton);
+            groupBox2.Controls.Add(this._dataFileBrowseButton);
+            groupBox2.Controls.Add(this._dataFileTextBox);
+            groupBox2.Location = new System.Drawing.Point(12, 140);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new System.Drawing.Size(368, 50);
+            groupBox2.TabIndex = 1;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "ID Shield data file location";
             // 
             // _dataFilePathTagsButton
             // 
@@ -146,22 +141,18 @@ namespace Extract.Redaction.Verification
             this._dataFilePathTagsButton.Name = "_dataFilePathTagsButton";
             this._dataFilePathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._dataFilePathTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._dataFilePathTagsButton.TabIndex = 2;
+            this._dataFilePathTagsButton.TabIndex = 1;
             this._dataFilePathTagsButton.UseVisualStyleBackColor = true;
             this._dataFilePathTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandleDataFilePathTagsButtonTagSelected);
             // 
             // _dataFileBrowseButton
             // 
-            this._dataFileBrowseButton.DefaultFilterIndex = -1;
             this._dataFileBrowseButton.FileFilter = "VOA files (*.voa)|*.voa||";
-            this._dataFileBrowseButton.FileOrFolderPath = null;
-            this._dataFileBrowseButton.FolderBrowser = false;
             this._dataFileBrowseButton.Location = new System.Drawing.Point(335, 20);
             this._dataFileBrowseButton.Name = "_dataFileBrowseButton";
             this._dataFileBrowseButton.Size = new System.Drawing.Size(27, 20);
-            this._dataFileBrowseButton.TabIndex = 1;
+            this._dataFileBrowseButton.TabIndex = 2;
             this._dataFileBrowseButton.Text = "...";
-            this._dataFileBrowseButton.TextControl = null;
             this._dataFileBrowseButton.UseVisualStyleBackColor = true;
             this._dataFileBrowseButton.PathSelected += new System.EventHandler<Extract.Utilities.Forms.PathSelectedEventArgs>(this.HandleDataFileBrowseButtonPathSelected);
             // 
@@ -172,79 +163,11 @@ namespace Extract.Redaction.Verification
             this._dataFileTextBox.Size = new System.Drawing.Size(298, 20);
             this._dataFileTextBox.TabIndex = 0;
             // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this._metadataPathTagsButton);
-            this.groupBox3.Controls.Add(this._metadataBrowseButton);
-            this.groupBox3.Controls.Add(this._metadataFileTextBox);
-            this.groupBox3.Controls.Add(this._onlyRedactionsRadioButton);
-            this.groupBox3.Controls.Add(this._alwaysOutputMetadataRadioButton);
-            this.groupBox3.Location = new System.Drawing.Point(12, 197);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(368, 100);
-            this.groupBox3.TabIndex = 2;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Metadata output";
-            // 
-            // _metadataPathTagsButton
-            // 
-            this._metadataPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_metadataPathTagsButton.Image")));
-            this._metadataPathTagsButton.Location = new System.Drawing.Point(311, 68);
-            this._metadataPathTagsButton.Name = "_metadataPathTagsButton";
-            this._metadataPathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
-            this._metadataPathTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._metadataPathTagsButton.TabIndex = 4;
-            this._metadataPathTagsButton.UseVisualStyleBackColor = true;
-            this._metadataPathTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandleMetadataPathTagsButtonTagSelected);
-            // 
-            // _metadataBrowseButton
-            // 
-            this._metadataBrowseButton.DefaultFilterIndex = -1;
-            this._metadataBrowseButton.FileFilter = null;
-            this._metadataBrowseButton.FileOrFolderPath = null;
-            this._metadataBrowseButton.FolderBrowser = false;
-            this._metadataBrowseButton.Location = new System.Drawing.Point(335, 68);
-            this._metadataBrowseButton.Name = "_metadataBrowseButton";
-            this._metadataBrowseButton.Size = new System.Drawing.Size(27, 20);
-            this._metadataBrowseButton.TabIndex = 3;
-            this._metadataBrowseButton.Text = "...";
-            this._metadataBrowseButton.TextControl = null;
-            this._metadataBrowseButton.UseVisualStyleBackColor = true;
-            this._metadataBrowseButton.PathSelected += new System.EventHandler<Extract.Utilities.Forms.PathSelectedEventArgs>(this.HandleMetadataBrowseButtonPathSelected);
-            // 
-            // _metadataFileTextBox
-            // 
-            this._metadataFileTextBox.Location = new System.Drawing.Point(7, 68);
-            this._metadataFileTextBox.Name = "_metadataFileTextBox";
-            this._metadataFileTextBox.Size = new System.Drawing.Size(298, 20);
-            this._metadataFileTextBox.TabIndex = 2;
-            // 
-            // _onlyRedactionsRadioButton
-            // 
-            this._onlyRedactionsRadioButton.AutoSize = true;
-            this._onlyRedactionsRadioButton.Location = new System.Drawing.Point(7, 44);
-            this._onlyRedactionsRadioButton.Name = "_onlyRedactionsRadioButton";
-            this._onlyRedactionsRadioButton.Size = new System.Drawing.Size(339, 17);
-            this._onlyRedactionsRadioButton.TabIndex = 1;
-            this._onlyRedactionsRadioButton.TabStop = true;
-            this._onlyRedactionsRadioButton.Text = "Create metadata output only for documents that contain redactions";
-            this._onlyRedactionsRadioButton.UseVisualStyleBackColor = true;
-            // 
-            // _alwaysOutputMetadataRadioButton
-            // 
-            this._alwaysOutputMetadataRadioButton.AutoSize = true;
-            this._alwaysOutputMetadataRadioButton.Location = new System.Drawing.Point(7, 20);
-            this._alwaysOutputMetadataRadioButton.Name = "_alwaysOutputMetadataRadioButton";
-            this._alwaysOutputMetadataRadioButton.Size = new System.Drawing.Size(219, 17);
-            this._alwaysOutputMetadataRadioButton.TabIndex = 0;
-            this._alwaysOutputMetadataRadioButton.TabStop = true;
-            this._alwaysOutputMetadataRadioButton.Text = "Create metadata output for all documents";
-            this._alwaysOutputMetadataRadioButton.UseVisualStyleBackColor = true;
-            // 
             // _cancelButton
             // 
+            this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(305, 304);
+            this._cancelButton.Location = new System.Drawing.Point(306, 204);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 3;
@@ -253,10 +176,11 @@ namespace Extract.Redaction.Verification
             // 
             // _okButton
             // 
-            this._okButton.Location = new System.Drawing.Point(224, 304);
+            this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._okButton.Location = new System.Drawing.Point(225, 204);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 4;
+            this._okButton.TabIndex = 2;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -267,46 +191,35 @@ namespace Extract.Redaction.Verification
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(392, 334);
+            this.ClientSize = new System.Drawing.Size(392, 239);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
-            this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(groupBox2);
+            this.Controls.Add(groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "VerificationSettingsDialog";
             this.ShowIcon = false;
             this.Text = "Verify redactions settings";
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox _verifyAllPagesCheckBox;
         private System.Windows.Forms.Button _feedbackSettingsButton;
         private System.Windows.Forms.CheckBox _collectFeedbackCheckBox;
         private System.Windows.Forms.CheckBox _requireExemptionsCheckBox;
         private System.Windows.Forms.CheckBox _requireTypeCheckBox;
-        private System.Windows.Forms.GroupBox groupBox2;
         private Extract.Utilities.Forms.PathTagsButton _dataFilePathTagsButton;
         private Extract.Utilities.Forms.BrowseButton _dataFileBrowseButton;
         private System.Windows.Forms.TextBox _dataFileTextBox;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.RadioButton _alwaysOutputMetadataRadioButton;
-        private Extract.Utilities.Forms.PathTagsButton _metadataPathTagsButton;
-        private Extract.Utilities.Forms.BrowseButton _metadataBrowseButton;
-        private System.Windows.Forms.TextBox _metadataFileTextBox;
-        private System.Windows.Forms.RadioButton _onlyRedactionsRadioButton;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button _okButton;
     }
