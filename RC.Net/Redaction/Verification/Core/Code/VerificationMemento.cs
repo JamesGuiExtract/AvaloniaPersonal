@@ -1,5 +1,5 @@
 using Extract.Imaging.Forms;
-using System.IO;
+using Extract.Utilities;
 
 namespace Extract.Redaction.Verification
 {
@@ -8,7 +8,7 @@ namespace Extract.Redaction.Verification
     /// </summary>
     internal class VerificationMemento
     {
-        #region VerificationMemento Fields
+        #region Fields
 
         /// <summary>
         /// The image file associated with the verified document.
@@ -66,9 +66,9 @@ namespace Extract.Redaction.Verification
         /// </summary>
         VisitedItemsCollection _visitedRedactions;
 
-        #endregion VerificationMemento Fields
+        #endregion Fields
 
-        #region VerificationMemento Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VerificationMemento"/> class.
@@ -81,18 +81,23 @@ namespace Extract.Redaction.Verification
             _actionId = actionId;
             _voaFile = attributesFile;
             _documentType = documentType;
-            _feedbackImage = feedbackImage;
 
-            // Initialize the destination found and expected voa files using the destination
-            // feedbackImage filename as a base.
-            int extentionPos = feedbackImage.Length - Path.GetExtension(feedbackImage).Length;
-            _foundAttributesFileName = feedbackImage.Substring(0, extentionPos) + ".found.voa";
-            _expectedAttributesFileName = feedbackImage.Substring(0, extentionPos) + ".expected.voa";
+            
+            if (feedbackImage != null)
+            {
+                _feedbackImage = feedbackImage;
+
+                // Initialize the destination found and expected voa files using the destination
+                // feedbackImage filename as a base.
+                string basePath = FileSystemMethods.GetFullPathWithoutExtension(feedbackImage);
+                _foundAttributesFileName = basePath + ".found.voa";
+                _expectedAttributesFileName = basePath + ".expected.voa";
+            }
         }
 
-        #endregion VerificationMemento Constructors
+        #endregion Constructors
 
-        #region VerificationMemento Properties
+        #region Properties
 
         /// <summary>
         /// Gets the image file associated with the verified document.
@@ -245,6 +250,6 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion VerificationMemento Properties
+        #endregion Properties
     }
 }
