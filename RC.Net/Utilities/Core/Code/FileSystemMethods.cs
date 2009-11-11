@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -8,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace Extract.Utilities
 {
@@ -20,14 +20,14 @@ namespace Extract.Utilities
         /// A static object used as a mutex in the temp file name generation to prevent
         /// multiple threads from generating the same temporary file name.
         /// </summary>
-        private static Mutex _tempFileLock = new Mutex(false,
+        static readonly Mutex _tempFileLock = new Mutex(false, 
             "C6D3EB7D-5DB9-4FC7-BEAD-0DBA39DBDB4B");
 
         /// <summary>
         /// Either "C:\Program Files\Extract Systems" or "C:\Program Files (x86)\Extract Systems"
         /// depending on the OS.
         /// </summary>
-        private static readonly string _EXTRACT_SYSTEMS_PATH =
+        static readonly string _EXTRACT_SYSTEMS_PATH =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
                "Extract Systems");
 
@@ -112,7 +112,7 @@ namespace Extract.Utilities
         {
             try
             {
-                ExtractException.Assert("ELI25508", "Specified folder cannot be found!",
+                ExtractException.Assert("ELI25508", "Specified folder cannot be found.",
                     !string.IsNullOrEmpty(folder) && Directory.Exists(folder),
                     "Folder Name", folder ?? "NULL");
 
@@ -147,7 +147,7 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw new ExtractException("ELI25509",
-                    "Failed generating temporary file name!", ex);
+                    "Failed generating temporary file name.", ex);
             }
             finally
             {
@@ -191,8 +191,7 @@ namespace Extract.Utilities
                         // copy the sub-directory files
                         if (recursive)
                         {
-                            CopyDirectory(element, destination + Path.GetFileName(element),
-                                recursive);
+                            CopyDirectory(element, destination + Path.GetFileName(element), true);
                         }
                     }
                     else
@@ -223,7 +222,7 @@ namespace Extract.Utilities
             try
             {
                 // Ensure the file/directory exists
-                ExtractException.Assert("ELI23083", "Path must exist!",
+                ExtractException.Assert("ELI23083", "Path must exist.",
                     File.Exists(path) || Directory.Exists(path), "Path", path);
 
                 // If it is a directory and recursive is set to true, then set
@@ -236,7 +235,7 @@ namespace Extract.Utilities
                         if (Directory.Exists(element))
                         {
                             File.SetAttributes(element, FileAttributes.Normal);
-                            MakeWritable(element, recursive);
+                            MakeWritable(element, true);
                         }
                     }
                 }
@@ -358,8 +357,7 @@ namespace Extract.Utilities
         {
             try
             {
-                return GetAbsolutePath(fileName,
-                    Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath));
+                return GetAbsolutePath(fileName, null);
             }
             catch (Exception ex)
             {
@@ -374,21 +372,22 @@ namespace Extract.Utilities
         /// <param name="fileName">The path to resolve. May not be <see langword="null"/>
         /// or empty string.</param>
         /// <param name="pathRoot">The path to serve as the root if the specified fileName is a
-        /// relative path.</param>
-        /// <returns>The absolute path to the specified file.</returns>
+        /// relative path; if <see langword="null"/> uses the application directory.</param>
+        /// <returns>The absolute path to the specified <paramref name="fileName"/>.</returns>
         // [DNRCAU #303]
         public static string GetAbsolutePath(string fileName, string pathRoot)
         {
             try
             {
                 // Ensure that fileName is not null or empty
-                ExtractException.Assert("ELI23514", "File name must not be null or empty string!",
+                ExtractException.Assert("ELI23514", "File name must not be null or empty string.",
                     !string.IsNullOrEmpty(fileName));
 
                 // Check if the filename is a relative path
                 if (!Path.IsPathRooted(fileName))
                 {
-                    fileName = Path.Combine(pathRoot, fileName);
+                    string root = pathRoot ?? Path.GetDirectoryName(Application.ExecutablePath);
+                    fileName = Path.Combine(root, fileName);
                     fileName = Path.GetFullPath(fileName);
                 }
 
@@ -457,7 +456,7 @@ namespace Extract.Utilities
                         object providerName = driveObject["ProviderName"];
                         if (providerName != null)
                         {
-                            path = providerName.ToString() + pathParts[1];
+                            path = providerName + pathParts[1];
                             return true;
                         }
                     }
@@ -512,7 +511,7 @@ namespace Extract.Utilities
 
                                 // Combine the share UNC path with the part of the working path not
                                 // included in the share path.
-                                path = sharePath.ToString() + workingPath.Substring(localPath.Length);
+                                path = sharePath + workingPath.Substring(localPath.Length);
                                 return true;
                             }
                         }
@@ -777,6 +776,21 @@ namespace Extract.Utilities
                 ee.AddDebugData("Index Of Invalid Character", index, false);
                 throw ee;
             }
+        }
+
+        /// <summary>
+        /// Gets the full path to the specified file and drops the file's extension.
+        /// </summary>
+        /// <param name="path">The path to the file whose extension should be dropped.</param>
+        /// <returns>The full path to the <paramref name="path"/> without the file extension.
+        /// </returns>
+        public static string GetFullPathWithoutExtension(string path)
+        {
+            string fullPath = GetAbsolutePath(path);
+            string directory = Path.GetDirectoryName(fullPath);
+            string file = Path.GetFileNameWithoutExtension(fullPath);
+
+            return Path.Combine(directory, file);
         }
     }
 }
