@@ -27,7 +27,7 @@ namespace Extract.Redaction.Verification
     [CLSCompliant(false)]
     public sealed partial class VerificationTaskForm : Form, IVerificationForm
     {
-        #region VerificationTaskForm Constants
+        #region Constants
 
         /// <summary>
         /// The license string for the SandDock manager
@@ -39,9 +39,14 @@ namespace Extract.Redaction.Verification
         /// </summary>
         const int _MAX_DOCUMENT_HISTORY = 20;
 
-        #endregion VerificationTaskForm Constants
+        /// <summary>
+        /// The title to display for the verification task form.
+        /// </summary>
+        const string _FORM_TITLE = "ID Shield Verification";
 
-        #region VerificationTaskForm Fields
+        #endregion Constants
+
+        #region Fields
 
         /// <summary>
         /// The settings for verification.
@@ -124,18 +129,18 @@ namespace Extract.Redaction.Verification
         readonly static LicenseStateCache _licenseCache =
             new LicenseStateCache(LicenseIdName.IDShieldVerificationObject, "Verification Form");
 
-        #endregion VerificationTaskForm Fields
+        #endregion Fields
 
-        #region VerificationTaskForm Events
+        #region Events
 
         /// <summary>
         /// Occurs when a file has completed verification.
         /// </summary>
         public event EventHandler<FileCompleteEventArgs> FileComplete;
 
-        #endregion VerificationTaskForm Events
+        #endregion Events
 
-        #region VerificationTaskForm Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="VerificationTaskForm"/> class.
@@ -186,9 +191,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion VerificationTaskForm Constructors
+        #endregion Constructors
 
-        #region VerificationTaskForm Properties
+        #region Properties
 
         /// <summary>
         /// Gets whether the control styles of the current Windows theme should be used for the
@@ -233,9 +238,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion VerificationTaskForm Properties
+        #endregion Properties
 
-        #region VerificationTaskForm Methods
+        #region Methods
 
         /// <summary>
         /// Gets the document type of the specified vector of attributes (VOA) file.
@@ -382,7 +387,7 @@ namespace Extract.Redaction.Verification
             string sourceDocument = _imageViewer.ImageFile;
             VerificationFileChanges changes = _redactionGridView.SaveChanges(sourceDocument);
 
-            _currentVoa.SaveTo(memento.AttributesFile, changes, screenTime, _settings);
+            _currentVoa.SaveVerificationSession(memento.AttributesFile, changes, screenTime, _settings);
 
             // Ensure HasContainedRedactions is set to true if the _redactionGridView was saved with
             // redactions present.
@@ -792,6 +797,19 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Activates the save and commit command
+        /// </summary>
+        void SelectSaveAndCommit()
+        {
+            _redactionGridView.CommitChanges();
+
+            if (!WarnIfInvalid())
+            {
+                Commit();
+            }
+        }
+
+        /// <summary>
         /// Selects the previous redaction row.
         /// </summary>
         void SelectPreviousRedaction()
@@ -1115,7 +1133,9 @@ namespace Extract.Redaction.Verification
         {
             if (_imageViewer.IsImageAvailable)
             {
-                _currentDocumentTextBox.Text = _imageViewer.ImageFile;
+                string imageFile = _imageViewer.ImageFile;
+                _currentDocumentTextBox.Text = imageFile;
+                Text = imageFile + " - " + _FORM_TITLE;
 
                 VerificationMemento memento = GetCurrentDocument();
                 _documentTypeTextBox.Text = memento.DocumentType;
@@ -1130,6 +1150,7 @@ namespace Extract.Redaction.Verification
             else
             {
                 _currentDocumentTextBox.Text = "";
+                Text = _FORM_TITLE + " (Waiting for file)";
 
                 _documentTypeTextBox.Text = "";
                 _commentsTextBox.Text = "";
@@ -1206,9 +1227,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion VerificationTaskForm Methods
+        #endregion Methods
 
-        #region VerificationTaskForm Overrides
+        #region Overrides
 
         /// <summary>
         /// Raises the <see cref="Form.Load"/> event.
@@ -1236,6 +1257,13 @@ namespace Extract.Redaction.Verification
 
                 // Use redaction tool
                 _imageViewer.Shortcuts[Keys.H] = _imageViewer.ToggleRedactionTool;
+
+                // Save and commit
+                _imageViewer.Shortcuts[Keys.Control | Keys.S] = SelectSaveAndCommit;
+
+                // Exemption codes
+                _imageViewer.Shortcuts[Keys.E] = _redactionGridView.PromptForExemptions;
+                _imageViewer.Shortcuts[Keys.Control | Keys.E] = _redactionGridView.ApplyLastExemptions;
             }
             catch (Exception ex)
             {
@@ -1300,9 +1328,9 @@ namespace Extract.Redaction.Verification
             return true;
         }
 
-        #endregion VerificationTaskForm Overrides
+        #endregion Overrides
 
-        #region VerificationTaskForm OnEvents
+        #region OnEvents
 
         /// <summary>
         /// Raises the <see cref="FileComplete"/> event.
@@ -1317,9 +1345,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion VerificationTaskForm OnEvents
+        #endregion OnEvents
 
-        #region VerificationTaskForm Event Handlers
+        #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event.
@@ -1358,12 +1386,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                _redactionGridView.CommitChanges();
-
-                if (!WarnIfInvalid())
-                {
-                    Commit();
-                }
+                SelectSaveAndCommit();
             }
             catch (Exception ex)
             {
@@ -1619,7 +1642,7 @@ namespace Extract.Redaction.Verification
         /// <see cref="ToolStripItem.Click"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ToolStripItem.Click"/> event.</param>
-        void HandleOptionsToolStripButtonClick(object sender, EventArgs e)
+        void HandleOptionsToolStripMenuItemClick(object sender, EventArgs e)
         {
             try
             {
@@ -1826,7 +1849,35 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion VerificationTaskForm Event Handlers
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleThumbnailsToolStripButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_thumbnailDockableWindow.IsOpen || _thumbnailDockableWindow.Collapsed)
+                {
+                    _thumbnailDockableWindow.Close();
+                }
+                else
+                {
+                    _thumbnailDockableWindow.Open();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI28508", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        #endregion Event Handlers
 
         #region IVerificationForm Members
 
