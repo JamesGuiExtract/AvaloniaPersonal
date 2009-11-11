@@ -1,7 +1,5 @@
 using Extract.Interop;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Extract.Redaction.Verification
 {
@@ -10,29 +8,22 @@ namespace Extract.Redaction.Verification
     /// </summary>
     public class MetadataSettings
     {
-        #region MetadataSettings Fields
-
-        /// <summary>
-        /// <see langword="true"/> if verification metadata should always be output; 
-        /// <see langword="false"/> if verification metadata should be output only for documents 
-        /// that contain redactions.
-        /// </summary>
-        readonly bool _alwaysOutputMetadata;
+        #region Fields
 
         /// <summary>
         /// The path to the output verification metadata xml file. May contain tags.
         /// </summary>
         readonly string _metadataFile;
 
-        #endregion MetadataSettings Fields
+        #endregion Fields
 
-        #region MetadataSettings Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MetadataSettings"/> class with default 
         /// settings.
         /// </summary>
-        public MetadataSettings() : this(true, null)
+        public MetadataSettings() : this(null)
         {
 
         }
@@ -40,29 +31,14 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Initializes a new instance of the <see cref="MetadataSettings"/> class.
         /// </summary>
-        public MetadataSettings(bool alwaysOutputMetadata, string metadataFile)
+        public MetadataSettings(string metadataFile)
         {
-            _alwaysOutputMetadata = alwaysOutputMetadata;
             _metadataFile = metadataFile ?? @"<SourceDocName>.xml";
         }
 
-        #endregion MetadataSettings Constructors
+        #endregion Constructors
 
-        #region MetadataSettings Properties
-
-        /// <summary>
-        /// Gets whether verification metadata should always be output.
-        /// </summary>
-        /// <returns><see langword="true"/> if verification metadata should always be output;
-        /// <see langword="false"/> if verification metadata should be output only for documents 
-        /// that contain redactions.</returns>
-        public bool AlwaysOutputMetadata
-        {
-            get
-            {
-                return _alwaysOutputMetadata;
-            }
-        }
+        #region Properties
 
         /// <summary>
         /// Gets the path to the verification metadata xml file. May contain tags.
@@ -76,9 +52,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion MetadataSettings Properties
+        #endregion Properties
 
-        #region MetadataSettings Methods
+        #region Methods
 
         /// <summary>
         /// Creates a <see cref="MetadataSettings"/> from the specified 
@@ -92,10 +68,9 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                bool alwaysOutputMetadata = reader.ReadBoolean();
                 string metadataFile = reader.ReadString();
 
-                return new MetadataSettings(alwaysOutputMetadata, metadataFile);
+                return new MetadataSettings(metadataFile);
             }
             catch (Exception ex)
             {
@@ -114,7 +89,6 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                writer.Write(_alwaysOutputMetadata);
                 writer.Write(_metadataFile);
             }
             catch (Exception ex)
@@ -124,6 +98,6 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion MetadataSettings Methods
+        #endregion Methods
     }
 }
