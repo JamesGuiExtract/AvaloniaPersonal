@@ -192,7 +192,7 @@ namespace SplitMultiPageImage
             using (ImageReader reader = codecs.CreateReader(input))
             {
                 // Get the full path of the input file without the extension
-                string baseFileName = GetBaseFileName(input);
+                string baseFileName = FileSystemMethods.GetFullPathWithoutExtension(input);
 
                 // Get format for the extension of the output file
                 string stringFormat = GetStringFormat(reader);
@@ -228,19 +228,6 @@ namespace SplitMultiPageImage
             {
                 File.Delete(input);
             }
-        }
-
-        /// <summary>
-        /// Get the full path of the specified file without the extension.
-        /// </summary>
-        /// <param name="path">The path to a file.</param>
-        /// <returns>The full path of <paramref name="path"/> without the extension.</returns>
-        static string GetBaseFileName(string path)
-        {
-            string directory = Path.GetDirectoryName(path);
-            string file = Path.GetFileNameWithoutExtension(path);
-
-            return Path.Combine(directory, file);
         }
 
         /// <summary>
