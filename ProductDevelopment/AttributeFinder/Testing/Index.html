@@ -33,6 +33,7 @@
           	<li><a href="CustomerErrors.html">Customer Errors</a></li>
           	<li><a href="General70.html">Miscellaneous 7.0 Tests</a></li>
           	<li><a href="./FeatureTesting/80_Features.html">New Features for 8.0</a></li>
+          	<li><a href="Final_SCRs_80.html">Final 8.0 SCRs</a></li>
        	</ul>
     	</LI>
 <p>
@@ -80,7 +81,8 @@
 	  	<li><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/Utils/FAMDBAdmin/InteractiveTest/FAMDBAdmin.html">FAM DB Admin</a></li>
 	  	<li><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/DBConnectivity.html">Database Connectivity</a></li>
 		<LI><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/ProcessingTab.html">File Processing Tabs</a></LI>
-		<LI><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/ProcessFilesTasks.html">File Processing Tasks</a></LI>
+		<LI><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/ProcessFilesTasks.html">File Processing Tasks - General</a></LI>
+          	<LI><a href="../IndustrySpecific/Redaction/InteractiveTest/IDShieldTasks.html"> File Processing Tasks - ID Shield</a></LI>
 		<LI><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/ESFileSuppliers/InteractiveTest/FileSuppliers.html">Queueing Tabs and File Suppliers</a></LI>
 	  	<li><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/Utils/ReportViewer/InteractiveTest/ReportViewer - General.html">Report Viewer - General</a></li>
 	  	<li><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/Utils/ReportViewer/InteractiveTest/ReportViewer - ID Shield.html">Report Viewer - ID Shield</a></li>
@@ -92,7 +94,14 @@
        	<ul>
           	<li><a href="Installation2.html">Installation</a></li>
 		<LI><a href="SanityTests/SanityTests.html">FAM Sanity Tests (#22)</a></LI>
-		<LI><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/RunningFileActionManagerAsService.html">Running FAM as a Service</a></LI>
+		<li>Running FAM as a Service
+		<ul>
+			<LI><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/ServiceSQL2005.html"> 
+			Service setup for SQL Server 2005</a></LI>
+			<LI><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/ServiceSQL2008.html"> 
+			Service setup for SQL Server 2008</a></LI>
+			<LI><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/RunningFileActionManagerAsService.html"> FAM Service - Testing</a></LI>
+		</ul>
 	</ul>
 	</LI>
 <br>
@@ -154,44 +163,36 @@
        	</ul>
 <p>
 	<LI><h3>General Stability Testing</h3>
-	<h2>Capture Rate - Tests 41 &amp; 42</h2>
+	<h2>Memory Leak Tests</h2>
 	<ul>
-         	<li><a href="./CaptureRateTesting/FLEXIndex_CaptureRate.html">FLEX Index</a></li>
-         	<li><a href="./CaptureRateTesting/IDShield_CaptureRate.html">ID Shield</a></li>
-	</ul>						 
+        	<li><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/MemoryLeakTesting.html"> 
+		Task Object Instructions</a></li>
+       		<li><a href="./MemoryLeakTesting/MemoryLeakTesting.html"> Rule Object Instructions</a></li>
+	</ul>
 <p>
-	<h2>Memory Leak - Tests 17 &amp; 18</h2>
-	<ul>
-        	<li><a href="../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/MemoryLeakTesting.html">Task Object Instructions</a></li>
-        	<li><a href="./MemoryLeakTesting/MemoryLeak_Tasks.html">Task Object List</a></li>
-<p>
-       		<li><a href="./MemoryLeakTesting/MemoryLeakTesting.html">Rule Object Instructions</a></li>
-       		<li><a href="./MemoryLeakTesting/MemoryLeak_RuleObjects.html">Rule Object List</a></li>
-	</ul>						 
-<p>
-	<h2>Endurance - Tests 6A &amp; 6B</h2>
+	<h2>Endurance Tests</h2>
 	<ul>
         	<li><a href="./EnduranceTesting/EarlyEndurance.html">Instructions for 
 		Pre-code Freeze Testing</a></li>
         	<li><a href="./EnduranceTesting/EnduranceTests.html">Instructions for 
 		Large-scale Test</a></li>
-	</ul>						 
+	</ul>
 <p>
-	<h2>Basic Stability - Tests 22, 23; 3A, 3C, 3E; 31</h2>
+	<h2>Basic Stability Tests</h2>
 	<ul>
-		<LI>Sanity Tests (#22) - see above</LI>
-		<LI><a href="ScalabilityTests/ScalabilityTests.html">FAM Scalability Tests (#23)</a></LI>
+		<LI>Sanity Tests - see above</LI>
+		<LI><a href="ScalabilityTests/ScalabilityTests.html">FAM Scalability Tests</a></LI>
 <p>
-       		<li><a href="./StabilityTesting/TIF_Stability.html">TIF Testing (#3A, #3C, #3E)</a></li>
-       		<li><a href="./StabilityTesting/PDF_Stability.html">PDF Testing (#31)</a></li>
-	</ul>						 
+       		<li><a href="./StabilityTesting/TIF_Stability.html">TIF Testing</a></li>
+       		<li><a href="./StabilityTesting/PDF_Stability.html">PDF Testing</a></li>
+	</ul>
 <p>
-	<h2>Processing Rate - Tests 4, 5, 7</h2>
+	<h2>ID Shield Benchmark Tests</h2>
 	<ul>
-       		<li><a href="./ProcessingRate/RateTests.html">Instructions</a></li>
-	</ul>						 
+       		<li><a href="./ProcessingRate/IDShieldBenchmarkTests.html">Instructions</a></li>
+	</ul>
 <p>
-	<h2>Large-Scale Verification Testing - Test 33</h2>
+	<h2>Large-Scale Verification Tests</h2>
 	<ul>
        		<li><a href="./ScalabilityTests/VerificationTesting.html">Instructions</a></li>
 	</ul>
