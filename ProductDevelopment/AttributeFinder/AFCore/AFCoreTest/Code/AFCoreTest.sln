@@ -1540,12 +1540,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFAMService", "..\..\..\..
 		{E07E00CC-656A-424A-977E-27B8B8D2C286} = {E07E00CC-656A-424A-977E-27B8B8D2C286}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Redaction", "..\..\..\..\..\RC.Net\Redaction\Core\Code\Extract.Redaction.csproj", "{44B108A6-5A58-4F2C-8126-BAF763A304BF}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 119
+		ProjectCount = 120
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcproj
@@ -1665,6 +1671,7 @@ Global
 		ProjectRelativeDiskPath117 = ..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\FAMProcess\Code\FAMProcess.vcproj
 		ProjectRelativeDiskPath118 = ..\..\..\..\Utils\SplitMultiPageImage\Code\SplitMultiPageImage.csproj
 		ProjectRelativeDiskPath119 = ..\..\..\..\..\RC.Net\FileActionManager\Utilities\ESFAMProcess\Core\Code\ESFAMService.csproj
+		ProjectRelativeDiskPath120 = ..\..\..\..\..\RC.Net\Redaction\Core\Code\Extract.Redaction.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2867,6 +2874,16 @@ Global
 		{2524969C-E82D-49E4-907A-AD6BDF9354DC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{2524969C-E82D-49E4-907A-AD6BDF9354DC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2524969C-E82D-49E4-907A-AD6BDF9354DC}.Release|Win32.ActiveCfg = Release|Any CPU
+		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
