@@ -28,6 +28,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DocumentationFile>..\..\..\..\..\Binaries\Debug\Extract.Redaction.Verification.xml</DocumentationFile>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,6 +41,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DocumentationFile>..\..\..\..\..\Binaries\Release\Extract.Redaction.Verification.xml</DocumentationFile>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Extract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
@@ -160,6 +162,13 @@
     <Compile Include="InitializationSettings.cs" />
     <Compile Include="MasterExemptionCodeList.cs" />
     <Compile Include="MetadataSettings.cs" />
+    <Compile Include="MetadataSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MetadataSettingsDialog.Designer.cs">
+      <DependentUpon>MetadataSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MetadataTask.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -176,7 +185,7 @@
     <Compile Include="RedactionCounts.cs" />
     <Compile Include="TimeInterval.cs" />
     <Compile Include="VerificationFileChanges.cs" />
-    <Compile Include="VerificationItem.cs" />
+    <Compile Include="SensitiveItem.cs" />
     <Compile Include="VerificationFile.cs" />
     <Compile Include="VerificationMemento.cs" />
     <Compile Include="VerificationOptions.cs" />
@@ -319,6 +328,10 @@
       <SubType>Designer</SubType>
       <DependentUpon>FeedbackSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="MetadataSettingsDialog.resx">
+      <DependentUpon>MetadataSettingsDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>
@@ -372,8 +385,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"
-"$(FrameworkDir)"\Regasm.exe "$(TargetPath)" /tlb:"$(ProjectDir)$(TargetName).tlb"
-</PostBuildEvent>
+    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
