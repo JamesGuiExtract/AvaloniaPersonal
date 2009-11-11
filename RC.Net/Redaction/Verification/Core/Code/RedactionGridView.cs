@@ -21,7 +21,7 @@ namespace Extract.Redaction.Verification
     /// </summary>
     public sealed partial class RedactionGridView : UserControl, IImageViewerControl
     {
-        #region RedactionGridView Enums
+        #region Enums
 
         /// <summary>
         /// Specifies the set of indexes in <see cref="_CATEGORIES"/>.
@@ -57,9 +57,9 @@ namespace Extract.Redaction.Verification
             // because the names of the enum are binary searched.
         }
 
-        #endregion RedactionGridView Enums
+        #endregion Enums
 
-        #region RedactionGridView Constants
+        #region Constants
 
         /// <summary>
         /// Directory where exemption code xml files are stored.
@@ -87,9 +87,9 @@ namespace Extract.Redaction.Verification
         /// </summary>
         const int _DEFAULT_AUTO_ZOOM_SCALE = 5;
 
-        #endregion RedactionGridView Constants
+        #endregion Constants
 
-        #region RedactionGridView Fields
+        #region Fields
 
         /// <summary>
         /// The <see cref="ImageViewer"/> with which the <see cref="RedactionGridView"/> is 
@@ -171,9 +171,9 @@ namespace Extract.Redaction.Verification
         /// </summary>
         DataGridViewCellStyle _visitedPageCellStyle;
 
-        #endregion RedactionGridView Fields
+        #endregion Fields
 
-        #region RedactionGridView Events
+        #region Events
 
         /// <summary>
         /// Occurs when an exemption code is applied to a redaction.
@@ -182,9 +182,9 @@ namespace Extract.Redaction.Verification
         [Description("Occurs when an exemption code is applied to a redaction.")]
         public event EventHandler<ExemptionsAppliedEventArgs> ExemptionsApplied;
 
-        #endregion RedactionGridView Events
+        #endregion Events
 
-        #region RedactionGridView Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="RedactionGridView"/> class.
@@ -199,9 +199,9 @@ namespace Extract.Redaction.Verification
             _dataGridView.DataSource = _redactions;
         }
 
-        #endregion RedactionGridView Constructors
+        #endregion Constructors
 
-        #region RedactionGridView Properties
+        #region Properties
 
         /// <summary>
         /// Gets the rows of the <see cref="RedactionGridView"/>.
@@ -477,9 +477,9 @@ namespace Extract.Redaction.Verification
             }
         }
         
-        #endregion RedactionGridView Properties
+        #endregion Properties
 
-        #region RedactionGridView Methods
+        #region Methods
 
         /// <summary>
         /// Adds the specified row to the <see cref="RedactionGridView"/>.
@@ -995,7 +995,7 @@ namespace Extract.Redaction.Verification
         void AddAttributesFromFile(VerificationFile file)
         {
             // Iterate over the attributes
-            foreach (VerificationItem item in file.Items)
+            foreach (SensitiveItem item in file.Items)
             {
                 // Add each attribute
                 RedactionGridViewRow row = 
@@ -1523,9 +1523,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion RedactionGridView Methods
+        #endregion Methods
 
-        #region RedactionGridView OnEvents
+        #region OnEvents
 
         /// <summary>
         /// Raises the <see cref="ExemptionsApplied"/> event.
@@ -1540,9 +1540,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion RedactionGridView OnEvents
+        #endregion OnEvents
 
-        #region RedactionGridView Event Handlers
+        #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
@@ -1766,7 +1766,7 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion RedactionGridView Event Handlers
+        #endregion Event Handlers
 
         #region IImageViewerControl Members
 

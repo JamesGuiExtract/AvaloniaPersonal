@@ -1,9 +1,9 @@
+using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
-using Extract.Licensing;
 using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 
@@ -49,12 +49,12 @@ namespace Extract.Redaction.Verification
         string _sourceDocument;
 
         /// <summary>
-        /// All items queried for verification.
+        /// Clues and redactions.
         /// </summary>
-        List<VerificationItem> _itemsToVerify;
+        List<SensitiveItem> _sensitiveItems;
 
         /// <summary>
-        /// All attributes that are not being verified.
+        /// All non-sensitive and metadata attributes.
         /// </summary>
         List<ComAttribute> _attributes;
 
@@ -94,14 +94,14 @@ namespace Extract.Redaction.Verification
         #region Properties
 
         /// <summary>
-        /// Gets the verifiable items that contain spatial information.
+        /// Gets the clues and redactions.
         /// </summary>
-        /// <value>The verifiable items that contain spatial information.</value>
-        public ReadOnlyCollection<VerificationItem> Items
+        /// <value>The clues and redactions.</value>
+        public ReadOnlyCollection<SensitiveItem> Items
         {
             get
             {
-                return _itemsToVerify.AsReadOnly();
+                return _sensitiveItems.AsReadOnly();
             }
         }
 
@@ -149,7 +149,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                _itemsToVerify = new List<VerificationItem>();
+                _sensitiveItems = new List<SensitiveItem>();
                 _attributes = new List<ComAttribute>();
                 _sessionId = 0;
                 _nextId = 1;
@@ -193,19 +193,19 @@ namespace Extract.Redaction.Verification
                 AddAttributes(vector, level);
             }
 
-            // Ensure all the items for verification have attribute ids
-            foreach (VerificationItem item in _itemsToVerify)
+            // Ensure all sensitive items have attribute ids
+            foreach (SensitiveItem item in _sensitiveItems)
             {
                 AssignId(item.Attribute);
             }
 
             // Determine the next attribute id
-            _nextId = GetNextId(_itemsToVerify, attributes);
+            _nextId = GetNextId(_sensitiveItems, attributes);
 
             // Get the current session id
             _sessionId = GetSessionId(attributes);
 
-            // Store the attributes that aren't being verified
+            // Store the remaining attributes
             int count = attributes.Size();
             for (int i = 0; i < count; i++)
             {
@@ -330,7 +330,7 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Adds attributes by confidence level and stores them in <see cref="_itemsToVerify"/>.
+        /// Adds attributes by confidence level and stores them in <see cref="_sensitiveItems"/>.
         /// </summary>
         /// <param name="attributes">The attributes to add.</param>
         /// <param name="level">The confidence level of the <paramref name="attributes"/>.</param>
@@ -346,8 +346,8 @@ namespace Extract.Redaction.Verification
                 SpatialString value = attribute.Value;
                 if (value.HasSpatialInfo())
                 {
-                    VerificationItem item = new VerificationItem(level, attribute);
-                    _itemsToVerify.Add(item);
+                    SensitiveItem item = new SensitiveItem(level, attribute);
+                    _sensitiveItems.Add(item);
                 }
                 else
                 {
@@ -397,11 +397,11 @@ namespace Extract.Redaction.Verification
         /// Calculates the unique id of the next created attribute.
         /// </summary>
         /// <returns>The unique id of the next created attribute.</returns>
-        long GetNextId(IEnumerable<VerificationItem> items, IUnknownVector vector)
+        long GetNextId(IEnumerable<SensitiveItem> items, IUnknownVector vector)
         {
-            // Iterate over the items to verify for the next id.
+            // Iterate over the clues and redactions for the next id.
             long nextId = 1;
-            foreach (VerificationItem item in items)
+            foreach (SensitiveItem item in items)
             {
                 nextId = GetNextId(item.Attribute, nextId);
             }
@@ -511,13 +511,13 @@ namespace Extract.Redaction.Verification
         /// <param name="time">The interval of screen time spent verifying the file.</param>
         /// <param name="settings">The settings used during verification.</param>
         [CLSCompliant(false)]
-        public void SaveTo(string fileName, VerificationFileChanges changes, TimeInterval time, 
-            VerificationSettings settings)
+        public void SaveVerificationSession(string fileName, VerificationFileChanges changes, 
+            TimeInterval time, VerificationSettings settings)
         {
             try
             {
                 // Calculate the new items to verify
-                List<VerificationItem> itemsToVerify = new List<VerificationItem>(_itemsToVerify);
+                List<SensitiveItem> itemsToVerify = new List<SensitiveItem>(_sensitiveItems);
 
                 // Update any changed items (deleted, modified, and added)
                 ComAttribute[] oldDeleted = UpdateDeletedItems(itemsToVerify, changes.Deleted);
@@ -533,7 +533,7 @@ namespace Extract.Redaction.Verification
                 output.SaveTo(fileName, false);
 
                 // Update the items to verify
-                _itemsToVerify = itemsToVerify;
+                _sensitiveItems = itemsToVerify;
 
                 // Update the attributes that don't need verification
                 _attributes = GetAttributesFromVector(attributes);
@@ -556,7 +556,7 @@ namespace Extract.Redaction.Verification
         /// <param name="items">The items to be updated.</param>
         /// <param name="deleted">The attributes to delete.</param>
         /// <returns>The previous version of the deleted attributes.</returns>
-        static ComAttribute[] UpdateDeletedItems(IList<VerificationItem> items,
+        static ComAttribute[] UpdateDeletedItems(IList<SensitiveItem> items,
             ICollection<ComAttribute> deleted)
         {
             // Make an array to hold the previous version of the modified attributes
@@ -593,7 +593,7 @@ namespace Extract.Redaction.Verification
         /// <param name="items">The items to be updated.</param>
         /// <param name="modified">The attributes to modify.</param>
         /// <returns>The previous version of the modified attributes.</returns>
-        static ComAttribute[] UpdateModifiedItems(IList<VerificationItem> items,
+        static ComAttribute[] UpdateModifiedItems(IList<SensitiveItem> items,
             ICollection<ComAttribute> modified)
         {
             // Make an array to hold the previous version of the modified attributes
@@ -614,7 +614,7 @@ namespace Extract.Redaction.Verification
                 }
 
                 // Store the previous version
-                VerificationItem old = items[index];
+                SensitiveItem old = items[index];
                 oldModified[i] = old.Attribute;
                 i++;
 
@@ -622,7 +622,7 @@ namespace Extract.Redaction.Verification
                 IncrementRevision(attribute);
 
                 // Store the new version
-                items[index] = new VerificationItem(old.Level, attribute);
+                items[index] = new SensitiveItem(old.Level, attribute);
             }
 
             return oldModified;
@@ -633,7 +633,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="items">The items to be updated.</param>
         /// <param name="added">The attributes to add.</param>
-        void UpdateAddedItems(ICollection<VerificationItem> items, IEnumerable<ComAttribute> added)
+        void UpdateAddedItems(ICollection<SensitiveItem> items, IEnumerable<ComAttribute> added)
         {
             foreach (ComAttribute attribute in added)
             {
@@ -641,7 +641,7 @@ namespace Extract.Redaction.Verification
                 AssignId(attribute);
 
                 // Add the attribute
-                VerificationItem item = new VerificationItem(_manual, attribute);
+                SensitiveItem item = new SensitiveItem(_manual, attribute);
                 items.Add(item);
             }
         }
@@ -654,11 +654,11 @@ namespace Extract.Redaction.Verification
         /// <param name="id">The attribute id of an item in <paramref name="items"/>.</param>
         /// <returns>The index of the item in <paramref name="items"/> with the specified 
         /// attribute <paramref name="id"/>; or -1 if no such item exists.</returns>
-        static int GetIndexFromAttributeId(IList<VerificationItem> items, long id)
+        static int GetIndexFromAttributeId(IList<SensitiveItem> items, long id)
         {
             for (int i = 0; i < items.Count; i++)
             {
-                VerificationItem item = items[i];
+                SensitiveItem item = items[i];
                 long itemId = GetAttributeId(item.Attribute);
                 if (id == itemId)
                 {
@@ -863,12 +863,12 @@ namespace Extract.Redaction.Verification
         /// <param name="unverified">The attributes that were not verified.</param>
         /// <returns>A vector containing the attributes from <paramref name="verified"/> and 
         /// <paramref name="unverified"/>.</returns>
-        static IUnknownVector GetOutputVector(IEnumerable<VerificationItem> verified, 
+        static IUnknownVector GetOutputVector(IEnumerable<SensitiveItem> verified, 
             IUnknownVector unverified)
         {
             // Add the verified attributes to the output vector
             IUnknownVector output = new IUnknownVector();
-            foreach (VerificationItem item in verified)
+            foreach (SensitiveItem item in verified)
             {
                 output.PushBack(item.Attribute);
             }

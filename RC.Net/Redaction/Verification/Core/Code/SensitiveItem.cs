@@ -5,41 +5,41 @@ using ComAttribute = UCLID_AFCORELib.Attribute;
 namespace Extract.Redaction.Verification
 {
     /// <summary>
-    /// Represents a single redaction or clue used for verification
+    /// Represents a single redaction or clue.
     /// </summary>
-    public class VerificationItem
+    public class SensitiveItem
     {
-        #region VerificationItem Fields
+        #region Fields
 
         /// <summary>
-        /// The confidence level of the <see cref="VerificationItem"/>.
+        /// The confidence level of the <see cref="SensitiveItem"/>.
         /// </summary>
         readonly ConfidenceLevel _level;
 
         /// <summary>
-        /// The attribute associated with the <see cref="VerificationItem"/>.
+        /// The attribute associated with the <see cref="SensitiveItem"/>.
         /// </summary>
         readonly ComAttribute _attribute;
 
-        #endregion VerificationItem Fields
+        #endregion Fields
 
-        #region VerificationItem Constructors
+        #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VerificationItem"/> class.
+        /// Initializes a new instance of the <see cref="SensitiveItem"/> class.
         /// </summary>
         /// <param name="level">The confidence level of this item.</param>
         /// <param name="attribute">The attribute associated with this item.</param>
         [CLSCompliant(false)]
-        public VerificationItem(ConfidenceLevel level, ComAttribute attribute)
+        public SensitiveItem(ConfidenceLevel level, ComAttribute attribute)
         {
             _level = level;
             _attribute = attribute;
         }
 
-        #endregion VerificationItem Constructors
+        #endregion Constructors
 
-        #region VerificationItem Properties
+        #region Properties
 
         /// <summary>
         /// Gets the value associated with this verification item.
@@ -66,6 +66,6 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion VerificationItem Properties
+        #endregion Properties
     }
 }

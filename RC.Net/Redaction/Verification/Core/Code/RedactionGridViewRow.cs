@@ -18,7 +18,7 @@ namespace Extract.Redaction.Verification
     /// </summary>
     public class RedactionGridViewRow
     {
-        #region RedactionGridViewRow Fields
+        #region Fields
 
         /// <summary>
         /// The attribute to which the row corresponds.
@@ -79,9 +79,9 @@ namespace Extract.Redaction.Verification
         /// </summary>
         bool _exemptionsDirty;
 
-        #endregion RedactionGridViewRow Fields
+        #endregion Fields
 
-        #region RedactionGridViewRow Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RedactionGridViewRow"/> class.
@@ -115,9 +115,9 @@ namespace Extract.Redaction.Verification
             _exemptions = exemptions ?? new ExemptionCodeList();
         }
 
-        #endregion RedactionGridViewRow Constructors
+        #endregion Constructors
 
-        #region RedactionGridViewRow Properties
+        #region Properties
 
         /// <summary>
         /// Gets the COM attribute associated with the <see cref="RedactionGridViewRow"/>.
@@ -299,9 +299,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion RedactionGridViewRow Properties
+        #endregion Properties
 
-        #region RedactionGridViewRow Methods
+        #region Methods
 
         /// <summary>
         /// Determines whether the specified layer object is associated with the 
@@ -376,7 +376,7 @@ namespace Extract.Redaction.Verification
 
         /// <summary>
         /// Creates a <see cref="RedactionGridViewRow"/> with information from the specified 
-        /// <see cref="VerificationItem"/>.
+        /// <see cref="SensitiveItem"/>.
         /// </summary>
         /// <param name="item">The verification item from which to create a 
         /// <see cref="RedactionGridViewRow"/>.</param>
@@ -384,7 +384,7 @@ namespace Extract.Redaction.Verification
         /// <param name="masterCodes">The list of valid exemption codes.</param>
         /// <returns>A <see cref="RedactionGridViewRow"/> with information from the specified 
         /// <paramref name="item"/>.</returns>
-        public static RedactionGridViewRow FromVerificationItem(VerificationItem item, 
+        public static RedactionGridViewRow FromVerificationItem(SensitiveItem item, 
             ImageViewer imageViewer, MasterExemptionCodeList masterCodes)
         {
             try
@@ -776,6 +776,6 @@ namespace Extract.Redaction.Verification
             return page;
         }
 
-        #endregion RedactionGridViewRow Methods
+        #endregion Methods
     }
 }
