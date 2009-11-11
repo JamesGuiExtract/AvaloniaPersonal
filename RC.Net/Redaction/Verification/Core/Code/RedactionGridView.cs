@@ -915,7 +915,7 @@ namespace Extract.Redaction.Verification
         /// <param name="file">A file containing a vector of attributes.</param>
         /// <param name="visitedRows">The rows to mark as visited; or <see langword="null"/> if 
         /// all rows should be marked as visited.</param>
-        public void LoadFrom(VerificationFile file, VisitedItemsCollection visitedRows)
+        public void LoadFrom(RedactionFile file, VisitedItemsCollection visitedRows)
         {
             try
             {
@@ -992,7 +992,7 @@ namespace Extract.Redaction.Verification
         /// Adds attributes from the specified file to the <see cref="RedactionGridView"/>.
         /// </summary>
         /// <param name="file">The file containing the attributes to add.</param>
-        void AddAttributesFromFile(VerificationFile file)
+        void AddAttributesFromFile(RedactionFile file)
         {
             // Iterate over the attributes
             foreach (SensitiveItem item in file.Items)
@@ -1014,7 +1014,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="sourceDocument">The source document to use for changed attributes.</param>
         /// <returns>The changes saved to the verification file.</returns>
-        public VerificationFileChanges SaveChanges(string sourceDocument)
+        public RedactionFileChanges SaveChanges(string sourceDocument)
         {
             try
             {
@@ -1034,7 +1034,7 @@ namespace Extract.Redaction.Verification
                     }
                 }
 
-                return new VerificationFileChanges(added, _deletedAttributes, modified);
+                return new RedactionFileChanges(added, _deletedAttributes, modified);
             }
             catch (Exception ex)
             {

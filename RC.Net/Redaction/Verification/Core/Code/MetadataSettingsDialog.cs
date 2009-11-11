@@ -2,7 +2,7 @@ using System;
 using System.Windows.Forms;
 using Extract.Utilities.Forms;
 
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
     /// Represents a dialog that allows the user to select metadata settings.

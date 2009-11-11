@@ -184,9 +184,9 @@
     </Compile>
     <Compile Include="RedactionCounts.cs" />
     <Compile Include="TimeInterval.cs" />
-    <Compile Include="VerificationFileChanges.cs" />
+    <Compile Include="RedactionFileChanges.cs" />
     <Compile Include="SensitiveItem.cs" />
-    <Compile Include="VerificationFile.cs" />
+    <Compile Include="RedactionFile.cs" />
     <Compile Include="VerificationMemento.cs" />
     <Compile Include="VerificationOptions.cs" />
     <Compile Include="VerificationOptionsDialog.cs">
@@ -317,6 +317,10 @@
     <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Core\Code\Extract.Redaction.csproj">
+      <Project>{44B108A6-5A58-4F2C-8126-BAF763A304BF}</Project>
+      <Name>Extract.Redaction</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

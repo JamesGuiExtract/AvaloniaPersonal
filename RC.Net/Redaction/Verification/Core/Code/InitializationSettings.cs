@@ -1,14 +1,10 @@
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
-using System.Text;
-using System.Collections.ObjectModel;
 
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
     /// Represents ID Shield settings read from an initialization file (ini).
@@ -17,35 +13,35 @@ namespace Extract.Redaction.Verification
     {
         #region InitializationSettings Constants
 
-        static readonly string _GENERAL_SECTION = "General";
+        const string _GENERAL_SECTION = "General";
 
-        static readonly string _LEVEL_SECTION_PREFIX = "Level";
+        const string _LEVEL_SECTION_PREFIX = "Level";
 
-        static readonly string _AUTO_ZOOM_KEY = "AutoZoom";
+        const string _AUTO_ZOOM_KEY = "AutoZoom";
 
-        static readonly string _AUTO_ZOOM_SCALE_KEY = "AutoZoomScale";
+        const string _AUTO_ZOOM_SCALE_KEY = "AutoZoomScale";
 
-        static readonly string _AUTO_TOOL_KEY = "AutoPan";
+        const string _AUTO_TOOL_KEY = "AutoPan";
 
-        static readonly string _REDACTION_COLOR_KEY = "RedactionColorInOutputFile";
+        const string _REDACTION_COLOR_KEY = "RedactionColorInOutputFile";
 
-        static readonly string _LEVEL_COUNT_KEY = "NumConfidenceLevels";
+        const string _LEVEL_COUNT_KEY = "NumConfidenceLevels";
 
-        static readonly string _LONG_NAME_KEY = "LongName";
+        const string _LONG_NAME_KEY = "LongName";
 
-        static readonly string _SHORT_NAME_KEY = "ShortName";
+        const string _SHORT_NAME_KEY = "ShortName";
 
-        static readonly string _QUERY_KEY = "Query";
+        const string _QUERY_KEY = "Query";
 
-        static readonly string _COLOR_KEY = "Color";
+        const string _COLOR_KEY = "Color";
 
-        static readonly string _OUTPUT_KEY = "Output";
+        const string _OUTPUT_KEY = "Output";
 
-        static readonly string _REDACTION_TYPES_SECTION = "RedactionDataTypes";
+        const string _REDACTION_TYPES_SECTION = "RedactionDataTypes";
 
-        static readonly string _REDACTION_TYPE_COUNT_KEY = "NumRedactionDataTypes";
+        const string _REDACTION_TYPE_COUNT_KEY = "NumRedactionDataTypes";
 
-        static readonly string _REDACTION_TYPE_KEY_PREFIX = "RedactionDataType";
+        const string _REDACTION_TYPE_KEY_PREFIX = "RedactionDataType";
 
         #endregion InitializationSettings Constants
 

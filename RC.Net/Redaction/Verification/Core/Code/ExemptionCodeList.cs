@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Extract.Utilities;
 
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
     /// Represents a list of exemption codes.
@@ -45,14 +45,7 @@ namespace Extract.Redaction.Verification
         {
             _category = category ?? "";
 
-            if (codes == null)
-            {
-                _codes = new string[0];
-            }
-            else
-            {
-                _codes = CollectionMethods.ToArray(codes);
-            }
+            _codes = codes == null ? new string[0] : CollectionMethods.ToArray(codes);
 
             _text = text ?? "";
         }
@@ -251,7 +244,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="codes">An array of exemption codes.</param>
         /// <returns>A hash code for <paramref name="codes"/>.</returns>
-        static int GetHashCode(string[] codes)
+        static int GetHashCode(IEnumerable<string> codes)
         {
             int hashCode = 0;
             foreach (string code in codes)

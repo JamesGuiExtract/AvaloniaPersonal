@@ -1,4 +1,4 @@
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
 	partial class MetadataSettingsDialog
 	{

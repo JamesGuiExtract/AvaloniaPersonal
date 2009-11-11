@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
     /// Represents an exemption code and its associated summary and description.

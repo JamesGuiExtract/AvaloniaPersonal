@@ -1,9 +1,7 @@
 using Extract.Interop;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
 	/// Specifies the sets of documents for which feedback should be collected.

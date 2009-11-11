@@ -10,12 +10,12 @@ using UCLID_COMUTILSLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
-    /// Represents the contents of a vector of attributes (VOA) file used for verification.
+    /// Represents the contents of a vector of attributes (VOA) file used for redaction.
     /// </summary>
-    public class VerificationFile
+    public class RedactionFile
     {
         #region Constants
 
@@ -29,7 +29,7 @@ namespace Extract.Redaction.Verification
         #region Fields
 
         /// <summary>
-        /// The confidence levels of attributes in the <see cref="RedactionGridView"/>.
+        /// The confidence levels of attributes.
         /// </summary>
         readonly ConfidenceLevelsCollection _levels;
 
@@ -79,9 +79,9 @@ namespace Extract.Redaction.Verification
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VerificationFile"/> class.
+        /// Initializes a new instance of the <see cref="RedactionFile"/> class.
         /// </summary>
-        public VerificationFile(ConfidenceLevelsCollection levels)
+        public RedactionFile(ConfidenceLevelsCollection levels)
         {
             _license.Validate("ELI28215");
 
@@ -504,14 +504,14 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Saves the <see cref="VerificationFile"/> with the specified changes and information. 
+        /// Saves the <see cref="RedactionFile"/> with the specified changes and information. 
         /// </summary>
         /// <param name="fileName">The full path to location where the file should be saved.</param>
         /// <param name="changes">The attributes that have been added, modified, and deleted.</param>
         /// <param name="time">The interval of screen time spent verifying the file.</param>
         /// <param name="settings">The settings used during verification.</param>
         [CLSCompliant(false)]
-        public void SaveVerificationSession(string fileName, VerificationFileChanges changes, 
+        public void SaveVerificationSession(string fileName, RedactionFileChanges changes, 
             TimeInterval time, VerificationSettings settings)
         {
             try
@@ -712,7 +712,7 @@ namespace Extract.Redaction.Verification
         /// <returns>All the attributes in a verification vector of attributes (VOA) file, other 
         /// than the ones that were directly verified by the user.</returns>
         IUnknownVector GetUnverifiedAttributes(VerificationSettings settings, TimeInterval time,
-            VerificationFileChanges changes, ComAttribute[] oldDeleted, ComAttribute[] oldModified)
+            RedactionFileChanges changes, ComAttribute[] oldDeleted, ComAttribute[] oldModified)
         {
             // Copy the original unverified attributes in to a vector
             IUnknownVector attributes = new IUnknownVector();
@@ -741,7 +741,7 @@ namespace Extract.Redaction.Verification
         /// <param name="changes">The changes made during verification.</param>
         /// <returns>A new session attribute.</returns>
         ComAttribute CreateSessionAttribute(TimeInterval screenTime, VerificationSettings settings,
-            VerificationFileChanges changes)
+            RedactionFileChanges changes)
         {
             // User and screenTime information
             ComAttribute user = CreateUserAttribute();

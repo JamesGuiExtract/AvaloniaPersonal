@@ -2,7 +2,7 @@ using System;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
     /// Represents a single redaction or clue.

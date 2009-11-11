@@ -1,6 +1,6 @@
 using System.Drawing;
 
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
     /// Represents a level of verification confidence for a set of clues or redactions.

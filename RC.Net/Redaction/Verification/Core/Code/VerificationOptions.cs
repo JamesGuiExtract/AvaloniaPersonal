@@ -1,31 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Extract.Redaction.Verification
 {
-    /// <summary>
-    /// Specifies a set of <see cref="Extract.Imaging.Forms.CursorTool"/> that can be automatically selected after a 
-    /// highlight is created.
-    /// </summary>
-    public enum AutoTool
-    {
-        /// <summary>
-        /// No cursor tool is specified
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// The pan tool
-        /// </summary>
-        Pan,
-
-        /// <summary>
-        /// The select layer object tool
-        /// </summary>
-        SelectLayerObject
-    }
-
     /// <summary>
     /// Represents settings for the <see cref="VerificationTaskForm"/> user interface.
     /// </summary>

@@ -61,7 +61,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The file corresponding to the currently open vector of attributes (VOA) file.
         /// </summary>
-        readonly VerificationFile _currentVoa;
+        readonly RedactionFile _currentVoa;
 
         /// <summary>
         /// The file processing database.
@@ -179,7 +179,7 @@ namespace Extract.Redaction.Verification
 
                 _options = VerificationOptions.ReadFrom(_iniSettings);
 
-                _currentVoa = new VerificationFile(_iniSettings.ConfidenceLevels);
+                _currentVoa = new RedactionFile(_iniSettings.ConfidenceLevels);
 
                 // Subscribe to layer object events
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
@@ -385,7 +385,7 @@ namespace Extract.Redaction.Verification
         void SaveAttributesTo(VerificationMemento memento, TimeInterval screenTime)
         {
             string sourceDocument = _imageViewer.ImageFile;
-            VerificationFileChanges changes = _redactionGridView.SaveChanges(sourceDocument);
+            RedactionFileChanges changes = _redactionGridView.SaveChanges(sourceDocument);
 
             _currentVoa.SaveVerificationSession(memento.AttributesFile, changes, screenTime, _settings);
 

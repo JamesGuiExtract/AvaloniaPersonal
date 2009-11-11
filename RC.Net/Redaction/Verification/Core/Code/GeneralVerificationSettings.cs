@@ -1,12 +1,10 @@
 using Extract.Interop;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
-    /// Represents general settings for the <see cref="VerificationTask"/>
+    /// Represents general settings for verification.
     /// </summary>
     public class GeneralVerificationSettings
     {

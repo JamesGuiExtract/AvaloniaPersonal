@@ -4,14 +4,14 @@ using System.Collections.ObjectModel;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
     /// Represents changes made to COM attributes in a vector of attributes (VOA) file.
     /// </summary>
-    public class VerificationFileChanges
+    public class RedactionFileChanges
     {
-        #region VerificationFileChanges Fields
+        #region Fields
 
         /// <summary>
         /// COM attributes that were added.
@@ -28,14 +28,14 @@ namespace Extract.Redaction.Verification
         /// </summary>
         readonly ReadOnlyCollection<ComAttribute> _modified;
 
-        #endregion VerificationFileChanges Fields
+        #endregion Fields
 
-        #region VerificationFileChanges Constructors
+        #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VerificationFileChanges"/> class.
+        /// Initializes a new instance of the <see cref="RedactionFileChanges"/> class.
         /// </summary>
-        public VerificationFileChanges(IList<ComAttribute> added, IList<ComAttribute> deleted, 
+        public RedactionFileChanges(IList<ComAttribute> added, IList<ComAttribute> deleted, 
             IList<ComAttribute> modified)
         {
             _added = new ReadOnlyCollection<ComAttribute>(added);
@@ -43,9 +43,9 @@ namespace Extract.Redaction.Verification
             _modified = new ReadOnlyCollection<ComAttribute>(modified);
         }
 
-        #endregion VerificationFileChanges Constructors
+        #endregion Constructors
 
-        #region VerificationFileChanges Properties
+        #region Properties
 
         /// <summary>
         /// Gets the COM attributes that were added.
@@ -86,6 +86,6 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion VerificationFileChanges Properties
+        #endregion Properties
     }
 }

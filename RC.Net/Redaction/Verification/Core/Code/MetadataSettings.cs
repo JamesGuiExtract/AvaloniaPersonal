@@ -1,7 +1,7 @@
 using Extract.Interop;
 using System;
 
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
     /// Represents verification metadata settings.
