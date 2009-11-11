@@ -2,10 +2,8 @@ using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -22,15 +20,15 @@ namespace Extract.Redaction.Verification
     public class VerificationTask : ICategorizedComponent, IConfigurableObject, ICopyableObject,
         IFileProcessingTask, ILicensedComponent, IPersistStream
     {
-        #region VerificationTask Constants
+        #region Constants
 
         const string _COMPONENT_DESCRIPTION = "Redaction: Verify sensitive data";
 
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
         
-        #endregion VerificationTask Constants
+        #endregion Constants
 
-        #region VerificationTask Fields
+        #region Fields
 
         /// <summary>
         /// <see langword="true"/> if changes have been made to <see cref="VerificationTask"/> 
@@ -52,17 +50,17 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// License cache for validating the license.
         /// </summary>
-        static LicenseStateCache _licenseCache =
+        static readonly LicenseStateCache _licenseCache =
             new LicenseStateCache(LicenseIdName.IDShieldVerificationObject, _COMPONENT_DESCRIPTION);
 
         /// <summary>
         /// Object used to mutex around the verification form creation.
         /// </summary>
-        static object _lock = new object();
+        static readonly object _lock = new object();
 
-        #endregion VerificationTask Fields
+        #endregion Fields
 
-        #region VerificationTask Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VerificationTask"/> class.
@@ -89,9 +87,9 @@ namespace Extract.Redaction.Verification
             CopyFrom(task);
         }
         
-        #endregion VerificationTask Constructors
+        #endregion Constructors
         
-        #region VerificationTask Methods
+        #region Methods
 
         /// <summary>
         /// Code to be executed upon registration in order to add this class to the
@@ -135,7 +133,7 @@ namespace Extract.Redaction.Verification
             return new VerificationTaskForm(_settings);
         }
         
-        #endregion VerificationTask Methods
+        #endregion Methods
 
         #region ICategorizedComponent Members
 
@@ -334,7 +332,7 @@ namespace Extract.Redaction.Verification
         /// return.</param>
         public void GetClassID(out Guid classID)
         {
-            classID = this.GetType().GUID;
+            classID = GetType().GUID;
         }
 
         /// <summary>
