@@ -489,7 +489,7 @@ BEGIN
         MENUITEM "&Check for new components",   ID_TOOLS_CHECKFORNEWCOMPONENTS
         MENUITEM "&Enable/disable auto-scrolling", ID_TOOLS_AUTOSCROLL
         MENUITEM SEPARATOR
-        MENUITEM "&Database Administration Utility...", ID_TOOLS_DATABASEADMINISTRATIONUTILITY
+        MENUITEM "&Database Administration Utility...\tCtrl+D", ID_TOOLS_DATABASEADMINISTRATIONUTILITY
         MENUITEM SEPARATOR
         MENUITEM "&Options...",                 ID_TOOLS_OPTIONS
     END
@@ -536,6 +536,7 @@ BEGIN
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+	"D", ID_TOOLS_DATABASEADMINISTRATIONUTILITY, VIRTKEY, CONTROL, NOINVERT
 END
 
 

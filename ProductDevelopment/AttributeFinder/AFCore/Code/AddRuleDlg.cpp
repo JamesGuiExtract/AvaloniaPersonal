@@ -180,8 +180,13 @@ void CAddRuleDlg::OnBtnConfigureRule2()
 	try
 	{	
 		// Make sure an Attribute Finding Rule is selected
-		if (m_ipAFRule != NULL)
+		ICopyableObjectPtr ipCopy = m_ipAFRule;
+		if (ipCopy != NULL)
 		{
+			// Clone the rule
+			UCLID_AFCORELib::IAttributeFindingRulePtr ipRule = ipCopy->Clone();
+			ASSERT_RESOURCE_ALLOCATION("ELI28512", ipRule != NULL);
+
 			// Create the ObjectPropertiesUI object
 			IObjectPropertiesUIPtr	ipProperties( CLSID_ObjectPropertiesUI );
 
@@ -198,8 +203,12 @@ void CAddRuleDlg::OnBtnConfigureRule2()
 					string( LPCTSTR(zText) );
 				_bstr_t	bstrTitle( strTitle.c_str() );
 
-				// Display the Property Page
-				ipProperties->DisplayProperties1( m_ipAFRule, bstrTitle );
+				// Display the Property Page and check if the settings were applied
+				if (ipProperties->DisplayProperties1( ipRule, bstrTitle ) == S_OK)
+				{
+					// Set the configured rule object to be the finding rule
+					m_ipAFRule = ipRule;
+				}
 
 				// Check configured state of Attribute Finding Rule
 				showReminder();
