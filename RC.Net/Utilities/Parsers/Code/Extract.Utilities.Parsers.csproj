@@ -89,9 +89,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>"$(FrameworkDir)$(FrameworkVersion)"\RegAsm "$(TargetPath)" /tlb:"$(ProjectDir)\$(TargetName).tlb"
-if $(ConfigurationName) == Debug CommonDebugPostBuild.bat "$(TargetPath)"
-if $(ConfigurationName) == Testing UnitTestingDebugPostBuild.bat "$(TargetPath)"
+    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"
 
 </PostBuildEvent>
   </PropertyGroup>
