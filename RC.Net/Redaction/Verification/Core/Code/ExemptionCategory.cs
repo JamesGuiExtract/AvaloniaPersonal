@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml;
 
-namespace Extract.Redaction.Verification
+namespace Extract.Redaction
 {
     /// <summary>
     /// Represents a category of exemption codes.
@@ -112,15 +111,16 @@ namespace Extract.Redaction.Verification
 
             // Get the exemption category from the xml file
             XmlElement category = document.DocumentElement;
-            if (category.Name != "ExemptionCategory")
+            if (category == null || category.Name != "ExemptionCategory")
             {
                 // Throw an exception
                 ExtractException ee = new ExtractException("ELI26687",
                     "Invalid root node.");
                 ee.AddDebugData("XML file name", xmlFile, false);
-                ee.AddDebugData("Root node", category.Name, false);
+                ee.AddDebugData("Root node", category == null ? "<None>" : category.Name, false);
                 throw ee;
             }
+
             return category;
         }
 
@@ -161,7 +161,7 @@ namespace Extract.Redaction.Verification
         /// <param name="attributes">The attributes that contain the value to get.</param>
         /// <returns>The value of the attribute in <paramref name="attributes"/> with the 
         /// specified <paramref name="name"/>.</returns>
-        static string GetNamedAttributeValue(string name, XmlAttributeCollection attributes)
+        static string GetNamedAttributeValue(string name, XmlNamedNodeMap attributes)
         {
             // Get the attribute with the specified name
             XmlNode attribute = attributes.GetNamedItem(name);
