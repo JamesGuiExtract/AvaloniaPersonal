@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 
 namespace Extract.Redaction.Verification
 {
@@ -10,7 +8,7 @@ namespace Extract.Redaction.Verification
     /// </summary>
     public class ConfidenceLevelsCollection : ReadOnlyCollection<ConfidenceLevel>
     {
-        #region ConfidenceLevelsCollection Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfidenceLevelsCollection"/> class.
@@ -27,6 +25,6 @@ namespace Extract.Redaction.Verification
         {
         }
 
-        #endregion ConfidenceLevelsCollection Constructors
+        #endregion Constructors
     }
 }

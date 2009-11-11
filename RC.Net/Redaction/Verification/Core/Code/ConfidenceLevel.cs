@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Text;
 
 namespace Extract.Redaction.Verification
 {
@@ -11,7 +7,7 @@ namespace Extract.Redaction.Verification
     /// </summary>
     public class ConfidenceLevel
     {
-        #region ConfidenceLevel Fields
+        #region Fields
 
         readonly string _longName;
         readonly string _shortName;
@@ -19,9 +15,9 @@ namespace Extract.Redaction.Verification
         readonly Color _color;
         readonly bool _output;
 
-        #endregion ConfidenceLevel Fields
+        #endregion Fields
 
-        #region ConfidenceLevel Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfidenceLevel"/> class.
@@ -36,9 +32,9 @@ namespace Extract.Redaction.Verification
             _output = output;
         }
 
-        #endregion ConfidenceLevel Constructors
+        #endregion Constructors
 
-        #region ConfidenceLevel Properties
+        #region Properties
 
         /// <summary>
         /// Gets the full name of the confidence level.
@@ -102,6 +98,6 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion ConfidenceLevel Properties
+        #endregion Properties
     }
 }
