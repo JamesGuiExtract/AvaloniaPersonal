@@ -28,7 +28,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PlatformTarget>x86</PlatformTarget>
     <DocumentationFile>..\..\..\..\..\binaries\debug\Extract.FileActionManager.FileProcessors.XML</DocumentationFile>
-    <RegisterForComInterop>false</RegisterForComInterop>
+    <RegisterForComInterop>true</RegisterForComInterop>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -42,6 +42,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <DocumentationFile>..\..\..\..\..\binaries\Release\Extract.FileActionManager.FileProcessors.XML</DocumentationFile>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Leadtools, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
@@ -157,7 +158,6 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"
-"$(FrameworkDir)"\Regasm.exe "$(TargetPath)" /tlb:"$(ProjectDir)$(TargetName).tlb"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
