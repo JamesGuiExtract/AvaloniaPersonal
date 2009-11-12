@@ -257,7 +257,18 @@ LRESULT CArchiveRestoreTaskPP::OnClickedBtnArchiveDocTag(WORD wNotifyCode, WORD 
 
 	try
 	{
-		// Do nothing
+		// Get the position of the doc tag button
+		RECT rect;
+		m_btnArchiveFolderDocTags.GetWindowRect(&rect);
+
+		// Display the doc tag menu without the SourceDocName [LRCAU #5242]
+		string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top, false);
+
+		// If the user selected a tag, add it to the corresponding edit control
+		if (!strChoice.empty())
+		{
+			m_editArchiveFolder.ReplaceSel(strChoice.c_str(), TRUE);
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24610");
 
