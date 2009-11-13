@@ -138,7 +138,10 @@ Dlg_SdStartCopy:
    	InstallInliteKeyDrivers();
    	                        
 	// Install Crystal Reports
-   	InstallCrystalReports();
+   	InstallCrystalReports();  
+   	               
+	// Install SQL CE   	               
+   	InstallSQLCE();
    	
    	gbInstalled = TRUE;
 
