@@ -45,7 +45,8 @@ public:
 	CEdit m_editSelectQuery;
 	CListCtrl m_listTags;
 	CButton m_checkRandomSubset;
-	CEdit m_editRandomPercent;
+	CEdit m_editRandomAmount;
+	CComboBox m_comboRandomSubsetUnits;
 
 // Implementation
 protected:

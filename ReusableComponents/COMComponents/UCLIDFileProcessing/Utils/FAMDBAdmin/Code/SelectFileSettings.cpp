@@ -11,7 +11,8 @@
 SelectFileSettings::SelectFileSettings() :
 m_scope(eAllFiles),
 m_bLimitByRandomCondition(false),
-m_nRandomPercent(0)
+m_bRandomSubsetUsePercentage(true),
+m_nRandomAmount(0)
 {
 }
 //--------------------------------------------------------------------------------------------------
@@ -75,8 +76,16 @@ string SelectFileSettings::getSummaryString()
 
 	if (m_bLimitByRandomCondition)
 	{
-		strSummary += ".\r\nThe scope of files will be further narrowed to a random "
-			+ asString(m_nRandomPercent) + "% subset.";
+		if (m_bRandomSubsetUsePercentage)
+		{
+			strSummary += ".\r\nThe scope of files will be further narrowed to a random "
+				+ asString(m_nRandomAmount) + " percent subset.";
+		}
+		else
+		{
+			strSummary += ".\r\nThe scope of files will be further narrowed to a random "
+				+ asString(m_nRandomAmount) + " file(s) subset.";
+		}
 	}
 
 	return strSummary;
@@ -85,33 +94,35 @@ string SelectFileSettings::getSummaryString()
 string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const string& strSelect)
 {
 	ASSERT_ARGUMENT("ELI27722", ipFAMDB != NULL);
+	
+	string strQueryPart1 = "SELECT " + strSelect + " FROM ";
+	string strQueryPart2;
 
-	string strQuery = "SELECT " + strSelect + " FROM ";
 	switch(m_scope)
 	{
 		// Query based on the action status
 	case eAllFilesForWhich:
 		{
-			strQuery += "FAMFile ";
+			strQueryPart2 += "FAMFile ";
 
 			// Check if comparing skipped status
 			if (m_nStatus == kActionSkipped)
 			{
-				strQuery += "INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID WHERE "
+				strQueryPart2 += "INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID WHERE "
 					"(SkippedFile.ActionID = " + asString(m_nActionID);
 				string strUser = m_strUser;
 				if (strUser != gstrANY_USER)
 				{
-					strQuery += " AND SkippedFile.UserName = '" + strUser + "'";
+					strQueryPart2 += " AND SkippedFile.UserName = '" + strUser + "'";
 				}
-				strQuery += ")";
+				strQueryPart2 += ")";
 			}
 			else
 			{
 				// Get the status as a string
 				string strStatus = ipFAMDB->AsStatusString((EActionStatus)m_nStatus);
 
-				strQuery += "WHERE (ASC_" + m_strAction + " = '"
+				strQueryPart2 += "WHERE (ASC_" + m_strAction + " = '"
 					+ strStatus + "')";
 			}
 		}
@@ -120,7 +131,7 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 		// Query to export all the files
 	case eAllFiles:
 		{
-			strQuery += "FAMFile";
+			strQueryPart2 += "FAMFile";
 		}
 		break;
 
@@ -128,7 +139,7 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 	case eAllFilesQuery:
 		{
 			// Get the query input by the user
-			strQuery += m_strSQL;
+			strQueryPart2 += m_strSQL;
 		}
 		break;
 
@@ -149,24 +160,24 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			// Get the conjunction for the where clause
 			string strConjunction = m_bAnyTags ? "\nUNION\n" : "\nINTERSECT\n";
 
-			strQuery += "(" + strMainQueryTemp;
-			replaceVariable(strQuery, gstrTAG_NAME_VALUE, m_vecTags[0]);
+			strQueryPart2 += "(" + strMainQueryTemp;
+			replaceVariable(strQueryPart2, gstrTAG_NAME_VALUE, m_vecTags[0]);
 
 			// Build the rest of the query
 			for (size_t i=1; i < nSize; i++)
 			{
 				string strTemp = strMainQueryTemp;
 				replaceVariable(strTemp, gstrTAG_NAME_VALUE, m_vecTags[i]);
-				strQuery += strConjunction + strTemp;
+				strQueryPart2 += strConjunction + strTemp;
 			}
 
-			strQuery += ") AS FAMFile";
+			strQueryPart2 += ") AS FAMFile";
 		}
 		break;
 
 	case eAllFilesPriority:
 		{
-			strQuery += "FAMFile WHERE FAMFile.Priority = "
+			strQueryPart2 += "FAMFile WHERE FAMFile.Priority = "
 				+ asString((long)m_ePriority);
 		}
 		break;
@@ -175,23 +186,84 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 		THROW_LOGIC_ERROR_EXCEPTION("ELI27723");
 	}
 
-	return strQuery;
+	if (m_bLimitByRandomCondition)
+	{
+		// If choosing a random subset by specifying the number of files to select, use the query
+		// parts generated thus far to create a proceedure which will randomly select the specified
+		// number of results from the query while preserving the order which would have resulted
+		// from the original query.
+		// This proceedure has 3 limitations regarding strSelect:
+		// 1) strSelect cannot be "*" if none of the select columns are an identity column (in which
+		//	  case, an extra "RowNumber" column will be returned.
+		// 2) If strSelect specifies a column with the identity property, the resulting row order
+		//	  will be random regardless of any order by clause included in the query.
+		// 3) strSelect cannot reference any table name other than FAMFile. Columns from other
+		//    tables can be referenced as long as the column name is unique amongst all tables in
+		//    the query and the table name is not explicitly included.
+
+		string strRandomizedQuery =
+			// Besides improving performance, SET NOCOUNT ON prevents "Operation is not allowed when
+			// the object is closed" errors.
+			"SET NOCOUNT ON\r\n"
+			"\r\n"
+			// This query creates table #OriginalResults with the same columns as the original query.
+			"SELECT TOP 0 " + strSelect + " INTO #OriginalResults FROM " + strQueryPart2 + "\r\n"
+			"\r\n"
+			// Determine if #OriginalResults contains an identity column. Add a RowNumber identity
+			// if an identity column doesn't already exist.
+			"DECLARE @queryHasIdentityColumn INT\r\n"
+			"SELECT @queryHasIdentityColumn = COUNT(object_id) FROM tempdb.SYS.IDENTITY_COLUMNS\r\n"
+			"	WHERE object_id = OBJECT_ID('tempdb..#OriginalResults')\r\n"
+			"IF @queryHasIdentityColumn = 0\r\n"
+			"	ALTER TABLE #OriginalResults ADD RowNumber INT IDENTITY\r\n"
+			"ELSE\r\n"
+			"	SET IDENTITY_INSERT #OriginalResults ON\r\n"
+			"\r\n"
+			"DECLARE @rowsToReturn INT\r\n"
+			// Populate the table via INSERT INTO to avoid issues with ORDER BY + SELECT INTO +
+			// IDENTITY (http://support.microsoft.com/kb/273586)
+			"INSERT INTO #OriginalResults (" + strSelect + ") " + strQueryPart1 +
+				strQueryPart2 + "\r\n"
+			// Calculate the number to return (using SQL's PERCENT seems to be returning unexpected
+			// results: 50% of 28 = 15)
+			"SET @rowsToReturn = " + (m_bRandomSubsetUsePercentage ? 
+				"CEILING(@@ROWCOUNT * " + asString(m_nRandomAmount)+ ".0 / 100) " :
+				asString(m_nRandomAmount)) + "\r\n"
+			"\r\n"
+			// If the original query has an identity column, just directly return a random subset
+			// in random order since I can't come up with a good way of respecting any specified
+			// order by clause.
+			"IF @queryHasIdentityColumn = 1\r\n"
+			"	SELECT TOP (@rowsToReturn) * FROM #OriginalResults AS FAMFile ORDER BY NEWID()\r\n"
+			// If the original query doesn't have an identity column, we can select the rows
+			// randomly into a table variable, then use the random row selection to select them
+			// out of the #OriginalResults in the order they were inserted.
+			"ELSE\r\n"
+			"BEGIN\r\n"
+			"	DECLARE @randomizedRows TABLE(RowNumber INT)\r\n"
+			"	INSERT INTO @randomizedRows (#OriginalResults.RowNumber)\r\n"
+			"		SELECT TOP (@rowsToReturn) RowNumber FROM #OriginalResults ORDER BY NEWID()\r\n"
+			"\r\n"
+			"	SELECT " + strSelect + " FROM #OriginalResults AS FAMFile\r\n"
+			"		INNER JOIN @randomizedRows ON FAMFile.RowNumber = [@randomizedRows].RowNumber\r\n"
+			"			ORDER BY FAMFile.RowNumber\r\n"
+			"END\r\n"
+			"\r\n"
+			"DROP TABLE #OriginalResults\r\n";
+
+		return strRandomizedQuery;
+	}
+	else
+	{
+		// We don't need to return a sized randomized subset-- simply combine the query parts and
+		// return;
+		return strQueryPart1 + strQueryPart2;
+	}
 }
 //--------------------------------------------------------------------------------------------------
 IRandomMathConditionPtr SelectFileSettings::getRandomCondition()
 {
-	// Create the random math condition if necessary
-	if (m_bLimitByRandomCondition)
-	{
-		IRandomMathConditionPtr ipRandomCondition(CLSID_RandomMathCondition);
-		ASSERT_RESOURCE_ALLOCATION("ELI27730", ipRandomCondition != NULL);
-
-		// Set the percentage
-		ipRandomCondition->Percent = m_nRandomPercent;
-
-		return ipRandomCondition;
-	}
-
+	// For the time being, SQL proceedure is taking care of all random scenarios.
 	return NULL;
 }
 //--------------------------------------------------------------------------------------------------

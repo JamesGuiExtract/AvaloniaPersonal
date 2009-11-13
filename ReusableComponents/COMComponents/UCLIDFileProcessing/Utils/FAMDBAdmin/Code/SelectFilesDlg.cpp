@@ -66,7 +66,8 @@ void CSelectFilesDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_FILE_PRIORITY, m_radioFilesWithPriority);
 	DDX_Control(pDX, IDC_CMB_FILE_PRIORITY, m_comboPriority);
 	DDX_Control(pDX, IDC_CHECK_LIMIT_SCOPE, m_checkRandomSubset);
-	DDX_Control(pDX, IDC_EDIT_LIMIT_SCOPE, m_editRandomPercent);
+	DDX_Control(pDX, IDC_EDIT_LIMIT_SCOPE, m_editRandomAmount);
+	DDX_Control(pDX, IDC_CMB_LIMIT_SCOPE_UNITS, m_comboRandomSubsetUnits);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CSelectFilesDlg, CDialog)
@@ -153,8 +154,8 @@ BOOL CSelectFilesDlg::OnInitDialog()
 		// radio button as default setting
 		m_radioAllFiles.SetCheck(BST_CHECKED);
 
-		// Limit the random percentage edit control to 2 characters
-		m_editRandomPercent.SetLimitText(2);
+		// Default to percent as the random subset units.
+		m_comboRandomSubsetUnits.SetCurSel(0);
 
 		// Update the controls
 		updateControls();
@@ -333,29 +334,58 @@ bool CSelectFilesDlg::saveSettings()
 		CWaitCursor wait;
 
 		// Check for narrowing scope by random percentage
-		long nRandomPercent = -1;
+		long nRandomAmount = -1;
+		bool bUsePercentage = true;
 		if (m_checkRandomSubset.GetCheck() == BST_CHECKED)
 		{
-			// Get the percentage from the control
+			CString zMessageUnits;
+
+			// Get the units to be used to limit the subset.
+			if (m_comboRandomSubsetUnits.GetCurSel() == 0)
+			{
+				bUsePercentage = true;
+				zMessageUnits = "percentage";
+			}
+			else
+			{
+				bUsePercentage = false;
+				zMessageUnits = "count";
+			}
+
+			// Get the amount from the control
 			CString zTemp;
-			m_editRandomPercent.GetWindowText(zTemp);
+			m_editRandomAmount.GetWindowText(zTemp);
 
 			if (zTemp.IsEmpty())
 			{
-				MessageBox("Must not leave percentage blank!", "Empty Percentage",
+				MessageBox("Must not leave " + zMessageUnits + " blank!", "Empty " + zMessageUnits,
 					MB_OK | MB_ICONERROR);
-				m_editRandomPercent.SetFocus();
+				m_editRandomAmount.SetFocus();
 				return false;
 			}
 
 			// Convert string to long
-			nRandomPercent = asLong((LPCTSTR) zTemp);
-			if (nRandomPercent < 1 || nRandomPercent > 99)
+			nRandomAmount = asLong((LPCTSTR) zTemp);
+
+			if (bUsePercentage)
 			{
-				MessageBox("Percentage must be between 1 and 99 inclusive!", "Invalid Percentage",
-					MB_OK | MB_ICONERROR);
-				m_editRandomPercent.SetFocus();
-				return false;
+				if (nRandomAmount < 1 || nRandomAmount > 99)
+				{
+					MessageBox("Percentage must be between 1 and 99 inclusive!",
+						"Invalid Percentage", MB_OK | MB_ICONERROR);
+					m_editRandomAmount.SetFocus();
+					return false;
+				}
+			}
+			else
+			{
+				if (nRandomAmount < 1)
+				{
+					MessageBox("Random subset size must be at least 1!",
+						"Invalid Subset Size", MB_OK | MB_ICONERROR);
+					m_editRandomAmount.SetFocus();
+					return false;
+				}
 			}
 		}
 
@@ -462,10 +492,11 @@ bool CSelectFilesDlg::saveSettings()
 		}
 
 		// Set the scope narrowing values
-		m_settings.setLimitByRandomCondition(nRandomPercent != -1);
-		if (nRandomPercent != -1)
+		m_settings.setLimitByRandomCondition(nRandomAmount != -1);
+		if (nRandomAmount != -1)
 		{
-			m_settings.setRandomPercent(nRandomPercent);
+			m_settings.setRandomSubsetUsePercentage(bUsePercentage);
+			m_settings.setRandomAmount(nRandomAmount);
 		}
 
 		return true;
@@ -525,7 +556,8 @@ void CSelectFilesDlg::updateControls()
 		m_comboPriority.EnableWindow(bFilesWithPriority);
 
 		// Enable the random percentage edit control
-		m_editRandomPercent.EnableWindow(bRandomSubset);
+		m_editRandomAmount.EnableWindow(bRandomSubset);
+		m_comboRandomSubsetUnits.EnableWindow(bRandomSubset);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26997");
 }
@@ -660,7 +692,8 @@ void CSelectFilesDlg::setControlsFromSettings()
 		{
 			// Set the check box and update the text in the edit control
 			m_checkRandomSubset.SetCheck(BST_CHECKED);
-			m_editRandomPercent.SetWindowText(asString(m_settings.getRandomPercent()).c_str());
+			m_comboRandomSubsetUnits.SetCurSel(m_settings.getRandomSubsetUsePercentage() ? 0 : 1);
+			m_editRandomAmount.SetWindowText(asString(m_settings.getRandomAmount()).c_str());
 		}
 
 		// Set the radio buttons

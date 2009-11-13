@@ -120,6 +120,7 @@
 #define	IDC_EDIT_COUNTER_VALUE			2079
 #define IDC_BTN_ADD_COUNTER_OK			2080
 #define IDC_BTN_ADD_COUNTER_CANCEL		2081
+#define IDC_CMB_LIMIT_SCOPE_UNITS       2082
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774
@@ -147,7 +148,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         32793
-#define _APS_NEXT_CONTROL_VALUE         2082
+#define _APS_NEXT_CONTROL_VALUE         2083
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

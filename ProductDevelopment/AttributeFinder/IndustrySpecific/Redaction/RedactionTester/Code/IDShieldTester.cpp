@@ -355,10 +355,8 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 				throw ue;
 			}	
 
-			// Determine the Analysis folder to create the log files in and create it
-			m_strOutputFileDirectory = getDirectoryFromFullPath( strTestRuleSetsFile ) 
-				+ "\\Analysis - " + getTimeStamp();
-			createDirectory( m_strOutputFileDirectory );
+			// Determine the Analysis folder to create the log files in
+			getOutputDirectory(getDirectoryFromFullPath(strTestRuleSetsFile));
 
 			// Process the DAT file
 			processDatFile(strTestRuleSetsFile);
@@ -504,6 +502,12 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 	}
 	else if( vecTokens[0] == "<TESTFOLDER>" )
 	{
+		// Create the output directory if this is the first test folder to run.
+		if (!isValidFolder(m_strOutputFileDirectory))
+		{
+			createDirectory(m_strOutputFileDirectory);
+		}
+
 		// Verify the correct number of tokens for the TESTFOLDER case and that BOTH conditions
 		// and the automated redaction query have been set to something useful
 		if( m_setVerificationCondition.empty() )
@@ -677,6 +681,11 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 		{
 			// Set whether to display entries for each test case or not
 			m_ipResultLogger->AddEntriesToTestLogger = asVariantBool(vecTokens[1] != "1");
+		}
+		else if (vecTokens[0] == "OutputFilesFolder")
+		{
+			// Update m_strOutputFileDirectory based on the specified folder.
+			getOutputDirectory(vecTokens[1]);
 		}
 		else
 		{
@@ -2207,5 +2216,11 @@ void CIDShieldTester::updateRedactionAttributeTester()
 	default:
 		THROW_LOGIC_ERROR_EXCEPTION("ELI25164");
 	}
+}
+//-------------------------------------------------------------------------------------------------
+void CIDShieldTester::getOutputDirectory(string rootDirectory)
+{
+	// Determine the Analysis folder to create the log files in
+	m_strOutputFileDirectory = rootDirectory + "\\Analysis - " + getTimeStamp();
 }
 //-------------------------------------------------------------------------------------------------

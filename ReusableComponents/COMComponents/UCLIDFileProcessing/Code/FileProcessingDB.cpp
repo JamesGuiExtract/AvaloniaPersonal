@@ -2626,25 +2626,21 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 		string strToAction = asString(bstrToAction);
 		ASSERT_ARGUMENT("ELI27038", !strToAction.empty());
 
-		string strFromAction = asString(bstrFromAction);
-		bool bFromSpecified = !strFromAction.empty();
-
 		validateLicense();
 
-		// Build the file set query
-		string strFileQuery = "SELECT FAMFile.ID";
+		// Determine the source of the new status
+		string strFromAction = asString(bstrFromAction);
+		bool bFromSpecified = !strFromAction.empty();
 		string strStatus = "";
 		if (bFromSpecified)
 		{
 			strFromAction = "ASC_" + strFromAction;
-			strFileQuery += ", FAMFile." + strFromAction;
 		}
 		else
 		{
 			// Get the new status as a string
 			strStatus = asStatusString(eaStatus);
 		}
-		strFileQuery += " FROM (" + strQueryFrom + ") AS FAMFile";
 
 		// Wrap the random condition (if there is one, in a smart pointer)
 		UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition(pRandomCondition);
@@ -2669,7 +2665,7 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 		ASSERT_RESOURCE_ALLOCATION("ELI27039", ipFileSet != NULL);
 
 		// Open the file set
-		ipFileSet->Open(strFileQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
+		ipFileSet->Open(strQueryFrom.c_str(), _variant_t((IDispatch*)ipConnection, true),
 			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Loop through each record

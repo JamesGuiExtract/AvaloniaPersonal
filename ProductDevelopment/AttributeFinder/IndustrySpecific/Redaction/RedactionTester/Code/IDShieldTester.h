@@ -297,6 +297,9 @@ private:
 	// PROMISE: To update the redaction AttributeTester so that it is ready to
 	//			be used in the testAttributeCondition.
 	void updateRedactionAttributeTester();
+
+	// PROMISE: Sets m_strOutputFileDirectory based on the provided rootDirectory and current time.
+	void getOutputDirectory(string rootDirectory);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(IDShieldTester), CIDShieldTester)

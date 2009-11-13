@@ -42,8 +42,9 @@ private:
 	string m_strPriority;
 
 	// Values for the random subset selection restriction
-	bool m_bLimitByRandomCondition; // Whether to narrow the selection
-	int m_nRandomPercent; // The random percentage to narrow it by
+	bool m_bLimitByRandomCondition; // Whether to narrow the selection to a random subset
+	bool m_bRandomSubsetUsePercentage; // Whether to narrow by percentage or file count
+	int m_nRandomAmount; // The size of the subset (percentage or filecount)
 
 public:
 	// Default the setting to all files
@@ -91,13 +92,14 @@ public:
 	void setLimitByRandomCondition(bool bLimitByRandomCondition) { m_bLimitByRandomCondition = bLimitByRandomCondition; }
 	bool getLimitByRandomCondition() { return m_bLimitByRandomCondition; }
 
-	void setRandomPercent(int nRandomPercent)
+	void setRandomSubsetUsePercentage(bool bUsePercentage) { m_bRandomSubsetUsePercentage = bUsePercentage; }
+	bool getRandomSubsetUsePercentage() { return m_bRandomSubsetUsePercentage; }
+
+	void setRandomAmount(int nRandomAmount)
 	{
-		// Ensure the percentage is between 1 and 100
-		ASSERT_ARGUMENT("ELI26954", nRandomPercent > 0 && nRandomPercent <= 100);
-		m_nRandomPercent = nRandomPercent;
+		m_nRandomAmount = nRandomAmount;
 	}
-	int getRandomPercent() { return m_nRandomPercent; }
+	int getRandomAmount() { return m_nRandomAmount; }
 
 	// Builds the summary string
 	string getSummaryString();
@@ -106,6 +108,7 @@ public:
 	// NOTE: strSelect should contain only the values to be selected by the query, for
 	// example strSelect = "FAMFile.ID, FAMFile.FileName" or
 	// strSelect = "FAMFile.ID, FAMFile.Priority", etc
+	// NOTE2: It can be assumed that the FAMFile table will be included in the query.
 	string buildQuery(const IFileProcessingDBPtr& ipFAMDB, const string& strSelect);
 
 	IRandomMathConditionPtr getRandomCondition();

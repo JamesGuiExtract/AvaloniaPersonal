@@ -65,7 +65,7 @@ CEAVGeneratorDlg::CEAVGeneratorDlg(CWnd* pParent /*=NULL*/)
 		if (!rpmVOA.keyExists(gstrVOAVIEWER_SECTION, gstrAUTOOPENIMAGE_KEY))
 		{
 			// create the key and default to off
-			rpmVOA.createKey(gstrVOAVIEWER_SECTION, gstrAUTOOPENIMAGE_KEY, "0");
+			rpmVOA.createKey(gstrVOAVIEWER_SECTION, gstrAUTOOPENIMAGE_KEY, "1");
 			
 			// set m_bAutoOpenImageEnabled = false;
 			m_bAutoOpenImageEnabled = false;

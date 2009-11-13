@@ -803,6 +803,8 @@ library UCLID_FILEPROCESSINGLib
 		//			pRandomCondition - If NULL will just be ignored, if not NULL then the files
 		//							   will only have their status modified if pRandomCondition
 		//							   returns TRUE
+		// REQUIRE: If bstrFromAction is specified, the bstrQueryFrom query must include the column name
+		//			the status is to be copied from.
 		[id(51), helpstring("method ModifyActionStatusForQuery")] HRESULT ModifyActionStatusForQuery(
 			[in] BSTR bstrQueryFrom, [in] BSTR bstrToAction, [in] EActionStatus eaNewStatus,
 			[in] BSTR bstrFromAction, [in] IRandomMathCondition* pRandomCondition,
