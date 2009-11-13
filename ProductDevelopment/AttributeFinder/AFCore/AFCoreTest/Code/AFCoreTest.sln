@@ -1556,6 +1556,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Redaction", "..\..\
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDShieldStatisticsReporter", "..\..\..\IndustrySpecific\Redaction\Utils\IDShieldStatisticsReporter\Code\IDShieldStatisticsReporter.csproj", "{95E9F2A7-811B-4228-9339-B3C6489C4242}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
@@ -2894,6 +2900,16 @@ Global
 		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{44B108A6-5A58-4F2C-8126-BAF763A304BF}.Release|Win32.ActiveCfg = Release|Any CPU
+		{95E9F2A7-811B-4228-9339-B3C6489C4242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95E9F2A7-811B-4228-9339-B3C6489C4242}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95E9F2A7-811B-4228-9339-B3C6489C4242}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{95E9F2A7-811B-4228-9339-B3C6489C4242}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{95E9F2A7-811B-4228-9339-B3C6489C4242}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{95E9F2A7-811B-4228-9339-B3C6489C4242}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95E9F2A7-811B-4228-9339-B3C6489C4242}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95E9F2A7-811B-4228-9339-B3C6489C4242}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{95E9F2A7-811B-4228-9339-B3C6489C4242}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{95E9F2A7-811B-4228-9339-B3C6489C4242}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
