@@ -18,8 +18,11 @@
 <OL>
 	<LI><h2>Thumbnail Support In Image Viewer (#7)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>SCRs:</b> FlexIDSCore #3696, #3698, #3765, #3806, #3808, #3809
+  	   	<LI><b>Details:</b> The .NET Image Viewer via the verification UI shall 
+		support display of pages of the current image as thumbnails.  The 
+		thumbnails window shall be dockable and displayed or hidden via a 
+		toolbar button.
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
@@ -27,7 +30,52 @@
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
+	      		<li><b><u>Verification UI</u></b>
+			<ul>
+				<li>Prepare some images for verification.
+				<li>Verify some images.
+				<li>Confirm that by default, a <b>Page thumbnails</b> 
+				window is displayed.
+				<li>Confirm that the <b>Page thumbnails</b> window 
+				includes both images and page number labels.
+				<li>Confirm that <b>Loading</b> is briefly displayed in 
+				the Page thumbnails window while the page is being loaded.
+				<li>Confirm that a meaningful toolbar button is present 
+				on the <b>Image Viewer</b> toolbar to toggle display of 
+				the <b>Page thumbnails</b> window.
+				<li>Confirm that an <b>X</b> button is present in the 
+				<b>Page thumbnails</b> window to hide display of the window.
+<p>
+				<li>Confirm that the <b>Page thumbnails</b> window can 
+				be undocked.
+				<li>Confirm that the <b>Page thumbnails</b> window can 
+				be docked, hiddden and restored in the following 
+				locations:
+				<ul>
+					<li>To the right of the image
+					<li>In between the Data window and the image
+					<li>Across the bottom of the image
+					<li>Across the top of the image
+					<li>To the left of the Data window
+					<li>Across the bottom of the Data window
+					<li>Across the top of the Data window
+					<li>Across the bottom of the entire window
+					<li>Across the top of the entire window
+				</ul>
+				<li>Confirm that location of the <b>Page thumbnails</b> 
+				window is persistent across verification sessions.
+<p>
+				<li>Test one or more many-page images.
+				<li>Confirm that only as many thumbnails as needed to 
+				fill the window are loaded when the image is initially 
+				displayed.
+				<li>Confirm that the displayed thumbnails change after 
+				navigation to a different page.  In other words, jump 
+				directly to page 50 of 100 and confirm that the actual 
+				displayed thumbnails change.
+				<li>Confirm that saving an output image is not delayed 
+				because some thumbnails remain unloaded.
+			</ul>
 	       	</ul>
        	</ul>
 <p>
@@ -111,8 +159,15 @@
 <p>
 	<LI><h2>Support Export Of Debug Data From UEX Viewer (#24)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>SCRs:</b> LegacyRC #5532
+  	   	<LI><b>Details:</b> A context menu should be provided in the main viewer 
+		window allowing a user to copy either an ELI code or the ELI text to the 
+		clipboard.  The Error details dialog should allow support a context menu 
+		allowing the user to copy either the <b>Name</b> or the <b>Value</b> text. 
+		A <b>Tools</b> menu will also be added with <b>Export debug data...</b>  
+		The associated dialog will allow export of specified debug parameters to 
+		an output file.  The export scope will be either all displayed exceptions 
+		or all selected exceptions.
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
@@ -120,7 +175,105 @@
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
+	      		<li><u><b>Main window</b></u>
+			<ul>
+				<li>Open a UEX file.
+				<li>Right-click on a single selected exception and confirm 
+				that a context menu appears.
+				<li>Confirm that <b>Copy ELI code</b> is enabled and that 
+				it copies the <b>Top ELI Code</b> text to the Clipboard.
+				<li>Confirm that <b>Copy ELI text</b> is enabled and that 
+				it copies the <b>Top Exception</b> text to the Clipboard.
+				<li>Confirm that <b>Cancel</b> is enabled and that it 
+				closes the context menu and does nothing to the Clipboard.
+<p>
+				<li>Right-click on multiple selected exceptions and confirm 
+				that a context menu appears.
+				<li>Confirm that <b>Copy ELI code</b> is disabled.
+				<li>Confirm that <b>Copy ELI text</b> is disabled.
+				<li>Confirm that <b>Cancel</b> is enabled and that it 
+				closes the context menu and does nothing to the Clipboard.
+			</ul>
+	      		<li><b><u>Error Details dialog</u></b>
+			<ul>
+				<li>Open a UEX file.
+				<li>Double-click on a selected exception to open the 
+				<b>Error details</b> dialog.
+				<li>Right-click on an entry in the <b>Debug information</b> 
+				list and confirm that a context menu appears.
+				<li>Confirm that <b>Copy name</b> is enabled and that 
+				it copies the <b>Name</b> text to the Clipboard.
+				<li>Confirm that <b>Copy value</b> is enabled and that 
+				it copies the <b>Value</b> text to the Clipboard.
+				<li>Confirm that <b>Cancel</b> is enabled and that it 
+				closes the context menu and does nothing to the Clipboard.
+			</ul>
+	      		<li><b><u>Export Debug Data dialog</u></b>
+			<ul>
+				<li>Confirm that a <b>Tools</b> menu exists.
+				<li>Confirm that an <b>Export debug data...</b> menu item 
+				exists.
+				<li>Confirm that selecting the menu item displays an 
+				<b>Export Debug Data</b> dialog.
+				<li>Confirm that the <b>Export Debug Data</b> dialog is 
+				modeless.
+				<li>Confirm that the dialog contains an <b>Export settings</b> 
+				group box.
+				<li>Confirm that the group box contains a <b>Name of debug 
+				parameter to export if found</b> edit box.
+				<li>Confirm that the group box contains a <b>Specify filename 
+				to export data to</b> edit box.
+				<li>Confirm that the group box contains an associated 
+				<b>...</b> (browse) button.
+				<li>Confirm that clicking the browse button displays an 
+				<b>Open</b> dialog
+				<ul>
+					<li>Confirm that <b>*.txt</b> is the default file 
+					extension.
+					<li>Confirm that <b>*.*</b> is an available file 
+					extension.
+					<li>Confirm that the fully-qualified path to the 
+					selected file is displayed in the edit box.
+					<li>Confirm that a previously selected export file 
+					is persisted if the browse button is clicked again.
+				</ul>
+				<li>Confirm that the group box contains an <b>If the file 
+				already exists, append to it rather than overwriting it</b> 
+				check box.
+				<li>Confirm that the dialog contains an <b>Export scope</b> 
+				group box.
+				<li>Confirm that the group box contains an <b>All displayed 
+				exceptions</b> radio button.
+				<li>Confirm that the group box contains an <b>All selected 
+				exceptions</b> radio button.
+				<li>Confirm that the group box contains a <b>Narrow above 
+				scope to those with this top-level ELI code:</b> check box.
+				<li>Confirm that the group box contains an associated edit 
+				box.
+				<li>Confirm that the edit box is enabled only if the check 
+				box is checked.
+				<li>Confirm that the edit box contains <b>ELI</b> text that 
+				cannot be deleted by the user.
+<p>
+				<li>Confirm that debug data can be exported via overwriting 
+				an existing file.
+				<li>Confirm that a message box is presented to the user 
+				reporting the number of exported entries.
+				<li>Confirm that if no entries are exported and the output 
+				file <b>did not</b> originally exist, then no export file is 
+				created.
+				<li>Confirm that if no entries are exported and the output 
+				file <b>did</b> originally exist, then the export file is 
+				unchanged.
+				<li>Confirm that debug data can be exported via appending 
+				to an existing file.
+				<li>Confirm that debug data can be exported for all displayed 
+				exceptions.
+				<li>Confirm that debug data can be exported for all selected 
+				exceptions.
+				<li>Confirm that debug data can be exported with scope 
+				narrowed to a specified ELI code.
+			</ul>
 	       	</ul>
        	</ul>
 <p>
