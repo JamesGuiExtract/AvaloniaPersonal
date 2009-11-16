@@ -18,4 +18,4 @@ SET VAULT_DIR=C:\Program Files\SourceGear\Vault Client
 SET INSTALL_SHIELD_DIR=C:\Program Files\InstallShield\InstallShield 5.5 Professional Edition
 SET WINZIP_DIR=C:\Program Files\WinZip
 
-SET DEV_STUDIO_DIR=C:\Program Files\Macrovision\IS12
+SET DEV_STUDIO_DIR=C:\Program Files\InstallShield\2010
