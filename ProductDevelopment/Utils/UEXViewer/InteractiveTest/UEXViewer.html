@@ -263,6 +263,110 @@ UEXViewer Utility - Testing Checklist<br>
   	</ul>
      	</li>
 <p>
+   	<li><b>Export of Debug Data</b>
+    	<ul>
+      		<li><u><b>Main window</b></u>
+		<ul>
+			<li>Open a UEX file.
+			<li>Right-click on a single selected exception and confirm 
+			that a context menu appears.
+			<li>Confirm that <b>Copy ELI code</b> is enabled and that 
+			it copies the <b>Top ELI Code</b> text to the Clipboard.
+			<li>Confirm that <b>Copy ELI text</b> is enabled and that 
+			it copies the <b>Top Exception</b> text to the Clipboard.
+			<li>Confirm that <b>Cancel</b> is enabled and that it 
+			closes the context menu and does nothing to the Clipboard.
+<p>
+			<li>Right-click on multiple selected exceptions and confirm 
+			that a context menu appears.
+			<li>Confirm that <b>Copy ELI code</b> is disabled.
+			<li>Confirm that <b>Copy ELI text</b> is disabled.
+			<li>Confirm that <b>Cancel</b> is enabled and that it 
+			closes the context menu and does nothing to the Clipboard.
+		</ul>
+      		<li><b><u>Error Details dialog</u></b>
+		<ul>
+			<li>Open a UEX file.
+			<li>Double-click on a selected exception to open the 
+			<b>Error details</b> dialog.
+			<li>Right-click on an entry in the <b>Debug information</b> 
+			list and confirm that a context menu appears.
+			<li>Confirm that <b>Copy name</b> is enabled and that 
+			it copies the <b>Name</b> text to the Clipboard.
+			<li>Confirm that <b>Copy value</b> is enabled and that 
+			it copies the <b>Value</b> text to the Clipboard.
+			<li>Confirm that <b>Cancel</b> is enabled and that it 
+			closes the context menu and does nothing to the Clipboard.
+		</ul>
+      		<li><b><u>Export Debug Data dialog</u></b>
+		<ul>
+			<li>Confirm that a <b>Tools</b> menu exists.
+			<li>Confirm that an <b>Export debug data...</b> menu item 
+			exists.
+			<li>Confirm that selecting the menu item displays an 
+			<b>Export Debug Data</b> dialog.
+			<li>Confirm that the <b>Export Debug Data</b> dialog is 
+			modeless.
+			<li>Confirm that the dialog contains an <b>Export settings</b> 
+			group box.
+			<li>Confirm that the group box contains a <b>Name of debug 
+			parameter to export if found</b> edit box.
+			<li>Confirm that the group box contains a <b>Specify filename 
+			to export data to</b> edit box.
+			<li>Confirm that the group box contains an associated 
+			<b>...</b> (browse) button.
+			<li>Confirm that clicking the browse button displays an 
+			<b>Open</b> dialog
+			<ul>
+				<li>Confirm that <b>*.txt</b> is the default file 
+				extension.
+				<li>Confirm that <b>*.*</b> is an available file 
+				extension.
+				<li>Confirm that the fully-qualified path to the 
+				selected file is displayed in the edit box.
+				<li>Confirm that a previously selected export file 
+				is persisted if the browse button is clicked again.
+			</ul>
+			<li>Confirm that the group box contains an <b>If the file 
+			already exists, append to it rather than overwriting it</b> 
+			check box.
+			<li>Confirm that the dialog contains an <b>Export scope</b> 
+			group box.
+			<li>Confirm that the group box contains an <b>All displayed 
+			exceptions</b> radio button.
+			<li>Confirm that the group box contains an <b>All selected 
+			exceptions</b> radio button.
+			<li>Confirm that the group box contains a <b>Narrow above 
+			scope to those with this top-level ELI code:</b> check box.
+			<li>Confirm that the group box contains an associated edit 
+			box.
+			<li>Confirm that the edit box is enabled only if the check 
+			box is checked.
+			<li>Confirm that the edit box contains <b>ELI</b> text that 
+			cannot be deleted by the user.
+<p>
+			<li>Confirm that debug data can be exported via overwriting 
+			an existing file.
+			<li>Confirm that a message box is presented to the user 
+			reporting the number of exported entries.
+			<li>Confirm that if no entries are exported and the output 
+			file <b>did not</b> originally exist, then no export file is 
+			created.
+			<li>Confirm that if no entries are exported and the output 
+			file <b>did</b> originally exist, then the export file is 
+			unchanged.
+			<li>Confirm that debug data can be exported via appending 
+			to an existing file.
+			<li>Confirm that debug data can be exported for all displayed 
+			exceptions.
+			<li>Confirm that debug data can be exported for all selected 
+			exceptions.
+			<li>Confirm that debug data can be exported with scope 
+			narrowed to a specified ELI code.
+		</ul>
+  	</ul>
+     	</li>
+<p>
    	<li><b>Miscellaneous Items</b>
     	<ul>
 		<li>Drag and drop a <b>.Uex</b> file onto the UEX Viewer.  Confirm that the new 
