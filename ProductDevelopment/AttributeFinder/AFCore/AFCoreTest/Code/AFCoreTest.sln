@@ -1532,6 +1532,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitMultiPageImage", "..\.
 	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{212E31D9-5F02-43AA-8625-BCB86B15CF8F} = {212E31D9-5F02-43AA-8625-BCB86B15CF8F}
+		{E610E652-0891-40D4-B5CA-A622B87C7979} = {E610E652-0891-40D4-B5CA-A622B87C7979}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFAMService", "..\..\..\..\..\RC.Net\FileActionManager\Utilities\ESFAMProcess\Core\Code\ESFAMService.csproj", "{2524969C-E82D-49E4-907A-AD6BDF9354DC}"
