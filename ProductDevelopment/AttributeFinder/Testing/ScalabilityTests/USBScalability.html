@@ -1,0 +1,162 @@
+<html>
+
+<head>
+<title>USB Key Scalability Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>USB Key Scalability Tests<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<p>
+* <b>ID Shield</b> should be installed and licensed for these tests. It is not necessary to install 
+FLEX Index.<br>
+* <b>Extract Systems LM</b> should also be installed for these tests.
+<ol>
+<li><h2>Maximum Rate Test #1</h2>
+<ul>
+	<li><b>Purpose, Machine Setup, & Database Setup</b>
+	<ul>
+		<li>Measure the maximum absolute rate at which a <b>USB key</b> can be decremented 
+		through executing a trivial rule set.
+		<li>Select a test machine to serve as the image host, database host and USB key host.
+		<li>Select a folder of customer images to process.  
+		<li>Duplicate the files as needed so that trivial processing of pre-queued and pre-OCR'd 
+		files requires at least three hours using <b>all</b> threads.
+		<li>Create a trivial rule set that decrements the <b>ID Shield - Redaction (By Page)</b> 
+		counter.
+		<li>Confirm that a <b>local 25-user</b> USB key is available.
+		<li>Create a <b>SCALABILITY_TEST</b> database on the test machine.
+		<li>Add an <b>OCR</b> action.
+		<li>Add a <b>Process</b> action.
+	</ul>
+<p>
+	<li><b>Test Execution</b>
+	<ul>
+		<li>Create an FPS file to queue and OCR the images for the <b>OCR</b> action.  Set 
+		the <b>Process</b> action to <b>Pending</b> after completing the <b>Core: OCR 
+		document</b> task.
+		<li>Queue and OCR the files.
+<p>
+		<li>Create an FPS file with <b>Core: Execute rules</b> for the <b>Process</b> 
+		action.
+		<li>Note the initial count for the <b>Redaction</b> counter.
+		<li>Process the files.
+	</ul>
+<p>
+	<li><b>Test Results</b>
+	<ul>
+		<li>Note the final count for the <b>Redaction</b> counter.
+		<li>Confirm that the correct number of <b>Redaction</b> counts were used.
+		<li>Review the exception log to determine the exact processing time.  Compute the 
+		rate at which USB key decrements took place.
+	</ul>
+</ul>
+<p>
+<li><h2>Maximum Rate Test #2</h2>
+<ul>
+	<li><b>Purpose & Details</b>
+	<ul>
+		<li>Determine if the maximum decrement rate is affected by using a remote 
+		machine as the USB key host.
+		<li>Repeat <b>Test #1</b> using a remote test machine as the USB key host.
+		<li>Confirm that the <b>Process</b> action was reset to <b>Pending</b> before 
+		starting the test.
+		<li>Use <b>SQL Server Management Studio</b> to clear the FAST table 
+		before starting the test.
+		<li>Confirm that the correct number of <b>Redaction</b> counts were used.
+		<li>Compute the rate at which USB key decrements took place.
+	</ul>
+</ul>
+<p>
+<li><h2>Maximum Rate Test #3</h2>
+<ul>
+	<li><b>Purpose & Details</b>
+	<ul>
+		<li>Determine if the maximum decrement rate is affected by using a slow 
+		machine as the USB key host.
+		<li>Repeat <b>Test #1</b> using a slow remote test machine as the USB key host.
+		<li>Confirm that the <b>Process</b> action was reset to <b>Pending</b> before 
+		starting the test.
+		<li>Use <b>SQL Server Management Studio</b> to clear the FAST table 
+		before starting the test.
+		<li>Confirm that the correct number of <b>Redaction</b> counts were used.
+		<li>Compute the rate at which USB key decrements took place.
+	</ul>
+</ul>
+<p>
+<li><h2>Multiple Machine Maximum Rate Tests</h2>
+<ul>
+	<li><b>Purpose & Details</b>
+	<ul>
+		<li>Determine if the maximum decrement rate is affected by using multiple 
+		machines to decrement the USB key.
+		<li>Prepare a second test machine with a local database, local pre-queued 
+		images and USS files and local trivial rules.
+		<li>Configure the both test machines to use the same USB key.
+		<li>Repeat <b>Test #1</b> using a slow remote test machine as the USB key host.
+		<li>Confirm that the <b>Process</b> action was reset to <b>Pending</b> before 
+		starting the test.
+		<li>Use <b>SQL Server Management Studio</b> to clear the FAST table 
+		before starting the test.
+		<li>Confirm that the correct number of <b>Redaction</b> counts were used.
+		<li>Compute the rate at which USB key decrements took place.
+<p>
+		<li>Repeat the above test with <b>three</b> test machines decrementing the USB key.
+		<li>Repeat the above test with <b>four</b> test machines decrementing the USB key.
+	</ul>
+</ul>
+<p>
+<li><h2>Multiple Machine Real Rate Tests</h2>
+<ul>
+	<li><b>Purpose & Setup</b>
+	<ul>
+		<li>Determine how the USB key decrement rate scales as additional machines 
+		are added to the testing pool.
+		<li>Identify and prepare one machine for use as the USB key host.
+		<li>Prepare each processing test machine:
+		<ul>
+			<li>Create a local database with <b>OCR</b> and <b>Process</b> actions.
+			<li>Make local copies of the selected image files.
+			<li>Make a local copy of the associated rules.
+			<li>Create an FPS file to queue and OCR the images for the <b>OCR</b> 
+			action.  Set the <b>Process</b> action to <b>Pending</b> after completing 
+			the <b>Core: OCR document</b> task.
+			<li>Queue and OCR the files.
+			<li>Create an FPS file with <b>Core: Execute rules</b> for the 
+			<b>Process</b> action.
+		</ul>
+	</ul>
+<p>
+	<li><b>Test Execution & Review</b>
+	<ul>
+		<li>Note the initial count for the <b>Redaction</b> counter.
+		<li>Simultaneously process files on each processing machine.
+		<li>Note the final count for the <b>Redaction</b> counter.
+		<li>Confirm that the correct number of <b>Redaction</b> counts were used.
+		<li>Review the exception logs to determine the processing <b>start</b> and 
+		<b>stop</b> times.
+		<li>Update the 
+		<b>I:\Common\Testing\Product Testing\FLEX_Index_80\StabilityTests\USB_Key_Scalability.xls</b> 
+		spreadsheet.
+<p>
+		<li>Exercise the above using <b>1</b> processing machine.
+		<li>Exercise the above using <b>2</b> processing machines.
+		<li>Exercise the above using <b>3</b> processing machines.
+		<li>Exercise the above using <b>4</b> processing machines.
+		<li>Exercise the above using <b>5</b> processing machines.
+		<li>Exercise the above using <b>6</b> processing machines.
+		<li>Exercise the above using <b>7</b> processing machines.
+		<li>Exercise the above using <b>8</b> processing machines.
+		<li>Exercise the above using <b>9</b> processing machines.
+		<li>Exercise the above using <b>10</b> processing machines.
+		<li>Exercise the above using <b>11</b> processing machines.
+		<li>Exercise the above using <b>12</b> processing machines.
+	</ul>
+</ul>
+</ol>
+</body>
+</html>
