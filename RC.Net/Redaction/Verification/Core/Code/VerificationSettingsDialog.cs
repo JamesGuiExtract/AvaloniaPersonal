@@ -1,4 +1,3 @@
-using Extract.Utilities.Forms;
 using System;
 using System.Windows.Forms;
 
@@ -79,7 +78,7 @@ namespace Extract.Redaction.Verification
             // Get the settings
             GeneralVerificationSettings general = GetGeneralSettings();
             FeedbackSettings feedback = GetFeedbackSettings();
-            string dataFile = _dataFileTextBox.Text;
+            string dataFile = _dataFileControl.DataFile;
 
             return new VerificationSettings(general, feedback, dataFile);
         }
@@ -132,12 +131,12 @@ namespace Extract.Redaction.Verification
         /// the settings are valid.</returns>
         bool WarnIfInvalid()
         {
-            bool isEmpty = string.IsNullOrEmpty(_dataFileTextBox.Text);
+            bool isEmpty = string.IsNullOrEmpty(_dataFileControl.DataFile);
             if (isEmpty)
             {
                 MessageBox.Show("Please enter the ID Shield data file", "Invalid ID Shield data file",
                     MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-                _dataFileTextBox.Focus();
+                _dataFileControl.Focus();
             }
 
             return isEmpty;
@@ -168,7 +167,7 @@ namespace Extract.Redaction.Verification
                 _collectFeedbackCheckBox.Checked = _feedback.Collect;
 
                 // ID Shield data file
-                _dataFileTextBox.Text = _settings.InputFile;
+                _dataFileControl.DataFile = _settings.InputFile;
 
                 // Update the UI
                 UpdateControls();
@@ -226,48 +225,6 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26305", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        void HandleDataFilePathTagsButtonTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _dataFileTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI26306", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="BrowseButton.PathSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="BrowseButton.PathSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="BrowseButton.PathSelected"/> event.</param>
-        void HandleDataFileBrowseButtonPathSelected(object sender, PathSelectedEventArgs e)
-        {
-            try
-            {
-                _dataFileTextBox.Text = e.Path;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI26307", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }

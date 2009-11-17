@@ -39,22 +39,16 @@ namespace Extract.Redaction.Verification
         private void InitializeComponent()
         {
             System.Windows.Forms.GroupBox groupBox1;
-            System.Windows.Forms.GroupBox groupBox2;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VerificationSettingsDialog));
             this._feedbackSettingsButton = new System.Windows.Forms.Button();
             this._collectFeedbackCheckBox = new System.Windows.Forms.CheckBox();
             this._requireExemptionsCheckBox = new System.Windows.Forms.CheckBox();
             this._requireTypeCheckBox = new System.Windows.Forms.CheckBox();
             this._verifyAllPagesCheckBox = new System.Windows.Forms.CheckBox();
-            this._dataFilePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._dataFileBrowseButton = new Extract.Utilities.Forms.BrowseButton();
-            this._dataFileTextBox = new System.Windows.Forms.TextBox();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
+            this._dataFileControl = new Extract.Redaction.DataFileControl();
             groupBox1 = new System.Windows.Forms.GroupBox();
-            groupBox2 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
-            groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -76,7 +70,7 @@ namespace Extract.Redaction.Verification
             this._feedbackSettingsButton.Location = new System.Drawing.Point(274, 88);
             this._feedbackSettingsButton.Name = "_feedbackSettingsButton";
             this._feedbackSettingsButton.Size = new System.Drawing.Size(75, 23);
-            this._feedbackSettingsButton.TabIndex = 4;
+            this._feedbackSettingsButton.TabIndex = 0;
             this._feedbackSettingsButton.Text = "Settings...";
             this._feedbackSettingsButton.UseVisualStyleBackColor = true;
             this._feedbackSettingsButton.Click += new System.EventHandler(this.HandleFeedbackSettingsButtonClick);
@@ -87,7 +81,7 @@ namespace Extract.Redaction.Verification
             this._collectFeedbackCheckBox.Location = new System.Drawing.Point(7, 92);
             this._collectFeedbackCheckBox.Name = "_collectFeedbackCheckBox";
             this._collectFeedbackCheckBox.Size = new System.Drawing.Size(261, 17);
-            this._collectFeedbackCheckBox.TabIndex = 3;
+            this._collectFeedbackCheckBox.TabIndex = 4;
             this._collectFeedbackCheckBox.Text = "Enable collection of redaction accuracy feedback";
             this._collectFeedbackCheckBox.UseVisualStyleBackColor = true;
             this._collectFeedbackCheckBox.CheckedChanged += new System.EventHandler(this.HandleCollectFeedbackCheckBoxCheckedChanged);
@@ -98,7 +92,7 @@ namespace Extract.Redaction.Verification
             this._requireExemptionsCheckBox.Location = new System.Drawing.Point(7, 68);
             this._requireExemptionsCheckBox.Name = "_requireExemptionsCheckBox";
             this._requireExemptionsCheckBox.Size = new System.Drawing.Size(289, 17);
-            this._requireExemptionsCheckBox.TabIndex = 2;
+            this._requireExemptionsCheckBox.TabIndex = 3;
             this._requireExemptionsCheckBox.Text = "Require users to specify exemption codes for redactions";
             this._requireExemptionsCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -108,7 +102,7 @@ namespace Extract.Redaction.Verification
             this._requireTypeCheckBox.Location = new System.Drawing.Point(7, 44);
             this._requireTypeCheckBox.Name = "_requireTypeCheckBox";
             this._requireTypeCheckBox.Size = new System.Drawing.Size(276, 17);
-            this._requireTypeCheckBox.TabIndex = 1;
+            this._requireTypeCheckBox.TabIndex = 2;
             this._requireTypeCheckBox.Text = "Require users to specify redaction type for redactions";
             this._requireTypeCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -118,56 +112,15 @@ namespace Extract.Redaction.Verification
             this._verifyAllPagesCheckBox.Location = new System.Drawing.Point(7, 20);
             this._verifyAllPagesCheckBox.Name = "_verifyAllPagesCheckBox";
             this._verifyAllPagesCheckBox.Size = new System.Drawing.Size(198, 17);
-            this._verifyAllPagesCheckBox.TabIndex = 0;
+            this._verifyAllPagesCheckBox.TabIndex = 1;
             this._verifyAllPagesCheckBox.Text = "Include all pages in redaction review";
             this._verifyAllPagesCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // groupBox2
-            // 
-            groupBox2.Controls.Add(this._dataFilePathTagsButton);
-            groupBox2.Controls.Add(this._dataFileBrowseButton);
-            groupBox2.Controls.Add(this._dataFileTextBox);
-            groupBox2.Location = new System.Drawing.Point(12, 140);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new System.Drawing.Size(368, 50);
-            groupBox2.TabIndex = 1;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "ID Shield data file location";
-            // 
-            // _dataFilePathTagsButton
-            // 
-            this._dataFilePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_dataFilePathTagsButton.Image")));
-            this._dataFilePathTagsButton.Location = new System.Drawing.Point(311, 20);
-            this._dataFilePathTagsButton.Name = "_dataFilePathTagsButton";
-            this._dataFilePathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
-            this._dataFilePathTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._dataFilePathTagsButton.TabIndex = 1;
-            this._dataFilePathTagsButton.UseVisualStyleBackColor = true;
-            this._dataFilePathTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandleDataFilePathTagsButtonTagSelected);
-            // 
-            // _dataFileBrowseButton
-            // 
-            this._dataFileBrowseButton.FileFilter = "VOA files (*.voa)|*.voa||";
-            this._dataFileBrowseButton.Location = new System.Drawing.Point(335, 20);
-            this._dataFileBrowseButton.Name = "_dataFileBrowseButton";
-            this._dataFileBrowseButton.Size = new System.Drawing.Size(27, 20);
-            this._dataFileBrowseButton.TabIndex = 2;
-            this._dataFileBrowseButton.Text = "...";
-            this._dataFileBrowseButton.UseVisualStyleBackColor = true;
-            this._dataFileBrowseButton.PathSelected += new System.EventHandler<Extract.Utilities.Forms.PathSelectedEventArgs>(this.HandleDataFileBrowseButtonPathSelected);
-            // 
-            // _dataFileTextBox
-            // 
-            this._dataFileTextBox.Location = new System.Drawing.Point(7, 20);
-            this._dataFileTextBox.Name = "_dataFileTextBox";
-            this._dataFileTextBox.Size = new System.Drawing.Size(298, 20);
-            this._dataFileTextBox.TabIndex = 0;
             // 
             // _cancelButton
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(306, 204);
+            this._cancelButton.Location = new System.Drawing.Point(306, 214);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 3;
@@ -177,7 +130,7 @@ namespace Extract.Redaction.Verification
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(225, 204);
+            this._okButton.Location = new System.Drawing.Point(225, 214);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 2;
@@ -185,16 +138,23 @@ namespace Extract.Redaction.Verification
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
             // 
+            // _dataFileControl
+            // 
+            this._dataFileControl.Location = new System.Drawing.Point(12, 140);
+            this._dataFileControl.Name = "_dataFileControl";
+            this._dataFileControl.Size = new System.Drawing.Size(369, 60);
+            this._dataFileControl.TabIndex = 1;
+            // 
             // VerificationSettingsDialog
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(392, 239);
+            this.ClientSize = new System.Drawing.Size(392, 249);
+            this.Controls.Add(this._dataFileControl);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
-            this.Controls.Add(groupBox2);
             this.Controls.Add(groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -204,8 +164,6 @@ namespace Extract.Redaction.Verification
             this.Text = "Verify redactions settings";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
-            groupBox2.ResumeLayout(false);
-            groupBox2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -217,10 +175,8 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.CheckBox _collectFeedbackCheckBox;
         private System.Windows.Forms.CheckBox _requireExemptionsCheckBox;
         private System.Windows.Forms.CheckBox _requireTypeCheckBox;
-        private Extract.Utilities.Forms.PathTagsButton _dataFilePathTagsButton;
-        private Extract.Utilities.Forms.BrowseButton _dataFileBrowseButton;
-        private System.Windows.Forms.TextBox _dataFileTextBox;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button _okButton;
+        private DataFileControl _dataFileControl;
     }
 }
