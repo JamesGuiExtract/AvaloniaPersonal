@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="AttributeComparer.cs" />
     <Compile Include="AttributeFinderPathTags.cs" />
+    <Compile Include="AttributeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AttributesFile.cs" />
   </ItemGroup>
