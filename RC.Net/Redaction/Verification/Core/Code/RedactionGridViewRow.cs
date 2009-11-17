@@ -23,7 +23,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The attribute to which the row corresponds.
         /// </summary>
-        ComAttribute _attribute;
+        RedactionItem _attribute;
 
         /// <summary>
         /// The layer objects to which the row corresponds.
@@ -103,8 +103,8 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Initializes a new instance of the <see cref="RedactionGridViewRow"/> class.
         /// </summary>
-        RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text, 
-            string category, string type, ComAttribute attribute, ExemptionCodeList exemptions)
+        RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text,
+            string category, string type, RedactionItem attribute, ExemptionCodeList exemptions)
         {
             _attribute = attribute;
             _layerObjects = new List<LayerObject>(layerObjects);
@@ -123,7 +123,7 @@ namespace Extract.Redaction.Verification
         /// Gets the COM attribute associated with the <see cref="RedactionGridViewRow"/>.
         /// </summary>
         /// <value>The COM attribute associated with the <see cref="RedactionGridViewRow"/>.</value>
-        internal ComAttribute ComAttribute
+        internal RedactionItem ComAttribute
         {
             get
             {
@@ -384,14 +384,14 @@ namespace Extract.Redaction.Verification
         /// <param name="masterCodes">The list of valid exemption codes.</param>
         /// <returns>A <see cref="RedactionGridViewRow"/> with information from the specified 
         /// <paramref name="item"/>.</returns>
-        public static RedactionGridViewRow FromVerificationItem(SensitiveItem item, 
+        public static RedactionGridViewRow FromSensitiveItem(SensitiveItem item, 
             ImageViewer imageViewer, MasterExemptionCodeList masterCodes)
         {
             try
             {
                 // Can only create row for spatial attribute
-                ComAttribute attribute = item.Attribute;
-                SpatialString value = attribute.Value;
+                RedactionItem attribute = item.Attribute;
+                SpatialString value = attribute.SpatialString;
                 if (!value.HasSpatialInfo())
                 {
                     throw new ExtractException("ELI28073",
@@ -402,9 +402,9 @@ namespace Extract.Redaction.Verification
                 List<LayerObject> layerObjects = 
                     GetLayerObjectsFromSpatialString(value, imageViewer, item.Level);
                 string text = StringMethods.ConvertLiteralToDisplay(value.String);
-                string category = attribute.Name;
-                string type = attribute.Type;
-                ExemptionCodeList exemptions = GetExemptionsFromComAttribute(attribute, masterCodes);
+                string category = attribute.Category;
+                string type = attribute.RedactionType;
+                ExemptionCodeList exemptions = attribute.GetExemptions(masterCodes);
 
                 return new RedactionGridViewRow(layerObjects, text, category, type, attribute, exemptions);
             }
@@ -416,32 +416,12 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets the exemption code list from an exemption codes attribute.
+        /// Creates a <see cref="RedactionItem"/> from the <see cref="RedactionGridViewRow"/>.
         /// </summary>
-        /// <param name="attribute">An exemption codes attribute.</param>
-        /// <param name="masterCodes">The master collection of valid exemption codes.</param>
-        /// <returns>The exemption code list created from <paramref name="attribute"/>.</returns>
-        static ExemptionCodeList GetExemptionsFromComAttribute(ComAttribute attribute,
-            MasterExemptionCodeList masterCodes)
-        {
-            ComAttribute exemptionsAttribute = GetExemptionsComAttribute(attribute.SubAttributes);
-            if (exemptionsAttribute == null)
-            {
-                return new ExemptionCodeList();
-            }
-
-            string category = exemptionsAttribute.Type;
-            string codes = exemptionsAttribute.Value.String;
-
-            return ExemptionCodeList.Parse(category, codes, masterCodes);
-        }
-
-        /// <summary>
-        /// Creates a COM attribute from the <see cref="RedactionGridViewRow"/>.
-        /// </summary>
-        /// <returns>A COM attribute created from the <see cref="RedactionGridViewRow"/>.</returns>
+        /// <returns>A <see cref="RedactionItem"/> created from the 
+        /// <see cref="RedactionGridViewRow"/>.</returns>
         [CLSCompliant(false)]
-        public ComAttribute SaveComAttribute(string sourceDocument, LongToObjectMap pageInfoMap)
+        public RedactionItem SaveRedactionItem(string sourceDocument, LongToObjectMap pageInfoMap)
         {
             try
             {
@@ -449,14 +429,14 @@ namespace Extract.Redaction.Verification
                 if (_attribute == null)
                 {
                     // Create the attribute
-                    _attribute = CreateComAttribute(sourceDocument, pageInfoMap);
+                    _attribute = CreateRedactionItem(sourceDocument, pageInfoMap);
 
                     ResetDirtyFlag();
                 }
                 else if (IsModified)
                 {
                     // Update the attribute
-                    _attribute = GetUpdatedComAttribute(sourceDocument, pageInfoMap);
+                    _attribute = GetUpdatedRedactionItem(sourceDocument, pageInfoMap);
 
                     ResetDirtyFlag();
                 }
@@ -471,12 +451,12 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Creates a new COM attribute that corresponds to the row.
+        /// Creates a <see cref="RedactionItem"/> that corresponds to the row.
         /// </summary>
         /// <param name="sourceDocument">The source document to use for the new attribute.</param>
         /// <param name="pageInfoMap">The page infomation map to use for the new attribute.</param>
-        /// <returns>A new COM attribute that corresponds to the row.</returns>
-        ComAttribute CreateComAttribute(string sourceDocument, LongToObjectMap pageInfoMap)
+        /// <returns>A new <see cref="RedactionItem"/> that corresponds to the row.</returns>
+        RedactionItem CreateRedactionItem(string sourceDocument, LongToObjectMap pageInfoMap)
         {
             // Create the attribute
             ComAttribute attribute = new ComAttribute();
@@ -484,22 +464,19 @@ namespace Extract.Redaction.Verification
             attribute.Name = _category;
             attribute.Type = _type;
                     
-            // Set exemptions
-            SetExemptions(attribute, sourceDocument);
-
-            return attribute;
+            return new RedactionItem(attribute, _exemptions, sourceDocument);
         }
 
         /// <summary>
-        /// Creates a COM attribute from the current row and <see cref="_attribute"/>.
+        /// Creates a <see cref="RedactionItem"/> from the current row and <see cref="_attribute"/>.
         /// </summary>
         /// <param name="sourceDocument">The source document to use for the new attribute.</param>
         /// <param name="pageInfoMap">The page infomation map to use for the new attribute.</param>
-        /// <returns>A new COM attribute that corresponds to the row.</returns>
-        ComAttribute GetUpdatedComAttribute(string sourceDocument, LongToObjectMap pageInfoMap)
+        /// <returns>A <see cref="RedactionItem"/> that corresponds to the row.</returns>
+        RedactionItem GetUpdatedRedactionItem(string sourceDocument, LongToObjectMap pageInfoMap)
         {
             // Don't modify the original attribute as it may be in use elsewhere
-            ICopyableObject copy = (ICopyableObject)_attribute;
+            ICopyableObject copy = (ICopyableObject)_attribute.ComAttribute;
             ComAttribute attribute = (ComAttribute)copy.Clone();
 
             // Update the value
@@ -519,12 +496,9 @@ namespace Extract.Redaction.Verification
             }
 
             // Update the exemption codes
-            if (_exemptionsDirty)
-            {
-                SetExemptions(attribute, sourceDocument);
-            }
+            ExemptionCodeList exemptions = _exemptionsDirty ? _exemptions : null;
 
-            return attribute;
+            return new RedactionItem(attribute, exemptions, sourceDocument);
         }
 
         /// <summary>
@@ -577,81 +551,6 @@ namespace Extract.Redaction.Verification
             }
 
             return vector;
-        }
-
-        /// <summary>
-        /// Sets the exemption codes for the specified COM attribute.
-        /// </summary>
-        /// <param name="attribute">The COM attribute to assign exemption codes.</param>
-        /// <param name="sourceDocument">The name of the source document.</param>
-        void SetExemptions(ComAttribute attribute, string sourceDocument)
-        {
-            // If there are no exemption codes to assign, just remove the exemption codes attribute.
-            if (_exemptions.IsEmpty)
-            {
-                RemoveExemptionsComAttribute(attribute);
-                return;
-            }
-
-            // Get the attribute's exemption codes attribute
-            IUnknownVector subattributes = attribute.SubAttributes;
-            ComAttribute exemptionsAttribute = GetExemptionsComAttribute(subattributes);
-            if (exemptionsAttribute == null)
-            {
-                // Append a new exemption codes COM attribute
-                exemptionsAttribute = new ComAttribute();
-                exemptionsAttribute.Name = "ExemptionCodes";
-                subattributes.PushBack(exemptionsAttribute);
-            }
-            
-            // Set the exemption codes
-            SpatialString value = new SpatialString();
-            value.CreateNonSpatialString(_exemptions.ToString(), sourceDocument);
-            exemptionsAttribute.Value = value;
-            exemptionsAttribute.Type = _exemptions.Category;
-        }
-
-        /// <summary>
-        /// Removes exemption codes from the specified COM attribute.
-        /// </summary>
-        /// <param name="attribute">The COM attribute from which to remove exemption codes.</param>
-        static void RemoveExemptionsComAttribute(ComAttribute attribute)
-        {
-            IUnknownVector subattributes = attribute.SubAttributes;
-            int count = subattributes.Size();
-            for (int i = 0; i < count; i++)
-            {
-                ComAttribute subattribute = (ComAttribute) subattributes.At(i);
-                if (subattribute.Name == "ExemptionCodes")
-                {
-                    subattributes.Remove(i);
-                    return;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Retrieves the exemption codes attribute from a vector of attributes.
-        /// </summary>
-        /// <param name="attributes">The attributes to check.</param>
-        /// <returns>The exemption code attribute if it is one of the <paramref name="attributes"/>;
-        /// otherwise returns <see langword="null"/>.</returns>
-        static ComAttribute GetExemptionsComAttribute(IUnknownVector attributes)
-        {
-            if (attributes != null)
-            {
-                int count = attributes.Size();
-                for (int i = 0; i < count; i++)
-                {
-                    ComAttribute subattribute = (ComAttribute)attributes.At(i);
-                    if (subattribute.Name == "ExemptionCodes")
-                    {
-                        return subattribute;
-                    }
-                }
-            }
-
-            return null;
         }
 
         /// <summary>
