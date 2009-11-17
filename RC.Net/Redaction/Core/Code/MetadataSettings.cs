@@ -11,6 +11,11 @@ namespace Extract.Redaction
         #region Fields
 
         /// <summary>
+        /// The path to the input ID Shield data file (VOA). May contain tags.
+        /// </summary>
+        readonly string _dataFile;
+
+        /// <summary>
         /// The path to the output verification metadata xml file. May contain tags.
         /// </summary>
         readonly string _metadataFile;
@@ -23,7 +28,7 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="MetadataSettings"/> class with default 
         /// settings.
         /// </summary>
-        public MetadataSettings() : this(null)
+        public MetadataSettings() : this(null, null)
         {
 
         }
@@ -31,14 +36,27 @@ namespace Extract.Redaction
         /// <summary>
         /// Initializes a new instance of the <see cref="MetadataSettings"/> class.
         /// </summary>
-        public MetadataSettings(string metadataFile)
+        public MetadataSettings(string dataFile, string metadataFile)
         {
+            _dataFile = dataFile ?? "<SourceDocName>.voa";
             _metadataFile = metadataFile ?? @"<SourceDocName>.xml";
         }
 
         #endregion Constructors
 
         #region Properties
+
+        /// <summary>
+        /// Gets the the path to the input ID Shield data file. May contain tags.
+        /// </summary>
+        /// <value>The the path to the input ID Shield data file. May contain tags.</value>
+        public string DataFile
+        {
+            get 
+            {
+                return _dataFile;
+            }
+        }
 
         /// <summary>
         /// Gets the path to the verification metadata xml file. May contain tags.
@@ -68,9 +86,10 @@ namespace Extract.Redaction
         {
             try
             {
+                string dataFile = reader.ReadString();
                 string metadataFile = reader.ReadString();
 
-                return new MetadataSettings(metadataFile);
+                return new MetadataSettings(dataFile, metadataFile);
             }
             catch (Exception ex)
             {
@@ -89,6 +108,7 @@ namespace Extract.Redaction
         {
             try
             {
+                writer.Write(_dataFile);
                 writer.Write(_metadataFile);
             }
             catch (Exception ex)

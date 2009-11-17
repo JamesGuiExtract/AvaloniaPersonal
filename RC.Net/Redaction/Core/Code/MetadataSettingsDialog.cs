@@ -71,9 +71,10 @@ namespace Extract.Redaction
         MetadataSettings GetMetadataSettings()
         {
             // Get the settings
+            string dataFile = _dataFileControl.DataFile;
             string metadataFile = _metadataFileTextBox.Text;
 
-            return new MetadataSettings(metadataFile);
+            return new MetadataSettings(dataFile, metadataFile);
         }
 
         /// <summary>
@@ -108,6 +109,7 @@ namespace Extract.Redaction
 
             try
             {
+                _dataFileControl.DataFile = _settings.DataFile;
                 _metadataFileTextBox.Text = _settings.MetadataFile;
             }
             catch (Exception ex)
