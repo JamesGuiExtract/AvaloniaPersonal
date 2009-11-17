@@ -1,3 +1,4 @@
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -10,6 +11,20 @@ namespace Extract.Redaction
     /// </summary>
     public class MasterExemptionCodeList
     {
+        #region Constants
+
+        /// <summary>
+        /// Directory where exemption code xml files are stored.
+        /// </summary>
+        const string _EXEMPTION_DIRECTORY =
+#if DEBUG
+            "..\\..\\ProductDevelopment\\AttributeFinder\\IndustrySpecific\\Redaction\\RedactionCustomComponents\\ExemptionCodes";
+#else
+	        "..\\IDShield\\ExemptionCodes";
+#endif
+
+        #endregion Constants
+
         #region MasterExemptionCodeList Fields
 
         /// <summary>
@@ -21,6 +36,15 @@ namespace Extract.Redaction
         #endregion MasterExemptionCodeList Fields
 
         #region MasterExemptionCodeList Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MasterExemptionCodeList"/> class.
+        /// </summary>
+        public MasterExemptionCodeList()
+            : this(GetDefaultExemptionDirectory())
+        {
+            
+        }
 
         /// <summary>
 	    /// Initializes a new instance of the <see cref="MasterExemptionCodeList"/> class.
@@ -59,6 +83,15 @@ namespace Extract.Redaction
         #endregion MasterExemptionCodeList Properties
 
         #region MasterExemptionCodeList Methods
+
+        /// <summary>
+        /// Gets the default path to the master file of exemption codes.
+        /// </summary>
+        /// <returns>The default path to the master file of exemption codes.</returns>
+        static string GetDefaultExemptionDirectory()
+        {
+            return FileSystemMethods.GetAbsolutePath(_EXEMPTION_DIRECTORY);
+        }
 
         /// <summary>
         /// Gets all the exemption codes in the specified category.
