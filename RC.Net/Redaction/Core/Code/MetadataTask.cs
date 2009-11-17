@@ -1,12 +1,20 @@
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
+using System.Xml;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.Redaction
 {
@@ -14,16 +22,18 @@ namespace Extract.Redaction
     /// Represents a file processing task that performs verification of redactions.
     /// </summary>
     [ComVisible(true)]
-    [Guid("5BB3A933-F515-4E0E-B2F3-E9702AF493F1")]
-    [ProgId("Extract.Redaction.Verification.MetadataTask")]
+    [Guid("7F567E34-CEBA-4C50-B2C9-B53BD13784FA")]
+    [ProgId("Extract.Redaction.MetadataTask")]
     public class MetadataTask : ICategorizedComponent, IConfigurableObject, ICopyableObject,
-                     IFileProcessingTask, ILicensedComponent, IPersistStream
+                                IFileProcessingTask, ILicensedComponent, IPersistStream
     {
         #region Constants
 
         const string _COMPONENT_DESCRIPTION = "Redaction: Create metadata xml";
 
-        const int _CURRENT_VERSION = 1;
+        const int _TASK_VERSION = 2;
+
+        const int _METADATA_VERSION = 4;
         
         #endregion Constants
 
@@ -40,6 +50,16 @@ namespace Extract.Redaction
         /// Settings for creating metadata xml.
         /// </summary>
         MetadataSettings _settings;
+
+        /// <summary>
+        /// The processing vector of attributes (VOA) file;
+        /// </summary>
+        RedactionFileLoader _voaFile;
+
+        /// <summary>
+        /// The master list of valid exemption codes.
+        /// </summary>
+        MasterExemptionCodeList _masterCodes;
 
         /// <summary>
         /// License cache for validating the license.
@@ -102,6 +122,238 @@ namespace Extract.Redaction
         public void CopyFrom(MetadataTask task)
         {
             _settings = task._settings;
+        }
+
+        /// <summary>
+        /// Creates the specified xml file from the currently processing vector of attributes (VOA) 
+        /// file.
+        /// </summary>
+        /// <param name="xmlFileName">The xml file to create.</param>
+        void WriteXml(string xmlFileName)
+        {
+            TemporaryFile file = null;
+            XmlWriter writer = null; 
+            try 
+	        {
+                file = new TemporaryFile(".xml");
+	            writer = XmlWriter.Create(file.FileName);
+	            if (writer == null)
+	            {
+	                throw new ExtractException("ELI28571", 
+	                    "Unable to write xml.");
+	            }
+
+                WriteXml(writer);
+
+	            writer.Close();
+	            writer = null;
+
+                // Create the output directory if it doesn't already exist
+                string xmlDirectory = Path.GetDirectoryName(xmlFileName);
+	            Directory.CreateDirectory(xmlDirectory);
+
+	            FileSystemMethods.MoveFile(file.FileName, xmlFileName, true);
+	        }
+            finally
+            {
+                if (writer != null)
+                {
+                    writer.Close();
+                }
+                if (file != null)
+                {
+                    file.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes the information from the currently processing vector of attributes (VOA) file 
+        /// to the xml writer.
+        /// </summary>
+        /// <param name="writer">The writer to perform the xml writing operation.</param>
+        void WriteXml(XmlWriter writer)
+        {
+            // Root
+            writer.WriteStartDocument();
+            writer.WriteStartElement("IDShieldMetadata");
+            writer.WriteAttributeString("Version", _METADATA_VERSION.ToString(CultureInfo.CurrentCulture));
+
+            // Document Info
+            WriteDocumentType(writer, _voaFile.DocumentType);
+
+            // Current and previous revisions
+            WriteCurrentItems(writer, _voaFile.Items);
+            WriteRevisions(writer, _voaFile.RevisionsAttribute);
+
+            // Verification and redaction sessions
+            if (_voaFile.VerificationSessions.Count > 0)
+            {
+                // TODO: Implement
+            }
+
+            if (_voaFile.RedactionSessions.Count > 0)
+            {
+                // TODO: Implement
+            }
+
+            writer.WriteEndElement();
+            writer.WriteEndDocument();
+        }
+
+        /// <summary>
+        /// Writes the document type information to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="documentType">The document type to write.</param>
+        static void WriteDocumentType(XmlWriter writer, string documentType)
+        {
+            if (documentType != null)
+            {
+                writer.WriteStartElement("DocumentInfo");
+                writer.WriteElementString("DocumentType", documentType);
+                writer.WriteEndElement();
+            }
+        }
+
+        /// <summary>
+        /// Writes the current redactions and clues to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="items">The current redactions and clues.</param>
+        void WriteCurrentItems(XmlWriter writer, ICollection<SensitiveItem> items)
+        {
+            if (items.Count > 0)
+            {
+                writer.WriteStartElement("CurrentRevisions");
+
+                foreach (SensitiveItem item in items)
+                {
+                    RedactionItem attribute = item.Attribute;
+
+                    WriteRedaction(writer, attribute);
+                }
+
+                writer.WriteEndElement();
+            }
+        }
+
+        /// <summary>
+        /// Writes the previous redactions and clues to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="revisions">The previous redaction and clues.</param>
+        void WriteRevisions(XmlWriter writer, ComAttribute revisions)
+        {
+            if (revisions != null)
+            {
+                IUnknownVector subAttributes = revisions.SubAttributes;
+                int count = subAttributes.Size();
+                if (count > 0)
+                {
+                    writer.WriteStartElement("OldRevisions");
+                    for (int i = 0; i < count; i++)
+                    {
+                        ComAttribute attribute = (ComAttribute) subAttributes.At(i);
+                        RedactionItem item = new RedactionItem(attribute);
+
+                        WriteRedaction(writer, item);
+                    }
+                    writer.WriteEndElement();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes a redaction or clue to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="item">The redaction or clue to write.</param>
+        void WriteRedaction(XmlWriter writer, RedactionItem item)
+        {
+            // Category
+            string category = item.Category;
+            if (category.Equals("Clue", StringComparison.OrdinalIgnoreCase))
+            {
+                writer.WriteStartElement("Clue");
+            }
+            else
+            {
+                writer.WriteStartElement("Redaction");
+                writer.WriteAttributeString("Category", category);
+            }
+
+            // Type
+            writer.WriteAttributeString("Type", item.RedactionType);
+
+            // ID and revision
+            WriteRevisionId(writer, item);
+
+            // Zones
+            WriteZones(writer, item);
+
+            // Exemption codes
+            WriteExemptions(writer, item);
+
+            writer.WriteEndElement();
+        }
+
+        /// <summary>
+        /// Writes the attribute ID and revision ID to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="item">The item containing the IDs to write.</param>
+        static void WriteRevisionId(XmlWriter writer, RedactionItem item)
+        {
+            long id = item.GetId();
+            writer.WriteAttributeString("ID", id.ToString(CultureInfo.CurrentCulture));
+            int revision = item.GetRevision();
+            writer.WriteAttributeString("Revision", revision.ToString(CultureInfo.CurrentCulture));
+        }
+
+        /// <summary>
+        /// Writes the redaction zones to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="item">The item containing to the zones to write.</param>
+        static void WriteZones(XmlWriter writer, RedactionItem item)
+        {
+            IUnknownVector zones = item.SpatialString.GetOriginalImageRasterZones();
+            int count = zones.Size();
+            for (int i = 0; i < count; i++)
+            {
+                // Get zone data
+                ComRasterZone zone = (ComRasterZone) zones.At(i);
+                int startX = 0, startY = 0, endX = 0, endY = 0, height = 0, page = 0;
+                zone.GetData(ref startX, ref startY, ref endX, ref endY, ref height, ref page);
+                            
+                // Write the zone to xml
+                writer.WriteStartElement("Zone");
+                writer.WriteAttributeString("StartX", startX.ToString(CultureInfo.CurrentCulture));
+                writer.WriteAttributeString("StartY", startY.ToString(CultureInfo.CurrentCulture));
+                writer.WriteAttributeString("EndX", endX.ToString(CultureInfo.CurrentCulture));
+                writer.WriteAttributeString("EndY", endY.ToString(CultureInfo.CurrentCulture));
+                writer.WriteAttributeString("Height", height.ToString(CultureInfo.CurrentCulture));
+                writer.WriteAttributeString("PageNumber", page.ToString(CultureInfo.CurrentCulture));
+                writer.WriteEndElement();
+            }
+        }
+
+        /// <summary>
+        /// Writes the exemptions codes to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="item">The item containing to the exemption codes to write.</param>
+        void WriteExemptions(XmlWriter writer, RedactionItem item)
+        {
+            ExemptionCodeList exemptions = item.GetExemptions(_masterCodes);
+            if (!exemptions.IsEmpty)
+            {
+                writer.WriteStartElement("ExemptionCode");
+                writer.WriteAttributeString("Category", exemptions.Category);
+                writer.WriteAttributeString("Code", exemptions.ToString());
+                writer.WriteEndElement();    
+            }
         }
 
         #endregion Methods
@@ -224,6 +476,17 @@ namespace Extract.Redaction
             {
                 // Validate the license
                 _licenseCache.Validate("ELI28519");
+
+                // Retrieve the confidence levels if necessary
+                if (_voaFile == null)
+                {
+                    InitializationSettings settings = new InitializationSettings();
+                    ConfidenceLevelsCollection levels = settings.ConfidenceLevels;
+                    _voaFile = new RedactionFileLoader(levels);
+                }
+
+                // Retrieve the master list of exemption codes
+                _masterCodes = new MasterExemptionCodeList();
             }
             catch (Exception ex)
             {
@@ -255,8 +518,24 @@ namespace Extract.Redaction
                 // Validate the license
                 _licenseCache.Validate("ELI28521");
 
-                // TODO: Implement
-                
+                FileActionManagerPathTags tags = 
+                    new FileActionManagerPathTags(bstrFileFullName, pFAMTM.FPSFileDir);
+
+                // Load voa
+                string voaFileName = tags.Expand(_settings.DataFile);
+                if (!File.Exists(voaFileName))
+                {
+                    ExtractException ee = new ExtractException("ELI28573",
+                        "Voa file not found.");
+                    ee.AddDebugData("Voa file", voaFileName, false);
+                    throw ee;
+                }
+                _voaFile.LoadFrom(voaFileName, bstrFileFullName);
+
+                // Write xml
+                string xmlFileName = tags.Expand(_settings.MetadataFile);
+                WriteXml(xmlFileName);
+
                 return EFileProcessingResult.kProcessingSuccessful;
             }
             catch (Exception ex)
@@ -313,7 +592,7 @@ namespace Extract.Redaction
         {
             try
             {
-                using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
+                using (IStreamReader reader = new IStreamReader(stream, _TASK_VERSION))
                 {
                     // Read the settings
                     _settings = MetadataSettings.ReadFrom(reader);
@@ -342,7 +621,7 @@ namespace Extract.Redaction
         {
             try 
             {
-                using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
+                using (IStreamWriter writer = new IStreamWriter(_TASK_VERSION))
                 {
                     // Serialize the settings
                     _settings.WriteTo(writer);
