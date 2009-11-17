@@ -156,6 +156,57 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Moves a file providing the option to overwrite if necessary.
+        /// </summary>
+        /// <param name="source">The file to move.</param>
+        /// <param name="destination">The location to which <paramref name="source"/> should be 
+        /// moved.</param>
+        /// <param name="overwrite"><see langword="true"/> if the <paramref name="destination"/> 
+        /// should be overwritten; <see langword="false"/> if an exception should be thrown if the 
+        /// <paramref name="destination"/> exists.</param>
+        public static void MoveFile(string source, string destination, bool overwrite)
+        {
+            try
+            {
+                // Attempt move first if possible, since this is fastest
+                if (!File.Exists(destination))
+                {
+                    try
+                    {
+                        File.Move(source, destination);
+                        return;
+                    }
+                    catch (IOException)
+                    {
+                        // The destination file exists. Ignore for now. 
+                        // Later either an exception will be thrown or the file will be copied by force.
+                    }
+                }
+
+                // The file already exists. If not overwriting, throw an exception.
+                if (!overwrite)
+                {
+                    ExtractException ee = new ExtractException("ELI28454",
+                        "Destination file already exists.");
+                    throw ee;
+                }
+
+                // Attempt to overwrite the file. This is slower than moving the file.
+                File.Copy(source, destination, true);
+                File.Delete(source);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI28532",
+                    "Unable to move file.", ex);
+                ee.AddDebugData("Source file", source, false);
+                ee.AddDebugData("Destination file", destination, false);
+                ee.AddDebugData("Overwrite", overwrite, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
         /// Copies all files from one directory to another directory.  If 
         /// <paramref name="recursive"/> is <see lanword="true"/> will perform
         /// a recursive copy; if <see langword="false"/> will only copy the top level

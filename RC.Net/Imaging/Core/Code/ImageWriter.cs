@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Extract.Licensing;
 using Extract.Utilities;
 using Leadtools;
@@ -130,43 +129,13 @@ namespace Extract.Imaging
         {
             try
             {
-                // Attempt move first if possible, since this is fastest
-                if (!File.Exists(_fileName))
-                {
-                    try
-                    {
-                        File.Move(_tempFile.FileName, _fileName);
-                        _tempFile.Dispose();
-                        _tempFile = null;
-                        return;
-                    }
-                    catch (IOException)
-                    {
-                        // The destination file exists. Ignore for now. 
-                        // Later either an exception will be thrown or the file will be copied by force.
-                    }
-                }
-
-                // The file already exists. If not overwriting, throw an exception.
-                if (!overwrite)
-                {
-                    ExtractException ee = new ExtractException("ELI28454",
-                        "Destination file already exists.");
-                    throw ee;
-                }
-
-                // Attempt to overwrite the file. This is a little slower than moving the file.
-                File.Copy(_tempFile.FileName, _fileName, true);
+                FileSystemMethods.MoveFile(_tempFile.FileName, _fileName, overwrite);
                 _tempFile.Dispose();
                 _tempFile = null;
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI28484",
-                    "Unable to write to file.", ex);
-                ee.AddDebugData("Destination file", _fileName, false);
-                ee.AddDebugData("Overwrite", overwrite, false);
-                throw ee;
+                throw ExtractException.AsExtractException("ELI28484", ex);
             }
         }
 
