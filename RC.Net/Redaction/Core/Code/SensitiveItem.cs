@@ -19,7 +19,7 @@ namespace Extract.Redaction
         /// <summary>
         /// The attribute associated with the <see cref="SensitiveItem"/>.
         /// </summary>
-        readonly ComAttribute _attribute;
+        readonly RedactionItem _attribute;
 
         #endregion Fields
 
@@ -32,6 +32,16 @@ namespace Extract.Redaction
         /// <param name="attribute">The attribute associated with this item.</param>
         [CLSCompliant(false)]
         public SensitiveItem(ConfidenceLevel level, ComAttribute attribute)
+            : this(level, new RedactionItem(attribute))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SensitiveItem"/> class.
+        /// </summary>
+        /// <param name="level">The confidence level of this item.</param>
+        /// <param name="attribute">The attribute associated with this item.</param>
+        public SensitiveItem(ConfidenceLevel level, RedactionItem attribute)
         {
             _level = level;
             _attribute = attribute;
@@ -45,8 +55,7 @@ namespace Extract.Redaction
         /// Gets the value associated with this verification item.
         /// </summary>
         /// <value>The value associated with this verification item.</value>
-        [CLSCompliant(false)]
-        public ComAttribute Attribute
+        public RedactionItem Attribute
         {
             get
             {
