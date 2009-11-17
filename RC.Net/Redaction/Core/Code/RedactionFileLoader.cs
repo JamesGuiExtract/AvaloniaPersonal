@@ -1,3 +1,4 @@
+using Extract.AttributeFinder;
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
@@ -13,9 +14,9 @@ using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 namespace Extract.Redaction
 {
     /// <summary>
-    /// Represents the contents of a vector of attributes (VOA) file used for redaction.
+    /// Loads the contents of a vector of attributes (VOA) file used for redaction or verification.
     /// </summary>
-    public class RedactionFile
+    public class RedactionFileLoader
     {
         #region Constants
 
@@ -23,6 +24,8 @@ namespace Extract.Redaction
         /// The current vector of attributes (VOA) schema version.
         /// </summary>
         static readonly int _VERSION = 1;
+
+        static readonly string _OBJECT_NAME = typeof (RedactionFileLoader).ToString();
 
         #endregion Constants
 
@@ -49,9 +52,19 @@ namespace Extract.Redaction
         string _sourceDocument;
 
         /// <summary>
+        /// The type of the document; or <see langword="null"/> if the document is uncategorized.
+        /// </summary>
+        string _documentType;
+
+        /// <summary>
         /// Clues and redactions.
         /// </summary>
         List<SensitiveItem> _sensitiveItems;
+
+        /// <summary>
+        /// The old revisions COM attribute.
+        /// </summary>
+        ComAttribute _revisionsAttribute;
 
         /// <summary>
         /// All non-sensitive and metadata attributes.
@@ -59,9 +72,19 @@ namespace Extract.Redaction
         List<ComAttribute> _attributes;
 
         /// <summary>
-        /// The unique session id.
+        /// The previous verification sessions.
+        /// </summary>
+        ComAttribute[] _verificationSessions;
+
+        /// <summary>
+        /// The unique verification session id.
         /// </summary>
         int _sessionId;
+
+        /// <summary>
+        /// The previous redaction sessions.
+        /// </summary>
+        ComAttribute[] _redactionSessions;
 
         /// <summary>
         /// The unique id of the next created attribute.
@@ -72,16 +95,16 @@ namespace Extract.Redaction
         /// Validates the license state.
         /// </summary>
         static readonly LicenseStateCache _license = 
-            new LicenseStateCache(LicenseIdName.IDShieldVerificationObject, "Verification file");
+            new LicenseStateCache(LicenseIdName.IDShieldVerificationObject, _OBJECT_NAME);
 
         #endregion Fields
 
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RedactionFile"/> class.
+        /// Initializes a new instance of the <see cref="RedactionFileLoader"/> class.
         /// </summary>
-        public RedactionFile(ConfidenceLevelsCollection levels)
+        public RedactionFileLoader(ConfidenceLevelsCollection levels)
         {
             _license.Validate("ELI28215");
 
@@ -114,6 +137,59 @@ namespace Extract.Redaction
             get
             {
                 return _fileName;
+            }
+        }
+
+        /// <summary>
+        /// Gets the document type associated with this file; <see langword="null"/> if no 
+        /// document type is specified.
+        /// </summary>
+        /// <value>The document type associated with this file; <see langword="null"/> if no 
+        /// document type is specified.</value>
+        public string DocumentType
+        {
+            get 
+            {
+                return _documentType;
+            }
+        }
+
+        /// <summary>
+        /// Gets the old revisions COM attribute.
+        /// </summary>
+        /// <value>The old revisions COM attribute.</value>
+        [CLSCompliant(false)]
+        public ComAttribute RevisionsAttribute
+        {
+            get 
+            {
+                return _revisionsAttribute;
+            }
+        }
+
+        /// <summary>
+        /// Gets the verification session attributes.
+        /// </summary>
+        /// <value>The verification session attributes.</value>
+        [CLSCompliant(false)]
+        public ReadOnlyCollection<ComAttribute> VerificationSessions
+        {
+            get 
+            {
+                return new ReadOnlyCollection<ComAttribute>(_verificationSessions);
+            }
+        }
+
+        /// <summary>
+        /// Gets the redaction session attributes.
+        /// </summary>
+        /// <value>The redaction session attributes.</value>
+        [CLSCompliant(false)]
+        public ReadOnlyCollection<ComAttribute> RedactionSessions
+        {
+            get
+            {
+                return new ReadOnlyCollection<ComAttribute>(_redactionSessions);
             }
         }
 
@@ -185,6 +261,9 @@ namespace Extract.Redaction
             // Ensure the schema of this VOA file is accurate
             ValidateSchema(attributes);
 
+            // Get the document type
+            _documentType = GetDocumentType(attributes);
+
             // Query and add attributes at each confidence level
             AFUtility utility = new AFUtility();
             foreach (ConfidenceLevel level in _levels)
@@ -199,11 +278,18 @@ namespace Extract.Redaction
                 AssignId(item.Attribute);
             }
 
-            // Determine the next attribute id
-            _nextId = GetNextId(_sensitiveItems, attributes);
+            // Get the previous revision
+            _revisionsAttribute = GetRevisionsAttribute(attributes);
 
-            // Get the current session id
-            _sessionId = GetSessionId(attributes);
+            // Determine the next attribute id
+            _nextId = GetNextId(_sensitiveItems, _revisionsAttribute);
+
+            // Get the previous verification sessions
+            _verificationSessions = AttributeMethods.GetAttributesByName(attributes, "_VerificationSession");
+            _sessionId = GetSessionId(_verificationSessions);
+
+            // Get the previous redaction session
+            _redactionSessions = AttributeMethods.GetAttributesByName(attributes, "_RedactedFileOutputSession");
 
             // Store the remaining attributes
             int count = attributes.Size();
@@ -222,7 +308,7 @@ namespace Extract.Redaction
         void ValidateSchema(IUnknownVector attributes)
         {            
             // Create the VOA file information attribute if it doesn't already exist
-            ComAttribute fileInfo = GetSingleAttributeByName(attributes, "_VOAFileInfo");
+            ComAttribute fileInfo = AttributeMethods.GetSingleAttributeByName(attributes, "_VOAFileInfo");
             if (fileInfo == null)
             {
                 fileInfo = CreateFileInfoAttribute();
@@ -233,7 +319,7 @@ namespace Extract.Redaction
             IUnknownVector subAttributes = fileInfo.SubAttributes;
 
             // Validate product name
-            ComAttribute productName = GetSingleAttributeByName(subAttributes, "_ProductName");
+            ComAttribute productName = AttributeMethods.GetSingleAttributeByName(subAttributes, "_ProductName");
             string product = productName.Value.String;
             if (!product.Equals("IDShield", StringComparison.OrdinalIgnoreCase))
             {
@@ -244,7 +330,7 @@ namespace Extract.Redaction
             }
 
             // Validate version
-            ComAttribute schema = GetSingleAttributeByName(subAttributes, "_SchemaVersion");
+            ComAttribute schema = AttributeMethods.GetSingleAttributeByName(subAttributes, "_SchemaVersion");
             int version = int.Parse(schema.Value.String, CultureInfo.CurrentCulture);
             if (version > _VERSION)
             {
@@ -254,59 +340,6 @@ namespace Extract.Redaction
                 ee.AddDebugData("Maximum recognized version", _VERSION, false);
                 throw ee;
             }
-        }
-
-        /// <summary>
-        /// Gets a single attribute by name from the specified vector of attributes. Throws an 
-        /// exception if more than one attribute is found.
-        /// </summary>
-        /// <param name="attributes">The attributes to search.</param>
-        /// <param name="name">The name of the attribute to find.</param>
-        /// <returns>The only attribute in <paramref name="attributes"/> with the specified name; 
-        /// if no such attribute exists, returns <see langword="null"/>.</returns>
-        static ComAttribute GetSingleAttributeByName(IUnknownVector attributes, string name)
-        {
-            ComAttribute[] idAttributes = GetAttributesByName(attributes, name);
-
-            if (idAttributes.Length == 0)
-            {
-                return null;
-            }
-            else if (idAttributes.Length == 1)
-            {
-                return idAttributes[0];
-            }
-
-            throw new ExtractException("ELI28197",
-                "More than one " + name + " attribute found.");
-        }
-
-        /// <summary>
-        /// Gets an array of COM attributes that have the specified name.
-        /// </summary>
-        /// <param name="attributes">A vector of COM attributes to search.</param>
-        /// <param name="name">The name of the attributes to return.</param>
-        /// <returns>An array of COM attributes in <paramref name="attributes"/> that have the 
-        /// specified <paramref name="name"/>.</returns>
-        static ComAttribute[] GetAttributesByName(IUnknownVector attributes, string name)
-        {
-            List<ComAttribute> result = new List<ComAttribute>();
-
-            // Iterate over each attribute
-            int count = attributes.Size();
-            for (int i = 0; i < count; i++)
-            {
-                ComAttribute attribute = (ComAttribute)attributes.At(i);
-
-                // If this attribute matches the specified name, add it to the result
-                string attributeName = attribute.Name;
-                if (attributeName.Equals(name, StringComparison.OrdinalIgnoreCase))
-                {
-                    result.Add(attribute);
-                }
-            }
-
-            return result.ToArray();
         }
 
         /// <summary>
@@ -327,6 +360,26 @@ namespace Extract.Redaction
             AppendChildAttributes(fileInfo, productNameAttribute, schemaVersion);
 
             return fileInfo;
+        }
+
+        /// <summary>
+        /// Gets the document type from the specified vector of attributes.
+        /// </summary>
+        /// <param name="attributes">The vector of attributes to search.</param>
+        /// <returns>The first document type in <paramref name="attributes"/>.</returns>
+        static string GetDocumentType(IIUnknownVector attributes)
+        {
+            int count = attributes.Size();
+            for (int i = 0; i < count; i++)
+            {
+                ComAttribute attribute = (ComAttribute)attributes.At(i);
+                if (attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase))
+                {
+                    return attribute.Value.String;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -361,43 +414,20 @@ namespace Extract.Redaction
         /// one.
         /// </summary>
         /// <param name="attribute">The attribute to which an id may be added.</param>
-        void AssignId(ComAttribute attribute)
+        void AssignId(RedactionItem attribute)
         {
-            ComAttribute id = GetIdAttribute(attribute);
-            if (id == null)
+            bool idAdded = attribute.AssignIdIfNeeded(_nextId, _sourceDocument);
+            if (idAdded)
             {
-                AddIdAttribute(attribute);
+                _nextId++;
             }
-        }
-
-        /// <summary>
-        /// Gets the id attribute associated with the specified attribute.
-        /// </summary>
-        /// <param name="attribute">The attribute from which to get the id attribute.</param>
-        /// <returns>The id attribute associated with <paramref name="attribute"/>.</returns>
-        static ComAttribute GetIdAttribute(ComAttribute attribute)
-        {
-            return GetSingleAttributeByName(attribute.SubAttributes, "_IDAndRevision");
-        }
-
-        /// <summary>
-        /// Creates and adds an id attribute for the specified attribute.
-        /// </summary>
-        /// <param name="attribute">The attribute to which the id attribute should be added.</param>
-        void AddIdAttribute(ComAttribute attribute)
-        {
-            ComAttribute revisionId = CreateComAttribute("_IDAndRevision", _nextId, "_1");
-
-            attribute.SubAttributes.PushBack(revisionId);
-
-            _nextId++;
         }
 
         /// <summary>
         /// Calculates the unique id of the next created attribute.
         /// </summary>
         /// <returns>The unique id of the next created attribute.</returns>
-        long GetNextId(IEnumerable<SensitiveItem> items, IUnknownVector vector)
+        static long GetNextId(IEnumerable<SensitiveItem> items, ComAttribute revisionsAttribute)
         {
             // Iterate over the clues and redactions for the next id.
             long nextId = 1;
@@ -407,13 +437,13 @@ namespace Extract.Redaction
             }
 
             // Iterate over all previously deleted attributes for the next id.
-            ComAttribute revisions = GetRevisionsAttribute(vector);
-            IUnknownVector subAttributes = revisions.SubAttributes;
+            IUnknownVector subAttributes = revisionsAttribute.SubAttributes;
             int count = subAttributes.Size();
             for (int i = 0; i < count; i++)
             {
-                ComAttribute attribute = (ComAttribute) subAttributes.At(i);
-                nextId = GetNextId(attribute, nextId);
+                ComAttribute attribute = (ComAttribute)subAttributes.At(i);
+                RedactionItem redaction = new RedactionItem(attribute);
+                nextId = GetNextId(redaction, nextId);
             }
 
             return nextId;
@@ -428,9 +458,9 @@ namespace Extract.Redaction
         /// <returns>Returns <paramref name="nextId"/> if it is smaller than the id of 
         /// <paramref name="attribute"/>; returns the id after the id of 
         /// <paramref name="attribute"/> if it is larger than <paramref name="nextId"/>.</returns>
-        static long GetNextId(ComAttribute attribute, long nextId)
+        static long GetNextId(RedactionItem attribute, long nextId)
         {
-            long id = GetAttributeId(attribute);
+            long id = attribute.GetId();
             return id < nextId ? nextId : id + 1;
         }
 
@@ -443,7 +473,7 @@ namespace Extract.Redaction
         ComAttribute GetRevisionsAttribute(IUnknownVector vector)
         {
             // Look for an existing revisions attribute
-            ComAttribute revisionsAttribute = GetSingleAttributeByName(vector, "_OldRevisions");
+            ComAttribute revisionsAttribute = AttributeMethods.GetSingleAttributeByName(vector, "_OldRevisions");
             if (revisionsAttribute == null)
             {
                 // Create a new revisions attribute
@@ -455,37 +485,18 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Gets the unique id of the specified attribute.
+        /// Gets the id of the most recent session.
         /// </summary>
-        /// <param name="attribute">The attribute from which the unique id should be determined.
+        /// <param name="sessions">An array of attributes to search for the most recent session.
         /// </param>
-        /// <returns>The unique id of <paramref name="attribute"/>; or -1 if 
-        /// <paramref name="attribute"/> does not have an attribute</returns>
-        static long GetAttributeId(ComAttribute attribute)
-        {
-            ComAttribute idAttribute = GetIdAttribute(attribute);
-            if (idAttribute != null)
-            {
-                return long.Parse(idAttribute.Value.String, CultureInfo.CurrentCulture);
-            }
-
-            return -1;
-        }
-
-        /// <summary>
-        /// Gets the id of the most recent verification session.
-        /// </summary>
-        /// <param name="attributes">A vector of attributes to search for the most recent 
-        /// verification session.</param>
-        /// <returns>The id of the most recent verification session in 
-        /// <paramref name="attributes"/>; or zero if no verification session attribute exists.
+        /// <returns>The id of the most recent verification session in <paramref name="sessions"/>; 
+        /// or zero if no verification session attribute exists.
         /// </returns>
-        static int GetSessionId(IUnknownVector attributes)
+        static int GetSessionId(ComAttribute[] sessions)
         {
             int result = 0;
 
             // Iterate over each verification session attribute
-            ComAttribute[] sessions = GetAttributesByName(attributes, "_VerificationSession");
             foreach (ComAttribute attribute in sessions)
             {
                 SpatialString value = attribute.Value;
@@ -504,7 +515,7 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Saves the <see cref="RedactionFile"/> with the specified changes and information. 
+        /// Saves the <see cref="RedactionFileLoader"/> with the specified changes and information. 
         /// </summary>
         /// <param name="fileName">The full path to location where the file should be saved.</param>
         /// <param name="changes">The attributes that have been added, modified, and deleted.</param>
@@ -520,8 +531,8 @@ namespace Extract.Redaction
                 List<SensitiveItem> itemsToVerify = new List<SensitiveItem>(_sensitiveItems);
 
                 // Update any changed items (deleted, modified, and added)
-                ComAttribute[] oldDeleted = UpdateDeletedItems(itemsToVerify, changes.Deleted);
-                ComAttribute[] oldModified = UpdateModifiedItems(itemsToVerify, changes.Modified);
+                RedactionItem[] oldDeleted = UpdateDeletedItems(itemsToVerify, changes.Deleted);
+                RedactionItem[] oldModified = UpdateModifiedItems(itemsToVerify, changes.Modified);
                 UpdateAddedItems(itemsToVerify, changes.Added);
 
                 // Create other verification attributes that don't undergo verification
@@ -556,17 +567,17 @@ namespace Extract.Redaction
         /// <param name="items">The items to be updated.</param>
         /// <param name="deleted">The attributes to delete.</param>
         /// <returns>The previous version of the deleted attributes.</returns>
-        static ComAttribute[] UpdateDeletedItems(IList<SensitiveItem> items,
-            ICollection<ComAttribute> deleted)
+        static RedactionItem[] UpdateDeletedItems(IList<SensitiveItem> items,
+            ICollection<RedactionItem> deleted)
         {
             // Make an array to hold the previous version of the modified attributes
-            ComAttribute[] oldDeleted = new ComAttribute[deleted.Count];
+            RedactionItem[] oldDeleted = new RedactionItem[deleted.Count];
 
             // Iterate over each deleted attribute
             int i = 0;
-            foreach (ComAttribute attribute in deleted)
+            foreach (RedactionItem attribute in deleted)
             {
-                long targetId = GetAttributeId(attribute);
+                long targetId = attribute.GetId();
 
                 // Find the corresponding previous version
                 int index = GetIndexFromAttributeId(items, targetId);
@@ -593,17 +604,17 @@ namespace Extract.Redaction
         /// <param name="items">The items to be updated.</param>
         /// <param name="modified">The attributes to modify.</param>
         /// <returns>The previous version of the modified attributes.</returns>
-        static ComAttribute[] UpdateModifiedItems(IList<SensitiveItem> items,
-            ICollection<ComAttribute> modified)
+        static RedactionItem[] UpdateModifiedItems(IList<SensitiveItem> items,
+            ICollection<RedactionItem> modified)
         {
             // Make an array to hold the previous version of the modified attributes
-            ComAttribute[] oldModified = new ComAttribute[modified.Count];
+            RedactionItem[] oldModified = new RedactionItem[modified.Count];
 
             // Iterate over each modified attribute
             int i = 0;
-            foreach (ComAttribute attribute in modified)
+            foreach (RedactionItem attribute in modified)
             {
-                long targetId = GetAttributeId(attribute);
+                long targetId = attribute.GetId();
 
                 // Find the corresponding previous version
                 int index = GetIndexFromAttributeId(items, targetId);
@@ -619,7 +630,7 @@ namespace Extract.Redaction
                 i++;
 
                 // Update the version number of the modified attribute
-                IncrementRevision(attribute);
+                attribute.IncrementRevision();
 
                 // Store the new version
                 items[index] = new SensitiveItem(old.Level, attribute);
@@ -633,9 +644,9 @@ namespace Extract.Redaction
         /// </summary>
         /// <param name="items">The items to be updated.</param>
         /// <param name="added">The attributes to add.</param>
-        void UpdateAddedItems(ICollection<SensitiveItem> items, IEnumerable<ComAttribute> added)
+        void UpdateAddedItems(ICollection<SensitiveItem> items, IEnumerable<RedactionItem> added)
         {
-            foreach (ComAttribute attribute in added)
+            foreach (RedactionItem attribute in added)
             {
                 // Each new attribute needs a unique id
                 AssignId(attribute);
@@ -659,7 +670,7 @@ namespace Extract.Redaction
             for (int i = 0; i < items.Count; i++)
             {
                 SensitiveItem item = items[i];
-                long itemId = GetAttributeId(item.Attribute);
+                long itemId = item.Attribute.GetId();
                 if (id == itemId)
                 {
                     return i;
@@ -667,37 +678,6 @@ namespace Extract.Redaction
             }
 
             return -1;
-        }
-
-        /// <summary>
-        /// Increment the version number of the specified attribute.
-        /// </summary>
-        /// <param name="attribute">The attribute whose revision should be incremented.</param>
-        static void IncrementRevision(ComAttribute attribute)
-        {
-            // Get the ID attribute
-            ComAttribute idAttribute = GetIdAttribute(attribute);
-
-            // Get the revision number incremented by one
-            int revision = 1 + GetRevisionFromIdAttribute(idAttribute);
-
-            // Store the new revision number.
-            // Prepend underscore because type must start with underscore or alphabetic character.
-            idAttribute.Type = "_" + revision.ToString(CultureInfo.CurrentCulture);
-        }
-
-        /// <summary>
-        /// Retrieves the revision number from the specified _IDAndRevision attribute.
-        /// </summary>
-        /// <param name="idAttribute">The _IDAndRevision attribute.</param>
-        /// <returns>The revisiion number of the <paramref name="idAttribute"/>.</returns>
-        static int GetRevisionFromIdAttribute(ComAttribute idAttribute)
-        {
-            // Drop the initial underscore from the ID attribute
-            string revisionString = idAttribute.Type.Substring(1);
-
-            // Parse the string
-            return int.Parse(revisionString, CultureInfo.CurrentCulture);
         }
 
         /// <summary>
@@ -712,7 +692,7 @@ namespace Extract.Redaction
         /// <returns>All the attributes in a verification vector of attributes (VOA) file, other 
         /// than the ones that were directly verified by the user.</returns>
         IUnknownVector GetUnverifiedAttributes(VerificationSettings settings, TimeInterval time,
-            RedactionFileChanges changes, ComAttribute[] oldDeleted, ComAttribute[] oldModified)
+            RedactionFileChanges changes, RedactionItem[] oldDeleted, RedactionItem[] oldModified)
         {
             // Copy the original unverified attributes in to a vector
             IUnknownVector attributes = new IUnknownVector();
@@ -817,7 +797,7 @@ namespace Extract.Redaction
         /// <param name="name">The name of entries changed attribute.</param>
         /// <param name="entries">The attributes that changed.</param>
         /// <returns>An entries changed attribute.</returns>
-        ComAttribute CreateChangeEntriesAttribute(string name, ICollection<ComAttribute> entries)
+        ComAttribute CreateChangeEntriesAttribute(string name, ICollection<RedactionItem> entries)
         {
             ComAttribute changeEntries = CreateComAttribute(name);
 
@@ -825,9 +805,9 @@ namespace Extract.Redaction
             if (entries.Count > 0)
             {
                 IUnknownVector subAttributes = changeEntries.SubAttributes;
-                foreach (ComAttribute entry in entries)
+                foreach (RedactionItem entry in entries)
                 {
-                    ComAttribute changeEntry = GetSingleAttributeByName(entry.SubAttributes, "_IDAndRevision");
+                    ComAttribute changeEntry = entry.GetIdAttribute();
                     subAttributes.PushBack(changeEntry);
                 }
             }
@@ -841,17 +821,17 @@ namespace Extract.Redaction
         /// <param name="revisions">The revisions attribute.</param>
         /// <param name="oldDeleted">Previous versions of deleted attributes.</param>
         /// <param name="oldModified">Previous versions of modified attributes.</param>
-        static void AddRevisions(ComAttribute revisions, IEnumerable<ComAttribute> oldDeleted,
-            IEnumerable<ComAttribute> oldModified)
+        static void AddRevisions(ComAttribute revisions, IEnumerable<RedactionItem> oldDeleted,
+            IEnumerable<RedactionItem> oldModified)
         {
             IUnknownVector subAttributes = revisions.SubAttributes;
-            foreach (ComAttribute deleted in oldDeleted)
+            foreach (RedactionItem deleted in oldDeleted)
             {
-                subAttributes.PushBack(deleted);
+                subAttributes.PushBack(deleted.ComAttribute);
             }
-            foreach (ComAttribute modified in oldModified)
+            foreach (RedactionItem modified in oldModified)
             {
-                subAttributes.PushBack(modified);
+                subAttributes.PushBack(modified.ComAttribute);
             }
         }
 
@@ -870,7 +850,7 @@ namespace Extract.Redaction
             IUnknownVector output = new IUnknownVector();
             foreach (SensitiveItem item in verified)
             {
-                output.PushBack(item.Attribute);
+                output.PushBack(item.Attribute.ComAttribute);
             }
 
             // Append the unverified attributes
