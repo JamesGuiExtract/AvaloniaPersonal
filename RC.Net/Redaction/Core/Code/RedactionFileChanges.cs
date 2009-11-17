@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
-using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.Redaction
 {
@@ -16,17 +13,17 @@ namespace Extract.Redaction
         /// <summary>
         /// COM attributes that were added.
         /// </summary>
-        readonly ReadOnlyCollection<ComAttribute> _added;
+        readonly ReadOnlyCollection<RedactionItem> _added;
 
         /// <summary>
         /// COM attributes that were deleted.
         /// </summary>
-        readonly ReadOnlyCollection<ComAttribute> _deleted;
+        readonly ReadOnlyCollection<RedactionItem> _deleted;
 
         /// <summary>
         /// COM attributes that were modified.
         /// </summary>
-        readonly ReadOnlyCollection<ComAttribute> _modified;
+        readonly ReadOnlyCollection<RedactionItem> _modified;
 
         #endregion Fields
 
@@ -35,12 +32,12 @@ namespace Extract.Redaction
         /// <summary>
         /// Initializes a new instance of the <see cref="RedactionFileChanges"/> class.
         /// </summary>
-        public RedactionFileChanges(IList<ComAttribute> added, IList<ComAttribute> deleted, 
-            IList<ComAttribute> modified)
+        public RedactionFileChanges(IList<RedactionItem> added, IList<RedactionItem> deleted,
+            IList<RedactionItem> modified)
         {
-            _added = new ReadOnlyCollection<ComAttribute>(added);
-            _deleted = new ReadOnlyCollection<ComAttribute>(deleted);
-            _modified = new ReadOnlyCollection<ComAttribute>(modified);
+            _added = new ReadOnlyCollection<RedactionItem>(added);
+            _deleted = new ReadOnlyCollection<RedactionItem>(deleted);
+            _modified = new ReadOnlyCollection<RedactionItem>(modified);
         }
 
         #endregion Constructors
@@ -51,8 +48,7 @@ namespace Extract.Redaction
         /// Gets the COM attributes that were added.
         /// </summary>
         /// <value>The COM attributes that were added.</value>
-        [CLSCompliant(false)]
-        public ReadOnlyCollection<ComAttribute> Added
+        public ReadOnlyCollection<RedactionItem> Added
         {
             get
             {
@@ -64,8 +60,7 @@ namespace Extract.Redaction
         /// Gets the COM attributes that were deleted.
         /// </summary>
         /// <value>The COM attributes that were deleted.</value>
-        [CLSCompliant(false)]
-        public ReadOnlyCollection<ComAttribute> Deleted
+        public ReadOnlyCollection<RedactionItem> Deleted
         {
             get
             {
@@ -77,8 +72,7 @@ namespace Extract.Redaction
         /// Gets the COM attributes that were modified.
         /// </summary>
         /// <value>The COM attributes that were modified.</value>
-        [CLSCompliant(false)]
-        public ReadOnlyCollection<ComAttribute> Modified
+        public ReadOnlyCollection<RedactionItem> Modified
         {
             get
             {
