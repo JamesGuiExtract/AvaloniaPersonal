@@ -62,16 +62,6 @@ namespace Extract.Redaction.Verification
         #region Constants
 
         /// <summary>
-        /// Directory where exemption code xml files are stored.
-        /// </summary>
-        const string _EXEMPTION_DIRECTORY =
-#if DEBUG
-            "..\\..\\ProductDevelopment\\AttributeFinder\\IndustrySpecific\\Redaction\\RedactionCustomComponents\\ExemptionCodes";
-#else
-	        "..\\IDShield\\ExemptionCodes";
-#endif
-
-        /// <summary>
         /// Gets the redaction categories that are recorded in the ID Shield database.
         /// </summary>
         static readonly string[] _CATEGORIES = Enum.GetNames(typeof(CategoryIndex));
@@ -132,7 +122,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The attributes corresponding to rows deleted since the last save.
         /// </summary>
-        readonly List<ComAttribute> _deletedAttributes = new List<ComAttribute>();
+        readonly List<RedactionItem> _deletedAttributes = new List<RedactionItem>();
 
         /// <summary>
         /// The tool to automatically select after a redaction has been created.
@@ -268,8 +258,7 @@ namespace Extract.Redaction.Verification
                 // Lazy instantiation
                 if (_masterCodes == null)
                 {
-                    string directory = FileSystemMethods.GetAbsolutePath(_EXEMPTION_DIRECTORY);
-                    _masterCodes = new MasterExemptionCodeList(directory);
+                    _masterCodes = new MasterExemptionCodeList();
                 }
 
                 return _masterCodes;
@@ -915,7 +904,7 @@ namespace Extract.Redaction.Verification
         /// <param name="file">A file containing a vector of attributes.</param>
         /// <param name="visitedRows">The rows to mark as visited; or <see langword="null"/> if 
         /// all rows should be marked as visited.</param>
-        public void LoadFrom(RedactionFile file, VisitedItemsCollection visitedRows)
+        public void LoadFrom(RedactionFileLoader file, VisitedItemsCollection visitedRows)
         {
             try
             {
@@ -992,14 +981,14 @@ namespace Extract.Redaction.Verification
         /// Adds attributes from the specified file to the <see cref="RedactionGridView"/>.
         /// </summary>
         /// <param name="file">The file containing the attributes to add.</param>
-        void AddAttributesFromFile(RedactionFile file)
+        void AddAttributesFromFile(RedactionFileLoader file)
         {
             // Iterate over the attributes
             foreach (SensitiveItem item in file.Items)
             {
                 // Add each attribute
                 RedactionGridViewRow row = 
-                    RedactionGridViewRow.FromVerificationItem(item, _imageViewer, MasterCodes);
+                    RedactionGridViewRow.FromSensitiveItem(item, _imageViewer, MasterCodes);
                 Add(row);
 
                 foreach (LayerObject layerObject in row.LayerObjects)
@@ -1018,19 +1007,19 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                List<ComAttribute> added = new List<ComAttribute>();
-                List<ComAttribute> modified = new List<ComAttribute>();
+                List<RedactionItem> added = new List<RedactionItem>();
+                List<RedactionItem> modified = new List<RedactionItem>();
                 LongToObjectMap pageInfoMap = GetPageInfoMap();
 
                 foreach (RedactionGridViewRow row in _redactions)
                 {
                     if (row.IsNew)
                     {
-                        added.Add(row.SaveComAttribute(sourceDocument, pageInfoMap));
+                        added.Add(row.SaveRedactionItem(sourceDocument, pageInfoMap));
                     }
                     else if (row.IsModified)
                     {
-                        modified.Add(row.SaveComAttribute(sourceDocument, pageInfoMap));
+                        modified.Add(row.SaveRedactionItem(sourceDocument, pageInfoMap));
                     }
                 }
 
