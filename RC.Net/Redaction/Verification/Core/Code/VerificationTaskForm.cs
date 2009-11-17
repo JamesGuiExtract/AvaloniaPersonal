@@ -61,7 +61,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The file corresponding to the currently open vector of attributes (VOA) file.
         /// </summary>
-        readonly RedactionFile _currentVoa;
+        readonly RedactionFileLoader _currentVoa;
 
         /// <summary>
         /// The file processing database.
@@ -179,7 +179,7 @@ namespace Extract.Redaction.Verification
 
                 _options = VerificationOptions.ReadFrom(_iniSettings);
 
-                _currentVoa = new RedactionFile(_iniSettings.ConfidenceLevels);
+                _currentVoa = new RedactionFileLoader(_iniSettings.ConfidenceLevels);
 
                 // Subscribe to layer object events
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
