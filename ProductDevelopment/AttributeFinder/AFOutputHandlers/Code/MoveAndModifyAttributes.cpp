@@ -249,9 +249,14 @@ STDMETHODIMP CMoveAndModifyAttributes::put_SpecifiedAttributeName(/*[in]*/ BSTR 
 			UCLIDException ue( "ELI09419", "The Specified Attribute Name must not be empty!");
 			throw ue;
 		}
-		IAttributePtr ipTmp(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI09509", ipTmp != NULL);
-		ipTmp->PutName(_bstr_t(newVal));
+
+		// Validate the attribute name
+		if (!isValidIdentifier(strTmp))
+		{
+			UCLIDException uex("ELI28576", "Invalid attribute name.");
+			uex.addDebugInfo("Invalid Name", strTmp);
+			throw uex;
+		}
 
 		// Store the Attribute Name
 		m_strSpecifiedName = strTmp;
@@ -409,10 +414,13 @@ STDMETHODIMP CMoveAndModifyAttributes::put_SpecifiedAttributeType(/*[in]*/ BSTR 
 			throw ue;
 		}
 
-		// Dummy IAttribute object for Type validation
-		IAttributePtr	ipDummy( CLSID_Attribute );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09532", ipDummy != NULL );
-		ipDummy->PutType( newVal );
+		// Validate the type
+		if (!isValidIdentifier(strTmp))
+		{
+			UCLIDException uex("ELI28577", "Invalid attribute type.");
+			uex.addDebugInfo("Invalid Type", strTmp);
+			throw uex;
+		}
 
 		// Store the Attribute Type
 		m_strSpecifiedType = strTmp;

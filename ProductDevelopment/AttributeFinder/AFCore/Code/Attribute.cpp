@@ -308,7 +308,7 @@ STDMETHODIMP CAttribute::put_Type(BSTR newVal)
 
 		// Tokenize the string
 		string strValue = asString( newVal );
-		std::vector<std::string>	vecTypes;
+		vector<string>	vecTypes;
 		StringTokenizer	st( '+' );
 		st.parse( strValue, vecTypes );
 
@@ -353,7 +353,7 @@ STDMETHODIMP CAttribute::AddType(BSTR newVal)
 
 		// Check string for reserved character
 		string strValue = asString( newVal );
-		std::vector<std::string>	vecTypes;
+		vector<string>	vecTypes;
 		StringTokenizer	st( '+' );
 		st.parse( strValue, vecTypes );
 
@@ -1335,7 +1335,7 @@ STDMETHODIMP CAttribute::GetSizeMax(ULARGE_INTEGER * pcbSize)
 //-------------------------------------------------------------------------------------------------
 // Private functions
 //-------------------------------------------------------------------------------------------------
-bool CAttribute::containsType(std::string strType)
+bool CAttribute::containsType(string strType)
 {
 	// Check for empty string
 	if (strType.length() == 0)
@@ -1361,7 +1361,7 @@ bool CAttribute::containsType(std::string strType)
 		if (lPos != string::npos)
 		{
 			// Parse Type into individual strings
-			std::vector<std::string>	vecTypes;
+			vector<string>	vecTypes;
 			StringTokenizer st( cReserved );
 			st.parse( m_strAttributeType.c_str(), vecTypes );
 
@@ -1396,10 +1396,8 @@ bool CAttribute::containsType(std::string strType)
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-void CAttribute::validateIdentifier(std::string strName)
+void CAttribute::validateIdentifier(const string& strName)
 {
-	// A Valid Attribute name is a series of space (' ') delimited identifiers
-
 	if (strName == "")
 	{
 		UCLIDException ue("ELI09508", "Empty Attribute Name / Type!");
@@ -1413,27 +1411,12 @@ void CAttribute::validateIdentifier(std::string strName)
 		throw ue;
 	}
 
-	vector<string> vecIdentifiers;
-	StringTokenizer::sGetTokens(strName, " ", vecIdentifiers);
-	
-	for (unsigned int ui = 0; ui < vecIdentifiers.size(); ui++)
+	// Attribute names/types should not contain spaces [FlexIDSCore #3690]
+	if (!isValidIdentifier(strName))
 	{
-		string strIdent = vecIdentifiers[ui];
-		
-		if (strIdent == "")
-		{
-			UCLIDException ue("ELI09507", "Extra Whitespace in Attribute Name / Type!");
-			ue.addDebugInfo("Invalid Attribute Name", strName);
-			throw ue;
-		}
-
-		if (!isValidIdentifier(strIdent))
-		{
-			UCLIDException ue("ELI13021", "Invalid Identifier in Attribute Name / Type!");
-			ue.addDebugInfo("Invalid String", strName);
-			ue.addDebugInfo("Invalid Identifier", strIdent);
-			throw ue;
-		}
+		UCLIDException ue("ELI13021", "Invalid Identifier in Attribute Name / Type!");
+		ue.addDebugInfo("Invalid String", strName);
+		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------

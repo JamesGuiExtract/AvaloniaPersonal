@@ -129,12 +129,15 @@ STDMETHODIMP CCreateValue::put_TypeString(BSTR newVal)
 		validateLicense();
 
 		string strType = asString( newVal );
-/*
-		if (strPattern.empty())
+
+		// Validate non-blank types [FlexIDSCore #3810]
+		if (!strType.empty() && !isValidIdentifier(strType))
 		{
-			throw UCLIDException("ELI05836", "Please provide non-empty regular expression.");
+			UCLIDException ue("ELI28572", "Specified type contains invalid characters.");
+			ue.addDebugInfo("Invalid Type", strType);
+			throw ue;
 		}
-*/
+
 		m_strType = strType;
 		m_bDirty = true;
 	}

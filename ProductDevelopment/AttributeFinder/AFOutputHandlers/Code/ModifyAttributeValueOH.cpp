@@ -144,8 +144,18 @@ STDMETHODIMP CModifyAttributeValueOH::put_AttributeName(/*[in]*/ BSTR newVal)
 		// Check license
 		validateLicense();
 
+		string strNewVal = asString(newVal);
+
+		// Validate the attribute name
+		if (!isValidIdentifier(strNewVal))
+		{
+			UCLIDException uex("ELI28574", "Invalid attribute name.");
+			uex.addDebugInfo("Invalid Name", strNewVal);
+			throw uex;
+		}
+
 		// Store the Attribute Name
-		m_strAttributeName = asString( newVal );
+		m_strAttributeName = strNewVal;
 		m_bDirty = true;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10011")
@@ -220,8 +230,18 @@ STDMETHODIMP CModifyAttributeValueOH::put_AttributeType(/*[in]*/ BSTR newVal)
 		// Check license
 		validateLicense();
 
+		string strNewVal = asString(newVal);
+
+		// Validate the attribute type
+		if (!strNewVal.empty() && !isValidIdentifier(strNewVal))
+		{
+			UCLIDException uex("ELI28575", "Invalid attribute type.");
+			uex.addDebugInfo("Invalid Type", strNewVal);
+			throw uex;
+		}
+
 		// Store the Attribute type
-		m_strAttributeType = asString( newVal );
+		m_strAttributeType = strNewVal;
 		m_bDirty = true;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08735")

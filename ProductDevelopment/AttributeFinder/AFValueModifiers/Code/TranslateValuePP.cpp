@@ -643,6 +643,18 @@ bool CTranslateValuePP::promptForTranslations(CString& zEnt1, CString& zEnt2, in
 			zEnt1 = promptDlg.m_zInput1;
 			zEnt2 = promptDlg.m_zInput2;
 
+			// If translating type validate the type name
+			if (m_radioTranslateType.GetCheck() == BST_CHECKED)
+			{
+				if (!zEnt2.IsEmpty() && !isValidIdentifier((LPCTSTR)zEnt2))
+				{
+					MessageBox("The value to translate to is an invalid type identifier.",
+						"Invalid Identifier", MB_OK | MB_ICONERROR);
+
+					continue;
+				}
+			}
+
 			// check whether or not the entered the zEnt1 already exists in the lst
 			int nExistingItemIndex = existsTranslateFromString((LPCTSTR)zEnt1);
 			if (nExistingItemIndex>=0 && nExistingItemIndex != nItemIndex) // entry already exists in the lst

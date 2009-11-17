@@ -6,6 +6,8 @@
 
 #include <string>
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CAttribute
 class ATL_NO_VTABLE CAttribute : 
@@ -87,8 +89,8 @@ private:
 	IInputValidatorPtr m_ipInputValidator;
 	IIUnknownVectorPtr m_ipSubAttributes;
 	ISpatialStringPtr m_ipAttributeValue;
-	std::string m_strAttributeName;
-	std::string m_strAttributeType;
+	string m_strAttributeName;
+	string m_strAttributeType;
 	IUnknownPtr m_ipDataObject;
 
 	// flag to keep track of whether this object has been modified
@@ -100,11 +102,11 @@ private:
 	//////////////
 	
 	// true if the attribute already contains all types specified by strType.
-	bool containsType(std::string strType);
+	bool containsType(string strType);
 
 	// Validates strName as valid Identifier.  This method is used to 
 	// validate both Names and Types
-	void validateIdentifier(std::string strName);
+	void validateIdentifier(const string& strName);
 
 	// Gets the sub attribute collection (will create an empty one if it doesn't exist)
 	IIUnknownVectorPtr getSubAttributes();

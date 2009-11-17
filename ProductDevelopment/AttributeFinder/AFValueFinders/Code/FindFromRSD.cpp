@@ -103,6 +103,14 @@ STDMETHODIMP CFindFromRSD::put_AttributeName(BSTR newVal)
 			throw UCLIDException("ELI10225", "Please provide a valid attribute name.");
 		}
 
+		// Validate the attribute name
+		if (!isValidIdentifier(strTmp))
+		{
+			UCLIDException uex("ELI28578", "Invalid attribute name.");
+			uex.addDebugInfo("Invalid Name", strTmp);
+			throw uex;
+		}
+
 		m_strAttributeName = strTmp;
 		m_bDirty = true;
 	}

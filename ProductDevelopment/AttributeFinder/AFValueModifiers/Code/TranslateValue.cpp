@@ -51,6 +51,7 @@ STDMETHODIMP CTranslateValue::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICategorizedComponent,
 		&IID_ICopyableObject,
 		&IID_ILicensedComponent,
+		&IID_IOutputHandler,
 		&IID_IMustBeConfiguredObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -352,6 +353,31 @@ STDMETHODIMP CTranslateValue::put_TranslationStringPairs(IIUnknownVector *pVal)
 	{
 		validateLicense();
 
+		IIUnknownVectorPtr ipNewVal(pVal);
+
+		// Need to validate the type identifiers
+		if (m_eTranslateFieldType == kTranslateType)
+		{
+			if (ipNewVal != NULL)
+			{
+				long nSize = ipNewVal->Size();
+				for (long i=0; i < nSize; i++)
+				{
+					IStringPairPtr ipPair = ipNewVal->At(i);
+					ASSERT_RESOURCE_ALLOCATION("ELI28579", ipPair != NULL);
+
+					// Only validate the type it is going to
+					string strTemp = asString(ipPair->StringValue);
+					if (!strTemp.empty() && !isValidIdentifier(strTemp))
+					{
+						UCLIDException uex("ELI28580", "Invalid attribute type identifier specified.");
+						uex.addDebugInfo("Invalid Type", strTemp);
+						throw uex;
+					}
+				}
+			}
+		}
+
 		if (m_ipTranslationStringPairs != NULL)
 		{
 			m_ipTranslationStringPairs = NULL;
@@ -484,6 +510,29 @@ STDMETHODIMP CTranslateValue::put_TranslateFieldType(ETranslateFieldType newVal)
 	{
 		validateLicense();
 		m_eTranslateFieldType = newVal;
+
+		// Need to validate the type identifiers
+		if (m_eTranslateFieldType == kTranslateType)
+		{
+			if (m_ipTranslationStringPairs != NULL)
+			{
+				long nSize = m_ipTranslationStringPairs->Size();
+				for (long i=0; i < nSize; i++)
+				{
+					IStringPairPtr ipPair = m_ipTranslationStringPairs->At(i);
+					ASSERT_RESOURCE_ALLOCATION("ELI28581", ipPair != NULL);
+
+					// Only validate the type it is going to
+					string strTemp = asString(ipPair->StringValue);
+					if (!strTemp.empty() && !isValidIdentifier(strTemp))
+					{
+						UCLIDException uex("ELI28582", "Invalid attribute type identifier specified.");
+						uex.addDebugInfo("Invalid Type", strTemp);
+						throw uex;
+					}
+				}
+			}
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09656");
 
