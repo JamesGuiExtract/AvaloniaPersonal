@@ -1,9 +1,7 @@
 using Extract.AttributeFinder;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace Extract.Redaction.Verification
 {
@@ -65,7 +63,7 @@ namespace Extract.Redaction.Verification
         public int Compare(RedactionGridViewRow x, RedactionGridViewRow y)
         {
             // If these are the same object, they are equal
-            if (RedactionGridViewRow.ReferenceEquals(x, y))
+            if (ReferenceEquals(x, y))
             {
                 return 0;
             }
@@ -80,8 +78,17 @@ namespace Extract.Redaction.Verification
                 return 1;
             }
 
+            if (x.RedactionItem == null)
+            {
+                return -1;
+            }
+            else if (y.RedactionItem == null)
+            {
+                return 1;
+            }
+
             // Compare the attributes spatially
-            return _attributeComparer.Compare(x.ComAttribute, y.ComAttribute);
+            return _attributeComparer.Compare(x.RedactionItem.ComAttribute, y.RedactionItem.ComAttribute);
         }
 
         #endregion IComparer<RedactionGridViewRow> Members
