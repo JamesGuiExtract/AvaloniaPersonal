@@ -36,7 +36,7 @@ namespace Extract.UtilityApplications.CustomApplications.EmbedPageNumber
                 }
 
                 // Get the file name from the argument list
-                string fullFileName = args[0];
+                string fullFileName = Path.GetFullPath(args[0]);
                 string fileName = Path.GetFileName(fullFileName);
 
                 // Ensure the file name meets the criteria
@@ -117,7 +117,7 @@ namespace Extract.UtilityApplications.CustomApplications.EmbedPageNumber
         /// <summary>
         /// Checks the file name for the customer specific criteria:
         /// <list type="number">
-        /// <item><description>File name is exactly 201 characters long.</description></item>
+        /// <item><description>File name is exactly 200 characters long.</description></item>
         /// <item><description>XXXXXX are the last 6 characters before the
         /// last period in the file name.</description></item>
         /// </list>
@@ -127,7 +127,7 @@ namespace Extract.UtilityApplications.CustomApplications.EmbedPageNumber
         /// and <see langword="false"/> otherwise.</returns>
         static bool CheckFileName(string fileName)
         {
-            bool pass = !string.IsNullOrEmpty(fileName) && fileName.Length == 201;
+            bool pass = !string.IsNullOrEmpty(fileName) && fileName.Length == 200;
             if (pass)
             {
                 int index = fileName.LastIndexOf(".", StringComparison.Ordinal);
@@ -146,6 +146,7 @@ namespace Extract.UtilityApplications.CustomApplications.EmbedPageNumber
         {
             // Build the usage message
             StringBuilder sb = new StringBuilder(message ?? "");
+            sb.AppendLine();
             sb.AppendLine("Usage:");
             sb.Append(Path.GetFileNameWithoutExtension(Application.ExecutablePath));
             sb.AppendLine(" <FileName>");

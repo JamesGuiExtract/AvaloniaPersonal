@@ -38,7 +38,7 @@ CRedactionTaskPP::CRedactionTaskPP()
 		m_dwHelpFileID = IDS_HELPFILERedactFileProcessorPP;
 		m_dwDocStringID = IDS_DOCSTRINGRedactFileProcessorPP;
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI11530")
+	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI28586")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ STDMETHODIMP CRedactionTaskPP::Apply()
 
 			// Get Redaction File Processor object
 			UCLID_REDACTIONCUSTOMCOMPONENTSLib::IRedactionTaskPtr ipRedactFileProc = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI09868", ipRedactFileProc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28587", ipRedactFileProc != NULL);
 
 			// Retrieve and store output filename
 			_bstr_t bstrFileName;
@@ -166,7 +166,7 @@ STDMETHODIMP CRedactionTaskPP::Apply()
 
 		m_bDirty = FALSE;
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09867");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28588");
 
 	return nResult;
 }
@@ -207,7 +207,7 @@ LRESULT CRedactionTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 
 		// Get Redaction File Processor object
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IRedactionTaskPtr ipRedactFileProc = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI09875", ipRedactFileProc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28589", ipRedactFileProc != NULL);
 
 		//////////////////////////
 		// Initialize data members
@@ -277,7 +277,7 @@ LRESULT CRedactionTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 		// Clear dirty flag
 		SetDirty(FALSE);
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09873");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28590");
 
 	return 0;
 }
@@ -304,7 +304,7 @@ LRESULT CRedactionTaskPP::OnClickedBtnBrowseOutput(WORD wNotifyCode, WORD wID, H
 			m_editOutputFileName.SetWindowText(fileDlg.GetPathName());
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09993");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28591");
 
 	return 0;
 }
@@ -318,7 +318,7 @@ LRESULT CRedactionTaskPP::OnClickedBtnAllAttributes(WORD wNotifyCode, WORD wID, 
 	{
 		updateAttributeGroup();
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI11775");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28592");
 
 	return 0;
 }
@@ -332,7 +332,7 @@ LRESULT CRedactionTaskPP::OnClickedBtnSelectAttributes(WORD wNotifyCode, WORD wI
 	{
 		updateAttributeGroup();
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI11776");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28593");
 
 	return 0;
 }
@@ -353,7 +353,7 @@ LRESULT CRedactionTaskPP::OnClickedBtnOCData(WORD wNotifyCode, WORD wID, HWND hW
 			m_editAttributes.EnableWindow(FALSE);
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19591");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28594");
 
 	return 0;
 }
@@ -374,7 +374,7 @@ LRESULT CRedactionTaskPP::OnClickedSelectImageFileTag(WORD wNotifyCode, WORD wID
 			m_editOutputFileName.ReplaceSel(strChoice.c_str(), TRUE);
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12011");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28595");
 
 	return 0;
 }
@@ -392,7 +392,7 @@ LRESULT CRedactionTaskPP::OnBnClickedButtonRedactAppearance(WORD wNotifyCode, WO
 			dialog.getOptions(m_redactionAppearance);
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24749");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28596");
 
 	return 0;
 }
@@ -406,7 +406,7 @@ LRESULT CRedactionTaskPP::OnClickedButtonDataFile(WORD wNotifyCode, WORD wID, HW
 	{
 		// Get SelectTargetFile object
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::ISelectTargetFileUIPtr ipFileSelector(CLSID_SelectTargetFileUI);
-		ASSERT_RESOURCE_ALLOCATION("ELI28314", ipFileSelector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28597", ipFileSelector != NULL);
 
 		// Initialize parameters
 		ipFileSelector->Title = "Specify ID Shield data file path";
@@ -423,7 +423,7 @@ LRESULT CRedactionTaskPP::OnClickedButtonDataFile(WORD wNotifyCode, WORD wID, HW
 			updateDataFileDescription();
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28313");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28598");
 
 	return 0;
 }
@@ -514,7 +514,7 @@ IVariantVectorPtr CRedactionTaskPP::getAttributeNames()
 		}
 
 		ipAttributeNames.CreateInstance(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI11782", ipAttributeNames != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28599", ipAttributeNames != NULL);
 
 		int nNumOfTokens = vecTokens.size();
 		for (int i = 0; i < nNumOfTokens; i++)
@@ -581,6 +581,6 @@ void CRedactionTaskPP::putAttributeNames(IVariantVectorPtr ipAttributeNames)
 //-------------------------------------------------------------------------------------------------
 void CRedactionTaskPP::validateLicense()
 {
-	VALIDATE_LICENSE(gnIDSHIELD_AUTOREDACTION_OBJECT, "ELI11531", "Redaction Task PP");
+	VALIDATE_LICENSE(gnIDSHIELD_AUTOREDACTION_OBJECT, "ELI28600", "Redaction Task PP");
 }
 //-------------------------------------------------------------------------------------------------

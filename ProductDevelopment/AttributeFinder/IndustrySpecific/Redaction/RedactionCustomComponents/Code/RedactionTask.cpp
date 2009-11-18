@@ -371,7 +371,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 			idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
 			idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions);
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09881")
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28604")
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactionTask::raw_Cancel()
@@ -1472,7 +1472,7 @@ long CRedactionTask::getNextSessionId(IIUnknownVectorPtr ipAttributes)
 		for	(int i = 0; i < count; i++)
 		{
 			IAttributePtr ipAttribute = ipAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI28355", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28603", ipAttribute != NULL);
 
 			string strName = asString(ipAttribute->Name);
 			makeUpperCase(strName);
@@ -1499,7 +1499,7 @@ long CRedactionTask::getNextSessionId(IIUnknownVectorPtr ipAttributes)
 		// The next session is the largest session plus 1
 		return lMaxSession + 1;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28353")
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28602")
 }
 //-------------------------------------------------------------------------------------------------
 IAttributePtr CRedactionTask::createMetaDataAttribute(long lSession, const string& strVoaFile,

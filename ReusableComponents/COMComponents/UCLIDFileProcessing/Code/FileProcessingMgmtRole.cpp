@@ -1093,7 +1093,7 @@ STDMETHODIMP CFileProcessingMgmtRole::put_ProcessingSchedule(IVariantVector* pHo
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26918");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28601");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingMgmtRole::get_LimitProcessingToSchedule(VARIANT_BOOL *pbVal)
