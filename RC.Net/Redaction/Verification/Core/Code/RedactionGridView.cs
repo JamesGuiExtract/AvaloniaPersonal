@@ -1,5 +1,4 @@
 using Extract.Imaging.Forms;
-using Extract.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +9,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 
-using ComAttribute = UCLID_AFCORELib.Attribute;
 using EOrientation = UCLID_RASTERANDOCRMGMTLib.EOrientation;
 using SpatialPageInfo = UCLID_RASTERANDOCRMGMTLib.SpatialPageInfo;
 
@@ -120,9 +118,9 @@ namespace Extract.Redaction.Verification
         readonly int[] _deletedCategoryCounts = new int[_CATEGORIES.Length];
 
         /// <summary>
-        /// The attributes corresponding to rows deleted since the last save.
+        /// The redaction items corresponding to rows deleted since the last save.
         /// </summary>
-        readonly List<RedactionItem> _deletedAttributes = new List<RedactionItem>();
+        readonly List<RedactionItem> _deletedItems = new List<RedactionItem>();
 
         /// <summary>
         /// The tool to automatically select after a redaction has been created.
@@ -556,7 +554,7 @@ namespace Extract.Redaction.Verification
                 // Store this deleted attribute if it was created in a previous session
                 if (!row.IsNew)
                 {
-                    _deletedAttributes.Add(row.ComAttribute);
+                    _deletedItems.Add(row.RedactionItem);
                 }
 
                 // Check if this category of redaction should be counted
@@ -700,6 +698,7 @@ namespace Extract.Redaction.Verification
                 if (layerObject.Selected != shouldBeSelected)
                 {
                     layerObject.Selected = shouldBeSelected;
+                    SelectLayerObject(layerObject, shouldBeSelected);
                 }
             }
         }
@@ -922,7 +921,7 @@ namespace Extract.Redaction.Verification
                     // Reset the attributes
                     _redactions.Clear();
                     _imageViewer.LayerObjects.Clear();
-                    _deletedAttributes.Clear();
+                    _deletedItems.Clear();
                     for (int i = 0; i < _deletedCategoryCounts.Length; i++)
                     {
                         _deletedCategoryCounts[i] = 0;
@@ -1023,7 +1022,7 @@ namespace Extract.Redaction.Verification
                     }
                 }
 
-                return new RedactionFileChanges(added, _deletedAttributes, modified);
+                return new RedactionFileChanges(added, _deletedItems, modified);
             }
             catch (Exception ex)
             {
@@ -1159,6 +1158,8 @@ namespace Extract.Redaction.Verification
             _dataGridView.SelectionChanged -= HandleDataGridViewSelectionChanged;
             try
             {
+                SelectLayerObject(layerObject, select);
+
                 foreach (DataGridViewRow row in _dataGridView.Rows)
                 {
                     if (_redactions[row.Index].ContainsLayerObject(layerObject))
@@ -1510,6 +1511,19 @@ namespace Extract.Redaction.Verification
                 throw new ExtractException("ELI27741",
                     "Unable to commit user changes.", ex);
             }
+        }
+
+        /// <summary>
+        /// Marks the specified layer object as selected or not selected.
+        /// </summary>
+        /// <param name="layerObject">The layer object to mark as selected or not selected.</param>
+        /// <param name="select"><see langword="true"/> to mark the layer object as selected;
+        /// <see langword="false"/> to mark the layer object as not selected.</param>
+        static void SelectLayerObject(LayerObject layerObject, bool select)
+        {
+            // TODO: Indicate layer object selection in a more prominent way [FIDSC #3771]
+            Console.WriteLine(layerObject);
+            Console.WriteLine(select);
         }
 
         #endregion Methods
