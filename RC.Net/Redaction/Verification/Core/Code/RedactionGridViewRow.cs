@@ -120,10 +120,12 @@ namespace Extract.Redaction.Verification
         #region Properties
 
         /// <summary>
-        /// Gets the COM attribute associated with the <see cref="RedactionGridViewRow"/>.
+        /// Gets the <see cref="RedactionItem"/> associated with the 
+        /// <see cref="RedactionGridViewRow"/>.
         /// </summary>
-        /// <value>The COM attribute associated with the <see cref="RedactionGridViewRow"/>.</value>
-        internal RedactionItem ComAttribute
+        /// <value>The <see cref="RedactionItem"/> associated with the 
+        /// <see cref="RedactionGridViewRow"/>.</value>
+        internal RedactionItem RedactionItem
         {
             get
             {
@@ -416,9 +418,9 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Creates a <see cref="RedactionItem"/> from the <see cref="RedactionGridViewRow"/>.
+        /// Creates a <see cref="Extract.Redaction.RedactionItem"/> from the <see cref="RedactionGridViewRow"/>.
         /// </summary>
-        /// <returns>A <see cref="RedactionItem"/> created from the 
+        /// <returns>A <see cref="Extract.Redaction.RedactionItem"/> created from the 
         /// <see cref="RedactionGridViewRow"/>.</returns>
         [CLSCompliant(false)]
         public RedactionItem SaveRedactionItem(string sourceDocument, LongToObjectMap pageInfoMap)
@@ -451,11 +453,11 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Creates a <see cref="RedactionItem"/> that corresponds to the row.
+        /// Creates a <see cref="Extract.Redaction.RedactionItem"/> that corresponds to the row.
         /// </summary>
         /// <param name="sourceDocument">The source document to use for the new attribute.</param>
         /// <param name="pageInfoMap">The page infomation map to use for the new attribute.</param>
-        /// <returns>A new <see cref="RedactionItem"/> that corresponds to the row.</returns>
+        /// <returns>A new <see cref="Extract.Redaction.RedactionItem"/> that corresponds to the row.</returns>
         RedactionItem CreateRedactionItem(string sourceDocument, LongToObjectMap pageInfoMap)
         {
             // Create the attribute
@@ -468,11 +470,11 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Creates a <see cref="RedactionItem"/> from the current row and <see cref="_attribute"/>.
+        /// Creates a <see cref="Extract.Redaction.RedactionItem"/> from the current row and <see cref="_attribute"/>.
         /// </summary>
         /// <param name="sourceDocument">The source document to use for the new attribute.</param>
         /// <param name="pageInfoMap">The page infomation map to use for the new attribute.</param>
-        /// <returns>A <see cref="RedactionItem"/> that corresponds to the row.</returns>
+        /// <returns>A <see cref="Extract.Redaction.RedactionItem"/> that corresponds to the row.</returns>
         RedactionItem GetUpdatedRedactionItem(string sourceDocument, LongToObjectMap pageInfoMap)
         {
             // Don't modify the original attribute as it may be in use elsewhere
