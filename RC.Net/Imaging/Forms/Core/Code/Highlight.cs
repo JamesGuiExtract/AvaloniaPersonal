@@ -1,14 +1,10 @@
-using Extract.Imaging;
 using Extract.Drawing;
-using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -28,18 +24,18 @@ namespace Extract.Imaging.Forms
     /// highlight. The <see cref="Height"/> is the distance between the sides of the highlight, 
     /// measured perpendicular to the bisecting line.</para>
     /// </remarks>
-    public class Highlight : LayerObject, IDisposable, IComparable<Highlight>
+    public sealed class Highlight : LayerObject, IComparable<Highlight>
     {
         #region Highlight Constants
 
         /// <summary>
         /// An array of the path point types for the <see cref="GraphicsPath"/> object.
         /// </summary>
-        private static readonly byte[] _RECTANGULAR_PATH_POINT_TYPE = new byte[] 
+        static readonly byte[] _RECTANGULAR_PATH_POINT_TYPE = new byte[] 
         {
-            (byte)PathPointType.Line,          // the first corner of the rectangle
-            (byte)PathPointType.Line,           // the next corner
-            (byte)PathPointType.Line,           // the next corner
+            (byte)PathPointType.Line,   // the first corner of the rectangle
+            (byte)PathPointType.Line,   // the next corner
+            (byte)PathPointType.Line,   // the next corner
             (byte)PathPointType.Line    // the last corner
         };
 
@@ -52,40 +48,40 @@ namespace Extract.Imaging.Forms
         /// <remarks><see cref="_endPoint"/> is the midpoint of the opposing side.</remarks>
         /// </summary>
         /// <seealso cref="StartPoint"/>
-        private Point _startPoint;
+        Point _startPoint;
 
         /// <summary>
         /// Midpoint of ending side of the highlight in logical (image) coordinates.
         /// <remarks><see cref="_startPoint"/> is the midpoint of the opposing side.</remarks>
         /// </summary>
         /// <seealso cref="EndPoint"/>
-        private Point _endPoint;
+        Point _endPoint;
 
         /// <summary>
         /// Distance in pixels between the sides of the highlight measured perpendicular to 
         /// the line segment formed by <see cref="_startPoint"/> and <see cref="_endPoint"/>.
         /// </summary>
         /// <seealso cref="Height"/>
-        private int _height;
+        int _height;
 
         /// <summary>
         /// <see cref="System.Drawing.Color"/> of the highlight.
         /// </summary>
         /// <seealso cref="Color"/>
-        private Color _color;
+        Color _color;
 
         /// <summary>
         /// <see cref="System.Drawing.Color"/> of the highlight outline. <see langword="null"/>
         /// for no outline.
         /// </summary>
         /// <seealso cref="Color"/>
-        private Color? _outlineColor;
+        Color? _outlineColor;
 
         /// <summary>
         /// Text associated with the highlight.
         /// </summary>
         /// <seealso cref="Text"/>
-        private string _text;
+        string _text;
 
         /// <summary>
         /// The region associated with the highlight in logical (image) coordinates.
@@ -95,7 +91,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="Height"/> are set.</remarks>
         /// <seealso cref="Region"/>
         /// <seealso cref="CalculateRegion"/>
-        private Region _region;
+        Region _region;
 
         /// <summary>
         /// Whether the highlight was angular when the tracking event began. Only intended to be
@@ -105,19 +101,19 @@ namespace Extract.Imaging.Forms
         /// <para>A highlight that is angular at the start of an interactive adjust angle event 
         /// may become rectangular by the end of the event.</para>
         /// </remarks>
-        private bool _originalIsAngular;
+        bool _originalIsAngular;
 
         /// <summary>
         /// The original endpoints of the highlight currently being processed during an 
         /// interactive highlight event.
         /// </summary>
-        private Point[] _originalLine;
+        Point[] _originalLine;
 
         /// <summary>
         /// The original height of the highlight currently being processed during an interactive
         /// highlight event.
         /// </summary>
-        private int _originalHeight;
+        int _originalHeight;
 
         /// <summary>
         /// The x and y components of the unit vector that describes the angle of the highlight 
@@ -131,7 +127,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The angle of the highlight.  Calculated whenever CalculateRegion is called.
         /// </summary>
-        private double _angle;
+        double _angle;
 
         #endregion
 
@@ -140,7 +136,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Initializes a new instance of the <see cref="Highlight"/> class.
         /// </summary>
-        protected Highlight() : base()
+        Highlight() : base()
         {
             // Needed for serialization
         }
@@ -491,7 +487,7 @@ namespace Extract.Imaging.Forms
                         CalculateRegion();
                     }
 
-                    base.Dirty = true;
+                    Dirty = true;
                 }
                 catch (Exception ex)
                 {
@@ -532,7 +528,7 @@ namespace Extract.Imaging.Forms
                         CalculateRegion();
                     }
 
-                    base.Dirty = true;
+                    Dirty = true;
                 }
                 catch (Exception ex)
                 {
@@ -571,7 +567,7 @@ namespace Extract.Imaging.Forms
                         CalculateRegion();
                     }
 
-                    base.Dirty = true;
+                    Dirty = true;
                 }
                 catch (Exception ex)
                 {
@@ -624,7 +620,7 @@ namespace Extract.Imaging.Forms
         /// </value>
         /// <returns>The text associated with the highlight.</returns>
         /// <remarks> The default text is the empty <see cref="string"/> if 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.RecognizeHighlightText"/> 
+        /// <see cref="Forms.ImageViewer.RecognizeHighlightText"/> 
         /// property is <see langword="false"/> or recognized text if the 
         /// <see cref="Forms.ImageViewer.RecognizeHighlightText"/> property is 
         /// <see langword="true"/>.
@@ -639,7 +635,7 @@ namespace Extract.Imaging.Forms
             {
                 _text = value;
 
-                base.Dirty = true;
+                Dirty = true;
             }
         }
 
@@ -668,7 +664,7 @@ namespace Extract.Imaging.Forms
         {
             get
             {
-                return this.GetBounds().Location;
+                return GetBounds().Location;
             }
         }
 
@@ -688,7 +684,7 @@ namespace Extract.Imaging.Forms
         /// destination coordinates.</param>
         public override void Paint(Graphics graphics, Region clip, Matrix transform)
         {
-            Paint(graphics, clip, transform, this.Color);
+            Paint(graphics, clip, transform, Color);
         }
 
         /// <summary>
@@ -702,7 +698,7 @@ namespace Extract.Imaging.Forms
         /// <param name="transform">A 3x3 affine matrix that maps logical (image) coordinates to 
         /// destination coordinates.</param>
         /// <param name="color">The color to paint the highlight.</param>
-        public virtual void Paint(Graphics graphics, Region clip, Matrix transform, Color color)
+        public void Paint(Graphics graphics, Region clip, Matrix transform, Color color)
         {
             try
             {
@@ -735,7 +731,7 @@ namespace Extract.Imaging.Forms
             if (imageViewer != null)
             {
                 // Use the highlight's region
-                using (Region region = this.Region.Clone())
+                using (Region region = Region.Clone())
                 {
                     // Transform region coordinates from logical to destination
                     region.Transform(transform);
@@ -748,20 +744,20 @@ namespace Extract.Imaging.Forms
                 }
 
                 // If OutlineColor is non-null, draw a outline using the specified color.
-                if (this.OutlineColor != null)
+                if (OutlineColor != null)
                 {
                     // Get the vertices of the highlight in logical (image) coordinates
-                    Point[] vertices = this.GetVertices();
+                    Point[] vertices = GetVertices();
 
                     // Get the center of the highlight in logical (image) coordinates
-                    Point[] center = new Point[] { this.GetCenterPoint() };
+                    Point center = GetCenterPoint();
 
-                    // Inflate each corner by 4 client pixels
-                    double expandBy = 4.0 * ImageViewer.ScaleFactor;
+                    // Inflate each corner by 6 client pixels (expressed in image pixels)
+                    double expandBy = 6.0 / ImageViewer.GetScaleFactorY();
                     for (int i = 0; i < vertices.Length; i++)
                     {
                         // Get the angle from the center to this vertex
-                        double angle = GeometryMethods.GetAngle(center[0], vertices[i]);
+                        double angle = GeometryMethods.GetAngle(center, vertices[i]);
 
                         // Get the difference in angle from the angle of the highlight as
                         // a whole and the angle to this vertex
@@ -773,19 +769,19 @@ namespace Extract.Imaging.Forms
 
                         // Expand this vertex to in the direction of the nearest diagonal angle
                         // (45, 135, 225 or 315 degrees)
-                        double angleExpansion = (double)((int)(anglediff / (Math.PI / 2.0)));
+                        double angleExpansion = (int)(2.0 * anglediff / Math.PI);
                         angleExpansion *= Math.PI / 2.0;
 
                         // Make this angle relative to angle of the highlight
                         angleExpansion += (Math.PI / 4.0) + _angle;
 
-                        // Use the angle of the expansion to expand this vertex 4 pixels out.
+                        // Use the angle of the expansion to expand this vertex
                         vertices[i].X += (int)Math.Round(expandBy * Math.Cos(angleExpansion));
                         vertices[i].Y += (int)Math.Round(expandBy * Math.Sin(angleExpansion));
                     }
 
-                    // Draw the outline.
-                    this.ImageViewer.Transform.TransformPoints(vertices);
+                    // Draw the outline
+                    ImageViewer.Transform.TransformPoints(vertices);
                     graphics.DrawPolygon(
                         ExtractPens.GetThickDashedPen(_outlineColor.Value), vertices);
                 }
@@ -805,7 +801,7 @@ namespace Extract.Imaging.Forms
             {
                 // Ensure the highlight is on the active page            
                 ImageViewer imageViewer = base.ImageViewer;
-                return imageViewer != null && imageViewer.PageNumber == this.PageNumber &&
+                return imageViewer != null && imageViewer.PageNumber == PageNumber &&
                     _region.IsVisible(point);
             }
             catch (Exception ex)
@@ -841,7 +837,7 @@ namespace Extract.Imaging.Forms
                 // Get the center of the highlight in client coordinates
                 Point[] center = new Point[] 
                 {
-                    this.GetCenterPoint()
+                    GetCenterPoint()
                 };
                 base.ImageViewer.Transform.TransformPoints(center);
 
@@ -938,7 +934,7 @@ namespace Extract.Imaging.Forms
 
                     if (raiseEvents)
                     {
-                        base.Dirty = true;
+                        Dirty = true;
                     }
                 }
             }
@@ -1039,7 +1035,7 @@ namespace Extract.Imaging.Forms
                     base.ImageViewer.ClientRectangle);
 
                 // Start the tracking event
-                base.TrackingData = new TrackingData(base.ImageViewer,
+                TrackingData = new TrackingData(base.ImageViewer,
                     trackingPoint.X, trackingPoint.Y,
                     base.ImageViewer.GetTransformedRectangle(clip, true));
 
@@ -1090,7 +1086,7 @@ namespace Extract.Imaging.Forms
         /// Recomputes <see cref="_activeHighlightVector"/>, the unit vector describing the angle 
         /// of the original highlight.
         /// </summary>
-        private void UpdateHighlightVector()
+        void UpdateHighlightVector()
         {
             // Get the vector components of the current highlight
             float x = _endPoint.X - _startPoint.X;
@@ -1143,16 +1139,16 @@ namespace Extract.Imaging.Forms
                     || imageViewer.Cursor == Cursors.SizeNESW))
                 {
                     // This is a corner resize event
-                    base.TrackingData.UpdateRectangle(mouse[0].X, mouse[0].Y);
+                    TrackingData.UpdateRectangle(mouse[0].X, mouse[0].Y);
 
                     // Get the y-coordinate for the raster points
-                    int y = (int)(base.TrackingData.Rectangle.Y
-                        + base.TrackingData.Rectangle.Height / 2.0 + 0.5);
+                    int y = (int)(TrackingData.Rectangle.Y
+                        + TrackingData.Rectangle.Height / 2.0 + 0.5);
 
                     // Set the spatial data for the highlight
-                    QuietSetSpatialData(new Point(base.TrackingData.Rectangle.X, y),
-                        new Point(base.TrackingData.Rectangle.Right, y),
-                        base.TrackingData.Rectangle.Height);
+                    QuietSetSpatialData(new Point(TrackingData.Rectangle.X, y),
+                        new Point(TrackingData.Rectangle.Right, y),
+                        TrackingData.Rectangle.Height);
                 }
                 else if (imageViewer.Cursor != Cursors.SizeAll)
                 {
@@ -1180,7 +1176,7 @@ namespace Extract.Imaging.Forms
         /// <param name="mouse">The position in logical (image) coordinates.</param>
         /// <remarks>The highlight maintains its start point, height, and angle. Only the end 
         /// point of the highlight is changed.</remarks>
-        private void ResizeActiveHighlight(Point mouse)
+        void ResizeActiveHighlight(Point mouse)
         {
             // Construct the vector components for a vector from the start point to the mouse
             int x = mouse.X - _startPoint.X;
@@ -1201,11 +1197,11 @@ namespace Extract.Imaging.Forms
         /// Restructures the specified highlight so that the specified grip handle corresponds to
         /// its <see cref="Highlight.EndPoint"/>.
         /// </summary>
-        /// <param name="gripHandles">The four midpoints of the sides of 
-        /// <paramref name="highlight"/>.</param>
+        /// <param name="gripHandles">The four midpoints of the sides of the 
+        /// <see cref="Highlight"/>.</param>
         /// <param name="gripHandleId">The index of the point in <paramref name="gripHandles"/> 
         /// that should be the new end point.</param>
-        private void MakeGripHandleEndPoint(Point[] gripHandles, int gripHandleId)
+        void MakeGripHandleEndPoint(Point[] gripHandles, int gripHandleId)
         {
             // If this grip handle is already the end point, we are done.
             if (gripHandles[gripHandleId] == _endPoint)
@@ -1317,7 +1313,7 @@ namespace Extract.Imaging.Forms
 
             if (markAsDirty)
             {
-                base.Dirty = true;
+                Dirty = true;
             }
         }
 
@@ -1351,7 +1347,7 @@ namespace Extract.Imaging.Forms
                     CalculateRegion();
                 }
 
-                base.Dirty = true;
+                Dirty = true;
             }
             catch (Exception ex)
             {
@@ -1409,7 +1405,7 @@ namespace Extract.Imaging.Forms
                     CalculateRegion();
                 }
 
-                base.Dirty = true;
+                Dirty = true;
             }
             catch (Exception ex)
             {
@@ -1433,7 +1429,7 @@ namespace Extract.Imaging.Forms
                 rasterZone.EndX = _endPoint.X;
                 rasterZone.EndY = _endPoint.Y;
                 rasterZone.Height = _height;
-                rasterZone.PageNumber = this.PageNumber;
+                rasterZone.PageNumber = PageNumber;
 
                 // Return the raster zone
                 return rasterZone;
@@ -1445,7 +1441,7 @@ namespace Extract.Imaging.Forms
                 ee.AddDebugData("Start point", _startPoint, false);
                 ee.AddDebugData("End point", _endPoint, false);
                 ee.AddDebugData("Height", _height, false);
-                ee.AddDebugData("Page number", this.PageNumber, false);
+                ee.AddDebugData("Page number", PageNumber, false);
                 throw ee;
             }
         }
@@ -1493,7 +1489,7 @@ namespace Extract.Imaging.Forms
         /// modified. For instance, when the <see cref="StartPoint"/>, <see cref="EndPoint"/>, and
         /// <see cref="Height"/> properties are set.</para>
         /// </remarks>
-        private void CalculateRegion()
+        void CalculateRegion()
         {
             // Calculate the angle of the line
             _angle = GeometryMethods.GetAngle(_startPoint, _endPoint);
@@ -1618,7 +1614,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Get the center point of the highlight
-                Point center = this.GetCenterPoint();
+                Point center = GetCenterPoint();
 
                 // Handle the special case of an empty highlight
                 if (_startPoint == _endPoint)
@@ -1772,7 +1768,7 @@ namespace Extract.Imaging.Forms
         public int CompareTo(Highlight other)
         {
             // Convert to RasterZone and compare
-            return this.ToRasterZone().CompareTo(other.ToRasterZone());
+            return ToRasterZone().CompareTo(other.ToRasterZone());
         }
 
         /// <summary>
@@ -1818,8 +1814,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The hashcode for this <see cref="Highlight"/>.</returns>
         public override int GetHashCode()
         {
-            return this.ToRasterZone().GetHashCode() ^ this.Id.GetHashCode()
-                ^ this._color.GetHashCode();
+            return ToRasterZone().GetHashCode() ^ Id.GetHashCode() ^ _color.GetHashCode();
         }
 
         /// <summary>
@@ -1832,7 +1827,7 @@ namespace Extract.Imaging.Forms
         /// <see langword="false"/> otherwise.</returns>
         public static bool operator ==(Highlight highlight1, Highlight highlight2)
         {
-            if (object.ReferenceEquals(highlight1, highlight2))
+            if (ReferenceEquals(highlight1, highlight2))
             {
                 return true;
             }
