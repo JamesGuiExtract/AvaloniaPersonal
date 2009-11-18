@@ -751,7 +751,7 @@ namespace Extract.Redaction.Verification
             // _thumbnailsToolStripButton
             // 
             this._thumbnailsToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._thumbnailsToolStripButton.Image = global::Extract.Redaction.Verification.Properties.Resources.VerifyOptions;
+            this._thumbnailsToolStripButton.Image = global::Extract.Redaction.Verification.Properties.Resources.ThumbnailViewer;
             this._thumbnailsToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._thumbnailsToolStripButton.Name = "_thumbnailsToolStripButton";
             this._thumbnailsToolStripButton.Size = new System.Drawing.Size(36, 36);

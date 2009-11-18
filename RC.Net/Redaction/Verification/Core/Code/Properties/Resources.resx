@@ -136,7 +136,7 @@
   <data name="PreviousRedaction" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\PreviousRedaction.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="VerifyOptions" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\VerifyOptions.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ThumbnailViewer" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ThumbnailViewer.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
