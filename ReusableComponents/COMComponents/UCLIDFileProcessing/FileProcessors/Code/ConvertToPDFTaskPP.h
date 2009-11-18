@@ -61,6 +61,7 @@ private:
 	ATLControls::CEdit m_editInputImage;
 	CImageButtonWithStyle m_btnInputImageDocTag;
 	ATLControls::CButton m_btnInputImageBrowse;
+	ATLControls::CButton m_checkPDFA;
 
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Throws an exception if ConvertToPDFTask is not licensed.

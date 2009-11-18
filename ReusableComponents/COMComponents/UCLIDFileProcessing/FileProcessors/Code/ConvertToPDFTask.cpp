@@ -15,7 +15,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 2;
+const unsigned long gnCurrentVersion = 3;
 
 // component description
 const string gstrCONVERT_TO_PDF_COMPONENT_DESCRIPTION = "Core: Convert to searchable PDF";
@@ -29,7 +29,8 @@ const string gstrDEFAULT_INPUT_IMAGE_FILENAME = "$InsertBeforeExt(<SourceDocName
 // CConvertToPDFTask
 //-------------------------------------------------------------------------------------------------
 CConvertToPDFTask::CConvertToPDFTask()
-  : m_strInputImage(gstrDEFAULT_INPUT_IMAGE_FILENAME)
+  : m_strInputImage(gstrDEFAULT_INPUT_IMAGE_FILENAME),
+  m_bPDFA(false)
 {
 	try
 	{
@@ -51,7 +52,7 @@ CConvertToPDFTask::~CConvertToPDFTask()
 //-------------------------------------------------------------------------------------------------
 // IConvertToPDFTask
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CConvertToPDFTask::SetOptions(BSTR bstrInputFile)
+STDMETHODIMP CConvertToPDFTask::SetOptions(BSTR bstrInputFile, VARIANT_BOOL vbPDFA)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -62,6 +63,7 @@ STDMETHODIMP CConvertToPDFTask::SetOptions(BSTR bstrInputFile)
 
 		// store options
 		m_strInputImage = asString(bstrInputFile);
+		m_bPDFA = asCppBool(vbPDFA);
 		
 		// set the dirty flag
 		m_bDirty = true;
@@ -71,7 +73,7 @@ STDMETHODIMP CConvertToPDFTask::SetOptions(BSTR bstrInputFile)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CConvertToPDFTask::GetOptions(BSTR *pbstrInputFile)
+STDMETHODIMP CConvertToPDFTask::GetOptions(BSTR *pbstrInputFile, VARIANT_BOOL* pvbPDFA)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -82,9 +84,11 @@ STDMETHODIMP CConvertToPDFTask::GetOptions(BSTR *pbstrInputFile)
 
 		// ensure parameters are non-NULL
 		ASSERT_ARGUMENT("ELI18740", pbstrInputFile != NULL);
+		ASSERT_ARGUMENT("ELI28585", pvbPDFA != NULL);
 		
 		// set options
 		*pbstrInputFile = _bstr_t(m_strInputImage.c_str()).Detach();
+		*pvbPDFA = asVariantBool(m_bPDFA);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18742");
 
@@ -128,10 +132,12 @@ STDMETHODIMP CConvertToPDFTask::raw_CopyFrom(IUnknown* pObject)
 
 		// get the options from the ConvertToPDFTask object 
 		_bstr_t bstrInputFile;
-		ipConvertToPDFTask->GetOptions( bstrInputFile.GetAddress() );
+		VARIANT_BOOL vbPDFA;
+		ipConvertToPDFTask->GetOptions( bstrInputFile.GetAddress(), &vbPDFA );
 		
 		// store the found options
 		m_strInputImage = asString(bstrInputFile);
+		m_bPDFA = asCppBool(vbPDFA);
 
 		// set the dirty flag
 		m_bDirty = true;
@@ -221,6 +227,12 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(BSTR bstrFileFullName, long nFil
 
 		// ensure the remove original image option is specified
 		strArgs += "\" /R";
+
+		// If needed, add the PDF/A flag
+		if (m_bPDFA)
+		{
+			strArgs += " /pdfa";
+		}
 
 		// execute the utility to convert the PDF
 		runExtractEXE(m_strConvertToPDFEXE, strArgs, INFINITE);
@@ -342,6 +354,8 @@ STDMETHODIMP CConvertToPDFTask::IsDirty(void)
 // Version 2:
 //   (removed) use cleaned image if available, output image filename
 //   (added) input image filename
+// Version 3:
+//   (added) pdfa option
 STDMETHODIMP CConvertToPDFTask::Load(IStream* pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -353,6 +367,7 @@ STDMETHODIMP CConvertToPDFTask::Load(IStream* pStream)
 
 		// clear the options
 		m_strInputImage = gstrDEFAULT_INPUT_IMAGE_FILENAME;
+		m_bPDFA = false;
 		
 		// use a smart pointer for the IStream interface
 		IStreamPtr ipStream(pStream);
@@ -382,12 +397,7 @@ STDMETHODIMP CConvertToPDFTask::Load(IStream* pStream)
 		}
 
 		// read data items
-		if(nDataVersion >= 2)
-		{
-			// read the input image filename
-			dataReader >> m_strInputImage;
-		}
-		else
+		if(nDataVersion < 2)
 		{
 			// read and ignore the cleaned image flag
 			bool bTempUseCleanedImage;
@@ -410,7 +420,18 @@ STDMETHODIMP CConvertToPDFTask::Load(IStream* pStream)
 				" no longer supports the \"Output PDF filename\" option. This setting will be ignored.").c_str(),
 				"Warning", MB_ICONWARNING);
 		}
-		
+		else
+		{
+			// read the input image filename
+			dataReader >> m_strInputImage;
+
+			if (nDataVersion >= 3)
+			{
+				// Read the PDF/A setting
+				dataReader >> m_bPDFA;
+			}
+		}
+
 		// clear the dirty flag since a new object was loaded
 		m_bDirty = false;
 	}
@@ -433,6 +454,7 @@ STDMETHODIMP CConvertToPDFTask::Save(IStream* pStream, BOOL fClearDirty)
 		ByteStreamManipulator dataWriter(ByteStreamManipulator::kWrite, data);
 		dataWriter << gnCurrentVersion;
 		dataWriter << m_strInputImage;
+		dataWriter << m_bPDFA;
 		dataWriter.flushToByteStream();
 
 		// use a smart pointer for IStream interface

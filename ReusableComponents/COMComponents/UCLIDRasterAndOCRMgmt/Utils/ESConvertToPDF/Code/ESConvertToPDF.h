@@ -50,6 +50,9 @@ private:
 	// user-specified
 	bool m_bRemoveOriginal;
 
+	// Whether the output PDF should be PDF/A compliant
+	bool m_bPDFA;
+
 	// whether or not the app failed to execute (true) or ran successfully (false)
 	bool m_bIsError;
 

@@ -110,7 +110,8 @@ STDMETHODIMP CConvertToPDFTaskPP::Apply()
 			UCLID_FILEPROCESSORSLib::IConvertToPDFTaskPtr ipConvertToPDFTask(m_ppUnk[i]);
 			ASSERT_RESOURCE_ALLOCATION("ELI18781", ipConvertToPDFTask != NULL);
 
-			ipConvertToPDFTask->SetOptions(bstrInputImage);
+			VARIANT_BOOL vbPDFA = asVariantBool(m_checkPDFA.GetCheck() == BST_CHECKED);
+			ipConvertToPDFTask->SetOptions(bstrInputImage, vbPDFA);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18782");
@@ -132,20 +133,25 @@ LRESULT CConvertToPDFTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 		UCLID_FILEPROCESSORSLib::IConvertToPDFTaskPtr ipConvertToPDFTask(m_ppUnk[0]);
 		ASSERT_RESOURCE_ALLOCATION("ELI18783", ipConvertToPDFTask != NULL);
 
-		// get the input image file controls
+		// get the input image file controls and the PDF/A check box
 		m_editInputImage = GetDlgItem(IDC_EDIT_CONVERT_TO_PDF_INPUT_IMAGE);
 		m_btnInputImageDocTag.SubclassDlgItem(IDC_BTN_CONVERT_TO_PDF_INPUT_IMAGE_DOC_TAG,
 			CWnd::FromHandle(m_hWnd));
 		m_btnInputImageDocTag.SetIcon(::LoadIcon(_Module.m_hInstResource, 
 			MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 		m_btnInputImageBrowse = GetDlgItem(IDC_BTN_CONVERT_TO_PDF_BROWSE_INPUT_IMAGE);
+		m_checkPDFA = GetDlgItem(IDC_CHECK_PDFA);
 
 		// get the Convert to PDF task's options
 		_bstr_t bstrInputImage;
-		ipConvertToPDFTask->GetOptions( bstrInputImage.GetAddress() );
+		VARIANT_BOOL vbPDFA;
+		ipConvertToPDFTask->GetOptions( bstrInputImage.GetAddress(), &vbPDFA );
 
 		// set the input image filename
 		m_editInputImage.SetWindowText(bstrInputImage);
+
+		// Set the PDF/A check state
+		m_checkPDFA.SetCheck(asBSTChecked(vbPDFA));
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18784");
 

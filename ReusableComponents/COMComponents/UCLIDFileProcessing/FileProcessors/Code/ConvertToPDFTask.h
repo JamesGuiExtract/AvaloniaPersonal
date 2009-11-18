@@ -57,8 +57,8 @@ END_CATEGORY_MAP()
 public:
 
 // IConvertToPDFTask
-	STDMETHOD(SetOptions)(BSTR bstrInputFile);
-	STDMETHOD(GetOptions)(BSTR* pbstrInputFile);
+	STDMETHOD(SetOptions)(BSTR bstrInputFile, VARIANT_BOOL vbPDFA);
+	STDMETHOD(GetOptions)(BSTR* pbstrInputFile, VARIANT_BOOL* pvbPDFA);
 
 // ICategorizedComponent
 	STDMETHOD(raw_GetComponentDescription)(BSTR* pstrComponentDescription);
@@ -97,6 +97,9 @@ private:
 
 	// filename of input image file
 	string m_strInputImage;
+
+	// if true then the converted PDF will be PDF/A compliant
+	bool m_bPDFA;
 
 	// full path to ESConvertToPDF.exe
 	string m_strConvertToPDFEXE;

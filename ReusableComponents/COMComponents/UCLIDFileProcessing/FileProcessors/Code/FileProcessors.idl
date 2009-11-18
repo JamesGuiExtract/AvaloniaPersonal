@@ -255,8 +255,11 @@ library UCLID_FILEPROCESSORSLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set/get all user options for the convert to pdf task.
 		// PARAMS:  (1) bstrInputFile - input image filename
-		[id(1), helpstring("method SetOptions")] HRESULT SetOptions([in] BSTR bstrInputFile);
-		[id(2), helpstring("method GetOptions")] HRESULT GetOptions([out] BSTR* pbstrInputFile);
+		//			(2) vbPDFA - whether the produced pdf should be PDF/A compatible
+		[id(1), helpstring("method SetOptions")] HRESULT SetOptions([in] BSTR bstrInputFile,
+			[in] VARIANT_BOOL vbPDFA);
+		[id(2), helpstring("method GetOptions")] HRESULT GetOptions([out] BSTR* pbstrInputFile,
+			[out] VARIANT_BOOL* pvbPDFA);
 	};
 
 	// IAddWatermarkTask

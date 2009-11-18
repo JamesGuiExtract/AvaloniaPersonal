@@ -67,6 +67,7 @@ CESConvertToPDFApp::CESConvertToPDFApp()
 	: m_strInputFile(""), 
 	  m_strOutputFile(""),
 	  m_bRemoveOriginal(false),
+	  m_bPDFA(false),
 	  m_bIsError(true),          // assume error until successfully completed
 	  m_strExceptionLogFile("")
 {
@@ -155,6 +156,30 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 		UCLIDException ue("ELI18580", "Unable to set output format.");
 		loadScansoftRecErrInfo(ue, rc);
 		throw ue;
+	}
+
+	// If output is to be PDF/A compliant then need to set the PDF/A compatibility mode
+	if (m_bPDFA)
+	{
+		// Get settings manager
+		HSETTING hSetting;
+		rc = kRecSettingGetHandle(NULL, "Converters.Text.PDFImageOnText.Compatibility",
+			&hSetting, NULL);
+		if (rc != REC_OK)
+		{
+			UCLIDException ue("ELI28583", "Unable to get the PDF compatibility setting.");
+			loadScansoftRecErrInfo(ue, rc);
+			throw ue;
+		}
+
+		// Set PDF/A compatible
+		rc = kRecSettingSetInt(0, hSetting, R2ID_PDFA);
+		if (rc != REC_OK)
+		{
+			UCLIDException ue("ELI28584", "Unable to set PDF/A compatibility mode.");
+			loadScansoftRecErrInfo(ue, rc);
+			throw ue;
+		}
 	}
 
 	// create temporary OmniPage document file.
@@ -312,10 +337,11 @@ bool CESConvertToPDFApp::displayUsage(const string& strFileName, const string& s
 	// create the usage message
 	strUsage += "Converts a machine-printed text image file into a searchable pdf file.\n\n";
 	strUsage += strFileName;
-	strUsage += " <source> <destination> /R [/ef <logfile>]\n\n";
+	strUsage += " <source> <destination> [/R] [/pdfa] [/ef <logfile>]\n\n";
 	strUsage += " source\t\tSpecifies the image file to convert into a searchable pdf file.\n";
 	strUsage += " destination\tSpecifies the filename of the searchable pdf file to create.\n";
 	strUsage += " /R\t\tRemove original image file after conversion.\n";
+	strUsage += " /pdfa\t\tSpecifies that the output file should be PDF/A compliant.\n";
 	strUsage += " /ef\t\tLog all errors to an exception file.\n";
 	strUsage += " logfile\t\tSpecifies the filename of an exception log to create.\n";
 
@@ -354,7 +380,7 @@ bool CESConvertToPDFApp::getAndValidateArguments(const int argc, char* argv[])
 		m_bIsError = false;
 		return displayUsage(argv[0]);
 	}
-	else if(argc < 3 || argc > 6)
+	else if(argc < 3 || argc > 7)
 	{
 		// invalid number of arguments
 		return displayUsage(argv[0], "Invalid number of arguments.");
@@ -383,6 +409,10 @@ bool CESConvertToPDFApp::getAndValidateArguments(const int argc, char* argv[])
 		{
 			// set the remove original flag
 			m_bRemoveOriginal = true;
+		}
+		else if (curArg == "/pdfa")
+		{
+			m_bPDFA = true;
 		}
 		else
 		{
