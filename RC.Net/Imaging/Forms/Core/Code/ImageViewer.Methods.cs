@@ -5136,6 +5136,17 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Calculates the vertical scale factor of the <see cref="ImageViewer"/>.
+        /// </summary>
+        /// <remarks>The vertical scale factor is the magnitude of a vertical unit vector after 
+        /// it has been transformed by the matrix.</remarks>
+        /// <returns>The vertical scale factor of the <see cref="ImageViewer"/>.</returns>
+        public double GetScaleFactorY()
+        {
+            return GetScaleFactorY(_transform);
+        }
+
+        /// <summary>
         /// Calculates the vertical scale factor of a 3x3 affine matrix.
         /// </summary>
         /// <remarks>The vertical scale factor is the magnitude of a vertical unit vector after 
