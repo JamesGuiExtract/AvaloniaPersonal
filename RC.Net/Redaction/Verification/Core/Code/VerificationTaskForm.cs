@@ -801,11 +801,36 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void SelectSaveAndCommit()
         {
-            _redactionGridView.CommitChanges();
-
-            if (!WarnIfInvalid())
+            if (_imageViewer.IsImageAvailable)
             {
-                Commit();
+                _redactionGridView.CommitChanges();
+
+                if (!WarnIfInvalid())
+                {
+                    Commit();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Activates the prompt for exemption codes command.
+        /// </summary>
+        void SelectPromptForExemptionCode()
+        {
+            if (_applyExemptionToolStripButton.Enabled)
+            {
+                _redactionGridView.PromptForExemptions();
+            }
+        }
+
+        /// <summary>
+        /// Activates the apply last exemption code command.
+        /// </summary>
+        void SelectApplyLastExemptionCode()
+        {
+            if (_lastExemptionToolStripButton.Enabled)
+            {
+                _redactionGridView.ApplyLastExemptions();
             }
         }
 
@@ -1135,7 +1160,7 @@ namespace Extract.Redaction.Verification
             {
                 string imageFile = _imageViewer.ImageFile;
                 _currentDocumentTextBox.Text = imageFile;
-                Text = imageFile + " - " + _FORM_TITLE;
+                Text = Path.GetFileName(imageFile) + " - " + _FORM_TITLE;
 
                 VerificationMemento memento = GetCurrentDocument();
                 _documentTypeTextBox.Text = memento.DocumentType;
@@ -1248,22 +1273,26 @@ namespace Extract.Redaction.Verification
                 // because the page summary view needs to handle this event FIRST.
                 _imageViewer.ImageFileChanged += HandleImageViewerImageFileChanged;
 
-                // Disable the close image shortcut key
-                _imageViewer.Shortcuts[Keys.Control | Keys.F4] = null;
+                // Disable the close image
+                _imageViewer.Shortcuts[Keys.F4 | Keys.Control] = null;
 
-                // Next/previous redaction shortcut keys
+                // Next/previous redaction
                 _imageViewer.Shortcuts[Keys.Tab] = SelectNextRedaction;
                 _imageViewer.Shortcuts[Keys.Tab | Keys.Shift] = SelectPreviousRedaction;
+
+                // Next/previous document
+                _imageViewer.Shortcuts[Keys.Tab | Keys.Control] = GoToNextDocument;
+                _imageViewer.Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = GoToPreviousDocument;
 
                 // Use redaction tool
                 _imageViewer.Shortcuts[Keys.H] = _imageViewer.ToggleRedactionTool;
 
                 // Save and commit
-                _imageViewer.Shortcuts[Keys.Control | Keys.S] = SelectSaveAndCommit;
+                _imageViewer.Shortcuts[Keys.S | Keys.Control] = SelectSaveAndCommit;
 
                 // Exemption codes
-                _imageViewer.Shortcuts[Keys.E] = _redactionGridView.PromptForExemptions;
-                _imageViewer.Shortcuts[Keys.Control | Keys.E] = _redactionGridView.ApplyLastExemptions;
+                _imageViewer.Shortcuts[Keys.E] = SelectPromptForExemptionCode;
+                _imageViewer.Shortcuts[Keys.E | Keys.Control] = SelectApplyLastExemptionCode;
             }
             catch (Exception ex)
             {
