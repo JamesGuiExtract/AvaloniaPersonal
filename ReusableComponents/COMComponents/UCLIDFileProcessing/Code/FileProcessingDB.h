@@ -307,7 +307,7 @@ private:
 
 	// PROMISE:	To add a single record to the QueueEvent table in the database with the given data
 	//			using the connection provided
-	void addQueueEventRecord( ADODB::_ConnectionPtr ipConnection, long nFileID, 
+	void addQueueEventRecord( ADODB::_ConnectionPtr ipConnection, long nFileID, long nActionID,
 		string strFileName, string strQueueEventCode );
 
 	// PROMISE: To add a single record to the FileActionStateTransition table with the given data

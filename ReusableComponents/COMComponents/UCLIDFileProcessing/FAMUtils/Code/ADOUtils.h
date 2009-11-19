@@ -11,10 +11,10 @@ using namespace ADODB;
 using namespace std;
 
 // Query to turn on Identity insert so Identity fields can be copied
-static const string gstrSET_IDENTITY_INSERT_ON = "SET IDENTITY_INSERT FAMFile ON";
+static const string gstrSET_IDENTITY_INSERT_ON = "SET IDENTITY_INSERT <TableName> ON";
 
 // Query to turn off Identity insert so Identity fields cannot be copied
-static const string gstrSET_IDENTITY_INSERT_OFF = "SET IDENTITY_INSERT FAMFile OFF";
+static const string gstrSET_IDENTITY_INSERT_OFF = "SET IDENTITY_INSERT <TableName> OFF";
 
 // PROMISE: To return the long value of the field named strFieldName in the ipFields collection
 //			if the field does not exist an exception will be thrown

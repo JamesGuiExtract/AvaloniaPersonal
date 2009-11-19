@@ -10,6 +10,7 @@
 #include <DialogSelect.h>
 #include <ADOUtils.h>
 #include <COMUtils.h>
+#include <cpputil.h>
 
 #include <string>
 #include <vector>
@@ -19,8 +20,9 @@
 #endif
 
 
-static std::string gstrDEFAULT_DATABASE_SUFFIX = "_7_0";
+static std::string gstrDEFAULT_DATABASE_SUFFIX = "_8_0";
 const int gi5_0DB_SCHEMA_VERSION = 7;
+const int gi7_0DB_SCHEMA_VERSION = 8;
 
 //-------------------------------------------------------------------------------------------------
 // CAboutDlg dialog used for App About
@@ -92,6 +94,7 @@ void CConvertFAMDBDlg::DoDataExchange(CDataExchange* pDX)
 		DDX_Control(pDX, IDC_COMBO_FROM_DB, m_cbFromDB);
 		DDX_Control(pDX, IDC_COMBO_TO_SERVER, m_cbToServer);
 		DDX_Control(pDX, IDC_COMBO_TO_DB, m_cbToDB);
+		DDX_Control(pDX, IDC_CHECK_RETAIN_HISTORY_DATA, m_checkRetainHistoryData);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18067");
 }
@@ -138,6 +141,9 @@ BOOL CConvertFAMDBDlg::OnInitDialog()
 				pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
 			}
 		}
+
+		// check the retain history check
+		m_checkRetainHistoryData.SetCheck(BST_CHECKED);
 
 		// Set the icon for this dialog.  The framework does this automatically
 		//  when the application's main window is not a dialog
@@ -295,54 +301,98 @@ void CConvertFAMDBDlg::convertDatabase()
 
 	try
 	{
+		// Log exception to indicate that a database is being converted
+		UCLIDException ue("ELI28525", "Application Trace: Converting DB to 8.0");
+		ue.addDebugInfo("From Server", (LPCSTR) m_zFromServer);
+		ue.addDebugInfo("From DB", (LPCSTR) m_zFromDB);
+		ue.addDebugInfo("To Server", (LPCSTR) m_zToServer);
+		ue.addDebugInfo("To DB", (LPCSTR) m_zToDB);
+		ue.log();
+
 		// Create a FAMDB object for creating the new database and adding the actions
 		IFileProcessingDBPtr ipFAMDB(CLSID_FileProcessingDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI19889", ipFAMDB != NULL);
 
 		// Set the Database Server
-		ipFAMDB->DatabaseServer = m_zToServer.operator LPCSTR();
+		ipFAMDB->DatabaseServer = (LPCSTR) m_zToServer;
 		_lastCodePos = "10";
 
 		// Create the new database
-		ipFAMDB->CreateNewDB(m_zToDB.operator LPCSTR());
+		ipFAMDB->CreateNewDB((LPCSTR) m_zToDB);
 		_lastCodePos = "20";
 
 		// Create the connection object for new database
-		_ConnectionPtr ipNewDB = getConnection ( m_zToServer.operator LPCSTR(), m_zToDB.operator LPCSTR() );
+		_ConnectionPtr ipNewDB = getConnection ( (LPCSTR) m_zToServer, (LPCSTR) m_zToDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI19961", ipNewDB != NULL );
+		_lastCodePos = "30";
 
 		// Create the connection object for the old database
-		_ConnectionPtr ipOldDB = getConnection ( m_zFromServer.operator LPCSTR(), m_zFromDB.operator LPCSTR() );
+		_ConnectionPtr ipOldDB = getConnection ( (LPCSTR) m_zFromServer, (LPCSTR) m_zFromDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI20014", ipOldDB != NULL );
+		_lastCodePos = "40";
 
 		// Add the actions from the old DB to the new DB using the FAMDB object
 		addActionsToNewDB(ipFAMDB, ipOldDB);
-		_lastCodePos = "30";
+		_lastCodePos = "50";
+
+		// Copy existing settings
+		copyDBInfoSettings(ipFAMDB, ipOldDB);
+		_lastCodePos = "55";
 
 		// Done with the FAMDB object so set to NULL
 		ipFAMDB = NULL;
-		_lastCodePos = "40";
+
+		// Copy the FAMUser table preserving the ID
+		copyRecords(ipOldDB, ipNewDB, "FAMUser", "FAMUser", true);
+		_lastCodePos = "60";
+
+		// Copy the Machine table preserving the ID
+		copyRecords(ipOldDB, ipNewDB, "Machine", "Machine", true);
+		_lastCodePos = "70";
 
 		// Copy the FAMFile records preserving the ID field since it is used in links to 
 		// other tables
 		copyRecords	(ipOldDB, ipNewDB, "FAMFile", "FAMFile", true);
-		_lastCodePos = "50";
+		_lastCodePos = "80";
 
 		// Copy the Login table without preserving the ID
 		copyRecords(ipOldDB, ipNewDB, "Login", "Login");
-		_lastCodePos = "50";
-
+		_lastCodePos = "90";
+		
 		// Copy the ActionStatistics table
-		copyRecords(ipOldDB, ipNewDB, gstrSELECT_ACTIONSTATISTICS_FOR_TRANSFER_FROM_5_0, "ActionStatistics");
-		_lastCodePos = "50";
+		copyRecords(ipOldDB, ipNewDB, gstrSELECT_ACTIONSTATISTICS_FOR_TRANSFER_FROM_7_0, "ActionStatistics");
+		_lastCodePos = "100";
 
-		// Copy the FileActionStateTransition
-		copyRecords(ipOldDB, ipNewDB, gstrSELECT_FAST_RECORDS_FOR_TRANSFER_FROM_5_0, "FileActionStateTransition");
-		_lastCodePos = "50";
+		// Only copy the FAST and QueueEvent records if retaining history data
+		if (m_checkRetainHistoryData.GetCheck() == BST_CHECKED)
+		{
+			// Copy the FileActionStateTransition
+			copyRecords(ipOldDB, ipNewDB, gstrSELECT_FAST_RECORDS_FOR_TRANSFER_FROM_7_0, "FileActionStateTransition");
+			_lastCodePos = "110";
 
-		// Copy the QueueEventRecords table 
-		copyRecords(ipOldDB, ipNewDB, "QueueEvent", "QueueEvent");
-		_lastCodePos = "50";
+			// Copy the QueueEventRecords table 
+			copyRecords(ipOldDB, ipNewDB, "QueueEvent", "QueueEvent");
+			_lastCodePos = "120";
+		}
+
+		// If there is an IDShieldData table copy it.
+		if (doesTableExist(ipOldDB, "IDShieldData") && doesTableExist(ipNewDB, "IDShieldData"))
+		{
+			// Need to check first if there is a IDShieldData file
+			copyRecords(ipOldDB, ipNewDB, gstrSELECT_IDSHIELD_DATA_FOR_TRANSFER_FROM_7_0, "IDShieldData");
+			_lastCodePos = "130";
+
+			// Fix up the duration totals
+			executeCmdQuery(ipNewDB, gstrUPDATE_IDSHIELD_DATA_DURATION_FOR_8_0);
+		}
+
+		// Log exception to indicate that a database convertion is complete
+		UCLIDException ueCompleted("ELI28526", "Application Trace: DB has been converted to 8.0");
+		ueCompleted.addDebugInfo("From Server", (LPCSTR) m_zFromServer);
+		ueCompleted.addDebugInfo("From DB", (LPCSTR) m_zFromDB);
+		ueCompleted.addDebugInfo("To Server", (LPCSTR) m_zToServer);
+		ueCompleted.addDebugInfo("To DB", (LPCSTR) m_zToDB);
+		ueCompleted.log();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20148");
 }
@@ -436,31 +486,6 @@ void CConvertFAMDBDlg::addFKData(_ConnectionPtr ipDestDBConnection, FieldsPtr ip
 		}
 		_lastCodePos = "20";
 
-		// Check for MachineName field
-		ipField = getNamedField(ipSourceFields, "MachineName");
-		_lastCodePos = "30";
-
-		// If the MachineName field was found set the MachineID in the Destination fields
-		if (ipField != NULL)
-		{
-			// Set the MachineID
-			copyIDValue(ipDestDBConnection, ipDestFields, "Machine", "MachineName", 
-				asString(ipField->Value.bstrVal), true);
-		}
-		_lastCodePos = "40";
-
-		// Check for the UserName Field
-		ipField = getNamedField(ipSourceFields, "UserName");
-		_lastCodePos = "50";
-
-		// If the UserName field was found set the ActionID in the Destination fields
-		if (ipField != NULL)
-		{
-			// Set the FAMUserID
-			copyIDValue(ipDestDBConnection, ipDestFields, "FAMUser", "UserName", 
-				asString(ipField->Value.bstrVal), true);
-		}
-		_lastCodePos = "60";
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20151");
 }
@@ -494,10 +519,14 @@ void CConvertFAMDBDlg::copyRecords(_ConnectionPtr ipSourceDBConnection, _Connect
 		// Create the destination ActionStatistics recordset
 		_RecordsetPtr ipDestSet( __uuidof( Recordset ));
 		ASSERT_RESOURCE_ALLOCATION("ELI20023", ipDestSet != NULL );
-
-		// Turn on Identity insert so any identity fields will be copied
-		executeCmdQuery(ipDestDBConnection, gstrSET_IDENTITY_INSERT_ON);
-		_lastCodePos = "30";
+		
+		// Turn IDENTITY_INSERT option on if required
+		if (bCopyID && !bSourceIsQuery)
+		{
+			// Turn on IDENTITY_INSERT to allow copying of ID
+			identityInsert(ipDestDBConnection, strSource, true); 
+			_lastCodePos = "30";
+		}
 
 		// Open the ActionStatistics set table in the database
 		ipDestSet->Open( strDest.c_str(), _variant_t((IDispatch *)ipDestDBConnection, true), adOpenDynamic, 
@@ -518,10 +547,6 @@ void CConvertFAMDBDlg::copyRecords(_ConnectionPtr ipSourceDBConnection, _Connect
 			copyExistingFields(ipSourceSet->Fields, ipDestSet->Fields, bCopyID);
 			_lastCodePos = "60-" + asString(nCount);;
 
-			// Copy any time fields found
-			copyTimeFields(ipSourceSet->Fields, ipDestSet->Fields);
-			_lastCodePos = "70-" + asString(nCount);;
-
 			// Add the foreign key data
 			addFKData(ipDestDBConnection, ipSourceSet->Fields, ipDestSet->Fields);
 			_lastCodePos = "80-" + asString(nCount);;
@@ -536,37 +561,54 @@ void CConvertFAMDBDlg::copyRecords(_ConnectionPtr ipSourceDBConnection, _Connect
 			
 			nCount++;
 		}
+		// Turn IDENTITY_INSERT option off as required
+		if (bCopyID && !bSourceIsQuery)
+		{
+			// Turn off Identity insert so any identity fields will be copied
+			identityInsert(ipDestDBConnection, strSource, false);
+			_lastCodePos = "110";
+		}
+
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20152");
 }
 //-------------------------------------------------------------------------------------------------
-void CConvertFAMDBDlg::copyTimeFields(FieldsPtr ipSource, FieldsPtr ipDest)
+void CConvertFAMDBDlg::copyDBInfoSettings(IFileProcessingDBPtr ipFAMDB, _ConnectionPtr ipSourceDBConnection)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI20127", ipSource != NULL);
-		ASSERT_ARGUMENT("ELI20128", ipDest != NULL);
+		ASSERT_ARGUMENT("ELI28607", ipFAMDB != NULL);
+		ASSERT_ARGUMENT("ELI28608", ipSourceDBConnection);
 
-		// Check for TS_Transition Field
-		FieldPtr ipField = getNamedField(ipSource, "TS_Transition");
+		// Create the source DBInfo set
+		_RecordsetPtr ipSourceDBInfoSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI28609", ipSourceDBInfoSet != NULL );
 
-		if (ipField == NULL )
+		// Open the DBInfo set table in the source DB database
+		ipSourceDBInfoSet->Open( "DBInfo", _variant_t((IDispatch *)ipSourceDBConnection, true), adOpenStatic, 
+			adLockReadOnly, adCmdTable );
+
+		// While there are records in the Source table
+		while (!ipSourceDBInfoSet->adoEOF)
 		{
-			ipField = getNamedField(ipSource, "TimeStamp");
-		}
+			// Get the setting name
+			string strSetting = getStringField(ipSourceDBInfoSet->Fields, "Name");
+			
+			// Check if this is a version setting and if it is do not transfer the setting
+			if (strSetting.find("Version") == string::npos)
+			{
+				// Get the value for the setting
+				string strValue = getStringField(ipSourceDBInfoSet->Fields, "Value");
 
-		// if either TS_Transition or TimeStamp field was found transfer the value
-		if ( ipField != NULL )
-		{
-			// Get the DestField
-			FieldPtr ipDateTimeStamp = ipDest->Item["DateTimeStamp"];
-			ASSERT_RESOURCE_ALLOCATION("ELI20056", ipDateTimeStamp != NULL);
+				// Save the setting in the new database
+				ipFAMDB->SetDBInfoSetting(strSetting.c_str(), strValue.c_str());
+			}
 
-			// Set the dest field value to the found source
-			ipDateTimeStamp->Value = ipField->Value;
+			// Move to the next record
+			ipSourceDBInfoSet->MoveNext();
 		}
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20153");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28606");
 }
 //-------------------------------------------------------------------------------------------------
 bool CConvertFAMDBDlg::isInputDataValid()
@@ -620,12 +662,12 @@ bool CConvertFAMDBDlg::isInputDataValid()
 	ipFAMDB->DatabaseName = (LPCSTR) m_zFromDB;
 
 	// Check the schema version
-	if (ipFAMDB->DBSchemaVersion != gi5_0DB_SCHEMA_VERSION )
+	if (ipFAMDB->DBSchemaVersion != gi7_0DB_SCHEMA_VERSION )
 	{
 		// Set focus to the FromDB control
 		m_cbFromDB.SetFocus();
 		AfxMessageBox(
-			"The selected database to convert data from is not a 5.0 database.\r\n"
+			"The selected database to convert data from is not a 6.0 or 7.0 database.\r\n"
 			"Please select a different database.", MB_OK | MB_ICONEXCLAMATION);
 		return false;
 	}
@@ -633,3 +675,15 @@ bool CConvertFAMDBDlg::isInputDataValid()
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+void CConvertFAMDBDlg::identityInsert(_ConnectionPtr ipDestDBConnection, const string& strTable, bool bState)
+{
+	string strIdentityInsertSetting = bState ? gstrSET_IDENTITY_INSERT_ON : 
+		gstrSET_IDENTITY_INSERT_OFF;
+
+	replaceVariable(strIdentityInsertSetting, "<TableName>", strTable);
+
+	// Turn on Identity insert so any identity fields will be copied
+	executeCmdQuery(ipDestDBConnection, strIdentityInsertSetting);
+}
+//-------------------------------------------------------------------------------------------------
+

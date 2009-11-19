@@ -44,6 +44,7 @@ private:
 	DBInfoCombo m_cbFromDB;
 	DBInfoCombo m_cbToServer;
 	DBInfoCombo m_cbToDB;
+	CButton m_checkRetainHistoryData;
 
 	// Stores the control that last had focus
 	int m_iLastControlID;
@@ -71,8 +72,16 @@ private:
 	// named DateTimeStamp in Destination
 	void copyTimeFields(FieldsPtr ipSource, FieldsPtr ipDest);
 
+	// The DBInfoSettings are set to there default values when the database is created
+	// This function will change the settings in the DBInfo table to the values that were in the 
+	// old database except for the Version settings ( FAMDBSchemaVersion and IDShieldSchemaVersion)
+	void copyDBInfoSettings(IFileProcessingDBPtr ipFAMDB, _ConnectionPtr ipSourceDBConnection);
+
 	// Get a connection object using the given server and database
 	_ConnectionPtr getConnection(const string& strServer, const string& strDatabase);
+
+	// Method will turn IDENTITY_INSERT on or off for the table in strTable
+	void identityInsert(_ConnectionPtr ipDestDBConnection, const string& strTable, bool bState);
 
 	// This method does basic validation. It checks the to and from servers and database to make sure
 	// they are not blank and verifies the schema version of the database to convert from

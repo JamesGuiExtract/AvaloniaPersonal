@@ -64,6 +64,7 @@ static const string gstrCREATE_FILE_ACTION_STATE_TRANSITION_TABLE  ="CREATE TABL
 static const string gstrCREATE_QUEUE_EVENT_TABLE = "CREATE TABLE [QueueEvent]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_QueueEvent] PRIMARY KEY CLUSTERED,"
 	"[FileID] [int] NULL,"
+	"[ActionID] [int] NULL,"
 	"[DateTimeStamp] [datetime] NULL,"
 	"[QueueEventCode] [nvarchar](1) NULL,"
 	"[FileModifyTime] [datetime] NULL,"
@@ -228,6 +229,11 @@ static const string gstrADD_QUEUE_EVENT_FAM_USER_FK =
 	"ALTER TABLE [QueueEvent] "
 	"WITH CHECK ADD CONSTRAINT [FK_QueueEvent_FAMUser] FOREIGN KEY([FAMUserID]) "
 	"REFERENCES [FAMUser] ([ID])";
+
+static const string gstrADD_QUEUE_EVENT_ACTION_FK =
+	"ALTER TABLE [QueueEvent] "
+	"WITH CHECK ADD CONSTRAINT [FK_QueueEvent_Action] FOREIGN KEY([ActionID]) "
+	"REFERENCES [Action] ([ID])";
 
 static const string gstrADD_FILE_ACTION_COMMENT_FAM_FILE_FK =
 	"ALTER TABLE [FileActionComment] "

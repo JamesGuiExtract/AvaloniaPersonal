@@ -29,7 +29,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 17;
+const long glFAMDBSchemaVersion = 18;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -357,7 +357,8 @@ string CFileProcessingDB::asStatusString ( EActionStatus eStatus )
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addQueueEventRecord( ADODB::_ConnectionPtr ipConnection, long nFileID, 
-											string strFileName, string strQueueEventCode )
+											long nActionID, string strFileName, 
+											string strQueueEventCode )
 {
 	try
 	{
@@ -389,6 +390,9 @@ void CFileProcessingDB::addQueueEventRecord( ADODB::_ConnectionPtr ipConnection,
 			//  add the field values to the new record
 			setLongField( ipFields, "FileID",  nFileID );
 			_lastCodePos = "40";
+
+			setLongField( ipFields, "ActionID", nActionID);
+			_lastCodePos = "45";
 
 			setStringField( ipFields, "DateTimeStamp", 
 				getSQLServerDateTime(ipConnection) );
@@ -913,6 +917,7 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_ACTION_STATE_FROM_FK);
 		vecQueries.push_back(gstrADD_QUEUE_EVENT_MACHINE_FK);
 		vecQueries.push_back(gstrADD_QUEUE_EVENT_FAM_USER_FK);
+		vecQueries.push_back(gstrADD_QUEUE_EVENT_ACTION_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_COMMENT_ACTION_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_COMMENT_FAM_FILE_FK);
 		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_FILE_FK);
@@ -1018,6 +1023,16 @@ void CFileProcessingDB::initializeTableValues()
 		// Add AutoRevertNotifyEmailList setting (default to empy string)
 		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_NOTIFY_EMAIL_LIST
 			+ "', '')";
+		vecQueries.push_back(strSQL);
+
+		// Add NumberOfConnectionRetries setting (default to empy string)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrNUMBER_CONNECTION_RETRIES
+			+ "', '10')";
+		vecQueries.push_back(strSQL);
+		
+		// Add ConnectionRetryTimeout setting (default to empy string)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCONNECTION_RETRY_TIMEOUT
+			+ "', '120')";
 		vecQueries.push_back(strSQL);
 
 		// Execute all of the queries

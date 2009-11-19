@@ -633,7 +633,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 		if (m_bUpdateQueueEventTable)
 		{
 			// add a new QueueEvent record 
-			addQueueEventRecord( ipConnection, nID, asString(strFile), ( bFileModified == VARIANT_TRUE ) ? "M":"A");
+			addQueueEventRecord( ipConnection, nID, nActionID, asString(strFile), ( bFileModified == VARIANT_TRUE ) ? "M":"A");
 		}
 
 		_lastCodePos = "160";
@@ -738,7 +738,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFile( BSTR strFile, BSTR strAction )
 			if (m_bUpdateQueueEventTable)
 			{
 				// add record the QueueEvent table to indicate that the file was deleted
-				addQueueEventRecord( ipConnection, nFileID, asString(strFile), "D" );
+				addQueueEventRecord( ipConnection, nFileID, nActionID, asString(strFile), "D" );
 			}
 		}
 
