@@ -5,7 +5,7 @@
 </head>
 <body>
 
-<h1>Running File Action Manager as a Service<br>
+<h1>FAM Service Setup - SQL Server 2008<br>
 <IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>	
 <hr>
@@ -17,238 +17,165 @@ the database is referred to as the "database machine."
 <ol>
 	<li><b>Setting up the Database Machine</b>
 	<ul>
-		<li>Make sure the database machine has <b>SQL Server 2005</b> or <b>SQL Server 
-		2008</b> installed.</li>
+		<li>Make sure the database machine has <b>SQL Server 2008</b> installed.</li>
 		<li>Use the <b>SQL Server Management Studio Express</b> application to create a new 
 		database named <b>ServiceTest</b> or clear the existing database if it 
 		already exists.</li>
-		<li>Add an action called "<b>ComputeRedactions</b>" to the database.</li>
+		<li>Add an action called <b>Process</b> to the database.</li>
 <p>
-		<li><b>SQL Server 2005</b>
+		<li><u>Configuring the Database</u>
 		<ul>
-			<li><u>Configuring the Database</u>
+			<li>Under the start menu go to <b>All Programs </b>-><b> Microsoft 
+			SQL Server 2008</b> -> <b>Configuration Tools</b> -> <b>SQL Server 
+			Configuration Manager</b></li>
+			<li>Click on <b>SQL Server Network Configuration</b>
 			<ul>
-				<li>Under the start menu go to <b>All Programs </b>-><b> Microsoft 
-				SQL Server 2005</b> -> <b>Configuration Tools</b> -> <b>SQL Server 
-				Surface Area Configuration</b></li>
-				<li>Click on <b>Surface Area Configuration for Services and 
-				Connections</b>.</li>
-				<li>Select <b>MSSQLSERVER</b> and then select <b>Database Engine</b>.</li>
-				<li>Click on <b>Remote Connections</b> and then select the <b>Local 
-				and remote connections</b> radio button.</li>
-				<li>Under <b>Local and remote connections</b> choose the <b>Using 
-				both TCP/IP and named pipes</b> radio button.</li>
-				<li>Click the <b>Apply</b> button.</li>
-				<li>Click on <b>Service</b> which is located in the list to the left 
-				above <b>Remote Connections</b>.</li>
-				<li>Change the <b>Startup type:</b> to <b>Automatic</b> and then click 
-				the <b>Apply</b> button.</li>
-				<li>Click the <b>Okay</b> button.
+				<li>Click on <b>SQL Server Network Configuration</b> -> <b>Protocols 
+				for MSSQLSERVER</b>.</li>
+				<li>Select and enable <b>Named Pipes</b>.</li>
+				<li>Select and enable <b>TCP/IP</b>.</li>
+			</ul>
+			<li>Click on <b>SQL Server Services</b>.</li>
+			<ul>
+				<li>Click on <b>SQL Server (MSSQLSERVER)</b>:
+				<li>Confirm that the State is <b>Running</b>.
+				<li>Confirm that the Start Mode is <b>Automatic</b>.
+				<li>Right-click and <b>Stop</b> the service.
+				<li>Right-click and <b>Start</b> the service.
 <p>
-				<li>Right click on <b>My Computer</b> and select <b>Manage</b>.</li>
-				<li>Select <b>System Tools</b> from the list on the left and then 
-				click on <b>Local Users and Groups</b>.</li>
-				<li>Click on <b>Groups</b> and then double click on 				<b>SQLServer2005MSSQLUser$</b>&ltLocal Machine Name&gt<b>$MSSQLSERVER</b> 
-				in the list on the right.</li>
-				<ul>
-					<li>Click the <b>Add</b> button.</li>
-					<li>Click on the <b>Locations</b> buttons, and then click 
-					<b>Entire Directory</b> from the list that appears.</li>
-					<li>Select <b>extract.local</b> and then click the <b>OK</b> 
-					button.</li>
-					<li>Search for your user name by entering the first few letters 
-					of your user name into the <b>Enter the object name to select</b> 
-					edit box and clicking the <b>Check Names</b> button.</li>
-					<li>After your user name appears in the <b>Enter the object name 
-					to select</b> edit box click the <b>OK</b> button.</li>
-					<li>Click the <b>Apply</b> button and then the <b>OK</b> button.
-				</ul>
-				</li>
-				<li>Repeat the above steps for all the groups that start with 
-				<b>SQLServer2005</b>.
+				<li>Click on <b>SQL Server Browser</b>:
+				<li>Confirm that the State is <b>Stopped</b>.
+				<li>Confirm that the Start Mode is <b>Other (Boot, System, 
+				Disabled or Unknown)</b>.
+				<li>Right-click and select <b>Properties</b>.
+				<li>Select the <b>Service</b> tab.
+				<li>Modify the Start Mode to <b>Automatic</b>.
+				<li>Click <b>OK</b>.
+				<li>Right-click and <b>Start</b> the service.
 			</ul>
 			</li>
+			<li>Close <b>SQL Server Configuration Manager</b>.</li>
 <p>
-			<li><u>Setting up the Firewall</u>
+			<li>Right click on <b>My Computer</b> and select <b>Manage</b>.</li>
+			<li>Select <b>System Tools</b> from the list on the left and then 
+			click on <b>Local Users and Groups</b>.</li>
+			<li>Click on <b>Groups</b> and then double click on 
+			<b>SQLServerMSSQLUser$</b>&ltLocal Machine Name&gt<b>$MSSQLSERVER</b> 
+			in the list on the right.</li>
 			<ul>
-				<li>Go to the Windows Control Panel and double click on the <b>Windows 
-				Firewall</b> icon.
-				<li>Select the <b>Exceptions</b> tab, and then click the 
-				<b>Add Program...</b> button.
-				<li>Click the <b>Browse...</b> button, and browse to 
-				<i>C:\Program Files\Microsoft SQL Server\90\Shared</i>.
-				<li>Select <b>sqlbrowser.exe</b> and click the <b>Open</b> button.
-				<li>Click the <b>OK</b> button to add the program to the exceptions 
-				list.
-				<li>Repeat the above steps to add <b>sqlservr.exe</b> to the 
-				exceptions list.  (It is located under <i>C:\Program Files\Microsoft 
-				SQL Server\MSSQL.1\MSSQL\Binn</i>.)
+				<li>Right-click and <b>Add to Group...</b></li>
+				<li>Click on the <b>Add...</b> button.</li>
+				<li>Click on the <b>Locations</b> buttons, and then click 
+				<b>Entire Directory</b> from the list that appears.</li>
+				<li>Select <b>extract.local</b> and then click the <b>OK</b> 
+				button.</li>
+				<li>Search for <b>Domain Users</b> by entering the first few letters 
+				of your user name into the <b>Enter the object name to select</b> 
+				edit box and clicking the <b>Check Names</b> button.</li>
+				<li>Select the name and click the <b>OK</b> button.</li>
+				<li>Click the <b>Apply</b> button and then the <b>OK</b> button.
 			</ul>
 			</li>
-<p>
-			<li><u>Restarting the SQLServer\Browser Services</u>
-			<ul>
-				<li>Under the start menu go to <b>All Programs </b>-><b> Microsoft SQL Server 
-				2005</b> -> <b>Configuration Tools</b> -> <b>SQL Server Surface Area 
-				Configuration</b></li>
-				<li>Click on <b>Surface Area Configuration for Services and 
-				Connections</b>.</li>
-				<li>Select <b>MSSQLSERVER</b> and then select <b>Database Engine</b>.</li>
-				<li>Select <b>Service</b> and then restart the service by clicking on 
-				the <b>Stop</b> button, and then clicking on the <b>Start</b> button.</li>
-				<li>On the menu to the left, select <b>SQL Server Browser</b> and then 
-				select <b>Service</b>.</li>
-				<li>Restart the service by clicking on the <b>Stop</b> button, and then 
-				clicking on the <b>Start</b> button.</li>
-				<li>Set the Startup Type <b>Automatic</b>.</li>
-			</ul>
-			</li>
-<p>
-			<li>Open up the <b>USB License Key Manager Utility</b> and make sure that 
-			the License Server is pointed to a valid machine.  (Usually <b>LISA</b>.)</li>
-			<li>Run <b>Windows Update</b> to check for any service packs or updates.</li>
+			<li>Repeat the above steps for the 
+			<b>SQLServer2005SQLBrowserUser$</b>&ltLocal Machine Name&gt<b></b> group.
 		</ul>
 		</li>
+<p>
+		<li><u>Setting up the Firewall</u>
+		<ul>
+			<li>Go to the Windows Control Panel and double click on the <b>Windows 
+			Firewall</b> icon.
+			<li>Select the <b>Exceptions</b> tab, and then click the 
+			<b>Add Program...</b> button.
+			<li>Click the <b>Browse...</b> button, and browse to 
+			<i>C:\Program Files\Microsoft SQL Server\90\Shared</i>.  Use 
+			<b>Program Files (x86)</b> if this is a 64-bit operating system.
+			<li>Select <b>sqlbrowser.exe</b> and click the <b>Open</b> button.
+			<li>Click the <b>OK</b> button to add the program to the exceptions 
+			list.
+			<li>Repeat the above steps to add <b>sqlservr.exe</b> to the 
+			exceptions list.  (It is located under <i>C:\Program Files\Microsoft 
+			SQL Server\MSSQL10.MSSQLSERVER\MSSQL\Binn</i>.)
+		</ul>
+		</li>
+<p>
+		<li><u>Allowing Remote Login</u>
+		<ul>
+			<li>From SQL Server Management Studio, select the <b>Logins</b> tab.
+			<li>Add <b>Domain Users</b>
+			<ul>
+				<li>Use the <b></b> query in Jeff's Public folder OR
+				<li>Create and exercise the following two-line query within 
+				Management Studio:
+				<ul><b>
+					<li>CREATE LOGIN [EXTRACT\Domain Users] FROM WINDOWS 
+					WITH DEFAULT_DATABASE=[master], DEFAULT_LANGUAGE=[us_english]
+					<br>GO
+				</ul></b>
+			</ul>
+			<li>Executing the previous query adds <b>EXTRACT\Domain Users</b> as a 
+			valid login to the database.
+			<li>Change the <b>Properties</b> for this login and check <b>sysadmin</b> 
+			under <b>Server Roles</b>.
+		</ul>
+		</li>
+<p>
+		<li>Open up the <b>USB License Key Manager Utility</b> and make sure that 
+		the License Server is pointed to a valid machine.  (Usually <b>LISA</b>.)</li>
+		<li>Run <b>Windows Update</b> to check for any service packs or updates.</li>
 	</ul>
 	</li>
 <p>
-	<li>Setting up the Service Machine
+	<li><b>Setting up the Service Machine</b>
 	<ul>
-		<li>Make sure that the machine that is running the service is fully licensed.  If it 
-		is not, use the <b>COM License Generator</b> utility to create a full license for 
-		the service machine.
-<p>
-		<li><u>Installing the Service</u>
+		<li><u>Software Installation and Licensing</u>
 		<ul>
-			<li>Install the Windows Server 2003 Resource Kit.  It can be found at 				<i>http://www.microsoft.com/downloads/details.aspx?FamilyID=9d467a69-57ff-4ae7-96ee-b18c4790cffd&displaylang=en</i>			</li>
-			<li>Run <b>Install ProcessFiles as a Service.bat</b>.  It is located in <i>I:\Common\Engineering\ProductDevelopment\AttributeFinder\Testing Files\ServiceTest\Install</i>.
-			<li>Confirm that the registry key <b>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\FlexIndex-Indexing\Parameters\Application</b> is pointing to the appropriate location
-			to find ProcessFiles.exe (in 7.0, it is located in the CommonComponents folder).</li>
-			<li>Confirm the presence of <b>Compute.fps</b> at <i>I:\Common\Engineering\ProductDevelopment\AttributeFinder\Testing Files\ServiceTest\FPS</i> and confirm that it uses exclusively UNC-style paths.</li>
-			<li>Make sure that <b>Compute.fps</b> is using the database on the Database Machine. 
+			<li>Confirm that <b>FLEX Index</b> or <b>ID Shield</b> is installed.
+			<li>Confirm that the service machine is fully licensed.  If it is not, use 
+			the <b>COM License Generator</b> utility to create a non-expiring license.
+			<li>Confirm via Add/Remove Programs that <b>SQL Compact Database</b> is 
+			installed.
+			<li>Confirm via Add/Remove Programs that <b>SQL CE Editor</b> is installed.
+			<li>Open up the <b>USB License Key Manager</b> utility and make sure 
+			that the License Server is pointed to a valid machine.  (Usually 
+			<b>LISA</b>.)</li>
 		</ul>
 		</li>
 <p>
 		<li><u>Configuring the Service</u>
 		<ul>
-			<li>Right click on "<b>My Computer</b>" and select "<b>Manage</b>."</li>
-			<li>Select "<b>Services and Applications</b>" from the list on the left 
-			and then click on "<b>Services</b>." On machines with a server OS installed,
+			<li>Right click on <b>My Computer</b> and select <b>Manage</b>.</li>
+			<li>Select <b>Services and Applications</b> from the list on the left 
+			and then click on <b>Services</b>. On machines with a server OS installed,
 			you'll instead select <b>Configuration &gt; Services</b>.</li>
 			<li>Scroll down the list on the right until you find an entry 
-			named "<b>FlexIndex-Indexing</b>."</li>
-			<li>Right click on "<b>FlexIndex-Indexing</b>" and select 
-			"<b>Properties</b>."</li>
-			<li>In the "<b>General</b>" tab of the properties dialog, make sure that 
-			the "<b>Startup type:</b>" is set to "<b>Automatic</b>."</li>
-			<li>In the "<b>Log On</b>" tab, select the "<b>This account:</b>" 
+			named <b>Extract Systems FAM Service</b>.</li>
+			<li>Right click on <b>Extract Systems FAM Service</b> and select 
+			<b>Properties</b>.</li>
+			<li>In the <b>General</b> tab of the properties dialog, make sure that 
+			the <b>Startup type:</b> is set to <b>Automatic</b>.</li>
+			<li>In the <b>Log On</b> tab, select the <b>Local system:</b> 
 			radio button.
+			<li>Follow the instructions below to change the account:
 			<ul>
-				<li>Click the "<b>Browse</b>" button next to the "<b>This 
-				account:</b>" radio button.</li>
-				<li>Click on the "<b>Locations</b>" buttons, and then click 
-				"<b>Entire Directory</b>" from the list that appears.</li>
-				<li>Select "<b>extract.local</b>" and then click the 
-				"<b>OK</b>" button.</li>
-				<li>Search for your user name by entering the first few letters 
-				of your user name into the "<b>Enter the object name to select</b>" 
-				edit box and clicking the "<b>Check Names</b>" button.</li>
-				<li>After your user name appears the "<b>Enter the object name to 
-				select</b>" edit box click the "<b>OK</b>" button.</li>
-				<li>Enter your network password into both the "<b>Password:</b>" 
-				edit box, and the "<b>Confirm password:</b>" edit box.</li>
+				<li>In the <b>Log On</b> tab, select the <b>This account:</b> 
+				radio button.
+				<li>Click the <b>Browse</b> button next to the <b>This 
+				account:</b> radio button.</li>
+				<li>Click on the <b>Locations</b> buttons, and then click 
+				<b>Entire Directory</b> from the list that appears.</li>
+				<li>Select <b>extract.local</b> and then click the 
+				<b>OK</b> button.</li>
+				<li>Search for a specific user name by entering the first few 
+				letters of the user name into the <b>Enter the object name to 
+				select</b> edit box and clicking the <b>Check Names</b> button.</li>
+				<li>After the user name appears in the <b>Enter the object name to 
+				select</b> edit box, click the <b>OK</b> button.</li>
+				<li>Enter the network password into both the <b>Password:</b> 
+				edit box, and the <b>Confirm password:</b> edit box.</li>
 			</ul>
 			</li>
-			<li>Click the "<b>Apply</b>" button, and then the "<b>OK</b>" button.</li>
-		</ul>
-		</li>
-<p>
-		<li>Open up the "<b>USB License Key Manager Utility</b>" and make sure that the 
-		License Server is pointed to a valid machine.  (Usually <b>LISA</b>.)</li>
-	</ul>
-	</li>
-<p>
-	<li>Testing the Service.
-	<ul>
-		<li><u>Local Test</u>
-		<ul>
-			<li>Restart the service machine, and log on to the machine.</li>
-			<li>Using the <b>service machine</b>, open up an "<b>Images</b>" 
-			folder located at 
-			<i>\\fnp2\internal\Common\Engineering\ProductDevelopment\AttributeFinder\Testing 
-			Files\ServiceTest\Images</i>.</li>
-			<li>Copy several <i>.tif</i> files into the "<b>Images</b>" folder.</li>
-			<li>Wait several minutes and confirm that <i>.uss</i> files, 
-			<i>.voa</i> files, and <i>.redacted.tif</i> images are created in the 
-			"<b>Images</b>" folder.</li>
-		</ul>
-		</li>
-<p>
-		<li><u>Remote Test</u>
-		<ul>
-			<li>Restart the service machine, but do <b>NOT</b> log on to 
-			the machine.</li>
-			<li>Using the <b>database machine</b>, open up the "<b>Images</b>" folder.</li>
-			<li>Copy several <i>.tif</i> files into the "<b>Images</b>" folder.</li>
-			<li>Wait several minutes and confirm that <i>.uss</i> files, 
-			<i>.voa</i> files, and <i>.redacted.tif</i> images are created in 
-			the "<b>Images</b>" folder.</li>
-		</ul>
-		</li>
-<p>
-		<li><u>Automatic Database Unlock Test</u>
-		<ul>
-			<li>Copy at least fifty <i>.tif</i> images into the "<b>Images</b>" folder.
-			<li>Stop the service on the service machine by performing the steps below:
-			<ul>
-				<li>Right click on "<b>My Computer</b>" and select "<b>Manage</b>."</li>
-				<li>Select "<b>Services and Applications</b>" from the list on the 
-				left and then click on "<b>Services</b>."</li>
-				<li>Scroll down the list on the right until you find an entry 
-				named <b>FlexIndex-Indexing</b> or <b>IDShield-Redaction</b>.</li>
-				<li>Right click on "<b>FlexIndex-Indexing</b>" or 
-				"<b>IDShield-Redaction</b>" and select "<b>Stop</b>".
-			</ul>
-			</li>
-			<li> Make sure that at least some files in the database are still pending.  
-			This can be done by looking at the database's "<b>FAMFile</b>" table using 
-			the <b>SQL Server Management Studio Express</b> application. The <b>Summary</b>
-			tab in the DB Administration utility can also be used.</li>
-			<li>Use the "<b>DB Administration</b>" utility to add an action 
-			called "<b>QueueDummy</b>" to the database.</li>
-			<li>Open and run the file "<b>dummy.fps</b>" which is located at 			<i>I:\Common\Engineering\ProductDevelopment\AttributeFinder\Testing 
-			Files\ServiceTest\FPS</i>.</li>
-			<li>Lock the database
-			<ul>
-				<li>While files are still being queued, execute the following 
-				commands in a batch file to lock the database.
-				<li>Use SQL Server Management Studio to review the Lock Table.
-				<li>The database was successfully locked if the <b>UPI</b> is 
-				<b>LockTest</b>.
-				<li>If the batch file did not lock the database, continue retrying 
-				until the lock succeeds.
-<p>
-				<li>Echo off
-				<li>rem This batch file takes the database to lock as a command line argument
-				<li>set DatabaseName=%1
-				<li>if  not defined (%DatabaseName%) goto missingArg
-				<li>sqlcmd -Q "INSERT INTO [%1].[dbo].[LockTable] ([LockID] ,[UPI]) VALUES (1, 'LockTest')"
-				<li>goto done
-				<li>:missingArg
-				<li>Echo Syntax: LockDatabase DatabaseName
-				<li>Echo %DatabaseName%
-				<li>Pause 
-				<li>:done
-			</ul>
-			<li>Reboot the service machine.</li>
-			<li>Confirm that no processing is taking place on the service machine.  
-			A simple way to do this is to try to select an action in the 
-			<b>File Action Manager</b>.  The <b>File Action Manager</b> will hang because 
-			it can not access the locked database.</li>
-			<li>Wait five minutes for the database lock to reset.</li>
-			<li>Wait several minutes and confirm that <i>.uss</i> files, 
-			<i>.voa</i> files, and <i>.redacted.tif</i> images are created in the 
-			"<b>Images</b>" folder.</li>
+			<li>Click the <b>Apply</b> button, and then the <b>OK</b> button.</li>
 		</ul>
 		</li>
 	</ul>
