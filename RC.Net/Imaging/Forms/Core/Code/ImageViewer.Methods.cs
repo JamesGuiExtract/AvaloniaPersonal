@@ -3004,24 +3004,430 @@ namespace Extract.Imaging.Forms
                         else
                         {
                             // Instantiate a new redaction and add it to _layerObjects
-                            Redaction redaction = new Redaction(this, PageNumber, 
-                                LayerObject.ManualComment,
-                                new RasterZone[] { new RasterZone(points[0], points[1],
-                                    _defaultHighlightHeight, _pageNumber) },
-                                    _defaultRedactionFillColor);
-                            _layerObjects.Add(redaction);
+                            RasterZone zone = new RasterZone(points[0], points[1],
+                                _defaultHighlightHeight, _pageNumber);
+                            RasterZone[] zones = GetFittedZones(zone);
+                            if (zones != null)
+                            {
+                                Redaction redaction = new Redaction(this, PageNumber,
+                                    LayerObject.ManualComment, zones, _defaultRedactionFillColor);
+                                _layerObjects.Add(redaction);
+                            }
                         }
-
                     }
-
-                    // Draw the new highlight
-                    DrawRegion(_trackingData.Region, graphics, drawColor,
-                        NativeMethods.BinaryRasterOperations.R2_MASKPEN);
                 }
             }
 
             // Invalidate the image viewer so the object is updated
             Invalidate();
+        }
+
+        /// <summary>
+        /// Determines an array of raster zones that fit within the specified zone using the 
+        /// appropriate auto fitting algorithm based on the modifier key pressed.
+        /// </summary>
+        /// <param name="zone">The zone to auto fit.</param>
+        /// <returns>An array of autofitted raster zones that fit within <paramref name="zone"/>.
+        /// </returns>
+        RasterZone[] GetFittedZones(RasterZone zone)
+        {
+            RasterZone[] zones;
+            if (ModifierKeys == Keys.Shift)
+            {
+                zones = GetLineFittedZones(zone);
+            }
+            else if (ModifierKeys == (Keys.Shift | Keys.Control))
+            {
+                RasterZone blockFittedZone = GetBlockFittedZone(zone);
+                zones = blockFittedZone == null ? null : new RasterZone[] {blockFittedZone};
+            }
+            else
+            {
+                zones = new RasterZone[] { zone };
+            }
+
+            return zones;
+        }
+
+        /// <summary>
+        /// Gets the smallest raster zone that contains all the black pixels of the specified zone.
+        /// </summary>
+        /// <param name="zone">The raster zone to block fit.</param>
+        /// <returns>The smallest raster zone that contains all the black pixels of 
+        /// <paramref name="zone"/>.</returns>
+        RasterZone GetBlockFittedZone(RasterZone zone)
+        {
+            using (PixelProbe probe = _reader.CreatePixelProbe(_pageNumber))
+            {
+                FittingData data = GetFittingData(zone);
+
+                return GetBlockFittedZone(data, probe);
+            }
+        }
+
+
+        /// <summary>
+        /// Gets the smallest raster zone that contains all the black pixels of the specified data.
+        /// </summary>
+        /// <param name="leftTop">The left top coordinates of the area to block fit.</param>
+        /// <param name="rightBottom">The right bottom coordinates of the area to block fit.</param>
+        /// <param name="theta">The angle of the resultant raster zone.</param>
+        /// <param name="probe">A probe to use to test for black pixels.</param>
+        /// <returns>The smallest raster zone that contains all the black pixels of the specified 
+        /// data.</returns>
+        RasterZone GetBlockFittedZone(PointF leftTop, PointF rightBottom, PointF theta, PixelProbe probe)
+        {
+            FittingData data = new FittingData(leftTop, rightBottom, theta);
+
+            return GetBlockFittedZone(data, probe);
+        }
+
+        /// <summary>
+        /// Gets the smallest raster zone that contains all the black pixels of the specified data.
+        /// </summary>
+        /// <param name="data">The fitting data to use for block fitting.</param>
+        /// <param name="probe">A probe to use to test for black pixels.</param>
+        /// <returns>The smallest raster zone that contains all the black pixels of the specified 
+        /// data.</returns>
+        RasterZone GetBlockFittedZone(FittingData data, PixelProbe probe)
+        {
+            // Shrink each side of the highlight
+            ShrinkLeftSide(data, probe);
+            ShrinkTopSide(data, probe);
+            ShrinkRightSide(data, probe);
+            ShrinkBottomSide(data, probe);
+
+            // Find the corners of the fitted highlight
+            PointF point1 = GeometryMethods.Rotate(data.LeftTop, data.Theta);
+            PointF point2 = GeometryMethods.Rotate(data.LeftTop.X, data.RightBottom.Y, data.Theta);
+            PointF point3 = GeometryMethods.Rotate(data.RightBottom, data.Theta);
+            PointF point4 = GeometryMethods.Rotate(data.RightBottom.X, data.LeftTop.Y, data.Theta);
+
+            // Create the raster zone
+            int startX = (int)((point1.X + point2.X) / 2);
+            int startY = (int)((point1.Y + point2.Y) / 2);
+            int endX = (int)((point3.X + point4.X) / 2);
+            int endY = (int)((point3.Y + point4.Y) / 2);
+            int height = (int)(data.RightBottom.Y - data.LeftTop.Y);
+
+            if (height < _MIN_SPLIT_HEIGHT)
+            {
+                return null;
+            }
+
+            return new RasterZone(startX, startY, endX, endY, height, _pageNumber);
+        }
+
+        /// <summary>
+        /// Gets a series of block fitted zones that fit within the specified zone.
+        /// </summary>
+        /// <param name="zone">The zone to line fit.</param>
+        /// <returns>A series of block fitted zones that fit within <paramref name="zone"/>.
+        /// </returns>
+        RasterZone[] GetLineFittedZones(RasterZone zone)
+        {
+            List<RasterZone> zones = new List<RasterZone>();
+            using (PixelProbe probe = _reader.CreatePixelProbe(_pageNumber))
+            {
+                FittingData data = GetFittingData(zone);
+
+                // Trim whitespace at the top and bottom
+                ShrinkLeftSide(data, probe);
+                ShrinkTopSide(data, probe);
+                ShrinkRightSide(data, probe);
+                ShrinkBottomSide(data, probe);
+
+                // Attempt to split the highlight as many times as possible
+                RasterZone blockFittedZone;
+                float rowToSplit = FindRowToSplit(data, probe);
+                while (rowToSplit > 0)
+                {
+                    // Create the zone entity
+                    PointF rightBottom = new PointF(data.RightBottom.X, rowToSplit);
+                    blockFittedZone = GetBlockFittedZone(data.LeftTop, rightBottom, data.Theta, probe);
+
+                    // Check if there was an error
+                    if (blockFittedZone == null)
+                    {
+                        // This is a non-serious logic error. End the loop to 
+                        // create the highlight without any further line fitting.
+                        break;
+                    }
+
+                    // Store the entity ID
+                    zones.Add(blockFittedZone);
+
+                    // Store the new highlight's top
+                    data.LeftTop.Y = rowToSplit + 1;
+
+                    // Trim whitespace from the top
+                    ShrinkTopSide(data, probe);
+
+                    // Look for a place to split the highlight
+                    rowToSplit = FindRowToSplit(data, probe);
+                }
+
+                // Create the last highlight and store the ID
+                blockFittedZone = GetBlockFittedZone(data, probe);
+                if (blockFittedZone != null)
+                {
+                    zones.Add(blockFittedZone);
+                }
+            }
+
+            // If no highlights were created, throw an exception
+            return zones.Count == 0 ? null : zones.ToArray();
+        }
+
+        /// <summary>
+        /// Shrinks the left side of the fitting data to exclude all-white pixel columns.
+        /// </summary>
+        /// <param name="data">The fitting data to shrink.</param>
+        /// <param name="probe">The probe used to test image pixels.</param>
+        static void ShrinkLeftSide(FittingData data, PixelProbe probe)
+        {
+            // Iterate over each column, checking if the left side can be shrunk by one pixel
+            while (data.LeftTop.X < data.RightBottom.X)
+            {
+                // Iterate over each pixel in this column
+                for (float y = data.LeftTop.Y; y <= data.RightBottom.Y; y++)
+                {
+                    // Check whether this pixel is black
+                    if (IsPixelBlack(data.LeftTop.X, y, data.Theta, probe))
+                    {
+                        // We are done.
+                        return;
+                    }
+                }
+
+                data.LeftTop.X++;
+            }
+        }
+
+        /// <summary>
+        /// Shrinks the right side of the fitting data to exclude all-white pixel columns.
+        /// </summary>
+        /// <param name="data">The fitting data to shrink.</param>
+        /// <param name="probe">The probe used to test image pixels.</param>
+        static void ShrinkRightSide(FittingData data, PixelProbe probe)
+        {
+            // Iterate over each column, checking if the right side can be shrunk by one pixel
+            while (data.RightBottom.X > data.LeftTop.X)
+            {
+                // Iterate over each pixel in this column
+                for (float y = data.LeftTop.Y; y <= data.RightBottom.Y; y++)
+                {
+                    // Check whether this pixel is black
+                    if (IsPixelBlack(data.RightBottom.X, y, data.Theta, probe))
+                    {
+                        // We are done.
+                        return;
+                    }
+                }
+
+                data.RightBottom.X--;
+            }
+        }
+
+        /// <summary>
+        /// Shrinks the top side of the fitting data to exclude all-white pixel rows.
+        /// </summary>
+        /// <param name="data">The fitting data to shrink.</param>
+        /// <param name="probe">The probe used to test image pixels.</param>
+        static void ShrinkTopSide(FittingData data, PixelProbe probe)
+        {
+            // Iterate over each row, checking if the top side can be shrunk by one pixel
+            while (data.LeftTop.Y < data.RightBottom.Y)
+            {
+
+                // Check whether this row contains a black pixel
+                if (RowContainsBlackPixel(data.LeftTop.Y, data.LeftTop.X, data.RightBottom.X, data.Theta, probe))
+                {
+                    // We are done.
+                    return;
+                }
+
+                data.LeftTop.Y++;
+            }
+        }
+
+        /// <summary>
+        /// Shrinks the bottom side of the fitting data to exclude all-white pixel rows.
+        /// </summary>
+        /// <param name="data">The fitting data to shrink.</param>
+        /// <param name="probe">The probe used to test image pixels.</param>
+        static void ShrinkBottomSide(FittingData data, PixelProbe probe)
+        {
+            // Iterate over each row, checking if the bottom side can be shrunk by one pixel
+            while (data.RightBottom.Y > data.LeftTop.Y)
+            {
+                // Check whether this row contains a black pixel
+                if (RowContainsBlackPixel(data.RightBottom.Y, data.LeftTop.X, data.RightBottom.X, data.Theta, probe))
+                {
+                    // We are done.
+                    return;
+                }
+
+                data.RightBottom.Y--;
+            }
+        }
+
+        /// <summary>
+        /// Gets the fitting data that corresponds to the specified raster zone.
+        /// </summary>
+        /// <param name="zone">The zone from which to retrieve fitting data.</param>
+        /// <returns>The fitting data that corresponds to <paramref name="zone"/>.</returns>
+        FittingData GetFittingData(RasterZone zone)
+        {
+            // Calculate the angle of the line dy/dx
+            double angle = Math.Atan2(zone.EndY - zone.StartY, zone.EndX - zone.StartX);
+
+            // Express the angle from horizontal as a number between -PI/2 and PI/2 [LegacyRCAndUtils #5205]
+            angle = GeometryMethods.GetAngleFromHorizontal(angle);
+
+            // Calculate the horizontal and vertical increments
+            PointF theta = new PointF((float)Math.Sin(angle), (float)Math.Cos(angle));
+
+            // Calculate the x and y modifiers
+            PointF modifier = new PointF(zone.Height / 2F * theta.X, zone.Height / 2F * theta.Y);
+
+            // Calculate opposing corners of the highlight as Points
+            PointF leftTop = new PointF(zone.StartX - modifier.X, zone.StartY + modifier.Y);
+            PointF rightBottom = new PointF(zone.EndX + modifier.X, zone.EndY - modifier.Y);
+
+            // Thetas should be relative to the side that is closest to the viewer's horizontal. 
+            // [LegacyRCAndUtils #5066]
+            angle += Orientation * Math.PI / 180.0;
+
+            // Express the angle from horizontal as a number between -PI/2 and PI/2 [LegacyRCAndUtils #5205]
+            angle = GeometryMethods.GetAngleFromHorizontal(angle);
+
+            // Calculate the thetas
+            theta.X = (float)Math.Sin(angle);
+            theta.Y = (float)Math.Cos(angle);
+
+            // Calculate the min/max x/y of the deskewed highlight
+            PointF negativeTheta = new PointF((float)Math.Sin(-angle), (float)Math.Cos(-angle));
+            leftTop = GeometryMethods.Rotate(leftTop, negativeTheta);
+            rightBottom = GeometryMethods.Rotate(rightBottom, negativeTheta);
+
+            if (leftTop.X > rightBottom.X)
+            {
+                float tmp = leftTop.X;
+                leftTop.X = rightBottom.X;
+                rightBottom.X = tmp;
+            }
+            if (leftTop.Y > rightBottom.Y)
+            {
+                float tmp = leftTop.Y;
+                leftTop.Y = rightBottom.Y;
+                rightBottom.Y = tmp;
+            }
+
+            // Return the fitting data
+            return new FittingData(leftTop, rightBottom, theta);
+        }
+
+        /// <summary>
+        /// Determines if the specified row of pixels contains at least one black pixel.
+        /// </summary>
+        /// <param name="left">The left most pixel in the row.</param>
+        /// <param name="y">The y coordinate of the row.</param>
+        /// <param name="right">The right most pixel in the row.</param>
+        /// <param name="theta">The cosine and sine theta of the angle of the row.</param>
+        /// <param name="probe">The probe used to test image pixels.</param>
+        /// <returns><see langword="true"/> if any pixel in the <paramref name="y"/> from 
+        /// <paramref name="left"/> to <paramref name="right"/> is black; <see langword="false"/> 
+        /// if all pixels in the <paramref name="y"/> from <paramref name="left"/> to 
+        /// <paramref name="right"/> are white.</returns>
+        static bool RowContainsBlackPixel(float y, float left, float right, PointF theta, PixelProbe probe)
+        {
+            for (float x = left; x <= right; x++)
+            {
+                // Check whether this pixel is black
+                if (IsPixelBlack(x, y, theta, probe))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines if the specified pixel is black.
+        /// </summary>
+        /// <param name="x">The x coordinate of the pixel to test.</param>
+        /// <param name="y">The y coordinate of the pixel to test.</param>
+        /// <param name="theta">The cosine and sine of the angle of rotation of the coordinate 
+        /// system.</param>
+        /// <param name="probe">The probe used to test image pixels.</param>
+        /// <returns><see langword="true"/> if the specified pixel is black; 
+        /// <see langword="false"/> if the specified pixel is white.</returns>
+        static bool IsPixelBlack(float x, float y, PointF theta, PixelProbe probe)
+        {
+            PointF pixel = GeometryMethods.Rotate(x, y, theta);
+            Point point = Point.Round(pixel);
+
+            return probe.Contains(point) && probe.IsPixelBlack(point);
+        }
+
+        /// <summary>
+        /// Determines the y coordinate that could split the fitting data into two regions.
+        /// </summary>
+        /// <param name="data">The data to split.</param>
+        /// <param name="probe">The probe to use to test image pixels.</param>
+        /// <returns>The y coordinate of a row of white pixels were it would be appropriate to 
+        /// split the fitting <paramref name="data"/>.</returns>
+        static float FindRowToSplit(FittingData data, PixelProbe probe)
+        {
+            // Starting at the minimum split height, find the first row containing a black pixel
+            float row = data.LeftTop.Y + _MIN_SPLIT_HEIGHT - 2;
+            do
+            {
+                row++;
+
+                // Ensure both highlights meet the minimum splitting height
+                if (row >= data.RightBottom.Y - _MIN_SPLIT_HEIGHT)
+                {
+                    return -1;
+                }
+            }
+            while (!RowContainsBlackPixel(row, data.LeftTop.X, data.RightBottom.X, data.Theta, probe));
+
+            // Look for the next row of white pixels
+            do
+            {
+                row++;
+
+                // Ensure both highlights meet the minimum splitting height
+                if (row > data.RightBottom.Y - _MIN_SPLIT_HEIGHT)
+                {
+                    return -1;
+                }
+            }
+            while (RowContainsBlackPixel(row, data.LeftTop.X, data.RightBottom.X, data.Theta, probe));
+
+            // Store this point. This is the row to split if minimum requirements have been met.
+            float rowToSplit = row;
+
+            // Starting at the minimum split height for the second highlight, 
+            // find the first row containing a black pixel.
+            row = data.RightBottom.Y - _MIN_SPLIT_HEIGHT + 2;
+            do
+            {
+                row--;
+
+                // Ensure both highlights meet the minimum splitting height
+                if (row <= rowToSplit)
+                {
+                    return -1;
+                }
+            }
+            while (!RowContainsBlackPixel(row, data.LeftTop.X, data.RightBottom.X, data.Theta, probe));
+
+            // If we reached this point, we have found a row that can split the highlight
+            return rowToSplit;
         }
 
         /// <summary>
@@ -3036,7 +3442,7 @@ namespace Extract.Imaging.Forms
             // Erase the previous frame if it exists
             Rectangle rectangle = _trackingData.Rectangle;
             ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
-                    Color.Black, FrameStyle.Thick);
+                Color.Black, FrameStyle.Thick);
 
             // If the event was canceled, there is nothing more to do.
             if (cancel)
@@ -3138,12 +3544,13 @@ namespace Extract.Imaging.Forms
                     else
                     {
                         // Add a new redaction to _layerObjects
-                        RasterZone[] rasterZones = new RasterZone[] 
+                        RasterZone zone = new RasterZone(points[0], points[1], height, _pageNumber);
+                        RasterZone[] zones = GetFittedZones(zone);
+                        if (zones != null)
                         {
-                            new RasterZone(points[0], points[1], height, _pageNumber)
-                        };
-                        _layerObjects.Add(new Redaction(this, PageNumber, 
-                            LayerObject.ManualComment, rasterZones, _defaultRedactionFillColor));
+                            _layerObjects.Add(new Redaction(this, PageNumber,
+                            LayerObject.ManualComment, zones, _defaultRedactionFillColor));
+                        }
                     }
 
                     // Draw the new highlight
@@ -3193,7 +3600,7 @@ namespace Extract.Imaging.Forms
 
             // Set the new highlight height (distance formula)
             _defaultHighlightHeight = (int)(Math.Sqrt(Math.Pow(line[0].X - line[1].X, 2) +
-                Math.Pow(line[0].Y - line[1].Y, 2)) + 0.5);
+                                                      Math.Pow(line[0].Y - line[1].Y, 2)) + 0.5);
 
             // Restore the last continuous use cursor tool
             CursorTool = _lastContinuousUseTool;
@@ -3320,10 +3727,10 @@ namespace Extract.Imaging.Forms
             {
                 // Get the top-left and bottom-right corners of the rectangle.
                 Point[] corners = new Point[] 
-            {
-                new Point(rectangle.Left, rectangle.Top),
-                new Point(rectangle.Right, rectangle.Bottom)
-            };
+                    {
+                        new Point(rectangle.Left, rectangle.Top),
+                        new Point(rectangle.Right, rectangle.Bottom)
+                    };
 
                 // Check the direction of conversion
                 if (clientToImage)
@@ -4070,7 +4477,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 return rectangle.Left >= 0 && rectangle.Top >= 0 &&
-                    rectangle.Right <= ImageWidth && rectangle.Bottom <= ImageHeight;
+                       rectangle.Right <= ImageWidth && rectangle.Bottom <= ImageHeight;
             }
             catch (Exception ex)
             {
@@ -4106,7 +4513,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 return rectangle.Left < ImageWidth && rectangle.Top < ImageHeight &&
-            rectangle.Right > 0 && rectangle.Bottom > 0;
+                       rectangle.Right > 0 && rectangle.Bottom > 0;
             }
             catch (Exception ex)
             {
@@ -4499,7 +4906,7 @@ namespace Extract.Imaging.Forms
                     // Add the filter list, index (ensure index is valid), and title to dialog
                     fileDialog.Filter = filterList.ToString();
                     fileDialog.FilterIndex = 
-                        _openImageFilterIndex > _openImageFileTypeFilter.Count ?
+                        _openImageFilterIndex > _openImageFileTypeFilter.Count ? 
                         1 : _openImageFilterIndex;
                     fileDialog.Title = "Open Image File";
 
@@ -4525,8 +4932,8 @@ namespace Extract.Imaging.Forms
         public void SelectRemoveSelectedLayerObjects()
         {
             try 
-	        {
-		        // We are done if there are no selected layer objects
+            {
+                // We are done if there are no selected layer objects
                 if (_layerObjects.Selection.Count <= 0)
                 {
                     return;
@@ -4636,7 +5043,7 @@ namespace Extract.Imaging.Forms
 
                         // Add the buttons to message box
                         messageBox.AddButton("Delete selected objects" + Environment.NewLine + 
-                            "and all their linked objects", "All", false);
+                                             "and all their linked objects", "All", false);
                         messageBox.AddButton("Delete selected objects only", "Selected", false);
                         messageBox.AddButton("Cancel", "Cancel", true);
 
@@ -4707,11 +5114,11 @@ namespace Extract.Imaging.Forms
                         messageBox.Show();
                     }
                 }
-	        }
-	        catch (Exception ex)
-	        {
-		        ExtractException.Display("ELI22599", ex);
-	        }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI22599", ex);
+            }
         }
 
         /// <summary>
@@ -5002,7 +5409,7 @@ namespace Extract.Imaging.Forms
                 if (brush.IsInvalid)
                 {
                     throw new ExtractException("ELI21591", "Unable to create brush for region.",
-                       new Win32Exception(Marshal.GetLastWin32Error()));
+                        new Win32Exception(Marshal.GetLastWin32Error()));
                 }
 
                 // Get the region handle
