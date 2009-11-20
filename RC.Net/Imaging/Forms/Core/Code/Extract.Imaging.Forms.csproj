@@ -165,13 +165,17 @@
     <Compile Include="Controls\SelectLayerObjectToolStripButton.Designer.cs">
       <DependentUpon>SelectLayerObjectToolStripButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="CursorTool.cs" />
     <Compile Include="EditHighlightTextForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EditHighlightTextForm.Designer.cs">
       <DependentUpon>EditHighlightTextForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FitMode.cs" />
+    <Compile Include="FittingData.cs" />
     <Compile Include="ImageLayerObject.cs" />
+    <Compile Include="ImageViewerCursors.cs" />
     <Compile Include="LayerObjectsCollectionEventArguments.cs" />
     <Compile Include="Controls\HighlightToolStripSplitButton.cs">
       <SubType>Component</SubType>
@@ -618,6 +622,7 @@
     </Compile>
     <Compile Include="TrackingData.cs" />
     <Compile Include="VisitedItemsCollection.cs" />
+    <Compile Include="ZoomInfo.cs" />
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
