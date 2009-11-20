@@ -97,9 +97,21 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 			createDirectory( strOutputFolder );
 		}
 
-		// Extract separate filename and extension strings
+		// Extract separate filename and a file extension string
 		string strFile = getFileNameWithoutExtension( strInputFile, false );
 		string strExt = getExtensionFromFullPath( strInputFile, false );
+
+		// Check for another file extension (i.e. ".tif" from C:\123.tif.voa)
+		string strExt2 = getExtensionFromFullPath( strFile, false );
+		string strFile2 = getFileNameWithoutExtension( strFile, false );
+		if (strExt2.length() > 0)
+		{
+			// Input file has at least two extensions, combine them
+			strExt2 += strExt.c_str();
+			strExt = strExt2;
+			// Use strFile2 as the filename string
+			strFile = strFile2;
+		}
 
 		// Check delay string for units
 		bool bUseMilliSeconds = false;
