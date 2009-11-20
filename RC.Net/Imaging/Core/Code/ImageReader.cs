@@ -196,6 +196,36 @@ namespace Extract.Imaging
             }
         }
 
+        /// <summary>
+        /// Creates a <see cref="PixelProbe"/> class for the specified page.
+        /// </summary>
+        /// <param name="pageNumber">The 1-based page number of the page whose pixels should be 
+        /// tested.</param>
+        public PixelProbe CreatePixelProbe(int pageNumber)
+        {
+            RasterImage image = null;
+            try
+            {
+                image = _codecs.Load(_stream, 1, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber);
+
+                return new PixelProbe(image);
+            }
+            catch (Exception ex)
+            {
+                // Dispose of the image
+                if (image != null)
+                {
+                    image.Dispose();
+                }
+
+                // Wrap as ExtractException
+                ExtractException ee = new ExtractException("ELI28612",
+                    "Unable to create pixel probe.", ex);
+                ee.AddDebugData("Page number", pageNumber, false);
+                throw ee;
+            }
+        }
+
         #endregion Methods
 
         #region IDisposable Members
