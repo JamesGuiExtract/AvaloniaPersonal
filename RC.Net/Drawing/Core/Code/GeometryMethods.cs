@@ -1,11 +1,8 @@
-using Extract;
 using Extract.Licensing;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Text;
 
 namespace Extract.Drawing
 {
@@ -19,8 +16,7 @@ namespace Extract.Drawing
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(GeometryMethods).ToString();
+        static readonly string _OBJECT_NAME = typeof(GeometryMethods).ToString();
 
         #endregion Constants
 
@@ -183,7 +179,7 @@ namespace Extract.Drawing
                 _licenseCache.Validate("ELI23165");
 
                 // Calculate the slope of the line
-                double slope = GeometryMethods.GetAngle(start, end);
+                double slope = GetAngle(start, end);
 
                 // Calculate the vertical and horizontal modifiers. These are the values to add and 
                 // subtract from the line endpoints to determine the bounds of the rectangle.
@@ -225,7 +221,7 @@ namespace Extract.Drawing
                 _licenseCache.Validate("ELI23166");
 
                 // Calculate the slope of the line
-                double slope = GeometryMethods.GetAngle(Point.Truncate(start),
+                double slope = GetAngle(Point.Truncate(start),
                     Point.Truncate(end));
 
                 // Calculate the vertical and horizontal modifiers. These are the values to add and 
@@ -268,7 +264,7 @@ namespace Extract.Drawing
                 _licenseCache.Validate("ELI23167");
 
                 // Calculate the angle of the line
-                double angle = GeometryMethods.GetAngle(start, end);
+                double angle = GetAngle(start, end);
 
                 // Calculate the vertical and horizontal modifiers. These are the values to add and 
                 // subtract from the line endpoints to determine the bounds of the rectangle.
@@ -372,7 +368,7 @@ namespace Extract.Drawing
                 }
 
                 // Get the smallest rectangle that contains the rotated points.
-                Rectangle rotatedRectangle = GeometryMethods.GetBoundingRectangle(cornerPoints);
+                Rectangle rotatedRectangle = GetBoundingRectangle(cornerPoints);
 
                 return rotatedRectangle;
             }
@@ -429,7 +425,7 @@ namespace Extract.Drawing
                 _licenseCache.Validate("ELI23168");
 
                 // Compute the area
-                double area = Distance(start, end) * (double)height;
+                double area = Distance(start, end) * height;
 
                 // Return the area
                 return area;
@@ -476,7 +472,7 @@ namespace Extract.Drawing
                 double cosSlope = Math.Cos(slope);
 
                 // Calculate mid point of the line joining start and end points
-                Point midpoint = GeometryMethods.GetCenterPoint(start, end);
+                Point midpoint = GetCenterPoint(start, end);
 
                 // Rotate the zone coordinates using Rotation and Translation matrix
                 Point newStart = new Point(
@@ -570,5 +566,89 @@ namespace Extract.Drawing
         }
 
         #endregion GeometryMethods Methods
+
+        /// <summary>
+        /// Gets the specified angle as an angle between -PI/2 (exclusive) and PI/2 (inclusive)
+        /// from horizontal.
+        /// </summary>
+        /// <param name="radians">The radians to express as a new angle.</param>
+        /// <returns>The specified angle as an angle between -PI/2 (exclusive) and PI/2 
+        /// (inclusive) from horizontal.</returns>
+        public static double GetAngleFromHorizontal(double radians)
+        {
+            try
+            {
+                if (radians >= Math.PI / 2.0)
+                {
+                    return radians - Math.PI;
+                }
+                else if (radians < -Math.PI / 2.0)
+                {
+                    return radians + Math.PI;
+                }
+
+                return radians;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI28618",
+                    "Unable to calculate angle from horizontal.", ex);
+                ee.AddDebugData("Radians", radians, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Rotates the specified point by the specified sin and cosine theta.
+        /// </summary>
+        /// <param name="point">The point to rotate.</param>
+        /// <param name="theta">The angles of rotation.</param>
+        /// <returns>The <paramref name="point"/> rotated by the specified sin and cosine 
+        /// <paramref name="theta"/>.</returns>
+        public static PointF Rotate(PointF point, PointF theta)
+        {
+            return Rotate(point.X, point.Y, theta.X, theta.Y);
+        }
+
+        /// <summary>
+        /// Rotates the specified point by the specified sin and cosine theta.
+        /// </summary>
+        /// <param name="x">The x coordinate of the point to rotate.</param>
+        /// <param name="y">The y coordinate of the point to rotate.</param>
+        /// <param name="theta">The angles of rotation.</param>
+        /// <returns>The point rotated by the specified sin and cosine <paramref name="theta"/>.
+        /// </returns>
+        // X and Y are descriptive names for a coordinate
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "x")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "y")]
+        public static PointF Rotate(float x, float y, PointF theta)
+        {
+            return Rotate(x, y, theta.X, theta.Y);
+        }
+
+        /// <summary>
+        /// Rotates the specified point by the specified sin and cosine theta.
+        /// </summary>
+        /// <param name="x">The x coordinate of the point to rotate.</param>
+        /// <param name="y">The y coordinate of the point to rotate.</param>
+        /// <param name="sinTheta">The sin theta by which to rotate the point.</param>
+        /// <param name="cosTheta">The cos theta by which to rotate the point.</param>
+        /// <returns>The point rotated by the specified <paramref name="sinTheta"/> and 
+        /// <paramref name="cosTheta"/>.
+        /// </returns>
+        // X and Y are descriptive names for a coordinate
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "x")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "y")]
+        public static PointF Rotate(float x, float y, float sinTheta, float cosTheta)
+        {
+            try
+            {
+                return new PointF(x * cosTheta - y * sinTheta, x * sinTheta + y * cosTheta);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28619", ex);
+            }
+        }
     }
 }
