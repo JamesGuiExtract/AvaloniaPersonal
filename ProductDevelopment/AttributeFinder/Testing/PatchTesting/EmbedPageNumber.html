@@ -1,0 +1,108 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0 EmbedPageNumber Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0<br> EmbedPageNumber Testing<br> <IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> CA - Contra Costa - AtPac
+   	<LI><b>SCRs:</b> DotNetRCAndUtils #355
+   	<LI><b>Issue:</b> Contra Costa needs a utility to modify a filename and include 
+	the count of pages for the image.
+	<ol>
+		<li>The application shall run from the command line.
+		<li>The application shall change the filename if and only if:
+		<ul>
+			<li>The filename is exactly 200 characters in length.
+			<li>The last 6 characters before the file extension are 
+			<b>XXXXXX</b>.
+			<li>The file is a standard supported image type such as 
+			TIF, JPG, PDF, etc.
+		</ul>
+		<li>If any of the above conditions are not met, then the application 
+		shall do nothing.
+		<li>If all of the above conditions are met, the application shall 
+		change the <b>XXXXXX</b> to <i>nnnnnn</i> to indicate the page count 
+		of the image.
+		<li>If all of the above conditions are met, but the application is 
+		unable to modify the filename, then a message shall be displayed and 
+		an exception shall be logged.
+	</ol>
+</ul>
+<p>
+<h3>Tests</h3>
+<OL>
+	<LI><b>Setup</b>
+	<ul>
+		<li><b>I:\users\Jeff_Shergalis\Public\CCC-EmbedPageNumber.exe-Utility\CCC-EmbedPageNumber.exe-Utility.zip</b> 
+		contains the EXE and supporting LeadTools DLLs needed for installation.
+		<li><b>I:\users\Jeff_Shergalis\Public\CCC-EmbedPageNumber.exe-Utility\CCCOB_Extract_Samples.zip</b> 
+		contains five test images that have already been renamed with page counts.
+		<li>Unzip and install the utility and supporting DLLs.
+		<li>Unzip the test images to a working folder.
+		<li>Make a copy of the images such that the filenames are changed 
+		to have <b>XXXXXX</b> as the last six characters before the file 
+		extension.
+		<li>Make another copy of the images such that the filenames are 
+		changed appropriately.  
+		<ul>
+			<li>Modify one of the filenames to have too few characters.
+			<li>Modify one of the filenames to have too many characters.
+			<li>Modify one of the files to have an appropriate filename 
+			but to actually be a VOA file or a USS file.
+			<li>Move one of the files to a subfolder and set the folder permissions 
+			to <b>Deny - Write</b> for the logged in user.  Confirm that the user is 
+			unable to rename the file from Windows Explorer after modifying the 
+			folder permissions.
+		</ul>
+	</ul>
+<p>
+	<LI><b>Good Test</b>
+	<ul>
+		<LI><b>Exercise the first set of images</b>
+		<ul>
+			<li>Confirm that the filenames are changed properly.
+			<li>Confirm that the files can be opend and have the expected 
+			numbers of pages.
+       		</ul>
+	   	</LI>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Bad Test</b>
+	<ul>
+		<LI><b>Exercise the second set of images</b> - including the image in 
+		the restricted subfolder.
+		<ul>
+			<li>Confirm that the filename with too few characters is 
+			unchanged.
+			<li>Confirm that the filename with too many characters is 
+			unchanged.
+			<li>For the file in the restricted subfolder:
+	       		<ul>
+				<li>Confirm that an exception is displayed and logged 
+				when processing this file.
+				<li>Confirm that the filename is unchanged.
+	       		</ul>
+			<li>Confirm that the filename for the non-image file is 
+			unchanged.
+	       		<ul>
+		       		<li>Confirm that an exception is not logged or displayed.
+		       		<li>Confirm that the page count in the FAM grids is <b>0</b>.
+	       		</ul>
+			<li>Confirm that one filename is changed properly.
+       		</ul>
+	   	</LI>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
