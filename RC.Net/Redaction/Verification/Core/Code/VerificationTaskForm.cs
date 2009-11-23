@@ -177,7 +177,8 @@ namespace Extract.Redaction.Verification
 
                 _imageViewer.DefaultRedactionFillColor = _iniSettings.OutputRedactionColor;
 
-                _options = VerificationOptions.ReadFrom(_iniSettings);
+                VerificationOptions options = VerificationOptions.ReadFrom(_iniSettings);
+                SetVerificationOptions(options);
 
                 _currentVoa = new RedactionFileLoader(_iniSettings.ConfidenceLevels);
 
@@ -561,6 +562,9 @@ namespace Extract.Redaction.Verification
                 // Store the current document in the history
                 _history.Add(_savedMemento);
                 _historyIndex++;
+
+                // Close current image before opening a new one. [FIDSC #3824]
+                _imageViewer.CloseImage();
 
                 // Successfully complete this file
                 OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSuccessful));
@@ -1252,6 +1256,20 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Stores the verification options specified and sets them on the 
+        /// <see cref="RedactionGridView"/>.
+        /// </summary>
+        /// <param name="options">The verification options to retain.</param>
+        void SetVerificationOptions(VerificationOptions options)
+        {
+            _options = options;
+
+            _redactionGridView.AutoTool = _options.AutoTool;
+            _redactionGridView.AutoZoom = _options.AutoZoom;
+            _redactionGridView.AutoZoomScale = _options.AutoZoomScale;
+        }
+
         #endregion Methods
 
         #region Overrides
@@ -1389,12 +1407,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                _redactionGridView.CommitChanges();
-
-                if (!WarnIfInvalid())
-	            {
-                    Commit();
-	            }
+                SelectSaveAndCommit();
             }
             catch (Exception ex)
             {
@@ -1473,6 +1486,9 @@ namespace Extract.Redaction.Verification
                     SaveRedactionCounts(screenTime);
 
                     CommitComment();
+
+                    // Close current image before opening a new one. [FIDSC #3824]
+                    _imageViewer.CloseImage();
 
                     OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSkipped));
                 }
@@ -1678,12 +1694,9 @@ namespace Extract.Redaction.Verification
                 VerificationOptionsDialog dialog = new VerificationOptionsDialog(_options);
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    _options = dialog.VerificationOptions;
-                    _options.WriteTo(_iniSettings);
+                    SetVerificationOptions(dialog.VerificationOptions);
 
-                    _redactionGridView.AutoTool = _options.AutoTool;
-                    _redactionGridView.AutoZoom = _options.AutoZoom;
-                    _redactionGridView.AutoZoomScale = _options.AutoZoomScale;
+                    _options.WriteTo(_iniSettings);
                 }
             }
             catch (Exception ex)
