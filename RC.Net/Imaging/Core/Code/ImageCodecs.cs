@@ -78,14 +78,20 @@ namespace Extract.Imaging
         /// <returns>An <see cref="ImageReader"/> to read <paramref name="fileName"/>.</returns>
         public ImageReader CreateReader(string fileName)
         {
+            RasterCodecs codecs = null;
             try
             {
-                RasterCodecs codecs = GetCodecs();
+                codecs = GetCodecs();
 
                 return new ImageReader(fileName, codecs);
             }
             catch (Exception ex)
             {
+                if (codecs != null)
+                {
+                    codecs.Dispose();
+                }
+
                 ExtractException ee = new ExtractException("ELI28479",
                     "Unable to create image reader.", ex);
                 ee.AddDebugData("File name", fileName, false);
@@ -101,14 +107,20 @@ namespace Extract.Imaging
         /// <returns>An <see cref="ImageWriter"/> to write to <paramref name="fileName"/>.</returns>
         public ImageWriter CreateWriter(string fileName, RasterImageFormat format)
         {
+            RasterCodecs codecs = null;
             try
             {
-                RasterCodecs codecs = GetCodecs();
+                codecs = GetCodecs();
 
                 return new ImageWriter(fileName, codecs, format);
             }
             catch (Exception ex)
             {
+                if (codecs != null)
+                {
+                    codecs.Dispose();
+                }
+
                 ExtractException ee = new ExtractException("ELI28480",
                     "Unable to create image writer", ex);
                 ee.AddDebugData("File name", fileName, false);
@@ -157,7 +169,7 @@ namespace Extract.Imaging
         {
             const string pdfDirectory = 
 #if DEBUG
-                @"\..\..\ReusableComponents\APIs\LeadTools_16.5\PDF";
+                @"..\..\ReusableComponents\APIs\LeadTools_16.5\PDF";
 #else
                 @".\PDF";
 #endif
