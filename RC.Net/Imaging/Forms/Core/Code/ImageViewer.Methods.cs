@@ -450,12 +450,9 @@ namespace Extract.Imaging.Forms
                 // Set the wait cursor
                 waitCursor = new TemporaryWaitCursor();
 
-                // Determine whether the output format is a tiff
-                bool isTiff = IsTiff(format);
-
                 // Check if annotations will be stored as tiff tags
                 AnnCodecs annCodecs = null;
-                if (_displayAnnotations && isTiff)
+                if (_displayAnnotations && ImageMethods.IsTiff(format))
                 {
                     // Prepare to store tiff tags
                     annCodecs = new AnnCodecs();
@@ -526,7 +523,10 @@ namespace Extract.Imaging.Forms
 
                     // Add the page to the resultant image
                     writer.AppendImage(page);
-                    writer.WriteTagOnPage(tag, i);
+                    if (tag != null)
+                    {
+                        writer.WriteTagOnPage(tag, i);
+                    }
                 }
                 transform = null;
                 hdc = IntPtr.Zero;
@@ -646,64 +646,6 @@ namespace Extract.Imaging.Forms
                 // Draw the watermark
                 DrawingMethods.DrawRotatedString(graphics, _watermark, font, Brushes.DimGray,
                     center, -45);
-            }
-        }
-
-        /// <summary>
-        /// Determines whether the specified format is a tagged image file format (TIFF).
-        /// </summary>
-        /// <param name="format">The image format to evaluate.</param>
-        /// <returns><see langword="true"/> if <paramref name="format"/> is a tagged image file 
-        /// format; <see langword="false"/> if the <paramref name="format"/> is not a tagged image 
-        /// file format.</returns>
-        static bool IsTiff(RasterImageFormat format)
-        {
-            switch (format)
-            {
-                case RasterImageFormat.Ccitt:
-                case RasterImageFormat.CcittGroup31Dim:
-                case RasterImageFormat.CcittGroup32Dim:
-                case RasterImageFormat.CcittGroup4:
-                case RasterImageFormat.GeoTiff:
-                case RasterImageFormat.IntergraphCcittG4:
-                case RasterImageFormat.RawCcitt:
-                case RasterImageFormat.Tif:
-                case RasterImageFormat.TifAbc:
-                case RasterImageFormat.TifAbic:
-                case RasterImageFormat.TifCmp:
-                case RasterImageFormat.TifCmw:
-                case RasterImageFormat.TifCmyk:
-                case RasterImageFormat.TifCustom:
-                case RasterImageFormat.TifDxf:
-                case RasterImageFormat.TifJ2k:
-                case RasterImageFormat.TifJbig:
-                case RasterImageFormat.TifJbig2:
-                case RasterImageFormat.TifJpeg:
-                case RasterImageFormat.TifJpeg411:
-                case RasterImageFormat.TifJpeg422:
-                case RasterImageFormat.TifLead1Bit:
-                case RasterImageFormat.TifLeadMrc:
-                case RasterImageFormat.TifLzw:
-                case RasterImageFormat.TifLzwCmyk:
-                case RasterImageFormat.TifLzwYcc:
-                case RasterImageFormat.TifMrc:
-                case RasterImageFormat.TifPackBits:
-                case RasterImageFormat.TifPackBitsCmyk:
-                case RasterImageFormat.TifPackbitsYcc:
-                case RasterImageFormat.TifUnknown:
-                case RasterImageFormat.TifYcc:
-                case RasterImageFormat.TifZip:
-                case RasterImageFormat.TifxFaxG31D:
-                case RasterImageFormat.TifxFaxG32D:
-                case RasterImageFormat.TifxFaxG4:
-                case RasterImageFormat.TifxJbig:
-                case RasterImageFormat.TifxJbigT43:
-                case RasterImageFormat.TifxJbigT43Gs:
-                case RasterImageFormat.TifxJbigT43ItuLab:
-                case RasterImageFormat.TifxJpeg:
-                    return true;
-                default:
-                    return false;
             }
         }
 
