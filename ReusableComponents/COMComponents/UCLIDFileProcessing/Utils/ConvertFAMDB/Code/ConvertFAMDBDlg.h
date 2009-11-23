@@ -3,7 +3,10 @@
 
 #pragma once
 
+#include "stdafx.h"
+
 #include <DBInfoCombo.h>
+#include <Win32Event.h>
 
 // CConvertFAMDBDlg dialog
 class CConvertFAMDBDlg : public CDialog
@@ -45,9 +48,18 @@ private:
 	DBInfoCombo m_cbToServer;
 	DBInfoCombo m_cbToDB;
 	CButton m_checkRetainHistoryData;
+	CStatic m_staticCurrentStep;
+	CStatic m_staticCurrentRecord;
+	CProgressCtrl m_progressCurrent;
+	CButton m_buttonStart;
+	CButton m_buttonClose;
 
 	// Stores the control that last had focus
 	int m_iLastControlID;
+
+	// Events used to signal the start of the conversion and the completion
+	Win32Event m_eventConvertStarted;
+	Win32Event m_eventConvertComplete;
 
 	// Methods
 
@@ -83,9 +95,19 @@ private:
 	// Method will turn IDENTITY_INSERT on or off for the table in strTable
 	void identityInsert(_ConnectionPtr ipDestDBConnection, const string& strTable, bool bState);
 
+	// Method will build the string to be displayed for the given step and update the current step
+	// control, rnStepNumber will be incremented.
+	void updateCurrentStep(string strStepDescription, long &rnStepNumber, long nTotalSteps);
+
 	// This method does basic validation. It checks the to and from servers and database to make sure
 	// they are not blank and verifies the schema version of the database to convert from
 	// is for a 5.0 database. If it finds a problem is changes the focus to that control and 
 	// displays a message.
 	bool isInputDataValid();
+
+	// Enables or disables the controls
+	void enableControls(bool bEnable);
+
+	// Thread function that calls convertDatabase pData should be passed the this pointer
+	static UINT convertDatabaseInThread(void *pData);
 };

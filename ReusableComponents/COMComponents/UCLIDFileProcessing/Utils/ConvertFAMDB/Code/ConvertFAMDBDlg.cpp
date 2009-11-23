@@ -95,6 +95,11 @@ void CConvertFAMDBDlg::DoDataExchange(CDataExchange* pDX)
 		DDX_Control(pDX, IDC_COMBO_TO_SERVER, m_cbToServer);
 		DDX_Control(pDX, IDC_COMBO_TO_DB, m_cbToDB);
 		DDX_Control(pDX, IDC_CHECK_RETAIN_HISTORY_DATA, m_checkRetainHistoryData);
+		DDX_Control(pDX, IDC_STATIC_CURRENT_STEP, m_staticCurrentStep);
+		DDX_Control(pDX, IDC_STATIC_CURRENT_RECORD, m_staticCurrentRecord);
+		DDX_Control(pDX, IDC_PROGRESS_CURRENT, m_progressCurrent);
+		DDX_Control(pDX, IDOK, m_buttonStart);
+		DDX_Control(pDX, IDCANCEL, m_buttonClose);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18067");
 }
@@ -144,7 +149,7 @@ BOOL CConvertFAMDBDlg::OnInitDialog()
 
 		// check the retain history check
 		m_checkRetainHistoryData.SetCheck(BST_CHECKED);
-
+		
 		// Set the icon for this dialog.  The framework does this automatically
 		//  when the application's main window is not a dialog
 		SetIcon(m_hIcon, TRUE);			// Set big icon
@@ -159,6 +164,13 @@ void CConvertFAMDBDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	try
 	{
+		// if the conversion process is running display message and return (don't process the close)
+		if (m_eventConvertStarted.isSignaled() && !m_eventConvertComplete.isSignaled() && nID == SC_CLOSE)
+		{
+			AfxMessageBox("The database is still in the process of being converted. Please wait.");
+			return;
+		}
+
 		if ((nID & 0xFFF0) == IDM_ABOUTBOX)
 		{
 			CAboutDlg dlgAbout;
@@ -282,11 +294,12 @@ void CConvertFAMDBDlg::OnBnClickedOk()
 		// If the user answers yes to the question convert the database
 		if ( iResult == IDYES )
 		{
-			// Convert the database
-			convertDatabase();
+			// Reset the Convert Events
+			m_eventConvertStarted.reset();
+			m_eventConvertComplete.reset();
 
-			// Tell the user the database has been converted
-			AfxMessageBox("The database has been successfully converted.", MB_OK | MB_ICONINFORMATION);
+			// Start the conversion thread
+			AfxBeginThread(convertDatabaseInThread, this);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18073");
@@ -301,6 +314,12 @@ void CConvertFAMDBDlg::convertDatabase()
 
 	try
 	{
+		// Disable the controls so they cannot be modified until after the conversion is done
+		enableControls(false);
+
+		// Signal that the conversion has started
+		m_eventConvertStarted.signal();
+
 		// Log exception to indicate that a database is being converted
 		UCLIDException ue("ELI28525", "Application Trace: Converting DB to 8.0");
 		ue.addDebugInfo("From Server", (LPCSTR) m_zFromServer);
@@ -309,6 +328,8 @@ void CConvertFAMDBDlg::convertDatabase()
 		ue.addDebugInfo("To DB", (LPCSTR) m_zToDB);
 		ue.log();
 
+		m_staticCurrentStep.SetWindowText("Creating database");
+		
 		// Create a FAMDB object for creating the new database and adding the actions
 		IFileProcessingDBPtr ipFAMDB(CLSID_FileProcessingDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI19889", ipFAMDB != NULL);
@@ -331,9 +352,22 @@ void CConvertFAMDBDlg::convertDatabase()
 		ASSERT_RESOURCE_ALLOCATION("ELI20014", ipOldDB != NULL );
 		_lastCodePos = "40";
 
+		// Need to determine the number of steps for the progress
+		bool bConvertIDShieldTable = doesTableExist(ipOldDB, "IDShieldData") && doesTableExist(ipNewDB, "IDShieldData");
+		bool bRetainHistory = m_checkRetainHistoryData.GetCheck() == BST_CHECKED;
+
+		// There are 8 steps + 2 for converting the IDShield table if the table exists + 
+		// 2 for retaining history (QueueEvent and FAST tables)
+		long nNumberOfSteps = 8 + (bConvertIDShieldTable ? 2 : 0) + (bRetainHistory ? 2 : 0); 
+		long nCurrentStep = 2;
+
+		updateCurrentStep("Creating actions ", nCurrentStep, nNumberOfSteps);
+		
 		// Add the actions from the old DB to the new DB using the FAMDB object
 		addActionsToNewDB(ipFAMDB, ipOldDB);
 		_lastCodePos = "50";
+
+		updateCurrentStep("Updating DBInfo settings", nCurrentStep, nNumberOfSteps);
 
 		// Copy existing settings
 		copyDBInfoSettings(ipFAMDB, ipOldDB);
@@ -342,49 +376,70 @@ void CConvertFAMDBDlg::convertDatabase()
 		// Done with the FAMDB object so set to NULL
 		ipFAMDB = NULL;
 
+		updateCurrentStep("Copying FAMUser table", nCurrentStep, nNumberOfSteps);
+
 		// Copy the FAMUser table preserving the ID
 		copyRecords(ipOldDB, ipNewDB, "FAMUser", "FAMUser", true);
 		_lastCodePos = "60";
+
+		updateCurrentStep("Copying Machine table", nCurrentStep, nNumberOfSteps);
 
 		// Copy the Machine table preserving the ID
 		copyRecords(ipOldDB, ipNewDB, "Machine", "Machine", true);
 		_lastCodePos = "70";
 
+		updateCurrentStep("Copying FAMFile table", nCurrentStep, nNumberOfSteps);
+		
 		// Copy the FAMFile records preserving the ID field since it is used in links to 
 		// other tables
 		copyRecords	(ipOldDB, ipNewDB, "FAMFile", "FAMFile", true);
 		_lastCodePos = "80";
 
+		updateCurrentStep("Copying Login table", nCurrentStep, nNumberOfSteps);
+		
 		// Copy the Login table without preserving the ID
 		copyRecords(ipOldDB, ipNewDB, "Login", "Login");
 		_lastCodePos = "90";
 		
+		updateCurrentStep("Copying ActionStatistics table", nCurrentStep, nNumberOfSteps);
+				
 		// Copy the ActionStatistics table
 		copyRecords(ipOldDB, ipNewDB, gstrSELECT_ACTIONSTATISTICS_FOR_TRANSFER_FROM_7_0, "ActionStatistics");
 		_lastCodePos = "100";
 
-		// Only copy the FAST and QueueEvent records if retaining history data
-		if (m_checkRetainHistoryData.GetCheck() == BST_CHECKED)
+		// If there is an IDShieldData table copy it.
+		if (bConvertIDShieldTable)
 		{
+			updateCurrentStep("Copying IDShieldData table", nCurrentStep, nNumberOfSteps);
+					
+			// Need to check first if there is a IDShieldData file
+			copyRecords(ipOldDB, ipNewDB, gstrSELECT_IDSHIELD_DATA_FOR_TRANSFER_FROM_7_0, "IDShieldData");
+			_lastCodePos = "130";
+
+			updateCurrentStep("Updating IDShieldData table", nCurrentStep, nNumberOfSteps);
+			m_staticCurrentRecord.SetWindowText("Please wait...");
+
+			// Fix up the duration totals
+			executeCmdQuery(ipNewDB, gstrUPDATE_IDSHIELD_DATA_DURATION_FOR_8_0);
+		}
+	
+		// Only copy the FAST and QueueEvent records if retaining history data
+		if (bRetainHistory)
+		{
+			updateCurrentStep("Copying FileActionStateTransition table", nCurrentStep, nNumberOfSteps);
+					
 			// Copy the FileActionStateTransition
 			copyRecords(ipOldDB, ipNewDB, gstrSELECT_FAST_RECORDS_FOR_TRANSFER_FROM_7_0, "FileActionStateTransition");
 			_lastCodePos = "110";
 
+			updateCurrentStep("Copying QueueEvent table", nCurrentStep, nNumberOfSteps);
+			
 			// Copy the QueueEventRecords table 
 			copyRecords(ipOldDB, ipNewDB, "QueueEvent", "QueueEvent");
 			_lastCodePos = "120";
 		}
 
-		// If there is an IDShieldData table copy it.
-		if (doesTableExist(ipOldDB, "IDShieldData") && doesTableExist(ipNewDB, "IDShieldData"))
-		{
-			// Need to check first if there is a IDShieldData file
-			copyRecords(ipOldDB, ipNewDB, gstrSELECT_IDSHIELD_DATA_FOR_TRANSFER_FROM_7_0, "IDShieldData");
-			_lastCodePos = "130";
-
-			// Fix up the duration totals
-			executeCmdQuery(ipNewDB, gstrUPDATE_IDSHIELD_DATA_DURATION_FOR_8_0);
-		}
+		m_staticCurrentStep.SetWindowText("");
 
 		// Log exception to indicate that a database convertion is complete
 		UCLIDException ueCompleted("ELI28526", "Application Trace: DB has been converted to 8.0");
@@ -393,8 +448,23 @@ void CConvertFAMDBDlg::convertDatabase()
 		ueCompleted.addDebugInfo("To Server", (LPCSTR) m_zToServer);
 		ueCompleted.addDebugInfo("To DB", (LPCSTR) m_zToDB);
 		ueCompleted.log();
+		
+		// Tell the user the database has been converted
+		AfxMessageBox("The database has been successfully converted.", MB_OK | MB_ICONINFORMATION);
+		enableControls(true);
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20148");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI20148");
+
+	try
+	{
+		// Signal that the conversion is complete
+		m_eventConvertComplete.signal();
+
+		// Clear the text in the status controls
+		m_staticCurrentRecord.SetWindowText("");
+		m_staticCurrentStep.SetWindowText("");
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28620");
 }
 //-------------------------------------------------------------------------------------------------
 _ConnectionPtr CConvertFAMDBDlg::getConnection(const string& strServer, const string& strDatabase)
@@ -444,21 +514,41 @@ void CConvertFAMDBDlg::addActionsToNewDB(IFileProcessingDBPtr ipFAMDB, _Connecti
 			adLockReadOnly, adCmdTable );
 		_lastCodePos = "10";
 
+		long nRecordCount = ipSourceActionSet->GetRecordCount();
+		string strRcdCount = asString(nRecordCount);
+		long nCurrentRecord = 1;
+		_lastCodePos = "20";
+
+		// Setup the progress bar
+		m_progressCurrent.SetRange32(1, nRecordCount + 1);
+		_lastCodePos = "30";
+
 		// While there are Actions in the Source table
-		while (!ipSourceActionSet->adoEOF)
+		while (ipSourceActionSet->adoEOF == VARIANT_FALSE)
 		{
 			// Get the action name
 			string strActionName = getStringField(ipSourceActionSet->Fields, "ASCName");
-			_lastCodePos = "20";
+			_lastCodePos = "40_" + strActionName;
+
+			string strRcdString = "Creating action " + asString(nCurrentRecord) + " of " + strRcdCount;
+			m_staticCurrentRecord.SetWindowText(strRcdString.c_str());
+			_lastCodePos = "50_" + strActionName;
+
+			// Set progress position
+			m_progressCurrent.SetPos(nCurrentRecord);
+			_lastCodePos = "60_" + strActionName;
 
 			// Create the action in the new database
 			ipFAMDB->DefineNewAction(strActionName.c_str());
-			_lastCodePos = "30_" + strActionName;
+			_lastCodePos = "70_" + strActionName;
 
 			// Move to the next action
 			ipSourceActionSet->MoveNext();
-			_lastCodePos = "40";
+			_lastCodePos = "80_" + strActionName;
+			
+			nCurrentRecord++;
 		}
+		_lastCodePos = "90";
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20150");
 }
@@ -497,24 +587,28 @@ void CConvertFAMDBDlg::copyRecords(_ConnectionPtr ipSourceDBConnection, _Connect
 
 	try
 	{
+		m_staticCurrentRecord.SetWindowText("Calculating...");
+		_lastCodePos = "10";
+
 		ASSERT_ARGUMENT("ELI20020", ipSourceDBConnection != NULL);
 		ASSERT_ARGUMENT("ELI20021", ipDestDBConnection != NULL);
 
 		// Create the source ActionStatistics recordset
 		_RecordsetPtr ipSourceSet( __uuidof( Recordset ));
 		ASSERT_RESOURCE_ALLOCATION("ELI20022", ipSourceSet != NULL );
+		_lastCodePos = "20";
 
 		// Source could be a Select statement
 		string strSelect = strSource.substr(0, strlen("SELECT"));
 		makeUpperCase(strSelect);
-		_lastCodePos = "10";
+		_lastCodePos = "30";
 
 		bool bSourceIsQuery = strSelect == "SELECT";
 
 		// Open the Source set
 		ipSourceSet->Open( strSource.c_str(), _variant_t((IDispatch *)ipSourceDBConnection, true), 
 			adOpenStatic, adLockReadOnly, bSourceIsQuery ? adCmdText : adCmdTable );
-		_lastCodePos = "20";
+		_lastCodePos = "40";
 
 		// Create the destination ActionStatistics recordset
 		_RecordsetPtr ipDestSet( __uuidof( Recordset ));
@@ -525,50 +619,70 @@ void CConvertFAMDBDlg::copyRecords(_ConnectionPtr ipSourceDBConnection, _Connect
 		{
 			// Turn on IDENTITY_INSERT to allow copying of ID
 			identityInsert(ipDestDBConnection, strSource, true); 
-			_lastCodePos = "30";
+			_lastCodePos = "50";
 		}
 
 		// Open the ActionStatistics set table in the database
 		ipDestSet->Open( strDest.c_str(), _variant_t((IDispatch *)ipDestDBConnection, true), adOpenDynamic, 
 			adLockOptimistic, adCmdTable );
-		_lastCodePos = "40";
+		_lastCodePos = "60";
 
-		// Counter to count the number of times through the loop
-		long nCount = 0;
+		long nRecordCount = ipSourceSet->GetRecordCount();
+		string strRcdCount = asString(nRecordCount);
+		long nCurrentRecord = 1;
+		_lastCodePos = "70";
+		
+		// Setup the progress bar
+		m_progressCurrent.SetRange32(1, nRecordCount + 1);
+		_lastCodePos = "80";
 
 		// While the source table is not at EOF
-		while (!ipSourceSet->adoEOF)
+		while (ipSourceSet->adoEOF == VARIANT_FALSE)
 		{
+			string strCurrRec = asString(nCurrentRecord);
+
+			string strRcdString = "Copying record " + strCurrRec + " of " + strRcdCount;
+			m_staticCurrentRecord.SetWindowText(strRcdString.c_str());
+			_lastCodePos = "90-" + strCurrRec;
+
+			m_progressCurrent.SetPos(nCurrentRecord);
+			_lastCodePos = "100" + strCurrRec;
+
 			// Create a new recod
 			ipDestSet->AddNew();
-			_lastCodePos = "50-" + asString(nCount);;
+			_lastCodePos = "110" + strCurrRec;
 	
 			// copy fields that have the same name except the ID field
 			copyExistingFields(ipSourceSet->Fields, ipDestSet->Fields, bCopyID);
-			_lastCodePos = "60-" + asString(nCount);;
+			_lastCodePos = "120" + strCurrRec;
 
 			// Add the foreign key data
 			addFKData(ipDestDBConnection, ipSourceSet->Fields, ipDestSet->Fields);
-			_lastCodePos = "80-" + asString(nCount);;
+			_lastCodePos = "130-" + strCurrRec;
 
 			// Update the new record
 			ipDestSet->Update();
-			_lastCodePos = "90-" + asString(nCount);;
+			_lastCodePos = "140-" + strCurrRec;
 
 			// move to next source record
 			ipSourceSet->MoveNext();	
-			_lastCodePos = "100-" + asString(nCount);;
+			_lastCodePos = "150-" + strCurrRec;
 			
-			nCount++;
+			nCurrentRecord++;
 		}
+		_lastCodePos = "160";
+
 		// Turn IDENTITY_INSERT option off as required
 		if (bCopyID && !bSourceIsQuery)
 		{
 			// Turn off Identity insert so any identity fields will be copied
 			identityInsert(ipDestDBConnection, strSource, false);
-			_lastCodePos = "110";
+			_lastCodePos = "170";
 		}
+		m_staticCurrentRecord.SetWindowText("");
+		_lastCodePos = "180";
 
+		m_progressCurrent.SetPos(0);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20152");
 }
@@ -589,7 +703,7 @@ void CConvertFAMDBDlg::copyDBInfoSettings(IFileProcessingDBPtr ipFAMDB, _Connect
 			adLockReadOnly, adCmdTable );
 
 		// While there are records in the Source table
-		while (!ipSourceDBInfoSet->adoEOF)
+		while (ipSourceDBInfoSet->adoEOF == VARIANT_FALSE)
 		{
 			// Get the setting name
 			string strSetting = getStringField(ipSourceDBInfoSet->Fields, "Name");
@@ -686,4 +800,37 @@ void CConvertFAMDBDlg::identityInsert(_ConnectionPtr ipDestDBConnection, const s
 	executeCmdQuery(ipDestDBConnection, strIdentityInsertSetting);
 }
 //-------------------------------------------------------------------------------------------------
+void CConvertFAMDBDlg::updateCurrentStep(string strStepDescription, long &rnStepNumber, long nTotalSteps)
+{
+	strStepDescription += " (Step " + asString(rnStepNumber) + " of " + asString(nTotalSteps) + ")";
+	m_staticCurrentStep.SetWindowText(strStepDescription.c_str());
+	rnStepNumber++;
+}
+//-------------------------------------------------------------------------------------------------
+UINT CConvertFAMDBDlg::convertDatabaseInThread(void *pData)
+{
+	CConvertFAMDBDlg * pDlg = static_cast<CConvertFAMDBDlg *>(pData);
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	try
+	{
+		ASSERT_ARGUMENT("ELI28617" ,pDlg != NULL);
 
+		// Convert the database
+		pDlg->convertDatabase();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28616");
+
+	CoUninitialize();
+}
+//-------------------------------------------------------------------------------------------------
+void CConvertFAMDBDlg::enableControls(bool bEnable)
+{
+	m_cbFromServer.EnableWindow(asMFCBool(bEnable));
+	m_cbFromDB.EnableWindow(asMFCBool(bEnable));
+	m_cbToServer.EnableWindow(asMFCBool(bEnable));
+	m_cbToDB.EnableWindow(asMFCBool(bEnable));
+	m_checkRetainHistoryData.EnableWindow(asMFCBool(bEnable));
+	m_buttonStart.EnableWindow(asMFCBool(bEnable));
+	m_buttonClose.EnableWindow(asMFCBool(bEnable));
+}
+//-------------------------------------------------------------------------------------------------
