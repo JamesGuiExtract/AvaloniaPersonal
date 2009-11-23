@@ -46,6 +46,12 @@ namespace Extract.Imaging
         readonly RasterImageFormat _format;
 
         /// <summary>
+        /// <see langword="true"/> if the image is a portable document format (PDF) file;
+        /// <see langword="false"/> if the image is not a PDF file.
+        /// </summary>
+        readonly bool _isPdf;
+
+        /// <summary>
         /// Extract licensing.
         /// </summary>
         static readonly LicenseStateCache _license =
@@ -62,19 +68,39 @@ namespace Extract.Imaging
         /// <param name="codecs">Used when decoding the image file.</param>
         internal ImageReader(string fileName, RasterCodecs codecs)
         {
-            _license.Validate("ELI28486");
-
-            _fileName = fileName;
-            _codecs = codecs;
-
-            // Prevent write access while reading
-            _stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-            // Get file information
-            using (CodecsImageInfo info = _codecs.GetInformation(_stream, true))
+            try
             {
-                _pageCount = info.TotalPages;
-                _format = info.Format;
+                _license.Validate("ELI28486");
+
+                _fileName = fileName;
+                _codecs = codecs;
+
+                // Prevent write access while reading
+                _stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                using (new PdfLock())
+                {
+                    // Get file information
+                    using (CodecsImageInfo info = _codecs.GetInformation(_stream, true))
+                    {
+                        _pageCount = info.TotalPages;
+                        _format = info.Format;
+                    }
+                }
+
+                _isPdf = ImageMethods.IsPdf(_format);
+            }
+            catch (Exception ex)
+            {
+                if (_stream != null)
+                {
+                    _stream.Dispose();
+                }
+
+                ExtractException ee = new ExtractException("ELI28623",
+                    "Unable to create image reader.", ex);
+                ee.AddDebugData("File name", fileName, false);
+                throw ee;
             }
         }
 
@@ -119,7 +145,10 @@ namespace Extract.Imaging
         {
             try
             {
-                return _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber);
+                using (new PdfLock(_isPdf))
+                {
+                    return _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber);
+                }
             }
             catch (Exception ex)
             {
@@ -144,26 +173,29 @@ namespace Extract.Imaging
         {
             try
             {
-                // TODO: Cache image info
-                // Get the dimensions of this page.
-                int width;
-                int height;
-                using (CodecsImageInfo info = _codecs.GetInformation(_stream, false, pageNumber))
+                using (new PdfLock(_isPdf))
                 {
-                    width = info.Width;
-                    height = info.Height;
+                    // TODO: Cache image info
+                    // Get the dimensions of this page.
+                    int width;
+                    int height;
+                    using (CodecsImageInfo info = _codecs.GetInformation(_stream, false, pageNumber))
+                    {
+                        width = info.Width;
+                        height = info.Height;
+                    } 
+
+                    // Calculate how far from the desired size the original image is
+                    double scale = Math.Min(fitWithin.Width / (double)width,
+                        fitWithin.Height / (double)height);
+
+                    // Set the desired width and height, maintaining aspect ratio
+                    width = (int)(width * scale);
+                    height = (int)(height * scale);
+
+                    return _codecs.Load(_fileName, width, height, 24, RasterSizeFlags.Bicubic,
+                        CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber); 
                 }
-
-                // Calculate how far from the desired size the original image is
-                double scale = Math.Min(fitWithin.Width / (double)width,
-                    fitWithin.Height / (double)height);
-
-                // Set the desired width and height, maintaining aspect ratio
-                width = (int)(width * scale);
-                height = (int)(height * scale);
-
-                return _codecs.Load(_fileName, width, height, 24, RasterSizeFlags.Bicubic,
-                    CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber);
             }
             catch (Exception ex)
             {
@@ -184,7 +216,8 @@ namespace Extract.Imaging
         {
             try
             {
-                return _codecs.ReadTag(_fileName, pageNumber, RasterTagMetadata.AnnotationTiff);
+                return _isPdf ? null : 
+                    _codecs.ReadTag(_fileName, pageNumber, RasterTagMetadata.AnnotationTiff);
             }
             catch (Exception ex)
             {
@@ -206,7 +239,10 @@ namespace Extract.Imaging
             RasterImage image = null;
             try
             {
-                image = _codecs.Load(_stream, 1, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber);
+                using (new PdfLock(_isPdf))
+                {
+                    image = _codecs.Load(_stream, 1, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber); 
+                }
 
                 return new PixelProbe(image);
             }
@@ -223,7 +259,7 @@ namespace Extract.Imaging
                     "Unable to create pixel probe.", ex);
                 ee.AddDebugData("Page number", pageNumber, false);
                 throw ee;
-            }
+            } 
         }
 
         #endregion Methods

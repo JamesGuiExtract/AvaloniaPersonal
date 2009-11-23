@@ -45,6 +45,12 @@ namespace Extract.Imaging
         readonly RasterImageFormat _format;
 
         /// <summary>
+        /// <see langword="true"/> if the output image is a portable document format (PDF) file;
+        /// <see langword="false"/> if the output image is not a PDF file.
+        /// </summary>
+        readonly bool _isPdf;
+
+        /// <summary>
         /// Extract licensing.
         /// </summary>
         static readonly LicenseStateCache _license =
@@ -62,12 +68,29 @@ namespace Extract.Imaging
         /// <param name="format">The output file format.</param>
         internal ImageWriter(string fileName, RasterCodecs codecs, RasterImageFormat format)
         {
-            _license.Validate("ELI28487");
+            try
+            {
+                _license.Validate("ELI28487");
 
-            _fileName = fileName;
-            _codecs = codecs;
-            _tempFile = new TemporaryFile();
-            _format = format;
+                _fileName = fileName;
+                _codecs = codecs;
+                _tempFile = new TemporaryFile();
+                _format = format;
+                _isPdf = ImageMethods.IsPdf(format);
+            }
+            catch (Exception ex)
+            {
+                if (_tempFile != null)
+                {
+                    _tempFile.Dispose();
+                    _tempFile = null;
+                }
+
+                ExtractException ee = new ExtractException("ELI28624",
+                    "Unable to create image reader.", ex);
+                ee.AddDebugData("File name", fileName, false);
+                throw ee;
+            }
         }
 
         #endregion Constructors
@@ -84,8 +107,11 @@ namespace Extract.Imaging
             {
                 int count = image.PageCount;
 
-                _codecs.Save(image, _tempFile.FileName, _format, image.BitsPerPixel, 1, count,
-                    _pageCount + 1, CodecsSavePageMode.Append);
+                using (new PdfLock(_isPdf))
+                {
+                    _codecs.Save(image, _tempFile.FileName, _format, image.BitsPerPixel, 1, count,
+                                _pageCount + 1, CodecsSavePageMode.Append); 
+                }
 
                 _pageCount += count;
             }
@@ -107,6 +133,11 @@ namespace Extract.Imaging
         {
             try
             {
+                if (_isPdf)
+                {
+                    throw new ExtractException("ELI28621", "Cannot write PDF tags.");
+                }
+
                 _codecs.WriteTag(_tempFile.FileName, pageNumber, tag);
             }
             catch (Exception ex)
