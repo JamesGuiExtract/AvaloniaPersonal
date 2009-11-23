@@ -1,7 +1,6 @@
 using Extract.Drawing;
 using Extract.Licensing;
 using Leadtools;
-using Leadtools.Codecs;
 using Leadtools.ImageProcessing;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -492,6 +491,97 @@ namespace Extract.Imaging
                 ExtractException ee2 =
                     new ExtractException("ELI28049", "Error adding image debug information.", ex);
                 ee2.Log();
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified format is a tagged image file format (TIFF).
+        /// </summary>
+        /// <param name="format">The image format to evaluate.</param>
+        /// <returns><see langword="true"/> if <paramref name="format"/> is a tagged image file 
+        /// format; <see langword="false"/> if the <paramref name="format"/> is not a tagged image 
+        /// file format.</returns>
+        // Enums don't throw exceptions
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
+        public static bool IsTiff(RasterImageFormat format)
+        {
+            switch (format)
+            {
+                case RasterImageFormat.Ccitt:
+                case RasterImageFormat.CcittGroup31Dim:
+                case RasterImageFormat.CcittGroup32Dim:
+                case RasterImageFormat.CcittGroup4:
+                case RasterImageFormat.GeoTiff:
+                case RasterImageFormat.IntergraphCcittG4:
+                case RasterImageFormat.RawCcitt:
+                case RasterImageFormat.Tif:
+                case RasterImageFormat.TifAbc:
+                case RasterImageFormat.TifAbic:
+                case RasterImageFormat.TifCmp:
+                case RasterImageFormat.TifCmw:
+                case RasterImageFormat.TifCmyk:
+                case RasterImageFormat.TifCustom:
+                case RasterImageFormat.TifDxf:
+                case RasterImageFormat.TifJ2k:
+                case RasterImageFormat.TifJbig:
+                case RasterImageFormat.TifJbig2:
+                case RasterImageFormat.TifJpeg:
+                case RasterImageFormat.TifJpeg411:
+                case RasterImageFormat.TifJpeg422:
+                case RasterImageFormat.TifLead1Bit:
+                case RasterImageFormat.TifLeadMrc:
+                case RasterImageFormat.TifLzw:
+                case RasterImageFormat.TifLzwCmyk:
+                case RasterImageFormat.TifLzwYcc:
+                case RasterImageFormat.TifMrc:
+                case RasterImageFormat.TifPackBits:
+                case RasterImageFormat.TifPackBitsCmyk:
+                case RasterImageFormat.TifPackbitsYcc:
+                case RasterImageFormat.TifUnknown:
+                case RasterImageFormat.TifYcc:
+                case RasterImageFormat.TifZip:
+                case RasterImageFormat.TifxFaxG31D:
+                case RasterImageFormat.TifxFaxG32D:
+                case RasterImageFormat.TifxFaxG4:
+                case RasterImageFormat.TifxJbig:
+                case RasterImageFormat.TifxJbigT43:
+                case RasterImageFormat.TifxJbigT43Gs:
+                case RasterImageFormat.TifxJbigT43ItuLab:
+                case RasterImageFormat.TifxJpeg:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified format is a portable document format (PDF).
+        /// </summary>
+        /// <param name="format">The image format to evaluate.</param>
+        /// <returns><see langword="true"/> if <paramref name="format"/> is a portable document
+        /// format; <see langword="false"/> if the <paramref name="format"/> is not a portable  
+        /// document format.</returns>
+        // Enums don't throw exceptions
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
+        public static bool IsPdf(RasterImageFormat format)
+        {
+            switch (format)
+            {
+                case RasterImageFormat.PdfLeadMrc:
+                case RasterImageFormat.RasPdf:
+                case RasterImageFormat.RasPdfCmyk:
+                case RasterImageFormat.RasPdfG31Dim:
+                case RasterImageFormat.RasPdfG32Dim:
+                case RasterImageFormat.RasPdfG4:
+                case RasterImageFormat.RasPdfJbig2:
+                case RasterImageFormat.RasPdfJpeg:
+                case RasterImageFormat.RasPdfJpeg411:
+                case RasterImageFormat.RasPdfJpeg422:
+                case RasterImageFormat.RasPdfLzw:
+                case RasterImageFormat.RasPdfLzwCmyk:
+                    return true;
+                default:
+                    return false;
             }
         }
     }
