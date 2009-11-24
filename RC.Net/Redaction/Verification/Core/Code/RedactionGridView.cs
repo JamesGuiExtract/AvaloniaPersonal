@@ -578,6 +578,17 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Determines whether the specified index corresponds to the redacted column.
+        /// </summary>
+        /// <param name="index">The index to test.</param>
+        /// <returns><see langword="true"/> if <paramref name="index"/> corresponds to the 
+        /// redacted column; <see langword="false"/> if it does not.</returns>
+        bool IsRedactedColumn(int index)
+        {
+            return _redactedColumn.Index == index;
+        }
+
+        /// <summary>
         /// Determines whether the specified index corresponds to the redaction type column.
         /// </summary>
         /// <param name="index">The index to test.</param>
@@ -1754,11 +1765,18 @@ namespace Extract.Redaction.Verification
             try
             {
                 // Check if the type column changed
-                if (IsTypeColumn(e.ColumnIndex) && e.RowIndex >= 0)
+                if (e.RowIndex >= 0)
                 {
-                    _dirty = true;
+                    if (IsTypeColumn(e.ColumnIndex))
+                    {
+                        _dirty = true;
 
-                    _lastType = (string)_dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+                        _lastType = (string)_dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+                    }
+                    else if (IsRedactedColumn(e.ColumnIndex))
+                    {
+                        _dirty = true;
+                    }
                 }
             }
             catch (Exception ex)

@@ -21,6 +21,12 @@ namespace Extract.Redaction
         /// </summary>
         readonly ComAttribute _attribute;
 
+        /// <summary>
+        /// <see langword="true"/> if the sensitive item should redacted; <see langword="false"/> 
+        /// if the sensitive item should not be redacted.
+        /// </summary>
+        bool _redacted;
+
         #endregion Fields
 
         #region Constructors
@@ -29,7 +35,7 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="RedactionItem"/> class.
         /// </summary>
         RedactionItem(RedactionItem attribute)
-            : this(GetClone(attribute._attribute), null, null)
+            : this(GetClone(attribute._attribute), null, null, true)
         {
         }
 
@@ -38,7 +44,7 @@ namespace Extract.Redaction
         /// </summary>
         [CLSCompliant(false)]
         public RedactionItem(ComAttribute attribute)
-            : this(attribute, null, null)
+            : this(attribute, null, null, true)
         {
         }
 
@@ -48,6 +54,16 @@ namespace Extract.Redaction
         [CLSCompliant(false)]
         public RedactionItem(ComAttribute attribute, ExemptionCodeList exemptions, 
             string sourceDocument)
+            : this(attribute, exemptions, sourceDocument, true)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedactionItem"/> class.
+        /// </summary>
+        [CLSCompliant(false)]
+        public RedactionItem(ComAttribute attribute, ExemptionCodeList exemptions,
+            string sourceDocument, bool redacted)
         {
             _attribute = attribute;
 
@@ -55,6 +71,8 @@ namespace Extract.Redaction
             {
                 SetExemptions(exemptions, sourceDocument);
             }
+
+            _redacted = redacted;
         }
 
         #endregion Constructors
@@ -108,6 +126,23 @@ namespace Extract.Redaction
             get
             {
                 return _attribute;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether this item should be redacted.
+        /// </summary>
+        /// <value><see langword="true"/> if the item should be redacted;
+        /// <see langword="false"/> if the item should not be redacted.</value>
+        public bool Redacted
+        {
+            get
+            {
+                return _redacted;
+            }
+            set
+            {
+                _redacted = value;
             }
         }
 

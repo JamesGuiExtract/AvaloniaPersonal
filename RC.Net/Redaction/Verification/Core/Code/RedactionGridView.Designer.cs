@@ -51,6 +51,7 @@ namespace Extract.Redaction.Verification
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this._dataGridView = new System.Windows.Forms.DataGridView();
+            this._redactedColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this._textColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._categoryColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._typeColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
@@ -66,6 +67,7 @@ namespace Extract.Redaction.Verification
             this._dataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this._redactedColumn,
             this._textColumn,
             this._categoryColumn,
             this._typeColumn,
@@ -90,6 +92,16 @@ namespace Extract.Redaction.Verification
             this._dataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellValueChanged);
             this._dataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellDoubleClick);
             this._dataGridView.SelectionChanged += new System.EventHandler(this.HandleDataGridViewSelectionChanged);
+            // 
+            // _redactedColumn
+            // 
+            this._redactedColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this._redactedColumn.DataPropertyName = "Redacted";
+            this._redactedColumn.FillWeight = 25F;
+            this._redactedColumn.HeaderText = "";
+            this._redactedColumn.MinimumWidth = 20;
+            this._redactedColumn.Name = "_redactedColumn";
+            this._redactedColumn.Width = 20;
             // 
             // _textColumn
             // 
@@ -148,6 +160,7 @@ namespace Extract.Redaction.Verification
         #endregion
 
         private System.Windows.Forms.DataGridView _dataGridView;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn _redactedColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _textColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _categoryColumn;
         private System.Windows.Forms.DataGridViewComboBoxColumn _typeColumn;

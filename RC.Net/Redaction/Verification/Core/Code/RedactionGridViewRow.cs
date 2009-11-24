@@ -56,6 +56,12 @@ namespace Extract.Redaction.Verification
         ExemptionCodeList _exemptions;
 
         /// <summary>
+        /// <see langword="true"/> if the row should be redacted; <see langword="false"/> if the 
+        /// row should not be redacted.
+        /// </summary>
+        bool _redacted;
+
+        /// <summary>
         /// <see langword="true"/> if this row has been visited; <see langword="false"/> if it has 
         /// not been visited.
         /// </summary>
@@ -79,6 +85,12 @@ namespace Extract.Redaction.Verification
         /// </summary>
         bool _exemptionsDirty;
 
+        /// <summary>
+        /// <see langword="true"/> if <see cref="_redacted"/> has been modified; 
+        /// <see langword="false"/> if it has not been modified.
+        /// </summary>
+        bool _redactedDirty;
+
         #endregion Fields
 
         #region Constructors
@@ -86,9 +98,9 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Initializes a new instance of the <see cref="RedactionGridViewRow"/> class.
         /// </summary>
-        public RedactionGridViewRow(LayerObject layerObject, string text, string category,
+        public RedactionGridViewRow(LayerObject layerObject, string text, string category, 
             string type)
-            : this(new LayerObject[] { layerObject }, text, category, type, null, null)
+            : this(new LayerObject[] { layerObject }, text, category, type, null, null, true)
         {
         }
 
@@ -96,15 +108,16 @@ namespace Extract.Redaction.Verification
         /// Initializes a new instance of the <see cref="RedactionGridViewRow"/> class.
         /// </summary>
         public RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text, 
-            string category, string type) : this(layerObjects, text, category, type, null, null)
+            string category, string type) 
+            : this(layerObjects, text, category, type, null, null, true)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RedactionGridViewRow"/> class.
         /// </summary>
-        RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text,
-            string category, string type, RedactionItem attribute, ExemptionCodeList exemptions)
+        RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text, string category, 
+            string type, RedactionItem attribute, ExemptionCodeList exemptions, bool redacted)
         {
             _attribute = attribute;
             _layerObjects = new List<LayerObject>(layerObjects);
@@ -113,6 +126,7 @@ namespace Extract.Redaction.Verification
             _type = type;
             _firstPage = GetFirstPageNumber();
             _exemptions = exemptions ?? new ExemptionCodeList();
+            _redacted = redacted;
         }
 
         #endregion Constructors
@@ -143,6 +157,28 @@ namespace Extract.Redaction.Verification
             get
             {
                 return _layerObjects.AsReadOnly();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the row should be redacted.
+        /// </summary>
+        /// <value><see langword="true"/> if the row should be redacted;
+        /// <see langword="false"/> if the row should not be redacted.</value>
+        public bool Redacted
+        {
+            get 
+            {
+                return _redacted;
+            }
+            set
+            {
+                if (_redacted != value)
+                {
+                    _redacted = value;
+
+                    _redactedDirty = true;
+                }
             }
         }
 
@@ -231,11 +267,11 @@ namespace Extract.Redaction.Verification
             set
             {
                 if (_exemptions != value)
-	            {
-		            _exemptions = value;
+                {
+                    _exemptions = value;
 
                     _exemptionsDirty = true;
-	            }
+                }
             }
         }
 
@@ -297,7 +333,7 @@ namespace Extract.Redaction.Verification
         {
             get
             {
-                return _exemptionsDirty || _layerObjectsDirty || _typeDirty;
+                return _exemptionsDirty || _layerObjectsDirty || _typeDirty || _redactedDirty;
             }
         }
 
@@ -407,8 +443,10 @@ namespace Extract.Redaction.Verification
                 string category = attribute.Category;
                 string type = attribute.RedactionType;
                 ExemptionCodeList exemptions = attribute.GetExemptions(masterCodes);
+                bool redacted = attribute.Redacted;
 
-                return new RedactionGridViewRow(layerObjects, text, category, type, attribute, exemptions);
+                return new RedactionGridViewRow(layerObjects, text, category, type, 
+                    attribute, exemptions, redacted);
             }
             catch (Exception ex)
             {
@@ -466,7 +504,7 @@ namespace Extract.Redaction.Verification
             attribute.Name = _category;
             attribute.Type = _type;
                     
-            return new RedactionItem(attribute, _exemptions, sourceDocument);
+            return new RedactionItem(attribute, _exemptions, sourceDocument, _redacted);
         }
 
         /// <summary>
@@ -500,7 +538,7 @@ namespace Extract.Redaction.Verification
             // Update the exemption codes
             ExemptionCodeList exemptions = _exemptionsDirty ? _exemptions : null;
 
-            return new RedactionItem(attribute, exemptions, sourceDocument);
+            return new RedactionItem(attribute, exemptions, sourceDocument, _redacted);
         }
 
         /// <summary>
