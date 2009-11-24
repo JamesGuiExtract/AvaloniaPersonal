@@ -20,7 +20,7 @@ goto finished
 :xp
 Echo XP
 if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-	"%~dp0\WindowsXP-KB942288-v3-x86.exe" /quiet
+	"%~dp0WindowsXP-KB942288-v3-x86.exe" /passive /promptrestart
 )
 
 goto finished
@@ -28,20 +28,20 @@ goto finished
 :2003Server
 Echo 2003 Server
 if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-	"%~dp0\WindowsServer2003-KB942288-v4-x86.exe" /quiet
+	"%~dp0WindowsServer2003-KB942288-v4-x86.exe" /passive /promptrestart
 )
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-	"%~dp0\WindowsServer2003-KB942288-v4-x64.exe" /quiet
+	"%~dp0WindowsServer2003-KB942288-v4-x64.exe" /passive /promptrestart
 )
 
 goto finished
 
 :Vista2008
 if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-	wusa "%~dp0\Windows6.0-KB942288-v2-x86.msu" /quiet
+	wusa "%~dp0Windows6.0-KB942288-v2-x86.msu" /passive /promptrestart
 )
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-	wusa "%~dp0\Windows6.0-KB942288-v2-x64.msu" /quiet
+	wusa "%~dp0Windows6.0-KB942288-v2-x64.msu" /passive /promptrestart
 )
 
 goto finished

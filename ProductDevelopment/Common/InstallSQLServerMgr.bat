@@ -19,17 +19,17 @@ goto finished
 
 :xp
 if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-	%~dp0\..\Powershell\WindowsXP-KB926139-v2-x86-ENU.exe /quiet
+	"%~dp0..\Powershell\WindowsXP-KB926139-v2-x86-ENU.exe" /passive
 )
 
 goto finished
 
 :2003Server
 if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-	%~dp0\..\Powershell\WindowsServer2003-KB926139-v2-x86-ENU.exe /quiet
+	"%~dp0..\Powershell\WindowsServer2003-KB926139-v2-x86-ENU.exe" /passive
 )
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-	%~dp0\..\Powershell\WindowsServer2003.WindowsXP-KB926139-v2-x64-ENU.exe /quiet
+	"%~dp0..\Powershell\WindowsServer2003.WindowsXP-KB926139-v2-x64-ENU.exe" /passive
 )
 
 goto finished
@@ -41,18 +41,18 @@ servermanagercmd - install powershell
 if "%errorlevel%" == "0" goto finished
 
 if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-	wusa %~dp0\..\Powershell\Windows6.0-KB928439-x86.msu /quiet
+	wusa "%~dp0..\Powershell\Windows6.0-KB928439-x86.msu" /passive
 )
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-	wusa %~dp0\..\Powershell\Windows6.0-KB928439-x64.msu /quiet
+	wusa "%~dp0..\Powershell\Windows6.0-KB928439-x64.msu" /passive
 )
 
 goto finished
 
 :finished
 if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-	%~dp0\SQLManagementStudio_x86_ENU /q /ACTION=Install /FEATURES=SQL,Tools /INSTANCENAME=MSSQLSERVER /INDICATEPROGRESS /SQLSVCACCOUNT="NT AUTHORITY\Network Service" /SQLSYSADMINACCOUNTS="BUILTIN\Administrators" /AGTSVCACCOUNT="NT AUTHORITY\Network Service"
+	"%~dp0SQLManagementStudio_x86_ENU" /qs /ACTION=Install /FEATURES=SQL,Tools /INSTANCENAME=MSSQLSERVER /SQLSVCACCOUNT="NT AUTHORITY\Network Service" /SQLSYSADMINACCOUNTS="BUILTIN\Administrators" /AGTSVCACCOUNT="NT AUTHORITY\Network Service"
 )
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-	%~dp0\SQLManagementStudio_x64_ENU /q /ACTION=Install /FEATURES=SQL,Tools /INSTANCENAME=MSSQLSERVER /INDICATEPROGRESS /SQLSVCACCOUNT="NT AUTHORITY\Network Service" /SQLSYSADMINACCOUNTS="BUILTIN\Administrators" /AGTSVCACCOUNT="NT AUTHORITY\Network Service"
+	"%~dp0SQLManagementStudio_x64_ENU" /qs /ACTION=Install /FEATURES=SQL,Tools /INSTANCENAME=MSSQLSERVER /SQLSVCACCOUNT="NT AUTHORITY\Network Service" /SQLSYSADMINACCOUNTS="BUILTIN\Administrators" /AGTSVCACCOUNT="NT AUTHORITY\Network Service"
 )
