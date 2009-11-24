@@ -12,9 +12,10 @@
 </h1>
 <hr>
 <p>
-* ID Shield should be installed and licensed for these tests. It is not necessary to install FLEX Index.
+* ID Shield and Extract Systems LM should be installed and licensed for these tests. It is not necessary 
+to install FLEX Index.
 <ol>
-<li><h2>Scalability Test #1</h2>
+<li><h2>Test #1 - Thread Scalability</h2>
 <ul>
 	<li><b>Purpose & Machine Setup</b>
 	<ul>
@@ -26,7 +27,7 @@
 		of pre-queued files requires between one and two days for <b>a single thread</b>.
 		<li>Confirm that the rules to be tested have been validated for the tested build.
 		<li>Copy and unzip the rules.
-		<li>Confirm that a USB key is available.
+		<li>Confirm that a <b>local</b> USB key is available.
 	</ul>
 <p>
 	<li><b>Database Setup</b>
@@ -47,7 +48,8 @@
 			Management Studio.
 		</ul>
 		<li>Create a Processing FPS file using the desired number of processing threads.  
-		Use the appropriate rule set with a <b>Redact images (no verification)</b> task.
+		Use the appropriate rule set with <b>Core: Execute rules</b> and <b>Redaction: 
+		Create redacted image</b> tasks.
 		<li>Reboot the server test machine.
 		<li>Start processing.
 	</ul>
@@ -64,7 +66,7 @@
 	</ul>
 </ul>
 <p>
-<li><h2>Scalability Test #2</h2>
+<li><h2>Test #2 - Machine Scalability</h2>
 <ul>
 	<li><b>Purpose & Machine Setup</b>
 	<ul>
@@ -79,9 +81,9 @@
 		<li>For each processing machine:
 		<ul>
 			<li>Copy and unzip the rules.
-			<li>Create a Processing FPS file.  Use the appropriate rule set with a 
-			<b>Redact images (no verification)</b> task.
-			<li>Confirm that a USB key is available.
+			<li>Create a Processing FPS file.  Use the appropriate rule set with <b>Core: 
+			Execute rules</b> and <b>Redaction: Create redacted image</b> tasks.
+			<li>Confirm that a <b>local</b> USB key is available.
 		</ul>
 	</ul>
 <p>
@@ -114,6 +116,59 @@
 		<li>The expected result is a linear graph.  As the number of machines continues 
 		to increase the improvement in overall processing rate may slow down due to the 
 		overhead associated with additional database connections.
+	</ul>
+</ul>
+<p>
+<li><h2>Test #3 - Maximum Server Processing Rate</h2>
+<ul>
+	<li><b>Purpose & Machine Setup</b>
+	<ul>
+		<li>Determine the absolute maximum processing rate for ID Shield on a multi-core server 
+		(i.e. <b>UltraTester</b>) by modifying the number of FAM instances and the number 
+		of threads.
+		<li>Compute processing rates for many different combinations and note the 
+		combination with the highest overall processing rate.
+		<li>Select a different test machine to serve as the image host and the database host.
+		<li>Select a folder of customer images to process.  
+		<li>Duplicate the files as needed on the image host so that auto-redaction processing 
+		of pre-queued files requires about two days for <b>a single FAM instance with a single 
+		thread</b>.
+		<li>Confirm that the rules to be tested have been validated for the tested build.
+		<li>Copy and unzip the rules.
+		<li>Confirm that a <b>local</b> USB key is available.
+	</ul>
+<p>
+	<li><b>Database Setup</b>
+	<ul>
+		<li>Create a <b>SCALABILITY_TEST</b> database on the database host machine.
+		<li>Add a <b>Process</b> action.
+		<li>Queue the files.  Note that the files must be queued via UNC path or via a mapped 
+		drive.
+	</ul>
+<p>
+	<li><b>Test Execution</b>
+	<ul>
+		<li>Reset the database back to a files queued state.
+		<ul>
+			<li>Delete the record in the <b>ActionStatistics</b> table.
+			<li>Delete the records in the <b>FileActionStateTransition</b> table using 
+			a <b>DELETE FROM FileActionStateTransition</b> query within SQL 
+			Management Studio.
+		</ul>
+		<li>Create a Processing FPS file using the desired number of processing threads.  
+		Use the appropriate rule set with <b>Core: Execute rules</b> and <b>Redaction: 
+		Create redacted image</b> tasks.
+		<li>Reboot the server test machine.
+		<li>Open the desired number of FAM instances.
+		<li>Start processing.
+	</ul>
+<p>
+	<li><b>Test Results</b>
+	<ul>
+		<li>Record the starting and ending processing times in an appropriate spreadsheet.
+		<li>The expected result is a table that shows a peak performance for each 
+		selected number of threads or number of FAM instances.
+		<li>One combination will be absolute maximum processing rate.
 	</ul>
 </ul>
 </ol>
