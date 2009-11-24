@@ -448,15 +448,17 @@ void CConvertFAMDBDlg::convertDatabase()
 		ueCompleted.addDebugInfo("To Server", (LPCSTR) m_zToServer);
 		ueCompleted.addDebugInfo("To DB", (LPCSTR) m_zToDB);
 		ueCompleted.log();
-		
+
 		// Tell the user the database has been converted
 		AfxMessageBox("The database has been successfully converted.", MB_OK | MB_ICONINFORMATION);
-		enableControls(true);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI20148");
 
 	try
 	{
+		// Enable the controls
+		enableControls(true);
+
 		// Signal that the conversion is complete
 		m_eventConvertComplete.signal();
 
@@ -821,6 +823,8 @@ UINT CConvertFAMDBDlg::convertDatabaseInThread(void *pData)
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28616");
 
 	CoUninitialize();
+
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
 void CConvertFAMDBDlg::enableControls(bool bEnable)

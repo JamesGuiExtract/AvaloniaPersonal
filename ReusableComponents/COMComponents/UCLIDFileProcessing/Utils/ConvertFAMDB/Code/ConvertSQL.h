@@ -21,7 +21,7 @@ static const string gstrSELECT_FAST_RECORDS_FOR_TRANSFER_FROM_7_0 =
 // Query to select the ActionStatistics records in 6.0 or 7.0 db to be transfered. The ActionID is 
 // Converted to the ASCName so it can be looked up in the new database
 static const string gstrSELECT_ACTIONSTATISTICS_FOR_TRANSFER_FROM_7_0 = 
-	"SELECT [ActionID]"
+	"SELECT ASCName"
 	"	  ,[NumDocuments]"
 	"	  ,[NumDocumentsComplete]"
 	"	  ,[NumDocumentsFailed]"
@@ -34,7 +34,7 @@ static const string gstrSELECT_ACTIONSTATISTICS_FOR_TRANSFER_FROM_7_0 =
 	"	  ,[NumBytesComplete]"
 	"	  ,[NumBytesFailed]"
 	"	  , 0 as [NumBytesSkipped]"
-	" FROM       ActionStatistics ";
+	" FROM       ActionStatistics INNER JOIN Action on ActionStatistics.ActionID = Action.ID";
 
 static const string gstrSELECT_IDSHIELD_DATA_FOR_TRANSFER_FROM_7_0 = 
 	"SELECT [FileID]"
