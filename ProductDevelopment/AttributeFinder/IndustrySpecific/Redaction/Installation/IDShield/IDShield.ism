@@ -3223,6 +3223,7 @@
 		<row><td>ID_STRING28</td><td>1033</td><td>CONVER~1|Convert FAM Database</td><td>0</td><td/><td>370922414</td></row>
 		<row><td>ID_STRING29</td><td>1033</td><td>CONFIG~1|Configure Email Settings</td><td>0</td><td/><td>-912450806</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>Documentation</td><td>0</td><td/><td>-216449551</td></row>
+		<row><td>ID_STRING30</td><td>1033</td><td>[ProductName] requires that your computer is running Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008 or Windows 7</td><td>0</td><td/><td>-979554771</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>IDShieldMain</td><td>0</td><td/><td>-216429071</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>EXTRAC~1|Extract Systems IDShield</td><td>0</td><td/><td>194604777</td></row>
 		<row><td>ID_STRING6</td><td>1033</td><td>NEWSHO~1|NewShortcut1</td><td>0</td><td/><td>194593546</td></row>
@@ -3508,6 +3509,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 	<table name="LaunchCondition">
 		<col key="yes" def="s255">Condition</col>
 		<col def="l255">Description</col>
+		<row><td>(Not Version9X=400) And (Not Version9X=410) And (Not Version9X=490) And (Not VersionNT=400) And (Not VersionNT=500)</td><td>##ID_STRING30##</td></row>
 	</table>
 
 	<table name="ListBox">
