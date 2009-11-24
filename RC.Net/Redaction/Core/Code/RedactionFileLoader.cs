@@ -215,6 +215,7 @@ namespace Extract.Redaction
             return null;
         }
 
+        /// <overloads>Loads the contents of the voa file from the specified file.</overloads>
         /// <summary>
         /// Loads the contents of the voa file from the specified file.
         /// </summary>
@@ -222,6 +223,20 @@ namespace Extract.Redaction
         /// <param name="sourceDocument">The source document corresponding to the 
         /// <paramref name="fileName"/>.</param>
         public void LoadFrom(string fileName, string sourceDocument)
+        {
+            LoadFrom(fileName, sourceDocument, true);
+        }
+
+        /// <summary>
+        /// Loads the contents of the voa file from the specified file.
+        /// </summary>
+        /// <param name="fileName">The vector of attributes (VOA) file to load.</param>
+        /// <param name="sourceDocument">The source document corresponding to the 
+        /// <paramref name="fileName"/>.</param>
+        /// <param name="toggleOffRedactions"><see langword="true"/> if non-output redactions 
+        /// should be toggled off; <see langword="false"/> if non-output redactions should remain 
+        /// in their current state.</param>
+        public void LoadFrom(string fileName, string sourceDocument, bool toggleOffRedactions)
         {
             try
             {
@@ -236,7 +251,7 @@ namespace Extract.Redaction
                 if (File.Exists(fileName))
                 {
                     // Load the attributes from the file
-                    LoadVoa(fileName);
+                    LoadVoa(fileName, toggleOffRedactions);
                 }
             }
             catch (Exception ex)
@@ -252,7 +267,10 @@ namespace Extract.Redaction
         /// Loads the contents of the voa file from the specified file.
         /// </summary>
         /// <param name="fileName">The vector of attributes (VOA) file to load.</param>
-        void LoadVoa(string fileName)
+        /// <param name="toggleOffRedactions"><see langword="true"/> if non-output redactions 
+        /// should be toggled off; <see langword="false"/> if non-output redactions should remain 
+        /// in their current state.</param>
+        void LoadVoa(string fileName, bool toggleOffRedactions)
         {
             // Load the attributes from the file
             IUnknownVector attributes = new IUnknownVector();
@@ -264,12 +282,19 @@ namespace Extract.Redaction
             // Get the document type
             _documentType = GetDocumentType(attributes);
 
+            // Get the previous revision
+            _revisionsAttribute = GetRevisionsAttribute(attributes);
+            IUnknownVector revisions = _revisionsAttribute.SubAttributes;
+
             // Query and add attributes at each confidence level
             AFUtility utility = new AFUtility();
             foreach (ConfidenceLevel level in _levels)
             {
-                IUnknownVector vector = utility.QueryAttributes(attributes, level.Query, true);
-                AddAttributes(vector, level);
+                IUnknownVector current = utility.QueryAttributes(attributes, level.Query, true);
+                AddAttributes(current, level, toggleOffRedactions);
+
+                IUnknownVector previous = utility.QueryAttributes(revisions, level.Query, false);
+                AddNonOutputAttributes(previous, level, revisions);
             }
 
             // Ensure all sensitive items have attribute ids
@@ -277,9 +302,6 @@ namespace Extract.Redaction
             {
                 AssignId(item.Attribute);
             }
-
-            // Get the previous revision
-            _revisionsAttribute = GetRevisionsAttribute(attributes);
 
             // Determine the next attribute id
             _nextId = GetNextId(_sensitiveItems, _revisionsAttribute);
@@ -387,7 +409,11 @@ namespace Extract.Redaction
         /// </summary>
         /// <param name="attributes">The attributes to add.</param>
         /// <param name="level">The confidence level of the <paramref name="attributes"/>.</param>
-        void AddAttributes(IUnknownVector attributes, ConfidenceLevel level)
+        /// <param name="toggleOffRedactions"><see langword="true"/> if non-output redactions 
+        /// should be toggled off; <see langword="false"/> if non-output redactions should remain 
+        /// in their current state.</param>
+        void AddAttributes(IUnknownVector attributes, ConfidenceLevel level, 
+            bool toggleOffRedactions)
         {
             // Iterate over the attributes
             int count = attributes.Size();
@@ -400,6 +426,11 @@ namespace Extract.Redaction
                 if (value.HasSpatialInfo())
                 {
                     SensitiveItem item = new SensitiveItem(level, attribute);
+                    if (toggleOffRedactions && !level.Output)
+                    {
+                        item.Attribute.Redacted = false;
+                    }
+
                     _sensitiveItems.Add(item);
                 }
                 else
@@ -407,6 +438,61 @@ namespace Extract.Redaction
                     _attributes.Add(attribute);
                 }
             }
+        }
+
+        /// <summary>
+        /// Adds attributes that are marked for non-output by confidence level and stores them in 
+        /// <see cref="_sensitiveItems"/>.
+        /// </summary>
+        /// <param name="attributes">The attributes from which non-output attributes should be 
+        /// added.</param>
+        /// <param name="level">The confidence level of the <paramref name="attributes"/>.</param>
+        /// <param name="revisions">The previous revisions of attributes.</param>
+        void AddNonOutputAttributes(IUnknownVector attributes, ConfidenceLevel level, 
+            IUnknownVector revisions)
+        {
+            // Iterate over the attributes
+            int count = attributes.Size();
+            for (int i = 0; i < count; i++)
+            {
+                ComAttribute attribute = (ComAttribute) attributes.At(i);
+
+                // This is a non output attribute if its archive action is turned off.
+                IUnknownVector subAttributes = attribute.SubAttributes;
+                ComAttribute[] archiveAction = 
+                    AttributeMethods.GetAttributesByName(subAttributes, "ArchiveAction");
+                if (archiveAction.Length == 1 && IsTurnedOffArchiveAction(archiveAction[0]))
+                {
+                    // Remove the archive action
+                    subAttributes.RemoveValue(archiveAction[0]);
+
+                    // Add this non output attribute to the collection of sensitive items
+                    SensitiveItem item = new SensitiveItem(level, attribute);
+                    item.Attribute.Redacted = false;
+                    _sensitiveItems.Add(item);
+
+                    // Remove it from the previous revisions
+                    revisions.RemoveValue(attribute);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified archive action is marked as 'turned off'.
+        /// </summary>
+        /// <param name="archiveAction">The archive action attribute to test.</param>
+        /// <returns><see langword="true"/> if <paramref name="archiveAction"/> is marked as 
+        /// 'turned off'; <see langword="false"/> if <paramref name="archiveAction"/> is not 
+        /// marked as 'turned off'.</returns>
+        static bool IsTurnedOffArchiveAction(ComAttribute archiveAction)
+        {
+            if (archiveAction == null)
+            {
+                return false;
+            }
+
+            SpatialString value = archiveAction.Value;
+            return string.Equals(value.String, "TurnedOff", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -535,9 +621,12 @@ namespace Extract.Redaction
                 RedactionItem[] oldModified = UpdateModifiedItems(itemsToVerify, changes.Modified);
                 UpdateAddedItems(itemsToVerify, changes.Added);
 
+                // Get the non output redactions
+                RedactionItem[] oldNonOutput = GetNonOutputRedactions(itemsToVerify);
+
                 // Create other verification attributes that don't undergo verification
-                IUnknownVector attributes = 
-                    GetUnverifiedAttributes(settings, time, changes, oldDeleted, oldModified);
+                IUnknownVector attributes = GetUnverifiedAttributes(settings, time, changes, 
+                    oldDeleted, oldModified, oldNonOutput);
 
                 // Save the attributes
                 IUnknownVector output = GetOutputVector(itemsToVerify, attributes);
@@ -681,6 +770,27 @@ namespace Extract.Redaction
         }
 
         /// <summary>
+        /// Gets redactions that have been marked to not be output.
+        /// </summary>
+        /// <param name="redactions">The redactions to check for non-output.</param>
+        /// <returns>The redactions in <paramref name="redactions"/> that are marked to not be 
+        /// output.</returns>
+        static RedactionItem[] GetNonOutputRedactions(List<SensitiveItem> redactions)
+        {
+            List<RedactionItem> nonOutputRedactions = new List<RedactionItem>();
+            foreach (SensitiveItem item in redactions)
+            {
+                RedactionItem redactionItem = item.Attribute;
+                if (!redactionItem.Redacted)
+                {
+                    nonOutputRedactions.Add(redactionItem);
+                }
+            }
+
+            return nonOutputRedactions.ToArray();
+        }
+
+        /// <summary>
         /// Creates all the attributes in a verification vector of attributes (VOA) file, other 
         /// than the ones that were directly verified by the user.
         /// </summary>
@@ -689,10 +799,13 @@ namespace Extract.Redaction
         /// <param name="changes">The changes made to the original verification file.</param>
         /// <param name="oldDeleted">The previous version of the deleted attributes.</param>
         /// <param name="oldModified">The previous version of the modified attributes.</param>
+        /// <param name="oldNonOutput">The previous version of the attributes that are marked to 
+        /// not be output.</param>
         /// <returns>All the attributes in a verification vector of attributes (VOA) file, other 
         /// than the ones that were directly verified by the user.</returns>
         IUnknownVector GetUnverifiedAttributes(VerificationSettings settings, TimeInterval time,
-            RedactionFileChanges changes, RedactionItem[] oldDeleted, RedactionItem[] oldModified)
+            RedactionFileChanges changes, RedactionItem[] oldDeleted, RedactionItem[] oldModified, 
+            RedactionItem[] oldNonOutput)
         {
             // Copy the original unverified attributes in to a vector
             IUnknownVector attributes = new IUnknownVector();
@@ -708,7 +821,7 @@ namespace Extract.Redaction
 
             // Copy and update the revision attribute
             ComAttribute revisions = GetRevisionsAttribute(attributes);
-            AddRevisions(revisions, oldDeleted, oldModified);
+            AddRevisions(revisions, oldDeleted, oldModified, oldNonOutput);
 
             return attributes;
         }
@@ -821,8 +934,10 @@ namespace Extract.Redaction
         /// <param name="revisions">The revisions attribute.</param>
         /// <param name="oldDeleted">Previous versions of deleted attributes.</param>
         /// <param name="oldModified">Previous versions of modified attributes.</param>
-        static void AddRevisions(ComAttribute revisions, IEnumerable<RedactionItem> oldDeleted,
-            IEnumerable<RedactionItem> oldModified)
+        /// <param name="oldNonOutput">Previous versions of the attributes marked to not be 
+        /// output.</param>
+        void AddRevisions(ComAttribute revisions, IEnumerable<RedactionItem> oldDeleted,
+            IEnumerable<RedactionItem> oldModified, RedactionItem[] oldNonOutput)
         {
             IUnknownVector subAttributes = revisions.SubAttributes;
             foreach (RedactionItem deleted in oldDeleted)
@@ -833,6 +948,30 @@ namespace Extract.Redaction
             {
                 subAttributes.PushBack(modified.ComAttribute);
             }
+            foreach (RedactionItem nonOutput in oldNonOutput)
+            {
+                ComAttribute attribute = CreateNonOutputAttribute(nonOutput);
+                subAttributes.PushBack(attribute);
+            }
+        }
+
+        /// <summary>
+        /// Creates a attribute that is marked for non-output from the specified redaction item.
+        /// </summary>
+        /// <param name="item">The item for which a non-output attribute should be created.</param>
+        /// <returns>An attribute that is marked for non-output from the specified 
+        /// <paramref name="item"/>.</returns>
+        ComAttribute CreateNonOutputAttribute(RedactionItem item)
+        {
+            // Copy the original attribute so other references to this object are not changed
+            ICopyableObject copy = (ICopyableObject) item.ComAttribute;
+            ComAttribute result = (ComAttribute) copy.Clone();
+
+            // Append the archive action attribute to this attribute
+            ComAttribute archiveAction = CreateComAttribute("ArchiveAction", "TurnedOff");
+            AppendChildAttributes(result, archiveAction);
+
+            return result;
         }
 
         /// <summary>
@@ -850,7 +989,11 @@ namespace Extract.Redaction
             IUnknownVector output = new IUnknownVector();
             foreach (SensitiveItem item in verified)
             {
-                output.PushBack(item.Attribute.ComAttribute);
+                RedactionItem redactionItem = item.Attribute;
+                if (redactionItem.Redacted)
+                {
+                    output.PushBack(redactionItem.ComAttribute);
+                }
             }
 
             // Append the unverified attributes
