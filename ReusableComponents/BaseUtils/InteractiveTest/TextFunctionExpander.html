@@ -20,6 +20,7 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 	test requires write privileges on drive H:\.</li> 
 	<li><b>***ENABLE FEEDBACK***</b> Without Feedback enabled, some of these tests will not work.&nbsp;</b></li> 
 <p>
+	<li>Create a <b>FLEX_INDEX_TEST</b> environment variable set to <b>FLEX Index test</b>.
 	<li>Navigate to <b>D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\</b>.</li> 
         <li>Run <b>clean.bat</b> to remove leftover xml files from previous tests.</li> 
         <li>Run <b>TestFunctionExpanderTest.bat</b>. The test will create files in the directory 		<b>D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\</b>.</li> 
@@ -100,6 +101,12 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 		with a current timestamp in \\fnp2\internal\users\wayne_lenius\Public\Write\ABC.</li>
 	</ul> 
 	</li>
+	<li><b>[LegacyRC #5551]</b> Test <b>$Env()</b>: 
+	<ul>
+		<li>Verify that the file <b>FLEX Index test.xml</b> 
+		exists.</li>
+	</ul> 
+	</li> 
 	<li>Test <b>$InsertBeforeExt()</b>:
 	<ul>
 		<li>Verify that the file <b>Test&nbsp;&nbsp;Image.INSERT1.tif.xml</b> exists.</li>
