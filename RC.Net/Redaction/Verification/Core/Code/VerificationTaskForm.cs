@@ -393,6 +393,9 @@ namespace Extract.Redaction.Verification
             // Ensure HasContainedRedactions is set to true if the _redactionGridView was saved with
             // redactions present.
             memento.HasContainedRedactions |= _redactionGridView.HasRedactions;
+
+            // The next time the redactions are read, don't toggle off non-output redactions
+            memento.ToggleOffRedactions = false;
         }
 
         /// <summary>
@@ -1199,7 +1202,8 @@ namespace Extract.Redaction.Verification
         void LoadMemento(VerificationMemento memento)
         {
             // Load the voa
-            _currentVoa.LoadFrom(memento.AttributesFile, _imageViewer.ImageFile);
+            _currentVoa.LoadFrom(memento.AttributesFile, _imageViewer.ImageFile, 
+                memento.ToggleOffRedactions);
 
             // Set the controls
             _redactionGridView.LoadFrom(_currentVoa, memento.VisitedRedactions);
