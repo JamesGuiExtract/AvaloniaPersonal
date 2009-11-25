@@ -11,13 +11,14 @@ using namespace std;
 class EXPORT_BaseUtils ValueTypePair
 { 
 	public:
-		enum EType { kString, kOctets, kInt, kLong, kUnsignedLong, kDouble, kBoolean, kNone };
+		enum EType { kString, kOctets, kInt, kInt64, kLong, kUnsignedLong, kDouble, kBoolean, kNone };
 
 		ValueTypePair();
 		ValueTypePair(const string &_strValue);
 		ValueTypePair(unsigned char *_octValue, long _lOctValueSize);
 		ValueTypePair(int _iValue);
 		ValueTypePair(unsigned int _iValue);
+		ValueTypePair(__int64 _llValue);
 		ValueTypePair(long _lValue);
 		ValueTypePair(unsigned long _lValue);
 		ValueTypePair(double _dValue);
@@ -36,6 +37,7 @@ class EXPORT_BaseUtils ValueTypePair
 		void setValue(const char *pszValue);
 		void setValue(unsigned char *_octValue, long _lOctValueSize);
 		void setValue(long _lValue);
+		void setValue(__int64 _llValue);
 		void setValue(unsigned long _lValue);
 		void setValue(double _dValue);
 		void setValue(bool _bValue);
@@ -49,6 +51,7 @@ class EXPORT_BaseUtils ValueTypePair
 		
 		long getOctSize() const;
 		int getIntValue() const;
+		__int64 getInt64Value() const;
 		long getLongValue() const;
 		unsigned long getUnsignedLongValue() const;
 		double getDoubleValue() const;
@@ -62,6 +65,7 @@ class EXPORT_BaseUtils ValueTypePair
 		string strValue;
 		int iValue;
 		long lValue;
+		__int64 llValue;
 		double dValue;
 		bool bValue;
 		unsigned long ulValue;

@@ -35,6 +35,7 @@ public:
 	{
 		kUnsignedChar,
 		kLong,
+		kLongLong,
 		kUnsignedLong,
 		kDouble,
 		kString,
@@ -50,6 +51,7 @@ public:
 	// following methods only work in kWrite mode
 	void flushToByteStream(unsigned long ulRequiredNumberToBeMultiplierOf = 1);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, long lData);
+	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, __int64 llData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, unsigned long ulData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, unsigned short usData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, double dData);
@@ -60,6 +62,7 @@ public:
 
 	// the following methods only work in kRead mode
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, long& rlData);
+	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, __int64& rllData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, unsigned long& rulData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, unsigned short& rusData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, double& rdData);

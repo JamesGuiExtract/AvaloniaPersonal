@@ -180,6 +180,19 @@ void ByteStreamManipulator::flushToByteStream(unsigned long ulRequiredNumberToBe
 			memcpy(pszDataCursor, pData, ulDataSize);
 			pszDataCursor += ulDataSize;
 			break;
+		case kLongLong:
+			// verify data size is as expected
+			if (ulDataSize != sizeof (__int64))
+			{
+				UCLIDException uclidEx("ELI28625", 
+					"Internal error in ByteStreamManipulator::flushToByteStream() - kLongLong!");
+				uclidEx.addDebugInfo("ulDataSize", ValueTypePair((long)ulDataSize));
+				throw uclidEx;
+			}
+			// copy the data
+			memcpy(pszDataCursor, pData, ulDataSize);
+			pszDataCursor += ulDataSize;
+			break;
 		case kUnsignedShort:
 			// verify data size is as expected
 			if (ulDataSize != sizeof (unsigned short))
@@ -265,6 +278,26 @@ ByteStreamManipulator& operator << (ByteStreamManipulator& rManipulator, long lD
 	rManipulator.vecBytes.push_back(pData);
 	rManipulator.vecLengths.push_back(ulDataSize);
 	rManipulator.vecStorageTypes.push_back(ByteStreamManipulator::kLong);
+
+	return rManipulator;
+}
+//--------------------------------------------------------------------------------------------------
+ByteStreamManipulator& operator << (ByteStreamManipulator& rManipulator, __int64 llData)
+{
+	// this operator should only work in the kWrite mode
+	if (rManipulator.eMode != ByteStreamManipulator::kWrite)
+	{
+		throw UCLIDException("ELI28626", 
+			"ByteStreamManipulator: cannot call << operator on a read-only object!");
+	}
+
+	rManipulator.ulNumItems++;
+	unsigned long ulDataSize = sizeof(llData);
+	char *pData = new char[ulDataSize];
+	memcpy(pData, &llData, ulDataSize);
+	rManipulator.vecBytes.push_back(pData);
+	rManipulator.vecLengths.push_back(ulDataSize);
+	rManipulator.vecStorageTypes.push_back(ByteStreamManipulator::kLongLong);
 
 	return rManipulator;
 }
@@ -435,6 +468,37 @@ ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator, long& r
 	
 	memcpy((char *) &rlData, (char *) rManipulator.pszByteStreamCursor, sizeof(rlData));
 	rManipulator.pszByteStreamCursor += sizeof(rlData);
+	
+	return rManipulator;
+}
+//--------------------------------------------------------------------------------------------------
+ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator, __int64& rllData)
+{
+	// this operator should only work in the kRead mode
+	if (rManipulator.eMode != ByteStreamManipulator::kRead)
+	{
+		throw UCLIDException("ELI28627", 
+			"ByteStreamManipulator: cannot call >> operator on a write-only object!");
+	}
+
+	// ensure that the cursor is not null
+	if (rManipulator.pszByteStreamCursor == NULL)
+	{
+		throw UCLIDException("ELI28628", 
+			"Internal error in ByteStreamManipulator >> operator - rlData!");
+	}
+
+	unsigned long ulDataSize = sizeof(__int64);
+
+	// ensure that the required amount of bytes can be read.
+	if (rManipulator.byteStream.getLength() - rManipulator.getCurPos() < ulDataSize)
+	{
+		throw UCLIDException("ELI28629", 
+			"Internal error in ByteStreamManipulator >> operator - cannot read a longlong item!");
+	}
+	
+	memcpy((char *) &rllData, (char *) rManipulator.pszByteStreamCursor, sizeof(ulDataSize));
+	rManipulator.pszByteStreamCursor += sizeof(ulDataSize);
 	
 	return rManipulator;
 }

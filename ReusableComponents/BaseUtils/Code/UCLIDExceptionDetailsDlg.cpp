@@ -581,6 +581,10 @@ void UCLIDExceptionDetailsDlg::loadExceptionData(const UCLIDException &ex)
 			strType = "integer";
 			strValue = asString(valTypePair.getIntValue());
 			break;
+		case ValueTypePair::kInt64:
+			strType = "int64";
+			strValue = asString(valTypePair.getInt64Value());
+			break;
 		case ValueTypePair::kLong:
 			strType = "long";
 			strValue = asString(valTypePair.getLongValue());

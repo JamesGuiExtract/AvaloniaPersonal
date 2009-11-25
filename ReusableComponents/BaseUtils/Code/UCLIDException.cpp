@@ -422,6 +422,10 @@ ByteStream UCLIDException::asByteStream() const
 				streamManipulator << (long) valueTypePair.getIntValue();
 				_lastCodePos = "170";
 				break;
+			case ValueTypePair::kInt64:
+				streamManipulator << valueTypePair.getInt64Value();
+				_lastCodePos = "175";
+				break;
 			case ValueTypePair::kLong:
 				streamManipulator << valueTypePair.getLongValue();
 				_lastCodePos = "180";
@@ -1688,6 +1692,7 @@ void UCLIDException::loadFromStream(ByteStream& rByteStream)
 			string strName;
 			double dTemp;
 			long lTemp;
+			__int64 llTemp;
 			unsigned long ulTemp;
 
 			streamManipulator >> strName;
@@ -1711,6 +1716,11 @@ void UCLIDException::loadFromStream(ByteStream& rByteStream)
 				streamManipulator >> lTemp;
 				valueTypePair.setIntValue(lTemp);
 				_lastCodePos = "210";
+				break;
+			case ValueTypePair::kInt64:
+				streamManipulator >> llTemp;
+				valueTypePair.setValue(llTemp);
+				_lastCodePos = "205";
 				break;
 			case ValueTypePair::kLong:
 				streamManipulator >> lTemp;
@@ -1839,6 +1849,9 @@ void UCLIDException::asString(string& rResult, bool bRecursiveCall) const
 				rResult += ::asString(iter2->GetPair().getIntValue());
 				rResult += " (int)";
 				break;
+			case ValueTypePair::kInt64:
+				rResult += ::asString(iter2->GetPair().getInt64Value());
+				rResult += " (int64)";
 			case ValueTypePair::kLong:
 				rResult += ::asString(iter2->GetPair().getLongValue());
 				rResult += " (long)";

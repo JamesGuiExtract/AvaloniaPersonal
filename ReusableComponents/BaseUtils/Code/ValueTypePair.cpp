@@ -33,6 +33,9 @@ ValueTypePair::ValueTypePair(const ValueTypePair& vtpToCopy)
 	case kInt:
 		setIntValue(vtpToCopy.iValue);
 		break;
+	case kInt64:
+		setValue(vtpToCopy.llValue);
+		break;
 	case kLong:
 		setValue(vtpToCopy.lValue);
 		break;
@@ -74,6 +77,9 @@ ValueTypePair& ValueTypePair::operator=(const ValueTypePair& vtpToAssign)
 		break;
 	case kInt:
 		setIntValue(vtpToAssign.iValue);
+		break;
+	case kInt64:
+		setValue(vtpToAssign.llValue);
 		break;
 	case kLong:
 		setValue(vtpToAssign.lValue);
@@ -134,6 +140,13 @@ ValueTypePair::ValueTypePair(unsigned int _iValue)
 	//set as unsigned long value 
 	unsigned long _ulValue = _iValue;
 	setValue(_ulValue);
+}
+//--------------------------------------------------------------------------------------------------
+ValueTypePair::ValueTypePair(__int64 _llValue)
+{
+	ValueTypePair::ValueTypePair();
+
+	setValue(_llValue);
 }
 //--------------------------------------------------------------------------------------------------
 ValueTypePair::ValueTypePair(long _lValue)
@@ -207,6 +220,12 @@ void ValueTypePair::setValue(long _lValue)
 {
 	eType = kLong;
 	lValue = _lValue;
+}
+//--------------------------------------------------------------------------------------------------
+void ValueTypePair::setValue(__int64 _llValue)
+{
+	eType = kInt64;
+	llValue = _llValue;
 }
 //--------------------------------------------------------------------------------------------------
 void ValueTypePair::setValue(unsigned long _ulValue)
@@ -350,6 +369,16 @@ int ValueTypePair::getIntValue() const
 	}
 
 	return iValue;
+}
+//--------------------------------------------------------------------------------------------------
+__int64 ValueTypePair::getInt64Value() const
+{
+	if (eType != kInt64)
+	{
+		throw UCLIDException("ELI28630", "Internal error: getInt64Value() called on a non-int64 ValueTypePair.");
+	}
+
+	return llValue;
 }
 //--------------------------------------------------------------------------------------------------
 double ValueTypePair::getDoubleValue() const

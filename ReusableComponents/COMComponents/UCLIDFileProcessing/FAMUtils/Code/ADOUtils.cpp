@@ -174,6 +174,7 @@ void setLongField( const FieldsPtr& ipFields, const string& strFieldName, const 
 	{
 		// Add FieldName to the debug info
 		ue.addDebugInfo("FieldName", strFieldName);
+		ue.addDebugInfo("Value To Set", nValue);
 		throw ue;
 	}
 }
@@ -206,6 +207,7 @@ void setLongLongField( const FieldsPtr& ipFields, const string& strFieldName, co
 	{
 		// Add FieldName to the debug info
 		ue.addDebugInfo("FieldName", strFieldName);
+		ue.addDebugInfo("Value To Set", llValue);
 		throw ue;
 	}
 }
@@ -246,6 +248,7 @@ void setStringField( const FieldsPtr& ipFields, const string& strFieldName, cons
 	{
 		// Add FieldName to the debug info
 		ue.addDebugInfo("FieldName", strFieldName);
+		ue.addDebugInfo("Value To Set", strValue);
 		throw ue;
 	}
 }
@@ -323,6 +326,7 @@ void setTimeDateField( const FieldsPtr& ipFields, const string& strFieldName, co
 	{
 		// Add FieldName to the debug info
 		ue.addDebugInfo("FieldName", strFieldName);
+		ue.addDebugInfo("Value To Set", (LPCTSTR) timeDate.Format("%m/%d/%Y %H:%M:%S"));
 		throw ue;
 	}
 }
@@ -354,6 +358,7 @@ void setDoubleField( const FieldsPtr& ipFields, const string& strFieldName, cons
 	{
 		// Add FieldName to the debug info
 		ue.addDebugInfo("FieldName", strFieldName);
+		ue.addDebugInfo("Value To Set", dValue);
 		throw ue;
 	}
 }
