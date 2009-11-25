@@ -2,7 +2,6 @@
 
 IF "%~1"=="" GOTO missing_version_number_error
 IF "%~2"=="" GOTO normal_build
-IF "%~2"=="/noget" GOTO noget_build
 IF "%~2"=="/patch" GOTO patch_build
 IF "%~2"=="/PATCH" GOTO patch_build
 IF "%~2"=="/Patch" GOTO patch_build
@@ -24,7 +23,7 @@ GOTO exit_script
 
 :patch_build
 ECHO Initiating a patch build....
-SET BuildScriptTarget=DoEverythingNoGet
+SET BuildScriptTarget=DoBuilds
 GOTO init_build
 
 :normal_build
