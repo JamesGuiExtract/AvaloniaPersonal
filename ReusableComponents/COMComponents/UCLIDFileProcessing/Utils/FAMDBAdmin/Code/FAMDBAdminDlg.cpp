@@ -318,11 +318,6 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 		// Set the database is good flag to true
 		m_bIsDBGood = true;
 
-		// Set the database status
-		setUIDatabaseStatus();
-
-		MessageBox("Current database has been cleared.", "Success", MB_ICONINFORMATION);
-
 		// Add application trace whenever a database modification is made
 		// [LRCAU #5052 - JDS - 12/18/2008]
 		UCLIDException uex("ELI23598", "Application trace: Database change");
@@ -332,6 +327,11 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 		uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
 		uex.addDebugInfo("Actions", bRetainActions ? "Retained" : "Not retained");
 		uex.log();
+
+		// Set the database status
+		setUIDatabaseStatus();
+
+		MessageBox("Current database has been cleared.", "Success", MB_ICONINFORMATION);
 
 		// Enable the menus based on the new flag settings
 		enableMenus();

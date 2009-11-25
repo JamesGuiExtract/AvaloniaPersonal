@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+using namespace std;
 
 class EXPORT_BaseUtils TextFunctionExpander
 {
@@ -20,19 +21,19 @@ public:
 	//			isFunctionAvailable(funcname) returns true
 	//			All arguments must be valid for their function
 	// PROMISE: 
-	const std::string expandFunctions(const std::string& str) const;
+	const string expandFunctions(const string& str) const;
 
 	// PURPOSE: to return a list of all functions that 
 	//			this method supports i.e. "dirof", "fileof", "extof"
 	// REQUIRE: NONE
 	// PROMISE: 
-	const std::vector<std::string>& getAvailableFunctions() const;
+	const vector<string>& getAvailableFunctions() const;
 
 	// PURPOSE: return whether a certain function is available
 	// REQUIRE: strFunction must be a plain function name i.e. 
 	//			"dirof" not "$dirof" or "$dirof()
 	// PROMISE:
-	bool isFunctionAvailable(const std::string& strFunction) const;
+	bool isFunctionAvailable(const string& strFunction) const;
 
 	// PURPOSE: To add the function syntax around each function in a list of
 	//			function names
@@ -40,7 +41,7 @@ public:
 	// PROMISE: each string in vecFunctions (which should be a function name 
 	//			e.g. "dirof") will be replaced by a formatted function name
 	//			(e.g. "$dirof()")
-	void formatFunctions(std::vector<std::string>& vecFunctions) const;
+	void formatFunctions(vector<string>& vecFunctions) const;
 
 	// PURPOSE: return whether a certain function can be expanded using 
 	//			strArgument as an argument and strParameter as zero or more 
@@ -52,8 +53,8 @@ public:
 	//			Parameters in strParameters must be comma separated
 	// PROMISE: Returns true if strFunction can be expanded as specified, 
 	//			otherwise false
-	bool isValidParameters(const std::string& strFunction, 
-		const std::string& strArgument, const std::string& strParameter) const;
+	bool isValidParameters(const string& strFunction, 
+		const string& strArgument, const string& strParameter) const;
 
 private:
 	// Examples for path = C:\temp1\temp2\filename.tif
@@ -65,15 +66,18 @@ private:
 	// $FileOf(path) = filename.tif
 	// $Replace(path,te,bli) = C:\blimp1\blimp2\filename.tif
 	// $InsertBefore(path,.new) = C:\temp1\temp2\filename.new.tif
-	const std::string expandDirOf(const std::string&) const;
-	const std::string expandDirNoDriveOf(const std::string&) const;
-	const std::string expandDriveOf(const std::string&) const;
-	const std::string expandExtOf(const std::string&) const;
-	const std::string expandFileOf(const std::string&) const;
-	const std::string expandFileNoExtOf(const std::string&) const;
-	const std::string expandInsertBeforeExt(const std::string& str) const;
-	const std::string expandOffset(const std::string& str) const;
-	const std::string expandPadValue(const std::string& str) const;
-	const std::string expandReplace(const std::string& str) const;
-	const std::string expandTrimAndConsolidateWS(const std::string& str) const;
+	// If FPS_PATH = C:\FPSFiles
+	// $Env(FPS_PATH) = C:\FPSFiles
+	const string expandDirOf(const string&) const;
+	const string expandDirNoDriveOf(const string&) const;
+	const string expandDriveOf(const string&) const;
+	const string expandExtOf(const string&) const;
+	const string expandFileOf(const string&) const;
+	const string expandFileNoExtOf(const string&) const;
+	const string expandInsertBeforeExt(const string& str) const;
+	const string expandOffset(const string& str) const;
+	const string expandPadValue(const string& str) const;
+	const string expandReplace(const string& str) const;
+	const string expandEnv(const string& str) const;
+	const string expandTrimAndConsolidateWS(const string& str) const;
 };

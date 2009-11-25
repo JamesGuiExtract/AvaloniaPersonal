@@ -43,13 +43,14 @@ TextFunctionExpander::TextFunctionExpander()
 		g_vecFunctions.push_back("Offset");
 		g_vecFunctions.push_back("PadValue");
 		g_vecFunctions.push_back("Replace");
+		g_vecFunctions.push_back("Env");
 		g_vecFunctions.push_back("TrimAndConsolidateWS");
 
 		g_bInit = true;
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandFunctions(const std::string& str) const
+const string TextFunctionExpander::expandFunctions(const string& str) const
 {
 	
 	string strRet;
@@ -181,6 +182,10 @@ const std::string TextFunctionExpander::expandFunctions(const std::string& str) 
 		{
 			strRet += expandTrimAndConsolidateWS( strArg );
 		}
+		else if (strFunction == "env")
+		{
+			strRet += expandEnv(strArg);
+		}
 		else
 		{
 			UCLIDException ue("ELI11769", "Invalid Text Function!");
@@ -195,7 +200,7 @@ const vector<string>& TextFunctionExpander::getAvailableFunctions() const
 	return g_vecFunctions;
 }
 //-------------------------------------------------------------------------------------------------
-bool TextFunctionExpander::isFunctionAvailable(const std::string& strFunction) const
+bool TextFunctionExpander::isFunctionAvailable(const string& strFunction) const
 {
 	for (unsigned int i = 0; i < g_vecFunctions.size(); i++)
 	{
@@ -207,7 +212,7 @@ bool TextFunctionExpander::isFunctionAvailable(const std::string& strFunction) c
 	return false;
 }
 //--------------------------------------------------------------------------------------------------
-void TextFunctionExpander::formatFunctions(std::vector<std::string>& vecFunctions) const
+void TextFunctionExpander::formatFunctions(vector<string>& vecFunctions) const
 {
 	for (unsigned int i = 0; i < vecFunctions.size(); i++)
 	{
@@ -216,9 +221,9 @@ void TextFunctionExpander::formatFunctions(std::vector<std::string>& vecFunction
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool TextFunctionExpander::isValidParameters(const std::string& strFunction, 
-											 const std::string& strArgument, 
-											 const std::string& strParameter) const
+bool TextFunctionExpander::isValidParameters(const string& strFunction, 
+											 const string& strArgument, 
+											 const string& strParameter) const
 {
 	// Locate strFunction
 	if (isFunctionAvailable(strFunction))
@@ -265,7 +270,7 @@ bool TextFunctionExpander::isValidParameters(const std::string& strFunction,
 //-------------------------------------------------------------------------------------------------
 // Private
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandDirNoDriveOf(const std::string& str) const
+const string TextFunctionExpander::expandDirNoDriveOf(const string& str) const
 {
 	// Retrieve full directory with drive
 	string strFullDir = expandDirOf( str );
@@ -289,37 +294,37 @@ const std::string TextFunctionExpander::expandDirNoDriveOf(const std::string& st
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandDirOf(const std::string& str) const
+const string TextFunctionExpander::expandDirOf(const string& str) const
 {
 	return getDirectoryFromFullPath(str, false);
 }
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandDriveOf(const std::string& str) const
+const string TextFunctionExpander::expandDriveOf(const string& str) const
 {
 	return getDriveFromFullPath(str, false);
 }
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandExtOf(const std::string& str) const
+const string TextFunctionExpander::expandExtOf(const string& str) const
 {
 	string strTmp = getExtensionFromFullPath(str, false);
 	strTmp.erase(0, 1);
 	return strTmp;
 }
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandFileOf(const std::string& str) const
+const string TextFunctionExpander::expandFileOf(const string& str) const
 {
 	return getFileNameFromFullPath(str, false);
 }
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandFileNoExtOf(const std::string& str) const
+const string TextFunctionExpander::expandFileNoExtOf(const string& str) const
 {
 	return getFileNameWithoutExtension(str, false);
 }
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandInsertBeforeExt(const std::string& str) const
+const string TextFunctionExpander::expandInsertBeforeExt(const string& str) const
 {
 	// Tokenize the string into strSource, strInsert
-	std::vector<std::string> vecTokens;
+	vector<string> vecTokens;
 	StringTokenizer::sGetTokens(str, ",", vecTokens);
 
 	// Check for proper number of tokens
@@ -378,9 +383,9 @@ const std::string TextFunctionExpander::expandInsertBeforeExt(const std::string&
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandOffset(const std::string& str) const
+const string TextFunctionExpander::expandOffset(const string& str) const
 {
-	std::vector<std::string> vecTokens;
+	vector<string> vecTokens;
 
 	StringTokenizer::sGetTokens(str, ",", vecTokens);
 
@@ -420,9 +425,9 @@ const std::string TextFunctionExpander::expandOffset(const std::string& str) con
 	return string(pszValue);
 }
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandPadValue(const std::string& str) const
+const string TextFunctionExpander::expandPadValue(const string& str) const
 {
-	std::vector<std::string> vecTokens;
+	vector<string> vecTokens;
 
 	StringTokenizer::sGetTokens(str, ",", vecTokens);
 
@@ -462,10 +467,10 @@ const std::string TextFunctionExpander::expandPadValue(const std::string& str) c
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandReplace(const std::string& str) const
+const string TextFunctionExpander::expandReplace(const string& str) const
 {
 	// Tokenize the string into strSource, strSearch, strReplace
-	std::vector<std::string> vecTokens;
+	vector<string> vecTokens;
 	StringTokenizer::sGetTokens(str, ",", vecTokens);
 
 	// Check for proper number of tokens
@@ -510,7 +515,7 @@ const std::string TextFunctionExpander::expandReplace(const std::string& str) co
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const std::string TextFunctionExpander::expandTrimAndConsolidateWS(const std::string& str) const
+const string TextFunctionExpander::expandTrimAndConsolidateWS(const string& str) const
 {
 	string strResult = str;
 	string strWS = " \t\r\n";
@@ -520,6 +525,14 @@ const std::string TextFunctionExpander::expandTrimAndConsolidateWS(const std::st
 
 	//remove all internal whitespace
 	strResult = replaceMultipleCharsWithOne(strResult, strWS, " ", true);
+
+	return strResult;
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandEnv(const string &str) const
+{
+	// Return the value for the environment variable
+	string strResult = getEnvironmentVariableValue(str);
 
 	return strResult;
 }
