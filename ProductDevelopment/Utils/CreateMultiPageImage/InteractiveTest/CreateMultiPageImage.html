@@ -1,15 +1,15 @@
 <html>
 <head>
-    <title>CreateMultiPageImage Utility - Testing Checklist</title>
+<title>Multi-Page Image Utilities Testing Checklist</title>
     <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </head>
 <body>
-<h1>CreateMultiPageImage Utility - Testing Checklist<br>
+<h1>Create Multi-Page Image &amp Split Multi-Page Image<br>
         <img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
 <ol>
-	<li><h2>General</h2>
+	<li><h2>CMPI - General</h2>
      	<ul>
            	<li>Confirm that <b>CreateMultiPageImage</b> requires a suitable license file.
            	<li><b>[LegacyRCAndUtils #4345]</b> Confirm that <b>CreateMultiPageImage /?</b> displays 
@@ -19,7 +19,7 @@
       	</ul>
      	</li>
 <p>
-     	<li><h2>File Name Formats - using InteractiveTest folder as command-line argument</h2>
+     	<li><h2>CMPI - File Name Formats - using InteractiveTest folder as command-line argument</h2>
 	The batch file <b>test_CreateMultiPageImage.bat</b> that is found in
 	the <b>InteractiveTest</b> folder will run the following tests
 	automatically.  In order to use it, copy the three images and the
@@ -76,13 +76,13 @@
      	</ul>
      	</li>
 <p>
-     	<li><h2>File Names From Input File - using InputFiles.txt</h2>
+     	<li><h2>CMPI - File Names From Input File - using InputFiles.txt</h2>
       	<ul>
            	<li><b>Command-line Arguments</b>.  TBD.
        	</ul>
      	</li>
 <p>
-     	<li><h2>Miscellaneous Items</h2>
+     	<li><h2>CMPI - Miscellaneous Items</h2>
       	<ul>
             	<li>Confirm that CreateMultiPageImage documentation is available in the 
 		<b>FLEX Index</b> Help file.
@@ -94,6 +94,34 @@
 		Start menu path or a fully-qualified path to the EXE.
      	</ul>
      	</li>
+<p>
+	<LI><h2>Split Multi-Page Image</h2>
+       	<ul>
+      		<li>Confirm that a single-page TIF image is successfully split.
+      		<li>Confirm that a multiple-page TIF image is successfully split.
+      		<li>Confirm that a folder with a combination of single- and multiple-page 
+		TIF images is successfully split.
+      		<li>Confirm that attempting to process a PDF image provides a meaningful 
+		error message.
+      		<li>Confirm that a processing a folder with a combination of TIF and PDF 
+		successfully processes TIFs until the first PDF image is found.
+		<li>Confirm that a meaningful error message is presented.
+<p>
+		<li>Confirm that using the <b>/ef &lt;LogFile&gt;</b> option is 
+		effective at writing exceptions to the specified log file.
+		<li>Confirm that using the <b>/d</b> option is effective at 
+		deleting the multi-page image after splitting pages.
+		<li>Confirm that using the <b>/o</b> option is effective at overwriting 
+		the output files if necessary.
+		<li>Confirm that without using the <b>/o</b> option, an error occurs 
+		if the output files already exist.
+		<li>Confirm that a multi-page image with existing annotations is split 
+		successfully and that the annotations are applied properly to each 
+		individual page.
+<p>
+		<li>Confirm that the utility can be used with the FAM to process 
+		individual images via the <b>Core: Launch external application</b> task.
+       	</ul>
 </ol>
 </body>
 </html>
