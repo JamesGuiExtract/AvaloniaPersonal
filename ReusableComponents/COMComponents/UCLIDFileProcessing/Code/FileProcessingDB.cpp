@@ -1141,6 +1141,10 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles( BSTR strAction,  EActionSt
 		string strDeleteSkippedSQL = "DELETE FROM [SkippedFile] WHERE ActionID = " + strActionID;
 		executeCmdQuery(ipConnection, strDeleteSkippedSQL);
 
+		// Remove any records in the LockedFile table for status changing from Processing to pending
+		string strDeleteLockedFiles = "DELETE FROM [LockedFile] WHERE ActionID = " + strActionID;
+		executeCmdQuery(ipConnection, strDeleteLockedFiles);
+
 		// If setting files to skipped, need to add skipped record for each file
 		if (eStatus == kActionSkipped)
 		{

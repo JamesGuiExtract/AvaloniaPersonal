@@ -1071,7 +1071,7 @@ void CFileProcessingDB::copyActionStatus( const _ConnectionPtr& ipConnection, co
 			// Need to add any new skipped records (files may be entering skipped status)
 			string strAddSkipped = "INSERT INTO SkippedFile (FileID, ActionID, UserName, UPIID) SELECT "
 				" FAMFile.ID, " + strToActionID + " AS NewActionID, '" + getCurrentUserName()
-				+ "' AS NewUserName " + asString(m_nUPIID) + " AS UPIID FROM FAMFile WHERE ASC_" 
+				+ "' AS NewUserName, " + asString(m_nUPIID) + " AS UPIID FROM FAMFile WHERE ASC_" 
 				+ strFrom + " = 'S'";
 
 			// Delete the existing skipped records for this action and insert any new ones
