@@ -174,6 +174,8 @@
 #define IDC_COMBO_CONTAINS              356
 #define IDC_COMBO_AUTO_TOOL             357
 #define IDC_CHECK_AUTO_TOOL             358
+#define IDC_GROUP_DATA_FILE_OPTIONS		359
+#define IDC_GROUP_MISSING_FILE_OPTIONS  360
 
 // Next default values for new objects
 // 
@@ -181,7 +183,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         32781
-#define _APS_NEXT_CONTROL_VALUE         359
+#define _APS_NEXT_CONTROL_VALUE         361
 #define _APS_NEXT_SYMED_VALUE           155
 #endif
 #endif

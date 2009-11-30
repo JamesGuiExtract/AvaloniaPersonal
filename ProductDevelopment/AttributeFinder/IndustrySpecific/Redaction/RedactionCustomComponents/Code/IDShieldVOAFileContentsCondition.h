@@ -88,6 +88,8 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(put_MissingFileBehavior)(EMissingVOAFileBehavior newVal);
 	STDMETHOD(get_AttributeQuantifier)(EAttributeQuantifier* pVal);
 	STDMETHOD(put_AttributeQuantifier)(EAttributeQuantifier newVal);
+	STDMETHOD(get_ConfigureConditionsOnly)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_ConfigureConditionsOnly)(VARIANT_BOOL newVal);
 
 // ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
@@ -133,6 +135,7 @@ private:
 	string m_strTargetFileName;
 	UCLID_REDACTIONCUSTOMCOMPONENTSLib::EMissingVOAFileBehavior m_eMissingFileBehavior;
 	UCLID_REDACTIONCUSTOMCOMPONENTSLib::EAttributeQuantifier m_eAttributeQuantifier;
+	bool m_bConfigureConditionsOnly;
 
 	// Tests if the attributes match the specified condition
 	auto_ptr<AttributeTester> m_apTester;

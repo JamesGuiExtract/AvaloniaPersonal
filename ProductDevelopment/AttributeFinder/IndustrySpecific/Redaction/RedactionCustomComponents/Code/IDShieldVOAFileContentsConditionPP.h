@@ -38,6 +38,7 @@ END_COM_MAP()
 BEGIN_MSG_MAP(CIDShieldVOAFileContentsConditionPP)
 	CHAIN_MSG_MAP(IPropertyPageImpl<CIDShieldVOAFileContentsConditionPP>)
 	MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+	MESSAGE_HANDLER(WM_SHOWWINDOW, OnShowWindow)
 	COMMAND_HANDLER(IDC_CHECK_CONTAINS_DATA, BN_CLICKED, OnClickedContainsData)
 	COMMAND_HANDLER(IDC_CHECK_DOCTYPE, BN_CLICKED, OnClickedIndicatesDocType)
 	COMMAND_HANDLER(IDC_BTN_SELECT_DOCTYPE, BN_CLICKED, OnClickedDocType)
@@ -46,6 +47,7 @@ END_MSG_MAP()
 
 // Windows Message Handlers
 	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnClickedContainsData(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedIndicatesDocType(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedDocType(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
@@ -71,8 +73,10 @@ private:
 	ATLControls::CButton m_checkIndicatesDocType;
 	ATLControls::CListBox m_listDocTypes;
 	ATLControls::CButton m_btnSelectDocType;
+	ATLControls::CStatic m_groupDataFileOptions;
 	ATLControls::CStatic m_txtDataFileStatus;
 	ATLControls::CButton m_btnConfigDataFile;
+	ATLControls::CStatic m_groupMissingFileOptions;
 	ATLControls::CButton m_btnErrorOnMissingData;
 	ATLControls::CButton m_btnSatisfiedOnMissingData;
 	ATLControls::CButton m_btnUnsatisfiedOnMissingData;

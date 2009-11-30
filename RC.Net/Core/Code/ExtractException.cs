@@ -1121,6 +1121,23 @@ namespace Extract
         }
 
         /// <summary>
+        /// Create an <see cref="ExtractException"/> from a previously stringized exception.
+        /// </summary>
+        /// <param name="eliCode">The ELI code for a new history entry associated with the
+        /// conversion.</param>
+        /// <param name="stringizedException">The stringized excpetion.</param>
+        /// <returns>An <see cref="ExtractException"/> that results from re-instantiating the
+        /// stringized exception.</returns>
+        [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Stringized")]
+        public static ExtractException FromStringizedByteStream(string eliCode, 
+            string stringizedException)
+        {
+            // Re-create an exception instance from a stringized version.
+            return FromCppException(eliCode, new Exception(stringizedException));
+        }
+
+        /// <summary>
         /// Create an <see cref="ExtractException"/> that can be thrown from a COM visible method.
         /// </summary>
         /// <param name="eliCode">The ELI code for the new exception.</param>

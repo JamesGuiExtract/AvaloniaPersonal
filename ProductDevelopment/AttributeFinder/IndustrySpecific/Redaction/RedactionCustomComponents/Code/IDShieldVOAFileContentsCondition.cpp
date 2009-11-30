@@ -14,7 +14,7 @@
 // Constants
 //--------------------------------------------------------------------------------------------------
 // current version
-const unsigned long gnCurrentVersion = 3;
+const unsigned long gnCurrentVersion = 4;
 // attribute names
 const string gstrATTRIBUTE_HCDATA	= "HCData";
 const string gstrATTRIBUTE_MCDATA	= "MCData";
@@ -37,7 +37,8 @@ CIDShieldVOAFileContentsCondition::CIDShieldVOAFileContentsCondition() :
 	m_strDocCategory(""),
 	m_strTargetFileName(gstrDEFAULT_TARGET_FILENAME),
 	m_eMissingFileBehavior(UCLID_REDACTIONCUSTOMCOMPONENTSLib::kThrowError),
-	m_eAttributeQuantifier(UCLID_REDACTIONCUSTOMCOMPONENTSLib::kAny)
+	m_eAttributeQuantifier(UCLID_REDACTIONCUSTOMCOMPONENTSLib::kAny),
+	m_bConfigureConditionsOnly(false)
 {
 	m_setDocTypes.clear();
 }
@@ -516,6 +517,42 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::put_AttributeQuantifier(EAttribu
 
 	return S_OK;
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CIDShieldVOAFileContentsCondition::get_ConfigureConditionsOnly(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check licensing
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28670", pVal != NULL);
+
+		*pVal = asVariantBool(m_bConfigureConditionsOnly);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28671");	
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CIDShieldVOAFileContentsCondition::put_ConfigureConditionsOnly(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check licensing
+		validateLicense();
+
+		m_bConfigureConditionsOnly = asCppBool(newVal);
+
+		setDirty(true);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28672");
+}
 
 //--------------------------------------------------------------------------------------------------
 // ISupportsErrorInfo
@@ -618,6 +655,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_CopyFrom(IUnknown *pObject)
 		m_strTargetFileName			= asString(ipCopyThis->TargetFileName);
 		m_eMissingFileBehavior		= ipCopyThis->MissingFileBehavior;
 		m_eAttributeQuantifier      = ipCopyThis->AttributeQuantifier;
+		m_bConfigureConditionsOnly  = asCppBool(ipCopyThis->ConfigureConditionsOnly);
 
 		// load m_setDocTypes
 		getThisAsCOMPtr()->DocTypes = ipCopyThis->DocTypes;
@@ -727,6 +765,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::Load(IStream *pStream)
 		m_strTargetFileName = gstrDEFAULT_TARGET_FILENAME;
 		m_eMissingFileBehavior = UCLID_REDACTIONCUSTOMCOMPONENTSLib::kThrowError;
 		m_eAttributeQuantifier = UCLID_REDACTIONCUSTOMCOMPONENTSLib::kAny;
+		m_bConfigureConditionsOnly = false;
 		m_apTester.reset();
 
 		// Read the bytestream data from the IStream object
@@ -790,6 +829,11 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::Load(IStream *pStream)
 			m_setDocTypes.insert(strValue);
 		}
 
+		if (nDataVersion >= 4)
+		{
+			dataReader >> m_bConfigureConditionsOnly;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		setDirty(false);
 	}
@@ -825,6 +869,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::Save(IStream *pStream, BOOL fCle
 		dataWriter << m_strTargetFileName;
 		dataWriter << (long)m_eMissingFileBehavior;
 		dataWriter << (long)m_eAttributeQuantifier;
+		dataWriter << m_bConfigureConditionsOnly;
 
 		// Save doc types
 		unsigned long ulSize = m_setDocTypes.size();

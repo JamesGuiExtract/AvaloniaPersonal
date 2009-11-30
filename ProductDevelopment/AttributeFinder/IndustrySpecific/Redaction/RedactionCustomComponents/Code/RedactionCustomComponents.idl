@@ -439,6 +439,14 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
 			[out, retval] EAttributeQuantifier* pVal);
 		[propput, id(12), helpstring("property AttributeQuantifier")] HRESULT AttributeQuantifier(
 			[in] EAttributeQuantifier newVal);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets or sets whether the condition object should allow only the condition itself
+		//			to be configured.
+		[propget, id(13), helpstring("property ConfigureConditionsOnly")] HRESULT ConfigureConditionsOnly(
+			[out, retval] VARIANT_BOOL* pVal);
+		[propput, id(13), helpstring("property ConfigureConditionsOnly")] HRESULT ConfigureConditionsOnly(
+			[in] VARIANT_BOOL newVal);
 	};
 	[
 		object,

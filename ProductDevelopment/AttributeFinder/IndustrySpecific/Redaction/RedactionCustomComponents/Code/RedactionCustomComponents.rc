@@ -242,10 +242,10 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,117,216,10
     LISTBOX         IDC_LIST_DOCTYPE,18,129,150,78,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Select...",IDC_BTN_SELECT_DOCTYPE,174,129,48,14
-    GROUPBOX        "ID Shield Data File Location",IDC_STATIC,6,213,216,36
+    GROUPBOX        "ID Shield Data File Location",IDC_GROUP_DATA_FILE_OPTIONS,6,213,216,36
     LTEXT           "You are using default settings.",IDC_STATIC_DATAFILE_STATUS,18,228,144,8
     PUSHBUTTON      "Customize...",IDC_BTN_CONFIG_DATAFILE,168,225,48,14
-    GROUPBOX        "If Data File Does Not Exist",IDC_STATIC,6,255,216,51
+    GROUPBOX        "If Data File Does Not Exist",IDC_GROUP_MISSING_FILE_OPTIONS,6,255,216,51
     CONTROL         "Record an error and continue",IDC_RECORD_ERROR,"Button",BS_AUTORADIOBUTTON,18,267,180,10
     CONTROL         "Consider condition satisfied (without error)",IDC_CONDITION_SATISFIED,
                     "Button",BS_AUTORADIOBUTTON,18,279,180,10

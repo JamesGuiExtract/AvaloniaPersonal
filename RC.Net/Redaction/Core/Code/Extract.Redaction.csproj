@@ -43,6 +43,10 @@
     <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Extract.Licensing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Binaries\Debug\Extract.Licensing.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -65,6 +69,7 @@
     <Compile Include="ExemptionCodeList.cs" />
     <Compile Include="FeedbackSettings.cs" />
     <Compile Include="GeneralVerificationSettings.cs" />
+    <Compile Include="IDShieldTesterSettings.cs" />
     <Compile Include="InitializationSettings.cs" />
     <Compile Include="MasterExemptionCodeList.cs" />
     <Compile Include="MetadataSettings.cs" />

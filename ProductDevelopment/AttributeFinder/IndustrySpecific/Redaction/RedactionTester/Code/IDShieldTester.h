@@ -86,6 +86,9 @@ BEGIN_COM_MAP(CIDShieldTester)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 END_COM_MAP()
 
+// IIDShieldTester
+	STDMETHOD(get_OutputFileDirectory)(BSTR *pVal);
+
 // ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
@@ -139,6 +142,9 @@ private:
 
 	// Flags for statistic output settings
 	bool m_bOutputHybridStats;
+
+	// Specifies whether only automated statistics should be calculated.
+	bool m_bOutputAutomatedStatsOnly;
 
 	// counters
 	unsigned long m_ulTotalExpectedRedactions, m_ulNumCorrectRedactions, 

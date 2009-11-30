@@ -216,6 +216,25 @@ void CIDShieldTester::FinalRelease()
 }
 
 //-------------------------------------------------------------------------------------------------
+// IIDShieldTester
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CIDShieldTester::get_OutputFileDirectory(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		*pVal = _bstr_t(m_strOutputFileDirectory.c_str());
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28679")
+}
+
+//-------------------------------------------------------------------------------------------------
 // ISupportsErrorInfo
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CIDShieldTester::InterfaceSupportsErrorInfo(REFIID riid)
@@ -323,6 +342,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			m_iNumFilesWithExistingVOA = 0;
 			m_ulNumFilesWithOverlappingExpectedRedactions = 0;
 			m_bOutputHybridStats = false;
+			m_bOutputAutomatedStatsOnly = false;
 			m_apRedactionTester.reset();
 			m_apVerificationTester.reset();
 
@@ -508,41 +528,38 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 			createDirectory(m_strOutputFileDirectory);
 		}
 
-		// Verify the correct number of tokens for the TESTFOLDER case and that BOTH conditions
-		// and the automated redaction query have been set to something useful
-		if( m_setVerificationCondition.empty() )
+		// Verify the correct number of tokens for the TESTFOLDER case and that a verification
+		// condition has been properly set (if required) and the automated redaction query have
+		// been set to something useful.
+		if(!m_bOutputAutomatedStatsOnly &&
+			(m_setVerificationCondition.empty() || m_strVerificationQuantifier.empty()) &&
+			m_setDocTypesToBeVerified.empty())
 		{
 			// Both condition settings must be set before test folder can take place
 			UCLIDException ue("ELI25180", 
-				"Verification condition must be set before using <TESTFOLDER> test case in DAT file.");
-			throw ue;
-		}
-		else if (m_strVerificationQuantifier.empty())
-		{
-			UCLIDException ue("ELI25181", 
-				"Verification condition quantifier must be set before using <TESTFOLDER> test case in DAT file.");
+				"Either a verification attribute condition or doc type condition must be set.");
 			throw ue;
 		}
 		else if (m_setRedactionCondition.empty())
 		{
 			// Both condition settings must be set before test folder can take place
 			UCLIDException ue("ELI25162", 
-				"Automated redaction condition must be set before using <TESTFOLDER> test case in DAT file.");
+				"Automated redaction condition must be set.");
 			throw ue;
 		}
 		else if (m_strRedactionQuantifier.empty())
 		{
 			UCLIDException ue("ELI25182", 
-				"Automated redaction condition quantifier must be set before using <TESTFOLDER> test case in DAT file.");
+				"Automated redaction condition quantifier must be set.");
 			throw ue;
 		}
-		else if( m_strRedactionQuery.empty() )
+		else if(m_strRedactionQuery.empty())
 		{
 			UCLIDException ue("ELI15194", 
-				"Automated redaction query must be set before using the <TESTFOLDER> test case in DAT file.");
+				"Automated redaction query must be set.");
 			throw ue;
 		}
-		else if( nNumTokens != 5 )
+		else if(nNumTokens != 5)
 		{
 			UCLIDException ue("ELI15173", 
 				"Invalid number of arguments for <TESTFOLDER> in DAT file.");
@@ -686,6 +703,10 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 		{
 			// Update m_strOutputFileDirectory based on the specified folder.
 			getOutputDirectory(vecTokens[1]);
+		}
+		else if (vecTokens[0] == "OutputAutomatedStatsOnly")
+		{
+			m_bOutputAutomatedStatsOnly = (vecTokens[1] == "1");
 		}
 		else
 		{
@@ -1006,15 +1027,19 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 		}
 	}
 
-	// analyze the attributes for verification based redaction
-	bool bVerified = analyzeDataForVerificationBasedRedaction(ipExpectedAttributes,
-		ipFoundAttributes, strSourceDoc);
-
-	// If outputting hybrid stats and the document was verified, mark it as true and
-	// do not compute automated statistics
-	if (m_bOutputHybridStats && bVerified)
+	// If only computing automated stats, skip analyzeDataForVerificationBasedRedaction.
+	if (!m_bOutputAutomatedStatsOnly)
 	{
-		return true;
+		// analyze the attributes for verification based redaction
+		bool bVerified = analyzeDataForVerificationBasedRedaction(ipExpectedAttributes,
+			ipFoundAttributes, strSourceDoc);
+
+		// If outputting hybrid stats and the document was verified, mark it as true and
+		// do not compute automated statistics
+		if (m_bOutputHybridStats && bVerified)
+		{
+			return true;
+		}
 	}
 
 	// analyze the attributes for automated redaction
@@ -1512,8 +1537,14 @@ void CIDShieldTester::displaySummaryStatistics()
 	// The string that will be put into gstrFILE_FOR_STATISTICS (statistics file) which is a textual
 	// version of all the statistics
 	string strStatisticSummary = "";
-	strStatisticSummary += "Verification Condition: " + m_strVerificationCondition + "\r\n";
-	strStatisticSummary += "Verification Quantifier: " + m_strVerificationQuantifier + "\r\n";
+
+	// If only automated stats were computed, there are no verification stats to report.
+	if (!m_bOutputAutomatedStatsOnly)
+	{
+		strStatisticSummary += "Verification Condition: " + m_strVerificationCondition + "\r\n";
+		strStatisticSummary += "Verification Quantifier: " + m_strVerificationQuantifier + "\r\n";
+	}
+
 	strStatisticSummary += "Redaction Condition: " + m_strRedactionCondition + "\r\n";
 	strStatisticSummary += "Redaction Quantifier: " + m_strRedactionQuantifier + "\r\n";
 	strStatisticSummary += "Redaction Query: " + m_strRedactionQuery + "\r\n";
@@ -1594,25 +1625,29 @@ void CIDShieldTester::displaySummaryStatistics()
 	m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
 	strStatisticSummary += zTemp + "\r\n";
 
-	if (!m_bOutputHybridStats)
+	// If only automated stats were computed, there are no verification stats to report.
+	if (!m_bOutputAutomatedStatsOnly)
 	{
-		// Label for the redaction with verification stats
-		zTemp = "Statistics for redaction with verification:";
+		if (!m_bOutputHybridStats)
+		{
+			// Label for the redaction with verification stats
+			zTemp = "Statistics for redaction with verification:";
+			m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
+			strStatisticSummary += zTemp + "\r\n";
+		}
+		// Label for Number of files selected for review
+		zTemp.Format( "Number of files selected for review: %d (%0.1f%%)", m_ulNumFilesSelectedForReview, 
+							getRatioAsPercentOfTwoLongs(m_ulNumFilesSelectedForReview, m_ulTotalFilesProcessed));
+		m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
+		strStatisticSummary += zTemp + "\r\n";
+
+		// Make a note for the number of expected redactions in the reviewed files
+		zTemp.Format( "Number of expected redactions found in reviewed files: %d (%0.1f%%)", 
+						m_ulNumExpectedRedactionsInReviewedFiles, 
+						getRatioAsPercentOfTwoLongs(m_ulNumExpectedRedactionsInReviewedFiles, m_ulTotalExpectedRedactions));
 		m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
 		strStatisticSummary += zTemp + "\r\n";
 	}
-	// Label for Number of files selected for review
-	zTemp.Format( "Number of files selected for review: %d (%0.1f%%)", m_ulNumFilesSelectedForReview, 
-						getRatioAsPercentOfTwoLongs(m_ulNumFilesSelectedForReview, m_ulTotalFilesProcessed));
-	m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
-	strStatisticSummary += zTemp + "\r\n";
-
-	// Make a note for the number of expected redactions in the reviewed files
-	zTemp.Format( "Number of expected redactions found in reviewed files: %d (%0.1f%%)", 
-					m_ulNumExpectedRedactionsInReviewedFiles, 
-					getRatioAsPercentOfTwoLongs(m_ulNumExpectedRedactionsInReviewedFiles, m_ulTotalExpectedRedactions));
-	m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
-	strStatisticSummary += zTemp + "\r\n";
 
 	// If the number of correct redactions match the number of total expected redactions, then 
 	// the test was 100% successful.

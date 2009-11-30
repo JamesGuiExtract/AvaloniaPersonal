@@ -50,8 +50,10 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnInitDialog(UINT uMsg, WPARAM wPar
 		m_checkIndicatesDocType			= GetDlgItem(IDC_CHECK_DOCTYPE);
 		m_listDocTypes					= GetDlgItem(IDC_LIST_DOCTYPE);
 		m_btnSelectDocType				= GetDlgItem(IDC_BTN_SELECT_DOCTYPE);
+		m_groupDataFileOptions			= GetDlgItem(IDC_GROUP_DATA_FILE_OPTIONS);
 		m_txtDataFileStatus				= GetDlgItem(IDC_STATIC_DATAFILE_STATUS);
 		m_btnConfigDataFile				= GetDlgItem(IDC_BTN_CONFIG_DATAFILE);
+		m_groupMissingFileOptions		= GetDlgItem(IDC_GROUP_MISSING_FILE_OPTIONS);
 		m_btnErrorOnMissingData			= GetDlgItem(IDC_RECORD_ERROR);
 		m_btnSatisfiedOnMissingData		= GetDlgItem(IDC_CONDITION_SATISFIED);
 		m_btnUnsatisfiedOnMissingData	= GetDlgItem(IDC_CONDITION_UNSATISFIED);
@@ -129,9 +131,90 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnInitDialog(UINT uMsg, WPARAM wPar
 		m_btnUnsatisfiedOnMissingData.SetCheck(
 			ipVoaCondition->MissingFileBehavior == UCLID_REDACTIONCUSTOMCOMPONENTSLib::kConsiderUnsatisfied ? BST_CHECKED : BST_UNCHECKED);
 
+		// If only the condition is to be configured, hide the options for handling a missing data
+		// file or specifying the data file location.
+		if (asCppBool(ipVoaCondition->ConfigureConditionsOnly))
+		{
+			m_groupDataFileOptions.ShowWindow(SW_HIDE);
+			m_txtDataFileStatus.ShowWindow(SW_HIDE);
+			m_btnConfigDataFile.ShowWindow(SW_HIDE);
+			m_btnErrorOnMissingData.ShowWindow(SW_HIDE);
+			m_btnSatisfiedOnMissingData.ShowWindow(SW_HIDE);
+			m_btnUnsatisfiedOnMissingData.ShowWindow(SW_HIDE);
+			m_groupMissingFileOptions.ShowWindow(SW_HIDE);
+		}
+
 		SetDirty(FALSE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17399");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CIDShieldVOAFileContentsConditionPP::OnShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		if (wParam == FALSE)
+		{
+			return S_OK;
+		}
+
+		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldVOAFileContentsConditionPtr ipVoaCondition = m_ppUnk[0];
+		ASSERT_RESOURCE_ALLOCATION("ELI28650", ipVoaCondition != NULL);
+
+		// Adjust the size of the screen to account for options that have been hidden.
+		if (asCppBool(ipVoaCondition->ConfigureConditionsOnly))
+		{
+			// The amount the screen needs to shrink is the distance between the bottoms of the
+			// doc type list box and missing file option group box
+			RECT rectListDocTypes;
+			m_listDocTypes.GetWindowRect(&rectListDocTypes);
+
+			RECT rectMissingFileOptions;
+			m_groupMissingFileOptions.GetWindowRect(&rectMissingFileOptions);
+
+			long nAmountToShrink = rectMissingFileOptions.bottom - rectListDocTypes.bottom;
+
+			// Calculate the new window size and position of the parent window.
+			CRect rect;
+			HWND hwndParent = this->GetParent();
+			::GetWindowRect(hwndParent, &rect);
+			rect.bottom -= nAmountToShrink;
+			::SetWindowPos(hwndParent, NULL, rect.left, rect.top, rect.Width(), rect.Height(),
+				SWP_NOZORDER);
+
+			// Adjust the size/position all siblings of the property page (beneath the parent).
+			HWND hwndSibling = ::GetWindow(hwndParent, GW_CHILD);
+			while (hwndSibling != NULL)
+			{
+				::GetWindowRect(hwndSibling, &rect);
+				CPoint ptTopLeft(rect.left, rect.top);
+				::ScreenToClient(hwndParent, &ptTopLeft);
+				rect.MoveToXY(ptTopLeft.x, ptTopLeft.y);
+
+				if (::GetWindowTextLength(hwndSibling) > 0)
+				{
+					// A control with text is a button that should move up, not shrink
+					rect.OffsetRect(0, -nAmountToShrink);
+				}
+				else
+				{
+					// Otherwise this is the property page itself of the group box that contains it.
+					// Shrink it.
+					rect.bottom -= nAmountToShrink;
+				}
+
+				::SetWindowPos(hwndSibling, NULL, rect.left, rect.top, rect.Width(), rect.Height(),
+					SWP_NOZORDER);
+
+				hwndSibling = ::GetWindow(hwndSibling, GW_HWNDNEXT);
+			}
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28651");
 
 	return 0;
 }

@@ -8,23 +8,30 @@ import "oaidl.idl";
 import "ocidl.idl";
 
 [
-	object,
-	uuid(C5BFE2C3-CAD9-47A2-A152-8B7A69A23951),
-	dual,
-	nonextensible,
-	helpstring("IIDShieldTester Interface"),
-	pointer_default(unique)
-]
-interface IIDShieldTester : IDispatch{
-};
-[
 	uuid(A4A34C92-B83C-46C6-8904-CB131E50CC25),
 	version(1.0),
 	helpstring("RedactionTester 1.0 Type Library")
 ]
 library EXTRACTREDACTIONTESTERLib
 {
+	importlib("stdole32.tlb");
 	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	[
+		object,
+		uuid(C5BFE2C3-CAD9-47A2-A152-8B7A69A23951),
+		dual,
+		nonextensible,
+		helpstring("IIDShieldTester Interface"),
+		pointer_default(unique)
+	]
+	interface IIDShieldTester : IDispatch
+	{
+		// PURPOSE: Gets the directory test results are written to
+		[propget, id(1), helpstring("property OutputFileDirectory")] HRESULT OutputFileDirectory([out, retval] BSTR *pVal);
+	};
+
 	[
 		uuid(42C705E2-CB7A-49D0-8F94-D1D0CB852359),
 		helpstring("IDShieldTester Class")
@@ -32,5 +39,6 @@ library EXTRACTREDACTIONTESTERLib
 	coclass IDShieldTester
 	{
 		[default] interface IIDShieldTester;
+		interface ITestableComponent;
 	};
 };
