@@ -399,7 +399,21 @@ namespace Extract.Redaction.Verification
         {
             get
             {
-                return _dataGridView.IsCurrentCellInEditMode;
+                return _dataGridView.IsCurrentCellInEditMode && !IsRedactedColumnActive;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the redacted column is active.
+        /// </summary>
+        /// <value><see langword="true"/> if the redacted column is active;
+        /// <see langword="false"/> if the redacted column is not active.</value>
+        bool IsRedactedColumnActive
+        {
+            get
+            {
+                return _dataGridView.CurrentCell != null &&
+                    IsRedactedColumn(_dataGridView.CurrentCell.ColumnIndex);
             }
         }
 
@@ -608,6 +622,26 @@ namespace Extract.Redaction.Verification
         bool IsExemptionColumn(int index)
         {
             return _exemptionsColumn.Index == index;
+        }
+
+        /// <summary>
+        /// Toggles the redacted state of the selected rows.
+        /// </summary>
+        public void ToggleRedactedState()
+        {
+            try
+            {
+                foreach (DataGridViewRow row in _dataGridView.SelectedRows)
+                {
+                    RedactionGridViewRow redaction = _redactions[row.Index];
+                    redaction.Redacted = !redaction.Redacted;
+                    _dataGridView.UpdateCellValue(_redactedColumn.Index, row.Index);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28631", ex);
+            }
         }
 
         /// <summary>
