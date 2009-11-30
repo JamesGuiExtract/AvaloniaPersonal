@@ -332,7 +332,7 @@ namespace Extract.Redaction
                     return new ExemptionCodeList();
                 }
 
-                string category = exemptionsAttribute.Type;
+                string category = exemptionsAttribute.Type.Replace('_', ' ');
                 string codes = exemptionsAttribute.Value.String;
 
                 return ExemptionCodeList.Parse(category, codes, masterCodes);
@@ -375,7 +375,7 @@ namespace Extract.Redaction
                 SpatialString value = new SpatialString();
                 value.CreateNonSpatialString(exemptions.ToString(), sourceDocument);
                 exemptionsAttribute.Value = value;
-                exemptionsAttribute.Type = exemptions.Category;
+                exemptionsAttribute.Type = exemptions.Category.Replace(' ', '_');
             }
             catch (Exception ex)
             {
