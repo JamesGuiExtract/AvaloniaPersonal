@@ -36,7 +36,7 @@ goto finished
 
 :Vista2008
 rem Since can't determine if this is 2008 or vista try installing for 2008 then if that is not successful attempt the other
-servermanagercmd - install powershell
+servermanagercmd -install powershell
 
 if "%errorlevel%" == "0" goto finished
 
