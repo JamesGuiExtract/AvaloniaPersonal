@@ -390,6 +390,9 @@ namespace Extract.Redaction.Verification
 
             _currentVoa.SaveVerificationSession(memento.AttributesFile, changes, screenTime, _settings);
 
+            // Clear the dirty flag [FIDSC #3846]
+            _redactionGridView.Dirty = false;
+
             // Ensure HasContainedRedactions is set to true if the _redactionGridView was saved with
             // redactions present.
             memento.HasContainedRedactions |= _redactionGridView.HasRedactions;
@@ -1176,7 +1179,11 @@ namespace Extract.Redaction.Verification
                 _previousDocumentToolStripButton.Enabled = _historyIndex > 0;
                 _nextDocumentToolStripButton.Enabled = IsInHistory;
 
+                _previousRedactionToolStripButton.Enabled = true;
+                _nextRedactionToolStripButton.Enabled = true;
+
                 _skipProcessingToolStripMenuItem.Enabled = !IsInHistory;
+                _saveToolStripButton.Enabled = !IsInHistory;
                 _saveToolStripMenuItem.Enabled = !IsInHistory;
             }
             else
@@ -1190,7 +1197,11 @@ namespace Extract.Redaction.Verification
                 _previousDocumentToolStripButton.Enabled = false;
                 _nextDocumentToolStripButton.Enabled = false;
 
+                _previousRedactionToolStripButton.Enabled = false;
+                _nextRedactionToolStripButton.Enabled = false;
+
                 _skipProcessingToolStripMenuItem.Enabled = false;
+                _saveToolStripButton.Enabled = false;
                 _saveToolStripMenuItem.Enabled = false;
             }
         }
@@ -1311,6 +1322,9 @@ namespace Extract.Redaction.Verification
 
                 // Save and commit
                 _imageViewer.Shortcuts[Keys.S | Keys.Control] = SelectSaveAndCommit;
+
+                // Toggle redacted state
+                _imageViewer.Shortcuts[Keys.Space] = _redactionGridView.ToggleRedactedState;
 
                 // Exemption codes
                 _imageViewer.Shortcuts[Keys.E] = SelectPromptForExemptionCode;
@@ -1814,6 +1828,11 @@ namespace Extract.Redaction.Verification
 
                     // Start recording the screen time
                     StartScreenTime();
+                }
+                else
+                {
+                    // No image is open. Clear the dirty flag [FIDSC #3846]
+                    _redactionGridView.Dirty = false;
                 }
             }
             catch (Exception ex)
