@@ -1,5 +1,4 @@
 <FILE>;..\ConditionalValueFinder\ConditionalValueFinder.dat
-<FILE>;..\AddressFinder\AddressFinder.dat
 <FILE>;..\BlockFinder\BlockFinder.dat
 <FILE>;..\CreateValue\CreateValue.dat
 <FILE>;..\ExtractLine\ExtractLine.dat
@@ -12,6 +11,3 @@
 <FILE>;..\ValueAfterClue\ValueAfterClue.dat
 <FILE>;..\ValueBeforeClue\ValueBeforeClue.dat
 <FILE>;..\ValueFromList\ValueFromList.dat
-<FILE>;..\Grantor-GranteeFinder\Grantor-GranteeFinder.dat
-<FILE>;..\ReturnAddressFinder\ReturnAddressFinder.dat
-<FILE>;..\LegalDescriptionFinder\LegalDescriptionFinder.dat
