@@ -159,21 +159,21 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Restart the <b>service machine</b>.</li>
 			<li>Confirm that files are processing.</li>
 			<li>From <b>Task Manager</b>, kill two of the running 
-			<b>ProcessFiles.exe</b> instances.
-			<li>Confirm that the remaining <b>ProcessFiles.exe</b> instances 
+			<b>ESFAMProcess.exe</b> instances.
+			<li>Confirm that the remaining <b>ESFAMProcess.exe</b> instances 
 			continue to run.</li>
 		</ul>
 		<li><b>Stop the service after killing FPS files</b>
 		<ul>
-			<li>Continuing the above test, <b>Stop</b> the <b>ESFAMProcess.exe</b> 
-			service.
-			<li>Confirm that each running <b>ProcessFiles.exe</b> instance 
+			<li>Continuing the above test, <b>Stop</b> the <b>Extract Systems 
+			FAM service</b> service from the Services management console.
+			<li>Confirm that each running <b>ESFAMProcess.exe</b> instance 
 			finishes processing the active files and then stops gracefully.</li>
 		</ul>
 		<li><b>Restart the stopped service</b>
 		<ul>
-			<li>Continuing the above test, <b>Start</b> the <b>ESFAMProcess.exe</b> 
-			service.
+			<li>Continuing the above test, <b>Start</b> the <b>Extract Systems 
+			FAM service</b> service from the Services management console.
 			<li>Confirm that each of the original four or more FPS files start 
 			processing files.</li>
 		</ul>
