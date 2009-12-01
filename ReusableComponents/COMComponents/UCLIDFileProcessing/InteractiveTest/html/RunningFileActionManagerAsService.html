@@ -27,10 +27,10 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
 			<li>Create a <b>Queuing</b> FPS file to supply the images for processing.  
 			Use a UNC path for the Folder file supplier.
-			<li>Create a Listening FPS file to supply existing images for processing.  
+			<li>Create a <b>Listening</b> FPS file to supply existing images for processing.  
 			Also define a second supplier to listen to a folder. Use UNC paths for 
 			the Folder file suppliers.
-			<li>Create a Processing FPS file to process the images.  Use a 
+			<li>Create a <b>Processing</b> FPS file to process the images.  Use a 
 			<b>Core: Execute rules</b> task.
 <p>
 			<li>Use the <b>SQL CE Editor</b> to add the FPS files to the 
@@ -145,6 +145,66 @@ called the <b>service machine</b>.  The machine that contains the database is re
 		<li><b>Local system user, stop service during processing of large file</b>
 		<ul>
 			<li>TBD
+		</ul>
+	</ul>
+	</li>
+<p>
+	<li><b>Error Handling:</b>
+	<ul>
+		<li><b>Run multiple FPS files, then kill some</b>
+		<ul>
+			<li>Confirm on the database machine that the database is clear.
+			<li>Create four or more FPS files configured for AutoStart.
+			<li>Set the service startup type to <b>Automatic</b>.
+			<li>Restart the <b>service machine</b>.</li>
+			<li>Confirm that files are processing.</li>
+			<li>From <b>Task Manager</b>, kill two of the running 
+			<b>ProcessFiles.exe</b> instances.
+			<li>Confirm that the remaining <b>ProcessFiles.exe</b> instances 
+			continue to run.</li>
+		</ul>
+		<li><b>Stop the service after killing FPS files</b>
+		<ul>
+			<li>Continuing the above test, <b>Stop</b> the <b>ESFAMProcess.exe</b> 
+			service.
+			<li>Confirm that each running <b>ProcessFiles.exe</b> instance 
+			finishes processing the active files and then stops gracefully.</li>
+		</ul>
+		<li><b>Restart the stopped service</b>
+		<ul>
+			<li>Continuing the above test, <b>Start</b> the <b>ESFAMProcess.exe</b> 
+			service.
+			<li>Confirm that each of the original four or more FPS files start 
+			processing files.</li>
+		</ul>
+<p>
+		<li><b>Run multiple FPS files, then gracefully restart the machine</b>
+		<ul>
+			<li>Confirm on the database machine that the database is clear.
+			<li>Create four or more FPS files configured for AutoStart.
+			<li>Set the service startup type to <b>Automatic</b>.
+			<li>Restart the <b>service machine</b>.</li>
+			<li>Confirm that files are processing.</li>
+			<li><b>Restart</b> the test machine from the Start menu.
+			<li>Confirm that the <b>ESFAMProcess.exe</b> instances 
+			gracefully finish their processing.</li>
+			<li>Confirm that files are processing normally after restart.</li>
+			<li>Confirm that if files were stuck in <b>Processing</b> mode 
+			during the restart, that they automatically revert to 
+			<b>Pending</b> mode.</li>
+		</ul>
+<p>
+		<li><b>Run multiple FPS files, then ungracefully restart the machine</b>
+		<ul>
+			<li>Confirm on the database machine that the database is clear.
+			<li>Create four or more FPS files configured for AutoStart.
+			<li>Set the service startup type to <b>Automatic</b>.
+			<li>Restart the <b>service machine</b>.</li>
+			<li>Confirm that files are processing.</li>
+			<li><b>Restart</b> the test machine by cycling power.
+			<li>Confirm that files are processing normally after restart.</li>
+			<li>Confirm that files stuck in <b>Processing</b> mode during the 
+			restart automatically revert to <b>Pending</b> mode.</li>
 		</ul>
 	</ul>
 	</li>
