@@ -68,6 +68,10 @@ STDMETHODIMP CAddressFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus
 
 	try
 	{
+		// This finder is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI28697", "Address finder is obsolete.");
+		throw ue;
+
 		// Wrap the AFDoc in a smart pointer
 		IAFDocumentPtr ipAFDoc(pAFDoc);
 		ASSERT_ARGUMENT("ELI25631", ipAFDoc != NULL);

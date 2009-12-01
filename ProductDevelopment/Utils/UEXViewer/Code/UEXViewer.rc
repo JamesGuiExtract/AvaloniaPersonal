@@ -226,6 +226,16 @@ BEGIN
     END
 END
 
+IDR_ELI_LIST_CONTEXT_MENU MENU 
+BEGIN
+    POPUP "ELIListContext"
+    BEGIN
+        MENUITEM "Copy ELI Code",               ID_ELILISTCONTEXT_COPYELICODE
+        MENUITEM SEPARATOR
+        MENUITEM "Cancel",                      ID_ELILISTCONTEXT_CANCEL
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -110,6 +110,8 @@ protected:
 	afx_msg void OnBnClickedBtnNextLogFile();
 	afx_msg void OnClose();
 	afx_msg void OnCbnSelchangeComboExceptionFileList();
+	afx_msg void OnCopyELICode();
+	afx_msg void OnNMRclickListUex(NMHDR *pNMHDR, LRESULT *pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 

@@ -104,6 +104,10 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_ParseText(IAFDocument* pAFDoc, IProgre
 
 	try
 	{
+		// This finder is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI28705", "Grantor-Grantee finder is obsolete.");
+		throw ue;
+
 		validateLicense();
 
 		// ensure pre-requisites

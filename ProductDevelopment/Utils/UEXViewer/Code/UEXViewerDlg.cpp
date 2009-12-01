@@ -147,12 +147,14 @@ BEGIN_MESSAGE_MAP(CUEXViewerDlg, CDialog)
 	ON_COMMAND(ID_EDIT_INVERT_SELECTION, OnEditInvertSelection)
 	ON_COMMAND(ID_EDIT_FIND, OnEditFind)
 	ON_COMMAND(ID_HELP_ABOUT, OnHelpAbout)
+	ON_COMMAND(ID_ELILISTCONTEXT_COPYELICODE, OnCopyELICode)
 	//}}AFX_MSG_MAP
 	ON_WM_CLOSE()
 	ON_BN_CLICKED(ID_BTN_PREV_LOG_FILE, &CUEXViewerDlg::OnBnClickedBtnPrevLogFile)
 	ON_BN_CLICKED(ID_BTN_NEXT_LOG_FILE, &CUEXViewerDlg::OnBnClickedBtnNextLogFile)
 	ON_CBN_SELCHANGE(IDC_COMBO_EXCEPTION_FILE_LIST, &CUEXViewerDlg::OnCbnSelchangeComboExceptionFileList)
 	ON_COMMAND(ID_FILE_REFRESHCURRENTLOGFILE, &CUEXViewerDlg::OnFileRefreshCurrentLogfile)
+	ON_NOTIFY(NM_RCLICK, IDC_LIST_UEX, &CUEXViewerDlg::OnNMRclickListUex)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -1180,6 +1182,77 @@ void CUEXViewerDlg::OnCbnSelchangeComboExceptionFileList()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14850")
 }
+//-------------------------------------------------------------------------------------------------
+void CUEXViewerDlg::OnNMRclickListUex(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	try
+	{
+		*pResult = 0;
+
+		// Get the selected position in the list
+		POSITION pos = m_listUEX.GetFirstSelectedItemPosition();
+
+		// return if there is no selection or more than one item is selected
+		if (pos == NULL || m_listUEX.GetSelectedCount() > 1)
+		{
+			return;
+		}
+
+		// Create the list context menu
+		CMenu menu;
+		menu.LoadMenu( IDR_ELI_LIST_CONTEXT_MENU );
+		CMenu *pContextMenu = menu.GetSubMenu( 0 );
+
+		// Get the cursor position
+		CPoint	point;
+		GetCursorPos( &point );
+
+		// Display the context menu
+		pContextMenu->TrackPopupMenu( TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, 
+			point.x, point.y, this );
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28681");
+}
+//-------------------------------------------------------------------------------------------------
+void CUEXViewerDlg::OnCopyELICode()
+{
+	try
+	{
+		POSITION pos = m_listUEX.GetFirstSelectedItemPosition();
+
+		// Don't do anything if nothing is selected
+		if (pos == NULL || m_listUEX.GetSelectedCount() > 1)
+		{
+			return;
+		}
+
+		// Get index of selected item
+		int iItem = m_listUEX.GetNextSelectedItem( pos );
+				
+		// Retrieve this data structure
+		ITEMINFO* pData = (ITEMINFO *)m_listUEX.GetItemData( iItem );
+
+		// This ELI Code will only be used it the pData->strData value is not a stringized exception
+		string strELICode = "ELI28695";
+
+		// Create a UCLIDException object
+		UCLIDException	ue;
+		ue.createFromString(strELICode, pData->strData);
+
+		// Check if there was a new exception created
+		string strTopELI = ue.getTopELI();
+		if ( strTopELI == strELICode )
+		{
+			// The exception should always be valid so throw a logic exception if this happens
+			THROW_LOGIC_ERROR_EXCEPTION("ELI28696");
+		}
+
+		// Put the ELI code on the clipboard
+		ClipboardManager clipboardMgr( this );
+		clipboardMgr.writeText(strTopELI);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28682");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private methods
@@ -1667,4 +1740,5 @@ void CUEXViewerDlg::setItemText(int iIndex, int iColumn, std::string strText)
 	// Write the text to the specified row and column
 	m_listUEX.SetItemText( iIndex, iColumn, strText.c_str() );
 }
+
 //-------------------------------------------------------------------------------------------------

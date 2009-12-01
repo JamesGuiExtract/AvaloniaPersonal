@@ -11,6 +11,7 @@
 #define IDD_UEXFIND_DLG                 129
 #define IDR_MAIN_MENU                   130
 #define IDR_ACCELERATOR_UEXVIEWER_DLG   132
+#define IDR_ELI_LIST_CONTEXT_MENU       133
 #define IDC_TREE_FILE                   1000
 #define IDC_LIST_UEX                    1001
 #define IDC_EDIT_DIRECTORY              1002
@@ -35,13 +36,15 @@
 #define ID_FILE_OPEN_PREV_LOG_FILE      32796
 #define ID_FILE_EXPORT                  32800
 #define ID_FILE_REFRESHCURRENTLOGFILE   32809
+#define ID_ELILISTCONTEXT_COPYELICODE   32810
+#define ID_ELILISTCONTEXT_CANCEL        32811
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        133
-#define _APS_NEXT_COMMAND_VALUE         32810
+#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_COMMAND_VALUE         32812
 #define _APS_NEXT_CONTROL_VALUE         1022
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

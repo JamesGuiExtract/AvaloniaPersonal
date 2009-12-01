@@ -76,6 +76,10 @@ STDMETHODIMP CAddressSplitter::raw_SplitAttribute(IAttribute * pAttribute, IAFDo
 {
 	try
 	{
+		// This splitter is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI28704", "Address splitter is obsolete.");
+		throw ue;
+
 		validateLicense();
 
 		// Reset flags, collection and counters

@@ -130,6 +130,10 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 
 	try
 	{
+		// This finder is obsolete so throw exception if this method is called
+		UCLIDException ue("ELI28703", "Return address finder is obsolete.");
+		throw ue;
+
 		validateLicense();
 
 		// wrap the AF document in a smart pointer
