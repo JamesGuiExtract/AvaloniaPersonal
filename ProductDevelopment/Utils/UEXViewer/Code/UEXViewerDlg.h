@@ -81,7 +81,6 @@ protected:
 	void setNewCurrentFile(std::string strNewCurrentFile);
 
 	// Generated message map functions
-	//{{AFX_MSG(CUEXViewerDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
@@ -112,7 +111,7 @@ protected:
 	afx_msg void OnCbnSelchangeComboExceptionFileList();
 	afx_msg void OnCopyELICode();
 	afx_msg void OnNMRclickListUex(NMHDR *pNMHDR, LRESULT *pResult);
-	//}}AFX_MSG
+
 	DECLARE_MESSAGE_MAP()
 
 	//=======================================================================

@@ -118,14 +118,11 @@ CUEXViewerDlg::~CUEXViewerDlg()
 void CUEXViewerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CUEXViewerDlg)
 	DDX_Control(pDX, IDC_LIST_UEX, m_listUEX);
 	DDX_Control(pDX, IDC_COMBO_EXCEPTION_FILE_LIST, m_comboExceptionsList);
-	//}}AFX_DATA_MAP
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CUEXViewerDlg, CDialog)
-	//{{AFX_MSG_MAP(CUEXViewerDlg)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_DROPFILES()
@@ -148,7 +145,6 @@ BEGIN_MESSAGE_MAP(CUEXViewerDlg, CDialog)
 	ON_COMMAND(ID_EDIT_FIND, OnEditFind)
 	ON_COMMAND(ID_HELP_ABOUT, OnHelpAbout)
 	ON_COMMAND(ID_ELILISTCONTEXT_COPYELICODE, OnCopyELICode)
-	//}}AFX_MSG_MAP
 	ON_WM_CLOSE()
 	ON_BN_CLICKED(ID_BTN_PREV_LOG_FILE, &CUEXViewerDlg::OnBnClickedBtnPrevLogFile)
 	ON_BN_CLICKED(ID_BTN_NEXT_LOG_FILE, &CUEXViewerDlg::OnBnClickedBtnNextLogFile)
@@ -195,6 +191,7 @@ std::string CUEXViewerDlg::GetWholeExceptionString(int nIndex)
 
 	// Retrieve this data structure
 	ITEMINFO*	pData = (ITEMINFO *)m_listUEX.GetItemData( nIndex );
+	ASSERT_RESOURCE_ALLOCATION("ELI28706", pData != NULL);
 
 	// Create a UCLIDException object
 	// using new ELI code for this application
@@ -517,6 +514,7 @@ void CUEXViewerDlg::OnEditViewDetails()
 
 			// Retrieve this data structure
 			ITEMINFO*	pData = (ITEMINFO *)m_listUEX.GetItemData( iItem );
+			ASSERT_RESOURCE_ALLOCATION("ELI28707", pData != NULL);
 
 			// Create a UCLIDException object
 			// using new ELI code for this application
@@ -873,6 +871,7 @@ void CUEXViewerDlg::OnFileExport()
 
 					// Retrieve ItemData
 					pData = (ITEMINFO *)m_listUEX.GetItemData( i );
+					ASSERT_RESOURCE_ALLOCATION("ELI28708", pData != NULL);
 
 					// Store time info as string
 					strTime = asString( pData->ulTime );
@@ -1231,15 +1230,20 @@ void CUEXViewerDlg::OnCopyELICode()
 				
 		// Retrieve this data structure
 		ITEMINFO* pData = (ITEMINFO *)m_listUEX.GetItemData( iItem );
+		ASSERT_RESOURCE_ALLOCATION("ELI28709", pData != NULL);
 
 		// This ELI Code will only be used it the pData->strData value is not a stringized exception
 		string strELICode = "ELI28695";
 
 		// Create a UCLIDException object
 		UCLIDException	ue;
+		// Create the exception from the items data which should always be stringized exception
+		// if it is the ELI code in strELICode will not be used if it is not a 
+		// stringized exception the strELICode will be the top ELI code of the exception
 		ue.createFromString(strELICode, pData->strData);
 
-		// Check if there was a new exception created
+		// Check if there the top ELICode is the same as the one passed to the creatFromString
+		// method which should never happen
 		string strTopELI = ue.getTopELI();
 		if ( strTopELI == strELICode )
 		{
@@ -1675,6 +1679,8 @@ void CUEXViewerDlg::parseLine(std::string strText)
 
 		// Set the Item Data
 		ITEMINFO*	pData = new ITEMINFO;
+		ASSERT_RESOURCE_ALLOCATION("ELI28710", pData != NULL);
+
 		pData->iIndex = iIndex;
 		pData->ulTime = lTime;
 		pData->strData = strToken;
@@ -1707,6 +1713,7 @@ void CUEXViewerDlg::refreshIndices()
 	{
 		// Retrieve ItemData
 		pData = (ITEMINFO *)m_listUEX.GetItemData( i );
+		ASSERT_RESOURCE_ALLOCATION("ELI28711", pData != NULL);
 
 		// Replace index item
 		pData->iIndex = i;
