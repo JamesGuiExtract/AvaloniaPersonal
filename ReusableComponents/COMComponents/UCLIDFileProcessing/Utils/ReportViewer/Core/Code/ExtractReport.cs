@@ -882,15 +882,22 @@ namespace Extract.ReportViewer
                 adapter = new SqlDataAdapter(query, connection);
                 adapter.Fill(table);
 
-                // Iterate through each row adding the first columns value to the list
-                List<string> values = new List<string>(table.Rows.Count);
-                foreach (DataRow row in table.Rows)
+                if (table.Rows.Count > 0)
                 {
-                    values.Add(row[0].ToString());
-                }
+                    // Iterate through each row adding the first columns value to the list
+                    List<string> values = new List<string>(table.Rows.Count);
+                    foreach (DataRow row in table.Rows)
+                    {
+                        values.Add(row[0].ToString());
+                    }
 
-                // Return the string array
-                return values.ToArray();
+                    // Return the string array
+                    return values.ToArray();
+                }
+                else
+                {
+                    return new string[] { "[No Values Found]" };
+                }
             }
             catch (Exception ex)
             {
