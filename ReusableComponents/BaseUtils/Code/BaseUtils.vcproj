@@ -789,6 +789,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Random.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\RegistryPersistenceMgr.cpp"
 				>
 			</File>
@@ -1464,6 +1468,10 @@
 			</File>
 			<File
 				RelativePath=".\QuickMenuChooser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Random.h"
 				>
 			</File>
 			<File

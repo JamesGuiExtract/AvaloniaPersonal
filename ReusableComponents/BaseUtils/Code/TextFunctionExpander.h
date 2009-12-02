@@ -1,10 +1,13 @@
 #pragma once
 
 #include "BaseUtils.h"
+#include "Random.h"
 #include "Win32CriticalSection.h"
 
 #include <string>
 #include <vector>
+#include <memory>
+#include <afxmt.h>
 
 using namespace std;
 
@@ -58,6 +61,8 @@ public:
 
 private:
 	// Examples for path = C:\temp1\temp2\filename.tif
+	//				FPS_PATH = C:\FPSFiles
+	//				Now() = 11/25/2009 09:01:03:257
 	// $DirNoDriveOf(path) = temp1\temp2
 	// $DirOf(path) = C:\temp1\temp2
 	// $DriveOf(path) = C:\
@@ -66,8 +71,9 @@ private:
 	// $FileOf(path) = filename.tif
 	// $Replace(path,te,bli) = C:\blimp1\blimp2\filename.tif
 	// $InsertBefore(path,.new) = C:\temp1\temp2\filename.new.tif
-	// If FPS_PATH = C:\FPSFiles
 	// $Env(FPS_PATH) = C:\FPSFiles
+	// $Now() = 2009-11-25-09-01-03-257
+	// $RandomAlphaNumeric(5) = A10FP
 	const string expandDirOf(const string&) const;
 	const string expandDirNoDriveOf(const string&) const;
 	const string expandDriveOf(const string&) const;
@@ -79,5 +85,13 @@ private:
 	const string expandPadValue(const string& str) const;
 	const string expandReplace(const string& str) const;
 	const string expandEnv(const string& str) const;
+	const string expandNow(const string& str) const;
+	const string expandRandomAlphaNumeric(const string& str) const;
 	const string expandTrimAndConsolidateWS(const string& str) const;
+
+	// Mutex for the Random object
+	static CMutex ms_RandomMutex;
+
+	// Random object used for "$RandomAlphaNumeric()" calls
+	static auto_ptr<Random> msap_Rand;
 };

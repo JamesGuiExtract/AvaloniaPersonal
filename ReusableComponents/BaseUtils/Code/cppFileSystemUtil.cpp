@@ -1618,7 +1618,7 @@ bool doesFileMatchPattern(const string& strMatchPattern, const string& strFileNa
 void getTempDir(string& strPath)
 {
 	// Get the path of the defin
-	char path[1024];
+	char path[1024] = {0};
 	DWORD dwRet = GetTempPath(1024, path);
 	if (dwRet == 0)
 	{
@@ -2251,5 +2251,30 @@ string getCleanImageNameIfExists(const string& strImageFileName)
 
 	// if it exists return the clean image, otherwise return the original
 	return isValidFile(strCleanImageName) ? strCleanImageName : strImageFileName;
+}
+//--------------------------------------------------------------------------------------------------
+unsigned __int64 getFreeSpaceOnDisk(string strDirectoryName)
+{
+	if (strDirectoryName.empty())
+	{
+		getTempDir(strDirectoryName);
+	}
+
+	// Ensure there is a trailing slash
+	if (strDirectoryName[strDirectoryName.length() - 1] != '\\')
+	{
+		strDirectoryName += '\\';
+	}
+	
+	ULARGE_INTEGER ulTemp;
+	if (GetDiskFreeSpaceEx(strDirectoryName.c_str(), NULL, NULL, &ulTemp) == FALSE)
+	{
+		UCLIDException uex("ELI28702", "Unable to get free space on disk.");
+		uex.addDebugInfo("Directory", strDirectoryName);
+		uex.addWin32ErrorInfo();
+		throw uex;
+	}
+
+	return ulTemp.QuadPart;
 }
 //--------------------------------------------------------------------------------------------------

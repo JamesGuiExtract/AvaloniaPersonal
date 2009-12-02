@@ -40,6 +40,7 @@
     <RegisterForComInterop>true</RegisterForComInterop>
     <DocumentationFile>..\..\..\..\binaries\release\Extract.Utilities.Parsers.XML</DocumentationFile>
     <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -29,6 +29,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DocumentationFile>..\..\..\..\..\Binaries\Debug\Extract.Redaction.Verification.xml</DocumentationFile>
     <RegisterForComInterop>true</RegisterForComInterop>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

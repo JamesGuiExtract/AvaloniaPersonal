@@ -31,6 +31,8 @@
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------
+// Enums
+//-------------------------------------------------------------------------------------------------
 enum EReplaceType
 {
 	kReplaceFirst,
@@ -50,11 +52,21 @@ enum EFileType
 	kXMLFile
 };
 
+//--------------------------------------------------------------------------------------------------
+// Constants
+//--------------------------------------------------------------------------------------------------
 // Mode constants for _access_s function
 const int giMODE_FILE_EXISTS = 00;
 const int giMODE_WRITE_ONLY = 02;
 const int giMODE_READ_ONLY = 04;
 const int giMODE_READ_WRITE = 06;
+
+// String collection constants for string functions
+const string gstrUPPER_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const string gstrLOWER_ALPHA = "abcdefghijklmnopqrstuvwxyz";
+const string gstrNUMBERS = "0123456789";
+const string gstrALPHA = gstrUPPER_ALPHA + gstrLOWER_ALPHA;
+const string gstrALPHA_NUMERIC = gstrALPHA + gstrNUMBERS;
 
 //-------------------------------------------------------------------------------------------------
 // ********* Operating System - Misc **********
@@ -488,6 +500,11 @@ EXPORT_BaseUtils string getCleanImageName(const string& strImageFileName);
 // PURPOSE: If the cleaned image exists returns the clean image name corresponding to 
 //          strImageFileName, otherwise returns strImageFileName.
 EXPORT_BaseUtils string getCleanImageNameIfExists(const string& strImageFileName);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To return the amount of free space on the specified disk (if no
+//			path is specified then returns the amount of free space on the disk
+//			containing the TEMP directory)
+EXPORT_BaseUtils unsigned __int64 getFreeSpaceOnDisk(string strPath = "");
 
 //-------------------------------------------------------------------------------------------------
 // Char Operations 

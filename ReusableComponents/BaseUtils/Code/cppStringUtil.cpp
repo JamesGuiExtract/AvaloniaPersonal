@@ -22,15 +22,6 @@
 using namespace std;
 
 //--------------------------------------------------------------------------------------------------
-// Constants
-//--------------------------------------------------------------------------------------------------
-const string gstrUPPER_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const string gstrLOWER_ALPHA = "abcdefghijklmnopqrstuvwxyz";
-const string gstrNUMBERS = "0123456789";
-const string gstrALPHA = gstrUPPER_ALPHA + gstrLOWER_ALPHA;
-const string gstrALPHA_NUMERIC = gstrALPHA + gstrNUMBERS;
-
-//--------------------------------------------------------------------------------------------------
 bool replaceVariable(string& s, const string& t1, const string& t2)
 {
 	// this function replaces all occurrences of t1 in S by t2

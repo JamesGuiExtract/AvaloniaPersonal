@@ -25,6 +25,12 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
+// Static initialization
+//-------------------------------------------------------------------------------------------------
+CMutex TextFunctionExpander::ms_RandomMutex;
+auto_ptr<Random> TextFunctionExpander::msap_Rand;
+
+//-------------------------------------------------------------------------------------------------
 // TextFunctionExpander
 //-------------------------------------------------------------------------------------------------
 TextFunctionExpander::TextFunctionExpander()
@@ -36,14 +42,16 @@ TextFunctionExpander::TextFunctionExpander()
 		g_vecFunctions.push_back("DirNoDriveOf");
 		g_vecFunctions.push_back("DirOf");
 		g_vecFunctions.push_back("DriveOf");
+		g_vecFunctions.push_back("Env");
 		g_vecFunctions.push_back("ExtOf");
 		g_vecFunctions.push_back("FileNoExtOf");
 		g_vecFunctions.push_back("FileOf");
 		g_vecFunctions.push_back("InsertBeforeExt");
+		g_vecFunctions.push_back("Now");
 		g_vecFunctions.push_back("Offset");
 		g_vecFunctions.push_back("PadValue");
+		g_vecFunctions.push_back("RandomAlphaNumeric");
 		g_vecFunctions.push_back("Replace");
-		g_vecFunctions.push_back("Env");
 		g_vecFunctions.push_back("TrimAndConsolidateWS");
 
 		g_bInit = true;
@@ -185,6 +193,14 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 		else if (strFunction == "env")
 		{
 			strRet += expandEnv(strArg);
+		}
+		else if (strFunction == "now")
+		{
+			strRet += expandNow(strArg);
+		}
+		else if (strFunction == "randomalphanumeric")
+		{
+			strRet += expandRandomAlphaNumeric(strArg);
 		}
 		else
 		{
@@ -535,5 +551,48 @@ const string TextFunctionExpander::expandEnv(const string &str) const
 	string strResult = getEnvironmentVariableValue(str);
 
 	return strResult;
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandNow(const string &str) const
+{
+	if (!str.empty())
+	{
+		UCLIDException uex("ELI28700", "$Now does not take an argument.");
+		uex.addDebugInfo("Argument", str);
+		throw uex;
+	}
+
+	// Get the local time
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+
+	char zTime[24] = {0};
+	int nRet = sprintf_s(zTime, 24, "%04d-%02d-%02d-%02d-%02d-%02d-%03d", st.wYear, st.wMonth,
+		st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+	if (nRet == -1)
+	{
+		UCLIDException uex("ELI28701", "Unable to format time string.");
+		uex.addWin32ErrorInfo(errno);
+		throw uex;
+	}
+
+	return zTime;
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandRandomAlphaNumeric(const string &str) const
+{
+	// Get the length from the argument
+	long nLength = asLong(str);
+
+	// Lock the mutex
+	CSingleLock lg(&ms_RandomMutex, TRUE);
+
+	if (msap_Rand.get() == NULL)
+	{
+		msap_Rand.reset(new Random(true, true, true, true));
+	}
+
+	// Return a random string of nLength containing only upper case letters and digits
+	return msap_Rand->getRandomString(nLength, true, false, true);
 }
 //-------------------------------------------------------------------------------------------------

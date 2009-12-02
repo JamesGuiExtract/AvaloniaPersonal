@@ -111,7 +111,7 @@ string getEnvironmentVariableValue(const string& strVarName)
 // This code was derived from Microsoft Knowledge Base Article Q118623
 string getMACAddress()
 {
-	string strTemp;
+	string strTemp = "";
 
 	ASTAT Adapter;
 	NCB Ncb;
@@ -145,14 +145,19 @@ string getMACAddress()
 
 		if ( uRetCode == 0 )
 		{
-			char	pszAddress[30];
-			sprintf_s( pszAddress, sizeof(pszAddress), "%02x%02x%02x%02x%02x%02x",
+			char	pszAddress[30] = {0};
+			if (sprintf_s( pszAddress, sizeof(pszAddress), "%02x%02x%02x%02x%02x%02x",
 				Adapter.adapt.adapter_address[0],
 				Adapter.adapt.adapter_address[1],
 				Adapter.adapt.adapter_address[2],
 				Adapter.adapt.adapter_address[3],
 				Adapter.adapt.adapter_address[4],
-				Adapter.adapt.adapter_address[5] );
+				Adapter.adapt.adapter_address[5] ) == -1)
+			{
+				UCLIDException uex("ELI28716", "Unable to format MAC address.");
+				uex.addWin32ErrorInfo(errno);
+				throw uex;
+			}
 
 			strTemp = pszAddress;
 		}
