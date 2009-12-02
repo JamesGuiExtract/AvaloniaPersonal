@@ -2342,7 +2342,7 @@ namespace Extract.Imaging.Forms
                         // Check if the mouse clicked on a link arrow
                         if (_activeLinkedLayerObject != null)
                         {
-                            int arrowId = 
+                            int arrowId =
                                 _activeLinkedLayerObject.GetLinkArrowId(new Point(mouseX, mouseY));
                             if (arrowId >= 0)
                             {
@@ -2380,47 +2380,65 @@ namespace Extract.Imaging.Forms
                             clientToImage.TransformPoints(mouse);
                         }
 
-                        // Check if the mouse cursor is over a layerObject
-                        bool layerObjectClicked = false;
+                        Point mousePoint = mouse[0];
+
+                        // Build the list of possible layer objects
+                        List<LayerObject> possibleSelection = new List<LayerObject>();
                         foreach (LayerObject layerObject in _layerObjects)
                         {
                             // Only perform hit test if the layer object is selectable and visible
                             if (layerObject.Selectable && layerObject.Visible &&
-                                layerObject.HitTest(mouse[0]))
+                                layerObject.HitTest(mousePoint))
                             {
-                                layerObjectClicked = true;
-
-                                // Select this layer object if it is not already
-                                if (!_layerObjects.Selection.Contains(layerObject))
-                                {
-                                    // Deselect previous layer object unless modifier key is pressed
-                                    if (modifiers != Keys.Control && modifiers != Keys.Shift)
-                                    {
-                                        _layerObjects.Selection.Clear();
-                                    }
-
-                                    layerObject.Selected = true;
-
-                                    // Switch the cursor to the move cursor
-                                    Cursor = Cursors.SizeAll;
-                                }
-                                else if (modifiers == Keys.Control)
-                                {
-                                    // The control key is pressed and a selected 
-                                    // layer object was clicked. Remove the layer object.
-                                    _layerObjects.Selection.Remove(layerObject);
-
-                                    // Invalidate the image viewer to remove any previous grip 
-                                    // handles and to redraw these grip handles
-                                    Invalidate();
-                                    return;
-                                }
+                                possibleSelection.Add(layerObject);
                             }
                         }
 
-                        // Check if any layer object was clicked [DotNetRCAndUtils #159]
+                        bool layerObjectClicked = possibleSelection.Count > 0;
                         if (layerObjectClicked)
                         {
+                            // Find the best layer object [DNRCAU #352]
+                            // Best layer object is defined as the one with the lowest average distance
+                            // to the corners of the object
+                            LayerObject clickedObject = null;
+                            double shortestDistance = double.MaxValue;
+                            foreach (LayerObject layerObject in possibleSelection)
+                            {
+                                double distance = layerObject.AverageDistanceToCorners(mousePoint);
+                                if (distance < shortestDistance)
+                                {
+                                    shortestDistance = distance;
+                                    clickedObject = layerObject;
+                                }
+                            }
+
+                            // Select this layer object if it is not already
+                            if (!_layerObjects.Selection.Contains(clickedObject))
+                            {
+                                // Deselect previous layer object unless modifier key is pressed
+                                if (modifiers != Keys.Control && modifiers != Keys.Shift)
+                                {
+                                    _layerObjects.Selection.Clear();
+                                }
+
+                                clickedObject.Selected = true;
+
+                                // Switch the cursor to the move cursor
+                                Cursor = Cursors.SizeAll;
+                            }
+                            else if (modifiers == Keys.Control)
+                            {
+                                // The control key is pressed and a selected 
+                                // layer object was clicked. Remove the layer object.
+                                _layerObjects.Selection.Remove(clickedObject);
+
+                                // Invalidate the image viewer to remove any previous grip 
+                                // handles and to redraw these grip handles
+                                Invalidate();
+                                return;
+                            }
+
+                            // Check if any layer object was clicked [DotNetRCAndUtils #159]
                             // Start a tracking event for all selected layer objects on the active page
                             foreach (LayerObject layerObject in _layerObjects.Selection)
                             {

@@ -755,6 +755,33 @@ namespace Extract.Imaging.Forms
         public abstract bool HitTest(Point point);
 
         /// <summary>
+        /// Determines the average distance between the specified point in logical (image)
+        /// coordinates and the vertices of the <see cref="LayerObject"/>.
+        /// </summary>
+        /// <param name="point">The point to check in logical (image) coordinates.</param>
+        /// <returns>The average distance between the <paramref name="point"/> and the vertices
+        /// of the <see cref="LayerObject"/>.</returns>
+        public virtual double AverageDistanceToCorners(Point point)
+        {
+            try
+            {
+                Point[] vertices = GetVertices();
+                double sum = 0.0;
+                double count = vertices.Length;
+                foreach (Point vertex in vertices)
+                {
+                    sum += GeometryMethods.Distance(vertex, point);
+                }
+
+                return sum / count;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28731", ex);
+            }
+        }
+
+        /// <summary>
         /// Determines whether the specified point is in proximity of the layer object or its
         /// link arrows.
         /// </summary>
