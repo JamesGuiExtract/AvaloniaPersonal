@@ -1305,12 +1305,11 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 													const ISpatialStringPtr& ipInputText, 
 													const IAFDocumentPtr& ipAFDoc)
 {
-	vector<int> vecRet;
 	// include region defined
-	
 	bool bRestrictionDefined = isRestrictionDefined();
 	if (m_ePageSelectionType == kSelectAll)
 	{
+		vector<int> vecPages;
 		if (!bRestrictionDefined)
 		{
 			// if all pages are selected and no restriction is posted, it is invalid
@@ -1319,8 +1318,10 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 		int i;
 		for(i = 0; i <= nLastPageNumber; i++)
 		{
-			vecRet.push_back(i);
+			vecPages.push_back(i);
 		}
+
+		return vecPages;
 	}
 	else if (m_ePageSelectionType == kSelectSpecified)
 	{
@@ -1329,168 +1330,170 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 	else if (m_ePageSelectionType == kSelectWithRegExp)
 	{
 		vector<int> vecPages;
-		if (m_bIsRegExp)
+
+		// Only search the text if the string is not non-spatial
+		if (ipInputText->GetMode() != kNonSpatialMode)
 		{
-			IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-			ASSERT_RESOURCE_ALLOCATION("ELI13023", ipMiscUtils != NULL );
-
-			// Find with a regular expression pattern
-			IRegularExprParserPtr ipRegExpParser = 	ipMiscUtils->GetNewRegExpParserInstance("SelectPageRegion");
-			ASSERT_RESOURCE_ALLOCATION("ELI09378", ipRegExpParser != NULL);
-
-			string strRootFolder = "";
-
-			// We eat the exception that will be thrown if the RSDFileDir tag does not exist 
-			// because we can still run the regexp providing of course that the regexp contains no
-			// #import statements
-			try
-			{
-				string rootTag = "<RSDFileDir>";
-				strRootFolder = m_ipAFUtility->ExpandTags(rootTag.c_str(), ipAFDoc );
-			}
-			catch(...)
-			{
-			}
-			string strRegExp = getRegExpFromText(m_strPattern, strRootFolder, true, gstrAF_AUTO_ENCRYPT_KEY_PATH);
-
-			ipRegExpParser->Pattern = strRegExp.c_str();
-			ipRegExpParser->IgnoreCase = asVariantBool(!m_bIsCaseSensitive);
-
+			// Get the collection of pages and the count
 			IIUnknownVectorPtr ipPages = ipInputText->GetPages();
 			ASSERT_RESOURCE_ALLOCATION("ELI28168", ipPages != NULL);
-
-			// Get the number of pages
 			long lSize = ipPages->Size();
-			if(m_eRegExpPageSelectionType == kSelectAllPagesWithRegExp)
-			{
-				for (long i = 0; i < lSize; i++)
-				{
-					ISpatialStringPtr ipPage = ipPages->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI09379", ipPage != NULL);
-					IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->String, 
-						VARIANT_TRUE, VARIANT_FALSE);
-					ASSERT_RESOURCE_ALLOCATION("ELI28169", ipFound != NULL);
-					if (ipFound->Size() > 0)
-					{
-						vecPages.push_back(ipPage->GetFirstPageNumber());
-					}
-				}
-			}
-			else if(m_eRegExpPageSelectionType == kSelectLeadingPagesWithRegExp)
-			{
-				for (long i = 0; i < lSize; i++)
-				{
-					ISpatialStringPtr ipPage = ipPages->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI19149", ipPage != NULL);
-					IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->String, 
-						VARIANT_TRUE, VARIANT_FALSE);
-					ASSERT_RESOURCE_ALLOCATION("ELI28170", ipFound != NULL);
-					if (ipFound->Size() > 0)
-					{
-						vecPages.push_back(ipPage->GetFirstPageNumber());
-					}
-					else 
-					{
-						break;
-					}
-				}
-			}
-			else if(m_eRegExpPageSelectionType == kSelectTrailingPagesWithRegExp)
-			{
-				for (long i = lSize - 1; i >= 0; i--)
-				{
-					ISpatialStringPtr ipPage = ipPages->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI19150", ipPage != NULL);
-					IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->GetString(), 
-						VARIANT_TRUE, VARIANT_FALSE);
-					ASSERT_RESOURCE_ALLOCATION("ELI28171", ipFound != NULL);
-					if (ipFound->Size() > 0)
-					{
-						vecPages.insert(vecPages.begin(), ipPage->GetFirstPageNumber());
-					}
-					else 
-					{
-						break;
-					}
-				}
-			}
-		}
-		else
-		{
-			// just find normal text pattern
-			IIUnknownVectorPtr ipPages = ipInputText->GetPages();
-			ASSERT_RESOURCE_ALLOCATION("ELI28172", ipPages != NULL);
 
-			long lSize = ipPages->Size();
-			if(m_eRegExpPageSelectionType == kSelectAllPagesWithRegExp)
+			if (m_bIsRegExp)
 			{
-				for (long i = 0; i < lSize; i++)
+				IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
+				ASSERT_RESOURCE_ALLOCATION("ELI13023", ipMiscUtils != NULL );
+
+				// Find with a regular expression pattern
+				IRegularExprParserPtr ipRegExpParser =
+					ipMiscUtils->GetNewRegExpParserInstance("SelectPageRegion");
+				ASSERT_RESOURCE_ALLOCATION("ELI09378", ipRegExpParser != NULL);
+
+				string strRootFolder = "";
+
+				// We eat the exception that will be thrown if the RSDFileDir tag does not exist 
+				// because we can still run the regexp providing of course that the regexp contains no
+				// #import statements
+				try
 				{
-					ISpatialStringPtr ipPage = ipPages->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI09380", ipPage != NULL);
-					string strPage = asString(ipPage->String);
-					
-					string strTmpPattern = m_strPattern;
-					if (!m_bIsCaseSensitive)
+					string rootTag = "<RSDFileDir>";
+					strRootFolder = m_ipAFUtility->ExpandTags(rootTag.c_str(), ipAFDoc );
+				}
+				catch(...)
+				{
+				}
+				string strRegExp = getRegExpFromText(m_strPattern, strRootFolder, true,
+					gstrAF_AUTO_ENCRYPT_KEY_PATH);
+
+				ipRegExpParser->Pattern = strRegExp.c_str();
+				ipRegExpParser->IgnoreCase = asVariantBool(!m_bIsCaseSensitive);
+
+				if(m_eRegExpPageSelectionType == kSelectAllPagesWithRegExp)
+				{
+					for (long i = 0; i < lSize; i++)
 					{
-						makeLowerCase(strTmpPattern);
-						makeLowerCase(strPage);
+						ISpatialStringPtr ipPage = ipPages->At(i);
+						ASSERT_RESOURCE_ALLOCATION("ELI09379", ipPage != NULL);
+						IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->String, 
+							VARIANT_TRUE, VARIANT_FALSE);
+						ASSERT_RESOURCE_ALLOCATION("ELI28169", ipFound != NULL);
+						if (ipFound->Size() > 0)
+						{
+							vecPages.push_back(ipPage->GetFirstPageNumber());
+						}
 					}
-					long pos = strPage.find(strTmpPattern, 0);
-					if (pos != string::npos)
+				}
+				else if(m_eRegExpPageSelectionType == kSelectLeadingPagesWithRegExp)
+				{
+					for (long i = 0; i < lSize; i++)
 					{
-						vecPages.push_back(ipPage->GetFirstPageNumber());
+						ISpatialStringPtr ipPage = ipPages->At(i);
+						ASSERT_RESOURCE_ALLOCATION("ELI19149", ipPage != NULL);
+						IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->String, 
+							VARIANT_TRUE, VARIANT_FALSE);
+						ASSERT_RESOURCE_ALLOCATION("ELI28170", ipFound != NULL);
+						if (ipFound->Size() > 0)
+						{
+							vecPages.push_back(ipPage->GetFirstPageNumber());
+						}
+						else 
+						{
+							break;
+						}
+					}
+				}
+				else if(m_eRegExpPageSelectionType == kSelectTrailingPagesWithRegExp)
+				{
+					for (long i = lSize - 1; i >= 0; i--)
+					{
+						ISpatialStringPtr ipPage = ipPages->At(i);
+						ASSERT_RESOURCE_ALLOCATION("ELI19150", ipPage != NULL);
+						IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->GetString(), 
+							VARIANT_TRUE, VARIANT_FALSE);
+						ASSERT_RESOURCE_ALLOCATION("ELI28171", ipFound != NULL);
+						if (ipFound->Size() > 0)
+						{
+							vecPages.insert(vecPages.begin(), ipPage->GetFirstPageNumber());
+						}
+						else 
+						{
+							break;
+						}
 					}
 				}
 			}
-			else if(m_eRegExpPageSelectionType == kSelectLeadingPagesWithRegExp)
+			else
 			{
-				for (long i = 0; i < lSize; i++)
+				if(m_eRegExpPageSelectionType == kSelectAllPagesWithRegExp)
 				{
-					ISpatialStringPtr ipPage = ipPages->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI19151", ipPage != NULL);
-					string strPage = asString(ipPage->String);
-					
-					string strTmpPattern = m_strPattern;
-					if (!m_bIsCaseSensitive)
+					for (long i = 0; i < lSize; i++)
 					{
-						makeLowerCase(strTmpPattern);
-						makeLowerCase(strPage);
-					}
-					long pos = strPage.find(strTmpPattern, 0);
-					if (pos != string::npos)
-					{
-						vecPages.push_back(ipPage->GetFirstPageNumber());
-					}
-					else 
-					{
-						break;
+						ISpatialStringPtr ipPage = ipPages->At(i);
+						ASSERT_RESOURCE_ALLOCATION("ELI09380", ipPage != NULL);
+						string strPage = asString(ipPage->String);
+
+						string strTmpPattern = m_strPattern;
+						if (!m_bIsCaseSensitive)
+						{
+							makeLowerCase(strTmpPattern);
+							makeLowerCase(strPage);
+						}
+						long pos = strPage.find(strTmpPattern, 0);
+						if (pos != string::npos)
+						{
+							vecPages.push_back(ipPage->GetFirstPageNumber());
+						}
 					}
 				}
-			}
-			else if(m_eRegExpPageSelectionType == kSelectTrailingPagesWithRegExp)
-			{
-				for (long i = lSize - 1; i >= 0; i--)
+				else if(m_eRegExpPageSelectionType == kSelectLeadingPagesWithRegExp)
 				{
-					ISpatialStringPtr ipPage = ipPages->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI19152", ipPage != NULL);
-					string strPage = asString(ipPage->String);
-					
-					string strTmpPattern = m_strPattern;
-					if (!m_bIsCaseSensitive)
+					for (long i = 0; i < lSize; i++)
 					{
-						makeLowerCase(strTmpPattern);
-						makeLowerCase(strPage);
+						ISpatialStringPtr ipPage = ipPages->At(i);
+						ASSERT_RESOURCE_ALLOCATION("ELI19151", ipPage != NULL);
+						string strPage = asString(ipPage->String);
+
+						string strTmpPattern = m_strPattern;
+						if (!m_bIsCaseSensitive)
+						{
+							makeLowerCase(strTmpPattern);
+							makeLowerCase(strPage);
+						}
+						long pos = strPage.find(strTmpPattern, 0);
+						if (pos != string::npos)
+						{
+							vecPages.push_back(ipPage->GetFirstPageNumber());
+						}
+						else 
+						{
+							break;
+						}
 					}
-					long pos = strPage.find(strTmpPattern, 0);
-					if (pos != string::npos)
+				}
+				else if(m_eRegExpPageSelectionType == kSelectTrailingPagesWithRegExp)
+				{
+					for (long i = lSize - 1; i >= 0; i--)
 					{
-						long nPageNum = ipPage->GetFirstPageNumber();
-						vecPages.insert(vecPages.begin(), nPageNum);
-					}
-					else 
-					{
-						break;
+						ISpatialStringPtr ipPage = ipPages->At(i);
+						ASSERT_RESOURCE_ALLOCATION("ELI19152", ipPage != NULL);
+						string strPage = asString(ipPage->String);
+
+						string strTmpPattern = m_strPattern;
+						if (!m_bIsCaseSensitive)
+						{
+							makeLowerCase(strTmpPattern);
+							makeLowerCase(strPage);
+						}
+						long pos = strPage.find(strTmpPattern, 0);
+						if (pos != string::npos)
+						{
+							long nPageNum = ipPage->GetFirstPageNumber();
+							vecPages.insert(vecPages.begin(), nPageNum);
+						}
+						else 
+						{
+							break;
+						}
 					}
 				}
 			}
@@ -1498,8 +1501,10 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 
 		return vecPages;
 	}
-
-	return vecRet;
+	else
+	{
+		THROW_LOGIC_ERROR_EXCEPTION("ELI28699");
+	}
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStringPtr& ipOriginPage,

@@ -74,93 +74,97 @@ PatternHolder::~PatternHolder()
 //-------------------------------------------------------------------------------------------------
 bool PatternHolder::foundPatternsInText(const ISpatialStringPtr& ipInputText, DocPageCache& cache)
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI07425", m_ipRegExpr != NULL);
-	ASSERT_ARGUMENT("ELI07423", ipInputText != NULL);
-
-	// if there's no pattern defined, return false
-	if (m_vecPatterns.empty())
+	try
 	{
-		m_strRuleID = "";
-		return false;
-	}
+		ASSERT_RESOURCE_ALLOCATION("ELI07425", m_ipRegExpr != NULL);
+		ASSERT_ARGUMENT("ELI07423", ipInputText != NULL);
 
-	// get input text
-	string strInputText = getInputText(ipInputText, cache);
-
-	if (strInputText.empty())
-	{
-		m_strRuleID = "";
-		return false;
-	}
-
-	m_ipRegExpr->IgnoreCase = m_bCaseSensitive ? VARIANT_FALSE : VARIANT_TRUE;
-	int nInputSize = strInputText.size();
-	// start from where in the input text
-	int nStartPos = (int)(m_dStartingRange * nInputSize);
-	// end at where
-	int nEndPos = (int)(m_dEndingRange * nInputSize);
-	// make sure end pos greater than start pos, and all within range
-	if (nStartPos > nEndPos || nStartPos > nInputSize || nEndPos > nInputSize)
-	{
-		UCLIDException ue("ELI07083", "Invalid starting/ending range defined in the file.");
-		ue.addDebugInfo("Starting Range", m_dStartingRange);
-		ue.addDebugInfo("Ending Range", m_dEndingRange);
-		throw ue;
-	}
-
-	// truncate the input string according to the range
-	string strInputWithinRange = strInputText.substr(nStartPos, nEndPos-nStartPos + 1);
-	for (unsigned int ui = 0; ui < m_vecPatterns.size(); ui++)
-	{
-		// Retrieve pattern plus optional Rule ID
-		string& strIDPlusPattern = m_vecPatterns[ui];
-
-		// Separate pattern and rule ID
-		string strPattern;
-		string strRuleID;
-		unsigned long ulLength = strIDPlusPattern.length();
-		unsigned long ulPos = strIDPlusPattern.find( '=', 0 );
-		if ((ulPos == string::npos) || (ulPos == ulLength - 1))
+		// if there's no pattern defined, return false
+		if (m_vecPatterns.empty())
 		{
-			// No defined Rule ID
-			strPattern = strIDPlusPattern;
-		}
-		else
-		{
-			// Rule ID is before EQUAL sign
-			strRuleID = strIDPlusPattern.substr( 0, ulPos );
-
-			// Pattern starts after EQUAL sign
-			strPattern = strIDPlusPattern.substr( ulPos + 1, ulLength - ulPos - 1 );
-		}
-
-		// Provide pattern to parser
-		m_ipRegExpr->Pattern = strPattern.c_str();
-		
-		// whether or not this pattern is found in the input text
-		//bool bFound = false;
-		bool bFound = asCppBool(m_ipRegExpr->StringContainsPattern(strInputWithinRange.c_str()));
-		
-		if (bFound && !m_bIsAndRelationship)
-		{
-			// if it's OR relationship, once a pattern is found
-			// save rule ID and return true immediately
-			m_strRuleID = strRuleID;
-			return true;
-		}
-		else if (!bFound && m_bIsAndRelationship)
-		{
-			// if it's AND relationship, once a pattern can't be found
-			// save rule ID and return false immediately
-			m_strRuleID = strRuleID;
+			m_strRuleID = "";
 			return false;
 		}
-	}
 
-	// once this point is reached, 
-	// if m_bIsAndRelationship == true, return true
-	// if m_bIsAndRelationship == false, return false
-	return m_bIsAndRelationship;
+		// get input text
+		string strInputText = getInputText(ipInputText, cache);
+
+		if (strInputText.empty())
+		{
+			m_strRuleID = "";
+			return false;
+		}
+
+		m_ipRegExpr->IgnoreCase = m_bCaseSensitive ? VARIANT_FALSE : VARIANT_TRUE;
+		int nInputSize = strInputText.size();
+		// start from where in the input text
+		int nStartPos = (int)(m_dStartingRange * nInputSize);
+		// end at where
+		int nEndPos = (int)(m_dEndingRange * nInputSize);
+		// make sure end pos greater than start pos, and all within range
+		if (nStartPos > nEndPos || nStartPos > nInputSize || nEndPos > nInputSize)
+		{
+			UCLIDException ue("ELI07083", "Invalid starting/ending range defined in the file.");
+			ue.addDebugInfo("Starting Range", m_dStartingRange);
+			ue.addDebugInfo("Ending Range", m_dEndingRange);
+			throw ue;
+		}
+
+		// truncate the input string according to the range
+		string strInputWithinRange = strInputText.substr(nStartPos, nEndPos-nStartPos + 1);
+		for (unsigned int ui = 0; ui < m_vecPatterns.size(); ui++)
+		{
+			// Retrieve pattern plus optional Rule ID
+			string& strIDPlusPattern = m_vecPatterns[ui];
+
+			// Separate pattern and rule ID
+			string strPattern;
+			string strRuleID;
+			unsigned long ulLength = strIDPlusPattern.length();
+			unsigned long ulPos = strIDPlusPattern.find( '=', 0 );
+			if ((ulPos == string::npos) || (ulPos == ulLength - 1))
+			{
+				// No defined Rule ID
+				strPattern = strIDPlusPattern;
+			}
+			else
+			{
+				// Rule ID is before EQUAL sign
+				strRuleID = strIDPlusPattern.substr( 0, ulPos );
+
+				// Pattern starts after EQUAL sign
+				strPattern = strIDPlusPattern.substr( ulPos + 1, ulLength - ulPos - 1 );
+			}
+
+			// Provide pattern to parser
+			m_ipRegExpr->Pattern = strPattern.c_str();
+
+			// whether or not this pattern is found in the input text
+			//bool bFound = false;
+			bool bFound = asCppBool(m_ipRegExpr->StringContainsPattern(strInputWithinRange.c_str()));
+
+			if (bFound && !m_bIsAndRelationship)
+			{
+				// if it's OR relationship, once a pattern is found
+				// save rule ID and return true immediately
+				m_strRuleID = strRuleID;
+				return true;
+			}
+			else if (!bFound && m_bIsAndRelationship)
+			{
+				// if it's AND relationship, once a pattern can't be found
+				// save rule ID and return false immediately
+				m_strRuleID = strRuleID;
+				return false;
+			}
+		}
+
+		// once this point is reached, 
+		// if m_bIsAndRelationship == true, return true
+		// if m_bIsAndRelationship == false, return false
+		return m_bIsAndRelationship;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28698");
 }
 //-------------------------------------------------------------------------------------------------
 bool PatternHolder::isUniqueRuleID(const string& strIDPlusPattern)

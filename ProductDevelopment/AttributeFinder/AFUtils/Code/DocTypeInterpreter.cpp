@@ -80,73 +80,77 @@ DocTypeInterpreter& DocTypeInterpreter::operator=(const DocTypeInterpreter& objT
 //-------------------------------------------------------------------------------------------------
 int DocTypeInterpreter::getDocConfidenceLevel(const ISpatialStringPtr& ipInputText, DocPageCache& cache)
 {
-	EConfidenceLevel eConfidenceLevel = kZero;
-
-	// go through all PatternHolders
-	for (unsigned int ui = 0; ui < m_vecPatternHolders.size(); ui++)
+	try
 	{
-		PatternHolder& patternHolder = m_vecPatternHolders[ui];
+		EConfidenceLevel eConfidenceLevel = kZero;
 
-		// find match
-		bool bFound = patternHolder.foundPatternsInText(ipInputText, cache);
-		if (bFound)
+		// go through all PatternHolders
+		for (unsigned int ui = 0; ui < m_vecPatternHolders.size(); ui++)
 		{
-			// Retrieve Block ID
-			string& strBlockID = patternHolder.m_strBlockID;
+			PatternHolder& patternHolder = m_vecPatternHolders[ui];
 
-			bool	bFoundMatch = false;
-			if (strBlockID.length() > 0)
+			// find match
+			bool bFound = patternHolder.foundPatternsInText(ipInputText, cache);
+			if (bFound)
 			{
-				unsigned long ulCount = m_vecBlockIDs.size();
-				for (unsigned int ui = 0; ui < ulCount; ui++)
+				// Retrieve Block ID
+				string& strBlockID = patternHolder.m_strBlockID;
+
+				bool	bFoundMatch = false;
+				if (strBlockID.length() > 0)
 				{
-					string& strTest = m_vecBlockIDs[ui];
-					if (strBlockID.compare( strTest ) == 0)
+					unsigned long ulCount = m_vecBlockIDs.size();
+					for (unsigned int ui = 0; ui < ulCount; ui++)
 					{
-						bFoundMatch = true;
+						string& strTest = m_vecBlockIDs[ui];
+						if (strBlockID.compare( strTest ) == 0)
+						{
+							bFoundMatch = true;
+						}
 					}
 				}
-			}
 
-			// Block ID (if defined) must be unique
-			if (!bFoundMatch)
-			{
-				// if there's a match, return current confidence level
-				// store in this pattern holder
-				eConfidenceLevel = patternHolder.m_eConfidenceLevel;
-
-				// Set document sub-type, if defined
-				if (patternHolder.m_strSubType.length() > 0)
+				// Block ID (if defined) must be unique
+				if (!bFoundMatch)
 				{
-					m_strDocSubType = patternHolder.m_strSubType;
+					// if there's a match, return current confidence level
+					// store in this pattern holder
+					eConfidenceLevel = patternHolder.m_eConfidenceLevel;
+
+					// Set document sub-type, if defined
+					if (patternHolder.m_strSubType.length() > 0)
+					{
+						m_strDocSubType = patternHolder.m_strSubType;
+					}
+					else
+					{
+						// Clear the sub-type
+						m_strDocSubType = "";
+					}
+
+					// Set Block ID and rule ID
+					m_strBlockID = strBlockID;
+					m_strRuleID = patternHolder.m_strRuleID;
+
+					// Update vector
+					if (strBlockID.length() > 0)
+					{
+						m_vecBlockIDs.push_back( strBlockID );
+					}
 				}
 				else
 				{
-					// Clear the sub-type
-					m_strDocSubType = "";
+					UCLIDException ue( "ELI10982", "Non-unique Block ID within DCC file.");
+					ue.addDebugInfo( "Block ID", strBlockID );
+					throw ue;
 				}
-
-				// Set Block ID and rule ID
-				m_strBlockID = strBlockID;
-				m_strRuleID = patternHolder.m_strRuleID;
-
-				// Update vector
-				if (strBlockID.length() > 0)
-				{
-					m_vecBlockIDs.push_back( strBlockID );
-				}
+				break;
 			}
-			else
-			{
-				UCLIDException ue( "ELI10982", "Non-unique Block ID within DCC file.");
-				ue.addDebugInfo( "Block ID", strBlockID );
-				throw ue;
-			}
-			break;
 		}
-	}
 
-	return (int)eConfidenceLevel;
+		return (int)eConfidenceLevel;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28728");
 }
 //-------------------------------------------------------------------------------------------------
 void DocTypeInterpreter::loadDocTypeFile(const string& strDocTypeFile, bool bClearPatterns)
