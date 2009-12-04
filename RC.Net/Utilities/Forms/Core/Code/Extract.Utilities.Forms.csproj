@@ -110,6 +110,12 @@
     </Compile>
     <Compile Include="TemporaryCursor.cs" />
     <Compile Include="TemporaryWaitCursor.cs" />
+    <Compile Include="ToolStripButtonBase.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolStripButtonBase.Designer.cs">
+      <DependentUpon>ToolStripButtonBase.cs</DependentUpon>
+    </Compile>
     <Compile Include="VerificationForm.cs" />
     <Compile Include="TimeoutResult.cs" />
   </ItemGroup>
