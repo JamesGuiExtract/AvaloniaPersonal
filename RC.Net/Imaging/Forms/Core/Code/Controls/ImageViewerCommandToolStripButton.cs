@@ -1,11 +1,7 @@
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics.CodeAnalysis;
 
@@ -15,7 +11,7 @@ namespace Extract.Imaging.Forms
     /// Provides the <see langword="abstract"/> base class for a <see cref="ToolStripButton"/> 
     /// that interacts with the <see cref="ImageViewer"/> control. 
     /// </summary>
-    public abstract partial class ImageViewerCommandToolStripButton : ToolStripButton, 
+    public abstract partial class ImageViewerCommandToolStripButton : ToolStripButtonBase, 
         IImageViewerControl
     {
         #region Constants
@@ -23,32 +19,31 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(ImageViewerCommandToolStripButton).ToString();
+        static readonly string _OBJECT_NAME = typeof(ImageViewerCommandToolStripButton).ToString();
 
         #endregion Constants
 
-        #region ImageViewerCommandToolStripButton Fields
+        #region Fields
 
         /// <summary>
         /// Image viewer with which this button connects.
         /// </summary>
-        private ImageViewer _imageViewer;
+        ImageViewer _imageViewer;
 
         /// <summary>
         /// Tool tip text without shortcut keys text
         /// </summary>
-        private string _baseToolTipText;
+        string _baseToolTipText;
 
         /// <summary>
         /// License cache for validating the license.
         /// </summary>
-        static LicenseStateCache _licenseCache =
+        static readonly LicenseStateCache _licenseCache =
             new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
 
-        #endregion
+        #endregion Fields
 
-        #region ImageViewerCommandToolStripButton Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="ImageViewerCommandToolStripButton"/>
@@ -87,30 +82,17 @@ namespace Extract.Imaging.Forms
         /// embedded resource name.</exception>
         // Don't fight with auto-generated code.
         [SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]
-        protected ImageViewerCommandToolStripButton(string buttonImage, string toolTipText, 
+        protected ImageViewerCommandToolStripButton(string buttonImage, string toolTipText,
             Type buttonType, string buttonText)
+            : base(buttonType, buttonImage)
         {
             try
             {
-                // Load licenses in design mode
-                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
-                {
-                    // Load the license files from folder
-                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel()); 
-                }
-
                 // Validate the license
                 _licenseCache.Validate("ELI23101");
 
-                // Ensure button image has been specified
-                ExtractException.Assert("ELI21329", "buttonImage must not be empty!",
-                    !string.IsNullOrEmpty(buttonImage));
-
                 // Call auto-generated code to initialize the component
                 InitializeComponent();
-
-                // Load and set the image for this compononent from the embedded resource
-                base.Image = (Image)new Bitmap(buttonType, buttonImage); 
 
                 // Set the tool tip text for the button
                 _baseToolTipText = toolTipText;
@@ -122,9 +104,6 @@ namespace Extract.Imaging.Forms
                     base.Text = buttonText;
                 }
 
-                // Set the display style to image
-                base.DisplayStyle = ToolStripItemDisplayStyle.Image;
-
                 // Disable the button by default
                 base.Enabled = false;
             }
@@ -135,9 +114,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion
+        #endregion Constructors
 
-        #region ImageViewerCommandToolStripButton Methods
+        #region Methods
 
         /// <summary>
         /// Set the <see cref="ImageViewerCommandToolStripButton"/> to enabled if the
@@ -152,7 +131,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Sets the tool tip text for the button including the keyboard shortcut.
         /// </summary>
-        private void SetToolTipText()
+        void SetToolTipText()
         {
             // Get the original tool tip text
             string toolTipText = _baseToolTipText;
@@ -179,9 +158,9 @@ namespace Extract.Imaging.Forms
         /// May be <see langword="null"/> if no keys are associated with the button.</returns>
         protected abstract Keys[] GetKeys();
 
-        #endregion
+        #endregion Methods
 
-        #region ImageViewerCommandToolStripButton Event Handlers
+        #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
@@ -190,7 +169,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the
         /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
-        private void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
+        void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             // Set the enabled state
             SetEnabledState();
@@ -203,7 +182,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="ShortcutsManager.ShortcutKeyChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ShortcutsManager.ShortcutKeyChanged"/> event.</param>
-        private void HandleShortcutKeyChanged(object sender, ShortcutKeyChangedEventArgs e)
+        void HandleShortcutKeyChanged(object sender, ShortcutKeyChangedEventArgs e)
         {
             try
             {
@@ -217,9 +196,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion
+        #endregion Event Handlers
 
-        #region ImageViewerCommandToolStripButton Properties
+        #region Properties
 
         /// <summary>
         /// The tooltip text to display in the <see cref="ToolStripButton"/>. (minus any shortcut
@@ -258,26 +237,7 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        /// <summary>
-        /// Gets the image that is displayed in this <see cref="ToolStripButton"/>.
-        /// </summary>
-        /// <value>The set property has been obsoleted and disabled.</value>
-        /// <return>The image that is displayed in this <see cref="ToolStripButton"/>.</return>
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public override Image Image
-        {
-            get
-            {
-                return base.Image;
-            }
-            set
-            {
-                // Prevent the image from being modified
-            }
-        }
-
-        #endregion
+        #endregion Properties
 
         #region IImageViewerControl Members
 
@@ -377,6 +337,6 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion
+        #endregion IImageViewerControl Members
     }
 }

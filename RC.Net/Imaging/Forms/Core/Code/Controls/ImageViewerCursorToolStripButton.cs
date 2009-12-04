@@ -1,11 +1,7 @@
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics.CodeAnalysis;
 
@@ -16,7 +12,7 @@ namespace Extract.Imaging.Forms
     /// that interacts with the <see cref="ImageViewer"/> control's 
     /// <see cref="P:Extract.Imaging.Forms.ImageViewer.CursorTool"/> property.
     /// </summary>
-    public abstract partial class ImageViewerCursorToolStripButton : ToolStripButton, 
+    public abstract partial class ImageViewerCursorToolStripButton : ToolStripButtonBase, 
         IImageViewerControl
     {
         #region Constants
@@ -24,42 +20,41 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(ImageViewerCursorToolStripButton).ToString();
+        static readonly string _OBJECT_NAME = typeof(ImageViewerCursorToolStripButton).ToString();
 
         #endregion Constants
 
-        #region ImageViewerCursorToolStripButton Fields
+        #region Fields
 
         /// <summary>
         /// Cursor tool type that this button controls.
         /// </summary>
-        private readonly CursorTool _cursorTool;
+        readonly CursorTool _cursorTool;
 
         /// <summary>
         /// Image viewer with which this button connects.
         /// </summary>
-        private ImageViewer _imageViewer;
+        ImageViewer _imageViewer;
 
         /// <summary>
         /// Tool tip text without shortcut keys text
         /// </summary>
-        private string _baseToolTipText;
+        string _baseToolTipText;
 
         /// <summary>
         /// License cache for validating the license.
         /// </summary>
-        static LicenseStateCache _licenseCache =
+        static readonly LicenseStateCache _licenseCache =
             new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
 
         #endregion
 
-        #region ImageViewerCursorToolStripButton Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="ImageViewerCursorToolStripButton"/>
         /// class that interacts with the specified 
-        /// <see cref="T:ImageViewer.CursorTool"/> enum value type.
+        /// <see cref="CursorTool"/> enum value type.
         /// </summary>
         /// <param name="cursorTool">Cursor tool value type with which the tool strip button 
         /// interacts.</param>
@@ -101,24 +96,16 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]
         protected ImageViewerCursorToolStripButton(CursorTool cursorTool, string buttonText,
             string buttonImage, string toolTipText, Type buttonType)
+            : base(buttonType, buttonImage)
         {
             try
             {
-                // Load licenses in design mode
-                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
-                {
-                    // Load the license files from folder
-                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel()); 
-                }
-
                 // Validate the license
                 _licenseCache.Validate("ELI23102");
 
                 // Ensure button text and image have been specified
                 ExtractException.Assert("ELI21227", "buttonText must not be empty!",
                     !string.IsNullOrEmpty(buttonText));
-                ExtractException.Assert("ELI21228", "buttonImage must not be empty!",
-                    !string.IsNullOrEmpty(buttonImage));
 
                 // Store the cursor tool that this button controls
                 _cursorTool = cursorTool;
@@ -129,15 +116,9 @@ namespace Extract.Imaging.Forms
                 // Set the text for the button
                 base.Text = buttonText;
 
-                // Load and set the image for this compononent from the embedded resource
-                base.Image = (Image)new Bitmap(buttonType, buttonImage); 
-
                 // Set the tool tip text for the button
                 _baseToolTipText = toolTipText;
                 base.ToolTipText = toolTipText;
-
-                // Set the display style to image
-                base.DisplayStyle = ToolStripItemDisplayStyle.Image;
 
                 // Button is not enabled until an image is open on the associated image viewer 
                 // control
@@ -152,7 +133,7 @@ namespace Extract.Imaging.Forms
 
         #endregion
 
-        #region ImageViewerCursorToolStripButton Events
+        #region Events
 
         /// <summary>
         /// Raises the <see cref="Control.Click"/> event.
@@ -168,8 +149,6 @@ namespace Extract.Imaging.Forms
                 {
                     _imageViewer.CursorTool = _cursorTool;
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -185,7 +164,7 @@ namespace Extract.Imaging.Forms
 
         #endregion
 
-        #region ImageViewerCursorToolStripButton Event Handlers
+        #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.CursorToolChanged"/> event.
@@ -194,7 +173,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="Extract.Imaging.Forms.ImageViewer.CursorToolChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="Extract.Imaging.Forms.ImageViewer.CursorToolChanged"/> event.</param>
-        private void HandleCursorToolChanged(object sender, CursorToolChangedEventArgs e)
+        void HandleCursorToolChanged(object sender, CursorToolChangedEventArgs e)
         {
             try
             {
@@ -216,7 +195,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
-        private void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
+        void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
             {
@@ -237,7 +216,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="ShortcutsManager.ShortcutKeyChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ShortcutsManager.ShortcutKeyChanged"/> event.</param>
-        private void HandleShortcutKeyChanged(object sender, ShortcutKeyChangedEventArgs e)
+        void HandleShortcutKeyChanged(object sender, ShortcutKeyChangedEventArgs e)
         {
             try
             {
@@ -253,7 +232,7 @@ namespace Extract.Imaging.Forms
 
         #endregion
 
-        #region ImageViewerCursorToolStripButton Properties
+        #region Properties
 
         /// <summary>
         /// The tooltip text to display in the <see cref="ToolStripButton"/>. (minus any shortcut
@@ -311,28 +290,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        /// <summary>
-        /// Gets the image that is displayed in this <see cref="ToolStripButton"/>.
-        /// </summary>
-        /// <value>The set property has been obsoleted and disabled.</value>
-        /// <return>The image that is displayed in this <see cref="ToolStripButton"/>.</return>
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public override Image Image
-        {
-            get
-            {
-                return base.Image;
-            }
-            set
-            {
-                // Do nothing
-            }
-        }
-
         #endregion
 
-        #region ImageViewerCursorToolStripButton Methods
+        #region Methods
 
         /// <summary>
         /// Sets the <see cref="ToolStripItem.Enabled"/> and <see cref="ToolStripButton.Checked"/> 
@@ -341,7 +301,7 @@ namespace Extract.Imaging.Forms
         /// <param name="updateEnabledStatus"><see langword="true"/> to update the enabled status
         /// of the button based on whether an image is open; <see langword="false"/> to update only
         /// the checked state of the button.</param>
-        private void SetButtonState(bool updateEnabledStatus)
+        void SetButtonState(bool updateEnabledStatus)
         {
             // Check whether an image is open on an associated image viewer control.
             bool imageIsOpen = _imageViewer != null && _imageViewer.IsImageAvailable;
@@ -354,13 +314,13 @@ namespace Extract.Imaging.Forms
             }
 
             // Check the button iff the image is open and the current cursor tool is selected
-            base.Checked = imageIsOpen && _imageViewer.CursorTool == _cursorTool;
+            Checked = imageIsOpen && _imageViewer.CursorTool == _cursorTool;
         }
 
         /// <summary>
         /// Sets the tool tip text for the button including the keyboard shortcut.
         /// </summary>
-        private void SetToolTipText()
+        void SetToolTipText()
         {
             // Get the original tool tip text
             string toolTipText = _baseToolTipText;
