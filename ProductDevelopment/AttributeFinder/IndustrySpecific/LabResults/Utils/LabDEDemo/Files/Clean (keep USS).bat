@@ -6,12 +6,11 @@ ECHO.
 IF EXIST input\*.tif del input\*.tif /s /q
 IF EXIST input\*.redacted.* del input\*.redacted.* /s /q
 IF EXIST input\*.voa del input\*.voa /s /q
-IF EXIST input\*.uss del input\*.uss /s /q
 IF EXIST "Outbound XML Messages\*.*" del "Outbound XML Messages\*.*" /s /q
 IF EXIST "Outbound XML Messages\Sent\*.*" del "Outbound XML Messages\Sent\*.*" /s /q
 IF EXIST "Transmitted HL7 Messages\*.*" del "Transmitted HL7 Messages\*.*" /s /q
 
-copy DemoFiles\Installs\CurrentDemo\TIF\*.tif input\
+copy DemoFiles\Installs\CurrentDemo\TIF\*.* input\
 
 rem Setup batch file to detach the DB
 echo sp_detach_db Demo_LabDE >"%~dp0SQL.sql"

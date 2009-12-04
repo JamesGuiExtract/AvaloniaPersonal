@@ -52,6 +52,12 @@ namespace Extract.Imaging
         static readonly LicenseStateCache _licenseCache =
             new LicenseStateCache(LicenseIdName.OcrOnClientFeature, _OBJECT_NAME);
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.OcrOnClientFeature, _OBJECT_NAME);
+
         #endregion Fields
 
         #region Constructors
