@@ -1182,6 +1182,9 @@ namespace Extract.Redaction.Verification
                 _previousRedactionToolStripButton.Enabled = true;
                 _nextRedactionToolStripButton.Enabled = true;
 
+                _tagFileToolStripButton.Enabled = true;
+                _tagFileToolStripButton.FileId = memento.FileId;
+
                 _skipProcessingToolStripMenuItem.Enabled = !IsInHistory;
                 _saveToolStripButton.Enabled = !IsInHistory;
                 _saveToolStripMenuItem.Enabled = !IsInHistory;
@@ -1199,6 +1202,8 @@ namespace Extract.Redaction.Verification
 
                 _previousRedactionToolStripButton.Enabled = false;
                 _nextRedactionToolStripButton.Enabled = false;
+
+                _tagFileToolStripButton.Enabled = false;
 
                 _skipProcessingToolStripMenuItem.Enabled = false;
                 _saveToolStripButton.Enabled = false;
@@ -1264,6 +1269,7 @@ namespace Extract.Redaction.Verification
 
                 // Store the file processing database
                 _fileDatabase = database;
+                _tagFileToolStripButton.Database = database;
 
                 // Create the IDShield database wrapper
                 _idShieldDatabase = new IDShieldProductDBMgrClass();
