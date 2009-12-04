@@ -1,7 +1,6 @@
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -32,7 +31,7 @@ namespace Extract.FileActionManager.Forms
         /// <summary>
         /// The context menu that is displayed when the button is clicked.
         /// </summary>
-        ContextMenuStrip _dropDown;
+        FileTagDropDown _dropDown;
 
         /// <summary>
         /// The file id of the tags to display.
@@ -43,11 +42,6 @@ namespace Extract.FileActionManager.Forms
         /// The database from which to read and write tags.
         /// </summary>
         IFileProcessingDB _database;
-
-        /// <summary>
-        /// A list of possible tags.
-        /// </summary>
-        string[] _tags;
 
         /// <summary>
         /// License cache for validating the license.
@@ -184,9 +178,7 @@ namespace Extract.FileActionManager.Forms
             VariantVector vector = _database.GetTagsOnFile(fileId);
 
             string[] tags = GetVectorAsArray(vector);
-
-            Array.Sort(tags, StringComparer.OrdinalIgnoreCase);
-
+            
             return tags;
         }
 
@@ -239,50 +231,23 @@ namespace Extract.FileActionManager.Forms
         /// <summary>
         /// Creates a drop down context menu strip to display to the user.
         /// </summary>
-        /// <param name="tags">The tags to display in the menu.</param>
-        /// <param name="checkedTags">The names of the tags that should be checked.</param>
-        /// <param name="applyNewTags"><see langword="true"/> if the user can apply new tags;
-        /// <see langword="false"/> if the user cannot apply new tags.</param>
         /// <returns>A drop down context menu strip to display to the user.</returns>
-        ContextMenuStrip CreateDropDown(ICollection<string> tags, string[] checkedTags, 
-            bool applyNewTags)
+        FileTagDropDown CreateDropDown()
         {
-            ContextMenuStrip dropDown = null;
+            FileTagDropDown dropDown = null;
             try
             {
-                // Create a context menu for the drop down
-                dropDown = new ContextMenuStrip();
-                dropDown.ShowCheckMargin = true;
-                dropDown.ShowImageMargin = false;
-                dropDown.ItemClicked += HandleItemClicked;
+                // Get the parameters
+                string[] tags = GetFileTags();
+                string[] checkedTags = GetTagsForFileId(_fileId);
+                bool applyNewTags = _database.AllowDynamicTagCreation();
 
-                // Get the drop down items
-                ToolStripItemCollection items = dropDown.Items;
+                // Create the drop down
+                dropDown = new FileTagDropDown(tags, checkedTags, applyNewTags);
 
-                // Add the file tags
-                if (tags.Count > 0)
-                {
-                    foreach (string tag in tags)
-                    {
-                        ToolStripMenuItem item = new ToolStripMenuItem(tag);
-                        item.Checked = IsTagContainedInArray(tag, checkedTags);
-                        items.Add(item);
-                    }
-                }
-                else
-                {
-                    ToolStripMenuItem item = new ToolStripMenuItem("No tags available");
-                    item.Enabled = false;
-                    items.Add(item);
-                }
-
-                // Add the apply new tags button if necessary
-                if (applyNewTags)
-                {
-                    items.Add(new ToolStripSeparator());
-                    
-                    items.Add(new ToolStripMenuItem("Apply new tag..."));
-                }
+                // Add event handlers
+                dropDown.FileTagAdded += HandleFileTagAdded;
+                dropDown.FileTagClicked += HandleFileTagClicked;
 
                 return dropDown;
             }
@@ -296,19 +261,7 @@ namespace Extract.FileActionManager.Forms
                 throw;
             }
         }
-        
-        /// <summary>
-        /// Determines if the specified tag is contained in the specified array.
-        /// </summary>
-        /// <param name="tag">The tag to check for containment.</param>
-        /// <param name="tags">The tags to check.</param>
-        /// <returns><see langword="true"/> if <paramref name="tag"/> is in 
-        /// <paramref name="tags"/>; <see langword="false"/> if <paramref name="tag"/> is not in 
-        /// <paramref name="tags"/>.</returns>
-        static bool IsTagContainedInArray(string tag, string[] tags)
-        {
-            return Array.BinarySearch(tags, tag, StringComparer.OrdinalIgnoreCase) >= 0;
-        }
+
 
         /// <summary>
         /// Displays the drop down context menu.
@@ -319,25 +272,6 @@ namespace Extract.FileActionManager.Forms
             Point leftBottom = new Point(Bounds.Left, Bounds.Bottom);
 
             _dropDown.Show(Parent.PointToScreen(leftBottom));
-        }
-
-        /// <summary>
-        /// Displays a prompt to the user allowing them to apply a new tag. Applies the new tag if 
-        /// they select OK.
-        /// </summary>
-        void PromptToApplyNewTag()
-        {
-            // Display the dialog.
-            using (FileTagDialog dialog = new FileTagDialog())
-            {
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    // Add and tag the file
-                    FileTag tag = dialog.FileTag;
-                    _database.AddTag(tag.Name, tag.Description);
-                    _database.TagFile(_fileId, tag.Name);
-                }
-            }
         }
 
         #endregion Methods
@@ -351,10 +285,10 @@ namespace Extract.FileActionManager.Forms
         /// event.</param>
         protected override void OnClick(EventArgs e)
         {
-            base.OnClick(e);
-
             try
             {
+                base.OnClick(e);
+
                 // If there is no database, do nothing
                 if (_database == null)
                 {
@@ -362,15 +296,11 @@ namespace Extract.FileActionManager.Forms
                 }
 
                 // Create the drop down
-                _tags = GetFileTags();
-                string[] checkedTags = GetTagsForFileId(_fileId);
-                bool applyNewTags = _database.AllowDynamicTagCreation();
-
                 if (_dropDown != null)
                 {
                     _dropDown.Dispose();
                 }
-                _dropDown = CreateDropDown(_tags, checkedTags, applyNewTags);
+                _dropDown = CreateDropDown();
 
                 // Show drop down
                 ShowDropDown();
@@ -386,34 +316,43 @@ namespace Extract.FileActionManager.Forms
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="ToolStrip.ItemClicked"/> event.
+        /// Handles the <see cref="FileTagDropDown.FileTagAdded"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="ToolStrip.ItemClicked"/> event.</param>
+        /// <see cref="FileTagDropDown.FileTagAdded"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="ToolStrip.ItemClicked"/> event.</param>
-        void HandleItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        /// <see cref="FileTagDropDown.FileTagAdded"/> event.</param>
+        void HandleFileTagAdded(object sender, FileTagAddedEventArgs e)
         {
             try
             {
-                // Get the index of the clicked item
-                ToolStripItem item = e.ClickedItem;
-                int index = item.Owner.Items.IndexOf(item);
-
-                if (index < _tags.Length)
-                {
-                    // A tag was clicked. Toggle it in the database.
-                    _database.ToggleTagOnFile(_fileId, item.Text);
-                }
-                else if (index == item.Owner.Items.Count - 1)
-                {
-                    // Apply new tag was clicked. Allow the user to apply a new tag.
-                    PromptToApplyNewTag();
-                }
+                // Add and tag the file
+                FileTag tag = e.FileTag;
+                _database.AddTag(tag.Name, tag.Description);
+                _database.TagFile(_fileId, tag.Name);
             }
             catch (Exception ex)
             {
                 ExtractException.Display("ELI28726", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="FileTagDropDown.FileTagClicked"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="FileTagDropDown.FileTagClicked"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="FileTagDropDown.FileTagClicked"/> event.</param>
+        void HandleFileTagClicked(object sender, FileTagClickedEventArgs e)
+        {
+            try
+            {
+                _database.ToggleTagOnFile(_fileId, e.Name);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI28761", ex);
             }
         }
 
