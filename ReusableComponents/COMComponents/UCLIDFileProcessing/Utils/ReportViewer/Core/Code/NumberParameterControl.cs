@@ -16,18 +16,21 @@ namespace Extract.ReportViewer
     /// </summary>
     public partial class NumberParameterControl : UserControl, IExtractParameterControl
     {
+        #region Constants
+
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        private static readonly string _OBJECT_NAME = typeof(NumberParameterControl).ToString();
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
         /// Holds the <see cref="NumberParameter"/> associated with this control.
         /// </summary>
         NumberParameter _numberParameter;
-
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "Number Paramer Control");
 
         #endregion Fields
 
@@ -59,7 +62,8 @@ namespace Extract.ReportViewer
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23818");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23818",
+					_OBJECT_NAME);
 
                 InitializeComponent();
 

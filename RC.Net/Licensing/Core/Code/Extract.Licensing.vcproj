@@ -206,7 +206,7 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}"
-			RelativePathToProject="..\..\..\Core\Code\Extract.csproj"
+			RelativePathToProject="..\..\..\..\..\RC.Net\Core\Code\Extract.csproj"
 		/>
 		<AssemblyReference
 			RelativePath="System.Windows.Forms.dll"
@@ -218,7 +218,7 @@
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}"
-			RelativePathToProject="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj"
+			RelativePathToProject="..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj"
 		/>
 	</References>
 	<Files>
@@ -304,6 +304,10 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StringHelperFunctions.h"
 				>
 			</File>
 		</Filter>

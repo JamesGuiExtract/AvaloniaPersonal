@@ -34,12 +34,6 @@ namespace Extract.IDShieldStatisticsReporter
         static readonly string _OBJECT_NAME = typeof(IDShieldStatisticsReporterForm).ToString();
 
         /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.FlexIndexIDShieldCoreObjects, _OBJECT_NAME);
-
-        /// <summary>
         /// The name of the automated redaction method.
         /// </summary>
         const string _AUTOMATED_REDACTION = "Automated redaction";
@@ -130,7 +124,8 @@ namespace Extract.IDShieldStatisticsReporter
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI28534");
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI28534",
+					_OBJECT_NAME);
 
                 InitializeComponent();
 

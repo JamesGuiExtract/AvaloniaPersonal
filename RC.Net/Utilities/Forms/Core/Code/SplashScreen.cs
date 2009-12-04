@@ -25,16 +25,6 @@ namespace Extract.Utilities.Forms
 
         #endregion Constants
 
-        #region Fields
-
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
-        #endregion Fields
-
         #region SplashScreen Constructors
 
         /// <summary>
@@ -54,7 +44,8 @@ namespace Extract.Utilities.Forms
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23157");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23157",
+                    _OBJECT_NAME);
 
                 InitializeComponent();
 

@@ -51,12 +51,6 @@ namespace Extract.FileActionManager.FileProcessors
         #region Fields
 
         /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _COMPONENT_DESCRIPTION);
-
-        /// <summary>
         /// The <see cref="BatesNumberFormat"/> to use to apply Bates numbers.
         /// </summary>
         BatesNumberFormat _format = new BatesNumberFormat(true);
@@ -351,7 +345,8 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI27893");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI27893",
+					_COMPONENT_DESCRIPTION);
 
                 // Create a tag manager and expand the tags in the file name
                 FileActionManagerPathTags tags = new FileActionManagerPathTags(

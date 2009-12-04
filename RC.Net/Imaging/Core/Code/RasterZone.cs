@@ -46,12 +46,6 @@ namespace Extract.Imaging
         /// </summary>
         private int _pageNumber;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -111,7 +105,8 @@ namespace Extract.Imaging
                     comRasterZone != null);
 
                 // Validate the license
-                _licenseCache.Validate("ELI23122");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23122",
+					_OBJECT_NAME);
 
                 _start.X = comRasterZone.StartX;
                 _start.Y = comRasterZone.StartY;
@@ -141,7 +136,8 @@ namespace Extract.Imaging
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI23123");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23123",
+					_OBJECT_NAME);
 
                 _start = new Point(startX, startY);
                 _end = new Point(endX, endY);
@@ -405,7 +401,8 @@ namespace Extract.Imaging
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI23154");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23154",
+					_OBJECT_NAME);
 
                 ExtractException.Assert("ELI22531", "Raster zone collection must not be null!",
                     rasterZones != null);

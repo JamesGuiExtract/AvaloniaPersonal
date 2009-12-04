@@ -28,16 +28,6 @@ namespace Extract.Drawing
 
         #endregion Constants
 
-        #region Fields
-
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
-        #endregion Fields
-
         #region Methods
 
         /// <summary>
@@ -51,7 +41,8 @@ namespace Extract.Drawing
             try
             {
                 // Check the license
-                _licenseCache.Validate("ELI27860");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI27860",
+                    _OBJECT_NAME);
 
                 // Return the user friendly font string
                 return string.Format(CultureInfo.CurrentCulture, _FONT_TEXT_FORMAT,
@@ -77,7 +68,8 @@ namespace Extract.Drawing
             try
             {
                 // Check the license
-                _licenseCache.Validate("ELI27979");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI27979",
+                    _OBJECT_NAME);
 
 
                 // Check for conversion from one unit to another
@@ -140,7 +132,8 @@ namespace Extract.Drawing
             try
             {
                 // Check the license
-                _licenseCache.Validate("ELI27981");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI27981",
+                    _OBJECT_NAME);
 
                 // Guess the size needed
                 float guess = Math.Min(size.Width, size.Height) * 1.2F / text.Length;

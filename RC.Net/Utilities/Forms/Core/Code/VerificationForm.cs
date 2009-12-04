@@ -94,12 +94,6 @@ namespace Extract.Utilities.Forms
         /// </summary>
         static object _lock = new object();
 		
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, Application.ProductName);
-
 	    #endregion VerificationForm Fields
 
         #region VerificationForm Delegates
@@ -123,7 +117,8 @@ namespace Extract.Utilities.Forms
                 // Initialize licensing (load from folder since caller could be using this class as 
                 // a static and it may therefore initialize before the caller's constructor code).
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-                _licenseCache.Validate("ELI24047");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI24047",
+                    Application.ProductName);
             }
             catch (Exception ex)
             {

@@ -38,12 +38,6 @@ namespace Extract.Interop
         /// </summary>
         readonly int _version;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion IStreamReader Fields
 
         #region IStreamReader Constructors
@@ -58,7 +52,8 @@ namespace Extract.Interop
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26479");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI26479",
+					_OBJECT_NAME);
 
                 // Get the size of data stream to load
                 byte[] dataLengthBuffer = new Byte[4];

@@ -14,18 +14,21 @@ namespace Extract.ReportViewer
     /// </summary>
     public partial class ValueListParameterControl : UserControl, IExtractParameterControl
     {
+        #region Constants
+
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        private static readonly string _OBJECT_NAME = typeof(ValueListParameterControl).ToString();
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
         /// The <see cref="ValueListParameter"/> associated with this control.
         /// </summary>
         ValueListParameter _valueListParameter;
-
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "Value List Parameter Control");
 
         #endregion Fields
 
@@ -57,7 +60,8 @@ namespace Extract.ReportViewer
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23826");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23826",
+					_OBJECT_NAME);
 
                 InitializeComponent();
 

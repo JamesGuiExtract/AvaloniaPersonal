@@ -89,7 +89,8 @@ ExtractPdfManager::ExtractPdfManager(System::String ^fileName, bool fileUsedAsIn
 	try
 	{
 		// Validate the license
-		_licenseCache->Validate("ELI27943");
+		LicenseUtilities::ValidateLicense(LicenseIdName::ExtractCoreObjects, "ELI27943",
+			"Extract Pdf Manager");
 
 		ExtractException::Assert("ELI28065", "File name cannot be null or empty",
 			!String::IsNullOrEmpty(fileName));

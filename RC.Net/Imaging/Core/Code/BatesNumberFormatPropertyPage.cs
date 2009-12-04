@@ -60,12 +60,6 @@ namespace Extract.Imaging
         /// </summary>
         List<string> _counters = new List<string>();
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache = new LicenseStateCache(LicenseIdName.ExtractCoreObjects,
-            _OBJECT_NAME);
-
         #endregion BatesNumberManagerFormatPropertyPage Fields
 
         #region BatesNumberManagerFormatPropertyPage Events
@@ -116,7 +110,8 @@ namespace Extract.Imaging
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23186");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23186",
+					_OBJECT_NAME);
 
                 ExtractException.Assert("ELI27842", "Bates number generator must not be NULL.",
                     generator != null);

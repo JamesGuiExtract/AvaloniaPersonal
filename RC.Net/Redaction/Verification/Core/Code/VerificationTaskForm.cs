@@ -44,6 +44,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         const string _FORM_TITLE = "ID Shield Verification";
 
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        private static readonly string _OBJECT_NAME = typeof(VerificationTaskForm).ToString();
+
         #endregion Constants
 
         #region Fields
@@ -123,12 +128,6 @@ namespace Extract.Redaction.Verification
         /// </summary>
         int _historyIndex;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        readonly static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.IDShieldVerificationObject, "Verification Form");
-
         #endregion Fields
 
         #region Events
@@ -158,7 +157,8 @@ namespace Extract.Redaction.Verification
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI27105");
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject, "ELI27105",
+					_OBJECT_NAME);
 
                 // License SandDock before creating the form
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);

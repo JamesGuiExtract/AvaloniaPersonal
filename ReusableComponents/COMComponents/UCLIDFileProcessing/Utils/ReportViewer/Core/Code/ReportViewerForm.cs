@@ -40,6 +40,11 @@ namespace Extract.ReportViewer
         /// </summary>
         static readonly string _PREVIEW_EXTENSION = ".jpg";
 
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        private static readonly string _OBJECT_NAME = typeof(ReportViewerForm).ToString();
+
         #endregion Constants
 
         #region Fields
@@ -70,12 +75,6 @@ namespace Extract.ReportViewer
         /// in the report saving but is only instantiated when it is actually used.
         /// </summary>
         private List<string> _standardReports;
-
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.FlexIndexIDShieldCoreObjects, "Report Viewer Form");
 
         #endregion Fields
 
@@ -111,7 +110,8 @@ namespace Extract.ReportViewer
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23504");
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects,
+                    "ELI23504", _OBJECT_NAME);
 
                 InitializeComponent();
 

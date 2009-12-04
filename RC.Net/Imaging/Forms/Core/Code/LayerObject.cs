@@ -159,12 +159,6 @@ namespace Extract.Imaging.Forms
         /// tracked.</remarks>
         TrackingData _trackingData;
         
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion LayerObject Fields
 
         #region LayerObject Constructors
@@ -175,7 +169,8 @@ namespace Extract.Imaging.Forms
         protected LayerObject()
         {
             // Validate the license
-            _licenseCache.Validate("ELI23110");
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23110",
+					_OBJECT_NAME);
 
             // Note: This constructor is needed for serialization
             _dirty = false;
@@ -189,7 +184,8 @@ namespace Extract.Imaging.Forms
         internal LayerObject(int pageNumber, string comment)
         {
             // Validate the license
-            _licenseCache.Validate("ELI23111");
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23111",
+					_OBJECT_NAME);
 
             _pageNumber = pageNumber;
             _comment = comment;
@@ -209,7 +205,8 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI23112");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23112",
+					_OBJECT_NAME);
 
                 // Ensure image viewer is not null.
                 ExtractException.Assert("ELI21197", "Image viewer must be specified.",

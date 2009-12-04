@@ -35,13 +35,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         string _baseToolTipText;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
-        #endregion Fields
+        #endregion
 
         #region Constructors
 
@@ -89,7 +83,8 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI23101");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23101",
+					_OBJECT_NAME);
 
                 // Call auto-generated code to initialize the component
                 InitializeComponent();

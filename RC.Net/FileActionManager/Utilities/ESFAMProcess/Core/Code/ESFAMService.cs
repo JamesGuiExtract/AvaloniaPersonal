@@ -99,12 +99,6 @@ namespace Extract.FileActionManager.Utilities
         static readonly string _connection = "Data Source='" + _databaseFile + "';";
 
         /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseCache = new LicenseStateCache(
-            LicenseIdName.FlexIndexIDShieldCoreObjects, _OBJECT_NAME);
-
-        /// <summary>
         /// Event to indicate processing should stop.
         /// </summary>
         ManualResetEvent _stopProcessing = new ManualResetEvent(false);
@@ -150,7 +144,8 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 // Validate the license on startup
-                _licenseCache.Validate("ELI28495");
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI28495",
+					_OBJECT_NAME);
 
                 // Get the list of FPS files to run
                 List<string> fpsFiles = GetFPSFilesToRun();

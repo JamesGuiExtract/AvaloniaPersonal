@@ -23,16 +23,6 @@ namespace Extract.Drawing
 
         #endregion Constants
 
-        #region Fields
-
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
-        #endregion Fields
-
         /// <overloads>Draws the specified text string with the specified rotation.</overloads>
         /// <summary>
         /// Draws the specified text string with the specified rotation.
@@ -148,7 +138,8 @@ namespace Extract.Drawing
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI23161");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23161",
+                    _OBJECT_NAME);
 
                 // Determine the size of the layout rectangle if necessary
                 if (layoutRectangle.Size.IsEmpty)
@@ -208,7 +199,8 @@ namespace Extract.Drawing
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28009");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28009",
+                    _OBJECT_NAME);
 
                 // Store the original rendering hint
                 originalHint = graphics.TextRenderingHint;
@@ -323,7 +315,8 @@ namespace Extract.Drawing
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28010");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28010",
+                    _OBJECT_NAME);
 
                 // Store the original graphics settings
                 Matrix originalTransform = graphics.Transform;
@@ -400,7 +393,8 @@ namespace Extract.Drawing
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28011");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28011",
+                    _OBJECT_NAME);
 
                 // Construct the vertices using the bounds of the text layer object
                 Point[] vertices =

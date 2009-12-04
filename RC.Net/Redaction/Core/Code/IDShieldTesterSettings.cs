@@ -22,12 +22,6 @@ namespace Extract.Redaction
         static readonly string _OBJECT_NAME = typeof(IDShieldTesterParameter).ToString();
 
         /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.FlexIndexIDShieldCoreObjects, _OBJECT_NAME);
-
-        /// <summary>
         /// The name of the current parameter type.
         /// </summary>
         string _type;
@@ -58,7 +52,8 @@ namespace Extract.Redaction
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28632");
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects,
+                    "ELI28632", _OBJECT_NAME);
 
                 _type = type;
                 _columnNames = columnNames;
@@ -636,12 +631,6 @@ namespace Extract.Redaction
         static readonly string _OBJECT_NAME = typeof(IDShieldTesterSettings).ToString();
 
         /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.FlexIndexIDShieldCoreObjects, _OBJECT_NAME);
-
-        /// <summary>
         /// The path to the IDShieldTester settings file (dat file).
         /// </summary>
         readonly string _settingsFileName;
@@ -762,7 +751,8 @@ namespace Extract.Redaction
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28647");
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects,
+                    "ELI28647", _OBJECT_NAME);
 
                 _settingsFileName = settingsFileName;
 

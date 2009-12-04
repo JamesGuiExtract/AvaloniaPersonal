@@ -38,12 +38,6 @@ namespace Extract.Utilities.Forms
         /// </summary>
         private Dictionary<Keys, ShortcutHandler> _shortcuts;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion
 
         #region Shortcuts Manager Event Handlers
@@ -69,7 +63,8 @@ namespace Extract.Utilities.Forms
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI23155");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23155",
+                    _OBJECT_NAME);
 
                 _shortcuts = new Dictionary<Keys, ShortcutHandler>();
             }

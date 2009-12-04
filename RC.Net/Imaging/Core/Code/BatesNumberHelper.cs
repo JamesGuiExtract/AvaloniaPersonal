@@ -21,16 +21,6 @@ namespace Extract.Imaging
 
         #endregion Constants
 
-        #region Fields
-
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache = new LicenseStateCache(LicenseIdName.ExtractCoreObjects,
-            _OBJECT_NAME);
-
-        #endregion Fields
-
         /// <summary>
         /// Generates the Bates number as text using the specified Bates number and page number.
         /// </summary>
@@ -45,7 +35,8 @@ namespace Extract.Imaging
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI27912");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI27912",
+					_OBJECT_NAME);
 
                 // Ensure the format object is not null
                 ExtractException.Assert("ELI27913", "Format object must not be null.",

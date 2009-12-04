@@ -43,12 +43,6 @@ namespace Extract.FileActionManager.FileProcessors
         #region Fields
 
         /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        LicenseStateCache _licenseCache = new LicenseStateCache(LicenseIdName.ExtractCoreObjects,
-            _OBJECT_NAME);
-
-        /// <summary>
         /// The <see cref="BatesNumberGeneratorWithDatabase"/> used to set the format and
         /// update the sample edit controls.
         /// </summary>
@@ -88,7 +82,8 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI27879");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI27879",
+					_OBJECT_NAME);
 
                 InitializeComponent();
 

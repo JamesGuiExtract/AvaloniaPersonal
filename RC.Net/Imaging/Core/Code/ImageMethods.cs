@@ -14,15 +14,11 @@ namespace Extract.Imaging
     /// </summary>
     public static class ImageMethods
     {
-        #region Fields
+        #region Constants
 
-        /// <summary>
-        /// License cache object used to validate the license
-        /// </summary>
-        static readonly LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, typeof(ImageMethods).ToString());
+        static readonly string _OBJECT_NAME = typeof(ImageMethods).ToString();
 
-        #endregion Fields
+        #endregion Constants
 
         /// <overloads>Generates a thumbnail of a specified scale size from a specified
         /// original image.</overloads>
@@ -120,7 +116,8 @@ namespace Extract.Imaging
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28012");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28012",
+					_OBJECT_NAME);
 
                 // Ensure that the image object is not null and that the percentage is
                 // greater than 0
@@ -197,7 +194,8 @@ namespace Extract.Imaging
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28013");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28013",
+					_OBJECT_NAME);
 
                 // Calculate the skew of the raster zone.
                 skew = GeometryMethods.GetAngle(
@@ -383,7 +381,8 @@ namespace Extract.Imaging
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28054");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28054",
+					_OBJECT_NAME);
 
                 // Sometimes the call to CreateLeadDC can return an IntPtr.Zero, in this
                 // case we should dispose of the page, call garbage collection, reclone

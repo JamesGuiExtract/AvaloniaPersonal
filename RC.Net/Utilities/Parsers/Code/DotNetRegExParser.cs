@@ -38,10 +38,10 @@ namespace Extract.Utilities.Parsers
         private string _pattern = "";
 
         /// <summary>
-        /// License cache for validating the license.
+        /// The name of the object to be used in the validate license calls.
         /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "DotNetRegExParser");
+        private static readonly string _OBJECT_NAME =
+            typeof(DotNetRegexParser).ToString();
 
         #endregion
 
@@ -410,7 +410,7 @@ namespace Extract.Utilities.Parsers
         private static void ValidateLicense()
         {
             // Validate the license
-            _licenseCache.Validate("ELI22446");
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI22446", _OBJECT_NAME);
         }
 
         /// <summary>

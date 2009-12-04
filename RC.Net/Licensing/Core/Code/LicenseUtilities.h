@@ -2,6 +2,7 @@
 
 #include "MapLabel.h"
 #include "LicenseIdName.h"
+#include "LicenseStateCache.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -95,6 +96,10 @@ namespace Extract
 			// The array used to store the public key for this assembly
 			static array<Byte>^ _myArray = CreateInternalArray();
 
+			// The dictionary of license ID's to LicenseStateCache objects
+			static Dictionary<LicenseIdName, LicenseStateCache^>^ _licenseCache
+				= CreateLicenseCacheCollection();
+
 			// boolean flag to indicate whether licenses have been loaded from folder yet
 			static bool _licensesLoaded;
 
@@ -104,18 +109,20 @@ namespace Extract
 			// PURPOSE: To create an array containing the public key data for this assembly
 			static array<Byte>^ CreateInternalArray();
             //--------------------------------------------------------------------------------------
+			static Dictionary<LicenseIdName, LicenseStateCache^>^ CreateLicenseCacheCollection();
+            //--------------------------------------------------------------------------------------
 			// PURPOSE: To check the given assemblies public key against the public key for this
 			//			assembly.  Returns true if they match or false otherwise.
 			//
 			// ARGS:	assembly - the Assembly whose public key will be checked.
 			static bool CheckData(Assembly^ assembly);
             //--------------------------------------------------------------------------------------
-			// PURPOSE: To return a CTime object containing the expiration date for the
-			//			specified LicenseIdName enum
-			//
-			// ARGS:	id				- The LicenseIdName enum of the particular
-			//							  component to check expiration date for
-			static CTime InternalGetExpirationDate(LicenseIdName id);
+			// PURPOSE: To call the ResetCache method for each LicenseStateCache object in the
+			//			_licenseCache collection.
+			static void ResetLicenseCache();
+            //--------------------------------------------------------------------------------------
+			// PURPOSE: To call the ResetCache method for a particular license ID.
+			static void ResetLicenseCache(LicenseIdName id);
             //--------------------------------------------------------------------------------------
 			// PURPOSE:	Added to remove FxCop error - http://msdn.microsoft.com/en-us/ms182169.aspx
 			//			Microsoft.Design::CA1053 - Static holder types should not have constructors

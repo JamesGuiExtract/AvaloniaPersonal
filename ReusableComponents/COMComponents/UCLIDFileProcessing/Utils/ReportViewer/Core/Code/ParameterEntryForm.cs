@@ -22,17 +22,12 @@ namespace Extract.ReportViewer
         /// </summary>
         private static readonly int _MAX_FORM_HEIGHT = 700;
 
-        #endregion Constants
-
-        #region Fields
-
         /// <summary>
-        /// License cache for validating the license.
+        /// The name of the object to be used in the validate license calls.
         /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "Parameter Entry Form");
+        private static readonly string _OBJECT_NAME = typeof(ParameterEntryForm).ToString();
 
-        #endregion Fields
+        #endregion Constants
 
         #region Constructors
 
@@ -60,7 +55,8 @@ namespace Extract.ReportViewer
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23821");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23821",
+					_OBJECT_NAME);
 
                 // Display wait cursor while the form is configured
                 using (Extract.Utilities.Forms.TemporaryWaitCursor waitCursor

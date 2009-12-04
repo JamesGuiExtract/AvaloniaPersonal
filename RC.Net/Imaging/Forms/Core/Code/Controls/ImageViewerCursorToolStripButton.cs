@@ -41,11 +41,6 @@ namespace Extract.Imaging.Forms
         /// </summary>
         string _baseToolTipText;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
 
         #endregion
 
@@ -101,7 +96,8 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI23102");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23102",
+					_OBJECT_NAME);
 
                 // Ensure button text and image have been specified
                 ExtractException.Assert("ELI21227", "buttonText must not be empty!",

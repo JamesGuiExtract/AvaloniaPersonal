@@ -26,12 +26,6 @@ namespace Extract.FileActionManager.Forms
         /// </summary>
         readonly string[] _tags;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Events
@@ -67,9 +61,9 @@ namespace Extract.FileActionManager.Forms
             }
 
             // Validate license
-            _licenseCache.Validate("ELI28737");
-            //LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28737",
-            //    _OBJECT_NAME);
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28737",
+                _OBJECT_NAME);
+
             InitializeComponent();
 
             ShowCheckMargin = true;

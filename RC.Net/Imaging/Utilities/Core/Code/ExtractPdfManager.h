@@ -19,10 +19,6 @@ namespace Extract
 				// The pdf manager file
 				PDFInputOutputMgr* _pdfFile;
 
-				// The license cache object for validating the license
-				static LicenseStateCache^ _licenseCache = gcnew LicenseStateCache(
-					LicenseIdName::ExtractCoreObjects, "Extract Pdf Manager");
-
 				// Finalizer - Cleans up unmanaged resources
 				!ExtractPdfManager();
 

@@ -50,12 +50,6 @@ namespace Extract.Imaging
         /// </summary>
         readonly bool _isPdf;
 
-        /// <summary>
-        /// Extract licensing.
-        /// </summary>
-        static readonly LicenseStateCache _license =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -70,7 +64,8 @@ namespace Extract.Imaging
         {
             try
             {
-                _license.Validate("ELI28487");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28487",
+                    _OBJECT_NAME);
 
                 _fileName = fileName;
                 _codecs = codecs;

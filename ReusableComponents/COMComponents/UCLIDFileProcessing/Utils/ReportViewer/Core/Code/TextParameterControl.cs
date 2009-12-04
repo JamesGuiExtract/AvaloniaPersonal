@@ -14,18 +14,21 @@ namespace Extract.ReportViewer
     /// </summary>
     public partial class TextParameterControl : UserControl, IExtractParameterControl
     {
+        #region Constants
+
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        private static readonly string _OBJECT_NAME = typeof(TextParameterControl).ToString();
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
         /// The <see cref="TextParameter"/> that underlies this control.
         /// </summary>
         TextParameter _textParameter;
-
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "Text Parameter Control");
 
         #endregion Fields
 
@@ -57,7 +60,8 @@ namespace Extract.ReportViewer
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23823");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23823",
+					_OBJECT_NAME);
 
                 InitializeComponent();
 

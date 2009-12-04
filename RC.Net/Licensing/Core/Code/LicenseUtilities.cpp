@@ -3,12 +3,11 @@
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 
-#include <vcclr.h>
-#include <string>
 #include <map>
 
 #include "LicenseUtilities.h"
 #include "MapLicenseIdsToComponentIds.h"
+#include "StringHelperFunctions.h"
 
 using namespace Extract;
 using namespace Extract::Licensing;
@@ -17,78 +16,6 @@ using namespace Extract::Utilities;
 #pragma unmanaged
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 #pragma managed
-
-//--------------------------------------------------------------------------------------------------
-// Internal functions
-//--------------------------------------------------------------------------------------------------
-// PURPOSE: To Convert .net string to stl string
-// NOTE:	This method is used internally and is placed here so the header file can
-//			be used in projects not compiled with the /clr switch
-//
-// This function is based on code from Stan Lippman's Blog on MSDN:
-// http://blogs.msdn.com/slippman/archive/2004/06/02/147090.aspx
-string asString(String^ netString)
-{
-	char* zData = NULL;
-
-	// Default the return string to empty
-	string strSTL = "";
-
-	if (!String::IsNullOrEmpty(netString))
-	{
-		try
-		{
-			// Compute the length needed to hold the converted string
-			int length = ((netString->Length+1) * 2);
-
-			// Declare a char array to hold the converted string
-			zData = new char[length];
-			ExtractException::Assert("ELI21825", "Failed array allocation!", zData != NULL);
-
-			// Scope for pin_ptr
-			int result;
-			{
-				// Get the pointer from the System::String
-				pin_ptr<const wchar_t> wideData = PtrToStringChars(netString);
-
-				// Convert the wide character string to multibyte
-				result = wcstombs_s(NULL, zData, length, wideData, length);
-			}
-
-			// If result != 0 then an error occurred
-			if (result != 0)
-			{
-				ExtractException^ ex = gcnew ExtractException("ELI21826",
-					"Unable to convert wide string to std::string!");
-				ex->AddDebugData("Error code", result, false);
-				throw ex;
-			}
-
-			// Store the result in the return string
-			strSTL = zData;
-		}
-		catch(Exception^ ex)
-		{
-			ExtractException::Log("ELI21827", ex);
-		}
-		finally
-		{
-			// Ensure the memory is cleaned up
-			if(zData != NULL)
-			{
-				delete [] zData;
-			}
-		}
-	}
-
-	// Return the STL string
-	return strSTL;
-}
-//--------------------------------------------------------------------------------------------------
-String^ AsSystemString(string stdString)
-{
-	return gcnew String(stdString.c_str());
-}
 
 //--------------------------------------------------------------------------------------------------
 // Public methods
@@ -118,7 +45,7 @@ void LicenseUtilities::LoadLicenseFilesFromFolder(int licenseType, MapLabel^ map
 	catch(UCLIDException& uex)
 	{
 		throw gcnew ExtractException("ELI21944", "Failed loading license from folder!",
-			AsSystemString(uex.asStringizedByteStream()));
+			StringHelpers::AsSystemString(uex.asStringizedByteStream()));
 	}
 	catch(Exception^ ex)
 	{
@@ -139,7 +66,7 @@ bool LicenseUtilities::IsLicensed(LicenseIdName id)
 	{
 		ExtractException^ ee = gcnew ExtractException("ELI21945",
 			"Failed checking licensed state for component!",
-			AsSystemString(uex.asStringizedByteStream()));
+			StringHelpers::AsSystemString(uex.asStringizedByteStream()));
 		ee->AddDebugData("License Id Name", id.ToString("G"), true);
 		throw ee;
 	}
@@ -156,17 +83,16 @@ bool LicenseUtilities::IsTemporaryLicense(LicenseIdName id)
 {
 	try
 	{
-		// Check if the specified component id is temporarily licensed
-		return LicenseManagement::sGetInstance().isTemporaryLicense(
-			ValueMapConversion::getConversion(static_cast<unsigned int>(id)));
-	}
-	catch(UCLIDException& uex)
-	{
-		ExtractException^ ee = gcnew ExtractException("ELI23061",
-			"Failed checking for temporary license state!",
-			AsSystemString(uex.asStringizedByteStream()));
-		ee->AddDebugData("License Id Name", id.ToString("G"), true);
-		throw ee;
+		LicenseStateCache^ licenseState = nullptr;
+		if(_licenseCache->TryGetValue(id, licenseState))
+		{
+			// Check if the specified component id is temporarily licensed
+			return licenseState->IsTemporaryLicense();
+		}
+		else
+		{
+			throw gcnew ExtractException("ELI28744", "License id was not found in the collection.");
+		}
 	}
 	catch(Exception^ ex)
 	{
@@ -180,20 +106,16 @@ DateTime LicenseUtilities::GetExpirationDate(LicenseIdName id)
 {
 	try
 	{
-		// Get the expiration date
-		CTime time = InternalGetExpirationDate(id);
-
-		// Return the expiration date as a DateTime object
-		return DateTime(time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(),
-			time.GetMinute(), time.GetSecond());
-	}
-	catch(UCLIDException& uex)
-	{
-		ExtractException^ ee = gcnew ExtractException("ELI23095",
-			"Failed getting license expiration date!",
-			AsSystemString(uex.asStringizedByteStream()));
-		ee->AddDebugData("License Id Name", id.ToString("G"), true);
-		throw ee;
+		LicenseStateCache^ licenseState = nullptr;
+		if(_licenseCache->TryGetValue(id, licenseState))
+		{
+			// Check if the specified component id is temporarily licensed
+			return licenseState->ExpirationDate;
+		}
+		else
+		{
+			throw gcnew ExtractException("ELI28745", "License id was not found in the collection.");
+		}
 	}
 	catch(Exception^ ex)
 	{
@@ -207,28 +129,24 @@ void LicenseUtilities::ValidateLicense(LicenseIdName id, String^ eliCode, String
 {
 	try
 	{
-		// Validate the license ID
-		LicenseManagement::sGetInstance().validateLicense(
-			ValueMapConversion::getConversion(static_cast<unsigned int>(id)),
-			asString(eliCode), asString(componentName));
-	}
-	catch(UCLIDException& uex)
-	{
-		ExtractException^ ee = gcnew ExtractException("ELI21946",
-			"License validation failed!",
-			AsSystemString(uex.asStringizedByteStream()));
-		ee->AddDebugData("License Id Name", id.ToString("G"), true);
-		ee->AddDebugData("Component name", componentName, false);
-		throw ee;
+		LicenseStateCache^ licenseState = nullptr;
+		if(_licenseCache->TryGetValue(id, licenseState))
+		{
+			// Check if the specified component id is temporarily licensed
+			return licenseState->Validate(eliCode, componentName);
+		}
+		else
+		{
+			ExtractException^ ee = gcnew ExtractException("ELI28745",
+				"License id was not found in the collection.");
+			ee->AddDebugData("License ID", id.ToString("G"), true);
+			throw ee;
+		}
 	}
 	catch(Exception^ ex)
 	{
 		// Wrap all exceptions as an ExtractException
-		ExtractException^ ee = gcnew ExtractException("ELI21938",
-			"License validation failed!", ex);
-		ee->AddDebugData("License Id Name", id.ToString("G"), true);
-		ee->AddDebugData("Component name", componentName, false);
-		throw ee;
+		throw ExtractException::AsExtractException("ELI21938", ex);
 	}
 }
 //--------------------------------------------------------------------------------------------------
@@ -237,12 +155,14 @@ void LicenseUtilities::ResetCache()
 	try
 	{
 		LicenseManagement::sGetInstance().resetCache();
+
+		ResetLicenseCache();
 	}
 	catch(UCLIDException& uex)
 	{
 		throw gcnew ExtractException("ELI21947",
 			"Failed resetting the license cache!", 
-			AsSystemString(uex.asStringizedByteStream()));
+			StringHelpers::AsSystemString(uex.asStringizedByteStream()));
 	}
 	catch(Exception^ ex)
 	{
@@ -256,12 +176,14 @@ void LicenseUtilities::EnableAll()
 	try
 	{
 		LicenseManagement::sGetInstance().enableAll();
+
+		ResetLicenseCache();
 	}
 	catch(UCLIDException& uex)
 	{
 		throw gcnew ExtractException("ELI21948",
 			"Failed enabling licenses!",
-			AsSystemString(uex.asStringizedByteStream()));
+			StringHelpers::AsSystemString(uex.asStringizedByteStream()));
 	}
 	catch(Exception^ ex)
 	{
@@ -276,12 +198,14 @@ void LicenseUtilities::EnableId(LicenseIdName id)
 	{
 		LicenseManagement::sGetInstance().enableId(
 			ValueMapConversion::getConversion(static_cast<unsigned long>(id)));
+
+		ResetLicenseCache(id);
 	}
 	catch(UCLIDException& uex)
 	{
 		ExtractException^ ee = gcnew ExtractException("ELI21949",
 			"Failed enabling license!", 
-			AsSystemString(uex.asStringizedByteStream()));
+			StringHelpers::AsSystemString(uex.asStringizedByteStream()));
 		ee->AddDebugData("License Id name", id.ToString("G"), true);
 		throw ee;
 	}
@@ -300,12 +224,14 @@ void LicenseUtilities::DisableAll()
 	try
 	{
 		LicenseManagement::sGetInstance().disableAll();
+
+		ResetLicenseCache();
 	}
 	catch(UCLIDException& uex)
 	{
 		throw gcnew ExtractException("ELI21950",
 			"Failed disabling licenses!",
-			AsSystemString(uex.asStringizedByteStream()));
+			StringHelpers::AsSystemString(uex.asStringizedByteStream()));
 	}
 	catch(Exception^ ex)
 	{
@@ -320,12 +246,14 @@ void LicenseUtilities::DisableId(LicenseIdName id)
 	{
 		LicenseManagement::sGetInstance().disableId(
 			ValueMapConversion::getConversion(static_cast<unsigned long>(id)));
+
+		ResetLicenseCache(id);
 	}
 	catch(UCLIDException& uex)
 	{
 		ExtractException^ ee = gcnew ExtractException("ELI21955",
 			"Failed disabling license!",
-			AsSystemString(uex.asStringizedByteStream()));
+			StringHelpers::AsSystemString(uex.asStringizedByteStream()));
 		ee->AddDebugData("License Id name", id.ToString("G"), true);
 		throw ee;
 	}
@@ -353,12 +281,12 @@ String^ LicenseUtilities::GetMapLabelValue(MapLabel^ mapLabel)
 		}
 
 		// Return the LicenseManagement Password as a System::String
-		return AsSystemString(LICENSE_MGMT_PASSWORD);
+		return StringHelpers::AsSystemString(LICENSE_MGMT_PASSWORD);
 	}
 	catch(UCLIDException& uex)
 	{
 		throw gcnew ExtractException("ELI22044", "Failed getting map label value!",
-			AsSystemString(uex.asStringizedByteStream()));
+			StringHelpers::AsSystemString(uex.asStringizedByteStream()));
 	}
 	catch(Exception^ ex)
 	{
@@ -381,18 +309,23 @@ array<Byte>^ LicenseUtilities::CreateInternalArray()
 	}
 }
 //--------------------------------------------------------------------------------------------------
-CTime LicenseUtilities::InternalGetExpirationDate(LicenseIdName id)
+Dictionary<LicenseIdName, LicenseStateCache^>^ LicenseUtilities::CreateLicenseCacheCollection()
 {
-	// Get the license ID to check
-	unsigned int licenseId = ValueMapConversion::getConversion(static_cast<unsigned int>(id));
+	try
+	{
+		Dictionary<LicenseIdName, LicenseStateCache^>^ dictionary =
+			gcnew Dictionary<LicenseIdName, LicenseStateCache^>();
+		for each(LicenseIdName id in Enum::GetValues(LicenseIdName::typeid))
+		{
+			dictionary->Add(id, gcnew LicenseStateCache(id));
+		}
 
-	// Ensure the component is temporarily licensed
-	ExtractException::Assert("ELI23094",
-		"Component is not temporarily licensed, cannot get expiration date!",
-		LicenseManagement::sGetInstance().isTemporaryLicense(licenseId));
-
-	// Get the expiration date
-	return LicenseManagement::sGetInstance().getExpirationDate(licenseId);
+		return dictionary;
+	}
+	catch(Exception^ ex)
+	{
+		throw gcnew ExtractException("ELI28741", "Failed while initializing collection.", ex);
+	}
 }
 //--------------------------------------------------------------------------------------------------
 bool LicenseUtilities::CheckData(Assembly^ assembly)
@@ -425,3 +358,30 @@ bool LicenseUtilities::CheckData(Assembly^ assembly)
 	// assemblyName is null or publicKey is either null or empty
 	return false;
 }
+//--------------------------------------------------------------------------------------------------
+void LicenseUtilities::ResetLicenseCache()
+{
+	// Reset the cache for each LicenseStateCache object
+	for each(LicenseStateCache^ licenseCache in _licenseCache->Values)
+	{
+		licenseCache->ResetCache();
+	}
+}
+//--------------------------------------------------------------------------------------------------
+void LicenseUtilities::ResetLicenseCache(LicenseIdName id)
+{
+	LicenseStateCache^ licenseState = nullptr;
+	if(_licenseCache->TryGetValue(id, licenseState))
+	{
+		// Reset the cache for this ID
+		licenseState->ResetCache();
+	}
+	else
+	{
+		ExtractException^ ee = gcnew ExtractException("ELI28748",
+			"License id was not found in the collection.");
+		ee->AddDebugData("License ID", id.ToString("G"), true);
+		throw ee;
+	}
+}
+//--------------------------------------------------------------------------------------------------

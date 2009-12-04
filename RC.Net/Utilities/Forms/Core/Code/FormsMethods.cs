@@ -23,16 +23,6 @@ namespace Extract.Utilities.Forms
 
         #endregion Constants
 
-        #region Fields
-
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
-        #endregion Fields
-
         #region FormsMethods Methods
 
         /// <summary>
@@ -51,7 +41,8 @@ namespace Extract.Utilities.Forms
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI23143");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23143",
+                    _OBJECT_NAME);
 
                 // Add the control to the container
                 container.Controls.Add(control);
@@ -94,7 +85,8 @@ namespace Extract.Utilities.Forms
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI23144");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23144",
+                    _OBJECT_NAME);
 
                 // Get the location and size of the parent form
                 Point formToCenterInLocation = formToCenterIn.Location;
@@ -125,7 +117,8 @@ namespace Extract.Utilities.Forms
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26080");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI26080",
+                    _OBJECT_NAME);
 
                 NativeMethods.LockControlUpdate(control, lockUpdate);
 

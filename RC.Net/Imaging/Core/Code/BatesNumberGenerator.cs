@@ -47,12 +47,6 @@ namespace Extract.Imaging
         /// </summary>
         StreamReader _reader;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion BatesNumberGenerator Fields
 
         #region BatesNumberGenerator Constructors
@@ -73,7 +67,8 @@ namespace Extract.Imaging
         public BatesNumberGenerator(BatesNumberFormat format)
         {
             // Validate the license
-            _licenseCache.Validate("ELI23182");
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23182",
+					_OBJECT_NAME);
 
             _format = format;
         }

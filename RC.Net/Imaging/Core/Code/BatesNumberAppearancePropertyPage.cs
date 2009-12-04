@@ -56,12 +56,6 @@ namespace Extract.Imaging
         /// </summary>
         BatesNumberFormat _format;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache = new LicenseStateCache(LicenseIdName.ExtractCoreObjects,
-            _OBJECT_NAME);
-
         #endregion BatesNumberManagerAppearancePropertyPage Fields
 
         #region BatesNumberManagerAppearancePropertyPage Events
@@ -92,7 +86,8 @@ namespace Extract.Imaging
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23184");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23184",
+					_OBJECT_NAME);
 
                 InitializeComponent();
 

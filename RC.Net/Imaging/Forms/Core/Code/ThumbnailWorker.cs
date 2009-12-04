@@ -93,12 +93,6 @@ namespace Extract.Imaging.Forms
         /// </summary>
         readonly object _lock = new object();
 
-        /// <summary>
-        /// Extract licensing.
-        /// </summary>
-        static readonly LicenseStateCache _license =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -108,7 +102,8 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public ThumbnailWorker(string fileName, Size thumbnailSize)
         {
-            _license.Validate("ELI28489");
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28489",
+                _OBJECT_NAME);
 
             _reader = _codecs.CreateReader(fileName);
             _pageCount = _reader.PageCount;

@@ -46,18 +46,6 @@ namespace Extract.Imaging
         /// </summary>
         ImageCodecs _codecs;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.OcrOnClientFeature, _OBJECT_NAME);
-
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.OcrOnClientFeature, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -81,7 +69,8 @@ namespace Extract.Imaging
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI24040");
+                LicenseUtilities.ValidateLicense(LicenseIdName.OcrOnClientFeature, "ELI24040",
+					_OBJECT_NAME);
 
                 // Set the tradeoff
                 _tradeoff = tradeoff;

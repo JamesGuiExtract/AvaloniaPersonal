@@ -146,24 +146,6 @@ namespace Extract.Imaging.Forms
         static readonly Dictionary<CursorTool, ImageViewerCursors> _cursorsForCursorTools =
             LoadCursorsForCursorTools();
 
-        /// <summary>
-        /// License cache for validating the core license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseCore =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
-        /// <summary>
-        /// License cache for validating the annotation license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseAnnotation =
-            new LicenseStateCache(LicenseIdName.AnnotationFeature, "Annotation Objects");
-
-        /// <summary>
-        /// License cache for validating the anti-alias license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseAntiAlias =
-            new LicenseStateCache(LicenseIdName.AntiAliasingFeature, "Anti-aliasing Component");
-
         #endregion Static Fields
 
         #region Fields
@@ -523,7 +505,8 @@ namespace Extract.Imaging.Forms
                 // LoadCursorsForCursorTools (ie, the static constructor)
                 InitializeComponent();
 
-                _licenseCore.Validate("ELI23109");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23109",
+                    _OBJECT_NAME);
 
                 // Attempt to unlock PDF support (returns an extract exception if unlocking failed).
                 ExtractException ee = UnlockLeadtools.UnlockPdfSupport(false);
@@ -808,7 +791,8 @@ namespace Extract.Imaging.Forms
                         // LeadTools support
                         if (!DesignMode)
                         {
-                            _licenseAnnotation.Validate("ELI21920");
+                            LicenseUtilities.ValidateLicense(LicenseIdName.AnnotationFeature,
+                                "ELI21920", "Annotation Objects");
                         }
 
                         // Set display annotations to true
@@ -871,7 +855,8 @@ namespace Extract.Imaging.Forms
                         // LeadTools support
                         if (!DesignMode)
                         {
-                            _licenseAntiAlias.Validate("ELI21921");
+                            LicenseUtilities.ValidateLicense(LicenseIdName.AntiAliasingFeature,
+                                "ELI21921", "Anti-aliasing Component");
 
                             // Turn on anti-aliasing
                             RasterPaintProperties properties = PaintProperties;

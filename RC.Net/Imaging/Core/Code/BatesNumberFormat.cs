@@ -130,12 +130,6 @@ namespace Extract.Imaging
         /// </summary>
         AnchorAlignment _anchorAlignment = RegistryManager._BATES_ANCHOR_ALIGNMENT_DEFAULT;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache = new LicenseStateCache(LicenseIdName.ExtractCoreObjects,
-            _OBJECT_NAME);
-
         #endregion BatesNumberFormat Fields
 
         #region BatesNumberFormat Constructors
@@ -157,7 +151,8 @@ namespace Extract.Imaging
         public BatesNumberFormat(bool useDatabaseCounter)
         {       
             // Validate the license
-            _licenseCache.Validate("ELI27862");
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI27862",
+					_OBJECT_NAME);
 
             _useDatabaseCounter = useDatabaseCounter;
         }
@@ -172,7 +167,8 @@ namespace Extract.Imaging
         {
             try
             {
-                _licenseCache.Validate("ELI27863");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI27863",
+					_OBJECT_NAME);
 
                 int version = info.GetInt32("Version");
                 if (version > _CURRENT_VERSION)

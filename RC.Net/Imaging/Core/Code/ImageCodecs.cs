@@ -35,12 +35,6 @@ namespace Extract.Imaging
         /// </remarks>
         readonly bool _loadPdfAsBitonal;
 
-        /// <summary>
-        /// Extract licensing.
-        /// </summary>
-        static readonly LicenseStateCache _license =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -52,7 +46,8 @@ namespace Extract.Imaging
         {
             try
             {
-                _license.Validate("ELI28485");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28485",
+                    _OBJECT_NAME);
 
                 // Load Leadtools libraries
                 RasterCodecs.Startup();

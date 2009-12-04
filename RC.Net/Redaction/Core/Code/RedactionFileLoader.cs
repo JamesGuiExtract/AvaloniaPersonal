@@ -91,12 +91,6 @@ namespace Extract.Redaction
         /// </summary>
         long _nextId;
 
-        /// <summary>
-        /// Validates the license state.
-        /// </summary>
-        static readonly LicenseStateCache _license = 
-            new LicenseStateCache(LicenseIdName.IDShieldVerificationObject, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -106,7 +100,8 @@ namespace Extract.Redaction
         /// </summary>
         public RedactionFileLoader(ConfidenceLevelsCollection levels)
         {
-            _license.Validate("ELI28215");
+            LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
+                "ELI28215", _OBJECT_NAME);
 
             _levels = levels;
             _manual = GetManualConfidenceLevel(levels);

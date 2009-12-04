@@ -42,12 +42,6 @@ namespace Extract.Imaging.Forms
         /// </summary>
         ThumbnailWorker _worker;
 
-        /// <summary>
-        /// Extract licensing.
-        /// </summary>
-        static readonly LicenseStateCache _license =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion ThumbnailViewer Fields
 
         #region ThumbnailViewer Constructors
@@ -59,7 +53,8 @@ namespace Extract.Imaging.Forms
         {
             InitializeComponent();
 
-            _license.Validate("ELI28488");
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28488",
+                _OBJECT_NAME);
 
             // Turn on anti-aliasing
             RasterSupport.Unlock(RasterSupportType.Document, _DOCUMENT_SUPPORT_KEY);

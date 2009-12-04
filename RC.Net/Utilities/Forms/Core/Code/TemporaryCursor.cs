@@ -38,12 +38,6 @@ namespace Extract.Utilities.Forms
         /// </summary>
         private Cursor saved;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -57,7 +51,8 @@ namespace Extract.Utilities.Forms
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI23159");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23159",
+                    _OBJECT_NAME);
 
                 // Store the current cursor
                 saved = Cursor.Current;

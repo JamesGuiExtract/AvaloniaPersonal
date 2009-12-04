@@ -24,12 +24,6 @@ namespace Extract.IDShieldStatisticsReporter
         static readonly string _OBJECT_NAME = typeof(FeedbackAdvancedOptionsForm).ToString();
 
         /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.FlexIndexIDShieldCoreObjects, _OBJECT_NAME);
-
-        /// <summary>
         /// The IDShieldTesterFolder representing the folder to be tested.
         /// </summary>
         IDShieldTesterFolder _testFolder;
@@ -54,7 +48,8 @@ namespace Extract.IDShieldStatisticsReporter
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI28652");
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI28652",
+					_OBJECT_NAME);
 
                 InitializeComponent();
 

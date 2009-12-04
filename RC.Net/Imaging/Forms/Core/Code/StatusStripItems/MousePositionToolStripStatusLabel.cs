@@ -90,12 +90,6 @@ namespace Extract.Imaging.Forms
         /// </summary>
         private bool _displayPercentages;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion
 
         #region MousePositionToolStripStatusLabel Constructors
@@ -118,7 +112,8 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23126");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23126",
+					_OBJECT_NAME);
 
                 InitializeComponent();
 

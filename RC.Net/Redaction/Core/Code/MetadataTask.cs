@@ -61,12 +61,6 @@ namespace Extract.Redaction
         /// </summary>
         MasterExemptionCodeList _masterCodes;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static readonly LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.IDShieldCoreObjects, _COMPONENT_DESCRIPTION);
-
         #endregion Fields
 
         #region Constructors
@@ -383,7 +377,8 @@ namespace Extract.Redaction
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28513");
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI28513",
+					_COMPONENT_DESCRIPTION);
 
                 // Allow the user to configure the settings
                 using (MetadataSettingsDialog dialog = new MetadataSettingsDialog(_settings))
@@ -441,7 +436,8 @@ namespace Extract.Redaction
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28515");
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI28515",
+					_COMPONENT_DESCRIPTION);
             }
             catch (Exception ex)
             {
@@ -458,7 +454,8 @@ namespace Extract.Redaction
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28517");
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI28517",
+					_COMPONENT_DESCRIPTION);
             }
             catch (Exception ex)
             {
@@ -475,7 +472,8 @@ namespace Extract.Redaction
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28519");
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI28519",
+					_COMPONENT_DESCRIPTION);
 
                 // Retrieve the confidence levels if necessary
                 if (_voaFile == null)
@@ -516,7 +514,8 @@ namespace Extract.Redaction
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI28521");
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI28521",
+					_COMPONENT_DESCRIPTION);
 
                 FileActionManagerPathTags tags = 
                     new FileActionManagerPathTags(bstrFileFullName, pFAMTM.FPSFileDir);

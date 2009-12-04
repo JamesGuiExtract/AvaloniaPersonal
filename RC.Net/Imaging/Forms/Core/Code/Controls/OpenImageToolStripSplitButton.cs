@@ -44,12 +44,6 @@ namespace Extract.Imaging.Forms
         /// </summary>
         ImageViewer _imageViewer;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion
 
         #region OpenImageToolStripSplitButton Constructors
@@ -71,7 +65,8 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23103");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23103",
+					_OBJECT_NAME);
 
                 InitializeComponent();
 

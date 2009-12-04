@@ -71,12 +71,6 @@ namespace Extract.Imaging.Forms
         /// </summary>
         Rectangle _cropWithin;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
-
         #endregion TrackingData Fields
 
         #region TrackingData Constructors
@@ -119,7 +113,8 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI23133");
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23133",
+					_OBJECT_NAME);
 
                 // Store the parameters
                 _control = control;
