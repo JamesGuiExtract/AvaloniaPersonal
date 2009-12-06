@@ -63,6 +63,8 @@ private:
 	// Examples for path = C:\temp1\temp2\filename.tif
 	//				FPS_PATH = C:\FPSFiles
 	//				Now() = 11/25/2009 09:01:03:257
+	//				Logged in user name = jsmith
+	//				Human readable user name = John Smith
 	// $DirNoDriveOf(path) = temp1\temp2
 	// $DirOf(path) = C:\temp1\temp2
 	// $DriveOf(path) = C:\
@@ -73,7 +75,10 @@ private:
 	// $InsertBefore(path,.new) = C:\temp1\temp2\filename.new.tif
 	// $Env(FPS_PATH) = C:\FPSFiles
 	// $Now() = 2009-11-25-09-01-03-257
+	// $Now(%m/%d/%Y %H:%M) = 11/25/2009 09:01
 	// $RandomAlphaNumeric(5) = A10FP
+	// &UserName() = jsmith
+	// &FullUserName() = John Smith
 	const string expandDirOf(const string&) const;
 	const string expandDirNoDriveOf(const string&) const;
 	const string expandDriveOf(const string&) const;
@@ -87,6 +92,8 @@ private:
 	const string expandEnv(const string& str) const;
 	const string expandNow(const string& str) const;
 	const string expandRandomAlphaNumeric(const string& str) const;
+	const string expandUserName(const string& str) const;
+	const string expandFullUserName(const string& str) const;
 	const string expandTrimAndConsolidateWS(const string& str) const;
 
 	// Mutex for the Random object

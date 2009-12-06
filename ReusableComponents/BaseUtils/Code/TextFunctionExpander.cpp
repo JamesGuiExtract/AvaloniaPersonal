@@ -46,6 +46,7 @@ TextFunctionExpander::TextFunctionExpander()
 		g_vecFunctions.push_back("ExtOf");
 		g_vecFunctions.push_back("FileNoExtOf");
 		g_vecFunctions.push_back("FileOf");
+		g_vecFunctions.push_back("FullUserName");
 		g_vecFunctions.push_back("InsertBeforeExt");
 		g_vecFunctions.push_back("Now");
 		g_vecFunctions.push_back("Offset");
@@ -53,6 +54,7 @@ TextFunctionExpander::TextFunctionExpander()
 		g_vecFunctions.push_back("RandomAlphaNumeric");
 		g_vecFunctions.push_back("Replace");
 		g_vecFunctions.push_back("TrimAndConsolidateWS");
+		g_vecFunctions.push_back("UserName");
 
 		g_bInit = true;
 	}
@@ -201,6 +203,14 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 		else if (strFunction == "randomalphanumeric")
 		{
 			strRet += expandRandomAlphaNumeric(strArg);
+		}
+		else if (strFunction == "username")
+		{
+			strRet += expandUserName(strArg);
+		}
+		else if (strFunction == "fullusername")
+		{
+			strRet += expandFullUserName(strArg);
 		}
 		else
 		{
@@ -555,28 +565,43 @@ const string TextFunctionExpander::expandEnv(const string &str) const
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandNow(const string &str) const
 {
-	if (!str.empty())
+	try
 	{
-		UCLIDException uex("ELI28700", "$Now does not take an argument.");
-		uex.addDebugInfo("Argument", str);
-		throw uex;
+		string strReturnTime;
+
+		// If no format argument is present, return the default string
+		// "YYYY-MM-DD-HH-MM-SS-mmm"
+		if (str.empty())
+		{
+			// Get the local time
+			SYSTEMTIME st;
+			GetLocalTime(&st);
+
+			char zTime[24] = {0};
+			int nRet = sprintf_s(zTime, 24, "%04d-%02d-%02d-%02d-%02d-%02d-%03d", st.wYear,
+				st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+			if (nRet == -1)
+			{
+				UCLIDException uex("ELI28701", "Unable to format time string.");
+				uex.addWin32ErrorInfo(errno);
+				throw uex;
+			}
+
+			strReturnTime = zTime;
+		}
+		else
+		{
+			// Get the current time and format it based on the format string
+			CTime cTime(_time64(NULL));
+			CString zTime = cTime.Format(str.c_str());
+
+			// Return the formatted time
+			strReturnTime = (LPCTSTR)zTime;
+		}
+
+		return strReturnTime;
 	}
-
-	// Get the local time
-	SYSTEMTIME st;
-	GetLocalTime(&st);
-
-	char zTime[24] = {0};
-	int nRet = sprintf_s(zTime, 24, "%04d-%02d-%02d-%02d-%02d-%02d-%03d", st.wYear, st.wMonth,
-		st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
-	if (nRet == -1)
-	{
-		UCLIDException uex("ELI28701", "Unable to format time string.");
-		uex.addWin32ErrorInfo(errno);
-		throw uex;
-	}
-
-	return zTime;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28763");
 }
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandRandomAlphaNumeric(const string &str) const
@@ -594,5 +619,29 @@ const string TextFunctionExpander::expandRandomAlphaNumeric(const string &str) c
 
 	// Return a random string of nLength containing only upper case letters and digits
 	return msap_Rand->getRandomString(nLength, true, false, true);
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandUserName(const string& str) const
+{
+	if (!str.empty())
+	{
+		UCLIDException uex("ELI28764", "$UserName() does not accept arguments.");
+		uex.addDebugInfo("Argument", str);
+		throw uex;
+	}
+
+	return getCurrentUserName();
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandFullUserName(const string& str) const
+{
+	if (!str.empty())
+	{
+		UCLIDException uex("ELI28765", "$FullUserName() does not accept arguments.");
+		uex.addDebugInfo("Argument", str);
+		throw uex;
+	}
+
+	return getFullUserName();
 }
 //-------------------------------------------------------------------------------------------------

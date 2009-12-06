@@ -71,7 +71,14 @@ const string gstrALPHA_NUMERIC = gstrALPHA + gstrNUMBERS;
 //-------------------------------------------------------------------------------------------------
 // ********* Operating System - Misc **********
 //-------------------------------------------------------------------------------------------------
+// Gets the login ID of the current user
+// Example: If login ID is jsmith returns jsmith
 EXPORT_BaseUtils string getCurrentUserName();
+//-------------------------------------------------------------------------------------------------
+// Gets the human readable user name
+// Example: If login ID is jsmith and User Name
+// is John Smith returns John Smith
+EXPORT_BaseUtils string getFullUserName();
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils string getComputerName();
 //-------------------------------------------------------------------------------------------------

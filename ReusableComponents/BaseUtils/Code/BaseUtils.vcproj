@@ -79,7 +79,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib advapi32.lib netapi32.lib version.lib mpr.lib shlwapi.lib Psapi.lib"
+				AdditionalDependencies="wsock32.lib advapi32.lib netapi32.lib version.lib mpr.lib shlwapi.lib Psapi.lib Secur32.lib"
 				OutputFile="..\..\..\Binaries\Debug/BaseUtils.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -177,7 +177,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib advapi32.lib netapi32.lib version.lib mpr.lib shlwapi.lib Psapi.lib"
+				AdditionalDependencies="wsock32.lib advapi32.lib netapi32.lib version.lib mpr.lib shlwapi.lib Psapi.lib Secur32.lib"
 				OutputFile="..\..\..\Binaries\Release/BaseUtils.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

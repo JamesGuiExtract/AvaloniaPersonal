@@ -19,6 +19,10 @@
 #include "TemporaryFileName.h"
 #include "StringTokenizer.h"
 
+// Needed for the GetUserNameEx function
+#define SECURITY_WIN32 
+#include <security.h>
+
 #include <ComDef.h>
 #include <ObjBase.h>
 #include <stdlib.h>
@@ -216,7 +220,7 @@ string getCurrentUserName()
 
 	// get the current logged-in user's name
 	// initialize variables
-	char pszUserName[512];
+	char pszUserName[512] = {0};
 	unsigned long ulBufferSize = sizeof(pszUserName);
 
 	// get the user name
@@ -228,13 +232,27 @@ string getCurrentUserName()
 	return strUserName;
 }
 //-------------------------------------------------------------------------------------------------
+string getFullUserName()
+{
+	string strFullUserName = "NOT AVAILABLE";
+
+	char zName[1024] = {0};
+	unsigned long nLength = 1024;
+	if (GetUserNameEx(NameDisplay, zName, &nLength) == TRUE)
+	{
+		strFullUserName = zName;
+	}
+
+	return strFullUserName;
+}
+//-------------------------------------------------------------------------------------------------
 string getComputerName()
 {
 	string strComputerName = "NOT AVAILABLE";
 
 	// get this computer's name
 	// initialize variables
-	char pszComputerName[512];
+	char pszComputerName[512] = {0};
 	unsigned long ulBufferSize = sizeof(pszComputerName);
 
 	// get the computer name
@@ -256,7 +274,7 @@ string getPrivateProfileString(const string& strAppName,
 							   const string& strDefault, 
 							   const string& strFileName)
 {
-	char pszTemp[2048];
+	char pszTemp[2048] = {0};
 	GetPrivateProfileString(strAppName.c_str(),
 							strKeyName.c_str(), 
 							strDefault.c_str(), 
