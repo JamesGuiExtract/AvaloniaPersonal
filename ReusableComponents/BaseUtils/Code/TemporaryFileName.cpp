@@ -21,7 +21,8 @@ const string gmutMUTEX_NAME = "Global\\260BA215-4090-4172-B696-FC86B52269B4";
 TemporaryFileName::TemporaryFileName(const char *pszPrefix, 
 									 const char *pszSuffix, bool bAutoDelete) :
 m_strFileName(""),
-m_bAutoDelete(bAutoDelete)
+m_bAutoDelete(bAutoDelete),
+m_Rand(true)
 {
 	try
 	{
@@ -33,7 +34,8 @@ m_bAutoDelete(bAutoDelete)
 TemporaryFileName::TemporaryFileName(const string& strDir, const char *pszPrefix, 
 									 const char *pszSuffix, bool bAutoDelete) :
 m_strFileName(""),
-m_bAutoDelete(bAutoDelete)
+m_bAutoDelete(bAutoDelete),
+m_Rand(true)
 {
 	try
 	{
@@ -46,7 +48,8 @@ TemporaryFileName::~TemporaryFileName()
 {
 	try
 	{
-		if (m_bAutoDelete && !m_strFileName.empty())
+		// If auto delete, there is a file name, and the file still exists, delete it
+		if (m_bAutoDelete && !m_strFileName.empty() && isValidFile(m_strFileName))
 		{
 			// Attempt to delete the file
 			deleteFile(m_strFileName, true);
@@ -63,18 +66,19 @@ TemporaryFileName::~TemporaryFileName()
 // which allows specification of a directory (and is more secure than _tempnam)
 void TemporaryFileName::init(string strDir, const char *pszPrefix, const char* pszSuffix)
 {
-	string strSuffix = "";
+	string strSuffix = ".tmp";
+	string strPrefix = (pszPrefix != NULL ? pszPrefix : "");
 
 	// check for NULL suffix
 	if (pszSuffix != NULL)
 	{
-		strSuffix.assign(pszSuffix);
+		strSuffix = pszSuffix;
 		makeLowerCase(strSuffix);
 
-		// if suffix is .tmp, then just ignore it (GetTempFile adds .tmp automatically)
-		if (strSuffix == ".tmp")
+		// Ensure the suffix starts with a '.'
+		if (strSuffix[0] != '.')
 		{
-			strSuffix = "";
+			strSuffix.insert(0, ".");
 		}
 	}
 
@@ -96,21 +100,16 @@ void TemporaryFileName::init(string strDir, const char *pszPrefix, const char* p
 		// set the strDir to point to temp directory
 		strDir = szDir;
 	}
+	// If a directory is provided, ensure it ends in a backslash
+	else if (strDir[strDir.length()-1] != '\\')
+	{
+		strDir.append("\\");
+	}
 
 	// ensure the directory exists
 	validateFileOrFolderExistence(strDir);
 
-	// also check to be sure the path is not too long for GetTempFileName
-	// path must not be longer than MAX_PATH - 14
-	// see: http://msdn2.microsoft.com/en-us/library/aa364991.aspx
-	if (strDir.length() > (MAX_PATH - 14))
-	{
-		UCLIDException ue("ELI20705", "Path for temporary file is too large!");
-		ue.addDebugInfo("Path", strDir);
-		ue.addDebugInfo("PathLength", strDir.length());
-		ue.addDebugInfo("MaxPathLength", MAX_PATH - 14);
-		throw ue;
-	}
+	string strFileName = "";
 
 	// lock this section of code while we create and open the file
 	// modified as per [p13 #4970] changed CSingleLock(&mutex, TRUE)
@@ -121,83 +120,33 @@ void TemporaryFileName::init(string strDir, const char *pszPrefix, const char* p
 	CMutex mutex(FALSE, gmutMUTEX_NAME.c_str());
 	CSingleLock lock(&mutex, TRUE);
 
-	// if strSuffix is empty then any temp file will do.  set uiUnique to
-	// 0 which causes GetTempFileName to generate a unique file name
-	// and create the file to ensure the uniqueness
-	if (strSuffix.empty())
+	do
 	{
-		char szTemp[BUFSIZ] = {0};
-
-		// call GetTempFileName with uUinque = 0 so function will generate
-		// unique file and create it to ensure uniqueness, if user
-		// does not have write permissions to strDir then GetTempFileName
-		// will fail and set GetLastError().  
-		UINT uRetVal = GetTempFileName(strDir.c_str(), pszPrefix, 0, szTemp);
-		if (uRetVal == 0)
-		{
-			UCLIDException ue("ELI20704", "Unable to create temporary file!");
-			ue.addDebugInfo("Directory", strDir);
-			ue.addWin32ErrorInfo();
-			throw ue;
-		}
-
-		m_strFileName = szTemp;
+		// Build a random file name
+		strFileName = strDir + strPrefix + m_Rand.getRandomString(8, true, false, true) + strSuffix;
 	}
-	// strSuffix is non-empty, need to generate a unique file name ending in
-	// strSuffix
-	else
+	while (isValidFile(strFileName));
+
+	HANDLE hFileHandle = CreateFile(strFileName.c_str(), GENERIC_WRITE | GENERIC_READ,
+		0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL |
+		FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH, NULL);
+
+	// check for failed file creation
+	if (hFileHandle == INVALID_HANDLE_VALUE)
 	{
-		// set uiUnique to 0 since it will be incremented as first step in the loop
-		// TODO: 5/12/07 SNK There seems to be threading issues with the function.
-		// See [LegacyRCAndUtils:4975] 
-		UINT uiUnique = 0;
-		do
-		{
-			// increment the unique file number (will generate a temp file name
-			// ending in uiUnique.tmp, it will not check for file existence,
-			// nor will it create the file, we must do this manually)
-			uiUnique++;
-
-			// create buffer to hold file name
-			char szTemp[BUFSIZ] = {0};
-
-			// attempt to create temporary file
-			UINT uRetVal = GetTempFileName(strDir.c_str(), pszPrefix, uiUnique, szTemp);
-			if (uRetVal == 0)
-			{
-				UCLIDException ue("ELI20706", "Unable to create temporary file!");
-				ue.addDebugInfo("Directory", strDir);
-				ue.addWin32ErrorInfo();
-				throw ue;
-			}
-
-			// assign temp file name
-			m_strFileName = szTemp;
-
-			// add the suffix before checking for file existence
-			m_strFileName += strSuffix;
-
-		}
-		while (isValidFile(m_strFileName));
-
-		HANDLE hFileHandle = CreateFile(m_strFileName.c_str(), GENERIC_WRITE | GENERIC_READ,
-			0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL |
-			FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH, NULL);
-
-		// check for failed file creation
-		if (hFileHandle == INVALID_HANDLE_VALUE)
-		{
-			UCLIDException ue("ELI21032", "Unable to create new temporary file!");
-			ue.addDebugInfo("TempFileName", m_strFileName);
-			ue.addWin32ErrorInfo();
-			throw ue;
-		}
-
-		// CreateFile was successful, need to close the handle
-		CloseHandle(hFileHandle);
-
-		// ensure file is created before releasing lock
-		waitForFileToBeReadable(m_strFileName);
+		UCLIDException ue("ELI21032", "Unable to create new temporary file!");
+		ue.addDebugInfo("TempFileName", m_strFileName);
+		ue.addWin32ErrorInfo();
+		throw ue;
 	}
+
+	// CreateFile was successful, need to close the handle
+	CloseHandle(hFileHandle);
+
+	// Set the file name
+	m_strFileName = strFileName;
+
+	// ensure file is created before releasing lock
+	waitForFileToBeReadable(m_strFileName);
 }
 //--------------------------------------------------------------------------------------------------

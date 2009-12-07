@@ -1,15 +1,19 @@
 #pragma once
 
 #include "BaseUtils.h"
+#include "Random.h"
+
 #include <string>
 #include <afxmt.h>
+
+using namespace std;
 
 class EXPORT_BaseUtils TemporaryFileName
 {
 public:
 	//----------------------------------------------------------------------------------------------
 	// constructor - added as per [p13 #4951] - JDS 04/09/2008
-	TemporaryFileName(const std::string& strDir, const char* pszPrefix, const char* pszSuffix,
+	TemporaryFileName(const string& strDir, const char* pszPrefix, const char* pszSuffix,
 		bool bAutoDelete);
 	//----------------------------------------------------------------------------------------------
 	// constructor
@@ -21,7 +25,7 @@ public:
 	// if m_bAutoDelete == true.
 	~TemporaryFileName();
 	//----------------------------------------------------------------------------------------------
-	inline const std::string& getName()
+	inline const string& getName()
 	{
 		return m_strFileName;
 	}
@@ -31,8 +35,9 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// Variables
 	//----------------------------------------------------------------------------------------------
-	std::string m_strFileName;
+	string m_strFileName;
 	bool m_bAutoDelete;
+	Random m_Rand;
 
 	//----------------------------------------------------------------------------------------------
 	// Functions
@@ -42,5 +47,5 @@ private:
 	//			sets the m_strFileName to point to the specified file.  
 	//
 	// PROMISE: To throw an exception if unable to create the temporary file.
-	void init(std::string strDir, const char* pszPrefix, const char* pszSuffix);
+	void init(string strDir, const char* pszPrefix, const char* pszSuffix);
 };

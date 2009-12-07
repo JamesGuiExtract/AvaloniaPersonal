@@ -11,7 +11,9 @@ using namespace std;
 class EXPORT_BaseUtils ValueTypePair
 { 
 	public:
-		enum EType { kString, kOctets, kInt, kInt64, kLong, kUnsignedLong, kDouble, kBoolean, kNone };
+		// Our code depends on these values being in this order, if adding a new value, add
+		// it to the end of the list
+		enum EType { kString, kOctets, kInt, kLong, kUnsignedLong, kDouble, kBoolean, kNone, kInt64 };
 
 		ValueTypePair();
 		ValueTypePair(const string &_strValue);
