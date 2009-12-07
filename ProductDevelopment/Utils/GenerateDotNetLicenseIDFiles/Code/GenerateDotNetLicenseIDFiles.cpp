@@ -63,7 +63,6 @@ const string gstrMAP_LICENSE_ID_TO_COMPONENT_IDS_FILE = gstrLICENSING_CODE_DIREC
 		"MapLicenseIdsToComponentIds.h";
 
 // Constants for the string find functions
-const string gstrNUMBERS = "0123456789";
 const string gstrWHITE_SPACE = "\t ";
 
 // Constant offset for where on a line in the ComponentLicenseIDs.h the name
