@@ -1189,7 +1189,7 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadProc(void *pData)
 		pFPMgmtRole->processFiles2(pThreadData);
 		CoUninitialize();
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI11073")
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI11073")
 
 	// notify interested parties that the thread has ended
 	pThreadData->m_threadEndedEvent.signal();

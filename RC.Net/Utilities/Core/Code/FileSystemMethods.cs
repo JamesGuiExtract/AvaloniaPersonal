@@ -522,14 +522,14 @@ namespace Extract.Utilities
                 // If attempting to convert local paths, search all shared directories for one that
                 // the specified path is included in.
                 foreach (ManagementObject sharedDirectory in
-                    SystemMethods.GetWMIObjects("Win32_ShareToDirectory"))
+                    SystemMethods.GetWmiObjects("Win32_ShareToDirectory"))
                 {
                     try
                     {
                         // Administrative shares will have the high bit of the Type property set;
                         // ignore these.
                         object shareTypeProperty =
-                            SystemMethods.GetWMIProperty(sharedDirectory, "Share.Type");
+                            SystemMethods.GetWmiProperty(sharedDirectory, "Share.Type");
                         if (shareTypeProperty != null && ((uint)shareTypeProperty & 0x80000000) != 0)
                         {
                             continue;
@@ -537,7 +537,7 @@ namespace Extract.Utilities
 
                         // Find the local path of the share.
                         object localPathProperty =
-                            SystemMethods.GetWMIProperty(sharedDirectory, "Share.Path");
+                            SystemMethods.GetWmiProperty(sharedDirectory, "Share.Path");
                         if (localPathProperty == null)
                         {
                             continue;
@@ -551,7 +551,7 @@ namespace Extract.Utilities
                             // Generate a UNC address for the share using the local host name combined
                             // with the share name.
                             object shareNameProperty =
-                                SystemMethods.GetWMIProperty(sharedDirectory, "Share.Name");
+                                SystemMethods.GetWmiProperty(sharedDirectory, "Share.Name");
                             if (shareNameProperty != null)
                             {
                                 StringBuilder sharePath = new StringBuilder();

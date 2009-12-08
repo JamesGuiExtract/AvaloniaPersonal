@@ -114,7 +114,7 @@ DateTime LicenseUtilities::GetExpirationDate(LicenseIdName id)
 		}
 		else
 		{
-			throw gcnew ExtractException("ELI28745", "License id was not found in the collection.");
+			throw gcnew ExtractException("ELI28777", "License id was not found in the collection.");
 		}
 	}
 	catch(Exception^ ex)

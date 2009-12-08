@@ -82,6 +82,11 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(ESFAMService).ToString();
 
+        /// <summary>
+        /// The name of the FAM Process, used for the IsProcessingRunning call.
+        /// </summary>
+        static readonly string _FAM_PROCESS_NAME = "FAMProcess";
+
         #endregion Constants
 
         #region Fields
@@ -150,6 +155,11 @@ namespace Extract.FileActionManager.Utilities
                 // Get the list of FPS files to run
                 List<string> fpsFiles = GetFPSFilesToRun();
 
+                // [DNRCAU #357] - Log application trace when service is starting
+                ExtractException ee = new ExtractException("ELI28772",
+                    "Application trace: FAM Service starting.");
+                ee.Log();
+
                 lock (_lock)
                 {
                     // Create and launch a processing thread for each fps file.
@@ -182,6 +192,11 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                // [DNRCAU #357] - Log application trace when service is stopping
+                ExtractException ee = new ExtractException("ELI28773",
+                    "Application trace: FAM Service stopping.");
+                ee.Log();
+
                 // Signal the threads to stop
                 _stopProcessing.Set();
 
@@ -191,6 +206,11 @@ namespace Extract.FileActionManager.Utilities
                     // Wait for all threads to exit
                     WaitHandle.WaitAll(_threadStopped);
                 }
+
+                // [DNRCAU #357] - Log application trace when service has shutdown
+                ExtractException ee2 = new ExtractException("ELI28774",
+                    "Application trace: FAM Service stopped.");
+                ee2.Log();
             }
             catch (Exception ex)
             {
@@ -211,6 +231,7 @@ namespace Extract.FileActionManager.Utilities
         {
             FileProcessingManagerProcessClass famProcess = null;
             int threadNumber = 0;
+            int pid = -1;
             try
             {
                 // Get the processing thread arguments
@@ -219,6 +240,7 @@ namespace Extract.FileActionManager.Utilities
 
                 // Create the FAM process
                 famProcess = new FileProcessingManagerProcessClass();
+                pid = famProcess.ProcessID;
 
                 // Set the FPS file name
                 famProcess.FPSFile = arguments.FPSFileName;
@@ -230,7 +252,7 @@ namespace Extract.FileActionManager.Utilities
                 _stopProcessing.WaitOne();
 
                 // Check if the process is still running
-                if (famProcess.IsRunning)
+                if (SystemMethods.IsProcessRunning(_FAM_PROCESS_NAME, pid) && famProcess.IsRunning)
                 {
                     // Tell the process to stop
                     famProcess.Stop();
@@ -250,7 +272,13 @@ namespace Extract.FileActionManager.Utilities
                     try
                     {
                         // Release the COM object so the FAMProcess.exe is cleaned up
-                        Marshal.ReleaseComObject(famProcess);
+                        Marshal.FinalReleaseComObject(famProcess);
+
+                        // Wait for the process to exit
+                        while (pid != -1 && SystemMethods.IsProcessRunning(_FAM_PROCESS_NAME, pid))
+                        {
+                            System.Threading.Thread.Sleep(100);
+                        }
                     }
                     catch (Exception ex)
                     {

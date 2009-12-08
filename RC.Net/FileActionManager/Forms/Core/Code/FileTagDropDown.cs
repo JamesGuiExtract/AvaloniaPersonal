@@ -61,7 +61,7 @@ namespace Extract.FileActionManager.Forms
             }
 
             // Validate license
-            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28737",
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28778",
                 _OBJECT_NAME);
 
             InitializeComponent();

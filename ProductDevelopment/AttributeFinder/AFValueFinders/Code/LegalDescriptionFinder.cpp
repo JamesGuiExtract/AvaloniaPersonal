@@ -71,7 +71,7 @@ STDMETHODIMP CLegalDescriptionFinder::raw_ParseText(IAFDocument* pAFDoc, IProgre
 	try
 	{
 		// This finder is obsolete so throw exception if this method is called
-		UCLIDException ue("ELI28702", "Legal Discription finder is obsolete.");
+		UCLIDException ue("ELI28779", "Legal Description finder is obsolete.");
 		throw ue;
 
 		// Check license

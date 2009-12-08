@@ -1,6 +1,7 @@
 using Extract;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Management;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,7 +11,7 @@ namespace Extract.Utilities
     /// <summary>
     /// A utility class of system methods.
     /// </summary>
-    class SystemMethods
+    public static class SystemMethods
     {
         /// <summary>
         /// Enumerates all <see cref="ManagementObject"/>s of the specified class.
@@ -21,7 +22,7 @@ namespace Extract.Utilities
         /// <para><b>Note</b></para>
         /// The caller is responsible for disposing of all <see cref="ManagementObject"/>s returned.
         /// </returns>
-        public static IEnumerable<ManagementObject> GetWMIObjects(string wmiClass)
+        internal static IEnumerable<ManagementObject> GetWmiObjects(string wmiClass)
         {
             // Obtain all instances of the specified class.
             using (ManagementClass wmiObject = new ManagementClass(wmiClass))
@@ -45,7 +46,7 @@ namespace Extract.Utilities
         /// see cref="ManagementObject"/>s  can be referenced with a '.' following the child
         /// object's property name.</param>
         /// <returns></returns>
-        public static object GetWMIProperty(ManagementObject wmiObject, string propertyName)
+        internal static object GetWmiProperty(ManagementBaseObject wmiObject, string propertyName)
         {
             try
             {
@@ -58,7 +59,7 @@ namespace Extract.Utilities
                     using (ManagementObject childObject =
                         new ManagementObject(wmiObject[childObjectName].ToString()))
                     {
-                        return GetWMIProperty(childObject,
+                        return GetWmiProperty(childObject,
                             propertyName.Substring(nextElementPos + 1));
                     }
                 }
@@ -71,6 +72,62 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI27319", ex);
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if the specified process is running, returns <see langword="true"/> if
+        /// the process is running and <see langword="false"/> if it is not.
+        /// </summary>
+        /// <param name="processId">The process ID to look for.</param>
+        /// <returns><see langword="true"/> if the process is running and
+        /// <see langword="false"/> if it is not running.</returns>
+        public static bool IsProcessRunning(int processId)
+        {
+            return IsProcessRunning(null, processId);
+        }
+
+        /// <summary>
+        /// Checks to see if the specified process is running, returns <see langword="true"/> if
+        /// the process is running and <see langword="false"/> if it is not.
+        /// </summary>
+        /// <param name="processId">The process ID to look for.</param>
+        /// <param name="processName">The name of the process to look for.</param>
+        /// <returns><see langword="true"/> if the process is running and
+        /// <see langword="false"/> if it is not running.</returns>
+        public static bool IsProcessRunning(string processName, int processId)
+        {
+            try
+            {
+                Process[] procs = null;
+
+                // If a process name is specified, get all the processes with that name
+                if (!string.IsNullOrEmpty(processName))
+                {
+                    procs = Process.GetProcessesByName(processName);
+                }
+                else
+                {
+                    // No name specified, get all processes.
+                    procs = Process.GetProcesses();
+                }
+
+                // Return true if the specified Process ID is in the list of processes.
+                foreach (Process process in procs)
+                {
+                    if (process.Id == processId &&
+                        (string.IsNullOrEmpty(processName)
+                        || processName.Equals(process.ProcessName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28771", ex);
             }
         }
     }
