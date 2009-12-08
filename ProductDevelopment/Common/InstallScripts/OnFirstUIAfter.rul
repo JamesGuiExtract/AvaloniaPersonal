@@ -22,7 +22,7 @@ begin
 	LaunchAppAndWait( szRegAllCmdLine, "", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
 	
 	// Install the ESFAMService.exe 
-	InstallDotNetService( EXTRACT_DIR ^ "ESFAMService.exe");
+	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFAMService.exe\"");
 
     Disable(STATUSEX);
 
