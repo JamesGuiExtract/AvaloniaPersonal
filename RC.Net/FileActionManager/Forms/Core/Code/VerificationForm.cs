@@ -6,7 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.Utilities.Forms
+namespace Extract.FileActionManager.Forms
 {
     /// <summary>
     /// Creates an <see cref="IVerificationForm"/>.

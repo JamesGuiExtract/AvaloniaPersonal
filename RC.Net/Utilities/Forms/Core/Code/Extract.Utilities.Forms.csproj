@@ -73,7 +73,6 @@
     <Compile Include="CustomizableMessageBoxManager.cs" />
     <Compile Include="CustomizableMessageBoxResult.cs" />
     <Compile Include="FormsMethods.cs" />
-    <Compile Include="IVerificationForm.cs" />
     <Compile Include="Inputbox.cs" />
     <Compile Include="InputBoxForm.cs">
       <SubType>Form</SubType>
@@ -116,7 +115,6 @@
     <Compile Include="ToolStripButtonBase.Designer.cs">
       <DependentUpon>ToolStripButtonBase.cs</DependentUpon>
     </Compile>
-    <Compile Include="VerificationForm.cs" />
     <Compile Include="TimeoutResult.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -213,14 +211,6 @@
     </COMReference>
     <COMReference Include="UCLID_COMUTILSLib">
       <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
-    <COMReference Include="UCLID_FILEPROCESSINGLib">
-      <Guid>{5FBC9199-D162-4F14-BAD9-090F6AB576C5}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
