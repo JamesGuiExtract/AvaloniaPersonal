@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.Utilities.Forms
+namespace Extract.FileActionManager.Forms
 {
     /// <summary>
     /// Event args for a <see cref="IVerificationForm.FileComplete"/> event.
