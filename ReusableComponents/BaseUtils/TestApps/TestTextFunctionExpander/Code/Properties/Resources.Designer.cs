@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TestTextFunctionExpander.Properties {
+namespace Extract.BaseUtils.Testing.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace TestTextFunctionExpander.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TestTextFunctionExpander.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Extract.BaseUtils.Testing.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,13 @@ namespace TestTextFunctionExpander.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        internal static System.Drawing.Icon TextFunctionExpander {
+            get {
+                object obj = ResourceManager.GetObject("TextFunctionExpander", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }

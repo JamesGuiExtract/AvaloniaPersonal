@@ -1,8 +1,10 @@
+using Extract.BaseUtils.Testing.Properties;
+using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace TestTextFuntionExpander
+namespace Extract.BaseUtils.Testing
 {
     static class Program
     {
@@ -12,11 +14,28 @@ namespace TestTextFuntionExpander
         [STAThread]
         static void Main()
         {
-            // Load the license files
-            Extract.Licensing.LicenseUtilities.LoadLicenseFilesFromFolder(0, new Extract.Licensing.MapLabel());
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TestForm());
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+
+                // Load the license files
+                LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
+                    "ELI28789", "TestTextFunctionExpander");
+
+                // Create the form and set the icon
+                TestForm form = new TestForm();
+                form.Icon = Resources.TextFunctionExpander;
+
+                Application.Run(form);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28795", ex);
+            }
         }
     }
 }
