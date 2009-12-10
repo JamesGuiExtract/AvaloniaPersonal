@@ -86,6 +86,8 @@ private:
 	ATLControls::CButton m_radioBlocking;
 	ATLControls::CButton m_radioNonBlocking;
 
+	ATLControls::CButton m_checkPropErrors;
+
 	///////////
 	// Methods
 	///////////

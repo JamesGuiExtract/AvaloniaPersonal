@@ -71,6 +71,9 @@ public:
 	STDMETHOD(get_Parameters)(BSTR* pRetVal);
 	STDMETHOD(put_Parameters)(BSTR newVal);
 
+	STDMETHOD(get_PropagateErrors)(VARIANT_BOOL* pbVal);
+	STDMETHOD(put_PropagateErrors)(VARIANT_BOOL bVal);
+
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
 	STDMETHOD(IsDirty)(void);
@@ -111,6 +114,8 @@ private:
 	string m_strCmdLine;
 	string m_strWorkingDir;
 	string m_strParameters;
+
+	bool m_bPropagateErrors;
 
 	/////////////
 	// Methods

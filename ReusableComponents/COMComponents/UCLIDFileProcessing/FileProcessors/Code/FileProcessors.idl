@@ -169,6 +169,11 @@ library UCLID_FILEPROCESSORSLib
 
 		[propget, id(4), helpstring("property Parameters")] HRESULT Parameters([out, retval] BSTR* pRetVal);
 		[propput, id(4), helpstring("property Parameters")] HRESULT Parameters([in] BSTR newVal);
+
+		[propget, id(5), helpstring("property PropagateErrors")] HRESULT PropagateErrors(
+			[out, retval] VARIANT_BOOL* pbVal);
+		[propput, id(5), helpstring("property PropagateErrors")] HRESULT PropagateErrors(
+			[in] VARIANT_BOOL bVal);
 	};
 
 	// ISetActionStatusFileProcessor interface

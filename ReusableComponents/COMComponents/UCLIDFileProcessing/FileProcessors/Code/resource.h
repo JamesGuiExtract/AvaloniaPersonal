@@ -148,6 +148,7 @@
 #define IDC_RADIO_TOGGLE_TAG			294
 #define IDC_LIST_TAGS					295
 #define IDC_CHECK_PDFA					296
+#define IDC_CHECK_PROP_ERRORS			297
 
 // Next default values for new objects
 // 
@@ -155,7 +156,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        152
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         297
+#define _APS_NEXT_CONTROL_VALUE         298
 #define _APS_NEXT_SYMED_VALUE           145
 #endif
 #endif

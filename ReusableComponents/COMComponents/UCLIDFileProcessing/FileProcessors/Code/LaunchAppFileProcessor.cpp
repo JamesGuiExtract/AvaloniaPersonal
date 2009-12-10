@@ -34,7 +34,7 @@ extern CComModule _Module;
 // Constants
 //--------------------------------------------------------------------------------------------------
 // current version
-const unsigned long gnCurrentVersion = 2;
+const unsigned long gnCurrentVersion = 3;
 
 //--------------------------------------------------------------------------------------------------
 // CLaunchAppFileProcessor
@@ -43,6 +43,7 @@ CLaunchAppFileProcessor::CLaunchAppFileProcessor()
 : m_bDirty(false),
   m_bBlocking(true),
   m_strCmdLine(""),
+  m_bPropagateErrors(false),
   m_strWorkingDir("")
 {
 	try
@@ -159,8 +160,18 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, lon
 		// Ensure the working directory is not quoted
 		strWorkingDirExp = trim(strWorkingDirExp, "\"", "\"");
 
-		runEXE(strCmdLineExp, strParameters,
-			(m_bBlocking ? INFINITE : 0), NULL, strWorkingDirExp, 0);
+		// If propogating errors back to the FAM then runExtractEXE rather than runEXE
+		// [LRCAU #5536]
+		if (m_bPropagateErrors)
+		{
+			runExtractEXE(strCmdLineExp, strParameters, (m_bBlocking ? INFINITE : 0), NULL,
+				strWorkingDirExp, 0);
+		}
+		else
+		{
+			runEXE(strCmdLineExp, strParameters,
+				(m_bBlocking ? INFINITE : 0), NULL, strWorkingDirExp, 0);
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12199")
 
@@ -228,6 +239,8 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_CopyFrom(IUnknown *pObject)
 		m_strParameters = asString(ipCopyThis->Parameters);
 
 		m_bBlocking = asCppBool(ipCopyThis->IsBlocking);
+
+		m_bPropagateErrors = asCppBool(ipCopyThis->PropagateErrors);
 
 		m_bDirty = true;
 	}
@@ -298,6 +311,7 @@ STDMETHODIMP CLaunchAppFileProcessor::Load(IStream *pStream)
 		m_strCmdLine = "";
 		m_strWorkingDir = "";
 		m_strParameters = "";
+		m_bPropagateErrors = false;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -354,6 +368,12 @@ STDMETHODIMP CLaunchAppFileProcessor::Load(IStream *pStream)
 
 		dataReader >> m_bBlocking;
 
+		if (nDataVersion >= 3)
+		{
+			// Read the propagate errors value
+			dataReader >> m_bPropagateErrors;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -382,6 +402,7 @@ STDMETHODIMP CLaunchAppFileProcessor::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_strWorkingDir;
 		dataWriter << m_strParameters;
 		dataWriter << m_bBlocking;
+		dataWriter << m_bPropagateErrors;
 
 		dataWriter.flushToByteStream();
 
@@ -614,6 +635,42 @@ STDMETHODIMP CLaunchAppFileProcessor::put_IsBlocking(VARIANT_BOOL newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12227");
 
 	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CLaunchAppFileProcessor::get_PropagateErrors(VARIANT_BOOL* pbVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI28795", pbVal != NULL);
+
+		*pbVal = asVariantBool(m_bPropagateErrors);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28796");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CLaunchAppFileProcessor::put_PropagateErrors(VARIANT_BOOL bVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		m_bPropagateErrors = asCppBool(bVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28797");
 }
 
 //-------------------------------------------------------------------------------------------------

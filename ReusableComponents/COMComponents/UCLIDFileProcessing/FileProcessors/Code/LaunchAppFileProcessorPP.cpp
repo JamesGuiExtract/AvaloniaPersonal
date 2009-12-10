@@ -89,7 +89,9 @@ STDMETHODIMP CLaunchAppFileProcessorPP::Apply(void)
 				ipFP->WorkingDirectory = _bstr_t(bstrWorkingDirFileName);
 				ipFP->Parameters = _bstr_t(bstrParameters);
 
-				ipFP->IsBlocking = m_radioBlocking.GetCheck() == 1 ? VARIANT_TRUE : VARIANT_FALSE;
+				ipFP->IsBlocking = asVariantBool(m_radioBlocking.GetCheck() == BST_CHECKED);
+
+				ipFP->PropagateErrors = asVariantBool(m_checkPropErrors.GetCheck() == BST_CHECKED);
 			}
 		}
 
@@ -138,18 +140,23 @@ LRESULT CLaunchAppFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM
 			m_radioBlocking = GetDlgItem(IDC_RADIO_BLOCKING);
 			m_radioNonBlocking = GetDlgItem(IDC_RADIO_NON_BLOCKING);
 
+			m_checkPropErrors = GetDlgItem(IDC_CHECK_PROP_ERRORS);
+
 			if (ipFP->IsBlocking == VARIANT_TRUE)
 			{
-				m_radioBlocking.SetCheck(1);
+				m_radioBlocking.SetCheck(BST_CHECKED);
 			}
 			else
 			{
-				m_radioNonBlocking.SetCheck(1);
+				m_radioNonBlocking.SetCheck(BST_CHECKED);
 			}
 
 			m_editCmdLine.SetWindowText(ipFP->CommandLine);
 			m_editWorkingDir.SetWindowText(ipFP->WorkingDirectory);
 			m_editParameters.SetWindowText(ipFP->Parameters);
+
+			// Set the propagate errors checkbox
+			m_checkPropErrors.SetCheck(asBSTChecked(ipFP->PropagateErrors));
 		}
 		
 		
