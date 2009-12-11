@@ -23,7 +23,7 @@ namespace Extract.Imaging.Forms
 {
     sealed partial class ImageViewer
     {
-        #region Image Viewer Methods
+        #region Methods
 
         /// <summary>
         /// Establishes a connection with the specified control and any sub-controls that 
@@ -2219,7 +2219,7 @@ namespace Extract.Imaging.Forms
         /// <exception cref="ExtractException">No image is open.</exception>
         /// <event cref="ZoomChanged"><paramref name="raiseZoomChanged"/> was 
         /// <see langword="true"/>.</event>
-        public void ZoomToRectangle(Rectangle rc, bool updateZoomHistory, bool raiseZoomChanged,
+        void ZoomToRectangle(Rectangle rc, bool updateZoomHistory, bool raiseZoomChanged, 
             bool updateFitMode)
         {
             try
@@ -4481,7 +4481,7 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #region Image Viewer Shortcut Key Methods
+        #region Shortcut Key Methods
 
         /// <summary>
         /// Activates the pan <see cref="CursorTool"/>.
@@ -5335,11 +5335,11 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion Image Viewer Shortcut Key Methods
+        #endregion Shortcut Key Methods
 
-        #endregion Image Viewer Methods
+        #endregion Methods
 
-        #region Image Viewer Static Methods
+        #region Static Methods
 
         /// <summary>
         /// Draws the specified region with the specified graphics using the specified options.
@@ -5356,6 +5356,12 @@ namespace Extract.Imaging.Forms
         internal static void DrawRegion(Region region, Graphics graphics, Color color,
             NativeMethods.BinaryRasterOperations drawMode)
         {
+            // No need to draw transparent regions
+            if (color == Color.Transparent)
+            {
+                return;
+            }
+
             // Create handles for the the brush, region, and device context
             SafeGdiHandle brush = null;
             IntPtr regionHandle = IntPtr.Zero;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.Imaging.Forms
@@ -20,7 +19,7 @@ namespace Extract.Imaging.Forms
         /// The mask to <see langword="&amp;"/> with a grip handle id to get the grip handle id of 
         /// the individual object to which it corresponds.
         /// </summary>
-        readonly static int _GRIP_HANDLE_MASK = 7;
+        const int _GRIP_HANDLE_MASK = 7;
 
         #endregion Constants
 
@@ -30,14 +29,14 @@ namespace Extract.Imaging.Forms
         /// The collection of layer objects from which the <see cref="CompositeLayerObject{T}"/>
         /// is comprised.
         /// </summary>
-        private List<T> _objects = new List<T>();
+        List<T> _objects = new List<T>();
 
         /// <summary>
         /// Cache for the overall bounds as calculated by the GetBounds call to improve efficiency
         /// for repeated calls to GetBounds (as is typical when populating an image with many
         /// CompositeHighlightLayerObjects)
         /// </summary>
-        private Rectangle? _bounds;
+        Rectangle? _bounds;
 
         #endregion Fields
 
@@ -46,7 +45,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Initializes a new instance of the <see cref="CompositeLayerObject{T}"/> class.
         /// </summary>
-        protected CompositeLayerObject() : base()
+        protected CompositeLayerObject()
         {
         }
 
@@ -72,7 +71,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                this.AddObjects(objects);
+                AddObjects(objects);
             }
             catch (Exception ex)
             {
@@ -120,7 +119,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                this.AddObjects(objects);
+                AddObjects(objects);
             }
             catch (Exception ex)
             {
@@ -142,7 +141,7 @@ namespace Extract.Imaging.Forms
             get
             {
                 // Return the top left of the bounding rectangle
-                return _objects.Count > 0 ? this.GetBounds().Location : Point.Empty;
+                return _objects.Count > 0 ? GetBounds().Location : Point.Empty;
             }
         }
 
@@ -190,7 +189,7 @@ namespace Extract.Imaging.Forms
                 {
                     base.ImageViewer = value;
 
-                    foreach (LayerObject layerObject in _objects)
+                    foreach (T layerObject in _objects)
                     {
                         layerObject.ImageViewer = value;
                     }
@@ -367,7 +366,7 @@ namespace Extract.Imaging.Forms
                 // [DNRCAU #298] - Composite layer object should set dirty flag if offset
                 if (raiseEvents)
                 {
-                    base.Dirty = true;
+                    Dirty = true;
                 }
             }
             catch (Exception ex)
@@ -397,8 +396,7 @@ namespace Extract.Imaging.Forms
                     gripHandleId & _GRIP_HANDLE_MASK);
 
                 // Start the tracking data
-                base.TrackingData = new TrackingData(base.ImageViewer, mouseX, mouseY,
-                    Rectangle.Empty);
+                TrackingData = new TrackingData(base.ImageViewer, mouseX, mouseY, Rectangle.Empty);
             }
             catch (Exception ex)
             {
@@ -508,7 +506,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // End the tracking event
-                this.TrackingData = null;
+                TrackingData = null;
             }
             catch (Exception ex)
             {
@@ -671,6 +669,32 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Retrieves the vertices of the selection border in logical (image) coordinates.
+        /// </summary>
+        /// <returns>The vertices of the selection border in logical (image) coordinates.</returns>
+        public override Point[] GetGripVertices()
+        {
+            try
+            {
+                // Create a list with the capacity to hold all the vertices
+                List<Point> vertices = new List<Point>(_objects.Count * 4);
+
+                // Add all the vertices to the collection
+                foreach (T layerObject in _objects)
+                {
+                    vertices.AddRange(layerObject.GetGripVertices());
+                }
+
+                // Return the result
+                return vertices.ToArray();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28781", ex);
+            }
+        }
+
+        /// <summary>
         /// Determines whether the specified rectangle intersects the <see cref="CompositeLayerObject{T}"/>.
         /// </summary>
         /// <param name="rectangle">The rectangle in logical (image) coordinates to check for 
@@ -710,7 +734,7 @@ namespace Extract.Imaging.Forms
         /// <param name="gripHandleId">The id from which to retrieve the index.</param>
         /// <returns>The corresponding index of the object in <see cref="_objects"/>.
         /// </returns>
-        private int GetObjectIndexFromGripHandleId(int gripHandleId)
+        int GetObjectIndexFromGripHandleId(int gripHandleId)
         {
             int i = gripHandleId >> 3;
             if (i < 0 || i >= _objects.Count)
@@ -729,7 +753,7 @@ namespace Extract.Imaging.Forms
         /// must be on the same page as this <see cref="CompositeLayerObject{T}"/>.</param>
         /// <exception cref="ExtractException">If <see cref="LayerObject.PageNumber"/>
         /// does not equal this <see cref="LayerObject.PageNumber"/>.</exception>
-        protected void AddObjects(IEnumerable<T> objects)
+        void AddObjects(IEnumerable<T> objects)
         {
             try
             {
@@ -741,7 +765,7 @@ namespace Extract.Imaging.Forms
                     // Ensure all objects are on the same page
                     foreach (T layerObject in objects)
                     {
-                        if (layerObject.PageNumber != this.PageNumber)
+                        if (layerObject.PageNumber != PageNumber)
                         {
                             throw new ExtractException("ELI22776",
                                 "Composite object cannot span multiple pages!");
@@ -855,6 +879,8 @@ namespace Extract.Imaging.Forms
                             layerObject.Dispose();
                         }
                     }
+
+                    _objects = null;
                 }
             }
 
@@ -941,7 +967,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The hashcode for this <see cref="CompositeLayerObject{T}"/>.</returns>
         public override int GetHashCode()
         {
-            return this.Id.GetHashCode();
+            return Id.GetHashCode();
         }
 
         /// <summary>
@@ -956,7 +982,7 @@ namespace Extract.Imaging.Forms
             CompositeLayerObject<T> compositeObject2)
         {
             // Check if the same object first
-            if (object.ReferenceEquals(compositeObject1, compositeObject2))
+            if (ReferenceEquals(compositeObject1, compositeObject2))
             {
                 return true;
             }

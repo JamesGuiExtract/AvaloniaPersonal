@@ -1,15 +1,8 @@
-using Extract.Drawing;
-using Extract.Imaging;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Globalization;
-using System.Windows.Forms;
 using System.Xml;
 
 namespace Extract.Imaging.Forms
@@ -36,7 +29,7 @@ namespace Extract.Imaging.Forms
     /// </summary>
     public class Redaction : CompositeHighlightLayerObject, IComparable<Redaction>
     {
-        #region Redaction Constants
+        #region Constants
 
         /// <summary>
         /// The color that black redactions will be painted on the screen.
@@ -58,9 +51,9 @@ namespace Extract.Imaging.Forms
         /// </summary>
         private static readonly Color _WHITE_RENDER = Color.White;
 
-        #endregion Redaction Constants
+        #endregion Constants
 
-        #region Redaction Fields
+        #region Fields
 
         /// <summary>
         /// The color that will be used to render a redaction when printing
@@ -68,14 +61,14 @@ namespace Extract.Imaging.Forms
         /// </summary>
         RedactionColor _fillColor;
 
-        #endregion Redaction Fields
+        #endregion Fields
 
-        #region Redaction Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Redaction"/> class.
         /// </summary>
-        protected Redaction() : base()
+        protected Redaction()
         {
             // Needed for serialization
         }
@@ -266,9 +259,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion Redaction Constructors
+        #endregion Constructors
 
-        #region Redaction Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets the fill color for this redaction object.
@@ -300,9 +293,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion Redaction Properties
+        #endregion Properties
 
-        #region Redaction Methods
+        #region Methods
 
         /// <summary>
         /// Paints the layer object using the specified <see cref="Graphics"/> object.
@@ -321,7 +314,7 @@ namespace Extract.Imaging.Forms
 
                 if (_fillColor == RedactionColor.White)
                 {
-                    foreach (Highlight highlight in this.Objects)
+                    foreach (Highlight highlight in Objects)
                     {
                         // Draw a black border around the highlight
                         Point[] vertices = highlight.GetVertices();
@@ -347,13 +340,13 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                if (base.CanRender)
+                if (CanRender)
                 {
                     // Get the render color
                     Color color = _fillColor == RedactionColor.White ? 
                         _WHITE_RENDER : _BLACK_RENDER;
 
-                    foreach (Highlight highlight in base.Objects)
+                    foreach (Highlight highlight in Objects)
                     {
                         // Draw the highlight's region as an opaque color [IDSO #149]
                         highlight.DrawRegion(graphics, graphics.Clip, transform, color,
@@ -391,18 +384,18 @@ namespace Extract.Imaging.Forms
                 if (_fillColor == RedactionColor.White)
                 {
                     // Do nothing if not on the active page
-                    if (base.PageNumber != base.ImageViewer.PageNumber)
+                    if (PageNumber != base.ImageViewer.PageNumber)
                     {
                         return;
                     }
 
                     // For each highlight in the redaction...
-                    foreach (Highlight highlight in this.Objects)
+                    foreach (Highlight highlight in Objects)
                     {
                         // "Erase" the black outline by drawing it white so a black dashed line can be
                         // seen on top of it.
                         Point[] vertices = highlight.GetVertices();
-                        this.ImageViewer.Transform.TransformPoints(vertices);
+                        ImageViewer.Transform.TransformPoints(vertices);
                         graphics.DrawPolygon(Pens.White, vertices);
                     }
                 }
@@ -430,10 +423,10 @@ namespace Extract.Imaging.Forms
 
             // Set the appropriate highlight color
             Color color = _fillColor == RedactionColor.Black ? BlackPaint : WhitePaint;
-            base.SetColor(color, markAsDirty);
+            SetColor(color, markAsDirty);
         }
 
-        #endregion Redaction Methods
+        #endregion Methods
 
         #region Operator Overloads
 
@@ -490,8 +483,7 @@ namespace Extract.Imaging.Forms
         /// <param name="redaction2">The second <see cref="Redaction"/> addend.</param>
         /// <returns>A new <see cref="Redaction"/> that is the sum of the specified
         /// <see cref="Redaction"/>.</returns>
-        public static Redaction Add(
-            Redaction redaction1, Redaction redaction2)
+        public static Redaction Add(Redaction redaction1, Redaction redaction2)
         {
             return redaction1 + redaction2;
         }
@@ -513,10 +505,8 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Cast to the base class and call the base compare
-                CompositeLayerObject<Highlight> thisCompositeHighlight =
-                    this as CompositeLayerObject<Highlight>;
-                CompositeLayerObject<Highlight> otherCompositeHighlight =
-                    other as CompositeLayerObject<Highlight>;
+                CompositeLayerObject<Highlight> thisCompositeHighlight = this;
+                CompositeLayerObject<Highlight> otherCompositeHighlight = other;
 
                 return thisCompositeHighlight.CompareTo(otherCompositeHighlight);
             }
@@ -569,7 +559,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The hashcode for this <see cref="Redaction"/>.</returns>
         public override int GetHashCode()
         {
-            return this.Id.GetHashCode();
+            return Id.GetHashCode();
         }
 
         /// <summary>
@@ -583,16 +573,14 @@ namespace Extract.Imaging.Forms
         public static bool operator ==(Redaction redaction1, Redaction redaction2)
         {
             // Check if the same object first
-            if (object.ReferenceEquals(redaction1, redaction2))
+            if (ReferenceEquals(redaction1, redaction2))
             {
                 return true;
             }
 
             // Cast to the base class
-            CompositeLayerObject<Highlight> redactionComposite1 =
-                redaction1 as CompositeLayerObject<Highlight>;
-            CompositeLayerObject<Highlight> redactionComposite2 =
-                redaction2 as CompositeLayerObject<Highlight>;
+            CompositeLayerObject<Highlight> redactionComposite1 = redaction1;
+            CompositeLayerObject<Highlight> redactionComposite2 = redaction2;
 
             // Call the base equals
             return redactionComposite1 == redactionComposite2;
@@ -639,23 +627,7 @@ namespace Extract.Imaging.Forms
             return redaction1.CompareTo(redaction2) > 0;
         }
 
-        #endregion
-
-        #region IDisposable Members
-
-        /// <overloads>Releases resources used by the <see cref="Redaction"/>.</overloads>
-        /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="Redaction"/>.
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
-        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        protected override void Dispose(bool disposing)
-        {
-            // No managed or unmanaged resources, just call the base class
-            base.Dispose(disposing);
-        }
-
-        #endregion IDisposable Members
+        #endregion IComparable<Redaction> Members
 
         #region IXmlSerializable Members
 
@@ -669,7 +641,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Read the base class data (zones only)
-                base.ReadXml(reader, true);
+                ReadXml(reader, true);
 
                 // Get the fill color
                 if (reader.Name != "Color")
@@ -696,7 +668,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Write the base class xml data (zones only)
-                base.WriteXml(writer, true);
+                WriteXml(writer, true);
 
                 // Write the color
                 writer.WriteElementString("Color", _fillColor.ToString());

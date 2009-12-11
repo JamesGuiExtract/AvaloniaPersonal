@@ -1,11 +1,7 @@
-using Extract.Drawing;
-using Extract.Imaging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Text;
 using System.Xml;
 
 namespace Extract.Imaging.Forms
@@ -20,18 +16,18 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The color for a clue object.
         /// </summary>
-        private static readonly Color _CLUE_COLOR = Color.Yellow;
+        static readonly Color _CLUE_COLOR = Color.Yellow;
 
         #endregion Constants
 
-        #region Clue Fields
+        #region Fields
 
         /// <summary>
         /// The text associated with this <see cref="Clue"/>.
         /// </summary>
         string _text = "";
 
-        #endregion Clue Fields
+        #endregion Fields
 
         #region Constructors
 
@@ -41,9 +37,9 @@ namespace Extract.Imaging.Forms
         protected Clue()
         {
             // Needed for serialization
-            base.Deletable = false;
-            base.Movable = false;
-            base.CanRender = false;
+            Deletable = false;
+            Movable = false;
+            CanRender = false;
         }
 
         /// <overloads>
@@ -107,14 +103,14 @@ namespace Extract.Imaging.Forms
             string comment, IEnumerable<RasterZone> rasterZones)
             : base(imageViewer, pageNumber, tags, comment, rasterZones, _CLUE_COLOR)
         {
-            base.Deletable = false;
-            base.Movable = false;
-            base.CanRender = false;
+            Deletable = false;
+            Movable = false;
+            CanRender = false;
         }
 
         #endregion Constructors
 
-        #region Clue Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets the text associated with this <see cref="Clue"/>.
@@ -136,7 +132,7 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion Clue Properties
+        #endregion Properties
 
         #region Methods
 
@@ -160,17 +156,17 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Do nothing if not on the active page
-                if (base.PageNumber != base.ImageViewer.PageNumber)
+                if (PageNumber != base.ImageViewer.PageNumber)
                 {
                     return;
                 }
 
                 // Just draw the line around the objects, do not draw the grip handles
-                foreach (Highlight highlight in this.Objects)
+                foreach (Highlight highlight in Objects)
                 {
-                    Point[] vertices = highlight.GetVertices();
-                    this.ImageViewer.Transform.TransformPoints(vertices);
-                    graphics.DrawPolygon(ExtractPens.DashedBlack, vertices);
+                    Point[] vertices = highlight.GetGripVertices();
+                    ImageViewer.Transform.TransformPoints(vertices);
+                    graphics.DrawPolygon(SelectionPen, vertices);
                 }
             }
             catch (Exception ex)
@@ -280,10 +276,8 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Cast to the base class and call the base compare
-                CompositeLayerObject<Highlight> thisCompositeHighlight =
-                    this as CompositeLayerObject<Highlight>;
-                CompositeLayerObject<Highlight> otherCompositeHighlight =
-                    other as CompositeLayerObject<Highlight>;
+                CompositeLayerObject<Highlight> thisCompositeHighlight = this;
+                CompositeLayerObject<Highlight> otherCompositeHighlight = other;
 
                 return thisCompositeHighlight.CompareTo(otherCompositeHighlight);
             }
@@ -336,7 +330,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The hashcode for this <see cref="Clue"/>.</returns>
         public override int GetHashCode()
         {
-            return this.Id.GetHashCode();
+            return Id.GetHashCode();
         }
 
         /// <summary>
@@ -350,16 +344,14 @@ namespace Extract.Imaging.Forms
         public static bool operator ==(Clue clue1, Clue clue2)
         {
             // Check if the same object first
-            if (object.ReferenceEquals(clue1, clue2))
+            if (ReferenceEquals(clue1, clue2))
             {
                 return true;
             }
 
             // Cast to the base class
-            CompositeLayerObject<Highlight> clueComposite1 =
-                clue1 as CompositeLayerObject<Highlight>;
-            CompositeLayerObject<Highlight> clueComposite2 =
-                clue2 as CompositeLayerObject<Highlight>;
+            CompositeLayerObject<Highlight> clueComposite1 = clue1;
+            CompositeLayerObject<Highlight> clueComposite2 = clue2;
 
             // Call the base equals
             return clueComposite1 == clueComposite2;
@@ -384,8 +376,8 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="clue1">A <see cref="Clue"/> to compare.</param>
         /// <param name="clue2">A <see cref="Clue"/> to compare.</param>
-        /// <returns><see langword="true"/> if <paramref name="redaction1"/> is less
-        /// than <paramref name="redaction2"/> and <see langword="false"/> otherwise.
+        /// <returns><see langword="true"/> if <paramref name="clue1"/> is less
+        /// than <paramref name="clue2"/> and <see langword="false"/> otherwise.
         /// </returns>
         public static bool operator <(Clue clue1, Clue clue2)
         {
@@ -398,8 +390,8 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="clue1">A <see cref="Clue"/> to compare.</param>
         /// <param name="clue2">A <see cref="Clue"/> to compare.</param>
-        /// <returns><see langword="true"/> if <paramref name="redaction1"/> is greater
-        /// than <paramref name="redaction2"/> and <see langword="false"/> otherwise.
+        /// <returns><see langword="true"/> if <paramref name="clue1"/> is greater
+        /// than <paramref name="clue2"/> and <see langword="false"/> otherwise.
         /// </returns>
         public static bool operator >(Clue clue1, Clue clue2)
         {

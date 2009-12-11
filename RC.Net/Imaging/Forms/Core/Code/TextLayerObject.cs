@@ -1,15 +1,10 @@
 using Extract.Drawing;
-using Extract.Licensing;
-using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.Globalization;
-using System.Text;
 using System.Xml;
 
 namespace Extract.Imaging.Forms
@@ -71,7 +66,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Initializes a new instance of the <see cref="TextLayerObject"/> class.
         /// </summary>
-        protected TextLayerObject() : base()
+        protected TextLayerObject()
         {
             // Needed for serialization
         }
@@ -510,7 +505,7 @@ namespace Extract.Imaging.Forms
             {
                 // Ensure the text layer is on the active page            
                 ImageViewer imageViewer = base.ImageViewer;
-                return imageViewer != null && imageViewer.PageNumber == base.PageNumber &&
+                return imageViewer != null && imageViewer.PageNumber == PageNumber &&
                     GetBounds().Contains(point);
             }
             catch (Exception ex)
@@ -571,6 +566,15 @@ namespace Extract.Imaging.Forms
             {
                 throw ExtractException.AsExtractException("ELI25680", ex);
             }
+        }
+
+        /// <summary>
+        /// Retrieves the vertices of the selection border in logical (image) coordinates.
+        /// </summary>
+        /// <returns>The vertices of the selection border in logical (image) coordinates.</returns>
+        public override Point[] GetGripVertices()
+        {
+            return GetVertices();
         }
 
         /// <summary>

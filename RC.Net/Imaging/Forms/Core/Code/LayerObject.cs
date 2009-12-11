@@ -147,6 +147,11 @@ namespace Extract.Imaging.Forms
         bool _render = true;
 
         /// <summary>
+        /// The pen used for drawing the selection border around selected layer objects.
+        /// </summary>
+        static Pen _selectionPen;
+
+        /// <summary>
         /// The image viewer on which the layer object appears.
         /// </summary>
         ImageViewer _imageViewer;
@@ -664,6 +669,27 @@ namespace Extract.Imaging.Forms
             get;
         }
 
+        /// <summary>
+        /// Gets or sets the pen used to draw the selection border around selected layer objects.
+        /// </summary>
+        /// <value>The pen used to draw the selection border around selected layer objects.</value>
+        public static Pen SelectionPen
+        {
+            get
+            {
+                if (_selectionPen == null)
+                {
+                    _selectionPen = ExtractPens.DashedBlack;
+                }
+
+                return _selectionPen;
+            }
+            set
+            {
+                _selectionPen = value;
+            }
+        }
+
         #endregion LayerObject Properties
 
         #region LayerObject Methods
@@ -758,7 +784,7 @@ namespace Extract.Imaging.Forms
         /// <param name="point">The point to check in logical (image) coordinates.</param>
         /// <returns>The average distance between the <paramref name="point"/> and the vertices
         /// of the <see cref="LayerObject"/>.</returns>
-        public virtual double AverageDistanceToCorners(Point point)
+        public double AverageDistanceToCorners(Point point)
         {
             try
             {
@@ -914,7 +940,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <returns>The center points of the link arrows in physical (client) coordinates.
         /// </returns>
-        public virtual Point[] GetLinkPoints()
+        public Point[] GetLinkPoints()
         {
             try
             {
@@ -1155,9 +1181,9 @@ namespace Extract.Imaging.Forms
                 // NOTE: A widthless highlight will only have one grip handle
                 if (gripPoints.Length != 1)
                 {
-                    Point[] vertices = GetVertices();
+                    Point[] vertices = GetGripVertices();
                     _imageViewer.Transform.TransformPoints(vertices);
-                    graphics.DrawPolygon(ExtractPens.DashedBlack, vertices);
+                    graphics.DrawPolygon(SelectionPen, vertices);
                 }
 
                 // If there are no grip points, we are done
@@ -1356,6 +1382,12 @@ namespace Extract.Imaging.Forms
         /// <returns>The vertices of the <see cref="LayerObject"/> in logical (image) coordinates.
         /// </returns>
         public abstract Point[] GetVertices();
+
+        /// <summary>
+        /// Retrieves the vertices of the selection border in logical (image) coordinates.
+        /// </summary>
+        /// <returns>The vertices of the selection border in logical (image) coordinates.</returns>
+        public abstract Point[] GetGripVertices();
 
         /// <summary>
         /// Determines whether a horizontal line can be drawn such that it intersects this 

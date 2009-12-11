@@ -1,14 +1,8 @@
 using Extract.Drawing;
-using Extract.Licensing;
-using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Globalization;
-using System.Text;
 using System.Xml;
 
 namespace Extract.Imaging.Forms
@@ -23,34 +17,33 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The image displayed by the <see cref="ImageLayerObject"/>.
         /// </summary>
-        private Image _image;
+        Image _image;
 
         /// <summary>
         /// The size of the displayed image in page pixel coordinates.
         /// </summary>
-        private Size _size;
+        Size _size;
 
         /// <summary>
         /// The angle (in degrees) the image layer object should be drawn at in respect to the image
         /// coordinates.
         /// </summary>
-        private float _orientation;
+        float _orientation;
 
         /// <summary>
         /// The bounds of the image layer object in logical (image) coordinates.
         /// </summary>
-        private Rectangle _bounds;
+        Rectangle _bounds;
 
         #endregion Fields
 
-        #region ImageLayerObject Constructors
+        #region Constructors
 
         /// <overloads>Initializes a new instance of the <see cref="ImageLayerObject"/> class.</overloads>
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageLayerObject"/> class.
         /// </summary>
         protected ImageLayerObject()
-            : base()
         {
             // Needed for serialization
         }
@@ -93,9 +86,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion ImageLayerObject Constructors
+        #endregion Constructors
 
-        #region ImageLayerObject Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets the <see cref="Image"/> displayed by the <see cref="ImageLayerObject"/>.
@@ -268,9 +261,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion ImageLayerObject Properties
+        #endregion Properties
 
-        #region ImageLayerObject Methods
+        #region Methods
 
         /// <summary>
         /// Translates the <see cref="ImageLayerObject"/> by the specified point and optionally 
@@ -390,7 +383,7 @@ namespace Extract.Imaging.Forms
             {
                 // Ensure the image layer is on the active page            
                 ImageViewer imageViewer = base.ImageViewer;
-                return imageViewer != null && imageViewer.PageNumber == base.PageNumber &&
+                return imageViewer != null && imageViewer.PageNumber == PageNumber &&
                     GetBounds().Contains(point);
             }
             catch (Exception ex)
@@ -460,6 +453,15 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Retrieves the vertices of the selection border in logical (image) coordinates.
+        /// </summary>
+        /// <returns>The vertices of the selection border in logical (image) coordinates.</returns>
+        public override Point[] GetGripVertices()
+        {
+            return GetVertices(true);
+        }
+
+        /// <summary>
         /// Determines whether the specified rectangle intersects the 
         /// <see cref="ImageLayerObject"/>.
         /// </summary>
@@ -481,7 +483,7 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion ImageLayerObject Methods
+        #endregion Methods
 
         #region IXmlSerializable Members
 
@@ -521,17 +523,14 @@ namespace Extract.Imaging.Forms
 
         #endregion IXmlSerializable Members
 
-        #region Private Members
+        #region Members
 
         /// <summary>
         /// Calculates the size and top left coordinate of the <see cref="ImageLayerObject"/> in 
         /// logical (image) coordinates.
         /// </summary>
-        private void UpdateBounds()
+        void UpdateBounds()
         {
-            // Calculate the size and position of the image layer object's bounds.
-            Point location;
-            
             // Calculate the top left coordinate based on the anchor alignment
             Point[] anchorPoint = { base.AnchorPoint };
 
@@ -543,7 +542,8 @@ namespace Extract.Imaging.Forms
                 transform.TransformPoints(anchorPoint);
             }
 
-            location = anchorPoint[0];
+            // Calculate the size and position of the image layer object's bounds.
+            Point location = anchorPoint[0];
 
             switch (base.AnchorAlignment)
             {
@@ -603,7 +603,7 @@ namespace Extract.Imaging.Forms
         /// coordinate system.</param>
         /// <returns>The vertices of the <see cref="ImageLayerObject"/>in the specified coordinate
         /// system.</returns>
-        private Point[] GetVertices(bool useImageCoordinates)
+        Point[] GetVertices(bool useImageCoordinates)
         {
             // Construct the vertices using the bounds of the image layer object
             Point[] vertices =
@@ -627,6 +627,6 @@ namespace Extract.Imaging.Forms
             return vertices;
         }
 
-        #endregion Private Members
+        #endregion Members
     }
 }

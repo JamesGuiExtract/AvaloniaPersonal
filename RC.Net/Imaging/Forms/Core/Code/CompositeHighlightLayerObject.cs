@@ -1,4 +1,3 @@
-using Extract.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,7 +5,6 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
-using System.Text;
 using System.Xml;
 
 namespace Extract.Imaging.Forms
@@ -38,7 +36,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Initializes a new instance of the <see cref="CompositeHighlightLayerObject"/> class.
         /// </summary>
-        protected CompositeHighlightLayerObject() : base()
+        protected CompositeHighlightLayerObject()
         {
             // Needed for serialization
         }
@@ -128,7 +126,7 @@ namespace Extract.Imaging.Forms
         {
             _color = highlightColor;
 
-            this.AddRasterZones(rasterZones);
+            AddRasterZones(rasterZones);
         }
 
         /// <summary>
@@ -156,7 +154,7 @@ namespace Extract.Imaging.Forms
         {
             _color = highlightColor;
 
-            this.AddRasterZones(rasterZones);
+            AddRasterZones(rasterZones);
         }
 
         /// <summary>
@@ -201,7 +199,12 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    SetColor(value, true);
+                    SetColor(value, false);
+
+                    if (ImageViewer != null)
+                    {
+                        ImageViewer.Invalidate();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -231,7 +234,7 @@ namespace Extract.Imaging.Forms
                     _outlineColor = value;
 
                     // Update the highlights
-                    foreach (Highlight highlight in base.Objects)
+                    foreach (Highlight highlight in Objects)
                     {
                         highlight.OutlineColor = _outlineColor;
                     }
@@ -242,8 +245,35 @@ namespace Extract.Imaging.Forms
                 }
             }
         }
-        
-        #endregion
+
+        /// <summary>
+        /// Gets or sets the color of the redaction's border.
+        /// </summary>
+        /// <value>The color of the redaction's border; <see langword="null"/> if no border should 
+        /// be drawn.</value>
+        public Color? BorderColor
+        {
+            get
+            {
+                return Objects[0].BorderColor;
+            }
+            set
+            {
+                try
+                {
+                    foreach (Highlight highlight in Objects)
+                    {
+                        highlight.BorderColor = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28798", ex);
+                }
+            }
+        }
+
+        #endregion Properties
 
         #region Methods
 
@@ -257,7 +287,7 @@ namespace Extract.Imaging.Forms
         /// specified <see cref="CompositeHighlightLayerObject"/>.</returns>
         /// <exception cref="ExtractException">If <paramref name="compositeObject"/>
         /// is <see langword="null"/>.</exception>
-        public virtual double GetAreaOverlappingWith(CompositeHighlightLayerObject compositeObject)
+        public double GetAreaOverlappingWith(CompositeHighlightLayerObject compositeObject)
         {
             try
             {
@@ -294,7 +324,7 @@ namespace Extract.Imaging.Forms
         /// specified <see cref="IEnumerable{T}"/> of <see cref="RasterZone"/> objects.</returns>
         /// <exception cref="ExtractException">If <paramref name="rasterZones"/>
         /// is <see langword="null"/>.</exception>
-        public virtual double GetAreaOverlappingWith(IEnumerable<RasterZone> rasterZones)
+        public double GetAreaOverlappingWith(IEnumerable<RasterZone> rasterZones)
         {
             try
             {
@@ -311,7 +341,7 @@ namespace Extract.Imaging.Forms
                     UCLID_RASTERANDOCRMGMTLib.RasterZone comRasterZone =
                         rasterZone.ToComRasterZone();
 
-                    foreach (Highlight highlight in this.Objects)
+                    foreach (Highlight highlight in Objects)
                     {
                         areaOverlap += highlight.ToRasterZone().GetAreaOverlappingWith(
                             comRasterZone);
@@ -337,7 +367,7 @@ namespace Extract.Imaging.Forms
                 // Sum the area of each highlight in the composite object to compute
                 // the total area of this composite object 
                 double area = 0.0;
-                foreach (Highlight highlight in this.Objects)
+                foreach (Highlight highlight in Objects)
                 {
                     area += highlight.ToRasterZone().Area();
                 }
@@ -373,19 +403,19 @@ namespace Extract.Imaging.Forms
                     foreach (RasterZone rasterZone in rasterZones)
                     {
                         // Ensure the raster zones are all on the same page as this object
-                        if (rasterZone.PageNumber != base.PageNumber)
+                        if (rasterZone.PageNumber != PageNumber)
                         {
                             throw new ExtractException("ELI22803",
                                 "Cannot add raster zones from other pages to this composite object!");
                         }
 
-                        highlights.Add(new Highlight(base.ImageViewer, base.Comment, rasterZone,
+                        highlights.Add(new Highlight(base.ImageViewer, Comment, rasterZone,
                             "", _color));
                     }
 
                     // Add the highlights to the collection of highlights and sort the collection
-                    base.Objects.AddRange(highlights);
-                    base.Objects.Sort();
+                    Objects.AddRange(highlights);
+                    Objects.Sort();
                 }
             }
             catch (Exception ex)
@@ -407,10 +437,10 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Create a list to hold the raster zones
-                List<RasterZone> rasterZones = new List<RasterZone>(this.Objects.Count);
+                List<RasterZone> rasterZones = new List<RasterZone>(Objects.Count);
 
                 // Get the raster zone for each highlight
-                foreach (Highlight highlight in this.Objects)
+                foreach (Highlight highlight in Objects)
                 {
                     rasterZones.Add(highlight.ToRasterZone());
                 }
@@ -437,14 +467,14 @@ namespace Extract.Imaging.Forms
             _color = color;
 
             // Update the highlights
-            foreach (Highlight highlight in base.Objects)
+            foreach (Highlight highlight in Objects)
             {
                 highlight.SetColor(_color, markAsDirty);
             }
 
             if (markAsDirty)
             {
-                base.Dirty = true;
+                Dirty = true;
             }
         }
 
@@ -530,10 +560,8 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Cast to the base class and call the base compare
-                CompositeLayerObject<Highlight> thisCompositeHighlight =
-                    this as CompositeLayerObject<Highlight>;
-                CompositeLayerObject<Highlight> otherCompositeHighlight =
-                    other as CompositeLayerObject<Highlight>;
+                CompositeLayerObject<Highlight> thisCompositeHighlight = this;
+                CompositeLayerObject<Highlight> otherCompositeHighlight = other;
 
                 return thisCompositeHighlight.CompareTo(otherCompositeHighlight);
             }
@@ -586,7 +614,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The hashcode for this <see cref="CompositeHighlightLayerObject"/>.</returns>
         public override int GetHashCode()
         {
-            return this.Id.GetHashCode();
+            return Id.GetHashCode();
         }
 
         /// <summary>
@@ -601,16 +629,14 @@ namespace Extract.Imaging.Forms
             CompositeHighlightLayerObject compositeHighlight2)
         {
             // Check if the same object first
-            if (object.ReferenceEquals(compositeHighlight1, compositeHighlight2))
+            if (ReferenceEquals(compositeHighlight1, compositeHighlight2))
             {
                 return true;
             }
 
             // Cast to the base class
-            CompositeLayerObject<Highlight> baseComposite1 =
-                compositeHighlight1 as CompositeLayerObject<Highlight>;
-            CompositeLayerObject<Highlight> baseComposite2 =
-                compositeHighlight2 as CompositeLayerObject<Highlight>;
+            CompositeLayerObject<Highlight> baseComposite1 = compositeHighlight1;
+            CompositeLayerObject<Highlight> baseComposite2 = compositeHighlight2;
 
             // Call the base equals
             return baseComposite1 == baseComposite2;
@@ -660,24 +686,7 @@ namespace Extract.Imaging.Forms
             return compositeHighlight1.CompareTo(compositeHighlight2) > 0;
         }
 
-        #endregion
-
-        #region IDisposable Members
-
-        /// <overloads>Releases resources used by the <see cref="CompositeHighlightLayerObject"/>.
-        /// </overloads>
-        /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="CompositeHighlightLayerObject"/>.
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
-        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        protected override void Dispose(bool disposing)
-        {
-            // No unmanaged or managed resources, call the base class
-            base.Dispose(disposing);
-        }
-
-        #endregion IDisposable Members
+        #endregion IComparable<CompositeHighlightLayerObject> Members
 
         #region IXmlSerializable Members
 
@@ -709,9 +718,9 @@ namespace Extract.Imaging.Forms
                 // Get the zones
                 while (reader.Name == "Zone")
                 {
-                    Highlight highlight = new Highlight(base.Comment, base.PageNumber);
+                    Highlight highlight = new Highlight(Comment, PageNumber);
                     highlight.ReadXmlZone(reader);
-                    base.Objects.Add(highlight);
+                    Objects.Add(highlight);
                 }
 
                 // Stop here if only zones are available
@@ -728,7 +737,7 @@ namespace Extract.Imaging.Forms
                 int red = GetAttributeAsInt32(reader, "Red");
                 int green = GetAttributeAsInt32(reader, "Green"); 
                 int blue = GetAttributeAsInt32(reader, "Blue");
-                this.Color = Color.FromArgb(red, green, blue);
+                Color = Color.FromArgb(red, green, blue);
                 reader.Read();
             }
             catch (Exception ex)
@@ -779,7 +788,7 @@ namespace Extract.Imaging.Forms
                 base.WriteXml(writer);
 
                 // Write the zones 
-                foreach (Highlight highlight in base.Objects)
+                foreach (Highlight highlight in Objects)
                 {
                     highlight.WriteXmlZone(writer);
                 }
@@ -812,7 +821,7 @@ namespace Extract.Imaging.Forms
         /// <paramref name="int32Byte"/>.</returns>
         static string GetInt32String(byte int32Byte)
         {
-            int int32 = (int)int32Byte;
+            int int32 = int32Byte;
             return int32.ToString(CultureInfo.CurrentCulture);
         }
 

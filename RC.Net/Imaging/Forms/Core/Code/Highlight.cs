@@ -26,7 +26,7 @@ namespace Extract.Imaging.Forms
     /// </remarks>
     public sealed class Highlight : LayerObject, IComparable<Highlight>
     {
-        #region Highlight Constants
+        #region Constants
 
         /// <summary>
         /// An array of the path point types for the <see cref="GraphicsPath"/> object.
@@ -39,9 +39,9 @@ namespace Extract.Imaging.Forms
             (byte)PathPointType.Line    // the last corner
         };
 
-        #endregion
+        #endregion Constants
 
-        #region Highlight Fields
+        #region Fields
 
         /// <summary>
         /// Midpoint of starting side of the highlight in logical (image) coordinates.
@@ -76,6 +76,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <seealso cref="Color"/>
         Color? _outlineColor;
+
+        /// <summary>
+        /// Color of the highlight's border; <see langword="null"/> for no border.
+        /// </summary>
+        Color? _borderColor;
 
         /// <summary>
         /// Text associated with the highlight.
@@ -129,14 +134,14 @@ namespace Extract.Imaging.Forms
         /// </summary>
         double _angle;
 
-        #endregion
+        #endregion Fields
 
-        #region Highlight Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Highlight"/> class.
         /// </summary>
-        Highlight() : base()
+        Highlight()
         {
             // Needed for serialization
         }
@@ -187,7 +192,7 @@ namespace Extract.Imaging.Forms
         /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
         public Highlight(ImageViewer imageViewer, string comment, Point start, Point end, int height)
             : this(imageViewer, comment, start, end, height, imageViewer.PageNumber, null, 
-            imageViewer.DefaultHighlightColor)
+                imageViewer.DefaultHighlightColor)
         {
 
         }
@@ -228,7 +233,7 @@ namespace Extract.Imaging.Forms
         public Highlight(ImageViewer imageViewer, string comment, Point start, Point end, 
             int height, int pageNumber)
             : this(imageViewer, comment, start, end, height, pageNumber, null, 
-            imageViewer.DefaultHighlightColor)
+                imageViewer.DefaultHighlightColor)
         {
 
         }
@@ -272,7 +277,7 @@ namespace Extract.Imaging.Forms
         public Highlight(ImageViewer imageViewer, string comment, Point start, Point end, 
             int height, int pageNumber, string text)
             : this(imageViewer, comment, start, end, height, pageNumber, text, 
-            imageViewer.DefaultHighlightColor)
+                imageViewer.DefaultHighlightColor)
         {
 
         }
@@ -374,8 +379,8 @@ namespace Extract.Imaging.Forms
         /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
         public Highlight(ImageViewer imageViewer, string comment, RasterZone rasterZone)
             : this(imageViewer, comment, new Point(rasterZone.StartX, rasterZone.StartY), 
-            new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
-            null, imageViewer.DefaultHighlightColor)
+                new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
+                null, imageViewer.DefaultHighlightColor)
         {
             
         }
@@ -411,8 +416,8 @@ namespace Extract.Imaging.Forms
         /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
         public Highlight(ImageViewer imageViewer, string comment, RasterZone rasterZone, string text)
             : this(imageViewer, comment, new Point(rasterZone.StartX, rasterZone.StartY),
-            new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
-            text, imageViewer.DefaultHighlightColor)
+                new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
+                text, imageViewer.DefaultHighlightColor)
         {
             
         }
@@ -449,15 +454,15 @@ namespace Extract.Imaging.Forms
         public Highlight(ImageViewer imageViewer, string comment, RasterZone rasterZone, 
             string text, Color color)
             : this(imageViewer, comment, new Point(rasterZone.StartX, rasterZone.StartY),
-            new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
-            text, color)
+                new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
+                text, color)
         {
 
         }
 
-        #endregion
+        #endregion Constructors
 
-        #region Highlight Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets the midpoint of the one side of the highlight in logical (image) 
@@ -614,6 +619,23 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Gets or sets the color of the highlight's border.
+        /// </summary>
+        /// <value>The color of the highlight's border; <see langword="null"/> if no value should 
+        /// be used.</value>
+        public Color? BorderColor
+        {
+            get
+            {
+                return _borderColor;
+            }
+            set
+            {
+                _borderColor = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the text associated with the highlight.
         /// </summary>
         /// <value>The text associated with the highlight. Cannot be <see langword="null"/>
@@ -668,9 +690,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion
+        #endregion Properties
 
-        #region Highlight Methods
+        #region Methods
 
         /// <summary>
         /// Paints the highlight within the specified region using the specified 
@@ -730,17 +752,20 @@ namespace Extract.Imaging.Forms
             ImageViewer imageViewer = base.ImageViewer;
             if (imageViewer != null)
             {
-                // Use the highlight's region
-                using (Region region = Region.Clone())
+                // Paint the highlight's region
+                if (_color != Color.Transparent)
                 {
-                    // Transform region coordinates from logical to destination
-                    region.Transform(transform);
+                    using (Region region = Region.Clone())
+                    {
+                        // Transform region coordinates from logical to destination
+                        region.Transform(transform);
 
-                    // Clip the region
-                    region.Intersect(clip);
+                        // Clip the region
+                        region.Intersect(clip);
 
-                    // Draw the highlight
-                    ImageViewer.DrawRegion(region, graphics, color, drawMode);
+                        // Draw the highlight
+                        ImageViewer.DrawRegion(region, graphics, color, drawMode);
+                    }
                 }
 
                 // If OutlineColor is non-null, draw a outline using the specified color.
@@ -785,6 +810,21 @@ namespace Extract.Imaging.Forms
                     graphics.DrawPolygon(
                         ExtractPens.GetThickDashedPen(_outlineColor.Value), vertices);
                 }
+
+                if (BorderColor != null)
+                {
+                    Pen pen = ExtractPens.GetThickPen(BorderColor.Value);
+
+                    Point start;
+                    Point end;
+                    int height;
+                    GetVerticesForPen(pen, out start, out end, out height);
+
+                    Point[] vertices = GeometryMethods.GetVertices(start, end, height);
+
+                    ImageViewer.Transform.TransformPoints(vertices);
+                    graphics.DrawPolygon(pen, vertices);
+                }
             }
         }
 
@@ -802,7 +842,7 @@ namespace Extract.Imaging.Forms
                 // Ensure the highlight is on the active page            
                 ImageViewer imageViewer = base.ImageViewer;
                 return imageViewer != null && imageViewer.PageNumber == PageNumber &&
-                    _region.IsVisible(point);
+                       _region.IsVisible(point);
             }
             catch (Exception ex)
             {
@@ -848,13 +888,13 @@ namespace Extract.Imaging.Forms
                     // is to the top-left/bottom-right of the center.
                     return gripPoints[gripHandleId].X < center[0].X ^ 
                            gripPoints[gripHandleId].Y < center[0].Y
-                        ? Cursors.SizeNESW : Cursors.SizeNWSE;
+                               ? Cursors.SizeNESW : Cursors.SizeNWSE;
                 }
 
                 // Get the angle in degrees between the highlight's 
                 // center and the center of the selected grip handle.
                 double angle = GeometryMethods.GetAngle(center[0], gripPoints[gripHandleId])
-                    * 180.0 / Math.PI;
+                               * 180.0 / Math.PI;
 
                 // Express the angle as a positive number greater than 22.5
                 // NOTE: This is done so that when the number is divided by 45,
@@ -991,9 +1031,10 @@ namespace Extract.Imaging.Forms
                 else
                 {
                     // Set the cross cursor if necessary
-                    base.ImageViewer.Cursor = modifiers == Keys.Control ?
-                        ExtractCursors.ActiveRotate
-                        : base.ImageViewer.GetSelectionCursor(mouseX, mouseY);
+                    base.ImageViewer.Cursor =
+                        modifiers == Keys.Control
+                            ? ExtractCursors.ActiveRotate
+                            : base.ImageViewer.GetSelectionCursor(mouseX, mouseY);
 
                     // Restructure the highlight so that the selected 
                     // grip handle is the end point of the highlight.
@@ -1135,15 +1176,15 @@ namespace Extract.Imaging.Forms
                     }
                 }
                 else if (!_originalIsAngular &&
-                    (imageViewer.Cursor == Cursors.SizeNWSE
-                    || imageViewer.Cursor == Cursors.SizeNESW))
+                         (imageViewer.Cursor == Cursors.SizeNWSE
+                          || imageViewer.Cursor == Cursors.SizeNESW))
                 {
                     // This is a corner resize event
                     TrackingData.UpdateRectangle(mouse[0].X, mouse[0].Y);
 
                     // Get the y-coordinate for the raster points
                     int y = (int)(TrackingData.Rectangle.Y
-                        + TrackingData.Rectangle.Height / 2.0 + 0.5);
+                                  + TrackingData.Rectangle.Height / 2.0 + 0.5);
 
                     // Set the spatial data for the highlight
                     QuietSetSpatialData(new Point(TrackingData.Rectangle.X, y),
@@ -1203,14 +1244,19 @@ namespace Extract.Imaging.Forms
         /// that should be the new end point.</param>
         void MakeGripHandleEndPoint(Point[] gripHandles, int gripHandleId)
         {
+            Point start;
+            Point end;
+            int height;
+            GetVerticesForPen(SelectionPen, out start, out end, out height);
+
             // If this grip handle is already the end point, we are done.
-            if (gripHandles[gripHandleId] == _endPoint)
+            if (gripHandles[gripHandleId] == end)
             {
                 return;
             }
 
             // Check if this grip handle is the start point
-            if (gripHandles[gripHandleId] == _startPoint)
+            if (gripHandles[gripHandleId] == start)
             {
                 // Swap the start point and end point
                 QuietSetSpatialData(_endPoint, gripHandles[gripHandleId], _height);
@@ -1223,13 +1269,11 @@ namespace Extract.Imaging.Forms
             // Find the other endpoint.
             for (int i = 0; i < gripHandles.Length; i++)
             {
-                if (gripHandleId != i && 
-                    gripHandles[i] != _startPoint && gripHandles[i] != _endPoint)
+                if (gripHandleId != i && gripHandles[i] != start && gripHandles[i] != end)
                 {
                     // Define the new highlight
-                    QuietSetSpatialData(gripHandles[i], gripHandles[gripHandleId], (int)
-                        (Math.Sqrt(Math.Pow(_startPoint.X - _endPoint.X, 2) +
-                        Math.Pow(_startPoint.Y - _endPoint.Y, 2) + 0.5)));
+                    QuietSetSpatialData(gripHandles[i], gripHandles[gripHandleId],
+                        (int) GeometryMethods.Distance(_startPoint, _endPoint));
 
                     // Done.
                     return;
@@ -1622,10 +1666,15 @@ namespace Extract.Imaging.Forms
                     return new Point[] { center };
                 }
 
+                Point start;
+                Point end;
+                int height;
+                GetVerticesForPen(SelectionPen, out start, out end, out height);
+
                 // Calculate the vertical and horizontal modifiers. These are the values to add and 
                 // subtract from the center to determine the "top" and "bottom" of the rectangle.
-                double xModifier = _height / 2.0 * Math.Sin(_angle);
-                double yModifier = _height / 2.0 * Math.Cos(_angle);
+                double xModifier = height / 2.0 * Math.Sin(_angle);
+                double yModifier = height / 2.0 * Math.Cos(_angle);
 
                 // Calculate the grip handles
                 Point[] gripHandles;
@@ -1633,27 +1682,27 @@ namespace Extract.Imaging.Forms
                 {
                     // This is a rectangular highlight. There should be eight grip handles.
                     gripHandles = new Point[] 
-                {
-                    _startPoint,
-                    new Point((int)(center.X - xModifier + 0.5), (int)(center.Y + yModifier + 0.5)),
-                    _endPoint,
-                    new Point((int)(center.X + xModifier + 0.5), (int)(center.Y - yModifier + 0.5)),
-                    new Point((int)(_startPoint.X + xModifier + 0.5), (int)(_startPoint.Y - yModifier + 0.5)),
-                    new Point((int)(_startPoint.X - xModifier + 0.5), (int)(_startPoint.Y + yModifier + 0.5)),
-                    new Point((int)(_endPoint.X - xModifier + 0.5), (int)(_endPoint.Y + yModifier + 0.5)),
-                    new Point((int)(_endPoint.X + xModifier + 0.5), (int)(_endPoint.Y - yModifier + 0.5))
-                };
+                        {
+                            start,
+                            new Point((int)(center.X - xModifier + 0.5), (int)(center.Y + yModifier + 0.5)),
+                            end,
+                            new Point((int)(center.X + xModifier + 0.5), (int)(center.Y - yModifier + 0.5)),
+                            new Point((int)(start.X + xModifier + 0.5), (int)(start.Y - yModifier + 0.5)),
+                            new Point((int)(start.X - xModifier + 0.5), (int)(start.Y + yModifier + 0.5)),
+                            new Point((int)(end.X - xModifier + 0.5), (int)(end.Y + yModifier + 0.5)),
+                            new Point((int)(end.X + xModifier + 0.5), (int)(end.Y - yModifier + 0.5))
+                        };
                 }
                 else
                 {
                     // This is an angular highlight. There should be four grip handles.
                     gripHandles = new Point[] 
-                {
-                    _startPoint,
-                    new Point((int)(center.X - xModifier + 0.5), (int)(center.Y + yModifier + 0.5)),
-                    _endPoint,
-                    new Point((int)(center.X + xModifier + 0.5), (int)(center.Y - yModifier + 0.5))
-                };
+                        {
+                            start,
+                            new Point((int)(center.X - xModifier + 0.5), (int)(center.Y + yModifier + 0.5)),
+                            end,
+                            new Point((int)(center.X + xModifier + 0.5), (int)(center.Y - yModifier + 0.5))
+                        };
                 }
 
                 // Return the grip handles
@@ -1663,6 +1712,72 @@ namespace Extract.Imaging.Forms
             {
                 throw ExtractException.AsExtractException("ELI22408", ex);
             }
+        }
+
+        /// <summary>
+        /// Retrieves the vertices of the selection border in logical (image) coordinates.
+        /// </summary>
+        /// <returns>The vertices of the selection border in logical (image) coordinates.</returns>
+        public override Point[] GetGripVertices()
+        {
+            try
+            {
+                // Get the center point of the highlight
+                Point center = GetCenterPoint();
+
+                // Handle the special case of an empty highlight
+                if (_startPoint == _endPoint)
+                {
+                    return new Point[] { center };
+                }
+
+                Point start;
+                Point end;
+                int height;
+                GetVerticesForPen(SelectionPen, out start, out end, out height);
+
+                // Calculate the vertical and horizontal modifiers. These are the values to add and 
+                // subtract from the center to determine the "top" and "bottom" of the rectangle.
+                double xModifier = height / 2.0 * Math.Sin(_angle);
+                double yModifier = height / 2.0 * Math.Cos(_angle);
+
+                // Calculate the grip vertices
+                Point[] vertices = new Point[] 
+                    {
+                        new Point((int)(start.X + xModifier + 0.5), (int)(start.Y - yModifier + 0.5)),
+                        new Point((int)(start.X - xModifier + 0.5), (int)(start.Y + yModifier + 0.5)),
+                        new Point((int)(end.X - xModifier + 0.5), (int)(end.Y + yModifier + 0.5)),
+                        new Point((int)(end.X + xModifier + 0.5), (int)(end.Y - yModifier + 0.5))
+                    };
+
+                return vertices;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28783", ex);
+            }
+        }
+
+        /// <summary>
+        /// Expands the points of a zone by half the width of the specified pen.
+        /// </summary>
+        /// <param name="pen">The pen to use. Its width is expressed in client pixels.</param>
+        /// <param name="start">The start point of the zone in image pixels.</param>
+        /// <param name="end">The end point of the zone in image pixels.</param>
+        /// <param name="height">The height of the zone in image pixels.</param>
+        void GetVerticesForPen(Pen pen, out Point start, out Point end, out int height)
+        {
+            // Get the number of image pixels by which to expand
+            double expandBy = pen.Width / 2.0 / ImageViewer.GetScaleFactorY();
+
+            // Get the amount to modify the points
+            Size delta = 
+                new Size((int)(expandBy * Math.Cos(_angle)), (int)(expandBy * Math.Sin(_angle)));
+
+            // Expand the zone by expandBy pixels on all sides
+            start = _startPoint - delta;
+            end = _endPoint + delta;
+            height = _height + (int)(expandBy * 2.0);
         }
 
         /// <summary>
@@ -1726,7 +1841,7 @@ namespace Extract.Imaging.Forms
             writer.WriteEndElement();
         }
 
-        #endregion
+        #endregion Methods
 
         #region IDisposable Members
 
@@ -1888,7 +2003,7 @@ namespace Extract.Imaging.Forms
             return highlight1.CompareTo(highlight2) > 0;
         }
 
-        #endregion
+        #endregion IComparable<Highlight> Members
 
         #region IXmlSerializable Members
 
