@@ -4,6 +4,7 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using UCLID_COMUTILSLib;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
@@ -173,11 +174,24 @@ namespace Extract.Redaction.Verification
             }
             set
             {
-                if (_redacted != value)
+                try
                 {
-                    _redacted = value;
+                    if (_redacted != value)
+                    {
+                        _redacted = value;
 
-                    _redactedDirty = true;
+                        Color color = _redacted ? Color.CornflowerBlue : Color.Transparent;
+                        foreach (RedactionLayerObject redaction in _layerObjects)
+                        {
+                            redaction.Color = color;
+                        }
+
+                        _redactedDirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28799", ex);
                 }
             }
         }
@@ -438,7 +452,7 @@ namespace Extract.Redaction.Verification
 
                 // Get the data for the row from the attribute
                 List<LayerObject> layerObjects = 
-                    GetLayerObjectsFromSpatialString(value, imageViewer, item.Level);
+                    GetLayerObjectsFromSpatialString(value, imageViewer, item);
                 string text = StringMethods.ConvertLiteralToDisplay(value.String);
                 string category = attribute.Category;
                 string type = attribute.RedactionType;
@@ -599,16 +613,17 @@ namespace Extract.Redaction.Verification
         /// <param name="spatialString">The spatial string from which to create the layer objects.
         /// </param>
         /// <param name="imageViewer">The image viewer on which the spatial string appears.</param>
-        /// <param name="level">The confidence level of the layer objects to create.</param>
+        /// <param name="item">Sensitive data that corresponds to the 
+        /// <paramref name="spatialString"/>.</param>
         /// <returns>Layer objects that correspond to <paramref name="spatialString"/>.</returns>
         static List<LayerObject> GetLayerObjectsFromSpatialString(SpatialString spatialString,
-            ImageViewer imageViewer, ConfidenceLevel level)
+            ImageViewer imageViewer, SensitiveItem item)
         {
             // Get the raster zones of the spatial string, organized by page
             Dictionary<int, List<RasterZone>> pagesToZones = GetRasterZonesByPage(spatialString);
 
             // Create a layer object for each page of raster zones
-            return CreateLayerObjects(pagesToZones, imageViewer, level);
+            return CreateLayerObjects(pagesToZones, imageViewer, item);
         }
 
         /// <summary>
@@ -655,11 +670,12 @@ namespace Extract.Redaction.Verification
         /// <see cref="LayerObject"/>s.</param>
         /// <param name="imageViewer">The image viewer to which each <see cref="LayerObject"/> 
         /// will be associated.</param>
-        /// <param name="level">The confidence level of the layer objects to create.</param>
+        /// <param name="item">The sensitive item that corresponds to the layer objects to create.
+        /// </param>
         /// <returns>A <see cref="List{T}"/> of <see cref="LayerObject"/> created from the 
         /// specified raster zones, one for each page of <paramref name="pagesToZones"/>.</returns>
         static List<LayerObject> CreateLayerObjects(Dictionary<int, List<RasterZone>> pagesToZones,
-            ImageViewer imageViewer, ConfidenceLevel level)
+            ImageViewer imageViewer, SensitiveItem item)
         {
             // Iterate over each raster zone
             LayerObject previous = null;
@@ -669,8 +685,9 @@ namespace Extract.Redaction.Verification
                 // Create a redaction and add it to the result collection
                 RedactionLayerObject redaction = new RedactionLayerObject(imageViewer,
                     pair.Key, new string[] { "Redaction" }, pair.Value);
-                redaction.Color = level.Color;
-                redaction.CanRender = level.Output;
+                redaction.BorderColor = item.Level.Color;
+                redaction.Color = item.Attribute.Redacted ? Color.CornflowerBlue : Color.Transparent;
+                redaction.CanRender = item.Level.Output;
 
                 layerObjects.Add(redaction);
 

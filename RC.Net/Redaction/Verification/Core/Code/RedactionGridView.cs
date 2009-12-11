@@ -1821,6 +1821,33 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="DataGridView.CellContentClick"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="DataGridView.CellContentClick"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="DataGridView.CellContentClick"/> event.</param>
+        void HandleDataGridViewCellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                if (e.RowIndex >= 0)
+                {
+                    if (IsRedactedColumn(e.ColumnIndex))
+                    {
+                        _dirty = true;
+
+                        CommitChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI28800", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region IImageViewerControl Members
