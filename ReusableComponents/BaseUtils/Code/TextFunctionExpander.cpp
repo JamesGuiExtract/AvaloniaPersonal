@@ -27,8 +27,7 @@ public:
 //-------------------------------------------------------------------------------------------------
 // Static initialization
 //-------------------------------------------------------------------------------------------------
-CMutex TextFunctionExpander::ms_RandomMutex;
-auto_ptr<Random> TextFunctionExpander::msap_Rand;
+Random TextFunctionExpander::ms_Rand;
 
 //-------------------------------------------------------------------------------------------------
 // TextFunctionExpander
@@ -609,16 +608,8 @@ const string TextFunctionExpander::expandRandomAlphaNumeric(const string &str) c
 	// Get the length from the argument
 	long nLength = asLong(str);
 
-	// Lock the mutex
-	CSingleLock lg(&ms_RandomMutex, TRUE);
-
-	if (msap_Rand.get() == NULL)
-	{
-		msap_Rand.reset(new Random(true, true, true, true));
-	}
-
 	// Return a random string of nLength containing only upper case letters and digits
-	return msap_Rand->getRandomString(nLength, true, false, true);
+	return ms_Rand.getRandomString(nLength, true, false, true);
 }
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandUserName(const string& str) const

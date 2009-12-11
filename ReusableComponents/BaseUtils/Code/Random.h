@@ -4,7 +4,6 @@
 			This class taken from/based on http://www.dreamincode.net/code/snippet342.htm
 			This class is designed to produce random numbers in a specific range
 			with a higher resolution and longer cycle time than the built in rand() function.
-NOTE: Instances of this class are not thread safe.
 
   Random number generator class
   =============================
@@ -38,6 +37,7 @@ NOTE: Instances of this class are not thread safe.
 #pragma once
 #include "BaseUtils.h"
 
+#include <afxmt.h>
 #include <string>
 
 using namespace std;
@@ -53,29 +53,18 @@ class EXPORT_BaseUtils Random
 	static const unsigned long MAX = 0xffffffffUL;
 
 public:
-	// Creates the class and intializes the seed based upon the settings
-	// If bUseTime == true then the time will be used as part of the seed value
-	// If bUseMachineName == true then the machine name will be used as part of the seed value
-	// If bUseMACAddress == true then the MAC address will be used as part of the seed value
-	// If bUseFreeDiskSpace == true then the free disk space on the drive containing the TEMP
-	//	  folder will be used as part of the seed value
-	Random(bool bUseTime = false, bool bUseMachineName = false,
-		bool bUseMACAddress = false, bool bUseFreeDiskSpace = false);
-
-	// Creates the class and initializes the seed
-	Random(unsigned long seed);
+	// Creates the class and intializes the seed based upon the process ID,
+	// the machine name, the MAC address, the free disk space on the drive
+	// containing the TEMP folder, and the current time
+	Random();
 
 	// Resets the Random object with new seed value, returns true if the object is reseeded
-	bool reseed(unsigned long seed);
+	void reseed(unsigned long seed);
 
-	// Resets the Random object with a computed seed value based upon the settings and
-	// returns true if the object is reseeded, false otherwise
-	// If bUseTime == true then the time will be used as part of the seed value
-	// If bUseMachineName == true then the machine name will be used as part of the seed value
-	// If bUseMACAddress == true then the MAC address will be used as part of the seed value
-	// If bUseFreeDiskSpace == true then the free disk space on the drive containing the TEMP
-	//	  folder will be used as part of the seed value
-	bool reseed(bool bUseTime, bool bUseMachineName, bool bUseMACAddress, bool bUseFreeDiskSpace);
+	// Resets the Random object with a computed seed value based upon the process ID,
+	// the machine name, the MAC address, the free disk space on the drive
+	// containing the TEMP folder, and the current time
+	void reseed();
 
 	// Return a uniform deviate in the range [0,1)
 	double uniform();
@@ -86,9 +75,6 @@ public:
 	// Return a uniform deviate in the range [lo,hi)
 	unsigned long uniform(unsigned long lo, unsigned long hi);
 
-	// Returns true if the object has been initialized false otherwise
-	bool isInitialized() { return _next != -1; }
-
 	// Returns a random string of nLength containing only the characters specified
 	// by the settings.  If bUpperCase == true then [A-Z] may be included in the
 	// return string, if bLowerCase == true then [a-z] may be included in the return string,
@@ -98,9 +84,15 @@ public:
 
 private:
 
-	unsigned long _x[N]; // Random number pool
-	int           _next; // Current pool index
+	static unsigned long m_ulx[N]; // Random number pool
+	static int           m_nNext; // Current pool index
 
 	void seedgen(unsigned long seed);
 	unsigned long randgen();
+
+	// The internal function to return the uniform random number
+	double internalUniform();
+
+	// Mutex to provide thread safety
+	static CMutex ms_Mutex;
 };

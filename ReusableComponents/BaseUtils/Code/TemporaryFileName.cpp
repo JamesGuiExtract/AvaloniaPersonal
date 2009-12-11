@@ -21,8 +21,7 @@ const string gmutMUTEX_NAME = "Global\\260BA215-4090-4172-B696-FC86B52269B4";
 TemporaryFileName::TemporaryFileName(const char *pszPrefix, 
 									 const char *pszSuffix, bool bAutoDelete) :
 m_strFileName(""),
-m_bAutoDelete(bAutoDelete),
-m_Rand(true)
+m_bAutoDelete(bAutoDelete)
 {
 	try
 	{
@@ -34,8 +33,7 @@ m_Rand(true)
 TemporaryFileName::TemporaryFileName(const string& strDir, const char *pszPrefix, 
 									 const char *pszSuffix, bool bAutoDelete) :
 m_strFileName(""),
-m_bAutoDelete(bAutoDelete),
-m_Rand(true)
+m_bAutoDelete(bAutoDelete)
 {
 	try
 	{

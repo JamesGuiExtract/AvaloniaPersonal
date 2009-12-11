@@ -96,9 +96,6 @@ private:
 	const string expandFullUserName(const string& str) const;
 	const string expandTrimAndConsolidateWS(const string& str) const;
 
-	// Mutex for the Random object
-	static CMutex ms_RandomMutex;
-
 	// Random object used for "$RandomAlphaNumeric()" calls
-	static auto_ptr<Random> msap_Rand;
+	static Random ms_Rand;
 };
