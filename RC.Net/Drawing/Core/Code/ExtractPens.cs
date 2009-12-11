@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Text;
 
 namespace Extract.Drawing
 {
@@ -17,12 +16,17 @@ namespace Extract.Drawing
         /// <summary>
         /// A collection of pens, keyed by color.
         /// </summary>
-        static Dictionary<Color, Pen> _pens = new Dictionary<Color, Pen>();
+        static readonly Dictionary<Color, Pen> _pens = new Dictionary<Color, Pen>();
+
+        /// <summary>
+        /// A collection of thick pens, keyed by color.
+        /// </summary>
+        static readonly Dictionary<Color, Pen> _thickPens = new Dictionary<Color, Pen>();
 
         /// <summary>
         /// A collection of thick dashed pens, keyed by color.
         /// </summary>
-        static Dictionary<Color, Pen> _thickDashedPens = new Dictionary<Color, Pen>();
+        static readonly Dictionary<Color, Pen> _thickDashedPens = new Dictionary<Color, Pen>();
 
         /// <summary>
         /// A pen that draws a dashed black line.
@@ -37,17 +41,22 @@ namespace Extract.Drawing
         /// <summary>
         /// Mutex object to provide exclusive access to the dashed and dotted pens
         /// </summary>
-        static object _lockDashedAndDotted = new object();
+        static readonly object _lockDashedAndDotted = new object();
 
         /// <summary>
         /// Mutex object to provide exclusive access to the pens collections
         /// </summary>
-        static object _lockPens = new object();
+        static readonly object _lockPens = new object();
+
+        /// <summary>
+        /// Mutex object to provide exclusive access to the thick pens collections
+        /// </summary>
+        static readonly object _lockThick = new object();
 
         /// <summary>
         /// Mutex object to provide exclusive access to the thick dashed pens collections
         /// </summary>
-        static object _lockThickDashed = new object();
+        static readonly object _lockThickDashed = new object();
 
         #endregion ExtractPens Fields
 
@@ -132,6 +141,36 @@ namespace Extract.Drawing
         }
 
         /// <summary>
+        /// Creates a thick pen from the specified color.
+        /// </summary>
+        /// <param name="color">The color of the pen to create.</param>
+        /// <returns>A thick pen from the specified color.</returns>
+        public static Pen GetThickPen(Color color)
+        {
+            try
+            {
+                // Mutex around collection to prevent multiple reads and writes
+                Pen thickPen;
+                lock (_lockThick)
+                {
+                    // Check if the pen has already been created
+                    if (!_thickPens.TryGetValue(color, out thickPen))
+                    {
+                        // Create the pen
+                        thickPen = new Pen(color, 5);
+                        _thickPens.Add(color, thickPen);
+                    }
+                }
+
+                return thickPen;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26492", ex);
+            }
+        }
+
+        /// <summary>
         /// Creates a dashed pen with a certain thickness from the specified color.
         /// </summary>
         /// <param name="color">The color of the dashed pen to create.</param>
@@ -181,6 +220,11 @@ namespace Extract.Drawing
                         _dottedBlack.Dispose();
                         _dottedBlack = null;
                     }
+                }
+
+                lock (_lockThick)
+                {
+                    CollectionMethods.ClearAndDispose(_thickPens);
                 }
 
                 lock (_lockThickDashed)
