@@ -63,11 +63,14 @@ namespace Extract.Redaction.Verification
             System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+            System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
             TD.SandDock.DockContainer dockContainer;
             System.Windows.Forms.ToolStripContainer imageViewerToolStripContainer;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+            System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
+            System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
             TD.SandDock.DockContainer dockContainer1;
             this._commentsTextBox = new System.Windows.Forms.TextBox();
             this._currentDocumentTextBox = new System.Windows.Forms.TextBox();
@@ -97,7 +100,6 @@ namespace Extract.Redaction.Verification
             this._exemptionsToolStrip = new System.Windows.Forms.ToolStrip();
             this._applyExemptionToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._lastExemptionToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this._tagFileToolStripButton = new Extract.FileActionManager.Forms.TagFileToolStripButton();
             this._dataWindowDockableWindow = new TD.SandDock.DockableWindow();
             this._sandDockManager = new TD.SandDock.SandDockManager();
@@ -123,12 +125,10 @@ namespace Extract.Redaction.Verification
             this._zoomNextToolStripButton = new Extract.Imaging.Forms.ZoomNextToolStripButton();
             this._fitToPageToolStripButton = new Extract.Imaging.Forms.FitToPageToolStripButton();
             this._fitToWidthToolStripButton = new Extract.Imaging.Forms.FitToWidthToolStripButton();
-            this._rotateCounterclockwiseToolStripButton = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton();
-            this._rotateClockwiseToolStripButton = new Extract.Imaging.Forms.RotateClockwiseToolStripButton();
-            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this._previousTileToolStripButton = new Extract.Imaging.Forms.PreviousTileToolStripButton();
             this._nextTileToolStripButton = new Extract.Imaging.Forms.NextTileToolStripButton();
-            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            this._rotateCounterclockwiseToolStripButton = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton();
+            this._rotateClockwiseToolStripButton = new Extract.Imaging.Forms.RotateClockwiseToolStripButton();
             this._thumbnailsToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
@@ -142,11 +142,14 @@ namespace Extract.Redaction.Verification
             toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             dockContainer = new TD.SandDock.DockContainer();
             imageViewerToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
+            toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
             dockContainer1 = new TD.SandDock.DockContainer();
             dataGridToolStripContainer.ContentPanel.SuspendLayout();
             dataGridToolStripContainer.TopToolStripPanel.SuspendLayout();
@@ -176,7 +179,7 @@ namespace Extract.Redaction.Verification
             // dataGridToolStripContainer.ContentPanel
             // 
             dataGridToolStripContainer.ContentPanel.Controls.Add(splitContainer1);
-            dataGridToolStripContainer.ContentPanel.Size = new System.Drawing.Size(527, 782);
+            dataGridToolStripContainer.ContentPanel.Size = new System.Drawing.Size(527, 821);
             dataGridToolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             dataGridToolStripContainer.Location = new System.Drawing.Point(0, 0);
             dataGridToolStripContainer.Name = "dataGridToolStripContainer";
@@ -213,8 +216,8 @@ namespace Extract.Redaction.Verification
             splitContainer1.Panel2.Controls.Add(label4);
             splitContainer1.Panel2.Controls.Add(this._pageSummaryView);
             splitContainer1.Panel2MinSize = 50;
-            splitContainer1.Size = new System.Drawing.Size(527, 782);
-            splitContainer1.SplitterDistance = 483;
+            splitContainer1.Size = new System.Drawing.Size(527, 821);
+            splitContainer1.SplitterDistance = 507;
             splitContainer1.TabIndex = 0;
             // 
             // _commentsTextBox
@@ -224,6 +227,7 @@ namespace Extract.Redaction.Verification
             this._commentsTextBox.Location = new System.Drawing.Point(7, 106);
             this._commentsTextBox.Multiline = true;
             this._commentsTextBox.Name = "_commentsTextBox";
+            this._commentsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._commentsTextBox.Size = new System.Drawing.Size(513, 58);
             this._commentsTextBox.TabIndex = 6;
             this._commentsTextBox.TextChanged += new System.EventHandler(this.HandleCommentsTextBoxTextChanged);
@@ -285,7 +289,7 @@ namespace Extract.Redaction.Verification
             this._redactionGridView.ImageViewer = null;
             this._redactionGridView.Location = new System.Drawing.Point(7, 170);
             this._redactionGridView.Name = "_redactionGridView";
-            this._redactionGridView.Size = new System.Drawing.Size(513, 312);
+            this._redactionGridView.Size = new System.Drawing.Size(513, 336);
             this._redactionGridView.TabIndex = 0;
             this._redactionGridView.ExemptionsApplied += new System.EventHandler<Extract.Redaction.Verification.ExemptionsAppliedEventArgs>(this.HandleRedactionGridViewExemptionsApplied);
             // 
@@ -307,7 +311,7 @@ namespace Extract.Redaction.Verification
             this._pageSummaryView.Location = new System.Drawing.Point(7, 19);
             this._pageSummaryView.MinimumSize = new System.Drawing.Size(100, 100);
             this._pageSummaryView.Name = "_pageSummaryView";
-            this._pageSummaryView.Size = new System.Drawing.Size(513, 266);
+            this._pageSummaryView.Size = new System.Drawing.Size(513, 281);
             this._pageSummaryView.TabIndex = 0;
             this._pageSummaryView.TabStop = false;
             // 
@@ -530,11 +534,11 @@ namespace Extract.Redaction.Verification
             this._exemptionsToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._applyExemptionToolStripButton,
             this._lastExemptionToolStripButton,
-            this.toolStripSeparator3,
+            toolStripSeparator3,
             this._tagFileToolStripButton});
-            this._exemptionsToolStrip.Location = new System.Drawing.Point(24, 63);
+            this._exemptionsToolStrip.Location = new System.Drawing.Point(207, 24);
             this._exemptionsToolStrip.Name = "_exemptionsToolStrip";
-            this._exemptionsToolStrip.Size = new System.Drawing.Size(126, 39);
+            this._exemptionsToolStrip.Size = new System.Drawing.Size(157, 39);
             this._exemptionsToolStrip.TabIndex = 1;
             // 
             // _applyExemptionToolStripButton
@@ -561,8 +565,8 @@ namespace Extract.Redaction.Verification
             // 
             // toolStripSeparator3
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 39);
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new System.Drawing.Size(6, 39);
             // 
             // _tagFileToolStripButton
             // 
@@ -812,10 +816,10 @@ namespace Extract.Redaction.Verification
             toolStripSeparator6,
             this._previousTileToolStripButton,
             this._nextTileToolStripButton,
-            this.toolStripSeparator9,
+            toolStripSeparator9,
             this._rotateCounterclockwiseToolStripButton,
             this._rotateClockwiseToolStripButton,
-            this.toolStripSeparator10,
+            toolStripSeparator10,
             this._thumbnailsToolStripButton});
             this._viewCommandsToolStrip.Location = new System.Drawing.Point(470, 0);
             this._viewCommandsToolStrip.Name = "_viewCommandsToolStrip";
@@ -898,33 +902,6 @@ namespace Extract.Redaction.Verification
             toolStripSeparator6.Name = "toolStripSeparator6";
             toolStripSeparator6.Size = new System.Drawing.Size(6, 39);
             // 
-            // _rotateCounterclockwiseToolStripButton
-            // 
-            this._rotateCounterclockwiseToolStripButton.BaseToolTipText = "Rotate counterclockwise";
-            this._rotateCounterclockwiseToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._rotateCounterclockwiseToolStripButton.Enabled = false;
-            this._rotateCounterclockwiseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._rotateCounterclockwiseToolStripButton.ImageViewer = null;
-            this._rotateCounterclockwiseToolStripButton.Name = "_rotateCounterclockwiseToolStripButton";
-            this._rotateCounterclockwiseToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._rotateCounterclockwiseToolStripButton.Text = "Rotate counterclockwise";
-            // 
-            // _rotateClockwiseToolStripButton
-            // 
-            this._rotateClockwiseToolStripButton.BaseToolTipText = "Rotate clockwise";
-            this._rotateClockwiseToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._rotateClockwiseToolStripButton.Enabled = false;
-            this._rotateClockwiseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._rotateClockwiseToolStripButton.ImageViewer = null;
-            this._rotateClockwiseToolStripButton.Name = "_rotateClockwiseToolStripButton";
-            this._rotateClockwiseToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._rotateClockwiseToolStripButton.Text = "Rotate clockwise";
-            // 
-            // toolStripSeparator9
-            // 
-            this.toolStripSeparator9.Name = "toolStripSeparator9";
-            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 39);
-            // 
             // _previousTileToolStripButton
             // 
             this._previousTileToolStripButton.BaseToolTipText = "Previous tile";
@@ -947,10 +924,37 @@ namespace Extract.Redaction.Verification
             this._nextTileToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextTileToolStripButton.Text = "nextTileToolStripButton1";
             // 
+            // toolStripSeparator9
+            // 
+            toolStripSeparator9.Name = "toolStripSeparator9";
+            toolStripSeparator9.Size = new System.Drawing.Size(6, 39);
+            // 
+            // _rotateCounterclockwiseToolStripButton
+            // 
+            this._rotateCounterclockwiseToolStripButton.BaseToolTipText = "Rotate counterclockwise";
+            this._rotateCounterclockwiseToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._rotateCounterclockwiseToolStripButton.Enabled = false;
+            this._rotateCounterclockwiseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._rotateCounterclockwiseToolStripButton.ImageViewer = null;
+            this._rotateCounterclockwiseToolStripButton.Name = "_rotateCounterclockwiseToolStripButton";
+            this._rotateCounterclockwiseToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._rotateCounterclockwiseToolStripButton.Text = "Rotate counterclockwise";
+            // 
+            // _rotateClockwiseToolStripButton
+            // 
+            this._rotateClockwiseToolStripButton.BaseToolTipText = "Rotate clockwise";
+            this._rotateClockwiseToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._rotateClockwiseToolStripButton.Enabled = false;
+            this._rotateClockwiseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._rotateClockwiseToolStripButton.ImageViewer = null;
+            this._rotateClockwiseToolStripButton.Name = "_rotateClockwiseToolStripButton";
+            this._rotateClockwiseToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._rotateClockwiseToolStripButton.Text = "Rotate clockwise";
+            // 
             // toolStripSeparator10
             // 
-            this.toolStripSeparator10.Name = "toolStripSeparator10";
-            this.toolStripSeparator10.Size = new System.Drawing.Size(6, 39);
+            toolStripSeparator10.Name = "toolStripSeparator10";
+            toolStripSeparator10.Size = new System.Drawing.Size(6, 39);
             // 
             // _thumbnailsToolStripButton
             // 
@@ -1007,7 +1011,9 @@ namespace Extract.Redaction.Verification
             this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "VerificationTaskForm";
             this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ID Shield Verification (Waiting for file)";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             dataGridToolStripContainer.ContentPanel.ResumeLayout(false);
             dataGridToolStripContainer.TopToolStripPanel.ResumeLayout(false);
             dataGridToolStripContainer.TopToolStripPanel.PerformLayout();
@@ -1103,12 +1109,9 @@ namespace Extract.Redaction.Verification
         private Extract.Imaging.Forms.ImageViewerStatusStrip _imageViewerStatusStrip;
         private System.Windows.Forms.ToolStripMenuItem _toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _optionsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
         private System.Windows.Forms.ToolStripButton _thumbnailsToolStripButton;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private Extract.FileActionManager.Forms.TagFileToolStripButton _tagFileToolStripButton;
         private Extract.Imaging.Forms.PreviousTileToolStripButton _previousTileToolStripButton;
         private Extract.Imaging.Forms.NextTileToolStripButton _nextTileToolStripButton;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
     }
 }
