@@ -1,4 +1,5 @@
 using Extract.AttributeFinder;
+using Extract.Drawing;
 using Extract.FileActionManager.Forms;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Security.Permissions;
@@ -48,7 +50,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(VerificationTaskForm).ToString();
+        static readonly string _OBJECT_NAME = typeof(VerificationTaskForm).ToString();
 
         #endregion Constants
 
@@ -182,6 +184,9 @@ namespace Extract.Redaction.Verification
                 SetVerificationOptions(options);
 
                 _currentVoa = new RedactionFileLoader(_iniSettings.ConfidenceLevels);
+
+                // Set the selection pen
+                LayerObject.SelectionPen = ExtractPens.GetThickPen(Color.Red);
 
                 // Subscribe to layer object events
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
