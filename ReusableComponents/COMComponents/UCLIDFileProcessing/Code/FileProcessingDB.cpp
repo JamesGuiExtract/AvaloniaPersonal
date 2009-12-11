@@ -2442,7 +2442,6 @@ STDMETHODIMP CFileProcessingDB::SetFileActionComment(long nFileID, long nActionI
 
 		// Get the comment
 		string strComment = asString(bstrComment);
-		replaceVariable(strComment, "'", "''");
 
 		// Get the current user name
 		string strUserName = getCurrentUserName();
