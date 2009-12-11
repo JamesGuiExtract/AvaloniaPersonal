@@ -76,7 +76,8 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"
-RegAsm "$(TargetPath)" /tlb</PostBuildEvent>
+    <PostBuildEvent>RegAsm "$(TargetPath)" /tlb:"$(TargetDir)$(TargetName).tlb"
+Call CommonDebugPostBuild.bat "$(TargetPath)"
+</PostBuildEvent>
   </PropertyGroup>
 </Project>
