@@ -178,6 +178,23 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			processing files.</li>
 		</ul>
 <p>
+		<li><b>Longer timeout during restart of machine</b>
+		<ul>
+			<li>Confirm on the database machine that the database is clear.
+			<li>Create one FPS file configured for AutoStart.
+			<li>Provide several large (20-30+ pages) images for processing.
+			<li>Set the service startup type to <b>Automatic</b>.
+			<li>Restart the <b>service machine</b>.</li>
+			<li>Confirm that files are processing.</li>
+			<li><b>Restart</b> the test machine from the Start menu.
+			<li>Confirm that the <b>ESFAMProcess.exe</b> instance 
+			gracefully finishes its processing.</li>
+			<li>Confirm that an Application trace message is logged for 
+			<b>FAM Service stopping</b>.
+			<li>Confirm that an Application trace message is logged for 
+			<b>FAM Service stopped</b>.
+		</ul>
+<p>
 		<li><b>Run multiple FPS files, then gracefully restart the machine</b>
 		<ul>
 			<li>Confirm on the database machine that the database is clear.
