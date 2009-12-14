@@ -18,10 +18,10 @@
 <LI><h2>Source Code Backup - On the Build Machine</h2>
 <UL>
   	<li>Rename the <b>D:\temp</b> folder on the build machine to <b>temp a.b.c.d</b>.
-  	<li>As VSS and/or domain administrator.
+  	<li>As Vault and/or domain administrator.
 	<UL>
-	  	<li>Undo current SourceSafe checkouts.</li>
-	  	<li>Copy the current VSS folder to an appropriately named folder under 
+	  	<li>Undo current checkouts.</li>
+	  	<li>Copy the current source folder to an appropriately named folder under 
 		<b>I:\Common\Engineering\VSSReleaseBuilds</b>.</li>
 	</UL>
 </UL>
@@ -45,8 +45,12 @@
   	<li>Update the <b>I:\Common\Engineering\Tools\SecureClients\COMLicense</b> folder 
 	used to create license files for the new release.
   	<li>Confirm that the new licensing folder cannot be used to create the following 
-	license packages: <b>Disable USB Key Serial Numbers</b>, <b>Rule Development Toolkit</b>, 
-	<b>Simple Rule Writing</b>.
+	license packages: 
+	<ul>
+		<li><b>Disable USB Key Serial Numbers</b>
+		<li><b>Rule Development Toolkit</b>
+		<li><b>Simple Rule Writing</b>
+	</ul>
 </UL>
 <br>
 
