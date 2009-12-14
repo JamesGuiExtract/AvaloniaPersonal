@@ -158,6 +158,7 @@ namespace Extract.Imaging
             this._counterToUseCombo.Name = "_counterToUseCombo";
             this._counterToUseCombo.Size = new System.Drawing.Size(238, 21);
             this._counterToUseCombo.TabIndex = 7;
+            this._counterToUseCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._counterToUseCombo.SelectedIndexChanged += new System.EventHandler(this.HandleUserCounterComboChanged);
             // 
             // _counterToUseLabel

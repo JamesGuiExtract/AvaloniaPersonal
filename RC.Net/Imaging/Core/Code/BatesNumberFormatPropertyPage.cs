@@ -58,7 +58,7 @@ namespace Extract.Imaging
         /// <summary>
         /// The list of values for the counter combo box
         /// </summary>
-        List<string> _counters = new List<string>();
+        List<string> _counters;
 
         #endregion BatesNumberManagerFormatPropertyPage Fields
 
@@ -121,6 +121,7 @@ namespace Extract.Imaging
                 // If counters has been specified, load the list
                 if (counters != null)
                 {
+                    _counters = new List<string>();
                     _counters.AddRange(counters);
                 }
 
@@ -148,11 +149,11 @@ namespace Extract.Imaging
             _digitsUpDown.Value = _format.Digits;
 
             // Update the values based on the counter list
-            if (_counters.Count > 0)
+            if (_counters != null)
             {
                 // Select the appropriate item (if it exists) in the combo box
                 // otherwise just select the first item in the list
-                int index = 0;
+                int index = -1;
                 if (!string.IsNullOrEmpty(_format.DatabaseCounter))
                 {
                     index = _counterToUseCombo.FindString(_format.DatabaseCounter);
@@ -163,8 +164,9 @@ namespace Extract.Imaging
                             "Counter Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information,
                             MessageBoxDefaultButton.Button1, 0);
 
-                        // Set the index to 0 so that the first counter is selected
-                        index = 0;
+                        // Set the index to 0 so that the first counter is selected (if
+                        // no items in the list then use -1 as the index)
+                        index = _counters.Count > 0 ? 0 : -1;
                     }
                 }
 
@@ -379,7 +381,7 @@ namespace Extract.Imaging
             base.OnLoad(e);
 
             // Show/hide controls based on the counters list
-            if (_counters.Count > 0)
+            if (_counters != null)
             {
                 // Fill the combo box with the counters list
                 _counterToUseCombo.Items.AddRange(_counters.ToArray());

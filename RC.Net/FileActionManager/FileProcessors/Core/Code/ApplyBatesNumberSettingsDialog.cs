@@ -305,7 +305,12 @@ namespace Extract.FileActionManager.FileProcessors
 
             // Ensure there is at least 1 item in the list
             int size = names.Size;
-            ExtractException.Assert("ELI27886", "User counter list was empty.", size > 0);
+            if (size == 0)
+            {
+                ExtractException ee = new ExtractException("ELI27886",
+                    "User counter list was empty.");
+                ee.Display();
+            }
 
             // Fill a list of strings with the counter names
             List<string> counterNames = new List<string>(size);
