@@ -75,6 +75,8 @@
 		<li>Exercise LabDE in <b>FAM</b> mode.
 		<li>Confirm that the specified controls are disabled.
 <p>
+		<li>Confirm that the default OCR confidence required for green highlights 
+		is <b>100%</b>.
 		<li>Modify <b>StandardLabDE_Phase1.config</b> in the appropriate Solution
 		folder so that <b>HighlightConfidenceBoundary</b> is set to a number between
 		0 and 100.
@@ -141,7 +143,7 @@
 		</ul>
 	</ul>
 <p>
-	<LI><h3>Menus and Toolbars</h3>
+	<LI><h3>Menus, Toolbars and Caption</h3>
 	<ul>
 		<LI><b>[DataEntry #516]</b> Text for toolbar buttons
 		<ul>
@@ -161,6 +163,18 @@
 	  	   	<LI>Confirm that the swiping tools are still disabled.
        		</ul>
 	   	</LI>
+<p>
+		<LI><b>[DataEntry #740]</b> Filename and action name in window caption
+       		<ul>
+			<li>Create an FPS file to verify images.
+	  	   	<LI>Exercise the FPS file without queuing any files.
+			<li>Confirm that the window caption is <b>Waiting - LabDE 
+			(&lt;action_name&gt;)</b>.
+			<li>Queue some files and exercise the FPS file again.
+			<li>Confirm that the window caption is <b>&lt;SourceDocName&gt; - LabDE 
+			(&lt;action_name&gt;)</b>.
+	       	</ul>
+   		</LI>
 <p>
 		<li>File menu - Stand-alone mode
 		<ul>
@@ -445,6 +459,21 @@
 			<li>Confirm that <b>Alt+R</b> activates the Review and Select tool.
 			<li>Confirm that <b>Alt+S</b> activates one of the swiping tools.
 			<li>Confirm that another <b>Alt+S</b> activates the other swiping tool.
+<p>
+			<LI><b>[DataEntry #747]</b> Shift+Space shortcut
+       			<ul>
+				<li>Process an image.
+				<li>Select a cell in a table and press <b>Shift+Space</b>.
+		  	   	<LI>Confirm that the whole row is selected and that the user can 
+				review whole rows by navigating with the up and down arrows.
+				<li>Select another cell and begin an edit operation.
+				<li>Press <b>Shift+Space</b>.
+		  	   	<LI>Confirm that the cell editing operation is completed and the 
+				whole row is selected.
+		  	   	<LI>Confirm that the user can review whole rows by navigating with 
+				the up and down arrows.
+		       	</ul>
+		   	</LI>
 		</ul>
 <p>
 		<LI><b>[DataEntry #412]</b> Shortcuts and frozen application
@@ -507,6 +536,8 @@
 			<li>Confirm that typing <b>C</b>, <b>F</b>, <b>P</b>, or <b>R</b> into the
 			combo box changes the setting to <b>Complete</b>, <b>Final</b>, <b>Preliminary</b>,
 			or <b>Reviewed</b>, respectively.
+			<LI><b>[DataEntry #743]</b> Confirm that the <b>Result Status</b> field is not 
+			a tab stop.
 			<LI><b>[DataEntry #683]</b> Result Status Of Delete
 			<ul>
   	   			<LI>Open a <b>LabDE</b> demo image.
@@ -550,6 +581,13 @@
 			<li>Confirm that text can be typed into the <b>Medical Record #</b> edit box.
 			<li>Confirm that a validation icon is displayed if the <b>Medical Record #</b>
 			edit box is empty.
+			<LI><b>[DataEntry #742]</b> Validation of medical record number
+       			<ul>
+				<li>Exercise second-stage verification.
+		  	   	<LI>Confirm that the medical record number is valid with or without a 
+				leading <b>M</b> or <b>Z</b>.
+		       	</ul>
+		   	</LI>
 			<li>Confirm that text can be swiped into the <b>Date of Birth</b> edit box.
 			<li>Confirm that text can be typed into the <b>Date of Birth</b> edit box.
 			<li>Confirm that a validation icon is displayed in the DEP if an invalid date is 
@@ -751,6 +789,14 @@
 				<li>Confirm that an <b>ELI27096: COllection was modified; enumeration 
 				operation may not execute</b> error is not seen.
 			</ul>
+			<LI><b>[DataEntry #744]</b> Default value for order-level comment
+	       		<ul>
+				<li>Process several documents.
+	  	   		<LI>Confirm that the default value for the order-level comment is 
+				<b>Order entered by $FullUserName() on $Now()</b>.
+				<li>Confirm that the order-level comment field can be modified.
+	       		</ul>
+   			</LI>
 			<li>Confirm that text can be swiped into the <b>Comment</b> edit box.
 			<li>Confirm that text can be typed into the <b>Comment</b> edit box.
 			<li>Confirm that a validation icon is not displayed even if the 
@@ -872,6 +918,16 @@
 	  	   	<LI>Confirm that the active cell is the next cell in the new row of the 
 			<b>Test</b> table.
 	       	</ul>
+<p>
+		<LI><b>[DataEntry #745]</b> Left and right arrows in edit mode
+       		<ul>
+			<li>Process an image.
+	  	   	<LI>Confirm that while editing a cell, the <b>right arrow</b> key does not 
+			change cell selection.
+  	   		<LI>Confirm that while editing a cell, the <b>left arrow</b> key does not 
+			change cell selection.
+       		</ul>
+	   	</LI>
 	</ul>
 <p>
 	<li><h3>Uninstall</h3>
