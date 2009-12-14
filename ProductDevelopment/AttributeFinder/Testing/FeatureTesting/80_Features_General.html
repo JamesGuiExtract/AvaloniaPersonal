@@ -18,7 +18,7 @@
 <OL>
 	<LI><h2>Run As Windows Service (#2)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>SCRs:</b> LegacyRC #5520, #5521
   	   	<LI><b>Details:</b> The goal for this feature is to allow the FAM to be used in a Windows 
 		service mode.  7.0.0.39 use of SrvAny.exe simply kills the underlying executable when the 
 		service is stopped.  This feature will allow the currently processing file to finish 
@@ -31,67 +31,10 @@
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
-	       	</ul>
-       	</ul>
-<p>
-	<LI><h2>Skip Pages That Fail OCR (Hotfix #08)</h2>
-       	<ul>
-  	   	<LI><b>SCRs:</b> LegacyRC #5370 
-  	   	<LI><b>Details:</b> 7.0.0.39 functionality fails a document if a single page fails to 
-		OCR. This feature allows a failed file to be skipped.  Registry entries control whether 
-		or not this feature is active, the maximum percentage of failed pages allowed before 
-		failing the document (default = 25), and the maximum number of failed pages allowed 
-		before failing the document (default = 10).
-  	   	<LI><b>Main Checklists Updated:</b> Yes
-  	   	<LI><b>Tested By:</b>
-	       	<ul>
-			<li>Joanna, 7.0.0.39 + Hotfix #08, 07/28/2009
-			<li>Doug, 7.1.1.55, 09/??/2009
-	       	</ul>
-  	   	<LI><b>Testing:</b> 
-	       	<ul>
-	      		<li>Exercise the <b>OCR document</b> task using the 
-			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5370</b> images.
-	      		<li>Confirm that each image fails when <b>SkipPageOnFailure = 0</b>. 
-	      		<li>Confirm that appropriate results are seen when <b>SkipPageOnFailure = 1</b>. 
-	      		<li>Confirm that appropriate exceptions (indicating skipped pages) are logged. 
-	       	</ul>
-       	</ul>
-<p>
-	<LI><h2>Select Files Dialog</h2>
-       	<ul>
-  	   	<LI><b>SCRs:</b> LegacyRC #5387
-  	   	<LI><b>Details:</b> Create a Select Files dialog for use by Manually set action status and 
-		Export file lists.  Include the ability to handle Skipped status.  Include the ability to 
-		handle any or all of the following tags.  
-	       	<ul>
-			<li>See the detailed <b>8.0 Req-Design - Random file selection 
-			functionality</b> notes posted by Arvind on 7/28/09.
-			<li>See the detailed <b>FLEXIDS 8.0 - Tag files specs</b> notes updated 
-			on 9/1/09.
-			<li>See the detailed <b>FLEXIDS 8.0 - File Processing Priority specs</b> 
-			notes updated on 9/11/09.
-	       	</ul>
-  	   	<LI><b>Main Checklists Updated:</b> TBD
-  	   	<LI><b>Tested By:</b> 
-	       	<ul>
-			<li>Doug, 7.1.1.58, 10/22/2009
-	       	</ul>
-  	   	<LI><b>Testing:</b> 
-	       	<ul>
-	      		<li>Confirm that the property page UI works as expected.
-	      		<li>Confirm that selecting Skipped files works correctly for a 
-			specific user.
-	      		<li>Confirm that selecting Skipped files works correctly for any user.
-	      		<li>Confirm that selecting files works correctly for any of the 
-			defined tags.
-	      		<li>Confirm that selecting files works correctly for a specified 
-			SQL query.
-	      		<li>Confirm that selecting files works correctly for a specified 
-			priority.
-	      		<li>Confirm that selecting files works correctly for a specified 
-			random subset.
+	      		<li>Exercise the <b>FAM Service - Testing</b> checklist for a 32-bit operating 
+			system.
+	      		<li>Exercise the <b>FAM Service - Testing</b> checklist for a 64-bit operating 
+			system.
 	       	</ul>
        	</ul>
 <p>
@@ -187,8 +130,7 @@
 	      		<li>Confirm that the installation page includes SQL Server Management Studio 2008.
 	      		<li>Confirm installation works properly on each supported operating system.
 			<ul>
-				<li><b>32-bit Windows XP</b>
-				<li><b>64-bit Windows XP</b>
+				<li><b>32-bit Windows XP</b> (64-bit XP not supported!)
 				<li><b>32-bit Windows Vista</b>
 				<li><b>64-bit Windows Vista</b>
 				<li><b>32-bit Windows 2003 Server</b>
@@ -213,7 +155,7 @@
   	   	<LI><b>Main Checklists Updated:</b> N/A
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
-			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+			<li>Joanna, 7.1.1.58, 10/23/2009
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
@@ -307,7 +249,7 @@
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
-			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+			<li>Art, 7.1.1.63, 11/05/2009 - no issues
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
@@ -339,6 +281,66 @@
 		      		<li>Confirm that if processing is inactive, that the FAM status 
 				bar includes the text <b>Processing Inactive</b>.
 		       	</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Skip Pages That Fail OCR (Hotfix #08)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> LegacyRC #5370 
+  	   	<LI><b>Details:</b> 7.0.0.39 functionality fails a document if a single page fails to 
+		OCR. This feature allows a failed file to be skipped.  Registry entries control whether 
+		or not this feature is active, the maximum percentage of failed pages allowed before 
+		failing the document (default = 25), and the maximum number of failed pages allowed 
+		before failing the document (default = 10).
+  	   	<LI><b>Main Checklists Updated:</b> Yes
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>Joanna, 7.0.0.39 + Hotfix #08, 07/28/2009
+			<li>Doug, 7.1.1.55, 09/??/2009
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Exercise the <b>OCR document</b> task using the 
+			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5370</b> images.
+	      		<li>Confirm that each image fails when <b>SkipPageOnFailure = 0</b>. 
+	      		<li>Confirm that appropriate results are seen when <b>SkipPageOnFailure = 1</b>. 
+	      		<li>Confirm that appropriate exceptions (indicating skipped pages) are logged. 
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Select Files Dialog</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> LegacyRC #5387
+  	   	<LI><b>Details:</b> Create a Select Files dialog for use by Manually set action status and 
+		Export file lists.  Include the ability to handle Skipped status.  Include the ability to 
+		handle any or all of the following tags.  
+	       	<ul>
+			<li>See the detailed <b>8.0 Req-Design - Random file selection 
+			functionality</b> notes posted by Arvind on 7/28/09.
+			<li>See the detailed <b>FLEXIDS 8.0 - Tag files specs</b> notes updated 
+			on 9/1/09.
+			<li>See the detailed <b>FLEXIDS 8.0 - File Processing Priority specs</b> 
+			notes updated on 9/11/09.
+	       	</ul>
+  	   	<LI><b>Main Checklists Updated:</b> Yes
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>Doug, 7.1.1.58, 10/22/2009
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Confirm that the property page UI works as expected.
+	      		<li>Confirm that selecting Skipped files works correctly for a 
+			specific user.
+	      		<li>Confirm that selecting Skipped files works correctly for any user.
+	      		<li>Confirm that selecting files works correctly for any of the 
+			defined tags.
+	      		<li>Confirm that selecting files works correctly for a specified 
+			SQL query.
+	      		<li>Confirm that selecting files works correctly for a specified 
+			priority.
+	      		<li>Confirm that selecting files works correctly for a specified 
+			random subset.
 	       	</ul>
        	</ul>
 </OL>
