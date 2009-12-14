@@ -1,0 +1,502 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.1.1.85 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.1.1.85 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[DotNet #336, #359, #361]</b> Apply tags
+	       	<ul>
+	      		<li>Confirm that a drop-down toolbar button is present in the 
+			verification interfacce that allows the user to apply a previously 
+			defined tag to the open document.
+			<li>Confirm that multiple tags can be applied to the document.
+			<li>Confirm that the drop-down menu does not close when a tag is 
+			selected.
+			<li>Confirm that other reasonable functionality also works.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #343, #357, #358, #363, LegacyRC #5520, #5521]</b> FAM service
+	       	<ul>
+	      		<li>Confirm that the <b>Extract Systems FAM service</b> is present in 
+			the list of installed <b>Services</b>.
+			<li>Exercise the <b>FAM Service</b> checklist.
+			<li>Confirm that an application trace is logged when the service 
+			<b>starts</b>.
+			<li>Confirm that an application trace is logged when the service 
+			<b>is stopping</b>.
+			<li>Confirm that an application trace is logged when the service 
+			<b>has stopped</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #352]</b> Overlapping highlights
+	       	<ul>
+	      		<li>Verify a document and create several overlapping highlights.
+			<li>Confirm that each of the overlapping highlights are individually 
+			selectable.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3573]</b> Windows version &gt;= XP
+	       	<ul>
+	      		<li>Prepare a test machine with an unsupported operating system such 
+			as Windows 2000.
+			<li>Confirm that <b>FLEX Index</b> cannot be installed.
+			<li>Confirm that <b>ID Shield</b> cannot be installed.
+			<li>Confirm that <b>Extract Systems LM</b> cannot be installed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3690, #3810, #3811, #3812, #3813]</b> Name and type 
+		should be valid identifiers
+	       	<ul>
+	      		<li>Confirm that <b>Name</b> and <b>Type</b> values must be valid 
+			identifiers (i.e. <b>[-A-Za-z][_A-Za-z0-9]*</b>) for the 
+			following rule objects
+			<ul>
+		      		<li>Create value
+				<li>Translate value
+				<li>Modify attributes
+				<li>Find from RSD
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3707]</b> SQL Server installation on 2003 Server
+	       	<ul>
+			<li>Confirm that <b>SQL Server 2008 Management Studio</b> can be 
+			installed on <b>32-bit 2003 Server</b> from the Demoshield application.
+			<li>Confirm that <b>Windows Installer 4.5</b> can be 
+			installed on <b>64-bit 2003 Server</b> from the Demoshield application.
+			<li>Confirm that <b>SQL Server 2008 Management Studio</b> can be 
+			installed on <b>64-bit 2003 Server</b> from the Demoshield application.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3718, #3772, #3785]</b> SQL Server 2005 references
+	       	<ul>
+			<li>Review the Demoshield text referring to <b>ID Shield</b>.  
+			Confirm that no <b>IDShield</b> text is seen.
+			<li>Review the Demoshield text referring to SQL Server versions.
+			<li>Confirm that <b>SQL Server 2005 is not</b> referenced as an 
+			installable product.
+			<li>Confirm that <b>SQL Server 2008 is</b> referenced as an 
+			installable product.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3733]</b> Select page region
+	       	<ul>
+	  	   	<LI>Configure Select page region to return text from all pages 
+			and restrict the scope.
+      			<li>Exercise the ruleset on a document with a blank USS file.
+      			<li>Confirm that no <b>GetFirstPageNumber() requires spatial or 
+			hybrid mode!</b> exception is seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3742, #3760]</b> Unstoppable FAM
+	       	<ul>
+	  	   	<LI>Create one or more 7.0 FPS files that include legacy tasks.
+			<li>Confirm that an appropriate error message is presented.
+			<li>Confirm that the FAM <b>is not</b> stuck in a bad state.
+			<ul>
+		  	   	<LI>Redaction: Redact image without verification (legacy).
+		  	   	<LI>Redaction: Verify and redact image (legacy).
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3751, #3756]</b> Create redacted image task
+	       	<ul>
+	  	   	<LI>Confirm that the following information is added to the output 
+			VOA file under a <b>Metadata</b> attribute
+			<ul>
+		      		<li>The user and machine that performed the redaction
+				<li>The start time and duration of creating the redacted image
+				<li>The input and output files
+				<li>The redacted attributes
+				<li>The output options
+			</ul>
+			<li>Redact an image by redacting <b>All</b> data categories.
+			<li>Review the associated database record and confirm that all attributes 
+			were redacted instead of none. 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3754]</b> Regular expression rule
+	       	<ul>
+			<li>Insert a new <b>Regular expression</b> rule in the <b>Ruleset 
+			Editor</b>.
+			<li>Type something in the regular expression text box in the 
+			Configuration dialog and press <b>OK</b>.
+			<li>Press <b>Configure...</b> again.
+			<li>Select the <b>Read regular expression from file</b> radio button 
+			and type something that is not a file path into the edit box.
+			<li>Press <b>OK</b>.
+			<li>Press <b>OK</b> in the error dialog and then press <b>Cancel</b> 
+			in the Configuration dialog.
+			<li>Press <b>Configure...</b> again.
+			<li>Confirm that the original regular expression text has been retained 
+			and that the <b>Read regular expression from file</b> radio button is 
+			no longer selected.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3758]</b> Document classification for image without 
+		recognized text
+	       	<ul>
+	  	   	<LI>Create a test ruleset that classifies documents
+      			<li>Exercise several files listed in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3758\fail.txt</b>.
+			<li>Confirm that <b>ELI25859: GetRelativePages is not valid for a 
+			non-spatial string!</b> exceptions are not seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3764, #3765, #3766, #3767, #3769, #3770, #3771, #3774, 
+		#3782, #3792, #3803, #3805, #3806, #3807, #3814, #3817, #3820, #3822, #3824, 
+		#3825, #3830, #3833, #3834, #3838, #3839, #3840, #3841, #3842, #3843, #3846, 
+		#3847, #3853, #3855, #3856, #3866, #3876]</b> 
+		Verify sensitive data
+	       	<ul>
+	  	   	<LI>Prepare several documents for verification and include collection 
+			of verification feedback.
+	  	   	<LI>Verify some of the documents.
+      			<li>Confirm that both expected and found VOA files are collected in 
+			the verification feedback.
+      			<li>Confirm that a <b>status bar</b> is include in the image pane 
+			with the following features
+			<ul>
+				<li>Prompt text that changes based on the active tool
+				<li>Image resolution
+				<li>X position of the cursor in the image
+				<li>Y position of the cursor in the image
+			</ul>
+			<li>Confirm that an appropriate toolbar button is present in the image 
+			pane to <b>toggle</b> display of the Thumbnails view.
+			<li>Confirm that the <b>Comments</b> edit box has a vertical scrollbar.
+			<li>Confirm that apostrophes in the <b>Comments</b> edit box no longer 
+			double after revisitation.
+			<li>Confirm that <b>toggled</b> redactions appear the same as 
+			<b>untoggled</b> redactions.
+			<li>Confirm that the following shortcuts work properly
+			<ul>
+				<li><b>E</b> for apply exemption codes.
+				<li><b>Ctrl+E</b> for apply last exemption code.
+				<li><b>Ctrl+S</b> for save and commit.
+				<li><b>Tab</b> for advancing to the next grid view item.
+				<li><b>Tab</b> for advancing to the next grid view item when 
+				the check box column has focus.
+				<li><b>Ctrl+Tab</b> for go to the next document.
+				<li><b>Space</b> to toggle the selected redaction on or off.
+				<li><b>Ctrl+Shift+Tab</b> for go to the previous document.
+				<li><b>Shift</b> while drawing a manual redaction for line 
+				fitting.
+				<li><b>Ctrl+Shift</b> while drawing a manual redaction for 
+				block fitting.
+				<li>Confirm that all shortcuts are displayed in the associated 
+				tooltips
+				<li>Confirm that all shortcuts are displayed on the associated 
+				menu items.
+			</ul>
+			<li>Confirm that <b>Options</b> are only available via the 
+			<b>Tools</b> menu.
+			<li>Confirm that a <b>Previous tile</b> toolbar button exists and 
+			works properly.
+			<li>Confirm that a <b>Next tile</b> toolbar button exists and 
+			works properly.
+			<li>Confirm that the image filename is displayed in the caption.
+			<li>Confirm that verification results can be saved when including 
+			exemption codes.
+			<li>Results after pause or stop
+			<ul>
+				<li>Open a document and make a change.
+				<li>Press <b>Pause</b> or <b>Stop</b> in the FAM.
+				<li>Press <b>Cancel</b> when asked about saving changes.
+				<li>Try to <b>save and commit</b> from the verification UI.
+				<li>Confirm that changes can be discarded.
+			</ul>
+			<li>Confirm that a selected attribute includes both grip handles 
+			and a thick red border.
+			<li>Confirm that the verification toolstrips can be moved and that 
+			no toolbars are thus lost and unavailable.
+			<li>Confirm that the rows in the grid view cannot be resized for 
+			height.
+			<li>Confirm that verifying several documents very quickly (before the 
+			Thumbnail panes are completely populated) does not skip any documents.  
+			<li>Confirm that navigation to previous documents displays each 
+			of the saved documents.
+			<li>Confirm that verification options are honored even for the first 
+			verified image.
+			<li>Thread safety for PDF images
+			<ul>
+				<li>Verify several multipage PDFs.
+				<li>Save and commit before the thumbnail viewer can load all 
+				of the pages.
+				<li>Confirm that no exceptions are thrown.
+				<li>Confirm that no unexpected application crashes are seen.
+			</ul>
+			<li>Confirm that redaction items that have been turned <b>off</b> are 
+			stored under <b>_OldRedactions</b> in the output VOA file.
+			<li>Confirm that redaction items that are turned <b>off</b> by default 
+			(based on INI file settings) are initially displayed as <b>off</b>.
+			<li>Results when verifying exactly one file
+			<ul>
+				<li>Create an action and supply exactly one file to the queue 
+				for that action.
+				<li>Process the file for verification making sure that a useful 
+				VOA file exists.
+				<li>Review all pages of the file and then click <b>Save</b>.
+				<li>Confirm that the verification interface closes gracefully 
+				if the FAM settings <b>are not</b> set to listen.
+				<li>Confirm that the verification interface remains 
+				if the FAM settings <b>are not</b> set to listen.
+			</ul>
+			<li>Confirm that toolbar buttons are appropriately <b>disabled</b> when 
+			no image is open.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3776]</b> Apply bates number task
+	       	<ul>
+	  	   	<LI>Open the <b>Apply bates number</b> property page.
+      			<li>Enter an invlaid tag such as <b>&lt;SourceDocName</b>.
+      			<li>Confirm that an appropriate error message is seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3780, #3791]</b> ID Shield Tester
+	       	<ul>
+	  	   	<LI>Confirm that the <b>ID Shield Tester</b> can be used without 
+			USS files.
+			<li>Confirm that the <b>OutputFilesFolder</b> setting is 
+			supported.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3781]</b> ID Shield Statistics Reporter
+	       	<ul>
+	  	   	<LI>Exercise the <b>Support User Testing Of ID Shield Accuracy (#18)</b> 
+			section of the FLEX Index 8.0 Features checklist.
+			<li>Confirm that the proper results are provided in the 
+			<b>Statistics</b> tab
+			<ul>
+				<li>Automated redaction process
+				<li>Standard verification process
+				<li>Hybrid process
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3786, LegacyRC #5519]</b> SplitMultiPageImage
+	       	<ul>
+			<li>Confirm that the utility is installed with <b>FLEX Index</b>.
+			<li>Confirm that the utility is installed with <b>ID Shield</b>.
+			<li>Exercise the <b>Split Multi-Page Image</b> portion of the 
+			<b>Create Multi-Page Image</b> checklist.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3790]</b> Create metadata xml task
+	       	<ul>
+	  	   	<LI>Confirm that the user interface works properly.
+	  	   	<LI>Confirm that XML output files can be created from the 
+			output of <b>Redaction: Create redacted image</b>.
+	  	   	<LI>Confirm that XML output files can be created from the 
+			output of <b>Redaction: Verify sensitive data</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3799]</b> VOA Viewer and AutoOpenImage
+	       	<ul>
+	  	   	<LI>Remove the <b>AutoOpenImage</b> registry key from 
+			<b>HKCU/Software/Extract Systems/AttributeFinder/Utils/EAVGenerator</b>.
+	  	   	<LI>Open a VOA file in the VOA Viewer and double-click on 
+			an attribute. 
+	  	   	<LI>Confirm that the appropriate image file is automatically opened. 
+			<li>Confirm that the <b>AutoOpenImage</b> registry key is 
+			present and set to <b>1</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3849]</b> Legacy rule objects
+	       	<ul>
+	  	   	<LI>Test execution of each of the following rule objects from a 
+			<b>7.0</b> ruleset.  Confirm that a meaningful error message is 
+			presented.
+			<ul>
+		  	   	<LI>Address finder 
+		  	   	<LI>Address splitter 
+		  	   	<LI>Grantor-Grantee finder ver. 2
+		  	   	<LI>Legal description finder 
+		  	   	<LI>Return address finder 
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5242]</b> Tag selector for Archive or restore associated 
+		file
+	       	<ul>
+	      		<li>Confirm that the <b>Tag selector</b> button associated with the 
+			<b>Root of archive folder</b> edit box works as expected.
+	      		<li>Confirm that the <b>Tag selector</b> button associated with the 
+			<b>File to archive</b> edit box works as expected.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5381]</b> DBInfo table and default settings
+	       	<ul>
+	      		<li>Create a new <b>ID Shield</b> database.
+	      		<li>Examine the <b>DBInfo</b> table using SQL Management Studio.
+	      		<li>Confirm that each field in the table has a meaningful default value.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5508, #5514]</b> Process files after crash
+	       	<ul>
+	      		<li>Create an FPS file to process some files.
+			<li>Kill <b>ProcessFiles.exe</b> from the Task Manager.
+			<li>Reset the <b>Processing</b> files to <b>Pending</b> 
+			using DB Admin.
+			<li>Reopen the FPS file and continue processing images.
+			<li>Confirm that processing continues without error.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5518, #5523, #5529, #5538, #5539]</b> DB Admin
+	       	<ul>
+	      		<li>Confirm that <b>F5</b> refreshes the <b>Summary</b> tab. 
+	      		<li>Confirm that <b>Ctrl+F</b> launches the File Action Manager. 
+			<li>Confirm that the <b>Select Files</b> dialog includes the 
+			ability to specify a random count of files.
+			<li>Confirm that the random count is always provided exactly instead 
+			of approximately.
+			<li>Add an action to a database using the <b>Copy from</b> option.
+			<li>Confirm that the proper action status is set.
+			<li>Confirm that an <b>Application trace</b> exception is logged 
+			when a database is cleared.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5522]</b> File Action Manager
+	       	<ul>
+	  	   	<LI>Confirm that <b>Ctrl+D</b> launches DB Admin.
+	      		<li>Use <b>DB Admin</b> to manually set the staus of some of 
+			the files to <b>Skipped</b>.
+	  	   	<LI>Modify the FPS file to verify <b>Skipped</b> files.
+	  	   	<LI>Confirm that the manually <b>Skipped</b> files can be 
+			processed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5524, #5526, #5527, #5541, #5550]</b> Convert FAM DB
+	       	<ul>
+	  	   	<LI>Confirm that <b>ConvertFAMDB</b> includes a progress bar.
+	  	   	<LI>Confirm that <b>ConvertFAMDB</b> includes a check box for 
+			<b>Retain transition and queue history data</b>.
+			<li>Confirm that <b>6.0</b> and <b>7.0</b> databases can be 
+			converted to 8.0.
+			<li>Confirm that <b>ConvertFAMDB</b> logs start and stop times 
+			for database conversion.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5528]</b> PDF/A conversion
+	       	<ul>
+	  	   	<LI>Exercise the <b>User Interface</b> and <b>Basic Testing</b> 
+			portions of the <b>PDF/A Converter</b> checklist.  The test cases 
+			can be found in the <b>80_Features_Objects.html</b> checklist 
+			under <b>AttributeFinder/Testing/FeatureTesting</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5536]</b> Launch application
+	       	<ul>
+	  	   	<LI>Confirm that the <b>Core: Launch application</b> task includes 
+			a <b>Propagate errors back to the File Action Manager</b> check box.
+	  	   	<LI>Confirm that errors are propagated correctly when the check box 
+			is <b>checked</b>. 
+	  	   	<LI>Confirm that errors are not propagated when the check box 
+			is <b>unchecked</b>. 
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5537]</b> UEX Viewer
+	       	<ul>
+	  	   	<LI>Exercise the <b>Support Export Of Debug Data From UEX Viewer</b> 
+			test cases in the <b>80_Features_Utilities.html</b> checklist 
+			under <b>AttributeFinder/Testing/FeatureTesting</b>.
+			<li>Note that not all functionality has been completed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5543, #5544]</b> Report viewer
+	       	<ul>
+	  	   	<LI>Confirm that the <b>Detailed report for specific document</b> 
+			report correctly includes comment data.
+	  	   	<LI>Confirm that the <b>List of all documents with specific tag</b> 
+			report presents a meaningful error message if no tags are defined.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5551, #5555, #5556, #5561, #5562, #5563, #5570, #5571]</b> 
+		Tag selector
+	       	<ul>
+	      		<li>Test the following new <b>tag selector</b> functions.  Confirm 
+			proper functionality.
+			<ul>
+		      		<li><b>$Env()</b>
+		      		<li><b>$FullUserName()</b>
+		      		<li><b>$Now()</b> without parameters
+		      		<li><b>$Now()</b> with parameters
+		      		<li><b>$RandomAlphaNumeric()</b>
+		      		<li><b>$UserName()</b>
+			</ul>
+<p>
+			<li>Confirm that the <b>TestTextFunctionExpander</b> utility is 
+			included in a <b>FLEX Index</b> installation.
+			<li>Confirm that the <b>TestTextFunctionExpander</b> utility is 
+			included in an <b>ID Shield</b> installation.
+			<li>Confirm proper functionality.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5554]</b> OCR engine version 16.3
+	       	<ul>
+	  	   	<LI>Confirm that <b>KernelAPI.dll</b> has a <b>16.3.9559.1746</b> 
+			version number.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5577]</b> Lead Tools version 16.5 Release 2
+	       	<ul>
+	  	   	<LI>Confirm that <b>Ltkrnu.dll.dll</b> has a <b>16.5.5.1</b> 
+			version number.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
