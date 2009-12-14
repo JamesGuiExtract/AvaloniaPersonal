@@ -115,9 +115,29 @@ namespace Extract.FileActionManager.Utilities
         ManualResetEvent[] _threadStopped;
 
         /// <summary>
+        /// Event handle to indicate that the dns service has started
+        /// </summary>
+        ManualResetEvent _dnsStarted = new ManualResetEvent(false);
+
+        /// <summary>
+        /// Event handle to indicate that the net login service has started
+        /// </summary>
+        ManualResetEvent _netLogonStarted = new ManualResetEvent(false);
+
+        /// <summary>
         /// The collection of threads which are running.
         /// </summary>
         List<Thread> _processingThreads = new List<Thread>();
+
+        /// <summary>
+        /// Thread for checking if the DNS Client service is running.
+        /// </summary>
+        Thread _dnsCheck;
+
+        /// <summary>
+        /// Thread for checking if the Net Logon service is running
+        /// </summary>
+        Thread _netLogonCheck;
 
         /// <summary>
         /// Mutex to provide synchronized access to data.
@@ -150,7 +170,7 @@ namespace Extract.FileActionManager.Utilities
             {
                 // Validate the license on startup
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI28495",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 // Get the list of FPS files to run
                 List<string> fpsFiles = GetFPSFilesToRun();
@@ -159,6 +179,12 @@ namespace Extract.FileActionManager.Utilities
                 ExtractException ee = new ExtractException("ELI28772",
                     "Application trace: FAM Service starting.");
                 ee.Log();
+
+                // Kick off threads to check for dependent services running
+                _dnsCheck = new Thread(CheckForDnsServiceRunning);
+                _netLogonCheck = new Thread(CheckForNetLogonServiceRunning);
+                _dnsCheck.Start();
+                _netLogonCheck.Start();
 
                 lock (_lock)
                 {
@@ -203,8 +229,14 @@ namespace Extract.FileActionManager.Utilities
                 // Only wait if there are wait handles
                 if (_threadStopped != null && _threadStopped.Length > 0)
                 {
-                    // Wait for all threads to exit
-                    WaitHandle.WaitAll(_threadStopped);
+                    // Wait for all the threads to exit (timeout after a second to request
+                    // additional time to stop)
+                    while (!WaitHandle.WaitAll(_threadStopped, 1000))
+                    {
+                        // All wait handles were not signaled,
+                        // request additional time to stop
+                        RequestAdditionalTime(1200);
+                    }
                 }
 
                 // [DNRCAU #357] - Log application trace when service has shutdown
@@ -216,11 +248,105 @@ namespace Extract.FileActionManager.Utilities
             {
                 ExtractException.Log("ELI28497", ex);
             }
+            finally
+            {
+                // Mutex around accessing the thread handle collection
+                lock (_lock)
+                {
+                    // Done with the thread events, close the handles and reset the
+                    // array to null
+                    if (_threadStopped != null)
+                    {
+                        foreach (ManualResetEvent threadEvent in _threadStopped)
+                        {
+                            if (threadEvent != null)
+                            {
+                                threadEvent.Close();
+                            }
+                        }
+
+                        _threadStopped = null;
+                    }
+                }
+
+                // Empty the processing threads collection since we are done with the threads
+                _processingThreads.Clear();
+            }
         }
 
         #endregion ServiceBase Overrides
 
-        #region Methods
+        #region Thread Methods
+
+        /// <summary>
+        /// Waits for the DNS Client service to start running and sets the service started handle
+        /// </summary>
+        void CheckForDnsServiceRunning()
+        {
+            try
+            {
+                // Ensure there is a wait handle to set and that it is not set already
+                if (_dnsStarted != null && !_dnsStarted.WaitOne(0))
+                {
+                    // Wait for the dns client to start (set the wait timeout to 1 minute)
+                    ServiceController dnsService = new ServiceController("DNS Client");
+                    dnsService.WaitForStatus(ServiceControllerStatus.Running, new TimeSpan(0, 1, 0));
+                }
+            }
+            // Log the timeout exception, ignore the other exceptions
+            catch (System.ServiceProcess.TimeoutException ex)
+            {
+                // Log the timeout application trace
+                ExtractException ee = new ExtractException("ELI28814",
+                    "Application Trace: Timeout expired while waiting for DNS client to start.",
+                    ex);
+                ee.Log();
+            }
+            finally
+            {
+                // Ensure there is a wait handle to set and that it is not set already
+                if (_dnsStarted != null && !_dnsStarted.WaitOne(0))
+                {
+                    // Set the wait handle
+                    _dnsStarted.Set();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Waits for the Net Logon service to start running and sets the service started handle
+        /// </summary>
+        void CheckForNetLogonServiceRunning()
+        {
+            try
+            {
+                // Ensure there is a wait handle to set and that it is not set already
+                if (_netLogonStarted != null && !_netLogonStarted.WaitOne(0))
+                {
+                    // Wait for the Net Logon to start (set the wait timeout to 1 minute)
+                    ServiceController netLogon = new ServiceController("Net Logon");
+                    netLogon.WaitForStatus(ServiceControllerStatus.Running, new TimeSpan(0, 1, 0));
+                }
+            }
+            // Log the timeout exception, ignore the other exceptions
+            catch (System.ServiceProcess.TimeoutException ex)
+            {
+                // Log the timeout application trace
+                ExtractException ee = new ExtractException("ELI28815",
+                    "Application Trace: Timeout expired while waiting for Net Logon to start.",
+                    ex);
+                ee.Log();
+            }
+            finally
+            {
+                // Ensure there is a wait handle to set and that it is not set already
+                if (_netLogonStarted != null && !_netLogonStarted.WaitOne(0))
+                {
+                    // Set the wait handle
+                    _netLogonStarted.Set();
+                }
+            }
+        }
 
         /// <summary>
         /// Thread function that handles launching the FAMProcess.
@@ -235,7 +361,7 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 // Get the processing thread arguments
-                ProcessingThreadArguments arguments = (ProcessingThreadArguments) threadParameters;
+                ProcessingThreadArguments arguments = (ProcessingThreadArguments)threadParameters;
                 threadNumber = arguments.ThreadNumber;
 
                 // Create the FAM process
@@ -245,8 +371,24 @@ namespace Extract.FileActionManager.Utilities
                 // Set the FPS file name
                 famProcess.FPSFile = arguments.FPSFileName;
 
-                // Start processing
-                famProcess.Start();
+                // Wait for both the dns service and the net login service to start
+                if (_dnsStarted != null)
+                {
+                    // Wait for the event to signal
+                    _dnsStarted.WaitOne(2000);
+                }
+                if (_netLogonStarted != null)
+                {
+                    // Wait for the event to signal
+                    _netLogonStarted.WaitOne(2000);
+                }
+
+                // Ensure that processing has not been stopped before starting processing
+                if (!_stopProcessing.WaitOne(0))
+                {
+                    // Start processing
+                    famProcess.Start();
+                }
 
                 // Wait for stop signal
                 _stopProcessing.WaitOne();
@@ -290,7 +432,8 @@ namespace Extract.FileActionManager.Utilities
                 {
                     lock (_lock)
                     {
-                        if (_threadStopped[threadNumber] != null)
+                        if (_threadStopped.Length > threadNumber &&
+                            _threadStopped[threadNumber] != null)
                         {
                             // Wrap in a try/catch and log to ensure no exceptions thrown
                             // from the finally block.
@@ -307,6 +450,10 @@ namespace Extract.FileActionManager.Utilities
                 }
             }
         }
+
+        #endregion Thread Methods
+
+        #region Methods
 
         /// <summary>
         /// Goes to the database and gets the list of FPS files to run.

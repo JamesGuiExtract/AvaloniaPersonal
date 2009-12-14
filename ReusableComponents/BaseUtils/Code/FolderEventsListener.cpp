@@ -168,6 +168,8 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 						{
 							// Error geting the results
 							UCLIDException ue ("ELI13017", "Error getting file changes.");
+							ue.addDebugInfo("Directory Name",
+								(pTD.get() != NULL ? pTD->m_strFilename : "<Empty>"));
 							ue.addWin32ErrorInfo();
 							throw ue;
 						}
@@ -437,6 +439,7 @@ HANDLE FolderEventsListener::getListeningHandle (std::string strDir )
 	if ( hDir == INVALID_HANDLE_VALUE )
 	{
 		UCLIDException ue("ELI13086", "Invalid Directory Handle!");
+		ue.addDebugInfo("Directory Name", strDir);
 		ue.addWin32ErrorInfo();
 		throw ue;
 	}

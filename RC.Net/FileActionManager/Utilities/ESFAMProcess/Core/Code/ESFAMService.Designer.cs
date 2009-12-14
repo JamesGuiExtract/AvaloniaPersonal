@@ -56,6 +56,17 @@ namespace Extract.FileActionManager.Utilities
                         }
                     }
                 }
+
+                if (_dnsStarted != null)
+                {
+                    _dnsStarted.Close();
+                    _dnsStarted = null;
+                }
+                if (_netLogonStarted != null)
+                {
+                    _netLogonStarted.Close();
+                    _netLogonStarted = null;
+                }
             }
 
             base.Dispose(disposing);
