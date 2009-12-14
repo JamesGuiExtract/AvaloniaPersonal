@@ -170,6 +170,9 @@ private:
 	// Allocates m_ipIDShieldDB pointer if it does not exist and returns m_ipIDShieldDB
 	UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr getIDShieldDBPtr();
 
+	// Gets the exemption codes associated with the specified attribute
+	string getExemptionCodes(IAttributePtr ipAttribute);
+
 	// Adds a metadata attribute to the specified voa file using the specified information
 	void storeMetaData(const string& strVoaFile, IIUnknownVectorPtr ipAttributes, 
 		IIUnknownVectorPtr ipRedactedAttributes, CTime tStartTime, double dSeconds, 

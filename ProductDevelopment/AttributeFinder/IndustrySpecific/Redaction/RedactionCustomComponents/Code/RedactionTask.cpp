@@ -285,9 +285,11 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 			// Only cover area if value is spatial
 			if (ipValue->HasSpatialInfo() == VARIANT_TRUE)
 			{
+				string strCodes = getExemptionCodes(ipAttr);
+
 				// Get the text associated with this attribute
 				string strText = CRedactionCustomComponentsUtils::ExpandRedactionTags(
-					m_redactionAppearance.m_strText, "", asString(ipAttr->Type));
+					m_redactionAppearance.m_strText, strCodes, asString(ipAttr->Type));
 				_lastCodePos = "270";
 
 				// Get the Raster zones to redact
@@ -1280,6 +1282,33 @@ IAFUtilityPtr CRedactionTask::getAFUtility()
 		ASSERT_RESOURCE_ALLOCATION("ELI09877", m_ipAFUtility != NULL);
 	}
 	return m_ipAFUtility;
+}
+//-------------------------------------------------------------------------------------------------
+string CRedactionTask::getExemptionCodes(IAttributePtr ipAttribute)
+{
+	// Iterate over each sub attribute
+	IIUnknownVectorPtr subAttributes = ipAttribute->SubAttributes;
+	if (subAttributes != NULL)
+    {
+        int count = subAttributes->Size();
+        for (int i = 0; i < count; i++)
+        {
+			// Find the exemption codes attribute
+            IAttributePtr subAttribute = subAttributes->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI28802", subAttribute != NULL);
+            if (asString(subAttribute->Name) == "ExemptionCodes")
+            {
+				// Get the exemption codes value
+				ISpatialStringPtr ipValue = subAttribute->Value;
+				ASSERT_RESOURCE_ALLOCATION("ELI28801", ipValue != NULL);
+
+                return asString(ipValue->String);
+            }
+        }
+    }
+
+	// There are no exemption codes
+	return "";
 }
 //-------------------------------------------------------------------------------------------------
 void CRedactionTask::storeMetaData(const string& strVoaFile, IIUnknownVectorPtr ipAttributes, 
