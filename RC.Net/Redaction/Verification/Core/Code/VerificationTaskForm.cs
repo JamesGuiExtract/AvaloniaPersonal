@@ -1192,7 +1192,8 @@ namespace Extract.Redaction.Verification
                 _tagFileToolStripButton.FileId = memento.FileId;
 
                 _skipProcessingToolStripMenuItem.Enabled = !IsInHistory;
-                _saveToolStripButton.Enabled = !IsInHistory;
+                _saveAndCommitToolStripButton.Enabled = true;
+                _saveAndCommitToolStripMenuItem.Enabled = true;
                 _saveToolStripMenuItem.Enabled = !IsInHistory;
             }
             else
@@ -1212,7 +1213,8 @@ namespace Extract.Redaction.Verification
                 _tagFileToolStripButton.Enabled = false;
 
                 _skipProcessingToolStripMenuItem.Enabled = false;
-                _saveToolStripButton.Enabled = false;
+                _saveAndCommitToolStripButton.Enabled = false;
+                _saveAndCommitToolStripMenuItem.Enabled = false;
                 _saveToolStripMenuItem.Enabled = false;
             }
         }

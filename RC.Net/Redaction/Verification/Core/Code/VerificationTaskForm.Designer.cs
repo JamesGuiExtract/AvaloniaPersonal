@@ -92,7 +92,7 @@ namespace Extract.Redaction.Verification
             this._idShieldHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._aboutIDShieldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._basicDataGridToolStrip = new System.Windows.Forms.ToolStrip();
-            this._saveToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._saveAndCommitToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._previousDocumentToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._nextDocumentToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._previousRedactionToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -450,7 +450,7 @@ namespace Extract.Redaction.Verification
             this._basicDataGridToolStrip.Dock = System.Windows.Forms.DockStyle.None;
             this._basicDataGridToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this._basicDataGridToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._saveToolStripButton,
+            this._saveAndCommitToolStripButton,
             toolStripSeparator1,
             this._previousDocumentToolStripButton,
             this._nextDocumentToolStripButton,
@@ -462,16 +462,16 @@ namespace Extract.Redaction.Verification
             this._basicDataGridToolStrip.Size = new System.Drawing.Size(204, 39);
             this._basicDataGridToolStrip.TabIndex = 0;
             // 
-            // _saveToolStripButton
+            // _saveAndCommitToolStripButton
             // 
-            this._saveToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._saveToolStripButton.Enabled = false;
-            this._saveToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_saveToolStripButton.Image")));
-            this._saveToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._saveToolStripButton.Name = "_saveToolStripButton";
-            this._saveToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._saveToolStripButton.Text = "Save";
-            this._saveToolStripButton.Click += new System.EventHandler(this.HandleSaveToolStripButtonClick);
+            this._saveAndCommitToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._saveAndCommitToolStripButton.Enabled = false;
+            this._saveAndCommitToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_saveAndCommitToolStripButton.Image")));
+            this._saveAndCommitToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._saveAndCommitToolStripButton.Name = "_saveAndCommitToolStripButton";
+            this._saveAndCommitToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._saveAndCommitToolStripButton.Text = "Save and Commit (Ctrl+S)";
+            this._saveAndCommitToolStripButton.Click += new System.EventHandler(this.HandleSaveToolStripButtonClick);
             // 
             // toolStripSeparator1
             // 
@@ -1079,7 +1079,7 @@ namespace Extract.Redaction.Verification
         private Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton _rotateCounterclockwiseToolStripButton;
         private Extract.Imaging.Forms.RotateClockwiseToolStripButton _rotateClockwiseToolStripButton;
         private System.Windows.Forms.ToolStrip _basicDataGridToolStrip;
-        private System.Windows.Forms.ToolStripButton _saveToolStripButton;
+        private System.Windows.Forms.ToolStripButton _saveAndCommitToolStripButton;
         private System.Windows.Forms.ToolStripButton _previousDocumentToolStripButton;
         private System.Windows.Forms.ToolStripButton _nextDocumentToolStripButton;
         private System.Windows.Forms.ToolStripButton _previousRedactionToolStripButton;
