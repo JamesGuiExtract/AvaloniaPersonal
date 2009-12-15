@@ -22,6 +22,8 @@
 #include "BaseUtils.h"
 #include <map>
 
+using namespace std;
+
 class UCLIDException;
 
 //==================================================================================================
@@ -82,8 +84,6 @@ public:
 	// ARGS:	None
 	void loadDebugInfoInListCtrls();
 	
-
-	//{{AFX_DATA(UCLIDExceptionDetailsDlg)
 	CListCtrl	m_ELIandTextListCtrl;
 	CListCtrl	m_debugParamsListCtrl;
 	CStatic		m_StackTraceStatic;
@@ -92,29 +92,23 @@ public:
 	CButton		m_CopyButton;
 	CButton		m_CloseButton;
 	CButton		m_AllExceptionsRadioButton;
-	//}}AFX_DATA
 
-
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(UCLIDExceptionDetailsDlg)
-	public:
+	// virtual functions
 	virtual int DoModal();
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
 protected:
 
-	// Generated message map functions
-	//{{AFX_MSG(UCLIDExceptionDetailsDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnButtonSaveAs();
 	afx_msg void OnButtonCopy();
 	afx_msg void OnRclickDebugParameters(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnEditCopy();
 	afx_msg void OnItemChangedListEliAndText(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDebugInformationClick();
-	//}}AFX_MSG
+	afx_msg void OnContextCopyName();
+	afx_msg void OnContextCopyValue();
+
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -125,7 +119,7 @@ private:
 	CString m_zClipboardText;
 
 	// Map exception list item number to the exception instance pointer.
-	std::map<long, const UCLIDException *> m_mapItemToException;
+	map<long, const UCLIDException *> m_mapItemToException;
 
 	// Variable to hold the state of the Debug details group
 	// 0 - Display debug data for the currently selected ELI code in the m_ELIandTextListCtrl
@@ -143,5 +137,12 @@ private:
 	void loadStackTraceData(const UCLIDException &ex);
 	
 	// Returns the decrypted string if it was encrypted if not just returns the string.
-	std::string getDataValue(const std::string strEncrpyted);
+	string getDataValue(const string &strEncrpyted);
+
+	// Returns index of selected item in the debug params list
+	// if no item is selected or more than one item is selected -1 will be returned
+	int getSelectedDebugParamsIndex();
+
+	// Method copies the contents of the given column in the m_debugParamsListCtrl to the clipboard
+	void copyDebugParamsColumnToClipboard(int iColumn);
 };

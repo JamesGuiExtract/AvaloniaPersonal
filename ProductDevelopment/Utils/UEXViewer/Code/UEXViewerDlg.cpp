@@ -19,6 +19,7 @@
 #include "UEXFindDlg.h"
 #include "AboutDlg.h"
 #include "ExceptionListControlHelper.h"
+#include "ExportDebugDataDlg.h"
 
 #include <StringTokenizer.h>
 #include <UCLIDException.h>
@@ -85,9 +86,7 @@ CUEXViewerDlg::CUEXViewerDlg(CWnd* pParent /*=NULL*/)
 	m_iTimeColumnWidth(130),
 	m_bInitialized(false)
 {
-	//{{AFX_DATA_INIT(CUEXViewerDlg)
 	m_zDirectory = _T("");
-	//}}AFX_DATA_INIT
 
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon( IDR_UEXVIEW );
@@ -110,6 +109,17 @@ CUEXViewerDlg::~CUEXViewerDlg()
 				ma_pFindDlg->DestroyWindow();
 			}
 			ma_pFindDlg.reset(NULL);
+		}
+		
+		// Close and clean-up ExportDebug dialog
+		if (ma_pExportDebugDataDlg.get())
+		{
+			// ensure the window has been created before trying to destroy it
+			if (asCppBool(::IsWindow(ma_pExportDebugDataDlg->m_hWnd)))
+			{
+				ma_pExportDebugDataDlg->DestroyWindow();
+			}
+			ma_pExportDebugDataDlg.reset(NULL);
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16546");
@@ -151,6 +161,7 @@ BEGIN_MESSAGE_MAP(CUEXViewerDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO_EXCEPTION_FILE_LIST, &CUEXViewerDlg::OnCbnSelchangeComboExceptionFileList)
 	ON_COMMAND(ID_FILE_REFRESHCURRENTLOGFILE, &CUEXViewerDlg::OnFileRefreshCurrentLogfile)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_UEX, &CUEXViewerDlg::OnNMRclickListUex)
+	ON_COMMAND(ID_TOOLS_EXPORTDEBUGDATA, &CUEXViewerDlg::OnToolsExportDebugData)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -257,6 +268,10 @@ BOOL CUEXViewerDlg::OnInitDialog()
 		// Construct and create a modeless Find dialog
 		ma_pFindDlg = auto_ptr<CUEXFindDlg>(new CUEXFindDlg( m_pCfgMgr, this ));
 		ma_pFindDlg->Create( CUEXFindDlg::IDD, NULL );
+
+		// Contruct and create a modeless export data dialog
+		ma_pExportDebugDataDlg = auto_ptr<CExportDebugDataDlg>(new CExportDebugDataDlg(this));
+		ma_pExportDebugDataDlg->Create(CExportDebugDataDlg::IDD, NULL);
 
 		// Set flag
 		m_bInitialized = true;
@@ -1256,6 +1271,23 @@ void CUEXViewerDlg::OnCopyELICode()
 		clipboardMgr.writeText(strTopELI);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28682");
+}
+//-------------------------------------------------------------------------------------------------
+void CUEXViewerDlg::OnToolsExportDebugData()
+{
+	try
+	{
+		if (ma_pExportDebugDataDlg.get() != NULL && asCppBool(::IsWindow(ma_pExportDebugDataDlg->m_hWnd)))
+		{
+			// Show the find dialog
+			ma_pExportDebugDataDlg->ShowWindow(SW_SHOW);
+		}
+		else
+		{
+			throw UCLIDException("ELI28735", "Export debug data dialog has not been initialized!");
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28732");
 }
 
 //-------------------------------------------------------------------------------------------------

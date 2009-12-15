@@ -290,6 +290,9 @@ string ValueTypePair::getValueAsString() const
 			strText += pszTemp;
 		}
 		break;
+	case kInt64:
+		strText = asString(llValue);
+		break;
 	}
 
 	return strText;

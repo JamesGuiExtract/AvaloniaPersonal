@@ -238,6 +238,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ExportDebugDataDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
@@ -340,6 +344,10 @@
 			</File>
 			<File
 				RelativePath=".\ExceptionListControlHelper.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ExportDebugDataDlg.h"
 				>
 			</File>
 			<File

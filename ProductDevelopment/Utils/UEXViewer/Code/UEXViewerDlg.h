@@ -19,9 +19,12 @@
 #include <vector>
 #include <IConfigurationSettingsPersistenceMgr.h>
 #include <memory>
-#include "afxwin.h"
+#include <UCLIDException.h>
+
+using namespace std;
 
 class CUEXFindDlg;
+class CExportDebugDataDlg;
 
 /////////////////////////////////////////////////////////////////////////////
 // CUEXViewerDlg dialog
@@ -45,27 +48,23 @@ public:
 	int		GetFirstSelectionIndex();
 
 	// Returns UE.asString() for the specified exception
-	std::string	GetWholeExceptionString(int nIndex);
+	string GetWholeExceptionString(int nIndex);
 
 	// Selects each specified exception
 	void	SelectExceptions(std::vector<int> &rvecExceptionIndices);
 
 // Dialog Data
-	//{{AFX_DATA(CUEXViewerDlg)
 	enum { IDD = IDD_UEXVIEWER_DIALOG };
 	CButton	m_find;
 	CListCtrl	m_listUEX;
 	CComboBox m_comboExceptionsList;
-	//}}AFX_DATA
 
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CUEXViewerDlg)
+	// virtual function overrides
 	public:
 	virtual BOOL DestroyWindow();
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	//}}AFX_VIRTUAL
 
 // Implementation
 protected:
@@ -111,6 +110,7 @@ protected:
 	afx_msg void OnCbnSelchangeComboExceptionFileList();
 	afx_msg void OnCopyELICode();
 	afx_msg void OnNMRclickListUex(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnToolsExportDebugData();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -148,7 +148,7 @@ protected:
 	//			be appended to the existing contents, but the name of the current
 	//			file, and the associated caption, etc will not change.
 	// ARGS:	strUEXFile - Full path to selected UEX file 
-	void addExceptions(std::string strUEXFile, bool bReplaceMode);
+	void addExceptions(string strUEXFile, bool bReplaceMode);
 	
 	//=======================================================================
 	// PURPOSE: Retrieves persistent column width from registry.
@@ -156,7 +156,7 @@ protected:
 	// PROMISE: Returns width from registry or 80 pixels if not found or 
 	//			out of range.
 	// ARGS:	strColumn - name of registry key 
-	long getColumnWidth(std::string strColumn);
+	long getColumnWidth(string strColumn);
 	
 	//=======================================================================
 	// PURPOSE: Extracts UCLID Exception properties from specified line of 
@@ -165,7 +165,7 @@ protected:
 	// REQUIRE: Nothing
 	// PROMISE: None.
 	// ARGS:	strText - Single line from UEX file
-	void parseLine(std::string strText);
+	void parseLine(string strText);
 
 	//=======================================================================
 	// PURPOSE: Updates iIndex field in ITEMINFO structure for each item in 
@@ -182,7 +182,7 @@ protected:
 	// ARGS:	iIndex - Row in list
 	//			iColumn - Column in list
 	//			strText - Text for cell
-	void setItemText(int iIndex, int iColumn, std::string strText);
+	void setItemText(int iIndex, int iColumn, string strText);
 
 private:
 	// Width of each column
@@ -199,12 +199,10 @@ private:
 	CString	m_zDirectory;
 
 	// Modeless Find dialog
-	std::auto_ptr<CUEXFindDlg> ma_pFindDlg;
+	auto_ptr<CUEXFindDlg> ma_pFindDlg;
+	auto_ptr<CExportDebugDataDlg> ma_pExportDebugDataDlg;
 
 	// Have the dialog's controls been instantiated yet - allows for resize
 	// and repositioning
 	bool	m_bInitialized;
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

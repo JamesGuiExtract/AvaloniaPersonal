@@ -24,7 +24,6 @@
 #define IDC_LIST_DEBUG_PARAMETERS       1167
 #define IDC_LIST_STACK_TRACE            1168
 #define IDC_STATIC_STACK_TRACE          1069
-#define IDC_EDIT_TEMP                   5000
 #define IDC_CHECK_TIMEOUT               5001
 #define IDD_PROMPT_DLG                  6000
 #define IDC_EDIT_INPUT                  6001
@@ -50,13 +49,15 @@
 #define ID_EDIT_CANCEL                  6024
 #define IDC_EDIT_OLD_PWD                6025
 #define IDD_CREATE_PASSWORD             6026
+#define ID_CONTEXT_COPYNAME             6027
+#define ID_CONTEXT_COPYVALUE            6028
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        102
-#define _APS_NEXT_COMMAND_VALUE         6027
+#define _APS_NEXT_COMMAND_VALUE         6029
 #define _APS_NEXT_CONTROL_VALUE         1070
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

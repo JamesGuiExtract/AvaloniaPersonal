@@ -12,6 +12,7 @@
 #define IDR_MAIN_MENU                   130
 #define IDR_ACCELERATOR_UEXVIEWER_DLG   132
 #define IDR_ELI_LIST_CONTEXT_MENU       133
+#define IDD_DIALOG_EXPORT_DEBUG_DATA    134
 #define IDC_TREE_FILE                   1000
 #define IDC_LIST_UEX                    1001
 #define IDC_EDIT_DIRECTORY              1002
@@ -25,6 +26,14 @@
 #define ID_BTN_NEXT_LOG_FILE            1019
 #define ID_BTN_PREV_LOG_FILE            1020
 #define IDC_STATIC_EXCEPTION_FILE_LIST  1021
+#define IDC_EDIT_DEBUG_PARAMETER        1022
+#define IDC_EDIT_EXPORT_FILENAME        1023
+#define IDC_BUTTON_BROWSE               1024
+#define IDC_CHECK_APPEND                1025
+#define IDC_RADIO_DISPLAY_ALL           1026
+#define IDC_RADIO_DISPLAY_SELECTED      1027
+#define IDC_CHECK_NARROW_SCOPE          1028
+#define IDC_EDIT_ELICODE                1029
 #define ID_FILE_EXIT                    32776
 #define ID_EDIT_DELETESELECTION         32777
 #define ID_EDIT_INVERTSELECTION         32778
@@ -38,14 +47,15 @@
 #define ID_FILE_REFRESHCURRENTLOGFILE   32809
 #define ID_ELILISTCONTEXT_COPYELICODE   32810
 #define ID_ELILISTCONTEXT_CANCEL        32811
+#define ID_TOOLS_EXPORTDEBUGDATA        32812
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
-#define _APS_NEXT_COMMAND_VALUE         32812
-#define _APS_NEXT_CONTROL_VALUE         1022
+#define _APS_NEXT_RESOURCE_VALUE        135
+#define _APS_NEXT_COMMAND_VALUE         32813
+#define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

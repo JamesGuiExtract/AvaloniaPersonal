@@ -30,6 +30,7 @@
 #include "EncryptionEngine.h"
 #include "ByteStream.h"
 #include "ByteStreamManipulator.h"
+#include "ClipboardManager.h"
 
 #include <string>
 using namespace std;
@@ -72,10 +73,6 @@ UCLIDExceptionDetailsDlg::UCLIDExceptionDetailsDlg(
 	: CDialog(IDD_DIALOG_DEBUG_INFO, pParent),
 	m_iDebugData(0)
 {
-	//{{AFX_DATA_INIT(UCLIDExceptionDetailsDlg)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
-
 	//get the reference of uclid exception to load its details 
 	//into list controls upon dialog initialisation
 	m_pUclidExceptonToLoad = &exception;
@@ -94,7 +91,6 @@ void UCLIDExceptionDetailsDlg::DoDataExchange(CDataExchange* pDX)
 	try
 	{
 		CDialog::DoDataExchange(pDX);
-		//{{AFX_DATA_MAP(UCLIDExceptionDetailsDlg)
 		DDX_Control(pDX, IDC_LIST_ELI_AND_TEXT, m_ELIandTextListCtrl);
 		DDX_Control(pDX, IDC_LIST_DEBUG_PARAMETERS, m_debugParamsListCtrl);
 		DDX_Control(pDX, IDC_LIST_STACK_TRACE, m_StackTraceListCtrl);
@@ -104,23 +100,20 @@ void UCLIDExceptionDetailsDlg::DoDataExchange(CDataExchange* pDX)
 		DDX_Control(pDX, IDOK, m_CloseButton);
 		DDX_Radio(pDX, IDC_RADIO_SELECTED_EXCEPTION, m_iDebugData);
 		DDX_Control(pDX, IDC_RADIO_ALL_EXCEPTIONS, m_AllExceptionsRadioButton);
-		
-		//}}AFX_DATA_MAP
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20282");
 }
 //--------------------------------------------------------------------------------------------------
 
 BEGIN_MESSAGE_MAP(UCLIDExceptionDetailsDlg, CDialog)
-	//{{AFX_MSG_MAP(UCLIDExceptionDetailsDlg)
 	ON_BN_CLICKED(IDC_BUTTON_SAVEAS, OnButtonSaveAs)
 	ON_BN_CLICKED(IDC_BUTTON_COPY, OnButtonCopy)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_DEBUG_PARAMETERS, OnRclickDebugParameters)
-	ON_COMMAND(ID_EDIT_COPY, OnEditCopy)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_ELI_AND_TEXT, OnItemChangedListEliAndText)
 	ON_BN_CLICKED(IDC_RADIO_SELECTED_EXCEPTION, OnDebugInformationClick)
 	ON_BN_CLICKED(IDC_RADIO_ALL_EXCEPTIONS, OnDebugInformationClick)
-	//}}AFX_MSG_MAP
+	ON_COMMAND(ID_CONTEXT_COPYNAME, OnContextCopyName)
+	ON_COMMAND(ID_CONTEXT_COPYVALUE, OnContextCopyValue)
 END_MESSAGE_MAP()
 
 //--------------------------------------------------------------------------------------------------
@@ -252,19 +245,8 @@ void UCLIDExceptionDetailsDlg::OnButtonCopy()
 		// Create the stringized data
 		string strData = m_pUclidExceptonToLoad->asStringizedByteStream();
 
-		// Use edit box to copy exception information to Clipboard
-		CEdit *pEdit = (CEdit *)GetDlgItem( IDC_EDIT_TEMP );
-		if (pEdit != NULL)
-		{
-			// Replace text with stringized exception
-			pEdit->SetWindowText( strData.c_str() );
-
-			// Set selection to entire text
-			pEdit->SetSel( 0, -1 );
-
-			// Copy string to clipboard
-			pEdit->Copy();
-		}
+		ClipboardManager clipboardMgr(this);
+		clipboardMgr.writeText(strData);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17291")
 }
@@ -276,73 +258,26 @@ void UCLIDExceptionDetailsDlg::OnRclickDebugParameters(NMHDR* pNMHDR, LRESULT* p
 
 	try
 	{	
-		// Load the context menu
-		CMenu menu;
-		menu.LoadMenu(IDR_BASE_MNU_CONTEXT);
-		CMenu *pContextMenu = menu.GetSubMenu(0);
-		
-		// Get first selected item from debug list ctrl
-		POSITION pos = m_debugParamsListCtrl.GetFirstSelectedItemPosition();
-		
-		int iIndex = -1;
-		if (pos!=NULL)
+		// Only need to display the context menu if one item is selected
+		if (getSelectedDebugParamsIndex() >= 0)
 		{
-			iIndex = m_debugParamsListCtrl.GetNextSelectedItem(pos);
+			// Load the context menu
+			CMenu menu;
+			menu.LoadMenu(IDR_BASE_MNU_CONTEXT);
+			CMenu *pContextMenu = menu.GetSubMenu(0);
+
+			// Map the point to the correct position
+			CPoint	point;
+			GetCursorPos( &point );
+
+			// Display and manage the context menu
+			pContextMenu->TrackPopupMenu(TPM_LEFTALIGN|TPM_LEFTBUTTON|TPM_RIGHTBUTTON, 
+				point.x, point.y, this);
 		}
-
-		// Don't enable copy if multiple items selected
-		bool bEnable = (iIndex>=0 && pos==NULL);  
-		
-		if (bEnable)
-		{
-			m_zClipboardText = m_debugParamsListCtrl.GetItemText(iIndex,2);
-		}
-
-		bEnable = (bEnable && !m_zClipboardText.IsEmpty());
-
-		//////////////////////////
-		// Enable or disable items
-		//////////////////////////
-		UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
-		UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-
-		pContextMenu->EnableMenuItem(ID_EDIT_COPY, bEnable ? nEnable : nDisable);
-
-		// Map the point to the correct position
-		CPoint	point;
-		GetCursorPos( &point );
-
-		// Display and manage the context menu
-		pContextMenu->TrackPopupMenu(TPM_LEFTALIGN|TPM_LEFTBUTTON|TPM_RIGHTBUTTON, 
-			point.x, point.y, this);
 
 		*pResult = 0;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17287")
-}
-//-------------------------------------------------------------------------------------------------
-void UCLIDExceptionDetailsDlg::OnEditCopy()
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-	TemporaryResourceOverride resourceOverride(gModuleResource);
-
-	try
-	{	
-		// Use edit box to copy exception information to Clipboard
-		CEdit *pEdit = (CEdit *)GetDlgItem( IDC_EDIT_TEMP );
-		if (pEdit != NULL)
-		{
-			// Replace text with stringized exception
-			pEdit->SetWindowText(m_zClipboardText);
-
-			// Set selection to entire text
-			pEdit->SetSel( 0, -1 );
-
-			// Copy string to clipboard
-			pEdit->Copy();
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17288")
 }
 //-------------------------------------------------------------------------------------------------
 void UCLIDExceptionDetailsDlg::OnItemChangedListEliAndText(NMHDR *pNMHDR, LRESULT *pResult)
@@ -456,6 +391,30 @@ void UCLIDExceptionDetailsDlg::OnDebugInformationClick()
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI21965")
+}
+//-------------------------------------------------------------------------------------------------
+void UCLIDExceptionDetailsDlg::OnContextCopyName()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+	TemporaryResourceOverride resourceOverride(gModuleResource);
+
+	try
+	{
+		copyDebugParamsColumnToClipboard(0);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28714")
+}
+//-------------------------------------------------------------------------------------------------
+void UCLIDExceptionDetailsDlg::OnContextCopyValue()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+	TemporaryResourceOverride resourceOverride(gModuleResource);
+
+	try
+	{
+		copyDebugParamsColumnToClipboard(2);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28713")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -644,7 +603,7 @@ void UCLIDExceptionDetailsDlg::loadStackTraceData(const UCLIDException &ex)
 	m_StackTraceListCtrl.SetColumnWidth(giSTACK_TRACE_LINE_COLUMN, LVSCW_AUTOSIZE);
 }
 //-------------------------------------------------------------------------------------------------
-std::string UCLIDExceptionDetailsDlg::getDataValue(const std::string strEncrypted)
+string UCLIDExceptionDetailsDlg::getDataValue(const string &strEncrypted)
 {
 	// Make a working copy so if it fails we can return the original
 	string strValue = strEncrypted;
@@ -750,5 +709,45 @@ void UCLIDExceptionDetailsDlg::resizeForNonInternalUse()
 	GetWindowRect(rect);
 	rect.bottom = nBottom + rect.bottom - nOriginalBottomOfButton;
 	MoveWindow(rect);
+}
+//-------------------------------------------------------------------------------------------------
+int UCLIDExceptionDetailsDlg::getSelectedDebugParamsIndex()
+{
+	// Get first selected item from debug list ctrl
+	POSITION pos = m_debugParamsListCtrl.GetFirstSelectedItemPosition();
+
+	int iIndex = -1;
+	int iSelectionCount = m_debugParamsListCtrl.GetSelectedCount();
+	
+	// if the pos is valid and only one item is selected get the index otherwise will
+	// return the default (-1)
+	if (pos != NULL && iSelectionCount == 1)
+	{
+		iIndex = m_debugParamsListCtrl.GetNextSelectedItem(pos);
+	}
+	return iIndex;
+}
+//-------------------------------------------------------------------------------------------------
+void UCLIDExceptionDetailsDlg::copyDebugParamsColumnToClipboard(int iColumn)
+{
+	// There are only 3 columns in the list control
+	ASSERT_ARGUMENT("ELI28729", iColumn >=0 && iColumn < 3);
+
+	// Get the selected item
+	int iSelectedItem = getSelectedDebugParamsIndex();
+
+	// The selected item should be greater than or equal to 0
+	if ( iSelectedItem >= 0)
+	{
+		// Create the clipboard manager
+		ClipboardManager clipboardMgr( this );
+
+		// Get the selected column
+		string strValueText = m_debugParamsListCtrl.GetItemText(iSelectedItem, iColumn);
+		
+		// put value on the clipboard, if the value is encrypted the getDataValue will decryt it if
+		// licensing allows it
+		clipboardMgr.writeText(getDataValue(strValueText));
+	}
 }
 //-------------------------------------------------------------------------------------------------
