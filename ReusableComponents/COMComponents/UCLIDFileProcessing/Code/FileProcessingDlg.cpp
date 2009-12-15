@@ -547,6 +547,12 @@ void FileProcessingDlg::OnBtnStop()
 	{
 		CWaitCursor wait;
 
+		// Log a message indicating that the user is stopping the FAM
+		UCLIDException ue("ELI15679", "The user has stopped File Action Manager processing!");
+		ue.addDebugInfo("FPS File",
+			m_strCurrFPSFilename.empty() ? "<Not Saved>" : m_strCurrFPSFilename);
+		ue.log();
+
 		// If only the stats thread is running need to stop it here as well as update
 		// the menus and running flags
 		if ( m_bStatsOnlyRunning )
@@ -2248,7 +2254,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr FileProcessingDlg::getFPM()
 	return UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr( m_pFileProcMgr );
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlg::setCurrFPSFile(std::string strFileName)
+void FileProcessingDlg::setCurrFPSFile(const string& strFileName)
 {
 	m_strCurrFPSFilename = strFileName;
 	CString szTitle = "File Action Manager";

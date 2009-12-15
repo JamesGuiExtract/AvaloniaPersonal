@@ -2046,21 +2046,18 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 				// notify them that processing is about to begin
 				for (int i = 0; i < nNumThreads; i++)
 				{
-					m_vecProcessingThreadData.push_back(new ProcessingThreadData());
-					// We'll work with rThreadData here instead of tmp
-					// because rThreadData is the actual ProcessingThreadData stored in
-					// the array which is a copy of tmp;
-					// get a reference to the thread data struct and update data members
-					ProcessingThreadData* pThreadData = m_vecProcessingThreadData[i];
+					// Create a thread data struct and add it to the vector
+					ProcessingThreadData* pThreadData = new ProcessingThreadData();
 					ASSERT_RESOURCE_ALLOCATION("ELI17948", pThreadData != NULL);
+					m_vecProcessingThreadData.push_back(pThreadData);
 
-					UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
-						pThreadData->m_ipTaskExecutor;
-					ASSERT_RESOURCE_ALLOCATION("ELI17949", ipExecutor != NULL);
-
+					// Update the thread data members
 					pThreadData->m_pFPMgmtRole = this;
 
 					// Initialize executor with a new copy of the file processors for the thread
+					UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
+						pThreadData->m_ipTaskExecutor;
+					ASSERT_RESOURCE_ALLOCATION("ELI17949", ipExecutor != NULL);
 					ipExecutor->Init(copyFileProcessingTasks(m_ipFileProcessingTasks),
 						getFPMDB(), getFAMTagManager());
 				}
@@ -2080,7 +2077,7 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 					ProcessingThreadData* pThreadData = m_vecProcessingThreadData[i];
 
 					// begin the thread
-					pThreadData->m_pThread = AfxBeginThread(fileProcessingThreadProc, m_vecProcessingThreadData[i]);
+					pThreadData->m_pThread = AfxBeginThread(fileProcessingThreadProc, pThreadData);
 					ASSERT_RESOURCE_ALLOCATION("ELI11075", pThreadData->m_pThread != NULL);
 
 					// wait for the thread to start

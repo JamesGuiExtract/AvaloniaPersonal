@@ -159,13 +159,6 @@ public:
 		int iType = 0);
 
 	//=======================================================================
-	// PURPOSE: This file will cleanup the license manager
-	// REQUIRE: It should be called before program exit.  No calls to the 
-	//			license manager (including the VALIDATE_LICENSE macro) can be
-	//			made after this function is called;
-	void terminate();
-
-	//=======================================================================
 	// PURPOSE: This function checks for licensing of PDF Functionality
 	bool isPDFLicensed();
 

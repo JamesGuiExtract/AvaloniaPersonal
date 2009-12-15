@@ -1153,7 +1153,7 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 	case kBeginStop:
 		{
 			// Log the info that processing is beginning to stop processing
-			UCLIDException ue("ELI15679", "The user has stopped File Action Manager processing!");
+			UCLIDException ue("ELI28831", "File Action Manager is stopping processing!");
 			ue.addDebugInfo("FPS File",
 				m_strFPSFileName.empty() ? "<Not Saved>" : m_strFPSFileName);
 			ue.log();

@@ -175,7 +175,6 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 			return false;
 		}
 
-
 		// Determine the number of files to get from the database
 		long nNumberToLoad = m_nMaxFilesFromDB;
 
@@ -198,9 +197,6 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 			// files left to process in this run.
 			nNumberToLoad = min(m_nMaxFilesFromDB, 
 				m_nNumberOfFilesToProcess - m_nNumberOfFilesProcessed);
-
-			// Increment the number of files processed
-			m_nNumberOfFilesProcessed++;
 		}
 
 		if (m_queTaskIds.size() <= 0 && !processingQueueIsDiscarded())
@@ -229,6 +225,14 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 		}
 		else
 		{
+			// Only increment the number of files processed if restricting the number
+			// of files to process and a FileProcessingRecord is being returned
+			// [LRCAU #5573]
+			if (m_nNumberOfFilesToProcess > 0)
+			{
+				m_nNumberOfFilesProcessed++;
+			}
+
 			long nTaskID = *(m_queTaskIds.begin());
 
 			task = getTask(nTaskID);
@@ -236,6 +240,10 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 			changeState(task, lockGuard);
 			return true;
 		}
+
+		// Unlock the lock guards before sleeping
+		lockGuard.Unlock();
+		lockDBLoad.Unlock();
 
 		// if a file is not available in the queue for processing, just wait for sometime
 		// and check again

@@ -105,11 +105,6 @@ LicenseManagement::~LicenseManagement()
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16431");
 }
 //-------------------------------------------------------------------------------------------------
-void LicenseManagement::terminate()
-{
-	// Do not close the ExtractTRP2 EXE, leave it running for any other applications.
-}
-//-------------------------------------------------------------------------------------------------
 void LicenseManagement::ignoreLockConstraints(long lKey)
 {
 	// prevent simultaneous access to this object from multiple threads

@@ -26,6 +26,8 @@
 
 #include <set>
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // FileProcessingDlg dialog
 
@@ -78,28 +80,22 @@ public:
 	bool isFAMReady();
 	
 // Dialog Data
-	//{{AFX_DATA(FileProcessingDlg)
 	enum { IDD = IDD_DLG_PROCESS_FILE };
-	//}}AFX_DATA
 
 // INotifyDBConfigChanged class
 public:
-	void OnDBConfigChanged(const std::string& strServer, const std::string& strDatabase);
+	void OnDBConfigChanged(const string& strServer, const string& strDatabase);
 
 protected:
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(FileProcessingDlg)
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
 // Implementation
 
 	HICON m_hIcon;
 
 	// Generated message map functions
-	//{{AFX_MSG(FileProcessingDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* pMMI);
@@ -135,7 +131,6 @@ protected:
 	afx_msg void OnHelpFileprocessingmanagerhelp();
 	afx_msg void OnToolsFAMDBAdmin();
 	BOOL OnToolTipNotify(UINT nID, NMHDR* pNMHDR, LRESULT* pResult);
-	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -160,13 +155,13 @@ private:
 	CStatusBarCtrl m_statusBar;
 
 	// an object that helps keep the database status icon updated
-	std::auto_ptr<DatabaseStatusIconUpdater> m_apDatabaseStatusIconUpdater;
+	auto_ptr<DatabaseStatusIconUpdater> m_apDatabaseStatusIconUpdater;
 
 	CSize m_sizeMinimumPropPage;
 	long m_nCurrentBottomOfPropPage;
 
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	std::auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
+	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 	
 	CToolTipCtrl m_ToolTipCtrl;
 
@@ -206,7 +201,7 @@ private:
 	FPRecordManager* m_pRecordMgr;
 
 	// Stores the name of the currently loaded(or saved) fps file
-	std::string m_strCurrFPSFilename;
+	string m_strCurrFPSFilename;
 
 	// This flag is set to true when the user stop processing using the stop button or stop processing
 	// menu option.  If the user interacts with the system by stopping processing the system will not
@@ -287,11 +282,11 @@ private:
 	// If the current configuration of the dialog has not been saved it will prompt the user to save.
 	// If strFileName == "" this method will open a dialog from which the user can select a .fps file
 	// to open
-	void openFile(std::string strFileName);
+	void openFile(string strFileName);
 	//---------------------------------------------------------------------------------------------
 	// This method will flush the current dialog settings to the m_ipFileProcMgr and then saves them
 	// to an fps file
-	bool saveFile(std::string strFileName);
+	bool saveFile(string strFileName);
 	//---------------------------------------------------------------------------------------------
 	// This method will check whether any settings in the editor have changed since the last 
 	// load/save if so it will prompt the user to Save, Continue without saving or cancel.
@@ -310,7 +305,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// This method sets the m_strCurrFPSFilename to strFileName and updates the Dialog title
 	// appropriately
-	void setCurrFPSFile(std::string strFileName);
+	void setCurrFPSFile(const string& strFileName);
 	//---------------------------------------------------------------------------------------------
 	void saveWindowSettings();
 	//---------------------------------------------------------------------------------------------
@@ -358,6 +353,3 @@ private:
 	// Displays the given page if it is not already displayed
 	void displayPage(EDlgTabPage ePage);
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
