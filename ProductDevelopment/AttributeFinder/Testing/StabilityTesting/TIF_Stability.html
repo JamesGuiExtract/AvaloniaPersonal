@@ -7,7 +7,7 @@
 
 <body>
 
-<h1>TIF Stability Tests (Test ID 3)<br>
+<h1>TIF Stability Tests<br>
 <img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
@@ -47,18 +47,17 @@
 		<li>Configure a <b>Folder file supplier</b> to supply existing *.tif images.  
 		Browse to the <b>Images</b> folder.  Remember to supply recursively if 
 		the TIFs are in one or more subfolders.
-		<li>If processing for <b>FLEX Index</b>, configure an <b>Execute Rules</b> task 
-		to use the Master RSD file previously copied to the <b>Rules</b> folder.  
-		<li>If processing for <b>ID Shield</b>, configure a 
-		<b>Redact images (no verification)</b> task 
-		to use the Master RSD file previously copied to the <b>Rules</b> folder.  
-		Redact HCData and MCData items.
+		<li>Configure a <b>Core: Execute rules</b> task to use the Master RSD 
+		file previously copied to the <b>Rules</b> folder.  
+		<li>If processing for <b>ID Shield</b>, add a <b>Redaction: Create 
+		redacted image</b> task.  Redact HCData and MCData items.
 <p>
 		<li>Begin collection of process statistics.  Use the following command from a 
 		command window open in the <b>Test_3A</b> folder.
 <p>
-		<b>LogProcessStats ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe
-        1m .\Statistics\Test_3A /el</b>
+		<b>LogProcessStats 
+		ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,ImageFormatConverter.exe,SQLServerInfo.exe 
+        	1m .\Statistics\Test_3A /el</b>
 <p>
 		<li>Start processing with the FPS file.
 		<li>Test 3A is expected to continue processing for at least 48 hours.
@@ -81,10 +80,10 @@
 		copy the desired rules to the local <b>Rules</b> folder under <b>Test_3C</b>.
 		<li>Select one or more folders of images for processing.
 		<li>Copy the folder(s) of images to the local <b>Images</b> folder 
-		under <b>Test_3C</b>. To ensure that the test runs long enough, a few
-          hundred thousand images are needed, so it is likely that you will need
-          to make several copies of the image folder(s). Note that a single file supplier on the first PC 
-		will be queueing these images.
+		under <b>Test_3C</b>. To ensure that the test runs long enough, a few 
+          	hundred thousand images are needed, so it is likely that you will need
+          	to make several copies of the image folder(s). Note that a single file supplier 
+		on the first PC will be queueing these images.
 <p>
 		<li>On the first PC:
 		<ul>
@@ -93,12 +92,10 @@
 			Browse to the <b>Images</b> folder.  Remember to supply recursively if 
 			the TIFs are in one or more subfolders.
 <p>
-			<li>If processing for <b>FLEX Index</b>, configure an <b>Execute Rules</b> task 
-			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
-			<li>If processing for <b>ID Shield</b>, configure a 
-			<b>Redact images (no verification)</b> task 
-			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
-			Redact HCData and MCData items.
+			<li>Configure a <b>Core: Execute rules</b> task to use the Master RSD 
+			file previously copied to the <b>Rules</b> folder.  
+			<li>If processing for <b>ID Shield</b>, add a <b>Redaction: Create 
+			redacted image</b> task.  Redact HCData and MCData items.
 		</ul>
 <p>
 		<li>On the second PC:
@@ -106,24 +103,24 @@
 			<li>Use the DB Admin utility to select the <b>Stability_3C</b> 
 			database on the first PC.
 			<li>Create an FPS file for processing.
-			<li>If processing for <b>FLEX Index</b>, configure an <b>Execute Rules</b> task 
-			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
-			<li>If processing for <b>ID Shield</b>, configure a 
-			<b>Redact images (no verification)</b> task 
-			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
-			Redact HCData and MCData items.
+			<li>Configure a <b>Core: Execute rules</b> task to use the Master RSD 
+			file previously copied to the <b>Rules</b> folder.  
+			<li>If processing for <b>ID Shield</b>, add a <b>Redaction: Create 
+			redacted image</b> task.  Redact HCData and MCData items.
 		</ul>
 <p>
 		<li>Begin collection of process statistics on both PCs.  Use the following command 
 		from a command window open in the <b>StabilityTest</b> folder.
 <p>
-		<b>LogProcessStats ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe
-        1m .\Statistics\Test_3C_1 /el</b>
+		<b>LogProcessStats 
+ 		ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,ImageFormatConverter.exe,SQLServerInfo.exe 
+	 	1m .\Statistics\Test_3C_1 /el</b>
 <p>
-        &nbsp;or
+	or
 <p>
-        <b>LogProcessStats ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe
-        1m .\Statistics\Test_3C_2 /el</b>
+        	<b>LogProcessStats 
+		ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,ImageFormatConverter.exe,SQLServerInfo.exe 
+		1m .\Statistics\Test_3C_2 /el</b>
 <p>
 		where Test_3C_1 is for the first PC and Test_3C_2 is for the second PC
 <p>
@@ -150,11 +147,11 @@
 		copy the desired rules to the local <b>Rules</b> folder under <b>Test_3E</b>.
 		<li>Select one or more folders of images for processing.
 		<li>Copy the folder(s) of images to the <b>Images</b> AND the <b>Images2</b> 
-		folders under <b>Test_3E</b> on the first PC. To ensure that the test
-          will run long enough, a few hundred thousand images are needed, so it
-          is likely that you will need to make several copies of the image
-          folder(s). Note that the images copied into the <b>Images2</b> folder
-          now will not be processed.
+		folders under <b>Test_3E</b> on the first PC. To ensure that the test 
+          	will run long enough, a few hundred thousand images are needed, so it 
+          	is likely that you will need to make several copies of the image 
+          	folder(s). Note that the images copied into the <b>Images2</b> folder 
+          	now will not be processed.
 		<li>Select one or more additional folders of images for supplying via listening.
 <p>
 		<li>On the first PC:
@@ -168,12 +165,10 @@
 			<li>Add a Skip Condition to not supply files that 
 			include <b>&quot;_redacted&quot;</b>.
 <p>
-			<li>If processing for <b>FLEX Index</b>, configure an <b>Execute Rules</b> task 
-			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
-			<li>If processing for <b>ID Shield</b>, configure a 
-			<b>Redact images (no verification)</b> task 
-			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
-			Redact HCData and MCData items.
+			<li>Configure a <b>Core: Execute rules</b> task to use the Master RSD 
+			file previously copied to the <b>Rules</b> folder.  
+			<li>If processing for <b>ID Shield</b>, add a <b>Redaction: Create 
+			redacted image</b> task.  Redact HCData and MCData items.
 		</ul>
 <p>
 		<li>On the second PC:
@@ -190,24 +185,24 @@
 			<li>Add a Skip Condition to not supply files that 
 			include <b>&quot;_redacted&quot;</b>.
 <p>
-			<li>If processing for <b>FLEX Index</b>, configure an <b>Execute Rules</b> task 
-			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
-			<li>If processing for <b>ID Shield</b>, configure a 
-			<b>Redact images (no verification)</b> task 
-			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
-			Redact HCData and MCData items.
+			<li>Configure a <b>Core: Execute rules</b> task to use the Master RSD 
+			file previously copied to the <b>Rules</b> folder.  
+			<li>If processing for <b>ID Shield</b>, add a <b>Redaction: Create 
+			redacted image</b> task.  Redact HCData and MCData items.
 		</ul>
 <p>
 		<li>Begin collection of process statistics on both PCs.  Use the following command 
 		from a command window open in the <b>Test_3E</b> folder.
 <p>
-        <b>LogProcessStats ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe 1m
-        .\Statistics\Test_3E_1 /el</b>
+		<b>LogProcessStats 
+		ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,ImageFormatConverter.exe,SQLServerInfo.exe 
+	 	1m .\Statistics\Test_3E_1 /el</b>
 <p>
         or
 <p>
-        <b>LogProcessStats ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe
-        1m .\Statistics\Test_3E_2 /el</b> <br>
+		<b>LogProcessStats 
+		ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,ImageFormatConverter.exe,SQLServerInfo.exe 
+	 	1m .\Statistics\Test_3E_2 /el</b>
 		where Test_3E_1 is for the first PC and Test_3E_2 is for the second PC
 <p>
 		<li>Start processing with the FPS files.
@@ -224,8 +219,9 @@
 		<ul>
 			<li>Processing failures listed on the <b>Processing Log</b> page.
 			<li>Memory usage via <b>Task Manager</b>.
-			<li>For Test_3E, use xcopy to copy a set of images into a subfolder under <b>Images2</b>.
-			This will exercise the file supplier that is listening for new files.
+			<li>For Test_3E, use xcopy to copy a set of images into a subfolder 
+			under <b>Images2</b>.  This will exercise the file supplier that is 
+			listening for new files.
 		</ul>
 <p>
 		<li>The following items should be checked when processing finishes or is stopped.
@@ -244,6 +240,5 @@
 		</ul>
 	</ul>
 </ol>
-
 </body>
 </html>
