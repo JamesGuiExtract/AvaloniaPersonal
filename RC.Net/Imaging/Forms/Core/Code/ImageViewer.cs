@@ -607,7 +607,7 @@ namespace Extract.Imaging.Forms
                                 RasterViewerInteractiveRegionType.Rectangle;
 
                             // Allow for the animation of the rectangular region 
-                            base.AnimateRegion = true;
+                            AnimateRegion = true;
 
                             // Clear selections if necessary
                             if (_cursorTool == CursorTool.SelectLayerObject)
@@ -1129,7 +1129,7 @@ namespace Extract.Imaging.Forms
         /// <param name="pageNumber">The one-based page number to be visible.</param>
         /// <param name="updateZoom">Whether to update the zoom setting.</param>
         /// <param name="raisePageChanged">Whether to raise the page changed event.</param>
-        public void SetPageNumber(int pageNumber, bool updateZoom, bool raisePageChanged)
+        void SetPageNumber(int pageNumber, bool updateZoom, bool raisePageChanged)
         {
             try
             {
@@ -1265,6 +1265,34 @@ namespace Extract.Imaging.Forms
             }
 
             return image;
+        }
+
+        /// <summary>
+        /// Gets the properties for the specified page of the currently open image.
+        /// </summary>
+        /// <param name="pageNumber">The 1-based page number from which to retrieve properties.
+        /// </param>
+        /// <returns>The properties for the specified <paramref name="pageNumber"/> of the 
+        /// currently open image.</returns>
+        public ImagePageProperties GetPageProperties(int pageNumber)
+        {
+            try
+            {
+                if (!IsImageAvailable)
+                {
+                    throw new ExtractException("ELI28829",
+                        "No image is open.");
+                }
+
+                return _reader.ReadPageProperties(pageNumber);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI28830",
+                    "Cannot get page properties.", ex);
+                ee.AddDebugData("Page Number", pageNumber, false);
+                throw ee;
+            }
         }
 
         /// <summary>
@@ -1753,7 +1781,7 @@ namespace Extract.Imaging.Forms
         /// Gets the codecs used to encode and decode images.
         /// </summary>
         /// <value>The codecs used to encode and decode images.</value>
-        public ImageCodecs Codecs
+        ImageCodecs Codecs
         {
             get 
             { 
