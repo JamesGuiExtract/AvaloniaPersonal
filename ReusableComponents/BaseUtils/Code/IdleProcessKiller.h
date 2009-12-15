@@ -14,6 +14,9 @@ public:
 	IdleProcessKiller(unsigned long ulProcessId, int iTimeOut=120000, int iInterval=2000);
 	~IdleProcessKiller();
 
+	// Returns true if the idle process killer killed the process and false otherwise
+	bool killedProcess() { return m_bKilledProcess; }
+
 private:
 
 	//---------------------------------------------------------------------------------------------
@@ -51,4 +54,6 @@ private:
 
 	// Signaled when the thread has stopped processing
 	Win32Event m_eventStopped;
+
+	bool m_bKilledProcess;
 };

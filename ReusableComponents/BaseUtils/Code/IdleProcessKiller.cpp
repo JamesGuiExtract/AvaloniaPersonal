@@ -9,7 +9,8 @@ IdleProcessKiller::IdleProcessKiller(unsigned long ulProcessId, int iTimeOut, in
 	: m_ulProcessId(ulProcessId),
 	  m_iInterval(iInterval),
 	  m_iZeroCpuCount(0),
-	  m_iMaxZeroCpuCount(0)
+	  m_iMaxZeroCpuCount(0),
+	  m_bKilledProcess(false)
 {
 	try
 	{
@@ -96,6 +97,8 @@ void IdleProcessKiller::monitorProcess()
 			// Terminate the process
 			TerminateProcess(hProcess, 0);
 			CloseHandle(hProcess);
+			
+			m_bKilledProcess = true;
 
 			// Log an application trace
 			UCLIDException ue("ELI25219", "Application trace: Idle process terminated.");

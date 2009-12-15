@@ -10,6 +10,7 @@
 #include <COMUtils.h>
 #include <ByteStream.h>
 #include <ComponentLicenseIDs.h>
+#include <IdleProcessKiller.h>
 #include <LicenseMgmt.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -234,8 +235,24 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(BSTR bstrFileFullName, long nFil
 			strArgs += " /pdfa";
 		}
 
-		// execute the utility to convert the PDF
-		runExtractEXE(m_strConvertToPDFEXE, strArgs, INFINITE);
+
+		// Execute the utility to convert the PDF
+		ProcessInformationWrapper pwWrapper;
+		runExtractEXE(m_strConvertToPDFEXE, strArgs, 0, &pwWrapper);
+
+		// Add an idle process killer to monitor the executable [LRCAU #5581]
+		IdleProcessKiller killer(pwWrapper.pi.dwProcessId);
+
+		// Wait for the process to end
+		WaitForSingleObject( pwWrapper.pi.hProcess, INFINITE );
+
+		// Check if the process was killed by the IdleProcessKiller.
+		if (killer.killedProcess())
+		{
+			UCLIDException uex("ELI28833", "Convert to PDF task was killed.");
+			uex.addDebugInfo("File Name", strInputImage);
+			throw uex;
+		}
 
 		// completed successfully
 		*pResult = kProcessingSuccessful;
