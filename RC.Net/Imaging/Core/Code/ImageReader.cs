@@ -162,7 +162,7 @@ namespace Extract.Imaging
         /// <param name="pageNumber">The 1-based page number to read.</param>
         /// <param name="fitWithin">The dimensions in pixels in which the resultant image will 
         /// fit while maintaining its aspect ratio.</param>
-        /// <returns>A <see cref="RasterImage"/> for  <paramref name="pageNumber"/>, sized to fit 
+        /// <returns>A <see cref="RasterImage"/> for <paramref name="pageNumber"/>, sized to fit 
         /// within the specified <paramref name="fitWithin"/>.</returns>
         public RasterImage ReadPageAsThumbnail(int pageNumber, Size fitWithin)
         {
@@ -170,23 +170,16 @@ namespace Extract.Imaging
             {
                 using (new PdfLock(_isPdf))
                 {
-                    // TODO: Cache image info
                     // Get the dimensions of this page.
-                    int width;
-                    int height;
-                    using (CodecsImageInfo info = _codecs.GetInformation(_stream, false, pageNumber))
-                    {
-                        width = info.Width;
-                        height = info.Height;
-                    } 
+                    ImagePageProperties properties = GetPageProperties(pageNumber);
 
                     // Calculate how far from the desired size the original image is
-                    double scale = Math.Min(fitWithin.Width / (double)width,
-                        fitWithin.Height / (double)height);
+                    double scale = Math.Min(fitWithin.Width / (double)properties.Width,
+                        fitWithin.Height / (double)properties.Height);
 
                     // Set the desired width and height, maintaining aspect ratio
-                    width = (int)(width * scale);
-                    height = (int)(height * scale);
+                    int width = (int)(properties.Width * scale);
+                    int height = (int)(properties.Height * scale);
 
                     return _codecs.Load(_fileName, width, height, 24, RasterSizeFlags.Bicubic,
                         CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber); 
@@ -199,6 +192,49 @@ namespace Extract.Imaging
                 ee.AddDebugData("Image file", _fileName, false);
                 ee.AddDebugData("Page", pageNumber, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Reads the <see cref="ImagePageProperties"/> from the specified page.
+        /// </summary>
+        /// <param name="pageNumber">The 1-based page from which the properties should be read.
+        /// </param>
+        /// <returns>The <see cref="ImagePageProperties"/> from the specified 
+        /// <paramref name="pageNumber"/>.</returns>
+        public ImagePageProperties ReadPageProperties(int pageNumber)
+        {
+            try
+            {
+                using (new PdfLock(_isPdf))
+                {
+                    return GetPageProperties(pageNumber); 
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI28827",
+                    "Unable to read page properties.", ex);
+                ee.AddDebugData("Image file", _fileName, false);
+                ee.AddDebugData("Page", pageNumber, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Reads the <see cref="ImagePageProperties"/> from the specified page. Unlike 
+        /// <see cref="ReadPageProperties"/>, this method does NOT lock for exclusive PDF reading.
+        /// </summary>
+        /// <param name="pageNumber">The 1-based page from which the properties should be read.
+        /// </param>
+        /// <returns>The <see cref="ImagePageProperties"/> from the specified 
+        /// <paramref name="pageNumber"/>.</returns>
+        ImagePageProperties GetPageProperties(int pageNumber)
+        {
+            // TODO: Cache image info?
+            using (CodecsImageInfo info = _codecs.GetInformation(_stream, false, pageNumber))
+            {
+                return new ImagePageProperties(info);
             }
         }
 
