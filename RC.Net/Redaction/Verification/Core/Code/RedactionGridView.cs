@@ -1,3 +1,4 @@
+using Extract.Imaging;
 using Extract.Imaging.Forms;
 using System;
 using System.Collections;
@@ -10,6 +11,7 @@ using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 
 using EOrientation = UCLID_RASTERANDOCRMGMTLib.EOrientation;
+using RedactionLayerObject = Extract.Imaging.Forms.Redaction;
 using SpatialPageInfo = UCLID_RASTERANDOCRMGMTLib.SpatialPageInfo;
 
 namespace Extract.Redaction.Verification
@@ -80,6 +82,11 @@ namespace Extract.Redaction.Verification
         #region Fields
 
         /// <summary>
+        /// The color that toggled on redactions are drawn on the image viewer.
+        /// </summary>
+        public static readonly Color ToggledRedactionColor = Color.CornflowerBlue;
+
+        /// <summary>
         /// The <see cref="ImageViewer"/> with which the <see cref="RedactionGridView"/> is 
         /// associated.
         /// </summary>
@@ -137,6 +144,11 @@ namespace Extract.Redaction.Verification
         /// The zoom setting when <see cref="_autoZoom"/> is <see langword="true"/>.
         /// </summary>
         int _autoZoomScale = _DEFAULT_AUTO_ZOOM_SCALE;
+
+        /// <summary>
+        /// The confidence level associated with manual redactions.
+        /// </summary>
+        ConfidenceLevel _manualConfidenceLevel;
 
         /// <summary>
         /// <see langword="true"/> if changes have been made to the grid since it was loaded;
@@ -273,6 +285,24 @@ namespace Extract.Redaction.Verification
             get
             {
                 return _lastCodes != null;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ConfidenceLevel"/> associated with manual redactions.
+        /// </summary>
+        /// <value>The <see cref="ConfidenceLevel"/> associated with manual redactions.</value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public ConfidenceLevel ManualConfidenceLevel
+        {
+            get
+            {
+                return _manualConfidenceLevel;
+            }
+            set
+            {
+                _manualConfidenceLevel = value;
             }
         }
 
@@ -1116,33 +1146,23 @@ namespace Extract.Redaction.Verification
         /// <returns>The page info map for the currently open image.</returns>
         LongToObjectMap GetPageInfoMap()
         {
-            // TODO: SetPageNumber is inefficient and should be removed from ImageViewer
-            int page = _imageViewer.PageNumber;
-            try
+            // Iterate over each page of the image.
+            LongToObjectMap pageInfoMap = new LongToObjectMap();
+            for (int i = 1; i <= _imageViewer.PageCount; i++)
             {
-                // Iterate over each page of the image.
-                LongToObjectMap pageInfoMap = new LongToObjectMap();
-                for (int i = 1; i <= _imageViewer.PageCount; i++)
-                {
-                    _imageViewer.SetPageNumber(i, false, false);
+                ImagePageProperties pageProperties = _imageViewer.GetPageProperties(i);
 
-                    // Create the spatial page info for this page
-                    SpatialPageInfo pageInfo = new SpatialPageInfo();
-                    int width = _imageViewer.ImageWidth;
-                    int height = _imageViewer.ImageHeight;
-                    pageInfo.SetPageInfo(width, height, EOrientation.kRotNone, 0);
+                // Create the spatial page info for this page
+                SpatialPageInfo pageInfo = new SpatialPageInfo();
+                int width = pageProperties.Width;
+                int height = pageProperties.Height;
+                pageInfo.SetPageInfo(width, height, EOrientation.kRotNone, 0);
 
-                    // Add it to the map
-                    pageInfoMap.Set(i, pageInfo);
-                }
-
-                return pageInfoMap;
+                // Add it to the map
+                pageInfoMap.Set(i, pageInfo);
             }
-            finally
-            {
-                // Restore the original page number
-                _imageViewer.SetPageNumber(page, false, false);
-            }
+
+            return pageInfoMap;
         }
 
         /// <summary>
@@ -1624,11 +1644,18 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Add(e.LayerObject, "[No text]", "Manual", _lastType);
-
-                if (_autoTool != AutoTool.None)
+                RedactionLayerObject redaction = e.LayerObject as RedactionLayerObject;
+                if (redaction != null)
                 {
-                    _imageViewer.CursorTool = GetAutoCursorTool();
+                    Add(e.LayerObject, "[No text]", "Manual", _lastType);
+
+                    redaction.BorderColor = _manualConfidenceLevel.Color;
+                    redaction.Color = ToggledRedactionColor;
+
+                    if (_autoTool != AutoTool.None)
+                    {
+                        _imageViewer.CursorTool = GetAutoCursorTool();
+                    }
                 }
             }
             catch (Exception ex)
