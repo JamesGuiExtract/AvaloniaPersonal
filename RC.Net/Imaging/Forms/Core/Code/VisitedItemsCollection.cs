@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections;
 
 namespace Extract.Imaging.Forms
@@ -10,15 +9,15 @@ namespace Extract.Imaging.Forms
     /// </summary>
     public class VisitedItemsCollection : IEnumerable<int>
     {
-        #region VisitedItemsCollection Fields
+        #region Fields
 
         readonly int[] _items;
 
         readonly int _count;
 
-        #endregion VisitedItemsCollection Fields
+        #endregion Fields
 
-        #region VisitedItemsCollection Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VisitedItemsCollection"/> class.
@@ -42,9 +41,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion VisitedItemsCollection Constructors
+        #endregion Constructors
 
-        #region VisitedItemsCollection Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets whether the specified item is visited.
@@ -58,7 +57,7 @@ namespace Extract.Imaging.Forms
         {
             get
             {
-                return (_items[index / 32] & (1 << (index % 32))) > 0;
+                return (_items[index / 32] & (1 << (index % 32))) != 0;
             }
             set
             {
@@ -83,7 +82,7 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion VisitedItemsCollection Properties
+        #endregion Properties
 
         #region IEnumerable<int> Members
 
@@ -105,7 +104,7 @@ namespace Extract.Imaging.Forms
                     j = 0;
                 }
 
-                if ((_items[i] & (1 << j)) > 0)
+                if ((_items[i] & (1 << j)) != 0)
                 {
                     yield return item;
                 }
