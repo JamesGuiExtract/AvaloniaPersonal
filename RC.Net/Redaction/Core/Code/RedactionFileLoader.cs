@@ -150,6 +150,18 @@ namespace Extract.Redaction
         }
 
         /// <summary>
+        /// Gets the <see cref="ConfidenceLevel"/> associated with manual redactions.
+        /// </summary>
+        /// <value>The <see cref="ConfidenceLevel"/> associated with manual redactions.</value>
+        public ConfidenceLevel ManualConfidenceLevel
+        {
+            get
+            {
+                return _manual;
+            }
+        }
+
+        /// <summary>
         /// Gets the old revisions COM attribute.
         /// </summary>
         /// <value>The old revisions COM attribute.</value>

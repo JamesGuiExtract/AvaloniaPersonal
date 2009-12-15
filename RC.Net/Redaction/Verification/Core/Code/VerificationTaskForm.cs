@@ -185,6 +185,8 @@ namespace Extract.Redaction.Verification
 
                 _currentVoa = new RedactionFileLoader(_iniSettings.ConfidenceLevels);
 
+                _redactionGridView.ManualConfidenceLevel = _currentVoa.ManualConfidenceLevel;
+
                 // Set the selection pen
                 LayerObject.SelectionPen = ExtractPens.GetThickPen(Color.Red);
 
@@ -431,7 +433,7 @@ namespace Extract.Redaction.Verification
                 else if ((types & CollectionTypes.Redacted) > 0)
                 {
                     // If there are any redactions currently in the grid, collect feedback.
-                    if (_redactionGridView.HasRedactions )
+                    if (_redactionGridView.HasRedactions)
                     {
                         return true;
                     }

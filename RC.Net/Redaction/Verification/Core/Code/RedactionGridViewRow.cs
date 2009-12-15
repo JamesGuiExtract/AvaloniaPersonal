@@ -180,7 +180,8 @@ namespace Extract.Redaction.Verification
                     {
                         _redacted = value;
 
-                        Color color = _redacted ? Color.CornflowerBlue : Color.Transparent;
+                        Color color = _redacted ? 
+                            RedactionGridView.ToggledRedactionColor : Color.Transparent;
                         foreach (RedactionLayerObject redaction in _layerObjects)
                         {
                             redaction.Color = color;
@@ -686,7 +687,8 @@ namespace Extract.Redaction.Verification
                 RedactionLayerObject redaction = new RedactionLayerObject(imageViewer,
                     pair.Key, new string[] { "Redaction" }, pair.Value);
                 redaction.BorderColor = item.Level.Color;
-                redaction.Color = item.Attribute.Redacted ? Color.CornflowerBlue : Color.Transparent;
+                redaction.Color = item.Attribute.Redacted ? 
+                    RedactionGridView.ToggledRedactionColor : Color.Transparent;
                 redaction.CanRender = item.Level.Output;
 
                 layerObjects.Add(redaction);
