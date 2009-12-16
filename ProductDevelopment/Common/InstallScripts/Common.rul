@@ -78,7 +78,9 @@
     prototype DetectDotNET_35();
     prototype UninstallInstallSQLCE();
     prototype InstallDotNetService(STRING);
-    
+    prototype UninstallDotNetService(STRING);    
+	prototype BOOL AreOtherExtractProductsInstalled();
+
     // your global variables
     BOOL gbInstalled;
 
@@ -573,10 +575,61 @@ end;
 //  FUNCTION:   InstallDotNetService
 //
 //  EVENT:      Installs a Dot Net service 
-//				Assumes the
 //
 ///////////////////////////////////////////////////////////////////////////////
 function InstallDotNetService(strServiceName)
 begin
 	LaunchAppAndWait( INSTALL_UTIL_PATH , strServiceName, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+end;
+     
+     
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   UninstallDotNetService
+//
+//  EVENT:      Uninstalls a Dot Net service 
+//
+///////////////////////////////////////////////////////////////////////////////
+function UninstallDotNetService(strServiceName)
+STRING szCmdLine;
+begin
+	szCmdLine = "/u " + strServiceName;            
+	LaunchAppAndWait( INSTALL_UTIL_PATH , szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+end;
+     
+     
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: AreOtherExtractProductsInstalled
+//
+//  Purpose: This function checks for other Extract Systems products
+//			 returns TRUE if there is another product installed
+// NOTE: Does not check to see if LM is installed
+///////////////////////////////////////////////////////////////////////////////
+function BOOL AreOtherExtractProductsInstalled()
+BOOL bReturnValue;
+STRING strVersion;
+begin
+    bReturnValue = FALSE;
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+ 	
+    // Check each of the expected version against any installed versions
+    if ((PRODUCT_GUID!= IDSHIELD_PRODUCT_CODE) && 
+    		CheckProductKeyInstalled(@FlexIndexVersion, IDSHIELD_PRODUCT_CODE, strVersion, FALSE)) then
+    	bReturnValue = TRUE;
+	elseif ((PRODUCT_GUID != FLEX_INDEX_PRODUCT_CODE) && 
+    		CheckProductKeyInstalled(@FlexIndexVersion, FLEX_INDEX_PRODUCT_CODE, strVersion, FALSE)) then
+    	bReturnValue = TRUE;
+	elseif ((PRODUCT_GUID != LASERFICHE_PRODUCT_CODE) && 
+    		CheckProductKeyInstalled(@LaserficheVersion, LASERFICHE_PRODUCT_CODE, strVersion, FALSE)) then 
+    	bReturnValue = TRUE;
+	elseif ((PRODUCT_GUID != IDSHIELDOFFICE_PRODUCT_CODE) && 
+    		CheckProductKeyInstalled(@IDShieldOfficeVersion, IDSHIELDOFFICE_PRODUCT_CODE, strVersion, FALSE)) then 
+    	bReturnValue = TRUE;
+   	elseif ((PRODUCT_GUID != LABDE_PRODUCT_CODE) && 
+    		CheckProductKeyInstalled(@LabDEVersion, LABDE_PRODUCT_CODE, strVersion, FALSE)) then 
+    	bReturnValue = TRUE;
+	endif;
+	
+	return bReturnValue;    	
 end;

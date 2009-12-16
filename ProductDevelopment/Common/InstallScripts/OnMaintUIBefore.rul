@@ -66,10 +66,16 @@ Dlg_SdFeatureTree:
 	switch(nType)
 		case REMOVEALL: 
 			detectRDTInstall();
-		
-			// Uninstall Crystal Reports
-			UninstallCrystalReports12();
-			UninstallInstallSQLCE ();
+			
+			// Check if other products are installed before uninstalling these items
+			if (AreOtherExtractProductsInstalled() == FALSE) then
+				// Uninstall ESFAMService
+				UninstallDotNetService("\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFAMService.exe\"");
+				
+				// Uninstall Crystal Reports
+				UninstallCrystalReports12();
+				UninstallInstallSQLCE ();
+			endif;
   			FeatureRemoveAll();
 		case REPAIR:    
 			FeatureReinstall();
