@@ -729,15 +729,22 @@ namespace Extract.Redaction.Verification
                 {
                     // If no redaction is on the currently visible page, 
                     // go to the page of the first selected redaction.
-                    if (!IsRedactionVisible())
+                    LayerObject[] selected = GetSelectedLayerObjectsOnVisiblePage();
+                    if (selected.Length == 0)
                     {
                         _imageViewer.PageNumber = GetFirstSelectedPage();
+
+                        selected = GetSelectedLayerObjectsOnVisiblePage();
                     }
 
-                    // If auto-zoom is on, zoom around all layer objects on the current page.
                     if (_autoZoom)
                     {
-                        PerformAutoZoom();
+                        // Auto-zoom is on, zoom around all layer objects on the current page.
+                        PerformAutoZoom(selected);
+                    }
+                    else if (ContainsNonVisibleLayerObject(selected))
+                    {
+                        _imageViewer.CenterOnLayerObjects(selected);
                     }
                 }
 
@@ -748,6 +755,30 @@ namespace Extract.Redaction.Verification
                 _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
                 _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
             }
+        }
+
+        /// <summary>
+        /// Determines if the specified layer objects contains at least one layer object that is 
+        /// not within the visible view of the user.
+        /// </summary>
+        /// <param name="layerObjects">The layer objects to test for visibility.</param>
+        /// <returns><see langword="true"/> if at least one of the <paramref name="layerObjects"/> 
+        /// is outside the user's view; <see langword="false"/> if all the 
+        /// <paramref name="layerObjects"/> are in view.</returns>
+        bool ContainsNonVisibleLayerObject(IEnumerable<LayerObject> layerObjects)
+        {
+            Rectangle visibleArea = _imageViewer.GetVisibleImageArea();
+            visibleArea = _imageViewer.GetTransformedRectangle(visibleArea, true);
+
+            foreach (LayerObject layerObject in layerObjects)
+            {
+                if (!layerObject.IsVisible(visibleArea))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -784,8 +815,10 @@ namespace Extract.Redaction.Verification
         /// <returns><see langword="true"/> if there is a redaction on the currently visible page;
         /// <see langword="false"/> if there are no redactions or all redactions are on 
         /// non-visible pages.</returns>
-        bool IsRedactionVisible()
+        LayerObject[] GetSelectedLayerObjectsOnVisiblePage()
         {
+            List<LayerObject> result = new List<LayerObject>();
+
             // Get the current page number
             int currentPage = _imageViewer.PageNumber;
             foreach (RedactionGridViewRow row in SelectedRows)
@@ -794,12 +827,12 @@ namespace Extract.Redaction.Verification
                 {
                     if (layerObject.PageNumber == currentPage)
                     {
-                        return true;
+                        result.Add(layerObject);
                     }
                 }
             }
 
-            return false;
+            return result.ToArray();
         }
 
         /// <summary>
@@ -822,12 +855,12 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Zooms around selected layer objects on the current page.
+        /// Zooms around the specified layer objects.
         /// </summary>
-        void PerformAutoZoom()
+        void PerformAutoZoom(IEnumerable<LayerObject> layerObjects)
         {
             // Get combined area of all the selected layer objects on the current page
-            Rectangle area = GetSelectedBoundsOnPage(_imageViewer.PageNumber);
+            Rectangle area = LayerObject.GetCombinedBounds(layerObjects);
 
             // Adjust the area by the auto zoom scale
             int padding = _autoZoomScale * _PADDING_MULTIPLIER;
@@ -836,40 +869,6 @@ namespace Extract.Redaction.Verification
 
             // Zoom to appropriate area
             _imageViewer.ZoomToRectangle(area);
-        }
-
-        /// <summary>
-        /// Determines the smallest bounding rectangle around all selected layer objects on the 
-        /// specified page.
-        /// </summary>
-        /// <param name="pageNumber">The page on which the selected layer objects appear.</param>
-        /// <returns>The smallest bounding rectangle around all selected layer objects on 
-        /// <paramref name="pageNumber"/>; or <see cref="Rectangle.Empty"/> if no layer objects 
-        /// are selected on <paramref name="pageNumber"/>.</returns>
-        Rectangle GetSelectedBoundsOnPage(int pageNumber)
-        {
-            // Iterate over each layer object on the page
-            Rectangle? area = null;
-            foreach (RedactionGridViewRow row in SelectedRows)
-            {
-                foreach (LayerObject layerObject in row.LayerObjects)
-                {
-                    if (layerObject.PageNumber == pageNumber)
-                    {
-                        // Append the bounds of this layer object
-                        if (area == null)
-                        {
-                            area = layerObject.GetBounds();
-                        }
-                        else
-                        {
-                            area = Rectangle.Union(area.Value, layerObject.GetBounds());
-                        }
-                    }
-                }
-            }
-
-            return area ?? Rectangle.Empty;
         }
 
         /// <summary>
