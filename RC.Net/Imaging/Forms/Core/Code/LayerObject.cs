@@ -19,7 +19,7 @@ namespace Extract.Imaging.Forms
     /// </summary>
     public abstract class LayerObject : IDisposable, IComparable<LayerObject>, IXmlSerializable
     {
-        #region LayerObject Constants
+        #region Constants
 
         /// <summary>
         /// The comment to use for manually created layer object.
@@ -59,9 +59,9 @@ namespace Extract.Imaging.Forms
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(LayerObject).ToString();
 
-        #endregion LayerObject Constants
+        #endregion Constants
 
-        #region LayerObject Fields
+        #region Fields
 
         /// <summary>
         /// The next unique id for a layer object.
@@ -164,9 +164,9 @@ namespace Extract.Imaging.Forms
         /// tracked.</remarks>
         TrackingData _trackingData;
         
-        #endregion LayerObject Fields
+        #endregion Fields
 
-        #region LayerObject Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LayerObject"/> class.
@@ -264,9 +264,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion LayerObject Constructors
+        #endregion Constructors
 
-        #region LayerObject Properties
+        #region Properties
 
         /// <summary>
         /// Gets the unique identification number of the layer object.
@@ -690,9 +690,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion LayerObject Properties
+        #endregion Properties
 
-        #region LayerObject Methods
+        #region Methods
 
         /// <summary>
         /// Gets the next unique id for an object.
@@ -1301,6 +1301,49 @@ namespace Extract.Imaging.Forms
         public abstract Rectangle GetBounds();
 
         /// <summary>
+        /// Determines the smallest bounding rectangle containing the specified layer objects in 
+        /// logical (image) coordinates.
+        /// </summary>
+        /// <param name="layerObjects">The layer objects from which to get bounds. Must all be on 
+        /// the same page.</param>
+        /// <returns>The smallest bounding rectangle containing the 
+        /// <paramref name="layerObjects"/> in logical (image) coordinates.</returns>
+        public static Rectangle GetCombinedBounds(IEnumerable<LayerObject> layerObjects)
+        {
+            try
+            {
+                // Iterate over each layer object
+                Rectangle? area = null;
+                int page = -1;
+                foreach (LayerObject layerObject in layerObjects)
+                {
+                    // Append the bounds of this layer object
+                    if (area == null)
+                    {
+                        area = layerObject.GetBounds();
+                        page = layerObject.PageNumber;
+                    }
+                    else if (page == layerObject.PageNumber)
+                    {
+                        area = Rectangle.Union(area.Value, layerObject.GetBounds());
+                    }
+                    else
+                    {
+                        throw new ExtractException("ELI28836", 
+                            "Cannot get bounds for layer objects on different pages.");
+                    }
+                }
+
+                return area ?? Rectangle.Empty;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI28835",
+                    "Unable to get combined bounds.", ex);
+            }
+        }
+
+        /// <summary>
         /// Gets the smallest rectangle that contains the <see cref="LayerObject"/> in physical 
         /// (client) coordinates.
         /// </summary>
@@ -1649,7 +1692,7 @@ namespace Extract.Imaging.Forms
             Dirty = true;
         }
 
-        #endregion LayerObject Methods
+        #endregion Methods
 
         #region IDisposable Members
 
