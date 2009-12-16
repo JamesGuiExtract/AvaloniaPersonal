@@ -1379,15 +1379,40 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap,
 void loadImagePage(PDFInputOutputMgr& inputFile, BITMAPHANDLE& rBitmap,
 				   FILEINFO& rFileInfo, LOADFILEOPTION& lfo, bool bChangeViewPerspective)
 {
-	// Check that the PDF manager is in input mode
-	ASSERT_ARGUMENT("ELI27288", inputFile.isInputFile());
-
 	try
 	{
 		try
 		{
-			throwExceptionIfNotSuccess(L_LoadBitmap( (char*)( inputFile.getFileName().c_str()), 
-				&rBitmap, sizeof(BITMAPHANDLE), 0, ORDER_RGB, &lfo, &rFileInfo),"ELI13284",
+			// Check that the PDF manager is in input mode
+			ASSERT_ARGUMENT("ELI27288", inputFile.isInputFile());
+
+			loadImagePage(inputFile.getFileName(), rBitmap, rFileInfo, lfo, false, bChangeViewPerspective);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28837");
+	}
+	catch(UCLIDException& uex)
+	{
+		uex.addDebugInfo("PDF Manager File", inputFile.getFileNameInformationString());
+		throw uex;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap, FILEINFO& rflInfo,
+				   LOADFILEOPTION& lfo, bool bLockPdf, bool bChangeViewPerspective)
+{
+	try
+	{
+		try
+		{
+			// Lock the PDF loading if bLockPdf == true
+			auto_ptr<LeadToolsPDFLoadLocker> apLoadLock;
+			if (bLockPdf)
+			{
+				apLoadLock.reset(new LeadToolsPDFLoadLocker(strImageFileName));
+			}
+
+			throwExceptionIfNotSuccess(L_LoadBitmap( (char*)( strImageFileName.c_str()), 
+				&rBitmap, sizeof(BITMAPHANDLE), 0, ORDER_RGB, &lfo, &rflInfo),"ELI13284",
 				"Unable to load image page!");
 
 			// If bChangeViewPerspective == true && the view perspective is not TOP_LEFT 
@@ -1403,8 +1428,9 @@ void loadImagePage(PDFInputOutputMgr& inputFile, BITMAPHANDLE& rBitmap,
 	}
 	catch(UCLIDException& ue)
 	{
-		ue.addDebugInfo("File To Load", inputFile.getFileNameInformationString());
+		ue.addDebugInfo("File To Load", strImageFileName);
 		ue.addDebugInfo("Page Number", lfo.PageNumber);
+		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -1443,19 +1469,44 @@ void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO&
 void saveImagePage(BITMAPHANDLE& hBitmap, PDFInputOutputMgr& outFile,
 				   FILEINFO& flInfo, SAVEFILEOPTION &sfo)
 {
-	// Check that the PDF manager is in output mode
-	ASSERT_ARGUMENT("ELI27289", !outFile.isInputFile());
-
 	try
 	{
 		try
 		{
+			// Check that the PDF manager is in output mode
+			ASSERT_ARGUMENT("ELI27289", !outFile.isInputFile());
+
+			saveImagePage(hBitmap, outFile.getFileName(), flInfo, sfo, false);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28838");
+	}
+	catch(UCLIDException& uex)
+	{
+		uex.addDebugInfo("PDF Manager File", outFile.getFileNameInformationString());
+		throw uex;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO& flInfo,
+				   SAVEFILEOPTION& sfo, bool bLockPdf)
+{
+	try
+	{
+		try
+		{
+			// Lock the PDF saving if bLockPdf == true
+			auto_ptr<LeadToolsPDFLoadLocker> apLoadLock;
+			if (bLockPdf)
+			{
+				apLoadLock.reset(new LeadToolsPDFLoadLocker(strOutputFile));
+			}
+
 			// Get the retry count and timeout
 			int iRetryCount(0), iRetryTimeout(0);
 			getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
 
 			// Get the file name as a char*
-			char* pszOutFile = (char*) outFile.getFileName().c_str();
+			char* pszOutFile = (char*) strOutputFile.c_str();
 
 			// Get the compression factor
 			long nCompression = getCompressionFactor(flInfo.Format);
@@ -1502,7 +1553,7 @@ void saveImagePage(BITMAPHANDLE& hBitmap, PDFInputOutputMgr& outFile,
 				UCLIDException ue("ELI20367",
 					"Application Trace: Successfully saved image page after retry.");
 				ue.addDebugInfo("Page Number", sfo.PageNumber);
-				ue.addDebugInfo("Output File Name", outFile.getFileNameInformationString());
+				ue.addDebugInfo("Output File Name", strOutputFile);
 				ue.addDebugInfo("Retries", nNumFailedAttempts);
 				ue.log();
 			}
@@ -1511,7 +1562,7 @@ void saveImagePage(BITMAPHANDLE& hBitmap, PDFInputOutputMgr& outFile,
 	}
 	catch(UCLIDException& uex)
 	{
-		uex.addDebugInfo("Output File Name", outFile.getFileNameInformationString());
+		uex.addDebugInfo("Output File Name", strOutputFile);
 		uex.addDebugInfo("Page Number", sfo.PageNumber);
 
 		throw uex;

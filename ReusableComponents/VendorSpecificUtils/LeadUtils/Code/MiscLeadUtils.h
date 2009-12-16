@@ -261,29 +261,37 @@ LEADUTILS_API void getImagePixelHeightAndWidth(const string& strImageFileName, i
 											   int& riWidth, int nPageNum=1);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the handle of a bitmap for the given page in the file
-// the bitmap will have to be free'd by caller
+// the bitmap will have to be freed by caller
 LEADUTILS_API void loadImagePage(const string& strImageFileName, unsigned long ulPage, 
 								 BITMAPHANDLE &rBitmap, bool bChangeViewPerspective = true);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the handle of a bitmap for the given page in the file
-// the bitmap will have to be free'd by caller, the rflInfo will be filled
+// the bitmap will have to be freed by caller, the rflInfo will be filled
 // with file information after this call
 LEADUTILS_API void loadImagePage(const string& strImageFileName, unsigned long ulPage,
 								 BITMAPHANDLE &rBitmap, FILEINFO& rflInfo, bool bChangeViewPerspective = true);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the handle of a bitmap for the specified file loaded based upon
 //			the provided LOADFILEOPTION (will load the page set in the lfo.PageNumber field)
-//			the bitmap will have to be free'd by caller
+//			the bitmap will have to be freed by caller
 LEADUTILS_API void loadImagePage(const string& strImageFileName, BITMAPHANDLE &rBitmap,
 								 FILEINFO& rflInfo, LOADFILEOPTION& lfo,
 								 bool bChangeViewPerspective = true);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the handle of a bitmap for the specified file loaded based upon
 //			the provided LOADFILEOPTION (will load the page set in the lfo.PageNumber field)
-//			the bitmap will have to be free'd by caller
+//			the bitmap will have to be freed by caller
 // REQUIRE:	inputFile is in input mode
 LEADUTILS_API void loadImagePage(PDFInputOutputMgr& inputFile, BITMAPHANDLE& rBitmap,
 								 FILEINFO& rflInfo, LOADFILEOPTION& lfo,
+								 bool bChangeViewPerspective = true);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To return the handle of a bitmap for the specified file loaded based upon
+//			the provided LOADFILEOPTION (will load the page set in the lfo.PageNumber field)
+//			the bitmap will have to be freed by the caller. If bLockPDF == true then
+//			the LeadtoolsPDFLoadLocker will be instantiated for the load call.
+LEADUTILS_API void loadImagePage(const string& strImageFileName, BITMAPHANDLE &rBitmap,
+								 FILEINFO &rflInfo, LOADFILEOPTION& lfo, bool bLockPdf,
 								 bool bChangeViewPerspective = true);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To save the bitmap to the specified image at the specified page number
@@ -300,6 +308,12 @@ LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputF
 // NOTE:	This code will internally perform multiple retry attempts when saving the page.
 LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, PDFInputOutputMgr& outFile,
 								 FILEINFO& flInfo, SAVEFILEOPTION& sfo);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To save the bitmap to the specified image based on the SAVEFILEOPTION struct.
+//			If bLockPDF == true then a LeadtoolsPDFLoadLocker will be instantiated.
+// NOTE:	This code will internally perform multiple retry attempts when saving the page.
+LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOuputFile,
+								 FILEINFO& flInfo, SAVEFILEOPTION& sfo, bool bLockPdf);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the color of the designated pixel
 LEADUTILS_API COLORREF getPixelColor(BITMAPHANDLE &rBitmap, int iRow, int iCol);

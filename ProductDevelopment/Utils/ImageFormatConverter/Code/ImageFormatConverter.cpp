@@ -124,9 +124,10 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 	{
 		try
 		{
-			// Provide multi-thread protection for PDF images
-			LeadToolsPDFLoadLocker ltInputPDF( strInputFileName );
-			LeadToolsPDFLoadLocker ltOutputPDF( strOutputFileName );
+			// Create a temporary file for the output [LRCAU #5583]
+			TemporaryFileName tmpOutput("", NULL,
+				getExtensionFromFullPath(strOutputFileName).c_str(), true);
+			const string& strTempOut = tmpOutput.getName();
 
 			L_INT nRet = FAILURE;
 
@@ -199,13 +200,8 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			LOADFILEOPTION lfo =
 				GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
 
-			// Get the retry count and timeout values
-			int iRetryCount(0), iRetryTimeout(0);
-			getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
-
-			// Get the input and output file names as char*
+			// Get the input file name as a char*
 			char* pszInputFile = (char*) strInputFileName.c_str();
-			char* pszOutputFile = (char*) strOutputFileName.c_str();
 
 			// Handle pages individually to deal with situation where existing annotations
 			// need to be retained
@@ -220,19 +216,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 
 				BITMAPHANDLE hBitmap = {0};
 				LeadToolsBitmapFreeer freer(hBitmap);
-
-				// Load the current page from the bitmap
-				nRet = L_LoadBitmap(pszInputFile, &hBitmap, sizeof(BITMAPHANDLE), 0, 0,
-					&lfo, &fileInfo);
-				if (nRet != SUCCESS)
-				{
-					UCLIDException ue("ELI23583", "Could not obtain page.");
-					ue.addDebugInfo("Error Code", nRet);
-					ue.addDebugInfo("Error Description", getErrorCodeDescription(nRet));
-					ue.addDebugInfo("File Name", strInputFileName);
-					ue.addDebugInfo("Page Number", i);
-					throw ue;
-				}
+				loadImagePage(strInputFileName, hBitmap, fileInfo, lfo, false, false);
 
 				// Load the existing annotations if bRetainAnnotations and they exist.
 				if(bRetainAnnotations && hasAnnotations(strInputFileName, lfo, iFormat))
@@ -291,55 +275,12 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 					hFileContainer = NULL;
 				}
 				// else container is NULL, so nothing to save
+
 				// Set the page number
 				sfOptions.PageNumber = i;
 
-				// Save this page of the original file
-				int nNumFailedAttempts = 0;
-				while (nNumFailedAttempts < iRetryCount)
-				{
-					// Save this page of the image
-					nRet = L_SaveBitmap( pszOutputFile, &hBitmap, 
-						nType, nBitsPerPixel, nQFactor, &sfOptions );
-
-					// Check result
-					if (nRet == SUCCESS)
-					{
-						// Exit loop
-						break;
-					}
-					else
-					{
-						// Increment counter
-						nNumFailedAttempts++;
-
-						// Sleep before retrying the Save
-						Sleep( iRetryTimeout );
-					}
-				}
-				if (nRet != SUCCESS)
-				{
-					UCLIDException ue("ELI23589", "Could not save image page.");
-					ue.addDebugInfo("Image To Output", strOutputFileName);
-					ue.addDebugInfo("Actual Page", i);
-					ue.addDebugInfo("Error description", getErrorCodeDescription(nRet));
-					ue.addDebugInfo("Actual Error Code", nRet);
-					ue.addDebugInfo("Retries attempted", nNumFailedAttempts);
-					ue.addDebugInfo("Max Retries", iRetryCount);
-					throw ue;
-				}
-				else
-				{
-					if (nNumFailedAttempts > 0)
-					{
-						UCLIDException ue("ELI23590",
-							"Application Trace:Saved image page successfully after retry.");
-						ue.addDebugInfo("Retries", nNumFailedAttempts);
-						ue.addDebugInfo("Image To Output", strOutputFileName);
-						ue.addDebugInfo("Actual Page", i);
-						ue.log();
-					}
-				}
+				// Save the image page
+				saveImagePage(hBitmap, strTempOut, fileInfo, sfOptions, false);
 
 				if (bSavedTag)
 				{
@@ -351,7 +292,31 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			}	// end for each page
 
 			// Wait for the file to be readable before continuing
-			waitForFileToBeReadable(strOutputFileName);
+			waitForFileToBeReadable(strTempOut);
+
+			// Check for a matching page count
+			long nOutPages = getNumberOfPagesInImage(strTempOut);
+			if (nPages != nOutPages)
+			{
+				UCLIDException uex("ELI28839", "Output page count mismatch.");
+				uex.addDebugInfo("Input File", strInputFileName);
+				uex.addDebugInfo("Input Page Count", nPages);
+				uex.addDebugInfo("Temporary Output File", strTempOut);
+				uex.addDebugInfo("Temporary Output Page Count", nOutPages);
+				uex.addDebugInfo("Output File", strOutputFileName);
+				throw uex;
+			}
+
+			// Ensure the outut directory exists
+			string strOutDir = getDirectoryFromFullPath(strOutputFileName);
+			if (!isValidFolder(strOutDir))
+			{
+				createDirectory(strOutDir);
+			}
+
+			// Move the temporary file to the output file location
+			// (overwrite the output file if it exists)
+			moveFile(strTempOut, strOutputFileName, true, true);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI23592");
 	}
@@ -412,8 +377,8 @@ void usage()
 //-------------------------------------------------------------------------------------------------
 void validateLicense()
 {
-	// Requires PDF license
-	static const unsigned long THIS_APP_ID = gnPDF_READWRITE_FEATURE;
+	// Requires Flex Index/ID Shield core license [LRCAU #5589]
+	static const unsigned long THIS_APP_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( THIS_APP_ID, "ELI15897", "ImageFormatConverter" );
 }
@@ -457,8 +422,8 @@ BOOL CImageFormatConverterApp::InitInstance()
 				}
 
 				// Retrieve file names and output type
-				string strInputName = vecParams[0];
-				string strOutputName = vecParams[1];
+				string strInputName = buildAbsolutePath(vecParams[0]);
+				string strOutputName = buildAbsolutePath(vecParams[1]);
 				if (stringCSIS::sEqual(strInputName, strOutputName))
 				{
 					UCLIDException uex("ELI25307", "Input and Output files must differ!");
@@ -491,8 +456,8 @@ BOOL CImageFormatConverterApp::InitInstance()
 					eOutputType = kFileType_Jpg;
 				}
 				
-				bool bRetainAnnotations = false;
 				// Check for retain annotation flag
+				bool bRetainAnnotations = false;
 				if (uiParamCount == 4 || uiParamCount == 6)
 				{
 					string strTemp = vecParams[3];
@@ -536,14 +501,8 @@ BOOL CImageFormatConverterApp::InitInstance()
 				}
 
 				// Unlock support for PDF Reading and Writing
-				if ( LicenseManagement::sGetInstance().isPDFLicensed() )
-				{
-					initPDFSupport();
-				}
-				else
-				{
-					throw UCLIDException("ELI19883", "PDF read/write support is not licensed.");
-				}
+				// (Only unlocks if PDF support is licensed)
+				initPDFSupport();
 
 				// Convert the file
 				convertImage( strInputName, strOutputName, eOutputType, bRetainAnnotations, this->m_hInstance );
