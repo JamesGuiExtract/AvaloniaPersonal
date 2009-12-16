@@ -846,7 +846,7 @@ namespace Extract.Imaging.Forms
 
                 if (nextLayerObject != null)
                 {
-                    CenterOnLayerObject(nextLayerObject, true);
+                    CenterOnLayerObjects(nextLayerObject);
 
                     if (selectObject)
                     {
@@ -900,7 +900,7 @@ namespace Extract.Imaging.Forms
 
                 if (previousLayerObject != null)
                 {
-                    CenterOnLayerObject(previousLayerObject, true);
+                    CenterOnLayerObjects(previousLayerObject);
 
                     if (selectObject)
                     {
@@ -919,67 +919,113 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Centers the view on the specified <see cref="LayerObject"/>.
+        /// Centers the view on the specified layer objects.
         /// </summary>
-        /// <param name="layerObject">The <see cref="LayerObject"/> to center on.</param>
-        /// <param name="adjustZoomToFitObject">If <see langword="true"/> will adjust the
-        /// zoom if necessary to fit the whole object in view; if <see langword="false"/>
-        /// will not adjust the zoom to fit the whole object in view.</param>
-        public void CenterOnLayerObject(LayerObject layerObject, bool adjustZoomToFitObject)
+        /// <param name="layerObjects">The layer objects on which to center. Must all be on the 
+        /// same page.</param>
+        public void CenterOnLayerObjects(params LayerObject[] layerObjects)
         {
             try
             {
-                ExtractException.Assert("ELI22430", "Object cannot be null.",
-                    layerObject != null);
-
                 // Is the image viewer in fit to page mode?
                 bool isFitToPage = _fitMode == FitMode.FitToPage;
 
-                // Set the image viewer to the proper page for this object
-                if (PageNumber != layerObject.PageNumber)
+                // Gets the page number of the first layer object
+                int pageNumber = layerObjects[0].PageNumber;
+
+                // Set the image viewer to the proper page for these objects
+                if (PageNumber != pageNumber)
                 {
-                    SetPageNumber(layerObject.PageNumber, isFitToPage, true);
+                    SetPageNumber(pageNumber, isFitToPage, true);
                 }
 
-                // Get the current zoom info
-                ZoomInfo zoomInfo = GetZoomInfo();
-
-                // Set the appropriate scale factor if necessary
+                // Set the appropriate zoom if necessary
                 if (!isFitToPage)
                 {
-                    // Set the center point
-                    zoomInfo.Center = layerObject.GetCenterPoint();
+                    // Get the unified bounds in image coordinates
+                    Rectangle bounds = LayerObject.GetCombinedBounds(layerObjects);
 
-                    // Center the view on the layer object's center point
-                    SetZoomInfo(zoomInfo, !adjustZoomToFitObject);
+                    // Get the center point in image coordinates
+                    Point center =
+                        new Point(bounds.Left + bounds.Width/2, bounds.Top + bounds.Height/2);
 
-                    // Check if the zoom should be adjusted to fit the object
-                    if (adjustZoomToFitObject)
+                    // Center the view on the layer objects' center point
+                    CenterAtPoint(center, false, false);
+
+                    // Get the current view rectangle in image coordinates
+                    // Do not pad the viewing rectangle [DNRCAU #282]
+                    Rectangle visibleArea = GetTransformedRectangle(GetVisibleImageArea(), true);
+
+                    // Check if the objects are in view
+                    if (!visibleArea.Contains(bounds))
                     {
-                        // Get the current view rectangle
-                        // Do not pad the viewing rectangle [DNRCAU #282]
-                        Rectangle viewRectangle =
-                            GetTransformedRectangle(GetVisibleImageArea(), true);
-
-                        // Check if the object is in view
-                        if (!layerObject.IsContained(viewRectangle, _pageNumber))
-                        {
-                            // Object is not in view, adjust the zoom so that the object
-                            // is in view (also change fit mode if necessary)
-                            Rectangle zoomRectangle = PadViewingRectangle(layerObject.GetBounds());
-                            zoomRectangle = GetTransformedRectangle(zoomRectangle, false);
-                            ZoomToRectangle(zoomRectangle, false, false, true);
-                        }
-
-                        // Update the zoom history and raise the zoom changed event
-                        UpdateZoom(true, true);
+                        // An object is not fully in view, adjust the zoom so all
+                        // objects are in view (also change fit mode if necessary)
+                        Rectangle zoomRectangle = PadViewingRectangle(bounds);
+                        zoomRectangle = GetTransformedRectangle(zoomRectangle, false);
+                        ZoomToRectangle(zoomRectangle, false, false, true);
                     }
+
+                    // Update the zoom history and raise the zoom changed event
+                    UpdateZoom(true, true);
                 }
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI22431", ex);
             }
+        }
+
+        /// <summary>
+        /// Centers the view at the specified point in logical (image) coordinates.
+        /// </summary>
+        /// <param name="pt">The point at which to center the view in logical (image) 
+        /// coordinates.</param>
+        public override void CenterAtPoint(Point pt)
+        {
+            CenterAtPoint(pt, true, true);
+        }
+
+        /// <summary>
+        /// Centers the view at the specified point in logical (image) coordinates.
+        /// </summary>
+        /// <param name="pt">The point at which to center the view in logical (image) 
+        /// coordinates.</param>
+        /// <param name="updateZoomHistory"><see langword="true"/> if the new zoom setting should 
+        /// be added to the history queue; <see langword="false"/> if it should not.</param>
+        /// <param name="raiseZoomChanged"><see langword="true"/> if the <see cref="ZoomChanged"/> 
+        /// event should be raised; <see langword="false"/> if it should not be raised.</param>
+        void CenterAtPoint(Point pt, bool updateZoomHistory, bool raiseZoomChanged)
+        {
+            // Normalize the point if it is off the image
+            int x = pt.X;
+            int y = pt.Y;
+            if (x < 0)
+            {
+                x = 0;
+            }
+            else if (x > ImageWidth)
+            {
+                x = ImageWidth - 1;
+            }
+            if (y < 0)
+            {
+                y = 0;
+            }
+            else if (y > ImageHeight)
+            {
+                y = ImageHeight - 1;
+            }
+
+            // Convert the point to client coordinates
+            Point[] client = new Point[] { new Point(x,y) };
+            _transform.TransformPoints(client);
+
+            // Center at the point
+            base.CenterAtPoint(client[0]);
+
+            // Update the zoom as necessary
+            UpdateZoom(updateZoomHistory, raiseZoomChanged);
         }
 
         /// <summary>
@@ -1008,7 +1054,7 @@ namespace Extract.Imaging.Forms
         /// <see langword="false"/>, the padding will be discarded resulting in a truncated
         /// rectangle.</param>
         /// <returns>A padded version of the specified rectangle.</returns>
-        public Rectangle PadViewingRectangle(Rectangle viewRectangle, int horizontalPadding,
+        public Rectangle PadViewingRectangle(Rectangle viewRectangle, int horizontalPadding, 
             int verticalPadding, bool transferPaddingIfOffPage)
         {
             try
@@ -1148,7 +1194,7 @@ namespace Extract.Imaging.Forms
                 // Get the list of objects in view
                 Collection<int> objectsInViewIndex =
                     _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(PageNumber,
-                    viewRectangle, true, true);
+                        viewRectangle, true, true);
 
                 if (objectsInViewIndex.Count == 1)
                 {
@@ -1277,7 +1323,7 @@ namespace Extract.Imaging.Forms
                 // Get the list of objects in view
                 Collection<int> objectsInViewIndex =
                     _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(PageNumber,
-                    viewRectangle, true, true);
+                        viewRectangle, true, true);
 
                 if (objectsInViewIndex.Count == 1)
                 {
@@ -1531,7 +1577,7 @@ namespace Extract.Imaging.Forms
                 try
                 {
                     // Get the center of the visible image in logical (image) coordinates
-                    Point[] center = new Point[] { GetVisibleImageCenter() };
+                    Point center = GetVisibleImageCenter();
 
                     try
                     {
@@ -1546,11 +1592,8 @@ namespace Extract.Imaging.Forms
                         throw;
                     }
 
-                    // Convert the center to client coordinates
-                    _transform.TransformPoints(center);
-
                     // Center at the same point as prior to rotation
-                    CenterAtPoint(center[0]);
+                    CenterAtPoint(center, false, false);
                 }
                 finally
                 {
@@ -1655,7 +1698,7 @@ namespace Extract.Imaging.Forms
                 {
                     if (_printDialog.PrinterSettings.IsValid
                         && !_disallowedPrinters.Contains(
-                        _printDialog.PrinterSettings.PrinterName.ToUpperInvariant()))
+                                _printDialog.PrinterSettings.PrinterName.ToUpperInvariant()))
                     {
                         // Refresh the form
                         RefreshImageViewerAndParent();
@@ -1680,15 +1723,15 @@ namespace Extract.Imaging.Forms
 
                         // Prompt the user about the disallowed printer
                         string applicationName = Application.ProductName;
-                        applicationName = string.IsNullOrEmpty(applicationName) ?
+                        applicationName = string.IsNullOrEmpty(applicationName) ? 
                             "Application" : applicationName;
                         MessageBox.Show(applicationName + " has disallowed Printing to "
-                            + _printDialog.PrinterSettings.PrinterName.ToUpperInvariant() + "."
-                            + " Please select a different printer." + Environment.NewLine
-                            + Environment.NewLine
-                            + Environment.NewLine + "The following printers have been disallowed:"
-                            + Environment.NewLine + "-------------------------------------"
-                            + Environment.NewLine + sb, " Printer",
+                                        + _printDialog.PrinterSettings.PrinterName.ToUpperInvariant() + "."
+                                        + " Please select a different printer." + Environment.NewLine
+                                        + Environment.NewLine
+                                        + Environment.NewLine + "The following printers have been disallowed:"
+                                        + Environment.NewLine + "-------------------------------------"
+                                        + Environment.NewLine + sb, " Printer",
                             MessageBoxButtons.OK, MessageBoxIcon.Error,
                             MessageBoxDefaultButton.Button1, 0);
 
@@ -1713,14 +1756,14 @@ namespace Extract.Imaging.Forms
             if (PrinterSettings.InstalledPrinters.Count > 0)
             {
                 moreInfo = "(You cannot print to " + GetCommaSeparatedDisallowedPrinters() + 
-                    " from " + (Application.ProductName ?? "the current application") + ")." 
-                    + Environment.NewLine;
+                           " from " + (Application.ProductName ?? "the current application") + ")." 
+                           + Environment.NewLine;
             }
 
             // Warn user that there are no valid printers installed
             MessageBox.Show("There are no printers available." + Environment.NewLine
-                + moreInfo + Environment.NewLine
-                + "Please install a printer and try again.", "No printers available", 
+                            + moreInfo + Environment.NewLine
+                            + "Please install a printer and try again.", "No printers available", 
                 MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, 0);
 
             RefreshImageViewerAndParent();
@@ -1753,7 +1796,7 @@ namespace Extract.Imaging.Forms
 
             // There are three or more disallowed printers
             return string.Join(",", _disallowedPrinters.ToArray(), 0, count - 1) + ", and " + 
-                _disallowedPrinters[count - 1];
+                   _disallowedPrinters[count - 1];
         }
 
         /// <summary>
@@ -1963,8 +2006,8 @@ namespace Extract.Imaging.Forms
 
             // Calculate the scale so the image fits exactly within the bounds of the page
             float scale = (float)Math.Min(
-                marginBounds.Width / (double)base.Image.ImageWidth,
-                marginBounds.Height / (double)base.Image.ImageHeight);
+                                     marginBounds.Width / (double)base.Image.ImageWidth,
+                                     marginBounds.Height / (double)base.Image.ImageHeight);
 
             // Calculate the horizontal and vertical padding
             PointF padding = new PointF(
@@ -2180,7 +2223,7 @@ namespace Extract.Imaging.Forms
                 SetZoomInfo(zoomInfo, false);
             }
             else if (zoomInfo.FitMode == FitMode.None &&
-                zoomInfo.ScaleFactor < _MAX_ZOOM_OUT_SCALE_FACTOR)
+                     zoomInfo.ScaleFactor < _MAX_ZOOM_OUT_SCALE_FACTOR)
             {
                 zoomInfo.ScaleFactor = _MAX_ZOOM_OUT_SCALE_FACTOR;
                 SetZoomInfo(zoomInfo, false);
@@ -2275,15 +2318,15 @@ namespace Extract.Imaging.Forms
             {
                 case CursorTool.AngularHighlight:
                 case CursorTool.AngularRedaction:
-                    {
-                        // Calculate the default highlight height in physical (client) coordinates
-                        int height = (int)(_defaultHighlightHeight * GetScaleFactorY(_transform) +
-                            0.5);
+                {
+                    // Calculate the default highlight height in physical (client) coordinates
+                    int height = (int)(_defaultHighlightHeight * GetScaleFactorY(_transform) +
+                                       0.5);
 
-                        // Begin interactive region tracking
-                        _trackingData = new TrackingData(this, mouseX, mouseY,
-                            GetVisibleImageArea(), height);
-                    }
+                    // Begin interactive region tracking
+                    _trackingData = new TrackingData(this, mouseX, mouseY,
+                        GetVisibleImageArea(), height);
+                }
                     break;
 
                 case CursorTool.DeleteLayerObjects:
@@ -2298,170 +2341,170 @@ namespace Extract.Imaging.Forms
                     break;
 
                 case CursorTool.EditHighlightText:
+                {
+                    // Convert the mouse click point from client to image coordinates
+                    Point[] mouseClick = new Point[] { new Point(mouseX, mouseY) };
+                    using (Matrix clientToImage = _transform.Clone())
                     {
-                        // Convert the mouse click point from client to image coordinates
-                        Point[] mouseClick = new Point[] { new Point(mouseX, mouseY) };
-                        using (Matrix clientToImage = _transform.Clone())
-                        {
-                            clientToImage.Invert();
-                            clientToImage.TransformPoints(mouseClick);
-                        }
-
-                        // Iterate through all the layer objects
-                        foreach (LayerObject layerObject in _layerObjects)
-                        {
-                            // Check if this layer object was clicked
-                            if (layerObject.HitTest(mouseClick[0]))
-                            {
-                                // Check if this was a highlight
-                                Highlight highlight = layerObject as Highlight;
-                                if (highlight == null)
-                                {
-                                    continue;
-                                }
-
-                                // Prompt the user for the new highlight text
-                                EditHighlightTextForm dialog =
-                                    new EditHighlightTextForm(highlight.Text);
-                                if (dialog.ShowDialog() == DialogResult.OK)
-                                {
-                                    // Store the new highlight text
-                                    highlight.Text = dialog.HighlightText;
-                                }
-                                break;
-                            }
-                        }
+                        clientToImage.Invert();
+                        clientToImage.TransformPoints(mouseClick);
                     }
-                    break;
 
-                case CursorTool.SelectLayerObject:
+                    // Iterate through all the layer objects
+                    foreach (LayerObject layerObject in _layerObjects)
                     {
-                        // Get modifier keys immediately
-                        Keys modifiers = ModifierKeys;
-
-                        // Check if the mouse clicked on a link arrow
-                        if (_activeLinkedLayerObject != null)
+                        // Check if this layer object was clicked
+                        if (layerObject.HitTest(mouseClick[0]))
                         {
-                            int arrowId =
-                                _activeLinkedLayerObject.GetLinkArrowId(new Point(mouseX, mouseY));
-                            if (arrowId >= 0)
-                            {
-                                // Go to the previous or next linked layer object
-                                GoToLink(arrowId == 0, _activeLinkedLayerObject);
-                                return;
-                            }
-                        }
-
-                        // Iterate through all selected layerObjects
-                        foreach (LayerObject layerObject in _layerObjects.Selection)
-                        {
-                            // Skip this layerObject if it is on a different page
-                            if (layerObject.PageNumber != _pageNumber)
+                            // Check if this was a highlight
+                            Highlight highlight = layerObject as Highlight;
+                            if (highlight == null)
                             {
                                 continue;
                             }
 
-                            // Check if the mouse cursor is over one of the grip handles
-                            int gripHandleId = layerObject.GetGripHandleId(new Point(mouseX, mouseY));
-                            if (gripHandleId >= 0)
+                            // Prompt the user for the new highlight text
+                            EditHighlightTextForm dialog =
+                                new EditHighlightTextForm(highlight.Text);
+                            if (dialog.ShowDialog() == DialogResult.OK)
                             {
-                                layerObject.StartTrackingGripHandle(mouseX, mouseY, gripHandleId);
-                                _trackingData = new TrackingData(this, mouseX, mouseY,
-                                    GetVisibleImageArea());
-                                return;
+                                // Store the new highlight text
+                                highlight.Text = dialog.HighlightText;
                             }
+                            break;
+                        }
+                    }
+                }
+                    break;
+
+                case CursorTool.SelectLayerObject:
+                {
+                    // Get modifier keys immediately
+                    Keys modifiers = ModifierKeys;
+
+                    // Check if the mouse clicked on a link arrow
+                    if (_activeLinkedLayerObject != null)
+                    {
+                        int arrowId =
+                            _activeLinkedLayerObject.GetLinkArrowId(new Point(mouseX, mouseY));
+                        if (arrowId >= 0)
+                        {
+                            // Go to the previous or next linked layer object
+                            GoToLink(arrowId == 0, _activeLinkedLayerObject);
+                            return;
+                        }
+                    }
+
+                    // Iterate through all selected layerObjects
+                    foreach (LayerObject layerObject in _layerObjects.Selection)
+                    {
+                        // Skip this layerObject if it is on a different page
+                        if (layerObject.PageNumber != _pageNumber)
+                        {
+                            continue;
                         }
 
-                        // Get the mouse position in image coordinates
-                        Point[] mouse = new Point[] { new Point(mouseX, mouseY) };
-                        using (Matrix clientToImage = _transform.Clone())
+                        // Check if the mouse cursor is over one of the grip handles
+                        int gripHandleId = layerObject.GetGripHandleId(new Point(mouseX, mouseY));
+                        if (gripHandleId >= 0)
                         {
-                            clientToImage.Invert();
-                            clientToImage.TransformPoints(mouse);
-                        }
-
-                        Point mousePoint = mouse[0];
-
-                        // Build the list of possible layer objects
-                        List<LayerObject> possibleSelection = new List<LayerObject>();
-                        foreach (LayerObject layerObject in _layerObjects)
-                        {
-                            // Only perform hit test if the layer object is selectable and visible
-                            if (layerObject.Selectable && layerObject.Visible &&
-                                layerObject.HitTest(mousePoint))
-                            {
-                                possibleSelection.Add(layerObject);
-                            }
-                        }
-
-                        bool layerObjectClicked = possibleSelection.Count > 0;
-                        if (layerObjectClicked)
-                        {
-                            // Find the best layer object [DNRCAU #352]
-                            // Best layer object is defined as the one with the lowest average distance
-                            // to the corners of the object
-                            LayerObject clickedObject = null;
-                            double shortestDistance = double.MaxValue;
-                            foreach (LayerObject layerObject in possibleSelection)
-                            {
-                                double distance = layerObject.AverageDistanceToCorners(mousePoint);
-                                if (distance < shortestDistance)
-                                {
-                                    shortestDistance = distance;
-                                    clickedObject = layerObject;
-                                }
-                            }
-
-                            // Select this layer object if it is not already
-                            if (!_layerObjects.Selection.Contains(clickedObject))
-                            {
-                                // Deselect previous layer object unless modifier key is pressed
-                                if (modifiers != Keys.Control && modifiers != Keys.Shift)
-                                {
-                                    _layerObjects.Selection.Clear();
-                                }
-
-                                clickedObject.Selected = true;
-
-                                // Switch the cursor to the move cursor
-                                Cursor = Cursors.SizeAll;
-                            }
-                            else if (modifiers == Keys.Control)
-                            {
-                                // The control key is pressed and a selected 
-                                // layer object was clicked. Remove the layer object.
-                                _layerObjects.Selection.Remove(clickedObject);
-
-                                // Invalidate the image viewer to remove any previous grip 
-                                // handles and to redraw these grip handles
-                                Invalidate();
-                                return;
-                            }
-
-                            // Check if any layer object was clicked [DotNetRCAndUtils #159]
-                            // Start a tracking event for all selected layer objects on the active page
-                            foreach (LayerObject layerObject in _layerObjects.Selection)
-                            {
-                                if (layerObject.PageNumber == _pageNumber)
-                                {
-                                    layerObject.StartTrackingSelection(mouseX, mouseY);
-                                }
-                            }
-                        }
-
-                        // Only start a tracking event if a layer object was clicked or banded
-                        // selection is enabled.
-                        if (layerObjectClicked || _allowBandedSelection)
-                        {
-                            // Start a click and drag event
+                            layerObject.StartTrackingGripHandle(mouseX, mouseY, gripHandleId);
                             _trackingData = new TrackingData(this, mouseX, mouseY,
                                 GetVisibleImageArea());
+                            return;
+                        }
+                    }
+
+                    // Get the mouse position in image coordinates
+                    Point[] mouse = new Point[] { new Point(mouseX, mouseY) };
+                    using (Matrix clientToImage = _transform.Clone())
+                    {
+                        clientToImage.Invert();
+                        clientToImage.TransformPoints(mouse);
+                    }
+
+                    Point mousePoint = mouse[0];
+
+                    // Build the list of possible layer objects
+                    List<LayerObject> possibleSelection = new List<LayerObject>();
+                    foreach (LayerObject layerObject in _layerObjects)
+                    {
+                        // Only perform hit test if the layer object is selectable and visible
+                        if (layerObject.Selectable && layerObject.Visible &&
+                            layerObject.HitTest(mousePoint))
+                        {
+                            possibleSelection.Add(layerObject);
+                        }
+                    }
+
+                    bool layerObjectClicked = possibleSelection.Count > 0;
+                    if (layerObjectClicked)
+                    {
+                        // Find the best layer object [DNRCAU #352]
+                        // Best layer object is defined as the one with the lowest average distance
+                        // to the corners of the object
+                        LayerObject clickedObject = null;
+                        double shortestDistance = double.MaxValue;
+                        foreach (LayerObject layerObject in possibleSelection)
+                        {
+                            double distance = layerObject.AverageDistanceToCorners(mousePoint);
+                            if (distance < shortestDistance)
+                            {
+                                shortestDistance = distance;
+                                clickedObject = layerObject;
+                            }
                         }
 
-                        // Invalidate the image viewer to remove any previous grip handles
-                        // and to redraw these grip handles
-                        Invalidate();
+                        // Select this layer object if it is not already
+                        if (!_layerObjects.Selection.Contains(clickedObject))
+                        {
+                            // Deselect previous layer object unless modifier key is pressed
+                            if (modifiers != Keys.Control && modifiers != Keys.Shift)
+                            {
+                                _layerObjects.Selection.Clear();
+                            }
+
+                            clickedObject.Selected = true;
+
+                            // Switch the cursor to the move cursor
+                            Cursor = Cursors.SizeAll;
+                        }
+                        else if (modifiers == Keys.Control)
+                        {
+                            // The control key is pressed and a selected 
+                            // layer object was clicked. Remove the layer object.
+                            _layerObjects.Selection.Remove(clickedObject);
+
+                            // Invalidate the image viewer to remove any previous grip 
+                            // handles and to redraw these grip handles
+                            Invalidate();
+                            return;
+                        }
+
+                        // Check if any layer object was clicked [DotNetRCAndUtils #159]
+                        // Start a tracking event for all selected layer objects on the active page
+                        foreach (LayerObject layerObject in _layerObjects.Selection)
+                        {
+                            if (layerObject.PageNumber == _pageNumber)
+                            {
+                                layerObject.StartTrackingSelection(mouseX, mouseY);
+                            }
+                        }
                     }
+
+                    // Only start a tracking event if a layer object was clicked or banded
+                    // selection is enabled.
+                    if (layerObjectClicked || _allowBandedSelection)
+                    {
+                        // Start a click and drag event
+                        _trackingData = new TrackingData(this, mouseX, mouseY,
+                            GetVisibleImageArea());
+                    }
+
+                    // Invalidate the image viewer to remove any previous grip handles
+                    // and to redraw these grip handles
+                    Invalidate();
+                }
                     break;
 
                 case CursorTool.None:
@@ -2526,10 +2569,10 @@ namespace Extract.Imaging.Forms
                 // Calculate the new center point in logical (image) coordinates
                 Point[] newCenter = new Point[] { linkRelative + delta };
                 using(Matrix clientToImage = _transform.Clone())
-	            {
+                {
                     clientToImage.Invert();
                     clientToImage.TransformPoints(newCenter);
-	            }
+                }
 
                 // Set the center point
                 zoomInfo.Center = newCenter[0];
@@ -2567,7 +2610,7 @@ namespace Extract.Imaging.Forms
         /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
         // This method has undergone a security review.
-        [SuppressMessage("Microsoft.Security",
+        [SuppressMessage("Microsoft.Security", 
             "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
         private void UpdateTracking(int mouseX, int mouseY)
         {
@@ -2581,8 +2624,8 @@ namespace Extract.Imaging.Forms
                     using (Graphics graphics = CreateGraphics())
                     {
                         // Get the appropriate color for drawing the object
-                        Color drawColor = (_cursorTool == CursorTool.AngularHighlight ?
-                            _defaultHighlightColor : _defaultRedactionPaintColor);
+                        Color drawColor = _cursorTool == CursorTool.AngularHighlight ? 
+                            _defaultHighlightColor : _defaultRedactionPaintColor;
 
                         // Erase the previous highlight if it exists
                         if (!_trackingData.Region.IsEmpty(graphics))
@@ -2614,7 +2657,7 @@ namespace Extract.Imaging.Forms
                         rectangle.Height = 1;
                     }
                     ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
-                            Color.Black, FrameStyle.Thick);
+                        Color.Black, FrameStyle.Thick);
 
                     // Recalculate and redraw the new frame
                     _trackingData.UpdateRectangle(mouseX, mouseY);
@@ -2628,7 +2671,7 @@ namespace Extract.Imaging.Forms
                         rectangle.Height = 1;
                     }
                     ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
-                            Color.Black, FrameStyle.Thick);
+                        Color.Black, FrameStyle.Thick);
                     break;
 
                 case CursorTool.RectangularHighlight:
@@ -2666,12 +2709,12 @@ namespace Extract.Imaging.Forms
 
                         // Erase the previous frame if it exists
                         ControlPaint.DrawReversibleFrame(RectangleToScreen(_trackingData.Rectangle),
-                                Color.Black, FrameStyle.Thick);
+                            Color.Black, FrameStyle.Thick);
 
                         // Recalculate and redraw the new frame
                         _trackingData.UpdateRectangle(mouseX, mouseY);
                         ControlPaint.DrawReversibleFrame(RectangleToScreen(_trackingData.Rectangle),
-                                Color.Black, FrameStyle.Thick);
+                            Color.Black, FrameStyle.Thick);
                     }
                     else
                     {
@@ -2958,7 +3001,7 @@ namespace Extract.Imaging.Forms
                             // Instantiate the new highlight and add it to _layerObjects
                             Highlight highlight =
                                 new Highlight(this, LayerObject.ManualComment, points[0], 
-                                points[1], _defaultHighlightHeight);
+                                    points[1], _defaultHighlightHeight);
                             _layerObjects.Add(highlight);
                         }
                         else
@@ -3509,7 +3552,7 @@ namespace Extract.Imaging.Forms
                         if (zones != null)
                         {
                             _layerObjects.Add(new Redaction(this, PageNumber,
-                            LayerObject.ManualComment, zones, _defaultRedactionFillColor));
+                                LayerObject.ManualComment, zones, _defaultRedactionFillColor));
                         }
                     }
 
@@ -3687,10 +3730,10 @@ namespace Extract.Imaging.Forms
             {
                 // Get the top-left and bottom-right corners of the rectangle.
                 Point[] corners = new Point[] 
-                    {
-                        new Point(rectangle.Left, rectangle.Top),
-                        new Point(rectangle.Right, rectangle.Bottom)
-                    };
+                {
+                    new Point(rectangle.Left, rectangle.Top),
+                    new Point(rectangle.Right, rectangle.Bottom)
+                };
 
                 // Check the direction of conversion
                 if (clientToImage)
@@ -3839,20 +3882,13 @@ namespace Extract.Imaging.Forms
                     ScaleFactor = zoomInfo.ScaleFactor;
                 }
 
-                // Convert the center point to client coordinates
-                Point[] center = new Point[] { zoomInfo.Center };
-                _transform.TransformPoints(center);
-
                 // Center at the specified point
-                CenterAtPoint(center[0]);
+                CenterAtPoint(zoomInfo.Center, updateZoomHistory, true);
             }
             finally
             {
                 base.EndUpdate();
             }
-
-            // Update the zoom history if necessary and raise the zoom changed event
-            UpdateZoom(updateZoomHistory, true);
         }
 
         /// <summary>
@@ -3969,8 +4005,8 @@ namespace Extract.Imaging.Forms
                 (_cursorTool == CursorTool.AngularHighlight || _cursorTool == CursorTool.AngularRedaction))
             {
                 // Increase/decrease highlight height as specified
-                _defaultHighlightHeight += (increaseHeight ?
-                    _MOUSEWHEEL_HEIGHT_INCREMENT : -_MOUSEWHEEL_HEIGHT_INCREMENT);
+                _defaultHighlightHeight += 
+                    increaseHeight ? _MOUSEWHEEL_HEIGHT_INCREMENT : -_MOUSEWHEEL_HEIGHT_INCREMENT;
 
                 // Enforce a minimum highlight height
                 if (_defaultHighlightHeight < LayerObject.MinSize.Height)
