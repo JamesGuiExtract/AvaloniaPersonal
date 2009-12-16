@@ -24,7 +24,7 @@ namespace Extract.FileActionManager.Forms
         /// <summary>
         /// List of displayed tags.
         /// </summary>
-        readonly string[] _tags;
+        readonly FileTag[] _tags;
 
         #endregion Fields
 
@@ -51,7 +51,7 @@ namespace Extract.FileActionManager.Forms
         /// <param name="checkedTags">The names of the tags that should be checked.</param>
         /// <param name="applyNewTags"><see langword="true"/> if the user can apply new tags;
         /// <see langword="false"/> if the user cannot apply new tags.</param>
-        public FileTagDropDown(string[] tags, string[] checkedTags, bool applyNewTags)
+        public FileTagDropDown(FileTag[] tags, string[] checkedTags, bool applyNewTags)
         {
             // Load licenses in design mode
             if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
@@ -74,10 +74,11 @@ namespace Extract.FileActionManager.Forms
             {
                 Array.Sort(checkedTags, StringComparer.OrdinalIgnoreCase);
 
-                foreach (string tag in tags)
+                foreach (FileTag tag in tags)
                 {
-                    ToolStripMenuItem item = new ToolStripMenuItem(tag);
-                    item.Checked = IsTagContainedInArray(tag, checkedTags);
+                    ToolStripMenuItem item = new ToolStripMenuItem(tag.Name);
+                    item.Checked = IsTagContainedInArray(tag.Name, checkedTags);
+                    item.ToolTipText = tag.Description;
                     Items.Add(item);
                 }
             }
@@ -97,7 +98,6 @@ namespace Extract.FileActionManager.Forms
             }
 
             _tags = tags;
-
         }
 
         #endregion Constructors

@@ -181,7 +181,7 @@ namespace Extract.FileActionManager.Forms
         /// Gets the file tags associated with the current file id.
         /// </summary>
         /// <returns>The file tags associated with the current file id.</returns>
-        string[] GetFileTags()
+        FileTag[] GetFileTags()
         {
             // If there is no database, return null
             if (_database == null)
@@ -190,11 +190,36 @@ namespace Extract.FileActionManager.Forms
             }
 
             // Get the file tags from the database
-            VariantVector vector = _database.GetTagNames();
-            string[] tags = GetVectorAsArray(vector);
+            StrToStrMap nameToDescription = _database.GetTags();
+            FileTag[] tags = GetMapAsFileTagArray(nameToDescription);
 
             // Sort the tags alphabetically
-            Array.Sort(tags, StringComparer.OrdinalIgnoreCase);
+            Array.Sort(tags, new FileTagComparer());
+
+            return tags;
+        }
+
+        /// <summary>
+        /// Creates an array of file tags from the specified map of tag names to tag descriptions.
+        /// </summary>
+        /// <param name="nameToDescription">A map of file tag names to file tag descriptions.</param>
+        /// <returns>An array of file tags from the specified <paramref name="nameToDescription"/> 
+        /// map.</returns>
+        static FileTag[] GetMapAsFileTagArray(IStrToStrMap nameToDescription)
+        {
+            // Construct the array to hold the result
+            int count = nameToDescription.Size;
+            FileTag[] tags = new FileTag[count];
+
+            // Iterate through each item in the map
+            for (int i = 0; i < count; i++)
+            {
+                string name;
+                string description;
+                nameToDescription.GetKeyValue(i, out name, out description);
+
+                tags[i] = new FileTag(name, description);
+            }
 
             return tags;
         }
@@ -233,7 +258,7 @@ namespace Extract.FileActionManager.Forms
             try
             {
                 // Get the parameters
-                string[] tags = GetFileTags();
+                FileTag[] tags = GetFileTags();
                 string[] checkedTags = GetTagsForFileId(_fileId);
                 bool applyNewTags = _database.AllowDynamicTagCreation();
 
