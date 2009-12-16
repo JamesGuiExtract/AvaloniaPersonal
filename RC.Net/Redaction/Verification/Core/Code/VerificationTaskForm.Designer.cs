@@ -63,7 +63,6 @@ namespace Extract.Redaction.Verification
             System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-            System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
             TD.SandDock.DockContainer dockContainer;
             System.Windows.Forms.ToolStripContainer imageViewerToolStripContainer;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
@@ -142,7 +141,7 @@ namespace Extract.Redaction.Verification
             toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this._tagFileToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             dockContainer = new TD.SandDock.DockContainer();
             imageViewerToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -534,7 +533,7 @@ namespace Extract.Redaction.Verification
             this._exemptionsToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._applyExemptionToolStripButton,
             this._lastExemptionToolStripButton,
-            toolStripSeparator3,
+            this._tagFileToolStripSeparator,
             this._tagFileToolStripButton});
             this._exemptionsToolStrip.Location = new System.Drawing.Point(207, 24);
             this._exemptionsToolStrip.Name = "_exemptionsToolStrip";
@@ -563,10 +562,10 @@ namespace Extract.Redaction.Verification
             this._lastExemptionToolStripButton.Text = "Apply last exemption codes (Ctrl+E)";
             this._lastExemptionToolStripButton.Click += new System.EventHandler(this.HandleLastExemptionToolStripButtonClick);
             // 
-            // toolStripSeparator3
+            // _tagFileToolStripSeparator
             // 
-            toolStripSeparator3.Name = "toolStripSeparator3";
-            toolStripSeparator3.Size = new System.Drawing.Size(6, 39);
+            this._tagFileToolStripSeparator.Name = "_tagFileToolStripSeparator";
+            this._tagFileToolStripSeparator.Size = new System.Drawing.Size(6, 39);
             // 
             // _tagFileToolStripButton
             // 
@@ -608,6 +607,7 @@ namespace Extract.Redaction.Verification
             this._sandDockManager.MaximumDockContainerSize = 2000;
             this._sandDockManager.MinimumDockContainerSize = 220;
             this._sandDockManager.OwnerForm = this;
+            this._sandDockManager.Renderer = new TD.SandDock.Rendering.Office2003Renderer();
             // 
             // imageViewerToolStripContainer
             // 
@@ -1113,5 +1113,6 @@ namespace Extract.Redaction.Verification
         private Extract.FileActionManager.Forms.TagFileToolStripButton _tagFileToolStripButton;
         private Extract.Imaging.Forms.PreviousTileToolStripButton _previousTileToolStripButton;
         private Extract.Imaging.Forms.NextTileToolStripButton _nextTileToolStripButton;
+        private System.Windows.Forms.ToolStripSeparator _tagFileToolStripSeparator;
     }
 }

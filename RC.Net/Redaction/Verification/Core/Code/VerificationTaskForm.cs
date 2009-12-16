@@ -1281,6 +1281,15 @@ namespace Extract.Redaction.Verification
                 _fileDatabase = database;
                 _tagFileToolStripButton.Database = database;
 
+                // Check if the tag file toolstrip button should be displayed
+                // [FlexIDSCore #3886]
+                if (_fileDatabase.GetTagNames().Size == 0
+                    && !_fileDatabase.AllowDynamicTagCreation())
+                {
+                    _tagFileToolStripButton.Visible = false;
+                    _tagFileToolStripSeparator.Visible = false;
+                }
+
                 // Create the IDShield database wrapper
                 _idShieldDatabase = new IDShieldProductDBMgrClass();
                 _idShieldDatabase.FAMDB = _fileDatabase;
