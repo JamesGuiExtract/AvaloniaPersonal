@@ -813,16 +813,16 @@ namespace Extract.Imaging.Forms
 
                 if (BorderColor != null)
                 {
-                    Pen pen = ExtractPens.GetThickPen(BorderColor.Value);
-
                     Point start;
                     Point end;
                     int height;
-                    GetVerticesForPen(pen, out start, out end, out height);
+                    GetBorderZone(out start, out end, out height);
 
                     Point[] vertices = GeometryMethods.GetVertices(start, end, height);
 
                     ImageViewer.Transform.TransformPoints(vertices);
+
+                    Pen pen = ExtractPens.GetThickPen(BorderColor.Value);
                     graphics.DrawPolygon(pen, vertices);
                 }
             }
@@ -1247,7 +1247,7 @@ namespace Extract.Imaging.Forms
             Point start;
             Point end;
             int height;
-            GetVerticesForPen(SelectionPen, out start, out end, out height);
+            GetSelectionZone(out start, out end, out height);
 
             // If this grip handle is already the end point, we are done.
             if (gripHandles[gripHandleId] == end)
@@ -1669,7 +1669,7 @@ namespace Extract.Imaging.Forms
                 Point start;
                 Point end;
                 int height;
-                GetVerticesForPen(SelectionPen, out start, out end, out height);
+                GetSelectionZone(out start, out end, out height);
 
                 // Calculate the vertical and horizontal modifiers. These are the values to add and 
                 // subtract from the center to determine the "top" and "bottom" of the rectangle.
@@ -1734,7 +1734,7 @@ namespace Extract.Imaging.Forms
                 Point start;
                 Point end;
                 int height;
-                GetVerticesForPen(SelectionPen, out start, out end, out height);
+                GetSelectionZone(out start, out end, out height);
 
                 // Calculate the vertical and horizontal modifiers. These are the values to add and 
                 // subtract from the center to determine the "top" and "bottom" of the rectangle.
@@ -1759,17 +1759,47 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Expands the points of a zone by half the width of the specified pen.
+        /// Gets a zone that represents the border of the highlight.
         /// </summary>
-        /// <param name="pen">The pen to use. Its width is expressed in client pixels.</param>
         /// <param name="start">The start point of the zone in image pixels.</param>
         /// <param name="end">The end point of the zone in image pixels.</param>
         /// <param name="height">The height of the zone in image pixels.</param>
-        void GetVerticesForPen(Pen pen, out Point start, out Point end, out int height)
+        void GetBorderZone(out Point start, out Point end, out int height)
         {
-            // Get the number of image pixels by which to expand
-            double expandBy = pen.Width / 2.0 / ImageViewer.GetScaleFactorY();
+            double expandBy = ExtractPens.ThickPenWidth / 2.0 / ImageViewer.GetScaleFactorY();
+            GetExpandedZone(expandBy, out start, out end, out height);
+        }
 
+        /// <summary>
+        /// Gets a zone that represents the selection border of the highlight.
+        /// </summary>
+        /// <param name="start">The start point of the zone in image pixels.</param>
+        /// <param name="end">The end point of the zone in image pixels.</param>
+        /// <param name="height">The height of the zone in image pixels.</param>
+        void GetSelectionZone(out Point start, out Point end, out int height)
+        {
+            // The selection border is around the regular border [FIDSC #3888]
+            double expandBy = SelectionPen.Width/2.0;
+            if (BorderColor != Color.Transparent)
+            {
+                expandBy += ExtractPens.ThickPenWidth - 1;
+            }
+
+            // Convert to image coordinates
+            expandBy /= ImageViewer.GetScaleFactorY();
+            
+            GetExpandedZone(expandBy, out start, out end, out height);
+        }
+
+        /// <summary>
+        /// Expands the points of a zone by the specified amount.
+        /// </summary>
+        /// <param name="expandBy">The amount to expand the vertices in image pixels.</param>
+        /// <param name="start">The start point of the zone in image pixels.</param>
+        /// <param name="end">The end point of the zone in image pixels.</param>
+        /// <param name="height">The height of the zone in image pixels.</param>
+        void GetExpandedZone(double expandBy, out Point start, out Point end, out int height)
+        {
             // Get the amount to modify the points
             Size delta = 
                 new Size((int)(expandBy * Math.Cos(_angle)), (int)(expandBy * Math.Sin(_angle)));
