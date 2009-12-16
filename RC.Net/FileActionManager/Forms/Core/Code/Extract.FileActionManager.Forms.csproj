@@ -53,6 +53,7 @@
     <Compile Include="FileTag.cs" />
     <Compile Include="FileTagAddedEventArgs.cs" />
     <Compile Include="FileTagClickedEventArgs.cs" />
+    <Compile Include="FileTagComparer.cs" />
     <Compile Include="FileTagDialog.cs">
       <SubType>Form</SubType>
     </Compile>
