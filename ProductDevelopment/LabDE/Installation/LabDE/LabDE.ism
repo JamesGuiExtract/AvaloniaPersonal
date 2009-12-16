@@ -1707,7 +1707,7 @@
 		<row><td>PATH_TO_LABDE_HELP_FILES</td><td>P:\DataEntry\LabDE\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL_CE_EDITOR_INSTALL</td><td>P:\DataEntry\RequiredInstalls\SQL Compact Edition Editor</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL_COMPACT_EDITION</td><td>P:\DataEntry\RequiredInstalls\SQLCompact Edition</td><td/><td>2</td></row>
-		<row><td>PATH_TO_SQL_INSTALLS</td><td>P:\AttributeFinder\RequiredInstalls\SQLServerExpress2005</td><td/><td>2</td></row>
+		<row><td>PATH_TO_SQL_INSTALLS</td><td>P:\AttributeFinder\RequiredInstalls\SQLServerExpress2008</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
 		<row><td>WindowsFolder</td><td/><td/><td>1</td></row>
