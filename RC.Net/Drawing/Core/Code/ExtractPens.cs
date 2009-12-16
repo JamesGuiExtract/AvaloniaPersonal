@@ -11,7 +11,7 @@ namespace Extract.Drawing
     /// </summary>
     public static class ExtractPens
     {
-        #region ExtractPens Fields
+        #region Fields
 
         /// <summary>
         /// A collection of pens, keyed by color.
@@ -58,9 +58,14 @@ namespace Extract.Drawing
         /// </summary>
         static readonly object _lockThickDashed = new object();
 
-        #endregion ExtractPens Fields
+        /// <summary>
+        /// The width of thick pens.
+        /// </summary>
+        public static readonly int ThickPenWidth = 5;
 
-        #region ExtractPens Properties
+        #endregion Fields
+
+        #region Properties
 
         /// <summary>
         /// Gets a pen that draws a dashed black line.
@@ -157,7 +162,7 @@ namespace Extract.Drawing
                     if (!_thickPens.TryGetValue(color, out thickPen))
                     {
                         // Create the pen
-                        thickPen = new Pen(color, 5);
+                        thickPen = new Pen(color, ThickPenWidth);
                         _thickPens.Add(color, thickPen);
                     }
                 }
@@ -243,6 +248,6 @@ namespace Extract.Drawing
             }
         }
 
-        #endregion ExtractPens Properties
+        #endregion Properties
     }
 }
