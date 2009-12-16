@@ -67,10 +67,16 @@ namespace Extract.Redaction.Verification
         static readonly string[] _CATEGORIES = Enum.GetNames(typeof(CategoryIndex));
 
         /// <summary>
+        /// The minimum amount of padding to apply when calculating the padding around an 
+        /// auto-zoom.
+        /// </summary>
+        const int _MIN_PADDING = 25;
+
+        /// <summary>
         /// The amount to multiply the <see cref="AutoZoomScale"/> when calculating the padding 
         /// around a view.
         /// </summary>
-        const int _PADDING_MULTIPLIER = 25;
+        const int _PADDING_MULTIPLIER = 60;
 
         /// <summary>
         /// The default value for the <see cref="AutoZoomScale"/>.
@@ -863,7 +869,7 @@ namespace Extract.Redaction.Verification
             Rectangle area = LayerObject.GetCombinedBounds(layerObjects);
 
             // Adjust the area by the auto zoom scale
-            int padding = _autoZoomScale * _PADDING_MULTIPLIER;
+            int padding = (_autoZoomScale - 1) * _PADDING_MULTIPLIER + _MIN_PADDING;
             area = _imageViewer.PadViewingRectangle(area, padding, padding, false);
             area = _imageViewer.GetTransformedRectangle(area, false);
 
