@@ -34,20 +34,12 @@ namespace Extract.FileActionManager.Utilities
             readonly string _fpsFileName;
 
             /// <summary>
-            /// The number for this thread (used to access the ManualResetEvent for the thread)
-            /// </summary>
-            readonly int _threadNumber;
-
-            /// <summary>
             /// Initializes a new instance of the <see cref="ProcessingThreadArguments"/> class.
             /// </summary>
             /// <param name="fpsFileName">The fps file to process.</param>
-            /// <param name="threadNumber">The index for this threads stop event in the
-            /// array of thread stop events.</param>
-            public ProcessingThreadArguments(string fpsFileName, int threadNumber)
+            public ProcessingThreadArguments(string fpsFileName)
             {
                 _fpsFileName = fpsFileName;
-                _threadNumber = threadNumber;
             }
 
             /// <summary>
@@ -58,17 +50,6 @@ namespace Extract.FileActionManager.Utilities
                 get
                 {
                     return _fpsFileName;
-                }
-            }
-
-            /// <summary>
-            /// Gets the thread number
-            /// </summary>
-            public int ThreadNumber
-            {
-                get
-                {
-                    return _threadNumber;
                 }
             }
         }
@@ -109,12 +90,6 @@ namespace Extract.FileActionManager.Utilities
         ManualResetEvent _stopProcessing = new ManualResetEvent(false);
 
         /// <summary>
-        /// Contains the event handles for each thread so that the threads can indicate
-        /// that they have stopped processing.
-        /// </summary>
-        ManualResetEvent[] _threadStopped;
-
-        /// <summary>
         /// Event handle to indicate that the dns service has started
         /// </summary>
         ManualResetEvent _dnsStarted = new ManualResetEvent(false);
@@ -128,6 +103,16 @@ namespace Extract.FileActionManager.Utilities
         /// The collection of threads which are running.
         /// </summary>
         List<Thread> _processingThreads = new List<Thread>();
+
+        /// <summary>
+        /// Event handle that is set when all threads have stopped
+        /// </summary>
+        ManualResetEvent _threadsStopped;
+
+        /// <summary>
+        /// The count of active processing threads
+        /// </summary>
+        volatile int _activeProcessingThreadCount;
 
         /// <summary>
         /// Thread for checking if the DNS Client service is running.
@@ -189,19 +174,17 @@ namespace Extract.FileActionManager.Utilities
                 lock (_lock)
                 {
                     // Create and launch a processing thread for each fps file.
-                    _threadStopped = new ManualResetEvent[fpsFiles.Count];
+                    _threadsStopped = new ManualResetEvent(fpsFiles.Count == 0);
                     for (int i = 0; i < fpsFiles.Count; i++)
                     {
-                        // Create a new stopped event to be signaled and add it to
-                        // the collection.
-                        _threadStopped[i] = new ManualResetEvent(false);
-
                         // Create a new thread and add it to the collection.
                         Thread thread = new Thread(ProcessFiles);
                         _processingThreads.Add(thread);
 
-                        // Start the thread
-                        thread.Start(new ProcessingThreadArguments(fpsFiles[i], i));
+                        // Start the thread in a Multithreaded apartment
+                        thread.SetApartmentState(ApartmentState.MTA);
+                        thread.Start(new ProcessingThreadArguments(fpsFiles[i]));
+                        _activeProcessingThreadCount++;
                     }
                 }
             }
@@ -226,15 +209,11 @@ namespace Extract.FileActionManager.Utilities
                 // Signal the threads to stop
                 _stopProcessing.Set();
 
-                // Only wait if there are wait handles
-                if (_threadStopped != null && _threadStopped.Length > 0)
+                // Only wait if there is a wait handle
+                if (_threadsStopped != null)
                 {
-                    // Wait for all the threads to exit (timeout after a second to request
-                    // additional time to stop)
-                    while (!WaitHandle.WaitAll(_threadStopped, 1000))
+                    while (_threadsStopped != null && !_threadsStopped.WaitOne(1000))
                     {
-                        // All wait handles were not signaled,
-                        // request additional time to stop
                         RequestAdditionalTime(1200);
                     }
                 }
@@ -253,20 +232,15 @@ namespace Extract.FileActionManager.Utilities
                 // Mutex around accessing the thread handle collection
                 lock (_lock)
                 {
-                    // Done with the thread events, close the handles and reset the
-                    // array to null
-                    if (_threadStopped != null)
+                    // Done with the thread event close the handle and set to null
+                    if (_threadsStopped != null)
                     {
-                        foreach (ManualResetEvent threadEvent in _threadStopped)
-                        {
-                            if (threadEvent != null)
-                            {
-                                threadEvent.Close();
-                            }
-                        }
-
-                        _threadStopped = null;
+                        _threadsStopped.Close();
+                        _threadsStopped = null;
                     }
+
+                    // Set the active processing count back to 0
+                    _activeProcessingThreadCount = 0;
                 }
 
                 // Empty the processing threads collection since we are done with the threads
@@ -356,13 +330,11 @@ namespace Extract.FileActionManager.Utilities
         void ProcessFiles(object threadParameters)
         {
             FileProcessingManagerProcessClass famProcess = null;
-            int threadNumber = 0;
             int pid = -1;
             try
             {
                 // Get the processing thread arguments
                 ProcessingThreadArguments arguments = (ProcessingThreadArguments)threadParameters;
-                threadNumber = arguments.ThreadNumber;
 
                 // Create the FAM process
                 famProcess = new FileProcessingManagerProcessClass();
@@ -428,18 +400,19 @@ namespace Extract.FileActionManager.Utilities
                     }
                 }
 
-                if (_threadStopped != null)
+                // Mutex around the active thread count decrement
+                lock (_lock)
                 {
-                    lock (_lock)
+                    _activeProcessingThreadCount--;
+                    if (_activeProcessingThreadCount <= 0)
                     {
-                        if (_threadStopped.Length > threadNumber &&
-                            _threadStopped[threadNumber] != null)
+                        if (_threadsStopped != null)
                         {
                             // Wrap in a try/catch and log to ensure no exceptions thrown
                             // from the finally block.
                             try
                             {
-                                _threadStopped[threadNumber].Set();
+                                _threadsStopped.Set();
                             }
                             catch (Exception ex)
                             {

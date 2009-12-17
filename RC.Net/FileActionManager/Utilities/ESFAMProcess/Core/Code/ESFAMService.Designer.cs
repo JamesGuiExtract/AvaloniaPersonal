@@ -30,10 +30,10 @@ namespace Extract.FileActionManager.Utilities
                     {
                         _stopProcessing.Set();
 
-                        if (_threadStopped != null && _threadStopped.Length > 0)
+                        if (_threadsStopped != null)
                         {
                             // Now wait for each thread to exit (set timeout to an hour)
-                            WaitHandle.WaitAll(_threadStopped, 3600000);
+                            _threadsStopped.WaitOne(3600000);
                         }
                     }
 
@@ -41,19 +41,13 @@ namespace Extract.FileActionManager.Utilities
                     _stopProcessing = null;
                 }
 
-                if (_threadStopped != null)
+                if (_threadsStopped != null)
                 {
-                    // Mutex around closing the events
+                    // Mutex around closing the event
                     lock (_lock)
                     {
-                        for (int i = 0; i < _threadStopped.Length; i++)
-                        {
-                            if (_threadStopped[i] != null)
-                            {
-                                _threadStopped[i].Close();
-                                _threadStopped[i] = null;
-                            }
-                        }
+                        _threadsStopped.Close();
+                        _threadsStopped = null;
                     }
                 }
 
