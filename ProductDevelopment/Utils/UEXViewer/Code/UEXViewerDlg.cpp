@@ -293,11 +293,20 @@ BOOL CUEXViewerDlg::OnInitDialog()
 			// Remove quotes from path
 			zCommand.Replace( "\"", "" );
 
-			// Validate filename
-			validateFileOrFolderExistence( zCommand.operator LPCTSTR() );
-
-			// Load this file
-			addExceptions( zCommand.operator LPCTSTR(), true );
+			// Only load exceptions if the file exists (do not throw an exception
+			// if the file does not exist) [LRCAU #5530]
+			if (isValidFile((LPCTSTR) zCommand))
+			{
+				// Load this file
+				addExceptions( (LPCTSTR) zCommand, true );
+			}
+			else
+			{
+				string strMessage = "The specified exception file does not exist. It may have "
+					"been moved, deleted, or not created yet.\nFile Name: ";
+				strMessage += (LPCTSTR)zCommand;
+				AfxMessageBox(strMessage.c_str(), MB_OK | MB_ICONINFORMATION);
+			}
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14820")

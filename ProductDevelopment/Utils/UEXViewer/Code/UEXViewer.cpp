@@ -99,15 +99,20 @@ void usage()
 						"<filename> - open UEXViewer.exe with the specified file\n";
 	AfxMessageBox(strUsage.c_str());
 }
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To display the UEX Viewer dialog
+void openUexDialog(CWnd* pMainWnd)
+{
+	// Create and run the main dialog window
+	CUEXViewerDlg dlg;
+	pMainWnd = &dlg;
+	dlg.DoModal();
+}
 
 //-------------------------------------------------------------------------------------------------
 // CUEXViewerApp
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CUEXViewerApp, CWinApp)
-	//{{AFX_MSG_MAP(CUEXViewerApp)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-		//    DO NOT EDIT what you see in these blocks of generated code!
-	//}}AFX_MSG
 	ON_COMMAND(ID_HELP, CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
@@ -143,15 +148,14 @@ BOOL CUEXViewerApp::InitInstance()
 		if (!zItem.IsEmpty())
 		{
 			// Find start to possible command-line file
-			int iPos = zPath.Find( zItem.operator LPCTSTR() );
+			int iPos = zPath.Find( zItem );
 
 			// Keep just the EXE part
 			zPath = zPath.Left( iPos - 1 );
 		}
 
 		// Remove quotes
-		string	strPath;
-		strPath = zPath.operator LPCTSTR();
+		string	strPath = (LPCTSTR) zPath;
 		replaceVariable( strPath, "\"", "" );
 
 		// Get version number as a string
@@ -221,68 +225,67 @@ BOOL CUEXViewerApp::InitInstance()
 			// Remove quotes from path
 			zItem.Replace( "\"", "" );
 
-			// Open the file
-			CFileException	e;
-			if (file.Open( zItem.operator LPCTSTR(), CFile::modeRead, &e ))
+			// Check for file existence
+			if (isValidFile((LPCTSTR) zItem))
 			{
-				// Read the first line
-				file.ReadString( zLine );
-
-				// Read the second line, if present
-				file.ReadString( zLine2 );
-
-				// Close the file
-				file.Close();
-
-				/////////////////////////////////////////////////
-				// If only one line in the input file, 
-				// then just display the exception in normal form
-				/////////////////////////////////////////////////
-				if (zLine2.IsEmpty())
+				// Open the file
+				CFileException	e;
+				if (file.Open( zItem.operator LPCTSTR(), CFile::modeRead, &e ))
 				{
-					// Parse the data
-					vector<string> vecTokens;
-					StringTokenizer	s;
-					string	strText( zLine.operator LPCTSTR() );
-					s.parse( strText, vecTokens );
+					// Read the first line
+					file.ReadString( zLine );
 
-					// Check the number of tokens
-					if (vecTokens.size() == 7)
+					// Read the second line, if present
+					file.ReadString( zLine2 );
+
+					// Close the file
+					file.Close();
+
+					/////////////////////////////////////////////////
+					// If only one line in the input file, 
+					// then just display the exception in normal form
+					/////////////////////////////////////////////////
+					if (zLine2.IsEmpty())
 					{
-						////////////////////////////////////////////////
-						// Create and display the UCLID Exception object
-						////////////////////////////////////////////////
-						UCLIDException ue;
-						string	strData = vecTokens[6];
-						ue.createFromString( "ELI14359", strData );
-						// Do not add this exception to the log
-						ue.display( false );
+						// Parse the data
+						vector<string> vecTokens;
+						StringTokenizer	s;
+						string	strText( zLine.operator LPCTSTR() );
+						s.parse( strText, vecTokens );
 
-					}	// end if right number of tokens
+						// Check the number of tokens
+						if (vecTokens.size() == 7)
+						{
+							////////////////////////////////////////////////
+							// Create and display the UCLID Exception object
+							////////////////////////////////////////////////
+							UCLIDException ue;
+							string	strData = vecTokens[6];
+							ue.createFromString( "ELI14359", strData );
+							// Do not add this exception to the log
+							ue.display( false );
+
+						}	// end if right number of tokens
+						else
+						{
+							// Format error message
+							CString zError;
+							zError.Format( "Parsing error (only %d tokens) on first line of file \"%s\"", 
+								vecTokens.size(), zItem );
+
+							// Display error message
+							::MessageBox( NULL, zError.operator LPCTSTR(), "Error", 
+								MB_ICONSTOP | MB_OK );
+
+						}	// end else wrong number of tokens
+					}		// end if single-line input file
 					else
 					{
-						// Format error message
-						CString zError;
-						zError.Format( "Parsing error (only %d tokens) on first line of file \"%s\"", 
-							vecTokens.size(), zItem );
-
-						// Display error message
-						::MessageBox( NULL, zError.operator LPCTSTR(), "Error", 
-							MB_ICONSTOP | MB_OK );
-
-					}	// end else wrong number of tokens
-				}		// end if single-line input file
+						openUexDialog(m_pMainWnd);
+					}		// end else multiple-line input file
+				}			// end if file open
 				else
 				{
-					// Create and run the main dialog window
-					CUEXViewerDlg dlg;
-					m_pMainWnd = &dlg;
-					dlg.DoModal();
-
-				}		// end else multiple-line input file
-			}			// end if file open
-			else
-			{
 					// Format error message
 					CString zError;
 					zError.Format( "Error: %d, Could not open file \"%s\"", e.m_cause, zItem );
@@ -291,15 +294,16 @@ BOOL CUEXViewerApp::InitInstance()
 					::MessageBox( NULL, zError.operator LPCTSTR(), "Error", 
 						MB_ICONSTOP | MB_OK );
 
-			}			// end else could not open file
+				}			// end else could not open file
+			}			// end if file on command line exists
+			else
+			{
+				openUexDialog(m_pMainWnd);
+			}
 		}				// end if file on command line
 		else
 		{
-			// Create and run the main dialog window
-			CUEXViewerDlg dlg;
-			m_pMainWnd = &dlg;
-			dlg.DoModal();
-
+			openUexDialog(m_pMainWnd);
 		}				// end else empty command line
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13415");

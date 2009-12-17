@@ -20,6 +20,7 @@
 #include <StopWatch.h>
 
 #include <string>
+#include <stack>
 
 using namespace std;
 using namespace ADODB;
@@ -3823,19 +3824,6 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 		// Set the transaction guard
 		TransactionGuard tg(ipConnection);
 
-		// Recordset for the FAMFile table
-		_RecordsetPtr ipFAMFile(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI28185", ipFAMFile != NULL );
-
-		// Get the recordset for the FAMFile table
-		ipFAMFile->Open("SELECT FAMFile.ID, FAMFile.Priority FROM FAMFile",
-			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
-		if (ipFAMFile->adoEOF == VARIANT_TRUE)
-		{
-			// Just return as there are no file records
-			return S_OK;
-		}
-
 		// Recordset to search for file IDs
 		_RecordsetPtr ipFileSet(__uuidof( Recordset ));
 		ASSERT_RESOURCE_ALLOCATION("ELI27711", ipFileSet != NULL );
@@ -3847,35 +3835,39 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 		// Setup the counter for the number of records
 		long nNumRecords = 0;
 
-		// Loop through the returned files setting the new priority
-		long nPriority =
-			eNewPriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long)eNewPriority;
+		// Build a list of file ID's to set
+		stack<string> stackIDs;
 		while ( ipFileSet->adoEOF == VARIANT_FALSE )
 		{
 			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", NULL) == VARIANT_TRUE)
 			{
 				// Get the file ID
-				long nFileID = getLongField(ipFileSet->Fields, "ID");
-
-				// Find the record in the FAMFile recordset
-				ipFAMFile->MoveFirst();
-				string strFindString = "ID = " + asString(nFileID);
-				ipFAMFile->Find(strFindString.c_str(), 0, adSearchForward);
-				if (ipFAMFile->adoEOF == VARIANT_TRUE)
-				{
-					UCLIDException ue("ELI28186", "File ID was not found.");
-					ue.addDebugInfo("File ID To Find", nFileID);
-					throw ue;
-				}
-
-				// Update the record in the FAMFile table
-				setLongField(ipFAMFile->Fields, "Priority", nPriority);
-				ipFAMFile->Update();
-				nNumRecords++;
+				stackIDs.push(asString(getLongField(ipFileSet->Fields, "ID")));
 			}
 
 			ipFileSet->MoveNext();
 		}
+
+		// Loop through the IDs setting the file priority
+		string strPriority = asString(eNewPriority == kPriorityDefault ?
+							glDEFAULT_FILE_PRIORITY : (long)eNewPriority);
+		while(!stackIDs.empty())
+		{
+			// Build the update query
+			string strUpdateQuery = "UPDATE FAMFile SET Priority = " + strPriority
+				+ " WHERE [FAMFile].[ID] IN (" + stackIDs.top();
+			stackIDs.pop();
+			for (int i=0; !stackIDs.empty() && i < 150; i++)
+			{
+				strUpdateQuery += ", " + stackIDs.top();
+				stackIDs.pop();
+			}
+			strUpdateQuery += ")";
+
+			// Execute the update query
+			nNumRecords += executeCmdQuery(ipConnection, strUpdateQuery);
+		}
+
 
 		// Commit the transaction
 		tg.CommitTrans();

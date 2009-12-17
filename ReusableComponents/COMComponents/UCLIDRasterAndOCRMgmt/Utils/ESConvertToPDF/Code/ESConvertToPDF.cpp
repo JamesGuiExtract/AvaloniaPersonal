@@ -199,15 +199,56 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 	// ensure the output document is closed when the memory releaser object goes out of scope
 	RecMemoryReleaser<tagRECDOCSTRUCT> outputDocumentMemoryReleaser(hDoc);
 
+	// Get the retry count and timeout
+	int iRetryCount(-1), iRetryTimeout(-1);
+	getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
+
 	// open the input image file
 	HIMGFILE hInputFile = NULL;
+	int iNumRetries = 0;
 	rc = kRecOpenImgFile(m_strInputFile.c_str(), &hInputFile, IMGF_READ, FF_SIZE);
-	if(rc != REC_OK)
+	while (rc != REC_OK)
 	{
-		UCLIDException ue("ELI18587", "Unable to open input file.");
-		loadScansoftRecErrInfo(ue, rc);
-		ue.addDebugInfo("Input filename", m_strInputFile);
-		throw ue;
+		// Increment the retry count and try again
+		iNumRetries++;
+		rc = kRecOpenImgFile(m_strInputFile.c_str(), &hInputFile, IMGF_READ, FF_SIZE);
+
+		// If opened successfully, log an application trace and break from the loop
+		if(rc == REC_OK)
+		{
+			UCLIDException ue("ELI28853", "Application Trace: Opened image after retrying.");
+			ue.addDebugInfo("Number of retries", iNumRetries);
+			ue.addDebugInfo("Image Name", m_strInputFile);
+			ue.log();
+
+			// Exit the while loop
+			break;
+		}
+		// Check if the error is not IMF_OPEN_ERROR, if not then throw an exception
+		else if (rc != IMF_OPEN_ERR)
+		{
+			UCLIDException ue("ELI18587", "Unable to open input file.");
+			loadScansoftRecErrInfo(ue, rc);
+			ue.addDebugInfo("Input filename", m_strInputFile);
+			throw ue;
+		}
+
+		// Check the retry count
+		if(iNumRetries < iRetryCount)
+		{
+			// Sleep and retry
+			Sleep(iRetryTimeout);
+		}
+		else
+		{
+			// Reached max retry count, throw an exception
+			UCLIDException ue("ELI28854", "Unable to open input file after retrying.");
+			loadScansoftRecErrInfo(ue, rc);
+			ue.addDebugInfo("Image Name", m_strInputFile);
+			ue.addDebugInfo("Number of retries", iNumRetries);
+			ue.addDebugInfo("Max number of retries", iRetryCount);
+			throw ue;
+		}
 	}
 
 	// ensure that the memory for the input file is released when the object goes out of scope

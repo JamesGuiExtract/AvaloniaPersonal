@@ -234,16 +234,16 @@ string getCurrentUserName()
 //-------------------------------------------------------------------------------------------------
 string getFullUserName()
 {
-	string strFullUserName = "NOT AVAILABLE";
-
 	char zName[1024] = {0};
 	unsigned long nLength = 1024;
 	if (GetUserNameEx(NameDisplay, zName, &nLength) == TRUE)
 	{
-		strFullUserName = zName;
+		return zName;
 	}
-
-	return strFullUserName;
+	else
+	{
+		return getCurrentUserName();
+	}
 }
 //-------------------------------------------------------------------------------------------------
 string getComputerName()
