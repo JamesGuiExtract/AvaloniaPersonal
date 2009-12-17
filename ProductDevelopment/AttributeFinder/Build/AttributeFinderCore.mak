@@ -97,6 +97,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe  /in:"$(BinariesFolder)\SplitMultiPageImage.exe" /mapout:"$(BinariesFolder)\Map\mapSplitMultiPageImage.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\ESFAMService.exe" /mapout:"$(BinariesFolder)\Map\mapESFAMService.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.FileActionManager.Forms.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.FileActionManager.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\IDShieldStatisticsReporter.exe" /mapout:"$(BinariesFolder)\Map\mapIDShieldStatisticsReporter.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	
 EncryptAndCopyComponentDataFiles: 
     @ECHO Copying the ComponentData subdirectories and files to installation directory...
@@ -193,6 +194,7 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\SplitMultiPageImage.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\ESFAMService.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.FileActionManager.Forms.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V  "$(BinariesFolder)\Obfuscated\IDShieldStatisticsReporter.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V "$(BinariesFolder)\Interop.*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Dotnet\Leadtools*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY "$(RCNETDir)\APIs\Divelements\SandDock\bin\SandDock.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
@@ -233,6 +235,7 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Redaction.Verification.dll" /b >>"$(IDShieldInstallFilesRootDir)\NonSelfRegComponents\IDShield.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.FileActionManager.FileProcessors.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents\AFCore.nl
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Redaction.dll" /b >>"$(IDShieldInstallFilesRootDir)\NonSelfRegComponents\IDShield.nl"
+	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\IDShieldStatisticsReporter.exe" /b >>"$(IDShieldInstallFilesRootDir)\NonSelfRegComponents\IDShield.nl"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents\vssver.scc" 
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\mssccprj.scc"

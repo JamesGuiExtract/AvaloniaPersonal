@@ -444,7 +444,7 @@ STDMETHODIMP CIDShieldTester::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 void CIDShieldTester::validateLicense()
 {
-	VALIDATE_LICENSE( gnIDSHIELD_RULE_WRITING_OBJECTS, "ELI15192", "ID Shield Tester" );
+	VALIDATE_LICENSE( gnIDSHIELD_CORE_OBJECTS, "ELI15192", "ID Shield Tester" );
 }
 //-------------------------------------------------------------------------------------------------
 void CIDShieldTester::processDatFile(const string& strDatFileName)
