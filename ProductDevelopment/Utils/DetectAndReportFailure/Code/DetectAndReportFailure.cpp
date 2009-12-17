@@ -55,32 +55,12 @@ BOOL CDetectAndReportFailureApp::InitInstance()
 		// load license files
 		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
-		try
-		{
-			static UCLIDExceptionDlg exceptionDlg;
-			UCLIDException::setExceptionHandler(&exceptionDlg);
+		static UCLIDExceptionDlg exceptionDlg;
+		UCLIDException::setExceptionHandler(&exceptionDlg);
 
-			CDetectAndReportFailureDlg dlg;
-			m_pMainWnd = &dlg;
-			int nResponse = dlg.DoModal();
-			if (nResponse == IDOK)
-			{
-				// TODO: Place code here to handle when the dialog is
-				//  dismissed with OK
-			}
-			else if (nResponse == IDCANCEL)
-			{
-				// TODO: Place code here to handle when the dialog is
-				//  dismissed with Cancel
-			}
-
-			LicenseManagement::sGetInstance().terminate();
-		}
-		catch(...)
-		{
-			LicenseManagement::sGetInstance().terminate();
-			throw;
-		}
+		CDetectAndReportFailureDlg dlg;
+		m_pMainWnd = &dlg;
+		dlg.DoModal();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15684")
 
