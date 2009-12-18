@@ -996,17 +996,14 @@ int getImageViewPerspective(const string strImageFileName, int nPageNum)
 	// Set page number
 	lfo.PageNumber = nPageNum;
 
-	// Convert a PDF input image to a temporary TIF
-	PDFInputOutputMgr ltPDF( strImageFileName, true );
-
 	LeadToolsPDFLoadLocker ltLocker(false);
 
 	// Get File Information
-	int nRet = L_FileInfo( (char*)( ltPDF.getFileName().c_str() ), &fileInfo, 
+	int nRet = L_FileInfo( (char*)( strImageFileName.c_str() ), &fileInfo, 
 		sizeof(FILEINFO), 0, &lfo );
 
 	throwExceptionIfNotSuccess(nRet, "ELI16655", 
-		"Could not obtain image info.", ltPDF.getFileNameInformationString() );
+		"Could not obtain image info.", strImageFileName );
 
 	// Return ViewPerspective field
 	return fileInfo.ViewPerspective;
@@ -1492,6 +1489,20 @@ void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO&
 {
 	try
 	{
+		int nFileFormat = flInfo.Format;
+		int nBitsPerPixel = flInfo.BitsPerPixel;
+		int nCompressionFactor = getCompressionFactor(nFileFormat);
+		saveImagePage(hBitmap, strOutputFile, nFileFormat, nCompressionFactor, nBitsPerPixel,
+			sfo, bLockPdf);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28866");
+}
+//-------------------------------------------------------------------------------------------------
+void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, int nFileFormat,
+				   int nCompressionFactor, int nBitsPerPixel, SAVEFILEOPTION& sfo, bool bLockPdf)
+{
+	try
+	{
 		try
 		{
 			// Lock the PDF saving if bLockPdf == true
@@ -1508,9 +1519,6 @@ void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO&
 			// Get the file name as a char*
 			char* pszOutFile = (char*) strOutputFile.c_str();
 
-			// Get the compression factor
-			long nCompression = getCompressionFactor(flInfo.Format);
-
 			// Default return to success
 			L_INT nRet = SUCCESS;
 
@@ -1518,8 +1526,8 @@ void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO&
 			long nNumFailedAttempts = 0;
 			while (nNumFailedAttempts < iRetryCount)
 			{
-				nRet = L_SaveBitmap(pszOutFile, &hBitmap, flInfo.Format, flInfo.BitsPerPixel,
-					nCompression, &sfo);
+				nRet = L_SaveBitmap(pszOutFile, &hBitmap, nFileFormat, nBitsPerPixel,
+					nCompressionFactor, &sfo);
 
 				// Check result
 				if (nRet == SUCCESS)
@@ -1543,8 +1551,8 @@ void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO&
 				ue.addDebugInfo("Error Message", getErrorCodeDescription(nRet));
 				ue.addDebugInfo("Number Of Retries", nNumFailedAttempts);
 				ue.addDebugInfo("Max Number Of Retries", iRetryCount);
-				ue.addDebugInfo("Compression Flag", nCompression);
-				addFormatDebugInfo(ue, flInfo.Format);
+				ue.addDebugInfo("Compression Flag", nCompressionFactor);
+				addFormatDebugInfo(ue, nFileFormat);
 				throw ue;
 			}
 			// Check if a retry was necessary, if so log an application trace

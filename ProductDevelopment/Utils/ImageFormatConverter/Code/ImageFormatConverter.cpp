@@ -280,7 +280,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 				sfOptions.PageNumber = i;
 
 				// Save the image page
-				saveImagePage(hBitmap, strTempOut, fileInfo, sfOptions, false);
+				saveImagePage(hBitmap, strTempOut, nType, nQFactor, nBitsPerPixel, sfOptions, false);
 
 				if (bSavedTag)
 				{
