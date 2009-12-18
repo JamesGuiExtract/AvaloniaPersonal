@@ -667,10 +667,23 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                // Determine the resultant redacted state [FIDSC #3897]
+                bool redacted = false;
+                foreach (RedactionGridViewRow row in SelectedRows)
+                {
+                    if (!row.Redacted)
+                    {
+                        redacted = true;
+                        break;
+                    }
+                }
+
+                // Set the state
                 foreach (DataGridViewRow row in _dataGridView.SelectedRows)
                 {
                     RedactionGridViewRow redaction = _redactions[row.Index];
-                    redaction.Redacted = !redaction.Redacted;
+                    redaction.Redacted = redacted;
+                    _dirty = true;
                     _dataGridView.UpdateCellValue(_redactedColumn.Index, row.Index);
                 }
             }
@@ -730,6 +743,38 @@ namespace Extract.Redaction.Verification
                 // Select only those layer objects that correspond to selected rows
                 UpdateLayerObjectSelection();
 
+                BringSelectionIntoView(false);
+
+                _imageViewer.Invalidate();
+            }
+            finally
+            {
+                _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
+                _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
+            }
+        }
+
+        /// <summary>
+        /// Centers the view on redactions selected on the current page; if there are no 
+        /// redactions selected on the current page, uses the first page with a selected redaction.
+        /// </summary>
+        public void BringSelectionIntoView()
+        {
+            BringSelectionIntoView(true);
+        }
+
+        /// <summary>
+        /// Centers the view on redactions selected on the current page; if there are no 
+        /// redactions selected on the current page, uses the first page with a selected redaction.
+        /// </summary>
+        /// <param name="alwaysShiftZoom"><see langword="true"/> if the zoom should be adjusted 
+        /// regardless of whether redactions are already in view; <see langword="false"/> if the 
+        /// zoom should only be adjusted if in auto-zoom mode is on or if at least one redaction 
+        /// on the page is not fully visible.</param>
+        public void BringSelectionIntoView(bool alwaysShiftZoom)
+        {
+            try
+            {
                 // Is at least one row selected?
                 if (_dataGridView.SelectedRows.Count > 0)
                 {
@@ -748,18 +793,15 @@ namespace Extract.Redaction.Verification
                         // Auto-zoom is on, zoom around all layer objects on the current page.
                         PerformAutoZoom(selected);
                     }
-                    else if (ContainsNonVisibleLayerObject(selected))
+                    else if (alwaysShiftZoom || ContainsNonVisibleLayerObject(selected))
                     {
                         _imageViewer.CenterOnLayerObjects(selected);
                     }
                 }
-
-                _imageViewer.Invalidate();
             }
-            finally
+            catch (Exception ex)
             {
-                _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
-                _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
+                throw ExtractException.AsExtractException("ELI28857", ex);
             }
         }
 
