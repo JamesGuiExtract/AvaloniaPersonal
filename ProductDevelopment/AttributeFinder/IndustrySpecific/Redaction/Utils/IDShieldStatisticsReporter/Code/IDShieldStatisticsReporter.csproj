@@ -33,12 +33,12 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\..\..\Binaries\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\..\Binaries\Release\</OutputPath>
     <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <DocumentationFile>..\..\..\..\..\..\..\Binaries\Debug\IDShieldStatisticsReporter.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\..\Binaries\Release\IDShieldStatisticsReporter.XML</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
