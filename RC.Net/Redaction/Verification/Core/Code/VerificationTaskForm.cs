@@ -1331,6 +1331,9 @@ namespace Extract.Redaction.Verification
                 // because the page summary view needs to handle this event FIRST.
                 _imageViewer.ImageFileChanged += HandleImageViewerImageFileChanged;
 
+                // Center on selected layer objects
+                _imageViewer.Shortcuts[Keys.F2] = _redactionGridView.BringSelectionIntoView;
+
                 // Disable the close image
                 _imageViewer.Shortcuts[Keys.F4 | Keys.Control] = null;
 
