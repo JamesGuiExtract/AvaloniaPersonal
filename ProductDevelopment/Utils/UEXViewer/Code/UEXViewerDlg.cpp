@@ -28,6 +28,7 @@
 #include <RegConstants.h>
 #include <FileDialogEx.h>
 #include <ClipboardManager.h>
+#include <SuspendWindowUpdates.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -565,16 +566,16 @@ void CUEXViewerDlg::OnFileOpen()
 		"||", NULL );
 
 		// Modify the initial directory
-		openFileDlg.m_ofn.lpstrInitialDir = m_zDirectory.operator LPCTSTR();
+		openFileDlg.m_ofn.lpstrInitialDir = (LPCTSTR) m_zDirectory;
 
 		if (openFileDlg.DoModal() == IDOK)
 		{
 			// Store folder of selected file
 			CString	zPath = openFileDlg.GetPathName();
-			m_zDirectory = getDirectoryFromFullPath( zPath.operator LPCTSTR() ).c_str();
+			m_zDirectory = getDirectoryFromFullPath( (LPCTSTR) zPath ).c_str();
 
 			// Add exceptions from selected file to UEX list
-			addExceptions( zPath.operator LPCTSTR(), true );
+			addExceptions( (LPCTSTR) zPath, true );
 		}
 
 		// Manage button states
@@ -684,6 +685,10 @@ void CUEXViewerDlg::OnEditClear()
 {
 	try
 	{
+		// Show the wait cursor and suspend window updates
+		CWaitCursor wait;
+		SuspendWindowUpdates suspend(*this);
+
 		// Release allocated ITEMINFO memory
 		int iCount = m_listUEX.GetItemCount();
 		for (int i = 0; i < iCount; i++)
@@ -753,6 +758,10 @@ void CUEXViewerDlg::OnEditDeleteSelection()
 {
 	try
 	{
+		// Show the wait cursor and suspend window updates
+		CWaitCursor wait;
+		SuspendWindowUpdates suspend(*this);
+
 		// Determine which list item is selected
 		POSITION pos = m_listUEX.GetFirstSelectedItemPosition();
 		if (pos == NULL)
@@ -842,7 +851,7 @@ void CUEXViewerDlg::OnFileExport()
 			"||", NULL);
 
 		// Modify the initial directory
-		dlg.m_ofn.lpstrInitialDir = m_zDirectory.operator LPCTSTR();
+		dlg.m_ofn.lpstrInitialDir = (LPCTSTR) m_zDirectory;
 
 		if (dlg.DoModal() == IDOK)
 		{
@@ -879,19 +888,19 @@ void CUEXViewerDlg::OnFileExport()
 				{
 					// Retrieve strings from list
 					zTemp = m_listUEX.GetItemText( i, SERIAL_LIST_COLUMN );
-					strSerial = zTemp.operator LPCTSTR();
+					strSerial = (LPCTSTR) zTemp;
 
 					zTemp = m_listUEX.GetItemText( i, APPLICATION_LIST_COLUMN );
-					strApp = zTemp.operator LPCTSTR();
+					strApp = (LPCTSTR) zTemp;
 
 					zTemp = m_listUEX.GetItemText( i, COMPUTER_LIST_COLUMN );
-					strComputer = zTemp.operator LPCTSTR();
+					strComputer = (LPCTSTR) zTemp;
 
 					zTemp = m_listUEX.GetItemText( i, USER_LIST_COLUMN );
-					strUser = zTemp.operator LPCTSTR();
+					strUser = (LPCTSTR) zTemp;
 
 					zTemp = m_listUEX.GetItemText( i, PID_LIST_COLUMN );
-					strPid = zTemp.operator LPCTSTR();
+					strPid = (LPCTSTR) zTemp;
 
 					// Retrieve ItemData
 					pData = (ITEMINFO *)m_listUEX.GetItemData( i );
@@ -1092,7 +1101,7 @@ void CUEXViewerDlg::OnClose()
 		m_pCfgMgr->setKeyValue( GENERAL, WINDOW_SIZE_Y, pszKey );
 
 		// Directory information
-		strKey = m_zDirectory.operator LPCTSTR();
+		strKey = (LPCTSTR) m_zDirectory;
 		m_pCfgMgr->setKeyValue( GENERAL, DIRECTORY, strKey, true );
 
 		// ELI Code column width
@@ -1185,6 +1194,10 @@ void CUEXViewerDlg::OnCbnSelchangeComboExceptionFileList()
 {
 	try
 	{
+		// Show the wait cursor and suspend window updates
+		CWaitCursor wait;
+		SuspendWindowUpdates suspend(*this);
+
 		// get the current selected index
 		int iCurSel = m_comboExceptionsList.GetCurSel();
 
@@ -1539,6 +1552,10 @@ void CUEXViewerDlg::addExceptions(std::string strUEXFile, bool bReplaceMode)
 		OnEditClear();
 	}
 
+	// Show the wait cursor and suspend window updates
+	CWaitCursor wait;
+	SuspendWindowUpdates suspend(*this);
+
 	CStdioFile	file;
 	CString		zLine;
 	string	strLine;
@@ -1549,26 +1566,26 @@ void CUEXViewerDlg::addExceptions(std::string strUEXFile, bool bReplaceMode)
 	{
 		CWaitCursor	wait;
 
-		try
+		// Read each line of text
+		while (file.ReadString( zLine ) == TRUE)
 		{
-			// Read each line of text
-			while (file.ReadString( zLine ))
+			ulLineNum++;
+			// Parse the text
+			strLine = (LPCTSTR)zLine;
+			if (!parseLine( strLine ))
 			{
-				ulLineNum++;
-				// Parse the text
-				strLine = zLine.operator LPCTSTR();
-				parseLine( strLine );
+				string strMessage = "Unable to parse current line of the UEX file. "
+					"Would you like to continue parsing the file?\n"
+					"File name: " + strUEXFile + "\nLine Number: " + asString(ulLineNum)
+					+ "\nLine Text: " + (strLine.empty() ? "<Blank Line>" : strLine);
+
+				// Prompt the user about the unparseable line
+				if (AfxMessageBox(strMessage.c_str(), MB_YESNO | MB_ICONWARNING) == IDNO)
+				{
+					// User does not want to continue, break from the loop
+					break;
+				}
 			}
-		}
-		catch (UCLIDException& ue)
-		{
-			// If there was an error with the UEX file, we know it is a bad format.
-			// Add debug info, and exit.
-			UCLIDException uexOuter("ELI13981", "UEX file not in expected format!", ue);
-			uexOuter.addDebugInfo("strLine", strLine );
-			uexOuter.addDebugInfo("Line #", ulLineNum);
-			uexOuter.display();
-			return;
 		}
 	}
 
@@ -1599,7 +1616,7 @@ void CUEXViewerDlg::setNewCurrentFile(string strNewCurrentFile)
 		zTitle.Format( "%s - %s", strCAPTION.c_str(), 
 			getFileNameFromFullPath( m_strCurrentFile.c_str() ).c_str() );
 	}
-	SetWindowText(zTitle.operator LPCTSTR());
+	SetWindowText((LPCTSTR) zTitle);
 
 	// clear the list of exceptions in the current folder
 	m_comboExceptionsList.ResetContent();
@@ -1641,108 +1658,96 @@ void CUEXViewerDlg::setNewCurrentFile(string strNewCurrentFile)
 	updateEnabledStateForControls();
 }
 //-------------------------------------------------------------------------------------------------
-void CUEXViewerDlg::parseLine(std::string strText)
+bool CUEXViewerDlg::parseLine(std::string strText)
 {
-	// Parse the string
-	vector<string> vecTokens;
-	StringTokenizer	s;
-	s.parse( strText, vecTokens );
-
-	// Step through tokens and add item to list
-	unsigned long ulCount = vecTokens.size();
-	string	strToken;
-	int		iIndex = 0;
-
-	// Only parse lines with expected number of tokens
-	if (ulCount == OLD_UEX_TOKEN_COUNT)
+	try
 	{
-		// Dummy text for 0-width column
-		iIndex = m_listUEX.InsertItem( 0, "a" );
+		// Parse the string
+		vector<string> vecTokens;
+		StringTokenizer	s;
+		s.parse( strText, vecTokens );
 
-		// Step through each token in expected order:
-		// Serial number
-		// Application name and version
-		// Computer name
-		// User name
-		// Process ID
-		// Time
-		long	lTime = 0;
-		for (int i = 0; i < OLD_UEX_TOKEN_COUNT - 1; i++)
+		// Step through tokens and add item to list
+		unsigned long ulCount = vecTokens.size();
+		string	strToken;
+		int		iIndex = 0;
+
+		// Only parse lines with expected number of tokens
+		if (ulCount == OLD_UEX_TOKEN_COUNT)
 		{
-			// Retrieve the token
-			strToken = vecTokens[i];
+			// Dummy text for 0-width column
+			iIndex = m_listUEX.InsertItem( 0, "a" );
 
-			switch (i+1)
+			// Set the serial column
+			setItemText(iIndex, SERIAL_LIST_COLUMN, vecTokens[SERIAL_VALUE]);
+
+			// Set the application list column
+			setItemText(iIndex, APPLICATION_LIST_COLUMN, vecTokens[APPLICATION_VALUE]);
+
+			// Set the computer column
+			setItemText(iIndex, COMPUTER_LIST_COLUMN, vecTokens[COMPUTER_VALUE]);
+
+			// Set the user column
+			setItemText(iIndex, USER_LIST_COLUMN, vecTokens[USER_VALUE]);
+
+			// Set the PID column
+			setItemText(iIndex, PID_LIST_COLUMN, vecTokens[PID_VALUE]);
+
+			// Get the time value and set the time column
+			long lTime = asLong(vecTokens[TIME_VALUE]);
+			CTime	time( lTime );
+			CString	zTime = lTime > 0 ? time.Format("%m/%d/%Y %H:%M:%S") : "N/A";
+			setItemText( iIndex, TIME_LIST_COLUMN, (LPCTSTR) zTime );
+
+			// Retrieve exception string for storage in ItemData
+			strToken = vecTokens[EXCEPTION_VALUE];
+
+			// Create local UCLIDException object
+			UCLIDException ue;
+			try
 			{
-			case OLD_SERIAL_LIST_COLUMN:
-				setItemText( iIndex, SERIAL_LIST_COLUMN, strToken );
-				break;
+				// make sure there is a valid string
+				ue.createFromString( "ELI12736", strToken );
 
-			case OLD_APPLICATION_LIST_COLUMN:
-				setItemText( iIndex, APPLICATION_LIST_COLUMN, strToken );
-				break;
-
-			case OLD_COMPUTER_LIST_COLUMN:
-				setItemText( iIndex, COMPUTER_LIST_COLUMN, strToken );
-				break;
-
-			case OLD_USER_LIST_COLUMN:
-				setItemText( iIndex, USER_LIST_COLUMN, strToken );
-				break;
-
-			case OLD_PID_LIST_COLUMN:
-				setItemText( iIndex, PID_LIST_COLUMN, strToken );
-				break;
-
-			case OLD_TIME_LIST_COLUMN:
+				// Check that the top text is not just the token passed in
+				// if it is, then this line could not be parsed
+				if (ue.getTopText() == strToken)
 				{
-					// Convert time string to integer
-					lTime = atol( strToken.c_str() );
-					CTime	time( lTime );
-					CString	zTime;
-					if (lTime > 0)
-					{
-						// Format time as MM/DD/YYYY HH:MM:SS
-						zTime = time.Format( "%m/%d/%Y %H:%M:%S" );
-					}
-					else
-					{
-						zTime = "N/A";
-					}
-					setItemText( iIndex, TIME_LIST_COLUMN, zTime.operator LPCTSTR() );
+					m_listUEX.DeleteItem(iIndex);
+					return false;
 				}
-				break;
 			}
+			catch (...)
+			{
+				// remove the bad item from the list.
+				m_listUEX.DeleteItem(iIndex);
+				return false;
+			}
+
+			// Display Top ELI code and Top Exception
+			setItemText( iIndex, TOP_ELI_COLUMN, ue.getTopELI() );
+			setItemText( iIndex, TOP_EXCEPTION_COLUMN, ue.getTopText() );
+
+			// Set all text items, now set the item data
+			ITEMINFO*	pData = new ITEMINFO;
+			ASSERT_RESOURCE_ALLOCATION("ELI28710", pData != NULL);
+
+			pData->iIndex = iIndex;
+			pData->ulTime = lTime;
+			pData->strData = strToken;
+			m_listUEX.SetItemData( iIndex, (DWORD)pData );
 		}
-
-		// Retrieve exception string for storage in ItemData
-		strToken = vecTokens[OLD_UEX_TOKEN_COUNT - 1];
-
-		// Set the Item Data
-		ITEMINFO*	pData = new ITEMINFO;
-		ASSERT_RESOURCE_ALLOCATION("ELI28710", pData != NULL);
-
-		pData->iIndex = iIndex;
-		pData->ulTime = lTime;
-		pData->strData = strToken;
-		m_listUEX.SetItemData( iIndex, (DWORD)pData );
-
-		// Create local UCLIDException object
-		UCLIDException ue;
-		try
+		else
 		{
-			// make sure there is a valid string
-			ue.createFromString( "ELI12736", strToken );
+			// This line could not be parsed properly return false
+			return false;
 		}
-		catch (UCLIDException& ue)
-		{
-			// remove the bad item from the list.
-			m_listUEX.DeleteItem(iIndex);
-			throw ue;
-		}
-		// Display Top ELI code and Top Exception
-		setItemText( iIndex, TOP_ELI_COLUMN, ue.getTopELI() );
-		setItemText( iIndex, TOP_EXCEPTION_COLUMN, ue.getTopText() );
+
+		return true;
+	}
+	catch(...)
+	{
+		return false;
 	}
 }
 //-------------------------------------------------------------------------------------------------

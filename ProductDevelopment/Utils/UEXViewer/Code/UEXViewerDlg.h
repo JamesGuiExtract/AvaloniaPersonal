@@ -161,11 +161,12 @@ protected:
 	//=======================================================================
 	// PURPOSE: Extracts UCLID Exception properties from specified line of 
 	//				text.  Adds new line to UEX list.  Populates ITEMINFO 
-	//				structure as appropriate.
+	//				structure as appropriate. If the line is unparsable
+	//				the method will return false.
 	// REQUIRE: Nothing
 	// PROMISE: None.
 	// ARGS:	strText - Single line from UEX file
-	void parseLine(string strText);
+	bool parseLine(string strText);
 
 	//=======================================================================
 	// PURPOSE: Updates iIndex field in ITEMINFO structure for each item in 

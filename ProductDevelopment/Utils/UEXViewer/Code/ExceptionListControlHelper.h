@@ -23,12 +23,13 @@ const unsigned long	USER_LIST_COLUMN =				7;
 const unsigned long	PID_LIST_COLUMN =				8;
 const unsigned long	DATA_LIST_COLUMN =				9;		// not displayed
 
-const unsigned long	OLD_SERIAL_LIST_COLUMN =		1;
-const unsigned long	OLD_APPLICATION_LIST_COLUMN =	2;
-const unsigned long	OLD_COMPUTER_LIST_COLUMN =		3;
-const unsigned long	OLD_USER_LIST_COLUMN =			4;
-const unsigned long	OLD_PID_LIST_COLUMN =			5;
-const unsigned long	OLD_TIME_LIST_COLUMN =			6;
+const unsigned long	SERIAL_VALUE =			0;
+const unsigned long	APPLICATION_VALUE =		1;
+const unsigned long	COMPUTER_VALUE =		2;
+const unsigned long	USER_VALUE =			3;
+const unsigned long	PID_VALUE =				4;
+const unsigned long	TIME_VALUE =			5;
+const unsigned long EXCEPTION_VALUE	=		6;
 
 //-------------------------------------------------------------------------------------------------
 // Sort function declarations for each column
