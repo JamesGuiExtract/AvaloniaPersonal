@@ -34,7 +34,9 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<b>Core: Execute rules</b> task.
 <p>
 			<li>Use the <b>SQL CE Editor</b> to add the FPS files to the 
-			<b>TBD</b> database.
+			<b>ESFAMService.sdf</b> database.  The database is created during 
+			installation and is located in a <b>Service</b> folder parallel to the 
+			<b>LogFiles</b> folder used for exception logs.
 			<li>Activate the FPS files appropriate for the test to be executed.
 		</ul>
 		<li><b>ID Shield</b>
@@ -54,7 +56,9 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			image</b> task.
 <p>
 			<li>Use the <b>SQL CE Editor</b> to add the FPS files to the 
-			<b>TBD</b> database.
+			<b>ESFAMService.sdf</b> database.  The database is created during 
+			installation and is located in a <b>Service</b> folder parallel to the 
+			<b>LogFiles</b> folder used for exception logs.
 			<li>Activate the FPS files appropriate for the test to be executed.
 		</ul>
 	</ul>
@@ -93,7 +97,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 	<ul>
 		<li>Confirm on the database machine that the database is clear.
 		<li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to AutoStart.
-		<li>Set the service startup type to <b>Automatic</b>.
+		<li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
 		<li>Restart the <b>service machine</b>.</li>
 		<li>Using a different machine, open up a FAM instance connected to 
 		the processing database and activate the <b>Statistics</b> tab.</li>
@@ -123,11 +127,33 @@ called the <b>service machine</b>.  The machine that contains the database is re
 	<ul>
 		<li><b>Local system user, listening for supplied files</b>
 		<ul>
-			<li>TBD
+			<li>Confirm on the database machine that the database is clear.
+			<li>Prepare the <b>Queuing</b> FPS file to only supply images via 
+			listening to a folder on a different test machine.
+			<li>Set the FLEX Index <b>Queuing</b> and <b>Processing</b> FPS files to 
+			AutoStart.
+			<li>Set the service startup type to <b>Automatic</b>.
+			<li>Restart the <b>service machine</b>.  Do not login.</li>
+			<li>Using a different machine, open up a FAM instance connected to 
+			the processing database and activate the <b>Statistics</b> tab.</li>
+			<li>Confirm that files <b>are not</b> queuing and processing.</li>
+			<li>Add some files to the remote folder to test the listening feature.
+			<li>Confirm that files <b>are</b> queuing and processing.</li>
 		</ul>
 		<li><b>Domain user, non-UNC path for supplying</b>
 		<ul>
-			<li>TBD
+			<li>Confirm on the database machine that the database is clear.
+			<li>Prepare the service to use login information for a specified 
+			domain user.
+			<li>Prepare the <b>Queuing</b> FPS file to supply images from a 
+			non-UNC path.
+			<li>Set the FLEX Index <b>Queuing</b> and <b>Processing</b> FPS files 
+			to AutoStart.
+			<li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
+			<li>Restart the <b>service machine</b>.  Do not login.</li>
+			<li>Using a different machine, open up a FAM instance connected to 
+			the processing database and activate the <b>Statistics</b> tab.</li>
+			<li>Confirm that files are queuing and processing.</li>
 		</ul>
 	</ul>
 	</li>
@@ -136,15 +162,64 @@ called the <b>service machine</b>.  The machine that contains the database is re
 	<ul>
 		<li><b>Local system users, two machines</b>
 		<ul>
-			<li>TBD
+			<li>Confirm on the database machine that the database is clear.
+			<li>For each service machine, set the ID Shield <b>Queuing</b> and 
+			<b>Processing</b> FPS files to AutoStart.
+			<li>Set the service startup types to <b>Delayed</b> or <b>Automatic</b>.
+			<li>Restart the <b>service machines</b>.  Do not login.</li>
+			<li>Using a different machine, open up a FAM instance connected to 
+			the processing database and activate the <b>Statistics</b> tab.</li>
+			<li>Confirm that files are queuing and processing.</li>
+			<li>Confirm that redacted images are being created.</li>
+<p>
+			<li>Login to one of the service machines and <b>Stop</b> the 
+			<b>ESFAMProcess.exe</b> service.
+			<li>Confirm that files are continuing to process.</li>
+			<li>Confirm that redacted images are being created.</li>
+			<li><b>Start</b> the <b>ESFAMProcess.exe</b> service.
+<p>
+			<li>Login to the other service machine and <b>Stop</b> the 
+			<b>ESFAMProcess.exe</b> service.
+			<li>Confirm that files are continuing to process.</li>
+			<li>Confirm that redacted images are being created.</li>
 		</ul>
 		<li><b>Local system user, scheduled processing</b>
 		<ul>
-			<li>TBD
+			<li>Confirm on the database machine that the database is clear.
+			<li>Modify the <b>Processing</b> FPS file to use scheduled processing.  
+			Ensure that processing <b>will not</b> be active when the test commences.
+			<li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to 
+			AutoStart.
+			<li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
+			<li>Restart the <b>service machine</b>.</li>
+			<li>Using a different machine, open up a FAM instance connected to 
+			the processing database and activate the <b>Statistics</b> tab.</li>
+			<li>Confirm that files <b>are</b> queuing.</li>
+			<li>Confirm that files <b>are not</b> processing.</li>
+			<li>Confirm that redacted images <b>are not</b> being created.</li>
+			<li>Wait until the scheduled processing is due to start.
+			<li>Confirm that files <b>are</b> processing.</li>
+			<li>Confirm that redacted images <b>are</b> being created.</li>
 		</ul>
 		<li><b>Local system user, stop service during processing of large file</b>
 		<ul>
-			<li>TBD
+			<li>Confirm on the database machine that the database is clear.
+			<li>Provide very large (~100 pages) files for processing.
+			<li>Modify the <b>Processing</b> FPS file to use a single thread.
+			<li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to 
+			AutoStart.
+			<li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
+			<li>Restart the <b>service machine</b>.</li>
+			<li>Using a different machine, open up a FAM instance connected to 
+			the processing database and activate the <b>Statistics</b> tab.</li>
+			<li>Confirm that files are queuing and processing.</li>
+			<li>Confirm that redacted images are being created.</li>
+<p>
+			<li>Login to the service machine and <b>Stop</b> the <b>ESFAMProcess.exe</b> 
+			service.
+			<li>Confirm that the service continues processing until the large image 
+			has finished.
+			<li>Confirm that the redacted image is created.</li>
 		</ul>
 	</ul>
 	</li>
@@ -159,15 +234,15 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Restart the <b>service machine</b>.</li>
 			<li>Confirm that files are processing.</li>
 			<li>From <b>Task Manager</b>, kill two of the running 
-			<b>ESFAMProcess.exe</b> instances.
-			<li>Confirm that the remaining <b>ESFAMProcess.exe</b> instances 
+			<b>FAMProcess.exe</b> instances.
+			<li>Confirm that the remaining <b>FAMProcess.exe</b> instances 
 			continue to run.</li>
 		</ul>
 		<li><b>Stop the service after killing FPS files</b>
 		<ul>
 			<li>Continuing the above test, <b>Stop</b> the <b>Extract Systems 
 			FAM service</b> service from the Services management console.
-			<li>Confirm that each running <b>ESFAMProcess.exe</b> instance 
+			<li>Confirm that each running <b>FAMProcess.exe</b> instance 
 			finishes processing the active files and then stops gracefully.</li>
 		</ul>
 		<li><b>Restart the stopped service</b>
@@ -187,7 +262,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Restart the <b>service machine</b>.</li>
 			<li>Confirm that files are processing.</li>
 			<li><b>Restart</b> the test machine from the Start menu.
-			<li>Confirm that the <b>ESFAMProcess.exe</b> instance 
+			<li>Confirm that the <b>FAMProcess.exe</b> instance 
 			gracefully finishes its processing.</li>
 			<li>Confirm that an Application trace message is logged for 
 			<b>FAM Service stopping</b>.
@@ -203,7 +278,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Restart the <b>service machine</b>.</li>
 			<li>Confirm that files are processing.</li>
 			<li><b>Restart</b> the test machine from the Start menu.
-			<li>Confirm that the <b>ESFAMProcess.exe</b> instances 
+			<li>Confirm that the <b>FAMProcess.exe</b> instances 
 			gracefully finish their processing.</li>
 			<li>Confirm that files are processing normally after restart.</li>
 			<li>Confirm that if files were stuck in <b>Processing</b> mode 
