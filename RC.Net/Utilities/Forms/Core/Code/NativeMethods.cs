@@ -1,7 +1,4 @@
-using Extract.Licensing;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Drawing;
@@ -11,7 +8,7 @@ namespace Extract.Utilities.Forms
 {
     internal static class NativeMethods
     {
-        #region P/Invoke statements
+        #region P/Invokes
 
         /// <summary>
         /// Creates a cursor based on data contained in a file.
@@ -26,7 +23,7 @@ namespace Extract.Utilities.Forms
         /// <seealso href="http://msdn.microsoft.com/en-us/library/ms648392(VS.85).aspx">
         /// LoadCursorFromFile</seealso>
         [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        static public extern IntPtr LoadCursorFromFile(string lpFileName);
+        public static extern IntPtr LoadCursorFromFile(string lpFileName);
 
         /// <summary>
         /// Gets the window rectangle associated with the provided window handle.
@@ -42,7 +39,7 @@ namespace Extract.Utilities.Forms
         /// get the extended error information.</returns>
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetWindowRect(IntPtr hWnd, ref WindowsRectangle rect);
+        static extern bool GetWindowRect(IntPtr hWnd, ref WindowsRectangle rect);
 
         /// <summary>
         /// Will send a system beep message.
@@ -80,8 +77,8 @@ namespace Extract.Utilities.Forms
         /// get the extended error information.</returns>
 		[DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-		private static extern bool SystemParametersInfo(int uiAction, int uiParam,
-			ref NONCLIENTMETRICS ncMetrics, int fWinIni);
+		static extern bool SystemParametersInfo(int uiAction, int uiParam, 
+            ref NONCLIENTMETRICS ncMetrics, int fWinIni);
 
         /// <summary>
         /// Gets the system menu from the specified window.
@@ -90,7 +87,7 @@ namespace Extract.Utilities.Forms
         /// <param name="bRevert">Whether to reset the menu back to default state.</param>
         // This function will not set the last error flag, no need to specify SetLastError
 		[DllImport("user32.dll", CharSet=CharSet.Auto)]
-		private static extern IntPtr GetSystemMenu(IntPtr hWnd,
+		static extern IntPtr GetSystemMenu(IntPtr hWnd, 
             [MarshalAs(UnmanagedType.Bool)] bool bRevert);
 
         /// <summary>
@@ -102,7 +99,7 @@ namespace Extract.Utilities.Forms
         // This function will not set the last error flag, no need to specify SetLastError
 		[DllImport("user32.dll", CharSet=CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-		private static extern bool EnableMenuItem(IntPtr hMenu, uint uIDEnableItem, uint uEnable);
+		static extern bool EnableMenuItem(IntPtr hMenu, uint uIDEnableItem, uint uEnable);
 
         /// <summary>
         /// Sends the specified message to a window or windows. The SendMessage function calls the
@@ -119,7 +116,7 @@ namespace Extract.Utilities.Forms
         /// <returns>The return value specifies the result of the message processing and depends on 
         /// the message sent.</returns>
         [DllImport("user32", CharSet = CharSet.Auto)]
-        internal extern static IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+        public static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
         /// <summary>
         /// Maps a virtual-key code into a scan code or character value, or translates a scan code
@@ -133,31 +130,45 @@ namespace Extract.Utilities.Forms
         /// return value is zero.
         /// </returns>
         [DllImport("user32", CharSet = CharSet.Auto)]
-        private extern static uint MapVirtualKey(uint uCode, uint uMapType);
+        static extern uint MapVirtualKey(uint uCode, uint uMapType);
 
-        #endregion
+        /// <summary>
+        /// Places (posts) a message in the message queue associated with the thread that created 
+        /// the specified window and returns without waiting for the thread to process the message.
+        /// </summary>
+        /// <param name="hWnd">Handle to the window whose window procedure is to receive the 
+        /// message.</param>
+        /// <param name="Msg">The message to be posted.</param>
+        /// <param name="wParam">Additional message-specific information.</param>
+        /// <param name="lParam">Additional message-specific information.</param>
+        /// <returns><see langword="true"/> if the function succeeds; <see langword="false"/> if 
+        /// the function fails.</returns>
+        /// <seealso href="http://msdn.microsoft.com/en-us/library/ms644944%28VS.85%29.aspx"/>
+        [return: MarshalAs(UnmanagedType.Bool)]
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern bool PostMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
 
-        #region constants
+        #endregion P/Invokes
 
-        private const int SPI_GETNONCLIENTMETRICS = 41;
-		private const int LF_FACESIZE = 32;
-		
+        #region Constants
 
-		private const int SC_CLOSE  = 0xF060;
-		private const int MF_BYCOMMAND  = 0x0;
-		private const int MF_GRAYED  = 0x1;
-		private const int MF_ENABLED  = 0x0;
+        const int _SPI_GETNONCLIENTMETRICS = 41;
 
-        private const int WM_SETREDRAW = 0x000B;
+        const int _SC_CLOSE  = 0xF060;
 
-        private const uint MAPVK_VK_TO_CHAR = 0x02;
+        const int _MF_BYCOMMAND  = 0x0;
+        const int _MF_GRAYED  = 0x1;
 
-        #endregion
+        const int _WM_SETREDRAW = 0x000B;
 
-        #region structs
+        const uint _MAPVK_VK_TO_CHAR = 0x02;
+
+        #endregion Constants
+
+        #region Structs
 
         [StructLayout(LayoutKind.Sequential)]
-        internal struct WindowsRectangle
+        struct WindowsRectangle
         {
             public int left;
             public int top;
@@ -166,46 +177,46 @@ namespace Extract.Utilities.Forms
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Auto)]
-		private struct LOGFONT
-		{ 
-			public int lfHeight; 
-			public int lfWidth; 
-			public int lfEscapement; 
-			public int lfOrientation; 
-			public int lfWeight; 
-			public byte lfItalic; 
-			public byte lfUnderline; 
-			public byte lfStrikeOut; 
-			public byte lfCharSet; 
-			public byte lfOutPrecision; 
-			public byte lfClipPrecision; 
-			public byte lfQuality; 
-			public byte lfPitchAndFamily; 
-			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-			public string lfFaceSize;
-		}
-
-		[StructLayout(LayoutKind.Sequential, CharSet=CharSet.Auto)]
-		private struct NONCLIENTMETRICS
-		{
-			public int cbSize;
-			public int iBorderWidth;
-			public int iScrollWidth;
-			public int iScrollHeight;
-			public int iCaptionWidth;
-			public int iCaptionHeight;
-			public LOGFONT lfCaptionFont;
-			public int iSmCaptionWidth;
-			public int iSmCaptionHeight;
-			public LOGFONT lfSmCaptionFont;
-			public int iMenuWidth;
-			public int iMenuHeight;
-			public LOGFONT lfMenuFont;
-			public LOGFONT lfStatusFont;
-			public LOGFONT lfMessageFont;
+        struct LOGFONT
+        { 
+            public int lfHeight; 
+            public int lfWidth; 
+            public int lfEscapement; 
+            public int lfOrientation; 
+            public int lfWeight; 
+            public byte lfItalic; 
+            public byte lfUnderline; 
+            public byte lfStrikeOut; 
+            public byte lfCharSet; 
+            public byte lfOutPrecision; 
+            public byte lfClipPrecision; 
+            public byte lfQuality; 
+            public byte lfPitchAndFamily; 
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            public string lfFaceSize;
         }
 
-        #endregion
+        [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Auto)]
+        struct NONCLIENTMETRICS
+        {
+            public int cbSize;
+            public int iBorderWidth;
+            public int iScrollWidth;
+            public int iScrollHeight;
+            public int iCaptionWidth;
+            public int iCaptionHeight;
+            public LOGFONT lfCaptionFont;
+            public int iSmCaptionWidth;
+            public int iSmCaptionHeight;
+            public LOGFONT lfSmCaptionFont;
+            public int iMenuWidth;
+            public int iMenuHeight;
+            public LOGFONT lfMenuFont;
+            public LOGFONT lfStatusFont;
+            public LOGFONT lfMessageFont;
+        }
+
+        #endregion Structs
 
         #region Methods
 
@@ -249,45 +260,45 @@ namespace Extract.Utilities.Forms
         /// </summary>
         /// <returns>Either the default <see cref="Font"/> from the system, or
         /// <see langword="null"> if unable to determine font from system.</see></returns>
-		public static Font GetCaptionFont()
-		{
-			try
-			{
-    			NONCLIENTMETRICS ncm = new NONCLIENTMETRICS();
-    			ncm.cbSize = Marshal.SizeOf(typeof(NONCLIENTMETRICS));
+        public static Font GetCaptionFont()
+        {
+            try
+            {
+                NONCLIENTMETRICS ncm = new NONCLIENTMETRICS();
+                ncm.cbSize = Marshal.SizeOf(typeof(NONCLIENTMETRICS));
 
-				if (!SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, ref ncm, 0))
-				{
+                if (!SystemParametersInfo(_SPI_GETNONCLIENTMETRICS, ncm.cbSize, ref ncm, 0))
+                {
                     throw new Win32Exception(Marshal.GetLastWin32Error());
-				}
+                }
 
-				return Font.FromLogFont(ncm.lfCaptionFont);
-			}
-			catch(Exception ex)
-			{
+                return Font.FromLogFont(ncm.lfCaptionFont);
+            }
+            catch(Exception ex)
+            {
                 ExtractException ee = new ExtractException("ELI21684",
                     "Unable to get caption font!", ex);
                 ee.Log();
-			}
+            }
 			
-			return null;
-		}
+            return null;
+        }
 
         /// <summary>
         /// Will disable the close button on the message box form.
         /// </summary>
         /// <param name="form">The <see cref="Form"/> on which to disable the close button.</param>
-		public static void DisableCloseButton(Form form)
-		{
-			try
-			{
-				EnableMenuItem(GetSystemMenu(form.Handle, false),
-                    SC_CLOSE, MF_BYCOMMAND | MF_GRAYED);
-			}
-			catch(Exception ex)
-			{
+        public static void DisableCloseButton(Form form)
+        {
+            try
+            {
+                EnableMenuItem(GetSystemMenu(form.Handle, false),
+                    _SC_CLOSE, _MF_BYCOMMAND | _MF_GRAYED);
+            }
+            catch(Exception ex)
+            {
                 throw new ExtractException("ELI21692", "Unable to disable close button!", ex);
-			}
+            }
         }
 
         /// <summary>
@@ -303,7 +314,7 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                SendMessage(control.Handle, WM_SETREDRAW, (IntPtr)(lockUpdate ? 0 : 1), IntPtr.Zero);
+                SendMessage(control.Handle, _WM_SETREDRAW, (IntPtr)(lockUpdate ? 0 : 1), IntPtr.Zero);
             }
             catch (Exception ex)
             {
@@ -322,7 +333,7 @@ namespace Extract.Utilities.Forms
             try
             {
                 // Attempt a map from virtual key code to character value.
-                uint keyValue = MapVirtualKey((uint)uCode, MAPVK_VK_TO_CHAR);
+                uint keyValue = MapVirtualKey((uint)uCode, _MAPVK_VK_TO_CHAR);
                 if (keyValue != 0)
                 {
                     // If successful, convert the mapped value to a character
@@ -337,6 +348,29 @@ namespace Extract.Utilities.Forms
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Places (posts) a message in the message queue associated with the thread that created 
+        /// the specified window and returns without waiting for the thread to process the message.
+        /// </summary>
+        /// <param name="handle">Handle to the window whose window procedure is to receive the 
+        /// message.</param>
+        /// <param name="message">The message to be posted.</param>
+        public static void BeginSendMessageToHandle(Message message, IntPtr handle)
+        {
+            try
+            {
+                bool success = PostMessage(handle, message.Msg, message.WParam, message.LParam);
+                if (!success)
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28891", ex);
+            }
+        }  
+
+        #endregion Methods
     }
 }
