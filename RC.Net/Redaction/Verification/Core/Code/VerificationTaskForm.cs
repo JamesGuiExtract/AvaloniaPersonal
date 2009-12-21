@@ -131,6 +131,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         int _historyIndex;
 
+        /// <summary>
+        /// Redirects shortcut key message to the main application window.
+        /// </summary>
+        ShortcutsMessageFilter _filter;
+
         #endregion Fields
 
         #region Events
@@ -231,25 +236,22 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        /// <summary>
-        /// Gets whether shortcuts are enabled.
-        /// </summary>
-        /// <value><see langword="true"/> if shortcut keys are enabled;
-        /// <see langword="false"/> if shortcut keys are disabled.</value>
-        bool ShortcutsEnabled
-        {
-            get
-            {
-                // Disable shortcuts if:
-                // 1) The comments text box is active OR
-                // 2) A cell of the redaction grid view is being edited
-                return !_commentsTextBox.Focused && !_redactionGridView.IsInEditMode;
-            }
-        }
-
         #endregion Properties
 
         #region Methods
+
+        /// <summary>
+        /// Gets whether shortcuts are enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if shortcut keys are enabled;
+        /// <see langword="false"/> if shortcut keys are disabled.</returns>
+        bool ShortcutsEnabled()
+        {
+            // Shortcuts are disabled if:
+            // 1) The comments text box is active OR
+            // 2) A cell of the redaction grid view is being edited
+            return !_commentsTextBox.Focused && !_redactionGridView.IsInEditMode;
+        }
 
         /// <summary>
         /// Gets the document type of the specified vector of attributes (VOA) file.
@@ -1357,6 +1359,10 @@ namespace Extract.Redaction.Verification
                 // Exemption codes
                 _imageViewer.Shortcuts[Keys.E] = SelectPromptForExemptionCode;
                 _imageViewer.Shortcuts[Keys.E | Keys.Control] = SelectApplyLastExemptionCode;
+
+                // Redirect shortcut keys to the main application window [FIDSC #3887]
+                _filter = 
+                    new ShortcutsMessageFilter(ShortcutsEnabled, _imageViewer.Shortcuts, this);
             }
             catch (Exception ex)
             {
@@ -1405,7 +1411,7 @@ namespace Extract.Redaction.Verification
             try
             {
                 // Allow the image viewer to handle keyboard input for shortcuts.
-                if (ShortcutsEnabled && _imageViewer.Shortcuts.ProcessKey(keyData))
+                if (ShortcutsEnabled() && _imageViewer.Shortcuts.ProcessKey(keyData))
                 {
                     return true;
                 }

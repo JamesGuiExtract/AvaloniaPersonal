@@ -36,6 +36,11 @@ namespace Extract.Redaction.Verification
                         ExtractException.Log("ELI27118", ex);
                     }
                 }
+                if (_filter != null)
+                {
+                    _filter.Dispose();
+                    _filter = null;
+                }
             }
 
             // Release unmanaged resources
