@@ -14,7 +14,7 @@ Copyright laws and international copyright treaties, as well as other intellectu
 
 3. OTHER RESTRICTIONS. 
 
-A. Use Within the Enterprise. Subject to Licensee's continued compliance with the other terms and conditions of this EULA, and provided that Licensee's usage does not exceed the number of Image Pages licensed, Licensee may (i) physically transfer the Software Product from one computer to another computer upon completion of a software transfer form.  Transfer may not be made to an unrelated company or to related a company (including but not limited to parent company, sister company, joint venture, etc). 
+A. Use Within the Enterprise. Subject to Licensee's continued compliance with the other terms and conditions of this EULA, and provided that Licensee's usage does not exceed the number of Image Pages licensed, Licensee may (i) physically transfer the Software Product from one computer to another computer upon completion of a software transfer form.  Transfer may not be made to an unrelated company or to a related company (including but not limited to parent company, sister company, joint venture, etc). 
 
 B. No Transfer or Assignment. Licensee shall not assign, rent, lease, sell, sublicense, or otherwise transfer this EULA or the Software Product to another party outside the licensed enterprise without prior written consent of Extract. Any party authorized by Extract to receive the Software Product must agree to be bound by the terms and conditions of this EULA.  
 
@@ -54,4 +54,4 @@ Unpublished -All Rights Reserved under the copyright laws of the United States
 Extract Systems, LLC
 6418 Normandy Lane, Suite 200
 Madison Wisconsin 53719 USA
-Phone (608) 216-7950     Fax (608) 238-7960
+Phone (608) 216-7950     Fax (608) 216-7960
