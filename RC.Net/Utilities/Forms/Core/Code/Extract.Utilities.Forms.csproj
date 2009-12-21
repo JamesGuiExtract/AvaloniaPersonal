@@ -95,6 +95,7 @@
     </Compile>
     <Compile Include="ShortcutsManager.cs" />
     <Compile Include="ShortcutsManagerEventArguments.cs" />
+    <Compile Include="ShortcutsMessageFilter.cs" />
     <Compile Include="SplashScreen.cs">
       <SubType>Form</SubType>
     </Compile>
