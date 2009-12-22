@@ -49,3 +49,75 @@
 
 //test15 The regular expression entry consists of loading a .dat file and a regular expression. 
 <TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
+
+//test16 Fuzzy search; 1 method=fast; input has 0 errors
+<TESTCASE>;Fuzzy1.rsd;.\Fuzzy1.txt;;Test16.eav
+
+//test17 Fuzzy search; 1 method=fast; input has 1 leading substitution
+<TESTCASE>;Fuzzy1.rsd;.\Fuzzy2.txt;;Test17.eav
+
+//test18 Fuzzy search; 2 method=fast; input has 0 errors
+<TESTCASE>;Fuzzy2.rsd;.\Fuzzy1.txt;;Test18.eav
+
+//test19 Fuzzy search; 2 method=fast; input has 1 leading substitution
+<TESTCASE>;Fuzzy2.rsd;.\Fuzzy2.txt;;Test19.eav
+
+//test20 Fuzzy search; 2 method=fast; input has 1 substitution at the end of the first part
+<TESTCASE>;Fuzzy2.rsd;.\Fuzzy3.txt;;Test20.eav
+
+//test21 Fuzzy search; 2 method=fast; input has 1 substitution 1 extra whitespace
+<TESTCASE>;Fuzzy2.rsd;.\Fuzzy4.txt;;Test21.eav
+
+//test22 Fuzzy search; 2 method=fast; input has 1 insertion
+<TESTCASE>;Fuzzy2.rsd;.\Fuzzy5.txt;;Test22.eav
+
+//test23 Fuzzy search; 2 method=fast; input has 1 insertion in first part, 2 deletions in second part
+<TESTCASE>;Fuzzy2.rsd;.\Fuzzy6.txt;;Test23.eav
+
+//test24 Fuzzy search; 2 method=fast; input has 1 insertion in first part, 2 deletions in second part
+<TESTCASE>;Fuzzy2.rsd;.\Fuzzy7.txt;;Test24.eav
+
+//test25 Fuzzy search; 2 method=fast; input has 1 insertion in first part, 1 deletion and 2 insertions in second part
+<TESTCASE>;Fuzzy2.rsd;.\Fuzzy8.txt;;Test25.eav
+
+//test26 Fuzzy search; 2 method=fast; input has 1 insertion in first part, 1 deletion and 1 insertion in second part
+<TESTCASE>;Fuzzy2.rsd;.\Fuzzy9.txt;;Test26.eav
+
+//test27 Fuzzy search; 2 method=fast; input has 1 insertion in first part, 1 trailing deletion in second part
+<TESTCASE>;Fuzzy2.rsd;.\Fuzzy10.txt;;Test27.eav
+
+//test28 Fuzzy search; 2 method=fast; input has 1 insertion, 3 extra whitespace in first part, 8 extra whitespace in second part
+<TESTCASE>;Fuzzy2.rsd;.\Fuzzy11.txt;;Test28.eav
+
+//test29 Fuzzy search; 1 method=better_fit; input has 0 errors
+<TESTCASE>;Fuzzy3.rsd;.\Fuzzy12.txt;;Test29.eav
+
+//test30 Fuzzy search; 1 method=better_fit; input has 2 insertions in the middle
+<TESTCASE>;Fuzzy3.rsd;.\Fuzzy13.txt;;Test30.eav
+
+//test31 Fuzzy search; 1 method=better_fit; input has 3 insertions
+<TESTCASE>;Fuzzy3.rsd;.\Fuzzy14.txt;;Test31.eav
+
+//test32 Fuzzy search; 1 method=better_fit; input has 1 leading substitution, 3 insertions
+<TESTCASE>;Fuzzy3.rsd;.\Fuzzy15.txt;;Test32.eav
+
+//test33 Fuzzy search; 1 method=better_fit; input has leading non-ws chars, 1 substitution, 3 insertions
+<TESTCASE>;Fuzzy3.rsd;.\Fuzzy16.txt;;Test33.eav
+
+//test34 Fuzzy search; 1 method=better_fit; input has leading ws chars
+<TESTCASE>;Fuzzy4.rsd;.\Fuzzy17.txt;;Test34.eav
+
+//test35 Fuzzy search; 1 method=better_fit; input has leading ws chars, 1 substitution, 2 insertions
+<TESTCASE>;Fuzzy4.rsd;.\Fuzzy18.txt;;Test35.eav
+
+//test36 Fuzzy search; 1 method=better_fit; input has leading ws chars, 6 extra whitespace chars, 2 insertions
+<TESTCASE>;Fuzzy4.rsd;.\Fuzzy19.txt;;Test36.eav
+
+//test37 Fuzzy search; 1 method=fast; input has repeating substrings, leading non-whitespace chars, 1 deletion
+<TESTCASE>;Fuzzy5.rsd;.\Fuzzy20.txt;;Test37.eav
+
+//test38 Fuzzy search; 1 method=better_fit; input has repeating substrings, leading non-whitespace chars, 1 deletion
+<TESTCASE>;Fuzzy5.rsd;.\Fuzzy20.txt;;Test38.eav
+
+//test39 Fuzzy search; 1 method=better_fit 1 method=fast; input has repeating substrings, leading non-whitespace chars, 1 deletion
+<TESTCASE>;Fuzzy6.rsd;.\Fuzzy21.txt;;Test39.eav
