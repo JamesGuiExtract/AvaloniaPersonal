@@ -49,3 +49,6 @@
 
 //test15 The regular expression entry consists of loading a .dat file and a regular expression. 
 <TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
+
+//test16 Exercise fuzzy expression expansion
+<TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test16.eav
