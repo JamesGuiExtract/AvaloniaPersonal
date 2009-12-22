@@ -237,29 +237,23 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(BSTR bstrFileFullName, long nFil
 
 
 		// Execute the utility to convert the PDF
-		ProcessInformationWrapper pwWrapper;
-		runExtractEXE(m_strConvertToPDFEXE, strArgs, 0, &pwWrapper);
+		DWORD dwExitCode = runExeWithProcessKiller(m_strConvertToPDFEXE, true, strArgs);
 
-		// Add an idle process killer to monitor the executable [LRCAU #5581]
-		IdleProcessKiller killer(pwWrapper.pi.dwProcessId);
-
-		// Wait for the process to end
-		WaitForSingleObject( pwWrapper.pi.hProcess, INFINITE );
-
-		// Check if the process was killed by the IdleProcessKiller.
-		if (killer.killedProcess())
+		// Check the exit code
+		if (dwExitCode != EXIT_SUCCESS)
 		{
-			UCLIDException uex("ELI28833", "Convert to PDF task was killed.");
+			UCLIDException uex("ELI28893", "Convert to PDF task failed.");
+			uex.addDebugInfo("Exit Code", dwExitCode);
 			uex.addDebugInfo("File Name", strInputImage);
 			throw uex;
 		}
 
 		// completed successfully
 		*pResult = kProcessingSuccessful;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18755")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConvertToPDFTask::raw_Cancel()

@@ -427,6 +427,24 @@ EXPORT_BaseUtils void runExtractEXE(const string& strExeFullFileName,
 									const string& strWorkingDir = "", 
 									DWORD dwCreationFlags = DETACHED_PROCESS);
 //-------------------------------------------------------------------------------------------------
+// PROMISE: To run an EXE from within C++. This call always has a timeout of infinite. Upon
+//			launching the EXE, an IdleProcessKiller will also be spawned to monitor the process.
+//			Upon process completion (via normal exit, idle process killed, or some other error
+//			result) the exit code will be checked and returned.
+// ARGS:	strExeFullFileName - The full path of the executable to run
+//			bIsExtractExe - Whether the executable is an extract exe (if true then this
+//							call will behave similar to runExtractExe.
+//			strParameters - Any parameters that should be passed to the executable
+//			strWorkingDirectory - The working directory for the process
+//			iIdleTimeout - How long a process should be idle before it is killed (in milliseconds)
+//			iIdleCheckInterval - How often to check on the process (in milliseconds)
+EXPORT_BaseUtils DWORD runExeWithProcessKiller(const string& strExeFullFileName,
+											   bool bIsExtractExe,
+											   const string& strParameters = "",
+											   const string& strWorkingDirectory = "",
+											   int iIdleTimeout=120000,
+											   int iIdleCheckInterval=2000);
+//-------------------------------------------------------------------------------------------------
 // PROMISE: To return the directory associated with hModule.  The returned string will not have
 //			a trailing slash character.
 EXPORT_BaseUtils string getModuleDirectory(HMODULE hModule);

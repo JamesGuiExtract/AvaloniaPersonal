@@ -18,6 +18,7 @@
 #include "UCLIDException.h"
 #include "TemporaryFileName.h"
 #include "StringTokenizer.h"
+#include "IdleProcessKiller.h"
 
 // Needed for the GetUserNameEx function
 #define SECURITY_WIN32 
@@ -602,6 +603,61 @@ void runExtractEXE(const string& strExeFullFileName, const string& strParameters
 			// Throw the exception to the outer scope
 			throw ue;
 		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractExe,
+							  const string& strParameters, const string& strWorkingDirectory,
+							  int iIdleTimeout, int iIdleCheckInterval)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI28886", iIdleCheckInterval > 0);
+			ASSERT_ARGUMENT("ELI28887", iIdleTimeout >= iIdleCheckInterval);
+
+			ProcessInformationWrapper piw;
+			if (bIsExtractExe)
+			{
+				runExtractEXE(strExeFullFileName, strParameters, 0, &piw, strWorkingDirectory);
+			}
+			else
+			{
+				runEXE(strExeFullFileName, strParameters, 0, &piw, strWorkingDirectory);
+			}
+
+			// Start an idle process killer
+			IdleProcessKiller idleKiller(piw.pi.dwProcessId, iIdleTimeout, iIdleCheckInterval);
+
+			// Wait for the process to end
+			WaitForSingleObject( piw.pi.hProcess, INFINITE );
+
+			if (idleKiller.killedProcess())
+			{
+				UCLIDException uex("ELI28888", "Process killed by idle process killer.");
+				uex.addDebugInfo("Idle Timeout", iIdleTimeout);
+				uex.addDebugInfo("Timeout Interval", iIdleCheckInterval);
+				throw uex;
+			}
+
+			// Get the process exit code
+			DWORD dwExitCode = 0;
+			GetExitCodeProcess(piw.pi.hProcess, &dwExitCode);
+
+			// Return the exit code
+			return dwExitCode;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28889");
+	}
+	catch(UCLIDException uex)
+	{
+		// Add the executable name, parameters, and working directory
+		uex.addDebugInfo("Executable Name", strExeFullFileName);
+		uex.addDebugInfo("Parameters", strParameters.empty() ? "<No Parameters>" : strParameters);
+		uex.addDebugInfo("Working Directory", strWorkingDirectory.empty()
+			? "<No Directory>" : strWorkingDirectory);
+		throw uex;
 	}
 }
 //-------------------------------------------------------------------------------------------------
