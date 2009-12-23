@@ -177,6 +177,9 @@ private:
 	// Used by IPersistStream Implementation
 	bool m_bDirty;
 
+	// Whether or not to record FAM session information
+	bool m_bRecordFAMSessions;
+
 	// Status to describe whether FAM is beginning to process,
 	// beginning to stop processing or actually stops processing.
 	enum EStartStopStatus

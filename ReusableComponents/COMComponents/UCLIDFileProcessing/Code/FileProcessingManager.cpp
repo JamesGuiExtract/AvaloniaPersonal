@@ -34,7 +34,8 @@ m_strPreviousDBServer(""),
 m_strPreviousDBName(""),
 m_isDBConnectionReady(false),
 m_nNumberOfFilesToExecute(0),
-m_bCancelling(false)
+m_bCancelling(false),
+m_bRecordFAMSessions(false)
 {
 	try
 	{
@@ -176,6 +177,10 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 
 		// Reset the DB Connection
 		getFPMDB()->ResetDBConnection();
+
+		// Check whether or not FAM Session history should be recorded
+		m_bRecordFAMSessions =
+			asString(getFPMDB()->GetDBInfoSetting(gstrSTORE_FAM_SESSION_HISTORY.c_str())) == "1";
 
 		// Set the number of files to process
 		m_recordMgr.setNumberOfFilesToProcess(m_nNumberOfFilesToExecute);
@@ -1150,8 +1155,11 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 				m_strFPSFileName.empty() ? "<Not Saved>" : m_strFPSFileName);
 			ue.log();
 
-			// Record the FAM session start
-			getFPMDB()->RecordFAMSessionStart(m_strFPSFileName.c_str());
+			if (m_bRecordFAMSessions)
+			{
+				// Record the FAM session start
+				getFPMDB()->RecordFAMSessionStart(m_strFPSFileName.c_str());
+			}
 		}
 		break;
 	case kBeginStop:
@@ -1171,8 +1179,11 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 				m_strFPSFileName.empty() ? "<Not Saved>" : m_strFPSFileName);
 			ue.log();
 
-			// Record the FAM session stop
-			getFPMDB()->RecordFAMSessionStop();
+			if (m_bRecordFAMSessions)
+			{
+				// Record the FAM session stop
+				getFPMDB()->RecordFAMSessionStop();
+			}
 		}
 		break;
 	default:
