@@ -4418,6 +4418,97 @@ STDMETHODIMP CFileProcessingDB::OffsetUserCounter(BSTR bstrCounterName, LONGLONG
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27817");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RecordFAMSessionStart(BSTR bstrFPSFileName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Get the FPS File name
+		string strFPSFileName = asString(bstrFPSFileName);
+
+		string strFAMSessionQuery = "INSERT INTO [" + gstrFAM_SESSION + "] ([MachineID], ";
+		strFAMSessionQuery += "[FAMUserID], [UPI], [FPSFileID]) VALUES (";
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		// Get FPSFileID, MachineID, and UserID (this will add records if they don't exist)
+		long nFPSFileID = getKeyID(ipConnection, gstrFPS_FILE, "FPSFileName",
+			strFPSFileName.empty() ? "<Unsaved FPS File>" : strFPSFileName);
+		long nMachineID = getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName);
+		long nUserID = getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName);
+
+		strFAMSessionQuery += asString(nMachineID) + ", " + asString(nUserID) + ", '"
+			+ m_strUPI + "', " + asString(nFPSFileID) + ")";
+
+		// Insert the record into the FAMSession table
+		executeCmdQuery(ipConnection, strFAMSessionQuery);
+
+		// Commit the transaction
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI28903");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28904");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RecordFAMSessionStop()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Build the update query to set stop time
+		string strFAMSessionQuery = "UPDATE [" + gstrFAM_SESSION + "] SET [StopTime] = GETDATE() "
+			"WHERE [" + gstrFAM_SESSION + "].[UPI] = '" + m_strUPI + "' AND [StopTime] IS NULL";
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		// Execute the update query
+		executeCmdQuery(ipConnection, strFAMSessionQuery);
+
+		// Commit the transaction
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI28905");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28906");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

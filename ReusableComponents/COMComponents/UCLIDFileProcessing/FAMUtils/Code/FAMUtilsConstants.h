@@ -21,6 +21,7 @@ static const string gstrALLOW_DYNAMIC_TAG_CREATION = "AllowDynamicTagCreation";
 static const string gstrAUTO_REVERT_LOCKED_FILES = "AutoRevertLockedFiles";
 static const string gstrAUTO_REVERT_TIME_OUT_IN_MINUTES = "AutoRevertTimeOutInMinutes";
 static const string gstrAUTO_REVERT_NOTIFY_EMAIL_LIST = "AutoRevertNotifyEmailList";
+static const string gstrSTORE_FAM_SESSION_HISTORY = "StoreFAMSessionHistory";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;

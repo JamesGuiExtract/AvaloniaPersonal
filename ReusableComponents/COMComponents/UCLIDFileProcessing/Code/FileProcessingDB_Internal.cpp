@@ -29,7 +29,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 18;
+const long glFAMDBSchemaVersion = 19;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -898,6 +898,9 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrCREATE_LOCKED_FILE_TABLE);
 		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_TABLE);
 		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX);
+		vecQueries.push_back(gstrCREATE_FPS_FILE_TABLE);
+		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
+		vecQueries.push_back(gstrCREATE_FAM_SESSION);
 
 		// Only create the login table if it does not already exist
 		if ( !doesTableExist( getDBConnection(), "Login"))
@@ -928,6 +931,9 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTION_STATE_FK);
 		vecQueries.push_back(gstrADD_LOCKED_FILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_LOCKED_FILE_PROCESSINGFAM_FK);
+		vecQueries.push_back(gstrADD_FAM_SESSION_MACHINE_FK);
+		vecQueries.push_back(gstrADD_FAM_SESSION_FAMUSER_FK);
+		vecQueries.push_back(gstrADD_FAM_SESSION_FPSFILE_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1033,6 +1039,11 @@ void CFileProcessingDB::initializeTableValues()
 		// Add ConnectionRetryTimeout setting (default to empy string)
 		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCONNECTION_RETRY_TIMEOUT
 			+ "', '120')";
+		vecQueries.push_back(strSQL);
+
+		// Add StoreFAMSessionHistory setting (default to true)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrSTORE_FAM_SESSION_HISTORY
+			+ "', '1')";
 		vecQueries.push_back(strSQL);
 
 		// Execute all of the queries
@@ -1848,6 +1859,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrPROCESSING_FAM);
 	vecTables.push_back(gstrLOCKED_FILE);
 	vecTables.push_back(gstrUSER_CREATED_COUNTER);
+	vecTables.push_back(gstrFPS_FILE);
+	vecTables.push_back(gstrFAM_SESSION);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

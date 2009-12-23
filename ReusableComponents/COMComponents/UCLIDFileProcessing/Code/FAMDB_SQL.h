@@ -136,6 +136,21 @@ static const string gstrCREATE_USER_CREATED_COUNTER_TABLE =
 	"[CounterName] [nvarchar](50) NOT NULL CONSTRAINT [PK_UserCreatedConter] PRIMARY KEY CLUSTERED,"
 	"[Value] [bigint] NOT NULL CONSTRAINT [DF_UserCreatedCounter_Value] DEFAULT((0)))";
 
+static const string gstrCREATE_FPS_FILE_TABLE =
+	"CREATE TABLE [FPSFile] ("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FPSFile] PRIMARY KEY CLUSTERED, "
+	"[FPSFileName] [nvarchar](512) NOT NULL)";
+
+static const string gstrCREATE_FAM_SESSION =
+	"CREATE TABLE [FAMSession] ("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FAMSession] PRIMARY KEY CLUSTERED, "
+	"[MachineID] int NOT NULL, "
+	"[FAMUserID] int NOT NULL, "
+	"[UPI] [nvarchar](450), "
+	"[StartTime] datetime NOT NULL CONSTRAINT [DF_FAMSession_StartTime] DEFAULT((GETDATE())), "
+	"[StopTime] datetime, "
+	"[FPSFileID] int NOT NULL)";
+
 // Create table indexes SQL
 static const string gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_PriorityID] "
 	"ON [FAMFile]([Priority] DESC, [ID] ASC)";
@@ -164,6 +179,9 @@ static const string gstrCREATE_PROCESSING_FAM_UPI_INDEX = "CREATE UNIQUE NONCLUS
 static const string gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX = "CREATE NONCLUSTERED INDEX "
 	"[IX_UserCreatedCounter_Value] ON [UserCreatedCounter]([Value])";
 
+static const string gstrCREATE_FPS_FILE_NAME_INDEX = "CREATE NONCLUSTERED INDEX "
+	"[IX_FPSFile_FPSFileName] ON [FPSFile]([FPSFileName])";
+
 // Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
 	"ALTER TABLE [ActionStatistics]  "
@@ -181,7 +199,7 @@ static const string gstrADD_FILE_ACTION_STATE_TRANSITION_ACTION_FK =
 
 static const string gstrADD_FILE_ACTION_STATE_TRANSITION_FAM_FILE_FK = 
 	"ALTER TABLE [FileActionStateTransition]  "
-	"WITH CHECK ADD  CONSTRAINT [FK_FileActionStateTransition_FAMFile] FOREIGN KEY([FileID]) "
+	"WITH CHECK ADD CONSTRAINT [FK_FileActionStateTransition_FAMFile] FOREIGN KEY([FileID]) "
 	"REFERENCES [FAMFile] ([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
@@ -302,6 +320,27 @@ static const string gstrADD_LOCKED_FILE_PROCESSINGFAM_FK =
 	"ALTER TABLE [dbo].[LockedFile]  "
 	"WITH CHECK ADD  CONSTRAINT [FK_LockedFile_ProcessingFAM] FOREIGN KEY([UPIID])"
 	"REFERENCES [dbo].[ProcessingFAM] ([ID])"
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FAM_SESSION_MACHINE_FK =
+	"ALTER TABLE [dbo].[FAMSession] "
+	"WITH CHECK ADD CONSTRAINT [FK_FAMSession_Machine] FOREIGN KEY([MachineID]) "
+	"REFERENCES [dbo].[Machine]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FAM_SESSION_FAMUSER_FK =
+	"ALTER TABLE [dbo].[FAMSession] "
+	"WITH CHECK ADD CONSTRAINT [FK_FAMSession_User] FOREIGN KEY([FAMUserID]) "
+	"REFERENCES [dbo].[FAMUser]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FAM_SESSION_FPSFILE_FK =
+	"ALTER TABLE [dbo].[FAMSession] "
+	"WITH CHECK ADD CONSTRAINT [FK_FAMSession_FPSFile] FOREIGN KEY([FPSFileID]) "
+	"REFERENCES [dbo].[FPSFile]([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 

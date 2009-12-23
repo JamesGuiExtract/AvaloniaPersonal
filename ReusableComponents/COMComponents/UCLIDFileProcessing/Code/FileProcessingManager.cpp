@@ -246,6 +246,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 				{
 					ipSupplyingActionMgmtRole->Stop();
 				}
+
 				// Rethrow the exception
 				throw;
 			}
@@ -303,7 +304,7 @@ STDMETHODIMP CFileProcessingManager::StopProcessing()
 		}
 
 		// ensure that processing is currently taking place
-		if (!m_bProcessing && ! m_bSupplying)
+		if (!m_bProcessing && !m_bSupplying)
 		{
 			THROW_LOGIC_ERROR_EXCEPTION("ELI12734")
 		}
@@ -1148,6 +1149,9 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 			ue.addDebugInfo("FPS File",
 				m_strFPSFileName.empty() ? "<Not Saved>" : m_strFPSFileName);
 			ue.log();
+
+			// Record the FAM session start
+			getFPMDB()->RecordFAMSessionStart(m_strFPSFileName.c_str());
 		}
 		break;
 	case kBeginStop:
@@ -1166,6 +1170,9 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 			ue.addDebugInfo("FPS File",
 				m_strFPSFileName.empty() ? "<Not Saved>" : m_strFPSFileName);
 			ue.log();
+
+			// Record the FAM session stop
+			getFPMDB()->RecordFAMSessionStop();
 		}
 		break;
 	default:

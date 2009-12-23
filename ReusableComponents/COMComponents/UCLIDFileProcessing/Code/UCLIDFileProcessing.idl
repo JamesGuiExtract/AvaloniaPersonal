@@ -241,7 +241,7 @@ library UCLID_FILEPROCESSINGLib
 		//					if kProcessingSkipped, file should be set to skipped.
 		//				nFileID - The ID of the file to act upon
 		//				nActionID - The ID of the action being processed
-		//				pFAMTM - A FAMTagManager object for expandin filename tags/methods
+		//				pFAMTM - A FAMTagManager object for expanding filename tags/methods
 		//				pDB - The database being operated upon
 		//				pProgressStatus - A caller may pass in a progress status object 
 		//					if the caller is interested in the progress information.  If the caller
@@ -971,7 +971,16 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To remove the record for in the ProcessingFAM table and stop the thread updating
 		//			the LastPingTime
 		[id(80), helpstring("method UnregisterProcessingFAM")] HRESULT UnregisterProcessingFAM();
+
 		// -----------------------------------------------------------------------------------------------
+		// Methods related to storing FAMSession information
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To record the start time for the current FAM session
+		[id(81), helpstring("method RecordFAMSessionStart")] HRESULT RecordFAMSessionStart(
+			[in] BSTR bstrFPSFileName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To record the stop time for the current FAM session
+		[id(82), helpstring("method RecordFAMSessionStop")] HRESULT RecordFAMSessionStop();
 	};
 
 	[

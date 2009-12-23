@@ -51,6 +51,8 @@ static const string gstrFAM_FILE_TAG = "FileTag";
 static const string gstrPROCESSING_FAM = "ProcessingFAM";
 static const string gstrLOCKED_FILE = "LockedFile";
 static const string gstrUSER_CREATED_COUNTER = "UserCreatedCounter";
+static const string gstrFPS_FILE = "FPSFile";
+static const string gstrFAM_SESSION = "FAMSession";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -178,6 +180,8 @@ public:
 	STDMETHOD(OffsetUserCounter)(BSTR bstrCounterName, LONGLONG llOffsetValue, LONGLONG* pllNewValue);
 	STDMETHOD(RegisterProcessingFAM)();
 	STDMETHOD(UnregisterProcessingFAM)();
+	STDMETHOD(RecordFAMSessionStart)(BSTR bstrFPSFileName);
+	STDMETHOD(RecordFAMSessionStop)();
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
