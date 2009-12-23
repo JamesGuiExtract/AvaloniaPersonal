@@ -18,8 +18,9 @@ const unsigned int gnSIMPLE_RULE_WRITING_PASSWORDS		= 2;
 // - ID Shield Office 1.0						2000
 // - FLEX Index and ID Shield 7.0				3000
 // - LabDE 1.0									4000
+// - FLEX Index and ID Shield 8.0				5000
 //-------------------------------------------------------------------------------------------------
-const unsigned int gnBASE_OFFSET						= 4000;
+const unsigned int gnBASE_OFFSET						= 5000;
 
 //-------------------------------------------------------------------------------------------------
 // Constants for core objects
