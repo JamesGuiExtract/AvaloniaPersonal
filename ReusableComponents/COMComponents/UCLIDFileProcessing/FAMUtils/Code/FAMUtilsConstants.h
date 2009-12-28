@@ -22,6 +22,8 @@ static const string gstrAUTO_REVERT_LOCKED_FILES = "AutoRevertLockedFiles";
 static const string gstrAUTO_REVERT_TIME_OUT_IN_MINUTES = "AutoRevertTimeOutInMinutes";
 static const string gstrAUTO_REVERT_NOTIFY_EMAIL_LIST = "AutoRevertNotifyEmailList";
 static const string gstrSTORE_FAM_SESSION_HISTORY = "StoreFAMSessionHistory";
+static const string gstrENABLE_INPUT_EVENT_TRACKING = "EnableInputEventTracking";
+static const string gstrINPUT_EVENT_HISTORY_SIZE = "InputEventHistorySize";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;

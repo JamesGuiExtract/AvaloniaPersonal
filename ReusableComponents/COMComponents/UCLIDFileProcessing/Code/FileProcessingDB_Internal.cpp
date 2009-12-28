@@ -29,7 +29,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 19;
+const long glFAMDBSchemaVersion = 20;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -901,6 +901,8 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrCREATE_FPS_FILE_TABLE);
 		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
 		vecQueries.push_back(gstrCREATE_FAM_SESSION);
+		vecQueries.push_back(gstrCREATE_INPUT_EVENT);
+		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX);
 
 		// Only create the login table if it does not already exist
 		if ( !doesTableExist( getDBConnection(), "Login"))
@@ -934,6 +936,9 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrADD_FAM_SESSION_MACHINE_FK);
 		vecQueries.push_back(gstrADD_FAM_SESSION_FAMUSER_FK);
 		vecQueries.push_back(gstrADD_FAM_SESSION_FPSFILE_FK);
+		vecQueries.push_back(gstrADD_INPUT_EVENT_ACTION_FK);
+		vecQueries.push_back(gstrADD_INPUT_EVENT_MACHINE_FK);
+		vecQueries.push_back(gstrADD_INPUT_EVENT_FAMUSER_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1044,6 +1049,16 @@ void CFileProcessingDB::initializeTableValues()
 		// Add StoreFAMSessionHistory setting (default to true)
 		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrSTORE_FAM_SESSION_HISTORY
 			+ "', '1')";
+		vecQueries.push_back(strSQL);
+
+		// Add the EnableInputEventTracking setting (default to false)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrENABLE_INPUT_EVENT_TRACKING
+			+ "', '0')";
+		vecQueries.push_back(strSQL);
+
+		// Add the InputEventHistorySize setting (default to 30 days)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrINPUT_EVENT_HISTORY_SIZE
+			+ "', '30')";
 		vecQueries.push_back(strSQL);
 
 		// Execute all of the queries
@@ -1861,6 +1876,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrUSER_CREATED_COUNTER);
 	vecTables.push_back(gstrFPS_FILE);
 	vecTables.push_back(gstrFAM_SESSION);
+	vecTables.push_back(gstrINPUT_EVENT);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
@@ -2730,6 +2746,43 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs( const _ConnectionPtr& ipCo
 		// move to next Processing FAM record
 		ipFileSet->MoveNext();
 	}
+}
+//--------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::isInputEventTrackingEnabled(const _ConnectionPtr& ipConnection)
+{
+	try
+	{
+		// Check the DB setting (only check once per session)
+		static bool bInputTrackingEnabled =
+			getDBInfoSetting(ipConnection, gstrENABLE_INPUT_EVENT_TRACKING) == "1";
+
+		return bInputTrackingEnabled;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28967");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::deleteOldInputEvents(const _ConnectionPtr& ipConnection)
+{
+	static CTime lastTime(1970, 1,1, 0, 0, 0);
+
+	try
+	{
+		// Get the current time and compute the time span between the current and the last
+		// delete operation
+		CTime currentTime = CTime::GetCurrentTime();
+		CTimeSpan span = currentTime - lastTime;
+
+		// Only execute the query if it hasn't been run in the past day
+		if (span.GetDays() > 1)
+		{
+			// Set the last time to the current time
+			lastTime = currentTime;
+
+			// Execute the delete old input event records query
+			executeCmdQuery(ipConnection, gstrDELETE_OLD_INPUT_EVENT_RECORDS);
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28941");
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::emailMessage(const string & strMessage)

@@ -53,6 +53,7 @@ static const string gstrLOCKED_FILE = "LockedFile";
 static const string gstrUSER_CREATED_COUNTER = "UserCreatedCounter";
 static const string gstrFPS_FILE = "FPSFile";
 static const string gstrFAM_SESSION = "FAMSession";
+static const string gstrINPUT_EVENT = "InputEvent";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -182,6 +183,8 @@ public:
 	STDMETHOD(UnregisterProcessingFAM)();
 	STDMETHOD(RecordFAMSessionStart)(BSTR bstrFPSFileName);
 	STDMETHOD(RecordFAMSessionStop)();
+	STDMETHOD(RecordInputEvent)(BSTR bstrTimeStamp, long nActionID, long nEventCount,
+		long nProcessID); 
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -551,6 +554,12 @@ private:
 
 	// Method that creates a thread to send the mail message
 	void emailMessage(const string& strMessage);
+
+	// Method to check whether input event tracking is on in the database
+	bool isInputEventTrackingEnabled(const _ConnectionPtr& ipConnection);
+
+	// Method to remove old Input events from the InputEvents table
+	void deleteOldInputEvents(const _ConnectionPtr& ipConnection);
 
 	// Class to contain the thread data for the emailMessageThread
 	class EmailThreadData

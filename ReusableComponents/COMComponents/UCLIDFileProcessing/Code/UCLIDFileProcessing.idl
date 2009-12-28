@@ -981,6 +981,14 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To record the stop time for the current FAM session
 		[id(82), helpstring("method RecordFAMSessionStop")] HRESULT RecordFAMSessionStop();
+
+		// -----------------------------------------------------------------------------------------------
+		// Methods related to storing input event history
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To record a new input event entry for the specified process ID.
+		[id(83), helpstring("method RecordInputEvent")] HRESULT RecordInputEvent(
+			[in] BSTR bstrTimeStamp, [in] long nActionID, [in] long nEventCount,
+			[in] long nProcessID);
 	};
 
 	[

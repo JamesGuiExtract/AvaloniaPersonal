@@ -1,5 +1,7 @@
 #pragma once
 
+#include <FAMUtilsConstants.h>
+
 #include <string>
 
 using namespace std;
@@ -151,6 +153,16 @@ static const string gstrCREATE_FAM_SESSION =
 	"[StopTime] datetime, "
 	"[FPSFileID] int NOT NULL)";
 
+static const string gstrCREATE_INPUT_EVENT =
+	"CREATE TABLE [InputEvent] ("
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_InputEvent] PRIMARY KEY CLUSTERED, "
+	"[TimeStamp] [DateTime] NOT NULL, "
+	"[ActionID] int NOT NULL, "
+	"[FAMUserID] int NOT NULL, "
+	"[MachineID] int NOT NULL, "
+	"[PID] int NOT NULL, "
+	"[InputEventCount] int NOT NULL)";
+
 // Create table indexes SQL
 static const string gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_PriorityID] "
 	"ON [FAMFile]([Priority] DESC, [ID] ASC)";
@@ -181,6 +193,9 @@ static const string gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX = "CREATE NONCLU
 
 static const string gstrCREATE_FPS_FILE_NAME_INDEX = "CREATE NONCLUSTERED INDEX "
 	"[IX_FPSFile_FPSFileName] ON [FPSFile]([FPSFileName])";
+
+static const string gstrCREATE_INPUT_EVENT_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_Input_Event] ON [InputEvent]([TimeStamp], [ActionID], [MachineID], [FAMUserID], [PID])";
 
 // Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
@@ -344,6 +359,27 @@ static const string gstrADD_FAM_SESSION_FPSFILE_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
+static const string gstrADD_INPUT_EVENT_ACTION_FK =
+	"ALTER TABLE [dbo].[InputEvent] "
+	"WITH CHECK ADD CONSTRAINT [FK_InputEvent_Action] FOREIGN KEY([ActionID]) "
+	"REFERENCES [dbo].[Action]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_INPUT_EVENT_MACHINE_FK =
+	"ALTER TABLE [dbo].[InputEvent] "
+	"WITH CHECK ADD CONSTRAINT [FK_InputEvent_Machine] FOREIGN KEY([MachineID]) "
+	"REFERENCES [dbo].[Machine]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_INPUT_EVENT_FAMUSER_FK =
+	"ALTER TABLE [dbo].[InputEvent] "
+	"WITH CHECK ADD CONSTRAINT [FK_InputEvent_User] FOREIGN KEY([FAMUserID]) "
+	"REFERENCES [dbo].[FAMUser]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_QUERY = 
 	"SELECT LockID, UPI, LockTime, DATEDIFF(second, LockTime, GETDATE()) AS TimeLocked "
@@ -362,3 +398,9 @@ static const string gstrSETTING_NAME = "<SettingName>";
 // To use run replaceVariable to replace <SettingName>
 static const string gstrDBINFO_SETTING_QUERY = 
 	"SELECT [Name], [Value] FROM DBInfo WHERE [Name] = '" + gstrSETTING_NAME + "'";
+
+// Query to delete old input event records from the InputEvent table
+static const string gstrDELETE_OLD_INPUT_EVENT_RECORDS =
+	"DELETE FROM InputEvent WHERE DATEDIFF(d, GETDATE(), [TimeStamp]) > (SELECT COALESCE("
+	"(SELECT CAST([Value] AS int) FROM [DBInfo] WHERE [Name] = '"
+	+ gstrINPUT_EVENT_HISTORY_SIZE + "'), 30))";

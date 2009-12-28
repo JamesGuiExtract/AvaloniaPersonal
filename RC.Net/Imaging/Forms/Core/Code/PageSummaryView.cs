@@ -1,3 +1,4 @@
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,16 +23,6 @@ namespace Extract.Imaging.Forms
         /// The number of cells in each row of the <see cref="PageSummaryView"/> grid.
         /// </summary>
         const int CELLS_PER_ROW = 10;
-
-        /// <summary>
-        /// Windows message that is posted when a nonsystem key is pressed.
-        /// </summary>
-        const int WM_KEYDOWN = 0x100;
-
-        /// <summary>
-        /// Windows message that is posted when a system key is pressed.
-        /// </summary>
-        const int WM_SYSKEYDOWN = 0x104;
 
         #endregion PageSummaryView Constants
 
@@ -399,7 +390,7 @@ namespace Extract.Imaging.Forms
         [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (msg.Msg == WM_KEYDOWN || msg.Msg == WM_SYSKEYDOWN)
+            if (msg.Msg == WindowsMessage.KeyDown || msg.Msg == WindowsMessage.SysKeyDown)
             {
                 switch (keyData)
                 {

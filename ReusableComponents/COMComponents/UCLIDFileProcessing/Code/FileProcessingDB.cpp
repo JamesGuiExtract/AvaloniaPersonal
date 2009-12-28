@@ -4509,6 +4509,60 @@ STDMETHODIMP CFileProcessingDB::RecordFAMSessionStop()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28906");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RecordInputEvent(BSTR bstrTimeStamp, long nActionID,
+												 long nEventCount, long nProcessID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		string strSQL = "INSERT INTO [" + gstrINPUT_EVENT + "] ([TimeStamp], "
+			"[ActionID], [FAMUserID], [MachineID], [PID], [InputEventCount]) "
+			"VALUES (CAST('" + asString(bstrTimeStamp) + "' AS smalldatetime), "
+			+ asString(nActionID) + ", ";
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		if (!isInputEventTrackingEnabled(ipConnection))
+		{
+			throw UCLIDException("ELI28966", "Input event tracking is not currently enabled.");
+		}
+
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		long nMachineID = getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName);
+		long nUserID = getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName);
+
+		// Add the remaining 
+		strSQL += asString(nUserID) + ", " + asString(nMachineID) + ", "
+			+ asString(nProcessID) + ", " + asString(nEventCount) + ")";
+
+		// Execute the insert query
+		executeCmdQuery(ipConnection, strSQL);
+
+		// Delete the old input events
+		deleteOldInputEvents(ipConnection);
+
+		// Commit the transaction
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI28942");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28943");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

@@ -616,6 +616,12 @@ namespace Extract
                 // Add the name of this control
                 AddDebugData(debugDataName,
                     debugDataValue == null ? "null" : debugDataValue.Name, encrypt);
+
+                // Add the control type if possible
+                if (debugDataValue != null)
+                {
+                    AddDebugData("Control Type", debugDataValue.GetType().ToString(), encrypt);
+                }
             }
             catch
             {
