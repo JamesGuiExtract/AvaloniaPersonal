@@ -270,6 +270,18 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<b>FAM Service stopped</b>.
 		</ul>
 <p>
+		<li><b>[DotNetRC #363] Clear database while processing</b>
+		<ul>
+			<li>Confirm on the database machine that the database is clear.
+			<li>Create one or more FPS files configured for AutoStart.
+			<li>Set the service startup type to <b>Automatic</b>.
+			<li>Restart the <b>service machine</b>.</li>
+			<li>Confirm that files are processing.</li>
+			<li><b>Clear</b> the database.
+			<li>Confirm that the meaningful errors are logged.</li>
+			<li>Confirm that the service can be stopped without additional errors.</li>
+		</ul>
+<p>
 		<li><b>Run multiple FPS files, then gracefully restart the machine</b>
 		<ul>
 			<li>Confirm on the database machine that the database is clear.
