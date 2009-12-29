@@ -73,7 +73,9 @@
     </Compile>
     <Compile Include="CustomizableMessageBoxManager.cs" />
     <Compile Include="CustomizableMessageBoxResult.cs" />
+    <Compile Include="FormMemento.cs" />
     <Compile Include="FormsMethods.cs" />
+    <Compile Include="IControlMemento.cs" />
     <Compile Include="Inputbox.cs" />
     <Compile Include="InputBoxForm.cs">
       <SubType>Form</SubType>
