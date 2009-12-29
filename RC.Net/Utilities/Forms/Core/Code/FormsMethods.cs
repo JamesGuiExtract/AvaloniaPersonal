@@ -1,8 +1,6 @@
 using Extract.Licensing;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.Utilities.Forms
@@ -18,12 +16,11 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(FormsMethods).ToString();
+        static readonly string _OBJECT_NAME = typeof(FormsMethods).ToString();
 
         #endregion Constants
 
-        #region FormsMethods Methods
+        #region Methods
 
         /// <summary>
         /// Adds and docks a control in a container and sets the minimum size of the parent to 
@@ -75,35 +72,6 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Centers the <paramref name="formToCenter"/> <see cref="Form"/>
-        /// in the <paramref name="formToCenterIn"/> <see cref="Form"/>.
-        /// </summary>
-        /// <param name="formToCenter">The <see cref="Form"/> to be centered.</param>
-        /// <param name="formToCenterIn">The <see cref="Form"/> to be centered on.</param>
-        public static void CenterFormInForm(Form formToCenter, Form formToCenterIn)
-        {
-            try
-            {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23144",
-                    _OBJECT_NAME);
-
-                // Get the location and size of the parent form
-                Point formToCenterInLocation = formToCenterIn.Location;
-                Size formToCenterInSize = formToCenterIn.Size;
-
-                // Compute and set the location for this form
-                formToCenter.Location = new Point(
-                    formToCenterInLocation.X + ((formToCenterInSize.Width / 2) - (formToCenter.Width / 2)),
-                    formToCenterInLocation.Y + ((formToCenterInSize.Height / 2) - (formToCenter.Height / 2)));
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI22220", ex);
-            }
-        }
-
-        /// <summary>
         /// Prevents the specified <see cref="Control"/> from updating (redrawing) until the lock 
         /// is released.
         /// </summary>
@@ -135,6 +103,6 @@ namespace Extract.Utilities.Forms
             }
         }
 
-        #endregion FormsMethods Methods
+        #endregion Methods
     }
 }
