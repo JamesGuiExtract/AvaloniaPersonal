@@ -15,6 +15,7 @@ using System.IO;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml;
 using TD.SandDock;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -46,6 +47,13 @@ namespace Extract.Redaction.Verification
         /// The title to display for the verification task form.
         /// </summary>
         const string _FORM_TITLE = "ID Shield Verification";
+
+        /// <summary>
+        /// The full path to the file that contains information about persisting the 
+        /// <see cref="VerificationTaskForm"/>.
+        /// </summary>
+        static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
+            FileSystemMethods.ApplicationDataPath, "ID Shield", "VerificationForm.xml");
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
@@ -166,7 +174,7 @@ namespace Extract.Redaction.Verification
 
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject, "ELI27105",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 // License SandDock before creating the form
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
@@ -198,6 +206,11 @@ namespace Extract.Redaction.Verification
                 // Subscribe to layer object events
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
                 _imageViewer.LayerObjects.LayerObjectDeleted += HandleImageViewerLayerObjectDeleted;
+
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                {
+                    LoadState();
+                }
             }
             catch (Exception ex)
             {
@@ -532,16 +545,16 @@ namespace Extract.Redaction.Verification
             string directory = tags.Expand(settings.DataFolder);
             string fileName;
             if (settings.UseOriginalFileNames)
-	        {
+            {
                 // Original file name
                 fileName = Path.GetFileName(sourceDocument);
-	        }
+            }
             else
-	        {
+            {
                 // Unique file name
                 fileName = fileId.ToString(CultureInfo.InvariantCulture) +
-                    Path.GetExtension(sourceDocument);
-	        }
+                           Path.GetExtension(sourceDocument);
+            }
 
             return Path.Combine(directory, fileName);
         }
@@ -651,8 +664,8 @@ namespace Extract.Redaction.Verification
                 {
                     messageBox.Caption = "Save changes?";
                     messageBox.Text = "Changes made to this document have not been saved." +
-                        Environment.NewLine + Environment.NewLine +
-                        "Would you like to save them now?";
+                                      Environment.NewLine + Environment.NewLine +
+                                      "Would you like to save them now?";
 
                     messageBox.AddButton("Save changes", "Save", false);
                     messageBox.AddButton("Discard changes", "Discard", false);
@@ -665,7 +678,8 @@ namespace Extract.Redaction.Verification
                     }
                     else if (result == "Save")
                     {
-                        if (WarnIfInvalid())
+                        // Prompt for invalid data only if in the history queue [FIDSC #3863]
+                        if (IsInHistory && WarnIfInvalid())
                         {
                             return true;
                         }
@@ -1312,6 +1326,78 @@ namespace Extract.Redaction.Verification
             _redactionGridView.AutoZoomScale = _options.AutoZoomScale;
         }
 
+        /// <summary>
+        /// Saves the state of the user interface.
+        /// </summary>
+        void SaveState()
+        {
+            // Get the pertinent information
+            FormMemento formMemento = new FormMemento(this);
+            int splitterDistance = _dataWindowSplitContainer.SplitterDistance;
+
+            // Create a memento to represent the state
+            VerificationTaskFormMemento memento = 
+                new VerificationTaskFormMemento(formMemento, splitterDistance);
+
+            // Convert the memento to XML
+            XmlDocument document = new XmlDocument();
+            XmlElement element = memento.ToXmlElement(document);
+            document.AppendChild(element);
+
+            // Create the directory for the file if necessary
+            string directory = Path.GetDirectoryName(_FORM_PERSISTENCE_FILE);
+            Directory.CreateDirectory(directory);
+
+            // Save the XML
+            document.Save(_FORM_PERSISTENCE_FILE);
+        }
+
+        /// <summary>
+        /// Loads the previously saved state of the user interface.
+        /// </summary>
+        void LoadState()
+        {
+            try
+            {
+                // Load memento if it exists
+                if (File.Exists(_FORM_PERSISTENCE_FILE))
+                {
+                    // Load the XML
+                    XmlDocument document = new XmlDocument();
+                    document.Load(_FORM_PERSISTENCE_FILE);
+
+                    // Convert the XML to the memento
+                    XmlElement element = (XmlElement)document.FirstChild;
+                    VerificationTaskFormMemento memento =
+                        VerificationTaskFormMemento.FromXmlElement(element);
+
+                    // Restore the saved state
+                    memento.FormMemento.Restore(this);
+                    _dataWindowSplitContainer.SplitterDistance = memento.SplitterDistance;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI28984",
+                    "Unable to load previous verification setting state.", ex);
+                ee.AddDebugData("Invalid XML file", _FORM_PERSISTENCE_FILE, false);
+                ee.Log();
+            }
+        }
+
+        /// <summary>
+        /// Expands the specified dockable window if it is collapsed. If the window is not 
+        /// collapsed, this method does nothing.
+        /// </summary>
+        /// <param name="window">The window to expand.</param>
+        static void UncollapseWindow(DockControl window)
+        {
+            if (window.DockSituation == DockSituation.Docked && window.Collapsed)
+            {
+                window.Collapsed = false;
+            }
+        }
+
         #endregion Methods
 
         #region Overrides
@@ -1327,6 +1413,10 @@ namespace Extract.Redaction.Verification
 
             try
             {
+                // Uncollapse dockable windows before establishing connections
+                UncollapseWindow(_dataWindowDockableWindow);
+                UncollapseWindow(_thumbnailDockableWindow);
+
                 _imageViewer.EstablishConnections(this);
 
                 // It is important that this line comes AFTER EstablishConnections, 
@@ -1369,7 +1459,7 @@ namespace Extract.Redaction.Verification
                 ExtractException.Display("ELI26715", ex);
             }
         }
-
+       
         /// <summary>
         /// Raises the <see cref="Form.FormClosing"/> event.
         /// </summary>
@@ -1391,6 +1481,11 @@ namespace Extract.Redaction.Verification
                 }
 
                 CommitComment();
+
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                {
+                    SaveState();
+                }
             }
             catch (Exception ex)
             {
