@@ -180,6 +180,7 @@
     <Compile Include="VerificationTaskForm.Designer.cs">
       <DependentUpon>VerificationTaskForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="VerificationTaskFormMemento.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">
