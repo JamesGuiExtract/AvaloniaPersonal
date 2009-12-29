@@ -12,29 +12,52 @@ using System.Windows.Forms;
 namespace Extract.Utilities
 {
     /// <summary>
-    /// A utiity class of file system methods.
+    /// A utility class of file system methods.
     /// </summary>
     public static class FileSystemMethods
     {
+        #region Fields
+
         /// <summary>
         /// A static object used as a mutex in the temp file name generation to prevent
         /// multiple threads from generating the same temporary file name.
         /// </summary>
-        static readonly Mutex _tempFileLock = new Mutex(false, 
+        static readonly Mutex _tempFileLock = new Mutex(false,
             "C6D3EB7D-5DB9-4FC7-BEAD-0DBA39DBDB4B");
 
         /// <summary>
         /// Either "C:\Program Files\Extract Systems" or "C:\Program Files (x86)\Extract Systems"
         /// depending on the OS.
         /// </summary>
-        static readonly string _EXTRACT_SYSTEMS_PATH =
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-               "Extract Systems");
+        static readonly string _EXTRACT_SYSTEMS_PATH = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Extract Systems");
+
+        /// <summary>
+        /// The full path to the Extract Systems application data folder.
+        /// </summary>
+        static readonly string _APPLICATION_DATA_PATH = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Extract Systems");
 
         /// <summary>
         /// Contains the list of invalid path characters.
         /// </summary>
         static readonly char[] _invalidPathCharacters = Path.GetInvalidPathChars();
+
+        #endregion Fields
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the full path to the Extract Systems application data folder.
+        /// </summary>
+        /// <value>The full path to the Extract Systems application data folder.</value>
+        public static string ApplicationDataPath
+        {
+            get
+            {
+                return _APPLICATION_DATA_PATH;
+            }
+        }
 
         /// <summary>
         /// Gets the full path to the Extract Systems program files directory.
@@ -47,6 +70,10 @@ namespace Extract.Utilities
                 return _EXTRACT_SYSTEMS_PATH;
             }
         }
+
+        #endregion Properties
+
+        #region Methods
 
         /// <summary>
         /// Generates a file in the users TEMP folder with an extension of ".tmp".
@@ -788,7 +815,7 @@ namespace Extract.Utilities
                     ValidatePathString(list[i]);
 
                     // Get the last character of the current "Path" string
-                    char ch = sb[sb.Length-1];
+                    char ch = sb[sb.Length - 1];
 
                     // Check if a directory separator is needed
                     if (ch != Path.DirectorySeparatorChar
@@ -843,5 +870,7 @@ namespace Extract.Utilities
 
             return Path.Combine(directory, file);
         }
+
+        #endregion Methods
     }
 }
