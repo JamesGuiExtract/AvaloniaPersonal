@@ -58,7 +58,6 @@ namespace Extract.Redaction.Verification
         private void InitializeComponent()
         {
             System.Windows.Forms.ToolStripContainer dataGridToolStripContainer;
-            System.Windows.Forms.SplitContainer splitContainer1;
             System.Windows.Forms.Label label3;
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label1;
@@ -137,7 +136,7 @@ namespace Extract.Redaction.Verification
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
             dataGridToolStripContainer = new System.Windows.Forms.ToolStripContainer();
-            splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this._dataWindowSplitContainer = new System.Windows.Forms.SplitContainer();
             label3 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
@@ -158,9 +157,9 @@ namespace Extract.Redaction.Verification
             dataGridToolStripContainer.ContentPanel.SuspendLayout();
             dataGridToolStripContainer.TopToolStripPanel.SuspendLayout();
             dataGridToolStripContainer.SuspendLayout();
-            splitContainer1.Panel1.SuspendLayout();
-            splitContainer1.Panel2.SuspendLayout();
-            splitContainer1.SuspendLayout();
+            this._dataWindowSplitContainer.Panel1.SuspendLayout();
+            this._dataWindowSplitContainer.Panel2.SuspendLayout();
+            this._dataWindowSplitContainer.SuspendLayout();
             this._menuStrip.SuspendLayout();
             this._basicDataGridToolStrip.SuspendLayout();
             this._exemptionsToolStrip.SuspendLayout();
@@ -182,7 +181,7 @@ namespace Extract.Redaction.Verification
             // 
             // dataGridToolStripContainer.ContentPanel
             // 
-            dataGridToolStripContainer.ContentPanel.Controls.Add(splitContainer1);
+            dataGridToolStripContainer.ContentPanel.Controls.Add(_dataWindowSplitContainer);
             dataGridToolStripContainer.ContentPanel.Size = new System.Drawing.Size(527, 821);
             dataGridToolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             dataGridToolStripContainer.Location = new System.Drawing.Point(0, 0);
@@ -197,32 +196,32 @@ namespace Extract.Redaction.Verification
             dataGridToolStripContainer.TopToolStripPanel.Controls.Add(this._basicDataGridToolStrip);
             dataGridToolStripContainer.TopToolStripPanel.Controls.Add(this._exemptionsToolStrip);
             // 
-            // splitContainer1
+            // _dataWindowSplitContainer
             // 
-            splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            splitContainer1.Location = new System.Drawing.Point(0, 0);
-            splitContainer1.Name = "splitContainer1";
-            splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this._dataWindowSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._dataWindowSplitContainer.Location = new System.Drawing.Point(0, 0);
+            this._dataWindowSplitContainer.Name = "_dataWindowSplitContainer";
+            this._dataWindowSplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
-            // splitContainer1.Panel1
+            // _dataWindowSplitContainer.Panel1
             // 
-            splitContainer1.Panel1.Controls.Add(this._commentsTextBox);
-            splitContainer1.Panel1.Controls.Add(label3);
-            splitContainer1.Panel1.Controls.Add(this._currentDocumentTextBox);
-            splitContainer1.Panel1.Controls.Add(label2);
-            splitContainer1.Panel1.Controls.Add(this._documentTypeTextBox);
-            splitContainer1.Panel1.Controls.Add(label1);
-            splitContainer1.Panel1.Controls.Add(this._redactionGridView);
-            splitContainer1.Panel1MinSize = 225;
+            this._dataWindowSplitContainer.Panel1.Controls.Add(this._commentsTextBox);
+            this._dataWindowSplitContainer.Panel1.Controls.Add(label3);
+            this._dataWindowSplitContainer.Panel1.Controls.Add(this._currentDocumentTextBox);
+            this._dataWindowSplitContainer.Panel1.Controls.Add(label2);
+            this._dataWindowSplitContainer.Panel1.Controls.Add(this._documentTypeTextBox);
+            this._dataWindowSplitContainer.Panel1.Controls.Add(label1);
+            this._dataWindowSplitContainer.Panel1.Controls.Add(this._redactionGridView);
+            this._dataWindowSplitContainer.Panel1MinSize = 225;
             // 
-            // splitContainer1.Panel2
+            // _dataWindowSplitContainer.Panel2
             // 
-            splitContainer1.Panel2.Controls.Add(label4);
-            splitContainer1.Panel2.Controls.Add(this._pageSummaryView);
-            splitContainer1.Panel2MinSize = 50;
-            splitContainer1.Size = new System.Drawing.Size(527, 821);
-            splitContainer1.SplitterDistance = 507;
-            splitContainer1.TabIndex = 0;
+            this._dataWindowSplitContainer.Panel2.Controls.Add(label4);
+            this._dataWindowSplitContainer.Panel2.Controls.Add(this._pageSummaryView);
+            this._dataWindowSplitContainer.Panel2MinSize = 50;
+            this._dataWindowSplitContainer.Size = new System.Drawing.Size(527, 821);
+            this._dataWindowSplitContainer.SplitterDistance = 507;
+            this._dataWindowSplitContainer.TabIndex = 0;
             // 
             // _commentsTextBox
             // 
@@ -608,6 +607,7 @@ namespace Extract.Redaction.Verification
             // 
             // _sandDockManager
             // 
+            this._sandDockManager.AutoSaveLayout = true;
             this._sandDockManager.DockSystemContainer = this;
             this._sandDockManager.MaximumDockContainerSize = 2000;
             this._sandDockManager.MinimumDockContainerSize = 220;
@@ -1024,11 +1024,11 @@ namespace Extract.Redaction.Verification
             dataGridToolStripContainer.TopToolStripPanel.PerformLayout();
             dataGridToolStripContainer.ResumeLayout(false);
             dataGridToolStripContainer.PerformLayout();
-            splitContainer1.Panel1.ResumeLayout(false);
-            splitContainer1.Panel1.PerformLayout();
-            splitContainer1.Panel2.ResumeLayout(false);
-            splitContainer1.Panel2.PerformLayout();
-            splitContainer1.ResumeLayout(false);
+            this._dataWindowSplitContainer.Panel1.ResumeLayout(false);
+            this._dataWindowSplitContainer.Panel1.PerformLayout();
+            this._dataWindowSplitContainer.Panel2.ResumeLayout(false);
+            this._dataWindowSplitContainer.Panel2.PerformLayout();
+            this._dataWindowSplitContainer.ResumeLayout(false);
             this._menuStrip.ResumeLayout(false);
             this._menuStrip.PerformLayout();
             this._basicDataGridToolStrip.ResumeLayout(false);
@@ -1119,5 +1119,6 @@ namespace Extract.Redaction.Verification
         private Extract.Imaging.Forms.PreviousTileToolStripButton _previousTileToolStripButton;
         private Extract.Imaging.Forms.NextTileToolStripButton _nextTileToolStripButton;
         private System.Windows.Forms.ToolStripSeparator _tagFileToolStripSeparator;
+        private System.Windows.Forms.SplitContainer _dataWindowSplitContainer;
     }
 }
