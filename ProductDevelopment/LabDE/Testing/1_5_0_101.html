@@ -1,0 +1,112 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.5.0.101 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.5.0.101 Testing <br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Exercise recent fixed SCRs
+   	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
+	present within the collected checklists.
+</ul>
+<p>
+<h3>SCRs</h3>
+<OL>
+	<LI><b>[DataEntry #149, #752]</b> Docking windows
+	<ul>
+		<li>Confirm that the <b>DEP window</b> and the <b>image window</b> can be docked 
+		separately and displayed on separate monitors.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #720, #722, #764]</b> LabDE installation
+	<ul>
+		<li>Review text on the Install - Other Products page in the DemoShield installation.
+		<li>Confirm that inappropriate apostrophes are not present.
+		<li>Confirm that text is not obscured.
+		<li>Confirm that the correct fax number is provided in the license agreement.
+		<li>Confirm that the correct <b>Transfer may not be made to an unrelated company or 
+		to a related company</b> text is provided in the license agreement.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #749]</b> Smart tags
+       	<ul>
+		<li>Confirm that <b>smart tags</b> are supported correctly - see Steve for more 
+		information.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[FlexIDSCore #3856]</b> Apostrophes in comment field
+       	<ul>
+		<li>Confirm that apostrophes in the <b>Comments</b> edit box no longer 
+		double after revisitation.
+       	</ul>
+   	</LI>
+<p>
+   	<LI><b>[LegacyRC #5568, #5605]</b> New database tables
+       	<ul>
+		<li>Confirm that a <b>FAMSession</b> table exists in the database.
+		<li>Confirm that a <b>SaveFAMSessionHistory</b> row exists in the 
+		<b>DBInfo</b> table.
+		<li>Confirm that the <b>SaveFAMSessionHistory</b> default is <b>1</b>.
+  	   	<LI>Confirm that <b>FAMSession</b> records with start and stop times 
+		are added for each FAM instance.
+  	   	<LI>Confirm that <b>FAMSession</b> records are not added for 
+		<b>SaveFAMSessionHistory = 0</b>.
+<p>
+		<li>Confirm that an <b>InputEvent</b> table exists in the database.
+		<li>Confirm that an <b>EnableInputEventTracking</b> row exists in the 
+		<b>DBInfo</b> table.
+		<li>Confirm that an <b>InputEventHistorySize</b> row exists in the 
+		<b>DBInfo</b> table.
+		<li>Confirm that the <b>EnableInputEventTracking</b> default is 
+		<b>1</b>.
+		<li>Confirm that the <b>InputEventHistorySize</b> default is 
+		<b>30</b>.
+       	</ul>
+</OL>
+<p>
+<UL>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests - LabDE Order Mapper
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : LabDE
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</UL>
+</BODY>
+</HTML>
