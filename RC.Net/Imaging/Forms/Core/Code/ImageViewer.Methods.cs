@@ -79,6 +79,17 @@ namespace Extract.Imaging.Forms
                     }
                 }
 
+                // Check whether this is a form control
+                Form form = control as Form;
+                if (form != null)
+                {
+                    foreach (Form childForm in form.OwnedForms)
+                    {
+                        // Recursively establish connections with child forms
+                        EstablishConnections(childForm);
+                    }
+                }
+
                 // Check each sub control of this control
                 ControlCollection controls = control.Controls;
                 foreach (Control subcontrol in controls)
