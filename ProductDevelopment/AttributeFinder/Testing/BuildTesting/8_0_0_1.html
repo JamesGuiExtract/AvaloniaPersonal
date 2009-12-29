@@ -1,0 +1,307 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.0.0.1 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.0.0.1 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3781, #3800]</b> ID Shield Statistics Reporter
+	       	<ul>
+	  	   	<LI>Exercise the <b>Support User Testing Of ID Shield Accuracy (#18)</b> 
+			section of the FLEX Index 8.0 Features checklist.
+			<li>Confirm that the proper results are provided in the 
+			<b>Statistics</b> tab
+			<ul>
+				<li>Automated redaction process
+				<li>Standard verification process
+				<li>Hybrid process
+			</ul>
+	       	</ul>
+<p>
+		<li><b>[FlexIDSCore #3789]</b> L_LoadBitmap()
+		<ul>
+			<li>Prepare a small set of image files for processing.
+			<li>Process the files via rule execution and prepare them for 
+			automatic redaction.
+			<li>Replace the actual image files with renamed copies of <b>notepad.exe</b> 
+			or another binary file.
+			<li>Process the replaced files for automatic redaction.
+			<li>Confirm that the processing fails gracefully.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3763, #3778, #3804, #3837, #3863, #3871, #3872, #3878, #3879, 
+		#3880, #3886, #3887, #3888, #3889, #3891, #3892, #3897]</b> 
+		Verify sensitive data
+	       	<ul>
+	      		<li>Prepare some images for verification.  Include at least one image 
+			with more than <b>64</b> pages.
+			<li>Confirm that the color of a manual redaction is set as soon as it 
+			is drawn in the verification interface.
+			<li>Review all pages of the large image.
+			<li>Confirm that saving the verification results VOA file <b>does not</b> 
+			take appreciably longer than for a smaller image.
+			<li>Navigate back to the large image after saving results.
+			<li>Confirm that the <b>Summary Grid</b> correctly represents all pages 
+			as viewed.
+			<li>Confirm that the <b>Save and commit</b> button is enabled when 
+			reviewing previous documents.
+			<li>Confirm that keyboard shortcuts work in the verification UI even 
+			when a floating dockable window has input focus.
+			<li>*Confirm that the <b>Thumbnails window</b> position is persisted 
+			across sessions.
+			<li>*Confirm that the <b>splitter window</b> position is persisted 
+			across sessions.
+			<li>*Confirm that the <b>Page summary splitter window</b> position is 
+			persisted across sessions.
+			<li>Select a redaction and zoom in far enough that the next listed 
+			redaction is not visible.
+			<li>Select the next redaction in the <b>Grid view</b>.
+			<li>Confirm that the formerly out-of-view redaction is now visible.
+			<li>Confirm that the selection border is drawn <b>around the outside</b> 
+			of the regular border.
+			<li>Press <b>F2</b>.  Confirm that the view is now centered on the 
+			currently selected redactions.
+			<li>Confirm that <b>zoom level 10</b> zooms out so that at least half of 
+			the page is visible.
+			<li>Apply tags button
+			<ul>
+				<li>Confirm that the toolbar button <b>is</b> visible if the 
+				database does not have a defined tag but allows dynamic tag creation.
+				<li>Confirm that the toolbar button <b>is not</b> visible if the 
+				database does not have a defined tag and does not allow dynamic tag 
+				creation.
+				<li>Confirm that the toolbar button <b>is</b> visible if the 
+				database has one or more defined tags.
+<p>
+				<li>Confirm that several tags are defined.
+				<li>Confirm that the <b>tooltip</b> for each tag is the associated 
+				description text.
+			</ul>
+			<li>Toggling redactions
+			<ul>
+				<li>Confirm that double-clicking the redaction checkbox in the Grid 
+				View updates the fill color appropriately.
+				<li>Confirm that selecting a redaction and pressing <b>SPACE</b> 
+				toggles the redaction state and sets the dirty flag.
+				<li>Select a group of redactions where some are toggled <b>on</b> 
+				and some are toggled <b>off</b>.
+				<li>Press <b>SPACE</b>.
+				<li>Confirm that all of the selected redactions are now toggled 
+				<b>on</b>.
+				<li>Press <b>SPACE</b>.
+				<li>Confirm that all of the selected redactions are now toggled 
+				<b>off</b>.
+			</ul>
+			<li>*Prompting for invalid data
+			<ul>
+				<li>Begin verifying a document.
+				<li>Leave the document data in an invalid state.
+				<li>Skip the document.
+				<li>Confirm that a prompt message about invalid data <b>is not</b> 
+				presented.
+				<li>Begin verifying a document.
+				<li>Leave the document data in an invalid state.
+				<li>Stop processing.
+				<li>Confirm that a prompt message about invalid data <b>is not</b> 
+				presented.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3869]</b> Create redacted image
+	       	<ul>
+	      		<li>Prepare some images for creation of redacted images.
+			<li>Set some exemption codes for the redactions.
+			<li>Confirm that the output images include the appropriate exemption codes.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3894]</b> ID Shield Statistics Reporter
+	       	<ul>
+			<li>Confirm that an <b>ID Shield Client</b> license is sufficient to 
+			run the utility.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3902]</b> FAM license
+	       	<ul>
+			<li>Confirm that a <b>Current</b> license is required to run an 
+			<b>8.0.0.x</b> build.
+			<li>Confirm that a <b>LabDE_10</b> license does not work to run an 
+			<b>8.0.0.x</b> build.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4931]</b> ESConvertToPDF.exe
+	       	<ul>
+	  	   	<LI>Confirm that the application has a non-default icon.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5530, #5537]</b> UEX Viewer
+	       	<ul>
+			<li>Confirm that a meaningful error message is presented for <b>View 
+			exception log</b> if no UEX file exists.
+	  	   	<LI>Exercise the <b>Support Export Of Debug Data From UEX Viewer</b> 
+			test cases in the <b>80_Features_Utilities.html</b> checklist 
+			under <b>AttributeFinder/Testing/FeatureTesting</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5531]</b> Setting file priority in DB Admin
+	       	<ul>
+	  	   	<LI>Confirm that the <b>FAM DB Admin</b> utility is not unresponsive 
+			for an extended period while setting file priority.  This should be 
+			tested with several thousand files in a database.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5560]</b> UEX Viewer
+	       	<ul>
+	  	   	<LI>Confirm that the <b>ExtractException.Uex</b> file contains multiple 
+			exceptions.
+			<li>Modify the exception log with a text editor to include several 
+			incorrect lines.
+			<li>Confirm that the exception log can still be opened by the 
+			<b>UEX Viewer</b> utility.
+			<li>Confirm that error messages are presented for each incorrect line.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5563]</b> $FullUserName()
+	       	<ul>
+			<li>Login as local administrator on a test machine.
+			<li>Confirm that no <b>Name</b> is associated with the login account.
+			<li>Exercise the <b>$FullUserName()</b> tag.
+			<li>Confirm that the login ID is returned.
+			<li>Add a <b>Name</b> definition.
+			<li>Exercise the <b>$FullUserName()</b> tag again.
+	  	   	<LI>Confirm that the new <b>Name</b> is returned.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5567, #5573, #5575]</b> FAM
+	       	<ul>
+	  	   	<LI>Confirm that the label above the Skip Condition edit box is 
+			<b>Do not queue any file that meets the following condition</b>.
+			<li>Confirm that a <b>File Action Manager is stopping</b> message is 
+			logged when the user stops processing.
+			<li>Confirm that a <b>File Action Manager is stopping</b> message is 
+			logged when the FAM finishes processing on its own.
+			<li>Confirm that a <b>File Action Manager is stopping</b> message is 
+			logged when the ESFAMProcess service finishes processing.
+			<li>Confirm that the ProcessFiles usage message includes <b>will 
+			process &lt;nnn&gt; documents and stop</b> for the <b>/m:&lt;nnn&gt;</b> 
+			switch.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5568, #5605]</b> New database tables
+	       	<ul>
+			<li>Confirm that a <b>FAMSession</b> table exists in the database.
+			<li>Confirm that a <b>SaveFAMSessionHistory</b> row exists in the 
+			<b>DBInfo</b> table.
+			<li>Confirm that the <b>SaveFAMSessionHistory</b> default is <b>1</b>.
+	  	   	<LI>Confirm that <b>FAMSession</b> records with start and stop times 
+			are added for each FAM instance.
+	  	   	<LI>Confirm that <b>FAMSession</b> records are not added for 
+			<b>SaveFAMSessionHistory = 0</b>.
+<p>
+			<li>Confirm that an <b>InputEvent</b> table exists in the database.
+			<li>Confirm that an <b>EnableInputEventTracking</b> row exists in the 
+			<b>DBInfo</b> table.
+			<li>Confirm that an <b>InputEventHistorySize</b> row exists in the 
+			<b>DBInfo</b> table.
+			<li>Confirm that the <b>EnableInputEventTracking</b> default is 
+			<b>1</b>.
+			<li>Confirm that the <b>InputEventHistorySize</b> default is 
+			<b>30</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5579, #5580]</b> Apply Bates number
+	       	<ul>
+	  	   	<LI>Prepare an FPS file to act on a database without any defined counters.
+	      		<li>Create an <b>Apply Bates number</b> task.
+	  	   	<LI>Confirm that the property page is displayed correctly even without 
+			a counter.
+<p>
+			<li>Define some counters in the database.
+			<li>Confirm that the couter drop-down list in the <b>Apply Bates number</b> 
+			task does not allow editing.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5581, #5586]</b> PDF/A conversion
+	       	<ul>
+	  	   	<LI>Prepare a large set of images for <b>PDF/A conversion</b>.
+			<li>Exercise the set.
+			<li>Confirm that no error windows appear that force one or more processing 
+			threads to be idle.
+			<li>Examine the UEX log to see if any <b>ELI28833: Convert to PDF task was 
+			killed.</b> messages were logged.
+			<li>Examine the UEX log to see if any <b>ELI28853: Application Trace: Opened 
+			file after retrying.</b> messages were logged.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5588, #5589, #5601]</b> Image format converter
+	       	<ul>
+	  	   	<LI>Confirm that ImageFormatConverter.exe requires a <b>FLEX Index / ID 
+			Shield Core</b> license in order to convert a TIF file to a TIF file.
+	  	   	<LI>Confirm that ImageFormatConverter.exe will create the output folder 
+			if it does not exist.
+			<li>Exercise the <b>ImageFormatConverter</b> testing checklist.  Confirm 
+			expected behavior.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5599]</b> PDF/A conversion
+	       	<ul>
+	      		<li>Create a set of images for PDF/A conversion testing.  Include several 
+			images that are too big to OCR.
+	  	   	<LI>Confirm that the unusually large images gracefully fail processing.
+			<li>Confirm that the normal images are processed and converted correctly.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
