@@ -646,7 +646,7 @@ STDMETHODIMP CLaunchAppFileProcessor::get_PropagateErrors(VARIANT_BOOL* pbVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28795", pbVal != NULL);
+		ASSERT_ARGUMENT("ELI28973", pbVal != NULL);
 
 		*pbVal = asVariantBool(m_bPropagateErrors);
 

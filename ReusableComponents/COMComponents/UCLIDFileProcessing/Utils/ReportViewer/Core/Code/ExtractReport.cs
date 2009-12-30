@@ -436,7 +436,7 @@ namespace Extract.ReportViewer
                     if (date != null)
                     {
                         numberOfParametersSet += SetParameterValues(reportParameters,
-                            date.ParameterName, date);
+                            date.ParameterName, date.ParameterValue);
                         continue;
                     }
 

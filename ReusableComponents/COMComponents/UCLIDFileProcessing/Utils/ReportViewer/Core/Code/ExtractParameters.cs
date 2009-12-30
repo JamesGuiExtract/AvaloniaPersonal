@@ -331,7 +331,7 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="name">The name of the parameter.</param>
         public DateParameter(string name)
-            : base(name)
+            : this(name, DateTime.Now)
         {
         }
 

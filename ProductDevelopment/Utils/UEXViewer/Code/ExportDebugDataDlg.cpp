@@ -171,7 +171,7 @@ void CExportDebugDataDlg::OnBnClickedButtonBrowse()
 			UpdateData(FALSE);
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10915");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28971");
 }
 //-------------------------------------------------------------------------------------------------
 void CExportDebugDataDlg::OnBnClickedCheckNarrowScope()

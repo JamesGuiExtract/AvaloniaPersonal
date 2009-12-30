@@ -202,7 +202,7 @@ namespace Extract.Drawing
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI26492", ex);
+                throw ExtractException.AsExtractException("ELI28972", ex);
             }
         }
 
