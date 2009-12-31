@@ -123,9 +123,9 @@ public:
 	STDMETHOD(GetActionID)(/*[in]*/ BSTR bstrActionName, /*[out, retval]*/ long* pnActionID);
 	STDMETHOD(ResetDBConnection)(void);
 	STDMETHOD(SetNotificationUIWndHandle)(long nHandle);
-	STDMETHOD(ShowAdminLogin)(VARIANT_BOOL* pbLoginCancelled, VARIANT_BOOL* pbLoginValid);
+	STDMETHOD(ShowLogin)(VARIANT_BOOL bShowAdmin, VARIANT_BOOL* pbLoginCancelled, VARIANT_BOOL* pbLoginValid);
 	STDMETHOD(get_DBSchemaVersion)(LONG* pVal);
-	STDMETHOD(ChangeAdminLogin)(VARIANT_BOOL* pbChangeCancelled, VARIANT_BOOL* pbChangeValid);
+	STDMETHOD(ChangeLogin)(VARIANT_BOOL bChangeAdmin, VARIANT_BOOL* pbChangeCancelled, VARIANT_BOOL* pbChangeValid);
 	STDMETHOD(GetCurrentConnectionStatus)(BSTR* pVal);
 	STDMETHOD(get_DatabaseServer)(BSTR* pVal);
 	STDMETHOD(put_DatabaseServer)(BSTR newVal);
@@ -431,14 +431,15 @@ private:
 	// unlocks db using the connection provided.
 	void unlockDB(ADODB::_ConnectionPtr ipConnection );
 
-	// Looks up the username: admin in the Login table
-	// if no record return empty string
-	// if there is a record returns the stored password
-	string getEncryptedAdminPWFromDB();
+	// Looks up the current username in the Login table if bUseAdmin is false
+	// and looks up the admin username if bUseAdmin is true
+	// if no record rstrEncrypted is an empty string and the return value is false
+	// if there is a record returns the stored password and the return value is true;
+	bool getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseAdmin);
 
 	// Encrypts the provided user name + password string
 	// and stores the result in the Login table
-	void encryptAndStoreUserNamePassword(const string strUserNameAndPassword);
+	void encryptAndStoreUserNamePassword(const string strUserNameAndPassword, bool bUseAdmin);
 
 	// Returns the result of encrypting the input string
 	string getEncryptedString(const string strInput);
@@ -450,7 +451,7 @@ private:
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr getThisAsCOMPtr();
 
 	// Checks the strPassword value agains the password from the database
-	bool isAdminPasswordValid(const string& strPassword);
+	bool isPasswordValid(const string& strPassword, bool bUseAdmin);
 
 	// Checks for blank database and if it is blank will clear the database to set it up
 	void initializeIfBlankDB();

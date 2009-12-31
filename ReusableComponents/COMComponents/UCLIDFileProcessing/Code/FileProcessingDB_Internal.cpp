@@ -16,6 +16,7 @@
 #include <ADOUtils.h>
 #include <StopWatch.h>
 #include <StringTokenizer.h>
+#include <stringCSIS.h>
 
 #include <string>
 #include <memory>
@@ -1061,6 +1062,11 @@ void CFileProcessingDB::initializeTableValues()
 			+ "', '30')";
 		vecQueries.push_back(strSQL);
 
+		// Add RequireAuthenticationBeforeRun setting (default to false)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_AUTHENTICATION_BEFORE_RUN
+			+ "', '0')";
+		vecQueries.push_back(strSQL);
+
 		// Execute all of the queries
 		executeVectorOfSQL( getDBConnection(), vecQueries);
 	}
@@ -1626,7 +1632,7 @@ void CFileProcessingDB::unlockDB(ADODB::_ConnectionPtr ipConnection)
 	m_bDBLocked = false;
 }
 //--------------------------------------------------------------------------------------------------
-string CFileProcessingDB::getEncryptedAdminPWFromDB()
+bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseAdmin)
 {
 	// Open the Login Table
 	// Lock the mutex for this instance
@@ -1636,29 +1642,33 @@ string CFileProcessingDB::getEncryptedAdminPWFromDB()
 	_RecordsetPtr ipLoginSet( __uuidof( Recordset ));
 	ASSERT_RESOURCE_ALLOCATION("ELI15103", ipLoginSet != NULL );
 
-	// setup the SQL Query.  Currently the only user that is allowed is 'admin'
-	string strSQL = "SELECT * FROM LOGIN WHERE UserName = '" + gstrADMIN_USER + "'";
+	// setup the SQL Query to get the encrypted combo for admin or user
+	string strSQL = "SELECT * FROM LOGIN WHERE UserName = '" + 
+		((bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName) + "'";
 
-	// Open the Action set for Action name 
+	// Open the set for the user being logged in
 	ipLoginSet->Open( strSQL.c_str(), _variant_t((IDispatch *)getDBConnection(), true), 
 		adOpenStatic, adLockReadOnly, adCmdText );
 
-	// admin user was in the DB if not at the end of file
+	// user was in the DB if not at the end of file
 	if ( ipLoginSet->adoEOF == VARIANT_FALSE )
 	{
 		// Return the encrypted password that is stored in the DB
-		string strEncryptedPW = getStringField( ipLoginSet->Fields, "Password" );
-		return strEncryptedPW;
+		rstrEncryptedPW = getStringField( ipLoginSet->Fields, "Password" );
+		return true;
 	}
 
-	// Was not in the DB
-	return "";
+	// record not found in DB for user or admin
+	rstrEncryptedPW = "";
+	return false;
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserNameAndPassword)
+void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserNameAndPassword, bool bUseAdmin)
 {
 	// Get the encrypted version of the combined string
 	string strEncryptedCombined = getEncryptedString( strUserNameAndPassword );
+
+	string strUser = bUseAdmin ? gstrADMIN_USER : m_strFAMUserName;
 
 	// Lock the mutex for this instance
 	CSingleLock lock( &m_mutex, TRUE );
@@ -1670,8 +1680,8 @@ void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserName
 	// Begin Transaction
 	TransactionGuard tg( getDBConnection() );
 
-	// Retrieve records from Login table.  Currently the only user that is allowed is 'admin'
-	string strSQL = "SELECT * FROM LOGIN WHERE UserName = '" + gstrADMIN_USER + "'";
+	// Retrieve records from Login table for the admin or current user
+	string strSQL = "SELECT * FROM LOGIN WHERE UserName = '" + strUser + "'";
 	ipLoginSet->Open( strSQL.c_str(), _variant_t((IDispatch *)getDBConnection(), true), 
 		adOpenDynamic, adLockPessimistic, adCmdText );
 
@@ -1682,7 +1692,7 @@ void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserName
 		ipLoginSet->AddNew();
 
 		// Set the UserName field
-		setStringField( ipLoginSet->Fields, "UserName", gstrADMIN_USER );
+		setStringField( ipLoginSet->Fields, "UserName", strUser );
 	}
 
 	// Update the password field
@@ -1779,13 +1789,20 @@ void CFileProcessingDB::setFieldsFromFileRecord(const ADODB::FieldsPtr& ipFields
 	}
 }
 //--------------------------------------------------------------------------------------------------
-bool  CFileProcessingDB::isAdminPasswordValid(const string& strPassword)
+bool  CFileProcessingDB::isPasswordValid(const string& strPassword, bool bUseAdmin)
 {
+	// Set the user to validate
+	string  strUser = bUseAdmin ? gstrADMIN_USER : m_strFAMUserName;
+	
 	// Make combined string for comparison
-	string strCombined = gstrADMIN_USER + strPassword;
-
+	string strCombined = strUser + strPassword;
+	
 	// Get the stored password ( if it exists)
-	string strStoredEncryptedCombined = getEncryptedAdminPWFromDB();
+	string strStoredEncryptedCombined;
+	getEncryptedPWFromDB(strStoredEncryptedCombined, bUseAdmin);
+
+
+	// Check for no password
 	if (strStoredEncryptedCombined.empty())
 	{
 		// if there is no stored password then strPassword should be emtpy
@@ -1808,14 +1825,16 @@ bool  CFileProcessingDB::isAdminPasswordValid(const string& strPassword)
 	string strDecryptedCombined = "";
 	bsm >> strDecryptedCombined;
 
-	// Successful login if decrypted matches the entered
-	if( strDecryptedCombined == strCombined )
-	{
-		return true;
-	}
+	// Since the username is not case sensitive and the password is, will need to separate them
 
-	// Password is not valid
-	return false;
+	// Extract the user from the decrypted username password combination using the expected
+	// username length
+	int iUserNameSize = strUser.length();
+
+	// Successful login if decrypted user matches the expected and the decrypted password matches 
+	// the expected password
+	return (stringCSIS::sEqual(strUser, strDecryptedCombined.substr(0, iUserNameSize)) &&
+		strDecryptedCombined.substr(iUserNameSize) == strCombined.substr(iUserNameSize));
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::initializeIfBlankDB()

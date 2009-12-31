@@ -77,7 +77,7 @@ static const string gstrCREATE_QUEUE_EVENT_TABLE = "CREATE TABLE [QueueEvent]("
 static const string gstrCREATE_LOGIN_TABLE = "CREATE TABLE [Login]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[UserName] [nvarchar](50) NOT NULL, "
-	"[Password] [nvarchar](128) NOT NULL, "
+	"[Password] [nvarchar](128) NOT NULL DEFAULT(''), "
 	"CONSTRAINT [PK_LoginID] PRIMARY KEY CLUSTERED ( [ID] ASC ))";
 
 static const string gstrCREATE_MACHINE_TABLE = "CREATE TABLE [Machine]("

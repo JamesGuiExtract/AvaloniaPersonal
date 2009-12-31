@@ -181,7 +181,7 @@ void SelectDBDialog::OnOK()
 				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18162");
 
 				// Attempt login
-				bLoginValid = m_ipFAMDB->ShowAdminLogin(&bLoginCanceled);
+				bLoginValid = m_ipFAMDB->ShowLogin(VARIANT_TRUE, &bLoginCanceled);
 
 				// If login is valid show Admin dialog
 				if (asCppBool(bLoginValid))

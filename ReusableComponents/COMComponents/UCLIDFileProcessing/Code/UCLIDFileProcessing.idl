@@ -693,19 +693,21 @@ library UCLID_FILEPROCESSINGLib
 		//			to the window represented by the handle nHandle
 		[id(27), helpstring("method SetNotificationUIWndHandle")] HRESULT SetNotificationUIWndHandle(long nHandle);
 
-		// PROMISE: To prompt the user for a Username and password if the admin password is in the DB Login table
+		// PROMISE: To prompt the user for a Username and password if the password is in the DB Login table
 		//			and compare the encrypted Username + password combination to the saved password.
-		//			if no password is in the Login table will display password dialog to get the new admin password
+		//			if no password is in the Login table will display password dialog to get the new password
 		//			and will encrypt the Username + password and save in the database
-		[id(28), helpstring("method ShowAdminLogin")] HRESULT ShowAdminLogin([out] VARIANT_BOOL* pbLoginCancelled, 
+		[id(28), helpstring("method ShowLogin")] HRESULT ShowLogin([in] VARIANT_BOOL bShowAdmin, 
+			[out] VARIANT_BOOL* pbLoginCancelled, 
 			[out,retval] VARIANT_BOOL* pbLoginValid);
 
 		// PROMISE: To return the DBSchemaVersion from the DBInfoTable
 		[propget, id(29), helpstring("property DBSchemaVersion")] HRESULT DBSchemaVersion([out, retval] LONG* pVal);
 
-		// PROMISE: To prompt the user for a new admin password.  The encrypted Username + password 
+		// PROMISE: To prompt the user for a new password.  The encrypted Username + password 
 		//			will be saved in the database.
-		[id(30), helpstring("method ChangeAdminLogin")] HRESULT ChangeAdminLogin([out] VARIANT_BOOL* pbLoginCancelled, 
+		[id(30), helpstring("method ChangeLogin")] HRESULT ChangeLogin([in] VARIANT_BOOL bChangeAdmin,
+			[out] VARIANT_BOOL* pbLoginCancelled, 
 			[out,retval] VARIANT_BOOL* pbLoginValid);
 
 		// PROMISE: To get and put the database configuration filename

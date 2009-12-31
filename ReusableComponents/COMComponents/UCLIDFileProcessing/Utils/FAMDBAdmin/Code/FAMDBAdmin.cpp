@@ -120,7 +120,7 @@ BOOL CFAMDBAdminApp::InitInstance()
 				VARIANT_BOOL bLoginValid = VARIANT_FALSE;
 
 				// Attempt to login to the database
-				bLoginValid = ipFAMDB->ShowAdminLogin(&bLoginCanceled);
+				bLoginValid = ipFAMDB->ShowLogin(VARIANT_TRUE, &bLoginCanceled);
 
 				if (asCppBool(bLoginValid))
 				{

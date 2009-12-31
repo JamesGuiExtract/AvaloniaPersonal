@@ -375,7 +375,7 @@ void CFAMDBAdminDlg::OnDatabaseChangePassword()
 	{
 		// Display the Change Login dialog - passing in a 'cancelled' parameter
 		VARIANT_BOOL vbCancelled = VARIANT_FALSE;
-		if ( m_ipFAMDB->ChangeAdminLogin( &vbCancelled ) == VARIANT_TRUE )
+		if ( m_ipFAMDB->ChangeLogin(VARIANT_TRUE, &vbCancelled ) == VARIANT_TRUE )
 		{
 			MessageBox("Changed password successfully.", "Success", MB_OK | MB_ICONINFORMATION);
 

@@ -1807,7 +1807,7 @@ STDMETHODIMP CFileProcessingDB::SetNotificationUIWndHandle(long nHandle)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::ShowAdminLogin(VARIANT_BOOL* pbLoginCancelled, 
+STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL* pbLoginCancelled, 
 											   VARIANT_BOOL* pbLoginValid)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -1817,8 +1817,12 @@ STDMETHODIMP CFileProcessingDB::ShowAdminLogin(VARIANT_BOOL* pbLoginCancelled,
 		ASSERT_ARGUMENT("ELI20471", pbLoginCancelled != NULL);
 		ASSERT_ARGUMENT("ELI20472", pbLoginValid != NULL);
 
-		// Initialize to no new password
-		bool bNewPassword = false;
+		// Convert bShowAdmin parameter to cpp bool for later use
+		bool bUseAdmin  = asCppBool(bShowAdmin);
+		string strUser = (bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName;
+		
+		// Set the user password
+		string strCaption = "Set " + m_strFAMUserName + "'s Password";
 
 		// Set login valid and cancelled to false
 		*pbLoginValid = VARIANT_FALSE;
@@ -1828,11 +1832,13 @@ STDMETHODIMP CFileProcessingDB::ShowAdminLogin(VARIANT_BOOL* pbLoginCancelled,
 		initializeIfBlankDB();
 
 		// Get the stored password ( if it exists)
-		string strStoredEncryptedCombined = getEncryptedAdminPWFromDB();
+		string strStoredEncryptedCombined;
+		bool bUserExists = getEncryptedPWFromDB(strStoredEncryptedCombined, bUseAdmin);
 
 		// if there is no password will need to get the new password
-		if ( strStoredEncryptedCombined == "" )
+		if ( strStoredEncryptedCombined == "" && bUseAdmin)
 		{
+			// Set the admin password
 			// default to using the desktop as the parent for the messagebox below
 			HWND hParent = getAppMainWndHandle();
 
@@ -1846,8 +1852,23 @@ STDMETHODIMP CFileProcessingDB::ShowAdminLogin(VARIANT_BOOL* pbLoginCancelled,
 				"commands such as removing rows in tables, or emptying out the entire database.\r\n\r\n"
 				"Click OK to continue to the next screen where you will be prompted to set the "
 				"admin password.", "Set Admin Password", MB_ICONINFORMATION | MB_APPLMODAL);
+		}
+		else if (!bUserExists)
+		{
+			// default to using the desktop as the parent for the messagebox below
+			HWND hParent = getAppMainWndHandle();
 
-			PasswordDlg dlgPW("Set Admin Password");
+			::MessageBox(hParent, "The system is not configured to allow you to perform this operation.\r\n"
+				"Please contact the administrator of this product for further assistance.", "Unable to Login", MB_OK);
+			*pbLoginValid = VARIANT_FALSE;
+			*pbLoginCancelled = VARIANT_TRUE;
+			return S_OK;
+		}
+
+		// If no password set then set a password
+		if (strStoredEncryptedCombined == "")
+		{
+			PasswordDlg dlgPW(strCaption);
 			if ( dlgPW.DoModal() != IDOK )
 			{
 				// Did not fill in and ok dlg so there is no login
@@ -1857,18 +1878,17 @@ STDMETHODIMP CFileProcessingDB::ShowAdminLogin(VARIANT_BOOL* pbLoginCancelled,
 			}
 
 			// Update password in database Login table
-			bNewPassword = true;
 			string strPassword = dlgPW.m_zNewPassword;
-			string strCombined = gstrADMIN_USER + strPassword;
-			encryptAndStoreUserNamePassword( strCombined );
+			string strCombined = strUser + strPassword;
+			encryptAndStoreUserNamePassword(strCombined, bUseAdmin);
 
 			// Just added password to the db so it is valid
 			*pbLoginValid = VARIANT_TRUE;
 			return S_OK;
 		}
 
-		// Set read-only user name to "admin" (P13 #4112)
-		CLoginDlg dlgLogin( "Login", gstrADMIN_USER, true );
+		// Set read-only user name to "admin" (P13 #4112) or user's name
+		CLoginDlg dlgLogin( "Login", (bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName , true );
 		if ( dlgLogin.DoModal() != IDOK )
 		{
 			// The OK button on the login dialog was not pressed so do not login
@@ -1878,7 +1898,7 @@ STDMETHODIMP CFileProcessingDB::ShowAdminLogin(VARIANT_BOOL* pbLoginCancelled,
 		}
 
 		// Validate password
-		*pbLoginValid = asVariantBool(isAdminPasswordValid(string(dlgLogin.m_zPassword)));
+		*pbLoginValid = asVariantBool(isPasswordValid(string(dlgLogin.m_zPassword), bUseAdmin));
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15099");
 
@@ -1901,7 +1921,7 @@ STDMETHODIMP CFileProcessingDB::get_DBSchemaVersion(LONG* pVal)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::ChangeAdminLogin(VARIANT_BOOL* pbChangeCancelled, 
+STDMETHODIMP CFileProcessingDB::ChangeLogin(VARIANT_BOOL bChangeAdmin, VARIANT_BOOL* pbChangeCancelled, 
 												 VARIANT_BOOL* pbChangeValid)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -1912,8 +1932,12 @@ STDMETHODIMP CFileProcessingDB::ChangeAdminLogin(VARIANT_BOOL* pbChangeCancelled
 		*pbChangeValid = VARIANT_FALSE;
 		*pbChangeCancelled = VARIANT_FALSE;
 
+		bool bUseAdmin = asCppBool(bChangeAdmin);
+
 		// Get and check the stored password
-		string strStoredEncryptedCombined = getEncryptedAdminPWFromDB();
+		string strStoredEncryptedCombined;
+		getEncryptedPWFromDB(strStoredEncryptedCombined, asCppBool(bChangeAdmin));
+
 		if (strStoredEncryptedCombined == "")
 		{
 			// Create and throw exception
@@ -1922,8 +1946,12 @@ STDMETHODIMP CFileProcessingDB::ChangeAdminLogin(VARIANT_BOOL* pbChangeCancelled
 		}
 
 		bool bPasswordValid = false;
+		string strUser = bUseAdmin ? gstrADMIN_USER : m_strFAMUserName;
+		string strPasswordDlgCaption = "Change " + strUser + " Password";
+		
 		// Display Change Password dialog
-		ChangePasswordDlg dlgPW("Change Admin Password");
+
+		ChangePasswordDlg dlgPW(strPasswordDlgCaption);
 		do
 		{
 			if ( dlgPW.DoModal() != IDOK )
@@ -1933,7 +1961,7 @@ STDMETHODIMP CFileProcessingDB::ChangeAdminLogin(VARIANT_BOOL* pbChangeCancelled
 				*pbChangeCancelled = VARIANT_TRUE;
 				return S_OK;
 			}
-			bPasswordValid = isAdminPasswordValid(string(dlgPW.m_zOldPassword));
+			bPasswordValid = isPasswordValid(string(dlgPW.m_zOldPassword), bUseAdmin);
 			
 			// If the password is not valid display a dialog
 			if (!bPasswordValid)
@@ -1948,8 +1976,8 @@ STDMETHODIMP CFileProcessingDB::ChangeAdminLogin(VARIANT_BOOL* pbChangeCancelled
 
 		// Encrypt and store the user name and password in the Login table
 		string strPassword = dlgPW.m_zNewPassword;
-		string strCombined = gstrADMIN_USER + strPassword;
-		encryptAndStoreUserNamePassword( strCombined );
+		string strCombined = strUser + strPassword;
+		encryptAndStoreUserNamePassword(strCombined, bUseAdmin);
 
 		// Just added the new password to the db so it is valid
 		*pbChangeValid = VARIANT_TRUE;

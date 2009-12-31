@@ -374,6 +374,23 @@ void FileProcessingDlg::OnBtnRun()
 			ipFPM->SaveTo(get_bstr_t(m_pFRM->getRecoveryFileName().c_str()),
 				VARIANT_FALSE);
 		}
+		
+		string strInfoSetting = getDBPointer()->GetDBInfoSetting(gstrREQUIRE_AUTHENTICATION_BEFORE_RUN.c_str());
+		// Check if a login is required before running
+		if ( strInfoSetting == "1")
+		{
+			VARIANT_BOOL vbCancelled;
+			
+			// Need to login
+			if (!asCppBool(getDBPointer()->ShowLogin(VARIANT_FALSE, &vbCancelled)))
+			{
+				if (!asCppBool(vbCancelled))
+				{
+					MessageBox("Incorrect password", "Invalid Login", MB_OK);
+				}
+				return;
+			}
+		}
 
 		// Get the index of the Queue log, process log and statistics page
 		int iQueueLogIndex = m_propSheet.GetPageIndex(&m_propQueueLogPage);
@@ -391,15 +408,15 @@ void FileProcessingDlg::OnBtnRun()
 		// Check if authentication is needed for processing skipped files [LRCAU #5413]
 		if (ipFPM->IsDBPasswordRequired == VARIANT_TRUE)
 		{
-			// Show the DB login prompt (if password is required)
+			// Show the DB login prompt (if password is required) for admin
 			VARIANT_BOOL vbCancelled;
-			if (getDBPointer()->ShowAdminLogin(&vbCancelled) == VARIANT_FALSE)
+			if (getDBPointer()->ShowLogin(VARIANT_TRUE, &vbCancelled) == VARIANT_FALSE)
 			{
 				// Check if the user cancelled, only warn about invalid password
 				// if they didn't cancel [LRCAU #5419]
 				if (vbCancelled == VARIANT_FALSE)
 				{
-					MessageBox("Invalid password! Cannot process skipped files for all users!",
+					MessageBox("Invalid password. Cannot process skipped files for all users.",
 						"Authentication Failed", MB_OK | MB_ICONERROR);
 				}
 				return;
