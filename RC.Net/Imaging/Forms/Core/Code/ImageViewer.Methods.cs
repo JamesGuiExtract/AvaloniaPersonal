@@ -368,7 +368,7 @@ namespace Extract.Imaging.Forms
         /// <exception cref="ExtractException">If there is no currently open image.</exception>
         /// <returns><see langword="true"/> If the image was closed; <see langword="false"/>
         /// if the closing event was canceled.</returns>
-        private bool CloseImage(bool raiseImageFileChangedEvent)
+        bool CloseImage(bool raiseImageFileChangedEvent)
         {
             try
             {
@@ -583,7 +583,7 @@ namespace Extract.Imaging.Forms
         /// Gets a command to convert an image to 16 bpp.
         /// </summary>
         /// <returns>A command to convert an image to 16 bpp.</returns>
-        private static ColorResolutionCommand GetSixteenBppConverter()
+        static ColorResolutionCommand GetSixteenBppConverter()
         {
             ColorResolutionCommand command = new ColorResolutionCommand();
             command.BitsPerPixel = 16;
@@ -686,53 +686,46 @@ namespace Extract.Imaging.Forms
                 Rectangle imageArea = PhysicalViewRectangle;
                 int deltaX = tileArea.Left - imageArea.Left;
 
-                // Suspend paint events until the next tile is shown
-                base.BeginUpdate();
-                try
+                // Check if the edge of the image has been reached
+                if (deltaX < _TILE_EDGE_DISTANCE)
                 {
-                    // Check if the edge of the image has been reached
-                    if (deltaX < _TILE_EDGE_DISTANCE)
+                    // Determine the distance in physical (client) coordinates between
+                    // the top of the viewing tile and the top of the image.
+                    int deltaY = tileArea.Top - imageArea.Top;
+
+                    // Check if the top of the page has been reached
+                    if (deltaY < _TILE_EDGE_DISTANCE)
                     {
-                        // Determine the distance in physical (client) coordinates between
-                        // the top of the viewing tile and the top of the image.
-                        int deltaY = tileArea.Top - imageArea.Top;
-
-                        // Check if the top of the page has been reached
-                        if (deltaY < _TILE_EDGE_DISTANCE)
+                        // Ensure this is not the first tile
+                        if (_pageNumber == 1)
                         {
-                            // Ensure this is not the first tile
-                            if (_pageNumber == 1)
-                            {
-                                throw new ExtractException("ELI21855",
-                                    "Cannot move before first tile.");
-                            }
-
-                            // Go to the previous page
-                            SetPageNumber(_pageNumber - 1, false, true);
-
-                            // Move the tile area to the bottom right of new page
-                            imageArea = PhysicalViewRectangle;
-                            tileArea.Offset(imageArea.Right, imageArea.Bottom);
+                            throw new ExtractException("ELI21855",
+                                "Cannot move before first tile.");
                         }
-                        else
-                        {
-                            // Move the tile to the previous row of tiles
-                            tileArea.Offset(imageArea.Right, -Math.Min(tileArea.Height, deltaY));
-                        }
+
+                        // Go to the previous page, preserving the scale factor
+                        double scaleFactor = ScaleFactor;
+                        SetPageNumber(_pageNumber - 1, false, true);
+                        ScaleFactor = scaleFactor;
+
+                        // Move the tile area to the bottom right of new page
+                        imageArea = PhysicalViewRectangle;
+                        tileArea.Offset(imageArea.Right, imageArea.Bottom);
                     }
                     else
                     {
-                        // Move the tile horizontally to the previous area
-                        tileArea.Offset(-Math.Min(tileArea.Width, deltaX), 0);
+                        // Move the tile to the previous row of tiles
+                        tileArea.Offset(imageArea.Right, -Math.Min(tileArea.Height, deltaY));
                     }
-
-                    // Move to the next tile, add to the zoom history, and raise ZoomChanged event
-                    ZoomToRectangle(tileArea, true, true, false);
                 }
-                finally
+                else
                 {
-                    base.EndUpdate();
+                    // Move the tile horizontally to the previous area
+                    tileArea.Offset(-Math.Min(tileArea.Width, deltaX), 0);
                 }
+
+                // Move to the next tile, add to the zoom history, and raise ZoomChanged event
+                ZoomToRectangle(tileArea, true, true, false);
             }
             catch (Exception ex)
             {
@@ -767,52 +760,45 @@ namespace Extract.Imaging.Forms
                 Rectangle imageArea = PhysicalViewRectangle;
                 int deltaX = imageArea.Right - tileArea.Right;
 
-                // Suspend paint events until the next tile is shown
-                base.BeginUpdate();
-                try
+                // Check if the edge of the image has been reached
+                if (deltaX < _TILE_EDGE_DISTANCE)
                 {
-                    // Check if the edge of the image has been reached
-                    if (deltaX < _TILE_EDGE_DISTANCE)
+                    // Determine the distance in physical (client) coordinates between
+                    // the bottom of the viewing tile and the bottom of the image.
+                    int deltaY = imageArea.Bottom - tileArea.Bottom;
+
+                    // Check if the bottom of the page has been reached
+                    if (deltaY < _TILE_EDGE_DISTANCE)
                     {
-                        // Determine the distance in physical (client) coordinates between
-                        // the bottom of the viewing tile and the bottom of the image.
-                        int deltaY = imageArea.Bottom - tileArea.Bottom;
-
-                        // Check if the bottom of the page has been reached
-                        if (deltaY < _TILE_EDGE_DISTANCE)
+                        // Ensure this is not the last tile
+                        if (_pageNumber == _pageCount)
                         {
-                            // Ensure this is not the last tile
-                            if (_pageNumber == _pageCount)
-                            {
-                                throw new ExtractException("ELI21846",
-                                    "Cannot advance past last tile.");
-                            }
-
-                            // Go to the next page
-                            SetPageNumber(_pageNumber + 1, false, true);
-
-                            // Move the tile area to the top-left of the new page
-                            tileArea.Offset(PhysicalViewRectangle.Location);
+                            throw new ExtractException("ELI21846",
+                                "Cannot advance past last tile.");
                         }
-                        else
-                        {
-                            // Move the tile to the next row of tiles
-                            tileArea.Offset(imageArea.Left, Math.Min(tileArea.Height, deltaY));
-                        }
+
+                        // Go to the next page, preserving the scale factor
+                        double scaleFactor = ScaleFactor;
+                        SetPageNumber(_pageNumber + 1, false, true);
+                        ScaleFactor = scaleFactor;
+
+                        // Move the tile area to the top-left of the new page
+                        tileArea.Offset(PhysicalViewRectangle.Location);
                     }
                     else
                     {
-                        // Move the tile horizontally to the next area
-                        tileArea.Offset(Math.Min(tileArea.Width, deltaX), 0);
+                        // Move the tile to the next row of tiles
+                        tileArea.Offset(imageArea.Left, Math.Min(tileArea.Height, deltaY));
                     }
-
-                    // Move to the next tile, add to the zoom history, and raise ZoomChanged event
-                    ZoomToRectangle(tileArea, true, true, false);
                 }
-                finally
+                else
                 {
-                    base.EndUpdate();
+                    // Move the tile horizontally to the next area
+                    tileArea.Offset(Math.Min(tileArea.Width, deltaX), 0);
                 }
+
+                // Move to the next tile, add to the zoom history, and raise ZoomChanged event
+                ZoomToRectangle(tileArea, true, true, false);
             }
             catch (Exception ex)
             {
@@ -1046,7 +1032,7 @@ namespace Extract.Imaging.Forms
         /// <param name="viewRectangle">The <see cref="Rectangle"/> to enlarge.</param>
         /// <returns>A padded version of the specified rectangle that has had space
         /// added to account for link arrows.</returns>
-        private Rectangle PadViewingRectangle(Rectangle viewRectangle)
+        Rectangle PadViewingRectangle(Rectangle viewRectangle)
         {
             return PadViewingRectangle(viewRectangle, _ZOOM_TO_OBJECT_WIDTH_PADDING,
                 _ZOOM_TO_OBJECT_HEIGHT_PADDING, false);
@@ -1123,7 +1109,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <returns>The next visible <see cref="LayerObject"/> that can be navigated
         /// to if there is one, otherwise <see langword="null"/>.</returns>
-        private LayerObject GetNextVisibleLayerObject()
+        LayerObject GetNextVisibleLayerObject()
         {
             // Default return value to null
             LayerObject returnObject = null;
@@ -1143,7 +1129,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <returns>The previous visible <see cref="LayerObject"/> that can be navigated
         /// to if there is one, otherwise <see langword="null"/>.</returns>
-        private LayerObject GetPreviousVisibleLayerObject()
+        LayerObject GetPreviousVisibleLayerObject()
         {
             // Default return value to null
             LayerObject returnObject = null;
@@ -1164,7 +1150,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <returns>The index of the next <see cref="LayerObject"/> or -1 if there is no
         /// next <see cref="LayerObject"/></returns>
-        private int GetNextVisibleLayerObjectIndex()
+        int GetNextVisibleLayerObjectIndex()
         {
             // Default the return value to -1
             int nextIndex = -1;
@@ -1292,7 +1278,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <returns>The index of the previous <see cref="LayerObject"/> or -1 if there is no
         /// previous <see cref="LayerObject"/></returns>
-        private int GetPreviousVisibleLayerObjectIndex()
+        int GetPreviousVisibleLayerObjectIndex()
         {
             // Default the return value to -1
             int previousIndex = -1;
@@ -1452,7 +1438,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <event cref="ZoomChanged">The method is successful.</event>
         /// <exception cref="ExtractException">No image is open.</exception>
-        private void Zoom(bool zoomIn)
+        void Zoom(bool zoomIn)
         {
             // Ensure an image is open.
             ExtractException.Assert("ELI21434", "No image is open.", base.Image != null);
@@ -1465,7 +1451,7 @@ namespace Extract.Imaging.Forms
                 if (_fitMode != FitMode.None)
                 {
                     // Set the fit mode without updating the zoom
-                    SetFitMode(FitMode.None, false, false);
+                    SetFitMode(FitMode.None, false, false, true);
                 }
 
                 // Get the current zoom setting
@@ -1673,7 +1659,7 @@ namespace Extract.Imaging.Forms
         /// <param name="raiseDisplayingPrint">If <see langword="true"/> then
         /// will raise the <see cref="DisplayingPrintDialog"/> event.</param>
         /// <exception cref="ExtractException">No image is open.</exception>
-        private void Print(bool raiseDisplayingPrint)
+        void Print(bool raiseDisplayingPrint)
         {
             try
             {
@@ -1929,7 +1915,7 @@ namespace Extract.Imaging.Forms
         /// print preview.
         /// </summary>
         /// <returns>A <see cref="PrintDocument"/> object for this image.</returns>
-        private PrintDocument GetPrintDocument()
+        PrintDocument GetPrintDocument()
         {
             // Create the print document if not already created
             if (_printDocument == null)
@@ -1989,7 +1975,7 @@ namespace Extract.Imaging.Forms
         /// Instantiates <see cref="_printDialog"/> if it has not yet been created and updates its 
         /// printer settings.
         /// </summary>
-        private void UpdatePrintDialog()
+        void UpdatePrintDialog()
         {
             // Check if the print dialog has been created yet
             if (_printDialog == null)
@@ -2010,7 +1996,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">The event data associated with a <see cref="PrintDocument.PrintPage"/> 
         /// event.</param>
-        private void PrintPage(PrintPageEventArgs e)
+        void PrintPage(PrintPageEventArgs e)
         {
             // Get the margin bounds
             Rectangle marginBounds = e.MarginBounds;
@@ -2141,7 +2127,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <remarks>If the <see cref="_displayAnnotations"/> is <see langword="false"/>. 
         /// Annotations will be cleared and no annotations will be displayed.</remarks>
-        private void UpdateAnnotations()
+        void UpdateAnnotations()
         {
             // Dispose of the annotations if they exist
             if (_annotations != null)
@@ -2220,7 +2206,7 @@ namespace Extract.Imaging.Forms
         /// event should be raised; <see langword="false"/> if it should not.</param>
         /// <event cref="ZoomChanged"><paramref name="raiseZoomChanged"/> was 
         /// <see langword="true"/>.</event>
-        private void UpdateZoom(bool updateZoomHistory, bool raiseZoomChanged)
+        void UpdateZoom(bool updateZoomHistory, bool raiseZoomChanged)
         {
             // Get the current zoom setting
             ZoomInfo zoomInfo = GetZoomInfo();
@@ -2281,23 +2267,27 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 ExtractException.Assert("ELI21455", "No image is open.", base.Image != null);
 
-                // Suspend paint event until after zoom has changed
-                base.BeginUpdate();
-                try
+                // Change the fit mode if it is not fit mode none
+                if (updateFitMode && _fitMode != FitMode.None)
                 {
-                    // Change the fit mode if it is not fit mode none
-                    if (updateFitMode && _fitMode != FitMode.None)
-                    {
-                        // Set the fit mode to none without updating the zoom
-                        SetFitMode(FitMode.None, false, false);
-                    }
+                    // Set the fit mode to none without updating the zoom
+                    SetFitMode(FitMode.None, false, false, true);
+                }
+
+                // If in fit to page mode, the whole page is already in view. No need to zoom.
+                if (_fitMode != FitMode.FitToPage)
+                {
+                    // Preserve fit to width mode if necessary
+                    bool preserveFitToWidth = _fitMode == FitMode.FitToWidth;
 
                     // Zoom to the specified rectangle
                     base.ZoomToRectangle(rc);
-                }
-                finally
-                {
-                    base.EndUpdate();
+
+                    // Restore the fit to width mode
+                    if (preserveFitToWidth)
+                    {
+                        SetFitMode(FitMode.FitToWidth, false, false, false);
+                    }
                 }
 
                 // Update the zoom if necessary
@@ -2315,7 +2305,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
-        private void StartTracking(int mouseX, int mouseY)
+        void StartTracking(int mouseX, int mouseY)
         {
             // Tracking data should be null at this point, but if not dispose of it.
             if (_trackingData != null)
@@ -2533,7 +2523,7 @@ namespace Extract.Imaging.Forms
         /// <param name="previous"><see langword="true"/> to go to the previous link; 
         /// <see langword="false"/> to go the next link.</param>
         /// <param name="layerObject">The layer object that holds the link to go to.</param>
-        private void GoToLink(bool previous, LayerObject layerObject)
+        void GoToLink(bool previous, LayerObject layerObject)
         {
             // Get the current zoom info
             ZoomInfo zoomInfo = GetZoomInfo();
@@ -2603,7 +2593,7 @@ namespace Extract.Imaging.Forms
         /// </param>
         /// <returns>The left or right side of the specified layer object in physical (client) 
         /// coordinates.</returns>
-        private Point GetRelativeLinkPoint(bool left, LayerObject layerObject)
+        Point GetRelativeLinkPoint(bool left, LayerObject layerObject)
         {
             // Get the bounds of the layer object in physical (client) coordinates.
             Rectangle bounds = GetTransformedRectangle(layerObject.GetBounds(), false);
@@ -2623,7 +2613,7 @@ namespace Extract.Imaging.Forms
         // This method has undergone a security review.
         [SuppressMessage("Microsoft.Security", 
             "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
-        private void UpdateTracking(int mouseX, int mouseY)
+        void UpdateTracking(int mouseX, int mouseY)
         {
             // Update the tracking dependent upon the active cursor tool
             switch (_cursorTool)
@@ -2773,7 +2763,7 @@ namespace Extract.Imaging.Forms
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
         /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
         /// <see langword="false"/> if the event is to be completed.</param>
-        private void EndTracking(int mouseX, int mouseY, bool cancel)
+        void EndTracking(int mouseX, int mouseY, bool cancel)
         {
             try
             {
@@ -2846,7 +2836,7 @@ namespace Extract.Imaging.Forms
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
         /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
         /// <see langword="false"/> if the event is to be completed.</param>
-        private void EndSelectLayerObject(int mouseX, int mouseY, bool cancel)
+        void EndSelectLayerObject(int mouseX, int mouseY, bool cancel)
         {
             // Check if this is a click and drag to select multiple highlights
             if (!cancel && Cursor == Cursors.Default)
@@ -2963,7 +2953,7 @@ namespace Extract.Imaging.Forms
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
         /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
         /// <see langword="false"/> if the event is to be completed.</param>
-        private void EndAngularHighlightOrRedaction(int mouseX, int mouseY, bool cancel)
+        void EndAngularHighlightOrRedaction(int mouseX, int mouseY, bool cancel)
         {
             // Get a drawing surface for the interactive highlight
             using (Graphics graphics = CreateGraphics())
@@ -3451,7 +3441,7 @@ namespace Extract.Imaging.Forms
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
         /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
         /// <see langword="false"/> if the event is to be completed.</param>
-        private void EndDeleteLayerObjects(int mouseX, int mouseY, bool cancel)
+        void EndDeleteLayerObjects(int mouseX, int mouseY, bool cancel)
         {
             // Erase the previous frame if it exists
             Rectangle rectangle = _trackingData.Rectangle;
@@ -3515,7 +3505,7 @@ namespace Extract.Imaging.Forms
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
         /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
         /// <see langword="false"/> if the event is to be completed.</param>
-        private void EndRectangularHighlightOrRedaction(int mouseX, int mouseY, bool cancel)
+        void EndRectangularHighlightOrRedaction(int mouseX, int mouseY, bool cancel)
         {
             // Get a drawing surface for the interactive highlight
             using (Graphics graphics = CreateGraphics())
@@ -3584,7 +3574,7 @@ namespace Extract.Imaging.Forms
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
         /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
         /// <see langword="false"/> if the event is to be completed.</param>
-        private void EndSetHighlightHeight(int mouseX, int mouseY, bool cancel)
+        void EndSetHighlightHeight(int mouseX, int mouseY, bool cancel)
         {
             // Erase the previous line if it exists
             Point[] line = _trackingData.Line;
@@ -3630,7 +3620,7 @@ namespace Extract.Imaging.Forms
         /// <param name="reverseRotation"><see langword="true"/> if the matrix should be rotated 
         /// counterclockwise; <see langword="false"/> if the matrix should be rotated clockwise. 
         /// The orientation is specified in degrees clockwise.</param>
-        private Matrix GetRotatedMatrix(Matrix matrix, bool reverseRotation)
+        Matrix GetRotatedMatrix(Matrix matrix, bool reverseRotation)
         {
             // Return a copy of the original matrix if no image is open.
             if (base.Image == null)
@@ -3685,7 +3675,7 @@ namespace Extract.Imaging.Forms
         /// undefined.</para>
         /// </remarks>
         /// <returns>The current <see cref="ZoomInfo"/>.</returns>
-        private ZoomInfo GetZoomInfo()
+        ZoomInfo GetZoomInfo()
         {
             // Return the ZoomInfo
             return new ZoomInfo(GetVisibleImageCenter(), ScaleFactor, _fitMode);
@@ -3696,7 +3686,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <returns>The center of the visible image area in logical (image) coordinates.
         /// </returns>
-        private Point GetVisibleImageCenter()
+        Point GetVisibleImageCenter()
         {
             // Get the image area of the client in physical (client) coordinates.
             Rectangle imageArea = GetVisibleImageArea();
@@ -3799,50 +3789,42 @@ namespace Extract.Imaging.Forms
         /// </remarks>
         /// <param name="fitMode">The new fit mode.</param>
         /// <param name="updateZoomHistory"><see langword="true"/> if the zoom history should be 
-        /// updated if an image is open; <see langword="false"/> if it should not be updated at 
-        /// all.</param>
-        /// <param name="raiseZoomChanged"><see langword="true"/> if the see cref="ZoomChanged"/> 
+        /// updated if an image is open; <see langword="false"/> if it should not be updated.
+        /// </param>
+        /// <param name="raiseZoomChanged"><see langword="true"/> if the <see cref="ZoomChanged"/> 
         /// event should be raised if an image is open; <see langword="false"/> if it should not 
-        /// be raised at all.</param>
+        /// be raised.</param>
+        /// <param name="raiseFitModeChanged"><see langword="true"/> if the 
+        /// <see cref="FitModeChanged"/> event should be raised; <see langword="false"/> if it 
+        /// should not be raised.</param>
         /// <exception cref="ExtractException"><paramref name="fitMode"/> is invalid.</exception>
         /// <event cref="ZoomChanged"><paramref name="raiseZoomChanged"/> was 
         /// <see langword="true"/>.</event>
         /// <event cref="FitModeChanged">Method was successful.</event>
-        private void SetFitMode(FitMode fitMode, bool updateZoomHistory, bool raiseZoomChanged)
+        void SetFitMode(FitMode fitMode, bool updateZoomHistory, bool raiseZoomChanged, 
+            bool raiseFitModeChanged)
         {
             switch (fitMode)
             {
                 case FitMode.FitToPage:
 
-                    // Suspend the paint event until the fit mode has changed
-                    base.BeginUpdate();
-                    try
-                    {
-                        base.SizeMode = RasterPaintSizeMode.FitAlways;
-                        ScaleFactor = _DEFAULT_SCALE_FACTOR;
-                    }
-                    finally
-                    {
-                        base.EndUpdate();
-                    }
+                    // Set the fit mode
+                    base.SizeMode = RasterPaintSizeMode.FitAlways;
+                    ScaleFactor = _DEFAULT_SCALE_FACTOR;
                     break;
 
                 case FitMode.FitToWidth:
 
-                    // Suspend the paint event until the fit mode has changed
-                    base.BeginUpdate();
-                    try
-                    {
-                        base.SizeMode = RasterPaintSizeMode.FitWidth;
-                        ScaleFactor = _DEFAULT_SCALE_FACTOR;
-                    }
-                    finally
-                    {
-                        base.EndUpdate();
-                    }
+                    // Set the fit mode, preserving the scroll position
+                    Point scrollPosition = ScrollPosition;
+                    base.SizeMode = RasterPaintSizeMode.FitWidth;
+                    ScaleFactor = _DEFAULT_SCALE_FACTOR;
+                    ScrollPosition = scrollPosition;
                     break;
 
                 case FitMode.None:
+
+                    // Zoom the specified rectangle
                     base.ZoomToRectangle(DisplayRectangle);
                     break;
 
@@ -3859,8 +3841,11 @@ namespace Extract.Imaging.Forms
                 UpdateZoom(updateZoomHistory, raiseZoomChanged);
             }
 
-            // Raise the FitModeChanged event.
-            OnFitModeChanged(new FitModeChangedEventArgs(_fitMode));
+            // Raise the FitModeChanged event if necessary
+            if (raiseFitModeChanged)
+            {
+                OnFitModeChanged(new FitModeChangedEventArgs(_fitMode));
+            }
         }
 
         /// <summary>
@@ -3870,7 +3855,7 @@ namespace Extract.Imaging.Forms
         /// <param name="updateZoomHistory"><see langword="true"/> if the zoom history should be 
         /// updated; <see langword="false"/> if it should not be updated.</param>
         /// <event cref="ZoomChanged">Method was successful.</event>
-        private void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory)
+        void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory)
         {
             // Suspend the paint event until the zoom setting has changed
             base.BeginUpdate();
@@ -3879,14 +3864,14 @@ namespace Extract.Imaging.Forms
                 // Check if the fit mode is specified
                 if (zoomInfo.FitMode != FitMode.None)
                 {
-                    SetFitMode(zoomInfo.FitMode, updateZoomHistory, true);
+                    SetFitMode(zoomInfo.FitMode, updateZoomHistory, true, true);
                 }
                 else
                 {
                     // Reset the fit mode if it is set
                     if (_fitMode != FitMode.None)
                     {
-                        SetFitMode(FitMode.None, false, false);
+                        SetFitMode(FitMode.None, false, false, true);
                     }
 
                     // Set the new scale factor
@@ -3905,7 +3890,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Loads the default shortcut keys into <see cref="_mainShortcuts"/>.
         /// </summary>
-        private void LoadDefaultShortcuts()
+        void LoadDefaultShortcuts()
         {
             // Open an image
             _mainShortcuts[Keys.O | Keys.Control] = SelectOpenImage;
@@ -4009,7 +3994,7 @@ namespace Extract.Imaging.Forms
         /// <param name="mouseY">The current mouse position's y-coordinate in physical (client) 
         /// pixels. Used to redraw the angular highlight.</param>
         /// <param name="increaseHeight"></param>
-        private void AdjustHighlightHeight(int mouseX, int mouseY, bool increaseHeight)
+        void AdjustHighlightHeight(int mouseX, int mouseY, bool increaseHeight)
         {
             // Adjust the highlight height only if an interactive angular highlight is being drawn.
             if (_trackingData != null &&
@@ -4301,7 +4286,7 @@ namespace Extract.Imaging.Forms
         /// requirements and <see langword="false"/> if it does not.</returns>
         /// <exception cref="ExtractException">If <paramref name="requiredTags"/> is
         /// <see langword="null"/>.</exception>
-        private static bool LayeredObjectHasProperTag(LayerObject layerObject,
+        static bool LayeredObjectHasProperTag(LayerObject layerObject,
             IEnumerable<string> requiredTags, ArgumentRequirement tagsArgumentRequirement)
         {
             // Ensure the required tags is not null
@@ -4349,7 +4334,7 @@ namespace Extract.Imaging.Forms
         /// specifying how to treat the <paramref name="excludeTypes"/> collection.</param>
         /// <returns><see langword="true"/> if the <see cref="LayerObject"/> meets the
         /// requirements and <see langword="false"/> if it does not.</returns>
-        private static bool LayeredObjectIsProperType(LayerObject layerObject,
+        static bool LayeredObjectIsProperType(LayerObject layerObject,
             IEnumerable<Type> requiredTypes, ArgumentRequirement requiredTypesArgumentRequirement,
             IEnumerable<Type> excludeTypes, ArgumentRequirement excludeTypesArgumentRequirement)
         {
@@ -4859,7 +4844,7 @@ namespace Extract.Imaging.Forms
             {
                 // Toggle the fit mode and update the zoom
                 SetFitMode(_fitMode == FitMode.FitToPage ? FitMode.None : FitMode.FitToPage,
-                    true, true);
+                    true, true, true);
             }
             catch (Exception ex)
             {
@@ -4876,7 +4861,7 @@ namespace Extract.Imaging.Forms
             {
                 // Toggle the fit mode and update the zoom
                 SetFitMode(_fitMode == FitMode.FitToWidth ? FitMode.None : FitMode.FitToWidth,
-                    true, true);
+                    true, true, true);
             }
             catch (Exception ex)
             {
@@ -5135,7 +5120,7 @@ namespace Extract.Imaging.Forms
         /// <returns><see langword="true"/> if <paramref name="layerObject"/> is linked to an 
         /// unselected layer object; <see langword="false"/> if <paramref name="layerObject"/> not 
         /// linked to any unselected layer object.</returns>
-        private static bool IsLinkedToUnselectedLayerObject(LayerObject layerObject)
+        static bool IsLinkedToUnselectedLayerObject(LayerObject layerObject)
         {
             // Check if any preceding link is unselected
             LayerObject link = layerObject.PreviousLink;
@@ -5574,7 +5559,7 @@ namespace Extract.Imaging.Forms
         /// <param name="matrix">3x3 affine matrix from which to calculate the vertical scale 
         /// factor.</param>
         /// <returns>The vertical scale factor of the 3x3 affine matrix.</returns>
-        private static double GetScaleFactorY(Matrix matrix)
+        static double GetScaleFactorY(Matrix matrix)
         {
             // Formula derived by transforming a vertical unit 
             // vector using an arbitrary transformation matrix:
@@ -5593,7 +5578,7 @@ namespace Extract.Imaging.Forms
         /// Will refresh the image viewer and if a parent form is found will
         /// call refresh on the parent as well.
         /// </summary>
-        private void RefreshImageViewerAndParent()
+        void RefreshImageViewerAndParent()
         {
             // If _parentForm is null attempt to get it
             if (_parentForm == null)
