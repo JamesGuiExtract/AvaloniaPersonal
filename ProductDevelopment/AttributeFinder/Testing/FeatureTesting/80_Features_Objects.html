@@ -15,13 +15,22 @@
 <OL>
 	<LI><h2>Fuzzy Text Search (#1)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
-  	   	<LI><b>Main Checklists Updated:</b> TBD
-  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>SCRs:</b> DotNetRC #312
+  	   	<LI><b>Details:</b> Provide a mechanism for regular expression search strings to use 
+		fuzzy search logic.  Define a special regular expression syntax that is expanded 
+		within our software to a recognized regular expression syntax.  Review the specifications 
+		in <b>Engineering\RC.Net\Utilities\Parsers\Req-Design</b> for more details.
+  	   	<LI><b>Main Checklists Updated:</b> N/A - automated tests
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 7.1.0.xx, MM/DD/YYYY
+	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
+	      		<li>Exercise the <b>Regular Expression Value Finder</b> automated tests.  This 
+			rule object contains a comprehensive set of test cases for fuzzy regular 
+			expressions.
+			<li>Confirm that all tests pass without error.
 	       	</ul>
        	</ul>
 <p>
