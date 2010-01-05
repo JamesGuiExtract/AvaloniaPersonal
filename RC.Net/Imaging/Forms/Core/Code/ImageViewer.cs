@@ -536,7 +536,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Set the fit mode
-                SetFitMode(RegistryManager.FitMode, false, false);
+                SetFitMode(RegistryManager.FitMode, false, false, true);
 
                 // Store the original transformation matrix
                 _transform = base.Transform;
@@ -754,7 +754,7 @@ namespace Extract.Imaging.Forms
                 try
                 {
                     // Set the fit mode and update the zoom
-                    SetFitMode(value, true, true);
+                    SetFitMode(value, true, true, true);
                 }
                 catch (Exception e)
                 {
