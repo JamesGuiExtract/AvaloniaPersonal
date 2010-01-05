@@ -96,9 +96,17 @@ namespace Extract.Utilities.Forms
         {
             try
             {
+                // Redirect the message if:
+                // 1) It is a key down message
+                // 2) The target is not already receiving the message
+                // 3) The target can receive input focus
+                // 4) The target does not already contain input focus
+                // 5) Shortcuts are enabled
+                // 6) This shortcut key has a handler
                 if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.SysKeyDown)
                 {
-                    if (_target.Handle != m.HWnd && _target.CanFocus && ShortcutsEnabled)
+                    if (_target.Handle != m.HWnd && _target.CanFocus && !_target.ContainsFocus && 
+                        ShortcutsEnabled)
                     {
                         Keys key = ((Keys)((int)((long)m.WParam))) | Control.ModifierKeys;
                         if (_manager[key] != null)
