@@ -1,0 +1,973 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.5 Feature Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.5 Feature Testing<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h2>File Priority (#1a)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> LegacyRC #5436, #5437, #5438, #5439, #5440, #5441, #5442, 
+		#5443, #5444, #5445, #5446
+  	   	<LI><b>Details:</b> This feature allows the user to specify a relative priority 
+		for processing of files.  The expected situation is for a customer to process 
+		back file images with a lower priority than day forward images.  Any time a 
+		dayforward image is available it gets bumped to the head of the queue.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li><u><b>File Action Manager</b></u>
+		       	<ul>
+		      		<li>Confirm that the <b>Queue Setup</b> tab contains a 
+				<b>Priority</b> column.
+		      		<li>Confirm that the <b>Priority</b> column has the following 
+				options:
+			       	<ul>
+					<li>High
+					<li>Above Normal
+					<li>Normal
+					<li>Below Normal
+					<li>Low
+			       	</ul>
+		      		<li>Confirm that the <b>Queue Log</b> tab contains a 
+				<b>Priority</b> column in each of the three grids.
+		      		<li>Confirm that the <b>Processing Log</b> tab contains a 
+				<b>Priority</b> column in each of the three grids.
+<p>
+		      		<li>Confirm that the <b>Priority</b> column is properly updated 
+				in the <b>Queue Log</b> tab.
+		      		<li>Confirm that the <b>Priority</b> column is properly updated 
+				in the <b>Processing Log</b> tab.
+		       	</ul>
+<p>
+	      		<li><u><b>DB Admin</b></u>
+		       	<ul>
+		      		<li>Confirm that a menu item for <b>Tools - Manually set file 
+				processing priority</b> exists and displays an associated 
+				dialog.
+		      		<li>Confirm that the <b>Manually Set File Processing Priority</b> 
+				dialog contains a <b>Select files...</b> button.
+		      		<li>Confirm that the <b>Manually Set File Processing Priority</b> 
+				dialog contains an associated edit box with a text-based description 
+				of the selected files.
+		      		<li>Confirm that the <b>Manually Set File Processing Priority</b> 
+				dialog contains a spinner control to specify the priority.
+		      		<li>Confirm that file priority is set properly.
+<p>
+		      		<li>Confirm that the <b>Select Files</b> dialog contains a 
+				radio button for <b>All files that have the file processing priority 
+				of</b> and an associated spinner control.
+		      		<li>Confirm that file selection is properly based on file priority.
+		       	</ul>
+<p>
+	      		<li><u><b>Updated Reports</b></u>
+		       	<ul>
+		      		<li>Detailed report for specific document - to include document 
+				priority.
+		      		<li>ID Shield detailed report for specific document - to include 
+				document priority.
+		       	</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Running as Service (#1b)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> LegacyRC #5520, #5521
+  	   	<LI><b>Details:</b> The goal for this feature is to allow the FAM to be used in a Windows 
+		service mode.  7.0.0.39 use of SrvAny.exe simply kills the underlying executable when the 
+		service is stopped.  This feature will allow the currently processing file to finish 
+		gracefully.  This implementation will <b>not</b> separate the file processing engine 
+		from the user interface.
+  	   	<LI><b>Main Checklists Updated:</b> Yes
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Exercise the <b>FAM Service - Testing</b> checklist adjusted to use 
+			LabDE tasks and workflow.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Automatic update of local database from master (#1c)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #729
+  	   	<LI><b>Details:</b> When the database is updated and the changes are applied to the 
+		rules, it may allow for new tests to be found which the rules did not previously know 
+		about. However, due to <b>DataEntry #688</b> the order mapper will be operating with a 
+		copy of the database made when the first document was processed and therefore the order 
+		mapper may not know of a test that was found.  To solve this problem, every time the order 
+		mapper is called, it should compare the modified date of the original database against 
+		the creation date of the temporary copy and update the temporary copy when appropriate.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Process an image.
+			<li>Make a modification to the original database.
+			<li>Process another image.
+			<li>Confirm that the temporary database has been updated to reflect the recent 
+			change.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Spatially sort or reorder tests within a new order (#1d)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Random spot checks on documents (#1e)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Exercise <b>Manually set action status</b> from the <b>DB Admin</b> 
+			utility.
+			<li>Confirm that a random set of recently verified images can be 
+			selected for independent review.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Tagging documents - to mark for deletion (#1f)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DotNet #336, FlexIDSCore #3650, LegacyRC #5420, #5421, 
+		#5422, #5423, #5424, #5425, #5426, #5427, #5428, #5429, #5430, #5431
+  	   	<LI><b>Details:</b> This feature is designed to allow the user to apply 
+		their own informative tag strings to documents during verification.  A 
+		Manage Tags task allows handling of files based on tags.  A Task Condition 
+		object allows for additional handling options.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li><u><b>Toolbar</b></u>
+		       	<ul>
+		      		<li>Confirm presence of an <b>Apply tags</b> toolbar button.
+		      		<li>Confirm that the toolbar button provides a drop-down menu 
+				allowing selection/deselection of already defined tags.
+		      		<li>Confirm that the toolbar button provides a means to  
+				define a new tag.
+		      		<li>Confirm that the ability to define a new tag is 
+				controlled by an <b>AllowDynamicTagCreation</b> item in 
+				the DB Info table.
+		      		<li>Confirm that <b>AllowDynamicTagCreation</b> has a 
+				default value of <b>0</b>.
+		      		<li>Confirm that the drop-down menu provides checkboxes to 
+				indicate that one or more tags are selected.
+		       	</ul>
+	      		<li><u><b>DB Admin</b></u>
+		       	<ul>
+		      		<li>Confirm that the <b>Select Files</b> dialog includes an 
+				option for <b>any</b> or <b>all</b> of the following tags.
+		      		<li>Confirm that the list of tags supports selection of one 
+				of more tags.
+		      		<li>Confirm that the tag-related controls are disabled unless 
+				the appropriate option is selected. 
+<p>
+		      		<li>Confirm presence of a <b>Tools - Manage Tags</b> menu item.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				two-column list of tags and associated descriptions.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				button to <b>Add</b> a new tag.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				button to <b>Modify</b> an existing tag.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				button to <b>Delete</b> an existing tag.
+		      		<li>Confirm that deleting a tag requires confirmation.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				button to <b>Refresh</b> the list of tags.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				button to <b>Close</b> the dialog.
+		      		<li>Confirm that tags must begin with a letter, number or 
+				underscore character.
+		      		<li>Confirm that tags can contain spaces allowing for 
+				multiple-word strings.
+		       	</ul>
+	      		<li><u><b>Manage Tags task</b></u>
+		       	<ul>
+		      		<li>Confirm presence of a <b>Manage tags</b> task.
+		      		<li>Confirm that the property page includes options to 
+				<b>Apply the tags selected below</b>, <b>Remove the tags 
+				selected below</b>, and <b>Toggle the state of the tags 
+				selected below</b>.
+		      		<li>Confirm that the property page includes a checked list 
+				of defined tags.
+		      		<li>Confirm that property page settings are persistent. 
+		      		<li>Confirm that the task functions as expected. 
+		       	</ul>
+	      		<li><u><b>Tag Condition object</b></u>
+		       	<ul>
+		      		<li>Confirm presence of a <b>Tag condition</b> object.
+		      		<li>Confirm that the property page includes a combo box for  
+				considering the condition <b>met</b>, or <b>not met</b>.
+		      		<li>Confirm that the property page includes a combo box for  
+				if the document is tagged with <b>any</b>, or <b>all</b> of 
+				the following conditions.
+		      		<li>Confirm that the property page includes a checked list 
+				of defined tags.
+		      		<li>Confirm that property page settings are persistent. 
+		      		<li>Confirm that the condition object functions as expected. 
+		       	</ul>
+	      		<li><u><b>New Reports</b></u>
+		       	<ul>
+		      		<li>List of all tags - shows a listing of all tags defined 
+				in the project.
+		      		<li>Tagged files - shows a listing of files for each tag, 
+				along with a count per tag and a total count.
+		      		<li>Files tagged with a certain tag - prompts user for a tag 
+				name and displays the <b>Tagged files</b> report narrowed 
+				down to the specified tag.
+		       	</ul>
+	      		<li><u><b>Updated Reports</b></u>
+		       	<ul>
+		      		<li>Detailed report for specific document - to include a 
+				section listing all tags applied on the document.
+		      		<li>ID Shield detailed report for specific document - to 
+				include a section listing all tags applied on the document.
+		       	</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Automatically fix stuck files (#1g)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> LegacyRC #5467, #5468, #5469, #5470, #5471, #5500
+  	   	<LI><b>Details:</b> The goal of this feature is to automatically determine 
+		when one or more processing files are stuck.  The File Action Manager shall 
+		automatically revert a stuck file to its previous status.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li><u><b>Setup</b></u>
+			<ul> 
+		      		<li>Prepare a collection of files for processing with 
+				<b>Execute rules</b>.
+		      		<li>Use Task Manager to kill <b>ProcessFiles.exe</b> 
+				while documents are being processed.
+		      		<li>Use <b>DB Admin</b> to confirm that some files 
+				are stuck in <b>Processing</b>.
+		      		<li>Use <b>DB Admin</b> after auto-reversion to confirm that 
+				the files are back in <b>Pending</b> mode.
+<p>
+		      		<li>Prepare a collection of files for processing with 
+				<b>Verify extracted data</b>.
+				<li>Verify some files and make sure to skip some of the files.
+				<li>Stop processing and modify the FPS file to process 
+				skipped images.
+		      		<li>Use Task Manager to kill <b>ProcessFiles.exe</b> 
+				while documents are being processed and before all of 
+				the previously skipped images had been processed.
+		      		<li>Use <b>DB Admin</b> to confirm that some files 
+				are stuck in <b>Processing</b>.
+		      		<li>Use <b>DB Admin</b> after auto-reversion to confirm that 
+				the files are back in <b>Skipped</b> mode.
+			</ul> 
+	      		<li><u><b>Functionality</b></u>
+			<ul> 
+		      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+				<b>AutoRevertLockedFiles</b> with a default of <b>1</b>.
+	      			<li>Confirm that with <b>AutoRevertLockedFiles = 1</b>, stuck 
+				files are automatically reverted to their previous status.
+		      		<li>Confirm that with <b>AutoRevertLockedFiles = 0</b>, stuck 
+				files are not automatically reverted to their previous status.
+<p>
+		      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+				<b>AutoRevertTimeOutInMinutes</b> with a default of <b>60</b>.
+	      			<li>Confirm that the minimum value for <b>AutoRevertTimeOutInMinutes</b> 
+				is <b>5</b>.
+		      		<li>Confirm that automatic reversion of stuck files is based on 
+				the timeout value.
+		      		<li>Confirm that the timeout value is automatically adjusted 
+				if a value less than 5 is provided.
+<p>
+		      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+				<b>AutoRevertNotifyEmailList</b> with a default of <b>an empty 
+				string</b>.
+		      		<li>Confirm that automatic reversion of stuck files sends emails 
+				to the addresses given in <b>AutoRevertNotifyEmailList</b>.
+<p>
+		      		<li>Confirm that an exception is logged if one or more files are 
+				reverted from being stuck.
+	      			<li>Confirm that the exception includes the number of minutes 
+				elapsed before reversion, the count of files that were reverted, 
+				the file status to which a file was reverted, and the associated 
+				action name.
+			</ul> 
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Green highlights for 100% confidence (#1h)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> By request from Advanced Health, highlighting of text in green 
+		to indicate high confidence is reserved for text with 100% confidence as reported 
+		by Nuance.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm that <b>100%</b> OCR confidence is required for green highlights.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Smart tag support for data entry (#1i)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #749
+  	   	<LI><b>Details:</b> A smart tag allows the user to expand small keywords into phrases 
+		to avoid a lot of typing.  The smart tags functionality would be invoked by typing in 
+		the period character at the beginning of the string, or after any white space character.  
+		When the period has been pressed in those situations, a drop down auto-completion combo 
+		box shall appear at the cursor location allowing the user to auto-complete the smart tag.  
+		The user shall be allowed to select one of the suggested entries using standard 
+		mechanisms (e.g. the mouse, or keyboard arrow-down/up followed by ENTER or TAB), at which 
+		point the smart tag shall expand out into its user-specified value (read from the database 
+		table).  The user-specified value may itself contain expandable functions such as 
+		$UserName(), $Now(), etc.  The database should be enhanced with a SmartTag table 
+		containing two columns - TagName, TagValue.  The smart tags functionality should work in 
+		any control that supports text input.  The smart tags functionality should work in an 
+		intuitive manner so that it is unintrusive to the normal typing operation.  For instance, 
+		suppose that the database contains three tags - ABA, ABB, ACD, and DEF.  When the user 
+		types a period after a whitespace char, that should invoke the smart tags functionality 
+		and a combo box with all four tags should be shown.  Then the user types in the letter A, 
+		and the combo box should only show the three choices that start with A.  Then the user 
+		types in B and the combo box should only show the two choices that start with AB.  Then 
+		the user types in E, and the combo box should disappear.  The user can keep typing as 
+		they would normally and no smart-tag expansion would take place and .ABE would be in 
+		the control's text value as if the user had typed this information in normally.  Then if 
+		the user realizes that the smart tag did not expand (when they had intended for it to), 
+		and they realize they made a typo, and start backspacing and end up backspacing through 
+		the E in .ABE, then the combo box should reappear showing the user the choices that start 
+		with AB.  If the user selects ABB and hits tab (or just types in the last missing B and 
+		presses SPACE), the ".ABB" in the text should be expanded to its corresponding value 
+		defined in the database, taking into account that that value may further need to be 
+		expanded due to usage of $ functions such as $Now().  Smart tag expansions shall allow for 
+		embedded data fields that are enclosed in double-angled brackets (such as <<TestName>>).  
+		When the user selects a smart tag and hits enter or tab, the smart tag shall expand out 
+		to its expanded value, and if the expanded value contains embedded data fields, the 
+		embedded data field shall be selected (so that the <<DataFieldName>> gets over-written 
+		with user-specified text as soon as the user starts typing).  When the user hits tab again, 
+		if there is another embedded data field available, it shall be selected (so tha the 		<<DataFieldName>> gets over-written with user-specified text as soon as the user starts 
+		typing).  If tab is pressed when no more embedded data fields exist, then the next cell 
+		(or next row or control as appropriate) shall get selected.  The main point here is that 
+		the TAB key should help the user easily navigate to the embedded data fields and specify 
+		their value before moving on to other cells/controls. 
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Password prompt before running FAM (#1j)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> LegacyRC #5606
+  	   	<LI><b>Details:</b> If the DBInfo table is configured to require authentication, 
+		check the <b>Login</b> table in the database for the current user's login ID when 
+		the user tries to start processing.  If not present, provide a meaningful error 
+		message.  If present, check for a hashed password in the Login table.  Request 
+		password if appropriate.  The <b>DB Admin</b> utility will be enhanced to allow 
+		management of users and passwords.
+	       	<ul>
+			<li>See the detailed <b>Specifications related to user authentication in 
+			the FAM</b> notes posted by Arvind on 1/4/10.
+	       	</ul>
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li><u><b>Manage Users - UI</b></u>
+		       	<ul>
+		      		<li>Confirm that a <b>Manage users...</b> menu entry exists 
+				under the <b>Tools</b> menu.
+		      		<li>Confirm that selecting the menu entry displays the 
+				<b>Manage Users</b> dialog.
+	      			<li>Confirm that the dialog includes a two-column list box 
+				for <b>User</b> and <b>Password set</b>.
+	      			<li>Confirm that the dialog includes an <b>Add...</b> button.
+				<li>Confirm that the Add button displays an edit box for 
+				adding a login ID.
+				<li>Confirm that the edit box is pre-populated with the 
+				current user's login ID. 
+				<li>Confirm that the login ID in the edit box is completely 
+				selected allowing for an easy overwrite. 
+	      			<li>Confirm that the dialog includes a <b>Remove</b> button.
+				<li>Confirm that the <b>Remove</b> button is disabled if 
+				no user is selected.
+				<li>Confirm that clicking the <b>Remove</b> button displays 
+				a confirmation dialog.
+	      			<li>Confirm that the dialog includes a <b>Rename</b> button.
+				<li>Confirm that the <b>Rename</b> button is disabled if 
+				no user is selected.
+				<li>Confirm that clicking the <b>Rename</b> button displays 
+				an edit box for modifying a login ID.
+				<li>Confirm that the edit box is pre-populated with the 
+				selected user's login ID. 
+	      			<li>Confirm that the dialog includes a <b>Clear password</b> 
+				button.
+				<li>Confirm that the <b>Clear password</b> button is disabled 
+				if no user is selected.
+				<li>Confirm that clicking the <b>Clear password</b> button 
+				displays a confirmation dialog.
+	      			<li>Confirm that the dialog includes a <b>Refresh</b> button.
+	      			<li>Confirm that the dialog includes a <b>Close</b> button.
+		       	</ul>
+<p>
+	      		<li><u><b>Manage Users - Functionality</b></u>
+		       	<ul>
+				<li>Confirm that a new user is added to the bottom of the list.
+				<li>Confirm that the <b>User</b> column for a new user 
+				is <b>first_last</b> per the normal network login.
+				<li>Confirm that the <b>Password set</b> column for a new user 
+				is <b>No</b>.
+		      		<li>Confirm that an error message is displayed if a duplicate 
+				user is added.
+				<li>Confirm that an <b>admin</b> user cannot be added.
+				<li>Confirm that an <b>administrator</b> user cannot be added.
+		      		<li>Confirm that a user is properly removed depending on the 
+				response to the confirmation dialog.
+		      		<li>Confirm that the <b>Password set</b> value is properly 
+				reset to <b>No</b> depending on the response to the 
+				confirmation dialog.
+	      			<li>Confirm that clicking the <b>Close</b> button closes the 
+				dialog.
+		       	</ul>
+<p>
+	      		<li><u><b>General Functionality</b></u>
+		       	<ul>
+				<li>Confirm that a <b>RequireAuthenticationBeforeRun</b> field 
+				is defined in the <b>DBInfo</b> table.
+				<li>Confirm that <b>RequireAuthenticationBeforeRun</b> defaults 
+				to <b>0</b>.
+				<li>Confirm that user authentication is only active when 
+				<b>RequireAuthenticationBeforeRun = 1</b>.
+				<li>Confirm that for a user with a cleared password, clicking 
+				the <b>Start processing</b> button prompts the user to define 
+				a password.
+				<li>Confirm that the <b>Login</b> table is updated.
+				<li>Confirm that the new password is not stored in clear text.
+				<li>Confirm that the new password does not need to match the 
+				user's network password.
+				<li>Confirm that processing <b>will not</b> start if an 
+				incorrect password is provided.
+				<li>Confirm that processing <b>will</b> start if a correct 
+				password is provided.
+				<li>Refresh and cleared passwords
+				<ul>
+					<li>Select a user with a defined password.
+					<li>Clear the password.
+					<li>Open a FAM instance as the selected user.
+					<li>Confirm that clicking the <b>Start processing</b> 
+					button prompts the user to define a new password.
+					<li>Confirm that the FAM starts processing after 
+					definition of the new password.
+					<li>Use SQL Management Studio to confirm that a hashed 
+					password exists in the <b>Login</b> table for the 
+					selected user.
+					<li>Click the <b>Refresh</b> button in the <b>Manage 
+					users</b> dialog.
+					<li>Confirm that <b>Password set = Yes</b>.
+				</ul>
+		       	</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Default tab mode (#1k)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #751
+  	   	<LI><b>Details:</b> It would be helpful if the table control supported two options for 
+		the tab mode.  Option 1 is <b>TabAcrossCells</b> which is the current behavior and is 
+		appropriate for patient name tables.  Option 2 is <b>TabAcrossRows</b> and is 
+		appropriate for Order and Test tables.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Confirm that the LabDE config file contains an <b>&lt;objectSettings&gt;</b> 
+			element.
+			<li>Confirm that <b>AllowTabbingByRow</b> properties are only defined for 
+			<b>_patientNameTable</b> and <b>_epicPatientNameTable</b>.
+			<li>Confirm that the properties are set to <b>false</b>.
+<p>
+			<li>Confirm that tabbing into the <b>Order name</b> table selects the first 
+			row.
+			<li>Confirm that appropriate information is highlighted in the image.
+			<li>Confirm that subsequent tabs move a row at a time.
+			<li>Confirm that appropriate information is highlighted in the image.
+			<li>Select a single cell in the <b>Order name</b> table.
+			<li>Confirm that tabs advance by cells until the end of the row.
+			<li>Confirm that subsequent tabs move a row at a time.
+			<li>Confirm that after selection of the last non-blank row in the <b>Order 
+			name</b> table, TAB advances to the first cell of the blank row.
+<p>
+			<li>Confirm that tabbing into the <b>Test name</b> table selects the first 
+			row.
+			<li>Confirm that appropriate information is highlighted in the image.
+			<li>Confirm that subsequent tabs move a row at a time.
+			<li>Confirm that appropriate information is highlighted in the image.
+			<li>Select a single cell in the <b>Test name</b> table.
+			<li>Confirm that tabs advance by cells until the end of the row.
+			<li>Confirm that subsequent tabs move a row at a time.
+			<li>Confirm that after selection of the last non-blank row in the <b>Test 
+			name</b> table, TAB advances to the first cell of the blank row.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Dockable image window (#1l)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #752
+  	   	<LI><b>Details:</b> The image viewer window should be dockable so that is can be 
+		moved to a different monitor.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm that the <b>DEP window</b> and the <b>image window</b> can be docked 
+			separately and displayed on separate monitors.
+			<li>Confirm that <b>F11</b> is a shortcut key to undock the image viewer.
+			<li>Confirm that docked window position is persistent.
+			<li>Confirm that undocked window position is persistent.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>LabDE table in database (#1m)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Input event tracking (#1n)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Confirm that the <b>Verify extracted data</b> task includes a 
+			check box for <b>Input event tracking</b>.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>New reports (#1o)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Support for fuzzy text matching (#1p)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DotNetRC #312
+  	   	<LI><b>Details:</b> Provide a mechanism for regular expression search strings to use 
+		fuzzy search logic.  Define a special regular expression syntax that is expanded 
+		within our software to a recognized regular expression syntax.  Review the specifications 
+		in <b>Engineering\RC.Net\Utilities\Parsers\Req-Design</b> for more details.
+  	   	<LI><b>Main Checklists Updated:</b> N/A - automated tests
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Exercise the <b>Regular Expression Value Finder</b> automated tests.  This 
+			rule object contains a comprehensive set of test cases for fuzzy regular 
+			expressions.
+			<li>Confirm that all tests pass without error.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Show action name in title bar (#2a)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #740
+  	   	<LI><b>Details:</b> Add the FPS filename and the action name to the window caption.  
+		This should reduce confusion for users that may have multiple FPS files open.
+  	   	<LI><b>Main Checklists Updated:</b> Yes
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Create an FPS file to verify images.
+  		   	<LI>Exercise the FPS file without queuing any files.
+			<li>Confirm that the window caption is <b>Waiting - LabDE 
+			(&lt;action_name&gt;)</b>.
+			<li>Queue some files and exercise the FPS file again.
+			<li>Confirm that the window caption is <b>&lt;SourceDocName&gt; - LabDE 
+			(&lt;action_name&gt;)</b>.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Copy button copies full path (#2b)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #737
+  	   	<LI><b>Details:</b> Provide the full path to the image being verified.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Verify an image.
+			<li>Confirm that the <b>Image name</b> field contains the full path 
+			to the image file.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Changed validation of medical record number (#2c)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #742
+  	   	<LI><b>Details:</b> The <b>Medical Record #</b> field should allow an 
+		optional leading <b>M</b> or <b>Z</b> character.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Verify an image.
+	      		<li>Confirm that a sequence of digits is acceptable for <b>Medical 
+			Record #</b>.
+	      		<li>Confirm that <b>M</b> followed by a sequence of digits is acceptable 
+			for <b>Medical Record #</b>.
+	      		<li>Confirm that <b>Z</b> followed by a sequence of digits is acceptable 
+			for <b>Medical Record #</b>.
+	      		<li>Confirm that <b>MZ</b> followed by a sequence of digits is not acceptable 
+			for <b>Medical Record #</b>.
+	      		<li>Confirm that <b>Q</b> followed by a sequence of digits is not acceptable 
+			for <b>Medical Record #</b>.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>No tab stop on result status (#2d)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #743
+  	   	<LI><b>Details:</b> The <b>Result Status</b> field should not be a tab stop field.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Verify an image.
+	      		<li>Confirm that <b>Result Status</b> is not the initially selected field.
+			<li>Tab through the fields.
+	      		<li>Confirm that <b>Result Status</b> is not in the tab order.
+	      		<li>Confirm that <b>Result Status</b> does not include <b>Delete</b> as 
+			an option.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Record FAM session start and stop times (#2e)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> LegacyRC #5568
+  	   	<LI><b>Details:</b> This feature is intended to provide more information to 
+		supervisors that want to track how much time is spent by data entry operators 
+		actually using LabDE. <b>FAMSession</b> information should be tracked in the 
+		database with a controlling field in the <b>DBInfo</b> table.  New reports 
+		should also be available to present useful results.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm that a <b>FAMSession</b> table exists in the database.
+			<li>Confirm that a <b>SaveFAMSessionHistory</b> row exists in the 
+			<b>DBInfo</b> table.
+			<li>Confirm that the <b>SaveFAMSessionHistory</b> default is <b>1</b>.
+  		   	<LI>Confirm that <b>FAMSession</b> records with start and stop times 
+			are added for each FAM instance.
+	  	   	<LI>Confirm that <b>FAMSession</b> records are not added for 
+			<b>SaveFAMSessionHistory = 0</b>.
+<p>
+			<li>Confirm that one or more reports are available that provide 
+			meaningful statistics for <b>FAMSession</b> data.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Keyboard shortcut for insert new row (#2f)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #756
+  	   	<LI><b>Details:</b> Define a <b>Ctrl+I</b> shortcut to add a new row to 
+		the active table.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Verify an image.
+	      		<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+			<b>Ordering Physician</b> table.
+	      		<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+			<b>CopyTo Physician</b> table.
+	      		<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+			<b>Orders</b> table.
+	      		<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+			<b>Tests</b> table.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Appending text via multiple swipes (#2g)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #741
+  	   	<LI><b>Details:</b> Instead of replacing the entire value of a swipe into 
+		a single textbox or text table cell, swiping will now replace the current 
+		selection or be inserted at the caret position.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Process a document.
+  		   	<LI>Confirm that swiped text replaces text in a cell that is 
+			completely selected. 
+  		   	<LI>Confirm that swiped text is inserted into a cell at the selection 
+			position. 
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Clear clipboard after pasting patient #, order #, patient name (#2h)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #757, #758
+  	   	<LI><b>Details:</b> To prevent accidental pasting of the same data (e.g. order 
+		number or patient number) into multiple cells, it would be good if the data 
+		entry framework supported emptying of the clipboard after a paste operation was 
+		performed on particular cells (or table columns).  This should be configurable 
+		on a per-control (or column) level.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Confirm that the Clipboard is cleared after pasting into the 
+			<b>Order Number</b> field.
+	      		<li>Confirm that the Clipboard is cleared after pasting into the 
+			<b>Patient Name</b> field.
+	      		<li>Confirm that the Clipboard is cleared after pasting into the 
+			<b>Medical Record #</b> field.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Multiple cell copy and paste (#2i)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #746
+  	   	<LI><b>Details:</b> It would be nice if the data entry framework supported 
+		multi-cell copy/paste.  For instance, if a document has 5 orders entered for 
+		it, and the collection date/time has been specified for the first one, it 
+		would be nice if the user could select the date/time cells from the first 
+		order, then <b>CTRL+C</b> to copy those two cells to the clipboard, and then 
+		select the two cells in the remaining 4 rows (for a total of 8 cells being 
+		selected), and then <b>CTRL+V</b> to paste the two cells in one shot on all 
+		four rows.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Process several documents.
+  		   	<LI>Confirm that the collection date and time values can be copied from one 
+			order and pasted into another order.
+			<li>Confirm that the units value for a single test can be pasted into 
+			multiple tests.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Mandatory order comment field (#2j)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Support default values that use smart tags expressions (#2k)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Default order comment to "Verified by $FullUserName() on $Now()" (#2l)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #744
+  	   	<LI><b>Details:</b> Advanced Health has requested a default entry for the 
+		Order - Comment field.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Verify an image.
+	      		<li>Confirm that the <b>Selected Order Details - Comment</b> table 
+			includes <b>Verified by &lt:full user name&gt: on &lt;Date&gt;</b> 
+			where the user name and date are as expected.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>"C" option for critical test result (#2m)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Continued right arrows during edit remains in cell (#3a)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #745
+  	   	<LI><b>Details:</b> When a cell is being edited, pressing the left or right arrows 
+		should not cause the cell selection to change.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Process an image.
+  		   	<LI>Confirm that while editing a cell, the <b>right arrow</b> key does not 
+			change cell selection.
+	  	   	<LI>Confirm that while editing a cell, the <b>left arrow</b> key does not 
+			change cell selection.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>SHIFT+SPACE during edit completes edit and selects whole row (#3b)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> DataEntry #747
+  	   	<LI><b>Details:</b> When a cell in a table is selected and <b>SHIFT+SPACE</b> is 
+		pressed, the whole row should be selected so that the user can use the down-arrow 
+		to review rows one at a time.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Process an image.
+			<li>Select a cell in a table and press <b>Shift+Space</b>.
+  	   		<LI>Confirm that the whole row is selected and that the user can review 
+			whole rows by navigating with the up and down arrows.
+			<li>Select another cell and begin an edit operation.
+			<li>Press <b>Shift+Space</b>.
+	  	   	<LI>Confirm that the cell editing operation is completed and the whole row is 
+			selected.
+  	   		<LI>Confirm that the user can review whole rows by navigating with the up 
+			and down arrows.
+	       	</ul>
+       	</ul>
+</OL>
+</BODY>
+</HTML>
