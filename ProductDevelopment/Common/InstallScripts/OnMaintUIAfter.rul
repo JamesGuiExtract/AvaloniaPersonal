@@ -12,6 +12,9 @@ function OnMaintUIAfter()
 begin
     if ( REMOVEALLMODE) then
     	UninstallInliteKeyDrivers();
+    	
+    	// Delete all lst files
+    	DeleteFile(PROGRAMFILES + EXTRACT_DIR + "\\*.LST");
     endif;
     
 	Disable(STATUSEX);
