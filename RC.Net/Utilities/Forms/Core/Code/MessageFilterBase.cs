@@ -10,6 +10,39 @@ using System.Security.Permissions;
 namespace Extract.Utilities.Forms
 {
     /// <summary>
+    /// A class containing the data for the <see cref="Message"/> that was handled by the
+    /// <see cref="IMessageFilter.PreFilterMessage"/> function.
+    /// </summary>
+    public class MessageHandledEventArgs : EventArgs
+    {
+        /// <summary>
+        /// The message associated with the event.
+        /// </summary>
+        private readonly Message _message;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MessageHandledEventArgs"/> class.
+        /// </summary>
+        /// <param name="message">The <see cref="Message"/> that was handled.</param>
+        public MessageHandledEventArgs(Message message)
+        {
+            _message = message;
+        }
+
+        /// <summary>
+        /// Gets the message that was handled in the <see cref="IMessageFilter.PreFilterMessage"/>
+        /// function.
+        /// </summary>
+        public Message Message
+        {
+            get
+            {
+                return _message;
+            }
+        }
+    }
+
+    /// <summary>
     /// A class for handling PreFilterMessage events for specific controls.
     /// </summary>
     public abstract class MessageFilterBase : IMessageFilter, IDisposable
@@ -30,6 +63,16 @@ namespace Extract.Utilities.Forms
         bool _disposed = true;
 
         #endregion Fields
+
+        #region Events
+
+        /// <summary>
+        /// Indicates that the <see cref="IMessageFilter.PreFilterMessage"/> method has
+        /// handled the <see cref="Message"/> and will return true.
+        /// </summary>
+        public event EventHandler<MessageHandledEventArgs> MessageHandled;
+
+        #endregion Event
 
         #region Constructors
 
@@ -111,6 +154,25 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="MessageHandled"/> event.
+        /// </summary>
+        /// <param name="e">The data associated with the event.</param>
+        void OnMessageHandled(MessageHandledEventArgs e)
+        {
+            try
+            {
+                if (MessageHandled != null)
+                {
+                    MessageHandled(this, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI29127", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region Methods
@@ -147,7 +209,15 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                return HandleMessage(m);
+                // Check if the message has been handled
+                if (HandleMessage(m))
+                {
+                    // Raise the message handled event.
+                    OnMessageHandled(new MessageHandledEventArgs(m));
+                    return true;
+                }
+
+                return false;
             }
             catch (Exception ex)
             {

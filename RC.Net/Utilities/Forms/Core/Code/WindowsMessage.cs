@@ -113,6 +113,51 @@ namespace Extract.Utilities.Forms
         /// Mouse wheel message
         /// </summary>
         public const int MouseWheel = 0x020A;
+
+        /// <summary>
+        /// Left button down in non-client area message.
+        /// </summary>
+        public const int NonClientLeftButtonDown = 0x00A1;
+
+        /// <summary>
+        /// Left button up in non-client area message.
+        /// </summary>
+        public const int NonClientLeftButtonUp = 0x00A2;
+
+        /// <summary>
+        /// Left button double click in non-client area message.
+        /// </summary>
+        public const int NonClientLeftButtonDoubleClick = 0x00A3;
+
+        /// <summary>
+        /// Right button down in non client area message.
+        /// </summary>
+        public const int NonClientRightButtonDown = 0x00A4;
+
+        /// <summary>
+        /// Right button up in non-client area message.
+        /// </summary>
+        public const int NonClientRightButtonUp = 0x00A5;
+
+        /// <summary>
+        /// Right button double click in non-client area message.
+        /// </summary>
+        public const int NonClientRightButtonDoubleClick = 0x00A6;
+
+        /// <summary>
+        /// Middle button down in non client area message.
+        /// </summary>
+        public const int NonClientMiddleButtonDown = 0x00A7;
+
+        /// <summary>
+        /// Middle button up in non-client area message.
+        /// </summary>
+        public const int NonClientMiddleButtonUp = 0x00A8;
+
+        /// <summary>
+        /// Middle button double click in non-client area message.
+        /// </summary>
+        public const int NonClientMiddleButtonDoubleClick = 0x00A9;
     }
 
 }

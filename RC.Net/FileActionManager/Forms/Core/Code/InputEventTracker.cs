@@ -276,6 +276,21 @@ namespace Extract.FileActionManager.Forms
         }
 
         /// <summary>
+        /// External method for notifying the input event counter that an input event
+        /// has occurred.
+        /// <para><b>Note:</b></para>
+        /// This method should only be used in the case where a class has another
+        /// <see cref="IMessageFilter.PreFilterMessage"/> running that handles the message
+        /// and returns <see langword="true"/>, which would cause this class
+        /// to never see the input event message.  In this case the external class should
+        /// call this method explicitly to record an input event.
+        /// </summary>
+        public void NotifyOfInputEvent()
+        {
+            _inputCount++;
+        }
+
+        /// <summary>
         /// Inserts a new record into the InputEvent table with the specified active minute data.
         /// </summary>
         /// <param name="data">The data to use when creating the IputEvent entry.</param>
@@ -298,12 +313,26 @@ namespace Extract.FileActionManager.Forms
         {
             try
             {
-                while (!_endThreads.WaitOne(1000))
+                int sleepTime = 1000;
+                while (!_endThreads.WaitOne(sleepTime))
                 {
+                    // Get the current tickcount
+                    int tickCount = Environment.TickCount;
                     if (_inputCount > 0)
                     {
                         _inputCount = 0;
                         _activeSecondCount++;
+                    }
+
+                    // Handle tick count rollover issue (rolls over at ~ 50 days uptime)
+                    if (Environment.TickCount < tickCount)
+                    {
+                        sleepTime = 1000;
+                    }
+                    else
+                    {
+                        // Sleep time is 1000 - milliseconds elapsed in the loop
+                        sleepTime = 1000 - (Environment.TickCount - tickCount);
                     }
                 }
             }
@@ -325,7 +354,8 @@ namespace Extract.FileActionManager.Forms
         {
             try
             {
-                while (!_endThreads.WaitOne(60000))
+                // Wait until the next minute boundary or the end threads event is signaled
+                while (!_endThreads.WaitOne(1000 * (60 - DateTime.Now.Second)))
                 {
                     if (_activeSecondCount > 0)
                     {
@@ -355,8 +385,16 @@ namespace Extract.FileActionManager.Forms
                 WaitHandle[] waitHandles = new WaitHandle[] { _updateDatabase, _endThreads };
                 while (WaitHandle.WaitAny(waitHandles) != 1)
                 {
-                    // Record the active minute data
-                    RecordActiveMinuteData(new ActiveMinuteData(_cachedMinuteData));
+                    try
+                    {
+                        // Record the active minute data
+                        RecordActiveMinuteData(new ActiveMinuteData(_cachedMinuteData));
+                    }
+                    catch (Exception ex)
+                    {
+                        // Just log the exception that occurred and allow the thread to continue
+                        ExtractException.Log("ELI29128", ex);
+                    }
                 }
 
                 // Check for any left over active second data
@@ -400,8 +438,12 @@ namespace Extract.FileActionManager.Forms
                     {
                         case WindowsMessage.KeyDown:
                         case WindowsMessage.LeftButtonDown:
-                        case WindowsMessage.MouseWheel:
                         case WindowsMessage.RightButtonDown:
+                        case WindowsMessage.MiddleButtonDown:
+                        case WindowsMessage.MouseWheel:
+                        case WindowsMessage.NonClientLeftButtonDown:
+                        case WindowsMessage.NonClientRightButtonDown:
+                        case WindowsMessage.NonClientMiddleButtonDown:
                             _inputCount++;
                             break;
                     }
