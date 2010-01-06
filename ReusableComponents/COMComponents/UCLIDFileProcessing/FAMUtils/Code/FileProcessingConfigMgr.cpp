@@ -78,7 +78,7 @@ static const string gstrSQL_SERVER_REG_PATH = "SOFTWARE\\Microsoft\\Microsoft SQ
 static const string gstrSQL_SERVER_INSTALLED_INSTANCES_KEY = "InstalledInstances";
 
 // Default for Max files from a database
-static const int DEFAULT_MAX_FILES_FROM_DB = 25;
+static const int DEFAULT_MAX_FILES_FROM_DB = 1;
 
 // Default timer tick speed (2000 ms)
 static const unsigned int DEFAULT_TIMER_TICK_SPEED = 2000;
