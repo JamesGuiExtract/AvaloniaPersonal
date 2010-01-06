@@ -1,0 +1,405 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.5.0.113 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.5.0.113 Testing <br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Exercise recent fixed SCRs
+   	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
+	present within the collected checklists.
+</ul>
+<p>
+<h3>SCRs</h3>
+<OL>
+	<LI><b>[DataEntry #155]</b> Validation warning
+	<ul>
+		<li>Verify a document.
+		<li>Modify the <b>Gender</b> element to <b>U</b>.
+		<li>Confirm that validation warning is provided as a yellow triangle exclamation.
+		<li>Confirm that a validation warning does not prevent a successful <b>Save 
+		and commit</b>.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #707]</b> Unscrollable tables
+	<ul>
+		<li>Open a document with a table containing even items so as to require a vertical 
+		scroll bar.
+		<li>Click on a row of the table and start to drag it.
+		<li>Drag the row over a single cell in the table and then release it.
+		<li>Confirm that the table can still be scrolled with the scroll bar.
+		<li>Confirm that the table can still be scrolled with the mousewheel.
+		<li>Confirm that the table can still be scrolled by navigating to a table row that 
+		is not currently visible.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #718, #726]</b> Swiping into a new row
+       	<ul>
+		<li>Process a document.
+	   	<LI>Swipe a value into the new row of a table. 
+	   	<LI>Confirm that dependent controls are active. 
+		<li>Confirm that the swiped text is marked as viewed.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #741, #773]</b> Appending text via multiple swipes
+       	<ul>
+		<li>Process a document.
+	   	<LI>Confirm that swiped text replaces text in a cell that is 
+		completely selected. 
+	   	<LI>Confirm that swiped text is inserted into a cell at the selection 
+		position. 
+		<li>Confirm that appending swiped text also works when using the 
+		<b>angular highlight</b> tool.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #746, #787, #789, #791]</b> Multi-cell copy and paste
+       	<ul>
+		<li>Process several documents.
+	   	<LI>Confirm that the collection date and time values can be copied from one 
+		order and pasted into another order.
+		<li>Confirm that the units value for a single test can be pasted into 
+		multiple tests.
+<p>
+		<li>Select a single cell not in edit mode.
+		<li>Click <b>Ctrl+C</b> to copy the contents of the cell.
+		<li>Confirm that the text can be pasted into cells in a dissimilar table 
+		(i.e. Physician last name to Test name).
+		<li>Select two adjacent cell in the same row.
+		<li>Click <b>Ctrl+C</b> to copy the contents.
+		<li>Select the same leftmost cell in the starred row.
+		<li>Click <b>Ctrl+V</b> to paste the contents.
+		<li>Confirm that both appropriate cells are populated.
+<p>
+		<li>Copy some plain text.
+		<li>Select a cell in a starred row of a table.
+		<li>Click <b>Ctrl+V</b> to paste the contents.
+		<li>Confirm that a single new row is created with one cell properly 
+		populated.
+<p>
+		<li>Create a new row in the <b>Order</b> table.
+		<li>Provide an <b>Order name</b> of <b>a</b>.
+		<li>Provide an <b>Epic code</b> of <b>b</b>.
+		<li>Provide an <b>Collection date</b> of <b>c</b>.
+		<li>Provide an <b>Collection time</b> of <b>d</b>.
+		<li>Select all of the cells in the row (but not the row header).
+		<li>Click <b>Ctrl+C</b> to copy the contents.
+		<li>Select the first cell in another row (not the starred row).
+		<li>Click <b>Ctrl+V</b> to paste the contents.
+		<li>Confirm that the four cells are properly updated.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #748]</b> Tag button
+	<ul>
+		<li>Use <b>DB Admin</b> to remove all tags from the database.
+		<li>Verify a document.
+		<li>Confirm that an <b>Apply tag to file</b> button is present on the toolbar.
+		<li>Confirm that clicking on the button drops down a <b>No tags available</b> 
+		menu item.
+		<li>Close the FAM.
+		<li>Use <b>DB Admin</b> to add some tags to the database.
+		<li>Verify a document.
+		<li>Confirm that clicking on the <b>Apply tag to file</b> button drops down a 
+		checked menu with an entry for the <b>Name</b> of each defined tag.
+		<li>Confirm that multiple tags can be applied to a document.
+<p>
+		<li>Exercise the <b>List of all tagged documents in the project (by tag)</b> 
+		report.
+		<li>Confirm that appropriate results are seen.
+		<li>Exercise the <b>List of all tags in the project (by tag)</b> 
+		report.
+		<li>Confirm that appropriate results are seen.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #756]</b> Shortcut for adding new rows to a table
+	<ul>
+      		<li>Verify an image.
+      		<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+		<b>Ordering Physician</b> table.
+      		<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+		<b>CopyTo Physician</b> table.
+      		<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+		<b>Orders</b> table.
+      		<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+		<b>Tests</b> table.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #757, #758]</b> Clearing Clipboard after paste
+	<ul>
+      		<li>Verify an image.
+      		<li>Confirm that the Clipboard is cleared after pasting into the 
+		<b>Order Number</b> field.
+      		<li>Confirm that the Clipboard is cleared after pasting into the 
+		<b>Patient Name</b> field.
+      		<li>Confirm that the Clipboard is cleared after pasting into the 
+		<b>Medical Record #</b> field.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #768, #781]</b> Zoom and fit mode
+	<ul>
+      		<li>Verify some images.
+		<li>Set fit mode to <b>full page</b> or <b>width</b>.
+      		<li>Confirm that the initial zoom for an image works as expected.
+		<li>Remove the fit mode setting.  Set the <b>Auto zoom</b> property to 
+		<b>Zoom out if necessary to fit current selection</b>.
+      		<li>Confirm that the initial zoom is to the first data item.
+<p>
+		<li>Set fit mode to <b>full page</b> or <b>width</b>.
+      		<li>Zoom in and update some data.
+      		<li>Click the <b>Zoom previous</b> button.
+      		<li>Confirm that the image returns to its fit-mode zoom state.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #771]</b> Confirm that a disabled table is not a tabstop when 
+	tabbing by row is enabled.
+<p>
+	<LI><b>[DataEntry #775]</b> Statistics recorded in InputEventTracking table
+       	<ul>
+		<li>Confirm that the <b>Verify extracted data</b> task includes an <b>Enable 
+		input event tracking</b> check box.
+		<li>Confirm that the <b>DBInfo</b> table includes a <b>EnableInputEventTracking</b> 
+		field.
+		<li>Confirm that the default setting for <b>EnableInputEventTracking</b> is <b>0</b>.
+		<li>Confirm that if both the task setting and the DBInfo setting are enabled, 
+		statistics are collected in the InputEventTracking table.
+		<li>Confirm that the <b>DBInfo</b> table includes a <b>InputEventHistorySizeInDays</b> 
+		field.
+		<li>Confirm that the default setting for <b>InputEventHistorySizeInDays</b> is 
+		<b>30</b>.
+<p>
+		<li>*Confirm that a new report exists to present the <b>InputEventTracking</b> data.
+		<li>*Confirm that the report format and content is appropriate.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #777]</b> Confirm that the task is now <b>DataEntry: Verify extracted 
+	data</b>.
+<p>
+	<LI><b>[DataEntry #790]</b> Order invalid with missing mandatory test
+	<ul>
+		<li>Verify document <b>A000.tif</b>.
+		<li>Remove the mandatory <b>TBD</b> test from the <b>TBD</b> order.
+		<li>Confirm that the order is now invalid.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #793]</b> Separate window menu item
+	<ul>
+		<li>Confirm that <b>View - Show image in separate window</b> properly separates 
+		the DEP and the image window.
+		<li>Confirm that the <b>F11</b> shortcut also separates the DEP and the 
+		image window.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #794, #797]</b> Statistics recorded in DataEntryData table
+       	<ul>
+		<li>Confirm that the <b>Verify extracted data</b> task includes an <b>Enable 
+		data entry counters</b> check box.
+		<li>Confirm that the <b>DBInfo</b> table includes a <b>EnableDataEntryCounters</b> 
+		field.
+		<li>Confirm that the default setting for <b>EnableDataEntryCounters</b> is <b>0</b>.
+		<li>Confirm that if both the task setting and the DBInfo setting are enabled, 
+		statistics are collected in the DataEntryData table.
+<p>
+		<li>*Confirm that a new report exists to present the <b>DataEntryCounters</b> 
+		information.
+		<li>*Confirm that the report format and content is appropriate.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[LegacyRC #5606]</b> User authentication in the FAM
+       	<ul>
+      		<li><u><b>Manage Users - UI</b></u>
+	       	<ul>
+	      		<li>Confirm that a <b>Manage users...</b> menu entry exists 
+			under the <b>Tools</b> menu.
+	      		<li>Confirm that selecting the menu entry displays the 
+			<b>Manage Users</b> dialog.
+      			<li>Confirm that the dialog includes a two-column list box 
+			for <b>User</b> and <b>Password set</b>.
+      			<li>Confirm that the dialog includes an <b>Add...</b> button.
+			<li>Confirm that the Add button displays an edit box for 
+			adding a login ID.
+			<li>Confirm that the edit box is pre-populated with the 
+			current user's login ID. 
+			<li>Confirm that the login ID in the edit box is completely 
+			selected allowing for an easy overwrite. 
+      			<li>Confirm that the dialog includes a <b>Remove</b> button.
+			<li>Confirm that the <b>Remove</b> button is disabled if 
+			no user is selected.
+			<li>Confirm that clicking the <b>Remove</b> button displays 
+			a confirmation dialog.
+      			<li>Confirm that the dialog includes a <b>Rename</b> button.
+			<li>Confirm that the <b>Rename</b> button is disabled if 
+			no user is selected.
+			<li>Confirm that clicking the <b>Rename</b> button displays 
+			an edit box for modifying a login ID.
+			<li>Confirm that the edit box is pre-populated with the 
+			selected user's login ID. 
+      			<li>Confirm that the dialog includes a <b>Clear password</b> 
+			button.
+			<li>Confirm that the <b>Clear password</b> button is disabled 
+			if no user is selected.
+			<li>Confirm that clicking the <b>Clear password</b> button 
+			displays a confirmation dialog.
+      			<li>Confirm that the dialog includes a <b>Refresh</b> button.
+      			<li>Confirm that the dialog includes a <b>Close</b> button.
+	       	</ul>
+<p>
+      		<li><u><b>Manage Users - Functionality</b></u>
+	       	<ul>
+			<li>Confirm that a new user is added to the bottom of the list.
+			<li>Confirm that the <b>User</b> column for a new user 
+			is <b>first_last</b> per the normal network login.
+			<li>Confirm that the <b>Password set</b> column for a new user 
+			is <b>No</b>.
+	      		<li>Confirm that an error message is displayed if a duplicate 
+			user is added.
+			<li>Confirm that an <b>admin</b> user cannot be added.
+			<li>Confirm that an <b>administrator</b> user cannot be added.
+	      		<li>Confirm that a user is properly removed depending on the 
+			response to the confirmation dialog.
+	      		<li>Confirm that the <b>Password set</b> value is properly 
+			reset to <b>No</b> depending on the response to the 
+			confirmation dialog.
+      			<li>Confirm that clicking the <b>Close</b> button closes the 
+			dialog.
+	       	</ul>
+<p>
+      		<li><u><b>General Functionality</b></u>
+	       	<ul>
+			<li>Confirm that a <b>RequireAuthenticationBeforeRun</b> field 
+			is defined in the <b>DBInfo</b> table.
+			<li>Confirm that <b>RequireAuthenticationBeforeRun</b> defaults 
+			to <b>0</b>.
+			<li>Confirm that user authentication is only active when 
+			<b>RequireAuthenticationBeforeRun = 1</b>.
+			<li>Confirm that for a user with a cleared password, clicking 
+			the <b>Start processing</b> button prompts the user to define 
+			a password.
+			<li>Confirm that the <b>Login</b> table is updated.
+			<li>Confirm that the new password is not stored in clear text.
+			<li>Confirm that the new password does not need to match the 
+			user's network password.
+			<li>Confirm that processing <b>will not</b> start if an 
+			incorrect password is provided.
+			<li>Confirm that processing <b>will</b> start if a correct 
+			password is provided.
+			<li>Refresh and cleared passwords
+			<ul>
+				<li>Select a user with a defined password.
+				<li>Clear the password.
+				<li>Open a FAM instance as the selected user.
+				<li>Confirm that clicking the <b>Start processing</b> 
+				button prompts the user to define a new password.
+				<li>Confirm that the FAM starts processing after 
+				definition of the new password.
+				<li>Use SQL Management Studio to confirm that a hashed 
+				password exists in the <b>Login</b> table for the 
+				selected user.
+				<li>Click the <b>Refresh</b> button in the <b>Manage 
+				users</b> dialog.
+				<li>Confirm that <b>Password set = Yes</b>.
+		       	</ul>
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+   	<LI><b>[LegacyRC #5607]</b> DB Admin Manage menu
+       	<ul>
+		<li>Confirm that the <b>DB Admin</b> utility contains a <b>Manage</b> menu.
+		<li>Confirm that the <b>Manage</b> menu contains an <b>Actions...</b> item.
+		<li>Confirm that <b>Manage - Actions</b> displays the Manage Actions dialog.
+		<li>Confirm that the <b>Manage Actions</b> dialog contains a single-column 
+		<b>Action name</b> list.
+		<li>Confirm that the <b>Manage Actions</b> dialog contains an <b>Add...</b> 
+		button.
+		<li>Confirm that the <b>Add...</b> button displays the usual Add Action dialog.
+		<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Remove</b> 
+		button.
+		<li>Confirm that the <b>Remove</b> button is disabled if no action is selected.
+		<li>Confirm that the <b>Remove</b> button displays a confirmation dialog.
+		<li>Confirm that an action is removed according to the confirmation dialog 
+		response.
+		<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Rename...</b> 
+		button.
+		<li>Confirm that the <b>Rename...</b> button displays a Rename Action dialog.
+		<li>Confirm that an action can be renamed.
+		<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Refresh</b> 
+		button.
+		<li>Confirm that the <b>Refresh</b> button updates the <b>Action name</b> list.
+		<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Close</b> 
+		button.
+		<li>Confirm that the <b>Close</b> button closes the dialog.
+		<li>Confirm that the <b>Manage</b> menu contains an <b>Counters...</b> item.
+		<li>Confirm that <b>Manage - Counters</b> displays the Manage Counters dialog.
+		<li>Confirm that the <b>Manage</b> menu contains an <b>Tags...</b> item.
+		<li>Confirm that <b>Manage - Tags</b> displays the Manage Tags dialog.
+		<li>Confirm that the <b>Manage</b> menu contains an <b>Users...</b> item.
+		<li>Confirm that <b>Manage - Users</b> displays the Manage Users dialog.
+<p>
+		<li>Confirm that the <b>DB Admin</b> utility contains a <b>Tools</b> menu.
+		<li>Confirm that the <b>Tools</b> menu contains the following items
+		<ul>
+			<li>Check for new components
+			<li>Manually set action status...
+			<li>Manually set processing priority...
+			<li>File Action Manager...
+			<li>Export file lists...
+			<li>Reports...
+		</ul>
+       	</ul>
+</OL>
+<p>
+<UL>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests - LabDE Order Mapper
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : LabDE
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</UL>
+</BODY>
+</HTML>
