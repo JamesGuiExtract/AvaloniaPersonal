@@ -19,16 +19,17 @@ public:
 
 // Dialog Data
 	enum { IDD = IDD_DLG_RENAME_ACTION };
-	CComboBox m_CMBAction;
-	CEdit m_EditNewAction;
+	CEdit m_editOldAction;
+	CEdit m_editNewAction;
+
+	void SetOldActionName(const string &strOld);
 
 // Method
-	DWORD GetOldNameAndNewName( string&  strOld, string& strNew);
+	void GetNewActionName(string & strNew);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual BOOL OnInitDialog();
-	afx_msg void OnCbnSelchangeCmbActionNames();
 	afx_msg void OnBnClickedOK();
 	DECLARE_MESSAGE_MAP()
 
@@ -37,11 +38,8 @@ private:
 	//Variable
 	////////////
 
-	// The selected action name from database (old name)
-	CString m_zSelectedActionName;
-
-	// The selected action ID
-	DWORD m_dwSelectedActionID;
+	// The old name of the action
+	CString m_zOldActionName;
 
 	// the action's new name
 	CString m_zNewActionName;

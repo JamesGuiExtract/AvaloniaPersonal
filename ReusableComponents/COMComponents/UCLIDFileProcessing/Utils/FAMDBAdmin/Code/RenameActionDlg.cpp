@@ -31,13 +31,14 @@ RenameActionDlg::~RenameActionDlg()
 void RenameActionDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_CMB_ACTION_NAMES, m_CMBAction);
-	DDX_Control(pDX, IDC_EDT_NEW_ACTION, m_EditNewAction);
+	DDX_Control(pDX, IDC_EDIT_OLD_ACTION_NAME, m_editOldAction);
+	DDX_Control(pDX, IDC_EDT_NEW_ACTION, m_editNewAction);
 	DDX_Text(pDX, IDC_EDT_NEW_ACTION, m_zNewActionName);
+	DDX_Text(pDX, IDC_EDIT_OLD_ACTION_NAME, m_zOldActionName);
 }
+
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(RenameActionDlg, CDialog)
-	ON_CBN_SELCHANGE(IDC_CMB_ACTION_NAMES, &RenameActionDlg::OnCbnSelchangeCmbActionNames)
 	ON_BN_CLICKED(IDOK, &RenameActionDlg::OnBnClickedOK)
 END_MESSAGE_MAP()
 
@@ -53,59 +54,14 @@ BOOL RenameActionDlg::OnInitDialog()
 		CDialog::OnInitDialog();
 
 		// Clear the new name edit box
-		m_EditNewAction.SetWindowText("");
+		m_editNewAction.SetWindowText("");
 
 		// Set focus to new name edit box
-		m_EditNewAction.SetFocus();
-
-		// Read all actions from the DB
-		IStrToStrMapPtr pMapActions = m_ipFPMDB->GetActions();
-
-		if (pMapActions->GetSize() > 0)
-		{
-			// Insert actions into ComboBox
-			for (int i = 0; i < pMapActions->GetSize(); i++)
-			{
-				// Bstr string to hold the name and ID of one action
-				CComBSTR bstrKey, bstrValue;
-
-				// Get one actions' name and ID inside the database
-				pMapActions->GetKeyValue(i, &bstrKey, &bstrValue);
-				string strAction = asString(bstrKey);
-				DWORD dwID = asUnsignedLong(asString(bstrValue));
-
-				// Insert the action name into ComboBox
-				int nIndex = m_CMBAction.InsertString(-1, strAction.c_str());
-				// Set the item data of the new item to the ID of the action
-				m_CMBAction.SetItemData(nIndex, dwID);
-			}
-			
-			// Set the default item to the first action
-			m_CMBAction.SetCurSel(0);
-
-			// Select the first action
-			m_dwSelectedActionID = m_CMBAction.GetItemData(0);
-			m_CMBAction.GetLBText(0, m_zSelectedActionName);
-		}
+		m_editNewAction.SetFocus();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14191")
 
 	return FALSE;
-}
-//-------------------------------------------------------------------------------------------------
-void RenameActionDlg::OnCbnSelchangeCmbActionNames()
-{
-	AFX_MANAGE_STATE(AfxGetModuleState());
-
-	try
-	{
-		// Update the Selected action ID when select another action
-		m_dwSelectedActionID = m_CMBAction.GetItemData(m_CMBAction.GetCurSel());
-
-		// Update the Selected action name when select another action
-		m_CMBAction.GetLBText(m_CMBAction.GetCurSel(), m_zSelectedActionName);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14192")	
 }
 //-------------------------------------------------------------------------------------------------
 void RenameActionDlg::OnBnClickedOK()
@@ -117,17 +73,6 @@ void RenameActionDlg::OnBnClickedOK()
 		// Retrieve latest text
 		UpdateData( TRUE );
 
-		// Confirm an action is specified for renaming
-		if (m_zSelectedActionName.IsEmpty())
-		{
-			MessageBox("An action must be specified before it can be renamed.", "Error", 
-				MB_OK|MB_ICONINFORMATION);
-
-			// Set the focus to the action combo box
-			m_CMBAction.SetFocus();
-			return;
-		}
-
 		// Confirm non-empty name
 		if (m_zNewActionName.IsEmpty())
 		{
@@ -135,18 +80,18 @@ void RenameActionDlg::OnBnClickedOK()
 				MB_OK|MB_ICONINFORMATION);
 
 			// Set the focus to the edit box
-			m_EditNewAction.SetFocus();
+			m_editNewAction.SetFocus();
 			return;
 		}
 
 		// Confirm that the name actually changes (P13 #3926)
-		if (m_zNewActionName == m_zSelectedActionName)
+		if (m_zNewActionName == m_zOldActionName)
 		{
 			MessageBox("The new name for the selected action cannot match the old name.", 
 				"Error", MB_OK|MB_ICONINFORMATION );
 
 			// Set the focus to the edit box
-			m_EditNewAction.SetFocus();
+			m_editNewAction.SetFocus();
 			return;
 		}
 
@@ -170,8 +115,8 @@ void RenameActionDlg::OnBnClickedOK()
 			ue.addDebugInfo( "New Name", (LPCTSTR) m_zNewActionName );
 
 			// Set the focus to the edit box
-			m_EditNewAction.SetSel( 0, -1 );
-			m_EditNewAction.SetFocus();
+			m_editNewAction.SetSel( 0, -1 );
+			m_editNewAction.SetFocus();
 			throw ue;
 		}
 
@@ -185,17 +130,17 @@ void RenameActionDlg::OnBnClickedOK()
 			ue.addDebugInfo( "Valid Pattern", "_*[a-zA-Z][a-zA-Z0-9]*" );
 
 			// Set the focus to the edit box
-			m_EditNewAction.SetSel(0, -1);
-			m_EditNewAction.SetFocus();
+			m_editNewAction.SetSel(0, -1);
+			m_editNewAction.SetFocus();
 			throw ue;
 		}
 
 		// Confirm the rename
-		if (m_zNewActionName != m_zSelectedActionName)
+		if (m_zNewActionName != m_zOldActionName)
 		{
 			CString zText;
 			zText.Format( "Do you really want to replace '%s' with '%s'?", 
-				m_zSelectedActionName, m_zNewActionName );
+				m_zOldActionName, m_zNewActionName );
 			int nRes = MessageBox( zText, "Confirm Rename", MB_YESNOCANCEL);
 			if (nRes == IDCANCEL)
 			{
@@ -204,7 +149,7 @@ void RenameActionDlg::OnBnClickedOK()
 			else if (nRes == IDNO)
 			{
 				// Reset the name back to the current name
-				m_zNewActionName = m_zSelectedActionName;
+				m_zNewActionName = m_zOldActionName;
 				UpdateData(FALSE);
 			}
 		}
@@ -217,13 +162,14 @@ void RenameActionDlg::OnBnClickedOK()
 //-------------------------------------------------------------------------------------------------
 // Public Methods
 //-------------------------------------------------------------------------------------------------
-DWORD RenameActionDlg::GetOldNameAndNewName(string& strOld, string& strNew)
+void RenameActionDlg::GetNewActionName(string& strNew)
 {
-	strOld = std::string((LPCTSTR) m_zSelectedActionName);
 	strNew = std::string((LPCTSTR) m_zNewActionName);
-
-	// Return the ID
-	return m_dwSelectedActionID;
+}
+//-------------------------------------------------------------------------------------------------
+void RenameActionDlg::SetOldActionName(const string& strOld)
+{
+	m_zOldActionName = strOld.c_str();
 }
 
 //-------------------------------------------------------------------------------------------------

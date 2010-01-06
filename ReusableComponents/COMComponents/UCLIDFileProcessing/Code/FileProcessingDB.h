@@ -185,6 +185,11 @@ public:
 	STDMETHOD(RecordFAMSessionStop)();
 	STDMETHOD(RecordInputEvent)(BSTR bstrTimeStamp, long nActionID, long nEventCount,
 		long nProcessID); 
+	STDMETHOD(GetLoginUsers)(IStrToStrMap**  ppUsers);
+	STDMETHOD(AddLoginUser)(BSTR bstrUserName);
+	STDMETHOD(RemoveLoginUser)(BSTR bstrUserName);
+	STDMETHOD(RenameLoginUser)(BSTR bstrUserNameToRename, BSTR bstrNewUserName);	
+	STDMETHOD(ClearLoginUserPassword)(BSTR bstrUserName);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

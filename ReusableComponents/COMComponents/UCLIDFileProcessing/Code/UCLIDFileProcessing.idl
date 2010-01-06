@@ -991,6 +991,20 @@ library UCLID_FILEPROCESSINGLib
 		[id(83), helpstring("method RecordInputEvent")] HRESULT RecordInputEvent(
 			[in] BSTR bstrTimeStamp, [in] long nActionID, [in] long nEventCount,
 			[in] long nProcessID);
+		// PURPOSE: To return a map containing the Login users and a string that is "Yes" if there 
+		//			is a password set for the user or "No" if no password is set
+		[id(84), helpstring("method GetLoginUsers")] HRESULT GetLoginUsers(
+			[out, retval] IStrToStrMap**  ppUsers);
+		// PURPOSE: To add the given user to the Login table
+		[id(85), helpstring("method AddLoginUser")] HRESULT AddLoginUser([in] BSTR bstrUserName);
+		// PURPOSE: To remove the given user from the Login table
+		[id(86), helpstring("method RemoveLoginUser")] HRESULT RemoveLoginUser([in] BSTR bstrUserName);
+		// PURPOSE: To rename the given user in the Login table
+		[id(87), helpstring("method RenameLoginUser")] HRESULT RenameLoginUser(
+			[in] BSTR bstrUserNameToRename, [in] BSTR bstrNewUserName);
+		// PURPOSE: To clear the password for the given user in the Login table
+		[id(88), helpstring("method ClearLoginUserPassword")] HRESULT ClearLoginUserPassword(
+			[in] BSTR bstrUserName);
 	};
 
 	[

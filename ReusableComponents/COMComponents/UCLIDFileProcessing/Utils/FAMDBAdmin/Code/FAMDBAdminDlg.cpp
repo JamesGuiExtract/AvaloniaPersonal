@@ -7,14 +7,14 @@
 #include "FAMDBAdminAboutDlg.h"
 #include "ClearWarningDlg.h"
 #include "ExportFileListDlg.h"
-#include "FileProcessingAddActionDlg.h"
 #include "ManageUserCountersDlg.h"
 #include "ManageTagsDlg.h"
-#include "RenameActionDlg.h"
 #include "SetActionStatusDlg.h"
 #include "SetFilePriorityDlg.h"
 #include "..\..\..\code\FPCategories.h"
 #include "..\..\..\..\InputFunnel\IFCore\Code\IFCategories.h"
+#include "ManageUsersDlg.h"
+#include "ManageActionsDlg.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -97,17 +97,16 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_DATABASE_RESETLOCK, &CFAMDBAdminDlg::OnDatabaseResetLock)
 	ON_COMMAND(ID_DATABASE_CHANGEPASSWORD, &CFAMDBAdminDlg::OnDatabaseChangePassword)
 	ON_COMMAND(ID_DATABASE_LOGOUT, &CFAMDBAdminDlg::OnDatabaseLogout)
-	ON_COMMAND(ID_ACTION_ADD, &CFAMDBAdminDlg::OnActionAdd)
-	ON_COMMAND(ID_ACTION_REMOVE, &CFAMDBAdminDlg::OnActionRemove)
-	ON_COMMAND(ID_ACTION_RENAME, &CFAMDBAdminDlg::OnActionRename)
-	ON_COMMAND(ID_ACTION_MANUALLYSETACTIONSTATUS, &CFAMDBAdminDlg::OnActionManuallySetActionStatus)
+	ON_COMMAND(ID_TOOLS_MANUALLYSETACTIONSTATUS, &CFAMDBAdminDlg::OnActionManuallySetActionStatus)
 	ON_COMMAND(ID_HELP_FILEACTIONMANAGERHELP, &CFAMDBAdminDlg::OnHelpFileActionManagerHelp)
 	ON_WM_SIZE()
 	ON_WM_GETMINMAXINFO()
 	ON_COMMAND(ID_TOOLS_REPORTS, &CFAMDBAdminDlg::OnToolsReports)
 	ON_COMMAND(ID_TOOLS_CHECKFORNEWCOMPONENTS, &CFAMDBAdminDlg::OnToolsCheckForNewComponents)
-	ON_COMMAND(ID_TOOLS_MANAGE_TAGS, &CFAMDBAdminDlg::OnToolsManageTags)
-	ON_COMMAND(ID_TOOLS_MANAGE_COUNTERS, &CFAMDBAdminDlg::OnToolsManageCounters)
+	ON_COMMAND(ID_MANAGE_TAGS, &CFAMDBAdminDlg::OnManageTags)
+	ON_COMMAND(ID_MANAGE_COUNTERS, &CFAMDBAdminDlg::OnManageCounters)
+	ON_COMMAND(ID_MANAGE_USERS, &CFAMDBAdminDlg::OnManageLoginUsers)
+	ON_COMMAND(ID_MANAGE_ACTIONS, &CFAMDBAdminDlg::OnManageActions)
 	ON_COMMAND(ID_TOOLS_SETPRIORITY, &CFAMDBAdminDlg::OnToolsSetPriority)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -411,190 +410,6 @@ void CFAMDBAdminDlg::OnDatabaseLogout()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14864");
 }
 //-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnActionAdd()
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-
-	try
-	{
-		// Create an add action dialog
-		FileProcessingAddActionDlg dlgAddAction(m_ipFAMDB);
-
-		if (dlgAddAction.DoModal() == IDOK)
-		{
-			// Add application trace whenever a database modification is made
-			// [LRCAU #5052 - JDS - 12/18/2008]
-			UCLIDException uex("ELI23600", "Application trace: Database change");
-			uex.addDebugInfo("Change", "Add new action");
-			uex.addDebugInfo("User Name", getCurrentUserName());
-			uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
-			uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
-
-			// Get the new action name
-			std::string strNewAction = std::string ((LPCTSTR) dlgAddAction.GetActionName());
-			if (strNewAction != "")
-			{
-				// Get the default status for the new action
-				int iStatus = dlgAddAction.GetDefaultStatus();
-
-				// Add the new action to the database
-				DWORD dwNewActionID;
-
-				// Display a wait-cursor because we are adding an action to DB
-				CWaitCursor wait;
-				
-				dwNewActionID = m_ipFAMDB->DefineNewAction(_bstr_t(strNewAction.c_str()));
-				uex.addDebugInfo("New Action Name", strNewAction);
-				uex.addDebugInfo("New Action ID", dwNewActionID);
-
-				// If the default status equal to -1,
-				// We should copy the status from one action to another
-				if (iStatus == -1)
-				{
-					// Get the action ID that the status of which will be copied from
-					DWORD dwCopyActionID = dlgAddAction.GetCopyStatusActionID();
-
-					// Copy action status from another action to the new action
-					m_ipFAMDB->CopyActionStatusFromAction(dwCopyActionID, dwNewActionID);
-					uex.addDebugInfo("Action ID Copied From", dwCopyActionID);
-				}
-				// If the default status is not -1
-				else
-				{
-					// Cast the default status to an EActionStatus type
-					UCLID_FILEPROCESSINGLib::EActionStatus eStatus;
-					eStatus = (UCLID_FILEPROCESSINGLib::EActionStatus)(iStatus);
-
-					// Call SetStatusForAllFiles() to set the default status for
-					// newly added action
-					m_ipFAMDB->SetStatusForAllFiles(_bstr_t(strNewAction.c_str()), eStatus);
-					uex.addDebugInfo("Default Status", asString(m_ipFAMDB->AsStatusString(eStatus)));
-				} // Inner else block
-
-				// Restore the wait cursor because we have finished adding an action to DB
-				wait.Restore();
-
-				// Log application trace [LRCAU #5052 - JDS - 12/18/2008]
-				uex.log();
-
-				// Update the summary tab
-				updateSummaryTab();
-			} // Out if block
-
-			// Prompt to the user that the action has been added
-			string strPrompt = "'" + strNewAction + "' has been added to the database.";
-			MessageBox(strPrompt.c_str(), "Add Action", MB_ICONINFORMATION);
-		} // Dialog block
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14865");
-}
-//-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnActionRemove()
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-
-	try
-	{
-		// Check if there is no action inside the datebase;
-		if ( notifyNoActions() )
-		{
-			return;
-		}
-
-		// Create IFAMDBUtilsPtr used to bring up select action dialog
-		UCLID_FILEPROCESSINGLib::IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI14914", ipFAMDBUtils != NULL );
-
-		// Get the action's name from the dialog
-		_bstr_t bstrActionName = ipFAMDBUtils->PromptForActionSelection(m_ipFAMDB, "Remove Action", "");
-
-		// Remove the action selected if strActionName is not empty
-		if (bstrActionName.length() > 0)
-		{
-			// Display the wait cursor wheil action is deleted
-			CWaitCursor cursor;
-
-			m_ipFAMDB->DeleteAction(bstrActionName);
-
-			// Add application trace whenever a database modification is made
-			// [LRCAU #5052 - JDS - 12/18/2008]
-			UCLIDException uex("ELI23601", "Application trace: Database change");
-			uex.addDebugInfo("Change", "Remove action");
-			uex.addDebugInfo("User Name", getCurrentUserName());
-			uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
-			uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
-			uex.addDebugInfo("Action To Remove", asString(bstrActionName));
-			uex.log();
-
-			// Update the summary tab
-			updateSummaryTab();
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14866");
-}
-//-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnActionRename()
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-
-	try
-	{
-		// Check if there is no action inside the datebase;
-		if ( notifyNoActions() )
-		{
-			return;
-		}
-
-		// Create an add action dialog
-		RenameActionDlg dlgRenameAction(m_ipFAMDB);
-
-		if (dlgRenameAction.DoModal() == IDOK)
-		{
-			// Add application trace whenever a database modification is made
-			// [LRCAU #5052 - JDS - 12/18/2008]
-			UCLIDException uex("ELI23602", "Application trace: Database change");
-			uex.addDebugInfo("Change", "Rename action");
-			uex.addDebugInfo("User Name", getCurrentUserName());
-			uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
-			uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
-
-			// Display wait cursor
-			CWaitCursor wait;
-
-			// Init the action ID, old name and new name
-			DWORD dwID;
-			string strOldName = "";
-			string strNewName = "";
-
-			// Get the old name and the new name
-			dwID = dlgRenameAction.GetOldNameAndNewName(strOldName, strNewName);
-
-			if (dwID > 0)
-			{
-				if (strOldName != strNewName)
-				{
-					// Call RenameAction to rename the action
-					m_ipFAMDB->RenameAction(dwID, _bstr_t(strNewName.c_str()));
-					uex.addDebugInfo("Old Action Name", strOldName);
-					uex.addDebugInfo("New Action Name", strNewName);
-
-					// Log application trace [LRCAU #5052 - JDS - 12/18/2008]
-					uex.log();
-
-					// Update the summary tab
-					updateSummaryTab();
-
-					// Display the message that the action is renamed
-					string strPrompt = "The action '" + strOldName + "' has been renamed to '"
-										+ strNewName + "'.";
-					MessageBox( strPrompt.c_str(), "Success", MB_OK|MB_ICONINFORMATION );
-				}
-			}
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14867");
-}
-//-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnActionManuallySetActionStatus()
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -814,7 +629,7 @@ void CFAMDBAdminDlg::OnToolsCheckForNewComponents()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18159");
 }
 //-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnToolsManageTags()
+void CFAMDBAdminDlg::OnManageTags()
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 
@@ -829,7 +644,7 @@ void CFAMDBAdminDlg::OnToolsManageTags()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27416");
 }
 //-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnToolsManageCounters()
+void CFAMDBAdminDlg::OnManageCounters()
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 
@@ -844,6 +659,38 @@ void CFAMDBAdminDlg::OnToolsManageCounters()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27787");
 }
 //-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnManageLoginUsers()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{	
+		// Create a new user manager dialog
+		CManageUsersDlg dlg(m_ipFAMDB);
+
+		// Display the dialog
+		dlg.DoModal();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29061");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnManageActions()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{	
+		// Create a new Actions manager dialog
+		CManageActionsDlg dlg(m_ipFAMDB);
+
+		// Display the dialog
+		dlg.DoModal();
+
+		//Update the summary tab
+		updateSummaryTab();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29104");
+}//-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnToolsSetPriority()
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -932,10 +779,11 @@ void CFAMDBAdminDlg::enableMenus()
 	// Only enable other menu items if the db connection is good
 	pMenu->EnableMenuItem(ID_DATABASE_RESETLOCK, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_DATABASE_CHANGEPASSWORD, m_bIsDBGood ? nEnable : nDisable);
-	pMenu->EnableMenuItem(ID_ACTION_ADD, m_bIsDBGood ? nEnable : nDisable);
-	pMenu->EnableMenuItem(ID_ACTION_REMOVE, m_bIsDBGood ? nEnable : nDisable);
-	pMenu->EnableMenuItem(ID_ACTION_RENAME, m_bIsDBGood ? nEnable : nDisable);
-	pMenu->EnableMenuItem(ID_ACTION_MANUALLYSETACTIONSTATUS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_MANAGE_TAGS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_MANAGE_COUNTERS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_MANAGE_ACTIONS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_MANAGE_USERS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_TOOLS_MANUALLYSETACTIONSTATUS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_EXPORTFILELISTS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_REPORTS, m_bIsDBGood ? nEnable : nDisable);
 }

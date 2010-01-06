@@ -24,6 +24,8 @@
 #define IDD_DIALOG_MANAGE_USER_COUNTERS	138
 #define IDD_DIALOG_ADDMODIFY_COUNTER	139
 #define IDR_MANAGE_COUNTER_ACCELERATORS	140
+#define IDR_MANAGE_ACTIONS_ACCELERATORS 141
+#define IDR_MANAGE_LOGIN_USERS_ACCELERATORS	142
 
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
@@ -38,13 +40,19 @@
 #define IDC_BUTTON_LAST_USED_DB         1007
 // End Database Page ID's
 
+
+// This ID's are the same as in BaseUtils resource.h
+#define IDC_EDIT_LOGIN_USER_NAME        1031
+#define IDC_EDIT_LOGIN_PASSWORD         1032
+// End of BaseUtils ID's
+
 #define IDC_EDT_ACTION_NAME             2000
 #define IDC_RDSETTO                     2001
 #define IDC_RDCOPYFROM                  2002
 #define IDC_CMB_STATUS                  2003
 #define IDC_CMB_COPY_FROM               2004
 #define IDC_COMBO_SELECT_DB_SERVER      2005
-#define IDC_CMB_ACTION_NAMES            2006
+#define IDC_EDIT_OLD_ACTION_NAME        2006
 #define IDC_RADIO_LOGIN_EXISTING        2007
 #define IDC_EDT_NEW_ACTION              2008
 #define IDC_RADIO_CREATE_NEW_DB         2009
@@ -66,8 +74,6 @@
 #define IDC_CMB_NEW_STATUS              2025
 #define IDC_RADIO_STATUS_OF_ACTION      2026
 #define IDC_CMB_STATUS_OF_ACTION        2027
-#define IDC_EDIT_LOGIN_USER_NAME        2028
-#define IDC_EDIT_LOGIN_PASSWORD         2029
 #define IDC_EDIT_VERSION                2030
 #define IDC_BTN_APPLY_ACTION_STATUS     2031
 #define IDC_LIST_ACTIONS                2032
@@ -121,15 +127,27 @@
 #define IDC_BTN_ADD_COUNTER_OK			2080
 #define IDC_BTN_ADD_COUNTER_CANCEL		2081
 #define IDC_CMB_LIMIT_SCOPE_UNITS       2082
+#define	IDD_DIALOG_MANAGE_USERS			2083
+#define IDC_LIST_USERS					2084
+#define IDC_BTN_ADD_USER				2085
+#define IDC_BTN_RENAME_USER				2086
+#define IDC_BTN_DELETE_USER				2087
+#define IDC_BTN_REFRESH_USERS			2088
+#define IDC_BTN_USER_CLOSE				2089
+#define IDD_DIALOG_MANAGE_ACTIONS		2090
+#define IDC_LIST_ACTIONS_TO_MANAGE		2091
+#define IDC_BTN_ADD_ACTION				2092
+#define IDC_BTN_REMOVE_ACTION			2093
+#define IDC_BTN_RENAME_ACTION			2094
+#define IDC_BTN_REFRESH_ACTIONS			2095
+#define IDC_BTN_ACTION_CLOSE			2096
+#define IDC_BTN_CLEAR_USER_PASSWORD		2097
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774
 #define ID_DATABASE_LOGIN               32776
 #define ID_DATABASE_LOGOUT              32777
-#define ID_ACTION_ADD                   32778
-#define ID_ACTION_REMOVE                32779
-#define ID_ACTION_RENAME                32780
-#define ID_ACTION_MANUALLYSETACTIONSTATUS 32781
+#define ID_TOOLS_MANUALLYSETACTIONSTATUS 32781
 #define ID_TOOLS_EXPORTFILELISTS        32782
 #define ID_HELP_FILEACTIONMANAGERHELP   32783
 #define ID_HELP_ABOUTTHISAPPLICATION    32784
@@ -138,17 +156,18 @@
 #define ID_TOOLS_FILEACTIONMANAGER      32787
 #define ID_TOOLS_REPORTS                32788
 #define ID_TOOLS_CHECKFORNEWCOMPONENTS  32789
-#define ID_TOOLS_MANAGE_TAGS			32790
+#define ID_MANAGE_TAGS					32790
 #define ID_TOOLS_SETPRIORITY			32791
-#define ID_TOOLS_MANAGE_COUNTERS		32792
-
+#define ID_MANAGE_COUNTERS				32792
+#define ID_MANAGE_ACTIONS				32793
+#define ID_MANAGE_USERS					32794
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        141
-#define _APS_NEXT_COMMAND_VALUE         32793
-#define _APS_NEXT_CONTROL_VALUE         2083
+#define _APS_NEXT_RESOURCE_VALUE        143
+#define _APS_NEXT_COMMAND_VALUE         32795
+#define _APS_NEXT_CONTROL_VALUE         2098
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

@@ -251,11 +251,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ManageActionsDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ManageTagsDlg.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\ManageUserCountersDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ManageUsersDlg.cpp"
 				>
 			</File>
 			<File
@@ -341,11 +349,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ManageActionsDlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ManageTagsDlg.h"
 				>
 			</File>
 			<File
 				RelativePath=".\ManageUserCountersDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ManageUsersDlg.h"
 				>
 			</File>
 			<File

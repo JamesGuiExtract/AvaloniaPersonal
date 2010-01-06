@@ -42,9 +42,6 @@ protected:
 	afx_msg void OnDatabaseResetLock();
 	afx_msg void OnDatabaseChangePassword();
 	afx_msg void OnDatabaseLogout();
-	afx_msg void OnActionAdd();
-	afx_msg void OnActionRemove();
-	afx_msg void OnActionRename();
 	afx_msg void OnActionManuallySetActionStatus();
 	afx_msg void OnHelpFileActionManagerHelp();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -52,8 +49,10 @@ protected:
 	afx_msg void OnToolsFileActionManager();
 	afx_msg void OnToolsReports();
 	afx_msg void OnToolsCheckForNewComponents();
-	afx_msg void OnToolsManageTags();
-	afx_msg void OnToolsManageCounters();
+	afx_msg void OnManageTags();
+	afx_msg void OnManageCounters();
+	afx_msg void OnManageLoginUsers();
+	afx_msg void OnManageActions();
 	afx_msg void OnToolsSetPriority();
 	DECLARE_MESSAGE_MAP()
 

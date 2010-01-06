@@ -18,6 +18,7 @@
 #include <ChangePasswordDlg.h>
 #include <ADOUtils.h>
 #include <StopWatch.h>
+#include <stringCSIS.h>
 
 #include <string>
 #include <stack>
@@ -4590,6 +4591,283 @@ STDMETHODIMP CFileProcessingDB::RecordInputEvent(BSTR bstrTimeStamp, long nActio
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28943");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetLoginUsers(IStrToStrMap**  ppUsers)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Get the users from the database
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database for this instance
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipLoginSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI29040", ipLoginSet != NULL );
+
+		// SQL query to get the login users that are not admin
+		string strSQL = "SELECT UserName, Password FROM Login where UserName <> 'admin'";
+
+		// Open the set of login users
+		ipLoginSet->Open( strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockReadOnly, adCmdText );
+
+		// Create map to return results
+		IStrToStrMapPtr ipUsers(CLSID_StrToStrMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI29039", ipUsers != NULL);
+
+		// Step through all records
+		while ( ipLoginSet->adoEOF == VARIANT_FALSE )
+		{
+			// Get the fields from the action set
+			FieldsPtr ipFields = ipLoginSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI29041", ipFields != NULL);
+
+			// Get the user
+			string strUser = getStringField(ipFields, "UserName");
+
+			// Get the password
+			string strPasswordset = getStringField(ipFields, "Password").empty() ? "No" : "Yes";
+
+			// Save in the Users map
+			ipUsers->Set( strUser.c_str(), strPasswordset.c_str());
+
+			// Go to next user
+			ipLoginSet->MoveNext();
+		}
+
+		// return the StrToStrMap containing all login users except admin
+		*ppUsers = ipUsers.Detach();
+		END_CONNECTION_RETRY(ipConnection, "ELI29042");
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29038");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AddLoginUser(BSTR bstrUserName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check License
+		validateLicense();
+
+		// Convert the user name to add to string for local use
+		string strUserName = asString(bstrUserName);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+		
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database for this instance
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipLoginSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI29064", ipLoginSet != NULL );
+
+		// Sql query that should either be empty if the passed in users is not in the table
+		// or will return the record with the given username
+		string strLoginSelect = "Select Username From Login Where UserName = '" + strUserName + "'";
+
+		// Open the sql query
+		ipLoginSet->Open( strLoginSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockReadOnly, adCmdText );
+
+		// Check to see if action exists
+		if (!asCppBool(ipLoginSet->adoEOF))
+		{
+			UCLIDException ue("ELI29065", "Login username already exists.");
+			ue.addDebugInfo("Usename", strUserName);
+			throw ue;
+		}
+
+		// Execute the insert query to add the user Password defaults to empty string
+		executeCmdQuery(ipConnection, "Insert Into Login (UserName) VALUES ('" + strUserName + "')");
+		
+		// Commit the changes
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI29063");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29043");}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RemoveLoginUser(BSTR bstrUserName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check License
+		validateLicense();
+
+		// Convert the passed in user to string for local use
+		string strUserName = asString(bstrUserName);
+
+		// admin or administrator is not allowed
+		if (stringCSIS::sEqual(strUserName, "admin") || stringCSIS::sEqual(strUserName, "administrator"))
+		{
+			UCLIDException ue("ELI29110", "Not allowed to delete admin or administrator.");
+			ue.addDebugInfo("User to delete", strUserName);
+			throw ue;
+		}
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+		
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database for this instance
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		// Delet the specified user from the login table
+		executeCmdQuery(ipConnection, "DELETE FROM Login WHERE UserName = '" + strUserName + "'");
+		
+		// Commit the changes
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI29067");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29044");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RenameLoginUser(BSTR bstrUserNameToRename, BSTR bstrNewUserName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check License
+		validateLicense();
+
+		// Convert the old user and new user names to string for local use
+		string strOldUserName = asString(bstrUserNameToRename);
+		string strNewUserName = asString(bstrNewUserName);
+
+		// admin or administrator is not allowed
+		if (stringCSIS::sEqual(strOldUserName, "admin") || stringCSIS::sEqual(strOldUserName, "administrator"))
+		{
+			UCLIDException ue("ELI29109", "Not allowed to rename admin or administrator.");
+			ue.addDebugInfo("Rename from", strOldUserName);
+			ue.addDebugInfo("Rename to", strNewUserName);
+			throw ue;
+		}
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+		
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database for this instance
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		// Change old username to new user name in the table.
+		executeCmdQuery(ipConnection, "UPDATE Login SET UserName = '" + strNewUserName + 
+			"' WHERE UserName = '" + strOldUserName + "'");
+		
+		// Commit the changes
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI29112");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29045");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::ClearLoginUserPassword(BSTR bstrUserName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check License
+		validateLicense();
+
+		// Convert username param to string for local use
+		string strUserName = asString(bstrUserName);
+
+		// admin or administrator is not allowed
+		if (stringCSIS::sEqual(strUserName, "admin") || stringCSIS::sEqual(strUserName, "administrator"))
+		{
+			UCLIDException ue("ELI29108", "Not allowed to clear administrator password.");
+			ue.addDebugInfo("Username", strUserName);
+			throw ue;
+		}
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+		
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database for this instance
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		// Clear the password for the given user in the login table
+		executeCmdQuery(ipConnection, "UPDATE Login SET Password = '' WHERE UserName = '" + strUserName + "'");
+		
+		// Commit the changes
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI29070");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29069");
 }
 
 //-------------------------------------------------------------------------------------------------
