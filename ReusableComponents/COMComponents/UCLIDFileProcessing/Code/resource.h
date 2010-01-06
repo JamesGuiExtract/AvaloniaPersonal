@@ -183,6 +183,7 @@
 #define IDD_DIALOG_SET_SCHEDULE         2005
 #define IDC_BUTTON_SELECT_ALL           2007
 #define IDC_BUTTON_SELECT_NONE          2008
+#define IDC_BTN_ACTION_TAG              2009
 #define IDC_BTN_RUN                     32768
 #define IDC_BTN_STOP                    32769
 #define IDC_BTN_AUTO_SCROLL             32770
@@ -217,7 +218,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        2006
 #define _APS_NEXT_COMMAND_VALUE         32803
-#define _APS_NEXT_CONTROL_VALUE         2009
+#define _APS_NEXT_CONTROL_VALUE         2010
 #define _APS_NEXT_SYMED_VALUE           2001
 #endif
 #endif

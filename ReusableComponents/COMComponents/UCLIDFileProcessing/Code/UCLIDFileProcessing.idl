@@ -333,13 +333,9 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To load the IndividualFileList from a file
 		[id(31), helpstring("method LoadFilesFromFile")] HRESULT LoadFilesFromFile([in] BSTR bstrFileName);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To return the name of the Action to process
+		// PURPOSE: To return the name of the Action to process (May contain tags)
 		[propget, id(34), helpstring("property ActionName")] HRESULT ActionName([out, retval] BSTR *pVal);
 		[propput, id(34), helpstring("property ActionName")] HRESULT ActionName([in] BSTR newVal);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To return the ID of the Action to process
-		//[propget, id(35), helpstring("property ActionID")] HRESULT ActionID([out, retval] long *pVal);
-		//[propput, id(35), helpstring("property ActionID")] HRESULT ActionID([in] long newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set/return the status of the Display check box in action tab,
 		//			indicating whether the statistics tab is displayed or not
@@ -386,6 +382,9 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(48), helpstring("property IsDBPasswordRequired")] HRESULT IsDBPasswordRequired(
 			[out, retval] VARIANT_BOOL* pvbIsDBPasswordRequired);
 		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets the name of the Action to process with tags expanded
+		[id(49), helpstring("method GetExpandedActionName")] HRESULT GetExpandedActionName(
+			[out, retval] BSTR *pbstrAction);
 	};
 
 	[
@@ -1005,6 +1004,12 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To clear the password for the given user in the Login table
 		[id(88), helpstring("method ClearLoginUserPassword")] HRESULT ClearLoginUserPassword(
 			[in] BSTR bstrUserName);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets whether actions should automatically be created in the database when 
+		// file processing starts.
+		[id(89), helpstring("method GetAutoCreateActions")] HRESULT GetAutoCreateActions(
+			[out, retval] VARIANT_BOOL* pvbValue);
 	};
 
 	[
@@ -1307,7 +1312,7 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To be used to notify the FileActionManager that the Processing is complete
 		[id(1), helpstring("method PromptForActionSelection")] HRESULT PromptForActionSelection(
 			[in]IFileProcessingDB* pDB, [in] BSTR strTitle, [in] BSTR strPrompt, 
-			[out, retval] BSTR *pActionName);
+			[in]VARIANT_BOOL vbAllowTags, [out, retval] BSTR *pActionName);
 	};
 	[
 		object,

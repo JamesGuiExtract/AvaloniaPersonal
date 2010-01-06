@@ -4869,6 +4869,40 @@ STDMETHODIMP CFileProcessingDB::ClearLoginUserPassword(BSTR bstrUserName)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29069");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetAutoCreateActions(VARIANT_BOOL* pvbValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI29118", pvbValue != NULL);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Get the setting
+		string strSetting = getDBInfoSetting(ipConnection, gstrAUTO_CREATE_ACTIONS);
+
+		// Set the out value
+		*pvbValue = strSetting == "1" ? VARIANT_TRUE : VARIANT_FALSE;
+
+		END_CONNECTION_RETRY(ipConnection, "ELI29119");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29120");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

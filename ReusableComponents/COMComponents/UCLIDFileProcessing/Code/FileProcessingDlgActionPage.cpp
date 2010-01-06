@@ -5,7 +5,6 @@
 #include "resource.h"
 #include "FileProcessingDlg.h"
 #include "FileProcessingDlgActionPage.h"
-#include "SelectActionDlg.h"
 #include "HelperFunctions.h"
 
 #include <TemporaryResourceOverride.h>
@@ -193,7 +192,7 @@ void FileProcessingDlgActionPage::OnBnClickedBtnSelAction()
 
 		// Get the action's name from the dialog
 		string strActionName = ipFAMDBUtils->PromptForActionSelection( 
-			m_pFPMDB, "Select Action", m_zActionName.GetBuffer() );
+			m_pFPMDB, "Select Action", m_zActionName.GetBuffer(), VARIANT_TRUE);
 
 		// If the selected action is not empty
 		if (strActionName != "")
@@ -323,31 +322,34 @@ void FileProcessingDlgActionPage::refresh()
 		// Update UI if the action name is not empty
 		else if (strActionName != "")
 		{
-			// Check for this action in the DB 
-			try
+			// Check for this action in the DB if it doesn't contain a function tag
+			if (strActionName.find('$') == string::npos)
 			{
-				// Use try ... catch block to convert exception to UCLID Exception
 				try
 				{
-					// Get the actionID from the database
-					long lActionID = getDBPointer()->GetActionID( strActionName.c_str() );
+					// Use try ... catch block to convert exception to UCLID Exception
+					try
+					{
+						// Get the actionID from the database
+						long lActionID = getDBPointer()->GetActionID( strActionName.c_str() );
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI19997");
 				}
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI19997");
-			}
-			catch (UCLIDException& ue)
-			{
-				// Log the exception just in case it is not related to the action name 
-				ue.log();
+				catch (UCLIDException& ue)
+				{
+					// Log the exception just in case it is not related to the action name 
+					ue.log();
 
-				// Notify the user that they must select another action
-				std::string	strPrompt;
-				strPrompt = "The action '" + strActionName + 
-					"' does not exist in the database any more, \nplease select another action.";
+					// Notify the user that they must select another action
+					std::string	strPrompt;
+					strPrompt = "The action '" + strActionName + 
+						"' does not exist in the database any more, \nplease select another action.";
 
-				MessageBox(strPrompt.c_str(), "Action not found", MB_OK | MB_ICONINFORMATION);
+					MessageBox(strPrompt.c_str(), "Action not found", MB_OK | MB_ICONINFORMATION);
 
-				// Reset page elements
-				bResetPage = true;
+					// Reset page elements
+					bResetPage = true;
+				}
 			}
 		}
 		// Action name is empty, reset the page

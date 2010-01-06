@@ -3,18 +3,20 @@
 
 #include "stdafx.h"
 #include "SelectActionDlg.h"
+#include "FileProcessingUtils.h"
+
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
 #include <ComUtils.h>
 #include <cpputil.h>
 
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // Constants
-//--------------------------------------------------------------------------------------------------
-const std::string strSELECT_ACTION = "Select Action";
-const std::string strSELECT_ACTION_LABEL = "Select an action to be used for processing";
-const std::string strREMOVE_ACTION = "Remove Action";
-const std::string strREMOVE_ACTION_LABEL = "Select action to remove from database";
+//-------------------------------------------------------------------------------------------------
+const string strSELECT_ACTION = "Select Action";
+const string strSELECT_ACTION_LABEL = "Select an action to be used for processing";
+const string strREMOVE_ACTION = "Remove Action";
+const string strREMOVE_ACTION_LABEL = "Select action to remove from database";
 
 //-------------------------------------------------------------------------------------------------
 // SelectActionDlg dialog
@@ -22,21 +24,24 @@ const std::string strREMOVE_ACTION_LABEL = "Select action to remove from databas
 IMPLEMENT_DYNAMIC(SelectActionDlg, CDialog)
 //-------------------------------------------------------------------------------------------------
 SelectActionDlg::SelectActionDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFPMDB,
-									   string strCaption, string strAction, CWnd* pParent)
+	string strCaption, string strAction, bool bAllowTags, CWnd* pParent)
 : CDialog(SelectActionDlg::IDD, pParent),
-m_ipFPMDB(ipFPMDB),
+m_strCaption(strCaption),
+m_strPrevAction(strAction),
+m_bAllowTags(bAllowTags),
 m_strSelectedActionName(""),
-m_dwSelectedActionID(0)
+m_dwSelectedActionID(0),
+m_dwActionSel(0),
+m_ipFPMDB(ipFPMDB)
 {
-	// Get the caption and current action used in FPM
-	m_strCaption = strCaption;
-	m_strPrevAction = strAction;
+	ASSERT_RESOURCE_ALLOCATION("ELI29107", m_ipFPMDB != NULL);
 }
 //-------------------------------------------------------------------------------------------------
 SelectActionDlg::~SelectActionDlg()
 {
 	try
 	{
+		m_ipFPMDB = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16536");
 }
@@ -44,13 +49,16 @@ SelectActionDlg::~SelectActionDlg()
 void SelectActionDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_CMB_ACTION, m_CMBAction);
-	DDX_Control(pDX, IDC_STATICINFO, m_StaticLabel);
+	DDX_Control(pDX, IDC_CMB_ACTION, m_cmbAction);
+	DDX_Control(pDX, IDC_STATICINFO, m_staticLabel);
+	DDX_Control(pDX, IDC_BTN_ACTION_TAG, m_btnActionTag);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(SelectActionDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_CMB_ACTION, &SelectActionDlg::OnCbnSelchangeCmbAction)
 	ON_BN_CLICKED(IDOK, &SelectActionDlg::OnBnClickOK)
+	ON_BN_CLICKED(IDC_BTN_ACTION_TAG, &SelectActionDlg::OnBnClickActionTag)
+	ON_CBN_SELENDCANCEL(IDC_CMB_ACTION, &SelectActionDlg::OnCbnSelEndCancel)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -71,39 +79,65 @@ BOOL SelectActionDlg::OnInitDialog()
 		// Set the Label text according to different caption
 		if (m_strCaption == strSELECT_ACTION)
 		{
-			m_StaticLabel.SetWindowText(strSELECT_ACTION_LABEL.c_str());
+			m_staticLabel.SetWindowText(strSELECT_ACTION_LABEL.c_str());
 		}
 		else if (m_strCaption == strREMOVE_ACTION)
 		{
-			m_StaticLabel.SetWindowText(strREMOVE_ACTION_LABEL.c_str());
+			m_staticLabel.SetWindowText(strREMOVE_ACTION_LABEL.c_str());
 		}
 
-		// display a wait-cursor because we are getting information from the DB, which may take a few seconds
+		// Check if tags are allowed
+		if (m_bAllowTags)
+		{
+			// Prepare the action tag button
+			m_btnActionTag.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
+
+			// Make the combo box editable
+			makeDropListEditable(m_cmbAction);
+		}
+		else
+		{
+			// Hide the action tag button
+			m_btnActionTag.ShowWindow(SW_HIDE);
+
+			// Expand the combo box into the empty space
+			CRect rect;
+			m_cmbAction.GetWindowRect(&rect);
+			ScreenToClient(rect);
+			rect.right += 18;
+			m_cmbAction.MoveWindow(&rect);
+		}
+
+		// Display a wait-cursor because we are getting information from the DB, 
+		// which may take a few seconds
 		CWaitCursor wait;
 
 		// Read all actions from the DB
-		IStrToStrMapPtr pMapActions = m_ipFPMDB->GetActions();
+		IStrToStrMapPtr ipMapActions = m_ipFPMDB->GetActions();
+		ASSERT_RESOURCE_ALLOCATION("ELI29106", ipMapActions != NULL);
 
-		if (pMapActions->GetSize() > 0)
+		int iSize = ipMapActions->Size;
+		if (iSize > 0)
 		{
-			// A integer used to memories which item is the current action
+			// An integer used to remember which item is the current action
 			int iCurActionIndex = 0;
 
 			// Insert actions into ComboBox
-			for (int i = 0; i < pMapActions->GetSize(); i++)
+			for (int i = 0; i < iSize; i++)
 			{
 				// Bstr string to hold the name and ID of one action
 				CComBSTR bstrKey, bstrValue;
 
 				// Get one actions' name and ID inside the database
-				pMapActions->GetKeyValue(i, &bstrKey, &bstrValue);
+				ipMapActions->GetKeyValue(i, &bstrKey, &bstrValue);
 				string strAction = asString(bstrKey);
 				DWORD dwID = asUnsignedLong(asString(bstrValue));
 
 				// Insert the action name into ComboBox
-				int nIndex = m_CMBAction.InsertString(-1, strAction.c_str());
+				int nIndex = m_cmbAction.InsertString(-1, strAction.c_str());
+
 				// Set the index of the item inside the Combobox same as the ID of the action
-				m_CMBAction.SetItemData(nIndex, dwID);
+				m_cmbAction.SetItemData(nIndex, dwID);
 
 				// If the action is the current action used for FPM
 				if (strAction == m_strPrevAction)
@@ -115,17 +149,16 @@ BOOL SelectActionDlg::OnInitDialog()
 			
 			// Set the default item in the Copy From ComboBox to the 
 			// action now used in FPM, if there is no, set to the firt action
-			m_CMBAction.SetCurSel(iCurActionIndex);
-
+			m_cmbAction.SetCurSel(iCurActionIndex);
 
 			// Set the current action ID to be the same as the current action
 			// used in FPM, if there is no action in FPM, set it to the first action's ID
-			m_dwSelectedActionID = m_CMBAction.GetItemData(iCurActionIndex);
+			m_dwSelectedActionID = m_cmbAction.GetItemData(iCurActionIndex);
 
 			// Set the current action name to be the same as the current action
 			// used in FPM, if there is no action in FPM, set it to the first action
 			CString	zCurrentAction;
-			m_CMBAction.GetLBText(iCurActionIndex, zCurrentAction);
+			m_cmbAction.GetLBText(iCurActionIndex, zCurrentAction);
 			m_strSelectedActionName = string((LPCTSTR)zCurrentAction);
 		}
 	}
@@ -142,12 +175,11 @@ void SelectActionDlg::OnCbnSelchangeCmbAction()
 	try
 	{
 		// Update the Selected action ID when select another action
-		m_dwSelectedActionID = m_CMBAction.GetItemData(m_CMBAction.GetCurSel());
+		int iCurSel = m_cmbAction.GetCurSel();
+		m_dwSelectedActionID = iCurSel == CB_ERR ? -1 : m_cmbAction.GetItemData(iCurSel);
 
 		// Update the Selected action name when select another action
-		CString	zCurrentAction;
-		m_CMBAction.GetLBText(m_CMBAction.GetCurSel(), zCurrentAction);
-		m_strSelectedActionName = string((LPCTSTR)zCurrentAction);
+		m_strSelectedActionName = getActionName();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14106")
 }
@@ -169,6 +201,9 @@ void SelectActionDlg::OnBnClickOK()
 
 	try
 	{
+		// Update the selected action name
+		OnCbnSelchangeCmbAction();
+
 		// If no action has been selected
 		if (m_strSelectedActionName == "")
 		{
@@ -238,7 +273,85 @@ void SelectActionDlg::OnBnClickOK()
 
 	OnOK();
 }
+//-------------------------------------------------------------------------------------------------
+void SelectActionDlg::OnBnClickActionTag()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		// Retrieve position of doc tag button
+		CRect rect;
+		m_btnActionTag.GetWindowRect(&rect);
+		
+		// Display menu and make selection
+		string strChoice = CFileProcessingUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
+
+		// Replace text if selection was made
+		if (strChoice != "")
+		{
+			// Replace the previously selected combobox text with the selected tag
+			int iStart = LOWORD(m_dwActionSel);
+			int iEnd = HIWORD(m_dwActionSel);
+
+			string strText = getActionName();
+
+			string strResult = strText.substr(0, iStart) + strChoice + strText.substr(iEnd);
+			m_cmbAction.SetWindowText(strResult.c_str());
+
+			// Reset the selection
+			m_dwActionSel = MAKELONG(strResult.length(), strResult.length());
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29111")
+}
+//-------------------------------------------------------------------------------------------------
+void SelectActionDlg::OnCbnSelEndCancel()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		m_dwActionSel = m_cmbAction.GetEditSel();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29113")
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private Methods
+//-------------------------------------------------------------------------------------------------
+string SelectActionDlg::getActionName()
+{
+	CString zText;
+	m_cmbAction.GetWindowText(zText);
+	return zText;
+}
+//-------------------------------------------------------------------------------------------------
+void SelectActionDlg::makeDropListEditable(CComboBox& cmbDropList)
+{
+	// Get the previous settings
+	DWORD dwStyle = cmbDropList.GetStyle();
+	DWORD dwExStyle = cmbDropList.GetExStyle();
+	int nID = cmbDropList.GetDlgCtrlID();
+	CWnd *pPrevWindow = cmbDropList.GetNextWindow(GW_HWNDPREV);
+	CWnd *pParentWnd = cmbDropList.GetParent();
+	CFont *pFont = cmbDropList.GetFont();
+	CRect rect;
+	cmbDropList.GetWindowRect(rect);
+	pParentWnd->ScreenToClient(rect);
+
+	// Change the style from dropdown list to dropdown
+	dwStyle &= ~CBS_DROPDOWNLIST;
+	dwStyle |= CBS_DROPDOWN;
+
+	// Destroy the previous combobox
+	cmbDropList.DestroyWindow();
+
+	// Create a new one in its place
+	cmbDropList.CreateEx(dwExStyle, "COMBOBOX", "", dwStyle, rect, pParentWnd, nID);
+	cmbDropList.SetFont(pFont, FALSE);
+	cmbDropList.SetWindowPos(pPrevWindow, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
+}
 //-------------------------------------------------------------------------------------------------

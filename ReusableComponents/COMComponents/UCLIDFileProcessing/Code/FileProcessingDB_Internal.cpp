@@ -1067,6 +1067,11 @@ void CFileProcessingDB::initializeTableValues()
 			+ "', '0')";
 		vecQueries.push_back(strSQL);
 
+		// Add Auto Create Actions setting (default to false)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_CREATE_ACTIONS
+			+ "', '0')";
+		vecQueries.push_back(strSQL);
+
 		// Execute all of the queries
 		executeVectorOfSQL( getDBConnection(), vecQueries);
 	}

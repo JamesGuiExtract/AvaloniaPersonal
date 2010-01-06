@@ -7,17 +7,19 @@
 #include "FPRecordManager.h"
 #include "FileSupplyingMgmtRole.h"
 #include "FileProcessingMgmtRole.h"
+#include "UCLIDFileProcessing.h"
 
-#include <memory>
 #include <Win32Event.h>
 #include <FolderEventsListener.h>
 #include <MTSafeQueue.h>
 #include <Win32CriticalSection.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <map>
-#include "UCLIDFileProcessing.h"
+
+using namespace std;
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingManager
@@ -57,36 +59,35 @@ public:
 	STDMETHOD(StartProcessing)();
 	STDMETHOD(ShowUI)(VARIANT_BOOL bRunOnInit, VARIANT_BOOL bCloseOnComplete, VARIANT_BOOL bForceClose, 
 		int iNumDocsToExecute, void * pFRM);
-	STDMETHOD(SaveTo)(/*[in]*/ BSTR strFullFileName, VARIANT_BOOL bClearDirty);
-	STDMETHOD(LoadFrom)(/*[in]*/ BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlagToTrue);
-	STDMETHOD(get_FPSFileName)(/*[out, retval]*/ BSTR *pVal);
-	STDMETHOD(put_FPSFileName)(/*[in]*/ BSTR newVal);
-	STDMETHOD(get_MaxStoredRecords)(/*[out, retval]*/ long *pVal);
-	STDMETHOD(put_MaxStoredRecords)(/*[in]*/ long newVal);
-	STDMETHOD(get_RestrictNumStoredRecords)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_RestrictNumStoredRecords)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(SaveTo)(BSTR strFullFileName, VARIANT_BOOL bClearDirty);
+	STDMETHOD(LoadFrom)(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlagToTrue);
+	STDMETHOD(get_FPSFileName)(BSTR *pVal);
+	STDMETHOD(put_FPSFileName)(BSTR newVal);
+	STDMETHOD(get_MaxStoredRecords)(long *pVal);
+	STDMETHOD(put_MaxStoredRecords)(long newVal);
+	STDMETHOD(get_RestrictNumStoredRecords)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_RestrictNumStoredRecords)(VARIANT_BOOL newVal);
 	STDMETHOD(PauseProcessing)();
-	STDMETHOD(get_ProcessingStarted)(/*[out, retval]*/ VARIANT_BOOL *pbValue);
-	STDMETHOD(get_ProcessingPaused)(/*[out, retval]*/ VARIANT_BOOL *pbValue);
+	STDMETHOD(get_ProcessingStarted)(VARIANT_BOOL *pbValue);
+	STDMETHOD(get_ProcessingPaused)(VARIANT_BOOL *pbValue);
 	STDMETHOD(LoadFilesFromFile)(BSTR bstrFileName);
-	STDMETHOD(get_ActionName)(/*[out, retval]*/ BSTR *pVal);
-	STDMETHOD(put_ActionName)(/*[in]*/ BSTR newVal);
-//	STDMETHOD(get_ActionID)(/*[out, retval]*/ long *pVal);
-//	STDMETHOD(put_ActionID)(/*[in]*/ long newVal);
-	STDMETHOD(get_DisplayOfStatisticsEnabled)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_DisplayOfStatisticsEnabled)(/*[in]*/  VARIANT_BOOL newVal);
+	STDMETHOD(get_ActionName)(BSTR *pVal);
+	STDMETHOD(put_ActionName)(BSTR newVal);
+	STDMETHOD(get_DisplayOfStatisticsEnabled)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_DisplayOfStatisticsEnabled)(VARIANT_BOOL newVal);
 	STDMETHOD(Clear)();
 	STDMETHOD(ValidateStatus)(void);
-	STDMETHOD(get_FileSupplyingMgmtRole)(/*[out, retval]*/ IFileSupplyingMgmtRole **pVal);
-	STDMETHOD(get_FileProcessingMgmtRole)(/*[out, retval]*/ IFileProcessingMgmtRole **pVal);
-	STDMETHOD(GetActionIDFromName)(/*[in]*/ BSTR bstrActionName, /*[out, retval]*/ long *pVal);
-	STDMETHOD(get_DatabaseServer)(/*[out, retval]*/ BSTR *pVal);
-	STDMETHOD(put_DatabaseServer)(/*[in]*/ BSTR newVal);
-	STDMETHOD(get_DatabaseName)(/*[out, retval]*/ BSTR *pVal);
-	STDMETHOD(put_DatabaseName)(/*[in]*/ BSTR newVal);
+	STDMETHOD(get_FileSupplyingMgmtRole)(IFileSupplyingMgmtRole **pVal);
+	STDMETHOD(get_FileProcessingMgmtRole)(IFileProcessingMgmtRole **pVal);
+	STDMETHOD(GetActionIDFromName)(BSTR bstrActionName, long *pVal);
+	STDMETHOD(get_DatabaseServer)(BSTR *pVal);
+	STDMETHOD(put_DatabaseServer)(BSTR newVal);
+	STDMETHOD(get_DatabaseName)(BSTR *pVal);
+	STDMETHOD(put_DatabaseName)(BSTR newVal);
 	STDMETHOD(GetCounts)(long* plNumFilesProcessed, long* plNumProcessingErrors,
 		long* plNumFilesSupplied, long* plNumSupplyingErrors);
 	STDMETHOD(get_IsDBPasswordRequired)(VARIANT_BOOL* pvbIsDBPasswordRequired);
+	STDMETHOD(GetExpandedActionName)(BSTR *pbstrAction);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -130,11 +131,11 @@ private:
 	// vector of thread data objects containing data for each of the processing threads
 	vector<ProcessingThreadData *> m_vecProcessingThreadData;
 
-	std::auto_ptr<FileProcessingDlg> m_apDlg;
+	auto_ptr<FileProcessingDlg> m_apDlg;
 
 	// The filename that this manager was most recently
 	// loaded from or saved to
-	std::string m_strFPSFileName;
+	string m_strFPSFileName;
 
 	// This flag will be set to true
 	bool bRunOnInit;
@@ -150,7 +151,7 @@ private:
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr m_ipFAMTagManager;
 
 	// Action Name being processed
-	std::string m_strAction;
+	string m_strAction;
 
 	// flag of the statistics checkbox in action tab
 	bool m_bDisplayOfStatisticsEnabled;
@@ -161,8 +162,8 @@ private:
 	// previous DB server and previous DB name 
 	// added as per [p13 #4581 & #4580] so that
 	// the dirty flag can be properly set
-	std::string m_strPreviousDBServer;
-	std::string m_strPreviousDBName;
+	string m_strPreviousDBServer;
+	string m_strPreviousDBName;
 
 	CMutex m_mutexLockFilter;
 
@@ -200,6 +201,9 @@ private:
 	// REQUIRE: ipUnknown must implement the IFileActionMgmtRole interface
 	UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr getActionMgmtRole(IUnknownPtr ipUnknown);
 
+	// Returns the action name with the tags expanded
+	string getExpandedActionName();
+
 	// Returns the value of m_ipFPMDB. If it is NULL a new instance will be created if
 	// unable to create and instance an exception will be thrown
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr getFPMDB();
@@ -209,6 +213,9 @@ private:
 
 	// get the file supplier data vector for brief use
 	IIUnknownVectorPtr getFileSuppliersData();
+
+	// Determines if the specified action is in the database
+	bool isActionNameInDatabase(const string& strAction);
 
 	// Log the start and stop processing information
 	void logStatusInfo(EStartStopStatus eStatus);

@@ -190,6 +190,7 @@ public:
 	STDMETHOD(RemoveLoginUser)(BSTR bstrUserName);
 	STDMETHOD(RenameLoginUser)(BSTR bstrUserNameToRename, BSTR bstrNewUserName);	
 	STDMETHOD(ClearLoginUserPassword)(BSTR bstrUserName);
+	STDMETHOD(GetAutoCreateActions)(VARIANT_BOOL* pvbValue);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

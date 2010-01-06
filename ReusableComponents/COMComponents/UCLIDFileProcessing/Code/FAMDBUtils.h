@@ -40,7 +40,7 @@ public:
 
 // IFAMDBUtils
 	STDMETHOD(PromptForActionSelection)(IFileProcessingDB* pDB, BSTR strTitle, BSTR strPrompt, 
-			BSTR *pActionName);
+			VARIANT_BOOL vbAllowTags, BSTR *pActionName);
 
 private:
 

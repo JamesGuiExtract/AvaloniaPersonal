@@ -24,9 +24,10 @@ CFileProcessingUtils::~CFileProcessingUtils()
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18000");
 }
 //--------------------------------------------------------------------------------------------------
-const std::string CFileProcessingUtils::ChooseDocTag(HWND hwnd, long x, long y)
+const string CFileProcessingUtils::ChooseDocTag(HWND hwnd, long x, long y, 
+													 bool bIncludeSourceDocName)
 {
-	std::vector<std::string> vecChoices;
+	vector<string> vecChoices;
 
 	// Add the built in tags
 	IVariantVectorPtr ipVecBuiltInTags = getFAMTagManager()->GetBuiltInTags();
@@ -34,8 +35,11 @@ const std::string CFileProcessingUtils::ChooseDocTag(HWND hwnd, long x, long y)
 	for (long i = 0; i < lBuiltInSize; i++)
 	{
 		_variant_t var = ipVecBuiltInTags->Item[i];
-		std::string str = asString(var.bstrVal);
-		vecChoices.push_back(str);
+		string str = asString(var.bstrVal);
+		if (bIncludeSourceDocName || str != "<SourceDocName>")
+		{
+			vecChoices.push_back(str);
+		}
 	}
 	// Add a separator if there is at
 	// least one built in tags
@@ -50,7 +54,7 @@ const std::string CFileProcessingUtils::ChooseDocTag(HWND hwnd, long x, long y)
 	for (long i = 0; i < lIniSize; i++)
 	{
 		_variant_t var = ipVecIniTags->Item[i];
-		std::string str = asString(var.bstrVal);
+		string str = asString(var.bstrVal);
 		vecChoices.push_back(str);
 	}
 	// Add a separator if there is
@@ -62,7 +66,7 @@ const std::string CFileProcessingUtils::ChooseDocTag(HWND hwnd, long x, long y)
 
 	// Add utility functions
 	TextFunctionExpander tfe;
-	std::vector<std::string> vecFunctions = tfe.getAvailableFunctions();
+	vector<string> vecFunctions = tfe.getAvailableFunctions();
 	tfe.formatFunctions(vecFunctions);
 	addVectors(vecChoices, vecFunctions); // add the functions
 
@@ -72,7 +76,7 @@ const std::string CFileProcessingUtils::ChooseDocTag(HWND hwnd, long x, long y)
 	return qmc.getChoiceString(CWnd::FromHandle(hwnd), x, y);
 }
 //--------------------------------------------------------------------------------------------------
-const std::string CFileProcessingUtils::ExpandTagsAndTFE(UCLID_FILEPROCESSINGLib::IFAMTagManager *pFAMTM, const string &strFile, const std::string &strSourceDocName)
+const string CFileProcessingUtils::ExpandTagsAndTFE(UCLID_FILEPROCESSINGLib::IFAMTagManager *pFAMTM, const string &strFile, const string &strSourceDocName)
 {
 	//////////////////////////////////////////////////////////////////////////
 	// Get the FAMTagManager Pointer and expand tags in m_strFileName, 

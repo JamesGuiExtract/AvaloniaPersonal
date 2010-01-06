@@ -7,9 +7,8 @@
 #include "FPCategories.h"
 #include "FPAboutDlg.h"
 #include "FP_UI_Notifications.h"
-#include "SelectActionDlg.h"
-#include "..\..\..\InputFunnel\IFCore\Code\IFCategories.h"
 
+#include <IFCategories.h>
 #include <UCLIDException.h>
 #include <RegistryPersistenceMgr.h>
 #include <TemporaryResourceOverride.h>
@@ -349,9 +348,6 @@ void FileProcessingDlg::OnBtnRun()
 		// Reset the db connection
 		getDBPointer()->ResetDBConnection();
 		
-		// Check if the current action is exist
-		getDBPointer()->GetActionID( get_bstr_t(m_propActionPage.GetCurrentActionName()) );
-
 		// set all parameters for file proc manager
 		// if saving a setting fails we will not run
 		if (!flushSettingsToManager())
@@ -505,6 +501,7 @@ void FileProcessingDlg::OnBtnRun()
 		catch(...)
 		{
 			// update the UI
+			m_bRunning = false;
 			updateMenuAndToolbar();
 			throw;
 		}
@@ -2507,36 +2504,48 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 
 		_lastCodePos = "50";
 
-		long nActionID = ipFPMDB->GetActionID( ipFPMgr->ActionName );
-
-		_lastCodePos = "60";
-
-		// Loop with call to check the stats - while the stop event is not signaled
-		do
+		// Get the action ID
+		long nActionID = -1;
+		try
 		{
-			// Get the stats from the db in a temp object so that the UI will not be blocked
-			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = 
-				ipFPMDB->GetStats( nActionID );
-			ASSERT_RESOURCE_ALLOCATION("ELI20383", ipNewActionStats != NULL);
-		
-			_lastCodePos = "70";
-
-			pFPDlg->PostMessageA(FP_STATISTICS_UPDATE, 
-				(WPARAM) ipNewActionStats.Detach(), (LPARAM)0 );
-
-			_lastCodePos = "80";
+			nActionID = ipFPMDB->GetActionID( ipFPMgr->GetExpandedActionName() );
 		}
-		while ( pFPDlg->m_eventStatsThreadStop.wait( uiTickSpeed ) == WAIT_TIMEOUT );
+		catch (...)
+		{
+			// If the action name doesn't exist the main thread will handle it
+		}
 
-		// Call one last time to get the final stats.  This is so that if processing or supplying of all of the files
-		// finishes the stats that are displayed will be current at the time of the thread stop event being signaled.
-		// If this is the only instance and it is processing files the final stats will show that the processing is 
-		// finished instead of showing the stats as of the last timout
-		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = ipFPMDB->GetStats( nActionID );
-		
-		_lastCodePos = "90";
-		
-		pFPDlg->PostMessageA(FP_STATISTICS_UPDATE, (WPARAM) ipNewActionStats.Detach(), (LPARAM)0 );
+		if (nActionID != -1)
+		{
+			_lastCodePos = "60";
+
+			// Loop with call to check the stats - while the stop event is not signaled
+			do
+			{
+				// Get the stats from the db in a temp object so that the UI will not be blocked
+				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = 
+					ipFPMDB->GetStats( nActionID );
+				ASSERT_RESOURCE_ALLOCATION("ELI20383", ipNewActionStats != NULL);
+			
+				_lastCodePos = "70";
+
+				pFPDlg->PostMessageA(FP_STATISTICS_UPDATE, 
+					(WPARAM) ipNewActionStats.Detach(), (LPARAM)0 );
+
+				_lastCodePos = "80";
+			}
+			while ( pFPDlg->m_eventStatsThreadStop.wait( uiTickSpeed ) == WAIT_TIMEOUT );
+
+			// Call one last time to get the final stats.  This is so that if processing or supplying of all of the files
+			// finishes the stats that are displayed will be current at the time of the thread stop event being signaled.
+			// If this is the only instance and it is processing files the final stats will show that the processing is 
+			// finished instead of showing the stats as of the last timout
+			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = ipFPMDB->GetStats( nActionID );
+			
+			_lastCodePos = "90";
+			
+			pFPDlg->PostMessageA(FP_STATISTICS_UPDATE, (WPARAM) ipNewActionStats.Detach(), (LPARAM)0 );
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15001");
 

@@ -44,7 +44,8 @@ STDMETHODIMP CFAMDBUtils::InterfaceSupportsErrorInfo(REFIID riid)
 //--------------------------------------------------------------------------------------------------
 // IFAMDBUtils
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMDBUtils::PromptForActionSelection(IFileProcessingDB* pDB, BSTR strTitle, BSTR strPrompt, BSTR *pActionName)
+STDMETHODIMP CFAMDBUtils::PromptForActionSelection(IFileProcessingDB* pDB, BSTR strTitle, 
+	BSTR strPrompt, VARIANT_BOOL vbAllowTags, BSTR *pActionName)
 {
 	// override the current resource project instance
 	TemporaryResourceOverride rcOverride(_Module.m_hInst);
@@ -52,7 +53,8 @@ STDMETHODIMP CFAMDBUtils::PromptForActionSelection(IFileProcessingDB* pDB, BSTR 
 	try
 	{
 		// Create select action dialog
-		SelectActionDlg dlgSelectAction(pDB, asString(strTitle), asString(strPrompt));
+		SelectActionDlg dlgSelectAction(pDB, asString(strTitle), asString(strPrompt), 
+			asCppBool(vbAllowTags));
 
 		// Define the selected action name and ID
 		string strActionName = "";
@@ -66,7 +68,7 @@ STDMETHODIMP CFAMDBUtils::PromptForActionSelection(IFileProcessingDB* pDB, BSTR 
 		}
 
 		// Return the action name
-		*pActionName = get_bstr_t(strActionName.c_str()).copy();
+		*pActionName = get_bstr_t(strActionName.c_str()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14693");
 

@@ -25,6 +25,7 @@ static const string gstrSTORE_FAM_SESSION_HISTORY = "StoreFAMSessionHistory";
 static const string gstrENABLE_INPUT_EVENT_TRACKING = "EnableInputEventTracking";
 static const string gstrINPUT_EVENT_HISTORY_SIZE = "InputEventHistorySize";
 static const string gstrREQUIRE_AUTHENTICATION_BEFORE_RUN = "RequireAuthenticationBeforeRun";
+static const string gstrAUTO_CREATE_ACTIONS = "AutoCreateActions";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;

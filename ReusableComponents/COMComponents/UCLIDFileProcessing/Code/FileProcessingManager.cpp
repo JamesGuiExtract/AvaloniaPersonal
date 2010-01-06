@@ -4,6 +4,7 @@
 #include "UCLIDFileProcessing.h"
 #include "FileProcessingManager.h"
 #include "FP_UI_Notifications.h"
+#include "FileProcessingUtils.h"
 
 #include <ComponentLicenseIDs.h>
 #include <ComUtils.h>
@@ -63,6 +64,9 @@ CFileProcessingManager::~CFileProcessingManager()
 	{
 		clear();
 		m_ipFPMDB = NULL;
+		m_ipFSMgmtRole = NULL;
+		m_ipFPMgmtRole = NULL;
+		m_ipFAMTagManager = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14256")
 }
@@ -171,6 +175,37 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 			}
 		}
 
+		// Make sure that the FPS file includes directory information (P13 #4502)
+		if ((m_strFPSFileName != "") && (!isAbsolutePath(m_strFPSFileName)))
+		{
+			// Append filename to the current directory
+			string strWholePath = getCurrentDirectory();
+			strWholePath += "\\";
+			strWholePath += m_strFPSFileName.c_str();
+
+			// Replace filename with whole-path version
+			m_strFPSFileName = strWholePath;
+		}
+
+		// Expand the action name
+		string strExpandedAction = getExpandedActionName();
+
+		// Ensure the action name exists in the database
+		if (!isActionNameInDatabase(strExpandedAction))
+		{
+			if (getFPMDB()->GetAutoCreateActions() == VARIANT_TRUE)
+			{
+				getFPMDB()->DefineNewAction(strExpandedAction.c_str());
+			}
+			else
+			{
+				UCLIDException ue("ELI29121", "Invalid action name.");
+				ue.addDebugInfo("Action name", m_strAction);
+				ue.addDebugInfo("Expanded action name", strExpandedAction);
+				throw ue;
+			}
+		}
+
 		// start the processing
 		m_bPaused = false;
 		m_bCancelling = false;
@@ -191,21 +226,6 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 			m_recordMgr.setDlg(m_apDlg->m_hWnd);
 		}
 
-		// Make sure that the FPS file includes directory information (P13 #4502)
-		if ((m_strFPSFileName != "") && (!isAbsolutePath(m_strFPSFileName)))
-		{
-			// Append filename to the current directory
-			string strWholePath = getCurrentDirectory();
-			strWholePath += "\\";
-			strWholePath += m_strFPSFileName.c_str();
-
-			// Replace filename with whole-path version
-			m_strFPSFileName = strWholePath;
-		}
-
-		// Set the FPS file directory for tag manager
-		m_ipFAMTagManager->FPSFileDir = _bstr_t(getDirectoryFromFullPath(m_strFPSFileName).c_str());
-
 		// clear all the records in the file processing record manager
 		// (i.e. clear the queue of files to process)
 		m_recordMgr.clear(true);
@@ -224,7 +244,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		{
 			// Set flag indicating that supplying was started
 			m_bSupplying = true;
-			ipSupplyingActionMgmtRole->Start(m_ipFPMDB, get_bstr_t(m_strAction), 
+			ipSupplyingActionMgmtRole->Start(m_ipFPMDB, strExpandedAction.c_str(), 
 				(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager, ipThis);
 		}
 
@@ -241,7 +261,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 			{
 				m_ipFPMgmtRole->OkToStopWhenQueueIsEmpty = m_bSupplying ? VARIANT_FALSE : VARIANT_TRUE;
 
-				ipProcessingActionMgmtRole->Start(m_ipFPMDB, get_bstr_t(m_strAction), 
+				ipProcessingActionMgmtRole->Start(m_ipFPMDB, strExpandedAction.c_str(), 
 					(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager, ipThis);
 			}
 			catch (...)
@@ -691,19 +711,15 @@ STDMETHODIMP CFileProcessingManager::ValidateStatus(void)
 			throw ue;
 		}
 
-		// If there is no action specified 
+		// If there is no action specified
 		if (m_strAction == "")
 		{
 			UCLIDException ue("ELI14362", "An action should be specified in action tab!");
 			throw ue;
 		}
 
-		// Test if the action is still inside the database
-		try
-		{
-			long lActionID = getFPMDB()->GetActionID( m_strAction.c_str() );
-		}
-		catch(...)
+		// Validate the action name unless it contains a function to expand
+		if (m_strAction.find('$') == string::npos && !isActionNameInDatabase(m_strAction))
 		{
 			string strDebugInfo = "The action '" + m_strAction + "' does not exist in database.";
 			UCLIDException ue("ELI15658", strDebugInfo.c_str());
@@ -945,7 +961,23 @@ STDMETHODIMP CFileProcessingManager::get_IsDBPasswordRequired(VARIANT_BOOL* pvbI
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28474")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::GetExpandedActionName(BSTR *pbstrAction)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI29117", pbstrAction != NULL);
+
+		*pbstrAction = _bstr_t(getExpandedActionName().c_str()).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14017")
+
+	return S_OK;
+}
 //-------------------------------------------------------------------------------------------------
 // IRoleNotifyFAM Methods
 //-------------------------------------------------------------------------------------------------
@@ -1073,6 +1105,15 @@ UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr CFileProcessingManager::getActio
 	return ipMgmtRole;
 }
 //-------------------------------------------------------------------------------------------------
+string CFileProcessingManager::getExpandedActionName()
+{
+	// Set the FPS file directory for tag manager
+	m_ipFAMTagManager->FPSFileDir = getDirectoryFromFullPath(m_strFPSFileName).c_str();
+
+	// Expand the tags
+	return CFileProcessingUtils::ExpandTagsAndTFE(m_ipFAMTagManager, m_strAction, "");
+}
+//-------------------------------------------------------------------------------------------------
 void CFileProcessingManager::clear()
 {
 	try
@@ -1141,6 +1182,20 @@ IIUnknownVectorPtr CFileProcessingManager::getFileSuppliersData()
 	ASSERT_RESOURCE_ALLOCATION("ELI19430", ipFileSuppliersData != NULL);
 
 	return ipFileSuppliersData;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingManager::isActionNameInDatabase(const string& strAction)
+{
+	try
+	{
+		getFPMDB()->GetActionID( strAction.c_str() );
+	}
+	catch(...)
+	{
+		return false;
+	}
+
+	return true;		
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
