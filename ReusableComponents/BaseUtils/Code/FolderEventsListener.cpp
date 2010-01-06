@@ -112,6 +112,10 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 		fl->m_eventFolderThreadBegin.signal();
 		unsigned long ulTimeBetweenRestarts = gulDEFAULT_TIME_BETWEEN_RESTARTS;
 
+		// Variable to track the number of times listening is started
+		// This will be used to track the number of calls to getListeningHandle
+		int nListeningStartCount = 0;
+
 		do
 		{
 			// Setup events for changes
@@ -143,6 +147,14 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 				// Handle for file changes
 				hFile = fl->getListeningHandle( pTD->m_strFilename );
 
+				nListeningStartCount++;
+
+				// Log an exception each time listening starts 
+				UCLIDException ueStart("ELI29123", "Application trace: Listening started.");
+				ueStart.addDebugInfo("Number times started", nListeningStartCount);
+				ueStart.addDebugInfo("Folder",  pTD->m_strFilename);
+				ueStart.log();
+
 				bool bDone = false;
 				do
 				// There are many flags that can be specified other than FILE_NOTIFY_CHANGE_FILE_NAME
@@ -171,6 +183,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 							ue.addDebugInfo("Directory Name",
 								(pTD.get() != NULL ? pTD->m_strFilename : "<Empty>"));
 							ue.addWin32ErrorInfo();
+							ue.addDebugInfo("Folder",  pTD->m_strFilename);
 							throw ue;
 						}
 
