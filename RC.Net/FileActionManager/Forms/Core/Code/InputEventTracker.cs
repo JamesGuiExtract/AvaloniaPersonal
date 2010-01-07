@@ -33,7 +33,7 @@ namespace Extract.FileActionManager.Forms
             /// <summary>
             /// The time stamp for the active minute.
             /// </summary>
-            readonly DateTime _timeStamp;
+            DateTime _timeStamp;
 
             /// <overloads>
             /// Initializes a new instance of the <see cref="ActiveMinuteData"/> class.
@@ -45,8 +45,11 @@ namespace Extract.FileActionManager.Forms
             /// </param>
             public ActiveMinuteData(int activeSecondCount)
             {
+                // Store the active second count
                 _activeSecondCount = activeSecondCount;
-                _timeStamp = DateTime.Now;
+
+                // The active minute is actually the previous minute
+                _timeStamp = DateTime.Now.AddMinutes(-1.0);
             }
 
             /// <summary>
@@ -79,6 +82,10 @@ namespace Extract.FileActionManager.Forms
                 get
                 {
                     return _timeStamp;
+                }
+                set
+                {
+                    _timeStamp = value;
                 }
             }
         }
@@ -382,13 +389,18 @@ namespace Extract.FileActionManager.Forms
         {
             try
             {
+                DateTime lastUpdate = DateTime.MinValue;
+
                 WaitHandle[] waitHandles = new WaitHandle[] { _updateDatabase, _endThreads };
                 while (WaitHandle.WaitAny(waitHandles) != 1)
                 {
                     try
                     {
+                        ActiveMinuteData data = new ActiveMinuteData(_cachedMinuteData);
+                        lastUpdate = data.TimeStamp;
+
                         // Record the active minute data
-                        RecordActiveMinuteData(new ActiveMinuteData(_cachedMinuteData));
+                        RecordActiveMinuteData(data);
                     }
                     catch (Exception ex)
                     {
@@ -400,8 +412,22 @@ namespace Extract.FileActionManager.Forms
                 // Check for any left over active second data
                 if (_activeSecondCount > 0)
                 {
+                    // Get the active minute data
+                    ActiveMinuteData data = new ActiveMinuteData(_activeSecondCount);
+
+                    // Check if we have recorded data for this minute already
+                    // (this is to handle the boundary conditions of the first/last
+                    // seconds of a minute)
+                    TimeSpan span = data.TimeStamp.Subtract(lastUpdate);
+                    if (span.Minutes == 0)
+                    {
+                        // Add a minute to the time stamp and record the data
+                        // for the current minute
+                        data.TimeStamp = data.TimeStamp.AddMinutes(1.0);
+                    }
+
                     // Record the active minute data
-                    RecordActiveMinuteData(new ActiveMinuteData(_activeSecondCount));
+                    RecordActiveMinuteData(data);
                 }
             }
             catch (ThreadAbortException)
