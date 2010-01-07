@@ -161,7 +161,7 @@ static const string gstrCREATE_INPUT_EVENT =
 	"[FAMUserID] int NOT NULL, "
 	"[MachineID] int NOT NULL, "
 	"[PID] int NOT NULL, "
-	"[InputEventCount] int NOT NULL)";
+	"[SecondsWithInputEvents] int NOT NULL)";
 
 // Create table indexes SQL
 static const string gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_PriorityID] "

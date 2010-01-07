@@ -4547,7 +4547,7 @@ STDMETHODIMP CFileProcessingDB::RecordInputEvent(BSTR bstrTimeStamp, long nActio
 	try
 	{
 		string strSQL = "INSERT INTO [" + gstrINPUT_EVENT + "] ([TimeStamp], "
-			"[ActionID], [FAMUserID], [MachineID], [PID], [InputEventCount]) "
+			"[ActionID], [FAMUserID], [MachineID], [PID], [SecondsWithInputEvents]) "
 			"VALUES (CAST('" + asString(bstrTimeStamp) + "' AS smalldatetime), "
 			+ asString(nActionID) + ", ";
 
