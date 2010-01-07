@@ -133,6 +133,15 @@
 	  	   	<LI>Confirm that no <b>ELI11649: Rule execution stack is empty.</b> exceptions 
 			are seen.
 	       	</ul>
+<p>
+		<LI><b>[DataEntry #718, #726]</b> Swiping into a new row
+       		<ul>
+			<li>Process a document.
+		   	<LI>Swipe a value into the new row of a table. 
+		   	<LI>Confirm that dependent controls are active. 
+			<li>Confirm that the swiped text is marked as viewed.
+	       	</ul>
+   		</LI>
 	</ul>
 <p>
 	<LI><h3>Cell Swiping</h3>
@@ -184,6 +193,18 @@
   	   		<LI>Type some text into the cell.
 	  	   	<LI>Confirm that the typed text is displayed as a tooltip.
        		</ul>
+<p>
+		<LI><b>[DataEntry #741, #773]</b> Appending text via multiple swipes
+       		<ul>
+			<li>Process a document.
+		   	<LI>Confirm that swiped text replaces text in a cell that is 
+			completely selected. 
+	   		<LI>Confirm that swiped text is inserted into a cell at the selection 
+			position. 
+			<li>Confirm that appending swiped text also works when using the 
+			<b>angular highlight</b> tool.
+	       	</ul>
+   		</LI>
 	</ul>
 <p>
 	<LI><h3>Copy and Paste from tables</h3>
@@ -313,13 +334,40 @@
   		   	<LI>Confirm that the selected row is dragged over a different row, the 
 			<b>Selected Order Details</b> table does not update based on the different row.
 	       	</ul>
-		<LI><b>[DataEntry #746]</b> Multi-cell support for copy and paste
+		<LI><b>[DataEntry #746, #787, #789, #791]</b> Multi-cell copy and paste
        		<ul>
 			<li>Process several documents.
-	  	   	<LI>Confirm that the collection date and time values can be copied from one 
+		   	<LI>Confirm that the collection date and time values can be copied from one 
 			order and pasted into another order.
 			<li>Confirm that the units value for a single test can be pasted into 
 			multiple tests.
+<p>
+			<li>Select a single cell not in edit mode.
+			<li>Click <b>Ctrl+C</b> to copy the contents of the cell.
+			<li>Confirm that the text can be pasted into cells in a dissimilar table 
+			(i.e. Physician last name to Test name).
+			<li>Select two adjacent cell in the same row.
+			<li>Click <b>Ctrl+C</b> to copy the contents.
+			<li>Select the same leftmost cell in the starred row.
+			<li>Click <b>Ctrl+V</b> to paste the contents.
+			<li>Confirm that both appropriate cells are populated.
+<p>
+			<li>Copy some plain text.
+			<li>Select a cell in a starred row of a table.
+			<li>Click <b>Ctrl+V</b> to paste the contents.
+			<li>Confirm that a single new row is created with one cell properly 
+			populated.
+<p>
+			<li>Create a new row in the <b>Order</b> table.
+			<li>Provide an <b>Order name</b> of <b>a</b>.
+			<li>Provide an <b>Epic code</b> of <b>b</b>.
+			<li>Provide an <b>Collection date</b> of <b>c</b>.
+			<li>Provide an <b>Collection time</b> of <b>d</b>.
+			<li>Select all of the cells in the row (but not the row header).
+			<li>Click <b>Ctrl+C</b> to copy the contents.
+			<li>Select the first cell in another row (not the starred row).
+			<li>Click <b>Ctrl+V</b> to paste the contents.
+			<li>Confirm that the four cells are properly updated.
        		</ul>
 	   	</LI>
 	</ul>
@@ -359,6 +407,42 @@
 			<li>Right-click on the row header for the row containing the selected cell.
 			<li>Select "Deleter Row(s)".
 			<li>Confirm that the entire row is deleted.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Smart tags</h3>
+	<ul>
+		<li>Confirm that the <b>SmartTags</b> table contains entries.
+		<LI>Open an image.
+		<LI>Select and clear an edit box.
+		<LI>Type a <b>period</b> character.
+		<LI>Confirm that a drop-down list appears at the cursor location.
+		<li>Confirm that the initial list contains all of the defined smart tags.
+		<li>Confirm that as characters are typed by the user, the list of available smart 
+		tags automatically adjusts to retain just the tags that begin with the typed text.
+		<li>Confirm that typing a <b>space</b> character after the smart tags list is 
+		provided automatically expands the selected tag into the associated text.
+		<li>Confirm that typing in an undefined smart tag such as <b>.abc123</b> 
+		leaves the text with the unexpanded string.
+		<li>Confirm that backspacing through the unexpanded string eventually provides 
+		a drop-down list once defined tags are again available.
+		<li>Confirm that smart tag text containing $ functions such as <b>$Now()</b> 
+		are properly expanded.
+		<li>Confirm that the smart tag list will also drop down if a <b>period</b> 
+		character is typed after whitespace.
+		<li>Confirm that the smart tag list will <b>not</b> drop down if a period 
+		character is typed after non-whitespace.
+		<li>Confirm that smart tags are available for all controls that allow text entry.
+<p>
+		<li>Embedded data fields
+		<ul>
+			<li>Define one or more smart tags that contain embedded data fields 
+			enclosed in double angle brackets such as <b>&lt;&lt;TestName&gt;&gt;</b>.
+			<li>Confirm that clicking <b>TAB</b> after selecting the above smart tag 
+			automatically selects the first embedded data field.
+			<li>Confirm that the user can easily overwrite the selected text.
+			<li>Confirm that a subsequent <b>TAB</b> automatically advances to the 
+			next embedded data field within the partially expanded smart tag text.
 		</ul>
 	</ul>
 <p>
@@ -622,6 +706,19 @@
 			<li>Select all the Orders and press <b>Delete</b>.
 			<li>Confirm that all of the <b>Orders</b> are deleted without an exception.
 	       	</ul>
+<p>
+		<LI><b>[DataEntry #707]</b> Unscrollable tables
+		<ul>
+			<li>Open a document with a table containing even items so as to require a 
+			vertical scroll bar.
+			<li>Click on a row of the table and start to drag it.
+			<li>Drag the row over a single cell in the table and then release it.
+			<li>Confirm that the table can still be scrolled with the scroll bar.
+			<li>Confirm that the table can still be scrolled with the mousewheel.
+			<li>Confirm that the table can still be scrolled by navigating to a table row 
+			that is not currently visible.
+       		</ul>
+	   	</LI>
    	</LI>
    	</LI>
 	</ul>

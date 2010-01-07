@@ -319,6 +319,16 @@
 				<li>Confirm that the autocomplete provides a list of possible entries
 				beginning with "C".
 			</ul>
+<p>
+			<li><b>[FlexIDSCore #3856]</b> Apostrophes in comments
+			<ul>
+				<li>Open an image.
+				<li>Add text including one or more <b>apostrophe</b> characters to 
+				the <b>Comments (for operator's use)</b> field.
+				<li>Save and commit the document.
+				<li>Navigate back to the document.
+				<li>Confirm that the apostrophe characters are not doubled.
+			</ul>
 		</ul>
 	</ul>
 <p>
@@ -404,6 +414,50 @@
 				<li>Pressing enter after navigating to a cell using a series of tabs,
 				focus moves down to the cell below the first in that series.
 			</ul>
+		</ul>
+<p>
+		<LI><b>[DataEntry #771]</b> Confirm that a disabled table is not a tabstop when 
+		tabbing by row is enabled.
+	</ul>
+<p>
+	<LI><h3>New database tables</h3>
+	<ul>
+		<li><b>DataEntryData</b>
+		<ul>
+			<li>Confirm that the <b>DataEntry: Verify extracted data</b> task includes an 
+			<b>Enable data entry counters</b> check box.
+			<li>Confirm that the <b>DBInfo</b> table includes a <b>EnableDataEntryCounters</b> 
+			field.
+			<li>Confirm that the default setting for <b>EnableDataEntryCounters</b> is <b>0</b>.
+			<li>Confirm that if both the task setting and the DBInfo setting are enabled, 
+			statistics are collected in the DataEntryData table.
+		</ul>
+		<li><b>FAMSession</b>
+		<ul>
+			<li>Confirm that a <b>FAMSession</b> table exists in the database.
+			<li>Confirm that a <b>SaveFAMSessionHistory</b> row exists in the 
+			<b>DBInfo</b> table.
+			<li>Confirm that the <b>SaveFAMSessionHistory</b> default is <b>1</b>.
+  		   	<LI>Confirm that <b>FAMSession</b> records with start and stop times 
+			are added for each FAM instance.
+	  	   	<LI>Confirm that <b>FAMSession</b> records are not added for 
+			<b>SaveFAMSessionHistory = 0</b>.
+		</ul>
+		<li><b>InputEvent</b>
+		<ul>
+			<li>Confirm that the <b>DataEntry: Verify extracted data</b> task includes an 
+			<b>Enable input event tracking</b> check box.
+			<li>Confirm that the <b>DBInfo</b> table includes a <b>EnableInputEventTracking</b> 
+			field.
+			<li>Confirm that the default setting for <b>EnableInputEventTracking</b> is <b>0</b>.
+			<li>Confirm that if both the task setting and the DBInfo setting are enabled, 
+			statistics are collected in the InputEventTracking table.
+			<li>Confirm that the <b>DBInfo</b> table includes a <b>InputEventHistorySizeInDays</b> 
+			field.
+			<li>Confirm that the default setting for <b>InputEventHistorySizeInDays</b> is 
+			<b>30</b>.
+			<li><b>[LegacyRC #5630]</b> Confirm that input activity is logged for the specific 
+			minute in which it occurs.
 		</ul>
 	</ul>
 <p>
@@ -531,6 +585,22 @@
 			<li>Process another image.
 			<li>Confirm that the temporary database has been updated to reflect the recent 
 			change.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>[DataEntry #768, #781]</b> Zoom and fit mode
+		<ul>
+      			<li>Verify some images.
+			<li>Set fit mode to <b>full page</b> or <b>width</b>.
+      			<li>Confirm that the initial zoom for an image works as expected.
+			<li>Remove the fit mode setting.  Set the <b>Auto zoom</b> property to 
+			<b>Zoom out if necessary to fit current selection</b>.
+      			<li>Confirm that the initial zoom is to the first data item.
+<p>
+			<li>Set fit mode to <b>full page</b> or <b>width</b>.
+      			<li>Zoom in and update some data.
+      			<li>Click the <b>Zoom previous</b> button.
+	      		<li>Confirm that the image returns to its fit-mode zoom state.
        		</ul>
 	   	</LI>
 <p>

@@ -141,6 +141,17 @@
 			<li>Re-open LabDE in <b>FAM</b> mode.
 			<li>Confirm that window size and position are persistent.
 		</ul>
+<p>
+		<LI><b>[DataEntry #149, #752]</b> Docking windows
+		<ul>
+			<li>Confirm that the <b>DEP window</b> and the <b>image window</b> can be docked 
+			separately and displayed on separate monitors.
+			<li>Confirm that window settings on separate monitors are persistent between 
+			sessions.
+			<li>Confirm that multiple monitor behavior is appropriate when switching primary 
+			and secondary monitors.
+       		</ul>
+	   	</LI>
 	</ul>
 <p>
 	<LI><h3>Menus, Toolbars and Caption</h3>
@@ -303,6 +314,9 @@
 			highlight indicating poorer OCR.
 			<li>Confirm that <b>Ctrl+T</b> changes the highlight to green.
 			<li>Confirm that <b>Ctrl+D</b> removes the highlight and the tooltip.
+<p>
+			<li>Confirm that <b>View - Show image in separate window</b> properly separates 
+			the DEP and the image window.
 		</ul>
 <p>
 		<li>Tools menu
@@ -450,6 +464,10 @@
 			<li>Confirm that <b>Escape</b> hides the active tooltip.
 			<li>Confirm that <b>F10</b> highlights all found data.
 			<li>Confirm that <b>F10</b> again turns off all highlights.
+			<li>Confirm that the <b>F11</b> shortcut also separates the DEP and the 
+			image window.
+			<li>Confirm that another <b>F11</b> shortcut redocks the DEP and the 
+			image window.
 			<li>Confirm that <b>Ctrl+T</b> accepts the active highlight by turning any 
 			red background color to green.
 			<li>Confirm that <b>Ctrl+D</b> deletes the active highlight.
@@ -474,6 +492,19 @@
 				the up and down arrows.
 		       	</ul>
 		   	</LI>
+			<LI><b>[DataEntry #756]</b> Shortcut for adding new rows to a table
+			<ul>
+      				<li>Verify an image.
+	      			<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+				<b>Ordering Physician</b> table.
+      				<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+				<b>CopyTo Physician</b> table.
+	      			<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+				<b>Orders</b> table.
+	      			<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
+				<b>Tests</b> table.
+		       	</ul>
+   			</LI>
 		</ul>
 <p>
 		<LI><b>[DataEntry #412]</b> Shortcuts and frozen application
@@ -575,6 +606,8 @@
 		       	</ul>
 			<li>Confirm that a name copied to the clipboard can be pasted into a row of the
 			<b>Patient Name</b> table.
+	      		<li>Confirm that the Clipboard is cleared after pasting into the 
+			<b>Patient Name</b> field.
 			<li>Confirm that a validation icon is displayed if the <b>First</b> or <b>Last</b>
 			name cells are empty.
 			<li>Confirm that text can be swiped into the <b>Medical Record #</b> edit box.
@@ -585,9 +618,11 @@
        			<ul>
 				<li>Exercise second-stage verification.
 		  	   	<LI>Confirm that the medical record number is valid with or without a 
-				leading <b>M</b> or <b>Z</b>.
+				leading <b>m</b> or <b>M</b> or <b>z</b> or <b>Z</b>.
 		       	</ul>
 		   	</LI>
+	      		<li>Confirm that the Clipboard is cleared after pasting into the 
+			<b>Medical Record #</b> field.
 			<li>Confirm that text can be swiped into the <b>Date of Birth</b> edit box.
 			<li>Confirm that text can be typed into the <b>Date of Birth</b> edit box.
 			<li>Confirm that a validation icon is displayed in the DEP if an invalid date is 
@@ -709,6 +744,25 @@
 			retains the information in the <b>Selected Order Details</b> table.
 			<li>Confirm that deleting all rows from the <b>Orders</b> table 
 			removes the information in the <b>Selected Order Details</b> table.
+			<LI><b>[DataEntry #155, #790]</b> Validation warning
+			<ul>
+				<li>Modify the <b>.config</b> file to include the following 
+				information so as to allow the user to save a file that contains 
+				one or more validation warnings.
+				<ul>
+					<li>&lt;objectSettings&gt;
+					<li>&lt;Extract.LabDE.StandardLabDE.StandardLabDEPanel&gt;
+					<li>&lt;Property name="InvalidDataSaveMode"&gt;AllowWithWarnings&lt;/Property&gt;
+					<li>&lt;/Extract.LabDE.StandardLabDE.StandardLabDEPanel&gt;
+					<li>&lt;/objectSettings&gt;
+				</ul>
+				<li>Verify a document containing a <b>CBC</b> order.
+				<li>Delete the <b>RBC</b> test.
+				<li>Confirm that a validation warning is provided as a yellow triangle 
+				exclamation.
+				<li>Confirm that the validation warning does not prevent a successful 
+				<b>Save and commit</b>.
+		       	</ul>
 			<li><b>[DataEntry #653]</b> Clicking on last visible Order row
 			<ul>
 				<li>Open a Demo_LabDE sample image such as <b>413.tif</b> that 
@@ -738,6 +792,8 @@
 			<li>Confirm that text can be typed into the <b>Order Number</b> edit box.
 			<li>Confirm that a validation icon is displayed if the <b>Order Number</b>
 			edit box is empty.
+	      		<li>Confirm that the Clipboard is cleared after pasting into the 
+			<b>Order Number</b> field.
 			<li>Confirm that typing into the <b>Lab Name</b> combo box cycles through
 			available lab names.
 			<li><b>[DataEntry #513]</b> Hybrid data for auto-updated values

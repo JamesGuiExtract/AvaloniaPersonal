@@ -250,10 +250,12 @@
 <p>
 	<LI><h3>File Action Manager</h3>
 	<ul>
-		<LI>Confirm that a <b>Verify extracted data</b> task is available as a file 
+		<LI>Confirm that a <b>DataEntry: Verify extracted data</b> task is available as a file 
 		processing task.
 		<LI><b>[DataEntry #249, #358]</b> Confirm that <b>Configure</b> button allows specification 
 		of a <b>.config</b> file.
+		<li>Confirm that the task includes an <b>Enable input event tracking</b> check box.
+		<li>Confirm that the task includes an <b>Enable data entry counters</b> check box.
 		<LI>Start processing with different numbers of threads and confirm that 
 		exactly one <b>Data Entry Application</b> is started.
 		<LI>Stop processing from the FAM and confirm that the active document is closed and 
@@ -307,20 +309,33 @@
 		key if defined.
 		<LI><b>[DataEntry #748]</b> Apply tags
 		<ul>
-			<li>Confirm that a toolbar button exists for applying tags to the 
-			open document.
-			<li>Confirm that multiple tags can be applied to the document.
+			<li>Use <b>DB Admin</b> to remove all tags from the database.
+			<li>Verify a document.
+			<li>Confirm that an <b>Apply tag to file</b> button is present on the toolbar.
+			<li>Confirm that clicking on the button drops down a <b>No tags available</b> 
+			menu item.
+			<li>Close the FAM.
+			<li>Use <b>DB Admin</b> to add some tags to the database.
+			<li>Verify a document.
+			<li>Confirm that clicking on the <b>Apply tag to file</b> button drops down a 
+			checked menu with an entry for the <b>Name</b> of each defined tag.
+			<li>Confirm that multiple tags can be applied to a document.
+<p>
+			<li>Exercise the <b>List of all tagged documents in the project (by tag)</b> 
+			report.
+			<li>Confirm that appropriate results are seen.
+			<li>Exercise the <b>List of all tags in the project (by tag)</b> 
+			report.
+			<li>Confirm that appropriate results are seen.
 		</ul>
 	</ul>
 <p>
 	<LI><h3>Reports</h3>
 	<ul>
-		<LI>Confirm that the <b>Activity report by user</b> report exists and 
+		<LI>Confirm that the <b>LabDE data entry rates by user</b> report exists and 
 		displays appropriate information.
-		<LI>Confirm that the <b>Activity report by date and user</b> report exists and 
+		<LI>Confirm that the <b>LabDE high effort files by user</b> report exists and 
 		displays appropriate information.
-		<LI>Confirm that the <b>Activity report by file, date and user</b> report exists 
-		and displays appropriate information.
 	</ul>
 <p>
 	<LI><h3>Highlighting</h3>
