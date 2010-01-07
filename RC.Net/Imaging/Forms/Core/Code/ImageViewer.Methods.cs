@@ -184,14 +184,6 @@ namespace Extract.Imaging.Forms
                 // [IDSD:193] Convert to the full path name otherwise OCR will fail
                 fileName = Path.GetFullPath(fileName);
 
-                // Ensure the file name is not null
-                ExtractException.Assert("ELI21218", "File name must be specified.",
-                    !String.IsNullOrEmpty(fileName));
-
-                // Ensure the file exists
-                ExtractException.Assert("ELI21110", "File does not exist.", File.Exists(fileName),
-                    "File name", fileName);
-
                 // Raise the opening image event
                 OpeningImageEventArgs opening = new OpeningImageEventArgs(fileName, updateMruList);
                 OnOpeningImage(opening);
