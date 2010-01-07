@@ -106,6 +106,12 @@ namespace Extract.Redaction.Verification
         VerificationMemento _unsavedMemento;
 
         /// <summary>
+        /// Prevents outside sources from writing to the currently processing document if the 
+        /// user navigates away from it.
+        /// </summary>
+        FileStream _processingStream;
+
+        /// <summary>
         /// The time the current displayed image was first displayed.
         /// </summary>
         DateTime _screenTimeStart;
@@ -503,15 +509,15 @@ namespace Extract.Redaction.Verification
                     // Create the destination directory if necessary.
                     Directory.CreateDirectory(Path.GetDirectoryName(memento.FoundAttributesFileName));
 
-                    // Copy the existing voa file as the found data if it exists
                     if (File.Exists(memento.AttributesFile))
                     {
+                        // Copy the existing voa file as the found data if it exists
                         File.Copy(memento.AttributesFile, memento.FoundAttributesFileName, false);
                     }
-                    // Otherwise save a new empty voa file as the found data to ensure we don't
-                    // save verified data as found data at a later point in time.
                     else
                     {
+                        // Otherwise save a new empty voa file as the found data to ensure we don't
+                        // save verified data as found data at a later point in time.
                         IUnknownVector emptyVector = new IUnknownVector();
                         emptyVector.SaveTo(memento.FoundAttributesFileName, false);
                     }
@@ -569,12 +575,8 @@ namespace Extract.Redaction.Verification
 
             if (IsInHistory)
             {
-                // Advance the history index
-                _historyIndex++;
-
                 // Open the next file
-                VerificationMemento memento = GetCurrentDocument();
-                _imageViewer.OpenImage(memento.ImageFile, false);
+                IncrementHistory(true);
             }
             else
             {
@@ -599,7 +601,7 @@ namespace Extract.Redaction.Verification
                 OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSuccessful));
             }
         }
-
+        
         /// <summary>
         /// Raises user prompts if any required fields are unfilled.
         /// </summary>
@@ -1154,14 +1156,16 @@ namespace Extract.Redaction.Verification
                         SaveAttributesTo(_unsavedMemento, screenTime);
                         
                         UpdateMemento();
+
+                        // Prevent outside sources from writing to the processing document
+                        _processingStream = File.Open(_savedMemento.ImageFile, FileMode.Open, 
+                            FileAccess.Read, FileShare.Read);
                     }
 
                     CommitComment();
 
                     // Go to the previous document
-                    _historyIndex--;
-                    VerificationMemento memento = GetCurrentDocument();
-                    _imageViewer.OpenImage(memento.ImageFile, false);
+                    IncrementHistory(false);
                 }
             }
         }
@@ -1181,6 +1185,54 @@ namespace Extract.Redaction.Verification
                     SaveRedactionCounts(screenTime);
 
                     AdvanceToNextDocument();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Increments or decrements the history index and opens the current image.
+        /// </summary>
+        /// <param name="forward"><see langword="true"/> if incrementing; <see langword="false"/> 
+        /// if decrementing.</param>
+        void IncrementHistory(bool forward)
+        {
+            // Prevent write access to the current image 
+            VerificationMemento oldMemento = GetCurrentDocument();
+            using (File.Open(oldMemento.ImageFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                // Increment the history
+                _historyIndex += forward ? 1 : -1;
+                VerificationMemento newMemento = GetCurrentDocument();
+
+                try
+                {
+                    // Attempt to open the new image
+                    _imageViewer.OpenImage(newMemento.ImageFile, false);
+                }
+                catch (Exception ex)
+                {
+                    // Display the exception
+                    ExtractException.Display("ELI29135", ex);
+
+                    // Remove the bad image
+                    if (IsInHistory)
+                    {
+                        _history.RemoveAt(_historyIndex);
+                    }
+
+                    // Undo the history increment
+                    if (forward)
+                    {
+                        _historyIndex--;
+                    }
+                    _imageViewer.OpenImage(oldMemento.ImageFile, false);
+                }
+
+                // If we have moved to the currently processing document, remove the write lock
+                if (!IsInHistory && _processingStream != null)
+                {
+                    _processingStream.Dispose();
+                    _processingStream = null;
                 }
             }
         }

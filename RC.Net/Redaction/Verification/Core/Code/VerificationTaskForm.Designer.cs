@@ -24,6 +24,11 @@ namespace Extract.Redaction.Verification
                 {
                     components.Dispose();
                 }
+                if (_processingStream != null)
+                {
+                    _processingStream.Dispose();
+                    _processingStream = null;
+                }
                 if (_unsavedMemento != null)
                 {
                     try
