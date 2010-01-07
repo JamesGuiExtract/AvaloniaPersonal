@@ -1,9 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.Redaction.Verification
@@ -13,7 +9,7 @@ namespace Extract.Redaction.Verification
 	/// </summary>
 	public partial class ExemptionCodeListDialog: Form
 	{
-		#region ExemptionCodeListDialog Fields
+		#region Fields
 
         /// <summary>
         /// The master list of the all valid exemption categories and codes.
@@ -48,9 +44,9 @@ namespace Extract.Redaction.Verification
         /// </summary>
         int _updating;
  
-		#endregion ExemptionCodeListDialog Fields
+		#endregion Fields
 
-		#region ExemptionCodeListDialog Constructors
+		#region Constructors
 
 		/// <summary>
 		/// Initializes a new <see cref="ExemptionCodeListDialog"/> class.
@@ -79,9 +75,9 @@ namespace Extract.Redaction.Verification
             }
 		}
 
-		#endregion ExemptionCodeListDialog Constructors
+		#endregion Constructors
 
-		#region ExemptionCodeListDialog Properties
+		#region Properties
 
 		/// <summary>
 		/// Gets or sets the <see cref="ExemptionCodeList"/>.
@@ -136,9 +132,9 @@ namespace Extract.Redaction.Verification
             }
         }
         
-		#endregion ExemptionCodeListDialog Properties
+		#endregion Properties
 
-		#region ExemptionCodeListDialog Methods
+		#region Methods
 
         /// <summary>
         /// Prevents updates of the user interface until the <see cref="EndUpdate"/> method is 
@@ -243,6 +239,7 @@ namespace Extract.Redaction.Verification
                 if (_categoryComboBox.Items.Count > 0)
                 {
                     _categoryComboBox.SelectedIndex = selectedIndex;
+                    UpdateListView();
                 }
 
                 // Check if the category wasn't found
@@ -330,10 +327,42 @@ namespace Extract.Redaction.Verification
 
             return _codes;
         }
-		 
-		#endregion ExemptionCodeListDialog Methods
 
-		#region ExemptionCodeListDialog Overrides
+        /// <summary>
+        /// Updates the list view based on the selected category combo box.
+        /// </summary>
+        void UpdateListView()
+        {
+            BeginUpdate();
+
+            try
+            {
+                // Get the currently selected category
+                string category = _categoryComboBox.Text;
+
+                // Populate the list view
+                _codesListView.Items.Clear();
+                foreach (ExemptionCode code in _masterCodes.GetCodesInCategory(category))
+                {
+                    string[] cells = new string[] { "", code.Name, code.Summary };
+                    _codesListView.Items.Add(new ListViewItem(cells));
+                }
+
+                // Select the first item in the list
+                if (_codesListView.Items.Count > 0)
+                {
+                    _codesListView.Items[0].Selected = true;
+                }
+            }
+            finally
+            {
+                EndUpdate();
+            }
+        }
+
+		#endregion Methods
+
+		#region Overrides
 
 		/// <summary>
 		/// Raises the <see cref="Form.Load"/> event.
@@ -357,9 +386,9 @@ namespace Extract.Redaction.Verification
 			}
 		}
 		 
-		#endregion ExemptionCodeListDialog Overrides
+		#endregion Overrides
 
-		#region ExemptionCodeListDialog Event Handlers
+		#region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="ComboBox.SelectedIndexChanged"/> event.
@@ -372,31 +401,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                BeginUpdate();
-
-                try
-                {
-                    // Get the currently selected category
-                    string category = _categoryComboBox.Text;
-
-                    // Populate the list view
-                    _codesListView.Items.Clear();
-                    foreach (ExemptionCode code in _masterCodes.GetCodesInCategory(category))
-                    {
-                        string[] cells = new string[] { "", code.Name, code.Summary };
-                        _codesListView.Items.Add(new ListViewItem(cells));
-                    }
-
-                    // Select the first item in the list
-                    if (_codesListView.Items.Count > 0)
-                    {
-                        _codesListView.Items[0].Selected = true;
-                    }
-                }
-                finally
-                {
-                    EndUpdate();
-                }
+                UpdateListView();
             }
             catch (Exception ex)
             {
@@ -406,7 +411,7 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        /// <summary>
+	    /// <summary>
         /// Handles the <see cref="ListView.SelectedIndexChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
@@ -572,7 +577,7 @@ namespace Extract.Redaction.Verification
                     _lastCategory = _codes.Category;
                 }
 
-                this.DialogResult = DialogResult.OK;
+                DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
             {
@@ -582,6 +587,6 @@ namespace Extract.Redaction.Verification
             }
         }
 
-		#endregion ExemptionCodeListDialog Event Handlers
+		#endregion Event Handlers
 	}
 }
