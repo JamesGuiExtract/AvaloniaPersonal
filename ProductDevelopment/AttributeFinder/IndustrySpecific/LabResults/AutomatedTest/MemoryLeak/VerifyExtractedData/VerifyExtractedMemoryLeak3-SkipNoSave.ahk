@@ -168,7 +168,7 @@ return
 IsRemainingInvalid()
 {
 	Send {F3}
-	Sleep, 400
+	Sleep, SleepTime
 	; If invalid items remain do nothing.
 	IfWinNotExist, LabDE, There are no invalid, ,
 	{

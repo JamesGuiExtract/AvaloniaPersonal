@@ -1,3 +1,4 @@
+@echo off
 REM Clean Source folder
 call Clean.bat Test_2
 
