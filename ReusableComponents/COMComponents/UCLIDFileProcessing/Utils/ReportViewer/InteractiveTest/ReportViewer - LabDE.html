@@ -19,8 +19,8 @@
 
 <h2>LabDE Specific Reports</h2>
 <ul>
-	<li><b>Detailed usage report by specific user for specific day</b>
-	<li><b>Usage report by user</b>
+	<li><b>LabDE data entry rates by user</b>
+	<li><b>LabDE high effort files by user</b>
 </ul>
 
 <div class="page-break"></div>
@@ -32,8 +32,8 @@
 <p>
 	<table border=0 cellpadding="2" cellspacing="0">
 		<tr class="first">
-			<th class="ver">Detailed usage report by specific user for specific day</th>
-			<th class="ver">Usage report by user</th>
+			<th class="ver">LabDE data entry rates by user</th>
+			<th class="ver">LabDE high effort files by user</th>
                 </tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -314,8 +314,8 @@
 <p>
 	<table border=0 cellpadding="2" cellspacing="0">
 		<tr class="first">
-			<th class="ver">Detailed usage report by specific user for specific day</th>
-			<th class="ver">Usage report by user</th>
+			<th class="ver">LabDE data entry rates by user</th>
+			<th class="ver">LabDE high effort files by user</th>
                 </tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -403,8 +403,8 @@
 <p>
 	<table border=0 cellpadding="2" cellspacing="0">
 		<tr class="first">
-			<th class="ver">Detailed usage report by specific user for specific day</th>
-			<th class="ver">Usage report by user</th>
+			<th class="ver">LabDE data entry rates by user</th>
+			<th class="ver">LabDE high effort files by user</th>
                 </tr>
 		<tr>
                         <td class="hor"><input type="checkbox"></td>
@@ -487,104 +487,48 @@
 </ol>
 <h2>Report specific features</h2>
 <ol>
- 
-	<li><b>Detailed usage report by specific user for specific day</b> 
-	<ul>
-		<li>Confirm that a <b>VerifyUserName</b> parameter is required. 
-		<li>For a particular user name and <b>Range</b> option:
-		<ul>
-			<li>Confirm that a meaningful report is presented.
-			<li>Create a saved report and confirm that the associated XML file 
-			contains a <b>DateRangeParameter</b> node with <b>Name = &quot;ReportingPeriod&quot;</b> 
-			and <b>Default = &quot;&lt;Range&gt;&quot;</b>.
-			<li>Confirm that the associated XML file also contains a <b>TextParameter</b> 
-			node with <b>Name = &quot;VerifyUserName&quot;</b> 
-			and <b>Default = &quot;&lt;name&gt;&quot;</b>.
-		</ul>
-<p>
-		<li><b>Test with meaningful data</b> 
-		<ul>
-			<li>Confirm that the <b>User and date</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the <b>User name</b> information is correct.
-			<li>Confirm that the <b>Date</b> information is correct.
-<p>
-			<li>Confirm that the <b>Hours and minutes</b> table and contents are 
-			formatted properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the top two rows of the table represent minutes within 
-			the hour ranging (vertically) between <b>0</b> and <b>59</b>.
-			<li>Confirm that the leftmost column displays specific hours starting with 
-			<b>6:00 AM</b> and ending with <b>6:00 PM</b>.
-			<li>Confirm that some remaining cells in the table have a <b>white</b> 
-			background to indicate <b>no input event activity</b> during the specific 
-			minute.
-			<li>Confirm that other remaining cells in the table have a <b>colored</b> 
-			background to indicate <b>input event activity</b> during the specific 
-			minute.
-<p>
-			<li>Confirm that after the <b>Hours and minutes</b> table is an entry for 
-			<b>Total minutes with input event activity</b>.
-			<li>Confirm that the total is correct based on the shaded cells in the table.
-		</ul>
-<p>
-		<li><b>Test with empty database</b> 
-		<ul>
-			<li>Confirm that the <b>User and date</b> table and contents are formatted 
-			properly even at 400% zoom factor.
-			<li>Confirm that the <b>User name</b> information is <b>N/A</b>.
-			<li>Confirm that the <b>Date</b> information is correct.
-<p>
-			<li>Confirm that the <b>Hours and minutes</b> table and contents are 
-			formatted properly even at 400% zoom factor.
-			<li>Confirm that the table title is displayed in white text on a black background.
-			<li>Confirm that the top two rows of the table represent minutes within 
-			the hour ranging (vertically) between <b>0</b> and <b>59</b>.
-			<li>Confirm that the leftmost column displays specific hours starting with 
-			<b>6:00 AM</b> and ending with <b>6:00 PM</b>.
-			<li>Confirm that the remaining cells in the table have a <b>white</b> 
-			background to indicate <b>no input event activity</b> during the specific 
-			minute.
-<p>
-			<li>Confirm that after the <b>Hours and minutes</b> table is an entry for 
-			<b>Total minutes with input event activity</b>.
-			<li>Confirm that the total is <b>0</b>.
-		</ul>
-	</ul>
-
-<p>
-	<li><b>ID Shield list of documents processed but not verified</b> 
+	<li><b>LabDE data entry rates by user</b>
 	<ul>
 		<li><b>Test with meaningful data</b> 
 		<ul>
 			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
 			properly even at 400% zoom factor.
-			<li>Confirm that the <b>Start date</b> information is correct.
-			<li>Confirm that the <b>End date</b> information is correct.
-			<li>Confirm that the <b>Duration</b> information is correct.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+			<li>Confirm that the <b>Report duration</b> information is correct.
 <p>
 			<li>Confirm that the following information is formatted properly 
 			for each user
 			<ul>
 				<li>Confirm that the user name is displayed in white text on a 
 				black background.
+				<li>Confirm that the section headers are displayed in a distinct 
+				background color.
 				<li>Confirm that the column headers are displayed in a distinct 
 				background color.
-				<li>Confirm that each <b>Date</b> is displayed in a distinct 
+				<li>Confirm that each <b>Username</b> is displayed in a distinct 
 				background color.
-				<li>Confirm that each <b>Total minutes</b> is displayed without a 
+				<li>Confirm that each <b># docs</b> is displayed without a 
 				background color.
-				<li>Confirm that a <b>Total:</b> row is displayed in a distinct 
+				<li>Confirm that each <b># pages</b> is displayed without a 
 				background color.
-				<li>Confirm that an <b>Average:</b> row is displayed in a distinct 
+				<li>Confirm that each <b># orders</b> is displayed without a 
 				background color.
-			</ul>
-<p>
-			<li>Confirm that the following information is presented after all users
-			<ul>
-				<li>Confirm that a <b>Grand total:</b> row is displayed in a distinct 
+				<li>Confirm that each <b># tests</b> is displayed without a 
 				background color.
-				<li>Confirm that an <b>Average:</b> row is displayed in a distinct 
+				<li>Confirm that each <b>Total time</b> is displayed without a 
+				background color.
+				<li>Confirm that each <b>docs/hr</b> is displayed without a 
+				background color.
+				<li>Confirm that each <b>pages/hr</b> is displayed without a 
+				background color.
+				<li>Confirm that each <b>orders/hr</b> is displayed without a 
+				background color.
+				<li>Confirm that each <b>tests/hr</b> is displayed without a 
+				background color.
+				<li>Confirm that a <b>Totals:</b> row is displayed in a distinct 
+				background color.
+				<li>Confirm that an <b>Averages:</b> row is displayed in a distinct 
 				background color.
 			</ul>
 		</ul>
@@ -593,15 +537,78 @@
 		<ul>
 			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
 			properly even at 400% zoom factor.
-			<li>Confirm that the <b>Start date</b> information is correct.
-			<li>Confirm that the <b>End date</b> information is correct.
-			<li>Confirm that the <b>Duration</b> information is correct.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+			<li>Confirm that the <b>Report duration</b> information is correct.
 <p>
 			<li>Confirm that the following information is presented
 			<ul>
-				<li>Confirm that a <b>Grand total: 0</b> row is displayed in a distinct 
+				<li>Confirm that the section headers are displayed in a distinct 
 				background color.
-				<li>Confirm that an <b>Average: 0.0</b> row is displayed in a distinct 
+				<li>Confirm that the column headers are displayed in a distinct 
+				background color.
+				<li>Confirm that a <b>Totals:</b> row is displayed in a distinct 
+				background color.
+				<li>Confirm that a <b>Averages:</b> row is displayed in a distinct 
+				background color.
+				<li>Confirm that each total is <b>0</b>.
+				<li>Confirm that each average is <b>0.0</b>.
+			</ul>
+		</ul>
+	</ul>
+<p>
+	<li><b>LabDE high effort files by user</b>
+	<ul>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+			<li>Confirm that the <b>Report duration</b> information is correct.
+<p>
+			<li>Confirm that the <b>Listing of files that took longer than:</b> row is 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the time value information is correct as specified.
+<p>
+			<li>Confirm that the following information is formatted properly 
+			for each user
+			<ul>
+				<li>Confirm that the column headers are displayed in a distinct 
+				background color.
+				<li>Confirm that each user name is displayed in white text on a 
+				black background.
+				<li>Confirm that each <b>Date/time</b> is displayed in a distinct 
+				background color.
+				<li>Confirm that each <b>FileID</b> is displayed without a 
+				background color.
+				<li>Confirm that each <b>Filename</b> is displayed without a 
+				background color.
+				<li>Confirm that each <b># orders</b> is displayed without a 
+				background color.
+				<li>Confirm that each <b># tests</b> is displayed without a 
+				background color.
+				<li>Confirm that each <b>Total time</b> is displayed without a 
+				background color.
+			</ul>
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+			<li>Confirm that the <b>Report duration</b> information is correct.
+<p>
+			<li>Confirm that the <b>Listing of files that took longer than:</b> row is 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the time value information is correct as specified.
+<p>
+			<li>Confirm that the following information is formatted properly 
+			for each user
+			<ul>
+				<li>Confirm that the column headers are displayed in a distinct 
 				background color.
 			</ul>
 		</ul>
