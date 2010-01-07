@@ -66,7 +66,7 @@ Loop,
 	; Select MR # edit box
 	ControlFocus WindowsForms10.EDIT.app.0.3d893c10
 	Sleep, SleepTime
-	Send, 123
+	Send, M123456
 	Sleep, SleepTime
 
 	;;Enter ordering physician code
@@ -94,16 +94,19 @@ Loop,
 	Sleep, SleepTime
 	Send s
 	Sleep, SleepTime
-	MouseClick, left, 625, 237, , , d
+	;MouseClick, left, 625, 237, , , d
+	MouseClick, left, 620, 180, , , d	;swipe bigger box in order to get Collection Date/Time
 	Sleep, SleepTime
 	MouseClick, left, 916, 280, , , u
-	Sleep, 10000
+	Sleep, 13500
 
 	;;Deal with remaining invalid data
 	
 	if !(IsRemainingInvalid()){
+		;MsgBox invalid was false	;debug only
 		continue
 	}
+	;MsgBox invalid was true	;debug only
 	
 	;Send, {F3}
 	; Select Result Date edit box
@@ -134,7 +137,7 @@ Loop,
 	ControlFocus WindowsForms10.EDIT.app.0.3d893c3
 	Sleep, SleepTime
 	; input valid data
-	Send, 123
+	Send, Order123456
 	Sleep, SleepTime
 	
 	if !(IsRemainingInvalid()){
@@ -171,7 +174,7 @@ IsRemainingInvalid()
 	; If invalid items remain do nothing.
 	IfWinNotExist, LabDE, There are no invalid, ,
 	{
-		return
+		return true
 	}
 	else
 	; Otherwise, hit ok on message box (press enter) and save the document.
@@ -179,7 +182,7 @@ IsRemainingInvalid()
 		Send {Enter}
 		Sleep, SleepTime
 		SaveAndContinue()
-		return
+		return false
 	}
 }
 
