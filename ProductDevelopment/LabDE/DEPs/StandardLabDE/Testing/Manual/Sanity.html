@@ -120,15 +120,17 @@
 			<li>Confirm that <b>Database name</b> includes a <b>&lt;Browse...&gt;</b> 
 			choice that populates the combo box with names of all databases available on the 
 			selected server.
+			<li>Confirm that a new database can be created.
 <p>
                         <li>Restart the utility and confirm that <b>Database server name</b> is
                         prepopulated with the previously selected server.
 			<li>Confirm that <b>Database name</b> is prepopulated with the previously selected 
 			database name.
 <p>
-			<li>Confirm that an action can be <b>added</b> to the database.
-			<li>Confirm that an action can be <b>removed</b> from the database.
-			<li>Confirm that an action can be <b>renamed</b> in the database.
+			<li>Confirm that <b>Manage actions...</b> works as expected.
+			<li>Confirm that <b>Manage counters...</b> works as expected.
+			<li>Confirm that <b>Manage tags...</b> works as expected.
+			<li>Confirm that <b>Manage users...</b> works as expected.
 			<li>Confirm that action status can be <b>modified</b>.
 <p>
 			<li>Confirm that the <b>Summary</b> tab displays current counts for the actions 
@@ -284,6 +286,8 @@
 			<LI>Process the images using the rules installed with <b>Demo_LabDE</b>.
 			<LI>Confirm that USS and VOA files are created.
 			<LI>Confirm that no unexpected behavior is seen.
+			<LI><b>[DataEntry #770]</b> Confirm that no <b>ELI13021: Invalid identifier in 
+			Attribute Name / Type</b> exceptions are seen.
 		</ul>
 <p>
 		<LI><b>[DataEntry #564]</b> LabDE Help and About Box
@@ -342,7 +346,7 @@
 	<ul>
 		<LI><b>OCR confidence</b>
 		<ul>
-			<LI>Open image <b>151.tif</b> from Demo_LabDE.
+			<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
 			<LI>Select the <b>ECO2</b> row in the <b>Orders</b> table.
 			<LI>Confirm that in the <b>Carbon Dioxide</b> text that the word <b>Carbon</b> has
 			a red background indicating lower OCR confidence.
@@ -364,7 +368,7 @@
 <p>
 		<LI><b>Highlights and hints on tables</b>
 		<ul>
-			<LI>Open image <b>151.tif</b> from Demo_LabDE.
+			<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
 			<LI>Select the <b>Test</b> table.
 			<LI>Confirm that selecting each individual row of the test table provides the 
 			appropriate highlights and tooltips.
@@ -447,7 +451,7 @@
 	<ul>
 		<LI><b>Tooltips and swipes</b>
 		<ul>
-			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that highlights 
+			<LI>Open image <b>Z151.tif</b> from Demo_LabDE.  Note that highlights 
 			are available for the selected fields.
 			<LI>Select the row in the <b>Patient Information - From Lab Result</b> table.
 			<LI>Swipe different text and confirm that the new text is entered 
@@ -461,7 +465,7 @@
 <p>
 		<LI><b>Tooltips and manual updates</b>
 		<ul>
-			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that highlights 
+			<LI>Open image <b>Z151.tif</b> from Demo_LabDE.  Note that highlights 
 			are available.
 			<LI>Select the row in the <b>Patient Information - From Lab Result</b> table.
 			<LI>Manually edit the text in the fields.
@@ -478,7 +482,7 @@
 <p>
 	<LI><h3>Swiping from tables</h3>
 	<ul>
-		<LI>Open image <b>151.tif</b> from Demo_LabDE.
+		<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
 		<LI>Select <b>UnknownOrder</b>.
 		<LI>Select the empty row at the bottom of the <b>Selected Order Details</b>.
 		<LI>Use the angular highlight tool to swipe the <b>Sodium</b> test data.
@@ -493,7 +497,7 @@
 			<LI>Confirm that the newly recognized text appears in the cell. 
 		</ul>
 <p>
-		<LI>Open image <b>191.tif</b> from Demo_LabDE.
+		<LI>Open image <b>Z191.tif</b> from Demo_LabDE.
 		<LI>Select the empty row at the bottom of the <b>Orders</b> table.
                 <LI>Use the rectangular highlight tool to swipe the entire <b>TOTAL/FREE PSA PANEL
                 </b> order (from the date above <b>TUMOR MARKER STUDIES</b> to the indented line
@@ -515,7 +519,7 @@
 <p>
 	<LI><h3>Copy and Paste from tables</h3>
 	<ul>
-		<LI>Open image <b>151.tif</b> from Demo_LabDE.
+		<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
                 <LI>Select the entire <b>Potassium</b> row from the test details in the
                 <b>Potassium</b> order.
 		<LI>Right-click and select <b>Copy row(s)</b>.
@@ -544,7 +548,7 @@
 <p>
 		<LI><b>[DataEntry #464]</b> Pasting text
        		<ul>
-			<li>Exercise the <b>003.tif</b> image from Demo_LabDE.
+			<li>Exercise the <b>A003.tif</b> image from Demo_LabDE.
 			<li>Click in the <b>Test Name</b> field in the starred row.
 			<li>Paste plain text from the Clipboard into the cell and press <b>Enter</b>.
   	   		<LI>Repeat several times.

@@ -16,7 +16,7 @@
 	<ul>
 		<LI><b>[DataEntry #146]</b> Scrolling and table activation
 		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 			<LI>Resize the DEP such that the table of <b>Order</b> names is not 
 			completely visible.
 			<LI>Select a <b>Test Name</b> cell.
@@ -24,12 +24,20 @@
 		</ul>
 		<LI><b>[DataEntry #200]</b> Scroll to top for new document
 		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 			<LI>Scroll to the bottom of the DEP.
 			<LI>Select and modify a <b>Flag</b> entry.
 			<LI>Open another document without saving changes. 
 			<LI>Confirm that the DEP automatically scrolls back to the top of the DEP.
 		</ul>
+		<LI><b>[DataEntry #847]</b> Scrolling
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Confirm that a data entry control has input focus.
+			<li>Resize the DEP window.
+			<li>Confirm that the DEP scroll position is unchanged (i.e. does <b>not</b> 
+			scroll to the top of the document).
+	       	</ul>
 	</ul>
 <p>
 	<LI><h3>Data Entry</h3>
@@ -60,7 +68,7 @@
 <p>
 			<LI><b>[DataEntry #273]</b> Carriage returns in swiped text
 			<ul>
-				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 				<LI>Select a <b>Patient Name</b> cell.
 				<LI>Carefully swipe <b>Community Memorial</b>.
 				<LI>Confirm that newline characters are replaced by spaces in the swiped text.
@@ -68,7 +76,7 @@
 <p>
 			<LI><b>[DataEntry #278]</b> Tab loop after swiping
 			<ul>
-				<LI>Open image <b>057.tif</b> from Demo_LabDE.
+				<LI>Open image <b>Z057.tif</b> from Demo_LabDE.
 				<LI>Select the first <b>Order</b>.
 				<LI>Select the <b>Result Date</b> field.
 				<LI>Swipe a different date from the image.
@@ -124,7 +132,7 @@
 <p>
 			<LI><b>[DataEntry #329]</b> Swiping and OCR confidence
 			<ul>
-				<LI>Open image <b>151.tif</b> from Demo_LabDE.
+				<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
 				<LI>Select the <b>Carbon Dioxide</b> test name field.
 				<LI>Confirm that original OCR confidence includes some red background. 
 				<LI>Reswipe the text.
@@ -190,7 +198,7 @@
 <p>
 			<LI><b>[DataEntry #256]</b> Typing into empty table cell
 			<ul>
-				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 				<LI>Select the <b>Comment</b> cell in one of the the <b>Component</b> rows.
 				<LI>Type some text into the cell.
 				<LI>Confirm that the text is accepted and that <b>Unable to draw image</b> 
@@ -199,7 +207,7 @@
 <p>
 			<LI><b>[DataEntry #257]</b> Navigation after Enter key
 			<ul>
-				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 				<LI>Select one of the the <b>Component</b> cells.
 				<LI>Type some text into the cell and then the <b>Enter</b> key.
 				<LI>Confirm that the next selected cell is the first cell in the next row.
@@ -220,7 +228,7 @@
 <p>
 			<LI><b>[DataEntry #267, #275]</b> Home, End, Shift+Space when editing a text box
 			<ul>
-				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 				<LI>Double-click the <b>Date of Birth</b> field.
 				<LI>Confirm that the entire contents of the text box are selected for editing.
 				<LI>Type <b>Home</b>.
@@ -235,7 +243,7 @@
 <p>
 			<LI><b>[DataEntry #274]</b> Tooltips and editing text
 			<ul>
-				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 				<LI>Select the <b>Patient Information - Name</b> field.
 				<LI>Confirm that the appropriate tooltip is displayed.
 				<LI>Modify the text of the edit box.
@@ -246,7 +254,7 @@
 <p>
 			<LI><b>[DataEntry #277]</b> Unexpected exception for go to next unviewed
 			<ul>
-				<LI>Open image <b>151.tif</b> from Demo_LabDE.
+				<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
 				<LI>Select the <b>Result Date</b> for the first Order.
 				<LI>Swipe in a new <b>Result Date</b>.
 				<LI>Type the <b>F10</b> key to highlight all attributes.
@@ -279,7 +287,7 @@
 <p>
 			<LI><b>[DataEntry #295]</b> Ctrl+A in a text box
 			<ul>
-				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 				<LI>Select the <b>Date of Birth</b> field.
 				<LI>Type <b>Ctrl+A</b>.
 				<LI>Confirm that the entire contents of the text box are selected.
@@ -287,7 +295,7 @@
 <p>
 			<LI><b>[DataEntry #306]</b> CAPS LOCK ignored
 			<ul>
-				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 				<LI>Select a field.
 				<LI>Turn on CAPS LOCK. 
 				<LI>Type some characters.
@@ -296,7 +304,7 @@
 <p>
 			<LI><b>[DataEntry #353]</b> Focus jumping to Result Status
 			<ul>
-				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 				<LI>Alternate clicking in the image viewer and pressing <b>Tab</b>.
 				<LI>Confirm that each and every <b>Tab</b> is handled correctly 
 				by advancing to the next appropriate field.
@@ -345,7 +353,7 @@
 <p>
 		<LI><b>[DataEntry #255]</b> Tab into new row of table
 		<ul>
-			<LI>Open image <b>004.tif</b> from Demo_LabDE.
+			<LI>Open image <b>Z004.tif</b> from Demo_LabDE.
 			<LI>Select the <b>CBC</b> test.
 			<LI>Click the <b>Tab</b> key to step through elements of the selected test.
 			<LI>Confirm that after selection of the <b>Flag</b> cell in the 
@@ -355,7 +363,7 @@
 <p>
 		<LI><b>[DataEntry #263]</b> Tab navigation skips tables with no data
 		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 			<LI>Select the <b>Ordering Physician</b> row.
 			<LI>Click the <b>Tab</b> key to step through different cells.
 			<LI>Confirm that even though no <b>CopyTo: Physicians</b> are available, the 
@@ -578,13 +586,17 @@
 	       	</ul>
    		</LI>
 <p>
-		<LI><b>[DataEntry #729]</b> Order Mapper and temporary database
+		<LI><b>[DataEntry #729, #813, #817]</b> Order Mapper
 		<ul>
 			<li>Process an image.
 			<li>Make a modification to the original database.
 			<li>Process another image.
 			<li>Confirm that the temporary database has been updated to reflect the recent 
 			change.
+			<li>Confirm that an Order cannot contain multiple tests with the same 
+			test code and official name.
+			<li>Confirm that for a document with two single-test Orders, the Order with 
+			the first found test is presented ahead of the Order with the second found test.
        		</ul>
 	   	</LI>
 <p>
@@ -603,6 +615,30 @@
 	      		<li>Confirm that the image returns to its fit-mode zoom state.
        		</ul>
 	   	</LI>
+<p>
+		<LI><b>[DataEntry #785]</b> SQL Compact Exporter
+		<ul>
+      			<li>Confirm that the SQL Compact Exporter utility can 
+			successfully export from <b>OrderMappingDB.sdf</b> using the 
+			<b>SELECT * FROM labordertest</b> query.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>[DataEntry #842]</b> PreventSave setting on DEP
+       		<ul>
+			<li>Exercise the special LabDE user interface configured for <b>AKA 
+			evaluation</b>.
+			<li>Confirm that the <b>.config</b> file has the <b>PreventSave</b> 
+			option enabled.
+			<li>Verify a document that was previously tagged <b>Evaluate for AKAs</b>.
+			<li>Confirm that changed data is <b>not</b> saved to the VOA file.
+  	   		<LI>Confirm that the <b>Save and commit</b> menu item has been renamed 
+			to <b>Commit without saving</b>.
+  	   		<LI>Confirm that the <b>Save and commit</b> toolbar button has been renamed 
+			to <b>Commit without saving</b>.
+			<li>Confirm that the menu item and toolbar each allow the FAM to advance 
+			to the next document.
+       		</ul>
 <p>
 		<LI><b>[LegacyRC #5460]</b> Unstoppable FAM
 		<ul>

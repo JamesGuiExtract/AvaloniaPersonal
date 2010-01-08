@@ -37,6 +37,13 @@
 			<li>Confirm that <b>Extract Systems LabDE</b> is available as the <b>Product</b>.
 			<li>Confirm that the proper version number is displayed.
 	       	</ul>
+<p>
+		<LI><b>[DataEntry #734]</b> MaxFilesFromDB
+		<ul>
+			<li>Check the above registry entry located at <b>HKCU\Software\Extract 
+			Systems\ReusableComponents\COMComponents\UCLIDFileProcessing\FPRecordManager</b>.
+			<li>Confirm that the default setting is <b>1</b>.
+	       	</ul>
    	</LI>
 	</ul>
 <p>
@@ -250,7 +257,7 @@
 <p>
 		<li>View menu
 		<ul>
-			<li>Open image <b>151.tif</b> from Demo_LabDE.
+			<li>Open image <b>Z151.tif</b> from Demo_LabDE.
 			<li>Confirm that the <b>Page number</b> toolbar edit box displays 
 			<b>1 of 2</b>.
 			<li>Confirm that the proper page is displayed if a valid page number 
@@ -264,7 +271,7 @@
 			<li>Confirm that an <b>Invalid page number</b> error is displayed if 
 			an invalid page number is entered.
 <p>
-			<li>Open image <b>004.tif</b> from Demo_LabDE.
+			<li>Open image <b>Z004.tif</b> from Demo_LabDE.
 			<li>Confirm that <b>View - Go To Item - Next unviewed</b> navigates to 
 			an item that displays in bold, indicating that it has not yet been viewed.
 			<li>Confirm that the <b>Go to next unviewed item</b> toolbar button 
@@ -528,7 +535,7 @@
 <p>
 	<LI><h3>Data Entry in cells</h3>
 	<ul>
-		<LI>Open image <b>003.tif</b> from Demo_LabDE.
+		<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 		<LI><b>[DataEntry #572]</b> Confirm that the LabDE user interface has a 
 		<b>LabDE</b> icon.
 		<LI><b>Comments (for operator's use)</b>
@@ -584,8 +591,8 @@
 <p>
 		<li><b>Image Path and Copy button</b>
 		<ul>
-	  	   	<LI><b>[DataEntry #684]</b> Confirm that the DEP includes a read-only edit 
-			box containing the image filename.
+	  	   	<LI><b>[DataEntry #737]</b> Confirm that the DEP includes a read-only edit 
+			box containing the full path to the image.
   	   		<LI>Confirm that the DEP includes a <b>Copy</b> button that allows the 
 			filename to be copied to the Clipboard.
   		   	<LI>Confirm that the Copy button is disabled during <b>Phase 1</b> verification.
@@ -614,11 +621,13 @@
 			<li>Confirm that text can be typed into the <b>Medical Record #</b> edit box.
 			<li>Confirm that a validation icon is displayed if the <b>Medical Record #</b>
 			edit box is empty.
-			<LI><b>[DataEntry #742]</b> Validation of medical record number
+			<LI><b>[DataEntry #742, #814, #815]</b> Validation of medical record number
        			<ul>
 				<li>Exercise second-stage verification.
 		  	   	<LI>Confirm that the medical record number is valid with or without a 
 				leading <b>m</b> or <b>M</b> or <b>z</b> or <b>Z</b>.
+	  		   	<LI>Confirm that the medical record number is valid with or without a 
+				trailing <b>space</b> character.
 		       	</ul>
 		   	</LI>
 	      		<li>Confirm that the Clipboard is cleared after pasting into the 
@@ -696,6 +705,16 @@
 				<li>Confirm that a blank entry is not included at the beginning of 
 				the drop-down list.
 			</ul>
+			<LI><b>[DataEntry #654]</b> Auto complete
+		       	<ul>
+				<li>Open a Demo_LabDE sample image.
+				<li>Ensure that the <b>Physician</b> row is empty.
+				<li>Select the code field.
+				<li>Press a key (letter, number, symbol, space, etc.)
+				<li>Confirm that all codes are not inserted into the cell ahead 
+				of the input.
+		       	</ul>
+		   	</LI>
 		</ul>
 <p>
 		<li><b>Orders</b>
@@ -765,7 +784,7 @@
 		       	</ul>
 			<li><b>[DataEntry #653]</b> Clicking on last visible Order row
 			<ul>
-				<li>Open a Demo_LabDE sample image such as <b>413.tif</b> that 
+				<li>Open a Demo_LabDE sample image such as <b>G413.tif</b> that 
 				contains multiple orders.
 		  	   	<LI>Click on the last visible <b>Order</b> in the Order table.
   	   			<LI>Confirm that the chosen <b>Order</b> is properly selected.
@@ -792,6 +811,13 @@
 			<li>Confirm that text can be typed into the <b>Order Number</b> edit box.
 			<li>Confirm that a validation icon is displayed if the <b>Order Number</b>
 			edit box is empty.
+			<LI><b>[DataEntry #816]</b> Validation of Order Number
+       			<ul>
+		  	   	<LI>Confirm that the Order Number is valid only for <b>digits</b>.
+	  		   	<LI>Confirm that the Order Number is valid with or without a 
+				trailing <b>space</b> character.
+		       	</ul>
+		   	</LI>
 	      		<li>Confirm that the Clipboard is cleared after pasting into the 
 			<b>Order Number</b> field.
 			<li>Confirm that typing into the <b>Lab Name</b> combo box cycles through
@@ -842,7 +868,7 @@
 				<li>Confirm that the lab name field updates appropriately
 				<li>Type a very long string in the lab code field.
 				<li>Press <b>Tab</b>.
-				<li>Confirm that an <b>ELI27096: COllection was modified; enumeration 
+				<li>Confirm that an <b>ELI27096: Collection was modified; enumeration 
 				operation may not execute</b> error is not seen.
 			</ul>
 			<LI><b>[DataEntry #744]</b> Default value for order-level comment
@@ -864,6 +890,17 @@
 			<li>Confirm that text can be typed into the <b>Test Name</b> cell.
 			<li>Confirm that a validation icon is displayed if the 
 			<b>Test Name</b> cell is empty.
+			<li><b>[DataEntry #795]</b> Cursor position for unviewed fields
+			<ul>
+				<li>Open a Demo_LabDE image.
+				<li>Select a <b>Test Name</b> cell that has not been viewed.
+				<li>Confirm that the cursor is located at the position 
+				appropriate with where the mouse clicked.
+				<li>Select a different <b>Test Name</b> cell that has already 
+				been viewed.
+				<li>Confirm that the cursor is located at the position 
+				appropriate with where the mouse clicked.
+			</ul>
 			<li>Confirm that text can be swiped into the <b>Value</b> cell.
 			<li>Confirm that text can be typed into the <b>Value</b> cell.
 			<li>Confirm that a validation icon is displayed if the 

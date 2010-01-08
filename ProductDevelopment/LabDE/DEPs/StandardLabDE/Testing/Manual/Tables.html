@@ -59,7 +59,7 @@
 		<li><b>[DataEntry #263]</b> Tab navigation and empty tables
 		<ul>
 			<LI>Open an image that does not find an <b>Ordering Physician</b> 
-			such as 1270.tif, 151.tif, 350.tif, ot 403.tif.
+			such as Z1270.tif, Z151.tif, F350.tif, or Z403.tif.
 			<li>Confirm that the user can navigate to the <b>Ordering 
 			Physician</b> table even though the table is empty.
 		</ul>
@@ -72,7 +72,7 @@
 <p>
 	<LI><h3>Row Swiping</h3>
 	<ul>
-		<LI>Open image <b>151.tif</b> from Demo_LabDE.
+		<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
 		<LI>Select one entire row from the <b>Selected Order Details</b>.
 		<LI>Use the angular highlight tool to Swipe the <b>Sodium</b> test data.
 		<LI>Confirm that the <b>Sodium</b> data appears in the <b>Selected Order 
@@ -105,7 +105,7 @@
 <p>
 		<LI><b>[DataEntry #351]</b> Swiping an entire table
 		<ul>
-			<LI>Open image <b>004.tif</b> from Demo_LabDE.
+			<LI>Open image <b>Z004.tif</b> from Demo_LabDE.
 			<LI>Select the new row from <b>Orders</b>.
 			<LI>Use the rectangular highlight tool to Swipe the entire 
 			<b>DIFFERENTIAL (AUTOMATED)</b> test.
@@ -115,7 +115,7 @@
 <p>
 		<li><b>[DataEntry #404]</b> Extra test row after swiping into inserted row
 		<ul>
-			<li>Open a 057.tif from Demo_LabDE and select the <b>GLUCOSE</b> order.
+			<li>Open Z057.tif from Demo_LabDE and select the <b>GLUCOSE</b> order.
 			<li>Right-click in the <b>Selected Order Details</b> table and insert a row.
 			<li>Select the <b>HGB</b> order then select <b>GLUCOSE</b> again.
 			<li>Confirm that there are no extra rows in the table.
@@ -146,7 +146,7 @@
 <p>
 	<LI><h3>Cell Swiping</h3>
 	<ul>
-		<LI>Open image <b>151.tif</b> from Demo_LabDE.
+		<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
 		<LI>Select one entire row from the <b>Selected Order Details</b>.
 		<LI>Use the angular highlight tool to Swipe the <b>Sodium</b> test data.
 		<LI>Confirm that the <b>Sodium</b> data appears in the <b>Selected Order 
@@ -209,7 +209,7 @@
 <p>
 	<LI><h3>Copy and Paste from tables</h3>
 	<ul>
-		<LI>Open image <b>151.tif</b> from Demo_LabDE.
+		<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
 		<LI>Select the entire <b>POTASSIUM</b> row from the <b>Selected Order Details</b> for the  
 		<b>POTASSIUM</b> order.
 		<LI>Right-click and select <b>Copy row(s)</b>.
@@ -326,7 +326,7 @@
 		</ul>
 		<LI><b>[DataEntry #626]</b> Dragging whole Order
        		<ul>
-			<li>Exercise the <b>151.tif</b> image from Demo_LabDE.
+			<li>Exercise the <b>Z151.tif</b> image from Demo_LabDE.
 			<li>Select all rows in the <b>Order</b> table.
   		   	<LI>Scroll down until the <b>Test</b> table is visible.
 			<li>Click on a row header in the <b>Order</b> table and drag the row 
@@ -374,7 +374,7 @@
 <p>
 	<LI><h3>Context menu for tables</h3>
 	<ul>
-		<LI>Open image <b>004.tif</b> from Demo_LabDE.
+		<LI>Open image <b>Z004.tif</b> from Demo_LabDE.
 		<LI>Select the entire <b>Potassium</b> row from the Selected Order Details in the first 
 		<b>Basic Metabolic Panel</b>.
 		<LI>Right-click and select <b>Copy row(s)</b>.
@@ -401,12 +401,24 @@
 			<LI>Confirm that selecting the entire rows displays 
 			proper highlights and no tooltips. 
 		</ul>
+<p>
 		<li><b>[Data Entry #177]</b> Row deletion
 		<ul>
 			<li>Select an individual table cell.
 			<li>Right-click on the row header for the row containing the selected cell.
-			<li>Select "Deleter Row(s)".
+			<li>Select <b>Delete Row(s)</b>.
 			<li>Confirm that the entire row is deleted.
+		</ul>
+		<li><b>[Data Entry #739, #776]</b> Row sorting
+		<ul>
+			<li>Open a document that contains an Order with many tests.
+			<li>Select the Order.
+			<li>Rearrange some of the Tests within the Order.
+			<li>Select several of the Tests including the starred row.
+			<li>Select <b>Sort rows to match document</b>.
+			<li>Confirm that the rows are sorted.
+			<li>Confirm that no <b>ELI28768: Unable to sort rows!</b> 
+			exception is seen.
 		</ul>
 	</ul>
 <p>
@@ -444,13 +456,26 @@
 			<li>Confirm that a subsequent <b>TAB</b> automatically advances to the 
 			next embedded data field within the partially expanded smart tag text.
 		</ul>
+<p>
+		<li><b>[DataEntry #760]</b> Confirm that the following smart tags are defined in 
+		the LabDE database
+		<ul>
+			<li><b>.verified</b> - Verified by (user) on (current date)
+			<li><b>.test</b> - Please see (test) from (date) for scanned report
+			<li><b>.reviewed</b> - Please see (test) from (date) for scanned 
+			report - Reviewed
+			<li><b>.normal</b> - Normal Lipemia, Normal Icterus, Normal Hemolysis
+			<li><b>.comments</b> - See scan for comments
+			<li><b>.range</b> - See scan for reference range
+			<li><b>.see</b> - See scan for reference range and comments
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Navigation</h3>
 	<ul>
 		<LI>Configure a <b>Verify extracted data</b> task to use the <b>Phase 2</b> 
 		config file.
-		<LI>Open image <b>004.tif</b> from Demo_LabDE.
+		<LI>Open image <b>Z004.tif</b> from Demo_LabDE.
 		<LI>Confirm that <b>Result Status</b> is initially selected. 
 		<LI>Click the <b>Go to next unviewed item</b> toolbar button. 
 		<LI>Confirm that selection changes to the <b>Patient Information - From Lab Result - 
@@ -479,6 +504,49 @@
 			<li>Confirm that focus moves to the next cell in the row instead of to the 
 			cell below the order name.
 	       	</ul>
+<p>
+		<LI><b>[DataEntry #751, #753, #754]</b> Tabbing by cell or by row
+		<ul>
+	      		<li>Confirm that the LabDE config file contains an <b>&lt;objectSettings&gt;</b> 
+			element.
+			<li>Confirm that <b>AllowTabbingByRow</b> properties are only defined for 
+			<b>_patientNameTable</b> and <b>_epicPatientNameTable</b>.
+			<li>Confirm that the properties are set to <b>false</b>.
+<p>
+			<li>Confirm that tabbing into the <b>Order name</b> table selects the first 
+			row.
+			<li>Confirm that appropriate information is highlighted in the image.
+			<li>Confirm that subsequent tabs move a row at a time.
+			<li>Confirm that appropriate information is highlighted in the image.
+			<li>Select a single cell in the <b>Order name</b> table.
+			<li>Confirm that tabs advance by cells until the end of the row.
+			<li>Confirm that subsequent tabs move a row at a time.
+			<li>Confirm that after selection of the last non-blank row in the <b>Order 
+			name</b> table, TAB advances to the first cell of the blank row.
+<p>
+			<li>Confirm that tabbing into the <b>Test name</b> table selects the first 
+			row.
+			<li>Confirm that appropriate information is highlighted in the image.
+			<li>Confirm that subsequent tabs move a row at a time.
+			<li>Confirm that appropriate information is highlighted in the image.
+			<li>Select a single cell in the <b>Test name</b> table.
+			<li>Confirm that tabs advance by cells until the end of the row.
+			<li>Confirm that subsequent tabs move a row at a time.
+			<li>Confirm that after selection of the last non-blank row in the <b>Test 
+			name</b> table, TAB advances to the first cell of the blank row.
+<p>
+			<li>Open a Demo_LabDE sample image.
+			<li>Select a table that supports tabbing by row.
+			<li>Manually select a single cell in the table.
+			<li>Press <b>TAB</b> several times.
+			<li>Confirm that individual cells are selected until reaching the end of the row.
+			<li>Confirm that the next <b>TAB</b> selects the entire following row.
+			<li>Manually select a single cell in the table.
+			<li>Press <b>SHIFT+TAB</b> several times.
+			<li>Confirm that individual cells are selected until reaching the beginning of 
+			the row.
+			<li>Confirm that the next <b>SHIFT+TAB</b> selects the entire previous row.
+	       	</ul>
 	</ul>
 <p>
 	<LI><h3>Miscellaneous</h3>
@@ -504,7 +572,7 @@
 <p>
 		<LI><b>[DataEntry #174]</b> Tab loop in dependent tables
 		<ul>
-			<LI>Open image <b>004.tif</b> from Demo_LabDE.
+			<LI>Open image <b>Z004.tif</b> from Demo_LabDE.
 			<LI>Select the <b>CBC</b> cell.
 			<LI>Click the <b>Tab</b> key to step through elements of the order row.
 			<LI>Confirm that continued Tabs advance to the <b>Selected Order Details</b> 
@@ -609,14 +677,14 @@
 <p>
 		<LI><b>[Data Entry #328]</b> Enabling dependent controls
 		<ul>
-			<LI>Rename the VOA file for <b>151.tif</b> from Demo_LabDE.
-			<LI>Open image <b>151.tif</b> from Demo_LabDE.
+			<LI>Rename the VOA file for <b>Z151.tif</b> from Demo_LabDE.
+			<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
 			<LI>Confirm that the <b>Selected Order Details</b> controls are disabled. 
 		</ul>
 <p>
 		<LI><b>[DataEntry #385]</b> Strangeness with Units
 		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Open image <b>A003.tif</b> from Demo_LabDE.
 			<LI>Select the <b>Units</b> cell from one of the <b>GFR</b> tests.
 			<LI>Click <b>F2</b> to enter edit mode.
 			<LI>Click <b>space</b> once and <b>backspace</b> once.
@@ -682,7 +750,7 @@
 <p>
 		<LI><b>[DataEntry #651]</b> Test name conflict
        		<ul>
-			<li>Open an image with a <b>CBC</b> order (i.e. <b>004.tif</b>).
+			<li>Open an image with a <b>CBC</b> order (i.e. <b>Z004.tif</b>).
 	  	   	<LI>Select a <b>Test Name</b> cell.
 	  	   	<LI>Type <b>SEG</b> in the cell.
   	   		<LI>Confirm that the name does not get updated to <b>SEGS</b>.
@@ -719,6 +787,33 @@
 			that is not currently visible.
        		</ul>
 	   	</LI>
+<p>
+		<LI><b>[DataEntry #759]</b> Auto-completion
+       		<ul>
+			<li>Open a Demo_LabDE sample image containing multiple <b>Orders</b>.
+			<li>Select one of the middle <b>Orders</b> that contains multiple Tests.
+			<li>Delete the test name in the first column and start typing that name again.
+			<li>When the auto-complete list appears, select the appropriate entry 
+			using the <b>keyboard</b>.
+			<li>Press <b>TAB</b>.
+			<li>Confirm that focus has advanced to the next cell.
+			<li>Delete the test name in the first column and start typing that name again.
+			<li>When the auto-complete list appears, select the appropriate entry 
+			using the <b>mouse</b>.
+			<li>Press <b>TAB</b>.
+			<li>Confirm that focus has advanced to the next cell.
+	       	</ul>
+<p>
+		<LI><b>[DataEntry #839]</b> Tab order
+       		<ul>
+			<li>Open a Demo_LabDE sample image containing an Order with at least two 
+			<b>Tests</b>.
+			<li>Confirm that tabbing by row is enabled.
+			<li>Select the entire <b>Order</b> row.
+			<li>Press <b>TAB</b>.
+			<li>Confirm that selection is on the <b>first</b> row of the <b>Test</b> 
+			table.
+	       	</ul>
    	</LI>
    	</LI>
 	</ul>
