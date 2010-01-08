@@ -1,0 +1,310 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.5 Final SCR Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.5 Final SCR Testing <br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Exercise recent fixed SCRs
+   	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
+	present within the collected checklists.  One part of validating a 1.5 
+	release candidate is to explicitly exercise these otherwise untested recent changes.
+</ul>
+<p>
+<h3>SCRs</h3>
+<OL>
+	<LI><b>[DataEntry #723]</b> Resizing the DEP
+	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Resize the DEP so that it is very wide.
+		<li>Close LabDE.
+		<li>Reopen LabDE.
+		<li>Confirm that all DEP controls are properly visible.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #754]</b> Tabbing by row
+	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Select a table that supports tabbing by row.
+		<li>Manually select a single cell in the table.
+		<li>Press <b>TAB</b> several times.
+		<li>Confirm that individual cells are selected until reaching the end of the row.
+		<li>Confirm that the next <b>TAB</b> selects the entire following row.
+		<li>Manually select a single cell in the table.
+		<li>Press <b>SHIFT+TAB</b> several times.
+		<li>Confirm that individual cells are selected until reaching the beginning of 
+		the row.
+		<li>Confirm that the next <b>SHIFT+TAB</b> selects the entire previous row.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #762]</b> Focus issues
+	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Separate the DEP and the image window.
+		<li>Select a cell for input in the DEP.
+		<li>Put focus in the image window.
+		<li>Use a shortcut key for the image window such as <b>F10</b>.
+		<li>Confirm that the DEP <b>is not</b> brought into focus.
+		<li>Perform regular keyboard input for the active cell.
+		<li>Confirm that the DEP <b>is</b> brought into focus.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #763, #786]</b> SQL Compact Importer
+	<ul>
+		<li>Merge two similar databases using options to insert all valid rows and 
+		to skip any problem rows.
+		<li>Confirm that a message is presented describing any problem rows.
+		<li>Confirm that the <b>LabOrderTest</b> table is successfully merged.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #766]</b> Incorrect highlight height
+	<ul>
+		<li>Copy the <b>Z151.tif.voa</b> file from <b>.\PVCS_Testing\DataEntry\766</b> 
+		to the appropriate local folder.
+		<li>Open the <b>Z151.tif</b> Demo_LabDE sample image.
+		<li>Examine the highlight for the <b>Anion Gap</b> test in the <b>Unknown 
+		Order</b>.
+		<li>Confirm that the highlight is an appropriate height.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #805]</b> Save / commit without validation
+	<ul>
+		<li>Confirm that the <b>.config</b> file supports a 
+		<b>SkipValidationIfDocTaggedAs</b> setting.
+		<li>Define an appropriate tag.
+		<li>Open an image.
+		<li>Modify the data so that it is not completely valid.
+		<li>Apply the special tag to the document.
+		<li>Confirm that the document can be saved without being valid.
+		<li>Confirm that the FAM considers the document successfully processed.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #814, #815, #816]</b> Medical Record # and Order Number
+	<ul>
+  	   	<LI>Confirm that the medical record number is valid with or without a 
+		leading <b>m</b> or <b>M</b> or <b>z</b> or <b>Z</b>.
+  	   	<LI>Confirm that the medical record number is valid with or without a 
+		trailing <b>space</b> character.
+  	   	<LI>Confirm that the Order Number is valid only for <b>digits</b>.
+	   	<LI>Confirm that the Order Number is valid with or without a 
+		trailing <b>space</b> character.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #818, LegacyRC #5624, #5625, #5630]</b> Input event tracking
+       	<ul>
+		<li>Prepare a verification FPS file with <b>Enable input event tracking</b>.
+		<li>Confirm that the <b>EnableInputEventTracking</b> field in the <b>DBInfo</b> 
+		table is set to <b>1</b>.
+		<li>Start verifying documents during a specific (noted) minute.  Make sure 
+		to perform some input events during the minute.
+		<li>During another minute, only make input events by scrolling the scroll bar.
+		<li>During another minute, only make input events by clicking the mouse in the 
+		scroll bar.
+		<li>During another minute, only make input events by moving the mousewheel.
+		<li>During another minute, <b>do not</b> make any input events.
+		<li>During another minute, only make input events by typing text from the keyboard.
+		<li>During another minute, only make input events by tabbing between cells and rows.
+		<li>Stop verifying documents near the beginning of a specific (noted) minute.
+		<li>Check input event tracking results
+		<ul>
+			<li>Run the <b>Detailed usage report for specific user for specific day</b> 
+			and select the appropriate user and day.
+			<li>Confirm that input events were noted for each of the following
+			<ul>
+				<li>The minute during which processing started
+				<li>The minute during which scrolling the scroll bar events 
+				were made
+				<li>The minute during which mouse clicks in the scroll bar events 
+				were made
+				<li>The minute during which mousewheel events were made
+				<li>The minute during which keyboard events were made
+				<li>The minute during which tabbing events were made
+				<li>The minute during which processing stopped
+			</ul>
+			<li>Confirm that input events are not noted for the minute(s) in which 
+			events were not made.
+		</ul>
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #820]</b> Malfunction with <b>v</b> key
+	<ul>
+		<li>Open an image.
+		<li>Copy row or cell data to the clipboard.
+		<li>Select a different cell (without an associated auto-complete feature) 
+		and move the cursor to the end of the text.
+		<li>Type a <b>v</b> character.
+		<li>Confirm that the contents of the cell are not deleted.
+		<li>Navigate to a cell with an associated auto-complete feature and 
+		move the cursor to the end of the text.
+		<li>Type a <b>v</b> character.
+		<li>Confirm that the contents of the cell are not selected.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #821]</b> Hiding the data validation icon
+	<ul>
+		<li>Verify a document.
+		<li>Select an <b>invalid</b> item.
+		<li>Confirm that an error icon is provided.
+		<li>Confirm that <b>ESC</b> hides the error icon.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #824]</b> Apply tags button
+	<ul>
+		<li>Verify a document.
+		<li>Confirm that the <b>Apply tags</b> button is after the <b>Save and 
+		commit</b> button.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #829]</b> Result status field
+	<ul>
+		<li>Verify a document.
+		<li>Confirm that the <b>Result status</b> field no longer contains a 
+		<b>Delete</b> option.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #831]</b> Swipe append
+	<ul>
+		<li>Verify a document.
+		<li>Select various cells and exercise the <b>swipe-append</b> feature.
+		<li>Review the resulting highlights and confirm that spatial information 
+		is not lost.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #833]</b> Order mapper
+	<ul>
+		<li>Exercise the Advanced Health rules labelled <b>1/6/2010b</b> on the 
+		<b>HP_Scan09-11-30 1530.tif</b> image from 
+		<b>K:\Common\Engineering\Sample Files\Advance Health\Set022\Images\</b>.
+		<li>Confirm that no <b>Unknown Order</b> orders are presented.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #835]</b> Original Name column in Test table
+	<ul>
+		<li>Exercise the special LabDE user interface configured for <b>AKA 
+		evaluation</b>.
+		<li>Verify a document that was previously tagged <b>Evaluate for AKAs</b>.
+		<li>Confirm that validation is turned off for all fields except the 
+		<b>Original Name</b> column.
+		<li>Confirm that a warning icon is presented for any entry that is missing 
+		an AKA.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #845]</b> Auto-zoom and fit mode
+	<ul>
+		<li>Open an image that contains many tests.
+		<li>Click the <b>Fit to page</b> button.
+		<li>Set the auto-zoom option to <b>Zoom out if necessary to fit current 
+		selection</b>.
+		<li>Tab through cells until about halfway through the <b>Tests</b>.
+		<li>Use the scrollbar to scroll the image window so that the highlighted 
+		test is all the way to the bottom of the image window.
+		<li><b>Tab</b> to the next test.
+		<li>Confirm that the selected test is scrolled into visibility.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[LegacyRC #5618]</b> FAM allows action name expressions
+       	<ul>
+		<li><u>Select Action dialog</u>
+		<ul>
+			<li>Confirm that the <b>Select Action</b> dialog includes a combo 
+			box populated with each defined action.
+			<li>Confirm that the <b>Select Action</b> dialog includes a 
+			<b>Tag Selector</b> button allowing the user to choose an action 
+			including a $ function.
+			<li>Confirm that such an action can be saved and reloaded.
+		</ul>
+		<li><u>Functionality</u>
+		<ul>
+			<li>Create a new database.
+			<li>Confirm that the <b>AutoCreateActions</b> field in the <b>DBInfo</b> 
+			table is set to <b>0</b>.
+			<li>Add a <b>Test_&lt;user_name&gt;</b> action with your user name 
+			inserted in the appropriate location.
+			<li>Add a <b>Test</b> action to the database.
+			<li>Create and save a <b>UserName.fps</b> file that uses <b>Test_$UserName()</b> as 
+			the action.
+			<li>Create and save a <b>Test.fps</b> file that uses <b>Test</b> as 
+			the action.
+			<li>Confirm that files can be supplied and processed using each FPS file.
+			<li>Delete or rename the <b>Test</b> action.
+			<li>Confirm that opening <b>Test.fps</b> displays an error about the 
+			undefined action name.
+			<li>Delete or rename the <b>Test_&lt;user_name&gt;</b> action.
+			<li>Exercise <b>UserName.fps</b>
+			<ul>
+				<li>Confirm that opening the FPS file does not display an error 
+				about the undefined action name.
+				<li>Confirm that exercising the FPS file displays an exception 
+				indicating that the specified action name is invalid.
+				<li>Close the FPS file.
+				<li>Set the <b>AutoCreateActions</b> field in the <b>DBInfo</b> 
+				table to <b>1</b>.
+				<li>Exercise the FPS file.
+				<li>Confirm that the action is automatically created and that 
+				processing works without error.
+			</ul>
+		</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[LegacyRC #5627]</b> Set File Action Status allows action name expressions
+       	<ul>
+		<li><u>Manually Set Action Status dialog</u>
+		<ul>
+			<li>Confirm that the <b>Manually Set Action Status</b> dialog includes 
+			a combo box populated with each defined action.
+			<li>Confirm that the <b>Manually Set Action Status</b> dialog includes a 
+			<b>Tag Selector</b> button allowing the user to choose an action 
+			including a $ function.
+			<li>Confirm that status can be modified for an action that uses a 
+			$ function.
+			<li>Confirm that trying to modify status for an action that uses a 
+			$ function that does not actually exist in the database displays a 
+			meaningful error.
+		</ul>
+       	</ul>
+   	</LI>
+</OL>
+<p>
+<h3>Miscellaneous</h3>
+<uL>
+	<li><b>Window caption</b>
+	<ul>
+		<li>Verify a document.
+		<li>Confirm that the <b>window caption</b> now includes a space between 
+		<b>LabDE</b> and the action name.
+	</ul>
+<p>
+	<li><b>User License</b>
+	<ul>
+		<li>Confirm that the <b>UserLicense</b> utility now reports the LabDE 
+		version number as starting with <b>1.5</b>.
+	</ul>
+</uL>
+</BODY>
+</HTML>
