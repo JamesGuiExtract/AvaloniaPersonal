@@ -148,7 +148,7 @@
 	<li>Confirm that the <b>browse</b> buttons for Database Server and Database 
 	Name are disabled.
 	<li>Confirm that the <b>Refresh</b> button for Connection Status is enabled.
-	<li>Confirm that menus are provided for <b>Database</b>, <b>Action</b>, 
+	<li>Confirm that menus are provided for <b>Database</b>, <b>Manage</b>, 
 	<b>Tools</b>, and <b>Help</b>.
 </ul>
 
@@ -261,118 +261,303 @@
 	</ul>
 </ul>
 
-<h2>Action Menu</h2>
+<h2>Manage Menu</h2>
 <ul>
-	<li>Confirm that <b>Add...</b>, <b>Remove...</b>, <b>Rename...</b>, 
-	and <b>Manually set action status...</b> items exist in the menu.
+	<li>Confirm that <b>Actions...</b>, <b>Counters...</b>, <b>Tags...</b>, 
+	and <b>Users...</b> items exist in the menu.
 	<li>Confirm that all menu items are enabled.
 <p>
-	<li>Connect to the database using <b>Microsoft SQL Server Management Studio 
-	Express</b>. Files queued by the File Action Manager can be found 
-	under Databases\&lt;DatabaseName&gt;\Tables\dbo.FAMFile. 
-	Right click <b>dbo.FAMFile</b> and select <b>Open table</b> to view files 
-	added to the database by the File Action Manager. The table will need to 
-	be closed and reopened each time an action is added or removed in order 
-	to see the changes. The table can be refreshed with <b>Ctrl+R</b> to view 
-	changes to an action's status.<p>
-<p>
-	<li><b>Add...</b></li>
+	<li><b>Manage Actions...</b>
 	<ul>
-		<li><b>Default status for action</b> displays <b>Unattempted</b> by default.
-		<li>Adding an action with the status adds a column 
-		ASC_&lt;ActionName&gt; to <b>dbo.FAMFile</b> with the following values:
-		<ul>
-			<li>Unattempted: U
-			<li>Pending: P
-			<li>Processing: R
-			<li>Completed: C
-			<li>Failed: F
-			<li>Skipped: S
-		</ul>
-		<li>Adding an action using <b>Copy from</b> adds a column 
-		ASC_&lt;ActionName&gt; to <b>dbo.FAMFile</b> with the expected values:
-		<ul>
-			<li>Unattempted: U
-			<li>Pending: P
-			<li>Processing: R
-			<li>Completed: C
-			<li>Failed: F
-			<li>Skipped: S
-		</ul>
-		<li><b>[LegacyRCAndUtils #5538]</b> Add an action using <b>Copy from</b>.  
-		Confirm that no exception is thrown.
-		<li>Confirm that an exception is thrown when attempting to 
-		add an action where the first character is a digit.
-		<li><b>[LegacyRC #5107]</b> Confirm that an error message is displayed when 
-		attempting to copy the default status from an action when no actions exist 
-		in the database.
-		<li>Confirm that adding an action and clicking <b>No</b> 
-		in the confirmation dialog does not add an action to the database.
-		<li>Confirm that adding an action and clicking <b>Cancel</b> 
-		in the confirmation dialog does not add an action to the database.
-		<li>Confirm that <b>CTRL+A</b> performs the same function as 
-		selecting <b>Add...</b> from the <b>Action</b> menu.
-		<li><b>[LegacyRC #4677]</b> Case-sensitivity for action names.
-		<ul>
-			<li>Add an action such as <b>test</b> to the database.
-			<li>Create an <b>FPS</b> file that queues and processes some files 
-			using this action.
-			<li>Exercise the FPS file and note the <b>Summary tab</b> information.
-			<li>Clear the database and replace the action with different case (i.e. 
-			<b>Test</b>).
-			<li>Open the previous <b>FPS</b> file and confirm that no error is displayed.
-			<li>Exercise the FPS file and confirm that the <b>Summary tab</b> 
-			information matches that seen previously.
+		<li><u><b>User Interface</b></u>
+	       	<ul>
+			<li>Confirm that the <b>Manage Actions</b> dialog contains a single-column 
+			<b>Action name</b> list.
+			<li>Confirm that the <b>Manage Actions</b> dialog contains an <b>Add...</b> 
+			button.
+			<li>Confirm that the <b>Add...</b> button displays the usual Add Action dialog.
+			<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Remove</b> 
+			button.
+			<li>Confirm that the <b>Remove</b> button is disabled if no action is selected.
+			<li>Confirm that the <b>Remove</b> button displays a confirmation dialog.
+			<li>Confirm that an action is removed according to the confirmation dialog 
+			response.
+			<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Rename...</b> 
+			button.
+			<li>Confirm that the <b>Rename...</b> button displays a Rename Action dialog.
+			<li>Confirm that an action can be renamed.
+			<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Refresh</b> 
+			button.
+			<li>Confirm that the <b>Refresh</b> button updates the <b>Action name</b> list.
+			<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Close</b> 
+			button.
+			<li>Confirm that the <b>Close</b> button closes the dialog.
 		</ul>
 <p>
-		<li><b>[LegacyRCAndUtils #3857]</b> Confirm that an error message is shown if the 
-		user attempts to add an action	to the database that differs from an existing action 
-		only in case (i.e. "test" and "TEST").
-		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the 
-		latest after a new action is added.
-		<li><b>[LegacyRCAndUtils #5106]</b> Confirm that <b>Copy From</b> radio button can 
-		be selected by using Tab and Arrow keys.
-		<li><b>[LegacyRCAndUtils #5592]</b> Error adding action
-		<ul>
-			<li>Export a list of files using a random set of files.
-			<li>Keep the DB Admin utility open.
-			<li>Confirm that a new action can be added without an <b>ELI23524: Cursor 
-			operation conflict</b> exception.
+		<li><u><b>Functionality</b></u>
+	       	<ul>
+			<li><b>[LegacyRCAndUtils #5538]</b> Add an action using <b>Copy from</b>.  
+			Confirm that no exception is thrown.
+			<li>Confirm that an exception is thrown when attempting to 
+			add an action where the first character is a digit.
+			<li><b>[LegacyRC #5107]</b> Confirm that an error message is displayed when 
+			attempting to copy the default status from an action when no actions exist 
+			in the database.
+			<li>Confirm that adding an action and clicking <b>No</b> 
+			in the confirmation dialog does not add an action to the database.
+			<li>Confirm that adding an action and clicking <b>Cancel</b> 
+			in the confirmation dialog does not add an action to the database.
+			<li>Confirm that <b>CTRL+A</b> performs the same function as 
+			selecting <b>Add...</b> from the <b>Action</b> menu.
+			<li><b>[LegacyRC #4677]</b> Case-sensitivity for action names.
+			<ul>
+				<li>Add an action such as <b>test</b> to the database.
+				<li>Create an <b>FPS</b> file that queues and processes some files 
+				using this action.
+				<li>Exercise the FPS file and note the <b>Summary tab</b> information.
+				<li>Clear the database and replace the action with different case (i.e. 
+				<b>Test</b>).
+				<li>Open the previous <b>FPS</b> file and confirm that no error is displayed.
+				<li>Exercise the FPS file and confirm that the <b>Summary tab</b> 
+				information matches that seen previously.
+			</ul>
+<p>
+			<li><b>[LegacyRCAndUtils #3857]</b> Confirm that an error message is shown if the 
+			user attempts to add an action	to the database that differs from an existing action 
+			only in case (i.e. "test" and "TEST").
+			<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the 
+			latest after a new action is added.
+			<li><b>[LegacyRCAndUtils #5106]</b> Confirm that <b>Copy From</b> radio button can 
+			be selected by using Tab and Arrow keys.
+			<li><b>[LegacyRCAndUtils #5592]</b> Error adding action
+			<ul>
+				<li>Export a list of files using a random set of files.
+				<li>Keep the DB Admin utility open.
+				<li>Confirm that a new action can be added without an <b>ELI23524: Cursor 
+				operation conflict</b> exception.
+			</ul>
+<p>
+			<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is 
+			refreshed to the latest after an action is removed.
+			<li>Confirm that an action cannot be renamed to the same name.
+			<li>Confirm that an action cannot be renamed to an invalid name, 
+			e.g. <b>"123"</b>.
+			<li>Confirm that an action cannot be renamed to an existing action name.
+			<li>Confirm that renaming an action and clicking <b>No</b> in the 
+			confirmation dialog does not rename an action.
+			<li>Confirm that renaming an action and clicking <b>Cancel</b> in 
+			the confirmation dialog does not rename an action.
+			<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed 
+			to the latest after an action is renamed.
 		</ul>
 	</ul>
 <p>
-	<li><b>Remove...</b></li>
+	<li><b>Manage Counters...</b>
 	<ul>
-		<li>Confirm that all actions listed in the database appear in the 
-		<b>Remove Action</b> drop down menu and vice-versa.
-		<li>Confirm that removing an action and clicking <b>No</b> in the 
-		confirmation dialog does not remove an action from the database and return to the 
-		<b>FAM DB</b> main window.
-		<li>Confirm that removing an action and clicking <b>Cancel</b> in the 
-		confirmation dialog does not remove an action from the database and return to 
-		<b>Remove Action</b> dialog.
-		<li>Confirm that removing an action removes the corresponding 
-		column ASC_&lt;ActionName&gt; from <b>dbo.FAMFile</b>.
-		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the 
-		latest after an action is removed.
+      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+		a list with columns for <b>Counter</b> and <b>Value</b>.
+      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+		an <b>Add...</b> button.
+		<ul>
+			<li>Confirm that an <b>Add Counter</b> dialog is displayed.
+			<li>Confirm that negative values can be used to 
+			initialize the counter.
+			<li><b>[LegacyRC #5516]</b> Confirm that whitespace 
+			is trimmed from user-provided counter names.
+			<li>Confirm that counter names must be unique in 
+			the database.
+		</ul>
+      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+		a <b>Delete</b> button.
+		<li>Confirm that a confirmation prompt is provided before 
+		deleting the counter.
+      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+		a <b>Rename...</b> button.
+		<ul>
+			<li>Confirm that a <b>Rename Counter</b> dialog is displayed.
+			<li>Confirm that counter names must be unique in 
+			the database.
+		</ul>
+      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+		a <b>Set value...</b> button.
+		<ul>
+			<li>Confirm that a <b>Set Counter Value</b> dialog is displayed.
+			<li>Confirm that the <b>Counter name</b> edit box 
+			is read-only.
+			<li>Confirm that a <b>New value for counter</b> edit 
+			box is provided.
+			<li>Confirm that the default value in the <b>New value 
+			for counter</b> edit box is the current value.
+		</ul>
+      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+		a <b>Refresh</b> button.
+      		<li>Confirm that <b>Refresh</b> updates the list of counters and values.
+      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+		a <b>Close</b> button.
+		<li>Confirm that <b>Close</b> closes the dialog.
 	</ul>
 <p>
-	<li><b>Rename...</b></li>
+	<li><b>Manage Tags...</b>
 	<ul>
-		<li>Confirm that all actions listed in the database appear in the 
-		<b>Rename Action</b> drop down menu and vice-versa.
-		<li>Confirm that renaming an action changes the Action name and the 
-		column ASC_&lt;ActionName&gt; in <b>dbo.FAMFile</b> to the expected value.
-		<li>Confirm that an action cannot be renamed to the same name.
-		<li>Confirm that an action cannot be renamed to an invalid name, 
-		e.g. <b>"123"</b>.
-		<li>Confirm that an action cannot be renamed to an existing action name.
-		<li>Confirm that renaming an action and clicking <b>No</b> in the 
-		confirmation dialog does not rename an action.
-		<li>Confirm that renaming an action and clicking <b>Cancel</b> in 
-		the confirmation dialog does not rename an action.
-		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the 
-		latest after an action is renamed.
+      		<li>Confirm that the <b>Manage Tags</b> dialog includes a two-column list 
+		of tags and associated descriptions.
+      		<li>Confirm that the <b>Manage Tags</b> dialog includes a button to 
+		<b>Add</b> a new tag.
+      		<li>Confirm that the <b>Manage Tags</b> dialog includes a button to 
+		<b>Modify</b> an existing tag.
+      		<li>Confirm that the <b>Manage Tags</b> dialog includes a button to 
+		<b>Delete</b> an existing tag.
+      		<li>Confirm that deleting a tag requires confirmation.
+      		<li>Confirm that the <b>Manage Tags</b> dialog includes a button to 
+		<b>Refresh</b> the list of tags.
+      		<li>Confirm that the <b>Manage Tags</b> dialog includes a button to 
+		<b>Close</b> the dialog.
+      		<li>Confirm that tags must begin with a letter, number or underscore 
+		character.
+      		<li>Confirm that tags can contain spaces allowing for multiple-word strings.
+<p>
+		<li><b>[LegacyRC #5453]</b> Log exception when tags are changed
+		<ul>
+			<li>Confirm that <b>DB Admin</b> logs an <b>Application 
+			trace:</b> exception when a tag is added to the database.
+			<li>Confirm that <b>DB Admin</b> logs an <b>Application 
+			trace:</b> exception when a tag is modified in the database.
+			<li>Confirm that <b>DB Admin</b> logs an <b>Application 
+			trace:</b> exception when a tag is removed from the database.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5515]</b> Invalid tag name
+	       	<ul>
+	      		<li>Open the <b>Manage Tags</b> dialog from <b>FAM DB Admin</b>.
+	  	   	<LI>Add an invalid tag such as <b>#32r</b>.
+			<li>Confirm that an <b>ELI27383: Invalid tag name!</b> exception 
+			is displayed.
+	      		<li>Close the expection.
+	  	   	<LI>Confirm that the <b>Add Tag</b> dialog is still open.
+	  	   	<LI>Confirm that existing description text has been retained.
+	       	</ul>
+	</ul>
+<p>
+	<li><b>Manage Users...</b>
+	<ul>
+		<li><u><b>User Interface</b></u>
+	       	<ul>
+      			<li>Confirm that the dialog includes a two-column list box 
+			for <b>User</b> and <b>Password set</b>.
+      			<li>Confirm that the dialog includes an <b>Add...</b> button.
+			<li>Confirm that the Add button displays an edit box for 
+			adding a login ID.
+			<li>Confirm that the edit box is pre-populated with the 
+			current user's login ID. 
+			<li>Confirm that the login ID in the edit box is completely 
+			selected allowing for an easy overwrite. 
+      			<li>Confirm that the dialog includes a <b>Remove</b> button.
+			<li>Confirm that the <b>Remove</b> button is disabled if 
+			no user is selected.
+			<li>Confirm that clicking the <b>Remove</b> button displays 
+			a confirmation dialog.
+      			<li>Confirm that the dialog includes a <b>Rename</b> button.
+			<li>Confirm that the <b>Rename</b> button is disabled if 
+			no user is selected.
+			<li>Confirm that clicking the <b>Rename</b> button displays 
+			an edit box for modifying a login ID.
+			<li>Confirm that the edit box is pre-populated with the 
+			selected user's login ID. 
+      			<li>Confirm that the dialog includes a <b>Clear password</b> 
+			button.
+			<li>Confirm that the <b>Clear password</b> button is disabled 
+			if no user is selected.
+			<li>Confirm that clicking the <b>Clear password</b> button 
+			displays a confirmation dialog.
+      			<li>Confirm that the dialog includes a <b>Refresh</b> button.
+      			<li>Confirm that the dialog includes a <b>Close</b> button.
+	       	</ul>
+<p>
+      		<li><u><b>Functionality</b></u>
+	       	<ul>
+			<li>Confirm that a new user is added to the bottom of the list.
+			<li>Confirm that the <b>User</b> column for a new user 
+			is <b>first_last</b> per the normal network login.
+			<li>Confirm that the <b>Password set</b> column for a new user 
+			is <b>No</b>.
+	      		<li>Confirm that an error message is displayed if a duplicate 
+			user is added.
+			<li>Confirm that an <b>admin</b> user cannot be added.
+			<li>Confirm that an <b>administrator</b> user cannot be added.
+	      		<li>Confirm that a user is properly removed depending on the 
+			response to the confirmation dialog.
+	      		<li>Confirm that the <b>Password set</b> value is properly 
+			reset to <b>No</b> depending on the response to the 
+			confirmation dialog.
+      			<li>Confirm that clicking the <b>Close</b> button closes the 
+			dialog.
+	       	</ul>
+<p>
+      		<li><u><b>General Functionality</b></u>
+	       	<ul>
+			<li>Confirm that a <b>RequireAuthenticationBeforeRun</b> field 
+			is defined in the <b>DBInfo</b> table.
+			<li>Confirm that <b>RequireAuthenticationBeforeRun</b> defaults 
+			to <b>0</b>.
+			<li>Confirm that user authentication is only active when 
+			<b>RequireAuthenticationBeforeRun = 1</b>.
+			<li>Confirm that for a user with a cleared password, clicking 
+			the <b>Start processing</b> button prompts the user to define 
+			a password.
+			<li>Confirm that the <b>Login</b> table is updated.
+			<li>Confirm that the new password is not stored in clear text.
+			<li>Confirm that the new password does not need to match the 
+			user's network password.
+			<li>Confirm that processing <b>will not</b> start if an 
+			incorrect password is provided.
+			<li>Confirm that processing <b>will</b> start if a correct 
+			password is provided.
+			<li>Refresh and cleared passwords
+			<ul>
+				<li>Select a user with a defined password.
+				<li>Clear the password.
+				<li>Open a FAM instance as the selected user.
+				<li>Confirm that clicking the <b>Start processing</b> 
+				button prompts the user to define a new password.
+				<li>Confirm that the FAM starts processing after 
+				definition of the new password.
+				<li>Use SQL Management Studio to confirm that a hashed 
+				password exists in the <b>Login</b> table for the 
+				selected user.
+				<li>Click the <b>Refresh</b> button in the <b>Manage 
+				users</b> dialog.
+				<li>Confirm that <b>Password set = Yes</b>.
+		       	</ul>
+	       	</ul>
+	</ul>
+</ul>
+	
+<h2>Tools Menu</h2>
+<ul>
+	<li>Confirm that the following items exist in the menu and that each are enabled:
+	<ul>
+		<li>Check for new components
+		<li>Manually set action status...
+		<li>Manually set file processing priority...
+		<li>File Action Manager...
+		<li>Export file lists...
+		<li>Reports...
+	</ul>
+<p>
+	<li><b>Check for new components</b>
+	<ul>
+		<li>Confirm that a wait cursor appears.
+		<li>Confirm that <b>LST</b> files with an updated timestamp appear in the 
+		<b>CommonComponents</b> folder.
+		<li><b>[LegacyRC #4758]</b> Confirm that the following LST files are updated.
+		<ul>
+			<li>Extract FAM Conditions.
+			<li><b>[LegacyRC #4962]</b> Extract FAM Product Specific DB Managers.
+			<li>Extract FAM Reports.
+			<li>Extract File Suppliers.
+			<li>UCLID File Processors.
+			<li>UCLID Input Funnel Input Receivers.
+		</ul>
 	</ul>
 <p>
 	<li><b>Manually set action status...</b>
@@ -444,174 +629,6 @@
 	       	</ul>
 	</ul>
 <p>
-	<li><b>[LegacyRC #5052]</b> Confirm that <b>Application trace</b> exceptions are logged 
-	for the following actions
-	<ul>
-		<li>Database - Clear
-		<li>Database - Reset lock
-		<li>Database - Change password
-		<li>Action - Add
-		<li>Action - Remove
-		<li>Action - Rename
-		<li>Action - Manually set action status
-	</ul>
-</ul>
-	
-<h2>Tools Menu</h2>
-<ul>
-	<li>Confirm that the following items exist in the menu and that each are enabled:
-	<ul>
-		<li>Check for new components
-		<li>Manage tags...
-		<li>Manage counters...
-		<li>Export file lists...
-		<li>Manually set file processing priority...
-		<li>File Action Manager...
-		<li>Reports...
-	</ul>
-<p>
-	<li><b>Check for new components</b>
-	<ul>
-		<li>Confirm that a wait cursor appears.
-		<li>Confirm that <b>LST</b> files with an updated timestamp appear in the 
-		<b>CommonComponents</b> folder.
-		<li><b>[LegacyRC #4758]</b> Confirm that the following LST files are updated.
-		<ul>
-			<li>Extract FAM Conditions.
-			<li><b>[LegacyRC #4962]</b> Extract FAM Product Specific DB Managers.
-			<li>Extract FAM Reports.
-			<li>Extract File Suppliers.
-			<li>UCLID File Processors.
-			<li>UCLID Input Funnel Input Receivers.
-		</ul>
-	</ul>
-<p>
-	<li><b>Manage tags...</b>
-	<ul>
-      		<li>Confirm that selecting the menu item displays a <b>Manage Tags</b> 
-		dialog.
-      		<li>Confirm that the <b>Manage Tags</b> dialog includes a two-column list 
-		of tags and associated descriptions.
-      		<li>Confirm that the <b>Manage Tags</b> dialog includes a button to 
-		<b>Add</b> a new tag.
-      		<li>Confirm that the <b>Manage Tags</b> dialog includes a button to 
-		<b>Modify</b> an existing tag.
-      		<li>Confirm that the <b>Manage Tags</b> dialog includes a button to 
-		<b>Delete</b> an existing tag.
-      		<li>Confirm that deleting a tag requires confirmation.
-      		<li>Confirm that the <b>Manage Tags</b> dialog includes a button to 
-		<b>Refresh</b> the list of tags.
-      		<li>Confirm that the <b>Manage Tags</b> dialog includes a button to 
-		<b>Close</b> the dialog.
-      		<li>Confirm that tags must begin with a letter, number or underscore 
-		character.
-      		<li>Confirm that tags can contain spaces allowing for multiple-word strings.
-<p>
-		<li><b>[LegacyRC #5453]</b> Log exception when tags are changed
-		<ul>
-			<li>Confirm that <b>DB Admin</b> logs an <b>Application 
-			trace:</b> exception when a tag is added to the database.
-			<li>Confirm that <b>DB Admin</b> logs an <b>Application 
-			trace:</b> exception when a tag is modified in the database.
-			<li>Confirm that <b>DB Admin</b> logs an <b>Application 
-			trace:</b> exception when a tag is removed from the database.
-		</ul>
-<p>
-  	   	<LI><b>[LegacyRC #5515]</b> Invalid tag name
-	       	<ul>
-	      		<li>Open the <b>Manage Tags</b> dialog from <b>FAM DB Admin</b>.
-	  	   	<LI>Add an invalid tag such as <b>#32r</b>.
-			<li>Confirm that an <b>ELI27383: Invalid tag name!</b> exception 
-			is displayed.
-	      		<li>Close the expection.
-	  	   	<LI>Confirm that the <b>Add Tag</b> dialog is still open.
-	  	   	<LI>Confirm that existing description text has been retained.
-	       	</ul>
-	</ul>
-<p>
-	<li><b>Manage counters...</b>
-	<ul>
-      		<li>Confirm that selecting the menu item displays 
-		a <b>Manage Counters</b> dialog.
-      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
-		a list with columns for <b>Counter</b> and <b>Value</b>.
-      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
-		an <b>Add...</b> button.
-		<ul>
-			<li>Confirm that an <b>Add Counter</b> dialog is displayed.
-			<li>Confirm that negative values can be used to 
-			initialize the counter.
-			<li><b>[LegacyRC #5516]</b> Confirm that whitespace 
-			is trimmed from user-provided counter names.
-			<li>Confirm that counter names must be unique in 
-			the database.
-		</ul>
-      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
-		a <b>Delete</b> button.
-		<li>Confirm that a confirmation prompt is provided before 
-		deleting the counter.
-      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
-		a <b>Rename...</b> button.
-		<ul>
-			<li>Confirm that a <b>Rename Counter</b> dialog is displayed.
-			<li>Confirm that counter names must be unique in 
-			the database.
-		</ul>
-      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
-		a <b>Set value...</b> button.
-		<ul>
-			<li>Confirm that a <b>Set Counter Value</b> dialog is displayed.
-			<li>Confirm that the <b>Counter name</b> edit box 
-			is read-only.
-			<li>Confirm that a <b>New value for counter</b> edit 
-			box is provided.
-			<li>Confirm that the default value in the <b>New value 
-			for counter</b> edit box is the current value.
-		</ul>
-      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
-		a <b>Refresh</b> button.
-      		<li>Confirm that <b>Refresh</b> updates the list of counters and values.
-      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
-		a <b>Close</b> button.
-		<li>Confirm that <b>Close</b> closes the dialog.
-	</ul>
-<p>
-	<li><b>Export file lists...</b>
-	<ul>
-		<li>Confirm that an error message is presented when attempting to 
-		export filenames when no <b>Export file name</b> is specified.
-		<li>Confirm that <b>Export a list of all files</b> exports all 
-		filenames in the database to the selected text file.
-		<li>Confirm that a message box is presented with the number of 
-		files exported.
-		<li>Confirm that <b>Export a list of file names for files that 
-		are in...</b> a selected state for a selected action exports 
-		only those filenames from the database (action status can be changed 
-		manually in the <b>dbo.FAMFile</b> table as necessary).
-		<ul>
-			<li>Unattempted: U
-			<li>Pending: P
-			<li>Processing: R
-			<li>Skipped: S
-			<li>Completed: C
-			<li>Failed: F
-		</ul>
-<p>
-		<li><b>Export a list of all files that result from this SQL query:</b> 
-		exports the proper filenames when the SQL query <i>FAMFile where 
-		ASC_&lt;ActionName&gt; = 'P'</i> is entered.
-		<li>Confirm that the expected list is exported.
-<p>
-		<li><b>[LegacyRCAndUtils #4900]</b> Disallow exporting to relative path.
-		<ul>
-			<li>Start the application.
-			<li>Confirm that the active database contains images and actions.
-			<li>Export a file list.
-			<li>Confirm that providing a relative path for the output file <b>is 
-			not</b> accepted.
-		</ul>
-	</ul>
-<p>
 	<li><b>Manually set file processing priority...</b>
 	<ul>
       		<li>Confirm that selecting the menu item displays a <b>Manually Set File 
@@ -669,6 +686,42 @@
 		menu for a <b>Database Name</b> containing a space.
 		<li><b>[LegacyRC #5523]</b> Confirm that <b>CTRL+F</b> performs the same 
 		function as selecting <b>File Action Manager...</b> from the <b>Tools</b> menu.
+	</ul>
+<p>
+	<li><b>Export file lists...</b>
+	<ul>
+		<li>Confirm that an error message is presented when attempting to 
+		export filenames when no <b>Export file name</b> is specified.
+		<li>Confirm that <b>Export a list of all files</b> exports all 
+		filenames in the database to the selected text file.
+		<li>Confirm that a message box is presented with the number of 
+		files exported.
+		<li>Confirm that <b>Export a list of file names for files that 
+		are in...</b> a selected state for a selected action exports 
+		only those filenames from the database (action status can be changed 
+		manually in the <b>dbo.FAMFile</b> table as necessary).
+		<ul>
+			<li>Unattempted: U
+			<li>Pending: P
+			<li>Processing: R
+			<li>Skipped: S
+			<li>Completed: C
+			<li>Failed: F
+		</ul>
+<p>
+		<li><b>Export a list of all files that result from this SQL query:</b> 
+		exports the proper filenames when the SQL query <i>FAMFile where 
+		ASC_&lt;ActionName&gt; = 'P'</i> is entered.
+		<li>Confirm that the expected list is exported.
+<p>
+		<li><b>[LegacyRCAndUtils #4900]</b> Disallow exporting to relative path.
+		<ul>
+			<li>Start the application.
+			<li>Confirm that the active database contains images and actions.
+			<li>Export a file list.
+			<li>Confirm that providing a relative path for the output file <b>is 
+			not</b> accepted.
+		</ul>
 	</ul>
 <p>
 	<li><b>Reports</b>
@@ -816,6 +869,18 @@
 	<li><b>[LegacyRC #4325]</b> The utility does not close when pressing the <b>Escape</b> key.
 	<li><b>[FlexIDSCore #2565]</b> Confirm that it is possible to navigate away from and back to 
 	the FAM DB Admin utility using <b>Alt+Tab</b>.
+<p>
+	<li><b>[LegacyRC #5052]</b> Confirm that <b>Application trace</b> exceptions are logged 
+	for the following actions
+	<ul>
+		<li>Database - Clear
+		<li>Database - Reset lock
+		<li>Database - Change password
+		<li>Action - Add
+		<li>Action - Remove
+		<li>Action - Rename
+		<li>Action - Manually set action status
+	</ul>
 </ul>
 </body>
 </html>
