@@ -10,9 +10,9 @@
 <hr>
 <b>File Processors</b>
 <ol>
-	<li><b>Add Watermark</b></li>
+	<li><b>Core: Add watermark</b></li>
    	<ul> 
-      		<li>Use the Add button to select <b>Add watermark</b> as the task.</li>
+      		<li>Use the Add button to select <b>Core: Add watermark</b> as the task.</li>
       		<li>Confirm presence of an edit box to hold the name of the <b>Document to 
 		apply the stamp on</b> file.</li>
       		<li>Confirm presence of an associated <b>Tag Selector</b> button.</li>
@@ -126,9 +126,114 @@
 	   	</ul> 
    	</ul> 
 <p>
-	<li><b>Archive or Restore Associated File</b></li>
+	<li><b>Core: Apply Bates number</b></li>
    	<ul> 
-      		<li>Use the Add button to select <b>Archive or restore associated file</b> as 
+      		<li>Confirm that an <b>Core: Apply Bates number</b> task exists.
+      		<li>Confirm that the <b>Core: Apply Bates number</b> task requires 
+		only a <b>general</b> Extract Systems license.
+<p>
+      		<li>Confirm that the property page includes a <b>Filename</b> 
+		group box.
+      		<li>Confirm that the group box contains an <b>Image file on 
+		which to apply Bates number</b> edit box.
+      		<li>Confirm that the group box contains an associated button 
+		for tags.
+      		<li>Confirm that the <b>tags</b> button works as expected.
+      		<li>Confirm that the group box contains an associated <b>...</b> 
+		button for browsing.
+      		<li>Confirm that the <b>browse</b> button works as expected.
+<p>
+      		<li>Confirm that the property page includes a <b>Next number</b> 
+		group box.
+      		<li>Confirm that the group box contains a <b>Counter to use for 
+		the next number</b> combo box.
+      		<li>Confirm that the combo box displays each defined counter.
+      		<li>Confirm that the specified counter is used to provide the 
+		next number.
+      		<li>Confirm that the group box contains a check box and spinner 
+		control for zero-padding the number to a specified number of 
+		digits.
+      		<li>Confirm that zero-padding is not used if not selected.
+      		<li>Confirm that zero-padding is used properly if selected.
+<p>
+      		<li>Confirm that the property page includes a <b>Bates number 
+		format</b> group box.
+      		<li>Confirm that the group box contains a <b>Prefix</b> edit box.
+      		<li>Confirm that the group box contains a <b>Suffix</b> edit box.
+      		<li>Confirm that the group box contains a <b>Use next number for 
+		each document and add separator with page number</b> radio button.
+      		<li>Confirm that the radio button includes an associated 
+		<b>Page number separator</b> edit box.
+      		<li>Confirm that the radio button includes an associated check box 
+		and spinner control for zero-padding the page number to a specified 
+		number of digits.
+      		<li>Confirm that the page number separator is not used if 
+		not selected.
+      		<li>Confirm that the page number separator is used properly if 
+		selected.
+      		<li>Confirm that zero-padding is not used if not selected.
+      		<li>Confirm that zero-padding is used properly if selected.
+      		<li>Confirm that the group box contains a <b>Use next number for 
+		every page</b> radio button.
+      		<li>Confirm that if this radio button is selected then each page 
+		contains a different number.
+<p>
+      		<li>Confirm that the property page includes a <b>Sample Bates 
+		number</b> group box.
+      		<li>Confirm that the group box contains a read-only edit box.
+      		<li>Confirm that the edit box contains an example Bates number 
+		using the <b>Prefix</b>, <b>Suffix</b>, <b>Separator</b> and 
+		<b>zero-padding</b> settings defined above.
+<p>
+      		<li>Confirm that the property page includes a <b>Position and  
+		appearance</b> group box.
+      		<li>Confirm that the group box contains a read-only edit box.
+      		<li>Confirm that the edit box contains <b>Font</b> and 
+		<b>Position</b> settings.
+      		<li>Confirm that the group box contains a <b>Change...</b> 
+		button.
+      		<li>Confirm that the <b>Change...</b> button displays a 
+		<b>Change Bates number default position and appearance</b> dialog.
+<p>
+      		<li>Confirm that the dialog includes an <b>Appearance</b> 
+		group box.
+      		<li>Confirm that the group box contains a read-only edit box 
+		for <b>Font</b>.
+      		<li>Confirm that the group box contains an associated <b>...</b> 
+		button for browsing.
+      		<li>Confirm that the <b>browse</b> button displays a <b>Select 
+		Font</b> dialog.
+      		<li>Confirm that the chosen <b>Name</b>, <b>Size</b>, and 
+		<b>Intensity</b> settings are displayed in the edit box.
+      		<li>Confirm that the dialog includes a <b>Default anchor position 
+		for Bates number</b> group box.
+      		<li>Confirm that the group box contains an edit box and combo box 
+		for number of inches from the <b>right</b> or <b>left</b> of 
+		the page.
+      		<li>Confirm that the group box contains an edit box and combo box 
+		for number of inches from the <b>top</b> or <b>bottom</b> of 
+		the page.
+      		<li>Confirm that the dialog includes a <b>Select alignment of Bates 
+		number relative to above anchor position</b> group box.
+      		<li>Confirm that the group box contains a <b>TEXT</b> graphic with 
+		nine selectable anchor points.
+      		<li>Confirm that the group box contains a label specifying the 
+		selected anchor point.
+      		<li>Confirm that <b>Font</b> settings are persistent.
+      		<li>Confirm that <b>Anchor position</b> settings are persistent.
+      		<li>Confirm that <b>Alignment</b> settings are persistent.
+<p>
+		<li>Exercise the <b>Apply Bates number</b> functionality.
+		<li>Confirm that progress status is updated correctly.
+<p>
+  	   	<LI><b>[FlexIDSCore #3776]</b> Confirm that an appropriate error message is 
+		seen if an invalid tag such as <b>&lt;SourceDocName</b> is entered in the 
+		property page.
+   	</ul> 
+<p>
+	<li><b>Core: Archive or restore associated file</b></li>
+   	<ul> 
+      		<li>Use the Add button to select <b>Core: Archive or restore associated file</b> as 
 		the task.</li>
 		<li>Confirm presence of a <b>Select operation</b> group box.</li>
 		<li>Confirm presence of an <b>Archive file</b> radio button.</li>
@@ -140,7 +245,8 @@
 	   	<ul> 
 			<li><b>NOTE:</b> Final functionality is still not defined.</li>
 			<li>Confirm that <b>&lt;FPSFileDir&gt;</b> is provided in the drop down list.</li>
-			<li>Confirm that <b>&lt;SourceDocName&gt;</b> is <b>NOT</b> provided in the drop down list.</li>
+			<li>Confirm that <b>&lt;SourceDocName&gt;</b> is <b>NOT</b> provided in the 
+			drop down list.</li>
 			<li>Confirm that the usual functions are provided in the drop down list.</li>
 	   	</ul> 
 		<li>Confirm presence of an associated <b>...</b> (Browse) button.</li>
@@ -185,19 +291,23 @@
 <p>
 	   	<li><b>Functionality Tests</b></li>
 	   	<ul>
-	   		<li>Create an RSD file an.rsd to find each word that follows "a" or "an" and output results to
-	   		&lt;SourceDocName&gt;.voa</li>
-	   		<li>Create a second RSD file the.rsd to find each word that follows "the" and output results to
-	   		&lt;SourceDocName&gt;.voa</li>
-	   		<li>Configure an FPS file to enqueue the images from the RedactionDemo, execute the rules in an.rsd, and
-	   		archive <b>&lt;SourceDocName&gt;.voa</b> with a tag of "an."</li>
-	   		<li><b>[LegacyRCAndUtils #5127]</b> Confirm that the files have been archived to 0-padded folders.</li>
-	   		<li>Use the FAM to execute the.rsd on the same images and archive <b>&lt;SourceDocName&gt;.voa</b> with a 
-	   		tag of "the." Configure the archive task to delete the file after archiving.</li>
+	   		<li>Create an RSD file an.rsd to find each word that follows "a" or "an" and 
+			output results to &lt;SourceDocName&gt;.voa</li>
+	   		<li>Create a second RSD file the.rsd to find each word that follows "the" 
+			and output results to &lt;SourceDocName&gt;.voa</li>
+	   		<li>Configure an FPS file to enqueue the images from the RedactionDemo, 
+			execute the rules in an.rsd, and archive <b>&lt;SourceDocName&gt;.voa</b> with 
+			a tag of "an."</li>
+	   		<li><b>[LegacyRCAndUtils #5127]</b> Confirm that the files have been archived 
+			to 0-padded folders.</li>
+	   		<li>Use the FAM to execute the.rsd on the same images and archive 
+			<b>&lt;SourceDocName&gt;.voa</b> with a tag of "the." Configure the archive 
+			task to delete the file after archiving.</li>
 	   		<li>Confirm that the archived file has been deleted.</li>
-	   		<li><b>[LegacyRCAndUtils #5133]</b> Configure a restore task to restore files archived with a tag of "the" 
-	   		to <b>$DirOf(&lt;SourceDocName&gt;)\newfolder\$FileOf(&lt;SourceDocName&gt;).voa</b>. Confirm that the task
-	   		was successful.</li>
+	   		<li><b>[LegacyRCAndUtils #5133]</b> Configure a restore task to restore files 
+			archived with a tag of "the" to 
+			<b>$DirOf(&lt;SourceDocName&gt;)\newfolder\$FileOf(&lt;SourceDocName&gt;).voa</b>. 
+			Confirm that the task was successful.</li>
 	   	</ul>
 <p>
 		<li><b>Archive and Restore Stress Test [LegacyRCAndUtils #5247]</b></li>
@@ -214,9 +324,10 @@
 			create a new task called "ArchiveRestore."</li>
 	   		<li>Open <b>ArchiveRestore_Test.fps</b>. Confirm that a connection is successfully 
 			established to the "ArchiveTest" database with database server, "(local)."</li>
-			<li>If a new database was created add a queue task to recursively add files from <b>F:\</b>.</li>
-			<li>Confirm that <b>ArchiveRestore_Test.fps</b> has three processing tasks: "Create Source 
-			voa," "Archive Source voa," and "Restore voa."</li>
+			<li>If a new database was created add a queue task to recursively add files 
+			from <b>F:\</b>.</li>
+			<li>Confirm that <b>ArchiveRestore_Test.fps</b> has three processing tasks: 
+			"Create Source voa," "Archive Source voa," and "Restore voa."</li>
 			<li>Confirm that <b>ArchiveRestore_Test.fps</b> is correctly configured to copy 
 			<b>Test.voa</b> to create <b>&lt;SourceDocName&gt;.voa</b> in the input folder.</li>
 			<li>Confirm that <b>ArchiveRestore_Test.fps</b> is configured to archive the voa files 
@@ -228,11 +339,11 @@
 	   	</ul>
    	</ul> 
 <p>
-	<li><b>Cleanup Image</b></li>
+	<li><b>Core: Cleanup Image</b></li>
    	<ul> 
 		<li><b>UI Component Test</b></li>
 		<ul>
-			<li>Use the Add button to select <b>Cleanup image</b> as the task.</li>
+			<li>Use the Add button to select <b>Core: Cleanup image</b> as the task.</li>
 			<li>Confirm presence of an edit box to hold the name of the <b>image cleanup 
 			settings</b> file.</li>
 			<li>Confirm presence of an associated <b>Tag Selector</b> button.</li>
@@ -294,9 +405,9 @@
 		</ul>
    	</ul> 
 <p>
-	<li><b>Conditional Task</b></li>
+	<li><b>Core: Conditionally execute task(s)</b></li>
    	<ul> 
-      		<li>Use the Add button to select <b>Conditionally execute task(s)</b> as the 
+      		<li>Use the Add button to select <b>Core: Conditionally execute task(s)</b> as the 
 		task.</li>
       		<li>Confirm there is a <b>Commands &gt;</b> button associated with <b>Evaluate 
 		the following condition</b>.</li>
@@ -481,25 +592,30 @@
       		</ul> 
    	</ul> 
 <p>
-	<li><b>Convert to Searchable PDF</b></li>
+	<li><b>Core: Convert to searchable PDF</b></li>
    	<ul> 
-      		<li>Use the Add button to select <b>Convert to searchable PDF</b> as the task.</li>
+      		<li>Use the Add button to select <b>Core: Convert to searchable PDF</b> as the task.</li>
       		<li>Confirm presence of an edit box to hold the name of the <b>Image (or PDF file) 
 		to convert</b> file.</li>
 		<li><b>[LegacyRC #4717]</b> Confirm that the output filename is always the input file, 
 		less the file extension if present, plus <b>.pdf</b>.
       		<li>Confirm presence of an associated <b>Tag Selector</b> button.</li>
       		<li>Confirm presence of an associated <b>...</b> ( Browse ) button.</li>
+		<li>Confirm presence of a <b>Make output PDFA/A compatible (this will increase the 
+		size of the PDF)</b> check box.
       		<li>Confirm that settings are persistent.</li>
+<p>
+		<li>Convert a folder of images to PDF/A-compliant PDFs.
+		<li>Use an updated demo installation of <b>Adobe Preflight</b> to validate compliance.
 <p>
 		<li><b>[LegacyRC #4745]</b> Confirm that the image files in the following 
 		folder convert to searchable PDF without error.  
 		I:\Common\Testing\PVCS_Testing\LegacyRC\4745
    	</ul> 
 <p>
-	<li><b>Convert VOA to XML</b></li>
+	<li><b>Core: Convert VOA to XML</b></li>
    	<ul> 
-      		<li>Use the Add button to select <b>Convert VOA to XML</b> as the task.</li>
+      		<li>Use the Add button to select <b>Core: Convert VOA to XML</b> as the task.</li>
       		<li>Confirm presence of an edit box to hold the name of the <b>VOA input 
 		file</b>.</li>
       		<li>Confirm presence of an associated <b>Configure XML Output...</b> button.</li>
@@ -542,9 +658,9 @@
       		<li>Confirm that spatial information can be <b>removed</b> from the output.</li>
    	</ul> 
 <p>
-	<li><b>Copy, Move or Delete File</b></li>
+	<li><b>Core: Copy, move or delete file</b></li>
    	<ul> 
-      		<li>Use the Add button to select <b>Copy, move or delete file</b> as the task.</li>
+      		<li>Use the Add button to select <b>Core: Copy, move or delete file</b> as the task.</li>
       		<li>Confirm the Configure Copy Move or Delete File dialog has a 
           	<b>Copy file</b> radio button, and the setting is persistent.</li> 
       		<li>Confirm the dialog has a <b>Move file</b> radio button, and the setting 
@@ -663,9 +779,9 @@
           	processed without causing any exception. E.g. Valid$(file), Valid$(folder).    
    	</ul>
 <p>
-	<li><b>Execute Rules</b></li>
+	<li><b>Core: Execute rules</b></li>
    	<ul> 
-      		<li>Select <b>Execute rules</b> as the task using the Add button.</li>
+      		<li>Select <b>Core: Execute rules</b> as the task using the Add button.</li>
       		<li>Confirm the Configure Execute Rules dialog has an edit box under 
           	Select Rules File.</li>
       		<ul> 
@@ -702,9 +818,9 @@
 		relevant exception is logged.
    	</ul> 
 <p>
-	<li><b>Launch Application</b></li>
+	<li><b>Core: Launch application</b></li>
    	<ul> 
-      		<li>Use the Add button to select <b>Launch application</b> as the task.</li> 
+      		<li>Use the Add button to select <b>Core: Launch application</b> as the task.</li> 
       		<li>Confirm the Configure Launch Application dialog has an edit box 
           	associated with <b>Application Command Line</b>.</li>
       		<ul> 
@@ -745,7 +861,9 @@
       		</ul> 
       		<li>Confirm there is a radio button for <b>Blocking</b> and a radio button for 
           	<b>Non_Blocking</b> in the Configure Launch Application dialog.</li> 
-      		<li>Confirm that the settings of the radio buttons are persistent.</li> 
+      		<li>Confirm there is a check box for <b>Propagate errors back to the File Action 
+		Manager</b>.
+      		<li>Confirm that the settings of the radio buttons and check box are persistent.</li> 
 <p>
       		<li>Create two Launch Application tasks with <b>one</b> processing thread and set 
 		the <i>Application Command Line</i> of each task to <b>"cmd.exe /c pause"</b> and the 
@@ -754,15 +872,39 @@
           	open until the first is closed if <b>Blocking</b> is selected.</li> 
       		<li>Confirm that both DOS windows open once processing starts if <b>Non_Blocking</b> 
           	is selected on the first task.</li>
+<p>
+		<li>Create a Launch Application FPS file to convert image formats.
+		<li>Use an invalid command-line option so as to create an error to be propagated 
+		back to the FAM.
+		<li>Confirm that the error <b>is</b> propagated if requested.
+		<li>Confirm that the error <b>is not</b> propagated if not requested.
    	</ul>
 <p>
-	<li><b>OCR Document</b></li>
+	<li><b>Core: Manage tags</b></li>
+   	<ul> 
+      		<li>Use the Add button to select <b>Core: Manage tags</b> as the task.</li>
+      		<li>Confirm that the property page includes options to <b>Apply the tags 
+		selected below</b>, <b>Remove the tags selected below</b>, and <b>Toggle the 
+		state of the tags selected below</b>.
+		<li>Confirm that the property page includes a checked list of defined tags.
+      		<li>Confirm that property page settings are persistent. 
+<p>
+      		<li>Use the <b>List of all documents with specific tag</b> report to confirm 
+		that the task functions as expected
+		<ul>
+			<li>Multiple tags can be applied to processed documents
+			<li>Multiple tags can be removed from processed documents
+			<li>Tags can be toggled for processed documents
+		</ul>
+   	</ul> 
+<p>
+	<li><b>Core: OCR document</b></li>
    	<ul> 
       		<li><b>[LegacyRC #4790]</b> Pay attention during OCR tests and watch for any MFC 
 		error messages from a Scansoft internal error.  These errors should be 
 		automatically dismissed so any recurrence <b>must</b> be noted.</li>
 <p>
-      		<li>Use the Add button to select <b>OCR document</b> as the task.</li>
+      		<li>Use the Add button to select <b>Core: OCR document</b> as the task.</li>
       		<li>Confirm there is a checkbox for <b>Use cleaned image if available</b> in the 
           	Configure OCR document dialog.</li>
       		<li>Confirm there is a radio button for <b>OCR all pages</b> in the 
@@ -849,9 +991,10 @@
 		</ul>
 </ul>
 <p>
-	<li><b>Set File Action Status In Database</b></li>
+	<li><b>Core: Set file action status in database</b></li>
    	<ul> 
-      		<li>Use the Add button to select <b>Set file-action status in database</b> as the task.</li>
+      		<li>Use the Add button to select <b>Core: Set file-action status in database</b> 
+		as the task.</li>
       		<li>Confirm that there is a combo box for <b>Status of the action</b> in the 
 		configuration dialog.</li>
       		<li>Confirm that each action defined in the current database is included in 
@@ -884,7 +1027,7 @@
 		<li><b>[LegacyRC #4966]</b> Display error message if target action not found in DB
 		<ul>
 	       		<li>Add action name <b>Test_First</b> to the working database.</li> 
-	       		<li>Create an FPS file with a Set File Action Status task to set 
+	       		<li>Create an FPS file with a Core: Set file action status task to set 
 			<b>Test_First</b> to Pending.</li> 
 	       		<li>Use FAM DB Admin to remove the <b>Test_First</b> action.</li> 
 	       		<li>Edit the task and confirm that an error message is displayed 
@@ -894,11 +1037,14 @@
 <p>
 		<li><b>[LegacyRCAndUtils #5096]</b> Set File Action Status adds queue event</li>
 		<ul>
-			<li>Create a database with multiple actions including <b>Process</b> and <b>CleanUp</b>.</li>
-			<li>Create FPS File #1 to <b>queue</b> images for <b>Process</b> action. The <b>Force Processing</b> flag
-			should be checked and <b>listening</b> for files to be added to the folder should also be checked.</li>
-			<li>Create FPS File #2 to <b>process</b> the images. Include an <b>Execute rules</b> task and a <b>Set
-			file action status</b> task to set <b>CleanUp</b> status to <b>Pending</b>.</li>
+			<li>Create a database with multiple actions including <b>Process</b> 
+			and <b>CleanUp</b>.</li>
+			<li>Create FPS File #1 to <b>queue</b> images for <b>Process</b> action. 
+			The <b>Force Processing</b> flag should be checked and <b>listening</b> 
+			for files to be added to the folder should also be checked.</li>
+			<li>Create FPS File #2 to <b>process</b> the images. Include a <b>Core: Execute 
+			rules</b> task and a <b>Core: Set file action status</b> task to set 
+			<b>CleanUp</b> status to <b>Pending</b>.</li>
 			<li>Confirm that <b>no</b> extra file added queue events are seen.</li>
 		</ul>
    	</ul> 
