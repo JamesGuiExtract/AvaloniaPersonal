@@ -126,5 +126,43 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 	drive <b>H:\</b> as created by the test.</li>
 	<li>Remove the drive mapping for <b>H:\</b>.</li>
 </ol>
+<p>
+<h3>New Functions</h3>
+<ul>
+	<li><b>$FullUserName()</b>
+	<ul>
+		<li>Confirm that $FullUserName() expands to the multiple word network user name for 
+		the logged in user.
+	</ul>
+	<li><b>$Now()</b>
+	<ul>
+		<li>Confirm that $Now() without parameters expands to the current date and time in a 
+		<b>YYYY-MM-DD-HH-MM-SS-mmm</b> format where <b>mmm</b> is a three-digit, zero-padded 
+		millisecond count.
+		<li>Confirm that $Now() properly expands the following parameters 
+		<ul>
+			<li><b>%B</b> - Full month name
+			<li><b>%d</b> - Day of month
+			<li><b>%H</b> - Hour in 24-hour format
+			<li><b>%I</b> - Hour in 12-hour format
+			<li><b>%m</b> - Month as decimal number
+			<li><b>%M</b> - Minute as decimal number
+			<li><b>%p</b> - AM / PM format
+			<li><b>%S</b> - Second as decimal number
+			<li><b>%y</b> - Year without century digits
+			<li><b>%Y</b> - Year with century digits
+		</ul>
+	</ul>
+	<li><b>$RandomAlphaNumeric()</b>
+	<ul>
+		<li>Confirm that $RandomAlphaNumeric() with an <b>nLength</b> parameter expands to a 
+		random sequence of alphanumeric characters of the specified length.
+	</ul>
+	<li><b>$UserName()</b>
+	<ul>
+		<li>Confirm that $UserName() expands to the single word (first_last) user name for 
+		the logged in user.
+	</ul>
+</ul>
 </body>
 </html>
