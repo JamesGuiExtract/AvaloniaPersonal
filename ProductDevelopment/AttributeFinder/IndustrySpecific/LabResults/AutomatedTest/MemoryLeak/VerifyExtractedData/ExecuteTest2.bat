@@ -1,4 +1,8 @@
 @echo off
+
+REM Start AutoHotkey script
+START "VerifyExtractedMemoryLeak2-SkipTif.ahk"
+
 REM Clean Source folder
 call Clean.bat Test_2
 

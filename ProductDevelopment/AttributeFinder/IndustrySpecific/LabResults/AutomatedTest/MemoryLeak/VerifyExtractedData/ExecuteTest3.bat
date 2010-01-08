@@ -1,4 +1,8 @@
 @echo off
+
+REM Start AutoHotkey script
+START "VerifyExtractedMemoryLeak3-SkipNoSave.ahk"
+
 REM Clean Source folder
 call Clean.bat Test_3
 
