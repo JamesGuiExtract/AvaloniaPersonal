@@ -1,17 +1,12 @@
 Test|N/A
-.Name|CBC
 .CollectionDate|09/21/2008
 .CollectionTime|06:40
+.Name|CBC
 .Component|WBC
 ..Flag|H
 ..Range|4.0-10.0
 ..Units|K/UL
 ..Value|16.2
-.Component|RBC
-..Flag|L
-..Range|4.00-5.30
-..Units|M/UL
-..Value|3.94
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -21,6 +16,19 @@ Test|N/A
 ..Range|36.0-48.0
 ..Units|%
 ..Value|36.8
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|318
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.6
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.94
 .Component|MCV
 ..Range|79.0-99.0
 ..Units|FL
@@ -33,10 +41,10 @@ Test|N/A
 ..Range|32.0-36.0
 ..Units|GM/DL
 ..Value|32.1
-.Component|PLT
-..Range|150-400
-..Units|K/UL
-..Value|318
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|49.3
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -45,10 +53,6 @@ Test|N/A
 ..Range|15.0-45.0
 ..Units|%
 ..Value|15.1
-.Component|RDW
-..Range|38.0-50.0
-..Units|FL
-..Value|49.3
 .Component|MONO
 ..Range|4.0-12.0
 ..Units|%
@@ -83,20 +87,67 @@ Test|N/A
 ..Range|0.0-0.2
 ..Units|K/UL
 ..Value|0.1
-.Component|MPV
-..Range|9.0-13.0
-..Units|FL
-..Value|10.6
 .EpicCode|85025
 Test|N/A
-.Name|COMPREHENSIVE PANEL
 .CollectionDate|09/21/2008
 .CollectionTime|06:40
+.Name|D DIMER
+.Component|D DIMER
+..Flag|H
+..Range|< 400
+..Units|NG/ML
+..Value|3060
+.EpicCode|85378
+Test|N/A
+.CollectionDate|09/21/2008
+.CollectionTime|06:40
+.Name|COMPREHENSIVE PANEL
 .Component|GLUCOSE
 ..Flag|H
 ..Range|70-99
 ..Units|MG/DL
 ..Value|195
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|14
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.8
+.Component|CALCIUM
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.9
+.Component|AST/SGOT
+..Range|9-36
+..Units|U/L
+..Value|20
+.Component|ALK PHOSPHATASE
+..Flag|H
+..Range|35-104
+..Units|U/L
+..Value|248
+.Component|ALT/SGPT
+..Range|7-49
+..Units|U/L
+..Value|13
+.Component|TOTAL BILIRUBIN
+..Range|0.2-1.0
+..Units|MG/DL
+..Value|0.4
+.Component|TOTAL PROTEIN
+..Range|6.3-8.3
+..Units|G/DL
+..Value|6.9
+.Component|ALBUMIN
+..Range|3.4-4.8
+..Units|G/DL
+..Value|3.5
+.Component|GFR AFRICAN AMERICAN
+..Value|84
+.Component|GFR,ESTIMATE
+..Value|69
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -114,56 +165,24 @@ Test|N/A
 ..Range|23-29
 ..Units|MMOL/L
 ..Value|27
-.Component|TOTAL PROTEIN
-..Range|6.3-8.3
-..Units|G/DL
-..Value|6.9
-.Component|ALBUMIN
-..Range|3.4-4.8
-..Units|G/DL
-..Value|3.5
-.Component|CALCIUM
-..Range|8.4-10.2
-..Units|MG/DL
-..Value|8.9
-.Component|TOTAL BILIRUBIN
-..Range|0.2-1.0
-..Units|MG/DL
-..Value|0.4
-.Component|AST/SGOT
-..Range|9-36
-..Units|U/L
-..Value|20
-.Component|ALK PHOSPHATASE
-..Flag|H
-..Range|35-104
-..Units|U/L
-..Value|248
-.Component|ALT/SGPT
-..Range|7-49
-..Units|U/L
-..Value|13
-.Component|BUN
-..Range|8-21
-..Units|MG/DL
-..Value|14
-.Component|CREATININE
-..Range|0.7-1.3
-..Units|MG/DL
-..Value|0.8
-.Component|GFR,ESTIMATE
-..Value|69
-.Component|GFR AFRICAN AMERICAN
-..Value|84
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
 ..Value|8
 .EpicCode|80053
 Test|N/A
-.Name|B-TYPE NATRIURETIC P
 .CollectionDate|09/21/2008
 .CollectionTime|06:40
+.Name|MAGNESIUM
+.Component|MAGNESIUM
+..Range|1.5-2.7
+..Units|MG/DL
+..Value|2.0
+.EpicCode|83735
+Test|N/A
+.CollectionDate|09/21/2008
+.CollectionTime|06:40
+.Name|B-TYPE NATRIURETIC P
 .Component|BNP
 ..Flag|H
 ..Range|< 100
@@ -171,38 +190,14 @@ Test|N/A
 ..Value|389
 .EpicCode|83519.05
 Test|N/A
-.Name|D DIMER
-.CollectionDate|09/21/2008
-.CollectionTime|06:40
-.Component|D DIMER
-..Flag|H
-..Range|< 400
-..Units|NG/ML
-..Value|3060
-.EpicCode|85378
-Test|N/A
-.Name|MAGNESIUM
-.CollectionDate|09/21/2008
-.CollectionTime|06:40
-.Component|MAGNESIUM
-..Range|1.5-2.7
-..Units|MG/DL
-..Value|2.0
-.EpicCode|83735
-Test|N/A
-.Name|CBC
 .CollectionDate|09/22/2008
 .CollectionTime|05:05
+.Name|CBC
 .Component|WBC
 ..Flag|H
 ..Range|4.0-10.0
 ..Units|K/UL
 ..Value|10.7
-.Component|RBC
-..Flag|L
-..Range|4.00-5.30
-..Units|M/UL
-..Value|3.38
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -213,6 +208,19 @@ Test|N/A
 ..Range|36.0-48.0
 ..Units|%
 ..Value|32.5
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|282
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.4
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.38
 .Component|MCV
 ..Range|79.0-99.0
 ..Units|FL
@@ -226,10 +234,10 @@ Test|N/A
 ..Range|32.0-36.0
 ..Units|GM/DL
 ..Value|31.7
-.Component|PLT
-..Range|150-400
-..Units|K/UL
-..Value|282
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|49.3
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -238,10 +246,6 @@ Test|N/A
 ..Range|15.0-45.0
 ..Units|%
 ..Value|19.6
-.Component|RDW
-..Range|38.0-50.0
-..Units|FL
-..Value|49.3
 .Component|MONO
 ..Range|4.0-12.0
 ..Units|%
@@ -275,20 +279,33 @@ Test|N/A
 ..Range|0.0-0.2
 ..Units|K/UL
 ..Value|0.1
-.Component|MPV
-..Range|9.0-13.0
-..Units|FL
-..Value|10.4
 .EpicCode|85025
 Test|N/A
-.Name|BASIC METABOLIC PANEL
 .CollectionDate|09/22/2008
 .CollectionTime|05:05
+.Name|BASIC METABOLIC PANEL
 .Component|GLUCOSE
 ..Flag|H
 ..Range|70-99
 ..Units|MG/DL
 ..Value|111
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|12
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.9
+.Component|CALCIUM
+..Flag|L
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.3
+.Component|GFR AFRICAN AMERICAN
+..Value|73
+.Component|GFR,ESTIMATE
+..Value|61
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -306,32 +323,15 @@ Test|N/A
 ..Range|23-29
 ..Units|MMOL/L
 ..Value|32
-.Component|CALCIUM
-..Flag|L
-..Range|8.4-10.2
-..Units|MG/DL
-..Value|8.3
-.Component|BUN
-..Range|8-21
-..Units|MG/DL
-..Value|12
-.Component|CREATININE
-..Range|0.7-1.3
-..Units|MG/DL
-..Value|0.9
-.Component|GFR,ESTIMATE
-..Value|61
-.Component|GFR AFRICAN AMERICAN
-..Value|73
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
 ..Value|4
 .EpicCode|80048
 Test|N/A
-.Name|B-TYPE NATRIURETIC P
 .CollectionDate|09/22/2008
 .CollectionTime|05:05
+.Name|B-TYPE NATRIURETIC P
 .Component|BNP
 ..Flag|H
 ..Range|< 100
@@ -339,19 +339,14 @@ Test|N/A
 ..Value|485
 .EpicCode|83519.05
 Test|N/A
-.Name|CBC
 .CollectionDate|09/23/2008
 .CollectionTime|05:40
+.Name|CBC
 .Component|WBC
 ..Flag|H
 ..Range|4.0-10.0
 ..Units|K/UL
 ..Value|12.1
-.Component|RBC
-..Flag|L
-..Range|4.00-5.30
-..Units|M/UL
-..Value|3.51
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -362,6 +357,19 @@ Test|N/A
 ..Range|36.0-48.0
 ..Units|%
 ..Value|33.0
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|269
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.5
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.51
 .Component|MCV
 ..Range|79.0-99.0
 ..Units|FL
@@ -374,10 +382,10 @@ Test|N/A
 ..Range|32.0-36.0
 ..Units|GM/DL
 ..Value|32.4
-.Component|PLT
-..Range|150-400
-..Units|K/UL
-..Value|269
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|48.3
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -386,10 +394,6 @@ Test|N/A
 ..Range|15.0-45.0
 ..Units|%
 ..Value|15.8
-.Component|RDW
-..Range|38.0-50.0
-..Units|FL
-..Value|48.3
 .Component|MONO
 ..Range|4.0-12.0
 ..Units|%
@@ -423,20 +427,33 @@ Test|N/A
 ..Range|0.0-0.2
 ..Units|K/UL
 ..Value|0.0
-.Component|MPV
-..Range|9.0-13.0
-..Units|FL
-..Value|10.5
 .EpicCode|85025
 Test|N/A
-.Name|BASIC METABOLIC PANEL
 .CollectionDate|09/23/2008
 .CollectionTime|05:40
+.Name|BASIC METABOLIC PANEL
 .Component|GLUCOSE
 ..Flag|H
 ..Range|70-99
 ..Units|MG/DL
 ..Value|288
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|19
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.8
+.Component|CALCIUM
+..Flag|L
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.1
+.Component|GFR AFRICAN AMERICAN
+..Value|84
+.Component|GFR,ESTIMATE
+..Value|69
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -454,32 +471,15 @@ Test|N/A
 ..Range|23-29
 ..Units|MMOL/L
 ..Value|27
-.Component|CALCIUM
-..Flag|L
-..Range|8.4-10.2
-..Units|MG/DL
-..Value|8.1
-.Component|BUN
-..Range|8-21
-..Units|MG/DL
-..Value|19
-.Component|CREATININE
-..Range|0.7-1.3
-..Units|MG/DL
-..Value|0.8
-.Component|GFR,ESTIMATE
-..Value|69
-.Component|GFR AFRICAN AMERICAN
-..Value|84
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
 ..Value|14
 .EpicCode|80048
 Test|N/A
-.Name|B-TYPE NATRIURETIC P
 .CollectionDate|09/23/2008
 .CollectionTime|05:40
+.Name|B-TYPE NATRIURETIC P
 .Component|BNP
 ..Flag|H
 ..Range|< 100
@@ -487,19 +487,14 @@ Test|N/A
 ..Value|270
 .EpicCode|83519.05
 Test|N/A
-.Name|CBC
 .CollectionDate|09/24/2008
 .CollectionTime|05:05
+.Name|CBC
 .Component|WBC
 ..Flag|H
 ..Range|4.0-10.0
 ..Units|K/UL
 ..Value|12.9
-.Component|RBC
-..Flag|L
-..Range|4.00-5.30
-..Units|M/UL
-..Value|3.32
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -510,6 +505,19 @@ Test|N/A
 ..Range|36.0-48.0
 ..Units|%
 ..Value|31.6
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|286
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|11.0
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.32
 .Component|MCV
 ..Range|79.0-99.0
 ..Units|FL
@@ -522,10 +530,10 @@ Test|N/A
 ..Range|32.0-36.0
 ..Units|GM/DL
 ..Value|32.0
-.Component|PLT
-..Range|150-400
-..Units|K/UL
-..Value|286
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|47.7
 .Component|SEG
 ..Flag|H
 ..Range|42.0-76.0
@@ -536,10 +544,6 @@ Test|N/A
 ..Range|15.0-45.0
 ..Units|%
 ..Value|11.2
-.Component|RDW
-..Range|38.0-50.0
-..Units|FL
-..Value|47.7
 .Component|MONO
 ..Range|4.0-12.0
 ..Units|%
@@ -573,20 +577,61 @@ Test|N/A
 ..Range|0.0-0.2
 ..Units|K/UL
 ..Value|0.0
-.Component|MPV
-..Range|9.0-13.0
-..Units|FL
-..Value|11.0
 .EpicCode|85025
 Test|N/A
-.Name|COMPREHENSIVE PANEL
 .CollectionDate|09/24/2008
 .CollectionTime|05:05
+.Name|COMPREHENSIVE PANEL
 .Component|GLUCOSE
 ..Flag|H
 ..Range|70-99
 ..Units|MG/DL
 ..Value|166
+.Component|BUN
+..Flag|H
+..Range|8-21
+..Units|MG/DL
+..Value|23
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.7
+.Component|CALCIUM
+..Flag|L
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.3
+.Component|AST/SGOT
+..Range|9-36
+..Units|U/L
+..Value|16
+.Component|ALK PHOSPHATASE
+..Flag|H
+..Range|35-104
+..Units|U/L
+..Value|197
+.Component|ALT/SGPT
+..Range|7-49
+..Units|U/L
+..Value|11
+.Component|TOTAL BILIRUBIN
+..Range|0.2-1.0
+..Units|MG/DL
+..Value|0.4
+.Component|TOTAL PROTEIN
+..Flag|L
+..Range|6.3-8.3
+..Units|G/DL
+..Value|5.5
+.Component|ALBUMIN
+..Flag|L
+..Range|3.4-4.8
+..Units|G/DL
+..Value|2.8
+.Component|GFR AFRICAN AMERICAN
+..Value|98
+.Component|GFR,ESTIMATE
+..Value|81
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -603,60 +648,43 @@ Test|N/A
 ..Range|23-29
 ..Units|MMOL/L
 ..Value|27
-.Component|TOTAL PROTEIN
-..Flag|L
-..Range|6.3-8.3
-..Units|G/DL
-..Value|5.5
-.Component|ALBUMIN
-..Flag|L
-..Range|3.4-4.8
-..Units|G/DL
-..Value|2.8
-.Component|CALCIUM
-..Flag|L
-..Range|8.4-10.2
-..Units|MG/DL
-..Value|8.3
-.Component|TOTAL BILIRUBIN
-..Range|0.2-1.0
-..Units|MG/DL
-..Value|0.4
-.Component|AST/SGOT
-..Range|9-36
-..Units|U/L
-..Value|16
-.Component|ALK PHOSPHATASE
-..Flag|H
-..Range|35-104
-..Units|U/L
-..Value|197
-.Component|ALT/SGPT
-..Range|7-49
-..Units|U/L
-..Value|11
-.Component|BUN
-..Flag|H
-..Range|8-21
-..Units|MG/DL
-..Value|23
-.Component|CREATININE
-..Range|0.7-1.3
-..Units|MG/DL
-..Value|0.7
-.Component|GFR,ESTIMATE
-..Value|81
-.Component|GFR AFRICAN AMERICAN
-..Value|98
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
 ..Value|13
 .EpicCode|80053
 Test|N/A
-.Name|LIPID PANEL
 .CollectionDate|09/24/2008
 .CollectionTime|05:05
+.Name|MAGNESIUM
+.Component|MAGNESIUM
+..Range|1.5-2.7
+..Units|MG/DL
+..Value|2.0
+.EpicCode|83735
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|05:05
+.Name|B-TYPE NATRIURETIC P
+.Component|BNP
+..Flag|H
+..Range|< 100
+..Units|PG/ML
+..Value|533
+.EpicCode|83519.05
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|05:05
+.Name|DIRECT BILIRUBIN
+.Component|DIRECT BILIRUBIN
+..Range|0.1-0.2
+..Units|MG/DL
+..Value|0.1
+.EpicCode|82248
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|05:05
+.Name|LIPID PANEL
 .Component|CHOLESTEROL
 ..Range|< 200
 ..Units|MG/DL
@@ -669,56 +697,23 @@ Test|N/A
 ..Range|< 40
 ..Units|MG/DL
 ..Value|61
-.Component|CHOL/HDL
-..Range|< 6.0
-..Value|2.8
 .Component|CALCULATED LDL
 ..Range|< 130
 ..Units|MG/DL
 ..Value|99
+.Component|CHOL/HDL
+..Range|< 6.0
+..Value|2.8
 .EpicCode|80061
 Test|N/A
-.Name|B-TYPE NATRIURETIC P
-.CollectionDate|09/24/2008
-.CollectionTime|05:05
-.Component|BNP
-..Flag|H
-..Range|< 100
-..Units|PG/ML
-..Value|533
-.EpicCode|83519.05
-Test|N/A
-.Name|DIRECT BILIRUBIN
-.CollectionDate|09/24/2008
-.CollectionTime|05:05
-.Component|DIRECT BILIRUBIN
-..Range|0.1-0.2
-..Units|MG/DL
-..Value|0.1
-.EpicCode|82248
-Test|N/A
-.Name|MAGNESIUM
-.CollectionDate|09/24/2008
-.CollectionTime|05:05
-.Component|MAGNESIUM
-..Range|1.5-2.7
-..Units|MG/DL
-..Value|2.0
-.EpicCode|83735
-Test|N/A
-.Name|CBC
 .CollectionDate|09/25/2008
 .CollectionTime|05:20
+.Name|CBC
 .Component|WBC
 ..Flag|H
 ..Range|4.0-10.0
 ..Units|K/UL
 ..Value|10.5
-.Component|RBC
-..Flag|L
-..Range|4.00-5.30
-..Units|M/UL
-..Value|3.40
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -729,6 +724,19 @@ Test|N/A
 ..Range|36.0-48.0
 ..Units|%
 ..Value|31.7
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|275
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.5
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.40
 .Component|MCV
 ..Range|79.0-99.0
 ..Units|FL
@@ -742,10 +750,10 @@ Test|N/A
 ..Range|32.0-36.0
 ..Units|GM/DL
 ..Value|31.9
-.Component|PLT
-..Range|150-400
-..Units|K/UL
-..Value|275
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|48.2
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -755,10 +763,6 @@ Test|N/A
 ..Range|15.0-45.0
 ..Units|%
 ..Value|13.8
-.Component|RDW
-..Range|38.0-50.0
-..Units|FL
-..Value|48.2
 .Component|MONO
 ..Range|4.0-12.0
 ..Units|%
@@ -792,20 +796,33 @@ Test|N/A
 ..Range|0.0-0.2
 ..Units|K/UL
 ..Value|0.0
-.Component|MPV
-..Range|9.0-13.0
-..Units|FL
-..Value|10.5
 .EpicCode|85025
 Test|N/A
-.Name|BASIC METABOLIC PANEL
 .CollectionDate|09/25/2008
 .CollectionTime|05:20
+.Name|BASIC METABOLIC PANEL
 .Component|GLUCOSE
 ..Flag|H
 ..Range|70-99
 ..Units|MG/DL
 ..Value|164
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|20
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.8
+.Component|CALCIUM
+..Flag|L
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.1
+.Component|GFR AFRICAN AMERICAN
+..Value|84
+.Component|GFR,ESTIMATE
+..Value|69
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -822,32 +839,15 @@ Test|N/A
 ..Range|23-29
 ..Units|MMOL/L
 ..Value|29
-.Component|CALCIUM
-..Flag|L
-..Range|8.4-10.2
-..Units|MG/DL
-..Value|8.1
-.Component|BUN
-..Range|8-21
-..Units|MG/DL
-..Value|20
-.Component|CREATININE
-..Range|0.7-1.3
-..Units|MG/DL
-..Value|0.8
-.Component|GFR,ESTIMATE
-..Value|69
-.Component|GFR AFRICAN AMERICAN
-..Value|84
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
 ..Value|10
 .EpicCode|80048
 Test|N/A
-.Name|B-TYPE NATRIURETIC P
 .CollectionDate|09/25/2008
 .CollectionTime|05:20
+.Name|B-TYPE NATRIURETIC P
 .Component|BNP
 ..Flag|H
 ..Range|< 100
@@ -855,19 +855,14 @@ Test|N/A
 ..Value|652
 .EpicCode|83519.05
 Test|N/A
-.Name|CBC
 .CollectionDate|09/26/2008
 .CollectionTime|04:55
+.Name|CBC
 .Component|WBC
 ..Flag|H
 ..Range|4.0-10.0
 ..Units|K/UL
 ..Value|11.3
-.Component|RBC
-..Flag|L
-..Range|4.00-5.30
-..Units|M/UL
-..Value|3.53
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -878,6 +873,19 @@ Test|N/A
 ..Range|36.0-48.0
 ..Units|%
 ..Value|33.5
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|280
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.8
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.53
 .Component|MCV
 ..Range|79.0-99.0
 ..Units|FL
@@ -890,10 +898,10 @@ Test|N/A
 ..Range|32.0-36.0
 ..Units|GM/DL
 ..Value|32.2
-.Component|PLT
-..Range|150-400
-..Units|K/UL
-..Value|280
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|48.7
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -903,10 +911,6 @@ Test|N/A
 ..Range|15.0-45.0
 ..Units|%
 ..Value|13.7
-.Component|RDW
-..Range|38.0-50.0
-..Units|FL
-..Value|48.7
 .Component|MONO
 ..Range|4.0-12.0
 ..Units|%
@@ -941,20 +945,33 @@ Test|N/A
 ..Range|0.0-0.2
 ..Units|K/UL
 ..Value|0.0
-.Component|MPV
-..Range|9.0-13.0
-..Units|FL
-..Value|10.8
 .EpicCode|85025
 Test|N/A
-.Name|BASIC METABOLIC PANEL
 .CollectionDate|09/26/2008
 .CollectionTime|04:55
+.Name|BASIC METABOLIC PANEL
 .Component|GLUCOSE
 ..Flag|H
 ..Range|70-99
 ..Units|MG/DL
 ..Value|155
+.Component|BUN
+..Flag|H
+..Range|8-21
+..Units|MG/DL
+..Value|22
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.9
+.Component|CALCIUM
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.4
+.Component|GFR AFRICAN AMERICAN
+..Value|73
+.Component|GFR,ESTIMATE
+..Value|61
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -971,32 +988,15 @@ Test|N/A
 ..Range|23-29
 ..Units|MMOL/L
 ..Value|27
-.Component|CALCIUM
-..Range|8.4-10.2
-..Units|MG/DL
-..Value|8.4
-.Component|BUN
-..Flag|H
-..Range|8-21
-..Units|MG/DL
-..Value|22
-.Component|CREATININE
-..Range|0.7-1.3
-..Units|MG/DL
-..Value|0.9
-.Component|GFR,ESTIMATE
-..Value|61
-.Component|GFR AFRICAN AMERICAN
-..Value|73
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
 ..Value|13
 .EpicCode|80048
 Test|N/A
-.Name|B-TYPE NATRIURETIC P
 .CollectionDate|09/26/2008
 .CollectionTime|04:55
+.Name|B-TYPE NATRIURETIC P
 .Component|BNP
 ..Flag|H
 ..Range|< 100
@@ -1004,19 +1004,14 @@ Test|N/A
 ..Value|431
 .EpicCode|83519.05
 Test|N/A
-.Name|CBC
 .CollectionDate|09/27/2008
 .CollectionTime|04:50
+.Name|CBC
 .Component|WBC
 ..Flag|H
 ..Range|4.0-10.0
 ..Units|K/UL
 ..Value|10.7
-.Component|RBC
-..Flag|L
-..Range|4.00-5.30
-..Units|M/UL
-..Value|3.33
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -1027,6 +1022,19 @@ Test|N/A
 ..Range|36.0-48.0
 ..Units|%
 ..Value|31.3
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|268
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.4
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.33
 .Component|MCV
 ..Range|79.0-99.0
 ..Units|FL
@@ -1039,10 +1047,10 @@ Test|N/A
 ..Range|32.0-36.0
 ..Units|GM/DL
 ..Value|32.3
-.Component|PLT
-..Range|150-400
-..Units|K/UL
-..Value|268
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|49.4
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -1051,10 +1059,6 @@ Test|N/A
 ..Range|15.0-45.0
 ..Units|%
 ..Value|20.2
-.Component|RDW
-..Range|38.0-50.0
-..Units|FL
-..Value|49.4
 .Component|MONO
 ..Range|4.0-12.0
 ..Units|%
@@ -1088,20 +1092,42 @@ Test|N/A
 ..Range|0.0-0.2
 ..Units|K/UL
 ..Value|0.1
-.Component|MPV
-..Range|9.0-13.0
-..Units|FL
-..Value|10.4
 .EpicCode|85025
 Test|N/A
-.Name|BASIC METABOLIC PANEL
 .CollectionDate|09/27/2008
 .CollectionTime|04:50
+.Name|PROTIME
+.Component|INR
+..Flag|H
+..Range|0.88-1.12
+..Value|1.18
+.EpicCode|85610
+Test|N/A
+.CollectionDate|09/27/2008
+.CollectionTime|04:50
+.Name|BASIC METABOLIC PANEL
 .Component|GLUCOSE
 ..Flag|H
 ..Range|70-99
 ..Units|MG/DL
 ..Value|123
+.Component|BUN
+..Flag|H
+..Range|8-21
+..Units|MG/DL
+..Value|22
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.9
+.Component|CALCIUM
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.5
+.Component|GFR AFRICAN AMERICAN
+..Value|73
+.Component|GFR,ESTIMATE
+..Value|61
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -1118,41 +1144,15 @@ Test|N/A
 ..Range|23-29
 ..Units|MMOL/L
 ..Value|29
-.Component|CALCIUM
-..Range|8.4-10.2
-..Units|MG/DL
-..Value|8.5
-.Component|BUN
-..Flag|H
-..Range|8-21
-..Units|MG/DL
-..Value|22
-.Component|CREATININE
-..Range|0.7-1.3
-..Units|MG/DL
-..Value|0.9
-.Component|GFR,ESTIMATE
-..Value|61
-.Component|GFR AFRICAN AMERICAN
-..Value|73
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
 ..Value|11
 .EpicCode|80048
 Test|N/A
-.Name|PROTIME
-.CollectionDate|09/27/2008
-.CollectionTime|04:50
-.Component|INR
-..Flag|H
-..Range|0.88-1.12
-..Value|1.18
-.EpicCode|85610
-Test|N/A
-.Name|HGB & HCT
 .CollectionDate|09/29/2008
 .CollectionTime|18:50
+.Name|HGB & HCT
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -1165,45 +1165,39 @@ Test|N/A
 ..Value|23.8
 .EpicCode|85014.01
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|18:50
 .Component|GLUCOSE
 ..Range|70-99
 ..Units|MG/DL
 ..Value|83
-.EpicCode|82947
-Test|N/A
-.Name|GLUCOSE
-.CollectionDate|09/29/2008
-.CollectionTime|18:50
-.Component|GLUCOSE
-..Range|70-105
-..Units|MG/DL
-..Value|98
-.EpicCode|82947
-Test|N/A
-.Name|POTASSIUM
-.CollectionDate|09/29/2008
-.CollectionTime|18:50
 .Component|POTASSIUM
 ..Range|3.5-5.1
 ..Units|MMOL/L
 ..Value|3.8
-.EpicCode|84132
+.EpicCode|80048
+.Name|BASIC METABOLIC PANEL
 Test|N/A
-.Name|MAGNESIUM
 .CollectionDate|09/29/2008
 .CollectionTime|18:50
+.Name|UnknownOrder
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|98
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|18:50
+.Name|MAGNESIUM
 .Component|MAGNESIUM
 ..Range|1.5-2.7
 ..Units|MG/DL
 ..Value|2.6
 .EpicCode|83735
 Test|N/A
-.Name|HGB & HCT
 .CollectionDate|09/30/2008
 .CollectionTime|02:00
+.Name|HGB & HCT
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -1216,28 +1210,23 @@ Test|N/A
 ..Value|34.2
 .EpicCode|85014.01
 Test|N/A
-.Name|POTASSIUM
 .CollectionDate|09/30/2008
 .CollectionTime|02:00
+.Name|POTASSIUM
 .Component|POTASSIUM
 ..Range|3.5-5.1
 ..Units|MMOL/L
 ..Value|3.8
 .EpicCode|84132
 Test|N/A
-.Name|CBC
 .CollectionDate|09/30/2008
 .CollectionTime|04:00
+.Name|CBC MANUAL DIFF
 .Component|WBC
 ..Flag|H
 ..Range|4.0-10.0
 ..Units|K/UL
 ..Value|17.0
-.Component|RBC
-..Flag|L
-..Range|4.00-5.30
-..Units|M/UL
-..Value|3.40
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -1248,6 +1237,19 @@ Test|N/A
 ..Range|36.0-48.0
 ..Units|%
 ..Value|31.1
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|214
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.4
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.40
 .Component|MCV
 ..Range|79.0-99.0
 ..Units|FL
@@ -1260,11 +1262,14 @@ Test|N/A
 ..Range|32.0-36.0
 ..Units|GM/DL
 ..Value|33.4
-.Component|PLT
-..Range|150-400
-..Units|K/UL
-..Value|214
-.Component|SEG
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|47.3
+.Component|BAND
+..Range|%
+..Value|4
+.Component|SEGS
 ..Flag|H
 ..Range|42-70
 ..Units|%
@@ -1274,10 +1279,6 @@ Test|N/A
 ..Range|15-45
 ..Units|%
 ..Value|3
-.Component|RDW
-..Range|38.0-50.0
-..Units|FL
-..Value|47.3
 .Component|MONO
 ..Range|4-12
 ..Units|%
@@ -1290,44 +1291,56 @@ Test|N/A
 ..Range|0-2
 ..Units|%
 ..Value|0
-.Component|SEG,ABS (AUTO)
+.Component|SEG,ABS
 ..Flag|H
 ..Range|1.6-7.6
 ..Units|K/UL
 ..Value|15.8
-.Component|LYMPH,ABS (AUTO)
+.Component|LYMPH, ABS
 ..Flag|L
 ..Range|1.1-4.0
 ..Units|K/UL
 ..Value|0.5
-.Component|MONO,ABS (AUTO)
+.Component|MONO,ABS
 ..Range|0.3-1.0
 ..Units|K/UL
 ..Value|0.7
-.Component|EOSIN,ABS (AUTO)
+.Component|EOSIN,ABS
 ..Range|0.0-0.6
 ..Units|K/UL
 ..Value|0.0
-.Component|BASO,ABS (AUTO)
+.Component|BASO,ABS
 ..Range|0.0-0.2
 ..Units|K/UL
 ..Value|0.0
-.Component|MPV
-..Range|9.0-13.0
-..Units|FL
-..Value|10.4
 .Component|RBC MORPHOLOGY
 ..Value|NORMAL
-.EpicCode|85025
+.EpicCode|85023
 Test|N/A
-.Name|BASIC METABOLIC PANEL
 .CollectionDate|09/30/2008
 .CollectionTime|04:00
+.Name|BASIC METABOLIC PANEL
 .Component|GLUCOSE
 ..Flag|H
 ..Range|70-99
 ..Units|MG/DL
 ..Value|151
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|20
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.9
+.Component|CALCIUM
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.9
+.Component|GFR AFRICAN AMERICAN
+..Value|73
+.Component|GFR,ESTIMATE
+..Value|61
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -1345,47 +1358,24 @@ Test|N/A
 ..Range|23-29
 ..Units|MMOL/L
 ..Value|26
-.Component|CALCIUM
-..Range|8.4-10.2
-..Units|MG/DL
-..Value|8.9
-.Component|BUN
-..Range|8-21
-..Units|MG/DL
-..Value|20
-.Component|CREATININE
-..Range|0.7-1.3
-..Units|MG/DL
-..Value|0.9
-.Component|GFR,ESTIMATE
-..Value|61
-.Component|GFR AFRICAN AMERICAN
-..Value|73
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
 ..Value|7
 .EpicCode|80048
 Test|N/A
-.Name|MAGNESIUM
 .CollectionDate|09/30/2008
 .CollectionTime|04:00
+.Name|MAGNESIUM
 .Component|MAGNESIUM
 ..Range|1.5-2.7
 ..Units|MG/DL
 ..Value|2.1
 .EpicCode|83735
 Test|N/A
-.Name|UnknownOrder
-.CollectionDate|09/30/2008
-.CollectionTime|04:00
-.Component|BANDS
-..Range|%
-..Value|4
-Test|N/A
-.Name|HGB & HCT
 .CollectionDate|09/30/2008
 .CollectionTime|12:00
+.Name|HGB & HCT
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -1398,9 +1388,9 @@ Test|N/A
 ..Value|33.5
 .EpicCode|85014.01
 Test|N/A
-.Name|HGB & HCT
 .CollectionDate|09/30/2008
 .CollectionTime|17:30
+.Name|HGB & HCT
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -1413,28 +1403,23 @@ Test|N/A
 ..Value|35.4
 .EpicCode|85014.01
 Test|N/A
-.Name|POTASSIUM
 .CollectionDate|09/30/2008
 .CollectionTime|17:30
+.Name|POTASSIUM
 .Component|POTASSIUM
 ..Range|3.5-5.1
 ..Units|MMOL/L
 ..Value|4.0
 .EpicCode|84132
 Test|N/A
-.Name|CBC
 .CollectionDate|10/01/2008
 .CollectionTime|04:15
+.Name|CBC MANUAL DIFF
 .Component|WBC
 ..Flag|H
 ..Range|4.0-10.0
 ..Units|K/UL
 ..Value|19.1
-.Component|RBC
-..Flag|L
-..Range|4.00-5.30
-..Units|M/UL
-..Value|3.55
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -1445,6 +1430,19 @@ Test|N/A
 ..Range|36.0-48.0
 ..Units|%
 ..Value|32.5
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|203
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.7
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.55
 .Component|MCV
 ..Range|79.0-99.0
 ..Units|FL
@@ -1457,11 +1455,16 @@ Test|N/A
 ..Range|32.0-36.0
 ..Units|GM/DL
 ..Value|32.6
-.Component|PLT
-..Range|150-400
-..Units|K/UL
-..Value|203
-.Component|SEG
+.Component|RDW
+..Flag|H
+..Range|38.0-50.0
+..Units|FL
+..Value|51.0
+.Component|BAND
+..Flag|H
+..Range|0-6
+..Value|7
+.Component|SEGS
 ..Flag|H
 ..Range|42-70
 ..Units|%
@@ -1471,11 +1474,6 @@ Test|N/A
 ..Range|15-45
 ..Units|%
 ..Value|6
-.Component|RDW
-..Flag|H
-..Range|38.0-50.0
-..Units|FL
-..Value|51.0
 .Component|MONO
 ..Range|4-12
 ..Units|%
@@ -1488,56 +1486,39 @@ Test|N/A
 ..Range|0-2
 ..Units|%
 ..Value|0
-.Component|SEG,ABS (AUTO)
+.Component|SEG,ABS
 ..Flag|H
 ..Range|1.6-7.6
 ..Units|K/UL
 ..Value|17.0
-.Component|LYMPH,ABS (AUTO)
+.Component|LYMPH, ABS
 ..Range|1.1-4.0
 ..Units|K/UL
 ..Value|1.1
-.Component|MONO,ABS (AUTO)
+.Component|MONO,ABS
 ..Range|0.3-1.0
 ..Units|K/UL
 ..Value|1.0
-.Component|EOSIN,ABS (AUTO)
+.Component|EOSIN,ABS
 ..Range|0.0-0.6
 ..Units|K/UL
 ..Value|0.0
-.Component|BASO,ABS (AUTO)
+.Component|BASO,ABS
 ..Range|0.0-0.2
 ..Units|K/UL
 ..Value|0.0
-.Component|MPV
-..Range|9.0-13.0
-..Units|FL
-..Value|10.7
 .Component|RBC MORPHOLOGY
 ..Value|NORMAL
-.EpicCode|85025
+.EpicCode|85023
 Test|N/A
-.Name|UnknownOrder
-.CollectionDate|10/01/2008
-.CollectionTime|04:15
-.Component|BANDS
-..Flag|H
-..Range|0-6
-..Value|7
-Test|N/A
-.Name|CBC
 .CollectionDate|10/02/2008
 .CollectionTime|03:29
+.Name|CBC MANUAL DIFF
 .Component|WBC
 ..Flag|H
 ..Range|4.0-10.0
 ..Units|K/UL
 ..Value|17.2
-.Component|RBC
-..Flag|L
-..Range|4.00-5.30
-..Units|M/UL
-..Value|3.41
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -1548,6 +1529,19 @@ Test|N/A
 ..Range|36.0-48.0
 ..Units|%
 ..Value|31.8
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|210
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|11.3
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.41
 .Component|MCV
 ..Range|79.0-99.0
 ..Units|FL
@@ -1560,11 +1554,11 @@ Test|N/A
 ..Range|32.0-36.0
 ..Units|GM/DL
 ..Value|32.7
-.Component|PLT
-..Range|150-400
-..Units|K/UL
-..Value|210
-.Component|SEG
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|49.4
+.Component|SEGS
 ..Flag|H
 ..Range|42-70
 ..Units|%
@@ -1574,10 +1568,6 @@ Test|N/A
 ..Range|15-45
 ..Units|%
 ..Value|10
-.Component|RDW
-..Range|38.0-50.0
-..Units|FL
-..Value|49.4
 .Component|MONO
 ..Range|4-12
 ..Units|%
@@ -1590,44 +1580,60 @@ Test|N/A
 ..Range|0-2
 ..Units|%
 ..Value|0
-.Component|SEG,ABS (AUTO)
+.Component|SEG,ABS
 ..Flag|H
 ..Range|1.6-7.6
 ..Units|K/UL
 ..Value|13.8
-.Component|LYMPH,ABS (AUTO)
+.Component|LYMPH, ABS
 ..Range|1.1-4.0
 ..Units|K/UL
 ..Value|1.7
-.Component|MONO,ABS (AUTO)
+.Component|MONO,ABS
 ..Flag|H
 ..Range|0.3-1.0
 ..Units|K/UL
 ..Value|1.7
-.Component|EOSIN,ABS (AUTO)
+.Component|EOSIN,ABS
 ..Range|0.0-0.6
 ..Units|K/UL
 ..Value|0.0
-.Component|BASO,ABS (AUTO)
+.Component|BASO,ABS
 ..Range|0.0-0.2
 ..Units|K/UL
 ..Value|0.0
-.Component|MPV
-..Range|9.0-13.0
-..Units|FL
-..Value|11.3
 .Component|RBC MORPHOLOGY
 ..Value|NORMAL
-.EpicCode|85025
+.Component|WBC MORPHOLOGY
+..Value|NORMAL
+.EpicCode|85023
 Test|N/A
-.Name|BASIC METABOLIC PANEL
 .CollectionDate|10/02/2008
 .CollectionTime|03:29
+.Name|BASIC METABOLIC PANEL
 .Component|GLUCOSE
 ..Flag|H
 ..Range|70-99
 ..Units|MG/DL
 ..Value|138
+.Component|BUN
+..Flag|H
+..Range|8-21
+..Units|MG/DL
+..Value|34
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|1.0
+.Component|CALCIUM
+..Flag|L
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.2
+.Component|GFR AFRICAN AMERICAN
+..Value|65
+.Component|GFR,ESTIMATE
+..Value|54
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -1644,328 +1650,286 @@ Test|N/A
 ..Range|23-29
 ..Units|MMOL/L
 ..Value|28
-.Component|CALCIUM
-..Flag|L
-..Range|8.4-10.2
-..Units|MG/DL
-..Value|8.2
-.Component|BUN
-..Flag|H
-..Range|8-21
-..Units|MG/DL
-..Value|34
-.Component|CREATININE
-..Range|0.7-1.3
-..Units|MG/DL
-..Value|1.0
-.Component|GFR,ESTIMATE
-..Value|54
-.Component|GFR AFRICAN AMERICAN
-..Value|65
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
 ..Value|4
 .EpicCode|80048
 Test|N/A
-.Name|WBC MORPHOLOGY
-.CollectionDate|10/02/2008
-.CollectionTime|03:29
-.Component|WBC MORPHOLOGY
-..Value|NORMAL
-.EpicCode|85097.04
-Test|N/A
-.Name|HGB & HCT
 .CollectionDate|09/29/2008
 .CollectionTime|13:09
-.Component|HGB
-..Flag|L
-..Range|12.0-16.0
-..Units|G/DL
-..Value|10.5
+.Name|HGB & HCT
 .Component|HCT
 ..Flag|L
 ..Range|36-48
 ..Units|%PCV
 ..Value|31
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|G/DL
+..Value|10.5
 .EpicCode|85014.01
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|13:09
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|102
-.EpicCode|82947
 Test|N/A
-.Name|POTASSIUM
-.CollectionDate|09/29/2008
-.CollectionTime|13:09
-.Component|POTASSIUM
-..Range|3.5-5.1
-..Units|MMOL/L
-..Value|3.8
-.EpicCode|84132
-Test|N/A
-.Name|SODIUM
 .CollectionDate|09/29/2008
 .CollectionTime|13:09
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
 ..Value|139
-.EpicCode|84295
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.8
+.EpicCode|80051
+.Name|ELECTROLYTE PANEL
 Test|N/A
-.Name|HGB & HCT
 .CollectionDate|09/29/2008
 .CollectionTime|14:30
-.Component|HGB
-..Flag|L
-..Range|12.0-16.0
-..Units|G/DL
-..Value|9.2
+.Name|HGB & HCT
 .Component|HCT
 ..Flag|L
 ..Range|36-48
 ..Units|%PCV
 ..Value|27
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|G/DL
+..Value|9.2
 .EpicCode|85014.01
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|14:30
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|113
-.EpicCode|82947
 Test|N/A
-.Name|POTASSIUM
-.CollectionDate|09/29/2008
-.CollectionTime|14:30
-.Component|POTASSIUM
-..Range|3.5-5.1
-..Units|MMOL/L
-..Value|3.7
-.EpicCode|84132
-Test|N/A
-.Name|SODIUM
 .CollectionDate|09/29/2008
 .CollectionTime|14:30
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
 ..Value|138
-.EpicCode|84295
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.7
+.EpicCode|80051
+.Name|ELECTROLYTE PANEL
 Test|N/A
-.Name|HGB & HCT
 .CollectionDate|09/29/2008
 .CollectionTime|15:54
-.Component|HGB
-..Flag|P
-..Range|12.0-16.0
-..Units|G/DL
-..Value|6.8
+.Name|HGB & HCT
 .Component|HCT
 ..Flag|L
 ..Range|36-48
 ..Units|%PCV
 ..Value|20
+.Component|HGB
+..Flag|P
+..Range|12.0-16.0
+..Units|G/DL
+..Value|6.8
 .EpicCode|85014.01
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|15:54
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|117
-.EpicCode|82947
 Test|N/A
-.Name|POTASSIUM
-.CollectionDate|09/29/2008
-.CollectionTime|15:54
-.Component|POTASSIUM
-..Range|3.5-5.1
-..Units|MMOL/L
-..Value|4.1
-.EpicCode|84132
-Test|N/A
-.Name|SODIUM
 .CollectionDate|09/29/2008
 .CollectionTime|15:54
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
 ..Value|139
-.EpicCode|84295
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.1
+.EpicCode|80051
+.Name|ELECTROLYTE PANEL
 Test|N/A
-.Name|HGB & HCT
 .CollectionDate|09/29/2008
 .CollectionTime|16:35
-.Component|HGB
-..Flag|L
-..Range|12.0-16.0
-..Units|G/DL
-..Value|7.5
+.Name|HGB & HCT
 .Component|HCT
 ..Flag|L
 ..Range|36-48
 ..Units|%PCV
 ..Value|22
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|G/DL
+..Value|7.5
 .EpicCode|85014.01
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|16:35
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|134
-.EpicCode|82947
 Test|N/A
-.Name|POTASSIUM
-.CollectionDate|09/29/2008
-.CollectionTime|16:35
-.Component|POTASSIUM
-..Range|3.5-5.1
-..Units|MMOL/L
-..Value|4.1
-.EpicCode|84132
-Test|N/A
-.Name|SODIUM
 .CollectionDate|09/29/2008
 .CollectionTime|16:35
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
 ..Value|140
-.EpicCode|84295
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.1
+.EpicCode|80051
+.Name|ELECTROLYTE PANEL
 Test|N/A
-.Name|HGB & HCT
 .CollectionDate|09/29/2008
 .CollectionTime|17:52
-.Component|HGB
-..Flag|P
-..Range|12.0-16.0
-..Units|G/DL
-..Value|6.5
+.Name|HGB & HCT
 .Component|HCT
 ..Flag|P
 ..Range|36-48
 ..Units|%PCV
 ..Value|19
+.Component|HGB
+..Flag|P
+..Range|12.0-16.0
+..Units|G/DL
+..Value|6.5
 .EpicCode|85014.01
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|17:52
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|107
-.EpicCode|82947
 Test|N/A
-.Name|POTASSIUM
-.CollectionDate|09/29/2008
-.CollectionTime|17:52
-.Component|POTASSIUM
-..Range|3.5-5.1
-..Units|MMOL/L
-..Value|3.5
-.EpicCode|84132
-Test|N/A
-.Name|SODIUM
 .CollectionDate|09/29/2008
 .CollectionTime|17:52
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
 ..Value|141
-.EpicCode|84295
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.5
+.EpicCode|80051
+.Name|ELECTROLYTE PANEL
 Test|N/A
-.Name|HGB & HCT
 .CollectionDate|09/29/2008
 .CollectionTime|18:14
-.Component|HGB
-..Flag|L
-..Range|12.0-16.0
-..Units|G/DL
-..Value|7.1
+.Name|HGB & HCT
 .Component|HCT
 ..Flag|L
 ..Range|36-48
 ..Units|%PCV
 ..Value|21
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|G/DL
+..Value|7.1
 .EpicCode|85014.01
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|18:14
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|107
-.EpicCode|82947
 Test|N/A
-.Name|POTASSIUM
-.CollectionDate|09/29/2008
-.CollectionTime|18:14
-.Component|POTASSIUM
-..Flag|L
-..Range|3.5-5.1
-..Units|MMOL/L
-..Value|3.2
-.EpicCode|84132
-Test|N/A
-.Name|SODIUM
 .CollectionDate|09/29/2008
 .CollectionTime|18:14
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
 ..Value|144
-.EpicCode|84295
+.Component|POTASSIUM
+..Flag|L
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.2
+.EpicCode|80051
+.Name|ELECTROLYTE PANEL
 Test|N/A
-.Name|HIV1/HIV2
 .CollectionDate|09/25/2008
 .CollectionTime|22:30
-.Component|HIV1/HIV2
-..Range|NON REAC
-..Value|NON REAC
-.EpicCode|86703
-Test|N/A
-.Name|HEP B SURFACE AG
-.CollectionDate|09/25/2008
-.CollectionTime|22:30
-.Component|HEP B SURFACE AG
-..Range|NON REAC
-..Value|NON REAC
-.EpicCode|87340
-Test|N/A
 .Name|PROTIME
-.CollectionDate|09/25/2008
-.CollectionTime|22:30
 .Component|INR
 ..Flag|H
 ..Range|0.88-1.12
 ..Value|1.14
 .EpicCode|85610
 Test|N/A
-.Name|BASIC METABOLIC PANEL
+.CollectionDate|09/25/2008
+.CollectionTime|22:30
+.Name|HEP B SURFACE AG
+.Component|HEP B SURFACE AG
+..Range|NON REAC
+..Value|NON REAC
+.EpicCode|87340
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|22:30
+.Name|UnknownOrder
+.Component|HIV 1/2 AB
+..Range|NON REAC
+..Value|NON REAC
+Test|N/A
 .CollectionDate|10/01/2008
 .CollectionTime|07:10
+.Name|BASIC METABOLIC PANEL
+.Component|FASTING STATUS
+..Value|UNKNOWN
 .Component|GLUCOSE
 ..Flag|H
 ..Range|70-99
 ..Units|MG/DL
 ..Value|138
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|20
+.Component|CREATININE
+..Flag|L
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.6
+.Component|CALCIUM
+..Flag|P
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|5.8
+.Component|GFR AFRICAN AMERICAN
+..Value|117
+.Component|GFR,ESTIMATE
+..Value|97
 .Component|SODIUM
 ..Range|136-145
 ..Units|MMOL/L
@@ -1985,1426 +1949,1271 @@ Test|N/A
 ..Range|23-29
 ..Units|MMOL/L
 ..Value|18
-.Component|CALCIUM
-..Flag|P
-..Range|8.4-10.2
-..Units|MG/DL
-..Value|5.8
-.Component|BUN
-..Range|8-21
-..Units|MG/DL
-..Value|20
-.Component|CREATININE
-..Flag|L
-..Range|0.7-1.3
-..Units|MG/DL
-..Value|0.6
-.Component|GFR,ESTIMATE
-..Value|97
-.Component|GFR AFRICAN AMERICAN
-..Value|117
-.Component|FASTING STATUS
-..Value|UNKNOWN
 .Component|ANION GAP
 ..Range|4-14
 ..Units|MMOL/L
 ..Value|12
 .EpicCode|80048
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|07:10
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|145
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/21/2008
 .CollectionTime|10:10
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|209
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/21/2008
 .CollectionTime|12:09
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|161
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/21/2008
 .CollectionTime|15:09
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|93
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/21/2008
 .CollectionTime|16:01
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|99
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/21/2008
 .CollectionTime|19:19
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|93
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/22/2008
 .CollectionTime|02:01
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|53
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/22/2008
 .CollectionTime|02:31
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|91
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/22/2008
 .CollectionTime|06:50
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|127
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/22/2008
 .CollectionTime|09:04
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|201
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/22/2008
 .CollectionTime|11:08
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|245
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/22/2008
 .CollectionTime|16:42
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|120
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/22/2008
 .CollectionTime|20:55
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|148
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/23/2008
 .CollectionTime|02:06
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|169
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/23/2008
 .CollectionTime|07:14
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|338
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/23/2008
 .CollectionTime|09:29
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|395
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/23/2008
 .CollectionTime|10:57
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|P
 ..Range|70-105
 ..Units|MG/DL
 ..Value|406
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/23/2008
 .CollectionTime|13:08
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|252
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/23/2008
 .CollectionTime|14:07
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|187
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/23/2008
 .CollectionTime|16:12
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|216
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/23/2008
 .CollectionTime|20:02
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|173
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/23/2008
 .CollectionTime|23:58
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|99
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|02:09
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|132
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|06:58
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|184
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|08:26
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|251
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|09:14
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|257
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|10:18
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|232
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|11:00
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|209
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|12:16
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|205
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|13:30
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|203
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|14:24
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|191
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|16:47
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|261
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|21:23
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|353
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|22:53
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|372
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/24/2008
 .CollectionTime|23:38
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|355
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/25/2008
 .CollectionTime|01:32
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|275
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/25/2008
 .CollectionTime|03:35
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|235
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/25/2008
 .CollectionTime|06:47
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|170
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/25/2008
 .CollectionTime|11:07
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|391
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/25/2008
 .CollectionTime|13:49
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|294
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/25/2008
 .CollectionTime|15:53
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|298
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/25/2008
 .CollectionTime|16:57
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|306
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/25/2008
 .CollectionTime|17:58
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|295
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/25/2008
 .CollectionTime|19:26
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|253
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/25/2008
 .CollectionTime|21:16
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|245
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/25/2008
 .CollectionTime|23:29
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|163
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/26/2008
 .CollectionTime|05:23
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|189
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/26/2008
 .CollectionTime|06:51
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|172
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/26/2008
 .CollectionTime|07:58
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|182
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/26/2008
 .CollectionTime|10:49
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|317
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/26/2008
 .CollectionTime|12:36
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|222
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/26/2008
 .CollectionTime|15:12
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|307
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/26/2008
 .CollectionTime|16:39
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|230
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/26/2008
 .CollectionTime|17:26
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|289
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/26/2008
 .CollectionTime|19:23
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|231
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/26/2008
 .CollectionTime|20:53
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|144
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/27/2008
 .CollectionTime|00:23
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|90
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/27/2008
 .CollectionTime|04:13
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|145
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/27/2008
 .CollectionTime|07:01
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|171
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/27/2008
 .CollectionTime|11:20
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|210
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/27/2008
 .CollectionTime|14:21
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|254
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/27/2008
 .CollectionTime|16:04
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|184
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/27/2008
 .CollectionTime|20:17
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|152
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/28/2008
 .CollectionTime|00:11
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|73
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/28/2008
 .CollectionTime|02:58
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|123
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/28/2008
 .CollectionTime|07:06
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|138
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/28/2008
 .CollectionTime|10:32
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|198
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/28/2008
 .CollectionTime|12:25
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|305
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/28/2008
 .CollectionTime|13:48
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|178
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/28/2008
 .CollectionTime|16:02
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|180
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/28/2008
 .CollectionTime|18:01
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|79
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/28/2008
 .CollectionTime|20:39
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|167
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/28/2008
 .CollectionTime|23:58
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|53
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|00:31
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|95
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|01:57
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|104
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|06:15
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|187
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|07:21
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|245
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|08:41
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|262
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|09:57
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|218
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|11:20
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|106
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|12:35
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|57
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|19:57
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|88
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|21:08
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|109
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|22:19
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|91
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/29/2008
 .CollectionTime|23:14
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|127
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|01:02
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|210
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|01:56
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|198
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|03:09
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|185
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|03:53
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|144
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|05:14
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|128
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|06:08
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|88
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|07:15
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|62
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|07:40
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|66
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|08:10
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|82
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|09:05
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|124
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|09:51
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|178
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|10:56
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|177
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|12:10
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|138
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|13:10
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|89
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|13:59
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|50
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|14:24
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|76
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|15:01
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|72
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|16:00
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|121
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|17:28
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|205
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|18:25
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|157
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|19:30
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|140
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|21:09
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|91
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|22:08
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|68
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|09/30/2008
 .CollectionTime|23:01
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|87
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|00:09
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|116
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|01:03
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|137
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|02:45
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|113
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|04:21
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|88
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|05:13
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|129
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|06:13
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|200
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|10:06
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|337
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|11:47
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|281
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|15:28
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|174
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|18:47
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|P
 ..Range|70-105
 ..Units|MG/DL
 ..Value|418
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|21:01
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|387
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/01/2008
 .CollectionTime|22:09
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|327
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/02/2008
 .CollectionTime|00:56
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|229
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/02/2008
 .CollectionTime|03:25
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|145
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/02/2008
 .CollectionTime|05:13
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|135
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/02/2008
 .CollectionTime|07:16
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|127
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/02/2008
 .CollectionTime|10:55
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|P
 ..Range|70-105
 ..Units|MG/DL
 ..Value|455
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/02/2008
 .CollectionTime|12:35
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|P
 ..Range|70-105
 ..Units|MG/DL
 ..Value|405
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/02/2008
 .CollectionTime|13:36
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|369
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/02/2008
 .CollectionTime|15:36
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|243
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/02/2008
 .CollectionTime|18:21
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|144
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/02/2008
 .CollectionTime|19:44
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|103
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/03/2008
 .CollectionTime|00:54
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|L
 ..Range|70-105
 ..Units|MG/DL
 ..Value|53
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/03/2008
 .CollectionTime|02:40
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Range|70-105
 ..Units|MG/DL
 ..Value|103
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/03/2008
 .CollectionTime|09:47
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|183
-.EpicCode|82947
 Test|N/A
-.Name|GLUCOSE
 .CollectionDate|10/03/2008
 .CollectionTime|11:27
-.Component|GLUCOSE
+.Name|UnknownOrder
+.Component|POC GLUCOSE
 ..Flag|H
 ..Range|70-105
 ..Units|MG/DL
 ..Value|109
-.EpicCode|82947
 Test|N/A
-.Name|CKMB
 .CollectionDate|09/21/2008
 .CollectionTime|09:14
+.Name|CKMB
 .Component|CKMB
 ..Range|< 10.0
 ..Units|NG/ML
 ..Value|2.3
 .EpicCode|82553
 Test|N/A
-.Name|TROPONIN I
 .CollectionDate|09/21/2008
 .CollectionTime|09:14
+.Name|TROPONIN I
 .Component|TROPONIN I
 ..Range|0.00-0.09
 ..Units|NG/ML
 ..Value|<0.05
 .EpicCode|84484
 Test|N/A
-.Name|POTASSIUM
 .CollectionDate|09/29/2008
 .CollectionTime|23:20
+.Name|POTASSIUM
 .Component|POTASSIUM
 ..Range|3.5-5.1
 ..Units|MMOL/L
 ..Value|4.1
 .EpicCode|84132
 Test|N/A
-.Name|POTASSIUM
 .CollectionDate|10/01/2008
 .CollectionTime|11:10
+.Name|POTASSIUM
 .Component|POTASSIUM
 ..Range|3.5-5.1
 ..Units|MMOL/L
 ..Value|3.9
 .EpicCode|84132
 Test|N/A
-.Name|POTASSIUM
 .CollectionDate|10/01/2008
 .CollectionTime|17:00
+.Name|POTASSIUM
 .Component|POTASSIUM
 ..Range|3.5-5.1
 ..Units|MMOL/L
 ..Value|4.5
 .EpicCode|84132
 Test|N/A
-.Name|POTASSIUM
 .CollectionDate|10/02/2008
 .CollectionTime|18:05
+.Name|POTASSIUM
 .Component|POTASSIUM
 ..Range|3.5-5.1
 ..Units|MMOL/L
 ..Value|3.7
 .EpicCode|84132
 Test|N/A
-.Name|POTASSIUM
 .CollectionDate|10/03/2008
 .CollectionTime|03:39
+.Name|POTASSIUM
 .Component|POTASSIUM
 ..Range|3.5-5.1
 ..Units|MMOL/L
 ..Value|5.0
 .EpicCode|84132
 Test|N/A
-.Name|HGB
 .CollectionDate|09/24/2008
 .CollectionTime|15:45
+.Name|HGB
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -3412,9 +3221,9 @@ Test|N/A
 ..Value|10.4
 .EpicCode|85018
 Test|N/A
-.Name|HGB
 .CollectionDate|09/24/2008
 .CollectionTime|15:45
+.Name|HGB
 .Component|HGB
 ..Flag|L
 ..Range|12.0-16.0
@@ -3422,9 +3231,13 @@ Test|N/A
 ..Value|10.3
 .EpicCode|85018
 Test|N/A
-.Name|URINE COMPLETE
 .CollectionDate|09/26/2008
 .CollectionTime|11:45
+.Name|URINE COMPLETE
+.Component|URINE TYPE
+..Value|UNKNOWN
+.Component|COLOR
+..Value|YELLOW
 .Component|CLARITY
 ..Flag|*
 ..Range|CLEAR
@@ -3432,20 +3245,6 @@ Test|N/A
 .Component|SPECIFIC GRAVITY
 ..Range|1.000-1.030
 ..Value|1.010
-.Component|pH
-..Range|5.0-7.0
-..Value|5.0
-.Component|LEUKOCYTE ESTERASE
-..Flag|*
-..Range|NEG
-..Value|LARGE
-.Component|NITRITE
-..Range|NEG
-..Value|NEGATIVE
-.Component|PROTEIN (URINE)
-..Range|<30
-..Units|MG/DL
-..Value|NEGATIVE
 .Component|GLUCOSE (URINE)
 ..Range|NEG
 ..Units|MG/DL
@@ -3454,60 +3253,60 @@ Test|N/A
 ..Range|NEG
 ..Units|MG/DL
 ..Value|NEGATIVE
-.Component|UROBILINOGEN
-..Range|0.2-1.0
+.Component|pH
+..Range|5.0-7.0
+..Value|5.0
+.Component|PROTEIN (URINE)
+..Range|<30
 ..Units|MG/DL
-..Value|0.2
-.Component|BILIRUBIN
-..Range|NEG
 ..Value|NEGATIVE
 .Component|BLOOD
 ..Flag|*
 ..Range|NEG
 ..Value|SMALL
-.Component|WBC
-..Range|0-5
-..Value|11-20
-.Component|URINE TYPE
-..Value|UNKNOWN
-.Component|COLOR
-..Value|YELLOW
-.Component|RBC
-..Range|0-2
-..Value|0-2
+.Component|BILIRUBIN
+..Range|NEG
+..Value|NEGATIVE
+.Component|UROBILINOGEN
+..Range|0.2-1.0
+..Units|MG/DL
+..Value|0.2
+.Component|NITRITE
+..Range|NEG
+..Value|NEGATIVE
+.Component|LEUKOCYTE ESTERASE
+..Flag|*
+..Range|NEG
+..Value|LARGE
 .Component|BACTERIA
 ..Flag|*
 ..Range|NOT SEEN
 ..Value|MANY
+.Component|WBC
+..Range|0-5
+..Value|11-20
+.Component|RBC
+..Range|0-2
+..Value|0-2
 .Component|EPITHELIAL CELLS
 ..Range|0-10
 ..Units|/LPF
 ..Value|6-10
 .EpicCode|81001
 Test|N/A
-.Name|URINE COMPLETE
 .CollectionDate|10/01/2008
 .CollectionTime|18:00
+.Name|URINE COMPLETE
+.Component|URINE TYPE
+..Value|UNKNOWN
+.Component|COLOR
+..Value|YELLOW
 .Component|CLARITY
 ..Range|CLEAR
 ..Value|CLEAR
 .Component|SPECIFIC GRAVITY
 ..Range|1.000-1.030
 ..Value|1.020
-.Component|pH
-..Range|5.0-7.0
-..Value|5.0
-.Component|LEUKOCYTE ESTERASE
-..Range|NEG
-..Value|NEGATIVE
-.Component|NITRITE
-..Range|NEG
-..Value|NEGATIVE
-.Component|PROTEIN (URINE)
-..Flag|*
-..Range|<30
-..Units|MG/DL
-..Value|50
 .Component|GLUCOSE (URINE)
 ..Range|NEG
 ..Units|MG/DL
@@ -3517,31 +3316,41 @@ Test|N/A
 ..Range|NEG
 ..Units|MG/DL
 ..Value|10
-.Component|UROBILINOGEN
-..Range|0.2-1.0
+.Component|pH
+..Range|5.0-7.0
+..Value|5.0
+.Component|PROTEIN (URINE)
+..Flag|*
+..Range|<30
 ..Units|MG/DL
-..Value|0.2
-.Component|BILIRUBIN
-..Range|NEG
-..Value|NEGATIVE
+..Value|50
 .Component|BLOOD
 ..Flag|*
 ..Range|NEG
 ..Value|MODERATE
-.Component|WBC
-..Range|0-5
-..Value|3-5
-.Component|URINE TYPE
-..Value|UNKNOWN
-.Component|COLOR
-..Value|YELLOW
-.Component|RBC
-..Range|0-2
-..Value|0-2
+.Component|BILIRUBIN
+..Range|NEG
+..Value|NEGATIVE
+.Component|UROBILINOGEN
+..Range|0.2-1.0
+..Units|MG/DL
+..Value|0.2
+.Component|NITRITE
+..Range|NEG
+..Value|NEGATIVE
+.Component|LEUKOCYTE ESTERASE
+..Range|NEG
+..Value|NEGATIVE
 .Component|BACTERIA
 ..Flag|*
 ..Range|NOT SEEN
 ..Value|FEW
+.Component|WBC
+..Range|0-5
+..Value|3-5
+.Component|RBC
+..Range|0-2
+..Value|0-2
 .Component|EPITHELIAL CELLS
 ..Flag|*
 ..Range|0-10
@@ -3553,9 +3362,13 @@ Test|N/A
 ..Value|11-20
 .EpicCode|81001
 Test|N/A
-.Name|URINE COMPLETE
 .CollectionDate|09/24/2008
 .CollectionTime|18:25
+.Name|URINE COMPLETE
+.Component|URINE TYPE
+..Value|VOIDED
+.Component|COLOR
+..Value|COLRLES
 .Component|CLARITY
 ..Flag|*
 ..Range|CLEAR
@@ -3563,20 +3376,6 @@ Test|N/A
 .Component|SPECIFIC GRAVITY
 ..Range|<=1.030
 ..Value|<1.005
-.Component|pH
-..Range|5.0-7.0
-..Value|6.0
-.Component|LEUKOCYTE ESTERASE
-..Flag|*
-..Range|NEG
-..Value|TRC
-.Component|NITRITE
-..Range|NEG
-..Value|NEGATIVE
-.Component|PROTEIN (URINE)
-..Range|<30
-..Units|MG/DL
-..Value|NEGATIVE
 .Component|GLUCOSE (URINE)
 ..Range|NEG
 ..Units|MG/DL
@@ -3585,30 +3384,40 @@ Test|N/A
 ..Range|NEG
 ..Units|MG/DL
 ..Value|NEGATIVE
-.Component|UROBILINOGEN
-..Range|0.2-1.0
+.Component|pH
+..Range|5.0-7.0
+..Value|6.0
+.Component|PROTEIN (URINE)
+..Range|<30
 ..Units|MG/DL
-..Value|0.2
-.Component|BILIRUBIN
-..Range|NEG
 ..Value|NEGATIVE
 .Component|BLOOD
 ..Range|NEG
 ..Value|NEGATIVE
-.Component|WBC
-..Range|0-5
-..Value|3-5
-.Component|URINE TYPE
-..Value|VOIDED
-.Component|COLOR
-..Value|COLRLES
-.Component|RBC
-..Range|0-2
-..Value|0-2
+.Component|BILIRUBIN
+..Range|NEG
+..Value|NEGATIVE
+.Component|UROBILINOGEN
+..Range|0.2-1.0
+..Units|MG/DL
+..Value|0.2
+.Component|NITRITE
+..Range|NEG
+..Value|NEGATIVE
+.Component|LEUKOCYTE ESTERASE
+..Flag|*
+..Range|NEG
+..Value|TRC
 .Component|BACTERIA
 ..Flag|*
 ..Range|NOT SEEN
 ..Value|MANY
+.Component|WBC
+..Range|0-5
+..Value|3-5
+.Component|RBC
+..Range|0-2
+..Value|0-2
 .Component|EPITHELIAL CELLS
 ..Range|0-10
 ..Units|/LPF
