@@ -15,7 +15,7 @@
 	<LI><h3>Installation and Licensing</h3>
 	<ul>
 		<LI>Confirm that <b>LabDE</b> installs successfully on this operating system.
-		<LI>Create individual license files for <b>FLEX Index Server</b>, <b>LabDE 
+		<LI>Create individual license files for <b>FLEX Index Server 8.0</b>, <b>LabDE 
 		Server</b> and <b>LabDE Client</b>.  Include support for <b>PDF</b> images.
 		<ul>
 			<LI>Confirm that LabDE <b>does not</b> run in stand-alone mode with only 
@@ -328,7 +328,7 @@
 			<li>Exercise the <b>List of all tagged documents in the project (by tag)</b> 
 			report.
 			<li>Confirm that appropriate results are seen.
-			<li>Exercise the <b>List of all tags in the project (by tag)</b> 
+			<li>Exercise the <b>List of all tags in the project</b> 
 			report.
 			<li>Confirm that appropriate results are seen.
 		</ul>
@@ -347,23 +347,20 @@
 		<LI><b>OCR confidence</b>
 		<ul>
 			<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
-			<LI>Select the <b>ECO2</b> row in the <b>Orders</b> table.
-			<LI>Confirm that in the <b>Carbon Dioxide</b> text that the word <b>Carbon</b> has
-			a red background indicating lower OCR confidence.
-			<LI>Select the Order Name field and swipe <b>Carbon Dioxide</b> to replace the Order Name.
-			<LI>Confirm that the text OCRs correctly. <b>Dioxide</b> may mis-ocr.
-			<LI>Confirm that now the word <b>Carbon</b> and the <b>x</b> in <b>Dioxide</b> 
-			have red backgrounds indicating lower OCR confidence.
-			<LI>Manually edit the <b>Order Name</b> cell such that <b>Carbon Dioxide</b> 
-			becomes <b>Carbon Monoxide</b>.
+			<LI>Select the <b>BASIC METABOLIC PANEL</b> row in the <b>Orders</b> table.
+			<LI>Confirm that the <b>Chloride</b> Test name text has a red background 
+			indicating lower OCR confidence.
+			<LI>Select the Test Name field and swipe <b>Chloride</b> to replace the 
+			Test Name.
+			<LI>Confirm that the text OCRs correctly.
+			<LI>Manually edit the <b>Test Name</b> cell such that <b>Chloride</b> 
+			becomes <b>Chlorine</b>.
 			<ul>
-				<LI>Confirm that the tooltip changes to <b>Carbon Monoxide</b>.
+				<LI>Confirm that the tooltip changes to <b>Chlorine</b>.
 				<LI>Confirm that the highlight is now completely <b>green</b>.
 			</ul>
-			<LI>Re-swipe <b>Carbon Dioxide</b> to replace the Order Name.
-			<LI>Confirm that the text OCRs correctly. <b>Dioxide</b> may mis-ocr.
-			<LI>Confirm that the word <b>Carbon</b> again has a red background indicating 
-			lower OCR confidence. <b>Dioxide</b> may also be in red at this time.
+			<LI>Re-swipe <b>Chloride</b> to replace the Test Name.
+			<LI>Confirm that the text OCRs correctly.
 		</ul>
 <p>
 		<LI><b>Highlights and hints on tables</b>
@@ -379,16 +376,6 @@
 			<b>Selected Order Details</b> table.
 			<LI>Confirm that the <b>Test Name</b> text is highlighted 
 			and that a tooltip is also displayed.
-			<LI>Select the entire <b>UnknownOrder</b> row in the 
-			<b>Orders</b> table.
-			<ul>
-				<LI>Confirm that all of the test results for the <b>Order</b> are 
-				highlighted but that none of the test results tooltips are displayed.
-				<LI>Confirm that both <b>Red</b> and <b>Green</b> highlights are 
-				visible for individual characters.
-				<LI>Confirm that several <b>direct</b> hints (dotted line boxes) are 
-				provided for <b>Flag</b> items under the <b>OUT OF RANGE</b> column.
-			</ul>
 			<LI>Select one of the empty <b>Flag</b> cells in the <b>Selected Test 
 			Details</b> table.
 			<LI>Confirm that a <b>direct</b> hint is provided under the 
@@ -406,14 +393,14 @@
 			in an empty cell for each of the following fields.  The auto-complete 
 			list should be restricted to the entries that match the typed text.
 			<ul>
-				<LI>Ordering Physician - First Name
-				<LI>Ordering Physician - Last Name (NOTE: this is dependent on the 
-				presence of a valid First Name)
+				<LI>Ordering Physician - First Name (NOTE: this is dependent on the 
+				presence of a valid Last Name)
+				<LI>Ordering Physician - Last Name
 				<LI>Ordering Physician - Code (NOTE: this is dependent on the values 
 				of the Name fields)
-				<LI>CopyTo Physician - First Name
-				<LI>CopyTo Physician - Last Name (NOTE: this is dependent on the 
-				presence of a valid First Name)
+				<LI>CopyTo Physician - First Name (NOTE: this is dependent on the 
+				presence of a valid Last Name)
+				<LI>CopyTo Physician - Last Name
 				<LI>CopyTo Physician - Code (NOTE: this is dependent on the values 
 				of the Name fields)
 				<LI>Orders - Order Name
@@ -483,19 +470,32 @@
 	<LI><h3>Swiping from tables</h3>
 	<ul>
 		<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
-		<LI>Select <b>UnknownOrder</b>.
+		<LI>Select <b>BASIC METABOLIC PANEL</b>.
+		<LI>Confirm that the order is incomplete, missing results for one or more of 
+		<b>BUN</b>, <b>CREAT</b>, <b>K</b> or <b>NA</b>.
 		<LI>Select the empty row at the bottom of the <b>Selected Order Details</b>.
 		<LI>Use the angular highlight tool to swipe the <b>Sodium</b> test data.
 		<ul>
-			<LI>Confirm that the <b>Sodium</b> data appears in the <b>Selected Test 
-			Details</b> table.
-			<LI>Select the individual <b>Sodium</b> cell.
-			<LI>Zoom in close to the <b>Sodium</b> text and swipe it carefully. 
-			<LI>Confirm that the newly recognized text appears in the cell. 
-			<LI>Select another cell with missing or incorrect text.
+			<LI>Confirm that a <b>Sodium</b> Order appears.
+			<LI>Confirm that the test data is presented correctly. 
+		</ul>
+		<li>Swipe the <b>Potassium</b> test information if missing.
+		<li>Confirm that a new Order is presented.
+		<li>Swipe the <b>Blood Urea Nitrogen</b> test information if missing.
+		<li>Confirm that a new Order is presented.
+		<li>Swipe the <b>Creatinine</b> test information if missing.
+		<li>Confirm that a new Order is presented.
+		<LI>Error correction
+		<ul>
+			<LI>Select a cell with missing or incorrect text.
 			<LI>Zoom in close to the text and swipe it carefully. 
 			<LI>Confirm that the newly recognized text appears in the cell. 
 		</ul>
+		<li>Confirm that each of the <b>Tests</b> from the newly added Orders 
+		can be copied and pasted into the <b>BASIC METABOLIC PANEL</b> Order.
+		<li>Confirm that the <b>BASIC METABOLIC PANEL</b> Order validation warning 
+		is gone.
+		<li>Confirm that the new Orders can be deleted.
 <p>
 		<LI>Open image <b>Z191.tif</b> from Demo_LabDE.
 		<LI>Select the empty row at the bottom of the <b>Orders</b> table.
@@ -519,33 +519,6 @@
 <p>
 	<LI><h3>Copy and Paste from tables</h3>
 	<ul>
-		<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
-                <LI>Select the entire <b>Potassium</b> row from the test details in the
-                <b>Potassium</b> order.
-		<LI>Right-click and select <b>Copy row(s)</b>.
-		<LI>Select another order.
-		<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
-		<ul>
-			<LI>Confirm that the <b>Potassium</b> data appears in the <b>Selected Test 
-			Details</b> table.
-			<LI>Confirm that selecting individual cells displays proper highlights 
-			and tooltips. 
-			<LI>Confirm that selecting the entire <b>Potassium</b> row displays 
-			proper highlights and all tooltips. 
-		</ul>
-		<LI>Select <b>multiple</b> rows from the test details in the <b>UnknownOrder</b>.
-		<LI>Right-click and select <b>Copy row(s)</b>.
-		<LI>Select the another order.
-		<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
-		<ul>
-			<LI>Confirm that all of the <b>copied rows</b> appear in the <b>Selected Test 
-			Details</b> table.
-			<LI>Confirm that selecting individual cells displays proper highlights 
-			and tooltips. 
-			<LI>Confirm that selecting the entire rows displays 
-			proper highlights and all tooltips. 
-		</ul>
-<p>
 		<LI><b>[DataEntry #464]</b> Pasting text
        		<ul>
 			<li>Exercise the <b>A003.tif</b> image from Demo_LabDE.
