@@ -21,6 +21,12 @@ runrules 11Test_DirNoDriveOfTag.rsd "Test  Image.tif"
 runrules 12Test_ReplaceTag.rsd "Test  Image.tif"
 runrules 13Test_InsertBeforeExt.rsd "Test  Image.tif"
 runrules 14Test_Env.rsd "Test  Image.tif"
+
+:: the following tests will be run, but no corresponding output will be in testResults.txt
+runrules 15Test_FullUserName.rsd "Test  Image.tif"
+runrules 16Test_Now.rsd "Test  Image.tif"
+runrules 17Test_RandomAlphaNumeric.rsd "Test  Image.tif"
+runrules 18Test_UserName.rsd "Test  Image.tif"
 pause
 
 :: Write results of test to "testResults.txt"
@@ -85,8 +91,8 @@ dir /B /S "\\fnp2\internal\users\wayne_lenius\Public\Write\ABC\Test  Image.tif.x
 if errorlevel 1 echo "\\fnp2\internal\users\wayne_lenius\Public\Write\ABC\Test  Image.tif.xml not created" >> testResults.txt
 echo "" >> testResults.txt
 
-dir /B "%username%.xml" >> testResults.txt
-if errorlevel 1 echo "%username%.xml not created" >> testResults.txt
+dir /B "%userdomain%.xml" >> testResults.txt
+if errorlevel 1 echo "%userdomain%.xml not created" >> testResults.txt
 echo "" >> testResults.txt
 
 dir /B "Test  Image.INSERT1.tif.xml" >> testResults.txt

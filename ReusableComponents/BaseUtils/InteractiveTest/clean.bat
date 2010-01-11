@@ -8,4 +8,5 @@ del "I:\users\wayne_lenius\Public\Write\ABD\Test  Image.tif.xml"
 del "\\fnp2\internal\users\wayne_lenius\Public\Write\Test  Image.tif.xml"
 del "\\fnp2\internal\users\wayne_lenius\Public\Write\ABC\Test  Image.tif.xml"
 rmdir /S h:
+rmdir /S Now
 del testResults.txt
