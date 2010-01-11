@@ -1,3 +1,8 @@
+mkdir d:\h
+net use h: \\127.0.0.1\d$\h
+::SET FLEX_INDEX_TEST="FLEX Index test"
+path "%programfiles(x86)%\Extract Systems\CommonComponents";%PATH%
+feedback.exe
 call clean.bat
 runrules 1Test_DirOfFileOfSourceDocName.rsd "Test  Image.tif"
 runrules 2Test_FileNoExtOf.rsd "Test  Image.tif"
@@ -16,3 +21,4 @@ runrules 11Test_DirNoDriveOfTag.rsd "Test  Image.tif"
 runrules 12Test_ReplaceTag.rsd "Test  Image.tif"
 runrules 13Test_InsertBeforeExt.rsd "Test  Image.tif"
 runrules 14Test_Env.rsd "Test  Image.tif"
+pause
