@@ -25,7 +25,7 @@ namespace Extract.FileActionManager.Forms
             /// <summary>
             /// The count of active seconds in the past active minute.
             /// </summary>
-            readonly int _activeSecondCount;
+            int _activeSecondCount;
 
             /// <summary>
             /// The time stamp for the active minute.
@@ -45,8 +45,8 @@ namespace Extract.FileActionManager.Forms
                 // Store the active second count
                 _activeSecondCount = activeSecondCount;
 
-                // The active minute is actually the previous minute
-                _timeStamp = DateTime.Now.AddMinutes(-1.0);
+                // Store the current timestamp
+                _timeStamp = DateTime.Now;
             }
 
             /// <summary>
@@ -68,6 +68,10 @@ namespace Extract.FileActionManager.Forms
                 get
                 {
                     return _activeSecondCount;
+                }
+                set
+                {
+                    _activeSecondCount = value;
                 }
             }
 
@@ -102,9 +106,9 @@ namespace Extract.FileActionManager.Forms
         volatile int _inputCount;
 
         /// <summary>
-        /// The count of active seconds
+        /// The active minute data for the current minute
         /// </summary>
-        volatile int _activeSecondCount;
+        volatile ActiveMinuteData _currentMinuteData;
 
         /// <summary>
         /// Cached active minute data that is set by the active minute thread and
@@ -156,6 +160,11 @@ namespace Extract.FileActionManager.Forms
         /// Whether the input events should be tracked in the database or not.
         /// </summary>
         readonly bool _trackEvents;
+
+        /// <summary>
+        /// Mutex for getting/setting the current minute data
+        /// </summary>
+        readonly static object _lock = new object();
 
         #endregion Fields
 
@@ -313,26 +322,44 @@ namespace Extract.FileActionManager.Forms
         {
             try
             {
-                int sleepTime = 1000;
+                int sleepTime = 1000 - DateTime.Now.Millisecond;
                 while (!_endThreads.WaitOne(sleepTime))
                 {
                     // Get the current tickcount
                     int tickCount = Environment.TickCount;
                     if (_inputCount > 0)
                     {
+                        lock (_lock)
+                        {
+                            if (_currentMinuteData == null)
+                            {
+                                _currentMinuteData = new ActiveMinuteData(1);
+                            }
+                            else
+                            {
+                                _currentMinuteData.ActiveSecondCount++;
+                            }
+                        }
+
                         _inputCount = 0;
-                        _activeSecondCount++;
                     }
 
+                    int elapsedTicks = Environment.TickCount - tickCount;
+
                     // Handle tick count rollover issue (rolls over at ~ 50 days uptime)
-                    if (Environment.TickCount < tickCount)
+                    if (elapsedTicks < 0)
                     {
                         sleepTime = 1000;
+                    }
+                    else if (elapsedTicks > 1000)
+                    {
+                        // We have spent over a second in the loop, set the sleep time to 0
+                        sleepTime = 0;
                     }
                     else
                     {
                         // Sleep time is 1000 - milliseconds elapsed in the loop
-                        sleepTime = 1000 - (Environment.TickCount - tickCount);
+                        sleepTime = 1000 - elapsedTicks;
                     }
                 }
             }
@@ -357,10 +384,15 @@ namespace Extract.FileActionManager.Forms
                 // Wait until the next minute boundary or the end threads event is signaled
                 while (!_endThreads.WaitOne(1000 * (60 - DateTime.Now.Second)))
                 {
-                    if (_activeSecondCount > 0)
+                    if (_currentMinuteData != null)
                     {
-                        _cachedMinuteData = new ActiveMinuteData(_activeSecondCount);
-                        _activeSecondCount = 0;
+                        // Mutex around current minute data
+                        lock (_lock)
+                        {
+                            _cachedMinuteData = _currentMinuteData;
+                            _currentMinuteData = null;
+                        }
+
                         _updateDatabase.Set();
                     }
                 }
@@ -400,13 +432,17 @@ namespace Extract.FileActionManager.Forms
                 }
 
                 // Check for any left over active second data
-                if (_activeSecondCount > 0)
+                lock (_lock)
                 {
-                    // Get the active minute data
-                    ActiveMinuteData data = new ActiveMinuteData(_activeSecondCount);
+                    if (_currentMinuteData != null)
+                    {
+                        // Get the active minute data
+                        ActiveMinuteData data = _currentMinuteData;
+                        _currentMinuteData = null;
 
-                    // Record the active minute data
-                    RecordActiveMinuteData(data);
+                        // Record the active minute data
+                        RecordActiveMinuteData(data);
+                    }
                 }
             }
             catch (ThreadAbortException)
