@@ -4542,15 +4542,13 @@ STDMETHODIMP CFileProcessingDB::RecordFAMSessionStop()
 STDMETHODIMP CFileProcessingDB::RecordInputEvent(BSTR bstrTimeStamp, long nActionID,
 												 long nEventCount, long nProcessID)
 {
+	// NOTE: This method is intentionally not threadsafe. 
+	// It does not use LockGuard for performance reasons.
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		string strSQL = "INSERT INTO [" + gstrINPUT_EVENT + "] ([TimeStamp], "
-			"[ActionID], [FAMUserID], [MachineID], [PID], [SecondsWithInputEvents]) "
-			"VALUES (CAST('" + asString(bstrTimeStamp) + "' AS smalldatetime), "
-			+ asString(nActionID) + ", ";
-
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
 		
@@ -4570,15 +4568,58 @@ STDMETHODIMP CFileProcessingDB::RecordInputEvent(BSTR bstrTimeStamp, long nActio
 		// Set the transaction guard
 		TransactionGuard tg(ipConnection);
 
-		long nMachineID = getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName);
-		long nUserID = getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName);
+		string strTimeStamp = asString(bstrTimeStamp);
+		string strActionId = asString(nActionID);
+		string strUserId = 
+			asString( getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName) );
+		string strMachineId = 
+			asString( getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName) );
+		string strProcessId = asString(nProcessID);
 
-		// Add the remaining 
-		strSQL += asString(nUserID) + ", " + asString(nMachineID) + ", "
-			+ asString(nProcessID) + ", " + asString(nEventCount) + ")";
+		string strQuery = 
+			"SELECT SecondsWithInputEvents "
+			"FROM " + gstrINPUT_EVENT + " "
+			"WHERE (TimeStamp = '" + strTimeStamp + "') AND (ActionID = " + strActionId + ") "
+				"AND (FAMUserID = " + strUserId + ") AND MachineID = " + strMachineId + 
+				"AND (PID = " + strProcessId + ")";
 
-		// Execute the insert query
-		executeCmdQuery(ipConnection, strSQL);
+		// Create a pointer to a recordset
+		_RecordsetPtr ipSeconds( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI29144", ipSeconds != NULL );
+
+		// Check if the record set already exists
+		ipSeconds->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText );
+
+		if (ipSeconds->adoEOF == VARIANT_TRUE)
+		{
+			// The record doesn't exist, create it
+			string strSQL = "INSERT INTO [" + gstrINPUT_EVENT + "] ([TimeStamp], "
+				"[ActionID], [FAMUserID], [MachineID], [PID], [SecondsWithInputEvents]) "
+				"VALUES (CAST('" + strTimeStamp + "' AS smalldatetime), "
+				+ strActionId + ", " + strUserId + ", " + strMachineId + ", "
+				+ strProcessId + ", " + asString(nEventCount) + ")";
+
+			// Execute the insert query
+			executeCmdQuery(ipConnection, strSQL);
+		}
+		else
+		{
+			// The record exists
+			FieldsPtr ipFields = ipSeconds->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI27357", ipFields != NULL);
+
+			// Add the new second count
+			long lTotalCount = nEventCount + getLongField(ipFields, "SecondsWithInputEvents");
+			if (lTotalCount > 60)
+			{
+				lTotalCount = 60;
+			}
+			setLongField(ipFields, "SecondsWithInputEvents", lTotalCount);
+
+			// Update the table
+			ipSeconds->Update();
+		}
 
 		// Delete the old input events
 		deleteOldInputEvents(ipConnection);

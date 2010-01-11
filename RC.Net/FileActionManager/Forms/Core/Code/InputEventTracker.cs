@@ -1,13 +1,10 @@
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using System.Media;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Forms
@@ -33,7 +30,7 @@ namespace Extract.FileActionManager.Forms
             /// <summary>
             /// The time stamp for the active minute.
             /// </summary>
-            DateTime _timeStamp;
+            readonly DateTime _timeStamp;
 
             /// <overloads>
             /// Initializes a new instance of the <see cref="ActiveMinuteData"/> class.
@@ -82,10 +79,6 @@ namespace Extract.FileActionManager.Forms
                 get
                 {
                     return _timeStamp;
-                }
-                set
-                {
-                    _timeStamp = value;
                 }
             }
         }
@@ -147,22 +140,22 @@ namespace Extract.FileActionManager.Forms
         /// <summary>
         /// The file processing DB manager that will be used to update the database
         /// </summary>
-        FileProcessingDB _famDB;
+        FileProcessingDB _database;
 
         /// <summary>
         /// The action ID for this event tracker.
         /// </summary>
-        int _actionID;
+        readonly int _actionId;
 
         /// <summary>
         /// The current processes ID
         /// </summary>
-        int _processID;
+        readonly int _processId;
 
         /// <summary>
         /// Whether the input events should be tracked in the database or not.
         /// </summary>
-        bool _trackEvents;
+        readonly bool _trackEvents;
 
         #endregion Fields
 
@@ -175,8 +168,8 @@ namespace Extract.FileActionManager.Forms
         /// Initializes a new instance of the <see cref="InputEventTracker"/> class.
         /// </summary>
         [CLSCompliant(false)]
-        public InputEventTracker(FileProcessingDB fileProcessingDB, int actionID)
-            : this(fileProcessingDB, actionID, null)
+        public InputEventTracker(FileProcessingDB database, int actionId)
+            : this(database, actionId, null)
         {
         }
 
@@ -184,31 +177,31 @@ namespace Extract.FileActionManager.Forms
         /// Initializes a new instance of the <see cref="InputEventTracker"/> class.
         /// </summary>
         [CLSCompliant(false)]
-        public InputEventTracker(FileProcessingDB fileProcessingDB, int actionID, params Control[] controls)
+        public InputEventTracker(FileProcessingDB database, int actionId, params Control[] controls)
             : base(controls)
         {
             try
             {
                 // Ensure the FAM DB object is not null
                 ExtractException.Assert("ELI28946", "File processing DB cannot be null.",
-                    fileProcessingDB != null);
+                    database != null);
 
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI28959", _OBJECT_NAME);
 
                 // Set the fam DB object
-                _famDB = fileProcessingDB;
+                _database = database;
 
                 // The action ID to record events for
-                _actionID = actionID;
+                _actionId = actionId;
 
                 using (Process process = Process.GetCurrentProcess())
                 {
-                    _processID = process.Id;
+                    _processId = process.Id;
                 }
 
                 // Check whether event tracking is enabled
-                _trackEvents = _famDB.GetDBInfoSetting("EnableInputEventTracking").Equals("1",
+                _trackEvents = _database.GetDBInfoSetting("EnableInputEventTracking").Equals("1",
                     StringComparison.OrdinalIgnoreCase);
 
                 if (_trackEvents)
@@ -304,8 +297,8 @@ namespace Extract.FileActionManager.Forms
         void RecordActiveMinuteData(ActiveMinuteData data)
         {
             // Update the InputEvent table
-            _famDB.RecordInputEvent(data.TimeStamp.ToString("g", DateTimeFormatInfo.InvariantInfo),
-                _actionID, data.ActiveSecondCount, _processID);
+            _database.RecordInputEvent(data.TimeStamp.ToString("g", DateTimeFormatInfo.InvariantInfo),
+                _actionId, data.ActiveSecondCount, _processId);
         }
 
         #endregion Methods
@@ -389,15 +382,12 @@ namespace Extract.FileActionManager.Forms
         {
             try
             {
-                DateTime lastUpdate = DateTime.MinValue;
-
                 WaitHandle[] waitHandles = new WaitHandle[] { _updateDatabase, _endThreads };
                 while (WaitHandle.WaitAny(waitHandles) != 1)
                 {
                     try
                     {
                         ActiveMinuteData data = new ActiveMinuteData(_cachedMinuteData);
-                        lastUpdate = data.TimeStamp;
 
                         // Record the active minute data
                         RecordActiveMinuteData(data);
@@ -414,17 +404,6 @@ namespace Extract.FileActionManager.Forms
                 {
                     // Get the active minute data
                     ActiveMinuteData data = new ActiveMinuteData(_activeSecondCount);
-
-                    // Check if we have recorded data for this minute already
-                    // (this is to handle the boundary conditions of the first/last
-                    // seconds of a minute)
-                    TimeSpan span = data.TimeStamp.Subtract(lastUpdate);
-                    if (span.Minutes == 0)
-                    {
-                        // Add a minute to the time stamp and record the data
-                        // for the current minute
-                        data.TimeStamp = data.TimeStamp.AddMinutes(1.0);
-                    }
 
                     // Record the active minute data
                     RecordActiveMinuteData(data);
@@ -530,9 +509,9 @@ namespace Extract.FileActionManager.Forms
                 }
 
                 // Set the FAMDB COM object to NULL
-                if (_famDB != null)
+                if (_database != null)
                 {
-                    _famDB = null;
+                    _database = null;
                 }
             }
 
