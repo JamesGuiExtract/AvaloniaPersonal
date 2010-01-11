@@ -22,3 +22,97 @@ runrules 12Test_ReplaceTag.rsd "Test  Image.tif"
 runrules 13Test_InsertBeforeExt.rsd "Test  Image.tif"
 runrules 14Test_Env.rsd "Test  Image.tif"
 pause
+
+:: Write results of test to "testResults.txt"
+:: Check that output files existence.
+echo off
+dir /B "Test  Image.tif.xml" >> testResults.txt
+if errorlevel 1 echo "Test  Image.tif.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "Test  Image.xml" >> testResults.txt
+if errorlevel 1 echo "Test  Image.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "Test Image.xml" >> testResults.txt
+if errorlevel 1 echo "Test Image.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "Test01.tif.xml" >> testResults.txt
+if errorlevel 1 echo "Test01.tif.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "TestRSDFileDirTag.xml" >> testResults.txt
+if errorlevel 1 echo "TestRSDFileDirTag.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "Test  Image.tif.xml.test" >> testResults.txt
+if errorlevel 1 echo "Test  Image.tif.xml.test not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "Test  Image.tif.voa.test" >> testResults.txt
+if errorlevel 1 echo "Test  Image.tif.voa.test not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "TestWarranty Deed.xml" >> testResults.txt
+if errorlevel 1 echo "TestWarranty Deed.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "TestRuleExecutionID*.xml" >> testResults.txt
+if errorlevel 1 echo "TestRuleExecutionID??.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "TestDriveOfTag.xml" >> testResults.txt
+if errorlevel 1 echo "TestDriveOfTag.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B /S "I:\users\wayne_lenius\Public\Write\ABD\Test  Image.tif.xml" >> testResults.txt
+if errorlevel 1 echo "I:\users\wayne_lenius\Public\Write\ABD\Test  Image.tif.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+echo "Check for Test  Image.tif.xml under a replicated directory tree in drive H:\"  >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B /S "h:\Test  Image.tif.xml" >> testResults.txt
+if errorlevel 1 echo "h:\Test  Image.tif.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B /S "\\fnp2\internal\users\wayne_lenius\Public\Write\Test  Image.tif.xml" >> testResults.txt
+if errorlevel 1 echo "\\fnp2\internal\users\wayne_lenius\Public\Write\Test  Image.tif.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B /S "\\fnp2\internal\users\wayne_lenius\Public\Write\ABC\Test  Image.tif.xml" >> testResults.txt
+if errorlevel 1 echo "\\fnp2\internal\users\wayne_lenius\Public\Write\ABC\Test  Image.tif.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "%username%.xml" >> testResults.txt
+if errorlevel 1 echo "%username%.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "Test  Image.INSERT1.tif.xml" >> testResults.txt
+if errorlevel 1 echo "Test  Image.INSERT1.tif.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "Test  Image.tif.INSERT2.xml" >> testResults.txt
+if errorlevel 1 echo "Test  Image.tif.INSERT2.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "Tst  Imag.tif.xml" >> testResults.txt
+if errorlevel 1 echo "Tst  Imag.tif.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "TestFile.tif.xml" >> testResults.txt
+if errorlevel 1 echo "TestFile.tif.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "TestFile.tif.xml" >> testResults.txt
+if errorlevel 1 echo "TestFile.tif.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+dir /B "Test  Image.tif.xml" >> testResults.txt
+if errorlevel 1 echo "Test  Image.tif.xml not created" >> testResults.txt
+echo "" >> testResults.txt
+
+echo "Test complete. See testResults.txt for output."
+pause
+
