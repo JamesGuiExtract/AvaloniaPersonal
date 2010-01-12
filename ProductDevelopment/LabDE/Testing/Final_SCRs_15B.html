@@ -1,0 +1,77 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.5 Final SCR Testing - B</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.5 Final SCR Testing - B<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Test scenario to reproduce the problem seen in LegacyRC #5654.  This 
+	will also serve to validate the fix before release of LabDE 1.5.
+   	<LI><b>Details:</b> FPS file 1 processes files for <b>ActionA</b> and sets 
+	<b>ActionB</b> to <b>Pending</b>.  FPS file 2 listens for and processes files for 
+	<b>ActionB</b>.  If FPS file 1 has another task that it still executing when FPS file 2 
+	tries to process a file, FPS file 2 stops processing.  An <b>ELI14382</b> exception is 
+	also logged.
+</ul>
+<p>
+<h3>SCRs</h3>
+<OL>
+	<LI><b>[LegacyRC #5654]</b> Database error with LockedFile table
+       	<ul>
+		<li><b>Test Setup</b>
+		<ul>
+			<li>Modify the <b>AutoRevertTimeOutInMinutes</b> field in the <b>DBInfo</b> 
+			table from <b>60</b> to <b>1</b>.
+			<li>Create a <b>Test</b> database with <b>ActionA</b> and <b>ActionB</b>.
+			<li>Create a <b>Test-ActionA</b> FPS file for <b>ActionA</b>
+			<ul>
+				<li>Queue some images.
+				<li>Add a <b>Core: Set file action status in database</b> task.
+				Set <b>ActionB</b> to <b>Pending</b>.
+				<li>Add another task in order to delay the finish processing for the 
+				image.  A <b>Core: Launch application</b> task to open a command prompt 
+				is sufficient.
+			</ul>
+			<li>Create a <b>Test-ActionB</b> FPS file for <b>ActionB</b>
+			<ul>
+				<li>Set the processing task for <b>Continuous processing</b>.
+				<li>Add a <b>Core: Launch application</b> task to open Notepad.
+			</ul>
+		</ul>
+<p>
+		<li><b>Test Execution</b>
+		<ul>
+			<li>Start processing for both FPS files.
+			<li>For problem <u>persistence</u>
+			<ul> 
+				<li>An <b>ELI14382</b> exception is logged.
+				<li>The <b>Test-ActionB</b> FPS file will process one file and then 
+				automatically stop processing.
+			</ul> 
+			<li>For problem <u>eradication</u>
+			<ul> 
+				<li>No <b>ELI14382</b> exception is logged.
+				<li>The <b>Test-ActionB</b> FPS file will continue processing files in 
+				step with the processing results from the <b>Test-ActionB</b> FPS file.
+<p>
+				<li>Kill both FPS files via <b>Task Manager</b> while processing.
+				<li>Confirm that two records exist in the <b>LockedFile</b> table.
+				<li>Wait for the <b>1 minute</b> auto-revert timeout.
+				<li>Open the <b>Test-ActionA</b> FPS file and start processing.
+				<li>Confirm that the previous two <b>LockedFile</b> records are removed.
+			</ul>
+		</ul>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
