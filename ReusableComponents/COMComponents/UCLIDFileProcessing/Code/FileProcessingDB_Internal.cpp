@@ -226,7 +226,8 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 
 					// Remove record from the LockedFileTable
 					executeCmdQuery(ipConnection, "DELETE FROM LockedFile WHERE FileID = " + 
-						asString(nFileID));
+						asString(nFileID) + " AND ActionID = " + asString(nActionID) + 
+						" AND UPIID = " + asString(m_nUPIID));
 				}
 				_lastCodePos = "250";
 				updateStats(ipConnection, nActionID, easStatsFrom, asEActionStatus(strState),
