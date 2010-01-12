@@ -190,21 +190,8 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		// Expand the action name
 		string strExpandedAction = getExpandedActionName();
 
-		// Ensure the action name exists in the database
-		if (!isActionNameInDatabase(strExpandedAction))
-		{
-			if (getFPMDB()->GetAutoCreateActions() == VARIANT_TRUE)
-			{
-				getFPMDB()->DefineNewAction(strExpandedAction.c_str());
-			}
-			else
-			{
-				UCLIDException ue("ELI29121", "Invalid action name.");
-				ue.addDebugInfo("Action name", m_strAction);
-				ue.addDebugInfo("Expanded action name", strExpandedAction);
-				throw ue;
-			}
-		}
+		// Validate that the action name exists in the database (auto-create if that setting is set)
+		getFPMDB()->AutoCreateAction(strExpandedAction.c_str());
 
 		// start the processing
 		m_bPaused = false;
