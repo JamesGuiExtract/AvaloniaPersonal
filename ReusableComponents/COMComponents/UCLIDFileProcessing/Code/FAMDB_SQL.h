@@ -128,10 +128,11 @@ static const string gstrCREATE_PROCESSING_FAM_TABLE =
 	"[LastPingTime] datetime NOT NULL CONSTRAINT [DF_ProcessingFAM_LastPingTime]  DEFAULT (GETDATE()))";
 
 static const string gstrCREATE_LOCKED_FILE_TABLE = 
-	"CREATE TABLE [LockedFile]([FileID] [int] NOT NULL CONSTRAINT [PK_LockedFile] PRIMARY KEY CLUSTERED,"
-	"[ActionID] [int] , "
+	"CREATE TABLE [LockedFile]([FileID] [int] NOT NULL,"
+	"[ActionID] [int] NOT NULL, "
 	"[UPIID] [int] , "
-	"[StatusBeforeLock] [nvarchar](1) NOT NULL)";
+	"[StatusBeforeLock] [nvarchar](1) NOT NULL, "
+	"CONSTRAINT [PK_LockedFile] PRIMARY KEY CLUSTERED ([FileID], [ActionID], [UPIID]))";
 
 static const string gstrCREATE_USER_CREATED_COUNTER_TABLE =
 	"CREATE TABLE [UserCreatedCounter] ("
