@@ -4607,7 +4607,7 @@ STDMETHODIMP CFileProcessingDB::RecordInputEvent(BSTR bstrTimeStamp, long nActio
 		{
 			// The record exists
 			FieldsPtr ipFields = ipSeconds->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI27357", ipFields != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29150", ipFields != NULL);
 
 			// Add the new second count
 			long lTotalCount = nEventCount + getLongField(ipFields, "SecondsWithInputEvents");

@@ -68,6 +68,21 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         static readonly string _FAM_PROCESS_NAME = "FAMProcess";
 
+        /// <summary>
+        /// The default sleep time the service should use when starting (default is 2 minutes)
+        /// </summary>
+        internal static readonly int DefaultSleepTimeOnStartup = 120000;
+
+        /// <summary>
+        /// The setting key to read the sleep time on startup value from.
+        /// </summary>
+        internal static readonly string SleepTimeOnStartupKey = "SleepTimeOnStart";
+
+        /// <summary>
+        /// The setting key to read the dependent services value from.
+        /// </summary>
+        internal static readonly string DependentServices = "DependentServices";
+
         #endregion Constants
 
         #region Fields
@@ -76,8 +91,7 @@ namespace Extract.FileActionManager.Utilities
         /// Path to the database that contains the FAM service settings.
         /// </summary>
         static readonly string _databaseFile = FileSystemMethods.PathCombine(
-            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-            "Extract Systems", "Service", "ESFAMService.sdf");
+            FileSystemMethods.ExtractSystemsPath, "CommonComponents", "ESFAMService.sdf");
 
         /// <summary>
         /// The connection string for connecting to the SqlCE database.
@@ -90,19 +104,20 @@ namespace Extract.FileActionManager.Utilities
         ManualResetEvent _stopProcessing = new ManualResetEvent(false);
 
         /// <summary>
-        /// Event handle to indicate that the dns service has started
+        /// Event to indicate the threads may start (set to true by the sleep time thread)
         /// </summary>
-        ManualResetEvent _dnsStarted = new ManualResetEvent(false);
-
-        /// <summary>
-        /// Event handle to indicate that the net login service has started
-        /// </summary>
-        ManualResetEvent _netLogonStarted = new ManualResetEvent(false);
+        ManualResetEvent _startThreads = new ManualResetEvent(false);
 
         /// <summary>
         /// The collection of threads which are running.
         /// </summary>
         List<Thread> _processingThreads = new List<Thread>();
+
+        /// <summary>
+        /// Thread which will sleep for the initial sleep time value and then set the
+        /// _startThreads event handle
+        /// </summary>
+        Thread _sleepThread;
 
         /// <summary>
         /// Event handle that is set when all threads have stopped
@@ -113,16 +128,6 @@ namespace Extract.FileActionManager.Utilities
         /// The count of active processing threads
         /// </summary>
         volatile int _activeProcessingThreadCount;
-
-        /// <summary>
-        /// Thread for checking if the DNS Client service is running.
-        /// </summary>
-        Thread _dnsCheck;
-
-        /// <summary>
-        /// Thread for checking if the Net Logon service is running
-        /// </summary>
-        Thread _netLogonCheck;
 
         /// <summary>
         /// Mutex to provide synchronized access to data.
@@ -165,11 +170,9 @@ namespace Extract.FileActionManager.Utilities
                     "Application trace: FAM Service starting.");
                 ee.Log();
 
-                // Kick off threads to check for dependent services running
-                _dnsCheck = new Thread(CheckForDnsServiceRunning);
-                _netLogonCheck = new Thread(CheckForNetLogonServiceRunning);
-                _dnsCheck.Start();
-                _netLogonCheck.Start();
+                // Create the sleep thread and start it
+                _sleepThread = new Thread(SleepAndCheckDependentServices);
+                _sleepThread.Start();
 
                 lock (_lock)
                 {
@@ -253,71 +256,98 @@ namespace Extract.FileActionManager.Utilities
         #region Thread Methods
 
         /// <summary>
-        /// Waits for the DNS Client service to start running and sets the service started handle
+        /// Thread function that sleeps on intial startup and then sets the startThreads event.
         /// </summary>
-        void CheckForDnsServiceRunning()
+        void SleepAndCheckDependentServices()
         {
             try
             {
-                // Ensure there is a wait handle to set and that it is not set already
-                if (_dnsStarted != null && !_dnsStarted.WaitOne(0))
-                {
-                    // Wait for the dns client to start (set the wait timeout to 1 minute)
-                    ServiceController dnsService = new ServiceController("DNS Client");
-                    dnsService.WaitForStatus(ServiceControllerStatus.Running, new TimeSpan(0, 1, 0));
-                }
-            }
-            // Log the timeout exception, ignore the other exceptions
-            catch (System.ServiceProcess.TimeoutException ex)
-            {
-                // Log the timeout application trace
-                ExtractException ee = new ExtractException("ELI28814",
-                    "Application Trace: Timeout expired while waiting for DNS client to start.",
-                    ex);
-                ee.Log();
-            }
-            finally
-            {
-                // Ensure there is a wait handle to set and that it is not set already
-                if (_dnsStarted != null && !_dnsStarted.WaitOne(0))
-                {
-                    // Set the wait handle
-                    _dnsStarted.Set();
-                }
-            }
-        }
+                int sleepTime = GetStartupSleepTime();
+                _stopProcessing.WaitOne(sleepTime);
 
-        /// <summary>
-        /// Waits for the Net Logon service to start running and sets the service started handle
-        /// </summary>
-        void CheckForNetLogonServiceRunning()
-        {
-            try
-            {
-                // Ensure there is a wait handle to set and that it is not set already
-                if (_netLogonStarted != null && !_netLogonStarted.WaitOne(0))
+                // Get the collection of ServiceController's for the dependent services
+                List<ServiceController> dependentServices = GetDependentServiceControllers();
+
+                // Check if the dependent services have started.
+                // Keep checking until either:
+                // 1. All dependent services have started
+                // 2. The service is stopped
+                bool allStartedAfterSleep = true;
+                while (dependentServices.Count > 0
+                    && _stopProcessing != null && !_stopProcessing.WaitOne(0))
                 {
-                    // Wait for the Net Logon to start (set the wait timeout to 1 minute)
-                    ServiceController netLogon = new ServiceController("Net Logon");
-                    netLogon.WaitForStatus(ServiceControllerStatus.Running, new TimeSpan(0, 1, 0));
+                    // Check for running services
+                    List<string> serviceNotStarted = new List<string>();
+                    for (int i = 0; i < dependentServices.Count; i++)
+                    {
+                        // Get the service controller and refresh its status
+                        ServiceController controller = dependentServices[i];
+                        controller.Refresh();
+
+                        // Check for running service
+                        if (controller.Status != ServiceControllerStatus.Running)
+                        {
+                            if (allStartedAfterSleep)
+                            {
+                                serviceNotStarted.Add(controller.ServiceName.ToUpperInvariant());
+                            }
+                        }
+                        else
+                        {
+                            dependentServices.RemoveAt(i);
+                            i--;
+                        }
+                    }
+
+                    // Log an exception if any services have not started yet (only log on
+                    // the first iteration)
+                    if (allStartedAfterSleep && serviceNotStarted.Count > 0)
+                    {
+                        allStartedAfterSleep = false;
+
+                        string services =
+                            StringMethods.ConvertArrayToDelimitedList(serviceNotStarted, ",");
+                        ExtractException ee = new ExtractException("ELI29147",
+                            "Application Trace: Some dependent services have not started yet.");
+                        ee.AddDebugData("Services", services, false);
+                        ee.Log();
+                    }
+
+                    // If all services started, just break from the loop
+                    if (dependentServices.Count == 0)
+                    {
+                        break;
+                    }
+
+                    // Sleep for 1 second and check dependent services again.
+                    Thread.Sleep(1000);
+                }
+
+                // Check if all the services had started after the sleep time
+                // Only log the application trace if the FAM is actually going to start
+                if (!allStartedAfterSleep
+                    && _stopProcessing != null && !_stopProcessing.WaitOne(0))
+                {
+                    // Log an application trace since after the sleep time not all services
+                    // had started.
+                    ExtractException ee = new ExtractException("ELI29148",
+                        "Application Trace: All dependent services are running and File Action Manager service will now begin processing.");
+                    ee.Log();
                 }
             }
-            // Log the timeout exception, ignore the other exceptions
-            catch (System.ServiceProcess.TimeoutException ex)
+            catch (ThreadAbortException)
             {
-                // Log the timeout application trace
-                ExtractException ee = new ExtractException("ELI28815",
-                    "Application Trace: Timeout expired while waiting for Net Logon to start.",
-                    ex);
-                ee.Log();
+                // Do not log any exception if the thread was aborted
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI29139", ex);
             }
             finally
             {
-                // Ensure there is a wait handle to set and that it is not set already
-                if (_netLogonStarted != null && !_netLogonStarted.WaitOne(0))
+                if (_startThreads != null)
                 {
-                    // Set the wait handle
-                    _netLogonStarted.Set();
+                    _startThreads.Set();
                 }
             }
         }
@@ -333,6 +363,12 @@ namespace Extract.FileActionManager.Utilities
             int pid = -1;
             try
             {
+                // Wait for the sleep time to expire
+                if (_startThreads != null)
+                {
+                    _startThreads.WaitOne();
+                }
+
                 // Get the processing thread arguments
                 ProcessingThreadArguments arguments = (ProcessingThreadArguments)threadParameters;
 
@@ -343,27 +379,18 @@ namespace Extract.FileActionManager.Utilities
                 // Set the FPS file name
                 famProcess.FPSFile = arguments.FPSFileName;
 
-                // Wait for both the dns service and the net login service to start
-                if (_dnsStarted != null)
-                {
-                    // Wait for the event to signal
-                    _dnsStarted.WaitOne(2000);
-                }
-                if (_netLogonStarted != null)
-                {
-                    // Wait for the event to signal
-                    _netLogonStarted.WaitOne(2000);
-                }
-
                 // Ensure that processing has not been stopped before starting processing
-                if (!_stopProcessing.WaitOne(0))
+                if (_stopProcessing != null && !_stopProcessing.WaitOne(0))
                 {
                     // Start processing
                     famProcess.Start();
                 }
 
                 // Wait for stop signal
-                _stopProcessing.WaitOne();
+                if (_stopProcessing != null)
+                {
+                    _stopProcessing.WaitOne();
+                }
 
                 // Check if the process is still running
                 if (SystemMethods.IsProcessRunning(_FAM_PROCESS_NAME, pid) && famProcess.IsRunning)
@@ -429,34 +456,203 @@ namespace Extract.FileActionManager.Utilities
         #region Methods
 
         /// <summary>
+        /// Gets the specified setting from the database.
+        /// </summary>
+        /// <param name="settingName">The setting to retrieve.</param>
+        /// <returns>The string value for the setting.</returns>
+        static string GetSettingFromDatabase(string settingName)
+        {
+            SqlCeConnection dbConnection = null;
+            SqlCeCommand command = null;
+            SqlCeDataReader reader = null;
+            try
+            {
+                string query = "SELECT [Value] FROM Settings WHERE [Name] = '"
+                    + settingName + "'";
+
+                // Connect to the database
+                dbConnection = new SqlCeConnection(_connection);
+                dbConnection.Open();
+                command = new SqlCeCommand(query, dbConnection);
+                reader = command.ExecuteReader();
+
+                string value = "";
+                if (reader.Read())
+                {
+                    value = reader.GetString(0);
+                }
+
+                return value;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29151", ex);
+            }
+            finally
+            {
+                if (reader != null)
+                {
+                    reader.Dispose();
+                }
+                if (command != null)
+                {
+                    command.Dispose();
+                }
+                if (dbConnection != null)
+                {
+                    dbConnection.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the startup sleep time value from the database.
+        /// </summary>
+        /// <returns>The startup sleep time value.</returns>
+        static int GetStartupSleepTime()
+        {
+            try
+            {
+                string time = GetSettingFromDatabase(SleepTimeOnStartupKey);
+                int value = DefaultSleepTimeOnStartup;
+                if (!string.IsNullOrEmpty(time))
+                {
+                    if (!int.TryParse(time, out value))
+                    {
+                        ExtractException ee = new ExtractException("ELI29138",
+                            "Initial sleep time value is not a valid integer value.");
+                        ee.AddDebugData("Initial Sleep Time Value", time, false);
+                        throw ee;
+                    }
+                    else if (value < 0)
+                    {
+                        ExtractException ee = new ExtractException("ELI29140",
+                            "Sleep time must be a positive value.");
+                        ee.AddDebugData("Sleep Time Value", time, false);
+                        throw ee;
+                    }
+                }
+
+                return value;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29141", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of dependent services from the service database.
+        /// </summary>
+        /// <returns>The list of dependent services from the service database.</returns>
+        static List<string> GetDependentServices()
+        {
+            try
+            {
+                string names = GetSettingFromDatabase(DependentServices);
+                Dictionary<string, object> serviceNames = new Dictionary<string,object>();
+                object temp = new object();
+                if (!string.IsNullOrEmpty(names))
+                {
+                    // Tokenize the list by the pipe character
+                    foreach (string service in names.Split(
+                        new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        // Add each unique service name to the collection
+                        string upper = service.ToUpperInvariant().Trim();
+                        if (!serviceNames.ContainsKey(upper))
+                        {
+                            serviceNames.Add(upper, temp);
+                        }
+                    }
+                }
+
+                // Get a list of service names from the collection
+                List<string> services = new List<string>();
+                foreach (string service in serviceNames.Keys)
+                {
+                    services.Add(service);
+                }
+
+                // Return the collection
+                return services;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29145", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="List{T}"/> of <see cref="ServiceController"/>s
+        /// for each dependent service listed in the service database settings table.
+        /// </summary>
+        /// <returns>A collection of <see cref="ServiceController"/>s for the
+        /// dependent services in the service database settings table.</returns>
+        static List<ServiceController> GetDependentServiceControllers()
+        {
+            // Get the list of dependent service names and sort it
+            List<string> dependentServiceNames = GetDependentServices();
+            dependentServiceNames.Sort();
+
+            // Iterate the collection of all services on the machine looking for
+            // the dependent services
+            List<ServiceController> dependentServices = new List<ServiceController>();
+            foreach (ServiceController controller in ServiceController.GetServices())
+            {
+                // Get the index in the list of dependent services for the current service
+                int index =
+                    dependentServiceNames.BinarySearch(controller.ServiceName.ToUpperInvariant());
+                if (index >= 0)
+                {
+                    // If the service was found in the dependency list, add it to the list
+                    // of controllers and remove if from the list of dependentServiceNames
+                    dependentServices.Add(controller);
+                    dependentServiceNames.RemoveAt(index);
+                }
+            }
+
+            // If there are any names left in this collection, they were not found on 
+            // the current system, log an exception with this list.
+            if (dependentServiceNames.Count > 0)
+            {
+                string services =
+                    StringMethods.ConvertArrayToDelimitedList(dependentServiceNames, ",");
+                ExtractException ee = new ExtractException("ELI29146",
+                    "Application Trace: Services not found on current system.");
+                ee.AddDebugData("Services", services, false);
+                ee.Log();
+            }
+
+            // Return the list of ServiceControllers
+            return dependentServices;
+        }
+
+        /// <summary>
         /// Goes to the database and gets the list of FPS files to run.
         /// </summary>
         /// <returns></returns>
         static List<string> GetFPSFilesToRun()
         {
             SqlCeConnection dbConnection = null;
-            SqlCeDataAdapter adapter = null;
-            DataTable data = null;
+            SqlCeCommand command = null;
+            SqlCeDataReader reader = null;
             try
             {
                 List<string> fpsFiles = new List<string>();
 
                 // Connect to the database
                 dbConnection = new SqlCeConnection(_connection);
+                dbConnection.Open();
 
                 // Get a data adapter connected to the FPSFile table
-                adapter = new SqlCeDataAdapter(
+                command = new SqlCeCommand(
                     "SELECT [FileName] FROM [FPSFile] WHERE [AutoStart] = 1", dbConnection);
 
-                // Fill a table from the data adapter
-                data = new DataTable();
-                data.Locale = CultureInfo.InvariantCulture;
-                adapter.Fill(data);
-
-                // Add each enabled FPS file to the list
-                foreach (DataRow row in data.Rows)
+                reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    fpsFiles.Add(row[0].ToString());
+                    fpsFiles.Add(reader.GetString(0));
                 }
 
                 return fpsFiles;
@@ -467,13 +663,13 @@ namespace Extract.FileActionManager.Utilities
             }
             finally
             {
-                if (data != null)
+                if (reader != null)
                 {
-                    data.Dispose();
+                    reader.Dispose();
                 }
-                if (adapter != null)
+                if (command != null)
                 {
-                    adapter.Dispose();
+                    command.Dispose();
                 }
                 if (dbConnection != null)
                 {

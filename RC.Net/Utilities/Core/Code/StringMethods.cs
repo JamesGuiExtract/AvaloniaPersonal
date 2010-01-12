@@ -194,5 +194,40 @@ namespace Extract.Utilities
                 throw ee;
             }
         }
+
+        /// <summary>
+        /// Creates a delimited list using the provided array of strings and delimiter.
+        /// </summary>
+        /// <param name="values">The <see cref="string"/> elements that are to be used to build
+        /// the list.</param>
+        /// <param name="delimiter">The delimeter that should be inserted between each value. Can be
+        /// <see langword="null"/> or empty if all values should be run together.</param>
+        /// <returns>A <see langword="string"/> containing all values from
+        /// <see paramref="values"/></returns>
+        public static string ConvertArrayToDelimitedList(IList<string> values, string delimiter)
+        {
+            try
+            {
+                ExtractException.Assert("ELI29083", "Values array cannot be null.",
+                    values != null);
+
+                StringBuilder result = new StringBuilder();
+                if (values.Count > 0)
+                {
+                    result.Append(values[0]);
+                    for (int i = 1; i < values.Count; i++)
+                    {
+                        result.Append(delimiter);
+                        result.Append(values[i]);
+                    }
+                }
+
+                return result.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29149", ex);
+            }
+        }
     }
 }

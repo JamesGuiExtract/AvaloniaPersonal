@@ -22,7 +22,8 @@ namespace Extract.FileActionManager.Utilities
             // _serviceInstaller
             // 
             this._serviceInstaller.Description = "Manages multiple instances of the Extract Systems FAM for file processing.";
-            this._serviceInstaller.ServiceName = "Extract Systems FAM Service";
+            this._serviceInstaller.DisplayName = "Extract Systems FAM Service";
+            this._serviceInstaller.ServiceName = "ESFAMService";
             // 
             // ProjectInstaller
             // 

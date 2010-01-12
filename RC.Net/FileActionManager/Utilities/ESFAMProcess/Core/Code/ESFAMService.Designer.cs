@@ -23,18 +23,26 @@ namespace Extract.FileActionManager.Utilities
                     components = null;
                 }
 
+                // If the start handle has not been signaled yet, signal it
+                // (this will allow the processing threads to exit so that the
+                // FAMProcess.exe's will be cleaned up)
+                if (_startThreads != null && !_startThreads.WaitOne(0))
+                {
+                    _startThreads.Set();
+                }
+
                 if (_stopProcessing != null)
                 {
                     // Check if processing has been stopped, if not stop it
                     if (!_stopProcessing.WaitOne(0, false))
                     {
                         _stopProcessing.Set();
+                    }
 
-                        if (_threadsStopped != null)
-                        {
-                            // Now wait for each thread to exit (set timeout to an hour)
-                            _threadsStopped.WaitOne(3600000);
-                        }
+                    if (_threadsStopped != null)
+                    {
+                        // Now wait for each thread to exit (set timeout to an hour)
+                        _threadsStopped.WaitOne(3600000);
                     }
 
                     _stopProcessing.Close();
@@ -51,15 +59,10 @@ namespace Extract.FileActionManager.Utilities
                     }
                 }
 
-                if (_dnsStarted != null)
+                if (_startThreads != null)
                 {
-                    _dnsStarted.Close();
-                    _dnsStarted = null;
-                }
-                if (_netLogonStarted != null)
-                {
-                    _netLogonStarted.Close();
-                    _netLogonStarted = null;
+                    _startThreads.Close();
+                    _startThreads = null;
                 }
             }
 

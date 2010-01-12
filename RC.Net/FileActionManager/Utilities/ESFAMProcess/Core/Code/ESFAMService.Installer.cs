@@ -5,7 +5,9 @@ using System.ComponentModel;
 using System.Configuration.Install;
 using System.Data;
 using System.Data.SqlServerCe;
+using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.FileActionManager.Utilities
@@ -16,10 +18,19 @@ namespace Extract.FileActionManager.Utilities
     [RunInstaller(true)]
     public partial class ProjectInstaller : Installer
     {
+        #region Fields
+
+        /// <summary>
+        /// Collection of settings to be added to the database on creation
+        /// </summary>
+        static Dictionary<string, string> _defaultSettings = InitializeDefaultSettings();
+
         /// <summary>
         /// Indicates whether the installer created the database file or not.
         /// </summary>
         bool _installerCreatedDatabase;
+
+        #endregion Fields
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProjectInstaller"/> class.
@@ -50,8 +61,19 @@ namespace Extract.FileActionManager.Utilities
                         _installerCreatedDatabase = true;
                     }
 
-                    // Now add the FPSFile table
-                    AddFPSFileTable();
+                    using (SqlCeConnection connection =
+                        new SqlCeConnection(ESFAMService.DatabaseConnectionString))
+                    {
+                        // If the connection is closed, open it
+                        if (connection.State == ConnectionState.Closed)
+                        {
+                            connection.Open();
+                        }
+
+                        // Now add the FPSFile table
+                        AddFPSFileTable(connection);
+                        AddSettingsTable(connection);
+                    }
                 }
 
                 base.OnAfterInstall(savedState);
@@ -107,46 +129,73 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Adds the FPSFile table to the database.
         /// </summary>
-        static void AddFPSFileTable()
+        static void AddFPSFileTable(SqlCeConnection connection)
         {
-            SqlCeConnection connection = null;
-            SqlCeCommand command = null;
             try
             {
                 // Create the query for table creation
                 string query = "CREATE TABLE FPSFile (AutoStart BIT NOT NULL, "
                     + "FileName NVARCHAR(512) NOT NULL)";
 
-                // Create the database connection
-                connection = new SqlCeConnection(ESFAMService.DatabaseConnectionString);
-
-                // If the connection is closed, open it
-                if (connection.State == ConnectionState.Closed)
-                {
-                    connection.Open();
-                }
-
                 // Create the command to perform the table creation
-                command = new SqlCeCommand(query, connection);
-
-                // Create the table
-                command.ExecuteNonQuery();
+                using (SqlCeCommand command = new SqlCeCommand(query, connection))
+                {
+                    // Create the table
+                    command.ExecuteNonQuery();
+                }
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28491", ex);
             }
-            finally
+        }
+
+        /// <summary>
+        /// Adds the settings table to the database with default setting values
+        /// </summary>
+        static void AddSettingsTable(SqlCeConnection connection)
+        {
+            try
             {
-                if (command != null)
+                // Create the query for table creation
+                string query = "CREATE TABLE Settings (Name NVARCHAR(100) NOT NULL, "
+                    + "Value NVARCHAR(512))";
+                // Create the command to perform the table creation
+                using (SqlCeCommand command = new SqlCeCommand(query, connection))
                 {
-                    command.Dispose();
+                    // Create the table
+                    command.ExecuteNonQuery();
                 }
-                if (connection != null)
+                foreach (KeyValuePair<string, string> setting in _defaultSettings)
                 {
-                    connection.Dispose();
+                    query = "INSERT INTO Settings (Name, Value) VALUES('"
+                        + setting.Key + "', '" + setting.Value + "')";
+                    using (SqlCeCommand command = new SqlCeCommand(query, connection))
+                    {
+                        // Insert the value
+                        command.ExecuteNonQuery();
+                    }
                 }
+
             }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29137", ex);
+            }
+        }
+
+        /// <summary>
+        /// Initializes the default settings dictionary
+        /// </summary>
+        /// <returns></returns>
+        static Dictionary<string, string> InitializeDefaultSettings()
+        {
+            Dictionary<string, string> defaultSettings = new Dictionary<string, string>();
+            defaultSettings.Add(ESFAMService.SleepTimeOnStartupKey,
+                ESFAMService.DefaultSleepTimeOnStartup.ToString(CultureInfo.InvariantCulture));
+            defaultSettings.Add(ESFAMService.DependentServices, "");
+
+            return defaultSettings;
         }
     }
 }
