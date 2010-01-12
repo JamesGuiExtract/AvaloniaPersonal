@@ -1,6 +1,7 @@
 
 #include "stdafx.h"
 #include "SetActionStatusFileProcessor.h"
+#include "FileProcessorsUtils.h"
 
 #include <UCLIDException.h>
 #include <COMUtils.h>
@@ -95,7 +96,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::put_ActionName(BSTR bstrNewVal)
 		validateLicense();
 
 		// verify validity of action name
-		std::string strNewVal = asString(bstrNewVal);
+		string strNewVal = asString(bstrNewVal);
 		if (strNewVal.empty())
 		{
 			UCLIDException ue("ELI15135", "Action name cannot be empty!");
@@ -193,8 +194,18 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(BSTR bstrFileFullNam
 		IFileProcessingDBPtr ipDB(pDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI15146", ipDB != NULL);
 
+		IFAMTagManagerPtr ipTagManager(pTagManager);
+		ASSERT_RESOURCE_ALLOCATION("ELI29126", ipTagManager != NULL);
+
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
+
+		// Expand action name
+		string strActionName = CFileProcessorsUtils::ExpandTagsAndTFE(ipTagManager, 
+			m_strActionName, asString(bstrFileFullName));
+
+		// Auto create if necessary
+		ipDB->AutoCreateAction(strActionName.c_str());
 
 		EActionStatus ePrevStatus = kActionUnattempted;
 
@@ -204,22 +215,23 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(BSTR bstrFileFullNam
 			// Call AddFile() to set the new status.  This will force the status to 
 			// the new status unless the status is processing
 			VARIANT_BOOL bAlreadyExists = VARIANT_FALSE;
-			ipDB->AddFile(bstrFileFullName, m_strActionName.c_str(), kPriorityDefault,
+			ipDB->AddFile(bstrFileFullName, strActionName.c_str(), kPriorityDefault,
 				VARIANT_TRUE, VARIANT_FALSE, m_eActionStatus, &bAlreadyExists, &ePrevStatus);
 		}
 		else
 		{
 			// Ensure the file is not in processing
-			if (ipDB->GetFileStatus(nFileID, m_strActionName.c_str())
+			if (ipDB->GetFileStatus(nFileID, strActionName.c_str())
 				!= kActionProcessing)
 			{
-				ipDB->SetStatusForFile(nFileID, m_strActionName.c_str(), m_eActionStatus,
+				ipDB->SetStatusForFile(nFileID, strActionName.c_str(), m_eActionStatus,
 					&ePrevStatus);
 			}
 			else
 			{
 				UCLIDException uex("ELI24025", "Cannot change status from Processing");
 				uex.addDebugInfo("Action Name", m_strActionName);
+				uex.addDebugInfo("Expanded Action Name", strActionName);
 				uex.addDebugInfo("Status Value", m_eActionStatus);
 
 				// Try to add the status as a string
