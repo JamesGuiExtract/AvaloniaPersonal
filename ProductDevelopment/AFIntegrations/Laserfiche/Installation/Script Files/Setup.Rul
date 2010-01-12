@@ -104,7 +104,7 @@ begin
     // Register Dlls
 	szRegAllCmdLine = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "\\CommonComponents\\RegisterAll.bat\"";
 	
-	LaunchAppAndWait( szRegAllCmdLine, "", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+	LaunchAppAndWait( szRegAllCmdLine, "/s", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
     
     szCmd = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "\\CommonComponents\\ESLaserficheService.exe\"";
 	LaunchAppAndWait( INSTALL_UTIL_PATH , szCmd, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );

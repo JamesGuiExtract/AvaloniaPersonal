@@ -145,7 +145,7 @@ begin
 	    // Register Dlls
 		szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
 		szCmd = "cmd";
-		LaunchAppAndWait( szRegAllCmdLine, "", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+		LaunchAppAndWait( szRegAllCmdLine, "/s", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
     	RegisterDataEntryApp();   
 		
 		// Install the ESFAMService.exe 
