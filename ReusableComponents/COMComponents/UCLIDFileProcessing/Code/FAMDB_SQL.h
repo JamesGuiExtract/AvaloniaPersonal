@@ -267,7 +267,9 @@ static const string gstrADD_QUEUE_EVENT_FAM_USER_FK =
 static const string gstrADD_QUEUE_EVENT_ACTION_FK =
 	"ALTER TABLE [QueueEvent] "
 	"WITH CHECK ADD CONSTRAINT [FK_QueueEvent_Action] FOREIGN KEY([ActionID]) "
-	"REFERENCES [Action] ([ID])";
+	"REFERENCES [Action] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
 
 static const string gstrADD_FILE_ACTION_COMMENT_FAM_FILE_FK =
 	"ALTER TABLE [FileActionComment] "
