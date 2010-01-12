@@ -1010,6 +1010,12 @@ library UCLID_FILEPROCESSINGLib
 		// file processing starts.
 		[id(89), helpstring("method GetAutoCreateActions")] HRESULT GetAutoCreateActions(
 			[out, retval] VARIANT_BOOL* pvbValue);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: If the action exists in the database, does nothing; if the action does not 
+		// exist and the AutoCreateActions setting is on, creates the action; if the action does 
+		// not exist and the AutoCreateActions setting is off, throws an exception.
+		[id(90), helpstring("method AutoCreateAction")] HRESULT AutoCreateAction(
+			[in] BSTR bstrActionName);
 	};
 
 	[

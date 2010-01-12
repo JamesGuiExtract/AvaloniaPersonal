@@ -18,10 +18,7 @@
 #include <vector>
 
 using namespace std;
-
-#if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
-#error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
-#endif
+using namespace ADODB;
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -92,40 +89,44 @@ public:
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 	// IFileProcessingDB Methods
-	STDMETHOD(DefineNewAction)( BSTR strAction,  long * pnID);
-	STDMETHOD(DeleteAction)( BSTR strAction);
-	STDMETHOD(GetActions)( IStrToStrMap * * pmapActionNameToID);
-	STDMETHOD(AddFile)( BSTR strFile,  BSTR strAction, EFilePriority ePriority,
+	STDMETHOD(DefineNewAction)(BSTR strAction, long* pnID);
+	STDMETHOD(DeleteAction)(BSTR strAction);
+	STDMETHOD(GetActions)(IStrToStrMap** pmapActionNameToID);
+	STDMETHOD(AddFile)(BSTR strFile, BSTR strAction, EFilePriority ePriority,
 		VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified, EActionStatus eNewStatus, 
-		VARIANT_BOOL * pbAlreadyExists, EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord);
-	STDMETHOD(RemoveFile)( BSTR strFile, BSTR strAction );
-	STDMETHOD(RemoveFolder)( BSTR strFolder, BSTR strAction );
-	STDMETHOD(NotifyFileProcessed)( long nFileID,  BSTR strAction);
-	STDMETHOD(NotifyFileFailed)( long nFileID,  BSTR strAction,  BSTR strException);
-	STDMETHOD(SetFileStatusToPending)( long nFileID,  BSTR strAction);
-	STDMETHOD(SetFileStatusToUnattempted)( long nFileID,  BSTR strAction);
-	STDMETHOD(SetFileStatusToSkipped)(long nFileID, BSTR strAction, VARIANT_BOOL bRemovePreviousSkipped);
-	STDMETHOD(GetFileStatus)( long nFileID,  BSTR strAction,  EActionStatus * pStatus);
-	STDMETHOD(SearchAndModifyFileStatus)( long nWhereActionID,  EActionStatus eWhereStatus,  
+		VARIANT_BOOL* pbAlreadyExists, EActionStatus* pPrevStatus, IFileRecord** ppFileRecord);
+	STDMETHOD(RemoveFile)(BSTR strFile, BSTR strAction);
+	STDMETHOD(RemoveFolder)(BSTR strFolder, BSTR strAction);
+	STDMETHOD(NotifyFileProcessed)(long nFileID, BSTR strAction);
+	STDMETHOD(NotifyFileFailed)(long nFileID, BSTR strAction, BSTR strException);
+	STDMETHOD(SetFileStatusToPending)(long nFileID, BSTR strAction);
+	STDMETHOD(SetFileStatusToUnattempted)(long nFileID, BSTR strAction);
+	STDMETHOD(SetFileStatusToSkipped)(long nFileID, BSTR strAction, 
+		VARIANT_BOOL bRemovePreviousSkipped);
+	STDMETHOD(GetFileStatus)(long nFileID, BSTR strAction, EActionStatus* pStatus);
+	STDMETHOD(SearchAndModifyFileStatus)(long nWhereActionID, EActionStatus eWhereStatus, 
 		long nToActionID, EActionStatus eToStatus, BSTR bstrSkippedFromUserName, long nFromActionID,
-		long * pnNumRecordsModified);
-	STDMETHOD(SetStatusForAllFiles)( BSTR strAction,  EActionStatus eStatus);
-	STDMETHOD(SetStatusForFile)( long nID,  BSTR strAction,  EActionStatus eStatus,  EActionStatus * poldStatus);
-	STDMETHOD(GetFilesToProcess)( BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
-		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
-	STDMETHOD(GetStats)(/*[in]*/ long nActionID, /*[out, retval]*/ IActionStatistics* *pStats);
+		long* pnNumRecordsModified);
+	STDMETHOD(SetStatusForAllFiles)(BSTR strAction, EActionStatus eStatus);
+	STDMETHOD(SetStatusForFile)(long nID, BSTR strAction, EActionStatus eStatus, 
+		EActionStatus* poldStatus);
+	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
+		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
+	STDMETHOD(GetStats)(long nActionID, IActionStatistics** pStats);
 	STDMETHOD(Clear)();
-	STDMETHOD(CopyActionStatusFromAction)( /*[in]*/ long  nFromAction, /*[in]*/ long nToAction );
-	STDMETHOD(RenameAction)(/*[in]*/ long  nActionID, /*[in]*/ BSTR strNewActionName );
+	STDMETHOD(CopyActionStatusFromAction)(long  nFromAction, long nToAction);
+	STDMETHOD(RenameAction)(long  nActionID, BSTR strNewActionName);
 	STDMETHOD(ExportFileList)(BSTR strQuery, BSTR strOutputFileName,
-		IRandomMathCondition* pRandomCondition,long *pnNumRecordsOutput);
+		IRandomMathCondition* pRandomCondition,long* pnNumRecordsOutput);
 	STDMETHOD(ResetDBLock)(void);
-	STDMETHOD(GetActionID)(/*[in]*/ BSTR bstrActionName, /*[out, retval]*/ long* pnActionID);
+	STDMETHOD(GetActionID)(BSTR bstrActionName, long* pnActionID);
 	STDMETHOD(ResetDBConnection)(void);
 	STDMETHOD(SetNotificationUIWndHandle)(long nHandle);
-	STDMETHOD(ShowLogin)(VARIANT_BOOL bShowAdmin, VARIANT_BOOL* pbLoginCancelled, VARIANT_BOOL* pbLoginValid);
+	STDMETHOD(ShowLogin)(VARIANT_BOOL bShowAdmin, VARIANT_BOOL* pbLoginCancelled, 
+		VARIANT_BOOL* pbLoginValid);
 	STDMETHOD(get_DBSchemaVersion)(LONG* pVal);
-	STDMETHOD(ChangeLogin)(VARIANT_BOOL bChangeAdmin, VARIANT_BOOL* pbChangeCancelled, VARIANT_BOOL* pbChangeValid);
+	STDMETHOD(ChangeLogin)(VARIANT_BOOL bChangeAdmin, VARIANT_BOOL* pbChangeCancelled, 
+		VARIANT_BOOL* pbChangeValid);
 	STDMETHOD(GetCurrentConnectionStatus)(BSTR* pVal);
 	STDMETHOD(get_DatabaseServer)(BSTR* pVal);
 	STDMETHOD(put_DatabaseServer)(BSTR newVal);
@@ -133,13 +134,13 @@ public:
 	STDMETHOD(put_DatabaseName)(BSTR newVal);
 	STDMETHOD(CreateNewDB)(BSTR bstrNewDBName);
 	STDMETHOD(ConnectLastUsedDBThisProcess)();
-	STDMETHOD(SetDBInfoSetting)(BSTR bstrSettingName, BSTR bstrSettingValue );
-	STDMETHOD(GetDBInfoSetting)(BSTR bstrSettingName, BSTR* pbstrSettingValue );
+	STDMETHOD(SetDBInfoSetting)(BSTR bstrSettingName, BSTR bstrSettingValue);
+	STDMETHOD(GetDBInfoSetting)(BSTR bstrSettingName, BSTR* pbstrSettingValue);
 	STDMETHOD(LockDB)();
 	STDMETHOD(UnlockDB)();
 	STDMETHOD(GetResultsForQuery)(BSTR bstrQuery, _Recordset** ppVal);
-	STDMETHOD(AsStatusString)(EActionStatus eaStatus, BSTR *pbstrStatusString);
-	STDMETHOD(AsEActionStatus)(BSTR bstrStatus, EActionStatus *peaStatus);
+	STDMETHOD(AsStatusString)(EActionStatus eaStatus, BSTR* pbstrStatusString);
+	STDMETHOD(AsEActionStatus)(BSTR bstrStatus, EActionStatus* peaStatus);
 	STDMETHOD(GetFileID)(BSTR bstrFileName, long* pnFileID);
 	STDMETHOD(GetActionName)(long nActionID, BSTR* pbstrActionName);
 	STDMETHOD(NotifyFileSkipped)(long nFileID, long nActionID);
@@ -185,22 +186,23 @@ public:
 	STDMETHOD(RecordFAMSessionStop)();
 	STDMETHOD(RecordInputEvent)(BSTR bstrTimeStamp, long nActionID, long nEventCount,
 		long nProcessID); 
-	STDMETHOD(GetLoginUsers)(IStrToStrMap**  ppUsers);
+	STDMETHOD(GetLoginUsers)(IStrToStrMap** ppUsers);
 	STDMETHOD(AddLoginUser)(BSTR bstrUserName);
 	STDMETHOD(RemoveLoginUser)(BSTR bstrUserName);
 	STDMETHOD(RenameLoginUser)(BSTR bstrUserNameToRename, BSTR bstrNewUserName);	
 	STDMETHOD(ClearLoginUserPassword)(BSTR bstrUserName);
 	STDMETHOD(GetAutoCreateActions)(VARIANT_BOOL* pvbValue);
+	STDMETHOD(AutoCreateAction)(BSTR bstrActionName);
 
 // ILicensedComponent Methods
-	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
+	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
 
 private:
 	friend class DBLockGuard;
 	// Variables
 
 	// Map that contains the open connection for each thread.
-	map<DWORD, ADODB::_ConnectionPtr> m_mapThreadIDtoDBConnections;
+	map<DWORD, _ConnectionPtr> m_mapThreadIDtoDBConnections;
 
 	// Mutex is locked only inside of the get connection method
 	CMutex m_mutex;
@@ -304,24 +306,24 @@ private:
 	//-------------------------------------------------------------------------------------------------
 	
 	// PROMISE: returns a pointer to a new FileRecord object filled from ipFields
-	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecordFromFields(const ADODB::FieldsPtr& ipFields);
+	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecordFromFields(const FieldsPtr& ipFields);
 
 	// PROMISE: To transfer the data from the ipFileRecord object to the appropriate Field in ipFields
 	// NOTE: This does not set the ID field from the ipFileRecord.
-	void setFieldsFromFileRecord(const ADODB::FieldsPtr& ipFields,
+	void setFieldsFromFileRecord(const FieldsPtr& ipFields,
 		const UCLID_FILEPROCESSINGLib::IFileRecordPtr& ipFileRecord, bool bSetPriority = true);
 	
 	// PROMISE:	To return the EActionStatus code for the string 
-	//			representation( "U", "P", "R", "F", or "C" ) given
-	EActionStatus asEActionStatus ( const string& strStatus );
+	//			representation("U", "P", "R", "F", or "C") given
+	EActionStatus asEActionStatus (const string& strStatus);
 
 	// PROMISE:	To return the string representation of the given EActionStatus
-	string asStatusString ( EActionStatus eStatus );
+	string asStatusString (EActionStatus eStatus);
 
 	// PROMISE:	To add a single record to the QueueEvent table in the database with the given data
 	//			using the connection provided
-	void addQueueEventRecord( ADODB::_ConnectionPtr ipConnection, long nFileID, long nActionID,
-		string strFileName, string strQueueEventCode );
+	void addQueueEventRecord(_ConnectionPtr ipConnection, long nFileID, long nActionID,
+		string strFileName, string strQueueEventCode);
 
 	// PROMISE: To add a single record to the FileActionStateTransition table with the given data
 	// ARGS:	ipConnection	- Connection object to use to update the tables
@@ -331,9 +333,9 @@ private:
 	//			strToState		- The new state for the action
 	//			strException	- Contains the exception string if this transitioning to a failed state
 	//			strComment		- Comment for the added records
-	void addFileActionStateTransition ( ADODB::_ConnectionPtr ipConnection, long nFileID, 
+	void addFileActionStateTransition (_ConnectionPtr ipConnection, long nFileID, 
 		long nActionID, const string &strFromState, const string &strToState, 
-		const string &strException, const string &strComment );
+		const string &strException, const string &strComment);
 
 	// PROMISE:	To add multiple ActionStateTransition table records that are represented be the given data.
 	// ARGS:	ipConnection	- Connection object to use to update the tables
@@ -346,23 +348,32 @@ private:
 	//							  be used so that only one current action state is selected
 	//			strTopClause	- Top clause to specifiy the number of records that meet the where clause condition that should
 	//							  have records added to the ActionStateTransition table
-	void addASTransFromSelect ( ADODB::_ConnectionPtr ipConnection, const string &strAction,
+	void addASTransFromSelect (_ConnectionPtr ipConnection, const string &strAction,
 		long nActionID, const string &strToState, const string &strException, const string &strComment, 
-		const string &strWhereClause, const string &strTopClause );
+		const string &strWhereClause, const string &strTopClause);
 
 	// PROMISE:	To return the ID from the Action table from the given Action Name and modify strActionName to match
 	//			the action name stored in the database using the connection object provided.
-	long getActionID( ADODB::_ConnectionPtr ipConnection, string& rstrActionName );
+	long getActionID(_ConnectionPtr ipConnection, string& rstrActionName);
 
 	// PROMISE: To return the Action name for the given ID using the connection object provided;
-	string getActionName(ADODB::_ConnectionPtr ipConnection, long nActionID);
+	string getActionName(_ConnectionPtr ipConnection, long nActionID);
+
+	// PROMISE: To return a record set containing the action with the specified name. The record 
+	// set will be empty if no such action exists.
+	_RecordsetPtr getActionSet(_ConnectionPtr ipConnection, const string &strAction);
+
+	// PROMISE: Adds an action with the specified name to the specified record set. Returns 
+	// the action ID of the newly created action.
+	long addActionToRecordset(_ConnectionPtr ipConnection, _RecordsetPtr ipRecordset, 
+		const string &strAction);
 
 	// PROMISE: To return the ID from the FAMFile table for the given File name and
 	// modify strFileName to match the file name stored in the database using the connection provided.
-	long getFileID(ADODB::_ConnectionPtr ipConnection, string& rstrFileName);
+	long getFileID(_ConnectionPtr ipConnection, string& rstrFileName);
 
 	// PROMISE: To return the m_ipDBConnection opened database connection for the current thread.
-	ADODB::_ConnectionPtr getDBConnection();
+	_ConnectionPtr getDBConnection();
 
 	// PROMISE: To close the database connection on the current thread, if it is open currently
 	void closeDBConnection();
@@ -377,13 +388,13 @@ private:
 	//			will be updated for the file with the information for the current user and process.
 	//			If bRemovePreviousSkipped is false and strState == "S" the UPIID will be updated,
 	//			but all other skipped file fields will be unmodified.
-	EActionStatus setFileActionState( ADODB::_ConnectionPtr ipConnection, long nFileID,
+	EActionStatus setFileActionState(_ConnectionPtr ipConnection, long nFileID,
 		string strAction, const string& strState, const string& strException,
 		long nActionID = -1, bool bLockDB = true, bool bRemovePreviousSkipped = false, 
 		const string& strFASTComment = "");
 
 	// PROMISE: Recalculates the statistics for the given Action ID using the connection provided.
-	void reCalculateStats( ADODB::_ConnectionPtr ipConnection, long nActionID );
+	void reCalculateStats(_ConnectionPtr ipConnection, long nActionID);
 
 	// PROMISE:	To drop all tables in the database
 	// NOTE:	If the operation is to be transactional the BeginTransaction should be done before calling
@@ -400,7 +411,7 @@ private:
 	// PROMISE: To copy the status from the strFrom action to the strTo action
 	//			if bAddTransRecords is true records will be added to the transition table
 	//			using the connection provided.
-	void copyActionStatus( const _ConnectionPtr& ipConnection, const string& strFrom, 
+	void copyActionStatus(const _ConnectionPtr& ipConnection, const string& strFrom, 
 		string strTo, bool bAddTransRecords, long nToActionID = -1);
 
 	// PROMISE:	To add action related columns and indexes to the FPMFile table
@@ -414,7 +425,7 @@ private:
 	//			the FileSize and Pages from the ipOldRecord are subtracted from the eFromStatus stats
 	//			Only time a ipNewRecord can be NULL is if the to status is kActionUnattempted
 	//			Only time a ipOldRecord can be NULL is if the from status is kActionUnattempted
-	void updateStats( ADODB::_ConnectionPtr ipConnection, long nActionID, EActionStatus eFromStatus, 
+	void updateStats(_ConnectionPtr ipConnection, long nActionID, EActionStatus eFromStatus, 
 		EActionStatus eToStatus, UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewRecord, 
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord);
 					
@@ -423,19 +434,19 @@ private:
 	//			if a record does not exist one is created by running recalculate stats
 	//			the record will be placed in the m_mapActionIDtoStats
 	//			if recalculate is called this returns true
-	bool loadStats( ADODB::_ConnectionPtr ipConnection, long nActionID );
+	bool loadStats(_ConnectionPtr ipConnection, long nActionID);
 
 	// PROMISE: To save the current stats record to that db ActionStatistics table
-	void saveStats( ADODB::_ConnectionPtr ipConnection, long nActionID );
+	void saveStats(_ConnectionPtr ipConnection, long nActionID);
 
 	// Returns the DBSchemaVersion
 	int getDBSchemaVersion();
 
 	// Locks the db for use using the connection provided.
-	void lockDB( ADODB::_ConnectionPtr ipConnection );
+	void lockDB(_ConnectionPtr ipConnection);
 	
 	// unlocks db using the connection provided.
-	void unlockDB(ADODB::_ConnectionPtr ipConnection );
+	void unlockDB(_ConnectionPtr ipConnection);
 
 	// Looks up the current username in the Login table if bUseAdmin is false
 	// and looks up the admin username if bUseAdmin is true
@@ -473,16 +484,16 @@ private:
 
 	// If m_lMachineID == 0 will lookup m_strMachineName in the machine table and add it if it is not there
 	// If m_lMachineID != 0 will return the value of m_lMachineID
-	long getMachineID(ADODB::_ConnectionPtr ipConnection);
+	long getMachineID(_ConnectionPtr ipConnection);
 
 	// If m_lFAMUserID == 0 will lookup m_strMachineUserName in the FAMUser table and add it if it is not there
 	// If m_lFAMUserID != 0 will return the value of m_lFAMUserID;
-	long getFAMUserID(ADODB::_ConnectionPtr ipConnection);
+	long getFAMUserID(_ConnectionPtr ipConnection);
 
 	// Loads settings from the DBInfo table if any exceptions are thrown while
 	// obtaining the settings the exception will be logged. 
 	// so that this function will always return	
-	void loadDBInfoSettings(ADODB::_ConnectionPtr ipConnection);
+	void loadDBInfoSettings(_ConnectionPtr ipConnection);
 
 	// Returns the running apps main window handle if can't get the main window returns NULL;
 	HWND getAppMainWndHandle();
@@ -497,7 +508,7 @@ private:
 	void addProductSpecificDB();
 
 	// Try's to read the sql server time using the provided connection and if it fails returns false
-	bool isConnectionAlive(ADODB::_ConnectionPtr ipConnection);
+	bool isConnectionAlive(_ConnectionPtr ipConnection);
 
 	// Recreates the connection for the current thread. If there is no connection object for 
 	// the current thread it will be created using the getDBConnection method. If the creation of
@@ -507,10 +518,10 @@ private:
 	bool reConnectDatabase();
 
 	// Adds a record to the skipped file table
-	void addSkipFileRecord(const ADODB::_ConnectionPtr& ipConnection, long nFileID, long nActionID);
+	void addSkipFileRecord(const _ConnectionPtr& ipConnection, long nFileID, long nActionID);
 
 	// Removes a record from the skipped file table
-	void removeSkipFileRecord(const ADODB::_ConnectionPtr& ipConnection, long nFileID,
+	void removeSkipFileRecord(const _ConnectionPtr& ipConnection, long nFileID,
 		long nActionID);
 
 	// Internal reset DB connection function
@@ -522,7 +533,7 @@ private:
 	// Fills a vector with the FileIDs of files skipped by a specific user (or skipped by
 	// all users if strUserName is "")
 	void getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, long nActionID,
-		string strUserName, const ADODB::_ConnectionPtr& ipConnection);
+		string strUserName, const _ConnectionPtr& ipConnection);
 
 	// Clears the file action comment for the specified fileID and actionID pair.  If
 	// nActionID == -1 will clear comments for the specified file for all actions.
@@ -547,14 +558,14 @@ private:
 	// Reverts file in the LockedFile table to the previous status if the current
 	// status is still processing.
 	void revertLockedFilesToPreviousState(const _ConnectionPtr& ipConnection, long nUPIID,
-		const string& strFASTComment = "", UCLIDException *pUE = NULL);
+		const string& strFASTComment = "", UCLIDException* pUE = NULL);
 
 	// Method checks for timed out FAM's and reverts file status for ones that are found.
-	void revertTimedOutProcessingFAMs( const _ConnectionPtr& ipConnection);
+	void revertTimedOutProcessingFAMs(const _ConnectionPtr& ipConnection);
 
 	// Thread function that maintains the LastPingtime in the ProcessingFAM table in
 	// the database pData should be a pointer to the database object
-	static UINT maintainLastPingTimeForRevert(void *pData);
+	static UINT maintainLastPingTimeForRevert(void* pData);
 
 	// Method updates the ProcessingFAM LastPingTime for the currently registered FAM
 	void pingDB();
@@ -581,7 +592,7 @@ private:
 
 	// Thread function to email message, pData should be allocated with new and be a pointer to
 	// emailThreadData
-	static UINT emailMessageThread(void *pData);
+	static UINT emailMessageThread(void* pData);
 
 	void validateLicense();
 };

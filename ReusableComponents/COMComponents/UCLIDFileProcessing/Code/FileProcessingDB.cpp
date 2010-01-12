@@ -45,7 +45,7 @@ using namespace ADODB;
 		bool bRetrySuccess = false; \
 		do \
 		{ \
-			CSingleLock retryLock(&m_mutex, TRUE ); \
+			CSingleLock retryLock(&m_mutex, TRUE); \
 			try \
 			{\
 				try\
@@ -182,7 +182,7 @@ STDMETHODIMP CFileProcessingDB::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::DefineNewAction( BSTR strAction,  long * pnID)
+STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction,  long * pnID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -210,42 +210,23 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction( BSTR strAction,  long * pnID)
 		// Begin a trasaction
 		TransactionGuard tg(ipConnection);
 
-		// Create a pointer to a recordset
-		_RecordsetPtr ipActionSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI13517", ipActionSet != NULL );
-
-		// Setup select statement to open Action Table
-		string strActionSelect = "Select ASCName From Action Where ASCName = '" + strActionName + "'";
-
-		// Open the Action table in the database
-		ipActionSet->Open( strActionSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+		// Create a pointer to a recordset containing the action
+		_RecordsetPtr ipActionSet = getActionSet(ipConnection, strActionName);
+		ASSERT_RESOURCE_ALLOCATION("ELI13517", ipActionSet != NULL);
 
 		// Check to see if action exists
-		if ( ipActionSet->adoEOF == VARIANT_FALSE )
+		if (ipActionSet->adoEOF == VARIANT_FALSE)
 		{
 			// Build error string (P13 #3931)
 			CString zText;
-			zText.Format( "The action '%s' already exists, and therefore cannot be added again.", 
-				strActionName.c_str() );
-			UCLIDException ue("ELI13946", zText.operator LPCTSTR());
+			zText.Format("The action '%s' already exists, and therefore cannot be added again.", 
+				strActionName.c_str());
+			UCLIDException ue("ELI13946", LPCTSTR(zText));
 			throw ue;
 		}
 
-		// Add a new record
-		ipActionSet->AddNew();
-
-		// Set the values of the ASCName field
-		setStringField(ipActionSet->Fields,"ASCName", strActionName);
-
-		// Add the record to the Action Table
-		ipActionSet->Update();
-
-		// Get and return the ID of the new Action
-		*pnID = getLastTableID(ipConnection, "Action");
-
-		// Add column to the FAMFile table
-		addActionColumn(ipConnection, strActionName);
+		// Create a new action and return its ID
+		*pnID = addActionToRecordset(ipConnection, ipActionSet, strActionName);
 
 		// Commit this transaction
 		tg.CommitTrans();
@@ -257,7 +238,7 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction( BSTR strAction,  long * pnID)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::DeleteAction( BSTR strAction)
+STDMETHODIMP CFileProcessingDB::DeleteAction(BSTR strAction)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -283,12 +264,12 @@ STDMETHODIMP CFileProcessingDB::DeleteAction( BSTR strAction)
 		validateDBSchemaVersion();
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipActionSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI13528", ipActionSet != NULL );
+		_RecordsetPtr ipActionSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI13528", ipActionSet != NULL);
 
 		// Open the Action table
-		ipActionSet->Open( "Action", _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdTableDirect );
+		ipActionSet->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdTableDirect);
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
@@ -300,13 +281,13 @@ STDMETHODIMP CFileProcessingDB::DeleteAction( BSTR strAction)
 		ipActionSet->Find(strFind.c_str(), 0, adSearchForward);
 
 		// if action was found
-		if ( ipActionSet->adoEOF == VARIANT_FALSE )
+		if (ipActionSet->adoEOF == VARIANT_FALSE)
 		{
 			// Get the action name from the database
 			strActionName = getStringField(ipActionSet->Fields, "ASCName");
 
 			// Delete the record 
-			ipActionSet->Delete( adAffectCurrent );
+			ipActionSet->Delete(adAffectCurrent);
 
 			// Remove column from FAMFile
 			removeActionColumn(ipConnection, strActionName);
@@ -321,7 +302,7 @@ STDMETHODIMP CFileProcessingDB::DeleteAction( BSTR strAction)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetActions( IStrToStrMap * * pmapActionNameToID)
+STDMETHODIMP CFileProcessingDB::GetActions(IStrToStrMap * * pmapActionNameToID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -345,19 +326,19 @@ STDMETHODIMP CFileProcessingDB::GetActions( IStrToStrMap * * pmapActionNameToID)
 		validateDBSchemaVersion();
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipActionSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI13530", ipActionSet != NULL );
+		_RecordsetPtr ipActionSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI13530", ipActionSet != NULL);
 
 		// Open the Action table
-		ipActionSet->Open( "Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockReadOnly, adCmdTableDirect );
+		ipActionSet->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockReadOnly, adCmdTableDirect);
 
 		// Create StrToStrMap to return the list of actions
-		IStrToStrMapPtr ipActions( CLSID_StrToStrMap );
-		ASSERT_RESOURCE_ALLOCATION("ELI13529", ipActions != NULL );
+		IStrToStrMapPtr ipActions(CLSID_StrToStrMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI13529", ipActions != NULL);
 
 		// Step through all records
-		while ( ipActionSet->adoEOF == VARIANT_FALSE )
+		while (ipActionSet->adoEOF == VARIANT_FALSE)
 		{
 			// Get the fields from the action set
 			FieldsPtr ipFields = ipActionSet->Fields;
@@ -371,7 +352,7 @@ STDMETHODIMP CFileProcessingDB::GetActions( IStrToStrMap * * pmapActionNameToID)
 			string strID = asString(lID);
 
 			// Put the values in the StrToStrMap
-			ipActions->Set( strActionName.c_str(), strID.c_str() );
+			ipActions->Set(strActionName.c_str(), strID.c_str());
 
 			// Move to the next record in the table
 			ipActionSet->MoveNext();
@@ -387,7 +368,7 @@ STDMETHODIMP CFileProcessingDB::GetActions( IStrToStrMap * * pmapActionNameToID)
 
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePriority ePriority,
+STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePriority ePriority,
 										VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified,
 										EActionStatus eNewStatus, VARIANT_BOOL * pbAlreadyExists,
 										EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord)
@@ -419,19 +400,19 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 		
 		// Replace any occurences of ' with '' this is because SQL Server use the ' to indicate the beginning and end of a string
 		string strFileName = asString(strFile);
-		replaceVariable(strFileName, "'", "''" );
+		replaceVariable(strFileName, "'", "''");
 
-		// Open a recordset that contain only the record (if it exists ) with the given filename
+		// Open a recordset that contain only the record (if it exists) with the given filename
 		string strFileSQL = "SELECT * FROM FAMFile WHERE FileName = '" + strFileName + "'";
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipFileSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI13535", ipFileSet != NULL );
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI13535", ipFileSet != NULL);
 
 		_lastCodePos = "20";
 
-		ipFileSet->Open( strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText);
 
 		_lastCodePos = "30";
 
@@ -440,7 +421,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 
 		// Create the file record to return
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewFileRecord(CLSID_FileRecord);
-		ASSERT_RESOURCE_ALLOCATION("ELI14203", ipNewFileRecord != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI14203", ipNewFileRecord != NULL);
 
 		// Initialize the id
 		long nID = 0;
@@ -463,7 +444,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 		// [LRCAU #5157] - getSizeOfFile performs a wait for file access call, no need
 		// to perform an additional call here.
 		long long llFileSize;
-		llFileSize = (long long )getSizeOfFile( strFileName );
+		llFileSize = (long long)getSizeOfFile(strFileName);
 
 		// get the file type
 		EFileType efType = getFileType(strFileName);
@@ -502,7 +483,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 		string strNewStatus = asStatusString(eNewStatus);
 
 		// If no records were returned a new record should be added to the FAMFile
-		if ( ipFileSet->BOF == VARIANT_TRUE )
+		if (ipFileSet->BOF == VARIANT_TRUE)
 		{
 			// The filename is not in the table
 			*pbAlreadyExists = VARIANT_FALSE;
@@ -522,7 +503,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 				ePriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long) ePriority);
 
 			// set the initial Action state to pending
-			setStringField( ipFields, strActionCol, strNewStatus );
+			setStringField(ipFields, strActionCol, strNewStatus);
 
 			_lastCodePos = "60";
 
@@ -532,7 +513,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 			_lastCodePos = "70";
 
 			// get the new records ID to return
-			nID = getLastTableID( ipConnection, "FAMFile" );
+			nID = getLastTableID(ipConnection, "FAMFile");
 
 			// return the previous state as Unattempted
 			*pPrevStatus = kActionUnattempted;
@@ -540,7 +521,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 			_lastCodePos = "80";
 
 			// update the statistics
-			updateStats( ipConnection, nActionID, *pPrevStatus, eNewStatus, ipNewFileRecord, NULL);
+			updateStats(ipConnection, nActionID, *pPrevStatus, eNewStatus, ipNewFileRecord, NULL);
 			_lastCodePos = "90";
 		}
 		else
@@ -562,24 +543,24 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 			_lastCodePos = "100";
 
 			// Get the last action status to return
-			string strStatus = getStringField(ipFields, strActionCol );
+			string strStatus = getStringField(ipFields, strActionCol);
 
 			// Set the Previous status return var
-			*pPrevStatus = asEActionStatus( strStatus );
+			*pPrevStatus = asEActionStatus(strStatus);
 
 			_lastCodePos = "100.1";
 
 			// if Force processing is set need to update the status or if the previous status for this action was unattempted
-			if ( bForceStatusChange == VARIANT_TRUE || *pPrevStatus == kActionUnattempted )
+			if (bForceStatusChange == VARIANT_TRUE || *pPrevStatus == kActionUnattempted)
 			{
 				_lastCodePos = "100.2";
 
 				// if the previous state is "R" it should not be changed
 				// TODO: Handle the "R" case so that they will be marked as pending after the processing has completed
-				if ( *pPrevStatus == kActionProcessing )
+				if (*pPrevStatus == kActionProcessing)
 				{
 					UCLIDException ue("ELI15043", "Cannot force status from Processing.");
-					ue.addDebugInfo("File", strFileName );
+					ue.addDebugInfo("File", strFileName);
 					ue.addDebugInfo("Action Name", strActionName);
 					throw ue;
 				}
@@ -589,7 +570,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 				setFieldsFromFileRecord(ipFields, ipNewFileRecord, asCppBool(bForceStatusChange));
 
 				// set the Action state to the new status
-				setStringField(ipFields, strActionCol, strNewStatus );
+				setStringField(ipFields, strActionCol, strNewStatus);
 
 				_lastCodePos = "110";
 
@@ -606,7 +587,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 
 				// add an Action State Transition if the previous state was not unattempted or was not the
 				// same as the new status
-				if ( *pPrevStatus != kActionUnattempted && *pPrevStatus != eNewStatus  )
+				if (*pPrevStatus != kActionUnattempted && *pPrevStatus != eNewStatus )
 				{
 					_lastCodePos = "130";
 
@@ -614,13 +595,13 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 					if (m_bUpdateFASTTable)
 					{
 						addFileActionStateTransition(ipConnection, nID, nActionID, strStatus.c_str(), 
-							strNewStatus, "", "" );
+							strNewStatus, "", "");
 					}
 
 					_lastCodePos = "140";
 				}
 				// update the statistics
-				updateStats( ipConnection, nActionID, *pPrevStatus, eNewStatus, ipNewFileRecord, ipOldRecord );
+				updateStats(ipConnection, nActionID, *pPrevStatus, eNewStatus, ipNewFileRecord, ipOldRecord);
 
 				_lastCodePos = "150";
 			}
@@ -635,7 +616,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 		if (m_bUpdateQueueEventTable)
 		{
 			// add a new QueueEvent record 
-			addQueueEventRecord( ipConnection, nID, nActionID, asString(strFile), ( bFileModified == VARIANT_TRUE ) ? "M":"A");
+			addQueueEventRecord(ipConnection, nID, nActionID, asString(strFile), (bFileModified == VARIANT_TRUE) ? "M":"A");
 		}
 
 		_lastCodePos = "160";
@@ -654,7 +635,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::RemoveFile( BSTR strFile, BSTR strAction )
+STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -678,17 +659,17 @@ STDMETHODIMP CFileProcessingDB::RemoveFile( BSTR strFile, BSTR strAction )
 		validateDBSchemaVersion();
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipFileSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI13537", ipFileSet != NULL );
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI13537", ipFileSet != NULL);
 
 		// Replace any occurances of ' with '' this is because SQL Server use the ' to indicate the beginning and end of a string
 		string strFileName = asString(strFile);
-		replaceVariable(strFileName, "'", "''" );
+		replaceVariable(strFileName, "'", "''");
 
-		// Open a recordset that contain only the record (if it exists ) with the given filename
+		// Open a recordset that contain only the record (if it exists) with the given filename
 		string strFileSQL = "SELECT * FROM FAMFile WHERE FileName = '" + strFileName + "'";
-		ipFileSet->Open( strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText);
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
@@ -698,7 +679,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFile( BSTR strFile, BSTR strAction )
 		long nActionID = getActionID(ipConnection, strActionName);
 
 		// If file exists this should not be at end of file
-		if ( ipFileSet->adoEOF == VARIANT_FALSE )
+		if (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
 			// Get the fields from the file set
 			FieldsPtr ipFields = ipFileSet->Fields;
@@ -715,13 +696,13 @@ STDMETHODIMP CFileProcessingDB::RemoveFile( BSTR strFile, BSTR strAction )
 			long nFileID = ipOldRecord->FileID;
 
 			// Get the Previous file state
-			string strActionState = getStringField( ipFields, strActionCol );
+			string strActionState = getStringField(ipFields, strActionCol);
 
 			// only change the state if the current state is pending
-			if ( strActionState == "P" )
+			if (strActionState == "P")
 			{
 				// change state to unattempted
-				setStringField( ipFields, strActionCol, "U" );
+				setStringField(ipFields, strActionCol, "U");
 
 				ipFileSet->Update();
 
@@ -729,18 +710,18 @@ STDMETHODIMP CFileProcessingDB::RemoveFile( BSTR strFile, BSTR strAction )
 				if (m_bUpdateFASTTable)
 				{
 					// Add a ActionStateTransition record for the state change
-					addFileActionStateTransition( ipConnection, nFileID, nActionID, strActionState, "U", "", "Removed" );
+					addFileActionStateTransition(ipConnection, nFileID, nActionID, strActionState, "U", "", "Removed");
 				}
 
 				// update the statistics
-				updateStats( ipConnection, nActionID, asEActionStatus(strActionState), kActionUnattempted, NULL, ipOldRecord); 
+				updateStats(ipConnection, nActionID, asEActionStatus(strActionState), kActionUnattempted, NULL, ipOldRecord); 
 			}
 
 			// Update QueueEvent table if enabled
 			if (m_bUpdateQueueEventTable)
 			{
 				// add record the QueueEvent table to indicate that the file was deleted
-				addQueueEventRecord( ipConnection, nFileID, nActionID, asString(strFile), "D" );
+				addQueueEventRecord(ipConnection, nFileID, nActionID, asString(strFile), "D");
 			}
 		}
 
@@ -753,7 +734,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFile( BSTR strFile, BSTR strAction )
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::NotifyFileProcessed( long nFileID,  BSTR strAction)
+STDMETHODIMP CFileProcessingDB::NotifyFileProcessed(long nFileID,  BSTR strAction)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -771,7 +752,7 @@ STDMETHODIMP CFileProcessingDB::NotifyFileProcessed( long nFileID,  BSTR strActi
 		ipConnection = getDBConnection();
 
 		// change the given files state to completed
-		setFileActionState( ipConnection, nFileID, asString(strAction), "C", "" );
+		setFileActionState(ipConnection, nFileID, asString(strAction), "C", "");
 
 		END_CONNECTION_RETRY(ipConnection, "ELI23529");
 	}
@@ -779,7 +760,7 @@ STDMETHODIMP CFileProcessingDB::NotifyFileProcessed( long nFileID,  BSTR strActi
 
 	return S_OK;}
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::NotifyFileFailed( long nFileID,  BSTR strAction,  BSTR strException)
+STDMETHODIMP CFileProcessingDB::NotifyFileFailed(long nFileID,  BSTR strAction,  BSTR strException)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -797,7 +778,7 @@ STDMETHODIMP CFileProcessingDB::NotifyFileFailed( long nFileID,  BSTR strAction,
 		ipConnection = getDBConnection();
 
 		// change the given files state to Failed
-		setFileActionState( ipConnection, nFileID, asString(strAction), "F", asString(strException) );
+		setFileActionState(ipConnection, nFileID, asString(strAction), "F", asString(strException));
 
 		END_CONNECTION_RETRY(ipConnection, "ELI23530");
 	}
@@ -806,7 +787,7 @@ STDMETHODIMP CFileProcessingDB::NotifyFileFailed( long nFileID,  BSTR strAction,
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetFileStatusToPending( long nFileID,  BSTR strAction)
+STDMETHODIMP CFileProcessingDB::SetFileStatusToPending(long nFileID,  BSTR strAction)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -824,7 +805,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToPending( long nFileID,  BSTR strA
 		ipConnection = getDBConnection();
 
 		// change the given files state to Pending
-		setFileActionState( ipConnection, nFileID, asString(strAction), "P", "" );
+		setFileActionState(ipConnection, nFileID, asString(strAction), "P", "");
 
 		END_CONNECTION_RETRY(ipConnection, "ELI23531");
 	}
@@ -833,7 +814,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToPending( long nFileID,  BSTR strA
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetFileStatusToUnattempted( long nFileID,  BSTR strAction)
+STDMETHODIMP CFileProcessingDB::SetFileStatusToUnattempted(long nFileID,  BSTR strAction)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -851,7 +832,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToUnattempted( long nFileID,  BSTR 
 		ipConnection = getDBConnection();
 
 		// change the given files state to unattempted
-		setFileActionState( ipConnection, nFileID, asString(strAction), "U", "" );
+		setFileActionState(ipConnection, nFileID, asString(strAction), "U", "");
 
 		END_CONNECTION_RETRY(ipConnection, "ELI23532");
 	}
@@ -889,7 +870,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToSkipped(long nFileID, BSTR strAct
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26939");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetFileStatus( long nFileID,  BSTR strAction,  EActionStatus * pStatus)
+STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,  EActionStatus * pStatus)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -913,13 +894,13 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus( long nFileID,  BSTR strAction,  E
 		validateDBSchemaVersion();
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipFileSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI13551", ipFileSet != NULL );
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI13551", ipFileSet != NULL);
 
 		// Open Recordset that contains only the record with the given ID
 		string strFileSQL = "SELECT * FROM FAMFile WHERE ID = " + asString (nFileID);
-		ipFileSet->Open( strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockOptimistic, adCmdText );
+		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockOptimistic, adCmdText);
 
 		// Set the action name from the parameter
 		string strActionName = asString(strAction);
@@ -930,17 +911,17 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus( long nFileID,  BSTR strAction,  E
 		// Action Column to update
 		string strActionCol = "ASC_" + strActionName;
 		// if the file exists should not be at the end of the file
-		if ( ipFileSet->adoEOF == VARIANT_FALSE )
+		if (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
 			// Set return value to the current Action Status
-			string strStatus = getStringField( ipFileSet->Fields, strActionCol );
-			*pStatus = asEActionStatus( strStatus );
+			string strStatus = getStringField(ipFileSet->Fields, strActionCol);
+			*pStatus = asEActionStatus(strStatus);
 		}
 		else
 		{
 			// File ID did not exist
-			UCLIDException ue("ELI13553", "File ID was not found." );
-			ue.addDebugInfo ( "File ID", nFileID );
+			UCLIDException ue("ELI13553", "File ID was not found.");
+			ue.addDebugInfo ("File ID", nFileID);
 			throw ue;
 		}
 		END_CONNECTION_RETRY(ipConnection, "ELI23533");
@@ -950,7 +931,7 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus( long nFileID,  BSTR strAction,  E
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nWhereActionID,  EActionStatus eWhereStatus,  
+STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus(long nWhereActionID,  EActionStatus eWhereStatus,  
 														  long nToActionID, EActionStatus eToStatus,
 														  BSTR bstrSkippedFromUserName, 
 														  long nFromActionID, long * pnNumRecordsModified)
@@ -963,7 +944,7 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nWhereActionID, 
 		validateLicense();
 
 		// Changing an Action status to failed should only be done on an individual file bases
-		if ( eToStatus == kActionFailed )
+		if (eToStatus == kActionFailed)
 		{
 			UCLIDException ue ("ELI13603", "Cannot change status Failed.");
 			throw ue;
@@ -972,7 +953,7 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nWhereActionID, 
 		// If the to status is not skipped, the from status is the same as the to status
 		// and the Action ids are the same, there is nothing to do
 		// If setting skipped status the skipped file table needs to be updated
-		if ( eToStatus != kActionSkipped
+		if (eToStatus != kActionSkipped
 			&& eWhereStatus == eToStatus
 			&& nToActionID == nWhereActionID)
 		{
@@ -1047,7 +1028,7 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nWhereActionID, 
 
 		// Open the recordset
 		ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenForwardOnly, adLockReadOnly, adCmdText );
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Modify each files status (count the number of records modified)
 		long nRecordsModified = 0;
@@ -1086,7 +1067,7 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nWhereActionID, 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles( BSTR strAction,  EActionStatus eStatus)
+STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionStatus eStatus)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -1109,7 +1090,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles( BSTR strAction,  EActionSt
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
-		if ( eStatus == kActionFailed )
+		if (eStatus == kActionFailed)
 		{
 			UCLIDException ue ("ELI13604", "Transition to Failed state is not allowed.");
 			throw ue;
@@ -1161,8 +1142,8 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles( BSTR strAction,  EActionSt
 		}
 
 		// Add the transition records
-		addASTransFromSelect( ipConnection, strActionName, nActionID, asStatusString( eStatus ),
-			"", "", strWhere, "" );
+		addASTransFromSelect(ipConnection, strActionName, nActionID, asStatusString(eStatus),
+			"", "", strWhere, "");
 
 		// Update the FAMFiles table
 		executeCmdQuery(ipConnection, strUpdateSQL);
@@ -1187,7 +1168,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles( BSTR strAction,  EActionSt
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetStatusForFile( long nID,  BSTR strAction,  EActionStatus eStatus,  
+STDMETHODIMP CFileProcessingDB::SetStatusForFile(long nID,  BSTR strAction,  EActionStatus eStatus,  
 												 EActionStatus * poldStatus)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1206,14 +1187,14 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFile( long nID,  BSTR strAction,  EA
 		ipConnection = getDBConnection();
 
 		// change the status for the given file and return the previous state
-		*poldStatus = setFileActionState( ipConnection, nID, asString(strAction), asStatusString( eStatus ), "" );
+		*poldStatus = setFileActionState(ipConnection, nID, asString(strAction), asStatusString(eStatus), "");
 
 		END_CONNECTION_RETRY(ipConnection, "ELI23536");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13572");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFiles, 
+STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFiles, 
 												  VARIANT_BOOL bGetSkippedFiles,
 												  BSTR bstrSkippedForUserName,
 												  IIUnknownVector * * pvecFileRecords)
@@ -1252,11 +1233,11 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 		string strActionCol = "ASC_" + strActionName;
 
 		string strWhere = "";
-		string strTop = "TOP (" + asString( nMaxFiles ) + " ) ";
+		string strTop = "TOP (" + asString(nMaxFiles) + ") ";
 		if (bGetSkippedFiles == VARIANT_TRUE)
 		{
 			strWhere = " INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID "
-				"WHERE ( SkippedFile.ActionID = " + strActionID
+				"WHERE (SkippedFile.ActionID = " + strActionID
 				+ " AND FAMFile." + strActionCol + " = 'S'";
 
 			string strUserName = asString(bstrSkippedForUserName);
@@ -1270,7 +1251,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 			// Only get files that have not been skipped by the current process
 			strWhere += " AND SkippedFile.UPIID <> " + strUPIID;
 
-			strWhere += " )";
+			strWhere += ")";
 		}
 		else
 		{
@@ -1288,8 +1269,8 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 			+ " FAMFile.ID, FileName, Pages, FileSize, Priority, " + strActionCol + " " + strFrom;
 
 		// IUnknownVector to hold the FileRecords to return
-		IIUnknownVectorPtr ipFiles( CLSID_IUnknownVector );
-		ASSERT_RESOURCE_ALLOCATION("ELI19504", ipFiles != NULL );
+		IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI19504", ipFiles != NULL);
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
@@ -1313,17 +1294,17 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 			" FAMFile.ID IN (";
 
 		// Recordset to contain the files to process
-		_RecordsetPtr ipFileSet(__uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI13573", ipFileSet != NULL );
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI13573", ipFileSet != NULL);
 
 		// get the recordset with the top nMaxFiles 
 		ipFileSet->Open(strSelectSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockPessimistic, adCmdText );
+			adLockPessimistic, adCmdText);
 
 		// Fill the ipFiles collection, also update the FAMFile table and build
 		// the queries to update both the FAST table and the Locked file table
 		string strFileIDIn = "";
-		while ( ipFileSet->adoEOF == VARIANT_FALSE )
+		while (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
 			FieldsPtr ipFields = ipFileSet->Fields;
 			ASSERT_RESOURCE_ALLOCATION("ELI28234", ipFields != NULL);
@@ -1387,7 +1368,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::RemoveFolder( BSTR strFolder, BSTR strAction )
+STDMETHODIMP CFileProcessingDB::RemoveFolder(BSTR strFolder, BSTR strAction)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -1421,10 +1402,10 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder( BSTR strFolder, BSTR strAction )
 
 		// Replace any occurences of ' with '' this is because SQL Server use the ' to indicate the beginning and end of a string
 		string strFolderName = asString(strFolder);
-		replaceVariable(strFolderName, "'", "''" );
+		replaceVariable(strFolderName, "'", "''");
 
 		// set up the where clause to find the pending records that the filename begins with the folder name
-		string strWhere = "WHERE (" + strActionCol + " = 'P') AND ( FileName LIKE '" + strFolderName + "%')";
+		string strWhere = "WHERE (" + strActionCol + " = 'P') AND (FileName LIKE '" + strFolderName + "%')";
 		string strFrom = "FROM FAMFile " + strWhere;
 
 		// Set up the SQL to update the FAMFile
@@ -1434,13 +1415,13 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder( BSTR strFolder, BSTR strAction )
 		TransactionGuard tg(ipConnection);
 
 		// add transition records to the databse
-		addASTransFromSelect( ipConnection, strActionName, nActionID, "U", "", "", strWhere, "" );
+		addASTransFromSelect(ipConnection, strActionName, nActionID, "U", "", "", strWhere, "");
 
 		// Only update the QueueEvent table if update is enabled
 		if (m_bUpdateQueueEventTable)
 		{
 			// Set up the SQL to add the queue event records
-			string strInsertQueueRecords = "INSERT INTO QueueEvent ( FileID, DateTimeStamp, QueueEventCode, FAMUserID, MachineID ) ";
+			string strInsertQueueRecords = "INSERT INTO QueueEvent (FileID, DateTimeStamp, QueueEventCode, FAMUserID, MachineID) ";
 
 			// Add the Select query to get the records to insert 
 			strInsertQueueRecords += "SELECT ID, GETDATE(), 'F', "
@@ -1496,11 +1477,11 @@ STDMETHODIMP CFileProcessingDB::GetStats(/*[in]*/ long nActionID, /*[out, retval
 	
 		// Create an ActionStatistics pointer to return the values
 		ICopyableObjectPtr ipCopyObj = m_mapActionIDtoStats[nActionID];
-		ASSERT_RESOURCE_ALLOCATION("ELI14633", ipCopyObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI14633", ipCopyObj != NULL);
 
 		// return a new object with the statistics
 		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats =  ipCopyObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI14107", ipActionStats != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI14107", ipActionStats != NULL);
 
 		// Return the value
 		*pStats = (IActionStatistics *)ipActionStats.Detach();
@@ -1512,7 +1493,7 @@ STDMETHODIMP CFileProcessingDB::GetStats(/*[in]*/ long nActionID, /*[out, retval
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::CopyActionStatusFromAction( long  nFromAction, long nToAction )
+STDMETHODIMP CFileProcessingDB::CopyActionStatusFromAction(long  nFromAction, long nToAction)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -1555,7 +1536,7 @@ STDMETHODIMP CFileProcessingDB::CopyActionStatusFromAction( long  nFromAction, l
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::RenameAction( long nActionID, BSTR strNewActionName )
+STDMETHODIMP CFileProcessingDB::RenameAction(long nActionID, BSTR strNewActionName)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -1634,14 +1615,14 @@ STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFile
 
 		// check for empty query string
 		string strSQL = asString(strQuery);
-		if ( strSQL.empty() )
+		if (strSQL.empty())
 		{
 			UCLIDException ue("ELI14724", "Query string is empty.");
 			throw ue;
 		}
 		// Check if output file name is not empty
 		string strOutFileName = asString(strOutputFileName);
-		if ( strOutFileName.empty())
+		if (strOutFileName.empty())
 		{
 			UCLIDException ue("ELI14727", "Output file name is blank.");
 			throw ue;
@@ -1668,12 +1649,12 @@ STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFile
 		validateDBSchemaVersion();
 
 		// Recordset to contain the files to process
-		_RecordsetPtr ipFileSet(__uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI14725", ipFileSet != NULL );
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI14725", ipFileSet != NULL);
 
 		// get the recordset with the top nMaxFiles 
 		ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-			adLockReadOnly, adCmdText );
+			adLockReadOnly, adCmdText);
 
 		// Open the output file
 		ofstream ofsOutput(strOutFileName.c_str(), ios::out | ios::trunc);
@@ -1682,12 +1663,12 @@ STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFile
 		long nNumRecords = 0;
 
 		// Fill the ipFiles collection
-		while ( ipFileSet->adoEOF == VARIANT_FALSE )
+		while (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
 			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", NULL) == VARIANT_TRUE)
 			{
 				// Get the FileName
-				string strFile = getStringField( ipFileSet->Fields, "FileName" );
+				string strFile = getStringField(ipFileSet->Fields, "FileName");
 				ofsOutput << strFile << endl;
 
 				// increment the number of records
@@ -1724,7 +1705,7 @@ STDMETHODIMP CFileProcessingDB::ResetDBLock(void)
 		ipConnection = getDBConnection();
 
 		// The mutex only needs to be locked while the data is being obtained
-		CSingleLock lock(&m_mutex, TRUE );
+		CSingleLock lock(&m_mutex, TRUE);
 
 		// Check License
 		validateLicense();
@@ -1748,7 +1729,7 @@ STDMETHODIMP CFileProcessingDB::ResetDBLock(void)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetActionID( BSTR bstrActionName, long* pnActionID)
+STDMETHODIMP CFileProcessingDB::GetActionID(BSTR bstrActionName, long* pnActionID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1832,12 +1813,12 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 		// Initialize the DB if it is blank
 		initializeIfBlankDB();
 
-		// Get the stored password ( if it exists)
+		// Get the stored password (if it exists)
 		string strStoredEncryptedCombined;
 		bool bUserExists = getEncryptedPWFromDB(strStoredEncryptedCombined, bUseAdmin);
 
 		// if there is no password will need to get the new password
-		if ( strStoredEncryptedCombined == "" && bUseAdmin)
+		if (strStoredEncryptedCombined == "" && bUseAdmin)
 		{
 			// Set the admin password
 			// default to using the desktop as the parent for the messagebox below
@@ -1870,7 +1851,7 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 		if (strStoredEncryptedCombined == "")
 		{
 			PasswordDlg dlgPW(strCaption);
-			if ( dlgPW.DoModal() != IDOK )
+			if (dlgPW.DoModal() != IDOK)
 			{
 				// Did not fill in and ok dlg so there is no login
 				// Set Cancelled flag
@@ -1889,8 +1870,8 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 		}
 
 		// Set read-only user name to "admin" (P13 #4112) or user's name
-		CLoginDlg dlgLogin( "Login", (bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName , true );
-		if ( dlgLogin.DoModal() != IDOK )
+		CLoginDlg dlgLogin("Login", (bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName , true);
+		if (dlgLogin.DoModal() != IDOK)
 		{
 			// The OK button on the login dialog was not pressed so do not login
 			// Set Cancelled flag
@@ -1912,7 +1893,7 @@ STDMETHODIMP CFileProcessingDB::get_DBSchemaVersion(LONG* pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI15149", pVal != NULL );
+		ASSERT_ARGUMENT("ELI15149", pVal != NULL);
 
 		*pVal = getDBSchemaVersion();
 
@@ -1942,7 +1923,7 @@ STDMETHODIMP CFileProcessingDB::ChangeLogin(VARIANT_BOOL bChangeAdmin, VARIANT_B
 		if (strStoredEncryptedCombined == "")
 		{
 			// Create and throw exception
-			UCLIDException ue( "ELI15721", "Cannot change password if no password is defined!" );
+			UCLIDException ue("ELI15721", "Cannot change password if no password is defined!");
 			throw ue;
 		}
 
@@ -1955,7 +1936,7 @@ STDMETHODIMP CFileProcessingDB::ChangeLogin(VARIANT_BOOL bChangeAdmin, VARIANT_B
 		ChangePasswordDlg dlgPW(strPasswordDlgCaption);
 		do
 		{
-			if ( dlgPW.DoModal() != IDOK )
+			if (dlgPW.DoModal() != IDOK)
 			{
 				// Did not fill in and ok dlg so there is no login
 				// Set Cancelled flag and return
@@ -2087,7 +2068,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 		closeDBConnection();
 
 		// Database server needs to be set in order to create a new database
-		if ( m_strDatabaseServer.empty())
+		if (m_strDatabaseServer.empty())
 		{
 			UCLIDException ue("ELI17470", "Database server must be set!");
 			ue.addDebugInfo("New DB name", asString(bstrNewDBName));
@@ -2104,7 +2085,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 		}
 		
 		// Create a connection object to the master db to create the database
-		ADODB::_ConnectionPtr ipDBConnection( __uuidof( Connection ) ); 
+		ADODB::_ConnectionPtr ipDBConnection(__uuidof(Connection)); 
 
 		// Open a connection to the the master database on the database server
 		ipDBConnection->Open(createConnectionString(m_strDatabaseServer, "master").c_str(),
@@ -2114,7 +2095,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 		string strCreateDB = "CREATE DATABASE [" + m_strDatabaseName + "]";
 
 		// Execute the query to create the new database
-		ipDBConnection->Execute(strCreateDB.c_str(), NULL, adCmdText | adExecuteNoRecords );
+		ipDBConnection->Execute(strCreateDB.c_str(), NULL, adCmdText | adExecuteNoRecords);
 
 		// Close the connections
 		ipDBConnection->Close();
@@ -2146,7 +2127,7 @@ STDMETHODIMP CFileProcessingDB::ConnectLastUsedDBThisProcess()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstrSettingValue )
+STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstrSettingValue)
 {
 	try
 	{
@@ -2177,15 +2158,15 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 		validateDBSchemaVersion();
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipDBInfoSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI19792", ipDBInfoSet != NULL );
+		_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI19792", ipDBInfoSet != NULL);
 
 		// Begin Transaction
 		TransactionGuard tg(ipConnection);
 		
 		// Open recordset for the DBInfo Settings
 		ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText ); 
+			adLockOptimistic, adCmdText); 
 
 		// Check if setting record exist
 		if (ipDBInfoSet->adoEOF == VARIANT_TRUE)
@@ -2210,7 +2191,7 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, BSTR* pbstrSettingValue )
+STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, BSTR* pbstrSettingValue)
 {
 	try
 	{
@@ -2316,15 +2297,15 @@ STDMETHODIMP CFileProcessingDB::GetResultsForQuery(BSTR bstrQuery, _Recordset** 
 		ipConnection = getDBConnection();
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipResultSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI19876", ipResultSet != NULL );
+		_RecordsetPtr ipResultSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI19876", ipResultSet != NULL);
 
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
 		// Open the Action table
-		ipResultSet->Open( bstrQuery, _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockReadOnly, adCmdText );
+		ipResultSet->Open(bstrQuery, _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockReadOnly, adCmdText);
 
 		*ppVal = ipResultSet.Detach();
 		
@@ -2775,12 +2756,12 @@ STDMETHODIMP CFileProcessingDB::GetTags(IStrToStrMap **ppTags)
 		validateDBSchemaVersion();
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27331", ipTagSet != NULL );
+		_RecordsetPtr ipTagSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27331", ipTagSet != NULL);
 
 		// Open Recordset that contains all the tags and their descriptions
-		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenForwardOnly, adLockReadOnly, adCmdText );
+		ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Add each tag and description to the map
 		while (ipTagSet->adoEOF == VARIANT_FALSE)
@@ -2838,12 +2819,12 @@ STDMETHODIMP CFileProcessingDB::GetTagNames(IVariantVector **ppTagNames)
 		validateDBSchemaVersion();
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27337", ipTagSet != NULL );
+		_RecordsetPtr ipTagSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27337", ipTagSet != NULL);
 
 		// Open Recordset that contains the tag names
-		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenForwardOnly, adLockReadOnly, adCmdText );
+		ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Loop through each tag name and add it to the variant vector
 		while (ipTagSet->adoEOF == VARIANT_FALSE)
@@ -2894,12 +2875,12 @@ STDMETHODIMP CFileProcessingDB::HasTags(VARIANT_BOOL* pvbVal)
 		validateDBSchemaVersion();
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27341", ipTagSet != NULL );
+		_RecordsetPtr ipTagSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27341", ipTagSet != NULL);
 
 		// Open Recordset that contains the tag names
-		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenForwardOnly, adLockReadOnly, adCmdText );
+		ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Check if there is at least 1 tag
 		bHasTags = ipTagSet->adoEOF == VARIANT_FALSE;
@@ -2950,12 +2931,12 @@ STDMETHODIMP CFileProcessingDB::TagFile(long nFileID, BSTR bstrTagName)
 			+ asString(nFileID) + " AND [TagID] = " + asString(nTagID);
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27344", ipTagSet != NULL );
+		_RecordsetPtr ipTagSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27344", ipTagSet != NULL);
 
 		// Open Recordset that contains the tag names
-		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+		ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText);
 
 		// Only need to add a record if one does not already exist
 		if(ipTagSet->adoEOF == VARIANT_TRUE)
@@ -3019,12 +3000,12 @@ STDMETHODIMP CFileProcessingDB::UntagFile(long nFileID, BSTR bstrTagName)
 			+ asString(nFileID) + " AND [TagID] = " + asString(nTagID);
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27348", ipTagSet != NULL );
+		_RecordsetPtr ipTagSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27348", ipTagSet != NULL);
 
 		// Open Recordset that contains the tag names
-		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+		ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText);
 
 		// Only need to remove the record if one exists
 		if(ipTagSet->adoEOF == VARIANT_FALSE)
@@ -3081,12 +3062,12 @@ STDMETHODIMP CFileProcessingDB::ToggleTagOnFile(long nFileID, BSTR bstrTagName)
 			+ asString(nFileID) + " AND [TagID] = " + asString(nTagID);
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27351", ipTagSet != NULL );
+		_RecordsetPtr ipTagSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27351", ipTagSet != NULL);
 
 		// Open Recordset that contains the tag names
-		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+		ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText);
 
 		// If record does not exist, add it
 		if (ipTagSet->adoEOF == VARIANT_TRUE)
@@ -3157,12 +3138,12 @@ STDMETHODIMP CFileProcessingDB::AddTag(BSTR bstrTagName, BSTR bstrTagDescription
 		TransactionGuard tg(ipConnection);
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27355", ipTagSet != NULL );
+		_RecordsetPtr ipTagSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27355", ipTagSet != NULL);
 
 		// Open Recordset that contains the tag names
-		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+		ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText);
 
 		if (ipTagSet->adoEOF == VARIANT_FALSE)
 		{
@@ -3232,12 +3213,12 @@ STDMETHODIMP CFileProcessingDB::DeleteTag(BSTR bstrTagName)
 		TransactionGuard tg(ipConnection);
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27418", ipTagSet != NULL );
+		_RecordsetPtr ipTagSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27418", ipTagSet != NULL);
 
 		// Open Recordset that contains the tag names
-		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+		ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText);
 
 		if (ipTagSet->adoEOF == VARIANT_FALSE)
 		{
@@ -3301,12 +3282,12 @@ STDMETHODIMP CFileProcessingDB::ModifyTag(BSTR bstrOldTagName, BSTR bstrNewTagNa
 			+ strOldTagName + "'";
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27362", ipTagSet != NULL );
+		_RecordsetPtr ipTagSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27362", ipTagSet != NULL);
 
 		// Open Recordset that contains the tag names
-		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+		ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText);
 
 		// Ensure there is a record for the old tag name
 		if (ipTagSet->adoEOF == VARIANT_TRUE)
@@ -3410,12 +3391,12 @@ STDMETHODIMP CFileProcessingDB::GetFilesWithTags(IVariantVector* pvecTagNames,
 		validateDBSchemaVersion();
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27370", ipTagSet != NULL );
+		_RecordsetPtr ipTagSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27370", ipTagSet != NULL);
 
 		// Open Recordset that contains the file IDs
-		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenForwardOnly, adLockReadOnly, adCmdText );
+		ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Loop through each file ID and add it to the variant vector
 		while (ipTagSet->adoEOF == VARIANT_FALSE)
@@ -3477,12 +3458,12 @@ STDMETHODIMP CFileProcessingDB::GetTagsOnFile(long nFileID, IVariantVector** ppv
 		validateFileID(ipConnection, nFileID);
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27375", ipTagSet != NULL );
+		_RecordsetPtr ipTagSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27375", ipTagSet != NULL);
 
 		// Open Recordset that contains the file IDs
-		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenForwardOnly, adLockReadOnly, adCmdText );
+		ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Loop through each tag name and add it to the vector
 		while (ipTagSet->adoEOF == VARIANT_FALSE)
@@ -3854,19 +3835,19 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 		TransactionGuard tg(ipConnection);
 
 		// Recordset to search for file IDs
-		_RecordsetPtr ipFileSet(__uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27711", ipFileSet != NULL );
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27711", ipFileSet != NULL);
 
 		// Get the recordset for the specified select query
 		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-			adLockReadOnly, adCmdText );
+			adLockReadOnly, adCmdText);
 
 		// Setup the counter for the number of records
 		long nNumRecords = 0;
 
 		// Build a list of file ID's to set
 		stack<string> stackIDs;
-		while ( ipFileSet->adoEOF == VARIANT_FALSE )
+		while (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
 			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", NULL) == VARIANT_TRUE)
 			{
@@ -4169,12 +4150,12 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterValue(BSTR bstrCounterName, LONGLO
 		validateDBSchemaVersion();
 
 		// Recordset to get the counter value from
-		_RecordsetPtr ipCounterSet(__uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27768", ipCounterSet != NULL );
+		_RecordsetPtr ipCounterSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27768", ipCounterSet != NULL);
 
 		// Get the recordset for the specified select query
 		ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-			adLockReadOnly, adCmdText );
+			adLockReadOnly, adCmdText);
 
 		// Check for value in the database
 		if (ipCounterSet->adoEOF == VARIANT_FALSE)
@@ -4227,12 +4208,12 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterNames(IVariantVector** ppvecNames)
 		validateDBSchemaVersion();
 
 		// Recordset to get the counters from
-		_RecordsetPtr ipCounterSet(__uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27775", ipCounterSet != NULL );
+		_RecordsetPtr ipCounterSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27775", ipCounterSet != NULL);
 
 		// Get the recordset for the specified select query
 		ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-			adLockReadOnly, adCmdText );
+			adLockReadOnly, adCmdText);
 
 		// Check for value in the database
 		while (ipCounterSet->adoEOF == VARIANT_FALSE)
@@ -4284,12 +4265,12 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterNamesAndValues(IStrToStrMap** ppma
 		validateDBSchemaVersion();
 
 		// Recordset to get the counters and values from
-		_RecordsetPtr ipCounterSet(__uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27781", ipCounterSet != NULL );
+		_RecordsetPtr ipCounterSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27781", ipCounterSet != NULL);
 
 		// Get the recordset for the specified select query
 		ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-			adLockReadOnly, adCmdText );
+			adLockReadOnly, adCmdText);
 
 		// Check for value in the database
 		while (ipCounterSet->adoEOF == VARIANT_FALSE)
@@ -4351,12 +4332,12 @@ STDMETHODIMP CFileProcessingDB::IsUserCounterValid(BSTR bstrCounterName,
 		validateDBSchemaVersion();
 
 		// Recordset to get
-		_RecordsetPtr ipCounterSet(__uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27909", ipCounterSet != NULL );
+		_RecordsetPtr ipCounterSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27909", ipCounterSet != NULL);
 
 		// Get the recordset for the specified select query
 		ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-			adLockReadOnly, adCmdText );
+			adLockReadOnly, adCmdText);
 
 		// Set true if there is a record found false otherwise
 		*pbCounterValid = asVariantBool(ipCounterSet->adoEOF == VARIANT_FALSE);
@@ -4406,12 +4387,12 @@ STDMETHODIMP CFileProcessingDB::OffsetUserCounter(BSTR bstrCounterName, LONGLONG
 		TransactionGuard tg(ipConnection);
 
 		// Recordset to get the counters and values from
-		_RecordsetPtr ipCounterSet(__uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI27717", ipCounterSet != NULL );
+		_RecordsetPtr ipCounterSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27717", ipCounterSet != NULL);
 
 		// Get the recordset for the specified select query
 		ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+			adLockOptimistic, adCmdText);
 
 		if (ipCounterSet->adoEOF == VARIANT_FALSE)
 		{
@@ -4571,9 +4552,9 @@ STDMETHODIMP CFileProcessingDB::RecordInputEvent(BSTR bstrTimeStamp, long nActio
 		string strTimeStamp = asString(bstrTimeStamp);
 		string strActionId = asString(nActionID);
 		string strUserId = 
-			asString( getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName) );
+			asString(getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName));
 		string strMachineId = 
-			asString( getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName) );
+			asString(getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName));
 		string strProcessId = asString(nProcessID);
 
 		string strQuery = 
@@ -4584,12 +4565,12 @@ STDMETHODIMP CFileProcessingDB::RecordInputEvent(BSTR bstrTimeStamp, long nActio
 				"AND (PID = " + strProcessId + ")";
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipSeconds( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI29144", ipSeconds != NULL );
+		_RecordsetPtr ipSeconds(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI29144", ipSeconds != NULL);
 
 		// Check if the record set already exists
-		ipSeconds->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText );
+		ipSeconds->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText);
 
 		if (ipSeconds->adoEOF == VARIANT_TRUE)
 		{
@@ -4656,22 +4637,22 @@ STDMETHODIMP CFileProcessingDB::GetLoginUsers(IStrToStrMap**  ppUsers)
 		validateDBSchemaVersion();
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipLoginSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI29040", ipLoginSet != NULL );
+		_RecordsetPtr ipLoginSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI29040", ipLoginSet != NULL);
 
 		// SQL query to get the login users that are not admin
 		string strSQL = "SELECT UserName, Password FROM Login where UserName <> 'admin'";
 
 		// Open the set of login users
-		ipLoginSet->Open( strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockReadOnly, adCmdText );
+		ipLoginSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockReadOnly, adCmdText);
 
 		// Create map to return results
 		IStrToStrMapPtr ipUsers(CLSID_StrToStrMap);
 		ASSERT_RESOURCE_ALLOCATION("ELI29039", ipUsers != NULL);
 
 		// Step through all records
-		while ( ipLoginSet->adoEOF == VARIANT_FALSE )
+		while (ipLoginSet->adoEOF == VARIANT_FALSE)
 		{
 			// Get the fields from the action set
 			FieldsPtr ipFields = ipLoginSet->Fields;
@@ -4684,7 +4665,7 @@ STDMETHODIMP CFileProcessingDB::GetLoginUsers(IStrToStrMap**  ppUsers)
 			string strPasswordset = getStringField(ipFields, "Password").empty() ? "No" : "Yes";
 
 			// Save in the Users map
-			ipUsers->Set( strUser.c_str(), strPasswordset.c_str());
+			ipUsers->Set(strUser.c_str(), strPasswordset.c_str());
 
 			// Go to next user
 			ipLoginSet->MoveNext();
@@ -4727,16 +4708,16 @@ STDMETHODIMP CFileProcessingDB::AddLoginUser(BSTR bstrUserName)
 		TransactionGuard tg(ipConnection);
 
 		// Create a pointer to a recordset
-		_RecordsetPtr ipLoginSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI29064", ipLoginSet != NULL );
+		_RecordsetPtr ipLoginSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI29064", ipLoginSet != NULL);
 
 		// Sql query that should either be empty if the passed in users is not in the table
 		// or will return the record with the given username
 		string strLoginSelect = "Select Username From Login Where UserName = '" + strUserName + "'";
 
 		// Open the sql query
-		ipLoginSet->Open( strLoginSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockReadOnly, adCmdText );
+		ipLoginSet->Open(strLoginSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockReadOnly, adCmdText);
 
 		// Check to see if action exists
 		if (!asCppBool(ipLoginSet->adoEOF))
@@ -4943,6 +4924,63 @@ STDMETHODIMP CFileProcessingDB::GetAutoCreateActions(VARIANT_BOOL* pvbValue)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29120");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Get the action name as a string
+		string strActionName = asString(bstrActionName);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
+		// Create a pointer to a recordset containing the action
+		_RecordsetPtr ipActionSet = getActionSet(ipConnection, strActionName);
+		ASSERT_RESOURCE_ALLOCATION("ELI13517", ipActionSet != NULL);
+
+		// Check if the action is not yet created
+		if (ipActionSet->adoEOF == VARIANT_TRUE)
+		{
+			if (getDBInfoSetting(ipConnection, gstrAUTO_CREATE_ACTIONS) == "1")
+			{
+				// AutoCreateActions is set, create the action
+				addActionToRecordset(ipConnection, ipActionSet, strActionName);
+			}
+			else
+			{
+				// AutoCreateActions is not set, throw an exception
+				UCLIDException ue("ELI29157", "Invalid action name.");
+				ue.addDebugInfo("Action name", strActionName);
+				throw ue;
+			}
+		}
+
+		// Commit the transaction
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI29153");
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29154");
 }
 
 //-------------------------------------------------------------------------------------------------
