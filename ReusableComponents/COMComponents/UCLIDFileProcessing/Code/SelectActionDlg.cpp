@@ -286,7 +286,7 @@ void SelectActionDlg::OnBnClickActionTag()
 		m_btnActionTag.GetWindowRect(&rect);
 		
 		// Display menu and make selection
-		string strChoice = CFileProcessingUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
+		string strChoice = CFileProcessingUtils::ChooseDocTag(m_hWnd, rect.right, rect.top, false);
 
 		// Replace text if selection was made
 		if (strChoice != "")
