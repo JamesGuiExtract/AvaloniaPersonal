@@ -108,8 +108,8 @@ IDR_ADD_WATERMARK_TASK  REGISTRY                "AddWatermarkTask.rgs"
 IDR_ADD_WATERMARK_TASKPP REGISTRY                "AddWatermarkTaskPP.rgs"
 IDR_ARCHIVE_RESTORE_TASK REGISTRY                "ArchiveRestoreTask.rgs"
 IDR_ARCHIVE_RESTORE_TASKPP REGISTRY                "ArchiveRestoreTaskPP.rgs"
-IDR_MANAGE_TAGS_TASK	REGISTRY				"ManageTagsTask.rgs"
-IDR_MANAGE_TAGS_TASKPP	REGISTRY				"ManageTagsTaskPP.rgs"
+IDR_MANAGE_TAGS_TASK    REGISTRY                "ManageTagsTask.rgs"
+IDR_MANAGE_TAGS_TASKPP  REGISTRY                "ManageTagsTaskPP.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -185,15 +185,16 @@ BEGIN
 					BS_AUTOCHECKBOX | WS_TABSTOP,5,105,168,10
 END
 
-IDD_SETACTIONSTATUSFILEPROCESSORPP DIALOGEX 0, 0, 200, 62
+IDD_SETACTIONSTATUSFILEPROCESSORPP DIALOGEX 0, 0, 211, 62
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    LTEXT           "Status of the action",IDC_STATIC,6,24,72,9
-    COMBOBOX        IDC_COMBO_ACTION,78,22,114,68,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_COMBO_STATUS,78,42,114,66,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "For the document being processed, set the",IDC_STATIC,6,6,144,9
+    LTEXT           "Status of the action",IDC_STATIC,6,24,72,9
+    COMBOBOX        IDC_COMBO_ACTION,78,22,114,68,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      ">",IDC_BTN_ACTION_TAG,194,22,10,14,BS_ICON
     LTEXT           "To",IDC_STATIC,6,42,53,9
+    COMBOBOX        IDC_COMBO_STATUS,78,42,114,66,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_CONDITIONALTASKPP DIALOGEX 0, 0, 256, 254
@@ -239,8 +240,8 @@ BEGIN
     EDITTEXT        IDC_EDIT_CONVERT_TO_PDF_INPUT_IMAGE,7,17,283,12,ES_AUTOHSCROLL
     PUSHBUTTON      "SelectDocTag",IDC_BTN_CONVERT_TO_PDF_INPUT_IMAGE_DOC_TAG,296,17,10,12,BS_ICON
     PUSHBUTTON      "...",IDC_BTN_CONVERT_TO_PDF_BROWSE_INPUT_IMAGE,310,17,15,12
-	CONTROL			"Make output PDF/A compatible (this will increase the size of the PDF)", IDC_CHECK_PDFA, "Button",
-					BS_AUTOCHECKBOX | WS_TABSTOP, 7, 34, 230, 10
+    CONTROL         "Make output PDF/A compatible (this will increase the size of the PDF)",IDC_CHECK_PDFA,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,34,230,10
     LTEXT           "Note: This task will replace the unsearchable image (or PDF file) with the searchable PDF file.\r\n\r\nIf the above file is an image file, it will be deleted after the searchable PDF file is created.",3,7,51,306,25
     LTEXT           "If the above file is a PDF file, it will be overwritten with the corresponding searchable version.",IDC_STATIC,7,82,308,10
 END
@@ -296,11 +297,11 @@ BEGIN
     PUSHBUTTON      "...",IDC_BTN_ARCHIVE_FILE_BROWSE,252,173,15,12
     CONTROL         "Delete above file after archiving",IDC_CHECK_ARCHIVE_DELETE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,188,115,12
-	GROUPBOX		"If the file to <ACTION> exists", IDC_ARCHIVE_GROUP_OVERWRITE,7,207,260,40
-	CONTROL			"Overwrite file (task will succeed)", IDC_RADIO_ARCHIVE_OVERWRITE, "Button",
-					BS_AUTORADIOBUTTON | WS_GROUP,12,217,115,12
-	CONTROL			"Don't overwrite file (task will fail)", IDC_RADIO_ARCHIVE_FAIL, "Button",
-					BS_AUTORADIOBUTTON,12,232,120,12
+    GROUPBOX        "If the file to <ACTION> exists",IDC_ARCHIVE_GROUP_OVERWRITE,7,207,260,40
+    CONTROL         "Overwrite file (task will succeed)",IDC_RADIO_ARCHIVE_OVERWRITE,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,12,217,115,12
+    CONTROL         "Don't overwrite file (task will fail)",IDC_RADIO_ARCHIVE_FAIL,
+                    "Button",BS_AUTORADIOBUTTON,12,232,120,12
 END
 
 IDD_MANAGE_TAGS_TASKPP DIALOGEX 0, 0, 250, 183
@@ -308,13 +309,17 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-	GROUPBOX		"Select tag operation to execute on document",IDC_STATIC,7,5,236,55
-	CONTROL			"Apply the tags selected below", IDC_RADIO_APPLY_TAG, "Button", BS_AUTORADIOBUTTON | WS_GROUP, 12,15,125,12
-	CONTROL			"Remove the tags selected below", IDC_RADIO_REMOVE_TAG, "Button", BS_AUTORADIOBUTTON, 12,30,130,12
-	CONTROL			"Toggle the state of the tags selected below", IDC_RADIO_TOGGLE_TAG, "Button", BS_AUTORADIOBUTTON, 12,45,150,12
-	GROUPBOX		"Tags", IDC_STATIC, 7,65,236,111
-	CONTROL			"", IDC_LIST_TAGS, "SysListView32", LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP | LVS_SINGLESEL, 12,75,226,96
+    GROUPBOX        "Select tag operation to execute on document",IDC_STATIC,7,5,236,55
+    CONTROL         "Apply the tags selected below",IDC_RADIO_APPLY_TAG,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,12,15,125,12
+    CONTROL         "Remove the tags selected below",IDC_RADIO_REMOVE_TAG,
+                    "Button",BS_AUTORADIOBUTTON,12,30,130,12
+    CONTROL         "Toggle the state of the tags selected below",IDC_RADIO_TOGGLE_TAG,
+                    "Button",BS_AUTORADIOBUTTON,12,45,150,12
+    GROUPBOX        "Tags",IDC_STATIC,7,65,236,111
+    CONTROL         "",IDC_LIST_TAGS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,12,75,226,96
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -351,7 +356,7 @@ BEGIN
     IDD_SETACTIONSTATUSFILEPROCESSORPP, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 193
+        RIGHTMARGIN, 204
         TOPMARGIN, 7
         BOTTOMMARGIN, 55
     END

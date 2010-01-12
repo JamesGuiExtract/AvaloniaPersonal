@@ -1,8 +1,9 @@
-
 #pragma once
 
 #include "resource.h"       // main symbols
 #include "FileProcessors.h"
+
+#include <ImageButtonWithStyle.h>
 
 #include <string>
 
@@ -36,6 +37,9 @@ public:
 	BEGIN_MSG_MAP(CSetActionStatusFileProcessorPP)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 		CHAIN_MSG_MAP(IPropertyPageImpl<CSetActionStatusFileProcessorPP>)
+		COMMAND_HANDLER(IDC_COMBO_ACTION, CBN_SELENDCANCEL, OnCbnSelEndCancelCmbActionName)
+		COMMAND_HANDLER(IDC_BTN_ACTION_TAG, BN_CLICKED, OnClickedBtnActionTag)
+		REFLECT_NOTIFICATIONS()
 	END_MSG_MAP()
 
 	// IPropertyPage
@@ -43,11 +47,21 @@ public:
 
 	// Message handlers
 	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnCbnSelEndCancelCmbActionName(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedBtnActionTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
+
+	// Action name selection
+	DWORD m_dwActionSel;
+
 	// UI controls
 	ATLControls::CComboBox m_cmbActionName;
+	CImageButtonWithStyle m_btnActionTag;
 	ATLControls::CComboBox m_cmbActionStatus;
+
+	// Gets the user-specified name of the action
+	string getActionName();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(SetActionStatusFileProcessorPP), CSetActionStatusFileProcessorPP)
