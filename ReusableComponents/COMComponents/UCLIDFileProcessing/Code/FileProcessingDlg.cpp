@@ -1123,9 +1123,6 @@ LRESULT FileProcessingDlg::OnProcessingComplete(WPARAM wParam, LPARAM lParam)
 		// This takes care of stopping the timer on the next timer tick. 
 		m_bRunning = false;
 
-		// Flush all cached PDF images
-		PDFInputOutputMgr::sFlushCache();
-
 		// enable the "process" menu
 		CMenu* pMenu = GetMenu();
 		pMenu->EnableMenuItem(1, MF_BYPOSITION | MF_ENABLED);

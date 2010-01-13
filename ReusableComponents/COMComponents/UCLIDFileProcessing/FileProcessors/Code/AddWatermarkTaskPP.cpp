@@ -21,6 +21,8 @@
 #include <LoadFileDlgThread.h>
 #include <ComponentLicenseIDs.h>
 #include <LicenseMgmt.h>
+#include <Misc.h>
+#include <ComUtils.h>
 
 //--------------------------------------------------------------------------------------------------
 // Constants
@@ -190,16 +192,15 @@ STDMETHODIMP CAddWatermarkTaskPP::Apply()
 			return S_FALSE;
 		}
 
-		// get the page to stamp
-		long lPageToStamp=0;
-
+		// get the pages to stamp string
+		string strPagesToStamp;
 		if (m_radioFirstPage.GetCheck() == BST_CHECKED)
 		{
-			lPageToStamp = 1;
+			strPagesToStamp = "1";
 		}
 		else if(m_radioLastPage.GetCheck() == BST_CHECKED)
 		{
-			lPageToStamp = -1;
+			strPagesToStamp = "-1";
 		}
 		else if(m_radioSpecifiedPage.GetCheck() == BST_CHECKED)
 		{
@@ -207,12 +208,24 @@ STDMETHODIMP CAddWatermarkTaskPP::Apply()
 
 			if (zTemp.IsEmpty())
 			{
-				AfxMessageBox("Please enter a page number to place the stamp on.", MB_ICONWARNING);
+				AfxMessageBox("Please enter the page(s) to stamp.", MB_ICONWARNING);
 				m_editSpecifiedPages.SetFocus();
 				return S_FALSE;
 			}
 
-			lPageToStamp = asLong(string(zTemp));
+			strPagesToStamp = (LPCTSTR) zTemp;
+			try
+			{
+				// Validate the page number string
+				validatePageNumbers(strPagesToStamp);
+			}
+			catch(UCLIDException& uex)
+			{
+				// Display the exception to the user and set focus to the pages edit box
+				uex.display();
+				m_editSpecifiedPages.SetFocus();
+				return S_FALSE;
+			}
 		}
 		else
 		{
@@ -229,7 +242,7 @@ STDMETHODIMP CAddWatermarkTaskPP::Apply()
 			ipAddWatermark->StampImageFile = bstrStampImage;
 			ipAddWatermark->HorizontalPercentage = dHorizontalPercentage;
 			ipAddWatermark->VerticalPercentage = dVerticalPercentage;
-			ipAddWatermark->PageToStamp = lPageToStamp;
+			ipAddWatermark->PagesToStamp = strPagesToStamp.c_str();
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19982");
@@ -251,6 +264,11 @@ LRESULT CAddWatermarkTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 		UCLID_FILEPROCESSORSLib::IAddWatermarkTaskPtr ipAddWatermarkTask(m_ppUnk[0]);
 		ASSERT_RESOURCE_ALLOCATION("ELI19983", ipAddWatermarkTask != NULL);
 
+		// create tooltip object
+		m_infoTip.Create(CWnd::FromHandle(m_hWnd));
+		// set no delay.
+		m_infoTip.SetShowDelay(0);
+
 		// get the controls from the property pages
 		m_editInputImage = GetDlgItem(IDC_EDIT_WATERMARK_INPUT_IMAGE);
 		m_btnInputImageBrowse = GetDlgItem(IDC_BTN_WATERMARK_BROWSE_INPUT_IMAGE);
@@ -260,8 +278,8 @@ LRESULT CAddWatermarkTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 		m_editVerticalPercentage = GetDlgItem(IDC_EDIT_WATERMARK_VERTICAL_PERCENT);
 		m_radioFirstPage = GetDlgItem(IDC_RADIO_WATERMARK_FIRSTPAGE);
 		m_radioLastPage = GetDlgItem(IDC_RADIO_WATERMARK_LASTPAGE);
-		m_radioSpecifiedPage = GetDlgItem(IDC_RADIO_WATERMARK_SPECIFIEDPAGE);
-		m_editSpecifiedPages = GetDlgItem(IDC_EDIT_WATERMARK_SPECIFIEDPAGE);
+		m_radioSpecifiedPage = GetDlgItem(IDC_RADIO_WATERMARK_SPECIFIEDPAGES);
+		m_editSpecifiedPages = GetDlgItem(IDC_EDIT_WATERMARK_SPECIFIEDPAGES);
 
 		// get the doc tag buttons
 		m_btnInputImageDocTag.SubclassDlgItem(IDC_BTN_WATERMARK_INPUT_IMAGE_DOC_TAG, 
@@ -294,19 +312,19 @@ LRESULT CAddWatermarkTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			m_editVerticalPercentage.SetWindowText(asString(dVerticalPercentage, 2).c_str());
 		}
 
-		long lPageToStamp = ipAddWatermarkTask->PageToStamp;
-		if (lPageToStamp == 1)
+		string strPagesToStamp = asString(ipAddWatermarkTask->PagesToStamp);
+		if (strPagesToStamp == "1")
 		{
 			m_radioFirstPage.SetCheck(BST_CHECKED);
 		}
-		else if (lPageToStamp == -1)
+		else if (strPagesToStamp == "-1")
 		{
 			m_radioLastPage.SetCheck(BST_CHECKED);
 		}
 		else
 		{
 			m_radioSpecifiedPage.SetCheck(BST_CHECKED);
-			m_editSpecifiedPages.SetWindowText(asString(lPageToStamp).c_str());
+			m_editSpecifiedPages.SetWindowText(strPagesToStamp.c_str());
 			
 			// since there is a specified page, enable the edit box
 			m_editSpecifiedPages.EnableWindow(TRUE);
@@ -430,6 +448,35 @@ LRESULT CAddWatermarkTaskPP::OnClickedBtnRadioPage(WORD wNotifyCode, WORD wID, H
 			asMFCBool(m_radioSpecifiedPage.GetCheck() == BST_CHECKED));
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19989");
+
+	return 0;
+}
+//--------------------------------------------------------------------------------------------------
+LRESULT CAddWatermarkTaskPP::OnClickedSpecificPageInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// show tooltip info
+		CString zText("Specify one or more pages. Page number must be greater than\n"
+					  "or equal to 1. You can specify individual page number, a collection\n"
+					  "of individual page numbers, a range of page numbers, or a mixture\n"
+					  "of individual page numbers and range(s) of page numbers.\n"
+					  "Use an integer followed by a hyphen (eg. \"4-\") to specify a range of\n"
+					  "pages that the starting page is the integer, and the ending page is the\n"
+					  "last page of the image.\n"
+					  "Use a hyphen followed by a positive integer (eg. \"-3\") to specify last X\n"
+					  "number of pages.\n"
+					  "Any duplicate entries will be only counted once. All page numbers will\n"
+					  "be sorted in an ascending fashion.\n\n"
+					  "For instance, \"3\", \"1,4,6\", \"2-3\", \"2, 4-7, 9\", \"3-5, 6-8\", \"1,3,5-\", \"-2\"\n"
+					  "are valid page numbers; \"6-2\", \"0, 2\", \"0-1\" are invalid.\n"
+					  "\"1-6,2-4\" will be counted as page 1,2,3,4,5,6. \"-2\" will be last 2 pages of\n"
+					  "original image. \"5,3,2\" will be same as \"2,3,5\"");
+		m_infoTip.Show(zText);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29156");
 
 	return 0;
 }

@@ -4,9 +4,9 @@
 
 #include <vector>
 #include <string>
+#include <set>
 
-using std::string;
-using std::vector;
+using namespace std;
 
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils vector<string> convertFileToLines(const string& strFilename);
@@ -61,6 +61,10 @@ EXPORT_BaseUtils void validatePageNumbers(const string& strSpecifiedPageNumbers)
 //			strSpecifiedPageNumbers.
 // 
 EXPORT_BaseUtils vector<int> getPageNumbers(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: Same as above with all above requirements, but instead of returning a sorted vector
+//			of page numbers, this method will return a set of page numbers.
+EXPORT_BaseUtils set<int> getPageNumbersAsSet(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: Load a list of files from a file vector of files
 // ARGUMENT:	strFileName is the name of the file with the list. Any lines or blocks with comments (// or /* */) are ignored

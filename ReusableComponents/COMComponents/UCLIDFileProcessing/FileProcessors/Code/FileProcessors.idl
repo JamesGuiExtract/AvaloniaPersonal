@@ -305,11 +305,14 @@ library UCLID_FILEPROCESSORSLib
 		[propget, id(4), helpstring("property VerticalPercentage")] HRESULT 
 			VerticalPercentage([out, retval] double* dVertPercentage);
 		//------------------------------------------------------------------------------------------
-		// The page number to place the stamp at
-		[propput, id(5), helpstring("property PageToStamp")] HRESULT 
-			PageToStamp([in] long lPageNumber);
-		[propget, id(5), helpstring("property PageToStamp")] HRESULT 
-			PageToStamp([out, retval] long* plPageNumber);
+		// REQUIRE: Valid page number format: single pages (eg. 2, 5), a range of pages (eg. 4-8),
+		//			or last X number of pages (eg. -3). They must be seperated by comma (,). When
+		//			a range of pages is specified,
+		//			starting page number must be less than ending page number.
+		[propput, id(6), helpstring("property PagesToStamp")] HRESULT
+			PagesToStamp([in] BSTR bstrPages);
+		[propget, id(6), helpstring("property PagesToStamp")] HRESULT
+			PagesToStamp([out, retval] BSTR* pbstrPages);
 		//------------------------------------------------------------------------------------------
 	};
 

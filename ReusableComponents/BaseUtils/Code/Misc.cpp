@@ -126,6 +126,156 @@ string getRegExpFromLines(CommentedTextFileReader& ctfr, const string& strRootFi
 
 	return strRegExp;
 }
+//-------------------------------------------------------------------------------------------------
+// Parse strPageRange, returns start and end page. nStartPage could be 0 (which means it's empty). 
+// nEndPage must be greater than 0 if start page is empty
+// Require: strPageRange must have one and only one dash (-)
+// 
+void getStartAndEndPage(const string& strPageRange, int& nStartPage, int& nEndPage)
+{
+	// assume this is a range of page numbers, or last X number of pages
+	// Further parse the string with delimiter as '-'
+	vector<string> vecTokens;
+	StringTokenizer::sGetTokens(strPageRange, "-", vecTokens);
+	if (vecTokens.size() != 2)
+	{
+		UCLIDException ue("ELI10262", "Invalid format for page range or last X number of pages.");
+		ue.addDebugInfo("String", strPageRange);
+		throw ue;
+	}
+	
+	string strStartPage = ::trim(vecTokens[0], " \t", " \t");
+	// start page could be empty
+	nStartPage = 0;
+	if (!strStartPage.empty())
+	{
+		if(strStartPage == "0")
+		{
+			UCLIDException ue("ELI12950", "Starting page can not be zero.");
+			ue.addDebugInfo("String", strPageRange);
+			throw ue;
+		}
+		// make sure the start page is a number
+
+		nStartPage = ::asLong(strStartPage);
+	}
+	
+	string strEndPage = ::trim(vecTokens[1], " \t", " \t");
+	// end page must not be empty if start page is empty
+	if (strStartPage.empty() && strEndPage.empty())
+	{
+		UCLIDException ue("ELI10263", "Starting and ending page can't be both empty.");
+		ue.addDebugInfo("Page range", strPageRange);
+		throw ue;
+	}
+	else if (!strStartPage.empty() && strEndPage.empty())
+	{
+		// if start page is not empty, but end page is empty, for instance, 2-,
+		// then the user wants to get all pages from the starting page till the end
+		// Set ending page as 0
+		nEndPage = 0;
+		return;
+	}
+	
+	nEndPage = ::asLong(strEndPage);
+	
+	// make sure the start page number is less than the end page number
+	if (nStartPage >= nEndPage)
+	{
+		UCLIDException ue("ELI10264", "Start page number must be less than the end page nubmer.");
+		ue.addDebugInfo("Page range", strPageRange);
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+// updates the vector with new page numbers
+void updatePageNumbers(vector<int>& rvecPageNubmers, 
+					   int nTotalNumberOfPages, 
+					   int nStartPage, 
+					   int nEndPage)
+{
+	int nLastPageNumber = (nEndPage < nTotalNumberOfPages && nEndPage > 0)? 
+							nEndPage : nTotalNumberOfPages;
+	for (int n=nStartPage; n<=nLastPageNumber; n++)
+	{
+		::vectorPushBackIfNotContained(rvecPageNubmers, n);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+// updates the vector with new page numbers. nPageNumber > 0
+// nPageNumber - this argument could be a single page number if bLastPagesDefined == false,
+//				 it could be last X number of pages if bLastPagesDefined == true
+void updatePageNumbers(vector<int>& rvecPageNubmers, 
+					   int nTotalNumberOfPages, 
+					   int nPageNumber,
+					   bool bLastPagesDefined = false)
+{
+	if (bLastPagesDefined)
+	{
+		int n = nPageNumber < nTotalNumberOfPages ? nTotalNumberOfPages-nPageNumber+1 : 1;
+		for (; n<=nTotalNumberOfPages; n++)
+		{
+			::vectorPushBackIfNotContained(rvecPageNubmers, n);
+		}
+	}
+	else
+	{
+		if (nPageNumber > nTotalNumberOfPages)
+		{
+			return;
+		}
+		
+		::vectorPushBackIfNotContained(rvecPageNubmers, nPageNumber);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void fillPageNumberVector(vector<int>& rvecPageNumbers,
+					int nTotalNumberOfPages, const string strSpecifiedPageNumbers)
+{
+	// Assume before this methods is called, the caller has already called validatePageNumbers()
+	vector<string> vecTokens;
+	// parse string into tokens
+	StringTokenizer::sGetTokens(strSpecifiedPageNumbers, ",", vecTokens);
+	for (unsigned int n=0; n<vecTokens.size(); n++)
+	{
+		// trim any leading/trailing white spaces
+		string strToken = ::trim(vecTokens[n], " \t", " \t");
+
+		// if the token contains a dash
+		if (strToken.find("-") != string::npos)
+		{
+			// start page could be empty
+			int nStartPage = 0, nEndPage = 0;
+			getStartAndEndPage(strToken, nStartPage, nEndPage);
+
+			if (nStartPage > 0 && 
+				(nEndPage > nStartPage || nEndPage <= 0))
+			{
+				// range of pages
+				updatePageNumbers(rvecPageNumbers, nTotalNumberOfPages, nStartPage, nEndPage);
+			}
+			else
+			{
+				// last X number of pages
+				updatePageNumbers(rvecPageNumbers, nTotalNumberOfPages, nEndPage, true);
+			}
+		}
+		else
+		{
+			// assume this is a page number
+			int nPageNumber = ::asLong(strToken);
+			if (nPageNumber <= 0)
+			{
+				UCLIDException ue("ELI19385", "Invalid page number.");
+				ue.addDebugInfo("Page Number", nPageNumber);
+				throw ue;
+			}
+
+			// single page number
+			updatePageNumbers(rvecPageNumbers, nTotalNumberOfPages, nPageNumber);
+		}
+	}
+}
 
 //-------------------------------------------------------------------------------------------------
 // Public Functions
@@ -285,67 +435,6 @@ void writeLinesToFile(const vector<string>& vecLines, const string& strFileName,
 	waitForFileToBeReadable(strFileName);
 }
 //-------------------------------------------------------------------------------------------------
-// Parse strPageRange, returns start and end page. nStartPage could be 0 (which means it's empty). 
-// nEndPage must be greater than 0 if start page is empty
-// Require: strPageRange must have one and only one dash (-)
-// 
-void getStartAndEndPage(const string& strPageRange, int& nStartPage, int& nEndPage)
-{
-	// assume this is a range of page numbers, or last X number of pages
-	// Further parse the string with delimiter as '-'
-	vector<string> vecTokens;
-	StringTokenizer::sGetTokens(strPageRange, "-", vecTokens);
-	if (vecTokens.size() != 2)
-	{
-		UCLIDException ue("ELI10262", "Invalid format for page range or last X number of pages.");
-		ue.addDebugInfo("String", strPageRange);
-		throw ue;
-	}
-	
-	string strStartPage = ::trim(vecTokens[0], " \t", " \t");
-	// start page could be empty
-	nStartPage = 0;
-	if (!strStartPage.empty())
-	{
-		if(strStartPage == "0")
-		{
-			UCLIDException ue("ELI12950", "Starting page can not be zero.");
-			ue.addDebugInfo("String", strPageRange);
-			throw ue;
-		}
-		// make sure the start page is a number
-
-		nStartPage = ::asLong(strStartPage);
-	}
-	
-	string strEndPage = ::trim(vecTokens[1], " \t", " \t");
-	// end page must not be empty if start page is empty
-	if (strStartPage.empty() && strEndPage.empty())
-	{
-		UCLIDException ue("ELI10263", "Starting and ending page can't be both empty.");
-		ue.addDebugInfo("Page range", strPageRange);
-		throw ue;
-	}
-	else if (!strStartPage.empty() && strEndPage.empty())
-	{
-		// if start page is not empty, but end page is empty, for instance, 2-,
-		// then the user wants to get all pages from the starting page till the end
-		// Set ending page as 0
-		nEndPage = 0;
-		return;
-	}
-	
-	nEndPage = ::asLong(strEndPage);
-	
-	// make sure the start page number is less than the end page number
-	if (nStartPage >= nEndPage)
-	{
-		UCLIDException ue("ELI10264", "Start page number must be less than the end page nubmer.");
-		ue.addDebugInfo("Page range", strPageRange);
-		throw ue;
-	}
-}
-//-------------------------------------------------------------------------------------------------
 void validatePageNumbers(const string& strSpecifiedPageNumbers)
 {
 	if (strSpecifiedPageNumbers.empty())
@@ -382,100 +471,28 @@ void validatePageNumbers(const string& strSpecifiedPageNumbers)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-// updates the vector with new page numbers
-void updatePageNumbers(vector<int>& rvecPageNubmers, 
-					   int nTotalNumberOfPages, 
-					   int nStartPage, 
-					   int nEndPage)
-{
-	int nLastPageNumber = (nEndPage < nTotalNumberOfPages && nEndPage > 0)? 
-							nEndPage : nTotalNumberOfPages;
-	for (int n=nStartPage; n<=nLastPageNumber; n++)
-	{
-		::vectorPushBackIfNotContained(rvecPageNubmers, n);
-	}
-}
-//-------------------------------------------------------------------------------------------------
-// updates the vector with new page numbers. nPageNubmer > 0
-// nPageNubmer - this argument could be a single page number if bLastPagesDefined == false,
-//				 it could be last X number of pages if bLastPagesDefined == true
-void updatePageNumbers(vector<int>& rvecPageNubmers, 
-					   int nTotalNumberOfPages, 
-					   int nPageNubmer,
-					   bool bLastPagesDefined = false)
-{
-	if (bLastPagesDefined)
-	{
-		int n = nPageNubmer < nTotalNumberOfPages ? nTotalNumberOfPages-nPageNubmer+1 : 1;
-		for (; n<=nTotalNumberOfPages; n++)
-		{
-			::vectorPushBackIfNotContained(rvecPageNubmers, n);
-		}
-	}
-	else
-	{
-		if (nPageNubmer > nTotalNumberOfPages)
-		{
-			return;
-		}
-		
-		::vectorPushBackIfNotContained(rvecPageNubmers, nPageNubmer);
-	}
-}
-//-------------------------------------------------------------------------------------------------
 vector<int> getPageNumbers(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers)
 {
 	// vector of page numbers in ascending order, no duplicates allowed
 	vector<int> vecSortedPageNumbers;
-
-	// Assume before this methods is called, the caller has already called validatePageNumbers()
-	vector<string> vecTokens;
-	// parse string into tokens
-	StringTokenizer::sGetTokens(strSpecifiedPageNumbers, ",", vecTokens);
-	for (unsigned int n=0; n<vecTokens.size(); n++)
-	{
-		// trim any leading/trailing white spaces
-		string strToken = ::trim(vecTokens[n], " \t", " \t");
-
-		// if the token contains a dash
-		if (strToken.find("-") != string::npos)
-		{
-			// start page could be empty
-			int nStartPage = 0, nEndPage = 0;
-			getStartAndEndPage(strToken, nStartPage, nEndPage);
-
-			if (nStartPage > 0 && 
-				(nEndPage > nStartPage || nEndPage <= 0))
-			{
-				// range of pages
-				updatePageNumbers(vecSortedPageNumbers, nTotalNumberOfPages, nStartPage, nEndPage);
-			}
-			else
-			{
-				// last X number of pages
-				updatePageNumbers(vecSortedPageNumbers, nTotalNumberOfPages, nEndPage, true);
-			}
-		}
-		else
-		{
-			// assume this is a page number
-			int nPageNumber = ::asLong(strToken);
-			if (nPageNumber <= 0)
-			{
-				UCLIDException ue("ELI19385", "Invalid page number.");
-				ue.addDebugInfo("Page Number", nPageNumber);
-				throw ue;
-			}
-
-			// single page number
-			updatePageNumbers(vecSortedPageNumbers, nTotalNumberOfPages, nPageNumber);
-		}
-	}
+	fillPageNumberVector(vecSortedPageNumbers, nTotalNumberOfPages, strSpecifiedPageNumbers);
 
 	// sort the vector in ascending order
 	sort(vecSortedPageNumbers.begin(), vecSortedPageNumbers.end());
 
 	return vecSortedPageNumbers;
+}
+//-------------------------------------------------------------------------------------------------
+set<int> getPageNumbersAsSet(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers)
+{
+	// vector of page numbers in ascending order, no duplicates allowed
+	vector<int> vecPageNumbers;
+	fillPageNumberVector(vecPageNumbers, nTotalNumberOfPages, strSpecifiedPageNumbers);
+
+	set<int> setPageNumbers;
+	setPageNumbers.insert(vecPageNumbers.begin(), vecPageNumbers.end());
+
+	return setPageNumbers;
 }
 //-------------------------------------------------------------------------------------------------
 void getFileListFromFile(const string &strFileName, vector<string> &rvecFiles, bool bUnique)

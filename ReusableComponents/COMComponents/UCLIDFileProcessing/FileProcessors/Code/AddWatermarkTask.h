@@ -88,8 +88,8 @@ public:
 	STDMETHOD(get_HorizontalPercentage)(double* pdHorizPercentage);
 	STDMETHOD(put_VerticalPercentage)(double dVertPercentage);
 	STDMETHOD(get_VerticalPercentage)(double* pdVertPercentage);
-	STDMETHOD(put_PageToStamp)(long lPageToStamp);
-	STDMETHOD(get_PageToStamp)(long* plPageToStamp);
+	STDMETHOD(put_PagesToStamp)(BSTR bstrPagesToStamp);
+	STDMETHOD(get_PagesToStamp)(BSTR* pbstrPagesToStamp);
 
 //----------------------------------------------------------------------------------------------
 // ICategorizedComponent
@@ -154,8 +154,8 @@ private:
 	// vertical percentage offset for watermark
 	double m_dVerticalPercentage;
 
-	// page to place stamp on
-	long m_lPageToStamp;
+	// pages to place stamp on
+	string m_strPagesToStamp;
 
 	// dirty flag
 	bool m_bDirty;
@@ -167,13 +167,6 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// PROMISE: Throws an exception if this component is not licensed. Runs successfully otherwise.
 	void validateLicense();
-	//----------------------------------------------------------------------------------------------
-	// PROMISE: To paste the stamp image onto the input image at the location specified by
-	//			the horizontal and vertical offset position and at the page specified and
-	//			to save the new image as the specified output image
-	void applyStampToImage(const string& stInputImage, const string& strOutputImage,
-		const string& strStampImage, double dHorizPercent, double dVertPercent,
-		long lPageToStamp);
 };
 
 OBJECT_ENTRY_AUTO(CLSID_AddWatermarkTask, CAddWatermarkTask)

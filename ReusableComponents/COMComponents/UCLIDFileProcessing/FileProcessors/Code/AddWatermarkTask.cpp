@@ -22,12 +22,15 @@
 #include <ByteStream.h>
 #include <ComponentLicenseIDs.h>
 #include <LicenseMgmt.h>
+#include <Misc.h>
 #include <PasteImage.h>
 
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2:
+//	Changed the page to stamp from a single integer to a string specifying a range of pages
+const unsigned long gnCurrentVersion = 2;
 
 // component description
 const string gstrADD_WATERMARK_COMPONENT_DESCRIPTION = "Core: Add watermark";
@@ -42,7 +45,7 @@ m_strInputImage(gstrDEFAULT_INPUT_IMAGE_FILENAME),
 m_strStampImage(""),
 m_dHorizontalPercentage(-1.0),
 m_dVerticalPercentage(-1.0),
-m_lPageToStamp(1)
+m_strPagesToStamp("1")
 {
 	try
 	{
@@ -201,24 +204,24 @@ STDMETHODIMP CAddWatermarkTask::put_VerticalPercentage(double dVertPercentage)
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CAddWatermarkTask::get_PageToStamp(long *plPageToStamp)
+STDMETHODIMP CAddWatermarkTask::get_PagesToStamp(BSTR *pbstrPagesToStamp)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19926", plPageToStamp != NULL);
+		ASSERT_ARGUMENT("ELI19926", pbstrPagesToStamp != NULL);
 
 		validateLicense();
 
-		*plPageToStamp = m_lPageToStamp;
+		*pbstrPagesToStamp = _bstr_t(m_strPagesToStamp.c_str()).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19927");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CAddWatermarkTask::put_PageToStamp(long lPageToStamp)
+STDMETHODIMP CAddWatermarkTask::put_PagesToStamp(BSTR bstrPagesToStamp)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -226,14 +229,19 @@ STDMETHODIMP CAddWatermarkTask::put_PageToStamp(long lPageToStamp)
 	{
 		validateLicense();
 
-		m_lPageToStamp = lPageToStamp;
+		// Get the page number string and validate it
+		string strPagesToStamp = asString(bstrPagesToStamp);
+		validatePageNumbers(strPagesToStamp);
+
+		// Store the valid string
+		m_strPagesToStamp = strPagesToStamp;
 
 		// set the dirty flag
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19928");
-
-	return S_OK;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -276,7 +284,7 @@ STDMETHODIMP CAddWatermarkTask::raw_CopyFrom(IUnknown* pObject)
 		m_strStampImage = asString(ipAddWatermarkTask->StampImageFile);
 		m_dHorizontalPercentage = ipAddWatermarkTask->HorizontalPercentage;
 		m_dVerticalPercentage = ipAddWatermarkTask->VerticalPercentage;
-		m_lPageToStamp = ipAddWatermarkTask->PageToStamp;
+		m_strPagesToStamp = asString(ipAddWatermarkTask->PagesToStamp);
 
 		// set the dirty flag
 		m_bDirty = true;
@@ -360,9 +368,9 @@ STDMETHODIMP CAddWatermarkTask::raw_ProcessFile(BSTR bstrFileFullName, long nFil
 		string strStampImage = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, 
 			m_strStampImage, strSourceDoc);
 
-		// apply the stamp to the image
-		applyStampToImage(strInputImage, strOutputImage, strStampImage, m_dHorizontalPercentage,
-			m_dVerticalPercentage, m_lPageToStamp);
+		// Apply the watermark to the image on the specified pages
+		pasteImageAtLocation(strInputImage, strOutputImage, strStampImage,
+			m_dHorizontalPercentage, m_dVerticalPercentage, m_strPagesToStamp);
 
 		// completed successfully
 		*pResult = kProcessingSuccessful;
@@ -496,7 +504,7 @@ STDMETHODIMP CAddWatermarkTask::Load(IStream* pStream)
 		m_strStampImage = "";
 		m_dHorizontalPercentage = -1.0;
 		m_dVerticalPercentage = -1.0;
-		m_lPageToStamp = 1;
+		m_strPagesToStamp = "1";
 		
 		// use a smart pointer for the IStream interface
 		IStreamPtr ipStream(pStream);
@@ -530,14 +538,25 @@ STDMETHODIMP CAddWatermarkTask::Load(IStream* pStream)
 		dataReader >> m_strStampImage;
 		dataReader >> m_dHorizontalPercentage;
 		dataReader >> m_dVerticalPercentage;
-		dataReader >> m_lPageToStamp;
+
+		// If the object is a version 1 object, read the specific page to stamp
+		if (nDataVersion == 1)
+		{
+			long lTemp;
+			dataReader >> lTemp;
+			m_strPagesToStamp = asString(lTemp);
+		}
+		else
+		{
+			dataReader >> m_strPagesToStamp;
+		}
 
 		// clear the dirty flag since a new object was loaded
 		m_bDirty = false;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19954");
-	
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CAddWatermarkTask::Save(IStream* pStream, BOOL fClearDirty)
@@ -557,7 +576,7 @@ STDMETHODIMP CAddWatermarkTask::Save(IStream* pStream, BOOL fClearDirty)
 		dataWriter << m_strStampImage;
 		dataWriter << m_dHorizontalPercentage;
 		dataWriter << m_dVerticalPercentage;
-		dataWriter << m_lPageToStamp;
+		dataWriter << m_strPagesToStamp;
 
 		// flush the data to the stream
 		dataWriter.flushToByteStream();
@@ -578,10 +597,10 @@ STDMETHODIMP CAddWatermarkTask::Save(IStream* pStream, BOOL fClearDirty)
 		{
 			m_bDirty = false;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19958");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CAddWatermarkTask::GetSizeMax(ULARGE_INTEGER* pcbSize)
@@ -630,13 +649,5 @@ void CAddWatermarkTask::validateLicense()
 {
 	// ensure that add watermark is licensed
 	VALIDATE_LICENSE(gnFILE_ACTION_MANAGER_OBJECTS, "ELI19960", "AddWatermarkTask");
-}
-//--------------------------------------------------------------------------------------------------
-void CAddWatermarkTask::applyStampToImage(const string &strInputImage, const string &strOutputImage, 
-										  const string &strStampImage, double dHorizPercent,
-										  double dVertPercent, long lPageToStamp)
-{
-	pasteImageAtLocation(strInputImage, strOutputImage, strStampImage, dHorizPercent,
-		dVertPercent, lPageToStamp);
 }
 //--------------------------------------------------------------------------------------------------

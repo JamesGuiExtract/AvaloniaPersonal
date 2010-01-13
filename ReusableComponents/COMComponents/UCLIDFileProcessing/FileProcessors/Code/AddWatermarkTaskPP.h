@@ -14,7 +14,9 @@
 #pragma once
 #include "resource.h"       // main symbols
 #include "FileProcessors.h"
+
 #include <ImageButtonWithStyle.h>
+#include <XInfoTip.h>
 
 EXTERN_C const CLSID CLSID_AddWatermarkTaskPP;
 
@@ -50,7 +52,8 @@ public:
 		COMMAND_HANDLER(IDC_BTN_WATERMARK_BROWSE_STAMP_IMAGE, BN_CLICKED, OnClickedBtnStampImageBrowse)
 		COMMAND_HANDLER(IDC_RADIO_WATERMARK_FIRSTPAGE, BN_CLICKED, OnClickedBtnRadioPage)
 		COMMAND_HANDLER(IDC_RADIO_WATERMARK_LASTPAGE, BN_CLICKED, OnClickedBtnRadioPage)
-		COMMAND_HANDLER(IDC_RADIO_WATERMARK_SPECIFIEDPAGE, BN_CLICKED, OnClickedBtnRadioPage)
+		COMMAND_HANDLER(IDC_RADIO_WATERMARK_SPECIFIEDPAGES, BN_CLICKED, OnClickedBtnRadioPage)
+		COMMAND_HANDLER(IDC_HELP_PAGENUMBERS, BN_CLICKED, OnClickedSpecificPageInfo)
 		// REFLECT_NOTIFICATIONS needed by ImageButtonWithSytle
 		REFLECT_NOTIFICATIONS()
 	END_MSG_MAP()
@@ -73,6 +76,7 @@ public:
 	LRESULT OnClickedBtnStampImageDocTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedBtnStampImageBrowse(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedBtnRadioPage(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedSpecificPageInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	// Ensures that this component is licensed
@@ -94,6 +98,7 @@ private:
 	ATLControls::CButton m_radioFirstPage;
 	ATLControls::CButton m_radioLastPage;
 	ATLControls::CButton m_radioSpecifiedPage;
+	CXInfoTip m_infoTip;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(AddWatermarkTaskPP), CAddWatermarkTaskPP)

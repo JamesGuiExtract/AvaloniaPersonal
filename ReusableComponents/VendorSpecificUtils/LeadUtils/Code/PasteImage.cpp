@@ -21,13 +21,14 @@
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <LicenseMgmt.h>
+#include <Misc.h>
 
 //--------------------------------------------------------------------------------------------------
 // Exported DLL functions
 //--------------------------------------------------------------------------------------------------
 void pasteImageAtLocation(const string& strInputImage, const string& strOutputImage,
 						  const string& strPasteImage, double dHorizPercent, 
-						  double dVertPercent, long lPage)
+						  double dVertPercent, const string& strPagesToStamp)
 {
 	ASSERT_ARGUMENT("ELI20174", dHorizPercent >= 0.0 && dHorizPercent <= 100.0);
 	ASSERT_ARGUMENT("ELI20175", dVertPercent >= 0.0 && dVertPercent <= 100.0);
@@ -50,6 +51,9 @@ void pasteImageAtLocation(const string& strInputImage, const string& strOutputIm
 
 			// Scope for the PDF managers
 			{
+				// Wait for the input file to be readable
+				waitForFileToBeReadable(strInputImage, true);
+
 				// create an input manager for the input image
 				PDFInputOutputMgr inImage(strInputImage, true);
 				PDFInputOutputMgr outImage(tmpOutFile.getName(), false);
@@ -65,15 +69,9 @@ void pasteImageAtLocation(const string& strInputImage, const string& strOutputIm
 				nPageCount = fileInfo.TotalPages;
 				int iFormat = fileInfo.Format;
 
-				// If destination page is -1 then set lPage to last page
-				if (lPage == -1)
-				{
-					lPage = nPageCount;
-				}
-				_lastCodePos = "30";
-
-				// validate the page number
-				validatePageNumber(lPage, nPageCount);
+				// Get the vector of page numbers to stamp
+				validatePageNumbers(strPagesToStamp);
+				set<int> setPages = getPageNumbersAsSet(nPageCount, strPagesToStamp);
 
 				// create a load files option
 				LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(
@@ -108,7 +106,7 @@ void pasteImageAtLocation(const string& strInputImage, const string& strOutputIm
 					loadImagePage(inImage, hBitmap, fileInfo, lfo, false);
 
 					// Check for stamp page
-					if (i == lPage)
+					if (setPages.find(i) != setPages.end())
 					{
 						// Declare the bitmaphandle and set the freer class to release it
 						BITMAPHANDLE hPasteBitmap;
@@ -147,8 +145,8 @@ void pasteImageAtLocation(const string& strInputImage, const string& strOutputIm
 			}
 			_lastCodePos = "60";
 
-			// Copy the temporary file to the destination file
-			copyFile(tmpOutFile.getName(), strOutputImage);
+			// Move the temporary file to the destination file
+			moveFile(tmpOutFile.getName(), strOutputImage, true, true);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20168");
 	}

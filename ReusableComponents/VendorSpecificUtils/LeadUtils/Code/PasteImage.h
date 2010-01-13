@@ -31,10 +31,11 @@ using namespace std;
 //			strPasteImage	- the name of the image that will be pasted onto the source image
 //			dHorizPercent	- the horizontal percentage offset from the top left of the image
 //			dVertPercent 	- the vertical percentage offset from the top left of the image
-//			lPage			- the page to paste the stamp on
+//			strPagesToStamp	- a string specifying which pages to stamp (see getPageNumbers
+//							  in BaseUtils/Misc.h for string specification)
 LEADUTILS_API void pasteImageAtLocation(const string& strInputImage, const string& strOutputImage,
 						  const string& strPasteImage, double dHorizPercent, 
-						  double dVertPercent, long lPage);
+						  double dVertPercent, const string& strPagesToStamp);
 
 //--------------------------------------------------------------------------------------------------
 // Non-exported helper functions

@@ -18,6 +18,7 @@
 #include <StringTokenizer.h>
 #include <TextFunctionExpander.h>
 #include <UCLIDException.h>
+#include <PDFInputOutputMgr.h>
 
 using namespace ADODB;
 
@@ -985,6 +986,9 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCompleted(void)
 		{
 			::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
 		}
+
+		// Processing is now complete, flush the PDF cache
+		PDFInputOutputMgr::sFlushCache();
 	}
 
 	return S_OK;

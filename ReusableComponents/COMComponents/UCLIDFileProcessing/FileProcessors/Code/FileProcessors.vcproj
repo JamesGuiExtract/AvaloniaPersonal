@@ -685,11 +685,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_up.ico"
+				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_info_middle.ico"
 				>
 			</File>
 			<File
 				RelativePath="..\..\Code\res\icon_up.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_up.ico"
 				>
 			</File>
 			<File

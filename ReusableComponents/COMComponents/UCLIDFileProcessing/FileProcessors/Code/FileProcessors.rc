@@ -268,12 +268,13 @@ BEGIN
     LTEXT           "Vertically",IDC_STATIC,12,132,30,10
     EDITTEXT        IDC_EDIT_WATERMARK_VERTICAL_PERCENT,57,130,30,12,ES_AUTOHSCROLL
     LTEXT           "% from the top of the page",IDC_STATIC,94,132,150,10
-    LTEXT           "Page to place stamp on:",IDC_STATIC,12,149,80,10
+    LTEXT           "Page(s) to place stamp on:",IDC_STATIC,12,149,100,10
     CONTROL         "First page",IDC_RADIO_WATERMARK_FIRSTPAGE,"Button",BS_AUTORADIOBUTTON,12,164,45,12
     CONTROL         "Last page",IDC_RADIO_WATERMARK_LASTPAGE,"Button",BS_AUTORADIOBUTTON,12,179,45,12
-    CONTROL         "Specified page:",IDC_RADIO_WATERMARK_SPECIFIEDPAGE,
-                    "Button",BS_AUTORADIOBUTTON,12,194,60,12
-    EDITTEXT        IDC_EDIT_WATERMARK_SPECIFIEDPAGE,79,194,20,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Specified page(s):",IDC_RADIO_WATERMARK_SPECIFIEDPAGES,
+                    "Button",BS_AUTORADIOBUTTON,12,194,65,12
+    EDITTEXT        IDC_EDIT_WATERMARK_SPECIFIEDPAGES,84,194,75,12,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_HELP_PAGENUMBERS,165,189,10,10,SS_NOTIFY
 END
 
 IDD_ARCHIVE_RESTORE_TASKPP DIALOGEX 0, 0, 274, 251
@@ -331,6 +332,8 @@ END
 IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
 IDI_ICON_UP             ICON                    "..\\..\\Code\\res\\icon_up.ico"
 IDI_ICON_DOWN           ICON                    "..\\..\\Code\\res\\icon_down.ico"
+IDI_ICON_INFO           ICON                    "..\\..\\..\\..\\BaseUtils\\Code\\res\\icon_info_middle.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -356,7 +359,7 @@ BEGIN
     IDD_SETACTIONSTATUSFILEPROCESSORPP, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 204
+        RIGHTMARGIN, 193
         TOPMARGIN, 7
         BOTTOMMARGIN, 55
     END
