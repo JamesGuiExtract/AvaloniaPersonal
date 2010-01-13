@@ -206,6 +206,13 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			// the object is closed" errors.
 			"SET NOCOUNT ON\r\n"
 			"\r\n"
+			// Start a try block so we can explicitly set NOCOUNT OFF
+			"BEGIN TRY\r\n"
+			"\r\n"
+			// Ensure the #OriginalResults table is dropped
+			"IF OBJECT_ID('tempdb..#OriginalResults', N'U') IS NOT NULL\r\n"
+			"	DROP TABLE #OriginalResults;\r\n"
+			"\r\n"
 			// This query creates table #OriginalResults with the same columns as the original query.
 			"SELECT TOP 0 " + strSelect + " INTO #OriginalResults FROM " + strQueryPart2 + "\r\n"
 			"\r\n"
@@ -249,8 +256,40 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			"			ORDER BY FAMFile.RowNumber\r\n"
 			"END\r\n"
 			"\r\n"
-			"DROP TABLE #OriginalResults\r\n";
-
+			"DROP TABLE #OriginalResults\r\n"
+			"\r\n"
+			"SET NOCOUNT OFF\r\n"
+			"\r\n"
+			"END TRY\r\n"
+			"\r\n"
+			"BEGIN CATCH"
+			"\r\n"
+			// Ensure NOCOUNT is set to OFF
+			"SET NOCOUNT OFF\r\n"
+			"\r\n"
+			// Get the error message, severity and state
+		    "	DECLARE @ErrorMessage NVARCHAR(4000);\r\n"
+		    "	DECLARE @ErrorSeverity INT;\r\n"
+		    "	DECLARE @ErrorState INT;\r\n"
+			"\r\n"
+		    "SELECT \r\n"
+	        "	@ErrorMessage = ERROR_MESSAGE(),\r\n"
+	        "	@ErrorSeverity = ERROR_SEVERITY(),\r\n"
+	        "	@ErrorState = ERROR_STATE();\r\n"
+			"\r\n"
+			// Check for state of 0 (cannot raise error with state 0, set to 1)
+			"IF @ErrorState = 0\r\n"
+			"	SELECT @ErrorState = 1\r\n"
+			"\r\n"
+			// Raise the error so that it will be caught at the outer scope
+		    "RAISERROR (@ErrorMessage,\r\n"
+			"	@ErrorSeverity,\r\n"
+			"	@ErrorState\r\n"
+			");\r\n"
+			"\r\n"
+			"END CATCH"
+			"\r\n";
+			
 		return strRandomizedQuery;
 	}
 	else
