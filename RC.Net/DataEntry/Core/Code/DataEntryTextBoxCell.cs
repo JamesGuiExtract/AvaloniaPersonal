@@ -58,12 +58,6 @@ namespace Extract.DataEntry
         /// </summary>
         private bool _initializingValue;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -84,7 +78,8 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI25584");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI25584", _OBJECT_NAME);
 
                 _dataEntryTable = base.DataGridView as DataEntryTableBase;
             }

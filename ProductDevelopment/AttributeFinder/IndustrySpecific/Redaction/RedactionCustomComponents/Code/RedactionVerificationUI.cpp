@@ -938,7 +938,8 @@ STDMETHODIMP CRedactionVerificationUI::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingTask
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRedactionVerificationUI::raw_Init()
+STDMETHODIMP CRedactionVerificationUI::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
+	IFileProcessingDB *pDB)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 

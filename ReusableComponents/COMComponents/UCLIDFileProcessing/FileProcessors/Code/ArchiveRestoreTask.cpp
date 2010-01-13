@@ -356,7 +356,8 @@ STDMETHODIMP CArchiveRestoreTask::raw_Clone(IUnknown** ppObject)
 //--------------------------------------------------------------------------------------------------
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CArchiveRestoreTask::raw_Init()
+STDMETHODIMP CArchiveRestoreTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
+	IFileProcessingDB *pDB)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 

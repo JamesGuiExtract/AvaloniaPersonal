@@ -180,7 +180,8 @@ STDMETHODIMP CConvertToPDFTask::raw_Clone(IUnknown** ppObject)
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingTask
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CConvertToPDFTask::raw_Init()
+STDMETHODIMP CConvertToPDFTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
+	IFileProcessingDB *pDB)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 

@@ -162,7 +162,8 @@ STDMETHODIMP CSetActionStatusFileProcessor::put_ActionStatus(long newVal)
 //--------------------------------------------------------------------------------------------------
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CSetActionStatusFileProcessor::raw_Init()
+STDMETHODIMP CSetActionStatusFileProcessor::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
+	IFileProcessingDB *pDB)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	

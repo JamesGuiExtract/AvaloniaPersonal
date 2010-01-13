@@ -1,0 +1,26 @@
+HKCR
+{
+	DataEntryCustomComponents.DataEntryProductDBMgr.1 = s 'DataEntryProductDBMgr Class'
+	{
+		CLSID = s '{2B336B61-CD96-4AED-9D99-A293C444E2C4}'
+	}
+	DataEntryCustomComponents.DataEntryProductDBMgr = s 'DataEntryProductDBMgr Class'
+	{
+		CLSID = s '{2B336B61-CD96-4AED-9D99-A293C444E2C4}'
+		CurVer = s 'DataEntryCustomComponents.DataEntryProductDBMgr.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {2B336B61-CD96-4AED-9D99-A293C444E2C4} = s 'DataEntryProductDBMgr Class'
+		{
+			ProgID = s 'DataEntryCustomComponents.DataEntryProductDBMgr.1'
+			VersionIndependentProgID = s 'DataEntryCustomComponents.DataEntryProductDBMgr'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{035D73E6-27B9-49B7-97AA-9D4E5722679E}'
+		}
+	}
+}

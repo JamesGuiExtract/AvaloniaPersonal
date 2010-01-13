@@ -40,7 +40,7 @@ namespace Extract.DataEntry
         /// name for this column.
         /// </summary>
         MultipleMatchSelectionMode _multipleMatchSelectionMode =
-            MultipleMatchSelectionMode.First;
+            MultipleMatchSelectionMode.None;
 
         /// <summary>
         /// 
@@ -100,12 +100,6 @@ namespace Extract.DataEntry
         /// </summary>
         bool _inDesignMode;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -131,7 +125,8 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI24497");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI24497", _OBJECT_NAME);
 
                 // [DataEntry:407]
                 // The DataEntryTable cannot currently support sorting.  Initialize as NotSortable
@@ -177,7 +172,7 @@ namespace Extract.DataEntry
         /// <returns>The selection mode to use to when choosing between multiple candidate attributes
         /// for a cell in a <see cref="DataEntryTableColumn"/>.</returns>
         [Category("Data Entry Table Column")]
-        [DefaultValue(MultipleMatchSelectionMode.First)]
+        [DefaultValue(MultipleMatchSelectionMode.None)]
         public MultipleMatchSelectionMode MultipleMatchSelectionMode
         {
             get
@@ -291,53 +286,6 @@ namespace Extract.DataEntry
                 catch (ExtractException ex)
                 {
                     throw ExtractException.AsExtractException("ELI24277", ex);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the name of a file containing a list of possible values the data entered in
-        /// a cell must match prior to being saved. 
-        /// <para><b>Requirements</b></para>
-        /// Must be specified if <see cref="UseComboBoxCells"/> is <see langword="true"/> since the 
-        /// values from this list will be used to populate the values of the combo boxes in this row.
-        /// Cannot be specified at the same time <see cref="ValidationPattern"/> is specified.
-        /// <para><b>Note</b></para>
-        /// If a cell's value matches a value in the supplied list case-insensitively but not 
-        /// case-sensitively, the value will be modified to match the casing in the list. If a value 
-        /// is specified in the list multiple times, the casing of the last entry will be used.
-        /// </summary>
-        /// <value>The name of a file containing list of values. <see langword="null"/> to remove
-        /// any existing validation list requirement.</value>
-        /// <returns>The name of a file containing list of values. <see langword="null"/> if there 
-        /// is no validation list set.</returns>
-        [Category("Data Entry Table Column")]
-        [DefaultValue(null)]
-        public string ValidationListFileName
-        {
-            get
-            {
-                try
-                {
-                    return _validator.ValidationListFileName;
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI24278", ex);
-                }
-            }
-
-            set
-            {
-                try
-                {
-                    _validator.ValidationListFileName = value;
-
-                    UpdateCellTemplate();
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI24280", ex);
                 }
             }
         }
@@ -700,7 +648,6 @@ namespace Extract.DataEntry
                 column.FormattingRuleFile = this.FormattingRuleFile;
                 column.MultipleMatchSelectionMode = this.MultipleMatchSelectionMode;
                 column.ValidationPattern = this.ValidationPattern;
-                column.ValidationListFileName = this.ValidationListFileName;
                 column.ValidationQuery = this.ValidationQuery;
                 column.ValidationErrorMessage = this.ValidationErrorMessage;
                 column.UseComboBoxCells = this.UseComboBoxCells;
@@ -733,10 +680,10 @@ namespace Extract.DataEntry
                 // validation list has been specified.
                 if (base.DataGridView != null && _useComboBoxCells)
                 {
-                    string[] validationListValues = _validator.GetValidationListValues();
+                    string[] autoCompleteValues = _validator.GetAutoCompleteValues();
 
-                    ExtractException.Assert("ELI25578", "ValidationListFileName must be specified " +
-                        "for ComboBox cells!", _inDesignMode || validationListValues != null);
+                    ExtractException.Assert("ELI25578", "Auto-complete query must be specified " +
+                        "for ComboBox cells!", _inDesignMode || autoCompleteValues != null);
                 }
             }
             catch (Exception ex)
@@ -761,10 +708,10 @@ namespace Extract.DataEntry
                 cellTemplate.Validator = (DataEntryValidator)_validator.Clone();
                 cellTemplate.RemoveNewLineChars = _removeNewLineChars;
 
-                string[] validationList = _validator.GetValidationListValues();
-                if (validationList != null)
+                string[] autoCompleteValues = _validator.GetAutoCompleteValues();
+                if (autoCompleteValues != null)
                 {
-                    cellTemplate.Items.AddRange(_validator.GetValidationListValues());
+                    cellTemplate.Items.AddRange(autoCompleteValues);
                 }
 
                 base.CellTemplate = cellTemplate;

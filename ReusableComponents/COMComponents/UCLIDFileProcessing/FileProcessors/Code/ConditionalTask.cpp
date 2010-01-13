@@ -272,7 +272,8 @@ STDMETHODIMP CConditionalTask::raw_IsConfigured(VARIANT_BOOL *pbValue)
 //--------------------------------------------------------------------------------------------------
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CConditionalTask::raw_Init()
+STDMETHODIMP CConditionalTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
+	IFileProcessingDB *pDB)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 

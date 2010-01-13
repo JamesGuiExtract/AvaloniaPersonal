@@ -2059,7 +2059,7 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 						pThreadData->m_ipTaskExecutor;
 					ASSERT_RESOURCE_ALLOCATION("ELI17949", ipExecutor != NULL);
 					ipExecutor->Init(copyFileProcessingTasks(m_ipFileProcessingTasks),
-						getFPMDB(), getFAMTagManager());
+						m_pRecordMgr->getActionID(), getFPMDB(), getFAMTagManager());
 				}
 			}
 

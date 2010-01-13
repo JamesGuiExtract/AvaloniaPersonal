@@ -33,6 +33,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._fileBrowseButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
+            this._enableInputTrackingCheckBox = new System.Windows.Forms.CheckBox();
+            this._enableCountersCheckBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // _label1
@@ -68,7 +70,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(327, 53);
+            this._okButton.Location = new System.Drawing.Point(327, 91);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 3;
@@ -79,19 +81,41 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(408, 53);
+            this._cancelButton.Location = new System.Drawing.Point(408, 91);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 4;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
+            // _enableInputTrackingCheckBox
+            // 
+            this._enableInputTrackingCheckBox.AutoSize = true;
+            this._enableInputTrackingCheckBox.Location = new System.Drawing.Point(15, 53);
+            this._enableInputTrackingCheckBox.Name = "_enableInputTrackingCheckBox";
+            this._enableInputTrackingCheckBox.Size = new System.Drawing.Size(156, 17);
+            this._enableInputTrackingCheckBox.TabIndex = 5;
+            this._enableInputTrackingCheckBox.Text = "Enable input event tracking";
+            this._enableInputTrackingCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // _enableCountersCheckBox
+            // 
+            this._enableCountersCheckBox.AutoSize = true;
+            this._enableCountersCheckBox.Location = new System.Drawing.Point(15, 77);
+            this._enableCountersCheckBox.Name = "_enableCountersCheckBox";
+            this._enableCountersCheckBox.Size = new System.Drawing.Size(153, 17);
+            this._enableCountersCheckBox.TabIndex = 6;
+            this._enableCountersCheckBox.Text = "Enable data entry counters";
+            this._enableCountersCheckBox.UseVisualStyleBackColor = true;
+            // 
             // ConfigurationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(495, 85);
+            this.ClientSize = new System.Drawing.Size(495, 126);
             this.ControlBox = false;
+            this.Controls.Add(this._enableCountersCheckBox);
+            this.Controls.Add(this._enableInputTrackingCheckBox);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._fileBrowseButton);
@@ -114,5 +138,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.Button _fileBrowseButton;
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
+        private System.Windows.Forms.CheckBox _enableInputTrackingCheckBox;
+        private System.Windows.Forms.CheckBox _enableCountersCheckBox;
     }
 }

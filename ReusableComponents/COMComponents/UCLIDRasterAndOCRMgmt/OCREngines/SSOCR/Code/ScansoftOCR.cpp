@@ -743,11 +743,6 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 					"Application trace: Unable to OCR document with standard decomposition attempt.";
 			}
 
-			// Log an exception for each decomposition attempt that fails
-			UCLIDException ueCurrentAttempt("ELI25303", strTopLevelText, ue);
-			ueCurrentAttempt.addDebugInfo("Failed File", asString(strImageFileName));
-			ueCurrentAttempt.log();
-
 			// Create or append to the aggregate exception.
 			if (apAggregateException.get() == NULL)
 			{
@@ -770,7 +765,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 		}
 	}
 
-	// Log the aggregate exception if all decompsition methods failed.
+	// Throw the aggregate exception if all decompsition methods failed.
 	if (bTryAgain)
 	{
 		apAggregateException.reset(new UCLIDException("ELI25300", 
@@ -779,6 +774,17 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 		apAggregateException->addDebugInfo("Failed Image", asString(strImageFileName));
 		throw *apAggregateException;
 	}
+	// ...or log the aggregate exception if at least one attempt failed before another succeeded.
+	else if (apAggregateException.get() != NULL)
+	{
+		apAggregateException.reset(new UCLIDException("ELI29014", 
+			"Application trace: At least one OCR decomposition methods failed.",
+			*apAggregateException));
+
+		apAggregateException->addDebugInfo("Image", asString(strImageFileName));
+		apAggregateException->log();
+	}
+
 
 	// get the spatial string from the stream
 	IPersistStreamPtr ipObj;

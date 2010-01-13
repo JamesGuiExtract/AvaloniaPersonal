@@ -36,7 +36,7 @@ static const string gstrIDSO_KEY_FILE = "\\IDShieldOffice.exe";
 
 static const string gstrLABDE_GUID = "{0E412937-E4FA-4737-A321-00AED69497C7}";
 static const string gstrLABDE_KEY_FILE = "\\Extract.LabResultsCustomComponents.dll";
-static const string gstrLABDE_VERSION_FILE = "\\Extract.DataEntry.dll";
+static const string gstrLABDE_VERSION_FILE = "\\Extract.LabDE.StandardLabDE.dll";
 
 static const string gstrICOMAP_GUID = "{0B7B53B1-B2F3-4EA0-97F9-D1280C11A892}";
 static const string gstrICOMAP_KEY_FILE = gstrRELATIVE_PATH_TO_ICOMAP_APP_DLL;

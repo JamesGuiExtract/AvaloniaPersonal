@@ -224,7 +224,7 @@ namespace Extract.SqlCompactExporter
                                     }
 
                                     // If the column value is empty, there is nothing to write.
-                                    string value = reader.GetString(i);
+                                    string value = reader.GetValue(i).ToString();
                                     if (string.IsNullOrEmpty(value))
                                     {
                                         continue;

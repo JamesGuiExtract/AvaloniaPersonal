@@ -239,7 +239,8 @@ STDMETHODIMP CManageTagsTask::raw_Clone(IUnknown** ppObject)
 //--------------------------------------------------------------------------------------------------
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CManageTagsTask::raw_Init()
+STDMETHODIMP CManageTagsTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
+	IFileProcessingDB *pDB)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 

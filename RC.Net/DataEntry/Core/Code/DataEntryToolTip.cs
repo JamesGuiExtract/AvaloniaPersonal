@@ -474,7 +474,7 @@ namespace Extract.DataEntry
 
                     // Obtain all the attribute's RasterZones grouped by page.
                     Dictionary<int, List<RasterZone>> rasterZonesByPage =
-                        _host.GetAttributeRasterZonesByPage(_attribute);
+                        _host.GetAttributeRasterZonesByPage(_attribute, false);
 
                     // Retrieve the RasterZones for this instance's page.
                     List<RasterZone> pageOfRasterZones;

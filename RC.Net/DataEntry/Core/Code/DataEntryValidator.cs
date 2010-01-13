@@ -27,57 +27,96 @@ namespace Extract.DataEntry
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(DataEntryValidator).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataEntryValidator).ToString();
 
         /// <summary>
         /// The value that should be specified in a validation list to consider a blank value as
         /// valid.
         /// </summary>
-        private static readonly string _BLANK_VALUE = "[BLANK]";
+        static readonly string _BLANK_VALUE = "[BLANK]";
 
         #endregion Constants
+
+        #region Struct
+
+        /// <summary>
+        /// Represents info about a <see cref="DataEntryQuery"/> to be used for validation.
+        /// </summary>
+        struct ValidationQuery
+        {
+            /// <summary>
+            /// The <see cref="DataEntryQuery"/> to be used to validate <see cref="IAttribute"/>
+            /// values.
+            /// </summary>
+            public DataEntryQuery DataEntryQuery;
+
+            /// <summary>
+            /// The set of values to be considered values (the key being an uppercase version of
+            /// the correctly cased value).
+            /// </summary>
+            public Dictionary<string, string> ValidationValues;
+
+            /// <summary>
+            /// If not <see langword="null"/>, rather than match a value from
+            /// <see cref="ValidationValues"/>, this field directly specifies whether the value is
+            /// valid based on the last execution of <see cref="DataEntryQuery"/>.
+            /// </summary>
+            public bool? IsValid;
+
+            /// <summary>
+            /// <see langword="true"/> if the query represents a validation warning,
+            /// <see langword="false"/> if the query identifies data that is truely invalid.
+            /// </summary>
+            public bool IsWarning;
+
+            /// <summary>
+            /// The <see cref="QueryResult"/> that was produced the last time
+            /// <see cref="DataEntryQuery"/> was evaluated.
+            /// </summary>
+            public QueryResult QueryResult;
+        }
+
+        #endregion Struct
 
         #region Fields
 
         /// <summary>
         /// A regular expression a string value must match prior to being saved.
         /// </summary>
-        private Regex _validationRegex;
+        Regex _validationRegex;
 
         /// <summary>
-        /// The name of a text file that contains a list of values a string value is required
-        /// to match.
+        /// Keeps track of the <see cref="DataEntryQuery"/>s that are used to validate data.
         /// </summary>
-        private string _validationListFileName;
+        Dictionary<DataEntryQuery, ValidationQuery> _validationQueries =
+            new Dictionary<DataEntryQuery, ValidationQuery>();
 
         /// <summary>
-        /// A dictionary of values a qualifying string value is required to match.  The keys are 
-        /// the values in upper-case to facilitate case-insensitive lookups.  The value for each 
-        /// key represents the original casing specified in the validation list file.
+        /// The list of values that comprise the auto-complete options that should be available.
         /// </summary>
-        private Dictionary<string, string> _validationListValues;
+        List<string> _autoCompleteValues;
 
         /// <summary>
         /// Specifies whether validation lists will be checked for matches case-sensitively.
         /// </summary>
-        private bool _caseSensitive;
+        bool _caseSensitive;
 
         /// <summary>
         /// Specifies whether a value that matches a validation list item case-insensitively but
         /// not case-sensitively will be changed to match the validation list value.
         /// </summary>
-        private bool _correctCase = true;
+        bool _correctCase = true;
 
         /// <summary>
         /// The error message that should be displayed upon validation failure.
         /// </summary>
-        private string _validationErrorMessage = "Invalid value";
+        string _validationErrorMessage = "Invalid value";
 
         /// <summary>
-        /// License cache for validating the license.
+        /// The error message that should be displayed instead of _validationErrorMessage based on
+        /// the <see cref="DataEntryQuery"/> used to mark the data as invalid.
         /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
+        string _overrideErrorMessage;
 
         #endregion Fields
 
@@ -98,7 +137,8 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI24492");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI24492", _OBJECT_NAME);
             }
             catch (Exception ex)
             {
@@ -111,9 +151,7 @@ namespace Extract.DataEntry
         #region Properties
 
         /// <summary>
-        /// Gets or set a regular expression data match prior to being saved.
-        /// <para><b>Requirements</b></para>
-        /// Cannot be specified at the same time <see cref="ValidationListFileName"/> is specified.
+        /// Gets or sets a regular expression data match prior to being saved.
         /// </summary>
         /// <value>A regular expression a <see langword="string"/> value must match prior to being 
         /// saved. <see langword="null"/> to remove any existing validation pattern requirement.
@@ -140,10 +178,6 @@ namespace Extract.DataEntry
                 {
                     if (!string.IsNullOrEmpty(value))
                     {
-                        ExtractException.Assert("ELI24294",
-                            "A validation pattern cannot be specified at the same time as a validation list!",
-                            _validationListValues == null);
-
                         _validationRegex = new Regex(value);
                     }
                     else
@@ -154,64 +188,6 @@ namespace Extract.DataEntry
                 catch (ExtractException ex)
                 {
                     throw ExtractException.AsExtractException("ELI24295", ex);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the name of a file containing a list of possible values a 
-        /// <see langword="string"/> value must match prior to being saved. 
-        /// <para><b>Requirements</b></para>
-        /// Cannot be specified at the same time <see cref="ValidationPattern"/> is specified.
-        /// <para><b>Note</b></para>
-        /// If a <see langword="string"/> value matches a value in the supplied list 
-        /// case-insensitively but not case-sensitively, the value will be modified to match the 
-        /// casing in the list. If a value is specified in the list multiple times, the casing of 
-        /// the last entry will be used.
-        /// </summary>
-        /// <value>The name of a file containing list of values. <see langword="null"/> to remove
-        /// any existing validation list requirement.</value>
-        /// <returns>The name of a file containing list of values. <see langword="null"/> if there 
-        /// is no validation list set.</returns>
-        public string ValidationListFileName
-        {
-            get
-            {
-                return _validationListFileName;
-            }
-
-            set
-            {
-                try
-                { 
-                    // Use a ProcessName check for design mode because LicenseUsageMode.UsageMode 
-                    // isn't always accruate.
-                    if (!Process.GetCurrentProcess().ProcessName.Equals(
-                            "devenv", StringComparison.CurrentCultureIgnoreCase) && 
-                        !string.IsNullOrEmpty(value))
-                    {
-                        // Read the file contents into a string value.
-                        string fileContents = File.ReadAllText(DataEntryMethods.ResolvePath(value));
-
-                        // Parse the file contents into individual list items.
-                        string[] listItems = fileContents.Split(new string[] { Environment.NewLine },
-                            StringSplitOptions.RemoveEmptyEntries);
-
-                        SetValidationListValues(listItems);
-                    }
-                    else
-                    {
-                        // Either in design mode or the filename was cleared; set the validation
-                        // list to null.
-                        _validationListValues = null;
-                    }
-
-                    // Save the provided file name.
-                    _validationListFileName = value;
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI24298", ex);
                 }
             }
         }
@@ -267,7 +243,7 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _validationErrorMessage;
+                return _overrideErrorMessage ?? _validationErrorMessage;
             }
 
             set
@@ -282,13 +258,16 @@ namespace Extract.DataEntry
         #endregion Properties
 
         #region Methods
-        
+
+        /// <overrides>
+        /// Tests to see if the provided value meets any validation requirements the validator has
+        /// </overrides>
         /// <summary>
         /// Tests to see if the provided value meets any validation requirements the validator has
         /// </summary>
         /// <param name="value">The <see langword="string"/> value is to be validated.
         /// <para><b>Note</b></para>
-        /// If a <see cref="ValidationListFileName"/> has been configured and the provided value
+        /// If a <see cref="DataEntryQuery"/> provides a list of valid values and the provided value
         /// matches a value in the supplied list case-insensitively but not case-sensitively, the 
         /// value will be modified to match the casing in the supplied list.</param>
         /// <param name="attribute">The <see cref="IAttribute"/> mapped to the value to be
@@ -300,34 +279,33 @@ namespace Extract.DataEntry
         /// instance in <see cref="IAttribute.DataObject"/></param>
         /// <param name="throwException">If <see langword="true"/> if the method will throw an
         /// exception if the provided value does not meet validation requirements.</param>
-        /// <returns><see langword="true"/> if the value met all validation requirements,
-        /// <see langword="false"/> if it did not and throwException is also <see langword="false"/>.
+        /// <returns>A <see cref="DataValidity"/>value indicating whether 
+        /// <see paramref="attribute"/>'s value is now valid.
         /// </returns>
         /// <throws><see cref="DataEntryValidationException"/> if the value fails to match any 
         /// validation requirements it has.</throws>
         [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "0#")]
-        public bool Validate(ref string value, IAttribute attribute, bool throwException)
+        public DataValidity Validate(ref string value, IAttribute attribute, bool throwException)
         {
             try
             {
+                // Reset the override error message prior to evaluating the value again.
+                _overrideErrorMessage = null;
+
+                DataValidity dataValidity = DataValidity.Valid;
+
                 // Allow validation lists and queries to be used only to update auto-complete lists
                 // without actually ever validating based on the list items.  Also, since .Net won't
                 // display validation error icons without error text, this enforces consistency by
                 // preventing cases where the DataEntry framework considers a value invalid, yet
                 // no error icon is displayed.
-                if (string.IsNullOrEmpty(_validationErrorMessage))
-                {
-                    return true;
-                }
+                bool validationEnabled = !string.IsNullOrEmpty(_validationErrorMessage) &&
+                                         AttributeStatusInfo.IsValidationEnabled(attribute);
 
                 // Ensure the control's attribute value matches the value of the text it contains.
-                bool dataIsValid = (attribute.Value == null && string.IsNullOrEmpty(value)) ||
-                                   (attribute.Value != null && attribute.Value.String == value);
-
-                // Check to see if data validation is enabled.
-                bool validationEnabled = AttributeStatusInfo.IsValidationEnabled(attribute);
-
-                if (!dataIsValid)
+                if (validationEnabled &&
+                    ((attribute.Value != null || !string.IsNullOrEmpty(value)) &&
+                     (attribute.Value == null || attribute.Value.String != value)))
                 {
                     if (throwException)
                     {
@@ -336,10 +314,14 @@ namespace Extract.DataEntry
                             AttributeStatusInfo.GetStatusInfo(attribute).OwningControl);
                         throw ee;
                     }
+                    else
+                    {
+                        dataValidity = DataValidity.Invalid;
+                    }
                 }
                 // If there is a specified validation pattern, check it.
-                else if (validationEnabled && _validationRegex != null &&
-                    !_validationRegex.IsMatch(value))
+                else if (validationEnabled &&  _validationRegex != null &&
+                         !_validationRegex.IsMatch(value))
                 {
                     if (throwException)
                     {
@@ -351,70 +333,62 @@ namespace Extract.DataEntry
                     }
                     else
                     {
-                        dataIsValid = false;
+                        dataValidity = DataValidity.Invalid;
                     }
                 }
-                // If there is a specified validation list, check it. Do this even if validation is
+                // If there are any validation queries, evaluate them. Do this even if validation is
                 // disabled to take advantage of trimming and case-correction.
-                else if (_validationListValues != null)
+                else if (_validationQueries != null)
                 {
-                    string valueTrimmed = value.Trim();
-                    bool valueIsInList = false;
-                    string listValue;
-                    if (_caseSensitive)
+                    ValidationQuery? validationFailure = null;
+
+                    // Evaluate each validation query looking for one that does not return valid.
+                    foreach (ValidationQuery validationQuery in _validationQueries.Values)
                     {
-                        // If case-sensitive, keys are assigned with the original casing.
-                        valueIsInList =
-                            _validationListValues.TryGetValue(valueTrimmed, out listValue);
-                    }
-                    else
-                    {
-                        // If checking case-insensitively, keys have been assigned using all caps.
-                        string valueUpper = valueTrimmed.ToUpper(CultureInfo.CurrentCulture);
-                        valueIsInList =
-                            _validationListValues.TryGetValue(valueUpper, out listValue);
-                    }
-                    
-                    if (!valueIsInList)
-                    {
-                        if (validationEnabled)
+                        if (!Validate(ref value, validationQuery))
                         {
-                            if (throwException)
+                            // validationFailure should be set to the first non-valid query or
+                            // to any query that returns invalid.
+                            if (validationFailure == null || !validationQuery.IsWarning)
                             {
-                                DataEntryValidationException ee = new DataEntryValidationException(
-                                    "ELI24282", "Invalid value: " + _validationErrorMessage,
-                                    AttributeStatusInfo.GetStatusInfo(attribute).OwningControl);
-                                ee.AddDebugData("Validation List", this.ValidationListFileName,
-                                    false);
-                                throw ee;
-                            }
-                            else
-                            {
-                                dataIsValid = false;
+                                validationFailure = validationQuery;
+
+                                // Keep searching until a query is found that returns invalid.
+                                if (!validationQuery.IsWarning)
+                                {
+                                    break;
+                                }
                             }
                         }
                     }
-                    else if (_correctCase && listValue != value)
+
+                    // If validation is enabled and one of the validation queries failed, set the
+                    // dataValidity and associated validation message from the query.
+                    if (validationEnabled && validationFailure != null)
                     {
-                        // If there is a validation list configured and the text box's data matches an
-                        // item in the list, but not case-sensitively, change the casing to match
-                        // the list item.
-                        value = listValue;
-                    }
-                    else if (value != valueTrimmed)
-                    {
-                        // Always trim the entries whether or not CorrectCase is enabled.  This
-                        // ensures that if controls add copies of the list entries with leading
-                        // spaces to enable all auto-complete entries to be displayed that the spaces
-                        // are removed in the final value.
-                        value = valueTrimmed;
+                        // Override the default error message if the query provides one.
+                        _overrideErrorMessage =
+                            validationFailure.Value.DataEntryQuery.GetValidationMessage(
+                                validationFailure.Value.QueryResult);
+
+                        if (throwException)
+                        {
+                            DataEntryValidationException ee = new DataEntryValidationException(
+                                "ELI24282", "Invalid value: " + ValidationErrorMessage,
+                                AttributeStatusInfo.GetStatusInfo(attribute).OwningControl);
+                            throw ee;
+                        }
+                        else
+                        {
+                            dataValidity = validationFailure.Value.IsWarning
+                                ? DataValidity.ValidationWarning : DataValidity.Invalid;
+                        }
                     }
                 }
 
-                // Update the statusInfo for this attribute.
-                AttributeStatusInfo.MarkDataAsValid(attribute, dataIsValid);
+                AttributeStatusInfo.SetDataValidity(attribute, dataValidity);
 
-                return dataIsValid;
+                return dataValidity;
             }
             catch (DataEntryValidationException validationException)
             {
@@ -428,47 +402,187 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Retrieves the values from the file specified by <see cref="ValidationListFileName"/>.
+        /// Validates the specified value using the specified <see cref="ValidationQuery"/>.
         /// </summary>
-        /// <returns>The values from the file specified by <see cref="ValidationListFileName"/>.
-        /// </returns>
-        public string[] GetValidationListValues()
+        /// <param name="value">The <see langword="string"/> value to be validated (and corrected
+        /// for casing differences if so configured).</param>
+        /// <param name="validationQuery">The <see cref="ValidationQuery"/> that is to be used to
+        /// validate the value.</param>
+        bool Validate(ref string value, ValidationQuery validationQuery)
         {
             try
             {
-                if (_validationListValues == null)
+                bool dataIsValid = true;
+                
+                ExtractException.Assert("ELI28976", "Missing validation query!",
+                    validationQuery.DataEntryQuery != null);
+
+                if (validationQuery.IsValid == null && validationQuery.ValidationValues == null)
+                {
+                    QueryResult queryResult = validationQuery.DataEntryQuery.Evaluate(null);
+                    SetValidationQuery(validationQuery.DataEntryQuery, queryResult);
+                }
+                
+                if (validationQuery.IsValid != null)
+                {
+                    dataIsValid = validationQuery.IsValid.Value;
+                }
+                else
+                {
+                    string valueTrimmed = value.Trim();
+                    string listValue;
+                    if (_caseSensitive)
+                    {
+                        // If case-sensitive, keys are assigned with the original casing.
+                        dataIsValid =
+                            validationQuery.ValidationValues.TryGetValue(valueTrimmed, out listValue);
+                    }
+                    else
+                    {
+                        // If checking case-insensitively, keys have been assigned using all caps.
+                        string valueUpper = valueTrimmed.ToUpper(CultureInfo.CurrentCulture);
+                        dataIsValid =
+                            validationQuery.ValidationValues.TryGetValue(valueUpper, out listValue);
+                    }
+
+                    if (dataIsValid)
+                    {
+                        if (_correctCase && listValue != value)
+                        {
+                            // If there is a validation list configured and the text box's data
+                            // matches an item in the list, but not case-sensitively, change the
+                            // casing to match the list item.
+                            value = listValue;
+                        }
+                        else if (value != valueTrimmed)
+                        {
+                            // Always trim the entries whether or not CorrectCase is enabled.  This
+                            // ensures that if controls add copies of the list entries with leading
+                            // spaces to enable all auto-complete entries to be displayed that the
+                            // spaces are removed in the final value.
+                            value = valueTrimmed;
+                        }
+                    }
+                }
+
+                return dataIsValid;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28930", ex);
+            }
+        }
+
+        /// <summary>
+        /// Specifies that the provided <see cref="DataEntryQuery"/> to be used to validate data or
+        /// generate auto-complete values in association with this <see cref="DataEntryValidator"/>.
+        /// </summary>
+        /// <param name="dataEntryQuery">The <see cref="DataEntryQuery"/> to be used to validate
+        /// data or generate auto-complete values.</param>
+        /// <param name="queryResults">The <see cref="QueryResult"/>s that were generated the last
+        /// time <see paramref="dataEntryQuery"/> was evaluated.</param>
+        internal void SetValidationQuery(DataEntryQuery dataEntryQuery, QueryResult queryResults)
+        {
+            try
+            {
+                // Initialize a ValidationQuery instance.
+                ValidationQuery validationQuery = new ValidationQuery();
+                validationQuery.DataEntryQuery = dataEntryQuery;
+                validationQuery.QueryResult = queryResults;
+                validationQuery.ValidationValues = new Dictionary<string, string>();
+                validationQuery.IsWarning = dataEntryQuery.IsValidationWarning;
+
+                // Initialize the value(s) of ValidValue or ValidationValues as appropriate.
+                if (!queryResults.IsEmpty || dataEntryQuery.ValidValue != null)
+                {
+                    // If ValidValue is not null, rather than provide a list, the query result
+                    // should be compared against the specified ValidValue.
+                    if (dataEntryQuery.ValidValue != null)
+                    {
+                        validationQuery.IsValid =
+                            dataEntryQuery.ValidValue.Equals(queryResults.ToString(),
+                                dataEntryQuery.CaseSensitive ?
+                                    StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
+                    }
+                    // Otherwise, generate a list of values to be considered valid.
+                    else
+                    {
+                        string[] values = queryResults.ToStringArray();
+
+                        foreach (string value in values)
+                        {
+                            string trimmedValue = value.Trim();
+
+                            // [DataEntry:188] Add support of "blank" as a valid value.
+                            if (string.Compare(trimmedValue, _BLANK_VALUE,
+                                    StringComparison.CurrentCultureIgnoreCase) == 0)
+                            {
+                                trimmedValue = "";
+                            }
+
+                            if (_caseSensitive)
+                            {
+                                // If using case-sensitive validation, the key should use the
+                                // original casing.
+                                validationQuery.ValidationValues[trimmedValue] = trimmedValue;
+                            }
+                            else
+                            {
+                                // If using case-insensitive validation, the key should use all
+                                // caps.
+                                string key = trimmedValue.ToUpper(CultureInfo.CurrentCulture);
+                                validationQuery.ValidationValues[key] = trimmedValue;
+                            }
+                        }
+                    }
+                }
+
+                _validationQueries[dataEntryQuery] = validationQuery;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28975", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets an array of <see langword="string"/> values that should be provided to the user in
+        /// an auto-complete list.
+        /// </summary>
+        /// <returns>
+        /// An array of <see langword="string"/> values that should be provided to the user in an
+        /// auto-complete list.
+        /// </returns>
+        public string[] GetAutoCompleteValues()
+        {
+            try
+            {
+                if (_autoCompleteValues == null)
                 {
                     return null;
                 }
                 else
                 {
-                    // Copy the values from the _validationListValues to an array and return them.
-                    string[] values = new string[_validationListValues.Values.Count];
-                    _validationListValues.Values.CopyTo(values, 0);
-                    return values;
+                    return _autoCompleteValues.ToArray();
                 }
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI25518", ex);
+                throw ExtractException.AsExtractException("ELI28929", ex);
             }
         }
 
         /// <summary>
-        /// Sets the possible values the validator will accept as valid. This overrides any existing
-        /// validation list.
+        /// Sets the values that should be provided to the user in an auto-complete list.
         /// </summary>
-        /// <param name="values">The values to be considered valid.</param>
-        public void SetValidationListValues(string[] values)
+        /// <param name="values">An array of values that should be provided to the user in an
+        /// auto-complete list associated with the data's control.</param>
+        public void SetAutoCompleteValues(string[] values)
         {
             try
             {
-                ExtractException.Assert("ELI24297",
-                    "A validation list cannot be specified at the same time as a validation pattern!",
-                    this.ValidationPattern == null);
-
                 // Populate the validation list dictionary.
-                _validationListValues = new Dictionary<string, string>();
+                _autoCompleteValues = new List<string>();
                 if (values != null)
                 {
                     foreach (string item in values)
@@ -482,22 +596,11 @@ namespace Extract.DataEntry
                             trimmedItem = "";
                         }
 
-                        if (_caseSensitive)
-                        {
-                            // If using case-sensitive validation, the key should use the original
-                            // casing.
-                            _validationListValues[trimmedItem] = trimmedItem;
-                        }
-                        else
-                        {
-                            // If using case-insensitive validation, the key should use all caps.
-                            _validationListValues[trimmedItem.ToUpper(CultureInfo.CurrentCulture)] =
-                                trimmedItem;
-                        }
+                        _autoCompleteValues.Add(trimmedItem);
                     }
                 }
 
-                OnValidationListChanged();
+                OnAutoCompleteValuesChanged();
             }
             catch (Exception ex)
             {
@@ -573,12 +676,9 @@ namespace Extract.DataEntry
                 DataEntryValidator source = (DataEntryValidator)pObject;
 
                 _validationRegex = source._validationRegex;
-                _validationListFileName = source._validationListFileName;
                 _validationErrorMessage = source._validationErrorMessage;
-                if (source._validationListValues != null)
-                {
-                    SetValidationListValues(source.GetValidationListValues());
-                }
+                // The validation queries will be re-populated when attributes are mapped.
+                _validationQueries.Clear();
                 _correctCase = source._correctCase;
                 _caseSensitive = source._caseSensitive;
             }
@@ -597,6 +697,11 @@ namespace Extract.DataEntry
         /// </summary>
         public event EventHandler<EventArgs> ValidationListChanged;
 
+        /// <summary>
+        /// Raised to indicate the auto-complete values have changed.
+        /// </summary>
+        public event EventHandler<EventArgs> AutoCompleteValuesChanged;
+
         #endregion Events
 
         #region Private Members
@@ -604,11 +709,22 @@ namespace Extract.DataEntry
         /// <summary>
         /// Raises the <see cref="ValidationListChanged"/> event.
         /// </summary>
-        private void OnValidationListChanged()
+        void OnValidationListChanged()
         {
             if (this.ValidationListChanged != null)
             {
                 ValidationListChanged(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="AutoCompleteValuesChanged"/> event.
+        /// </summary>
+        void OnAutoCompleteValuesChanged()
+        {
+            if (this.AutoCompleteValuesChanged != null)
+            {
+                AutoCompleteValuesChanged(this, new EventArgs());
             }
         }
 

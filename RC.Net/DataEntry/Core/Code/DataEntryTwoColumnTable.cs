@@ -40,7 +40,7 @@ namespace Extract.DataEntry
         /// name for this control.
         /// </summary>
         MultipleMatchSelectionMode _multipleMatchSelectionMode =
-            MultipleMatchSelectionMode.First;
+            MultipleMatchSelectionMode.None;
 
         /// <summary>
         /// Indicates whether swiping should be allowed when an individual cell is selected.
@@ -82,12 +82,6 @@ namespace Extract.DataEntry
         /// </summary>
         bool _inDesignMode;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -110,7 +104,8 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI24491");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI24491", _OBJECT_NAME);
 
                 InitializeComponent();
 
@@ -174,7 +169,7 @@ namespace Extract.DataEntry
         /// <returns>The selection mode to use to find the mapped attribute for the
         /// <see cref="DataEntryTwoColumnTable"/>.</returns>
         [Category("Data Entry Table")]
-        [DefaultValue(MultipleMatchSelectionMode.First)]
+        [DefaultValue(MultipleMatchSelectionMode.None)]
         public MultipleMatchSelectionMode MultipleMatchSelectionMode
         {
             get
@@ -460,7 +455,8 @@ namespace Extract.DataEntry
                 // Include all the attributes for the specifically selected cells in the 
                 // spatial info, not any children of those attributes. Show tooltips only
                 // if one attribute is selected.
-                OnAttributesSelected(selectedAttributes, false, selectedAttributes.Size() == 1);
+                OnAttributesSelected(selectedAttributes, false, selectedAttributes.Size() == 1,
+                    null);
                
                 // Update the swiping state based on the current selection.
                 OnSwipingStateChanged();
@@ -876,17 +872,53 @@ namespace Extract.DataEntry
                 }
             }
 
-            // A rule didn't exist or didn't produce a valid attribute. Apply the 
-            // swiped text value directly to the mapped attribute.
-            base.CurrentCell.Value = swipedText;
+            // If there is an active text box editing control, swipe into the current
+            // selection rather than replacing the entire value.
+            DataGridViewTextBoxEditingControl textBoxEditingControl =
+                EditingControl as DataGridViewTextBoxEditingControl;
+            int selectionStart = -1;
+            int selectionLength = -1;
+            if (textBoxEditingControl != null)
+            {
+                // Keep track of what the final selection should be.
+                selectionStart = textBoxEditingControl.SelectionStart;
+                selectionLength = swipedText.Size;
+
+                IDataEntryTableCell dataEntryCell = CurrentCell as IDataEntryTableCell;
+
+                if (dataEntryCell != null)
+                {
+                    swipedText = DataEntryMethods.InsertSpatialStringIntoSelection(
+                        textBoxEditingControl, dataEntryCell.Attribute.Value, swipedText);
+                }
+            }
+
+            // Apply the new value directly to the mapped attribute (Don't replace the entire 
+            // attribute).
+            CurrentCell.Value = swipedText;
+
+            // If an editing control is active, update it to reflect the result of the swipe.
+            if (EditingControl != null)
+            {
+                RefreshEdit();
+
+                if (textBoxEditingControl != null)
+                {
+                    // Select the newly swiped text.
+                    textBoxEditingControl.Select(selectionStart, selectionLength);
+                }
+
+                // Forces the caret position to be updated appropriately.
+                EditingControl.Focus();
+            }
 
             // Since the spatial information for this cell has changed, spatial hints need to be 
             // updated.
-            base.UpdateHints(false);
+            UpdateHints(false);
 
             // Raise AttributesSelected to updated the control's highlight.
             OnAttributesSelected(DataEntryMethods.AttributeAsVector(
-                    DataEntryTableBase.GetAttribute(selectedDataEntryCell)), false, true);
+                    DataEntryTableBase.GetAttribute(selectedDataEntryCell)), false, true, null);
 
             return true;
         }

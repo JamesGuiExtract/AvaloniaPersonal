@@ -410,6 +410,13 @@ STDMETHODIMP CIUnknownVector::RemoveRange(long nStart, long nEnd)
 		// validate indexes
 		validateIndex(nStart);
 		validateIndex(nEnd);
+		if (nEnd < nStart)
+		{
+			UCLIDException ue("ELI28784", "Invalid index range!");
+			ue.addDebugInfo("start", nStart);
+			ue.addDebugInfo("end", nEnd);
+			throw ue;
+		}
 
 		vector<IUnknownPtr>::iterator iterStart, iterEnd;
 
@@ -417,13 +424,9 @@ STDMETHODIMP CIUnknownVector::RemoveRange(long nStart, long nEnd)
 		iterStart = m_vecIUnknowns.begin() + nStart;
 
 		// get the iterEnd iterator to the correct location
-		iterEnd = iterStart + (nEnd - nStart);
-
-		// Protect against iterators pointing to same location
-		if (iterEnd == iterStart)
-		{
-			iterEnd++;
-		}
+		// [LegacyRCAndUtils:5569] Add one since stl doesn't include the end iterator in the
+		// deletions.
+		iterEnd = m_vecIUnknowns.begin() + nEnd + 1;
 
 		// erase the entries in the specified range
 		m_vecIUnknowns.erase(iterStart, iterEnd);

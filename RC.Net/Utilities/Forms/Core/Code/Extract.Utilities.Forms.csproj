@@ -100,6 +100,12 @@
     <Compile Include="ShortcutsManager.cs" />
     <Compile Include="ShortcutsManagerEventArguments.cs" />
     <Compile Include="ShortcutsMessageFilter.cs" />
+    <Compile Include="SmartTagManager.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SmartTagManager.designer.cs">
+      <DependentUpon>SmartTagManager.cs</DependentUpon>
+    </Compile>
     <Compile Include="SplashScreen.cs">
       <SubType>Form</SubType>
     </Compile>

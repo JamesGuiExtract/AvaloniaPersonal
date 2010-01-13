@@ -29,20 +29,20 @@ namespace Extract.DataEntry
         /// <summary>
         /// The <see cref="IAttribute"/> is truely spatial (not a hint).
         /// </summary>
-        None,
+        None = 0,
 
         /// <summary>
         /// The <see cref="IAttribute"/> is a direct hint (specifies the region one would expect to
         /// find the data related to this hint.
         /// </summary>
-        Direct,
+        Direct = 1,
 
         /// <summary>
         /// The <see cref="IAttribute"/> is an indirect hint (specifies spatial clues that will help
         /// determine where the <see cref="IAttribute"/>'s data may be found, but not necessarily
         /// where one would expect to actually find the data).
         /// </summary>
-        Indirect
+        Indirect = 2
     }
 
     /// <summary>
@@ -54,24 +54,45 @@ namespace Extract.DataEntry
         /// <summary>
         /// The <see cref="IAttribute"/> should always be in the tab order (assuming it is viewable).
         /// </summary>
-        Always,
+        Always = 0,
 
         /// <summary>
         /// The <see cref="IAttribute"/> should only be included in the tab order if it is populated
         /// with a non-empty value or its data is marked as invalid.
         /// </summary>
-        OnlyWhenPopulatedOrInvalid,
+        OnlyWhenPopulatedOrInvalid = 1,
 
         /// <summary>
         /// The <see cref="IAttribute"/> should only be included in the tab order if its data is
         /// marked as invalid (regardless of whether the value is non-empty).
         /// </summary>
-        OnlyWhenInvalid,
+        OnlyWhenInvalid = 2,
 
         /// <summary>
         /// The <see cref="IAttribute"/> should never be included in the tab order.
         /// </summary>
-        Never
+        Never = 3
+    }
+
+    /// <summary>
+    /// Specifies whether a particular data element is valid or not.
+    /// </summary>
+    public enum DataValidity
+    {
+        /// <summary>
+        /// The data is valid.
+        /// </summary>
+        Valid = 0,
+
+        /// <summary>
+        /// The data is invalid.
+        /// </summary>
+        Invalid = 1,
+
+        /// <summary>
+        /// The data is suspect; there is reason to believe it is not valid.
+        /// </summary>
+        ValidationWarning = 2
     }
 
     /// <summary>
@@ -282,7 +303,8 @@ namespace Extract.DataEntry
                 try
                 {
                     // Validate the license
-                    _licenseCache.Validate("ELI26132");
+                    LicenseUtilities.ValidateLicense(
+                        LicenseIdName.DataEntryCoreComponents, "ELI26132", _OBJECT_NAME);
 
                     // Create a node in charge of scanning the root-level attributes.
                     AttributeScanner rootScanNode = new AttributeScanner(attributes, accessorMethod,
@@ -588,6 +610,11 @@ namespace Extract.DataEntry
         static string _sourceDocName;
 
         /// <summary>
+        /// Used to expand path tags.
+        /// </summary>
+        static SourceDocumentPathTags _sourceDocumentPathTags = new SourceDocumentPathTags();
+
+        /// <summary>
         /// The active attribute hierarchy.
         /// </summary>
         static IUnknownVector _attributes;
@@ -639,6 +666,11 @@ namespace Extract.DataEntry
         static bool _endEditInProgress;
 
         /// <summary>
+        /// Specifies whether validation triggers are currently auto-resolving as they are loaded.
+        /// </summary>
+        static bool _validationTriggersEnabled;
+
+        /// <summary>
         /// Indicates whether the object has been modified since being loaded via the 
         /// IPersistStream interface. This is an int because that is the return type of 
         /// IPersistStream::IsDirty in order to support COM values of <see cref="HResult.Ok"/> and 
@@ -674,10 +706,9 @@ namespace Extract.DataEntry
         bool _isViewable;
 
         /// <summary>
-        /// <see langword="true"/> if the attribute's data is currently know to be valid.
-        /// <see langword="false"/> otherwise.
+        /// A <see cref="DataValidity"/> value indicating whether the attribute's value is valid.
         /// </summary>
-        bool _dataIsValid = true;
+        DataValidity _dataValidity = DataValidity.Valid;
 
         /// <summary>
         /// <see langword="true"/> if data validation should be performed on the attribute,
@@ -752,10 +783,12 @@ namespace Extract.DataEntry
         bool _persistAttribute = true;
 
         /// <summary>
-        /// License cache for validating the license.
+        /// A list of <see cref="IAttribute"/>s that are contained within a group owned by this
+        /// <see cref="IAttribute"/>.  Will be <see langword="null"/> for attributes in controls
+        /// that don't support tab groups or an empty list for attributes that don't own a group
+        /// in a control that supports tab groups.
         /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
+        List<IAttribute> _tabGroup;
 
         #endregion Fields
 
@@ -778,7 +811,8 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI24485");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI24485", _OBJECT_NAME);
             }
             catch (Exception ex)
             {
@@ -967,6 +1001,19 @@ namespace Extract.DataEntry
                 return _sourceDocName;
             }
         }
+       
+        /// <summary>
+        /// Gets a <see cref="SourceDocumentPathTags"/> instance to expands path tags.
+        /// </summary>
+        /// <returns>A <see cref="SourceDocumentPathTags"/> instance.</returns>
+        [ComVisible(false)]
+        public static SourceDocumentPathTags SourceDocumentPathTags
+        {
+            get
+            {
+                return _sourceDocumentPathTags;
+            }
+        }
 
         /// <summary>
         /// Returns the <see cref="AttributeStatusInfo"/> object associated with the provided
@@ -983,7 +1030,8 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26109");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI26109", _OBJECT_NAME);
 
                 AttributeStatusInfo statusInfo;
                 if (!_statusInfoMap.TryGetValue(attribute, out statusInfo))
@@ -1024,7 +1072,8 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26133");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI26133", _OBJECT_NAME);
 
                 _sourceDocName = sourceDocName;
                 _attributes = attributes;
@@ -1033,6 +1082,9 @@ namespace Extract.DataEntry
                 _subAttributesToParentMap.Clear();
                 _attributesBeingModified.Clear();
                 _endEditInProgress = false;
+                _sourceDocumentPathTags = (string.IsNullOrEmpty(_sourceDocName))
+                    ? new SourceDocumentPathTags()
+                    : new SourceDocumentPathTags(AttributeStatusInfo.SourceDocName);
 
                 foreach (AutoUpdateTrigger autoUpdateTrigger in _autoUpdateTriggers.Values)
                 {
@@ -1089,7 +1141,8 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26134");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI26134", _OBJECT_NAME);
 
                 // Create a new statusInfo instance (or retrieve an existing one).
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
@@ -1203,8 +1256,8 @@ namespace Extract.DataEntry
                         // need to be re-ordered later.
                         sourceAttributes.PushBackIfNotContained(attribute);
 
-                        _autoUpdateTriggers[attribute] =
-                            new AutoUpdateTrigger(attribute, autoUpdateQuery, _dbConnection, false);
+                        _autoUpdateTriggers[attribute] = new AutoUpdateTrigger(attribute,
+                            autoUpdateQuery, _dbConnection, false, true);
                     }
                 }
 
@@ -1242,8 +1295,8 @@ namespace Extract.DataEntry
                         // need to be re-ordered later.
                         sourceAttributes.PushBackIfNotContained(attribute);
 
-                        _validationTriggers[attribute] =
-                            new AutoUpdateTrigger(attribute, validationQuery, _dbConnection, true);
+                        _validationTriggers[attribute] = new AutoUpdateTrigger(attribute,
+                            validationQuery, _dbConnection, true, _validationTriggersEnabled);
                     }
                 }
                 else
@@ -1259,17 +1312,20 @@ namespace Extract.DataEntry
                     }
                 }
 
-                foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
+                if (_validationTriggersEnabled)
                 {
-                    if (!validationTrigger.GetIsFullyResolved())
+                    foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
                     {
-                        // We need to ensure that the attribute is a part of the sourceAttributes
-                        // in order for RegisterTriggerCandidate to work. When creating a new
-                        // attribute, this won't be the case.  Add it now, even though it will still
-                        // need to be re-ordered later.
-                        sourceAttributes.PushBackIfNotContained(attribute);
+                        if (!validationTrigger.GetIsFullyResolved())
+                        {
+                            // We need to ensure that the attribute is a part of the sourceAttributes
+                            // in order for RegisterTriggerCandidate to work. When creating a new
+                            // attribute, this won't be the case.  Add it now, even though it will
+                            // still need to be re-ordered later.
+                            sourceAttributes.PushBackIfNotContained(attribute);
 
-                        validationTrigger.RegisterTriggerCandidate(attribute);
+                            validationTrigger.RegisterTriggerCandidate(attribute);
+                        }
                     }
                 }
 
@@ -1288,6 +1344,42 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI24684", ex);
+            }
+        }
+
+        /// <summary>
+        /// Specifies whether validation triggers should be enabled or disabled.
+        /// </summary>
+        /// <param name="enable"><see langword="true"/> if validation triggers are to be enabled,
+        /// <see langword="false"/> otherwise.
+        /// <para><b>Note</b></para>
+        /// Specifying <see langword="false"/> only prevents newly created triggers from
+        /// registering for immediate evaluation. It does not prevent already registered triggers
+        /// from updating the validation status based on the modification of trigger attributes.
+        /// </param>
+        [ComVisible(false)]
+        public static void EnableValidationTriggers(bool enable)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI29046", _OBJECT_NAME);
+
+                _validationTriggersEnabled = enable;
+
+                // If validation triggers are being enabled, try to register all triggers.
+                if (_validationTriggersEnabled)
+                {
+                    foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
+                    {
+                        validationTrigger.RegisterTriggerCandidate(null);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29047", ex);
             }
         }
 
@@ -1316,7 +1408,8 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI27093");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI27093", _OBJECT_NAME);
 
                 // Make a copy of the original value.
                 ICopyableObject copySource = (ICopyableObject)attribute.Value;
@@ -1381,8 +1474,7 @@ namespace Extract.DataEntry
                         // AttributeValueModified to notify the host of the change.
                         AttributeStatusInfo statusInfo =
                             AttributeStatusInfo.GetStatusInfo(attribute);
-                        statusInfo.OwningControl.RefreshAttributes(new IAttribute[] { attribute }, 
-                            true);
+                        statusInfo.OwningControl.RefreshAttributes(true, attribute);
                         statusInfo.OnAttributeValueModified(attribute, false, false, true);
                     }
                     catch (Exception ex2)
@@ -1418,7 +1510,8 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26135");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI26135", _OBJECT_NAME);
 
                 // Don't do anything if the specified value matches the existing value.
                 if (attribute.Value.String != value)
@@ -1482,8 +1575,7 @@ namespace Extract.DataEntry
                         // AttributeValueModified to notify the host of the change.
                         AttributeStatusInfo statusInfo =
                             AttributeStatusInfo.GetStatusInfo(attribute);
-                        statusInfo.OwningControl.RefreshAttributes(new IAttribute[] { attribute },
-                            false);
+                        statusInfo.OwningControl.RefreshAttributes(false, attribute);
                         statusInfo.OnAttributeValueModified(attribute, false, false, false);
                     }
                     catch (Exception ex2)
@@ -1507,7 +1599,8 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26136");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI26136", _OBJECT_NAME);
 
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
@@ -1690,6 +1783,8 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s 
         /// to be checked for whether its data is valid.</param>
+        /// <param name="includeWarnings">Whether attributes marked as
+        /// <see cref="InvalidDataSaveMode.AllowWithWarnings"/> should be included.</param>
         /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
         /// the point at which the scan should be started with each attribute further down the
         /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
@@ -1711,14 +1806,21 @@ namespace Extract.DataEntry
         /// </returns>
         [ComVisible(false)]
         public static Stack<IAttribute> FindNextInvalidAttribute(IUnknownVector attributes,
-            Stack<IAttribute> startingPoint, bool forward, bool loop)
+            bool includeWarnings, Stack<IAttribute> startingPoint, bool forward, bool loop)
         {
             try
             {
                 Stack<IAttribute> invalidAttributes = new Stack<IAttribute>();
 
-                if (!AttributeScanner.Scan(attributes, startingPoint, ConfirmDataValidity, true,
-                    forward, loop, invalidAttributes))
+                // Scan with ConfirmDataIsValid or ConfirmDataIsNotInvalid depending on the value of
+                // includeWarnings.
+                bool scanResult = includeWarnings ?
+                    AttributeScanner.Scan(attributes, startingPoint, ConfirmDataIsValid, true,
+                        forward, loop, invalidAttributes) :
+                    AttributeScanner.Scan(attributes, startingPoint, ConfirmDataIsNotInvalid, true,
+                        forward, loop, invalidAttributes);
+
+                if (!scanResult)
                 {
                     return invalidAttributes;
                 }
@@ -1734,15 +1836,15 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Mark the data associated with the specified attribute as valid or invalid.  This applies
-        /// only to the associated attribute's data, not to any subattributes.
+        /// Specifies whether the data associated with the specified attribute as valid. This
+        /// applies only to the associated attribute's data, not to any subattributes.
         /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> for which the data should be marked
-        /// valid or invalid.</param>
-        /// <param name="dataIsValid"><see langword="true"/> if the attribute's data should be
-        /// considered valid; <see langword="false"/> otherwise.</param>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose validity is being set.
+        /// </param>
+        /// <param name="dataValidity">A <see cref="DataValidity"/> value indicating whether the
+        /// attribute's value is valid, invalid or a validation warning.</param>
         [ComVisible(false)]
-        public static void MarkDataAsValid(IAttribute attribute, bool dataIsValid)
+        public static void SetDataValidity(IAttribute attribute, DataValidity dataValidity)
         {
             try
             {
@@ -1750,11 +1852,11 @@ namespace Extract.DataEntry
 
                 // If the validation status of the attribute has changed from its previous value,
                 // raise the ValidationStateChanged event to notify listeners of the new status.
-                if (statusInfo._isViewable && statusInfo._dataIsValid != dataIsValid)
+                if (statusInfo._isViewable && statusInfo._dataValidity != dataValidity)
                 {
-                    statusInfo._dataIsValid = dataIsValid;
+                    statusInfo._dataValidity = dataValidity;
 
-                    OnValidationStateChanged(attribute, dataIsValid);
+                    OnValidationStateChanged(attribute, dataValidity);
                 }
             }
             catch (Exception ex)
@@ -1770,16 +1872,16 @@ namespace Extract.DataEntry
         /// (See <see cref="IsViewable"/>).
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> to be checked.</param>
-        /// <returns><see langword="true"/> if the <see cref="IAttribute"/>'s data is valid or 
-        /// <see langword="false"/> if it is not valid.</returns>
+        /// <returns>A <see cref="DataValidity"/> value indicating whether the attribute's value is
+        /// valid.</returns>
         [ComVisible(false)]
-        public static bool IsDataValid(IAttribute attribute)
+        public static DataValidity GetDataValidity(IAttribute attribute)
         {
             try
             {
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                return (!statusInfo._isViewable || statusInfo._dataIsValid);
+                return (statusInfo._isViewable) ? statusInfo._dataValidity : DataValidity.Valid;
             }
             catch (Exception ex)
             {
@@ -1985,6 +2087,10 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI28823", _OBJECT_NAME);
+
                 Stack<IAttribute> nextTabStopAttributeGenealogy = new Stack<IAttribute>();
 
                 if (!AttributeScanner.Scan(
@@ -1992,6 +2098,131 @@ namespace Extract.DataEntry
                         nextTabStopAttributeGenealogy))
                 {
                     return nextTabStopAttributeGenealogy;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28817", ex);
+            }
+        }
+
+        /// <summary>
+        /// Finds the first <see cref="IAttribute"/> representing the next tab group after the
+        /// specified starting point.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/>s from which a tab group
+        /// <see cref="IAttribute"/> is to be sought.</param>
+        /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
+        /// the point at which the scan should be started with each attribute further down the
+        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// </param>
+        /// <param name="forward"><see langword="true"/> to scan forward through the
+        /// <see cref="IAttribute"/>s, <see langword="false"/> to scan backward.</param>
+        /// <returns>A genealogy of <see cref="IAttribute"/>s specifying the next tab group
+        /// <see cref="IAttribute"/> in a control which supports tab groups or the next
+        /// tab stop attribute in a control that does not support tab stops.</returns>
+        [ComVisible(false)]
+        public static Stack<IAttribute> GetNextTabGroupAttribute(IUnknownVector attributes,
+            Stack<IAttribute> startingPoint, bool forward)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI28824", _OBJECT_NAME);
+
+                Stack<IAttribute> nextTabGroupAttributeGenealogy = new Stack<IAttribute>();
+
+                if (!AttributeScanner.Scan(
+                        attributes, startingPoint, ConfirmIsTabGroup, false, forward, true,
+                        nextTabGroupAttributeGenealogy))
+                {
+                    return nextTabGroupAttributeGenealogy;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28816", ex);
+            }
+        }
+
+        /// <summary>
+        /// Finds the first <see cref="IAttribute"/> representing the next tab group or tab after
+        /// the specified starting point (whichever comes first).
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/>s from which a tabstop
+        /// <see cref="IAttribute"/> is to be sought.</param>
+        /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
+        /// the point at which the scan should be started with each attribute further down the
+        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// </param>
+        /// <param name="forward"><see langword="true"/> to scan forward through the
+        /// <see cref="IAttribute"/>s, <see langword="false"/> to scan backward.</param>
+        /// <returns>A genealogy of <see cref="IAttribute"/>s specifying the next tabgroup or
+        /// tabstop <see cref="IAttribute"/> (whichever comes first). If no such attribute is found
+        /// in control indicated by <see paramref="startingPoint"/>, the result will by found in the
+        /// same manner as <see cref="GetNextTabGroupAttribute"/>.</returns>
+        [ComVisible(false)]
+        public static Stack<IAttribute> GetNextTabStopOrGroupAttribute(IUnknownVector attributes,
+            Stack<IAttribute> startingPoint, bool forward)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI28825", _OBJECT_NAME);
+
+                // Find the control indicated by startingPoint.
+                IDataEntryControl startingControl = null;
+                foreach (IAttribute attribute in startingPoint)
+                {
+                    startingControl = AttributeStatusInfo.GetOwningControl(attribute);
+                }
+
+                Stack<IAttribute> nextTabStopOrGroupAttributeGenealogy = new Stack<IAttribute>();
+
+                // Find the next tab stop or group attribute
+                if (!AttributeScanner.Scan(
+                        attributes, startingPoint, ConfirmIsTabStopOrGroup, false, forward, true,
+                        nextTabStopOrGroupAttributeGenealogy))
+                {
+                    // Find the attribute and control indicated by the result.
+                    IAttribute endingAttribute = null;
+                    IDataEntryControl endingControl = null;
+                    foreach (IAttribute attribute in nextTabStopOrGroupAttributeGenealogy)
+                    {
+                        endingAttribute = attribute;
+                        endingControl = AttributeStatusInfo.GetOwningControl(attribute);
+                    }
+
+                    // Return the result if still in the same control.
+                    if (startingControl == endingControl)
+                    {
+                        return nextTabStopOrGroupAttributeGenealogy;
+                    }
+                    else
+                    {
+                        // If the result is in a different control, return the result only if the
+                        // control does not support tab groups or the result represents a tab group.
+                        List<IAttribute> tabGroup =
+                            AttributeStatusInfo.GetAttributeTabGroup(endingAttribute);
+                        if (tabGroup == null || tabGroup.Count > 0)
+                        {
+                            return nextTabStopOrGroupAttributeGenealogy;
+                        }
+
+                        // Otherwise, search instead for the next tab group.
+                        return GetNextTabGroupAttribute(attributes,
+                            nextTabStopOrGroupAttributeGenealogy, forward);
+                    }
                 }
                 else
                 {
@@ -2306,6 +2537,80 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets a list of <see cref="IAttribute"/>s that are contained within a group owned by this
+        /// <see cref="IAttribute"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose tab group is requested.
+        /// </param>
+        /// <returns>A list of <see cref="IAttribute"/>s that are contained within a group owned by this
+        /// <see cref="IAttribute"/>. Will be <see langword="null"/> for attributes in controls
+        /// that don't support tab groups or an empty list for attributes that don't own a group
+        /// in a control that supports tab groups.</returns>
+        [ComVisible(false)]
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        public static List<IAttribute> GetAttributeTabGroup(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                return statusInfo._tabGroup;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28812", ex);
+            }
+        }
+
+        /// <summary>
+        /// Sets a list of <see cref="IAttribute"/>s that are contained within a group owned by this
+        /// <see cref="IAttribute"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose tab group is being assigned.
+        /// </param>
+        /// <param name="tabGroup">The list of attributes in the tab group owned by
+        /// <see paramref="attribute"/>.</param>
+        [ComVisible(false)]
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        public static void SetAttributeTabGroup(IAttribute attribute, List<IAttribute> tabGroup)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                ExtractException.Assert("ELI29048",
+                    "A tab group must be associated with an enabled control!",
+                    statusInfo.OwningControl != null && !statusInfo.OwningControl.Disabled);
+
+                statusInfo._tabGroup = tabGroup;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28813", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the specified <see cref="IAttribute"/> currently represents a tab stop.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose tab stop status is being
+        /// checked.</param>
+        /// <returns><see langword="true"/> if the attibute currently represents a tab stop,
+        /// <see langword="false"/> otherwise.</returns>
+        [ComVisible(false)]
+        public static bool IsAttributeTabStop(IAttribute attribute)
+        {
+            try
+            {
+                return ConfirmIsTabStop(attribute, GetStatusInfo(attribute), true);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29131", ex);
+            }
+        }
+
+        /// <summary>
         /// Removes all spatial info associated with the <see cref="IAttribute"/> (including any
         /// hint).
         /// </summary>
@@ -2367,7 +2672,8 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26138");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI26138", _OBJECT_NAME);
 
                 // If the specified attribute is null, just return blank.
                 if (attribute == null)
@@ -2408,7 +2714,8 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26139");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI26139", _OBJECT_NAME);
 
                 // Tokenize the query and process each element in order.
                 string[] pathTokens =
@@ -2620,8 +2927,8 @@ namespace Extract.DataEntry
                     foreach (KeyValuePair<IDataEntryControl, List<IAttribute>>
                         controlToRefresh in controlsToRefresh)
                     {
-                        controlToRefresh.Key.RefreshAttributes(controlToRefresh.Value.ToArray(),
-                            refreshSpatialInfo);
+                        controlToRefresh.Key.RefreshAttributes(refreshSpatialInfo,
+                            controlToRefresh.Value.ToArray());
                     }
                 }
                 catch (Exception ex2)
@@ -2740,11 +3047,35 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        static bool ConfirmDataValidity(IAttribute attribute, AttributeStatusInfo statusInfo,
+        static bool ConfirmDataIsValid(IAttribute attribute, AttributeStatusInfo statusInfo,
             bool value)
         {
             return (statusInfo._owningControl == null || !statusInfo._isViewable ||
-                statusInfo._dataIsValid == value);
+                (statusInfo._dataValidity == DataValidity.Valid) == value);
+        }
+
+        /// <summary>
+        /// An <see cref="AccessorMethod"/> implementation used to confirm all attributes
+        /// do not have invalid data (validation warnings are allowed).
+        /// <para><b>Note</b></para>
+        /// An attribute that does not have an <see cref="OwningControl"/> 
+        /// specified will pass this test (return <see langword="true"/>) whether the specfied 
+        /// value is <see langword="true"/> or <see langword="false"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
+        /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
+        /// the status information for the attribute in question.</param>
+        /// <param name="value"><see langword="true"/> to confirm all attributes do not have
+        /// invalid data or <see langword="false"/> to confirm all attributes do not have invalid
+        /// data.</param>
+        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
+        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
+        /// without traversing any more attributes.</returns>
+        static bool ConfirmDataIsNotInvalid(IAttribute attribute, AttributeStatusInfo statusInfo,
+            bool value)
+        {
+            return (statusInfo._owningControl == null || !statusInfo._isViewable ||
+                (statusInfo._dataValidity != DataValidity.Invalid) == value);
         }
 
         /// <summary>
@@ -2797,7 +3128,7 @@ namespace Extract.DataEntry
                     case TabStopMode.OnlyWhenPopulatedOrInvalid:
                         {
                             if (!string.IsNullOrEmpty(attribute.Value.String) ||
-                                !statusInfo._dataIsValid)
+                                (statusInfo._dataValidity != DataValidity.Valid))
                             {
                                 isTabStop = true;
                             }
@@ -2806,7 +3137,7 @@ namespace Extract.DataEntry
 
                     case TabStopMode.OnlyWhenInvalid:
                         {
-                            if (!statusInfo._dataIsValid)
+                            if (statusInfo._dataValidity != DataValidity.Valid)
                             {
                                 isTabStop = true;
                             }
@@ -2818,6 +3149,68 @@ namespace Extract.DataEntry
             }
             
             return (isTabStop == value);
+        }
+
+        /// <summary>
+        /// An <see cref="AccessorMethod"/> implementation used to check whether the specified
+        /// <see cref="IAttribute"/> represents a tab stop or group.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
+        /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
+        /// the status information for the attribute in question.</param>
+        /// <param name="value"><see langword="true"/> to confirm the attribute tabstop status
+        /// matches the provided value, <see langword="false"/> if it does not.</param>
+        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
+        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
+        /// without traversing any more attributes.</returns>
+        static bool ConfirmIsTabStopOrGroup(IAttribute attribute, AttributeStatusInfo statusInfo,
+            bool value)
+        {
+            // Default the attribute as not being a tab stop or group.
+            bool isTabStopOrGroup = false;
+
+            if (ConfirmIsTabStop(attribute, statusInfo, true))
+            {
+                isTabStopOrGroup = true;
+            }
+            else if (ConfirmIsTabGroup(attribute, statusInfo, true))
+            {
+                isTabStopOrGroup = true; 
+            }
+
+            return (isTabStopOrGroup == value);
+        }
+
+        /// <summary>
+        /// An <see cref="AccessorMethod"/> implementation used to check whether the specified
+        /// <see cref="IAttribute"/> represents a tab group.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
+        /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
+        /// the status information for the attribute in question.</param>
+        /// <param name="value"><see langword="true"/> to confirm the attribute tab group status
+        /// matches the provided value or if the attribute is a tab stop in a control that does not
+        /// support tab groups, <see langword="false"/> otherwise.</param>
+        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
+        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
+        /// without traversing any more attributes.</returns>
+        static bool ConfirmIsTabGroup(IAttribute attribute, AttributeStatusInfo statusInfo,
+            bool value)
+        {
+            bool isTabGroup;
+
+            // If _tabGroup is null, the control does not support tab groups and for the purposes
+            // of this method should be considered a tab group if it is a tab stop.
+            if (statusInfo._tabGroup == null)
+            {
+                isTabGroup = ConfirmIsTabStop(attribute, statusInfo, true);
+            }
+            else
+            {
+                isTabGroup = (statusInfo._tabGroup.Count > 0);
+            }
+
+            return (isTabGroup == value);
         }
 
         /// <summary>
@@ -2859,15 +3252,14 @@ namespace Extract.DataEntry
         /// Raises the <see cref="ValidationStateChanged"/> event. 
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> associated with the event.</param>
-        /// <param name="dataIsValid"><see langword="true"/> if the <see cref="IAttribute"/>'s data
-        /// has now been marked as valid, <see langword="false"/> if it has now been marked as 
-        /// invalid.</param>
-        static void OnValidationStateChanged(IAttribute attribute, bool dataIsValid)
+        /// <param name="dataValidity">A <see cref="DataValidity"/> value indicating whether the
+        /// attribute's value is now valid.</param>
+        static void OnValidationStateChanged(IAttribute attribute, DataValidity dataValidity)
         {
             if (AttributeStatusInfo.ValidationStateChanged != null)
             {
-                ValidationStateChanged(null, 
-                    new ValidationStateChangedEventArgs(attribute, dataIsValid));
+                ValidationStateChanged(null,
+                    new ValidationStateChangedEventArgs(attribute, dataValidity));
             }
         }
 
@@ -3098,7 +3490,7 @@ namespace Extract.DataEntry
                 _isViewable = source._isViewable;
                 _displayOrder = source._displayOrder;
                 _hasBeenViewed = source._hasBeenViewed;
-                _dataIsValid = source._dataIsValid;
+                _dataValidity = source._dataValidity;
                 _owningControl = source._owningControl;
                 _hintType = source._hintType;
                 _hintRasterZones = source._hintRasterZones;

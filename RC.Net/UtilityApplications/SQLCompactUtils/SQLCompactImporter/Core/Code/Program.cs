@@ -1,5 +1,6 @@
 using Extract;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -93,7 +94,8 @@ namespace Extract.SqlCompactImporter
         static void Main(string[] args)
         {
             Settings settings = null;
-            int rowsAdded = 0;
+            int rowsProcessed = 0;
+            int rowsFailed = 0;
 
             try
             {
@@ -136,7 +138,8 @@ namespace Extract.SqlCompactImporter
 
                     // Obtain information about the columns the data is to be imported into.
                     List<int> columnSizes = new List<int>();
-                    string schemaQuery = "SELECT CHARACTER_MAXIMUM_LENGTH FROM " +
+                    List<string> columnNames = new List<string>();
+                    string schemaQuery = "SELECT COLUMN_NAME, CHARACTER_MAXIMUM_LENGTH FROM " +
                         "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + settings.TableName + "'";
                     using (SqlCeCommand schemaCommand = new SqlCeCommand(schemaQuery, sqlConnection))
                     {
@@ -144,7 +147,16 @@ namespace Extract.SqlCompactImporter
                         {
                             for (int i = 0; reader.Read(); i++)
                             {
-                                columnSizes.Add(reader.GetInt32(0));
+                                columnNames.Add(reader.GetString(0));
+
+                                if (reader.IsDBNull(1))
+                                {
+                                    columnSizes.Add(0);
+                                }
+                                else
+                                {
+                                    columnSizes.Add(reader.GetInt32(1));
+                                }
                             }
                         }
                     }
@@ -153,22 +165,29 @@ namespace Extract.SqlCompactImporter
                         "Could not find table: " + settings.TableName, columnSizes.Count > 0);
 
                     // Loop through each row of the input file and it to the DB.
-                    for (rowsAdded = 0; rowsAdded < rows.Length; rowsAdded++)
+                    for (rowsProcessed = 0; rowsProcessed < rows.Length; rowsProcessed++)
                     {
                         Dictionary<string, string> columnValues =
                             new Dictionary<string, string>(columnSizes.Count);
 
                         // Split the input row into columns using the column delimiter.
-                        string[] columns = rows[rowsAdded].Split(
+                        string[] columns = rows[rowsProcessed].Split(
                             new string[] { settings.ColumnDelimiter }, StringSplitOptions.None);
+
+                        int columnCount = Math.Min(columns.Length, columnNames.Count);
+                        string[] includedColumns = new string[columnCount];
+                        columnNames.CopyTo(0, includedColumns, 0, columnCount);
 
                         // Initialize the SQL command used to add the data.
                         StringBuilder commandText = new StringBuilder("INSERT INTO [");
                         commandText.Append(settings.TableName);
-                        commandText.Append("] VALUES (");
+                        commandText.Append("] ([");
+                        commandText.Append(
+                            StringMethods.ConvertArrayToDelimitedList(includedColumns, "], ["));
+                        commandText.Append("]) VALUES (");
 
                         // Parameterize the data for each column and build them into the command.
-                        for (int i = 0; i < columnSizes.Count; i++)
+                        for (int i = 0; i < columnCount; i++)
                         {
                             string key = "@" + i.ToString(CultureInfo.InvariantCulture);
                             string value = (i < columns.Length) ? columns[i] : "";
@@ -180,7 +199,7 @@ namespace Extract.SqlCompactImporter
                             columnValues[key] = value;
                             commandText.Append(key);
 
-                            if (i + 1 < columnSizes.Count)
+                            if (i + 1 < columnCount)
                             {
                                 commandText.Append(", ");
                             }
@@ -199,7 +218,18 @@ namespace Extract.SqlCompactImporter
                                 command.Parameters.AddWithValue(key, columnValues[key]);
                             }
 
-                            command.ExecuteNonQuery();
+                            try
+                            {
+                                command.ExecuteNonQuery();
+                            }
+                            catch (Exception ex)
+                            {
+                                rowsFailed++;
+                                Console.WriteLine("Failed to import row \"" + rows[rowsProcessed] +
+                                    "\" with the following error:");
+                                Console.WriteLine(ex.Message);
+                                Console.WriteLine();
+                            }
                         }
                     }
                 } 
@@ -219,7 +249,13 @@ namespace Extract.SqlCompactImporter
                 Console.WriteLine();
             }
 
+            int rowsAdded = rowsProcessed - rowsFailed;
             Console.WriteLine("Added " + rowsAdded.ToString(CultureInfo.CurrentCulture) + " rows.");
+            if (rowsFailed > 0)
+            {
+                Console.WriteLine("Failed to import " +
+                    rowsFailed.ToString(CultureInfo.CurrentCulture) + " rows.");
+            }
         }
 
         /// <summary>

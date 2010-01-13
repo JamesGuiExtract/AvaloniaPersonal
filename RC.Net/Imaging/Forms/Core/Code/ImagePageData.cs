@@ -100,24 +100,29 @@ namespace Extract.Imaging.Forms
             }
             set
             {
-                // Remove any subsequent zooms in the history
-                while (_currentZoom != _zoomHistory.Last)
+                // Don't add a zoom history if current zoom is the same as the zoom value to be
+                // added.
+                if (_currentZoom == null || _currentZoom.Value != value)
                 {
-                    _zoomHistory.RemoveLast();
+                    // Remove any subsequent zooms in the history
+                    while (_currentZoom != _zoomHistory.Last)
+                    {
+                        _zoomHistory.RemoveLast();
+                    }
+
+                    // Check if the zoom history is at maximum capacity
+                    if (_zoomHistory.Count == _MAX_ZOOM_HISTORY_COUNT)
+                    {
+                        // Remove the oldest zoom history item
+                        _zoomHistory.RemoveFirst();
+                    }
+
+                    // Add the zoom to the zoom history
+                    _zoomHistory.AddLast(value);
+
+                    // Store the current zoom
+                    _currentZoom = _zoomHistory.Last;
                 }
-
-                // Check if the zoom history is at maximum capacity
-                if (_zoomHistory.Count == _MAX_ZOOM_HISTORY_COUNT)
-                {
-                    // Remove the oldest zoom history item
-                    _zoomHistory.RemoveFirst();
-                }
-
-                // Add the zoom to the zoom history
-                _zoomHistory.AddLast(value);
-
-                // Store the current zoom
-                _currentZoom = _zoomHistory.Last;
             }
         }
 

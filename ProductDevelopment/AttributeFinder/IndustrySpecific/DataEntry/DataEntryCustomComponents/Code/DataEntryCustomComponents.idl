@@ -1,0 +1,73 @@
+// DataEntryCustomComponents.idl : IDL source for DataEntryCustomComponents
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (DataEntryCustomComponents.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+[
+	uuid(035D73E6-27B9-49B7-97AA-9D4E5722679E),
+	version(1.0),
+	helpstring("DataEntryCustomComponents 1.0 Type Library")
+]
+library UCLID_DATAENTRYCUSTOMCOMPONENTSLib
+{
+	importlib("stdole2.tlb");
+	importlib("stdole32.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFILEPROCESSING.tlb");
+	importlib("..\..\..\..\AFCore\Code\AFCore.tlb");
+	importlib("c:\Program Files\Common Files\System\ADO\msado27.tlb");
+
+	[
+		object,
+		uuid(C6A8172C-E92B-4FF6-A946-52DA513AB52F),
+		dual,
+		nonextensible,
+		helpstring("IDataEntryProductDBMgr Interface"),
+		pointer_default(unique)
+	]
+	interface IDataEntryProductDBMgr : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To add a record in the DataEntryData table in the database for the file with the
+		//          given values.
+		// NOTE:	Any existing records in the table that have IsMostRecentUpdate set to 1 will 
+		//          have it reset to 0 and the new record will have IsMostRecentUpdate set to 1.
+		[id(1), helpstring("method AddDataEntryData")] HRESULT AddDataEntryData([in] long lFileID, 
+			long nActionID, [in] double lDuration, [out, retval] long* plInstanceID);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To set the FAMDB
+		[propput, id(2), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* newVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To record counts into the DataEntryCounterValue table for all counters defined
+		//			in the DataEntryCounterDefinition table. 
+		// ARGS:	-plInstanceToken: -1 to calculate counter values associated with OnLoad.
+		//			If >= 0, counts are to be performed in associated with OnSave and
+		//			plInstanceToken identifies associated OnLoad counts that should be recorded
+		//			under the same lDataEntryDataInstanceID. A >= 0 token is no longer valid after
+		//			calling this method as the token data is cleared.
+		//			-lDataEntryDataInstanceID: The ID from the DataEntryData table that the counts
+		//			should be associated with. Ignored if plInstanceToken == -1.
+		//			- pAttributes: The attributes on which the counts should be performed.
+		[id(3), helpstring("method RecordCounterValues")] HRESULT RecordCounterValues(
+			[in, out] long* plInstanceToken, [in] long lDataEntryDataInstanceID,
+			[in] IIUnknownVector* pAttributes);
+	};
+
+	[
+		uuid(2B336B61-CD96-4AED-9D99-A293C444E2C4),
+		helpstring("DataEntryProductDBMgr Class")
+	]
+	coclass DataEntryProductDBMgr
+	{
+		[default] interface IDataEntryProductDBMgr;
+		interface IProductSpecificDBMgr;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+	};
+};

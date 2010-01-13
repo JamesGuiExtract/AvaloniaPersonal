@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Design;
@@ -64,18 +65,24 @@ namespace Extract.DataEntry
         /// Allow data to be saved without prompting when data that does not conform to a
         /// validation requirement is present.
         /// </summary>
-        Allow,
+        Allow = 0,
+
+        /// <summary>
+        /// Allow data to be saved without prompting only if the data is all valid or only
+        /// validation warnings are present (as opposed to completely invalid data).
+        /// </summary>
+        AllowWithWarnings = 1,
 
         /// <summary>
         /// Allow data to be saved when  when data that does not conform to a
         /// validation requirement is present, but prompt for each invalid field first.
         /// </summary>
-        PromptForEach,
+        PromptForEach = 2,
 
         /// <summary>
         /// Require all data to meet validation requirements before saving.
         /// </summary>
-        Disallow
+        Disallow = 3
     }
 
     /// <summary>
@@ -288,6 +295,13 @@ namespace Extract.DataEntry
         IUnknownVector _attributes = (IUnknownVector)new IUnknownVectorClass();
 
         /// <summary>
+        /// The <see cref="IAttribute"/>s output from the most recent call to <see cref="SaveData"/>.
+        /// <see langword="null"/> if data has not been saved or new data has been loaded since the
+        /// most recent save.
+        /// </summary>
+        IUnknownVector _mostRecentlySaveAttributes;
+
+        /// <summary>
         /// A dictionary to keep track of the highlights associated with each attribute.
         /// </summary>
         Dictionary<IAttribute, List<CompositeHighlightLayerObject>> _attributeHighlights =
@@ -427,7 +441,13 @@ namespace Extract.DataEntry
         /// The ErrorProvider data entry controls should used to display data validation errors
         /// (unless the control needs a specialized error provider).
         /// </summary>
-        ErrorProvider _errorProvider = new ErrorProvider();
+        ErrorProvider _validationErrorProvider = new ErrorProvider();
+
+        /// <summary>
+        /// The ErrorProvider data entry controls should used to display data validation errors
+        /// (unless the control needs a specialized error provider).
+        /// </summary>
+        ErrorProvider _validationWarningErrorProvider = new ErrorProvider();
 
         /// <summary>
         /// The number of unviewed attributes known to exist.
@@ -590,9 +610,14 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Indicates whether the image viewer is currently being zoomed automatically per AutoZoom
-        /// settings.
+        /// settings or by programmatically changing pages.
         /// </summary>
-        bool _performingAutoZoom;
+        bool _performingProgrammaticZoom;
+
+        /// <summary>
+        /// Keeps track of the last region specified to be zoomed to by EnforceAutoZoom
+        /// </summary>
+        Rectangle _lastAutoZoomSelection = new Rectangle();
 
         /// <summary>
         /// A <see cref="ToolTip"/> used to display notifications to the user.
@@ -616,10 +641,25 @@ namespace Extract.DataEntry
         bool _drawingHighlights;
 
         /// <summary>
-        /// License cache for validating the license.
+        /// Indicates whether tabbing should allow groups (rows) of attributes to be selected at a
+        /// time for controls in which group tabbing is enabled.
         /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
+        bool _allowTabbingByGroup = true;
+
+        /// <summary>
+        /// Indicates any currently selected attribute tab group.
+        /// </summary>
+        IAttribute _currentlySelectedGroupAttribute;
+
+        /// <summary>
+        /// Provided smart tag support to all text controls in the DEP.
+        /// </summary>
+        SmartTagManager _smartTagManager;
+
+        /// <summary>
+        /// Indicates whether the form as been loaded.
+        /// </summary>
+        bool _isLoaded;
 
         #endregion Fields
 
@@ -642,7 +682,8 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23666");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI23666", _OBJECT_NAME);
 
                 InitializeComponent();
 
@@ -663,7 +704,22 @@ namespace Extract.DataEntry
                 this.HighlightColors = highlightColors;
 
                 // Blinking error icons are annoying and unnecessary.
-                _errorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+                _validationErrorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+                _validationWarningErrorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+
+                // Scale SystemIcons.Warning down to 16x16 for _validationWarningErrorProvider
+                using (Bitmap scaledBitmap = new Bitmap(16, 16))
+                {
+                    using (Graphics graphics = Graphics.FromImage(scaledBitmap))
+                    {
+                        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        graphics.DrawImage(SystemIcons.Warning.ToBitmap(), 0, 0, 16, 16);
+                        using (Icon warningIcon = Icon.FromHandle(scaledBitmap.GetHicon()))
+                        {
+                            _validationWarningErrorProvider.Icon = warningIcon;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -1155,7 +1211,24 @@ namespace Extract.DataEntry
 
             set
             {
-                _dbConnection = value;
+                try
+                {
+                    if (_dbConnection != value)
+                    {
+                        _dbConnection = value;
+
+                        if (_isLoaded)
+                        {
+                            // If the dbconnection is changed, the SmartTagManager needs to be
+                            // updated.
+                            InitializeSmartTagManager();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28879", ex);
+                }
             }
         }
 
@@ -1200,6 +1273,42 @@ namespace Extract.DataEntry
             set
             {
                 _autoZoomContext = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether tabbing should allow groups (rows) of attributes to be selected a
+        /// a time for controls in which group tabbing is enabled.
+        /// </summary>
+        /// <value><see langword="true"/> if tabbing should allow a group (row) to be selected at a
+        /// for controls in which group tabbing is enabled.</value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool AllowTabbingByGroup
+        {
+            get
+            {
+                return _allowTabbingByGroup;
+            }
+
+            set
+            {
+                _allowTabbingByGroup = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IAttribute"/>s output from the most recent call to
+        /// <see cref="SaveData"/>.
+        /// </summary>
+        /// <returns>The <see cref="IAttribute"/>s output from the most recent call to
+        /// <see cref="SaveData"/> or <see langword="null"/> if data has not been saved or new data
+        /// has been loaded since the most recent save.</returns>
+        public IUnknownVector MostRecentlySavedAttributes
+        {
+            get
+            {
+                return _mostRecentlySaveAttributes;
             }
         }
 
@@ -1252,6 +1361,7 @@ namespace Extract.DataEntry
                         _imageViewer.ZoomChanged -= HandleImageViewerZoomChanged;
                         _imageViewer.ScrollPositionChanged -= HandleImageViewerScrollPositionsChanged;
                         _imageViewer.PageChanged -= HandleImageViewerPageChanged;
+                        _imageViewer.FitModeChanged -= HandleImageViewerFitModeChanged;
                     }
 
                     // Store the new image viewer internally
@@ -1270,6 +1380,7 @@ namespace Extract.DataEntry
                         _imageViewer.ZoomChanged += HandleImageViewerZoomChanged;
                         _imageViewer.ScrollPositionChanged += HandleImageViewerScrollPositionsChanged;
                         _imageViewer.PageChanged += HandleImageViewerPageChanged;
+                        _imageViewer.FitModeChanged += HandleImageViewerFitModeChanged;
 
                         _imageViewer.DefaultHighlightColor = _defaultHighlightColor;
                         _imageViewer.AllowBandedSelection = false;
@@ -1316,7 +1427,8 @@ namespace Extract.DataEntry
                         // or keyup event.
                         _shiftKeyDown = (m.Msg == _WM_KEYDOWN);
                     }
-                    else if (m.WParam == (IntPtr)Keys.Tab)
+                    else if (m.WParam == (IntPtr)Keys.Tab && 
+                        (_smartTagManager == null || !_smartTagManager.IsActive))
                     {
                         // [DataEntry:346]
                         // If a shift tab is being sent via KeyMethods.SendKeyToControl the tab key
@@ -1331,25 +1443,10 @@ namespace Extract.DataEntry
                         // propagate selection to the next attribute in the tab order.
                         if (m.Msg == _WM_KEYDOWN)
                         {
-                            // Notify AttributeStatusInfo that the current edit is over.
-                            // This will also be called as part of a focus change event, but it needs
-                            // to be done here first so that any auto-updating that needs to occur
-                            // occurs prior to finding the next tab stop since the next tab stop may
-                            // depend on an auto-update.
-                            AttributeStatusInfo.EndEdit();
+                            ProcessTabKey();
 
-                            Stack<IAttribute> nextTabStopAttribute =
-                                AttributeStatusInfo.GetNextTabStopAttribute(_attributes,
-                                    ActiveAttributeGenealogy(), !_shiftKeyDown);
-
-                            if (nextTabStopAttribute != null)
-                            {
-                                // Indicate a manual focus event so that HandleControlGotFocus allows the
-                                // new attribute selection rather than overriding it.
-                                _manualFocusEvent = true;
-
-                                PropagateAttributes(nextTabStopAttribute, true);
-                            }
+                            // So that the input tracker is able to track this input
+                            OnMessageHandled(new MessageHandledEventArgs(m));
 
                             return true;
                         }
@@ -1377,6 +1474,10 @@ namespace Extract.DataEntry
                                 _imageViewer.PointToClient(Control.MousePosition)))
                     {
                         _imageViewer.Focus();
+
+                        // So that the input tracker is able to track this input
+                        OnMessageHandled(new MessageHandledEventArgs(m));
+
                         return true;
                     }
                 }
@@ -1447,7 +1548,7 @@ namespace Extract.DataEntry
 
                 using (new TemporaryWaitCursor())
                 {
-                    if (GetNextInvalidAttribute() == null)
+                    if (GetNextInvalidAttribute(true) == null)
                     {
                         MessageBox.Show(this, "There are no invalid items.", _applicationTitle,
                             MessageBoxButtons.OK, MessageBoxIcon.Information,
@@ -1496,18 +1597,12 @@ namespace Extract.DataEntry
                             // Create a copy of the data to be saved so that attributes that should
                             // not be persisted can be removed.
                             ICopyableObject copyThis = (ICopyableObject)_attributes;
-                            IUnknownVector dataCopy = (IUnknownVector)copyThis.Clone();
+                            _mostRecentlySaveAttributes = (IUnknownVector)copyThis.Clone();
 
-                            PruneNonPersistingAttributes(dataCopy);
+                            PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
                             // If all attributes passed validation, save the data.
-                            dataCopy.SaveTo(_imageViewer.ImageFile + ".voa", true);
-
-                            // [DataEntry:693]
-                            // Since these attributes will no longer be accessed by the DataEntry,
-                            // they need to be released with FinalReleaseComObject to prevent handle
-                            // leaks.
-                            AttributeStatusInfo.ReleaseAttributes(dataCopy);
+                            _mostRecentlySaveAttributes.SaveTo(_imageViewer.ImageFile + ".voa", true);
 
                             _dirty = false;
                         }
@@ -1547,7 +1642,12 @@ namespace Extract.DataEntry
                     foreach (IAttribute attribute in tooltipAttributes)
                     {
                         RemoveAttributeToolTip(attribute);
+                        
                     }
+
+                    // [DataEntry:821]
+                    // Show and hide the error icons along with the tooltips.
+                    ShowAllErrorIcons(false);                    
 
                     // Remove the hoverAttribute's tooltip.
                     if (_hoverAttribute != null && _hoverToolTip != null)
@@ -1564,6 +1664,13 @@ namespace Extract.DataEntry
                 else
                 {
                     _temporarilyHidingTooltips = false;
+
+                    // The error icons for selected attributes will re-display automatically,
+                    // but if all highlights are showing, need to re-display all error icons.
+                    if (_showingAllHighlights)
+                    {
+                        ShowAllErrorIcons(true);
+                    }
 
                     DrawHighlights(false);
                 }
@@ -1666,7 +1773,7 @@ namespace Extract.DataEntry
                 {
                     // [DataEntry:547]
                     // Refresh the attributes so that any hints can be updated.
-                    _activeDataControl.RefreshAttributes(activeAttributes.ToArray(), true);
+                    _activeDataControl.RefreshAttributes(true, activeAttributes.ToArray());
                     _refreshActiveControlHighlights = true;
 
                     DrawHighlights(false);
@@ -1819,6 +1926,17 @@ namespace Extract.DataEntry
         /// </summary>
         public event EventHandler<ItemSelectionChangedEventArgs> ItemSelectionChanged;
 
+        /// <summary>
+        /// Raised when data associated with an image is loaded from disk.
+        /// </summary>
+        public event EventHandler<AttributesEventArgs> DataLoaded;
+
+        /// <summary>
+        /// Indicates that the <see cref="IMessageFilter.PreFilterMessage"/> method has
+        /// handled the <see cref="Message"/> and will return true.
+        /// </summary>
+        public event EventHandler<MessageHandledEventArgs> MessageHandled;
+
         #endregion Events
 
         #region Overrides
@@ -1849,6 +1967,11 @@ namespace Extract.DataEntry
                 // IDataEntryControl interface.  Registers events necessary to facilitate
                 // the flow of information between the controls.
                 RegisterDataEntryControls(this);
+
+                // Create and initialize smart tag support for all text controls.
+                InitializeSmartTagManager();
+
+                _isLoaded = true;
             }
             catch (Exception ex)
             {
@@ -1906,10 +2029,20 @@ namespace Extract.DataEntry
                     _ocrManager = null;
                 }
 
-                if (_errorProvider != null)
+                if (_validationErrorProvider != null)
                 {
-                    _errorProvider.Dispose();
-                    _errorProvider = null;
+                    _validationErrorProvider.Dispose();
+                    _validationErrorProvider = null;
+                }
+
+                if (_validationWarningErrorProvider != null)
+                {
+                    if (_validationWarningErrorProvider.Icon != null)
+                    {
+                        _validationWarningErrorProvider.Icon.Dispose();
+                    }
+                    _validationWarningErrorProvider.Dispose();
+                    _validationWarningErrorProvider = null;
                 }
 
                 if (_toolTipFont != null)
@@ -1928,6 +2061,12 @@ namespace Extract.DataEntry
                 {
                     _hoverToolTip.Dispose();
                     _hoverToolTip = null;
+                }
+
+                if (_smartTagManager != null)
+                {
+                    _smartTagManager.Dispose();
+                    _smartTagManager = null;
                 }
             }
 
@@ -1971,6 +2110,12 @@ namespace Extract.DataEntry
                     // Ensure the data in the contols is cleared prior to loading any new data.
                     ClearData();
 
+                    // While data is loading, disable validation triggers. Unlike auto-update
+                    // triggers that need to be processed while data is loading, validation triggers
+                    // can wait until the data is loaded to prevent validation triggers from firing
+                    // more often than they have to.
+                    AttributeStatusInfo.EnableValidationTriggers(false);
+
                     bool imageIsAvailable = _imageViewer.IsImageAvailable;
 
                     if (imageIsAvailable)
@@ -1979,12 +2124,22 @@ namespace Extract.DataEntry
                         // page and create a SpatialPageInfo entry for each page.
                         for (int page = 1; page <= _imageViewer.PageCount; page++)
                         {
-                            _imageViewer.SetPageNumber(page, false, false);
+                            SetImageViewerPageNumber(page);
+
                             _errorIconSizes[page] = new Size(
                                 (int)(_ERROR_ICON_SIZE * _imageViewer.ImageDpiX),
                                 (int)(_ERROR_ICON_SIZE * _imageViewer.ImageDpiY));
                         }
-                        _imageViewer.SetPageNumber(1, false, false);
+                        SetImageViewerPageNumber(1);
+
+                        // [DataEntry:693]
+                        // The attributes need to be released with FinalReleaseComObject to prevent
+                        // handle leaks.
+                        if (_mostRecentlySaveAttributes != null)
+                        {
+                            AttributeStatusInfo.ReleaseAttributes(_mostRecentlySaveAttributes);
+                            _mostRecentlySaveAttributes = null;
+                        }
 
                         // If an image was loaded, look for and attempt to load corresponding data.
                         string dataFilename = e.FileName + ".voa";
@@ -1993,6 +2148,8 @@ namespace Extract.DataEntry
                         {
                             _attributes.LoadFrom(e.FileName + ".voa", false);
                         }
+
+                        OnDataLoaded(_attributes);
 
                         // Notify AttributeStatusInfo of the new attribute hierarchy
                         AttributeStatusInfo.ResetData(e.FileName, _attributes, _dbConnection);
@@ -2052,7 +2209,7 @@ namespace Extract.DataEntry
                     while (!AttributeStatusInfo.HasBeenPropagated(_attributes, null,
                         unpropagatedAttributeGenealogy))
                     {
-                        PropagateAttributes(unpropagatedAttributeGenealogy, false);
+                        PropagateAttributes(unpropagatedAttributeGenealogy, false, false);
                         unpropagatedAttributeGenealogy.Clear();
                     }
 
@@ -2060,7 +2217,13 @@ namespace Extract.DataEntry
                     // Re-propagate the attributes that were originally propagated.
                     foreach (IDataEntryControl dataEntryControl in _rootLevelControls)
                     {
-                        dataEntryControl.PropagateAttribute(null, false);
+                        dataEntryControl.PropagateAttribute(null, false, false);
+                    }
+
+                    // After all the data is loaded, re-enable validation triggers.
+                    if (_imageViewer.IsImageAvailable)
+                    {
+                        AttributeStatusInfo.EnableValidationTriggers(true);
                     }
 
                     // Count the number of unviewed attributes in the newly loaded data.
@@ -2196,6 +2359,10 @@ namespace Extract.DataEntry
                 // active.
                 _controlUpdateInProgress = false;
 
+                // If focus has changed to another control, it is up to that control to indicate via
+                // the AttributesSelected event whether an attribute group is selected.
+                _currentlySelectedGroupAttribute = null;
+
                 // De-activate any existing control that is active
                 if (_activeDataControl != null)
                 {
@@ -2215,7 +2382,17 @@ namespace Extract.DataEntry
                 }
 
                 // Once a new control gains focus, show tooltips again if they were hidden.
-                _temporarilyHidingTooltips = false;
+                if (_temporarilyHidingTooltips)
+                {
+                    _temporarilyHidingTooltips = false;
+
+                    // The error icons for selected attributes will re-display automatically,
+                    // but if all highlights are showing, need to re-display all error icons.
+                    if (_showingAllHighlights)
+                    {
+                        ShowAllErrorIcons(true);
+                    }
+                }
 
                 DrawHighlights(true);
 
@@ -2277,7 +2454,17 @@ namespace Extract.DataEntry
 
                 // Once a new attribute is selected within a control, show tooltips again if they
                 // were hidden.
-                _temporarilyHidingTooltips = false;
+                if (_temporarilyHidingTooltips)
+                {
+                    _temporarilyHidingTooltips = false;
+
+                    // The error icons for selected attributes will re-display automatically,
+                    // but if all highlights are showing, need to re-display all error icons.
+                    if (_showingAllHighlights)
+                    {
+                        ShowAllErrorIcons(true);
+                    }
+                }
 
                 UpdateControlAttributes(dataControl, e.Attributes, e.IncludeSubAttributes,
                     e.DisplayToolTips);
@@ -2296,6 +2483,8 @@ namespace Extract.DataEntry
                 {
                     throw endEditException;
                 }
+
+                _currentlySelectedGroupAttribute = e.SelectedGroupAttribute;
             }
             catch (Exception ex)
             {
@@ -2354,6 +2543,26 @@ namespace Extract.DataEntry
         {
             try
             {
+                // [DataEntry:757, 798]
+                // Check to see if the clipboard should be cleared based on a control's
+                // ClearClipboardOnPaste setting. This code is a shortcut to be able to implement
+                // ClearClipboardOnPaste in one place rather than overriding more controls 
+                // (such as DataGridViewTextBoxEditingControl) and intercepting WM_PAINT message in
+                // WndProc. It assumes that when text is on the clipboard that matches the text
+                // that the new attribute's value ends with that it has been pasted.
+                // NOTE: Don't call Clipboard.ContainsText separately... that seems to lead to
+                // "Clipboard operation did not succeed" exceptions in this case.
+                if (e.AutoUpdatedAttributes.Count == 0 &&
+                    AttributeStatusInfo.GetOwningControl(e.Attribute).ClearClipboardOnPaste)
+                {
+                    string text = Clipboard.GetText();
+
+                    if (e.Attribute.Value.String.EndsWith(text, StringComparison.Ordinal))
+                    {
+                        Clipboard.Clear();
+                    }
+                }
+
                 OnDataChanged();
 
                 // If the spatial info for the attribute has changed, re-create the highlight for
@@ -2638,11 +2847,10 @@ namespace Extract.DataEntry
                     AttributeStatusInfo.EnableValidation(e.Attribute, false);
 
                     // If the data was already marked as invalid, mark it as valid.
-                    if (!AttributeStatusInfo.IsDataValid(e.Attribute))
+                    if (AttributeStatusInfo.GetDataValidity(e.Attribute) != DataValidity.Valid)
                     {
-                        AttributeStatusInfo.MarkDataAsValid(e.Attribute, true);
-                        e.DataEntryControl.RefreshAttributes(new IAttribute[] { e.Attribute },
-                            false);
+                        AttributeStatusInfo.SetDataValidity(e.Attribute, DataValidity.Valid);
+                        e.DataEntryControl.RefreshAttributes(false, e.Attribute);
                     }
                 }
 
@@ -2651,7 +2859,7 @@ namespace Extract.DataEntry
                     UpdateUnviewedCount(true);
                 }
 
-                if (!AttributeStatusInfo.IsDataValid(e.Attribute))
+                if (AttributeStatusInfo.GetDataValidity(e.Attribute) != DataValidity.Valid)
                 {
                     UpdateInvalidCount(true);
                 }
@@ -2724,10 +2932,10 @@ namespace Extract.DataEntry
             try
             {
                 // Update the invalid count to reflect the new state of the attribute.
-                UpdateInvalidCount(!e.IsDataValid);
+                UpdateInvalidCount(e.DataValidity != DataValidity.Valid);
 
                 // Remove the image viewer error icon if the data is now valid.
-                if (e.IsDataValid)
+                if (e.DataValidity != DataValidity.Invalid)
                 {
                     RemoveAttributeErrorIcon(e.Attribute);
                 }
@@ -2763,14 +2971,28 @@ namespace Extract.DataEntry
                 // reason... exempt F10 from being handled here.
                 // [DataEntry:335] Don't handle tab key either since that already has special
                 // handling in PreFilterMessage.
-                if (!_imageViewer.Capture && activeControl != null && !activeControl.Focused &&
-                    e.KeyCode != Keys.F10 && e.KeyCode != Keys.Tab)
+                bool sendKeyToActiveControl = (!_imageViewer.Capture && activeControl != null && 
+                    !activeControl.Focused && e.KeyCode != Keys.F10 && e.KeyCode != Keys.Tab);
+
+                // If the image viewer is in a separate form which has focus, DataEntryApplication's
+                // ProcessCmdKey (which enables shortcuts to be processed) will not receive
+                // keystrokes and sendKeyToActiveControl will not be true. Therefore, also redirect
+                // keystrokes to the DEP when the image viewer is receiving input while another
+                // form is active.
+                // TODO: I think there's probably better ways to do this, and I think the code to
+                // handle this situation is better suited in DataEntryApplicationForm.
+                bool separateImageWindowKeyEvent =
+                    (!sendKeyToActiveControl && ParentForm != Form.ActiveForm);
+
+                if (sendKeyToActiveControl || separateImageWindowKeyEvent)
                 {
-                    if (KeyMethods.SendKeyToControl(e.KeyValue, e.Shift, e.Control, e.Alt, activeControl))
+                    Control target = sendKeyToActiveControl ? activeControl : this;
+
+                    if (KeyMethods.SendKeyToControl(e.KeyValue, e.Shift, e.Control, e.Alt, target))
                     {
-                        // Allowing special key handling (when IsInputKey == false) seems to cause arrow
-                        // keys as well as some shortcuts to do unexpected things.  Set IsInputKey to true 
-                        // to disable special handling.
+                        // Allowing special key handling (when IsInputKey == false) seems to cause
+                        // arrow keys as well as some shortcuts to do unexpected things.  Set
+                        // IsInputKey to true to disable special handling.
                         e.IsInputKey = true;
                     }
                 }
@@ -2904,7 +3126,7 @@ namespace Extract.DataEntry
                         _manualFocusEvent = true;
 
                         // Propagate and select the former hover attribute.
-                        PropagateAttributes(attributesToPropagate, true);
+                        PropagateAttributes(attributesToPropagate, true, false);
                     }
                 }
             }
@@ -2944,7 +3166,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (!_performingAutoZoom)
+                if (!_performingProgrammaticZoom)
                 {
                     _lastManualZoomSize = _imageViewer.GetTransformedRectangle(
                         _imageViewer.GetVisibleImageArea(), true).Size;
@@ -2967,7 +3189,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (!_performingAutoZoom)
+                if (!_performingProgrammaticZoom)
                 {
                     _lastManualZoomSize = _imageViewer.GetTransformedRectangle(
                         _imageViewer.GetVisibleImageArea(), true).Size;
@@ -3004,7 +3226,237 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="SmartTagManager.ApplyingValue"/> event so that any smart tags
+        /// values that need to be resolved using a <see cref="DataEntryQuery"/> can be.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">A <see cref="SmartTagApplyingValueEventArgs"/> that contains the event data.
+        /// </param>
+        void HandleSmartTagApplyingValue(object sender, SmartTagApplyingValueEventArgs e)
+        {
+            try
+            {
+                // If a smart tag was selected and the tag value being applied is a query, execute a
+                // DataEntryQuery on the value and update the value with the result.
+                if (e.SmartTagSelected  &&
+                    e.Value.StartsWith("<Query", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Find the attribute that should be used as the root attribute for a
+                    // DataEntryQuery.
+                    IAttribute activeAttribute = GetActiveAttribute(null);
+
+                    DataEntryQuery dataEntryQuery =
+                        DataEntryQuery.Create(e.Value, activeAttribute, _dbConnection,
+                        MultipleQueryResultSelectionMode.None, true);
+                    QueryResult queryResult = dataEntryQuery.Evaluate(null);
+                    e.Value = queryResult.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI28878", ex);
+                ee.AddDebugData("Event Data", e, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Handles the ImageViewer FitModeChanged event.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">A <see cref="FitModeChangedEventArgs"/> that contains the event data.
+        /// </param>
+        void HandleImageViewerFitModeChanged(object sender, FitModeChangedEventArgs e)
+        {
+            try
+            {
+                // If the fit mode was changed, enforce auto-zoom on the next selection even if
+                // the next selection is the same.
+                _lastAutoZoomSelection = new Rectangle();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI29143", ex);
+                ee.AddDebugData("Event Data", e, false);
+                throw ee;
+            }
+        }
+
         #endregion Event Handlers
+
+        #region Internal Members
+
+        /// <overloads>Retrieves the <see cref="RasterZone"/>s of the specified
+        /// <see cref="IAttribute"/>(s) highlights grouped by page.</overloads>
+        /// <summary>
+        /// Retrieves the <see cref="RasterZone"/>s of the specified <see cref="IAttribute"/>
+        /// highlights grouped by page.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose highlight 
+        /// <see cref="RasterZone"/>s will be returned.</param>
+        /// <param name="includeSubAttributes"><see langword="true"/> if raster zones from all
+        /// descendents of the specified <see cref="IAttribute"/> should be included;
+        /// <see langword="false"/> if they should not.</param>
+        /// <returns>The <see cref="RasterZone"/>s of the <see paramref="attribute"/> grouped by
+        /// page.</returns>
+        internal Dictionary<int, List<RasterZone>> 
+            GetAttributeRasterZonesByPage(IAttribute attribute, bool includeSubAttributes)
+        {
+            return GetAttributeRasterZonesByPage(new IAttribute[] { attribute },
+                includeSubAttributes);
+        }
+
+        /// <summary>
+        /// Retrieves the <see cref="RasterZone"/>s of the specified <see cref="IAttribute"/>s'
+        /// highlights grouped by page.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/>s whose highlight
+        /// <see cref="RasterZone"/>s will be returned.</param>
+        /// <param name="includeSubAttributes"><see langword="true"/> if raster zones from all
+        /// descendents of the specified <see cref="IAttribute"/>s should be included;
+        /// <see langword="false"/> if they should not.</param>
+        /// <returns>The <see cref="RasterZone"/>s of the <see paramref="attributes"/>' highlights
+        /// grouped by page.</returns>
+        internal Dictionary<int, List<RasterZone>>
+            GetAttributeRasterZonesByPage(IEnumerable<IAttribute> attributes,
+                bool includeSubAttributes)
+        {
+            Dictionary<int, List<RasterZone>> rasterZonesByPage =
+                new Dictionary<int,List<RasterZone>>();
+
+            // Loop through each attribute
+            foreach (IAttribute attribute in attributes)
+            {
+                // Try to find the highlight(s) that have been associated with the attribute.
+                List<CompositeHighlightLayerObject> highlights;
+                if (_attributeHighlights.TryGetValue(attribute, out highlights))
+                {
+                    // Add the raster zones of each highlight to the appropriate page in the
+                    // dictionary return value.
+                    foreach (CompositeHighlightLayerObject highlight in highlights)
+                    {
+                        List<RasterZone> rasterZones = null;
+                        if (!rasterZonesByPage.TryGetValue(highlight.PageNumber, out rasterZones))
+                        {
+                            rasterZones = new List<RasterZone>();
+                            rasterZonesByPage[highlight.PageNumber] = rasterZones;
+                        }
+
+                        rasterZones.AddRange(highlight.GetRasterZones());
+                    }
+                }
+
+                // If raster zones from sub-attributes are to be included, recursively collect their
+                // raster zones as well.
+                if (includeSubAttributes)
+                {
+                    IUnknownVector subAttributesVector = attribute.SubAttributes;
+                    int count = subAttributesVector.Size();
+                    IAttribute[] subAttributeArray = new IAttribute[count];
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        subAttributeArray[i] = (IAttribute)subAttributesVector.At(i);
+                    }
+
+                    Dictionary<int, List<RasterZone>> subAttributeRasterZones =
+                        GetAttributeRasterZonesByPage(subAttributeArray, true);
+
+                    // Combine the raster zones from child attributes into the parent
+                    // attribute's raster zones.
+                    foreach (KeyValuePair<int, List<RasterZone>> keyValuePair in
+                        subAttributeRasterZones)
+                    {
+                        if (!rasterZonesByPage.ContainsKey(keyValuePair.Key))
+                        {
+                            rasterZonesByPage[keyValuePair.Key] = new List<RasterZone>();
+                        }
+
+                        rasterZonesByPage[keyValuePair.Key].AddRange(keyValuePair.Value);
+                    }
+                }
+            }
+
+            return rasterZonesByPage;
+        }
+
+        /// <summary>
+        /// Sorts the specified <see cref="IAttribute"/>s according to their positions in the
+        /// document. The sorting will attempt to identify attributes in a row across the page and
+        /// and work from left-to-right across the row before dropping down to the next row.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/>s to sort.</param>
+        /// <returns>The sorted <see cref="IAttribute"/>s.</returns>
+        internal List<IAttribute> SortAttributesSpatially(List<IAttribute> attributes)
+        {
+            // Compile dictionaries mapping each page to a list of attributes that begin on the
+            // specified page and that map each attribute to a rectangle describing its bounds.
+            Dictionary<int, List<IAttribute>> attributesByPage =
+                new Dictionary<int, List<IAttribute>>();
+            Dictionary<IAttribute, Rectangle> attributeBounds =
+                new Dictionary<IAttribute, Rectangle>();
+
+            // Loop through the specified attributes to collect the info.
+            foreach(IAttribute attribute in attributes)
+            {
+                Dictionary<int, List<RasterZone>> rasterZonesByPage =
+                    GetAttributeRasterZonesByPage(attribute, false);
+
+                if (rasterZonesByPage.Count > 0)
+                {
+                    // Identify the first page the attribute is found on
+                    int firstPage = -1;
+                    foreach (int page in rasterZonesByPage.Keys)
+                    {
+                        if (firstPage == -1 || page < firstPage)
+                        {
+                            firstPage = page;
+                        }
+                    }
+
+                    if (!attributesByPage.ContainsKey(firstPage))
+                    {
+                        attributesByPage[firstPage] = new List<IAttribute>();
+                    }
+                    attributesByPage[firstPage].Add(attribute);
+
+                    // Calculate the attribute's overall bounds on its first page.
+                    Rectangle bounds = new Rectangle();
+                    foreach (RasterZone rasterZone in rasterZonesByPage[firstPage])
+                    {
+                        if (bounds.IsEmpty)
+                        {
+                            bounds = rasterZone.GetRectangularBounds();
+                        }
+                        else
+                        {
+                            bounds = Rectangle.Union(bounds, rasterZone.GetRectangularBounds());
+                        }
+                    }
+
+                    attributeBounds[attribute] = bounds;
+                }
+            }
+
+            // Using this data, sort the attributes. 
+            List<IAttribute> sortedAttributes =
+                SortAttributesSpatially(attributesByPage, attributeBounds);
+
+            // The sorted attributes will not include non-spatial attributes. Append any non-spatial
+            // attributes at the end of the list.
+            foreach (IAttribute attribute in attributes)
+            {
+                if (!sortedAttributes.Contains(attribute))
+                {
+                    sortedAttributes.Add(attribute);
+                }
+            }
+
+            return sortedAttributes;
+        }
+
+        #endregion Internal Members
 
         #region Private Members
 
@@ -3034,6 +3486,8 @@ namespace Extract.DataEntry
                 }
                 else
                 {
+                    dataControl.DataEntryControlHost = this;
+
                     // Set the font of data controls to the _DATA_FONT_FAMILY.
                     control.Font = new Font(_DATA_FONT_FAMILY, base.Font.Size);
 
@@ -3048,7 +3502,8 @@ namespace Extract.DataEntry
                     IRequiresErrorProvider errorControl = control as IRequiresErrorProvider;
                     if (errorControl != null)
                     {
-                        errorControl.SetErrorProvider(_errorProvider);
+                        errorControl.SetErrorProviders(
+                            _validationErrorProvider, _validationWarningErrorProvider);
                     }
 
                     if (dataControl.ParentDataEntryControl != null)
@@ -3092,12 +3547,205 @@ namespace Extract.DataEntry
                     dataControl.AttributesSelected -= HandleAttributesSelected;
                     dataControl.UpdateStarted -= HandleControlUpdateStarted;
                     dataControl.UpdateEnded -= HandleControlUpdateEnded;
+                    dataControl.DataEntryControlHost = null;
                 }
             }
             catch (Exception ex)
             {
                 // This is called from Dispose, so don't throw an exception.
                 ExtractException.AsExtractException("ELI25201", ex).Log();
+            }
+        }
+
+        /// <summary>
+        /// Attempts to create or update the existing <see cref="SmartTagManager"/> using the smart
+        /// tags defined in the current database connection.
+        /// </summary>
+        void InitializeSmartTagManager()
+        {
+            DbCommand queryCommand = null;
+
+            try
+            {
+                // DataEntry SmartTags require an SQL CE database connection.
+                SqlCeConnection sqlCeConnection = _dbConnection as SqlCeConnection;
+                if (sqlCeConnection == null)
+                {
+                    if (_smartTagManager != null)
+                    {
+                        _smartTagManager.Dispose();
+                        _smartTagManager = null;
+                    }
+
+                    return;
+                }
+
+                // DataEntry SmartTags require a 'SmartTag' table.
+                queryCommand = DataEntryMethods.CreateDBCommand(sqlCeConnection,
+                        "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SmartTag'", null);
+                string[] queryResults = DataEntryMethods.ExecuteDBQuery(queryCommand, "\t");
+                if (queryResults.Length == 0)
+                {
+                    if (_smartTagManager != null)
+                    {
+                        _smartTagManager.Dispose();
+                        _smartTagManager = null;
+                    }
+
+                    return;
+                }
+
+
+                // Retrieve the smart tags...
+                queryCommand.Dispose();
+                queryCommand = DataEntryMethods.CreateDBCommand(
+                        sqlCeConnection, "SELECT TagName, TagValue FROM [SmartTag]", null);
+                queryResults = DataEntryMethods.ExecuteDBQuery(queryCommand, "\t");
+
+                // And put them into a dictionary that the SmartTagManager can use
+                Dictionary<string, string> smartTags = new Dictionary<string, string>();
+                foreach (string smartTag in queryResults)
+                {
+                    string[] columns =
+                        smartTag.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (columns.Length == 2)
+                    {
+                        smartTags[columns[0]] = columns[1];
+                    }
+                }
+
+                // Create or update the SmartTagManager
+                if (_smartTagManager == null)
+                {
+                    _smartTagManager = new SmartTagManager(this, smartTags);
+                    _smartTagManager.ApplyingValue += HandleSmartTagApplyingValue;
+                }
+                else
+                {
+                    _smartTagManager.UpdateSmartTags(smartTags);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28902", ex);
+            }
+            finally
+            {
+                if (queryCommand != null)
+                {
+                    queryCommand.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the tab key by advancing field selection appropriately.
+        /// </summary>
+        void ProcessTabKey()
+        {
+            // Notify AttributeStatusInfo that the current edit is over.
+            // This will also be called as part of a focus change event, but it needs
+            // to be done here first so that any auto-updating that needs to occur
+            // occurs prior to finding the next tab stop since the next tab stop may
+            // depend on an auto-update.
+            AttributeStatusInfo.EndEdit();
+
+            Stack<IAttribute> nextTabStopGenealogy = null;
+            bool selectGroup = _allowTabbingByGroup;
+
+            if (_allowTabbingByGroup)
+            {
+                // If _allowTabbingByGroup and a group is currently selected,
+                // use GetNextTabGroupAttribute to search for the next attribute
+                // group (rather than tab stop attribute) in controls that support
+                // attribute groups. (tab stops will be found in controls that
+                // don't).
+                if (_currentlySelectedGroupAttribute != null)
+                {
+                    nextTabStopGenealogy =
+                        AttributeStatusInfo.GetNextTabGroupAttribute(_attributes,
+                            ActiveAttributeGenealogy(_shiftKeyDown,
+                                _currentlySelectedGroupAttribute), !_shiftKeyDown);
+                }
+                // If no attribute group is currently selected, use
+                // GetNextTabStopOrGroupAttribute to find either the next tab
+                // stop attribute or the next attribute group within the same
+                // control. If nothing is found within the current control, 
+                // the next attribute group will be found in controls that support
+                // attribute groups (tab stops will be found in controls that don't).
+                else
+                {
+                    // If the active attribute is already a tab group attribute but the tab group
+                    // is not currently selected, select the tab group without advancing the active
+                    // attribute.
+                    IAttribute activeAttribute = GetActiveAttribute(_shiftKeyDown);
+                    if (activeAttribute != null)
+                    {
+                        List<IAttribute> tabGroup =
+                            AttributeStatusInfo.GetAttributeTabGroup(activeAttribute);
+                        if (tabGroup != null && tabGroup.Count > 0)
+                        {
+                            nextTabStopGenealogy = GetAttributeGenealogy(activeAttribute);
+                        }
+                    }
+
+                    // Otherwise, advance the current selection to the next tab stop or group.
+                    if (nextTabStopGenealogy == null)
+                    {
+                        nextTabStopGenealogy =
+                            AttributeStatusInfo.GetNextTabStopOrGroupAttribute(_attributes,
+                                ActiveAttributeGenealogy(_shiftKeyDown,
+                                    _currentlySelectedGroupAttribute), !_shiftKeyDown);
+
+                        // [DataEntry:754]
+                        // If the next tab stop attribute represents an attribute group and that
+                        // group contains the currently active attribute and is a tab stop on its
+                        // own, don't select the group, rather first select the attribute
+                        // indepently (set selectGroup = false).
+                        if (activeAttribute != null)
+                        {
+                            IAttribute nextTabStopAttribute = null;
+                            foreach (IAttribute attribute in nextTabStopGenealogy)
+                            {
+                                nextTabStopAttribute = attribute;
+                            }
+
+                            if (AttributeStatusInfo.GetAttributeTabGroup(nextTabStopAttribute) == null)
+                            {
+                                // [DataEntry:840]
+                                // If nextTabStopAttribute is null, the control owning it does not
+                                // support tabbing by group. Don't select by group.
+                                selectGroup = false;
+                            }
+                            else if (AttributeStatusInfo.IsAttributeTabStop(nextTabStopAttribute))
+                            {
+                                List<IAttribute> tabGroup =
+                                    AttributeStatusInfo.GetAttributeTabGroup(nextTabStopAttribute);
+
+                                if (tabGroup != null && tabGroup.Contains(activeAttribute))
+                                {
+                                    selectGroup = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // Tabbing by row is not supported-- find the next tab stop attribute.
+            else
+            {
+                nextTabStopGenealogy =
+                    AttributeStatusInfo.GetNextTabStopAttribute(_attributes,
+                        ActiveAttributeGenealogy(true, null), !_shiftKeyDown);
+            }
+
+            if (nextTabStopGenealogy != null)
+            {
+                // Indicate a manual focus event so that HandleControlGotFocus allows the
+                // new attribute selection rather than overriding it.
+                _manualFocusEvent = true;
+
+                PropagateAttributes(nextTabStopGenealogy, true, selectGroup);
             }
         }
 
@@ -3174,6 +3822,18 @@ namespace Extract.DataEntry
             if (this.InvalidItemsFound != null)
             {
                 InvalidItemsFound(this, new InvalidItemsFoundEventArgs(invalidItemsFound));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DataLoaded"/> event.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/>s that were loaded.</param>
+        void OnDataLoaded(IUnknownVector attributes)
+        {
+            if (DataLoaded != null)
+            {
+                DataLoaded(this, new AttributesEventArgs(attributes));
             }
         }
 
@@ -3442,7 +4102,7 @@ namespace Extract.DataEntry
                         pageToShow = firstPageOfHighlights;
                     }
 
-                    _imageViewer.SetPageNumber(pageToShow, false, true);
+                    SetImageViewerPageNumber(pageToShow);
                 }
 
                 // Create & position tooltips for the currently selected attribute(s).
@@ -3507,7 +4167,8 @@ namespace Extract.DataEntry
                 foreach (KeyValuePair<IDataEntryControl, List<IAttribute>> updatedAttributes in 
                     attributesMarkedAsViewed)
                 {
-                    updatedAttributes.Key.RefreshAttributes(updatedAttributes.Value.ToArray(), false);
+                    updatedAttributes.Key.RefreshAttributes(
+                        false, updatedAttributes.Value.ToArray());
                 }
             }
         }
@@ -3522,7 +4183,13 @@ namespace Extract.DataEntry
         {
             try
             {
-                _performingAutoZoom = true;
+                // If we are trying to enforce auto-zoom on the same selection as last time, return.
+                if (_lastAutoZoomSelection == selectedImageRegion)
+                {
+                    return;
+                }
+
+                _performingProgrammaticZoom = true;
 
                 // Initialize the newViewRegion as the selected object region.
                 Rectangle newViewRegion = selectedImageRegion;
@@ -3638,7 +4305,14 @@ namespace Extract.DataEntry
                     _imageViewer.GetTransformedRectangle(newViewRegion, false);
 
                 // Zoom to the specified rectangle.
-                _imageViewer.ZoomToRectangle(newViewRegion, true, true, true);
+                _imageViewer.ZoomToRectangle(newViewRegion);
+
+                // If zoom has to change very much to zoom on the specified rectangle, calling
+                // GetTransformedRectangle again after the first call will likely result in a
+                // slightly different rectangle. To prevent multiple calls, keep track of the last
+                // specified selectedImageRegion, and don't re-apply auto-zoom settings after it
+                // is applied the first time.
+                _lastAutoZoomSelection = selectedImageRegion;
             }
             catch (Exception ex)
             {
@@ -3646,7 +4320,7 @@ namespace Extract.DataEntry
             }
             finally
             {
-                _performingAutoZoom = false;
+                _performingProgrammaticZoom = false;
             }
         }
 
@@ -3663,19 +4337,28 @@ namespace Extract.DataEntry
         /// should be selected in their respective controls and the target attribute should be
         /// active. If <see langword="false"/>, the data is only propagated behind the scenes 
         /// (which causes the attributes' data to be validated).</param>
-        static IAttribute PropagateAttributes(Stack<IAttribute> attributes, bool select)
+        /// <param name="selectTabGroup"><see langword="true"/> if an attribute group should be
+        /// selected provided the specified attribute represents an attribute group,
+        /// <see langword="false"/> otherwise.</param>
+        /// <returns></returns>
+        IAttribute PropagateAttributes(Stack<IAttribute> attributes, bool select,
+            bool selectTabGroup)
         {
             if (attributes.Count == 0)
             {
                 // Nothing to do.
                 return null;
             }
+
+            // It is up to the owning control to indicate via the AttributesSelected event whether
+            // an attribute group is selected
+            _currentlySelectedGroupAttribute = null;
             
             // Get the first attribute off the stack and obtain its owning control.
             IAttribute attribute = attributes.Pop();
             IDataEntryControl dataEntryControl = 
                 AttributeStatusInfo.GetStatusInfo(attribute).OwningControl;
-            
+
             // Initialize the "last" attribute and control.
             IAttribute lastAttribute = attribute;
             IDataEntryControl lastDataEntryControl = dataEntryControl;
@@ -3693,7 +4376,7 @@ namespace Extract.DataEntry
                 // attribute in the last control.
                 if (dataEntryControl != lastDataEntryControl)
                 {
-                    lastDataEntryControl.PropagateAttribute(lastAttribute, select);
+                    lastDataEntryControl.PropagateAttribute(lastAttribute, select, selectTabGroup);
                 }
 
                 // Update the "last" attribute and control.
@@ -3701,7 +4384,7 @@ namespace Extract.DataEntry
                 lastAttribute = attribute;
             }
 
-            lastDataEntryControl.PropagateAttribute(lastAttribute, select);
+            lastDataEntryControl.PropagateAttribute(lastAttribute, select, selectTabGroup);
 
             // Give focus to the target attribute control if selection is requested.
             if (select)
@@ -3717,18 +4400,28 @@ namespace Extract.DataEntry
         /// attribute. If more that one attribute is selected in the active control, the first 
         /// attribute (in display order) will be used.
         /// </summary>
+        /// <param name="first"><see langword="true"/> if the first of the selected attributes
+        /// should be returned, <see langword="false"/> if the last should.</param>
+        /// <param name="includedAttribute">If not <see langword="null"/>, the specified attribute
+        /// should be considered part of the active set.</param>
         /// <returns>A Stack of <see cref="IAttribute"/>s describing the currently active
         /// <see cref="IAttribute"/> or <see langword="null"/> if there is no active attribute.
         /// </returns>
-        Stack<IAttribute> ActiveAttributeGenealogy()
+        Stack<IAttribute> ActiveAttributeGenealogy(bool first, IAttribute includedAttribute)
         {
             if (_activeDataControl != null)
             {
                 List<IAttribute> controlAttributes;
                 if (_controlAttributes.TryGetValue(_activeDataControl, out controlAttributes))
                 {
-                    IAttribute firstAttribute = GetFirstAttribute(controlAttributes);
-                    return GetAttributeGenealogy(firstAttribute);
+                    if (includedAttribute != null)
+                    {
+                        controlAttributes.Add(includedAttribute);
+                    }
+
+                    IAttribute attribute =
+                        GetFirstOrLastAttribute(controlAttributes, first, _activeDataControl);
+                    return GetAttributeGenealogy(attribute);
                 }
             }
 
@@ -3736,36 +4429,89 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Retrieves the first <see cref="IAttribute"/> in display order from the provided
+        /// Retrieves the active attribute or selects from one of several active attributes.
+        /// </summary>
+        /// <param name="first">If <see langword="true"/> and at least 2 attributes are active, the
+        /// first attribute (in tab order) will be returned, if <see langword="false"/> the last
+        /// active attribute would be returned or if <see langword="null"/>, an attribute will be
+        /// returned only if there is one and only one attribute active.</param>
+        /// <returns>The active attribute per <see paramref="first"/>, or <see langword="null"/> if
+        /// no qualifying attribute could be found.</returns>
+        IAttribute GetActiveAttribute(bool? first)
+        {
+            if (_activeDataControl != null)
+            {
+                List<IAttribute> activeAttributes = null;
+                if (_controlAttributes.TryGetValue(_activeDataControl, out activeAttributes))
+                {
+                    if (activeAttributes.Count == 1)
+                    {
+                        return activeAttributes[0];
+                    }
+                    else if (first != null)
+                    {
+                        return GetFirstOrLastAttribute(activeAttributes, first.Value, 
+                            _activeDataControl);
+                    }
+                }
+            }
+        
+            return null;
+        }
+
+        /// <summary>
+        /// Retrieves the first or last <see cref="IAttribute"/> in display order from the provided
         /// vector of <see cref="IAttribute"/>s.
         /// </summary>
         /// <param name="attributes">The list of <see cref="IAttribute"/>s
-        /// from which the first attribute in display order should be found.</param>
-        /// <returns>The <see cref="IAttribute"/> containing the lowest 
+        /// from which the first or last attribute in display order should be found.</param>
+        /// <param name="first"><see langword="true"/> if the first attribute from the specified
+        /// list should be return <see langword="false"/> if the last attribute should be returned.
+        /// </param>
+        /// <param name="dataEntryControl">If not <see langword="null"/>, attributes not in the
+        /// specified control will be ignored when selecting the active attribute.</param>
+        /// <returns>The <see cref="IAttribute"/> containing the lowest (or highest)
         /// <see cref="AttributeStatusInfo.DisplayOrder"/>.</returns>
-        static IAttribute GetFirstAttribute(List<IAttribute> attributes)
+        static IAttribute GetFirstOrLastAttribute(List<IAttribute> attributes, bool first,
+            IDataEntryControl dataEntryControl)
         {
-            string firstDisplayOrder = "";
-            IAttribute firstAttribute = null;
+            if (attributes.Count == 0)
+            {
+                return null;
+            }
+
+            IAttribute targetAttribute = attributes[0];
+            string targetDisplayOrder =
+                AttributeStatusInfo.GetStatusInfo(targetAttribute).DisplayOrder;
 
             // Iterate through all provided attributes to find the one with the lowest display
             // order value.
-            foreach (IAttribute attribute in attributes)
+            for (int i = 1; i < attributes.Count; i++)
             {
-                string displayOrder = AttributeStatusInfo.GetStatusInfo(attribute).DisplayOrder;
+                IAttribute attribute = attributes[i];
+                AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
 
-                // If the current attribute's display order is less than the lowest value found to
-                // this point, use this attribute as the first.
-                if (string.IsNullOrEmpty(firstDisplayOrder) ||
-                    string.Compare(displayOrder, firstDisplayOrder, 
-                        StringComparison.CurrentCultureIgnoreCase) < 0)
+                // [DataEntry:4494]
+                // If the selection is to be limited to the specified control, ignore attributes
+                // from any other control.
+                if (dataEntryControl == null || statusInfo.OwningControl == dataEntryControl)
                 {
-                    firstDisplayOrder = displayOrder;
-                    firstAttribute = attribute;
+                    string displayOrder = AttributeStatusInfo.GetStatusInfo(attribute).DisplayOrder;
+                    int comparisonResult = string.Compare(displayOrder, targetDisplayOrder,
+                        StringComparison.CurrentCultureIgnoreCase);
+
+                    // If the current attribute's display order is less than the lowest value found
+                    // to this point (or greater than the highest value found when first == false),
+                    // use this attribute as the target.
+                    if ((first && comparisonResult < 0) || (!first && comparisonResult > 0))
+                    {
+                        targetDisplayOrder = displayOrder;
+                        targetAttribute = attribute;
+                    }
                 }
             }
 
-            return firstAttribute;
+            return targetAttribute;
         }
 
         /// <summary>
@@ -3811,11 +4557,11 @@ namespace Extract.DataEntry
             // Look for any attributes whose data failed validation.
             Stack<IAttribute> unviewedAttributeGenealogy =
                 AttributeStatusInfo.FindNextUnviewedAttribute(_attributes,
-                ActiveAttributeGenealogy(), true, true);
+                ActiveAttributeGenealogy(true, null), true, true);
 
             if (unviewedAttributeGenealogy != null)
             {
-                return PropagateAttributes(unviewedAttributeGenealogy, true);
+                return PropagateAttributes(unviewedAttributeGenealogy, true, false);
             }
             else
             {
@@ -3827,9 +4573,11 @@ namespace Extract.DataEntry
         /// Attempts to find the next <see cref="IAttribute"/> (in display order) whose data
         /// has failed validation.
         /// </summary>
+        /// <param name="includeValidationWarnings"><see langword="true"/> if attributes marked
+        /// AllowWithWarnings should be included in the search.</param>
         /// <returns>The first <see cref="IAttribute"/> that failed validation, or 
         /// <see langword="null"/> if no invalid <see cref="IAttribute"/>s were found.</returns>
-        IAttribute GetNextInvalidAttribute()
+        IAttribute GetNextInvalidAttribute(bool includeValidationWarnings)
         {
             // Toggle the enabled status of the active control to force editing to end and 
             // validation to occur for any field that is currently being edited.
@@ -3849,11 +4597,11 @@ namespace Extract.DataEntry
             // Look for any attributes whose data failed validation.
             Stack<IAttribute> invalidAttributeGenealogy = 
                 AttributeStatusInfo.FindNextInvalidAttribute(_attributes, 
-                ActiveAttributeGenealogy(), true, true);
+                    includeValidationWarnings, ActiveAttributeGenealogy(true, null), true, true);
             
             if (invalidAttributeGenealogy != null)
             {
-                return PropagateAttributes(invalidAttributeGenealogy, true);
+                return PropagateAttributes(invalidAttributeGenealogy, true, false);
             }
             else
             {
@@ -4107,7 +4855,7 @@ namespace Extract.DataEntry
             do
             {
                 nextInvalidAttributeGenealogy = AttributeStatusInfo.FindNextInvalidAttribute(
-                    _attributes, startingPoint, true, false);
+                    _attributes, true, startingPoint, true, false);
 
                 if (nextInvalidAttributeGenealogy != null)
                 {
@@ -4153,7 +4901,7 @@ namespace Extract.DataEntry
 
                 // If the current attribute contains invalid data, decrement the 
                 // _invalidAttributeCount and raise InvalidItemsFound as appropriate.
-                if (!AttributeStatusInfo.IsDataValid(attribute))
+                if (AttributeStatusInfo.GetDataValidity(attribute) != DataValidity.Valid)
                 {
                     UpdateInvalidCount(false);
                 }
@@ -4556,58 +5304,152 @@ namespace Extract.DataEntry
             return horizontal;
         }
 
-        /// <overloads>Retrieves the <see cref="RasterZone"/>s of the specified
-        /// <see cref="IAttribute"/>(s) highlights grouped by page.</overloads>
         /// <summary>
-        /// Retrieves the <see cref="RasterZone"/>s of the specified <see cref="IAttribute"/>
-        /// highlights grouped by page.
+        /// Sorts the <see cref="IAttribute"/>s contained in the provided dictionaries according to
+        /// their positions in the document. The sorting will attempt to identify attributes in a
+        /// row across the page and and work from left-to-right across the row before dropping down
+        /// to the next row.
+        /// <para><b>Note</b></para>
+        /// This private helper will not include any non-spatial attributes in the results.
         /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> whose highlight 
-        /// <see cref="RasterZone"/>s will be returned.</param>
-        /// <returns>The <see cref="RasterZone"/>s of the <see paramref="attribute"/> grouped by
-        /// page.</returns>
-        internal Dictionary<int, List<RasterZone>> 
-            GetAttributeRasterZonesByPage(IAttribute attribute)
+        /// <param name="attributesByPage">A map of each page to a list of attributes that begin on
+        /// the specified page.</param>
+        /// <param name="attributeBounds">A map of each attribute to a rectangle describing its
+        /// bounds.</param>
+        /// <returns>The sorted <see cref="IAttribute"/>s.</returns>
+        List<IAttribute> SortAttributesSpatially(Dictionary<int, List<IAttribute>> attributesByPage,
+            Dictionary<IAttribute, Rectangle> attributeBounds)
         {
-            return GetAttributeRasterZonesByPage(new IAttribute[] { attribute });
-        }
+            List<IAttribute> sortedList = new List<IAttribute>();
 
-        /// <summary>
-        /// Retrieves the <see cref="RasterZone"/>s of the specified <see cref="IAttribute"/>s'
-        /// highlights grouped by page.
-        /// </summary>
-        /// <param name="attributes">The <see cref="IAttribute"/>s whose highlight
-        /// <see cref="RasterZone"/>s will be returned.</param>
-        /// <returns>The <see cref="RasterZone"/>s of the <see paramref="attributes"/>' highlights
-        /// grouped by page.</returns>
-        internal Dictionary<int, List<RasterZone>>
-            GetAttributeRasterZonesByPage(IEnumerable<IAttribute> attributes)
-        {
-            Dictionary<int, List<RasterZone>> rasterZonesByPage =
-                new Dictionary<int,List<RasterZone>>();
-
-            // Loop through each attribute
-            foreach (IAttribute attribute in attributes)
+            // Compile the sorted attributes page-by-page
+            for (int i = 1; i <= _imageViewer.PageCount; i++)
             {
-                // Try to find the highlight(s) that have been associated with the attribute.
-                List<CompositeHighlightLayerObject> highlights;
-                if (_attributeHighlights.TryGetValue(attribute, out highlights))
+                // If there are no attributes on the specified page, move on.
+                List<IAttribute> attributesOnPage;
+                if (!attributesByPage.TryGetValue(i, out attributesOnPage))
                 {
-                    // Add the raster zones of each highlight to the appropriate page in the
-                    // dictionary return value.
-                    foreach (CompositeHighlightLayerObject highlight in highlights)
+                    continue;
+                }
+
+                // Cycle through the attributes on this page attempting to group them into rows.
+                List<List<IAttribute>> rows = new List<List<IAttribute>>();
+                foreach (IAttribute attribute in attributesOnPage)
+                {
+                    bool belongsInExistingRow = false;
+
+                    // Check to see if the attribute appears to belong in an existing row.
+                    foreach (List<IAttribute> row in rows)
                     {
-                        if (!rasterZonesByPage.ContainsKey(highlight.PageNumber))
+                        // Compare with each attribute in the existing row to see if it seems to
+                        // line up with it.
+                        foreach (IAttribute existingAttribute in row)
                         {
-                            rasterZonesByPage[highlight.PageNumber] = new List<RasterZone>();
+                            Rectangle rectangle = attributeBounds[attribute];
+                            Rectangle existingRectangle = attributeBounds[existingAttribute];
+
+                            int horizontalOverlap =
+                                Math.Min(rectangle.Right, existingRectangle.Right) -
+                                Math.Max(rectangle.Left, existingRectangle.Left);
+
+                            int verticalOverlap =
+                                Math.Min(rectangle.Bottom, existingRectangle.Bottom) -
+                                Math.Max(rectangle.Top, existingRectangle.Top);
+
+                            // If there is more vertical overlap than horizontal overlap,
+                            // make the attribute a member of this row.
+                            if (verticalOverlap > 0 && verticalOverlap > horizontalOverlap)
+                            {
+                                row.Add(attribute);
+                                belongsInExistingRow = true;
+                                break;
+                            }
                         }
 
-                        rasterZonesByPage[highlight.PageNumber].AddRange(highlight.GetRasterZones());
+                        // If the attribute was added to an existing row, don't search any remaining
+                        // row.
+                        if (belongsInExistingRow)
+                        {
+                            break;
+                        }
+                    }
+
+                    // If the attribute didn't belong to an existing row, create a new row for it.
+                    if (!belongsInExistingRow)
+                    {
+                        List<IAttribute> row = new List<IAttribute>();
+                        row.Add(attribute);
+                        rows.Add(row);
+                    }
+                }
+
+                // Calculate the Y position of each row.
+                Dictionary<int, List<IAttribute>> rowPositions =
+                    new Dictionary<int, List<IAttribute>>();
+                foreach (List<IAttribute> row in rows)
+                {
+                    int rowPosition = -1;
+
+                    foreach (IAttribute attribute in row)
+                    {
+                        int attributePosition = attributeBounds[attribute].Top;
+
+                        if (rowPosition == -1 || attributePosition < rowPosition)
+                        {
+                            rowPosition = attributePosition;
+                        }
+                    }
+
+                    if (rowPositions.ContainsKey(rowPosition))
+                    {
+                        rowPositions[rowPosition].AddRange(row);
+                    }
+                    else
+                    {
+                        rowPositions[rowPosition] = row;
+                    }
+                }
+
+                // Sort the rows top down.
+                List<int> sortedRowPositions = new List<int>(rowPositions.Keys);
+                sortedRowPositions.Sort();
+
+                // Loop through each row in order to sort the attributes in each from left to right.
+                foreach (int rowPosition in sortedRowPositions)
+                {
+                    List<IAttribute> row = rowPositions[rowPosition];
+
+                    // Calculate the X position of each attribute in the row.
+                    Dictionary<int, List<IAttribute>> attributePositions =
+                            new Dictionary<int, List<IAttribute>>();
+                    foreach (IAttribute attribute in row)
+                    {
+                        int attributePosition = attributeBounds[attribute].Left;
+
+                        if (attributePositions.ContainsKey(attributePosition))
+                        {
+                            attributePositions[attributePosition].Add(attribute);
+                        }
+                        else
+                        {
+                            attributePositions[attributePosition] = new List<IAttribute>();
+                            attributePositions[attributePosition].Add(attribute);
+                        }
+                    }
+
+                    // Sort the attributes in the row.
+                    List<int> sortedAttributePositions = new List<int>(attributePositions.Keys);
+                    sortedAttributePositions.Sort();
+
+                    // Add the sorted attributes to the result list.
+                    foreach (int attributePosition in sortedAttributePositions)
+                    {
+                        sortedList.AddRange(attributePositions[attributePosition]);
                     }
                 }
             }
 
-            return rasterZonesByPage;
+            return sortedList;
         }
 
         /// <summary>
@@ -4627,7 +5469,7 @@ namespace Extract.DataEntry
 
             // If the attribute's data is valid, or it is represented by an indirect hint there is
             // nothing else to do.
-            if (AttributeStatusInfo.IsDataValid(attribute) ||
+            if (AttributeStatusInfo.GetDataValidity(attribute) != DataValidity.Invalid ||
                 AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
             {
                 return;
@@ -4635,7 +5477,7 @@ namespace Extract.DataEntry
 
             // Groups the attribute's raster zones by page.
             Dictionary<int, List<RasterZone>> rasterZonesByPage =
-                GetAttributeRasterZonesByPage(attribute);
+                GetAttributeRasterZonesByPage(attribute, false);
 
             // Create an error icon for each page on which the attribute is present.
             foreach (int page in rasterZonesByPage.Keys)
@@ -5104,6 +5946,22 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Displays or hides error icon for all invalid <see cref="IAttribute"/>s.
+        /// </summary>
+        /// <param name="show"><see langword="true"/> to display the error icons,
+        /// <see langword="false"/> to hide them.</param>
+        void ShowAllErrorIcons(bool show)
+        {
+            foreach (List<ImageLayerObject> errorIconList in _attributeErrorIcons.Values)
+            {
+                foreach (ImageLayerObject errorIcon in errorIconList)
+                {
+                    errorIcon.Visible = show;
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns the error icon for the specified <see cref="IAttribute"/> on the specified
         /// page. (if such an error icon exists)
         /// </summary>
@@ -5161,14 +6019,15 @@ namespace Extract.DataEntry
         {
             // Keep track of the currently selected attribute and whether selection is changed by
             // this method so that the selection can be restored at the end of this method.
-            Stack<IAttribute> currentlySelectedAttribute = ActiveAttributeGenealogy();
+            Stack<IAttribute> currentlySelectedAttribute = ActiveAttributeGenealogy(true, null);
             bool changedSelection = false;
 
             // If saving should be or can be prevented by invalid data, check for invalid data.
             if (_invalidDataSaveMode != InvalidDataSaveMode.Allow)
             {
                 // Attempt to find any attributes that haven't passed validation.
-                IAttribute firstInvalidAttribute = GetNextInvalidAttribute();
+                IAttribute firstInvalidAttribute = GetNextInvalidAttribute(
+                    _invalidDataSaveMode != InvalidDataSaveMode.AllowWithWarnings);
                 IAttribute invalidAttribute = firstInvalidAttribute;
 
                 // Loop as long as more invalid attributes are found (for the case that we need to
@@ -5215,7 +6074,8 @@ namespace Extract.DataEntry
                             // invalid attributes before returning true.
                             else
                             {
-                                invalidAttribute = GetNextInvalidAttribute();
+                                invalidAttribute = GetNextInvalidAttribute(
+                                    _invalidDataSaveMode != InvalidDataSaveMode.AllowWithWarnings);
 
                                 // If the next invalid attribute is the first one that was found,
                                 // the user has responded to prompts for each-- exit the prompting
@@ -5279,12 +6139,12 @@ namespace Extract.DataEntry
                 // inactive controls may then be left with improper data.
                 foreach (IDataEntryControl dataControl in _rootLevelControls)
                 {
-                    dataControl.PropagateAttribute(null, false);
+                    dataControl.PropagateAttribute(null, false, false);
                 }
 
                 // TODO: If multiple cells in a table were selected, only one will be selected at the
                 // end of this call.
-                PropagateAttributes(currentlySelectedAttribute, true);
+                PropagateAttributes(currentlySelectedAttribute, true, false);
             }
 
             return true;
@@ -5415,65 +6275,80 @@ namespace Extract.DataEntry
         {
             if (_imageViewer.IsImageAvailable)
             {
+                // Initialize _currentlySelectedGroupAttribute as null. 
+                _currentlySelectedGroupAttribute = null;
+
                 // Select the first control on the form.
                 base.Focus();
                 base.SelectNextControl(null, true, true, true, true);
 
                 // If there is an active data control, ensure the initially selected attribute is
                 // appropriate based on its TabStopMode
-                if (_activeDataControl != null)
+                IAttribute activeAttribute = GetActiveAttribute(true);
+                if (activeAttribute != null)
                 {
-                    List<IAttribute> controlAttributes;
-                    if (_controlAttributes.TryGetValue(_activeDataControl, out controlAttributes))
+                    // We found an active attribute.  Specify advanceSelection based on the
+                    // attribute's TabStopMode.
+                    bool advanceSelection = false;
+
+                    switch (AttributeStatusInfo.GetStatusInfo(activeAttribute).TabStopMode)
                     {
-                        IAttribute activeAttribute = GetFirstAttribute(controlAttributes);
-                        if (activeAttribute != null)
-                        {
-                            // We found an active attribute.  Specify advanceSelection based on the
-                            // attribute's TabStopMode.
-                            bool advanceSelection = false;
-
-                            switch (AttributeStatusInfo.GetStatusInfo(activeAttribute).TabStopMode)
+                        case TabStopMode.OnlyWhenPopulatedOrInvalid:
                             {
-                                case TabStopMode.OnlyWhenPopulatedOrInvalid:
-                                    {
-                                        if (string.IsNullOrEmpty(activeAttribute.Value.String) &&
-                                            AttributeStatusInfo.IsDataValid(activeAttribute))
-                                        {
-                                            advanceSelection = true;
-                                        }
-                                    }
-                                    break;
-
-                                case TabStopMode.OnlyWhenInvalid:
-                                    {
-                                        if (AttributeStatusInfo.IsDataValid(activeAttribute))
-                                        {
-                                            advanceSelection = true;
-                                        }
-                                    }
-                                    break;
-
-                                case TabStopMode.Never:
-                                    {
-                                        advanceSelection = true;
-                                    }
-                                    break;
-                            }
-
-                            // If selection should be advanced based on the attribute's TabStopMode,
-                            // do so.
-                            if (advanceSelection)
-                            {
-                                Stack<IAttribute> nextTabStopAttribute =
-                                AttributeStatusInfo.GetNextTabStopAttribute(_attributes,
-                                    ActiveAttributeGenealogy(), !_shiftKeyDown);
-
-                                if (nextTabStopAttribute != null)
+                                if (string.IsNullOrEmpty(activeAttribute.Value.String) &&
+                                    (AttributeStatusInfo.GetDataValidity(activeAttribute) 
+                                        == DataValidity.Valid))
                                 {
-                                    PropagateAttributes(nextTabStopAttribute, true);
+                                    advanceSelection = true;
                                 }
                             }
+                            break;
+
+                        case TabStopMode.OnlyWhenInvalid:
+                            {
+                                if (AttributeStatusInfo.GetDataValidity(activeAttribute)
+                                        == DataValidity.Valid)
+                                {
+                                    advanceSelection = true;
+                                }
+                            }
+                            break;
+
+                        case TabStopMode.Never:
+                            {
+                                advanceSelection = true;
+                            }
+                            break;
+                    }
+
+                    // If selection should be advanced based on the attribute's TabStopMode,
+                    // do so.
+                    if (advanceSelection)
+                    {
+                        Stack<IAttribute> nextTabStopAttribute = null;
+                        // Advance to the next attribute group if _allowTabbingByGroup and
+                        // the first attributes are within a control that supports attribute
+                        // groups.
+                        if (_allowTabbingByGroup)
+                        {
+                            nextTabStopAttribute =
+                                AttributeStatusInfo.GetNextTabGroupAttribute(_attributes, 
+                                    ActiveAttributeGenealogy(false, 
+                                        _currentlySelectedGroupAttribute), 
+                                    true);
+                        }
+                        // Otherwise advance to the first tab stop.
+                        else
+                        {
+                            nextTabStopAttribute =
+                                AttributeStatusInfo.GetNextTabStopAttribute(_attributes,
+                                ActiveAttributeGenealogy(true, null), false);
+                        }
+
+                        if (nextTabStopAttribute != null)
+                        {
+                            PropagateAttributes(nextTabStopAttribute, true,
+                                _allowTabbingByGroup);
                         }
                     }
                 }
@@ -5481,7 +6356,7 @@ namespace Extract.DataEntry
             else
             {
                 // Clear any existing validation errors
-                _errorProvider.Clear();
+                _validationErrorProvider.Clear();
             }
 
             OnItemSelectionChanged();
@@ -5513,6 +6388,51 @@ namespace Extract.DataEntry
 
             _userNotificationTooltip.Show(message, (IWin32Window)base.TopLevelControl,
                 toolTipPosition, 5000);
+        }
+
+        /// <summary>
+        /// Navigates to the specified page, settings _performingProgrammaticZoom in the process to
+        /// avoid handling scroll and zoom events that occur as a result.
+        /// </summary>
+        /// <param name="pageNumber">The page to be displayed</param>
+        void SetImageViewerPageNumber(int pageNumber)
+        {
+            try
+            {
+                if (pageNumber != _imageViewer.PageNumber)
+                {
+                    _performingProgrammaticZoom = true;
+                    _lastAutoZoomSelection = new Rectangle();
+                    _imageViewer.PageNumber = pageNumber;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29105", ex);
+            }
+            finally
+            {
+                _performingProgrammaticZoom = false;
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="MessageHandled"/> event.
+        /// </summary>
+        /// <param name="e">The data associated with the event.</param>
+        void OnMessageHandled(MessageHandledEventArgs e)
+        {
+            try
+            {
+                if (MessageHandled != null)
+                {
+                    MessageHandled(this, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI29134", ex);
+            }
         }
 
         #endregion Private Members

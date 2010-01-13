@@ -26,6 +26,11 @@ namespace Extract.DataEntry
         private string _attributeName;
 
         /// <summary>
+        /// The <see cref="DataEntryControlHost"/> to which this control belongs
+        /// </summary>
+        DataEntryControlHost _dataEntryControlHost;
+
+        /// <summary>
         /// Used to specify the data entry control which is mapped to the parent of the attribute 
         /// to which the current group box is to be mapped.
         /// </summary>
@@ -36,7 +41,7 @@ namespace Extract.DataEntry
         /// name for this control.
         /// </summary>
         private MultipleMatchSelectionMode _multipleMatchSelectionMode =
-            MultipleMatchSelectionMode.First;
+            MultipleMatchSelectionMode.None;
 
         /// <summary>
         /// The attribute mapped to this control.
@@ -98,6 +103,24 @@ namespace Extract.DataEntry
         #region IDataEntryControl Members
 
         /// <summary>
+        /// Gets or sets the <see cref="DataEntryControlHost"/> to which this control belongs
+        /// </summary>
+        /// <value>The <see cref="DataEntryControlHost"/> to which this control belongs.</value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public DataEntryControlHost DataEntryControlHost
+        {
+            get
+            {
+                return _dataEntryControlHost;
+            }
+            set
+            {
+                _dataEntryControlHost = value;
+            }
+        }
+
+        /// <summary>
         /// If the <see cref="DataEntryGroupBox"/> is not intended to operate on root-level data, 
         /// this property must be used to specify the <see cref="IDataEntryControl"/> which is 
         /// mapped to the parent of the <see cref="IAttribute"/>(s) to which the current 
@@ -130,6 +153,7 @@ namespace Extract.DataEntry
         /// <returns>The selection mode to use to find the mapped attribute for the
         /// <see cref="DataEntryGroupBox"/>.</returns>
         [Category("Data Entry Group Box")]
+        [DefaultValue(MultipleMatchSelectionMode.None)]
         public MultipleMatchSelectionMode MultipleMatchSelectionMode
         {
             get
@@ -171,7 +195,7 @@ namespace Extract.DataEntry
                     // Attempt to find a mapped attribute from the provided vector.  Create a new 
                     // attribute if no such attribute can be found.
                     _attribute = DataEntryMethods.InitializeAttribute(_attributeName,
-                        MultipleMatchSelectionMode.First, !string.IsNullOrEmpty(_attributeName),
+                        MultipleMatchSelectionMode.None, !string.IsNullOrEmpty(_attributeName),
                         sourceAttributes, null, this, 0, false, TabStopMode.Never, null, null, null);
                 }
 
@@ -191,10 +215,10 @@ namespace Extract.DataEntry
         /// associated with any <see cref="IAttribute"/> it propagates as propagated.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">An <see cref="PropagateAttributesEventArgs"/> that contains the event data.
+        /// <param name="e">An <see cref="AttributesEventArgs"/> that contains the event data.
         /// </param>
         /// <seealso cref="IDataEntryControl"/>
-        public void HandlePropagateAttributes(object sender, PropagateAttributesEventArgs e)
+        public void HandlePropagateAttributes(object sender, AttributesEventArgs e)
         {
             try
             {
@@ -254,8 +278,12 @@ namespace Extract.DataEntry
         /// If <see langword="false"/>, the previous selection will remain even if a different
         /// <see cref="IAttribute"/> was propagated.
         /// </param>
+        /// <param name="selectTabGroup">If <see langword="true"/> all <see cref="IAttribute"/>s in
+        /// the specified <see cref="IAttribute"/>'s tab group are to be selected,
+        /// <see langword="false"/> otherwise.</param>
         /// <seealso cref="IDataEntryControl"/>
-        public void PropagateAttribute(IAttribute attribute, bool selectAttribute)
+        public void PropagateAttribute(IAttribute attribute, bool selectAttribute,
+            bool selectTabGroup)
         {
             ExtractException.Assert("ELI26037", "Unexpected attribute!",
                 attribute == null || attribute == _attribute);
@@ -267,7 +295,7 @@ namespace Extract.DataEntry
         /// <see cref="DataEntryGroupBox"/>'s attribute being re-mapped.
         /// The event will provide the updated <see cref="IAttribute"/> to registered listeners.
         /// </summary>
-        public event EventHandler<PropagateAttributesEventArgs> PropagateAttributes;
+        public event EventHandler<AttributesEventArgs> PropagateAttributes;
 
         #endregion IDataEntryControl Members
 
@@ -358,10 +386,36 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// <see cref="DataEntryGroupBox"/> does not support pasting; the value of this property
+        /// will always be <see langword="false"/>.
+        /// </summary>
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool ClearClipboardOnPaste
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+                if (value)
+                {
+                    throw new ExtractException("ELI29012",
+                        "DataEntryGroup box does not support pasting!");
+                }
+            }
+        }
+
+        /// <summary>
         /// <see cref="DataEntryGroupBox"/> does not support disabled status; the value of this
         /// property will always be <see langword="false"/>.
         /// </summary>
-        [Category("Data Entry Control")]
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Disabled
         {
             get
@@ -401,9 +455,9 @@ namespace Extract.DataEntry
         /// <summary>
         /// <see cref="DataEntryGroupBox"/> does not have any implementation for this method.
         /// </summary>
-        /// <param name="attributes">Unused.</param>
         /// <param name="spatialInfoUpdated">Unused.</param>
-        public virtual void RefreshAttributes(IAttribute[] attributes, bool spatialInfoUpdated)
+        /// <param name="attributes">Unused.</param>
+        public virtual void RefreshAttributes(bool spatialInfoUpdated, params IAttribute[] attributes)
         {
         }
 
@@ -433,13 +487,13 @@ namespace Extract.DataEntry
                     // If the group box is not currently mapped to an attribute, it should propagate
                     // null so all dependent controls are unmapped.
                     PropagateAttributes(this,
-                        new PropagateAttributesEventArgs(null));
+                        new AttributesEventArgs(null));
                 }
                 else
                 {
                     // Propagate the mapped attribute.
                     PropagateAttributes(this,
-                        new PropagateAttributesEventArgs(
+                        new AttributesEventArgs(
                             DataEntryMethods.AttributeAsVector(_attribute)));
                 }
             }

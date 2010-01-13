@@ -2,6 +2,7 @@ using Extract;
 using Extract.DataEntry;
 using Extract.DataEntry.Utilities.DataEntryApplication.Properties;
 using Extract.Imaging.Forms;
+using Extract.FileActionManager.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -11,6 +12,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
@@ -21,6 +23,8 @@ using System.Runtime.Remoting;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
+using UCLID_COMUTILSLib;
+using UCLID_DATAENTRYCUSTOMCOMPONENTSLib;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry.Utilities.DataEntryApplication
@@ -61,14 +65,34 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         static readonly IntPtr _SC_CLOSE = (IntPtr)0xF060;
 
+        /// <summary>
+        /// "Commit without saving"
+        /// </summary>
+        static string _COMMIT_WITHOUT_SAVING = "Commit without saving";
+
         #endregion Constants
 
         #region Fields
 
         /// <summary>
+        /// The settings for this application.
+        /// </summary>
+        Settings _settings;
+
+        /// <summary>
         /// The data entry panel control host implementation to be used by the application.
         /// </summary>
         DataEntryControlHost _dataEntryControlHost;
+
+        /// <summary>
+        /// A <see cref="Form"/> to display the <see cref="ImageViewer"/> in a separate window.
+        /// </summary>
+        Form _imageViewerForm;
+
+        /// <summary>
+        /// Processes shortcuts when the image viewer is being displayed in a separate form.
+        /// </summary>
+        ShortcutsMessageFilter _imageWindowShortcutsMessageFilter;
 
         /// <summary>
         /// Indicates whether the <see cref="DataEntryApplicationForm"/> is in standalone mode 
@@ -102,6 +126,43 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The ID of the action being processed.
         /// </summary>
         int _actionID;
+
+        /// <summary>
+        /// The name of the action being processed.
+        /// </summary>
+        string _actionName;
+
+        /// <summary>
+        /// Allows data entry specific database operations.
+        /// </summary>
+        DataEntryProductDBMgr _dataEntryDatabaseManager;
+
+        /// <summary>
+        /// A token value that allows "OnLoad" DataEntryCounterValue DB entries to be made once the
+        /// corresponding DataEntryData table entry is made. -1 indicates there is no pending counts
+        /// to be stored.
+        /// </summary>
+        int _counterStatisticsToken = -1;
+
+        /// <summary>
+        /// Specifies whether input event tracking should be logged in the database.
+        /// </summary>
+        bool _inputEventTrackingEnabled;
+
+        /// <summary>
+        /// Specifies whether counts will be recorded for the defined data entry counters.
+        /// </summary>
+        bool _countersEnabled;
+
+        /// <summary>
+        /// Tracks user input in the file processing database.
+        /// </summary>
+        InputEventTracker _inputEventTracker;
+
+        /// <summary>
+        /// Keeps track of the time spent verifying a file.
+        /// </summary>
+        Stopwatch _fileProcessingStopwatch;
 
         /// <summary>
         /// The close file command
@@ -171,6 +232,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         TemporaryFile _localDBCopy;
 
         /// <summary>
+        /// The last time the source DB was modified (set only when caching the DB locally)
+        /// </summary>
+        DateTime _lastDBModificationTime;
+
+        /// <summary>
+        /// The path of the source DB.
+        /// </summary>
+        string _dataSourcePath;
+
+        /// <summary>
         /// The user-specified settings for the data entry application.
         /// </summary>
         UserPreferences _userPreferences;
@@ -222,12 +293,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         bool _scrollToTopRequired;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -241,7 +306,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="configFileName">The name of the configuration file used to supply settings
         /// for the <see cref="DataEntryApplicationForm"/>.</param>
         public DataEntryApplicationForm(string configFileName)
-            : this(configFileName, true)
+            : this(configFileName, true, null, false, false)
         {
         }
 
@@ -252,7 +317,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// for the <see cref="DataEntryApplicationForm"/>.</param>
         /// <param name="standAloneMode"><see langref="true"/> if the created as a standalone 
         /// application; <see langref="false"/> if launched via the COM interface.</param>
-        public DataEntryApplicationForm(string configFileName, bool standAloneMode)
+        /// <param name="actionName">The name of the file processing action currently being used.
+        /// (Can be <see langword="null"/> if no file processing action is involved)</param>
+        /// <param name="inputEventTrackingEnabled"><see langword="true"/> to record data from user
+        /// input, <see langword="false"/> otherwise.</param>
+        /// <param name="countersEnabled"><see langword="true"/> to record counts for the defined
+        /// data entry counters, <see langword="false"/> otherwise.</param>
+        public DataEntryApplicationForm(string configFileName, bool standAloneMode,
+            string actionName, bool inputEventTrackingEnabled, bool countersEnabled)
         {
             try
             {
@@ -264,12 +336,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI23668");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI23668", _OBJECT_NAME);
 
                 // Initialize the configuration settings.
-                ConfigSettings.Initialize(configFileName);
+                _settings = ConfigSettings.InitializeSettings<Settings>(configFileName);
+
+                // Initialize the root directory the DataEntry framework should use when resolving
+                // relative paths.
+                DataEntryMethods.SolutionRootDirectory = Path.GetDirectoryName(configFileName);
 
                 _standAloneMode = standAloneMode;
+                _actionName = actionName;
+                _inputEventTrackingEnabled = inputEventTrackingEnabled;
+                _countersEnabled = countersEnabled;
                 
                 InitializeComponent();
 
@@ -286,6 +366,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
                     }
                 }
+                else
+                {
+                    // If in stand-alone mode, the _tagFileToolStripButton isn't useful.
+                    _tagFileToolStripButton.Visible = false;
+                }
 
                 // Add the file tool strip items
                 AddFileToolStripItems(_fileToolStripMenuItem.DropDownItems);
@@ -293,35 +378,48 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Change the text on certain controls if not running in stand alone mode
                 if (!_standAloneMode)
                 {
-                    _saveAndCommitMenuItem.Text = "&Save and commit";
                     _exitToolStripMenuItem.Text = "Stop processing";
-                    _saveAndCommitButton.Text = "Save and commit";
-                    _saveAndCommitButton.ToolTipText = "Save and commit (Ctrl+S)";
                     _imageViewer.DefaultStatusMessage = "Waiting for next document...";
+
+                    if (_settings.PreventSave)
+                    {
+                        _saveAndCommitMenuItem.Text = _COMMIT_WITHOUT_SAVING;
+                        _saveAndCommitButton.Text = _COMMIT_WITHOUT_SAVING;
+                        _saveAndCommitButton.ToolTipText = _COMMIT_WITHOUT_SAVING + " (Ctrl+S)";
+                    }
+                    else
+                    {
+                        _saveAndCommitMenuItem.Text = "&Save and commit";
+                        _saveAndCommitButton.Text = "Save and commit";
+                        _saveAndCommitButton.ToolTipText = "Save and commit (Ctrl+S)";
+                    }
                 }
 
                 // Read the user preferences object from the registry
                 _userPreferences = UserPreferences.FromRegistry();
 
                 // Retrieve the name of the DEP assembly
-                string dataEntryPanelFileName = 
-                    DataEntryMethods.ResolvePath(ConfigSettings.AppSettings.DataEntryPanelFileName);
+                string dataEntryPanelFileName =
+                    DataEntryMethods.ResolvePath(_settings.DataEntryPanelFileName);
 
                 // Create the data entry control host from the specified assembly
-                this.DataEntryControlHost = CreateDataEntryControlHost(dataEntryPanelFileName);
+                DataEntryControlHost = CreateDataEntryControlHost(dataEntryPanelFileName);
+
+                // Apply settings from the config file that pertain to the DEP.
+                ConfigSettings.ApplySettings(configFileName, DataEntryControlHost);
 
                 // If there's a database available, let the control host know about it.
                 if (TryOpenDatabaseConnection())
                 {
-                    this.DataEntryControlHost.DatabaseConnection = _dbConnection;
+                    DataEntryControlHost.DatabaseConnection = _dbConnection;
                 }
 
-                this.DataEntryControlHost.AutoZoomMode = _userPreferences.AutoZoomMode;
-                this.DataEntryControlHost.AutoZoomContext = _userPreferences.AutoZoomContext;
+                DataEntryControlHost.AutoZoomMode = _userPreferences.AutoZoomMode;
+                DataEntryControlHost.AutoZoomContext = _userPreferences.AutoZoomContext;
 
-                base.Icon = _dataEntryControlHost.ApplicationIcon;
-                _appHelpMenuItem.Text = this.DataEntryControlHost.ApplicationTitle + " &help...";
-                _aboutMenuItem.Text = "&About " + this.DataEntryControlHost.ApplicationTitle + "...";
+                Icon = _dataEntryControlHost.ApplicationIcon;
+                _appHelpMenuItem.Text = DataEntryControlHost.ApplicationTitle + " &help...";
+                _aboutMenuItem.Text = "&About " + DataEntryControlHost.ApplicationTitle + "...";
             }
             catch (Exception ex)
             {
@@ -352,7 +450,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     if (_dataEntryControlHost != null)
                     {
-                        // TODO: un-register SwipingStateChange event
                         _splitContainer.Panel1.Controls.Remove(_dataEntryControlHost);
                         _dataEntryControlHost.Dispose();
                     }
@@ -361,45 +458,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     if (_dataEntryControlHost != null)
                     {
-                        // TODO: register SwipingStateChange event
-
-                        // Pad by _DATA_ENTRY_PANEL_PADDING around DEP content
-                        _dataEntryControlHost.Location
-                            = new Point(_DATA_ENTRY_PANEL_PADDING, _DATA_ENTRY_PANEL_PADDING);
-                        _splitContainer.SplitterWidth = _DATA_ENTRY_PANEL_PADDING;
-                        if (RegistryManager.DefaultSplitterPosition > 0)
-                        {
-                            _dataEntryControlHost.Width = RegistryManager.DefaultSplitterPosition - 
-                                _DATA_ENTRY_PANEL_PADDING - _scrollPanel.AutoScrollMargin.Width;
-                            _splitContainer.SplitterDistance = 
-                                RegistryManager.DefaultSplitterPosition;
-                        }
-                        else
-                        {
-                            _splitContainer.SplitterDistance = _dataEntryControlHost.Size.Width +
-                                _DATA_ENTRY_PANEL_PADDING + _scrollPanel.AutoScrollMargin.Width;
-                        }
-
-                        _dataEntryControlHost.Anchor = AnchorStyles.Left | AnchorStyles.Top | 
-                            AnchorStyles.Right;
-
-                        // The splitter should respect the minimum size of the DEP.
-                        _splitContainer.Panel1MinSize =
-                            _dataEntryControlHost.MinimumSize.Width +
-                            (2 * _DATA_ENTRY_PANEL_PADDING) + _scrollPanel.AutoScrollMargin.Width +
-                            SystemInformation.VerticalScrollBarWidth;
-
-                        // Add the DEP to an auto-scroll pane to allow scrolling if the DEP is too
-                        // long. (The scroll pane is sized to allow the full width of the DEP to 
-                        // display initially) 
-                        _scrollPanel.Size = new Size(_splitContainer.SplitterDistance, 
-                            _scrollPanel.Height);
-                        _scrollPanel.Controls.Add(_dataEntryControlHost);
-
-                        // Handle scroll in order to update the panel position while a scroll is in
-                        // progress.
-                        _scrollPanel.Scroll += HandleScrollPanelScroll;
-
                         // If there's a database available, let the control host know about it.
                         if (_dbConnection != null)
                         {
@@ -570,9 +628,53 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException.Assert("ELI26940", "Null argument exception!",
                     fileProcessingDB != null);
 
-                _fileProcessingDB = fileProcessingDB;
+                if (_fileProcessingDB != fileProcessingDB)
+                {
+                    _fileProcessingDB = fileProcessingDB;
+
+                    // Whether to enable data entry counters depends upon the DBInfo setting as well as
+                    // the task configuration.
+                    if (_countersEnabled)
+                    {
+                        _countersEnabled =
+                            fileProcessingDB.GetDBInfoSetting("EnableDataEntryCounters").Equals(
+                                "1", StringComparison.OrdinalIgnoreCase);
+                    }
+                }
+                
                 _fileID = fileID;
                 _actionID = actionID;
+                _actionName = _fileProcessingDB.GetActionName(_actionID);
+
+                _tagFileToolStripButton.Database = fileProcessingDB;
+                _tagFileToolStripButton.FileId = fileID;
+                // For consistency with other buttons, keep disabled until the file is loaded.
+                _tagFileToolStripButton.Enabled = false;
+
+                if (_inputEventTrackingEnabled && _inputEventTracker == null)
+                {
+                    _inputEventTracker = new InputEventTracker(fileProcessingDB, actionID);
+                }
+
+                if (_dataEntryDatabaseManager == null)
+                {
+                    _dataEntryDatabaseManager =
+                        (DataEntryProductDBMgr)new DataEntryProductDBMgrClass();
+                    _dataEntryDatabaseManager.FAMDB = fileProcessingDB;
+                }
+
+                // If using a local cached copy of the database, check to see if the database has
+                // been updated since the last time it was cached.
+                if (_localDBCopy != null)
+                {
+                    if (File.GetLastWriteTime(_dataSourcePath) > _lastDBModificationTime)
+                    {
+                        if (TryOpenDatabaseConnection())
+                        {
+                            DataEntryControlHost.DatabaseConnection = _dbConnection;
+                        }
+                    }
+                }
 
                 _imageViewer.OpenImage(fileName, false);
 
@@ -602,7 +704,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 base.OnLoad(e);
 
                 // Set the application name
-                base.Text = _dataEntryControlHost.ApplicationTitle;
+                if (string.IsNullOrEmpty(_actionName))
+                {
+                    base.Text = _dataEntryControlHost.ApplicationTitle;
+                }
+                else
+                {
+                    // [DataEntry:740] Show the name of the current action in the title bar.
+                    base.Text = "Waiting - " + _dataEntryControlHost.ApplicationTitle +
+                        " (" + _actionName + ")";
+                }
 
                 // Establish shortcut keys
 
@@ -706,6 +817,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _imageViewer.Shortcuts[Keys.R | Keys.Control | Keys.Shift] =
                     _imageViewer.SelectRotateCounterclockwise;
 
+                // Toggle tab by row/group mode
+                _imageViewer.Shortcuts[Keys.F9] = ToggleAllowTabbingByGroup;
+                _allowTabbingByGroupToolStripMenuItem.CheckState =
+                    _dataEntryControlHost.AllowTabbingByGroup 
+                        ? CheckState.Checked
+                        : CheckState.Unchecked;
+
+                // Toggle showing image viewer in a separate window.
+                _imageViewer.Shortcuts[Keys.F11] = ToggleSeparateImageWindow;
+                _separateImageWindowToolStripMenuItem.CheckState =
+                    RegistryManager.DefaultShowSeparateImageWindow
+                        ? CheckState.Checked
+                        : CheckState.Unchecked;
+
                 // Hide any visible toolTips
                 _hideToolTipsCommand = new ApplicationCommand(_imageViewer.Shortcuts,
                     new Keys[] { Keys.Escape }, _dataEntryControlHost.ToggleHideTooltips,
@@ -727,9 +852,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     new Keys[] { Keys.D | Keys.Control }, _dataEntryControlHost.RemoveSpatialInfo,
                     new ToolStripItem[] { _removeImageHighlightMenuItem }, false, true, false);
 
-                // Establish connections between the image viewer and all image viewer controls.
-                _imageViewer.EstablishConnections(this);
-
                 // Disable the OpenImageToolStripSplitButton if this is not stand alone mode
                 if (!_standAloneMode)
                 {
@@ -746,14 +868,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Register for events.
                 _imageViewer.ImageFileChanged += HandleImageFileChanged;
                 _imageViewer.ImageFileClosing += HandleImageFileClosing;
+                _imageViewer.LoadingNewImage += HandleLoadingNewImage;
                 _dataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
                 _dataEntryControlHost.InvalidItemsFound += HandleInvalidItemsFound;
                 _dataEntryControlHost.UnviewedItemsFound += HandleUnviewedItemsFound;
                 _dataEntryControlHost.ItemSelectionChanged += HandleItemSelectionChanged;
+                if (_inputEventTrackingEnabled)
+                {
+                    _dataEntryControlHost.MessageHandled += HandleMessageFilterMessageHandled;
+                }
                 _saveAndCommitMenuItem.Click += HandleSaveAndCommitClick;
                 _saveAndCommitButton.Click += HandleSaveAndCommitClick;
                 if (!_standAloneMode)
                 {
+                    _dataEntryControlHost.DataLoaded += HandleDataLoaded;
                     _saveMenuItem.Click += HandleSaveClick;
                     _skipProcessingMenuItem.Click += HandleSkipFileClick;
                 }
@@ -771,21 +899,41 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _aboutMenuItem.Click += HandleAboutMenuItemClick;
                 _appHelpMenuItem.Click += HandleHelpMenuItemClick;
                 _optionsToolStripMenuItem.Click += HandleOptionsMenuItemClick;
+                _allowTabbingByGroupToolStripMenuItem.Click += HandleToggleAllowTabbingByGroup;
+                _separateImageWindowToolStripMenuItem.Click += HandleSeparateImageWindow;
 
                 // [DataEntry:195] Open the form with the position and size set per the registry 
                 // settings. Do this regardless of whether the window will be maximized so that it
                 // will restore to the size used the last time the window was in the "normal" state.
-                this.DesktopBounds = new Rectangle(
+                Rectangle defaultBounds = new Rectangle(
                     new Point(RegistryManager.DefaultWindowPositionX,
                               RegistryManager.DefaultWindowPositionY),
                     new Size(RegistryManager.DefaultWindowWidth,
                              RegistryManager.DefaultWindowHeight));
 
-                if (RegistryManager.DefaultWindowMaximized)
+                Rectangle workingArea = Screen.GetWorkingArea(defaultBounds);
+                if (workingArea.IntersectsWith(defaultBounds))
                 {
-                    // Maximize the window if the registry setting indicates the application should
-                    // launch maximized.
-                    this.WindowState = FormWindowState.Maximized;
+                    DesktopBounds = defaultBounds;
+
+                    if (RegistryManager.DefaultWindowMaximized)
+                    {
+                        // Maximize the window if the registry setting indicates the application should
+                        // launch maximized.
+                        this.WindowState = FormWindowState.Maximized;
+                    }
+                }
+
+                // Load the DEP into the left-hand panel or separate image window and position and
+                // sizes it correctly.
+                LoadDataEntryControlHostPanel();
+
+                // Establish connections between the image viewer and all image viewer controls.
+                _imageViewer.EstablishConnections(this);
+
+                if (RegistryManager.DefaultShowSeparateImageWindow)
+                {
+                    OpenSeparateImageWindow();
                 }
 
                 if (!_standAloneMode)
@@ -969,6 +1117,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
                     else
                     {
+                        // Record statistics to database that needs to happen when a file is closed.
+                        if (!_standAloneMode)
+                        {
+                            RecordFileProcessingDatabaseStatistics(false, null);
+                        }
+
                         // Clear data to give the host a chance to clear any static COM objects that will
                         // not be accessible from a different thread due to the single apartment threading
                         // model.
@@ -992,6 +1146,24 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             if (disposing)
             {
+                if (_inputEventTracker != null)
+                {
+                    _inputEventTracker.Dispose();
+                    _inputEventTracker = null;
+                }
+
+                if (_imageWindowShortcutsMessageFilter != null)
+                {
+                    _imageWindowShortcutsMessageFilter.Dispose();
+                    _imageWindowShortcutsMessageFilter = null;
+                }
+
+                if (_imageViewerForm != null)
+                {
+                    _imageViewerForm.Dispose();
+                    _imageViewerForm = null;
+                }
+
                 if (components != null)
                 {
                     components.Dispose();
@@ -1095,6 +1267,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
+                ExtractException.Assert("ELI29142", "Saving is disabled!", !_settings.PreventSave);
+
                 SaveData(false);
             }
             catch (Exception ex)
@@ -1107,21 +1281,31 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// 
+        /// Saves the data currently displayed to disk.
         /// </summary>
-        /// <param name="validateData"></param>
-        /// <returns></returns>
+        /// <param name="validateData"><see langword="true"/> to ensure the data is conforms to the
+        /// DataEntryControlHost InvalidDataSaveMode before saving, <see langword="false"/> to save
+        /// data without validating.</param>
+        /// <returns><see langword="true"/> if the data was saved, <see langword="false"/> if it was
+        /// not.</returns>
         bool SaveData(bool validateData)
         {
-            bool saved = _dataEntryControlHost.SaveData(validateData);
-
-            if (saved && !_standAloneMode)
+            if (_settings.PreventSave)
             {
-                _fileProcessingDB.SetFileActionComment(_fileID, _actionID,
-                        _dataEntryControlHost.Comment);
+                return false;
             }
+            else
+            {
+                bool saved = _dataEntryControlHost.SaveData(validateData);
 
-            return saved;
+                if (saved && !_standAloneMode)
+                {
+                    _fileProcessingDB.SetFileActionComment(_fileID, _actionID,
+                            _dataEntryControlHost.Comment);
+                }
+
+                return saved;
+            }
         }
 
         /// <summary>
@@ -1138,6 +1322,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _forcingClose = true;
 
                     _imageViewer.CloseImage();
+
+                    // Record statistics to database that need to happen when a file is closed.
+                    RecordFileProcessingDatabaseStatistics(false, null);
 
                     OnFileComplete(EFileProcessingResult.kProcessingSkipped);
                 }
@@ -1164,16 +1351,22 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // Saving or closing the document or hiding of tooltips should be allowed as long as
-                // a document is available.
-                _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable;
+                // If in standalone mode and prevent save is active, no need to enable
+                // _saveAndCommitFileCommand
+                if (!_settings.PreventSave || !_standAloneMode)
+                {
+                    // Saving or closing the document or hiding of tooltips should be allowed as long as
+                    // a document is available.
+                    _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable;
+                }
                 _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
                 _toggleShowAllHighlightsCommand.Enabled = _imageViewer.IsImageAvailable;
 
                 if (!_standAloneMode)
                 {
                     _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
-                    _saveMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                    _saveMenuItem.Enabled = _imageViewer.IsImageAvailable && !_settings.PreventSave;
+                    _tagFileToolStripButton.Enabled = _imageViewer.IsImageAvailable;
                 }
 
                 // [DataEntry:414]
@@ -1198,11 +1391,30 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _selectRectangularHighlightCommand.Enabled = false;
                 }
 
-                // Set the application title to reflect the name of the open document.
                 base.Text = _dataEntryControlHost.ApplicationTitle;
+                if (_imageViewerForm != null)
+                {
+                    _imageViewerForm.Text =
+                        _dataEntryControlHost.ApplicationTitle + " Image Window";
+                }
                 if (_imageViewer.IsImageAvailable)
                 {
-                    base.Text += " - " + Path.GetFileName(_imageViewer.ImageFile);
+                    string imageName = Path.GetFileName(_imageViewer.ImageFile);
+                    base.Text = imageName + " - " + base.Text;
+                    if (_imageViewerForm != null)
+                    {
+                        _imageViewerForm.Text = imageName + " - " + _imageViewerForm.Text;
+                    }
+                }
+                else if (!string.IsNullOrEmpty(_actionName))
+                {
+                    base.Text = "Waiting - " + base.Text;
+                }
+
+                if (!string.IsNullOrEmpty(_actionName))
+                {
+                    // [DataEntry:740] Show the name of the current action in the title bar.
+                    base.Text += " (" + _actionName + ")";
                 }
 
                 // Ensure the DEP is scrolled back to the top when a document is loaded, but delay
@@ -1239,6 +1451,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
                     else
                     {
+                        // Record statistics to database that need to happen when a file is closed.
+                        if (!_standAloneMode)
+                        {
+                            RecordFileProcessingDatabaseStatistics(false, null);
+                        }
+
                         OnFileComplete(EFileProcessingResult.kProcessingCancelled);
                     }
                 }
@@ -1248,6 +1466,33 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException ee = ExtractException.AsExtractException("ELI24982", ex);
                 ee.AddDebugData("Event data", e, false);
                 DisplayCriticalException(ee);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.</param>
+        /// <param name="e">The event data associated with the
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.</param>
+        void HandleLoadingNewImage(object sender, LoadingNewImageEventArgs e)
+        {
+            try
+            {
+                // Set the application title to reflect the name of the document being opened.
+                base.Text = "Loading document - " + _dataEntryControlHost.ApplicationTitle;
+                if (!string.IsNullOrEmpty(_actionName))
+                {
+                    // [DataEntry:740] Show the name of the current action in the title bar.
+                    base.Text += " (" + _actionName + ")";
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI23253", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
             }
         }
 
@@ -1362,6 +1607,30 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI25981", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryControlHost"/> DataLoaded event in order to record
+        /// statistics regarding the data that was loaded.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="AttributesEventArgs"/> instance containing the
+        /// event data.</param>
+        void HandleDataLoaded(object sender, AttributesEventArgs e)
+        {
+            try
+            {
+                // Record statistics to database that need to happen when a file is opened.
+                // (This event is raised before ImageFileChanged is called and will therefore result
+                // in more accurate durations being recorded in the DataEntryData table.
+                RecordFileProcessingDatabaseStatistics(true, e.Attributes);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI29050", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }
@@ -1543,8 +1812,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                Help.ShowHelp(this, 
-                    DataEntryMethods.ResolvePath(ConfigSettings.AppSettings.HelpFile));
+                Help.ShowHelp(this,
+                    DataEntryMethods.ResolvePath(_settings.HelpFile));
             }
             catch (Exception ex)
             {
@@ -1615,10 +1884,184 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
         }
 
+        /// <summary>
+        /// Handles the case that the user selected the "Allow tabbing by group" menu item.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleToggleAllowTabbingByGroup(object sender, EventArgs e)
+        {
+            try
+            {
+                ToggleAllowTabbingByGroup();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI28811", ex);
+                ee.AddDebugData("Event arguments", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the user selected the "Show image in separate Window" menu item.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleSeparateImageWindow(object sender, EventArgs e)
+        {
+            try
+            {
+                ToggleSeparateImageWindow();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI28852", ex);
+                ee.AddDebugData("Event arguments", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles an image viewer form <see cref="Control.Resize"/> event so that the new size
+        /// can be applied as the new default size in the registry.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleImageViewerFormResize(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_imageViewerForm.WindowState == FormWindowState.Maximized)
+                {
+                    // If the user maximized the form, set the form to default to maximized,
+                    // but don't adjust the default form size to use in normal mode.
+                    RegistryManager.DefaultImageWindowMaximized = true;
+                }
+                else if (_imageViewerForm.WindowState == FormWindowState.Normal)
+                {
+                    // If the user restored or moved the form in normal mode, store
+                    // the new size as the default size.
+                    RegistryManager.DefaultImageWindowMaximized = false;
+                    RegistryManager.DefaultImageWindowWidth = _imageViewerForm.Size.Width;
+                    RegistryManager.DefaultImageWindowHeight = _imageViewerForm.Size.Height;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI28848", ex);
+                ee.AddDebugData("Event arguments", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles an image viewer form <see cref="Control.Move"/> event so that the new position
+        /// can be applied as the new default position in the registry.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleImageViewerFormMove(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_imageViewerForm.WindowState == FormWindowState.Normal)
+                {
+                    // If the user moved the form, store the new position.
+                    RegistryManager.DefaultImageWindowPositionX = _imageViewerForm.DesktopLocation.X;
+                    RegistryManager.DefaultImageWindowPositionY = _imageViewerForm.DesktopLocation.Y;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI28849", ex);
+                ee.AddDebugData("Event arguments", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles an image viewer form <see cref="Form.Activate"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleImageViewerFormActivated(object sender, EventArgs e)
+        {
+            try
+            {
+                // Ensure the image viewer gets focus whenever the image viewer form is brought up.
+                _imageViewer.Focus();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI28856", ex);
+                ee.AddDebugData("Event arguments", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles an image viewer form <see cref="Form.Closing"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleImageViewerFormFormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                // If the user is closes the image viewer form, go back to single-window mode.
+                RegistryManager.DefaultShowSeparateImageWindow = false;
+                _separateImageWindowToolStripMenuItem.CheckState = CheckState.Unchecked;
+                CloseSeparateImageWindow();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI28841", ex);
+                ee.AddDebugData("Event arguments", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="MessageFilterBase.MessageHandled"/> or 
+        /// <see cref="DataEntryControlHost"/> MessageHandled event.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleMessageFilterMessageHandled(object sender, MessageHandledEventArgs e)
+        {
+            try
+            {
+                // If we are recording input event statistics, notify the input tracker of any
+                // events that have been intercepted.
+                if (CurrentlyRecordingStatistics && _inputEventTracker != null)
+                {
+                    _inputEventTracker.NotifyOfInputEvent();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI29133", ex);
+                ee.AddDebugData("Event arguments", e, false);
+                ee.Display();
+            }
+        }
 
         #endregion Event Handlers
 
         #region Private Members
+
+        /// <summary>
+        /// Gets whether statistics are currently being tracked (data entry file duration, counters,
+        /// or input events).
+        /// </summary>
+        bool CurrentlyRecordingStatistics
+        {
+            get
+            {
+                return _fileProcessingStopwatch != null;
+            }
+        }
 
         /// <summary>
         /// Raises the <see cref="FileComplete"/> event.
@@ -1655,6 +2098,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     _imageViewer.CloseImage();
 
+                    // Record statistics to database that need to happen when a file is closed.
+                    RecordFileProcessingDatabaseStatistics(
+                        false, _dataEntryControlHost.MostRecentlySavedAttributes);
+
                     OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
                 }
             }
@@ -1684,10 +2131,39 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             DialogResult response = DialogResult.Yes;
 
+            // If preventing save, don't save, but also return "Yes" so the application behaves as
+            // if it did save correctly.
+            if (_settings.PreventSave)
+            {
+                return response;
+            }
+
             if (_imageViewer.IsImageAvailable && (commitData || _dataEntryControlHost.Dirty))
             {
+                if (commitData)
+                {
+                    // [DataEntry:805]
+                    // commitData flag determines if data will be validated on save.
+                    // Turn off commitData if an applied tag matches the SkipValidationIfDocTaggedAs
+                    // setting (and save without prompting)
+                    if (!_standAloneMode && _fileProcessingDB != null &&
+                        !string.IsNullOrEmpty(_settings.SkipValidationIfDocTaggedAs))
+                    {
+                        VariantVector appliedTags = _fileProcessingDB.GetTagsOnFile(_fileID);
+                        int tagCount = appliedTags.Size;
+                        for (int i = 0; i < tagCount; i++)
+                        {
+                            if (_settings.SkipValidationIfDocTaggedAs.Equals(
+                                    (string)appliedTags[i], StringComparison.OrdinalIgnoreCase))
+                            {
+                                commitData = false;
+                                break;
+                            }
+                        }
+                    }
+                }
                 // Prompt if the data is not being commited.
-                if (!commitData)
+                else
                 {
                     response = MessageBox.Show(this,
                         "Data has not been saved, would you like to save now?",
@@ -1729,7 +2205,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="assemblyFileName">The filename of the assembly to use.</param>
         /// <returns>A <see cref="DataEntryControlHost"/> instantiated from the specified assembly.
         /// </returns>
-        static DataEntryControlHost CreateDataEntryControlHost(string assemblyFileName)
+        DataEntryControlHost CreateDataEntryControlHost(string assemblyFileName)
         {
             try
             {
@@ -1765,11 +2241,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // If HighlightConfidenceBoundary settings has been specified in the config file and
                 // the controlHost has exactly two confidence tiers, use the provided value as the
                 // minimum OCR confidence value in order to highlight text as confidently OCR'd
-                if (!string.IsNullOrEmpty(ConfigSettings.AppSettings.HighlightConfidenceBoundary) &&
+                if (!string.IsNullOrEmpty(_settings.HighlightConfidenceBoundary) &&
                     controlHost.HighlightColors.Length == 2)
                 {
                     int confidenceBoundary = Convert.ToInt32(
-                        ConfigSettings.AppSettings.HighlightConfidenceBoundary,
+                        _settings.HighlightConfidenceBoundary,
                         CultureInfo.CurrentCulture);
 
                     ExtractException.Assert("ELI25684", "HighlightConfidenceBoundary settings must " +
@@ -1781,9 +2257,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     controlHost.HighlightColors = highlightColors;
                 }
 
-                controlHost.DisabledControls = ConfigSettings.AppSettings.DisabledControls;
+                controlHost.DisabledControls = _settings.DisabledControls;
                 controlHost.DisabledValidationControls =
-                    ConfigSettings.AppSettings.DisabledValidationControls;
+                    _settings.DisabledValidationControls;
 
                 return controlHost;
             }
@@ -1813,6 +2289,240 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Toggles whether tabbing should allow groups (rows) of attributes to be
+        /// selected at a time for controls in which group tabbing is enabled.
+        /// </summary>
+        void ToggleAllowTabbingByGroup()
+        {
+            bool allowTabbingByGroup = !_dataEntryControlHost.AllowTabbingByGroup;
+
+            _allowTabbingByGroupToolStripMenuItem.CheckState =
+                allowTabbingByGroup ? CheckState.Checked : CheckState.Unchecked;
+
+            _dataEntryControlHost.AllowTabbingByGroup = allowTabbingByGroup;
+        }
+
+        /// <summary>
+        /// Toggles whether the image viewer is displayed in a separate window.
+        /// </summary>
+        void ToggleSeparateImageWindow()
+        {
+            if (_imageViewerForm == null)
+            {
+                OpenSeparateImageWindow();
+            }
+            else
+            {
+                CloseSeparateImageWindow();
+            }
+        }
+
+        /// <summary>
+        /// Moves the <see cref="ImageViewer"/> and associated <see cref="ToolStrip"/>s to a
+        /// separate <see cref="Form"/>.
+        /// </summary>
+        void OpenSeparateImageWindow()
+        {
+            // Store mode in registry so the next time it will re-open in the same state.
+            RegistryManager.DefaultShowSeparateImageWindow = true;
+            _separateImageWindowToolStripMenuItem.CheckState = CheckState.Checked;
+
+            if (_imageViewerForm == null)
+            {
+                // Create the form.
+                _imageViewerForm = new Form();
+                _imageViewerForm.Text = _dataEntryControlHost.ApplicationTitle + " Image Window";
+                _imageViewerForm.Icon = Icon;
+
+                // Create a shortcut filter to handle shortcuts when the image viewer is displayed
+                // in a separate window to prevent the shortcut keys from being passed back to the
+                // main window (thereby activating it and dropping the image window to the
+                // background).
+                _imageWindowShortcutsMessageFilter = new ShortcutsMessageFilter(
+                    ShortcutsEnabled, _imageViewer.Shortcuts, this);
+
+                if (_inputEventTrackingEnabled)
+                {
+                    _imageWindowShortcutsMessageFilter.MessageHandled +=
+                        HandleMessageFilterMessageHandled;
+                }
+
+                // Move the image viewer to the new form.
+                MoveControls(_splitContainer.Panel2, _imageViewerForm, _imageViewer);
+
+                // Create a toolstrip container to hold the image viewer related toolstrips.
+                ToolStripContainer imageViewerFormToolStripContainer = new ToolStripContainer();
+                imageViewerFormToolStripContainer.Name = "_toolStripContainer";
+                imageViewerFormToolStripContainer.BottomToolStripPanelVisible = false;
+                imageViewerFormToolStripContainer.Dock = DockStyle.Top;
+                // Initialize to a very large size to ensure the toolstrips do not get added in
+                // in multiple rows.
+                imageViewerFormToolStripContainer.Size = new Size(9999, 9999);
+
+                // Move the toolstrips.
+                MoveControls(_toolStripContainer.TopToolStripPanel,
+                    imageViewerFormToolStripContainer.TopToolStripPanel, _miscImageToolStrip,
+                    _basicCommandsImageViewerToolStrip, _pageNavigationImageViewerToolStrip,
+                    _viewCommandsImageViewerToolStrip);
+                // Size the toolstrip container correctly.
+                imageViewerFormToolStripContainer.TopToolStripPanel.AutoSize = true;
+                imageViewerFormToolStripContainer.Size =
+                    imageViewerFormToolStripContainer.TopToolStripPanel.Size;
+
+                // Add the toolstrip container to the new form and show it.
+                _imageViewerForm.Controls.Add(imageViewerFormToolStripContainer);
+                _imageViewerForm.Show();
+
+                // Initialize the position using previously stored registry settings or
+                // the previous desktop location of the image viewer.
+                Point location = new Point(RegistryManager.DefaultImageWindowPositionX,
+                    RegistryManager.DefaultImageWindowPositionY);
+                Rectangle workingArea = Screen.GetWorkingArea(location);
+                if (location.X != -1 && location.Y != -1 && workingArea.Contains(location))
+                {
+                    _imageViewerForm.DesktopLocation = location;
+                }
+                else
+                {
+                    location = new Point(DesktopLocation.X + _splitContainer.SplitterDistance,
+                        DesktopLocation.Y + 10);
+                    _imageViewerForm.DesktopLocation = location;
+                }
+
+                // Initialize the size using previously stored registry settings or
+                // the previous size of the image viewer.
+                Size size = new Size(RegistryManager.DefaultImageWindowWidth,
+                    RegistryManager.DefaultImageWindowHeight);
+                if (size.Width > 0 && size.Height > 0 && workingArea.Contains(location))
+                {
+                    _imageViewerForm.Size = size;
+                }
+                else
+                {
+                    Size clientSize = _splitContainer.Panel2.Size;
+                    clientSize.Height += imageViewerFormToolStripContainer.Height;
+                    _imageViewerForm.ClientSize = clientSize;
+                }
+
+                // Collapse the pane the image viewer was removed from.
+                _splitContainer.Panel2Collapsed = true;
+
+                if (RegistryManager.DefaultImageWindowMaximized)
+                {
+                    _imageViewerForm.WindowState = FormWindowState.Maximized;
+                }
+
+                // Ensure the image viewer gets focus.
+                _imageViewer.Focus();
+
+                _imageViewerForm.FormClosing += HandleImageViewerFormFormClosing;
+                _imageViewerForm.Activated += HandleImageViewerFormActivated;
+                _imageViewerForm.Resize += HandleImageViewerFormResize;
+                _imageViewerForm.Move += HandleImageViewerFormMove;
+            }
+        }
+
+        /// <summary>
+        /// Moves the <see cref="ImageViewer"/> and associated <see cref="ToolStrip"/>s from a
+        /// separate <see cref="Form"/> back into the main application form.
+        /// </summary>
+        void CloseSeparateImageWindow()
+        {
+            // Store mode in registry so the next time it will re-open in the same state.
+            RegistryManager.DefaultShowSeparateImageWindow = false;
+            _separateImageWindowToolStripMenuItem.CheckState = CheckState.Unchecked;
+
+            if (_imageViewerForm != null)
+            {
+                if (_inputEventTrackingEnabled)
+                {
+                    _imageWindowShortcutsMessageFilter.MessageHandled -=
+                        HandleMessageFilterMessageHandled;
+                }
+
+                _imageWindowShortcutsMessageFilter.Dispose();
+                _imageWindowShortcutsMessageFilter = null;
+
+                Form imageViewerForm = _imageViewerForm;
+                _imageViewerForm = null;
+
+                imageViewerForm.FormClosing -= HandleImageViewerFormFormClosing;
+                imageViewerForm.Activated -= HandleImageViewerFormActivated;
+                imageViewerForm.Resize -= HandleImageViewerFormResize;
+                imageViewerForm.Move -= HandleImageViewerFormMove;
+
+                // Restore the pane for the image viewer, and move the image viewer back into it.
+                _splitContainer.Panel2Collapsed = false;
+                MoveControls(imageViewerForm, _splitContainer.Panel2, _imageViewer);
+
+                // Move the image viewer toolstrips back into the main application window.
+                ToolStripContainer imageViewerFormToolStripContainer =
+                    (ToolStripContainer)imageViewerForm.Controls["_toolStripContainer"];
+
+                MoveControls(imageViewerFormToolStripContainer.TopToolStripPanel,
+                    _toolStripContainer.TopToolStripPanel, _miscImageToolStrip,
+                    _basicCommandsImageViewerToolStrip, _pageNavigationImageViewerToolStrip,
+                    _viewCommandsImageViewerToolStrip);
+
+                // Get rid of the separate image viewer form.
+                imageViewerForm.Close();
+                imageViewerForm.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Represents a delegate that determines whether shortcuts are enabled in _imageViewerForm.
+        /// </summary>
+        /// <returns><see langword="true"/> since shortcuts should always be enabled in the image
+        /// window.</returns>
+        static public bool ShortcutsEnabled()
+        {
+            return true;
+        }
+        
+        /// <summary>
+        /// Moves the specified child controls from specified source to the specified destination.
+        /// Controls will be added in a single row from left to right.
+        /// </summary>
+        /// <param name="sourceControl">The <see cref="Control"/> that currently contains the
+        /// controls to be moved.</param>
+        /// <param name="destinationControl">The <see cref="Control"/> that is to contain the
+        /// controls to be moved.</param>
+        /// <param name="controlsToMove">The <see cref="Control"/>s that are to be moved.</param>
+        static void MoveControls(Control sourceControl, Control destinationControl,
+            params Control[] controlsToMove)
+        {
+            // Keep track of the position to try to add the next control.
+            Point locationToAdd = new Point(0, 0);
+
+            // If the destination already has child controls use the right side of the last control
+            // as the initial location to add.
+            foreach (Control control in destinationControl.Controls)
+            {
+                Point location = control.Location;
+                location.Offset(control.Width, 0);
+
+                if ((location.Y > locationToAdd.Y) ||
+                    (location.Y == locationToAdd.Y && location.X > locationToAdd.X))
+                {
+                    locationToAdd = location;
+                }
+            }
+
+            // Add each control, updating the location to add as we go.
+            foreach (Control control in controlsToMove)
+            {
+                sourceControl.Controls.Remove(control);
+
+                control.Location = locationToAdd;
+                destinationControl.Controls.Add(control);
+
+                locationToAdd = control.Location;
+                locationToAdd.Offset(control.Width, 0);
+            }
+        }
+
+        /// <summary>
         /// Attempts to open a database connection for use by the DEP for validation and
         /// auto-updates if connection information is specfied in the config settings.
         /// </summary>
@@ -1823,32 +2533,33 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (!string.IsNullOrEmpty(ConfigSettings.AppSettings.DatabaseType))
+                if (!string.IsNullOrEmpty(_settings.DatabaseType))
                 {
                     string connectionString = "";
 
                     // A full connection string has been provided.
-                    if (!string.IsNullOrEmpty(ConfigSettings.AppSettings.DatabaseConnectionString))
+                    if (!string.IsNullOrEmpty(_settings.DatabaseConnectionString))
                     {
                         ExtractException.Assert("ELI26157", "Either a database connection string " +
                             "can be specified, or a local datasource-- not both.",
-                            string.IsNullOrEmpty(ConfigSettings.AppSettings.LocalDataSource));
+                            string.IsNullOrEmpty(_settings.LocalDataSource));
 
-                        connectionString = ConfigSettings.AppSettings.DatabaseConnectionString;
+                        connectionString = _settings.DatabaseConnectionString;
                     }
                     // A local datasource has been specfied; compute the connection string.
-                    else if (!string.IsNullOrEmpty(ConfigSettings.AppSettings.LocalDataSource))
+                    else if (!string.IsNullOrEmpty(_settings.LocalDataSource))
                     {
                         ExtractException.Assert("ELI26158", "Either a database connection string " +
                             "can be specified, or a local datasource-- not both.",
-                            string.IsNullOrEmpty(ConfigSettings.AppSettings.DatabaseConnectionString));
+                            string.IsNullOrEmpty(_settings.DatabaseConnectionString));
 
-                        string dataSourcePath =
-                            DataEntryMethods.ResolvePath(ConfigSettings.AppSettings.LocalDataSource);
+                        _dataSourcePath =
+                            DataEntryMethods.ResolvePath(_settings.LocalDataSource);
+                        string dataSourcePath = _dataSourcePath;
 
                         // Use ConvertToNetworkPath to tell if the DB is being accesseed via a
                         // network share.
-                        FileSystemMethods.ConvertToNetworkPath(ref dataSourcePath, false);
+                        FileSystemMethods.ConvertToNetworkPath(ref _dataSourcePath, false);
 
                         // [DataEntry:399, 688]
                         // Whether or not the file is local, if it is being accessed via a network share
@@ -1857,7 +2568,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         if (dataSourcePath.StartsWith(@"\\", StringComparison.Ordinal))
                         {
                             _localDBCopy = new TemporaryFile();
-                            File.Copy(dataSourcePath, _localDBCopy.FileName, true);
+                            _lastDBModificationTime = File.GetLastWriteTime(dataSourcePath);
+                            File.Copy(_dataSourcePath, _localDBCopy.FileName, true);
                             dataSourcePath = _localDBCopy.FileName;
                         }
 
@@ -1868,7 +2580,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // create and open the database connection.
                     if (!string.IsNullOrEmpty(connectionString))
                     {
-                        Type dbType = Type.GetType(ConfigSettings.AppSettings.DatabaseType);
+                        if (_dbConnection != null)
+                        {
+                            _dbConnection.Dispose();
+                        }
+
+                        Type dbType = Type.GetType(_settings.DatabaseType);
                         _dbConnection = (DbConnection)Activator.CreateInstance(dbType);
                         _dbConnection.ConnectionString = connectionString;
                         _dbConnection.Open();
@@ -1883,13 +2600,110 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 ExtractException ee = new ExtractException("ELI26159",
                     "Failed to open database connection!", ex);
-                ee.AddDebugData("Database type", ConfigSettings.AppSettings.DatabaseType, false);
-                ee.AddDebugData("Local datasource", ConfigSettings.AppSettings.LocalDataSource, false);
+                ee.AddDebugData("Database type", _settings.DatabaseType, false);
+                ee.AddDebugData("Local datasource", _settings.LocalDataSource, false);
                 ee.AddDebugData("Connection string",
-                    ConfigSettings.AppSettings.DatabaseConnectionString, false);
+                    _settings.DatabaseConnectionString, false);
 
                 throw ee;
             }
+        }
+
+        /// <summary>
+        /// Records statistics to the file processing database.
+        /// </summary>
+        /// <param name="onLoad"><see langword="true"/> if a new file is being opened,
+        /// <see langword="false"/> if processing of a file is ending.</param>
+        /// <param name="attributes">The attributes to be associated with recorded statistics.
+        /// </param>
+        void RecordFileProcessingDatabaseStatistics(bool onLoad, IUnknownVector attributes)
+        {
+            if (onLoad)
+            {
+                _fileProcessingStopwatch = new Stopwatch();
+                _fileProcessingStopwatch.Start();
+
+                // Enable input event tracking.
+                if (_inputEventTracker != null)
+                {
+                    _inputEventTracker.RegisterControl(this);
+                }
+
+                if (_countersEnabled)
+                {
+                    // Calculate the initial counter values and receive a token that will allow the
+                    // counts to be stored once the associated DataEntryData table row is added.
+                    _counterStatisticsToken = -1;
+                    _dataEntryDatabaseManager.RecordCounterValues(
+                        ref _counterStatisticsToken, 0, attributes);
+                }
+            }
+            else if (_fileProcessingStopwatch != null)
+            {
+                // Don't count input when a document is not open.
+                if (_inputEventTracker != null)
+                {
+                    _inputEventTracker.UnregisterControl(this);
+                }
+
+                double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
+                int instanceID =
+                    _dataEntryDatabaseManager.AddDataEntryData(_fileID, _actionID, elapsedSeconds);
+
+                if (_countersEnabled)
+                {
+                    _dataEntryDatabaseManager.RecordCounterValues(
+                        ref _counterStatisticsToken, instanceID, attributes);
+                }
+
+                // Set to null after recording to ensure we never inappropriately record an entry
+                // for a file.
+                _fileProcessingStopwatch = null;
+            }
+        }
+
+        /// <summary>
+        /// Loads the DEP into the left-hand panel or separate window and positions and sizes it
+        /// correctly.
+        /// </summary>
+        void LoadDataEntryControlHostPanel()
+        {
+            // Pad by _DATA_ENTRY_PANEL_PADDING around DEP content
+            _dataEntryControlHost.Location
+                = new Point(_DATA_ENTRY_PANEL_PADDING, _DATA_ENTRY_PANEL_PADDING);
+            _splitContainer.SplitterWidth = _DATA_ENTRY_PANEL_PADDING;
+            if (RegistryManager.DefaultSplitterPosition > 0)
+            {
+                _dataEntryControlHost.Width = RegistryManager.DefaultSplitterPosition -
+                    _DATA_ENTRY_PANEL_PADDING - _scrollPanel.AutoScrollMargin.Width;
+                _splitContainer.SplitterDistance =
+                    RegistryManager.DefaultSplitterPosition;
+            }
+            else
+            {
+                _splitContainer.SplitterDistance = _dataEntryControlHost.Size.Width +
+                    _DATA_ENTRY_PANEL_PADDING + _scrollPanel.AutoScrollMargin.Width;
+            }
+
+            _dataEntryControlHost.Anchor = AnchorStyles.Left | AnchorStyles.Top |
+                AnchorStyles.Right;
+
+            // The splitter should respect the minimum size of the DEP.
+            _splitContainer.Panel1MinSize =
+                _dataEntryControlHost.MinimumSize.Width +
+                (2 * _DATA_ENTRY_PANEL_PADDING) + _scrollPanel.AutoScrollMargin.Width +
+                SystemInformation.VerticalScrollBarWidth;
+
+            // Add the DEP to an auto-scroll pane to allow scrolling if the DEP is too
+            // long. (The scroll pane is sized to allow the full width of the DEP to 
+            // display initially) 
+            _scrollPanel.Size = new Size(_splitContainer.SplitterDistance,
+                _scrollPanel.Height);
+            _scrollPanel.Controls.Add(_dataEntryControlHost);
+
+            // Handle scroll in order to update the panel position while a scroll is in
+            // progress.
+            _scrollPanel.Scroll += HandleScrollPanelScroll;
         }
 
         #endregion Private Members

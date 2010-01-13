@@ -122,7 +122,8 @@ STDMETHODIMP COCRFileProcessor::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //--------------------------------------------------------------------------------------------------
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP COCRFileProcessor::raw_Init()
+STDMETHODIMP COCRFileProcessor::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
+	IFileProcessingDB *pDB)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	

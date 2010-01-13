@@ -103,7 +103,8 @@ STDMETHODIMP CRedactionTask::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingTask
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRedactionTask::raw_Init()
+STDMETHODIMP CRedactionTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
+	IFileProcessingDB *pDB)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	

@@ -76,7 +76,8 @@ STDMETHODIMP CAFEngineFileProcessor::InterfaceSupportsErrorInfo(REFIID riid)
 //--------------------------------------------------------------------------------------------------
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFEngineFileProcessor::raw_Init()
+STDMETHODIMP CAFEngineFileProcessor::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
+	IFileProcessingDB *pDB)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	

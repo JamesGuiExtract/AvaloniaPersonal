@@ -160,6 +160,7 @@
     <Compile Include="DataEntryGroupBox.Designer.cs">
       <DependentUpon>DataEntryGroupBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataEntryQuery.cs" />
     <Compile Include="DataEntryTable.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -193,8 +194,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="QueryNodes.cs">
-      <DependentUpon>AutoUpdateTrigger.cs</DependentUpon>
+    <Compile Include="QueryResult.cs">
+      <DependentUpon>DataEntryQuery.cs</DependentUpon>
     </Compile>
     <Compile Include="SpatialHintGenerator.cs" />
     <Compile Include="DataEntryTableRow.cs">

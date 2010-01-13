@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace Extract.DataEntry
 {
@@ -22,40 +25,35 @@ namespace Extract.DataEntry
         private static extern IntPtr GetParent(IntPtr hWnd);
 
         /// <summary>
-        /// Retrieves a handle to the top-level window whose class name match the specified string.
-        /// This function does not search child windows. This function does not perform a
-        /// case-sensitive search. This function is to be used to search for windows by class only.
+        /// Creates a new shape for the system caret and assigns ownership of the caret to the 
+        /// specified window.
         /// </summary>
-        /// <param name="lpClassName">Pointer to a null-terminated string that specifies the class
-        /// name.</param>
-        /// <param name="zeroOnly">Must be <see cref="IntPtr.Zero"/>.</param>
-        /// <returns></returns>
-        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        static extern IntPtr FindWindow(string lpClassName, IntPtr zeroOnly);
+        /// <param name="hWnd">Handle to the window that owns the caret.</param>
+        /// <param name="hBitmap">Handle to the bitmap that defines the caret shape. If this
+        /// parameter is <see cref="IntPtr.Zero"/>, the caret is solid</param>
+        /// <param name="nWidth">Specifies the width of the caret in logical units. If this
+        /// parameter is zero, the width is set to the system-defined window border width.</param>
+        /// <param name="nHeight">Specifies the height, in logical units, of the caret. If this
+        /// parameter is zero, the height is set to the system-defined window border height.</param>
+        /// <returns><see lanword="true"/> if the function succeeds, <see lanword="false"/>
+        /// otherwise.</returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool CreateCaret(IntPtr hWnd, IntPtr hBitmap, int nWidth, int nHeight);
 
         /// <summary>
-        /// Retrieves information about the specified window.
+        /// Makes the caret visible on the screen at the caret's current position.
         /// </summary>
-        /// <param name="hWnd">Handle to the window and, indirectly, the class to which the window
-        /// belongs.</param>
-        /// <param name="nIndex">Specifies the zero-based offset to the value to be retrieved.
-        /// </param>
-        /// <returns>If the function succeeds, the return value is the requested 32-bit value. If
-        /// the function fails, the return value is zero.</returns>
+        /// <param name="hWnd">Handle to the window that owns the caret. If this parameter is
+        /// <see cref="IntPtr.Zero"/>, ShowCaret searches the current task for the window that
+        /// owns the caret.</param>
+        /// <returns><see lanword="true"/> if the function succeeds, <see lanword="false"/>
+        /// otherwise.</returns>
         [DllImport("user32.dll", SetLastError = true)]
-        static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool ShowCaret(IntPtr hWnd);
 
         #endregion P/Invoke statements
-
-        #region Constants
-
-        const int GWL_STYLE = -16;
-        const int GWL_EXSTYLE = -20;
-
-        const uint WS_VISIBLE = 0x10000000;
-        const uint WS_EX_TOPMOST = 0x0008;
-
-        #endregion Constants
 
         #region Methods
 
@@ -81,32 +79,26 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Checks whether a .Net auto-complete list is displayed.
+        /// Displays the caret in the specified control.
         /// </summary>
-        /// <returns><see langword="true"/> if an auto-complete list is displayed;
-        /// <see langword="false"/> otherwise.</returns>
-        public static bool IsAutoCompleteDisplayed()
+        /// <param name="control">The <see cref="Control"/> which should display a caret.</param>
+        public static void ShowCaret(Control control)
         {
             try
             {
-                // Look for a top-level Auto-Suggest window
-                IntPtr handle = FindWindow("Auto-Suggest Dropdown", IntPtr.Zero);
-                if (handle != IntPtr.Zero)
+                Size textSize = TextRenderer.MeasureText("X", control.Font);
+                if (!CreateCaret(control.Handle, IntPtr.Zero, 0, textSize.Height))
                 {
-                    // If such a window is found and it is both visible and top-most, it is
-                    // displayed.
-                    if ((GetWindowLong(handle, GWL_STYLE) & WS_VISIBLE) != 0 &&
-                        (GetWindowLong(handle, GWL_EXSTYLE) & WS_EX_TOPMOST) != 0)
-                    {
-                        return true;
-                    }
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
                 }
-
-                return false;
+                if (!ShowCaret(control.Handle))
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI27647", ex);
+                throw ExtractException.AsExtractException("ELI28832", ex);
             }
         }
 

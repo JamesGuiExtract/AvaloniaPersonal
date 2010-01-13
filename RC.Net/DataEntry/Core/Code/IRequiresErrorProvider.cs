@@ -16,11 +16,14 @@ namespace Extract.DataEntry
     public interface IRequiresErrorProvider
     {
         /// <summary>
-        /// Specifies the standard <see cref="ErrorProvider"/> that should be used to 
+        /// Specifies the standard <see cref="ErrorProvider"/>s that should be used to 
         /// display data validation errors.
         /// </summary>
-        /// <param name="errorProvider">The standard <see cref="ErrorProvider"/> that should be 
-        /// used to display data validation errors.</param>
-        void SetErrorProvider(ErrorProvider errorProvider);
+        /// <param name="validationErrorProvider">The standard <see cref="ErrorProvider"/> that
+        /// should be used to display data validation errors.</param>
+        /// <param name="validationWarningErrorProvider">The <see cref="ErrorProvider"/> that should
+        /// be used to display data validation warnings.</param>
+        void SetErrorProviders(ErrorProvider validationErrorProvider,
+            ErrorProvider validationWarningErrorProvider);
     }
 }

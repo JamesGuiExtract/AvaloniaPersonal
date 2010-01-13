@@ -57,12 +57,6 @@ namespace Extract.DataEntry
         /// </summary>
         private bool _initializingValue;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -83,7 +77,8 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI24488");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI24488", _OBJECT_NAME);
 
                 _dataEntryTable = base.DataGridView as DataEntryTableBase;
             }
@@ -141,12 +136,12 @@ namespace Extract.DataEntry
                     {
                         if (_validator != null)
                         {
-                            _validator.ValidationListChanged -= HandleValidationListChanged;
+                            _validator.AutoCompleteValuesChanged -= HandleAutoCompleteValuesChanged;
                         }
 
                         _validator = value;
 
-                        _validator.ValidationListChanged += HandleValidationListChanged;
+                        _validator.AutoCompleteValuesChanged += HandleAutoCompleteValuesChanged;
                     }
                 }
                 catch (Exception ex)
@@ -493,12 +488,12 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the case that the validation list was changed so that the combo box list items
-        /// can be updated to reflect the new list.
+        /// Handles the case that the auto complete list was changed so that the combo box list
+        /// items can be updated to reflect the new list.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleValidationListChanged(object sender, EventArgs e)
+        private void HandleAutoCompleteValuesChanged(object sender, EventArgs e)
         {
             try
             {
@@ -506,13 +501,13 @@ namespace Extract.DataEntry
                 // value.
                 string originalValue = base.Value.ToString();
 
-                string[] validationListValues = _validator.GetValidationListValues();
+                string[] autoCompleteValues = _validator.GetAutoCompleteValues();
 
                 base.Items.Clear();
 
-                if (validationListValues != null)
+                if (autoCompleteValues != null)
                 {
-                    base.Items.AddRange(validationListValues);
+                    base.Items.AddRange(autoCompleteValues);
 
                     // Restore the original value
                     base.Value = originalValue;

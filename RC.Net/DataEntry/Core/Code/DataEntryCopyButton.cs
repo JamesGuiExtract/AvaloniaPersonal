@@ -32,6 +32,11 @@ namespace Extract.DataEntry
         IAttribute _attribute;
 
         /// <summary>
+        /// The <see cref="DataEntryControlHost"/> to which this control belongs
+        /// </summary>
+        DataEntryControlHost _dataEntryControlHost;
+
+        /// <summary>
         /// Used to specify the data entry control which is mapped to the parent of the attribute 
         /// to which this button is to be mapped.
         /// </summary>
@@ -164,7 +169,7 @@ namespace Extract.DataEntry
                 }
 
                 _errorProvider.SetError(this, "");
-                AttributeStatusInfo.MarkDataAsValid(_attribute, true);
+                AttributeStatusInfo.SetDataValidity(_attribute, DataValidity.Valid);
 
                 base.OnClick(e);
             }
@@ -193,7 +198,7 @@ namespace Extract.DataEntry
                 ExtractException.Assert("ELI27080", "Error validating data!",
                     attribute == _attribute);
 
-                if (!AttributeStatusInfo.IsDataValid(attribute))
+                if (AttributeStatusInfo.GetDataValidity(attribute) != DataValidity.Valid)
                 {
                     throw new DataEntryValidationException("ELI27081", _validationErrorMessage,
                         this);
@@ -210,14 +215,17 @@ namespace Extract.DataEntry
         #region IRequiresErrorProvider Members
 
         /// <summary>
-        /// Specifies the standard <see cref="ErrorProvider"/> that should be used to 
+        /// Specifies the standard <see cref="ErrorProvider"/>s that should be used to 
         /// display data validation errors.
         /// </summary>
-        /// <param name="errorProvider">The standard <see cref="ErrorProvider"/> that should be 
-        /// used to display data validation errors.</param>
-        public void SetErrorProvider(ErrorProvider errorProvider)
+        /// <param name="validationErrorProvider">The standard <see cref="ErrorProvider"/> that
+        /// should be used to display data validation errors.</param>
+        /// <param name="validationWarningErrorProvider">The <see cref="ErrorProvider"/> that should
+        /// be used to display data validation warnings.</param>
+        public void SetErrorProviders(ErrorProvider validationErrorProvider,
+            ErrorProvider validationWarningErrorProvider)
         {
-            _errorProvider = errorProvider;
+            _errorProvider = validationErrorProvider;
         }
 
         #endregion IRequiresErrorProvider Members
@@ -231,6 +239,24 @@ namespace Extract.DataEntry
         /// active.
         /// </summary>
         public event EventHandler<AttributesSelectedEventArgs> AttributesSelected;
+
+        /// <summary>
+        /// Gets or sets the <see cref="DataEntryControlHost"/> to which this coopy button belongs
+        /// </summary>
+        /// <value>The <see cref="DataEntryControlHost"/> to which this copy button belongs.</value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public DataEntryControlHost DataEntryControlHost
+        {
+            get
+            {
+                return _dataEntryControlHost;
+            }
+            set
+            {
+                _dataEntryControlHost = value;
+            }
+        }
 
         /// <summary>
         /// If the <see cref="DataEntryCopyButton"/> is not intended to operate on root-level data, 
@@ -371,7 +397,7 @@ namespace Extract.DataEntry
                         if (!_disabled && AttributeStatusInfo.IsAttributePersistable(_attribute))
                         {
                             _errorProvider.SetError(this, _validationErrorMessage);
-                            AttributeStatusInfo.MarkDataAsValid(_attribute, false);
+                            AttributeStatusInfo.SetDataValidity(_attribute, DataValidity.Invalid);
                         }
                     }
 
@@ -401,10 +427,10 @@ namespace Extract.DataEntry
         /// associated with any <see cref="IAttribute"/> it propagates as propagated.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">An <see cref="PropagateAttributesEventArgs"/> that contains the event data.
+        /// <param name="e">An <see cref="AttributesEventArgs"/> that contains the event data.
         /// </param>
         /// <seealso cref="IDataEntryControl"/>
-        public void HandlePropagateAttributes(object sender, PropagateAttributesEventArgs e)
+        public void HandlePropagateAttributes(object sender, AttributesEventArgs e)
         {
             try
             {
@@ -466,8 +492,12 @@ namespace Extract.DataEntry
         /// If <see langword="false"/>, the previous selection will remain even if a different
         /// <see cref="IAttribute"/> was propagated.
         /// </param>
+        /// <param name="selectTabGroup">If <see langword="true"/> all <see cref="IAttribute"/>s in
+        /// the specified <see cref="IAttribute"/>'s tab group are to be selected,
+        /// <see langword="false"/> otherwise.</param>
         /// <seealso cref="IDataEntryControl"/>
-        public void PropagateAttribute(IAttribute attribute, bool selectAttribute)
+        public void PropagateAttribute(IAttribute attribute, bool selectAttribute,
+            bool selectTabGroup)
         {
             ExtractException.Assert("ELI26978", "Unexpected attribute!",
                 attribute == null || attribute == _attribute);
@@ -480,7 +510,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// This event is not raised by <see cref="DataEntryCopyButton"/>.
         /// </summary>
-        public event EventHandler<PropagateAttributesEventArgs> PropagateAttributes
+        public event EventHandler<AttributesEventArgs> PropagateAttributes
         {
             // Since this event is not currently used by this class but is needed by the 
             // IDataEntryControl interface, define it with an empty implementation to prevent
@@ -561,6 +591,27 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// <see cref="DataEntryCopyButton"/> does not support pasting; the value of this property
+        /// will always be <see langword="false"/>.
+        /// </summary>
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool ClearClipboardOnPaste
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+                throw new ExtractException("ELI29011",
+                    "DataEntryCopyButton box does not support pasting!");
+            }
+        }
+
+        /// <summary>
         /// <see cref="DataEntryCopyButton"/> does not have any implementation for this method.
         /// </summary>
         /// <param name="setActive">Unused.</param>
@@ -582,9 +633,9 @@ namespace Extract.DataEntry
         /// <summary>
         /// <see cref="DataEntryCopyButton"/> does not have any implementation for this method.
         /// </summary>
-        /// <param name="attributes">Unused.</param>
         /// <param name="spatialInfoUpdated">Unused.</param>
-        public void RefreshAttributes(IAttribute[] attributes, bool spatialInfoUpdated)
+        /// <param name="attributes">Unused.</param>
+        public void RefreshAttributes(bool spatialInfoUpdated,  params IAttribute[] attributes)
         {
         }
 
@@ -608,7 +659,7 @@ namespace Extract.DataEntry
             {
                 AttributesSelected(this,
                     new AttributesSelectedEventArgs(DataEntryMethods.AttributeAsVector(_attribute),
-                        false, true));
+                        false, true, null));
             }
         }
 

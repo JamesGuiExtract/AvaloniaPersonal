@@ -3,6 +3,7 @@ using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlServerCe;
 using System.Globalization;
@@ -20,82 +21,6 @@ using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.LabResultsCustomComponents
 {
-    /// <summary>
-    /// Class to hold the attribute and name of a specific lab test.
-    /// </summary>
-    internal class LabTest
-    {
-        #region Fields
-
-        /// <summary>
-        /// The attribute associated with this test
-        /// </summary>
-        IAttribute _attribute;
-
-        /// <summary>
-        /// The name associated with this test
-        /// </summary>
-        string _name;
-
-        #endregion Fields
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LabTest"/> struct.
-        /// </summary>
-        /// <param name="attribute">The attribute associated with this object. Must
-        /// not be <see langword="null"/>.</param>
-        public LabTest(IAttribute attribute)
-        {
-            try
-            {
-                ExtractException.Assert("ELI26441", "Attribute cannot be null!", attribute != null);
-
-                // Store the attribute
-                _attribute = attribute;
-
-                // Set the name based on the attributes spatial string
-                SpatialString ss = _attribute.Value;
-                _name = ss.String;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI26442", ex);
-            }
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
-        /// <summary>
-        /// Gets the attribute for this <see cref="LabTest"/>.
-        /// </summary>
-        /// <returns>The attribute for this <see cref="LabTest"/>.</returns>
-        public IAttribute Attribute
-        {
-            get
-            {
-                return _attribute;
-            }
-        }
-
-        /// <summary>
-        /// Gets the name for this <see cref="LabTest"/>.
-        /// </summary>
-        /// <returns>The name for this <see cref="LabTest"/>.</returns>
-        public string Name
-        {
-            get
-            {
-                return _name;
-            }
-        }
-
-        #endregion Properties
-    }
-
     /// <summary>
     /// Handles mapping orders from the rules output into Lab orders and their
     /// associated EPIC codes based on a database file.
@@ -304,33 +229,6 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         bool _dirty;
 
-        /// <summary>
-        /// A <see cref="DataTable"/> containing the lab order table from the specified database.
-        /// </summary>
-        DataTable _labOrder;
-
-        /// <summary>
-        /// A <see cref="DataTable"/> containing the lab order test table from the specified database.
-        /// </summary>
-        DataTable _labOrderTest;
-
-        /// <summary>
-        /// A <see cref="DataTable"/> containing the lab test table from the specified database.
-        /// </summary>
-        DataTable _labTest;
-
-        /// <summary>
-        /// A <see cref="DataTable"/> containing the alternate test name table from the specified
-        /// database.
-        /// </summary>
-        DataTable _alternateTestName;
-
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.LabDECoreObjects, _DEFAULT_OUTPUT_HANDLER_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -374,14 +272,16 @@ namespace Extract.LabResultsCustomComponents
             get
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26887");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.LabDECoreObjects, "ELI26887", _DEFAULT_OUTPUT_HANDLER_NAME);
 
                 return _databaseFile;
             }
             set
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26895");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.LabDECoreObjects, "ELI26895", _DEFAULT_OUTPUT_HANDLER_NAME);
 
                 _databaseFile = value;
                 _dirty = true;
@@ -405,40 +305,56 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26889");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.LabDECoreObjects, "ELI26889", _DEFAULT_OUTPUT_HANDLER_NAME);
 
                 // Get a database connection for processing (creating a local copy of the database
                 // first, if necessary).
                 dbConnection = GetDatabaseConnection(pDoc);
 
+                // Open the database connection
+                dbConnection.Open();
+
                 // Build a new vector of attributes that have been mapped to orders
                 IUnknownVector newAttributes = new IUnknownVector();
 
-                // Create an attribute sorter for sorting sub attributes
-                ISortCompare attributeSorter =
-                            (ISortCompare)new SpatiallyCompareAttributesClass();
-
+                // Build the list of test attributes to map (all other attributes
+                // should just be added to the new attributes collection
                 int size = pAttributes.Size();
+                List<IAttribute> testAttributes = new List<IAttribute>();
                 for (int i = 0; i < size; i++)
                 {
                     IAttribute attribute = (IAttribute)pAttributes.At(i);
                     if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
                     {
-                        List<IAttribute> mappedAttributes =
-                            MapOrders(attribute.SubAttributes, dbConnection);
-                        foreach (IAttribute newAttribute in mappedAttributes)
-                        {
-                            // Sort the sub attributes spatially
-                            newAttribute.SubAttributes.Sort(attributeSorter);
-
-                            // Add the attribute to the vector
-                            newAttributes.PushBack(newAttribute);
-                        }
+                        testAttributes.Add(attribute);
                     }
                     else
                     {
                         // Not a test attribute, just copy it
                         newAttributes.PushBack(attribute);
+                    }
+                }
+
+                // Only need to perform mapping if there are test attributes
+                if (testAttributes.Count > 0)
+                {
+                    // Perform order mapping on the list of test attributes
+                    List<IAttribute> mappedAttributes =
+                        MapOrders(testAttributes, dbConnection);
+
+                    // Create an attribute sorter for sorting sub attributes
+                    ISortCompare attributeSorter =
+                                (ISortCompare)new SpatiallyCompareAttributesClass();
+
+                    // Add each order to the output collection (sorting subattributes)
+                    foreach (IAttribute newAttribute in mappedAttributes)
+                    {
+                        // Sort the sub attributes spatially
+                        newAttribute.SubAttributes.Sort(attributeSorter);
+
+                        // Add the attribute to the vector
+                        newAttributes.PushBack(newAttribute);
                     }
                 }
 
@@ -653,7 +569,8 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26902");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.LabDECoreObjects, "ELI26902", _DEFAULT_OUTPUT_HANDLER_NAME);
 
                 // Display the configuration form
                 using (LabDEOrderMapperConfigurationForm configureForm =
@@ -753,88 +670,130 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
+        /// Builds a collection of order codes mapped to <see cref="LabOrder"/>s.
+        /// </summary>
+        /// <param name="dbConnection">The database connection to use to retrieve the data.</param>
+        /// <returns>A collection of order codes mapped to <see cref="LabOrder"/>s.</returns>
+        static Dictionary<string, LabOrder> FillLabOrderCollection(SqlCeConnection dbConnection)
+        {
+            string query = "SELECT [Code], [Name], [EpicCode] FROM [LabOrder] "
+                + "WHERE [EpicCode] IS NOT NULL";
+            Dictionary<string, LabOrder> orders = new Dictionary<string,LabOrder>();
+            using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
+            {
+                using (SqlCeDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string code = reader.GetString(0);
+                        string name = reader.GetString(1);
+                        string epicCode = reader.GetString(2);
+                        orders.Add(code, new LabOrder(code, name, epicCode, dbConnection));
+                    }
+                }
+            }
+
+            return orders;
+        }
+
+        /// <summary>
         /// Performs the mapping from tests to order grouping.
         /// </summary>
-        /// <param name="attributes">A vector of attributes to map.</param>
+        /// <param name="tests">A list of tests to group.</param>
         /// <param name="dbConnection">The database connection to use
         /// for querying.</param>
-        List<IAttribute> MapOrders(IUnknownVector attributes, SqlCeConnection dbConnection)
+        static List<IAttribute> MapOrders(List<IAttribute> tests, SqlCeConnection dbConnection)
         {
+            // If there are no tests, just return an empty list
+            if (tests.Count == 0)
+            {
+                return new List<IAttribute>();
+            }
+
             // Get the source doc name from the first attribute
             string sourceDocName = "Unknown";
-            if (attributes.Size() > 0)
+            sourceDocName = tests[0].Value.SourceDocName;
+
+            // Build the list of all lab orders with their associated test collections.
+            Dictionary<string, LabOrder> labOrders = FillLabOrderCollection(dbConnection);
+
+            // Perform the first pass grouping of the tests
+            List<IAttribute> firstPass = FirstPassGrouping(tests, dbConnection, labOrders,
+                sourceDocName);
+
+            // Perform the final grouping of the tests
+            List<IAttribute> finalGroupings = GetFinalGrouping(firstPass, dbConnection,
+                labOrders, sourceDocName);
+
+            // Return the final groupings
+            return finalGroupings;
+        }
+
+        /// <summary>
+        /// Performs the first pass grouping for each group of TEST attributes.
+        /// </summary>
+        /// <param name="tests">The list of TEST attributes to group.</param>
+        /// <param name="dbConnection">The database connection to use for the grouping.</param>
+        /// <param name="labOrders">A collection mapping order codes to
+        /// <see cref="LabOrder"/>s.</param>
+        /// <param name="sourceDocName">The sourcedoc name to use in the grouping.</param>
+        static List<IAttribute> FirstPassGrouping(List<IAttribute> tests, SqlCeConnection dbConnection,
+            Dictionary<string, LabOrder> labOrders, string sourceDocName)
+        {
+            List<IAttribute> firstPassMapping = new List<IAttribute>();
+
+            foreach (IAttribute attribute in tests)
             {
-                sourceDocName = ((IAttribute)attributes.At(0)).Value.SourceDocName;
-            }
+                IUnknownVector attributes = attribute.SubAttributes;
 
-            // Ensure the data sets are loaded
-            LoadDataTables(dbConnection);
+                // Get a map of names to attributes from the attribute collection
+                Dictionary<string, List<IAttribute>> nameToAttributes =
+                    GetMapOfNamesToAttributes(attributes);
 
-            // Get a map of names to attributes from the attribute collection
-            Dictionary<string, List<IAttribute>> nameToAttributes =
-                GetMapOfNamesToAttributes(attributes);
-
-            IAttribute dateAttribute = null;
-            IAttribute timeAttribute = null;
-
-            // Get the date and time from the attributes
-            List<IAttribute> temp;
-            if (nameToAttributes.TryGetValue("COLLECTIONDATE", out temp))
-            {
-                // List should have at least 1 item, pick the first
-                ExtractException.Assert("ELI26231", "Attribute list should have at least 1"
-                    + " collection date.", temp.Count > 0);
-
-                dateAttribute = temp[0];
-            }
-            temp = null;
-            if (nameToAttributes.TryGetValue("COLLECTIONTIME", out temp))
-            {
-                // List should have at least 1 item, pick the first
-                ExtractException.Assert("ELI26232", "Attribute list should have at least 1"
-                    + " collection time.", temp.Count > 0);
-
-                timeAttribute = temp[0];
-            }
-
-            List<IAttribute> mappedList = new List<IAttribute>();
-            foreach (KeyValuePair<string, List<IAttribute>> pair in nameToAttributes)
-            {
-                if (!pair.Key.Equals("COMPONENT", StringComparison.OrdinalIgnoreCase))
+                // Build a list of all attributes that are not in the components category
+                List<IAttribute> components = null;
+                List<IAttribute> nonComponents = new List<IAttribute>();
+                foreach (KeyValuePair<string, List<IAttribute>> pair in nameToAttributes)
                 {
-                    mappedList.AddRange(pair.Value);
+                    if (pair.Key.Equals("COMPONENT", StringComparison.OrdinalIgnoreCase))
+                    {
+                        components = pair.Value;
+                    }
+                    else
+                    {
+                        nonComponents.AddRange(pair.Value);
+                    }
                 }
-                else
+
+                List<IAttribute> mappedList = new List<IAttribute>();
+                if (components != null && components.Count > 0)
                 {
                     // All attributes are unmatched at this point
-                    List<LabTest> unmatchedTests = BuildUnmatchedTestList(pair.Value);
+                    List<LabTest> unmatchedTests = BuildTestList(components);
 
                     while (unmatchedTests.Count > 0)
                     {
                         // Create a new IUnknown vector for the matched tests
                         IUnknownVector vecMatched = new IUnknownVector();
-                        
+
+                        // Add all the noncomponent attributes to the sub attributes
+                        foreach (IAttribute attr in nonComponents)
+                        {
+                            vecMatched.PushBack(attr);
+                        }
+
                         // Create the new order grouping attribute (default to UnknownOrder)
                         // and add it to the vector
                         AttributeClass orderGrouping = new AttributeClass();
-                        orderGrouping.Name = "Order";
+                        orderGrouping.Name = "Name";
                         orderGrouping.Value.CreateNonSpatialString("UnknownOrder", sourceDocName);
                         vecMatched.PushBack(orderGrouping);
 
-                        // Add the date, time
-                        if (dateAttribute != null)
-                        {
-                            vecMatched.PushBack(dateAttribute);
-                        }
-                        if (timeAttribute != null)
-                        {
-                            vecMatched.PushBack(timeAttribute);
-                        }
 
-                        // Get the best match order for the remaining unmatched tests
-                        Dictionary<string, string> testNamesToCodes;
+                        // Get the best match order for the remaining unmatched tests (require
+                        // mandatory tests)
                         KeyValuePair<string, List<LabTest>> matchedTests =
-                            FindBestOrder(unmatchedTests, out testNamesToCodes);
+                            FindBestOrder(unmatchedTests, labOrders, dbConnection, true);
 
                         // Update the unmatched test list by removing the now matched tests
                         foreach (LabTest matches in matchedTests.Value)
@@ -847,38 +806,35 @@ namespace Extract.LabResultsCustomComponents
                         {
                             foreach (LabTest matches in matchedTests.Value)
                             {
-                                // Look for the test code for this match and update the test
-                                // name based on the order code and test code
-                                string testCode;
-                                if (testNamesToCodes.TryGetValue(matches.Name, out testCode))
-                                {
-                                    SpatialString value = matches.Attribute.Value;
-                                    value.Replace(matches.Name, GetTestNameFromTestCode(
-                                        testCode, dbConnection), false, 1, null);
-                                }
-
                                 // Add the test to the vector
                                 vecMatched.PushBack(matches.Attribute);
                             }
 
-                            // Get the order name and epic code
-                            KeyValuePair<string, string> orderNameAndEpicCode =
-                                GetOrderNameAndEpicCodeFromOrderCode(orderCode, dbConnection);
+                            LabOrder labOrder;
+                            if (!labOrders.TryGetValue(orderCode, out labOrder))
+                            {
+                                ExtractException ee = new ExtractException("ELI29072",
+                                    "Order code could not be found in collection.");
+                                ee.AddDebugData("OrderCode", orderCode, false);
+                                throw ee;
+                            }
+
 
                             // Set the order group name
                             orderGrouping.Value.ReplaceAndDowngradeToNonSpatial(
-                                orderNameAndEpicCode.Key);
+                                labOrder.OrderName);
 
                             // Add the epic code
                             AttributeClass epicCode = new AttributeClass();
                             epicCode.Name = "EpicCode";
-                            epicCode.Value.CreateNonSpatialString(orderNameAndEpicCode.Value,
+                            epicCode.Value.CreateNonSpatialString(labOrder.EpicCode,
                                 sourceDocName);
                             vecMatched.PushBack(epicCode);
                         }
                         else
                         {
                             // Add all of the "UnknownOrder" tests since there is no group for them
+                            // NOTE: With the current algorithm, this should only be 1 test
                             foreach (LabTest matches in matchedTests.Value)
                             {
                                 vecMatched.PushBack(matches.Attribute);
@@ -894,78 +850,245 @@ namespace Extract.LabResultsCustomComponents
                         mappedList.Add(newAttribute);
                     }
                 }
+
+                firstPassMapping.AddRange(mappedList);
             }
 
-            return mappedList;
+            return firstPassMapping;
         }
 
         /// <summary>
-        /// Loads the data tables from the sql connection
+        /// Operates on the <paramref name="firstPassGrouping"/> collection (which should be the
+        /// result of calling <see cref="FirstPassGrouping"/>, and tries to combine smaller
+        /// order groups into larger order groups.  Returns a new collection of attributes
+        /// that is the post-final grouping result.
         /// </summary>
-        /// <param name="dbConnection">The database connection to use to load the data sets.</param>
-        void LoadDataTables(SqlCeConnection dbConnection)
+        /// <param name="firstPassGrouping">A collection of attributes that have been grouped
+        /// into orders.</param>
+        /// <param name="dbConnection">The database connection to use for querying data.</param>
+        /// <param name="labOrders">The collection of lab order codes to <see cref="LabOrder"/>
+        /// objects.</param>
+        /// <param name="sourceDocName">The source document name to be used when creating new
+        /// spatial strings.</param>
+        /// <returns>A new collection of attributes that represent the second order
+        /// grouping attempt.</returns>
+        static List<IAttribute> GetFinalGrouping(List<IAttribute> firstPassGrouping,
+            SqlCeConnection dbConnection, Dictionary<string, LabOrder> labOrders,
+            string sourceDocName)
         {
-            try
+            List<IAttribute> finalGrouping = new List<IAttribute>();
+
+            List<OrderGrouping> firstPass = new List<OrderGrouping>(firstPassGrouping.Count);
+            foreach (IAttribute attribute in firstPassGrouping)
             {
-                if (_labOrder == null)
+                if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
                 {
-                    using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
-                        "SELECT * FROM [LabOrder]", dbConnection))
-                    {
-                        _labOrder = new DataTable();
-                        _labOrder.Locale = CultureInfo.InvariantCulture;
-                        adapter.Fill(_labOrder);
-                    }
+                    firstPass.Add(new OrderGrouping(attribute, labOrders));
                 }
-                if (_labOrderTest == null)
+                else
                 {
-                    using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
-                        "SELECT * FROM [LabOrderTest]", dbConnection))
-                    {
-                        _labOrderTest = new DataTable();
-                        _labOrderTest.Locale = CultureInfo.InvariantCulture;
-                        adapter.Fill(_labOrderTest);
-                    }
+                    finalGrouping.Add(attribute);
                 }
-                if (_labTest == null)
+            }
+
+            // Now compare each item in the first pass grouping to see if it can be grouped
+            // with another item in the grouping
+            for (int i=0; i < firstPass.Count; i++)
+            {
+                OrderGrouping group1 = firstPass[i];
+                List<LabTest> group1List = new List<LabTest>(group1.LabTests);
+                for (int j=i+1; j < firstPass.Count; j++)
                 {
-                    using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
-                        "SELECT * FROM [LabTest]", dbConnection))
+                    OrderGrouping group2 = firstPass[j];
+
+                    // Check collection dates
+                    if (!OrderGrouping.CollectionDatesEqual(group1, group2))
                     {
-                        _labTest = new DataTable();
-                        _labTest.Locale = CultureInfo.InvariantCulture;
-                        adapter.Fill(_labTest);
+                        // Collection dates don't match, cannot group these orders
+                        continue;
                     }
-                }
-                if (_alternateTestName == null)
-                {
-                    using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
-                        "SELECT * FROM [AlternateTestName]", dbConnection))
+
+                    List<LabTest> group2List = new List<LabTest>(group2.LabTests);
+                    group2List.AddRange(group1List);
+
+                    // Build a new list of tests by combining the two lists
+                    bool unique = true;
+                    Dictionary<string, LabTest> labTests = new Dictionary<string, LabTest>();
+                    foreach (LabTest test in group2List)
                     {
-                        _alternateTestName = new DataTable();
-                        _alternateTestName.Locale = CultureInfo.InvariantCulture;
-                        adapter.Fill(_alternateTestName);
+                        string name = test.Name.ToUpperInvariant();
+                        if (labTests.ContainsKey(name))
+                        {
+                            // The test was already contained in the list, these two groups
+                            // cannot be combined, just break from the inner loop
+                            unique = false;
+                            break;
+                        }
+
+                        labTests.Add(name, test);
+                    }
+
+                    // There were duplicate tests, these orders cannot be combined
+                    if (!unique)
+                    {
+                        continue;
+                    }
+
+                    // Groups could potentially be merged, find the best order (do not
+                    // require mandatory tests in the second pass grouping)
+                    KeyValuePair<string, List<LabTest>> bestOrder =
+                        FindBestOrder(group2List, labOrders, dbConnection, false);
+
+                    // In order to group into a new combined order, the resulting order
+                    // must contain all of the tests from the list
+                    if (group2List.Count == bestOrder.Value.Count)
+                    {
+                        // Update the attributes of group1 with the attributes in group2
+                        group1.InsertNameAttributeMap(group2);
+
+                        OrderGrouping groupCombined =
+                            CreateNewOrderGrouping(bestOrder.Key, labOrders, sourceDocName, group1);
+
+                        // Remove the combined groups from the list
+                        firstPass.RemoveAt(j);
+                        firstPass.RemoveAt(i);
+
+                        // Add the combined group to the list at the location of the
+                        // first group [DataEntry #817]
+                        firstPass.Insert(i, groupCombined);
+
+                        // Set the index back to -1 so it will be incremented to 0
+                        i = -1;
+
+                        // Break from the inner loop so that we can begin the grouping
+                        // over again with the new firstPass list
+                        break;
                     }
                 }
             }
-            catch (Exception ex)
+
+            // Check for any order groupings that are "UnknownOrder"
+            // and attempt to map them to an order [DE #833]
+            MapSingleUnknownOrders(firstPass, labOrders, dbConnection, sourceDocName);
+
+            // firstPass should now contain all groupings that could be combined
+            // update the test names to their official name
+            foreach (OrderGrouping orderGroup in firstPass)
             {
-                throw new ExtractException("ELI27742", "Error loading data tables!", ex);
+                orderGroup.UpdateLabTestsToOfficialName(dbConnection);
+
+                // Add the mapped group to the final grouping
+                finalGrouping.Add(orderGroup.Attribute);
+            }
+
+            return finalGrouping;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="OrderGrouping"/> from the sub attributes contained in the
+        /// <paramref name="sourceGroup"/> <see cref="OrderGrouping"/>.
+        /// </summary>
+        /// <param name="orderCode">The order code to create the group for.
+        /// <para><b>Note:</b></para>
+        /// This must be a valid order code, do not call this method with "UnknownOrder".</param>
+        /// <param name="labOrders">The map of order codes to <see cref="LabOrder"/>s.</param>
+        /// <param name="sourceDocName">The source doc name for the new attributes.</param>
+        /// <param name="sourceGroup">The <see cref="OrderGrouping"/> that contains the
+        /// sub attributes that should be added to the new <see cref="OrderGrouping"/>.</param>
+        /// <returns>A new <see cref="OrderGrouping"/> based on <paramref name="sourceGroup"/>
+        /// and the new <paramref name="orderCode"/>.</returns>
+        static OrderGrouping CreateNewOrderGrouping(string orderCode,
+            Dictionary<string, LabOrder> labOrders, string sourceDocName,
+            OrderGrouping sourceGroup)
+        {
+            LabOrder labOrder;
+            if (!labOrders.TryGetValue(orderCode, out labOrder))
+            {
+                ExtractException ee = new ExtractException("ELI29074",
+                    "Order code could not be found in collection.");
+                ee.AddDebugData("OrderCode", orderCode, false);
+                throw ee;
+            }
+
+            // Update the order name of the group1 mapping
+            List<IAttribute> tempList = new List<IAttribute>();
+            IAttribute temp = new AttributeClass();
+            temp.Name = "Name";
+            temp.Value.CreateNonSpatialString(labOrder.OrderName, sourceDocName);
+            tempList.Add(temp);
+            sourceGroup.NameToAttributes["NAME"] = tempList;
+
+            // Update the epic code of the group mapping
+            tempList = new List<IAttribute>();
+            temp = new AttributeClass();
+            temp.Name = "EpicCode";
+            temp.Value.CreateNonSpatialString(labOrder.EpicCode, sourceDocName);
+            tempList.Add(temp);
+            sourceGroup.NameToAttributes["EPICCODE"] = tempList;
+
+            // Build a new order for this group
+            IAttribute attribute = new AttributeClass();
+            attribute.Name = "Test";
+            attribute.Value.CreateNonSpatialString("N/A", sourceDocName);
+            attribute.SubAttributes = sourceGroup.GetAllAttributesAsIUnknownVector();
+
+            // Create a new group with this object
+            OrderGrouping newGroup = new OrderGrouping(attribute);
+            newGroup.LabOrder = labOrder;
+            return newGroup;
+        }
+
+        /// <summary>
+        /// Attempts to map any single unknown orders into an actual order grouping.
+        /// If a mapping is possible, the unknown order <see cref="OrderGrouping"/>
+        /// will be replaced in <paramref name="orderGroups"/> with the a new
+        /// <see cref="OrderGrouping"/> that has been mapped to a specific order.
+        /// </summary>
+        /// <param name="orderGroups">The collection of <see cref="OrderGrouping"/>s
+        /// to check.</param>
+        /// <param name="labOrders">The map of order codes to <see cref="LabOrder"/>s.</param>
+        /// <param name="dbConnection">The database connection to use for querying data.</param>
+        /// <param name="sourceDocName">The source doc name for the new attributes.</param>
+        static void MapSingleUnknownOrders(List<OrderGrouping> orderGroups,
+            Dictionary<string, LabOrder> labOrders, SqlCeConnection dbConnection,
+            string sourceDocName)
+        {
+            for (int i = 0; i < orderGroups.Count; i++)
+            {
+                OrderGrouping group = orderGroups[i];
+                if (group.LabOrder == null && group.LabTests.Count == 1)
+                {
+                    // Try to map this unknown order
+                    KeyValuePair<string, List<LabTest>> bestMatch =
+                        FindBestOrder(new List<LabTest>(group.LabTests),
+                        labOrders, dbConnection, false);
+
+                    // Check for a new mapping
+                    if (!bestMatch.Key.Equals("UnknownOrder", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Create the new order grouping
+                        OrderGrouping newGroup = CreateNewOrderGrouping(bestMatch.Key,
+                            labOrders, sourceDocName, group);
+
+                        // Update the list entry with the new order grouping
+                        orderGroups[i] = newGroup;
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// Builds a list of pairs of test attribtues to test name from the list of unmatched tests.
+        /// Builds a list of pairs of test attributes to test name from the list of unmatched tests.
         /// </summary>
-        /// <param name="unmatchedTests">A list of unmatched test attributes.</param>
-        /// <returns>A list of pairs of test attributes to test name.</returns>
-        static List<LabTest> BuildUnmatchedTestList(
-            List<IAttribute> unmatchedTests)
+        /// <param name="tests">A list of test attributes.</param>
+        /// <returns>A list of <see cref="LabTest"/>.</returns>
+        internal static List<LabTest> BuildTestList(
+            List<IAttribute> tests)
         {
             // Build a list of lab tests
             List<LabTest> returnList = new
-                List<LabTest>();
-            foreach(IAttribute attribute in unmatchedTests)
+                List<LabTest>(tests.Count);
+            foreach(IAttribute attribute in tests)
             {
                 returnList.Add(new LabTest(attribute));
             }
@@ -979,195 +1102,99 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="unmatchedTests">The list of unmatched tests to try to fit into
         /// a known order.</param>
-        /// <param name="testNameToTestCode">A collection of test names (the value
-        /// from the <see cref="KeyValuePair{T,K}"/> mapped to its corresponding
-        /// test code.</param>
+        /// <param name="labOrders">A collection mapping order codes to
+        /// <see cref="LabOrder"/>s</param>
+        /// <param name="dbConnection">The database connection to use for data queries.</param>
+        /// <param name="requireMandatory">If <see langword="true"/> then will only map to an
+        /// order if all mandatory tests are present.  If <see langword="false"/> will map to
+        /// the order with the most tests, even if all mandatory are not present.</param>
         /// <returns>A pair containing the order code and a list of matched tests.</returns>
-        KeyValuePair<string, List<LabTest>> FindBestOrder(
-            List<LabTest> unmatchedTests,
-            out Dictionary<string, string> testNameToTestCode)
+        static KeyValuePair<string, List<LabTest>> FindBestOrder(List<LabTest> unmatchedTests,
+            Dictionary<string, LabOrder> labOrders, SqlCeConnection dbConnection,
+            bool requireMandatory)
         {
             // Variables to hold the best match seen thus far (will be modified as the
             // best matching algorithm does its work
             int bestMatchCount = 0;
+            int bestMandatoryCount = 0;
             string bestOrderId = "UnknownOrder";
             List<LabTest> bestMatchedTests = new List<LabTest>();
 
-            // Initialize the test name to code collection so that it will at least not
-            // be null when returned (it may be empty if there is no best match).
-            testNameToTestCode = new Dictionary<string, string>();
+            // Check to see if the first test is part of any valid order
+            List<string> potentialOrderCodes =
+                GetPotentialOrderCodes(unmatchedTests[0].Name, dbConnection);
 
-            // Loop through each order and try to find the best match for the collection
-            // of unmatched tests
-            foreach (DataRow orderRow in _labOrder.Rows)
+            // Loop through the potential orders attempting to match the order
+            foreach (string orderCode in potentialOrderCodes)
             {
-                Dictionary<string, string> nameToCode = new Dictionary<string,string>();
-                List<LabTest> unmatchedCopy = new List<LabTest>(unmatchedTests);
-                List<LabTest> matchedTests = new List<LabTest>();
-
-                // Attempt to match all mandatory tests
-                string orderCode = (string)orderRow["Code"];
-                DataRow[] tests = _labOrderTest.Select("OrderCode = '" + orderCode
-                    + "' AND Mandatory = 1");
-                bool allMandatoryMatch = true;
-                foreach (DataRow test in tests)
+                // Get the lab order from the order code
+                LabOrder labOrder;
+                if (!labOrders.TryGetValue(orderCode, out labOrder))
                 {
-                    // Get the test code and test name
-                    string testCode = (string)test["TestCode"];
-                    DataRow temp = _labTest.Select("TestCode = '" + testCode + "'")[0];
-                    string testName = (string)temp["OfficialName"];
-
-                    // Get the alternate test names for this test
-                    DataRow[] alternateName = _alternateTestName.Select("TestCode = '"
-                        + testCode + "'");
-
-                    // Check for test match (default to false)
-                    bool testMatched = false;
-
-                    // See if this test matches one of the unmatched tests
-                    foreach (LabTest labTest in unmatchedCopy)
-                    {
-                        // If it doesn't match the test, check the alternate tests
-                        if (!labTest.Name.Equals(testName, StringComparison.OrdinalIgnoreCase)
-                            && !labTest.Name.Equals(testCode, StringComparison.OrdinalIgnoreCase))
-                        {
-                            bool alternateTestMatch = false;
-                            foreach (DataRow alternateTest in alternateName)
-                            {
-                                // The alternate test name matched so add the test to
-                                // the list of matched tests, remove it from the unmatched tests
-                                // and update the name to code map
-                                if (labTest.Name.Equals((string)alternateTest["Name"],
-                                    StringComparison.OrdinalIgnoreCase))
-                                {
-                                    if (!nameToCode.ContainsKey(labTest.Name))
-                                    {
-                                        nameToCode.Add(labTest.Name, testCode);
-                                    }
-                                    matchedTests.Add(labTest);
-                                    unmatchedCopy.Remove(labTest);
-                                    alternateTestMatch = true;
-                                    break;
-                                }
-                            }
-
-                            if (alternateTestMatch)
-                            {
-                                testMatched = true;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            // The name was a match, update the name to code map,
-                            // add the test to the matched tests and remove it from the
-                            // unmatched tests
-                            if (!nameToCode.ContainsKey(labTest.Name))
-                            {
-                                nameToCode.Add(labTest.Name, testCode);
-                            }
-                            matchedTests.Add(labTest);
-                            unmatchedCopy.Remove(labTest);
-                            testMatched = true;
-                            break;
-                        }
-                    }
-
-                    // If a test did not match set the all mandatory flag to false and break
-                    // from the loop
-                    if (!testMatched)
-                    {
-                        allMandatoryMatch = false;
-                        break;
-                    }
+                    ExtractException ee = new ExtractException("ELI29075",
+                        "Order code was not found in the collection.");
+                    ee.AddDebugData("Order Code", orderCode, false);
+                    throw ee;
                 }
 
-                // If all the mandatory tests match, try to find matching non-mandatory tests
-                // as well
-                if (allMandatoryMatch)
+                // Check if either mandatory not required or all the mandatory tests are present
+                if (!requireMandatory || labOrder.ContainsAllMandatoryTests(unmatchedTests))
                 {
-                    // Now look for additional matching test
-                    DataRow[] nonMandatory = _labOrderTest.Select("OrderCode = '" + orderCode
-                        + "' AND Mandatory = 0");
-                    foreach (DataRow test in nonMandatory)
-                    {
-                        string testCode = (string)test["TestCode"];
-                        DataRow temp = _labTest.Select("TestCode = '" + testCode + "'")[0];
-                        string testName = (string)temp["OfficialName"];
+                    List<LabTest> matchedTests = labOrder.GetMatchingTests(unmatchedTests);
 
-                        // Get the alternate test names for this test
-                        DataRow[] alternateName = _alternateTestName.Select("TestCode = '"
-                            + testCode + "'");
-
-                        // See if this test matches one of the unmatched tests
-                        foreach (LabTest labTest in unmatchedCopy)
-                        {
-                            // If it doesn't match the test, check the alternate tests
-                            if (!labTest.Name.Equals(testName, StringComparison.OrdinalIgnoreCase)
-                                && !labTest.Name.Equals(testCode, StringComparison.OrdinalIgnoreCase))
-                            {
-                                // Look for a matching alternate test name
-                                bool alternateMatch = false;
-                                foreach (DataRow alternateTest in alternateName)
-                                {
-                                    // The alternate test name matched so add the test to
-                                    // the list of matched tests, remove it from the unmatched tests
-                                    // and update the name to code map
-                                    if (labTest.Name.Equals((string)alternateTest["Name"],
-                                        StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        if (!nameToCode.ContainsKey(labTest.Name))
-                                        {
-                                            nameToCode.Add(labTest.Name, testCode);
-                                        }
-                                        matchedTests.Add(labTest);
-                                        unmatchedCopy.Remove(labTest);
-                                        alternateMatch = true;
-                                        break;
-                                    }
-                                }
-
-                                if (alternateMatch)
-                                {
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                // The name was a match, update the name to code map,
-                                // add the test to the matched tests and remove it from the
-                                // unmatched tests
-                                if (!nameToCode.ContainsKey(labTest.Name))
-                                {
-                                    nameToCode.Add(labTest.Name, testCode);
-                                }
-                                matchedTests.Add(labTest);
-                                unmatchedCopy.Remove(labTest);
-                                break;
-                            }
-                        }
-                    }
-
-                    // Check if this is a better match than seen already
-                    if (matchedTests.Count > bestMatchCount)
+                    // Best match if more tests matched OR equal test count and the mandatory test
+                    // count is smaller
+                    if (matchedTests.Count > bestMatchCount
+                        || (matchedTests.Count == bestMatchCount && labOrder.MandatoryCount < bestMandatoryCount))
                     {
                         bestMatchCount = matchedTests.Count;
-                        bestOrderId = orderCode;
                         bestMatchedTests = matchedTests;
-                        testNameToTestCode = nameToCode;
+                        bestOrderId = labOrder.OrderCode;
+                        bestMandatoryCount = labOrder.MandatoryCount;
                     }
                 }
             }
 
-            // If there was no match then all tests are unmatched, return a copy of the
-            // unmatched tests.
+            // No best order match was found, add this test to its own order
             if (bestMatchCount == 0)
             {
-                bestMatchedTests = new List<LabTest>(unmatchedTests);
+                bestMatchedTests.Add(unmatchedTests[0]);
             }
 
-            return new KeyValuePair<string, List<LabTest>>(bestOrderId,
-                bestMatchedTests);
+            return new KeyValuePair<string,List<LabTest>>(bestOrderId, bestMatchedTests);
+        }
+
+        /// <summary>
+        /// Gets the list of potential order codes for the specified test.
+        /// </summary>
+        /// <param name="testName">The test to get the order codes for.</param>
+        /// <param name="dbConnection">The database connection to use.</param>
+        /// <returns>A list of potential order codes (or an empty list if no potential orders).
+        /// </returns>
+        static List<string> GetPotentialOrderCodes(string testName, SqlCeConnection dbConnection)
+        {
+            // Escape the single quote
+            testName = testName.Replace("'", "''");
+
+            List<string> orderCodes = new List<string>();
+            string query = "SELECT DISTINCT [OrderCode] FROM [LabOrderTest] INNER JOIN "
+                + "[LabTest] ON [LabOrderTest].[TestCode] = [LabTest].[TestCode] "
+                + "INNER JOIN [AlternateTestName] ON [AlternateTestName].[TestCode] = "
+                + "[LabOrderTest].[TestCode] WHERE [AlternateTestName].[Name] = '"
+                + testName + "' OR [LabTest].[OfficialName] = '" + testName + "'";
+
+            using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
+            {
+                using (SqlCeDataReader reader = command.ExecuteReader())
+                {
+                    while(reader.Read())
+                    {
+                        orderCodes.Add(reader.GetString(0));
+                    }
+                }
+            }
+
+            return orderCodes;
         }
 
         /// <summary>
@@ -1175,7 +1202,7 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="attributes">The vector of attributes to group.</param>
         /// <returns>The map of names to attributes.</returns>
-        static Dictionary<string, List<IAttribute>> GetMapOfNamesToAttributes(
+        internal static Dictionary<string, List<IAttribute>> GetMapOfNamesToAttributes(
             IUnknownVector attributes)
         {
             // Get an AFUtility object and use it to produce a StrToObject map for
@@ -1210,56 +1237,34 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
-        /// Gets the order name and epic code from the database based on the specified order code.
-        /// </summary>
-        /// <param name="orderCode">The order code to search for.</param>
-        /// <param name="dbConnection">The database connection to use.</param>
-        /// <returns>A pair containing the order name and epic code.</returns>
-        static KeyValuePair<string, string> GetOrderNameAndEpicCodeFromOrderCode(string orderCode,
-            SqlCeConnection dbConnection)
-        {
-            string query = "SELECT [Name], [EpicCode] FROM [LabOrder] WHERE [Code] = '"
-                + orderCode + "'";
-
-            using (SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter(query, dbConnection))
-            {
-                using (DataTable dt = new DataTable())
-                {
-                    dt.Locale = CultureInfo.InvariantCulture;
-                    dataAdapter.Fill(dt);
-
-                    // Should only be 1 row, so just return the top row
-                    ExtractException.Assert("ELI26233", "Order name not found!",
-                        dt.Rows.Count == 1, "Order Code", orderCode ?? "null");
-
-                    return new KeyValuePair<string, string>((string)dt.Rows[0][0],
-                        (string)dt.Rows[0][1]);
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets the test name from the database based on the specified order code and test code.
         /// </summary>
         /// <param name="testCode">The test code to search on.</param>
         /// <param name="dbConnection">The database connection to use.</param>
         /// <returns>The test name for the specified order code and test code.</returns>
-        static string GetTestNameFromTestCode(string testCode, SqlCeConnection dbConnection)
+        internal static string GetTestNameFromTestCode(string testCode, SqlCeConnection dbConnection)
         {
-            string query = "SELECT [OfficialName] FROM [LabTest] WHERE [TestCode] = '" + testCode
-                + "'";
+            // Escape the single quote
+            string testCodeEscaped = testCode.Replace("'", "''");
 
-            using (SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter(query, dbConnection))
+            string query = "SELECT [OfficialName] FROM [LabTest] WHERE [TestCode] = '"
+                + testCodeEscaped + "'";
+
+            using (SqlCeCommand command = new SqlCeCommand(query, dbConnection))
             {
-                using (DataTable dt = new DataTable())
+                using (SqlCeDataReader reader = command.ExecuteReader())
                 {
-                    dt.Locale = CultureInfo.InvariantCulture;
-                    dataAdapter.Fill(dt);
-
-                    // Should only be 1 row, so just return the top row
-                    ExtractException.Assert("ELI26234", "Could not find test name!",
-                        dt.Rows.Count == 1, "TestCode", testCode ?? "null");
-                    return (string)dt.Rows[0][0];
+                    if (reader.Read())
+                    {
+                        return reader.GetString(0);
+                    }
+                    else
+                    {
+                        ExtractException ee = new ExtractException("ELI26234",
+                            "Could not find test name!");
+                        ee.AddDebugData("TestCode", testCode, false);
+                        throw ee;
+                    }
                 }
             }
         }
@@ -1374,28 +1379,6 @@ namespace Extract.LabResultsCustomComponents
         {
             if (disposing)
             {
-                // Dispose of managed objects
-                if (_labOrder != null)
-                {
-                    _labOrder.Dispose();
-                    _labOrder = null;
-                }
-                if (_labOrderTest != null)
-                {
-                    _labOrderTest.Dispose();
-                    _labOrderTest = null;
-                }
-                if (_labTest != null)
-                {
-                    _labTest.Dispose();
-                    _labTest = null;
-                }
-                if (_alternateTestName != null)
-                {
-                    _alternateTestName.Dispose();
-                    _alternateTestName = null;
-                }
-
                 // Remove any existing reference to a local database copy. Dispose of the
                 // local database copy if this was the last instance referencing it.
                 LocalDatabaseCopy localDatabaseCopy;

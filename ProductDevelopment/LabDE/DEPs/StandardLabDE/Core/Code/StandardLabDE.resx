@@ -134,6 +134,15 @@
     <value>&lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE EpicCode = SUBSTRING(&lt;Attribute&gt;../EpicCode&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;
 &lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE Code = SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,25)&lt;/SQL&gt;&lt;/Query&gt;</value>
   </data>
+  <data name="_testName.ValidationQuery" xml:space="preserve">
+    <value>&lt;Query&gt;&lt;SQL&gt;SELECT Name FROM LabOrder WHERE EpicCode IS NOT NULL ORDER BY Name&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidValue='' ValidationMessage='ValidationMessage' ValidationWarning='1'&gt;
+	&lt;SQL Name='MandatoryTests' Exclude='1'&gt;SELECT TestCode FROM LabOrderTest INNER JOIN LabOrder ON LabOrderTest.OrderCode = LabOrder.Code WHERE   LabOrder.Code = &lt;Attribute&gt;../OrderCode&lt;/Attribute&gt; AND Mandatory = 1&lt;/SQL&gt;
+	&lt;Attribute Name='ExistingTests' Exclude='1' SelectionMode='List'&gt;../Component/TestCode&lt;/Attribute&gt;
+	&lt;Result Name='MissingTests' Arg1='MandatoryTests' Operation='SubtractList' Arg2='ExistingTests'/&gt;
+	&lt;Complex Name='ValidationMessage' Exclude='1'&gt;Missing mandatory test(s): &lt;Result Arg1='MissingTests' StringList=', '/&gt;&lt;/Complex&gt;
+&lt;/Query&gt;</value>
+  </data>
   <metadata name="_orderCode.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -170,6 +179,9 @@
     <value>True</value>
   </metadata>
   <metadata name="_componentComment.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_componentOriginalName.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="_epicPatientFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">

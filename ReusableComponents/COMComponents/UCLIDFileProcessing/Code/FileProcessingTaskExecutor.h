@@ -40,7 +40,8 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	void FinalRelease();
 
 // IFileProcessingTaskExecutor
-	STDMETHOD(Init)(IIUnknownVector *pFileProcessingTasks, IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager);
+	STDMETHOD(Init)(IIUnknownVector *pFileProcessingTasks, long nActionID, IFileProcessingDB *pDB,
+		IFAMTagManager *pFAMTagManager);
 	STDMETHOD(ProcessFile)(BSTR bstrSourceDocName, long nFileID, long nActionID,
 		IProgressStatus *pProgressStatus, VARIANT_BOOL vbCancelRequested,
 		EFileProcessingResult* pResult);
@@ -133,6 +134,7 @@ private:
 
 	// Internal Init method
 	void init(const IIUnknownVectorPtr& ipFileProcessingTasks,
+		long actionID,
 		const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipDB,
 		const UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr& ipFAMTagManager);
 

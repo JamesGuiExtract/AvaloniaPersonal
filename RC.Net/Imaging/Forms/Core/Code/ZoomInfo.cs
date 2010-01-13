@@ -177,9 +177,22 @@ namespace Extract.Imaging.Forms
         /// setting as this <see cref="ZoomInfo"/>; <see langword="false"/> if they differ.</returns>
         public bool Equals(ZoomInfo other)
         {
-            return _fitMode == other._fitMode &&
-                _scaleFactor == other._scaleFactor &&
-                _zoomCenter == other._zoomCenter;
+            if (_fitMode != other._fitMode || _scaleFactor != other._scaleFactor)
+            {
+                return false;
+            }
+
+            if (_zoomCenter == other._zoomCenter)
+            {
+                return true;
+            }
+            else
+            {
+                // Sometimes rounding issues cause the center to be 1 pixel different than the zoom
+                // info used to set the current zoom. Allow for 1 pixel difference.
+                return (Math.Abs(_zoomCenter.X - other._zoomCenter.X) <= 1 &&
+                        Math.Abs(_zoomCenter.Y - other._zoomCenter.Y) <= 1);
+            }
         }
 
         #endregion IEquatable<ZoomInfo> Members

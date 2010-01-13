@@ -326,7 +326,8 @@ STDMETHODIMP CAddWatermarkTask::raw_Clone(IUnknown** ppObject)
 //--------------------------------------------------------------------------------------------------
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CAddWatermarkTask::raw_Init()
+STDMETHODIMP CAddWatermarkTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
+	IFileProcessingDB *pDB)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 

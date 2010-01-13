@@ -99,7 +99,28 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                ExtractException.AsExtractException("ELI25203", ex);
+                throw ExtractException.AsExtractException("ELI25203", ex);
+            }
+        }
+
+        /// <summary>
+        /// Checks whether a .Net auto-complete list is displayed.
+        /// </summary>
+        /// <returns><see langword="true"/> if an auto-complete list is displayed;
+        /// <see langword="false"/> otherwise.</returns>
+        public static bool IsAutoCompleteDisplayed()
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28877",
+                    _OBJECT_NAME);
+
+                return NativeMethods.IsAutoCompleteDisplayed();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28868", ex);
             }
         }
 

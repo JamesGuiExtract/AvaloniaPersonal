@@ -1147,6 +1147,14 @@ namespace Extract.Imaging.Forms
                 base.BeginUpdate();
                 try
                 {
+                    // Add a zoom history entry for the current page so that when the user navigates
+                    // back to this page, they will be looking at the same region they were before
+                    // they moved away.
+                    if (updateZoom && _pageNumber != pageNumber)
+                    {
+                        UpdateZoom(true, false);
+                    }
+
                     // Go to the specified page
                     _pageNumber = pageNumber;
                     base.Image = GetPage(pageNumber);

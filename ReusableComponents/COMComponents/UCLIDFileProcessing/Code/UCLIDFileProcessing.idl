@@ -220,11 +220,15 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE:		To alert the file processor that processing is about to start so it can 
 		//				perform any necessary initialization.
+		// ARGUMENTS:	nActionID - The ID of the action being processed
+		//				pFAMTM - A FAMTagManager object for expanding filename tags/methods
+		//				pDB - The database being operated upon
 		// NOTE:		This may be called multiple times on the same object because the same coClass
 		//				may be being used in multiple threads.  This will happen per processing session
 		//				not per file.
 		//				See note about IFileProcessingTask multithreading above
-		[id(11), helpstring("method Init")] HRESULT Init();
+		[id(11), helpstring("method Init")] HRESULT Init([in] long nActionID,
+			[in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB *pDB);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE:		To process the file strFileFullName and output a vector of files either generated
 		//				or the file being processed. 
@@ -987,6 +991,7 @@ library UCLID_FILEPROCESSINGLib
 		// Methods related to storing input event history
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To record a new input event entry for the specified process ID.
+		// NOTE: This method is intentionally not threadsafe for performance reasons.
 		[id(83), helpstring("method RecordInputEvent")] HRESULT RecordInputEvent(
 			[in] BSTR bstrTimeStamp, [in] long nActionID, [in] long nEventCount,
 			[in] long nProcessID);
@@ -1340,11 +1345,12 @@ library UCLID_FILEPROCESSINGLib
 		//			to use to process files. To subsequently call Init on each of the
 		//			file processing tasks
 		// ARGS:	pFileProcessingTasks- A Object with Description list of file processing tasks
+		//			nActionID- The ID of the action being processed
 		//			pDB- The database being acted upon
 		//			pFAMTagManager- The tag manager to use when required
 		// REQUIRED: Nothing.
-		[id(1), helpstring("method Init")] HRESULT Init([in] IIUnknownVector *pFileProcessingTasks, 
-			[in] IFileProcessingDB *pDB, [in] IFAMTagManager *pFAMTagManager);
+		[id(1), helpstring("method Init")] HRESULT Init([in] IIUnknownVector *pFileProcessingTasks,
+			[in] long nActionID, [in] IFileProcessingDB *pDB, [in] IFAMTagManager *pFAMTagManager);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To process the given file
 		// ARGS:	bstrSourceDocName- The file to act upon

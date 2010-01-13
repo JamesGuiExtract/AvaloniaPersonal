@@ -18,7 +18,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// The <see cref="ComClass"/> instance for which configuration is being performed.
         /// </summary>
-        private ComClass _comClass;
+        ComClass _comClass;
 
         /// <summary>
         /// Initializes a new <see cref="ConfigurationForm"/> instance for the specified
@@ -53,12 +53,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 // Initialize the form's controls
                 _configFileNameTextBox.Text = _comClass.ConfigFileName;
+                _enableInputTrackingCheckBox.Checked = _comClass.InputEventTrackingEnabled;
+                _enableCountersCheckBox.Checked = _comClass.CountersEnabled;
 
                 // Display the form modally and wait for the result
                 if (ShowDialog() == DialogResult.OK)
                 {
                     // The user is applying settings; apply the current form values to the _comClass.
                     _comClass.ConfigFileName = _configFileNameTextBox.Text;
+                    _comClass.InputEventTrackingEnabled = _enableInputTrackingCheckBox.Checked;
+                    _comClass.CountersEnabled = _enableCountersCheckBox.Checked;
 
                     return true;
                 }
@@ -81,7 +85,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleFileBrowseButtonClick(object sender, EventArgs e)
+        void HandleFileBrowseButtonClick(object sender, EventArgs e)
         {
             try
             {
@@ -114,7 +118,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="fileNameTextBoxObject">A <see cref="TextBox"/> whose value should be
         /// updated via the <see cref="OpenFileDialog"/>.</param>
-        private void BrowseForFile(Object fileNameTextBoxObject)
+        void BrowseForFile(Object fileNameTextBoxObject)
         {
             try
             {
@@ -145,7 +149,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="textBox">The <see cref="TextBox"/> to updated.</param>
         /// <param name="value">The value to apply to the <see cref="TextBox"/>.</param>
-        private void UpdateTextBoxValue(TextBox textBox, string value)
+        void UpdateTextBoxValue(TextBox textBox, string value)
         {
             // If not running in the UI thread than an invoke is required
             if (base.InvokeRequired)
@@ -169,7 +173,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="textBox">The <see cref="TextBox"/> to updated.</param>
         /// <param name="value">The value to apply to the <see cref="TextBox"/>.</param>
-        private delegate void UpdateTextBoxParameterDelegate(TextBox textBox, string value);
+        delegate void UpdateTextBoxParameterDelegate(TextBox textBox, string value);
 
         #endregion Delegates
     }

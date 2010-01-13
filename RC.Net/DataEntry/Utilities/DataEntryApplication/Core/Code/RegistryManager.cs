@@ -54,6 +54,36 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         static readonly string _SPLITTER_POSITION = "SplitterPostion";
 
         /// <summary>
+        /// Indicates whether the image viewer should be shown in a separate window.
+        /// </summary>
+        static readonly string _SHOW_SEPARATE_IMAGE_WINDOW = "ShowSeparateImageWindow";
+
+        /// <summary>
+        /// The value to indicate whether the image window should launch maximized.
+        /// </summary>
+        static readonly string _IMAGE_WINDOW_MAXIMIZED_VALUE = "ImageWindowMaximized";
+
+        /// <summary>
+        /// The value to indicate the initial horizontal position of the image window.
+        /// </summary>
+        static readonly string _IMAGE_WINDOW_POSITION_X = "ImageWindowPositionX";
+
+        /// <summary>
+        /// The value to indicate the initial vertical position of the image window.
+        /// </summary>
+        static readonly string _IMAGE_WINDOW_POSITION_Y = "ImageWindowPositionY";
+
+        /// <summary>
+        /// The value to indicate the initial width of the image window.
+        /// </summary>
+        static readonly string _IMAGE_WINDOW_WIDTH = "ImageWindowWidth";
+
+        /// <summary>
+        /// The value to indicate the initial height of the image window.
+        /// </summary>
+        static readonly string _IMAGE_WINDOW_HEIGHT = "ImageWindowHeight";
+
+        /// <summary>
         /// Specifies how the image viewer zoom/view is adjusted when new fields are selected.
         /// </summary>
         static readonly string _AUTO_ZOOM_MODE = "AutoZoomMode";
@@ -220,6 +250,168 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 catch (Exception ex)
                 {
                     throw ExtractException.AsExtractException("ELI25074", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the image viewer should be shown in a separate window.
+        /// </summary>
+        /// <value><see langword="true"/> if the image viewer should be shown in a separate window
+        /// when the data entry application is launched, <see langword="false"/> otherwise.</value>
+        public static bool DefaultShowSeparateImageWindow
+        {
+            get
+            {
+                try
+                {
+                    return Convert.ToBoolean(_userDataEntrySubKey.GetValue(
+                        _SHOW_SEPARATE_IMAGE_WINDOW, false), CultureInfo.CurrentCulture);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28850", ex);
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    _userDataEntrySubKey.SetValue(_SHOW_SEPARATE_IMAGE_WINDOW, value);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28851", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the the image window should launch maximized.
+        /// </summary>
+        /// <value><see langword="true"/> if the image window  should launch
+        /// maximized or <see langword="false"/> if the image window  should
+        /// launch as a normal window.</value>
+        /// <returns><see langword="true"/> if the image window  will launch
+        /// maximized or <see langword="false"/> if the image window  will
+        /// launch as a normal window.</returns>
+        public static bool DefaultImageWindowMaximized
+        {
+            get
+            {
+                try
+                {
+                    return Convert.ToBoolean(_userDataEntrySubKey.GetValue(
+                        _IMAGE_WINDOW_MAXIMIZED_VALUE, false), CultureInfo.CurrentCulture);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28842", ex);
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    _userDataEntrySubKey.SetValue(_IMAGE_WINDOW_MAXIMIZED_VALUE, value);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28843", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the X position ID for the image window upon launch.
+        /// </summary>
+        /// <value>The X position ID for the image window upon launch.</value>
+        public static int DefaultImageWindowPositionX
+        {
+            get
+            {
+                return (int)_userDataEntrySubKey.GetValue(_IMAGE_WINDOW_POSITION_X, -1);
+            }
+            set
+            {
+                try
+                {
+                    _userDataEntrySubKey.SetValue(_IMAGE_WINDOW_POSITION_X, value);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28844", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Y position ID for the image window upon launch
+        /// </summary>
+        /// <value>The Y position ID for the image window upon launch.</value>
+        public static int DefaultImageWindowPositionY
+        {
+            get
+            {
+                return (int)_userDataEntrySubKey.GetValue(_IMAGE_WINDOW_POSITION_Y, -1);
+            }
+            set
+            {
+                try
+                {
+                    _userDataEntrySubKey.SetValue(_IMAGE_WINDOW_POSITION_Y, value);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28845", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the starting width for the image window.
+        /// </summary>
+        /// <value>The starting width for the image window.</value>
+        public static int DefaultImageWindowWidth
+        {
+            get
+            {
+                return (int)_userDataEntrySubKey.GetValue(_IMAGE_WINDOW_WIDTH, -1);
+            }
+            set
+            {
+                try
+                {
+                    _userDataEntrySubKey.SetValue(_IMAGE_WINDOW_WIDTH, value);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28846", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the starting height for the image window.
+        /// </summary>
+        /// <value>The starting height for the image window.</value>
+        public static int DefaultImageWindowHeight
+        {
+            get
+            {
+                return (int)_userDataEntrySubKey.GetValue(_IMAGE_WINDOW_HEIGHT, 600);
+            }
+            set
+            {
+                try
+                {
+                    _userDataEntrySubKey.SetValue(_IMAGE_WINDOW_HEIGHT, value);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28847", ex);
                 }
             }
         }

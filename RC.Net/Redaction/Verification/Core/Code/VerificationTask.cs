@@ -247,8 +247,12 @@ namespace Extract.Redaction.Verification
 
         /// <summary>
         /// Called before any file processing starts.
-        /// </summary>
-        public void Init()
+        /// </summary>  
+        /// <param name="nActionID">The ID of the action being processed.</param>
+        /// <param name="pFAMTM">The <see cref="FAMTagManager"/> to use if needed.</param>
+        /// <param name="pDB">The <see cref="FileProcessingDB"/> in use.</param>
+        [CLSCompliant(false)]
+        public void Init(int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB)
         {
             try
             {

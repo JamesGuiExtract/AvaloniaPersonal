@@ -91,12 +91,6 @@ namespace Extract.DataEntry
         private static string _solutionRootDirectory =
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
-
         #endregion Fields
 
         /// <summary>
@@ -477,14 +471,31 @@ namespace Extract.DataEntry
                     if (attributeVector.Size() > 0)
                     {
                         attributeVector.FindByReference(newAttribute, 0, ref currentIndex);
-                        if (currentIndex >= 0 && currentIndex != index)
+                        
+                        if (currentIndex == index)
                         {
+                            // If the attribute already exists at the targe location, there
+                            // is nothing to do.
+                            currentIndex = -1;
+                            index = -1;
+                        }
+                        else if (currentIndex >= 0)
+                        {
+                            // If the attribute exists at a another location in the vector, remove
+                            // it from there.
                             attributeVector.Remove(currentIndex);
+
+                            // If the attribute was removed from a previous position in the vector
+                            // adjust the target index accordingly.
+                            if (currentIndex < index)
+                            {
+                                index--;
+                            }
                         }
                     }
 
                     // As long as the attribute doesn't already exist at this index, insert it.
-                    if (currentIndex != index)
+                    if (index >= 0)
                     {
                         attributeVector.Insert(index, newAttribute);
                     }
@@ -628,6 +639,106 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI24310", ex);
+            }
+        }
+
+        /// <summary>
+        /// Inserts into the selected portion of the existing <see cref="SpatialString"/> the
+        /// specified provided <see cref="SpatialString"/>.
+        /// </summary>
+        /// <param name="textBoxControl">A <see cref="TextBoxBase"/> whose current selection
+        /// indicates which part of the existing text is to be replaced.</param>
+        /// <param name="existingText">The existing <see cref="SpatialString"/> associated with 
+        /// <see paramref="textBoxControl"/>.
+        /// <para><b>Note</b></para>
+        /// This value will be modified (it is the same value that is returned).</param>
+        /// <param name="newText">The <see cref="SpatialString"/> that is to replace the current
+        /// selection.</param>
+        /// <returns></returns>
+        internal static SpatialString InsertSpatialStringIntoSelection(TextBoxBase textBoxControl,
+            SpatialString existingText, SpatialString newText)
+        {
+            try
+            {
+                // If the current selection doesn't include all text, combine the existing
+                // text with the swiped text.
+                if (textBoxControl.SelectionLength != textBoxControl.Text.Length)
+                {
+                    // So that SpatialString::Insert/Append works properly ensure the source doc
+                    // names are the same.
+                    existingText.SourceDocName = newText.SourceDocName;
+
+                    // If both SpatialStrings are spatial we need to normalize them before they can
+                    // be combined.
+                    if (existingText.HasSpatialInfo() && newText.HasSpatialInfo())
+                    {
+                        // [DataEntry:831] 
+                        // Simply appending true spatial info will cause unexpected results if the text
+                        // does not fall on the same line. When combining different spatial string
+                        // values, convert each to a hybrid and use the hybrid raster zones to
+                        // create a hybrid result.
+                        existingText.DowngradeToHybridMode();
+                        newText.DowngradeToHybridMode();
+
+                        // A unified spatial page infos needs to be created. Start with newText's
+                        // spatial page infos, and replace any shared pages with existingText's
+                        // spatial page infos.
+                        ICopyableObject copyThis = (ICopyableObject)newText.SpatialPageInfos;
+                        LongToObjectMap unifiedSpatialPageInfos = (LongToObjectMap)copyThis.Clone();
+
+                        VariantVector existingSpatialPages = existingText.SpatialPageInfos.GetKeys();
+                        int count = existingSpatialPages.Size;
+                        for (int i = 0; i < count; i++)
+                        {
+                            int page = (int)existingSpatialPages[i];
+                            unifiedSpatialPageInfos.Set(
+                                page, existingText.SpatialPageInfos.GetValue(page));
+                        }
+
+                        // In order for newText's rasterZones to show up in the correct spot if the
+                        // spatial page infos differed at all, we need to convert newText's raster
+                        // zones into the unifiedSpatialPageInfo coordinate system.
+                        IUnknownVector translatedRasterZones =
+                            (IUnknownVector)newText.GetTranslatedImageRasterZones(
+                                unifiedSpatialPageInfos);
+
+                        // Recreate newText using the translated raster zones and
+                        // unifiedSpatialPageInfos. The two spatial strings are now able to be
+                        // merged.
+                        newText.CreateHybridString(translatedRasterZones, newText.String,
+                            existingText.SourceDocName, unifiedSpatialPageInfos); 
+                    }
+
+
+                    // If the current selection is not at the end of the existing text,
+                    // insert the new text in place of the current selection.
+                    int selectionStart = textBoxControl.SelectionStart;
+                    if (selectionStart < textBoxControl.Text.Length - 1)
+                    {
+                        // Remove the existing selection if necessary.
+                        if (textBoxControl.SelectionLength > 0)
+                        {
+                            existingText.Remove(selectionStart,
+                                selectionStart + textBoxControl.SelectionLength - 1);
+                        }
+
+                        existingText.Insert(selectionStart, newText);
+                    }
+                    // If the caret is currently at the end of the existing text, just append the
+                    // swiped text.
+                    else
+                    {
+                        existingText.Append(newText);
+                    }
+
+                    newText = existingText;
+                }
+
+                return newText;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28834", ex);
             }
         }
 
@@ -804,7 +915,8 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26727");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI26727", _OBJECT_NAME);
 
                 ExtractException.Assert("ELI26731", "Null argument exception!",
                     sqlCEConnection != null);
@@ -834,44 +946,32 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Executes a query against the specified database connection and returns the
-        /// result as a string.
+        /// result as a string array.
         /// </summary>
         /// <param name="dbCommand">The <see cref="DbCommand"/> defining the query to be applied.
         /// </param>
-        /// <param name="rowSeparator">The string used to separate multiple row results. (Will not
-        /// be included in any result of less than 2 rows).  If <see langword="null"/>, no result
-        /// will be returned unless there is exactly 1 matching row.</param>
         /// <param name="columnSeparator">The string used to separate multiple column results.
         /// (Will not be included in any result with less than 2 columns)</param>
-        public static string ExecuteDBQuery(DbCommand dbCommand, string rowSeparator,
-            string columnSeparator)
+        /// <returns>An array of <see cref="string"/>s, each representing a result row from the
+        /// query.</returns>
+        public static string[] ExecuteDBQuery(DbCommand dbCommand, string columnSeparator)
         {
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26758");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI26758", _OBJECT_NAME);
 
                 ExtractException.Assert("ELI26151", "Null argument exception!", dbCommand != null);
 
                 using (DbDataReader sqlReader = dbCommand.ExecuteReader())
                 {
-                    StringBuilder result = new StringBuilder();
+                    List<string> results = new List<string>();
 
                     // Loop throw each row of the results.
                     while (sqlReader.Read())
                     {
-                        // If not the first row result, append the row separator
-                        if (result.Length > 0)
-                        {
-                            // If more than one row was found, do not return any value if
-                            // rowSeparator is null.
-                            if (rowSeparator == null)
-                            {
-                                return "";
-                            }
-
-                            result.Append(rowSeparator);
-                        }
+                        StringBuilder result = new StringBuilder();
 
                         // Keep track of all column delimiters that are appended. They are
                         // only added once it is confirmed that there is more data in the
@@ -904,9 +1004,11 @@ namespace Extract.DataEntry
                                 }
                             }
                         }
+
+                        results.Add(result.ToString());
                     }
 
-                    return result.ToString();
+                    return results.ToArray();
                 }
             }
             catch (Exception ex)

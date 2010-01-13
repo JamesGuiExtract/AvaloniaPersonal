@@ -1,5 +1,6 @@
 using Extract.Drawing;
 using Extract.Licensing;
+using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
 using System.Collections;
@@ -55,6 +56,11 @@ namespace Extract.DataEntry
         string _attributeName;
 
         /// <summary>
+        /// The <see cref="DataEntryControlHost"/> to which this control belongs.
+        /// </summary>
+        DataEntryControlHost _dataEntryControlHost;
+
+        /// <summary>
         /// Used to specify the data entry control which is mapped to the parent of the attribute(s) 
         /// to which the current table is to be mapped.
         /// </summary>
@@ -69,6 +75,12 @@ namespace Extract.DataEntry
         /// Specifies whether the control should remain disabled at all times.
         /// </summary>
         bool _disabled;
+
+        /// <summary>
+        /// Specifies whether the clipboard contents should be cleared after pasting into the
+        /// control.
+        /// </summary>
+        bool _clearClipboardOnPaste;
 
         /// <summary>
         /// Specifies whether the table will attempt to generate a hint by indicating the other
@@ -184,12 +196,6 @@ namespace Extract.DataEntry
         /// </summary>
         DataGridViewCellStyle _disabledCellStyle;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Delegates
@@ -302,7 +308,8 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                _licenseCache.Validate("ELI24495");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI24495", _OBJECT_NAME);
 
                 // Initialize the various cell styles (modifying existing cell styles on-the-fly
                 // causes poor performance. Microsoft recommends sharing DataGridViewCellStyle
@@ -607,8 +614,8 @@ namespace Extract.DataEntry
                     data = data.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
                 }
 
-                if (!dataEntryCell.Validator.Validate(
-                        ref data, dataEntryCell.Attribute, throwException))
+                if (dataEntryCell.Validator.Validate(ref data, dataEntryCell.Attribute, throwException)
+                    != DataValidity.Valid)
                 {
                     // If validation fails on a combo box cell, clear the data in the cell since it
                     // displayed wouldn't be displayed in the cell but would be displayed as a tooltip.
@@ -895,10 +902,10 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Otherwise if a delete/cut/copy/paste shortcut is being used on a single cell,
+                // If a delete/cut/copy/paste shortcut is being used on a single cell,
                 // force the current cell into edit mode and re-send the keys to allow the edit
                 // control to handle them.
-                if (base.SelectedCells.Count == 1 && 
+                if (!e.Handled && base.SelectedCells.Count == 1 && 
                          (e.KeyCode == Keys.Delete ||
                             (e.Modifiers == Keys.Control && 
                                 (e.KeyCode == Keys.C || e.KeyCode == Keys.X || e.KeyCode == Keys.V))))
@@ -933,8 +940,16 @@ namespace Extract.DataEntry
                 // Otherwise, allow the base class to handle the key
                 else
                 {
-                    base.OnKeyDown(e);
+                    // If in edit mode but the edit control does not have focus, send keyboard input
+                    // to the editing control.
+                    if (_editingControl != null && !_editingControl.Focused)
+                    {
+                        KeyMethods.SendKeyToControl(e.KeyValue, e.Shift, e.Control, e.Alt, _editingControl);
+                        e.Handled = true;
+                    }
                 }
+
+                base.OnKeyDown(e);
             }
             catch (Exception ex)
             {
@@ -976,13 +991,14 @@ namespace Extract.DataEntry
                             return true;
                         }
                     }
-
-                    // [DataEntry:275]
-                    // When in edit mode of a textbox cell shift + space should not exit edit mode
-                    // to select the whole row, but should simply insert a space.
-                    else if (m.WParam == (IntPtr)Keys.Space && Control.ModifierKeys == Keys.Shift)
+                }
+                // [DataEntry:747]
+                // If using shift+space to select a row, end edit mode.
+                else if (m.WParam == (IntPtr)Keys.Space && Control.ModifierKeys == Keys.Shift)
+                {
+                    if (EditingControl != null)
                     {
-                        return true;
+                        EndEdit();
                     }
                 }
             }
@@ -1195,29 +1211,28 @@ namespace Extract.DataEntry
                             (DataGridViewTextBoxEditingControl)_editingControl;
 
                         textEditingControl.TextChanged += HandleCellTextChanged;
-
                         DataEntryValidator validator = dataEntryCell.Validator;
 
                         // If available, use the validation list values to initialize the
                         // auto-complete values.
                         if (validator != null)
                         {
-                            string[] validationListValues = validator.GetValidationListValues();
-                            if (validationListValues != null)
+                            string[] autoCompleteValues = validator.GetAutoCompleteValues();
+                            if (autoCompleteValues != null)
                             {
                                 // [DataEntry:443]
-                                // Add each item from the validation list to the auto-complete list
-                                // twice, once as it is in the validation list, and the second time
-                                // with a leading space. This way, a user can press space in an
+                                // Add each item from the auto-complete values to the auto-complete
+                                // list twice, once as it is in the validation list, and the second
+                                // time with a leading space. This way, a user can press space in an
                                 // empty cell to see all possible values.
                                 string[] autoCompleteList =
-                                    new string[validationListValues.Length * 2];
-                                for (int i = 0; i < validationListValues.Length; i++)
+                                    new string[autoCompleteValues.Length * 2];
+                                for (int i = 0; i < autoCompleteValues.Length; i++)
                                 {
-                                    autoCompleteList[i] = " " + validationListValues[i];
+                                    autoCompleteList[i] = " " + autoCompleteValues[i];
                                 }
-                                validationListValues.CopyTo(autoCompleteList,
-                                    validationListValues.Length);
+                                autoCompleteValues.CopyTo(autoCompleteList,
+                                    autoCompleteValues.Length);
 
                                 textEditingControl.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                                 textEditingControl.AutoCompleteSource = AutoCompleteSource.CustomSource;
@@ -1236,6 +1251,108 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI24986", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Validating"/> event to prevent edit mode from ending as
+        /// a result of the DEP losing focus.
+        /// </summary>
+        /// <param name="e">A <see cref="CancelEventArgs"/> that contains the event data.</param>
+        protected override void OnValidating(CancelEventArgs e)
+        {
+            try
+            {
+                // If in edit mode and the DEP doesn't contain focus, eat the OnValidating event.
+                // This will prevent edit mode from ending.
+                if (EditingControl != null && !DataEntryControlHost.ContainsFocus)
+                {
+                    // If the active cell is a text box control, continue to show the current
+                    // selection and caret so that it is clear the cell can still receive input.
+                    TextBoxBase textBoxEditingControl = EditingControl as TextBoxBase;
+                    if (textBoxEditingControl != null)
+                    {
+                        textBoxEditingControl.HideSelection = false;
+                        NativeMethods.ShowCaret(textBoxEditingControl);
+                    }
+                }
+                else
+                {
+                    base.OnValidating(e);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI28835", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DataGridView.CellPainting"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="DataGridViewCellPaintingEventArgs"/> that contains the
+        /// event data. </param>
+        protected override void OnCellPainting(DataGridViewCellPaintingEventArgs e)
+        {
+            try
+            {
+                bool paintWarningIcon = false;
+                IDataEntryTableCell dataEntryCell = null;
+
+                // If the error icon is set to be drawn
+                if (((e.PaintParts & DataGridViewPaintParts.ErrorIcon) != 0) &&
+                    !string.IsNullOrEmpty(e.ErrorText))
+                {
+                    dataEntryCell = Rows[e.RowIndex].Cells[e.ColumnIndex] as IDataEntryTableCell;
+
+                    // If the cell in question has a validation warning assosiated with it, paint
+                    // the warning icon instead of the error icon.
+                    if (dataEntryCell != null &&
+                        (AttributeStatusInfo.GetDataValidity(dataEntryCell.Attribute) ==
+                            DataValidity.ValidationWarning))
+                    {
+                        paintWarningIcon = true;
+                    }
+                }
+
+                if (paintWarningIcon)
+                {
+                    // Allow the base class to paint everything except the error icon.
+                    e.Paint(e.ClipBounds, e.PaintParts ^ DataGridViewPaintParts.ErrorIcon);
+
+                    // Calculate the position of the error icon to be drawn.
+                    Rectangle bounds = dataEntryCell.AsDataGridViewCell.ErrorIconBounds;
+                    bounds.Offset(e.CellBounds.Location);
+
+                    // The warning icon does not have a recognizable exclamation point if it is
+                    // not drawn somewhat bigger than ErrorIconBounds.
+                    bounds.Inflate(2, 2);
+
+                    // Set high-quality settings.
+                    GraphicsState origState = e.Graphics.Save();
+                    e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    e.Graphics.CompositingQuality = CompositingQuality.HighQuality;
+                    e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+                    e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                    e.Graphics.DrawIcon(SystemIcons.Warning, bounds);
+
+                    // Restore previous settings.
+                    e.Graphics.Restore(origState);
+
+                    // Indicate to base class that the painting has been taken care of.
+                    e.Handled = true;
+                }
+
+                base.OnCellPainting(e);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI28982", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
             }
         }
 
@@ -1260,7 +1377,7 @@ namespace Extract.DataEntry
         /// updated <see cref="IAttribute"/>(s) to registered listeners.
         /// </summary>
         /// <seealso cref="IDataEntryControl"/>
-        public event EventHandler<PropagateAttributesEventArgs> PropagateAttributes;
+        public event EventHandler<AttributesEventArgs> PropagateAttributes;
 
         /// <summary>
         /// Fired when the table has been manipulated in such a way that swiping should be
@@ -1292,6 +1409,24 @@ namespace Extract.DataEntry
         /// <see cref="DataEntryControlHost"/> such as re-drawing highlights can now proceed.
         /// </summary>
         public event EventHandler<EventArgs> UpdateEnded;
+
+        /// <summary>
+        /// Gets or sets the <see cref="DataEntryControlHost"/> to which this control belongs
+        /// </summary>
+        /// <value>The <see cref="DataEntryControlHost"/> to which this control belongs.</value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public DataEntryControlHost DataEntryControlHost
+        {
+            get
+            {
+                return _dataEntryControlHost;
+            }
+            set
+            {
+                _dataEntryControlHost = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="IDataEntryControl"/> which is mapped to the parent of the 
@@ -1344,6 +1479,27 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets whether the clipboard contents should be cleared after pasting into the
+        /// control.
+        /// </summary>
+        /// <value><see langword="true"/> if the clipboard should be cleared after pasting,
+        /// <see langword="false"/> otherwise.</value>
+        [Category("Data Entry Control")]
+        [DefaultValue(false)]
+        public bool ClearClipboardOnPaste
+        {
+            get
+            {
+                return _clearClipboardOnPaste;
+            }
+
+            set
+            {
+                _clearClipboardOnPaste = value;
+            }
+        }
+
+        /// <summary>
         /// Activates or inactivates the <see cref="DataEntryTable"/>.
         /// <para><b>Requirments:</b></para>
         /// This method must be called with setActive <see langword="true"/> before the user is
@@ -1359,6 +1515,12 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Ensure edit mode ends once this control is no longer active.
+                if (!setActive && EditingControl != null)
+                {
+                    EndEdit();
+                }
+
                 // The table should be displayed as active only if it is editable.
                 _isActive = setActive && !base.ReadOnly;
                 _color = color;
@@ -1420,8 +1582,12 @@ namespace Extract.DataEntry
         /// <see langword="false"/>, the previous selection will remain even if a different
         /// <see cref="IAttribute"/> was propagated.
         /// </param>
+        /// <param name="selectTabGroup">If <see langword="true"/> all <see cref="IAttribute"/>s in
+        /// the specified <see cref="IAttribute"/>'s tab group are to be selected,
+        /// <see langword="false"/> otherwise.</param>
         /// <seealso cref="IDataEntryControl"/>
-        public virtual void PropagateAttribute(IAttribute attribute, bool selectAttribute)
+        public virtual void PropagateAttribute(IAttribute attribute, bool selectAttribute,
+            bool selectTabGroup)
         {
             try
             {
@@ -1520,15 +1686,17 @@ namespace Extract.DataEntry
         /// <summary>
         /// Refreshes the specified <see cref="IAttribute"/>s' values to the table.
         /// </summary>
-        /// <param name="attributes">The <see cref="IAttribute"/>s whose values should be refreshed.
-        /// </param>
         /// <param name="spatialInfoUpdated"><see langword="true"/> if the attribute's spatial info
         /// has changed so that hints can be updated; <see langword="false"/> if the attribute's
         /// spatial info has not changed.</param>
-        public virtual void RefreshAttributes(IAttribute[] attributes, bool spatialInfoUpdated)
+        /// <param name="attributes">The <see cref="IAttribute"/>s whose values should be refreshed.
+        /// </param>
+        public virtual void RefreshAttributes(bool spatialInfoUpdated, params IAttribute[] attributes)
         {
             try
             {
+                bool refreshedAttribute = false;
+
                 foreach (IAttribute attribute in attributes)
                 {
                     object tableElement = null;
@@ -1545,12 +1713,14 @@ namespace Extract.DataEntry
                             {
                                 cell.DataGridView.RefreshEdit();
                             }
+
+                            refreshedAttribute = true;
                         }
                     }
                 }
 
                 // [DataEntry:547] Update hints if the spatial info has changed.
-                if (spatialInfoUpdated)
+                if (refreshedAttribute && spatialInfoUpdated)
                 {
                     this.UpdateHints(true);
                 }
@@ -1569,10 +1739,10 @@ namespace Extract.DataEntry
         /// as propagated.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">An <see cref="PropagateAttributesEventArgs"/> that contains the event data.
+        /// <param name="e">An <see cref="AttributesEventArgs"/> that contains the event data.
         /// </param>
         /// <seealso cref="IDataEntryControl"/>
-        public virtual void HandlePropagateAttributes(object sender, PropagateAttributesEventArgs e)
+        public virtual void HandlePropagateAttributes(object sender, AttributesEventArgs e)
         {
             try
             {
@@ -1742,13 +1912,16 @@ namespace Extract.DataEntry
         /// specified attributes' subattributes should be included as well.</param>
         /// <param name="displayTooltips"><see langword="true"/> if tooltips should be displayed
         /// for the <see paramref="attributes"/>.</param>
-        protected void OnAttributesSelected(IUnknownVector attributes, bool includeSubAttributes,
-            bool displayTooltips)
+        /// <param name="selectedGroupAttribute">The <see cref="IAttribute"/> representing a
+        /// currently selected row or group. <see langword="null"/> if no row or group is selected.
+        /// </param>
+        protected void OnAttributesSelected(IUnknownVector attributes,
+            bool includeSubAttributes, bool displayTooltips, IAttribute selectedGroupAttribute)
         {
             if (this.AttributesSelected != null)
             {
                 AttributesSelected(this, new AttributesSelectedEventArgs(attributes,
-                    includeSubAttributes, displayTooltips));
+                    includeSubAttributes, displayTooltips, selectedGroupAttribute));
             }
         }
 
@@ -1777,7 +1950,7 @@ namespace Extract.DataEntry
                 {
                     _currentlyPropagatedAttribute = attributeToPropagate;
 
-                    PropagateAttributes(this, new PropagateAttributesEventArgs(attributes));
+                    PropagateAttributes(this, new AttributesEventArgs(attributes));
                 }
             }
             else if (attributes != null)
@@ -2093,7 +2266,7 @@ namespace Extract.DataEntry
                 // refresh those attributes.
                 if (clearedAttributes.Count > 0)
                 {
-                    RefreshAttributes(clearedAttributes.ToArray(), true);
+                    RefreshAttributes(true, clearedAttributes.ToArray());
                 }
             }
             catch (Exception ex)
@@ -2255,7 +2428,7 @@ namespace Extract.DataEntry
 
                     if (textEditingControl.AutoCompleteMode != AutoCompleteMode.None &&
                         textEditingControl.SelectionStart == textEditingControl.Text.Length &&
-                        !NativeMethods.IsAutoCompleteDisplayed())
+                        !FormsMethods.IsAutoCompleteDisplayed())
                     {
                         // Ensure the arrow key changes cell selection in this circumstance by first
                         // ending edit mode...

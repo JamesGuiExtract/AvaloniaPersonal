@@ -34,6 +34,11 @@ namespace Extract.DataEntry
         readonly bool _displayToolTips;
 
         /// <summary>
+        /// The <see cref="IAttribute"/> representing a currently selected row or group.
+        /// </summary>
+        readonly IAttribute _selectedGroupAttribute;
+
+        /// <summary>
         /// Initializes a new <see cref="AttributesSelectedEventArgs"/> instance.
         /// </summary>
         /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s 
@@ -46,12 +51,16 @@ namespace Extract.DataEntry
         /// themselves.</param>
         /// <param name="displayToolTips"><see langword="true"/> if tooltips should be displayed
         /// for the <see paramref="attributes"/>.</param>
+        /// <param name="selectedGroupAttribute">The <see cref="IAttribute"/> representing a
+        /// currently selected row or group. <see langword="null"/> if no row or group is selected.
+        /// </param>
         public AttributesSelectedEventArgs(IUnknownVector attributes, bool includeSubAttributes,
-            bool displayToolTips)
+            bool displayToolTips, IAttribute selectedGroupAttribute)
         {
             _attributes = attributes;
             _includeSubAttributes = includeSubAttributes;
             _displayToolTips = displayToolTips;
+            _selectedGroupAttribute = selectedGroupAttribute;
         }
 
         /// <summary>
@@ -90,33 +99,45 @@ namespace Extract.DataEntry
                 return _displayToolTips;
             }
         }
+
+        /// <summary>
+        /// Gets the <see cref="IAttribute"/> representing a currently selected row or group.
+        /// <see langword="null"/> if no row or group is selected.
+        /// </summary>
+        /// <value>The <see cref="IAttribute"/> representing a currently selected row or group.
+        /// <see langword="null"/> if no row or group is selected.</value>
+        public IAttribute SelectedGroupAttribute
+        {
+            get
+            {
+                return _selectedGroupAttribute;
+            }
+        }
     }
 
     /// <summary>
     /// Provides the <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s 
-    /// associated with an <see cref="IDataEntryControl.PropagateAttributes"/> event.
+    /// associated with an event.
     /// </summary>
-    public class PropagateAttributesEventArgs : EventArgs
+    public class AttributesEventArgs : EventArgs
     {
         /// <summary>
-        /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated with the
-        /// <see cref="IDataEntryControl.PropagateAttributes"/> event.
+        /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated with the event.
         /// </summary>
         readonly IUnknownVector _attributes;
 
         /// <summary>
-        /// Initializes a new <see cref="PropagateAttributesEventArgs"/> instance.
+        /// Initializes a new <see cref="AttributesEventArgs"/> instance.
         /// </summary>
         /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s 
-        /// associated with the <see cref="IDataEntryControl.PropagateAttributes"/> event.</param>
-        public PropagateAttributesEventArgs(IUnknownVector attributes)
+        /// associated with the event.</param>
+        public AttributesEventArgs(IUnknownVector attributes)
         {
             _attributes = attributes;
         }
 
         /// <summary>
-        /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated with the
-        /// <see cref="IDataEntryControl.PropagateAttributes"/> event.
+        /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated with the event.
         /// </summary>
         public IUnknownVector Attributes
         {
@@ -528,21 +549,20 @@ namespace Extract.DataEntry
         /// <summary>
         /// Specifies whether the <see cref="IAttribute"/>'s data is now valid or invalid.
         /// </summary>
-        readonly bool _dataIsValid;
+        readonly DataValidity _dataValidity;
 
         /// <summary>
         /// Initializes a new <see cref="ValidationStateChangedEventArgs"/> instance.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> for which the data validity has 
         /// changed.</param>
-        /// <param name="dataIsValid"><see langword="true"/> if the <see cref="IAttribute"/>'s data
-        /// has been marked as valid or <see langword="false"/> if the <see cref="IAttribute"/>'s 
-        /// data has been marked as invalid.</param>
-        public ValidationStateChangedEventArgs(IAttribute attribute, bool dataIsValid)
+        /// <param name="dataValidity">An <see cref="DataValidity"/>value indicating whether
+        /// <see paramref="attribute"/>'s value is now valid.</param>
+        public ValidationStateChangedEventArgs(IAttribute attribute, DataValidity dataValidity)
             : base()
         {
             _attribute = attribute;
-            _dataIsValid = dataIsValid;
+            _dataValidity = dataValidity;
         }
 
         /// <summary>
@@ -558,18 +578,16 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Gets whether the <see cref="IAttribute"/>'s data is now valid or invalid.
+        /// Gets whether the <see cref="IAttribute"/>'s data is now valid.
         /// </summary>
         /// <returns>
-        /// <see langword="true"/> if the <see cref="IAttribute"/>'s data has been marked
-        /// as valid or <see langword="false"/> if the <see cref="IAttribute"/>'s data has been
-        /// marked as invalid.
+        /// A <see cref="DataValidity"/> value indicating whether the data is now valid.
         /// </returns>
-        public bool IsDataValid
+        public DataValidity DataValidity
         {
             get
             {
-                return _dataIsValid;
+                return _dataValidity;
             }
         }
     }

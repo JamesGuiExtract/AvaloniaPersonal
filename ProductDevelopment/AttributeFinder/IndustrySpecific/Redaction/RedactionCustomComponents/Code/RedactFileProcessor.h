@@ -98,7 +98,7 @@ public:
 	STDMETHOD(put_FontSize)(long lFontSize);
 
 // IFileProcessingTask
-	STDMETHOD(raw_Init)();
+	STDMETHOD(raw_Init)(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB *pDB);
 	STDMETHOD(raw_ProcessFile)(BSTR bstrFileFullName, long nFileID, long nActionID,
 		IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 		VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult);

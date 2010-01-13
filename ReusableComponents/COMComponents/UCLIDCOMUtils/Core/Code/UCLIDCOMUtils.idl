@@ -146,6 +146,7 @@ library UCLID_COMUTILSLib
 			[in] long nStartIndex, [out, retval] long *plIndex);
 		[id(15), helpstring("method InsertVector")] HRESULT InsertVector([in] long lPos, 
 			[in] IIUnknownVector *pObj);
+		// Removes elements from nStart up to and including nEnd
 		[id(16), helpstring("method RemoveRange")] HRESULT RemoveRange([in] long nStart, 
 			[in] long nEnd);
 		[id(17), helpstring("method LoadFrom")] HRESULT LoadFrom([in] BSTR strFullFileName, 

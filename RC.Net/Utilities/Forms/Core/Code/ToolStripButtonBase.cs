@@ -51,6 +51,9 @@ namespace Extract.Utilities.Forms
 
             // Load and set the image for this compononent from the embedded resource
             base.Image = new Bitmap(resourceType, resourceName);
+
+            // Set the display style to image
+            base.DisplayStyle = ToolStripItemDisplayStyle.Image;
         }
 
         #endregion Constructors

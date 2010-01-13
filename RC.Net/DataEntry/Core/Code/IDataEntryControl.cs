@@ -36,7 +36,7 @@ namespace Extract.DataEntry
         /// the result of a new selection in a multi-attribute control. The event will provide the 
         /// updated <see cref="IAttribute"/>(s) to registered listeners.
         /// </summary>
-        event EventHandler<PropagateAttributesEventArgs> PropagateAttributes;
+        event EventHandler<AttributesEventArgs> PropagateAttributes;
 
         /// <summary>
         /// Fired when a <see cref="IDataEntryControl"/> has been manipulated in such a way that 
@@ -72,6 +72,16 @@ namespace Extract.DataEntry
         #region Properties
 
         /// <summary>
+        /// Gets or sets the <see cref="DataEntryControlHost"/> to which this control belongs
+        /// </summary>
+        /// <value>The <see cref="DataEntryControlHost"/> to which this control belongs.</value>
+        DataEntryControlHost DataEntryControlHost
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// If the <see cref="IDataEntryControl"/> is not intended to operate on root-level data, 
         /// this property must be used to specify the <see cref="IDataEntryControl"/> which is 
         /// mapped to the parent of the <see cref="IAttribute"/>(s) to which the current 
@@ -104,6 +114,18 @@ namespace Extract.DataEntry
         /// Disabled controls will not perform validation on mapped data.
         /// </summary>
         bool Disabled
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets whether the clipboard contents should be cleared after pasting into the
+        /// control.
+        /// </summary>
+        /// <value><see langword="true"/> if the clipboard should be cleared after pasting,
+        /// <see langword="false"/> otherwise.</value>
+        bool ClearClipboardOnPaste
         {
             get;
             set;
@@ -154,7 +176,10 @@ namespace Extract.DataEntry
         /// If <see langword="false"/>, the previous selection will remain even if a different
         /// <see cref="IAttribute"/> was propagated.
         /// </param>
-        void PropagateAttribute(IAttribute attribute, bool selectAttribute);
+        /// <param name="selectTabGroup">If <see langword="true"/> all <see cref="IAttribute"/>s in
+        /// the specified <see cref="IAttribute"/>'s tab group are to be selected,
+        /// <see langword="false"/> otherwise.</param>
+        void PropagateAttribute(IAttribute attribute, bool selectAttribute, bool selectTabGroup);
 
         /// <summary>
         /// Requests that the <see cref="IDataEntryControl"/> process the supplied 
@@ -170,12 +195,12 @@ namespace Extract.DataEntry
         /// Requests that the <see cref="IDataEntryControl"/> refresh the specified
         /// <see cref="IAttribute"/>s' values to the screen.
         /// </summary>
-        /// <param name="attributes">The <see cref="IAttribute"/>s whose values should be refreshed
-        /// in the UI.</param>
         /// <param name="spatialInfoUpdated"><see langword="true"/> if the attributes spatial info
         /// has changed so that hints can be updated; <see langword="false"/> if the attributes'
         /// spatial info has not changed.</param>
-        void RefreshAttributes(IAttribute[] attributes, bool spatialInfoUpdated);
+        /// <param name="attributes">The <see cref="IAttribute"/>s whose values should be refreshed
+        /// in the UI.</param>
+        void RefreshAttributes(bool spatialInfoUpdated, params IAttribute[] attributes);
 
         /// <summary>
         /// Any data that was cached should be cleared;  This is called when a document is unloaded.
@@ -202,9 +227,9 @@ namespace Extract.DataEntry
         /// from raising events dealing with specific <see cref="IAttribute"/>s.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">An <see cref="PropagateAttributesEventArgs"/> that contains the event data.
+        /// <param name="e">An <see cref="AttributesEventArgs"/> that contains the event data.
         /// </param>
-        void HandlePropagateAttributes(object sender, PropagateAttributesEventArgs e);
+        void HandlePropagateAttributes(object sender, AttributesEventArgs e);
 
         #endregion EventHandlers
     }

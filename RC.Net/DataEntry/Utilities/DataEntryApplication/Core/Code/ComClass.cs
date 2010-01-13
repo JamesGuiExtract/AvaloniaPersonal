@@ -1,5 +1,6 @@
 using Extract;
 using Extract.DataEntry;
+using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities.Forms;
@@ -44,16 +45,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The default filename that will appear in the FAM to describe the task the data entry
         /// application is fulfilling
         /// </summary>
-        static readonly string _DEFAULT_FILE_ACTION_TASK_NAME = "Verify extracted data";
+        static readonly string _DEFAULT_FILE_ACTION_TASK_NAME = "Data Entry: Verify extracted data";
 
         /// <summary>
         /// The current version of this object.
         /// <para><b>Versions:</b></para>
         /// <list type="bullet">
         /// <item>2: Added _configFileName</item>
+        /// <item>3: Added _inputEventTrackingEnabled</item>
+        /// <item>4: Added _countersEnabled</item>
         /// </list>
         /// </summary>
-        static readonly int _CURRENT_VERSION = 2;
+        static readonly int _CURRENT_VERSION = 4;
 
         #endregion Constants
 
@@ -78,13 +81,21 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The name of the DataEntry configuration file to use for the DataEntryApplicationForm.
         /// </summary>
         string _configFileName;
+        
+        /// <summary>
+        /// Specifies whether input event tracking should be logged in the database.
+        /// </summary>
+        bool _inputEventTrackingEnabled;
 
         /// <summary>
-        /// License cache for validating the license.
+        /// Specifies whether counts will be recorded for the defined data entry counters.
         /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents,
-            _DEFAULT_FILE_ACTION_TASK_NAME);
+        bool _countersEnabled;
+
+        /// <summary>
+        /// The name of the action currently being processd.
+        /// </summary>
+        string _actionName;
 
         // Object for mutexing data entry form manager creation
         static object _lock = new object();
@@ -133,6 +144,58 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
         }
 
+        /// <summary>
+        /// Gets or sets whether input event tracking should be logged in the database.
+        /// <para><b>Note</b></para>
+        /// Input tracking will only be recorded if this option is <see langword="true"/> and
+        /// the "EnableInputEventTracking" option is set in the database.
+        /// </summary>
+        /// <value><see langword="true"/> to record data from user input, <see langword="false"/>
+        /// otherwise.</value>
+        public bool InputEventTrackingEnabled
+        {
+            get
+            {
+                return _inputEventTrackingEnabled;
+            }
+
+            set
+            {
+                if (_inputEventTrackingEnabled != value)
+                {
+                    _inputEventTrackingEnabled = value;
+
+                    _dirty = HResult.Ok;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether counts will be recorded for the defined data entry counters.
+        /// <para><b>Note</b></para>
+        /// Counter values will only be recorded if this option is <see langword="true"/> and
+        /// the "EnableDataEntryCounters" option is set in the database.
+        /// </summary>
+        /// <value><see langword="true"/> to record counts for the defined counters,
+        /// <see langword="false"/> otherwise.</value>
+        public bool CountersEnabled
+        {
+            get
+            {
+                return _countersEnabled;
+            }
+
+            set
+            {
+                if (_countersEnabled != value)
+                {
+                    _countersEnabled = value;
+
+                    _dirty = HResult.Ok;
+                }
+            }
+        }
+
         #endregion Properties
 
         #region IPersistStreamMembers
@@ -175,6 +238,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         _configFileName = reader.ReadString();
                     }
+
+                    if (reader.Version >= 3)
+                    {
+                        _inputEventTrackingEnabled = reader.ReadBoolean();
+                    }
+
+                    if (reader.Version >= 4)
+                    {
+                        _countersEnabled = reader.ReadBoolean();
+                    }
                 }
 
                 _dirty = HResult.False;
@@ -211,6 +284,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     // Save the settings
                     writer.Write(_configFileName);
+                    writer.Write(_inputEventTrackingEnabled);
+                    writer.Write(_countersEnabled);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -292,13 +367,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Initializes the <see cref="DataEntryApplicationForm"/> to receive documents for
         /// processing.
         /// </summary>
-        public void Init()
+        /// <param name="nActionID">The ID of the action being processed.</param>
+        /// <param name="pFAMTM">The <see cref="FAMTagManager"/> to use if needed.</param>
+        /// <param name="pDB">The <see cref="FileProcessingDB"/> in use.</param>
+        public void Init(int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB)
         {
             try
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
                     "ELI26896", _DEFAULT_FILE_ACTION_TASK_NAME);
+
+                _actionName = pDB.GetActionName(nActionID);
 
                 // Ask the manager to create and display the data entry form.
                 _dataEntryFormManager.ShowForm(CreateDataEntryForm);
@@ -339,7 +419,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26897");
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
+                    "ELI26897", _DEFAULT_FILE_ACTION_TASK_NAME);
 
                 EFileProcessingResult processingResult;
 
@@ -376,7 +457,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26898");
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
+                    "ELI26898", _DEFAULT_FILE_ACTION_TASK_NAME);
 
                 _dataEntryFormManager.Cancel();
             }
@@ -395,7 +477,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26899");
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
+                    "ELI26899", _DEFAULT_FILE_ACTION_TASK_NAME);
 
                 _dataEntryFormManager.CloseForm();
             }
@@ -447,6 +530,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // Copy properties here
                 _configFileName = copyThis._configFileName;
+                _inputEventTrackingEnabled = copyThis._inputEventTrackingEnabled;
+                _countersEnabled = copyThis._countersEnabled;
             }
             catch (Exception ex)
             {
@@ -469,7 +554,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI26900");
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
+                    "ELI26900", _DEFAULT_FILE_ACTION_TASK_NAME);
 
                 // Create a new configuration form to display the configurable settings to the user.
                 ConfigurationForm configForm = new ConfigurationForm(this);
@@ -587,7 +673,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <returns>A <see cref="DataEntryApplicationForm"/> using the current settings.</returns>
         IVerificationForm CreateDataEntryForm()
         {
-            return new DataEntryApplicationForm(_configFileName, false);
+            return new DataEntryApplicationForm(_configFileName, false, _actionName,
+                _inputEventTrackingEnabled, _countersEnabled);
         }
 
         /// <summary>

@@ -85,6 +85,10 @@
       <Project>{25920A74-6A5D-4054-BEA5-F4ADE228D864}</Project>
       <Name>DataEntryApplication</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
+      <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
+      <Name>Extract.FileActionManager.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj">
       <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
       <Name>Extract.Imaging</Name>

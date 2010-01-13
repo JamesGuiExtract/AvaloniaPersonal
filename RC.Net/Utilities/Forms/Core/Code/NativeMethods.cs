@@ -148,6 +148,30 @@ namespace Extract.Utilities.Forms
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool PostMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
 
+        /// <summary>
+        /// Retrieves a handle to the top-level window whose class name match the specified string.
+        /// This function does not search child windows. This function does not perform a
+        /// case-sensitive search. This function is to be used to search for windows by class only.
+        /// </summary>
+        /// <param name="lpClassName">Pointer to a null-terminated string that specifies the class
+        /// name.</param>
+        /// <param name="zeroOnly">Must be <see cref="IntPtr.Zero"/>.</param>
+        /// <returns></returns>
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        static extern IntPtr FindWindow(string lpClassName, IntPtr zeroOnly);
+
+        /// <summary>
+        /// Retrieves information about the specified window.
+        /// </summary>
+        /// <param name="hWnd">Handle to the window and, indirectly, the class to which the window
+        /// belongs.</param>
+        /// <param name="nIndex">Specifies the zero-based offset to the value to be retrieved.
+        /// </param>
+        /// <returns>If the function succeeds, the return value is the requested 32-bit value. If
+        /// the function fails, the return value is zero.</returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+
         #endregion P/Invokes
 
         #region Constants
@@ -162,6 +186,12 @@ namespace Extract.Utilities.Forms
         const int _WM_SETREDRAW = 0x000B;
 
         const uint _MAPVK_VK_TO_CHAR = 0x02;
+
+        const int GWL_STYLE = -16;
+        const int GWL_EXSTYLE = -20;
+
+        const uint WS_VISIBLE = 0x10000000;
+        const uint WS_EX_TOPMOST = 0x0008;
 
         #endregion Constants
 
@@ -369,7 +399,50 @@ namespace Extract.Utilities.Forms
             {
                 throw ExtractException.AsExtractException("ELI28891", ex);
             }
-        }  
+        }
+
+        /// <summary>
+        /// Checks whether a .Net auto-complete list is displayed.
+        /// </summary>
+        /// <returns><see langword="true"/> if an auto-complete list is displayed;
+        /// <see langword="false"/> otherwise.</returns>
+        public static bool IsAutoCompleteDisplayed()
+        {
+            try
+            {
+                // Look for a top-level Auto-Suggest window
+                IntPtr handle = FindWindow("Auto-Suggest Dropdown", IntPtr.Zero);
+                if (handle != IntPtr.Zero)
+                {
+                    // If such a window is found and it is both visible and top-most, it is
+                    // displayed.
+                    uint style = GetWindowLong(handle, GWL_STYLE);
+                    int lastError = Marshal.GetLastWin32Error();
+                    if (style == 0 && lastError != 0)
+                    {
+                        throw new Win32Exception(lastError);
+                    }
+
+                    uint extendedStyle = GetWindowLong(handle, GWL_EXSTYLE);
+                    lastError = Marshal.GetLastWin32Error();
+                    if (extendedStyle == 0 && lastError != 0)
+                    {
+                        throw new Win32Exception(lastError);
+                    }
+
+                    if ((style & WS_VISIBLE) != 0 && (extendedStyle & WS_EX_TOPMOST) != 0)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27647", ex);
+            }
+        }
 
         #endregion Methods
     }

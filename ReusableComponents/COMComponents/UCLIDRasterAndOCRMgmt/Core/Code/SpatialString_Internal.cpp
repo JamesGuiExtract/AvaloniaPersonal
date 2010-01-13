@@ -1810,11 +1810,14 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
 					// borders are all the same.
 					if (rectCurrentLineZone != grectNULL)
 					{
+						int top = min(rectCurrentZone.top, rectCurrentLineZone.top);
+						int bottom = max(rectCurrentZone.bottom, rectCurrentLineZone.bottom);
+
 						for (vector<CRect>::iterator iter = vecCurrentLineZones.begin();
 							iter != vecCurrentLineZones.end(); iter++)
 						{
-							iter->top = rectCurrentLineZone.top;
-							iter->bottom = rectCurrentLineZone.bottom;
+							iter->top = top;
+							iter->bottom = bottom;
 						}
 
 						rectCurrentLineZone = grectNULL;

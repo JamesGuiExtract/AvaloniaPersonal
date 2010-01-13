@@ -49,8 +49,8 @@ void CFileProcessingTaskExecutor::FinalRelease()
 //--------------------------------------------------------------------------------------------------
 // IFileProcessingTaskExecutor
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingTaskExecutor::Init(IIUnknownVector *pFileProcessingTasks, IFileProcessingDB *pDB, 
-	IFAMTagManager *pFAMTagManager)
+STDMETHODIMP CFileProcessingTaskExecutor::Init(IIUnknownVector *pFileProcessingTasks, long nActionID,
+	IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -71,7 +71,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::Init(IIUnknownVector *pFileProcessingT
 		ASSERT_ARGUMENT("ELI26782", ipFAMTagManager != NULL);
 
 		// Call the init method
-		init(ipFileProcessingTasks, ipDB, ipFAMTagManager);
+		init(ipFileProcessingTasks, nActionID, ipDB, ipFAMTagManager);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17844");
 
@@ -140,7 +140,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(BSTR bstrSourceDocNam
 		IProgressStatusPtr ipProgressStatus(pProgressStatus);
 
 		// Initialize the processing tasks
-		init(ipFileProcessingTasks, ipDB, ipFAMTagManager);
+		init(ipFileProcessingTasks, nActionID, ipDB, ipFAMTagManager);
 		
 		// Process the tasks
 		try
@@ -460,6 +460,7 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingTaskExecutor::init(const IIUnknownVectorPtr& ipFileProcessingTasks,
+									   long actionID,
 									   const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipDB,
 									   const UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr& ipFAMTagManager)
 {
@@ -501,7 +502,7 @@ void CFileProcessingTaskExecutor::init(const IIUnknownVectorPtr& ipFileProcessin
 			// Only initialize the processing task if it is enabled
 			if (task.Enabled)
 			{
-				ipFileProc->Init();
+				ipFileProc->Init(actionID, ipFAMTagManager, ipDB);
 			}
 
 			// Add the task to the vector

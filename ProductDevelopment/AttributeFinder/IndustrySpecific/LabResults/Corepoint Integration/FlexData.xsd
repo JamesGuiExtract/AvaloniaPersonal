@@ -356,6 +356,13 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                    <xs:element name="OriginalName">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="FullText" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>

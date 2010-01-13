@@ -94,7 +94,8 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //--------------------------------------------------------------------------------------------------
 // IFileProcessingTask
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CCleanupImageFileProcessor::raw_Init()
+STDMETHODIMP CCleanupImageFileProcessor::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
+	IFileProcessingDB *pDB)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 

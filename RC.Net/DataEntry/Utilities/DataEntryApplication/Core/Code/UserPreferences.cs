@@ -42,12 +42,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         UserPreferencesPropertyPage _propertyPage;
 
-        /// <summary>
-        /// License cache for validating the license.
-        /// </summary>
-        static LicenseStateCache _licenseCache =
-            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
-
         #endregion Fields
 
         #region Constructors
@@ -60,7 +54,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                _licenseCache.Validate("ELI27010");
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI27010", _OBJECT_NAME);
             }
             catch (Exception ex)
             {
