@@ -3842,9 +3842,6 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
 			adLockReadOnly, adCmdText);
 
-		// Setup the counter for the number of records
-		long nNumRecords = 0;
-
 		// Build a list of file ID's to set
 		stack<string> stackIDs;
 		while (ipFileSet->adoEOF == VARIANT_FALSE)
@@ -3857,6 +3854,9 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 
 			ipFileSet->MoveNext();
 		}
+
+		// Store the count of records that will be modified
+		long nNumRecords = stackIDs.size();
 
 		// Loop through the IDs setting the file priority
 		string strPriority = asString(eNewPriority == kPriorityDefault ?
@@ -3875,7 +3875,7 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 			strUpdateQuery += ")";
 
 			// Execute the update query
-			nNumRecords += executeCmdQuery(ipConnection, strUpdateQuery);
+			executeCmdQuery(ipConnection, strUpdateQuery);
 		}
 
 
