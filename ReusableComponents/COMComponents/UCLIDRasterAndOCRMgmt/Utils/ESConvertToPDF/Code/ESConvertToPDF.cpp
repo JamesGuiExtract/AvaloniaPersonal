@@ -13,6 +13,8 @@
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 #include <RecAPIPlus.h>
+#include <StringCSIS.h>
+#include <cppUtil.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -103,9 +105,14 @@ BOOL CESConvertToPDFApp::InitInstance()
 			convertToSearchablePDF();
 
 			// remove the original file if that option was specified
-			if(m_bRemoveOriginal && m_strInputFile != m_strOutputFile)
+			if(m_bRemoveOriginal)
 			{
-				deleteFile(m_strInputFile);
+				// Do not remove the original if the input and output files are the same
+				// [LRCAU #5595]
+				if (!stringCSIS::sEqual(getUNCPath(m_strInputFile), getUNCPath(m_strOutputFile)))
+				{
+					deleteFile(m_strInputFile);
+				}
 			}
 
 			// completed successfully
