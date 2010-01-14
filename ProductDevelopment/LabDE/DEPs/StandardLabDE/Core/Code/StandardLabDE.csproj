@@ -5,8 +5,8 @@
     <ProjectGuid>{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
-    <AssemblyName>Extract.LabDE.StandardLabDE</AssemblyName>
-    <RootNamespace>Extract.LabDE.StandardLabDE</RootNamespace>
+    <AssemblyName>Extract.DataEntry.DEP.StandardLabDE</AssemblyName>
+    <RootNamespace>Extract.DataEntry.DEP.StandardLabDE</RootNamespace>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
@@ -77,6 +77,10 @@
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
       <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
       <Name>Extract.Imaging.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj">
+      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
+      <Name>Extract.Interop</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>

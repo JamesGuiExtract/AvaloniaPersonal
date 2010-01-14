@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace Extract.DataEntry.DEPs.DemoFlexIndex
+namespace Extract.DataEntry.DEP.DemoFlexIndex
 {
     /// <summary>
     /// A sample <see cref="DataEntryControlHost"/> intended to demonstrate data entry functionality

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Extract.LabDE.StandardLabDE.Test
+namespace Extract.DataEntry.DEP.StandardLabDE.Test
 {
     public partial class TestStandardLabDE
     {

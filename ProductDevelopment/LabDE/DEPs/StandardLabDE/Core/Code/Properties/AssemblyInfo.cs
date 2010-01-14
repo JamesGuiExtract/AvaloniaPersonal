@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Extract.LabDE.StandardLabDE")]
+[assembly: AssemblyTitle("Extract.DataEntry.DEP.StandardLabDE")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract System, LLC")]
-[assembly: AssemblyProduct("Extract.LabDE.StandardLabDE.Properties")]
+[assembly: AssemblyProduct("Extract.DataEntry.DEP.StandardLabDE.Properties")]
 [assembly: AssemblyCopyright("Copyright © Extract System, LLC 2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -37,5 +37,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
-// Mark as not CLS compliant (since this assembly will be unusable without CLS-imcompliant controls.)
+// Mark as not CLS compliant (since this assembly will be unusable without CLS-noncompliant controls.)
 [assembly: CLSCompliant(false)]

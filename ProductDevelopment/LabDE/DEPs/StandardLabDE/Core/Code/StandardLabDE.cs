@@ -8,7 +8,7 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Extract.LabDE.StandardLabDE
+namespace Extract.DataEntry.DEP.StandardLabDE
 {
     /// <summary>
     /// A sample <see cref="DataEntryControlHost"/> intended to demonstrate functionality.

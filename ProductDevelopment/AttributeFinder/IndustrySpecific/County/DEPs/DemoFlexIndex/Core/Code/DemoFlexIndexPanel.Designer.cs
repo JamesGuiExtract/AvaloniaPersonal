@@ -1,4 +1,4 @@
-namespace Extract.DataEntry.DEPs.DemoFlexIndex
+namespace Extract.DataEntry.DEP.DemoFlexIndex
 {
     partial class DemoFlexIndexPanel
     {

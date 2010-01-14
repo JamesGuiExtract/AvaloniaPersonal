@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Extract.LabDE.StandardLabDE.Test
+namespace Extract.DataEntry.DEP.StandardLabDE.Test
 {
     /// <summary>
     /// Class for testing the StandardLabDE data entry panel
