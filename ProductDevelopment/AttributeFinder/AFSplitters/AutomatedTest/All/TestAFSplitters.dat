@@ -6,7 +6,7 @@
 
 // Test Date/Time Splitter
 <FILE>;..\DateTimeSplitter\DateTimeSplitter.dat
-<FILE>;..\LegalDescriptionSplitter\LegalDescriptionSplitter.dat
+//<FILE>;..\LegalDescriptionSplitter\LegalDescriptionSplitter.dat
 <FILE>;..\RSDFileSplitter\RSDFileSplitter.dat
 <FILE>;..\StringTokenizerSplitter\StringTokenizerSplitter.dat
 
