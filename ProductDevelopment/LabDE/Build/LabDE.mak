@@ -95,7 +95,6 @@ ObfuscateFiles: BuildLabDEApplication
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.DataEntry.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.DataEntry.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Imaging.Forms.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Imaging.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\DataEntryApplication.exe" /mapout:"$(BinariesFolder)\Map\mapDataEntryApplication.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
-	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.LabDE.StandardLabDE.dll" /mapout:"$(BinariesFolder)\Map\mapEExtract.LabDE.StandardLabDE.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.LabResultsCustomComponents.dll" /mapout:"$(BinariesFolder)\Map\mapEExtract.LabResultsCustomComponents.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\SqlCompactImporter.exe" /mapout:"$(BinariesFolder)\Map\mapSqlCompactImporter.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\SqlCompactExporter.exe" /mapout:"$(BinariesFolder)\Map\SqlCompactExporter.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
@@ -105,24 +104,29 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\DotNet" @MKDIR "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\Misc" @MKDIR "$(DataEntryCoreInstallFilesDir)\DotNet\Misc" 
 	@IF NOT EXIST "$(InternalUseBuildFilesArchive)" @MKDIR "$(InternalUseBuildFilesArchive)" 
+	@IF NOT EXIST "$(LabDEInstallFiles)\Reports" @MKDIR "$(LabDEInstallFiles)\Reports"
 	
 	@DeleteFiles  "$(DataEntryCoreInstallFilesDir)\DotNet\*.*" /S
+	@DeleteFiles "$(LabDEInstallFiles)\Reports\*.*" /S
 	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Dotnet\leadtools*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet"
 	@COPY /v "$(BinariesFolder)\Obfuscated\*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /v "$(BinariesFolder)\Extract.LabDE.StandardLabDE.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /v "$(BinariesFolder)\DataEntryCC.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Obfuscated\DataEntryApplication.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Interop.*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Obfuscated\SqlCompactImporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Obfuscated\SqlCompactExporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
-
+	@COPY /v "$(LabDEDir)\Reports\*.*" "$(LabDEInstallFiles)\Reports"
 # Copy pdb and map files to archive
 	@COPY  "$(BinariesFolder)\*.pdb" "$(InternalUseBuildFilesArchive)" 
 	@COPY  "$(BinariesFolder)\Obfuscated\*.pdb" "$(InternalUseBuildFilesArchive)" 
 	@COPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)" 
 # Make .nl files to register the COM .NET files
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.DataEntry.dll" /b
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\DataEntryApplication.exe" /b
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\DataEntry.nl"
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.DataEntry.dll" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\DataEntry.nl"
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\DataEntryApplication.exe" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\DataEntry.nl"
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\DataEntryCC.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\DataEntry.rl"
 
 BuildDataEntryMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder BuildLabDEApplication
     @ECHO Building Extract Systems DataEntry Merge Module...
@@ -179,7 +183,6 @@ CreateDemo_LabDE:
 	@XCOPY "$(LabResultsDir)\Utils\LabDEDemo\Files\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE" /v /s /e /y
 	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\DemoFiles\Installs\LongDemo\TIF" /v /s /e /y
 	@XCOPY "$(RulesDir)\LabDE\Demo_LabDE\Solution\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution" /v /s /e /y	
-	@COPY /v "$(LabResultsDir)\Corepoint Integration\*.nix" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Corepoint Integration"
 	@ECHO Encrypting LabDE Demo Rules...
 	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"

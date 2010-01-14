@@ -315,6 +315,7 @@
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>AllOtherFiles</td><td>{BF13F1DD-ACE5-414A-97D2-8A7CEE2DAC71}</td><td>COMMON_COMPONENTS</td><td>8</td><td>VersionNT&gt;=600</td><td>disabledthemes.sdb</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td>labde.chm</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Reports</td><td>{54169BEE-5EA8-44BD-A6E1-2AC7380B9DDA}</td><td>STANDARD_REPORTS</td><td>8</td><td/><td>labde_high_effort_files_by_u1</td><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -420,6 +421,7 @@
 		<row><td>CommonFilesFolder</td><td>TARGETDIR</td><td>.:Common</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
+		<row><td>FILEPROCESSINGCOMPONENTS</td><td>COMMON_COMPONENTS</td><td>FILEPR~1|FileProcessingComponents</td><td/><td>0</td><td/></row>
 		<row><td>FavoritesFolder</td><td>TARGETDIR</td><td>.:FAVORI~1|Favorites</td><td/><td>0</td><td/></row>
 		<row><td>FontsFolder</td><td>TARGETDIR</td><td>.:Fonts</td><td/><td>0</td><td/></row>
 		<row><td>GlobalAssemblyCache</td><td>TARGETDIR</td><td>.:Global~1|GlobalAssemblyCache</td><td/><td>0</td><td/></row>
@@ -435,6 +437,8 @@
 		<row><td>ProgramFiles64Folder</td><td>TARGETDIR</td><td>.:Prog64~1|Program Files 64</td><td/><td>0</td><td/></row>
 		<row><td>ProgramFilesFolder</td><td>TARGETDIR</td><td>.:PROGRA~1|program files</td><td/><td>0</td><td/></row>
 		<row><td>ProgramMenuFolder</td><td>TARGETDIR</td><td>.:Programs</td><td/><td>3</td><td/></row>
+		<row><td>REPORTS</td><td>FILEPROCESSINGCOMPONENTS</td><td>Reports</td><td/><td>0</td><td/></row>
+		<row><td>STANDARD_REPORTS</td><td>REPORTS</td><td>STANDA~1|Standard reports</td><td/><td>0</td><td/></row>
 		<row><td>SendToFolder</td><td>TARGETDIR</td><td>.:SendTo</td><td/><td>3</td><td/></row>
 		<row><td>StartMenuFolder</td><td>TARGETDIR</td><td>.:STARTM~1|Start Menu</td><td/><td>3</td><td/></row>
 		<row><td>StartupFolder</td><td>TARGETDIR</td><td>.:StartUp</td><td/><td>3</td><td/></row>
@@ -1126,6 +1130,7 @@
 		<col key="yes" def="s72">Component_</col>
 		<row><td>DefaultFeature</td><td>AllOtherFiles</td></row>
 		<row><td>DefaultFeature</td><td>Help</td></row>
+		<row><td>DefaultFeature</td><td>Reports</td></row>
 	</table>
 
 	<table name="File">
@@ -1142,6 +1147,11 @@
 		<col def="S72">ISComponentSubFolder_</col>
 		<row><td>disabledthemes.sdb</td><td>AllOtherFiles</td><td>DISABL~1.SDB|DisabledThemes.sdb</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DATAENTRY_MISC&gt;\DisabledThemes.sdb</td><td>1</td><td/></row>
 		<row><td>labde.chm</td><td>Help</td><td>LabDE.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDE_HELP_FILES&gt;\LabDE.chm</td><td>1</td><td/></row>
+		<row><td>labde_data_entry_rates_by_us</td><td>Reports</td><td>LABDED~1.JPG|LabDE data entry rates by user.jpg</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE data entry rates by user.jpg</td><td>1</td><td/></row>
+		<row><td>labde_data_entry_rates_by_us1</td><td>Reports</td><td>LABDED~1.RPT|LabDE data entry rates by user.rpt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE data entry rates by user.rpt</td><td>1</td><td/></row>
+		<row><td>labde_data_entry_rates_by_us2</td><td>Reports</td><td>LABDED~1.XML|LabDE data entry rates by user.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE data entry rates by user.xml</td><td>1</td><td/></row>
+		<row><td>labde_high_effort_files_by_u</td><td>Reports</td><td>LABDEH~1.RPT|LabDE high effort files by user.rpt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE high effort files by user.rpt</td><td>1</td><td/></row>
+		<row><td>labde_high_effort_files_by_u1</td><td>Reports</td><td>LABDEH~1.XML|LabDE high effort files by user.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE high effort files by user.xml</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -1392,6 +1402,7 @@
 		<col def="S0">Miscellaneous</col>
 		<row><td>AllOtherFiles</td><td/><td/><td>_2609E52D_0837_45AF_AB4E_609D37B72624_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Help</td><td/><td/><td>_10883AA1_60F1_460D_A0E0_D91F6169AF21_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Reports</td><td/><td/><td>_D2822A61_C91B_40B5_9F32_E99BF4A6A776_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -1705,6 +1716,7 @@
 		<row><td>PATH_TO_INLITE_INSTALL</td><td>P:\AttributeFinder\InliteInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITE_KEY_INSTALL</td><td>P:\AttributeFinder\RequiredInstalls\InliteKeyInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_LABDE_HELP_FILES</td><td>P:\DataEntry\LabDE\Files\Help</td><td/><td>2</td></row>
+		<row><td>PATH_TO_REPORTS_FILES</td><td>P:\DataEntry\LabDE\Files\Reports</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL_CE_EDITOR_INSTALL</td><td>P:\DataEntry\RequiredInstalls\SQL Compact Edition Editor</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL_COMPACT_EDITION</td><td>P:\DataEntry\RequiredInstalls\SQLCompact Edition</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL_INSTALLS</td><td>P:\AttributeFinder\RequiredInstalls\SQLServerExpress2008</td><td/><td>2</td></row>
