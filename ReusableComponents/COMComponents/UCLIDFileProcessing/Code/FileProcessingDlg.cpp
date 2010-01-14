@@ -2519,17 +2519,23 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 			// Loop with call to check the stats - while the stop event is not signaled
 			do
 			{
-				// Get the stats from the db in a temp object so that the UI will not be blocked
-				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = 
-					ipFPMDB->GetStats( nActionID );
-				ASSERT_RESOURCE_ALLOCATION("ELI20383", ipNewActionStats != NULL);
-			
-				_lastCodePos = "70";
+				// Display any exceptions that occur, but allow the thread to
+				// keep attempting to update the statistics
+				try
+				{
+					// Get the stats from the db in a temp object so that the UI will not be blocked
+					UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = 
+						ipFPMDB->GetStats( nActionID );
+					ASSERT_RESOURCE_ALLOCATION("ELI20383", ipNewActionStats != NULL);
+				
+					_lastCodePos = "70";
 
-				pFPDlg->PostMessageA(FP_STATISTICS_UPDATE, 
-					(WPARAM) ipNewActionStats.Detach(), (LPARAM)0 );
+					pFPDlg->PostMessageA(FP_STATISTICS_UPDATE, 
+						(WPARAM) ipNewActionStats.Detach(), (LPARAM)0 );
 
-				_lastCodePos = "80";
+					_lastCodePos = "80";
+				}
+				CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29166");
 			}
 			while ( pFPDlg->m_eventStatsThreadStop.wait( uiTickSpeed ) == WAIT_TIMEOUT );
 
