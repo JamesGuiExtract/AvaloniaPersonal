@@ -2,7 +2,7 @@ REM Clean Source folder
 call Clean.bat Test_1
 
 REM Supply Numbered Files for 4 hours
-START I:\Common\Engineering\Tools\Utils\CopyNumberedFiles\CopyNumberedFiles.exe "..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss" ".\Source" 3s -h4
+START I:\Common\Engineering\Tools\Utils\CopyNumberedFiles\CopyNumberedFiles.exe "..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss" ".\Source" 3s -h4
 
 REM Execute command-line for desired test
 START ProcessFiles.exe MemoryLeak_1.fps /s
