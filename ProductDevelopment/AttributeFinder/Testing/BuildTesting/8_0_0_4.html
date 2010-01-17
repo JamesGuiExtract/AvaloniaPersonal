@@ -1,0 +1,657 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.0.0.4 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.0.0.4 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[DotNet #370, #373, #374]</b> FAM service
+	       	<ul>
+	      		<li>Confirm that <b>ESFAMService.sdf</b> is located in the 
+			<b>CommonComponents</b> folder.
+	      		<li>Confirm that <b>ESFAMService.sdf</b> contains a <b>Settings</b> table.
+			<li>Confirm that the <b>Settings</b> table includes a 
+			<b>SleepTimeOnStart</b> field.
+			<li>Confirm that the <b>SleepTimeOnStart</b> field defaults to 
+			<b>120000</b>.  Units are milliseconds.
+			<li>Confirm that the <b>Settings</b> table includes a 
+			<b>DependentServices</b> field.
+			<li>Confirm that the <b>DependentServices</b> field is empty by default.
+<p>
+			<li>Exercise the FAM service and confirm that the service does not 
+			start until after the <b>SleepTimeOnStart</b> value.
+			<li>Add an entry to the <b>DependentServices</b> field.  Confirm that the 
+			service is not currently running.
+			<li>Confirm that the FAM service does not start if the specified dependent 
+			service has not started.
+			<li>Confirm that an exception is logged after the sleep time has expired 
+			noting which dependent services have not started.
+			<li>Start the dependent service.
+			<li>Confirm that the FAM service starts.
+			<li>Stop the FAM service.
+<p>
+			<li>Add more entries to the <b>DependentServices</b> field using a pipe 
+			character as a delimiter.
+			<li>Confirm that the FAM service does not start if only some of the specified 
+			dependent services have started.
+			<li>Confirm that an exception is logged after the sleep time has expired 
+			noting which dependent services have not started.
+			<li>Stop the FAM service.
+			<li>Confirm that an exception is logged noting which dependent services 
+			have still not started as of the stop request.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #372, FlexIDSCore #3903, #3906]</b> Redaction: Verify sensitive data
+	       	<ul>
+	      		<li>Verify an image.
+			<li>Zoom in to a rectangle in the lower section of the image.
+			<li>Change to <b>fit-to-width</b> mode.
+			<li>Confirm that the zoom is still centered around the lower section 
+			of the image.
+<p>
+			<li>Configure verification to require visiting all pages.
+			<li>Verify a multiple-page image.
+			<li>Confirm that the <b>Next tile</b> button is enabled.
+			<li>Click the <b>Next tile</b> button.
+			<li>Confirm that the image advances to page 2.
+			<li>Confirm that the current zoom level is retained.
+			<li>Press the <b>ALT</b> key.
+			<li>Press <b>z</b> or any other shortcut key.
+			<li>Confirm that the UI is still responsive.
+	       	</ul>
+<p>
+		<LI><b>[DotNet #378, LegacyRC #5626]</b> Input Event Tracking
+       		<ul>
+			<li>Enable Input Event Tracking for verification
+			<li>Verify a document and click only one button.
+			<li>Close the verification UI.
+			<li>Reopen the verification UI.
+			<li>Create, move and modify redactions until near the end of the minute.
+			<li>Close the verification UI.
+			<li>Confirm that an <b>ELI14382: Cannot insert duplicate key row...</b> 
+			exception is not seen.
+			<li>Confirm that the input event table shows activity for more than one second 
+			in the relevant minute.
+       		</ul>
+	   	</LI>
+<p>
+  	   	<LI><b>[FlexIDSCore #3411]</b> Remove bad files from history
+	       	<ul>
+	      		<li>Prepare several documents for verification.
+			<li>Verify several documents.
+			<li>Rename one of the recently verified documents.
+			<li>Navigate back to the renamed image.
+			<li>Confirm that a meaningful error is presented.
+			<li>Confirm that the error indicates that the document will 
+			be removed from the history.
+			<li>Confirm that the active document is still the next most recent 
+			document in the history.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3621]</b> Duplicate exemption codes
+	       	<ul>
+			<li>Verify a document.
+			<li>Create a redaction.
+			<li>Apply the <b>(b)(1)</b> exemption code from FOIA to the 
+			redaction and press <b>OK</b>.
+			<li>Open the exemption code dialog again.
+			<li>Confirm that only one copy of the exemption code is present.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3917]</b> RegisterAll.bat
+	       	<ul>
+			<li>Confirm that <b>RegisterAll.bat</b> is located in the 
+			<b>CommonComponents</b> folder.
+			<li>Exercise the batch file.
+			<li>Confirm that the user is prompted to start the registration process.
+			<li>Confirm that a status message is displayed in the command window for 
+			each file being registered.
+			<li>Confirm that the user is prompted again at the end of the registration 
+			process.
+			<li>Confirm that exercising the batch file using the <b>/s</b> flag 
+			causes the file to run silently without prompts or messages.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3929, #3930, LegacyRC #5604]</b> Operating system specific installer 
+	       	<ul>
+	  	   	<LI>Confirm that each application available for installation through 
+			<b>DemoShield</b> installs correctly through DemoShield.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4329]</b> Remove LST files with Uninstall
+	       	<ul>
+	      		<li>Uninstall both <b>FLEX Index</b> and <b>ID Shield</b>.
+			<li>Confirm that the <b>*.LST</b> files have been removed 
+			from the <b>CommonComponents</b> folder.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4947]</b> Applications installed with the RDT 
+	       	<ul>
+	  	   	<LI>Confirm that <b>CopyNumberedFiles</b> is installed with the RDT.
+			<li>Confirm proper behavior.
+	  	   	<LI>Confirm that <b>GetWordLengthDist</b> is installed with the RDT.
+			<li>Confirm proper behavior.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5571]</b> TestTextFunctionExpander 
+	       	<ul>
+	  	   	<LI>Confirm that this application is installed.
+			<li>Exercise each supported $ function.  Confirm proper behavior.
+			<li>Exercise at least two complex statements using multiple functions.  
+			Confirm proper behavior.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5592]</b> Manually set file processing priority 
+	       	<ul>
+	  	   	<LI>Queue some files in the database.
+			<li>Export some files using a random percentage subset.
+			<li>Confirm that actions can be added.
+			<li>Repeat the above test using a <b>random count subset</b>.
+			<li>Confirm that actions can be added.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5595]</b> Core: Convert to searchable PDF
+	       	<ul>
+	  	   	<LI>Exercise the FPS file and image from 
+			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5595</b>, copying the image to 
+			<b>D:\</b>.
+			<li>Confirm that the PDF image is converted to a searchable PDF.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5606]</b> User authentication in the FAM 
+	       	<ul>
+	      		<li><u><b>Manage Users - UI</b></u>
+		       	<ul>
+	      			<li>Confirm that a <b>Manage users...</b> menu entry exists 
+				under the <b>Tools</b> menu.
+		      		<li>Confirm that selecting the menu entry displays the 
+				<b>Manage Users</b> dialog.
+      				<li>Confirm that the dialog includes a two-column list box 
+				for <b>User</b> and <b>Password set</b>.
+	      			<li>Confirm that the dialog includes an <b>Add...</b> button.
+				<li>Confirm that the Add button displays an edit box for 
+				adding a login ID.
+				<li>Confirm that the edit box is pre-populated with the 
+				current user's login ID. 
+				<li>Confirm that the login ID in the edit box is completely 
+				selected allowing for an easy overwrite. 
+      				<li>Confirm that the dialog includes a <b>Remove</b> button.
+				<li>Confirm that the <b>Remove</b> button is disabled if 
+				no user is selected.
+				<li>Confirm that clicking the <b>Remove</b> button displays 
+				a confirmation dialog.
+	      			<li>Confirm that the dialog includes a <b>Rename</b> button.
+				<li>Confirm that the <b>Rename</b> button is disabled if 
+				no user is selected.
+				<li>Confirm that clicking the <b>Rename</b> button displays 
+				an edit box for modifying a login ID.
+				<li>Confirm that the edit box is pre-populated with the 
+				selected user's login ID. 
+      				<li>Confirm that the dialog includes a <b>Clear password</b> 
+				button.
+				<li>Confirm that the <b>Clear password</b> button is disabled 
+				if no user is selected.
+				<li>Confirm that clicking the <b>Clear password</b> button 
+				displays a confirmation dialog.
+      				<li>Confirm that the dialog includes a <b>Refresh</b> button.
+      				<li>Confirm that the dialog includes a <b>Close</b> button.
+		       	</ul>
+<p>
+      			<li><u><b>Manage Users - Functionality</b></u>
+		       	<ul>
+				<li>Confirm that a new user is added to the bottom of the list.
+				<li>Confirm that the <b>User</b> column for a new user 
+				is <b>first_last</b> per the normal network login.
+				<li>Confirm that the <b>Password set</b> column for a new user 
+				is <b>No</b>.
+	      			<li>Confirm that an error message is displayed if a duplicate 
+				user is added.
+				<li>Confirm that an <b>admin</b> user cannot be added.
+				<li>Confirm that an <b>administrator</b> user cannot be added.
+	      			<li>Confirm that a user is properly removed depending on the 
+				response to the confirmation dialog.
+		      		<li>Confirm that the <b>Password set</b> value is properly 
+				reset to <b>No</b> depending on the response to the 
+				confirmation dialog.
+      				<li>Confirm that clicking the <b>Close</b> button closes the 
+				dialog.
+		       	</ul>
+<p>
+   	   		<li><u><b>General Functionality</b></u>
+		       	<ul>
+				<li>Confirm that a <b>RequireAuthenticationBeforeRun</b> field 
+				is defined in the <b>DBInfo</b> table.
+				<li>Confirm that <b>RequireAuthenticationBeforeRun</b> defaults 
+				to <b>0</b>.
+				<li>Confirm that user authentication is only active when 
+				<b>RequireAuthenticationBeforeRun = 1</b>.
+				<li>Confirm that for a user with a cleared password, clicking 
+				the <b>Start processing</b> button prompts the user to define 
+				a password.
+				<li>Confirm that the <b>Login</b> table is updated.
+				<li>Confirm that the new password is not stored in clear text.
+				<li>Confirm that the new password does not need to match the 
+				user's network password.
+				<li>Confirm that processing <b>will not</b> start if an 
+				incorrect password is provided.
+				<li>Confirm that processing <b>will</b> start if a correct 
+				password is provided.
+				<li>Refresh and cleared passwords
+				<ul>
+					<li>Select a user with a defined password.
+					<li>Clear the password.
+					<li>Open a FAM instance as the selected user.
+					<li>Confirm that clicking the <b>Start processing</b> 
+					button prompts the user to define a new password.
+					<li>Confirm that the FAM starts processing after 
+					definition of the new password.
+					<li>Use SQL Management Studio to confirm that a hashed 
+					password exists in the <b>Login</b> table for the 
+					selected user.
+					<li>Click the <b>Refresh</b> button in the <b>Manage 
+					users</b> dialog.
+					<li>Confirm that <b>Password set = Yes</b>.
+			       	</ul>
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5607, #5663, #5664, #5665]</b> DB Admin Manage menu
+	       	<ul>
+			<li><u>User Interface</u>
+			<ul>
+				<li>Confirm that the <b>DB Admin</b> utility contains a <b>Manage</b> menu.
+				<li>Confirm that the <b>Manage</b> menu contains an <b>Actions...</b> item.
+				<li>Confirm that <b>Manage - Actions</b> displays the Manage Actions dialog.
+				<li>Confirm that the <b>Manage Actions</b> dialog contains a single-column 
+				<b>Action name</b> list.
+				<li>Confirm that the <b>Manage Actions</b> dialog contains an <b>Add...</b> 
+				button.
+				<li>Confirm that the <b>Add...</b> button displays the usual Add Action dialog.
+				<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Remove</b> 
+				button.
+				<li>Confirm that the <b>Remove</b> button is disabled if no action is selected.
+				<li>Confirm that the <b>Remove</b> button displays a confirmation dialog.
+				<li>Confirm that an action is removed according to the confirmation dialog 
+				response.
+				<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Rename...</b> 
+				button.
+				<li>Confirm that the <b>Rename...</b> button displays a Rename Action dialog.
+				<li>Confirm that an action can be renamed.
+				<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Refresh</b> 
+				button.
+				<li>Confirm that the <b>Refresh</b> button updates the <b>Action name</b> list.
+				<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Close</b> 
+				button.
+				<li>Confirm that the <b>Close</b> button closes the dialog.
+				<li>Confirm that the <b>Manage</b> menu contains an <b>Counters...</b> item.
+				<li>Confirm that <b>Manage - Counters</b> displays the Manage Counters dialog.
+				<li>Confirm that the <b>Manage</b> menu contains an <b>Tags...</b> item.
+				<li>Confirm that <b>Manage - Tags</b> displays the Manage Tags dialog.
+				<li>Confirm that the <b>Manage</b> menu contains an <b>Users...</b> item.
+				<li>Confirm that <b>Manage - Users</b> displays the Manage Users dialog.
+				<li>Confirm that <b>Ctrl+A</b> displays the <b>Manage Actions</b> dialog.
+				<li>Confirm that <b>Ctrl+C</b> displays the <b>Manage Counters</b> dialog.
+				<li>Confirm that <b>Ctrl+T</b> displays the <b>Manage Tags</b> dialog.
+				<li>Confirm that <b>Ctrl+U</b> displays the <b>Manage Users</b> dialog.
+<p>
+				<li>Confirm that the <b>DB Admin</b> utility contains a <b>Tools</b> menu.
+				<li>Confirm that the <b>Tools</b> menu contains the following items
+				<ul>
+					<li>Check for new components
+					<li>Manually set action status...
+					<li>Manually set processing priority...
+					<li>File Action Manager...
+					<li>Export file lists...
+					<li>Reports...
+				</ul>
+			</ul>
+<p>
+			<li><u><b>Functionality</b></u>
+		       	<ul>
+				<li><b>[LegacyRCAndUtils #5538]</b> Add an action using <b>Copy from</b>.  
+				Confirm that no exception is thrown.
+				<li>Confirm that an exception is thrown when attempting to 
+				add an action where the first character is a digit.
+				<li><b>[LegacyRC #5107]</b> Confirm that an error message is displayed when 
+				attempting to copy the default status from an action when no actions exist 
+				in the database.
+				<li>Confirm that adding an action and clicking <b>No</b> 
+				in the confirmation dialog does not add an action to the database.
+				<li>Confirm that adding an action and clicking <b>Cancel</b> 
+				in the confirmation dialog does not add an action to the database.
+				<li><b>[LegacyRC #4677]</b> Case-sensitivity for action names.
+				<ul>
+					<li>Add an action such as <b>test</b> to the database.
+					<li>Create an <b>FPS</b> file that queues and processes some files 
+					using this action.
+					<li>Exercise the FPS file and note the <b>Summary tab</b> information.
+					<li>Clear the database and replace the action with different case (i.e. 
+					<b>Test</b>).
+					<li>Open the previous <b>FPS</b> file and confirm that no error 
+					is displayed.
+					<li>Exercise the FPS file and confirm that the <b>Summary tab</b> 
+					information matches that seen previously.
+				</ul>
+<p>
+				<li><b>[LegacyRCAndUtils #3857]</b> Confirm that an error message is shown 
+				if the user attempts to add an action	to the database that differs from 
+				an existing action only in case (i.e. "test" and "TEST").
+				<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed 
+				to the latest after a new action is added.
+				<li><b>[LegacyRCAndUtils #5106]</b> Confirm that <b>Copy From</b> radio 
+				button can be selected by using Tab and Arrow keys.
+				<li><b>[LegacyRCAndUtils #5592]</b> Error adding action
+				<ul>
+					<li>Export a list of files using a random set of files.
+					<li>Keep the DB Admin utility open.
+					<li>Confirm that a new action can be added without an <b>ELI23524: 
+					Cursor operation conflict</b> exception.
+				</ul>
+<p>
+				<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is 
+				refreshed to the latest after an action is removed.
+				<li>Confirm that an action cannot be renamed to the same name.
+				<li>Confirm that an action cannot be renamed to an invalid name, 
+				e.g. <b>"123"</b>.
+				<li>Confirm that an action cannot be renamed to an existing action name.
+				<li>Confirm that renaming an action and clicking <b>No</b> in the 
+				confirmation dialog does not rename an action.
+				<li>Confirm that renaming an action and clicking <b>Cancel</b> in 
+				the confirmation dialog does not rename an action.
+				<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed 
+				to the latest after an action is renamed.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5611, #5612]</b> Detailed usage report for specific user 
+		for specific day
+	       	<ul>
+	  	   	<LI>Confirm that this report is available in the <b>Standard reports</b>.
+			<li>Confirm that the <b>DateParameter</b> prompt is provided.
+			<li>Confirm that the report can be generated even if no useful data 
+			is available.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5613]</b> Usage report during custom date range broken 
+		down by user
+	       	<ul>
+	  	   	<LI>Confirm that this report is available in the <b>Standard reports</b>.
+			<li>Confirm that the report can be generated.
+			<li>Confirm that data is presented properly.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5614, #5615]</b> Core: Add Watermark
+	       	<ul>
+	  	   	<LI>Confirm that the property page includes a fourth radio button for 
+			<b>All pages</b>.
+			<li>Confirm that the third radio button on the property page is now 
+			<b>Specified page(s)</b>.
+			<li>Confirm that the associated edit box is wide enough to include 
+			a string of specified pages such as <b>1, 2, 4-6</b>.
+<p>
+			<li>Confirm that <b>Core: Add watermark</b> works for the new options 
+			by exercising a multiple-page TIF image in the following ways
+			<ul>
+				<li>All pages
+				<li>Each even-numbered page
+				<li>Just the last three pages (via <b>-3</b>)
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5617]</b> MaxFilesFromDB registry setting
+	       	<ul>
+			<li>Examine <b>HKCU/Software/Extract 
+			Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FPRecordManager</b>.
+			<li>Confirm that the default value for the <b>MaxFilesFromDB</b> key 
+			is <b>1</b>.
+	       	</ul>
+<p>
+		<LI><b>[LegacyRC #5618]</b> FAM allows action name expressions
+       		<ul>
+			<li><u>Select Action dialog</u>
+			<ul>
+				<li>Confirm that the <b>Select Action</b> dialog includes a combo 
+				box populated with each defined action.
+				<li>Confirm that the <b>Select Action</b> dialog includes a 
+				<b>Tag Selector</b> button allowing the user to choose an action 
+				including a $ function.
+				<li>Confirm that such an action can be saved and reloaded.
+			</ul>
+			<li><u>Functionality</u>
+			<ul>
+				<li>Create a new database.
+				<li>Confirm that the <b>AutoCreateActions</b> field in the <b>DBInfo</b> 
+				table is set to <b>0</b>.
+				<li>Add a <b>Test_&lt;user_name&gt;</b> action with your user name 
+				inserted in the appropriate location.
+				<li>Add a <b>Test</b> action to the database.
+				<li>Create and save a <b>UserName.fps</b> file that uses 
+				<b>Test_$UserName()</b> as the action.
+				<li>Create and save a <b>Test.fps</b> file that uses <b>Test</b> as 
+				the action.
+				<li>Confirm that files can be supplied and processed using each FPS file.
+				<li>Delete or rename the <b>Test</b> action.
+				<li>Confirm that opening <b>Test.fps</b> displays an error about the 
+				undefined action name.
+				<li>Delete or rename the <b>Test_&lt;user_name&gt;</b> action.
+				<li>Exercise <b>UserName.fps</b>
+				<ul>
+					<li>Confirm that opening the FPS file does not display an error 
+					about the undefined action name.
+					<li>Confirm that exercising the FPS file displays an exception 
+					indicating that the specified action name is invalid.
+					<li>Close the FPS file.
+					<li>Set the <b>AutoCreateActions</b> field in the <b>DBInfo</b> 
+					table to <b>1</b>.
+					<li>Exercise the FPS file.
+					<li>Confirm that the action is automatically created and that 
+					processing works without error.
+				</ul>
+			</ul>
+	       	</ul>
+   		</LI>
+<p>
+  	   	<LI><b>[LegacyRC #5620]</b> Manually set file processing priority 
+		down by user
+	       	<ul>
+	  	   	<LI>Queue some files in the database with <b>Below normal</b> priority.
+			<li>Set file processing priority to <b>High</b> by using the <b>Select Files</b> 
+			dialog to select all files with <b>Below normal</b> priority and narrow that down 
+			to a random percentage subset.
+			<li>Confirm that the appropriate number of files were adjusted for priority.
+			<li>Confirm that the user message provides the correct number of files with 
+			changed priority.
+<p>
+			<li>Repeat the above test using a <b>random count subset</b>.
+			<li>Confirm that the appropriate number of files were adjusted for priority.
+			<li>Confirm that the user message provides the correct number of files with 
+			changed priority.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5623]</b> Robust folder listening
+	       	<ul>
+			<li>Exercise the following scenarios.  Confirm that graceful behavior is 
+			noted and that appropriate exceptions are logged with useful debug data
+			<ol>
+				<li><u>File supplier watching a disconnected machine</u>
+				<ul>
+					<li>Prepare an FPS file with a file supplier that is 
+					listening to a folder on a different machine where 
+					the different machine is <b>not connected</b> to the 
+					network.
+					<li>Start processing and confirm that no files are queued.
+					<li>Connect the second machine to the network.
+					<li>Confirm that within no more than a few minutes, files 
+					are being queued from the remote machine.
+					<li>Add more files to the folder that is being watched.
+					<li>Confirm that the new files are also queued.
+				</ul>
+				<li><u>File supplier watching a connected machine</u>
+				<ul>
+					<li>Prepare an FPS file with a file supplier that is 
+					listening to a folder on a different machine where 
+					the different machine is <b>connected</b> to the 
+					network.
+					<li>Start processing and confirm that files are queued.
+					<li>Disconnect the remote machine from the network.
+					<li>Add more files to the folder that is being watched.
+					<li>Reconnect the remote machine to the network while 
+					the FAM is still running.
+					<li>Check whether or not the files added while disconnected 
+					are queued by the file supplier.
+					<li>Previous test notes
+					<ul>
+						<li>New files were not added, as expected
+					</ul>
+					<li>Add more files to the folder that is being watched after 
+					the remote machine has been reconnected.
+					<li>Confirm that within no more than a few minutes, files 
+					are being queued from the remote machine.
+					<li>Previous test notes
+					<ul>
+						<li>Noticed <b>ELI13017: Error getting file changes</b>
+					</ul>
+				</ul>
+				<li><u>File supplier watching a machine that gets rebooted</u>
+				<ul>
+					<li>Prepare an FPS file with a file supplier that is 
+					listening to a folder on a different machine where 
+					the different machine is <b>connected</b> to the 
+					network.
+					<li>Start processing and confirm that files are queued.
+					<li>Reboot the remote machine.
+					<li>Add more files to the folder that is being watched.
+					<li>Confirm that within no more than a few minutes, files 
+					are being queued from the remote machine.
+					<li>Previous test notes
+					<ul>
+						<li>Noticed <b>ELI13017: Error getting file changes</b>
+						<li>Noticed <b>ELI13086: Invalid directory handle</b>
+					</ul>
+				</ul>
+				<li><u>Stop supplying from a disconnected machine</u>
+				<ul>
+					<li>Prepare an FPS file with a file supplier that is 
+					listening to a folder on a different machine where 
+					the different machine is <b>connected</b> to the 
+					network.
+					<li>Start processing and confirm that files are queued.
+					<li>Disconnect the remote machine from the network.
+					<li>Confirm that files are no longer being queued.
+					<li>Stop processing and confirm that the FAM stops 
+					gracefully.
+				</ul>
+			</ol>
+	       	</ul>
+<p>
+		<LI><b>[LegacyRC #5627, #5647]</b> Set File Action Status allows action name expressions
+       		<ul>
+			<li>Confirm that the <b>Manually Set Action Status</b> dialog includes 
+			a combo box populated with each defined action.
+			<li>Confirm that the <b>Manually Set Action Status</b> dialog includes a 
+			<b>Tag Selector</b> button allowing the user to choose an action 
+			including a $ function.
+			<li>Confirm that status can be modified for an action that uses a 
+			$ function.
+			<li>Confirm that trying to modify status for an action that uses a 
+			$ function that does not actually exist in the database displays a 
+			meaningful error.
+			<li>Confirm that status can be modified for an action that uses 
+			<b>&lt;SourceDocName&gt;</b>.
+			<li>Confirm that <b>Manually Set Action Status</b> automatically 
+			creates an action if <b>AutoCreateActions = 1</b>.
+			<li>Confirm that <b>Manually Set Action Status</b> does not automatically 
+			create an action if <b>AutoCreateActions = 0</b>.
+       		</ul>
+	   	</LI>
+<p>
+  	   	<LI><b>[LegacyRC #5649, #5656]</b> Deleting automatically created actions
+	       	<ul>
+			<li>Execute an FPS file such that an action is automatically created.
+			<li>Process some files using the automatically created action.
+			<li>Confirm that the action can be deleted.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Miscellaneous</h3>
+       	<ul>
+		<LI><b>[FlexIDSCore #3921]</b> Broken tasks
+	       	<ul>
+	      		<li>Confirm that <b>Core: Apply Bates number</b> is available in an <b>ID 
+			Shield</b> installation.
+	      		<li>Confirm that <b>Redaction: Create metadata xml</b> is available in an 
+			<b>ID Shield</b> installation.
+	      		<li>Confirm that <b>Redaction: Verify sensitive data</b> is available in an 
+			<b>ID Shield</b> installation.
+	       	</ul>
+<p>
+		<LI><b>Reports</b>
+       		<ul>
+			<li>Confirm for each available report
+			<ul>
+				<li>Report has a thumbnail view
+				<li>Report runs successfully against a <b>SQL Server 2005</b> database
+				<li>Report runs successfully against a <b>SQL Server 2008</b> database
+			</ul>
+       		</ul>
+	   	</LI>
+<p>
+		<li>Confirm that <b>&lt;SourceDocName&gt;</b> does not appear in the Select Action 
+		dialog.
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
