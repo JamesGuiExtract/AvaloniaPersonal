@@ -1,3 +1,5 @@
+using System;
+using System.Drawing;
 using Leadtools.Codecs;
 
 namespace Extract.Imaging
@@ -61,5 +63,29 @@ namespace Extract.Imaging
         }
 
         #endregion Properties
+
+        #region Methods
+
+        /// <summary>
+        /// Determines whether the specified rectangle is completly contained by the image page.
+        /// </summary>
+        /// <param name="rectangle">The rectangle to test for containment.</param>
+        /// <returns><see langword="true"/> if the <paramref name="rectangle"/> is completely 
+        /// contained within the page; <see langword="false"/> if it is partially contained or 
+        /// completely off the page.</returns>
+        public bool Contains(Rectangle rectangle)
+        {
+            try
+            {
+                return rectangle.Left >= 0 && rectangle.Top >= 0 && rectangle.Width <= _width &&
+                    rectangle.Height <= _height;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29184", ex);
+            }
+        }
+
+        #endregion Methods
     }
 }
