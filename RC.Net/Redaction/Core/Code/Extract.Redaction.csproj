@@ -87,6 +87,7 @@
     <Compile Include="RedactionFileLoader.cs" />
     <Compile Include="RedactionFileChanges.cs" />
     <Compile Include="SensitiveItem.cs" />
+    <Compile Include="SetFileActionStatusSettings.cs" />
     <Compile Include="TimeInterval.cs" />
     <Compile Include="VerificationSettings.cs" />
   </ItemGroup>
