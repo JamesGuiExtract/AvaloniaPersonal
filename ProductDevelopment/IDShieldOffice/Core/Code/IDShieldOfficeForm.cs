@@ -1143,7 +1143,7 @@ namespace IDShieldOffice
             // Center on the layer object if necessary
             if (result == DialogResult.No)
             {
-                _imageViewer.CenterOnLayerObject(offPageObject, false);
+                _imageViewer.CenterOnLayerObjects(offPageObject);
             }
 
             // Return the user's response
@@ -1163,49 +1163,30 @@ namespace IDShieldOffice
                 return null;
             }
 
-            // Store the original page number
-            int originalPageNumber = _imageViewer.PageNumber;
-
-            // Ensure the original page number gets restored
-            try
+            // Iterate through the sorted collection
+            foreach (LayerObject layerObject in _imageViewer.LayerObjects.GetSortedCollection())
             {
-                // Iterate through the sorted collection
-                foreach (LayerObject layerObject in _imageViewer.LayerObjects.GetSortedCollection())
+                // If this object isn't movable, skip it.
+                if (!layerObject.Movable)
                 {
-                    // If this object isn't movable, skip it.
-                    if (!layerObject.Movable)
-                    {
-                        continue;
-                    }
-
-                    // Go to the page of this layer object if necessary
-                    if (layerObject.PageNumber != _imageViewer.PageNumber)
-                    {
-                        _imageViewer.SetPageNumber(layerObject.PageNumber, false, false);
-                    }
-
-                    // Check if the layer object is off the page at all
-                    if (!_imageViewer.Contains(layerObject))
-                    {
-                        // This layer object was off the page
-                        return layerObject;
-                    }
+                    continue;
                 }
 
-                // If this point was reached, no layer object is off the page
-                return null;
-            }
-            finally
-            {
-                // Restore the original page number
-                if (_imageViewer.PageNumber != originalPageNumber)
+
+                ImagePageProperties properties = 
+                    _imageViewer.GetPageProperties(layerObject.PageNumber);
+
+                // Check if the layer object is off the page at all
+                if (!properties.Contains(layerObject.GetBounds()))
                 {
-                    _imageViewer.SetPageNumber(originalPageNumber, false, false);
+                    // This layer object was off the page
+                    return layerObject;
                 }
             }
+
+            // If this point was reached, no layer object is off the page
+            return null;
         }
-
-
 
         /// <summary>
         /// Updates the form caption with the currently opened image and adds a "*" if

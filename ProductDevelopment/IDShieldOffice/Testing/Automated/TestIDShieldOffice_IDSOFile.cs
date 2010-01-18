@@ -2751,7 +2751,7 @@ namespace IDShieldOffice.Test
                 // Zoom in a few times
                 imageViewer.ZoomToRectangle(new Rectangle(500, 500, 50, 300));
 
-                imageViewer.CenterOnLayerObject(redactions[0], true);
+                imageViewer.CenterOnLayerObjects(redactions[0]);
 
                 Assert.That(MessageBox.Show(
                     "Is the redaction rendered a Dark Gray and can the text be viewed through it?",
@@ -2828,7 +2828,7 @@ namespace IDShieldOffice.Test
                 // Zoom in a few times
                 imageViewer.ZoomToRectangle(new Rectangle(500, 500, 50, 300));
 
-                imageViewer.CenterOnLayerObject(redactions[0], true);
+                imageViewer.CenterOnLayerObjects(redactions[0]);
 
                 Assert.That(MessageBox.Show(
                     "Is the redaction rendered a Light Gray and can the text be viewed through it?",

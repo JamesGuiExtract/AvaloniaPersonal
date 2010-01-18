@@ -224,12 +224,6 @@ namespace IDShieldOffice
                     this.FormBorderStyle = FormBorderStyle.FixedDialog;
                 }
 
-                // Set the startup location of the form
-                if (_idShieldOfficeForm != null)
-                {
-                    FormsMethods.CenterFormInForm(this, _idShieldOfficeForm);
-                }
-
                 // Update the button states
                 UpdateButtonStates();
 
@@ -936,7 +930,7 @@ namespace IDShieldOffice
 
                     // Center the image viewer around the first composite highlight
                     // in the match results
-                    imageViewer.CenterOnLayerObject(findResult.CompositeMatch, true);
+                    imageViewer.CenterOnLayerObjects(findResult.CompositeMatch);
                 }
             }
 

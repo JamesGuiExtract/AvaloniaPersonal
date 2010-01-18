@@ -346,12 +346,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Interop", "..\..\..
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Imaging.Utilities", "..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcproj", "{E610E652-0891-40D4-B5CA-A622B87C7979}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 36
+		ProjectCount = 37
 		ProjectRelativeDiskPath1 = ..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj
 		ProjectRelativeDiskPath2 = ..\..\..\..\RC.Net\Core\Code\Extract.csproj
 		ProjectRelativeDiskPath3 = ..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj
@@ -388,6 +394,7 @@ Global
 		ProjectRelativeDiskPath34 = ..\..\..\..\RC.Net\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj
 		ProjectRelativeDiskPath35 = ..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj
 		ProjectRelativeDiskPath36 = ..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj
+		ProjectRelativeDiskPath37 = ..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -778,6 +785,16 @@ Global
 		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Release|Win32.ActiveCfg = Release|Any CPU
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Debug|Win32.Build.0 = Debug|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Release|Any CPU.ActiveCfg = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Release|Win32.ActiveCfg = Release|Win32
+		{E610E652-0891-40D4-B5CA-A622B87C7979}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -189,7 +189,7 @@ namespace IDShieldOffice
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "IDShieldOfficeRuleForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "IDShieldOfficeRuleForm";
             this._splitContainer.Panel2.ResumeLayout(false);
             this._splitContainer.Panel2.PerformLayout();

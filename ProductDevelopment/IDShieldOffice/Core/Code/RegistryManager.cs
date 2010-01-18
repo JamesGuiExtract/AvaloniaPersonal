@@ -1,4 +1,5 @@
 using Extract;
+using Extract.Drawing;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Utilities;

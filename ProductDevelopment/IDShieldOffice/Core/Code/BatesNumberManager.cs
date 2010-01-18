@@ -1,4 +1,5 @@
 using Extract;
+using Extract.Drawing;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
@@ -336,6 +337,7 @@ namespace IDShieldOffice
             // Show the wait cursor
             using (new TemporaryWaitCursor())
             {
+                // TODO: Go directly to image rather than use the image viewer control
                 // Store the original page number
                 int originalPageNumber = _imageViewer.PageNumber;
                 try
@@ -353,7 +355,7 @@ namespace IDShieldOffice
                     for (int i = 1; i <= _imageViewer.PageCount; i++)
                     {
                         // Go to the ith page
-                        _imageViewer.SetPageNumber(i, false, false);
+                        _imageViewer.PageNumber = i;
 
                         // Add and increment Bates number
                         TextLayerObject batesNumber = new TextLayerObject(_imageViewer, i, 
@@ -407,7 +409,7 @@ namespace IDShieldOffice
                 finally
                 {
                     // Restore the original page number
-                    _imageViewer.SetPageNumber(originalPageNumber, false, false);
+                    _imageViewer.PageNumber = originalPageNumber;
                 }
             }
 

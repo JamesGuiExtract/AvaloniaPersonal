@@ -252,6 +252,10 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj">
+      <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
+      <Name>Extract.Drawing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcproj">
       <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
       <Name>Extract.Encryption</Name>
