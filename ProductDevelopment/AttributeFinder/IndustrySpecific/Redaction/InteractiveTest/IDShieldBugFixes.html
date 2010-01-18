@@ -38,7 +38,16 @@
 
 	<LI><h2>Redaction: Create redacted image</h2>
 	<UL>
-		<LI>TBD
+  	   	<LI><b>[FlexIDSCore #3547, #3548]</b> Redacted images with incorrect page count
+	       	<ul>
+	      		<li>Prepare a redaction test with a significant number of sensitive images that each 
+			contain 20 or more pages.
+	      		<li>Confirm that during the writing of the the redacted output image, 
+			<b>&lt;OutputName&gt;.tmp</b> is created.
+	      		<li>Confirm that <b>&lt;OutputName&gt;.tmp</b> is renamed to <b>&lt;OutputName&gt;</b>.
+			<li>Confirm that if <b>ELI09202, Could not save image.</b> is seen in the exception 
+			log, then <b>&lt;OutputName&gt;</b> does not exist.
+	       	</ul>
 	</UL>
 <p>
 
