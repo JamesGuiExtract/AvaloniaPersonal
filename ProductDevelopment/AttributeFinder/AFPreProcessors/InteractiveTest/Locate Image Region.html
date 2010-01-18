@@ -313,6 +313,30 @@
 		</ul>
        	</ul>
 <p>
+   	<LI><b>[FlexIDSCore #3165, #3545, #3555]</b> Locate Image Region
+       	<ul>
+      		<li>Exercise <b>test.rsd</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3165</b>.
+		<ul>
+	      		<li>Confirm that the <b>AllBecauseNoRegion</b> attribute is found.
+	      		<li>Confirm that the <b>AllBecauseInvalidRegion</b> attribute is found.
+	      		<li>Confirm that the <b>NoneBecauseNoRegion</b> attribute is not found.
+	      		<li>Confirm that the <b>NoneBecauseInvalidRegion</b> attribute is not found.
+		</ul>
+<p>
+      		<li>Exercise <b>example.rsd</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3545</b>.
+		<ul>
+	      		<li>Confirm that <b>no</b> attributes are found.
+		</ul>
+<p>
+      		<li>Exercise <b>test.rsd</b> and the sample image 
+		from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3555</b>.
+		<ul>
+	      		<li>Confirm that the <b>Locate Image Region</b> rule uses <b>top of page 
+			containing clues</b> as the top boundary.
+	      		<li>Confirm that attributes are found and that no exception is thrown.
+		</ul>
+       	</ul>
+<p>
    	<LI><b>[FlexIDSCore #3529]</b> Locate Image Region and invalid settings
        	<ul>
       		<li>Open an RSD file with a <b>Locate Image Region</b> rule configured 
