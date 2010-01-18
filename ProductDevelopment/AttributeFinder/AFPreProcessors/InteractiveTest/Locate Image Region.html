@@ -295,5 +295,35 @@
        	</ul>
 	</li>
 </ul>
+<h3>Miscellaneous</h3>
+<ul>
+   	<LI><b>[FlexIDSCore #3051]</b> Locate Image Region
+       	<ul>
+      		<li>Exercise <b>Locate Image Region</b> using opposite page edges as 
+		part of the region boundaries.
+		<ul>
+	      		<li>Left of page containing Clues expanded Right by <i>x</i> 
+			characters, as Right boundary.
+	      		<li>Right of page containing Clues expanded Left by <i>x</i> 
+			characters, as Left boundary.
+	      		<li>Top of page containing Clues expanded Down by <i>x</i> 
+			spatial lines, as Bottom boundary.
+	      		<li>Bottom of page containing Clues expanded Up by <i>x</i> 
+			spatial lines, as Top boundary.
+		</ul>
+       	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #3529]</b> Locate Image Region and invalid settings
+       	<ul>
+      		<li>Open an RSD file with a <b>Locate Image Region</b> rule configured 
+		to find a text region.
+      		<li>Modify the object to return an image region. 
+      		<li>Click OK and confirm that a validation error is presented. 
+      		<li>Close the validation error message and <b>Cancel</b> the 
+		configuration changes. 
+      		<li>Re-open the object property page and confirm that the valid settings 
+		are presented. 
+       	</ul>
+</ul>
 </body>
 </html>
