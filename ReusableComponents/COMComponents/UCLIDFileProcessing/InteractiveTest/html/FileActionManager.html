@@ -156,6 +156,15 @@
            	checkboxes in the Action tab are checked.</li> 
        		<li>Confirm that shortcut key <b>Ctrl+S</b> performs the same function as selecting 
            	File - Save.</li>
+<p>
+  	   	<LI><b>[LegacyRC #5278]</b> Saving when disabled
+	       	<ul>
+	      		<li>Open a previously saved FPS file.
+	      		<li>Uncheck all checkboxes on the <b>Action</b> tab.
+	      		<li>Confirm that <b>File - Save</b> and <b>File - Save As</b> 
+			are disabled.
+	      		<li>Confirm that <b>Ctrl+S</b> does not save the FPS file.
+	       	</ul>
     	</ul>  
 <p>
     	<li>Confirm that the File menu has an <b>Exit</b> item and the initial state is enabled.</li>
@@ -515,6 +524,14 @@
 		the list boxes.
 		<li>Repeat this test on a machine running Vista.
 	</ul>
+<p>
+   	<LI><b>[LegacyRC #5302]</b> Logging FAM Stop time
+       	<ul>
+      		<li>Start processing for an FPS file with only <b>Display real-time 
+		status</b> active.
+      		<li>Stop processing.
+      		<li>Confirm that both the start time and the stop time are logged.
+       	</ul>
 </ul>
 <p>
 <h3><u>Status Bar</u></h3> 
