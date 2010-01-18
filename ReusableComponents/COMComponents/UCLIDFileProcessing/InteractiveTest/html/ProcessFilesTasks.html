@@ -813,6 +813,13 @@
       		<li><b>[FlexIDSCore #2397]</b> Exercise the <b>Execute rules</b> task on a group of previously 
 		OCR'd images.  Confirm that updated progress information is provided on the 
 		<b>Files currently being processed</b> grid on the Processing Log tab.
+  	   	<LI><b>[FlexIDSCore #3518]</b> Execute rules with no text in image
+	       	<ul>
+	      		<li>Execute rules in the FAM for images without USS files.
+	      		<li>Supply at least one file without recognized text (i.e. 
+			<b>K:\Common\Engineering\Sample Files\CO - SoS\Set005\Images\O_3696988.tif</b>).
+	      		<li>Confirm that the rules process without failing the document. 
+	       	</ul>
       		<li><b>[LegacyRC #4840]</b> Exercise the <b>Execute rules</b> task on a USS file renamed 
 		to be a TIF image.  Confirm that the file fails processing and that only <b>one</b> 
 		relevant exception is logged.
@@ -822,7 +829,7 @@
    	<ul> 
       		<li>Use the Add button to select <b>Core: Launch application</b> as the task.</li> 
       		<li>Confirm the Configure Launch Application dialog has an edit box 
-          	associated with <b>Application Command Line</b>.</li>
+          	associated with <b>Application</b>.</li>
       		<ul> 
          		<li>Confirm that the edit box has an associated <b>Tag Selector</b> button, 
              		and a <b>...</b> ( Browse ) button.</li> 
@@ -841,7 +848,7 @@
 			the path is automatically wrapped in quotation marks.</li>
        		</ul> 
 <p>
-      		<li>Confirm the Configure Launch Application dialog has a combo box 
+      		<li>Confirm the Configure Launch Application dialog has an edit box 
           	associated with <b>Launch Directory</b>.</li>
       		<ul> 
          		<li>Confirm that the combo box has an associated <b>Tag Selector</b> button, 
@@ -858,6 +865,25 @@
          		<li><b>[FlexIDSCore #3001]</b> Confirm that cancelling from the <b>Browse for 
 			Folder</b> dialog retains the previous folder definition without error.</li> 
          		<li>Confirm that the folder path is placed in the edit box.</li>
+      		</ul> 
+<p>
+      		<li>Confirm the Configure Launch Application dialog has an edit box 
+          	associated with <b>Parameters (Any parameter that contains spaces must be 
+		quoted)</b>.</li>
+      		<ul> 
+         		<li>Confirm that the combo box has an associated <b>Tag Selector</b> button, 
+             		and a <b>...</b> ( Browse ) button.</li> 
+         		<li>Confirm that the <b>Tag Selector</b> button opens a context menu to the 
+			immedaite right of the button.</li>
+         		<li>Confirm that the context menu includes <b>&lt;SourceDocName&gt;</b>,
+             		<b>&lt;FPSFileDir&gt;</b>, and a set of functions that start with $. 
+         		<li>Confirm that when an item is chosen from the context menu it either 
+             		inserts at the current cursor position or replaces selected text in 
+             		the edit box. 
+         		<li>Confirm that pressing the Browse button brings up an Open file dialog 
+			with default file type All Files(*.*).</li> 
+         		<li>Confirm that when a file is chosen, it replaces the text in the edit 
+             		box.</li>
       		</ul> 
       		<li>Confirm there is a radio button for <b>Blocking</b> and a radio button for 
           	<b>Non_Blocking</b> in the Configure Launch Application dialog.</li> 
@@ -877,6 +903,7 @@
 		<li>Use an invalid command-line option so as to create an error to be propagated 
 		back to the FAM.
 		<li>Confirm that the error <b>is</b> propagated if requested.
+		<li>Confirm that complete debug information is available.
 		<li>Confirm that the error <b>is not</b> propagated if not requested.
    	</ul>
 <p>
