@@ -43,6 +43,17 @@
 	   	<li>Confirm that the resulting TIF has 275 pages. 
 	</ul>
 <p>
+   	<LI><b>[LegacyRC #5298]</b> PDF page sizes from Image Format Converter
+       	<ul>
+		<li>Make a local copy of the <b>Old Republic Title\RedactionDemo\Set003</b> 
+		image files.  Use <b>Image Format Converter</b> to convert them from PDF 
+		format to TIF.
+		<li>Open each image file in the Image Viewer.  Confirm that pages of different 
+		size are displayed without black areas.
+		<li>Write basic rules using Extract Lines.  Confirm that spatial information for 
+		OCR'd text is correct for both legal-size and letter-size pages.
+       	</ul>
+<p>
 	<li><b>Image conversion for same type</b>
 	<ul>
 		<li>Referenced images can be found in 
@@ -120,6 +131,11 @@
    		<li>Confirm that <b>ESConvertToPDF PDF_Image.pdf PDF_Image2.pdf /R</b> 
 		creates the searchable PDF file and deletes the original PDF image.
    		<li>Replace the deleted <b>PDF_Image.pdf</b>.
+	</ul>
+	<li>Confirm that the following command-line options are supported
+	<ul>
+		<li><b>/ef&lt:logfile&gt;</b> - logs all errors to the specified log file
+		<li><b>/pdfa</b> - the output file will be PDF/A-compliant
 	</ul>
 </ul>
 </li>
