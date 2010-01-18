@@ -1,5 +1,5 @@
 REM Clean Source folder
-call Clean.bat
+call Clean.bat Test_1
 
 REM Supply Numbered Files for 4 hours
 START CopyNumberedFiles.exe ".\Images\1.voa" ".\Source" 50ms -h4
