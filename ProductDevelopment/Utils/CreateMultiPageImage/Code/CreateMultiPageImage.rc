@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "CreateMultiPageImage Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "CreateMultiPageImage"
-            VALUE "LegalCopyright", "Copyright (C) 2009"
+            VALUE "LegalCopyright", "Copyright (C) 2010"
             VALUE "OriginalFilename", "CreateMultiPageImage.EXE"
             VALUE "ProductName", "CreateMultiPageImage Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

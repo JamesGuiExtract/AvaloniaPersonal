@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.Testing.Utilities")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2009")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

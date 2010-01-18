@@ -140,7 +140,7 @@ BEGIN
             VALUE "FileDescription", "RDTConfig MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "RDTConfig"
-            VALUE "LegalCopyright", "Copyright (C) 2009"
+            VALUE "LegalCopyright", "Copyright (C) 2010"
             VALUE "OriginalFilename", "RDTConfig.EXE"
             VALUE "ProductName", "RDTConfig Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

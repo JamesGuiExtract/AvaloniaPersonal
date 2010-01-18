@@ -116,7 +116,7 @@ BEGIN
             VALUE "FileDescription", "ImageViewer MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "Extract Image Viewer"
-            VALUE "LegalCopyright", "Copyright (C) 2009"
+            VALUE "LegalCopyright", "Copyright (C) 2010"
             VALUE "OriginalFilename", "ImageViewer.EXE"
             VALUE "ProductName", "ImageViewer Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

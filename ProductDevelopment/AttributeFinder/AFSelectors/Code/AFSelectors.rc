@@ -73,7 +73,7 @@ BEGIN
             VALUE "FileDescription", "AFSelectors Module"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "AFSelectors.dll"
-            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "LegalCopyright", "Copyright 2010"
             VALUE "OriginalFilename", "AFSelectors.dll"
             VALUE "ProductName", "AFSelectors Module"
             VALUE "ProductVersion", "1.0.0.1"

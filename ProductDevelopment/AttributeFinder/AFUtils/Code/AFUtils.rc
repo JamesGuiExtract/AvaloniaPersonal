@@ -85,7 +85,7 @@ BEGIN
             VALUE "FileDescription", "AFUtils Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFUtils"
-            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "LegalCopyright", "Copyright 2010"
             VALUE "OriginalFilename", "AFUtils.DLL"
             VALUE "ProductName", "AFUtils Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

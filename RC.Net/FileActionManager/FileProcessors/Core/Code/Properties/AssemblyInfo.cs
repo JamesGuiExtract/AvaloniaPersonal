@@ -12,7 +12,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.FileActionManager.FileProcessors")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2009")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -74,7 +74,7 @@ BEGIN
             VALUE "FileDescription", "RWUtils Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "RWUtils\0"
-            VALUE "LegalCopyright", "Copyright 2009\0"
+            VALUE "LegalCopyright", "Copyright 2010\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OLESelfRegister", "\0"
             VALUE "OriginalFilename", "RWUtils.DLL\0"

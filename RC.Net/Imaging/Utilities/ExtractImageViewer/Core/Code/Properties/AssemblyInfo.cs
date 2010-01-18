@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems LLC")]
 [assembly: AssemblyProduct("ExtractImageViewer")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2008")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

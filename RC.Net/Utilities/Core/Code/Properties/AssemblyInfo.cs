@@ -11,7 +11,7 @@ using System;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems LLC")]
 [assembly: AssemblyProduct("Extract.Utilities")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2009")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

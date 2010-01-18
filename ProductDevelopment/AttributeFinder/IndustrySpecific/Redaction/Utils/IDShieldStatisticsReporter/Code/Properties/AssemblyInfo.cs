@@ -12,7 +12,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract System, LLC")]
 [assembly: AssemblyProduct("ID Shield Statistics Reporter")]
-[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2009")]
+[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

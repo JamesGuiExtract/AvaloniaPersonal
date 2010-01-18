@@ -67,7 +67,7 @@ BEGIN
             VALUE "FileDescription", "SplitFile Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "SplitFile"
-            VALUE "LegalCopyright", "Copyright (C) 2009"
+            VALUE "LegalCopyright", "Copyright (C) 2010"
             VALUE "OriginalFilename", "SplitFile.EXE"
             VALUE "ProductName", "SplitFile Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

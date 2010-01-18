@@ -145,7 +145,7 @@ BEGIN
             VALUE "FileDescription", "USBLicenseKeyManager MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "USBLicenseKeyManager"
-            VALUE "LegalCopyright", "Copyright (C) 2009"
+            VALUE "LegalCopyright", "Copyright (C) 2010"
             VALUE "OriginalFilename", "USBLicenseKeyManager.EXE"
             VALUE "ProductName", "USBLicenseKeyManager Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

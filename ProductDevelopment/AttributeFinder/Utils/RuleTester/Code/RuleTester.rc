@@ -95,7 +95,7 @@ BEGIN
             VALUE "FileDescription", "RuleTester MFC Application\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "RuleTester\0"
-            VALUE "LegalCopyright", "Copyright (C) 2009\0"
+            VALUE "LegalCopyright", "Copyright (C) 2010\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "RuleTester.EXE\0"
             VALUE "ProductName", "RuleTester Application\0"

@@ -72,7 +72,7 @@ BEGIN
             VALUE "FileDescription", "UCLIDTestingFrameworkCore Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "UCLIDTestingFrameworkCore"
-            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "LegalCopyright", "Copyright 2010"
             VALUE "OriginalFilename", "UCLIDTestingFrameworkCore.DLL"
             VALUE "ProductName", "UCLIDTestingFrameworkCore Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

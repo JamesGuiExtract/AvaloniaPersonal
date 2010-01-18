@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems LLC")]
 [assembly: AssemblyProduct("ValidateXMLFile")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2006")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

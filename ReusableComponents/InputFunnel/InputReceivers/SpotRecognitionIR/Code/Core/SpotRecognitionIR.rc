@@ -72,7 +72,7 @@ BEGIN
             VALUE "FileDescription", "SpotRecognitionIR Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "SpotRecognitionIR"
-            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "LegalCopyright", "Copyright 2010"
             VALUE "OriginalFilename", "SpotRecognitionIR.DLL"
             VALUE "ProductName", "SpotRecognitionIR Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

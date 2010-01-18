@@ -74,7 +74,7 @@ BEGIN
             VALUE "FileDescription", "COMLM Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "COMLM\0"
-            VALUE "LegalCopyright", "Copyright 2009\0"
+            VALUE "LegalCopyright", "Copyright 2010\0"
             VALUE "OriginalFilename", "COMLM.DLL\0"
             VALUE "ProductName", "COMLM Module\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

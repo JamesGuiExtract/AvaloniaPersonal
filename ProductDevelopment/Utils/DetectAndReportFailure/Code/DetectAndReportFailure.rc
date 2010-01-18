@@ -159,7 +159,7 @@ BEGIN
             VALUE "FileDescription", "DetectAndReportFailure MFC Application\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "DetectAndReportFailure\0"
-            VALUE "LegalCopyright", "Copyright (C) 2009\0"
+            VALUE "LegalCopyright", "Copyright (C) 2010\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "DetectAndReportFailure.EXE\0"
             VALUE "ProductName", "DetectAndReportFailure Application\0"

@@ -95,7 +95,7 @@ BEGIN
             VALUE "FileDescription", "ProcessFiles MFC Application\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "ProcessFiles\0"
-            VALUE "LegalCopyright", "Copyright (C) 2009\0"
+            VALUE "LegalCopyright", "Copyright (C) 2010\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "ProcessFiles.EXE\0"
             VALUE "ProductName", "ProcessFiles Application\0"

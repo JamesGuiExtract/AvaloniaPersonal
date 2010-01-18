@@ -129,7 +129,7 @@ BEGIN
             VALUE "FileDescription", "VOAFileViewer MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "VOA File Viewer"
-            VALUE "LegalCopyright", "Copyright (C) 2009"
+            VALUE "LegalCopyright", "Copyright (C) 2010"
             VALUE "OriginalFilename", "VOAFileViewer.EXE"
             VALUE "ProductName", "VOAFileViewer Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

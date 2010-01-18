@@ -85,7 +85,7 @@ BEGIN
 			VALUE "FileDescription", "AFCppUtils DLL\0"
 			VALUE "FileVersion",     "1, 0, 0, 1\0"
 			VALUE "InternalName",    "AFCppUtils\0"
-			VALUE "LegalCopyright",  "Copyright (C) 2009\0"
+			VALUE "LegalCopyright",  "Copyright (C) 2010\0"
 			VALUE "LegalTrademarks", "\0"
 			VALUE "OriginalFilename","AFCppUtils.DLL\0"
 			VALUE "ProductName",     "AFCppUtils Dynamic Link Library\0"

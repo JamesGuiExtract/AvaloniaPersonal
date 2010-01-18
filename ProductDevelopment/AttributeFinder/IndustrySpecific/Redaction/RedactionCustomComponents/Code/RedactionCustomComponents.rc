@@ -72,7 +72,7 @@ BEGIN
             VALUE "FileDescription", "RedactionCustomComponents Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "RedactionCustomComponents"
-            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "LegalCopyright", "Copyright 2010"
             VALUE "OriginalFilename", "RedactionCustomComponents.DLL"
             VALUE "ProductName", "RedactionCustomComponents Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

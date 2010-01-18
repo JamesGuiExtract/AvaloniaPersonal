@@ -72,7 +72,7 @@ BEGIN
             VALUE "FileDescription", "GridGenerator Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "GridGenerator"
-            VALUE "LegalCopyright", "Copyright 2004"
+            VALUE "LegalCopyright", "Copyright 2010"
             VALUE "OriginalFilename", "GridGenerator.DLL"
             VALUE "ProductName", "GridGenerator Module"
             VALUE "ProductVersion", "1, 0, 0, 1"
