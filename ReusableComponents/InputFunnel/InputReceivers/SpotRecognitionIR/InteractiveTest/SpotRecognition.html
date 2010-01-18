@@ -229,7 +229,7 @@
 		<li>Open <b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\Document Classification\County Document\Affidavit of Death\0002.tif</b> and recognize all of the text in the image.</li> 
 		<li>Execute the rules from the <b>Rule Tester</b>.</li> 
 		<li>Review the found attributes and confirm that the highlights are 
-		    properly aligned with the text.</li> 
+		properly aligned with the text.</li> 
 	</ul>
 <p>
    	<li><b>[FlexIDSCore #2994]</b> Right-to-left highlighting
@@ -250,14 +250,14 @@
 		<li>Save <b>(#4621) B03307AABMB.TIF (Image A)</b> and <b>(#4627) 00002.tif (Image B)</b> locally.
 		<li>Right-click on <b>Image A</b> and <b>Open With Image Viewer</b>.
 		<li>Verify that Image Viewer <b>displays</b> an exception showing that 
-		    it failed to load the file.
+		it failed to load the file.
 		<li>Verify that Image Viewer will allow you to open a non-corrupt image.
 		<li>Repeat the above steps for <b>Image B</b>.
 <p>
 		<li>Open Image Viewer.
 		<li>Open <b>Image A</b>.
 		<li>Verify that Image Viewer <b>displays</b> an exception showing that
-		    it failed to load the file.
+		it failed to load the file.
 		<li>Verify that Image Viewer will allow you to open a non-corrupt image.
 		<li>Repeat the above steps for <b>Image B</b>.
 <p>
@@ -265,21 +265,29 @@
 		<li>Open a known <b>non-corrupt</b> image.
 		<li>Open <b>Image A</b>.
 		<li>Verify that Image Viewer <b>displays</b> an exception showing that
-		    it failed to load the file.
+		it failed to load the file.
 		<li>Verify that Image Viewer will allow you to open a non-corrupt image.
 		<li>Repeat the above steps for <b>Image B</b>.
 	</ul>
 <p>
-	<li><b>[LegacyRC #4726]</b> OCR Rectangular Area.</li>   
+	<li><b>[LegacyRC #4726, #5307]</b> OCR Rectangular Area.</li>   
 	<ul>
 		<li>Open an image in the Image Viewer.</li> 
-		<li>Zoom out so that a gray area is visible both below and to the right of the image.</li> 
+		<li>Zoom out so that a gray area is visible both below and to the right of 
+		the image.</li> 
 		<li>Confirm that OCRing a rectangular region that includes text and runs off the 
-		bottom of the page is successful. Note: alternatively, confirm that it
-          is not possible to select a region that runs off the page.</li> 
+		bottom of the page is successful. Note: alternatively, confirm that it is not 
+		possible to select a region that runs off the page.</li> 
 		<li>Confirm that OCRing a rectangular region that includes text and runs off the 
-		right side of the page is successful. Note: alternatively, confirm that
-          it is not possible to select a region that runs off the page.</li> 
+		right side of the page is successful. Note: alternatively, confirm that it is not 
+		possible to select a region that runs off the page.</li> 
+<p>
+      		<li>Open an image in the Image Viewer.
+      		<li>Select a highlight tool.
+      		<li>Select <b>Recognize text and process to OCR a rectangular area</b>.
+      		<li>Click on the image after the OCR results appear.
+      		<li>Click OK in the OCR results.
+      		<li>Confirm that the OCR results close and that no exception is logged.
 	</ul>
 <p>
 	<li><b>[LegacyRC #4416]</b> Open image from USS.</li>   
@@ -371,57 +379,90 @@ County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.
 		<li>Copy all of the images in <b>I:/Common/Testing/Rotated_Images</b> to the local machine.</li>
 		<li>OCR each of the images to create a .uss file.</li>
 		<li><b>FOR EACH IMAGE:</b>
+		<ul>
+			<li>Whole Document Testing:
 			<ul>
-				<p>
-					<li>Whole Document Testing:
-						<ul>
-							<li>Open the image in the <b>Rule Tester</b>.  Make sure that the text in the .uss file is properly OCRed.
-								<ul>
-									<li><b>PLEASE NOTE:</b>  Any image whose file name ends in <b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly because it is mirrored.</li>
-								</ul>
-							</li>
-							<li>Run <b>ExtractLines.rsd</b>, which is located in SourceGear under <b>$\Engineering\ProductDevelopment\AttributeFinder\Testing\RotationTesting</b>, on the image.
-								<ul>
-									<li>Double click on one of the found items.  This will open the image in the Image Viewer.</li>
-									<li>Make sure that the highlights created by the rules are in the correct orientation.</li>
-								</ul>
-							</li>
-						</ul>
-					</li>
-				</p>
-				<p>
-					<li>Current Page Testing:
-						<ul>
-							<li>While the image is still open in the Image Viewer, use the Image Viewer's <b>Send text to Rule Tester window (Process Current Page)</b> tool to OCR the first page of the document and send the results to the Rule Tester.</li>
-								<ul>
-									<li>Make sure that the text that is sent to the rule tester is OCRed properly.
-										<ul>
-											<li><b>PLEASE NOTE:</b>  Any image whose file name ends in <b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly because it is mirrored.</li>
-										</ul>
-									</li>
-									<li>Run <b>ExtractLines.rsd</b> again and make sure that the highlights created by the rules are in the correct orientation.</li>
-								</ul>
-							</li>
-						</ul>
-					</li>
-				</p>
-				<p>
-					<li>Rectangular Area Testing:
-						<ul>
-							<li>While the image is still open in the Image Viewer, use the Image Viewer's <b>Send text to Rule Tester window (Process Rectangular Area)</b> tool to OCR a rectangular region of the document and send the results to the Rule Tester.</li>
-								<ul>
-									<li>Make sure that the text that is sent to the rule tester is OCRed properly.
-										<ul>
-											<li><b>PLEASE NOTE:</b>  Any image whose file name ends in <b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly because it is mirrored.</li>
-										</ul>
-									</li>
-									<li>Run <b>ExtractLines.rsd</b> again and make sure that the highlights created by the rules are in the correct orientation.</li>
-								</ul>
-							</li>
-						</ul>
-					</li>
-				</p>
+				<li>Open the image in the <b>Rule Tester</b>.  Make sure that the 
+				text in the .uss file is properly OCRed.
+				<ul>
+					<li><b>PLEASE NOTE:</b>  Any image whose file name ends in 
+					<b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly 
+					because it is mirrored.</li>
+				</ul>
+				</li>
+				<li>Run <b>ExtractLines.rsd</b>, which is located in SourceGear under 
+				<b>$\Engineering\ProductDevelopment\AttributeFinder\Testing\RotationTesting</b>, 
+				on the image.
+				<ul>
+					<li>Double click on one of the found items.  This will open the 
+					image in the Image Viewer.</li>
+					<li>Make sure that the highlights created by the rules are in 
+					the correct orientation.</li>
+				</ul>
+				</li>
 			</ul>
+			</li>
+<p>
+			<li>Current Page Testing:
+			<ul>
+				<li>While the image is still open in the Image Viewer, use the Image 
+				Viewer's <b>Send text to Rule Tester window (Process Current Page)</b> 
+				tool to OCR the first page of the document and send the results to the 
+				Rule Tester.</li>
+				<ul>
+					<li>Make sure that the text that is sent to the rule tester 
+					is OCRed properly.
+					<ul>
+						<li><b>PLEASE NOTE:</b>  Any image whose file name ends in 
+						<b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly 
+						because it is mirrored.</li>
+					</ul>
+					</li>
+					<li>Run <b>ExtractLines.rsd</b> again and make sure that the 
+					highlights created by the rules are in the correct orientation.</li>
+				</ul>
+				</li>
+			</ul>
+			</li>
+<p>
+			<li>Rectangular Area Testing:
+			<ul>
+				<li>While the image is still open in the Image Viewer, use the Image 
+				Viewer's <b>Send text to Rule Tester window (Process Rectangular Area)</b> 
+				tool to OCR a rectangular region of the document and send the results to 
+				the Rule Tester.</li>
+				<ul>
+					<li>Make sure that the text that is sent to the rule tester is 
+					OCRed properly.
+					<ul>
+						<li><b>PLEASE NOTE:</b>  Any image whose file name ends in 
+						<b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly 
+						because it is mirrored.</li>
+					</ul>
+					</li>
+					<li>Run <b>ExtractLines.rsd</b> again and make sure that the 
+					highlights created by the rules are in the correct orientation.</li>
+				</ul>
+				</li>
+			</ul>
+			</li>
+<p>
+			<li>Miscellaneous:
+			<ul>
+	  		   	<LI><b>[FlexIDSCore #3525]</b> Spatial String Searcher and rotated rectangles
+		       		<ul>
+			      		<li>Exercise the RSD file and image from 
+					<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3525</b>.
+					<li>Also exercise <b>Image087_VP5.tif</b>.
+					<li>Also exercise <b>Image087_VP8.tif</b>.
+					<li>Also exercise <b>Image960_VP3.tif</b>.
+					<li>Also exercise <b>Image23_VP7.tif</b>.
+					<li>Also exercise <b>Image152_VP6.tif</b>.
+	      				<li>Confirm that the rules run without error. 
+			       	</ul>
+			</ul>
+			</li>
+		</ul>
 		</li>
 	</ul>
 </li>
