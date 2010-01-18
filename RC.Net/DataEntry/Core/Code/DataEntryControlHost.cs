@@ -1,4 +1,3 @@
-using Extract;
 using Extract.Drawing;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
@@ -7,9 +6,7 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
@@ -19,10 +16,8 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
-using UCLID_AFOUTPUTHANDLERSLib;
 using UCLID_COMUTILSLib;
 
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
@@ -266,7 +261,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The font family used to display data.
         /// </summary>
-        static readonly string _DATA_FONT_FAMILY = "Verdana";
+        const string _DATA_FONT_FAMILY = "Verdana";
 
         /// <summary>
         /// The width/height in inches of the icon to be shown in the image viewer to indicate
@@ -292,7 +287,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The vector of attributes associated with any currently open document.
         /// </summary>
-        IUnknownVector _attributes = (IUnknownVector)new IUnknownVectorClass();
+        IUnknownVector _attributes = new IUnknownVectorClass();
 
         /// <summary>
         /// The <see cref="IAttribute"/>s output from the most recent call to <see cref="SaveData"/>.
@@ -304,7 +299,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// A dictionary to keep track of the highlights associated with each attribute.
         /// </summary>
-        Dictionary<IAttribute, List<CompositeHighlightLayerObject>> _attributeHighlights =
+        readonly Dictionary<IAttribute, List<CompositeHighlightLayerObject>> _attributeHighlights =
             new Dictionary<IAttribute, List<CompositeHighlightLayerObject>>();
 
         /// <summary>
@@ -316,19 +311,19 @@ namespace Extract.DataEntry
         /// <summary>
         /// A dictionary to keep track of each attribute's error icons
         /// </summary>
-        Dictionary<IAttribute, List<ImageLayerObject>> _attributeErrorIcons =
+        readonly Dictionary<IAttribute, List<ImageLayerObject>> _attributeErrorIcons =
             new Dictionary<IAttribute, List<ImageLayerObject>>();
 
         /// <summary>
         /// The size the error icons should be on each page (determined via a combination of
         /// _ERROR_ICON_SIZE and the DPI of the page.
         /// </summary>
-        Dictionary<int, Size> _errorIconSizes = new Dictionary<int, Size>();
+        readonly Dictionary<int, Size> _errorIconSizes = new Dictionary<int, Size>();
 
         /// <summary>
         /// A dictionary to keep track of the attribute each highlight is related to.
         /// </summary>
-        Dictionary<CompositeHighlightLayerObject, IAttribute> _highlightAttributes =
+        readonly Dictionary<CompositeHighlightLayerObject, IAttribute> _highlightAttributes =
             new Dictionary<CompositeHighlightLayerObject, IAttribute>();
 
         /// <summary>
@@ -343,13 +338,13 @@ namespace Extract.DataEntry
         /// <summary>
         /// A dictionary to keep track of each control's active attributes.
         /// </summary>
-        Dictionary<IDataEntryControl, List<IAttribute>> _controlAttributes =
+        readonly Dictionary<IDataEntryControl, List<IAttribute>> _controlAttributes =
             new Dictionary<IDataEntryControl, List<IAttribute>>();
 
         /// <summary>
         /// A dictionary to keep track of each control's attributes that have tooltips.
         /// </summary>
-        Dictionary<IDataEntryControl, List<IAttribute>> _controlToolTipAttributes =
+        readonly Dictionary<IDataEntryControl, List<IAttribute>> _controlToolTipAttributes =
             new Dictionary<IDataEntryControl, List<IAttribute>>();
 
         /// <summary>
@@ -371,18 +366,18 @@ namespace Extract.DataEntry
         /// <summary>
         /// A list of all data controls contained in this control host.
         /// </summary>
-        List<IDataEntryControl> _dataControls = new List<IDataEntryControl>();
+        readonly List<IDataEntryControl> _dataControls = new List<IDataEntryControl>();
 
         /// <summary>
         /// A list of all controls on the DEP which do not implement IDataEntryControl.
         /// </summary>
-        List<Control> _nonDataControls = new List<Control>();
+        readonly List<Control> _nonDataControls = new List<Control>();
 
         /// <summary>
         /// A list of the controls mapped to root-level attributes. (to which the control host needs
         /// to provide attributes)
         /// </summary>
-        List<IDataEntryControl> _rootLevelControls = new List<IDataEntryControl>();
+        readonly List<IDataEntryControl> _rootLevelControls = new List<IDataEntryControl>();
 
         /// <summary>
         /// A flag used to indicate that the current document image is changing so that highlight
@@ -521,12 +516,12 @@ namespace Extract.DataEntry
         /// <summary>
         /// A list of names of DataEntry controls that should remain disabled at all times.
         /// </summary>
-        List<string> _disabledControls = new List<string>();
+        readonly List<string> _disabledControls = new List<string>();
 
         /// <summary>
         /// A list of names of DataEntry controls in which data validation should be disabled.
         /// </summary>
-        List<string> _disabledValidationControls = new List<string>();
+        readonly List<string> _disabledValidationControls = new List<string>();
 
         /// <summary>
         /// The number of selected attributes with highlights that have been accepted by the user.
@@ -568,7 +563,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Indicates if the host is in design mode or not.
         /// </summary>
-        bool _inDesignMode;
+        readonly bool _inDesignMode;
 
         /// <summary>
         /// A description of the current DataEntry application.
@@ -617,7 +612,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Keeps track of the last region specified to be zoomed to by EnforceAutoZoom
         /// </summary>
-        Rectangle _lastAutoZoomSelection = new Rectangle();
+        Rectangle _lastAutoZoomSelection;
 
         /// <summary>
         /// A <see cref="ToolTip"/> used to display notifications to the user.
@@ -627,7 +622,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// A list of attributes that have been added since the last time DrawHighlights was run.
         /// </summary>
-        List<IAttribute> _newlyAddedAttributes = new List<IAttribute>();
+        readonly List<IAttribute> _newlyAddedAttributes = new List<IAttribute>();
 
         /// <summary>
         /// Indicates whether a control is in the middle of processing an updated.  DrawHighlights
@@ -701,7 +696,7 @@ namespace Extract.DataEntry
                 // Specify the default highlight colors.
                 HighlightColor[] highlightColors = {new HighlightColor(89, Color.LightSalmon),
                                                     new HighlightColor(100, Color.LightGreen)};
-                this.HighlightColors = highlightColors;
+                HighlightColors = highlightColors;
 
                 // Blinking error icons are annoying and unnecessary.
                 _validationErrorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
@@ -933,7 +928,7 @@ namespace Extract.DataEntry
                     _defaultHighlightColor = _highlightColors[_highlightColors.Length - 1].Color;
 
                     // Initialize _confidenceBoundaries
-                    _confidenceBoundaries = (VariantVector)new VariantVectorClass();
+                    _confidenceBoundaries = new VariantVectorClass();
                     foreach (HighlightColor confidenceTier in _highlightColors)
                     {
                         _confidenceBoundaries.PushBack(confidenceTier.MaxOcrConfidence);
@@ -1436,7 +1431,7 @@ namespace Extract.DataEntry
                         // using Control.ModifierKeys to help ensure that shift is not missed.
                         if (!_shiftKeyDown)
                         {
-                            _shiftKeyDown = (Control.ModifierKeys == Keys.Shift);
+                            _shiftKeyDown = (ModifierKeys == Keys.Shift);
                         }
 
                         // If the tab key was pressed, indicate a manual focus event and
@@ -1452,8 +1447,7 @@ namespace Extract.DataEntry
                         }
                     }
                 }
-                else if (!base.ContainsFocus &&
-                         (m.Msg == _WM_LBUTTONDOWN || m.Msg == _WM_RBUTTONDOWN))
+                else if (!ContainsFocus && (m.Msg == _WM_LBUTTONDOWN || m.Msg == _WM_RBUTTONDOWN))
                 {
                     // Attempt to find a data entry control that should receive active status and 
                     // focus as the result of the mouse click.
@@ -1471,7 +1465,7 @@ namespace Extract.DataEntry
                     // handle the mouse wheel event instead.
                     if (_imageViewer != null && _imageViewer.IsImageAvailable && !_imageViewer.Focused &&
                             _imageViewer.ClientRectangle.Contains(
-                                _imageViewer.PointToClient(Control.MousePosition)))
+                                _imageViewer.PointToClient(MousePosition)))
                     {
                         _imageViewer.Focus();
 
@@ -1596,7 +1590,7 @@ namespace Extract.DataEntry
                         {
                             // Create a copy of the data to be saved so that attributes that should
                             // not be persisted can be removed.
-                            ICopyableObject copyThis = (ICopyableObject)_attributes;
+                            ICopyableObject copyThis = _attributes;
                             _mostRecentlySaveAttributes = (IUnknownVector)copyThis.Clone();
 
                             PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
@@ -1858,7 +1852,7 @@ namespace Extract.DataEntry
                     AttributeStatusInfo.ReleaseAttributes(_attributes);
 
                     // Clear any existing attributes.
-                    _attributes = (IUnknownVector)new IUnknownVectorClass();
+                    _attributes = new IUnknownVectorClass();
                 }
 
                 // [DataEntry:576]
@@ -2252,7 +2246,7 @@ namespace Extract.DataEntry
                     // Some tasks (such as selecting the first control), must take place after the
                     // ImageFileChanged event is complete. Use BeginInvoke to schedule
                     // FinalizeDocumentLoad at the end of the current message queue.
-                    base.BeginInvoke(new ParameterlessDelegate(FinalizeDocumentLoad));
+                    BeginInvoke(new ParameterlessDelegate(FinalizeDocumentLoad));
                 }
             }
             catch (Exception ex)
@@ -2842,7 +2836,7 @@ namespace Extract.DataEntry
 
                 // Disable validation on any controls in the _disabledValidationControls list.
                 Control control = e.DataEntryControl as Control;
-                if (_disabledValidationControls.Contains(control.Name))
+                if (control != null && _disabledValidationControls.Contains(control.Name))
                 {
                     AttributeStatusInfo.EnableValidation(e.Attribute, false);
 
@@ -3336,7 +3330,7 @@ namespace Extract.DataEntry
                     // dictionary return value.
                     foreach (CompositeHighlightLayerObject highlight in highlights)
                     {
-                        List<RasterZone> rasterZones = null;
+                        List<RasterZone> rasterZones;
                         if (!rasterZonesByPage.TryGetValue(highlight.PageNumber, out rasterZones))
                         {
                             rasterZones = new List<RasterZone>();
@@ -3776,7 +3770,7 @@ namespace Extract.DataEntry
             }
 
             // Raise the event for registered listeners
-            if (this.SwipingStateChanged != null)
+            if (SwipingStateChanged != null)
             {
                 SwipingStateChanged(this, e);
             }
@@ -3787,7 +3781,7 @@ namespace Extract.DataEntry
         /// </summary>
         void OnItemSelectionChanged()
         {
-            if (this.ItemSelectionChanged != null)
+            if (ItemSelectionChanged != null)
             {
                 ItemSelectionChanged(this, new ItemSelectionChangedEventArgs(
                     _selectedAttributesWithAcceptedHighlights,
@@ -3805,7 +3799,7 @@ namespace Extract.DataEntry
         /// now known that all <see cref="IAttribute"/>s have been viewed.</param>
         void OnUnviewedItemsFound(bool unviewedItemsFound)
         {
-            if (this.UnviewedItemsFound != null)
+            if (UnviewedItemsFound != null)
             {
                 UnviewedItemsFound(this, new UnviewedItemsFoundEventArgs(unviewedItemsFound));
             }
@@ -3819,7 +3813,7 @@ namespace Extract.DataEntry
         /// now known that all <see cref="IAttribute"/>s contain valid data.</param>
         void OnInvalidItemsFound(bool invalidItemsFound)
         {
-            if (this.InvalidItemsFound != null)
+            if (InvalidItemsFound != null)
             {
                 InvalidItemsFound(this, new InvalidItemsFoundEventArgs(invalidItemsFound));
             }
@@ -3894,7 +3888,7 @@ namespace Extract.DataEntry
                     _controlAttributes.TryGetValue(_activeDataControl, out attributes))
                 {
                     // Obtain the list of highlights that need tooltips.
-                    List<IAttribute> activeToolTipAttributes = null;
+                    List<IAttribute> activeToolTipAttributes;
                     _controlToolTipAttributes.TryGetValue(
                         _activeDataControl, out activeToolTipAttributes);
 
@@ -3903,7 +3897,7 @@ namespace Extract.DataEntry
                     {
                         // Find any highlight CompositeHighlightLayerObject that has been created for
                         // this data entry control.
-                        List<CompositeHighlightLayerObject> highlightList = null;
+                        List<CompositeHighlightLayerObject> highlightList;
 
                         _attributeHighlights.TryGetValue(attribute, out highlightList);
 
@@ -4441,7 +4435,7 @@ namespace Extract.DataEntry
         {
             if (_activeDataControl != null)
             {
-                List<IAttribute> activeAttributes = null;
+                List<IAttribute> activeAttributes;
                 if (_controlAttributes.TryGetValue(_activeDataControl, out activeAttributes))
                 {
                     if (activeAttributes.Count == 1)
@@ -4627,14 +4621,14 @@ namespace Extract.DataEntry
         IDataEntryControl FindClickedDataEntryControl(Message m)
         {
             ExtractException.Assert("ELI24760", "Unexpected message!",
-                m != null && (m.Msg == _WM_LBUTTONDOWN || m.Msg == _WM_RBUTTONDOWN));
+                (m.Msg == _WM_LBUTTONDOWN || m.Msg == _WM_RBUTTONDOWN));
 
             // Initialize the return value to null.
             IDataEntryControl clickedDataEntryControl = null;
 
             // Obtain the control that was clicked (may be a container rather than the specific
             // control.
-            Control clickedControl = Control.FromHandle(m.HWnd);
+            Control clickedControl = FromHandle(m.HWnd);
 
             // [DataEntry:354]
             // Sometimes the window handle may be a child of a .Net control (such as the edit box
@@ -4644,7 +4638,7 @@ namespace Extract.DataEntry
             {
                 m.HWnd = NativeMethods.GetParentWindowHandle(m.HWnd);
 
-                clickedControl = Control.FromHandle(m.HWnd);
+                clickedControl = FromHandle(m.HWnd);
             }
 
             if (clickedControl != null)
@@ -4657,7 +4651,7 @@ namespace Extract.DataEntry
                 // If the click occured within the control host, if it didn't occur on a data entry
                 // control, make sure that focus will remain on the currently active data entry 
                 // control.
-                if (clickedControl == this || base.Contains(clickedControl))
+                if (clickedControl == this || Contains(clickedControl))
                 {
                     clickedDataEntryControl = _activeDataControl;
                 }
@@ -4798,7 +4792,7 @@ namespace Extract.DataEntry
         int CountUnviewedItems()
         {
             Stack<IAttribute> startingPoint = null;
-            Stack<IAttribute> nextUnviewedAttributeGenealogy = null;
+            Stack<IAttribute> nextUnviewedAttributeGenealogy;
             int count = 0;
 
             // Loop to find the next unviewed attribute until no more can be found without looping.
@@ -4812,7 +4806,7 @@ namespace Extract.DataEntry
                     // Use the found attribute as the starting point for the search in the next
                     // iteration.
                     startingPoint =
-                        CollectionMethods.CopyStack<IAttribute>(nextUnviewedAttributeGenealogy);
+                        CollectionMethods.CopyStack(nextUnviewedAttributeGenealogy);
 
                     // TODO: Now that there is a reason to access the last attribute from
                     // FindNextUnviewedAttribute, FindNextUnviewedAttribute should be ideally be
@@ -4848,7 +4842,7 @@ namespace Extract.DataEntry
         int CountInvalidItems()
         {
             Stack<IAttribute> startingPoint = null;
-            Stack<IAttribute> nextInvalidAttributeGenealogy = null;
+            Stack<IAttribute> nextInvalidAttributeGenealogy;
             int count = 0;
 
             // Loop to find the next invalid attribute until no more can be found without looping.
@@ -4864,7 +4858,7 @@ namespace Extract.DataEntry
                     // Use the found attribute as the starting point for the search in the next
                     // iteration.
                     startingPoint =
-                        CollectionMethods.CopyStack<IAttribute>(nextInvalidAttributeGenealogy);
+                        CollectionMethods.CopyStack(nextInvalidAttributeGenealogy);
                 }
             }
             while (nextInvalidAttributeGenealogy != null);
@@ -5018,8 +5012,6 @@ namespace Extract.DataEntry
             if (attribute.Value.GetMode() == ESpatialStringMode.kSpatialMode &&
                 !AttributeStatusInfo.IsAccepted(attribute))
             {
-                zoneConfidenceTiers = (VariantVector)new VariantVectorClass();
-
                 comRasterZones = attribute.Value.GetOriginalImageRasterZonesGroupedByConfidence(
                     _confidenceBoundaries, out zoneConfidenceTiers);
             }
@@ -5284,14 +5276,14 @@ namespace Extract.DataEntry
             bool horizontal = true;
 
             // Find the horizontal overlap in the raster zones.
-            double horizontalOverlap = 0;
+            double horizontalOverlap;
             SpatialHintGenerator.GetHintRange(rasterZones, true, out horizontalOverlap);
 
             if (horizontalOverlap > 0.1)
             {
                 // If it appears there is horizontal overlap (indicating a vertical arrangement),
                 // test to see if there is more horizontal overlap than vertical overlap.
-                double verticalOverlap = 0;
+                double verticalOverlap;
                 SpatialHintGenerator.GetHintRange(rasterZones, false, out verticalOverlap);
 
                 if (horizontalOverlap > verticalOverlap)
@@ -5491,9 +5483,9 @@ namespace Extract.DataEntry
 
                 // Create the error icon
                 ImageLayerObject errorIcon = new ImageLayerObject(_imageViewer, page,
-                    "", errorIconAnchorPoint, AnchorAlignment.Left,
-                    global::Extract.DataEntry.Properties.Resources.LargeErrorIcon,
-                    _errorIconSizes[page], (float)errorIconRotation);
+                    "", errorIconAnchorPoint, AnchorAlignment.Left, 
+                    Properties.Resources.LargeErrorIcon, _errorIconSizes[page], 
+                    (float)errorIconRotation);
                 errorIcon.Selectable = false;
                 errorIcon.Visible = makeVisible;
                 errorIcon.CanRender = false;
@@ -6179,7 +6171,7 @@ namespace Extract.DataEntry
             }
 
             // Lock the DEP's parent (a Panel) to prevent scrolling
-            FormsMethods.LockControlUpdate(base.Parent, lockUpdates);
+            FormsMethods.LockControlUpdate(Parent, lockUpdates);
 
             // Lock each visible control.
             foreach (IDataEntryControl dataControl in _dataControls)
@@ -6202,7 +6194,7 @@ namespace Extract.DataEntry
         /// in which the returned <see cref="IAttribute"/>(s) must exist.</param>
         /// <returns>The viewable <see cref="IAttribute"/>s in the specified
         /// <see cref="IDataEntryControl"/>.</returns>
-        IEnumerable<IAttribute> GetViewableAttributesInControl(IDataEntryControl dataEntryControl,
+        static IEnumerable<IAttribute> GetViewableAttributesInControl(IDataEntryControl dataEntryControl,
             IUnknownVector attributes)
         {
             ExtractException.Assert("ELI25356", "Null argument exception!", dataEntryControl != null);
@@ -6237,7 +6229,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attributes">The hierarchy of <see cref="IAttribute"/>s from which
         /// non-persistable attributes should be removed.</param>
-        void PruneNonPersistingAttributes(IUnknownVector attributes)
+        static void PruneNonPersistingAttributes(IUnknownVector attributes)
         {
             int count = attributes.Size();
             for (int i = 0; i < count; i++)
@@ -6279,8 +6271,8 @@ namespace Extract.DataEntry
                 _currentlySelectedGroupAttribute = null;
 
                 // Select the first control on the form.
-                base.Focus();
-                base.SelectNextControl(null, true, true, true, true);
+                Focus();
+                SelectNextControl(null, true, true, true, true);
 
                 // If there is an active data control, ensure the initially selected attribute is
                 // appropriate based on its TabStopMode
@@ -6325,7 +6317,7 @@ namespace Extract.DataEntry
                     // do so.
                     if (advanceSelection)
                     {
-                        Stack<IAttribute> nextTabStopAttribute = null;
+                        Stack<IAttribute> nextTabStopAttribute;
                         // Advance to the next attribute group if _allowTabbingByGroup and
                         // the first attributes are within a control that supports attribute
                         // groups.
@@ -6380,14 +6372,13 @@ namespace Extract.DataEntry
             // Since the angular highlight cursor extends above the cursor position and would
             // otherwise be drawn on top of the tooltip, shift the tooltip below the cursor
             // position if the angular highlight cursor tool is active.
-            Point toolTipPosition = base.TopLevelControl.PointToClient(MousePosition);
+            Point toolTipPosition = TopLevelControl.PointToClient(MousePosition);
             if (_imageViewer.CursorTool == CursorTool.AngularHighlight)
             {
                 toolTipPosition.Offset(0, 35);
             }
 
-            _userNotificationTooltip.Show(message, (IWin32Window)base.TopLevelControl,
-                toolTipPosition, 5000);
+            _userNotificationTooltip.Show(message, TopLevelControl, toolTipPosition, 5000);
         }
 
         /// <summary>
