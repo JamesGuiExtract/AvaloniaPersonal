@@ -382,6 +382,18 @@ UEXViewer Utility - Testing Checklist<br>
            	<li>Confirm that UEX Viewer documentation includes either a Start menu path or a 
 		fully-qualified path to the EXE.
 <p>
+  	   	<LI><b>[FlexIDSCore #3499]</b> Oversize exception
+	       	<ul>
+	      		<li>Create a license file that <b>does not</b> include support for <b>Convert 
+			to searchable PDF</b>.
+	      		<li>Open an auto-redaction FPS file from the 6.0 Redaction Demo or 7.0 
+			Demo IDShield.
+	      		<li>Confirm that an exception is logged about an inability to open 
+			the FPS file.
+	      		<li>Confirm that the exception does not create an unusually large UEX 
+			file and that the UEX Viewer opens the UEX file without difficulty.
+	       	</ul>
+<p>
           	<li><b>[LegacyRCAndUtils #4642]</b> Encrypted Debug values
 		<ul>
 	           	<li>Confirm that a mapped drive exists to <b>\\fnp2\internal</b> - 
@@ -420,6 +432,12 @@ UEXViewer Utility - Testing Checklist<br>
 			<li>Confirm that the <b>UEX Viewer</b> successfully navigates between 
 			old and new UEX files.
 		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5308]</b> UEX Viewer
+	       	<ul>
+	      		<li>Confirm that UEX files from <b>ID Shield 6.0</b> can be opened.
+	      		<li>Confirm that UEX files from <b>ID Shield 7.0</b> can be opened.
+	       	</ul>
     	</ul>
    	</li>
 </ol>
