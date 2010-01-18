@@ -1,0 +1,189 @@
+<HTML>
+
+<HEAD>
+<TITLE>ID Shield Bug Fixes Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>ID Shield Bug Fixes Checklist<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<UL>
+	<LI><h2>Redaction: Create metadata xml</h2>
+	<UL>
+  	   	<LI><b>[FlexIDSCore #3453, #3485]</b> Metadata total time incorrect after navigation
+	       	<ul>
+			<li>Create an FPS file to verify some images followed by creation of 
+			the metadata xml.
+	      		<li>Supply two files and wait for document 1 to come up for verification.
+	      		<li>Wait one minute and save document 1.
+	      		<li>Confirm that document 2 appears.
+	      		<li>Confirm that the metadata XML file for document 1 shows a total verification 
+			time of approximately one minute.
+	      		<li>Wait one minute with document 2 and navigate back to document 1.
+	      		<li>Wait one more minute without making or saving any changes and navigate 
+			forward to document 2.
+	      		<li>Save document 2.
+	      		<li>Confirm that the metadata XML file for document 1 shows a total verification 
+			time of approximately two minutes.
+	      		<li>Confirm that the metadata XML file for document 2 shows a total verification 
+			time of approximately one minute.
+	       	</ul>
+	</UL>
+<p>
+
+	<LI><h2>Redaction: Create redacted image</h2>
+	<UL>
+		<LI>TBD
+	</UL>
+<p>
+
+	<LI><h2>Redaction: Verify sensitive data</h2>
+	<UL>
+  	   	<LI><b>[FlexIDSCore #3320]</b> Selection of redactions while selecting exemption codes
+	       	<ul>
+	      		<li>Exercise <b>verification</b>.
+	      		<li>Hit the <b>Escape</b> key and select a redaction.
+	      		<li>Use the <b>E</b> shortcut to display the Exemption Codes dialog.
+	      		<li>Cancel out of the dialog and click the <b>Stop</b> button on 
+			the Verification toolbar.
+	      		<li>Confirm that a prompt is displayed about changes not being saved.
+	      		<li>Select <b>Yes</b> to close the verification window.
+	      		<li>Without closing the FAM, start processing to continue verifying documents.
+	      		<li>Hit the <b>Escape</b> key and select a redaction.
+	      		<li>Use the <b>E</b> shortcut to display the Exemption Codes dialog.
+	      		<li>Confirm that interaction with the <b>Data Grid</b> is still not allowed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3448]</b> No auto-zoom for new redactions
+	       	<ul>
+	      		<li>Exercise <b>verification</b>.
+	      		<li>Enable auto-zoom and set the zoom level to 10.
+	      		<li>Open an image in the verification UI and zoom in close enough to see only 3-4 
+			words at a time.
+	      		<li>Redact a word.
+	      		<li>Confirm that the Image Viewer <b>does not</b> automatically zoom to the new 
+			manual redaction.
+	      		<li>Tab to a new row in the Data Grid and confirm that the Image Viewer 
+			<b>does</b> auto-zoom to the item.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3462]</b> Auto-zoom problem for redactions at page edge
+	       	<ul>
+	      		<li>Exercise <b>verification</b> for Demo_IDShield.
+	      		<li>Enable auto-zoom and set the zoom level to 10.
+	      		<li>Open image 7 in the verification UI and note that the right side of the 
+			redaction is not visible plus no horizontal scrollbar is provided.
+	      		<li>Confirm that the redaction can be resized by first moving the redaction.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3463, #3496]</b> Unstoppable FAM
+	       	<ul>
+	      		<li>Exercise <b>verification</b> for Demo_IDShield.
+	      		<li>Queue the files with <b>Force Processing</b> enabled while 
+			verifying the documents.
+	      		<li>Confirm that at least one document fails because it cannot be 
+			queued while it is being processed.
+	      		<li>Confirm that stopping processing from <b>the FAM</b> works.
+	      		<li>Confirm that stopping processing from <b>Verification</b> works.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3487]</b> Adjust auto-zoom scale factors
+	       	<ul>
+	      		<li>Exercise <b>verification</b> for Demo_IDShield and TestImage001.tif.
+	      		<li>Enable auto-zoom and set the zoom level to 1.
+	      		<li>Confirm that the width of the <b>SSN:</b> clue almost completely fills 
+			the window.
+	      		<li>Set the zoom level to 2.
+	      		<li>Confirm that the width of the <b>SSN:</b> clue is significantly reduced.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3488]</b> Save in Verification
+	       	<ul>
+	      		<li>Confirm that <b>Ctrl+S</b> works to save a document.  Test with 
+			either Data Grid or Image Viewer having focus.
+	      		<li>Confirm that <b>Shift+S</b> does not work to save a document.  Test with 
+			either Data Grid or Image Viewer having focus.
+	      		<li>Confirm that <b>Alt+S</b> does not work to save a document.  Test with 
+			either Data Grid or Image Viewer having focus.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3491]</b> Declining to overwrite exemption codes
+	       	<ul>
+	      		<li>Exercise <b>verification</b> and select one or more exemption codes 
+			for <b>all</b> redactions.
+	      		<li>Select a different set of exemption codes for <b>all</b> redactions.
+	      		<li>Confirm that a confirmation dialog is presented to the user.
+	      		<li>Select <b>No</b> to not overwrite the previously selected exemption 
+			codes.
+	      		<li>Confirm that toolbar buttons still work, new redactions can be added, 
+			and that the image can be saved.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3495]</b> Sharing violation during Verification
+	       	<ul>
+	      		<li>Exercise the <b>Verification with annotations</b> memory leak test.
+	      		<li>Review the exception log after the test is completed.
+	      		<li>Confirm that no <b>Sharing violation</b> errors were logged.
+	       	</ul>
+	</UL>
+<p>
+
+	<LI><h2>Miscellaneous</h2>
+	<UL>
+  	   	<LI><b>[FlexIDSCore #3412]</b> Auto-zoom persistence
+	       	<ul>
+	      		<li>Exercise <b>verification</b> and open the Options dialog.
+	      		<li>Set the zoom level to something other than 1, uncheck the auto-zoom option 
+			and save the settings.
+	      		<li>Re-open the Options dialog.
+	      		<li>Confirm that the zoom level <b>did not</b> reset to 1.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3517]</b> Retaining annotations and Legislation Guard
+	       	<ul>
+			<li>Copy <b>test.fps</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3517</b>.
+	      		<li>Exercise the FPS file and supply several multipage TIFs.
+	      		<li>Exercise verification and toggle at least one redaction on for each image.
+	      		<li>Confirm that proper output is seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5248]</b> Support for JPEG-compressed TIFs
+	       	<ul>
+			<li>Make a local copy of the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5248</b> 
+			image files.
+			<li>Exercise automated redaction using the St Johns rules.  Confirm that 
+			acceptable output files are generated.
+			<li>Exercise verification using the St Johns rules.  Confirm that 
+			acceptable output files are generated.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5250]</b> Tab order for ID Shield dialogs
+	       	<ul>
+	      		<li>Confirm that the <b>Filter ID Shield data file</b> task can be 
+			configured from the keyboard.
+	      		<li>Confirm that the <b>ID Shield data file condition</b> object can be 
+			configured from the keyboard.
+	      		<li>Confirm that the <b>Redaction: Verify sensitive data</b> task can be 
+			configured from the keyboard.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5316]</b> Locked FAM during Verification
+	       	<ul>
+	      		<li>Exercise <b>Verification</b>.
+	      		<li>Pause the FAM. 
+	      		<li>Confirm that processing can be stopped from the verification UI.
+<p>
+	      		<li>Exercise <b>Verification</b> again.
+	      		<li>Pause the FAM. 
+	      		<li>Confirm that processing can be stopped from the FAM.
+	       	</ul>
+	</UL>
+</UL>
+<br>
+</HTML>
+</BODY>
