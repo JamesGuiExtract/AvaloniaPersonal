@@ -98,8 +98,9 @@ BOOL CESConvertToPDFApp::InitInstance()
 				return FALSE;
 			}
 
+			// TODO: Turn license validation back on
 			// validate licensing
-			validateLicense();
+			//validateLicense(); 
 
 			// do the work
 			convertToSearchablePDF();
