@@ -26,6 +26,11 @@ namespace Extract.Redaction
         readonly string _inputFile;
 
         /// <summary>
+        /// Settings associated with changing the action status of a file once it is committed.
+        /// </summary>
+        readonly SetFileActionStatusSettings _actionStatusSettings;
+
+        /// <summary>
         /// Whether input event tracking should be enabled.
         /// </summary>
         readonly bool _enableInputTracking;
@@ -37,7 +42,8 @@ namespace Extract.Redaction
         /// <summary>
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class.
         /// </summary>
-        public VerificationSettings() : this(null, null, null, false)
+        public VerificationSettings() 
+            : this(null, null, null, null, false)
         {
 
         }
@@ -46,12 +52,13 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class with the 
         /// specified settings.
         /// </summary>
-        public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback,
-            string inputFile, bool enableInputTracking)
+        public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback, 
+            string inputFile, SetFileActionStatusSettings actionStatus, bool enableInputTracking)
         {
             _generalSettings = general ?? new GeneralVerificationSettings();
             _feedbackSettings = feedback ?? new FeedbackSettings();
             _inputFile = inputFile ?? @"<SourceDocName>.voa";
+            _actionStatusSettings = actionStatus ?? new SetFileActionStatusSettings();
             _enableInputTracking = enableInputTracking;
         }
 
@@ -97,6 +104,20 @@ namespace Extract.Redaction
         }
 
         /// <summary>
+        /// Gets the settings associated with setting the action status for file when it is 
+        /// committed.
+        /// </summary>
+        /// <value>The settings associated with setting the action status for file when it is 
+        /// committed.</value>
+        public SetFileActionStatusSettings ActionStatusSettings
+        {
+            get
+            {
+                return _actionStatusSettings;
+            }
+        }
+
+        /// <summary>
         /// Gets whether input event tracking should be enabled.
         /// </summary>
         /// <returns><see langword="true"/> if input event tracking should be enabled and
@@ -128,22 +149,25 @@ namespace Extract.Redaction
                 GeneralVerificationSettings general = GeneralVerificationSettings.ReadFrom(reader);
                 FeedbackSettings feedback = FeedbackSettings.ReadFrom(reader);
                 string inputFile = reader.ReadString();
+                SetFileActionStatusSettings actionStatusSettings = null;
+                bool enableInputTracking = false;
 
-                int version = reader.Version;
-                if (version < 2)
+                if (reader.Version < 2)
                 {
                     // Ignore obsolete metadata settings
                     reader.ReadBoolean();
                     reader.ReadString();
                 }
-
-                // Read the input event tracking setting
-                bool enableInputTracking = false;
-                if (version >= 3)
+                if (reader.Version >= 3)
                 {
                     enableInputTracking = reader.ReadBoolean();
                 }
-                return new VerificationSettings(general, feedback, inputFile, enableInputTracking);
+                if (reader.Version >= 4)
+                {
+                	actionStatusSettings = SetFileActionStatusSettings.ReadFrom(reader);
+                }
+
+                return new VerificationSettings(general, feedback, inputFile, actionStatusSettings, enableInputTracking);
             }
             catch (Exception ex)
             {
@@ -166,6 +190,7 @@ namespace Extract.Redaction
                 _feedbackSettings.WriteTo(writer);
                 writer.Write(_inputFile);
                 writer.Write(_enableInputTracking);
+                _actionStatusSettings.WriteTo(writer);
             }
             catch (Exception ex)
             {

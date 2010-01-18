@@ -19,6 +19,7 @@ using System.Xml;
 using TD.SandDock;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+using UCLID_FILEPROCESSORSLib;
 using UCLID_REDACTIONCUSTOMCOMPONENTSLib;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
@@ -154,6 +155,16 @@ namespace Extract.Redaction.Verification
         /// Tracks user input in the file processing database.
         /// </summary>
         InputEventTracker _inputEventTracker;
+        
+        /// <summary>
+        /// Used to set the file action status when a document is committed.
+        /// </summary>
+        readonly IFileProcessingTask _actionStatusTask;
+
+        /// <summary>
+        /// Expands file action manager path tags.
+        /// </summary>
+        FAMTagManager _tagManager;
 
         #endregion Fields
 
@@ -191,6 +202,8 @@ namespace Extract.Redaction.Verification
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
 
                 _settings = settings;
+
+                _actionStatusTask = GetActionStatusTask(_settings.ActionStatusSettings);
 
                 InitializeComponent();
 
@@ -265,6 +278,25 @@ namespace Extract.Redaction.Verification
         #region Methods
 
         /// <summary>
+        /// Creates an action status file processor using the specified settings.
+        /// </summary>
+        /// <param name="settings">The settings to use to create the file processor.</param>
+        /// <returns>An action status file processor.</returns>
+        static IFileProcessingTask GetActionStatusTask(
+            SetFileActionStatusSettings settings)
+        {
+            SetActionStatusFileProcessor processor = null;
+            if (settings.Enabled)
+            {
+                processor = new SetActionStatusFileProcessor();
+                processor.ActionName = settings.ActionName;
+                processor.ActionStatus = (int)settings.ActionStatus;
+            }
+
+            return (IFileProcessingTask) processor;
+        }
+
+        /// <summary>
         /// Gets whether shortcuts are enabled.
         /// </summary>
         /// <returns><see langword="true"/> if shortcut keys are enabled;
@@ -303,12 +335,17 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void Commit()
         {
+            // Save
             TimeInterval screenTime = StopScreenTime();
             Save(screenTime);
 
-            SaveRedactionCounts(screenTime);
-
-            AdvanceToNextDocument();
+            // Commit
+            if (_actionStatusTask != null)
+            {
+                VerificationMemento memento = GetSavedMemento();
+                _actionStatusTask.ProcessFile(memento.ImageFile, memento.FileId, memento.ActionId,
+                    _tagManager, _fileDatabase, null, false);
+            }
         }
 
         /// <summary>
@@ -576,6 +613,9 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void AdvanceToNextDocument()
         {
+            TimeInterval screenTime = StopScreenTime();
+            SaveRedactionCounts(screenTime);
+
             CommitComment();
 
             if (IsInHistory)
@@ -685,14 +725,21 @@ namespace Extract.Redaction.Verification
                     }
                     else if (result == "Save")
                     {
-                        // Prompt for invalid data only if in the history queue [FIDSC #3863]
-                        if (IsInHistory && WarnIfInvalid())
+                        if (IsInHistory)
                         {
-                            return true;
-                        }
+                            // Prompt for invalid data only if in the history queue [FIDSC #3863]
+                            if (WarnIfInvalid())
+                            {
+                                return true;
+                            }
 
-                        TimeInterval screenTime = StopScreenTime();
-                        Save(screenTime);
+                            Commit();
+                        }
+                        else
+                        {
+                            TimeInterval screenTime = StopScreenTime();
+                            Save(screenTime);
+                        }
                     }
                 }
             }
@@ -849,6 +896,8 @@ namespace Extract.Redaction.Verification
                 if (!WarnIfInvalid())
                 {
                     Commit();
+
+                    AdvanceToNextDocument();
                 }
             }
         }
@@ -960,6 +1009,8 @@ namespace Extract.Redaction.Verification
                     if (!WarnBeforeTabCommit())
                     {
                         Commit();
+
+                        AdvanceToNextDocument();
                     }
                 }
             }
@@ -1186,9 +1237,6 @@ namespace Extract.Redaction.Verification
 
                 if (!WarnIfDirty())
                 {
-                    TimeInterval screenTime = StopScreenTime();
-                    SaveRedactionCounts(screenTime);
-
                     AdvanceToNextDocument();
                 }
             }
@@ -2171,6 +2219,7 @@ namespace Extract.Redaction.Verification
                 // Create the path tags
                 FileActionManagerPathTags pathTags = 
                     new FileActionManagerPathTags(fullPath, tagManager.FPSFileDir);
+                _tagManager = tagManager;
 
                 // Create the saved memento
                 _savedMemento = CreateSavedMemento(fullPath, fileID, actionID, pathTags);

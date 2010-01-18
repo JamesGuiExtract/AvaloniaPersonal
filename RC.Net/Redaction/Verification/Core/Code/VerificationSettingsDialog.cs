@@ -1,5 +1,8 @@
+using Extract.Utilities.Forms;
 using System;
 using System.Windows.Forms;
+using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.Redaction.Verification
 {
@@ -42,6 +45,17 @@ namespace Extract.Redaction.Verification
             InitializeComponent();
 
             _settings = settings ?? new VerificationSettings();
+
+			FileProcessingDB database = new FileProcessingDB();
+			database.ConnectLastUsedDBThisProcess();
+
+            StrToStrMap actionNameToId = database.GetActions();
+            VariantVector actionNames = actionNameToId.GetKeys();
+            int size = actionNames.Size;
+            for (int i = 0; i < size; i++)
+            {
+                _actionNameComboBox.Items.Add(actionNames[i]);
+            }
         }
 
         #endregion Constructors
@@ -79,9 +93,10 @@ namespace Extract.Redaction.Verification
             GeneralVerificationSettings general = GetGeneralSettings();
             FeedbackSettings feedback = GetFeedbackSettings();
             string dataFile = _dataFileControl.DataFile;
+            SetFileActionStatusSettings action = GetActionStatusSettings();
             bool enableInputTracking = _enableInputEventTrackingCheckBox.Checked;
 
-            return new VerificationSettings(general, feedback, dataFile, enableInputTracking);
+            return new VerificationSettings(general, feedback, dataFile, action, enableInputTracking);
         }
 
         /// <summary>
@@ -118,11 +133,105 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Gets the <see cref="SetFileActionStatusSettings"/> from the user interface.
+        /// </summary>
+        /// <returns>The <see cref="SetFileActionStatusSettings"/> from the user interface.
+        /// </returns>
+        SetFileActionStatusSettings GetActionStatusSettings()
+        {
+            // Get the settings
+            bool enabled = _fileActionCheckBox.Checked;
+            string actionName = _actionNameComboBox.Text;
+            EActionStatus actionStatus = GetActionStatusFromString(_actionStatusComboBox.Text);
+
+            return new SetFileActionStatusSettings(enabled, actionName, actionStatus);
+        }
+
+        /// <summary>
+        /// Gets the action status with the specified name.
+        /// </summary>
+        /// <param name="name">The name of the action status to return.</param>
+        /// <returns>The action status with the specified <paramref name="name"/>.</returns>
+        static EActionStatus GetActionStatusFromString(string name)
+        {
+            string upperCaseName = name.ToUpperInvariant();
+            switch (upperCaseName)
+            {
+                case "PENDING":
+                    return EActionStatus.kActionPending;
+                case "UNATTEMPTED":
+                    return EActionStatus.kActionUnattempted;
+                case "COMPLETED":
+                    return EActionStatus.kActionCompleted;
+                case "FAILED":
+                    return EActionStatus.kActionFailed;
+                case "SKIPPED":
+                    return EActionStatus.kActionSkipped;
+            }
+
+            ExtractException ee = new ExtractException("ELI29171",
+                "Unexpected action status.");
+            ee.AddDebugData("Action status", name, false);
+            throw ee;
+        }
+
+        /// <summary>
+        /// Gets the name of the specified action status.
+        /// </summary>
+        /// <param name="status">Action status whose name should be retrieved.</param>
+        /// <returns>The name of the specified action <paramref name="status"/>.</returns>
+        static string GetStringFromActionStatus(EActionStatus status)
+        {
+            switch (status)
+            {
+                case EActionStatus.kActionCompleted:
+                    return "Completed";
+                case EActionStatus.kActionFailed:
+                    return "Failed";
+                case EActionStatus.kActionPending:
+                    return "Pending";
+                case EActionStatus.kActionSkipped:
+                    return "Skipped";
+                case EActionStatus.kActionUnattempted:
+                    return "Unattempted";
+            }
+
+            ExtractException ee = new ExtractException("ELI29172",
+                "Unexpected action status");
+            ee.AddDebugData("Action status", status, false);
+            throw ee;
+        }
+
+        /// <summary>
+        /// Gets the name of the action to select when the form is first displayed.
+        /// </summary>
+        /// <returns>The name of the action to select when the form is first displayed.</returns>
+        string GetInitialActionName()
+        {
+            string actionName = _settings.ActionStatusSettings.ActionName;
+            if (string.IsNullOrEmpty(actionName) && _actionNameComboBox.Items.Count > 0)
+            {
+                // If no action is selected, select the first action in the combo box
+                object item = _actionNameComboBox.Items[0];
+                actionName = _actionNameComboBox.GetItemText(item);
+            }
+
+            return actionName;
+        }
+
+        /// <summary>
         /// Updates the enabled state of the controls.
         /// </summary>
         void UpdateControls()
         {
+            // Enable or disable feedback settings
             _feedbackSettingsButton.Enabled = _collectFeedbackCheckBox.Checked;
+
+            // Enable or disable action status settings
+            bool enabled = _fileActionCheckBox.Checked;
+            _actionNameComboBox.Enabled = enabled;
+            _actionNamePathTagsButton.Enabled = enabled;
+            _actionStatusComboBox.Enabled = enabled;
         }
 
         /// <summary>
@@ -170,6 +279,11 @@ namespace Extract.Redaction.Verification
                 // ID Shield data file
                 _dataFileControl.DataFile = _settings.InputFile;
 
+                // Action status settings
+                _fileActionCheckBox.Checked = _settings.ActionStatusSettings.Enabled;
+                _actionNameComboBox.Text = GetInitialActionName();
+                _actionStatusComboBox.Text = GetStringFromActionStatus(_settings.ActionStatusSettings.ActionStatus);
+                
                 // Input tracking
                 _enableInputEventTrackingCheckBox.Checked = _settings.EnableInputTracking;
 
@@ -231,6 +345,44 @@ namespace Extract.Redaction.Verification
                 ExtractException ee = ExtractException.AsExtractException("ELI26305", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="CheckBox.CheckedChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="CheckBox.CheckedChanged"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="CheckBox.CheckedChanged"/> event.</param>
+        void HandleFileActionCheckBoxCheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateControls();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29173", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
+        void HandleActionNamePathTagsButtonTagSelected(object sender, TagSelectedEventArgs e)
+        {
+            try
+            {
+                _actionNameComboBox.SetSelectedText(e.Tag);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29162", ex);
             }
         }
 
