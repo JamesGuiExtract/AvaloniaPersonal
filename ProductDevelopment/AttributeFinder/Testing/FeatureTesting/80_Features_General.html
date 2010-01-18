@@ -343,6 +343,122 @@
 			random subset.
 	       	</ul>
        	</ul>
+<p>
+	<LI><h2>User Authentication in the FAM</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> LegacyRC #5606
+  	   	<LI><b>Details:</b> If the DBInfo table is configured to require authentication, 
+		check the <b>Login</b> table in the database for the current user's login ID when 
+		the user tries to start processing.  If not present, provide a meaningful error 
+		message.  If present, check for a hashed password in the Login table.  Request 
+		password if appropriate.  The <b>DB Admin</b> utility will be enhanced to allow 
+		management of users and passwords.
+	       	<ul>
+			<li>See the detailed <b>Specifications related to user authentication in 
+			the FAM</b> notes posted by Arvind on 1/4/10.
+	       	</ul>
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+			<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li><u><b>Manage Users - UI</b></u>
+		       	<ul>
+		      		<li>Confirm that a <b>Manage users...</b> menu entry exists 
+				under the <b>Tools</b> menu.
+		      		<li>Confirm that selecting the menu entry displays the 
+				<b>Manage Users</b> dialog.
+	      			<li>Confirm that the dialog includes a two-column list box 
+				for <b>User</b> and <b>Password set</b>.
+	      			<li>Confirm that the dialog includes an <b>Add...</b> button.
+				<li>Confirm that the Add button displays an edit box for 
+				adding a login ID.
+				<li>Confirm that the edit box is pre-populated with the 
+				current user's login ID. 
+				<li>Confirm that the login ID in the edit box is completely 
+				selected allowing for an easy overwrite. 
+	      			<li>Confirm that the dialog includes a <b>Remove</b> button.
+				<li>Confirm that the <b>Remove</b> button is disabled if 
+				no user is selected.
+				<li>Confirm that clicking the <b>Remove</b> button displays 
+				a confirmation dialog.
+	      			<li>Confirm that the dialog includes a <b>Rename</b> button.
+				<li>Confirm that the <b>Rename</b> button is disabled if 
+				no user is selected.
+				<li>Confirm that clicking the <b>Rename</b> button displays 
+				an edit box for modifying a login ID.
+				<li>Confirm that the edit box is pre-populated with the 
+				selected user's login ID. 
+	      			<li>Confirm that the dialog includes a <b>Clear password</b> 
+				button.
+				<li>Confirm that the <b>Clear password</b> button is disabled 
+				if no user is selected.
+				<li>Confirm that clicking the <b>Clear password</b> button 
+				displays a confirmation dialog.
+	      			<li>Confirm that the dialog includes a <b>Refresh</b> button.
+	      			<li>Confirm that the dialog includes a <b>Close</b> button.
+		       	</ul>
+<p>
+	      		<li><u><b>Manage Users - Functionality</b></u>
+		       	<ul>
+				<li>Confirm that a new user is added to the bottom of the list.
+				<li>Confirm that the <b>User</b> column for a new user 
+				is <b>first_last</b> per the normal network login.
+				<li>Confirm that the <b>Password set</b> column for a new user 
+				is <b>No</b>.
+		      		<li>Confirm that an error message is displayed if a duplicate 
+				user is added.
+				<li>Confirm that an <b>admin</b> user cannot be added.
+				<li>Confirm that an <b>administrator</b> user cannot be added.
+		      		<li>Confirm that a user is properly removed depending on the 
+				response to the confirmation dialog.
+		      		<li>Confirm that the <b>Password set</b> value is properly 
+				reset to <b>No</b> depending on the response to the 
+				confirmation dialog.
+	      			<li>Confirm that clicking the <b>Close</b> button closes the 
+				dialog.
+		       	</ul>
+<p>
+	      		<li><u><b>General Functionality</b></u>
+		       	<ul>
+				<li>Confirm that a <b>RequireAuthenticationBeforeRun</b> field 
+				is defined in the <b>DBInfo</b> table.
+				<li>Confirm that <b>RequireAuthenticationBeforeRun</b> defaults 
+				to <b>0</b>.
+				<li>Confirm that user authentication is only active when 
+				<b>RequireAuthenticationBeforeRun = 1</b>.
+				<li>Confirm that for a user with a cleared password, clicking 
+				the <b>Start processing</b> button prompts the user to define 
+				a password.
+				<li>Confirm that the <b>Login</b> table is updated.
+				<li>Confirm that the new password is not stored in clear text.
+				<li>Confirm that the new password does not need to match the 
+				user's network password.
+				<li>Confirm that processing <b>will not</b> start if an 
+				incorrect password is provided.
+				<li>Confirm that processing <b>will</b> start if a correct 
+				password is provided.
+				<li>Refresh and cleared passwords
+				<ul>
+					<li>Select a user with a defined password.
+					<li>Clear the password.
+					<li>Open a FAM instance as the selected user.
+					<li>Confirm that clicking the <b>Start processing</b> 
+					button prompts the user to define a new password.
+					<li>Confirm that the FAM starts processing after 
+					definition of the new password.
+					<li>Use SQL Management Studio to confirm that a hashed 
+					password exists in the <b>Login</b> table for the 
+					selected user.
+					<li>Click the <b>Refresh</b> button in the <b>Manage 
+					users</b> dialog.
+					<li>Confirm that <b>Password set = Yes</b>.
+				</ul>
+		       	</ul>
+	       	</ul>
+       	</ul>
 </OL>
 </BODY>
 </HTML>
