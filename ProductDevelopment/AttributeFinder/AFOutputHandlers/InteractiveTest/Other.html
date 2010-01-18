@@ -282,6 +282,33 @@
 	      	<li>Changes made are persistent.</li>
       		<li><b>Cancel</b> button ignores changes and exits dialog.</li>
 	      	<li><b>X</b> button ignores changes and exits dialog.
+<p>
+  	   	<LI><b>[FlexIDSCore #2655, #3557, #3559]</b> Output To XML
+	       	<ul>
+	      		<li>Create an RSD file that contains an <b>Output to XML</b> output handler.  
+			Confirm that <b>Include schema name in output</b> is unchecked.
+	      		<li>Save the RSD file.
+	      		<li>Reload the same RSD file.
+	      		<li>Configure the output handler.
+	      		<li>Change nothing and click <b>OK</b>.
+	      		<li>Confirm that an <b>Unspecified schema name</b> error message is not displayed.
+<p>
+	      		<li>Confirm that <b>Remove spatial information in output</b> is available 
+			in the property page.
+	      		<li>Confirm that the setting is persistent.
+	      		<li>Confirm that with the option <b>off</b>, spatial information is provided 
+			in the XML file.
+	      		<li>Confirm that with the option <b>on</b>, spatial information is not provided 
+			in the XML file.
+<p>
+	      		<li>Create an RSD file that contains an <b>Output to XML</b> output handler.  
+			Select <b>Version 1</b> format.
+	      		<li>Save the RSD file.
+	      		<li>Reload the same RSD file.
+	      		<li>Configure the output handler.
+	      		<li>Confirm that the checkboxes associated with <b>Version 2</b> format are 
+			not enabled.
+	       	</ul>
 	</ul>
 <p>
 	<li><h2>Reformat Person Names</h2>
