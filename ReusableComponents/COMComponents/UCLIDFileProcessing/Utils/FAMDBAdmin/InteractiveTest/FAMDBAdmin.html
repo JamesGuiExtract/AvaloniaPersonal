@@ -165,7 +165,6 @@
 	database is cleared by clicking Database->Clear menu.
 	<li><b>[LegacyRC #4774]</b> Keyboard Accelerators from Summary Tab.
 	<ul>
-		<li>Confirm that <b>Ctrl + A</b> works for <b>Add Action</b>.
 		<li>Confirm that <b>Ctrl + H</b> works for <b>Change Password</b>.
 		<li>Confirm that <b>Ctrl + M</b> works for <b>Manually Set Action Status</b>.
 	</ul>
@@ -220,8 +219,10 @@
 		<li>Confirm that successful login is possible when the database is locked.
 		<li>Confirm that clicking on <b>Reset lock</b> clears the 
 		database lock (removes all entries from <b>dbo.LockTable</b>).
-		<li>Confirm that <b>CTRL+R</b> performs the same function as selecting 
-		the <b>Reset lock</b> option from the <b>Database</b> menu.
+<p>
+		<LI><b>[LegacyRC #5281]</b> Confirm that <b>LockDB.bat</b> located in the 
+		<b>.\UCLIDFileProcessing\AutomatedTests</b> folder locks the database.
+		<li>Confirm that <b>CTRL+R</b> unlocks the database.
 	</ul>
 <p>
 	<li><b>Change Password</b></li>
@@ -266,6 +267,10 @@
 	<li>Confirm that <b>Actions...</b>, <b>Counters...</b>, <b>Tags...</b>, 
 	and <b>Users...</b> items exist in the menu.
 	<li>Confirm that all menu items are enabled.
+	<li>Confirm that <b>Ctrl+A</b> displays the <b>Manage Actions</b> dialog.
+	<li>Confirm that <b>Ctrl+C</b> displays the <b>Manage Counters</b> dialog.
+	<li>Confirm that <b>Ctrl+T</b> displays the <b>Manage Tags</b> dialog.
+	<li>Confirm that <b>Ctrl+U</b> displays the <b>Manage Users</b> dialog.
 <p>
 	<li><b>Manage Actions...</b>
 	<ul>
@@ -307,8 +312,6 @@
 			in the confirmation dialog does not add an action to the database.
 			<li>Confirm that adding an action and clicking <b>Cancel</b> 
 			in the confirmation dialog does not add an action to the database.
-			<li>Confirm that <b>CTRL+A</b> performs the same function as 
-			selecting <b>Add...</b> from the <b>Action</b> menu.
 			<li><b>[LegacyRC #4677]</b> Case-sensitivity for action names.
 			<ul>
 				<li>Add an action such as <b>test</b> to the database.
