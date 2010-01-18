@@ -40,6 +40,8 @@ ClearImageInstallFilesDir=P:\AttributeFinder\ClearImageFiles
 
 InternalUseBuildFilesArchive=P:\AttributeFinder\Archive\InternalUseBuildFiles\InternalBuilds\$(FlexIndexVersion)
 
+MergeModuleDir=C:\InstallShield 2010 Projects\MergeModules
+
 # determine the name of the release output directory based upon the build
 # configuration that is being built
 !IF "$(BuildConfig)" == "Release"
@@ -243,6 +245,12 @@ CopyFilesToInstallFolder: ObfuscateFiles
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\mssccprj.scc"
 	@DeleteFiles "$(ClearImageInstallFilesDir)\vssver.scc"
 
+CleanUpMergeModulesFromPreviousBuilds:
+	@ECHO Deleting old merge modules....
+	@DeleteFiles "$(MergeModuleDir)\DataEntry.msm"
+	@DeleteFiles "$(MergeModuleDir)\UCLIDFlexIndex.msm"
+	@DeleteFiles "$(MergeModuleDir)\UCLIDInputFunnel.msm"
+	
 BuildAFCoreMergeModule: CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles
     @ECHO Buliding the UCLIDFlexIndex Merge Module installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
@@ -251,7 +259,7 @@ BuildAFCoreMergeModule: CopyFilesToInstallFolder EncryptAndCopyComponentDataFile
  
 GetAllFiles: GetPDCommonFiles GetReusableComponentFiles GetRCdotNETFiles GetAttributeFinderFiles GetPDUtilsFiles GetComponentDataFiles
 
-DoEverythingNoGet: SetupBuildEnv BuildAFCoreMergeModule
+DoEverythingNoGet: SetupBuildEnv CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule
     @ECHO.
     @DATE /T
     @TIME /T
