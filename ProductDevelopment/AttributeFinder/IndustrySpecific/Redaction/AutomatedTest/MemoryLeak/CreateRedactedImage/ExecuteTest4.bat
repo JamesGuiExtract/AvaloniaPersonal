@@ -1,5 +1,5 @@
 REM Clean Source folder
-call Clean.bat
+call Clean.bat Test_4
 
 REM Supply Numbered Files for 4 hours - first VOA files, then image files
 START CopyNumberedFiles.exe "ImageWithAnnotations.tif.voa" ".\Source" 1s -h4
