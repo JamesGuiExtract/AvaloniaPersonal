@@ -14,18 +14,7 @@
 	<li><h2><b>Address Finder</b></h2>
     	<ul>
     		<li>Confirm that the <b>Configure</b> button is inactive.</li>
-<p>
-  	   	<LI><b>[FlexIDSCore #3072]</b> Return Address Finder
-	       	<ul>
-	      		<li>Exercise the RSD file and samples attached to the SCR.
-	      		<li>Confirm that no <b>Invalid index!</b> exceptions are generated.
-	       	</ul>
-	    	<li><b>[FlexIDSCore #3246]</b> Licensing for Address Finder and Return Address Finder</li>
-		<ul>
-		    	<li>Confirm that only an <b>ID Shield Server</b> license file is present.</li>
-		    	<li>Check for new components.</li>
-		    	<li>Confirm that an RSD file using <b>Address Finder</b> runs without error.</li>
-		</ul>
+    		<li>Confirm that an RSD file using <b>Address finder</b> will not run.</li>
     	</ul>
   	</li>
 <p>
@@ -183,29 +172,15 @@
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Grantor-Grantee Finder 
 		Ver 2</b> dialog.</li>
-      		<li><b>Find all entity types</b> radio button is selectable.</li>
-      		<li><b>Find entity types for each document type as specified</b>
-        	radio button is selectable.
-        	<ul>
-          		<li>Related list boxes are activated when selected.
-            		<ul>
-              			<li>Upper list box lists an entry for existing folders in the
-                		<b>ComponentData\GrantorGranteeFinder</b> directory.</li>
-              			<li>Lower list box lists a checkable entry for any existing files
-                		contained in the folder selected in the upper list box.</li>
-            		</ul>
-          		</li>
-        	</ul>
-      		</li>
-      		<li><b>OK</b> button saves changes and exits the dialog.</li>
-      		<li><b>Cancel</b> button ignores changes and exits dialog.</li>
-      		<li><b>X</b> button ignores changes and exits dialog.</li>
+    		<li>Confirm that an RSD file using <b>Grantor-Grantee finder ver. 2</b> will 
+		not run.</li>
     	</ul>
   	</li>
 <p>
   	<li><h2><b>Legal Description Finder</b></h2>
     	<ul>
       		<li><b>Configure</b> button is inactive.</li>
+    		<li>Confirm that an RSD file using <b>Legal Description Finder</b> will not run.</li>
     	</ul>
   	</li>
 <p>
@@ -267,6 +242,13 @@
 			Confirm that the processing time is significantly less.
   			<li>Confirm that the overall capture rate is nearly the same.
   		</ul>
+  	   	<LI><b>[FlexIDSCore #3502]</b> MICR Finder and bad images
+	       	<ul>
+	      		<li>Exercise the delivered <b>St Johns</b> rules against the images in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3502</b>.
+	      		<li>Confirm that <b>Internal error: Function/Method requirements not met</b> 
+			exceptions are not seen.
+	       	</ul>
     	</ul>
   	</li>
 <p>
@@ -324,24 +306,7 @@
   	<li><h2><b>Return Address Finder</b></h2>
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Return Address Finder</b> dialog.</li>
-      		<li><b>If no return addresses are found search for other addresses</b>
-        	check box is checkable.</li>
-	  	<li><b>Ok</b> button Saves changes.</li>
-	  	<li><b>Cancel</b> button does not save changes.</li>
-	  	<li><b>X</b> button does not save changes.</li>
-<p>
-	  	<li><b>[FlexIDSCore #2943]</b> Use the Return Address Finder on the following 
-		document and confirm that the <b>Spatial String must not be multi-page for 
-		GetBounds.</b> error is not logged.</li>
-	  	<li>K:\Common\Engineering\Sample Files\AtPac\OR -
-		Washington\Set007\Images\BYLAWS\2007-028700.tif.uss</li>
-<p>
-		<li><b>[FlexIDSCore #3246]</b> Licensing for Address Finder and Return Address Finder.</li>
-		<ul>
-			<li>Confirm that only an <b>ID Shield Server</b> license file is present.</li>
-			<li>Check for new components.</li>
-			<li>Confirm that an RSD file using <b>Return Address Finder</b> runs without error.</li>
-		</ul>
+    		<li>Confirm that an RSD file using <b>Return address finder</b> will not run.</li>
     	</ul>
   	</li>
 </ol>
