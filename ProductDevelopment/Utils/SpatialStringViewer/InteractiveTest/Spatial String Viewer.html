@@ -63,6 +63,21 @@
  			<li>Confirm presence of columns for <b>Page #</b>, <b>Height</b>, 
 			<b>Width</b>, <b>Deskew</b> and <b>Orientation</b>.
 <p>
+	  	   	<LI><b>[FlexIDSCore #3519]</b> USS files and UNC path
+		       	<ul>
+	      			<li>Exercise the RSD file attached to the SCR against 
+				<b>K:\Common\Engineering\Sample Files\AtPac\CA -
+				Kern\Set002\Images\19834000236501.001</b>.
+		      		<li>Confirm that the rules work without error.
+<p> 
+		      		<li>Navigate to and open a USS via a mapped drive.
+	      			<li>Confirm that <b>File - Properties</b> shows the navigated path as 
+				Source Document and the UNC path as Original Source Document.
+		      		<li>Navigate to and open a USS via a UNC path.
+		      		<li>Confirm that <b>File - Properties</b> shows the UNC path as both 
+				Source Document and Original Source Document.
+		       	</ul>
+<p>
  			<li><b>[LegacyRC #5313]</b> Confirm that the <b>File - Properties</b> 
 			menu item displays a meaningful error message if no USS file is open.
       		</ul>
