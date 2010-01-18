@@ -39,6 +39,7 @@ namespace Extract.Redaction.Verification
         private void InitializeComponent()
         {
             System.Windows.Forms.GroupBox groupBox1;
+            this._enableInputEventTrackingCheckBox = new System.Windows.Forms.CheckBox();
             this._feedbackSettingsButton = new System.Windows.Forms.Button();
             this._collectFeedbackCheckBox = new System.Windows.Forms.CheckBox();
             this._requireExemptionsCheckBox = new System.Windows.Forms.CheckBox();
@@ -53,6 +54,7 @@ namespace Extract.Redaction.Verification
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(this._enableInputEventTrackingCheckBox);
             groupBox1.Controls.Add(this._feedbackSettingsButton);
             groupBox1.Controls.Add(this._collectFeedbackCheckBox);
             groupBox1.Controls.Add(this._requireExemptionsCheckBox);
@@ -60,10 +62,20 @@ namespace Extract.Redaction.Verification
             groupBox1.Controls.Add(this._verifyAllPagesCheckBox);
             groupBox1.Location = new System.Drawing.Point(12, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(368, 121);
+            groupBox1.Size = new System.Drawing.Size(368, 138);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "General";
+            // 
+            // _enableInputEventTrackingCheckBox
+            // 
+            this._enableInputEventTrackingCheckBox.AutoSize = true;
+            this._enableInputEventTrackingCheckBox.Location = new System.Drawing.Point(6, 115);
+            this._enableInputEventTrackingCheckBox.Name = "_enableInputEventTrackingCheckBox";
+            this._enableInputEventTrackingCheckBox.Size = new System.Drawing.Size(156, 17);
+            this._enableInputEventTrackingCheckBox.TabIndex = 5;
+            this._enableInputEventTrackingCheckBox.Text = "Enable input event tracking";
+            this._enableInputEventTrackingCheckBox.UseVisualStyleBackColor = true;
             // 
             // _feedbackSettingsButton
             // 
@@ -120,7 +132,7 @@ namespace Extract.Redaction.Verification
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(306, 214);
+            this._cancelButton.Location = new System.Drawing.Point(306, 225);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 3;
@@ -130,7 +142,7 @@ namespace Extract.Redaction.Verification
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(225, 214);
+            this._okButton.Location = new System.Drawing.Point(225, 225);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 2;
@@ -140,7 +152,7 @@ namespace Extract.Redaction.Verification
             // 
             // _dataFileControl
             // 
-            this._dataFileControl.Location = new System.Drawing.Point(12, 140);
+            this._dataFileControl.Location = new System.Drawing.Point(12, 156);
             this._dataFileControl.Name = "_dataFileControl";
             this._dataFileControl.Size = new System.Drawing.Size(369, 60);
             this._dataFileControl.TabIndex = 1;
@@ -151,7 +163,7 @@ namespace Extract.Redaction.Verification
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(392, 249);
+            this.ClientSize = new System.Drawing.Size(392, 260);
             this.Controls.Add(this._dataFileControl);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
@@ -178,5 +190,6 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button _okButton;
         private DataFileControl _dataFileControl;
+        private System.Windows.Forms.CheckBox _enableInputEventTrackingCheckBox;
     }
 }

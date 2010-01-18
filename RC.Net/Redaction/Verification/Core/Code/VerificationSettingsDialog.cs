@@ -79,8 +79,9 @@ namespace Extract.Redaction.Verification
             GeneralVerificationSettings general = GetGeneralSettings();
             FeedbackSettings feedback = GetFeedbackSettings();
             string dataFile = _dataFileControl.DataFile;
+            bool enableInputTracking = _enableInputEventTrackingCheckBox.Checked;
 
-            return new VerificationSettings(general, feedback, dataFile);
+            return new VerificationSettings(general, feedback, dataFile, enableInputTracking);
         }
 
         /// <summary>
@@ -168,6 +169,9 @@ namespace Extract.Redaction.Verification
 
                 // ID Shield data file
                 _dataFileControl.DataFile = _settings.InputFile;
+
+                // Input tracking
+                _enableInputEventTrackingCheckBox.Checked = _settings.EnableInputTracking;
 
                 // Update the UI
                 UpdateControls();

@@ -83,6 +83,19 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         internal static readonly string DependentServices = "DependentServices";
 
+        /// <summary>
+        /// The setting key to read the number of files to process from.
+        /// </summary>
+        internal static readonly string NumberOfFilesToProcess = "NumberOfFilesToProcess";
+
+        /// <summary>
+        /// The default number of files to process before respawning the FAMProcess
+        /// <para><b>Note:</b></para>
+        /// A value of 0 indicates that the process should keep processing until it is
+        /// stopped and will not be respawned. Negative values are not allowed.
+        /// </summary>
+        internal static readonly int DefaultNumberOfFilesToProcess = 0;
+
         #endregion Constants
 
         #region Fields
@@ -130,6 +143,11 @@ namespace Extract.FileActionManager.Utilities
         volatile int _activeProcessingThreadCount;
 
         /// <summary>
+        /// The number of files to process
+        /// </summary>
+        int _numberOfFilesToProcess = DefaultNumberOfFilesToProcess;
+
+        /// <summary>
         /// Mutex to provide synchronized access to data.
         /// </summary>
         object _lock = new object();
@@ -173,6 +191,9 @@ namespace Extract.FileActionManager.Utilities
                 // Create the sleep thread and start it
                 _sleepThread = new Thread(SleepAndCheckDependentServices);
                 _sleepThread.Start();
+
+                // Get the number of files to process
+                _numberOfFilesToProcess = GetNumberOfFilesToProcess();
 
                 lock (_lock)
                 {
@@ -372,24 +393,44 @@ namespace Extract.FileActionManager.Utilities
                 // Get the processing thread arguments
                 ProcessingThreadArguments arguments = (ProcessingThreadArguments)threadParameters;
 
-                // Create the FAM process
-                famProcess = new FileProcessingManagerProcessClass();
-                pid = famProcess.ProcessID;
-
-                // Set the FPS file name
-                famProcess.FPSFile = arguments.FPSFileName;
-
-                // Ensure that processing has not been stopped before starting processing
-                if (_stopProcessing != null && !_stopProcessing.WaitOne(0))
+                // Run FAMProcesses in a loop respawning them if needed
+                while(_stopProcessing != null && !_stopProcessing.WaitOne(0))
                 {
-                    // Start processing
-                    famProcess.Start();
-                }
+                    // If we are spawning a new fam process, release the old
+                    // one so that the memory is released before spawning the new
+                    // process.
+                    if (famProcess != null)
+                    {
+                        // Release the COM object so the FAMProcess.exe is cleaned up
+                        Marshal.FinalReleaseComObject(famProcess);
+                        famProcess = null;
+                    }
 
-                // Wait for stop signal
-                if (_stopProcessing != null)
-                {
-                    _stopProcessing.WaitOne();
+                    // Create the FAM process
+                    famProcess = new FileProcessingManagerProcessClass();
+                    pid = famProcess.ProcessID;
+
+                    // Set the FPS file name
+                    famProcess.FPSFile = arguments.FPSFileName;
+
+                    // Ensure that processing has not been stopped before starting processing
+                    if (_stopProcessing != null && !_stopProcessing.WaitOne(0))
+                    {
+                        // Start processing
+                        famProcess.Start(_numberOfFilesToProcess);
+                    }
+
+                    // Sleep for a second and check if processing has stopped
+                    // or the FAMProcess has exited
+                    while (_stopProcessing != null && !_stopProcessing.WaitOne(1000)
+                        && SystemMethods.IsProcessRunning(_FAM_PROCESS_NAME, pid)
+                        && famProcess.IsRunning);
+
+                    // Only loop back around if the number of files to process is not 0
+                    if (_numberOfFilesToProcess == 0)
+                    {
+                        break;
+                    }
                 }
 
                 // Check if the process is still running
@@ -675,6 +716,37 @@ namespace Extract.FileActionManager.Utilities
                 {
                     dbConnection.Dispose();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of files to process from the database setting.
+        /// </summary>
+        /// <returns>The number of files to process.</returns>
+        static int GetNumberOfFilesToProcess()
+        {
+            string numberString = "";
+            try
+            {
+                int numberOfFiles = DefaultNumberOfFilesToProcess;
+                numberString = GetSettingFromDatabase(NumberOfFilesToProcess);
+                if (!string.IsNullOrEmpty(numberString))
+                {
+                    if (!int.TryParse(numberString, out numberOfFiles) ||
+                        numberOfFiles < 0)
+                    {
+                        throw new ExtractException("ELI29186",
+                            "Setting is not a valid positive integer.");
+                    }
+                }
+
+                return numberOfFiles;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI29187", ex);
+                ee.AddDebugData("Default Number Of Files", numberString, false);
+                throw ee;
             }
         }
 

@@ -108,7 +108,8 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
  m_apDatabaseStatusIconUpdater(NULL),
  m_bStatsOnlyRunning(false),
  m_bProcessingSkippedFiles(false),
- m_bPaused(false)
+ m_bPaused(false),
+ m_nNumberOfDocsToExecute(0)
 {
 	try
 	{
@@ -496,7 +497,7 @@ void FileProcessingDlg::OnBtnRun()
 		// the menus should still be updated and the exception rethrown
 		try
 		{
-			ipFPM->StartProcessing();
+			ipFPM->StartProcessing(VARIANT_FALSE);
 		}
 		catch(...)
 		{
@@ -525,7 +526,7 @@ void FileProcessingDlg::OnBtnPause()
 			if ( getFPM()->ProcessingPaused == VARIANT_TRUE)
 			{
 				// resume the processing
-				getFPM()->StartProcessing();
+				getFPM()->StartProcessing(VARIANT_FALSE);
 			}
 			else
 			{
@@ -1669,6 +1670,14 @@ void FileProcessingDlg::setCloseOnComplete(bool bCloseOnComplete)
 void FileProcessingDlg::setForceCloseOnComplete( bool bForceClose)
 {
 	m_bForceCloseOnComplete = bForceClose;
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::setNumberOfDocsToExecute(long lNumberOfDocToExecute)
+{
+	// Number must be positive or 0
+	ASSERT_ARGUMENT("ELI29185", lNumberOfDocToExecute >= 0);
+
+	m_nNumberOfDocsToExecute = lNumberOfDocToExecute;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::updateTabs(const set<EDlgTabPage>& setPages)

@@ -130,7 +130,7 @@ STDMETHODIMP CFileProcessingManager::ShowUI(VARIANT_BOOL bRunOnInit, VARIANT_BOO
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManager::StartProcessing()
+STDMETHODIMP CFileProcessingManager::StartProcessing(VARIANT_BOOL bRunningAsService)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -961,11 +961,27 @@ STDMETHODIMP CFileProcessingManager::GetExpandedActionName(BSTR *pbstrAction)
 		ASSERT_ARGUMENT("ELI29117", pbstrAction != NULL);
 
 		*pbstrAction = _bstr_t(getExpandedActionName().c_str()).Detach();
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14017")
 
-	return S_OK;
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29178");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::put_NumberOfDocsToProcess(long lNumberOfDocsToProcess)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_nNumberOfFilesToExecute = lNumberOfDocsToProcess;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29179");
+}
+
 //-------------------------------------------------------------------------------------------------
 // IRoleNotifyFAM Methods
 //-------------------------------------------------------------------------------------------------

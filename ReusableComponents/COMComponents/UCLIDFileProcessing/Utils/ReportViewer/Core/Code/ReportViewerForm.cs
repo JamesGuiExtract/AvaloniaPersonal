@@ -373,10 +373,15 @@ namespace Extract.ReportViewer
                 try
                 {
                     // Copy the report and preview file (overwriting if necessary)
+                    string previewName = FileSystemMethods.PathCombine(
+                        ExtractReport.StandardReportFolder,
+                        Path.GetFileNameWithoutExtension(_report.FileName),
+                        _PREVIEW_EXTENSION);
                     File.Copy(_report.FileName, baseSavedName + ".rpt", true);
-                    File.Copy(ExtractReport.StandardReportFolder
-                        + Path.GetFileNameWithoutExtension(_report.FileName) + _PREVIEW_EXTENSION,
-                        baseSavedName + _PREVIEW_EXTENSION, true);
+                    if (File.Exists(previewName))
+                    {
+                        File.Copy(previewName, baseSavedName + _PREVIEW_EXTENSION, true);
+                    }
 
                     // Write the xml file
                     _report.WriteXmlFile(baseSavedName + ".xml", true);

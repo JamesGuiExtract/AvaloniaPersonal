@@ -326,7 +326,7 @@ string SelectActionDlg::getActionName()
 {
 	CString zText;
 	m_cmbAction.GetWindowText(zText);
-	return zText;
+	return (LPCTSTR)zText;
 }
 //-------------------------------------------------------------------------------------------------
 void SelectActionDlg::makeDropListEditable(CComboBox& cmbDropList)

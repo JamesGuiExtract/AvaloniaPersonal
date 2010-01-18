@@ -190,10 +190,17 @@ namespace Extract.FileActionManager.Utilities
         /// <returns></returns>
         static Dictionary<string, string> InitializeDefaultSettings()
         {
+            // Add the sleep time setting
             Dictionary<string, string> defaultSettings = new Dictionary<string, string>();
             defaultSettings.Add(ESFAMService.SleepTimeOnStartupKey,
                 ESFAMService.DefaultSleepTimeOnStartup.ToString(CultureInfo.InvariantCulture));
+
+            // Add the dependent services setting
             defaultSettings.Add(ESFAMService.DependentServices, "");
+
+            // Add the number of files to process setting
+            defaultSettings.Add(ESFAMService.NumberOfFilesToProcess,
+                ESFAMService.DefaultNumberOfFilesToProcess.ToString(CultureInfo.InvariantCulture));
 
             return defaultSettings;
         }

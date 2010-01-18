@@ -1490,7 +1490,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI23253", ex);
+                ExtractException ee = ExtractException.AsExtractException("ELI29180", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }

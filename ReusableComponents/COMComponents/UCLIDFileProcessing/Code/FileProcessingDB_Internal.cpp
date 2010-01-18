@@ -1114,6 +1114,11 @@ void CFileProcessingDB::initializeTableValues()
 			+ "', '0')";
 		vecQueries.push_back(strSQL);
 
+		// Add Skip Authentication For Services On Machines
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+			+ gstrSKIP_AUTHENTICATION_FOR_SERVICES + "', '')";
+		vecQueries.push_back(strSQL);
+
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
 	}

@@ -115,9 +115,7 @@ namespace Extract.Utilities
                 // Return true if the specified Process ID is in the list of processes.
                 foreach (Process process in procs)
                 {
-                    if (process.Id == processId &&
-                        (string.IsNullOrEmpty(processName)
-                        || processName.Equals(process.ProcessName, StringComparison.OrdinalIgnoreCase)))
+                    if (process.Id == processId)
                     {
                         return true;
                     }

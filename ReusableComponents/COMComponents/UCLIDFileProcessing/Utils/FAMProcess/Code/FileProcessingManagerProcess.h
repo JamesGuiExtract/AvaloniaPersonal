@@ -53,7 +53,7 @@ END_COM_MAP()
 	// IFileProcessingManagerProcess
 	//----------------------------------------------------------------------------------------------
 	STDMETHOD(Ping)();
-	STDMETHOD(Start)();
+	STDMETHOD(Start)(LONG lNumberOfFilesToProcess);
 	STDMETHOD(Stop)();
 	STDMETHOD(GetCounts)(LONG* plNumFilesProcessed, LONG* plNumProcessingErrors,
 		LONG* plNumFilesSupplied, LONG* plNumSupplyingErrors);

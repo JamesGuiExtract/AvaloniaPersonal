@@ -150,6 +150,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         ShortcutsMessageFilter _filter;
 
+        /// <summary>
+        /// Tracks user input in the file processing database.
+        /// </summary>
+        InputEventTracker _inputEventTracker;
+
         #endregion Fields
 
         #region Events
@@ -1560,6 +1565,9 @@ namespace Extract.Redaction.Verification
                 // Allow the image viewer to handle keyboard input for shortcuts.
                 if (ShortcutsEnabled() && _imageViewer.Shortcuts.ProcessKey(keyData))
                 {
+                    // Ensure we track an input event for the shortcur key
+                    _inputEventTracker.NotifyOfInputEvent();
+
                     return true;
                 }
 
@@ -2149,6 +2157,13 @@ namespace Extract.Redaction.Verification
 
                 // Store the file processing database
                 StoreDatabase(fileProcessingDB);
+
+                // Enable input tracking if specified and there is a database
+                if (_inputEventTracker == null && _settings.EnableInputTracking
+                    && fileProcessingDB != null)
+                {
+                    _inputEventTracker = new InputEventTracker(fileProcessingDB, actionID, this);
+                }
 
                 // Get the full path of the source document
                 string fullPath = Path.GetFullPath(fileName);

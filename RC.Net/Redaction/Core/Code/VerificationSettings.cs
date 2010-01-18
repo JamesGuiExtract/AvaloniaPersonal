@@ -25,6 +25,11 @@ namespace Extract.Redaction
         /// </summary>
         readonly string _inputFile;
 
+        /// <summary>
+        /// Whether input event tracking should be enabled.
+        /// </summary>
+        readonly bool _enableInputTracking;
+
         #endregion Fields
 
         #region Constructors
@@ -32,7 +37,7 @@ namespace Extract.Redaction
         /// <summary>
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class.
         /// </summary>
-        public VerificationSettings() : this(null, null, null)
+        public VerificationSettings() : this(null, null, null, false)
         {
 
         }
@@ -41,11 +46,13 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class with the 
         /// specified settings.
         /// </summary>
-        public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback, string inputFile)
+        public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback,
+            string inputFile, bool enableInputTracking)
         {
             _generalSettings = general ?? new GeneralVerificationSettings();
             _feedbackSettings = feedback ?? new FeedbackSettings();
             _inputFile = inputFile ?? @"<SourceDocName>.voa";
+            _enableInputTracking = enableInputTracking;
         }
 
         #endregion Constructors
@@ -89,6 +96,19 @@ namespace Extract.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets whether input event tracking should be enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if input event tracking should be enabled and
+        /// <see langword="false"/> otherwise.</returns>
+        public bool EnableInputTracking
+        {
+            get
+            {
+                return _enableInputTracking;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -109,14 +129,21 @@ namespace Extract.Redaction
                 FeedbackSettings feedback = FeedbackSettings.ReadFrom(reader);
                 string inputFile = reader.ReadString();
 
-                if (reader.Version < 2)
+                int version = reader.Version;
+                if (version < 2)
                 {
                     // Ignore obsolete metadata settings
                     reader.ReadBoolean();
                     reader.ReadString();
                 }
 
-                return new VerificationSettings(general, feedback, inputFile);
+                // Read the input event tracking setting
+                bool enableInputTracking = false;
+                if (version >= 3)
+                {
+                    enableInputTracking = reader.ReadBoolean();
+                }
+                return new VerificationSettings(general, feedback, inputFile, enableInputTracking);
             }
             catch (Exception ex)
             {
@@ -138,6 +165,7 @@ namespace Extract.Redaction
                 _generalSettings.WriteTo(writer);
                 _feedbackSettings.WriteTo(writer);
                 writer.Write(_inputFile);
+                writer.Write(_enableInputTracking);
             }
             catch (Exception ex)
             {

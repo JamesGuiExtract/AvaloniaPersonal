@@ -50,6 +50,9 @@ public:
 	//---------------------------------------------------------------------------------------------
 	void setForceCloseOnComplete( bool bForceClose);
 	//---------------------------------------------------------------------------------------------
+	// REQUIRE: lNumberOfDocsToExecute >= 0
+	void setNumberOfDocsToExecute(long lNumberOfDocsToExecute);
+	//---------------------------------------------------------------------------------------------
 	
 	// Enum contains value for each page 
 	enum EDlgTabPage:int
@@ -196,6 +199,9 @@ private:
 	long m_nNumSkipped;
 	long m_nNumCurrentlyProcessing;
 	long m_nNumTotalDocs;
+
+	// The number of documents to execute when processing
+	long m_nNumberOfDocsToExecute;
 
 	// Used to retrieve information about specific file processing records
 	FPRecordManager* m_pRecordMgr;

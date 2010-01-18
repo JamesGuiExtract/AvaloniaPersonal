@@ -23,7 +23,7 @@ interface IFileProcessingManagerProcess : IDispatch
 	//----------------------------------------------------------------------------------------------
 	// Starts processing the FPS File
 	// REQUIRES: FPS file has been set
-	[id(2), helpstring("method Start")] HRESULT Start();
+	[id(2), helpstring("method Start")] HRESULT Start([in] LONG lNumberOfFilesToProcess);
 	//----------------------------------------------------------------------------------------------
 	// Stops the processing.  If no processing is being done, does nothing.
 	[id(3), helpstring("method Stop")] HRESULT Stop();

@@ -626,13 +626,14 @@ const string TextFunctionExpander::expandUserName(const string& str) const
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandFullUserName(const string& str) const
 {
-	if (!str.empty())
+	if (!str.empty() && (str != "0" && str != "1"))
 	{
-		UCLIDException uex("ELI28765", "$FullUserName() does not accept arguments.");
+		UCLIDException uex("ELI28765", "Invalid argument for $FullUserName().");
 		uex.addDebugInfo("Argument", str);
 		throw uex;
 	}
 
-	return getFullUserName();
+	bool bThrowException = str != "1";
+	return getFullUserName(bThrowException);
 }
 //-------------------------------------------------------------------------------------------------

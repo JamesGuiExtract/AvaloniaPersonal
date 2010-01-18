@@ -24,7 +24,12 @@ namespace Extract.Redaction.Verification
 
         const string _COMPONENT_DESCRIPTION = "Redaction: Verify sensitive data";
 
-        const int _CURRENT_VERSION = 2;
+        /// <summary>
+        /// Current task version.
+        /// <para>Version 3</para>
+        /// Added enable input event tracking setting.
+        /// </summary>
+        const int _CURRENT_VERSION = 3;
         
         #endregion Constants
 

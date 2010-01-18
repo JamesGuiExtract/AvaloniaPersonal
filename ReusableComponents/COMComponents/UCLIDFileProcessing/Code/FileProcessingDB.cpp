@@ -4956,7 +4956,7 @@ STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName)
 
 		// Create a pointer to a recordset containing the action
 		_RecordsetPtr ipActionSet = getActionSet(ipConnection, strActionName);
-		ASSERT_RESOURCE_ALLOCATION("ELI13517", ipActionSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29177", ipActionSet != NULL);
 
 		// Check if the action is not yet created
 		if (ipActionSet->adoEOF == VARIANT_TRUE)

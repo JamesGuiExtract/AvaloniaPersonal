@@ -302,7 +302,7 @@ library UCLID_FILEPROCESSINGLib
 	{
 		[id(9), helpstring("method ShowUI")] HRESULT ShowUI([in] VARIANT_BOOL bRunOnInit, [in] VARIANT_BOOL bCloseOnComplete, 
 			VARIANT_BOOL bForceClose, int iNumDocsToExecute, void * pFRM);
-		[id(10), helpstring("method StartProcessing")] HRESULT StartProcessing();
+		[id(10), helpstring("method StartProcessing")] HRESULT StartProcessing([in] VARIANT_BOOL bRunningAsService);
 		[id(11), helpstring("method StopProcessing")] HRESULT StopProcessing();
 		[id(17), helpstring("method LoadFrom")] HRESULT LoadFrom([in] BSTR strFullFileName, [in] VARIANT_BOOL bSetDirtyFlagToTrue);
 		[id(18), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName, [in] VARIANT_BOOL bClearDirty);
@@ -389,6 +389,10 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: Gets the name of the Action to process with tags expanded
 		[id(49), helpstring("method GetExpandedActionName")] HRESULT GetExpandedActionName(
 			[out, retval] BSTR *pbstrAction);
+		//-----------------------------------------------------------------------------------------
+		// Sets the number of documents to process
+		[propput, id(50), helpstring("property NumberOfDocsToProcess")] HRESULT
+			NumberOfDocsToProcess([in] long lNumberOfDocsToProcess);
 	};
 
 	[

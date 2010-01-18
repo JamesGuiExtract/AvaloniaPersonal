@@ -124,7 +124,7 @@ STDMETHODIMP CFileProcessingManagerProcess::Ping()
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28444");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManagerProcess::Start()
+STDMETHODIMP CFileProcessingManagerProcess::Start(LONG lNumberOfFilesToProcess)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 	try
@@ -156,8 +156,11 @@ STDMETHODIMP CFileProcessingManagerProcess::Start()
 			throw uex;
 		}
 
+		// Set the number of files to process
+		m_ipFPM->NumberOfDocsToProcess = lNumberOfFilesToProcess;
+
 		// Start the processing
-		m_ipFPM->StartProcessing();
+		m_ipFPM->StartProcessing(VARIANT_TRUE);
 
 		return S_OK;
 	}

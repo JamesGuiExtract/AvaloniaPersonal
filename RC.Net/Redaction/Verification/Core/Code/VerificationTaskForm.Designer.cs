@@ -46,6 +46,11 @@ namespace Extract.Redaction.Verification
                     _filter.Dispose();
                     _filter = null;
                 }
+                if (_inputEventTracker != null)
+                {
+                    _inputEventTracker.Dispose();
+                    _inputEventTracker = null;
+                }
             }
 
             // Release unmanaged resources

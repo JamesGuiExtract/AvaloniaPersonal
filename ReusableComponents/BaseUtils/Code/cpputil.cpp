@@ -233,7 +233,7 @@ string getCurrentUserName()
 	return strUserName;
 }
 //-------------------------------------------------------------------------------------------------
-string getFullUserName()
+string getFullUserName(bool bThrowExceptionIfNoFound)
 {
 	char zName[1024] = {0};
 	unsigned long nLength = 1024;
@@ -241,9 +241,15 @@ string getFullUserName()
 	{
 		return zName;
 	}
-	else
+	else if (!bThrowExceptionIfNoFound)
 	{
 		return getCurrentUserName();
+	}
+	else
+	{
+		UCLIDException ue("ELI29183", "Unable to retrieve full user name.");
+		ue.addWin32ErrorInfo();
+		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------
