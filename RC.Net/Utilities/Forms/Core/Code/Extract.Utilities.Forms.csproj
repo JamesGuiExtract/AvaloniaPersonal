@@ -58,6 +58,12 @@
       <DependentUpon>AnchorAlignmentControl.cs</DependentUpon>
     </Compile>
     <Compile Include="ApplicationCommand.cs" />
+    <Compile Include="BetterComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BetterComboBox.Designer.cs">
+      <DependentUpon>BetterComboBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="BrowseButton.cs">
       <SubType>Component</SubType>
     </Compile>
