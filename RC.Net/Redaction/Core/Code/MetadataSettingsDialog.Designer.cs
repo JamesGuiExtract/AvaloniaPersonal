@@ -79,6 +79,7 @@ namespace Extract.Redaction
             this._metadataPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_metadataPathTagsButton.Image")));
             this._metadataPathTagsButton.Location = new System.Drawing.Point(363, 40);
             this._metadataPathTagsButton.Name = "_metadataPathTagsButton";
+            this._metadataPathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._metadataPathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._metadataPathTagsButton.TabIndex = 2;
             this._metadataPathTagsButton.UseVisualStyleBackColor = true;
