@@ -1,0 +1,94 @@
+<html>
+<head>
+<title>FAM Bug Fixes Testing Checklist</title>
+	<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>FAM Bug Fixes Testing Checklist<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>	
+<hr>
+
+<ul>
+	<li><h2>[LegacyRC #3473] - Thread exits with exception</h2>
+	<ul>
+		<LI><b>Test #1</b> - Invalid task id
+		<ul>
+			<li>Create a <b>Queuing</b> FPS file to listen to a specific folder.
+			<li>Create a <b>Processing</b> FPS file to OCR images and execute rules 
+			for the supplied images.
+			<li>Set the size of the <b>History</b> to 10 files.
+			<li>Supply and Process <b>2</b> files.
+			<li>Supply and Process <b>6</b> more files.
+			<li>Supply and Process the original <b>2</b> files again.
+			<li>Supply and Process <b>15</b> new files.
+			<li>Errors are expected as the second processing instances of the original 2 files 
+			are removed from the history queue.  This should happen as the 9th and 10th of 
+			the new files are going through processing.
+<p>
+			<li>Exercise the scenario on a stock <b>7.0.0.39</b> installation.
+			<li>Confirm that <b>ELI24633</b> exceptions were seen with Debug information 
+			as <b>LastCodePos = MLI02389.520</b>.
+			<li>Exercise the scenario on a <b>7.0.0.39 + Hotfix #3</b> installation.
+			<li>Confirm that processing finishes without error.  An Application Trace 
+			exception should be logged for <b>ELI25353 - Task id not found in map.</b>
+       		</ul>
+   		</LI>
+<p>
+		<LI><b>Test #2</b> - File removed from history list while being processed
+		<ul>
+			<li>Create a <b>Queuing</b> FPS file to listen to a specific folder.
+			<li>Create a <b>Processing</b> FPS file to OCR images and execute rules 
+			for the supplied images.
+			<li>Set the size of the <b>History</b> to 10 files.
+			<li>Supply and Process <b>9</b> small files plus <b>1</b> relatively large file.
+			<li>Supply and Process <b>9</b> new files.  This causes the slow file to be 
+			the next file to be removed from the <b>History</b> collection.
+			<li>Resupply and reprocess the same large file <b>1</b> more time.
+			<li>While the large file is processing, supply <b>4</b> more files from the 
+			original set.
+			<li>As the first of these original files finishes processing, the history 
+			record for the large file will be removed.  Errors will be logged (frequently) 
+			each time status updates are attempted.
+<p>
+			<li>Exercise the scenario on a stock <b>7.0.0.39</b> installation.
+			<li>Confirm that lots of <b>Invalid task id</b> exceptions were seen.
+			<li>Exercise the scenario on a <b>7.0.0.39 + Hotfix #3</b> installation.
+			<li>Confirm that processing finishes without error.  An Application Trace 
+			exception should be logged for <b>ELI25355 - Task cannot be removed.</b>
+       		</ul>
+   		</LI>
+<p>
+		<LI><b>Test #3</b> - File removed from history list while in Pending state
+		<ul>
+			<li>Create a <b>Queuing</b> FPS file to listen to a specific folder.
+			<li>Create a <b>Processing</b> FPS file to OCR images and execute rules 
+			for the supplied images.
+			<li>Set the size of the <b>History</b> to 10 files.
+			<li>Supply and Process <b>4</b> files.
+			<li>Supply and Process <b>5</b> different files.
+			<li>Resupply and reprocess the same <b>5</b> files.  This will finish filling 
+			the history collection and remove the first four files from the history.
+			<li>Supply and Process <b>4</b> relatively large files where OCR and rule 
+			execution take about one minute.
+			<li>While the slow files are processing, resupply and reprocess the previous 
+			<b>9</b> files.  This is expected to cause the first four files to begin 
+			processing first since those have smaller file IDs.  
+			<li>As the first four files finish processing, they will push history entries 
+			off for the next five files.  Since these files are in <b>Pending</b> state, 
+			each thread will try and fail to transition the file to <b>Processing</b>.
+			<li>Note that this scenario is difficult to set up due to files being provided 
+			for processing in an uncertain order.
+<p>
+			<li>Exercise the scenario on a stock <b>7.0.0.39</b> installation.
+			<li>Confirm that each thread fails and stops processing.
+			<li>Exercise the scenario on a <b>7.0.0.39 + Hotfix #3</b> installation.
+			<li>Confirm that processing finishes without error. 
+	       	</ul>
+   		</LI>
+	</ul>
+</ul>
+</body> 
+</html>
