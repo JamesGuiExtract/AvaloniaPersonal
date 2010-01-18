@@ -140,6 +140,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._fileTagsButton.MaximumSize = new System.Drawing.Size(18, 20);
             this._fileTagsButton.MinimumSize = new System.Drawing.Size(18, 20);
             this._fileTagsButton.Name = "_fileTagsButton";
+            this._fileTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._fileTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileTagsButton.TabIndex = 2;
             this._fileTagsButton.UseVisualStyleBackColor = true;
