@@ -1,4 +1,5 @@
-
+REM Clean Source folder
+call Clean.bat Test_2
 
 REM Supply Numbered Files for 2 hours
 START CopyNumberedFiles ".\Images\Image1.pdf" ".\Source" 10s -h2
