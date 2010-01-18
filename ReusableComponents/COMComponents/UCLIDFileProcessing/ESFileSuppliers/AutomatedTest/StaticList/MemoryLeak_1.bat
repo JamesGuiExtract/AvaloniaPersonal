@@ -1,5 +1,5 @@
 REM Clean Source folder
-CALL Clean.bat
+CALL Clean.bat Test_1
 
 REM Supply 60000 numbered files
 FOR %%i in (One Two Three Four Five Six) DO (
