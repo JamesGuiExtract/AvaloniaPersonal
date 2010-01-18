@@ -134,6 +134,25 @@ namespace Extract.Redaction.Verification
         
         #endregion Methods
 
+        #region Properties
+
+        /// <summary>
+        /// Gets/sets the <see cref="VerificationSettings"/>.
+        /// </summary>
+        public VerificationSettings Settings
+        {
+            get
+            {
+                return _settings;
+            }
+            set
+            {
+                _settings = value;
+            }
+        }
+
+        #endregion Properties
+
         #region ICategorizedComponent Members
 
         /// <summary>
