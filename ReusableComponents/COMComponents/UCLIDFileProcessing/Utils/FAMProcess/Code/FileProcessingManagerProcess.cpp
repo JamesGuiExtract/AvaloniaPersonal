@@ -138,17 +138,6 @@ STDMETHODIMP CFileProcessingManagerProcess::Start(LONG lNumberOfFilesToProcess)
 			throw uex;
 		}
 
-		// Ensure the FPS file is valid
-		if (!isValidFile(m_strFPSFile))
-		{
-			UCLIDException uex("ELI28470", "Cannot process, the specified FPS file cannot be found.");
-			uex.addDebugInfo("FPS File", m_strFPSFile);
-			throw uex;
-		}
-
-		// Load the FPS file into the File processing manager
-		m_ipFPM->LoadFrom(m_strFPSFile.c_str(), VARIANT_FALSE);
-
 		if (m_ipFPM->IsDBPasswordRequired == VARIANT_TRUE)
 		{
 			UCLIDException uex("ELI28475",

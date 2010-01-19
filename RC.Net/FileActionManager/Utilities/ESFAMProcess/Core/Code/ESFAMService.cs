@@ -433,7 +433,7 @@ namespace Extract.FileActionManager.Utilities
                             _threadsThatRequireAuthentication++;
                         }
 
-                        ExtractException ee = new ExtractException("ELI0",
+                        ExtractException ee = new ExtractException("ELI29208",
                             "User authentication is required to launch this FPS file.");
                         ee.AddDebugData("FPS File Name", arguments.FPSFileName, false);
                         throw ee;
@@ -519,7 +519,7 @@ namespace Extract.FileActionManager.Utilities
                         {
                             // All threads failed due to authentication requirement
                             // call OnStop to stop the service
-                            OnStop();
+                            base.OnStop();
                         }
                     }
                 }

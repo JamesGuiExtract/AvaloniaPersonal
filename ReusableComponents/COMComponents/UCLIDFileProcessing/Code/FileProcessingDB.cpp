@@ -4996,7 +4996,7 @@ STDMETHODIMP CFileProcessingDB::GetSkipAuthenticationForServices(VARIANT_BOOL* p
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
-		ASSERT_ARGUMENT("ELI0", pvbSkipAuthentication != NULL);
+		ASSERT_ARGUMENT("ELI29207", pvbSkipAuthentication != NULL);
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;

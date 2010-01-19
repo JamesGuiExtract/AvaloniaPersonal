@@ -582,7 +582,8 @@ private:
 	// Method to remove old Input events from the InputEvents table
 	void deleteOldInputEvents(const _ConnectionPtr& ipConnection);
 
-	// Gets the list of machines that can skip user authentication for services
+	// Checks if the current machine is in the list of machines to skip user authentication
+	// when running as a service
 	bool isMachineInListOfMachinesToSkipUserAuthentication(const _ConnectionPtr& ipConnection);
 
 	// Class to contain the thread data for the emailMessageThread
