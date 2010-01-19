@@ -19,16 +19,11 @@
   	   	<LI>To track the feature-based testing of <b>FLEX Index 8.0</b>.
        	</ul>
 <p>
-	<LI><h3>New Features</h3>
+	<LI><h3>High-Level Testing</h3>
        	<ul>
-      		<li><a href="80_Features_General.html">General Features</a></li>
-      		<li><a href="80_Features_Verification.html">ID Shield Verification</a></li>
-      		<li><a href="80_Features_IDShield.html">Other ID Shield Features</a></li>
-      		<li><a href="80_Features_Objects.html">Task, Condition and Rule Objects</a></li>
-      		<li><a href="80_Features_Utilities.html">Demos and Utilities</a></li>
        	</ul>
 <p>
-	<LI><h3>Testing</h3>
+	<LI><h3>Low-Level Testing</h3>
        	<ul>
   	   	<LI><b>Build:</b> 7.1.1.55
   	   	<LI><b>Tested By:</b> Doug, 09/30/2009
@@ -81,7 +76,12 @@
 	       	<ul>
 	      		<li><b>(#13)</b> - Endurance Test With Two Million Documents
 		       	<ul>
-		      		<li>TBD
+				<li>Testing of ID Shield rules for UT - DoC
+		      		<li>Many examples of <b>ELI15090</b> seen.
+				<li>3 examples of DELLQC5 having a file stuck in processing, 
+				requiring a machine restart
+				<li>Many processing failures due to Select Page Region exceptions 
+				that have since been fixed
 		       	</ul>
 	       	</ul>
 <p>
@@ -92,6 +92,82 @@
 	      		<li><b>(#00)</b> - Spatial String Type In VOA Viewer - no issues
 	      		<li><b>(#11)</b> - Delete Redactions During Verification - no issues
 	      		<li><b>(#16)</b> - Rotate Redactions During Verification - no issues
+	       	</ul>
+<p>
+  	   	<LI><b>Build:</b> 7.1.1.63
+  	   	<LI><b>Tested By:</b> Art, 11/20/2009
+  	   	<LI><b>Tested Features:</b> 
+	       	<ul>
+	      		<li><b>(#21)</b> - FAM Scheduled Processing - no issues
+	       	</ul>
+<p>
+  	   	<LI><b>Build:</b> 7.1.1.85
+  	   	<LI><b>Tested By:</b> Jennifer, 12/15/2009
+  	   	<LI><b>Tested Features:</b> 
+	       	<ul>
+	      		<li><b>(#04)</b> - Tag Files During Verification
+			<ul>
+				<li><b>ID Shield detailed report for specific document</b> does 
+				not have a section for document tags.
+			</ul>
+	      		<li><b>(#05)</b> - Skip Files During Verification - no issues
+	      		<li><b>(#11)</b> - Delete Redactions During Verification - no issues
+	      		<li><b>(#16)</b> - Rotate Redactions During Verification - no issues
+	       	</ul>
+<p>
+  	   	<LI><b>Build:</b> 7.1.1.85
+  	   	<LI><b>Tested By:</b> Doug, 12/18/2009
+  	   	<LI><b>Tested Features:</b> 
+	       	<ul>
+	      		<li><b>(#00)</b> - Split Multi Page Image - no issues
+	      		<li><b>(#07)</b> - Thumbnail Support In Image Viewer
+			<ul>
+				<li><b>[FlexIDSCore #3809]</b> Location of thumbnails window 
+				is not persistent
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>Build:</b> 7.1.1.89
+  	   	<LI><b>Tested By:</b> Jennifer, 12/28/2009
+  	   	<LI><b>Tested Features:</b> 
+	       	<ul>
+	      		<li><b>(#08)</b> - Automatic Detection / Correction Of Stuck Files
+			<ul>
+				<li>No exception is logged if minimum timeout is less than 
+				5 minutes.
+			</ul>
+	      		<li><b>(#17)</b> - User-Configurable File Processing Priority
+			<ul>
+				<li><b>ID Shield detailed report for specific document</b> does 
+				not have a section for document priority.
+			</ul>
+	      		<li><b>(#21)</b> - FAM Scheduled Processing - no issues
+	       	</ul>
+<p>
+  	   	<LI><b>Build:</b> 7.1.1.89
+  	   	<LI><b>Tested By:</b> Doug, 12/31/2009
+  	   	<LI><b>Tested Features:</b> 
+	       	<ul>
+	      		<li><b>(#09)</b> - Three Distinct Objects For ID Shield - no issues
+	      		<li><b>(#18)</b> - User Testing Of ID Shield Accuracy
+			<ul>
+				<li><b>[FlexIDSCore #3911]</b> Remove <b>Analysis</b> from 
+				drop-down text
+				<li><b>[FlexIDSCore #3912]</b> Statistics tab does not list 
+				the number of pages processed
+				<li><b>[FlexIDSCore #3913]</b> Double-click on whitespace in file 
+				lists throws exception
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>Build:</b> 8.0.0.1
+  	   	<LI><b>Tested By:</b> Jennifer, 01/07/2010
+  	   	<LI><b>Tested Features:</b> 
+	       	<ul>
+	      		<li><b>(#03)</b> - Redact Fixed Locations On Document - minor UI SCR
+	      		<li><b>(#06)</b> - Mathematical Condition Object - no issues
+	      		<li><b>(#20)</b> - Bates Numbers In Automated, Verification and Hybrid 
+			Redaction - requested better error message for non-uniquer counter names
 	       	</ul>
        	</ul>
 </OL>
