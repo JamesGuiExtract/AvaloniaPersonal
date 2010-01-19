@@ -44,6 +44,10 @@ interface IFileProcessingManagerProcess : IDispatch
 	[propget, id(7), helpstring("property FPSFile")] HRESULT FPSFile([out, retval] BSTR* pbstrFileName);
 	[propput, id(7), helpstring("property FPSFile")] HRESULT FPSFile([in] BSTR bstrFileName);
 	//----------------------------------------------------------------------------------------------
+	// Gets whether user authentication is required to start the FAMProcess
+	[propget, id(8), helpstring("property AuthenticationRequired")] HRESULT
+		AuthenticationRequired([out, retval] VARIANT_BOOL* vbAuthenticationRequired);
+	//----------------------------------------------------------------------------------------------
 };
 
 [

@@ -497,7 +497,7 @@ void FileProcessingDlg::OnBtnRun()
 		// the menus should still be updated and the exception rethrown
 		try
 		{
-			ipFPM->StartProcessing(VARIANT_FALSE);
+			ipFPM->StartProcessing();
 		}
 		catch(...)
 		{
@@ -526,7 +526,7 @@ void FileProcessingDlg::OnBtnPause()
 			if ( getFPM()->ProcessingPaused == VARIANT_TRUE)
 			{
 				// resume the processing
-				getFPM()->StartProcessing(VARIANT_FALSE);
+				getFPM()->StartProcessing();
 			}
 			else
 			{

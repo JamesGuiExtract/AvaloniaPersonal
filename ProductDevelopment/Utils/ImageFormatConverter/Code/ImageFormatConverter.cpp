@@ -392,8 +392,6 @@ BOOL CImageFormatConverterApp::InitInstance()
 	{
 		AfxEnableControlContainer();
 
-		CoInitializeEx(NULL, COINIT_MULTITHREADED);
-
 		// Define empty string for local exception log
 		string strLocalExceptionLog;
 
@@ -455,7 +453,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 					// Set type
 					eOutputType = kFileType_Jpg;
 				}
-				
+
 				// Check for retain annotation flag
 				bool bRetainAnnotations = false;
 				if (uiParamCount == 4 || uiParamCount == 6)
@@ -511,7 +509,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15898");
 		}
-		catch(UCLIDException ue)
+		catch(UCLIDException& ue)
 		{
 			// Set failure code
 			nExitCode = EXIT_FAILURE;
@@ -528,10 +526,8 @@ BOOL CImageFormatConverterApp::InitInstance()
 				ue.log( strLocalExceptionLog, false );
 			}
 		}
-
-		CoUninitialize();
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15899")
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15899");
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.

@@ -94,7 +94,7 @@ namespace Extract.FileActionManager.Utilities
         /// A value of 0 indicates that the process should keep processing until it is
         /// stopped and will not be respawned. Negative values are not allowed.
         /// </summary>
-        internal static readonly int DefaultNumberOfFilesToProcess = 0;
+        internal const int DefaultNumberOfFilesToProcess = 0;
 
         #endregion Constants
 
@@ -143,9 +143,14 @@ namespace Extract.FileActionManager.Utilities
         volatile int _activeProcessingThreadCount;
 
         /// <summary>
+        /// The count of threads that required authentication to run.
+        /// </summary>
+        volatile int _threadsThatRequireAuthentication;
+
+        /// <summary>
         /// The number of files to process
         /// </summary>
-        int _numberOfFilesToProcess = DefaultNumberOfFilesToProcess;
+        int _numberOfFilesToProcess;
 
         /// <summary>
         /// Mutex to provide synchronized access to data.
@@ -246,6 +251,9 @@ namespace Extract.FileActionManager.Utilities
                 ExtractException ee2 = new ExtractException("ELI28774",
                     "Application trace: FAM Service stopped.");
                 ee2.Log();
+
+                // Set successful exit code
+                ExitCode = 0;
             }
             catch (Exception ex)
             {
@@ -265,6 +273,9 @@ namespace Extract.FileActionManager.Utilities
 
                     // Set the active processing count back to 0
                     _activeProcessingThreadCount = 0;
+
+                    // Set the threads that required authentication back to 0
+                    _threadsThatRequireAuthentication = 0;
                 }
 
                 // Empty the processing threads collection since we are done with the threads
@@ -413,6 +424,21 @@ namespace Extract.FileActionManager.Utilities
                     // Set the FPS file name
                     famProcess.FPSFile = arguments.FPSFileName;
 
+                    // Check if authentication is required
+                    if (famProcess.AuthenticationRequired)
+                    {
+                        // Mutex around incrementing _threadsThatRequireAuthentication
+                        lock (_lock)
+                        {
+                            _threadsThatRequireAuthentication++;
+                        }
+
+                        ExtractException ee = new ExtractException("ELI0",
+                            "User authentication is required to launch this FPS file.");
+                        ee.AddDebugData("FPS File Name", arguments.FPSFileName, false);
+                        throw ee;
+                    }
+
                     // Ensure that processing has not been stopped before starting processing
                     if (_stopProcessing != null && !_stopProcessing.WaitOne(0))
                     {
@@ -486,6 +512,14 @@ namespace Extract.FileActionManager.Utilities
                             {
                                 ExtractException.Log("ELI28506", ex);
                             }
+                        }
+
+                        // Check if all threads failed to launch because they required authentication
+                        if (_threadsThatRequireAuthentication == _processingThreads.Count)
+                        {
+                            // All threads failed due to authentication requirement
+                            // call OnStop to stop the service
+                            OnStop();
                         }
                     }
                 }

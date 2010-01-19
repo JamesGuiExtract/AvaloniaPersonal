@@ -56,7 +56,7 @@ public:
 
 	// IFileProcessingManager
 	STDMETHOD(StopProcessing)();
-	STDMETHOD(StartProcessing)(VARIANT_BOOL bRunningAsService);
+	STDMETHOD(StartProcessing)();
 	STDMETHOD(ShowUI)(VARIANT_BOOL bRunOnInit, VARIANT_BOOL bCloseOnComplete, VARIANT_BOOL bForceClose, 
 		int iNumDocsToExecute, void * pFRM);
 	STDMETHOD(SaveTo)(BSTR strFullFileName, VARIANT_BOOL bClearDirty);
@@ -89,6 +89,7 @@ public:
 	STDMETHOD(get_IsDBPasswordRequired)(VARIANT_BOOL* pvbIsDBPasswordRequired);
 	STDMETHOD(GetExpandedActionName)(BSTR *pbstrAction);
 	STDMETHOD(put_NumberOfDocsToProcess)(long lNumberOfDocsToProcess);
+	STDMETHOD(get_IsUserAuthenticationRequired)(VARIANT_BOOL* pvbIsAuthenticationRequired);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);

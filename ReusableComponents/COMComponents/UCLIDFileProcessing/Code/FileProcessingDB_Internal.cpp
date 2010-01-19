@@ -2856,6 +2856,41 @@ void CFileProcessingDB::deleteOldInputEvents(const _ConnectionPtr& ipConnection)
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28941");
 }
 //--------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::isMachineInListOfMachinesToSkipUserAuthentication(
+	const _ConnectionPtr& ipConnection)
+{
+	try
+	{
+		// Get the list of machine names
+		string strMachines = getDBInfoSetting(ipConnection, gstrSKIP_AUTHENTICATION_FOR_SERVICES);
+
+		// Tokenize by either comma, semicolon, or pipe
+		vector<string> vecTokens;
+		StringTokenizer::sGetTokens(strMachines, ",;|", vecTokens, true);
+
+		string strMachineName = m_strMachineName;
+		makeLowerCase(strMachineName);
+
+		// Look through the list of strings for the machine name
+		for(vector<string>::iterator it = vecTokens.begin(); it != vecTokens.end(); it++)
+		{
+			// Trim whitespace and make the string lower case
+			string strTemp = trim(*it, " \t", " \t");
+			makeLowerCase(strTemp);
+
+			// Check if it matches the machine name
+			if (strTemp == strMachineName)
+			{
+				return true;
+			}
+		}
+
+		// No match found, return false
+		return false;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29188");
+}
+//--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::emailMessage(const string & strMessage)
 {
 	AfxBeginThread(emailMessageThread, 

@@ -302,7 +302,7 @@ library UCLID_FILEPROCESSINGLib
 	{
 		[id(9), helpstring("method ShowUI")] HRESULT ShowUI([in] VARIANT_BOOL bRunOnInit, [in] VARIANT_BOOL bCloseOnComplete, 
 			VARIANT_BOOL bForceClose, int iNumDocsToExecute, void * pFRM);
-		[id(10), helpstring("method StartProcessing")] HRESULT StartProcessing([in] VARIANT_BOOL bRunningAsService);
+		[id(10), helpstring("method StartProcessing")] HRESULT StartProcessing();
 		[id(11), helpstring("method StopProcessing")] HRESULT StopProcessing();
 		[id(17), helpstring("method LoadFrom")] HRESULT LoadFrom([in] BSTR strFullFileName, [in] VARIANT_BOOL bSetDirtyFlagToTrue);
 		[id(18), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName, [in] VARIANT_BOOL bClearDirty);
@@ -393,6 +393,10 @@ library UCLID_FILEPROCESSINGLib
 		// Sets the number of documents to process
 		[propput, id(50), helpstring("property NumberOfDocsToProcess")] HRESULT
 			NumberOfDocsToProcess([in] long lNumberOfDocsToProcess);
+		//-----------------------------------------------------------------------------------------
+		// Gets whether user authentication is required to start processing.
+		[propget, id(51), helpstring("property IsUserAuthenticationRequired")] HRESULT
+			IsUserAuthenticationRequired([out, retval] VARIANT_BOOL* pvbIsAuthenticationRequired);
 	};
 
 	[
@@ -1025,6 +1029,12 @@ library UCLID_FILEPROCESSINGLib
 		// not exist and the AutoCreateActions setting is off, throws an exception.
 		[id(90), helpstring("method AutoCreateAction")] HRESULT AutoCreateAction(
 			[in] BSTR bstrActionName);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get whether user authentication should be skipped for the current machine
+		// when running as a service.
+		[id(91), helpstring("method GetSkipAuthenticationForServices")] HRESULT
+			GetSkipAuthenticationForServices([out, retval] VARIANT_BOOL* pvbSkipAuthentication);
 	};
 
 	[

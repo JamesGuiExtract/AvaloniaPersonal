@@ -130,7 +130,7 @@ STDMETHODIMP CFileProcessingManager::ShowUI(VARIANT_BOOL bRunOnInit, VARIANT_BOO
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManager::StartProcessing(VARIANT_BOOL bRunningAsService)
+STDMETHODIMP CFileProcessingManager::StartProcessing()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -980,6 +980,29 @@ STDMETHODIMP CFileProcessingManager::put_NumberOfDocsToProcess(long lNumberOfDoc
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29179");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::get_IsUserAuthenticationRequired(
+	VARIANT_BOOL* pvbAuthenticationRequired)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI29190", pvbAuthenticationRequired != NULL);
+
+		// Check if authentication is required
+		bool bRequire = asString(getFPMDB()->GetDBInfoSetting(
+			gstrREQUIRE_AUTHENTICATION_BEFORE_RUN.c_str())) == "1";
+
+		// Set the return value
+		*pvbAuthenticationRequired = asVariantBool(bRequire);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29191");
 }
 
 //-------------------------------------------------------------------------------------------------

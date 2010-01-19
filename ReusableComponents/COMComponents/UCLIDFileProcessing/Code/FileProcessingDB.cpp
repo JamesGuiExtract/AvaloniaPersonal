@@ -4979,6 +4979,41 @@ STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName)
 		tg.CommitTrans();
 
 		END_CONNECTION_RETRY(ipConnection, "ELI29153");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29154");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetSkipAuthenticationForServices(VARIANT_BOOL* pvbSkipAuthentication)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		ASSERT_ARGUMENT("ELI0", pvbSkipAuthentication != NULL);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Check whether the current machine is in the list of machines to skip user
+		// authentication when running as a service
+		*pvbSkipAuthentication = asVariantBool(
+			isMachineInListOfMachinesToSkipUserAuthentication(ipConnection));
+
+		END_CONNECTION_RETRY(ipConnection, "ELI29153");
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29154");
 }

@@ -160,7 +160,7 @@ STDMETHODIMP CFileProcessingManagerProcess::Start(LONG lNumberOfFilesToProcess)
 		m_ipFPM->NumberOfDocsToProcess = lNumberOfFilesToProcess;
 
 		// Start the processing
-		m_ipFPM->StartProcessing(VARIANT_TRUE);
+		m_ipFPM->StartProcessing();
 
 		return S_OK;
 	}
@@ -272,11 +272,55 @@ STDMETHODIMP CFileProcessingManagerProcess::put_FPSFile(BSTR bstrFPSFile)
 			throw uex;
 		}
 
+		// Ensure the FPS file is valid
+		if (!isValidFile(strFPSFile))
+		{
+			UCLIDException uex("ELI28470", "Cannot process, the specified FPS file cannot be found.");
+			uex.addDebugInfo("FPS File", strFPSFile);
+			throw uex;
+		}
+
+		// Load the FPS file into the File processing manager
+		m_ipFPM->LoadFrom(strFPSFile.c_str(), VARIANT_FALSE);
+
 		m_strFPSFile = strFPSFile;
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28462");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManagerProcess::get_AuthenticationRequired(VARIANT_BOOL* pvbAuthenticationRequired)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI29192", pvbAuthenticationRequired != NULL);
+
+		bool bCanSkip = true;
+		if (m_ipFPM->IsUserAuthenticationRequired == VARIANT_TRUE)
+		{
+			// Create a FAMDB pointer
+			IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+			ASSERT_RESOURCE_ALLOCATION("ELI29193", ipDB != NULL);
+
+			// Create the database connection
+			ipDB->DatabaseServer = m_ipFPM->DatabaseServer;
+			ipDB->DatabaseName = m_ipFPM->DatabaseName;
+			ipDB->ResetDBConnection();
+
+			// Check if the current machine can skip authentication
+			bCanSkip = asCppBool(ipDB->GetSkipAuthenticationForServices());
+		}
+
+		// Set the return value
+		*pvbAuthenticationRequired = asVariantBool(!bCanSkip);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29194");
 }
 
 //--------------------------------------------------------------------------------------------------

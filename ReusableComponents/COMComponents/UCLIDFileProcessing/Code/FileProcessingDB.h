@@ -12,10 +12,12 @@
 #include <FileProcessingConfigMgr.h>
 #include <LockGuard.h>
 #include <Win32Event.h>
+#include <StringCSIS.h>
 
 #include <string>
 #include <map>
 #include <vector>
+#include <set>
 
 using namespace std;
 using namespace ADODB;
@@ -193,6 +195,7 @@ public:
 	STDMETHOD(ClearLoginUserPassword)(BSTR bstrUserName);
 	STDMETHOD(GetAutoCreateActions)(VARIANT_BOOL* pvbValue);
 	STDMETHOD(AutoCreateAction)(BSTR bstrActionName);
+	STDMETHOD(GetSkipAuthenticationForServices)(VARIANT_BOOL* pvbSkipAuthentication);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -578,6 +581,9 @@ private:
 
 	// Method to remove old Input events from the InputEvents table
 	void deleteOldInputEvents(const _ConnectionPtr& ipConnection);
+
+	// Gets the list of machines that can skip user authentication for services
+	bool isMachineInListOfMachinesToSkipUserAuthentication(const _ConnectionPtr& ipConnection);
 
 	// Class to contain the thread data for the emailMessageThread
 	class EmailThreadData
