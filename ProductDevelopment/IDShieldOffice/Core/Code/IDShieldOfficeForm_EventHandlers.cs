@@ -1,19 +1,14 @@
 using Extract;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
-using Extract.Utilities;
 using Extract.Utilities.Forms;
-using Leadtools;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Security.Permissions;
-using System.Text;
 using System.Windows.Forms;
-using System.Xml;
 using TD.SandDock;
 
 namespace IDShieldOffice
@@ -51,7 +46,7 @@ namespace IDShieldOffice
                 _objectPropertyGridDockableWindow.Close();
 
                 // Check if the form should be reset [IDSD #235 - JDS]
-                if (!this.ResetForm)
+                if (!ResetForm)
                 {
                     // Load the saved user toolstrip settings
                     // NOTE: If you are noticing strange toolstrip behavior, try commenting out
@@ -65,7 +60,7 @@ namespace IDShieldOffice
                     // [IDSD:196] Open the form with the position and size set per the registry settings.
                     // Do this regardless of whether the window will be maximized so that it will restore
                     // to the size used the last time the window was in the "normal" state.
-                    this.DesktopBounds = new Rectangle(
+                    DesktopBounds = new Rectangle(
                         new Point(RegistryManager.DefaultWindowPositionX,
                                   RegistryManager.DefaultWindowPositionY),
                         new Size(RegistryManager.DefaultWindowWidth,
@@ -75,17 +70,17 @@ namespace IDShieldOffice
                     {
                         // [IDSD:196] Maximize the window if the registry setting indicates ID Shield 
                         // Office should launch maximized.
-                        this.WindowState = FormWindowState.Maximized;
+                        WindowState = FormWindowState.Maximized;
                     }
                 }
                 else
                 {
                     // Reset the stored form position and maximized state
                     RegistryManager.DefaultWindowMaximized = false;
-                    RegistryManager.DefaultWindowPositionX = this.DesktopBounds.Left;
-                    RegistryManager.DefaultWindowPositionY = this.DesktopBounds.Top;
-                    RegistryManager.DefaultWindowWidth = this.DesktopBounds.Width;
-                    RegistryManager.DefaultWindowHeight = this.DesktopBounds.Height;
+                    RegistryManager.DefaultWindowPositionX = DesktopBounds.Left;
+                    RegistryManager.DefaultWindowPositionY = DesktopBounds.Top;
+                    RegistryManager.DefaultWindowWidth = DesktopBounds.Width;
+                    RegistryManager.DefaultWindowHeight = DesktopBounds.Height;
 
                     // Make sure the dockable windows are hidden
                     SetObjectPropertiesGridDockableWindowVisible(false);
@@ -170,7 +165,7 @@ namespace IDShieldOffice
         /// event.</param>
         /// <param name="e">An <see cref="OcrProgressUpdateEventArgs"/> that contains
         /// the event data.</param>
-        private void HandleOcrProgressUpdate(object sender, OcrProgressUpdateEventArgs e)
+        void HandleOcrProgressUpdate(object sender, OcrProgressUpdateEventArgs e)
         {
             // Update the OCR progress status label
             UpdateProgressStatus(e.ProgressPercent);
@@ -183,7 +178,7 @@ namespace IDShieldOffice
         /// <see cref="Extract.Imaging.AsynchronousOcrManager.OcrError"/>
         /// event.</param>
         /// <param name="e">An <see cref="OcrErrorEventArgs"/> that contains the event data.</param>
-        private void HandleOcrError(object sender, OcrErrorEventArgs e)
+        void HandleOcrError(object sender, OcrErrorEventArgs e)
         {
             // Store the exception.  Do this before updating the progress status
             _lastOcrException = e.Exception;
@@ -200,14 +195,14 @@ namespace IDShieldOffice
         {
             try
             {
-                if (this.Dirty)
+                if (Dirty)
                 {
                     // Prompt the user if the file is dirty
                     DialogResult result = PromptForDirtyFile();
                     if (result == DialogResult.Yes)
                     {
                         // If user canceled the save, cancel the closing event
-                        if (!this.Save(false))
+                        if (!Save(false))
                         {
                             // Cancel the event
                             e.Cancel = true;
@@ -260,11 +255,11 @@ namespace IDShieldOffice
             {
                 base.OnMove(e);
 
-                if (_isLoaded && this.WindowState == FormWindowState.Normal)
+                if (_isLoaded && WindowState == FormWindowState.Normal)
                 {
                     // If the user moved the form, store the new position.
-                    RegistryManager.DefaultWindowPositionX = this.DesktopLocation.X;
-                    RegistryManager.DefaultWindowPositionY = this.DesktopLocation.Y;
+                    RegistryManager.DefaultWindowPositionX = DesktopLocation.X;
+                    RegistryManager.DefaultWindowPositionY = DesktopLocation.Y;
                 }
             }
             catch (Exception ex)
@@ -285,21 +280,21 @@ namespace IDShieldOffice
             {
                 base.OnResize(e);
 
-                if (_isLoaded && this.WindowState != FormWindowState.Minimized)
+                if (_isLoaded && WindowState != FormWindowState.Minimized)
                 {
-                    if (this.WindowState == FormWindowState.Maximized)
+                    if (WindowState == FormWindowState.Maximized)
                     {
                         // If the user maximized the form, set the form to default to maximized,
                         // but don't adjust the default form size to use in normal mode.
                         RegistryManager.DefaultWindowMaximized = true;
                     }
-                    else if (this.WindowState == FormWindowState.Normal)
+                    else if (WindowState == FormWindowState.Normal)
                     {
                         // If the user restored or moved the form in normal mode, store
                         // the new size as the default size.
                         RegistryManager.DefaultWindowMaximized = false;
-                        RegistryManager.DefaultWindowWidth = this.Size.Width;
-                        RegistryManager.DefaultWindowHeight = this.Size.Height;
+                        RegistryManager.DefaultWindowWidth = Size.Width;
+                        RegistryManager.DefaultWindowHeight = Size.Height;
                     }
 
                     // If there is an image open in the image viewer then restore the previous
@@ -323,7 +318,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleRedactEntirePageMenuItemClick(object sender, EventArgs e)
+        void HandleRedactEntirePageMenuItemClick(object sender, EventArgs e)
         {
             try
             {
@@ -354,7 +349,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleShowBracketedTextFinderWindow(object sender, EventArgs e)
+        void HandleShowBracketedTextFinderWindow(object sender, EventArgs e)
         {
             try
             {
@@ -372,13 +367,13 @@ namespace IDShieldOffice
         /// <summary>
         /// Displays the bracketed text rule form.
         /// </summary>
-        private void ShowBracketedTextFinderWindow()
+        void ShowBracketedTextFinderWindow()
         {
             // Create the form if it has not been created yet
             if (_bracketedTextRuleForm == null)
             {
-                _bracketedTextRuleForm = new IDShieldOfficeRuleForm("Bracketed Text",
-                    new BracketedTextRule(), this);
+                _bracketedTextRuleForm = CreateRuleForm("Bracketed Text", 
+                    new BracketedTextRule());
             }
 
             // Show the bracketed text rule form.
@@ -393,7 +388,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleShowWordOrPatternListRuleForm(object sender, EventArgs e)
+        void HandleShowWordOrPatternListRuleForm(object sender, EventArgs e)
         {
             try
             {
@@ -414,8 +409,8 @@ namespace IDShieldOffice
         {
             if (_wordOrPatternListRuleForm == null)
             {
-                _wordOrPatternListRuleForm = new IDShieldOfficeRuleForm("Words/patterns",
-                    new WordOrPatternsListRule(), this);
+                _wordOrPatternListRuleForm = CreateRuleForm("Words/patterns", 
+                    new WordOrPatternsListRule());
             }
 
             // Show the word or pattern list rule form
@@ -430,7 +425,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleShowDataTypeRuleForm(object sender, EventArgs e)
+        void HandleShowDataTypeRuleForm(object sender, EventArgs e)
         {
             try
             {
@@ -447,12 +442,12 @@ namespace IDShieldOffice
         /// <summary>
         /// Displays the data type rule form.
         /// </summary>
-        private void ShowDataTypeRuleForm()
+        void ShowDataTypeRuleForm()
         {
             if (_dataTypeRuleForm == null)
             {
-                _dataTypeRuleForm = new IDShieldOfficeRuleForm("Data types",
-                    new DataTypeRule(), this);
+                _dataTypeRuleForm = CreateRuleForm("Data types",
+                    new DataTypeRule());
             }
 
             // Show the data type rule form
@@ -463,11 +458,66 @@ namespace IDShieldOffice
         }
 
         /// <summary>
+        /// Creates an <see cref="IDShieldOfficeRuleForm"/> with the specified title and rule.
+        /// </summary>
+        /// <param name="title">The text to display on the rule form's title bar.</param>
+        /// <param name="rule">The rule that the form executes.</param>
+        /// <returns>An <see cref="IDShieldOfficeRuleForm"/> with the specified 
+        /// <paramref name="title"/> and <paramref name="rule"/>.</returns>
+        IDShieldOfficeRuleForm CreateRuleForm(string title, IIDShieldOfficeRule rule)
+        {
+            IDShieldOfficeRuleForm form = new IDShieldOfficeRuleForm(title, rule, _imageViewer, this, this);
+            form.ShowClues = CluesVisible;
+            form.MatchesFound += HandleMatchesFound;
+            form.MatchRedacted += HandleMatchRedacted;
+
+            return form;
+        }
+
+        /// <summary>
+        /// Handles the <see cref="IDShieldOfficeRuleForm.MatchesFound"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="IDShieldOfficeRuleForm.MatchesFound"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="IDShieldOfficeRuleForm.MatchesFound"/> event.</param>
+        void HandleMatchesFound(object sender, MatchesFoundEventArgs e)
+        {
+            try
+            {
+                AddClues(e.Matches);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29195", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="IDShieldOfficeRuleForm.MatchRedacted"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="IDShieldOfficeRuleForm.MatchRedacted"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="IDShieldOfficeRuleForm.MatchRedacted"/> event.</param>
+        void HandleMatchRedacted(object sender, MatchRedactedEventArgs e)
+        {
+            try
+            {
+                AddRedaction(e.Match.RasterZones, e.Match.FindingRule);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29189", ex);
+            }
+        }
+
+        /// <summary>
         /// Handles showing or hiding of the Properties grid window.
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleShowObjectPropertyGridWindow(object sender, EventArgs e)
+        void HandleShowObjectPropertyGridWindow(object sender, EventArgs e)
         {
             try
             {
@@ -487,7 +537,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleShowBatesNumbersCheckboxChanged(object sender, EventArgs e)
+        void HandleShowBatesNumbersCheckboxChanged(object sender, EventArgs e)
         {
             try
             {
@@ -510,14 +560,28 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleShowCluesCheckboxChanged(object sender, EventArgs e)
+        void HandleShowCluesCheckboxChanged(object sender, EventArgs e)
         {
             try
             {
                 // Set the visible flag
-                _imageViewer.SetVisibleStateForSpecifiedLayerObjects(null,
-                    new Type[] { typeof(Clue) },
-                    _showCluesCheckBox.Checked);
+                bool cluesVisible = _showCluesCheckBox.Checked;
+                _imageViewer.SetVisibleStateForSpecifiedLayerObjects(null, 
+                    new Type[] { typeof(Clue) }, cluesVisible);
+
+                // Update the rule forms
+                if (_bracketedTextRuleForm != null)
+                {
+                    _bracketedTextRuleForm.ShowClues = cluesVisible;
+                }
+                if (_wordOrPatternListRuleForm != null)
+                {
+                    _wordOrPatternListRuleForm.ShowClues = cluesVisible;
+                }
+                if (_dataTypeRuleForm != null)
+                {
+                    _dataTypeRuleForm.ShowClues = cluesVisible;
+                }
 
                 // Invalidate the image viewer to update the visibility
                 _imageViewer.Invalidate();
@@ -533,7 +597,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleShowRedactionsCheckboxChanged(object sender, EventArgs e)
+        void HandleShowRedactionsCheckboxChanged(object sender, EventArgs e)
         {
             try
             {
@@ -556,7 +620,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleCheckOrUncheckAllLayerObjects(object sender, EventArgs e)
+        void HandleCheckOrUncheckAllLayerObjects(object sender, EventArgs e)
         {
             try
             {
@@ -587,7 +651,7 @@ namespace IDShieldOffice
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="DockControlClosingEventArgs"/> that
         /// contains the event data.</param>
-        private void objectPropertyGridDockableWindow_Closing(object sender,
+        void objectPropertyGridDockableWindow_Closing(object sender,
             DockControlClosingEventArgs e)
         {
             try
@@ -609,7 +673,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleShowLayersWindow(object sender, EventArgs e)
+        void HandleShowLayersWindow(object sender, EventArgs e)
         {
             try
             {
@@ -629,7 +693,7 @@ namespace IDShieldOffice
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="DockControlClosingEventArgs"/> that
         /// contains the event data.</param>
-        private void layersDockableWindow_Closing(object sender, DockControlClosingEventArgs e)
+        void layersDockableWindow_Closing(object sender, DockControlClosingEventArgs e)
         {
             try
             {
@@ -651,12 +715,12 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
             {
                 // Close the form 
-                this.Close();
+                Close();
             }
             catch (Exception ex)
             {
@@ -673,7 +737,7 @@ namespace IDShieldOffice
         /// event.</param>
         /// <param name="e">The <see cref="EventArgs"/> data associated with the
         /// <see cref="Control.DoubleClick"/> event.</param>
-        private void ocrProgressStatusLabel_DoubleClick(object sender, EventArgs e)
+        void ocrProgressStatusLabel_DoubleClick(object sender, EventArgs e)
         {
             try
             {
@@ -696,7 +760,7 @@ namespace IDShieldOffice
         /// </param>
         /// <param name="e">The event data associated with the <see cref="ToolStripItem.Click"/> 
         /// event.</param>
-        private void HandlePreferencesToolStripMenuItemClick(object sender, EventArgs e)
+        void HandlePreferencesToolStripMenuItemClick(object sender, EventArgs e)
         {
             ShowPreferencesDialog();
         }
@@ -716,7 +780,7 @@ namespace IDShieldOffice
                     ComponentResourceManager resources =
                         new ComponentResourceManager(typeof(IDShieldOfficeForm));
                     _userPreferencesDialog.Icon =
-                        ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+                        ((Icon)(resources.GetObject("$this.Icon")));
                 }
 
                 // Display the dialog
@@ -748,7 +812,7 @@ namespace IDShieldOffice
         /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
-        private void HandleImageViewerImageFileChanged(object sender, ImageFileChangedEventArgs e)
+        void HandleImageViewerImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
             {
@@ -800,7 +864,7 @@ namespace IDShieldOffice
                 }
 
                 // Set the dirty flag to false
-                this.Dirty = false;
+                Dirty = false;
 
                 // Reset the output file path
                 _outputFilePath = null;
@@ -825,17 +889,17 @@ namespace IDShieldOffice
         /// <param name="sender">The <see cref="object"/></param> that sent the event.
         /// <param name="e">The event data associated with the
         /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileClosing"/> event.</param>
-        private void HandleImageViewerImageFileClosing(object sender, ImageFileClosingEventArgs e)
+        void HandleImageViewerImageFileClosing(object sender, ImageFileClosingEventArgs e)
         {
             try
             {
-                if (this.Dirty)
+                if (Dirty)
                 {
                     // Prompt the user to save the dirty file
                     DialogResult result = PromptForDirtyFile();
                     if (result == DialogResult.Yes)
                     {
-                        if (!this.Save(false))
+                        if (!Save(false))
                         {
                             // Cancel the event
                             e.Cancel = true;
@@ -863,7 +927,7 @@ namespace IDShieldOffice
         /// <see cref="Extract.Imaging.Forms.ImageViewer.CursorToolChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="Extract.Imaging.Forms.ImageViewer.CursorToolChanged"/> event.</param>
-        private void HandleImageViewerCursorToolChanged(object sender, CursorToolChangedEventArgs e)
+        void HandleImageViewerCursorToolChanged(object sender, CursorToolChangedEventArgs e)
         {
             try
             {
@@ -892,7 +956,7 @@ namespace IDShieldOffice
         /// <param name="sender">The <see cref="object"/> which sent the event.</param>
         /// <param name="e">An <see cref="OpeningImageEventArgs"/> associated with
         /// the event.</param>
-        private void HandleImageViewerOpeningImage(object sender, OpeningImageEventArgs e)
+        void HandleImageViewerOpeningImage(object sender, OpeningImageEventArgs e)
         {
             try
             {
@@ -921,7 +985,7 @@ namespace IDShieldOffice
         /// <param name="sender">The <see cref="object"/> which sent the event.</param>
         /// <param name="e">An <see cref="LoadingNewImageEventArgs"/> associated with
         /// the event.</param>
-        private void HandleImageViewerLoadingNewImage(object sender, LoadingNewImageEventArgs e)
+        void HandleImageViewerLoadingNewImage(object sender, LoadingNewImageEventArgs e)
         {
             try
             {
@@ -946,7 +1010,7 @@ namespace IDShieldOffice
         /// <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.</param>
-        private void HandleImageViewerPageChanged(object sender, PageChangedEventArgs e)
+        void HandleImageViewerPageChanged(object sender, PageChangedEventArgs e)
         {
             try
             {
@@ -969,7 +1033,7 @@ namespace IDShieldOffice
         /// <see cref="Extract.Imaging.Forms.ImageViewer.DisplayingPrintDialog"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="Extract.Imaging.Forms.ImageViewer.DisplayingPrintDialog"/> event.</param>
-        private void HandleImageViewerDisplayingPrintDialog(object sender, 
+        void HandleImageViewerDisplayingPrintDialog(object sender, 
             DisplayingPrintDialogEventArgs e)
         {
             try
@@ -994,7 +1058,7 @@ namespace IDShieldOffice
         /// <param name="sender">The <see cref="object"/> which sent the event.</param>
         /// <param name="e">An <see cref="ModificationHistoryLoadedEventArgs"/>
         /// associated with the event.</param>
-        private void HandleModificationHistoryLoaded(object sender,
+        void HandleModificationHistoryLoaded(object sender,
             ModificationHistoryLoadedEventArgs e)
         {
             try
@@ -1003,7 +1067,7 @@ namespace IDShieldOffice
                 SetLayerObjectsVisibility();
 
                 // Reset the dirty flag after the modification history is loaded
-                this.Dirty = false;
+                Dirty = false;
 
                 UpdateButtonAndMenuItemState();
             }
@@ -1065,7 +1129,7 @@ namespace IDShieldOffice
         /// </param>
         /// <param name="e">The event data associated with the <see cref="ToolStripItem.Click"/> 
         /// event.</param>
-        private void HandleApplyBatesNumberToolStripButtonClick(object sender, EventArgs e)
+        void HandleApplyBatesNumberToolStripButtonClick(object sender, EventArgs e)
         {
             try
             {
@@ -1084,7 +1148,7 @@ namespace IDShieldOffice
         /// </param>
         /// <param name="e">The event data associated with the <see cref="ToolStripItem.Click"/> 
         /// event.</param>
-        private void HandleApplyBatesNumberToolStripMenuItemClick(object sender, EventArgs e)
+        void HandleApplyBatesNumberToolStripMenuItemClick(object sender, EventArgs e)
         {
             try
             {
@@ -1121,7 +1185,7 @@ namespace IDShieldOffice
         /// </param>
         /// <param name="e">The event data associated with the
         /// <see cref="LayerObjectsCollection.LayerObjectVisibilityChanged"/> event.</param>
-        private void HandleLayerObjectsVisibilityChanged(object sender,
+        void HandleLayerObjectsVisibilityChanged(object sender,
             LayerObjectVisibilityChangedEventArgs e)
         {
             // Check if it was a Bates number
@@ -1157,15 +1221,15 @@ namespace IDShieldOffice
         /// <param name="sender">The <see cref="object"/> that sent the event.</param>
         /// <param name="e">An <see cref="LayerObjectDeletedEventArgs"/> associated
         /// with the event.</param>
-        private void HandleLayerObjectDeleted(object sender, LayerObjectDeletedEventArgs e)
+        void HandleLayerObjectDeleted(object sender, LayerObjectDeletedEventArgs e)
         {
             try
             {
                 // Do not set the dirty flag for search results [IDSD #231 - JDS]
-                if (!e.LayerObject.Tags.Contains(IDShieldOfficeForm._SEARCH_RESULT_TAGS[0]))
+                if (!e.LayerObject.Tags.Contains(_SEARCH_RESULT_TAGS[0]))
                 {
                     // Set the dirty flag
-                    this.Dirty = true;
+                    Dirty = true;
                 }
 
                 UpdateButtonAndMenuItemState();
@@ -1182,7 +1246,7 @@ namespace IDShieldOffice
         /// <param name="sender">The <see cref="object"/> that sent the event.</param>
         /// <param name="e">An <see cref="LayerObjectAddedEventArgs"/> associated
         /// with the event.</param>
-        private void HandleLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
+        void HandleLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
         {
             try
             {
@@ -1226,10 +1290,10 @@ namespace IDShieldOffice
                 }
 
                 // Do not set the dirty flag for search results [IDSD #231 - JDS]
-                if (!layerObject.Tags.Contains(IDShieldOfficeForm._SEARCH_RESULT_TAGS[0]))
+                if (!layerObject.Tags.Contains(_SEARCH_RESULT_TAGS[0]))
                 {
                     // Set the dirty flag
-                    this.Dirty = true;
+                    Dirty = true;
                 }
 
                 UpdateButtonAndMenuItemState();
@@ -1247,7 +1311,7 @@ namespace IDShieldOffice
         /// <see cref="LayerObjectsCollection.DeletingLayerObjects"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="LayerObjectsCollection.DeletingLayerObjects"/> event.</param>
-        private void HandleDeletingLayerObjects(object sender, DeletingLayerObjectsEventArgs e)
+        void HandleDeletingLayerObjects(object sender, DeletingLayerObjectsEventArgs e)
         {
             try
             {
@@ -1316,7 +1380,7 @@ namespace IDShieldOffice
         /// <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.</param>
-        private void HandleSelectionLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
+        void HandleSelectionLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
         {
             try
             {
@@ -1338,15 +1402,15 @@ namespace IDShieldOffice
         /// <see cref="LayerObjectsCollection.LayerObjectChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="LayerObjectsCollection.LayerObjectChanged"/> event.</param>
-        private void HandleLayerObjectChanged(object sender, LayerObjectChangedEventArgs e)
+        void HandleLayerObjectChanged(object sender, LayerObjectChangedEventArgs e)
         {
             try
             {
                 // Do not set the dirty flag for search results [IDSD #231 - JDS]
-                if (!e.LayerObject.Tags.Contains(IDShieldOfficeForm._SEARCH_RESULT_TAGS[0]))
+                if (!e.LayerObject.Tags.Contains(_SEARCH_RESULT_TAGS[0]))
                 {
                     // Set the dirty flag
-                    this.Dirty = true;
+                    Dirty = true;
                 }
 
                 _objectPropertyGrid.Refresh();
@@ -1366,7 +1430,7 @@ namespace IDShieldOffice
         /// <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.</param>
-        private void HandleSelectionLayerObjectDeleted(object sender, LayerObjectDeletedEventArgs e)
+        void HandleSelectionLayerObjectDeleted(object sender, LayerObjectDeletedEventArgs e)
         {
             try
             {
@@ -1388,7 +1452,7 @@ namespace IDShieldOffice
         /// <see cref="PropertyGrid.PropertyValueChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="PropertyGrid.PropertyValueChanged"/> event.</param>
-        private void HandleObjectPropertyGridPropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
+        void HandleObjectPropertyGridPropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
         {
             try
             {
@@ -1409,7 +1473,7 @@ namespace IDShieldOffice
         /// </param>
         /// <param name="e">The event data associated with the <see cref="ToolStripItem.Click"/> 
         /// event.</param>
-        private void HandlePageSetupMenuItemClick(object sender, EventArgs e)
+        void HandlePageSetupMenuItemClick(object sender, EventArgs e)
         {
             try
             {
@@ -1430,7 +1494,7 @@ namespace IDShieldOffice
         /// </param>
         /// <param name="e">The event data associated with the <see cref="ToolStripItem.Click"/> 
         /// event.</param>
-        private void HandleAboutIDShieldOfficeMenuItemClick(object sender, EventArgs e)
+        void HandleAboutIDShieldOfficeMenuItemClick(object sender, EventArgs e)
         {
             try
             {
@@ -1453,11 +1517,11 @@ namespace IDShieldOffice
         /// <see cref="ToolStripItem.Click"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ToolStripItem.Click"/> event.</param>
-        private void HandleSaveToolStripButtonClick(object sender, EventArgs e)
+        void HandleSaveToolStripButtonClick(object sender, EventArgs e)
         {
             try
             {
-                this.Save(false);
+                Save(false);
             }
             catch (Exception ex)
             {
@@ -1474,11 +1538,11 @@ namespace IDShieldOffice
         /// <see cref="ToolStripItem.Click"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ToolStripItem.Click"/> event.</param>
-        private void HandleSaveToolStripMenuItemClick(object sender, EventArgs e)
+        void HandleSaveToolStripMenuItemClick(object sender, EventArgs e)
         {
             try
             {
-                this.Save(false);
+                Save(false);
             }
             catch (Exception ex)
             {
@@ -1495,7 +1559,7 @@ namespace IDShieldOffice
         /// <see cref="ToolStripItem.Click"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ToolStripItem.Click"/> event.</param>
-        private void HandlePropertiesToolStripMenuItemClick(object sender, EventArgs e)
+        void HandlePropertiesToolStripMenuItemClick(object sender, EventArgs e)
         {
             try
             {
@@ -1522,11 +1586,11 @@ namespace IDShieldOffice
         /// <see cref="ToolStripItem.Click"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ToolStripItem.Click"/> event.</param>
-        private void HandleSaveAsToolStripMenuItemClick(object sender, EventArgs e)
+        void HandleSaveAsToolStripMenuItemClick(object sender, EventArgs e)
         {
             try
             {
-                this.Save(true);
+                Save(true);
             }
             catch (Exception ex)
             {
@@ -1615,7 +1679,7 @@ namespace IDShieldOffice
         /// <see cref="ToolStripItem.Click"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ToolStripItem.Click"/> event.</param>
-        private void HandleIdShieldOfficeHelpToolStripMenuItemClick(object sender, EventArgs e)
+        void HandleIdShieldOfficeHelpToolStripMenuItemClick(object sender, EventArgs e)
         {
             try
             {
@@ -1632,7 +1696,7 @@ namespace IDShieldOffice
         /// <summary>
         /// Shows the IDSO help file to the user.
         /// </summary>
-        private void ShowIdsoHelp()
+        void ShowIdsoHelp()
         {
             Help.ShowHelp(this, HelpFileUrl);
         }
@@ -1644,7 +1708,7 @@ namespace IDShieldOffice
         /// <see cref="ToolStripItem.Click"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ToolStripItem.Click"/> event.</param>
-        private void HandleRegularExpressionHelpToolStripMenuItemClick(object sender, EventArgs e)
+        void HandleRegularExpressionHelpToolStripMenuItemClick(object sender, EventArgs e)
         {
             try
             {
@@ -1665,7 +1729,7 @@ namespace IDShieldOffice
         /// <see cref="Extract.Imaging.Forms.ImageViewer.FileOpenError"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="Extract.Imaging.Forms.ImageViewer.FileOpenError"/> event.</param>
-        private void HandleFileOpenError(object sender, FileOpenErrorEventArgs e)
+        void HandleFileOpenError(object sender, FileOpenErrorEventArgs e)
         {
             if (Extract.Utilities.FileSystemMethods.HasImageFileExtension(e.FileName))
             {

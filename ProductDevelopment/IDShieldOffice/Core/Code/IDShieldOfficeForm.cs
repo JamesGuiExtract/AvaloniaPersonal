@@ -9,46 +9,42 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-using TD.SandDock;
-using UCLID_COMUTILSLib;
-using UCLID_RASTERANDOCRMGMTLib;
-using UCLID_SSOCRLib;
+
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
 namespace IDShieldOffice
 {
     /// <summary>
     /// The main form for the ID Shield Office application.
     /// </summary>
-    public partial class IDShieldOfficeForm : Form
+    public partial class IDShieldOfficeForm : Form, IRuleFormHelper
     {
         #region Fields
 
         /// <summary>
         /// Boolean flag to indicate whether the objectPropertiesGrid window is visible.
         /// </summary>
-        private bool _objectPropertiesGridWindowVisible;
+        bool _objectPropertiesGridWindowVisible;
 
         /// <summary>
         /// Boolean flag to indicate whether the layers window is visible.
         /// </summary>
-        private bool _layersWindowVisible;
+        bool _layersWindowVisible;
 
         /// <summary>
         /// The manager object for performing OCR on the opened image files.
         /// </summary>
-        private AsynchronousOcrManager _ocrManager;
+        AsynchronousOcrManager _ocrManager;
 
         /// <summary>
         /// Stores the last exception object from the OCR manager.
         /// </summary>
-        private ExtractException _lastOcrException;
+        ExtractException _lastOcrException;
 
         /// <summary>
         /// The "Save As" file dialog.
@@ -58,22 +54,22 @@ namespace IDShieldOffice
         /// <summary>
         /// The form for finding and redacting bracketed text.
         /// </summary>
-        private IDShieldOfficeRuleForm _bracketedTextRuleForm;
+        IDShieldOfficeRuleForm _bracketedTextRuleForm;
 
         /// <summary>
         /// The form for finding and redacting a word/pattern list.
         /// </summary>
-        private IDShieldOfficeRuleForm _wordOrPatternListRuleForm;
+        IDShieldOfficeRuleForm _wordOrPatternListRuleForm;
 
         /// <summary>
         /// The form for finding and redacting specific data types.
         /// </summary>
-        private IDShieldOfficeRuleForm _dataTypeRuleForm;
+        IDShieldOfficeRuleForm _dataTypeRuleForm;
 
         /// <summary>
         /// The user-specified settings for the ID Shield Office application.
         /// </summary>
-        UserPreferences _userPreferences;
+        readonly UserPreferences _userPreferences;
 
         /// <summary>
         /// The dialog for setting user preferences.
@@ -83,7 +79,7 @@ namespace IDShieldOffice
         /// <summary>
         /// The history of all modifications to the currently open document.
         /// </summary>
-        ModificationHistory _modifications;
+        readonly ModificationHistory _modifications;
 
         /// <summary>
         /// Whether the currently open file has been saved or not.
@@ -122,7 +118,7 @@ namespace IDShieldOffice
         /// <summary>
         /// File to be opened when the IDSO form has loaded.
         /// </summary>
-        string _fileToOpen;
+        readonly string _fileToOpen;
 
         #endregion Fields
 
@@ -131,43 +127,43 @@ namespace IDShieldOffice
         /// <summary>
         /// The main string displayed in the title bar of the ID Shield office application.
         /// </summary>
-        private static readonly string _IDSHIELD_OFFICE_TITLE = "ID Shield Office";
+        const string _IDSHIELD_OFFICE_TITLE = "ID Shield Office";
 
         /// <summary>
         /// The percentage of overlap tolerance for adding objects.
         /// </summary>
-        private static readonly double _OBJECT_OVERLAP_TOLERANCE = 0.95;
+        const double _OBJECT_OVERLAP_TOLERANCE = 0.95;
 
         /// <summary>
         /// The format string for displaying the OCR progress before it is complete.
         /// </summary>
-        private static readonly string _OCR_PROGRESS_FORMAT = "OCR {0:0%}";
+        const string _OCR_PROGRESS_FORMAT = "OCR {0:0%}";
 
         /// <summary>
         /// The string to display when the OCR has completed.
         /// </summary>
-        private static readonly string _OCR_PROGRESS_COMPLETE = "OCR Complete!";
+        const string _OCR_PROGRESS_COMPLETE = "OCR Complete!";
 
         /// <summary>
         /// The string to display when an OCR error has occurred.
         /// </summary>
-        private static readonly string _OCR_PROGRESS_ERROR = "OCR Error Occurred!";
+        const string _OCR_PROGRESS_ERROR = "OCR Error Occurred!";
 
         /// <summary>
         /// The string to display when an OCR event has been canceled.
         /// </summary>
-        private static readonly string _OCR_PROGRESS_CANCELED = "OCR Canceled!";
+        const string _OCR_PROGRESS_CANCELED = "OCR Canceled!";
 
         /// <summary>
         /// Value indicating that an error has occurred in OCR so the ocrProgressStatusLabel
         /// should display the error string.
         /// </summary>
-        private static readonly double _OCR_DISPLAY_PROGRESS_ERROR = -42.0;
+        const double _OCR_DISPLAY_PROGRESS_ERROR = -42.0;
 
         /// <summary>
         /// Value indicating that the OCR status text should no longer be displayed.
         /// </summary>
-        private static readonly double _OCR_DISPLAY_PROGRESS_NONE = -43.0;
+        const double _OCR_DISPLAY_PROGRESS_NONE = -43.0;
         
         /// <summary>
         /// The tag that will be added to search results.
@@ -182,7 +178,7 @@ namespace IDShieldOffice
         /// <summary>
         /// The filter string containing the file formats that ID Shield Office supports saving
         /// </summary>
-        static readonly string _OUTPUT_FORMAT_FILTER =
+        const string _OUTPUT_FORMAT_FILTER =
             "TIFF files (*.tif)|*.tif|" +
             "PDF files (*.pdf)|*.pdf|" +
             "IDSO files (*.idso)|*.idso||";
@@ -191,7 +187,7 @@ namespace IDShieldOffice
         /// The filter string containing the file formats that ID Shield Office supports saving
         /// for temporary files.
         /// </summary>
-        static readonly string _TEMPFILE_OUTPUT_FORMAT_FILTER =
+        const string _TEMPFILE_OUTPUT_FORMAT_FILTER =
             "TIFF files (*.tif)|*.tif|" +
             "PDF files (*.pdf)|*.pdf||";
 
@@ -217,24 +213,23 @@ namespace IDShieldOffice
         /// <summary>
         /// The index to the printing section of the ID Shield Office help file
         /// </summary>
-        static readonly string _PRINTING_HELP_INDEX = "temporary images";
+        const string _PRINTING_HELP_INDEX = "temporary images";
 
         /// <summary>
         /// The url to the regular expression help file.
         /// </summary>
-        static readonly string _REGEX_HELP_FILE_URL =
+        const string _REGEX_HELP_FILE_URL =
             @"http://msdn.microsoft.com/en-us/library/hs600312(VS.80).aspx";
 
         /// <summary>
         /// The keyword for the help sections that contains examples of document tags.
         /// </summary>
-        static readonly string _TAGS_EXAMPLE_HELP_KEYWORD = "Examples_of_Output_File_Settings.htm";
+        const string _TAGS_EXAMPLE_HELP_KEYWORD = "Examples_of_Output_File_Settings.htm";
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(IDShieldOfficeForm).ToString();
+        static readonly string _OBJECT_NAME = typeof(IDShieldOfficeForm).ToString();
 
         /// <summary>
         /// An array of <see cref="Boolean"/> values indexed by zero-based page number indicating 
@@ -282,15 +277,11 @@ namespace IDShieldOffice
         /// with the specified image file.
         /// </summary>
         /// <param name="fileName">The image file or ID Shield Office data file to open.
-        /// <param name="tempFile">If <see langword="true"/> Indicates that the file is a temporary
-        /// file and should be deleted when the image file changes and also should not be
-        /// added to the MRU list.  If <see langword="false"/> then the file will not be deleted
-        /// and will be added to the MRU list.
-        /// <paramref name="fileName"/> will be added to the MRU list when it is opened.  If
-        /// <see langword="true"/> the file will not be added to the MRU list.  This also
-        /// indicates that the file is a temporary file and so no IDSO file will be auto generated
-        /// for the file if <see langword="true"/> (you can still create one through SaveAs).</param>
         /// <see langword="null"/> if no file should be opened.</param>
+        /// <param name="tempFile">If <see langword="true"/> the file is a temporary file and 
+        /// should be deleted when the image file changes and also should not be added to the MRU 
+        /// list. If <see langword="false"/> then the file will not be deleted and will be added 
+        /// to the MRU list.</param>
         public IDShieldOfficeForm(string fileName, bool tempFile)
         {
             try
@@ -357,7 +348,7 @@ namespace IDShieldOffice
                         LicenseUtilities.GetExpirationDate(LicenseIdName.IdShieldOfficeObject);
 
                     // Calculate the days remaining in the evaluation.
-                    int daysLeft = ((TimeSpan)(date - DateTime.Now)).Days;
+                    int daysLeft = (date - DateTime.Now).Days;
 
                     // Build time remaining in the evaluation for the label
                     StringBuilder sb = new StringBuilder("Evaluation expires ");
@@ -386,7 +377,7 @@ namespace IDShieldOffice
         /// <summary>
         /// Toggles the display of the object properties grid window.
         /// </summary>
-        private void ToggleObjectPropertiesGridDockableWindow()
+        void ToggleObjectPropertiesGridDockableWindow()
         {
             // Set the object properties pane visibility to its opposite value
             SetObjectPropertiesGridDockableWindowVisible(!_objectPropertiesGridWindowVisible);
@@ -397,7 +388,7 @@ namespace IDShieldOffice
         /// <param name="makeVisible"><see langword="true"/> makes the oject properties pane visible;
         /// <see langword="false"/> hides the object properties pane.</param>
         /// </summary>
-        private void SetObjectPropertiesGridDockableWindowVisible(bool makeVisible)
+        void SetObjectPropertiesGridDockableWindowVisible(bool makeVisible)
         {
             if (makeVisible == _objectPropertiesGridWindowVisible)
             {
@@ -432,7 +423,7 @@ namespace IDShieldOffice
         /// <summary>
         /// Toggles the display of the layers window.
         /// </summary>
-        private void ToggleLayersDockableWindow()
+        void ToggleLayersDockableWindow()
         {
             // Change the layers pane visibility to its opposite value
             SetLayersDockableWindowVisible(!_layersWindowVisible);
@@ -443,7 +434,7 @@ namespace IDShieldOffice
         /// <param name="makeVisible"><see langword="true"/> makes the layer selection pane visible;
         /// <see langword="false"/> hides the layer selection pane.</param>
         /// </summary>
-        private void SetLayersDockableWindowVisible(bool makeVisible)
+        void SetLayersDockableWindowVisible(bool makeVisible)
         {
             if (makeVisible == _layersWindowVisible)
             {
@@ -482,10 +473,10 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="progress">A <see cref="double"/> containing the
         /// current OCR progress percentage.</param>
-        private void UpdateProgressStatus(double progress)
+        void UpdateProgressStatus(double progress)
         {
             // If not running in the UI thread than an invoke is required
-            if (base.InvokeRequired)
+            if (InvokeRequired)
             {
                 // Call UpdateProgressStatus via BeginInvoke (Asynchronous call)
                 BeginInvoke(new DoubleParameterDelegate(UpdateProgressStatus),
@@ -604,8 +595,7 @@ namespace IDShieldOffice
         /// <see cref="Extract.Imaging.RasterZone"/>
         /// objects that make up this redaction.</param>
         /// <param name="comment">The comment associated with the redaction.</param>
-        internal void AddRedaction(IEnumerable<Extract.Imaging.RasterZone> rasterZones, 
-            string comment)
+        internal void AddRedaction(IEnumerable<RasterZone> rasterZones, string comment)
         {
             // Get a list of clues that haven't already been added to this image.
             List<Redaction> redactionsToAdd = CreateIfNotDuplicate<Redaction>(rasterZones, comment);
@@ -641,8 +631,8 @@ namespace IDShieldOffice
         /// <param name="comment">The comment to be associated with the clues or redactions.</param>
         /// <returns><see langword="null"/> if no unique clue or redaction could be created. 
         /// Otherwise a list of non-overlapping clues or redactions is returned.</returns>
-        internal List<T> CreateIfNotDuplicate<T>(IEnumerable<Extract.Imaging.RasterZone> rasterZones,
-            string comment) where T : CompositeHighlightLayerObject
+        internal List<T> CreateIfNotDuplicate<T>(IEnumerable<RasterZone> rasterZones, string comment) 
+            where T : CompositeHighlightLayerObject
         {
             // Default overlap to true.
             bool allObjectsOverlapExisting = true;
@@ -651,8 +641,7 @@ namespace IDShieldOffice
             List<T> objectsToAdd = new List<T>();
 
             // Add the new object (need to split the object into zones on different pages first).
-            foreach (KeyValuePair<int, List<Extract.Imaging.RasterZone>> pair in
-                Extract.Imaging.RasterZone.SplitZonesByPage(rasterZones))
+            foreach (KeyValuePair<int, List<RasterZone>> pair in RasterZone.SplitZonesByPage(rasterZones))
             {
                 T objectToAdd = null;
 
@@ -679,8 +668,7 @@ namespace IDShieldOffice
                 if (allObjectsOverlapExisting)
                 {
                     // Build a list of all raster zones for existing objects of the same type.
-                    List<Extract.Imaging.RasterZone> existingZones =
-                        new List<Extract.Imaging.RasterZone>();
+                    List<RasterZone> existingZones = new List<RasterZone>();
                     foreach (T existingObject in _imageViewer.GetLayeredObjectsOnPage(
                         pair.Key, null, ArgumentRequirement.Any, new Type[] { typeof(T) },
                         ArgumentRequirement.All, null, ArgumentRequirement.All))
@@ -703,7 +691,7 @@ namespace IDShieldOffice
         /// <summary>
         /// Updates the button and menu item enabled states for the IDShieldOffice Form
         /// </summary>
-        private void UpdateButtonAndMenuItemState()
+        void UpdateButtonAndMenuItemState()
         {
             // Get isImageAvailable
             bool isImageAvailable = _imageViewer.IsImageAvailable;
@@ -737,7 +725,7 @@ namespace IDShieldOffice
         /// <param name="turnBatesLayerOn"> <see langword="true"/> forces the bates number
         /// layer to be turned on as part of this call.</param>
         /// </summary>
-        private void UpdateBatesNumberControls(bool turnBatesLayerOn)
+        void UpdateBatesNumberControls(bool turnBatesLayerOn)
         {
             // Update the apply bates number menu item and button state
             // 1. Image must be available
@@ -815,7 +803,7 @@ namespace IDShieldOffice
         /// <returns><see langword="true"/> if the save was executed; <see langword="false"/> if 
         /// the user cancelled the operation.</returns>
         /// </summary>
-        private bool SaveAs()
+        bool SaveAs()
         {
             try
             {
@@ -829,14 +817,7 @@ namespace IDShieldOffice
                 }
 
                 // Set the output filter based on whether it is a temp file or not
-                if (_tempFile)
-                {
-                    _saveAsDialog.Filter = _TEMPFILE_OUTPUT_FORMAT_FILTER;
-                }
-                else
-                {
-                    _saveAsDialog.Filter = _OUTPUT_FORMAT_FILTER;
-                }
+                _saveAsDialog.Filter = _tempFile ? _TEMPFILE_OUTPUT_FORMAT_FILTER : _OUTPUT_FORMAT_FILTER;
 
                 // Set the default file path and format
                 OutputFormat format;
@@ -963,7 +944,7 @@ namespace IDShieldOffice
         internal void SaveImage(string fileName, OutputFormat format)
         {
             // Refresh the form
-            this.Refresh();
+            Refresh();
 
             if (format == OutputFormat.Idso)
             {
@@ -983,7 +964,7 @@ namespace IDShieldOffice
             }
 
             // Reset the dirty flag
-            this.Dirty = false;
+            Dirty = false;
         }
 
         /// <summary>
@@ -1016,7 +997,7 @@ namespace IDShieldOffice
         /// option to save the file, not save and continue, or cancel.
         /// </summary>
         /// <returns>A <see cref="DialogResult"/> containing the result of the message box.</returns>
-        private DialogResult PromptForDirtyFile()
+        DialogResult PromptForDirtyFile()
         {
             return MessageBox.Show(this, "File has not been saved, would you like to save now?",
                 "File Not Saved", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
@@ -1192,7 +1173,7 @@ namespace IDShieldOffice
         /// Updates the form caption with the currently opened image and adds a "*" if
         /// the currently opened image is dirty.
         /// </summary>
-        private void UpdateCaption()
+        void UpdateCaption()
         {
             StringBuilder sb = new StringBuilder(_IDSHIELD_OFFICE_TITLE);
 
@@ -1201,13 +1182,13 @@ namespace IDShieldOffice
                 sb.Append(" - ");
                 sb.Append(_imageViewer.ImageFile);
 
-                if (this.Dirty)
+                if (Dirty)
                 {
                     sb.Append("*");
                 }
             }
 
-            this.Text = sb.ToString();
+            Text = sb.ToString();
         }
 
         #endregion Methods
@@ -1257,7 +1238,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <returns>The value of the dirty flag.</returns>
         /// <value>The value of the dirty flag.</value>
-        private bool Dirty
+        bool Dirty
         {
             get
             {
@@ -1336,5 +1317,90 @@ namespace IDShieldOffice
         }
 
         #endregion Properties
+
+        #region IRuleFormHelper Members
+
+        /// <summary>
+        /// Retrieves the optical character recognition (OCR) results for the rule form to use.
+        /// </summary>
+        /// <returns>The optical character recognition (OCR) results for the rule form to use.
+        /// </returns>
+        [CLSCompliant(false)]
+        public SpatialString GetOcrResults()
+        {
+            try
+            {
+                using (new TemporaryWaitCursor())
+                {
+                    // Get the current image name
+                    string imageFileName = _imageViewer.ImageFile;
+
+                    // Wait for OCR to complete
+                    while (!OcrManager.OcrFinished)
+                    {
+                        Application.DoEvents();
+
+                        // If while waiting the image file was changed, then exit this find
+                        if (imageFileName != _imageViewer.ImageFile)
+                        {
+                            return null;
+                        }
+
+                        // [IDSD:344]
+                        // Wait a tenth of a second between checks for OCR information so that
+                        // we don't burn CPU unnecessarily while waiting for OCR result.
+                        System.Threading.Thread.Sleep(100);
+                    }
+
+                    // Get the SpatialString
+                    return OcrManager.GetOcrSpatialString();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI29204",
+                    "Unable to get OCR results.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified match has already been found.
+        /// </summary>
+        /// <param name="match">The match to check for duplication.</param>
+        /// <returns><see langword="true"/> if the specified <paramref name="match"/> has 
+        /// already been found; <see langword="false"/> has not yet been found.</returns>
+        public bool IsDuplicate(MatchResult match)
+        {
+            try
+            {
+                bool isDuplicate = true;
+                if (match.MatchType == MatchType.Clue)
+                {
+                    List<Clue> clues = CreateIfNotDuplicate<Clue>(match.RasterZones, "");
+                    if (clues != null)
+                    {
+                        isDuplicate = false;
+                        CollectionMethods.ClearAndDispose(clues);
+                    }
+                }
+                else
+                {
+                    List<Redaction> redactions = CreateIfNotDuplicate<Redaction>(match.RasterZones, "");
+                    if (redactions != null)
+                    {
+                        isDuplicate = false;
+                        CollectionMethods.ClearAndDispose(redactions);
+                    }
+                }
+
+                return isDuplicate;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29205", ex);
+            }
+        }
+
+        #endregion IRuleFormHelper Members
     }
 }

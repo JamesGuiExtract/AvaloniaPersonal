@@ -66,7 +66,8 @@ namespace IDShieldOffice.Test
 
             // Create a new IDShieldOfficeRuleForm
             using (IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Data Type Finder",
-                new DataTypeRule(new string[] { ssnDataTypeName }), _idShieldOfficeForm))
+                new DataTypeRule(new string[] { ssnDataTypeName }), _idShieldOfficeForm.ImageViewer, 
+                _idShieldOfficeForm, _idShieldOfficeForm))
             {
 
                 // Show the rule form
@@ -117,7 +118,7 @@ namespace IDShieldOffice.Test
             // Create a new IDShieldOfficeRuleForm
             using (IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed Text Finder",
                 new BracketedTextRule(squareBrackets, curvedBrackets, curlyBrackets),
-                _idShieldOfficeForm))
+                _idShieldOfficeForm.ImageViewer, _idShieldOfficeForm, _idShieldOfficeForm))
             {
 
                 // Show the rule form

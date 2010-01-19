@@ -160,6 +160,8 @@
       <DependentUpon>DataTypeRulePropertyPage.cs</DependentUpon>
     </Compile>
     <Compile Include="FindResult.cs" />
+    <Compile Include="IRuleFormHelper.cs" />
+    <Compile Include="MatchesFoundEventArgs.cs" />
     <Compile Include="IDShieldOfficeForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -177,6 +179,7 @@
       <DependentUpon>IDShieldOfficeRuleForm.cs</DependentUpon>
     </Compile>
     <Compile Include="IIDShieldOfficeRule.cs" />
+    <Compile Include="MatchRedactedEventArgs.cs" />
     <Compile Include="MatchResult.cs" />
     <Compile Include="ModificationHistory.cs" />
     <Compile Include="NativeMethods.cs" />

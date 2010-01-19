@@ -28,7 +28,8 @@ namespace IDShieldOffice.Test
 
             // Create a new IDShieldOfficeRuleForm
             IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
-                new BracketedTextRule(true, true, true), _idShieldOfficeForm);
+                new BracketedTextRule(true, true, true), _idShieldOfficeForm.ImageViewer, 
+                _idShieldOfficeForm, _idShieldOfficeForm);
             
             // Show the rule form
             ruleForm.Show();
@@ -80,7 +81,8 @@ namespace IDShieldOffice.Test
 
             // Create a new IDShieldOfficeRuleForm
             IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
-                new BracketedTextRule(true, false, false), _idShieldOfficeForm);
+                new BracketedTextRule(true, false, false), _idShieldOfficeForm.ImageViewer, 
+                _idShieldOfficeForm, _idShieldOfficeForm);
             
             // Show the rule form
             ruleForm.Show();
@@ -166,7 +168,8 @@ namespace IDShieldOffice.Test
 
             // Create a new IDShieldOfficeRuleForm
             IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
-                new BracketedTextRule(true, false, false), _idShieldOfficeForm);
+                new BracketedTextRule(true, false, false), _idShieldOfficeForm.ImageViewer, 
+                _idShieldOfficeForm, _idShieldOfficeForm);
             
             // Show the rule form
             ruleForm.Show();
@@ -206,7 +209,8 @@ namespace IDShieldOffice.Test
 
             // Create a new IDShieldOfficeRuleForm
             IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
-                new BracketedTextRule(true, false, false), _idShieldOfficeForm);
+                new BracketedTextRule(true, false, false), _idShieldOfficeForm.ImageViewer, 
+                _idShieldOfficeForm, _idShieldOfficeForm);
             
             // Show the rule form
             ruleForm.Show();
@@ -234,7 +238,8 @@ namespace IDShieldOffice.Test
 
             // Create a new IDShieldOfficeRuleForm
             IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
-                new BracketedTextRule(true, false, false), _idShieldOfficeForm);
+                new BracketedTextRule(true, false, false), _idShieldOfficeForm.ImageViewer, 
+                _idShieldOfficeForm, _idShieldOfficeForm);
             
             // Show the rule form
             ruleForm.Show();
@@ -287,7 +292,8 @@ namespace IDShieldOffice.Test
 
             // Create a new IDShieldOfficeRuleForm
             IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
-                new BracketedTextRule(true, true, true), _idShieldOfficeForm);
+                new BracketedTextRule(true, true, true), _idShieldOfficeForm.ImageViewer, 
+                _idShieldOfficeForm, _idShieldOfficeForm);
             
             // Show the rule form
             ruleForm.Show();

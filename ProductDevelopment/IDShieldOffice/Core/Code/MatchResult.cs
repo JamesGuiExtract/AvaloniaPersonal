@@ -1,19 +1,21 @@
+using System.Collections.ObjectModel;
 using Extract;
 using Extract.Imaging;
-using Extract.Imaging.Forms;
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.Text.RegularExpressions;
+
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
 namespace IDShieldOffice
 {
     /// <summary>
     /// An enum defining types of string matches.
     /// </summary>
-    internal enum MatchType
+    public enum MatchType
     {
         /// <summary>
         /// Indicates that the match is an actual data match.
@@ -28,47 +30,47 @@ namespace IDShieldOffice
 
     /// <summary>
     /// A class that represents a particular match from a SpatialString.  Contains both the
-    /// location (as a <see cref="RasterZone"/>) and the <see cref="MatchType"/> that was found.
+    /// location (as a <see cref="Extract.Imaging.RasterZone"/>) and the <see cref="MatchType"/> that was found.
     /// </summary>
-    internal class MatchResult : IComparable<MatchResult>
+    public class MatchResult : IComparable<MatchResult>
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(MatchResult).ToString();
+        static readonly string _OBJECT_NAME = typeof(MatchResult).ToString();
 
         #endregion Constants
 
         #region Fields
 
         /// <summary>
-        /// The <see cref="List{T}"/> of <see cref="RasterZone"/> objects for this match.
+        /// The <see cref="List{T}"/> of <see cref="Extract.Imaging.RasterZone"/> objects for this match.
         /// </summary>
-        private List<RasterZone> _rasterZones = new List<RasterZone>();
+        readonly ReadOnlyCollection<RasterZone> _rasterZones;
 
         /// <summary>
         /// The <see cref="MatchType"/> for this match.
         /// </summary>
-        private MatchType _matchType;
+        readonly MatchType _matchType;
 
         /// <summary>
         /// Text associated with the match (will be empty if <see cref="MatchType"/> is
         /// Match and will contain OCR text if <see cref="MatchType"/>
         /// is Clue.
         /// </summary>
-        private string _text;
+        readonly string _text;
 
         /// <summary>
         /// The rule that created this <see cref="MatchResult"/>.
         /// </summary>
-        private string _findingRule;
+        readonly string _findingRule;
 
-        #endregion
+        #endregion Fields
 
         #region Constructors
+
         /// <summary>
         /// Inititializes a new <see cref="MatchResult"/> class with the specified
         /// <see cref="RasterZone"/> and <see cref="MatchType"/>.
@@ -105,12 +107,14 @@ namespace IDShieldOffice
                     _OBJECT_NAME);
 
                 // Expand each raster zones height and width by 4 pixels [IDSD #177 - JDS]
+                List<RasterZone> zones = new List<RasterZone>();
                 foreach (RasterZone rasterZone in rasterZones)
                 {
                     rasterZone.ExpandRasterZone(4, 4);
-                    _rasterZones.Add(rasterZone);
+                    zones.Add(rasterZone);
                 }
 
+                _rasterZones = zones.AsReadOnly();
                 _matchType = matchType;
                 _text = text;
                 _findingRule = findingRule;
@@ -129,7 +133,7 @@ namespace IDShieldOffice
         /// Gets the <see cref="RasterZone"/> for this <see cref="MatchResult"/>.
         /// </summary>
         /// <returns>The <see cref="RasterZone"/> for this <see cref="MatchResult"/>.</returns>
-        public List<RasterZone> RasterZones
+        public ReadOnlyCollection<RasterZone> RasterZones
         {
             get
             {
@@ -179,7 +183,7 @@ namespace IDShieldOffice
 
         #endregion Properties
 
-        #region Static methods
+        #region Static Methods
 
         /// <summary>
         /// Computes a <see cref="List{T}"/> of <see cref="MatchResult"/> objects
@@ -197,8 +201,8 @@ namespace IDShieldOffice
         /// found in the specified SpatialString.</returns>
         /// <exception cref="ExtractException">If <paramref name="regex"/> is
         /// <see langword="null"/>.</exception>
-        public static List<MatchResult> ComputeMatches(string baseRule, Regex regex,
-            UCLID_RASTERANDOCRMGMTLib.SpatialString ocrOutput, MatchType matchType,
+        internal static List<MatchResult> ComputeMatches(string baseRule, Regex regex,
+            SpatialString ocrOutput, MatchType matchType,
             bool performIncrementalSearch)
         {
             try
@@ -213,7 +217,7 @@ namespace IDShieldOffice
                 if (performIncrementalSearch)
                 {
                     // Compute the first match
-                    UCLID_RASTERANDOCRMGMTLib.SpatialString subString = ocrOutput;
+                    SpatialString subString = ocrOutput;
                     Match match = regex.Match(subString.String);
 
                     // While there are matches, add the result and keep searching
@@ -274,27 +278,26 @@ namespace IDShieldOffice
         /// Gets a <see cref="List{T}"/> collection of <see cref="RasterZone"/> objects
         /// from the specified SpatialString for the specified <see cref="Group"/>.
         /// </summary>
-        /// <param name="group">The group to get the <see cref="RasterZone"/> objects
+        /// <param name="capture">The group to get the <see cref="RasterZone"/> objects
         /// for.</param>
         /// <param name="ocrOutput">The SpatialString where the <see cref="Group"/>
         /// was found.</param>
         /// <returns>A collection of <see cref="RasterZone"/> objects from 
         /// <paramref name="ocrOutput"/> for the specified <see cref="Group"/>; 
-        /// <see langword="null"/> if no raster zones are available for this group.</returns>
-        static List<RasterZone> GetRasterZonesForGroup(Group group, 
-            UCLID_RASTERANDOCRMGMTLib.SpatialString ocrOutput)
+        /// <see langword="null"/> if no raster zones are available for this capture.</returns>
+        static List<RasterZone> GetRasterZonesForCapture(Capture capture, SpatialString ocrOutput)
         {
             try
             {
-                // If the group has no length, we are done.
-                if (group.Length <= 0)
+                // If the capture has no length, we are done.
+                if (capture.Length <= 0)
                 {
                     return null;
                 }
 
-                // Get the group as a spatial string
-                UCLID_RASTERANDOCRMGMTLib.SpatialString groupString = 
-                    ocrOutput.GetSubString(group.Index, group.Index + group.Length - 1);
+                // Get the capture as a spatial string
+                SpatialString groupString = 
+                    ocrOutput.GetSubString(capture.Index, capture.Index + capture.Length - 1);
 
                 // If the spatial string is non-spatial, we are done.
                 if (!groupString.HasSpatialInfo())
@@ -318,8 +321,7 @@ namespace IDShieldOffice
                 List<RasterZone> rasterZoneCollection = new List<RasterZone>(zones);
                 for (int i = 0; i < zones; i++)
                 {
-                    rasterZoneCollection.Add(new RasterZone(
-                        (UCLID_RASTERANDOCRMGMTLib.RasterZone)vectorOfZones.At(i)));
+                    rasterZoneCollection.Add(new RasterZone((ComRasterZone)vectorOfZones.At(i)));
                 }
 
                 return rasterZoneCollection;
@@ -340,7 +342,7 @@ namespace IDShieldOffice
         /// <returns>The name of the matching group for the specified <see cref="Match"/>.</returns>
         /// <exception cref="ExtractException">If <see cref="Match"/> was not successful.
         /// </exception>
-        private static KeyValuePair<int, string> GetNameAndNumberOfMatchingGroup(Match match, Regex regex)
+        static KeyValuePair<int, string> GetNameAndNumberOfMatchingGroup(Match match, Regex regex)
         {
             // Ensure the match was a successful match
             ExtractException.Assert("ELI22871", "Match must be successful to get group name!",
@@ -375,8 +377,8 @@ namespace IDShieldOffice
         /// <param name="matchType">The type of <see cref="MatchResult"/> to build.</param>
         /// <returns>A new <see cref="MatchResult"/> for the specified <see cref="Match"/>; or 
         /// <see langword="null"/> if no match result was found for this match.</returns>
-        private static MatchResult ProcessMatch(string baseRule, Regex regex, Match match,
-            UCLID_RASTERANDOCRMGMTLib.SpatialString ocrText, MatchType matchType)
+        static MatchResult ProcessMatch(string baseRule, Regex regex, Match match,
+            SpatialString ocrText, MatchType matchType)
         {
             // Get the name and number of the matching named group
             KeyValuePair<int, string> groupNameAndNumber =
@@ -385,7 +387,7 @@ namespace IDShieldOffice
             string ruleText = baseRule + ": " + groupNameAndNumber.Value;
             string matchText =
                 matchType == MatchType.Clue ? match.Groups[groupNameAndNumber.Key].Value : "";
-            List<RasterZone> rasterZones = GetRasterZonesForGroup(match.Groups[groupNameAndNumber.Key], ocrText);
+            List<RasterZone> rasterZones = GetRasterZonesForCapture(match.Groups[groupNameAndNumber.Key], ocrText);
 
             // If no raster zones were found, we are done.
             if (rasterZones == null)
@@ -396,26 +398,26 @@ namespace IDShieldOffice
             return new MatchResult(rasterZones, matchType, matchText, ruleText);
         }
 
-        #endregion Static methods
+        #endregion Static Methods
 
         #region IComparable<MatchResult> Members
 
         /// <summary>
         /// Compares this <see cref="MatchResult"/> with another <see cref="MatchResult"/>.
         /// </summary>
-        /// <param name="result">A <see cref="MatchResult"/> to compare with this
+        /// <param name="other">A <see cref="MatchResult"/> to compare with this
         /// <see cref="MatchResult"/>.</param>
         /// <returns>An <see cref="int"/> that indicates the relative order of the
         /// <see cref="MatchResult"/> objects that are being compared.</returns>
-        public int CompareTo(MatchResult result)
+        public int CompareTo(MatchResult other)
         {
             // Compare the first raster zone of each match result first
-            int returnVal = this.RasterZones[0].CompareTo(result.RasterZones[0]);
+            int returnVal = RasterZones[0].CompareTo(other.RasterZones[0]);
 
             // If the first raster zones are equal then compare the match types
             if (returnVal == 0)
             {
-                returnVal = this.MatchType.CompareTo(result.MatchType);
+                returnVal = MatchType.CompareTo(other.MatchType);
             }
 
             // Return the compared value
@@ -485,7 +487,7 @@ namespace IDShieldOffice
         public static bool operator ==(MatchResult result1, MatchResult result2)
         {
             // If they are the same object return true
-            if (object.ReferenceEquals(result1, result2))
+            if (ReferenceEquals(result1, result2))
             {
                 return true;
             }
@@ -576,6 +578,6 @@ namespace IDShieldOffice
             return result1.CompareTo(result2) > 0;
         }
 
-        #endregion
+        #endregion IComparable<MatchResult> Members
     }
 }

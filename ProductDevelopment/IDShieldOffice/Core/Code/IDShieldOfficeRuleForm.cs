@@ -7,10 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
+
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
 namespace IDShieldOffice
 {
@@ -24,101 +25,126 @@ namespace IDShieldOffice
         /// <summary>
         /// Default text that will be displayed in the <see cref="IDShieldOfficeRuleForm"/>.
         /// </summary>
-        private static readonly string _CAPTION_TEXT = "Find or redact";
+        const string _CAPTION_TEXT = "Find or redact";
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(IDShieldOfficeRuleForm).ToString();
+        static readonly string _OBJECT_NAME = typeof(IDShieldOfficeRuleForm).ToString();
 
         #endregion Constants
 
         #region Fields
 
         /// <summary>
-        /// The IDShield office form that the find/redact form is associated with.
-        /// </summary>
-        private IDShieldOfficeForm _idShieldOfficeForm;
-
-        /// <summary>
         /// The rule to run in this form.
         /// </summary>
-        private IIDShieldOfficeRule _rule;
+        readonly IIDShieldOfficeRule _rule;
+
+        /// <summary>
+        /// Used to query external source about OCR results, duplicate clues &amp; redactions, and 
+        /// whether to include clues in the search results.
+        /// </summary>
+        readonly IRuleFormHelper _helper;
+
+        /// <summary>
+        /// The image viewer on which the results will be displayed.
+        /// </summary>
+        readonly ImageViewer _imageViewer;
 
         /// <summary>
         /// The search results collection. 
         /// </summary>
-        private List<FindResult> _findResults;
+        List<FindResult> _findResults;
 
         /// <summary>
-        /// The colletion of matches.
+        /// The collection of matches.
         /// </summary>
-        private List<MatchResult> _matchResults;
+        List<MatchResult> _matchResults;
 
         /// <summary>
         /// The index of the next find result to display.
         /// </summary>
-        private int _nextFindResult;
+        int _nextFindResult;
 
         /// <summary>
         /// The property page interface for the current rules property page.
         /// </summary>
-        private IPropertyPage _propertyPage;
+        IPropertyPage _propertyPage;
 
         /// <summary>
         /// Flag to indicate whether a find operation has already been initiated.
         /// </summary>
-        private bool _finding;
+        bool _finding;
 
         /// <summary>
         /// Flag to indicate that the last find result has been redacted.
         /// </summary>
-        private bool _haveRedactedLastFindResult;
+        bool _haveRedactedLastFindResult;
 
         /// <summary>
         /// The total number of clues in _findResults
         /// </summary>
-        private int _numTotalClues;
+        int _numTotalClues;
 
         /// <summary>
         /// The number of new clues in _findResults
         /// </summary>
-        private int _numNewClues;
+        int _numNewClues;
 
         /// <summary>
         /// The total number of matches in _findResults
         /// </summary>
-        private int _numTotalMatches;
+        int _numTotalMatches;
 
         /// <summary>
         /// The number of new matches in _findResults
         /// </summary>
-        private int _numNewMatches;
+        int _numNewMatches;
 
         /// <summary>
         /// The number of clues that have been iterated through
         /// </summary>
-        private int _currentClue;
+        int _currentClue;
 
         /// <summary>
         /// The number of matches that have been iterated through
         /// </summary>
-        private int _currentMatch;
+        int _currentMatch;
 
         /// <summary>
         /// Indicates whether we are displaying just new clues and redactions that resulted from a 
         /// redact all operation or whether we are viewing all results from a find operation.
         /// </summary>
-        private bool _showingRedactAllResults;
+        bool _showingRedactAllResults;
 
         /// <summary>
         /// Indicates the MatchType of the currently displayed result or null if no
         /// result is currently displayed.
         /// </summary>
-        private MatchType? _currentMatchType;
+        MatchType? _currentMatchType;
+
+        /// <summary>
+        /// <see langword="true"/> if clues should be shown as part of the search results; 
+        /// <see langword="false"/> if clues should be hidden.
+        /// </summary>
+        bool _showClues;
 
         #endregion Fields
+
+        #region Events
+
+        /// <summary>
+        /// Occurs when matches are found.
+        /// </summary>
+        public event EventHandler<MatchesFoundEventArgs> MatchesFound;
+
+        /// <summary>
+        /// Occurs when the user chooses to redact a match.
+        /// </summary>
+        public event EventHandler<MatchRedactedEventArgs> MatchRedacted;
+
+        #endregion Events
 
         #region Constructors
 
@@ -129,10 +155,13 @@ namespace IDShieldOffice
         /// <param name="titleText">The text to append to the title bar.</param>
         /// <param name="rule">The <see cref="IIDShieldOfficeRule"/> to run in
         /// the find/redact form.</param>
-        /// <param name="idShieldOfficeForm">The IDShield office form to associate with
+        /// <param name="imageViewer">The image viewer on which the results of searches should be 
+        /// shown.</param>
+        /// <param name="helper">Provides OCR and other assistance to the rule form.</param>
+        /// <param name="owner">The IDShield office form to associate with
         /// this find/redact form.</param>
         public IDShieldOfficeRuleForm(string titleText, IIDShieldOfficeRule rule,
-            IDShieldOfficeForm idShieldOfficeForm) : base()
+            ImageViewer imageViewer, IRuleFormHelper helper, Form owner)
         {
             try
             {
@@ -150,24 +179,16 @@ namespace IDShieldOffice
                 InitializeComponent();
 
                 // Set the form caption
-                this.Text = IDShieldOfficeRuleForm._CAPTION_TEXT +
-                    (string.IsNullOrEmpty(titleText) ? "" : (" - " + titleText));
+                Text = _CAPTION_TEXT + (string.IsNullOrEmpty(titleText) ? "" : (" - " + titleText));
 
-                // Set the IDShield Office form
-                _idShieldOfficeForm = idShieldOfficeForm;
-                
-                // Set the rule
+                // Store parameters
+                _imageViewer = imageViewer;
+                _helper = helper;
                 _rule = rule;
-
-                // Set the IDSO form as the owner of this form
-                this.Owner = _idShieldOfficeForm;
+                Owner = owner;
 
                 // Add the image file changed event handler
-                _idShieldOfficeForm.ImageViewer.ImageFileChanged += HandleImageFileChanged;
-
-                // Add the layer object visibility changed event handler
-                _idShieldOfficeForm.ImageViewer.LayerObjects.LayerObjectVisibilityChanged
-                    += HandleLayerObjectVisibilityChanged;
+                _imageViewer.ImageFileChanged += HandleImageFileChanged;
             }
             catch (Exception ex)
             {
@@ -180,7 +201,47 @@ namespace IDShieldOffice
 
         #endregion Constructors
 
-        #region Event handlers
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets whether clues should be displayed.
+        /// </summary>
+        /// <value><see langword="true"/> if clues should be displayed;
+        /// <see langword="false"/> if clues should not be displayed.</value>
+        public bool ShowClues
+        {
+            get
+            {
+                return _showClues;
+            }
+            set
+            {
+                try
+                {
+                    if (_showClues != value)
+                    {
+                        _showClues = value;
+
+                        // Update the button states
+                        UpdateButtonStates();
+
+                        // Update the results table
+                        UpdateResults();
+
+                        // Update the status bar message.
+                        UpdateStatusBar();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExtractException.Display("ELI22927", ex);
+                }
+            }
+        }
+
+        #endregion Properties
+
+        #region On Events
 
         /// <summary>
         /// Raises the <see cref="Form.Load"/> event.
@@ -221,7 +282,7 @@ namespace IDShieldOffice
                 else
                 {
                     // If there is no property page then make the form non-resizeable
-                    this.FormBorderStyle = FormBorderStyle.FixedDialog;
+                    FormBorderStyle = FormBorderStyle.FixedDialog;
                 }
 
                 // Update the button states
@@ -256,7 +317,7 @@ namespace IDShieldOffice
                 ResetFindDialog();
 
                 // Hide the form
-                this.Hide();
+                Hide();
             }
             catch (Exception ex)
             {
@@ -296,12 +357,42 @@ namespace IDShieldOffice
         }
 
         /// <summary>
+        /// Raises the <see cref="MatchesFound"/> event.
+        /// </summary>
+        /// <param name="e">The event data associated with the <see cref="MatchesFound"/> 
+        /// event.</param>
+        protected virtual void OnMatchesFound(MatchesFoundEventArgs e)
+        {
+            if (MatchesFound != null)
+            {
+                MatchesFound(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="MatchRedacted"/> event.
+        /// </summary>
+        /// <param name="e">The event data associated with the <see cref="MatchRedacted"/> 
+        /// event.</param>
+        protected virtual void OnMatchRedacted(MatchRedactedEventArgs e)
+        {
+            if (MatchRedacted != null)
+            {
+                MatchRedacted(this, e);
+            }
+        }
+
+        #endregion On Events
+
+        #region Event Handlers
+
+        /// <summary>
         /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The <see cref="object"/> which sent the event.</param>
         /// <param name="e">An <see cref="ImageFileChangedEventArgs"/>
         /// that contains event data.</param>
-        private void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
+        void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
             {
@@ -319,33 +410,7 @@ namespace IDShieldOffice
             }
             catch (Exception ex)
             {
-                ExtractException.AsExtractException("ELI22315", ex).Display();
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="LayerObjectsCollection.LayerObjectVisibilityChanged"/> event.
-        /// </summary>
-        /// <param name="sender">The <see cref="object"/> which sent the event.</param>
-        /// <param name="e">An <see cref="LayerObjectVisibilityChangedEventArgs"/>
-        /// that contains event data.</param>
-        private void HandleLayerObjectVisibilityChanged(object sender,
-            LayerObjectVisibilityChangedEventArgs e)
-        {
-            try
-            {
-                // Update the button states
-                UpdateButtonStates();
-
-                // Update the results table
-                UpdateResults();
-
-                // Update the status bar message.
-                UpdateStatusBar();
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI22927", ex);
+                ExtractException.Display("ELI22315", ex);
             }
         }
 
@@ -354,7 +419,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains event data.</param>
-        private void HandlePropertyPageModified(object sender, EventArgs e)
+        void HandlePropertyPageModified(object sender, EventArgs e)
         {
             try
             {
@@ -372,7 +437,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> containing the event data.</param>
-        private void HandleResetButton(object sender, EventArgs e)
+        void HandleResetButton(object sender, EventArgs e)
         {
             try
             {
@@ -407,7 +472,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> containing the event data.</param>
-        private void HandleFindNextButton(object sender, EventArgs e)
+        void HandleFindNextButton(object sender, EventArgs e)
         {
             try
             {
@@ -445,13 +510,10 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> containing the event data.</param>
-        private void HandleRedactButton(object sender, EventArgs e)
+        void HandleRedactButton(object sender, EventArgs e)
         {
             try
             {
-                // Get the image viewer
-                ImageViewer imageViewer = _idShieldOfficeForm.ImageViewer;
-
                 // Get the find result
                 FindResult findResult = _findResults[_nextFindResult-1];
 
@@ -459,9 +521,9 @@ namespace IDShieldOffice
                 CompositeHighlightLayerObject compositeMatch = findResult.CompositeMatch;
 
                 // Create a new redaction from the find result
-                Redaction redaction = new Redaction(imageViewer, compositeMatch.PageNumber,
+                Redaction redaction = new Redaction(_imageViewer, compositeMatch.PageNumber,
                     findResult.MatchResult.FindingRule, compositeMatch.GetRasterZones(),
-                    imageViewer.DefaultRedactionFillColor);
+                    _imageViewer.DefaultRedactionFillColor);
 
                 // Add the id of the object to the find result
                 findResult.RedactionId = redaction.Id;
@@ -474,7 +536,7 @@ namespace IDShieldOffice
                     {
                         // Try to get the redaction associated with this link
                         Redaction redactionToLink =
-                            imageViewer.LayerObjects.TryGetLayerObject(result.RedactionId ?? -1)
+                            _imageViewer.LayerObjects.TryGetLayerObject(result.RedactionId ?? -1)
                             as Redaction;
 
                         // If there was a redaction, add a link to it
@@ -486,10 +548,10 @@ namespace IDShieldOffice
                 }
 
                 // Add the new redaction to the image viewer
-                imageViewer.LayerObjects.Add(redaction);
+                _imageViewer.LayerObjects.Add(redaction);
 
                 // Invalidate the form so the redaction is drawn
-                imageViewer.Invalidate();
+                _imageViewer.Invalidate();
 
                 // Check if at the last match result (do this before the call to display next match)
                 if (_findResults != null && _nextFindResult >= _findResults.Count)
@@ -520,7 +582,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> containing the event data.</param>
-        private void HandleRedactAllButton(object sender, EventArgs e)
+        void HandleRedactAllButton(object sender, EventArgs e)
         {
             try
             {
@@ -549,14 +611,14 @@ namespace IDShieldOffice
                         // If the match result is a match then redact it
                         if (matchResult.MatchType == MatchType.Match)
                         {
-                            _idShieldOfficeForm.AddRedaction(matchResult.RasterZones,
-                                matchResult.FindingRule);
+                            // Raise the MatchRedacted event
+                            OnMatchRedacted(new MatchRedactedEventArgs(matchResult));
                         }
                     }
                 }
 
                 // Invalidate the form so the redaction is drawn
-                _idShieldOfficeForm.ImageViewer.Invalidate();
+                _imageViewer.Invalidate();
 
                 if (_numNewMatches > 0 || _numNewClues > 0)
                 {
@@ -586,40 +648,37 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The <see cref="Object"/> which sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> containing the event data.</param>
-        private void HandleCloseButton(object sender, EventArgs e)
+        void HandleCloseButton(object sender, EventArgs e)
         {
             // Reset the find dialog before hiding the form
             ResetFindDialog();
 
             // Hide the form
-            this.Hide();
-
-            // Give IDSO the focus
-            _idShieldOfficeForm.Focus();
+            Hide();
         }
 
-//        /// <summary>
-//        /// This should eventually  be able to be used to prevent resizing of columns.
-//        /// However, I was not able to get this to be called. (IDSD:304)
-//        /// </summary>
-//        /// <param name="sender">Temp</param>
-//        /// <param name="e">Temp</param>
-//        void HandleResultsListColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
-//        {
-//            try
-//            {
-//                e.Cancel = true;
-//                e.NewWidth = this._resultsList.Columns[e.ColumnIndex].Width;
-//            }
-//            catch (Exception ex)
-//            {
-//                ExtractException ee = ExtractException.AsExtractException("ELI23323", ex);
-//                ee.AddDebugData("Event Args", e, false);
-//                ee.Display();
-//            }
-//        }
+        //        /// <summary>
+        //        /// This should eventually  be able to be used to prevent resizing of columns.
+        //        /// However, I was not able to get this to be called. (IDSD:304)
+        //        /// </summary>
+        //        /// <param name="sender">Temp</param>
+        //        /// <param name="e">Temp</param>
+        //        void HandleResultsListColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
+        //        {
+        //            try
+        //            {
+        //                e.Cancel = true;
+        //                e.NewWidth = this._resultsList.Columns[e.ColumnIndex].Width;
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                ExtractException ee = ExtractException.AsExtractException("ELI23323", ex);
+        //                ee.AddDebugData("Event Args", e, false);
+        //                ee.Display();
+        //            }
+        //        }
 
-        #endregion Event handlers
+        #endregion Event Handlers
 
         #region Methods
 
@@ -627,7 +686,7 @@ namespace IDShieldOffice
         /// Resets the find dialog and clears the currently visible match (if there is one)
         /// from the image window.
         /// </summary>
-        private void ResetFindDialog()
+        void ResetFindDialog()
         {
             // Clear any current match
             ClearCurrentMatch();
@@ -681,23 +740,21 @@ namespace IDShieldOffice
         /// <summary>
         /// Clears the currently displayed match
         /// </summary>
-        private void ClearCurrentMatch()
+        void ClearCurrentMatch()
         {
             _currentMatchType = null;
 
             // If there is a result to remove, remove it
             if (_nextFindResult > 0 && _nextFindResult <= _findResults.Count)
             {
-                ImageViewer imageViewer = _idShieldOfficeForm.ImageViewer;
-
                 // Remove the currently visible find result if possible
-                if (imageViewer.LayerObjects.Contains(_findResults[_nextFindResult - 1].CompositeMatch.Id))
+                if (_imageViewer.LayerObjects.Contains(_findResults[_nextFindResult - 1].CompositeMatch.Id))
                 {
-                    imageViewer.LayerObjects.Remove(_findResults[_nextFindResult - 1].CompositeMatch);
+                    _imageViewer.LayerObjects.Remove(_findResults[_nextFindResult - 1].CompositeMatch);
                 }
 
                 // Invalidate the form so it will redraw
-                imageViewer.Invalidate();
+                _imageViewer.Invalidate();
             }
         }
 
@@ -707,7 +764,7 @@ namespace IDShieldOffice
         /// <returns><see langword="true"/> if <see cref="_matchResults"/> can be updated 
         /// or was already updated; <see langword="false"/> if the property page is invalid.
         /// </returns>
-        private bool TryUpdateMatches()
+        bool TryUpdateMatches()
         {
             // If currently in the midst of a find operation, just return false
             if (_finding)
@@ -750,63 +807,42 @@ namespace IDShieldOffice
                     // Clear results and status bar as soon as a find starts
                     UpdateResults();
                     UpdateStatusBar();
-                    this.Refresh();
+                    Refresh();
 
-                    // Set the wait cursor
-                    using (new TemporaryWaitCursor())
+                    // Get the ocr results
+                    SpatialString ocrOutput = _helper.GetOcrResults();
+                    if (ocrOutput == null)
                     {
-                        // Get the current image name
-                        string imageFileName = _idShieldOfficeForm.ImageViewer.ImageFile;
-
-                        // Wait for OCR to complete
-                        while (!_idShieldOfficeForm.OcrManager.OcrFinished)
-                        {
-                            Application.DoEvents();
-
-                            // If while waiting the image file was changed, then exit this find
-                            if (imageFileName != _idShieldOfficeForm.ImageViewer.ImageFile)
-                            {
-                                // False indicates no matches have been updated
-                                return false;
-                            }
-
-                            // [IDSD:344]
-                            // Wait a tenth of a second between checks for OCR information so that
-                            // we don't burn CPU unnecessarily while waiting for OCR result.
-                            System.Threading.Thread.Sleep(100);
-                        }
-
-                        // Get the SpatialString
-                        UCLID_RASTERANDOCRMGMTLib.SpatialString ocrOutput =
-                            _idShieldOfficeForm.OcrManager.GetOcrSpatialString();
-
-                        // Get the match results
-                        _matchResults = _rule.GetMatches(ocrOutput);
-
-                        if (_matchResults.Count == 0)
-                        {
-                            MessageBox.Show("No matches found!", "No Matches", MessageBoxButtons.OK,
-                                MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
-                            return false;
-                        }
-
-                        // Sort the results
-                        _matchResults.Sort();
-
-                        // Create the find result collection by splitting the match results
-                        _findResults = SplitMatchResultsByPage(_matchResults);
-
-                        // Count the number of matches and clues and remove any duplicates as per
-                        // _showingRedactAllResults.  Make sure to do this before the AddClues
-                        // call so that all clues don't appear to be duplicates.
-                        CountFindResults(MatchType.Clue, _showingRedactAllResults,
-                            out _numTotalClues, out _numNewClues);
-                        CountFindResults(MatchType.Match, _showingRedactAllResults,
-                            out _numTotalMatches, out _numNewMatches);
-
-                        // Add all the clues to the document. 
-                        _idShieldOfficeForm.AddClues(_matchResults);
+                        // False indicates no matches have been updated
+                        return false;
                     }
+
+                    // Get the match results
+                    _matchResults = _rule.GetMatches(ocrOutput);
+
+                    if (_matchResults.Count == 0)
+                    {
+                        MessageBox.Show("No matches found!", "No Matches", MessageBoxButtons.OK,
+                            MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+                        return false;
+                    }
+
+                    // Sort the results
+                    _matchResults.Sort();
+
+                    // Create the find result collection by splitting the match results
+                    _findResults = SplitMatchResultsByPage(_matchResults);
+
+                    // Count the number of matches and clues and remove any duplicates as per
+                    // _showingRedactAllResults.  Make sure to do this before raising the 
+                    // MatchesFound event so that all clues don't appear to be duplicates.
+                    CountFindResults(MatchType.Clue, _showingRedactAllResults,
+                        out _numTotalClues, out _numNewClues);
+                    CountFindResults(MatchType.Match, _showingRedactAllResults,
+                        out _numTotalMatches, out _numNewMatches);
+
+                    // Raise the MatchesFound event
+                    OnMatchesFound(new MatchesFoundEventArgs(_matchResults.AsReadOnly()));
                 }
                 finally
                 {
@@ -829,7 +865,7 @@ namespace IDShieldOffice
         /// type.</param>
         /// <param name="newCount">Returns the number of find results found that were not
         /// already present in the image viewer.</param>
-        private void CountFindResults(MatchType type, bool removeDuplicates, out int totalCount, 
+        void CountFindResults(MatchType type, bool removeDuplicates, out int totalCount, 
             out int newCount)
         {
             // Initialize counts to zero.
@@ -852,23 +888,7 @@ namespace IDShieldOffice
                 {
                     // If removeDuplicates is true, remove this result from _findResults if it 
                     // is a duplicate, count it as new if it is not a duplicate.
-                    bool isDuplicate;
-
-                    if (type == MatchType.Clue)
-                    {
-                        // This found clue is a duplicate if we were unable to create a new unique
-                        // clue in the image viewer.
-                        isDuplicate = (_idShieldOfficeForm.CreateIfNotDuplicate<Clue>(
-                            _findResults[i].CompositeMatch.GetRasterZones(), "") == null);
-                    }
-                    else
-                    {
-                        // This found redaction is a duplicate if we were unable to create a new unique
-                        // redaction in the image viewer.
-                        isDuplicate = (_idShieldOfficeForm.CreateIfNotDuplicate<Redaction>(
-                            _findResults[i].CompositeMatch.GetRasterZones(), "") == null);
-                    }
-
+                    bool isDuplicate = _helper.IsDuplicate(_findResults[i].MatchResult);
                     if (isDuplicate)
                     {
                         // Remove the duplicate.
@@ -887,22 +907,19 @@ namespace IDShieldOffice
         /// Clears the current displayed match, and displays the next match (if there is a match
         /// remaining to display)
         /// </summary>
-        private void DisplayNextMatch()
+        void DisplayNextMatch()
         {
             // Clear any current match
             ClearCurrentMatch();
-
-            // Get the image viewer
-            ImageViewer imageViewer = _idShieldOfficeForm.ImageViewer;
 
             // Ensure there is a find to display
             if (_findResults != null && _nextFindResult < _findResults.Count)
             {
                 // Get the next find result to display (if clues are hidden skip clues)
                 FindResult findResult = _findResults[_nextFindResult++];
-                while (!_idShieldOfficeForm.CluesVisible
-                    && findResult.MatchResult.MatchType == MatchType.Clue
-                    && _nextFindResult < _findResults.Count)
+                while (!ShowClues
+                       && findResult.MatchResult.MatchType == MatchType.Clue
+                       && _nextFindResult < _findResults.Count)
                 {
                     // Indicate that we've iterated through this clue even if it not displayed.
                     _currentClue++;
@@ -926,36 +943,36 @@ namespace IDShieldOffice
                     }
 
                     // Add the find result to the image viewer and center on it
-                    imageViewer.LayerObjects.Add(findResult.CompositeMatch);
+                    _imageViewer.LayerObjects.Add(findResult.CompositeMatch);
 
                     // Center the image viewer around the first composite highlight
                     // in the match results
-                    imageViewer.CenterOnLayerObjects(findResult.CompositeMatch);
+                    _imageViewer.CenterOnLayerObjects(findResult.CompositeMatch);
                 }
             }
 
             // Invalidate the image viewer to ensure the composite highlight is displayed
-            imageViewer.Invalidate();
+            _imageViewer.Invalidate();
         }
 
         /// <summary>
         /// Updates the enabled/disabled state of the buttons on the
         /// <see cref="IDShieldOfficeRuleForm"/>.
         /// </summary>
-        private void UpdateButtonStates()
+        void UpdateButtonStates()
         {
             // Find next is enabled if all of the following are true:
             // 1) There is an open image
             // 2) There is a valid property page 
             // 3) There are more matches to display
-            _findNextButton.Enabled = _idShieldOfficeForm.ImageViewer.IsImageAvailable &&
-                (_propertyPage == null || _propertyPage.IsValid) &&
-                (_findResults == null || _nextFindResult < _findResults.Count);
+            _findNextButton.Enabled = _imageViewer.IsImageAvailable &&
+                                      (_propertyPage == null || _propertyPage.IsValid) &&
+                                      (_findResults == null || _nextFindResult < _findResults.Count);
 
             // If clues are not visible, also need to check that there is at least one
             // remaining find result that is not a clue
             // [IDSD:288] Added check to disable redact button when the current find result is a clue.
-            if (_findNextButton.Enabled && !_idShieldOfficeForm.CluesVisible && _findResults != null)
+            if (_findNextButton.Enabled && !ShowClues && _findResults != null)
             {
                 int count = _nextFindResult;
                 while (count < _findResults.Count && 
@@ -972,13 +989,12 @@ namespace IDShieldOffice
             // 2) We are not showing redact all results
             // 3) The current result is a match
             // 4) Have not redacted the last match result yet
-            _redactButton.Enabled = _findResults != null && 
-                !_showingRedactAllResults && _currentMatchType == MatchType.Match &&
-                !_haveRedactedLastFindResult;
+            _redactButton.Enabled = _findResults != null && !_showingRedactAllResults 
+                && _currentMatchType == MatchType.Match && !_haveRedactedLastFindResult;
 
             // Redact all is enabled if an image is open and there is a valid property page
-            _redactAllButton.Enabled = _idShieldOfficeForm.ImageViewer.IsImageAvailable && 
-                (_propertyPage == null || _propertyPage.IsValid);
+            _redactAllButton.Enabled = _imageViewer.IsImageAvailable && 
+                                       (_propertyPage == null || _propertyPage.IsValid);
 
             // Reset is enabled if a search has begun (_findResults != null)
             _resetButton.Enabled = _findResults != null;
@@ -987,7 +1003,7 @@ namespace IDShieldOffice
         /// <summary>
         /// Updates the rule results table.
         /// </summary>
-        private void UpdateResults()
+        void UpdateResults()
         {
             // Clear any existing result.
             _resultsList.DataSource = null;
@@ -1029,7 +1045,7 @@ namespace IDShieldOffice
                 // Update the total column for matches/redactions
                 dt.Rows[0]["Total"] = _numTotalMatches;
 
-                if (_rule.UsesClues && _idShieldOfficeForm.CluesVisible)
+                if (_rule.UsesClues && ShowClues)
                 {
                     // Label the clue row
                     dt.Rows[1][0] = "Clues";
@@ -1052,19 +1068,19 @@ namespace IDShieldOffice
         /// <summary>
         /// Updates the message on the status bar to reflect the current state of the search.
         /// </summary>
-        private void UpdateStatusBar()
+        void UpdateStatusBar()
         {
             if (_finding)
             {
                 // If a search is in progress, indicate it in the status bar.
-                this._toolStripStatusLabel.Text = "Searching...";
+                _toolStripStatusLabel.Text = "Searching...";
                 return;
             }
 
             if (_findResults == null)
             {
                 // If no results are available, add the table title and nothing else.
-                this._toolStripStatusLabel.Text = "";
+                _toolStripStatusLabel.Text = "";
                 return;
             }
 
@@ -1093,7 +1109,7 @@ namespace IDShieldOffice
                 status.Append(".");
             }
 
-            this._toolStripStatusLabel.Text = status.ToString();
+            _toolStripStatusLabel.Text = status.ToString();
         }
 
         /// <summary>
@@ -1102,11 +1118,8 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="matchResults">The list of match results to split.</param>
         /// <returns>A list of <see cref="FindResult"/> objects.</returns>
-        private List<FindResult> SplitMatchResultsByPage(List<MatchResult> matchResults)
+        List<FindResult> SplitMatchResultsByPage(List<MatchResult> matchResults)
         {
-            // Get the image viewer
-            ImageViewer imageViewer = _idShieldOfficeForm.ImageViewer;
-
             // Build the list of find results
             List<FindResult> findResults = new List<FindResult>();
             foreach (MatchResult matchResult in matchResults)
@@ -1118,9 +1131,9 @@ namespace IDShieldOffice
                     // Create a composite highlight with the appropriate search tags,
                     // find color, selectable set to false and can render to false
                     CompositeHighlightLayerObject compositeHighlight =
-                        new CompositeHighlightLayerObject(imageViewer, pair.Key,
-                        IDShieldOfficeForm._SEARCH_RESULT_TAGS, pair.Value,
-                        IDShieldOfficeForm._FIND_COLOR);
+                        new CompositeHighlightLayerObject(_imageViewer, pair.Key,
+                            IDShieldOfficeForm._SEARCH_RESULT_TAGS, pair.Value,
+                            IDShieldOfficeForm._FIND_COLOR);
                     compositeHighlight.Selectable = false;
                     compositeHighlight.CanRender = false;
                     compositeHighlight.OutlineColor = IDShieldOfficeForm._FIND_COLOR;
@@ -1137,6 +1150,6 @@ namespace IDShieldOffice
             return findResults;
         }
 
-        #endregion
+        #endregion Methods
     }
 }
