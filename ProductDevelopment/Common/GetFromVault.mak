@@ -79,6 +79,14 @@ GetIDShieldOfficeFiles:
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(IDShieldOfficeVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(IDShieldOfficeVersion)"
 
+GetDataEntryInstall:
+	@ECHO Getting $(LabDEDir)\Installation\DataEntry
+	@ECHO Please wait...
+	@IF NOT EXIST "$(LabDEDir)\Installation\DataEntry" @MKDIR "$(LabDEDir)\Installation\DataEntry"
+	$(BUILD_DRIVE) 
+	@CD "$(LabDEDir)\Installation\DataEntry"
+	$(Get) $(GetOptions) -nonworkingfolder "$(LabDEDir)" "$$$(Branch)/Engineering/ProductDevelopment/LabDE/Installation/DataEntry" "$(LabDEVersion)"
+ 	
 GetLabDEFiles:
 	@ECHO Getting $(LabDEDir) ...
 	@ECHO Please wait...

@@ -36,6 +36,11 @@ PDCommonDir=$(PDRootDir)\Common
 
 IDShieldInstallFilesRootDir=P:\AttributeFinder\IDShieldInstallation\Files
 
+LabDEDir=$(PDRootDir)\LabDE
+LabDEInstallRootDir=$(LabDEDir)\Installation
+DataEntryInstallFiles=P:\DataEntry
+DataEntryCoreInstallFilesDir=$(DataEntryInstallFiles)\CoreInstallation\Files
+
 ClearImageInstallFilesDir=P:\AttributeFinder\ClearImageFiles
 
 InternalUseBuildFilesArchive=P:\AttributeFinder\Archive\InternalUseBuildFiles\InternalBuilds\$(FlexIndexVersion)
@@ -101,7 +106,9 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.FileActionManager.Forms.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.FileActionManager.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\IDShieldStatisticsReporter.exe" /mapout:"$(BinariesFolder)\Map\mapIDShieldStatisticsReporter.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\TestTextFunctionExpander.exe" /mapout:"$(BinariesFolder)\Map\mapTestTextFunctionExpander.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
-	
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.DataEntry.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.DataEntry.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\DataEntryApplication.exe" /mapout:"$(BinariesFolder)\Map\mapDataEntryApplication.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
+
 EncryptAndCopyComponentDataFiles: 
     @ECHO Copying the ComponentData subdirectories and files to installation directory...
     @rmdir "$(AFCoreInstallFilesRootDir)\ComponentData" /s /q
@@ -178,6 +185,7 @@ CopyFilesToInstallFolder: ObfuscateFiles
     @COPY /v  "$(AFRootDirectory)\Misc\RunRules_s.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegCoreComponents"
     @COPY /v "$(BinariesFolder)\USSFileViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegCoreComponents"
     @COPY /v "$(BinariesFolder)\VOAFileViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegCoreComponents"
+	@COPY /v  "$(BinariesFolder)\GetFullUserName.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\CSharpDatabaseUtilities.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\SQLServerInfo.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
@@ -201,6 +209,9 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@COPY /V "$(BinariesFolder)\Interop.*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Dotnet\Leadtools*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY "$(RCNETDir)\APIs\Divelements\SandDock\bin\SandDock.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
+	@COPY /v "$(BinariesFolder)\DataEntryCC.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /v "$(BinariesFolder)\Obfuscated\DataEntryApplication.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
+	@COPY /v "$(BinariesFolder)\Obfuscated\Extract.DataEntry.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	
 # Need the .net DLLs  in the same folder as Extract.Utilities.Parsers.dll
 	@COPY /V  "$(BinariesFolder)\Obfuscated\TestTextFunctionExpander.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents"
@@ -234,12 +245,15 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@DIR "$(AFCoreInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents\AFCommon.rl"
 	@Dir "$(IDShieldInstallFilesRootDir)\SelfRegIDShieldComponents\*.*" /b >"$(IDShieldInstallFilesRootDir)\NonSelfRegComponents\IDShield.rl"
 	@DIR "$(ClearImageInstallFilesDir)\*Image.dll" /b >"$(AFCoreInstallFilesRootDir)\ClearImage.rl"
+	DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\DataEntryCC.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\DataEntry.rl"
 # Add .net com objects to the .nl file
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Utilities.Parsers.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents\AFCore.nl
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Redaction.Verification.dll" /b >>"$(IDShieldInstallFilesRootDir)\NonSelfRegComponents\IDShield.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.FileActionManager.FileProcessors.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents\AFCore.nl
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Redaction.dll" /b >>"$(IDShieldInstallFilesRootDir)\NonSelfRegComponents\IDShield.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\IDShieldStatisticsReporter.exe" /b >>"$(IDShieldInstallFilesRootDir)\NonSelfRegComponents\IDShield.nl"
+	DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.DataEntry.dll" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\DataEntry.nl"
+	DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\DataEntryApplication.exe" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\DataEntry.nl"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents\vssver.scc" 
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\mssccprj.scc"
@@ -251,13 +265,19 @@ CleanUpMergeModulesFromPreviousBuilds:
 	@DeleteFiles "$(MergeModuleDir)\UCLIDFlexIndex.msm"
 	@DeleteFiles "$(MergeModuleDir)\UCLIDInputFunnel.msm"
 	
-BuildAFCoreMergeModule: CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles
+BuildAFCoreMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles
     @ECHO Buliding the UCLIDFlexIndex Merge Module installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(AFCoreMergeModuleInstallRoot)\UCLID FlexIndex.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(AFCoreMergeModuleInstallRoot)\UCLID FlexIndex.ism"
- 
-GetAllFiles: GetPDCommonFiles GetReusableComponentFiles GetRCdotNETFiles GetAttributeFinderFiles GetPDUtilsFiles GetComponentDataFiles
+
+BuildDataEntryMergeModule: CreateVersionISImportFile BuildAFCoreMergeModule
+    @ECHO Building Extract Systems DataEntry Merge Module...
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Dotnet
+	$(SetProductVerScript) "$(LabDEInstallRootDir)\DataEntry\DataEntry.ism" "$(LabDEVersion)"
+    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(LabDEInstallRootDir)\DataEntry\DataEntry.ism"
+
+GetAllFiles: GetPDCommonFiles GetReusableComponentFiles GetRCdotNETFiles GetAttributeFinderFiles GetPDUtilsFiles GetComponentDataFiles GetDataEntryInstall
 
 DoEverythingNoGet: SetupBuildEnv CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule
     @ECHO.
