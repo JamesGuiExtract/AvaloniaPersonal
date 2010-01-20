@@ -45,13 +45,14 @@
 <p>
       		<li>Confirm that the stamp image can be placed on the <b>First page</b>.</li>
       		<li>Confirm that the stamp image can be placed on the <b>Last page</b>.</li>
-      		<li>Confirm that the stamp image can be placed on a <b>Specified page</b>.</li>
+      		<li>Confirm that the stamp image can be placed on <b>Specified page(s)</b>.</li>
 	   	<ul> 
 	      		<li>Confirm that the associated edit box is enabled only when 
-			<b>Specified page</b> is selected.</li>
-	      		<li>Confirm that the edit box accepts only numeric characters.</li> 
+			<b>Specified page(s)</b> is selected.</li>
+	      		<li>Confirm that the edit box accepts various ranges of page numbers.</li> 
+	      		<li>Confirm that specifying <b>1-</b> for the range of page numbers, 
+			applies the stamp to every page.</li> 
 	   	</ul> 
-      		<li>Confirm that settings are persistent.</li>
 <p>
 		
       		<li><b>Functionality Tests</b>.</li>
@@ -124,6 +125,15 @@
 				</ul>
 			</ul>
 	   	</ul> 
+<p>
+  	   	<LI><b>[LegacyRC #5408, #5410]</b> Errors when using Add Watermark
+	       	<ul>
+	      		<li>Process an image with many pages using the <b>Add Watermark</b> task.
+	      		<li>During processing, modify file/folder permissions such that 
+			the watermark cannot be added to one or more of the subsequent pages.
+	      		<li>Confirm that an output image ( with an incorrect page count ) was 
+			<b>not</b> created.
+	       	</ul>
    	</ul> 
 <p>
 	<li><b>Core: Apply Bates number</b></li>
@@ -590,6 +600,21 @@
       				<li>Confirm <b>Cancel</b> exits context menu.</li>
    			</ul> 
       		</ul> 
+<p>
+  	   	<LI><b>[LegacyRC #5406]</b> Conditional task processing with an empty list
+	       	<ul>
+	      		<li>Create an FPS file with a conditional task with an empty list of 
+			tasks to be executed if the condition is <b>false</b>.
+	      		<li>Confirm that the task works correctly when the condition is <b>true</b>.
+	      		<li>Confirm that the expected behavior of <b>nothing</b> happens when 
+			the condition is <b>false</b>.
+<p>
+	      		<li>Create an FPS file with a conditional task with an empty list of 
+			tasks to be executed if the condition is <b>true</b>.
+	      		<li>Confirm that the task works correctly when the condition is <b>false</b>.
+	      		<li>Confirm that the expected behavior of <b>nothing</b> happens when 
+			the condition is <b>true</b>.
+	       	</ul>
    	</ul> 
 <p>
 	<li><b>Core: Convert to searchable PDF</b></li>

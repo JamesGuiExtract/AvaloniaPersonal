@@ -639,6 +639,23 @@
        		<li>Confirm that after the third FAM instance has finished processing (i.e. the <b>Start 
 		processing</b> button turns green), the value in the <b>Pending</b> pane is 0.
     	</ul>  
+<p>
+   	<LI><b>[LegacyRC #5397]</b> FAM status bar problems with skipped files
+       	<ul>
+      		<li>Create an FPS file with a file supplier configured to <b>force 
+		processing</b>.
+      		<li>Use a task that supports skipping files.
+      		<li>Start processing and skip all the files. 
+      		<li>Confirm that the status bar shows correct numbers for skipped, 
+		pending and processing.
+      		<li>Start processing again and skip all the files again. 
+      		<li>Confirm that the status bar shows correct numbers for skipped, 
+		pending and processing.
+      		<li>Close the FAM instance. 
+      		<li>Reopen the FPS file and start processing. 
+      		<li>Confirm that the status bar shows correct numbers for skipped, 
+		pending and processing.
+       	</ul>
 </ul>
 <p>
 <h3><u>Miscellaneous</u></h3>
