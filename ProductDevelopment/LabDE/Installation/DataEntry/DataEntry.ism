@@ -120,7 +120,6 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
-		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 	</table>
 
 	<table name="BindImage">
@@ -187,8 +186,6 @@
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{0A06E51C-1038-4613-AACE-79E968210746}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{5B173D58-7D91-43A5-BCE8-16447E2EF734}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>interop.uclid_dataentrycusto.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>NonSelfRegisteredComponents.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{9681B55A-3FCF-4928-914C-2AEB433FB11A}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>SqlCompactExporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{F38C653C-E9E2-4967-A08C-CBA86D45DBE2}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>sqlcompactexporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>SqlCompactImporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{2D329D6E-A7A7-476D-86FB-740D397F8F83}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>sqlcompactimporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -244,10 +241,6 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
-		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%SystemRoot]\Profiles\All Users</td><td/><td/></row>
 		<row><td>setAllUsersProfile2K</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%ALLUSERSPROFILE]</td><td/><td/></row>
 		<row><td>setUserProfileNT</td><td>51</td><td>USERPROFILE</td><td>[%USERPROFILE]</td><td/><td/></row>
@@ -370,8 +363,6 @@
 		<row><td>dataentrycc.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DATAEN~1.DLL|DataEntryCC.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\DataEntryCC.dll</td><td>1</td><td/></row>
 		<row><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>EXTRAC~1.DLL|Extract.DataEntry.dll</td><td>0</td><td/><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.DataEntry.dll</td><td>1</td><td/></row>
 		<row><td>interop.uclid_dataentrycusto.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>INTERO~1.DLL|Interop.UCLID_DATAENTRYCUSTOMCOMPONENTSLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Interop.UCLID_DATAENTRYCUSTOMCOMPONENTSLib.dll</td><td>1</td><td/></row>
-		<row><td>sqlcompactexporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>SqlCompactExporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>SQLCOM~1.EXE|SqlCompactExporter.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\SqlCompactExporter.exe</td><td>1</td><td/></row>
-		<row><td>sqlcompactimporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>SqlCompactImporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>SQLCOM~1.EXE|SqlCompactImporter.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\SqlCompactImporter.exe</td><td>1</td><td/></row>
 	</table>
 
 	<table name="Font">
@@ -492,8 +483,6 @@
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_1D662107_2612_4CA6_B3AF_26979F2ED520_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_4BAA7454_B79D_4DFD_8BA6_ED0A4CA7C219_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>NonSelfRegisteredComponents.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_67840FA9_4B65_4033_BDE5_C7B089E8928F_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>SqlCompactExporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_7D6272D9_0FCF_4947_B0C2_12C95A793D5B_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>SqlCompactImporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_7F4980AA_043E_4BFB_B139_0A73437E720E_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -578,7 +567,7 @@
 		<col def="S0">IncludeFiles</col>
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>NonSelfRegisteredComponents.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>&lt;PATH_TO_NONSELFREGISTER_FI&gt;</td><td>4</td><td/><td/><td>10</td></row>
+		<row><td>NonSelfRegisteredComponents.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>&lt;PATH_TO_NONSELFREGISTER_FI1&gt;</td><td>4</td><td/><td/><td>10</td></row>
 	</table>
 
 	<table name="ISFeatureMergeModuleExcludes">
@@ -727,13 +716,14 @@
 		<col def="S255">TestValue</col>
 		<col def="i4">Type</col>
 		<row><td>CommonFilesFolder</td><td/><td/><td>1</td></row>
-		<row><td>DATA_ENTRY_CORE_FILES</td><td>P:\DataEntry\CoreInstallation\Files\DotNet</td><td/><td>2</td></row>
+		<row><td>DATA_ENTRY_CORE_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>ISPROJECTDIR</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProductFolder</td><td/><td/><td>1</td></row>
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
-		<row><td>PATH_TO_LEADTOOLS_DOTNETDLLS</td><td>P:\DataEntry\CoreInstallation\Files\DotNet</td><td/><td>2</td></row>
-		<row><td>PATH_TO_NONSELFREGISTER_FI</td><td>P:\DataEntry\CoreInstallation\Files\NonSelfRegisteredFiles</td><td/><td>2</td></row>
+		<row><td>PATH_TO_LEADTOOLS_DOTNETDLLS</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
+		<row><td>PATH_TO_NONSELFREGISTER_FI</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegCommonComponents</td><td/><td>2</td></row>
+		<row><td>PATH_TO_NONSELFREGISTER_FI1</td><td>P:\DataEntry\CoreInstallation\Files\NonSelfRegisteredFiles</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
 		<row><td>WindowsFolder</td><td/><td/><td>1</td></row>
@@ -1081,8 +1071,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>NonSelfRegisteredComponents.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
-		<row><td>SqlCompactExporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
-		<row><td>SqlCompactImporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 	</table>
 
 	<table name="ModuleConfiguration">
@@ -1128,13 +1116,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S64">BaseAction</col>
 		<col def="I2">After</col>
 		<col def="S255">Condition</col>
-		<row><td>ISSelfRegisterCosting</td><td/><td>SelfUnregModules</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td/><td>SelfRegModules</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td/><td>ISSelfRegisterCosting</td><td>1</td><td/></row>
-		<row><td>InstallFinalize</td><td>3150</td><td/><td/><td/></row>
-		<row><td>SelfRegModules</td><td>2850</td><td/><td/><td/></row>
-		<row><td>SelfUnregModules</td><td>1100</td><td/><td/><td/></row>
 	</table>
 
 	<table name="ModuleInstallUISequence">
