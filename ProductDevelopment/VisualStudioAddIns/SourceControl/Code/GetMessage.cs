@@ -39,7 +39,8 @@ namespace SourceControl
         public static string GetSince(DateTime date)
         {
             // Get the root directory
-            ISourceControl sourceControl = SourceControlFactory.Create(new LogOnSettings());
+            ISourceControl sourceControl = SourceControlFactory.Create(new LogOnSettings(),
+                RegistryManager.EngineeringRoot);
             string rootDirectory = sourceControl.GetRootDirectory();
 
             // Construct the get message from the history items checked out to the current user

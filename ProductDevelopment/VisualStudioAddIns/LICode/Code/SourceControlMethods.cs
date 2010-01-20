@@ -6,6 +6,7 @@ using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using SourceControl;
 
 namespace LICode
 {
@@ -60,7 +61,8 @@ namespace LICode
         public static ISourceControl OpenSourceControlDatabase()
         {
             // Open the source control database
-            ISourceControl db = SourceControlFactory.Create(new LogOnSettings());
+            ISourceControl db = SourceControlFactory.Create(new LogOnSettings(),
+                RegistryManager.EngineeringRoot);
 
             // TODO: The repository is hard-coded at the moment. What's a better way?
             //db.Open(null);

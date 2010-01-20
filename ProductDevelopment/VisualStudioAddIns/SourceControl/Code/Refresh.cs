@@ -49,7 +49,8 @@ namespace SourceControl
             try
             {
                 // Get the source control database
-                ISourceControl sourceDB = SourceControlFactory.Create(new LogOnSettings());
+                ISourceControl sourceDB = SourceControlFactory.Create(new LogOnSettings(),
+                    RegistryManager.EngineeringRoot);
 
                 // Refresh the database connection
                 sourceDB.RefreshConnection();

@@ -18,9 +18,9 @@ namespace Extract.SourceControl
         #region VaultSourceControl Constants
 
         /// <summary>
-        /// The repository root of the engineering tree.
+        /// The default value for the engineering tree root
         /// </summary>
-        static readonly string _ENGINEERING_ROOT = "$/Engineering";
+        static readonly string _ENGINEERING_ROOT_DEFAULT = "$/Engineering";
 
         /// <summary>
         /// History item actions for which to query.
@@ -49,12 +49,21 @@ namespace Extract.SourceControl
 
         #endregion VaultSourceControl Constants
 
+        #region Fields
+
+        /// <summary>
+        /// The root of the engineering tree
+        /// </summary>
+        readonly string _engineeringRoot;
+
+        #endregion Fields
+
         #region VaultSourceControl Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VaultSourceControl"/> class.
         /// </summary>
-        public VaultSourceControl(LogOnSettings settings)
+        public VaultSourceControl(LogOnSettings settings, string engineeringRoot)
         {
             bool loggedIn = AttemptLogin(settings, false);
             if (!loggedIn)
@@ -75,6 +84,8 @@ namespace Extract.SourceControl
                     } 
                 }
             }
+
+            _engineeringRoot = engineeringRoot ?? _ENGINEERING_ROOT_DEFAULT;
         }
 
         static bool AttemptLogin(LogOnSettings settings, bool saveSettings)
@@ -182,9 +193,9 @@ namespace Extract.SourceControl
             throw new InvalidOperationException("Currently logged in user could not be determined.");
         }
 
-        static VaultClientTreeObject GetEngineeringRoot()
+        VaultClientTreeObject GetEngineeringRoot()
         {
-            return RepositoryUtil.FindVaultTreeObjectAtReposOrLocalPath(_ENGINEERING_ROOT);
+            return RepositoryUtil.FindVaultTreeObjectAtReposOrLocalPath(_engineeringRoot);
         }
 
         static bool IsCurrentUser(VaultUser user)

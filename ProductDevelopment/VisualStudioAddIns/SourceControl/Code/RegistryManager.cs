@@ -8,7 +8,7 @@ namespace SourceControl
     /// <summary>
     /// Manages registry settings for the Source Control Add-In.
     /// </summary>
-    internal static class RegistryManager
+    public static class RegistryManager
     {
         #region RegistryManager Constants
 
@@ -27,6 +27,16 @@ namespace SourceControl
         /// The key for the list of the recipients of get messages.
         /// </summary>
         static readonly string _GET_RECIPIENTS_KEY = "Get recipients";
+
+        /// <summary>
+        /// The key for the engineering root
+        /// </summary>
+        static readonly string _ENGINEERING_ROOT_KEY = "Engineering root";
+
+        /// <summary>
+        /// The repository root of the engineering tree.
+        /// </summary>
+        static readonly string _ENGINEERING_ROOT_DEFAULT = "$/Engineering";
 
         /// <summary>
         /// The default for the list of the recipients of get messages.
@@ -117,6 +127,27 @@ namespace SourceControl
                 }
 
                 return recipients;
+            }
+        }
+
+        /// <summary>
+        /// Gets the root of the engineering tree (used for creating get messages)
+        /// </summary>
+        /// <returns>The root of the engineering tree.</returns>
+        public static string EngineeringRoot
+        {
+            get
+            {
+                // Get the root from the registry
+                string value = SubKey.GetValue(_ENGINEERING_ROOT_KEY, null) as string;
+                if (value == null)
+                {
+                    // If the value didn't exist, create it with default value
+                    SubKey.SetValue(_ENGINEERING_ROOT_KEY, _ENGINEERING_ROOT_DEFAULT,
+                        RegistryValueKind.String);
+                }
+
+                return value ?? _ENGINEERING_ROOT_DEFAULT;
             }
         }
 

@@ -93,6 +93,10 @@
       <Project>{981AB0AA-D788-484A-A2BA-984426022F51}</Project>
       <Name>Extract.VisualStudio.AddIns</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\SourceControl\Code\SourceControl.csproj">
+      <Project>{052DB25A-500B-4E48-95EA-63086C3B1C2A}</Project>
+      <Name>SourceControl</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>
