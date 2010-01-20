@@ -13,7 +13,7 @@ namespace SourceControl
     /// </summary>
     public class GetMessageBuilder
     {
-        #region GetMessageBuilder Fields
+        #region Fields
 
         /// <summary>
         /// Renamed, moved, or deleted files or folders that may be deleted locally.
@@ -35,9 +35,9 @@ namespace SourceControl
         /// </summary>
         readonly List<string> _reviewers = new List<string>();
 
-        #endregion GetMessageBuilder Fields
+        #endregion Fields
 
-        #region GetMessageBuilder Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GetMessageBuilder"/> class.
@@ -47,9 +47,9 @@ namespace SourceControl
             _modified = new DisplayDirectoryBuilder(rootDirectory);
         }
 
-        #endregion GetMessageBuilder Constructors
+        #endregion Constructors
 
-        #region GetMessageBuilder Methods
+        #region Methods
 
         /// <summary>
         /// Adds the specified history item to the get message.
@@ -60,7 +60,9 @@ namespace SourceControl
             // Add deleted files
             if (item.LocalFileDeleted)
             {
-                AddIfUnique(_deleted, item.FormerRepositoryPath);
+                string fileName = item.FormerRepositoryPath;
+                fileName = fileName.Replace("/", @"\");
+                AddIfUnique(_deleted, fileName);
             }
 
             // Add directory
@@ -110,9 +112,9 @@ namespace SourceControl
             }
         }
 
-        #endregion GetMessageBuilder Methods
+        #endregion Methods
 
-        #region GetMessageBuilder Overrides
+        #region Overrides
 
         /// <summary>
         /// Converts the value of this instance to a <see cref="String"/>.
@@ -170,7 +172,7 @@ namespace SourceControl
             return message.ToString();
         }
 
-        #endregion GetMessageBuilder Overrides
+        #endregion Overrides
     }
 }
 
