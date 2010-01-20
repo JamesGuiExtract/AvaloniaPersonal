@@ -5,7 +5,6 @@ using Microsoft.VisualStudio.CommandBars;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -14,20 +13,23 @@ namespace Extract.VisualStudio.AddIns
     /// <summary>
     /// Represents a framework for making a Visual Studio addin. 
     /// </summary>
+    // This warning should not be fired by FxCop for abstract classes. 
+    // Microsoft fixed this in a service pack to Visual Studio 2008.
+    [SuppressMessage("Microsoft.Interoperability", "CA1409:ComVisibleTypesShouldBeCreatable")]
     [ComVisible(true)]
     public abstract class ConnectBase : IDTExtensibility2, IDTCommandTarget, IDisposable
     {
-        #region ConnectBase Fields
+        #region Fields
 
         AddIn _addIn;
         string _typeName;
-        Dictionary<string, ICommand> _addInCommands = new Dictionary<string, ICommand>();
+        readonly Dictionary<string, ICommand> _addInCommands = new Dictionary<string, ICommand>();
         DTE2 _dte;
         VisualStudioUI _ui;
 
-        #endregion ConnectBase Fields
+        #endregion Fields
 
-        #region ConnectBase Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectBase"/> class.
@@ -36,9 +38,9 @@ namespace Extract.VisualStudio.AddIns
         {
         }
 
-        #endregion ConnectBase Constructors
+        #endregion Constructors
 
-        #region ConnectBase Properties
+        #region Properties
 
         /// <summary>
         /// Gets the user displayable name of the add-in.
@@ -49,9 +51,9 @@ namespace Extract.VisualStudio.AddIns
             get;
         }
 
-        #endregion ConnectBase Properties
+        #endregion Properties
 
-        #region ConnectBase Methods
+        #region Methods
 
         /// <summary>
         /// Called when the add-in is loaded for the very first time. It is only called once. The 
@@ -149,7 +151,7 @@ namespace Extract.VisualStudio.AddIns
             return null;
         }
 
-        #endregion ConnectBase Methods
+        #endregion Methods
 
         #region IDTExtensibility2 Implementation
 
@@ -236,7 +238,7 @@ namespace Extract.VisualStudio.AddIns
         {
         }
 
-        #endregion
+        #endregion IDTExtensibility2 Implementation
 
         #region IDTCommandTarget Implementation
 
@@ -305,7 +307,7 @@ namespace Extract.VisualStudio.AddIns
                 }
             }
         }
-        #endregion
+        #endregion IDTCommandTarget Implementation
 
         #region IDisposable Members
 
