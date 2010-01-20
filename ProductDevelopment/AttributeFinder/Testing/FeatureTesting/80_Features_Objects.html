@@ -203,6 +203,151 @@
 		       	</ul>
 	       	</ul>
        	</ul>
+<p>
+	<LI><h2>Character Confidence Based Rule Objects</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #3936, #3937, #3938
+  	   	<LI><b>Details:</b> Create three new rule objects that allow rule writers to 
+		exploit character confidence provided by the OCR engine.  An AFCondition object 
+		shall return true or false depending on evaluating the characters in the entire 
+		document.  An Attribute Selector object will be created to support using a data 
+		score criterion.  This also allows the Entity Name Data Scorer to be used by a 
+		selector.  A Data Scorer object will allow selection of attributes (typically 
+		for removal) based on their character confidence.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li><u><b>Character Confidence Condition</u></b>
+		       	<ul>
+		      		<li>Confirm that the property page includes a combo box for 
+				treating the condition as <b>met</b> or <b>not met</b>.
+				<li>Confirm that the combo box defaults to <b>met</b>.
+		      		<li>Confirm that the property page includes a combo box for 
+				the type of character confidence as <b>average</b>, <b>minimum</b> 
+				or <b>maximum</b>.
+				<li>Confirm that the combo box defaults to <b>average</b>.
+		      		<li>Confirm that the property page includes a mathematical operator 
+				combo box for <b>&lt;</b>, <b>&gt;</b>, <b>&lt;=</b>, <b>&gt;=</b>, 
+				<b>!=</b>,  or <b>=</b>.
+				<li>Confirm that the combo box defaults to <b>&lt;</b>.
+		      		<li>Confirm that the property page includes an associated edit box 
+				for the actual character confidence. 
+				<li>Confirm that the edit box is empty by default.
+				<li>Confirm that the edit box accepts values from <b>0</b> to 
+				<b>100</b> inclusive.
+		      		<li>Confirm that the property page includes a check box for 
+				allowing specification of a second character confidence.
+				<li>Confirm that the associated controls (two combo boxes and an 
+				edit box) are enabled only when the check box is checked.
+		      		<li>Confirm that the first combo box describes how the two confidence 
+				levels should be combined as <b>and</b> or <b>or</b>.
+		      		<li>Confirm that the second combo box is for mathematical operators
+				and includes <b>&lt;</b>, <b>&gt;</b>, <b>&lt;=</b>, <b>&gt;=</b>, 
+				<b>!=</b>,  or <b>=</b>.
+		      		<li>Confirm that the associated edit box is for the actual character 
+				confidence. 
+				<li>Confirm that the edit box is empty by default.
+				<li>Confirm that the edit box accepts values from <b>0</b> to 
+				<b>100</b> inclusive.
+				<li>Confirm that the object settings are persistent.
+<p>
+				<li>Confirm that the following scenarios can be successfully tested
+				<ul>
+					<li>Single-sided condition with average confidence met.
+					<li>Single-sided condition with average confidence not met.
+					<li>Single-sided condition with maximum confidence met.
+					<li>Single-sided condition with maximum confidence not met.
+					<li>Single-sided condition with minimum confidence met.
+					<li>Single-sided condition with minimum confidence not met.
+					<li>Double-sided condition with average confidence met.
+					<li>Double-sided condition with average confidence not met.
+					<li>Double-sided condition with maximum confidence met.
+					<li>Double-sided condition with maximum confidence not met.
+					<li>Double-sided condition with minimum confidence met.
+					<li>Double-sided condition with minimum confidence not met.
+				</ul>
+<p>
+				<li>Exercise various double-sided conditions and confirm that 
+				invalid settings cannot be saved
+				<ul>
+					<li><b>&lt; 50</b> and <b>&gt; 90</b>.
+					<li><b>= 50</b> and <b>&lt; 40</b>.
+				</ul>
+		       	</ul>
+<p>
+	      		<li><u><b>Character Confidence Data Scorer</u></b>
+		       	<ul>
+		      		<li>Confirm that the property page includes a combo box for 
+				the type of character confidence as <b>average</b>, <b>minimum</b> 
+				or <b>maximum</b>.
+				<li>Confirm that the object settings are persistent.
+		       	</ul>
+<p>
+	      		<li><u><b>Data Scorer Based Attribute Selector</u></b>
+		       	<ul>
+		      		<li>Confirm that the property page includes a mathematical operator 
+				combo box for <b>&lt;</b>, <b>&gt;</b>, <b>&lt;=</b>, <b>&gt;=</b>, 
+				<b>!=</b>,  or <b>=</b>.
+				<li>Confirm that the combo box defaults to <b>&lt;</b>.
+		      		<li>Confirm that the property page includes an associated edit box 
+				for the actual character confidence. 
+				<li>Confirm that the edit box is empty by default.
+				<li>Confirm that the edit box accepts values from <b>0</b> to 
+				<b>100</b> inclusive.
+		      		<li>Confirm that the property page includes a check box for 
+				allowing specification of a second character confidence.
+				<li>Confirm that the associated controls (two combo boxes and an 
+				edit box) are enabled only when the check box is checked.
+		      		<li>Confirm that the first combo box describes how the two confidence 
+				levels should be combined as <b>and</b> or <b>or</b>.
+		      		<li>Confirm that the second combo box is for mathematical operators
+				and includes <b>&lt;</b>, <b>&gt;</b>, <b>&lt;=</b>, <b>&gt;=</b>, 
+				<b>!=</b>,  or <b>=</b>.
+		      		<li>Confirm that the associated edit box is for the actual character 
+				confidence. 
+				<li>Confirm that the edit box is empty by default.
+				<li>Confirm that the edit box accepts values from <b>0</b> to 
+				<b>100</b> inclusive.
+		      		<li>Confirm that the property page includes a read-only edit box 
+				to describe the selected data scorer. 
+		      		<li>Confirm that the property page includes an associated 
+				<b>Commands &gt;</b> button.
+				<li>Confirm that clicking the <b>Commands &gt;</b> button displays 
+				a menu with <b>Select data scorer...</b>, <b>Configure data 
+				scorer...</b> and <b>Cancel</b>.
+				<li>Confirm that <b>Select data scorer...</b> displays an appropriate 
+				dialog allowing the user to select and configure a data scorer.
+				<li>Confirm that the read-only edit box is updated after a data 
+				scorer is configured.
+				<li>Confirm that <b>Configure data scorer...</b> is enabled only when 
+				a data scorer was previously selected. 
+				<li>Confirm that selecting <b>Configure data scorer...</b> displays 
+				the appropriate configuration dialog pre-populated with the 
+				existing settings.
+				<li>Confirm that the object settings are persistent.
+<p>
+				<li>Confirm that the following attribute selector scenarios can 
+				be successfully tested
+				<ul>
+					<li>Single-sided condition with character confidence 
+					data scorer.
+					<li>Double-sided condition with character confidence 
+					data scorer.
+					<li>Single-sided condition with entity name 
+					data scorer.
+					<li>Double-sided condition with entity name 
+					data scorer.
+				</ul>
+<p>
+				<li>Exercise various double-sided conditions and confirm that 
+				invalid settings cannot be saved.
+		       	</ul>
+	       	</ul>
+       	</ul>
 </OL>
 </BODY>
 </HTML>
