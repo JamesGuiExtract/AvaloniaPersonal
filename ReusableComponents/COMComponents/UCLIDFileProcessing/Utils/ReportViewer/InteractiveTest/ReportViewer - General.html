@@ -1388,6 +1388,9 @@
 			<b>Total number of files referenced in the database</b>.
 			<li>Confirm that the <b>Total number of files referenced in the database</b> count 
 			is <b>&gt;=</b> the largest individual total count.
+			<li><b>[LegacyRC #5432]</b> Confirm that the total is not just the sum of the 
+			totals for each action, allowing files referenced by multiple actions to be 
+			counted more than once.
 		</ul>
 <p>
 		<li><b>Test with empty database</b> 
@@ -1449,6 +1452,9 @@
 			<b>Total number of pages referenced in the database</b>.
 			<li>Confirm that the <b>Total number of pages referenced in the database</b> count 
 			is <b>&gt;=</b> the largest individual total count.
+			<li><b>[LegacyRC #5432]</b> Confirm that the total is not just the sum of the 
+			totals for each action, allowing files referenced by multiple actions to be 
+			counted more than once.
 		</ul>
 <p>
 		<li><b>Test with empty database</b> 
