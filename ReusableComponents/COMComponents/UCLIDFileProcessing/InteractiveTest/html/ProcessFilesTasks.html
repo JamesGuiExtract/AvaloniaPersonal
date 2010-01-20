@@ -956,6 +956,29 @@
 			<li>Multiple tags can be removed from processed documents
 			<li>Tags can be toggled for processed documents
 		</ul>
+<p>
+		<li><b>[LegacyRC #5447]</b> Do not partially complete a task
+		<ul>
+			<li>Create three tags in the <b>DB Admin</b> utility.
+			<li>Configure a FAM task to apply all three tags.
+			<li>Delete one of the tags via <b>DB Admin</b>.
+			<li>Start processing.
+			<li>Confirm that each processed file fails.
+			<li>Confirm that neither of the two remaining tags 
+			are applied to any of the processed documents.
+		</ul>
+		<li><b>[LegacyRC #5448]</b> Tag must exist for configuration
+		<ul>
+			<li>Create a tag in the <b>DB Admin</b> utility.
+			<li>Configure a FAM task to apply the tag.
+			<li>Delete the tag via <b>DB Admin</b>.
+			<li>Open the property page for the previously configured 
+			task and click <b>Ok</b>.
+			<li>Confirm that an error message is presented about 
+			the missing tag.
+			<li>Confirm that the user must <b>Cancel</b> out of the 
+			property page.
+		</ul>
    	</ul> 
 <p>
 	<li><b>Core: OCR document</b></li>
