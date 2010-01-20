@@ -297,6 +297,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseUtils", "..\..\..\..\..
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{4FAC64AD-4684-4FD9-88AB-E629E0561E68} = {4FAC64AD-4684-4FD9-88AB-E629E0561E68}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLM", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcproj", "{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -1618,6 +1621,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEntryApplication", "..\
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{63FCAC1B-4562-469C-B7C3-DF1D4386FB45} = {63FCAC1B-4562-469C-B7C3-DF1D4386FB45}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.DemoFlexIndex", "..\..\..\IndustrySpecific\County\DEPs\DemoFlexIndex\Core\Code\Extract.DataEntry.DEP.DemoFlexIndex.csproj", "{BE903913-8853-4966-A333-93B29D64E7E4}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -1630,12 +1636,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.DemoF
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetFullUserName", "..\..\..\..\Utils\GetFullUserName\Code\GetFullUserName.vcproj", "{4FAC64AD-4684-4FD9-88AB-E629E0561E68}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 126
+		ProjectCount = 127
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcproj
@@ -1762,6 +1774,7 @@ Global
 		ProjectRelativeDiskPath124 = ..\..\..\..\..\RC.Net\DataEntry\Core\Code\Extract.DataEntry.csproj
 		ProjectRelativeDiskPath125 = ..\..\..\..\..\RC.Net\DataEntry\Utilities\DataEntryApplication\Core\Code\DataEntryApplication.csproj
 		ProjectRelativeDiskPath126 = ..\..\..\IndustrySpecific\County\DEPs\DemoFlexIndex\Core\Code\Extract.DataEntry.DEP.DemoFlexIndex.csproj
+		ProjectRelativeDiskPath127 = ..\..\..\..\Utils\GetFullUserName\Code\GetFullUserName.vcproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3034,6 +3047,16 @@ Global
 		{BE903913-8853-4966-A333-93B29D64E7E4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{BE903913-8853-4966-A333-93B29D64E7E4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{BE903913-8853-4966-A333-93B29D64E7E4}.Release|Win32.ActiveCfg = Release|Any CPU
+		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Debug|Win32.Build.0 = Debug|Win32
+		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Release|Any CPU.ActiveCfg = Release|Win32
+		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Release|Win32.ActiveCfg = Release|Win32
+		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

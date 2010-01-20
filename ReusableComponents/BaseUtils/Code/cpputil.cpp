@@ -20,10 +20,6 @@
 #include "StringTokenizer.h"
 #include "IdleProcessKiller.h"
 
-// Needed for the GetUserNameEx function
-#define SECURITY_WIN32 
-#include <security.h>
-
 #include <ComDef.h>
 #include <ObjBase.h>
 #include <stdlib.h>
@@ -235,20 +231,64 @@ string getCurrentUserName()
 //-------------------------------------------------------------------------------------------------
 string getFullUserName(bool bThrowExceptionIfNoFound)
 {
-	char zName[1024] = {0};
-	unsigned long nLength = 1024;
-	if (GetUserNameEx(NameDisplay, zName, &nLength) == TRUE)
+	// Get the path to the GetFullUserName executable
+	static string strGetFullUserNamePath = getModuleDirectory("BaseUtils.dll")
+		+ "\\GetFullUserName.exe";
+
+	// Create a temporary file for the username to be written to
+	TemporaryFileName tempFile;
+
+	// Run the GetFullUserName application passing the temp file in as the argument
+	DWORD dwExitCode = runExeWithProcessKiller(strGetFullUserNamePath, false, tempFile.getName());
+
+	// Check the exit code of the application and ensure the file size is not 0
+	if (dwExitCode == 0 && getSizeOfFile(tempFile.getName()) > 0)
 	{
-		return zName;
+		// Pointer to an ifstream
+		ifstream* pinFile = NULL;
+
+		// Wait for the file to be readable (pass in reference to ifstream object
+		// so that the file will be opened upon exit if it was successful
+		waitForFileToBeReadable(tempFile.getName(), true, &pinFile);
+
+		// Create an auto pointer to manage the pinFile
+		auto_ptr<ifstream> apInFile(pinFile);
+
+		// If pointer is null then file was not opened, make one more attempt to open the file
+		if (apInFile.get() == NULL)
+		{
+			// Open the file
+			apInFile.reset(new ifstream(tempFile.getName().c_str(), ios::in));
+		}
+
+		// Check if the file is open
+		if (apInFile->is_open())
+		{
+			// Get the user name from the file
+			string strFullUserName;
+			getline(*apInFile, strFullUserName);
+			apInFile->close();
+
+			// Return the full user name
+			return trim(strFullUserName, " \t", " \t");
+		}
 	}
-	else if (!bThrowExceptionIfNoFound)
+
+	// Application failed, file size is 0, or the temp file could not be opened
+	if (!bThrowExceptionIfNoFound)
 	{
+		// Not throwing an exception, return the username
 		return getCurrentUserName();
 	}
 	else
 	{
+		// Throw an exception (add the exit code as error info since GetFullUserName
+		// returns the result of GetLastError when it fails
 		UCLIDException ue("ELI29183", "Unable to retrieve full user name.");
-		ue.addWin32ErrorInfo();
+		if (dwExitCode != 0)
+		{
+			ue.addWin32ErrorInfo(dwExitCode);
+		}
 		throw ue;
 	}
 }

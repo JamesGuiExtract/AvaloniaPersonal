@@ -1962,7 +1962,7 @@ void waitForFileAccess(const string& strFileName, int iAccess)
 	while (!bRtnValue);
 }
 //--------------------------------------------------------------------------------------------------
-void waitForFileToBeReadable(const string& strFileName, bool bLogException)
+void waitForFileToBeReadable(const string& strFileName, bool bLogException, ifstream** ppinFile)
 {
 	// Static variables
 	int iTimeout = -1;
@@ -1974,14 +1974,32 @@ void waitForFileToBeReadable(const string& strFileName, bool bLogException)
 	bool bOpen = false; // Default bOpen to false
 	do
 	{
-		ifstream fIn(strFileName.c_str(), ios::in);
-
-		// Check if the file was successfully opened
-		if (!fIn.fail())
+		// Scope for the auto_ptr
 		{
-			// Set bOpen to true and close the file
-			bOpen = true;
-			fIn.close();
+			auto_ptr<ifstream> apIn;
+			apIn.reset(new ifstream(strFileName.c_str(), ios::in));
+
+			// Check if the file was successfully opened
+			if (!apIn->fail())
+			{
+				// Set bOpen to true
+				bOpen = true;
+
+				// Check if looking for an ifstream pointer
+				if (ppinFile != NULL)
+				{
+					// Store the ifstream pointer
+					*ppinFile = apIn.release();
+
+					// The file has been opened so just return
+					return;
+				}
+				else
+				{
+					// Close the file
+					apIn->close();
+				}
+			}
 		}
 
 		// if file does not have the requested rights check retry count 
