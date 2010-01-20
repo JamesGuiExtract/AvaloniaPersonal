@@ -145,23 +145,6 @@
     <Compile Include="BatesNumberManagerPropertyPage.Designer.cs">
       <DependentUpon>BatesNumberManagerPropertyPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="BracketedTextRule.cs" />
-    <Compile Include="BracketedTextRulePropertyPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="BracketedTextRulePropertyPage.Designer.cs">
-      <DependentUpon>BracketedTextRulePropertyPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DataTypeRule.cs" />
-    <Compile Include="DataTypeRulePropertyPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DataTypeRulePropertyPage.Designer.cs">
-      <DependentUpon>DataTypeRulePropertyPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FindResult.cs" />
-    <Compile Include="IRuleFormHelper.cs" />
-    <Compile Include="MatchesFoundEventArgs.cs" />
     <Compile Include="IDShieldOfficeForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -172,46 +155,20 @@
       <DependentUpon>IDShieldOfficeForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MatchResultCollection.cs" />
-    <Compile Include="RuleForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="RuleForm.Designer.cs">
-      <DependentUpon>RuleForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="IRule.cs" />
-    <Compile Include="MatchRedactedEventArgs.cs" />
-    <Compile Include="MatchResult.cs" />
     <Compile Include="ModificationHistory.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="RegistryManager.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="BracketedTextRulePropertyPage.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>BracketedTextRulePropertyPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DataTypeRulePropertyPage.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DataTypeRulePropertyPage.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="IDShieldOfficeForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>IDShieldOfficeForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="RuleForm.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>RuleForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="WordOrPatternListRulePropertyPage.resx">
-      <DependentUpon>WordOrPatternListRulePropertyPage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
@@ -235,13 +192,6 @@
     <Compile Include="UserPreferencesPropertyPage.Designer.cs">
       <DependentUpon>UserPreferencesPropertyPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="WordOrPatternListRulePropertyPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="WordOrPatternListRulePropertyPage.Designer.cs">
-      <DependentUpon>WordOrPatternListRulePropertyPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="WordOrPatternListRule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AddBatesNumber.png" />
@@ -275,6 +225,10 @@
     <ProjectReference Include="..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RC.Net\Rules\Core\Code\Extract.Rules.csproj">
+      <Project>{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}</Project>
+      <Name>Extract.Rules</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
