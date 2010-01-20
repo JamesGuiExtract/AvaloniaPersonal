@@ -1613,9 +1613,6 @@ namespace Extract.Redaction.Verification
                 // Allow the image viewer to handle keyboard input for shortcuts.
                 if (ShortcutsEnabled() && _imageViewer.Shortcuts.ProcessKey(keyData))
                 {
-                    // Ensure we track an input event for the shortcur key
-                    _inputEventTracker.NotifyOfInputEvent();
-
                     return true;
                 }
 
