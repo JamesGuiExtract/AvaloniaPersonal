@@ -1,31 +1,32 @@
-using Extract;
 using Extract.Encryption;
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace IDShieldOffice
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
+
+namespace Extract.Rules
 {
     /// <summary>
     /// Represents path information for the 
     /// </summary>
-    internal class DataType
+    public class DataType
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(DataType).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataType).ToString();
 
         #endregion Constants
 
-        #region DataType Fields
+        #region Fields
 
         /// <summary>
         /// The full path of the data rule or <see langword="null"/> if there is no data rule for 
@@ -49,9 +50,9 @@ namespace IDShieldOffice
         /// </summary>
         Regex _cluesRegex;
 
-        #endregion DataType Fields
+        #endregion Fields
 
-        #region DataType Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataType"/> class.
@@ -70,9 +71,9 @@ namespace IDShieldOffice
             _cluesFile = cluesFile;
         }
 
-        #endregion DataType Constructors
+        #endregion Constructors
         
-        #region DataType Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets the full path of the data rule.
@@ -142,22 +143,22 @@ namespace IDShieldOffice
             }
         }
 
-	    #endregion DataType Properties
+	    #endregion Properties
     }
 
     /// <summary>
-    /// A class that implements <see cref="IIDShieldOfficeRule"/> that will search a
+    /// A class that implements <see cref="IRule"/> that will search a
     /// a SpatialString for specified pre-defined data types.
     /// </summary>
-    internal class DataTypeRule : IIDShieldOfficeRule, IDisposable
+    public class DataTypeRule : IRule, IDisposable
     {
-        #region DataTypeRule Constants
+        #region Constants
 
         /// <summary>
         /// The name for this rule (for use with specifying the rule that produced a particular
         /// match result).
         /// </summary>
-        private static readonly string _RULE_NAME = "Data type rule";
+        const string _RULE_NAME = "Data type rule";
 
         /// <summary>
         /// Placeholder for the parent directory of the IDShieldOffice data types rules directory.
@@ -168,20 +169,19 @@ namespace IDShieldOffice
         /// <summary>
         /// The file name of the data file.
         /// </summary>
-        static readonly string _DATA_FILE = "Data.dat.ese";
+        const string _DATA_FILE = "Data.dat.ese";
 
         /// <summary>
         /// The file name of the clues file.
         /// </summary>
-        static readonly string _CLUES_FILE = "Clues.dat.ese";
+        const string _CLUES_FILE = "Clues.dat.ese";
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(DataTypeRule).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataTypeRule).ToString();
 
-        #endregion DataTypeRule Constants
+        #endregion Constants
 
         #region Fields
 
@@ -189,18 +189,18 @@ namespace IDShieldOffice
         /// A <see cref="List{T}"/> of <see cref="string"/> objects that specify what
         /// data types to search for when searching the SpatialString.
         /// </summary>
-        private List<string> _dataTypeList = new List<string>();
+        readonly List<string> _dataTypeList = new List<string>();
 
         /// <summary>
         /// A <see cref="Dictionary{T,T}"/> that maps all possible data types to their associated 
         /// rules file.
         /// </summary>
-        private static Dictionary<string, DataType> _validDataTypes;
+        static Dictionary<string, DataType> _validDataTypes;
 
         /// <summary>
         /// The property page of the <see cref="DataTypeRule"/>.
         /// </summary>
-        private DataTypeRulePropertyPage _propertyPage;
+        DataTypeRulePropertyPage _propertyPage;
 
         #endregion Fields
 
@@ -252,15 +252,11 @@ namespace IDShieldOffice
         /// define the data types to be searched.</value>
         /// <returns>The <see cref="List{T}"/> of <see cref="string"/> objects that
         /// define the data types to be searched.</returns>
-        public List<string> DataTypeList
+        public IList<string> DataTypeList
         {
             get
             {
                 return _dataTypeList;
-            }
-            set
-            {
-                _dataTypeList = value;
             }
         }
 
@@ -268,6 +264,7 @@ namespace IDShieldOffice
         /// Gets the list of all the possible data types for which to search.
         /// </summary>
         /// <value>The list of all the possible data types for which to search.</value>
+        [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
         public static Dictionary<string, DataType> ValidDataTypes
         {
             get
@@ -322,7 +319,7 @@ namespace IDShieldOffice
             }
         }
 
-        private static string GetRulesFullPath(string directory, string rulesFileName)
+        static string GetRulesFullPath(string directory, string rulesFileName)
         {
             // Get the full path of the rules file for this directory
             string fullPath = Path.Combine(directory, rulesFileName);
@@ -333,7 +330,7 @@ namespace IDShieldOffice
 
         #endregion Properties
 
-        #region IIDShieldOfficeRule Members
+        #region IRule Members
 
         /// <summary>
         /// Searches the specified SpatialString for the specified list of data types
@@ -342,10 +339,11 @@ namespace IDShieldOffice
         /// <param name="ocrOutput">The SpatialString to be searched for matches.</param>
         /// <returns>A <see cref="List{T}"/> of <see cref="MatchResult"/> objects containing
         /// the found items in the SpatialString.</returns>
-        public List<MatchResult> GetMatches(UCLID_RASTERANDOCRMGMTLib.SpatialString ocrOutput)
+        [CLSCompliant(false)]
+        public MatchResultCollection GetMatches(SpatialString ocrOutput)
         {
             // Iterate through all the selected data types
-            List<MatchResult> result = new List<MatchResult>();
+            MatchResultCollection result = new MatchResultCollection();
             foreach (string dataTypeName in _dataTypeList)
             {
                 // Get the data type 
@@ -393,10 +391,16 @@ namespace IDShieldOffice
             }
         }
 
-        #endregion IIDShieldOfficeRule Members
+        #endregion IRule Members
 
         #region IUserConfigurableComponent Members
 
+        /// <summary>
+        /// Gets or sets the <see cref="UserControl"/> that contains the configurable objects 
+        /// property page.
+        /// </summary>
+        /// <return>The <see cref="UserControl"/> that contains the configurable objects 
+        /// property page.</return>
         public UserControl PropertyPage
         {
             get
@@ -430,7 +434,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        private void Dispose(bool disposing)
+        void Dispose(bool disposing)
         {
             // Dispose of managed resources
             if (disposing)

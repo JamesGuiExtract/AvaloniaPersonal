@@ -1,12 +1,8 @@
-using Extract;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
 
-namespace IDShieldOffice
+namespace Extract.Rules
 {
     internal class FindResult : IComparable<FindResult>
     {
@@ -15,8 +11,7 @@ namespace IDShieldOffice
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(FindResult).ToString();
+        static readonly string _OBJECT_NAME = typeof(FindResult).ToString();
 
         #endregion Constants
 
@@ -26,19 +21,19 @@ namespace IDShieldOffice
         /// The <see cref="CompositeHighlightLayerObject"/> associated
         /// with this <see cref="FindResult"/>.
         /// </summary>
-        private CompositeHighlightLayerObject _compositeMatch;
+        readonly CompositeHighlightLayerObject _compositeMatch;
 
         /// <summary>
         /// The <see cref="MatchResult"/> that produced this <see cref="FindResult"/>.
         /// </summary>
-        private MatchResult _matchResult;
+        readonly MatchResult _matchResult;
 
         /// <summary>
         /// The id of the <see cref="Redaction"/> object that is associated with this
-        /// <see cref="FindResult"/>.  Will be <see langword="null"/> if no redaction has
-        /// been created for this object yet.
+        /// <see cref="FindResult"/>. Will be <see langword="null"/> if no redaction has been 
+        /// created for this object yet.
         /// </summary>
-        private long? _redactionId;
+        long? _redactionId;
 
         #endregion Fields
 
@@ -192,7 +187,7 @@ namespace IDShieldOffice
         /// <see langword="false"/> otherwise.</returns>
         public static bool operator ==(FindResult result1, FindResult result2)
         {
-            if (object.ReferenceEquals(result1, result2))
+            if (ReferenceEquals(result1, result2))
             {
                 return true;
             }

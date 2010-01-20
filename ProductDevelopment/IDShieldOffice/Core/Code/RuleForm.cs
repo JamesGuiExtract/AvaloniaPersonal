@@ -1,4 +1,3 @@
-using Extract;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
@@ -7,39 +6,50 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Drawing;
 using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
-namespace IDShieldOffice
+namespace Extract.Rules
 {
     /// <summary>
     /// Base class for all of the IDShield Office Rule forms.
     /// </summary>
-    internal partial class IDShieldOfficeRuleForm : Form
+    public partial class RuleForm : Form
     {
         #region Constants
 
         /// <summary>
-        /// Default text that will be displayed in the <see cref="IDShieldOfficeRuleForm"/>.
+        /// Default text that will be displayed in the <see cref="RuleForm"/>.
         /// </summary>
         const string _CAPTION_TEXT = "Find or redact";
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        static readonly string _OBJECT_NAME = typeof(IDShieldOfficeRuleForm).ToString();
+        static readonly string _OBJECT_NAME = typeof(RuleForm).ToString();
+
+        /// <summary>
+        /// The color to be used for find results.
+        /// </summary>
+        static readonly Color _FIND_COLOR = Color.LimeGreen;
 
         #endregion Constants
 
         #region Fields
 
         /// <summary>
+        /// The tag that will be added to search results.
+        /// </summary>
+        public static readonly string SearchResultTag = "Search result";
+
+        /// <summary>
         /// The rule to run in this form.
         /// </summary>
-        readonly IIDShieldOfficeRule _rule;
+        readonly IRule _rule;
 
         /// <summary>
         /// Used to query external source about OCR results, duplicate clues &amp; redactions, and 
@@ -60,7 +70,7 @@ namespace IDShieldOffice
         /// <summary>
         /// The collection of matches.
         /// </summary>
-        List<MatchResult> _matchResults;
+        MatchResultCollection _matchResults;
 
         /// <summary>
         /// The index of the next find result to display.
@@ -149,18 +159,19 @@ namespace IDShieldOffice
         #region Constructors
 
         /// <summary>
-        /// Initializes a new <see cref="IDShieldOfficeRuleForm"/> with the specified
+        /// Initializes a new <see cref="RuleForm"/> with the specified
         /// string appended to the form title.
         /// </summary>
         /// <param name="titleText">The text to append to the title bar.</param>
-        /// <param name="rule">The <see cref="IIDShieldOfficeRule"/> to run in
+        /// <param name="rule">The <see cref="IRule"/> to run in
         /// the find/redact form.</param>
         /// <param name="imageViewer">The image viewer on which the results of searches should be 
         /// shown.</param>
         /// <param name="helper">Provides OCR and other assistance to the rule form.</param>
         /// <param name="owner">The IDShield office form to associate with
         /// this find/redact form.</param>
-        public IDShieldOfficeRuleForm(string titleText, IIDShieldOfficeRule rule,
+        [CLSCompliant(false)]
+        public RuleForm(string titleText, IRule rule,
             ImageViewer imageViewer, IRuleFormHelper helper, Form owner)
         {
             try
@@ -957,7 +968,7 @@ namespace IDShieldOffice
 
         /// <summary>
         /// Updates the enabled/disabled state of the buttons on the
-        /// <see cref="IDShieldOfficeRuleForm"/>.
+        /// <see cref="RuleForm"/>.
         /// </summary>
         void UpdateButtonStates()
         {
@@ -1118,7 +1129,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="matchResults">The list of match results to split.</param>
         /// <returns>A list of <see cref="FindResult"/> objects.</returns>
-        List<FindResult> SplitMatchResultsByPage(List<MatchResult> matchResults)
+        List<FindResult> SplitMatchResultsByPage(IEnumerable<MatchResult> matchResults)
         {
             // Build the list of find results
             List<FindResult> findResults = new List<FindResult>();
@@ -1132,11 +1143,10 @@ namespace IDShieldOffice
                     // find color, selectable set to false and can render to false
                     CompositeHighlightLayerObject compositeHighlight =
                         new CompositeHighlightLayerObject(_imageViewer, pair.Key,
-                            IDShieldOfficeForm._SEARCH_RESULT_TAGS, pair.Value,
-                            IDShieldOfficeForm._FIND_COLOR);
+                            new string[] { SearchResultTag }, pair.Value, _FIND_COLOR);
                     compositeHighlight.Selectable = false;
                     compositeHighlight.CanRender = false;
-                    compositeHighlight.OutlineColor = IDShieldOfficeForm._FIND_COLOR;
+                    compositeHighlight.OutlineColor = _FIND_COLOR;
 
                     // Add the find result to the collection
                     findResults.Add(new FindResult(compositeHighlight, matchResult));

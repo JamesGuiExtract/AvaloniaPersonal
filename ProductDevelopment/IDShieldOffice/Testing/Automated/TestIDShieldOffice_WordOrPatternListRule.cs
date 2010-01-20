@@ -1,8 +1,6 @@
+using Extract.Rules;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace IDShieldOffice.Test
 {
@@ -30,7 +28,7 @@ namespace IDShieldOffice.Test
             OpenTestImage(_idShieldOfficeForm.ImageViewer);
 
             // Create a new word or pattern list rule to search for the regular expression
-            WordOrPatternsListRule wordRule = new WordOrPatternsListRule(false,
+            WordOrPatternListRule wordRule = new WordOrPatternListRule(false,
                 true, regex);
 
             // Wait for OCR to complete

@@ -1,47 +1,41 @@
-using Extract;
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
-namespace IDShieldOffice
+namespace Extract.Rules
 {
     /// <summary>
     /// Represents a property page that configure the <see cref="DataTypeRule"/>.
     /// </summary>
-    internal partial class DataTypeRulePropertyPage : UserControl, IPropertyPage
+    public partial class DataTypeRulePropertyPage : UserControl, IPropertyPage
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(DataTypeRulePropertyPage).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataTypeRulePropertyPage).ToString();
 
         #endregion Constants
 
-        #region DataTypeRulePropertyPage Fields
+        #region Fields
 
         /// <summary>
         /// The rule with which this property page is associated.
         /// </summary>
-        DataTypeRule _rule;
+        readonly DataTypeRule _rule;
 
         /// <summary>
         /// Whether or not the settings on the property page have been modified.
         /// </summary>
         bool _dirty;
 
-        #endregion DataTypeRulePropertyPage Fields
+        #endregion Fields
 
-        #region DataTypeRulePropertyPage Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="DataTypeRulePropertyPage"/> class.
@@ -99,9 +93,9 @@ namespace IDShieldOffice
             }
         }
 
-        #endregion DataTypeRulePropertyPage Constructors
+        #endregion Constructors
 
-        #region DataTypeRulePropertyPage Event Handlers
+        #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="CheckBox.CheckedChanged"/> event.
@@ -110,7 +104,7 @@ namespace IDShieldOffice
         /// <see cref="CheckBox.CheckedChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="CheckBox.CheckedChanged"/> event.</param>
-        private void HandleCheckedChanged(object sender, EventArgs e)
+        void HandleCheckedChanged(object sender, EventArgs e)
         {
             try
             {
@@ -125,7 +119,7 @@ namespace IDShieldOffice
             }
         }
 
-        #endregion DataTypeRulePropertyPage Event Handlers
+        #endregion Event Handlers
 
         #region IPropertyPage Members
 
@@ -137,7 +131,7 @@ namespace IDShieldOffice
         /// <summary>
         /// Raises the PropertyPageModified event.
         /// </summary>
-        private void OnPropertyPageModified()
+        void OnPropertyPageModified()
         {
             try
             {
@@ -162,7 +156,7 @@ namespace IDShieldOffice
         public void Apply()
         {
             // Ensure the settings are valid
-            if (!this.IsValid)
+            if (!IsValid)
             {
                 MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
                     MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);

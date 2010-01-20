@@ -1,16 +1,15 @@
-using System.Collections.ObjectModel;
-using Extract;
 using Extract.Imaging;
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
-namespace IDShieldOffice
+namespace Extract.Rules
 {
     /// <summary>
     /// An enum defining types of string matches.
@@ -201,7 +200,7 @@ namespace IDShieldOffice
         /// found in the specified SpatialString.</returns>
         /// <exception cref="ExtractException">If <paramref name="regex"/> is
         /// <see langword="null"/>.</exception>
-        internal static List<MatchResult> ComputeMatches(string baseRule, Regex regex,
+        internal static MatchResultCollection ComputeMatches(string baseRule, Regex regex,
             SpatialString ocrOutput, MatchType matchType,
             bool performIncrementalSearch)
         {
@@ -212,7 +211,7 @@ namespace IDShieldOffice
                     regex != null);
 
                 // Create the list to hold the match results
-                List<MatchResult> matches = new List<MatchResult>();
+                MatchResultCollection matches = new MatchResultCollection();
 
                 if (performIncrementalSearch)
                 {
@@ -368,7 +367,7 @@ namespace IDShieldOffice
         /// <summary>
         /// Builds a new <see cref="MatchResult"/> for the specified <see cref="Match"/>.
         /// </summary>
-        /// <param name="baseRule">The name of the base <see cref="IIDShieldOfficeRule"/>
+        /// <param name="baseRule">The name of the base <see cref="IRule"/>
         /// which found this result.</param>
         /// <param name="regex">The <see cref="Regex"/> object that found this result.</param>
         /// <param name="match">The specific <see cref="Match"/> to build the

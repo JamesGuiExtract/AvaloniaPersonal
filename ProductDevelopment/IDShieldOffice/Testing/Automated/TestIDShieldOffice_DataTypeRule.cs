@@ -1,12 +1,11 @@
 using Extract;
 using Extract.Imaging.Forms;
+using Extract.Rules;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace IDShieldOffice.Test
@@ -99,7 +98,7 @@ namespace IDShieldOffice.Test
             button.PerformClick();
 
             // Ensure the data type rule is displayed
-            IDShieldOfficeRuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
+            RuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
             Assert.That(ruleForm != null && ruleForm.Visible, "Cannot display rule form.");
 
             // Check the Account numbers - Credit and debit card numbers checkbox.
@@ -223,7 +222,7 @@ namespace IDShieldOffice.Test
             button.PerformClick();
 
             // Ensure the data type rule is displayed
-            IDShieldOfficeRuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
+            RuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
             Assert.That(ruleForm != null && ruleForm.Visible, "Cannot display rule form.");
 
             // Check the Account numbers - Savings, checking, and bank account numbers checkbox.
@@ -330,7 +329,7 @@ namespace IDShieldOffice.Test
             button.PerformClick();
 
             // Ensure the data type rule is displayed
-            IDShieldOfficeRuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
+            RuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
             Assert.That(ruleForm != null && ruleForm.Visible, "Cannot display rule form.");
 
             // Check the Account numbers - Other account numbers checkbox.
@@ -463,7 +462,7 @@ namespace IDShieldOffice.Test
             button.PerformClick();
 
             // Ensure the data type rule is displayed
-            IDShieldOfficeRuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
+            RuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
             Assert.That(ruleForm != null && ruleForm.Visible, "Cannot display rule form.");
 
             // Check the Driver's license numbers checkbox.
@@ -572,7 +571,7 @@ namespace IDShieldOffice.Test
             button.PerformClick();
 
             // Ensure the data type rule is displayed
-            IDShieldOfficeRuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
+            RuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
             Assert.That(ruleForm != null && ruleForm.Visible, "Cannot display rule form.");
 
             // Check the E-mail addresses checkbox.
@@ -694,7 +693,7 @@ namespace IDShieldOffice.Test
             button.PerformClick();
 
             // Ensure the data type rule is displayed
-            IDShieldOfficeRuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
+            RuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
             Assert.That(ruleForm != null && ruleForm.Visible, "Cannot display rule form.");
 
             // Check the Federal tax identification numbers checkbox.
@@ -841,7 +840,7 @@ namespace IDShieldOffice.Test
             button.PerformClick();
 
             // Ensure the data type rule is displayed
-            IDShieldOfficeRuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
+            RuleForm ruleForm = _idShieldOfficeForm.DataTypeRuleForm;
             Assert.That(ruleForm != null && ruleForm.Visible, "Cannot display rule form.");
 
             // Check the Social security numbers checkbox.
@@ -941,8 +940,8 @@ namespace IDShieldOffice.Test
         {
             // Get all search results, there should be only one at a time
             List<LayerObject> searchResults = imageViewer.GetLayeredObjectsOnPage(
-                imageViewer.PageNumber, IDShieldOfficeForm._SEARCH_RESULT_TAGS, 
-                ArgumentRequirement.Any, new Type[] { typeof(CompositeHighlightLayerObject) }, 
+                imageViewer.PageNumber, new string[] { RuleForm.SearchResultTag },
+                ArgumentRequirement.Any, new Type[] { typeof(CompositeHighlightLayerObject) },
                 ArgumentRequirement.Any, null, ArgumentRequirement.Any);
             Assert.That(searchResults.Count == 1, "Unexpected number of search results.");
 

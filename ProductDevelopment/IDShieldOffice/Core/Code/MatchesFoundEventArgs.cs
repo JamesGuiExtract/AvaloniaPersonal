@@ -1,10 +1,10 @@
 using System;
 using System.Collections.ObjectModel;
 
-namespace IDShieldOffice
+namespace Extract.Rules
 {	
     /// <summary>
-    /// Provides data for the <see cref="IDShieldOfficeRuleForm.MatchesFound"/> event.
+    /// Provides data for the <see cref="RuleForm.MatchesFound"/> event.
     /// </summary>
     public class MatchesFoundEventArgs : EventArgs
     {

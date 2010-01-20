@@ -1,6 +1,7 @@
 using Extract;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
+using Extract.Rules;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections;
@@ -410,7 +411,7 @@ namespace IDShieldOffice
             if (_wordOrPatternListRuleForm == null)
             {
                 _wordOrPatternListRuleForm = CreateRuleForm("Words/patterns", 
-                    new WordOrPatternsListRule());
+                    new WordOrPatternListRule());
             }
 
             // Show the word or pattern list rule form
@@ -458,15 +459,15 @@ namespace IDShieldOffice
         }
 
         /// <summary>
-        /// Creates an <see cref="IDShieldOfficeRuleForm"/> with the specified title and rule.
+        /// Creates an <see cref="RuleForm"/> with the specified title and rule.
         /// </summary>
         /// <param name="title">The text to display on the rule form's title bar.</param>
         /// <param name="rule">The rule that the form executes.</param>
-        /// <returns>An <see cref="IDShieldOfficeRuleForm"/> with the specified 
+        /// <returns>An <see cref="RuleForm"/> with the specified 
         /// <paramref name="title"/> and <paramref name="rule"/>.</returns>
-        IDShieldOfficeRuleForm CreateRuleForm(string title, IIDShieldOfficeRule rule)
+        RuleForm CreateRuleForm(string title, IRule rule)
         {
-            IDShieldOfficeRuleForm form = new IDShieldOfficeRuleForm(title, rule, _imageViewer, this, this);
+            RuleForm form = new RuleForm(title, rule, _imageViewer, this, this);
             form.ShowClues = CluesVisible;
             form.MatchesFound += HandleMatchesFound;
             form.MatchRedacted += HandleMatchRedacted;
@@ -475,12 +476,12 @@ namespace IDShieldOffice
         }
 
         /// <summary>
-        /// Handles the <see cref="IDShieldOfficeRuleForm.MatchesFound"/> event.
+        /// Handles the <see cref="RuleForm.MatchesFound"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="IDShieldOfficeRuleForm.MatchesFound"/> event.</param>
+        /// <see cref="RuleForm.MatchesFound"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="IDShieldOfficeRuleForm.MatchesFound"/> event.</param>
+        /// <see cref="RuleForm.MatchesFound"/> event.</param>
         void HandleMatchesFound(object sender, MatchesFoundEventArgs e)
         {
             try
@@ -494,12 +495,12 @@ namespace IDShieldOffice
         }
 
         /// <summary>
-        /// Handles the <see cref="IDShieldOfficeRuleForm.MatchRedacted"/> event.
+        /// Handles the <see cref="RuleForm.MatchRedacted"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="IDShieldOfficeRuleForm.MatchRedacted"/> event.</param>
+        /// <see cref="RuleForm.MatchRedacted"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="IDShieldOfficeRuleForm.MatchRedacted"/> event.</param>
+        /// <see cref="RuleForm.MatchRedacted"/> event.</param>
         void HandleMatchRedacted(object sender, MatchRedactedEventArgs e)
         {
             try
@@ -1226,7 +1227,7 @@ namespace IDShieldOffice
             try
             {
                 // Do not set the dirty flag for search results [IDSD #231 - JDS]
-                if (!e.LayerObject.Tags.Contains(_SEARCH_RESULT_TAGS[0]))
+                if (!e.LayerObject.Tags.Contains(RuleForm.SearchResultTag))
                 {
                     // Set the dirty flag
                     Dirty = true;
@@ -1290,7 +1291,7 @@ namespace IDShieldOffice
                 }
 
                 // Do not set the dirty flag for search results [IDSD #231 - JDS]
-                if (!layerObject.Tags.Contains(_SEARCH_RESULT_TAGS[0]))
+                if (!layerObject.Tags.Contains(RuleForm.SearchResultTag))
                 {
                     // Set the dirty flag
                     Dirty = true;
@@ -1407,7 +1408,7 @@ namespace IDShieldOffice
             try
             {
                 // Do not set the dirty flag for search results [IDSD #231 - JDS]
-                if (!e.LayerObject.Tags.Contains(_SEARCH_RESULT_TAGS[0]))
+                if (!e.LayerObject.Tags.Contains(RuleForm.SearchResultTag))
                 {
                     // Set the dirty flag
                     Dirty = true;
@@ -1712,7 +1713,7 @@ namespace IDShieldOffice
         {
             try
             {
-                ShowRegexHelp(this);
+                UserHelpMethods.ShowRegexHelp(this);
             }
             catch (Exception ex)
             {

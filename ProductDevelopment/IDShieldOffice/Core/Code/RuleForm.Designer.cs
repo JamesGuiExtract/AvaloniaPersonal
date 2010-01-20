@@ -1,6 +1,6 @@
-namespace IDShieldOffice
+namespace Extract.Rules
 {
-    partial class IDShieldOfficeRuleForm
+    partial class RuleForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@ namespace IDShieldOffice
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(IDShieldOfficeRuleForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RuleForm));
             this._resetButton = new System.Windows.Forms.Button();
             this._findNextButton = new System.Windows.Forms.Button();
             this._redactButton = new System.Windows.Forms.Button();
@@ -180,7 +180,7 @@ namespace IDShieldOffice
             this._toolStripStatusLabel.Text = "_toolStripStatusLabel";
             this._toolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // IDShieldOfficeRuleForm
+            // RuleForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -188,9 +188,9 @@ namespace IDShieldOffice
             this.Controls.Add(this._splitContainer);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Name = "IDShieldOfficeRuleForm";
+            this.Name = "RuleForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "IDShieldOfficeRuleForm";
+            this.Text = "RuleForm";
             this._splitContainer.Panel2.ResumeLayout(false);
             this._splitContainer.Panel2.PerformLayout();
             this._splitContainer.ResumeLayout(false);

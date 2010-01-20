@@ -2,6 +2,7 @@ using Extract;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
+using Extract.Rules;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Leadtools;
@@ -54,17 +55,17 @@ namespace IDShieldOffice
         /// <summary>
         /// The form for finding and redacting bracketed text.
         /// </summary>
-        IDShieldOfficeRuleForm _bracketedTextRuleForm;
+        RuleForm _bracketedTextRuleForm;
 
         /// <summary>
         /// The form for finding and redacting a word/pattern list.
         /// </summary>
-        IDShieldOfficeRuleForm _wordOrPatternListRuleForm;
+        RuleForm _wordOrPatternListRuleForm;
 
         /// <summary>
         /// The form for finding and redacting specific data types.
         /// </summary>
-        IDShieldOfficeRuleForm _dataTypeRuleForm;
+        RuleForm _dataTypeRuleForm;
 
         /// <summary>
         /// The user-specified settings for the ID Shield Office application.
@@ -164,16 +165,6 @@ namespace IDShieldOffice
         /// Value indicating that the OCR status text should no longer be displayed.
         /// </summary>
         const double _OCR_DISPLAY_PROGRESS_NONE = -43.0;
-        
-        /// <summary>
-        /// The tag that will be added to search results.
-        /// </summary>
-        internal static readonly string[] _SEARCH_RESULT_TAGS = new string[] { "Search result" };
-
-        /// <summary>
-        /// The color to be used for find results.
-        /// </summary>
-        internal static readonly Color _FIND_COLOR = Color.LimeGreen;
 
         /// <summary>
         /// The filter string containing the file formats that ID Shield Office supports saving
@@ -214,12 +205,6 @@ namespace IDShieldOffice
         /// The index to the printing section of the ID Shield Office help file
         /// </summary>
         const string _PRINTING_HELP_INDEX = "temporary images";
-
-        /// <summary>
-        /// The url to the regular expression help file.
-        /// </summary>
-        const string _REGEX_HELP_FILE_URL =
-            @"http://msdn.microsoft.com/en-us/library/hs600312(VS.80).aspx";
 
         /// <summary>
         /// The keyword for the help sections that contains examples of document tags.
@@ -968,22 +953,6 @@ namespace IDShieldOffice
         }
 
         /// <summary>
-        /// Displays the regular expression help file using the specified parent control.
-        /// </summary>
-        /// <param name="parent">The parent of the Help dialog box.</param>
-        public static void ShowRegexHelp(Control parent)
-        {
-            try
-            {
-                Help.ShowHelp(parent, _REGEX_HELP_FILE_URL);
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI23210", ex);
-            }
-        }
-
-        /// <summary>
         /// Shows the IDSO help file, opened to the Tags section.
         /// </summary>
         /// <param name="parent">The parent of the Help dialog box.</param>
@@ -1295,7 +1264,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <returns>The ata type rule form.</returns>
         [Browsable(false)]
-        internal IDShieldOfficeRuleForm DataTypeRuleForm
+        internal RuleForm DataTypeRuleForm
         {
             get
             {

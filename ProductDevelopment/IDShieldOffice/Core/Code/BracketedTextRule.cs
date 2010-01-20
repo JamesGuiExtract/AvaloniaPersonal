@@ -1,20 +1,18 @@
-using Extract;
-using Extract.Imaging.Forms;
 using Extract.Licensing;
-using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace IDShieldOffice
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
+
+namespace Extract.Rules
 {
     /// <summary>
-    /// A class that implements <see cref="IIDShieldOfficeRule"/> that will search a
+    /// A class that implements <see cref="IRule"/> that will search a
     /// a SpatialString for text contained between pairs of specified brackets.
     /// </summary>
-    internal class BracketedTextRule : IIDShieldOfficeRule, IUserConfigurableComponent,
-        IDisposable
+    public class BracketedTextRule : IRule, IDisposable
     {
         #region Constants
 
@@ -22,12 +20,12 @@ namespace IDShieldOffice
         /// The name for this rule (for use with specifying the rule that produced a particular
         /// match result).
         /// </summary>
-        private static readonly string _RULE_NAME = "Bracketed text rule";
+        const string _RULE_NAME = "Bracketed text rule";
 
         /// <summary>
         /// The Regex for matching nested balanced square brackets
         /// </summary>
-        private static readonly string _MATCH_SQUARE_BRACKETS =
+        static readonly string _MATCH_SQUARE_BRACKETS =
               @"(?<Square_brackets>                             " + "\n"
             + @"\[(?!\s*\])                    # match opening [         " + "\n"
             + @"  (?>                                           " + "\n"
@@ -42,7 +40,7 @@ namespace IDShieldOffice
         /// <summary>
         /// The Regex for matching nested balanced curved brackets
         /// </summary>
-        private static readonly string _MATCH_CURVED_BRACKETS = 
+        static readonly string _MATCH_CURVED_BRACKETS = 
               @"(?<Curved_brackets>                             " + "\n"
             + @"\((?!\s*\))                    # match opening (         " + "\n"
             + @"  (?>                                           " + "\n"
@@ -57,7 +55,7 @@ namespace IDShieldOffice
         /// <summary>
         /// The Regex for matching nested balanced curly brackets
         /// </summary>
-        private static readonly string _MATCH_CURLY_BRACKETS =
+        static readonly string _MATCH_CURLY_BRACKETS =
               @"(?<Curly_brackets>                              " + "\n"
             + @"\{(?!\s*\})                    # match opening {         " + "\n"
             + @"  (?>                                           " + "\n"
@@ -72,8 +70,7 @@ namespace IDShieldOffice
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(BracketedTextRule).ToString();
+        static readonly string _OBJECT_NAME = typeof(BracketedTextRule).ToString();
 
         #endregion Constants
 
@@ -82,27 +79,27 @@ namespace IDShieldOffice
         /// <summary>
         /// Flag to specify whether to search for matching square brackets ([...]).
         /// </summary>
-        private bool _matchSquareBrackets;
+        bool _matchSquareBrackets;
 
         /// <summary>
         /// Flag to specify whether to search for matching curved brackets ((...)).
         /// </summary>
-        private bool _matchCurvedBrackets;
+        bool _matchCurvedBrackets;
 
         /// <summary>
         /// Flag to specify whether to search for matching curly brackets ({...}).
         /// </summary>
-        private bool _matchCurlyBrackets;
+        bool _matchCurlyBrackets;
 
         /// <summary>
         /// The property page for this rule object.
         /// </summary>
-        private BracketedTextRulePropertyPage _propertyPage;
+        BracketedTextRulePropertyPage _propertyPage;
 
         /// <summary>
         /// The regular expression pattern to search.
         /// </summary>
-        private Regex _regex;
+        Regex _regex;
 
         #endregion Fields
 
@@ -252,7 +249,7 @@ namespace IDShieldOffice
 
         #endregion Methods
 
-        #region IIDShieldOfficeRule Members
+        #region IRule Members
 
         /// <summary>
         /// Searches the specified SpatialString for the different specified bracket matches
@@ -261,7 +258,8 @@ namespace IDShieldOffice
         /// <param name="ocrOutput">The SpatialString to be searched for matches.</param>
         /// <returns>A <see cref="List{T}"/> of <see cref="MatchResult"/> objects containing
         /// the found items in the SpatialString.</returns>
-        public List<MatchResult> GetMatches(UCLID_RASTERANDOCRMGMTLib.SpatialString ocrOutput)
+        [CLSCompliant(false)]
+        public MatchResultCollection GetMatches(SpatialString ocrOutput)
         {
             try
             {
@@ -337,7 +335,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        private void Dispose(bool disposing)
+        void Dispose(bool disposing)
         {
             // Dispose of managed resources
             if (disposing)

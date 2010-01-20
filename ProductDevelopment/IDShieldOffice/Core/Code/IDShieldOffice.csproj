@@ -172,13 +172,14 @@
       <DependentUpon>IDShieldOfficeForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IDShieldOfficeRuleForm.cs">
+    <Compile Include="MatchResultCollection.cs" />
+    <Compile Include="RuleForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IDShieldOfficeRuleForm.Designer.cs">
-      <DependentUpon>IDShieldOfficeRuleForm.cs</DependentUpon>
+    <Compile Include="RuleForm.Designer.cs">
+      <DependentUpon>RuleForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="IIDShieldOfficeRule.cs" />
+    <Compile Include="IRule.cs" />
     <Compile Include="MatchRedactedEventArgs.cs" />
     <Compile Include="MatchResult.cs" />
     <Compile Include="ModificationHistory.cs" />
@@ -199,9 +200,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>IDShieldOfficeForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IDShieldOfficeRuleForm.resx">
+    <EmbeddedResource Include="RuleForm.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>IDShieldOfficeRuleForm.cs</DependentUpon>
+      <DependentUpon>RuleForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -240,7 +241,7 @@
     <Compile Include="WordOrPatternListRulePropertyPage.Designer.cs">
       <DependentUpon>WordOrPatternListRulePropertyPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="WordOrPatternsListRule.cs" />
+    <Compile Include="WordOrPatternListRule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AddBatesNumber.png" />

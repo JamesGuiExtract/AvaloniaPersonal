@@ -2,13 +2,12 @@ using Extract;
 using Extract.Encryption;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
-using Extract.Utilities.Forms;
+using Extract.Rules;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -19,13 +18,6 @@ namespace IDShieldOffice
     /// </summary>
     internal class ModificationHistoryLoadedEventArgs : EventArgs
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ModificationHistoryLoadedEventArgs"/>
-        /// class.
-        /// </summary>
-        public ModificationHistoryLoadedEventArgs()
-        {
-        }
     }
 
     /// <summary>
@@ -38,22 +30,21 @@ namespace IDShieldOffice
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(ModificationHistory).ToString();
+        static readonly string _OBJECT_NAME = typeof(ModificationHistory).ToString();
 
         #endregion Constants
 
-        #region ModificationHistory Fields
+        #region Fields
 
         /// <summary>
         /// The version number for the <see cref="ModificationHistory"/>.
         /// </summary>
-        int _version = 1;
+        readonly int _version = 1;
 
         /// <summary>
         /// The image viewer associated with the <see cref="ModificationHistory"/>.
         /// </summary>
-        ImageViewer _imageViewer;
+        readonly ImageViewer _imageViewer;
 
         /// <summary>
         /// The name of the ID Shield Office data file to load.
@@ -104,7 +95,8 @@ namespace IDShieldOffice
         /// <summary>
         /// A collection of xml serializers for each layer object, keyed by type.
         /// </summary>
-        Dictionary<Type, XmlSerializer> _serializersByType = new Dictionary<Type,XmlSerializer>();
+        readonly Dictionary<Type, XmlSerializer> _serializersByType = 
+            new Dictionary<Type,XmlSerializer>();
 
         /// <summary>
         /// If <see langword="true"/> then currently loading an IDSO file, if
@@ -112,18 +104,18 @@ namespace IDShieldOffice
         /// </summary>
         bool _loadingIDSO;
 
-        #endregion ModificationHistory Fields
+        #endregion Fields
 
-        #region ModificationHistory Events
+        #region Events
 
         /// <summary>
         /// Occurs when the modification history has been loaded (when an IDSO file is loaded).
         /// </summary>
         internal event EventHandler<ModificationHistoryLoadedEventArgs> ModificationHistoryLoaded;
 
-        #endregion ModificationHistory Events
+        #endregion Events
 
-        #region ModificationHistory Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModificationHistory"/> class.
@@ -159,9 +151,9 @@ namespace IDShieldOffice
             }
         }
 
-        #endregion ModificationHistory Constructors
+        #endregion Constructors
 
-        #region ModificationHistory Methods
+        #region Methods
 
         /// <summary>
         /// Creates a child node of root node of the <see cref="_document"/>.
@@ -444,7 +436,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="node">The node to retrieve the Id attribute from</param>
         /// <returns>The value of the Id attribute of the specifed node.</returns>
-        private static long GetNodeId(XmlNode node)
+        static long GetNodeId(XmlNode node)
         {
             XmlAttribute idAttribute = node.Attributes["Id"];
             return Convert.ToInt64(idAttribute.Value, CultureInfo.CurrentCulture);
@@ -456,7 +448,7 @@ namespace IDShieldOffice
         /// <param name="reader">The stream from which to read the child nodes.</param>
         /// <param name="parent">The name of the parent node whose children should be read.</param>
         /// <param name="node">The node onto which the child nodes should be appended.</param>
-        void ReadChildNodes(XmlTextReader reader, string parent, XmlNode node)
+        void ReadChildNodes(XmlReader reader, string parent, XmlNode node)
         {
             if (reader.Name != parent)
             {
@@ -470,6 +462,7 @@ namespace IDShieldOffice
                 while (reader.NodeType != XmlNodeType.EndElement)
                 {
                     XmlNode child = _document.ReadNode(reader);
+                    ExtractException.Assert("ELI29221", "Unrecognized node.", child != null);
                     node.AppendChild(child);
                 }
             }
@@ -537,14 +530,14 @@ namespace IDShieldOffice
         /// Get all the layer objects that can be saved.
         /// </summary>
         /// <returns>All the layer objects that can be saved.</returns>
-        private LayerObjectsCollection GetSaveableLayerObjects()
+        LayerObjectsCollection GetSaveableLayerObjects()
         {
             // Iterate through all the layer objects
             LayerObjectsCollection saveable = new LayerObjectsCollection();
             foreach (LayerObject layerObject in _imageViewer.LayerObjects)
             {
                 // Add this layer object if it is not search results
-                if (!layerObject.Tags.Contains(IDShieldOfficeForm._SEARCH_RESULT_TAGS[0]))
+                if (!layerObject.Tags.Contains(RuleForm.SearchResultTag))
                 {
                     saveable.Add(layerObject);
                 }
@@ -560,7 +553,7 @@ namespace IDShieldOffice
         /// <param name="node">The xml representation of the desired layer object.</param>
         /// <returns>The layer object that corresponds to the specified xml node if it exists; 
         /// <see langword="null"/> if it doesn't exist.</returns>
-        private LayerObject TryGetLayerObjectFromNode(XmlNode node)
+        LayerObject TryGetLayerObjectFromNode(XmlNode node)
         {
             // Get the id of the layer object represented by the node
             long id = GetNodeId(node);
@@ -576,7 +569,7 @@ namespace IDShieldOffice
         /// </param>
         /// <param name="layerObjects">The layer objects to serialize into 
         /// <paramref name="writer"/>.</param>
-        void WriteLayerObjects(XmlWriter writer, LayerObjectsCollection layerObjects)
+        void WriteLayerObjects(XmlWriter writer, IEnumerable<LayerObject> layerObjects)
         {
             foreach (LayerObject layerObject in layerObjects)
             {
@@ -622,23 +615,20 @@ namespace IDShieldOffice
         /// specified type name.</returns>
         XmlSerializer GetSerializer(string typeName)
         {
-            if (typeName == "Redaction")
+            switch (typeName)
             {
-                return GetSerializer(typeof(Redaction));
-            }
-            else if (typeName == "TextLayerObject")
-            {
-                return GetSerializer(typeof(TextLayerObject));
-            }
-            else if (typeName == "Clue")
-            {
-                return GetSerializer(typeof(Clue));
-            }
-            else
-            {
-                ExtractException ee = new ExtractException("ELI22936", "Unexpected object.");
-                ee.AddDebugData("Type", typeName, false);
-                throw ee;
+                case "Redaction":
+                    return GetSerializer(typeof(Redaction));
+                case "TextLayerObject":
+                    return GetSerializer(typeof(TextLayerObject));
+                case "Clue":
+                    return GetSerializer(typeof(Clue));
+                default:
+                {
+                    ExtractException ee = new ExtractException("ELI22936", "Unexpected object.");
+                    ee.AddDebugData("Type", typeName, false);
+                    throw ee;
+                }
             }
         }
 
@@ -648,7 +638,7 @@ namespace IDShieldOffice
         /// <param name="writer">The stream on which to write &lt;Object&gt; nodes.</param>
         /// <param name="layerObjects">The layer objects from which &lt;Object&gt; nodes should be 
         /// created.</param>
-        static void WriteObjectList(XmlTextWriter writer, LayerObjectsCollection layerObjects)
+        static void WriteObjectList(XmlWriter writer, IEnumerable<LayerObject> layerObjects)
         {
             foreach (LayerObject layerObject in layerObjects)
             {
@@ -668,7 +658,7 @@ namespace IDShieldOffice
         /// <param name="writer">The stream on which to write &lt;Object&gt; nodes.</param>
         /// <param name="layerObjects">The parent node of layer object nodes from which 
         /// &lt;Object&gt; nodes should be created.</param>
-        static void WriteObjectList(XmlTextWriter writer, XmlNode layerObjects)
+        static void WriteObjectList(XmlWriter writer, XmlNode layerObjects)
         {
             foreach (XmlNode layerObject in layerObjects.ChildNodes)
             {
@@ -680,9 +670,9 @@ namespace IDShieldOffice
             }
         }
 
-        #endregion ModificationHistory Methods
+        #endregion Methods
 
-        #region ModificationHistory Event handlers
+        #region Event handlers
 
         /// <summary>
         /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event.
@@ -691,7 +681,7 @@ namespace IDShieldOffice
         /// <see cref="ImageViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ImageViewer.ImageFileChanged"/> event.</param>
-        private void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
+        void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
             {
@@ -720,16 +710,16 @@ namespace IDShieldOffice
             }
         }
 
-        #endregion ModificationHistory Event handlers
+        #endregion Event handlers
 
-        #region ModificationHistory OnEvents
+        #region OnEvents
 
         /// <summary>
         /// Raises the <see cref="ModificationHistory.ModificationHistoryLoaded"/> event.
         /// </summary>
         /// <param name="e">The <see cref="ModificationHistoryLoadedEventArgs"/>
         /// that contains the data associated with the event.</param>
-        private void OnModificationHistoryLoaded(ModificationHistoryLoadedEventArgs e)
+        void OnModificationHistoryLoaded(ModificationHistoryLoadedEventArgs e)
         {
             if (ModificationHistoryLoaded != null)
             {
@@ -737,9 +727,9 @@ namespace IDShieldOffice
             }
         }
 
-        #endregion ModificationHistory OnEvents
+        #endregion OnEvents
 
-        #region ModificationHistory Properties
+        #region Properties
 
         /// <summary>
         /// Gets whether an IDSO file is currently being loaded.
@@ -754,6 +744,6 @@ namespace IDShieldOffice
             }
         }
 
-        #endregion ModificationHistory Properties
+        #endregion Properties
     }
 }

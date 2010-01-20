@@ -1,28 +1,22 @@
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Text;
 using System.Windows.Forms;
-using Extract;
 
-namespace IDShieldOffice
+namespace Extract.Rules
 {
     /// <summary>
     /// A class representing the Property page for the <see cref="BracketedTextRule"/> object.
     /// </summary>
-    internal partial class BracketedTextRulePropertyPage : UserControl, IPropertyPage
+    public partial class BracketedTextRulePropertyPage : UserControl, IPropertyPage
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(BracketedTextRulePropertyPage).ToString();
+         static readonly string _OBJECT_NAME = typeof(BracketedTextRulePropertyPage).ToString();
 
         #endregion Constants
 
@@ -31,12 +25,12 @@ namespace IDShieldOffice
         /// <summary>
         /// The <see cref="BracketedTextRule"/> that settings will be applied to.
         /// </summary>
-        private BracketedTextRule _bracketedTextRule;
+        readonly BracketedTextRule _bracketedTextRule;
 
         /// <summary>
         /// Flag to indicate if the object is dirty.
         /// </summary>
-        private bool _dirty;
+        bool _dirty;
 
         #endregion Fields
 
@@ -76,14 +70,14 @@ namespace IDShieldOffice
 
         #endregion Constructors
 
-        #region Event handlers
+        #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="CheckBox.CheckedChanged"/> event.
         /// </summary>
         /// <param name="sender">The <see cref="object"/> which sent the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> association with the event.</param>
-        protected void OnCheckBoxCheckedChanged(object sender, EventArgs e)
+        void HandleCheckBoxCheckedChanged(object sender, EventArgs e)
         {
             try
             {
@@ -98,7 +92,7 @@ namespace IDShieldOffice
             }
         }
 
-        #endregion Event handlers
+        #endregion Event Handlers
 
         #region IPropertyPage Members
 
@@ -110,7 +104,7 @@ namespace IDShieldOffice
         /// <summary>
         /// Raises the PropertyPageModified event.
         /// </summary>
-        private void OnPropertyPageModified()
+        protected virtual void OnPropertyPageModified()
         {
             try
             {
@@ -136,7 +130,7 @@ namespace IDShieldOffice
         public void Apply()
         {
             // Ensure the settings are valid
-            if (!this.IsValid)
+            if (!IsValid)
             {
                 MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
                     MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);

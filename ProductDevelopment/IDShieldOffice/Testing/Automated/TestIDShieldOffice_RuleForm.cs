@@ -1,13 +1,10 @@
 using Extract;
-using Extract.Imaging;
 using Extract.Imaging.Forms;
-using Extract.Licensing;
+using Extract.Rules;
 using Extract.Testing.Utilities;
-using Extract.Utilities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows.Forms;
 
 namespace IDShieldOffice.Test
@@ -15,7 +12,7 @@ namespace IDShieldOffice.Test
     public partial class TestIDShieldOffice
     {
         /// <summary>
-        /// Test that the <see cref="IDShieldOfficeRuleForm"/> redact all
+        /// Test that the <see cref="RuleForm"/> redact all
         /// button will not add the same redaction multiple times. [IDSD #51]
         /// </summary>
         [Test, Category("Automated")]
@@ -26,8 +23,8 @@ namespace IDShieldOffice.Test
             // Open the test image
             OpenTestImage(_idShieldOfficeForm.ImageViewer);
 
-            // Create a new IDShieldOfficeRuleForm
-            IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
+            // Create a new RuleForm
+            RuleForm ruleForm = new RuleForm("Bracketed text finder",
                 new BracketedTextRule(true, true, true), _idShieldOfficeForm.ImageViewer, 
                 _idShieldOfficeForm, _idShieldOfficeForm);
             
@@ -68,7 +65,7 @@ namespace IDShieldOffice.Test
         }
 
         /// <summary>
-        /// Test that the <see cref="IDShieldOfficeRuleForm"/> redact all
+        /// Test that the <see cref="RuleForm"/> redact all
         /// button will add back a redaction that was deleted. [IDSD #51]
         /// </summary>
         [Test, Category("Automated")]
@@ -79,8 +76,8 @@ namespace IDShieldOffice.Test
             // Open the test image
             OpenTestImage(_idShieldOfficeForm.ImageViewer);
 
-            // Create a new IDShieldOfficeRuleForm
-            IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
+            // Create a new RuleForm
+            RuleForm ruleForm = new RuleForm("Bracketed text finder",
                 new BracketedTextRule(true, false, false), _idShieldOfficeForm.ImageViewer, 
                 _idShieldOfficeForm, _idShieldOfficeForm);
             
@@ -166,8 +163,8 @@ namespace IDShieldOffice.Test
                 ArgumentRequirement.Any, new Type[] { typeof(Redaction) }, ArgumentRequirement.Any,
                 null, ArgumentRequirement.Any).Count == 1);
 
-            // Create a new IDShieldOfficeRuleForm
-            IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
+            // Create a new RuleForm
+            RuleForm ruleForm = new RuleForm("Bracketed text finder",
                 new BracketedTextRule(true, false, false), _idShieldOfficeForm.ImageViewer, 
                 _idShieldOfficeForm, _idShieldOfficeForm);
             
@@ -207,8 +204,8 @@ namespace IDShieldOffice.Test
             // Show the IDSO form
             _idShieldOfficeForm.Show();
 
-            // Create a new IDShieldOfficeRuleForm
-            IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
+            // Create a new RuleForm
+            RuleForm ruleForm = new RuleForm("Bracketed text finder",
                 new BracketedTextRule(true, false, false), _idShieldOfficeForm.ImageViewer, 
                 _idShieldOfficeForm, _idShieldOfficeForm);
             
@@ -236,8 +233,8 @@ namespace IDShieldOffice.Test
             // Open the test image
             OpenTestImage(_idShieldOfficeForm.ImageViewer);
 
-            // Create a new IDShieldOfficeRuleForm
-            IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
+            // Create a new RuleForm
+            RuleForm ruleForm = new RuleForm("Bracketed text finder",
                 new BracketedTextRule(true, false, false), _idShieldOfficeForm.ImageViewer, 
                 _idShieldOfficeForm, _idShieldOfficeForm);
             
@@ -290,8 +287,8 @@ namespace IDShieldOffice.Test
             // Open the test image
             OpenTestImage(_idShieldOfficeForm.ImageViewer);
 
-            // Create a new IDShieldOfficeRuleForm
-            IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed text finder",
+            // Create a new RuleForm
+            RuleForm ruleForm = new RuleForm("Bracketed text finder",
                 new BracketedTextRule(true, true, true), _idShieldOfficeForm.ImageViewer, 
                 _idShieldOfficeForm, _idShieldOfficeForm);
             
@@ -318,7 +315,7 @@ namespace IDShieldOffice.Test
                 // Get the newly added find result (there should only be one)
                 results.Add((CompositeHighlightLayerObject)
                     _idShieldOfficeForm.ImageViewer.GetLayeredObjects(
-                    IDShieldOfficeForm._SEARCH_RESULT_TAGS, ArgumentRequirement.Any,
+                    new string[] { RuleForm.SearchResultTag }, ArgumentRequirement.Any,
                     new Type[] { typeof(CompositeHighlightLayerObject) }, ArgumentRequirement.Any,
                     null, ArgumentRequirement.Any)[0]);
             }

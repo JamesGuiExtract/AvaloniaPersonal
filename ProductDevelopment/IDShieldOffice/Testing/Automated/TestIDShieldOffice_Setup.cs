@@ -1,19 +1,16 @@
 using Extract;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
-using Extract.Licensing;
+using Extract.Rules;
 using Extract.Testing.Utilities;
-using Extract.Utilities;
 using Extract.Utilities.Forms;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
@@ -204,7 +201,7 @@ namespace IDShieldOffice.Test
         /// <para><b>Note:</b></para>
         /// These should be listed in the order they are expected to be found.</param>
         /// <returns>Whether the found results match the expected results.</returns>
-        private static bool TestFindingRuleOnText(IIDShieldOfficeRule rule,
+        private static bool TestFindingRuleOnText(IRule rule,
             string textToSearch, string[] expectedResults)
         {
             int lineMultiplier = 100;
@@ -299,7 +296,7 @@ namespace IDShieldOffice.Test
             }
 
             // Get the matches
-            List<MatchResult> matches = rule.GetMatches(fakeOcrText);
+            MatchResultCollection matches = rule.GetMatches(fakeOcrText);
 
             // Build the results collection
             string[] results = new string[matches.Count];

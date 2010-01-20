@@ -1,61 +1,53 @@
-using Extract;
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace IDShieldOffice
+namespace Extract.Rules
 {
     /// <summary>
-    /// Represents the property page of a <see cref="WordOrPatternsListRule"/>.
+    /// Represents the property page of a <see cref="WordOrPatternListRule"/>.
     /// </summary>
-    internal partial class WordOrPatternListRulePropertyPage : UserControl, IPropertyPage
+    public partial class WordOrPatternListRulePropertyPage : UserControl, IPropertyPage
     {
-        #region WordOrPatternListRulePropertyPage Constants
+        #region Constants
 
         /// <summary>
         /// The types of word/pattern list files that can be opened.
         /// </summary>
-        private static readonly string _PATTERN_LIST_TYPES =
+        static readonly string _PATTERN_LIST_TYPES =
             "Text documents (*.txt)|*.txt*|" +
             "All files (*.*)|*.*||";
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(WordOrPatternListRulePropertyPage).ToString();
+        static readonly string _OBJECT_NAME = typeof(WordOrPatternListRulePropertyPage).ToString();
 
-        #endregion WordOrPatternListRulePropertyPage Constants
+        #endregion Constants
 
-        #region WordOrPatternListRulePropertyPage Fields
+        #region Fields
 
         /// <summary>
         /// The rule associated with the property page.
         /// </summary>
-        WordOrPatternsListRule _rule;
+        readonly WordOrPatternListRule _rule;
 
         /// <summary>
         /// Whether or not the settings on the property page have been modified.
         /// </summary>
         bool _dirty;
 
-        #endregion WordOrPatternListRulePropertyPage Fields
+        #endregion Fields
 
-        #region WordOrPatternListRulePropertyPage Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="WordOrPatternListRulePropertyPage"/> class.
         /// </summary>
-        public WordOrPatternListRulePropertyPage(WordOrPatternsListRule rule)
+        public WordOrPatternListRulePropertyPage(WordOrPatternListRule rule)
         {
             try
             {
@@ -89,21 +81,21 @@ namespace IDShieldOffice
             }
         }
 
-        #endregion WordOrPatternListRulePropertyPage Constructors
+        #endregion Constructors
 
-        #region WordOrPatternListRulePropertyPage Methods
+        #region Methods
 
         /// <summary>
         /// Updates the state of the controls on the property page.
         /// </summary>
-        private void UpdateState()
+        void UpdateState()
         {
             // Enable or disable the export button, depending on whether the textbox is empty.
             // [IDSO #13]
             _exportButton.Enabled = _wordsOrPatternsTextBox.Text.Length > 0;
         }
 
-        #endregion WordOrPatternListRulePropertyPage Methods
+        #endregion Methods
 
         #region IPropertyPage Members
 
@@ -115,7 +107,7 @@ namespace IDShieldOffice
         /// <summary>
         /// Raises the PropertyPageModified event.
         /// </summary>
-        private void OnPropertyPageModified()
+        void OnPropertyPageModified()
         {
             try
             {
@@ -135,12 +127,12 @@ namespace IDShieldOffice
         }
 
         /// <summary>
-        /// Applies the changes to the <see cref="WordOrPatternsListRule"/>.
+        /// Applies the changes to the <see cref="WordOrPatternListRule"/>.
         /// </summary>
         public void Apply()
         {
             // Ensure the settings are valid
-            if (!this.IsValid)
+            if (!IsValid)
             {
                 MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings", 
                     MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
@@ -200,7 +192,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void _importButton_Click(object sender, EventArgs e)
+        void _importButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -231,7 +223,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void _exportButton_Click(object sender, EventArgs e)
+        void _exportButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -264,7 +256,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void _wordsOrPatternsTextBox_TextChanged(object sender, EventArgs e)
+        void _wordsOrPatternsTextBox_TextChanged(object sender, EventArgs e)
         {
             try
             {
@@ -284,7 +276,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void _matchCaseCheckBox_CheckedChanged(object sender, EventArgs e)
+        void _matchCaseCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             try
             {
@@ -302,7 +294,7 @@ namespace IDShieldOffice
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void _isRegexCheckBox_CheckedChanged(object sender, EventArgs e)
+        void _isRegexCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             try
             {
@@ -324,7 +316,7 @@ namespace IDShieldOffice
         /// <see cref="LinkLabel.LinkClicked"/> event.</param>
         void HandleRegexHelpLinkLabelLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            IDShieldOfficeForm.ShowRegexHelp(this.TopLevelControl);
+            UserHelpMethods.ShowRegexHelp(TopLevelControl);
         }
     }
 }

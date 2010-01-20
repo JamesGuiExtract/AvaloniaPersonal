@@ -1,9 +1,9 @@
 using System;
 
-namespace IDShieldOffice
+namespace Extract.Rules
 {
     /// <summary>
-    /// Provides data for the <see cref="IDShieldOfficeRuleForm.MatchRedacted"/> event.
+    /// Provides data for the <see cref="RuleForm.MatchRedacted"/> event.
     /// </summary>
     public class MatchRedactedEventArgs : EventArgs
     {

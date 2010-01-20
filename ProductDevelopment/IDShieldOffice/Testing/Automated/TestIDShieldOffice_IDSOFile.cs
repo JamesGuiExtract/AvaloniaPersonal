@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
+using Extract.Rules;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
@@ -11,8 +12,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.XPath;
@@ -64,8 +63,8 @@ namespace IDShieldOffice.Test
                 }
             }
 
-            // Create a new IDShieldOfficeRuleForm
-            using (IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Data Type Finder",
+            // Create a new RuleForm
+            using (RuleForm ruleForm = new RuleForm("Data Type Finder",
                 new DataTypeRule(new string[] { ssnDataTypeName }), _idShieldOfficeForm.ImageViewer, 
                 _idShieldOfficeForm, _idShieldOfficeForm))
             {
@@ -115,8 +114,8 @@ namespace IDShieldOffice.Test
         private void RunBracketedTextFinder(bool squareBrackets,
             bool curvedBrackets, bool curlyBrackets)
         {
-            // Create a new IDShieldOfficeRuleForm
-            using (IDShieldOfficeRuleForm ruleForm = new IDShieldOfficeRuleForm("Bracketed Text Finder",
+            // Create a new RuleForm
+            using (RuleForm ruleForm = new RuleForm("Bracketed Text Finder",
                 new BracketedTextRule(squareBrackets, curvedBrackets, curlyBrackets),
                 _idShieldOfficeForm.ImageViewer, _idShieldOfficeForm, _idShieldOfficeForm))
             {

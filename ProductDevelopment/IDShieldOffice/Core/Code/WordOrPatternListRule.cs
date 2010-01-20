@@ -1,20 +1,17 @@
-using Extract;
-using Extract.Imaging.Forms;
 using Extract.Licensing;
-using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
-using UCLID_COMUTILSLib;
 
-namespace IDShieldOffice
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
+
+namespace Extract.Rules
 {
     /// <summary>
-    /// A class that implements <see cref="IIDShieldOfficeRule"/> that will search a
+    /// A class that implements <see cref="IRule"/> that will search a
     /// SpatialString for specified words or patterns.
     /// </summary>
-    internal class WordOrPatternsListRule : IIDShieldOfficeRule, IDisposable
+    public class WordOrPatternListRule : IRule, IDisposable
     {
         #region Constants
 
@@ -22,18 +19,17 @@ namespace IDShieldOffice
         /// The name for this rule (for use with specifying the rule that produced a particular
         /// match result).
         /// </summary>
-        private static readonly string _RULE_NAME = "Word or pattern list rule";
+        const string _RULE_NAME = "Word or pattern list rule";
 
         /// <summary>
         /// The name of the group that will be captured by the specified word list.
         /// </summary>
-        static readonly string _GROUP_NAME = @"(?<WordList>";
+        const string _GROUP_NAME = @"(?<WordList>";
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(WordOrPatternsListRule).ToString();
+        static readonly string _OBJECT_NAME = typeof(WordOrPatternListRule).ToString();
 
         #endregion Constants
 
@@ -42,56 +38,56 @@ namespace IDShieldOffice
         /// <summary>
         /// Flag indicating if the search is case sensitive or not.
         /// </summary>
-        private bool _matchCase;
+        bool _matchCase;
 
         /// <summary>
         /// Flag indicating if the word list should be treated as a regular expression.
         /// </summary>
-        private bool _treatAsRegularExpression;
+        bool _treatAsRegularExpression;
 
         /// <summary>
         /// The word/pattern list to search for.
         /// </summary>
-        private string _text;
+        string _text;
 
         /// <summary>
         /// The regular expression pattern to search.
         /// </summary>
         /// <remarks>
-        /// <para>All <see cref="WordOrPatternsListRule"/>s can be expressed as a regular 
+        /// <para>All <see cref="WordOrPatternListRule"/>s can be expressed as a regular 
         /// expression regardless of whether <see cref="_treatAsRegularExpression"/> is true.
         /// </para>
         /// <para>Value is <see langword="null"/> if the regular expression has not yet been 
         /// compiled.</para>
         /// </remarks>
-        private Regex _regex;
+        Regex _regex;
 
         /// <summary>
         /// The property page associated with this rule.
         /// </summary>
-        private WordOrPatternListRulePropertyPage _propertyPage;
+        WordOrPatternListRulePropertyPage _propertyPage;
 
         #endregion Fields
 
         #region Constructors
 
-        /// <overloads>Initializes a new <see cref="WordOrPatternsListRule"/> class.</overloads>
+        /// <overloads>Initializes a new <see cref="WordOrPatternListRule"/> class.</overloads>
         /// <summary>
-        /// Initializes a new <see cref="WordOrPatternsListRule"/> class. 
+        /// Initializes a new <see cref="WordOrPatternListRule"/> class. 
         /// </summary>
-        public WordOrPatternsListRule() : this(false, false, "")
+        public WordOrPatternListRule() : this(false, false, "")
         {
         }
 
         /// <summary>
-        /// Initializes a new <see cref="WordOrPatternsListRule"/> class with
+        /// Initializes a new <see cref="WordOrPatternListRule"/> class with
         /// the specified settings.</summary>
         /// <param name="matchCase">If <see langword="true"/> will search the text
         /// in a case-sensitive fashion.</param>
         /// <param name="treatAsRegularExpression">If <see langword="true"/> will
         /// treat the search text as a regular expression pattern.</param>
         /// <param name="text">The search text.</param>
-        public WordOrPatternsListRule(bool matchCase, bool treatAsRegularExpression, string text)
+        public WordOrPatternListRule(bool matchCase, bool treatAsRegularExpression, string text)
         {
             try
             {
@@ -184,7 +180,7 @@ namespace IDShieldOffice
 
         #endregion Properties
 
-        #region WordOrPatternsListRule Methods
+        #region Methods
 
         void UpdateRegex()
         {
@@ -223,9 +219,9 @@ namespace IDShieldOffice
             }
         }
 
-        #endregion WordOrPatternsListRule Methods
+        #endregion Methods
 
-        #region IIDShieldOfficeRule Members
+        #region IRule Members
 
         /// <summary>
         /// Searches the specified SpatialString for the specified search text
@@ -234,7 +230,8 @@ namespace IDShieldOffice
         /// <param name="ocrOutput">The SpatialString to be searched for matches.</param>
         /// <returns>A <see cref="List{T}"/> of <see cref="MatchResult"/> objects containing
         /// the found items in the SpatialString.</returns>
-        public List<MatchResult> GetMatches(UCLID_RASTERANDOCRMGMTLib.SpatialString ocrOutput)
+        [CLSCompliant(false)]
+        public MatchResultCollection GetMatches(SpatialString ocrOutput)
         {
             // Ensure the regular expression is valid
             UpdateRegex();
@@ -244,10 +241,7 @@ namespace IDShieldOffice
                 _regex != null);
 
             // Compute the matches
-            List<MatchResult> result = MatchResult.ComputeMatches(_RULE_NAME, _regex,
-                ocrOutput, MatchType.Match, false);
-
-            return result;
+            return MatchResult.ComputeMatches(_RULE_NAME, _regex, ocrOutput, MatchType.Match, false);
         }
 
         /// <summary>
@@ -269,9 +263,9 @@ namespace IDShieldOffice
         #region IUserConfigurableComponent Members
 
         /// <summary>
-        /// Gets or sets the property page of the <see cref="WordOrPatternsListRule"/>.
+        /// Gets or sets the property page of the <see cref="WordOrPatternListRule"/>.
         /// </summary>
-        /// <return>The property page of the <see cref="WordOrPatternsListRule"/>.</return>
+        /// <return>The property page of the <see cref="WordOrPatternListRule"/>.</return>
         public System.Windows.Forms.UserControl PropertyPage
         {
             get
@@ -291,7 +285,7 @@ namespace IDShieldOffice
         #region IDisposable Members
 
         /// <summary>
-        /// Releases all resources used by the <see cref="WordOrPatternsListRule"/>.
+        /// Releases all resources used by the <see cref="WordOrPatternListRule"/>.
         /// </summary>
         public void Dispose()
         {
@@ -299,9 +293,9 @@ namespace IDShieldOffice
             GC.SuppressFinalize(this);
         }
 
-        /// <overloads>Releases resources used by the <see cref="WordOrPatternsListRule"/>.</overloads>
+        /// <overloads>Releases resources used by the <see cref="WordOrPatternListRule"/>.</overloads>
         /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="WordOrPatternsListRule"/>.
+        /// Releases all unmanaged resources used by the <see cref="WordOrPatternListRule"/>.
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        

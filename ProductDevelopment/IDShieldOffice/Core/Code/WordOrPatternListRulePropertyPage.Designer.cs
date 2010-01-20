@@ -1,4 +1,4 @@
-namespace IDShieldOffice
+namespace Extract.Rules
 {
     partial class WordOrPatternListRulePropertyPage
     {

@@ -1,4 +1,4 @@
-namespace IDShieldOffice
+namespace Extract.Rules
 {
     partial class BracketedTextRulePropertyPage
     {
@@ -59,7 +59,7 @@ namespace IDShieldOffice
             this._curvedBracketsCheckBox.TabIndex = 2;
             this._curvedBracketsCheckBox.Text = "Parenthesis ( ... )";
             this._curvedBracketsCheckBox.UseVisualStyleBackColor = true;
-            this._curvedBracketsCheckBox.CheckedChanged += new System.EventHandler(this.OnCheckBoxCheckedChanged);
+            this._curvedBracketsCheckBox.CheckedChanged += new System.EventHandler(this.HandleCheckBoxCheckedChanged);
             // 
             // curlyBracketsCheckBox
             // 
@@ -72,7 +72,7 @@ namespace IDShieldOffice
             this._curlyBracketsCheckBox.TabIndex = 1;
             this._curlyBracketsCheckBox.Text = "Curly brackets { ... }";
             this._curlyBracketsCheckBox.UseVisualStyleBackColor = true;
-            this._curlyBracketsCheckBox.CheckedChanged += new System.EventHandler(this.OnCheckBoxCheckedChanged);
+            this._curlyBracketsCheckBox.CheckedChanged += new System.EventHandler(this.HandleCheckBoxCheckedChanged);
             // 
             // squareBracketCheckBox
             // 
@@ -85,7 +85,7 @@ namespace IDShieldOffice
             this._squareBracketsCheckBox.TabIndex = 0;
             this._squareBracketsCheckBox.Text = "Square brackets [ ... ]";
             this._squareBracketsCheckBox.UseVisualStyleBackColor = true;
-            this._squareBracketsCheckBox.CheckedChanged += new System.EventHandler(this.OnCheckBoxCheckedChanged);
+            this._squareBracketsCheckBox.CheckedChanged += new System.EventHandler(this.HandleCheckBoxCheckedChanged);
             // 
             // BracketedTextRulePropertyPage
             // 
