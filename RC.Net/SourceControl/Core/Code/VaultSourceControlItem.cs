@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 using VaultClientIntegrationLib;
+using VaultClientNetLib;
 using VaultClientOperationsLib;
 using VaultLib;
 
@@ -13,14 +11,14 @@ namespace Extract.SourceControl
     /// </summary>
     public class VaultSourceControlItem : ISourceControlItem
     {
-        #region VaultSourceControlItem Fields
+        #region Fields
 
         readonly VaultClientFile _file;
         string _path;
 
-        #endregion VaultSourceControlItem Fields
+        #endregion Fields
 
-        #region VaultSourceControlItem Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VaultSourceControlItem"/> class.
@@ -30,9 +28,9 @@ namespace Extract.SourceControl
             _file = RepositoryUtil.FindVaultFileAtReposOrLocalPath(path);
         }
 
-        #endregion VaultSourceControlItem Constructors
+        #endregion Constructors
 
-        #region VaultSourceControlItem Properties
+        #region Properties
 
         /// <summary>
         /// Gets the Vault client instance.
@@ -46,9 +44,9 @@ namespace Extract.SourceControl
             }
         }
 
-        #endregion VaultSourceControlItem Properties
+        #endregion Properties
 
-        #region VaultSourceControlItem Methods
+        #region Methods
 
         /// <summary>
         /// Creates a <see cref="ChangeSetItemColl"/> for the <see cref="VaultSourceControlItem"/>.
@@ -70,7 +68,7 @@ namespace Extract.SourceControl
             return changeSet;
         }
 
-        #endregion VaultSourceControlItem Methods
+        #endregion Methods
 
         #region ISourceControlItem Members
 
@@ -108,12 +106,34 @@ namespace Extract.SourceControl
         /// </summary>
         public void CheckOut()
         {
+            // Exclusively check out the file
             if (Client.CheckOut(_file, VaultCheckOutType.Exclusive, "") == null)
             {
                 throw new InvalidOperationException("Could not check out file: " + _file.FullPath);
             }
-            Client.Get(_file, false, MakeWritableType.MakeAllFilesWritable, 
+
+            // Refresh the repository structure.
+            // Note: This is important, because if the Client is not up to date, the Get will fail.
+            Client.Refresh();
+
+            // Get the latest version
+            VaultGetResponse[] list = Client.Get(_file, false, MakeWritableType.MakeAllFilesWritable, 
                 SetFileTimeType.Current, MergeType.OverwriteWorkingCopy, null);
+            if (list != null && list.Length > 0)
+            {
+                foreach (VaultGetResponse response in list)
+                {
+                    int statusCode = response.Response.Status;
+                    if (statusCode != VaultStatusCode.Success && statusCode != VaultStatusCode.SuccessRequireFileDownload)
+                    {
+                        // Throw an exception
+                        string message = "Error getting " + response.File.FullPath + 
+                            ": " + VaultConnection.GetSoapExceptionMessage(statusCode);
+
+                        throw new InvalidOperationException(message);
+                    }
+                }
+            }
         }
 
         /// <summary>
