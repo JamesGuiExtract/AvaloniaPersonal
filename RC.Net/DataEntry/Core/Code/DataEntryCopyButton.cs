@@ -183,31 +183,132 @@ namespace Extract.DataEntry
 
         #region IDataEntryValidator Members
 
+        #region Events
+
+        /// <summary>
+        /// Raised to indicate the validation list has been updated.
+        /// </summary>
+        public event EventHandler<EventArgs> ValidationListChanged
+        {
+            // Since this event is not currently used by this class but is needed by the 
+            // IDataEntryValidator interface, define it with an empty implementation to prevent
+            // "unused" warnings during compile.
+            add { }
+            remove { }
+        }
+
+        /// <summary>
+        /// Raised to indicate the auto-complete values have changed.
+        /// </summary>
+        public event EventHandler<EventArgs> AutoCompleteValuesChanged
+        {
+            // Since this event is not currently used by this class but is needed by the 
+            // IDataEntryValidator interface, define it with an empty implementation to prevent
+            // "unused" warnings during compile.
+            add { }
+            remove { }
+        }
+
+        #endregion Events
+
+        /// <overloads>
+        /// Tests to see if the provided <see cref="IAttribute"/> meets all specified 
+        /// validation requirements the implementing class has.
+        /// </overloads>
         /// <summary>
         /// Tests to see if the provided <see cref="IAttribute"/> meets all specified 
         /// validation requirements the implementing class has.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> whose data is to be validated.
         /// </param>
+        /// <param name="throwException">If <see langword="true"/> if the method will throw an
+        /// exception if the provided value does not meet validation requirements.</param>
+        /// <returns>A <see cref="DataValidity"/>value indicating whether 
+        /// <see paramref="attribute"/>'s value is currently valid.
+        /// </returns>
         /// <throws><see cref="DataEntryValidationException"/> if the <see cref="IAttribute"/>'s 
-        /// data fails to match any validation requirements it has.</throws>
-        public void Validate(IAttribute attribute)
+        /// data fails to match any validation requirements it has and
+        /// <see paramref="throwException"/> is <see langword="true"/></throws>
+        public DataValidity Validate(IAttribute attribute, bool throwException)
         {
             try
             {
-                ExtractException.Assert("ELI27080", "Error validating data!",
-                    attribute == _attribute);
+                DataValidity dataValidity = AttributeStatusInfo.GetDataValidity(attribute);
 
-                if (AttributeStatusInfo.GetDataValidity(attribute) != DataValidity.Valid)
+                if (throwException && dataValidity != DataValidity.Valid)
                 {
                     throw new DataEntryValidationException("ELI27081", _validationErrorMessage,
                         this);
+                }
+                else
+                {
+                    return dataValidity;
                 }
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI27079", ex);
             }
+        }
+
+        /// <summary>
+        /// Tests to see if the provided <see cref="IAttribute"/> meets all specified 
+        /// validation requirements the implementing class has.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose data is to be validated.
+        /// </param>
+        /// <param name="throwException">If <see langword="true"/> if the method will throw an
+        /// exception if the provided value does not meet validation requirements.</param>
+        /// <param name="correctedValue">If the value is valid but has extra whitespace or has
+        /// different casing, this parameter will be populated with a corrected version of the
+        /// value that has already been applied to the attribute.</param>
+        /// <returns>A <see cref="DataValidity"/>value indicating whether 
+        /// <see paramref="attribute"/>'s value is currently valid.
+        /// </returns>
+        /// <throws><see cref="DataEntryValidationException"/> if the <see cref="IAttribute"/>'s 
+        /// data fails to match any validation requirements it has and
+        /// <see paramref="throwException"/> is <see langword="true"/></throws>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
+        public DataValidity Validate(IAttribute attribute, bool throwException, out string correctedValue)
+        {
+            try
+            {
+                correctedValue = null;
+                DataValidity dataValidity = AttributeStatusInfo.GetDataValidity(attribute);
+
+                if (throwException && dataValidity != DataValidity.Valid)
+                {
+                    throw new DataEntryValidationException("ELI29213", _validationErrorMessage,
+                        this);
+                }
+                else
+                {
+                    return dataValidity;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29214", ex);
+            }
+        }
+
+        /// <summary>
+        /// Unused. The copy button does not provide any auto-complete list.
+        /// </summary>
+        /// <returns><see langword="null"/></returns>
+        public string[] GetAutoCompleteValues()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// The copy button's validation is not specific to any given attribute; the same instance
+        /// can be used to validate multiple attributes.
+        /// </summary>
+        /// <returns>The current instance.</returns>
+        public IDataEntryValidator GetPerAttributeInstance()
+        {
+            return this;
         }
 
         #endregion IDataEntryValidator Members

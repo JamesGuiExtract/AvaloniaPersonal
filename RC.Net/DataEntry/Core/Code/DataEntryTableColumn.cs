@@ -53,9 +53,9 @@ namespace Extract.DataEntry
         IRuleSet _formattingRule;
         
         /// <summary>
-        /// The object which will provide validation for cell data.
+        /// The template object to be used as a model for per-attribute validation objects.
         /// </summary>
-        DataEntryValidator _validator = new DataEntryValidator();
+        DataEntryValidator _validatorTemplate = new DataEntryValidator();
 
         /// <summary>
         /// A query which will cause value to automatically be updated using the values from other
@@ -267,7 +267,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    return _validator.ValidationPattern;
+                    return _validatorTemplate.ValidationPattern;
                 }
                 catch (Exception ex)
                 {
@@ -279,7 +279,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    _validator.ValidationPattern = value;
+                    _validatorTemplate.ValidationPattern = value;
 
                     UpdateCellTemplate();
                 }
@@ -344,12 +344,12 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _validator.CorrectCase;
+                return _validatorTemplate.CorrectCase;
             }
 
             set
             {
-                _validator.CorrectCase = value;
+                _validatorTemplate.CorrectCase = value;
             }
         }
 
@@ -366,12 +366,12 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _validator.CaseSensitive;
+                return _validatorTemplate.CaseSensitive;
             }
 
             set
             {
-                _validator.CaseSensitive = value;
+                _validatorTemplate.CaseSensitive = value;
             }
         }
 
@@ -390,7 +390,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    return _validator.ValidationErrorMessage;
+                    return _validatorTemplate.ValidationErrorMessage;
                 }
                 catch (Exception ex)
                 {
@@ -402,7 +402,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    _validator.ValidationErrorMessage = value;
+                    _validatorTemplate.ValidationErrorMessage = value;
 
                     UpdateCellTemplate();
                 }
@@ -680,7 +680,7 @@ namespace Extract.DataEntry
                 // validation list has been specified.
                 if (base.DataGridView != null && _useComboBoxCells)
                 {
-                    string[] autoCompleteValues = _validator.GetAutoCompleteValues();
+                    string[] autoCompleteValues = _validatorTemplate.GetAutoCompleteValues();
 
                     ExtractException.Assert("ELI25578", "Auto-complete query must be specified " +
                         "for ComboBox cells!", _inDesignMode || autoCompleteValues != null);
@@ -705,10 +705,10 @@ namespace Extract.DataEntry
             if (_useComboBoxCells)
             {
                 DataEntryComboBoxCell cellTemplate = new DataEntryComboBoxCell();
-                cellTemplate.Validator = (DataEntryValidator)_validator.Clone();
+                cellTemplate.ValidatorTemplate = (DataEntryValidator)_validatorTemplate.Clone();
                 cellTemplate.RemoveNewLineChars = _removeNewLineChars;
 
-                string[] autoCompleteValues = _validator.GetAutoCompleteValues();
+                string[] autoCompleteValues = _validatorTemplate.GetAutoCompleteValues();
                 if (autoCompleteValues != null)
                 {
                     cellTemplate.Items.AddRange(autoCompleteValues);
@@ -719,7 +719,7 @@ namespace Extract.DataEntry
             else
             {
                 DataEntryTextBoxCell cellTemplate = new DataEntryTextBoxCell();
-                cellTemplate.Validator = (DataEntryValidator)_validator.Clone();
+                cellTemplate.ValidatorTemplate = (DataEntryValidator)_validatorTemplate.Clone();
                 cellTemplate.RemoveNewLineChars = _removeNewLineChars;
 
                 base.CellTemplate = cellTemplate;

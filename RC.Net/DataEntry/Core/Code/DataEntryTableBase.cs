@@ -592,34 +592,37 @@ namespace Extract.DataEntry
         /// <throws><see cref="DataEntryValidationException"/> if the 
         /// <see cref="IDataEntryTableCell"/>'s data fails to match any validation requirements it 
         /// has.</throws>
-        internal static void ValidateCell(IDataEntryTableCell dataEntryCell, bool throwException)
+        internal void ValidateCell(IDataEntryTableCell dataEntryCell, bool throwException)
         {
             try
             {
-                if (dataEntryCell.Validator == null || dataEntryCell.Attribute == null ||
-                    AttributeStatusInfo.GetOwningControl(dataEntryCell.Attribute).Disabled)
+                IAttribute attribute = dataEntryCell.Attribute;
+
+                if (attribute == null || AttributeStatusInfo.GetOwningControl(attribute).Disabled)
                 {
                     // Nothing to do.
                     return;
                 }
 
                 DataGridViewCell cell = dataEntryCell.AsDataGridViewCell;
+                DataValidity dataValidity;
 
-                string data = cell.Value.ToString();
-
-                // Before validating the value, replace the CRLF display substitution with actual
-                // CR/LFs.
-                if (!dataEntryCell.RemoveNewLineChars)
+                if (EditingControl == null)
                 {
-                    data = data.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
+                    string correctedValue;
+                    dataValidity =
+                        AttributeStatusInfo.Validate(attribute, throwException, out correctedValue);
+                }
+                else
+                {
+                    dataValidity = AttributeStatusInfo.Validate(attribute, throwException);
                 }
 
-                if (dataEntryCell.Validator.Validate(ref data, dataEntryCell.Attribute, throwException)
-                    != DataValidity.Valid)
+                if (dataValidity != DataValidity.Valid)
                 {
                     // If validation fails on a combo box cell, clear the data in the cell since it
                     // displayed wouldn't be displayed in the cell but would be displayed as a tooltip.
-                    if (cell is DataEntryComboBoxCell && !string.IsNullOrEmpty(data))
+                    if (cell is DataEntryComboBoxCell)
                     {
                         cell.Value = "";
                         cell.ErrorText = "";
@@ -627,7 +630,12 @@ namespace Extract.DataEntry
                     // Otherwise, display an error icon to indicate the data is invalid.
                     else
                     {
-                        cell.ErrorText = dataEntryCell.Validator.ValidationErrorMessage;
+                        IDataEntryValidator validator =
+                            AttributeStatusInfo.GetStatusInfo(attribute).Validator;
+                        ExtractException.Assert("ELI29215", "Null validator exception!",
+                            validator != null);
+
+                        cell.ErrorText = validator.ValidationErrorMessage;
                     }
                 }
                 else
@@ -635,21 +643,6 @@ namespace Extract.DataEntry
                     // If validation was successful, make sure any existing error icon is cleared and
                     // apply the data.
                     cell.ErrorText = "";
-
-                    string cellValue = cell.Value.ToString();
-
-                    // If RemoveNewLineChars and the value has changed, update the value.
-                    if (dataEntryCell.RemoveNewLineChars && cellValue != data)
-                    {
-                        cell.Value = data;
-                    }
-                    // If !RemoveNewLineChars and the value has changed after accounting for
-                    // _CRLF_REPLACEMENT, update the value.
-                    else if (!dataEntryCell.RemoveNewLineChars &&
-                        cellValue != data.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT))
-                    {
-                        cell.Value = data;
-                    }
                 }
             }
             catch (Exception ex)
@@ -1205,13 +1198,14 @@ namespace Extract.DataEntry
                     // If a text box is being used, initialize the auto-complete values (if
                     // applicable) and register for the TextChanged event to handle
                     // changes to the value.
-                    else
+                    else if (dataEntryCell.Attribute != null)
                     {
                         DataGridViewTextBoxEditingControl textEditingControl =
                             (DataGridViewTextBoxEditingControl)_editingControl;
 
                         textEditingControl.TextChanged += HandleCellTextChanged;
-                        DataEntryValidator validator = dataEntryCell.Validator;
+                        IDataEntryValidator validator =
+                            AttributeStatusInfo.GetStatusInfo(dataEntryCell.Attribute).Validator;
 
                         // If available, use the validation list values to initialize the
                         // auto-complete values.
@@ -2085,19 +2079,16 @@ namespace Extract.DataEntry
                 AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
                 statusInfo.AttributeDeleted += HandleAttributeDeleted;
 
-                if (base.Visible)
+                // Only attributes mapped to a IDataEntryTableCell will be viewable.
+                IDataEntryTableCell dataEntryCell = tableElement as IDataEntryTableCell;
+                
+                // Mark the attribute as visible if the table is visible and the table element
+                // is a cell (as opposed to a row which isn't visible on its own)
+                if (dataEntryCell != null)
                 {
-                    // Only attributes mapped to a IDataEntryTableCell will be viewable.
-                    IDataEntryTableCell dataEntryCell = tableElement as IDataEntryTableCell;
-                    
-                    // Mark the attribute as visible if the table is visible and the table element
-                    // is a cell (as opposed to a row which isn't visible on its own)
-                    if (dataEntryCell != null)
-                    {
-                        // Register to recieve notification that the spatial info for the cell has
-                        // changed.
-                        dataEntryCell.CellSpatialInfoChanged += HandleCellSpatialInfoChanged;
-                    }
+                    // Register to recieve notification that the spatial info for the cell has
+                    // changed.
+                    dataEntryCell.CellSpatialInfoChanged += HandleCellSpatialInfoChanged;
                 }
             }
             catch (Exception ex)
@@ -2110,9 +2101,11 @@ namespace Extract.DataEntry
         /// Un-maps a <see cref="IAttribute"/> from a table element.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> to un-map.</param>
+        /// <param name="clearCellAttributes"><see langword="true"/> to remove the reference
+        /// to each cell's <see cref="IAttribute"/>, <see langword="false"/> otherwise.</param>
         // I can't find a way to case "UnMap" in a way that makes FX cop happy.
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Un")]
-        protected void UnMapAttribute(IAttribute attribute)
+        protected void UnMapAttribute(IAttribute attribute, bool clearCellAttributes)
         {
             try
             {
@@ -2125,15 +2118,18 @@ namespace Extract.DataEntry
                     AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
                     statusInfo.AttributeDeleted -= HandleAttributeDeleted;
 
-                    if (base.Visible)
+                    // If the attribute was mapped to a dataEntryCell, clear the cell's attribute
+                    // property to ensure it is no longer referenced and unregister the 
+                    // HandleCellSpatialInfoChanged that was previously registered.
+                    IDataEntryTableCell dataEntryCell = tableElement as IDataEntryTableCell;
+                    if (dataEntryCell != null)
                     {
-                        // If the attribute was mapped to a dataEntryCell, unregister the 
-                        // HandleCellSpatialInfoChanged that was previously registered.
-                        IDataEntryTableCell dataEntryCell = tableElement as IDataEntryTableCell;
-                        if (dataEntryCell != null)
+                        if (clearCellAttributes)
                         {
-                            dataEntryCell.CellSpatialInfoChanged -= HandleCellSpatialInfoChanged;
+                            dataEntryCell.Attribute = null;
                         }
+
+                        dataEntryCell.CellSpatialInfoChanged -= HandleCellSpatialInfoChanged;
                     }
                 }
             }
@@ -2147,7 +2143,9 @@ namespace Extract.DataEntry
         /// Clears <see cref="DataEntryTableBase"/>'s internal attribute map and resets selection
         /// to the first displayed table cell.
         /// </summary>
-        protected void ClearAttributeMappings()
+        /// <param name="clearCellAttributes"><see langword="true"/> to remove the reference
+        /// to each cell's <see cref="IAttribute"/>, <see langword="false"/> otherwise.</param>
+        protected void ClearAttributeMappings(bool clearCellAttributes)
         {
             try
             {
@@ -2158,7 +2156,7 @@ namespace Extract.DataEntry
                 List<IAttribute> attributeList = new List<IAttribute>(_attributeMap.Keys);
                 foreach (IAttribute attribute in attributeList)
                 {
-                    UnMapAttribute(attribute);
+                    UnMapAttribute(attribute,clearCellAttributes);
                 }
 
                 // Reset selection back to the first displayed cell.
@@ -2354,9 +2352,12 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Since the spatial information for this table has changed, refresh all spatial
-                // hints for this table.
-                _hintsAreDirty = true;
+                if (Visible)
+                {
+                    // Since the spatial information for this table has changed, refresh all spatial
+                    // hints for this table.
+                    _hintsAreDirty = true;
+                }
             }
             catch (Exception ex)
             {
@@ -2479,8 +2480,9 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Remove any deleted attributes from the _attributeMap
-                UnMapAttribute(e.DeletedAttribute);
+                // Remove any deleted attributes from the _attributeMap and that the attribute is
+                // no longer reference by the cell that contains it.
+                UnMapAttribute(e.DeletedAttribute, true);
             }
             catch (Exception ex)
             {

@@ -95,9 +95,14 @@ namespace Extract.DataEntry
         IRuleSet _formattingRule;
 
         /// <summary>
-        /// The object which will provide validation for cell data.
+        /// The template object to be used as a model for per-attribute validation objects.
         /// </summary>
-        DataEntryValidator _validator = new DataEntryValidator();
+        DataEntryValidator _validatorTemplate = new DataEntryValidator();
+
+        /// <summary>
+        /// The validator currently being used to validate the control's attribute.
+        /// </summary>
+        IDataEntryValidator _activeValidator;
 
         /// <summary>
         /// The error provider to be used to indicate data validation problems to the user.
@@ -172,13 +177,11 @@ namespace Extract.DataEntry
 
                 InitializeComponent();
 
-                _validator.AutoCompleteValuesChanged += HandleAutoCompleteValuesChanged;
-
                 // Initialize auto-complete mode if not using a drop-list.
-                if (base.DropDownStyle != ComboBoxStyle.DropDownList)
+                if (DropDownStyle != ComboBoxStyle.DropDownList)
                 {
-                    base.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    base.AutoCompleteSource = AutoCompleteSource.CustomSource;
+                    AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                    AutoCompleteSource = AutoCompleteSource.CustomSource;
                 }
             }
             catch (Exception ex)
@@ -298,7 +301,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    return _validator.ValidationPattern;
+                    return _validatorTemplate.ValidationPattern;
                 }
                 catch (Exception ex)
                 {
@@ -310,7 +313,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    _validator.ValidationPattern = value;
+                    _validatorTemplate.ValidationPattern = value;
                 }
                 catch (ExtractException ex)
                 {
@@ -364,12 +367,12 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _validator.CorrectCase;
+                return _validatorTemplate.CorrectCase;
             }
 
             set
             {
-                _validator.CorrectCase = value;
+                _validatorTemplate.CorrectCase = value;
             }
         }
 
@@ -386,12 +389,12 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _validator.CaseSensitive;
+                return _validatorTemplate.CaseSensitive;
             }
 
             set
             {
-                _validator.CaseSensitive = value;
+                _validatorTemplate.CaseSensitive = value;
             }
         }
 
@@ -410,7 +413,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    return _validator.ValidationErrorMessage;
+                    return _validatorTemplate.ValidationErrorMessage;
                 }
                 catch (Exception ex)
                 {
@@ -422,7 +425,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    _validator.ValidationErrorMessage = value;
+                    _validatorTemplate.ValidationErrorMessage = value;
                 }
                 catch (Exception ex)
                 {
@@ -553,7 +556,7 @@ namespace Extract.DataEntry
                 // Only apply data if the combo box is currently mapped.
                 if (_attribute != null)
                 {
-                    AttributeStatusInfo.SetValue(_attribute, this.Text, true, false);
+                    AttributeStatusInfo.SetValue(_attribute, Text, true, false);
                 }
 
                 // Display a validation error icon if needed.
@@ -578,7 +581,7 @@ namespace Extract.DataEntry
                 // Only apply data if the combo box is currently mapped.
                 if (_attribute != null)
                 {
-                    AttributeStatusInfo.SetValue(_attribute, this.Text, true, true);
+                    AttributeStatusInfo.SetValue(_attribute, Text, true, true);
                 }
 
                 // Display or clear a validation error icon if needed.
@@ -623,15 +626,15 @@ namespace Extract.DataEntry
                 // Ctrl + A is not implemented by the base ComboBox class.
                 if (e.KeyCode == Keys.A && e.Control)
                 {
-                    base.SelectAll();
+                    SelectAll();
 
                     e.Handled = true;
                 }
                 // If the delete key is pressed while all text is selected or when using
                 // DropDownList, delete spatial info.
                 else if (e.KeyCode == Keys.Delete && _attribute != null &&
-                            (base.DropDownStyle == ComboBoxStyle.DropDownList || 
-                                base.SelectionLength == base.Text.Length))
+                            (DropDownStyle == ComboBoxStyle.DropDownList || 
+                             SelectionLength == base.Text.Length))
                 {
                     AttributeStatusInfo.RemoveSpatialInfo(_attribute);
                 }
@@ -644,13 +647,12 @@ namespace Extract.DataEntry
                 // is active, an enter key press was registered, all text is selected an the text
                 // leads off with a space, trim off the space that is very likely the special space
                 // that was added for all entries in the auto-complete list.
-                if (e.KeyCode == Keys.Return && base.AutoCompleteCustomSource != null &&
-                    base.AutoCompleteCustomSource.Count > 0 && !string.IsNullOrEmpty(this.Text) &&
-                    this.Text.Length > 1 && base.SelectionLength == this.Text.Length &&
-                    this.Text[0] == ' ')
+                if (e.KeyCode == Keys.Return && AutoCompleteCustomSource != null &&
+                    AutoCompleteCustomSource.Count > 0 && !string.IsNullOrEmpty(Text) &&
+                    Text.Length > 1 && SelectionLength == Text.Length && Text[0] == ' ')
                 {
-                    this.Text = this.Text.Substring(1);
-                    base.SelectAll();
+                    Text = Text.Substring(1);
+                    SelectAll();
                 }
             }
             catch (Exception ex)
@@ -1005,16 +1007,37 @@ namespace Extract.DataEntry
                     // If the source attribute is null, clear existing data and do not attempt to
                     // map to a new attribute.
                     _attribute = null;
-                    this.Text = "";
+                    Text = "";
                 }
                 else
                 {
+                    // Stop listening to the previous active validator (if there is one)
+                    if (_activeValidator != null)
+                    {
+                        _activeValidator.AutoCompleteValuesChanged -= HandleAutoCompleteValuesChanged;
+                        _activeValidator = null;
+                    }
+
                     // Attempt to find a mapped attribute from the provided vector.  Create a new 
                     // attribute if no such attribute can be found.
                     _attribute = DataEntryMethods.InitializeAttribute(_attributeName,
                         _multipleMatchSelectionMode, !string.IsNullOrEmpty(_attributeName),
-                        sourceAttributes, null, this, 0, false, _tabStopMode, _validator, 
+                        sourceAttributes, null, this, 0, false, _tabStopMode, _validatorTemplate, 
                         _autoUpdateQuery, _validationQuery);
+
+                    // Update the combo box using the new attribute's validator (if there is one).
+                    if (_attribute != null)
+                    {
+                        _activeValidator = AttributeStatusInfo.GetStatusInfo(_attribute).Validator;
+
+                        if (_activeValidator != null)
+                        {
+                            UpdateComboBoxItemsViaAutoCompleteValues();
+
+                            _activeValidator.AutoCompleteValuesChanged +=
+                                HandleAutoCompleteValuesChanged;
+                        }
+                    }
 
                     if (base.Visible)
                     {
@@ -1099,7 +1122,7 @@ namespace Extract.DataEntry
                     base.ResetBackColor();
                 }
 
-                this.Invalidate();
+                Invalidate();
             }
             catch (Exception ex)
             {
@@ -1156,7 +1179,7 @@ namespace Extract.DataEntry
                 {
                     if (_attribute == attribute)
                     {
-                        this.Text = (_attribute.Value != null) ? _attribute.Value.String : "";
+                        Text = (_attribute.Value != null) ? _attribute.Value.String : "";
 
                         // In case the value itself didn't change but the validation list did,
                         // explicitly check validation here.
@@ -1344,7 +1367,7 @@ namespace Extract.DataEntry
         void OnAttributeChanged()
         {
             // Display the attribute text.
-            this.Text = (_attribute != null && _attribute.Value != null)
+            Text = (_attribute != null && _attribute.Value != null)
                 ? _attribute.Value.String : "";
 
             // Display a validation error icon if needed.
@@ -1364,7 +1387,7 @@ namespace Extract.DataEntry
         /// </summary>
         void OnAttributesSelected()
         {
-            if (this.AttributesSelected != null)
+            if (AttributesSelected != null)
             {
                 AttributesSelected(this,
                     new AttributesSelectedEventArgs(DataEntryMethods.AttributeAsVector(_attribute),
@@ -1377,7 +1400,7 @@ namespace Extract.DataEntry
         /// </summary>
         void OnPropagateAttributes()
         {
-            if (this.PropagateAttributes != null)
+            if (PropagateAttributes != null)
             {
                 if (_attribute == null)
                 {
@@ -1420,23 +1443,32 @@ namespace Extract.DataEntry
         /// </returns>
         DataValidity Validate(bool correctValue)
         {
-            // If there is no mapped attribute or the control is disabled, the data cannot be invalid.
-            if (_disabled || _attribute == null)
+            // If there is no mapped attribute, the control is disabled or there is not active
+            // validator, the data cannot be validated.
+            if (_disabled || _attribute == null || _activeValidator == null)
             {
                 return DataValidity.Valid;
             }
 
-            string value = this.Text;
+            DataValidity dataValidity;
 
-            // Test to see if the data is valid.
-            DataValidity dataValidity = _validator.Validate(ref value, _attribute, false);
-
-            // If the data is valid, correctValue is true, and the validator updated the value with
-            // new casing, apply the updated value to both the control and underlying attribute.
-            if (dataValidity == DataValidity.Valid && correctValue && value != this.Text)
+            if (correctValue)
             {
-                this.Text = value;
-                AttributeStatusInfo.SetValue(_attribute, value, false, false);
+                // If the attribute's value should be removed of extra whitespace and made to match
+                // the casing in the validator, provide a variable to retrieve a corrected value.
+                string correctedValue;
+                dataValidity = AttributeStatusInfo.Validate(_attribute, false, out correctedValue);
+
+                // If a corrected value was returned, apply it to the combo box.
+                if (!string.IsNullOrEmpty(correctedValue))
+                {
+                    Text = correctedValue;
+                }
+            }
+            else
+            {
+                // Do not auto-correct whitespace, casing... just validate.
+                dataValidity = AttributeStatusInfo.Validate(_attribute, false);
             }
 
             return dataValidity;
@@ -1469,13 +1501,15 @@ namespace Extract.DataEntry
         void UpdateComboBoxItemsViaAutoCompleteValues()
         {
             string[] autoCompleteValues = null;
-
-            autoCompleteValues = _validator.GetAutoCompleteValues();
+            if (_activeValidator != null)
+            {
+                autoCompleteValues = _activeValidator.GetAutoCompleteValues();
+            }
 
             if (autoCompleteValues != null)
             {
                 // Reseting the item list will clear the value. Preserve the original value.
-                string originalValue = this.Text;
+                string originalValue = Text;
 
                 // Auto-complete is supported unless the DropDownStyle is DropDownList
                 if (base.DropDownStyle != ComboBoxStyle.DropDownList)
@@ -1494,11 +1528,14 @@ namespace Extract.DataEntry
                     base.AutoCompleteCustomSource = autoCompleteList;
                 }
 
-                base.Items.Clear();
-                base.Items.AddRange(autoCompleteValues);
+                Items.Clear();
+                Items.AddRange(autoCompleteValues);
 
                 // Restore the original value
-                this.Text = originalValue;
+                if (Items.Contains(originalValue))
+                {
+                    Text = originalValue;
+                }
             }
         }
 
@@ -1514,14 +1551,14 @@ namespace Extract.DataEntry
                 if (_validationErrorProvider != null)
                 {
                     _validationErrorProvider.SetError(this, dataValidity == DataValidity.Invalid ?
-                        _validator.ValidationErrorMessage : "");
+                        _activeValidator.ValidationErrorMessage : "");
                 }
 
                 if (_validationWarningErrorProvider != null)
                 {
                     _validationWarningErrorProvider.SetError(this,
                         dataValidity == DataValidity.ValidationWarning ?
-                            _validator.ValidationErrorMessage : "");
+                            _activeValidator.ValidationErrorMessage : "");
                 }
             }
         }

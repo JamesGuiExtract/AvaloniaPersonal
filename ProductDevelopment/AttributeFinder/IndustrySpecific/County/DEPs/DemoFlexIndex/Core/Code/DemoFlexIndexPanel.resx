@@ -117,4 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="dataEntryTableRow5.ValidationQuery" xml:space="preserve">
+    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = &lt;Attribute&gt;../City&lt;/Attribute&gt; AND ([Name] = &lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt; OR [Abbreviation] = &lt;Result Arg1='State'/&gt;)&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidValue='1'&gt;&lt;SQL&gt;SELECT '1' FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = &lt;Attribute&gt;../City&lt;/Attribute&gt; AND ([Name] = &lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt; OR [Abbreviation] = &lt;Result Arg1='State'/&gt;) AND SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,5) = [ZipCode].[ZipCode]&lt;/SQL&gt;&lt;/Query&gt;</value>
+  </data>
+  <metadata name="_grantorColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="dataEntryTableRow9.ValidationQuery" xml:space="preserve">
+    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = &lt;Attribute&gt;../City&lt;/Attribute&gt; AND ([Name] = &lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt; OR [Abbreviation] = &lt;Result Arg1='State'/&gt;)&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidValue='1'&gt;&lt;SQL&gt;SELECT '1' FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = &lt;Attribute&gt;../City&lt;/Attribute&gt; AND ([Name] = &lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt; OR [Abbreviation] = &lt;Result Arg1='State'/&gt;) AND SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,5) = [ZipCode].[ZipCode] UNION SELECT '1' WHERE LEN(&lt;Attribute&gt;.&lt;/Attribute&gt;) = 0&lt;/SQL&gt;&lt;/Query&gt;</value>
+  </data>
+  <metadata name="First.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="Middle.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="Last.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="Suffix.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="Column1.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="_granteeTable.Locked" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="dataEntryTableRow14.ValidationQuery" xml:space="preserve">
+    <value>&lt;Query ValidationListType='AutoCompleteOnly'&gt;&lt;SQL&gt;SELECT [ZipCode] FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = &lt;Attribute&gt;../City&lt;/Attribute&gt; AND ([Name] = &lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt; OR [Abbreviation] = &lt;Result Arg1='State'/&gt;)&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query ValidationListType='ValidationListOnly' ValidValue='1'&gt;&lt;SQL&gt;SELECT '1' FROM [ZipCode] INNER JOIN [State] ON [ZipCode].[StateID] = [State].[ID] WHERE [ZipCode].[City] = &lt;Attribute&gt;../City&lt;/Attribute&gt; AND ([Name] = &lt;Attribute Name='State'&gt;../State&lt;/Attribute&gt; OR [Abbreviation] = &lt;Result Arg1='State'/&gt;) AND SUBSTRING(&lt;Attribute&gt;.&lt;/Attribute&gt;,1,5) = [ZipCode].[ZipCode] UNION SELECT '1' WHERE LEN(&lt;Attribute&gt;.&lt;/Attribute&gt;) = 0&lt;/SQL&gt;&lt;/Query&gt;</value>
+  </data>
+  <metadata name="dataEntryTableColumn2.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="dataEntryTableColumn3.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="dataEntryTableColumn4.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="dataEntryTableColumn5.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="Lot.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="Block.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="Subdivision.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
 </root>

@@ -811,14 +811,17 @@ namespace Extract.DataEntry
                 base.OnUserAddedRow(e);
 
                 // Re-enter edit mode so that any changes to the validation list based on triggers
-                // are put into effect. 
-                base.EndEdit();
+                // are put into effect.
+                if (EditingControl != null)
+                {
+                    EndEdit();
+                }
 
                 // Obtain the initial value before calling ApplyAttributeToRow which may trigger
                 // auto-update queries and cause the value to change.
                 string initialValue = base.CurrentCell.Value.ToString();
 
-                base.CurrentCell.Value = "";
+                CurrentCell.Value = "";
 
                 // Add a new attribute for the specified row.
                 ApplyAttributeToRow(e.Row.Index - 1, null, null);
@@ -903,7 +906,7 @@ namespace Extract.DataEntry
                 {
                     // An empty vector is a cue to clear mappings and reset the selection to the first
                     // cell.
-                    base.ClearAttributeMappings();
+                    ClearAttributeMappings(false);
                 }
             }
             catch (Exception ex)
@@ -1664,7 +1667,7 @@ namespace Extract.DataEntry
                 {
                     // If no data is being assigned, clear the existing attribute mappings and do not
                     // attempt to map a new attribute.
-                    base.ClearAttributeMappings();
+                    ClearAttributeMappings(false);
 
                     // Ensure _tabOrderPlaceholderAttribute is cleared when propagating null so that
                     // if a parent attribute is deleted, we don't try to use a deleted
@@ -2669,7 +2672,7 @@ namespace Extract.DataEntry
                             // the table.
                             AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this,
                                 column.Index + 1, false, dataEntryTableColumn.TabStopMode,
-                                dataEntryCell.Validator, dataEntryTableColumn.AutoUpdateQuery,
+                                dataEntryCell.ValidatorTemplate, dataEntryTableColumn.AutoUpdateQuery,
                                 dataEntryTableColumn.ValidationQuery);
                         }
                         else
@@ -2680,7 +2683,7 @@ namespace Extract.DataEntry
                                 dataEntryTableColumn.AttributeName,
                                 dataEntryTableColumn.MultipleMatchSelectionMode,
                                 true, attribute.SubAttributes, null, this, column.Index + 1, true,
-                                dataEntryTableColumn.TabStopMode, dataEntryCell.Validator,
+                                dataEntryTableColumn.TabStopMode, dataEntryCell.ValidatorTemplate,
                                 dataEntryTableColumn.AutoUpdateQuery,
                                 dataEntryTableColumn.ValidationQuery);
 

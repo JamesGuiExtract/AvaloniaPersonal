@@ -6028,22 +6028,11 @@ namespace Extract.DataEntry
                 {
                     // If GetNextInvalidAttribute found something, the selection has been changed.
                     changedSelection = true;
-
-                    // Obtain a validator that can be used to generate a 
-                    // DataEntryValidationException for the attribute.
-                    IDataEntryValidator validator =
-                            AttributeStatusInfo.GetStatusInfo(invalidAttribute).Validator;
-
-                    ExtractException.Assert("ELI27082", "Uninitialized validator!",
-                        validator != null);
                     
                     try
                     {
                         // Generate an exception which can be displayed to the user.
-                        if (validator != null)
-                        {
-                            validator.Validate(invalidAttribute);
-                        }
+                        AttributeStatusInfo.Validate(invalidAttribute, true);
                     }
                     catch (DataEntryValidationException validationException)
                     {

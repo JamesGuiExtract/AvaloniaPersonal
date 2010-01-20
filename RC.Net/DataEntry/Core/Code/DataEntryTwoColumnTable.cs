@@ -413,14 +413,7 @@ namespace Extract.DataEntry
                         !this.TableSwipingEnabled || _tableFormattingRule != null);
                 }
 
-                // Initialize the table's one and only column.
-                DataGridViewColumn column = new DataGridViewColumn();
-                column.HeaderText = _displayName;
-                column.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                column.SortMode = DataGridViewColumnSortMode.NotSortable;
-                column.CellTemplate = new DataEntryTextBoxCell();
-
-                base.Columns.Add(column);
+                InitializeColumn();
             }
             catch (Exception ex)
             {
@@ -548,6 +541,8 @@ namespace Extract.DataEntry
                     // as each row is added.
                     base.SuspendLayout();
 
+                    InitializeColumn();
+
                     UpdateRows();
 
                     base.ResumeLayout();
@@ -668,6 +663,14 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Any existing attributes need to be cleared before loading the new attributes
+                // so that the current attributes don't get overwritten by auto-update queries
+                // in the process of loading.
+                if (_sourceAttributes != null && sourceAttributes != null)
+                {
+                    SetAttributes(null);
+                }
+                
                 // [DataEntry:298]
                 // If the table isn't assigned any data, disable it since any data entered would
                 // not be mapped into the attribute hierarchy.
@@ -681,7 +684,7 @@ namespace Extract.DataEntry
                 {
                     // If no data is being assigned, clear the existing attribute mappings and do not
                     // attempt to map a new attribute.
-                    base.ClearAttributeMappings();
+                    ClearAttributeMappings(true);
 
                     _attribute = null;
                 }
@@ -768,7 +771,15 @@ namespace Extract.DataEntry
         /// </summary>
         public override void ClearCachedData()
         {
-            // Nothing to do.
+            try
+            {
+                // Ensure attributes are no longer referenced by any of the cells.
+                ClearAttributeMappings(true);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29212", ex);
+            }
         }
 
         #endregion IDataEntryControl Methods
@@ -967,7 +978,7 @@ namespace Extract.DataEntry
                 {
                     // "." indicates that the parent attribute should be used in this row.
                     AttributeStatusInfo.Initialize(_attribute, _sourceAttributes, this, row.Index,
-                        false, row.TabStopMode, dataEntryCell.Validator, row.AutoUpdateQuery,
+                        false, row.TabStopMode, dataEntryCell.ValidatorTemplate, row.AutoUpdateQuery,
                         row.ValidationQuery);
                     row.Cells[0].Value = _attribute;
                 }
@@ -976,7 +987,7 @@ namespace Extract.DataEntry
                     // Attempts to map an appropriate sub-attribute to the row.
                     row.Cells[0].Value = DataEntryMethods.InitializeAttribute(row.AttributeName,
                         row.MultipleMatchSelectionMode, true, _attribute.SubAttributes, null,
-                        this, row.Index, true, row.TabStopMode, dataEntryCell.Validator,
+                        this, row.Index, true, row.TabStopMode, dataEntryCell.ValidatorTemplate,
                         row.AutoUpdateQuery, row.ValidationQuery);
                 }
 
@@ -1008,6 +1019,24 @@ namespace Extract.DataEntry
             // Fire selection change event to update the highlights to reflect the 
             // new attribute.
             OnSelectionChanged(new EventArgs());
+        }
+
+        /// <summary>
+        /// Creates and assigns the tables one and only (non-configurable) column.
+        /// </summary>
+        void InitializeColumn()
+        {
+            if (Columns.Count == 0)
+            {
+                // Initialize the table's one and only column.
+                DataGridViewColumn column = new DataGridViewColumn();
+                column.HeaderText = _displayName;
+                column.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+                column.CellTemplate = new DataEntryTextBoxCell();
+
+                base.Columns.Add(column);
+            }
         }
 
         #endregion Private Members

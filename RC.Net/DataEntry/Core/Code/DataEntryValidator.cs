@@ -20,7 +20,7 @@ namespace Extract.DataEntry
     /// Provides ability to configure and execute data validation on <see langword="string"/> 
     /// values.
     /// </summary>
-    public class DataEntryValidator : ICopyableObject, IDataEntryValidator
+    public class DataEntryValidator : ICloneable, IDataEntryValidator
     {
         #region Constants
 
@@ -55,13 +55,6 @@ namespace Extract.DataEntry
             /// the correctly cased value).
             /// </summary>
             public Dictionary<string, string> ValidationValues;
-
-            /// <summary>
-            /// If not <see langword="null"/>, rather than match a value from
-            /// <see cref="ValidationValues"/>, this field directly specifies whether the value is
-            /// valid based on the last execution of <see cref="DataEntryQuery"/>.
-            /// </summary>
-            public bool? IsValid;
 
             /// <summary>
             /// <see langword="true"/> if the query represents a validation warning,
@@ -235,10 +228,10 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Gets or set the error message that should be displayed upon validation failure. 
-        /// If unspecified, a default of "Bad value" will be used.
+        /// If unspecified, a default of "Invalid value" will be used.
         /// </summary>
         /// <value>The error that should be displayed upon validation failure.</value>
-        /// <returns>The error that to be displayed upon validation failure.</returns>
+        /// <returns>The error that is to be displayed upon validation failure.</returns>
         public string ValidationErrorMessage
         {
             get
@@ -264,12 +257,11 @@ namespace Extract.DataEntry
         /// </overrides>
         /// <summary>
         /// Tests to see if the provided value meets any validation requirements the validator has
-        /// </summary>
-        /// <param name="value">The <see langword="string"/> value is to be validated.
         /// <para><b>Note</b></para>
         /// If a <see cref="DataEntryQuery"/> provides a list of valid values and the provided value
         /// matches a value in the supplied list case-insensitively but not case-sensitively, the 
-        /// value will be modified to match the casing in the supplied list.</param>
+        /// value will be modified to match the casing in the supplied list.
+        /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> mapped to the value to be
         /// validated. If throwException is <see langword="false"/>, the <see cref="IAttribute"/>'s
         /// associated <see cref="AttributeStatusInfo"/> will be updated to reflect the result of 
@@ -279,20 +271,34 @@ namespace Extract.DataEntry
         /// instance in <see cref="IAttribute.DataObject"/></param>
         /// <param name="throwException">If <see langword="true"/> if the method will throw an
         /// exception if the provided value does not meet validation requirements.</param>
+        /// <param name="correctValue"><see langword="true"/> if the value is valid, to remove any
+        /// extra whitespace and to match the value's casing used by the validator.</param>
+        /// <param name="correctedValue">If the value is valid but has extra whitespace or has
+        /// different casing, this parameter will be populated with a corrected version of the
+        /// value that has already been applied to the attribute. Unused if
+        /// <see paramref="correctValue"/> is <see langword="false"/>.</param>
         /// <returns>A <see cref="DataValidity"/>value indicating whether 
         /// <see paramref="attribute"/>'s value is now valid.
         /// </returns>
-        /// <throws><see cref="DataEntryValidationException"/> if the value fails to match any 
-        /// validation requirements it has.</throws>
-        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "0#")]
-        public DataValidity Validate(ref string value, IAttribute attribute, bool throwException)
+        /// <throws><see cref="DataEntryValidationException"/> if the <see cref="IAttribute"/>'s 
+        /// data fails to match any validation requirements it has and
+        /// <see paramref="throwException"/> is <see langword="true"/></throws>
+        DataValidity Validate(IAttribute attribute, bool throwException, bool correctValue,
+            out string correctedValue)
         {
+            string originalValue = null;
+
             try
             {
+                ExtractException.Assert("ELI29217", "Null argument exception!", attribute != null);
+
                 // Reset the override error message prior to evaluating the value again.
                 _overrideErrorMessage = null;
+                correctedValue = null;
 
                 DataValidity dataValidity = DataValidity.Valid;
+                originalValue = attribute.Value == null ? "" : attribute.Value.String;
+                string value = originalValue;
 
                 // Allow validation lists and queries to be used only to update auto-complete lists
                 // without actually ever validating based on the list items.  Also, since .Net won't
@@ -302,25 +308,8 @@ namespace Extract.DataEntry
                 bool validationEnabled = !string.IsNullOrEmpty(_validationErrorMessage) &&
                                          AttributeStatusInfo.IsValidationEnabled(attribute);
 
-                // Ensure the control's attribute value matches the value of the text it contains.
-                if (validationEnabled &&
-                    ((attribute.Value != null || !string.IsNullOrEmpty(value)) &&
-                     (attribute.Value == null || attribute.Value.String != value)))
-                {
-                    if (throwException)
-                    {
-                        DataEntryValidationException ee = new DataEntryValidationException("ELI24182",
-                            "Unexpected data!",
-                            AttributeStatusInfo.GetStatusInfo(attribute).OwningControl);
-                        throw ee;
-                    }
-                    else
-                    {
-                        dataValidity = DataValidity.Invalid;
-                    }
-                }
                 // If there is a specified validation pattern, check it.
-                else if (validationEnabled &&  _validationRegex != null &&
+                if (validationEnabled &&  _validationRegex != null &&
                          !_validationRegex.IsMatch(value))
                 {
                     if (throwException)
@@ -360,6 +349,15 @@ namespace Extract.DataEntry
                                 }
                             }
                         }
+                        else if (correctValue && value != originalValue)
+                        {
+                            // If the data is valid, correctValue is true, and the validator updated
+                            // the value with new casing, apply the updated value to both the
+                            // control and underlying attribute.
+                            AttributeStatusInfo.SetValue(attribute, value, false, false);
+                            correctedValue = value;
+                            originalValue = value;
+                        }
                     }
 
                     // If validation is enabled and one of the validation queries failed, set the
@@ -392,7 +390,7 @@ namespace Extract.DataEntry
             }
             catch (DataEntryValidationException validationException)
             {
-                validationException.AddDebugData("Value", value, false);
+                validationException.AddDebugData("Value", originalValue, false);
                 throw;
             }
             catch (Exception ex)
@@ -408,26 +406,40 @@ namespace Extract.DataEntry
         /// for casing differences if so configured).</param>
         /// <param name="validationQuery">The <see cref="ValidationQuery"/> that is to be used to
         /// validate the value.</param>
+        /// <returns><see langword="true"/> if the specified <see paramref="value"/> passes
+        /// validation using <see paramref="validationQuery"/>, <see langword="false"/> otherwise.
+        /// </returns>
         bool Validate(ref string value, ValidationQuery validationQuery)
         {
             try
             {
                 bool dataIsValid = true;
-                
-                ExtractException.Assert("ELI28976", "Missing validation query!",
-                    validationQuery.DataEntryQuery != null);
 
-                if (validationQuery.IsValid == null && validationQuery.ValidationValues == null)
+                DataEntryQuery dataEntryQuery = validationQuery.DataEntryQuery;
+                ExtractException.Assert("ELI28976", "Missing validation query!",
+                    dataEntryQuery != null);
+
+                // The validation query needs to be evaluated every time if a ValidValue is being
+                // used or if the validation values have not yet been calculated.
+                if (dataEntryQuery.ValidValue != null || validationQuery.ValidationValues == null)
                 {
-                    QueryResult queryResult = validationQuery.DataEntryQuery.Evaluate(null);
-                    SetValidationQuery(validationQuery.DataEntryQuery, queryResult);
+                    QueryResult queryResult = dataEntryQuery.Evaluate(null);
+
+                    if (dataEntryQuery.ValidValue != null)
+                    {
+                        dataIsValid =
+                            dataEntryQuery.ValidValue.Equals(queryResult.ToString(),
+                                dataEntryQuery.CaseSensitive ?
+                                    StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
+                    }
+                    // If using a validation value list, update the values associated with this query.
+                    else
+                    {
+                        SetValidationQuery(dataEntryQuery, queryResult);
+                    }
                 }
-                
-                if (validationQuery.IsValid != null)
-                {
-                    dataIsValid = validationQuery.IsValid.Value;
-                }
-                else
+
+                if (dataEntryQuery.ValidValue == null)
                 {
                     string valueTrimmed = value.Trim();
                     string listValue;
@@ -496,16 +508,9 @@ namespace Extract.DataEntry
                 if (!queryResults.IsEmpty || dataEntryQuery.ValidValue != null)
                 {
                     // If ValidValue is not null, rather than provide a list, the query result
-                    // should be compared against the specified ValidValue.
-                    if (dataEntryQuery.ValidValue != null)
-                    {
-                        validationQuery.IsValid =
-                            dataEntryQuery.ValidValue.Equals(queryResults.ToString(),
-                                dataEntryQuery.CaseSensitive ?
-                                    StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
-                    }
-                    // Otherwise, generate a list of values to be considered valid.
-                    else
+                    // will be compared against the specified ValidValue.
+                    // If ValidValue is null, generate a list of values to be considered valid.
+                    if (dataEntryQuery.ValidValue == null)
                     {
                         string[] values = queryResults.ToStringArray();
 
@@ -616,15 +621,19 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> whose data is to be validated.
         /// </param>
+        /// <param name="throwException">If <see langword="true"/> if the method will throw an
+        /// exception if the provided value does not meet validation requirements.</param>
+        /// <returns></returns>
         /// <throws><see cref="DataEntryValidationException"/> if the <see cref="IAttribute"/>'s 
-        /// data fails to match any validation requirements it has.</throws>
-        public void Validate(IAttribute attribute)
+        /// data fails to match any validation requirements it has and
+        /// <see paramref="throwException"/> is <see langword="true"/></throws>
+        public DataValidity Validate(IAttribute attribute, bool throwException)
         {
             try
             {
-                string value = attribute.Value == null ? "" : attribute.Value.String;
-
-                Validate(ref value, attribute, true);
+                string correctedValue;
+                
+                return Validate(attribute, throwException, false, out correctedValue);
             }
             catch (Exception ex)
             {
@@ -632,11 +641,58 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Tests to see if the provided <see cref="IAttribute"/> meets any specified 
+        /// validation requirements the <see cref="DataEntryValidator"/> has.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose data is to be validated.
+        /// </param>
+        /// <param name="throwException">If <see langword="true"/> if the method will throw an
+        /// exception if the provided value does not meet validation requirements.</param>
+        /// <param name="correctedValue">If the value is valid but has extra whitespace or has
+        /// different casing, this parameter will be populated with a corrected version of the
+        /// value that has already been applied to the attribute.</param>
+        /// <returns>A <see cref="DataValidity"/>value indicating whether 
+        /// <see paramref="attribute"/>'s value is currently valid.
+        /// </returns>
+        /// <throws><see cref="DataEntryValidationException"/> if the <see cref="IAttribute"/>'s 
+        /// data fails to match any validation requirements it has and
+        /// <see paramref="throwException"/> is <see langword="true"/></throws>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
+        public DataValidity Validate(IAttribute attribute, bool throwException, out string correctedValue)
+        {
+            try
+            {
+                return Validate(attribute, throwException, true, out correctedValue);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29218", ex);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a validator instance that is either not specific to any given attribute or
+        /// is a new copy of the validator to use for a specific attribute.
+        /// </summary>
+        /// <returns>A <see cref="IDataEntryValidator"/> instance.</returns>
+        public IDataEntryValidator GetPerAttributeInstance()
+        {
+            try
+            {
+                return (IDataEntryValidator)Clone();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29175", ex);
+            }
+        }
+
         #endregion IDataEntryValidator Members
 
         #endregion Methods
 
-        #region ICopyableObject Members
+        #region ICloneable Members
 
         /// <summary>
         /// Creates a copy of the current <see cref="DataEntryValidator"/> instance.
@@ -656,35 +712,6 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI26203", ex);
-            }
-        }
-
-        /// <summary>
-        /// Copies the value of the provided <see cref="DataEntryValidator"/> instance into the 
-        /// current one.
-        /// </summary>
-        /// <param name="pObject">The object to copy from.</param>
-        /// <exception cref="ExtractException">If the supplied object is not of type
-        /// <see cref="DataEntryValidator"/>.</exception>
-        public void CopyFrom(object pObject)
-        {
-            try
-            {
-                ExtractException.Assert("ELI26205", "Cannot copy from an object of a different type!",
-                    pObject.GetType() == this.GetType());
-
-                DataEntryValidator source = (DataEntryValidator)pObject;
-
-                _validationRegex = source._validationRegex;
-                _validationErrorMessage = source._validationErrorMessage;
-                // The validation queries will be re-populated when attributes are mapped.
-                _validationQueries.Clear();
-                _correctCase = source._correctCase;
-                _caseSensitive = source._caseSensitive;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI26204", ex);
             }
         }
 
@@ -725,6 +752,35 @@ namespace Extract.DataEntry
             if (this.AutoCompleteValuesChanged != null)
             {
                 AutoCompleteValuesChanged(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Copies the value of the provided <see cref="DataEntryValidator"/> instance into the 
+        /// current one.
+        /// </summary>
+        /// <param name="sourceInstance">The object to copy from.</param>
+        /// <exception cref="ExtractException">If the supplied object is not of type
+        /// <see cref="DataEntryValidator"/>.</exception>
+        void CopyFrom(object sourceInstance)
+        {
+            try
+            {
+                ExtractException.Assert("ELI26205", "Cannot copy from an object of a different type!",
+                    sourceInstance.GetType() == GetType());
+
+                DataEntryValidator sourceValidator = (DataEntryValidator)sourceInstance;
+
+                _validationRegex = sourceValidator._validationRegex;
+                _validationErrorMessage = sourceValidator._validationErrorMessage;
+                // The validation queries will be re-populated when attributes are mapped.
+                _validationQueries.Clear();
+                _correctCase = sourceValidator._correctCase;
+                _caseSensitive = sourceValidator._caseSensitive;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26204", ex);
             }
         }
 

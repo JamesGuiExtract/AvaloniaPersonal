@@ -21,7 +21,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(DataEntryComboBoxCell).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataEntryComboBoxCell).ToString();
 
         #endregion Constants
 
@@ -30,32 +30,37 @@ namespace Extract.DataEntry
         /// <summary>
         /// The attribute whose value is associated with this cell.
         /// </summary>
-        private IAttribute _attribute;
+        IAttribute _attribute;
 
         /// <summary>
-        /// The object that is to provided validation of this cell's data.
+        /// The template object to be used as a model for per-attribute validation objects.
         /// </summary>
-        private DataEntryValidator _validator;
+        DataEntryValidator _validatorTemplate;
+
+        /// <summary>
+        /// The validator currently being used to validate the control's attribute.
+        /// </summary>
+        IDataEntryValidator _activeValidator;
 
         /// <summary>
         /// Specifies whether carriage return or new line characters will be replaced with spaces.
         /// </summary>
-        private bool _removeNewLineChars = true;
+        bool _removeNewLineChars = true;
 
         /// <summary>
         /// The <see cref="DataEntryTable"/> the cell is associated with.
         /// </summary>
-        private DataEntryTableBase _dataEntryTable;
+        DataEntryTableBase _dataEntryTable;
 
         /// <summary>
         /// Indicates whether the cell is being dragged as part of a drag and drop operation.
         /// </summary>
-        private bool _isBeingDragged;
+        bool _isBeingDragged;
 
         /// <summary>
         /// Indicates whether the cell's value is in the process of being initialized.
         /// </summary>
-        private bool _initializingValue;
+        bool _initializingValue;
 
         #endregion Fields
 
@@ -109,7 +114,41 @@ namespace Extract.DataEntry
 
             set
             {
-                _attribute = value;
+                try
+                {
+                    if (_attribute != value)
+                    {
+                        // Stop listening to the previous active validator (if there is one)
+                        if (_activeValidator != null)
+                        {
+                            _activeValidator.AutoCompleteValuesChanged -=
+                                HandleAutoCompleteValuesChanged;
+                            _activeValidator = null;
+                        }
+
+                        _attribute = value;
+
+                        // Update the combo box using the new attribute's validator (if there is
+                        // one).
+                        if (_attribute != null)
+                        {
+                            _activeValidator =
+                                AttributeStatusInfo.GetStatusInfo(_attribute).Validator;
+
+                            if (_activeValidator != null)
+                            {
+                                UpdateItemList();
+
+                                _activeValidator.AutoCompleteValuesChanged +=
+                                    HandleAutoCompleteValuesChanged;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI29216", ex);
+                }
             }
         }
 
@@ -121,33 +160,16 @@ namespace Extract.DataEntry
         /// data.</value>
         /// <returns>The <see cref="DataEntryValidator"/> used to validate this cell's data.
         /// </returns>
-        public DataEntryValidator Validator
+        public DataEntryValidator ValidatorTemplate
         {
             get
             {
-                return _validator;
+                return _validatorTemplate;
             }
 
             set
             {
-                try
-                {
-                    if (value != _validator)
-                    {
-                        if (_validator != null)
-                        {
-                            _validator.AutoCompleteValuesChanged -= HandleAutoCompleteValuesChanged;
-                        }
-
-                        _validator = value;
-
-                        _validator.AutoCompleteValuesChanged += HandleAutoCompleteValuesChanged;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI26208", ex);
-                }
+                _validatorTemplate = value;
             }
         }
 
@@ -228,10 +250,7 @@ namespace Extract.DataEntry
             {
                 DataEntryComboBoxCell clone = (DataEntryComboBoxCell)base.Clone();
 
-                if (_validator != null)
-                {
-                    clone.Validator = (DataEntryValidator)_validator.Clone();
-                }
+                clone.ValidatorTemplate = _validatorTemplate;
                 clone.RemoveNewLineChars = _removeNewLineChars;
 
                 return clone;
@@ -321,7 +340,7 @@ namespace Extract.DataEntry
         /// <see langword="false"/></returns>
         protected override bool SetValue(int rowIndex, object value)
         {
-            bool result;
+            bool result = false;
 
             try
             {
@@ -342,7 +361,7 @@ namespace Extract.DataEntry
                     }
 
                     // If so, use the provided attribute.
-                    _attribute = attribute;
+                    Attribute = attribute;
                 }
                 else
                 {
@@ -389,22 +408,34 @@ namespace Extract.DataEntry
                 {
                     result = base.SetValue(rowIndex, _attribute.Value.String);
 
-                    if (base.DataGridView.Visible && base.Visible)
+                    if (DataGridView == null)
                     {
-                        // [DataEntry:243]
-                        // Set viewable now rather than later, otherwise HasBeenViewed will return
-                        // false on the basis that the attribute is not viewable.
-                        AttributeStatusInfo.MarkAsViewable(_attribute, true);
+                        // [DataEntry:765]
+                        // The value can be updated with a null DataGridView as long as it has an
+                        // already initialized attribute and the value is not being set with an
+                        // attribute.
+                        ExtractException.Assert("ELI29202",
+                            "Failed to apply attribute to table cell!", attribute == null);
                     }
-
-                    // If a control is read-only, consider the attribute as viewed since it is
-                    // unlikely to matter if a field that can't be changed was viewed.
-                    if (base.DataGridView.ReadOnly || base.ReadOnly)
+                    else
                     {
-                        AttributeStatusInfo.MarkAsViewed(_attribute, true);
-                    }
+                        if (DataGridView.Visible && Visible)
+                        {
+                            // [DataEntry:243]
+                            // Set viewable now rather than later, otherwise HasBeenViewed will return
+                            // false on the basis that the attribute is not viewable.
+                            AttributeStatusInfo.MarkAsViewable(_attribute, true);
+                        }
 
-                    _dataEntryTable.UpdateCellStyle((IDataEntryTableCell)this);
+                        // If a control is read-only, consider the attribute as viewed since it is
+                        // unlikely to matter if a field that can't be changed was viewed.
+                        if (DataGridView.ReadOnly || ReadOnly)
+                        {
+                            AttributeStatusInfo.MarkAsViewed(_attribute, true);
+                        }
+
+                        _dataEntryTable.UpdateCellStyle((IDataEntryTableCell)this);
+                    }
                 }
                 else
                 {
@@ -412,9 +443,9 @@ namespace Extract.DataEntry
                 }
 
                 // If a value was applied, validate it.
-                if (result)
+                if (result && _dataEntryTable != null)
                 {
-                    DataEntryTableBase.ValidateCell(this, false);
+                    _dataEntryTable.ValidateCell(this, false);
                 }
 
                 if (spatialInfoChanged)
@@ -430,7 +461,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI24288", ex);
+                ExtractException.Display("ELI24288", ex);
             }
 
             return result;
@@ -479,7 +510,7 @@ namespace Extract.DataEntry
         /// Raises the <see cref="IDataEntryTableCell.CellSpatialInfoChanged"/> event
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> associated with the event.</param>
-        private void OnCellSpatialInfoChanged(IAttribute attribute)
+        void OnCellSpatialInfoChanged(IAttribute attribute)
         {
             if (this.CellSpatialInfoChanged != null)
             {
@@ -493,31 +524,43 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleAutoCompleteValuesChanged(object sender, EventArgs e)
+        void HandleAutoCompleteValuesChanged(object sender, EventArgs e)
         {
             try
             {
-                // Reseting the item list will clear the value. Preserve the original
-                // value.
-                string originalValue = base.Value.ToString();
-
-                string[] autoCompleteValues = _validator.GetAutoCompleteValues();
-
-                base.Items.Clear();
-
-                if (autoCompleteValues != null)
-                {
-                    base.Items.AddRange(autoCompleteValues);
-
-                    // Restore the original value
-                    base.Value = originalValue;
-                }
+                UpdateItemList();
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26209", ex);
                 ee.AddDebugData("Event data", e, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Updates the items in the combo box using the validator (if there is one).
+        /// </summary>
+        void UpdateItemList()
+        {
+            if (_activeValidator != null)
+            {
+                string[] autoCompleteValues = _activeValidator.GetAutoCompleteValues();
+
+                if (autoCompleteValues != null)
+                {
+                    // Reseting the item list will clear the value. Preserve the original value.
+                    string originalValue = Value.ToString();
+
+                    Items.Clear();
+                    Items.AddRange(autoCompleteValues);
+
+                    // Restore the original value
+                    if (Items.Contains(originalValue))
+                    {
+                        Value = originalValue;
+                    }
+                }
             }
         }
 

@@ -34,9 +34,9 @@ namespace Extract.DataEntry
         private IAttribute _attribute;
 
         /// <summary>
-        /// The object that is to provided validation of this cell's data.
+        /// The template object to be used as a model for per-attribute validation objects.
         /// </summary>
-        private DataEntryValidator _validator;
+        private DataEntryValidator _validatorTemplate;
 
         /// <summary>
         /// Specifies whether carriage return or new line characters will be replaced with spaces.
@@ -81,7 +81,7 @@ namespace Extract.DataEntry
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI25584", _OBJECT_NAME);
 
-                _dataEntryTable = base.DataGridView as DataEntryTableBase;
+                _dataEntryTable = DataGridView as DataEntryTableBase;
             }
             catch (Exception ex)
             {
@@ -122,16 +122,16 @@ namespace Extract.DataEntry
         /// data.</value>
         /// <returns>The <see cref="DataEntryValidator"/> used to validate this cell's data.
         /// </returns>
-        public DataEntryValidator Validator
+        public DataEntryValidator ValidatorTemplate
         {
             get
             {
-                return _validator;
+                return _validatorTemplate;
             }
 
             set
             {
-                _validator = value;
+                _validatorTemplate = value;
             }
         }
 
@@ -212,10 +212,7 @@ namespace Extract.DataEntry
             {
                 DataEntryTextBoxCell clone = (DataEntryTextBoxCell)base.Clone();
 
-                if (_validator != null)
-                {
-                    clone._validator = (DataEntryValidator)_validator.Clone();
-                }
+                clone.ValidatorTemplate = _validatorTemplate;
                 clone.RemoveNewLineChars = _removeNewLineChars;
 
                 return clone;
@@ -235,7 +232,7 @@ namespace Extract.DataEntry
             {
                 base.OnDataGridViewChanged();
 
-                _dataEntryTable = base.DataGridView as DataEntryTableBase;
+                _dataEntryTable = DataGridView as DataEntryTableBase;
             }
             catch (Exception ex)
             {
@@ -306,7 +303,7 @@ namespace Extract.DataEntry
         /// <see langword="false"/></returns>
         protected override bool SetValue(int rowIndex, object value)
         {
-            bool result;
+            bool result = false;
 
             try
             {
@@ -327,7 +324,7 @@ namespace Extract.DataEntry
                     }
 
                     // If so, use the provided attribute.
-                    _attribute = attribute;                    
+                    Attribute = attribute;                    
                 }
                 else
                 {
@@ -382,22 +379,34 @@ namespace Extract.DataEntry
                 {
                     result = base.SetValue(rowIndex, _attribute.Value.String);
 
-                    if (base.DataGridView.Visible && base.Visible)
+                    if (DataGridView == null)
                     {
-                        // [DataEntry:243]
-                        // Set viewable now rather than later, otherwise HasBeenViewed will return
-                        // false on the basis that the attribute is not viewable.
-                        AttributeStatusInfo.MarkAsViewable(_attribute, true);
+                        // [DataEntry:765]
+                        // The value can be updated with a null DataGridView as long as it has an
+                        // already initialized attribute and the value is not being set with an
+                        // attribute.
+                        ExtractException.Assert("ELI29203",
+                            "Failed to apply attribute to table cell!", attribute == null);
                     }
-
-                    // If a control is read-only, consider the attribute as viewed since it is
-                    // unlikely to matter if a field that can't be changed was viewed.
-                    if (base.DataGridView.ReadOnly || base.ReadOnly)
+                    else
                     {
-                        AttributeStatusInfo.MarkAsViewed(_attribute, true);
-                    }
+                        if (DataGridView.Visible && Visible)
+                        {
+                            // [DataEntry:243]
+                            // Set viewable now rather than later, otherwise HasBeenViewed will return
+                            // false on the basis that the attribute is not viewable.
+                            AttributeStatusInfo.MarkAsViewable(_attribute, true);
+                        }
 
-                    _dataEntryTable.UpdateCellStyle((IDataEntryTableCell)this);
+                        // If a control is read-only, consider the attribute as viewed since it is
+                        // unlikely to matter if a field that can't be changed was viewed.
+                        if (DataGridView.ReadOnly || ReadOnly)
+                        {
+                            AttributeStatusInfo.MarkAsViewed(_attribute, true);
+                        }
+
+                        _dataEntryTable.UpdateCellStyle((IDataEntryTableCell)this);
+                    }
                 }
                 else
                 {
@@ -405,9 +414,9 @@ namespace Extract.DataEntry
                 }
 
                 // If a value was applied, validate it.
-                if (result)
+                if (result && _dataEntryTable != null)
                 {
-                    DataEntryTableBase.ValidateCell(this, false);
+                    _dataEntryTable.ValidateCell(this, false);
                 }
 
                 if (spatialInfoChanged)
@@ -423,7 +432,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI25583", ex);
+                ExtractException.Display("ELI25583", ex);
             }
 
             return result;

@@ -849,8 +849,6 @@ namespace Extract.DataEntry
         /// Gets or sets the <see cref="IDataEntryValidator"/> used to validate the associated 
         /// <see cref="IAttribute"/>'s data.
         /// </summary>
-        /// <value>The <see cref="IDataEntryValidator"/> used to validate the associated 
-        /// <see cref="IAttribute"/>'s data.</value>
         /// <returns>The <see cref="IDataEntryValidator"/> used to validate the associated 
         /// <see cref="IAttribute"/>'s data.</returns>
         public IDataEntryValidator Validator
@@ -858,11 +856,6 @@ namespace Extract.DataEntry
             get
             {
                 return _validator;
-            }
-
-            set
-            {
-                _validator = value;
             }
         }
 
@@ -1033,6 +1026,8 @@ namespace Extract.DataEntry
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI26109", _OBJECT_NAME);
 
+                ExtractException.Assert("ELI29196", "Null attribute exception!", attribute != null);
+
                 AttributeStatusInfo statusInfo;
                 if (!_statusInfoMap.TryGetValue(attribute, out statusInfo))
                 {
@@ -1120,9 +1115,10 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/> to keep any display order it already has.</param>
         /// <param name="considerPropagated"><see langword="true"/> to consider the 
         /// <see cref="IAttribute"/> already propagated; <see langword="false"/> otherwise.</param>
-        /// <param name="validator">An object to be used to validate the data contained in the
-        /// <see cref="IAttribute"/>. Can be <see langword="null"/> to keep the existing validator
-        /// or if data validation is not required.</param>
+        /// <param name="validatorTemplate">A template to be used as the master for any per-attribute
+        /// <see cref="IDataEntryValidator"/> created to validate the attribute's data.
+        /// Can be <see langword="null"/> to keep the existing validator or if data validation is
+        /// not required.</param>
         /// <param name="tabStopMode">A <see cref="TabStopMode"/> value indicatng under what
         /// circumstances the attribute should serve as a tab stop. Can be <see langword="null"/> to
         /// keep the existing tabStopMode settin.</param>
@@ -1135,7 +1131,7 @@ namespace Extract.DataEntry
         [ComVisible(false)]
         public static void Initialize(IAttribute attribute, IUnknownVector sourceAttributes, 
             IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
-            TabStopMode? tabStopMode, IDataEntryValidator validator, string autoUpdateQuery,
+            TabStopMode? tabStopMode, IDataEntryValidator validatorTemplate, string autoUpdateQuery,
             string validationQuery)
         {
             try
@@ -1201,9 +1197,13 @@ namespace Extract.DataEntry
                 }
 
                 // Set/update the validator if necessary.
-                if (validator != null && statusInfo._validator != validator)
+                if (validatorTemplate != null && statusInfo._validator == null)
                 {
-                    statusInfo._validator = validator;
+                    // [DataEntry:861]
+                    // Recent changes to validation in the DataEntry framework now require
+                    // validators to have a 1 to 1 relationship with attribute it is validating so
+                    // long as the validation is attribute specific.
+                    statusInfo._validator = validatorTemplate.GetPerAttributeInstance();
                 }
 
                 // Update the tabStopMode if necessary
@@ -1656,6 +1656,85 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI26107", ex);
+            }
+        }
+
+        /// <overloads>
+        /// Tests to see if the provided <see cref="IAttribute"/> meets any validation requirements
+        /// the associated <see cref="DataEntryValidator"/> has.
+        /// </overloads>
+        /// <summary>
+        /// Tests to see if the provided <see cref="IAttribute"/> meets any validation requirements
+        /// the associated <see cref="DataEntryValidator"/> has.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to validate.</param>
+        /// <param name="throwException">If <see langword="true"/> the method will throw an
+        /// exception if the provided value does not meet validation requirements.</param>
+        /// <returns>A <see cref="DataValidity"/>value indicating whether 
+        /// <see paramref="attribute"/>'s value is currently valid.</returns>
+        [ComVisible(false)]
+        public static DataValidity Validate(IAttribute attribute, bool throwException)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI29200", _OBJECT_NAME);
+
+                IDataEntryValidator validator = GetStatusInfo(attribute).Validator;
+                if (validator == null)
+                {
+                    return DataValidity.Valid;
+                }
+                else
+                {
+                    return validator.Validate(attribute, throwException);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29176", ex);
+            }
+        }
+
+        /// <summary>
+        /// Tests to see if the provided <see cref="IAttribute"/> meets any validation requirements
+        /// the associated <see cref="DataEntryValidator"/> has. If valid, uses the validator to
+        /// match the casing in the validator and to remove extra whitespace.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to validate.</param>
+        /// <param name="throwException">If <see langword="true"/> if the method will throw an
+        /// exception if the provided value does not meet validation requirements.</param>
+        /// <param name="correctedValue">A corrected value applied to the attribute or
+        /// <see langword="null"/> if no changes to the attribute's value were made.</param>
+        /// <returns>A <see cref="DataValidity"/>value indicating whether 
+        /// <see paramref="attribute"/>'s value is currently valid.</returns>
+        [ComVisible(false)]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
+        public static DataValidity Validate(IAttribute attribute, bool throwException,
+            out string correctedValue)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.DataEntryCoreComponents, "ELI29201", _OBJECT_NAME);
+
+                correctedValue = null;
+
+                IDataEntryValidator validator = GetStatusInfo(attribute).Validator;
+                if (validator == null)
+                {
+                    return DataValidity.Valid;
+                }
+                else
+                {
+                    return validator.Validate(attribute, throwException, out correctedValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29199", ex);
             }
         }
 
@@ -2798,7 +2877,7 @@ namespace Extract.DataEntry
                 }
                 // If the parent attribute is specified, return the result of running the remaining
                 // query on the parent attribute.
-                else if (query.Substring(0, 2) == "..")
+                else if (query.StartsWith("..", StringComparison.Ordinal))
                 {
                     ExtractException.Assert("ELI26141", "Invalid attribute query!",
                         rootAttribute != null);

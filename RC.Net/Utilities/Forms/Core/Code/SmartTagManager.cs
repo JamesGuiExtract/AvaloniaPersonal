@@ -682,6 +682,13 @@ namespace Extract.Utilities.Forms
         /// </summary>
         void PositionControl()
         {
+            // [DataEntry:836, 873]
+            // Ensure the manager is still active.
+            if (Parent == null)
+            {
+                return;
+            }
+            
             TextBoxBase textControl = (TextBoxBase)Parent;
 
             // Find the point on screen to place this control.
@@ -716,6 +723,12 @@ namespace Extract.Utilities.Forms
         {
             try
             {
+                if (_activeTextControl != null)
+                {
+                    _activeTextControl.TextChanged -= HandleTextBoxControlTextChanged;
+                    _activeTextControl.LostFocus -= HandleFocusedTextControlLostFocus;
+                }
+
                 _activeTextControl = null;
                 
                 if (Parent != null)

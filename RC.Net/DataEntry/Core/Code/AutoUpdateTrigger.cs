@@ -47,6 +47,11 @@ namespace Extract.DataEntry
         /// </summary>
         private bool _validationTrigger;
 
+        /// <summary>
+        /// Indicates whether the trigger as updated the target attribute since its creation.
+        /// </summary>
+        bool _hasUpdatedValue;
+
         #endregion Fields
 
         #region Contructors
@@ -115,7 +120,10 @@ namespace Extract.DataEntry
                 }
 
                 // Attempt to update the value once the query has been loaded.
-                UpdateValue();
+                if (resolveOnLoad)
+                {
+                    UpdateValue();
+                }
             }
             catch (Exception ex)
             {
@@ -206,8 +214,9 @@ namespace Extract.DataEntry
                 }
 
                 // If any attribute was registered as a trigger, attempt to update the target
-                // attribute.
-                if (registeredTrigger)
+                // attribute. Also attempt an update if a general registration call is being made
+                // (attribute == null) and UpdateValue has not yet been called.
+                if (registeredTrigger || (attribute == null && !_hasUpdatedValue))
                 {
                     UpdateValue();
                 }
@@ -251,6 +260,8 @@ namespace Extract.DataEntry
                         }
                     }
                 }
+
+                _hasUpdatedValue = valueUpdated;
 
                 return valueUpdated;
             }

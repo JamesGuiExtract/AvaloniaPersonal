@@ -62,9 +62,9 @@ namespace Extract.DataEntry
         IRuleSet _formattingRule;
 
         /// <summary>
-        /// The object which will provide validation for cell data.
+        /// The template object to be used as a model for per-attribute validation objects.
         /// </summary>
-        DataEntryValidator _validator = new DataEntryValidator();
+        DataEntryValidator _validatorTemplate = new DataEntryValidator();
 
         /// <summary>
         /// A query which will cause value to automatically be updated using the values from other
@@ -307,7 +307,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    return _validator.ValidationPattern;
+                    return _validatorTemplate.ValidationPattern;
                 }
                 catch (Exception ex)
                 {
@@ -319,7 +319,12 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    _validator.ValidationPattern = value;
+                    if (_validatorTemplate.ValidationPattern != value)
+                    {
+                        _validatorTemplate.ValidationPattern = value;
+
+                        UpdateCellValidatorTemplates();
+                    }
                 }
                 catch (ExtractException ex)
                 {
@@ -355,7 +360,19 @@ namespace Extract.DataEntry
 
             set
             {
-                _validationQuery = value;
+                try
+                {
+                    if (_validationQuery != value)
+                    {
+                        _validationQuery = value;
+
+                        UpdateCellValidatorTemplates();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI29168", ex);
+                }
             }
         }
 
@@ -373,12 +390,24 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _validator.CorrectCase;
+                return _validatorTemplate.CorrectCase;
             }
 
             set
             {
-                _validator.CorrectCase = value;
+                try
+                {
+                    if (_validatorTemplate.CorrectCase != value)
+                    {
+                        _validatorTemplate.CorrectCase = value;
+                        
+                        UpdateCellValidatorTemplates();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI29169", ex);
+                }
             }
         }
 
@@ -395,12 +424,24 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _validator.CaseSensitive;
+                return _validatorTemplate.CaseSensitive;
             }
 
             set
             {
-                _validator.CaseSensitive = value;
+                try
+                {
+                    if (_validatorTemplate.CaseSensitive != value)
+                    {
+                        _validatorTemplate.CaseSensitive = value;
+                        
+                        UpdateCellValidatorTemplates();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI29170", ex);
+                }
             }
         }
 
@@ -419,7 +460,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    return _validator.ValidationErrorMessage;
+                    return _validatorTemplate.ValidationErrorMessage;
                 }
                 catch (Exception ex)
                 {
@@ -431,7 +472,12 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    _validator.ValidationErrorMessage = value;
+                    if (_validatorTemplate.ValidationErrorMessage != value)
+                    {
+                        _validatorTemplate.ValidationErrorMessage = value;
+
+                        UpdateCellValidatorTemplates();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -659,29 +705,8 @@ namespace Extract.DataEntry
             {
                 base.OnDataGridViewChanged();
 
-                // If a valid grid has been specified and combo boxes are being used, initialize the
-                // item list in each cell.
-                if (base.DataGridView != null && _useComboBoxCells)
-                {
-                    string[] autoCompleteValues = _validator.GetAutoCompleteValues();
-
-                    ExtractException.Assert("ELI25934", "Auto-complete query must be specified " +
-                        "for ComboBox cells!", _inDesignMode || autoCompleteValues != null);
-
-                    if (autoCompleteValues != null)
-                    {
-                        // Create a template to use in each cell.
-                        DataEntryComboBoxCell template = new DataEntryComboBoxCell();
-                        template.Items.AddRange(autoCompleteValues);
-
-                        // Loop through the cell in each column of the table, and replace the
-                        // cell with a clone of the template.
-                        for (int i = 0; i < base.DataGridView.ColumnCount; i++)
-                        {
-                            base.Cells[i] = (DataGridViewCell)template.Clone();
-                        }
-                    }
-                }
+                // Initialize the validator and auto-complete/item list in for cell.
+                UpdateCellValidatorTemplates();
             }
             catch (Exception ex)
             {
@@ -694,24 +719,33 @@ namespace Extract.DataEntry
         #region Private Members
 
         /// <summary>
-        /// Updates the items in the combo box's list using the current validation list.
+        /// Updates the ValidatorTemplates of the row's cells to reflect the current
+        /// _validatorTemplate.
         /// </summary>
-        void UpdateComboBoxItems()
+        void UpdateCellValidatorTemplates()
         {
-            // If an auto-complete list was specified, use it to populate the combo box items.
-            string[] autoCompleteValues = _validator.GetAutoCompleteValues();
-            if (autoCompleteValues != null)
+            // If the row does yet belong to a DataGridView, there is nothing to do.
+            if (DataGridView == null)
             {
-                foreach (DataEntryComboBoxCell cell in base.Cells)
+                return;
+            }
+
+            // Update the validator template for each cell in a column that is not a 
+            // DataEntryTableColumn (in which case the column will be managing the cells).
+            foreach (DataGridViewCell cell in Cells)
+            {
+                if (cell.ColumnIndex >= 0)
                 {
-                    // Reseting the item list will clear the value. Preserve the original value.
-                    string originalValue = cell.Value.ToString();
+                    IDataEntryTableCell dataEntryCell = cell as IDataEntryTableCell;
 
-                    cell.Items.Clear();
-                    cell.Items.AddRange(autoCompleteValues);
-
-                    // Restore the original value
-                    cell.Value = originalValue;
+                    if (dataEntryCell != null)
+                    {
+                        DataGridViewColumn column = DataGridView.Columns[cell.ColumnIndex];
+                        if (!(column is DataEntryTableColumn))
+                        {
+                            dataEntryCell.ValidatorTemplate = _validatorTemplate;
+                        }
+                    }
                 }
             }
         }

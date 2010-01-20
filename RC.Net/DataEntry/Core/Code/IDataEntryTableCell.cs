@@ -26,7 +26,7 @@ namespace Extract.DataEntry
         /// data.</value>
         /// <returns>The <see cref="DataEntryValidator"/> used to validate a cell's data.
         /// </returns>
-        DataEntryValidator Validator { get; set; }
+        DataEntryValidator ValidatorTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets whether carriage return or new line characters will be replaced with

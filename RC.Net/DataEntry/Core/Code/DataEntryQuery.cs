@@ -91,7 +91,7 @@ namespace Extract.DataEntry
         /// Specifies whether the query node should be parameterized if it is used
         /// in an <see cref="SqlQueryNode"/>.
         /// </summary>
-        bool _parameterize;
+        bool _parameterize = true;
 
         /// <summary>
         /// Specifies the way in which spatial information will be persisted from this
@@ -163,7 +163,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the query's result will be parameterized when
         /// used as part of an <see cref="SqlQueryNode"/>, <see langword="false"/> if the
         /// query's result will be used as literal text.</returns>
-        public virtual bool Parameterize
+        public bool Parameterize
         {
             get
             {
@@ -244,7 +244,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <value>The <see cref="MultipleQueryResultSelectionMode"/> that should be used to
         /// determine how multiple resulting values should be handled.</value>
-        public virtual MultipleQueryResultSelectionMode SelectionMode
+        public MultipleQueryResultSelectionMode SelectionMode
         {
             get
             {
@@ -510,6 +510,10 @@ namespace Extract.DataEntry
             : base(MultipleQueryResultSelectionMode.List, false)
         {
             _query = query;
+
+            // A literal query node is the only node type that should default to being parameterized
+            // in an SQL query (since the text would almost certainly be the SQL query itself).
+            Parameterize = false;
         }
 
         /// <summary>
@@ -542,7 +546,13 @@ namespace Extract.DataEntry
             ExtractException.Assert("ELI26753", "Cannot evaluate un-resolved query!",
                 this.GetIsMinimallyResolved());
 
-            string expandedQuery = AttributeStatusInfo.SourceDocumentPathTags.Expand(_query);
+            // [DataEntry:858]
+            // Do not unnecessarily call SourceDocumentPathTags.Expand()-- this method is called a
+            // lot and SourceDocumentPathTags.Expand() uses an expensive COM call.
+            bool containsPossiblePathTag = (_query.Contains("$") || 
+                _query.IndexOf("<SourceDocName>",StringComparison.OrdinalIgnoreCase) >= 0);
+            string expandedQuery = containsPossiblePathTag ?
+                AttributeStatusInfo.SourceDocumentPathTags.Expand(_query) : _query;
 
             // Treat separate lines as separate values.
             string[] parsedQuery =
@@ -1060,8 +1070,6 @@ namespace Extract.DataEntry
                 _rootAttribute = rootAttribute;
                 _rootPath = AttributeStatusInfo.GetFullPath(_rootAttribute);
                 _dbConnection = dbConnection;
-
-                base.Parameterize = true;
             }
             catch (Exception ex)
             {
