@@ -726,6 +726,22 @@ namespace Extract.Imaging.Forms
             {
                 DrawRegion(graphics, clip, transform, color, 
                     NativeMethods.BinaryRasterOperations.R2_MASKPEN);
+
+                // This is done outside of DrawRegion so it is not rendered in a printed document
+                if (BorderColor != null)
+                {
+                    Point start;
+                    Point end;
+                    int height;
+                    GetBorderZone(out start, out end, out height);
+
+                    Point[] vertices = GeometryMethods.GetVertices(start, end, height);
+
+                    transform.TransformPoints(vertices);
+
+                    Pen pen = ExtractPens.GetThickPen(BorderColor.Value);
+                    graphics.DrawPolygon(pen, vertices);
+                }
             }
             catch (Exception ex)
             {
@@ -809,21 +825,6 @@ namespace Extract.Imaging.Forms
                     ImageViewer.Transform.TransformPoints(vertices);
                     graphics.DrawPolygon(
                         ExtractPens.GetThickDashedPen(_outlineColor.Value), vertices);
-                }
-
-                if (BorderColor != null)
-                {
-                    Point start;
-                    Point end;
-                    int height;
-                    GetBorderZone(out start, out end, out height);
-
-                    Point[] vertices = GeometryMethods.GetVertices(start, end, height);
-
-                    ImageViewer.Transform.TransformPoints(vertices);
-
-                    Pen pen = ExtractPens.GetThickPen(BorderColor.Value);
-                    graphics.DrawPolygon(pen, vertices);
                 }
             }
         }
