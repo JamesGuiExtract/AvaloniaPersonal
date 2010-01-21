@@ -382,39 +382,12 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 		// Check License
 		validateLicense();
 
-		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-		ADODB::_ConnectionPtr ipConnection = NULL;
-		
-		BEGIN_CONNECTION_RETRY();
-		
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
-
-		// Lock the database for this instance
-		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
-
-		// Make sure the DB Schema is the expected version
-		validateDBSchemaVersion();
-		
-		_lastCodePos = "10";
-		
 		// Replace any occurences of ' with '' this is because SQL Server use the ' to indicate the beginning and end of a string
 		string strFileName = asString(strFile);
 		replaceVariable(strFileName, "'", "''");
 
 		// Open a recordset that contain only the record (if it exists) with the given filename
 		string strFileSQL = "SELECT * FROM FAMFile WHERE FileName = '" + strFileName + "'";
-
-		// Create a pointer to a recordset
-		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI13535", ipFileSet != NULL);
-
-		_lastCodePos = "20";
-
-		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdText);
-
-		_lastCodePos = "30";
 
 		// put the unaltered file name back in the strFileName variable
 		strFileName = asString(strFile);
@@ -423,71 +396,100 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewFileRecord(CLSID_FileRecord);
 		ASSERT_RESOURCE_ALLOCATION("ELI14203", ipNewFileRecord != NULL);
 
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database for this instance
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		_lastCodePos = "10";
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI13535", ipFileSet != NULL);
+
+		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText);
+
+		_lastCodePos = "30";
+
+		// Check whether the file already exists in the database
+		*pbAlreadyExists = asVariantBool(ipFileSet->adoEOF == VARIANT_FALSE);
+
 		// Initialize the id
 		long nID = 0;
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
 
-		_lastCodePos = "40";
-
 		// Set the action name from the parameter
 		string strActionName = asString(strAction);
-		
+
 		// Get the action ID and update the strActionName to stored value
 		long nActionID = getActionID(ipConnection, strActionName);
+		_lastCodePos = "45";
 
 		// Action Column to update
 		string strActionCol = "ASC_" + strActionName;
 
-		// Get the size of the file
-		// [LRCAU #5157] - getSizeOfFile performs a wait for file access call, no need
-		// to perform an additional call here.
-		long long llFileSize;
-		llFileSize = (long long)getSizeOfFile(strFileName);
+		// Get the previous status (if there was no previous record then the previous status
+		// is always unattempted
+		*pPrevStatus = *pbAlreadyExists == VARIANT_TRUE ?
+			asEActionStatus(getStringField(ipFileSet->Fields, strActionCol)) : kActionUnattempted;
+		_lastCodePos = "48";
 
-		// get the file type
-		EFileType efType = getFileType(strFileName);
+		// Only update file size and page count if the previous status is unattempted
+		// or force status change is true
+		// [FlexIDSCore #3734]
+		long long llFileSize = 0;
 		long nPages = 0;
-
-		// if it is an image file OR unknown file [p13 #4816] attempt to
-		// get the number of pages
-		if (efType == kImageFile || efType == kUnknown)
+		if (*pPrevStatus == kActionUnattempted || bForceStatusChange == VARIANT_TRUE)
 		{
-			try
+			// Get the size of the file
+			// [LRCAU #5157] - getSizeOfFile performs a wait for file access call, no need
+			// to perform an additional call here.
+			llFileSize = (long long)getSizeOfFile(strFileName);
+
+			// get the file type
+			EFileType efType = getFileType(strFileName);
+
+			// if it is an image file OR unknown file [p13 #4816] attempt to
+			// get the number of pages
+			if (efType == kImageFile || efType == kUnknown)
 			{
-				// Get the number of pages in the file if it is an image file
-				nPages = getNumberOfPagesInImage(strFileName);
-			}
-			catch(...)
-			{
-				// if there is an error this may not be a valid image file but we still want
-				// to put it in the database
-				nPages = 0;
+				try
+				{
+					// Get the number of pages in the file if it is an image file
+					nPages = getNumberOfPagesInImage(strFileName);
+				}
+				catch(...)
+				{
+					// if there is an error this may not be a valid image file but we still want
+					// to put it in the database
+					nPages = 0;
+				}
 			}
 		}
-		// Set the number of pages in return record
-		ipNewFileRecord->Pages = nPages;
 
-		// Set the Name in return record
-		ipNewFileRecord->Name = strFileName.c_str();
-
-		// Set the FileSize in return record
-		ipNewFileRecord->FileSize = llFileSize;
-
-		// Set the priority in return record
-		ipNewFileRecord->Priority = (UCLID_FILEPROCESSINGLib::EFilePriority) ePriority;
+		// Update the new file record with the file data
+		ipNewFileRecord->SetFileData(-1, nActionID, strFileName.c_str(),
+			llFileSize, nPages, (UCLID_FILEPROCESSINGLib::EFilePriority) ePriority);
 
 		_lastCodePos = "50";
 
 		string strNewStatus = asStatusString(eNewStatus);
 
-		// If no records were returned a new record should be added to the FAMFile
-		if (ipFileSet->BOF == VARIANT_TRUE)
+		// If file did not already exist then add a new record to the database
+		if (*pbAlreadyExists == VARIANT_FALSE)
 		{
-			// The filename is not in the table
-			*pbAlreadyExists = VARIANT_FALSE;
-
 			// Add new record
 			ipFileSet->AddNew();
 
@@ -498,10 +500,6 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 			// Set the fields from the new file record
 			setFieldsFromFileRecord(ipFields, ipNewFileRecord);
 
-			// Set the priority
-			setLongField(ipFields, "Priority",
-				ePriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long) ePriority);
-
 			// set the initial Action state to pending
 			setStringField(ipFields, strActionCol, strNewStatus);
 
@@ -509,16 +507,11 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 
 			// Add the record
 			ipFileSet->Update();
-			
+
 			_lastCodePos = "70";
 
 			// get the new records ID to return
 			nID = getLastTableID(ipConnection, "FAMFile");
-
-			// return the previous state as Unattempted
-			*pPrevStatus = kActionUnattempted;
-
-			_lastCodePos = "80";
 
 			// update the statistics
 			updateStats(ipConnection, nActionID, *pPrevStatus, eNewStatus, ipNewFileRecord, NULL);
@@ -526,9 +519,6 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 		}
 		else
 		{
-			// The file name is in the database
-			*pbAlreadyExists = VARIANT_TRUE;
-
 			// Get the fields from the file set
 			FieldsPtr ipFields = ipFileSet->Fields;
 			ASSERT_RESOURCE_ALLOCATION("ELI26873", ipFields != NULL);
@@ -541,14 +531,6 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 			nID = ipOldRecord->FileID;
 
 			_lastCodePos = "100";
-
-			// Get the last action status to return
-			string strStatus = getStringField(ipFields, strActionCol);
-
-			// Set the Previous status return var
-			*pPrevStatus = asEActionStatus(strStatus);
-
-			_lastCodePos = "100.1";
 
 			// if Force processing is set need to update the status or if the previous status for this action was unattempted
 			if (bForceStatusChange == VARIANT_TRUE || *pPrevStatus == kActionUnattempted)
@@ -586,31 +568,34 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 				}
 
 				// add an Action State Transition if the previous state was not unattempted or was not the
-				// same as the new status
-				if (*pPrevStatus != kActionUnattempted && *pPrevStatus != eNewStatus )
+				// same as the new status and the FAST table should be updated
+				if (*pPrevStatus != kActionUnattempted && *pPrevStatus != eNewStatus
+					&& m_bUpdateFASTTable)
 				{
-					_lastCodePos = "130";
-
-					// Only update FileActionStateTransition table if required
-					if (m_bUpdateFASTTable)
-					{
-						addFileActionStateTransition(ipConnection, nID, nActionID, strStatus.c_str(), 
-							strNewStatus, "", "");
-					}
-
-					_lastCodePos = "140";
+					addFileActionStateTransition(ipConnection, nID, nActionID,
+						asStatusString(*pPrevStatus), strNewStatus, "", "");
 				}
+				_lastCodePos = "140";
+
 				// update the statistics
 				updateStats(ipConnection, nActionID, *pPrevStatus, eNewStatus, ipNewFileRecord, ipOldRecord);
 
 				_lastCodePos = "150";
+			}
+			else
+			{
+				// Set the file size and and page count for the file record to
+				// the file size and page count stored in the database
+				ipNewFileRecord->FileSize = ipOldRecord->FileSize;
+				ipNewFileRecord->Pages = ipOldRecord->Pages;
+				_lastCodePos = "152";
 			}
 		}
 
 		// Set the new file Record ID to nID;
 		ipNewFileRecord->FileID = nID;
 
-		_lastCodePos = "150.1";
+		_lastCodePos = "155";
 
 		// Update QueueEvent table if enabled
 		if (m_bUpdateQueueEventTable)
@@ -630,9 +615,10 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 		*ppFileRecord = (IFileRecord*)ipNewFileRecord.Detach();
 
 		END_CONNECTION_RETRY(ipConnection, "ELI23527");
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13536");
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
