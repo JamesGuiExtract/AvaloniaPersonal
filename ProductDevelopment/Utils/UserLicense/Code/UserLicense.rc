@@ -125,7 +125,7 @@ CAPTION "User License - Step 2 of 3"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Select email system",IDC_STATIC,0,0,359,63
-    CONTROL         "I use a desktop email application on this machine\r\n(eg. Microsoft outlook, Outlook Express, Windows Mail, Lotus Mail, Thunderbird, etc)",IDC_RADIO_DESKTOP_EMAIL,
+    CONTROL         "I use a desktop email application on this machine\r\n(e.g. Microsoft outlook, Outlook Express, Windows Mail, Lotus Mail, Thunderbird, etc)",IDC_RADIO_DESKTOP_EMAIL,
                     "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,6,14,282,18
     CONTROL         "I use web based email on this machine\r\n(e.g. Gmail, Yahoo Mail, Hotmail, etc)",IDC_RADIO_WEB_EMAIL,
                     "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,6,38,246,18

@@ -280,10 +280,6 @@ void CStep1::updateUserLicenseKeyInUI()
 
 	// Retrieve MAC address
 	string	strAddress = getMACAddress();
-	if (strAddress.length() == 0)
-	{
-		strAddress = "Address N/A";
-	}
 
 	/////////////////////////////////////
 	// Add license information to the bsm

@@ -164,6 +164,13 @@ string getMACAddress()
 		}
 	}
 
+	// If no address was found, set the value to Address N/A
+	// [LRCAU #5475]
+	if (strTemp.length() == 0)
+	{
+		strTemp = "Address N/A";
+	}
+
 	return strTemp;
 }
 //-------------------------------------------------------------------------------------------------
