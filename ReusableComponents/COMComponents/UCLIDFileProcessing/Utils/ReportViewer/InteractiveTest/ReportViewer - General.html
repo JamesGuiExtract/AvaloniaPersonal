@@ -829,11 +829,12 @@
 			<li>Confirm that the <b>Document name</b> information is correct.
 			<li>Confirm that the <b>File size (bytes)</b> information is correct.
 			<li>Confirm that the <b>Number of pages</b> information is correct.
+			<li>Confirm that the <b>File priority</b> information is correct.
 <p>
 			<li>Confirm that the <b>Summary of status</b> 
 			table and contents are formatted properly even at 400% zoom factor.
 			<li>Confirm that an <b>Action</b> column is provided.
-			<li>Confirm that an <b>Status</b> column is provided.
+			<li>Confirm that a <b>Status</b> column is provided.
 			<li>Confirm that the column headings are displayed with a distinct background color.
 			<li>Confirm that one row is provided for each <b>action</b> and that action 
 			status is correct.
@@ -842,10 +843,10 @@
 			table and contents are formatted properly even at 400% zoom factor.
 			<li>Confirm that an <b>Event time stamp</b> column is provided.
 			<li>Confirm that an <b>Event type</b> column is provided.
-			<li>Confirm that an <b>File modify time</b> column is provided.
-			<li>Confirm that an <b>File size (bytes)</b> column is provided.
-			<li>Confirm that an <b>Machine</b> column is provided.
-			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that a <b>File modify time</b> column is provided.
+			<li>Confirm that a <b>File size (bytes)</b> column is provided.
+			<li>Confirm that a <b>Machine</b> column is provided.
+			<li>Confirm that a <b>User</b> column is provided.
 			<li>Confirm that the column headings are displayed with a distinct background color.
 			<li>Confirm that one row is provided for each <b>event</b> and that each entry 
 			is appropriate.
@@ -861,10 +862,34 @@
 			<li>Confirm that the column headings are displayed with a distinct background color.
 			<li>Confirm that one row is provided for each <b>event</b> and that each entry 
 			is appropriate.
+<p>
+			<li>Confirm that the <b>Tags applied to document</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<ul>
+				<li>Note that the <b>Tags applied to document</b> table may not be present 
+				if no tags were applied for the specified document.
+			</ul>
+			<li>Confirm that a <b>Tag Name</b> column is provided.
+			<li>Confirm that the column heading is displayed with a distinct background color.
+			<li>Confirm that one row is provided for each <b>tag</b> and that each entry 
+			is appropriate.
+<p>
+			<li>Confirm that the <b>File action comments</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<ul>
+				<li>Note that the <b>File action comments</b> table may not be present 
+				if no comments were applied for the specified document.
+			</ul>
+			<li>Confirm that a <b>User</b> column is provided.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that a <b>Time Stamp</b> column is provided.
+			<li>Confirm that a <b>Comment</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided and that the entry is appropriate.
 		</ul>
 <p>
 		<li><b>Test with empty database</b> 
-		<li><b>Test with nonsense filename</b> 
+		<li><b>[LegacyRC #5360] Test with nonsense filename</b> 
 		<ul>
 			<li>Confirm that the <b>Document name</b> information is as specified.
 			<li>Confirm that the <b>File size (bytes)</b> information is empty.
@@ -1070,6 +1095,8 @@
 	<li><b>List of all documents with specific tag</b> 
 	<ul>
 		<li>Confirm that a <b>TagName</b> parameter is required. 
+		<li>Confirm that the <b>Parameter Entry Form</b> includes a combo box pre-populated 
+		with the defined tags.
 		<li>Confirm that a meaningful report is presented.
 		<li>Create a saved report and confirm that the associated XML file 
 		contains a <b>TextParameter</b> node with <b>Name = &quot;TagName&quot;</b> 
@@ -1379,6 +1406,7 @@
 			<li>Confirm that the <b>Pending</b> column information is correct.
 			<li>Confirm that the <b>Processing</b> column information is correct.
 			<li>Confirm that the <b>Complete</b> column information is correct.
+			<li>Confirm that the <b>Skipped</b> column information is correct.
 			<li>Confirm that the <b>Failed</b> column information is correct.
 			<li>Confirm that the <b>Total</b> column information is correct.
 			<li>Confirm that each <b>Total</b> is the sum of the Pending, Processing, 
@@ -1403,6 +1431,7 @@
 			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Skipped</b> column information is correct.
 			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
 <p>
@@ -1422,6 +1451,7 @@
 			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Skipped</b> column information is correct.
 			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
 		</ul>
@@ -1443,6 +1473,7 @@
 			<li>Confirm that the <b>Pending</b> column information is correct.
 			<li>Confirm that the <b>Processing</b> column information is correct.
 			<li>Confirm that the <b>Complete</b> column information is correct.
+			<li>Confirm that the <b>Skipped</b> column information is correct.
 			<li>Confirm that the <b>Failed</b> column information is correct.
 			<li>Confirm that the <b>Total</b> column information is correct.
 			<li>Confirm that each <b>Total</b> is the sum of the Pending, Processing, 
@@ -1467,6 +1498,7 @@
 			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Skipped</b> column information is correct.
 			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
 <p>
@@ -1486,6 +1518,7 @@
 			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Skipped</b> column information is correct.
 			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
 			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
 		</ul>
