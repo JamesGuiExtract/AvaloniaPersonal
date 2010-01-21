@@ -90,6 +90,38 @@
 			action name.
 	       	</ul>
 	</ul>
+<p>
+	<li><h2>Scheduled Processing</h2>
+	<ul>
+      		<li>Confirm presence of a <b>Processing schedule</b> group 
+		box on the <b>Processing setup</b> tab.
+      		<li>Confirm that the group box contains a <b>Limit processing 
+		to certain days/times</b> check box.
+      		<li>Confirm that the group box contains a <b>Set schedule...</b> 
+		button.
+      		<li>Confirm that the <b>Set schedule...</b> button displays 
+		a <b>Set Processing Schedule</b> dialog.
+      		<li>Confirm that the <b>Set Processing Scheule</b> dialog 
+		includes a grid for hours and days allowing each of the 168 
+		hours in a week to be controlled.
+      		<li>Confirm that the schedule settings are persistent.
+<p>
+      		<li>Confirm processing goes inactive per schedule.
+      		<li>Confirm that when processing goes inactive, currently 
+		processing files finish, all processing threads exit, and 
+		memory is released.
+      		<li>Confirm that when processing goes inactive, currently 
+		pending files revert to their previous state.
+      		<li>Confirm processing goes active per schedule.
+<p>
+      		<li>Confirm that if processing is inactive, that the FAM title 
+		bar includes the text <b>(Processing Inactive)</b>.
+      		<li>Confirm that if processing is inactive, that the FAM status 
+		bar includes the text <b>Processing Inactive</b>.
+<p>
+		<li>Confirm that scheduled processing works as expected when the 
+		FAM is running as a service.
+	</ul>
 </ul>
 </body> 
 </html>
