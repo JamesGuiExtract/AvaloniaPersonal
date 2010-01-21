@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Extract.Imaging.Forms
 {
     /// <summary>
@@ -381,6 +377,30 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public const string _PRINT_IMAGE_BUTTON_TOOL_TIP =
             "Print image";
+
+        /// <summary>
+        /// Constant string for the print view button image.
+        /// </summary>
+        public const string _PRINT_VIEW_BUTTON_IMAGE =
+            "Resources.PrintViewButton.png";
+
+        /// <summary>
+        /// Constant string for a small version of the print view button view.
+        /// </summary>
+        public const string _PRINT_VIEW_BUTTON_IMAGE_SMALL =
+            "Resources.PrintViewButtonSmall.png";
+
+        /// <summary>
+        /// Constant string for the print view button text.
+        /// </summary>
+        public const string _PRINT_VIEW_BUTTON_TEXT =
+            "Print view";
+
+        /// <summary>
+        /// Constant string for the print view button tool tip text.
+        /// </summary>
+        public const string _PRINT_VIEW_BUTTON_TOOL_TIP =
+            "Print view";
 
         /// <summary>
         /// Constant string for the print preview button image.
@@ -777,6 +797,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public const string _PRINT_IMAGE_MENU_ITEM_TEXT =
             "&Print...";
+
+        /// <summary>
+        /// Constant string for the print view menu item text.
+        /// </summary>
+        public const string _PRINT_VIEW_MENU_ITEM_TEXT =
+            "Print view...";
 
         /// <summary>
         /// Constant string for the print preview menu item text.

@@ -155,6 +155,12 @@
     <Compile Include="Controls\PrintPreviewToolStripButton.Designer.cs">
       <DependentUpon>PrintPreviewToolStripButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\PrintViewToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\PrintViewToolStripButton.Designer.cs">
+      <DependentUpon>PrintViewToolStripButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\RedactionToolStripSplitButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -367,6 +373,12 @@
     </Compile>
     <Compile Include="MenuItems\PrintPreviewToolStripMenuItem.Designer.cs">
       <DependentUpon>PrintPreviewToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\PrintViewToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\PrintViewToolStripMenuItem.Designer.cs">
+      <DependentUpon>PrintViewToolStripMenuItem.cs</DependentUpon>
     </Compile>
     <Compile Include="MenuItems\RectangularHighlightToolStripMenuItem.cs">
       <SubType>Component</SubType>
@@ -835,6 +847,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Loading.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PrintViewButton.png" />
+    <EmbeddedResource Include="Resources\PrintViewButtonSmall.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

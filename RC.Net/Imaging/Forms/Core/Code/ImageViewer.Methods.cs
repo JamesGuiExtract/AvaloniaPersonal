@@ -1633,6 +1633,14 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Prints the area of the image that is currently in view.
+        /// </summary>
+        public void PrintView()
+        {
+            Print(true, false);
+        }
+
+        /// <summary>
         /// Prints the currently open image.
         /// <para><b>Requirements</b></para>
         /// <para>An image must be open.</para>
@@ -1640,7 +1648,7 @@ namespace Extract.Imaging.Forms
         /// <exception cref="ExtractException">No image is open.</exception>
         public void Print()
         {
-            Print(true);
+            Print(false, true);
         }
 
         /// <summary>
@@ -1652,6 +1660,19 @@ namespace Extract.Imaging.Forms
         /// will raise the <see cref="DisplayingPrintDialog"/> event.</param>
         /// <exception cref="ExtractException">No image is open.</exception>
         void Print(bool raiseDisplayingPrint)
+        {
+            Print(false, raiseDisplayingPrint);
+        }
+        
+        /// <summary>
+        /// Prints the currently open image.
+        /// </summary>
+        /// <param name="printView">Print only the current view.</param>
+        /// <param name="raiseDisplayingPrint">If <see langword="true"/> will raise the 
+        /// <see cref="DisplayingPrintDialog"/>; <see langword="false"/> will not raise the event.
+        /// </param>
+        void Print(bool printView, bool raiseDisplayingPrint)
+
         {
             try
             {
@@ -1672,7 +1693,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Update the print dialog
-                UpdatePrintDialog();
+                UpdatePrintDialog(printView);
 
                 // Display a warning if there are no valid printers and quit
                 if (string.IsNullOrEmpty(_printDialog.PrinterSettings.PrinterName))
@@ -1691,6 +1712,11 @@ namespace Extract.Imaging.Forms
                     {
                         // Refresh the form
                         RefreshImageViewerAndParent();
+
+                        if (printView)
+                        {
+                            _printDialog.PrinterSettings.PrintRange = PrintRange.Selection;
+                        }
 
                         // Print the document
                         _printDialog.Document.Print();
@@ -1712,8 +1738,8 @@ namespace Extract.Imaging.Forms
 
                         // Prompt the user about the disallowed printer
                         string applicationName = Application.ProductName;
-                        applicationName = string.IsNullOrEmpty(applicationName) ? 
-                            "Application" : applicationName;
+                        applicationName = string.IsNullOrEmpty(applicationName) 
+                            ? "Application" : applicationName;
                         MessageBox.Show(applicationName + " has disallowed Printing to "
                                         + _printDialog.PrinterSettings.PrinterName.ToUpperInvariant() + "."
                                         + " Please select a different printer." + Environment.NewLine
@@ -1728,7 +1754,7 @@ namespace Extract.Imaging.Forms
                         RefreshImageViewerAndParent();
 
                         // Update the print dialog
-                        UpdatePrintDialog();
+                        UpdatePrintDialog(printView);
                     }
                 }
             }
@@ -1967,17 +1993,21 @@ namespace Extract.Imaging.Forms
         /// Instantiates <see cref="_printDialog"/> if it has not yet been created and updates its 
         /// printer settings.
         /// </summary>
-        void UpdatePrintDialog()
+        /// <param name="printView"><see langword="true"/> if only the current view should be 
+        /// printed; <see langword="false"/> otherwise.</param>
+        void UpdatePrintDialog(bool printView)
         {
             // Check if the print dialog has been created yet
             if (_printDialog == null)
             {
                 // Create the print dialog
                 _printDialog = new PrintDialog();
-                _printDialog.AllowCurrentPage = true;
-                _printDialog.AllowSomePages = true;
                 _printDialog.UseEXDialog = true;
             }
+
+            // Enable page options unless only printing the current view
+            _printDialog.AllowCurrentPage = !printView;
+            _printDialog.AllowSomePages = !printView;
 
             // Setup the print document
             _printDialog.Document = GetPrintDocument();
@@ -1993,15 +2023,26 @@ namespace Extract.Imaging.Forms
             // Get the margin bounds
             Rectangle marginBounds = e.MarginBounds;
 
+            Rectangle source;
+            if (e.PageSettings.PrinterSettings.PrintRange == PrintRange.Selection)
+            {
+                Rectangle imageArea = GetVisibleImageArea();
+                source = GetTransformedRectangle(imageArea, true);
+            }
+            else
+            {
+                source = SourceRectangle;
+            }
+
             // Calculate the scale so the image fits exactly within the bounds of the page
             float scale = (float)Math.Min(
-                                     marginBounds.Width / (double)base.Image.ImageWidth,
-                                     marginBounds.Height / (double)base.Image.ImageHeight);
+                                     marginBounds.Width / (double)source.Width,
+                                     marginBounds.Height / (double)source.Height);
 
             // Calculate the horizontal and vertical padding
             PointF padding = new PointF(
-                (marginBounds.Width - base.Image.ImageWidth * scale) / 2.0F,
-                (marginBounds.Height - base.Image.ImageHeight * scale) / 2.0F);
+                (marginBounds.Width - source.Width * scale) / 2.0F,
+                (marginBounds.Height - source.Height * scale) / 2.0F);
 
             // Calculate the destination rectangle
             Rectangle destination = new Rectangle(
@@ -2015,14 +2056,14 @@ namespace Extract.Imaging.Forms
             Matrix imageToPrinter = null;
             try
             {
-                // Create a matrices to map logical (image) coordinates to printer coordinates
-                unrotatedToPrinter = GetPrintMatrix(scale, destination.Location);
+                // Create matrices to map logical (image) coordinates to printer coordinates
+                unrotatedToPrinter = GetPrintMatrix(source.Location, scale, destination.Location);
                 imageToPrinter = GetRotatedMatrix(unrotatedToPrinter, false);
 
                 // Draw the image
                 using (Image img = base.Image.ConvertToGdiPlusImage())
                 {
-                    e.Graphics.DrawImage(img, destination);
+                    e.Graphics.DrawImage(img, destination, source, GraphicsUnit.Pixel);
                 }
 
                 // Check if annotations need to be drawn
@@ -2089,9 +2130,11 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Creates a 3x3 affine matrix that maps the unrotated image to a destination rectangle 
-        /// with the specified scale factor and margin padding.
+        /// Creates a 3x3 affine matrix that maps the unrotated image using the specified offset,
+        /// scale, and padding.
         /// </summary>
+        /// <param name="offset">The offset applied to the original image in logical (image) 
+        /// coordinates.</param>
         /// <param name="scale">The scale to apply to the original image in logical (image) 
         /// coordinates.</param>
         /// <param name="padding">The padding to apply to the original image in logical (image) 
@@ -2099,13 +2142,16 @@ namespace Extract.Imaging.Forms
         /// <returns>A 3x3 affine matrix that maps the unrotated image to a rotated destination 
         /// rectangle with the specified scale factor and margin padding.
         /// </returns>
-        static Matrix GetPrintMatrix(float scale, PointF padding)
+        static Matrix GetPrintMatrix(PointF offset, float scale, PointF padding)
         {
             // Create the matrix
             Matrix printMatrix = new Matrix();
 
+            // Translate the origin by the specified offset
+            printMatrix.Translate(-offset.X, -offset.Y);
+
             // Scale the matrix
-            printMatrix.Scale(scale, scale);
+            printMatrix.Scale(scale, scale, MatrixOrder.Append);
 
             // Translate the matrix so the image is centered with the specified padding
             printMatrix.Translate(padding.X, padding.Y, MatrixOrder.Append);
@@ -2617,8 +2663,8 @@ namespace Extract.Imaging.Forms
                     using (Graphics graphics = CreateGraphics())
                     {
                         // Get the appropriate color for drawing the object
-                        Color drawColor = _cursorTool == CursorTool.AngularHighlight ? 
-                            _defaultHighlightColor : _defaultRedactionPaintColor;
+                        Color drawColor = _cursorTool == CursorTool.AngularHighlight 
+                            ? _defaultHighlightColor : _defaultRedactionPaintColor;
 
                         // Erase the previous highlight if it exists
                         if (!_trackingData.Region.IsEmpty(graphics))
@@ -2674,8 +2720,8 @@ namespace Extract.Imaging.Forms
                     using (Graphics graphics = CreateGraphics())
                     {
                         // Get the appropriate color for drawing the object
-                        Color drawColor = (_cursorTool == CursorTool.RectangularHighlight ?
-                            _defaultHighlightColor : _defaultRedactionPaintColor);
+                        Color drawColor = (_cursorTool == CursorTool.RectangularHighlight 
+                            ? _defaultHighlightColor : _defaultRedactionPaintColor);
 
                         // Erase the previous highlight if it exists
                         if (!_trackingData.Region.IsEmpty(graphics))
@@ -2951,8 +2997,8 @@ namespace Extract.Imaging.Forms
             using (Graphics graphics = CreateGraphics())
             {
                 // Get the appropriate color for drawing the object
-                Color drawColor = (_cursorTool == CursorTool.AngularHighlight ?
-                    _defaultHighlightColor : _defaultRedactionPaintColor);
+                Color drawColor = (_cursorTool == CursorTool.AngularHighlight 
+                    ? _defaultHighlightColor : _defaultRedactionPaintColor);
 
                 // Erase the previous highlight if it exists
                 if (!_trackingData.Region.IsEmpty(graphics))
@@ -3503,8 +3549,8 @@ namespace Extract.Imaging.Forms
             using (Graphics graphics = CreateGraphics())
             {
                 // Get the appropriate color for drawing the object
-                Color drawColor = (_cursorTool == CursorTool.RectangularHighlight) ?
-                    _defaultHighlightColor : _defaultRedactionPaintColor;
+                Color drawColor = (_cursorTool == CursorTool.RectangularHighlight) 
+                    ? _defaultHighlightColor : _defaultRedactionPaintColor;
 
                 // Erase the previous highlight if it exists
                 if (!_trackingData.Region.IsEmpty(graphics))
@@ -4890,8 +4936,8 @@ namespace Extract.Imaging.Forms
                     // Add the filter list, index (ensure index is valid), and title to dialog
                     fileDialog.Filter = filterList.ToString();
                     fileDialog.FilterIndex = 
-                        _openImageFilterIndex > _openImageFileTypeFilter.Count ? 
-                        1 : _openImageFilterIndex;
+                        _openImageFilterIndex > _openImageFileTypeFilter.Count 
+                                                ? 1 : _openImageFilterIndex;
                     fileDialog.Title = "Open Image File";
 
                     // Show the dialog and bail if the user selected cancel
@@ -5324,6 +5370,24 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 ExtractException.Display("ELI24084", ex);
+            }
+        }
+
+        /// <summary>
+        /// Activates the print view command.
+        /// </summary>
+        public void SelectPrintView()
+        {
+            try
+            {
+                if (base.Image != null)
+                {
+                    PrintView();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29258", ex);
             }
         }
 

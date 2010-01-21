@@ -2850,16 +2850,11 @@ namespace Extract.Imaging.Forms
                     break;
 
                 case PrintRange.CurrentPage:
-
-                    // Print the current page
-                    PrintPage(e);
-                    break;
-
                 case PrintRange.Selection:
 
-                    // This option is not supported
-                    throw new ExtractException("ELI21524",
-                        "Invalid print option. Cannot print selection.");
+                    // Print the current page or view
+                    PrintPage(e);
+                    break;
 
                 default:
 
@@ -2974,7 +2969,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Call print and do not raise the DisplayingPrintDialog event
-                Print(false);
+                Print(false, false);
             }
             catch (Exception ex)
             {
