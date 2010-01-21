@@ -383,6 +383,19 @@
 					<li>Condition <b>met</b> with <b>none</b> of the following tags.
 					<li>Condition <b>unmet</b> with <b>none</b> of the following tags.
 				</ul>
+<p>
+		  	   	<LI><b>[LegacyRC #5497]</b> Any tag condition is always true
+	       			<ul>
+			      		<li>Prepare some files for processing such that some files 
+					have tags and some do not have tags.
+					<li>Prepare an FPS file with a conditional task and Tag condition 
+					to OCR the document if the document is tagged with <b>any</b> tag.  
+					No task should be run against the document if the document is 
+					not tagged.
+					<li>Delete any existing USS files.
+					<li>Process the documents.
+	      				<li>Confirm that only the tagged documents have USS files.
+			       	</ul>
      			</ul>
 <p>
 	      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
