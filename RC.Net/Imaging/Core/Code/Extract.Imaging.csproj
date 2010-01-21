@@ -88,6 +88,7 @@
     <Compile Include="PixelProbe.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RasterZone.cs" />
+    <Compile Include="RasterZoneCollection.cs" />
     <Compile Include="RegistryManager.cs" />
     <Compile Include="SynchronousOcrManager.cs" />
   </ItemGroup>
