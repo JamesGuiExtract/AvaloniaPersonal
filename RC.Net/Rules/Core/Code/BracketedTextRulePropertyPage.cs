@@ -129,21 +129,28 @@ namespace Extract.Rules
         /// </summary>
         public void Apply()
         {
-            // Ensure the settings are valid
-            if (!IsValid)
+            try
             {
-                MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
-                    MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-                return;
+                // Ensure the settings are valid
+                if (!IsValid)
+                {
+                    MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                    return;
+                }
+
+                // Apply the settings to the BracketedTextRule object
+                _bracketedTextRule.MatchSquareBrackets = _squareBracketsCheckBox.Checked;
+                _bracketedTextRule.MatchCurlyBrackets = _curlyBracketsCheckBox.Checked;
+                _bracketedTextRule.MatchCurvedBrackets = _curvedBracketsCheckBox.Checked;
+
+                // Reset the dirty flag
+                _dirty = false;
             }
-
-            // Apply the settings to the BracketedTextRule object
-            _bracketedTextRule.MatchSquareBrackets = _squareBracketsCheckBox.Checked;
-            _bracketedTextRule.MatchCurlyBrackets = _curlyBracketsCheckBox.Checked;
-            _bracketedTextRule.MatchCurvedBrackets = _curvedBracketsCheckBox.Checked;
-
-            // Reset the dirty flag
-            _dirty = false;
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29227", ex);
+            }
         }
 
         /// <summary>

@@ -170,10 +170,17 @@ namespace Extract.Rules
             }
             set
             {
-                if (_text != value)
+                try
                 {
-                    _text = value;
-                    _regex = null;
+                    if (_text != value)
+                    {
+                        _text = value;
+                        _regex = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI29231", ex);
                 }
             }
         }
@@ -233,15 +240,22 @@ namespace Extract.Rules
         [CLSCompliant(false)]
         public MatchResultCollection GetMatches(SpatialString ocrOutput)
         {
-            // Ensure the regular expression is valid
-            UpdateRegex();
+            try
+            {
+                // Ensure the regular expression is valid
+                UpdateRegex();
 
-            // Ensure that the regular expression is not null
-            ExtractException.Assert("ELI22222", "Regular expression must not be null!",
-                _regex != null);
+                // Ensure that the regular expression is not null
+                ExtractException.Assert("ELI22222", "Regular expression must not be null!",
+                    _regex != null);
 
-            // Compute the matches
-            return MatchResult.ComputeMatches(_RULE_NAME, _regex, ocrOutput, MatchType.Match, false);
+                // Compute the matches
+                return MatchResult.ComputeMatches(_RULE_NAME, _regex, ocrOutput, MatchType.Match, false);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29230", ex);
+            }
         }
 
         /// <summary>

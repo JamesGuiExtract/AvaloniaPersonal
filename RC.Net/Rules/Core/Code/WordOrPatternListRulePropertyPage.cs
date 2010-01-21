@@ -131,21 +131,28 @@ namespace Extract.Rules
         /// </summary>
         public void Apply()
         {
-            // Ensure the settings are valid
-            if (!IsValid)
+            try
             {
-                MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings", 
-                    MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-                return;
+                // Ensure the settings are valid
+                if (!IsValid)
+                {
+                    MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                    return;
+                }
+
+                // Store the settings
+                _rule.Text = _wordsOrPatternsTextBox.Text;
+                _rule.MatchCase = _matchCaseCheckBox.Checked;
+                _rule.TreatAsRegularExpression = _isRegexCheckBox.Checked;
+
+                // Reset the dirty flag
+                _dirty = false;
             }
-
-            // Store the settings
-            _rule.Text = _wordsOrPatternsTextBox.Text;
-            _rule.MatchCase = _matchCaseCheckBox.Checked;
-            _rule.TreatAsRegularExpression = _isRegexCheckBox.Checked;
-
-            // Reset the dirty flag
-            _dirty = false;
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29232", ex);
+            }
         }
 
         /// <summary>

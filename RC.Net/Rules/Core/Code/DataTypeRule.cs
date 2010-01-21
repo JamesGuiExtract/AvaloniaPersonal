@@ -342,27 +342,34 @@ namespace Extract.Rules
         [CLSCompliant(false)]
         public MatchResultCollection GetMatches(SpatialString ocrOutput)
         {
-            // Iterate through all the selected data types
-            MatchResultCollection result = new MatchResultCollection();
-            foreach (string dataTypeName in _dataTypeList)
+            try
             {
-                // Get the data type 
-                DataType dataType = _validDataTypes[dataTypeName];
-                
-                // Add the matches associated with this data type
-                if (dataType.DataFile != null)
+                // Iterate through all the selected data types
+                MatchResultCollection result = new MatchResultCollection();
+                foreach (string dataTypeName in _dataTypeList)
                 {
-                    result.AddRange(MatchResult.ComputeMatches(_RULE_NAME, dataType.DataRegex,
-                        ocrOutput, MatchType.Match, false));
-                }
-                if (dataType.CluesFile != null)
-                {
-                    result.AddRange(MatchResult.ComputeMatches(_RULE_NAME, dataType.CluesRegex,
-                        ocrOutput, MatchType.Clue, false));
-                }
-            }
+                    // Get the data type 
+                    DataType dataType = _validDataTypes[dataTypeName];
 
-            return result;
+                    // Add the matches associated with this data type
+                    if (dataType.DataFile != null)
+                    {
+                        result.AddRange(MatchResult.ComputeMatches(_RULE_NAME, dataType.DataRegex,
+                            ocrOutput, MatchType.Match, false));
+                    }
+                    if (dataType.CluesFile != null)
+                    {
+                        result.AddRange(MatchResult.ComputeMatches(_RULE_NAME, dataType.CluesRegex,
+                            ocrOutput, MatchType.Clue, false));
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29228", ex);
+            }
         }
 
         /// <summary>

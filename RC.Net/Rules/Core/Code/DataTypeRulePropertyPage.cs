@@ -155,26 +155,33 @@ namespace Extract.Rules
         /// </summary>
         public void Apply()
         {
-            // Ensure the settings are valid
-            if (!IsValid)
+            try
             {
-                MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
-                    MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-                return;
-            }
+                // Ensure the settings are valid
+                if (!IsValid)
+                {
+                    MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                    return;
+                }
 
-            // Store the settings
-            _rule.DataTypeList.Clear();
-            foreach (CheckBox checkBox in _dataTypesGroupBox.Controls)
+                // Store the settings
+                _rule.DataTypeList.Clear();
+                foreach (CheckBox checkBox in _dataTypesGroupBox.Controls)
+                {
+                    if (checkBox.Checked)
+                    {
+                        _rule.DataTypeList.Add(checkBox.Text);
+                    }
+                }
+
+                // Reset the dirty flag
+                _dirty = false;
+            }
+            catch (Exception ex)
             {
-                if (checkBox.Checked)
-	            {
-                    _rule.DataTypeList.Add(checkBox.Text);
-	            }
+                throw ExtractException.AsExtractException("ELI29229", ex);
             }
-
-            // Reset the dirty flag
-            _dirty = false;
         }
 
         /// <summary>
