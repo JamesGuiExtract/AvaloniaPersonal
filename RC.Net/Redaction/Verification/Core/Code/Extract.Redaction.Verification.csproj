@@ -166,6 +166,7 @@
     <Compile Include="VerificationOptionsDialog.Designer.cs">
       <DependentUpon>VerificationOptionsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="VerificationRuleFormHelper.cs" />
     <Compile Include="VerificationSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -305,6 +306,10 @@
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Rules\Core\Code\Extract.Rules.csproj">
+      <Project>{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}</Project>
+      <Name>Extract.Rules</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
@@ -370,6 +375,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ThumbnailViewer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FindWordsSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FindWords.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

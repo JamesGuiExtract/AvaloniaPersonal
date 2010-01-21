@@ -3,6 +3,7 @@ using Extract.Drawing;
 using Extract.FileActionManager.Forms;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
+using Extract.Rules;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -162,6 +163,11 @@ namespace Extract.Redaction.Verification
         readonly IFileProcessingTask _actionStatusTask;
 
         /// <summary>
+        /// The find or redact dialog.
+        /// </summary>
+        RuleForm _findOrRedactForm;
+
+        /// <summary>
         /// Expands file action manager path tags.
         /// </summary>
         FAMTagManager _tagManager;
@@ -306,7 +312,9 @@ namespace Extract.Redaction.Verification
             // Shortcuts are disabled if:
             // 1) The comments text box is active OR
             // 2) A cell of the redaction grid view is being edited
-            return !_commentsTextBox.Focused && !_redactionGridView.IsInEditMode;
+            // 3) The find or redact form has focus
+            return !_commentsTextBox.Focused && !_redactionGridView.IsInEditMode && 
+                (_findOrRedactForm == null || !_findOrRedactForm.ContainsFocus);
         }
 
         /// <summary>
@@ -903,6 +911,28 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Activates the find or redact command.
+        /// </summary>
+        void SelectFindOrRedact()
+        {
+            if (_imageViewer.IsImageAvailable)
+	        {
+	            if (_findOrRedactForm == null)
+	            {
+	                VerificationRuleFormHelper helper = new VerificationRuleFormHelper(_imageViewer);
+
+	                RuleForm ruleForm = new RuleForm("Find or redact text", 
+                        new WordOrPatternListRule(), _imageViewer, helper, this);
+	                ruleForm.MatchRedacted += helper.HandleMatchRedacted;
+
+	                _findOrRedactForm = ruleForm;
+	            }
+
+	            _findOrRedactForm.Show();
+	        }
+        }
+
+        /// <summary>
         /// Activates the prompt for exemption codes command.
         /// </summary>
         void SelectPromptForExemptionCode()
@@ -1318,6 +1348,9 @@ namespace Extract.Redaction.Verification
                 _saveAndCommitToolStripButton.Enabled = true;
                 _saveAndCommitToolStripMenuItem.Enabled = true;
                 _saveToolStripMenuItem.Enabled = !IsInHistory;
+
+                _findOrRedactToolStripMenuItem.Enabled = true;
+                _findOrRedactToolStripButton.Enabled = true;
             }
             else
             {
@@ -1339,6 +1372,9 @@ namespace Extract.Redaction.Verification
                 _saveAndCommitToolStripButton.Enabled = false;
                 _saveAndCommitToolStripMenuItem.Enabled = false;
                 _saveToolStripMenuItem.Enabled = false;
+
+                _findOrRedactToolStripMenuItem.Enabled = false;
+                _findOrRedactToolStripButton.Enabled = false;
             }
         }
 
@@ -1547,6 +1583,8 @@ namespace Extract.Redaction.Verification
 
                 // Save and commit
                 _imageViewer.Shortcuts[Keys.S | Keys.Control] = SelectSaveAndCommit;
+
+                _imageViewer.Shortcuts[Keys.F | Keys.Control] = SelectFindOrRedact;
 
                 // Toggle redacted state
                 _imageViewer.Shortcuts[Keys.Space] = _redactionGridView.ToggleRedactedState;
@@ -1800,9 +1838,26 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27048", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27048", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleFindOrRedactToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                SelectFindOrRedact();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29239", ex);
             }
         }
 
@@ -2155,6 +2210,25 @@ namespace Extract.Redaction.Verification
         /// <see cref="ToolStripItem.Click"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleFindOrRedactToolStripButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                SelectFindOrRedact();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29240", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
         void HandleThumbnailsToolStripButtonClick(object sender, EventArgs e)
         {
             try
@@ -2170,9 +2244,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI28508", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI28508", ex);
             }
         }
 

@@ -67,6 +67,20 @@ namespace Extract.Redaction.Verification.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap FindWords {
+            get {
+                object obj = ResourceManager.GetObject("FindWords", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap FindWordsSmall {
+            get {
+                object obj = ResourceManager.GetObject("FindWordsSmall", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap LastExemption {
             get {
                 object obj = ResourceManager.GetObject("LastExemption", resourceCulture);

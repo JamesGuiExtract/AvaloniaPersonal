@@ -852,7 +852,6 @@ namespace Extract.Redaction.Verification
                 if (layerObject.Selected != shouldBeSelected)
                 {
                     layerObject.Selected = shouldBeSelected;
-                    SelectLayerObject(layerObject, shouldBeSelected);
                 }
             }
         }
@@ -1270,8 +1269,6 @@ namespace Extract.Redaction.Verification
             _dataGridView.SelectionChanged -= HandleDataGridViewSelectionChanged;
             try
             {
-                SelectLayerObject(layerObject, select);
-
                 foreach (DataGridViewRow row in _dataGridView.Rows)
                 {
                     if (_redactions[row.Index].ContainsLayerObject(layerObject))
@@ -1625,19 +1622,6 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        /// <summary>
-        /// Marks the specified layer object as selected or not selected.
-        /// </summary>
-        /// <param name="layerObject">The layer object to mark as selected or not selected.</param>
-        /// <param name="select"><see langword="true"/> to mark the layer object as selected;
-        /// <see langword="false"/> to mark the layer object as not selected.</param>
-        static void SelectLayerObject(LayerObject layerObject, bool select)
-        {
-            // TODO: Indicate layer object selection in a more prominent way [FIDSC #3771]
-            Console.WriteLine(layerObject);
-            Console.WriteLine(select);
-        }
-
         #endregion Methods
 
         #region OnEvents
@@ -1724,7 +1708,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Remove(e.LayerObject);
+                if (e.LayerObject is RedactionLayerObject)
+                {
+                    Remove(e.LayerObject);
+                }
             }
             catch (Exception ex)
             {
