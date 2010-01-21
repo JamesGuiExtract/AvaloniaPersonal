@@ -1,0 +1,95 @@
+<html>
+<head>
+<title>FAM Features Testing Checklist</title>
+	<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>General FAM Features Testing Checklist<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>	
+<hr>
+
+<ul>
+	<li><h2>User Authentication</h2>
+	<ul>
+		<LI>TBD
+	</ul>
+<p>
+	<li><h2>Skipping Files</h2>
+	<ul>
+  	   	<LI><b>[LegacyRC #5403]</b> Do not process currently skipped files
+	       	<ul>
+	      		<li>Modify the <b>MaxFilesFromDB</b> registry entry to a small number 
+			such as 3.
+	      		<li>Process and skip a larger number of files such as 10.
+	      		<li>Process skipped files.
+	      		<li>Confirm that files that are skipped again are not repeatedly 
+			presented for processing.
+	       	</ul>
+	</ul>
+<p>
+	<li><h2>Automatic Detection and Correction of Stuck Files</h2>
+	<ul>
+      		<li><u><b>Setup</b></u>
+		<ul> 
+	      		<li>Prepare a collection of files for processing with 
+			<b>Execute rules</b>.
+	      		<li>Use Task Manager to kill <b>ProcessFiles.exe</b> 
+			while documents are being processed.
+	      		<li>Use <b>DB Admin</b> to confirm that some files 
+			are stuck in <b>Processing</b>.
+	      		<li>Use <b>DB Admin</b> after auto-reversion to confirm that 
+			the files are back in <b>Pending</b> mode.
+<p>
+	      		<li>Prepare a collection of files for processing with 
+			<b>Verify redactions two</b>.
+			<li>Verify some files and make sure to skip some of the files.
+			<li>Stop processing and modify the FPS file to process 
+			skipped images.
+	      		<li>Use Task Manager to kill <b>ProcessFiles.exe</b> 
+			while documents are being processed and before all of 
+			the previously skipped images had been processed.
+	      		<li>Use <b>DB Admin</b> to confirm that some files 
+			are stuck in <b>Processing</b>.
+	      		<li>Use <b>DB Admin</b> after auto-reversion to confirm that 
+			the files are back in <b>Skipped</b> mode.
+		</ul> 
+      		<li><u><b>Functionality</b></u>
+		<ul> 
+	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+			<b>AutoRevertLockedFiles</b> with a default of <b>1</b>.
+      			<li>Confirm that with <b>AutoRevertLockedFiles = 1</b>, stuck 
+			files are automatically reverted to their previous status.
+	      		<li>Confirm that with <b>AutoRevertLockedFiles = 0</b>, stuck 
+			files are not automatically reverted to their previous status.
+<p>
+	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+			<b>AutoRevertTimeOutInMinutes</b> with a default of <b>60</b>.
+      			<li>Confirm that the minimum value for <b>AutoRevertTimeOutInMinutes</b> 
+			is <b>5</b>.
+	      		<li>Confirm that automatic reversion of stuck files is based on 
+			the timeout value.
+	      		<li><b>[LegacyRC #5500]</b> Confirm that an exception is logged and the 
+			timeout value is automatically adjusted if a value less than 5 is provided.
+<p>
+	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+			<b>AutoRevertNotifyEmailList</b> with a default of <b>an empty 
+			string</b>.
+	      		<li>Confirm that automatic reversion of stuck files sends emails 
+			to the addresses given in <b>AutoRevertNotifyEmailList</b>.
+			<li>Confirm that the email contains the same information as 
+			in the exception log as noted below.
+<p>
+	      		<li>Confirm that an exception is logged if one or more files are 
+			reverted from being stuck.
+      			<li>Confirm that the exception includes the number of minutes 
+			elapsed before reversion, the count of files that were reverted, 
+			the file status to which a file was reverted, and the associated 
+			action name.
+	       	</ul>
+	</ul>
+</ul>
+</body> 
+</html>
