@@ -1642,12 +1642,29 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetFullUserName", "..\..\..
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Rules", "..\..\..\..\..\RC.Net\Rules\Core\Code\Extract.Rules.csproj", "{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Encryption", "..\..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcproj", "{C79815C7-A80A-41AA-AB02-F6AC83EFA579}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 127
+		ProjectCount = 129
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcproj
@@ -1775,6 +1792,8 @@ Global
 		ProjectRelativeDiskPath125 = ..\..\..\..\..\RC.Net\DataEntry\Utilities\DataEntryApplication\Core\Code\DataEntryApplication.csproj
 		ProjectRelativeDiskPath126 = ..\..\..\IndustrySpecific\County\DEPs\DemoFlexIndex\Core\Code\Extract.DataEntry.DEP.DemoFlexIndex.csproj
 		ProjectRelativeDiskPath127 = ..\..\..\..\Utils\GetFullUserName\Code\GetFullUserName.vcproj
+		ProjectRelativeDiskPath128 = ..\..\..\..\..\RC.Net\Rules\Core\Code\Extract.Rules.csproj
+		ProjectRelativeDiskPath129 = ..\..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3057,6 +3076,26 @@ Global
 		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Release|Win32.ActiveCfg = Release|Win32
 		{4FAC64AD-4684-4FD9-88AB-E629E0561E68}.Release|Win32.Build.0 = Release|Win32
+		{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{775DF74F-6DF6-4DFD-8259-4A4896CA85B2}.Release|Win32.ActiveCfg = Release|Any CPU
+		{C79815C7-A80A-41AA-AB02-F6AC83EFA579}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{C79815C7-A80A-41AA-AB02-F6AC83EFA579}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{C79815C7-A80A-41AA-AB02-F6AC83EFA579}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{C79815C7-A80A-41AA-AB02-F6AC83EFA579}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C79815C7-A80A-41AA-AB02-F6AC83EFA579}.Debug|Win32.Build.0 = Debug|Win32
+		{C79815C7-A80A-41AA-AB02-F6AC83EFA579}.Release|Any CPU.ActiveCfg = Release|Win32
+		{C79815C7-A80A-41AA-AB02-F6AC83EFA579}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{C79815C7-A80A-41AA-AB02-F6AC83EFA579}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{C79815C7-A80A-41AA-AB02-F6AC83EFA579}.Release|Win32.ActiveCfg = Release|Win32
+		{C79815C7-A80A-41AA-AB02-F6AC83EFA579}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
