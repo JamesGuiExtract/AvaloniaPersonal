@@ -3278,8 +3278,28 @@ STDMETHODIMP CFileProcessingDB::ModifyTag(BSTR bstrOldTagName, BSTR bstrNewTagNa
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
 
-		string strQuery = "SELECT [TagName], [TagDescription] FROM [Tag] WHERE [TagName] = '"
-			+ strOldTagName + "'";
+		string strQueryBase = "SELECT [TagName], [TagDescription] FROM [Tag] WHERE [TagName] = '";
+
+		// If specifying new tag name, check for new tag name existence
+		if (!strNewTagName.empty())
+		{
+			string strTempQuery = strQueryBase + strNewTagName + "'";
+			_RecordsetPtr ipTemp(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI29225", ipTemp != NULL);
+
+			ipTemp->Open(strTempQuery.c_str(), _variant_t((IDispatch*) ipConnection, true),
+				adOpenDynamic, adLockOptimistic, adCmdText);
+			if (ipTemp->adoEOF == VARIANT_FALSE)
+			{
+				UCLIDException ue("ELI29226", "New tag name already exists.");
+				ue.addDebugInfo("Old Tag Name", strOldTagName);
+				ue.addDebugInfo("New Tag Name", strNewTagName);
+				ue.addDebugInfo("New Description", strNewDescription);
+				throw ue;
+			}
+		}
+
+		string strQuery = strQueryBase + strOldTagName + "'";
 
 		// Create a pointer to a recordset
 		_RecordsetPtr ipTagSet(__uuidof(Recordset));
@@ -3928,6 +3948,30 @@ STDMETHODIMP CFileProcessingDB::AddUserCounter(BSTR bstrCounterName, LONGLONG ll
 		// Set the transaction guard
 		TransactionGuard tg(ipConnection);
 
+		// Build a query to check for the existence of the specified counter
+		string strCheckDuplicateCounter = "SELECT [CounterName] FROM "
+			+ gstrUSER_CREATED_COUNTER + " WHERE [CounterName] = '"
+			+ strCounterName + "'";
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipCounter(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI29235", ipCounter != NULL);
+
+		// Open Recordset that contains the counter
+		ipCounter->Open(strCheckDuplicateCounter.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenDynamic, adLockOptimistic, adCmdText);
+
+		// Check that the counter does not exist
+		if (ipCounter->adoEOF == VARIANT_FALSE)
+		{
+			UCLIDException ue("ELI29236", "Cannot add counter, the specified counter already exists.");
+			ue.addDebugInfo("Counter To Add", asString(bstrCounterName));
+			throw ue;
+		}
+
+		// Close the recordset
+		ipCounter->Close();
+
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
@@ -4040,8 +4084,30 @@ STDMETHODIMP CFileProcessingDB::RenameUserCounter(BSTR bstrCounterName, BSTR bst
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
-		// Make sure the DB Schema is the expected version
-		validateDBSchemaVersion();
+		// Check for the existence of the new name
+		string strCounterExistsQuery = "SELECT [CounterName] FROM " + gstrUSER_CREATED_COUNTER
+			+ " WHERE [CounterName] = '" + strNewCounterName + "'";
+		
+		// Create a pointer to a recordset
+		_RecordsetPtr ipCounter(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI29233", ipCounter != NULL);
+
+		// Open Recordset that contains the counter
+		ipCounter->Open(strCounterExistsQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenDynamic, adLockOptimistic, adCmdText);
+
+		// Check for a record found
+		if (ipCounter->adoEOF == VARIANT_FALSE)
+		{
+			UCLIDException ue("ELI29234",
+				"Unable to modify counter name, the specified name is already in use.");
+			ue.addDebugInfo("Counter To Modify", asString(bstrCounterName));
+			ue.addDebugInfo("New Counter Name", asString(bstrNewCounterName));
+			throw ue;
+		}
+
+		// Close the recordset
+		ipCounter->Close();
 
 		// Update the counter name
 		if (executeCmdQuery(ipConnection, strQuery) == 0)
@@ -5011,11 +5077,11 @@ STDMETHODIMP CFileProcessingDB::GetSkipAuthenticationForServices(VARIANT_BOOL* p
 		*pvbSkipAuthentication = asVariantBool(
 			isMachineInListOfMachinesToSkipUserAuthentication(ipConnection));
 
-		END_CONNECTION_RETRY(ipConnection, "ELI29153");
+		END_CONNECTION_RETRY(ipConnection, "ELI29237");
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29154");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29238");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -9,6 +9,7 @@ using System.Data.SqlServerCe;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text;
@@ -103,8 +104,10 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Path to the database that contains the FAM service settings.
         /// </summary>
+        // Store the database parallel to the ESFAMService.exe file [DNRCAU #381]
         static readonly string _databaseFile = FileSystemMethods.PathCombine(
-            FileSystemMethods.ExtractSystemsPath, "CommonComponents", "ESFAMService.sdf");
+            Path.GetDirectoryName(Assembly.GetAssembly(typeof(ESFAMService)).Location),
+            "ESFAMService.sdf");
 
         /// <summary>
         /// The connection string for connecting to the SqlCE database.
