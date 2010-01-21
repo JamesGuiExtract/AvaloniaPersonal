@@ -825,23 +825,34 @@
 			is selected.</li>
       		</ul> 
 <p>
-      		<li>Confirm that there is a checkbox for <b>Extract data from USS file if the input file 
-          	is an image and a corresponding USS file exists</b>.</li> 
-      		<li>Confirm that there is a checkbox for <b>If input file is an image…</b> </li>
-      		<li>Confirm that the checkbox settings are persistent.</li> 
-      		<li>Confirm that an image OCRs before rules are executed if <b>Extract Data 
-          	from USS file</b> and <b>If input file is an image…</b> are unchecked.</li> 
-      		<li>Confirm that an image with a corresponding USS file does not OCR 
-          	before rules are executed if <b>Extract data from USS file</b> is checked.</li> 
+      		<li>Confirm that there is a checkbox for <b>Use previously saved OCR results 
+		if available</b>.</li> 
+      		<li>Confirm that there is a group box for <b>OCR settings</b>
+		<ul>
+	      		<li>Confirm presence of a radio button for <b>OCR all 
+			pages of the image</b>.
+	      		<li>Confirm presence of a radio button for <b>OCR specific 
+			pages</b>.
+	      		<li>Confirm presence of an associated edit box to specify 
+			page numbers.
+	      		<li>Confirm presence of a radio button for <b>Do not OCR any 
+			of the pages (Use this option only if you're sure the rules 
+			don't require OCR results)</b>.
+		</ul>
+      		<li>Confirm presence of a <b>Save OCR results to speed up re-processing</b> checkbox.
+  	   	<LI><b>[FlexIDSCore #3715]</b> Confirm that the <b>Save OCR results to speed up 
+		re-processing</b> check box is cleared and disabled if the <b>Do not OCR any of 
+		the pages</b> radio button is selected.
+	       	</ul>
+	      	<li>Confirm presence of a <b>Use cleaned image if available</b> checkbox.
+      		<li>Confirm that settings are persistent.
 <p>
-      		<li>Check <b>If input file is an image...</b></li>
-      		<ul> 
-         		<li>Confirm that a USS file is created.</li> 
-         		<li>Confirm that all pages appear in the resulting USS file if 
-             		<b>OCR all pages</b> is selected.</li> 
-         		<li>Confirm that only the specified pages(s) appear in the USS 
-             		file if <b>OCR specific pages</b> is selected.</li>
-      		</ul>
+      		<li>Confirm that an image OCRs before rules are executed if <b>Use previously saved OCR 
+		results if available</b> is unchecked and <b>Do not OCR any of the pages</b> is not 
+		selected.</li> 
+      		<li>Confirm that an image with a corresponding USS file does not OCR 
+          	before rules are executed if <b>Use previously saved OCR results if available</b> 
+		is checked.</li> 
 <p>
       		<li><b>[FlexIDSCore #2397]</b> Exercise the <b>Execute rules</b> task on a group of previously 
 		OCR'd images.  Confirm that updated progress information is provided on the 
