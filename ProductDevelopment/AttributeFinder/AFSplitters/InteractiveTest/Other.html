@@ -256,16 +256,27 @@
       		<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
       		<li><b>X</b> button ignores changes and exits the dialog.</li>
 <p>
-		<li><b>[FlexIDSCore #3144]</b> Split Regions - doesn't account for view perspective, 
-		highlights wrong text</li>
-		<ul>	
+  	   	<LI><b>[FlexIDSCore #3144, #3439, #3441, #3467, #3611]</b> Split Region
+		Into Content Areas
+	       	<ul>
 			<li>Open the ruleset at 
 			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3144\splitregion.rsd</b>.</li>
-			<li>Test the rules against the image 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3144\image152_vp6.tif</b>.</li>
-			<li>Ensure that highlights are over text and rotated correctly. 						<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3144\screenshot.bmp</b>
+	      		<li>Exercise the rules against 
+			<b>I:\Common\Testing\Rotated_Images\Image152_VP6.tif</b>.
+			<li>Ensure that highlights are over text and rotated correctly. 							<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3144\screenshot.bmp</b>
 			is an example of incorrect behavior.</li>
-		</ul>
+	      		<li>Exercise the <b>test.rsd</b> rules against the test image 
+			(both) found in <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3439</b>.
+			<li>Confirm that a content region is found even when the 
+			<b>Exclude pixel content of lines from content areas</b> 
+			setting is true.
+			<li>Confirm that a property page setting is available for 
+			<b>Minimum width of areas to be returned</b>.
+			<li>Confirm that the default setting is <b>3</b> in units 
+			of average character width.
+			<li>Confirm that all of the <b>Split region into content area</b> 
+			automated tests pass.
+	       	</ul>
 <p>
   	   	<LI><b>[FlexIDSCore #3171, #3527]</b> Split Region Into Content Areas
 	       	<ul>
