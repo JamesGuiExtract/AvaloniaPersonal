@@ -332,23 +332,15 @@ namespace Extract.Imaging.Forms
                 ExtractException.Assert("ELI22792", "Raster zone collection may not be null!",
                     rasterZones != null);
 
-                // For each raster zone in the collection, compute the area of overlap
-                // with each highlight in this composite object
-                double areaOverlap = 0.0;
-                foreach (RasterZone rasterZone in rasterZones)
-                {
-                    // Convert RasterZone to COM RasterZone
-                    UCLID_RASTERANDOCRMGMTLib.RasterZone comRasterZone =
-                        rasterZone.ToComRasterZone();
 
-                    foreach (Highlight highlight in Objects)
-                    {
-                        areaOverlap += highlight.ToRasterZone().GetAreaOverlappingWith(
-                            comRasterZone);
-                    }
+                // Get the raster zones of the composite
+                RasterZoneCollection myZones = new RasterZoneCollection(Objects.Count);
+                for (int i = 0; i < Objects.Count; i++)
+                {
+                    myZones.Add(Objects[i].ToRasterZone());
                 }
 
-                return areaOverlap;
+                return myZones.GetAreaOverlappingWith(rasterZones);
             }
             catch (Exception ex)
             {
