@@ -122,6 +122,66 @@
 		<li>Confirm that scheduled processing works as expected when the 
 		FAM is running as a service.
 	</ul>
+<p>
+	<li><h2>PDF/A Conversion</h2>
+	<ul>
+      		<li><u><b>User Interface</u></b>
+	       	<ul>
+	      		<li>Confirm that the property page includes a <b>Make output PDF/A 
+			compatible (this will increase the size of the PDF)</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that the task settings are persistent.
+	       	</ul>
+<p>
+      		<li><u><b>Basic Testing</u></b>
+	       	<ul>
+	      		<li>Confirm that TIF images can be converted to searchable PDFs 
+			<b>without</b> being PDF/A-compliant.
+			<li>Confirm that output filename is the input filename less the file 
+			extension plus PDF.
+			<li>Confirm that the input TIF images are deleted.
+<p>
+	      		<li>Confirm that TIF images can be converted to searchable PDFs 
+			<b>with</b> being PDF/A-compliant.
+			<li>Confirm that output filename is the input filename less the file 
+			extension plus PDF.
+			<li>Confirm that the input TIF images are deleted.
+<p>
+	      		<li>Confirm that PDF images can be converted to searchable PDFs 
+			<b>without</b> being PDF/A-compliant.
+			<li>Confirm that output filename is the same as the input filename.
+<p>
+	      		<li>Confirm that PDF images can be converted to searchable PDFs 
+			<b>with</b> being PDF/A-compliant.
+			<li>Confirm that output filename is the same as the input filename.
+	       	</ul>
+<p>
+      		<li><u><b>Large-Scale Test</u></b>
+	       	<ul>
+			<li>Prepare at least 1M image files for this test.  Include 
+			single-page and multiple-page images.  Include TIF and PDF images.
+			<li>Prepare an FPS file to queue and process these images:
+			<ul>
+				<li>Use the <b>Core: Convert to searchable PDF</b> task.
+				<li>Include a listening file supplier in order to 
+				confirm that added files can be converted to searchable 
+				PDF/A format.
+			</ul>
+			<li>Process the images.
+			<li>Spot check a random subset of the output files and confirm 
+			that they are PDF/A-compliant.  
+			<li>Check at least 1,000 files if the check must be done manually.
+			<li>Check at least 50,000 files if the check can be done 
+			automatically.
+			<li>Make sure to check some of each of the following files:
+			<ul>
+				<li>Single-page TIF
+				<li>Multiple-page TIF
+				<li>Single-page PDF
+				<li>Multiple-page PDF
+			</ul>
+	       	</ul>
+	</ul>
 </ul>
 </body> 
 </html>
