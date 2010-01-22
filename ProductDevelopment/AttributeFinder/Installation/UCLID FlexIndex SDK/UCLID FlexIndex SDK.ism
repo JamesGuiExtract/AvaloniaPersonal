@@ -1514,6 +1514,7 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s255">ISMergeModule_</col>
 		<col key="yes" def="i2">Language_</col>
+		<row><td>SDKMain</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>SDKMain</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>SDKMain</td><td>VC_User_CRT71.07D8793C_DC93_47EF_8FDA_3517BC941A0F</td><td>0</td></row>
 		<row><td>SDKMain</td><td>VC_User_MFC71.211ADFCA_ED54_4E97_A0C1_80845B72BE77</td><td>0</td></row>
@@ -1645,6 +1646,7 @@
 		<col def="s255">Name</col>
 		<col def="S255">Destination</col>
 		<col def="I4">ISAttributes</col>
+		<row><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td><td>Extract Systems Data Entry merge Module</td><td/><td/></row>
 		<row><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td><td>Extract Systems FLEX Index</td><td/><td/></row>
 		<row><td>VC_User_CRT71.07D8793C_DC93_47EF_8FDA_3517BC941A0F</td><td>0</td><td>VC User CRT71 RTL X86 ---</td><td>[SystemFolder]</td><td/></row>
 		<row><td>VC_User_MFC71.211ADFCA_ED54_4E97_A0C1_80845B72BE77</td><td>0</td><td>VC User MFC71 RTL X86 ---</td><td>[SystemFolder]</td><td/></row>
