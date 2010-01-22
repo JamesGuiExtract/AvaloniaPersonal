@@ -30,6 +30,7 @@
 5006,Rule_Development_Toolkit_Objects
 5007,IcoMap_Core_Objects
 5008,IcoMap_ArcGIS_Objects
+5010,Redaction_Core_Objects
 
 // IDs for core features
 5021,OCR_On_Server_Feature

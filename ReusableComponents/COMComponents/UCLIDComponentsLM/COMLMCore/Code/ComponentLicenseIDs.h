@@ -81,6 +81,10 @@ const unsigned int gnICOMAP_ARCGIS_OBJECTS				= gnBASE_OFFSET + 8;
 // *** THIS PACKAGE IS NOT USED AT THIS TIME ***
 const unsigned int gnINPUTFUNNEL_SDK_OBJECTS			= gnBASE_OFFSET + 9;
 
+// The Redaction Core package is for all components that are specific to 
+// any redaction product including ID Shield and ID Shield Office.
+const unsigned int gnREDACTION_CORE_OBJECTS             = gnBASE_OFFSET + 10;
+
 
 //-------------------------------------------------------------------------------------------------
 // Constants for function-specific objects and features
