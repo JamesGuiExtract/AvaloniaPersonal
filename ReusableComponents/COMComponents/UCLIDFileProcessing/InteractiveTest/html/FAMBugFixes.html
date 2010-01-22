@@ -99,6 +99,16 @@
 		<li>Confirm that the <b>DB Login</b> dialog <b>is not</b> presented.
 		<li>Confirm that queuing files is allowed.
        	</ul>
+<p>
+   	<LI><b>[LegacyRC #5508, #5514]</b> Process files after crash
+       	<ul>
+      		<li>Create an FPS file to process some files.
+		<li>Kill <b>ProcessFiles.exe</b> from the Task Manager.
+		<li>Reset the <b>Processing</b> files to <b>Pending</b> 
+		using DB Admin.
+		<li>Reopen the FPS file and continue processing images.
+		<li>Confirm that processing continues without error.
+       	</ul>
 </ul>
 </body> 
 </html>
