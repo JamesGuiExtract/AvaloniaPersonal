@@ -455,6 +455,7 @@
 		<row><td>ProgramFilesFolder</td><td>TARGETDIR</td><td>.:PROGRA~1|program files</td><td/><td>0</td><td/></row>
 		<row><td>ProgramMenuFolder</td><td>TARGETDIR</td><td>.:Programs</td><td/><td>3</td><td/></row>
 		<row><td>REPORTS</td><td>FILE_PROCESSING_COMPONENTS</td><td>Reports</td><td/><td>0</td><td/></row>
+		<row><td>SQL_CE_EDITOR</td><td>ProgramFilesFolder</td><td>SQLCEE~1|SQL CE Editor</td><td/><td>0</td><td/></row>
 		<row><td>STANDARD_REPORTS</td><td>REPORTS</td><td>STANDA~1|Standard reports</td><td/><td>0</td><td/></row>
 		<row><td>SendToFolder</td><td>TARGETDIR</td><td>.:SendTo</td><td/><td>3</td><td/></row>
 		<row><td>StartMenuFolder</td><td>TARGETDIR</td><td>.:STARTM~1|Start Menu</td><td/><td>3</td><td/></row>
@@ -4372,6 +4373,10 @@
 		<row><td>ID_STRING35</td><td>1033</td><td>CONFIG~1|Configure Email Settings</td><td>0</td><td/><td>-912409910</td></row>
 		<row><td>ID_STRING36</td><td>0</td><td>[ProductName] requires that your computer is running Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008 or Windows 7</td><td>0</td><td/><td>-979544531</td></row>
 		<row><td>ID_STRING36</td><td>1033</td><td>[ProductName] requires that your computer is running Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008 or Windows 7</td><td>0</td><td/><td>-979544531</td></row>
+		<row><td>ID_STRING37</td><td>0</td><td>NEWSHO~1|NewShortcut15</td><td>0</td><td/><td>-1331801781</td></row>
+		<row><td>ID_STRING37</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331775157</td></row>
+		<row><td>ID_STRING38</td><td>0</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331819989</td></row>
+		<row><td>ID_STRING38</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331819989</td></row>
 		<row><td>ID_STRING4</td><td>0</td><td>FEEDBA~1|FeedBack Manager</td><td>0</td><td/><td>178112137</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>FEEDBA~1|FeedBack Manager</td><td>0</td><td/><td>1830330511</td></row>
 		<row><td>ID_STRING5</td><td>0</td><td>FEEDBA~1|FeedBack Manager</td><td>0</td><td/><td>178112137</td></row>
@@ -5051,6 +5056,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="L255">FileName</col>
 		<col def="s72">DirProperty</col>
 		<col def="i2">InstallMode</col>
+		<row><td>ConfigureEmailSettingsShortcut</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut1</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut10</td><td>Help</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut11</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
@@ -5160,6 +5166,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut13</td><td>newfolder1</td><td>##ID_STRING29##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut141</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING31##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]FAMDBAdmin.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut1411</td><td>newfolder1</td><td>##ID_STRING34##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ConvertFAMDB.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut151</td><td>newfolder1</td><td>##ID_STRING38##</td><td>SDKComponents</td><td>[SQL_CE_EDITOR]SqlCeEditor.exe</td><td>ESFAMService.sdf</td><td/><td/><td/><td/><td>1</td><td>COMMON_COMPONENTS</td><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut2</td><td>newfolder1</td><td>##ID_STRING5##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]Feedback.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut3</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING6##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ProcessFiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>newfolder1</td><td>##ID_STRING7##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]RuleTester.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>

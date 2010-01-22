@@ -3229,7 +3229,7 @@
 		<row><td>ID_STRING27</td><td>1033</td><td>OCRTES~1|OCR Test Images</td><td>0</td><td/><td>1536828750</td></row>
 		<row><td>ID_STRING28</td><td>1033</td><td>IMAGEC~1|Image Cleanup Settings Editor</td><td>0</td><td/><td>1570496653</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>ENCRYP~1|EncryptTextFile</td><td>0</td><td/><td>1914185967</td></row>
-		<row><td>ID_STRING4</td><td>1033</td><td>ENCRYP~1|EncryptTextFile</td><td>0</td><td/><td>1914212623</td></row>
+		<row><td>ID_STRING4</td><td>1033</td><td>ENCRYP~1|Encrypt File</td><td>0</td><td/><td>-1331814998</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>RDT Components</td><td>0</td><td/><td>1914202479</td></row>
 		<row><td>ID_STRING6</td><td>1033</td><td>FLEXIN~1|Extract Systems FLEX Index SDK</td><td>0</td><td/><td>194598446</td></row>
 		<row><td>ID_STRING7</td><td>1033</td><td>EXTRAC~1|Extract Systems FLEX Index RDT</td><td>0</td><td/><td>-1600449462</td></row>
@@ -3966,7 +3966,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">ISComments</col>
 		<col def="S255">ISShortcutName</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>NewShortcut1</td><td>SendToFolder</td><td>##ID_STRING4##</td><td>Binaries</td><td>[BIN]EncryptTextFile.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut1</td><td>SendToFolder</td><td>##ID_STRING4##</td><td>Binaries</td><td>[COMMON_COMPONENTS]EncryptFile.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut2</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING28##</td><td>Binaries</td><td>[COMMON_COMPONENTS]ImageCleanupSettingsEditor.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut3</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING10##</td><td>Binaries</td><td>[COMMON_COMPONENTS]TestHarness.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING11##</td><td>Help</td><td>[HELP]FlexIndex.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
