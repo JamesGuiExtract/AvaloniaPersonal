@@ -1,3 +1,4 @@
+using Extract.AttributeFinder;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -183,12 +184,12 @@ namespace Extract.Redaction
             // Verification and redaction sessions
             if (_voaFile.VerificationSessions.Count > 0)
             {
-                // TODO: Implement
+                WriteVerificationSessions(writer, _voaFile.VerificationSessions);
             }
 
             if (_voaFile.RedactionSessions.Count > 0)
             {
-                // TODO: Implement
+                WriteRedactionSessions(writer, _voaFile.RedactionSessions);
             }
 
             writer.WriteEndElement();
@@ -347,6 +348,200 @@ namespace Extract.Redaction
                 writer.WriteAttributeString("Category", exemptions.Category);
                 writer.WriteAttributeString("Code", exemptions.ToString());
                 writer.WriteEndElement();    
+            }
+        }
+
+        /// <summary>
+        /// Writes the verification sessions to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="sessions">The attributes containing the verification session data.</param>
+        static void WriteVerificationSessions(XmlWriter writer, IEnumerable<ComAttribute> sessions)
+        {
+            foreach (ComAttribute session in sessions)
+            {
+                writer.WriteStartElement("IDShieldVerificationSession");
+                writer.WriteAttributeString("ID", session.Value.String);
+
+                IUnknownVector subAttributes = session.SubAttributes;
+
+                // User Info and Time Info
+                WriteUserInfo(writer, subAttributes);
+                WriteTimeInfo(writer, subAttributes);
+
+                // File Info and Verification Options
+                WriteAttributeAsXml(writer, subAttributes, "FileInfo", "SourceDocName", "IDShieldDataFile");
+                WriteAttributeAsXml(writer, subAttributes, "VerificationOptions", "VerifyAllPages");
+
+                // Entries Added, Deleted, and Modified
+                WriteEntries(writer, subAttributes, "EntriesAdded");
+                WriteEntries(writer, subAttributes, "EntriesDeleted");
+                WriteEntries(writer, subAttributes, "EntriesModified");
+
+                writer.WriteEndElement();
+            }
+        }
+
+        /// <summary>
+        /// Writes the redaction sessions to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="sessions">The attributes containing the redaction session data.</param>
+        static void WriteRedactionSessions(XmlWriter writer, IEnumerable<ComAttribute> sessions)
+        {
+            foreach (ComAttribute session in sessions)
+            {
+                writer.WriteStartElement("RedactedFileOutputSession");
+                writer.WriteAttributeString("ID", session.Value.String);
+
+                IUnknownVector subAttributes = session.SubAttributes;
+
+                // User Info and Time Info
+                WriteUserInfo(writer, subAttributes);
+                WriteTimeInfo(writer, subAttributes);
+
+                // File Info
+                WriteAttributeAsXml(writer, subAttributes, "FileInfo", "SourceDocName", "IDShieldDataFile", "OutputFile");
+                
+                // Output Options
+                WriteOutputOptions(writer, subAttributes);
+
+                // Entries Added, Deleted, Modified
+                WriteEntries(writer, subAttributes, "EntriesRedacted");
+
+                writer.WriteEndElement();
+            }
+        }
+
+        /// <summary>
+        /// Writes the redaction output options to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="attributes">A collection of attributes containing the output options 
+        /// attribute.</param>
+        static void WriteOutputOptions(XmlWriter writer, IUnknownVector attributes)
+        {
+            ComAttribute attribute = AttributeMethods.GetSingleAttributeByName(attributes, "_OutputOptions");
+
+            writer.WriteStartElement("OutputOption");
+
+            if (attribute != null)
+            {
+                IUnknownVector subAttributes = attribute.SubAttributes;
+
+                WriteValueByName(writer, subAttributes, "RetainExistingRedactionsInOutputFile");
+                WriteValueByName(writer, subAttributes, "OutputFileExistedPriorToOutputOperation");
+                WriteValueByName(writer, subAttributes, "RetainExistingAnnotations");
+                WriteValueByName(writer, subAttributes, "ApplyRedactionsAsAnnotations");
+
+                WriteAttributeAsXml(writer, subAttributes, "RedactionTextAndColorSettings",
+                    "TextFormat", "FillColor", "BorderColor", "PreferredTextSize");
+            }
+
+            writer.WriteEndElement();
+        }
+
+        /// <summary>
+        /// Writes the user info to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="attributes">A collection of attributes containing the user info 
+        /// attribute.</param>
+        static void WriteUserInfo(XmlWriter writer, IUnknownVector attributes)
+        {
+            WriteAttributeAsXml(writer, attributes, "UserInfo", "LoginID", "Computer");
+        }
+
+        /// <summary>
+        /// Writes the time info to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="attributes">A collection of attributes containing the time info 
+        /// attribute.</param>
+        static void WriteTimeInfo(XmlWriter writer, IUnknownVector attributes)
+        {
+            WriteAttributeAsXml(writer, attributes, "TimeInfo", "Date", "TimeStarted", "TotalSeconds");
+        }
+
+        /// <summary>
+        /// Writes the specified attributes and its specified sub attributes to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="attributes">A collection of attributes containing the attribute to write.
+        /// </param>
+        /// <param name="name">The name of the attribute to write.</param>
+        /// <param name="subAttributeNames">The names of the subattributes to write.</param>
+        static void WriteAttributeAsXml(XmlWriter writer, IUnknownVector attributes, string name,
+            params string[] subAttributeNames)
+        {
+            ComAttribute attribute = AttributeMethods.GetSingleAttributeByName(attributes, "_" + name);
+
+            writer.WriteStartElement(name);
+
+            if (attribute != null)
+            {
+                IUnknownVector subAttributes = attribute.SubAttributes;
+                foreach (string subAttributeName in subAttributeNames)
+                {
+                    WriteValueByName(writer, subAttributes, subAttributeName);
+                }
+            }
+
+            writer.WriteEndElement();
+        }
+
+        /// <summary>
+        /// Writes the contents of the specified attribute to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="attributes">A collection of attributes containing the attribute to write.
+        /// </param>
+        /// <param name="name">The name of the attribute to write.</param>
+        static void WriteValueByName(XmlWriter writer, IUnknownVector attributes, string name)
+        {
+            ComAttribute attribute = AttributeMethods.GetSingleAttributeByName(attributes, "_" + name);
+            if (attribute != null)
+            {
+                writer.WriteElementString(name, attribute.Value.String);
+            }
+        }
+
+        /// <summary>
+        /// Writes the contents of the specified revision entries to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="attributes">A collection of attributes containing the revision entries 
+        /// attribute to write.
+        /// </param>
+        /// <param name="name">The name of the attribute to write.</param>
+        static void WriteEntries(XmlWriter writer, IUnknownVector attributes, string name)
+        {
+            ComAttribute attribute = AttributeMethods.GetSingleAttributeByName(attributes, "_" + name);
+
+            if (attribute != null)
+            {
+                IUnknownVector subAttributes = attribute.SubAttributes;
+
+                writer.WriteStartElement(name);
+
+                int size = subAttributes.Size();
+                for (int i = 0; i < size; i++)
+                {
+                    ComAttribute idRevision = (ComAttribute)subAttributes.At(i);
+                    if (idRevision.Name == "_IDAndRevision")
+                    {
+                        writer.WriteStartElement("Entry");
+
+                        writer.WriteAttributeString("ID", idRevision.Value.String);
+
+                        string revision = idRevision.Type.Substring(1);
+                        writer.WriteAttributeString("Revision", revision);
+
+                        writer.WriteEndElement();
+                    }
+                }
+
+                writer.WriteEndElement();
             }
         }
 
