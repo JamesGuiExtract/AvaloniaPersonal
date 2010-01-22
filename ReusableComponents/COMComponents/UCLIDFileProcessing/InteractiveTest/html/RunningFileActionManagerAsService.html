@@ -86,6 +86,14 @@ called the <b>service machine</b>.  The machine that contains the database is re
 		immediately.
 		<li>Confirm that processing stops gracefully as soon as the currently 
 		processing files are finished.
+		<ul>
+			<li>Confirm that an application trace is logged when the service 
+			<b>starts</b>.
+			<li>Confirm that an application trace is logged when the service 
+			<b>is stopping</b>.
+			<li>Confirm that an application trace is logged when the service 
+			<b>has stopped</b>.
+		</ul>
 		<li>Confirm via <b>Task Manager</b> that none of the above EXEs are 
 		continuing to run.
 		<li>Confirm via <b>DB Admin</b> that no files are left in <b>Processing</b> 
