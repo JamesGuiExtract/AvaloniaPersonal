@@ -456,7 +456,7 @@ bool CRDTConfigDlg::getAutoOpenImage()
 	if (!ma_pSettingsCfgMgr->keyExists( VOAVIEWER_SECTION, AUTOOPENIMAGE_KEY))
 	{
 		// create the key if not found and default to true
-		ma_pSettingsCfgMgr->createKey(VOAVIEWER_SECTION, AUTOOPENIMAGE_KEY, "0");
+		ma_pSettingsCfgMgr->createKey(VOAVIEWER_SECTION, AUTOOPENIMAGE_KEY, "1");
 		return false;
 	}
 
