@@ -26,7 +26,7 @@ namespace Extract.IDShieldStatisticsReporter
     /// </summary>
     public partial class IDShieldStatisticsReporterForm : Form, ITestResultLogger
     {
-        #region Fields
+        #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
@@ -52,6 +52,15 @@ namespace Extract.IDShieldStatisticsReporter
         /// The ProgID of the IDShieldTester COM class.
         /// </summary>
         const string _IDSHIELD_TESTER_PROGID = "EXTRACTRedactionTester.IDShieldTester.1";
+
+        /// <summary>
+        /// The prefix that ID Shield tester prepends to the name of every test output folder.
+        /// </summary>
+        const string _ANAYLYSIS_FOLDER_PREFIX = "Analysis - ";
+
+        #endregion Constants
+
+        #region Fields 
 
         /// <summary>
         /// The ID Shield tester settings.
@@ -525,7 +534,7 @@ namespace Extract.IDShieldStatisticsReporter
 
                     ApplySettings(settingsFile.FileName);
 
-                    string tclFileContents = _IDSHIELD_TESTER_PROGID + settingsFile.FileName;
+                    string tclFileContents = _IDSHIELD_TESTER_PROGID + ";;" + settingsFile.FileName;
                     File.WriteAllText(tclFile.FileName, tclFileContents);
                     
                     VariantVectorClass testParameters = new VariantVectorClass();
@@ -552,6 +561,7 @@ namespace Extract.IDShieldStatisticsReporter
                     PopulateResultsList();
 
                     string folderToSelect = Path.GetFileName(_idShieldTester.OutputFileDirectory);
+                    folderToSelect = folderToSelect.Remove(0, _ANAYLYSIS_FOLDER_PREFIX.Length);
                     int indexToSelect = _resultsSelectionComboBox.FindStringExact(folderToSelect);
                     _resultsSelectionComboBox.SelectedIndex = indexToSelect;
 
@@ -669,8 +679,8 @@ namespace Extract.IDShieldStatisticsReporter
         {
             try
             {
-                string newOutputFolder =
-                    Path.Combine(_feedbackFolderTextBox.Text, _resultsSelectionComboBox.Text);
+                string newOutputFolder = _ANAYLYSIS_FOLDER_PREFIX + _resultsSelectionComboBox.Text;
+                newOutputFolder = Path.Combine(_feedbackFolderTextBox.Text, newOutputFolder);
                 _currentResultsFolder = Directory.Exists(newOutputFolder) ? newOutputFolder : "";
 
                 string statisticsFileName = Path.Combine(_currentResultsFolder, "statistics.txt");
@@ -753,6 +763,13 @@ namespace Extract.IDShieldStatisticsReporter
         {
             try
             {
+                // [FlexIDSCore:3913]
+                // If no item was selected, there is nothing to display.
+                if (_fileListListBox.SelectedItem == null)
+                {
+                    return;
+                }
+
                 string sourceDocName = _fileListListBox.SelectedItem.ToString();
                 string commonComponentsDir = Path.GetDirectoryName(
                         Assembly.GetExecutingAssembly().Location);
@@ -836,14 +853,15 @@ namespace Extract.IDShieldStatisticsReporter
 
             if (Directory.Exists(_feedbackFolderTextBox.Text))
             {
-                string[] outputFolders = Directory.GetDirectories(
-                    _feedbackFolderTextBox.Text, "Analysis -*", SearchOption.TopDirectoryOnly);
+                string[] outputFolders = Directory.GetDirectories(_feedbackFolderTextBox.Text,
+                    _ANAYLYSIS_FOLDER_PREFIX + "*", SearchOption.TopDirectoryOnly);
 
                 foreach (string folder in outputFolders)
                 {
                     if (File.Exists(Path.Combine(folder, "statistics.txt")))
                     {
                         string listEntry = Path.GetFileName(folder);
+                        listEntry = listEntry.Remove(0, _ANAYLYSIS_FOLDER_PREFIX.Length);
                         _resultsSelectionComboBox.Items.Add(listEntry);
                     }
                 }
@@ -982,7 +1000,6 @@ namespace Extract.IDShieldStatisticsReporter
         /// <param name="strFileName">The filename of the added test case file.</param>
         public void AddTestCaseFile(string strFileName)
         {
-            _testCaseCount++;
             _currentTestCaseFile = strFileName;
         }
 
@@ -1049,7 +1066,12 @@ namespace Extract.IDShieldStatisticsReporter
         [CLSCompliant(false)]
         public void StartTestCase(string strTestCaseID, string strTestCaseDescription, ETestCaseType ETestCaseType)
         {
-            // Nothing to do.
+            // Note that summary info is added at the end which calls this method with a blank test case ID.
+            // Don't include these in the test case count.
+            if (!string.IsNullOrEmpty(strTestCaseID))
+            {
+                _testCaseCount++;
+            }
         }
 
         /// <summary>
