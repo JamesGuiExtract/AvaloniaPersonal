@@ -873,8 +873,8 @@ namespace Extract.Redaction
         ComAttribute CreateUserAttribute()
         {
             ComAttribute userInfo = CreateComAttribute("_UserInfo");
-            ComAttribute loginId = CreateComAttribute(Environment.UserName);
-            ComAttribute computerName = CreateComAttribute(Environment.MachineName);
+            ComAttribute loginId = CreateComAttribute("_LoginID", Environment.UserName);
+            ComAttribute computerName = CreateComAttribute("_RevisionID", Environment.MachineName);
             AppendChildAttributes(userInfo, loginId, computerName);
 
             return userInfo;
@@ -888,8 +888,8 @@ namespace Extract.Redaction
         ComAttribute CreateScreenTimeAttribute(TimeInterval time)
         {
             ComAttribute timeInfo = CreateComAttribute("_TimeInfo");
-            ComAttribute date = CreateComAttribute("_Date", time.Start.Date);
-            ComAttribute timeStarted = CreateComAttribute("_TimeStarted", time.Start.ToLocalTime());
+            ComAttribute date = CreateComAttribute("_Date", time.Start.ToShortDateString());
+            ComAttribute timeStarted = CreateComAttribute("_TimeStarted", time.Start.ToLongTimeString());
             ComAttribute totalSeconds = CreateComAttribute("_TotalSeconds", time.ElapsedSeconds);
             AppendChildAttributes(timeInfo, date, timeStarted, totalSeconds);
 
