@@ -388,7 +388,7 @@ namespace Extract.Imaging.Forms
         /// Constant string for a small version of the print view button view.
         /// </summary>
         public const string _PRINT_VIEW_BUTTON_IMAGE_SMALL =
-            "Resources.PrintViewButtonSmall.png";
+            null;
 
         /// <summary>
         /// Constant string for the print view button text.
