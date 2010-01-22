@@ -1,5 +1,5 @@
 REM Clean Source folder
-call Clean.bat
+call Clean.bat Test_2
 
 REM Supply Numbered Files for 6 hours
 START CopyNumberedFiles ".\0001.tif" ".\Source" 1 -h6
