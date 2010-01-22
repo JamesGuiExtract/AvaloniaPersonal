@@ -18,12 +18,13 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 <ol>
 	<li><b>***CREATE A DRIVE MAPPING TO H***</b> The <b>$DirNoDriveOf()</b> 
 	test requires write privileges on drive H:\.</li> 
-	<li><b>***ENABLE FEEDBACK***</b> Without Feedback enabled, some of these tests will not work.&nbsp;</b></li> 
+	<li><b>***ENABLE FEEDBACK***</b> Without Feedback enabled, some of these tests will not work.</b></li> 
 <p>
 	<li>Create a <b>FLEX_INDEX_TEST</b> environment variable set to <b>FLEX Index test</b>.
 	<li>Navigate to <b>D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\</b>.</li> 
         <li>Run <b>clean.bat</b> to remove leftover xml files from previous tests.</li> 
-        <li>Run <b>TestFunctionExpanderTest.bat</b>. The test will create files in the directory 		<b>D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\</b>.</li> 
+        <li>Run <b>TestFunctionExpanderTest.bat</b>. The test will create files in the directory 
+	<b>D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\</b>.</li> 
 <p>
 	<li>Test <b>&lt;SourceDocName&gt;</b>,<b>$DirOf()</b>, and <b>$FileOf()</b>:
 	<ul>
@@ -162,6 +163,66 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 	<ul>
 		<li>Confirm that $UserName() expands to the single word (first_last) user name for 
 		the logged in user.
+	</ul>
+</ul>
+<p>
+<h3>Test Text Function Expander utility</h3>
+<ul>
+	<li><b><u>User Interface</u></b>
+	<ul>
+		<li>Confirm that a non-MFC icon is provided for the application.
+		<li>Confirm that the window caption is <b>Text Function Tester</b>.
+		<li>Confirm that a <b>&lt;SourceDocName&gt;</b> label is provided.
+		<li>Confirm that an associated edit box is provided.
+		<li>Confirm that the edit box is pre-populated with 
+		<b>C:\InputFiles\TestImage01.tif</b>.
+		<li>Confirm that an associated browse <b>...</b> button is provided.
+		<li>Confirm that the browse button displays an <b>Open File</b> dialog.
+		<li>Confirm that the full path to the selected file is displayed in 
+		the edit box.
+		<li>Confirm that an <b>&lt;FPSFileDir&gt;</b> label is provided.
+		<li>Confirm that an associated edit box is provided.
+		<li>Confirm that the edit box is pre-populated with 
+		<b>C:\FPSFiles</b>.
+		<li>Confirm that an associated browse <b>...</b> button is provided.
+		<li>Confirm that the browse button displays a <b>Browse For Folder</b> dialog.
+		<li>Confirm that the full path to the selected folder is displayed in 
+		the edit box.
+		<li>Confirm that a <b>Value</b> label is provided.
+		<li>Confirm that an associated multi-line edit box is provided.
+		<li>Confirm that the edit box is empty by default.
+		<li>Confirm that an associated <b>tag selector</b> button is provided.
+		<li>Confirm that clicking the tag selector button drops down the 
+		complete set of $ functions, preceded by &lt;SourceDocName&gt; and 
+		&lt;FPSFileDir&gt;.
+		<li>Confirm that the selected tag is displayed in the <b>Value</b> edit 
+		box and that it replaces the currently selected text in the edit box.
+		<li>Confirm that an <b>Expansion</b> label is provided.
+		<li>Confirm that an associated read-only multi-line edit box is provided.
+		<li>Confirm that the edit box is empty by default.
+		<li>Confirm that a <b>Clear</b> button is provided.
+		<li>Confirm that clicking <b>Clear</b> empties the edit boxes for 
+		<b>Value</b> and <b>Expansion</b>.
+		<li>Confirm that a <b>Test</b> button is provided.
+		<li>Confirm that clicking <b>Test</b> expands the text in the <b>Value</b> 
+		edit box and displays the result in the <b>Expansion</b> edit box.
+	</ul>
+<p>
+	<li><b><u>Functionality</u></b>
+	<ul>
+		<li>Confirm that each individual function can be tested.
+		<li>Exercise some multiple function statements.  Confirm proper results.
+		<ul>
+			<li>Note statement #1
+			<li>Note statement #2
+			<li>Note statement #3
+			<li>Note statement #4
+		</ul>
+		<li>Exercise an undefined function such as <b>$DirNoOf(&lt;SourceDocName&gt;)</b>. 
+		Confirm that no expansion of the <b>$</b> function occurs.
+		<li>Exercise an invalid function such as <b>$DirOf(&lt;SourceDocName&gt;</b> 
+		- without the trailing parentheses.  Confirm that a meaningful error message is 
+		presented.
 	</ul>
 </ul>
 </body>
