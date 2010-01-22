@@ -51,7 +51,7 @@ namespace Extract.Rules
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IdShieldOfficeObject, "ELI23196",
+                LicenseUtilities.ValidateLicense(LicenseIdName.RedactionCoreObjects, "ELI23196",
                     _OBJECT_NAME);
 
                 _compositeMatch = compositeMatch;

@@ -59,7 +59,7 @@ namespace Extract.Rules
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IdShieldOfficeObject, "ELI23206",
+                LicenseUtilities.ValidateLicense(LicenseIdName.RedactionCoreObjects, "ELI23206",
                     _OBJECT_NAME);
 
                 InitializeComponent();

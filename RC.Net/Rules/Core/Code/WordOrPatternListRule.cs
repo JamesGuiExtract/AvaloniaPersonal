@@ -92,7 +92,7 @@ namespace Extract.Rules
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IdShieldOfficeObject, "ELI23208",
+                LicenseUtilities.ValidateLicense(LicenseIdName.RedactionCoreObjects, "ELI23208",
                     _OBJECT_NAME);
 
                 _matchCase = matchCase;

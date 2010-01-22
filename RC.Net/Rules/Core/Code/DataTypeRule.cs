@@ -215,7 +215,7 @@ namespace Extract.Rules
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IdShieldOfficeObject, "ELI23192",
+                LicenseUtilities.ValidateLicense(LicenseIdName.RedactionCoreObjects, "ELI23192",
                     _OBJECT_NAME);
             }
             catch (Exception ex)

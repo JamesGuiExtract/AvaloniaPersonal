@@ -102,7 +102,7 @@ namespace Extract.Rules
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IdShieldOfficeObject, "ELI23199",
+                LicenseUtilities.ValidateLicense(LicenseIdName.RedactionCoreObjects, "ELI23199",
                     _OBJECT_NAME);
 
                 // Expand each raster zones height and width by 4 pixels [IDSD #177 - JDS]

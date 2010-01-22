@@ -184,7 +184,7 @@ namespace Extract.Rules
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IdShieldOfficeObject, "ELI23198",
+                LicenseUtilities.ValidateLicense(LicenseIdName.RedactionCoreObjects, "ELI23198",
                     _OBJECT_NAME);
 
                 InitializeComponent();
@@ -329,6 +329,9 @@ namespace Extract.Rules
 
                 // Hide the form
                 Hide();
+
+                // Restore the focus to its owner [FIDSC #3952]
+                Owner.Focus();
             }
             catch (Exception ex)
             {

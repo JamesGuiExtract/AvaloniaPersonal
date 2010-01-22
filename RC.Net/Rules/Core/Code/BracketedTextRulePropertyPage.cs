@@ -51,7 +51,7 @@ namespace Extract.Rules
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IdShieldOfficeObject, "ELI23190",
+                LicenseUtilities.ValidateLicense(LicenseIdName.RedactionCoreObjects, "ELI23190",
                     _OBJECT_NAME);
 
                 _bracketedTextRule = bracketedTextRule;
