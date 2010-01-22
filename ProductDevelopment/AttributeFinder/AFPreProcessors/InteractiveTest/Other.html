@@ -3,10 +3,6 @@
 <HEAD>
 <TITLE>Other Preprocessors Testing Checklist</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
-<style>
-<!--
--->
-</style>
 </HEAD>
 
 <body>
@@ -27,6 +23,16 @@
       		<li>Changes made are persistent.</li>
       		<li><b>Cancel</b> button ignores changes and exits dialog.</li>
       		<li><b>X</b> button ignores changes and exits dialog.</li>
+<p>
+  	   	<LI><b>[FlexIDSCore #3758]</b> Document classification for image without 
+		recognized text
+	       	<ul>
+	  	   	<LI>Create a test ruleset that classifies documents
+      			<li>Exercise several files listed in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3758\fail.txt</b>.
+			<li>Confirm that <b>ELI25859: GetRelativePages is not valid for a 
+			non-spatial string!</b> exceptions are not seen.
+	       	</ul>
     	</ul>
   	</li>
 <p>
