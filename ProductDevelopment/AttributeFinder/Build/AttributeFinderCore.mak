@@ -108,6 +108,8 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe  /in:"$(BinariesFolder)\TestTextFunctionExpander.exe" /mapout:"$(BinariesFolder)\Map\mapTestTextFunctionExpander.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.DataEntry.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.DataEntry.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\DataEntryApplication.exe" /mapout:"$(BinariesFolder)\Map\mapDataEntryApplication.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Rules.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Rules.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Encryption.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Encryption.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 
 EncryptAndCopyComponentDataFiles: 
     @ECHO Copying the ComponentData subdirectories and files to installation directory...
@@ -198,6 +200,8 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Interop.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Redaction.Verification.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Redaction.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Rules.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Encryption.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Utilities.Parsers.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.AttributeFinder.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.FileActionManager.FileProcessors.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
@@ -279,7 +283,7 @@ BuildDataEntryMergeModule: CreateVersionISImportFile BuildAFCoreMergeModule
 
 GetAllFiles: GetPDCommonFiles GetReusableComponentFiles GetRCdotNETFiles GetAttributeFinderFiles GetPDUtilsFiles GetComponentDataFiles GetDataEntryInstall
 
-DoEverythingNoGet: SetupBuildEnv CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule
+DoEverythingNoGet: SetupBuildEnv CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule BuildDataEntryMergeModule
     @ECHO.
     @DATE /T
     @TIME /T
