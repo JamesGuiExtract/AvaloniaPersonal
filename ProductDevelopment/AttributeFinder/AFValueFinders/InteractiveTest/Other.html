@@ -36,6 +36,8 @@
 		 	<li>If left blank, does not throw an exception.</li>
 	  	</ul>
 	  	<li>Settings are persistent.</li>
+      		<li><b>[FlexIDSCore #3810]</b> Confirm that <b>Name</b> and <b>Type</b> values must 
+		be valid identifiers (i.e. <b>[-A-Za-z][_A-Za-z0-9]*</b>).
     	</ul>
   	</li>
 <p>
@@ -121,6 +123,8 @@
       		</li>
       		<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
       		<li><b>X</b> button ignores changes and exits the dialog.</li>
+      		<li><b>[FlexIDSCore #3813]</b> Confirm that <b>Attribute name</b> must be a valid 
+		identifier (i.e. <b>[-A-Za-z][_A-Za-z0-9]*</b>).
     	</ul>
   	</li>
 <p>
@@ -300,6 +304,24 @@
       		</li>
       		<li><b>Cancel</b> button ignores changes and exits the dialog.</li>
       		<li><b>X</b> button ignores changes and exits the dialog.</li>
+<p>
+  	   	<LI><b>[FlexIDSCore #3754]</b> Configuration error
+	       	<ul>
+			<li>Insert a new <b>Regular expression</b> rule in the <b>Ruleset 
+			Editor</b>.
+			<li>Type something in the regular expression text box in the 
+			Configuration dialog and press <b>OK</b>.
+			<li>Press <b>Configure...</b> again.
+			<li>Select the <b>Read regular expression from file</b> radio button 
+			and type something that is not a file path into the edit box.
+			<li>Press <b>OK</b>.
+			<li>Press <b>OK</b> in the error dialog and then press <b>Cancel</b> 
+			in the Configuration dialog.
+			<li>Press <b>Configure...</b> again.
+			<li>Confirm that the original regular expression text has been retained 
+			and that the <b>Read regular expression from file</b> radio button is 
+			no longer selected.
+	       	</ul>
     	</ul>
   	</li>
 <p>
