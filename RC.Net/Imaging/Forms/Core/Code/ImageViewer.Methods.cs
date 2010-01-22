@@ -2027,7 +2027,10 @@ namespace Extract.Imaging.Forms
             if (e.PageSettings.PrinterSettings.PrintRange == PrintRange.Selection)
             {
                 Rectangle imageArea = GetVisibleImageArea();
-                source = GetTransformedRectangle(imageArea, true);
+
+                // Use the base transform because it does not take rotation into account.
+                // Rotation will be applied later
+                source = GetTransformedRectangle(imageArea, true, base.Transform);
             }
             else
             {
@@ -2050,7 +2053,8 @@ namespace Extract.Imaging.Forms
                 (int)(marginBounds.Width - padding.X * 2), (int)(marginBounds.Height - padding.Y * 2));
 
             // Clip the region based on printable area [IDSD #318]
-            e.Graphics.Clip = new Region(e.PageSettings.PrintableArea);
+            RectangleF clip = RectangleF.Intersect(e.PageSettings.PrintableArea, destination);
+            e.Graphics.Clip = new Region(clip);
 
             Matrix unrotatedToPrinter = null;
             Matrix imageToPrinter = null;
@@ -3752,6 +3756,7 @@ namespace Extract.Imaging.Forms
             return Rectangle.Intersect(PhysicalViewRectangle, ClientRectangle);
         }
 
+        /// <overloads>Returns a rectangle transformed by an affine matrix.</overloads>
         /// <summary>
         /// Returns the specified rectangle in either client or image coordinates.
         /// </summary>
@@ -3765,8 +3770,28 @@ namespace Extract.Imaging.Forms
         /// <remarks>The result is undefined if no image is open.</remarks>
         public Rectangle GetTransformedRectangle(Rectangle rectangle, bool clientToImage)
         {
+            return GetTransformedRectangle(rectangle, clientToImage, _transform);
+        }
+
+        /// <summary>
+        /// Returns the specified rectangle transformed by the specified matrix.
+        /// </summary>
+        /// <param name="rectangle">The rectangle to return in a different coordinate system.
+        /// </param>
+        /// <param name="invertMatrix"><see langword="true"/> if <paramref name="rectangle"/> is 
+        /// in client coordinates and should be returned in image coordinates; 
+        /// <see langword="false"/> if <paramref name="rectangle"/> is in image coordinates and 
+        /// should be returned in client coordinates.</param>
+        /// <param name="transform">The transformation matrix to use.</param>
+        /// <returns><paramref name="rectangle"/> in the coordinate system specified.</returns>
+        static Rectangle GetTransformedRectangle(Rectangle rectangle, bool invertMatrix, 
+            Matrix transform)
+        {
             try
             {
+                // NOTE: This method assumes the transformation matrix has a rotation that is a 
+                // multiple of 90 degrees. The results will be incorrect for other rotations.
+
                 // Get the top-left and bottom-right corners of the rectangle.
                 Point[] corners = new Point[] 
                 {
@@ -3775,10 +3800,10 @@ namespace Extract.Imaging.Forms
                 };
 
                 // Check the direction of conversion
-                if (clientToImage)
+                if (invertMatrix)
                 {
                     // Convert the corners from client coordinates to image coordinates
-                    using (Matrix clientToImageMatrix = _transform.Clone())
+                    using (Matrix clientToImageMatrix = transform.Clone())
                     {
                         clientToImageMatrix.Invert();
                         clientToImageMatrix.TransformPoints(corners);
@@ -3787,7 +3812,7 @@ namespace Extract.Imaging.Forms
                 else
                 {
                     // Convert the corners from image to client coordinates
-                    _transform.TransformPoints(corners);
+                    transform.TransformPoints(corners);
                 }
 
                 // Calculate the x coordinates of the rectangle
