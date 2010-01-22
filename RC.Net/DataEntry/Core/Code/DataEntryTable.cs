@@ -1716,7 +1716,7 @@ namespace Extract.DataEntry
                         // If there is a "new" row, initialize the _tabOrderPlaceholderAttribute.
                         _tabOrderPlaceholderAttribute = DataEntryMethods.InitializeAttribute(
                             "PlaceholderAttribute_" + base.Name, MultipleMatchSelectionMode.First,
-                            true, _sourceAttributes, null, this, null, true, TabStopMode.Always,
+                            true, _sourceAttributes, null, this, 1, true, TabStopMode.Always,
                             null, null, null);
 
                         // Don't persist placeholder attributes in output.
@@ -2755,18 +2755,18 @@ namespace Extract.DataEntry
                     AttributeStatusInfo.MarkAsPropagated(attribute, true, true);
                 }
 
+                // If _tabOrderPlaceholderAttribute is being used, make sure it remains the last
+                // attribute from this control in _sourceAttributes.
+                if (_tabOrderPlaceholderAttribute != null)
+                {
+                    DataEntryMethods.ReorderAttributes(_sourceAttributes,
+                        DataEntryMethods.AttributeAsVector(_tabOrderPlaceholderAttribute));
+                }
+
                 // If a new attribute was created for this row, ensure that it propagates all its
                 // sub-attributes to keep all status info's in the attribute heirarchy up-to-date.
                 if (newAttributeCreated)
                 {
-                    // If _tabOrderPlaceholderAttribute is being used, make sure it remains the last
-                    // attribute in _sourceAttributes.
-                    if (_tabOrderPlaceholderAttribute != null)
-                    {
-                        _sourceAttributes.RemoveValue(_tabOrderPlaceholderAttribute);
-                        _sourceAttributes.PushBack(_tabOrderPlaceholderAttribute);
-                    }
-
                     ProcessSelectionChange();
                 }
 
@@ -3547,11 +3547,11 @@ namespace Extract.DataEntry
                     base.UpdateHints(false);
 
                     // If _tabOrderPlaceholderAttribute is being used, make sure it remains the last
-                    // attribute in _sourceAttributes.
+                    // attribute from this control in _sourceAttributes.
                     if (_tabOrderPlaceholderAttribute != null)
                     {
-                        _sourceAttributes.RemoveValue(_tabOrderPlaceholderAttribute);
-                        _sourceAttributes.PushBack(_tabOrderPlaceholderAttribute);
+                        DataEntryMethods.ReorderAttributes(_sourceAttributes,
+                            DataEntryMethods.AttributeAsVector(_tabOrderPlaceholderAttribute));
                     }
                 }
 

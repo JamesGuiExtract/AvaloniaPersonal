@@ -135,6 +135,10 @@
     <Compile Include="AttributeStatusInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="AttributeScanner.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>AttributeStatusInfo.cs</DependentUpon>
+    </Compile>
     <Compile Include="AutoUpdateTrigger.cs" />
     <Compile Include="DataEntryComboBox.cs">
       <SubType>Component</SubType>

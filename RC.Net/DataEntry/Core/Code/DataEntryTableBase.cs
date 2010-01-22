@@ -2482,7 +2482,13 @@ namespace Extract.DataEntry
             {
                 // Remove any deleted attributes from the _attributeMap and that the attribute is
                 // no longer reference by the cell that contains it.
-                UnMapAttribute(e.DeletedAttribute, true);
+                // Don't clear the cell attribute here-- in some cases in the process of adding a
+                // row, an attribute that has already been replaced in the table will be deleted
+                // and clearing the cell attribute would result in the newly placed attribute being
+                // deleted. There is no need to clear the cell attribute on delete since there is
+                // not any current situation where a deleted attribute doesn't also result in either
+                // the removal of its associated cell or in the replacement of the cell's attribute.
+                UnMapAttribute(e.DeletedAttribute, false);
             }
             catch (Exception ex)
             {
