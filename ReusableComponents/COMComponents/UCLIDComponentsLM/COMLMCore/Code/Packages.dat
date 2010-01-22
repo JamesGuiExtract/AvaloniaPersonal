@@ -41,8 +41,9 @@
 !ExtractCore,5001
 !InputFunnelCore,5002:5070:$ExtractCore
 !FlexIndexAndIDShieldCore,5003:5076:$RuleWritingCore
-!FlexIndex,5004:$FlexIndexAndIDShieldCore
-!IDShield,5005:$FlexIndexAndIDShieldCore
+!FlexIndex,5004:$FlexIndexAndIDShieldCore:$DataEntryCore
+!RedactionCore,5010
+!IDShield,5005:$FlexIndexAndIDShieldCore:$RedactionCore
 !IcoMapCore,5007:$InputFunnelCore
 
 // NOT !IcoMapForArcGIS,5008:$IcoMapCore because IcoMapCore is licensed separately
@@ -58,7 +59,7 @@
 
 // ID Shield Office = IDShieldOffice + OCROnClient + ExtractCore
 // plus built-in support for AntiAliasing + PDF Read/Write + Annotations
-!IDShieldOffice,$ExtractCore:5022:5049:5070:5073:5076
+!IDShieldOffice,$ExtractCore:$RedactionCore:5022:5049:5070:5073:5076
 
 ////////////////////
 // Functionality IDs
@@ -69,7 +70,7 @@
 !FlexServer,5023:$FlexShieldServerCore:$FlexIndex
 !RuleWritingCore,5024:$InputFunnelCore
 !DataEntryCore,5029
-!LabDECore,5028:$DataEntryCore
+!LabDECore,5028:$DataEntryCore:$FlexIndexAndIDShieldCore
 !LabDEServer,5050:$LabDECore:$FlexServer
 !LabDEClient,5050:$LabDECore:$FlexIndex:$OCROnClient
 
@@ -83,7 +84,7 @@ ID Shield,0
 -    Server (OCR + run rules + auto-redact),$IDShield:5044:5045:$FlexShieldServerCore
 
 LabDE,0
--    Client (Verify data),$LabDEClient
+-    Client (Verify data),$LabDEClient:5047
 -    Server,$LabDEServer
 
 FLEX Index / ID Shield Utilities,0
