@@ -85,7 +85,7 @@ GetDataEntryInstall:
 	@IF NOT EXIST "$(LabDEDir)\Installation\DataEntry" @MKDIR "$(LabDEDir)\Installation\DataEntry"
 	$(BUILD_DRIVE) 
 	@CD "$(LabDEDir)\Installation\DataEntry"
-	$(Get) $(GetOptions) -nonworkingfolder "$(LabDEDir)" "$$$(Branch)/Engineering/ProductDevelopment/LabDE/Installation/DataEntry" "$(LabDEVersion)"
+	$(Get) $(GetOptions) -nonworkingfolder "$(LabDEDir)\Installation\DataEntry" "$$$(Branch)/Engineering/ProductDevelopment/LabDE/Installation/DataEntry" "$(LabDEVersion)"
  	
 GetLabDEFiles:
 	@ECHO Getting $(LabDEDir) ...
