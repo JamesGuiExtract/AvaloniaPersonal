@@ -302,8 +302,9 @@
 <p>
 	<LI><h2>Support Find-And-Redact Of Text Or Regular Expression In Verification (#19)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>SCRs:</b> FlexIDSCore #3945, #3952, #3953, #3955, #3956, #3957, #3958
+  	   	<LI><b>Details:</b> Provide a Find or Redact dialog in the verification 
+		UI to allow the user to find and redact specified text or regular expressions.
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
@@ -311,7 +312,158 @@
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
+	      		<li><u>User Interface</u>
+			<ul>
+				<li>Confirm that a <b>Find or redact</b> button is available 
+				on the image window toolbar.
+				<li>Confirm that clicking the <b>Find or redact</b> button 
+				displays a <b>Find or redact text</b> dialog.
+				<li>Confirm that <b>Ctrl+F</b> displays a <b>Find or redact 
+				text</b> dialog.
+				<li>Confirm that a multi-line edit box is provided for 
+				<b>Words/patterns (one per line)</b>.
+				<li>Confirm that the edit box has initial focus.
+				<li>Confirm that the edit box is empty.
+				<li>Confirm that checkboxes are included for: <b>Match case</b>
+				and <b>Treat as regular expressions</b>.
+				<li>Confirm that a help link label next to the <b>Treat as regular 
+				expressions</b> checkbox is provided.
+				<li>Confirm that the checkboxes are <b>unchecked</b>.
+				<li>Confirm that buttons are provided next to the edit box for 
+				<b>Import...</b> and <b>Export...</b>.
+				<li>Confirm that buttons are provided below the checkboxes for 
+				<b>Reset search</b>, <b>Find next</b>, <b>Redact</b>, <b>Redact 
+				all</b>, and <b>Close</b>.
+				<li>Confirm that a <b>Results</b> grid is provided.
+				<li>Confirm that a status bar is provided.
+				<li>Confirm that tab order is correct.
+				<li>Confirm that only the <b>Import...</b> and <b>Close</b> 
+				buttons are enabled.
+				<li>Confirm that the <b>Close</b> button closes the dialog.
+				<li>Reopen the dialog.
+				<li>Add a word or pattern to the edit box.
+				<li>Confirm that the <b>Export...</b>, <b>Find next</b> and 
+				<b>Redact all</b> buttons are also enabled.
+				<li>Confirm that tab order is still correct.
+				<li>Close and reopen the dialog.
+				<li>Confirm that the same word or pattern is present in the edit box.
+				<li>Modify the checkbox settings.
+				<li>Add additional lines of text to fill up the edit box.
+				<li>Confirm that a horizontal scroll bar is displayed when needed.
+				<li>Confirm that a vertical scroll bar is displayed when needed.
+				<li>Close and reopen the <b>Find and redact text</b> dialog.
+				<li>Confirm that the edit box contents are retained.
+				<li>Confirm that the checkbox settings are retained.
+				<li>Stop processing and close <b>File Action Manager</b>.
+				<li>Reopen the FAM and start processing.
+				<li>Reopen the <b>Find and redact text</b> dialog.
+				<li>Confirm that the edit box is empty.
+				<li>Confirm that the <b>Export...</b> button is disabled.
+				<li>Add several entries to the edit box.
+				<li>Confirm that the <b>Export...</b> button is enabled.
+				<li>Confirm that the entries can be <b>exported</b> to a text file.
+				<li>Confirm that the entries can be <b>exported</b> to a file with 
+				a non-TXT file extension.
+				<li>Confirm that Export... defaults to <b>TXT</b> file extension.
+				<li>Stop processing and close the FAM.
+				<li>Reopen the FAM and start processing.
+				<li>Reopen the <b>Find and redact text</b> dialog.
+				<li>Confirm that <b>Import...</b> defaults to <b>TXT</b> file 
+				extension.
+				<li>Confirm that the previously saved entries can be <b>imported</b> 
+				from the text file.
+				<li>Delete an entry and export the remaining items to the same 
+				text file.
+				<li>Confirm that a confirmation dialog is presented before file 
+				contents are overwritten.
+				<li>Confirm that the new contents were saved to the text file.
+			</ul>
+<p>
+	      		<li><u>Functionality</u>
+			<ul>
+				<li>Prepare the <b>Demo_IDShield</b> images for verification.
+				<li>Verify <b>TestImage001.tif</b>.
+				<li>Open the <b>Find and redact text</b> dialog.
+				<li>Add separate entries for <b>Jane</b> and <b>The</b>.
+				<li>Click the <b>Find next</b> button.
+				<li>Confirm that the list box, check boxes and the Import/Export 
+				buttons are disabled.
+				<li>Confirm that the word <b>THE</b> has a dotted line highlight.
+				<li>Confirm that the <b>Results</b> grid notes 17 matches.
+				<li>Confirm that the status bar includes <b>Displaying match 1 
+				of 17</b>.
+				<li>Click the <b>Redact</b> button.
+				<li>Confirm that the highlight changes to a redaction and that 
+				the word <b>JANE</b> is now highlighted.
+				<li><b>[FlexIDSCore #3960]</b> Confirm that a new entry has appeared 
+				in the Grid view with <b>THE</b> as Text.
+				<li>Click the <b>Redact</b> button.
+				<li>Confirm that the highlight changes to a redaction and that 
+				the word <b>the</b> is now highlighted.
+				<li>Confirm that a new entry has appeared in the Grid view with 
+				<b>JANE</b> as Text.
+				<li>Click the <b>Find next</b> button repeatedly.
+				<li>Confirm that the highlight changes appropriately.
+				<li>Confirm that the status bar text changes appropriately.
+<p>
+				<li>Click the <b>Reset search</b> button.
+				<li>Confirm that the dotted-line highlight disappears and that 
+				the status bar text is cleared.
+				<li>Confirm that the list box, check boxes and the Import/Export 
+				buttons are enabled.
+				<li>Confirm that list box contents are retained.
+				<li>Confirm that each found item that was <b>Redact</b>ed is 
+				still present in both the grid view and the image window.
+				<li>Remove <b>the</b> from the list box and click the <b>Find 
+				next</b> button.
+				<li>Confirm that no dotted-line highlight is displayed since 
+				the first <b>JANE</b> text is still a redaction.
+				<li>Click the <b>Redact all</b> button.
+				<li><b>[FlexIDSCore #3956]</b> Confirm that <b>one</b> additional 
+				redaction is added since only one more <b>Jane</b> text string is 
+				present in the document.
+				<li>Click the <b>Redact all</b> button again.
+				<li><b>[FlexIDSCore #3956]</b> Confirm that <b>no</b> additional 
+				redactions are added since no more unredacted <b>Jane</b> strings 
+				are present in the document.
+<p>
+				<li>Click the <b>Reset search</b> button.
+				<li>Change the search to look for <b>The</b>.
+				<li>Click the <b>Find next</b> button and confirm that <b>15</b> 
+				matches are found.
+				<li>Click the <b>Reset search</b> button and then check the 
+				<b>Match case</b> button.
+				<li>Click the <b>Find next</b> button and confirm that <b>1</b> 
+				match is correctly found.
+<p>
+				<li>Click the <b>Reset search</b> button.
+				<li>Uncheck the <b>Match case</b> button.
+				<li>Change the search to look for <b>1{3,}</b>.
+				<li>Click the <b>Find next</b> button.
+				<li>Confirm that a <b>No matches found!</b> message is displayed.
+				<li>Check the <b>Treat as regular expressions</b> button.
+				<li>Click the <b>Find next</b> button.
+				<li>Click the <b>Find next</b> button and confirm that <b>1</b> 
+				match is correctly found.
+				<li>Click the <b>Redact</b> button.
+				<li>Confirm that the appropriate entry is added to the grid view.
+				<li>Confirm that the dotted-line highlight changes to a redaction.
+			</ul>
+<p>
+	      		<li><u>Miscellaneous</u>
+			<ul>
+				<li><b>[FlexIDSCore #3955]</b> Message if USS file not available
+				<ul>
+					<li>Verify an image that does not have a corresponding USS 
+					file.
+					<li>Click the <b>Find and redact text</b> toolbar button.
+					<li>Confirm that a meaningful message is presented 
+					about how find or redact cannot be used without OCR data.
+					<li>Click the <b>Edit - Find or redact...</b> menu item.
+					<li>Confirm that a meaningful message is presented 
+					about how find or redact cannot be used without OCR data.
+				</ul>
+			</ul>
 	       	</ul>
        	</ul>
 </OL>
