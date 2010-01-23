@@ -26,17 +26,18 @@
 	   	<li>Start a blank <b>File Action Manager</b>.</li> 
    		<li>Select a database server and database.  Select an action, then check the 
 		<b>Queue files for this action</b> checkbox.</li> 
-   		<li>Confirm that pressing the <b>Commands &gt;</b> button for Select Skip Condition in 
-		the Queue Setup tab of the File Action Manager brings up a drop-down menu with 
-		<b>Select Skip Condition...</b> and then brings up the dialog.</li> 
-   		<li>Confirm that the <b>Select Skip Condition</b> dialog has three active buttons: 
+ 	   	<LI>Confirm that the label above the bottom edit box is <b>Do not queue any file 
+		that meets the following condition</b>.
+   		<li>Confirm that pressing the associated <b>Commands &gt;</b> button for brings up 
+		a drop-down menu with <b>Select Condition...</b> and then brings up the dialog.</li> 
+   		<li>Confirm that the <b>Select Condition</b> dialog has three active buttons: 
        		Configure..., OK, Cancel.  There should also be an edit box for <i>FAM Condition 
-       		description</i>, and a droplist for <i>Select Skip Condition</i>.</li>
+       		description</i>, and a droplist for <i>Select Condition</i>.</li>
    		<ul> 
-      			<li>Confirm the droplist for the Select Skip Condition includes: <b>None</b>.</li>
+      			<li>Confirm the droplist for Select Condition includes: <b>None</b>.</li>
 	      		<ul> 
         	 		<li>Confirm that when <b>None</b> is selected, it disables the Configure 
-				button  in the Select Skip Condition dialog.</li> 
+				button in the Select Condition dialog.</li> 
          			<li>Clear the database, then double-click on <b>Skip_None.fps</b> in 
 				the FPS folder. 
 				Confirm that an <b>Action not Found</b> error message is displayed.</li> 
@@ -50,7 +51,7 @@
 				<b>TestImage020.tif</b>, and <b>TestImageB.tif</b>, each in a separate row.
       			</ul>
 <p>
-	     		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+	     		<li>Confirm the droplist for the Select Condition dialog includes: 
         	  	<b>AND multiple conditions</b>.
       			<ul> 
          			<li>Confirm when <b>AND multiple conditions</b> is selected, and the 
@@ -64,7 +65,7 @@
         		    		<li>Confirm that only the <b>Add...</b> button is initially enabled.
       		  	    		<li>Confirm that pressing the <b>Add...</b> button brings up a 
 					<b>Select FAM Condition</b> dialog.
-            				<li>Insert several skip conditions into the <b>Configure AND 
+            				<li>Insert several conditions into the <b>Configure AND 
 					multiple conditions</b> dialog. 
 	        	    		<li>Confirm that the initial state for all the FAM conditions has the 
 					<b>Enabled</b> checkbox checked.
@@ -84,7 +85,7 @@
 	        	    		<li>Confirm that the <b>Delete</b> button can delete multiple selected 
 					list box items. 
             				<li>Confirm that the <b>Command &gt;</b> button displays a popup menu 
-					with <b>Select Skip Condition...</b>, <b>Configure FAM Condition...</b>,  
+					with <b>Select Condition...</b>, <b>Configure FAM Condition...</b>,  
 					<b>Configure description...</b> and <b>Cancel</b>items. 
 	        	    		<li>Confirm that the <b>Up</b> arrow button moves the selected item up 
 					in the list box.
@@ -142,10 +143,10 @@
 				recently</i> display area.</li>
       			</ul>
 <p>
-	      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+	      		<li>Confirm the droplist for the Select Condition dialog includes: 
 			<b>Exactly ONE in multiple conditions</b>.</li> 
       			<ul>
-         			<li>Confirm when the Configure button in Select Skip Condition 
+         			<li>Confirm when the Configure button in Select Condition 
 	             		is pressed, it brings up the <b>Configure Exactly one in multiple 
         	     		conditions</b> dialog.</li> 
          			<li>Clear the database, then double click on <b>Skip_ExactlyOne.fps</b> 
@@ -163,10 +164,10 @@
 				recently</b> display area.</li>
 	      		</ul>
 <p> 
-	      		<li>Confirm the droplist for the Select Skip Condition includes: 
+	      		<li>Confirm the droplist for the Select Condition includes: 
         	  	<b>NONE in multiple conditions</b>.</li> 
       			<ul>
-         			<li>Confirm that when the Configure button in Select Skip Condition 
+         			<li>Confirm that when the Configure button in Select Condition 
 	             		is pressed, it brings up the <b>Configure NONE in multiple 
 				conditions</b> dialog.</li> 
          			<li>Clear the database, then double click on <b>Skip_NoneInMultiple.fps</b> 
@@ -184,10 +185,10 @@
 				recently</b> display area.</li>
 	      		</ul> 
 <p>
-   	   		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+   	   		<li>Confirm the droplist for the Select Condition dialog includes: 
         	  	<b>OR multiple conditions</b>.</li>
       			<ul> 
-         			<li>Confirm when the Configure button in Select Skip Condition 
+         			<li>Confirm when the Configure button in Select Condition 
 	             		is pressed, it brings up <b>Configure OR multiple conditions</b> 
 				dialog.</li> 
          			<li>Clear the database, then double click on <b>Skip_OR.fps</b> in 
@@ -206,14 +207,14 @@
         	     		<b>Files added or updated in the queue recently</b> display area.</li>
       			</ul> 
 <p>
-	      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+	      		<li>Confirm the droplist for the Select Condition dialog includes: 
         	  	<b>Match based upon file existence</b>.</li>
       			<ul> 
          			<li>Confirm clicking on the Configure button brings up the <b>Configure  
 				Match based upon file existence</b> dialog.
         	    		<li>Confirm that the dialog has a droplist with entries of <b>does</b> 
-				and <b>does not</b> as the fill-in text for <b>Skip processing 
-                		if the file does|does not exist</b>. 
+				and <b>does not</b> as the fill-in text for <b>Match if the file 
+				does|does not exist</b>. 
 	            		<li>Confirm that the dialog has an edit box with an associated 
 				<b>Tag Selector</b> button and <b>Browse</b> button.
             			<li>Confirm that the <b>Tag Selector</b> button displays a context 
@@ -244,11 +245,11 @@
 				recently</b> display area.</li>
 	      		</ul>
 <p>
-   	   		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+   	   		<li>Confirm the droplist for the Select Condition dialog includes: 
         	  	<b>Match based upon filename pattern</b>.</li>
       			<ul>
-         			<li>Confirm that pressing the Configure button in the Select Skip 
-				Condition dialog brings up the <b>Configure Match based upon filename 
+         			<li>Confirm that pressing the Configure button in the Select 
+				Condition dialog brings up the <b>Configure Match based upon file name 
 				pattern</b> dialog.</li>
         	    		<li>Confirm there is an edit box with an associated <b>Tag Selector</b> 
 				button.</li> 
@@ -267,7 +268,7 @@
 				match</b>.</li> 
         	    		<li>Confirm that the default combo box settings are <b>does contain</b>.
 <p>
-	            		<li>Confirm that the <b>Skip based upon file name pattern</b> dialog 
+	            		<li>Confirm that the <b>Match based upon file name pattern</b> dialog 
 				has a <b>Read regular expression from file</b> radio button and an 
                 		associated edit box.</li> 
 	            		<li>Confirm that the edit box is enabled only when the radio button 
@@ -306,7 +307,7 @@
 				added or updated in the queue recently</b> display area.
       			</ul> 
 <p>
-	      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+	      		<li>Confirm the droplist for the Select Condition dialog includes: 
         	  	<b>Match based upon mathematical condition</b>.</li>
       			<ul> 
          			<li>Confirm clicking on the Configure button brings up the <b>Configure  
@@ -353,10 +354,10 @@
 			       	</ul>
       			</ul> 
 <p>
-	      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+	      		<li>Confirm the droplist for the Select Condition dialog includes: 
         	  	<b>Tag condition</b>.</li>
       			<ul> 
-         			<li>Confirm that pressing the Configure button in the Select Skip 
+         			<li>Confirm that pressing the Configure button in the Select 
 				Condition dialog brings up the <b>Configure Tag condition</b> 
 				dialog.</li>
         	    		<li>Confirm that there is a combo box for the condition being 
@@ -398,10 +399,10 @@
 			       	</ul>
      			</ul>
 <p>
-	      		<li>Confirm the droplist for the Select Skip Condition dialog includes: 
+	      		<li>Confirm the droplist for the Select Condition dialog includes: 
         	  	<b>Task condition</b>.</li>
       			<ul> 
-         			<li>Confirm that pressing the Configure button in the Select Skip 
+         			<li>Confirm that pressing the Configure button in the Select 
 				Condition dialog brings up the <b>Configure Task condition</b> 
 				dialog.</li>
         	    		<li>Confirm that there is a label about the condition being 
@@ -443,15 +444,15 @@
 		<li><b>[LegacyRC #4791]</b> FAM Condition still executes after being removed.
 		<ul>
 		   	<li>Open an existing <b>FPS</b> file.  Confirm that it properly executes files. 
-		   	<li> Configure a skip condition that will always be true (i.e. <b>File 
+		   	<li> Configure a condition that will always be true (i.e. <b>File 
 			Existence</b> on <b>&lt;SourceDocName&gt;</b>).
-		   	<li><b>[LegacyRC #4316]</b> Confirm that <b>Double-click</b> of the Skip Condition edit 
+		   	<li><b>[LegacyRC #4316]</b> Confirm that <b>Double-click</b> of the Condition edit 
 			box displays the <b>configuration</b> dialog.
-	   		<li><b>[LegacyRC #4316]</b> Confirm that <b>Alt+Double-click</b> of the Skip Condition edit 
+	   		<li><b>[LegacyRC #4316]</b> Confirm that <b>Alt+Double-click</b> of the Condition edit 
 			box displays the <b>Configure description</b> dialog.
-		   	<li><b>[LegacyRC #4316]</b> Confirm that <b>Ctrl+Double-click</b> of the Skip Condition edit 
-			box displays the <b>Select SKip condition</b> dialog.
-		   	<li>Reselect a skip condition of <b>&lt;NONE&gt;</b>.
+		   	<li><b>[LegacyRC #4316]</b> Confirm that <b>Ctrl+Double-click</b> of the Condition edit 
+			box displays the <b>Select condition</b> dialog.
+		   	<li>Reselect a condition of <b>&lt;NONE&gt;</b>.
 		   	<li>Run the <b>FPS</b> file.
 	   		<li>Confirm that <b>all</b> files are added to the queue.
 		</ul>
