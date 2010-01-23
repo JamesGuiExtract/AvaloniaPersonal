@@ -239,6 +239,18 @@
   	   	<LI><b>[FlexIDSCore #3776]</b> Confirm that an appropriate error message is 
 		seen if an invalid tag such as <b>&lt;SourceDocName</b> is entered in the 
 		property page.
+<p>
+  	   	<LI><b>[LegacyRC #5579, #5580]</b> Apply Bates number
+	       	<ul>
+	  	   	<LI>Prepare an FPS file to act on a database without any defined counters.
+	      		<li>Create an <b>Apply Bates number</b> task.
+	  	   	<LI>Confirm that the property page is displayed correctly even without 
+			a counter.
+<p>
+			<li>Define some counters in the database.
+			<li>Confirm that the couter drop-down list in the <b>Apply Bates number</b> 
+			task does not allow editing.
+	       	</ul>
    	</ul> 
 <p>
 	<li><b>Core: Archive or restore associated file</b></li>
@@ -636,6 +648,26 @@
 		<li><b>[LegacyRC #4745]</b> Confirm that the image files in the following 
 		folder convert to searchable PDF without error.  
 		I:\Common\Testing\PVCS_Testing\LegacyRC\4745
+<p>
+  	   	<LI><b>[LegacyRC #5581, #5586]</b> PDF/A conversion
+	       	<ul>
+	  	   	<LI>Prepare a large set of images for <b>PDF/A conversion</b>.
+			<li>Exercise the set.
+			<li>Confirm that no error windows appear that force one or more processing 
+			threads to be idle.
+			<li>Examine the UEX log to see if any <b>ELI28833: Convert to PDF task was 
+			killed.</b> messages were logged.
+			<li>Examine the UEX log to see if any <b>ELI28853: Application Trace: Opened 
+			file after retrying.</b> messages were logged.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5599]</b> PDF/A conversion
+	       	<ul>
+	      		<li>Create a set of images for PDF/A conversion testing.  Include several 
+			images that are too big to OCR.
+	  	   	<LI>Confirm that the unusually large images gracefully fail processing.
+			<li>Confirm that the normal images are processed and converted correctly.
+	       	</ul>
    	</ul> 
 <p>
 	<li><b>Core: Convert VOA to XML</b></li>

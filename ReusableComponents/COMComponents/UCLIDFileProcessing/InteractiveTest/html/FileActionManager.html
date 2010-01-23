@@ -51,6 +51,19 @@
     	<li><b>[LegacyRC #4857]</b> Test <b>ProcessFiles.exe <i>filename.fps</i> /s /fc /m:4</b> 
 	on the command line.  Confirm that the File Action Manager processes 4 files and closes.  
 	Run the same command-line options again.  Confirm that 4 more files are processed.
+<p>
+   	<LI><b>[LegacyRC #5573, #5575]</b> FAM
+       	<ul>
+		<li>Confirm that a <b>File Action Manager is stopping</b> message is 
+		logged when the user stops processing.
+		<li>Confirm that a <b>File Action Manager is stopping</b> message is 
+		logged when the FAM finishes processing on its own.
+		<li>Confirm that a <b>File Action Manager is stopping</b> message is 
+		logged when the ESFAMProcess service finishes processing.
+		<li>Confirm that the ProcessFiles usage message includes <b>will 
+		process &lt;nnn&gt; documents and stop</b> for the <b>/m:&lt;nnn&gt;</b> 
+		switch.
+       	</ul>
 </ul>
 <b>File Menu</b>
 <ul>
