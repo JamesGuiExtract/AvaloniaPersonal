@@ -144,8 +144,9 @@
 <p>
 	<LI><h2>Support Cropping And Printing Of Image Regions In Image Viewer (#22)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>SCRs:</b> FlexIDSCore #3949, #3951, #3962
+  	   	<LI><b>Details:</b> Provide the ability for the user to print the current 
+		viewing area during verification.
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
@@ -153,7 +154,42 @@
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
+			<li><u>User Interface</u>
+			<ul>
+				<li>Verify an image.
+		      		<li>Confirm that a <b>Print view...</b> item is present in the 
+				<b>File</b> menu.
+				<li>Confirm that a toolbar button <b>is not</b> provided.
+				<li>Confirm that selecting <b>File - Print view...</b> displays 
+				a Print dialog
+				<ul>
+					<li>Confirm that the normal options are available in the 
+					<b>Select Printer</b> group box.
+					<li>Confirm that the only <b>Page Range</b> option is 
+					<b>All</b>.
+					<li>Confirm that the <b>Number of copies</b> can be 
+					selected and ddefaults to <b>1</b>.
+				</ul>
+			</ul>
+<p>
+			<li><u>Functionality</u>
+			<ul>
+				<li>Verify an image with fit mode set to <b>Fit-To-Page</b>.
+				<li>Modify the width of the <b>Data window</b> so that some of 
+				the viewing area is wasted.
+				<li>Confirm that the entire page is printed without wasting space.
+				<li>Zoom in to a portion of the image.
+				<li>Confirm that the exact viewing area is printed.
+<p>
+				<li>Confirm that unredacted highlights are not printed as 
+				highlights.
+				<li>Confirm that redactions are printed in <b>black</b> if the 
+				task settings are set for <b>black</b>.
+				<li>Confirm that redactions are printed in <b>white</b> if the 
+				task settings are set for <b>white</b>.
+				<li>Confirm that redaction text is correctly printed.
+				<li>Confirm that exemption codes are correctly printed.
+			</ul>
 	       	</ul>
        	</ul>
 <p>
