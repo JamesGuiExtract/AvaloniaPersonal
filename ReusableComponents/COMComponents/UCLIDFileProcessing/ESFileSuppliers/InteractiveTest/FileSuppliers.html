@@ -341,7 +341,7 @@
 <p>
 <b>Miscellaneous</b>
 <ul>
-	<li><b>[LegacyRCAndUtils #5157]</b> Write-caching errors for file supplying
+	<li><b>[LegacyRC #5157]</b> Write-caching errors for file supplying
 	<ul>
 		<li>Run a small memory leak test for file supplying.
 		<ul>
@@ -353,11 +353,83 @@
 		in the exception log.
 	</ul>
 <p>
-	<li><b>[LegacyRCAndUtils #5168]</b> Queueing should stop if action name is changed
+	<li><b>[LegacyRC #5168]</b> Queueing should stop if action name is changed
 	<ul>
 		<li>Configure an instance of the FAM to queue and process files.
 		<li>Use the <b>DBAdmin</b> to change the name of the relevant action within the database.
 		<li>Confirm that the FAM stops trying to queue more files reasonably quickly.
+	</ul>
+<p>
+	<li><b>[LegacyRC #5623]</b> Robust folder listening
+	<ul>
+		<li>Exercise the following scenarios.  Confirm that graceful behavior is 
+		noted and that appropriate exceptions are logged with useful debug data
+		<ol>
+			<li><u>File supplier watching a disconnected machine</u>
+			<ul>
+				<li>Prepare an FPS file with a file supplier that is 
+				listening to a folder on a different machine where 
+				the different machine is <b>not connected</b> to the network.
+				<li>Start processing and confirm that no files are queued.
+				<li>Connect the second machine to the network.
+				<li>Confirm that within no more than a few minutes, files 
+				are being queued from the remote machine.
+				<li>Add more files to the folder that is being watched.
+				<li>Confirm that the new files are also queued.
+			</ul>
+			<li><u>File supplier watching a connected machine</u>
+			<ul>
+				<li>Prepare an FPS file with a file supplier that is 
+				listening to a folder on a different machine where 
+				the different machine is <b>connected</b> to the network.
+				<li>Start processing and confirm that files are queued.
+				<li>Disconnect the remote machine from the network.
+				<li>Add more files to the folder that is being watched.
+				<li>Reconnect the remote machine to the network while 
+				the FAM is still running.
+				<li>Check whether or not the files added while disconnected 
+				are queued by the file supplier.
+				<li>Previous test notes
+				<ul>
+					<li>New files were not added, as expected
+				</ul>
+				<li>Add more files to the folder that is being watched after 
+				the remote machine has been reconnected.
+				<li>Confirm that within no more than a few minutes, files 
+				are being queued from the remote machine.
+				<li>Previous test notes
+				<ul>
+					<li>Noticed <b>ELI13017: Error getting file changes</b>
+				</ul>
+			</ul>
+			<li><u>File supplier watching a machine that gets rebooted</u>
+			<ul>
+				<li>Prepare an FPS file with a file supplier that is 
+				listening to a folder on a different machine where 
+				the different machine is <b>connected</b> to the network.
+				<li>Start processing and confirm that files are queued.
+				<li>Reboot the remote machine.
+				<li>Add more files to the folder that is being watched.
+				<li>Confirm that within no more than a few minutes, files 
+				are being queued from the remote machine.
+				<li>Previous test notes
+				<ul>
+					<li>Noticed <b>ELI13017: Error getting file changes</b>
+					<li>Noticed <b>ELI13086: Invalid directory handle</b>
+				</ul>
+			</ul>
+			<li><u>Stop supplying from a disconnected machine</u>
+			<ul>
+				<li>Prepare an FPS file with a file supplier that is 
+				listening to a folder on a different machine where 
+				the different machine is <b>connected</b> to the network.
+				<li>Start processing and confirm that files are queued.
+				<li>Disconnect the remote machine from the network.
+				<li>Confirm that files are no longer being queued.
+				<li>Stop processing and confirm that the FAM stops 
+				gracefully.
+			</ul>
+		</ol>
 	</ul>
 </ul>
 
