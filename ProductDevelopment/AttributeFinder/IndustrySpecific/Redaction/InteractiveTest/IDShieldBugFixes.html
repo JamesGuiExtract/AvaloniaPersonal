@@ -63,6 +63,25 @@
 			the image. 
 	       	</ul>
 <p>
+  	   	<LI><b>[DotNet #372, FlexIDSCore #3903, #3906]</b> Various
+	       	<ul>
+	      		<li>Verify an image.
+			<li>Zoom in to a rectangle in the lower section of the image.
+			<li>Change to <b>fit-to-width</b> mode.
+			<li>Confirm that the zoom is still centered around the lower section 
+			of the image.
+<p>
+			<li>Configure verification to require visiting all pages.
+			<li>Verify a multiple-page image.
+			<li>Confirm that the <b>Next tile</b> button is enabled.
+			<li>Click the <b>Next tile</b> button.
+			<li>Confirm that the image advances to page 2.
+			<li>Confirm that the current zoom level is retained.
+			<li>Press the <b>ALT</b> key.
+			<li>Press <b>z</b> or any other shortcut key.
+			<li>Confirm that the UI is still responsive.
+	       	</ul>
+<p>
   	   	<LI><b>[FlexIDSCore #3320]</b> Selection of redactions while selecting exemption codes
 	       	<ul>
 	      		<li>Exercise <b>verification</b>.
@@ -76,6 +95,19 @@
 	      		<li>Hit the <b>Escape</b> key and select a redaction.
 	      		<li>Use the <b>E</b> shortcut to display the Exemption Codes dialog.
 	      		<li>Confirm that interaction with the <b>Data Grid</b> is still not allowed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3411]</b> Remove bad files from history
+	       	<ul>
+	      		<li>Prepare several documents for verification.
+			<li>Verify several documents.
+			<li>Rename one of the recently verified documents.
+			<li>Navigate back to the renamed image.
+			<li>Confirm that a meaningful error is presented.
+			<li>Confirm that the error indicates that the document will 
+			be removed from the history.
+			<li>Confirm that the active document is still the next most recent 
+			document in the history.
 	       	</ul>
 <p>
   	   	<LI><b>[FlexIDSCore #3448]</b> No auto-zoom for new redactions
@@ -148,6 +180,16 @@
 	      		<li>Exercise the <b>Verification with annotations</b> memory leak test.
 	      		<li>Review the exception log after the test is completed.
 	      		<li>Confirm that no <b>Sharing violation</b> errors were logged.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3621]</b> Duplicate exemption codes
+	       	<ul>
+			<li>Verify a document.
+			<li>Create a redaction.
+			<li>Apply the <b>(b)(1)</b> exemption code from FOIA to the 
+			redaction and press <b>OK</b>.
+			<li>Open the exemption code dialog again.
+			<li>Confirm that only one copy of the exemption code is present.
 	       	</ul>
 	</UL>
 <p>
