@@ -638,6 +638,27 @@
 	  	   	<LI>Confirm that the manually <b>Skipped</b> files can be 
 			processed.
 	       	</ul>
+<p>
+		<LI><b>[LegacyRC #5627, #5647]</b> Set File Action Status allows action name expressions
+       		<ul>
+			<li>Confirm that the <b>Manually Set Action Status</b> dialog includes 
+			a combo box populated with each defined action.
+			<li>Confirm that the <b>Manually Set Action Status</b> dialog includes a 
+			<b>Tag Selector</b> button allowing the user to choose an action 
+			including a $ function.
+			<li>Confirm that status can be modified for an action that uses a 
+			$ function.
+			<li>Confirm that trying to modify status for an action that uses a 
+			$ function that does not actually exist in the database displays a 
+			meaningful error.
+			<li>Confirm that status can be modified for an action that uses 
+			<b>&lt;SourceDocName&gt;</b>.
+			<li>Confirm that <b>Manually Set Action Status</b> automatically 
+			creates an action if <b>AutoCreateActions = 1</b>.
+			<li>Confirm that <b>Manually Set Action Status</b> does not automatically 
+			create an action if <b>AutoCreateActions = 0</b>.
+       		</ul>
+	   	</LI>
 	</ul>
 <p>
 	<li><b>Manually set file processing priority...</b>
@@ -685,6 +706,22 @@
 	  	   	<LI>Confirm that the <b>FAM DB Admin</b> utility is not unresponsive 
 			for an extended period while setting file priority.  This should be 
 			tested with several thousand files in a database.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5620]</b> Manually set file processing priority 
+	       	<ul>
+	  	   	<LI>Queue some files in the database with <b>Below normal</b> priority.
+			<li>Set file processing priority to <b>High</b> by using the <b>Select Files</b> 
+			dialog to select all files with <b>Below normal</b> priority and narrow that down 
+			to a random percentage subset.
+			<li>Confirm that the appropriate number of files were adjusted for priority.
+			<li>Confirm that the user message provides the correct number of files with 
+			changed priority.
+<p>
+			<li>Repeat the above test using a <b>random count subset</b>.
+			<li>Confirm that the appropriate number of files were adjusted for priority.
+			<li>Confirm that the user message provides the correct number of files with 
+			changed priority.
 	       	</ul>
 	</ul>
 <p>
