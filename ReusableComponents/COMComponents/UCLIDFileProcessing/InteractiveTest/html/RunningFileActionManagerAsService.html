@@ -322,6 +322,46 @@ called the <b>service machine</b>.  The machine that contains the database is re
 		</ul>
 	</ul>
 	</li>
+<p>
+	<li><b>Miscellaneous</b>
+	<ul>
+  	   	<LI><b>[DotNet #370, #373, #374]</b> FAM service
+	       	<ul>
+	      		<li>Confirm that <b>ESFAMService.sdf</b> is located in the 
+			<b>CommonComponents</b> folder.
+	      		<li>Confirm that <b>ESFAMService.sdf</b> contains a <b>Settings</b> table.
+			<li>Confirm that the <b>Settings</b> table includes a 
+			<b>SleepTimeOnStart</b> field.
+			<li>Confirm that the <b>SleepTimeOnStart</b> field defaults to 
+			<b>120000</b>.  Units are milliseconds.
+			<li>Confirm that the <b>Settings</b> table includes a 
+			<b>DependentServices</b> field.
+			<li>Confirm that the <b>DependentServices</b> field is empty by default.
+<p>
+			<li>Exercise the FAM service and confirm that the service does not 
+			start until after the <b>SleepTimeOnStart</b> value.
+			<li>Add an entry to the <b>DependentServices</b> field.  Confirm that the 
+			service is not currently running.
+			<li>Confirm that the FAM service does not start if the specified dependent 
+			service has not started.
+			<li>Confirm that an exception is logged after the sleep time has expired 
+			noting which dependent services have not started.
+			<li>Start the dependent service.
+			<li>Confirm that the FAM service starts.
+			<li>Stop the FAM service.
+<p>
+			<li>Add more entries to the <b>DependentServices</b> field using a pipe 
+			character as a delimiter.
+			<li>Confirm that the FAM service does not start if only some of the specified 
+			dependent services have started.
+			<li>Confirm that an exception is logged after the sleep time has expired 
+			noting which dependent services have not started.
+			<li>Stop the FAM service.
+			<li>Confirm that an exception is logged noting which dependent services 
+			have still not started as of the stop request.
+	       	</ul>
+	</ul>
+	</li>
 </ul>
 </body> 
 </html>
