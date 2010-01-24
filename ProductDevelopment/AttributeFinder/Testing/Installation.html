@@ -439,6 +439,16 @@
 				<td><font size="2">.\CommonComponents\<br>ConvertFPSFile.exe
 			</tr>
 			<tr align="center">
+				<th><font size="2">CopyNumberedFiles
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2">.\CommonComponents\<br>CopyNumberedFiles.exe
+			</tr>
+			<tr align="center">
 				<th><font size="2">Create Multipage Image
 				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
@@ -487,6 +497,16 @@
 				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
 				<td><font size="2">.\CommonComponents\<br>ESOCR.exe
+			</tr>
+			<tr align="center">
+				<th><font size="2">GetWordLengthDist
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2">.\CommonComponents\<br>GetWordLengthDist.exe
 			</tr>
 			<tr align="center">
 				<th><font size="2">ID Shield Statistics Reporter
@@ -763,6 +783,14 @@
 			version number.
 	       	</ul>
 <p>
+  	   	<LI><b>[LegacyRC #5617]</b> Max Files From Database
+	       	<ul>
+			<li>Examine <b>HKCU/Software/Extract 
+			Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FPRecordManager</b>.
+			<li>Confirm that the default value for the <b>MaxFilesFromDB</b> key 
+			is <b>1</b>.
+	       	</ul>
+<p>
 		<li><b>[FlexIDSCore #3160]</b> Install - Register .fps file types to open with ProcessFiles</li>
 		<ul>
 			<li>Ensure that the .fps file type is registered to open with ProcessFiles.</li>
@@ -791,6 +819,27 @@
 			File\shell\open\command	points to "C:\Program Files\Extract 
 			Systems\CommonComponents\VOAFileViewer.exe" "%1"</li>
 		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3917]</b> RegisterAll.bat
+	       	<ul>
+			<li>Confirm that <b>RegisterAll.bat</b> is located in the 
+			<b>CommonComponents</b> folder.
+			<li>Exercise the batch file.
+			<li>Confirm that the user is prompted to start the registration process.
+			<li>Confirm that a status message is displayed in the command window for 
+			each file being registered.
+			<li>Confirm that the user is prompted again at the end of the registration 
+			process.
+			<li>Confirm that exercising the batch file using the <b>/s</b> flag 
+			causes the file to run silently without prompts or messages.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4329]</b> Remove LST files with Uninstall
+	       	<ul>
+	      		<li>Uninstall both <b>FLEX Index</b> and <b>ID Shield</b>.
+			<li>Confirm that the <b>*.LST</b> files have been removed 
+			from the <b>CommonComponents</b> folder.
+	       	</ul>
 	</UL>
 <p>
 </OL>
