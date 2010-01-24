@@ -443,6 +443,12 @@
 		<b>Select Action</b> dialog.
           	<li>Confirm that the Select Action dialog has a combo box with a list of 
 		available actions.
+		<li>Confirm that the <b>Select Action</b> dialog includes a 
+		<b>Tag Selector</b> button allowing the user to choose an action 
+		including a $ function.
+		<li>Confirm that <b>&lt;SourceDocName&gt;</b> does not appear in the 
+		<b>Select Action</b> dialog.
+		<li>Confirm that such an action can be saved and reloaded.
           	<li>Confirm that an Action selected by pressing the <b>OK</b> button in 
 		the Select Action dialog is placed in the <b>Select action</b> edit box on 
 		the Action tab.
@@ -711,6 +717,39 @@
 		<li>Turn off caching and repeat the above exercise.</li>
 		<li>Verify that there are still no exceptions logged.</li>
 	</ul>
+<p>
+	<LI><b>[LegacyRC #5618]</b> FAM allows action name expressions
+	<ul>
+		<li>Create a new database.
+		<li>Confirm that the <b>AutoCreateActions</b> field in the <b>DBInfo</b> 
+		table is set to <b>0</b>.
+		<li>Add a <b>Test_&lt;user_name&gt;</b> action with your user name 
+		inserted in the appropriate location.
+		<li>Add a <b>Test</b> action to the database.
+		<li>Create and save a <b>UserName.fps</b> file that uses 
+		<b>Test_$UserName()</b> as the action.
+		<li>Create and save a <b>Test.fps</b> file that uses <b>Test</b> as 
+		the action.
+		<li>Confirm that files can be supplied and processed using each FPS file.
+		<li>Delete or rename the <b>Test</b> action.
+		<li>Confirm that opening <b>Test.fps</b> displays an error about the 
+		undefined action name.
+		<li>Delete or rename the <b>Test_&lt;user_name&gt;</b> action.
+		<li>Exercise <b>UserName.fps</b>
+		<ul>
+			<li>Confirm that opening the FPS file does not display an error 
+			about the undefined action name.
+			<li>Confirm that exercising the FPS file displays an exception 
+			indicating that the specified action name is invalid.
+			<li>Close the FPS file.
+			<li>Set the <b>AutoCreateActions</b> field in the <b>DBInfo</b> 
+			table to <b>1</b>.
+			<li>Exercise the FPS file.
+			<li>Confirm that the action is automatically created and that 
+			processing works without error.
+		</ul>
+       	</ul>
+	</LI>
 <ul> 
 </body> 
 </html>
