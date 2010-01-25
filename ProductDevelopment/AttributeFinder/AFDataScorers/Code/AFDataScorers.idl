@@ -21,6 +21,21 @@ library UCLID_AFDATASCORERSLib
 	importlib("..\..\AFCore\Code\AFCore.tlb");
 
 
+	//////////////
+	// Enums
+	//////////////
+	typedef
+	[
+		uuid(864A21E3-BD94-44d3-9AEE-8FA4915FF0BB), 
+		helpstring("Extract Systems EAggregateFunctions")
+	]
+	enum EAggregateFunctions
+	{
+		kAverage = 0,
+		kMinimum = 1,
+		kMaximum = 2,
+	} EAggregateFunctions;
+
 	[
 		object,
 		uuid(0EDBFC88-9CBE-4F4B-9458-55E94E991A50),
@@ -33,6 +48,23 @@ library UCLID_AFDATASCORERSLib
 	};
 
 	[
+		object,
+		uuid(D43B269D-1ECD-4984-912C-D0FD58BE3176),
+		dual,
+		nonextensible,
+		helpstring("ICharacterConfidenceDS Interface"),
+		pointer_default(unique)
+	]
+	interface ICharacterConfidenceDS : IDispatch{
+		//------------------------------------------------------------------------------------------
+		// PURPOSE: Property that indicates how to select the character confidence 
+		[propget, id(1), helpstring("property AggregateFunction")] 
+			HRESULT AggregateFunction([out, retval] EAggregateFunctions *pVal);
+		[propput, id(1), helpstring("property AggregateFunction")] 
+			HRESULT AggregateFunction([in] EAggregateFunctions newVal);
+	};
+
+	[
 		uuid(0E9555F7-9F77-41BD-9762-199F07A871E0),
 		helpstring("EntityNameDataScorer Class")
 	]
@@ -40,5 +72,26 @@ library UCLID_AFDATASCORERSLib
 	{
 		[default] interface IDataScorer;
 		interface ILicensedComponent;
+	};
+	[
+		uuid(07F86A2E-923C-4EDF-9E6E-17588E745324),
+		helpstring("CharacterConfidenceDS Class")
+	]
+	coclass CharacterConfidenceDS
+	{
+		[default] interface ICharacterConfidenceDS;
+		interface IDataScorer;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(83EFE042-EB4B-4C8E-BCAD-EE7689D07088),
+		helpstring("CharacterConfidenceDSPP Class")
+	]
+	coclass CharacterConfidenceDSPP
+	{
+		[default] interface IUnknown;
 	};
 };

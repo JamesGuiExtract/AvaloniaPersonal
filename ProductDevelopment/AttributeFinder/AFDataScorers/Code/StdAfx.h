@@ -22,6 +22,7 @@
 //something, but do not change the name of _Module
 extern CComModule _Module;
 #include <atlcom.h>
+#include <atlctl.h>
 
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
@@ -45,6 +46,7 @@ using namespace UCLID_AFUTILSLib;
 #import "..\..\AFSplitters\Code\AFSplitters.tlb" named_guids
 using namespace UCLID_AFSPLITTERSLib; 
 
+#import "AFDataScorers.tlb"
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

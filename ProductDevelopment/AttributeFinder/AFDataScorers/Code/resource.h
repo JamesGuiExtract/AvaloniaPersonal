@@ -1,9 +1,16 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by AFDataScorers.rc
 //
 #define IDS_PROJNAME                    100
 #define IDR_ENTITYNAMEDATASCORER        102
+#define IDR_CHARACTERCONFIDENCEDS       103
+#define IDD_CHARACTERCONFIDENCEDSPP     104
+#define IDS_TITLECHARACTERCONFIDENCEDSPP 105
+#define IDS_HELPFILECHARACTERCONFIDENCEDSPP 106
+#define IDS_DOCSTRINGCHARACTERCONFIDENCEDSPP 107
+#define IDR_CHARACTERCONFIDENCEDSPP     108
+#define IDC_COMBO_AGGREGATE_FUNCTION    201
 
 // Next default values for new objects
 // 
@@ -11,7 +18,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        201
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         201
-#define _APS_NEXT_SYMED_VALUE           103
+#define _APS_NEXT_CONTROL_VALUE         202
+#define _APS_NEXT_SYMED_VALUE           109
 #endif
 #endif

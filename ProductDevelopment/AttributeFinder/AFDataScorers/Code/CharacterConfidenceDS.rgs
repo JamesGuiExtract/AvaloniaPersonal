@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFDataScorers.CharacterConfidenceDS.1 = s 'CharacterConfidenceDS Class'
+	{
+		CLSID = s '{07F86A2E-923C-4EDF-9E6E-17588E745324}'
+	}
+	UCLIDAFDataScorers.CharacterConfidenceDS = s 'CharacterConfidenceDS Class'
+	{
+		CLSID = s '{07F86A2E-923C-4EDF-9E6E-17588E745324}'
+		CurVer = s 'UCLIDAFDataScorers.CharacterConfidenceDS.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {07F86A2E-923C-4EDF-9E6E-17588E745324} = s 'CharacterConfidenceDS Class'
+		{
+			ProgID = s 'UCLIDAFDataScorers.CharacterConfidenceDS.1'
+			VersionIndependentProgID = s 'UCLIDAFDataScorers.CharacterConfidenceDS'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{F0A8FC59-37EE-4EB5-A9C8-C322F851BC88}'
+		}
+	}
+}

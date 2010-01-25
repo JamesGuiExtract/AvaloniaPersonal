@@ -300,6 +300,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\CharacterConfidenceDS.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CharacterConfidenceDSPP.cpp"
+				>
+			</File>
+			<File
 				RelativePath="EntityNameDataScorer.cpp"
 				>
 				<FileConfiguration
@@ -351,6 +359,14 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
+				RelativePath=".\CharacterConfidenceDS.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CharacterConfidenceDSPP.h"
+				>
+			</File>
+			<File
 				RelativePath="EntityNameDataScorer.h"
 				>
 			</File>
@@ -368,11 +384,23 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
+				RelativePath=".\CharacterConfidenceDS.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\CharacterConfidenceDSPP.rgs"
+				>
+			</File>
+			<File
 				RelativePath="EntityNameDataScorer.rgs"
 				>
 			</File>
 		</Filter>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="AFDataScorers.rc"
+		/>
 	</Globals>
 </VisualStudioProject>
