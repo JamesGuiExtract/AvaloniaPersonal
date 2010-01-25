@@ -49,10 +49,6 @@ typedef struct _ASTAT_
 	NAME_BUFFER    NameBuff [30];
 }	ASTAT, *PASTAT;
 
-// Valid identifier characters
-const string gstrVALID_IDENTIFIER_CHARS = 
-	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
-
 //-------------------------------------------------------------------------------------------------
 unsigned char getValueOfHexChar(unsigned char ucChar)
 {

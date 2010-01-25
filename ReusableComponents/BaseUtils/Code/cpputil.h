@@ -68,6 +68,9 @@ const string gstrNUMBERS = "0123456789";
 const string gstrALPHA = gstrUPPER_ALPHA + gstrLOWER_ALPHA;
 const string gstrALPHA_NUMERIC = gstrALPHA + gstrNUMBERS;
 
+// Valid identifier characters
+const string gstrVALID_IDENTIFIER_CHARS = gstrALPHA_NUMERIC + "_";
+
 //-------------------------------------------------------------------------------------------------
 // ********* Operating System - Misc **********
 //-------------------------------------------------------------------------------------------------

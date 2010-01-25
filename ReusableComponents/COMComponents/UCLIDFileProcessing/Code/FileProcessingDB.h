@@ -586,6 +586,9 @@ private:
 	// when running as a service
 	bool isMachineInListOfMachinesToSkipUserAuthentication(const _ConnectionPtr& ipConnection);
 
+	// Checks whether the specified action name is valid
+	void validateNewActionName(const string& strActionName);
+
 	// Class to contain the thread data for the emailMessageThread
 	class EmailThreadData
 	{

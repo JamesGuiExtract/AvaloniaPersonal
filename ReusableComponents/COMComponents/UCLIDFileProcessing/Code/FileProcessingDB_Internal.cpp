@@ -2891,6 +2891,19 @@ bool CFileProcessingDB::isMachineInListOfMachinesToSkipUserAuthentication(
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29188");
 }
 //--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::validateNewActionName(const string& strActionName)
+{
+	// Check if the action name is valid
+	if (!isValidIdentifier(strActionName))
+	{
+		// Throw an exception
+		UCLIDException ue("ELI29334", "Specified action name is invalid.");
+		ue.addDebugInfo("Action Name", strActionName);
+		ue.addDebugInfo( "Valid Pattern", "[_a-zA-Z][_a-zA-Z0-9]*" );
+		throw ue;
+	}
+}
+//--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::emailMessage(const string & strMessage)
 {
 	AfxBeginThread(emailMessageThread, 

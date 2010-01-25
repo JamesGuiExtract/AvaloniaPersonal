@@ -188,6 +188,11 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction,  long * pnID)
 
 	try
 	{
+		string strActionName = asString(strAction);
+
+		// Validate the new action name
+		validateNewActionName(strActionName);
+
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
 		
@@ -204,8 +209,6 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction,  long * pnID)
 
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
-
-		string strActionName = asString(strAction);
 
 		// Begin a trasaction
 		TransactionGuard tg(ipConnection);
@@ -232,10 +235,10 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction,  long * pnID)
 		tg.CommitTrans();
 
 		END_CONNECTION_RETRY(ipConnection, "ELI23524");
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13524");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::DeleteAction(BSTR strAction)
@@ -4991,6 +4994,9 @@ STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName)
 
 		// Get the action name as a string
 		string strActionName = asString(bstrActionName);
+
+		// Validate the new action name
+		validateNewActionName(strActionName);
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
