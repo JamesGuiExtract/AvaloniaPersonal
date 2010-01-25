@@ -177,11 +177,12 @@ void FileProcessingDlgActionPage::OnBnClickedBtnSelAction()
 		IStrToStrMapPtr ipMapActions = getDBPointer()->GetActions();
 		ASSERT_RESOURCE_ALLOCATION("ELI15021", ipMapActions != NULL );
 
-		// If there is no action inside database
-		// Prompt user to define an action first
-		if (ipMapActions->GetSize() == 0)
+		// If there is no action inside database Prompt user to define an action first
+		// unless AutoCreateAction is TRUE [LRCAU #5650]
+		if (ipMapActions->GetSize() == 0 && getDBPointer()->GetAutoCreateActions() == VARIANT_FALSE)
 		{
-			string strPrompt = "There are no actions inside the current database!\nPlease use the DB Administration tool to add an action first.";
+			string strPrompt = "There are no actions inside the current database!\n"
+				"Please use the DB Administration tool to add an action first.";
 			MessageBox(strPrompt.c_str(), "No action", MB_ICONINFORMATION);
 			return;
 		}

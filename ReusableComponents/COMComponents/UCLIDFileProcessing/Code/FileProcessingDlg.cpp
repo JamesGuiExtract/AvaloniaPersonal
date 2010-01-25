@@ -501,9 +501,12 @@ void FileProcessingDlg::OnBtnRun()
 		}
 		catch(...)
 		{
-			// update the UI
-			m_bRunning = false;
-			updateMenuAndToolbar();
+			try
+			{
+				updateUIForProcessingComplete();
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29348");
+
 			throw;
 		}
 
@@ -1093,43 +1096,7 @@ LRESULT FileProcessingDlg::OnProcessingComplete(WPARAM wParam, LPARAM lParam)
 
 	try
 	{
-		// Stop the statistics thread
-		stopStatsThread();
-
-		// Enable the process setup page after processing
-		if (isPageDisplayed(kProcessingSetupPage))
-		{
-			m_propProcessSetupPage.setEnabled(true);
-		}
-
-		// Enable the queue setup page after processing
-		if (isPageDisplayed(kQueueSetupPage))
-		{
-			m_propQueueSetupPage.setEnabled(true);
-		}
-
-		// Enable the action page after processing
-		if (isPageDisplayed(kActionPage))
-		{
-			m_propActionPage.setEnabled(true);
-		}
-
-		// If the processing log page is shown, notify it to stop
-		// progress updates
-		if (isPageDisplayed(kProcessingLogPage))
-		{
-			m_propProcessLogPage.stopProgressUpdates();
-		}
-
-		// This takes care of stopping the timer on the next timer tick. 
-		m_bRunning = false;
-
-		// enable the "process" menu
-		CMenu* pMenu = GetMenu();
-		pMenu->EnableMenuItem(1, MF_BYPOSITION | MF_ENABLED);
-
-		updateUI();
-		updateMenuAndToolbar();
+		updateUIForProcessingComplete();
 
 		// If any files failed we will automatically show the user the failed list on the report page.
 		if (m_nNumFailed > 0)
@@ -2720,5 +2687,50 @@ void FileProcessingDlg::displayPage(EDlgTabPage ePage)
 		THROW_LOGIC_ERROR_EXCEPTION("ELI17057");
 		break;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::updateUIForProcessingComplete()
+{
+	try
+	{
+		// Stop the statistics thread
+		stopStatsThread();
+
+		// Enable the process setup page after processing
+		if (isPageDisplayed(kProcessingSetupPage))
+		{
+			m_propProcessSetupPage.setEnabled(true);
+		}
+
+		// Enable the queue setup page after processing
+		if (isPageDisplayed(kQueueSetupPage))
+		{
+			m_propQueueSetupPage.setEnabled(true);
+		}
+
+		// Enable the action page after processing
+		if (isPageDisplayed(kActionPage))
+		{
+			m_propActionPage.setEnabled(true);
+		}
+
+		// If the processing log page is shown, notify it to stop
+		// progress updates
+		if (isPageDisplayed(kProcessingLogPage))
+		{
+			m_propProcessLogPage.stopProgressUpdates();
+		}
+
+		// This takes care of stopping the timer on the next timer tick. 
+		m_bRunning = false;
+
+		// enable the "process" menu
+		CMenu* pMenu = GetMenu();
+		pMenu->EnableMenuItem(1, MF_BYPOSITION | MF_ENABLED);
+
+		updateUI();
+		updateMenuAndToolbar();
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29347");
 }
 //-------------------------------------------------------------------------------------------------

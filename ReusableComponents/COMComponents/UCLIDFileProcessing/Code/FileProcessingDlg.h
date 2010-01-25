@@ -337,6 +337,9 @@ private:
 	//			  need to be updated.
 	void setupAndLaunchStatsThread();
 	//---------------------------------------------------------------------------------------------
+	// Promise: To update the UI to the appropriate state when processing has completed
+	void updateUIForProcessingComplete();
+	//---------------------------------------------------------------------------------------------
 
 	// Stops the statistics thread
 	void stopStatsThread();
