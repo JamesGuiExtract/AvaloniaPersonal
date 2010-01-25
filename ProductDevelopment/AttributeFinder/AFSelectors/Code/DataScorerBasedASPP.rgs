@@ -1,0 +1,26 @@
+HKCR
+{
+	AFSelectorsLib.DataScorerBasedASPP.1 = s 'DataScorerBasedASPP Class'
+	{
+		CLSID = s '{812A632C-373C-4F35-BE42-8F2BC441548F}'
+	}
+	AFSelectorsLib.DataScorerBasedASPP = s 'DataScorerBasedASPP Class'
+	{
+		CLSID = s '{812A632C-373C-4F35-BE42-8F2BC441548F}'
+		CurVer = s 'AFSelectorsLib.DataScorerBasedASPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {812A632C-373C-4F35-BE42-8F2BC441548F} = s 'DataScorerBasedASPP Class'
+		{
+			ProgID = s 'AFSelectorsLib.DataScorerBasedASPP.1'
+			VersionIndependentProgID = s 'AFSelectorsLib.DataScorerBasedASPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{B2548FD4-6D38-4849-828E-FE0660B45935}'
+		}
+	}
+}

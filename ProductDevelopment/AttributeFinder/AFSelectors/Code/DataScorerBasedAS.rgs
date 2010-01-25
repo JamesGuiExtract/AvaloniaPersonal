@@ -1,0 +1,27 @@
+HKCR
+{
+	AFSelectors.DataScorerBasedAS.1 = s 'DataScorerBasedAS Class'
+	{
+		CLSID = s '{8AFB7D8A-F883-4E2E-A22E-50DBCC1B9BF7}'
+	}
+	AFSelectors.DataScorerBasedAS = s 'DataScorerBasedAS Class'
+	{
+		CLSID = s '{8AFB7D8A-F883-4E2E-A22E-50DBCC1B9BF7}'
+		CurVer = s 'AFSelectors.DataScorerBasedAS.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8AFB7D8A-F883-4E2E-A22E-50DBCC1B9BF7} = s 'DataScorerBasedAS Class'
+		{
+			ProgID = s 'AFSelectors.DataScorerBasedAS.1'
+			VersionIndependentProgID = s 'AFSelectors.DataScorerBasedAS'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{B2548FD4-6D38-4849-828E-FE0660B45935}'
+		}
+	}
+}

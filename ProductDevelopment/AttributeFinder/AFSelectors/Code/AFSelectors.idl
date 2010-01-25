@@ -186,6 +186,52 @@ library UCLID_AFSELECTORSLib
 		[propput, id(8), helpstring("property TargetsMustContainReferences")] HRESULT TargetsMustContainReferences([in] VARIANT_BOOL newVal);
 	};
 
+	[
+		object,
+		uuid(33983299-4536-4D55-A03F-90BDC7661980),
+		dual,
+		nonextensible,
+		helpstring("IDataScorerBasedAS Interface"),
+		pointer_default(unique)
+	]
+	interface IDataScorerBasedAS : IDispatch
+	{
+		// PURPOSE: This is the data scorer that is used to provide the score from 0 to 100
+		[propget, id(1), helpstring("property DataScorer")] HRESULT DataScorer([out, retval] IObjectWithDescription** pVal);
+		[propput, id(1), helpstring("property DataScorer")] HRESULT DataScorer([in] IObjectWithDescription* newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This is the condition comparison(=,!=,<,>,<=,>=) for the first condition
+		[propget, id(2), helpstring("property FirstScoreCondition")] HRESULT FirstScoreCondition([out, retval] EConditionalOp* pVal);
+		[propput, id(2), helpstring("property FirstScoreCondition")] HRESULT FirstScoreCondition([in] EConditionalOp newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This is the score that the score returned from the data scorer will be
+		//			compared against with the comparison assigned by FirstScoreCondition
+		[propget, id(3), helpstring("property FirstScoreToCompare")] HRESULT FirstScoreToCompare([out, retval] long* pVal);
+		[propput, id(3), helpstring("property FirstScoreToCompare")] HRESULT FirstScoreToCompare([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This is used to indicate if there are 2 conditions. 
+		//			If this is VARIANT_TRUE a second condition needs to be set, 
+		//			if set to VARIANT_TRUE the second condition properties will be ignored
+		[propget, id(4), helpstring("property IsSecondCondition")] HRESULT IsSecondCondition([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(4), helpstring("property IsSecondCondition")] HRESULT IsSecondCondition([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This is the condition comparison(=,!=,<,>,<=,>=) for the second condition
+		// NOTE:	This property is ignored if IsSecondCondition is VARIANT_FALSE
+		[propget, id(5), helpstring("property SecondScoreCondition")] HRESULT SecondScoreCondition([out, retval] EConditionalOp* pVal);
+		[propput, id(5), helpstring("property SecondScoreCondition")] HRESULT SecondScoreCondition([in] EConditionalOp newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This is the score that the score returned from the data scorer will be
+		//			compared against with the comparison assigned by SecondScoreCondition
+		// NOTE:	This property is ignored if IsSecondCondition is VARIANT_FALSE
+		[propget, id(6), helpstring("property SecondScoreToCompare")] HRESULT SecondScoreToCompare([out, retval] long* pVal);
+		[propput, id(6), helpstring("property SecondScoreToCompare")] HRESULT SecondScoreToCompare([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: If there is a second condition and this is VARIANT_TRUE, the first and second condition 
+		//			must be true, if this is VARIANT_FALSE, the first or second condition must be true
+		// NOTE:	This property is ignored if IsSecondCondition is VARIANT_FALSE
+		[propget, id(7), helpstring("property AndSecondCondition")] HRESULT AndSecondCondition([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(7), helpstring("property AndSecondCondition")] HRESULT AndSecondCondition([in] VARIANT_BOOL newVal);
+	};
 	//////////////////
 	// CoClasses
 	//////////////////
@@ -243,6 +289,27 @@ library UCLID_AFSELECTORSLib
 		helpstring("SpatialProximityASPP Class")
 	]
 	coclass SpatialProximityASPP
+	{
+		[default] interface IUnknown;
+	};
+	[
+		uuid(8AFB7D8A-F883-4E2E-A22E-50DBCC1B9BF7),
+		helpstring("DataScorerBasedAS Class")
+	]
+	coclass DataScorerBasedAS
+	{
+		[default] interface IDataScorerBasedAS;
+		interface IAttributeSelector;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(812A632C-373C-4F35-BE42-8F2BC441548F),
+		helpstring("DataScorerBasedASPP Class")
+	]
+	coclass DataScorerBasedASPP
 	{
 		[default] interface IUnknown;
 	};
