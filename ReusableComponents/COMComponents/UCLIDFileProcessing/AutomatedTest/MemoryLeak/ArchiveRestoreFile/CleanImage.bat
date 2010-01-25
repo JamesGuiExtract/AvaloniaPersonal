@@ -1,3 +1,3 @@
-echo off
-del /q /S /F .\Source\*.*
-del /q /S /F .\Stats\%1\*
+@echo off
+del /q /S /F .\Source\*.* > NUL
+::del /q /S /F .\Stats\%1\*
