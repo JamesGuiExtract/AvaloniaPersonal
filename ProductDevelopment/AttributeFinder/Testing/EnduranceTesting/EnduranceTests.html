@@ -7,21 +7,21 @@
 
 <body>
 
-<h1>FAM Endurance Tests (Test ID 6A &amp; 6B)<br>
+<h1>FAM Endurance Tests<br>
 <img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
-<h2>NOTE: Test results should be archived under I:\Common\Testing\Product Testing\FLEX_Index_60\EnduranceTests</h2>
+<h2>NOTE: Test results should be archived under I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests</h2>
 <ol>
-<li><h2>Machine Preparation</h2>
+	<li><h2>Machine Preparation</h2>
 	<ul>
 		<li>Select a test machine.  Various operating systems should be exercised 
-		    for these collected tests.  Confirm that the chosen operating system is 
-		    appropriate for this test.
+		for these collected tests.  Confirm that the chosen operating system is 
+		appropriate for this test.
 		<li>Install and license <b>FLEX Index</b> or <b>ID Shield</b>.  Note that 
-		    Disable USB Key Serial Numbers is required to exercise a customer ruleset.
+		Disable USB Key Serial Numbers is required to exercise a customer ruleset.
 		<li>Use the <b>USB License Key Manager</b> utility to confirm that a network 
-		    USB key is configured and available.  The usual location is on <b>LISA</b>.
+		USB key is configured and available.  The usual location is on <b>LISA</b>.
 		<li>Create a local <b>Statistics</b> folder for collection of process statistics.
 		<li>Create a local folder for the ruleset to be exercised and select the corresponding 
 		images.  Note: The images need to match the ruleset.
@@ -75,7 +75,7 @@
 	</ul>
 <p>
 -->
-<li><h2>Database Preparation</h2>
+	<li><h2>Database Preparation</h2>
 	<ul>
 		<li>Use the <b>FAM DB Admin</b> utility to log onto or create the 
 		Endurance_Test database on HPQC2.  The server name should be <b>HPQC2</b>.
@@ -83,7 +83,7 @@
 		database if it does not already exist.
 	</ul>
 <p>
-<li><h2>File Preparation</h2>
+	<li><h2>File Preparation</h2>
 	<ul>
 		<li>Create a <b>Queue.fps</b> file with two Folder file suppliers.  
 		    The file suppliers should be configured as follows: 
@@ -107,16 +107,17 @@
 		</ul>
 	</ul>
 <p>
-<li><h2>Schedule Reports</h2>
-<ul>
+	<li><h2>Schedule Reports</h2>
+	<ul>
 		<li>Confirm that the machine with the Endurance_Test database has the desired 
 		<b>ID Shield</b> build.
 		<li>Confirm that <b>C:\Program Files\Extract Systems\CommonComponents\</b> (if the 
-		machine has a 64-bit OS, instead put <b>C:\Program Files (x86)\Extract Systems\CommonComponents\</b>) 
-		is in the database machine's system path. 
+		machine has a 64-bit OS, instead put <b>C:\Program Files (x86)\Extract 
+		Systems\CommonComponents\</b>) is in the database machine's system path. 
 		<li>Confirm that email settings are correctly configured on the database machine.
 		<ul>
-			<li>Open a command window and type emailFile /c to open the <b>Email Settings</b> dialog.
+			<li>Open a command window and type emailFile /c to open the <b>Email 
+			Settings</b> dialog.
 			<li>SMTP should be set to 192.168.44.1.
 			<li>Enter your desired Sender Display Name and your email address.
 		</ul>
@@ -127,21 +128,24 @@
 		separated by semicolons.
 		<li>Use <b>Windows Task Scheduler</b> to run reports.bat.
 		<ul>
-			<li>Go to <b>Start</b>-><b>Programs</b>-><b>Accessories</b>-><b>System Tools</b>-><b>Scheduled 
-			Tasks</b> (<b>Task Scheduler</b> in Vista/Server 2008)</li>
+			<li>Go to <b>Start</b>-><b>Programs</b>-><b>Accessories</b>-><b>System 
+			Tools</b>-><b>Scheduled Tasks</b> (<b>Task Scheduler</b> in 
+			Vista/Server 2008)</li>
 			<li>Create a new task.</li>
-			<li>Configure it to run reports.bat and schedule the task to run at least once per day.</li>
+			<li>Configure it to run reports.bat and schedule the task to run at least 
+			once per day.</li>
 		</ul>
 		<li>After the <b>Windows Scheduled Task</b> has been configured, confirm that the scheduled 
 		task, batch file, and Report Viewer are working correctly by doing a test run of the task (right 
 		click the task in the list and click 'Run').
-</ul>
+	</ul>
 <p>
 
-<li><h2>Test Execution</h2>
+	<li><h2>Test Execution</h2>
 	<ul>
 		<li>Open a command prompt and begin the collection of process statistics with the 
-		following command string where &quot;Statistics&quot; is the folder created in Step 4 of Machine Preparation.	
+		following command string where &quot;Statistics&quot; is the folder created in Step 4 
+		of Machine Preparation.	
 		<li><b>LogProcessStats.exe ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe 5m &quot;Statistics&quot;</b>
 		<li>Open both the Queueing and the Processing FPS files.
 <p>
@@ -149,7 +153,7 @@
 		<li>Start Processing for the <b>Process.fps</b> file.
 	</ul>
 <p>
-<li><h2>Test Review and Data Analysis</h2>
+	<li><h2>Test Review and Data Analysis</h2>
 	<ul>
 		<li>The following items should be periodically reviewed during processing.
 		<ul>
@@ -178,14 +182,15 @@
 		be updated throughout the test.
 	</ul>
 <p>
-<li><h2>Saving Test Results</h2>
+	<li><h2>Saving Test Results</h2>
 	<ul>
 		<li>Data will be stored in subfolders under 
-		I:\Common\Testing\Product Testing\FLEX_Index_70\EnduranceTests.
-		<li>Subfolders exist for:
+		I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests.
+		<li>Subfolders can be created for some or all of
 		<ul>
-			<li>Test_6A
-			<li>Test_6B
+			<li>ID_Shield
+			<li>FLEX_Index
+			<LI>PDFA
 		</ul>
 		<li>The <b>Stats</b> folder should be copied to a <b>YYYY-MM-DD</b> 
 		named subfolder under the associated test subfolder.
@@ -193,12 +198,11 @@
 		This is useful if any unexpected errors are noticed during review. 
 		<li>SQL Server Management Studio can be used to backup the ENDURANCE 
 		database files to a <b>Database</b> subfolder.
-		<li>An example path for a particular test is: <br>
-<b>I:\Common\Testing\Product Testing\FLEX_Index_70\EnduranceTests\Test_6B\2007-10-30</b>.
+		<li>An example path for a particular test is: <br> 
+		<b>I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests\ID_Shield\2007-10-30</b>.
 		<li>Copy and update a <b>TestDetails.txt</b> file in the YYYY-MM-DD folder.
 		This file will contain a summary of the test environment and results.
 	</ul>
 </ol>
-
 </body>
 </html>
