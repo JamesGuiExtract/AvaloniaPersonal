@@ -1,0 +1,400 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.0.0.13 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.0.0.13 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[DotNet #379, LegacyRC #5670]</b> FAM Service
+	       	<ul>
+	  	   	<LI>Confirm that the <b>Settings</b> table in the <b>ESFAMService.sdf</b> 
+			database contains an entry for <b>NumberOfFilesToProcess</b>.
+			<li>Confirm that the default setting is <b>0</b>.
+			<li>Confirm that for a <b>zero</b> value, the service continues to run as 
+			long as files are available to process.
+			<li>Confirm that for a <b>non-zero</b> value, the service processes only 
+			the specified number of files.
+			<li>Confirm that after processing the specified number of files, the 
+			<b>FAMProcess.exe</b> instance is automatically killed and then another 
+			<b>FAMProcess.exe</b> instance is automatically started.
+<p>
+			<li>Confirm that a <b>SkipAuthenticationForServicesOnMachines</b> field 
+			exists in the <b>DBInfo</b> table.
+			<li>Enable user authentication via <b>RequireAuthenticationBeforeRun</b>.
+			<li>Confirm that running an FPS file in normal mode correctly requires 
+			a user to be defined in the database and to provide a password.
+			<li>Add the test machine to the comma-separated list of machines for 
+			<b>SkipAuthenticationForServicesOnMachines</b>.
+			<li>Confirm that the FAM service runs as expected without requiring a 
+			password.
+			<li>Confirm (again) that running an FPS file in normal mode correctly 
+			requires a user to be defined in the database and to provide a password.
+<p>
+			<li>Remove the test machine from the comma-separated list of machines for 
+			<b>SkipAuthenticationForServicesOnMachines</b>.
+			<li>Prepare FPS files to be run via the FAM service against at least two 
+			databases.
+			<li>Configure one database to <b>require</b> user authentication.
+			<li>Configure another database to <b>not require</b> user authentication.
+			<li>Confirm that the FAM service logs an expection for the FPS file 
+			processing files for the database that requries user authentication.
+			<li>Confirm that the other FPS file processes files as expected.
+			<li>Stop the service.
+			<li>Configure each database to require user authentication.
+			<li>Restart the service.
+			<li>Confirm that the FAM service <b>automatically</b> stops processing 
+			since no FPS file can be exercised without user authentication.
+			<li>Add the test machine to the comma-separated list of machines for 
+			<b>SkipAuthenticationForServicesOnMachines</b>.
+			<li>Restart the service.
+			<li>Confirm that the FAM service runs as expected without requiring a 
+			password.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #380]</b> Report Viewer
+	       	<ul>
+			<li>Select a report that provides meaningful output.
+			<li>Confirm that a report template can be created.
+			<li>Rename the <b>.JPG</b> report thumbnail image.
+			<li>Confirm that a new report template can be created.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3734]</b> Page number checking when queuing
+	       	<ul>
+	  	   	<LI>Create a list of PDF files to be supplied to a new database via 
+			<b>Files from dynamic list</b>.
+			<li>Queue the files and confirm that page count information is 
+			provided.
+			<li>Add new files to the end of the list.
+			<li>Queue the files again, without using the <b>Force processing</b> 
+			option.
+			<li>Confirm that page counts <b>are not</b> recomputed for the listed 
+			files that were queued previously.
+			<li>Add new files to the end of the list.
+			<li>Queue the files again, using the <b>Force processing</b> option.
+			<li>Confirm that page counts <b>are</b> recomputed for the listed 
+			files that were queued previously.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3734]</b> AutoOpenImage in RDTConfig
+	       	<ul>
+	  	   	<LI>Confirm that the default setting is <b>true</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3790]</b> Redaction: Create metadata xml
+	       	<ul>
+	  	   	<LI>Verify an image.
+			<li>Confirm that verification session information is added to the VOA file.
+			<li>Review and change the verification results via history navigation.
+			<li>Confirm that additional verification session information is added to 
+			the VOA file.
+			<li>Create a redacted image from the verification results.
+			<li>Confirm that redaction session information is added to the VOA file.
+			<li>Execute different rules on the image (as is done for Legislation 
+			Guard).
+			<li>Reverify the image.
+			<li>Confirm that additional verification session information is added to 
+			the VOA file.
+			<li>Create another redacted image from the new verification results.
+			<li>Confirm that more redaction session information is added to the 
+			VOA file.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3907, #3909, #3911, #3913]</b> ID Shield Statistics Reporter
+	       	<ul>
+			<li>Exercise verification on a set of images.
+			<li>Evaluate the results using IDSSR for standard analysis, automated 
+			analysis and hybrid analysis.
+	  	   	<LI>Confirm that the results are appropriate for the document set.
+			<li>Confirm that the <b>TCL</b> file created in the temp directory 
+			to be used by IDSSR also runs in the <b>Test Harness</b>.
+			<li>Confirm that the combo box entries in the IDSSR Review tab 
+			include only dates and times, not a preceding <b>Analysis -</b>.
+<p>
+			<li>Open a file list (with 5 or fewer entries) in the IDSSR Review tab.
+			<li>Confirm that whitespace is present in the <b>Entries ...</b> 
+			list box.
+			<li>Double-click in the whitespace.
+			<li>Confirm that no error is seen.
+	       	</ul>
+<p>
+		<li><b>[FlexIDSCore #3919]</b> Set file action status after verification
+		<ul>
+			<li>Confirm that the <b>Verify redactions settings</b> dialog 
+			includes an <b>After committing a document</b> group box.
+			<li>Confirm that the group box contains a checkbox for 
+			<b>Set file action status of</b>.
+			<li>Confirm that the associated controls are enabled only when 
+			the checkbox is checked.
+			<li>Confirm that an associated combo box containing the defined 
+			actions is available.
+			<li>Confirm that an associated <b>tag selector</b> button is 
+			available.
+			<li>Confirm that the tag selector drop down includes the usual 
+			<b>$ functions</b>.
+			<li>Confirm that the tag selector drop down also includes 
+			<b>&lt;SourceDocName&gt;</b> and <b>&lt;FPSFileDir&gt;</b>.
+			<li>Confirm that an associated combo box containing the defined 
+			statuses is available
+			<ul>
+				<li>Completed
+				<li>Failed
+				<li>Pending
+				<li>Skipped
+				<li>Unattempted
+			</ul>
+			<li>Confirm that <b>Pending</b> is the default status.
+			<li>Confirm that settings are persistent.
+<p>
+			<li>Confirm that the appropriate file action status is set if 
+			so configured.
+		</ul>
+<p>
+		<li><b>[FlexIDSCore #3920]</b> Input Event Tracking support for verification
+		<ul>
+			<li>Confirm that the <b>Verify redactions settings</b> dialog 
+			includes an <b>Enable input event tracking</b> checkbox in 
+			the <b>General</b> group box.
+			<li>Confirm that input event tracking information is logged in 
+			the database if the checkbox and the <b>EnableInputEventTracking</b> 
+			field in DBInfo is enabled.
+			<li>Confirm that the <b>Detailed usage report for specific user for 
+			specific day</b> report displays expected results.
+<p>
+			<li>Start verifying documents during a specific (noted) minute.  Make sure 
+			to perform some input events during the minute.
+			<li>During another minute, only make input events by scrolling the scroll bar.
+			<li>During another minute, only make input events by clicking the mouse in the 
+			scroll bar.
+			<li>During another minute, only make input events by moving the mousewheel.
+			<li>During another minute, <b>do not</b> make any input events.
+			<li>During another minute, only make input events by typing text from the keyboard.
+			<li>During another minute, only make input events by tabbing between cells and rows.
+			<li>Stop verifying documents near the beginning of a specific (noted) minute.
+			<li>Check input event tracking results
+			<ul>
+				<li>Run the <b>Detailed usage report for specific user for specific day</b> 
+				and select the appropriate user and day.
+				<li>Confirm that input events were noted for each of the following
+				<ul>
+					<li>The minute during which processing started
+					<li>The minute during which scrolling the scroll bar events 
+					were made
+					<li>The minute during which mouse clicks in the scroll bar events 
+					were made
+					<li>The minute during which mousewheel events were made
+					<li>The minute during which keyboard events were made
+					<li>The minute during which tabbing events were made
+					<li>The minute during which processing stopped
+				</ul>
+				<li>Confirm that input events are not noted for the minute(s) in which 
+				events were not made.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3915]</b> Start menu shortcut for SQL CE Editor
+	       	<ul>
+	  	   	<LI>Confirm that a <b>Start menu</b> shortcut exists under the <b>Utilities</b> 
+			menu to open <b>ESFAMService.sdf</b> in the SQL CE Editor.
+			<ul>
+				<li>For FLEX Index
+				<li>For ID Shield
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3916]</b> 2010 copyright notices
+	       	<ul>
+	  	   	<LI>Confirm that copyright dates have been updated to 2010 for the following
+			<ul>
+				<li>FLEX Index installation splash screen
+				<li>FLEX Index installation licensing page
+				<li>ID Shield installation splash screen
+				<li>ID Shield installation licensing page
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3932]</b> Create metadata xml property page
+	       	<ul>
+	  	   	<LI>Confirm that <b>&lt;FPSFileDir&gt;</b> is available in the tag selector.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3933]</b> Apply Bates number property page
+	       	<ul>
+	  	   	<LI>Confirm that <b>&lt;FPSFileDir&gt;</b> is available in the tag selector.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3937, #3938]</b> Character confidence rule objects
+	       	<ul>
+			<li>Exercise the <b>Character Confidence Based Rule Objects</b> test 
+			cases in the <b>8.0 Features - Utilities</b> checklist.
+			<li>Exercise additional tests of the functionality, as appropriate.
+			<li>Note that the <b>Character confidence condition</b> functionality 
+			is not yet complete.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3940]</b> Shortcut keys in verification
+	       	<ul>
+	  	   	<LI>Confirm that shortcut keys do not display null reference exceptions.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3945]</b> Find or redact text or regular expression
+	       	<ul>
+			<li>Exercise the <b>Support Find-And-Redact Of Text Or Regular Expression 
+			In Verification (#19)</b> test cases in the <b>8.0 Features - ID Shield 
+			Verification</b> checklist.
+			<li>Confirm that an <b>ID Shield Client</b> license is sufficient.
+			<li>Exercise additional tests of the functionality, as appropriate.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3949]</b> Print view
+	       	<ul>
+			<li>Exercise the <b>Support Cropping And Printing Of Image regions In Image 
+			Viewer (#22)</b> test cases in the <b>8.0 Features - Utilities</b> checklist.
+			<li>Confirm that <b>Print view</b> works with rotated images.
+			<li>Confirm that <b>Print view</b> clips redactions to the destination 
+			rectangle.
+			<li>Exercise additional tests of the functionality, as appropriate.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3950]</b> Printing without redaction borders
+	       	<ul>
+			<li>Verify a sensitive document adding some manual redactions.
+			<li>Print the document.
+			<li>Confirm that the redaction border is not rendered in the print output.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5475]</b> User License and MAC address
+	       	<ul>
+	  	   	<LI>Use the installed <b>UserLicense.exe</b> to generate a license string.
+			<LI>Use the generated license string to generate a license file and 
+			an Unlock file.
+	  	   	<LI>Use <b>COMLicenseEval.exe</b> to evaluate the <b>MAC address</b> 
+			section of the files.
+			<li>Confirm that the two addresses are identical.
+			<li>Delete the two files.
+<p>
+			<li>Disconnect the network cable and use the installed <b>UserLicense.exe</b> 
+			to generate a new license string.
+			<LI>Use the new license string to generate a license file and 
+			an Unlock file.
+	  	   	<LI>Use <b>COMLicenseEval.exe</b> to evaluate the <b>MAC address</b> 
+			section of the files.
+			<li>Confirm that the two addresses are <b>Address N/A</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5584, #5596, #5675]</b> Related Vista O/S problems
+	       	<ul>
+	  	   	<LI>Confirm that a <b>GetFullUserName.exe</b> application is available in 
+			the CommonComponents folder.
+			<LI>Exercise OCR for the sample image in 
+			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5584</b>.  Confirm that an 
+			<b>SSOCR2 Module has stopped working</b> message is not displayed.
+			<li>Exercise the <b>Convert to searchable PDF</b> task on a document 
+			that does not exist such as <b>&lt;SourceDocName&gt;.noexist</b>.
+			<li>Confirm that an <b>ELI18550: Invalid filename.  Input file must be 
+			readable</b> expection is not seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5644]</b> Auto-create action exception
+	       	<ul>
+	  	   	<LI>Prepare a FAM to use an <b>ExtractData_$UserName()</b> action.
+			<LI>Confirm that the user name contains a space.
+	  	   	<LI>Exercise the FAM.
+			<LI>Confirm that a meaningful exception is displayed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5662]</b> DB Admin exceptions
+	       	<ul>
+	  	   	<LI>Use DB Admin to rename a tag to an existing tag name.
+			<LI>Confirm that a meaningful exception is displayed.
+	  	   	<LI>Use DB Admin to add a counter using an existing counter name.
+			<LI>Confirm that a meaningful exception is displayed.
+	  	   	<LI>Use DB Admin to rename a counter to an existing counter name.
+			<LI>Confirm that a meaningful exception is displayed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5672]</b> $FullUserName() arguments
+	       	<ul>
+	  	   	<LI>Confirm that the <b>$FullUsername()</b> function supports an 
+			argument of <b>0</b> or <b>1</b>.
+			<li>Confirm that for <b>0</b>, an exception is thrown if the full 
+			user name cannot be retrieved.
+			<li>Confirm that for <b>1</b>, an exception is not thrown if the full 
+			user name cannot be retrieved - instead the <b>$UserName()</b> text 
+			is provided.
+			<li>Confirm that for <b>$FullUsername()</b> without a parameter, 
+			functionality is the same as for <b>0</b>.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Demo_FLEXIndex</h3>
+       	<ul>
+		<li>Exercise <b>Demo_FLEXIndex</b>.
+		<ul>
+			<li>Confirm that a <b>DataEntry: Verify extracted data</b> task is 
+			available from the FAM.
+			<li>Confirm that the <b>DataEntry: Verify extracted data</b> task 
+			requires only a <b>FLEX Index Client</b> license.
+			<li>Confirm that the installed rules work properly for the installed 
+			sample images.
+			<li>Confirm that additional attributes can be added by swiping.
+			<li>Do general testing of the current Indexing demo.  Note any 
+			shortcomings.
+		</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
