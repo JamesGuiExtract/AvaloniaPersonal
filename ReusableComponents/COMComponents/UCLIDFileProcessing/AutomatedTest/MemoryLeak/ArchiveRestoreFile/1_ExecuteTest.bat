@@ -1,5 +1,5 @@
 REM Clean Source folder
-call CleanImage.bat
+call CleanImage.bat Test_1
 call CleanArchive.bat
 
 REM Supply Numbered Files for 4 hours
