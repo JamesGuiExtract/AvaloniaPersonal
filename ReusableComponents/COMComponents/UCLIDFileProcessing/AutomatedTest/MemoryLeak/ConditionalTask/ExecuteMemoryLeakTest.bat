@@ -1,6 +1,9 @@
 REM Clean Source folder
 call Clean.bat Test_1
 
+REM create TestArea
+mkdir TestArea
+
 REM Supply numbered file sets every 10 seconds for 6 hours
 START CopyNumberedSets SourceImages TestArea 10 6
 
