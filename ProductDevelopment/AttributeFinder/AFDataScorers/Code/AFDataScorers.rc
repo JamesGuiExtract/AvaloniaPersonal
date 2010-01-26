@@ -106,7 +106,7 @@ FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     COMBOBOX        IDC_COMBO_AGGREGATE_FUNCTION,36,6,60,42,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Use the",IDC_STATIC,7,8,26,8
-    LTEXT           "confidence as the data score",IDC_STATIC,102,10,93,8
+    LTEXT           "confidence as the data score",IDC_STATIC,102,8,93,8
 END
 
 
