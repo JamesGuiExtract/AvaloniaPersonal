@@ -268,7 +268,7 @@ namespace Extract.Redaction
         {
             // Category
             string category = item.Category;
-            if (category.Equals("Clue", StringComparison.OrdinalIgnoreCase))
+            if (category.Equals("Clues", StringComparison.OrdinalIgnoreCase))
             {
                 writer.WriteStartElement("Clue");
             }
@@ -283,6 +283,9 @@ namespace Extract.Redaction
 
             // ID and revision
             WriteRevisionId(writer, item);
+
+            // Enabled
+            writer.WriteAttributeString("Enabled", item.Redacted ? "1" : "0");
 
             // Zones
             WriteZones(writer, item);
@@ -435,7 +438,7 @@ namespace Extract.Redaction
                 WriteValueByName(writer, subAttributes, "ApplyRedactionsAsAnnotations");
 
                 WriteAttributeAsXml(writer, subAttributes, "RedactionTextAndColorSettings",
-                    "TextFormat", "FillColor", "BorderColor", "PreferredTextSize");
+                    "TextFormat", "FillColor", "BorderColor", "Font");
             }
 
             writer.WriteEndElement();
