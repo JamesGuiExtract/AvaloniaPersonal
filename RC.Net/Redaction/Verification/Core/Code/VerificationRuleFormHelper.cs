@@ -91,8 +91,6 @@ namespace Extract.Redaction.Verification
 
                 // If the overlap is greater than 95%, it is duplicate
                 return overlapArea / matchZones.GetArea() > 0.95;
-
-                
             }
             catch (Exception ex)
             {
@@ -100,9 +98,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        
-
         #endregion IRuleFormHelper Members
+
+        #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="RuleForm.MatchRedacted"/> event.
@@ -115,13 +113,16 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Dictionary<int, List<RasterZone>> pageToZones = 
-                    RasterZone.SplitZonesByPage(e.Match.RasterZones);
-                foreach (KeyValuePair<int, List<RasterZone>> pair in pageToZones)
+                if (!IsDuplicate(e.Match))
                 {
-                    RedactionLayerObject redaction = new RedactionLayerObject(_imageViewer,
-                        pair.Key, e.Match.Text, pair.Value);
-                    _imageViewer.LayerObjects.Add(redaction);
+                    Dictionary<int, List<RasterZone>> pageToZones =
+                                RasterZone.SplitZonesByPage(e.Match.RasterZones);
+                    foreach (KeyValuePair<int, List<RasterZone>> pair in pageToZones)
+                    {
+                        RedactionLayerObject redaction = new RedactionLayerObject(_imageViewer,
+                                        pair.Key, e.Match.Text, pair.Value);
+                        _imageViewer.LayerObjects.Add(redaction);
+                    }
                 }
             }
             catch (Exception ex)
@@ -129,5 +130,7 @@ namespace Extract.Redaction.Verification
                 ExtractException.Display("ELI29245", ex);
             }
         }
+
+        #endregion Event Handlers
     }
 }
