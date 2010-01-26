@@ -5,7 +5,7 @@
 using namespace std;
 
 // Current meta data version
-const int giCURRENT_META_DATA_VERSION = 3;
+const int giCURRENT_META_DATA_VERSION = 4;
 
 // Exemption codes tag
 const string gstrEXEMPTION_CODES_TAG = "<ExemptionCodes>";

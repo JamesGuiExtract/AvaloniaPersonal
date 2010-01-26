@@ -101,19 +101,30 @@ private:
 		const string& strName);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Gets a raster zone to use as a prototype for all other raster zones in the 
-	//          specified session.
+	//          specified node.
 	// PROMISE: Returns a raster zone initialized with redaction appearance settings and the 
 	//          redaction text format.
-	static PageRasterZone getRasterZonePrototypeFromSessionNode(MSXML::IXMLDOMElementPtr ipSession,
+	static PageRasterZone getRasterZonePrototypeFromNode(MSXML::IXMLDOMElementPtr ipNode,
 		string &rstrTextFormat);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Creates a vector of PageRasterZones corresponding to the redactions of the 
-	//          specified VerificationSession node.
-	static vector<PageRasterZone> getRasterZonesFromSessionNode(MSXML::IXMLDOMElementPtr ipSession);
+	//          specified node.
+	static vector<PageRasterZone> getRasterZonesFromNode(MSXML::IXMLDOMElementPtr ipNode, 
+		PageRasterZone& prototype, const string& strTextFormat);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Gets the page rastse zone from the specified xml node.
+	static PageRasterZone getRasterZoneFromXML(MSXML::IXMLDOMNodePtr ipZone, 
+		PageRasterZone& prototype);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Returns a vector of raster zones corresponding to all the output redactions in the 
 	//          IDShield xml metadata file specified.
 	static vector<PageRasterZone> getRasterZonesFromXML(const string& strXMLFile);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Gets the last redaction session node from the root node of an xml file.
+	static MSXML::IXMLDOMElementPtr getLastRedactionSessionNode(MSXML::IXMLDOMElementPtr ipRoot);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Returns true if one of the specified attributes are marked as enabled; false otherwise.
+	static bool isRedactionEnabled(MSXML::IXMLDOMNamedNodeMapPtr ipAttributes);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Throws an exception if this EXE is not licensed, completes successfully otherwise.
 	static void validateLicense();

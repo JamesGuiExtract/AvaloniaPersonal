@@ -42,8 +42,6 @@ CRedactFromXMLApp::CRedactFromXMLApp()
 	  m_bRetainAnnotations(false),
 	  m_bIsError(true) // assume error until successfully completed
 {
-	// TODO: add construction code here,
-	// Place all significant initialization in InitInstance
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -56,7 +54,7 @@ BOOL CRedactFromXMLApp::InitInstance()
 	try
 	{		
 		// Get the command line arguments
-		if( !getArguments(__argc, __argv) )
+		if ( !getArguments(__argc, __argv) )
 		{
 			return FALSE;
 		}
@@ -64,7 +62,7 @@ BOOL CRedactFromXMLApp::InitInstance()
 		// License this EXE
 		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		validateLicense();
-		if(m_bRedactAsAnnotation && !LicenseManagement::sGetInstance().isAnnotationLicensed())
+		if (m_bRedactAsAnnotation && !LicenseManagement::sGetInstance().isAnnotationLicensed())
 		{
 			// create and throw exception
 			throw UCLIDException("ELI18675", "Annotation support is not licensed.");
@@ -77,8 +75,8 @@ BOOL CRedactFromXMLApp::InitInstance()
 			vector<PageRasterZone> vecZones = getRasterZonesFromXML(m_strXMLFile);
 
 			// Redact the area if any zones were found or always outputting a file
-			// Calling fillImageArea will handle removing exisiting annotations even
-			// if the redacted file is not being created [FlexIDSCore #3584 & #3585]
+			// Calling fillImageArea will handle removing existing annotations even
+			// if the output file has no redactions [FlexIDSCore #3584 & #3585]
 			if (vecZones.size() > 0 || m_bAlwaysOutput)
 			{
 				// Save redactions
@@ -127,7 +125,7 @@ bool CRedactFromXMLApp::displayUsage(const string& strFileName)
 bool CRedactFromXMLApp::getArguments(const int argc, char* argv[])
 {
 	// check for a valid number of arguments
-	if(argc < 4 || argc > 8)
+	if (argc < 4 || argc > 8)
 	{
 		return displayUsage(argv[0]);
 	}
@@ -141,7 +139,7 @@ bool CRedactFromXMLApp::getArguments(const int argc, char* argv[])
 
 	// ensure output directory exists
 	string strOutputDir(getDirectoryFromFullPath(m_strOutputFile));
-	if(!directoryExists(strOutputDir))
+	if (!directoryExists(strOutputDir))
 	{
 		createDirectory(strOutputDir);
 	}
@@ -154,15 +152,15 @@ bool CRedactFromXMLApp::getArguments(const int argc, char* argv[])
 	{
 		string strArg(argv[i]);
 
-		if(strArg == "/a")
+		if (strArg == "/a")
 		{
 			m_bRedactAsAnnotation = true;
 		}
-		else if(strArg == "/O")
+		else if (strArg == "/O")
 		{
 			m_bAlwaysOutput = true;
 		}
-		else if(strArg == "/r")
+		else if (strArg == "/r")
 		{
 			m_bRetainAnnotations = true;
 		}
@@ -308,30 +306,33 @@ MSXML::IXMLDOMNodePtr CRedactFromXMLApp::getFirstNodeNamed(MSXML::IXMLDOMNodeLis
 	return NULL;
 }
 //-------------------------------------------------------------------------------------------------
-PageRasterZone CRedactFromXMLApp::getRasterZonePrototypeFromSessionNode(
-	MSXML::IXMLDOMElementPtr ipSession, string &rstrTextFormat)
+PageRasterZone CRedactFromXMLApp::getRasterZonePrototypeFromNode(MSXML::IXMLDOMElementPtr ipNode, 
+																 string &rstrTextFormat)
 {
 	// Create the default raster zone to return
 	PageRasterZone prototype;
 	rstrTextFormat = "";
 
-	// Get the child nodes of the session
-	MSXML::IXMLDOMNodeListPtr ipChildren = ipSession->childNodes;
-	ASSERT_RESOURCE_ALLOCATION("ELI25111", ipChildren != NULL);
-
-	// Get the redaction appearance settings
-	MSXML::IXMLDOMNodePtr ipSettingsNode = 
-		getFirstNodeNamed(ipChildren, "RedactionTextAndColorSettings");
-	if (ipSettingsNode == NULL)
+	MSXML::IXMLDOMNodeListPtr ipSettings = NULL;
+	if (ipNode != NULL)
 	{
-		// No settings were found. Return default prototype.
-		return prototype;
+		// Get the child nodes of the session
+		MSXML::IXMLDOMNodeListPtr ipChildren = ipNode->childNodes;
+		ASSERT_RESOURCE_ALLOCATION("ELI25111", ipChildren != NULL);
+
+		// Get the redaction appearance settings
+		MSXML::IXMLDOMNodePtr ipSettingsNode = 
+			getFirstNodeNamed(ipChildren, "RedactionTextAndColorSettings");
+		if (ipSettingsNode != NULL)
+		{
+			// Get the individual settings
+			ipSettings = ipSettingsNode->childNodes;
+		}
 	}
 
-	// Get the individual settings
-	MSXML::IXMLDOMNodeListPtr ipSettings = ipSettingsNode->childNodes;
 	if (ipSettings == NULL)
 	{
+		// No settings were found. Return default prototype.
 		return prototype;
 	}
 
@@ -342,28 +343,25 @@ PageRasterZone CRedactFromXMLApp::getRasterZonePrototypeFromSessionNode(
 		MSXML::IXMLDOMNodePtr ipSetting = ipSettings->item[i];
 		ASSERT_RESOURCE_ALLOCATION("ELI25114", ipSetting != NULL);
 
-		if (asString(ipSetting->nodeName) == "TextFormat")
+		string strNodeName = asString(ipSetting->nodeName);
+		if (strNodeName == "TextFormat")
 		{
 			rstrTextFormat = asString(ipSetting->text);
-			continue;
 		}
-		if (asString(ipSetting->nodeName) == "FillColor")
+		else if (strNodeName == "FillColor")
 		{
 			prototype.m_crFillColor = getColorFromNode(ipSetting);
 			prototype.m_crTextColor = invertColor(prototype.m_crFillColor);
-			continue;
 		}
-		if (asString(ipSetting->nodeName) == "BorderColor")
+		else if (strNodeName == "BorderColor")
 		{
 			prototype.m_crBorderColor = getColorFromNode(ipSetting);
-			continue;
 		}
-		if (asString(ipSetting->nodeName) == "Font")
+		else if (strNodeName == "Font")
 		{
 			int iPointSize = 0;
 			prototype.m_font = getFontFromNode(ipSetting, iPointSize);
 			prototype.m_iPointSize = iPointSize;
-			continue;
 		}
 	}
 
@@ -371,19 +369,21 @@ PageRasterZone CRedactFromXMLApp::getRasterZonePrototypeFromSessionNode(
 	return prototype;
 }
 //-------------------------------------------------------------------------------------------------
-vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromSessionNode(
-	MSXML::IXMLDOMElementPtr ipSession)
+vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromNode(MSXML::IXMLDOMElementPtr ipNode, 
+	PageRasterZone& prototype, const string& strTextFormat)
 {
-	// Create a raster zone to store the xml zones
-	string strTextFormat;
-	PageRasterZone zone = getRasterZonePrototypeFromSessionNode(ipSession, strTextFormat);
-
-	// Get the redactions
-	MSXML::IXMLDOMNodeListPtr ipRedactionList = ipSession->getElementsByTagName("Redaction");
-	ASSERT_RESOURCE_ALLOCATION("ELI18644", ipRedactionList != NULL);
-
 	// Create a vector to hold the raster zones
 	vector<PageRasterZone> vecZones;
+
+	// If there are no raster zones, return an empty vector
+	if (ipNode == NULL)
+	{
+		return vecZones;
+	}
+
+	// Get the redactions
+	MSXML::IXMLDOMNodeListPtr ipRedactionList = ipNode->getElementsByTagName("Redaction");
+	ASSERT_RESOURCE_ALLOCATION("ELI18644", ipRedactionList != NULL);
 
 	// Iterate through each redaction
 	long lNumRedactions = ipRedactionList->length;
@@ -398,13 +398,13 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromSessionNode(
 		ASSERT_RESOURCE_ALLOCATION("ELI18647", ipRedactionAttributes != NULL);
 
 		// Check if this redaction was correct
-		if (getAttributeAsString(ipRedactionAttributes, "Output") == "1")
+		if (isRedactionEnabled(ipRedactionAttributes))
 		{
 			// Get exemption codes for this redaction
-			zone.m_strText = getRedactionTextFromRedactionNode(ipRedaction, strTextFormat);
+			prototype.m_strText = getRedactionTextFromRedactionNode(ipRedaction, strTextFormat);
 
 			// Get the lines associated with this redaction
-			MSXML::IXMLDOMNodeListPtr ipLines = ipRedaction->GetchildNodes();
+			MSXML::IXMLDOMNodeListPtr ipLines = ipRedaction->childNodes;
 			ASSERT_RESOURCE_ALLOCATION("ELI18649", ipLines != NULL);
 			
 			// Iterate through each line of this redaction
@@ -415,14 +415,24 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromSessionNode(
 				MSXML::IXMLDOMNodePtr ipLine = ipLines->item[j];
 				ASSERT_RESOURCE_ALLOCATION("ELI18650", ipLine != NULL);
 
+				string strNodeName = asString(ipLine->nodeName);
+
+				// Version 4+ uses zone instead of line
+				if (strNodeName == "Zone")
+				{
+					PageRasterZone zone = getRasterZoneFromXML(ipLine, prototype);
+					vecZones.push_back(zone);
+					continue;
+				}
+
 				// Skip this node if it is not a line
-				if (asString(ipLine->nodeName) != "Line")
+				if (strNodeName != "Line")
 				{
 					continue;
 				}
 
 				// Get the zones associated with this line
-				MSXML::IXMLDOMNodeListPtr ipXMLZones = ipLine->GetchildNodes();
+				MSXML::IXMLDOMNodeListPtr ipXMLZones = ipLine->childNodes;
 				ASSERT_RESOURCE_ALLOCATION("ELI18651", ipXMLZones != NULL);
 
 				// Iterate through each zone of this line
@@ -433,32 +443,36 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromSessionNode(
 					MSXML::IXMLDOMNodePtr ipXMLZone = ipXMLZones->item[k];
 					ASSERT_RESOURCE_ALLOCATION("ELI18652", ipXMLZone != NULL);
 
-					// Skip this node if it is not a zone
-					if (asString(ipXMLZone->nodeName) != "Zone")
-					{
-						continue;
-					}
-
-					// Get the attributes of this zone
-					MSXML::IXMLDOMNamedNodeMapPtr ipZoneAttributes(ipXMLZone->attributes);
-					ASSERT_RESOURCE_ALLOCATION("ELI18653", ipZoneAttributes != NULL);
-
-					// Store the zone
-					zone.m_nStartX = getAttributeAsLong(ipZoneAttributes, "StartX");
-					zone.m_nStartY = getAttributeAsLong(ipZoneAttributes, "StartY");
-					zone.m_nEndX = getAttributeAsLong(ipZoneAttributes, "EndX");
-					zone.m_nEndY = getAttributeAsLong(ipZoneAttributes, "EndY");
-					zone.m_nHeight = getAttributeAsLong(ipZoneAttributes, "Height");
-					zone.m_nPage = getAttributeAsLong(ipZoneAttributes, "PageNumber");
-
 					// Add this zone to the list
-					vecZones.push_back(zone);
+					if (asString(ipXMLZone->nodeName) == "Zone")
+					{
+						PageRasterZone zone = getRasterZoneFromXML(ipXMLZone, prototype);
+						vecZones.push_back(zone);
+					}
 				} // End iterate through zones
 			} // End iterate through lines
 		} // End if found output redaction
 	} // End iterate through redactions
 
 	return vecZones;
+}
+//-------------------------------------------------------------------------------------------------
+PageRasterZone CRedactFromXMLApp::getRasterZoneFromXML(MSXML::IXMLDOMNodePtr ipZone, 
+													   PageRasterZone& prototype)
+{
+	// Get the attributes of this zone
+	MSXML::IXMLDOMNamedNodeMapPtr ipZoneAttributes(ipZone->attributes);
+	ASSERT_RESOURCE_ALLOCATION("ELI18653", ipZoneAttributes != NULL);
+
+	// Store the zone
+	prototype.m_nStartX = getAttributeAsLong(ipZoneAttributes, "StartX");
+	prototype.m_nStartY = getAttributeAsLong(ipZoneAttributes, "StartY");
+	prototype.m_nEndX = getAttributeAsLong(ipZoneAttributes, "EndX");
+	prototype.m_nEndY = getAttributeAsLong(ipZoneAttributes, "EndY");
+	prototype.m_nHeight = getAttributeAsLong(ipZoneAttributes, "Height");
+	prototype.m_nPage = getAttributeAsLong(ipZoneAttributes, "PageNumber");
+
+	return prototype;
 }
 //-------------------------------------------------------------------------------------------------
 vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& strXMLFile)
@@ -471,7 +485,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 	ipXMLDocument->async = VARIANT_FALSE;
 
 	// load the XML File
-	if(VARIANT_FALSE == ipXMLDocument->load( _variant_t(strXMLFile.c_str()) ))
+	if (VARIANT_FALSE == ipXMLDocument->load( _variant_t(strXMLFile.c_str()) ))
 	{
 		UCLIDException ue("ELI18641", "Unable to load XML file.");
 		ue.addDebugInfo("XML filename", strXMLFile);
@@ -487,7 +501,8 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 
 	// get the version number of the ID Shield meta data
 	long lVersionNumber = 1;
-	if(strRootNodeName == "IDShieldMetaData" || strRootNodeName == "IDShieldMetaDataEx")
+	if (strRootNodeName == "IDShieldMetadata" || strRootNodeName == "IDShieldMetaData" || 
+		strRootNodeName == "IDShieldMetaDataEx")
 	{
 		// get the attributes of the root node
 		MSXML::IXMLDOMNamedNodeMapPtr ipRootAttributes = ipRoot->attributes;
@@ -498,7 +513,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 
 		// set the version number if it was found
 		// NOTE: the first version had no version attribute, only the IDShieldMetaData tag
-		if(ipAttribute != NULL)
+		if (ipAttribute != NULL)
 		{
 			lVersionNumber = asLong( asString(ipAttribute->text) );
 		}
@@ -522,9 +537,21 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 	}
 
 	// Previous versions didn't support multiple session, the root contains one session
-	if (lVersionNumber <= 2)
+	if (lVersionNumber != 3)
 	{
-		return getRasterZonesFromSessionNode(ipRoot);
+		// Version 4+ gets the zone prototype from the last redaction session
+		MSXML::IXMLDOMElementPtr ipSession = 
+			lVersionNumber < 4 ? ipRoot : getLastRedactionSessionNode(ipRoot);
+
+		// Get the zone prototype
+		string strTextFormat;
+		PageRasterZone prototype = getRasterZonePrototypeFromNode(ipSession, strTextFormat);
+
+		// Version 4+ gets the raster zones to redact from the current revisions node
+		MSXML::IXMLDOMElementPtr ipRevisions = 
+			lVersionNumber < 4 ? ipRoot : getFirstNodeNamed(ipRoot->childNodes, "CurrentRevisions");
+
+		return getRasterZonesFromNode(ipRevisions, prototype, strTextFormat);
 	}
 
 	// Get the session nodes
@@ -540,8 +567,13 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 		MSXML::IXMLDOMNodePtr ipSession = ipSessions->item[i];
 		ASSERT_RESOURCE_ALLOCATION("ELI25125", ipSession != NULL);
 
+		// Get the zone prototype and text format from this sessions redaction appearance settings
+		string strTextFormat;
+		PageRasterZone prototype = getRasterZonePrototypeFromNode(ipRoot, strTextFormat);
+
 		// Get the raster zones of this session
-		vector<PageRasterZone>& vecCurrentZones = getRasterZonesFromSessionNode(ipSession);
+		vector<PageRasterZone>& vecCurrentZones = 
+			getRasterZonesFromNode(ipSession, prototype, strTextFormat);
 
 		// Append this session's raster zones to the master list
 		vecZones.insert(vecZones.end(), vecCurrentZones.begin(), vecCurrentZones.end());
@@ -549,6 +581,53 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 
 	// Return the result
 	return vecZones;
+}
+//-------------------------------------------------------------------------------------------------
+MSXML::IXMLDOMElementPtr CRedactFromXMLApp::getLastRedactionSessionNode(
+	MSXML::IXMLDOMElementPtr ipRoot)
+{
+	MSXML::IXMLDOMNodeListPtr ipSessions = ipRoot->getElementsByTagName("RedactedFileOutputSession");
+	ASSERT_RESOURCE_ALLOCATION("ELI29384", ipSessions != NULL);
+
+	// Iterate over each automated redaction session
+	MSXML::IXMLDOMElementPtr ipLastSession = NULL;
+	long lLastSessionId = 0;
+	long lCount = ipSessions->length;
+	for	(long i = 0; i < lCount; i++)
+	{
+		MSXML::IXMLDOMNodePtr ipSession = ipSessions->item[i];
+		ASSERT_RESOURCE_ALLOCATION("ELI29385", ipSession != NULL);
+
+		// Get the session's attributes
+		MSXML::IXMLDOMNamedNodeMapPtr ipAttributes(ipSession->attributes);
+		ASSERT_RESOURCE_ALLOCATION("ELI29386", ipAttributes != NULL);
+
+		// Get the session id
+		MSXML::IXMLDOMNodePtr ipSessionId = ipAttributes->getNamedItem("ID");
+		ASSERT_RESOURCE_ALLOCATION("ELI29387", ipSessionId != NULL);
+		long lSessionId = asLong( asString(ipSessionId->text) );
+
+		// The last session is the session with the largest session id
+		if (lSessionId > lLastSessionId)
+		{
+			ipLastSession = ipSession;
+			lLastSessionId = lSessionId;
+		}
+	}
+
+	return ipLastSession;
+}
+//-------------------------------------------------------------------------------------------------
+bool CRedactFromXMLApp::isRedactionEnabled(MSXML::IXMLDOMNamedNodeMapPtr ipAttributes)
+{
+	MSXML::IXMLDOMNodePtr ipEnabled = ipAttributes->getNamedItem("Enabled");
+	if (ipEnabled == NULL)
+	{
+		ipEnabled = ipAttributes->getNamedItem("Output");
+		ASSERT_RESOURCE_ALLOCATION("ELI29346", ipEnabled != NULL);
+	}
+
+	return asString(ipEnabled->text) == "1";
 }
 //-------------------------------------------------------------------------------------------------
 void CRedactFromXMLApp::validateLicense()
