@@ -323,8 +323,8 @@ void CManageTagsDlg::OnBtnModify()
 					// Show the wait cursor while updating the dialog
 					CWaitCursor wait;
 
-					string strNewTagName = dlg.getTagName();
-					string strNewDescription = dlg.getDescription();
+					string strNewTagName = trim(dlg.getTagName(), " \t", " \t");
+					string strNewDescription = trim(dlg.getDescription(), " \t", " \t");
 
 					try
 					{

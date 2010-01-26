@@ -818,6 +818,13 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::Load(IStream *pStream)
 				(UCLID_REDACTIONCUSTOMCOMPONENTSLib::EAttributeQuantifier) lAttributeQuantifier;
 		}
 
+		// Modified as per [FlexIDSCore #3971]
+		// Read the configure conditions only value
+		if (nDataVersion >= 4)
+		{
+			dataReader >> m_bConfigureConditionsOnly;
+		}
+
 		// Read doc types
 		unsigned long ulSize;
 		dataReader >> ulSize;
@@ -827,11 +834,6 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::Load(IStream *pStream)
 			string strValue;
 			dataReader >> strValue;
 			m_setDocTypes.insert(strValue);
-		}
-
-		if (nDataVersion >= 4)
-		{
-			dataReader >> m_bConfigureConditionsOnly;
 		}
 
 		// Clear the dirty flag as we've loaded a fresh object

@@ -91,6 +91,7 @@ namespace Extract.FileActionManager.Forms
             // _nameTextBox
             // 
             this._nameTextBox.Location = new System.Drawing.Point(15, 29);
+            this._nameTextBox.MaxLength = 100;
             this._nameTextBox.Name = "_nameTextBox";
             this._nameTextBox.Size = new System.Drawing.Size(191, 20);
             this._nameTextBox.TabIndex = 1;
@@ -99,6 +100,7 @@ namespace Extract.FileActionManager.Forms
             // _descriptionTextBox
             // 
             this._descriptionTextBox.Location = new System.Drawing.Point(15, 73);
+            this._descriptionTextBox.MaxLength = 255;
             this._descriptionTextBox.Name = "_descriptionTextBox";
             this._descriptionTextBox.Size = new System.Drawing.Size(191, 20);
             this._descriptionTextBox.TabIndex = 3;

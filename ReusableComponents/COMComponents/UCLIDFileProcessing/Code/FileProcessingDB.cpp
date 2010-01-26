@@ -1814,12 +1814,12 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 			HWND hParent = getAppMainWndHandle();
 
 			::MessageBox(hParent, "This is the first time you are logging into this File Action Manager database.\r\n\r\n"
-				"You will be prompted to set the admin password in the next screen.  The admin password\r\n"
-				"will be required to login into the database before any actions can be performed on the\r\n"
+				"You will be prompted to set the admin password in the next screen.  The admin password "
+				"will be required to login into the database before any actions can be performed on the "
 				"database from this application.\r\n\r\n"
-				"Please keep your admin password in a safe location and share it only with people capable\r\n"
-				"of administering the File Action Manager database.  Please note that anyone with access\r\n"
-				"to the admin password will be able to use this application to execute data-deleting\r\n"
+				"Please keep your admin password in a safe location and share it only with people capable "
+				"of administering the File Action Manager database.  Please note that anyone with access "
+				"to the admin password will be able to use this application to execute data-deleting "
 				"commands such as removing rows in tables, or emptying out the entire database.\r\n\r\n"
 				"Click OK to continue to the next screen where you will be prompted to set the "
 				"admin password.", "Set Admin Password", MB_ICONINFORMATION | MB_APPLMODAL);
@@ -3107,6 +3107,15 @@ STDMETHODIMP CFileProcessingDB::AddTag(BSTR bstrTagName, BSTR bstrTagDescription
 		// Get the description
 		string strDescription = asString(bstrTagDescription);
 
+		// Check the description length
+		if (strDescription.length() > 255)
+		{
+			UCLIDException ue("ELI29349", "Description is longer than 255 characters.");
+			ue.addDebugInfo("Description", strDescription);
+			ue.addDebugInfo("Description Length", strDescription.length());
+			throw ue;
+		}
+
 		string strQuery = "SELECT [TagName], [TagDescription] FROM [Tag] WHERE [TagName] = '"
 			+ strTagName + "'";
 
@@ -3251,6 +3260,14 @@ STDMETHODIMP CFileProcessingDB::ModifyTag(BSTR bstrOldTagName, BSTR bstrNewTagNa
 			validateTagName(strNewTagName);
 		}
 
+		// Check the description length
+		if (strNewDescription.length() > 255)
+		{
+			UCLIDException ue("ELI29350", "Description is longer than 255 characters.");
+			ue.addDebugInfo("Description", strNewDescription);
+			ue.addDebugInfo("Description Length", strNewDescription.length());
+			throw ue;
+		}
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
 		

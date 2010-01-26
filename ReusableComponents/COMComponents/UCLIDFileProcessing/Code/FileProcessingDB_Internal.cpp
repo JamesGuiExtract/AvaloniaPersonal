@@ -2555,11 +2555,17 @@ void CFileProcessingDB::validateTagName(const string& strTagName)
 			m_ipParser->Pattern = gstrTAG_REGULAR_EXPRESSION.c_str();
 		}
 
-		if (strTagName.empty() ||
-			m_ipParser->StringMatchesPattern(strTagName.c_str()) == VARIANT_FALSE)
+		// Tag name is invalid if either:
+		// 1. Empty
+		// 2. Longer than 100 characters
+		// 3. Does not match the TAG_REGULAR_EXPRESSION
+		if (strTagName.empty() || strTagName.length() > 100
+			|| m_ipParser->StringMatchesPattern(strTagName.c_str()) == VARIANT_FALSE)
 		{
 			UCLIDException ue("ELI27383", "Invalid tag name!");
 			ue.addDebugInfo("Tag", strTagName);
+			ue.addDebugInfo("Tag Length", strTagName.length());
+			ue.addDebugInfo("Valid Tag Name", gstrTAG_REGULAR_EXPRESSION);
 			throw ue;
 		}
 	}
