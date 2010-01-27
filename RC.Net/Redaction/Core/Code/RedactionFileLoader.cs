@@ -874,7 +874,7 @@ namespace Extract.Redaction
         {
             ComAttribute userInfo = CreateComAttribute("_UserInfo");
             ComAttribute loginId = CreateComAttribute("_LoginID", Environment.UserName);
-            ComAttribute computerName = CreateComAttribute("_RevisionID", Environment.MachineName);
+            ComAttribute computerName = CreateComAttribute("_Computer", Environment.MachineName);
             AppendChildAttributes(userInfo, loginId, computerName);
 
             return userInfo;
