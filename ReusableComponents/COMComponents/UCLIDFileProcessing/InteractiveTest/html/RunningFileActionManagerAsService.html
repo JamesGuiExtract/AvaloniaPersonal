@@ -35,8 +35,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
 			<li>Use the <b>SQL CE Editor</b> to add the FPS files to the 
 			<b>ESFAMService.sdf</b> database.  The database is created during 
-			installation and is located in a <b>Service</b> folder parallel to the 
-			<b>LogFiles</b> folder used for exception logs.
+			installation and is located in the <b>CommonComponents</b> folder.
 			<li>Activate the FPS files appropriate for the test to be executed.
 		</ul>
 		<li><b>ID Shield</b>
@@ -57,8 +56,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
 			<li>Use the <b>SQL CE Editor</b> to add the FPS files to the 
 			<b>ESFAMService.sdf</b> database.  The database is created during 
-			installation and is located in a <b>Service</b> folder parallel to the 
-			<b>LogFiles</b> folder used for exception logs.
+			installation and is located in the <b>CommonComponents</b> folder.
 			<li>Activate the FPS files appropriate for the test to be executed.
 		</ul>
 	</ul>
@@ -359,6 +357,52 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Stop the FAM service.
 			<li>Confirm that an exception is logged noting which dependent services 
 			have still not started as of the stop request.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #379, LegacyRC #5670]</b> FAM Service
+	       	<ul>
+	  	   	<LI>Confirm that the <b>Settings</b> table in the <b>ESFAMService.sdf</b> 
+			database contains an entry for <b>NumberOfFilesToProcess</b>.
+			<li>Confirm that the default setting is <b>0</b>.
+			<li>Confirm that for a <b>zero</b> value, the service continues to run as 
+			long as files are available to process.
+			<li>Confirm that for a <b>non-zero</b> value, the service processes only 
+			the specified number of files.
+			<li>Confirm that after processing the specified number of files, the 
+			<b>FAMProcess.exe</b> instance is automatically killed and then another 
+			<b>FAMProcess.exe</b> instance is automatically started.
+<p>
+			<li>Confirm that a <b>SkipAuthenticationForServicesOnMachines</b> field 
+			exists in the <b>DBInfo</b> table.
+			<li>Enable user authentication via <b>RequireAuthenticationBeforeRun</b>.
+			<li>Confirm that running an FPS file in normal mode correctly requires 
+			a user to be defined in the database and to provide a password.
+			<li>Add the test machine to the comma-separated list of machines for 
+			<b>SkipAuthenticationForServicesOnMachines</b>.
+			<li>Confirm that the FAM service runs as expected without requiring a 
+			password.
+			<li>Confirm (again) that running an FPS file in normal mode correctly 
+			requires a user to be defined in the database and to provide a password.
+<p>
+			<li>Remove the test machine from the comma-separated list of machines for 
+			<b>SkipAuthenticationForServicesOnMachines</b>.
+			<li>Prepare FPS files to be run via the FAM service against at least two 
+			databases.
+			<li>Configure one database to <b>require</b> user authentication.
+			<li>Configure another database to <b>not require</b> user authentication.
+			<li>Confirm that the FAM service logs an expection for the FPS file 
+			processing files for the database that requries user authentication.
+			<li>Confirm that the other FPS file processes files as expected.
+			<li>Stop the service.
+			<li>Configure each database to require user authentication.
+			<li>Restart the service.
+			<li>Confirm that the FAM service <b>automatically</b> stops processing 
+			since no FPS file can be exercised without user authentication.
+			<li>Add the test machine to the comma-separated list of machines for 
+			<b>SkipAuthenticationForServicesOnMachines</b>.
+			<li>Restart the service.
+			<li>Confirm that the FAM service runs as expected without requiring a 
+			password.
 	       	</ul>
 	</ul>
 	</li>
