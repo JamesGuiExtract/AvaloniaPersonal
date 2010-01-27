@@ -49,11 +49,17 @@ private:
 	//  output redacted image filename 
 	string m_strOutputFile;
 	
-	// whether to redact as annotations (true) or regular redactions (false)
+	// whether to redact as annotations (true) or use the default setting (false)
 	bool m_bRedactAsAnnotation;
 
-	// whether to retain original annotations
+	// whether to burn redactions directly into the image (true) or use the default setting (false)
+	bool m_bBurnInRedactions;
+
+	// whether to retain original annotations (true) or use the default setting (false)
 	bool m_bRetainAnnotations;
+
+	// whether to discard existing annotation (true) or use the default setting (false)
+	bool m_bDiscardAnnotations;
 
 	// whether to create an output only if the document contained redactions (false)
 	// or always create an output image (true)
@@ -118,10 +124,14 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Returns a vector of raster zones corresponding to all the output redactions in the 
 	//          IDShield xml metadata file specified.
-	static vector<PageRasterZone> getRasterZonesFromXML(const string& strXMLFile);
+	vector<PageRasterZone> getRasterZonesFromXML(const string& strXMLFile);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Gets the last redaction session node from the root node of an xml file.
 	static MSXML::IXMLDOMElementPtr getLastRedactionSessionNode(MSXML::IXMLDOMElementPtr ipRoot);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Updates the annotation settings from the specified automated redaction session iff 
+	// a command line setting has not been specified.
+	void updateAnnotationSettings(MSXML::IXMLDOMElementPtr ipSession);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Returns true if one of the specified attributes are marked as enabled; false otherwise.
 	static bool isRedactionEnabled(MSXML::IXMLDOMNamedNodeMapPtr ipAttributes);

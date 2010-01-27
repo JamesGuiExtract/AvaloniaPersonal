@@ -39,7 +39,9 @@ CRedactFromXMLApp::CRedactFromXMLApp()
 	  m_strXMLFile(""),
 	  m_strOutputFile(""),
 	  m_bRedactAsAnnotation(false),
+	  m_bBurnInRedactions(false),
 	  m_bRetainAnnotations(false),
+	  m_bDiscardAnnotations(false),
 	  m_bIsError(true) // assume error until successfully completed
 {
 }
@@ -108,13 +110,15 @@ bool CRedactFromXMLApp::displayUsage(const string& strFileName)
 	// create the usage message
 	string strUsage = "Creates a redacted image from an image file and an IDShield metadata xml file.\n\n";
 	strUsage += strFileName;
-	strUsage += " <input_image> <metadata_xml> <output_image> [/a] [/O] [/r]\n\n";
+	strUsage += " <input_image> <metadata_xml> <output_image> [/a|/b] [/O] [/r|/d]\n\n";
 	strUsage += " input_image\tSpecifies the original image file from which to create the redacted image.\n";
 	strUsage += " metadata_xml\tSpecifies IDShield metadata xml file associated with the input image.\n";
 	strUsage += " output_image\tSpecifies the path to the redacted image.\n";
-	strUsage += " /a\t\tApply redactions as annotations.\n";
+	strUsage += " /a\t\tApply redactions as annotations. Cannot be used with /b.\n";
+	strUsage += " /b\t\tBurn redaction into the image. Cannot be used with /a.\n";
 	strUsage += " /O\t\tCreate output image for this file, even if no redactions were found.\n";
-	strUsage += " /r\t\tRetain existing annotations in input file.\n";
+	strUsage += " /r\t\tRetain existing annotations in input file. Cannot be used with /d.\n";
+	strUsage += " /d\t\tDiscard existing annotations in input file. Cannot be used with /r.\n";
 
 	// display the message
 	AfxMessageBox(strUsage.c_str(), MB_ICONWARNING);
@@ -156,6 +160,10 @@ bool CRedactFromXMLApp::getArguments(const int argc, char* argv[])
 		{
 			m_bRedactAsAnnotation = true;
 		}
+		else if (strArg == "/b")
+		{
+			m_bBurnInRedactions = true;
+		}
 		else if (strArg == "/O")
 		{
 			m_bAlwaysOutput = true;
@@ -164,10 +172,23 @@ bool CRedactFromXMLApp::getArguments(const int argc, char* argv[])
 		{
 			m_bRetainAnnotations = true;
 		}
+		else if (strArg == "/d")
+		{
+			m_bDiscardAnnotations = true;
+		}
 		else
 		{
 			return displayUsage(argv[0]);
 		}
+	}
+
+	if (m_bRedactAsAnnotation && m_bBurnInRedactions)
+	{
+		throw UCLIDException("ELI29390", "Cannot redact as annotation and burn in redaction.");
+	}
+	if (m_bRetainAnnotations && m_bDiscardAnnotations)
+	{
+		throw UCLIDException("ELI29391", "Cannot retain and discard annotations.");
 	}
 
 	return true;
@@ -540,8 +561,19 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 	if (lVersionNumber != 3)
 	{
 		// Version 4+ gets the zone prototype from the last redaction session
-		MSXML::IXMLDOMElementPtr ipSession = 
-			lVersionNumber < 4 ? ipRoot : getLastRedactionSessionNode(ipRoot);
+		MSXML::IXMLDOMElementPtr ipSession = NULL;
+		if (lVersionNumber < 4)
+		{
+			ipSession = ipRoot;
+		}
+		else
+		{
+			ipSession = getLastRedactionSessionNode(ipRoot);
+
+			// Read the annotation settings from the last redaction session 
+			// if not overridden by command-line parameters.
+			updateAnnotationSettings(ipSession);
+		}
 
 		// Get the zone prototype
 		string strTextFormat;
@@ -616,6 +648,55 @@ MSXML::IXMLDOMElementPtr CRedactFromXMLApp::getLastRedactionSessionNode(
 	}
 
 	return ipLastSession;
+}
+//-------------------------------------------------------------------------------------------------
+void CRedactFromXMLApp::updateAnnotationSettings(MSXML::IXMLDOMElementPtr ipSession)
+{
+	// Get the children of the session node
+	MSXML::IXMLDOMNodeListPtr ipSessionChildren = ipSession->childNodes;
+	ASSERT_RESOURCE_ALLOCATION("ELI29392", ipSessionChildren != NULL);
+
+	// Get the output options
+	MSXML::IXMLDOMNodePtr ipOutputOptions = getFirstNodeNamed(ipSessionChildren, "OutputOptions");
+	ASSERT_RESOURCE_ALLOCATION("ELI29393", ipOutputOptions != NULL);
+
+	// Get the children of the output options
+	MSXML::IXMLDOMNodeListPtr ipOptionsChildren = ipOutputOptions->childNodes;
+	ASSERT_RESOURCE_ALLOCATION("ELI29394", ipOptionsChildren != NULL);
+
+	// Redact as annotations or burn in redactions?
+	if (!m_bRedactAsAnnotation && !m_bBurnInRedactions)
+	{
+		MSXML::IXMLDOMNodePtr ipRedactAsAnnotation = 
+			getFirstNodeNamed(ipOptionsChildren, "ApplyRedactionsAsAnnotations");
+		ASSERT_RESOURCE_ALLOCATION("ELI29388", ipRedactAsAnnotation != NULL);
+
+		if (asString(ipRedactAsAnnotation->text) == "Yes")
+		{
+			m_bRedactAsAnnotation = true;
+		}
+		else
+		{
+			m_bBurnInRedactions = true;
+		}
+	}
+
+	// Retain existing annotations or discard existing annotations?
+	if (!m_bRetainAnnotations && !m_bDiscardAnnotations)
+	{
+		MSXML::IXMLDOMNodePtr ipRetainAnnotations = 
+			getFirstNodeNamed(ipOptionsChildren, "RetainExistingAnnotations");
+		ASSERT_RESOURCE_ALLOCATION("ELI29389", ipRetainAnnotations != NULL);
+
+		if (asString(ipRetainAnnotations->text) == "Yes")
+		{
+			m_bRetainAnnotations = true;
+		}
+		else
+		{
+			m_bDiscardAnnotations = true;
+		}
+	}
 }
 //-------------------------------------------------------------------------------------------------
 bool CRedactFromXMLApp::isRedactionEnabled(MSXML::IXMLDOMNamedNodeMapPtr ipAttributes)

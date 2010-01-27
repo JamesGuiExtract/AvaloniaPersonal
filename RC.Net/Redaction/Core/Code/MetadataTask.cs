@@ -426,7 +426,7 @@ namespace Extract.Redaction
         {
             ComAttribute attribute = AttributeMethods.GetSingleAttributeByName(attributes, "_OutputOptions");
 
-            writer.WriteStartElement("OutputOption");
+            writer.WriteStartElement("OutputOptions");
 
             if (attribute != null)
             {
