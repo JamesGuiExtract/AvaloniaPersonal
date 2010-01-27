@@ -50,6 +50,8 @@
 			file path.
 		   	<li>Confirm that the group box includes an associated <b>Tag 
 			Selector</b> button.
+	  	   	<LI><b>[FlexIDSCore #3932]</b> Confirm that <b>&lt;FPSFileDir&gt;</b> is 
+			available in the tag selector.
 	   		<li>Confirm that the group box includes an associated <b>...</b> 
 			( Browse ) button.
 		   	<li>Confirm that the default file path is <b>&lt;SourceDocName&gt;.xml</b>.
@@ -85,6 +87,25 @@
 				<li>Output XML files are created without error.
 				<li>XML file contains <b>TBD</b> node.
 			</ul>
+<p>
+	  	   	<LI><b>[FlexIDSCore #3790]</b> Redaction: Create metadata xml
+		       	<ul>
+	  		   	<LI>Verify an image.
+				<li>Confirm that verification session information is added to the VOA file.
+				<li>Review and change the verification results via history navigation.
+				<li>Confirm that additional verification session information is added to 
+				the VOA file.
+				<li>Create a redacted image from the verification results.
+				<li>Confirm that redaction session information is added to the VOA file.
+				<li>Execute different rules on the image (as is done for Legislation 
+				Guard).
+				<li>Reverify the image.
+				<li>Confirm that additional verification session information is added to 
+				the VOA file.
+				<li>Create another redacted image from the new verification results.
+				<li>Confirm that more redaction session information is added to the 
+				VOA file.
+		       	</ul>
 <p>
 			<li><b>[FlexIDSCore #3877]</b> Confirm that the metadata XML includes 
 			information about the redactions being turned <b>on</b> or <b>off</b>.
@@ -969,6 +990,80 @@
 	      			<li><b>[FlexIDSCore #3826]</b> Confirm that a warning message is 
 				presented if the user attempts to navigate to a previous image 
 				without saving changes made to the current document.
+			</ul>
+<p>
+			<li><b>[FlexIDSCore #3919]</b> Set file action status after verification
+			<ul>
+				<li>Confirm that the <b>Verify redactions settings</b> dialog 
+				includes an <b>After committing a document</b> group box.
+				<li>Confirm that the group box contains a checkbox for 
+				<b>Set file action status of</b>.
+				<li>Confirm that the associated controls are enabled only when 
+				the checkbox is checked.
+				<li>Confirm that an associated combo box containing the defined 
+				actions is available.
+				<li>Confirm that an associated <b>tag selector</b> button is 
+				available.
+				<li>Confirm that the tag selector drop down includes the usual 
+				<b>$ functions</b>.
+				<li>Confirm that the tag selector drop down also includes 
+				<b>&lt;SourceDocName&gt;</b> and <b>&lt;FPSFileDir&gt;</b>.
+				<li>Confirm that an associated combo box containing the defined 
+				statuses is available
+				<ul>
+					<li>Completed
+					<li>Failed
+					<li>Pending
+					<li>Skipped
+					<li>Unattempted
+				</ul>
+				<li>Confirm that <b>Pending</b> is the default status.
+				<li>Confirm that settings are persistent.
+<p>
+				<li>Confirm that the appropriate file action status is set if 
+				so configured.
+			</ul>
+<p>
+			<li><b>[FlexIDSCore #3920]</b> Input Event Tracking support for verification
+			<ul>
+				<li>Confirm that the <b>Verify redactions settings</b> dialog 
+				includes an <b>Enable input event tracking</b> checkbox in 
+				the <b>General</b> group box.
+				<li>Confirm that input event tracking information is logged in 
+				the database if the checkbox and the <b>EnableInputEventTracking</b> 
+				field in DBInfo is enabled.
+				<li>Confirm that the <b>Detailed usage report for specific user for 
+				specific day</b> report displays expected results.
+<p>
+				<li>Start verifying documents during a specific (noted) minute.  Make sure 
+				to perform some input events during the minute.
+				<li>During another minute, only make input events by scrolling the scroll bar.
+				<li>During another minute, only make input events by clicking the mouse in the 
+				scroll bar.
+				<li>During another minute, only make input events by moving the mousewheel.
+				<li>During another minute, <b>do not</b> make any input events.
+				<li>During another minute, only make input events by typing text from the keyboard.
+				<li>During another minute, only make input events by tabbing between cells and rows.
+				<li>Stop verifying documents near the beginning of a specific (noted) minute.
+				<li>Check input event tracking results
+				<ul>
+					<li>Run the <b>Detailed usage report for specific user for specific day</b> 
+					and select the appropriate user and day.
+					<li>Confirm that input events were noted for each of the following
+					<ul>
+						<li>The minute during which processing started
+						<li>The minute during which scrolling the scroll bar events 
+						were made
+						<li>The minute during which mouse clicks in the scroll bar events 
+						were made
+						<li>The minute during which mousewheel events were made
+						<li>The minute during which keyboard events were made
+						<li>The minute during which tabbing events were made
+						<li>The minute during which processing stopped
+					</ul>
+					<li>Confirm that input events are not noted for the minute(s) in which 
+					events were not made.
+				</ul>
 			</ul>
 <p>
 			<li><b>Miscellaneous</b>
