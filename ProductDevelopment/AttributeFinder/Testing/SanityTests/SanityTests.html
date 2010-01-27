@@ -105,20 +105,26 @@
 		</ul>
 	</ul>
 <p>
-	<li><h2>FLEX Index - Flex Data Entry</h2>
+	<li><h2>FLEX Index - Demo</h2>
 	<ul>
-		<li>Copy the <b>Flex Data Entry</b> folder to the test machine.
-		<li>Exercise the rules and images
+		<li>Copy the <b>Demo_FlexIndex</b> folder to the test machine.
+		<li>Exercise <b>ExtractData.fps</b>
 		<ul>
-			<li>Confirm that each image finds appropriate fields.
+			<li>Confirm that all images are processed.
 			<li>Confirm that no exceptions are thrown during rule execution.
-			<li>Confirm that each field type can be swiped using the <b>angular redaction</b> 
-			tool.
-			<li>Confirm that each field type can be swiped using the <b>rectangular redaction</b> 
-			tool.
-			<li>Confirm that both Return Address and Legal Description types can be swiped via 
-			<b>Recognize text and process</b>.
 		</ul>
+		<li>Exercise <b>VerifyData.fps</b>
+		<ul>
+			<li>Confirm that appropriate data were found for each image.
+			<li>Confirm that each field type can be swiped using the <b>angular 
+			redaction</b> tool.
+			<li>Confirm that each field type can be swiped using the <b>rectangular 
+			redaction</b> tool.
+			<li>Confirm that both Return Address and Legal Description types can be 
+			swiped via <b>Recognize text and process</b>.
+		</ul>
+		<li>Confirm that verification and swiping require only a <b>FLEX Index 
+		Client</b> license.
 	</ul>
 <p>
 	<li><h2>New Features</h2>
@@ -144,6 +150,8 @@
 			<b>text</b>.
 			<li>Confirm that redactions can be created from user-specified 
 			<b>regular expressions</b>.
+			<li>Confirm that each button in the <b>Find and Redact Text</b> 
+			window works as expected.
 			<li>Confirm that VOA files show the expected redactions. 
 		</ul>
 		<li><b>Scheduled processing</b>
@@ -172,7 +180,32 @@
 		</ul>
 		<li><b>Test ID Shield accuracy</b>
 		<ul>
-	      		<li><b>TBD</b>.
+	      		<li>Prepare a set of images for verification.
+			<li>Collect feedback during verification.
+			<li>Exercise <b>ID Shield Statistics Reporter</b>
+			<ul>
+				<li>Confirm that the UI works as expected.
+				<li>Confirm that <b>Automated redaction</b> analysis works 
+				as expected when limiting data types to be tested.
+				<li>Confirm that <b>Hybrid</b> analysis works 
+				as expected when redacting only High confidence and Medium 
+				confidence data.
+				<li>Confirm that analysis works as expected when using an 
+				<b>Automated file selection condition</b>.
+				<li>Confirm that <b>Standard verification</b> analysis works 
+				as expected.
+				<li>Confirm that analysis works as expected when using an 
+				<b>Verification file selection condition</b>.
+				<li>Confirm that previous analysis results can be checked 
+				via the <b>Review</b> tab.
+				<li>Confirm that appropriate files are provided in the 
+				<b>File lists</b> tab.
+			</ul>
+		</ul>
+		<li><b>FAM Service</b>
+		<ul>
+	      		<li>Confirm that the service is installed.
+			<li>Confirm that a utility shortcut 
 		</ul>
 	</ul>
 <p>
@@ -199,20 +232,26 @@
 			<li>Confirm that a tag can be <b>modified</b> in the database.
 			<li>Confirm that a tag can be <b>deleted</b> from the database.
 <p>
-			<li>Confirm that a user counter can be <b>added</b> to the database.
-			<li>Confirm that a user counter can be <b>deleted</b> from the database.
-			<li>Confirm that a user counter can be <b>renamed</b> in the database.
-			<li>Confirm that the value of a user counter can be <b>modified</b> 
+			<li>Confirm that a counter can be <b>added</b> to the database.
+			<li>Confirm that a counter can be <b>deleted</b> from the database.
+			<li>Confirm that a counter can be <b>renamed</b> in the database.
+			<li>Confirm that the value of a counter can be <b>modified</b> 
 			in the database.
+<p>
+			<li>Confirm that a user can be <b>added</b> to the database.
+			<li>Confirm that a user can be <b>modified</b> in the database.
+			<li>Confirm that a user can be <b>deleted</b> from the database.
+			<li>Confirm that a user password can be <b>reset</b> in the database.
 <p>
 			<li>Confirm that the <b>Summary</b> tab displays current counts for the actions 
 			defined in the selected database.
 			<li>Confirm that the <b>Refresh</b> button updates the current counts.
 <p>
-			<li>Confirm that a file list can be <b>exported</b>.
+			<li>Confirm that file action status can be <b>modified</b>.
 			<li>Confirm that file processing priority can be <b>modified</b>.
 			<li>Confirm that the <b>File Action Manager</b> can be started from the Tools 
 			menu and that the active database is preselected.
+			<li>Confirm that a file list can be <b>exported</b>.
 			<li>Confirm that each available <b>Report</b> can be generated.
 		</ul>
 <p>
@@ -369,8 +408,13 @@
 <p>
 		<li><b>Rule Set Editor</b>
 		<ul>
-			<li>Confirm that <b>File - Properties</b> allows choice of counters to decrement, 
-			Key Serial #'s, and setting of an Internal Use Only flag.
+			<li>Confirm that <b>File - Properties</b> allows 
+			<ul>
+				<li>choice of counters to decrement
+				<li>specification of USB Key Serial #'s 
+				<li>setting of a Swiping rule flag
+				<li>setting of an Internal Use Only flag.
+			</ul>
 			<li>Confirm that <b>Tools - Rule Tester</b> displays the Rule Tester dialog.
 			<li>Confirm that <b>Tools - Execute Test Harnesss</b> displays the Test Harness dialog 
 			and the Test Result Logger window.
@@ -393,6 +437,5 @@
 		</ul>
 	</ul>
 </ol>
-
 </body>
 </html>
