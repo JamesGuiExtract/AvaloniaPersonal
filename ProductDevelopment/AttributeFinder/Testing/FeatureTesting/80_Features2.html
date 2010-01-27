@@ -116,10 +116,56 @@
 <p>
   	   	<LI><b>FAM Condition For Document Tags- (#06)</b>
 		<ul>
+			<li>Confirm that the object's property page works as expected.
+			<li>Confirm that <b>Match based upon tag condition</b> works 
+			properly for the following situations
+			<ul>
+				<li>met versus unmet
+				<li><b>all</b> of the following tags
+				<li><b>any</b> of the following tags
+				<li><b>none</b> of the following tags
+			</ul>
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
   	   	<LI><b>Track And Report User's Productive Time - (#07)</b>
 		<ul>
+			<li>Confirm that <b>EnableInputEventTracking</b> in the <b>DBInfo</b> 
+			table works in tandem with the configuration setting for <b>Redaction: 
+			Verify sensitive data</b>.
+			<li>Confirm that <b>EnableInputEventTracking</b> in the <b>DBInfo</b> 
+			table works in tandem with the configuration setting for <b>DataEntry: 
+			Verify extracted data</b>.
+			<li>Confirm that the following activities count as input events during 
+			<b>Redaction: Verify sensitive data</b>.
+			<ul>
+				<li>Mouse clicks in the image window
+				<li>Image window scrolling
+				<li>Image window shortcuts
+				<li>Clicking a button in the data window
+				<li>Selection of an item in the data window
+				<li>Selection of a menu item in the data window
+				<li>Modification of an item type in the data window
+			</ul>
+			<li>Confirm that the following activities count as input events during 
+			<b>DataEntry: Verify extracted data</b>.
+			<ul>
+				<li>Mouse clicks in the image window
+				<li>Image window scrolling
+				<li>Image window shortcuts
+				<li>Clicking a button in the data entry window
+				<li>Selection of an item in the data entry window
+				<li>Selection of a menu item in the data entry window
+			</ul>
+			<li>Confirm that the <b>Detailed usage report for specific user for 
+			specific day</b> report provides appropriate information from <b>Redaction: 
+			Verify sensitive data</b> activities.
+			<li>Confirm that the <b>Detailed usage report for specific user for 
+			specific day</b> report provides appropriate information from <b>DataEntry: 
+			Verify extracted data</b> activities.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
   	   	<LI><b>Automatic Detection / Correction Of Stuck Files - (#08)</b>
@@ -129,43 +175,141 @@
 <p>
   	   	<LI><b>RSD-Based Finders &amp; Splitters - (#09)</b>
 		<ul>
-			<li>
+			<li>Use the following list of deprecated rule objects to test this feature
+			<ul>
+				<li>Address Finder
+				<li>Address Splitter
+				<li>Grantor-Grantee Finder Ver. 2
+				<li>Legal Description Finder
+				<li>Return Address Finder
+			</ul>
+<p>
+			<li>Confirm that <b>7.0</b> rulesets using these objects can be loaded 
+			in <b>8.0</b>.
+			<li>Confirm that <b>7.0</b> rulesets using these objects cannot be 
+			exercised in <b>8.0</b>.
+			<li>Confirm that RSD-based solutions exist within ComponentData for 
+			the following.  Confirm that each solution produces appropriate output 
+			during independent testing.
+			<ul>
+				<li>legal AddressFinder
+				<li>postal AddressFinder
+				<li>SplitDetailed Address Splitter
+				<li>SplitIntoLines Address Splitter
+				<li>LegalFinder
+				<li>LegalSplitter
+				<li>PartyFinder
+				<li>ParcelIDNumber (Finder)
+				<li>PINSplitter
+			</ul>
+<p>
+			<li>Exercise a <b>FLEX Index</b> customer ruleset that has been 
+			validated for version 8.0.  Confirm that capture rates are not unusually 
+			poor compared to rules delivered for version 7.0.
+			<li>Exercise an <b>ID Shield</b> customer ruleset that has been 
+			validated for version 8.0.  Confirm that capture rates are not unusually 
+			poor compared to rules delivered for version 7.0.
 		</ul>
 <p>
   	   	<LI><b>SQL Server 2008 - (#10)</b>
 		<ul>
-			<li>
+			<li>Confirm that <b>SQL Server 2008 Express</b> is included with the 
+			installation for <b>FLEX Index 8.0</b>.
+			<li>Confirm that <b>SQL Server 2008 Express</b> is included with the 
+			installation for <b>ID Shield 8.0</b>.
+			<li>Confirm that <b>FLEX Index 8.0</b> will run properly on a test 
+			machine that has <b>SQL Server 2005 Express</b> installed.
+			<li>Confirm that <b>ID Shield 8.0</b> will run properly on a test 
+			machine that has <b>SQL Server 2005 Express</b> installed.
 		</ul>
 <p>
   	   	<LI><b>Two Million Image Endurance Test - (#11)</b>
 		<ul>
-			<li>
+			<li>Confirm that a 2 million image <b>ID Shield</b> endurance test 
+			has successfully completed against an 8.0 internal or external build.
+			<li>Confirm that a 2 million image <b>FLEX Index</b> endurance test 
+			has successfully completed against an 8.0 internal or external build.
 		</ul>
 <p>
   	   	<LI><b>Internal Rule Writing Enhancements - (#12)</b>
 		<ul>
 			<li>AFCondition - Character Confidence Condition
 			<ul>
-				<li>
+				<li>Confirm that the property page works as expected.
+				<li>Confirm that <b>Conditionally preprocess</b> works as 
+				expected with this rule object.
+				<li>Confirm that <b>Conditionally find value</b> works as 
+				expected with this rule object.
+				<li>Confirm that <b>Conditionally handle output</b> works as 
+				expected with this rule object.
+				<li>Confirm that an automated test exists for this rule object 
+				and passes at 100%.
+				<li>Document the details of additional independent testing of 
+				this rule object.
 			</ul>
 			<li>AFSelector - Select Based On Data Score
 			<ul>
-				<li>
+				<li>Confirm that the property page works as expected.
+				<li>Confirm that the <b>Remove attributes</b> output handler 
+				works as expected when using this AFSelector rule object.
+				<li>Confirm that an automated test exists for this rule object 
+				and passes at 100%.
+				<li>Document the details of additional independent testing of 
+				this rule object.
 			</ul>
 			<li>Character Confidence Data Scorer
 			<ul>
-				<li>
+				<li>Confirm that the property page works as expected.
+				<li>Confirm that the <b>Remove attributes</b> output handler 
+				works as expected when using this data scorer.
+				<li>Confirm that an automated test exists for this rule object 
+				and passes at 100%.
+				<li>Document the details of additional independent testing of 
+				this rule object.
 			</ul>
 		</ul>
 <p>
   	   	<LI><b>File Processing Priority - (#13)</b>
 		<ul>
-			<li>
+			<li>Confirm that the following priority levels are supported
+			<ul>
+				<li>Low
+				<li>Below normal
+				<li>Normal
+				<li>Above normal
+				<li>High
+			</ul>
+			<li>Confirm that priority information is correctly applied based 
+			on settings from the <b>Queue Setup</b> tab.
+			<li>Confirm that priority information is correctly displayed on the 
+			<b>Queue Log</b> tab.
+			<li>Confirm that recently queued documents of higher priority are 
+			processed ahead of previously queued documents of lower priority.
+			<li>Confirm that file priority can be exploited by selection of 
+			files within <b>DB Admin</b>.
+			<li>Confirm that file priority can be modified within <b>DB Admin</b>.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
   	   	<LI><b>Scheduled Processing In FAM - (#14)</b>
 		<ul>
-			<li>
+			<li>Confirm that the property page works as expected.
+			<li>Confirm that queuing is unaffected by settings for scheduled 
+			processing.
+			<li>Confirm that scheduled processing starts properly and on schedule.
+			<li>Confirm that scheduled processing stops properly and on schedule.
+			<li>Exercise scheduled processing in combination with one or more of the 
+			following features.  Confirm either that the feature works properly 
+			or that a meaningful exception is logged.
+			<ul>
+				<li>FAM service
+				<li>User authentication
+				<li>File processing priority
+				<li>Other, tester defined feature or combination
+			</ul>
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
 		<li><b>User Authentication In FAM - (#15)</b>
@@ -190,22 +334,150 @@
 			this feature.
 		</ul>
 <p>
-  	   	<LI><b>Thumbnails In Image Viewer - (#17)</b>
+  	   	<LI><b>Thumbnails In Image Viewer For Verification - (#17)</b>
 		<ul>
-			<li>
+			<li>Confirm that a <b>Thumbnails window</b> is provided for 
+			<b>Redaction: Verify sensitive data</b>.
+			<li>Confirm that the <b>Thumbnails window</b> can be repositioned 
+			and that position and docking status is persistent.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
   	   	<LI><b>Three ID Shield Objects - (#18)</b>
 		<ul>
-			<li>
+			<li><u>Redaction: Create metadata xml</u>
+			<ul>
+				<li>Exercise this task per the updated checklist.
+				<li>Confirm that the property page works as expected.
+				<li>Confirm that the <b>DocumentInfo</b> section of the 
+				output XML contains the expected <b>DocumentType</b> information.
+				<li>Confirm that the <b>CurrentRevisions</b> section of the 
+				output XML contains the expected information
+				<ul>
+					<li><b>Redaction</b> items with Category, Type, 
+					ID, Revision and Enabled
+					<li><b>Zone</b> information for each <b>Redaction</b>
+					<li><b>ExemptionCode</b> information for each 
+					<b>Redaction</b>
+					<li><b>Clue</b> items with Type, ID and Revision
+				</ul>
+				<li>Confirm that the <b>OldRevisions</b> section of the 
+				output XML contains the expected information
+				<ul>
+					<li><b>Redaction</b> items with Category, Type, 
+					ID, Revision and Enabled
+					<li><b>Zone</b> information for each <b>Redaction</b>
+					<li><b>ExemptionCode</b> information for each 
+					<b>Redaction</b>
+					<li><b>Clue</b> items with Type, ID and Revision
+				</ul>
+				<li>Confirm that the <b>IDShieldVerificationSession</b> section 
+				of the output XML contains the expected information
+				<ul>
+					<li><b>UserInfo</b> item with LoginID and Computer
+					<li><b>TimeInfo</b> item with Date, TimeStarted and 
+					TotalSeconds
+					<li><b>FileInfo</b> item with SourceDocName and 
+					IDShieldDataFile
+					<li><b>VerificationOptions</b> item with appropriate 
+					entries
+					<li><b>EntriesAdded</b> item with appropriate Redaction 
+					items
+					<li><b>EntriesModified</b> item with appropriate Redaction 
+					items
+					<li><b>EntriesDeleted</b> item with appropriate Redaction 
+					items
+				</ul>
+				<li>Confirm that the <b>RedactedFileOutputSession</b> section 
+				of the output XML contains the expected information
+				<ul>
+					<li><b>UserInfo</b> item with LoginID and Computer
+					<li><b>TimeInfo</b> item with Date, TimeStarted and 
+					TotalSeconds
+					<li><b>FileInfo</b> item with SourceDocName and 
+					IDShieldDataFile
+					<li><b>OutputOptions</b> item with 
+					<ul>
+						<li>RetainExistingRedactionsInOutputFile
+						<li>OutputFileExistedPriorToOutputOperation entries
+						<li>RetainExistingAnnotations
+						<li>ApplyRedactionsAsAnnotations
+						<li>RedactionTextAndColorSettings
+					</ul>
+					<li><b>EntriesRedacted</b> item with appropriate Redaction 
+					items
+				</ul>
+				<li>Document the details of additional independent testing of 
+				this feature.
+			</ul>
+<p>
+			<li><u>Redaction: Create redacted image</u>
+			<ul>
+				<li>Exercise this task per the updated checklist.
+				<li>Confirm that the property page works as expected.
+				<li>Confirm that TIF input images can be redacted as TIF 
+				output images.
+				<li>Confirm that TIF input images can be redacted as PDF 
+				output images.
+				<li>Confirm that PDF input images can be redacted as TIF 
+				output images.
+				<li>Confirm that PDF input images can be redacted as PDF 
+				output images.
+				<li>Confirm that redaction text is output correctly.
+				<li>Confirm that exemption codes are output correctly.
+				<li>Confirm that annotations can be properly retained or 
+				discarded.
+				<li>Confirm that redactions can be output as annotations.
+				<li>Confirm that redactions can be output in <b>black</b> 
+				or <b>white</b>.
+				<li>Confirm that redaction details are added to the 
+				output VOA file as expected.
+				<li>Document the details of additional independent testing of 
+				this feature.
+			</ul>
+<p>
+			<li><u>Redaction: Verify sensitive data</u>
+			<ul>
+				<li>Exercise this task per the updated checklist.
+				<li>Confirm that the property page works as expected.
+				<li>Confirm that PDF images can be verified.
+				<li>Confirm that TIF images can be verified.
+				<li>Confirm that action status can be automatically 
+				updated after verification.
+				<li>Confirm that modifying verification results via 
+				document history also modifies the associated post-verification 
+				action status.
+				<li>Confirm that verification details are added to the 
+				output VOA file as expected.
+				<li>Document the details of additional independent testing of 
+				this feature.
+			</ul>
+<p>
+			<li><u>Miscellaneous</u>
+			<ul>
+				<li>Confirm that FPS files containing the legacy tasks 
+				can still be opened.
+				<li>Confirm that exercising an FPS file containing a legacy 
+				task provides an informative error message.
+			</ul>
 		</ul>
 <p>
   	   	<LI><b>Deleting Redactions - (#19)</b>
 		<ul>
-			<li>
+			<li>Confirm that a redaction object can be selected and deleted from 
+			the <b>Data window</b>.
+			<li>Confirm that a redaction object can be selected and deleted from 
+			the <b>Image window</b> using the toolbar.
+			<li>Confirm that a redaction object can be selected and deleted from 
+			the <b>Image window</b> using the keyboard.
+			<li>Confirm that deleting a redaction from one window also deletes the 
+			redaction from the other window.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
-  	   	<LI><b>.NET Image Window For Verification- (#20)</b>
+  	   	<LI><b>.NET Image Window For Verification - (#20)</b>
 		<ul>
 			<li>
 		</ul>
@@ -215,7 +487,7 @@
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>Support For Dual Monitors During Verification- (#22)</b>
+  	   	<LI><b>Support For Dual Monitors During Verification - (#22)</b>
 		<ul>
 			<li>
 		</ul>
@@ -247,12 +519,25 @@
 <p>
   	   	<LI><b>Exporting Debug Data From UEX Viewer - (#28)</b>
 		<ul>
-			<li>
+			<li>Confirm that the UEX Viewer checklist test cases for export 
+			of debug data work properly.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
 		<li><b>PDF/A Conversion - (#29)</b>
 		<ul>
-			<li>
+			<li>Confirm that the <b>Core: Convert to searchable PDF</b> task 
+			includes a check box for <b>Make output PDF/A compatible.</b>
+			<li>Confirm that <b>TIF</b> input images can be converted 
+			to PDF/A-compatible output images.
+			<li>Confirm that <b>PDF</b> input images can be converted 
+			to PDF/A-compatible output images.
+			<li>Confirm that images that cannot be converted to 
+			PDF/A-compatible output images fail during processing and provide 
+			informative error messages.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
 		<li><b>Support For Output Of Password Protected PDFs - (#30)</b>
@@ -289,6 +574,26 @@
 <p>
 	<LI><h3>Unnumbered Features</h3>
 	<ul>
+  	   	<LI><b>AnywhereUSB</b>
+		<ul>
+			<li>Confirm that a USB key can be attached to an <b>AnywhereUSB</b> 
+			device and configured for use by FLEX Index and ID Shield.
+			<li>Note which test machine is required to have an installation of 
+			<b>Extract Systems LM</b>.
+			<li>Confirm that <b>Field Activation Utility</b> can be used to 
+			update <b>Indexing</b> counts.
+			<li>Confirm that <b>Field Activation Utility</b> can be used to 
+			update <b>Redaction</b> counts.
+<p>
+			<li>Adjust the <b>NumberOfUSBKeyRetries</b> and <b>WaitTimeoutUSBKeyRetry</b> 
+			keys under <b>HKLM\Software\Extract Systems\SafeNetUtils</b> to make 
+			the following tests more manageable.
+			<li>Confirm that FLEX Index and ID Shield recover gracefully from 
+			the removal and later replacement of the remote USB key.
+			<li>Confirm that FLEX Index and ID Shield recover gracefully from 
+			the stop and later restart of the <b>Sentinel Protection Server</b> 
+			service.
+		</ul>
 	</ul>
 </UL>
 </BODY>
