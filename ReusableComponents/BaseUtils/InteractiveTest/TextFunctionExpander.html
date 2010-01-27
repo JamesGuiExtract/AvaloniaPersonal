@@ -134,6 +134,19 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 	<ul>
 		<li>Confirm that $FullUserName() expands to the multiple word network user name for 
 		the logged in user.
+<p>
+  	   	<LI><b>[LegacyRC #5672]</b> $FullUserName() arguments
+	       	<ul>
+	  	   	<LI>Confirm that the <b>$FullUsername()</b> function supports an 
+			argument of <b>0</b> or <b>1</b>.
+			<li>Confirm that for <b>0</b>, an exception is thrown if the full 
+			user name cannot be retrieved.
+			<li>Confirm that for <b>1</b>, an exception is not thrown if the full 
+			user name cannot be retrieved - instead the <b>$UserName()</b> text 
+			is provided.
+			<li>Confirm that for <b>$FullUsername()</b> without a parameter, 
+			functionality is the same as for <b>0</b>.
+	       	</ul>
 	</ul>
 	<li><b>$Now()</b>
 	<ul>
