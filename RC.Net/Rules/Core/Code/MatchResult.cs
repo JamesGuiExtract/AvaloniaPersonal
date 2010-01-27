@@ -385,7 +385,7 @@ namespace Extract.Rules
 
             string ruleText = baseRule + ": " + groupNameAndNumber.Value;
             string matchText =
-                matchType == MatchType.Clue ? match.Groups[groupNameAndNumber.Key].Value : "";
+                matchType == MatchType.Clue ? match.Groups[groupNameAndNumber.Key].Value : match.Value;
             List<RasterZone> rasterZones = GetRasterZonesForCapture(match.Groups[groupNameAndNumber.Key], ocrText);
 
             // If no raster zones were found, we are done.

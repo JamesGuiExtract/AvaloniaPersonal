@@ -1678,7 +1678,17 @@ namespace Extract.Redaction.Verification
                 RedactionLayerObject redaction = e.LayerObject as RedactionLayerObject;
                 if (redaction != null)
                 {
-                    Add(e.LayerObject, "[No text]", "Manual", _lastType);
+                    string strText;
+                    if (e.LayerObject.Tags.Contains(VerificationRuleFormHelper.RedactedMatchTag))
+                    {
+                        strText = e.LayerObject.Comment;
+                    }
+                    else
+                    {
+                        strText = "[No text]";
+                    }
+
+                    Add(e.LayerObject, strText, "Manual", _lastType);
 
                     redaction.BorderColor = _manualConfidenceLevel.Color;
                     redaction.Color = ToggledRedactionColor;

@@ -28,13 +28,6 @@ namespace Extract.Rules
         /// </summary>
         readonly MatchResult _matchResult;
 
-        /// <summary>
-        /// The id of the <see cref="Redaction"/> object that is associated with this
-        /// <see cref="FindResult"/>. Will be <see langword="null"/> if no redaction has been 
-        /// created for this object yet.
-        /// </summary>
-        long? _redactionId;
-
         #endregion Fields
 
         #region Constructor
@@ -78,26 +71,6 @@ namespace Extract.Rules
             get
             {
                 return _compositeMatch;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="LayerObject.Id"/> of the <see cref="Redaction"/>
-        /// created from this <see cref="FindResult"/>.
-        /// </summary>
-        /// <value>The <see cref="LayerObject.Id"/> of the <see cref="Redaction"/> object
-        /// created from this <see cref="FindResult"/>.</value>
-        /// <returns>The <see cref="LayerObject.Id"/> of the <see cref="Redaction"/> object
-        /// created from this <see cref="FindResult"/>.</returns>
-        internal long? RedactionId
-        {
-            get
-            {
-                return _redactionId;
-            }
-            set
-            {
-                _redactionId = value;
             }
         }
 

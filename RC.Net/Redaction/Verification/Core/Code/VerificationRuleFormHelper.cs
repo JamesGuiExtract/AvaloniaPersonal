@@ -15,6 +15,15 @@ namespace Extract.Redaction.Verification
     /// </summary>
     public class VerificationRuleFormHelper : IRuleFormHelper
     {
+        #region Constants
+
+        /// <summary>
+        /// Tag indicating a redaction was the result of a rule form match.
+        /// </summary>
+        public static readonly string RedactedMatchTag = "RedactedMatch";
+
+        #endregion Constants
+
         #region Fields
 
         readonly ImageViewer _imageViewer;
@@ -120,7 +129,7 @@ namespace Extract.Redaction.Verification
                     foreach (KeyValuePair<int, List<RasterZone>> pair in pageToZones)
                     {
                         RedactionLayerObject redaction = new RedactionLayerObject(_imageViewer,
-                                        pair.Key, e.Match.Text, pair.Value);
+                            pair.Key, new string[] { RedactedMatchTag }, e.Match.Text, pair.Value);
                         _imageViewer.LayerObjects.Add(redaction);
                     }
                 }

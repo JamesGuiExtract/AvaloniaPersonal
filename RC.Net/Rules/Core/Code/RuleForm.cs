@@ -531,41 +531,15 @@ namespace Extract.Rules
                 // Get the find result
                 FindResult findResult = _findResults[_nextFindResult-1];
 
-                // Get the composite highlight from the find result
-                CompositeHighlightLayerObject compositeMatch = findResult.CompositeMatch;
-
-                // Create a new redaction from the find result
-                Redaction redaction = new Redaction(_imageViewer, compositeMatch.PageNumber,
-                    findResult.MatchResult.FindingRule, compositeMatch.GetRasterZones(),
-                    _imageViewer.DefaultRedactionFillColor);
-
-                // Add the id of the object to the find result
-                findResult.RedactionId = redaction.Id;
-
-                // Find if there are any other redactions to link this object with
-                foreach (FindResult result in _findResults)
-                {
-                    // Check for another find result from the same match
-                    if (result.MatchResult == findResult.MatchResult && result != findResult)
-                    {
-                        // Try to get the redaction associated with this link
-                        Redaction redactionToLink =
-                            _imageViewer.LayerObjects.TryGetLayerObject(result.RedactionId ?? -1)
-                            as Redaction;
-
-                        // If there was a redaction, add a link to it
-                        if (redactionToLink != null)
-                        {
-                            redaction.AddLink(redactionToLink);
-                        }
-                    }
-                }
-
-                // Add the new redaction to the image viewer
-                _imageViewer.LayerObjects.Add(redaction);
-
-                // Invalidate the form so the redaction is drawn
-                _imageViewer.Invalidate();
+                // Create a match result for this find result
+                IEnumerable<RasterZone> zones = findResult.CompositeMatch.GetRasterZones();
+                MatchType type = findResult.MatchResult.MatchType;
+                string text = findResult.MatchResult.Text;
+                string rule = findResult.MatchResult.FindingRule;
+                MatchResult matchResult = new MatchResult(zones, type, text, rule);
+                
+                // Raise the MatchRedacted event
+                OnMatchRedacted(new MatchRedactedEventArgs(matchResult));
 
                 // Check if at the last match result (do this before the call to display next match)
                 if (_findResults != null && _nextFindResult >= _findResults.Count)
