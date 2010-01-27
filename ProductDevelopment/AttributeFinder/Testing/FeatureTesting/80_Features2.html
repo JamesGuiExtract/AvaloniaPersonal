@@ -16,6 +16,8 @@
   	   	<LI>To test individual features as well as combinations of features.
   	   	<LI>To allow for individual experimentation during feature testing.
   	   	<LI>To document the tested aspects of various features.
+		<li>Numbered items reference Arvind's <b>Updated 8.0 feature list</b> 
+		email from 01/26/2010.
        	</ul>
 <p>
 	<LI><h3>Numbered Features</h3>
@@ -40,31 +42,84 @@
 			Service - see separate Instructions checklist for details.
 			<li>Exercise configuration of SQL Server 2008 for use with FAM 
 			Service - see separate Instructions checklist for details.
+			<li>Exercise the FAM Service checklist.
+			<li>Exercise the FAM service in combination with one or more of the 
+			following features.  Confirm either that the service works properly 
+			or that a meaningful exception is logged.
+			<ul>
+				<li>Scheduled processing
+				<li>User authentication
+				<li>File processing priority
+				<li>PDF/A Conversion
+				<li>Other, tester defined feature or combination
+			</ul>
 		</ul>
 <p>
-  	   	<LI><b>Redact Fixed Locations - (#03)</b>
+  	   	<LI><b>Tagging Files - (#03)</b>
 		<ul>
-			<li>
+			<li>Exercise <b>Manage Tags</b> from within DB Admin.
+			<li>Exercise application of tags from within verification.
+			<li>Confirm that new tags can be created during verification based 
+			on <b>AllowDynamicTagCreation</b>.
+			<li>Exercise the following reports that provide tag information
+			<ul>
+				<li>Detailed report for specific document
+				<li>ID Shield detailed report for specific document
+				<li>List of all documents with specific tag
+				<li>List of all tagged documents in the project (by tag)
+				<li>List of all tags in the project
+			</ul>
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
-  	   	<LI><b>Tagging Files - (#04)</b>
+  	   	<LI><b>Skipping Files - (#04)</b>
 		<ul>
-			<li>
+			<li>Exercise skipping of files from within verification of sensitive data.
+			<ul>
+				<li>Are files properly skipped?
+				<li>Is verification history updated as expected?
+				<li>Is the FAM status bar updated as expected?
+				<li>Is the DB Admin Summary tab status bar updated as expected?
+			</ul>
+			<li>Exercise skipping of files from within verification of extracted data.
+			<ul>
+				<li>Are files properly skipped?
+				<li>Is the FAM status bar updated as expected?
+				<li>Is the DB Admin Summary tab status bar updated as expected?
+			</ul>
+			<li>Confirm that processing of skipped files from the FAM works as 
+			expected for files skipped by the user and by any user.
+			<li>Confirm that the <b>Select Files</b> dialog within DB Admin 
+			works as expected to operate on files currently in <b>Skipped</b> 
+			status.
+			<li>Confirm that the <b>Select Files</b> dialog within DB Admin 
+			works as expected to set files to <b>Skipped</b> status.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
-  	   	<LI><b>Skipping Files - (#05)</b>
+  	   	<LI><b>Mathematical FAM Condition - (#05)</b>
 		<ul>
-			<li>
+			<li>Confirm that the object's property page works as expected.
+			<li>Confirm that <b>Match based upon mathematical condition</b> works 
+			properly for the following situations
+			<ul>
+				<li>met versus unmet
+				<li>randomly as a percentage
+				<li>once every <i>N</i> times
+				<li>based on File ID modulus for files already in the database
+			</ul>
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
-  	   	<LI><b>Mathematical FAM Condition - (#06)</b>
+  	   	<LI><b>FAM Condition For Document Tags- (#06)</b>
 		<ul>
-			<li>
 		</ul>
 <p>
-  	   	<LI><b>Thumbnails In Image Viewer - (#07)</b>
+  	   	<LI><b>Track And Report User's Productive Time - (#07)</b>
 		<ul>
-			<li>
 		</ul>
 <p>
   	   	<LI><b>Automatic Detection / Correction Of Stuck Files - (#08)</b>
@@ -72,79 +127,161 @@
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>Three ID Shield Objects - (#09)</b>
+  	   	<LI><b>RSD-Based Finders &amp; Splitters - (#09)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>RSD-Based Finders &amp; Splitters - (#10)</b>
+  	   	<LI><b>SQL Server 2008 - (#10)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>Deleting Redactions - (#11)</b>
+  	   	<LI><b>Two Million Image Endurance Test - (#11)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>SQL Server 2008 - (#12)</b>
+  	   	<LI><b>Internal Rule Writing Enhancements - (#12)</b>
+		<ul>
+			<li>AFCondition - Character Confidence Condition
+			<ul>
+				<li>
+			</ul>
+			<li>AFSelector - Select Based On Data Score
+			<ul>
+				<li>
+			</ul>
+			<li>Character Confidence Data Scorer
+			<ul>
+				<li>
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>File Processing Priority - (#13)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>Two Million Image Endurance Test - (#13)</b>
+  	   	<LI><b>Scheduled Processing In FAM - (#14)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>FLEX Index Demo With DEP - (#14)</b>
+		<li><b>User Authentication In FAM - (#15)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>.NET Image Window - (#15)</b> - removed from 8.0 features list
+  	   	<LI><b>Redact Fixed Locations - (#16)</b>
+		<ul>
+			<li>Exercise the <b>Core: Execute rules</b> task and confirm that 
+			OCR results are not necessarily required in order to run rules.
+			<li>Exercise <b>Select Page Region</b> and confirm that functionality 
+			is as expected for each of the following
+			<ul>
+				<li>Returning existing text
+				<li>Re-OCR of a region and returning the resulting text
+				<li>Returning just the image region, without OCR results
+			</ul>
+			<li>Test use of forms-based processing where a previously created 
+			VOA is used to redact a fixed location on multiple documents.
+			<li>Document the details of additional independent testing of 
+			this feature.
+		</ul>
 <p>
-  	   	<LI><b>Rotating Redactions - (#16)</b>
+  	   	<LI><b>Thumbnails In Image Viewer - (#17)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>File Processing Priority - (#17)</b>
+  	   	<LI><b>Three ID Shield Objects - (#18)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>ID Shield Statistics Reporter - (#18)</b>
+  	   	<LI><b>Deleting Redactions - (#19)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>Find And Redact User-Specified Text Or Regular Expressions - (#19)</b>
+  	   	<LI><b>.NET Image Window For Verification- (#20)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>Bates Numbers - (#20)</b>
+  	   	<LI><b>Rotating Redactions - (#21)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>Scheduled Processing In FAM - (#21)</b>
+  	   	<LI><b>Support For Dual Monitors During Verification- (#22)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>Printing Cropped Images - (#22)</b>
+  	   	<LI><b>ID Shield Statistics Reporter - (#23)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>Rule Object To Load List From Database - (#23)</b>
+  	   	<LI><b>Find And Redact User-Specified Text Or Regular Expressions - (#24)</b>
 		<ul>
 			<li>
 		</ul>
 <p>
-  	   	<LI><b>Exporting Debug Data From UEX Viewer - (#24)</b>
+  	   	<LI><b>Bates Numbers - (#25)</b>
+		<ul>
+			<li>
+		</ul>
+<p>
+  	   	<LI><b>Printing Cropped Images - (#26)</b>
+		<ul>
+			<li>
+		</ul>
+<p>
+  	   	<LI><b>Rule Object To Load List From Database - (#27)</b>
+		<ul>
+			<li>
+		</ul>
+<p>
+  	   	<LI><b>Exporting Debug Data From UEX Viewer - (#28)</b>
+		<ul>
+			<li>
+		</ul>
+<p>
+		<li><b>PDF/A Conversion - (#29)</b>
+		<ul>
+			<li>
+		</ul>
+<p>
+		<li><b>Support For Output Of Password Protected PDFs - (#30)</b>
+		<ul>
+			<li>
+		</ul>
+<p>
+		<li><b>Support For Copying Bookmarks Between PDFs - (#31)</b>
+		<ul>
+			<li>
+		</ul>
+<p>
+		<li><b>Support Watermarks On All Pages - (#32)</b>
+		<ul>
+			<li>
+		</ul>
+<p>
+		<li><b>Support For Removing Annotations And Markups From PDFs - (#33)</b>
+		<ul>
+			<li>
+		</ul>
+<p>
+		<li><b>Support For Randomly Redacting Additional Context Around Sensitive Data 
+		- (#34)</b>
+		<ul>
+			<li>
+		</ul>
+<p>
+  	   	<LI><b>FLEX Index Demo With DEP - (#35)</b>
 		<ul>
 			<li>
 		</ul>
@@ -152,40 +289,6 @@
 <p>
 	<LI><h3>Unnumbered Features</h3>
 	<ul>
-		<li>Skip Failed Pages In OCR
-		<ul>
-			<li>
-		</ul>
-<p>
-		<li>Select Files Dialog
-		<ul>
-			<li>
-		</ul>
-<p>
-		<li>PDF/A Conversion
-		<ul>
-			<li>
-		</ul>
-<p>
-		<li>User Authentication In FAM
-		<ul>
-			<li>
-		</ul>
-<p>
-		<li>AFCondition - Character Confidence Condition
-		<ul>
-			<li>
-		</ul>
-<p>
-		<li>AFSelector - Select Based On Data Score
-		<ul>
-			<li>
-		</ul>
-<p>
-		<li>Character Confidence Data Scorer
-		<ul>
-			<li>
-		</ul>
 	</ul>
 </UL>
 </BODY>
