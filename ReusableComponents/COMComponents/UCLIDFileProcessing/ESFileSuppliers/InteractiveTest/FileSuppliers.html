@@ -180,6 +180,21 @@
             	finished supplying files to the queue.
      	</ul>
 <p>
+   	<LI><b>[FlexIDSCore #3734]</b> Page number checking when queuing
+       	<ul>
+  	   	<LI>Create a list of PDF files to be supplied to a new database via 
+		<b>Files from dynamic list</b>.
+		<li>Queue the files and confirm that page count information is provided.
+		<li>Add new files to the end of the list.
+		<li>Queue the files again, without using the <b>Force processing</b> option.
+		<li>Confirm that page counts <b>are not</b> recomputed for the listed 
+		files that were queued previously.
+		<li>Add new files to the end of the list.
+		<li>Queue the files again, using the <b>Force processing</b> option.
+		<li>Confirm that page counts <b>are</b> recomputed for the listed 
+		files that were queued previously.
+       	</ul>
+<p>
    	<LI><b>[LegacyRC #5117]</b> Faster queuing of PDFs
        	<ul>
       		<li>Select a folder of PDF images for queuing and processing.
