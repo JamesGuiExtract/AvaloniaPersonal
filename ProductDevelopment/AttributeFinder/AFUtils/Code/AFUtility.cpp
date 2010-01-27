@@ -688,9 +688,9 @@ STDMETHODIMP CAFUtility::get_ShouldCacheRSD(VARIANT_BOOL *pvbCacheRSD)
 		}
 		else
 		{
-			// Default to enabling RSD caching
-			ma_pUserCfgMgr->createKey(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY, "1");
-			*pvbCacheRSD = VARIANT_TRUE;
+			// Default to disabling RSD caching [FIDSC #3979]
+			ma_pUserCfgMgr->createKey(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY, "0");
+			*pvbCacheRSD = VARIANT_FALSE;
 		}
 
 		return S_OK;
