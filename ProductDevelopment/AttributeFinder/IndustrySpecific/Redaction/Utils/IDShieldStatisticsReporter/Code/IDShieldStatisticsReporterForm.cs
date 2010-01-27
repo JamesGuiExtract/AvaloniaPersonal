@@ -229,10 +229,10 @@ namespace Extract.IDShieldStatisticsReporter
                 }
 
                 // Populate the types to be tested 
-                if (!string.IsNullOrEmpty(_settings.TypesToBeTested))
+                if (!string.IsNullOrEmpty(_settings.TypeToBeTested))
                 {
                     _limitTypesCheckBox.Checked = true;
-                    _dataTypesTextBox.Text = _settings.TypesToBeTested;
+                    _dataTypesTextBox.Text = _settings.TypeToBeTested;
                 }
 
                 // Initialize the automated and verification condition objects
@@ -409,16 +409,27 @@ namespace Extract.IDShieldStatisticsReporter
                 _testFolder.TestFolderName = _feedbackFolderTextBox.Text;
                 _settings.OutputFilesFolder = _feedbackFolderTextBox.Text;
                 _settings.OutputHybridStats = _analysisTypeComboBox.Text == _HYBRID;
-
-                string automatedCondition, automatedConditionQuantifier, tempDocTypes;
-                ApplyCondition(_automatedConditionObject,
-                    out automatedCondition, out automatedConditionQuantifier, out tempDocTypes);
-                _settings.AutomatedCondition = automatedCondition;
-                _settings.AutomatedConditionQuantifier = automatedConditionQuantifier;
-
                 _settings.OutputAutomatedStatsOnly =
-                    (_analysisTypeComboBox.Text == _AUTOMATED_REDACTION);
+                        (_analysisTypeComboBox.Text == _AUTOMATED_REDACTION);
 
+                // Initialize the automated redaction condition
+                if (!_settings.OutputAutomatedStatsOnly && !_settings.OutputHybridStats)
+                {
+                    _settings.AutomatedCondition = "";
+                    _settings.AutomatedConditionQuantifier = "any";
+                    _settings.DocTypesToRedact = null;
+                }
+                else
+                {
+                    string automatedCondition, automatedConditionQuantifier, docTypes;
+                    ApplyCondition(_automatedConditionObject,
+                        out automatedCondition, out automatedConditionQuantifier, out docTypes);
+                    _settings.AutomatedCondition = automatedCondition;
+                    _settings.AutomatedConditionQuantifier = automatedConditionQuantifier;
+                    _settings.DocTypesToRedact = docTypes;
+                }
+
+                // Initialize the verification condition
                 if (_settings.OutputAutomatedStatsOnly)
                 {
                     _settings.VerificationCondition = "";
@@ -435,30 +446,22 @@ namespace Extract.IDShieldStatisticsReporter
                     _settings.DocTypesToVerify = docTypes;
                 }
 
-                if (_limitTypesCheckBox.Checked)
+                if (_limitTypesCheckBox.Checked && !string.IsNullOrEmpty(_dataTypesTextBox.Text))
                 {
-                    _settings.TypesToBeTested = _dataTypesTextBox.Text;
+                    _settings.TypeToBeTested = _dataTypesTextBox.Text;
                 }
                 else
                 {
-                    _settings.TypesToBeTested = null;
+                    _settings.TypeToBeTested = null;
                 }
 
-                if (_analysisTypeComboBox.Text == _STANDARD_VERIFICATION)
-                {
-                    _settings.QueryForAutomatedRedaction = _settings.AutomatedCondition;
-                }
-                else
-                {
-                    StringBuilder queryForAutomatedRedaction = new StringBuilder();
-                    queryForAutomatedRedaction.Append(_redactHCDataCheckBox.Checked ?
-                        "HCData" : "");
-                    queryForAutomatedRedaction.Append(_redactMCDataCheckBox.Checked ?
-                        (queryForAutomatedRedaction.Length > 0 ? "|MCData" : "MCData") : "");
-                    queryForAutomatedRedaction.Append(_redactLCDataCheckBox.Checked ?
-                        (queryForAutomatedRedaction.Length > 0 ? "|LCData" : "LCData") : "");
-                    _settings.QueryForAutomatedRedaction = queryForAutomatedRedaction.ToString();
-                }
+                StringBuilder queryForAutomatedRedaction = new StringBuilder();
+                queryForAutomatedRedaction.Append(_redactHCDataCheckBox.Checked ? "HCData" : "");
+                queryForAutomatedRedaction.Append(_redactMCDataCheckBox.Checked ?
+                    (queryForAutomatedRedaction.Length > 0 ? "|MCData" : "MCData") : "");
+                queryForAutomatedRedaction.Append(_redactLCDataCheckBox.Checked ?
+                    (queryForAutomatedRedaction.Length > 0 ? "|LCData" : "LCData") : "");
+                _settings.QueryForAutomatedRedaction = queryForAutomatedRedaction.ToString();
 
                 _settings.Save(settingFileName);
             }
@@ -826,21 +829,11 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         void UpdateControlsBasedOnAnalysisType()
         {
-            if (_analysisTypeComboBox.Text == _STANDARD_VERIFICATION)
-            {
-                _redactHCDataCheckBox.Enabled = false;
-                _redactMCDataCheckBox.Enabled = false;
-                _redactLCDataCheckBox.Enabled = false;
-            }
-            else
-            {
-                _redactHCDataCheckBox.Enabled = true;
-                _redactMCDataCheckBox.Enabled = true;
-                _redactLCDataCheckBox.Enabled = true;
-            }
+            _automatedFileConditionButton.Enabled =
+                (_analysisTypeComboBox.Text != _STANDARD_VERIFICATION);
 
             _verificationFileConditionButton.Enabled =
-                    (_analysisTypeComboBox.Text != _AUTOMATED_REDACTION);
+                (_analysisTypeComboBox.Text != _AUTOMATED_REDACTION);
         }
 
         /// <summary>

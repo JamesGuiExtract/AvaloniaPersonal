@@ -109,6 +109,37 @@ END_COM_MAP()
 private:
 
 	/////////////////
+	// Classes
+	/////////////////
+
+	// Encapsulates statistics for a test case.
+	class TestCaseStatistics
+	{
+	public:
+		TestCaseStatistics();
+		
+		// Reset all counters back to zero
+		void reset();
+		
+		// Add one set of statistics to another. In this case m_bTestCaseResult will only be true
+		// if both test cases are true
+		TestCaseStatistics& operator += (const TestCaseStatistics& otherStatistics);
+
+		// Whether the test case succeeded
+		bool m_bTestCaseResult;
+
+		// Statistics counters
+		unsigned long m_ulTotalExpectedRedactions;
+		unsigned long m_ulExpectedRedactionsInSelectedFiles;
+		unsigned long m_ulFoundRedactions;
+		unsigned long m_ulNumCorrectRedactions;
+		unsigned long m_ulNumFalsePositives;
+		unsigned long m_ulNumOverRedactions;
+		unsigned long m_ulNumUnderRedactions;
+		unsigned long m_ulNumMisses;
+	};
+
+	/////////////////
 	// Variables
 	/////////////////
 
@@ -146,12 +177,20 @@ private:
 	// Specifies whether only automated statistics should be calculated.
 	bool m_bOutputAutomatedStatsOnly;
 
+	// Statistics for files selected for automated redaction
+	CIDShieldTester::TestCaseStatistics automatedStatistics;
+
+	// Statistics for files selected for review
+	CIDShieldTester::TestCaseStatistics verificationStatistics;
+
 	// counters
 	unsigned long m_ulTotalExpectedRedactions, m_ulNumCorrectRedactions, 
-		m_ulNumFalsePositives, m_ulNumOverRedactions, m_ulNumUnderRedactions,
+		m_ulNumOverRedactions, m_ulNumUnderRedactions,
 		m_ulNumMisses, m_ulTotalFilesProcessed, m_ulNumFilesWithExpectedRedactions,
 		m_ulNumFilesSelectedForReview, m_ulNumExpectedRedactionsInReviewedFiles,
-		m_ulNumFilesWithOverlappingExpectedRedactions;
+		m_ulNumExpectedRedactionsInRedactedFiles, m_ulNumFilesAutomaticallyRedacted, 
+		m_ulNumFilesWithOverlappingExpectedRedactions, m_ulTotalPages,
+		m_ulNumPagesWithExpectedRedactions;
 
 	// Map to keep track of document types
 	map<string, int> m_mapDocTypeCount;
@@ -174,6 +213,9 @@ private:
 
 	// Doc types to select for verification
 	set<string> m_setDocTypesToBeVerified;
+
+	// Doc types to select for automatic redaction
+	set<string> m_setDocTypesToBeAutomaticallyRedacted;
 
 	// Count of the number of files that use an existing VOA file. This is used in the disclaimer
 	// note about multiply classified documents.
@@ -208,6 +250,10 @@ private:
 	//			appropriate. Also output the document type(s) of the files.
 	void displaySummaryStatistics();
 
+	// PROMISE: Logs the statistics associcated with the specified TestCaseStatistics instance.
+	string displayStatisticsSection(const CIDShieldTester::TestCaseStatistics& sectionStatistics,
+									bool bVerificationStatistics);
+
 	// PROMISE: This method uses the expected and found attribute vectors to increment the count
 	//			of m_ulTotalFilesProcessed, update the m_ulTotalExpectedRedactions,
 	//			update m_ulNumFilesWithExpectedRedactions, and then calls the two analyze methods.
@@ -220,6 +266,7 @@ private:
 	//			file would have been verified.
 	bool analyzeDataForVerificationBasedRedaction(IIUnknownVectorPtr ipExpectedAttributes,
 												  IIUnknownVectorPtr ipFoundAttributes,
+												  bool bSelectedForVerification,
 												  const string& strSourceDoc);
 
 	// PROMISE: This method updates m_ulNumCorrectRedactions and m_ulNumFalsePositives using
@@ -228,8 +275,9 @@ private:
 	//			the number of expected attributes
 	//			Returns false otherwise.
 	bool analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpectedAttributes,
-										   IIUnknownVectorPtr ipFoundAttributes,
-										   const string& strSourceDoc);
+										  IIUnknownVectorPtr ipFoundAttributes,
+										  bool bSelectedForAutomatedProcess,
+										  const string& strSourceDoc);
 
 	// PROMISE: This method compares two spatial strings using the GetAreaOverlappingWith method from 
 	//          IRasterZone. If the two spatial strings overlap within the percentage specified in the 
@@ -238,15 +286,13 @@ private:
 
 	// PROMISE: This method loops through the vectors of expected and found attributes in order
 	//			to compare each raster zone and compare them using spatiallyMatches.
-	// ARGS: rNumCorrectlyFound and rNumFalsePositives are used by the calling method in order
-	//		 to keep track of the total number of each for the image that is being tested. 
-	void analyzeExpectedAndFoundAttributes(	IIUnknownVectorPtr ipExpectedAttributes, 
+	// ARGS:	bDocumentSelected indicates whether the document was selected for automatic
+	//			redaction or verification (depending on the test being executed).
+	// RETURNS: The statistics calculated from running the analysis.
+	CIDShieldTester::TestCaseStatistics analyzeExpectedAndFoundAttributes(
+											IIUnknownVectorPtr ipExpectedAttributes, 
 											IIUnknownVectorPtr ipFoundAttributes, 
-											unsigned long& rNumCorrectlyFound, 
-											unsigned long& rNumFalsePositives,
-											unsigned long& rNumOverRedacted,
-											unsigned long& rNumUnderRedacted,
-											unsigned long& rNumMissed,
+											bool bDocumentSelected,
 											const string& strSourceDoc);
 
 	// PROMISE: Takes 2 unsigned longs and if the second value is > 0, divides the first by the second.
@@ -263,9 +309,10 @@ private:
 	void countDocTypes( IIUnknownVectorPtr ipFoundAttributes, const string& strSourceDoc,
 						IAFDocumentPtr ipAFDoc, bool bCalculatedFoundValues);
 
-	// PROMISE: to compare each of the Expected attributes with themselves and return
-	//			the number of attributes that overlap
-	unsigned long calculateOverlappingExpected(IIUnknownVectorPtr ipExpectedAttributes);
+	// PROMISE: to compare each of the Expected attributes with themselves and return the number of
+	//			attributes that overlap as well as the number of pages with expected redactions.
+	void countExpectedOverlapsAndPages(IIUnknownVectorPtr ipExpectedAttributes,
+		unsigned long& rulOverlaps, unsigned long& rulNumPagesWithRedactions);
 
 	// PROMISE: to compare two spatial strings and return true if they overlap spatially
 	bool spatialStringsOverlap(ISpatialStringPtr ipSS1, ISpatialStringPtr ipSS2);
@@ -306,6 +353,9 @@ private:
 
 	// PROMISE: Sets m_strOutputFileDirectory based on the provided rootDirectory and current time.
 	void getOutputDirectory(string rootDirectory);
+
+	// PROMISE: To convert a set of strings into a comma delimited list.
+	string getSetAsDelimitedList(const set<string>& rsetValues);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(IDShieldTester), CIDShieldTester)

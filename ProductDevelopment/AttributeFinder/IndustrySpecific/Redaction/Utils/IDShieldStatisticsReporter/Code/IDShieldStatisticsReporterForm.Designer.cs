@@ -251,11 +251,11 @@ namespace Extract.IDShieldStatisticsReporter
             // _label3
             // 
             this._label3.AutoSize = true;
-            this._label3.Location = new System.Drawing.Point(6, 105);
+            this._label3.Location = new System.Drawing.Point(6, 102);
             this._label3.Name = "_label3";
-            this._label3.Size = new System.Drawing.Size(265, 13);
+            this._label3.Size = new System.Drawing.Size(165, 13);
             this._label3.TabIndex = 4;
-            this._label3.Text = "Redact the following in fully automated redaction mode";
+            this._label3.Text = "Default to redacting the following:";
             // 
             // _dataTypesTextBox
             // 
@@ -271,9 +271,9 @@ namespace Extract.IDShieldStatisticsReporter
             this._limitTypesCheckBox.AutoSize = true;
             this._limitTypesCheckBox.Location = new System.Drawing.Point(9, 46);
             this._limitTypesCheckBox.Name = "_limitTypesCheckBox";
-            this._limitTypesCheckBox.Size = new System.Drawing.Size(170, 17);
+            this._limitTypesCheckBox.Size = new System.Drawing.Size(138, 17);
             this._limitTypesCheckBox.TabIndex = 2;
-            this._limitTypesCheckBox.Text = "Limit data types to be tested to";
+            this._limitTypesCheckBox.Text = "Limit data tested to type";
             this._limitTypesCheckBox.UseVisualStyleBackColor = true;
             this._limitTypesCheckBox.CheckedChanged += new System.EventHandler(this.OnLimitTypesCheckBoxCheckedChanged);
             // 

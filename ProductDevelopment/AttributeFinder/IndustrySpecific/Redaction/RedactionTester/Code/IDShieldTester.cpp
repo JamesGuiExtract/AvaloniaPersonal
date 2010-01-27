@@ -16,6 +16,7 @@
 #include <RegistryPersistenceMgr.h>
 #include <mathUtil.h>
 #include <SafeTwoDimensionalArray.h>
+#include <MiscLeadUtils.h>
 
 #include <cmath>
 
@@ -60,6 +61,13 @@ const string gstrFILES_WITH_HCDATA = "\\Files_AtLeastOneFoundHCData.txt";
 const string gstrFILES_WITH_MCDATA = "\\Files_AtLeastOneFoundMCData.txt";
 const string gstrFILES_WITH_LCDATA = "\\Files_AtLeastOneFoundLCData.txt";
 const string gstrFILES_WITH_CLUES = "\\Files_AtLeastOneFoundClue.txt";
+
+const string gstrFILES_CORRECTLY_SELECTED_FOR_REDACTION =
+	"\\SensitiveFiles_AutomaticallyRedacted.txt";
+const string gstrFILES_INCORRECTLY_SELECTED_FOR_REDACTION = 
+	"\\InsensitiveFiles_SelectedForRedaction.txt";
+const string gstrFILES_MISSED_BEING_SELECTED_FOR_REDACTION =
+	"\\SensitiveFiles_NotSelectedForRedaction.txt";
 
 // Files output in countDocTypes
 const string gstrFILES_CLASSIFIED_AS_MORE_THAN_ONE_DOC_TYPE = 
@@ -329,22 +337,28 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			m_strRedactionQuery = "";
 			m_strTypeToBeTested = "";
 			m_setDocTypesToBeVerified.clear();
+			m_setDocTypesToBeAutomaticallyRedacted.clear();
 			m_ulTotalExpectedRedactions = 0;
 			m_ulNumCorrectRedactions = 0;
-			m_ulNumFalsePositives = 0;
 			m_ulNumOverRedactions = 0;
 			m_ulNumUnderRedactions = 0;
 			m_ulNumMisses = 0;
 			m_ulTotalFilesProcessed = 0;
 			m_ulNumFilesWithExpectedRedactions = 0;
 			m_ulNumFilesSelectedForReview = 0;
+			m_ulNumFilesAutomaticallyRedacted = 0;
 			m_ulNumExpectedRedactionsInReviewedFiles = 0;
+			m_ulNumExpectedRedactionsInRedactedFiles = 0;
 			m_iNumFilesWithExistingVOA = 0;
 			m_ulNumFilesWithOverlappingExpectedRedactions = 0;
+			m_ulTotalPages = 0;
+			m_ulNumPagesWithExpectedRedactions = 0;
 			m_bOutputHybridStats = false;
 			m_bOutputAutomatedStatsOnly = false;
 			m_apRedactionTester.reset();
 			m_apVerificationTester.reset();
+			automatedStatistics.reset();
+			verificationStatistics.reset();
 
 			IVariantVectorPtr ipParams(pParams);
 			ASSERT_RESOURCE_ALLOCATION("ELI15258", ipParams != NULL);
@@ -540,23 +554,13 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 				"Either a verification attribute condition or doc type condition must be set.");
 			throw ue;
 		}
-		else if (m_setRedactionCondition.empty())
+		else if ((m_bOutputAutomatedStatsOnly || m_bOutputHybridStats) &&
+			(m_setRedactionCondition.empty() || m_strRedactionQuantifier.empty()) &&
+			m_setDocTypesToBeAutomaticallyRedacted.empty())
 		{
 			// Both condition settings must be set before test folder can take place
 			UCLIDException ue("ELI25162", 
-				"Automated redaction condition must be set.");
-			throw ue;
-		}
-		else if (m_strRedactionQuantifier.empty())
-		{
-			UCLIDException ue("ELI25182", 
-				"Automated redaction condition quantifier must be set.");
-			throw ue;
-		}
-		else if(m_strRedactionQuery.empty())
-		{
-			UCLIDException ue("ELI15194", 
-				"Automated redaction query must be set.");
+				"Either an automated redaction condition or doc type condition must be set.");
 			throw ue;
 		}
 		else if(nNumTokens != 5)
@@ -688,6 +692,22 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 
 			// Insert the doc types into the set of doc types
 			m_setDocTypesToBeVerified.insert(vecTemp.begin(), vecTemp.end());
+		}
+		// [FlexIDSCore:3980]
+		else if (vecTokens[0] == "DocTypesToRedact")
+		{
+			if (!m_setDocTypesToBeAutomaticallyRedacted.empty())
+			{
+				throw UCLIDException("ELI29401",
+					"Doc types to automatically redact may only be set once.");
+			}
+
+			// Tokenize the doc types to be automatically redacted by the '|' character
+			vector<string> vecTemp;
+			StringTokenizer::sGetTokens(vecTokens[1], '|', vecTemp);
+
+			// Insert the doc types into the set of doc types
+			m_setDocTypesToBeAutomaticallyRedacted.insert(vecTemp.begin(), vecTemp.end());
 		}
 		// [FlexIDSCore #3358 - JDS 03/30/2009]
 		else if (vecTokens[0] == "OutputHybridStats")
@@ -991,6 +1011,8 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 		m_ulNumFilesWithExpectedRedactions++;
 	}
 
+	m_ulTotalPages += getNumberOfPagesInImage(strSourceDoc);
+
 	// if user wants a list of files with HCData, MCData, LCData, etc. then
 	// gather the attribute names from the found attributes and
 	// output the appropriate files ([p16 #2552] - JDS)
@@ -1027,96 +1049,14 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 		}
 	}
 
-	// If only computing automated stats, skip analyzeDataForVerificationBasedRedaction.
-	if (!m_bOutputAutomatedStatsOnly)
-	{
-		// analyze the attributes for verification based redaction
-		bool bVerified = analyzeDataForVerificationBasedRedaction(ipExpectedAttributes,
-			ipFoundAttributes, strSourceDoc);
+	// compute the number of overlapping expected redactions and the number of pages with expected
+	// redactions.
+	unsigned long ulNumOverlappingExpected;
+	unsigned long ulNumPagesWithRedactions;
+	countExpectedOverlapsAndPages(ipExpectedAttributes, ulNumOverlappingExpected,
+		ulNumPagesWithRedactions);
 
-		// If outputting hybrid stats and the document was verified, mark it as true and
-		// do not compute automated statistics
-		if (m_bOutputHybridStats && bVerified)
-		{
-			return true;
-		}
-	}
-
-	// analyze the attributes for automated redaction
-	return analyzeDataForAutomatedRedaction(ipExpectedAttributes, ipFoundAttributes, strSourceDoc);
-}
-//-------------------------------------------------------------------------------------------------
-bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(IIUnknownVectorPtr ipExpectedAttributes,
-															   IIUnknownVectorPtr ipFoundAttributes,
-															   const string& strSourceDoc)
-{
-	ASSERT_ARGUMENT("ELI18507", ipExpectedAttributes != NULL);
-	ASSERT_ARGUMENT("ELI18508", ipFoundAttributes != NULL);
-
-	// Ensure the verification condition is refreshed
-	updateVerificationAttributeTester();
-
-	// Flag to indicate if it was selected for verification or not
-	bool bVerified = testAttributeCondition(ipFoundAttributes, m_apVerificationTester.get());
-
-	// Increment the counters based on the file being verified
-	if (bVerified)
-	{
-		// increment the number of files that would be selected for review
-		m_ulNumFilesSelectedForReview++;
-
-		// Get the size of the expected attribute collection
-		long lExpectedSize = ipExpectedAttributes->Size();
-
-		// increment the number of expected redactions in files selected for review
-		m_ulNumExpectedRedactionsInReviewedFiles += lExpectedSize;
-
-		// If there are one or more redactions and at least one filtered attribute, then add
-		// this file to the FilesCorrectlySelectedForReview.txt file.
-		if( lExpectedSize > 0 )
-		{
-			appendToFile( strSourceDoc, m_strOutputFileDirectory + gstrFILES_CORRECTLY_SELECTED_FOR_REVIEW );
-		}
-		else
-		{
-			// There are one or more found redactions, but no expected redactions
-			appendToFile( strSourceDoc, m_strOutputFileDirectory + gstrFILES_INCORRECTLY_SELECTED_FOR_REVIEW);
-		}
-	}
-	else
-	{
-		// The document has no found attributes, but it does have an expected attribute
-		// and we are not outputting hybrid statistics
-		if( !m_bOutputHybridStats && ipExpectedAttributes->Size() > 0 )
-		{
-			appendToFile( strSourceDoc, m_strOutputFileDirectory + gstrFILES_MISSED_BEING_SELECTED_FOR_REVIEW );
-		}
-		else
-		{
-			// The case of no expected and no found attributes is intentionally not tracked.
-		}
-	}
-
-	return bVerified;
-}
-//-------------------------------------------------------------------------------------------------
-bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpectedAttributes,
-													   IIUnknownVectorPtr ipFoundAttributes,
-													   const string& strSourceDoc)
-{
-	ASSERT_ARGUMENT("ELI18509", ipExpectedAttributes != NULL);
-	ASSERT_ARGUMENT("ELI18510", ipFoundAttributes != NULL);
-
-	// Variables to track the number of found and false positives for the automatic redaction
-	unsigned long ulNumCorrectlyFound = 0;
-	unsigned long ulNumFalsePositives = 0;
-	unsigned long ulNumOverRedacted = 0;
-	unsigned long ulNumUnderRedacted = 0;
-	unsigned long ulNumMissed = 0;
-	unsigned long ulNumOverlappingExpected = 0;
-
-	// compute the number of overlapping expected redactions
-	ulNumOverlappingExpected = calculateOverlappingExpected(ipExpectedAttributes);
+	m_ulNumPagesWithExpectedRedactions += ulNumPagesWithRedactions;
 
 	// if there is at least 1 overlapping expected redaction increment the number of
 	// files with overlapping expected redactions and add a text node indicating
@@ -1130,70 +1070,166 @@ bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpe
 		m_ipResultLogger->AddTestCaseNote(strNumOverLappingExpected.c_str());
 	}
 
-	// Ensure the redaction condition is refreshed
-	updateRedactionAttributeTester();
-
-	// Test the automated redaction condition
-	bool bAutomated = testAttributeCondition(ipFoundAttributes, m_apRedactionTester.get());
-
-	// If the document was selected for automated redaction, process it
-	IIUnknownVectorPtr ipFilteredFoundAttributes = NULL;
-	if (bAutomated)
-	{
-		// restrict the found attributes by the query that will be used for automated redaction
-		ipFilteredFoundAttributes = m_ipAFUtility->QueryAttributes(
-			ipFoundAttributes, m_strRedactionQuery.c_str(), VARIANT_FALSE);
-	}
-	// Not selected for automated redaction
-	else 
-	{
-		// Create an empty attribute vector, all expected attributes are a miss
-		ipFilteredFoundAttributes.CreateInstance(CLSID_IUnknownVector); 
-	}
-	ASSERT_RESOURCE_ALLOCATION("ELI19877", ipFilteredFoundAttributes != NULL);
-
-	// analyze the expected and found attributes 
-	analyzeExpectedAndFoundAttributes(ipExpectedAttributes, ipFilteredFoundAttributes, 
-		ulNumCorrectlyFound, ulNumFalsePositives, ulNumOverRedacted, ulNumUnderRedacted,
-		ulNumMissed, strSourceDoc);
-
-	// check for output test voa file
-	if (m_ipTestOutputVOAVector != NULL)
-	{
-		// write the testoutput.voa file
-		string strTestOutputFile = strSourceDoc + ".testoutput.voa";
-		m_ipTestOutputVOAVector->SaveTo(strTestOutputFile.c_str(), VARIANT_TRUE);
-
-		// clear the vector
-		m_ipTestOutputVOAVector->Clear();
-
-		// add a link to the output data
-		m_ipResultLogger->AddTestCaseFile(strTestOutputFile.c_str());
-	}
-
-	// update total statistics
-	m_ulNumCorrectRedactions += ulNumCorrectlyFound;
-	m_ulNumOverRedactions += ulNumOverRedacted;
-	m_ulNumUnderRedactions += ulNumUnderRedacted;
-	m_ulNumMisses += ulNumMissed;
-	m_ulNumFalsePositives += ulNumFalsePositives;
+	// Determine if the file is selected for automatic redaction
+	bool bSelectedForAutomatedProcess = false;
+	bool bSelectedForVerification = false;
 	
-	// test case is considered failed if:
-	// 1 or more redactions was missed 
-	// OR if there are 1 or more under redactions
-	// OR if there are 1 or more over redactions
-	// OR if there are 1 or more false positives
-	if (ulNumMissed > 0
-		|| ulNumUnderRedacted > 0
-		|| ulNumOverRedacted > 0
-		|| ulNumFalsePositives > 0)
+	if (m_bOutputAutomatedStatsOnly)
 	{
-		return false;
+		// Ensure the redaction condition is refreshed
+		updateRedactionAttributeTester();
+
+		// Test the automated redaction condition
+		bSelectedForAutomatedProcess =
+			testAttributeCondition(ipFoundAttributes, m_apRedactionTester.get());
 	}
 	else
 	{
-		return true;
-	}	
+		// Ensure the verification condition is refreshed
+		updateVerificationAttributeTester();
+
+		bSelectedForVerification =
+			testAttributeCondition(ipFoundAttributes, m_apVerificationTester.get());
+
+		// In hybrid mode, analyze the file as an automated file only if it is not
+		// also selected for verification.
+		if (!bSelectedForVerification && m_bOutputHybridStats)
+		{
+			// Ensure the redaction condition is refreshed
+			updateRedactionAttributeTester();
+
+			// Test the automated redaction condition
+			bSelectedForAutomatedProcess =
+				testAttributeCondition(ipFoundAttributes, m_apRedactionTester.get());
+		}
+	}
+
+	if (m_bOutputAutomatedStatsOnly || bSelectedForAutomatedProcess)
+	{
+		// Analyze the attributes for automated redaction. Also process files not selected for
+		// review if computing only automated stats
+		return analyzeDataForAutomatedRedaction(ipExpectedAttributes, ipFoundAttributes,
+			bSelectedForAutomatedProcess, strSourceDoc);
+	}
+	else
+	{
+		// Analyze the attributes for verification based redaction. Include documents that were
+		// not otherwise selected for either process in hybrid mode.
+		return analyzeDataForVerificationBasedRedaction(ipExpectedAttributes, ipFoundAttributes,
+				bSelectedForVerification, strSourceDoc);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(
+														IIUnknownVectorPtr ipExpectedAttributes,
+														IIUnknownVectorPtr ipFoundAttributes,
+														bool bSelectedForVerification,
+														const string& strSourceDoc)
+{
+	ASSERT_ARGUMENT("ELI18507", ipExpectedAttributes != NULL);
+	ASSERT_ARGUMENT("ELI18508", ipFoundAttributes != NULL);
+
+	// analyze the expected and found attributes 
+	CIDShieldTester::TestCaseStatistics testCaseStatistics = analyzeExpectedAndFoundAttributes(
+		ipExpectedAttributes, ipFoundAttributes, bSelectedForVerification, strSourceDoc);
+
+	// update total statistics
+	verificationStatistics += testCaseStatistics;
+
+	if (bSelectedForVerification)
+	{
+		// increment the number of files that would be selected for review
+		m_ulNumFilesSelectedForReview++;
+
+		// Get the size of the expected attribute collection
+		long lExpectedSize = ipExpectedAttributes->Size();
+
+		// increment the number of expected redactions in files selected for review
+		m_ulNumExpectedRedactionsInReviewedFiles += lExpectedSize;
+
+		// If there are one or more redactions and at least one filtered attribute, then add
+		// this file to the FilesCorrectlySelectedForReview.txt file.
+		if(lExpectedSize > 0)
+		{
+			appendToFile( strSourceDoc, m_strOutputFileDirectory + gstrFILES_CORRECTLY_SELECTED_FOR_REVIEW );
+		}
+		else
+		{
+			// There are one or more found redactions, but no expected redactions
+			appendToFile( strSourceDoc, m_strOutputFileDirectory + gstrFILES_INCORRECTLY_SELECTED_FOR_REVIEW);
+		}
+	}
+	else
+	{
+		// The document has no found attributes, but it does have an expected attribute
+		if (ipExpectedAttributes->Size() > 0)
+		{
+			appendToFile( strSourceDoc, m_strOutputFileDirectory + gstrFILES_MISSED_BEING_SELECTED_FOR_REVIEW);
+		}
+		else
+		{
+			// The case of no expected and no found attributes is intentionally not tracked.
+		}
+	}
+
+	return testCaseStatistics.m_bTestCaseResult;
+}
+//-------------------------------------------------------------------------------------------------
+bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpectedAttributes,
+													   IIUnknownVectorPtr ipFoundAttributes,
+													   bool bSelectedForAutomatedProcess,
+													   const string& strSourceDoc)
+{
+	ASSERT_ARGUMENT("ELI18509", ipExpectedAttributes != NULL);
+	ASSERT_ARGUMENT("ELI18510", ipFoundAttributes != NULL);
+
+	// analyze the expected and found attributes 
+	CIDShieldTester::TestCaseStatistics testCaseStatistics = analyzeExpectedAndFoundAttributes(
+		ipExpectedAttributes, ipFoundAttributes, bSelectedForAutomatedProcess, strSourceDoc);
+
+	// update total statistics
+	automatedStatistics += testCaseStatistics;
+
+	if (bSelectedForAutomatedProcess)
+	{
+		m_ulNumFilesAutomaticallyRedacted++;
+		
+		// Get the size of the expected attribute collection
+		long lExpectedSize = ipExpectedAttributes->Size();
+
+		// increment the number of expected redactions in files selected for redaction
+		m_ulNumExpectedRedactionsInRedactedFiles += lExpectedSize;
+
+		// If there are one or more redactions and at least one filtered attribute, then add
+		// this file to the FilesCorrectlySelectedForReview.txt file.
+		if(lExpectedSize > 0)
+		{
+			appendToFile(strSourceDoc,
+				m_strOutputFileDirectory + gstrFILES_CORRECTLY_SELECTED_FOR_REDACTION);
+		}
+		else
+		{
+			// There are one or more found redactions, but no expected redactions
+			appendToFile(strSourceDoc,
+				m_strOutputFileDirectory + gstrFILES_INCORRECTLY_SELECTED_FOR_REDACTION);
+		}
+	}
+	else
+	{
+		// The document has no found attributes, but it does have an expected attribute
+		// and we are not outputting hybrid statistics
+		if(ipExpectedAttributes->Size() > 0)
+		{
+			appendToFile(strSourceDoc,
+				m_strOutputFileDirectory + gstrFILES_MISSED_BEING_SELECTED_FOR_REDACTION);
+		}
+		else
+		{
+			// The case of no expected and no found attributes is intentionally not tracked.
+		}
+	}
+
+	return testCaseStatistics.m_bTestCaseResult;
 }
 //-------------------------------------------------------------------------------------------------
 bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
@@ -1278,42 +1314,58 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExpectedAttributes,
-														IIUnknownVectorPtr ipFoundAttributes,
-														unsigned long& rNumCorrectlyFound,
-														unsigned long& rNumFalsePositives,
-														unsigned long& rNumOverRedacted,
-														unsigned long& rNumUnderRedacted,
-														unsigned long& rNumMissed,
-														const string& strSourceDoc)
+CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttributes(
+	IIUnknownVectorPtr ipExpectedAttributes, IIUnknownVectorPtr ipFoundAttributes,
+	bool bDocumentSelected, const string& strSourceDoc)
 {
 	ASSERT_ARGUMENT("ELI18511", ipExpectedAttributes != NULL);
 	ASSERT_ARGUMENT("ELI18512", ipFoundAttributes != NULL);
 
-	// reset return parameters to default value of zero
-	rNumCorrectlyFound = 0;
-	rNumFalsePositives = 0;
-	rNumOverRedacted = 0;
-	rNumUnderRedacted = 0;
-	rNumMissed = 0;
+	CIDShieldTester::TestCaseStatistics testCaseStatistics;
+	testCaseStatistics.m_ulTotalExpectedRedactions = ipExpectedAttributes->Size();
 
-	long lExpectedSize = ipExpectedAttributes->Size();
-	long lFoundSize = ipFoundAttributes->Size();
+	// If the document was selected, find the attributes that would be redacted by default and use
+	// those attributes as the basis for the statistics.
+	IIUnknownVectorPtr ipAutoRedactedAttributes = NULL;
+	if (bDocumentSelected)
+	{
+		// restrict the found attributes by the query that will be used for automated redaction
+		ipAutoRedactedAttributes = m_ipAFUtility->QueryAttributes(
+			ipFoundAttributes, m_strRedactionQuery.c_str(), VARIANT_FALSE);
 
-	if (lFoundSize != 0 && lExpectedSize != 0)
+		testCaseStatistics.m_ulExpectedRedactionsInSelectedFiles = ipExpectedAttributes->Size();
+		testCaseStatistics.m_ulFoundRedactions = ipAutoRedactedAttributes->Size();
+	}
+	// If the document was not selected for verification the total number of auto-redacted
+	// attributes is zero.
+	else
+	{
+		// Create an empty attribute vector, all expected attributes are a miss
+		ipAutoRedactedAttributes.CreateInstance(CLSID_IUnknownVector);
+	}
+	ASSERT_RESOURCE_ALLOCATION("ELI29334", ipAutoRedactedAttributes != NULL);
+	
+	if (testCaseStatistics.m_ulFoundRedactions != 0 &&
+		testCaseStatistics.m_ulTotalExpectedRedactions != 0)
 	{
 		// declare an array of MatchInfos
-		SafeTwoDimensionalArray<MatchInfo> s2dMatchInfos(lExpectedSize, lFoundSize);
+		SafeTwoDimensionalArray<MatchInfo> s2dMatchInfos(
+			testCaseStatistics.m_ulTotalExpectedRedactions, testCaseStatistics.m_ulFoundRedactions);
 
 		//--------------------------------------------------------
 		// Compute match info section
 		//--------------------------------------------------------
-		for (long iExpectedIndex = 0; iExpectedIndex < lExpectedSize; iExpectedIndex++)
+		for (unsigned long ulExpectedIndex = 0;
+			 ulExpectedIndex < testCaseStatistics.m_ulTotalExpectedRedactions;
+			 ulExpectedIndex++)
 		{
-			for (long iFoundIndex = 0; iFoundIndex < lFoundSize; iFoundIndex++)
+			for (unsigned long ulFoundIndex = 0;
+				 ulFoundIndex < testCaseStatistics.m_ulFoundRedactions;
+				 ulFoundIndex++)
 			{
-				getMatchInfo(s2dMatchInfos[iExpectedIndex][iFoundIndex],
-					ipExpectedAttributes->At(iExpectedIndex), ipFoundAttributes->At(iFoundIndex));
+				getMatchInfo(s2dMatchInfos[ulExpectedIndex][ulFoundIndex],
+					ipExpectedAttributes->At(ulExpectedIndex), 
+					ipAutoRedactedAttributes->At(ulFoundIndex));
 			}
 		}
 
@@ -1321,16 +1373,20 @@ void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExp
 		// Compute data from the expected attribute perspective
 		//--------------------------------------------------------
 		// compute correct redactions, under redactions, and missed redactions
-		for (long iExpectedIndex = 0; iExpectedIndex < lExpectedSize; iExpectedIndex++)
+		for (unsigned long ulExpectedIndex = 0;
+			 ulExpectedIndex < testCaseStatistics.m_ulTotalExpectedRedactions;
+			 ulExpectedIndex++)
 		{
 			// flags for under redactions and covered redactions
 			bool bExpectedCovered = false;
 			bool bUnderRedaction = false;
 
-			for (long iFoundIndex = 0; iFoundIndex < lFoundSize; iFoundIndex++)
+			for (unsigned long ulFoundIndex = 0;
+				 ulFoundIndex < testCaseStatistics.m_ulFoundRedactions;
+				 ulFoundIndex++)
 			{
 				// get the match info
-				MatchInfo miTemp = s2dMatchInfos(iExpectedIndex, iFoundIndex);
+				MatchInfo miTemp = s2dMatchInfos(ulExpectedIndex, ulFoundIndex);
 
 				// check if there is any area of overlap
 				if (!MathVars::isZero(miTemp.m_dAreaOfOverlap))
@@ -1364,8 +1420,8 @@ void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExp
 				if (bUnderRedaction) 
 				{
 					// increment the number of under redactions (which also count as misses)
-					rNumUnderRedacted++;
-					rNumMissed++;
+					testCaseStatistics.m_ulNumUnderRedactions++;
+					testCaseStatistics.m_ulNumMisses++;
 
 					// set the outputVOA tag string
 					strTestOutputTag = gstrTEST_UNDER_REDACTED;
@@ -1373,7 +1429,7 @@ void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExp
 				else
 				{
 					// if it was not under redacted then it was correct
-					rNumCorrectlyFound++;
+					testCaseStatistics.m_ulNumCorrectRedactions++;
 
 					// set the outputVOA tag string
 					strTestOutputTag = gstrTEST_CORRECT_REDACTED;
@@ -1382,7 +1438,7 @@ void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExp
 			else
 			{
 				// did not cover the attribute at all, this is a miss
-				rNumMissed++;
+				testCaseStatistics.m_ulNumMisses++;
 
 				// set the outputVOA tag string
 				strTestOutputTag = gstrTEST_MISSED_REDACTED;
@@ -1392,7 +1448,7 @@ void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExp
 			if (m_ipTestOutputVOAVector != NULL)
 			{
 				// add this expected attribute to the output VOA vector
-				addAttributeToTestOutputVOA(s2dMatchInfos(iExpectedIndex, 0).m_ipExpectedAttribute,
+				addAttributeToTestOutputVOA(s2dMatchInfos(ulExpectedIndex, 0).m_ipExpectedAttribute,
 					strTestOutputTag);
 			}
 		}
@@ -1401,13 +1457,17 @@ void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExp
 		// Compute data from the found attribute perspective
 		//--------------------------------------------------------
 		// compute over redactions and false positives
-		for (long iFoundIndex = 0; iFoundIndex < lFoundSize; iFoundIndex++)
+		for (unsigned long ulFoundIndex = 0;
+			 ulFoundIndex < testCaseStatistics.m_ulFoundRedactions;
+			 ulFoundIndex++)
 		{
 			double dTotalOverlapArea = 0.0;
-			for (long iExpectedIndex = 0; iExpectedIndex < lExpectedSize; iExpectedIndex++)
+			for (unsigned long ulExpectedIndex = 0;
+				 ulExpectedIndex < testCaseStatistics.m_ulTotalExpectedRedactions;
+				 ulExpectedIndex++)
 			{
 				// get the match info for these two attributes and add the area of overlap
-				MatchInfo miOverlap = s2dMatchInfos(iExpectedIndex, iFoundIndex);
+				MatchInfo miOverlap = s2dMatchInfos(ulExpectedIndex, ulFoundIndex);
 				dTotalOverlapArea += miOverlap.m_dAreaOfOverlap;
 			}
 
@@ -1417,7 +1477,7 @@ void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExp
 
 			if (MathVars::isZero(dTotalOverlapArea))
 			{
-				rNumFalsePositives++;
+				testCaseStatistics.m_ulNumFalsePositives++;
 
 				// set the outputVOA tag string
 				strTestOutputTag = gstrTEST_FALSE_POSITIVE;
@@ -1426,7 +1486,7 @@ void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExp
 			{
 				// get the area of the found redaction
 				double dAreaOfFoundRedaction = 
-					s2dMatchInfos(0, iFoundIndex).m_dAreaOfFoundRedaction;
+					s2dMatchInfos(0, ulFoundIndex).m_dAreaOfFoundRedaction;
 
 				double dERAP = 0.0;
 
@@ -1443,7 +1503,7 @@ void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExp
 
 				if (dERAP >= m_dOverRedactionERAP)
 				{
-					rNumOverRedacted++;
+					testCaseStatistics.m_ulNumOverRedactions++;
 
 					// set the outputVOA tag string
 					strTestOutputTag = gstrTEST_OVER_REDACTED;
@@ -1458,34 +1518,34 @@ void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExp
 				if (strTestOutputTag != "")
 				{
 					// add this found attribute to the output VOA vector
-					addAttributeToTestOutputVOA(s2dMatchInfos(0, iFoundIndex).m_ipFoundAttribute, 
+					addAttributeToTestOutputVOA(s2dMatchInfos(0, ulFoundIndex).m_ipFoundAttribute, 
 						strTestOutputTag);
 				}
 			}
 		}
 	}
-	// lExpected == 0 || lFoundSize == 0
+	// m_ulTotalExpectedRedactions == 0 || m_ulFoundRedactions == 0
 	else
 	{
 		// if lFoundSize is 0 then all expected attributes are misses
-		// if lExpectedSize is 0 then all found attributes are false positives 
-		rNumMissed = lExpectedSize;
-		rNumFalsePositives = lFoundSize;
+		// if lExpectedSize is 0 then all found attributes are false positives
+		testCaseStatistics.m_ulNumMisses = testCaseStatistics.m_ulTotalExpectedRedactions;
+		testCaseStatistics.m_ulNumFalsePositives = testCaseStatistics.m_ulFoundRedactions;
 
 		// check for the CreateTestOutputVOAFile
 		if (m_ipTestOutputVOAVector != NULL)
 		{
 			// if lExpectedSize > 0 then all expected attributes are misses
-			for (long i=0; i < lExpectedSize; i++)
+			for (unsigned long i = 0; i < testCaseStatistics.m_ulTotalExpectedRedactions; i++)
 			{
 				addAttributeToTestOutputVOA(ipExpectedAttributes->At(i),
 					gstrTEST_MISSED_REDACTED);
 			}
 
 			// if lFoundSize > 0 then all found attributes are false positives
-			for (long i=0; i < lFoundSize; i++)
+			for (unsigned long i = 0; i < testCaseStatistics.m_ulFoundRedactions; i++)
 			{
-				addAttributeToTestOutputVOA(ipFoundAttributes->At(i),
+				addAttributeToTestOutputVOA(ipAutoRedactedAttributes->At(i),
 					gstrTEST_FALSE_POSITIVE);
 			}
 		}
@@ -1495,39 +1555,72 @@ void CIDShieldTester::analyzeExpectedAndFoundAttributes(IIUnknownVectorPtr ipExp
 	// File output section 
 	//--------------------------------------------------------
 	// if at least 1 correctly found then output to files with correct redactions
-	if (rNumCorrectlyFound > 0)
+	if (testCaseStatistics.m_ulNumCorrectRedactions > 0)
 	{
-		appendToFile(strSourceDoc, 
+		appendToFile(strSourceDoc,
 			m_strOutputFileDirectory + gstrFILES_WITH_CORRECT_REDACTIONS);
 	}
 
 	// if at least 1 over redaction then output to files with over redactions
-	if (rNumOverRedacted > 0)
+	if (testCaseStatistics.m_ulNumOverRedactions > 0)
 	{
 		appendToFile(strSourceDoc, 
 			m_strOutputFileDirectory + gstrFILES_WITH_OVER_REDACTIONS);
 	}
 
 	// if at least 1 under redaction then output to files with under redactions
-	if (rNumUnderRedacted > 0)
+	if (testCaseStatistics.m_ulNumUnderRedactions > 0)
 	{
 		appendToFile(strSourceDoc, 
 			m_strOutputFileDirectory + gstrFILES_WITH_UNDER_REDACTIONS);
 	}
 
 	// if at least 1 false positive then output to files with false positives
-	if (rNumFalsePositives > 0)
+	if (testCaseStatistics.m_ulNumFalsePositives > 0)
 	{
 		appendToFile(strSourceDoc,
 			m_strOutputFileDirectory + gstrFILES_WITH_FALSE_POSITIVES);
 	}
 
 	// if at least 1 redaction missed then output to files with missed redactions
-	if (rNumMissed > 0)
+	if (testCaseStatistics.m_ulNumMisses > 0)
 	{
 		appendToFile(strSourceDoc,
 			m_strOutputFileDirectory + gstrFILES_WITH_MISSED_REDACTIONS);
 	}
+
+	// check for output test voa file
+	if (m_ipTestOutputVOAVector != NULL)
+	{
+		// write the testoutput.voa file
+		string strTestOutputFile = strSourceDoc + ".testoutput.voa";
+		m_ipTestOutputVOAVector->SaveTo(strTestOutputFile.c_str(), VARIANT_TRUE);
+
+		// clear the vector
+		m_ipTestOutputVOAVector->Clear();
+
+		// add a link to the output data
+		m_ipResultLogger->AddTestCaseFile(strTestOutputFile.c_str());
+	}
+
+	// test case is considered failed if:
+	// 1 or more redactions was missed 
+	// OR if there are 1 or more under redactions
+	// OR if there are 1 or more over redactions
+	// OR if there are 1 or more false positives
+	if (testCaseStatistics.m_ulNumMisses > 0
+		|| testCaseStatistics.m_ulNumUnderRedactions > 0
+		|| testCaseStatistics.m_ulNumOverRedactions > 0
+		|| testCaseStatistics.m_ulNumFalsePositives > 0)
+	{
+		testCaseStatistics.m_bTestCaseResult = false;
+	}
+	else
+	{
+		testCaseStatistics.m_bTestCaseResult = true;
+	}	
+	
+	return testCaseStatistics;
 }
 //-------------------------------------------------------------------------------------------------
 void CIDShieldTester::displaySummaryStatistics()
@@ -1536,132 +1629,277 @@ void CIDShieldTester::displaySummaryStatistics()
 
 	// The string that will be put into gstrFILE_FOR_STATISTICS (statistics file) which is a textual
 	// version of all the statistics
-	string strStatisticSummary = "";
+	string strStatisticSummary = "Image analysis:\r\n";
+
+	CString zTemp;
+	zTemp.Format("Number of files tested: %d", m_ulTotalFilesProcessed);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	zTemp.Format("Number of pages tested: %d", m_ulTotalPages);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	// Calculate the number of files with expected redactions
+	zTemp.Format("Number of files containing sensitive data items: %d (%0.1f%%)",	
+					m_ulNumFilesWithExpectedRedactions, 
+					getRatioAsPercentOfTwoLongs(m_ulNumFilesWithExpectedRedactions, m_ulTotalFilesProcessed));	
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	// Calculate the number of pages with expected redactions
+	zTemp.Format("Number of pages containing sensitive data items: %d (%0.1f%%)",	
+					m_ulNumPagesWithExpectedRedactions, 
+					getRatioAsPercentOfTwoLongs(m_ulNumPagesWithExpectedRedactions, m_ulTotalPages));	
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	zTemp.Format("Number of sensitive data items: %d", m_ulTotalExpectedRedactions);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	zTemp.Format("Number of documents with overlapping expected redactions: %d ", 
+		m_ulNumFilesWithOverlappingExpectedRedactions);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticSummary += zTemp + "\r\n";
+
+	strStatisticSummary += "\r\nWorkflow:\r\n";
 
 	// If only automated stats were computed, there are no verification stats to report.
 	if (!m_bOutputAutomatedStatsOnly)
 	{
-		strStatisticSummary += "Verification Condition: " + m_strVerificationCondition + "\r\n";
-		strStatisticSummary += "Verification Quantifier: " + m_strVerificationQuantifier + "\r\n";
+		string strDataTypes = m_strVerificationCondition;
+		replaceVariable(strDataTypes, "|", ", ");
+
+		strStatisticSummary += "Manually review: Files that contain "
+			+ m_strVerificationQuantifier + " " + strDataTypes + "\r\n";
 	}
 
-	strStatisticSummary += "Redaction Condition: " + m_strRedactionCondition + "\r\n";
-	strStatisticSummary += "Redaction Quantifier: " + m_strRedactionQuantifier + "\r\n";
-	strStatisticSummary += "Redaction Query: " + m_strRedactionQuery + "\r\n";
+	if (m_bOutputAutomatedStatsOnly || m_bOutputHybridStats)
+	{
+		string strDataTypes = m_strRedactionCondition;
+		replaceVariable(strDataTypes, "|", ", ");
 
-	CString zTemp;
-	zTemp.Format( "Total files processed: %d", m_ulTotalFilesProcessed);
-	m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
-	strStatisticSummary += zTemp + "\r\n";
+		strStatisticSummary += "Automatically redact: Files that contain " +
+			m_strRedactionQuantifier + " " + strDataTypes + "\r\n";
+	}
 
-	zTemp.Format( "Total Expected Redactions: %d", m_ulTotalExpectedRedactions);
-	m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
-	strStatisticSummary += zTemp + "\r\n";
+	string strDataTypes = m_strRedactionQuery;
+	replaceVariable(strDataTypes, "|", ", ");
 
-	// Calculate the Number of files with expected redactions
-	zTemp.Format( "Number of files with expected redactions: %d (%0.1f%%)",	
-					m_ulNumFilesWithExpectedRedactions, 
-					getRatioAsPercentOfTwoLongs(m_ulNumFilesWithExpectedRedactions, m_ulTotalFilesProcessed));	
-	m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
-	strStatisticSummary += zTemp + "\r\n";
+	strStatisticSummary += "Default to redacting the following: " + strDataTypes + "\r\n";
+
+	// [FlexIDSCore: 3798]
+	// If limiting testing to specified doc types, indicates the doc types being tested.
+	if (!m_bOutputAutomatedStatsOnly && !m_setDocTypesToBeVerified.empty())
+	{
+		strStatisticSummary += "Document types to be verified: " +
+			getSetAsDelimitedList(m_setDocTypesToBeVerified) + "\r\n";
+	}
+	if ((m_bOutputAutomatedStatsOnly || m_bOutputHybridStats) &&
+		!m_setDocTypesToBeAutomaticallyRedacted.empty())
+	{
+		strStatisticSummary += "Document types to be automatically redacted: " +
+			getSetAsDelimitedList(m_setDocTypesToBeAutomaticallyRedacted) + "\r\n";
+	}
+
+	// If limiting testing to specified doc type, indicates the doc type being tested.
+	if (!m_strTypeToBeTested.empty())
+	{
+		strStatisticSummary += "Limit data tested to type: " + m_strTypeToBeTested + "\r\n";
+	}
 
 	// Compute the number of correct redactions based on whether this is hyrbid stats or not
-	unsigned long ulNumberOfCorrectRedactions = m_bOutputHybridStats ?
-		m_ulNumCorrectRedactions + m_ulNumExpectedRedactionsInReviewedFiles : m_ulNumCorrectRedactions;
+	unsigned long ulTotalNumberOfCorrectRedactions = automatedStatistics.m_ulNumCorrectRedactions +
+		verificationStatistics.m_ulExpectedRedactionsInSelectedFiles;
 
-	zTemp = m_bOutputHybridStats ?
-		"Statistics for hybrid process:" : "Statistics for automated redaction:";
-	m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
+	strStatisticSummary += "\r\n";
+
+	if (m_bOutputAutomatedStatsOnly)
+	{
+		strStatisticSummary += "Final results of automated workflow:\r\n";
+	}
+	else if (m_bOutputHybridStats)
+	{
+		strStatisticSummary += "Final results of hybrid workflow:\r\n";
+	}
+	else
+	{
+		strStatisticSummary += "Final results of standard workflow:\r\n";
+	}
+
+	// Note for number of redactions found
+	zTemp.Format(
+		"Number of sensitive data items redacted after processing: %d (%0.1f%%)",
+			ulTotalNumberOfCorrectRedactions, getRatioAsPercentOfTwoLongs(
+				ulTotalNumberOfCorrectRedactions, m_ulTotalExpectedRedactions));
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
-	// If outputting hybrid stats then add a node for the count of redactions found
-	// by the automated process
-	if (m_bOutputHybridStats)
+	if (m_bOutputAutomatedStatsOnly || m_bOutputHybridStats)
 	{
-		zTemp.Format("Number of automated redactions: %d (%0.1f%%)", m_ulNumCorrectRedactions,
-			getRatioAsPercentOfTwoLongs(m_ulNumCorrectRedactions, m_ulTotalExpectedRedactions));
+		// Note for the number of false positives found
+		zTemp.Format("Number of false positives in redacted images: %d ",
+			automatedStatistics.m_ulNumFalsePositives);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
+
+		// if m_ulNumFalsePositives == 0, append "(ROCE = n/a)"
+		if(automatedStatistics.m_ulNumFalsePositives <= 0)
+		{
+			zTemp = "Ratio of correctly redacted items to false positives: n/a";
+		}
+		// else ROCE > 0, append "(ROCE = N)"
+		else
+		{
+			// Use integer division to get a whole number ratio as a result
+			zTemp.Format("Ratio of correctly redacted items to false positives: %0.1f",
+				((double)ulTotalNumberOfCorrectRedactions /
+				 (double)automatedStatistics.m_ulNumFalsePositives));
+		}
 		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 		strStatisticSummary += zTemp + "\r\n";
 	}
 
-	zTemp.Format( "Number of over-redactions: %d", m_ulNumOverRedactions);
-	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
-	strStatisticSummary += zTemp + "\r\n";
-
-	zTemp.Format( "Number of under-redactions: %d", m_ulNumUnderRedactions);
-	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
-	strStatisticSummary += zTemp + "\r\n";
-
-	zTemp.Format( "Number of missed redactions: %d", m_ulNumMisses);
-	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
-	strStatisticSummary += zTemp + "\r\n";
-
-	// Note for number of redactions found
-	zTemp.Format( "Number of correct redactions: %d (%0.1f%%)", ulNumberOfCorrectRedactions,
-		getRatioAsPercentOfTwoLongs(ulNumberOfCorrectRedactions, m_ulTotalExpectedRedactions));
-	m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
-	strStatisticSummary += zTemp + "\r\n";
-
-	// Note for the number of false positives found
-	zTemp.Format( "Number of false positives: %d ", m_ulNumFalsePositives);
-
-	// if ROCE == 0, append "(ROCE = n/a)"
-	if( m_ulNumFalsePositives <= 0 )
+	if (m_bOutputHybridStats || !m_bOutputAutomatedStatsOnly)
 	{
-		zTemp.Append( "(ROCE = n/a)");
-	}
-	// else ROCE > 0, append "(ROCE = N)"
-	else
-	{
-		// Use integer division to get a whole number ratio as a result
-		zTemp.AppendFormat( "(ROCE = %d)", 
-			( ulNumberOfCorrectRedactions / m_ulNumFalsePositives ));
-	}
-	m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
-	strStatisticSummary += zTemp + "\r\n";
+		strStatisticSummary += "\r\nVerification efficiency:\r\n";
 
-	zTemp.Format( "Number of documents with overlapping expected redactions: %d ", 
-		m_ulNumFilesWithOverlappingExpectedRedactions);
-	m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
-	strStatisticSummary += zTemp + "\r\n";
+		// Label for Number of files selected for review
+		zTemp.Format("Number of files selected for review: %d (%0.1f%%)",
+			m_ulNumFilesSelectedForReview, getRatioAsPercentOfTwoLongs(
+				m_ulNumFilesSelectedForReview, m_ulTotalFilesProcessed));
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticSummary += zTemp + "\r\n";
 
-	// If only automated stats were computed, there are no verification stats to report.
-	if (!m_bOutputAutomatedStatsOnly)
-	{
-		if (!m_bOutputHybridStats)
+		if (m_bOutputHybridStats)
 		{
-			// Label for the redaction with verification stats
-			zTemp = "Statistics for redaction with verification:";
-			m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
+			// Make a note for the number of expected redactions in the reviewed files
+			// (This number would be a duplicate statistic in a standard workflow).
+			zTemp.Format("Number of expected redactions in files presented for review: %d (%0.1f%%)",
+				verificationStatistics.m_ulExpectedRedactionsInSelectedFiles,
+				getRatioAsPercentOfTwoLongs(
+					verificationStatistics.m_ulExpectedRedactionsInSelectedFiles,
+					m_ulTotalExpectedRedactions));
+			m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 			strStatisticSummary += zTemp + "\r\n";
 		}
+
+		strStatisticSummary += displayStatisticsSection(verificationStatistics, true);
+	}
+
+	if (m_bOutputHybridStats || m_bOutputAutomatedStatsOnly)
+	{
+		strStatisticSummary += "\r\nAutomated redaction efficiency:\r\n";
+		
 		// Label for Number of files selected for review
-		zTemp.Format( "Number of files selected for review: %d (%0.1f%%)", m_ulNumFilesSelectedForReview, 
-							getRatioAsPercentOfTwoLongs(m_ulNumFilesSelectedForReview, m_ulTotalFilesProcessed));
-		m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
+		zTemp.Format("Number of automatically redacted files: %d (%0.1f%%)",
+			m_ulNumFilesAutomaticallyRedacted, getRatioAsPercentOfTwoLongs(
+				m_ulNumFilesAutomaticallyRedacted, m_ulTotalFilesProcessed));
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 		strStatisticSummary += zTemp + "\r\n";
 
-		// Make a note for the number of expected redactions in the reviewed files
-		zTemp.Format( "Number of expected redactions found in reviewed files: %d (%0.1f%%)", 
-						m_ulNumExpectedRedactionsInReviewedFiles, 
-						getRatioAsPercentOfTwoLongs(m_ulNumExpectedRedactionsInReviewedFiles, m_ulTotalExpectedRedactions));
-		m_ipResultLogger->AddTestCaseNote( _bstr_t(zTemp) );
+		// Make a note for the number of expected redactions in the automatically redacted files
+		zTemp.Format("Number of expected redactions in automatically redacted files: %d (%0.1f%%)",
+			automatedStatistics.m_ulExpectedRedactionsInSelectedFiles, 
+			getRatioAsPercentOfTwoLongs(automatedStatistics.m_ulExpectedRedactionsInSelectedFiles,
+				m_ulTotalExpectedRedactions));
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 		strStatisticSummary += zTemp + "\r\n";
+
+		strStatisticSummary += displayStatisticsSection(automatedStatistics, false);
 	}
 
 	// If the number of correct redactions match the number of total expected redactions, then 
 	// the test was 100% successful.
 	bool bOneHundredPercentSuccess = false;
-	bOneHundredPercentSuccess = (m_ulTotalExpectedRedactions == ulNumberOfCorrectRedactions);
+	bOneHundredPercentSuccess = 
+		automatedStatistics.m_bTestCaseResult && verificationStatistics.m_bTestCaseResult &&
+		(m_ulTotalExpectedRedactions == ulTotalNumberOfCorrectRedactions);
 
 	m_ipResultLogger->EndTestCase(bOneHundredPercentSuccess ? VARIANT_TRUE : VARIANT_FALSE);
 
 	// Output the printed statistics to a file so they can be viewed later without running
 	// the test again.
-	appendToFile( strStatisticSummary, m_strOutputFileDirectory + gstrFILE_FOR_STATISTICS );
+	appendToFile(strStatisticSummary, m_strOutputFileDirectory + gstrFILE_FOR_STATISTICS);
 
 	// Display the document type statistics
 	displayDocumentTypeStats();
+}
+//-------------------------------------------------------------------------------------------------
+string CIDShieldTester::displayStatisticsSection(
+											const CIDShieldTester::TestCaseStatistics& statistics,
+											bool bVerificationStatistics)
+{
+	string strStatisticsSection = "";
+	CString zTemp;
+
+	// Section specific false positive data will be duplicating the overall false positive stat
+	// when using automatic mode.
+	if (m_bOutputHybridStats || !m_bOutputAutomatedStatsOnly)
+	{
+		zTemp = CString("Number of correct redactions") +
+			(bVerificationStatistics ? " presented to reviewers" : "");
+		zTemp.Format(zTemp + ": %d", statistics.m_ulNumCorrectRedactions);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticsSection += zTemp + "\r\n";
+	}
+
+	zTemp = CString("Number of over-redactions") +
+		(bVerificationStatistics ? " presented to reviewers" : "");
+	zTemp.Format(zTemp + ": %d", statistics.m_ulNumOverRedactions);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticsSection += zTemp + "\r\n";
+
+	zTemp = CString("Number of under-redactions") +
+		(bVerificationStatistics ? " presented to reviewers" : "");
+	zTemp.Format(zTemp + ": %d", statistics.m_ulNumUnderRedactions);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticsSection += zTemp + "\r\n";
+
+	if (bVerificationStatistics)
+	{
+		zTemp.Format(
+			"Number of items not automatically redacted in files presented to reviewers: %d", 
+			statistics.m_ulNumMisses -
+				(statistics.m_ulTotalExpectedRedactions -
+				 statistics.m_ulExpectedRedactionsInSelectedFiles));
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticsSection += zTemp + "\r\n";
+	}
+	else
+	{
+		zTemp.Format("Number of missed redactions: %d", statistics.m_ulNumMisses);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticsSection += zTemp + "\r\n";
+	}
+
+	// Section specific false positive data will be duplicating the overall false positive stat
+	// when using automatic mode.
+	if (m_bOutputHybridStats || !m_bOutputAutomatedStatsOnly)
+	{
+		// Note for the number of false positives found
+		zTemp = CString("Number of false positives") +
+			(bVerificationStatistics ? " presented to reviewers" : "");
+		zTemp.Format(zTemp + ": %d ", statistics.m_ulNumFalsePositives);
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticsSection += zTemp + "\r\n";
+
+		if(statistics.m_ulNumFalsePositives <= 0)
+		{
+			zTemp = CString("Ratio of correctly redacted items to false positives: n/a");
+		}
+		else
+		{
+			zTemp.Format("Ratio of correctly redacted items to false positives: %0.1f",
+				((double)statistics.m_ulNumCorrectRedactions /
+					(double)statistics.m_ulNumFalsePositives));
+		}
+		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+		strStatisticsSection += zTemp + "\r\n";
+	}
+
+	return strStatisticsSection;
 }
 //-------------------------------------------------------------------------------------------------
 double CIDShieldTester::getRatioAsPercentOfTwoLongs(unsigned long ulNumerator, 
@@ -1866,13 +2104,16 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 	}
 }
 //-------------------------------------------------------------------------------------------------
-unsigned long CIDShieldTester::calculateOverlappingExpected(IIUnknownVectorPtr ipExpectedAttributes)
+void CIDShieldTester::countExpectedOverlapsAndPages(IIUnknownVectorPtr ipExpectedAttributes,
+	unsigned long& rulOverlaps, unsigned long& rulNumPagesWithRedactions)
 {
 	ASSERT_ARGUMENT("ELI18361", ipExpectedAttributes != NULL);
 
 	// get the size of the vector
 	long nSize = ipExpectedAttributes->Size();
-	unsigned long ulOverlaps = 0;
+	rulOverlaps = 0;
+
+	set<int> setPagesWithExpectedAttributes;
 
 	// loop over each item in the vector
 	for (long i = 0; i < nSize; i++)
@@ -1900,13 +2141,29 @@ unsigned long CIDShieldTester::calculateOverlappingExpected(IIUnknownVectorPtr i
 			if (spatialStringsOverlap(ipSS1, ipSS2))
 			{
 				// strings overlap, increment our overlap counter
-				ulOverlaps++;
+				rulOverlaps++;
 			}
+		}
+
+		long lLastPageNumber = ipSS1->GetLastPageNumber();
+		for (long lPage = ipSS1->GetFirstPageNumber(); lPage <= lLastPageNumber; lPage++)
+		{
+			// Retrieve the specific page we need.
+			ISpatialStringPtr ipPage = ipSS1->GetSpecifiedPages(lPage, lPage);
+			ASSERT_RESOURCE_ALLOCATION("ELI29438", ipPage != NULL);
+
+			if (!asCppBool(ipPage->HasSpatialInfo()))
+			{
+				// If this page has no spatial information, do not include it as a page with
+				// expected attributes.
+				continue;
+			}
+
+			setPagesWithExpectedAttributes.insert(lPage);
 		}
 	}
 
-	// return the number of overlaps
-	return ulOverlaps;
+	rulNumPagesWithRedactions = (unsigned long)setPagesWithExpectedAttributes.size();
 }
 //-------------------------------------------------------------------------------------------------
 bool CIDShieldTester::spatialStringsOverlap(ISpatialStringPtr ipSS1, ISpatialStringPtr ipSS2)
@@ -2251,11 +2508,80 @@ void CIDShieldTester::updateRedactionAttributeTester()
 	default:
 		THROW_LOGIC_ERROR_EXCEPTION("ELI25164");
 	}
+
+	// If there are doc types that should be selected for automatic redaction add a tester for the
+	// doc types
+	if (!m_setDocTypesToBeAutomaticallyRedacted.empty())
+	{
+		m_apRedactionTester->addTester(
+			new DocTypeAttributeTester(m_setDocTypesToBeAutomaticallyRedacted));
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void CIDShieldTester::getOutputDirectory(string rootDirectory)
 {
 	// Determine the Analysis folder to create the log files in
 	m_strOutputFileDirectory = rootDirectory + "\\Analysis - " + getTimeStamp();
+}
+//-------------------------------------------------------------------------------------------------
+string CIDShieldTester::getSetAsDelimitedList(const set<string>& rsetValues)
+{
+	string strList;
+
+	bool bFirst = true;
+	for each (string strValue in rsetValues)
+	{
+		if (!bFirst)
+		{
+			strList += ", ";
+		}
+
+		strList += strValue;
+		bFirst = false;
+	}
+
+	return strList;
+}
+//-------------------------------------------------------------------------------------------------
+CIDShieldTester::TestCaseStatistics::TestCaseStatistics()
+: m_bTestCaseResult(true)
+, m_ulTotalExpectedRedactions(0)
+, m_ulExpectedRedactionsInSelectedFiles(0)
+, m_ulFoundRedactions(0)
+, m_ulNumCorrectRedactions(0)
+, m_ulNumFalsePositives(0)
+, m_ulNumOverRedactions(0)
+, m_ulNumUnderRedactions(0)
+, m_ulNumMisses(0)
+{
+}
+//-------------------------------------------------------------------------------------------------
+void CIDShieldTester::TestCaseStatistics::reset()
+{
+	m_bTestCaseResult = true;
+	m_ulTotalExpectedRedactions = 0;
+	m_ulExpectedRedactionsInSelectedFiles = 0;
+	m_ulFoundRedactions = 0;
+	m_ulNumCorrectRedactions = 0;
+	m_ulNumFalsePositives = 0;
+	m_ulNumOverRedactions = 0;
+	m_ulNumUnderRedactions = 0;
+	m_ulNumMisses = 0;
+}
+//-------------------------------------------------------------------------------------------------
+CIDShieldTester::TestCaseStatistics& CIDShieldTester::TestCaseStatistics::operator += (
+															const TestCaseStatistics& otherTestCase)
+{
+	m_bTestCaseResult = (m_bTestCaseResult && otherTestCase.m_bTestCaseResult);
+	m_ulTotalExpectedRedactions += otherTestCase.m_ulTotalExpectedRedactions;
+	m_ulExpectedRedactionsInSelectedFiles += otherTestCase.m_ulExpectedRedactionsInSelectedFiles;
+	m_ulFoundRedactions += otherTestCase.m_ulFoundRedactions;
+	m_ulNumCorrectRedactions += otherTestCase.m_ulNumCorrectRedactions;
+	m_ulNumFalsePositives += otherTestCase.m_ulNumFalsePositives;
+	m_ulNumOverRedactions += otherTestCase.m_ulNumOverRedactions;
+	m_ulNumUnderRedactions += otherTestCase.m_ulNumUnderRedactions;
+	m_ulNumMisses += otherTestCase.m_ulNumMisses;
+
+	return *this;
 }
 //-------------------------------------------------------------------------------------------------

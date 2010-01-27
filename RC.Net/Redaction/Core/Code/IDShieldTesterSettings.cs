@@ -713,10 +713,10 @@ namespace Extract.Redaction
             new IDShieldTesterSetting<bool>("OutputAutomatedStatsOnly");
 
         /// <summary>
-        /// Specifies which attribute types are to be included in the test.
+        /// Specifies an attribute type to which the  are to be included in the test.
         /// </summary>
-        IDShieldTesterSetting<string> _typesToBeTested =
-            new IDShieldTesterSetting<string>("TypesToBeTested");
+        IDShieldTesterSetting<string> _typeToBeTested =
+            new IDShieldTesterSetting<string>("TypeToBeTested");
 
         /// <summary>
         /// Specifies the folder where the test results will be output.
@@ -769,7 +769,7 @@ namespace Extract.Redaction
                 _parameters.Add(_outputFinalStatsOnly);
                 _parameters.Add(_outputHybridStats);
                 _parameters.Add(_outputAutomatedStatsOnly);
-                _parameters.Add(_typesToBeTested);
+                _parameters.Add(_typeToBeTested);
                 _parameters.Add(_outputFilesFolder);
                 _parameters.Add(new IDShieldTesterFolder());
 
@@ -1017,19 +1017,20 @@ namespace Extract.Redaction
         }
         
         /// <summary>
-        /// Gets or sets which attribute types are to be included in the test.
+        /// Gets or sets which attribute type is to be included in the test.
         /// </summary>
-        /// <value>Which attribute types are to be included in the test.</value>
-        public string TypesToBeTested
+        /// <value>If specified, which attribute type is to be included in the test. If not
+        /// specified all types will be included.</value>
+        public string TypeToBeTested
         {
             get
             {
-                return _typesToBeTested.Value;
+                return _typeToBeTested.Value;
             }
 
             set
             {
-                _typesToBeTested.Value = value;
+                _typeToBeTested.Value = value;
             }
         }
 
