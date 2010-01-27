@@ -656,7 +656,7 @@ void runExtractEXE(const string& strExeFullFileName, const string& strParameters
 }
 //-------------------------------------------------------------------------------------------------
 DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractExe,
-							  const string& strParameters, const string& strWorkingDirectory,
+							  string strParameters, const string& strWorkingDirectory,
 							  int iIdleTimeout, int iIdleCheckInterval)
 {
 	try
@@ -666,15 +666,22 @@ DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractE
 			ASSERT_ARGUMENT("ELI28886", iIdleCheckInterval > 0);
 			ASSERT_ARGUMENT("ELI28887", iIdleTimeout >= iIdleCheckInterval);
 
-			ProcessInformationWrapper piw;
+			auto_ptr<TemporaryFileName> apTempFile;
+
+			// If running an extract exe, add the /ef <ExceptionFile> argument
 			if (bIsExtractExe)
 			{
-				runExtractEXE(strExeFullFileName, strParameters, 0, &piw, strWorkingDirectory);
+				apTempFile.reset(new TemporaryFileName( "", ".uex", true));
+				ASSERT_RESOURCE_ALLOCATION("ELI29399", apTempFile.get() != NULL);
+
+				strParameters += " /ef \"";
+				strParameters += apTempFile->getName();
+				strParameters += "\"";
 			}
-			else
-			{
-				runEXE(strExeFullFileName, strParameters, 0, &piw, strWorkingDirectory);
-			}
+
+			// Launch the executable
+			ProcessInformationWrapper piw;
+			runEXE(strExeFullFileName, strParameters, 0, &piw, strWorkingDirectory);
 
 			// Start an idle process killer
 			IdleProcessKiller idleKiller(piw.pi.dwProcessId, iIdleTimeout, iIdleCheckInterval);
@@ -682,12 +689,39 @@ DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractE
 			// Wait for the process to end
 			WaitForSingleObject( piw.pi.hProcess, INFINITE );
 
+			// Check if process was killed by the idle process killer
 			if (idleKiller.killedProcess())
 			{
 				UCLIDException uex("ELI28888", "Process killed by idle process killer.");
 				uex.addDebugInfo("Idle Timeout", iIdleTimeout);
 				uex.addDebugInfo("Timeout Interval", iIdleCheckInterval);
 				throw uex;
+			}
+
+			// If there was a temp exception file, check if an exception was logged
+			if (apTempFile.get() != NULL && getSizeOfFile(apTempFile->getName()) > 0)
+			{
+				// Exception file is non-empty, get contents as string
+				string strError = getTextFileContentsAsString(apTempFile->getName());
+
+				// Parse the data
+				vector<string> vecTokens;
+				StringTokenizer	s;
+				s.parse( strError, vecTokens );
+
+				// Check the number of tokens
+				if (vecTokens.size() == 7)
+				{
+					// Retrieve the exception's stringized data
+					string strData = trim( vecTokens[6], " \r\n", " \r\n" );
+
+					// Create the Exception object from the string
+					UCLIDException ue;
+					ue.createFromString( "ELI29400", strData );
+
+					// Throw the exception to the outer scope
+					throw ue;
+				}
 			}
 
 			// Get the process exit code

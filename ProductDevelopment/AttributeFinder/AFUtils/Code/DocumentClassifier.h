@@ -137,7 +137,7 @@ private:
 	void	appendSpecialTags(vector<string>& rvecTags);
 
 	// create document probability and confidence level in pAFDoc
-	void createDocTags(IAFDocument* pAFDoc, const string& strSpecificIndustryName);
+	void createDocTags(IAFDocumentPtr ipAFDoc, const string& strSpecificIndustryName);
 
 	// load DocTypes.idx file, which contains all available document
 	// types for specified industry category. Based on these type names,

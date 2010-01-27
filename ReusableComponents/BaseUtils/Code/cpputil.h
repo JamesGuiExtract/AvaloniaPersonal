@@ -443,7 +443,7 @@ EXPORT_BaseUtils void runExtractEXE(const string& strExeFullFileName,
 //			iIdleCheckInterval - How often to check on the process (in milliseconds)
 EXPORT_BaseUtils DWORD runExeWithProcessKiller(const string& strExeFullFileName,
 											   bool bIsExtractExe,
-											   const string& strParameters = "",
+											   string strParameters = "",
 											   const string& strWorkingDirectory = "",
 											   int iIdleTimeout=120000,
 											   int iIdleCheckInterval=2000);

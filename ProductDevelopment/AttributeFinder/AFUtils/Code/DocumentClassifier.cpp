@@ -149,9 +149,12 @@ STDMETHODIMP CDocumentClassifier::raw_Process(IAFDocument* pDocument, IProgressS
 		// create tags in the document
 		try
 		{
+			IAFDocumentPtr ipDocument(pDocument);
+			ASSERT_RESOURCE_ALLOCATION("ELI29402", ipDocument != NULL);
+
 			try
 			{
-				createDocTags(pDocument, m_strIndustryCategoryName);
+				createDocTags(ipDocument, m_strIndustryCategoryName);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15652");
 		}
@@ -614,7 +617,7 @@ void CDocumentClassifier::appendSpecialTags(vector<string>& rvecTags)
 	return;
 }
 //-------------------------------------------------------------------------------------------------
-void CDocumentClassifier::createDocTags(IAFDocument* pAFDoc, const string& strSpecificIndustryName)
+void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& strSpecificIndustryName)
 {
 	// make sure the vecDocTypeInterpreters is not empty
 	map<string, vector<DocTypeInterpreter> >::iterator itMap 
@@ -628,8 +631,7 @@ void CDocumentClassifier::createDocTags(IAFDocument* pAFDoc, const string& strSp
 
 	vector<DocTypeInterpreter> vecDocTypeInterpreters = itMap->second;
 
-	IAFDocumentPtr ipAFDoc(pAFDoc);
-	ASSERT_RESOURCE_ALLOCATION("ELI05886", ipAFDoc != NULL);
+	ASSERT_ARGUMENT("ELI05886", ipAFDoc != NULL);
 
 	int nConfidenceLevel = 0;
 	// the vector that stores all document types (in string) at the same level
