@@ -15,333 +15,355 @@
 <h2>NOTE: Items prefaced with an asterisk indicate functionality that is not yet complete.</h2>
 
 <ol>
-
-<!-- *********************************************** -->
-<li><h3>License Generator - Errors and Restrictions</h3>
-<ul>
-  	<li>Start with a clean test machine or virtual machine.
-  	<li>Create the usual drive mappings for <b>I</b> and <b>K</b>.
-	<LI>Confirm that <b>COMLicenseGenerator.exe</b> displays an error message that 
-	<b>Mscal.ocx</b> is not installed.</li>
-   	<li>Install the calendar control via <b>ocx-install.bat</b> and confirm that 
-	<b>COMLicenseGenerator.exe</b> starts without error.</li>
-<p>
-  	<li>Remove the drive mappings for <b>I</b> and <b>K</b>.
-   	<li>Navigate to <b>COMLicenseGenerator.exe</b> via UNC path (not mapped drive).  Confirm 
-	that an error message is displayed <b>Unable to run License Generator Utility</b>.</li>
-   	<li>Copy the contents of a specific COMLicense folder to a local folder on the 
-	test machine.  Confirm that an error message is displayed <b>Unable to run License 
-	Generator Utility</b>.</li>
-<p>
-   	<li>Confirm that the package group names such as FLEX Index, ID Shield, FLEX Index / ID Shield 
-	Utilities cannot be selected in the <b>Packages</b> list.</li>
-   	<li>Paste a valid user license string into a temporary text file.  Copy a modified version 
-	of the license string back into the Clipboard.  Confirm that clicking <b>Paste User String</b> 
-	to paste the modified license string generates a <b>The User License string you have provided is 
-	not a valid license string!</b> error message.</li>
-   	<li>Confirm that the <b>Generate Unlock File...</b> button is not enabled until a valid User 
-	License String has been provided.</li>
-   	<li>Confirm that the <b>Generate License File...</b> button is not enabled until a valid 
-	User License String, a Licensee Name and an Organization Name have been provided and at least 
-	one package has been selected.</li>
-<p>
-   	<li>Confirm that <b>Computer Name</b> and <b>Computer MAC Address</b> options are not enabled 
-	until a valid User License String has been provided.</li>
-   	<li>Confirm that <b>Disk Serial Number</b> option is both checked and disabled when the 
-	<b>Fully Licensed</b> mode is selected.  This prevents creation of a non-expiring license file 
-	that is not locked to a specific machine.</li>
-<p>
-   	<li>Confirm that selection of the <b>UCLID Password for end-user products</b> option controls 
-	the enabled or disabled state of the associated checkbox and combo box controls.</li>
-   	<li>Confirm that the <b>Random Password for Input Funnel SDK</b> option is not enabled unless 
-	the <b>-sdk</b> command-line switch is provided via <b>sdklicense.bat</b>.</li>
-   	<li>Confirm that selection of the <b>Specified Password for SDK</b> option controls the enabled 
-	or disabled state of the associated <b>Paste</b> button.</li>
-</ul>
-</li>
-<p>
-
-<!-- *********************************************** -->
-<li><h3>License Generator - Functionality</h3>
-<ul>
-   	<li>Confirm that the Packages, Licensee Name and Organization Name controls are always enabled.</li>
-   	<li>Confirm that clicking <b>Run User License Utility...</b> starts the desired utility application.</li>
-   	<li>Confirm that after pasting a valid user license string, the <b>Computer</b> edit box is 
-	updated with the name of the computer that created the string.</li>
-<p>
-   	<li>Confirm that selecting <b>Fully Licensed</b> mode hides the calendar control.</li>
-   	<li>Confirm that selecting <b>Evaluation License</b> mode displays the calendar control.</li>
-   	<li>Confirm that selecting a date on the calendar control updates the <b>Evaluation License</b> 
-	edit box.</li>
-   	<li>Confirm that an already expired evaluation license can be created.</li>
-<p>
-   	<li>Confirm that the <b>Special Passwords</b> combo box provides the following options: <b>Default</b>, 
-	<b>IcoMap</b> and <b>Simple Rules</b>.</li>
-<p>
-   	<li>Confirm that clicking <b>Generate License File...</b> for an evaluation license displays a File 
-	Save dialog with a default file name of <i>OrganizationName_LicenseeName_ExpirationDate.lic</i>.</li>
-   	<li>Confirm that clicking <b>Generate License File...</b> for a non-expiring license displays a 
-	File Save dialog with a default file name of <i>OrganizationName_LicenseeName_Full.lic</i>.</li>
-   	<li>Confirm that the default folder for saving a license file is <b>I:\Common\Sales\SBL</b>.</li>
-   	<li>Confirm that the license file and folder edit boxes are updated with the name and location 
-	of the new license file.</li>
-<p>
-   	<li>Confirm that the License Password edit box contains <b>&ltUCLID Password&gt</b> and the OEM 
-	Password edit box contains <b>&ltUCLID OEM&gt</b> after creating a license file with default 
-	Extract Systems passwords.</li>
-   	<li>Confirm that the License Password edit box and the OEM Password edit box contain updated values 
-	after creating a license file with Random passwords.</li>
-   	<li>Confirm that the user is prompted to save a password file (*.pwd) after creating a license file 
-	with Random passwords.</li>
-   	<li>Confirm that the License Password edit box contains desired values after creating a license file 
-	with Specified passwords.</li>
-   	<li>Confirm that the user is prompted to save a password file after creating a license file with 
-	Specified passwords.</li>
-   	<li>Create a license file using passwords copied from a previously saved password file.  After creating 
-	a license file with these Specified passwords, confirm that the <b>OEM Password</b> edit box contains 
-	the same value as stored in the password file.</li>
-</ul>
-</li>
-<p>
-
-<!-- *********************************************** -->
-<li><h3>License Evaluator - Functionality</h3>
-<ul>
-   	<li>Confirm that the File Open dialog displayed via the browse button defaults to displaying 
-	license (*.lic) files.</li>
-   	<li>Confirm that the File Open dialog displayed via the browse button can also display license 
-	(*.esl), text (*.txt) files or all (*.*) files.</li>
-<p>
-   	<li>Confirm that the default Extraction String is <b>User String</b>.</li>
-   	<li>For <b>User String</b> selection, confirm that the <b>Evaluate Code</b> button is enabled only 
-	if the License File Password edit box is non-empty.</li>
-   	<li>For <b>UCLID String</b> selection, confirm that the <b>Evaluate Code</b> button is enabled 
-	regardless of the License File Password contents.</li>
-<p>
-   	<li>Select a license file created with Default passwords and provide nonsense passwords 
-	(i.e. 1,2,3,4).  For <b>User String</b> selection, confirm that Evaluate Code displays a error 
-	message suggesting that passwords are incorrect.</li>
-   	<li>Select a license file created with Default passwords and provide nonsense passwords 
-	(i.e. 1,2,3,4).  For <b>UCLID String</b> selection, confirm that Evaluate Code updates the 
-	Licensed Components list with meaningful information.</li>
-   	<li>Select a license file created with Default passwords and provide nonsense passwords 
-	(i.e. 1,2,3,4).  For <b>UCLID String</b> selection and special passwords of type 1, confirm that 
-	Evaluate Code displays a error message suggesting that passwords are incorrect.</li>
-   	<li>Select a license file created with Default passwords and provide nonsense passwords 
-	(i.e. 1,2,3,4).  For <b>UCLID String</b> selection and special passwords of type 2, confirm that 
-	Evaluate Code displays a error message suggesting that passwords are incorrect.</li>
-<p>
-   	<li>Select a license file created with special IcoMap passwords and provide nonsense passwords 
-	(i.e. 1,2,3,4).  For <b>User String</b> selection, confirm that Evaluate Code displays a error 
-	message suggesting that passwords are incorrect.</li>
-   	<li>Select a license file created with special IcoMap passwords.  For <b>UCLID String</b> selection 
-	and special passwords of type 0, confirm that Evaluate Code displays a error message suggesting that 
-	passwords are incorrect.</li>
-   	<li>Select a license file created with special IcoMap passwords.  For <b>UCLID String</b> selection 
-	and special passwords of type 1, confirm that Evaluate Code updates the Licensed Components list with 
-	meaningful information.</li>
-   	<li>Select a license file created with special IcoMap passwords.  For <b>UCLID String</b> selection 
-	and special passwords of type 2, confirm that Evaluate Code displays a error message suggesting that 
-	passwords are incorrect.</li>
-<p>
-   	<li>Select a license file created with special Simple Rules passwords and provide nonsense passwords 
-	(i.e. 1,2,3,4).  For <b>User String</b> selection, confirm that Evaluate Code displays a error message 
-	suggesting that passwords are incorrect.</li>
-   	<li>Select a license file created with special Simple Rules passwords.  For <b>UCLID String</b> selection 
-	and special passwords of type 0, confirm that Evaluate Code displays a error message suggesting that 
-	passwords are incorrect.</li>
-   	<li>Select a license file created with special Simple Rules passwords.  For <b>UCLID String</b> selection 
-	and special passwords of type 1, confirm that Evaluate Code displays a error message suggesting that 
-	passwords are incorrect.</li>
-   	<li>Select a license file created with special Simple Rules passwords.  For <b>UCLID String</b> selection 
-	and special passwords of type 2, confirm that Evaluate Code updates the Licensed Components list with 
-	meaningful information.</li>
-<p>
-   	<li>Create a license file with known passwords or with saved random passwords and use this 
-	license file for the following test cases.</li>
+	<li><h3>License Generator - Errors and Restrictions</h3>
 	<ul>
-		<li>*Meaningful information in the <b>Licensed Components</b> list includes one 
-		column of component IDs and one column of component names.  The list shall be sorted 
-		by component ID.</li>
-	   	<li>For <b>User String</b> selection and nonsense passwords (i.e. 1,2,3,4), confirm 
-		that Evaluate Code displays a error message suggesting that passwords are incorrect.</li>
-	   	<li>For <b>User String</b> selection and the correct passwords, confirm that Evaluate 
-		Code updates the Licensed Components list with meaningful information.</li>
-	   	<li>For <b>UCLID String</b> selection and with or without passwords, confirm that 
-		Evaluate Code updates the Licensed Components list with meaningful information.</li>
+  		<li>Start with a clean test machine or virtual machine.
+	  	<li>Create the usual drive mappings for <b>I</b> and <b>K</b>.
+		<LI>Confirm that <b>COMLicenseGenerator.exe</b> displays an error message that 
+		<b>Mscal.ocx</b> is not installed.</li>
+   		<li>Install the calendar control via <b>ocx-install.bat</b> and confirm that 
+		<b>COMLicenseGenerator.exe</b> starts without error.</li>
+<p>
+  		<li>Remove the drive mappings for <b>I</b> and <b>K</b>.
+   		<li>Navigate to <b>COMLicenseGenerator.exe</b> via UNC path (not mapped drive).  Confirm 
+		that an error message is displayed <b>Unable to run License Generator Utility</b>.</li>
+   		<li>Copy the contents of a specific COMLicense folder to a local folder on the 
+		test machine.  Confirm that an error message is displayed <b>Unable to run License 
+		Generator Utility</b>.</li>
+<p>
+	   	<li>Confirm that the package group names such as FLEX Index, ID Shield, FLEX Index / ID Shield 
+		Utilities cannot be selected in the <b>Packages</b> list.</li>
+	   	<li>Paste a valid user license string into a temporary text file.  Copy a modified version 
+		of the license string back into the Clipboard.  Confirm that clicking <b>Paste User String</b> 
+		to paste the modified license string generates a <b>The User License string you have provided is 
+		not a valid license string!</b> error message.</li>
+	   	<li>Confirm that the <b>Generate Unlock File...</b> button is not enabled until a valid User 
+		License String has been provided.</li>
+	   	<li>Confirm that the <b>Generate License File...</b> button is not enabled until a valid 
+		User License String, a Licensee Name and an Organization Name have been provided and at least 
+		one package has been selected.</li>
+<p>
+   		<li>Confirm that <b>Computer Name</b> and <b>Computer MAC Address</b> options are not enabled 
+		until a valid User License String has been provided.</li>
+	   	<li>Confirm that <b>Disk Serial Number</b> option is both checked and disabled when the 
+		<b>Fully Licensed</b> mode is selected.  This prevents creation of a non-expiring license file 
+		that is not locked to a specific machine.</li>
+<p>
+   		<li>Confirm that selection of the <b>UCLID Password for end-user products</b> option controls 
+		the enabled or disabled state of the associated checkbox and combo box controls.</li>
+	   	<li>Confirm that the <b>Random Password for Input Funnel SDK</b> option is not enabled unless 
+		the <b>-sdk</b> command-line switch is provided via <b>sdklicense.bat</b>.</li>
+	   	<li>Confirm that selection of the <b>Specified Password for SDK</b> option controls the enabled 
+		or disabled state of the associated <b>Paste</b> button.</li>
+<p>
+  	   	<LI><b>[LegacyRC #5475]</b> User License and MAC address
+	       	<ul>
+	  	   	<LI>Use the installed <b>UserLicense.exe</b> to generate a license string.
+			<LI>Use the generated license string to generate a license file and 
+			an Unlock file.
+	  	   	<LI>Use <b>COMLicenseEval.exe</b> to evaluate the <b>MAC address</b> 
+			section of the files.
+			<li>Confirm that the two addresses are identical.
+			<li>Delete the two files.
+<p>
+			<li>Disconnect the network cable and use the installed <b>UserLicense.exe</b> 
+			to generate a new license string.
+			<LI>Use the new license string to generate a license file and 
+			an Unlock file.
+	  	   	<LI>Use <b>COMLicenseEval.exe</b> to evaluate the <b>MAC address</b> 
+			section of the files.
+			<li>Confirm that the two addresses are <b>Address N/A</b>.
+	       	</ul>
+	</ul>
+	</li>
+<p>
+	<li><h3>License Generator - Functionality</h3>
+	<ul>
+   		<li>Confirm that the Packages, Licensee Name and Organization Name controls are 
+		always enabled.</li>
+	   	<li>Confirm that clicking <b>Run User License Utility...</b> starts the desired 
+		utility application.</li>
+   		<li>Confirm that after pasting a valid user license string, the <b>Computer</b> edit 
+		box is updated with the name of the computer that created the string.</li>
+<p>
+	   	<li>Confirm that selecting <b>Fully Licensed</b> mode hides the calendar control.</li>
+   		<li>Confirm that selecting <b>Evaluation License</b> mode displays the calendar control.</li>
+	   	<li>Confirm that selecting a date on the calendar control updates the <b>Evaluation 
+		License</b> edit box.</li>
+	   	<li>Confirm that an already expired evaluation license can be created.</li>
+<p>
+   		<li>Confirm that the <b>Special Passwords</b> combo box provides the following options: 
+		<b>Default</b>, <b>IcoMap</b> and <b>Simple Rules</b>.</li>
+<p>
+	   	<li>Confirm that clicking <b>Generate License File...</b> for an evaluation license 
+		displays a File Save dialog with a default file name of 
+		<i>OrganizationName_LicenseeName_ExpirationDate.lic</i>.</li>
+	   	<li>Confirm that clicking <b>Generate License File...</b> for a non-expiring license 
+		displays a File Save dialog with a default file name of 
+		<i>OrganizationName_LicenseeName_Full.lic</i>.</li>
+	   	<li>Confirm that the default folder for saving a license file is 
+		<b>I:\Common\Sales\SBL</b>.</li>
+   		<li>Confirm that the license file and folder edit boxes are updated with the name 
+		and location of the new license file.</li>
+<p>
+	   	<li>Confirm that the License Password edit box contains <b>&ltUCLID Password&gt</b> 
+		and the OEM Password edit box contains <b>&ltUCLID OEM&gt</b> after creating a license 
+		file with default Extract Systems passwords.</li>
+	   	<li>Confirm that the License Password edit box and the OEM Password edit box contain 
+		updated values after creating a license file with Random passwords.</li>
+	   	<li>Confirm that the user is prompted to save a password file (*.pwd) after creating a 
+		license file with Random passwords.</li>
+	   	<li>Confirm that the License Password edit box contains desired values after creating a 
+		license file with Specified passwords.</li>
+	   	<li>Confirm that the user is prompted to save a password file after creating a license 
+		file with Specified passwords.</li>
+	   	<li>Create a license file using passwords copied from a previously saved password file.  
+		After creating a license file with these Specified passwords, confirm that the <b>OEM 
+		Password</b> edit box contains the same value as stored in the password file.</li>
+	</ul>
+	</li>
+<p>
+	<li><h3>License Evaluator - Functionality</h3>
+	<ul>
+   		<li>Confirm that the File Open dialog displayed via the browse button defaults to 
+		displaying license (*.lic) files.</li>
+   		<li>Confirm that the File Open dialog displayed via the browse button can also display 
+		license (*.esl), text (*.txt) files or all (*.*) files.</li>
+<p>
+	   	<li>Confirm that the default Extraction String is <b>User String</b>.</li>
+   		<li>For <b>User String</b> selection, confirm that the <b>Evaluate Code</b> button is 
+		enabled only if the License File Password edit box is non-empty.</li>
+	   	<li>For <b>UCLID String</b> selection, confirm that the <b>Evaluate Code</b> button is 
+		enabled regardless of the License File Password contents.</li>
+<p>
+   		<li>Select a license file created with Default passwords and provide nonsense passwords 
+		(i.e. 1,2,3,4).  For <b>User String</b> selection, confirm that <b>Evaluate Code</b> 
+		displays an error message suggesting that passwords are incorrect.</li>
+   		<li>Select a license file created with Default passwords and provide nonsense passwords 
+		(i.e. 1,2,3,4).  For <b>UCLID String</b> selection, confirm that <b>Evaluate Code</b> 
+		updates the Licensed Components list with meaningful information.</li>
+	   	<li>Select a license file created with Default passwords and provide nonsense passwords 
+		(i.e. 1,2,3,4).  For <b>UCLID String</b> selection and special passwords of type 1, 
+		confirm that <b>Evaluate Code</b> displays a error message suggesting that passwords 
+		are incorrect.</li>
+   		<li>Select a license file created with Default passwords and provide nonsense passwords 
+		(i.e. 1,2,3,4).  For <b>UCLID String</b> selection and special passwords of type 2, 
+		confirm that <b>Evaluate Code</b> displays a error message suggesting that passwords 
+		are incorrect.</li>
+<p>
+	   	<li>Select a license file created with special IcoMap passwords and provide nonsense 
+		passwords (i.e. 1,2,3,4).  For <b>User String</b> selection, confirm that <b>Evaluate 
+		Code</b> displays an error message suggesting that passwords are incorrect.</li>
+   		<li>Select a license file created with special IcoMap passwords.  For <b>UCLID String</b> 
+		selection and special passwords of type 0, confirm that <b>Evaluate Code</b> displays an 
+		error message suggesting that passwords are incorrect.</li>
+	   	<li>Select a license file created with special IcoMap passwords.  For <b>UCLID String</b> 
+		selection and special passwords of type 1, confirm that <b>Evaluate Code</b> updates the 
+		Licensed Components list with meaningful information.</li>
+	   	<li>Select a license file created with special IcoMap passwords.  For <b>UCLID String</b> 
+		selection and special passwords of type 2, confirm that <b>Evaluate Code</b> displays an 
+		error message suggesting that passwords are incorrect.</li>
+<p>
+	   	<li>Select a license file created with special Simple Rules passwords and provide nonsense 
+		passwords (i.e. 1,2,3,4).  For <b>User String</b> selection, confirm that <b>Evaluate 
+		Code</b> displays an error message suggesting that passwords are incorrect.</li>
+	   	<li>Select a license file created with special Simple Rules passwords.  For <b>UCLID 
+		String</b> selection and special passwords of type 0, confirm that Evaluate Code displays an 
+		error message suggesting that passwords are incorrect.</li>
+	   	<li>Select a license file created with special Simple Rules passwords.  For <b>UCLID 
+		String</b> selection and special passwords of type 1, confirm that <b>Evaluate Code</b> 
+		displays an error message suggesting that passwords are incorrect.</li>
+	   	<li>Select a license file created with special Simple Rules passwords.  For <b>UCLID 
+		String</b> selection and special passwords of type 2, confirm that <b>Evaluate Code</b> 
+		updates the Licensed Components list with meaningful information.</li>
+<p>
+	   	<li>Create a license file with known passwords or with saved random passwords and use this 
+		license file for the following test cases.</li>
+		<ul>
+			<li>*Meaningful information in the <b>Licensed Components</b> list includes one 
+			column of component IDs and one column of component names.  The list shall be sorted 
+			by component ID.</li>
+		   	<li>For <b>User String</b> selection and nonsense passwords (i.e. 1,2,3,4), confirm 
+			that <b>Evaluate Code</b> displays a error message suggesting that passwords are 
+			incorrect.</li>
+	   		<li>For <b>User String</b> selection and the correct passwords, confirm that 
+			<b>Evaluate Code</b> updates the Licensed Components list with meaningful 
+			information.</li>
+	   		<li>For <b>UCLID String</b> selection and with or without passwords, confirm that 
+			<b>Evaluate Code</b> updates the Licensed Components list with meaningful 
+			information.</li>
 	</ul>
 <p>
-   	<li>Test a non-expiring license file and confirm that Licensing Mode = Fully Licensed.</li>
-   	<li>Test an expiring license file and confirm that Licensing Mode = Evaluation License and the 
-	Expires edit box is updated.  Confirm that the date is correct and the time is <b>23:59:59</b></li>
+	   	<li>Test a non-expiring license file and confirm that Licensing Mode = Fully Licensed.</li>
+   		<li>Test an expiring license file and confirm that Licensing Mode = Evaluation License and the 
+		Expires edit box is updated.  Confirm that the date is correct and the time is 
+		<b>23:59:59</b>.</li>
 <p>
-   	<li>For successful evaluation of a license file, confirm that License Version, Issue Date, Licensee 
-	Name, Organization Name, and Issuer Name fields are updated.</li>
-   	<li>Create a license file locked to Computer Name, Disk Serial Number, and MAC Address.  After 
-	successful evaluation of the license file, confirm that all three check boxes and all three edit boxes 
-	are updated properly.</li>
-</ul>
-</li>
+	   	<li>For successful evaluation of a license file, confirm that License Version, Issue Date, 
+		Licensee Name, Organization Name, and Issuer Name fields are updated.</li>
+	   	<li>Create a license file locked to Computer Name, Disk Serial Number, and MAC Address.  
+		After successful evaluation of the license file, confirm that all three check boxes and all 
+		three edit boxes are updated properly.</li>
+	</ul>
+	</li>
 <p>
-
-<!-- *********************************************** -->
-<li><h3>License Evaluator - Version Compatibility</h3>
-<ul>
-	<li>For the testing below, use <b>COMLicenseEval.exe</b> from the appropriate 
-	<b>I:\Common\Engineering\Tools\SecureClients\COMLicense</b> folder.</li>
-	<li>Create a license file using each available version of <b>COMLicenseGenerator.exe</b>.
-	<li>Confirm that the license files marked <b>Yes</b> on the table can be evaluated with the 
-	specified <b>COMLicenseEval.exe</b> version.</li>
-	<li>Confirm that the license files marked <b>No</b> on the table cannot be evaluated with 
-	the specified <b>COMLicenseEval.exe</b> version.<br>
-	<b>*</b>Failure provides an informative error message.</li>
+	<li><h3>License Evaluator - Version Compatibility</h3>
+	<ul>
+		<li>For the testing below, use <b>COMLicenseEval.exe</b> from the appropriate 
+		<b>I:\Common\Engineering\Tools\SecureClients\COMLicense</b> folder.</li>
+		<li>Create a license file using each available version of <b>COMLicenseGenerator.exe</b>.
+		<li>Confirm that the license files marked <b>Yes</b> on the table can be evaluated with the 
+		specified <b>COMLicenseEval.exe</b> version.</li>
+		<li>Confirm that the license files marked <b>No</b> on the table cannot be evaluated with 
+		the specified <b>COMLicenseEval.exe</b> version.<br>
+		<b>*</b>Failure provides an informative error message.</li>
 <p>
-	<table border=1 cellpadding="5" cellspacing="0">
-	<tr>
-		<th><font size="2">License File / Evaluator Version</font></th>
-		<th><font size="2">FLEX Index 3.2</font></th>
-		<th><font size="2">FLEX Index 5.0</font></th>
-		<th><font size="2">FLEX Index 6.0</font></th>
-		<th><font size="2">FLEX Index 7.0</font></th>
-		<th><font size="2">FLEX Index 8.0</font></th>
-		<th><font size="2">IcoMap 4.0</font></th>
-		<th><font size="2">IcoMap 4.2</font></th>
-		<th><font size="2">ID Shield Office 1.0</font></th>
-		<th><font size="2">ID Shield Laserfiche 1.0</font></th>
-		<th><font size="2">LabDE 1.0</font></th>
-	<tr align="center">
-		<th><font size="2">FlexIndex3_2
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-	</tr>
-	<tr align="center">
-		<th><font size="2">FlexIndex5_0
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-	</tr>
-	<tr align="center">
-		<th><font size="2">FlexIndex6_0
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-	</tr>
-	<tr align="center">
-		<th><font size="2">FlexIndex7_0
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-	</tr>
-	<tr align="center">
-		<th><font size="2">FlexIndex8_0
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-	</tr>
-	<tr align="center">
-		<th><font size="2">IcoMap4_0
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-	</tr>
-	<tr align="center">
-		<th><font size="2">IcoMap4_2
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-	</tr>
-	<tr align="center">
-		<th><font size="2">IDShieldOffice1_0
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-	</tr>
-	<tr align="center">
-		<th><font size="2">Laserfiche1_0
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>Yes
-		<td><font size="2"><li>No
-	</tr>
-	<tr align="center">
-		<th><font size="2">LabDE1_0
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>No
-		<td><font size="2"><li>Yes
-	</tr>
-	</table>
-</ul>
-</li>
+		<table border=1 cellpadding="5" cellspacing="0">
+		<tr>
+			<th><font size="2">License File / Evaluator Version</font></th>
+			<th><font size="2">FLEX Index 3.2</font></th>
+			<th><font size="2">FLEX Index 5.0</font></th>
+			<th><font size="2">FLEX Index 6.0</font></th>
+			<th><font size="2">FLEX Index 7.0</font></th>
+			<th><font size="2">FLEX Index 8.0</font></th>
+			<th><font size="2">IcoMap 4.0</font></th>
+			<th><font size="2">IcoMap 4.2</font></th>
+			<th><font size="2">ID Shield Office 1.0</font></th>
+			<th><font size="2">ID Shield Laserfiche 1.0</font></th>
+			<th><font size="2">LabDE 1.5</font></th>
+			<tr align="center">
+				<th><font size="2">FlexIndex3_2
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+			</tr>
+			<tr align="center">
+				<th><font size="2">FlexIndex5_0
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+			</tr>
+			<tr align="center">
+				<th><font size="2">FlexIndex6_0
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+			</tr>
+			<tr align="center">
+				<th><font size="2">FlexIndex7_0
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+			</tr>
+			<tr align="center">
+				<th><font size="2">FlexIndex8_0
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+			</tr>
+			<tr align="center">
+				<th><font size="2">IcoMap4_0
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+			</tr>
+			<tr align="center">
+				<th><font size="2">IcoMap4_2
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+			</tr>
+			<tr align="center">
+				<th><font size="2">IDShieldOffice1_0
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+			</tr>
+			<tr align="center">
+				<th><font size="2">Laserfiche1_0
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+			</tr>
+			<tr align="center">
+				<th><font size="2">LabDE1_5
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+			</tr>
+		</table>
+	</ul>
+	</li>
 </ol>
 </body>
 </html>
