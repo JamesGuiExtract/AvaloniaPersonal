@@ -97,6 +97,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				AdditionalManifestFiles="..\..\..\..\BaseUtils\Code\manifest.xml"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -198,6 +199,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				AdditionalManifestFiles="..\..\..\..\BaseUtils\Code\manifest.xml"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
