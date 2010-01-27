@@ -15,7 +15,23 @@
 	<li><h2>User Authentication</h2>
 	<ul>
 		<LI>see other test cases in <b>DB Admin</b> checklist.
-		<LI>TBD
+	</ul>
+<p>
+	<li><h2>File Priority</h2>
+	<ul>
+		<LI>see other test cases in <b>DB Admin</b> checklist.
+		<LI>see other test cases in <b>Queuing Tabs</b> checklist.
+<p>
+		<LI>Confirm that <b>MaxFilesFromDB = 1</b>.
+		<li>Prepare a large collection of files for processing.
+		<li>Queue and process these files using a <b>Folder file supplier</b> set to 
+		<b>Normal</b> priority.
+		<li>Prepare another <b>Folder file supplier</b> to listen to a different folder. 
+		Set these files to <b>Above normal</b> priority.
+		<li>As the <b>Normal</b> priority files are processing, add some files to 
+		the <b>Above normal</b> folder.
+		<li>Confirm that as soon as a <b>Normal</b> priority file finishes processing, 
+		an <b>Above normal</b> priority file starts processing.
 	</ul>
 <p>
 	<li><h2>Skipping Files</h2>
