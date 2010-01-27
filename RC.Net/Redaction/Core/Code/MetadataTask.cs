@@ -250,9 +250,12 @@ namespace Extract.Redaction
                     for (int i = 0; i < count; i++)
                     {
                         ComAttribute attribute = (ComAttribute) subAttributes.At(i);
-                        RedactionItem item = new RedactionItem(attribute);
+                        if (attribute.Value.HasSpatialInfo())
+                        {
+                            RedactionItem item = new RedactionItem(attribute);
 
-                        WriteRedaction(writer, item);
+                            WriteRedaction(writer, item);
+                        }
                     }
                     writer.WriteEndElement();
                 }
