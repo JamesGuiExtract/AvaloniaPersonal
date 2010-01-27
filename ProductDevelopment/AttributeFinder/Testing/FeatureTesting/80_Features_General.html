@@ -24,10 +24,14 @@
 		service is stopped.  This feature will allow the currently processing file to finish 
 		gracefully.  This implementation will <b>not</b> separate the file processing engine 
 		from the user interface.
-  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> Yes
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
-			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+			<li>Joanna, 7.1.1.74, 12/04/2009 - 64-bit Vista
+			<li>Joanna, 7.1.1.77, 12/04/2009 - 64-bit 2008 Server
+			<li>Art, 7.1.1.79, 12/07/2009 - 64-bit XP
+			<li>Doug, 7.1.1.85, 12/18/2009 - 32-bit Windows 7
+			<li>Joanna, 7.1.1.85, 12/18/2009 - 32-bit Vista
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
@@ -44,7 +48,7 @@
   	   	<LI><b>Details:</b> The goal of this feature is to automatically determine 
 		when one or more processing files are stuck.  The File Action Manager shall 
 		automatically revert a stuck file to its previous status.
-  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> Yes
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
 			<li>Doug, 7.1.1.58, 10/26/2009
@@ -52,6 +56,7 @@
 				<li><b>[LegacyRC #5500]</b> Use minimum for 
 				<b>AutoRevertTimeOutInMinutes</b>.
 		       	</ul>
+			<li>Jennifer, 7.1.1.89, 12/28/2009 - no new issues
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
@@ -122,13 +127,14 @@
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
 			<li>Joanna, 7.1.1.58, 10/23/2009 - Endurance Test using SQL Server 2008 Express
-			<li>TBD, 7.1.0.xx, MM/DD/YYYY
+			<li>Joanna, 8.0.0.7, started 01/19/2010 - FLEX Index Endurance Test
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
 	      		<li>Confirm that the installation page includes SQL Server 2008 Express.
 	      		<li>Confirm that the installation page includes SQL Server Management Studio 2008.
-	      		<li>Confirm installation works properly on each supported operating system.
+	      		<li>Confirm installation works properly on each supported operating system - 
+			see each operating system-specific installation checklist.
 			<ul>
 				<li><b>32-bit Windows XP</b> (64-bit XP not supported!)
 				<li><b>32-bit Windows Vista</b>
@@ -152,7 +158,7 @@
        	<ul>
   	   	<LI><b>SCRs:</b> N/A
   	   	<LI><b>Details:</b> Exercise the <b>Large-scale</b> Endurance test checklist for ID Shield.
-  	   	<LI><b>Main Checklists Updated:</b> N/A
+  	   	<LI><b>Main Checklists Updated:</b> Yes
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
 			<li>Joanna, 7.1.1.58, 10/23/2009
@@ -172,13 +178,14 @@
 		for processing of files.  The expected situation is for a customer to process 
 		back file images with a lower priority than day forward images.  Any time a 
 		dayforward image is available it gets bumped to the head of the queue.
-  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> Yes
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
 			<li>Doug, 7.1.1.58, 10/26/2009
 		       	<ul>
 				<li>Updated reports not implemented yet.
 		       	</ul>
+			<li>Jennifer, 7.1.1.89, 12/28/2009 - no new issues
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
@@ -246,10 +253,11 @@
 		<b>Processing</b> status should revert to their previous status.  When processing 
 		is inactive and the active time is reached, processing should automatically 
 		begin.  This feature does not apply to file supplying.
-  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> Yes
   	   	<LI><b>Tested By:</b> 
 	       	<ul>
 			<li>Art, 7.1.1.63, 11/05/2009 - no issues
+			<li>Jennifer, 7.1.1.89, 12/28/2009 - no issues
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
