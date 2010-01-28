@@ -4,5 +4,6 @@
 <FILE>;..\..\..\AFValueFinders\AutomatedTest\All\AFValueFinders.dat
 <FILE>;..\..\..\AFValueModifiers\AutomatedTest\All\AFValueModifiers.dat
 <FILE>;..\..\..\AFUtils\AutomatedTest\All\AFUtils.dat
+<FILE>;..\..\..\AFSelectors\AutomatedTest\All\AFSelectors.dat
 <FILE>;..\..\..\AFSplitters\AutomatedTest\All\TestAFSplitters.dat
 <FILE>;..\..\..\InputValidators\AutomatedTest\All\InputValidators.dat
