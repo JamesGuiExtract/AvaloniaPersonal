@@ -37,11 +37,6 @@ namespace Extract.Redaction
         readonly ConfidenceLevelsCollection _levels;
 
         /// <summary>
-        /// The confidence level for manual redactions.
-        /// </summary>
-        readonly ConfidenceLevel _manual;
-
-        /// <summary>
         /// The name of the vector of attributes (VOA) file.
         /// </summary>
         string _fileName;
@@ -104,7 +99,6 @@ namespace Extract.Redaction
                 "ELI28215", _OBJECT_NAME);
 
             _levels = levels;
-            _manual = GetManualConfidenceLevel(levels);
         }
 
         #endregion Constructors
@@ -150,14 +144,14 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Gets the <see cref="ConfidenceLevel"/> associated with manual redactions.
+        /// Gets the possible confidence levels of loaded redactions and clues.
         /// </summary>
-        /// <value>The <see cref="ConfidenceLevel"/> associated with manual redactions.</value>
-        public ConfidenceLevel ManualConfidenceLevel
+        /// <value>The possible confidence levels of loaded redactions and clues.</value>
+        public ConfidenceLevelsCollection ConfidenceLevels
         {
             get
             {
-                return _manual;
+                return _levels;
             }
         }
 
@@ -203,24 +197,6 @@ namespace Extract.Redaction
         #endregion Properties
 
         #region Methods
-
-        /// <summary>
-        /// Get the confidence level associated with manual redactions.
-        /// </summary>
-        /// <param name="levels">The valid confidence levels.</param>
-        /// <returns>The confidence level associated with manual redactions.</returns>
-        static ConfidenceLevel GetManualConfidenceLevel(IEnumerable<ConfidenceLevel> levels)
-        {
-            foreach (ConfidenceLevel level in levels)
-            {
-                if (level.ShortName == "Man")
-                {
-                    return level;
-                }
-            }
-
-            return null;
-        }
 
         /// <overloads>Loads the contents of the voa file from the specified file.</overloads>
         /// <summary>
@@ -748,7 +724,7 @@ namespace Extract.Redaction
                 AssignId(attribute);
 
                 // Add the attribute
-                SensitiveItem item = new SensitiveItem(_manual, attribute);
+                SensitiveItem item = new SensitiveItem(_levels.Manual, attribute);
                 items.Add(item);
             }
         }
@@ -782,7 +758,7 @@ namespace Extract.Redaction
         /// <param name="redactions">The redactions to check for non-output.</param>
         /// <returns>The redactions in <paramref name="redactions"/> that are marked to not be 
         /// output.</returns>
-        static RedactionItem[] GetNonOutputRedactions(List<SensitiveItem> redactions)
+        static RedactionItem[] GetNonOutputRedactions(IEnumerable<SensitiveItem> redactions)
         {
             List<RedactionItem> nonOutputRedactions = new List<RedactionItem>();
             foreach (SensitiveItem item in redactions)
