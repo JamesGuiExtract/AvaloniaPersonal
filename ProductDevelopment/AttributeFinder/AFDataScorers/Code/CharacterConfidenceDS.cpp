@@ -65,7 +65,7 @@ STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore1(IAttribute * pAttribute, 
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08602")
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29453")
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore2(IIUnknownVector * pAttributes, LONG * pScore)

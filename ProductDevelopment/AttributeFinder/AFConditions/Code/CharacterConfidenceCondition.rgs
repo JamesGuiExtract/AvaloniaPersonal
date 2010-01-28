@@ -1,0 +1,26 @@
+HKCR
+{
+	AFConditions.CharacterConfidenceCondition.1 = s 'CharacterConfidenceCondition Class'
+	{
+		CLSID = s '{5E884ED2-41E2-41FD-AB2C-AAB028D60D85}'
+	}
+	AFConditions.CharacterConfidenceCondition = s 'CharacterConfidenceCondition Class'
+	{
+		CLSID = s '{5E884ED2-41E2-41FD-AB2C-AAB028D60D85}'
+		CurVer = s 'AFConditions.CharacterConfidenceCondition.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {5E884ED2-41E2-41FD-AB2C-AAB028D60D85} = s 'CharacterConfidenceCondition Class'
+		{
+			ProgID = s 'AFConditions.CharacterConfidenceCondition.1'
+			VersionIndependentProgID = s 'AFConditions.CharacterConfidenceCondition'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D3DC98FB-A212-409B-B68C-64D1DC430594}'
+		}
+	}
+}

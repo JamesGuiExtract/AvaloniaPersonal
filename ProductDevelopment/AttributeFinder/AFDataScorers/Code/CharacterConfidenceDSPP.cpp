@@ -33,7 +33,7 @@ STDMETHODIMP CCharacterConfidenceDSPP::Apply(void)
 			{
 				// Save the new value for the aggregate function
 				ipCCDS->AggregateFunction = 
-					(UCLID_AFDATASCORERSLib::EAggregateFunctions) m_comboAggregateFunction.GetCurSel();
+					(EAggregateFunctions) m_comboAggregateFunction.GetCurSel();
 			}
 		}
 		m_bDirty = FALSE;

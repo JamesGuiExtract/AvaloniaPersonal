@@ -303,6 +303,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\CharacterConfidenceCondition.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CharacterConfidenceConditionPP.cpp"
+				>
+			</File>
+			<File
 				RelativePath="DocTypeCondition.cpp"
 				>
 				<FileConfiguration
@@ -432,6 +440,14 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
+				RelativePath=".\CharacterConfidenceCondition.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CharacterConfidenceConditionPP.h"
+				>
+			</File>
+			<File
 				RelativePath="DocTypeCondition.h"
 				>
 			</File>
@@ -469,6 +485,14 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
+				RelativePath=".\CharacterConfidenceCondition.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\CharacterConfidenceConditionPP.rgs"
+				>
+			</File>
+			<File
 				RelativePath="DocTypeCondition.rgs"
 				>
 			</File>
@@ -490,6 +514,10 @@
 			</File>
 			<File
 				RelativePath="RSDFileConditionPP.rgs"
+				>
+			</File>
+			<File
+				RelativePath="..\..\AFValueModifiers\Code\res\SelectDocTagArrow.ico"
 				>
 			</File>
 		</Filter>

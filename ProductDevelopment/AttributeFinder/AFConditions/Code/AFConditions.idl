@@ -6,7 +6,6 @@
 
 import "oaidl.idl";
 import "ocidl.idl";
-//import "..\..\AFUtils\Code\AFUtils.idl";
 [
 	uuid(D3DC98FB-A212-409B-B68C-64D1DC430594),
 	version(1.0),
@@ -92,6 +91,61 @@ library UCLID_AFCONDITIONSLib
 		[propget, id(1), helpstring("property AFRule")] HRESULT AFRule([out, retval] IAttributeFindingRule **ppRetVal);
 		[propput, id(1), helpstring("property AFRule")] HRESULT AFRule([in] IAttributeFindingRule *pNewVal);
 	};
+	
+	[
+		object,
+		uuid(482AD82F-A447-4314-BB7F-911F34AC933C),
+		dual,
+		nonextensible,
+		helpstring("ICharacterConfidenceCondition Interface"),
+		pointer_default(unique)
+	]
+	interface ICharacterConfidenceCondition : IDispatch{
+		//------------------------------------------------------------------------------------------
+		// PURPOSE: Property that indicates how to select the character confidence 
+		[propget, id(1), helpstring("property AggregateFunction")] 
+		HRESULT AggregateFunction([out, retval] EAggregateFunctions *pVal);
+		[propput, id(1), helpstring("property UCLID_COMUTILSLib::AggregateFunction")] 
+			HRESULT AggregateFunction([in] EAggregateFunctions newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This is the condition comparison(=,!=,<,>,<=,>=) for the first condition
+		[propget, id(2), helpstring("property FirstScoreCondition")] HRESULT FirstScoreCondition([out, retval] EConditionalOp* pVal);
+		[propput, id(2), helpstring("property FirstScoreCondition")] HRESULT FirstScoreCondition([in] EConditionalOp newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This is the valut to compare the confidence returned for the AFDoc spatial string
+		//			using the comparison assigned by FirstScoreCondition
+		[propget, id(3), helpstring("property FirstScoreToCompare")] HRESULT FirstScoreToCompare([out, retval] long* pVal);
+		[propput, id(3), helpstring("property FirstScoreToCompare")] HRESULT FirstScoreToCompare([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This is used to indicate if there are 2 conditions. 
+		//			If this is VARIANT_TRUE a second condition needs to be set, 
+		//			if set to VARIANT_TRUE the second condition properties will be ignored
+		[propget, id(4), helpstring("property IsSecondCondition")] HRESULT IsSecondCondition([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(4), helpstring("property IsSecondCondition")] HRESULT IsSecondCondition([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This is the condition comparison(=,!=,<,>,<=,>=) for the second condition
+		// NOTE:	This property is ignored if IsSecondCondition is VARIANT_FALSE
+		[propget, id(5), helpstring("property SecondScoreCondition")] HRESULT SecondScoreCondition([out, retval] EConditionalOp* pVal);
+		[propput, id(5), helpstring("property SecondScoreCondition")] HRESULT SecondScoreCondition([in] EConditionalOp newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This is the valut to compare the confidence returned for the AFDoc spatial string
+		//			using the comparison assigned by SecondScoreCondition
+		// NOTE:	This property is ignored if IsSecondCondition is VARIANT_FALSE
+		[propget, id(6), helpstring("property SecondScoreToCompare")] HRESULT SecondScoreToCompare([out, retval] long* pVal);
+		[propput, id(6), helpstring("property SecondScoreToCompare")] HRESULT SecondScoreToCompare([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: If there is a second condition and this is VARIANT_TRUE, the first and second condition 
+		//			must be true, if this is VARIANT_FALSE, the first or second condition must be true
+		// NOTE:	This property is ignored if IsSecondCondition is VARIANT_FALSE
+		[propget, id(7), helpstring("property AndSecondCondition")] HRESULT AndSecondCondition([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(7), helpstring("property AndSecondCondition")] HRESULT AndSecondCondition([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This should be set to VARIANT_TRUE if the conditions specified should be met and
+		//			should be set to VARIANT_FALSE if the conditions should not be met
+		// NOTE:	This property is ignored if IsSecondCondition is VARIANT_FALSE
+		[propget, id(8), helpstring("property IsMet")] HRESULT IsMet([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(8), helpstring("property IsMet")] HRESULT IsMet([in] VARIANT_BOOL newVal);
+	};
 
 	////////////
 	// CoClasses
@@ -159,6 +213,27 @@ library UCLID_AFCONDITIONSLib
 		helpstring("FindingRuleConditionPP Class")
 	]
 	coclass FindingRuleConditionPP
+	{
+		[default] interface IUnknown;
+	};
+	[
+		uuid(5E884ED2-41E2-41FD-AB2C-AAB028D60D85),
+		helpstring("CharacterConfidenceCondition Class")
+	]
+	coclass CharacterConfidenceCondition
+	{
+		[default] interface ICharacterConfidenceCondition;
+		interface IAFCondition;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(D9417CD1-DB0E-4B1C-849A-2E35C5015550),
+		helpstring("CharacterConfidenceConditionPP Class")
+	]
+	coclass CharacterConfidenceConditionPP
 	{
 		[default] interface IUnknown;
 	};

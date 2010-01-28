@@ -3,7 +3,8 @@
 #pragma once
 #include "resource.h"       // main symbols
 #include "AFConditions.h"
-#include "..\..\AFCore\Code\AFCategories.h"
+
+#include <AFCategories.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CFindingRuleCondition

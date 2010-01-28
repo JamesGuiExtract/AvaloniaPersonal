@@ -39,6 +39,18 @@ library UCLID_COMUTILSLib
 		kGEQ = 5
     } EConditionalOp;
 
+	typedef
+	[
+		uuid(864A21E3-BD94-44d3-9AEE-8FA4915FF0BB), 
+		helpstring("Extract Systems EAggregateFunctions")
+	]
+	enum 
+	{
+		kAverage = 0,
+		kMinimum = 1,
+		kMaximum = 2,
+	} EAggregateFunctions;
+
 	typedef 
 	[
 		uuid(0F049611-7D7C-4881-8C01-657C8A788438), 

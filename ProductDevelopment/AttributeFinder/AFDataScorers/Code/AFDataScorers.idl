@@ -24,18 +24,6 @@ library UCLID_AFDATASCORERSLib
 	//////////////
 	// Enums
 	//////////////
-	typedef
-	[
-		uuid(864A21E3-BD94-44d3-9AEE-8FA4915FF0BB), 
-		helpstring("Extract Systems EAggregateFunctions")
-	]
-	enum EAggregateFunctions
-	{
-		kAverage = 0,
-		kMinimum = 1,
-		kMaximum = 2,
-	} EAggregateFunctions;
-
 	[
 		object,
 		uuid(0EDBFC88-9CBE-4F4B-9458-55E94E991A50),
@@ -59,8 +47,8 @@ library UCLID_AFDATASCORERSLib
 		//------------------------------------------------------------------------------------------
 		// PURPOSE: Property that indicates how to select the character confidence 
 		[propget, id(1), helpstring("property AggregateFunction")] 
-			HRESULT AggregateFunction([out, retval] EAggregateFunctions *pVal);
-		[propput, id(1), helpstring("property AggregateFunction")] 
+		HRESULT AggregateFunction([out, retval] EAggregateFunctions *pVal);
+		[propput, id(1), helpstring("property UCLID_COMUTILSLib::AggregateFunction")] 
 			HRESULT AggregateFunction([in] EAggregateFunctions newVal);
 	};
 
