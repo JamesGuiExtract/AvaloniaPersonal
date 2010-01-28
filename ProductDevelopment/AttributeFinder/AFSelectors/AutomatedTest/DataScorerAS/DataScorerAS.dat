@@ -1,0 +1,45 @@
+// Test using Entity name data scorer; score = 0
+  // Should remove the blank attr and its subattr
+  <TESTCASE>;Test1.rsd;Blank.txt;;Result1.eav
+
+  // ...; score < 1
+  // Should be the same as above
+  <TESTCASE>;Test2.rsd;Blank.txt;;Result1.eav
+
+  // ...; score > 0
+  // Should remove all except the blank attr and its subattr
+  <TESTCASE>;Test3.rsd;Blank.txt;;Result2.eav
+
+  // ...; score = 20
+  // Should remove the husband and wife attr
+  <TESTCASE>;Test4.rsd;Blank.txt;;Result3.eav
+
+  // ...; score = 10
+  // Should remove the John Doe attr
+  // Should not remove the subattr that has this score
+  <TESTCASE>;Test5.rsd;Blank.txt;;Result4.eav
+
+  // ...; score is > 0 and < 20
+  // Should be the same as above
+  <TESTCASE>;Test6.rsd;Blank.txt;;Result4.eav
+
+// Test using Character confidence data scorer; average score = 75
+  // Should remove the Book attr
+  <TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Result5.eav
+
+  // ...; minimum score = 40
+  // Should remove the -Vol attr
+  <TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Result6.eav
+
+  // ...; maximum score = 100
+  // Should remove all but the Book and -Vol attrr
+  <TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Result7.eav
+
+  // ...; average score <= 100 and >= 75
+  // Should remove all but the -Vol attr
+  <TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Result8.eav
+
+// Test using Query attribute selector (*/*) with supplemental Character confidence filter
+// Finds attrr as subattr of blank attr; average score != 75
+  // Should remove all but the Book subattr
+  <TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Result9.eav
