@@ -152,9 +152,9 @@ namespace Extract.Redaction.Verification
         int _autoZoomScale = _DEFAULT_AUTO_ZOOM_SCALE;
 
         /// <summary>
-        /// The confidence level associated with manual redactions.
+        /// The confidence level associated with redactions and clues.
         /// </summary>
-        ConfidenceLevel _manualConfidenceLevel;
+        ConfidenceLevelsCollection _confidenceLevels;
 
         /// <summary>
         /// <see langword="true"/> if changes have been made to the grid since it was loaded;
@@ -295,20 +295,22 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="ConfidenceLevel"/> associated with manual redactions.
+        /// Gets or sets the possible confidence levels for redactions and clues.
         /// </summary>
-        /// <value>The <see cref="ConfidenceLevel"/> associated with manual redactions.</value>
+        /// <value>The possible confidence levels for redactions and clues.</value>
+        // Using a setter makes working with the confidence levels simpler
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ConfidenceLevel ManualConfidenceLevel
+        public ConfidenceLevelsCollection ConfidenceLevels
         {
             get
             {
-                return _manualConfidenceLevel;
+                return _confidenceLevels;
             }
             set
             {
-                _manualConfidenceLevel = value;
+                _confidenceLevels = value;
             }
         }
 
@@ -525,11 +527,14 @@ namespace Extract.Redaction.Verification
         /// <param name="text">The text associated with the <paramref name="layerObject"/>.</param>
         /// <param name="category">The category associated with the <paramref name="layerObject"/>.</param>
         /// <param name="type">The type associated with the <paramref name="layerObject"/>.</param>
-        public void Add(LayerObject layerObject, string text, string category, string type)
+        /// <param name="confidenceLevel">The confidence level associated with the 
+        /// <paramref name="layerObject"/>.</param>
+        public void Add(LayerObject layerObject, string text, string category, string type, 
+            ConfidenceLevel confidenceLevel)
         {
             try
             {
-                Add( new RedactionGridViewRow(layerObject, text, category, type) );
+                Add( new RedactionGridViewRow(layerObject, text, category, type, confidenceLevel) );
             }
             catch (Exception ex)
             {
@@ -678,6 +683,12 @@ namespace Extract.Redaction.Verification
                     }
                 }
 
+                // Display a warning if necessary and allow the user to cancel
+                if (WarnIfSettingRedactedState(redacted))
+                {
+                    return;
+                }
+
                 // Set the state
                 foreach (DataGridViewRow row in _dataGridView.SelectedRows)
                 {
@@ -691,6 +702,55 @@ namespace Extract.Redaction.Verification
             {
                 throw ExtractException.AsExtractException("ELI28631", ex);
             }
+        }
+
+        /// <summary>
+        /// Displays a warning to the user if the user is setting the redacted state of a row that 
+        /// is marked to display a warning.
+        /// </summary>
+        /// <param name="redacted"><see langword="true"/> if the row is being set to redacted; 
+        /// <see langword="false"/> if the row is being set to unredacted.</param>
+        /// <returns><see langword="true"/> if a warning was displayed and the user chose to 
+        /// cancel; <see langword="false"/> if no warning needed to be displayed or if a warning 
+        /// was displayed and the user chose to continue.</returns>
+        bool WarnIfSettingRedactedState(bool redacted)
+        {
+            // Determine whether a warning should be displayed
+            bool warn = false;
+            foreach (RedactionGridViewRow row in SelectedRows)
+            {
+                if (redacted)
+                {
+                    if (row.WarnIfRedacted)
+                    {
+                        warn = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (row.WarnIfNotRedacted)
+                    {
+                        warn = true;
+                        break;
+                    }
+                }
+            }
+
+            // If no warning should be displayed, we are done
+            if (!warn)
+            {
+                return false;
+            }
+
+            string state = redacted ? "redact" : "unredact";
+            string message = "Are you sure you want to " + state + " the selected item(s)?";
+
+            // Display the warning
+            DialogResult result = MessageBox.Show(message, "Change redacted state?", 
+                MessageBoxButtons.OKCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+
+            return result == DialogResult.Cancel;
         }
 
         /// <summary>
@@ -1658,9 +1718,29 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26673", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI26673", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="LayerObjectsCollection.DeletingLayerObjects"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="LayerObjectsCollection.DeletingLayerObjects"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="LayerObjectsCollection.DeletingLayerObjects"/> event.</param>
+        void HandleDeletingLayerObjects(object sender, DeletingLayerObjectsEventArgs e)
+        {
+            try
+            {
+                if (WarnIfSettingRedactedState(false))
+                {
+                    e.Cancel = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29443", ex);
             }
         }
 
@@ -1688,9 +1768,9 @@ namespace Extract.Redaction.Verification
                         strText = "[No text]";
                     }
 
-                    Add(e.LayerObject, strText, "Manual", _lastType);
+                    Add(e.LayerObject, strText, "Manual", _lastType, _confidenceLevels.Manual);
 
-                    redaction.BorderColor = _manualConfidenceLevel.Color;
+                    redaction.BorderColor = _confidenceLevels.Manual.Color;
                     redaction.Color = ToggledRedactionColor;
 
                     if (_autoTool != AutoTool.None)
@@ -1701,9 +1781,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26677", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI26677", ex);
             }
         }
 
@@ -1725,9 +1803,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26678", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI26678", ex);
             }
         }
 
@@ -1762,9 +1838,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26951", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI26951", ex);
             }
         }
 
@@ -1784,9 +1858,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27061", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27061", ex);
             }
         }
 
@@ -1806,9 +1878,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27065", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27065", ex);
             }
         }
 
@@ -1827,9 +1897,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27064", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27064", ex);
             }
         }
 
@@ -1852,9 +1920,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26709", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI26709", ex);
             }
         }
 
@@ -1886,9 +1952,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27725", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27725", ex);
             }
         }
 
@@ -1946,6 +2010,7 @@ namespace Extract.Redaction.Verification
                     if (_imageViewer != null)
                     {
                         _imageViewer.ImageFileChanged -= HandleImageFileChanged;
+                        _imageViewer.LayerObjects.DeletingLayerObjects -= HandleDeletingLayerObjects;
                         _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
                         _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
                         _imageViewer.LayerObjects.LayerObjectChanged -= HandleLayerObjectChanged;
@@ -1961,6 +2026,7 @@ namespace Extract.Redaction.Verification
                     if (_imageViewer != null)
                     {
                         _imageViewer.ImageFileChanged += HandleImageFileChanged;
+                        _imageViewer.LayerObjects.DeletingLayerObjects += HandleDeletingLayerObjects;
                         _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
                         _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
                         _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;

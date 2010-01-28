@@ -9,11 +9,12 @@ namespace Extract.Redaction
     {
         #region Fields
 
-        readonly string _longName;
         readonly string _shortName;
         readonly string _query;
         readonly Color _color;
         readonly bool _output;
+        readonly bool _warnIfRedact;
+        readonly bool _warnIfNonRedact;
 
         #endregion Fields
 
@@ -22,31 +23,19 @@ namespace Extract.Redaction
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfidenceLevel"/> class.
         /// </summary>
-        public ConfidenceLevel(string longName, string shortName, string query, Color color, 
-            bool output)
+        public ConfidenceLevel(string shortName, string query, Color color, bool output, bool warnIfRedact, bool warnIfNonRedact)
         {
-            _longName = longName;
             _shortName = shortName;
             _query = query;
             _color = color;
             _output = output;
+            _warnIfRedact = warnIfRedact;
+            _warnIfNonRedact = warnIfNonRedact;
         }
 
         #endregion Constructors
 
         #region Properties
-
-        /// <summary>
-        /// Gets the full name of the confidence level.
-        /// </summary>
-        /// <value>The full name of the confidence level.</value>
-        public string LongName
-        {
-            get
-            {
-                return _longName;
-            }
-        }
 
         /// <summary>
         /// Gets the abbreviated name of the confidence level.
@@ -95,6 +84,34 @@ namespace Extract.Redaction
             get
             {
                 return _output;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether a warning should be displayed if the attribute is redacted.
+        /// </summary>
+        /// <value><see langword="true"/> if a warning should be displayed if the attribute is 
+        /// redacted; <see langword="false"/> if a warning should not be displayed if the 
+        /// attribute is redacted.</value>
+        public bool WarnIfRedacted
+        {
+            get
+            {
+                return _warnIfRedact;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether a warning should be displayed if the attribute is not redacted.
+        /// </summary>
+        /// <value><see langword="true"/> if a warning should be displayed if the attribute is not 
+        /// redacted; <see langword="false"/> if a warning should not be displayed if the 
+        /// attribute is not redacted.</value>
+        public bool WarnIfNotRedacted
+        {
+            get
+            {
+                return _warnIfNonRedact;
             }
         }
 

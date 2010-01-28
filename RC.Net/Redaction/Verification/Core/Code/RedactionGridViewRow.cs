@@ -63,6 +63,11 @@ namespace Extract.Redaction.Verification
         bool _redacted;
 
         /// <summary>
+        /// The confidence level of the attribute in this row.
+        /// </summary>
+        readonly ConfidenceLevel _confidenceLevel;
+
+        /// <summary>
         /// <see langword="true"/> if this row has been visited; <see langword="false"/> if it has 
         /// not been visited.
         /// </summary>
@@ -100,17 +105,18 @@ namespace Extract.Redaction.Verification
         /// Initializes a new instance of the <see cref="RedactionGridViewRow"/> class.
         /// </summary>
         public RedactionGridViewRow(LayerObject layerObject, string text, string category, 
-            string type)
-            : this(new LayerObject[] { layerObject }, text, category, type, null, null, true)
+            string type, ConfidenceLevel confidenceLevel)
+            : this(new LayerObject[] { layerObject }, text, category, type, null, null, true, 
+            confidenceLevel)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RedactionGridViewRow"/> class.
         /// </summary>
-        public RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text, 
-            string category, string type) 
-            : this(layerObjects, text, category, type, null, null, true)
+        public RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text,
+            string category, string type, ConfidenceLevel confidenceLevel)
+            : this(layerObjects, text, category, type, null, null, true, confidenceLevel)
         {
         }
 
@@ -118,7 +124,8 @@ namespace Extract.Redaction.Verification
         /// Initializes a new instance of the <see cref="RedactionGridViewRow"/> class.
         /// </summary>
         RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text, string category, 
-            string type, RedactionItem attribute, ExemptionCodeList exemptions, bool redacted)
+            string type, RedactionItem attribute, ExemptionCodeList exemptions, bool redacted, 
+            ConfidenceLevel confidenceLevel)
         {
             _attribute = attribute;
             _layerObjects = new List<LayerObject>(layerObjects);
@@ -128,6 +135,7 @@ namespace Extract.Redaction.Verification
             _firstPage = GetFirstPageNumber();
             _exemptions = exemptions ?? new ExemptionCodeList();
             _redacted = redacted;
+            _confidenceLevel = confidenceLevel;
         }
 
         #endregion Constructors
@@ -287,6 +295,32 @@ namespace Extract.Redaction.Verification
 
                     _exemptionsDirty = true;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets whether a warning should be displayed if this row is redacted.
+        /// </summary>
+        /// <value><see langword="true"/> if a warning should be displayed if this row is redacted;
+        /// <see langword="false"/> if a warning should not be displayed if this row is redacted.</value>
+        public bool WarnIfRedacted
+        {
+            get
+            {
+                return _confidenceLevel.WarnIfRedacted;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether a warning should be displayed if this row is unredacted.
+        /// </summary>
+        /// <value><see langword="true"/> if a warning should be displayed if this row is unredacted;
+        /// <see langword="false"/> if a warning should not be displayed if this row is unredacted.</value>
+        public bool WarnIfNotRedacted
+        {
+            get
+            {
+                return _confidenceLevel.WarnIfNotRedacted;
             }
         }
 
@@ -459,9 +493,10 @@ namespace Extract.Redaction.Verification
                 string type = attribute.RedactionType;
                 ExemptionCodeList exemptions = attribute.GetExemptions(masterCodes);
                 bool redacted = attribute.Redacted;
+                ConfidenceLevel level = item.Level;
 
                 return new RedactionGridViewRow(layerObjects, text, category, type, 
-                    attribute, exemptions, redacted);
+                    attribute, exemptions, redacted, level);
             }
             catch (Exception ex)
             {

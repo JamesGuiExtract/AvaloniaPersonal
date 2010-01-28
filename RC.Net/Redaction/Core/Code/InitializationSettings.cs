@@ -11,7 +11,7 @@ namespace Extract.Redaction
     /// </summary>
     public class InitializationSettings
     {
-        #region InitializationSettings Constants
+        #region Constants
 
         const string _GENERAL_SECTION = "General";
 
@@ -27,8 +27,6 @@ namespace Extract.Redaction
 
         const string _LEVEL_COUNT_KEY = "NumConfidenceLevels";
 
-        const string _LONG_NAME_KEY = "LongName";
-
         const string _SHORT_NAME_KEY = "ShortName";
 
         const string _QUERY_KEY = "Query";
@@ -37,15 +35,19 @@ namespace Extract.Redaction
 
         const string _OUTPUT_KEY = "Output";
 
+        const string _WARN_IF_REDACT = "WarnIfRedact";
+
+        const string _WARN_IF_NON_REDACT = "WarnIfNonRedact";
+
         const string _REDACTION_TYPES_SECTION = "RedactionDataTypes";
 
         const string _REDACTION_TYPE_COUNT_KEY = "NumRedactionDataTypes";
 
         const string _REDACTION_TYPE_KEY_PREFIX = "RedactionDataType";
 
-        #endregion InitializationSettings Constants
+        #endregion Constants
 
-        #region InitializationSettings Fields
+        #region Fields
 
         /// <summary>
         /// Initialization (ini) file containing the settings.
@@ -85,9 +87,9 @@ namespace Extract.Redaction
         /// </summary>
         readonly RedactionColor _outputRedactionColor;
 
-        #endregion InitializationSettings Fields
+        #endregion Fields
 
-        #region InitializationSettings Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InitializationSettings"/> class.
@@ -110,9 +112,9 @@ namespace Extract.Redaction
             }
         }
 
-        #endregion InitializationSettings Constructors
+        #endregion Constructors
 
-        #region InitializationSettings Properties
+        #region Properties
 
         /// <summary>
         /// Gets the confidence levels of ID Shield attributes.
@@ -193,9 +195,9 @@ namespace Extract.Redaction
             }
         }
 
-        #endregion InitializationSettings Properties
+        #endregion Properties
 
-        #region InitializationSettings Methods
+        #region Methods
 
         /// <summary>
         /// Gets an array of the default redaction types.
@@ -244,14 +246,16 @@ namespace Extract.Redaction
                 string section = _LEVEL_SECTION_PREFIX + i.ToString(CultureInfo.InvariantCulture);
 
                 // Get the data associated with this section
-                string longName = iniFile.ReadString(section, _LONG_NAME_KEY);
                 string shortName = iniFile.ReadString(section, _SHORT_NAME_KEY);
                 string query = iniFile.ReadString(section, _QUERY_KEY);
                 Color color = GetColor(iniFile, section, _COLOR_KEY);
                 bool output = iniFile.ReadInt32(section, _OUTPUT_KEY) != 0;
+                bool warnIfRedact = iniFile.ReadInt32(section, _WARN_IF_REDACT) != 0;
+                bool warnIfNonRedact = iniFile.ReadInt32(section, _WARN_IF_NON_REDACT) != 0;
 
                 // Store the confidence level
-                levels[i - 1] = new ConfidenceLevel(longName, shortName, query, color, output);
+                levels[i - 1] = new ConfidenceLevel(shortName, query, color, output, 
+                    warnIfRedact, warnIfNonRedact);
             }
 
             return new ConfidenceLevelsCollection(levels);
@@ -358,6 +362,6 @@ namespace Extract.Redaction
             return isWhite ? RedactionColor.White : RedactionColor.Black;
         }
 
-        #endregion InitializationSettings Methods
+        #endregion Methods
     }
 }
