@@ -109,6 +109,9 @@
 <p>
 			<li><b>[FlexIDSCore #3877]</b> Confirm that the metadata XML includes 
 			information about the redactions being turned <b>on</b> or <b>off</b>.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3967]</b> Confirm that <b>Redaction: Create metadata xml</b> 
+			can successfully process a VOA file that contains non-spatial attributes.
 		</ul>
 	</UL>
 <p>
@@ -291,11 +294,84 @@
 		</ul>
 	</UL>
 <p>
+	<LI><h2>Redaction: Extend redactions to surround context</h2>
+	<UL>
+		<li><b>User Interface</b>
+		<ul>
+			<li>Use the Add button to select <b>Redaction: Extend redactions to 
+			surround context</b> as the task.</li>
+			<li>Confirm presence of an <b>Extend redactions to surround context</b> 
+			group box.
+			<li>Confirm that the group box contains a <b>For all data types</b> 
+			radio button.
+			<li>Confirm that this radio button is selected by default.
+			<li>Confirm that the group box contains a <b>For the following data types 
+			(separate types using a comma)</b> radio button.
+			<li>Confirm presence of an associated edit box.
+			<li>Confirm that the edit box is enabled only when the radio button is 
+			selected.
+			<li>Confirm presence of an <b>Options</b> group box.
+			<li>Confirm that the group box contains a <b>Randomly redact surrounding 
+			context up to</b> checkbox.
+			<li>Confirm presence of an associated edit box and spinner control.
+			<li>Confirm that the associated controls are enabled only when the 
+			checkbox is selected.
+			<li>Confirm that the edit accepts numbers between <b>1</b> and <b>99</b> 
+			inclusive.
+			<li>Confirm that the spinner control is limited between <b>1</b> and 
+			<b>99</b> inclusive.
+			<li>Confirm presence of a following <b>words on each side</b> label.
+			<li>Confirm that the group box contains an <bAdjust height of redaction if 
+			necessary to further obscure content</b> checkbox.
+			<li>Confirm that at least one checkbox must be checked for the 
+			configuration to be valid.
+			<li>Confirm that settings are persistent.
+	       	</ul>
+<p>
+		<li><b>Random Redaction Functionality</b>
+		<ul>
+	  	   	<LI>Confirm that an appropriate random number of words are redacted 
+			both <b>before</b> and <b>after</b> the sensitive text.  Note that 
+			<b>0</b> words is acceptable.
+	  	   	<LI>Confirm that the redacted area includes intermediate whitespace 
+			so that it is unclear how many contextual words were redacted.
+	  	   	<LI>Confirm that contextual words are properly redacted on a previous 
+			line and page.
+	  	   	<LI>Confirm that contextual words are properly redacted on a subsequent 
+			line and page.
+	  	   	<LI>Confirm that no error is seen if the <b>first</b> word in the USS 
+			file is sensitive and that preceding context would go past the beginning 
+			of the document.
+	  	   	<LI>Confirm that no error is seen if the <b>last</b> word in the USS 
+			file is sensitive and that preceding context would go past the end 
+			of the document.
+		</ul>
+<p>
+		<li><b>Adjust Height Functionality</b>
+		<ul>
+	  	   	<LI>Confirm that the new height of the redaction area is the height of the 
+			tallest character in the enclosing paragraph.
+			<ul>
+		  	   	<LI>The enclosing paragraph is the natural paragraph if at least 
+				<b>10 times</b> the size of the sensitive area.
+		  	   	<LI>The enclosing paragraph is the entire width of the document 
+				extending <b>1.5 inches</b> above the sensitive area and <b>1.5 
+				inches</b> below the sensitive area if the natural paragraph is 
+				less than <b>10 times</b> the size of the sensitive area.
+			</ul>
+			<li>Confirm that the new height of the redaction is no more than 
+			<b>twice</b> the original height.
+	  	   	<LI>Confirm that no unexpected results are seen when using both options 
+			together.
+		</ul>
+	</UL>
+<p>
 	<LI><h2>Redaction: Filter ID Shield data file</h2>
 	<UL>
 		<li><b>User Interface</b>
 		<ul>
-			<li>Use the Add button to select <b>Filter ID Shield data file</b> as the task.</li>
+			<li>Use the Add button to select <b>Redaction: Filter ID Shield data file</b> 
+			as the task.</li>
 			<li>Confirm presence of a <b>Read the following ID Shield data file</b> edit box.</li>
 			<li>Confirm presence of an associated <b>Tag Selector</b> button.</li>
 		   	<ul> 
