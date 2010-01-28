@@ -231,6 +231,37 @@
 <p>
   	   	<LI><b>Miscellaneous</b>
 	       	<ul>
+	  	   	<LI><b>[FlexIDSCore #3752, #3796, #3797, #3798, #3904, #3910, #3912, 
+			#3959, #3980]</b> ID Shield Statistics Reporter
+	       		<ul>
+		  	   	<LI>Confirm that a <b>complete and correct</b> set of statistics 
+				is provided for hybrid processing in one pass.
+				<li>Check that the output closely matches the external statistics 
+				template.
+				<li>Confirm that the output statistics files use the standard 
+				<b>\r\n</b> characters as line separators.
+				<li>Confirm that the <b>Configure automated condition</b> dialog 
+				displays more than one at a time of { only, any, none } when the 
+				combo box drops down.
+				<li>Confirm that the <b>Configure verification condition</b> dialog 
+				displays more than one at a time of { only, any, none } when the 
+				combo box drops down.
+				<li>Confirm that the label for <b>Number of automated redactions</b> is 
+				clear for both automated and overall statistics.
+				<li>Confirm that the <b>Summary statistics</b> file reports the 
+				<b>DocTypesToVerify</b> setting when specified.
+				<li>Confirm that the <b>Summary statistics</b> file reports the 
+				<b>DocTypesToRedact</b> setting when specified.
+				<li>Confirm that IDSSR honors the <b>DocTypesToRedact</b> setting.
+				<li>Confirm that IDSSR allows limiting by single <b>type</b> without 
+				an error.
+				<li>Confirm that IDSSR allows limiting by multiple <b>types</b> 
+				without an error.
+				<li>Confirm that IDSSR reports the <b>number of pages processed</b>.
+				<li>Confirm that IDSSR reports the <b>number of pages with expected 
+				redactions</b>.
+	       		</ul>
+<p>
 	  	   	<LI><b>[FlexIDSCore #3894]</b> Confirm that an <b>ID Shield Client</b> 
 			license is sufficient to run the utility.
 <p>
@@ -475,6 +506,36 @@
 				in the relevant minute.
 	       		</ul>
 		   	</LI>
+		</ul>
+	</ul>
+<p>
+	<li><h2>Redact From XML</h2>
+	<ul>
+		<li><u>Functionality</u>
+		<ul>
+	  	   	<LI>Verify some images, making additions and changes to the found redactions.
+			<li>Create the metadata XML files after verification is complete.
+			<li>Confirm that the <b>RedactFromXml</b> application creates proper 
+			redacted images
+			<ul>
+				<li>Check redaction placement
+				<li>Confirm that deleted redactions are not applied
+				<li>Check that disabled redactions are not applied
+				<li>Check proper redaction color
+				<li>Check redaction text and exemption codes
+				<li>Check annotation settings
+			</ul>
+			<li>Confirm that <b>RedactFromXml</b> command-line parameters can 
+			override the annotation settings in the VOA file.
+		</ul>
+		<li><u>Old Versions</u> - see .\Testing\PVCS_Testing\FlexIDSCore\3975
+		<ul>
+			<li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 1</b> 
+			metadata.
+			<li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 2</b> 
+			metadata.
+			<li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 3</b> 
+			metadata.
 		</ul>
 	</ul>
 </ul>
