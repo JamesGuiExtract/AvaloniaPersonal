@@ -3,3 +3,6 @@
 
 // Test Spatial Content Based attribute Selectors
 <FILE>;..\SpatialContentBasedAS\SpatialContentBasedAS.dat
+
+// Test Data scorer attribute selector
+<FILE>;..\DataScorerAS\DataScorerAS.dat
