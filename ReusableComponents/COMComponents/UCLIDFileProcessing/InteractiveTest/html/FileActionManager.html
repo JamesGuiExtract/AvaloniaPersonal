@@ -453,6 +453,29 @@
 		the Select Action dialog is placed in the <b>Select action</b> edit box on 
 		the Action tab.
        	</ul>
+   	<LI><b>[LegacyRC #5650, #5653]</b> Select action with empty database
+       	<ul>
+  	   	<LI>Create a new database.
+		<LI>Confirm that <b>AutoCreateAction=0</b> within DBInfo.
+  	   	<LI>Confirm that an error message is displayed when trying to select an action.
+		<li>Close the FAM.
+		<LI>Modify DBInfo so that <b>AutoCreateAction=1</b>.
+		<li>Open a FAM instance pointing to the same new, empty database.
+  	   	<LI>Confirm that no error message is displayed when trying to select an action.
+		<li>Confirm that an error message is displayed if a non-existent action 
+		is selected that <b>does not</b> include a valid $ function.
+		<li>Confirm that no error message is displayed if a non-existent action 
+		is selected that <b>does</b> include a valid $ function.
+<p>
+		<LI>Confirm that <b>AutoCreateAction=0</b> within DBInfo.
+		<li>Create and save an FPS file using a defined action.
+		<li>Close the FAM.
+		<li>Delete the action from the database.
+		<li>Open the FPS file.
+		<li>Confirm that after dismissing the error messages, the user is unable 
+		to start processing.
+       	</ul>
+<p>
        	<li>Confirm that on the Action tab there is a <b>Queue files for this action</b> checkbox 
 	and that the initial state is disabled.
        	<li>Confirm that on the Action tab there is a <b>Process files in the queue for this action</b> 
