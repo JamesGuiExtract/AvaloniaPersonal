@@ -228,7 +228,7 @@ namespace Extract.Redaction.Verification
 
                 _currentVoa = new RedactionFileLoader(_iniSettings.ConfidenceLevels);
 
-                _redactionGridView.ManualConfidenceLevel = _currentVoa.ManualConfidenceLevel;
+                _redactionGridView.ConfidenceLevels = _currentVoa.ConfidenceLevels;
 
                 // Set the selection pen
                 LayerObject.SelectionPen = ExtractPens.GetThickPen(Color.Red);
