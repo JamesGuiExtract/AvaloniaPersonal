@@ -1,13 +1,13 @@
 // This test the Spatial Content Based Selector using Remove Attributes
 // Remove all attributes that contain 15 rows of 5 to 50 % pixel coverage. Does not remove non spatial data
-<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;Test1.eav
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test1.eav
 
 // Remove all attributes that don't contain 15 rows of 5 to 50% pixel coverage. Does not remove non spatial data
-<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;Test2.eav
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test2.eav
 
 // Remove all attributes that contain 15 rows of 5 to 50 % pixel coverage. Remove non Spatial data
-<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;Test3.eav
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test3.eav
 
 // Remove all attributes that don't contain 15 rows of 5 to 50% pixel coverage.  Remove non Spatial Data
-<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;Test4.eav
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test4.eav
 
