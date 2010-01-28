@@ -118,6 +118,18 @@
 		<li>Confirm that an <b>Invalid object name 'DBInfo'</b> exception is 
 		either not logged or is prepended with <b>Application trace:</b>.
 	</ul>
+<p>
+   	<LI><b>[LegacyRC #5679]</b> DB Admin and old schema version
+       	<ul>
+		<LI>Create a new database using <b>DB Admin</b>.
+		<li>Use SQL Management Studio to modify the schema version
+		<LI>Login to the database.
+		<li>Select the <b>Summary</b> tab.
+		<li>Confirm that an error message is displayed about the incorrect 
+		schema version.
+		<li>Close the error message and confirm that the UI is still in a 
+		good state.
+       	</ul>
 </ul>
 
 <h2>Database Selection - Part 2</h2>
@@ -398,6 +410,14 @@
       		<li>Confirm that the <b>Manage Counters</b> dialog includes 
 		a <b>Close</b> button.
 		<li>Confirm that <b>Close</b> closes the dialog.
+<p>
+  	   	<LI><b>[LegacyRC #5662]</b> DB Admin exceptions
+	       	<ul>
+	  	   	<LI>Use DB Admin to add a counter using an existing counter name.
+			<LI>Confirm that a meaningful exception is displayed.
+	  	   	<LI>Use DB Admin to rename a counter to an existing counter name.
+			<LI>Confirm that a meaningful exception is displayed.
+	       	</ul>
 	</ul>
 <p>
 	<li><b>Manage Tags...</b>
@@ -438,6 +458,16 @@
 	      		<li>Close the expection.
 	  	   	<LI>Confirm that the <b>Add Tag</b> dialog is still open.
 	  	   	<LI>Confirm that existing description text has been retained.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5632, #5662]</b> Tag management
+	       	<ul>
+			<LI>Confirm that leading and trailing whitespace is trimmed when <b>creating</b> 
+			a tag.
+			<LI>Confirm that leading and trailing whitespace is trimmed when <b>modifying</b> 
+			a tag.
+	  	   	<LI>Rename a tag to an existing tag name.
+			<LI>Confirm that a meaningful exception is displayed.
 	       	</ul>
 	</ul>
 <p>
@@ -929,16 +959,6 @@
 			<li>Action - Rename
 			<li>Action - Manually set action status
 		</ul>
-<p>
-  	   	<LI><b>[LegacyRC #5662]</b> DB Admin exceptions
-	       	<ul>
-	  	   	<LI>Use DB Admin to rename a tag to an existing tag name.
-			<LI>Confirm that a meaningful exception is displayed.
-	  	   	<LI>Use DB Admin to add a counter using an existing counter name.
-			<LI>Confirm that a meaningful exception is displayed.
-	  	   	<LI>Use DB Admin to rename a counter to an existing counter name.
-			<LI>Confirm that a meaningful exception is displayed.
-	       	</ul>
 	</ul>
 </body>
 </html>
