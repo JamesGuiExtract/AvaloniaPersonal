@@ -168,8 +168,8 @@ private:
 	// Redaction query
 	string m_strRedactionQuery;
 
-	// string for type to be tested
-	string m_strTypeToBeTested;
+	// The attribute types to be included in the test.
+	set<string> m_setTypesToBeTested;
 
 	// Flags for statistic output settings
 	bool m_bOutputHybridStats;
@@ -338,7 +338,7 @@ private:
 	void countAttributeNames(IIUnknownVectorPtr ipFoundAttributes, unsigned long& rulHCData,
 		unsigned long& rulMCData, unsigned long& rulLCData, unsigned long& rulClues);
 
-	// PROMISE: to filter the expected and found attributes by the m_strTypeToBeTested string
+	// PROMISE: to filter the expected and found attributes by m_setTypesToBeTested
 	//			and to return a new IIUnknownVector containing only attributes of the
 	//			specified type
 	IIUnknownVectorPtr filterAttributesByType(IIUnknownVectorPtr ipAttributeVector);
@@ -355,7 +355,7 @@ private:
 	void getOutputDirectory(string rootDirectory);
 
 	// PROMISE: To convert a set of strings into a comma delimited list.
-	string getSetAsDelimitedList(const set<string>& rsetValues);
+	string getSetAsDelimitedList(const set<string>& setValues);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(IDShieldTester), CIDShieldTester)

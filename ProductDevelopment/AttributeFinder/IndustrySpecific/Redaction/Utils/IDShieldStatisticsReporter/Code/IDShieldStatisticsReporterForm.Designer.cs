@@ -271,9 +271,9 @@ namespace Extract.IDShieldStatisticsReporter
             this._limitTypesCheckBox.AutoSize = true;
             this._limitTypesCheckBox.Location = new System.Drawing.Point(9, 46);
             this._limitTypesCheckBox.Name = "_limitTypesCheckBox";
-            this._limitTypesCheckBox.Size = new System.Drawing.Size(138, 17);
+            this._limitTypesCheckBox.Size = new System.Drawing.Size(170, 17);
             this._limitTypesCheckBox.TabIndex = 2;
-            this._limitTypesCheckBox.Text = "Limit data tested to type";
+            this._limitTypesCheckBox.Text = "Limit data types to be tested to";
             this._limitTypesCheckBox.UseVisualStyleBackColor = true;
             this._limitTypesCheckBox.CheckedChanged += new System.EventHandler(this.OnLimitTypesCheckBoxCheckedChanged);
             // 

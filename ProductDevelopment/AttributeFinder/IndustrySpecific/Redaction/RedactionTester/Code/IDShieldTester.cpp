@@ -192,7 +192,6 @@ bool testAttributeCondition(IIUnknownVectorPtr ipAttributes,
 //-------------------------------------------------------------------------------------------------
 CIDShieldTester::CIDShieldTester() :
 m_bOutputAttributeNameFilesList(false),
-m_strTypeToBeTested(""),
 m_ipTestOutputVOAVector(NULL)
 {
 	try
@@ -335,7 +334,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			m_strRedactionQuantifier = "";
 			m_eaqRedactionQuantifier = kAny;
 			m_strRedactionQuery = "";
-			m_strTypeToBeTested = "";
+			m_setTypesToBeTested.clear();
 			m_setDocTypesToBeVerified.clear();
 			m_setDocTypesToBeAutomaticallyRedacted.clear();
 			m_ulTotalExpectedRedactions = 0;
@@ -663,19 +662,28 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 			m_bOutputAttributeNameFilesList = vecTokens[1] == "1";
 		}
 		// [p16 #2385 - JDS]
-		else if (vecTokens[0] == "TypeToBeTested")
+		// [FlexIDSCore:3752] Multiple types can now be tested at once... but allow legacy support
+		// of "TypeToBeTested" setting name.
+		else if (vecTokens[0] == "TypeToBeTested" ||
+				 vecTokens[0] == "TypesToBeTested")
 		{
-			if (!m_strTypeToBeTested.empty())
+			if (!m_setTypesToBeTested.empty())
 			{
 				throw UCLIDException("ELI18506", "Type to be tested may only be set once.");
 			}
 
 			// check for the "all"
-			string strTest = vecTokens[1];
-			makeLowerCase(strTest);
-			if (strTest != "all")
+			string strLowerTypes = vecTokens[1];
+			makeLowerCase(strLowerTypes);
+
+			if (strLowerTypes != "all")
 			{
-				m_strTypeToBeTested = vecTokens[1];
+				// Support both comma and pipe delimiters.
+				vector<string> vecTemp;
+				StringTokenizer::sGetTokens(vecTokens[1], "|,", vecTemp, true);
+
+				// Insert the doc types into the set of doc types
+				m_setTypesToBeTested.insert(vecTemp.begin(), vecTemp.end());
 			}
 		}
 		// [FlexIDSCore #3347 - JDS 03/30/2009]
@@ -772,8 +780,11 @@ void CIDShieldTester::handleTestFolder(const string& strRulesFile, const string&
 	// If the directory contains tif and uss files, there will be duplicates. Extract the image name
 	// from each listing and add it to a set to eliminate duplicates.
 	set<string> setImageFilesToTest;
-	for each(string strFileName in vecDirListing)
+	for (vector<string>::iterator iterFileName = vecDirListing.begin();
+		 iterFileName != vecDirListing.end();
+		 iterFileName++)
 	{
+		string strFileName = *iterFileName;
 		EFileType eFileType = getFileType(strFileName);
 		if (eFileType == kUSSFile)
 		{
@@ -784,8 +795,12 @@ void CIDShieldTester::handleTestFolder(const string& strRulesFile, const string&
 	
 	// Process each file in the folder
 	int nTestCastNum = 1;
-	for each (string strImageFileName in setImageFilesToTest)
+	for (set<string>::iterator iterImageFileName = setImageFilesToTest.begin();
+		 iterImageFileName != setImageFilesToTest.end();
+		 iterImageFileName++)
 	{
+		string strImageFileName = *iterImageFileName;
+
 		// Items to replace in the full path
 		string strFoundVOAFileWithTags = strFoundVOAFile;
 		string strExpectedVOAFileWithTags = strExpectedVOAFile;
@@ -991,7 +1006,7 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 	m_ulTotalFilesProcessed++;
 
 	// if there is a type string to filter by, filter the attributes
-	if (!m_strTypeToBeTested.empty())
+	if (!m_setTypesToBeTested.empty())
 	{
 		// filter the expected and found attributes by the specified type
 		ipExpectedAttributes = filterAttributesByType(ipExpectedAttributes);
@@ -1665,6 +1680,19 @@ void CIDShieldTester::displaySummaryStatistics()
 
 	strStatisticSummary += "\r\nWorkflow:\r\n";
 
+	if (m_bOutputAutomatedStatsOnly)
+	{
+		strStatisticSummary += "Analysis type: Automated redaction\r\n";
+	}
+	else if (m_bOutputHybridStats)
+	{
+		strStatisticSummary += "Analysis type: Hybrid\r\n";
+	}
+	else
+	{
+		strStatisticSummary += "Analysis type: Standard verification\r\n";
+	}
+
 	// If only automated stats were computed, there are no verification stats to report.
 	if (!m_bOutputAutomatedStatsOnly)
 	{
@@ -1704,9 +1732,10 @@ void CIDShieldTester::displaySummaryStatistics()
 	}
 
 	// If limiting testing to specified doc type, indicates the doc type being tested.
-	if (!m_strTypeToBeTested.empty())
+	if (!m_setTypesToBeTested.empty())
 	{
-		strStatisticSummary += "Limit data tested to type: " + m_strTypeToBeTested + "\r\n";
+		strStatisticSummary += "Limit data types to be tested to: " + 
+			getSetAsDelimitedList(m_setTypesToBeTested) + "\r\n";
 	}
 
 	// Compute the number of correct redactions based on whether this is hyrbid stats or not
@@ -2406,9 +2435,22 @@ IIUnknownVectorPtr CIDShieldTester::filterAttributesByType(IIUnknownVectorPtr ip
 		makeLowerCase(strName);
 
 		// if the attribute contains the specified type, add it to the vector
-		if (strName == "documenttype" || asCppBool(ipAttribute->ContainsType(m_strTypeToBeTested.c_str())))
+		if (strName == "documenttype")
 		{
 			ipNewVector->PushBack(ipAttribute);
+		}
+		else
+		{
+			for (set<string>::iterator iterType = m_setTypesToBeTested.begin();
+				 iterType != m_setTypesToBeTested.end();
+				 iterType++)
+			{
+				if (asCppBool(ipAttribute->ContainsType(iterType->c_str())))
+				{
+					ipNewVector->PushBack(ipAttribute);
+					break;
+				}
+			}
 		}
 	}
 
@@ -2524,19 +2566,21 @@ void CIDShieldTester::getOutputDirectory(string rootDirectory)
 	m_strOutputFileDirectory = rootDirectory + "\\Analysis - " + getTimeStamp();
 }
 //-------------------------------------------------------------------------------------------------
-string CIDShieldTester::getSetAsDelimitedList(const set<string>& rsetValues)
+string CIDShieldTester::getSetAsDelimitedList(const set<string>& setValues)
 {
 	string strList;
 
 	bool bFirst = true;
-	for each (string strValue in rsetValues)
+	for (set<string>::const_iterator iterValue = setValues.begin();
+		 iterValue != setValues.end();
+		 iterValue++)
 	{
 		if (!bFirst)
 		{
 			strList += ", ";
 		}
 
-		strList += strValue;
+		strList += *iterValue;
 		bFirst = false;
 	}
 

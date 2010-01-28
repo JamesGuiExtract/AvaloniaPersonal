@@ -229,10 +229,10 @@ namespace Extract.IDShieldStatisticsReporter
                 }
 
                 // Populate the types to be tested 
-                if (!string.IsNullOrEmpty(_settings.TypeToBeTested))
+                if (!string.IsNullOrEmpty(_settings.TypesToBeTested))
                 {
                     _limitTypesCheckBox.Checked = true;
-                    _dataTypesTextBox.Text = _settings.TypeToBeTested;
+                    _dataTypesTextBox.Text = _settings.TypesToBeTested;
                 }
 
                 // Initialize the automated and verification condition objects
@@ -402,10 +402,25 @@ namespace Extract.IDShieldStatisticsReporter
         /// Saves the current settings to an ID Shield tester settings file.
         /// </summary>
         /// <param name="settingFileName">The name of the file to write the settings to.</param>
-        void ApplySettings(string settingFileName)
+        /// <returns><see langword="true"/> if settings were applied successfully,
+        /// <see langword="false"/> otherwise.</returns>
+        bool ApplySettings(string settingFileName)
         {
             try
             {
+                if (!Directory.Exists(_feedbackFolderTextBox.Text))
+                {
+                    _tabControl.SelectTab(_feedbackDataTab);
+                    ActiveControl = _feedbackFolderTextBox;
+                    _feedbackFolderTextBox.SelectAll();
+
+                    MessageBox.Show("Specify a valid feedback folder.",
+                        "Configuration error", MessageBoxButtons.OK, MessageBoxIcon.Warning,
+                        MessageBoxDefaultButton.Button1, 0);
+
+                    return false;
+                }
+
                 _testFolder.TestFolderName = _feedbackFolderTextBox.Text;
                 _settings.OutputFilesFolder = _feedbackFolderTextBox.Text;
                 _settings.OutputHybridStats = _analysisTypeComboBox.Text == _HYBRID;
@@ -446,13 +461,27 @@ namespace Extract.IDShieldStatisticsReporter
                     _settings.DocTypesToVerify = docTypes;
                 }
 
-                if (_limitTypesCheckBox.Checked && !string.IsNullOrEmpty(_dataTypesTextBox.Text))
+                if (_limitTypesCheckBox.Checked)
                 {
-                    _settings.TypeToBeTested = _dataTypesTextBox.Text;
+                    if (string.IsNullOrEmpty(_dataTypesTextBox.Text))
+                    {
+                        _tabControl.SelectTab(_analyzeTab);
+                        ActiveControl = _dataTypesTextBox;
+                        _dataTypesTextBox.SelectAll();
+
+                        MessageBox.Show("Specify a comma delimited list of types to be tested or " +
+                            "uncheck  the \"Limit data types to be tested box\".",
+                            "Configuration error", MessageBoxButtons.OK, MessageBoxIcon.Warning,
+                            MessageBoxDefaultButton.Button1, 0);
+                        
+                        return false;
+                    }
+
+                    _settings.TypesToBeTested = _dataTypesTextBox.Text;
                 }
                 else
                 {
-                    _settings.TypeToBeTested = null;
+                    _settings.TypesToBeTested = null;
                 }
 
                 StringBuilder queryForAutomatedRedaction = new StringBuilder();
@@ -464,6 +493,8 @@ namespace Extract.IDShieldStatisticsReporter
                 _settings.QueryForAutomatedRedaction = queryForAutomatedRedaction.ToString();
 
                 _settings.Save(settingFileName);
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -535,7 +566,11 @@ namespace Extract.IDShieldStatisticsReporter
                     settingsFile = new TemporaryFile(".dat");
                     tclFile = new TemporaryFile(".tcl");
 
-                    ApplySettings(settingsFile.FileName);
+                    if (!ApplySettings(settingsFile.FileName))
+                    {
+                        // If the settings could not be applied, don't run the test
+                        return;
+                    }
 
                     string tclFileContents = _IDSHIELD_TESTER_PROGID + ";;" + settingsFile.FileName;
                     File.WriteAllText(tclFile.FileName, tclFileContents);

@@ -98,7 +98,8 @@ unsigned long getDiskSerialNumber()
 void writeToFile(const string& strData, const string& strOutputFileName)
 {
 	// create the output file stream
-	ofstream ofs(strOutputFileName.c_str());
+	// [FlexIDSCore:3797] Open as binary to prevent each "\n" char from being converted to "\r\n"
+	ofstream ofs(strOutputFileName.c_str(), ofstream::binary);
 	
 	// make sure the output file stream could be created ok
 	if (!ofs)
@@ -110,7 +111,7 @@ void writeToFile(const string& strData, const string& strOutputFileName)
 	}
 
 	// write the data to the output file stream
-	ofs << strData << endl;
+	ofs << strData << "\r\n";
 	ofs.close();
 
 	// make sure that there were no errors in closing the output file stream
@@ -128,8 +129,9 @@ void writeToFile(const string& strData, const string& strOutputFileName)
 void appendToFile(const string& strData, const string& strOutputFileName)
 {
 	// create the output file stream
-	ofstream ofs(strOutputFileName.c_str(), ofstream::out | ofstream::app);
-	
+	// [FlexIDSCore:3797] Open as binary to prevent each "\n" char from being converted to "\r\n"
+	ofstream ofs(strOutputFileName.c_str(), ofstream::out | ofstream::app | ofstream::binary);
+	 
 	// make sure the output file stream could be created ok
 	if (!ofs)
 	{
@@ -140,7 +142,7 @@ void appendToFile(const string& strData, const string& strOutputFileName)
 	}
 
 	// write the data to the output file stream
-	ofs << strData << endl;
+	ofs << strData << "\r\n";
 	ofs.close();
 
 	// make sure that there were no errors in closing the output file stream
