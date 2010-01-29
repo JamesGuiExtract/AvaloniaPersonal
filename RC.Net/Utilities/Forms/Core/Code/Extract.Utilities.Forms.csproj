@@ -81,6 +81,7 @@
     <Compile Include="CustomizableMessageBoxResult.cs" />
     <Compile Include="FormMemento.cs" />
     <Compile Include="FormsMethods.cs" />
+    <Compile Include="SystemCommand.cs" />
     <Compile Include="UserHelpMethods.cs" />
     <Compile Include="IControlMemento.cs" />
     <Compile Include="Inputbox.cs" />
