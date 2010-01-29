@@ -1,14 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Extract.Utilities.Forms
 {
     /// <summary>
-    /// Common windows messages.
+    /// Represents a Windows message.
     /// </summary>
     public static class WindowsMessage
     {
+        /// <summary>
+        /// Allows changes in a window to be redrawn or prevents changes in that window from being 
+        /// redrawn.
+        /// </summary>
+        public const int SetRedraw = 0x000B;
+
         /// <summary>
         /// Key down message
         /// </summary>
@@ -20,34 +22,40 @@ namespace Extract.Utilities.Forms
         public const int KeyUp = 0x0101;
 
         /// <summary>
-        /// Char message
+        /// Character message
         /// </summary>
-        public const int Char = 0x0102;
+        public const int Character = 0x0102;
 
         /// <summary>
         /// Dead char message
         /// </summary>
-        public const int DeadChar = 0x0103;
+        public const int DeadCharacter = 0x0103;
 
         /// <summary>
         /// System key down message
         /// </summary>
-        public const int SysKeyDown = 0x0104;
+        public const int SystemKeyDown = 0x0104;
 
         /// <summary>
         /// System key up message
         /// </summary>
-        public const int SysKeyUp = 0x0105;
+        public const int SystemKeyUp = 0x0105;
 
         /// <summary>
         /// System char message
         /// </summary>
-        public const int SysChar = 0x0106;
+        public const int SystemCharacter = 0x0106;
 
         /// <summary>
         /// System dead char message
         /// </summary>
-        public const int SysDeadChar = 0x0107;
+        public const int SystemDeadCharacter = 0x0107;
+
+        /// <summary>
+        /// The user chose a command from the Window menu or chose the maximize button, minimize 
+        /// button, restore button, or close button.
+        /// </summary>
+        public const int SystemCommand = 0x0112;
 
         /// <summary>
         /// Horizontal scroll message

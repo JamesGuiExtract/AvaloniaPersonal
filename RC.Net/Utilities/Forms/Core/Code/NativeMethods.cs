@@ -178,20 +178,16 @@ namespace Extract.Utilities.Forms
 
         const int _SPI_GETNONCLIENTMETRICS = 41;
 
-        const int _SC_CLOSE  = 0xF060;
-
         const int _MF_BYCOMMAND  = 0x0;
         const int _MF_GRAYED  = 0x1;
 
-        const int _WM_SETREDRAW = 0x000B;
-
         const uint _MAPVK_VK_TO_CHAR = 0x02;
 
-        const int GWL_STYLE = -16;
-        const int GWL_EXSTYLE = -20;
+        const int _GWL_STYLE = -16;
+        const int _GWL_EXSTYLE = -20;
 
-        const uint WS_VISIBLE = 0x10000000;
-        const uint WS_EX_TOPMOST = 0x0008;
+        const uint _WS_VISIBLE = 0x10000000;
+        const uint _WS_EX_TOPMOST = 0x0008;
 
         #endregion Constants
 
@@ -322,8 +318,8 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                EnableMenuItem(GetSystemMenu(form.Handle, false),
-                    _SC_CLOSE, _MF_BYCOMMAND | _MF_GRAYED);
+                EnableMenuItem(GetSystemMenu(form.Handle, false), SystemCommand.Close, 
+                    _MF_BYCOMMAND | _MF_GRAYED);
             }
             catch(Exception ex)
             {
@@ -344,7 +340,8 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                SendMessage(control.Handle, _WM_SETREDRAW, (IntPtr)(lockUpdate ? 0 : 1), IntPtr.Zero);
+                SendMessage(control.Handle, WindowsMessage.SetRedraw, (IntPtr)(lockUpdate ? 0 : 1), 
+                    IntPtr.Zero);
             }
             catch (Exception ex)
             {
@@ -416,21 +413,21 @@ namespace Extract.Utilities.Forms
                 {
                     // If such a window is found and it is both visible and top-most, it is
                     // displayed.
-                    uint style = GetWindowLong(handle, GWL_STYLE);
+                    uint style = GetWindowLong(handle, _GWL_STYLE);
                     int lastError = Marshal.GetLastWin32Error();
                     if (style == 0 && lastError != 0)
                     {
                         throw new Win32Exception(lastError);
                     }
 
-                    uint extendedStyle = GetWindowLong(handle, GWL_EXSTYLE);
+                    uint extendedStyle = GetWindowLong(handle, _GWL_EXSTYLE);
                     lastError = Marshal.GetLastWin32Error();
                     if (extendedStyle == 0 && lastError != 0)
                     {
                         throw new Win32Exception(lastError);
                     }
 
-                    if ((style & WS_VISIBLE) != 0 && (extendedStyle & WS_EX_TOPMOST) != 0)
+                    if ((style & _WS_VISIBLE) != 0 && (extendedStyle & _WS_EX_TOPMOST) != 0)
                     {
                         return true;
                     }
