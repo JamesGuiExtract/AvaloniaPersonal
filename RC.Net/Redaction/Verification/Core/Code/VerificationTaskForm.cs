@@ -172,6 +172,12 @@ namespace Extract.Redaction.Verification
         /// </summary>
         FAMTagManager _tagManager;
 
+        /// <summary>
+        /// <see langword="true"/> if the user chose to close the application through the x button, 
+        /// ALT+F4, or through stop processing; <see langword="false"/> otherwise.
+        /// </summary>
+        bool _userClosing;
+
         #endregion Fields
 
         #region Events
@@ -314,7 +320,7 @@ namespace Extract.Redaction.Verification
             // 2) A cell of the redaction grid view is being edited
             // 3) The find or redact form has focus
             return !_commentsTextBox.Focused && !_redactionGridView.IsInEditMode && 
-                (_findOrRedactForm == null || !_findOrRedactForm.ContainsFocus);
+                   (_findOrRedactForm == null || !_findOrRedactForm.ContainsFocus);
         }
 
         /// <summary>
@@ -808,6 +814,26 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Displays a warning message if the user is trying to stop when no document is currently 
+        /// processing.
+        /// </summary>
+        /// <returns><see langword="true"/> if a warning was displayed; <see langword="false"/> if 
+        /// no warning was displayed.</returns>
+        bool WarnIfStopping()
+        {
+            bool warn = _userClosing && !_imageViewer.IsImageAvailable;
+            if (warn)
+            {
+                string message = "If you are intending to stop processing, "
+                                 + "press the stop button in the File Action Manager.";
+                MessageBox.Show(this, message, "Stop processing", MessageBoxButtons.OK, 
+                    MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+            }
+
+            return warn;
+        }
+
+        /// <summary>
         /// Gets the current document to view from the history. This may be the unsaved memento.
         /// </summary>
         /// <returns>The current document to view from the history. This may be the unsaved 
@@ -916,20 +942,20 @@ namespace Extract.Redaction.Verification
         void SelectFindOrRedact()
         {
             if (_imageViewer.IsImageAvailable)
-	        {
-	            if (_findOrRedactForm == null)
-	            {
-	                VerificationRuleFormHelper helper = new VerificationRuleFormHelper(_imageViewer);
+            {
+                if (_findOrRedactForm == null)
+                {
+                    VerificationRuleFormHelper helper = new VerificationRuleFormHelper(_imageViewer);
 
-	                RuleForm ruleForm = new RuleForm("Find or redact text", 
+                    RuleForm ruleForm = new RuleForm("Find or redact text", 
                         new WordOrPatternListRule(), _imageViewer, helper, this);
-	                ruleForm.MatchRedacted += helper.HandleMatchRedacted;
+                    ruleForm.MatchRedacted += helper.HandleMatchRedacted;
 
-	                _findOrRedactForm = ruleForm;
-	            }
+                    _findOrRedactForm = ruleForm;
+                }
 
-	            _findOrRedactForm.Show();
-	        }
+                _findOrRedactForm.Show();
+            }
         }
 
         /// <summary>
@@ -1417,8 +1443,8 @@ namespace Extract.Redaction.Verification
         /// <param name="memento">The memento for which to retrieve a comment.</param>
         string GetFileActionComment(VerificationMemento memento)
         {
-            return _fileDatabase == null ? 
-                "" : _fileDatabase.GetFileActionComment(memento.FileId, memento.ActionId);
+            return _fileDatabase == null 
+                ? "" : _fileDatabase.GetFileActionComment(memento.FileId, memento.ActionId);
         }
 
         /// <summary>
@@ -1544,6 +1570,20 @@ namespace Extract.Redaction.Verification
         #region Overrides
 
         /// <summary>
+        /// Processes Windows messages.
+        /// </summary>
+        /// <param name="m">The Windows <see cref="Message"/> to process.</param>
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == WindowsMessage.SystemCommand && m.WParam == new IntPtr(SystemCommand.Close))
+            {
+                _userClosing = true;
+            }
+
+            base.WndProc(ref m);
+        }
+
+        /// <summary>
         /// Raises the <see cref="Form.Load"/> event.
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="Form.Load"/> 
@@ -1602,7 +1642,7 @@ namespace Extract.Redaction.Verification
                 ExtractException.Display("ELI26715", ex);
             }
         }
-       
+
         /// <summary>
         /// Raises the <see cref="Form.FormClosing"/> event.
         /// </summary>
@@ -1615,6 +1655,13 @@ namespace Extract.Redaction.Verification
             try
             {
                 _redactionGridView.CommitChanges();
+
+                // Warn if stopping with no document processing [FIDSC #3885, #3995]
+                if (WarnIfStopping())
+                {
+                    e.Cancel = true;
+                    return; 
+                }
 
                 // TODO: Also check if the main document is dirty, but not in view.
                 if (WarnIfDirty())
@@ -1633,6 +1680,10 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ExtractException.Display("ELI27116", ex);
+            }
+            finally
+            {
+                _userClosing = false;
             }
         }
 
@@ -1701,9 +1752,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26628", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI26628", ex);
             }
         }
 
@@ -1722,9 +1771,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26785", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI26785", ex);
             }
         }
 
@@ -1751,9 +1798,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27044", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27044", ex);
             }
         }
 
@@ -1785,9 +1830,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27046", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27046", ex);
             }
         }
 
@@ -1802,13 +1845,12 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                _userClosing = true;
                 Close();
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27047", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27047", ex);
             }
         }
 
@@ -1876,9 +1918,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27049", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27049", ex);
             }
         }
 
@@ -1897,9 +1937,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27050", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27050", ex);
             }
         }
 
@@ -1918,9 +1956,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27074", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27074", ex);
             }
         }
 
@@ -1939,9 +1975,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27075", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27075", ex);
             }
         }
 
@@ -1960,9 +1994,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27076", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27076", ex);
             }
         }
 
@@ -1981,9 +2013,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27077", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27077", ex);
             }
         }
 
@@ -2008,9 +2038,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27078", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27078", ex);
             }
         }
 
@@ -2029,9 +2057,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26710", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI26710", ex);
             }
         }
 
@@ -2050,9 +2076,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26711", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI26711", ex);
             }
         }
 
@@ -2072,9 +2096,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27051", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27051", ex);
             }
         }
 
@@ -2126,9 +2148,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26760", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI26760", ex);
             }
         }
 
@@ -2151,9 +2171,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27052", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27052", ex);
             }
         }
 
@@ -2176,9 +2194,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27053", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27053", ex);
             }
         }
 
@@ -2197,9 +2213,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27936", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27936", ex);
             }
         }
 
