@@ -29,18 +29,14 @@ CValueBeforeClue::CValueBeforeClue()
   m_nNumOfLines(0),
   m_bIncludeClueLine(true),
   m_strLimitingString(""),
-//  m_strLimitingRegExpr(""),
   m_ipClues(CLSID_VariantVector),
   m_bDirty(false),
   m_bClueToStringAsRegExpr(false)
 {
 	try
 	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13051", ipMiscUtils != NULL );
-
-		m_ipRegExParser = ipMiscUtils->GetNewRegExpParserInstance("ValueBeforeClue");
-		ASSERT_RESOURCE_ALLOCATION("ELI13052", m_ipRegExParser != NULL);
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI13051", m_ipMiscUtils != NULL );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13053")
 }
@@ -49,6 +45,8 @@ CValueBeforeClue::~CValueBeforeClue()
 {
 	try
 	{
+		m_ipMiscUtils = NULL;
+		m_ipClues = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16351");
 }
@@ -125,10 +123,14 @@ STDMETHODIMP CValueBeforeClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatu
 			_bstrCluesPattern += _bstr_t(strClue.c_str());
 		}
 
+		// Get the regex parser
+		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("ValueBeforeClue");
+		ASSERT_RESOURCE_ALLOCATION("ELI13052", ipParser != NULL);
+
 		// find all clues in the input string
-		m_ipRegExParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
-		m_ipRegExParser->Pattern = _bstrCluesPattern;
-		IIUnknownVectorPtr ipVecFoundClues(m_ipRegExParser->Find(_bstrText, VARIANT_FALSE, VARIANT_FALSE));
+		ipParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
+		ipParser->Pattern = _bstrCluesPattern;
+		IIUnknownVectorPtr ipVecFoundClues(ipParser->Find(_bstrText, VARIANT_FALSE, VARIANT_FALSE));
 
 		long nNumOfCluesFound = ipVecFoundClues->Size();
 		for (n = 0; n < nNumOfCluesFound; n++)
@@ -161,8 +163,8 @@ STDMETHODIMP CValueBeforeClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatu
 						// get everything before the clue text 
 						// on the same line as the clue text
 						// look for new line chars in the substr
-						m_ipRegExParser->Pattern = _bstr_t("[\n\r]+");
-						IIUnknownVectorPtr ipNewLines = m_ipRegExParser->Find(_bstrStrValue,
+						ipParser->Pattern = _bstr_t("[\n\r]+");
+						IIUnknownVectorPtr ipNewLines = ipParser->Find(_bstrStrValue,
 							VARIANT_FALSE, VARIANT_FALSE);
 						long nNumOfNewLines = ipNewLines->Size();
 						// if there's no line break, simply take the strValue;
@@ -193,10 +195,10 @@ STDMETHODIMP CValueBeforeClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatu
 					{
 						// look for all words separated by punctuations specified
 						string strWordPattern = "[^" + m_strPunctuations + "]+";
-						m_ipRegExParser->Pattern = _bstr_t(strWordPattern.c_str());
+						ipParser->Pattern = _bstr_t(strWordPattern.c_str());
 						
 						// get all words before clue text
-						IIUnknownVectorPtr ipAllWordsInfo(m_ipRegExParser->Find(_bstrStrValue, 
+						IIUnknownVectorPtr ipAllWordsInfo(ipParser->Find(_bstrStrValue, 
 							VARIANT_FALSE, VARIANT_FALSE));
 						if (ipAllWordsInfo)
 						{
@@ -235,10 +237,10 @@ STDMETHODIMP CValueBeforeClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatu
 									}
 									// Finish and apply the Pattern
 									strStopPattern = strStopPattern + "]+";
-									m_ipRegExParser->Pattern = _bstr_t( strStopPattern.c_str() );
+									ipParser->Pattern = _bstr_t( strStopPattern.c_str() );
 
 									IIUnknownVectorPtr ipStopChars 
-										= m_ipRegExParser->Find(_bstrStrValue, VARIANT_FALSE, 
+										= ipParser->Find(_bstrStrValue, VARIANT_FALSE, 
 										VARIANT_FALSE);
 									long nNumOfStops = ipStopChars->Size();
 									if (nNumOfStops >= 1)
@@ -277,8 +279,8 @@ STDMETHODIMP CValueBeforeClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatu
 				case kUptoXLines:
 					{
 						// find all new line chars
-						m_ipRegExParser->Pattern = _bstr_t("[\n\r]+");
-						IIUnknownVectorPtr ipNewLines = m_ipRegExParser->Find(_bstrStrValue, 
+						ipParser->Pattern = _bstr_t("[\n\r]+");
+						IIUnknownVectorPtr ipNewLines = ipParser->Find(_bstrStrValue, 
 							VARIANT_FALSE, VARIANT_FALSE);
 						long nNumOfNewLines = ipNewLines->Size();
 						// if there's only clue line
@@ -365,8 +367,8 @@ STDMETHODIMP CValueBeforeClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatu
 						_bstr_t _bstrLimitPattern( strLimit.c_str() );
 						
 						// Check for limiting strings
-						m_ipRegExParser->Pattern = _bstrLimitPattern;
-						IIUnknownVectorPtr ipVecFoundStrings(m_ipRegExParser->Find(_bstrStrValue, 
+						ipParser->Pattern = _bstrLimitPattern;
+						IIUnknownVectorPtr ipVecFoundStrings(ipParser->Find(_bstrStrValue, 
 							VARIANT_FALSE, VARIANT_FALSE));
 						
 						long nFoundSize = ipVecFoundStrings->Size();

@@ -5,6 +5,10 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <string>
+
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CStringTokenizerSplitter
 class ATL_NO_VTABLE CStringTokenizerSplitter : 
@@ -96,9 +100,10 @@ private:
 	IIUnknownVectorPtr m_ipVecNameValuePair;
 	EStringTokenizerSplitType m_eSplitType;
 
-	// member variable for reg-ex-parser and method to lazy initialize it
-	IRegularExprParserPtr m_ipRegExParser;
-	IRegularExprParserPtr getRegExParser();
+	IMiscUtilsPtr m_ipMiscUtils;
+
+	// Gets a regular expression parser with the specified pattern
+	IRegularExprParserPtr getRegExParser(const string& strPattern);
 	
 	// flag to keep track of whether object is dirty
 	bool m_bDirty;

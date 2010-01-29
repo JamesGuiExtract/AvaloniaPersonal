@@ -24,18 +24,12 @@ CStringTokenizerModifier::CStringTokenizerModifier()
   m_strResultExpression(""),
   m_strTextInBetween(""),
   m_eNumOfTokensType(kAnyNumber),
-  m_ipSyntexValidator(NULL),
   m_nNumOfTokensRequired(-1)
 {
 	try
 	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13059", ipMiscUtils != NULL );
-
-		m_ipRegExpr = ipMiscUtils->GetNewRegExpParserInstance("StringTokenizerModifier");
-		ASSERT_RESOURCE_ALLOCATION("ELI05367", m_ipRegExpr!=NULL);
-		// this pattern will search for any %d and %d-%d
-		m_ipRegExpr->Pattern = "(\\\\*)%(\\d+)(-%(\\d+))?";
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI13059", m_ipMiscUtils != NULL );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI05366")
 }
@@ -44,6 +38,7 @@ CStringTokenizerModifier::~CStringTokenizerModifier()
 {
 	try
 	{
+		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16365");
 }
@@ -310,9 +305,12 @@ STDMETHODIMP CStringTokenizerModifier::raw_ModifyValue(IAttribute* pAttribute, I
 			break;
 		}
 
+		// Get a regular expression parser with a pattern that will search for any %d and %d-%d
+		IRegularExprParserPtr ipParser = getRegexParser("(\\\\*)%(\\d+)(-%(\\d+))?");
+
 		// find all token place holders (i.e. %d or %d-%d) in the result expression
 		IIUnknownVectorPtr ipTokenPlaceHolders = 
-			m_ipRegExpr->Find(_bstr_t(m_strResultExpression.c_str()), VARIANT_FALSE, VARIANT_TRUE);
+			ipParser->Find(_bstr_t(m_strResultExpression.c_str()), VARIANT_FALSE, VARIANT_TRUE);
 		ASSERT_RESOURCE_ALLOCATION("ELI05375", ipTokenPlaceHolders!=NULL);
 
 		long nPlaceHoldersSize  = ipTokenPlaceHolders->Size();
@@ -428,9 +426,10 @@ STDMETHODIMP CStringTokenizerModifier::raw_ModifyValue(IAttribute* pAttribute, I
 
 		// remove any escape sequence char
 		_bstr_t _bstrEscapeChars("\\\\(%|-|\\\\)");
+
 		// replace any \\ with \, \% with %, \- with -
 		ipInputText->Replace(_bstrEscapeChars, "$1", VARIANT_FALSE, 0, 
-			getSyntexValidator());
+			getRegexParser());
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05314");
 	
@@ -714,18 +713,23 @@ ISpatialStringPtr CStringTokenizerModifier::getReplacement(IIUnknownVectorPtr ip
 	return ipReturnString;
 }
 //-------------------------------------------------------------------------------------------------
-IRegularExprParserPtr CStringTokenizerModifier::getSyntexValidator()
+IRegularExprParserPtr CStringTokenizerModifier::getRegexParser(const string& strPattern)
 {
-	if (m_ipSyntexValidator == NULL)
+	try
 	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13060", ipMiscUtils != NULL );
+		IRegularExprParserPtr ipParser =
+			m_ipMiscUtils->GetNewRegExpParserInstance("StringTokenizerModifier");
+		ASSERT_RESOURCE_ALLOCATION("ELI13061", ipParser != NULL);
 
-		m_ipSyntexValidator = ipMiscUtils->GetNewRegExpParserInstance("StringTokenizerModifier");
-		ASSERT_RESOURCE_ALLOCATION("ELI13061", m_ipSyntexValidator != NULL);
+		if (!strPattern.empty())
+		{
+			// Set the pattern
+			ipParser->Pattern = strPattern.c_str();
+		}
+
+		return ipParser;
 	}
-
-	return m_ipSyntexValidator;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29477");
 }
 //-------------------------------------------------------------------------------------------------
 void CStringTokenizerModifier::validateLicense()
@@ -740,9 +744,8 @@ void CStringTokenizerModifier::validateLicense()
 bool CStringTokenizerModifier::validateExpression(const string& strExpr)
 {
 	// set pattern
-	getSyntexValidator()->Pattern = "(\\\\*)(%|-|\\\\)";
-	IIUnknownVectorPtr ipFound = 
-		getSyntexValidator()->Find(_bstr_t(strExpr.c_str()), VARIANT_FALSE, VARIANT_TRUE);
+	IRegularExprParserPtr ipParser = getRegexParser("(\\\\*)(%|-|\\\\)");
+	IIUnknownVectorPtr ipFound = ipParser->Find(strExpr.c_str(), VARIANT_FALSE, VARIANT_TRUE);
 	if (ipFound != NULL)
 	{
 		long nSize = ipFound->Size();

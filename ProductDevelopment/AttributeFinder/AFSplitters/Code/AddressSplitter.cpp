@@ -24,16 +24,13 @@ CAddressSplitter::CAddressSplitter()
   m_bFoundZip(false),
   m_lNumRecipientLines(0),
   m_lNumAddressLines(0),
+  m_ipParser(NULL),
   m_bCombinedNameAddress(false)
 {
 	try
 	{
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
 		ASSERT_RESOURCE_ALLOCATION("ELI13024", ipMiscUtils != NULL );
-
-		// Instantiate the Regular Expression Parser object
-		m_ipParser = ipMiscUtils->GetNewRegExpParserInstance("AddressSplitter");
-		ASSERT_RESOURCE_ALLOCATION( "ELI07166", m_ipParser != NULL );
 
 		// Instantiate the Entity Keywords object
 		m_ipKeys.CreateInstance( CLSID_EntityKeywords );

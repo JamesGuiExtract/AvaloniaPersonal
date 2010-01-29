@@ -24,7 +24,7 @@ class ATL_NO_VTABLE CEntityNameDataScorer :
 {
 public:
 	CEntityNameDataScorer();
-	~CEntityNameDataScorer(){};
+	~CEntityNameDataScorer();
 
 DECLARE_REGISTRY_RESOURCEID(IDR_ENTITYNAMEDATASCORER)
 
@@ -78,7 +78,7 @@ private:
 	bool m_bDirty; // dirty flag to indicate modified state of this object
 
 	// Handles configuration persistence
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 
 	// if m_bLoggingEnabled is true the scores should be logged
 	bool m_bLoggingEnabled;
@@ -89,12 +89,13 @@ private:
 	bool m_bIsCommonWordsLoaded;
 
 	// vector containing words that will invalidate a person
-	std::vector<std::string> m_vecInvalidPersonWords;
+	vector<string> m_vecInvalidPersonWords;
 
 	bool m_bIsInvalidPersonWordsLoaded;
 
 	IAFUtilityPtr	m_ipAFUtility;
-	IRegularExprParserPtr m_ipParser;
+
+	IMiscUtilsPtr m_ipMiscUtils;
 	
 	//////////
 	// Methods
@@ -103,8 +104,10 @@ private:
 	// returns the score for a single attribute
 	long getAttrScore( IAttributePtr ipAttribute );
 
-	long getCompanyScore( string strCompanyString, string strOriginal );
-	long getPersonScore( IAttributePtr ipAttribute, string strOriginal );
+	long getCompanyScore( string strCompanyString, string strOriginal,
+		IRegularExprParserPtr ipParser );
+	long getPersonScore( IAttributePtr ipAttribute, string strOriginal,
+		IRegularExprParserPtr ipParser );
 
 	// returns true if 1/2 of the words in the vector have first letter capitalized
 	bool isTitleCase( vector<string> &vecWords );
@@ -112,7 +115,8 @@ private:
 
 	// Takes a company or person value and removes common words and gives a
 	// score of 2 if anything is left in the string and 0 if not
-	bool isAllCommonWords( const string& strInput );
+	bool isAllCommonWords( const string& strInput,
+		IRegularExprParserPtr ipParser);
 	
 	// Returns the pattern for testing for common words
 	string &getCommonWordsPattern();
@@ -122,26 +126,30 @@ private:
 
 	// Adds line to end of ENDSLog.dat file in the directory the AFDataScorers.dll is in
 	// the format of the lines is: <nScore>|<strItemScored>
-	void logResults(long nScore, std::string strItemScored, bool bLineAfter = false);
+	void logResults(long nScore, string strItemScored, bool bLineAfter = false);
 	
 	// Obtains the Logging Enabled setting from the registry
 	long getLoggingEnabled();
 
 	// returns true if string contains both vowels and consonants
-	bool hasVowelsAndConsonants( const std::string& strItem );
+	bool hasVowelsAndConsonants( const string& strItem );
 
 	// returns true if there are only characters in strValidChars are in strItem
-	bool noInvalidChars( const std::string& strItem, const std::string& strValidChars );
+	bool noInvalidChars( const string& strItem, const string& strValidChars );
 
 	void loadInvalidPersonVector();
 
 	// Promise:	To return true if the vector vecWords contains any word in the
 	//			vector m_vecInvalidPersonWords and false other wise
-	bool containsInvalidPersonWords( const std::vector<std::string> &vecWords );
+	bool containsInvalidPersonWords( const vector<string> &vecWords );
 
 	// Promise: To return the number of times the regular expressing strRegExpToFind appears in strInput
 	// Note:	Performs a case insensitive search
-	long countOfRegExpInInput( const string &strRegExpToFind, const string &strInput );
+	long countOfRegExpInInput( const string &strRegExpToFind, const string &strInput,
+		IRegularExprParserPtr ipParser);
+
+	// Gets a new instance of the regex parser
+	IRegularExprParserPtr getParser();
 
 	void validateLicense();
 };

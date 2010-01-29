@@ -155,6 +155,6 @@ private:
 
 	// list of clues defined
 	IVariantVectorPtr m_ipClues;
-	// regular expression parse
-	IRegularExprParserPtr m_ipRegExParser;
+
+	IMiscUtilsPtr m_ipMiscUtils;
 };

@@ -25,11 +25,8 @@ CExtractLine::CExtractLine()
 {
 	try
 	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13040", ipMiscUtils != NULL );
-
-		m_ipRegExParser = ipMiscUtils->GetNewRegExpParserInstance("ExtractLine");
-		ASSERT_RESOURCE_ALLOCATION("ELI05426", m_ipRegExParser!=NULL);
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI13040", m_ipMiscUtils != NULL );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05427")
 }
@@ -38,6 +35,7 @@ CExtractLine::~CExtractLine()
 {
 	try
 	{
+		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16343");
 }
@@ -91,10 +89,10 @@ STDMETHODIMP CExtractLine::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 
 		// divide input string into individual lines including 
 		// the line break at the end of each line
-		m_ipRegExParser->Pattern = "[\\s\\S]*?(\\r\\n|\\n|\\r|(?=\\r*$))";
+		IRegularExprParserPtr ipParser = getParser("[\\s\\S]*?(\\r\\n|\\n|\\r|(?=\\r*$))");
 
 		// all lines are stored separated in the vector
-		IIUnknownVectorPtr ipLines = m_ipRegExParser->Find( _bstrText, VARIANT_FALSE, VARIANT_FALSE );
+		IIUnknownVectorPtr ipLines = ipParser->Find( _bstrText, VARIANT_FALSE, VARIANT_FALSE );
 		long nNumOfLines = ipLines->Size();
 
 		long nStart, nEnd;
@@ -555,15 +553,16 @@ void CExtractLine::parseLineNumbers(const string& strLineNumbers)
 	}
 
 	// pattern for any invalid character sets
-	m_ipRegExParser->Pattern 
-		= _bstr_t("((^|\\D)-\\d+)"		// any negative numbers
+	IRegularExprParserPtr ipParser = getParser(
+				   "((^|\\D)-\\d+)"		// any negative numbers
 				  "|(\\d+(,|-)(?=\\r*$))"		// any digits followed by , or -
 				  "|(^|,|-)(,|-)"		// consecutive - or ,
 				  "|(-\\d+-)"			// any digits with - on both sides
 				  "|[^0-9,-]"			// any non-digit characters excluding , and -
 				  "|\\b0");				// any word starts with 0
+
 	IIUnknownVectorPtr ipNonDigitChars = 
-		m_ipRegExParser->Find(_bstr_t(strLineNumbers.c_str()), VARIANT_FALSE, VARIANT_FALSE);
+		ipParser->Find(_bstr_t(strLineNumbers.c_str()), VARIANT_FALSE, VARIANT_FALSE);
 	if (ipNonDigitChars != NULL && ipNonDigitChars->Size() > 0)
 	{
 		UCLIDException ue("ELI05834", "Invalid line numbers are defined.");
@@ -572,10 +571,10 @@ void CExtractLine::parseLineNumbers(const string& strLineNumbers)
 	}
 
 	m_vecLineNumbers.clear();
-	m_ipRegExParser->Pattern = "(\\d+)(\\s?-\\s?(\\d+))?";
+	ipParser->Pattern = "(\\d+)(\\s?-\\s?(\\d+))?";
 	// get top matches, which might be some numbers and some number ranges
 	IIUnknownVectorPtr ipTopMatches = 
-		m_ipRegExParser->Find(_bstr_t(strLineNumbers.c_str()), VARIANT_FALSE, VARIANT_TRUE);
+		ipParser->Find(_bstr_t(strLineNumbers.c_str()), VARIANT_FALSE, VARIANT_TRUE);
 	if (ipTopMatches != NULL)
 	{
 		// look at each top match's sub matches
@@ -638,6 +637,21 @@ void CExtractLine::parseLineNumbers(const string& strLineNumbers)
 			}
 		}
 	}
+}
+//-------------------------------------------------------------------------------------------------
+IRegularExprParserPtr CExtractLine::getParser(const string& strPattern)
+{
+	try
+	{
+		// Get the parser and set the pattern
+		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("BoxFinder");
+		ASSERT_RESOURCE_ALLOCATION("ELI22433", ipParser);
+
+		ipParser->Pattern = strPattern.c_str();
+
+		return ipParser;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29474");
 }
 //-------------------------------------------------------------------------------------------------
 void CExtractLine::validateLicense()

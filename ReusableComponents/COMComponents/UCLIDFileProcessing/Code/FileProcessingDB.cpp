@@ -105,7 +105,6 @@ m_bUpdateQueueEventTable(true),
 m_bUpdateFASTTable(true),
 m_bAutoDeleteFileActionComment(false),
 m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
-m_ipParser(NULL),
 m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
 m_nUPIID(0)
 {
@@ -118,6 +117,9 @@ m_nUPIID(0)
 			// Load the license files
 			LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		}
+
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI29457", m_ipMiscUtils != NULL);
 
 		// set the Unique Process Identifier string to be used to in locking the database
 		m_strUPI = UPI::getCurrentProcessUPI().getUPI();
@@ -143,9 +145,6 @@ CFileProcessingDB::~CFileProcessingDB()
 	{
 		// Clean up the map of connections
 		m_mapThreadIDtoDBConnections.clear();
-
-		// Ensure the parser is released
-		m_ipParser = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14981");
 }
@@ -154,8 +153,6 @@ void CFileProcessingDB::FinalRelease()
 {
 	try
 	{
-		// Ensure the parser is released
-		m_ipParser = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27324");
 }

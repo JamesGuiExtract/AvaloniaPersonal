@@ -21,6 +21,7 @@ class ATL_NO_VTABLE CPersonNameSplitter :
 {
 public:
 	CPersonNameSplitter();
+	~CPersonNameSplitter();
 
 DECLARE_REGISTRY_RESOURCEID(IDR_PERSONNAMESPLITTER)
 
@@ -77,9 +78,10 @@ private:
 	// Provides collections of person and company keywords
 	IEntityKeywordsPtr	m_ipKeys;
 
-	// Regular expression parser used for calls to spatial string methods that
-	// require a parser
-	IRegularExprParserPtr m_ipRegExprParser;
+	IMiscUtilsPtr m_ipMisc;
+
+	// Gets a new instance of the regular expression parser
+	IRegularExprParserPtr getParser();
 
 	// ensure that this component is licensed
 	void validateLicense();

@@ -35,11 +35,8 @@ CReplaceStrings::CReplaceStrings()
 	{
 		ASSERT_RESOURCE_ALLOCATION("ELI06628", m_ipReplaceInfos != NULL);
 
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13085", ipMiscUtils != NULL );
-
-		m_ipRegExpr = ipMiscUtils->GetNewRegExpParserInstance("ReplaceStrings");
-		ASSERT_RESOURCE_ALLOCATION("ELI06627", m_ipRegExpr != NULL);
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI13085", m_ipMiscUtils != NULL );
 
 		m_cachedStringListLoader.m_obj == NULL;
 	}
@@ -50,6 +47,8 @@ CReplaceStrings::~CReplaceStrings()
 {
 	try
 	{
+		m_ipMiscUtils = NULL;
+		m_ipReplaceInfos = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16364");
 }
@@ -860,8 +859,14 @@ void CReplaceStrings::replaceValue(ISpatialStringPtr ipInputText, IIUnknownVecto
 		_bstr_t _bstrToBeReplace = ipKeyValuePair->StringKey;
 		_bstr_t _bstrReplacement = ipKeyValuePair->StringValue;
 
+		IRegularExprParserPtr ipParser = NULL;
+		if (m_bAsRegExpr)
+		{
+			ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("ReplaceStrings");
+			ASSERT_RESOURCE_ALLOCATION("ELI06627", ipParser != NULL);
+		}
 		ipInputText->Replace(_bstrToBeReplace, _bstrReplacement,
-			asVariantBool(m_bIsCaseSensitive), 0, m_bAsRegExpr ? m_ipRegExpr : NULL);
+			asVariantBool(m_bIsCaseSensitive), 0, ipParser);
 	}
 
 	// mark progress status as complete if it exists

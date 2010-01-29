@@ -2542,25 +2542,12 @@ void CFileProcessingDB::validateTagName(const string& strTagName)
 {
 	try
 	{
-		// If the parser has not been created yet, create it
-		if (m_ipParser == NULL)
-		{
-			IMiscUtilsPtr ipMisc(CLSID_MiscUtils);
-			ASSERT_RESOURCE_ALLOCATION("ELI27381", ipMisc != NULL);
-
-			m_ipParser = ipMisc->GetNewRegExpParserInstance("");
-			ASSERT_RESOURCE_ALLOCATION("ELI27382", m_ipParser != NULL);
-
-			// Set the pattern
-			m_ipParser->Pattern = gstrTAG_REGULAR_EXPRESSION.c_str();
-		}
-
 		// Tag name is invalid if either:
 		// 1. Empty
 		// 2. Longer than 100 characters
 		// 3. Does not match the TAG_REGULAR_EXPRESSION
 		if (strTagName.empty() || strTagName.length() > 100
-			|| m_ipParser->StringMatchesPattern(strTagName.c_str()) == VARIANT_FALSE)
+			|| getParser()->StringMatchesPattern(strTagName.c_str()) == VARIANT_FALSE)
 		{
 			UCLIDException ue("ELI27383", "Invalid tag name!");
 			ue.addDebugInfo("Tag", strTagName);
@@ -2908,6 +2895,21 @@ void CFileProcessingDB::validateNewActionName(const string& strActionName)
 		ue.addDebugInfo( "Valid Pattern", "[_a-zA-Z][_a-zA-Z0-9]*" );
 		throw ue;
 	}
+}
+//--------------------------------------------------------------------------------------------------
+IRegularExprParserPtr CFileProcessingDB::getParser()
+{
+	try
+	{
+		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("");
+		ASSERT_RESOURCE_ALLOCATION("ELI27382", ipParser != NULL);
+
+		// Set the pattern
+		ipParser->Pattern = gstrTAG_REGULAR_EXPRESSION.c_str();
+
+		return ipParser;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29458");
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::emailMessage(const string & strMessage)

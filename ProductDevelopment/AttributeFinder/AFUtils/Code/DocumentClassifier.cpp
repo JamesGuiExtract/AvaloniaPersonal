@@ -25,8 +25,7 @@ const unsigned long gnCurrentVersion = 1;
 CDocumentClassifier::CDocumentClassifier()
 : m_bDirty(false),
   m_strIndustryCategoryName(""),
-  m_ipAFUtility(NULL),
-  m_ipRegExpr(NULL)
+  m_ipAFUtility(NULL)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -36,7 +35,6 @@ CDocumentClassifier::~CDocumentClassifier()
 	{
 		// Ensure COM objects are released
 		m_ipAFUtility = NULL;
-		m_ipRegExpr = NULL;
 
 		// Clear the maps
 		m_mapNameToVecDocTypes.clear();
@@ -56,7 +54,6 @@ void CDocumentClassifier::FinalRelease()
 	{
 		// Ensure COM objects are released
 		m_ipAFUtility = NULL;
-		m_ipRegExpr = NULL;
 
 		// Clear the maps
 		m_mapNameToVecDocTypes.clear();
@@ -738,15 +735,6 @@ void CDocumentClassifier::loadDocTypeFiles(const string& strSpecificIndustryName
 		ASSERT_RESOURCE_ALLOCATION("ELI07125", m_ipAFUtility != NULL);
 	}
 	
-	if (m_ipRegExpr == NULL)
-	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13084", ipMiscUtils != NULL );
-
-		m_ipRegExpr = ipMiscUtils->GetNewRegExpParserInstance("DocumentClassifier");
-		ASSERT_RESOURCE_ALLOCATION("ELI07426", m_ipRegExpr != NULL);
-	}
-
 	// look for the industry name entry
 	map<string, vector<DocTypeInterpreter> >::iterator itMap 
 		= m_mapNameToVecInterpreters.find(strSpecificIndustryName);
@@ -816,7 +804,8 @@ void CDocumentClassifier::loadDocTypeFiles(const string& strSpecificIndustryName
 			get_bstr_t(strDefaultFile) );
 		
 		// load the document type file into interpreter
-		DocTypeInterpreter docTypeInterpreter(m_ipRegExpr);
+		DocTypeInterpreter docTypeInterpreter;
+
 		// store current doc type name
 		docTypeInterpreter.m_strDocTypeName = vecDocTypeNames[ui];
 		docTypeInterpreter.loadDocTypeFile(strDocTypeFileName, true);

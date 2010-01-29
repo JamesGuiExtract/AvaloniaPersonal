@@ -7,6 +7,8 @@
 
 #include <string>
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CRegExprInputValidator
 class ATL_NO_VTABLE CRegExprInputValidator : 
@@ -25,6 +27,7 @@ class ATL_NO_VTABLE CRegExprInputValidator :
 {
 public:
 	CRegExprInputValidator();
+	~CRegExprInputValidator();
 
 DECLARE_REGISTRY_RESOURCEID(IDR_REGEXPRINPUTVALIDATOR)
 
@@ -108,16 +111,22 @@ private:
 	//----------------------------------------------------------------------------------------------
 	UCLID_REGEXPRIVLib::IRegExprInputValidatorPtr getThisAsCOMPtr();
 	//----------------------------------------------------------------------------------------------
+	// Gets a regular expression parser with the specified pattern and case sensitivity settings
+	IRegularExprParserPtr getParser();
+	//----------------------------------------------------------------------------------------------
 
 	void validateLicense();
 
-	// Variables
-	IRegularExprParserPtr m_ipRegExprParser;
+	string m_strInputTypeName;
 
-	std::string m_strInputTypeName;
+	string m_strPattern;
+
+	bool m_bIgnoreCase;
 
 	// Pointer to test result logger that stores and displays test results
 	ITestResultLoggerPtr		m_ipLogger;
+
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	// flag to keep track of whether this object has changed
 	// since the last save-to-stream operation

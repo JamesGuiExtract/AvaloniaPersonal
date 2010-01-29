@@ -42,16 +42,17 @@ const long gnMAXIMUM_DIMENSION_UPPER_LIMIT	= 100;
 CBoxFinder::CBoxFinder() :
 	m_bDirty(false)
 {
-	resetDataMembers();
+	try
+	{
+		resetDataMembers();
 
-	m_ipClues.CreateInstance(CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI19742", m_ipClues != NULL);
+		m_ipClues.CreateInstance(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI19742", m_ipClues != NULL);
 
-	IMiscUtilsPtr ipMisc(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI22432", ipMisc != NULL);
-
-	m_ipRegExprParser = ipMisc->GetNewRegExpParserInstance("BoxFinder");
-	ASSERT_RESOURCE_ALLOCATION("ELI22433", m_ipRegExprParser);
+		m_ipMisc.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI22432", m_ipMisc != NULL);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29473");
 }
 //-------------------------------------------------------------------------------------------------
 CBoxFinder::~CBoxFinder()
@@ -61,6 +62,7 @@ CBoxFinder::~CBoxFinder()
 		m_ipClues = NULL;
 		m_ipImageLineUtility = NULL;
 		m_ipSpatialStringSearcher = NULL;
+		m_ipMisc = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19219");
 }
@@ -738,6 +740,10 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI19223", ipAttributes != NULL );
 
+		// Get a regular expression parser
+		IRegularExprParserPtr ipParser = m_ipMisc->GetNewRegExpParserInstance("BoxFinder");
+		ASSERT_RESOURCE_ALLOCATION("ELI22433", ipParser != NULL);
+
 		// Populate a vector of ints that indicates which pages
 		// to process
 		const vector<int> &vecPages = getPagesToSearch(ipDocText);
@@ -752,7 +758,8 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 			// Search for any clues that exist on this page
 			bool bPageContainsText;
 			IIUnknownVectorPtr ipFoundClues = getCluesOnPage(ipExpandedClues, ipDocText, 
-															 nPageNum, bPageContainsText);
+															 nPageNum, bPageContainsText,
+															 ipParser);
 
 			// [P16:3005] If the page contains no text, we won't be able to obtain the PageInfo
 			// to search for lines.  Ignore this page.
@@ -886,7 +893,7 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 					else if (m_eFindType == kText)
 					{
 						// Create the resulting attribute
-						ipResult = createTextResult(ipAFDoc, ipDataBox, ipFoundClue);
+						ipResult = createTextResult(ipAFDoc, ipDataBox, ipFoundClue, ipParser);
 					}
 					else
 					{
@@ -1400,7 +1407,8 @@ IAttributePtr CBoxFinder::createAttributeFromRects(IIUnknownVectorPtr ipRects,
 }
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CBoxFinder::getCluesOnPage(IVariantVectorPtr ipClues, ISpatialStringPtr ipDocText, 
-											  int nPageNum, bool &rbPageContainsText)
+											  int nPageNum, bool &rbPageContainsText,
+											  IRegularExprParserPtr ipParser)
 {
 	ASSERT_ARGUMENT("ELI20221", ipClues);
 	ASSERT_ARGUMENT("ELI19833", ipDocText != NULL);
@@ -1433,7 +1441,7 @@ IIUnknownVectorPtr CBoxFinder::getCluesOnPage(IVariantVectorPtr ipClues, ISpatia
 				// Search for clue as regular expression
 				ipPage->FindFirstItemInRegExpVector(ipClues, 
 					asVariantBool(m_bCluesAreCaseSensitive), asVariantBool(m_bFirstBoxOnly), 
-					nStart + 1, m_ipRegExprParser, &nStart, &nEnd);
+					nStart + 1, ipParser, &nStart, &nEnd);
 			}
 			else
 			{
@@ -1886,7 +1894,7 @@ IAttributePtr CBoxFinder::createRegionResult(ISpatialStringPtr ipDocText, int nP
 }
 //-------------------------------------------------------------------------------------------------
 IAttributePtr CBoxFinder::createTextResult(IAFDocumentPtr ipAFDoc, ILongRectanglePtr ipBox, 
-										   ISpatialStringPtr ipClue)
+										   ISpatialStringPtr ipClue, IRegularExprParserPtr ipParser)
 {
 	ASSERT_ARGUMENT("ELI20237", ipAFDoc != NULL);
 	ASSERT_ARGUMENT("ELI20226", ipBox != NULL);
@@ -1936,7 +1944,7 @@ IAttributePtr CBoxFinder::createTextResult(IAFDocumentPtr ipAFDoc, ILongRectangl
 			// Search for clue as regular expression
 			ipText->FindFirstItemInRegExpVector(ipExpandedClues, 
 				asVariantBool(m_bCluesAreCaseSensitive), 
-				asVariantBool(m_bFirstBoxOnly), nStart + 1, m_ipRegExprParser, &nStart, &nEnd);
+				asVariantBool(m_bFirstBoxOnly), nStart + 1, ipParser, &nStart, &nEnd);
 		}
 		else
 		{

@@ -23,7 +23,8 @@ private:
 
 	//=============================================================================
 	// Finds and adds the NomineeFor SubAttribute for MERS 
-	void findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc );
+	void findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
+		IRegularExprParserPtr ipParser);
 
 	//=============================================================================
 	// Extracts entity out from input text, return NULL if no entity is found
@@ -41,7 +42,8 @@ private:
 	//=============================================================================
 	// If certain MERS keywords exist in the input
 	// If found, return the start and end positions for the keyword
-	bool findMERSKeyword(const std::string& strInput, int& nStartPos, int& nEndPos);
+	bool findMERSKeyword(const std::string& strInput, int& nStartPos, int& nEndPos,
+		IRegularExprParserPtr ipParser);
 
 	//=============================================================================
 	// Look for the first word (i.e. ignore any leading non-alpha chars if any). And
@@ -73,15 +75,19 @@ private:
 	// Sets predefined expressions for String Pattern Matcher
 	void setPredefinedExpressions();
 
+	//=============================================================================
+	IRegularExprParserPtr getMERSParser();
+
 	/////////////
 	// Variables
 	/////////////
 	UCLID_AFUTILSLib::IEntityFinderPtr m_ipEntityFinder;
 	IStringPatternMatcherPtr m_ipSPM;
 	IStrToStrMapPtr m_ipExprDefined;
-	IRegularExprParserPtr m_ipRegExpr;
 
 	IDataScorerPtr	m_ipDataScorer;
+
+	IMiscUtilsPtr m_ipMiscUtils;
 
 
 };

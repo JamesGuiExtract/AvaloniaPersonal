@@ -22,14 +22,22 @@ const unsigned long gnCurrentVersion = 2;
 CStringTokenizerSplitter::CStringTokenizerSplitter()
 : m_bDirty(false)
 {
-	// reset variables
-	resetVariablesToDefault();
+	try
+	{
+		// reset variables
+		resetVariablesToDefault();
+
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI29469", m_ipMiscUtils != NULL);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29470");
 }
 //-------------------------------------------------------------------------------------------------
 CStringTokenizerSplitter::~CStringTokenizerSplitter()
 {
 	try
 	{
+		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16329");
 }
@@ -344,6 +352,10 @@ STDMETHODIMP CStringTokenizerSplitter::raw_SplitAttribute(IAttribute *pAttribute
 		{
 			// create each of the specified sub-attributes
 			long nNumSubAttributes = m_ipVecNameValuePair->Size();
+
+			// Get a regex parser with the pattern we'll be using this object to search for
+			IRegularExprParserPtr ipParser = getRegExParser("%\\d+");
+
 			for (int i = 0; i < nNumSubAttributes; i++)
 			{
 				IStringPairPtr ipStringPair = m_ipVecNameValuePair->At(i);
@@ -351,16 +363,12 @@ STDMETHODIMP CStringTokenizerSplitter::raw_SplitAttribute(IAttribute *pAttribute
 
 				// get the value expression string and replace %1 with the first
 				// token, %2 with second token, etc.
-				string strValue = ipStringPair->StringValue;
-
-				// initialize the regex parser object with the
-				// pattern that we'll be using this object to search for
-				getRegExParser()->Pattern = "%\\d+";
+				string strValue = asString(ipStringPair->StringValue);
 
 				// find all instances of % followed by a number in the value
 				// expression string
 				IIUnknownVectorPtr ipVecTokens;
-				ipVecTokens = getRegExParser()->Find(ipStringPair->StringValue, VARIANT_FALSE, 
+				ipVecTokens = ipParser->Find(strValue.c_str(), VARIANT_FALSE, 
 					VARIANT_FALSE);
 				ASSERT_RESOURCE_ALLOCATION("ELI05400", ipVecTokens != NULL);
 
@@ -799,11 +807,10 @@ void CStringTokenizerSplitter::validateSubAttributeValueExpression(const string&
 
 	// initialize the regex parser object with the
 	// pattern for invalid %something expressions
-	getRegExParser()->Pattern = strInvalidExpr.c_str();
+	IRegularExprParserPtr ipParser = getRegExParser(strInvalidExpr);
 
 	// check if any invalid %something expression exists
-	if (getRegExParser()->StringContainsPattern(strExpr.c_str()) ==
-		VARIANT_TRUE)
+	if (ipParser->StringContainsPattern(strExpr.c_str()) == VARIANT_TRUE)
 	{
 		UCLIDException ue("ELI05788", "Invalid token expression.\r\n"
 			"\r\n"
@@ -871,19 +878,18 @@ void CStringTokenizerSplitter::resetVariablesToDefault()
 	m_ipVecNameValuePair = NULL;
 }
 //-------------------------------------------------------------------------------------------------
-IRegularExprParserPtr CStringTokenizerSplitter::getRegExParser()
+IRegularExprParserPtr CStringTokenizerSplitter::getRegExParser(const string& strPattern)
 {
-	// if the regular expresion parser object has not yet been created, create it
-	if (m_ipRegExParser == NULL)
+	try
 	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI12960", ipMiscUtils != NULL );
+		IRegularExprParserPtr ipParser =
+			m_ipMiscUtils->GetNewRegExpParserInstance("StringTokenizerSplitter");
+		ASSERT_RESOURCE_ALLOCATION("ELI05399", ipParser != NULL);
 
-		// create the parser object
-		m_ipRegExParser = ipMiscUtils->GetNewRegExpParserInstance("StringTokenizerSplitter");
-		ASSERT_RESOURCE_ALLOCATION("ELI05399", m_ipRegExParser != NULL);
+		ipParser->Pattern = strPattern.c_str();
+
+		return ipParser;
 	}
-
-	return m_ipRegExParser;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29468");
 }
 //-------------------------------------------------------------------------------------------------

@@ -8,6 +8,8 @@
 #include <vector>
 #include <string>
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CExtractLine
 class ATL_NO_VTABLE CExtractLine : 
@@ -99,17 +101,21 @@ private:
 	bool m_bEachLineAsUniqueValue;
 	bool m_bIncludeLineBreak;
 	// this string needs to be parsed into individual line numbers
-	std::string m_strLineNumbers;
+	string m_strLineNumbers;
 
 	// vector for line numbers
-	std::vector<long> m_vecLineNumbers;
-	IRegularExprParserPtr m_ipRegExParser;
+	vector<long> m_vecLineNumbers;
+
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	///////////
 	// Methods
 	///////////
+	// Gets a new regular expression parser with the specified pattern
+	IRegularExprParserPtr getParser(const string& strPattern);
+
 	// parse the m_strLineNumber into individual line numbers
 	// and store them in the m_vecLineNumbers
-	void parseLineNumbers(const std::string& strLineNumbers);
+	void parseLineNumbers(const string& strLineNumbers);
 	void validateLicense();
 };

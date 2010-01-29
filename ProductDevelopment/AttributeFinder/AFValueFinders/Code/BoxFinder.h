@@ -131,11 +131,9 @@ private:
 	// Variables
 	/////////////////
 
-	// Regular expression parser used for calls to spatial string methods that
-	// require a parser
-	IRegularExprParserPtr m_ipRegExprParser;
-
 	bool m_bDirty;
+
+	IMiscUtilsPtr m_ipMisc;
 
 	// Clue list (vector of BSTRs)
 	IVariantVectorPtr m_ipClues;
@@ -220,7 +218,7 @@ private:
 	//			ipBox- A rectangle representing the box that was found
 	//			ipClue- The found instance of a clue that was used to find the box
 	IAttributePtr createTextResult(IAFDocumentPtr ipAFDoc, ILongRectanglePtr ipBox, 
-		ISpatialStringPtr ipClue);
+		ISpatialStringPtr ipClue, IRegularExprParserPtr ipParser);
 	
 	// PROMISE: Finds any clues on the specified page of the document text provided
 	//			using the provided clue list
@@ -230,7 +228,7 @@ private:
 	//			rbPageContainsText- Set to true by getCluesOnPage if the specified
 	//				page contained text, false if it did not.
 	IIUnknownVectorPtr getCluesOnPage(IVariantVectorPtr ipClues, ISpatialStringPtr ipDocText, 
-		int nPageNum, bool &rbPageContainsText);
+		int nPageNum, bool &rbPageContainsText, IRegularExprParserPtr ipParser);
 
 	// PROMISE: Returns a rectangle representing the string's bounds relative to the native
 	//			document (rather than relative to the page text's page info)

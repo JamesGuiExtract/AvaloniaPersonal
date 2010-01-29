@@ -31,6 +31,7 @@ static const string gstrDEFAULT_FILENAME = "<SourceDocName>";
 CFileNamePattern::CFileNamePattern()
 :m_bDirty(false),
 m_strFileName(gstrDEFAULT_FILENAME),
+m_ipMiscUtils(NULL),
 m_bDoesDoesNot(true),
 m_bContainMatch(true),
 m_bCaseSensitive(false),
@@ -38,21 +39,15 @@ m_bIsRegExpFromFile(false)
 {
 	try
 	{
-		// create the regular expression parser object
-		m_ipRegExParser = getMiscUtils()->GetNewRegExpParserInstance("FileNamePattern");
-
-		if (m_ipRegExParser == NULL)
-		{
-			throw UCLIDException("ELI13647", "Unable to create regular expression parser object!");
-		}
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13648")
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI13648")
 }
 //--------------------------------------------------------------------------------------------------
 CFileNamePattern::~CFileNamePattern()
 {
 	try
 	{
+		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16561");
 }
@@ -609,11 +604,9 @@ STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileP
 		// String contain the regular expression
 		string strRegExp = "";
 
-		// if the parser engine is not successfully been created, return
-		if (m_ipRegExParser == NULL)
-		{
-			throw UCLIDException("ELI13670", "Regular expression parser not available!");
-		}
+		// Get a regex parser
+		IRegularExprParserPtr ipParser = getMiscUtils()->GetNewRegExpParserInstance("FileNamePattern");
+		ASSERT_RESOURCE_ALLOCATION("ELI13647", ipParser != NULL);
 
 		// Get the FAMTagManager smart Pointer
 		IFAMTagManagerPtr ipTag = IFAMTagManagerPtr(pFAMTM);
@@ -627,7 +620,7 @@ STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileP
 
 			// Get regular expression from file
 			strRegExp = getRegExpFromFile(strRegExprFile, true, gstrAF_AUTO_ENCRYPT_KEY_PATH);
-			m_ipRegExParser->Pattern = _bstr_t(strRegExp.c_str());
+			ipParser->Pattern = strRegExp.c_str();
 		}
 		else
 		{
@@ -651,7 +644,7 @@ STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileP
 
 			// Get regular expression from text
 			strRegExp = getRegExpFromText(m_strRegPattern, strRootFolder, true, gstrAF_AUTO_ENCRYPT_KEY_PATH);
-			m_ipRegExParser->Pattern = _bstr_t(strRegExp.c_str());
+			ipParser->Pattern = strRegExp.c_str();
 		}
 
 		// Call ExpandTagsAndTFE() to expand tags and utility functions
@@ -661,14 +654,14 @@ STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileP
 		*pRetVal = VARIANT_FALSE;
 
 		// Set whether the regular expression parser is case sensitive or not
-		m_ipRegExParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
+		ipParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
 
 		// There are four cases due to the combination of "does", "does not", "contain" and
 		// "exactly match", consider each of them separately.
 		if(m_bContainMatch)
 		{
 			// If current selection is "contain"
-			IIUnknownVectorPtr ipFound = m_ipRegExParser->Find(get_bstr_t(strFAMFile), 
+			IIUnknownVectorPtr ipFound = ipParser->Find(get_bstr_t(strFAMFile), 
 				VARIANT_TRUE, VARIANT_FALSE);
 			if(ipFound->Size() > 0 && m_bDoesDoesNot == true)
 			{
@@ -682,7 +675,7 @@ STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileP
 		else
 		{
 			// If current selection is "exactly match"
-			bool bFound = m_ipRegExParser->StringMatchesPattern(get_bstr_t(strFAMFile)) == VARIANT_TRUE;
+			bool bFound = ipParser->StringMatchesPattern(get_bstr_t(strFAMFile)) == VARIANT_TRUE;
 
 			if (m_bDoesDoesNot == true && bFound)
 			{
@@ -693,10 +686,10 @@ STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileP
 				*pRetVal = VARIANT_TRUE;
 			}
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13674");
-	
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------

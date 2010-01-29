@@ -13,7 +13,7 @@
 //-------------------------------------------------------------------------------------------------
 // private / helper methods
 //-------------------------------------------------------------------------------------------------
-bool CEntityNameSplitter::doTrustSplitting(ISpatialStringPtr ipGroup, IAFDocument *pAFDoc, 
+bool CEntityNameSplitter::doTrustSplitting(ISpatialStringPtr ipGroup, IAFDocumentPtr ipAFDoc, 
 										   IIUnknownVectorPtr ipMainAttrSub)
 {
 	// Find delimiters between potential Entities
@@ -134,7 +134,7 @@ bool CEntityNameSplitter::doTrustSplitting(ISpatialStringPtr ipGroup, IAFDocumen
 				ipTrusteeAttr->Type = "Trustee";
 
 				// Split the Person Trustee
-				ipPersonSplitter->SplitAttribute( ipTrusteeAttr, pAFDoc, NULL );
+				ipPersonSplitter->SplitAttribute( ipTrusteeAttr, ipAFDoc, NULL );
 			}
 
 			// Add Trustee to collection
@@ -3066,6 +3066,20 @@ void CEntityNameSplitter::trimTrailingWord(ISpatialStringPtr& ripEntity, string 
 
 	// Trim leading and trailing space, dash, comma
 	ripEntity->Trim( _bstr_t( " -,." ), _bstr_t( " -," ) );
+}
+//-------------------------------------------------------------------------------------------------
+IRegularExprParserPtr CEntityNameSplitter::getParser()
+{
+	try
+	{
+		// Get a regular expression parser
+		IRegularExprParserPtr ipParser =
+			m_ipMiscUtils->GetNewRegExpParserInstance("EntityNameSplitter");
+		ASSERT_RESOURCE_ALLOCATION( "ELI22439", ipParser != NULL );
+
+		return ipParser;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29459");
 }
 //-------------------------------------------------------------------------------------------------
 void CEntityNameSplitter::validateLicense()

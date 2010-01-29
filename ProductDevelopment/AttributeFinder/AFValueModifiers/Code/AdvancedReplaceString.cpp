@@ -33,11 +33,8 @@ CAdvancedReplaceString::CAdvancedReplaceString()
 {
 	try
 	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13055", ipMiscUtils != NULL );
-
-		m_ipRegExpr = ipMiscUtils->GetNewRegExpParserInstance("AdvancedReplaceString");
-		ASSERT_RESOURCE_ALLOCATION("ELI06796", m_ipRegExpr != NULL);
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI13055", m_ipMiscUtils != NULL );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI06795")
 }
@@ -46,6 +43,7 @@ CAdvancedReplaceString::~CAdvancedReplaceString()
 {
 	try
 	{
+		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16353");
 }
@@ -660,9 +658,16 @@ void CAdvancedReplaceString::modifyValue(ISpatialString* pText, IAFDocument* pAF
 		throw ue;
 	}
 
+	IRegularExprParserPtr ipParser = NULL;
+	if (m_bAsRegularExpression)
+	{
+		ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("AdvancedReplaceString");
+		ASSERT_RESOURCE_ALLOCATION("ELI06796", ipParser != NULL);
+	}
+
 	// Replace specified occurrence(s) of the pattern string
 	ipInputText->Replace(strStringToBeReplaced.c_str(), strStringReplacement.c_str(), 
-		asVariantBool(m_bCaseSensitive), lOccurrence, m_bAsRegularExpression ? m_ipRegExpr : NULL);
+		asVariantBool(m_bCaseSensitive), lOccurrence, ipParser);
 }
 //-------------------------------------------------------------------------------------------------
 void CAdvancedReplaceString::getStringsFromFiles(IAFDocument* pAFDoc, std::string& strFind, std::string& strReplaced)

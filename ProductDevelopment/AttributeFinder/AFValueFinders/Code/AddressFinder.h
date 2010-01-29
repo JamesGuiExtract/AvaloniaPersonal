@@ -75,9 +75,8 @@ private:
 	std::string loadRegExp(std::string strFileName, IAFDocumentPtr ipAFDoc);
 	IIUnknownVectorPtr chooseAddressBlocks(IRegularExprParserPtr ipSuffixParser, IIUnknownVectorPtr ipBlocks);
 
-	IRegularExprParserPtr m_ipRegExpParser;
-
 	IAFUtilityPtr	m_ipAFUtility;
 	IMiscUtilsPtr	m_ipMiscUtils;
+	IRegularExprParserPtr m_ipRegExpParser;
 };
 

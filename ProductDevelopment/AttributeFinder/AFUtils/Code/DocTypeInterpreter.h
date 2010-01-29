@@ -19,7 +19,7 @@ class CommentedTextFileReader;
 class DocTypeInterpreter
 {
 public:
-	DocTypeInterpreter(IRegularExprParserPtr ipRegExpr);
+	DocTypeInterpreter();
 	DocTypeInterpreter(const DocTypeInterpreter& objToCopy);
 	DocTypeInterpreter& operator=(const DocTypeInterpreter& objToAssign);
 
@@ -85,8 +85,6 @@ private:
 
 	// vector of Block IDs associated with m_vecPatternHolders
 	vector<string> m_vecBlockIDs;
-
-	IRegularExprParserPtr m_ipRegExpr;
 
 	// Provides access to encryption functionality
 	IMiscUtilsPtr	m_ipUtils;

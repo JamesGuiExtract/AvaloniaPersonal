@@ -128,6 +128,9 @@ private:
 	void setPredefinedExpressions();
 
 	//=============================================================================
+	IRegularExprParserPtr getParser();
+
+	//=============================================================================
 	void validateLicense();
 
 	/////////////
@@ -136,7 +139,8 @@ private:
 	UCLID_AFUTILSLib::IEntityFinderPtr m_ipEntityFinder;
 	IStringPatternMatcherPtr m_ipSPM;
 	IStrToStrMapPtr m_ipExprDefined;
-	IRegularExprParserPtr m_ipRegExpr;
+
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	bool m_bDirty;
 };

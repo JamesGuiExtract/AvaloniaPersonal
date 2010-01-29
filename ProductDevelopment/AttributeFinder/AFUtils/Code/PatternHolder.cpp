@@ -10,7 +10,7 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // PatternHolder
 //-------------------------------------------------------------------------------------------------
-PatternHolder::PatternHolder(const IRegularExprParserPtr& ipRegExpr)
+PatternHolder::PatternHolder()
 : m_eConfidenceLevel(kZero),
   m_bIsAndRelationship(false),
   m_dStartingRange(0.0),
@@ -18,53 +18,77 @@ PatternHolder::PatternHolder(const IRegularExprParserPtr& ipRegExpr)
   m_bCaseSensitive(false),
   m_nStartPage(0),
   m_nEndPage(0),
-  m_ipRegExpr(ipRegExpr)
+  m_ipMisc(NULL)
 {
-	m_vecPatterns.clear();
+	try
+	{
+		m_vecPatterns.clear();
+
+		// Create the misc utils pointer
+		m_ipMisc.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI29444", m_ipMisc != NULL);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29445");
 }
 //-------------------------------------------------------------------------------------------------
 PatternHolder::PatternHolder(const PatternHolder& objToCopy)
+: m_ipMisc(NULL)
 {
-	m_eConfidenceLevel = objToCopy.m_eConfidenceLevel;
-	m_bIsAndRelationship = objToCopy.m_bIsAndRelationship;
-	m_vecPatterns = objToCopy.m_vecPatterns;
-	m_dStartingRange = objToCopy.m_dStartingRange;
-	m_dEndingRange = objToCopy.m_dEndingRange;
-	m_bCaseSensitive = objToCopy.m_bCaseSensitive;
-	m_nStartPage = objToCopy.m_nStartPage;
-	m_nEndPage = objToCopy.m_nEndPage;
-	m_ipRegExpr = objToCopy.m_ipRegExpr;
+	try
+	{
+		m_eConfidenceLevel = objToCopy.m_eConfidenceLevel;
+		m_bIsAndRelationship = objToCopy.m_bIsAndRelationship;
+		m_vecPatterns = objToCopy.m_vecPatterns;
+		m_dStartingRange = objToCopy.m_dStartingRange;
+		m_dEndingRange = objToCopy.m_dEndingRange;
+		m_bCaseSensitive = objToCopy.m_bCaseSensitive;
+		m_nStartPage = objToCopy.m_nStartPage;
+		m_nEndPage = objToCopy.m_nEndPage;
 
-	// NEW FORMAT items
-	m_strBlockID = objToCopy.m_strBlockID;
-	m_strSubType = objToCopy.m_strSubType;
+		// NEW FORMAT items
+		m_strBlockID = objToCopy.m_strBlockID;
+		m_strSubType = objToCopy.m_strSubType;
+
+		// Create the misc utils pointer
+		m_ipMisc.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI29446", m_ipMisc != NULL);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29447");
 }
 //-------------------------------------------------------------------------------------------------
 PatternHolder& PatternHolder::operator=(const PatternHolder& objToAssign)
 {
-	m_eConfidenceLevel = objToAssign.m_eConfidenceLevel;
-	m_bIsAndRelationship = objToAssign.m_bIsAndRelationship;
-	m_vecPatterns = objToAssign.m_vecPatterns;
-	m_dStartingRange = objToAssign.m_dStartingRange;
-	m_dEndingRange = objToAssign.m_dEndingRange;
-	m_bCaseSensitive = objToAssign.m_bCaseSensitive;
-	m_nStartPage = objToAssign.m_nStartPage;
-	m_nEndPage = objToAssign.m_nEndPage;
-	m_ipRegExpr = objToAssign.m_ipRegExpr;
+	try
+	{
+		m_eConfidenceLevel = objToAssign.m_eConfidenceLevel;
+		m_bIsAndRelationship = objToAssign.m_bIsAndRelationship;
+		m_vecPatterns = objToAssign.m_vecPatterns;
+		m_dStartingRange = objToAssign.m_dStartingRange;
+		m_dEndingRange = objToAssign.m_dEndingRange;
+		m_bCaseSensitive = objToAssign.m_bCaseSensitive;
+		m_nStartPage = objToAssign.m_nStartPage;
+		m_nEndPage = objToAssign.m_nEndPage;
 
-	// NEW FORMAT items
-	m_strBlockID = objToAssign.m_strBlockID;
-	m_strSubType = objToAssign.m_strSubType;
+		// NEW FORMAT items
+		m_strBlockID = objToAssign.m_strBlockID;
+		m_strSubType = objToAssign.m_strSubType;
 
-	return *this;
+		// Clear the misc utils pointer and create a new one
+		m_ipMisc = NULL;
+		m_ipMisc.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI29448", m_ipMisc != NULL);
+
+		return *this;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29449");
 }
 //-------------------------------------------------------------------------------------------------
 PatternHolder::~PatternHolder()
 {
 	try
 	{
-		// Ensure COM object is released
-		m_ipRegExpr = NULL;
+		// Release the COM pointers
+		m_ipMisc = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28218");
 }
@@ -76,7 +100,6 @@ bool PatternHolder::foundPatternsInText(const ISpatialStringPtr& ipInputText, Do
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION("ELI07425", m_ipRegExpr != NULL);
 		ASSERT_ARGUMENT("ELI07423", ipInputText != NULL);
 
 		// if there's no pattern defined, return false
@@ -95,7 +118,6 @@ bool PatternHolder::foundPatternsInText(const ISpatialStringPtr& ipInputText, Do
 			return false;
 		}
 
-		m_ipRegExpr->IgnoreCase = m_bCaseSensitive ? VARIANT_FALSE : VARIANT_TRUE;
 		int nInputSize = strInputText.size();
 		// start from where in the input text
 		int nStartPos = (int)(m_dStartingRange * nInputSize);
@@ -109,6 +131,9 @@ bool PatternHolder::foundPatternsInText(const ISpatialStringPtr& ipInputText, Do
 			ue.addDebugInfo("Ending Range", m_dEndingRange);
 			throw ue;
 		}
+
+		// Get the parser
+		IRegularExprParserPtr ipParser = getParser();
 
 		// truncate the input string according to the range
 		string strInputWithinRange = strInputText.substr(nStartPos, nEndPos-nStartPos + 1);
@@ -136,26 +161,17 @@ bool PatternHolder::foundPatternsInText(const ISpatialStringPtr& ipInputText, Do
 				strPattern = strIDPlusPattern.substr( ulPos + 1, ulLength - ulPos - 1 );
 			}
 
-			// Provide pattern to parser
-			m_ipRegExpr->Pattern = strPattern.c_str();
+			ipParser->Pattern = strPattern.c_str();
 
 			// whether or not this pattern is found in the input text
-			//bool bFound = false;
-			bool bFound = asCppBool(m_ipRegExpr->StringContainsPattern(strInputWithinRange.c_str()));
-
-			if (bFound && !m_bIsAndRelationship)
+			bool bFound = asCppBool(ipParser->StringContainsPattern(strInputWithinRange.c_str()));
+			if (bFound != m_bIsAndRelationship)
 			{
-				// if it's OR relationship, once a pattern is found
-				// save rule ID and return true immediately
+				// If found and OR relationship ||
+				// !found and AND relationship
+				// save the rule ID and return bFound immediately
 				m_strRuleID = strRuleID;
-				return true;
-			}
-			else if (!bFound && m_bIsAndRelationship)
-			{
-				// if it's AND relationship, once a pattern can't be found
-				// save rule ID and return false immediately
-				m_strRuleID = strRuleID;
-				return false;
+				return bFound;
 			}
 		}
 
@@ -222,5 +238,23 @@ std::string PatternHolder::getInputText(const ISpatialStringPtr& ipInputText, Do
 	// add the page range to the cache
 	cache.add(m_nStartPage, m_nEndPage, strInputText);
 	return strInputText;
+}
+//-------------------------------------------------------------------------------------------------
+IRegularExprParserPtr PatternHolder::getParser()
+{
+	try
+	{
+		// Create a new parser (this object is held inside the document classifier so get
+		// the parser for the classifier)
+		IRegularExprParserPtr ipParser = m_ipMisc->GetNewRegExpParserInstance("DocumentClassifier");
+		ASSERT_RESOURCE_ALLOCATION("ELI29452", ipParser != NULL);
+
+		// Set the case sensitivity flag
+		ipParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
+
+		// Return the new parser
+		return ipParser;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29450");
 }
 //-------------------------------------------------------------------------------------------------

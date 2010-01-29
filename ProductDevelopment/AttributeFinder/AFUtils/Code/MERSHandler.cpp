@@ -38,15 +38,25 @@ CMERSHandler::CMERSHandler()
 : m_ipEntityFinder(NULL),
   m_ipSPM(NULL),
   m_ipExprDefined(NULL),
-  m_ipRegExpr(NULL),
   m_bDirty(false)
 {
+	try
+	{
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI29454", m_ipMiscUtils != NULL);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29455");
 }
 //-------------------------------------------------------------------------------------------------
 CMERSHandler::~CMERSHandler()
 {
 	try
 	{
+		// Release COM pointers
+		m_ipMiscUtils = NULL;
+		m_ipEntityFinder = NULL;
+		m_ipSPM = NULL;
+		m_ipExprDefined = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16333");
 }
@@ -494,22 +504,9 @@ bool CMERSHandler::findMERSKeyword(const string& strInput, int& nStartPos, int& 
 {
 	bool bFoundMatch = false;
 
-	// if "MORTGAGE ELECTRONIC REGISTRATION SYSTEMS" is found..
-	string strPattern;
-	// if the pattern is found, that means the MERS is in the strInput
-	if (m_ipRegExpr == NULL)
-	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13039", ipMiscUtils != NULL );
-
-		m_ipRegExpr = ipMiscUtils->GetNewRegExpParserInstance("MERSHandler");
-		ASSERT_RESOURCE_ALLOCATION("ELI09488", m_ipRegExpr != NULL);
-
-		m_ipRegExpr->Pattern = "(Mortgage\\s+Electronic\\s+Registration\\s+System(s)?"
-			"|\\bMERS\\b|Mortgage[\\s\\S]+?Registration\\s+System(s)?)([\\s\\S]{1,3}Inc(\\s*\\.)?)?";
-	}
-
-	IIUnknownVectorPtr ipFoundMatch = m_ipRegExpr->Find(_bstr_t(strInput.c_str()), VARIANT_TRUE,
+	// Get the parser and search for matches
+	IRegularExprParserPtr ipParser = getParser();
+	IIUnknownVectorPtr ipFoundMatch = ipParser->Find(_bstr_t(strInput.c_str()), VARIANT_TRUE,
 		VARIANT_FALSE);
 
 	if (ipFoundMatch->Size() > 0)
@@ -737,6 +734,21 @@ void CMERSHandler::setPredefinedExpressions()
 		m_ipExprDefined->Set(_bstr_t("BorrowerIs"), _bstr_t(BORROWER_IS.c_str()));
 		m_ipExprDefined->Set(_bstr_t("LenderIs"), _bstr_t(LENDER_IS.c_str()));
 	}
+}
+//-------------------------------------------------------------------------------------------------
+IRegularExprParserPtr CMERSHandler::getParser()
+{
+	try
+	{
+		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("MERSHandler");
+		ASSERT_RESOURCE_ALLOCATION("ELI09488", ipParser != NULL);
+
+		ipParser->Pattern = "(Mortgage\\s+Electronic\\s+Registration\\s+System(s)?"
+			"|\\bMERS\\b|Mortgage[\\s\\S]+?Registration\\s+System(s)?)([\\s\\S]{1,3}Inc(\\s*\\.)?)?";
+
+		return ipParser;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29456");
 }
 //-------------------------------------------------------------------------------------------------
 void CMERSHandler::validateLicense()

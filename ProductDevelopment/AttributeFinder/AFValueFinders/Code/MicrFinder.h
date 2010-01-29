@@ -173,7 +173,7 @@ private:
 	// searching for MICR
 	map<int, bool> m_mapRotations;
 
-	IRegularExprParserPtr m_ipParser;
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	//----------------------------------------------------------------------------------------------
 	// Methods

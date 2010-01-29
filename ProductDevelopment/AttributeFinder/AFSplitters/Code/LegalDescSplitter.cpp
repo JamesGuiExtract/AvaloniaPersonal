@@ -36,18 +36,22 @@ CLegalDescSplitter::CLegalDescSplitter()
 : m_bDirty(false),
 m_ipAFUtility(NULL),
 m_ipMiscUtils(NULL),
+m_ipRegExParser(NULL),
 m_ipLegalTypeToRuleSetMap(NULL)
 
 {
+}
+//-------------------------------------------------------------------------------------------------
+CLegalDescSplitter::~CLegalDescSplitter()
+{
 	try
 	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13030", ipMiscUtils != NULL );
-
-		m_ipRegExParser = ipMiscUtils->GetNewRegExpParserInstance("LegalDescSplitter");
-		ASSERT_RESOURCE_ALLOCATION("ELI07965", m_ipRegExParser != NULL);
+		m_ipMiscUtils = NULL;
+		m_ipRegExParser = NULL;
+		m_ipAFUtility = NULL;
+		m_ipLegalTypeToRuleSetMap = NULL;
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI07966")
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29462");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -179,42 +183,62 @@ STDMETHODIMP CLegalDescSplitter::GetClassID(CLSID *pClassID)
 STDMETHODIMP CLegalDescSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDocument *pAFDoc,
 													IProgressStatus *pProgressStatus)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		validateLicense();
+		try
+		{
+			validateLicense();
 
-		//Create local copies of  Attribute and subattribues
-		IAttributePtr ipMainAttribute( pAttribute );
-		ASSERT_RESOURCE_ALLOCATION("ELI08404", ipMainAttribute != NULL );
-		IIUnknownVectorPtr ipMainAttrSub = ipMainAttribute->SubAttributes;
-		ASSERT_RESOURCE_ALLOCATION("ELI08407", ipMainAttrSub != NULL );
+			//Create local copies of  Attribute and subattribues
+			IAttributePtr ipMainAttribute( pAttribute );
+			ASSERT_RESOURCE_ALLOCATION("ELI08404", ipMainAttribute != NULL );
+			IIUnknownVectorPtr ipMainAttrSub = ipMainAttribute->SubAttributes;
+			ASSERT_RESOURCE_ALLOCATION("ELI08407", ipMainAttrSub != NULL );
 
-		
-		ISpatialStringPtr ipValue = ipMainAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI10427", ipValue != NULL );
+			ISpatialStringPtr ipValue = ipMainAttribute->Value;
+			ASSERT_RESOURCE_ALLOCATION("ELI10427", ipValue != NULL );
 
-		// Fix up OCR errors for the keywords
-		ipValue->Replace("(\\b.ot(s)?\\b|\\bL.t(s)?\\b|\\bLo.(s)\\b)(?=.{1,30}\\d)", 
-			"LOT", VARIANT_FALSE, 0, m_ipRegExParser);
-		ipValue->Replace("(\\b.nit|\\bU.it|\\bUn.t|\\bUni.)(?=.{1,30}\\d)", 
-			"UNIT", VARIANT_FALSE, 0, m_ipRegExParser);
-		ipValue->Replace("(\\b.uilding|\\bB.ilding|\\bBu.lding|\\bBui.ding|\\bBuil.ing|\\bBuild.ng|\\bBuildi.g|\\bBuildin.)(?=.{1,30}\\d)",
-			"BUILDING", VARIANT_FALSE, 0, m_ipRegExParser);
-		ipValue->Replace("(\\b.utlot|\\bO.tlot|\\bOu[\\s\\S]{0,4}?ot|\\bOutl.t|\\bOutlo.)(?=.{1,30}\\d)", 
-			"OUTLOT", VARIANT_FALSE, 0, m_ipRegExParser);
-		ipValue->Replace("(\\b.lock\\b|\\bB.ock\\b|\\bBl.ck\\b|\\bBlo.k\\b|\\bBloc.\\b)(?=.{1,30}\\d)", 
-			"BLOCK", VARIANT_FALSE, 0, m_ipRegExParser);
-		ipValue->Replace("\\b1N\\b", "IN", VARIANT_FALSE, 0, m_ipRegExParser);
+			// Get a new regular expression parser
+			m_ipRegExParser = getParser();
 
-		// Remove Colons and Semicolons
-		ipValue->Replace("[;:]", "", VARIANT_FALSE, 0, m_ipRegExParser);
+			// Fix up OCR errors for the keywords
+			ipValue->Replace("(\\b.ot(s)?\\b|\\bL.t(s)?\\b|\\bLo.(s)\\b)(?=.{1,30}\\d)", 
+				"LOT", VARIANT_FALSE, 0, m_ipRegExParser);
+			ipValue->Replace("(\\b.nit|\\bU.it|\\bUn.t|\\bUni.)(?=.{1,30}\\d)", 
+				"UNIT", VARIANT_FALSE, 0, m_ipRegExParser);
+			ipValue->Replace("(\\b.uilding|\\bB.ilding|\\bBu.lding|\\bBui.ding|\\bBuil.ing|\\bBuild.ng|\\bBuildi.g|\\bBuildin.)(?=.{1,30}\\d)",
+				"BUILDING", VARIANT_FALSE, 0, m_ipRegExParser);
+			ipValue->Replace("(\\b.utlot|\\bO.tlot|\\bOu[\\s\\S]{0,4}?ot|\\bOutl.t|\\bOutlo.)(?=.{1,30}\\d)", 
+				"OUTLOT", VARIANT_FALSE, 0, m_ipRegExParser);
+			ipValue->Replace("(\\b.lock\\b|\\bB.ock\\b|\\bBl.ck\\b|\\bBlo.k\\b|\\bBloc.\\b)(?=.{1,30}\\d)", 
+				"BLOCK", VARIANT_FALSE, 0, m_ipRegExParser);
+			ipValue->Replace("\\b1N\\b", "IN", VARIANT_FALSE, 0, m_ipRegExParser);
 
-		processLegal ("any", ipMainAttribute->Value, ipMainAttrSub );
+			// Remove Colons and Semicolons
+			ipValue->Replace("[;:]", "", VARIANT_FALSE, 0, m_ipRegExParser);
+
+			processLegal ("any", ipMainAttribute->Value, ipMainAttrSub );
+
+			// Reset the regular expression parser
+			m_ipRegExParser = NULL;
+		}
+		catch(...)
+		{
+			try
+			{
+				// Ensure the regular expression parser is reset
+				m_ipRegExParser = NULL;
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29463");
+
+			throw;
+		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07962");
-
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1858,5 +1882,18 @@ void CLegalDescSplitter::separateFullAndPartial ( IIUnknownVectorPtr ipValueStri
 			ipFullValues->PushBack( ipCurrValue );
 		}
 	}
+}
+//-------------------------------------------------------------------------------------------------
+IRegularExprParserPtr CLegalDescSplitter::getParser()
+{
+	try
+	{
+		IRegularExprParserPtr ipParser =
+			getMiscUtils()->GetNewRegExpParserInstance("LegalDescSplitter");
+		ASSERT_RESOURCE_ALLOCATION("ELI07965", ipParser != NULL);
+
+		return ipParser;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29464");
 }
 //-------------------------------------------------------------------------------------------------

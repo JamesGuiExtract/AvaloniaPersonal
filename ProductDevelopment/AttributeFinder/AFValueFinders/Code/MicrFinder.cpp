@@ -453,26 +453,30 @@ RECT getOtherRoutingSearchZone(const vector<MicrLine>& vecLines, const MicrZone&
 //-------------------------------------------------------------------------------------------------
 CMicrFinder::CMicrFinder() 
 :	m_bDirty(false),
-m_ipParser(NULL),
 m_bSplitRoutingNumber(true),
 m_bSplitAccountNumber(true),
 m_bSplitCheckNumber(false),
 m_bSplitAmount(false)
 {
-	// Default to most accurate search (all rotations of image)
-	m_mapRotations[0] = true;
-	m_mapRotations[90] = true;
-	m_mapRotations[180] = true;
-	m_mapRotations[270] = true;
+	try
+	{
+		// Default to most accurate search (all rotations of image)
+		m_mapRotations[0] = true;
+		m_mapRotations[90] = true;
+		m_mapRotations[180] = true;
+		m_mapRotations[270] = true;
+
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI29475", m_ipMiscUtils != NULL);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29476");
 }
 //-------------------------------------------------------------------------------------------------
 CMicrFinder::~CMicrFinder()
 {
 	try
 	{
-		// Set the parser to NULL so that if it throws an exception when being destructed
-		// it will be caught and logged
-		m_ipParser = NULL;
+		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI24338");
 }
@@ -1685,36 +1689,31 @@ IRegularExprParserPtr CMicrFinder::getOtherRoutingNumberRegexParser()
 {
 	try
 	{
-		if (m_ipParser == NULL)
+		string strOtherRoutingRegex = "";
+
+		// Get the name for the regex file
+		string strRoutingRegexFile = getModuleDirectory(_Module.m_hInst) + "\\" + gstrREGEX_FILE;
+
+		// Check if the file exists
+		if (isValidFile(strRoutingRegexFile))
 		{
-			string strOtherRoutingRegex = "";
-
-			// Get the name for the regex file
-			string strRoutingRegexFile = getModuleDirectory(_Module.m_hInst) + "\\" + gstrREGEX_FILE;
-
-			// Check if the file exists
-			if (isValidFile(strRoutingRegexFile))
-			{
-				strOtherRoutingRegex = getRegExpFromFile(strRoutingRegexFile,
-					true, gstrAF_AUTO_ENCRYPT_KEY_PATH);
-			}
-			else
-			{
-				strOtherRoutingRegex = gstrOTHER_ROUTING_REGEX;
-			}
-
-			// Get a regular expression parser
-			IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-			ASSERT_RESOURCE_ALLOCATION("ELI24947", ipMiscUtils != NULL );
-			m_ipParser = ipMiscUtils->GetNewRegExpParserInstance("");
-			ASSERT_RESOURCE_ALLOCATION("ELI24948", m_ipParser != NULL );
-
-			// Load the regex pattern into the parser
-			m_ipParser->Pattern = _bstr_t(strOtherRoutingRegex.c_str());
+			strOtherRoutingRegex = getRegExpFromFile(strRoutingRegexFile,
+				true, gstrAF_AUTO_ENCRYPT_KEY_PATH);
+		}
+		else
+		{
+			strOtherRoutingRegex = gstrOTHER_ROUTING_REGEX;
 		}
 
+		// Get a regular expression parser
+		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("");
+		ASSERT_RESOURCE_ALLOCATION("ELI24948", ipParser != NULL );
+
+		// Load the regex pattern into the parser
+		ipParser->Pattern = strOtherRoutingRegex.c_str();
+
 		// Return the parser
-		return m_ipParser;
+		return ipParser;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI24954");
 }

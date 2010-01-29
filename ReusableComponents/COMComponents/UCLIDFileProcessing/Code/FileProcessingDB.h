@@ -297,8 +297,7 @@ private:
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
 
-	// Regular expression parser to validate tag names
-	IRegularExprParserPtr m_ipParser;
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	// Events used for the LastPingThread
 	Win32Event m_eventStopPingThread;
@@ -588,6 +587,9 @@ private:
 
 	// Checks whether the specified action name is valid
 	void validateNewActionName(const string& strActionName);
+
+	// Gets a regular expression parser
+	IRegularExprParserPtr getParser();
 
 	// Class to contain the thread data for the emailMessageThread
 	class EmailThreadData

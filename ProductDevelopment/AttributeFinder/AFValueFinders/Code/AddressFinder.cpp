@@ -21,15 +21,14 @@ CAddressFinder::CAddressFinder()
 	
 	m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
 	ASSERT_RESOURCE_ALLOCATION("ELI08824", m_ipMiscUtils != NULL);
-
-	m_ipRegExpParser = m_ipMiscUtils->GetNewRegExpParserInstance("AddressFinder");
-	ASSERT_RESOURCE_ALLOCATION("ELI08801", m_ipRegExpParser != NULL);
 }
 //-------------------------------------------------------------------------------------------------
 CAddressFinder::~CAddressFinder()
 {
 	try
 	{
+		m_ipAFUtility = NULL;
+		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16338");
 }

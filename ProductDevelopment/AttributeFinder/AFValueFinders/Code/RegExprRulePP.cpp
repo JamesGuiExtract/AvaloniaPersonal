@@ -25,9 +25,6 @@ CRegExprRulePP::CRegExprRulePP()
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
 		ASSERT_RESOURCE_ALLOCATION("ELI13043", ipMiscUtils != NULL );
 
-		m_ipRegExParser = ipMiscUtils->GetNewRegExpParserInstance("RegExprRule");
-		ASSERT_RESOURCE_ALLOCATION("ELI13044", m_ipRegExParser != NULL);
-
 		m_dwTitleID = IDS_TITLERegExprRulePP;
 		m_dwHelpFileID = IDS_HELPFILERegExprRulePP;
 		m_dwDocStringID = IDS_DOCSTRINGRegExprRulePP;
@@ -337,8 +334,6 @@ bool CRegExprRulePP::storePattern(UCLID_AFVALUEFINDERSLib::IRegExprRulePtr ipReg
 		// get the pattern string, and verify it is not empty
 		CComBSTR bstrPattern;
 		GetDlgItemText(IDC_EDIT_PATTERN, bstrPattern.m_str);
-		// make sure the pattern string is valid
-		m_ipRegExParser->Pattern = _bstr_t(bstrPattern);
 
 		ipRegExprRule->Pattern = _bstr_t(bstrPattern);
 

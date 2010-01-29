@@ -56,11 +56,8 @@ CLocateImageRegion::CLocateImageRegion()
 
 		ASSERT_RESOURCE_ALLOCATION("ELI07919", m_ipSpatialStringSearcher != NULL);
 
-		IMiscUtilsPtr ipMisc(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22434", ipMisc != NULL);
-
-		m_ipRegExprParser = ipMisc->GetNewRegExpParserInstance("LocateImageRegion");
-		ASSERT_RESOURCE_ALLOCATION("ELI22435", m_ipRegExprParser);
+		m_ipMisc.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI22434", m_ipMisc != NULL);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI07795")
 }
@@ -70,6 +67,7 @@ CLocateImageRegion::~CLocateImageRegion()
 	 try
 	 {
 		 m_ipSpatialStringSearcher = NULL;
+		 m_ipMisc = NULL;
 	 }
 	 CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16346");
 }
@@ -1001,7 +999,8 @@ STDMETHODIMP CLocateImageRegion::raw_Clone(IUnknown* *pObject)
 // Private functions
 //-------------------------------------------------------------------------------------------------
 bool CLocateImageRegion::calculateRoughBorderPosition(BoundaryToInfo mapBorderToInfo, 
-													  ISpatialStringPtr ipPageText)
+													  ISpatialStringPtr ipPageText,
+													  IRegularExprParserPtr ipParser)
 {
 	// get the boundary condition from any one of the map items since
 	// all items have the same boundary condition
@@ -1021,7 +1020,7 @@ bool CLocateImageRegion::calculateRoughBorderPosition(BoundaryToInfo mapBorderTo
 	{
 		ClueListInfo& listInfo = itClueLists->second;
 		if (!m_mapBorderToPosition.empty() && listInfo.m_bRestrictByBoundary 
-			&& !findCluesWithinBoundary(ipPageText, listInfo))
+			&& !findCluesWithinBoundary(ipPageText, listInfo, ipParser))
 		{
 			return false;
 		}
@@ -1110,10 +1109,6 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 	IAFDocumentPtr ipAFDoc(pDocument);
 	ASSERT_RESOURCE_ALLOCATION("ELI14636", ipAFDoc != NULL);
 
-	// Create an IMiscUtilsPtr object
-	IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI14588", ipMiscUtils != NULL );
-
 	// create an IIUnknownVector to hold the results
 	IIUnknownVectorPtr ipVecFoundRegions(CLSID_IUnknownVector);
 	ASSERT_RESOURCE_ALLOCATION("ELI16817", ipVecFoundRegions != NULL);
@@ -1121,6 +1116,10 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 	// Create IVariantVectorPtr array to backup the clues strings.
 	IVariantVectorPtr ipCopy[4];
 	
+	// Create a regex parser
+	IRegularExprParserPtr ipParser = m_ipMisc->GetNewRegExpParserInstance("LocateImageRegion");
+	ASSERT_RESOURCE_ALLOCATION("ELI22435", ipParser != NULL);
+
 	// Loop through all items in the map of clue lists
 	IndexToClueListInfo::iterator itClueLists = m_mapIndexToClueListInfo.begin();
 	for (int i = 0; itClueLists != m_mapIndexToClueListInfo.end(); itClueLists++, i++)
@@ -1140,7 +1139,7 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 
 		// Remove the header of the string if it is a file name,
 		// return the original string if it is not a file name
-		_bstr_t bstrAfterRemoveHeader = ipMiscUtils->GetFileNameWithoutHeader(bstrFirstEntry);
+		_bstr_t bstrAfterRemoveHeader = m_ipMisc->GetFileNameWithoutHeader(bstrFirstEntry);
 
 		// Expand tags only happens when the string is a file name
 		// if it is not, all tags will be treated as common strings [P16: 2118]
@@ -1156,7 +1155,7 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 			strAfterRemoveHeader = tagMgr.expandTagsAndFunctions(strAfterRemoveHeader, ipAFDoc);
 
 			// perform any appropriate auto-encrypt actions on the input file
-			ipMiscUtils->AutoEncryptFile(get_bstr_t(strAfterRemoveHeader.c_str()),
+			m_ipMisc->AutoEncryptFile(get_bstr_t(strAfterRemoveHeader.c_str()),
 				get_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
 
 			if (m_cachedClue[i].m_obj == NULL)
@@ -1206,13 +1205,13 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 	int i=-1;
 
 	// locate the clues on the first page in ipPages that matches all the clues
-	long nFoundIndex = findCluesOnSamePage(ipPages, 0);
+	long nFoundIndex = findCluesOnSamePage(ipPages, 0, ipParser);
 	
 	// loop as long as a page was found
 	while(nFoundIndex >= 0)
 	{
 		// get the content of the region of the found page
-		ipCurrentRegion = getPageRegionContent( ipPages->At(nFoundIndex) );
+		ipCurrentRegion = getPageRegionContent( ipPages->At(nFoundIndex), ipParser );
 
 		// check if the found region should be outside of the boundaries on the page
 		if(m_bDataInsideBoundaries)
@@ -1252,7 +1251,7 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 		// keep finding clues on subsequent pages 
 		// if m_bMatchMultiplePagesPerDocument is set
 		nFoundIndex = (m_bMatchMultiplePagesPerDocument ? 
-			findCluesOnSamePage(ipPages, nFoundIndex+1) : -1);
+			findCluesOnSamePage(ipPages, nFoundIndex+1, ipParser) : -1);
 	}
 
 	// check if we are including text outside of the boundaries
@@ -1274,7 +1273,8 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 }
 
 //-------------------------------------------------------------------------------------------------
-ISpatialStringPtr CLocateImageRegion::getPageRegionContent(ISpatialStringPtr ipPage)
+ISpatialStringPtr CLocateImageRegion::getPageRegionContent(ISpatialStringPtr ipPage,
+														   IRegularExprParserPtr ipParser)
 {
 	// reset border to position map before each calculation
 	m_mapBorderToPosition.clear();
@@ -1304,7 +1304,8 @@ ISpatialStringPtr CLocateImageRegion::getPageRegionContent(ISpatialStringPtr ipP
 		}
 		
 		// get border(s) position
-		if (!mapBorderToInfo.empty() && !calculateRoughBorderPosition(mapBorderToInfo, ipPage))
+		if (!mapBorderToInfo.empty()
+			&& !calculateRoughBorderPosition(mapBorderToInfo, ipPage, ipParser))
 		{		
 			// can't calculate region boundaries, return empty string
 			return NULL;
@@ -1372,7 +1373,8 @@ ISpatialStringPtr CLocateImageRegion::getImageRegion(ISpatialStringPtr ipPageTex
 	}
 }
 //-------------------------------------------------------------------------------------------------
-long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lStartIndex)
+long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lStartIndex,
+											 IRegularExprParserPtr ipParser)
 {
 	// Narrow down the clue lists to search for. i.e. not all clue lists
 	// defined in the map shall be searched as long as the boundary definitions
@@ -1458,7 +1460,7 @@ long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lS
 						ipPageText->FindFirstItemInRegExpVector(
 							clueListInfo.m_ipClues, 
 							asVariantBool(clueListInfo.m_bCaseSensitive), 
-							VARIANT_TRUE, nSearchStart, m_ipRegExprParser, &nStart, &nEnd);
+							VARIANT_TRUE, nSearchStart, ipParser, &nStart, &nEnd);
 					}
 					else
 					{
@@ -1521,7 +1523,8 @@ long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lS
 }
 //-------------------------------------------------------------------------------------------------
 bool CLocateImageRegion::findCluesWithinBoundary(ISpatialStringPtr ipPageText, 
-												 ClueListInfo& rlistInfo)
+												 ClueListInfo& rlistInfo,
+												 IRegularExprParserPtr ipParser)
 {
 	if (!m_mapBorderToPosition.empty() && rlistInfo.m_bRestrictByBoundary)
 	{
@@ -1593,7 +1596,7 @@ bool CLocateImageRegion::findCluesWithinBoundary(ISpatialStringPtr ipPageText,
 			ipStringInBound->FindFirstItemInRegExpVector(
 				rlistInfo.m_ipClues, 
 				asVariantBool(rlistInfo.m_bCaseSensitive), 
-				VARIANT_TRUE, 0, m_ipRegExprParser, &nStart, &nEnd);
+				VARIANT_TRUE, 0, ipParser, &nStart, &nEnd);
 		}
 		else
 		{

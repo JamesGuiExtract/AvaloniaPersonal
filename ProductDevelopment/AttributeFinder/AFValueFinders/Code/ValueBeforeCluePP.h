@@ -104,7 +104,6 @@ private:
 	// Variables
 	/////////////
 	UCLID_AFVALUEFINDERSLib::ERuleRefiningType m_eRefiningType;
-	IRegularExprParserPtr m_ipRegExpParser;
 	bool m_bCaseSensitive;
 
 	std::string m_strOtherPunctuations;

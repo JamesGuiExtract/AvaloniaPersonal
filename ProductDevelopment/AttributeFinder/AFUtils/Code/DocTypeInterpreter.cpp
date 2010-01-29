@@ -39,9 +39,8 @@ const string DocTypeInterpreter::SCOPEEndTag = "SCOPE_END";
 //-------------------------------------------------------------------------------------------------
 // DocTypeInterpreter
 //-------------------------------------------------------------------------------------------------
-DocTypeInterpreter::DocTypeInterpreter(IRegularExprParserPtr ipRegExpr)
-: m_ipRegExpr(ipRegExpr),
-m_ipUtils(NULL)
+DocTypeInterpreter::DocTypeInterpreter()
+: m_ipUtils(NULL)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -50,7 +49,6 @@ DocTypeInterpreter::DocTypeInterpreter(const DocTypeInterpreter& objToCopy)
 	m_strDocTypeName = objToCopy.m_strDocTypeName;
 	m_strDocSubType = objToCopy.m_strDocSubType;
 	m_ipUtils = objToCopy.m_ipUtils;
-	m_ipRegExpr = objToCopy.m_ipRegExpr;
 	m_vecPatternHolders = objToCopy.m_vecPatternHolders;
 }
 //-------------------------------------------------------------------------------------------------
@@ -58,7 +56,6 @@ DocTypeInterpreter::~DocTypeInterpreter()
 {
 	try
 	{
-		m_ipRegExpr = NULL;
 		m_ipUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28219");
@@ -69,7 +66,6 @@ DocTypeInterpreter& DocTypeInterpreter::operator=(const DocTypeInterpreter& objT
 	m_strDocTypeName = objToAssign.m_strDocTypeName;
 	m_strDocSubType = objToAssign.m_strDocSubType;
 	m_ipUtils = objToAssign.m_ipUtils;
-	m_ipRegExpr = objToAssign.m_ipRegExpr;
 	m_vecPatternHolders = objToAssign.m_vecPatternHolders;
 
 	return *this;
@@ -476,7 +472,7 @@ void DocTypeInterpreter::loadPatternsBlock(CommentedTextFileReader& fileReader,
 	// Note that the associated SCOPE block also applies here
 
 	// create a new PatternHolder
-	PatternHolder patternHolder(m_ipRegExpr);
+	PatternHolder patternHolder;
 	patternHolder.m_eConfidenceLevel = eConfidenceLevel;
 
 	// parse first line of BEGIN block

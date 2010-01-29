@@ -57,22 +57,26 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		// Make copy of original string for LOG
 		string	strOriginal = strLocal;
 
+		// Instantiate the Regular Expression parser
+		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("EntityFinder");
+		ASSERT_RESOURCE_ALLOCATION( "ELI06026", ipParser != NULL );
+
 		///////////////////////////////////////////////////
 		// Step 0A: Remove any embedded Address information
 		///////////////////////////////////////////////////
-		bool bFoundAddress = removeAddressText( ipText );
+		bool bFoundAddress = removeAddressText( ipText, ipParser );
 
 		////////////////////////////////////////////////////
 		// Step 0B: Look for XXand or andXX and insert space
 		////////////////////////////////////////////////////
-		long lSpacePos = makeSpaceForAnd( ipText );
+		long lSpacePos = makeSpaceForAnd( ipText, ipParser );
 		while (lSpacePos != -1)
 		{
 			// Insert the space
 			ipText->InsertString(lSpacePos, " ");
 
 			// Keep checking
-			lSpacePos = makeSpaceForAnd( ipText );
+			lSpacePos = makeSpaceForAnd( ipText, ipParser );
 		}
 
 		// Make copy of current string for later substring extraction
@@ -84,7 +88,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		//////////////////////////////////////////////////////
 		// Step 1: Trim unwanted text from beginning of string
 		//////////////////////////////////////////////////////
-		strLocal = trimLeadingNonsense( strLocal );
+		strLocal = trimLeadingNonsense( strLocal, ipParser );
 
 		// Create local ISpatialString
 		ISpatialStringPtr	ipSpatial( CLSID_SpatialString );
@@ -118,7 +122,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 
 			// Check string for first Phrase, if any
 			ipSpatial->FindFirstItemInRegExpVector( ipTrimLeading, VARIANT_FALSE, VARIANT_FALSE, 
-				0, m_ipParser, &lTrimStart, &lTrimEnd );
+				0, ipParser, &lTrimStart, &lTrimEnd );
 			if (lTrimStart != -1 && lTrimEnd != -1)
 			{
 				// A phrase for trimming was found, trim it if at or near the beginning of the text
@@ -136,7 +140,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		// Step 2A: Look for Trust Indicator
 		//          and trim as appropriate
 		////////////////////////////////////
-		bool bFoundTrust = doTrustTrimming( ipSpatial );
+		bool bFoundTrust = doTrustTrimming( ipSpatial, ipParser );
 
 		//////////////////////////////////////////////////
 		// Step 2B: Check text for Municipality Indicators
@@ -152,7 +156,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		long	lMuniStart = -1;
 		long	lMuniEnd = -1;
 		ipSpatial->FindFirstItemInRegExpVector( ipMuniInd, VARIANT_FALSE, VARIANT_FALSE, 
-			0, m_ipParser, &lMuniStart, &lMuniEnd );
+			0, ipParser, &lMuniStart, &lMuniEnd );
 		if (lMuniStart != -1 && lMuniEnd != -1 && lMuniStart < 10)
 		{
 			// Just set the flag here
@@ -179,7 +183,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		{
 			// Search the substring for another Person Designator
 			ipSpatial->FindFirstItemInRegExpVector( m_ipKeys->PersonDesignators, 
-							VARIANT_FALSE, VARIANT_FALSE, 0, m_ipParser, &lStartPos, &lEndPos );
+							VARIANT_FALSE, VARIANT_FALSE, 0, ipParser, &lStartPos, &lEndPos );
 			if (lStartPos != -1 && lEndPos != -1 && lStartPos < lDesignatorLimit)
 			{
 				// Check for Person Designator with preceding dash or succeeding dash
@@ -248,7 +252,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		{
 			// Search the substring for another Person Trim Identifier
 			ipSpatial->FindFirstItemInRegExpVector( m_ipKeys->PersonTrimIdentifiers, 
-							VARIANT_FALSE, VARIANT_FALSE, 0, m_ipParser, &lStartPos, &lEndPos );
+							VARIANT_FALSE, VARIANT_FALSE, 0, ipParser, &lStartPos, &lEndPos );
 			if (lStartPos != -1 && lEndPos != -1)
 			{
 				// Update the string to be searched
@@ -287,7 +291,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 			////////////////////////////////////////////////////
 
 			// Find first lower-case word
-			long lLCTrimPos = findFirstLowerCaseWordToTrim( strLocal, lPTIStop, false );
+			long lLCTrimPos = findFirstLowerCaseWordToTrim( strLocal, ipParser, lPTIStop, false );
 
 			// Remove appropriate text
 			if (lLCTrimPos > -1)
@@ -313,7 +317,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 			lEndPos = -1;
 
 			if (asCppBool(ipSpatial->ContainsStringInVector(
-				m_ipKeys->PersonSuffixes, VARIANT_FALSE, VARIANT_TRUE, m_ipParser)))
+				m_ipKeys->PersonSuffixes, VARIANT_FALSE, VARIANT_TRUE, ipParser)))
 			{
 				// Just set the flag
 				bPersonSuffix = true;
@@ -330,7 +334,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		long	lCompanyEnd = -1;
 		if (!bFoundTrust)
 		{
-			bFoundCompany = findCompanyEnd( ipSpatial, 0, &lSuffixStart, &lSuffixStop, 
+			bFoundCompany = findCompanyEnd( ipSpatial, ipParser, 0, &lSuffixStart, &lSuffixStop, 
 				&lCompanyEnd, &bCompanySuffix, &bFoundAlias );
 
 			// Just trim after the Company endpoint and update SpatialString
@@ -380,7 +384,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		////////////////////////////////////////////
 		if ((lKeywordStop == -1) || (lPTIStop == -1))
 		{
-			strLocal = doBlankLineTrimming( strLocal, lKeywordStop, bFoundTrust );
+			strLocal = doBlankLineTrimming( strLocal, ipParser, lKeywordStop, bFoundTrust );
 		}
 
 		//////////////////////////////////////////////////////
@@ -408,7 +412,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 			}
 
 			// Find first lower-case word
-			int iTrimPos = findFirstLowerCaseWordToTrim( strLocal, iStart, bIsMunicipality );
+			int iTrimPos = findFirstLowerCaseWordToTrim( strLocal, ipParser, iStart, bIsMunicipality );
 
 			// Find first punctuation character
 			string	strPunct( ":^\"" );
@@ -438,7 +442,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		// NOTE: Entity trimming not done for persons
 		/////////////////////////////////////////////
 
-		strLocal = doGeneralTrimming( strLocal, bPersonSuccess );
+		strLocal = doGeneralTrimming( strLocal, bPersonSuccess, ipParser );
 
 		/////////////////////////////////////
 		// Step 7C: Company-specific trimming
@@ -491,14 +495,14 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		//          except if words contain Alias or Person Designator
 		//          Remove any leftover parentheses and brackets
 		//////////////////////////////////////////////////////////////
-		handleParentheses( ipResult );
+		handleParentheses( ipResult, ipParser );
 
 		///////////////////////////////////////////
 		// Step 9B: Trim leading and trailing stuff
 		///////////////////////////////////////////
 
 		// Replace explicit goofy characters with spaces
-		ipResult->Replace("ý", " ", VARIANT_FALSE, 0, m_ipParser);
+		ipResult->Replace("ý", " ", VARIANT_FALSE, 0, ipParser);
 
 		// Leading and trailing spaces
 		ipResult->Trim( _bstr_t( " " ), _bstr_t( " " ) );
@@ -597,8 +601,8 @@ string CEntityFinder::consolidateMultipleCharsIntoOne(const string& strInput,
 	return strRet;
 }
 //-------------------------------------------------------------------------------------------------
-string CEntityFinder::doBlankLineTrimming(string strInput, long lKeywordEndPos, 
-										  bool bFoundTrust)
+string CEntityFinder::doBlankLineTrimming(string strInput, IRegularExprParserPtr ipParser,
+										  long lKeywordEndPos, bool bFoundTrust)
 {
 	int		iBlankLineCounter = 0;
 	string	strLocal = strInput;
@@ -674,7 +678,7 @@ string CEntityFinder::doBlankLineTrimming(string strInput, long lKeywordEndPos,
 						strLocal = strLocal.substr( iTrimPos + 4 );
 
 						// Return result of a recursive test
-						return doBlankLineTrimming( strLocal, -1, bFoundTrust );
+						return doBlankLineTrimming( strLocal, ipParser, -1, bFoundTrust );
 					}
 					// Check for strSecond containing no alphanumeric chars
 					else if (!containsAlphaNumericChar( strSecond ))
@@ -697,7 +701,7 @@ string CEntityFinder::doBlankLineTrimming(string strInput, long lKeywordEndPos,
 						strLocal = strLocal.substr( iTrimPos + 4 );
 
 						// Return result of a recursive test
-						return doBlankLineTrimming( strLocal, -1, bFoundTrust );
+						return doBlankLineTrimming( strLocal, ipParser, -1, bFoundTrust );
 					}
 					// Check for strSecond containing no alphabetic chars
 					else if (!containsAlphaChar( strSecond ))
@@ -718,7 +722,7 @@ string CEntityFinder::doBlankLineTrimming(string strInput, long lKeywordEndPos,
 						strLocal = strLocal.substr( iTrimPos + 4 );
 
 						// Return result of a recursive test
-						return doBlankLineTrimming( strLocal, -1, bFoundTrust );
+						return doBlankLineTrimming( strLocal, ipParser, -1, bFoundTrust );
 					}
 					// Check for strSecond too short
 					else if ((strFirst.length() >= 5) && (strSecond.length() < 5))
@@ -732,17 +736,17 @@ string CEntityFinder::doBlankLineTrimming(string strInput, long lKeywordEndPos,
 					// Check for one line containing a date string
 					// This is also sufficient information for trimming
 					///////////////////////////////////////////////////
-					if (hasDateText( strFirst ))
+					if (hasDateText( strFirst, ipParser ))
 					{
 						// Remove the first line and continue 
 						// checking for blank lines to trim
 						strLocal = strLocal.substr( iTrimPos + 4 );
 
 						// Return result of a recursive test
-						return doBlankLineTrimming( strLocal, -1, bFoundTrust );
+						return doBlankLineTrimming( strLocal, ipParser, -1, bFoundTrust );
 					}
 					// Check for strSecond containing a date string
-					else if (hasDateText( strSecond ))
+					else if (hasDateText( strSecond, ipParser ))
 					{
 						// Retain text before the blank line
 						strLocal = strLocal.substr( 0, iTrimPos );
@@ -753,17 +757,17 @@ string CEntityFinder::doBlankLineTrimming(string strInput, long lKeywordEndPos,
 					// Check for one line containing an exact keyword match
 					// This is also sufficient information for trimming
 					///////////////////////////////////////////////////////
-					if (isKeywordPhrase( strFirst ))
+					if (isKeywordPhrase( strFirst, ipParser ))
 					{
 						// Remove the first line and continue 
 						// checking for blank lines to trim
 						strLocal = strLocal.substr( iTrimPos + 4 );
 
 						// Return result of a recursive test
-						return doBlankLineTrimming( strLocal, -1, bFoundTrust );
+						return doBlankLineTrimming( strLocal, ipParser, -1, bFoundTrust );
 					}
 					// Check for strSecond matching a keyword
-					else if (isKeywordPhrase( strSecond ))
+					else if (isKeywordPhrase( strSecond, ipParser ))
 					{
 						// Retain text before the blank line
 						strLocal = strLocal.substr( 0, iTrimPos );
@@ -789,7 +793,7 @@ string CEntityFinder::doBlankLineTrimming(string strInput, long lKeywordEndPos,
 					// Check for keyword phrase that crosses the two lines
 					// If found, do NOT trim here
 					//////////////////////////////////////////////////////
-					if (foundKeywordPhraseOverlap( strFirst, strSecond ))
+					if (foundKeywordPhraseOverlap( strFirst, strSecond, ipParser ))
 					{
 						bCanTrim = false;
 					}
@@ -847,7 +851,7 @@ string CEntityFinder::doBlankLineTrimming(string strInput, long lKeywordEndPos,
 							strLocal = strLocal.substr( iTrimPos + 4 );
 
 							// Return result of a recursive test
-							return doBlankLineTrimming( strLocal, -1, bFoundTrust );
+							return doBlankLineTrimming( strLocal, ipParser, -1, bFoundTrust );
 						}
 						// Retain text before the blank line if upper case
 						else
@@ -970,7 +974,7 @@ string CEntityFinder::doBlankLineTrimming(string strInput, long lKeywordEndPos,
 		if (!bTrimmed)
 		{
 			// Try trimming while ignoring the keyword information
-			string strLastChance = doBlankLineTrimming( strLocal, -1, bFoundTrust );
+			string strLastChance = doBlankLineTrimming( strLocal, ipParser, -1, bFoundTrust );
 
 			// Locate new string within original string
 			long lNewPos = strLocal.find( strLastChance );
@@ -1261,7 +1265,8 @@ string CEntityFinder::doCompanyPostProcessing(const string& strInput, long lSuff
 	return strFinal;
 }
 //-------------------------------------------------------------------------------------------------
-string CEntityFinder::doGeneralTrimming(string strInput, bool bPersonFound)
+string CEntityFinder::doGeneralTrimming(string strInput, bool bPersonFound,
+										IRegularExprParserPtr ipParser)
 {
 	string	strBreakChars( "()[]" );
 	long lLength = strInput.length();
@@ -1291,7 +1296,7 @@ string CEntityFinder::doGeneralTrimming(string strInput, bool bPersonFound)
 
 		// Search the string for an Entity Trim Phrase
 		ipSpatial->FindFirstItemInRegExpVector( m_ipKeys->EntityTrimTrailingPhrases, 
-						VARIANT_FALSE, VARIANT_FALSE, 0, m_ipParser, &lStartPos, &lEndPos );
+						VARIANT_FALSE, VARIANT_FALSE, 0, ipParser, &lStartPos, &lEndPos );
 		if (lStartPos != -1 && lEndPos != -1)
 		{
 			// Create a composite collection of Alias items
@@ -1309,7 +1314,7 @@ string CEntityFinder::doGeneralTrimming(string strInput, bool bPersonFound)
 
 			// Search the string for an Entity Trim Phrase
 			if (!asCppBool(ipSpatial->ContainsStringInVector(
-				ipAliases, VARIANT_FALSE, VARIANT_TRUE, m_ipParser)))
+				ipAliases, VARIANT_FALSE, VARIANT_TRUE, ipParser)))
 			{
 				// Trim at the Phrase if not at or near beginning
 				if (lStartPos > 8)
@@ -1330,9 +1335,9 @@ string CEntityFinder::doGeneralTrimming(string strInput, bool bPersonFound)
 	return strInput;
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityFinder::findCompanyEnd(ISpatialString *pText, long lStartPos, long *plSuffixStart, 
-								   long *plSuffixEnd, long *plEndPos, bool *pbFoundSuffix, 
-								   bool *pbFoundAlias)
+bool CEntityFinder::findCompanyEnd(ISpatialStringPtr ipText, IRegularExprParserPtr ipParser,
+								   long lStartPos, long *plSuffixStart, long *plSuffixEnd,
+								   long *plEndPos, bool *pbFoundSuffix, bool *pbFoundAlias)
 {
 	bool	bSuffix = false;
 	bool	bDesignator = false;
@@ -1357,9 +1362,8 @@ bool CEntityFinder::findCompanyEnd(ISpatialString *pText, long lStartPos, long *
 	ipAliases->Append( m_ipKeys->GetRelatedCompany( 
 		(UCLID_AFUTILSLib::ERelatedCompanyType)kRelatedCompanyAll ) );
 
-	// Make local smart pointer and string
-	ISpatialStringPtr	ipText( pText );
-	ASSERT_RESOURCE_ALLOCATION( "ELI08868", ipText != NULL );
+	ASSERT_ARGUMENT( "ELI08868", ipText != NULL );
+
 	string	strLocal = asString(ipText->String);
 	long	lLength = strLocal.length();
 
@@ -1372,7 +1376,7 @@ bool CEntityFinder::findCompanyEnd(ISpatialString *pText, long lStartPos, long *
 	while (!bDone)
 	{
 		ipText->FindFirstItemInRegExpVector( m_ipKeys->CompanySuffixes, 
-			VARIANT_FALSE, VARIANT_FALSE, lLocalStart, m_ipParser, &lSuffixStart, &lSuffixStop );
+			VARIANT_FALSE, VARIANT_FALSE, lLocalStart, ipParser, &lSuffixStart, &lSuffixStop );
 		if ((lSuffixStart != -1) && lSuffixStop != -1 &&
 			(lSuffixStart - lLocalStart < glDesignatorLimit) && 
 			((lEndPreviousSuffix == -1) || (lSuffixStart - lEndPreviousSuffix < 4)))
@@ -1413,7 +1417,7 @@ bool CEntityFinder::findCompanyEnd(ISpatialString *pText, long lStartPos, long *
 				long lSuffStart = -1;
 				long lSuffEnd = -1;
 				long lFinish = -1;
-				bool bFound = findCompanyEnd( ipText, lStartPos, &lSuffStart, &lSuffEnd, 
+				bool bFound = findCompanyEnd( ipText, ipParser, lStartPos, &lSuffStart, &lSuffEnd, 
 					&lFinish, &bThisSuffix, &bThisAlias );
 				if (bFound)
 				{
@@ -1490,7 +1494,7 @@ bool CEntityFinder::findCompanyEnd(ISpatialString *pText, long lStartPos, long *
 		long	lDesignatorStart = -1;
 		long	lDesignatorStop = -1;
 		ipText->FindFirstItemInRegExpVector( m_ipKeys->CompanyDesignators, 
-			VARIANT_FALSE, VARIANT_FALSE, lStartPos, m_ipParser, &lDesignatorStart, &lDesignatorStop );
+			VARIANT_FALSE, VARIANT_FALSE, lStartPos, ipParser, &lDesignatorStart, &lDesignatorStop );
 		if (lDesignatorStart != -1 && lDesignatorStop != -1)
 		{
 			// Set flag and default endpoint
@@ -1514,7 +1518,7 @@ bool CEntityFinder::findCompanyEnd(ISpatialString *pText, long lStartPos, long *
 				lDesignatorStart = -1;
 				lDesignatorStop = -1;
 				ipText->FindFirstItemInRegExpVector(m_ipKeys->CompanyDesignators, 
-					VARIANT_FALSE, VARIANT_FALSE, lNewStart, m_ipParser, &lDesignatorStart, &lDesignatorStop);
+					VARIANT_FALSE, VARIANT_FALSE, lNewStart, ipParser, &lDesignatorStart, &lDesignatorStop);
 				if (lDesignatorStart != -1 && lDesignatorStop != -1)
 				{
 					// Another Designator found!
@@ -1537,7 +1541,7 @@ bool CEntityFinder::findCompanyEnd(ISpatialString *pText, long lStartPos, long *
 					long	lAliasStartPos = -1;
 					long	lAliasEndPos = -1;
 					ipText->FindFirstItemInRegExpVector( ipAliases, VARIANT_FALSE, VARIANT_FALSE,
-						lNewStart, m_ipParser, &lAliasStartPos, &lAliasEndPos );
+						lNewStart, ipParser, &lAliasStartPos, &lAliasEndPos );
 					if (lAliasStartPos != -1 && lAliasEndPos != -1)
 					{
 						// Check for more text following the Alias
@@ -1599,7 +1603,7 @@ AliasStart:
 			long	lAliasStartPos = -1;
 			long	lAliasEndPos = -1;
 			ipText->FindFirstItemInRegExpVector( ipAliases, VARIANT_FALSE, VARIANT_FALSE,
-				lAliasStart, m_ipParser, &lAliasStartPos, &lAliasEndPos );
+				lAliasStart, ipParser, &lAliasStartPos, &lAliasEndPos );
 			if (lAliasStartPos != -1 && lAliasEndPos != -1 &&
 				(lAliasStartPos - lAliasStart < 50))
 			{
@@ -1611,7 +1615,7 @@ AliasStart:
 					long lSuffEnd = -1;
 					long lFinish = -1;
 					bThisAlias = true;
-					bool bFound = findCompanyEnd( ipText, lAliasEndPos + 1, &lSuffStart, 
+					bool bFound = findCompanyEnd( ipText, ipParser, lAliasEndPos + 1, &lSuffStart, 
 						&lSuffEnd, &lFinish, &bThisSuffix, &bThisAlias );
 					if (bFound)
 					{
@@ -1635,7 +1639,7 @@ AliasStart:
 						else
 						{
 							long lNewStartPos = -1;
-							int iTrimPos = findFirstLowerCaseWordToTrim( strLocal, 
+							int iTrimPos = findFirstLowerCaseWordToTrim( strLocal, ipParser,
 								lAliasEndPos + 1, true );
 							if ((iTrimPos > 0) && (lLength > iTrimPos + 1))
 							{
@@ -1669,7 +1673,7 @@ AliasStart:
 			{
 				// Find lower-case word following the Designator
 				long lNewStartPos = -1;
-				int iTrimPos = findFirstLowerCaseWordToTrim( strLocal, 
+				int iTrimPos = findFirstLowerCaseWordToTrim( strLocal, ipParser,
 					lAliasStart, true );
 				if ((iTrimPos > 0) && (lLength > iTrimPos + 1))
 				{
@@ -1706,7 +1710,7 @@ AliasStart:
 				else
 				{
 					long lNewStartPos = -1;
-					int iTrimPos = findFirstLowerCaseWordToTrim( strLocal, 
+					int iTrimPos = findFirstLowerCaseWordToTrim( strLocal, ipParser,
 						lAliasStart, true );
 					if ((iTrimPos > 0) && (lLength >= iTrimPos + 1))
 					{
@@ -1736,12 +1740,9 @@ long CEntityFinder::findFirstCaseWord(const string& strText, int iStartPos, bool
 {
 	long	lPos = -1;
 
-	IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI13037", ipMiscUtils != NULL );
-
 	// Separate string into individual words
 	UCLID_COMUTILSLib::IRegularExprParserPtr ipParser = 
-		ipMiscUtils->GetNewRegExpParserInstance("EntityFinder");
+		m_ipMiscUtils->GetNewRegExpParserInstance("EntityFinder");
 	ASSERT_RESOURCE_ALLOCATION("ELI13038", ipParser != NULL);
 
 	if (ipParser != NULL)
@@ -1852,7 +1853,9 @@ long CEntityFinder::findFirstCaseWord(const string& strText, int iStartPos, bool
 	return lPos;
 }
 //-------------------------------------------------------------------------------------------------
-long CEntityFinder::findFirstLowerCaseWordToTrim(const string& strText, int iStartPos, bool bIsCompany)
+long CEntityFinder::findFirstLowerCaseWordToTrim(const string& strText,
+												 IRegularExprParserPtr ipParser,
+												 int iStartPos, bool bIsCompany)
 {
 	long	lTrimPos = -1;
 	long	lLength = strText.length();
@@ -1866,7 +1869,8 @@ long CEntityFinder::findFirstLowerCaseWordToTrim(const string& strText, int iSta
 	{
 		// Find next lower-case word
 		// Digits count as lower-case
-		long lFirstLower = findFirstCaseWord( strText, lCurrentStartPos, false, true, bIsCompany );
+		long lFirstLower = findFirstCaseWord( strText, lCurrentStartPos,
+			false, true, bIsCompany );
 		if (lFirstLower > -1)
 		{
 			// Check for this lower-case word immediately following a separator
@@ -1881,7 +1885,7 @@ long CEntityFinder::findFirstLowerCaseWordToTrim(const string& strText, int iSta
 				////////////////////////////
 				// Check for valid separator
 				////////////////////////////
-				lSeparatorEndPos = findSeparatorWordEnd( strText, lFirstLower, bIsCompany );
+				lSeparatorEndPos = findSeparatorWordEnd( strText, ipParser, lFirstLower, bIsCompany );
 				if (lSeparatorEndPos != -1)
 				{
 					lSeparatorStartPos = lFirstLower;
@@ -1908,7 +1912,8 @@ long CEntityFinder::findFirstLowerCaseWordToTrim(const string& strText, int iSta
 	return lTrimPos;
 }
 //-------------------------------------------------------------------------------------------------
-long CEntityFinder::findSeparatorWordEnd(const string& strText, long lStart, bool bIsCompany)
+long CEntityFinder::findSeparatorWordEnd(const string& strText, IRegularExprParserPtr ipParser,
+										 long lStart, bool bIsCompany)
 {
 	long lSeparatorEnd = -1;
 	long lLength = strText.length();
@@ -1952,7 +1957,7 @@ long CEntityFinder::findSeparatorWordEnd(const string& strText, long lStart, boo
 	long lStartPos = -1;
 	long lEndPos = -1;
 	ipLocal->FindFirstItemInRegExpVector( ipSeparators, VARIANT_FALSE, VARIANT_FALSE, 
-		lStart, m_ipParser, &lStartPos, &lEndPos );
+		lStart, ipParser, &lStartPos, &lEndPos );
 	if (lStartPos == lStart)
 	{
 		// Check for non-whitespace character following end of separator
@@ -1974,7 +1979,8 @@ long CEntityFinder::findSeparatorWordEnd(const string& strText, long lStart, boo
 	return lSeparatorEnd;
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityFinder::foundKeywordPhraseOverlap(const string& strText1, const string& strText2)
+bool CEntityFinder::foundKeywordPhraseOverlap(const string& strText1, const string& strText2,
+											  IRegularExprParserPtr ipParser)
 {
 	// Construct test string as str1 + \n + str2
 	string strTest = strText1;
@@ -2006,7 +2012,7 @@ bool CEntityFinder::foundKeywordPhraseOverlap(const string& strText1, const stri
 		long lStartPos = -1;
 		long lEndPos = -1;
 		ipSpatial->FindFirstItemInRegExpVector( ipPhrases, VARIANT_FALSE, VARIANT_FALSE,
-			lSearchPos, m_ipParser, &lStartPos, &lEndPos );
+			lSearchPos, ipParser, &lStartPos, &lEndPos );
 		if (lStartPos != -1 && lEndPos != -1)
 		{
 			// A keyword phrase was found, check for overlap
@@ -2071,7 +2077,7 @@ long CEntityFinder::getWordCount(const string& strText)
 	return lCount;
 }
 //-------------------------------------------------------------------------------------------------
-void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText)
+void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText, IRegularExprParserPtr ipParser)
 {
 	// Define search strings once
 	static string strParenthesesPattern = "\\([^\\(\\)]*\\)";
@@ -2104,12 +2110,12 @@ void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText)
 	////////////////////////////
 
 	// Set pattern
-	m_ipParser->Pattern = _bstr_t( strParenthesesPattern.c_str() );
+	ipParser->Pattern = _bstr_t( strParenthesesPattern.c_str() );
 
 	while (true)
 	{
 		// Find an instance of the search pattern
-		ipFound = m_ipParser->Find( ripText->String, VARIANT_TRUE, VARIANT_FALSE );
+		ipFound = ipParser->Find( ripText->String, VARIANT_TRUE, VARIANT_FALSE );
 
 		// Retrieve text from vector of results
 		if (ipFound->Size() > 0)
@@ -2123,7 +2129,7 @@ void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText)
 
 			// Check result for desired pattern (Alias or Designator)
 			if (!asCppBool(ipResult->ContainsStringInVector(
-				ipSearchRE, VARIANT_FALSE, VARIANT_TRUE, m_ipParser)))
+				ipSearchRE, VARIANT_FALSE, VARIANT_TRUE, ipParser)))
 			{
 				// Not found, just remove the text and parentheses from the text
 				ripText->Remove( nStart, nEnd );
@@ -2147,12 +2153,12 @@ void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText)
 	////////////////////////////////
 
 	// Set pattern
-	m_ipParser->Pattern = _bstr_t( strBracketsPattern.c_str() );
+	ipParser->Pattern = _bstr_t( strBracketsPattern.c_str() );
 
 	while (true)
 	{
 		// Find an instance of the search pattern
-		ipFound = m_ipParser->Find( ripText->String, VARIANT_TRUE, VARIANT_FALSE );
+		ipFound = ipParser->Find( ripText->String, VARIANT_TRUE, VARIANT_FALSE );
 
 		// Retrieve text from vector of results
 		if (ipFound->Size() > 0)
@@ -2166,7 +2172,7 @@ void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText)
 
 			// Check result for desired pattern (Alias or Designator)
 			if (!asCppBool(ipResult->ContainsStringInVector(
-				ipSearchRE, VARIANT_FALSE, VARIANT_TRUE, m_ipParser)))
+				ipSearchRE, VARIANT_FALSE, VARIANT_TRUE, ipParser)))
 			{
 				// Not found, just remove the text and brackets from the text
 				ripText->Remove( nStart, nEnd );
@@ -2192,7 +2198,7 @@ void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText)
 	ripText->Replace("]", " ", VARIANT_FALSE, 0, NULL);
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityFinder::doTrustTrimming(ISpatialStringPtr &ripSpatial)
+bool CEntityFinder::doTrustTrimming(ISpatialStringPtr &ripSpatial, IRegularExprParserPtr ipParser)
 {
 	bool bFound = false;
 	long lSize = ripSpatial->Size;
@@ -2213,7 +2219,7 @@ bool CEntityFinder::doTrustTrimming(ISpatialStringPtr &ripSpatial)
 	while (!bDone)
 	{
 		ripSpatial->FindFirstItemInRegExpVector( ipTrustInd, VARIANT_FALSE, VARIANT_FALSE,
-			lStart, m_ipParser, &lTrustStartPos, &lTrustEndPos );
+			lStart, ipParser, &lTrustStartPos, &lTrustEndPos );
 
 		// Continue only if a Trust Indicator was found
 		if (lTrustStartPos > -1 && (lTrustEndPos > -1) && (lTrustStartPos - lStart < 150))
@@ -2269,7 +2275,7 @@ bool CEntityFinder::doTrustTrimming(ISpatialStringPtr &ripSpatial)
 
 		// Continue only if a Non-Trust Indicator was not found
 		if (!asCppBool(ripSpatial->ContainsStringInVector(
-			ipNonTrust, VARIANT_FALSE, VARIANT_TRUE, m_ipParser)))
+			ipNonTrust, VARIANT_FALSE, VARIANT_TRUE, ipParser)))
 		{
 			bFound = true;
 
@@ -2434,7 +2440,7 @@ string CEntityFinder::handleTrustDated(string strInput)
 	return strInput;
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityFinder::hasDateText(const string& strText)
+bool CEntityFinder::hasDateText(const string& strText, IRegularExprParserPtr ipParser)
 {
 	bool	bFoundDate = false;
 
@@ -2450,7 +2456,7 @@ bool CEntityFinder::hasDateText(const string& strText)
 	long	lStartPos = -1;
 	long	lEndPos = -1;
 	ipSpatial->FindFirstItemInRegExpVector( m_ipKeys->MonthWords, 
-					VARIANT_FALSE, VARIANT_FALSE, 0, m_ipParser, &lStartPos, &lEndPos );
+					VARIANT_FALSE, VARIANT_FALSE, 0, ipParser, &lStartPos, &lEndPos );
 	if (lStartPos != -1 && lEndPos != -1)
 	{
 		// Check for digits within the next 5 characters
@@ -2498,7 +2504,7 @@ bool CEntityFinder::isAbbreviation(const string& strWord)
 	return !(lPos != string::npos || (strWord.length() > 8 && getWordCount(strWord) > 1));
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityFinder::isKeywordPhrase(const string& strText)
+bool CEntityFinder::isKeywordPhrase(const string& strText, IRegularExprParserPtr ipParser)
 {
 	// Trim whitespace and punctuation from input string
 	string strTest = trim( strText, " \r\n.,;", " \r\n.,;" );
@@ -2524,7 +2530,7 @@ bool CEntityFinder::isKeywordPhrase(const string& strText)
 	long lStartPos = -1;
 	long lEndPos = -1;
 	ipSpatial->FindFirstItemInRegExpVector( ipPhrases, VARIANT_FALSE, VARIANT_FALSE, 
-		0, m_ipParser, &lStartPos, &lEndPos );
+		0, ipParser, &lStartPos, &lEndPos );
 	if ((lStartPos == 0) && (lEndPos == lSize - 1))
 	{
 		// A keyword phrase exactly matched
@@ -2559,19 +2565,19 @@ void CEntityFinder::logResults(string strInitial, string strFinal)
 	waitForFileToBeReadable(strLogFile);
 }
 //-------------------------------------------------------------------------------------------------
-long CEntityFinder::makeSpaceForAnd(ISpatialStringPtr ipText)
+long CEntityFinder::makeSpaceForAnd(ISpatialStringPtr ipText, IRegularExprParserPtr ipParser)
 {
 	// Retrieve existing case-sensitivity setting
-	VARIANT_BOOL vbCase = m_ipParser->GetIgnoreCase();
+	VARIANT_BOOL vbCase = ipParser->GetIgnoreCase();
 
 	////////////////////////////////////////////////
 	// Define pattern for leading upper-case letters
 	////////////////////////////////////////////////
-	m_ipParser->PutPattern( _bstr_t( "[A-Z]{2,}and\\s" ) );
-	m_ipParser->PutIgnoreCase( VARIANT_FALSE );
+	ipParser->PutPattern( _bstr_t( "[A-Z]{2,}and\\s" ) );
+	ipParser->PutIgnoreCase( VARIANT_FALSE );
 
 	// Locate match
-	IIUnknownVectorPtr	ipMatch1 = m_ipParser->Find( ipText->String, VARIANT_TRUE, VARIANT_FALSE );
+	IIUnknownVectorPtr	ipMatch1 = ipParser->Find( ipText->String, VARIANT_TRUE, VARIANT_FALSE );
 	ASSERT_RESOURCE_ALLOCATION( "ELI10532", ipMatch1 != NULL );
 
 	long		lStartPos, lEndPos;
@@ -2584,7 +2590,7 @@ long CEntityFinder::makeSpaceForAnd(ISpatialStringPtr ipText)
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
 		// Replace case-sensitivity setting
-		m_ipParser->PutIgnoreCase( vbCase );
+		ipParser->PutIgnoreCase( vbCase );
 
 		return lEndPos - 3;
 	}
@@ -2592,10 +2598,10 @@ long CEntityFinder::makeSpaceForAnd(ISpatialStringPtr ipText)
 	/////////////////////////////////////////////////
 	// Define pattern for trailing upper-case letters
 	/////////////////////////////////////////////////
-	m_ipParser->PutPattern( _bstr_t( "\\sand[A-Z]{2,}" ) );
+	ipParser->PutPattern( _bstr_t( "\\sand[A-Z]{2,}" ) );
 
 	// Locate match
-	IIUnknownVectorPtr	ipMatch2 = m_ipParser->Find( ipText->String, VARIANT_TRUE, VARIANT_FALSE );
+	IIUnknownVectorPtr	ipMatch2 = ipParser->Find( ipText->String, VARIANT_TRUE, VARIANT_FALSE );
 	ASSERT_RESOURCE_ALLOCATION( "ELI10533", ipMatch2 != NULL );
 
 	// Retrieve this token
@@ -2605,19 +2611,19 @@ long CEntityFinder::makeSpaceForAnd(ISpatialStringPtr ipText)
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
 		// Replace case-sensitivity setting
-		m_ipParser->PutIgnoreCase( vbCase );
+		ipParser->PutIgnoreCase( vbCase );
 
 		return lStartPos + 4;
 	}
 
 	// Replace case-sensitivity setting
-	m_ipParser->PutIgnoreCase( vbCase );
+	ipParser->PutIgnoreCase( vbCase );
 
 	// No match found
 	return -1;
 }
 //-------------------------------------------------------------------------------------------------
-long CEntityFinder::removeFirstDigitsWords(const string& strInput)
+long CEntityFinder::removeFirstDigitsWords(const string& strInput, IRegularExprParserPtr ipParser)
 {
 	static string strBreakChars( "()[]" );
 
@@ -2631,8 +2637,8 @@ long CEntityFinder::removeFirstDigitsWords(const string& strInput)
 	//   Letters + Digits
 	//   Digits + Letters + Digits
 	///////////////////////////////////////////////////////////
-	m_ipParser->Pattern = "\\S+";
-	IIUnknownVectorPtr ipMatches = m_ipParser->Find(strInput.c_str(), VARIANT_FALSE, 
+	ipParser->Pattern = "\\S+";
+	IIUnknownVectorPtr ipMatches = ipParser->Find(strInput.c_str(), VARIANT_FALSE, 
 		VARIANT_FALSE );
 	long lCount = ipMatches->Size();
 	long lTrimPos = 0;
@@ -2705,7 +2711,7 @@ long CEntityFinder::removeFirstDigitsWords(const string& strInput)
 	return lTrimPos;
 }
 //-------------------------------------------------------------------------------------------------
-string	CEntityFinder::trimLeadingNonsense(string strInput)
+string	CEntityFinder::trimLeadingNonsense(string strInput, IRegularExprParserPtr ipParser)
 {
 	long	lLength = strInput.length();
 
@@ -2778,7 +2784,7 @@ string	CEntityFinder::trimLeadingNonsense(string strInput)
 		//////////////////////////////////////////
 		// Step 1C: Trim leading digits-only words
 		//////////////////////////////////////////
-		long lTrimPos = removeFirstDigitsWords( strInput );
+		long lTrimPos = removeFirstDigitsWords( strInput, ipParser );
 		if (lTrimPos > 0)
 		{
 			// Remove leading digits-only words
@@ -2812,7 +2818,8 @@ string	CEntityFinder::trimLeadingNonsense(string strInput)
 	return strInput;
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityFinder::removeAddressText(const ISpatialStringPtr& ripText)
+bool CEntityFinder::removeAddressText(const ISpatialStringPtr& ripText,
+									  IRegularExprParserPtr ipParser)
 {
 	bool bFound = false;
 
@@ -2856,7 +2863,7 @@ bool CEntityFinder::removeAddressText(const ISpatialStringPtr& ripText)
 		long lStartPos = -1;
 		long lEndPos = -1;
 		ripText->FindFirstItemInRegExpVector( ipAddress, VARIANT_FALSE, VARIANT_FALSE,
-			0, m_ipParser, &lStartPos, &lEndPos );
+			0, ipParser, &lStartPos, &lEndPos );
 		if ((lStartPos != -1) && (lEndPos != -1))
 		{
 			// Remove the Address text less one character
@@ -2918,7 +2925,7 @@ bool CEntityFinder::removeAddressText(const ISpatialStringPtr& ripText)
 		long lStartPos = -1;
 		long lEndPos = -1;
 		ripText->FindFirstItemInRegExpVector( ipAddress, VARIANT_FALSE, VARIANT_FALSE,
-			0, m_ipParser, &lStartPos, &lEndPos );
+			0, ipParser, &lStartPos, &lEndPos );
 
 		// Address must be more than 10 characters long
 		if ((lStartPos != -1) && lEndPos != -1 && (lEndPos - lStartPos > 9))
@@ -2966,7 +2973,7 @@ bool CEntityFinder::removeAddressText(const ISpatialStringPtr& ripText)
 		long lStartPos = -1;
 		long lEndPos = -1;
 		ripText->FindFirstItemInRegExpVector( ipAddress, VARIANT_FALSE, VARIANT_FALSE,
-			0, m_ipParser, &lStartPos, &lEndPos );
+			0, ipParser, &lStartPos, &lEndPos );
 
 		// Text must be near the end of the string
 		if (lEndPos > -1 && ripText->Size - lEndPos < 10)

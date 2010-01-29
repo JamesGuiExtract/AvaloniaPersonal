@@ -125,9 +125,6 @@ private:
 
 	IMiscUtilsPtr	m_ipMiscUtils;
 
-	// the regular expresion parser engine
-	IRegularExprParserPtr m_ipRegExParser;
-
 	/////////////
 	// Methods
 	/////////////

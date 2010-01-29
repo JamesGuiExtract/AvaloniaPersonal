@@ -32,17 +32,11 @@ CBlockFinder::CBlockFinder()
 {
 	try
 	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI19416", ipMiscUtils != NULL );
-
-		m_ipRegExParser = ipMiscUtils->GetNewRegExpParserInstance("BlockFinder");
-		ASSERT_RESOURCE_ALLOCATION("ELI05738", m_ipRegExParser != NULL);
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI19416", m_ipMiscUtils != NULL );
 
 		m_ipClues.CreateInstance(CLSID_VariantVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI05740", m_ipClues != NULL);
-		
-		// all comparisons are case insensitive
-		m_ipRegExParser->IgnoreCase = VARIANT_TRUE;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05739")
 }
@@ -698,6 +692,13 @@ STDMETHODIMP CBlockFinder::GetBlockScore(BSTR strBlockText, long *pScore)
 	{
 		validateLicense();
 
+		// Get a regular expression parser
+		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("BlockFinder");
+		ASSERT_RESOURCE_ALLOCATION("ELI05738", ipParser != NULL);
+
+		// All comparisons are case insensitive
+		ipParser->IgnoreCase = VARIANT_TRUE;
+
 		string strBlock = asString( strBlockText );
 		long nCluesSize = m_ipClues->Size;
 		string strClue("");
@@ -720,8 +721,8 @@ STDMETHODIMP CBlockFinder::GetBlockScore(BSTR strBlockText, long *pScore)
 			}
 
 			// use a regular expression parser to search for clue match
-			m_ipRegExParser->Pattern = _bstr_t(strClue.c_str());
-			IIUnknownVectorPtr ipFoundMatches = m_ipRegExParser->Find(strBlockText, VARIANT_FALSE, 
+			ipParser->Pattern = strClue.c_str();
+			IIUnknownVectorPtr ipFoundMatches = ipParser->Find(strBlockText, VARIANT_FALSE, 
 				VARIANT_FALSE);
 			if (ipFoundMatches != NULL && ipFoundMatches->Size() > 0)
 			{

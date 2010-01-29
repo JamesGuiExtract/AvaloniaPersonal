@@ -20,6 +20,7 @@ class ATL_NO_VTABLE CLegalDescSplitter :
 {
 public:
 	CLegalDescSplitter();
+	~CLegalDescSplitter();
 
 DECLARE_REGISTRY_RESOURCEID(IDR_LEGALDESCSPLITTER)
 
@@ -71,15 +72,15 @@ private:
 	// Map containing the Regular Expression strings indexed on file name
 	std::map<std::string, std::string> m_mapFileNameToRegExpString;
 
-	// the regular expresion parser engine
-	IRegularExprParserPtr m_ipRegExParser;
-	
 	// Map containing rulesets for each Legal Description Type.
 	// The Ruleset is used to apply modifiers to individual subattriubtes
 	IStrToObjectMapPtr m_ipLegalTypeToRuleSetMap;
 	
 	IAFUtilityPtr	m_ipAFUtility;
 	IMiscUtilsPtr	m_ipMiscUtils;
+
+	// the regular expresion parser engine (must be reset with each call to SplitAttributes)
+	IRegularExprParserPtr m_ipRegExParser;
 
 	// Flag to keep track of whether object is dirty
 	bool m_bDirty;
@@ -238,6 +239,9 @@ private:
 	
 	// Looks for the keywords of Feet, part as values and all items after them are considered partials
 	void separateFullAndPartial ( IIUnknownVectorPtr ipValueStrings, IIUnknownVectorPtr &ipFullValues, IIUnknownVectorPtr &ipPartValues );
+
+	// Gets a new regular expression parser
+	IRegularExprParserPtr getParser();
 
 	// Checks that this component is licensed
 	void	validateLicense();

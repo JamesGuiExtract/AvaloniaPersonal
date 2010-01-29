@@ -111,8 +111,7 @@ private:
 	bool m_bAsRegExpr;
 	IIUnknownVectorPtr m_ipReplaceInfos;
 
-	// reg expr parser
-	IRegularExprParserPtr m_ipRegExpr;
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	bool m_bDirty;
 

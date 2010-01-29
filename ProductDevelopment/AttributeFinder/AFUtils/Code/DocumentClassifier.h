@@ -128,8 +128,6 @@ private:
 	// Each industry name associated with a vector of DocType names
 	map<string, vector<string> > m_mapNameToVecDocTypes;
 
-	IRegularExprParserPtr m_ipRegExpr;
-
 	//////////
 	// Methods
 	//////////

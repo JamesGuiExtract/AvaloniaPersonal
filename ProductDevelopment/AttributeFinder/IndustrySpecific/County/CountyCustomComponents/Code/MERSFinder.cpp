@@ -39,19 +39,29 @@ MERSFinder::MERSFinder()
 : m_ipEntityFinder(NULL),
   m_ipSPM(NULL),
   m_ipExprDefined(NULL),
-  m_ipRegExpr(NULL),
   m_ipDataScorer(NULL)
 {
-
+	try
+	{
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI29478", m_ipMiscUtils);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29479");
 }
-
+//-------------------------------------------------------------------------------------------------
 MERSFinder::~MERSFinder()
 {
 	try
 	{
+		m_ipEntityFinder = NULL;
+		m_ipSPM = NULL;
+		m_ipExprDefined = NULL;
+		m_ipDataScorer = NULL;
+		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16434");
 }
+
 //-------------------------------------------------------------------------------------------------
 // Public Methods
 //-------------------------------------------------------------------------------------------------
@@ -63,6 +73,9 @@ void MERSFinder::findMERS( IIUnknownVectorPtr ipVecEntities, IAFDocumentPtr ipAF
 	
 	IAFDocumentPtr ipOriginalDoc(ipAFDoc);
 	
+	// Get the regex parser
+	IRegularExprParserPtr ipParser = getMERSParser();
+
 	IIUnknownVectorPtr ipFoundAttributes(ipVecEntities);
 	long nSize = ipFoundAttributes->Size();
 	for (long n = 0; n < nSize; n++)
@@ -74,18 +87,18 @@ void MERSFinder::findMERS( IIUnknownVectorPtr ipVecEntities, IAFDocumentPtr ipAF
 		// first to check if the value contains MERS keyword
 		string strValue = ipAttrValue->String;
 		int nStartPos = 0, nEndPos = 0;
-		if (findMERSKeyword(strValue, nStartPos, nEndPos))
+		if (findMERSKeyword(strValue, nStartPos, nEndPos, ipParser))
 		{
 			// if MERS keywords is found in the attribute value, 
 			// then get this value
 			ISpatialStringPtr ipMERSKeyword = ipAttrValue->GetSubString(nStartPos, nEndPos);
 			
 			// for each attribute value, call ModifyValue
-			findNomineeFor(ipAttribute, ipOriginalDoc);
+			findNomineeFor(ipAttribute, ipOriginalDoc, ipParser);
 			
 			// if the value contains no more MERS keyword
 			strValue = ipAttrValue->String;
-			if (!findMERSKeyword(strValue, nStartPos, nEndPos))
+			if (!findMERSKeyword(strValue, nStartPos, nEndPos, ipParser))
 			{
 				// if MERS is found the subattributes from previous split are invalid so remove them
 				IIUnknownVectorPtr ipSubs = ipAttribute->SubAttributes;
@@ -136,7 +149,8 @@ void MERSFinder::findMERS( IIUnknownVectorPtr ipVecEntities, IAFDocumentPtr ipAF
 //-------------------------------------------------------------------------------------------------
 // private / helper methods
 //-------------------------------------------------------------------------------------------------
-void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc )
+void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
+								IRegularExprParserPtr ipParser )
 {
 	IAFDocumentPtr ipOriginalDoc(ipAFDoc);
 	ASSERT_RESOURCE_ALLOCATION("ELI09479", ipOriginalDoc != NULL);
@@ -160,7 +174,7 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc )
 	
 	// If any "MERS" keywords is appearing in the text
 	int nStartPos = 0, nEndPos = 0;
-	if (findMERSKeyword(strValue, nStartPos, nEndPos))
+	if (findMERSKeyword(strValue, nStartPos, nEndPos, ipParser))
 	{
 		IAttributePtr ipTempAttr(CLSID_Attribute);
 		ASSERT_RESOURCE_ALLOCATION("ELI09503", ipTempAttr != NULL );
@@ -174,7 +188,7 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc )
 			strValueFound = asString(ipFoundValue->String);
 		}
 		long nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
-		if (ipFoundValue == NULL || findMERSKeyword ( strValueFound, nStartPos, nEndPos ) 
+		if (ipFoundValue == NULL || findMERSKeyword ( strValueFound, nStartPos, nEndPos, ipParser ) 
 				|| nDataScore < MINSCORE )
 		{
 			// now search pattern 1
@@ -185,7 +199,7 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc )
 				strValueFound = ipFoundValue->String;
 			}
 			nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
-			if (ipFoundValue == NULL || findMERSKeyword ( strValueFound, nStartPos, nEndPos )
+			if (ipFoundValue == NULL || findMERSKeyword ( strValueFound, nStartPos, nEndPos, ipParser )
 				|| nDataScore < MINSCORE)
 			{
 				// no entity found in the first pattern,  
@@ -309,26 +323,15 @@ ISpatialStringPtr MERSFinder::findMatchEntity(ISpatialString* pInputText,
 	return ipResult;
 }
 //-------------------------------------------------------------------------------------------------
-bool MERSFinder::findMERSKeyword(const string& strInput, int& nStartPos, int& nEndPos)
+bool MERSFinder::findMERSKeyword(const string& strInput, int& nStartPos, int& nEndPos,
+								 IRegularExprParserPtr ipParser)
 {
 	bool bFoundMatch = false;
 
 	// if "MORTGAGE ELECTRONIC REGISTRATION SYSTEMS" is found..
 	string strPattern;
 	// if the pattern is found, that means the MERS is in the strInput
-	if (m_ipRegExpr == NULL)
-	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13062", ipMiscUtils != NULL );
-
-		m_ipRegExpr = ipMiscUtils->GetNewRegExpParserInstance("MERSFinder");
-		ASSERT_RESOURCE_ALLOCATION("ELI19370", m_ipRegExpr != NULL);
-
-		m_ipRegExpr->Pattern = "(Mortgage\\s+Electronic\\s+Registration\\s+System(s)?"
-			"|\\bMERS\\b|Mortgage[\\s\\S]+?Registration\\s+System(s)?)([\\s\\S]{1,3}Inc(\\s*\\.)?)?";
-	}
-
-	IIUnknownVectorPtr ipFoundMatch = m_ipRegExpr->Find(_bstr_t(strInput.c_str()), VARIANT_TRUE,
+	IIUnknownVectorPtr ipFoundMatch = ipParser->Find(_bstr_t(strInput.c_str()), VARIANT_TRUE,
 		VARIANT_FALSE);
 
 	if (ipFoundMatch->Size() > 0)
@@ -564,5 +567,20 @@ void MERSFinder::setPredefinedExpressions()
 		m_ipExprDefined->Set(_bstr_t("LenderIs"), _bstr_t(LENDER_IS.c_str()));
 		m_ipExprDefined->Set(_bstr_t("MortgageeKeyword"), _bstr_t(MORGAGEE.c_str()));
 	}
+}
+//-------------------------------------------------------------------------------------------------
+IRegularExprParserPtr MERSFinder::getMERSParser()
+{
+	try
+	{
+		IRegularExprParserPtr ipMERSParser = m_ipMiscUtils->GetNewRegExpParserInstance("MERSFinder");
+		ASSERT_RESOURCE_ALLOCATION("ELI19370", ipMERSParser != NULL);
+
+		ipMERSParser->Pattern = "(Mortgage\\s+Electronic\\s+Registration\\s+System(s)?"
+			"|\\bMERS\\b|Mortgage[\\s\\S]+?Registration\\s+System(s)?)([\\s\\S]{1,3}Inc(\\s*\\.)?)?";
+
+		return ipMERSParser;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29480");
 }
 //-------------------------------------------------------------------------------------------------

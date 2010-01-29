@@ -17,17 +17,12 @@ CExtractLinePP::CExtractLinePP()
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
 		ASSERT_RESOURCE_ALLOCATION("ELI13041", ipMiscUtils != NULL );
 
-		m_ipRegExParser = ipMiscUtils->GetNewRegExpParserInstance("ExtractLine");
-		ASSERT_RESOURCE_ALLOCATION("ELI13042", m_ipRegExParser != NULL);
-
 		// Check licensing
 		validateLicense();
 
 		m_dwTitleID = IDS_TITLEExtractLinePP;
 		m_dwHelpFileID = IDS_HELPFILEExtractLinePP;
 		m_dwDocStringID = IDS_DOCSTRINGExtractLinePP;
-
-		m_ipRegExParser->Pattern = _bstr_t("[^\\d\\s-,]+");
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI05435")
 }

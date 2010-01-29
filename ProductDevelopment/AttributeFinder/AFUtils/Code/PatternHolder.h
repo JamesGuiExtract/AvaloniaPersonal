@@ -12,7 +12,7 @@ enum EConfidenceLevel{kZero = 0, kMaybe, kProbable, kSure};
 class PatternHolder
 {
 public:
-	PatternHolder(const IRegularExprParserPtr& ipRegExpr);
+	PatternHolder();
 	PatternHolder(const PatternHolder& objToCopy);
 	PatternHolder& operator=(const PatternHolder& objToAssign);
 
@@ -63,10 +63,14 @@ public:
 
 private:
 
+	// Misc utils pointer
+	IMiscUtilsPtr m_ipMisc;
+
 	// vector of Rule IDs associated with m_vecPatterns
 	set<string> m_setRuleIDs;
 
 	string getInputText(const ISpatialStringPtr& ipInputText, DocPageCache& cache);
 
-	IRegularExprParserPtr m_ipRegExpr;
+	// Gets a regular expression parser with appropriate case sensitive flag set
+	IRegularExprParserPtr getParser();
 };

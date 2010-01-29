@@ -237,9 +237,7 @@ private:
 	// the clue list from file
 	CachedObjectFromFile<IVariantVectorPtr, StringLoader> m_cachedClue[4];
 
-	// Regular expression parser used for calls to spatial string methods that
-	// require a parser
-	IRegularExprParserPtr m_ipRegExprParser;
+	IMiscUtilsPtr m_ipMisc;
 
 	//////////
 	// Methods
@@ -253,7 +251,8 @@ private:
 	//          ipPageText != NULL
 	// PROMISE: Result doesn't include any expansion. Returns true if it's possible to calculate 
 	//          the boundaries, false otherwise
-	bool calculateRoughBorderPosition(BoundaryToInfo mapBorderToInfo, ISpatialStringPtr ipPageText);
+	bool calculateRoughBorderPosition(BoundaryToInfo mapBorderToInfo, ISpatialStringPtr ipPageText,
+		IRegularExprParserPtr ipParser);
 
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the vertical or horizontal position in pixels of the specified side of the
@@ -287,7 +286,7 @@ private:
 	//          m_bDataInsideBoundaries - whether to include or exclude the region
 	//          m_bIncludeIntersecting - whether to include intersecting entities
 	// NOTE:    At most, only one region per page will be found.
-	ISpatialStringPtr getPageRegionContent(ISpatialStringPtr ipPage);
+	ISpatialStringPtr getPageRegionContent(ISpatialStringPtr ipPage, IRegularExprParserPtr ipParser);
 
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the first page of ipPages after lStartPage that contains all the clues of 
@@ -297,13 +296,15 @@ private:
 	// PROMISE: Returns the index of the first page of ipPages such that 
 	//          lStartPage <= returnValue < ipPages->Size(). If no such page is found, will return -1.
 	//          Stores the bounding rectangle for the found clues into clueListInfo.m_ipFoundString.
-	long findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lStartIndex);
+	long findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lStartIndex,
+		IRegularExprParserPtr ipParser);
 
 	// Require : m_mapBorderToPosition is not empty
 	// Find pass-in clue list in the ipPageText within boundaries stored in m_mapBorderToPosition
 	// Return true if found, false otherwise.
 	// The found clue string will be stored in listInfo
-	bool findCluesWithinBoundary(ISpatialStringPtr ipPageText, ClueListInfo& rlistInfo);
+	bool findCluesWithinBoundary(ISpatialStringPtr ipPageText, ClueListInfo& rlistInfo,
+		IRegularExprParserPtr ipParser);
 
 	// get the expand pixels according to the border
 	long getExpandPixels(EBoundary eRegionBound, ISpatialStringPtr ipPageText);

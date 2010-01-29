@@ -26,12 +26,8 @@ CEntityFinder::CEntityFinder()
 {
 	try
 	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13036", ipMiscUtils != NULL );
-
-		// Instantiate the Regular Expression parser
-		m_ipParser = ipMiscUtils->GetNewRegExpParserInstance("EntityFinder");
-		ASSERT_RESOURCE_ALLOCATION( "ELI06026", m_ipParser != NULL );
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI13036", m_ipMiscUtils != NULL );
 
 		// Instantiate the Entity Keywords object
 		m_ipKeys.CreateInstance( CLSID_EntityKeywords );
@@ -50,7 +46,17 @@ CEntityFinder::CEntityFinder()
 		// Check logging flag
 		m_bLoggingEnabled = (ma_pEFConfigMgr->getLoggingEnabled() > 0) ? true : false;
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI05953")
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI05953");
+}
+//-------------------------------------------------------------------------------------------------
+CEntityFinder::~CEntityFinder()
+{
+	try
+	{
+		m_ipKeys = NULL;
+		m_ipMiscUtils = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29442");
 }
 
 //-------------------------------------------------------------------------------------------------

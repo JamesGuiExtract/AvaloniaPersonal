@@ -28,11 +28,8 @@ CRemoveCharacters::CRemoveCharacters()
 {
 	try
 	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13056", ipMiscUtils != NULL );
-
-		m_ipRegExpr = ipMiscUtils->GetNewRegExpParserInstance("RemoveCharacters");
-		ASSERT_RESOURCE_ALLOCATION("ELI06655", m_ipRegExpr != NULL);
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI13056", m_ipMiscUtils != NULL );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06656")
 }
@@ -41,6 +38,7 @@ CRemoveCharacters::~CRemoveCharacters()
 {
 	try
 	{
+		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16363");
 }
@@ -90,10 +88,15 @@ STDMETHODIMP CRemoveCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 		string strCharacters = translateToRegExString(m_strCharactersDefined);
 		string strPattern = "[" + strCharacters + "]+";
 
+		// Get a regular expression parser
+		IRegularExprParserPtr ipParser =
+			m_ipMiscUtils->GetNewRegExpParserInstance("RemoveCharacters");
+		ASSERT_RESOURCE_ALLOCATION("ELI06655", ipParser != NULL);
+
 		if (m_bRemoveAll)
 		{
 			// remove all characters defined
-			IIUnknownVectorPtr ipVecInfo = findPatternInString(_bstrText, 
+			IIUnknownVectorPtr ipVecInfo = findPatternInString(ipParser, _bstrText, 
 				_bstr_t(strPattern.c_str()), true);
 			while (ipVecInfo != NULL && ipVecInfo->Size()> 0)
 			{
@@ -109,7 +112,7 @@ STDMETHODIMP CRemoveCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 				ipInputText->Remove(nStart, nEnd);
 
 				_bstrText = ipInputText->String;
-				ipVecInfo = findPatternInString(_bstrText, 
+				ipVecInfo = findPatternInString(ipParser, _bstrText, 
 				_bstr_t(strPattern.c_str()), true);
 			}
 		}
@@ -150,7 +153,7 @@ STDMETHODIMP CRemoveCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 				_bstrText = ipInputText->String;
 				// look for all character defined in the input string
 				IIUnknownVectorPtr ipVecInfo 
-					= findPatternInString(_bstrText, _bstr_t(strPattern.c_str()));
+					= findPatternInString(ipParser, _bstrText, _bstr_t(strPattern.c_str()));
 				if (ipVecInfo->Size()>0)
 				{
 					// let's get the very first occurrence of 
@@ -173,7 +176,7 @@ STDMETHODIMP CRemoveCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 				// update current text
 				_bstrText = ipInputText->String;
 				IIUnknownVectorPtr ipVecInfo 
-					= findPatternInString(_bstrText, _bstr_t(strPattern.c_str()));
+					= findPatternInString(ipParser, _bstrText, _bstr_t(strPattern.c_str()));
 				if (ipVecInfo->Size()>0)
 				{
 					// let's get the very last occurrence of 
@@ -652,15 +655,16 @@ STDMETHODIMP CRemoveCharacters::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // Private functions
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CRemoveCharacters::findPatternInString(_bstr_t _bstrInput, 
+IIUnknownVectorPtr CRemoveCharacters::findPatternInString(IRegularExprParserPtr ipParser,
+														  _bstr_t _bstrInput, 
 														  _bstr_t _bstrPattern,
 														  bool bFindFirstMatchOnly)
 {
 	IIUnknownVectorPtr ipFoundStringInfos(NULL);
 
-	m_ipRegExpr->Pattern = _bstrPattern;
-	m_ipRegExpr->IgnoreCase = asVariantBool(!m_bCaseSensitive);
-	ipFoundStringInfos = m_ipRegExpr->Find(_bstrInput, asVariantBool(bFindFirstMatchOnly), 
+	ipParser->Pattern = _bstrPattern;
+	ipParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
+	ipFoundStringInfos = ipParser->Find(_bstrInput, asVariantBool(bFindFirstMatchOnly), 
 		VARIANT_FALSE);
 
 	return ipFoundStringInfos;

@@ -66,8 +66,6 @@ private:
 
 	CXInfoTip m_infoTip;
 
-	IRegularExprParserPtr m_ipRegExParser;
-
 	//////////
 	// Methods
 	//////////

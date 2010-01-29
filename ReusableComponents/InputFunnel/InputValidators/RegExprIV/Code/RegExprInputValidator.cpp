@@ -14,17 +14,24 @@ using namespace std;
 // CRegExprInputValidator
 //-------------------------------------------------------------------------------------------------
 CRegExprInputValidator::CRegExprInputValidator()
-:m_ipRegExprParser(NULL), m_bDirty(false)
+: m_bDirty(false)
 {
 	try
 	{
 		// Get a regular expression parser.
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22291", ipMiscUtils != NULL);
-		m_ipRegExprParser = ipMiscUtils->GetNewRegExpParserInstance("RegExprInputValidator");
-		ASSERT_RESOURCE_ALLOCATION("ELI22277", m_ipRegExprParser != NULL);
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI22291", m_ipMiscUtils != NULL);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI22278");
+}
+//-------------------------------------------------------------------------------------------------
+CRegExprInputValidator::~CRegExprInputValidator()
+{
+	try
+	{
+		m_ipMiscUtils = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29484");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRegExprInputValidator::InterfaceSupportsErrorInfo(REFIID riid)
@@ -59,21 +66,14 @@ STDMETHODIMP CRegExprInputValidator::raw_ValidateInput(ITextInput * pTextInput, 
 	{
 		// Check license
 		validateLicense();
-		
-		if (m_ipRegExprParser)
-		{
-			ITextInputPtr ipTextInput(pTextInput);
-			*pbSuccessful = m_ipRegExprParser->StringMatchesPattern(ipTextInput->GetText());
-		}
-		else
-		{
-			throw UCLIDException("ELI03880", "RegExpr parser object not initialized!");
-		}
-				
+
+		// Validate the input text
+		ITextInputPtr ipTextInput(pTextInput);
+		*pbSuccessful = getParser()->StringMatchesPattern(ipTextInput->GetText());
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI03865")
-		
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRegExprInputValidator::raw_GetInputType(BSTR * pstrInputType)
@@ -85,7 +85,7 @@ STDMETHODIMP CRegExprInputValidator::raw_GetInputType(BSTR * pstrInputType)
 		// Check license
 		validateLicense();
 
-		*pstrInputType = _bstr_t(m_strInputTypeName.c_str()).copy();
+		*pstrInputType = _bstr_t(m_strInputTypeName.c_str()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI03866")
 	
@@ -123,14 +123,13 @@ STDMETHODIMP CRegExprInputValidator::get_Pattern(BSTR *pVal)
 		// Check license
 		validateLicense();
 
-		if (m_ipRegExprParser)
-		{
-			*pVal = m_ipRegExprParser->Pattern.copy();
-		}
+		ASSERT_ARGUMENT("ELI29481", pVal != NULL);
+
+		*pVal = _bstr_t(m_strPattern.c_str()).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI03867")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRegExprInputValidator::put_Pattern(BSTR newVal)
@@ -142,16 +141,13 @@ STDMETHODIMP CRegExprInputValidator::put_Pattern(BSTR newVal)
 		// Check license
 		validateLicense();
 
-		if (m_ipRegExprParser)
-		{
-			m_ipRegExprParser->Pattern = newVal;
-		}
+		m_strPattern = asString(newVal);
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI03868")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRegExprInputValidator::get_IgnoreCase(VARIANT_BOOL *pVal)
@@ -163,14 +159,13 @@ STDMETHODIMP CRegExprInputValidator::get_IgnoreCase(VARIANT_BOOL *pVal)
 		// Check license
 		validateLicense();
 
-		if (m_ipRegExprParser)
-		{
-			*pVal = m_ipRegExprParser->IgnoreCase;
-		}
+		ASSERT_ARGUMENT("ELI29482", pVal != NULL);
+
+		*pVal = asVariantBool(m_bIgnoreCase);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI03869")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRegExprInputValidator::put_IgnoreCase(VARIANT_BOOL newVal)
@@ -182,16 +177,13 @@ STDMETHODIMP CRegExprInputValidator::put_IgnoreCase(VARIANT_BOOL newVal)
 		// Check license
 		validateLicense();
 
-		if (m_ipRegExprParser)
-		{
-			m_ipRegExprParser->IgnoreCase = newVal;
-		}
+		m_bIgnoreCase = asCppBool(newVal);
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI03870")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRegExprInputValidator::SetInputType(BSTR strInputTypeName)
@@ -206,11 +198,10 @@ STDMETHODIMP CRegExprInputValidator::SetInputType(BSTR strInputTypeName)
 		m_strInputTypeName = asString( strInputTypeName );
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI03871")
-
-	return S_OK;
-
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRegExprInputValidator::GetInputType(BSTR* strInputTypeName)
@@ -222,12 +213,13 @@ STDMETHODIMP CRegExprInputValidator::GetInputType(BSTR* strInputTypeName)
 		// Check license
 		validateLicense();
 
-		*strInputTypeName = _bstr_t(m_strInputTypeName.c_str()).copy();
+		ASSERT_ARGUMENT("ELI29483", strInputTypeName != NULL);
 
+		*strInputTypeName = _bstr_t(m_strInputTypeName.c_str()).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08309")
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -245,17 +237,15 @@ STDMETHODIMP CRegExprInputValidator::raw_CopyFrom(IUnknown *pObject)
 		UCLID_REGEXPRIVLib::IRegExprInputValidatorPtr ipSource(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI08303", ipSource != NULL);
 
-		// Here we are using a put method inside of copy from
-		// this is undesirable put as long as the put methods 
-		// on IRegularExprParser aren't doing any validation we are ok
-		m_ipRegExprParser->PutIgnoreCase(ipSource->GetIgnoreCase());
-		m_ipRegExprParser->PutPattern(ipSource->GetPattern());
+		m_bIgnoreCase = asCppBool(ipSource->IgnoreCase);
+		m_strPattern = asString(ipSource->Pattern);
+		m_strInputTypeName = asString(ipSource->GetInputType());
 
-		m_strInputTypeName = ipSource->GetInputType();
+		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08310");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRegExprInputValidator::raw_Clone(IUnknown* *pObject)
@@ -293,13 +283,11 @@ STDMETHODIMP CRegExprInputValidator::raw_IsConfigured(VARIANT_BOOL * pbValue)
 		// Check license
 		validateLicense();
 
-		_bstr_t bstrPattern = m_ipRegExprParser->Pattern;
-		*pbValue = (bstrPattern.length()==0 || m_strInputTypeName.empty()) 
-					? VARIANT_FALSE : VARIANT_TRUE;
+		*pbValue = asVariantBool(!m_strPattern.empty() && !m_strInputTypeName.empty()); 
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04868");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -329,8 +317,8 @@ STDMETHODIMP CRegExprInputValidator::Load(IStream *pStream)
 
 		// Clear the variables first
 		m_strInputTypeName = "";
-		string	strPattern;
-		bool	bIgnoreCase = false;
+		m_strPattern = "";
+		m_bIgnoreCase = false;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -345,15 +333,9 @@ STDMETHODIMP CRegExprInputValidator::Load(IStream *pStream)
 		if (nDataVersion >= 1)
 		{
 			dataReader >> m_strInputTypeName;
-			dataReader >> strPattern;
-			dataReader >> bIgnoreCase;
+			dataReader >> m_strPattern;
+			dataReader >> m_bIgnoreCase;
 		}
-
-		UCLID_REGEXPRIVLib::IRegExprInputValidatorPtr ipRegExpInputValidator = getThisAsCOMPtr();
-
-		// Apply the settings
-		ipRegExpInputValidator->Pattern = get_bstr_t(strPattern);
-		ipRegExpInputValidator->IgnoreCase = asVariantBool(bIgnoreCase);
 
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
@@ -381,19 +363,11 @@ STDMETHODIMP CRegExprInputValidator::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << nCurrentVersion;
 		dataWriter << m_strInputTypeName;
 
-		UCLID_REGEXPRIVLib::IRegExprInputValidatorPtr ipRegExpInputValidator = getThisAsCOMPtr();
-
-		// get the regex pattern to the bytestream
-		string	strPattern  = asString(ipRegExpInputValidator->Pattern);
-
 		// Write the regex pattern to the bytestream
-		dataWriter << strPattern;
-
-		// get the case-sensitive flag to the bytestream
-		bool bIgnoreCase = asCppBool(ipRegExpInputValidator->IgnoreCase);
+		dataWriter << m_strPattern;
 
 		// Write the case-sensitive flag to the bytestream
-		dataWriter << bIgnoreCase;
+		dataWriter << m_bIgnoreCase;
 
 		dataWriter.flushToByteStream();
 
@@ -512,7 +486,7 @@ void CRegExprInputValidator::doTest1()
 	// Set regular expression pattern
 	//   for 3 or more digits
 	/////////////////////////////////
-	m_ipRegExprParser->PutPattern( _bstr_t( "\\d{3,}\\s*With" ) );
+	m_strPattern = "\\d{3,}\\s*With";
 
 	/////////////////////////////////////////////
 	// Prepare ITextInput object with test string
@@ -538,10 +512,10 @@ void CRegExprInputValidator::doTest1()
 	}
 
 	// Set case sensitivity flag
-	m_ipRegExprParser->PutIgnoreCase( VARIANT_FALSE );
+	m_bIgnoreCase = false;
 
 	// Retest validity - expect failure
-	vbResult = ValidateInput( ipTextInput );
+	vbResult = ipThis->ValidateInput( ipTextInput );
 	if (vbResult == VARIANT_TRUE)
 	{
 		// If valid, leave a note
@@ -558,6 +532,23 @@ void CRegExprInputValidator::doTest1()
 	/////////////////////
 	ipTextInput = NULL;
 	m_ipLogger->EndTestCase( bTestSuccess ? VARIANT_TRUE : VARIANT_FALSE );
+}
+//-------------------------------------------------------------------------------------------------
+IRegularExprParserPtr CRegExprInputValidator::getParser()
+{
+	try
+	{
+		IRegularExprParserPtr ipParser =
+			m_ipMiscUtils->GetNewRegExpParserInstance("RegExprInputValidator");
+		ASSERT_RESOURCE_ALLOCATION("ELI22277", ipParser != NULL);
+
+		// Set the case sensitivity and pattern
+		ipParser->IgnoreCase = asVariantBool(m_bIgnoreCase);
+		ipParser->Pattern = m_strPattern.c_str();
+
+		return ipParser;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29485");
 }
 //-------------------------------------------------------------------------------------------------
 void CRegExprInputValidator::validateLicense()

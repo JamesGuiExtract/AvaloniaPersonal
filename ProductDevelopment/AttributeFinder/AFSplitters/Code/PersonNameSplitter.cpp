@@ -26,13 +26,20 @@ CPersonNameSplitter::CPersonNameSplitter()
 		m_ipKeys.CreateInstance( CLSID_EntityKeywords );
 		ASSERT_RESOURCE_ALLOCATION( "ELI06473", m_ipKeys != NULL );
 		
-		IMiscUtilsPtr ipMisc(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22557", ipMisc != NULL);
-
-		m_ipRegExprParser = ipMisc->GetNewRegExpParserInstance("PersonNameSplitter");
-		ASSERT_RESOURCE_ALLOCATION("ELI22558", m_ipRegExprParser);
+		m_ipMisc.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI22557", m_ipMisc != NULL);
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI06474")
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI06474")
+}
+//-------------------------------------------------------------------------------------------------
+CPersonNameSplitter::~CPersonNameSplitter()
+{
+	try
+	{
+		m_ipKeys = NULL;
+		m_ipMisc = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29465");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -78,11 +85,11 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 		// This was probably an OCR error and should have been an ampersand
 		ipEntity->Trim( _bstr_t( "8" ), _bstr_t( "" ) );
 
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13031", ipMiscUtils != NULL );
+		// Get a regex parser
+		IRegularExprParserPtr ipParser = getParser();
 
 		// Set to ignore case
-		m_ipRegExprParser->IgnoreCase = VARIANT_TRUE;
+		ipParser->IgnoreCase = VARIANT_TRUE;
 
 		// Create SpatialString object for pattern searches
 		ISpatialStringPtr	ipWord( CLSID_SpatialString );
@@ -101,8 +108,8 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 		// "Tokenize" the string, i.e. find all "whole words"	
 		// Each word is composed of alpha-numeric characters, dash(-), underscore(_), 
 		// period(.), forward slash(/), backward slash(\) and apostrophe(')
-		m_ipRegExprParser->Pattern = "[A-Za-z0-9\\-_\\./\\\\']+";
-		IIUnknownVectorPtr ipMatches = m_ipRegExprParser->Find( 
+		ipParser->Pattern = "[A-Za-z0-9\\-_\\./\\\\']+";
+		IIUnknownVectorPtr ipMatches = ipParser->Find( 
 			ipEntity->String, VARIANT_FALSE, VARIANT_FALSE );
 
 		// Check if the first word is a title ("Mr.", "Ms.", etc.)
@@ -116,7 +123,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			ipWord = ipEntity->GetSubString( lStartPos, lEndPos );
 
 			if (asCppBool(ipWord->ContainsStringInVector(
-				m_ipKeys->PersonTitles, VARIANT_FALSE, VARIANT_TRUE,  m_ipRegExprParser)))
+				m_ipKeys->PersonTitles, VARIANT_FALSE, VARIANT_TRUE,  ipParser)))
 			{
 				// Just remove the first word from the collection of words
 				ipMatches->Remove( 0 );
@@ -145,7 +152,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			ipWord = ipEntity->GetSubString( lStartPos, lEndPos );
 
 			if (asCppBool(ipWord->ContainsStringInVector(
-				m_ipKeys->PersonSuffixes, VARIANT_FALSE, VARIANT_TRUE, m_ipRegExprParser)))
+				m_ipKeys->PersonSuffixes, VARIANT_FALSE, VARIANT_TRUE, ipParser)))
 			{
 				// Just remove the last word from the collection of words
 				ipMatches->Remove( ipMatches->Size() - 1 );
@@ -178,9 +185,9 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 			// Check against Last Name Prefixes Keyword
 			_bstr_t bstrPrefixes = m_ipKeys->GetKeywordPattern( _bstr_t( "LastNamePrefixes" ) );
-			m_ipRegExprParser->Pattern = bstrPrefixes;
+			ipParser->Pattern = bstrPrefixes;
 
-			if (m_ipRegExprParser->StringMatchesPattern( ipWord->String ))
+			if (ipParser->StringMatchesPattern( ipWord->String ))
 			{
 				// Set last name prefix flag
 				bLastNamePrefix = true;
@@ -200,7 +207,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			}
 
 			// Check against Last Name Prefixes Keyword
-			if (m_ipRegExprParser->StringMatchesPattern(_bstr_t(bstrValue)))
+			if (ipParser->StringMatchesPattern(_bstr_t(bstrValue)))
 			{
 				// Also must check second word for trailing comma
 				// implying last name, first format
@@ -914,6 +921,18 @@ STDMETHODIMP CPersonNameSplitter::BuildAttribute(BSTR strParentName, BSTR strTit
 
 //-------------------------------------------------------------------------------------------------
 // private / helper methods
+//-------------------------------------------------------------------------------------------------
+IRegularExprParserPtr CPersonNameSplitter::getParser()
+{
+	try
+	{
+		IRegularExprParserPtr ipParser = m_ipMisc->GetNewRegExpParserInstance("PersonNameSplitter");
+		ASSERT_RESOURCE_ALLOCATION("ELI29467", ipParser != NULL);
+		
+		return ipParser;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29466");
+}
 //-------------------------------------------------------------------------------------------------
 void CPersonNameSplitter::validateLicense()
 {

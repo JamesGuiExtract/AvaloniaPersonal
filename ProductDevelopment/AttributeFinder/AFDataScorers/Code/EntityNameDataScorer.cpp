@@ -43,11 +43,8 @@ m_bIsInvalidPersonWordsLoaded(false)
 {
 	try
 	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI12971", ipMiscUtils != NULL );
-
-		m_ipParser = ipMiscUtils->GetNewRegExpParserInstance("EntityNameDataScorer");
-		ASSERT_RESOURCE_ALLOCATION("ELI08724", m_ipParser != NULL );
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI12971", m_ipMiscUtils != NULL );
 
 		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrAF_DATA_SCORERS_PATH ) );
@@ -56,7 +53,17 @@ m_bIsInvalidPersonWordsLoaded(false)
 		m_bLoggingEnabled = getLoggingEnabled() == 1;
 		loadInvalidPersonVector();
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI08962")
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI08962");
+}
+//-------------------------------------------------------------------------------------------------
+CEntityNameDataScorer::~CEntityNameDataScorer()
+{
+	try
+	{
+		m_ipMiscUtils = NULL;
+		m_ipAFUtility = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29471");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -366,19 +373,24 @@ long CEntityNameDataScorer::getAttrScore( IAttributePtr ipAttribute )
 	{
 		return 0;
 	}
+
+	// Get the regex parser
+	IRegularExprParserPtr ipParser = getParser();
+
 	long nScore = 0;
-	string strAttrName = ipAttribute->Name;
-	string strValue = ipAttrValue->String;
+	string strAttrName = asString(ipAttribute->Name);
+	string strValue = asString(ipAttrValue->String);
+
 	// if the Top level attribute name is a split subattribute name get the score of top level
 	if ( strAttrName == "Person" || strAttrName == "PersonAlias" )
 	{
-		nScore = getPersonScore( ipAttribute, strValue );
+		nScore = getPersonScore( ipAttribute, strValue, ipParser );
 		return nScore;
 	}
 	else if ( strAttrName == "Company" || strAttrName == "CompanyAlias" ||
 			strAttrName == "RelatedCompany" || strAttrName == "Trust" )
 	{
-		nScore = getCompanyScore( strValue, strValue );
+		nScore = getCompanyScore( strValue, strValue, ipParser );
 		return nScore;
 	}
 
@@ -417,11 +429,11 @@ long CEntityNameDataScorer::getAttrScore( IAttributePtr ipAttribute )
 		// Score based on the company or the person
 		if (( strName == "Company" ) || ( strName == "Trust" ))
 		{
-			nScore += getCompanyScore( strSubValue, strValue );
+			nScore += getCompanyScore( strSubValue, strValue, ipParser );
 		}
 		if ( strName == "Person")
 		{
-			nScore += getPersonScore( ipCurrAttr, strValue );
+			nScore += getPersonScore( ipCurrAttr, strValue, ipParser );
 		}
 		if ( nScore > 100 )
 		{
@@ -438,7 +450,8 @@ long CEntityNameDataScorer::getAttrScore( IAttributePtr ipAttribute )
 	return nScore;
 }
 //-------------------------------------------------------------------------------------------------
-long CEntityNameDataScorer::getCompanyScore( string strCompanyString, string strOriginal  )
+long CEntityNameDataScorer::getCompanyScore( string strCompanyString, string strOriginal,
+											IRegularExprParserPtr ipParser)
 {
 	// min size of a valid Company is 4 char
 	if ( strCompanyString.size() < 4 ) 
@@ -461,7 +474,7 @@ long CEntityNameDataScorer::getCompanyScore( string strCompanyString, string str
 
 	// Base score is 2 since this was split as company
 	long nScore = 1;
-	if ( isAllCommonWords( strCompany ) )
+	if ( isAllCommonWords( strCompany, ipParser ) )
 	{
 		return nScore;
 	}
@@ -486,12 +499,13 @@ long CEntityNameDataScorer::getCompanyScore( string strCompanyString, string str
 //	}
 
 	// Check for too many vowels or consonants together
-	if ( countOfRegExpInInput( "[aeiou]{4,}", strCompany ) == 0 && countOfRegExpInInput( "[^aeiouy\\s]{4,}", strCompany ) == 0 )
+	if ( countOfRegExpInInput( "[aeiou]{4,}", strCompany, ipParser ) == 0
+		&& countOfRegExpInInput( "[^aeiouy\\s]{4,}", strCompany, ipParser ) == 0 )
 	{
 		nScore += 2;
 	}
 	// Count the number embedded numbers
-	if ( countOfRegExpInInput ("[a-z]*?\\d+?[a-z]+", strCompany ) <= 2)
+	if ( countOfRegExpInInput ("[a-z]*?\\d+?[a-z]+", strCompany, ipParser ) <= 2)
 	{
 		nScore += 2;
 	}
@@ -508,7 +522,8 @@ long CEntityNameDataScorer::getCompanyScore( string strCompanyString, string str
 	return nScore;
 }
 //-------------------------------------------------------------------------------------------------
-long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string strOriginal )
+long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string strOriginal,
+										   IRegularExprParserPtr ipParser)
 {
 
 	if (ipAttribute == NULL )
@@ -560,7 +575,8 @@ long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string st
 		nScore++;
 	}
 		// Check for too many vowels or consonants together
-	if ( countOfRegExpInInput( "[aeiou]{4,}", strPerson ) == 0 && countOfRegExpInInput( "[^aeiouy]{4,}", strPerson ) == 0 )
+	if ( countOfRegExpInInput( "[aeiou]{4,}", strPerson, ipParser ) == 0
+		&& countOfRegExpInInput( "[^aeiouy]{4,}", strPerson, ipParser ) == 0 )
 	{
 		nScore++;
 	}
@@ -595,11 +611,11 @@ long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string st
 		{
 			bSuffixFound = true;
 		}
-		else if (  strAttrName == "First" && !isAllCommonWords (strValue) )
+		else if (  strAttrName == "First" && !isAllCommonWords (strValue, ipParser) )
 		{
 			bFirstNameFound = true;
 		}
-		else if ( bAboveMinSize  && strAttrName == "Last" && !isAllCommonWords (strValue))
+		else if ( bAboveMinSize  && strAttrName == "Last" && !isAllCommonWords (strValue, ipParser))
 		{
 			bLastNameFound = true;
 		}
@@ -642,14 +658,14 @@ long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string st
 	ASSERT_RESOURCE_ALLOCATION("ELI08725", ipPersonDesignators != NULL );
 
 	// Search original string for Person designators
-	VARIANT_BOOL bFound = m_ipParser->StringContainsPatterns(strOriginal.c_str(), 
+	VARIANT_BOOL bFound = ipParser->StringContainsPatterns(strOriginal.c_str(), 
 															ipPersonDesignators, FALSE);
 	if ( bFound || bAliasFound )
 	{
 		nScore++;
 	}
 	// Determine all common words
-	if ( !isAllCommonWords (strPerson) )
+	if ( !isAllCommonWords (strPerson, ipParser) )
 	{
 		nScore += 2;
 	}
@@ -690,7 +706,8 @@ void CEntityNameDataScorer::validateLicense()
 	VALIDATE_LICENSE( ENTITY_NAME_DATA_SCORER_ID, "ELI08849", "Entity Data Scorer" );
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityNameDataScorer::isAllCommonWords( const string& strInput )
+bool CEntityNameDataScorer::isAllCommonWords( const string& strInput,
+											 IRegularExprParserPtr ipParser)
 {
 	if ( strInput.size() == 0 ) 
 	{
@@ -698,13 +715,14 @@ bool CEntityNameDataScorer::isAllCommonWords( const string& strInput )
 	}
 	// Load common words regular expression
 	string strPattern = getCommonWordsPattern();
-	m_ipParser->IgnoreCase = VARIANT_TRUE;
-	m_ipParser->Pattern = strPattern.c_str();
-	string strWithoutWords = m_ipParser->ReplaceMatches(strInput.c_str(), "", VARIANT_FALSE );
+	ipParser->IgnoreCase = VARIANT_TRUE;
+	ipParser->Pattern = strPattern.c_str();
+	string strWithoutWords = asString(ipParser->ReplaceMatches(strInput.c_str(), "", VARIANT_FALSE));
 	
 	// remove punctuation
-	m_ipParser->Pattern = "[\\.,/?';:""\\[\\]\\(\\)\\s\\\\]";
-	string strWithoutPunct = m_ipParser->ReplaceMatches(strWithoutWords.c_str(), "", VARIANT_FALSE );
+	ipParser->Pattern = "[\\.,/?';:""\\[\\]\\(\\)\\s\\\\]";
+	string strWithoutPunct =
+		asString(ipParser->ReplaceMatches(strWithoutWords.c_str(), "", VARIANT_FALSE));
 	
 	//  if anything is left return score of 2
 	if ( strWithoutPunct.size() > 0 ) 
@@ -750,7 +768,7 @@ IAFUtilityPtr CEntityNameDataScorer::getAFUtility()
 	return m_ipAFUtility;
 }
 //-------------------------------------------------------------------------------------------------
-void CEntityNameDataScorer::logResults(long nScore, std::string strItemScored, bool bLineAfter)
+void CEntityNameDataScorer::logResults(long nScore, string strItemScored, bool bLineAfter)
 {
 	// Convert each string to single-line string
 	::convertCppStringToNormalString( strItemScored );
@@ -797,7 +815,7 @@ long CEntityNameDataScorer::getLoggingEnabled()
 	return lResult;
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityNameDataScorer::hasVowelsAndConsonants( const std::string& strItem )
+bool CEntityNameDataScorer::hasVowelsAndConsonants( const string& strItem )
 {
 	string strTemp = strItem;
 	makeUpperCase( strTemp );
@@ -813,7 +831,7 @@ bool CEntityNameDataScorer::hasVowelsAndConsonants( const std::string& strItem )
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityNameDataScorer::noInvalidChars( const std::string& strItem, const std::string& strValidChars )
+bool CEntityNameDataScorer::noInvalidChars( const string& strItem, const string& strValidChars )
 {
 	string strTemp = strItem;
 	makeUpperCase( strTemp );
@@ -865,7 +883,7 @@ void CEntityNameDataScorer::loadInvalidPersonVector()
 	return;
 }
 //-------------------------------------------------------------------------------------------------
-bool CEntityNameDataScorer::containsInvalidPersonWords( const std::vector<std::string> &vecWords )
+bool CEntityNameDataScorer::containsInvalidPersonWords( const vector<string> &vecWords )
 {
 	bool bResult = false;
 	long nNumWords = vecWords.size();
@@ -881,23 +899,38 @@ bool CEntityNameDataScorer::containsInvalidPersonWords( const std::vector<std::s
 	return bResult;
 };
 //-------------------------------------------------------------------------------------------------
-long CEntityNameDataScorer::countOfRegExpInInput( const string &strRegExpToFind, const string &strInput )
+long CEntityNameDataScorer::countOfRegExpInInput( const string &strRegExpToFind,
+												 const string &strInput,
+												 IRegularExprParserPtr ipParser)
 {
 	if ( strInput.size() == 0 ) 
 	{
 		return false;
 	}
 	// Set pattern for Multiple vowels
-	m_ipParser->IgnoreCase = VARIANT_TRUE;
-	m_ipParser->Pattern = strRegExpToFind.c_str();
+	ipParser->IgnoreCase = VARIANT_TRUE;
+	ipParser->Pattern = strRegExpToFind.c_str();
 
 	IIUnknownVectorPtr ipFound;
-	ipFound =	m_ipParser->Find( strInput.c_str(), VARIANT_TRUE, VARIANT_FALSE );
+	ipFound =	ipParser->Find( strInput.c_str(), VARIANT_TRUE, VARIANT_FALSE );
 
 	if (ipFound != NULL )
 	{
 		return ipFound->Size();
 	}
 	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+IRegularExprParserPtr CEntityNameDataScorer::getParser()
+{
+	try
+	{
+		IRegularExprParserPtr ipParser =
+			m_ipMiscUtils->GetNewRegExpParserInstance("EntityNameDataScorer");
+		ASSERT_RESOURCE_ALLOCATION("ELI08724", ipParser != NULL );
+
+		return ipParser;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29472");
 }
 //-------------------------------------------------------------------------------------------------

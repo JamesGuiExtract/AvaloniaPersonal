@@ -115,14 +115,13 @@ private:
 
 	bool m_bDirty;
 
-	// reg expr parser
-	IRegularExprParserPtr m_ipRegExpr;
-
 	// This object will used to read the string to find from the file
 	CachedObjectFromFile<std::string, StringLoader> m_cachedFindStringLoader;
 
 	// This object will used to read the string to replace the find string from the file
 	CachedObjectFromFile<std::string, StringLoader> m_cachedReplaceStringLoader;
+
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	//////////////
 	// Methods

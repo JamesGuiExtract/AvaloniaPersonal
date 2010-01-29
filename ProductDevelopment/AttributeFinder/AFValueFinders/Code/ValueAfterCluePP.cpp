@@ -39,12 +39,6 @@ CValueAfterCluePP::CValueAfterCluePP()
 		m_dwTitleID = IDS_TITLEValueAfterCluePP;
 		m_dwHelpFileID = IDS_HELPFILEValueAfterCluePP;
 		m_dwDocStringID = IDS_DOCSTRINGValueAfterCluePP;
-
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13050", ipMiscUtils != NULL );
-
-		m_ipRegExpParser = ipMiscUtils->GetNewRegExpParserInstance("ValueAfterClue");
-		ASSERT_RESOURCE_ALLOCATION("ELI04586", m_ipRegExpParser != NULL);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI04585")
 }
@@ -356,16 +350,24 @@ LRESULT CValueAfterCluePP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 						SetDlgItemText( IDC_EDIT_OTHER_STOP_AC, m_strOtherStops.c_str() );
 					}
 
+					// Get a regex parser
+					IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
+					ASSERT_RESOURCE_ALLOCATION("ELI13050", ipMiscUtils != NULL );
+
+					IRegularExprParserPtr ipRegExpParser =
+						ipMiscUtils->GetNewRegExpParserInstance("ValueAfterClue");
+					ASSERT_RESOURCE_ALLOCATION("ELI04586", ipRegExpParser != NULL);
+
 					// parse the available punctuations, into spaces and non-spaces chars
 					string strPunct = asString(bstrPunctuations);
 					m_bSpacesAsPunctuations = strPunct.find(" ") != string::npos;
 					ATLControls::CButton checkSpaces(GetDlgItem(IDC_CHK_SPACES_AC));
 					checkSpaces.SetCheck(m_bSpacesAsPunctuations ? 1 : 0);
 
-					m_ipRegExpParser->Pattern = "[\\S]+";
-					m_ipRegExpParser->IgnoreCase = m_bCaseSensitive?VARIANT_FALSE:VARIANT_TRUE;
+					ipRegExpParser->Pattern = "[\\S]+";
+					ipRegExpParser->IgnoreCase = m_bCaseSensitive?VARIANT_FALSE:VARIANT_TRUE;
 					IIUnknownVectorPtr ipVecObjPairs = 
-						m_ipRegExpParser->Find(_bstr_t(bstrPunctuations), VARIANT_FALSE, 
+						ipRegExpParser->Find(_bstr_t(bstrPunctuations), VARIANT_FALSE, 
 						VARIANT_FALSE);
 
 					ATLControls::CButton checkOther(GetDlgItem(IDC_CHK_OTHER_PUNC_AC));

@@ -33,6 +33,7 @@ class ATL_NO_VTABLE CEntityFinder :
 {
 public:
 	CEntityFinder();
+	~CEntityFinder();
 
 DECLARE_REGISTRY_RESOURCEID(IDR_ENTITYFINDER)
 
@@ -87,11 +88,11 @@ private:
 	///////
 	// Data
 	///////
-	// Parses using regular expressions
-	IRegularExprParserPtr	m_ipParser;
-
 	// Manages keywords associated with identifying entities
 	UCLID_AFUTILSLib::IEntityKeywordsPtr	m_ipKeys;
+
+	// Misc utils pointer used to get a regular expression parser
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	// Handles configuration persistence
 	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
@@ -109,7 +110,7 @@ private:
 	void findEntities(const ISpatialStringPtr& ipText);
 	//----------------------------------------------------------------------------------------------
 	// Returns left-hand portion of string after intelligent trimming of blank lines
-	string	doBlankLineTrimming(string strInput, long lKeywordEndPos, 
+	string	doBlankLineTrimming(string strInput, IRegularExprParserPtr ipParser, long lKeywordEndPos, 
 		bool bFoundTrust);
 	//----------------------------------------------------------------------------------------------
 	// Returns upper-case substring having period delimiter
@@ -117,37 +118,41 @@ private:
 		long lSuffixStop, bool bAliasFound);
 	//----------------------------------------------------------------------------------------------
 	// Returns right-hand portion of string without any leading parentheses
-	string	doGeneralTrimming(string strInput, bool bPersonFound);
+	string	doGeneralTrimming(string strInput, bool bPersonFound, IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// Trims string after TrustIndicator if followed by "DATED", or other TrustDates expression.
 	// Returns true if TrustIndicator found, false otherwise.
-	bool	doTrustTrimming(ISpatialStringPtr &ripSpatial);
+	bool	doTrustTrimming(ISpatialStringPtr &ripSpatial, IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// Checks ipText starting at lStartPos for Company-related keywords.
 	// Alias information will be included as long as a subsequent Entity is found
-	bool	findCompanyEnd(ISpatialString *pText, long lStartPos, long *plSuffixStart, 
-		long *plSuffixEnd, long *plEndPos, bool *pbFoundSuffix, bool *pbFoundAlias);
+	bool	findCompanyEnd(ISpatialStringPtr ipText, IRegularExprParserPtr ipParser,
+		long lStartPos, long *plSuffixStart, long *plSuffixEnd, long *plEndPos,
+		bool *pbFoundSuffix, bool *pbFoundAlias);
 	//----------------------------------------------------------------------------------------------
 	// Searches strText from specified starting character for the first word containing either
 	// one or more upper-case characters OR all lower-case characters.  A word containing a 
 	// digit can be either accepted or rejected, as desired
 	// The word "of" is acceptable if bIsCompany == true
-	long	findFirstCaseWord(const string& strText, int iStartPos, bool bUpperCase, 
+	long	findFirstCaseWord(const string& strText, int iStartPos, bool bUpperCase,
 		bool bAcceptDigit, bool bIsCompany);
 	//----------------------------------------------------------------------------------------------
 	// Searches strText from specified starting character for the first LC word that should 
 	// be trimmed.  "and" and "&" are accepted as separators between otherwise UC words.
 	// NOTE: Neither "and" nor "&" will be accepted as trailing LC words
 	// If bCompany == true, "of" is an acceptable separator
-	long	findFirstLowerCaseWordToTrim(const string& strText, int iStartPos, bool bIsCompany);
+	long	findFirstLowerCaseWordToTrim(const string& strText, IRegularExprParserPtr ipParser,
+		int iStartPos, bool bIsCompany);
 	//----------------------------------------------------------------------------------------------
 	// Searches strText from lStart, checking to see if the next word is a valid
 	// separator.  Returns end position of separator, if found, otherwise -1.
-	long	findSeparatorWordEnd(const string& strText, long lStart, bool bIsCompany);
+	long	findSeparatorWordEnd(const string& strText, IRegularExprParserPtr ipParser,
+		long lStart, bool bIsCompany);
 	//----------------------------------------------------------------------------------------------
 	// Searches strText1 and strText2 to find a keyword phrase that crosses from one 
 	// to the other.
-	bool	foundKeywordPhraseOverlap(const string& strText1, const string& strText2);
+	bool	foundKeywordPhraseOverlap(const string& strText1, const string& strText2,
+		IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// Provide long, involved Address pattern as string
 	string	getAddressSuffixPattern();
@@ -158,13 +163,13 @@ private:
 	// Removes paired parentheses or square brackets.  Embedded text is retained if 
 	// it contains a Person Designator or Alias.  Otherwise, embedded text is removed
 	// Single parentheses or brackets are replaced with spaces.
-	void	handleParentheses(ISpatialStringPtr &ripText);
+	void	handleParentheses(ISpatialStringPtr &ripText, IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// Trims string after TRUST if finds TRUST DATED or TRUST DTD
 	string	handleTrustDated(string strInput);
 	//----------------------------------------------------------------------------------------------
 	// Checks strText to see if it contains a date string
-	bool	hasDateText(const string& strText);
+	bool	hasDateText(const string& strText, IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// Checks strWord to see if it contains only punctuation characters
 	bool	hasOnlyPunctuation(const string& strWord);
@@ -178,7 +183,7 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// Checks to see if strText exactly matches a keyword phrase
 	//   i.e. PersonDesignator or PersonTrimIdentifier
-	bool	isKeywordPhrase(const string& strText);
+	bool	isKeywordPhrase(const string& strText, IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// Logs initial and final strings to log file
 	void	logResults(string strInitial, string strFinal);
@@ -186,11 +191,11 @@ private:
 	// Searches ipText looking for two or more upper case letters followed by "and " or 
 	// " and" followed by two or more upper case letters.  Returns the position at 
 	// which to add a space or -1 if not found
-	long	makeSpaceForAnd(ISpatialStringPtr ipText);
+	long	makeSpaceForAnd(ISpatialStringPtr ipText, IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// Returns first character to be retained after trimming leading digits-only word(s)
 	// If return value is zero, no trimming is needed.
-	long	removeFirstDigitsWords(const string& strInput);
+	long	removeFirstDigitsWords(const string& strInput, IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// look for consecutive strChars in the input string and eliminate rudundant ones
 	// for example, input string is "ABBBC" and strChars is "B", then "ABC" will be returned
@@ -207,11 +212,11 @@ private:
 	//   Lower-case words
 	//   Digits-only words
 	//   Various nonsense words and strings from next method
-	string trimLeadingNonsense(string strInput);
+	string trimLeadingNonsense(string strInput, IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// Removes any embedded Address from ripText.  Returns true if found, otherwise
 	// false.
-	bool removeAddressText(const ISpatialStringPtr& ripText);
+	bool removeAddressText(const ISpatialStringPtr& ripText, IRegularExprParserPtr ipParser);
 	//----------------------------------------------------------------------------------------------
 	// Checks license state
 	void	validateLicense();

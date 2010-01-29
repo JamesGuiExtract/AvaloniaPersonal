@@ -78,8 +78,6 @@ private:
 
 	bool m_bIsRegExpFromFile;
 
-	IRegularExprParserPtr m_ipRegExParser;
-
 	bool storePattern(UCLID_AFVALUEFINDERSLib::IRegExprRulePtr ipRegExprRule);
 	bool storePatternFile(UCLID_AFVALUEFINDERSLib::IRegExprRulePtr ipRegExprRule);
 	void updateControls();

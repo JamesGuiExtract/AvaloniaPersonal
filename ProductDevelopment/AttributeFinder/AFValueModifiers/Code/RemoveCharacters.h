@@ -104,7 +104,7 @@ private:
 	/////////////
 	// Methods
 	////////////
-	IIUnknownVectorPtr findPatternInString(_bstr_t _bstrInput, 
+	IIUnknownVectorPtr findPatternInString(IRegularExprParserPtr ipParser, _bstr_t _bstrInput, 
 		_bstr_t _bstrPattern, bool bFindFirstMatchOnly = false);
 
 	// translate the input string into a regual expression compatible string
@@ -124,8 +124,7 @@ private:
 	bool m_bTrimLeading;
 	bool m_bTrimTrailing;
 
-	// reg expr parser
-	IRegularExprParserPtr m_ipRegExpr;
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	bool m_bDirty;
 };

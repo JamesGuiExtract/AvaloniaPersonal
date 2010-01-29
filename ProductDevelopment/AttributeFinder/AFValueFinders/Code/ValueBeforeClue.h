@@ -101,7 +101,6 @@ private:
 	// Variables
 	////////////
 	IVariantVectorPtr m_ipClues;
-	IRegularExprParserPtr m_ipRegExParser;
 
 	// whether or not all provided clue texts are treated regular expressions
 	bool m_bClueAsRegExpr;
@@ -135,9 +134,7 @@ private:
 	// whether or not specified string is treated as a regular expression
 	bool m_bClueToStringAsRegExpr;
 
-	// If m_eRefiningType is from specified regular expression till clue text...
-	// Reg expr that's used to limit text from this reg expr to clue string
-//	std::string m_strLimitingRegExpr;
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	// whether the current object is modified
 	bool m_bDirty;

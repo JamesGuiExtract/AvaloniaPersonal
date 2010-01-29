@@ -28,6 +28,7 @@ class ATL_NO_VTABLE CEntityNameSplitter :
 {
 public:
 	CEntityNameSplitter();
+	~CEntityNameSplitter();
 	
 DECLARE_REGISTRY_RESOURCEID(IDR_ENTITYNAMESPLITTER)
 
@@ -87,6 +88,9 @@ private:
 	// Data
 	///////
 
+	// Misc utils object used to get the parser
+	IMiscUtilsPtr m_ipMiscUtils;
+
 	// Regular Expression parser to be used internally
 	IRegularExprParserPtr m_ipRegExprParser;
 
@@ -117,7 +121,7 @@ private:
 
 	// Creates Trust sub-attribute with appropriate Person and Company 
 	// sub-sub-attributes.  Returns false if no valid Entities found.
-	bool doTrustSplitting(ISpatialStringPtr ipGroup, IAFDocument *pAFDoc, 
+	bool doTrustSplitting(ISpatialStringPtr ipGroup, IAFDocumentPtr ipAFDoc, 
 		IIUnknownVectorPtr ipMainAttrSub);
 
 	// Replaces forward slash with " AKA " unless previous and next non-space
@@ -229,6 +233,9 @@ private:
 	// Returns: false - strTrim not found
 	//           true - found and trimmed strTrim from beginning of ripEntity
 	bool	doLeadingWordTrim(ISpatialStringPtr& ripEntity, string strTrim);
+
+	// Gets a new regular expression parser
+	IRegularExprParserPtr getParser();
 
 	// ensure that this component is licensed
 	void validateLicense();

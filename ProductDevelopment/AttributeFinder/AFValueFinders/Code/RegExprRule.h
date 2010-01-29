@@ -105,9 +105,6 @@ public:
 	STDMETHOD(raw_CopyFrom)(/*[in]*/ IUnknown *pObject);
 
 private:	
-	// the regular expresion parser engine
-	IRegularExprParserPtr m_ipRegExParser;
-	
 	bool m_bCaseSensitive;
 
 	bool m_bAddCapturesAsSubAttributes;
@@ -115,7 +112,7 @@ private:
 	bool m_bIsRegExpFromFile;
 	std::string m_strRegExpFileName;
 	IAFUtilityPtr	m_ipAFUtility;
-	IMiscUtilsPtr	m_ipMiscUtils;
+	IMiscUtilsPtr m_ipMiscUtils;
 
 	// flag to keep track of whether this object has been modified
 	// since the last save-to-stream operation
@@ -145,4 +142,10 @@ private:
 	// Creates an attribute with the Name from the ipToken->Name and a value created from the
 	// sub string of ipInput with start and end from the ipToken
 	IAttributePtr createAttribute(ITokenPtr ipToken, ISpatialStringPtr ipInput);
+
+	// Gets the regular expression parser
+	IRegularExprParserPtr getParser();
+
+	// Parses the text and returns an IUnknownVector of attributes
+	IIUnknownVectorPtr parseText(IAFDocumentPtr ipAFDoc);
 };

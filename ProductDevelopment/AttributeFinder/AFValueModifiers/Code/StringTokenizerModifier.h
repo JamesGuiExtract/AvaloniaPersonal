@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CStringTokenizerModifier
 class ATL_NO_VTABLE CStringTokenizerModifier : 
@@ -109,29 +111,26 @@ private:
 	// strToBeReplacedStart = 5, strToBeReplacedEnd = ""
 	// Replacement will be "GHI"
 	ISpatialStringPtr getReplacement(IIUnknownVectorPtr ipTokens, 
-							   const std::string& strToBeReplacedStart,
-							   const std::string& strToBeReplacedEnd);
+							   const string& strToBeReplacedStart,
+							   const string& strToBeReplacedEnd);
 	
-	IRegularExprParserPtr getSyntexValidator();
+	IRegularExprParserPtr getRegexParser(const string& strPattern = "");
 
 	void validateLicense();
 
 	// validate the syntex of the result expression
-	bool validateExpression(const std::string& strExpr);
+	bool validateExpression(const string& strExpr);
 
 	/////////////
 	// Variables
 	/////////////
 	bool m_bDirty;
 
-	std::string m_strDelimiter;
-	std::string m_strResultExpression;
-	std::string m_strTextInBetween;
+	string m_strDelimiter;
+	string m_strResultExpression;
+	string m_strTextInBetween;
 	ENumOfTokensType m_eNumOfTokensType;
 	long m_nNumOfTokensRequired;
 
-	// reg expr parser
-	IRegularExprParserPtr m_ipRegExpr;
-	// this reg expr parser will be used as a syntex validator for result expression
-	IRegularExprParserPtr m_ipSyntexValidator;
+	IMiscUtilsPtr m_ipMiscUtils;
 };
