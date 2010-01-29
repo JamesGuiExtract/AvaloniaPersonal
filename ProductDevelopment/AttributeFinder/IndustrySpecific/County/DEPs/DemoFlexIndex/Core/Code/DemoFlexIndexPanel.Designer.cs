@@ -89,7 +89,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._grantorTable.Location = new System.Drawing.Point(3, 164);
             this._grantorTable.Name = "_grantorTable";
             this._grantorTable.ParentDataEntryControl = null;
-            this._grantorTable.RowFormattingRuleFile = "..\\Rules\\Swiping\\Grantor.rsd.etf";
+            this._grantorTable.RowFormattingRuleFile = "..\\Rules\\RubberbandSplitters\\Grantor.rsd.etf";
             this._grantorTable.RowSwipingEnabled = true;
             this._grantorTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._grantorTable.Size = new System.Drawing.Size(562, 90);
@@ -156,7 +156,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._granteeTable.Location = new System.Drawing.Point(3, 282);
             this._granteeTable.Name = "_granteeTable";
             this._granteeTable.ParentDataEntryControl = null;
-            this._granteeTable.RowFormattingRuleFile = "..\\Rules\\Swiping\\Grantee.rsd.etf";
+            this._granteeTable.RowFormattingRuleFile = "..\\Rules\\RubberbandSplitters\\Grantee.rsd.etf";
             this._granteeTable.RowSwipingEnabled = true;
             this._granteeTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._granteeTable.Size = new System.Drawing.Size(562, 90);
