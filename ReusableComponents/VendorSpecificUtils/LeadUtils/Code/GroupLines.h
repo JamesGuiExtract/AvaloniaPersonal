@@ -170,6 +170,10 @@ private:
 
 	// Minimum number of require lines needed to satisfy less-than-exact scores
 	long m_nLineMinimum;
+	
+	// Parameter used only within box finding functions to keep track of whether the group is a box
+	// where all four sides have been identified.
+	bool m_bIsFourSidedBox;
 
 	// If either end of this line is the result of an intersection with a perpedicular line,
 	// these variables will keep track of which line it intersected with 
@@ -214,6 +218,18 @@ private:
 				  list<LeadToolsLineGroup>::iterator &riterGroup_i,
 				  list<LeadToolsLineGroup>::iterator &riterGroup_j,
 				  bool bPreferLargerRegion = true);
+
+	// Appends the results from a box search in one orientation (horizontal/vertical) to the
+	// results of a box search in the other orientation. In the process, any box that was found
+	// in both orientations is identified as a four-sided box that will be prefered over any box
+	// where all 4 sides haven't been found when paring overlapping boxes from the final result.
+	void appendBoxResults(list<LeadToolsLineGroup>& rlistExistingBoxes,
+						  list<LeadToolsLineGroup> listBoxesToAppend);
+
+	// Calculates the percentage of each specified line group that is contained in the overlap of
+	// the two line groups. Both values will be zero if the line groups do not overlap.
+	void calculateIntersection(const LeadToolsLineGroup& group1, const LeadToolsLineGroup& group2,
+							   int& rnPercentInclusion_1, int &rnPercentInclusion_2);
 
 	// Given the provided LineRect, locate nearby lines from vrecHorzLineRects and 
 	// rvecVertLineRects.  Following the call, vrecHorzLineRects and rvecVertLineRects

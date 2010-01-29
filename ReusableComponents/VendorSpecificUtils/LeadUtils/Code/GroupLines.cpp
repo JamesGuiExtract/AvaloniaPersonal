@@ -52,6 +52,7 @@ LeadToolsLineGroup::LeadToolsLineGroup() :
 	m_nSpacing(gnDEFAULT_MAX_SPACING / 2),
 	m_nColumnSpacing(gnDEFAULT_MAX_COLUMN_SPACING / 2),
 	m_nLineMinimum(0),
+	m_bIsFourSidedBox(false),
 	m_apSubLineGroup(NULL),
 	m_apSubColumnGroup(NULL),
 	m_LineRect(true),
@@ -89,6 +90,7 @@ LeadToolsLineGroup::LeadToolsLineGroup(LineRect rectLine, const Settings &settin
 	m_nSpacing(gnDEFAULT_MAX_SPACING / 2),
 	m_nColumnSpacing(gnDEFAULT_MAX_COLUMN_SPACING / 2),
 	m_nLineMinimum(0),
+	m_bIsFourSidedBox(false),
 	m_nLineTopOrLeftEndId(gnUNSPECIFIED),
 	m_nLineBottomOrRightEndId(gnUNSPECIFIED),
 	m_apSubLineGroup(NULL),
@@ -105,6 +107,7 @@ LeadToolsLineGroup::LeadToolsLineGroup(const LeadToolsLineGroup &group) :
 	m_nSpacing(group.m_nSpacing),
 	m_nColumnSpacing(group.m_nColumnSpacing),
 	m_nLineMinimum(group.m_nLineMinimum),
+	m_bIsFourSidedBox(false),
 	m_nLineTopOrLeftEndId(group.m_nLineTopOrLeftEndId),
 	m_nLineBottomOrRightEndId(group.m_nLineBottomOrRightEndId),
 	m_apSubLineGroup(NULL),
@@ -137,6 +140,7 @@ LeadToolsLineGroup& LeadToolsLineGroup::operator =(LeadToolsLineGroup &group)
 	m_nSpacing					= group.m_nSpacing;
 	m_nColumnSpacing			= group.m_nColumnSpacing;
 	m_nLineMinimum				= group.m_nLineMinimum;
+	m_bIsFourSidedBox			= group.m_bIsFourSidedBox;
 	m_nLineTopOrLeftEndId		= group.m_nLineTopOrLeftEndId;
 	m_nLineBottomOrRightEndId	= group.m_nLineBottomOrRightEndId;
 
@@ -271,7 +275,7 @@ bool LeadToolsLineGroup::findBoxes(vector<LineRect> &rvecHorzLineRects,
 	qualifyAreas(listBoxes, false);
 	
 	// Add the qualified return values to the result list
-	rlistFoundBoxes.splice(rlistFoundBoxes.end(), listBoxes);
+	appendBoxResults(rlistFoundBoxes, listBoxes);
 
 	return bResult;
 }
@@ -305,8 +309,10 @@ bool LeadToolsLineGroup::findBoxContainingRect(const LineRect &rect, vector<Line
 	// Merge any duplicated boxes from the two calls
 	qualifyAreas(listFoundBoxes, false);
 
-	// Keep track of whether we have found a qualifying box
+	// Keep track of whether we have found a qualifying box and whether all four sides of the
+	// qualifying box have been found.
 	bool bFoundBox = false;
+	bool bFoundFourSidedBox = false;
 
 	// Cycle through all boxes that were found.
 	for each (const LeadToolsLineGroup &groupBox in listFoundBoxes)
@@ -346,9 +352,16 @@ bool LeadToolsLineGroup::findBoxContainingRect(const LineRect &rect, vector<Line
 
 			if (bFoundBox)
 			{
-				// If we already have a qualifying candidate, compare the sizes of the boxes
-				if ((groupBox.m_Rect.Width() * groupBox.m_Rect.Height()) > 
-					(rrectResult.Width() * rrectResult.Height()))
+				// If we already have a qualifying candidate, determine which candidate is more
+				// desireable.
+				if (bFoundFourSidedBox && !groupBox.m_bIsFourSidedBox)
+				{
+					// If already have a box where four sides were found, prefer it over any box
+					// with just 2 sides found.
+					continue;
+				}
+				else if ((groupBox.m_Rect.Width() * groupBox.m_Rect.Height()) > 
+						 (rrectResult.Width() * rrectResult.Height()))
 				{
 					// Existing qualifying result is smaller and thus prefered.
 					// Ignore the latest result.
@@ -358,6 +371,7 @@ bool LeadToolsLineGroup::findBoxContainingRect(const LineRect &rect, vector<Line
 
 			// Set the return value to true and set the dimensions of rrectResult.
 			bFoundBox = true;
+			bFoundFourSidedBox = groupBox.m_bIsFourSidedBox;
 			rrectResult = LineRect(groupBox.m_Rect, rrectResult.IsHorizontal());
 		}
 	}
@@ -985,54 +999,52 @@ void LeadToolsLineGroup::pareArea(list<LeadToolsLineGroup> &rListGroups,
 	// Don't test against self
 	if (rIterGroup_i != rIterGroup_j)
 	{
-		// Create rects for testing
-		LineRect rectGroup_i = (*rIterGroup_i).m_Rect;
-		LineRect rectGroup_j = (*rIterGroup_j).m_Rect;
+		// What percent of group i and j are contained in the overlapping area?
+		int nPercentInclusion_i, nPercentInclusion_j;
+		calculateIntersection(*rIterGroup_i, *rIterGroup_j, nPercentInclusion_i, nPercentInclusion_j);
 
-		// Test to see if they overlap at all.
-		LineRect rectTest = rectGroup_i;
-		if (rectTest.IntersectRect(rectGroup_i, rectGroup_j))
+		if (nPercentInclusion_i > m_Settings.m_nCombineGroupPercentage ||
+			nPercentInclusion_j > m_Settings.m_nCombineGroupPercentage)
 		{
-			// What percent of group 1 is contained in the overlapping area?
-			int nPercentInclusion_i = 100 * (rectTest.Width() * rectTest.Height()) /
-				(rectGroup_i.Width() * rectGroup_i.Height());
-
-			// What percent of group 2 is contained in the overlapping area?
-			int nPercentInclusion_j = 100 * (rectTest.Width() * rectTest.Height()) /
-				(rectGroup_j.Width() * rectGroup_j.Height());
-
-			if (nPercentInclusion_i > m_Settings.m_nCombineGroupPercentage ||
+			// [FlexIDS:3865]
+			// A box where all 4 sides have been found should always be prefered over a box where
+			// only 2 sides have been found.
+			if (rIterGroup_i->m_bIsFourSidedBox && !rIterGroup_j->m_bIsFourSidedBox)
+			{
+				bDelete_j = true;
+			}
+			else if (rIterGroup_j->m_bIsFourSidedBox && !rIterGroup_i->m_bIsFourSidedBox)
+			{
+				bDelete_i = true;
+			}
+			else if (nPercentInclusion_i > m_Settings.m_nCombineGroupPercentage &&
 				nPercentInclusion_j > m_Settings.m_nCombineGroupPercentage)
 			{
-				if (nPercentInclusion_i > m_Settings.m_nCombineGroupPercentage &&
-					nPercentInclusion_j > m_Settings.m_nCombineGroupPercentage)
+				// If both areas are sufficiently contained in the overlap area, prefer
+				// the area with more lines.
+				if (rIterGroup_i->m_nLineCount > rIterGroup_j->m_nLineCount)
 				{
-					// If both areas are sufficiently contained in the overlap area, prefer
-					// the area with more lines.
-					if (rIterGroup_i->m_nLineCount > rIterGroup_j->m_nLineCount)
-					{
-						bDelete_j = true;
-					}
-					else if (rIterGroup_j->m_nLineCount > rIterGroup_i->m_nLineCount)
-					{
-						bDelete_i = true;
-					}
+					bDelete_j = true;
 				}
-
-				if (bDelete_i == false && bDelete_j == false)
+				else if (rIterGroup_j->m_nLineCount > rIterGroup_i->m_nLineCount)
 				{
-					// If either of the areas are sufficiently contained in the overlap area,
-					// use bPreferLargerRegion to determine which group to toss out.
-					if (bPreferLargerRegion)
-					{
-						bDelete_i = (nPercentInclusion_i > nPercentInclusion_j);
-						bDelete_j = !bDelete_i;
-					}
-					else
-					{
-						bDelete_i = (nPercentInclusion_i < nPercentInclusion_j);
-						bDelete_j = !bDelete_i;
-					}
+					bDelete_i = true;
+				}
+			}
+
+			if (bDelete_i == false && bDelete_j == false)
+			{
+				// If either of the areas are sufficiently contained in the overlap area,
+				// use bPreferLargerRegion to determine which group to toss out.
+				if (bPreferLargerRegion)
+				{
+					bDelete_i = (nPercentInclusion_i > nPercentInclusion_j);
+					bDelete_j = !bDelete_i;
+				}
+				else
+				{
+					bDelete_i = (nPercentInclusion_i < nPercentInclusion_j);
+					bDelete_j = !bDelete_i;
 				}
 			}
 		}
@@ -1072,6 +1084,85 @@ void LeadToolsLineGroup::pareArea(list<LeadToolsLineGroup> &rListGroups,
 			rIterGroup_i++;
 			rIterGroup_j = rListGroups.begin();
 		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void LeadToolsLineGroup::appendBoxResults(list<LeadToolsLineGroup>& rlistExistingBoxes,
+										  list<LeadToolsLineGroup> listBoxesToAppend)
+{
+	// Compare every box from rlistExistingBoxes to the ones in listBoxesToAppend to find boxes that
+	// were found in both orientations (ie, all 4 sides have been identified).
+	list<LeadToolsLineGroup>::iterator iterGroup_i = rlistExistingBoxes.begin();
+	while (iterGroup_i != rlistExistingBoxes.end())
+	{
+		list<LeadToolsLineGroup>::iterator iterGroup_j = listBoxesToAppend.begin();
+
+		while (iterGroup_i != rlistExistingBoxes.end() && 
+			   iterGroup_j != listBoxesToAppend.end())
+		{
+			// Test to see if the boxes are similar enough to consider them the same box.
+			int nPercentInclusion_i, nPercentInclusion_j;
+			calculateIntersection(*iterGroup_i, *iterGroup_j, nPercentInclusion_i, nPercentInclusion_j);
+
+			if (nPercentInclusion_i > m_Settings.m_nCombineGroupPercentage &&
+				nPercentInclusion_j > m_Settings.m_nCombineGroupPercentage)
+			{
+				// Delete the smaller of the two boxes (though they will likely be the same size)
+				// and mark the larger box as 4 sided.
+				if (nPercentInclusion_i < nPercentInclusion_j)
+				{
+					list<LeadToolsLineGroup>::iterator iterToDelete = iterGroup_i;
+					iterGroup_i = rlistExistingBoxes.erase(iterToDelete);
+
+					iterGroup_j->m_bIsFourSidedBox = true;
+
+					// Given that rlistExistingBoxes has changed, reset listBoxesToAppend's iterator
+					iterGroup_j = listBoxesToAppend.begin();
+				}
+				else
+				{
+					list<LeadToolsLineGroup>::iterator iterToDelete = iterGroup_j;
+					iterGroup_j = listBoxesToAppend.erase(iterToDelete);
+
+					iterGroup_i->m_bIsFourSidedBox = true;
+				}
+
+				continue;
+			}
+
+			iterGroup_j++;
+		}
+
+		if (iterGroup_i == rlistExistingBoxes.end())
+		{
+			break;
+		}
+	
+		iterGroup_i++;
+	}
+
+	// Combine the remaining boxes into rlistExistingBoxes
+	rlistExistingBoxes.splice(rlistExistingBoxes.end(), listBoxesToAppend);
+}
+//-------------------------------------------------------------------------------------------------
+void LeadToolsLineGroup::calculateIntersection(const LeadToolsLineGroup& group1,
+			const LeadToolsLineGroup& group2, int& rnPercentInclusion_1, int &rnPercentInclusion_2)
+{
+	// Initialize inclusion to zero
+	rnPercentInclusion_1 = 0;
+	rnPercentInclusion_2 = 0;
+	
+	// Test to see if they overlap at all.
+	LineRect rectTest = group1.m_Rect;
+	if (rectTest.IntersectRect(group1.m_Rect, group2.m_Rect))
+	{
+		// What percent of group 1 is contained in the overlapping area?
+		rnPercentInclusion_1 = 100 * (rectTest.Width() * rectTest.Height()) /
+			(group1.m_Rect.Width() * group1.m_Rect.Height());
+
+		// What percent of group 2 is contained in the overlapping area?
+		rnPercentInclusion_2 = 100 * (rectTest.Width() * rectTest.Height()) /
+			(group2.m_Rect.Width() * group2.m_Rect.Height());
 	}
 }
 //-------------------------------------------------------------------------------------------------
