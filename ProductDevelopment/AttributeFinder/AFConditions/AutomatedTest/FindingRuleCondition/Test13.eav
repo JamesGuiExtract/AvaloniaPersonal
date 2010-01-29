@@ -1,4 +1,31 @@
-Test|Allegheny County\r\nValerie McDonald Roberts\r\nPittsburgh, PA 15219\r\n
-Test|PROFESSIONAL ESCROW SERVICES L L C\r\n381 MANSFIELD AVE STE 301\r\nPITTSBURGH PA 15220\r\n
-Test|Professional Escrow Services LLC\r\n381 Mansfield Ave., Ste. 301\r\nPittsburgh, PA 15220\r\n
-Test|This instrument was prepared by:\r\nHome Equity of America, Inc.\r\n1000 E 80th Place, North Tower\r\nMerrillville, IN 46410\r\n
+Test|Valerie McDonald Roberts\r\n\r\nPittsburgh, PA 15219
+.Recipient1|Valerie McDonald Roberts
+.Address1|Recorder of Deeds
+.City|Pittsburgh
+.State|PA
+.ZipCode|15219
+Test|User / Station: M Ward - Cash Super 12\r\n\r\nPROFESSIONAL ESCROW SERVICES L L C\r\n381 MANSFIELD AVE STE 301\r\nPITTSBURGH PA 15220
+.Recipient1|PROFESSIONAL ESCROW SERVICES L L C
+.Address1|381 MANSFIELD AVE STE 301
+.City|PITTSBURGH
+.State|PA
+.ZipCode|15220
+Test|\r\nProfessional Escrow Services LLC\r\n381 Mansfield Ave., Ste. 301\r\nPittsburgh, PA 15220
+.Recipient1|Valerie McDonald-Roberts Recorder of Deeds
+.Recipient2|Professional Escrow Services LLC
+.Address1|381 Mansfield Ave., Ste. 301
+.City|Pittsburgh
+.State|PA
+.ZipCode|15220
+Test|Fifth Third Bank,\r\n38 Fountain Square, Cincinnati, Ohio 45263
+.Recipient1|Fifth Third Bank
+.Address1|38 Fountain Square
+.City|Cincinnati
+.State|Ohio
+.ZipCode|45263
+Test|Home Equity of America, Inc.\r\n1000 E 80th Place, North Tower\r\nMerrillville, IN 46410
+.Recipient1|Home Equity of America, Inc.
+.Address1|1000 E 80th Place, North Tower
+.City|Merrillville
+.State|IN
+.ZipCode|46410

@@ -1,2 +1,24 @@
-Test|Recording Requested By:\r\nCTC Real Estate Services\r\n176 Countrywide Way\r\nMS: LAN-88\r\nLancaster, CA 93535-9944\r\n
-Test|When Recorded Return To:\r\nM. PAUL PEACOCK, RENEE LYNCH PEACOCK\r\n3600 APOLLO CT\r\nMIDLAND, TX 79707\r\n
+Test|CTC Real Estate Services\r\n176 Countrywide Way\r\nMS: LAN-88\r\nLancaster, CA 93535-9944
+.Recipient1|CTC Real Estate Services
+.Address1|176 Countrywide Way
+.Address2|MS: LAN-88
+.City|Lancaster
+.State|CA
+.ZipCode|93535-9944
+Test|M. PAUL PEACOCK, RENEE LYNCH PEACOCK\r\n3600 APOLLO CT\r\nMIDLAND, TX 79707
+.Recipient1|M. PAUL PEACOCK, RENEE LYNCH PEACOCK
+.Address1|3600 APOLLO CT
+.City|MIDLAND
+.State|TX
+.ZipCode|79707
+Test|3600 APOLLO COURT, M1DLAND,TX 79707
+.Address1|3600 APOLLO COURT
+.City|M1DLAND
+.State|TX
+.ZipCode|79707
+Test|176 Countrywide Way, MS:\r\nLAN-88, Lancaster CA 93535-9944
+.Address1|176 Countrywide Way
+.Address2|MS:\r\nLAN-88
+.City|Lancaster
+.State|CA
+.ZipCode|93535-9944
