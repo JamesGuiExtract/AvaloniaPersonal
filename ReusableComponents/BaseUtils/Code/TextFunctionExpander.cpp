@@ -556,8 +556,19 @@ const string TextFunctionExpander::expandTrimAndConsolidateWS(const string& str)
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandEnv(const string &str) const
 {
+	if (str.empty())
+	{
+		throw UCLIDException("ELI29487", "Env function requires an environment variable name.");
+	}
+
 	// Return the value for the environment variable
 	string strResult = getEnvironmentVariableValue(str);
+	if (strResult.empty())
+	{
+		UCLIDException uex("ELI29490", "Specified environment variable could not be found.");
+		uex.addDebugInfo("Environment Variable", str);
+		throw uex;
+	}
 
 	return strResult;
 }
@@ -605,8 +616,24 @@ const string TextFunctionExpander::expandNow(const string &str) const
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandRandomAlphaNumeric(const string &str) const
 {
-	// Get the length from the argument
-	long nLength = asLong(str);
+	if (str.empty())
+	{
+		throw UCLIDException("ELI29488", "RandomAlphaNumeric function requires a number of digits.");
+	}
+
+	long nLength = 0;
+	try
+	{
+		// Get the length from the argument
+		nLength = asLong(str);
+	}
+	catch(...)
+	{
+		UCLIDException uex("ELI29489",
+			"Invalid number string specified for RandomAlphaNumeric function.");
+		uex.addDebugInfo("Argument", str);
+		throw uex;
+	}
 
 	// Return a random string of nLength containing only upper case letters and digits
 	return ms_Rand.getRandomString(nLength, true, false, true);

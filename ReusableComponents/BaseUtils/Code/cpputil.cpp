@@ -88,20 +88,29 @@ string getHumanTimeAsString(CTime tmInput)
 //-------------------------------------------------------------------------------------------------
 string getEnvironmentVariableValue(const string& strVarName)
 {
-	string strValue;
+	string strValue = "";
 	char *pszValue = NULL;
 
 	// TESTTHIS: usage of dupenv
-	if (_dupenv_s(&pszValue, NULL, strVarName.c_str()) != 0)
+	errno_t err = _dupenv_s(&pszValue, NULL, strVarName.c_str());
+	if (err != 0)
 	{
+		// Ensure the memory is cleared if an error occurred
+		// (it is safe to call free even if the pointer is NULL)
+		free(pszValue);
 		UCLIDException ue("ELI12928", "Unable to determine environment variable value!");
+		ue.addWin32ErrorInfo(err);
 		ue.addDebugInfo("Var", strVarName);
 		throw ue;
 	}
 
 	// return the value after freeing the memory
-	strValue = pszValue;
-	free (pszValue);
+	if (pszValue != NULL)
+	{
+		strValue = pszValue;
+		free (pszValue);
+	}
+
 	return strValue;
 }
 //-------------------------------------------------------------------------------------------------
