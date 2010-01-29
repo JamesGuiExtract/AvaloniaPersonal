@@ -42,35 +42,35 @@
 
 //Test10 RSD-based Address Finder
 //	 Conditional Modifying Rule = (if true) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
-//	 Modifyier = ".*Record.*\r\n"
+//	 Modifier = ".*Record.*\r\n"
 <TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
 
-//Test11 Address Finder
+//Test11 RSD-based Address Finder
 //	 Conditional Modifying Rule = (if true) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
-//	 Modifyier = ".*Record.*\r\n"
+//	 Modifier = ".*Record.*\r\n"
 <TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test11.eav
 
-//Test12 Address Finder
+//Test12 RSD-based Address Finder
 //	 Conditional Modifying Rule = (if false) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
-//	 Modifyier = ".*Record.*\r\n"
+//	 Modifier = ".*Record.*\r\n"
 <TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
 
-//Test13 Address Finder
+//Test13 RSD-based Address Finder
 //	 Conditional Modifying Rule = (if false) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
-//	 Modifyier = ".*Record.*\r\n"
+//	 Modifier = ".*Record.*\r\n"
 <TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test13.eav
 
-//Test14 Address Finder
+//Test14 RSD-based Address Finder
 //	 Conditional Output handler = (if true) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
-//	 Modifyier = Change case (upper)
+//	 Modifier = Change case (upper)
 <TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test14.eav
 
-//Test15 Address Finder
+//Test15 RSD-based Address Finder
 //	 Conditional Output handler = (if true) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
-//	 Modifyier = Change case (upper)
+//	 Modifier = Change case (upper)
 <TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test15.eav
 
-//Test16 Address Finder
+//Test16 RSD-based Address Finder
 //	 Conditional Output handler = (if false) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
-//	 Modifyier = Change case (upper)
+//	 Modifier = Change case (upper)
 <TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test16.eav
