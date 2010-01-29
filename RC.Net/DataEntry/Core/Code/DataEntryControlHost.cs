@@ -214,41 +214,6 @@ namespace Extract.DataEntry
         static readonly string _OBJECT_NAME = typeof(DataEntryControlHost).ToString();
 
         /// <summary>
-        /// The value associated with a window's key down message.
-        /// </summary>
-        const int _WM_KEYDOWN = 0x100;
-
-        /// <summary>
-        /// The value associated with a window's key up message.
-        /// </summary>
-        const int _WM_KEYUP = 0x101;
-
-        /// <summary>
-        /// The value associated with a window's left mouse button down message.
-        /// </summary>
-        const int _WM_LBUTTONDOWN = 0x0201;
-
-        /// <summary>
-        /// The value associated with a window's left mouse button up message.
-        /// </summary>
-        const int _WM_LBUTTONUP = 0x0202;
-
-        /// <summary>
-        /// The value associated with a window's right mouse button down message.
-        /// </summary>
-        const int _WM_RBUTTONDOWN = 0x0204;
-
-        /// <summary>
-        /// The value associated with a window's right mouse button up message.
-        /// </summary>
-        const int _WM_RBUTTONUP = 0x0205;
-
-        /// <summary>
-        /// The value associated with a window's mouse wheel message.
-        /// </summary>
-        const int _WM_MOUSEWHEEL = 0x020A;
-
-        /// <summary>
         /// The default font size to be used for tooltips.
         /// </summary>
         const float _TOOLTIP_FONT_SIZE = 13F;
@@ -729,10 +694,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Gets or sets whether the data has been modified since the last load or save operation.
         /// </summary>
-        /// <value><see langword="true"/> to consider the data a modified since the last load or
-        /// save operation; <see langword="false"/> to consider the data unchanged.</value>
-        /// <returns><see langword="true"/> if the data has been modified since the last load or
-        /// save operation; <see langword="false"/> if the data is unchanged.</returns>
+        /// <value><see langword="true"/> if the data has been modified since the last load or
+        /// save operation; <see langword="false"/> if the data is unchanged.</value>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Dirty
@@ -1413,14 +1376,14 @@ namespace Extract.DataEntry
                     return false;
                 }
 
-                if (m.Msg == _WM_KEYDOWN || m.Msg == _WM_KEYUP)
+                if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.KeyUp)
                 {
                     // Check for shift or tab key press events
                     if (m.WParam == (IntPtr)Keys.ShiftKey)
                     {
                         // Set or clear _shiftKeyDown depending upon whether this is a keydown
                         // or keyup event.
-                        _shiftKeyDown = (m.Msg == _WM_KEYDOWN);
+                        _shiftKeyDown = (m.Msg == WindowsMessage.KeyDown);
                     }
                     else if (m.WParam == (IntPtr)Keys.Tab && 
                         (_smartTagManager == null || !_smartTagManager.IsActive))
@@ -1436,7 +1399,7 @@ namespace Extract.DataEntry
 
                         // If the tab key was pressed, indicate a manual focus event and
                         // propagate selection to the next attribute in the tab order.
-                        if (m.Msg == _WM_KEYDOWN)
+                        if (m.Msg == WindowsMessage.KeyDown)
                         {
                             ProcessTabKey();
 
@@ -1447,18 +1410,20 @@ namespace Extract.DataEntry
                         }
                     }
                 }
-                else if (!ContainsFocus && (m.Msg == _WM_LBUTTONDOWN || m.Msg == _WM_RBUTTONDOWN))
+                else if (!ContainsFocus && (m.Msg == WindowsMessage.LeftButtonDown || 
+                    m.Msg == WindowsMessage.RightButtonDown))
                 {
                     // Attempt to find a data entry control that should receive active status and 
                     // focus as the result of the mouse click.
                     _clickedDataEntryControl = FindClickedDataEntryControl(m);
                 }
-                else if (m.Msg == _WM_LBUTTONUP || m.Msg == _WM_RBUTTONUP)
+                else if (m.Msg == WindowsMessage.LeftButtonUp || 
+                    m.Msg == WindowsMessage.RightButtonUp)
                 {
                     // Make sure to clear the _clickedDataEntryControl on mouse up. 
                     _clickedDataEntryControl = null;
                 }
-                else if (m.Msg == _WM_MOUSEWHEEL)
+                else if (m.Msg == WindowsMessage.MouseWheel)
                 {
                     // [DataEntry:302]
                     // If the mouse is over the image viewer, select the image viewer and allow it to 
@@ -3294,8 +3259,8 @@ namespace Extract.DataEntry
         /// <see langword="false"/> if they should not.</param>
         /// <returns>The <see cref="RasterZone"/>s of the <see paramref="attribute"/> grouped by
         /// page.</returns>
-        internal Dictionary<int, List<RasterZone>> 
-            GetAttributeRasterZonesByPage(IAttribute attribute, bool includeSubAttributes)
+        Dictionary<int, List<RasterZone>> GetAttributeRasterZonesByPage(IAttribute attribute, 
+            bool includeSubAttributes)
         {
             return GetAttributeRasterZonesByPage(new IAttribute[] { attribute },
                 includeSubAttributes);
@@ -3312,9 +3277,8 @@ namespace Extract.DataEntry
         /// <see langword="false"/> if they should not.</param>
         /// <returns>The <see cref="RasterZone"/>s of the <see paramref="attributes"/>' highlights
         /// grouped by page.</returns>
-        internal Dictionary<int, List<RasterZone>>
-            GetAttributeRasterZonesByPage(IEnumerable<IAttribute> attributes,
-                bool includeSubAttributes)
+        Dictionary<int, List<RasterZone>> GetAttributeRasterZonesByPage(
+            IEnumerable<IAttribute> attributes, bool includeSubAttributes)
         {
             Dictionary<int, List<RasterZone>> rasterZonesByPage =
                 new Dictionary<int,List<RasterZone>>();
@@ -4135,7 +4099,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attributes">The attributes whose viewed status should be set according to
         /// the absence of a value.</param>
-        static void MarkEmptyAttributesAsViewed(List<IAttribute> attributes)
+        static void MarkEmptyAttributesAsViewed(IEnumerable<IAttribute> attributes)
         {
             foreach (IAttribute attribute in attributes)
             {
@@ -4466,7 +4430,7 @@ namespace Extract.DataEntry
         /// specified control will be ignored when selecting the active attribute.</param>
         /// <returns>The <see cref="IAttribute"/> containing the lowest (or highest)
         /// <see cref="AttributeStatusInfo.DisplayOrder"/>.</returns>
-        static IAttribute GetFirstOrLastAttribute(List<IAttribute> attributes, bool first,
+        static IAttribute GetFirstOrLastAttribute(IList<IAttribute> attributes, bool first,
             IDataEntryControl dataEntryControl)
         {
             if (attributes.Count == 0)
@@ -4614,14 +4578,15 @@ namespace Extract.DataEntry
         /// <param name="m">The <see cref="Message"/> containing data about the mouse press event.
         /// <para><b>Requirements</b></para>
         /// The <see cref="Message"/> must not be <see langword="null"/> and must describe a
-        /// WM_LBUTTONDOWN or WM_RBUTTONDOWN event.</param>
+        /// <see cref="WindowsMessage.LeftButtonDown"/> or 
+        /// <see cref="WindowsMessage.RightButtonDown"/>.</param>
         /// <returns>The <see cref="IDataEntryControl"/> that should receive active status.
         /// <see langword="null"/> if no such <see cref="IDataEntryControl"/> was found.
         /// </returns>
         IDataEntryControl FindClickedDataEntryControl(Message m)
         {
             ExtractException.Assert("ELI24760", "Unexpected message!",
-                (m.Msg == _WM_LBUTTONDOWN || m.Msg == _WM_RBUTTONDOWN));
+                (m.Msg == WindowsMessage.LeftButtonDown || m.Msg == WindowsMessage.RightButtonDown));
 
             // Initialize the return value to null.
             IDataEntryControl clickedDataEntryControl = null;
@@ -5528,7 +5493,7 @@ namespace Extract.DataEntry
         /// <returns>A <see cref="Point"/> to use as the anchor for an <see cref="AnchoredObject"/>.
         /// </returns>
         static Point GetAnchorPoint(
-            List<RasterZone> rasterZones, AnchorAlignment anchorAlignment, double anchorOffsetAngle,
+            IList<RasterZone> rasterZones, AnchorAlignment anchorAlignment, double anchorOffsetAngle,
             int standoffDistance, out double anchoredObjectRotation)
         {
             // Keep track of the average height of all raster zones as well as all start and end

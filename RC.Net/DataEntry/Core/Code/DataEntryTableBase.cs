@@ -1,20 +1,20 @@
-using Extract.Drawing;
+using Extract.Imaging;
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Security.Permissions;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
-using UCLID_RASTERANDOCRMGMTLib;
+
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
 namespace Extract.DataEntry
 {
@@ -22,7 +22,7 @@ namespace Extract.DataEntry
     /// A base of common code needed by any <see cref="IDataEntryControl"/> that extends
     /// <see cref="DataGridView"/>.
     /// </summary>
-    public abstract class DataEntryTableBase : DataGridView, IDataEntryControl, IDisposable
+    public abstract class DataEntryTableBase : DataGridView, IDataEntryControl
     {
         #region Constants
 
@@ -36,11 +36,6 @@ namespace Extract.DataEntry
         /// not the active data control.</summary>
         static readonly Color _INACTIVE_SELECTION_COLOR = Color.LightGray;
 
-        /// <summary>
-        /// The value associated with a window's key down message.
-        /// </summary>
-        const int _WM_KEYDOWN = 0x100;
-
         #endregion Constants
 
         #region Fields
@@ -48,7 +43,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Specifies whether the current instance is running in design mode.
         /// </summary>
-        bool _inDesignMode;
+        readonly bool _inDesignMode;
 
         /// <summary>
         /// The name used to identify the <see cref="IAttribute"/> to be associated with the table.
@@ -97,7 +92,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Used to generate "smart" hints for attributes missing spatial info.
         /// </summary>
-        SpatialHintGenerator _spatialHintGenerator = new SpatialHintGenerator();
+        readonly SpatialHintGenerator _spatialHintGenerator = new SpatialHintGenerator();
 
         /// <summary>
         /// Indicates whether the spatial information has changed such that hints need to be
@@ -113,7 +108,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Keeps track of which table element is mapped to each attribute represented in the table.
         /// </summary>
-        Dictionary<IAttribute, object> _attributeMap = new Dictionary<IAttribute, object>();
+        readonly Dictionary<IAttribute, object> _attributeMap = new Dictionary<IAttribute, object>();
 
         /// <summary>
         /// The attribute that is currently propagated by this table (if any)
@@ -148,53 +143,53 @@ namespace Extract.DataEntry
         Font _boldFont;
 
         /// <summary>
-        /// 
+        /// The default style to use for cells.
         /// </summary>
-        DataGridViewCellStyle _defaultCellStyle;
+        readonly DataGridViewCellStyle _defaultCellStyle;
 
         /// <summary>
         /// The style to use for cells currently being edited.
         /// </summary>
-        DataGridViewCellStyle _editModeCellStyle;
+        readonly DataGridViewCellStyle _editModeCellStyle;
 
         /// <summary>
         /// The style to use for selected cells whose fields have been viewed in the active table.
         /// </summary>
-        DataGridViewCellStyle _regularActiveCellStyle;
+        readonly DataGridViewCellStyle _regularActiveCellStyle;
 
         /// <summary>
         /// The style to use for selected cells whose fields have been viewed and are not in the
         /// active table.
         /// </summary>
-        DataGridViewCellStyle _regularInactiveCellStyle;
+        readonly DataGridViewCellStyle _regularInactiveCellStyle;
 
         /// <summary>
         /// The style to use for selected cells whose fields have not been viewed in the active table.
         /// </summary>
-        DataGridViewCellStyle _boldActiveCellStyle;
+        readonly DataGridViewCellStyle _boldActiveCellStyle;
 
         /// <summary>
         /// The style to use for selected cells whose fields have not been viewed and are not in the
         /// active table.
         /// </summary>
-        DataGridViewCellStyle _boldInactiveCellStyle;
+        readonly DataGridViewCellStyle _boldInactiveCellStyle;
 
         /// <summary>
         /// The style to use for selected cells whose contents have been viewed and that are
         /// currently being dragged.
         /// </summary>
-        DataGridViewCellStyle _regularDraggedCellStyle;
+        readonly DataGridViewCellStyle _regularDraggedCellStyle;
 
         /// <summary>
         /// The style to use for selected cells whose contents have not been viewed and that are
         /// currently being dragged.
         /// </summary>
-        DataGridViewCellStyle _boldDraggedCellStyle;
+        readonly DataGridViewCellStyle _boldDraggedCellStyle;
 
         /// <summary>
         /// The style to use for table cells when the table is disabled.
         /// </summary>
-        DataGridViewCellStyle _disabledCellStyle;
+        readonly DataGridViewCellStyle _disabledCellStyle;
 
         #endregion Fields
 
@@ -219,7 +214,7 @@ namespace Extract.DataEntry
             /// <summary>
             /// The <see cref="DataEntryTable"/> whose SelectionChanged handling is to be suppressed.
             /// </summary>
-            DataEntryTableBase _dataEntryTable;
+            readonly DataEntryTableBase _dataEntryTable;
 
             /// <summary>
             /// Indicates whether or not the object instance has been disposed.
@@ -294,7 +289,6 @@ namespace Extract.DataEntry
         /// Initializes <see cref="DataEntryTableBase"/> instance as part of a derived class.
         /// </summary>
         protected DataEntryTableBase()
-            : base()
         {
             try
             {
@@ -316,10 +310,10 @@ namespace Extract.DataEntry
                 // instances as much as possible.
 
                 // Initialize the fonts used by the DataGridViewCellStyle objects.
-                _regularFont = new Font(base.DefaultCellStyle.Font, FontStyle.Regular);
-                _boldFont = new Font(base.DefaultCellStyle.Font, FontStyle.Bold);
+                _regularFont = new Font(DefaultCellStyle.Font, FontStyle.Regular);
+                _boldFont = new Font(DefaultCellStyle.Font, FontStyle.Bold);
 
-                _defaultCellStyle = base.DefaultCellStyle;
+                _defaultCellStyle = DefaultCellStyle;
 
                 // The style to use for cells currently being edited.
                 _editModeCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
@@ -382,9 +376,9 @@ namespace Extract.DataEntry
                 // Use a DataEntryTableRow instance as the row template.
                 base.RowTemplate = new DataEntryTableRow();
 
-                base.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
+                EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
 
-                base.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+                ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             }
             catch (Exception ex)
             {
@@ -407,7 +401,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    return (this.PropagateAttributes != null);
+                    return (PropagateAttributes != null);
                 }
                 catch (Exception ex)
                 {
@@ -674,7 +668,7 @@ namespace Extract.DataEntry
                 DataGridViewCellStyle style;
 
                 // Check if we need the disabled style
-                if (!base.Enabled)
+                if (!Enabled)
                 {
                     style = _disabledCellStyle;
                 }
@@ -742,7 +736,7 @@ namespace Extract.DataEntry
                 DataGridViewCellStyle style;
 
                 // Check if we need the disabled style
-                if (!base.Enabled)
+                if (!Enabled)
                 {
                     style = _disabledCellStyle;
                 }
@@ -799,7 +793,7 @@ namespace Extract.DataEntry
                 base.OnCellBeginEdit(e);
 
                 // Update the style now that the cell is in edit mode
-                base.Rows[e.RowIndex].Cells[e.ColumnIndex].Style = _editModeCellStyle;
+                Rows[e.RowIndex].Cells[e.ColumnIndex].Style = _editModeCellStyle;
             }
             catch (Exception ex)
             {
@@ -841,7 +835,7 @@ namespace Extract.DataEntry
                 _editingControl = null;
 
                 // Update the style now that the cell is out of edit mode
-                UpdateCellStyle(base.Rows[e.RowIndex].Cells[e.ColumnIndex]);
+                UpdateCellStyle(Rows[e.RowIndex].Cells[e.ColumnIndex]);
             }
             catch (Exception ex)
             {
@@ -870,7 +864,7 @@ namespace Extract.DataEntry
                     base.Font = value;
 
                     // In case the table has existing cells, update the font in those cells.
-                    foreach (DataGridViewRow row in base.Rows)
+                    foreach (DataGridViewRow row in Rows)
                     {
                         foreach (DataGridViewCell cell in row.Cells)
                         {
@@ -898,7 +892,7 @@ namespace Extract.DataEntry
                 // If a delete/cut/copy/paste shortcut is being used on a single cell,
                 // force the current cell into edit mode and re-send the keys to allow the edit
                 // control to handle them.
-                if (!e.Handled && base.SelectedCells.Count == 1 && 
+                if (!e.Handled && SelectedCells.Count == 1 && 
                          (e.KeyCode == Keys.Delete ||
                             (e.Modifiers == Keys.Control && 
                                 (e.KeyCode == Keys.C || e.KeyCode == Keys.X || e.KeyCode == Keys.V))))
@@ -965,7 +959,7 @@ namespace Extract.DataEntry
                 DataGridViewTextBoxEditingControl textBoxEditingControl = 
                     _editingControl as DataGridViewTextBoxEditingControl;
 
-                if (textBoxEditingControl != null && m.Msg == _WM_KEYDOWN)
+                if (textBoxEditingControl != null && m.Msg == WindowsMessage.KeyDown)
                 {
                     // [DataEntry:267]
                     // When in edit mode of a textbox cell, home and end should go to the beginning
@@ -987,7 +981,7 @@ namespace Extract.DataEntry
                 }
                 // [DataEntry:747]
                 // If using shift+space to select a row, end edit mode.
-                else if (m.WParam == (IntPtr)Keys.Space && Control.ModifierKeys == Keys.Shift)
+                else if (m.WParam == (IntPtr)Keys.Space && ModifierKeys == Keys.Shift)
                 {
                     if (EditingControl != null)
                     {
@@ -1085,11 +1079,9 @@ namespace Extract.DataEntry
             {
                 base.OnSelectionChanged(e);
 
-                ExtractException.Assert("ELI25375", "Invalid table state!", _color != null);
-
                 // Repeat the iteration for non-data entry cells to make sure the background color
                 // is updated for all cells in the table.
-                foreach (DataGridViewCell cell in base.SelectedCells)
+                foreach (DataGridViewCell cell in SelectedCells)
                 {
                     UpdateCellStyle(cell);
                 }
@@ -1101,7 +1093,7 @@ namespace Extract.DataEntry
                     ProcessSelectionChange();
                 }
 
-                base.Invalidate();
+                Invalidate();
             }
             catch (Exception ex)
             {
@@ -1124,10 +1116,10 @@ namespace Extract.DataEntry
                 if (!_inDesignMode)
                 {
                     // Change the table's default cell style base on the enabled status
-                    base.DefaultCellStyle = base.Enabled ? _defaultCellStyle : _disabledCellStyle;
+                    DefaultCellStyle = Enabled ? _defaultCellStyle : _disabledCellStyle;
 
                     // Update the style of all cells currently displayed.
-                    foreach (DataGridViewRow row in base.Rows)
+                    foreach (DataGridViewRow row in Rows)
                     {
                         foreach (DataGridViewCell cell in row.Cells)
                         {
@@ -1157,10 +1149,10 @@ namespace Extract.DataEntry
                 // If the current selection does not result in a propagated attribute when dependent
                 // controls are present (ie, selection across multiple rows), don't allow edit mode
                 // since that dependent triggers in the dependent controls wouldn't be updated.
-                if (this.PropagateAttributes != null && _currentlyPropagatedAttribute == null &&
-                    base.CurrentRow.Index != base.NewRowIndex)
+                if (PropagateAttributes != null && _currentlyPropagatedAttribute == null &&
+                    CurrentRow.Index != NewRowIndex)
                 {
-                    base.EndEdit();
+                    EndEdit();
                     return;
                 }
 
@@ -1170,12 +1162,12 @@ namespace Extract.DataEntry
                 // [DataEntry:664]
                 // Also ensure that the currently selected cell is the CurrentCell (the cell that is
                 // in edit mode).
-                if (base.SelectedCells.Count > 1 || !base.SelectedCells.Contains(base.CurrentCell))
+                if (SelectedCells.Count > 1 || !SelectedCells.Contains(base.CurrentCell))
                 {
                     // Clear all selections first since sometimes trying to select an individual cell 
                     // in a selected row doesn't clear the row selection otherwise.
-                    base.ClearSelection();
-                    base.ClearSelection(base.CurrentCell.ColumnIndex, base.CurrentCell.RowIndex,
+                    ClearSelection();
+                    ClearSelection(base.CurrentCell.ColumnIndex, base.CurrentCell.RowIndex,
                         true);
                 }
 
@@ -1516,7 +1508,7 @@ namespace Extract.DataEntry
                 }
 
                 // The table should be displayed as active only if it is editable.
-                _isActive = setActive && !base.ReadOnly;
+                _isActive = setActive && !ReadOnly;
                 _color = color;
 
                 // Update the color of the cell styles if necessary.
@@ -1534,7 +1526,7 @@ namespace Extract.DataEntry
                 }
 
                 // Update the style of the selected cells in the newly activated/deactivated table.
-                foreach (DataGridViewCell cell in base.SelectedCells)
+                foreach (DataGridViewCell cell in SelectedCells)
                 {
                     UpdateCellStyle(cell);
                 }
@@ -1551,7 +1543,7 @@ namespace Extract.DataEntry
                 // the other events already on the queue (such as a mouse click) are processed.
                 if (setActive)
                 {
-                    base.BeginInvoke(new EventArgsDelegate(OnSelectionChanged),
+                    BeginInvoke(new EventArgsDelegate(OnSelectionChanged),
                         new object[] { new EventArgs() });
                 }
             }
@@ -1634,12 +1626,12 @@ namespace Extract.DataEntry
                                     newCurrentCell = row.Cells[0];
 
                                     // Update the selection to include the entire row.
-                                    base.ClearSelection(-1, row.Index, true);
+                                    ClearSelection(-1, row.Index, true);
                                 }
                                 else
                                 {
                                     // Select the cell containing
-                                    base.ClearSelection(newCurrentCell.ColumnIndex, row.Index, true);
+                                    ClearSelection(newCurrentCell.ColumnIndex, row.Index, true);
                                 }
 
                                 base.CurrentCell = newCurrentCell;
@@ -1664,8 +1656,8 @@ namespace Extract.DataEntry
 
                         // Clear all selections first since sometimes trying to select an individual cell 
                         // in a selected row doesn't clear the row selection otherwise.
-                        base.ClearSelection();
-                        base.ClearSelection(base.CurrentCell.ColumnIndex, base.CurrentCell.RowIndex, true);
+                        ClearSelection();
+                        ClearSelection(base.CurrentCell.ColumnIndex, base.CurrentCell.RowIndex, true);
 
                         ProcessSelectionChange();
                     }
@@ -1693,7 +1685,7 @@ namespace Extract.DataEntry
 
                 foreach (IAttribute attribute in attributes)
                 {
-                    object tableElement = null;
+                    object tableElement;
                     if (_attributeMap.TryGetValue(attribute, out tableElement))
                     {
                         DataGridViewCell cell = tableElement as DataGridViewCell;
@@ -1716,7 +1708,7 @@ namespace Extract.DataEntry
                 // [DataEntry:547] Update hints if the spatial info has changed.
                 if (refreshedAttribute && spatialInfoUpdated)
                 {
-                    this.UpdateHints(true);
+                    UpdateHints(true);
                 }
             }
             catch (Exception ex)
@@ -1744,7 +1736,7 @@ namespace Extract.DataEntry
                 // propagated.
                 if (e.Attributes != null && e.Attributes.Size() == 1)
                 {
-                    base.Enabled = !_disabled;
+                    Enabled = !_disabled;
 
                     // Mark the attribute as propagated.
                     IAttribute parentAttribute = (IAttribute)e.Attributes.At(0);
@@ -1877,9 +1869,9 @@ namespace Extract.DataEntry
             {
                 // Only mark a cell is viewed if  it is the only selected cell and that cell is a
                 // IDataEntryTableCell.
-                if (_isActive && base.SelectedCells.Count == 1)
+                if (_isActive && SelectedCells.Count == 1)
                 {
-                    IDataEntryTableCell cell = base.SelectedCells[0] as IDataEntryTableCell;
+                    IDataEntryTableCell cell = SelectedCells[0] as IDataEntryTableCell;
                     if (cell != null && cell.Attribute != null)
                     {
                         if (!_dragOverInProgress)
@@ -1912,7 +1904,7 @@ namespace Extract.DataEntry
         protected void OnAttributesSelected(IUnknownVector attributes,
             bool includeSubAttributes, bool displayTooltips, IAttribute selectedGroupAttribute)
         {
-            if (this.AttributesSelected != null)
+            if (AttributesSelected != null)
             {
                 AttributesSelected(this, new AttributesSelectedEventArgs(attributes,
                     includeSubAttributes, displayTooltips, selectedGroupAttribute));
@@ -1925,7 +1917,7 @@ namespace Extract.DataEntry
         /// <param name="attributes">The set of attributes that have been updated.</param>
         protected void OnPropagateAttributes(IUnknownVector attributes)
         {
-            if (this.PropagateAttributes != null)
+            if (PropagateAttributes != null)
             {
                 IAttribute attributeToPropagate = null;
 
@@ -1968,9 +1960,9 @@ namespace Extract.DataEntry
         /// </summary>
         protected void OnSwipingStateChanged()
         {
-            if (this.SwipingStateChanged != null)
+            if (SwipingStateChanged != null)
             {
-                SwipingStateChanged(this, new SwipingStateChangedEventArgs(this.SupportsSwiping));
+                SwipingStateChanged(this, new SwipingStateChangedEventArgs(SupportsSwiping));
             }
         }
 
@@ -1985,7 +1977,7 @@ namespace Extract.DataEntry
         /// <param name="e">The <see cref="DragEventArgs"/> associated with the drag event.</param>
         protected void OnQueryDraggedDataSupported(DragEventArgs e)
         {
-            if (this.QueryDraggedDataSupported != null)
+            if (QueryDraggedDataSupported != null)
             {
                 QueryDraggedDataSupported(this, new QueryDraggedDataSupportedEventArgs(e));
             }
@@ -1997,7 +1989,7 @@ namespace Extract.DataEntry
         /// <param name="e">The <see cref="EventArgs"/> associated with the drag event.</param>
         protected void OnUpdateStarted(EventArgs e)
         {
-            if (this.UpdateStarted != null)
+            if (UpdateStarted != null)
             {
                 UpdateStarted(this, e);
             }
@@ -2009,7 +2001,7 @@ namespace Extract.DataEntry
         /// <param name="e">The <see cref="EventArgs"/> associated with the drag event.</param>
         protected void OnUpdateEnded(EventArgs e)
         {
-            if (this.UpdateEnded != null)
+            if (UpdateEnded != null)
             {
                 UpdateEnded(this, e);
             }
@@ -2109,7 +2101,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                object tableElement = null;
+                object tableElement;
                 if (_attributeMap.TryGetValue(attribute, out tableElement))
                 {
                     _attributeMap.Remove(attribute);
@@ -2160,7 +2152,7 @@ namespace Extract.DataEntry
                 }
 
                 // Reset selection back to the first displayed cell.
-                base.CurrentCell = base.FirstDisplayedCell;
+                base.CurrentCell = FirstDisplayedCell;
             }
             catch (Exception ex)
             {
@@ -2185,7 +2177,7 @@ namespace Extract.DataEntry
 
                     // Compile all rows that are to be used to generate SmartHints
                     List<DataGridViewRow> smartHintRows = new List<DataGridViewRow>();
-                    foreach (DataGridViewRow row in base.Rows)
+                    foreach (DataGridViewRow row in Rows)
                     {
                         DataEntryTableRow dataEntryRow = row as DataEntryTableRow;
                         if (dataEntryRow != null && dataEntryRow.SmartHintsEnabled)
@@ -2196,7 +2188,7 @@ namespace Extract.DataEntry
 
                     // Compile all columns that are to be used to generate SmartHints
                     List<DataGridViewColumn> smartHintColumns = new List<DataGridViewColumn>();
-                    foreach (DataGridViewColumn column in base.Columns)
+                    foreach (DataGridViewColumn column in Columns)
                     {
                         DataEntryTableColumn dataEntryColumn = column as DataEntryTableColumn;
                         if (dataEntryColumn != null && dataEntryColumn.SmartHintsEnabled)
@@ -2246,7 +2238,7 @@ namespace Extract.DataEntry
                 // Delay screen redraw until all cells are processed.
                 OnUpdateStarted(new EventArgs());
 
-                foreach (DataGridViewCell cell in base.SelectedCells)
+                foreach (DataGridViewCell cell in SelectedCells)
                 {
                     // Clear the value of each selected cell.
                     cell.Value = "";
@@ -2378,7 +2370,7 @@ namespace Extract.DataEntry
             try
             {
                 // If the editing control is being hidden.
-                if (!base.EditingControl.Visible)
+                if (!EditingControl.Visible)
                 {
                     DataGridViewTextBoxEditingControl textEditingControl =
                                     _editingControl as DataGridViewTextBoxEditingControl;
@@ -2445,9 +2437,9 @@ namespace Extract.DataEntry
                         // key pressed.
                         if (e.KeyCode == Keys.Down)
                         {
-                            if (CurrentCell.RowIndex < base.Rows.Count - 1)
+                            if (CurrentCell.RowIndex < Rows.Count - 1)
                             {
-                                CurrentCell = base.Rows[CurrentCell.RowIndex + 1]
+                                CurrentCell = Rows[CurrentCell.RowIndex + 1]
                                     .Cells[CurrentCell.ColumnIndex];
                             }
                         }
@@ -2455,7 +2447,7 @@ namespace Extract.DataEntry
                         {
                             if (CurrentCell.RowIndex > 0)
                             {
-                                CurrentCell = base.Rows[CurrentCell.RowIndex - 1]
+                                CurrentCell = Rows[CurrentCell.RowIndex - 1]
                                     .Cells[CurrentCell.ColumnIndex];
                             }
                         }
@@ -2501,17 +2493,17 @@ namespace Extract.DataEntry
         #region Private Members
 
         /// <summary>
-        /// Compiles a list of <see cref="Extract.Imaging.RasterZone"/>s that describe the specified
+        /// Compiles a list of <see cref="RasterZone"/>s that describe the specified
         /// <see cref="IAttribute"/>'s location.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> whose 
-        /// <see cref="Extract.Imaging.RasterZone"/>(s) are needed.</param>
-        /// <returns>A list of <see cref="Extract.Imaging.RasterZone"/>s that describe the specified
+        /// <see cref="RasterZone"/>(s) are needed.</param>
+        /// <returns>A list of <see cref="RasterZone"/>s that describe the specified
         /// <see cref="IAttribute"/>'s location.</returns>
-        static List<Extract.Imaging.RasterZone> GetAttributeRasterZones(IAttribute attribute)
+        static List<RasterZone> GetAttributeRasterZones(IAttribute attribute)
         {
             // Initialize the return value.
-            List<Extract.Imaging.RasterZone> zones = new List<Extract.Imaging.RasterZone>();
+            List<RasterZone> zones = new List<RasterZone>();
 
             // If the specified attribute has a text value and spatial information, proceed to
             // find its location.
@@ -2523,11 +2515,9 @@ namespace Extract.DataEntry
                 int rasterZoneCount = comRasterZones.Size();
                 for (int j = 0; j < rasterZoneCount; j++)
                 {
-                    UCLID_RASTERANDOCRMGMTLib.RasterZone comRasterZone =
-                        (UCLID_RASTERANDOCRMGMTLib.RasterZone)comRasterZones.At(j);
+                    ComRasterZone comRasterZone = (ComRasterZone)comRasterZones.At(j);
 
-                    Extract.Imaging.RasterZone rasterZone =
-                        new Extract.Imaging.RasterZone(comRasterZone);
+                    RasterZone rasterZone = new RasterZone(comRasterZone);
 
                     zones.Add(rasterZone);
                 }
@@ -2537,22 +2527,21 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Retrieves a list of <see cref="Extract.Imaging.RasterZone"/>s that describe the location
+        /// Retrieves a list of <see cref="RasterZone"/>s that describe the location
         /// of other <see cref="IAttribute"/>s in the same row as the specified cell.
         /// </summary>
         /// <param name="targetCell">The <see cref="DataGridViewCell"/> for which raster zones of
         /// <see cref="IAttribute"/>s sharing the same row are needed.</param>
         /// <param name="columnsToUse">The set of <see cref="DataGridViewColumn"/>s from which
         /// spatial info will be used.</param>
-        /// <returns>A list of <see cref="Extract.Imaging.RasterZone"/>s describe the location
+        /// <returns>A list of <see cref="RasterZone"/>s describe the location
         /// of other <see cref="IAttribute"/>s in the same row.</returns>
-        List<Extract.Imaging.RasterZone> GetRowRasterZones(DataGridViewCell targetCell,
+        List<RasterZone> GetRowRasterZones(DataGridViewCell targetCell,
             IEnumerable columnsToUse)
         {
             try
             {
-                List<Extract.Imaging.RasterZone> rowZones =
-                    new List<Extract.Imaging.RasterZone>(base.Columns.Count - 1);
+                List<RasterZone> rowZones = new List<RasterZone>(Columns.Count - 1);
 
                 // Ensure the target cell is a IDataEntryTableCell; otherwise return an empty list
                 if (!(targetCell is IDataEntryTableCell))
@@ -2567,7 +2556,7 @@ namespace Extract.DataEntry
                     if (column.Index != targetCell.ColumnIndex)
                     {
                         IDataEntryTableCell cell =
-                            base.Rows[targetCell.RowIndex].Cells[column.Index] as IDataEntryTableCell;
+                            Rows[targetCell.RowIndex].Cells[column.Index] as IDataEntryTableCell;
 
                         // If the cell in the current column is a DataEntry cell, compile
                         // the RasterZones that describe it's attribute location.
@@ -2591,22 +2580,22 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Retrieves a list of <see cref="Extract.Imaging.RasterZone"/>s that describe the location
+        /// Retrieves a list of <see cref="RasterZone"/>s that describe the location
         /// of other <see cref="IAttribute"/>s in the same column as the specified cell.
         /// </summary>
         /// <param name="targetCell">The <see cref="DataGridViewCell"/> for which raster zones of
         /// <see cref="IAttribute"/>s sharing the same column are needed.</param>
         /// <param name="rowsToUse">The set of <see cref="DataGridViewRow"/>s from which spatial
         /// info will be used.</param>
-        /// <returns>A list of <see cref="Extract.Imaging.RasterZone"/>s describe the location
+        /// <returns>A list of <see cref="RasterZone"/>s describe the location
         /// of other <see cref="IAttribute"/>s in the same column.</returns>
-        List<Extract.Imaging.RasterZone> GetColumnRasterZones(DataGridViewCell targetCell,
+        List<RasterZone> GetColumnRasterZones(DataGridViewCell targetCell,
             IEnumerable rowsToUse)
         {
             try
             {
-                List<Extract.Imaging.RasterZone> columnZones =
-                    new List<Extract.Imaging.RasterZone>(base.Rows.Count - 1);
+                List<RasterZone> columnZones =
+                    new List<RasterZone>(Rows.Count - 1);
 
                 // Ensure the target cell is a IDataEntryTableCell; otherwise return an empty list
                 if (!(targetCell is IDataEntryTableCell))
@@ -2621,7 +2610,7 @@ namespace Extract.DataEntry
                     if (row.Index != targetCell.RowIndex)
                     {
                         IDataEntryTableCell cell =
-                            base.Rows[row.Index].Cells[targetCell.ColumnIndex] as IDataEntryTableCell;
+                            Rows[row.Index].Cells[targetCell.ColumnIndex] as IDataEntryTableCell;
 
                         // If the cell in the current row is a DataEntry cell, compile
                         // the RasterZones that describe it's attribute location.
@@ -2669,37 +2658,33 @@ namespace Extract.DataEntry
                     smartHintColumns != null);
 
                 // Initialize a list of raster zones for hint locations.
-                List<Extract.Imaging.RasterZone> spatialHints = null;
-
-                // A list to keep track of RasterZones for attributes sharing the same row as the
-                // target attribute.
-                List<Extract.Imaging.RasterZone> rowZones = null;
+                List<RasterZone> spatialHints = null;
 
                 // A list to keep track of RasterZones for attributes sharing the same column as the
                 // target attribute.
-                List<Extract.Imaging.RasterZone> columnZones = null;
+                List<RasterZone> columnZones;
 
                 // Attempt to generate a hint based on the intersection of row and column data
                 // if both the row and column containing the target cell have smart hints enabled.
                 if (smartHintRows.Count > 1 && smartHintColumns.Count > 1 &&
-                    smartHintRows.Contains(base.Rows[targetCell.RowIndex]) &&
-                    smartHintColumns.Contains(base.Columns[targetCell.ColumnIndex]))
+                    smartHintRows.Contains(Rows[targetCell.RowIndex]) &&
+                    smartHintColumns.Contains(Columns[targetCell.ColumnIndex]))
                 {
                     // Compile a set of raster zones representing the other attributes sharing
                     // the same row and column.
-                    rowZones = GetRowRasterZones(targetCell, smartHintColumns);
+                    List<RasterZone> rowZones = GetRowRasterZones(targetCell, smartHintColumns);
                     columnZones = GetColumnRasterZones(targetCell, smartHintRows);
 
                     // Attempt to generate a spatial hint using the spatial intersection of the
                     // row and column zones.
-                    Extract.Imaging.RasterZone rasterZone =
+                    RasterZone rasterZone =
                         _spatialHintGenerator.GetRowColumnIntersectionSpatialHint(
                             targetCell.RowIndex, rowZones, targetCell.ColumnIndex, columnZones);
 
                     // If a smart hint was able to be generated, use it.
                     if (rasterZone != null)
                     {
-                        spatialHints = new List<Extract.Imaging.RasterZone>();
+                        spatialHints = new List<RasterZone>();
                         spatialHints.Add(rasterZone);
 
                         AttributeStatusInfo.SetHintType(attribute, HintType.Direct);
@@ -2712,22 +2697,22 @@ namespace Extract.DataEntry
                 // If a "smart" hint was not generated, check to see if row and/or column hints can
                 // and should be generated.
                 // If row hints are enabled and there are other attributes sharing the row.
-                if (_rowHintsEnabled && base.Columns.Count > 1)
+                if (_rowHintsEnabled && Columns.Count > 1)
                 {
                     // Compile the raster zones of other attributes sharing the row
-                    spatialHints = GetRowRasterZones(targetCell, base.Columns);
+                    spatialHints = GetRowRasterZones(targetCell, Columns);
                 }
 
                 // If column hints are enabled and there are other attributes sharing the column.
-                if (_columnHintsEnabled && base.Rows.Count > 1)
+                if (_columnHintsEnabled && Rows.Count > 1)
                 {
                     // Compile the raster zones of other attributes sharing the column
-                    columnZones = GetColumnRasterZones(targetCell, base.Rows);
+                    columnZones = GetColumnRasterZones(targetCell, Rows);
 
                     // Assign or append the column zones to the return value.
                     if (spatialHints == null)
                     {
-                        spatialHints = new List<Extract.Imaging.RasterZone>(columnZones);
+                        spatialHints = new List<RasterZone>(columnZones);
                     }
                     else
                     {

@@ -1,17 +1,12 @@
-using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Globalization;
 using System.Security.Permissions;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -32,11 +27,6 @@ namespace Extract.DataEntry
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(DataEntryTable).ToString();
-
-        /// <summary>
-        /// The value associated with a window's key down message.
-        /// </summary>
-        const int _WM_KEYDOWN = 0x100;
 
         #endregion Constants
 
@@ -73,7 +63,7 @@ namespace Extract.DataEntry
         /// Specifies names of attributes that can be mapped into this control by renaming them.
         /// The purpose is to be able to copy data out of one control and paste it into another.
         /// </summary>
-        Collection<string> _compatibleAttributeNames = new Collection<string>();
+        readonly Collection<string> _compatibleAttributeNames = new Collection<string>();
 
         /// <summary>
         /// Specifies whether the table will have a context menu option to allow rows to be sorted
@@ -84,39 +74,39 @@ namespace Extract.DataEntry
         /// <summary>
         /// Context MenuItem that allows a row to be inserted at the current location.
         /// </summary>
-        ToolStripMenuItem _rowInsertMenuItem = new ToolStripMenuItem("Insert row");
+        readonly ToolStripMenuItem _rowInsertMenuItem = new ToolStripMenuItem("Insert row");
 
         /// <summary>
         /// Context MenuItem that allows the selected row(s) to be deleted.
         /// </summary>
-        ToolStripMenuItem _rowDeleteMenuItem = new ToolStripMenuItem("Delete row(s)");
+        readonly ToolStripMenuItem _rowDeleteMenuItem = new ToolStripMenuItem("Delete row(s)");
 
         /// <summary>
         /// Context MenuItem that allows the selected row(s) to be copied to the clipboard.
         /// </summary>
-        ToolStripMenuItem _rowCopyMenuItem = new ToolStripMenuItem("Copy row(s)");
+        readonly ToolStripMenuItem _rowCopyMenuItem = new ToolStripMenuItem("Copy row(s)");
 
         /// <summary>
         /// Context MenuItem that allows the selected row(s) to be copied to the clipboard and
         /// deleted from the table.
         /// </summary>
-        ToolStripMenuItem _rowCutMenuItem = new ToolStripMenuItem("Cut row(s)");
+        readonly ToolStripMenuItem _rowCutMenuItem = new ToolStripMenuItem("Cut row(s)");
 
         /// <summary>
         /// Context MenuItem that allows the selected row(s) to be pasted into the current
         /// selection from the clipboard.
         /// </summary>
-        ToolStripMenuItem _rowPasteMenuItem = new ToolStripMenuItem("Paste copied row(s)");
+        readonly ToolStripMenuItem _rowPasteMenuItem = new ToolStripMenuItem("Paste copied row(s)");
 
         /// <summary>
         /// Context MenuItem that allows the selected row(s) to be inserted into from the clipboard.
         /// </summary>
-        ToolStripMenuItem _rowInsertCopiedMenuItem = new ToolStripMenuItem("Insert copied row(s)");
+        readonly ToolStripMenuItem _rowInsertCopiedMenuItem = new ToolStripMenuItem("Insert copied row(s)");
 
         /// <summary>
         /// Context MenuItem that sorts the all rows in the table spatially.
         /// </summary>
-        ToolStripMenuItem _sortAllRowsMenuItem = new ToolStripMenuItem("Sort rows to match document");
+        readonly ToolStripMenuItem _sortAllRowsMenuItem = new ToolStripMenuItem("Sort rows to match document");
 
         /// <summary>
         /// The domain of attributes to which this control's attribute(s) belong.
@@ -134,7 +124,7 @@ namespace Extract.DataEntry
         /// propagates between different attributes, the propagated attribute does not need to be
         /// re-initialized as long as it had previously been initialized.
         /// </summary>
-        Dictionary<IUnknownVector, Dictionary<IAttribute, DataEntryTableRow>> _cachedRows =
+        readonly Dictionary<IUnknownVector, Dictionary<IAttribute, DataEntryTableRow>> _cachedRows =
             new Dictionary<IUnknownVector, Dictionary<IAttribute, DataEntryTableRow>>();
 
         /// <summary>
@@ -159,7 +149,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Specifies whether the current instance is running in design mode.
         /// </summary>
-        bool _inDesignMode;
+        readonly bool _inDesignMode;
 
         /// <summary>
         /// A lazily instantiated <see cref="MiscUtils"/> instance to use for converting 
@@ -191,7 +181,6 @@ namespace Extract.DataEntry
         /// Initializes a new <see cref="DataEntryTable"/> instance.
         /// </summary>
         public DataEntryTable()
-            : base()
         {
             try
             {
@@ -293,7 +282,7 @@ namespace Extract.DataEntry
                     // the attribute finding rule.
                     if (!_inDesignMode && !string.IsNullOrEmpty(value))
                     {
-                        _rowFormattingRule = (IRuleSet) new RuleSetClass();
+                        _rowFormattingRule = new RuleSetClass();
                         _rowFormattingRule.LoadFrom(DataEntryMethods.ResolvePath(value), false);
                     }
                     else
@@ -513,17 +502,17 @@ namespace Extract.DataEntry
                 {
                     ExtractException.Assert("ELI24222",
                         "A DataEntryTable must have an AttributeName specified!",
-                        !string.IsNullOrEmpty(base.AttributeName));
+                        !string.IsNullOrEmpty(AttributeName));
 
                     ExtractException.Assert("ELI24249",
                         "Row swiping is enabled, but no row formatting rule was specified!",
-                        !this.RowSwipingEnabled || _rowFormattingRule != null);
+                        !RowSwipingEnabled || _rowFormattingRule != null);
 
                     // Create a context menu for the table
                     base.ContextMenuStrip = new ContextMenuStrip();
 
                     // Insert row menu option
-                    if (base.AllowUserToAddRows)
+                    if (AllowUserToAddRows)
                     {
                         _rowInsertMenuItem.Enabled = false;
                         _rowInsertMenuItem.Click += HandleInsertMenuItemClick;
@@ -531,7 +520,7 @@ namespace Extract.DataEntry
                     }
 
                     // Delete row(s) menu option
-                    if (base.AllowUserToDeleteRows)
+                    if (AllowUserToDeleteRows)
                     {
                         _rowDeleteMenuItem.Enabled = false;
                         _rowDeleteMenuItem.Click += HandleDeleteMenuItemClick;
@@ -550,7 +539,7 @@ namespace Extract.DataEntry
                     base.ContextMenuStrip.Items.Add(_rowCopyMenuItem);
 
                     // Cut row(s) menu option
-                    if (base.AllowUserToDeleteRows)
+                    if (AllowUserToDeleteRows)
                     {
                         _rowCutMenuItem.Enabled = false;
                         _rowCutMenuItem.Click += HandleRowCutMenuItemClick;
@@ -566,7 +555,7 @@ namespace Extract.DataEntry
                     base.ContextMenuStrip.Items.Add(_rowPasteMenuItem);
 
                     // Insert copied row(s) menu option
-                    if (base.AllowUserToAddRows)
+                    if (AllowUserToAddRows)
                     {
                         _rowInsertCopiedMenuItem.Enabled = false;
                         _rowInsertCopiedMenuItem.Click += HandleRowInsertMenuItemClick;
@@ -588,15 +577,15 @@ namespace Extract.DataEntry
 
                     // Handle the case that rows collection has been changed so that
                     // _sourceAttributes can be updated as appropriate.
-                    base.Rows.CollectionChanged += HandleRowsCollectionChanged;
+                    Rows.CollectionChanged += HandleRowsCollectionChanged;
 
                     // Disable column header wrap mode, otherwise resizing columns widths can cause
                     // wrapped text to increse the height of the header column thereby upsetting
                     // control sizing and possibly hiding data.
-                    base.ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.False;
+                    ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.False;
 
                     // Prevent drag operations from accidentally resizing rows.
-                    base.AllowUserToResizeRows = false;
+                    AllowUserToResizeRows = false;
                 }
             }
             catch (Exception ex)
@@ -616,26 +605,26 @@ namespace Extract.DataEntry
             // If a selection change has resulted in a single cell being selected in a column less
             // than the current _carriageReturnColumn, the current column is now the
             // _carriageReturnColumn regardless of how selection arrived here.
-            if (base.SelectedCells.Count == 1 && base.CurrentCell != null &&
-                base.CurrentCell.ColumnIndex < _carriageReturnColumn)
+            if (SelectedCells.Count == 1 && CurrentCell != null && 
+                CurrentCell.ColumnIndex < _carriageReturnColumn)
             {
-                _carriageReturnColumn = base.CurrentCell.ColumnIndex;
+                _carriageReturnColumn = CurrentCell.ColumnIndex;
             }
 
             // Create a vector to store the attributes in the currently selected row(s).
-            IUnknownVector selectedAttributes = (IUnknownVector)new IUnknownVectorClass();
+            IUnknownVector selectedAttributes = new IUnknownVectorClass();
 
             // [DataEntry:645]
             // Process selection as a row selection only if there are no cells outside
             // the selected rows that are selected.
             bool rowSelectionMode = false;
-            if (base.SelectedRows.Count > 0)
+            if (SelectedRows.Count > 0)
             {
                 rowSelectionMode = true;
 
-                foreach (DataGridViewCell cell in base.SelectedCells)
+                foreach (DataGridViewCell cell in SelectedCells)
                 {
-                    if (!base.SelectedRows.Contains(base.Rows[cell.RowIndex]))
+                    if (!SelectedRows.Contains(Rows[cell.RowIndex]))
                     {
                         rowSelectionMode = false;
                         break;
@@ -650,14 +639,14 @@ namespace Extract.DataEntry
 
                 // Loop through each selected row and add the attribute corresponding to each
                 // to the set of selected attributes;
-                foreach (DataGridViewRow selectedRow in base.SelectedRows)
+                foreach (DataGridViewRow selectedRow in SelectedRows)
                 {
-                    IAttribute attribute = DataEntryTableBase.GetAttribute(selectedRow);
+                    IAttribute attribute = GetAttribute(selectedRow);
                     if (attribute != null)
                     {
                         selectedAttributes.PushBack(attribute);
                     }
-                    else if (selectedRow.Index == base.NewRowIndex && base.SelectedRows.Count == 1)
+                    else if (selectedRow.Index == NewRowIndex && SelectedRows.Count == 1)
                     {
                         newRowSelection = true;
                     }
@@ -673,18 +662,18 @@ namespace Extract.DataEntry
                     // _tabOrderPlaceholderAttribute as the selected attribute so that the
                     // control host will be able to correctly direct tab order forward and
                     // backward from this point.
-                    selectedAttributes.PushBack(this._tabOrderPlaceholderAttribute);
+                    selectedAttributes.PushBack(_tabOrderPlaceholderAttribute);
                 }
 
                 // Allow all selected cells to be viewed with tooltips only if exactly one row
                 // attribute is selected.
                 // [DataEntry:491] Don't show tooltips during a drag & drop.
-                bool rowView = selectedAttributes.Size() == 1 && !base.DragOverInProgress;
+                bool rowView = selectedAttributes.Size() == 1 && !DragOverInProgress;
 
                 // If the whole row is being viewed, mark the row's attributes as viewed.
-                if (rowView && base.IsActive)
+                if (rowView && IsActive)
                 {
-                    foreach (DataGridViewCell cell in base.SelectedRows[0].Cells)
+                    foreach (DataGridViewCell cell in SelectedRows[0].Cells)
                     {
                         IDataEntryTableCell dataEntryCell = cell as IDataEntryTableCell;
 
@@ -703,23 +692,23 @@ namespace Extract.DataEntry
                 OnAttributesSelected(selectedAttributes, true, rowView,
                     (_allowTabbingByRow && !Disabled) ? (IAttribute)selectedAttributes.At(0) : null);
             }
-            else if (base.SelectedCells.Count > 0)
+            else if (SelectedCells.Count > 0)
             {
                 // _tabOrderPlaceholderAttribute may represent an attribute group if selected.
                 IAttribute selectedGroupAttribute = null;
 
                 // Create a collection to keep track of the attributes for each row in which a cell
                 // is selected.
-                IUnknownVector selectedRowAttributes = (IUnknownVector)new IUnknownVectorClass();
+                IUnknownVector selectedRowAttributes = new IUnknownVectorClass();
 
                 // If the selection is on a cell-by-cell basis rather, we need to compile the
                 // attributes corresponding to each cell for the AttributesSelected event,
                 // then find the attribute for the current row for the PropagateAttributes
                 // event.
-                foreach (IDataEntryTableCell selectedDataEntryCell in base.SelectedCells)
+                foreach (IDataEntryTableCell selectedDataEntryCell in SelectedCells)
                 {
                     // Keep track of the cells' attributes for OnAttributesSelected
-                    IAttribute attribute = DataEntryTableBase.GetAttribute(selectedDataEntryCell);
+                    IAttribute attribute = GetAttribute(selectedDataEntryCell);
                     if (attribute != null)
                     {
                         selectedAttributes.PushBack(attribute);
@@ -728,7 +717,7 @@ namespace Extract.DataEntry
                     DataGridViewCell selectedCell = (DataGridViewCell)selectedDataEntryCell;
 
                     // Keep track of the rows' attributes for OnPropagateAttributes
-                    DataEntryTableRow row = base.Rows[selectedCell.RowIndex] as DataEntryTableRow;
+                    DataEntryTableRow row = Rows[selectedCell.RowIndex] as DataEntryTableRow;
                     if (row != null && row.Attribute != null)
                     {
                         selectedRowAttributes.PushBackIfNotContained(row.Attribute);
@@ -744,7 +733,7 @@ namespace Extract.DataEntry
                 // will be able to correctly direct tab order forward and backward from this point.
                 if (_tabOrderPlaceholderAttribute != null &&
                     selectedRowAttributes.Size() == 0 &&
-                    base.CurrentCell != null && base.CurrentCell.RowIndex == base.NewRowIndex)
+                    CurrentCell != null && CurrentCell.RowIndex == NewRowIndex)
                 {
                     selectedAttributes.PushBack(_tabOrderPlaceholderAttribute);
 
@@ -760,10 +749,10 @@ namespace Extract.DataEntry
                 // Allow all selected cells to be viewed with tooltips only if exactly one row
                 // attribute is selected.
                 // [DataEntry:491] Don't show tooltips during a drag & drop.
-                bool rowView = selectedRowAttributes.Size() == 1 && !base.DragOverInProgress;
+                bool rowView = selectedRowAttributes.Size() == 1 && !DragOverInProgress;
 
                 // If the whole row is being viewed, mark the row's attributes as viewed.
-                if (rowView && base.IsActive)
+                if (rowView && IsActive)
                 {
                     int selectedCount = selectedAttributes.Size();
                     for (int i = 0; i < selectedCount; i++)
@@ -771,7 +760,7 @@ namespace Extract.DataEntry
                         AttributeStatusInfo.MarkAsViewed((IAttribute)selectedAttributes.At(i), true);
                     }
 
-                    foreach (DataGridViewCell cell in base.SelectedCells)
+                    foreach (DataGridViewCell cell in SelectedCells)
                     {
                         UpdateCellStyle(cell);
                     }
@@ -788,8 +777,7 @@ namespace Extract.DataEntry
                 OnPropagateAttributes(null);
 
                 // Raise AttributesSelected to update the control's highlight.
-                OnAttributesSelected((IUnknownVector)new IUnknownVectorClass(), false, false,
-                    null);
+                OnAttributesSelected(new IUnknownVectorClass(), false, false, null);
             }
 
             // Update the swiping state based on the current selection.
@@ -804,7 +792,7 @@ namespace Extract.DataEntry
         /// data.</param>
         protected override void OnUserAddedRow(DataGridViewRowEventArgs e)
         {
-            DataGridViewEditMode originalEditMode = base.EditMode;
+            DataGridViewEditMode originalEditMode = EditMode;
 
             try
             {
@@ -819,7 +807,7 @@ namespace Extract.DataEntry
 
                 // Obtain the initial value before calling ApplyAttributeToRow which may trigger
                 // auto-update queries and cause the value to change.
-                string initialValue = base.CurrentCell.Value.ToString();
+                string initialValue = CurrentCell.Value.ToString();
 
                 CurrentCell.Value = "";
 
@@ -833,22 +821,23 @@ namespace Extract.DataEntry
                     return;
                 }
 
-                // If the initial value is a single character, assume it is typed and re-send it as
-                // WM_CHAR message via SendCharacterToControl to trigger auto-complete to display.
+                // If the initial value is a single character, assume it is typed and re-send it 
+                // as WindowsMessage.Character message via SendCharacterToControl to trigger 
+                // auto-complete to display.
                 if (initialValue.Length == 1)
                 {
                     base.BeginEdit(false);
 
-                    KeyMethods.SendCharacterToControl(initialValue[0], base.EditingControl);
+                    KeyMethods.SendCharacterToControl(initialValue[0], EditingControl);
                 }
                 // For initial values > 1 char (ie, pasted text), simply re-apply the initial value
                 // and refresh the attribute.
                 else if (initialValue.Length > 1)
                 {
-                    IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
+                    IDataEntryTableCell dataEntryCell = CurrentCell as IDataEntryTableCell;
                     if (dataEntryCell != null)
                     {
-                        base.CurrentCell.Value = initialValue;
+                        CurrentCell.Value = initialValue;
                         base.RefreshAttributes(false, dataEntryCell.Attribute);
                     }
 
@@ -864,9 +853,9 @@ namespace Extract.DataEntry
             finally
             {
                 // Edit mode can once again be initiated by the use.
-                base.EditMode = originalEditMode;
+                EditMode = originalEditMode;
 
-                base.OnUpdateEnded(new EventArgs());
+                OnUpdateEnded(new EventArgs());
             }
         }
 
@@ -887,19 +876,19 @@ namespace Extract.DataEntry
                 // be selected following a delete.  It is more natural to leave an entire row
                 // selected. But this needs to be done in a fashion so that the selected row matches
                 // the "current" row.
-                if (base.Rows.Count > 0)
+                if (Rows.Count > 0)
                 {
-                    if ((e.RowIndex < base.Rows.Count && e.RowIndex > 0 && e.RowIndex == base.NewRowIndex) ||
-                        (e.RowIndex == base.Rows.Count))
+                    if ((e.RowIndex < Rows.Count && e.RowIndex > 0 && e.RowIndex == NewRowIndex) ||
+                        (e.RowIndex == Rows.Count))
                     {
                         // If the last row is selected (except if there is only one row selected in a table
                         // that allows new rows), select the previous row from the row that was deleted.
-                        base.ClearSelection(-1, e.RowIndex - 1, true);
+                        ClearSelection(-1, e.RowIndex - 1, true);
                     }
-                    else if (e.RowIndex < base.Rows.Count)
+                    else if (e.RowIndex < Rows.Count)
                     {
                         // If this is not the last row, select the same row index as was previous seleced.
-                        base.ClearSelection(-1, e.RowIndex, true);
+                        ClearSelection(-1, e.RowIndex, true);
                     }
                 }
                 else
@@ -936,7 +925,7 @@ namespace Extract.DataEntry
                     // Check to see if row task options should be available based on the current
                     // table cell.
                     bool enableRowOptions = AllowRowTasks(
-                        base.CurrentCell.RowIndex, base.CurrentCell.ColumnIndex);
+                        CurrentCell.RowIndex, CurrentCell.ColumnIndex);
 
                     switch (e.KeyCode)
                     {
@@ -956,7 +945,7 @@ namespace Extract.DataEntry
 
                         // Cut selected rows
                         case Keys.X:
-                            if (enableRowOptions && base.AllowUserToDeleteRows)
+                            if (enableRowOptions && AllowUserToDeleteRows)
                             {
                                 CopySelectedRows();
 
@@ -966,7 +955,7 @@ namespace Extract.DataEntry
                             }
                             else if (CopySelectedCells())
                             {
-                                foreach (DataGridViewCell cell in base.SelectedCells)
+                                foreach (DataGridViewCell cell in SelectedCells)
                                 {
                                     cell.Value = null;
                                 }
@@ -1022,8 +1011,8 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (EditingControl != null && m.Msg == _WM_KEYDOWN && m.WParam == (IntPtr)Keys.V &&
-                    (Control.ModifierKeys & Keys.Control) != 0)
+                if (EditingControl != null && m.Msg == WindowsMessage.KeyDown && 
+                    m.WParam == (IntPtr)Keys.V && (ModifierKeys & Keys.Control) != 0)
                 {
                     if (PasteCellData(Clipboard.GetDataObject()))
                     {
@@ -1055,14 +1044,14 @@ namespace Extract.DataEntry
             try
             {
                 _rowMouseDownPoint = null;
-                HitTestInfo hit = base.HitTest(e.X, e.Y);
+                HitTestInfo hit = HitTest(e.X, e.Y);
 
                 // If row operations are supported for the current selection and shift or control
                 // keys are not pressed, suppress the MouseDown event until the mouse button is
                 // released to maintain the current selection for any potential drag and drop
                 // operation unless the shift or control modifiers are being used.
-                if ((Control.ModifierKeys & Keys.Shift) == 0 &&
-                    (Control.ModifierKeys & Keys.Control) == 0 &&
+                if ((ModifierKeys & Keys.Shift) == 0 &&
+                    (ModifierKeys & Keys.Control) == 0 &&
                     AllowRowTasks(hit.RowIndex, hit.ColumnIndex))
                 {
                     _rowMouseDownPoint = e.Location;
@@ -1151,11 +1140,11 @@ namespace Extract.DataEntry
                 // the mouse is in a different location than when the mouse button was pressed and
                 // row tasks are allowed given the current selection, begin a drag and drop
                 // operation.
-                if (!base.DragOverInProgress && _rowMouseDownPoint != null &&
+                if (!DragOverInProgress && _rowMouseDownPoint != null &&
                     e.Location != _rowMouseDownPoint.Value &&
-                    (Control.MouseButtons & MouseButtons.Left) != 0)
+                    (MouseButtons & MouseButtons.Left) != 0)
                 {
-                    HitTestInfo hit = base.HitTest(e.X, e.Y);
+                    HitTestInfo hit = HitTest(e.X, e.Y);
 
                     if (AllowRowTasks(hit.RowIndex, hit.ColumnIndex))
                     {
@@ -1191,8 +1180,8 @@ namespace Extract.DataEntry
                 // If the dragged data is compatible with the rows of this table.
                 if (dataType != null)
                 {
-                    Point location = base.PointToClient(new Point(drgevent.X, drgevent.Y));
-                    HitTestInfo hit = base.HitTest(location.X, location.Y);
+                    Point location = PointToClient(new Point(drgevent.X, drgevent.Y));
+                    HitTestInfo hit = HitTest(location.X, location.Y);
 
                     // If row tasks are allowed given the current selection.
                     if (AllowRowTasks(hit.RowIndex, hit.ColumnIndex))
@@ -1200,7 +1189,7 @@ namespace Extract.DataEntry
                         // Give focus to the table if a drop is supported.
                         if (!base.Focused)
                         {
-                            base.Focus();
+                            Focus();
                         }
 
                         // Started with all allowed operations from the drag source.
@@ -1210,7 +1199,7 @@ namespace Extract.DataEntry
                         if (RowsBeingDraggedFromCurrentTable)
                         {
                             // Don't allow rows to be dragged onto themselves.
-                            if (_draggedRows.Contains((DataEntryTableRow)base.CurrentRow))
+                            if (_draggedRows.Contains((DataEntryTableRow)CurrentRow))
                             {
                                 drgevent.Effect &= DragDropEffects.None;
                             }
@@ -1232,8 +1221,8 @@ namespace Extract.DataEntry
                 // dependent control.
                 else
                 {
-                    Point location = base.PointToClient(new Point(drgevent.X, drgevent.Y));
-                    HitTestInfo hit = base.HitTest(location.X, location.Y);
+                    Point location = PointToClient(new Point(drgevent.X, drgevent.Y));
+                    HitTestInfo hit = HitTest(location.X, location.Y);
 
                     // If row tasks are allowed given the current selection.
                     if (AllowRowTasks(hit.RowIndex, hit.ColumnIndex))
@@ -1256,7 +1245,7 @@ namespace Extract.DataEntry
                 // the cursor is over any of the dragged rows so that dragging behavior doesn't
                 // change after dragging out of the dragged rows and then back into them.
                 if (_draggedRows != null && _draggedRows.Count > 1 &&
-                    _draggedRows.Contains(base.CurrentRow as DataEntryTableRow))
+                    _draggedRows.Contains(CurrentRow as DataEntryTableRow))
                 {
                     bool changedSelection = false;
 
@@ -1304,7 +1293,7 @@ namespace Extract.DataEntry
                 {
                     // When dropping data into a compatible table control that allows rows to be
                     // added, insert it before the selected row, not over top of it.
-                    if (base.AllowUserToAddRows)
+                    if (AllowUserToAddRows)
                     {
                         InsertNewRow(true);
                     }
@@ -1312,17 +1301,17 @@ namespace Extract.DataEntry
                     // Paste the dropped data in.
                     PasteRowData(drgevent.Data);
 
-                    base.Focus();
+                    Focus();
                 }
                 // If a dependent control has indicated it supports the dragged data and the new
                 // row is currently selected.
-                else if (drgevent.Effect != DragDropEffects.None &&
-                    base.CurrentCell.RowIndex == base.NewRowIndex)
+                else if (drgevent.Effect != DragDropEffects.None && 
+                    CurrentCell.RowIndex == NewRowIndex)
                 {
                     // Create a new entry for the data that will be propagated to dependent controls.
                     InsertNewRow(true);
 
-                    base.Focus();
+                    Focus();
                 }
 
                 base.OnDragDrop(drgevent);
@@ -1346,7 +1335,7 @@ namespace Extract.DataEntry
                 // If a drag and drop operation is in progress or a manual selection reset is in
                 // progress, prevent the table from being scrolled as the results are usually
                 // undesireable.
-                if (_selectionIsBeingReset || base.DragOverInProgress)
+                if (_selectionIsBeingReset || DragOverInProgress)
                 {
                     e.NewValue = e.OldValue;
                 }
@@ -1420,11 +1409,11 @@ namespace Extract.DataEntry
                 // If the delete key was pressed while not in edit mode and where it won't result in
                 // any rows being deleted, instead delete the contents of all selected cells.
                 if (e.KeyCode == Keys.Delete &&
-                    (base.SelectedRows.Count == 0 || !base.AllowUserToDeleteRows))
+                    (SelectedRows.Count == 0 || !AllowUserToDeleteRows))
                 {
                     // [DataEntry:641]
                     // Clear the contents as well as the spatial info of all selected cells.
-                    base.DeleteSelectedCellContents();
+                    DeleteSelectedCellContents();
 
                     return true;
                 }
@@ -1436,8 +1425,7 @@ namespace Extract.DataEntry
                     // If DataGridViewKey was processed for any key other than Enter or Delete,
                     // reset the _carriageReturnColumn to the current column as the current
                     // selection is likely not the result of tabbing.
-                    _carriageReturnColumn =
-                        (base.CurrentCell == null) ? 0 : base.CurrentCell.ColumnIndex;
+                    _carriageReturnColumn = CurrentCell == null ? 0 : CurrentCell.ColumnIndex;
                 }
             }
             catch (Exception ex)
@@ -1474,19 +1462,19 @@ namespace Extract.DataEntry
                 }
                 // If the delete key is pressed while a combo cell is selected or all text
                 // is selected in a text box cell, delete spatial info.
-                else if (keyData == Keys.Delete && base.EditingControl != null)
+                else if (keyData == Keys.Delete && EditingControl != null)
                 {
-                    IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
+                    IDataEntryTableCell dataEntryCell = CurrentCell as IDataEntryTableCell;
 
                     if (dataEntryCell != null)
                     {
                         DataGridViewTextBoxEditingControl textBoxEditingControl =
-                            base.EditingControl as DataGridViewTextBoxEditingControl;
+                            EditingControl as DataGridViewTextBoxEditingControl;
 
                         if (textBoxEditingControl == null ||
                             textBoxEditingControl.SelectionLength == textBoxEditingControl.Text.Length)
                         {
-                            base.DeleteSelectedCellContents();
+                            DeleteSelectedCellContents();
                         }
                     }
                 }
@@ -1497,8 +1485,7 @@ namespace Extract.DataEntry
                 // current column as the current selection is likely not the result of tabbing.
                 if (keyProcessed)
                 {
-                    _carriageReturnColumn =
-                        (base.CurrentCell == null) ? 0 : base.CurrentCell.ColumnIndex;
+                    _carriageReturnColumn = CurrentCell == null ? 0 : CurrentCell.ColumnIndex;
                 }
             }
             catch (Exception ex)
@@ -1520,8 +1507,7 @@ namespace Extract.DataEntry
             base.OnClick(e);
 
             // In the event of a click, the selected column is now the _carriageReturnColumn.
-            _carriageReturnColumn =
-                        (base.CurrentCell == null) ? 0 : base.CurrentCell.ColumnIndex;
+            _carriageReturnColumn = CurrentCell == null ? 0 : CurrentCell.ColumnIndex;
         }
 
         #endregion Overrides
@@ -1543,7 +1529,7 @@ namespace Extract.DataEntry
                 {
                     // Remove the row's attribute from _sourceAttributes and raise the 
                     // AttributesDeleted event.
-                    IAttribute attributeToRemove = DataEntryTableBase.GetAttribute(e.Element);
+                    IAttribute attributeToRemove = GetAttribute(e.Element);
                     if (attributeToRemove != null)
                     {
                         ExtractException.Assert("ELI26142", "Uninitialized data!",
@@ -1591,20 +1577,20 @@ namespace Extract.DataEntry
             {
                 // If the control isn't enabled or no attributes have been mapped, swiping is not
                 // currently supported.
-                if (!base.Enabled || _sourceAttributes == null)
+                if (!Enabled || _sourceAttributes == null)
                 {
                     return false;
                 }
-                else if (base.SelectedRows.Count > 0)
+                else if (SelectedRows.Count > 0)
                 {
                     // Row selection
                     return _rowSwipingEnabled;
                 }
-                else if (base.SelectedCells.Count == 1 && base.CurrentCell != null)
+                else if (SelectedCells.Count == 1 && CurrentCell != null)
                 {
                     // Cell selection
-                    return (_cellSwipingEnabled && 
-                        base.Columns[base.CurrentCell.ColumnIndex] is DataEntryTableColumn);
+                    return _cellSwipingEnabled && 
+                        Columns[CurrentCell.ColumnIndex] is DataEntryTableColumn;
                 }
 
                 return false;
@@ -1641,7 +1627,7 @@ namespace Extract.DataEntry
                 // not be mapped into the attribute hierarchy.
                 // Also, prevent it from being enabled if explicitly disabled via the
                 // IDataEntryControl interface.
-                base.Enabled = (sourceAttributes != null && !base.Disabled);
+                Enabled = sourceAttributes != null && !Disabled;
 
                 _sourceAttributes = sourceAttributes;
 
@@ -1661,7 +1647,7 @@ namespace Extract.DataEntry
                 }
 
                 // Clear all existing entries from the table.
-                base.Rows.Clear();
+                Rows.Clear();
 
                 if (_sourceAttributes == null)
                 {
@@ -1678,7 +1664,7 @@ namespace Extract.DataEntry
                 {
                     // Attempt to find mapped attribute(s) from the provided vector.  
                     IUnknownVector mappedAttributes = DataEntryMethods.InitializeAttributes(
-                        base.AttributeName, MultipleMatchSelectionMode.All, _sourceAttributes, null,
+                        AttributeName, MultipleMatchSelectionMode.All, _sourceAttributes, null,
                         this, null, false, null, null, null, null);
 
                     // Create arrays to store the attributes associated with each row & cell.
@@ -1690,7 +1676,7 @@ namespace Extract.DataEntry
                         // be visible)
                         if (count > 0)
                         {
-                            base.Rows.Add(count);
+                            Rows.Add(count);
                         }
                     }
 
@@ -1703,19 +1689,19 @@ namespace Extract.DataEntry
 
                     // [DataEntry:393]
                     // If the minimum number of rows are not present, add new blank rows as necessary.
-                    while (base.Rows.Count < _minimumNumberOfRows)
+                    while (Rows.Count < _minimumNumberOfRows)
                     {
-                        int addedRowIndex = base.Rows.Add();
+                        int addedRowIndex = Rows.Add();
 
                         // Apply the new attribute to the added row.
                         ApplyAttributeToRow(addedRowIndex, null, null);
                     }
 
-                    if (base.AllowUserToAddRows && base.Visible)
+                    if (AllowUserToAddRows && Visible)
                     {
                         // If there is a "new" row, initialize the _tabOrderPlaceholderAttribute.
                         _tabOrderPlaceholderAttribute = DataEntryMethods.InitializeAttribute(
-                            "PlaceholderAttribute_" + base.Name, MultipleMatchSelectionMode.First,
+                            "PlaceholderAttribute_" + Name, MultipleMatchSelectionMode.First,
                             true, _sourceAttributes, null, this, 1, true, TabStopMode.Always,
                             null, null, null);
 
@@ -1741,13 +1727,13 @@ namespace Extract.DataEntry
 
                 // Since the spatial information for this cell has likely changed, spatial hints need 
                 // to be updated.
-                base.UpdateHints(false);
+                UpdateHints(false);
 
                 // Highlights the specified attributes in the image viewer and propagates the 
                 // current selection to dependent controls (if appropriate)
                 ProcessSelectionChange();
 
-                this.Invalidate();
+                Invalidate();
             }
             catch (Exception ex)
             {
@@ -1768,16 +1754,16 @@ namespace Extract.DataEntry
             try
             {
                 // Swiping not supported if control isn't enabled or data isn't loaded.
-                if (!base.Enabled || _sourceAttributes == null)
+                if (!Enabled || _sourceAttributes == null)
                 {
                     return false;
                 }
 
-                if (base.SelectedRows.Count > 0)
+                if (SelectedRows.Count > 0)
                 {
                     return ProcessRowSwipe(swipedText);
                 }
-                else if (base.SelectedCells.Count > 0)
+                else if (SelectedCells.Count > 0)
                 {
                     return ProcessCellSwipe(swipedText);
                 }
@@ -1790,7 +1776,7 @@ namespace Extract.DataEntry
                 {
                     // If an exception was thrown while processing a swipe, refresh hints for the
                     // table since the hints may not be valid at this point.
-                    base.UpdateHints(true);
+                    UpdateHints(true);
                 }
                 catch (Exception ex2)
                 {
@@ -1814,18 +1800,17 @@ namespace Extract.DataEntry
         /// <param name="selectAttribute">If <see langword="true"/>, the specified 
         /// <see cref="IAttribute"/> will also be selected within the table.  If 
         /// <see langword="false"/>, the previous selection will remain even if a different
-        /// <see cref="IAttribute"/> was propagated.
+        /// <see cref="IAttribute"/> was propagated.</param>
         /// <param name="selectTabGroup">If <see langword="true"/> all <see cref="IAttribute"/>s in
         /// the specified <see cref="IAttribute"/>'s tab group are to be selected,
         /// <see langword="false"/> otherwise.</param>
-        /// </param>
         public override void PropagateAttribute(IAttribute attribute, bool selectAttribute,
             bool selectTabGroup)
         {
             try
             {
                 // Needed if selecting a row (selectTabGroup)
-                DataEntryTableRow selectedRow = null;
+                DataEntryTableRow selectedRow;
 
                 // Special handling is needed for the case where the _tabOrderPlaceholderAttribute
                 // is to be propagated.
@@ -1834,11 +1819,11 @@ namespace Extract.DataEntry
                     // If selectAttribute is specified, activate the first cell in the new row.
                     if (selectAttribute)
                     {
-                        base.ClearSelection();
-                        base.CurrentCell = base.Rows[base.NewRowIndex].Cells[0];
-                        base.CurrentCell.Selected = true;
+                        ClearSelection();
+                        CurrentCell = Rows[NewRowIndex].Cells[0];
+                        CurrentCell.Selected = true;
 
-                        base.OnAttributesSelected(
+                        OnAttributesSelected(
                             DataEntryMethods.AttributeAsVector(_tabOrderPlaceholderAttribute),
                             false, false, _tabOrderPlaceholderAttribute);
                     }
@@ -1846,7 +1831,7 @@ namespace Extract.DataEntry
                     // never have children.
                     else
                     {
-                        base.OnPropagateAttributes(null);
+                        OnPropagateAttributes(null);
                     }
                 }
                 // If selecting an entire row, ensure the specified attribute is a row attribute,
@@ -1854,8 +1839,8 @@ namespace Extract.DataEntry
                 else if (selectTabGroup &&
                     _activeCachedRows.TryGetValue(attribute, out selectedRow))
                 {
-                    base.ClearSelection(-1, selectedRow.Index, true);
-                    base.CurrentCell = base.Rows[selectedRow.Index].Cells[0];
+                    ClearSelection(-1, selectedRow.Index, true);
+                    CurrentCell = Rows[selectedRow.Index].Cells[0];
                 }
                 // If _tabOrderPlaceholderAttribute is not the attribute to propagate, allow the
                 // base class to handle the propagation.
@@ -1880,7 +1865,7 @@ namespace Extract.DataEntry
             try
             {
                 // Ensure all rows are removed from the table before disposing of the cached rows.
-                base.Rows.Clear();
+                Rows.Clear();
 
                 // Dispose of all cached rows.
                 foreach (Dictionary<IAttribute, DataEntryTableRow> cachedSet in _cachedRows.Values)
@@ -1931,8 +1916,8 @@ namespace Extract.DataEntry
                 // can be added to the table or there is only one possible row the data could go.
                 // (Don't use any compatible type since that data should be handled by either
                 // the parent or the control associated with the data type).
-                if (GetDataType(e.DragDropEventArgs.Data) == this.RowDataType &&
-                    (base.AllowUserToAddRows || base.Rows.Count == 0))
+                if (GetDataType(e.DragDropEventArgs.Data) == RowDataType &&
+                    (AllowUserToAddRows || Rows.Count == 0))
                 {
                     // As long as this table is from the same table from which the data was
                     // dragged, support the data being moved into active table.
@@ -1963,31 +1948,31 @@ namespace Extract.DataEntry
                 // If the dropped data is the data type used by this table's rows.
                 // (Don't use any compatible type since that data should be handled by either
                 // the parent or the control associated with the data type).
-                if (GetDataType(e.Data) == this.RowDataType)
+                if (GetDataType(e.Data) == RowDataType)
                 {
-                    if (base.AllowUserToAddRows)
+                    if (AllowUserToAddRows)
                     {
                         // Highlight the table's new row.
-                        base.ClearSelection(-1, base.NewRowIndex, true);
-                        base.CurrentCell = base.Rows[base.NewRowIndex].Cells[0];
+                        ClearSelection(-1, NewRowIndex, true);
+                        CurrentCell = Rows[NewRowIndex].Cells[0];
 
                         // Paste the dropped data in.
                         PasteRowData(e.Data);
 
-                        base.Focus();
+                        Focus();
                     }
                     // If rows are not allowed to be added, but there is only a single attribute
                     // it seems pretty clear that this attribute should be replaced.
-                    else if (base.Rows.Count == 1)
+                    else if (Rows.Count == 1)
                     {
                         // Highlight the table's one and only row.
-                        base.ClearSelection(-1, 0, true);
-                        base.CurrentCell = base.Rows[0].Cells[0];
+                        ClearSelection(-1, 0, true);
+                        CurrentCell = Rows[0].Cells[0];
 
                         // Paste the dropped data in.
                         PasteRowData(e.Data);
 
-                        base.Focus();
+                        Focus();
                     }
                 }
             }
@@ -2152,7 +2137,7 @@ namespace Extract.DataEntry
 
                 // Compile the list of row attributes.
                 List<IAttribute> rowAttributes = new List<IAttribute>();
-                foreach (DataEntryTableRow row in base.Rows)
+                foreach (DataEntryTableRow row in Rows)
                 {
                     if (row.IsNewRow)
                     {
@@ -2173,7 +2158,7 @@ namespace Extract.DataEntry
                     // are still in _sourceAttributes and still in the row cache.
                     Rows.Clear();
 
-                    base.Rows.Add(rowAttributes.Count);
+                    Rows.Add(rowAttributes.Count);
 
                     // Add back each row at the appropriate possition. By allowing the row cache to
                     // remain intact, this will have a minimal perfomance hit as opposed to
@@ -2190,7 +2175,7 @@ namespace Extract.DataEntry
                     }
 
                     // Reset the original selection.
-                    base.ClearSelection();
+                    ClearSelection();
                     foreach (DataGridViewCell cell in selectedCells)
                     {
                         cell.Selected = true;
@@ -2222,14 +2207,14 @@ namespace Extract.DataEntry
                 // [DataEntry:587]
                 // Ensure this table is active before performing any sort of operation that can be
                 // started via a context menu to prevent confusion with the current selection.
-                if (!base.IsActive)
+                if (!IsActive)
                 {
-                    base.Focus();
+                    Focus();
                 }
 
                 // Determine the location where the context menu was opened.
-                Point mouseLocation = base.PointToClient(Control.MousePosition);
-                HitTestInfo hit = base.HitTest(mouseLocation.X, mouseLocation.Y);
+                Point mouseLocation = PointToClient(MousePosition);
+                HitTestInfo hit = HitTest(mouseLocation.X, mouseLocation.Y);
 
                 // Check to see if row and/or row task options should be available based on
                 // the current table cell.
@@ -2275,7 +2260,7 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _OBJECT_NAME + base.AttributeName;
+                return _OBJECT_NAME + AttributeName;
             }
         }
 
@@ -2289,7 +2274,7 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _OBJECT_NAME + base.AttributeName + "<MultiColumnSelection>";
+                return _OBJECT_NAME + AttributeName + "<MultiColumnSelection>";
             }
         }
         
@@ -2307,9 +2292,9 @@ namespace Extract.DataEntry
             if (dataObject != null)
             {
                 // Check for data from this table.
-                if (dataObject.GetDataPresent(this.RowDataType))
+                if (dataObject.GetDataPresent(RowDataType))
                 {
-                    return this.RowDataType;
+                    return RowDataType;
                 }
                 // Check for data from compatible tables.
                 else
@@ -2341,20 +2326,20 @@ namespace Extract.DataEntry
         {
             try
             {
-                IDataObject rowDataObject = null;
+                IDataObject rowDataObject;
                 string rowData = GetSelectedRowData();
 
                 // Row data is available from the current selection.
                 if (!string.IsNullOrEmpty(rowData))
                 {
                     // Create a dataObject containing the rows' data.
-                    rowDataObject = new DataObject(this.RowDataType, rowData);
+                    rowDataObject = new DataObject(RowDataType, rowData);
                    
                     // Maintain an internal list of the rows being dragged.
                     _draggedRows = new List<DataEntryTableRow>();
-                    foreach (DataGridViewRow row in base.SelectedRows)
+                    foreach (DataGridViewRow row in SelectedRows)
                     {
-                        if (row.Index != base.NewRowIndex)
+                        if (row.Index != NewRowIndex)
                         {
                             _draggedRows.Add((DataEntryTableRow)row);
 
@@ -2373,15 +2358,15 @@ namespace Extract.DataEntry
                     return;
                 }
 
-                DragDropEffects allowedEffects = base.AllowUserToDeleteRows ?
+                DragDropEffects allowedEffects = AllowUserToDeleteRows ?
                     (DragDropEffects.Move | DragDropEffects.Copy) : DragDropEffects.Copy;
 
                 // Begin the drag-and-drop operation.
-                DragDropEffects operationPerformed = base.DoDragDrop(rowDataObject, allowedEffects);
+                DragDropEffects operationPerformed = DoDragDrop(rowDataObject, allowedEffects);
 
                 // After the drag-and-drop has ended (whether or not the data was dropped), remove
                 // the special style applied to the dragged rows.
-                foreach (DataGridViewRow row in _draggedRows)
+                foreach (DataEntryTableRow row in _draggedRows)
                 {
                     foreach (DataGridViewCell cell in row.Cells)
                     {
@@ -2392,11 +2377,11 @@ namespace Extract.DataEntry
 
                 // If the rows were moved to a different location, they need to be removed from this
                 // table.
-                if (_draggedRows != null && (operationPerformed & DragDropEffects.Move) != 0)
+                if ((operationPerformed & DragDropEffects.Move) != 0)
                 {
                     RemoveDraggedRows();
                 }
-                else if (_draggedRows != null && operationPerformed == 0)
+                else if (operationPerformed == 0)
                 {
                     // Restore row selection to the dragged rows if no drag operation ended up being
                     // performed.
@@ -2407,8 +2392,8 @@ namespace Extract.DataEntry
                         {
                             DataGridViewRow lastSelectedRow = null;
 
-                            base.ClearSelection();
-                            foreach (DataGridViewRow row in _draggedRows)
+                            ClearSelection();
+                            foreach (DataEntryTableRow row in _draggedRows)
                             {
                                 lastSelectedRow = row;
                             }
@@ -2417,16 +2402,16 @@ namespace Extract.DataEntry
                             // selection(s) may be undone.
                             if (lastSelectedRow != null)
                             {
-                                base.CurrentCell = lastSelectedRow.Cells[0];
+                                CurrentCell = lastSelectedRow.Cells[0];
                             }
 
-                            foreach (DataGridViewRow row in _draggedRows)
+                            foreach (DataEntryTableRow row in _draggedRows)
                             {
                                 row.Selected = true;
                             }
                         }
 
-                        base.Focus();
+                        Focus();
                     }
                 }
 
@@ -2457,8 +2442,8 @@ namespace Extract.DataEntry
                 if (cachedSet.ContainsKey(_draggedRows[0].Attribute))
                 {
                     // Preserve the row selection that existed prior to removing the rows.
-                    DataGridViewRow[] selectedRows = new DataGridViewRow[base.SelectedRows.Count];
-                    base.SelectedRows.CopyTo(selectedRows, 0);
+                    DataGridViewRow[] selectedRows = new DataGridViewRow[SelectedRows.Count];
+                    SelectedRows.CopyTo(selectedRows, 0);
                     List<DataGridViewRow> initialSelectedRows =
                         new List<DataGridViewRow>(selectedRows);
 
@@ -2469,7 +2454,7 @@ namespace Extract.DataEntry
                         // removing the row will trigger all necessary actions.
                         if (cachedSet == _activeCachedRows)
                         {
-                            base.Rows.Remove(draggedRow);
+                            Rows.Remove(draggedRow);
                         }
                         // If the rows are from a table not currently displayed,
                         // DeleteAttribute needs to be called and the cached row set needs
@@ -2491,7 +2476,7 @@ namespace Extract.DataEntry
                         {
                             DataGridViewRow lastSelectedRow = null;
 
-                            base.ClearSelection();
+                            ClearSelection();
                             foreach (DataGridViewRow row in initialSelectedRows)
                             {
                                 lastSelectedRow = row;
@@ -2502,7 +2487,7 @@ namespace Extract.DataEntry
                             if (lastSelectedRow != null &&
                                 !_draggedRows.Contains(lastSelectedRow as DataEntryTableRow))
                             {
-                                base.CurrentCell = lastSelectedRow.Cells[0];
+                                CurrentCell = lastSelectedRow.Cells[0];
                             }
 
                             foreach (DataGridViewRow row in initialSelectedRows)
@@ -2575,37 +2560,37 @@ namespace Extract.DataEntry
             // If no attribute was supplied, create a new one.
             if (attribute == null)
             {
-                attribute = (IAttribute)new AttributeClass();
-                attribute.Name = base.AttributeName;
+                attribute = new AttributeClass();
+                attribute.Name = AttributeName;
                 AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this, null, false,
                     null, null, null, null);
                 newAttributeCreated = true;
             }
 
             // Keep track of any attribute we are replacing.
-            IAttribute attributeToReplace = DataEntryTableBase.GetAttribute(base.Rows[rowIndex]);
+            IAttribute attributeToReplace = GetAttribute(Rows[rowIndex]);
 
             using (new SelectionProcessingSuppressor(this))
             {
                 // Add a new row to the table if necessary
-                if (rowIndex == base.Rows.Count || base.Rows[rowIndex].IsNewRow)
+                if (rowIndex == Rows.Count || Rows[rowIndex].IsNewRow)
                 {
-                    base.Rows.Add();
+                    Rows.Add();
                 }
             }
 
             // If a row has already been cached for the attribute, simply swap out the current row
             // for the cached row and re-map all attributes in the row.
-            DataEntryTableRow cachedRow = null;
+            DataEntryTableRow cachedRow;
             if (_activeCachedRows.TryGetValue(attribute, out cachedRow))
             {
                 using (new SelectionProcessingSuppressor(this))
                 {
-                    base.Rows.RemoveAt(rowIndex);
-                    base.Rows.Insert(rowIndex, cachedRow);
+                    Rows.RemoveAt(rowIndex);
+                    Rows.Insert(rowIndex, cachedRow);
 
                     // Start by mapping the attribute to the row itself.
-                    base.MapAttribute(attribute, base.Rows[rowIndex]);
+                    MapAttribute(attribute, Rows[rowIndex]);
 
                     // If insertBeforeAttribute as specified, ensure the attribute is added at the
                     // the specified position.
@@ -2622,7 +2607,7 @@ namespace Extract.DataEntry
                         IDataEntryTableCell dataEntryCell = cell as IDataEntryTableCell;
                         if (dataEntryCell != null)
                         {
-                            base.MapAttribute(dataEntryCell.Attribute, dataEntryCell);
+                            MapAttribute(dataEntryCell.Attribute, dataEntryCell);
 
                             // Re-validate the cells when being re-displayed in case validation
                             // status changed while the cell was not displayed.
@@ -2639,8 +2624,8 @@ namespace Extract.DataEntry
             else
             {
                 // Map the attribute to the row itself.
-                ((DataEntryTableRow)base.Rows[rowIndex]).Attribute = attribute;
-                base.MapAttribute(attribute, base.Rows[rowIndex]);
+                ((DataEntryTableRow)Rows[rowIndex]).Attribute = attribute;
+                MapAttribute(attribute, Rows[rowIndex]);
 
                 bool parentAttributeIsMapped = false;
 
@@ -2649,17 +2634,17 @@ namespace Extract.DataEntry
                 List<IAttribute> rowAttributes = new List<IAttribute>();
 
                 // Loop through each column to populate the values.
-                foreach (DataGridViewColumn column in base.Columns)
+                foreach (DataGridViewColumn column in Columns)
                 {
-                    IAttribute subAttribute = null;
                     DataEntryTableColumn dataEntryTableColumn = column as DataEntryTableColumn;
 
                     // If the column is a data entry column, we need to populate it as appropriate.
                     if (dataEntryTableColumn != null)
                     {
                         IDataEntryTableCell dataEntryCell = (IDataEntryTableCell)
-                            base.Rows[rowIndex].Cells[column.Index];
+                            Rows[rowIndex].Cells[column.Index];
 
+                        IAttribute subAttribute;
                         if (dataEntryTableColumn.AttributeName == ".")
                         {
                             // "." indicates that the value of the row's attribute should be used in
@@ -2713,10 +2698,10 @@ namespace Extract.DataEntry
                         // Map the column's attribute and set the attribute's validator. NOTE: This
                         // may be remapping the row's attribute; this is intentional so that 
                         // PropagateAttribute will select the specified cell for the row's attribute.
-                        base.MapAttribute(subAttribute, dataEntryCell);
+                        MapAttribute(subAttribute, dataEntryCell);
 
                         // Apply the subAttribute as the cell's value.
-                        base.Rows[rowIndex].Cells[column.Index].Value = subAttribute;
+                        Rows[rowIndex].Cells[column.Index].Value = subAttribute;
                     }
                 }
 
@@ -2741,7 +2726,7 @@ namespace Extract.DataEntry
                     _activeCachedRows.Remove(attributeToReplace);
                 }
 
-                if (base.HasDependentControls)
+                if (HasDependentControls)
                 {
                     // [DataEntry:679]
                     // Propagate the attribute right away; otherwise they will not be marked
@@ -2777,7 +2762,7 @@ namespace Extract.DataEntry
                 }
 
                 // Cache the initialized attribute's row for later use.
-                _activeCachedRows[attribute] = (DataEntryTableRow)base.Rows[rowIndex];
+                _activeCachedRows[attribute] = (DataEntryTableRow)Rows[rowIndex];
             }
         }
 
@@ -2806,11 +2791,11 @@ namespace Extract.DataEntry
             // Row selecton mode. The swipe can only be applied via the results of
             // a row formatting rule.
             IUnknownVector formattedData = DataEntryMethods.RunFormattingRule(_rowFormattingRule,
-                swipedText, base.AttributeName);
+                swipedText, AttributeName);
 
             // Find all attributes which apply to this control.
             IUnknownVector formattedAttributes = DataEntryMethods.InitializeAttributes(
-                base.AttributeName, MultipleMatchSelectionMode.All, formattedData, null, this, null,
+                AttributeName, MultipleMatchSelectionMode.All, formattedData, null, this, null,
                 false, null, null, null, null);
 
             // If no attributes were returned from the rule, return false to indicate formatting
@@ -2837,17 +2822,17 @@ namespace Extract.DataEntry
         {
             ExtractException.Assert("ELI24239",
                 "Cell swiping is supported only for one cell at a time!", 
-                base.SelectedCells.Count == 1);
+                SelectedCells.Count == 1);
 
             // Obtain the row and column where the swipe occured. (One or both may not
             // apply depending on the selection type).
-            int rowIndex = base.CurrentCell.RowIndex;
-            int columnIndex = base.CurrentCell.ColumnIndex;
+            int rowIndex = CurrentCell.RowIndex;
+            int columnIndex = CurrentCell.ColumnIndex;
 
             // Cell selecton mode. The swipe can be applied either via the results of a
             // column formatting rule or the swiped text value can be applied directly to
             // the cell's mapped attribute.
-            DataEntryTableColumn dataEntryColumn = (DataEntryTableColumn)base.Columns[columnIndex];
+            DataEntryTableColumn dataEntryColumn = (DataEntryTableColumn)Columns[columnIndex];
 
             // Process the swiped text with a formatting rule (if available).
             if (dataEntryColumn.FormattingRule != null)
@@ -2855,7 +2840,7 @@ namespace Extract.DataEntry
                 // Select the attribute name to look for from the rule results. (Could be based on
                 // a sub-attribute name or the name of the table's primary attribute).
                 string attributeName = (dataEntryColumn.AttributeName == ".")
-                    ? base.AttributeName : dataEntryColumn.AttributeName;
+                    ? AttributeName : dataEntryColumn.AttributeName;
 
                 IAttribute attribute = DataEntryMethods.RunFormattingRule(
                     dataEntryColumn.FormattingRule, swipedText, attributeName,
@@ -2870,14 +2855,14 @@ namespace Extract.DataEntry
             }
 
             // If swiping into the "new" row, create & map a new attribute as necessary.
-            if (base.CurrentRow.IsNewRow)
+            if (CurrentRow.IsNewRow)
             {
                 // NOTE: SelectionProcessingSuppressor does not work here since ApplyAttributeToRow
                 // calls ProcessSelectionChange directly.
                 ApplyAttributeToRow(rowIndex, null, null);
 
                 // [DataEntry:288] Keep cell selection on the cell that was swiped.
-                base.CurrentCell = base.Rows[rowIndex].Cells[columnIndex];
+                CurrentCell = Rows[rowIndex].Cells[columnIndex];
             }
 
             // If there is an active text box editing control, swipe into the current
@@ -2928,7 +2913,7 @@ namespace Extract.DataEntry
             // Raise AttributesSelected to update the control's highlight.
             OnAttributesSelected(
                 DataEntryMethods.AttributeAsVector(
-                    DataEntryTableBase.GetAttribute(base.CurrentCell)), false, true, null);
+                    GetAttribute(CurrentCell)), false, true, null);
 
             return true;
         }
@@ -2943,11 +2928,11 @@ namespace Extract.DataEntry
             if (_sourceAttributes != null)
             {
                 // Obtain the current row and its associated attribute.
-                int rowIndex = base.CurrentRow.Index;
-                IAttribute insertBeforeAttribute = DataEntryTableBase.GetAttribute(base.CurrentRow);
+                int rowIndex = CurrentRow.Index;
+                IAttribute insertBeforeAttribute = GetAttribute(CurrentRow);
 
                 // Insert the new row and adjust the existing attribute mappings accordingly.
-                base.Rows.Insert(rowIndex, 1);
+                Rows.Insert(rowIndex, 1);
 
                 // Apply the new attribute to the inserted row.
                 ApplyAttributeToRow(rowIndex, null, insertBeforeAttribute);
@@ -2955,8 +2940,8 @@ namespace Extract.DataEntry
                 if (selectNewRow)
                 {
                     // Highlight the newly inserted row.
-                    base.ClearSelection(-1, rowIndex, true);
-                    base.CurrentCell = base.Rows[rowIndex].Cells[0];
+                    ClearSelection(-1, rowIndex, true);
+                    CurrentCell = Rows[rowIndex].Cells[0];
                 }
                 else
                 {
@@ -2978,11 +2963,11 @@ namespace Extract.DataEntry
         void DeleteSelectedRows()
         {
             // Delete each row in the current selection.
-            foreach (DataGridViewRow row in base.SelectedRows)
+            foreach (DataGridViewRow row in SelectedRows)
             {
                 if (!row.IsNewRow)
                 {
-                    base.Rows.RemoveAt(row.Index);
+                    Rows.RemoveAt(row.Index);
                 }
             }
         }
@@ -2999,7 +2984,7 @@ namespace Extract.DataEntry
             if (rowData != null)
             {
                 // Add the copied attributes to the clipboard
-                Clipboard.SetData(this.RowDataType, rowData);
+                Clipboard.SetData(RowDataType, rowData);
             }
         }
 
@@ -3025,7 +3010,7 @@ namespace Extract.DataEntry
                 List<int> selectedColumns = new List<int>();
                 int selectedRow = -1;
 
-                foreach (DataGridViewCell cell in base.SelectedCells)
+                foreach (DataGridViewCell cell in SelectedCells)
                 {
                     if (!selectedColumns.Contains(cell.ColumnIndex))
                     {
@@ -3090,11 +3075,11 @@ namespace Extract.DataEntry
         {
             if (_sourceAttributes != null)
             {
-                IUnknownVector copiedAttributes = (IUnknownVector)new IUnknownVectorClass();
+                IUnknownVector copiedAttributes = new IUnknownVectorClass();
 
                 // Get a sorted (top to bottom) list of currently selected rows.
-                DataGridViewRow[] selectedRows = new DataGridViewRow[base.SelectedRows.Count];
-                base.SelectedRows.CopyTo(selectedRows, 0);
+                DataGridViewRow[] selectedRows = new DataGridViewRow[SelectedRows.Count];
+                SelectedRows.CopyTo(selectedRows, 0);
                 List<DataGridViewRow> selectedRowList = new List<DataGridViewRow>(selectedRows);
                 selectedRowList.Sort(CompareRowsByIndex);
 
@@ -3115,7 +3100,7 @@ namespace Extract.DataEntry
                 {
                     // Convert to a stringized byte stream so that the data can be preserved in the
                     // clipboard (this also removes the need to clone attributes before adding).
-                    return this.MiscUtils.GetObjectAsStringizedByteStream(copiedAttributes);
+                    return MiscUtils.GetObjectAsStringizedByteStream(copiedAttributes);
                 }
             }
 
@@ -3148,7 +3133,7 @@ namespace Extract.DataEntry
             try
             {
                 // Delay processing of changes in the control host until PasteRowData is complete.
-                base.OnUpdateStarted(new EventArgs());
+                OnUpdateStarted(new EventArgs());
 
                 string dataType = GetDataType(dataObject);
 
@@ -3156,7 +3141,7 @@ namespace Extract.DataEntry
                 // text into the row.
                 if (_rowFormattingRule != null && dataType == "System.String")
                 {
-                    SpatialString spatialString = (SpatialString)new SpatialStringClass();
+                    SpatialString spatialString = new SpatialStringClass();
                     spatialString.CreateNonSpatialString((string)dataObject.GetData(dataType), "");
 
                     ProcessRowSwipe(spatialString);
@@ -3168,7 +3153,7 @@ namespace Extract.DataEntry
                     string stringizedAttributes = (string)dataObject.GetData(dataType);
 
                     IUnknownVector attributesToPaste = (IUnknownVector)
-                        this.MiscUtils.GetObjectFromStringizedByteStream(stringizedAttributes);
+                        MiscUtils.GetObjectFromStringizedByteStream(stringizedAttributes);
 
                     int count = attributesToPaste.Size();
                     for (int i = 0; i < count; i++)
@@ -3176,9 +3161,9 @@ namespace Extract.DataEntry
                         IAttribute attribute = (IAttribute)attributesToPaste.At(i);
 
                         // If the attributes are not from this table, rename them.
-                        if (dataType != this.RowDataType)
+                        if (dataType != RowDataType)
                         {
-                            attribute.Name = base.AttributeName;
+                            attribute.Name = AttributeName;
                         }
                     }
 
@@ -3200,7 +3185,7 @@ namespace Extract.DataEntry
             }
             finally
             {
-                base.OnUpdateEnded(new EventArgs());
+                OnUpdateEnded(new EventArgs());
             }
         }
 
@@ -3464,8 +3449,8 @@ namespace Extract.DataEntry
                 using (new SelectionProcessingSuppressor(this))
                 {
                     // Get a sorted (top to bottom) list of currently selected rows.
-                    DataGridViewRow[] selectedRows = new DataGridViewRow[base.SelectedRows.Count];
-                    base.SelectedRows.CopyTo(selectedRows, 0);
+                    DataGridViewRow[] selectedRows = new DataGridViewRow[SelectedRows.Count];
+                    SelectedRows.CopyTo(selectedRows, 0);
                     List<DataGridViewRow> destinationRows = new List<DataGridViewRow>(selectedRows);
                     destinationRows.Sort(CompareRowsByIndex);
 
@@ -3480,7 +3465,7 @@ namespace Extract.DataEntry
                         {
                             // If the table doesn't allow new rows, break without adding the 
                             // remaining attributes.
-                            if (base.AllowUserToAddRows == false)
+                            if (AllowUserToAddRows == false)
                             {
                                 break;
                             }
@@ -3488,10 +3473,9 @@ namespace Extract.DataEntry
                             // Add a new row for the next attribute and add it to the
                             // destinationRows list.
                             int nextIndex = destinationRows[destinationRows.Count - 1].Index + 1;
-                            insertBeforeAttribute =
-                                DataEntryTableBase.GetAttribute(base.Rows[nextIndex]);
-                            base.Rows.Insert(nextIndex, 1);
-                            destinationRows.Add(base.Rows[nextIndex]);
+                            insertBeforeAttribute = GetAttribute(Rows[nextIndex]);
+                            Rows.Insert(nextIndex, 1);
+                            destinationRows.Add(Rows[nextIndex]);
                         }
 
                         IAttribute attribute = (IAttribute)attributes.At(rowsAdded);
@@ -3514,19 +3498,19 @@ namespace Extract.DataEntry
                         // the entry to reflect previous row which is the one that was just added.
                         if (destinationRows[rowsAdded].IsNewRow)
                         {
-                            destinationRows[rowsAdded] = base.Rows[base.NewRowIndex - 1];
+                            destinationRows[rowsAdded] = Rows[NewRowIndex - 1];
                         }
                     }
 
                     // If deletions are allowed, delete all selected rows that were not replaced with
                     // attribute from the swiped text.
-                    if (base.AllowUserToDeleteRows)
+                    if (AllowUserToDeleteRows)
                     {
                         while (rowsAdded < destinationRows.Count)
                         {
-                            if (destinationRows[rowsAdded].Index != base.NewRowIndex)
+                            if (destinationRows[rowsAdded].Index != NewRowIndex)
                             {
-                                base.Rows.RemoveAt(destinationRows[rowsAdded].Index);
+                                Rows.RemoveAt(destinationRows[rowsAdded].Index);
                             }
 
                             destinationRows.RemoveAt(rowsAdded);
@@ -3535,8 +3519,8 @@ namespace Extract.DataEntry
 
                     // Adjust the current selection to encapsulate all rows populated via swiped text
                     // with the current row being the last row populated.
-                    base.ClearSelection(-1, destinationRows[destinationRows.Count - 1].Index, true);
-                    base.CurrentCell = destinationRows[destinationRows.Count - 1].Cells[0];
+                    ClearSelection(-1, destinationRows[destinationRows.Count - 1].Index, true);
+                    CurrentCell = destinationRows[destinationRows.Count - 1].Cells[0];
                     foreach (DataGridViewRow row in destinationRows)
                     {
                         row.Selected = true;
@@ -3544,7 +3528,7 @@ namespace Extract.DataEntry
 
                     // Since the spatial information for this cell has likely changed, spatial hints
                     // need to be updated.
-                    base.UpdateHints(false);
+                    UpdateHints(false);
 
                     // If _tabOrderPlaceholderAttribute is being used, make sure it remains the last
                     // attribute from this control in _sourceAttributes.
@@ -3589,7 +3573,7 @@ namespace Extract.DataEntry
             // is down, disallow any scrolling until the mouse button is released. Otherwise
             // the mouse release may occur over a different cell due to scrolling and result
             // in unintended cell selection.
-            if (Control.MouseButtons != MouseButtons.None)
+            if (MouseButtons != MouseButtons.None)
             {
                 _selectionIsBeingReset = true;
             }
@@ -3597,63 +3581,59 @@ namespace Extract.DataEntry
             // Determine if row-level options are to be available based on the clicked location
             // and the current selection.
             bool enableRowOptions = (originRowIndex >= 0 &&
-                                     (originColumnIndex == -1 || base.Rows[originRowIndex].Selected));
+                                     (originColumnIndex == -1 || Rows[originRowIndex].Selected));
 
             if (!enableRowOptions && originRowIndex >= 0 && originColumnIndex >= 0)
             {
                 // If the menu was opened via a data entry cell, check to see if the clicked
                 // cell is currently selected.  If not, select this cell instead to prevent
                 // confusion about which cell(s) will be acted upon.
-                DataGridViewCell clickedCell = base.Rows[originRowIndex].Cells[originColumnIndex];
+                DataGridViewCell clickedCell = Rows[originRowIndex].Cells[originColumnIndex];
 
                 if (!clickedCell.Selected)
                 {
-                    base.CurrentCell = clickedCell;
+                    CurrentCell = clickedCell;
                 }
             }
             else if (originRowIndex >= 0)
             {
                 // If the menu was opened via a row header, checked to see if the menu was
                 // opened within a currently selected row.
-                DataGridViewRow clickedRow = base.Rows[originRowIndex];
-                DataGridViewRow[] selectedRows = null;
-                if (clickedRow.Selected && base.CurrentRow != clickedRow)
+                DataGridViewRow clickedRow = Rows[originRowIndex];
+                if (clickedRow.Selected && CurrentRow != clickedRow)
                 {
                     // If the clicked row was selected, but not the "current" row, we want to make
                     // it the current row so it is clear which row is being used as the basis for
                     // for a row insertion operation.
-                    selectedRows = new DataGridViewRow[base.SelectedRows.Count];
-                    base.SelectedRows.CopyTo(selectedRows, 0);
+                    DataGridViewRow[] selectedRows = new DataGridViewRow[SelectedRows.Count];
+                    SelectedRows.CopyTo(selectedRows, 0);
 
                     // Suppress selection while changing the selection to prevent undesirable
                     // flickering of tests while adjusting the selection.
                     using (new SelectionProcessingSuppressor(this))
                     {
                         // Set the current cell to the first cell in the clicked row
-                        base.CurrentCell = clickedRow.Cells[0];
+                        CurrentCell = clickedRow.Cells[0];
 
                         // Changing the current cell will have cleared the previously selected rows.
                         // Re-select them now.
-                        if (selectedRows != null)
+                        foreach (DataGridViewRow row in selectedRows)
                         {
-                            foreach (DataGridViewRow row in selectedRows)
-                            {
-                                row.Selected = true;
-                            }
+                            row.Selected = true;
                         }
                     }
                 }
-                else if (base.CurrentRow != clickedRow)
+                else if (CurrentRow != clickedRow)
                 {
-                    base.ClearSelection(-1, originRowIndex, true);
+                    ClearSelection(-1, originRowIndex, true);
 
                     // If the clicked row is not the current row, make the click row current
                     // and selected.
-                    base.CurrentCell = clickedRow.Cells[0];
+                    CurrentCell = clickedRow.Cells[0];
                 }
-                else if (!base.CurrentRow.Selected)
+                else if (!CurrentRow.Selected)
                 {
-                    base.ClearSelection(-1, originRowIndex, true);
+                    ClearSelection(-1, originRowIndex, true);
                 }
             }
 
@@ -3667,15 +3647,15 @@ namespace Extract.DataEntry
         /// <see cref="DataEntryTable"/>; otherwise, <see langword="false"/>.</returns>
         bool ProcessEnterKey()
         {
-            if (base.SelectedCells.Count == 1 && base.CurrentCell != null)
+            if (SelectedCells.Count == 1 && CurrentCell != null)
             {
-                int newRowIndex = base.CurrentCell.RowIndex;
-                if (newRowIndex < (base.RowCount - 1))
+                int newRowIndex = CurrentCell.RowIndex;
+                if (newRowIndex < (RowCount - 1))
                 {
                     newRowIndex++;
                 }
 
-                base.CurrentCell = base.Rows[newRowIndex].Cells[_carriageReturnColumn];
+                CurrentCell = Rows[newRowIndex].Cells[_carriageReturnColumn];
                 return true;
             }
             else

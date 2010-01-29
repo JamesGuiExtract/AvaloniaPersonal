@@ -1,5 +1,3 @@
-using Extract;
-using Extract.DataEntry;
 using Extract.DataEntry.Utilities.DataEntryApplication.Properties;
 using Extract.Imaging.Forms;
 using Extract.FileActionManager.Forms;
@@ -7,21 +5,14 @@ using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
-using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting;
 using System.Security.Permissions;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_DATAENTRYCUSTOMCOMPONENTSLib;
@@ -56,19 +47,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         const int _DATA_ENTRY_PANEL_PADDING = 3;
 
         /// <summary>
-        /// The value associated with a window's system command message.
-        /// </summary>
-        const int _WM_SYSCOMMAND = 0x112;
-
-        /// <summary>
-        /// The value associated with a window's close system command message.
-        /// </summary>
-        static readonly IntPtr _SC_CLOSE = (IntPtr)0xF060;
-
-        /// <summary>
         /// "Commit without saving"
         /// </summary>
-        static string _COMMIT_WITHOUT_SAVING = "Commit without saving";
+        const string _COMMIT_WITHOUT_SAVING = "Commit without saving";
 
         #endregion Constants
 
@@ -77,7 +58,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// The settings for this application.
         /// </summary>
-        Settings _settings;
+        readonly Settings _settings;
 
         /// <summary>
         /// The data entry panel control host implementation to be used by the application.
@@ -115,17 +96,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// The <see cref="FileProcessingDB"/> in use.
         /// </summary>
-        FileProcessingDB _fileProcessingDB;
+        FileProcessingDB _fileProcessingDb;
 
         /// <summary>
         /// The ID of the file being processed.
         /// </summary>
-        int _fileID;
+        int _fileId;
 
         /// <summary>
         /// The ID of the action being processed.
         /// </summary>
-        int _actionID;
+        int _actionId;
 
         /// <summary>
         /// The name of the action being processed.
@@ -147,7 +128,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// Specifies whether input event tracking should be logged in the database.
         /// </summary>
-        bool _inputEventTrackingEnabled;
+        readonly bool _inputEventTrackingEnabled;
 
         /// <summary>
         /// Specifies whether counts will be recorded for the defined data entry counters.
@@ -229,12 +210,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The filename of a local copy of the database made if the master database resides on
         /// another machine.
         /// </summary>
-        TemporaryFile _localDBCopy;
+        TemporaryFile _localDbCopy;
 
         /// <summary>
         /// The last time the source DB was modified (set only when caching the DB locally)
         /// </summary>
-        DateTime _lastDBModificationTime;
+        DateTime _lastDbModificationTime;
 
         /// <summary>
         /// The path of the source DB.
@@ -244,7 +225,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// The user-specified settings for the data entry application.
         /// </summary>
-        UserPreferences _userPreferences;
+        readonly UserPreferences _userPreferences;
 
         /// <summary>
         /// The dialog for setting user preferences.
@@ -628,9 +609,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException.Assert("ELI26940", "Null argument exception!",
                     fileProcessingDB != null);
 
-                if (_fileProcessingDB != fileProcessingDB)
+                if (_fileProcessingDb != fileProcessingDB)
                 {
-                    _fileProcessingDB = fileProcessingDB;
+                    _fileProcessingDb = fileProcessingDB;
 
                     // Whether to enable data entry counters depends upon the DBInfo setting as well as
                     // the task configuration.
@@ -642,9 +623,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
                 }
                 
-                _fileID = fileID;
-                _actionID = actionID;
-                _actionName = _fileProcessingDB.GetActionName(_actionID);
+                _fileId = fileID;
+                _actionId = actionID;
+                _actionName = _fileProcessingDb.GetActionName(_actionId);
 
                 _tagFileToolStripButton.Database = fileProcessingDB;
                 _tagFileToolStripButton.FileId = fileID;
@@ -658,16 +639,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (_dataEntryDatabaseManager == null)
                 {
-                    _dataEntryDatabaseManager =
-                        (DataEntryProductDBMgr)new DataEntryProductDBMgrClass();
+                    _dataEntryDatabaseManager = new DataEntryProductDBMgrClass();
                     _dataEntryDatabaseManager.FAMDB = fileProcessingDB;
                 }
 
                 // If using a local cached copy of the database, check to see if the database has
                 // been updated since the last time it was cached.
-                if (_localDBCopy != null)
+                if (_localDbCopy != null)
                 {
-                    if (File.GetLastWriteTime(_dataSourcePath) > _lastDBModificationTime)
+                    if (File.GetLastWriteTime(_dataSourcePath) > _lastDbModificationTime)
                     {
                         if (TryOpenDatabaseConnection())
                         {
@@ -679,7 +659,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _imageViewer.OpenImage(fileName, false);
 
                 _dataEntryControlHost.Comment =
-                    _fileProcessingDB.GetFileActionComment(_fileID, _actionID);
+                    _fileProcessingDb.GetFileActionComment(_fileId, _actionId);
             }
             catch (Exception ex)
             {
@@ -920,7 +900,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         // Maximize the window if the registry setting indicates the application should
                         // launch maximized.
-                        this.WindowState = FormWindowState.Maximized;
+                        WindowState = FormWindowState.Maximized;
                     }
                 }
 
@@ -974,21 +954,21 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 base.OnResize(e);
 
-                if (_isLoaded && this.WindowState != FormWindowState.Minimized)
+                if (_isLoaded && WindowState != FormWindowState.Minimized)
                 {
-                    if (this.WindowState == FormWindowState.Maximized)
+                    if (WindowState == FormWindowState.Maximized)
                     {
                         // If the user maximized the form, set the form to default to maximized,
                         // but don't adjust the default form size to use in normal mode.
                         RegistryManager.DefaultWindowMaximized = true;
                     }
-                    else if (this.WindowState == FormWindowState.Normal)
+                    else if (WindowState == FormWindowState.Normal)
                     {
                         // If the user restored or moved the form in normal mode, store
                         // the new size as the default size.
                         RegistryManager.DefaultWindowMaximized = false;
-                        RegistryManager.DefaultWindowWidth = this.Size.Width;
-                        RegistryManager.DefaultWindowHeight = this.Size.Height;
+                        RegistryManager.DefaultWindowWidth = Size.Width;
+                        RegistryManager.DefaultWindowHeight = Size.Height;
                     }
 
                     // If there is an image open in the image viewer then restore the previous
@@ -1017,11 +997,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 base.OnMove(e);
 
-                if (_isLoaded && this.WindowState == FormWindowState.Normal)
+                if (_isLoaded && WindowState == FormWindowState.Normal)
                 {
                     // If the user moved the form, store the new position.
-                    RegistryManager.DefaultWindowPositionX = this.DesktopLocation.X;
-                    RegistryManager.DefaultWindowPositionY = this.DesktopLocation.Y;
+                    RegistryManager.DefaultWindowPositionX = DesktopLocation.X;
+                    RegistryManager.DefaultWindowPositionY = DesktopLocation.Y;
                 }
             }
             catch (Exception ex)
@@ -1081,7 +1061,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // the FAM of a cancel. Therefore, don't allow the form to be closed in FAM mode
                 // when a document is not loaded.
                 if (!_standAloneMode && !_imageViewer.IsImageAvailable && 
-                    m.Msg == _WM_SYSCOMMAND && m.WParam == _SC_CLOSE)
+                    m.Msg == WindowsMessage.SystemCommand && m.WParam == new IntPtr(SystemCommand.Close))
                 {
                     MessageBox.Show(this, "If you are intending to stop processing, " +
                         "press the stop button in the File Action Manager.",
@@ -1176,17 +1156,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _dbConnection = null;
                 }
 
-                if (this.DataEntryControlHost != null)
+                if (DataEntryControlHost != null)
                 {
                     // Will cause the control host to be disposed of.
-                    this.DataEntryControlHost = null;
+                    DataEntryControlHost = null;
                 }
 
                 // If we were using a temporary local copy of a remote database, delete it now.
-                if (_localDBCopy != null)
+                if (_localDbCopy != null)
                 {
-                    _localDBCopy.Dispose();
-                    _localDBCopy = null;
+                    _localDbCopy.Dispose();
+                    _localDbCopy = null;
                 }
 
                 // Dispose of menu items
@@ -1300,7 +1280,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (saved && !_standAloneMode)
                 {
-                    _fileProcessingDB.SetFileActionComment(_fileID, _actionID,
+                    _fileProcessingDb.SetFileActionComment(_fileId, _actionId,
                             _dataEntryControlHost.Comment);
                 }
 
@@ -1516,7 +1496,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         (_imageViewer.CursorTool == CursorTool.AngularHighlight ||
                          _imageViewer.CursorTool == CursorTool.RectangularHighlight))
                     {
-                        this._imageViewer.CursorTool = CursorTool.None;
+                        _imageViewer.CursorTool = CursorTool.None;
                     }
 
                     // Enable or disable highlight commands as appropriate.
@@ -1645,7 +1625,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                this.Close();
+                Close();
             }
             catch (Exception ex)
             {
@@ -1870,8 +1850,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // dataEntryControlHost's settings.
                     _userPreferences.WriteToRegistry();
 
-                    this.DataEntryControlHost.AutoZoomMode = _userPreferences.AutoZoomMode;
-                    this.DataEntryControlHost.AutoZoomContext = _userPreferences.AutoZoomContext;
+                    DataEntryControlHost.AutoZoomMode = _userPreferences.AutoZoomMode;
+                    DataEntryControlHost.AutoZoomContext = _userPreferences.AutoZoomContext;
                 }
                 else
                 {
@@ -2146,10 +2126,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // commitData flag determines if data will be validated on save.
                     // Turn off commitData if an applied tag matches the SkipValidationIfDocTaggedAs
                     // setting (and save without prompting)
-                    if (!_standAloneMode && _fileProcessingDB != null &&
+                    if (!_standAloneMode && _fileProcessingDb != null &&
                         !string.IsNullOrEmpty(_settings.SkipValidationIfDocTaggedAs))
                     {
-                        VariantVector appliedTags = _fileProcessingDB.GetTagsOnFile(_fileID);
+                        VariantVector appliedTags = _fileProcessingDb.GetTagsOnFile(_fileId);
                         int tagCount = appliedTags.Size;
                         for (int i = 0; i < tagCount; i++)
                         {
@@ -2567,10 +2547,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // connections via a network share.
                         if (dataSourcePath.StartsWith(@"\\", StringComparison.Ordinal))
                         {
-                            _localDBCopy = new TemporaryFile();
-                            _lastDBModificationTime = File.GetLastWriteTime(dataSourcePath);
-                            File.Copy(_dataSourcePath, _localDBCopy.FileName, true);
-                            dataSourcePath = _localDBCopy.FileName;
+                            _localDbCopy = new TemporaryFile();
+                            _lastDbModificationTime = File.GetLastWriteTime(dataSourcePath);
+                            File.Copy(_dataSourcePath, _localDbCopy.FileName, true);
+                            dataSourcePath = _localDbCopy.FileName;
                         }
 
                         connectionString = "Data Source='" + dataSourcePath + "';";
@@ -2647,13 +2627,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
 
                 double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
-                int instanceID =
-                    _dataEntryDatabaseManager.AddDataEntryData(_fileID, _actionID, elapsedSeconds);
+                int instanceId =
+                    _dataEntryDatabaseManager.AddDataEntryData(_fileId, _actionId, elapsedSeconds);
 
                 if (_countersEnabled)
                 {
                     _dataEntryDatabaseManager.RecordCounterValues(
-                        ref _counterStatisticsToken, instanceID, attributes);
+                        ref _counterStatisticsToken, instanceId, attributes);
                 }
 
                 // Set to null after recording to ensure we never inappropriately record an entry

@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Forms;
 using System.Globalization;
-using System.ComponentModel;
 
 namespace Extract.Utilities.Forms
 {
@@ -17,11 +14,6 @@ namespace Extract.Utilities.Forms
         /// </summary>
         static readonly char[] _SPECIAL_SENDKEYS_CHARS =
             { '^', '%', '(', ')', '+', '~', '{', '}', '[', ']' };
-
-        /// <summary>
-        /// The message ID for a character being posted to a window.
-        /// </summary>
-        const int WM_CHAR = 0x102;
 
         /// <summary>
         /// Sends the specified key (in combination with the specified modifiers) to the specfied
@@ -179,7 +171,7 @@ namespace Extract.Utilities.Forms
             {
                 ExtractException.Assert("ELI27439", "Null argument exception!", control != null);
 
-                NativeMethods.SendMessage(control.Handle, WM_CHAR, (IntPtr)character, (IntPtr)0);
+                NativeMethods.SendMessage(control.Handle, WindowsMessage.Character, (IntPtr)character, (IntPtr)0);
             }
             catch (Exception ex)
             {
