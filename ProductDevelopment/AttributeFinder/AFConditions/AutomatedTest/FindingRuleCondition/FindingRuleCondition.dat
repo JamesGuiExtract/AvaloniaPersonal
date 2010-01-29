@@ -24,12 +24,12 @@
 //	Finding Rule = Create Value "Test (output)
 <TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
 
-//Test6 Conditional Finding Rule = (if true) Grantee/Grantor finder - OriginalGrantor only
-//	Finding Rule = Grantee/Grantor finder (all types)
+//Test6 Conditional Finding Rule = (if true) Value After Clue (text not found)
+//	Finding Rule = Value After Clue
 <TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
 
-//Test7 Conditional Finding Rule = (if true) Grantee/Grantor finder - OriginalGrantor only
-//	Finding Rule = Grantee/Grantor finder (all types)
+//Test7 Conditional Finding Rule = (if true) Value After Clue (text found)
+//	Finding Rule = Value After Clue
 <TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test7.eav
 
 //Test8 Conditional Finding Rule = (if true) LocateImageRegion
@@ -40,7 +40,7 @@
 //	Finding Rule = Value After Clue
 <TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
 
-//Test10 Address Finder
+//Test10 RSD-based Address Finder
 //	 Conditional Modifying Rule = (if true) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
 //	 Modifyier = ".*Record.*\r\n"
 <TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
