@@ -1,13 +1,10 @@
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Security.Permissions;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.Imaging.Forms
@@ -17,16 +14,16 @@ namespace Extract.Imaging.Forms
     /// </summary>
     public partial class PageSummaryView : UserControl, IImageViewerControl
     {
-        #region PageSummaryView Constants
+        #region Constants
 
         /// <summary>
         /// The number of cells in each row of the <see cref="PageSummaryView"/> grid.
         /// </summary>
-        const int CELLS_PER_ROW = 10;
+        const int _CELLS_PER_ROW = 10;
 
-        #endregion PageSummaryView Constants
+        #endregion Constants
 
-        #region PageSummaryView Fields
+        #region Fields
 
         /// <summary>
         /// The image viewer associated with the <see cref="PageSummaryView"/>.
@@ -43,9 +40,9 @@ namespace Extract.Imaging.Forms
         /// </summary>
         DataGridViewCellStyle _visitedPageStyle;
 
-        #endregion PageSummaryView Fields
+        #endregion Fields
 
-        #region PageSummaryView Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="PageSummaryView"/> class.
@@ -57,9 +54,9 @@ namespace Extract.Imaging.Forms
             InitializeComponent();
         }
 
-        #endregion PageSummaryView Constructors
+        #endregion Constructors
 
-        #region PageSummaryView Properties
+        #region Properties
 
         /// <summary>
         /// Gets the number of pages that are marked as visited.
@@ -105,9 +102,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion PageSummaryView Properties
+        #endregion Properties
 
-        #region PageSummaryView Methods
+        #region Methods
 
         /// <summary>
         /// Gets the first unvisited page on or before the specified page.
@@ -215,8 +212,8 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Compute the number of full rows and remaining cells needed to represent the pages
-                int fullRows = _imageViewer.PageCount / CELLS_PER_ROW;
-                int remainingCells = _imageViewer.PageCount % CELLS_PER_ROW;
+                int fullRows = _imageViewer.PageCount / _CELLS_PER_ROW;
+                int remainingCells = _imageViewer.PageCount % _CELLS_PER_ROW;
 
                 // Create the full rows
                 for (int i = 0; i < fullRows; i++)
@@ -245,7 +242,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The row corresponding to <paramref name="rowNumber"/>.</returns>
         static string[] CreateRow(int rowNumber)
         {
-            return CreateRow(rowNumber, CELLS_PER_ROW);
+            return CreateRow(rowNumber, _CELLS_PER_ROW);
         }
 
         /// <summary>
@@ -258,10 +255,10 @@ namespace Extract.Imaging.Forms
         static string[] CreateRow(int rowNumber, int cellsInRow)
         {
             // Prepare the cells of the row
-            string[] row = new string[CELLS_PER_ROW];
+            string[] row = new string[_CELLS_PER_ROW];
 
             // Set the text for each cell
-            int lower = rowNumber * CELLS_PER_ROW + 1;
+            int lower = rowNumber * _CELLS_PER_ROW + 1;
             int upper = lower + cellsInRow;
             for (int i = lower; i < upper; i++)
             {
@@ -269,7 +266,7 @@ namespace Extract.Imaging.Forms
             }
 
             // Any remaining cells should be blank
-            for (int i = cellsInRow; i < CELLS_PER_ROW; i++)
+            for (int i = cellsInRow; i < _CELLS_PER_ROW; i++)
             {
                 row[i] = "";
             }
@@ -286,8 +283,8 @@ namespace Extract.Imaging.Forms
         /// </returns>
         DataGridViewCell GetCellByPageNumber(int pageNumber)
         {
-            int row = (pageNumber - 1) / CELLS_PER_ROW;
-            int column = (pageNumber - 1) % CELLS_PER_ROW;
+            int row = (pageNumber - 1) / _CELLS_PER_ROW;
+            int column = (pageNumber - 1) % _CELLS_PER_ROW;
 
             return _dataGridView.Rows[row].Cells[column];
         }
@@ -301,7 +298,7 @@ namespace Extract.Imaging.Forms
         /// <paramref name="column"/>.</returns>
         static int GetPageNumberByIndices(int row, int column)
         {
-            return row * CELLS_PER_ROW + column + 1;
+            return row * _CELLS_PER_ROW + column + 1;
         }
 
         /// <summary>
@@ -376,9 +373,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion PageSummaryView Methods
+        #endregion Methods
 
-        #region PageSummaryView Overrides
+        #region Overrides
 
         /// <summary>
         /// Processes a command key.
@@ -390,14 +387,14 @@ namespace Extract.Imaging.Forms
         [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (msg.Msg == WindowsMessage.KeyDown || msg.Msg == WindowsMessage.SysKeyDown)
+            if (msg.Msg == WindowsMessage.KeyDown || msg.Msg == WindowsMessage.SystemKeyDown)
             {
                 switch (keyData)
                 {
                     case Keys.Down:
 
                         // If moving would move to an invalid page cell, don't process the key.
-                        if (!IsValidToMoveBy(CELLS_PER_ROW))
+                        if (!IsValidToMoveBy(_CELLS_PER_ROW))
                         {
                             return true;
                         }
@@ -417,9 +414,9 @@ namespace Extract.Imaging.Forms
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        #endregion PageSummaryView Overrides
+        #endregion Overrides
 
-        #region PageSummaryView Event Handlers
+        #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
@@ -513,10 +510,10 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Check if a mouse event is about to occur
-                if (Control.MouseButtons != MouseButtons.None)
+                if (MouseButtons != MouseButtons.None)
                 {
                     // Is a cell being clicked?
-                    Point mouse = _dataGridView.PointToClient(Control.MousePosition);
+                    Point mouse = _dataGridView.PointToClient(MousePosition);
                     DataGridView.HitTestInfo info = _dataGridView.HitTest(mouse.X, mouse.Y);
                     if (info.Type == DataGridViewHitTestType.Cell)
                     {
@@ -537,7 +534,7 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion PageSummaryView Event Handlers
+        #endregion Event Handlers
 
         #region IImageViewerControl Members
 

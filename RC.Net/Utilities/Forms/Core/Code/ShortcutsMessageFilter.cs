@@ -1,6 +1,5 @@
 using Extract.Licensing;
 using System;
-using System.Security.Permissions;
 using System.Windows.Forms;
 
 namespace Extract.Utilities.Forms
@@ -87,7 +86,7 @@ namespace Extract.Utilities.Forms
         #endregion Properties
 
         /// <summary>
-        /// Handles the message in the PreFilterMessage function.
+        /// Handles the message in the <see cref="MessageFilterBase.PreFilterMessage"/> function.
         /// </summary>
         /// <param name="m">The message to handle.</param>
         /// <returns><see langword="true"/> if the message has been handled
@@ -103,7 +102,7 @@ namespace Extract.Utilities.Forms
                 // 4) The target does not already contain input focus
                 // 5) Shortcuts are enabled
                 // 6) This shortcut key has a handler
-                if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.SysKeyDown)
+                if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.SystemKeyDown)
                 {
                     if (_target.Handle != m.HWnd && _target.CanFocus && !_target.ContainsFocus && 
                         ShortcutsEnabled)
