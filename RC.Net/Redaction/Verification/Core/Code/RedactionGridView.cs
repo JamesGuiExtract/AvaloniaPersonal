@@ -177,6 +177,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         DataGridViewCellStyle _visitedPageCellStyle;
 
+        /// <summary>
+        /// Whether to ignore the next cell content click event.
+        /// </summary>
+        bool _ignoreCellContentClick;
+
         #endregion Fields
 
         #region Events
@@ -684,7 +689,8 @@ namespace Extract.Redaction.Verification
                 }
 
                 // Display a warning if necessary and allow the user to cancel
-                if (WarnIfSettingRedactedState(redacted))
+                bool displayWarning = ShouldWarnAboutRedactedState(redacted);
+                if (displayWarning && ShowRedactedStateWarning(redacted))
                 {
                     return;
                 }
@@ -697,6 +703,25 @@ namespace Extract.Redaction.Verification
                     _dirty = true;
                     _dataGridView.UpdateCellValue(_redactedColumn.Index, row.Index);
                 }
+
+                // Handle special cases when the check box has input focus [FIDSC #3998]
+                if (_dataGridView.IsCurrentCellInEditMode && IsRedactedColumnActive)
+                {
+                    if (displayWarning)
+                    {
+                        // If a warning was displayed, the currently edited cell 
+                        // will not be in the correct state and needs be restored.
+                        DataGridViewCheckBoxCell cell = 
+                            (DataGridViewCheckBoxCell) _dataGridView.CurrentCell;
+                        cell.EditingCellFormattedValue = redacted;
+                    }
+                    else
+                    {
+                        // If no warning was displayed, then the space bar will trigger
+                        // a cell content click event which must be ignored.
+                        _ignoreCellContentClick = true;    
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -708,20 +733,39 @@ namespace Extract.Redaction.Verification
         /// Displays a warning to the user if the user is setting the redacted state of a row that 
         /// is marked to display a warning.
         /// </summary>
-        /// <param name="redacted"><see langword="true"/> if the row is being set to redacted; 
-        /// <see langword="false"/> if the row is being set to unredacted.</param>
+        /// <param name="redacted"><see langword="true"/> if the row(s) are being set to redacted; 
+        /// <see langword="false"/> if the row(s) are being set to unredacted.</param>
         /// <returns><see langword="true"/> if a warning was displayed and the user chose to 
         /// cancel; <see langword="false"/> if no warning needed to be displayed or if a warning 
         /// was displayed and the user chose to continue.</returns>
         bool WarnIfSettingRedactedState(bool redacted)
         {
             // Determine whether a warning should be displayed
+            if (!ShouldWarnAboutRedactedState(redacted))
+            {
+                return false;
+            }
+
+            return ShowRedactedStateWarning(redacted);
+        }
+
+        /// <summary>
+        /// Determines whether a warning should be displayed when the redacted state of selected 
+        /// rows are being changed.
+        /// </summary>
+        /// <param name="redacted"><see langword="true"/> if the row(s) are being set to redacted; 
+        /// <see langword="false"/> if the row(s) are being set to unredacted.</param>
+        /// <returns><see langword="true"/> if a warning should be shown; <see langword="false"/>
+        /// if a warning should not be displayed.</returns>
+        bool ShouldWarnAboutRedactedState(bool redacted)
+        {
             bool warn = false;
             foreach (RedactionGridViewRow row in SelectedRows)
             {
+                // Warn only if the redacted state has changed [FIDSC #3987]
                 if (redacted)
                 {
-                    if (row.WarnIfRedacted)
+                    if (!row.Redacted && row.WarnIfRedacted)
                     {
                         warn = true;
                         break;
@@ -729,7 +773,7 @@ namespace Extract.Redaction.Verification
                 }
                 else
                 {
-                    if (row.WarnIfNotRedacted)
+                    if (row.Redacted && row.WarnIfNotRedacted)
                     {
                         warn = true;
                         break;
@@ -737,17 +781,23 @@ namespace Extract.Redaction.Verification
                 }
             }
 
-            // If no warning should be displayed, we are done
-            if (!warn)
-            {
-                return false;
-            }
+            return warn;
+        }
 
+        /// <summary>
+        /// Displays a warning message that the redacted state of selected redactions are changing.
+        /// </summary>
+        /// <param name="redacted"><see langword="true"/> if the row(s) are being set to redacted; 
+        /// <see langword="false"/> if the row(s) are being set to unredacted.</param>
+        /// <returns><see langword="true"/> if the user chose to cancel; <see langword="false"/> 
+        /// if the user chose to continue.</returns>
+        static bool ShowRedactedStateWarning(bool redacted)
+        {
             string state = redacted ? "redact" : "unredact";
             string message = "Are you sure you want to " + state + " the selected item(s)?";
 
             // Display the warning
-            DialogResult result = MessageBox.Show(message, "Change redacted state?", 
+            DialogResult result = MessageBox.Show(message, "Change redacted state?",
                 MessageBoxButtons.OKCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
 
             return result == DialogResult.Cancel;
@@ -1967,10 +2017,21 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                if (e.RowIndex >= 0)
+                if (e.RowIndex >= 0 && IsRedactedColumn(e.ColumnIndex))
                 {
-                    if (IsRedactedColumn(e.ColumnIndex))
+                    // Warn if necessary about the redacted state
+                    bool redacted = Rows[e.RowIndex].Redacted;
+                    if (_ignoreCellContentClick || WarnIfSettingRedactedState(!redacted))
                     {
+                        // Restore the checkbox to its initial state
+                        DataGridViewCheckBoxCell cell = (DataGridViewCheckBoxCell) 
+                                                        _dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
+                        cell.EditingCellFormattedValue = redacted;
+                        _ignoreCellContentClick = false;
+                    }
+                    else
+                    {
+                        // Commit the changes
                         _dirty = true;
 
                         CommitChanges();
