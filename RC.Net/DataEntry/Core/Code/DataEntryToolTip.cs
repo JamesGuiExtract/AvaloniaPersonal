@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Text;
+using System.Windows.Forms;
 using UCLID_AFCORELib;
 
 namespace Extract.DataEntry
@@ -607,6 +608,9 @@ namespace Extract.DataEntry
                     // The normalized page bounds are the initial _maximumExtent for this tooltip.
                     _maximumExtent = _normalizedImageBounds;
 
+                    // [DataEntry:885]
+                    EnsureTooltipIsNotWiderThanPage();
+
                     using (Matrix transform = new Matrix())
                     {
                         // Initialize coordinates that need to be mapped into the ImageViewer
@@ -688,6 +692,26 @@ namespace Extract.DataEntry
                 catch (Exception ex)
                 {
                     throw ExtractException.AsExtractException("ELI26929", ex);
+                }
+            }
+
+            /// <summary>
+            /// Ensures that no individual tooltip is wider than the image page itself by scaling
+            /// down the font if necessary.
+            /// </summary>
+            void EnsureTooltipIsNotWiderThanPage()
+            {
+                if (_normalizedBounds.Width > _normalizedImageBounds.Width)
+                {
+                    using (Graphics graphics = _host.ImageViewer.CreateGraphics())
+                    {
+                        SizeF imageSizeF = new SizeF(_normalizedImageBounds.Size.Width,
+                            _normalizedImageBounds.Size.Height);
+
+                        _textLayerObject.Font = FontMethods.GetFontThatFits(
+                            _textLayerObject.Text, graphics, imageSizeF,
+                            _textLayerObject.Font.FontFamily, _textLayerObject.Font.Style);
+                    }
                 }
             }
 
