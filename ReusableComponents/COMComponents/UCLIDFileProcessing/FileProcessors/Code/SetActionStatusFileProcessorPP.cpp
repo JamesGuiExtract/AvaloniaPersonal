@@ -120,6 +120,9 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
 			m_cmbActionName = GetDlgItem(IDC_COMBO_ACTION);
 			m_cmbActionStatus = GetDlgItem(IDC_COMBO_STATUS);
 
+			// Limit the amount of text to the maximum size of an action name
+			m_cmbActionName.LimitText(50);
+
 			// Bind the action tag button
 			m_btnActionTag.SubclassDlgItem(IDC_BTN_ACTION_TAG, CWnd::FromHandle(m_hWnd));
 			m_btnActionTag.SetIcon(

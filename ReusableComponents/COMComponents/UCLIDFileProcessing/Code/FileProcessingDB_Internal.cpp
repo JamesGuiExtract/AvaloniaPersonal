@@ -2887,12 +2887,14 @@ bool CFileProcessingDB::isMachineInListOfMachinesToSkipUserAuthentication(
 void CFileProcessingDB::validateNewActionName(const string& strActionName)
 {
 	// Check if the action name is valid
-	if (!isValidIdentifier(strActionName))
+	if (strActionName.length() > 50 || !isValidIdentifier(strActionName))
 	{
 		// Throw an exception
 		UCLIDException ue("ELI29334", "Specified action name is invalid.");
 		ue.addDebugInfo("Action Name", strActionName);
-		ue.addDebugInfo( "Valid Pattern", "[_a-zA-Z][_a-zA-Z0-9]*" );
+		ue.addDebugInfo("Valid Pattern", "[_a-zA-Z][_a-zA-Z0-9]*" );
+		ue.addDebugInfo("Action Name Length", strActionName.length());
+		ue.addDebugInfo("Maximum Length", "50");
 		throw ue;
 	}
 }
