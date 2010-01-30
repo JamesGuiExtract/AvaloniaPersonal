@@ -309,6 +309,8 @@
 			<li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Close</b> 
 			button.
 			<li>Confirm that the <b>Close</b> button closes the dialog.
+			<li><b>[LegacyRC #5608]</b> Confirm that <b>ESC</b> will close 
+			the dialog.
 		</ul>
 <p>
 		<li><u><b>Functionality</b></u>
@@ -410,6 +412,8 @@
       		<li>Confirm that the <b>Manage Counters</b> dialog includes 
 		a <b>Close</b> button.
 		<li>Confirm that <b>Close</b> closes the dialog.
+		<li><b>[LegacyRC #5608]</b> Confirm that <b>ESC</b> will close 
+		the dialog.
 <p>
   	   	<LI><b>[LegacyRC #5662]</b> DB Admin exceptions
 	       	<ul>
@@ -435,6 +439,8 @@
 		<b>Refresh</b> the list of tags.
       		<li>Confirm that the <b>Manage Tags</b> dialog includes a button to 
 		<b>Close</b> the dialog.
+		<li><b>[LegacyRC #5608]</b> Confirm that <b>ESC</b> will close 
+		the dialog.
       		<li>Confirm that tags must begin with a letter, number or underscore 
 		character.
       		<li>Confirm that tags can contain spaces allowing for multiple-word strings.
@@ -496,6 +502,9 @@
 			an edit box for modifying a login ID.
 			<li>Confirm that the edit box is pre-populated with the 
 			selected user's login ID. 
+			<li><b>[LegacyRC #5634]</b> Confirm that a meaningful error 
+			message is provided when trying to rename a user to a different 
+			existing user.
       			<li>Confirm that the dialog includes a <b>Clear password</b> 
 			button.
 			<li>Confirm that the <b>Clear password</b> button is disabled 
@@ -504,13 +513,17 @@
 			displays a confirmation dialog.
       			<li>Confirm that the dialog includes a <b>Refresh</b> button.
       			<li>Confirm that the dialog includes a <b>Close</b> button.
+			<li><b>[LegacyRC #5608]</b> Confirm that <b>ESC</b> will close 
+			the dialog.
 	       	</ul>
 <p>
       		<li><u><b>Functionality</b></u>
 	       	<ul>
-			<li>Confirm that a new user is added to the bottom of the list.
-			<li>Confirm that the <b>User</b> column for a new user 
-			is <b>first_last</b> per the normal network login.
+			<li>Confirm that a new user is added to the appropriate 
+			alphabetically sorted position.
+			<li><b>[LegacyRC #5689]</b> Confirm that the <b>Add User</b> 
+			is pre-populated with the login name of the current user.  Also 
+			confirm that the entire text is selected. 
 			<li>Confirm that the <b>Password set</b> column for a new user 
 			is <b>No</b>.
 	      		<li>Confirm that an error message is displayed if a duplicate 
@@ -958,6 +971,35 @@
 			<li>Action - Remove
 			<li>Action - Rename
 			<li>Action - Manually set action status
+		</ul>
+<p>
+		<li><b>[LegacyRC #5684, #5685]</b> User authentication bugs
+		<ul>
+			<li>Confirm that <b>RequireAuthenticationBeforeRun = 1</b>.
+			<li>Create a user with an undefined password.
+			<li>Login to the test machine as the user with an undefined password.
+			<li>Start processing from an FPS file.
+			<li>Confirm that the user is prompted for a password.
+			<li>Before clicking <b>OK</b> from the password prompt, use <b>DB Admin</b> to 
+			delete the user.
+			<li>Click <b>OK</b> from the password prompt.
+			<li>Confirm that a meaningful error message is presented and that processing 
+			does not start.
+<p>
+			<li>Login to the test machine as a user with a <b>defined</b> password.
+			<li>Start processing from an FPS file.
+			<li>Confirm that the user is prompted for a password.
+			<li>Before clicking <b>OK</b> from the password prompt, use <b>DB Admin</b> to 
+			delete the user.
+			<li><b>Do not</b> enter a password and click <b>OK</b> from the password prompt.
+			<li>Confirm that a meaningful error message is presented and that processing 
+			does not start.
+<p>
+			<li>Remain logged in to the test machine as a user with a <b>defined</b> 
+			password.
+			<li>Create a new database.
+			<li>Confirm that the caption for the notification message about setting the 
+			database password is <b>Set Admin Password</b>.
 		</ul>
 	</ul>
 </body>
