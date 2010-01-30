@@ -419,6 +419,15 @@
 <p>
 		<li><b>Functionality</b>
 		<ul>
+	  	   	<LI><b>[FlexIDSCore #3451]</b> Retain document type attribute
+		       	<ul>
+				<li>Confirm that a specific unfiltered VOA file contains a 
+				<b>DocumentType</b> attribute.
+	      			<li>Filter the VOA file.
+	      			<li>Confirm that no matter which settings are used, the 
+				<b>DocumentType</b> attribute is reatined in the output VOA file.
+	       		</ul>
+<p>
 	  	   	<LI><b>[LegacyRC #5249]</b> Filter ID Shield Data File
 		       	<ul>
 	      			<li>Configure the task.
@@ -643,6 +652,10 @@
 		  	   	<LI><b>[FlexIDSCore #3713]</b> Confirm that running a verification FPS 
 				file without any pending files does not throw an exception.
 <p>
+		  	   	<LI><b>[FlexIDSCore #3747]</b> Confirm that the default colors for 
+				different types of redactions (HCData, MCData, LCData, Manual, Clue) 
+				are all distinct and different.
+<p>
 		  	   	<LI><b>[FlexIDSCore #3818]</b> Confirm that the <b>ID Shield</b> icon 
 				is shown for the verification window in the taskbar.
 <p>
@@ -674,6 +687,14 @@
 	      				<li>Confirm that the document is skipped and no prompts 
 					are presented.
 				</ol>
+<p>
+		  	   	<LI><b>[FlexIDSCore #3957]</b> Confirm that a post-verification VOA 
+				file contains updated information about the recent verification session
+				<ul>
+					<li>User
+					<li>Session
+					<li>Computer
+				</ul>
 			</ul>
 <p>
 			<li><b>Thumbnail window</b>
@@ -684,8 +705,8 @@
 				depressed with the <b>Thumbnails view</b> is visible.
 				<li>Confirm that verifying several documents very quickly (before the 
 				Thumbnail panes are completely populated) does not skip any documents.  
-				<li>Confirm that the position and state of the <b>Thumbnails window</b> 
-				is correctly persisted.
+				<li>Confirm that the position and pinned/unpinned state of the 
+				<b>Thumbnails window</b> is correctly persisted.
 			</ul>
 <p>
 			<li><b>Menu and Toolbar</b>
@@ -762,6 +783,14 @@
 					<b>enabled</b>.
 				</ul>
 <p>
+				<li><b>Exemption codes</b>
+				<ul>
+					<li>Confirm that the <b>Apply exemption codes</b> toolbar 
+					button is enabled only when a redaction is selected. 
+					<li>Confirm that the <b>Apply last exemption codes</b> toolbar 
+					button is enabled only when a redaction is selected. 
+				</ul>
+<p>
 				<li><b>Apply tags button</b>
 				<ul>
 					<li>Confirm that the toolbar button <b>is</b> visible if the 
@@ -808,6 +837,14 @@
 				save changes if necessary.
       				<li>Confirm that <b>File - Skip document</b> does not prompt the user to 
 				provide missing type information, if required.
+<p>
+				<li><b>[FlexIDSCore #3982]</b> Help menu
+				<ul>
+					<li>Confirm that <b>Help - ID Shield help</b> opens the ID 
+					Shield help file.
+					<li>Confirm that <b>Help - About ID Shield help</b> displays 
+					the appropriate About box with version information.
+				</ul>
 			</ul>
 <p>
 			<li><b>Grid View</b>
@@ -911,6 +948,9 @@
 					comment text.
 	       			</ul>
 <p>
+		  	   	<LI><b>[FlexIDSCore #3712]</b> Confirm that a new <b>Manual</b> 
+				redaction is displayed in the appropriate sorted position.
+<p>
 		  	   	<LI><b>[FlexIDSCore #3762]</b> Confirm that the window position, 
 				maximized state, and the Grid view state (pinned, undocked, 
 				position) are persisted across verification sessions.
@@ -936,7 +976,7 @@
 					requiring an extra click.
 				</ul>
 <p>
-		  	   	<LI><b>[FlexIDSCore #3852]</b> INI file settings
+		  	   	<LI><b>[FlexIDSCore #3852, #3987]</b> INI file settings
 				<ul>
 	      				<li>Confirm that <b>IDShield.ini</b> contains 
 					<b>WarnIfNonRedact=1</b> for high confidence data.
@@ -944,12 +984,16 @@
 	      				<li>Toggle an <b>HCData</b> item to <b>off</b>.
 		      			<li>Confirm that a confirmation message is presented to the 
 					verifier.
+		      			<li>Confirm that a confirmation message is <b>not<b> presented 
+					to the verifier if the item is toggled back on.
 	      				<li>Modify <b>IDShield.ini</b> to contain 
-					<b>WarnIfRedact=1</b> for low confidence data.
-	      				<li>Verify a document that contains <b>LCData</b> redactions.
-	      				<li>Toggle an <b>LCData</b> item to <b>on</b>.
+					<b>WarnIfRedact=1</b> for Clue items.
+	      				<li>Verify a document that contains <b>Clue</b> items.
+	      				<li>Toggle an <b>Clue</b> item to <b>on</b>.
 		      			<li>Confirm that a confirmation message is presented to the 
 					verifier.
+		      			<li>Confirm that a confirmation message is <b>not<b> presented 
+					to the verifier if the item is toggled back off.
 				</ul>
 <p>
 		  	   	<LI><b>[FlexIDSCore #3858]</b> Resizing Grid view
@@ -1255,6 +1299,19 @@
 					<li>Confirm that <b>zoom level 10</b> zooms out so that at least half 
 					of the page is visible.
 				</ul>
+<p>
+	  	   		<LI><b>[FlexIDSCore #3510]</b> Interaction with different tools
+			       	<ul>
+		  		   	<LI>Verify an image.
+      					<li>Select a redaction and drag it around the image.
+					<li>While still holding down the left mouse button, select a 
+					different tool.
+					<li>Press <b>ESC</b> to release the tool and continue dragging 
+					the redaction into the Image Viewer toolbar.
+					<li>Confirm that the verification interface continues to stay 
+					in an appropriate state during assorted manipulations.
+					<li>Confirm proper behavior during a redaction resize.
+			       	</ul>
 <p>
 		  	   	<LI><b>[FlexIDSCore #3674]</b> Confirm that manual redactions default 
 				to using the last applied redaction type.
