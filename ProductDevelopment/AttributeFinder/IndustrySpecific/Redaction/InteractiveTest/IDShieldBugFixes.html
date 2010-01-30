@@ -82,6 +82,46 @@
 			<li>Confirm that the UI is still responsive.
 	       	</ul>
 <p>
+  	   	<LI><b>[FlexIDSCore #2939]</b> Summary grid automatic scrolling
+	       	<ul>
+	      		<li>Exercise <b>verification</b> on an image with more pages than will 
+			display in the Summary grid.  It is acceptable to resize the Summary grid 
+			until a scrollbar is displayed.
+			<li>Configure verification to require review of all pages.
+			<li><b>TAB</b> through the document.
+			<li>Confirm that the Summary grid is updated as pages change.
+			<li>Confirm that the Summary grid automatically scrolls so that the 
+			active page is always visible.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3010]</b> Prompting for save with unmodified document
+	       	<ul>
+	      		<li>Exercise <b>verification</b> on several documents.
+			<li>Navigate to a previous document but do not make any changes.
+			<li>Click <b>TAB</b>.
+			<li>Confirm that no prompt for saving is provided since no changes 
+			were made.
+			<li>Confirm that a prompt is provided if changes were made.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3013]</b> Confirm that the data window and image window 
+		automatically reposition themselves if the Windows taskbar is changed to 
+		another position.
+<p>
+  	   	<LI><b>[FlexIDSCore #3277]</b> Undo redactions with Legislation Guard
+	       	<ul>
+	      		<li>Exercise <b>verification</b> of Social Security Numbers on several 
+			documents.
+			<li>Process the images again to verify driver's license numbers.  Make 
+			sure to use the previous redacted output image as the input image.
+			<li>Confirm that the previously redacted image is displayed during 
+			the second verification effort.
+			<li>Confirm that an initial Social Security Number redaction can be 
+			removed.
+			<li>Confirm that the final output file <b>does not</b> redact the 
+			removed Social Security Number.
+	       	</ul>
+<p>
   	   	<LI><b>[FlexIDSCore #3320]</b> Selection of redactions while selecting exemption codes
 	       	<ul>
 	      		<li>Exercise <b>verification</b>.
@@ -95,6 +135,16 @@
 	      		<li>Hit the <b>Escape</b> key and select a redaction.
 	      		<li>Use the <b>E</b> shortcut to display the Exemption Codes dialog.
 	      		<li>Confirm that interaction with the <b>Data Grid</b> is still not allowed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3383]</b> Highlights after zoom
+	       	<ul>
+	      		<li>Exercise <b>verification</b> of an image that contains sensitive 
+			information.
+			<li>Set the fit mode to <b>Fit-To-Page</b>.
+			<li>Select the Pan or Zoom window tool.
+			<li>Confirm that the image zooms in as the mousewheel is scrolled up.
+			<li>Confirm that existing highlights are retained.
 	       	</ul>
 <p>
   	   	<LI><b>[FlexIDSCore #3411]</b> Remove bad files from history
@@ -197,6 +247,33 @@
 			<li>Verify a sensitive document adding some manual redactions.
 			<li>Print the document.
 			<li>Confirm that the redaction border is not rendered in the print output.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3993]</b> Grip handles visible during zoom operation
+	       	<ul>
+			<li>Verify a sensitive document.
+			<li>Select the <b>Zoom</b> tool.
+			<li>Click <b>TAB</b> to navigate to the next entry.
+			<li>Confirm that the red border is correctly displayed for the selected 
+			item.
+			<li>Confirm that the grip handles are only visible if the current tool 
+			is the <b>Selection</b> tool.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3994]</b> Confirm that close zooming into redactions displayed 
+		in the image viewer during verification does not show any white slivers suggesting 
+		incomplete coverage of the sensitive region.
+<p>
+  	   	<LI><b>[FlexIDSCore #3995]</b> Stopping FAM during verification
+	       	<ul>
+	      		<li>Exercise <b>verification</b> for an action that has no queued files 
+			and that is listening.
+	      		<li>Confirm that the UI appears in <b>waiting</b> mode.
+			<li>Select <b>File - Stop processing</b>.
+	      		<li>Confirm that a message is presented asking the user to stop processing 
+			from the FAM.
+	      		<li>Confirm that the same message is seen if the user tries to close the 
+			image window.
 	       	</ul>
 	</UL>
 <p>
