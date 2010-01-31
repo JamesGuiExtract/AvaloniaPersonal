@@ -2507,7 +2507,7 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Gets a lazily instantiate <see cref="MiscUtils"/> instance to use for converting 
-        /// <see cref="IPersistStream"/> implementations to/from a stringized byte stream.
+        /// IPersistStream implementations to/from a stringized byte stream.
         /// </summary>
         /// <returns>A <see cref="MiscUtils"/> instance.</returns>
         MiscUtils MiscUtils
