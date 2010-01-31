@@ -312,31 +312,6 @@
 <p>
 <LI><h2>Error Handling</h2>
 <ul>
-	<li>Multi-threaded execution of RunRules.exe
-	<UL>
-  		<LI>Use <b>MultiThreadedRunRules</b> located under SafeNetUtils/Utils
-		<li>Open the SLN file on the build machine using Visual Studio and the current 
-		software baseline.
-		<li>Build the EXE.
-		<li>Build the Installer project also included in the SLN.
-<p>
-		<li>Copy the MSI file to the test machine.
-		<li>Run the MSI file to install the EXE.  Select the <b>FlexIndexComponents/Bin</b> folder 
-		as the location for the EXE.  The EXE expects to be in the same folder as RunRules.exe.
-<p>
-		<li>Run the EXE and define the number of threads.
-		<li>Use the <b>File</b> menu to select a folder of images to be processed 
-		and a rules file.
-		<li>Click Run.  The application will process the specified images and re-process them 
-		over and over to continue exercising the USB key.
-		<li>Click Exit to stop the application.
-<p>
-		<li>The test is expected to run for at least two days without a USB key failure.
-		<li>The Exception log may contain one or more <b>ELI18226</b> or <b>ELI18243</b> 
-		exceptions indicating that access to the USB key was retried.
-	</UL>
-	</li>
-<p>
 	<li>Test Setup for next numbered items
 	<UL>
   		<LI>Prepare a set of local images to use with the File Action Manager where the 
@@ -412,6 +387,21 @@
 		finish without failure.
 	</UL>
 	</li>
+	</UL>
+<p>
+<LI><h2>Miscellaneous</h2>
+<ul>
+	<li><b>[LegacyRC #5098, #5109]</b> Deadlock on USB key
+	<ul>
+		<li>Prepare an FPS file to execute rules on a test machine.
+		<li>Configure the test machine to use a remote machine to host the USB key.
+		<li>Confirm that processing is successful on the test machine.
+		<li>Reboot the remote machine that is hosting the USB key.
+		<li>Confirm that the processing machine handles the reboot gracefully and 
+		reconnects to the USB host.
+		<li>Confirm that an exception is logged when the test machine reconnects to 
+		the USB host.
+	</ul>
 </ul>
 </body>
 </HTML>
