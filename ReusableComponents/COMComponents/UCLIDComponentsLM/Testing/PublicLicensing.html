@@ -29,6 +29,18 @@
 		the application.</li>
    		<li>Confirm that unsupported command-line arguments such as <b>ExtractTRP2 /abc</b> 
 		provide a message box with usage instructions.</li>
+   		<li><b>[LegacyRC #4934]</b> ExtractTRP2.exe and Unlock files
+		<ul>
+			<li>Create an evaluation license.
+			<li>Confirm that the FAM opens and runs
+			<li>Close the FAM
+			<li>Set test machine time back one month.
+			<LI>Confirm that the FAM reports a license corruption error.
+			<li>Create a suitable Unlock file and copy it to the <b>CommonComponents</b> 
+			folder.
+			<li>Confirm that the Unlock file works even though the ExtractTRP2.exe 
+			process is not killed before restarting the FAM.
+		</ul>
 		<li><b>[LegacyRC #5021]</b> Instance will be left running with /exit flag
 		<ul>
 			<li>With no instance of <b>ExtractTRP2.exe</b> running, confirm that entering 
