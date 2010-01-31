@@ -63,6 +63,23 @@
 			the image. 
 	       	</ul>
 <p>
+  	   	<LI><b>[DotNet #365]</b> Changing angular redaction into rectangular
+	       	<ul>
+	      		<li>Verify an image.
+	      		<li>Create a very slightly angular redaction.
+			<li>Click one of the grip handles on the long side.
+			<li>Confirm that the redaction remains angular during the resize event.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #371]</b> Moving a piece of a split redaction
+	       	<ul>
+	      		<li>Verify an image.
+	      		<li>Create a split redaction by holding <b>SHIFT</b> while 
+			drawing a manual redaction.
+			<li>Confirm that individual pieces of the redaction can be resized or rotated.
+			<li>Confirm that individual pieces of the redaction can be moved.
+	       	</ul>
+<p>
   	   	<LI><b>[DotNet #372, FlexIDSCore #3903, #3906]</b> Various
 	       	<ul>
 	      		<li>Verify an image.
@@ -303,6 +320,14 @@
 			condition.
 			<li>Close the FAM.
 			<li>Confirm that the FPS file can reopened.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5090]</b> Waiting for file access
+	       	<ul>
+			<li>Create an FPS file that executes rules to create VOA files and then 
+			immediately uses an <b>ID Shield data file condition</b> to read the VOA file.
+			<li>Exercise this FPS file with a large number of images.
+			<li>Confirm that no file access errors are seen.
 	       	</ul>
 <p>
   	   	<LI><b>[LegacyRC #5248]</b> Support for JPEG-compressed TIFs
