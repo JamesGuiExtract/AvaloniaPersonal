@@ -1,0 +1,359 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.0.0.19 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.0.0.19 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[DataEntry #885]</b> Tooltips wider than the page
+	       	<ul>
+	  	   	<LI>Exercise the <b>DataEntry: Verify extracted data</b> task.
+			<li>Select a very long line of text.
+			<li>Confirm that the tooltip is not wider than the image page.  The 
+			tooltip may have a smaller than normal font.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3752, #3796, #3797, #3798, #3904, #3910, #3912, #3959, #3980]</b> 
+		ID Shield Statistics Reporter
+	       	<ul>
+	  	   	<LI>Confirm that a <b>complete and correct</b> set of statistics 
+			is provided for hybrid processing in one pass.
+			<li>Check that the output closely matches the external statistics 
+			template.
+			<li>Confirm that the output statistics files use the standard 
+			<b>\r\n</b> characters as line separators.
+			<li>Confirm that the <b>Configure automated condition</b> dialog 
+			displays more than one at a time of { only, any, none } when the 
+			combo box drops down.
+			<li>Confirm that the <b>Configure verification condition</b> dialog 
+			displays more than one at a time of { only, any, none } when the 
+			combo box drops down.
+			<li>Confirm that the label for <b>Number of automated redactions</b> is 
+			clear for both automated and overall statistics.
+			<li>Confirm that the <b>Summary statistics</b> file reports the 
+			<b>DocTypesToVerify</b> setting when specified.
+			<li>Confirm that the <b>Summary statistics</b> file reports the 
+			<b>DocTypesToRedact</b> setting when specified.
+			<li>Confirm that IDSSR honors the <b>DocTypesToRedact</b> setting.
+			<li>Confirm that IDSSR allows limiting by single <b>type</b> without 
+			an error.
+			<li>Confirm that IDSSR allows limiting by multiple <b>types</b> 
+			without an error.
+			<li>Confirm that IDSSR reports the <b>number of pages processed</b>.
+			<li>Confirm that IDSSR reports the <b>number of pages with expected 
+			redactions</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3799]</b> AutoOpenImage in RDTConfig
+	       	<ul>
+	  	   	<LI>Confirm that the default setting is <b>true</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3852, #3987, #3998, #3999]</b> WarnIfRedact and 
+		WarnIfNonRedact settings
+	       	<ul>
+	  	   	<LI>Modify <b>IDShield.ini</b> such that <b>WarnIfRedact=1</b> for 
+			low confidence data.
+	  	   	<LI>Modify <b>IDShield.ini</b> such that <b>WarnIfNonRedact=1</b> for 
+			high confidence data.
+			<li>Verify a document that contains <b>low confidence</b> data.
+			<li>Toggle a low confidence redaction to <b>ON</b>.
+			<li>Confirm that a meaningful confirmation dialog is presented.
+			<li>Confirm that the toggle is accepted if the confirmation is 
+			accepted.
+			<li>Confirm that the toggle is rejected if the confirmation is 
+			rejected.
+			<li>Confirm that a confirmation dialog is presented if the toggle is 
+			done via <b>SPACE</b> or via checkbox.
+			<li>Toggle a high confidence redaction to <b>OFF</b>.
+			<li>Confirm that a meaningful confirmation dialog is presented.
+			<li>Confirm that the toggle is accepted if the confirmation is 
+			accepted.
+			<li>Confirm that the toggle is rejected if the confirmation is 
+			rejected.
+			<li>Confirm that a confirmation dialog is presented if the toggle is 
+			done via <b>SPACE</b> or via checkbox.
+<p>
+			<li>Confirm that deleting a toggled-off manual redaction does not 
+			display a warning message.
+			<li>Confirm that deleting a toggled-on manual redaction does 
+			display a warning message.
+			<li>Confirm that when the redacted checkbox has input focus, pressing 
+			<b>SPACE</b> properly toggles the redacted state.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3865]</b> Box Finder
+	       	<ul>
+	  	   	<LI>Exercise the RSD file and image from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3865</b>.
+			<li>Confirm that all <b>6</b> of the address boxes on the first page 
+			are found.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3877]</b> Toggled redactions in metadata XML
+	       	<ul>
+	  	   	<LI>Verify some documents.
+			<li>Add some manual redactions.
+			<li>Toggle some of the redactions off - including both high confidence 
+			and manual redactions.
+			<li>Create redacted images.
+			<li>Create metadata XML.
+			<li>Review the metadata output
+			<ul> 
+				<li>Confirm that the <b>IDShieldVerificationSession</b> details 
+				include <b>Enabled</b> items for whether or not the redactions 
+				are on or off.
+				<li>Confirm that the <b>RedactedFileOutputSession</b> does not 
+				include <b>Enabled</b> items.
+			</ul> 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3885, #3995]</b> Verification warning
+	       	<ul>
+	  	   	<LI>Queue one file for verification, listening for more files.
+			<li>Verify and save the document.
+			<li>Confirm that the verification UI remains open waiting for the 
+			next file.
+			<li>Stop processing from the verification UI.
+			<li>Confirm that a menaingful warning message is presented, asking 
+			the user to stop processing from the FAM.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3936]</b> Character confidence condition rule object
+	       	<ul>
+	  	   	<LI>Exercise the <b>Character confidence condition</b> portion of the 
+			<b>AFConditions</b> testing checklist.
+			<li>Do independent functional testing of this rule object.
+			<li>Confirm that an automated test exists for this rule object and 
+			that it passes at 100%.
+			<li>Confirm that a <b>memory leak</b> test exists for this rule 
+			object.
+			<li>Exercise the memory leak test for this rule object if it has not 
+			already been exercised.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3956, #3960]</b> Find or Redact Text
+	       	<ul>
+	  	   	<LI>Verify a document that has a USS file.
+			<li>Use the <b>Find or Redact Text</b> dialog to find some common text.
+			<li>Step through the matches and redact some of them.
+			<li>Confirm that the found text is displayed in the <b>Data View</b>.
+			<li>Click the <b>Redact All</b> button.
+			<li>Confirm that the matches that have already been redacted do not 
+			appear twice in the <b>Data View</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3967]</b> Confirm that <b>Redaction: Create metadata xml</b> 
+		can successfully process a VOA file that contains non-spatial attributes.
+<p>
+  	   	<LI><b>[FlexIDSCore #3971]</b> ID Shield data file condition
+	       	<ul>
+	  	   	<LI>Create and save an FPS file using an <b>ID Shield data file contents</b> 
+			condition.
+			<li>Close the FAM.
+			<li>Confirm that the FPS file can reopened.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3975, #3976]</b> Redact from XML
+	       	<ul>
+	  	   	<LI>Verify some images, making additions and changes to the found redactions.
+			<li>Create the metadata XML files after verification is complete.
+			<li>Confirm that the <b>RedactFromXml</b> application creates proper 
+			redacted images
+			<ul>
+				<li>Check redaction placement
+				<li>Confirm that deleted redactions are not applied
+				<li>Check that disabled redactions are not applied
+				<li>Check proper redaction color
+				<li>Check redaction text and exemption codes
+				<li>Check annotation settings
+			</ul>
+			<li>Confirm that <b>RedactFromXml</b> command-line parameters can 
+			override the annotation settings in the VOA file.
+<p>
+			<li>Exercise images and XML from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3975</b>
+			<ul>
+				<li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 1</b> 
+				metadata.
+				<li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 2</b> 
+				metadata.
+				<li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 3</b> 
+				metadata.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3979]</b> Confirm that <b>CacheRSD</b> is disabled by default.
+<p>
+  	   	<LI><b>[LegacyRC #5628]</b> Creating very long tags
+	       	<ul>
+			<LI>Confirm that <b>AutoDynamicTagCreation=1</b> within DBInfo.
+			<li>Verify an image.
+	  	   	<LI>Confirm that a long tag can be created and applied.
+			<LI>Confirm that the tag length is limited to <b>100</b> characters.
+			<li>Confirm that the tag description is limited to <b>255</b> characters.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5632]</b> Tag management
+	       	<ul>
+			<LI>Confirm that leading and trailing whitespace is trimmed when <b>creating</b> 
+			a tag.
+			<LI>Confirm that leading and trailing whitespace is trimmed when <b>modifying</b> 
+			a tag.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5650, #5653]</b> Select action with empty database
+	       	<ul>
+	  	   	<LI>Create a new database.
+			<LI>Confirm that <b>AutoCreateAction=0</b> within DBInfo.
+	  	   	<LI>Confirm that an error message is displayed when trying to select an action.
+			<li>Close the FAM.
+			<LI>Modify DBInfo so that <b>AutoCreateAction=1</b>.
+			<li>Open a FAM instance pointing to the same new, empty database.
+	  	   	<LI>Confirm that no error message is displayed when trying to select an action.
+			<li>Confirm that an error message is displayed if a non-existent action 
+			is selected that <b>does not</b> include a valid $ function.
+			<li>Confirm that no error message is displayed if a non-existent action 
+			is selected that <b>does</b> include a valid $ function.
+<p>
+			<LI>Confirm that <b>AutoCreateAction=0</b> within DBInfo.
+			<li>Create and save an FPS file using a defined action.
+			<li>Close the FAM.
+			<li>Delete the action from the database.
+			<li>Open the FPS file.
+			<li>Confirm that after dismissing the error messages, the user is unable 
+			to start processing.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5662]</b> DB Admin exceptions
+	       	<ul>
+	  	   	<LI>Use DB Admin to rename a tag to an existing tag name.
+			<LI>Confirm that a meaningful exception is displayed.
+	  	   	<LI>Use DB Admin to add a counter using an existing counter name.
+			<LI>Confirm that a meaningful exception is displayed.
+	  	   	<LI>Use DB Admin to rename a counter to an existing counter name.
+			<LI>Confirm that a meaningful exception is displayed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5669]</b> PDF/A conversion failures
+	       	<ul>
+			<LI>Exercise the <b>Core: Convert to searchable PDF</b> task with the 
+			PDF/A conversion option against the 
+			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5669</b> image file.
+			<LI>Confirm that the image cannot be converted to a PDF/A-compliant image.
+			<li>Confirm that a meaningful error message is logged.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5672]</b> $FullUserName() arguments
+	       	<ul>
+	  	   	<LI>Confirm that the <b>$FullUsername()</b> function supports an 
+			argument of <b>0</b> or <b>1</b>.
+			<li>Confirm that for <b>0</b>, an exception is thrown if the full 
+			user name cannot be retrieved.
+			<li>Confirm that for <b>1</b>, an exception is not thrown if the full 
+			user name cannot be retrieved - instead the <b>$UserName()</b> text 
+			is provided.
+			<li>Confirm that for <b>$FullUsername()</b> without a parameter, 
+			functionality is the same as for <b>0</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5679]</b> DB Admin and old schema version
+	       	<ul>
+			<LI>Create a new database using <b>DB Admin</b>.
+			<li>Use SQL Management Studio to modify the schema version
+			<LI>Login to the database.
+			<li>Select the <b>Summary</b> tab.
+			<li>Confirm that an error message is displayed about the incorrect 
+			schema version.
+			<li>Close the error message and confirm that the UI is still in a 
+			good state.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5683]</b> Bad arguments for $Env() or $RandomAlphaNumeric()
+	       	<ul>
+			<LI>Exercise <b>$Env()</b> without an argument.
+			<li>Confirm that a meaningful error message is presented.
+			<LI>Exercise <b>$RandomAlphaNumeric()</b> without an argument.
+			<li>Confirm that a meaningful error message is presented.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5688]</b> Long action names in Select Action
+	       	<ul>
+			<LI>Confirm that the <b>Select Action</b> dialog has enough space for 
+			50 lower-case characters without scrolling.
+			<LI>Confirm that the <b>Select Action</b> dialog has enough space for 
+			50 upper-case characters with scrolling.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Demo_FLEXIndex</h3>
+       	<ul>
+		<li>Exercise <b>Demo_FLEXIndex</b>.
+		<ul>
+			<li>Confirm that a <b>DataEntry: Verify extracted data</b> task is 
+			available from the FAM.
+			<li>Confirm that the <b>DataEntry: Verify extracted data</b> task 
+			requires only a <b>FLEX Index Client</b> license.
+			<li>Confirm that the installed rules work properly for the installed 
+			sample images.
+			<li>Confirm that additional attributes can be added by swiping.
+			<li>Do general testing of the current Indexing demo.  Note any 
+			shortcomings.
+		</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
