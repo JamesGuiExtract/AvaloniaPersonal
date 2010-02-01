@@ -120,8 +120,9 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			}
 
 			// Wrap the AFDocument in smart pointer
+			// This does not need to be non-NULL since the Entity Name Splitter does 
+			// not use the AFDocument object
 			IAFDocumentPtr ipAFDoc(pAFDoc);
-			ASSERT_ARGUMENT("ELI29460", ipAFDoc != NULL);
 
 			// Get a new parser (we will release this parser when the method exits)
 			m_ipRegExprParser = getParser();
