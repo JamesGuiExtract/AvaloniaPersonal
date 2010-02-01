@@ -1,12 +1,10 @@
 using Extract.Licensing;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 
 namespace Extract.Interop
 {
@@ -15,13 +13,13 @@ namespace Extract.Interop
     /// </summary>
     public class IStreamReader : IDisposable
     {
-        #region IStreamReader Constants
+        #region Constants
 
         static readonly string _OBJECT_NAME = typeof(IStreamReader).ToString();
 
-        #endregion IStreamReader Constants
+        #endregion Constants
 
-        #region IStreamReader Fields
+        #region Fields
 
         /// <summary>
         /// A <see cref="MemoryStream"/> into which all data is read.
@@ -38,9 +36,9 @@ namespace Extract.Interop
         /// </summary>
         readonly int _version;
 
-        #endregion IStreamReader Fields
+        #endregion Fields
 
-        #region IStreamReader Constructors
+        #region Constructors
 
         /// <summary>
 	    /// Initializes a new instance of the <see cref="IStreamReader"/> class.
@@ -85,9 +83,9 @@ namespace Extract.Interop
             }
         }
 
-        #endregion IStreamReader Constructors
+        #endregion Constructors
 
-        #region IStreamReader Properties
+        #region Properties
 
         /// <summary>
         /// Gets the version number of the <see cref="IStream"/> object being read.
@@ -101,9 +99,9 @@ namespace Extract.Interop
             }
         }
 
-        #endregion IStreamReader Properties
+        #endregion Properties
 
-        #region IStreamReader Methods
+        #region Methods
 
         /// <summary>
         /// Reads a {T} from the <see cref="IStream"/> object.
@@ -157,6 +155,40 @@ namespace Extract.Interop
             {
                 throw new ExtractException("ELI26480",
                     "Unable to read string.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Reads an array of strings from the <see cref="IStream"/> object.
+        /// </summary>
+        /// <returns>An array of strings.</returns>
+        public string[] ReadStringArray()
+        {
+            try
+            {
+                // Check if the value is null
+                bool hasValue = (bool)_formatter.Deserialize(_stream);
+                if (!hasValue)
+                {
+                    return null;
+                }
+
+                // Get the number of items in the array
+                int count = (int)_formatter.Deserialize(_stream);
+                
+                // Read each string
+                string[] result = new string[count];
+                for (int i = 0; i < count; i++)
+                {
+                    result[i] = ReadString();
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI29520",
+                    "Unable to read string array.", ex);
             }
         }
 
@@ -242,7 +274,7 @@ namespace Extract.Interop
             }
         }
 
-        #endregion IStreamReader Methods
+        #endregion Methods
 
         #region IDisposable Members
 
