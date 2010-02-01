@@ -210,6 +210,15 @@
 	      		<li>Confirm that stopping processing from <b>Verification</b> works.
 	       	</ul>
 <p>
+  	   	<LI><b>[FlexIDSCore #3464]</b> Removing exemption codes
+	       	<ul>
+	      		<li>Verify an image.
+	      		<li>Select a redaction on an image with multiple redactions.
+	      		<li>Apply an exemption code.
+	      		<li>Toggle the item to unredacted.
+	      		<li>Confirm that the exemption code can be removed.
+	       	</ul>
+<p>
   	   	<LI><b>[FlexIDSCore #3487]</b> Adjust auto-zoom scale factors
 	       	<ul>
 	      		<li>Exercise <b>verification</b> for Demo_IDShield and TestImage001.tif.
@@ -257,6 +266,17 @@
 			redaction and press <b>OK</b>.
 			<li>Open the exemption code dialog again.
 			<li>Confirm that only one copy of the exemption code is present.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3885, #3995]</b> Verification warning
+	       	<ul>
+	  	   	<LI>Queue one file for verification, listening for more files.
+			<li>Verify and save the document.
+			<li>Confirm that the verification UI remains open waiting for the 
+			next file.
+			<li>Stop processing from the verification UI.
+			<li>Confirm that a menaingful warning message is presented, asking 
+			the user to stop processing from the FAM.
 	       	</ul>
 <p>
   	   	<LI><b>[FlexIDSCore #3950]</b> Printing without redaction borders
