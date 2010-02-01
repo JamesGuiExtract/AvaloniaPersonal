@@ -19,6 +19,9 @@ void CompressionEngine::compressFile(const std::string& strInputFile,
 	{
 		try
 		{
+			static UCLIDException ueInsufficientMemory("ELI29530",
+				"Unable to create compressed file. Insufficient memory available.");
+
 			// Validate the input files existence
 			validateFileOrFolderExistence(strInputFile, "ELI28330");
 
@@ -53,10 +56,18 @@ void CompressionEngine::compressFile(const std::string& strInputFile,
 			// create an instance of the gZip compression engine and create
 			// the compressed file
 			CGZip gzip;
-			if (!gzip.Open(strOutputFile.c_str(), CGZip::ArchiveModeWrite))
+			bool bInsufficientMemory = false;
+			if (!gzip.Open(strOutputFile.c_str(), CGZip::ArchiveModeWrite, &bInsufficientMemory))
 			{
-				UCLIDException ue("ELI06748", "Unable to create compressed file!");
-				throw ue;
+				if (bInsufficientMemory)
+				{
+					throw ueInsufficientMemory;
+				}
+				else
+				{
+					UCLIDException ue("ELI06748", "Unable to create compressed file!");
+					throw ue;
+				}
 			}
 
 			// write the compressed output to the file
@@ -109,6 +120,9 @@ void CompressionEngine::decompressFile(const std::string& strInputFile,
 	{
 		try
 		{
+			static UCLIDException ueInsufficientMemory("ELI29531",
+				"Unable to open compressed file. Insufficient memory available.");
+
 			// Check that the input file exists
 			validateFileOrFolderExistence(strInputFile, "ELI28317");
 
@@ -121,8 +135,14 @@ void CompressionEngine::decompressFile(const std::string& strInputFile,
 
 			// open the compressed file
 			CGZip gzip;
-			if (!gzip.Open(strInputFile.c_str(), CGZip::ArchiveModeRead))
+			bool bInsufficientMemory = false;
+			if (!gzip.Open(strInputFile.c_str(), CGZip::ArchiveModeRead, &bInsufficientMemory))
 			{
+				if (bInsufficientMemory)
+				{
+					throw ueInsufficientMemory;
+				}
+
 				// Get the retry count and time out value
 				int iRetryCount, iTimeOut;
 				getFileAccessRetryCountAndTimeout(iRetryCount, iTimeOut);
@@ -132,11 +152,16 @@ void CompressionEngine::decompressFile(const std::string& strInputFile,
 				do
 				{
 					// Attempt to open the file
-					bOpened = gzip.Open(strInputFile.c_str(), CGZip::ArchiveModeRead);
+					bOpened = gzip.Open(strInputFile.c_str(), CGZip::ArchiveModeRead, &bInsufficientMemory);
 
 					// Check if the file was opened
 					if (!bOpened)
 					{
+						if (bInsufficientMemory)
+						{
+							throw ueInsufficientMemory;
+						}
+
 						// Check if the retry limit has been reached
 						if (iRetries > iRetryCount)
 						{
