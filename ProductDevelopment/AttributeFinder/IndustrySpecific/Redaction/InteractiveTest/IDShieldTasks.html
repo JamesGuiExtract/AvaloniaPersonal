@@ -822,6 +822,15 @@
 				advancing to the next document.
       				<li>Confirm that <b>Save without commit</b> is successful even if 
 				required type information has not yet been specified.
+				<li><b>[FlexIDSCore #3333]</b> Open VOA Viewer on save
+				<ul>
+					<li>Modify IDShield.ini so <b>OpenVOAViewerOnShiftSave=1</b>.
+					<li>Verify some images.
+					<li>Confirm that saving a document via <b>CTRL+SHIFT+S</b> opens 
+					the saved VOA file in the VOA Viewer.
+					<li>Confirm that saving a document via <b>SHIFT+Save button</b> 
+					opens the saved VOA file in the VOA Viewer.
+				</ul>
 <p>
 		  	   	<LI><b>[FlexIDSCore #3618]</b> Confirm that a <b>File - Stop processing</b> 
 				menu item allows the user to stop processing.
@@ -976,7 +985,7 @@
 					requiring an extra click.
 				</ul>
 <p>
-		  	   	<LI><b>[FlexIDSCore #3852, #3987]</b> INI file settings
+		  	   	<LI><b>[FlexIDSCore #3852, #3987, #3998, #3999]</b> INI file settings
 				<ul>
 	      				<li>Confirm that <b>IDShield.ini</b> contains 
 					<b>WarnIfNonRedact=1</b> for high confidence data.
@@ -984,6 +993,8 @@
 	      				<li>Toggle an <b>HCData</b> item to <b>off</b>.
 		      			<li>Confirm that a confirmation message is presented to the 
 					verifier.
+					<li>Confirm that a confirmation dialog is presented if the 
+					toggle is done via <b>SPACE</b> or via checkbox.
 		      			<li>Confirm that a confirmation message is <b>not<b> presented 
 					to the verifier if the item is toggled back on.
 	      				<li>Modify <b>IDShield.ini</b> to contain 
@@ -992,8 +1003,17 @@
 	      				<li>Toggle an <b>Clue</b> item to <b>on</b>.
 		      			<li>Confirm that a confirmation message is presented to the 
 					verifier.
+					<li>Confirm that a confirmation dialog is presented if the 
+					toggle is done via <b>SPACE</b> or via checkbox.
 		      			<li>Confirm that a confirmation message is <b>not<b> presented 
 					to the verifier if the item is toggled back off.
+<p>
+					<li>Confirm that deleting a toggled-off manual redaction does not 
+					display a warning message.
+					<li>Confirm that deleting a toggled-on manual redaction does 
+					display a warning message.
+					<li>Confirm that when the redacted checkbox has input focus, 
+					pressing <b>SPACE</b> properly toggles the redacted state.
 				</ul>
 <p>
 		  	   	<LI><b>[FlexIDSCore #3858]</b> Resizing Grid view
@@ -1042,6 +1062,9 @@
 				list of supported redaction types.
 				<LI>Confirm <b>E</b> for apply exemption codes.
 				<LI>Confirm <b>Ctrl+E</b> for apply last exemption code.
+				<li><b>[FlexIDSCore #3443]</b> Confirm that using the shortcut to 
+				apply the last exemption code does not advance to the last page in 
+				the image viewer.
 				<LI>Confirm <b>Ctrl+S</b> for save and commit.
 				<LI>Confirm <b>Tab</b> for advancing to the next grid view item.
 				<LI>Confirm <b>Tab</b> for advancing to the next grid view item when 
