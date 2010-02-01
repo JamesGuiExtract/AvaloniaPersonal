@@ -1,0 +1,148 @@
+<HTML>
+
+<HEAD>
+<TITLE>Run FPS File - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Run FPS File - Testing Checklist<br>
+<IMG src="../../../../UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<h2>NOTE: This utility is designed to exercise an FPS file with a specified document.</h2>
+<hr>
+
+<ol>
+  	<li><h2>Operation and Basic Errors</h2></li>
+  	<ul>
+    		<li>Confirm that <b>RunFPSFile.exe</b> requires a license file.</li>
+		<li>Confirm that the utility supports the following syntax:<br>
+		<b>RunFPSFile.exe &lt;FPSFile&gt; &lt;SourceDocName&gt; [/ignoreDB] 
+		[/queue] [/process] [/forceprocessing] [/ef &lt;filename&gt;]</b>
+    		<li>Confirm that an error message is displayed if only an input FPS file is 
+		defined.</li>
+    		<li>Confirm that an error message is displayed if only a source image is defined.</li>
+    		<li>Confirm that an error message is displayed if no switches are defined.</li>
+		<li>Confirm that a non-default icon is provided.
+<p>
+    		<li><b>/ignoreDB</b> switch
+		<ul>
+			<li>Confirm that an error message is displayed if the <b>/process</b> 
+			switch is also used.
+			<li>Confirm that an error message is displayed if the <b>/queue</b> 
+			switch is also used.
+			<li>Confirm that an error message is displayed if the <b>/forceprocessing</b> 
+			switch is also used.
+		</ul>
+    		<li><b>/process</b> switch
+		<ul>
+			<li>Confirm that an error message is displayed if the <b>/ignoreDB</b> 
+			switch is also used.
+			<li>Confirm that an error message is displayed if the <b>/forceprocessing</b> 
+			switch is also used (without the <b>/queue</b> switch).
+		</ul>
+    		<li><b>/queue</b> switch
+		<ul>
+			<li>Confirm that an error message is displayed if the <b>/ignoreDB</b> 
+			switch is also used.
+		</ul>
+    		<li><b>/forceprocessing</b> switch
+		<ul>
+			<li>Confirm that an error message is displayed if the <b>/ignoreDB</b> 
+			switch is also used.
+			<li>Confirm that an error message is displayed if the <b>/queue</b> switch 
+			<b>is not</b> used.
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>Optional Arguments and Usage</h2></li>
+  	<ul>
+    		<li>Confirm that <b>/ef &lt;filename&gt;</b> is a supported option and 
+		redirects any exceptions to the specified <b>filename</b>.</li>
+    		<li>Confirm that <b>/?</b> is a supported option and displays a
+		Usage message box.</li>
+  	</ul>
+<p>
+  	<li><h2>/ignoreDB Functionality</h2></li>
+  	<ul>
+    		<li>Confirm that no database updates are made.</li>
+    		<li>Confirm that FPS files with the following tasks execute without error
+		<ul>
+			<li>Core: Add watermark
+			<li>Core: Archive or restore associated file
+			<li>Core: Cleanup image
+			<li>Core: Conditionally execute task(s)
+			<li>Core: Convert to searchable PDF
+			<li>Core: Convert VOA to XML
+			<li>Core: Copy, move or delete file
+			<li>Core: Execute rules
+			<li>Core: Launch application
+			<li>Core: OCR document
+			<li>DataEntry: Verify extracted data
+			<li>Redaction: Create metadata xml
+			<li>Redaction: Create redacted image
+			<li>Redaction: Extend redactions to surround context
+			<li>Redaction: Filter ID Shield data file
+			<li>Redaction: Verify sensitive data
+		</ul>
+    		<li>Confirm that FPS files with the following tasks fail and provide a meaningful 
+		error message
+		<ul>
+			<li>Core: Apply Bates number
+			<li>Core: Manage tags
+			<li>Core: Set file-action status in database
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>/queue Functionality</h2></li>
+  	<ul>
+    		<li>Confirm that the document specified by <b>&lt;SourceDocName&gt;</b> is 
+		supplied to the database for the action in the FPS file if it was not already 
+		in the database.</li>
+    		<li>Confirm that if <b>&lt;SourceDocName&gt;</b> is already in the database for 
+		the action in the FPS file, then its status <b>is not</b> changed.
+    		<li>Confirm that if <b>&lt;SourceDocName&gt;</b> is already in the database for 
+		the action in the FPS file, then its status <b>is</b> changed to <b>Pending</b> 
+		if the <b>/forceprocessing</b> switch is included.
+  	</ul>
+<p>
+  	<li><h2>/process Functionality</h2></li>
+  	<ul>
+    		<li>Confirm that if <b>&lt;SourceDocName&gt;</b> is already in the database and 
+		<b>Pending</b> for the action in the FPS file, then its status is changed to 
+		<b>Completed</b> (assuming no processing errors).
+    		<li>Exercise the following scenarios for <b>&lt;SourceDocName&gt;</b> already 
+		in the database and <b>not Pending</b> for the action in the FPS file
+		<ul>
+			<li><b>just /process switch:</b> - exception displayed that 
+			<b>&lt;SourceDocName&gt;</b> not in <b>Pending</b> status
+			<li><b>add /queue switch:</b> - exception displayed that 
+			<b>&lt;SourceDocName&gt;</b> not in <b>Pending</b> status
+			<li><b>add /queue and /forceprocessing switches:</b> - status changes 
+			to <b>Completed</b>
+		</ul>
+    		<li>Exercise the following scenarios for <b>&lt;SourceDocName&gt;</b> not already 
+		in the database
+		<ul>
+			<li><b>just /process switch:</b> - exception displayed that 
+			<b>&lt;SourceDocName&gt;</b> not found in database
+			<li><b>add /queue switch:</b> - <b>&lt;SourceDocName&gt;</b> added to 
+			database, processed, ends with <b>Completed</b> status
+			<li><b>add /queue and /forceprocessing switches:</b> - 
+			<b>&lt;SourceDocName&gt;</b> added to database, processed, ends with 
+			<b>Completed</b> status
+		</ul>
+  	</ul>
+<p>
+  	<li><h2>Error Conditions</h2></li>
+  	<ul>
+  	</ul>
+<p>
+  	<li><h2>Miscellaneous</h2></li>
+  	<ul>
+  	</ul>
+</ol>
+</body>
+</html>
