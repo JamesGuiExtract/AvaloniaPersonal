@@ -154,6 +154,23 @@ void CSpatialString::insert(long nPos,
 				// get the letters associated with the other string
 				ipStringToInsert->GetOCRImageLetterArray(&nNumLetters, (void**)&letters);
 
+				{
+					try
+					{
+					// TODO: Remove this debug code
+					UCLIDException uex("ELI29528", "Application Trace: Letter count.");
+					uex.addDebugInfo("Existing Letters", vecFinalLetters.size());
+					uex.addDebugInfo("Number Of Letters", nNumLetters);
+					uex.addDebugInfo("Size Of Letters",
+						(vecFinalLetters.size() + nNumLetters) * sizeof(CPPLetter), true);
+					uex.log();
+					}
+					catch(...)
+					{
+						// Just eat any exception that occurs logging this data
+					}
+				}
+
 				if (nNumLetters > 0)
 				{	
 					vecLetters.resize(nNumLetters);
