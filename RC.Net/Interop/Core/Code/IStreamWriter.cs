@@ -14,13 +14,13 @@ namespace Extract.Interop
     /// </summary>
     public class IStreamWriter : IDisposable
     {
-        #region IStreamWriter Constants
+        #region Constants
 
         static readonly string _OBJECT_NAME = typeof(IStreamWriter).ToString();
 
-        #endregion IStreamWriter Constants
+        #endregion Constants
 
-        #region IStreamWriter Fields
+        #region Fields
 
         /// <summary>
         /// A <see cref="MemoryStream"/> to which all data is written before it is committed to
@@ -33,9 +33,9 @@ namespace Extract.Interop
         /// </summary>
         readonly BinaryFormatter _formatter = new BinaryFormatter(); 
 
-        #endregion IStreamWriter Fields
+        #endregion Fields
 
-        #region IStreamWriter Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IStreamWriter"/> class.
@@ -61,9 +61,9 @@ namespace Extract.Interop
             }
         }
 
-        #endregion IStreamWriter Constructors
+        #endregion Constructors
 
-        #region IStreamWriter Methods
+        #region Methods
 
         /// <summary>
         /// Writes a {T} to the stream.
@@ -114,6 +114,36 @@ namespace Extract.Interop
                     "Unable to write string.", ex);
                 ee.AddDebugData("Value", value, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Writes an array of strings to the <see cref="IStream"/> object.
+        /// </summary>
+        /// <param name="value">The array of strings to write.</param>
+        public void Write(string[] value)
+        {
+            try
+            {
+                // First stream whether the value is null
+                bool hasValue = value != null;
+                _formatter.Serialize(_stream, hasValue);
+                if (hasValue)
+                {
+                    // Stream the number of strings in the array
+                    _formatter.Serialize(_stream, value.Length);
+
+                    // Stream each string
+                    for (int i = 0; i < value.Length; i++)
+                    {
+                        Write(value[i]);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI29521",
+                    "Unable to write string array.", ex);
             }
         }
 
@@ -233,7 +263,7 @@ namespace Extract.Interop
             }
         }
 
-        #endregion IStreamWriter Methods
+        #endregion Methods
 
         #region IDisposable Members
 
