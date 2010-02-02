@@ -125,7 +125,6 @@ CreateIDSRDTInstallCD: BuildIDSRDTInstall
 
 CopyTestFiles:
 	@ECHO Copying Automated Test Files
-	NET USE T: "$(INSTALL_PRODUCT_DEVELOPMENT_PATH)\AttributeFinder\RDTInstallation\Files\TestFiles"
     @DeleteFiles /S /Q "$(TestingFilesDirectory)\*.*"
 	@XCOPY "$(AFRootDirectory)\AFConditions\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFConditions\AutomatedTest" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\AFCore\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\" /s /e /y /I
@@ -151,7 +150,6 @@ CopyTestFiles:
 	@XCOPY "$(ReusableComponentsRootDirectory)\BaseUtils\AutomatedTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\BaseUtils\AutomatedTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\AutomatedTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\AutomatedTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\VendorSpecificUtils\SafeNetUtils\AutomatedTest\TestFiles\" /s /e /y /I
-	NET USE T: /DELETE
 
 DoEverythingNoGet: DoEverything
 

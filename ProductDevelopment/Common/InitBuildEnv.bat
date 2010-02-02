@@ -17,8 +17,10 @@ IF DEFINED BUILD_FINISHED_INSTALL (
 
 IF DEFINED BUILD_INSTALL_FILES (
 	net use p: %BUILD_INSTALL_FILES%
+	net use t: %BUILD_INSTALL_FILES%\AttributeFinder\RDTInstallation\Files\TestFiles
 ) ELSE (
 	net use p: %INSTALL_PRODUCT_DEVELOPMENT_PATH%
+	net use t: %INSTALL_PRODUCT_DEVELOPMENT_PATH%\AttributeFinder\RDTInstallation\Files\TestFiles
 )
 
 IF DEFINED BUILD_INTERNAL_INSTALLS (
@@ -26,3 +28,4 @@ IF DEFINED BUILD_INTERNAL_INSTALLS (
 ) ELSE (
 	net use s: \\fnp2\internal\Common\Engineering\ProductReleases_InternalUseOnly
 )
+
