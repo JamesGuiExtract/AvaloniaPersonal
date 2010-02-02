@@ -166,7 +166,7 @@ protected:
 	// REQUIRE: Nothing
 	// PROMISE: None.
 	// ARGS:	strText - Single line from UEX file
-	bool parseLine(string strText);
+	bool parseLine(const string& strText);
 
 	//=======================================================================
 	// PURPOSE: Updates iIndex field in ITEMINFO structure for each item in 

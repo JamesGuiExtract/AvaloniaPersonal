@@ -136,9 +136,6 @@ private:
 	// returns without adding anything to the list.
 	void loadStackTraceData(const UCLIDException &ex);
 	
-	// Returns the decrypted string if it was encrypted if not just returns the string.
-	string getDataValue(const string &strEncrpyted);
-
 	// Returns index of selected item in the debug params list
 	// if no item is selected or more than one item is selected -1 will be returned
 	int getSelectedDebugParamsIndex();

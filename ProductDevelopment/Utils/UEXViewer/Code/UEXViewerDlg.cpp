@@ -29,6 +29,7 @@
 #include <FileDialogEx.h>
 #include <ClipboardManager.h>
 #include <SuspendWindowUpdates.h>
+#include <TemporaryFileName.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -189,7 +190,7 @@ int CUEXViewerDlg::GetFirstSelectionIndex()
 	return iFirst;
 }
 //-------------------------------------------------------------------------------------------------
-std::string CUEXViewerDlg::GetWholeExceptionString(int nIndex)
+string CUEXViewerDlg::GetWholeExceptionString(int nIndex)
 {
 	// Validate index
 	int iCount = m_listUEX.GetItemCount();
@@ -216,7 +217,7 @@ std::string CUEXViewerDlg::GetWholeExceptionString(int nIndex)
 	return strFullText;
 }
 //-------------------------------------------------------------------------------------------------
-void CUEXViewerDlg::SelectExceptions(std::vector<int> &rvecExceptionIndices)
+void CUEXViewerDlg::SelectExceptions(vector<int> &rvecExceptionIndices)
 {
 	// Clear selection
 	int iCount = m_listUEX.GetItemCount();
@@ -1541,7 +1542,7 @@ void CUEXViewerDlg::updateEnabledStateForControls()
 	pNextButton->EnableWindow(bEnableNextLogFileNavigation ? TRUE : FALSE);
 }
 //-------------------------------------------------------------------------------------------------
-void CUEXViewerDlg::addExceptions(std::string strUEXFile, bool bReplaceMode)
+void CUEXViewerDlg::addExceptions(string strUEXFile, bool bReplaceMode)
 {
 	// adding exceptions are done in either append mode or replace mode
 	// depending upon the value of bReplaceMode
@@ -1552,8 +1553,7 @@ void CUEXViewerDlg::addExceptions(std::string strUEXFile, bool bReplaceMode)
 		OnEditClear();
 	}
 
-	// Show the wait cursor and suspend window updates
-	CWaitCursor wait;
+	// Suspend window updates
 	SuspendWindowUpdates suspend(*this);
 
 	CStdioFile	file;
@@ -1561,36 +1561,58 @@ void CUEXViewerDlg::addExceptions(std::string strUEXFile, bool bReplaceMode)
 	string	strLine;
 	unsigned long ulLineNum = 0;
 
-	// Open the file
-	if (file.Open( strUEXFile.c_str(), CFile::modeRead ))
-	{
-		CWaitCursor	wait;
+	// Show the wait cursor
+	CWaitCursor wait;
 
+	// Create a temporary file and attempt to copy the uex file to it
+	// By operating on the copy we should be able to read the file without
+	// causing corruption to the underlying exception file if processing is
+	// taking place. [LRCAU #3986]
+	TemporaryFileName tempFile;
+	string strFileToOpen = strUEXFile;
+	try
+	{
+		copyFile(strUEXFile, tempFile.getName());
+		strFileToOpen = tempFile.getName();
+	}
+	catch(...)
+	{
+		// If copy was unsuccessful, just try parsing the actual file
+	}
+
+	// Open the file and read each line from it
+	vector<string> vecLines;
+	if (file.Open( strFileToOpen.c_str(), CFile::modeRead ))
+	{
 		// Read each line of text
 		while (file.ReadString( zLine ) == TRUE)
 		{
-			ulLineNum++;
-			// Parse the text
-			strLine = (LPCTSTR)zLine;
-			if (!parseLine( strLine ))
-			{
-				string strMessage = "Unable to parse current line of the UEX file. "
-					"Would you like to continue parsing the file?\n"
-					"File name: " + strUEXFile + "\nLine Number: " + asString(ulLineNum)
-					+ "\nLine Text: " + (strLine.empty() ? "<Blank Line>" : strLine);
+			vecLines.push_back((LPCTSTR)zLine);
+		}
 
-				// Prompt the user about the unparseable line
-				if (AfxMessageBox(strMessage.c_str(), MB_YESNO | MB_ICONWARNING) == IDNO)
-				{
-					// User does not want to continue, break from the loop
-					break;
-				}
+		file.Close();
+	}
+
+	// Parse each line from the UEX file
+	for (size_t ulLineNum = 0; ulLineNum < vecLines.size(); ulLineNum++)
+	{
+		const string& strLine = vecLines[ulLineNum];
+
+		if (!parseLine( strLine ))
+		{
+			string strMessage = "Unable to parse current line of the UEX file. "
+				"Would you like to continue parsing the file?\n"
+				"File name: " + strUEXFile + "\nLine Number: " + asString(ulLineNum+1)
+				+ "\nLine Text: " + (strLine.empty() ? "<Blank Line>" : strLine);
+
+			// Prompt the user about the unparseable line
+			if (AfxMessageBox(strMessage.c_str(), MB_YESNO | MB_ICONWARNING) == IDNO)
+			{
+				// User does not want to continue, break from the loop
+				break;
 			}
 		}
 	}
-
-	// Close the file
-	file.Close();
 
 	// if we are in replace mode, set the UEX file as the new current file
 	if (bReplaceMode)
@@ -1658,7 +1680,7 @@ void CUEXViewerDlg::setNewCurrentFile(string strNewCurrentFile)
 	updateEnabledStateForControls();
 }
 //-------------------------------------------------------------------------------------------------
-bool CUEXViewerDlg::parseLine(std::string strText)
+bool CUEXViewerDlg::parseLine(const string& strText)
 {
 	try
 	{
@@ -1766,7 +1788,7 @@ void CUEXViewerDlg::refreshIndices()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-long CUEXViewerDlg::getColumnWidth(std::string strColumn)
+long CUEXViewerDlg::getColumnWidth(string strColumn)
 {
 	long lWidth = 80;
 
@@ -1788,7 +1810,7 @@ long CUEXViewerDlg::getColumnWidth(std::string strColumn)
 	return lWidth;
 }
 //-------------------------------------------------------------------------------------------------
-void CUEXViewerDlg::setItemText(int iIndex, int iColumn, std::string strText)
+void CUEXViewerDlg::setItemText(int iIndex, int iColumn, string strText)
 {
 	// Write the text to the specified row and column
 	m_listUEX.SetItemText( iIndex, iColumn, strText.c_str() );

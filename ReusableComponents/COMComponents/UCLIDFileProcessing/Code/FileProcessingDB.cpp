@@ -3284,7 +3284,8 @@ STDMETHODIMP CFileProcessingDB::ModifyTag(BSTR bstrOldTagName, BSTR bstrNewTagNa
 		string strQueryBase = "SELECT [TagName], [TagDescription] FROM [Tag] WHERE [TagName] = '";
 
 		// If specifying new tag name, check for new tag name existence
-		if (!strNewTagName.empty())
+		// [LRCAU #5693] - Only check existence if the tag name is different
+		if (!strNewTagName.empty() && !stringCSIS::sEqual(strOldTagName, strNewTagName))
 		{
 			string strTempQuery = strQueryBase + strNewTagName + "'";
 			_RecordsetPtr ipTemp(__uuidof(Recordset));

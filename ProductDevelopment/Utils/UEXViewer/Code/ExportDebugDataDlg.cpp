@@ -226,8 +226,11 @@ void CExportDebugDataDlg::getDebugDataFromException(vector<string> &rvecDebugPar
 			// Get the Pair
 			ValueTypePair &pair = vecDebug[i].GetPair();
 
+			// Get the value (decrypted if allowed) [LRCAU #5696]
+			string strValue = UCLIDException::sGetDataValue(pair.getValueAsString());
+
 			// Add the value to the vector
-			rvecDebugParams.push_back(pair.getValueAsString());
+			rvecDebugParams.push_back(strValue);
 		}
 	}
 

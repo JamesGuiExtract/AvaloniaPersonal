@@ -400,6 +400,11 @@ public:
 	//			winerror.h (e.g. if hr == E_ACCESSDENIED rstrErrorLabel = "E_ACCESSDENIED")
 	void setErrorLabel(HRESULT hr, string& rstrErrorLabel);
 	//----------------------------------------------------------------------------------------------
+	// PURPOSE: To decrypt the encrypted data value if decryption is allowed, if
+	//			decryption is not allowed returns gstrENCRYPTED_INDICATOR.
+	//			If the value is not encrypted returns the value.
+	static string sGetDataValue(const string& strEncryptedValue);
+	//----------------------------------------------------------------------------------------------
 	// This class initializes the static critical section, and any other static initialization code
 	// in a thread safe manner
 	friend class UCLIDExceptionInitializer;

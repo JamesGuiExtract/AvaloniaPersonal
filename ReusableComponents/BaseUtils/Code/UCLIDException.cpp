@@ -1562,6 +1562,62 @@ void UCLIDException::setErrorLabel(HRESULT hr, string& rstrErrorLabel)
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20288");
 }
 //-------------------------------------------------------------------------------------------------
+string UCLIDException::sGetDataValue(const string& strEncryptedValue)
+{
+	// Make a working copy so if it fails we can return the original
+	string strValue = strEncryptedValue;
+
+	// Check Value for Encryption
+	if (strValue.find( gstrENCRYPTED_PREFIX.c_str(), 0 ) == 0)
+	{
+		// Check Internal Tools license
+		if (isInternalToolsLicensed())
+		{
+			// Decrypt the value
+			try
+			{
+				try
+				{
+					///////////////////////////////////
+					// Licensed, provide decrypted text
+					///////////////////////////////////
+					// Remove encryption indicator prefix
+					strValue.erase( 0, gstrENCRYPTED_PREFIX.length() );
+
+					// Create encrypted ByteStream from the hex string
+					ByteStream bsInput(strValue);
+
+					// Decrypt the ByteStream
+					ByteStream decryptedBytes;
+					EncryptionEngine ee;
+					ByteStream passwordBytes;
+
+					getUEPassword( passwordBytes );
+
+					ee.decrypt( decryptedBytes, bsInput, passwordBytes );
+
+					// Retrieve the final string
+					ByteStreamManipulator bsmFinal(ByteStreamManipulator::kRead, decryptedBytes);
+					bsmFinal >> strValue;
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI21609")
+			}
+			catch(UCLIDException ue)
+			{
+				UCLIDException uex("ELI21613", "Unable to decrypt value", ue);
+				uex.log();
+				strValue = strEncryptedValue;
+			}
+		}
+		else
+		{
+			// Not licensed, replace text with Encrypted indicator
+			strValue = gstrENCRYPTED_INDICATOR;
+		}
+	}
+	return strValue;
+}
+//-------------------------------------------------------------------------------------------------
 void UCLIDException::loadFromStream(ByteStream& rByteStream)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI00516");

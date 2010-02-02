@@ -562,7 +562,7 @@ void UCLIDExceptionDetailsDlg::loadExceptionData(const UCLIDException &ex)
 		}
 
 		// Check Value for Encryption
-		strValue = getDataValue(strValue);
+		strValue = UCLIDException::sGetDataValue(strValue);
 
 		// now you have got Name, Type and Value
 		//load them into the debug parameters list control
@@ -596,67 +596,12 @@ void UCLIDExceptionDetailsDlg::loadStackTraceData(const UCLIDException &ex)
 	for each ( string s in vecStackTrace )
 	{
 		// Insert the stack trace line into the list.
-		m_StackTraceListCtrl.InsertItem(m_StackTraceListCtrl.GetItemCount(), getDataValue(s).c_str());
+		m_StackTraceListCtrl.InsertItem(m_StackTraceListCtrl.GetItemCount(),
+			UCLIDException::sGetDataValue(s).c_str());
 	}
 
 	// Set the column width to the size of the widest item.
 	m_StackTraceListCtrl.SetColumnWidth(giSTACK_TRACE_LINE_COLUMN, LVSCW_AUTOSIZE);
-}
-//-------------------------------------------------------------------------------------------------
-string UCLIDExceptionDetailsDlg::getDataValue(const string &strEncrypted)
-{
-	// Make a working copy so if it fails we can return the original
-	string strValue = strEncrypted;
-
-	// Check Value for Encryption
-	if (strValue.find( gstrENCRYPTED_PREFIX.c_str(), 0 ) == 0)
-	{
-		// Check Internal Tools license
-		if (isInternalToolsLicensed())
-		{
-			// Decrypt the value
-			try
-			{
-				try
-				{
-					///////////////////////////////////
-					// Licensed, provide decrypted text
-					///////////////////////////////////
-					// Remove encryption indicator prefix
-					strValue.erase( 0, gstrENCRYPTED_PREFIX.length() );
-
-					// Create encrypted ByteStream from the hex string
-					ByteStream bsInput(strValue);
-
-					// Decrypt the ByteStream
-					ByteStream decryptedBytes;
-					EncryptionEngine ee;
-					ByteStream passwordBytes;
-
-					getUEPassword( passwordBytes );
-
-					ee.decrypt( decryptedBytes, bsInput, passwordBytes );
-
-					// Retrieve the final string
-					ByteStreamManipulator bsmFinal(ByteStreamManipulator::kRead, decryptedBytes);
-					bsmFinal >> strValue;
-				}
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI21609")
-			}
-			catch(UCLIDException ue)
-			{
-				UCLIDException uex("ELI21613", "Unable to decrypt value", ue);
-				uex.log();
-				strValue = strEncrypted;
-			}
-		}
-		else
-		{
-			// Not licensed, replace text with Encrypted indicator
-			strValue = gstrENCRYPTED_INDICATOR;
-		}
-	}
-	return strValue;
 }
 //-------------------------------------------------------------------------------------------------
 void UCLIDExceptionDetailsDlg::resizeForNonInternalUse()
@@ -745,9 +690,9 @@ void UCLIDExceptionDetailsDlg::copyDebugParamsColumnToClipboard(int iColumn)
 		// Get the selected column
 		string strValueText = m_debugParamsListCtrl.GetItemText(iSelectedItem, iColumn);
 		
-		// put value on the clipboard, if the value is encrypted the getDataValue will decryt it if
-		// licensing allows it
-		clipboardMgr.writeText(getDataValue(strValueText));
+		// put value on the clipboard, if the value is encrypted the
+		// sGetDataValue will decrypt it if licensing allows it
+		clipboardMgr.writeText(UCLIDException::sGetDataValue(strValueText));
 	}
 }
 //-------------------------------------------------------------------------------------------------
