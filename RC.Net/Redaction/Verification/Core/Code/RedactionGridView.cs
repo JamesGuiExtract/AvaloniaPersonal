@@ -1773,6 +1773,26 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Handles the <see cref="Imaging.Forms.ImageViewer.ImageFileClosing"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="Imaging.Forms.ImageViewer.ImageFileClosing"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="Imaging.Forms.ImageViewer.ImageFileClosing"/> event.</param>
+        void HandleImageFileClosing(object sender, ImageFileClosingEventArgs e)
+        {
+            try
+            {
+                // Deselect layer objects before image closes [FIDSC #4002]
+                _imageViewer.LayerObjects.Selection.Clear();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29532", ex);
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="LayerObjectsCollection.DeletingLayerObjects"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
@@ -1783,7 +1803,18 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                if (WarnIfSettingRedactedState(false))
+                // Only warn if deleting redactions [FIDSC #4002]
+                bool deletingRedactions = false;
+                foreach (LayerObject layerObject in e.LayerObjects)
+                {
+                    if (layerObject is RedactionLayerObject)
+                    {
+                        deletingRedactions = true;
+                        break;
+                    }
+                }
+
+                if (deletingRedactions && WarnIfSettingRedactedState(false))
                 {
                     e.Cancel = true;
                 }
@@ -2071,6 +2102,7 @@ namespace Extract.Redaction.Verification
                     if (_imageViewer != null)
                     {
                         _imageViewer.ImageFileChanged -= HandleImageFileChanged;
+                        _imageViewer.ImageFileClosing -= HandleImageFileClosing;
                         _imageViewer.LayerObjects.DeletingLayerObjects -= HandleDeletingLayerObjects;
                         _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
                         _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
@@ -2087,6 +2119,7 @@ namespace Extract.Redaction.Verification
                     if (_imageViewer != null)
                     {
                         _imageViewer.ImageFileChanged += HandleImageFileChanged;
+                        _imageViewer.ImageFileClosing += HandleImageFileClosing;
                         _imageViewer.LayerObjects.DeletingLayerObjects += HandleDeletingLayerObjects;
                         _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
                         _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
