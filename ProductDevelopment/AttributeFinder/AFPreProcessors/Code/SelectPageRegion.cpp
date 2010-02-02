@@ -1860,7 +1860,7 @@ void CSelectPageRegion::excludeImageZone(const string& strSourceImage, const str
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28131");
 }
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CSelectPageRegion::buildRasterZonesForExcludedRegion(long nTop, long nLeft,
+IIUnknownVectorPtr CSelectPageRegion::buildRasterZonesForExcludedRegion(long nLeft, long nTop,
 																	   long nRight, long nBottom,
 																	   long nWidth, long nHeight,
 																	   long nPageNum)
