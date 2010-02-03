@@ -59,14 +59,14 @@ void CProgressStatusMFCDlg::DoDataExchange(CDataExchange* pDX)
 void CProgressStatusMFCDlg::setProgressStatusObject(UCLID_COMUTILSLib::IProgressStatusPtr ipProgressStatus)
 {
 	// Update the reference to the progress status object
-	CSingleLock lock(&m_mutexProgressStatus);
+	CSingleLock lock(&m_mutexProgressStatus, TRUE);
 	m_ipProgressStatus = ipProgressStatus;
 }
 //--------------------------------------------------------------------------------------------------
 UCLID_COMUTILSLib::IProgressStatusPtr CProgressStatusMFCDlg::getProgressStatusObject()
 {
 	// Return a reference to the progress status object
-	CSingleLock lock(&m_mutexProgressStatus);
+	CSingleLock lock(&m_mutexProgressStatus, TRUE);
 	return m_ipProgressStatus;
 }
 
@@ -265,7 +265,7 @@ void CProgressStatusMFCDlg::refreshProgressStatus()
 
 	// Lock access to the progress status object so that it can't be modified during the
 	// refresh operation
-	CSingleLock lock(&m_mutexProgressStatus);
+	CSingleLock lock(&m_mutexProgressStatus, TRUE);
 
 	UCLID_COMUTILSLib::IProgressStatusPtr ipCurrentLevelPS = m_ipProgressStatus;
 	for (int iLevel = 0; iLevel < m_nNumProgressLevels; iLevel++)

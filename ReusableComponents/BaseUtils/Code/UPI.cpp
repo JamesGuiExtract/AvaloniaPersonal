@@ -92,40 +92,47 @@ const string& UPI::getStartDate() const
 //-------------------------------------------------------------------------------------------------
 const UPI& UPI::getCurrentProcessUPI()
 {
-	static CMutex sMutex;
-	CSingleLock lg(&sMutex);
+	static bool sbInitialized = false;
 
-	// create the UPI for the current process if it already hasnt' been created.
+	// create the UPI for the current process if it hasn't already been created.
 	static string strUPI;
-	if (strUPI.empty())
+	if (!sbInitialized)
 	{
-		// append the computer name
-		const string strSLASH = "\\";
-		strUPI += getComputerName() + strSLASH;
+		static CMutex sMutex;
+		CSingleLock lg(&sMutex, TRUE);
 
-		// append the application name
-		string strAppName;
-		try
+		if (!sbInitialized)
 		{
-			strAppName = getFileNameWithoutExtension(__argv[0]);
+			// append the computer name
+			const string strSLASH = "\\";
+			strUPI += getComputerName() + strSLASH;
+
+			// append the application name
+			string strAppName;
+			try
+			{
+				strAppName = getFileNameWithoutExtension(__argv[0]);
+			}
+			catch (...)
+			{
+				strAppName = "Unknown";
+			}
+			strUPI += strAppName + strSLASH;
+
+			// append the process id
+			strUPI += getCurrentProcessID() + strSLASH;
+
+			// append the current date
+			CTime currentTime = CTime::GetCurrentTime();
+			string strTemp;
+			strTemp = LPCTSTR(currentTime.Format("%m%d%Y"));
+			strUPI += strTemp + strSLASH;
+
+			// append the current time
+			strUPI += getTimeAsString();
+
+			sbInitialized = true;
 		}
-		catch (...)
-		{
-			strAppName = "Unknown";
-		}
-		strUPI += strAppName + strSLASH;
-
-		// append the process id
-		strUPI += getCurrentProcessID() + strSLASH;
-
-		// append the current date
-		CTime currentTime = CTime::GetCurrentTime();
-		string strTemp;
-		strTemp = currentTime.Format("%m%d%Y").operator LPCTSTR();
-		strUPI += strTemp + strSLASH;
-
-		// append the current time
-		strUPI += getTimeAsString();
 	}
 
 	// return the UPI

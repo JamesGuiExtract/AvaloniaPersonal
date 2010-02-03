@@ -50,25 +50,31 @@ PSUpdateThreadManager::PSUpdateThreadManager(IProgressStatus* pProgressStatus, I
 			m_lCompletedProgressItems, m_lTotalProgressItems, VARIANT_FALSE);
 
 		// initialize the static array of process names
-		static CMutex localMutex;
-		CSingleLock lock(&localMutex);
-		if (ms_vecstrProcessName.empty())
+		static bool sbInitialized = false;
+		if (!sbInitialized)
 		{
-			ms_vecstrProcessName.resize(PID_SCANNER_WARMUP + 1);
-			ms_vecstrProcessName[PID_IMGINPUT] =       "Loading Image";
-			ms_vecstrProcessName[PID_IMGSAVE] =        "Saving Image";
-			ms_vecstrProcessName[PID_IMGPREPROCESS] =  "Pre-Processing Image";
-			ms_vecstrProcessName[PID_DECOMPOSITION] =  "Performing Page Decomposition";
-			ms_vecstrProcessName[PID_RECOGNITION1] =   "Performing First Recognition Pass";
-			ms_vecstrProcessName[PID_RECOGNITION2] =   "Performing Second Recognition Pass";
-			ms_vecstrProcessName[PID_RECOGNITION3] =   "Performing Third Recognition Pass";
-			ms_vecstrProcessName[PID_SPELLING] =       "Spell Checking";
-			ms_vecstrProcessName[PID_FORMATTING] =     "Formatting Image";
-			ms_vecstrProcessName[PID_WRITEFOUTDOC] =   "Writing Recognized Text";
-			ms_vecstrProcessName[PID_CONVERTIMG] =     "Writing Graphical Zones";
-			ms_vecstrProcessName[PID_SCANNER_WARMUP] = "Scanner Warming Up";
+			static CMutex localMutex;
+			CSingleLock lock(&localMutex, TRUE);
+
+			if (!sbInitialized)
+			{
+				ms_vecstrProcessName.resize(PID_SCANNER_WARMUP + 1);
+				ms_vecstrProcessName[PID_IMGINPUT] =       "Loading Image";
+				ms_vecstrProcessName[PID_IMGSAVE] =        "Saving Image";
+				ms_vecstrProcessName[PID_IMGPREPROCESS] =  "Pre-Processing Image";
+				ms_vecstrProcessName[PID_DECOMPOSITION] =  "Performing Page Decomposition";
+				ms_vecstrProcessName[PID_RECOGNITION1] =   "Performing First Recognition Pass";
+				ms_vecstrProcessName[PID_RECOGNITION2] =   "Performing Second Recognition Pass";
+				ms_vecstrProcessName[PID_RECOGNITION3] =   "Performing Third Recognition Pass";
+				ms_vecstrProcessName[PID_SPELLING] =       "Spell Checking";
+				ms_vecstrProcessName[PID_FORMATTING] =     "Formatting Image";
+				ms_vecstrProcessName[PID_WRITEFOUTDOC] =   "Writing Recognized Text";
+				ms_vecstrProcessName[PID_CONVERTIMG] =     "Writing Graphical Zones";
+				ms_vecstrProcessName[PID_SCANNER_WARMUP] = "Scanner Warming Up";
+
+				sbInitialized = true;
+			}
 		}
-		lock.Unlock();
 		
 		// In order to marshall the OCR engine and progress status interface pointers into the status
 		// update thread, add entries into a global interface table.
