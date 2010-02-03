@@ -20,7 +20,8 @@
     		<li>Confirm that <b>RunFPSFile.exe</b> requires a license file.</li>
 		<li>Confirm that the utility supports the following syntax:<br>
 		<b>RunFPSFile.exe &lt;FPSFile&gt; &lt;SourceDocName&gt; [/ignoreDB] 
-		[/queue] [/process] [/forceprocessing] [/ef &lt;filename&gt;]</b>
+		[/queue] [/priority <i>numericvalue</i>] [/process] [/forceprocessing] 
+		[/ef &lt;filename&gt;]</b>
     		<li>Confirm that an error message is displayed if only an input FPS file is 
 		defined.</li>
     		<li>Confirm that an error message is displayed if only a source image is defined.</li>
@@ -35,12 +36,16 @@
 			switch is also used.
 			<li>Confirm that an error message is displayed if the <b>/forceprocessing</b> 
 			switch is also used.
+			<li>Confirm that an error message is displayed if the <b>/priority</b> 
+			switch is also used.
 		</ul>
     		<li><b>/process</b> switch
 		<ul>
 			<li>Confirm that an error message is displayed if the <b>/ignoreDB</b> 
 			switch is also used.
 			<li>Confirm that an error message is displayed if the <b>/forceprocessing</b> 
+			switch is also used (without the <b>/queue</b> switch).
+			<li>Confirm that an error message is displayed if the <b>/priority</b> 
 			switch is also used (without the <b>/queue</b> switch).
 		</ul>
     		<li><b>/queue</b> switch
@@ -54,6 +59,15 @@
 			switch is also used.
 			<li>Confirm that an error message is displayed if the <b>/queue</b> switch 
 			<b>is not</b> used.
+		</ul>
+    		<li><b>/priority</b> switch
+		<ul>
+			<li>Confirm that an error message is displayed if the <b>/ignoreDB</b> 
+			switch is also used.
+			<li>Confirm that an error message is displayed if the <b>/queue</b> switch 
+			<b>is not</b> used.
+			<li>Confirm that an error message is displayed if the <b>/priority</b> 
+			setting is less than <b>1</b> or greater than <b>5</b>.
 		</ul>
   	</ul>
 <p>
@@ -106,6 +120,19 @@
     		<li>Confirm that if <b>&lt;SourceDocName&gt;</b> is already in the database for 
 		the action in the FPS file, then its status <b>is</b> changed to <b>Pending</b> 
 		if the <b>/forceprocessing</b> switch is included.
+<p>
+		<li>Confirm that a document supplied with <b>/priority 1</b> is added to 
+		the database with <b>Low</b> priority.
+		<li>Confirm that a document supplied with <b>/priority 2</b> is added to 
+		the database with <b>Below normal</b> priority.
+		<li>Confirm that a document supplied with <b>/priority 3</b> is added to 
+		the database with <b>Normal</b> priority.
+		<li>Confirm that a document supplied with <b>/priority 4</b> is added to 
+		the database with <b>Above normal</b> priority.
+		<li>Confirm that a document supplied with <b>/priority 5</b> is added to 
+		the database with <b>High</b> priority.
+		<li>Confirm that a document supplied <b>without a /priority</b> setting is 
+		added to the database with <b>Normal</b> priority.
   	</ul>
 <p>
   	<li><h2>/process Functionality</h2></li>
@@ -136,12 +163,10 @@
 		</ul>
   	</ul>
 <p>
-  	<li><h2>Error Conditions</h2></li>
-  	<ul>
-  	</ul>
-<p>
   	<li><h2>Miscellaneous</h2></li>
   	<ul>
+		<li><b>[LegacyRC #5697]</b> Confirm that processing a file <b>ignores</b> any 
+		scheduled processing settings in the associated FPS file.
   	</ul>
 </ol>
 </body>
