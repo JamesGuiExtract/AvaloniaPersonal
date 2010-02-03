@@ -12,6 +12,7 @@
 #include <ComponentLicenseIDs.h>
 #include <ThreadSafeLogFile.h>
 #include <ScheduleGrid.h>
+#include <ValueRestorer.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -67,7 +68,8 @@ CFileProcessingMgmtRole::CFileProcessingMgmtRole()
 : m_pRecordMgr(NULL),
   m_ipRoleNotifyFAM(NULL),
   m_threadDataSemaphore(2,2),
-  m_bProcessing(false)
+  m_bProcessing(false),
+  m_bProcessingSingleFile(false)
 {
 	try
 	{
@@ -1136,6 +1138,82 @@ STDMETHODIMP CFileProcessingMgmtRole::put_LimitProcessingToSchedule(VARIANT_BOOL
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28176");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord,
+										IFileProcessingDB* pFPDB, IFAMTagManager* pFAMTagManager)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (m_bProcessing || m_bProcessingSingleFile)
+		{
+			throw new UCLIDException("ELI29554", "Cannot process single file when processing "
+				"is already in progress!");
+		}
+
+		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI29536", ipFileRecord != NULL);
+
+		m_pDB = pFPDB;
+		ASSERT_ARGUMENT("ELI29552", m_pDB != NULL);
+
+		m_pFAMTagManager = pFAMTagManager;
+		ASSERT_ARGUMENT("ELI29553", m_pFAMTagManager != NULL);
+
+		// Ensure m_bProcessingSingleFile will be reset to false.
+		ValueRestorer<volatile bool> restorer(m_bProcessingSingleFile, false);
+
+		m_bProcessingSingleFile = true;
+
+		// Set action ID to the record manager
+		m_pRecordMgr->setActionID(ipFileRecord->ActionID);
+
+		// Clear the record manager to ensure no files except the one specified will be processed.
+		m_pRecordMgr->clear(false);
+
+		// Use the configured skipped file settings.
+		m_pRecordMgr->setProcessSkippedFiles(m_bProcessSkippedFiles);
+		m_pRecordMgr->setSkippedForCurrentUser(!m_bSkippedForAnyUser);
+
+		// Do not keep processing regardless of the configured setting.
+		m_pRecordMgr->setKeepProcessingAsAdded(false);
+
+		// Create a FileProcessingRecord for the file and add it to the record manager's queue.
+		FileProcessingRecord task(ipFileRecord);
+		m_pRecordMgr->push(task);
+
+		// Create and initialize a processing thread data struct needed by processTask.
+		ProcessingThreadData threadData;
+		threadData.m_pFPMgmtRole = this;
+
+		// Initialize the task executor
+		UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
+			threadData.m_ipTaskExecutor;
+		ASSERT_RESOURCE_ALLOCATION("ELI29555", ipExecutor != NULL);
+		ipExecutor->Init(m_ipFileProcessingTasks, m_pRecordMgr->getActionID(), getFPMDB(),
+			getFAMTagManager());
+
+		// Process the file
+		processTask(task, &threadData);
+
+		ipExecutor->Close();
+
+		m_bProcessingSingleFile = false;
+
+		// Exceptions that occured while processing a file in processTask will not be thrown out.
+		// Throw the exception here if necessary.
+		if (!task.m_strException.empty())
+		{
+			UCLIDException ue;
+			ue.createFromString("ELI29557", task.m_strException);
+			throw ue;
+		}
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29533");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private methods
@@ -1413,7 +1491,7 @@ EFileProcessingResult CFileProcessingMgmtRole::startFileProcessingChain(FileProc
 		ASSERT_RESOURCE_ALLOCATION("ELI17945", ipExecutor != NULL);
 
 		// If m_bProcessing is false it means processing has been stopped.
-		if (!m_bProcessing)
+		if (!m_bProcessing && !m_bProcessingSingleFile)
 		{
 			return kProcessingCancelled;
 		}
@@ -1967,6 +2045,12 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 {
+	if (m_bProcessingSingleFile)
+	{
+		throw new UCLIDException("ELI29556", "Cannot start processing; currently processing a file "
+			"independently!");
+	}
+
 	// Obtain this lock since both semaphores are needed
 	CSingleLock lockThread(&m_threadLock, TRUE );
 

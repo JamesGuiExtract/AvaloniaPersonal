@@ -5090,6 +5090,75 @@ STDMETHODIMP CFileProcessingDB::GetSkipAuthenticationForServices(VARIANT_BOOL* p
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29238");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFileRecord(BSTR bstrFile, IFileRecord** ppFileRecord)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI29546",  ppFileRecord != NULL);
+
+		validateLicense();
+
+		// Replace any occurences of ' with '' this is because SQL Server use the ' to indicate the
+		// beginning and end of a string
+		string strFileName = asString(bstrFile);
+		replaceVariable(strFileName, "'", "''");
+
+		// Open a recordset that contain only the record (if it exists) with the given filename
+		string strFileSQL = "SELECT * FROM FAMFile WHERE FileName = '" + strFileName + "'";
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database for this instance
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI29547", ipFileSet != NULL);
+
+		// Execute the query to find the file in the database
+		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockReadOnly, adCmdText);
+
+		if (!asCppBool(ipFileSet->adoEOF))
+		{
+			// Get the fields from the file set
+			FieldsPtr ipFields = ipFileSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI29548", ipFields != NULL);
+
+			// Get the file record from the fields
+			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
+			ASSERT_RESOURCE_ALLOCATION("ELI29549", ipFileRecord != NULL);
+
+			// Get and return the appropriate file record
+			ipFileRecord = getFileRecordFromFields(ipFields);
+			ASSERT_RESOURCE_ALLOCATION("ELI29550", ipFileRecord != NULL);
+
+			*ppFileRecord = (IFileRecord*)ipFileRecord.Detach();
+		}
+		else
+		{
+			// If no entry was found in the database, return NULL
+			*ppFileRecord = NULL;
+		}
+
+		END_CONNECTION_RETRY(ipConnection, "ELI29551");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29238");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

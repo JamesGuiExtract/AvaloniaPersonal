@@ -112,6 +112,8 @@ public:
 	STDMETHOD(put_ProcessingSchedule)(IVariantVector* pHoursSchedule);
 	STDMETHOD(get_LimitProcessingToSchedule)(VARIANT_BOOL *pbVal);
 	STDMETHOD(put_LimitProcessingToSchedule)(VARIANT_BOOL bVal);
+	STDMETHOD(ProcessSingleFile)(IFileRecord* pFileRecord, IFileProcessingDB *pFPDB,
+		IFAMTagManager* pFAMTagManager);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -149,8 +151,11 @@ private:
 	// Variables
 	/////////////
 
-	// a flag to indicate the process in on going
+	// A flag to indicate the process in on going
 	volatile bool m_bProcessing;
+
+	// A flag to indicate a single file is currently being processed via ProcessSingleFile
+	volatile bool m_bProcessingSingleFile;
 
 	// Event used to signal that processing should be resumed after a pause
 	Win32Event m_eventResume;

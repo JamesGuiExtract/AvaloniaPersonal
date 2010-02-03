@@ -90,6 +90,8 @@ public:
 	STDMETHOD(GetExpandedActionName)(BSTR *pbstrAction);
 	STDMETHOD(put_NumberOfDocsToProcess)(long lNumberOfDocsToProcess);
 	STDMETHOD(get_IsUserAuthenticationRequired)(VARIANT_BOOL* pvbIsAuthenticationRequired);
+	STDMETHOD(ProcessSingleFile)(BSTR bstrSourceDocName,VARIANT_BOOL vbQueue,
+		VARIANT_BOOL vbProcess, VARIANT_BOOL vbForceProcessing);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);

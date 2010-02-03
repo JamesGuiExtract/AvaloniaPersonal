@@ -1004,6 +1004,118 @@ STDMETHODIMP CFileProcessingManager::get_IsUserAuthenticationRequired(
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29191");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, VARIANT_BOOL vbQueue,
+		VARIANT_BOOL vbProcess, VARIANT_BOOL vbForceProcessing)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		try
+		{
+			try
+			{
+				validateLicense();
+
+				bool bQueue = asCppBool(vbQueue);
+				bool bProcess = asCppBool(vbProcess);
+				bool bForceProcessing = asCppBool(vbForceProcessing);
+
+				if (bForceProcessing && !bQueue)
+				{
+					UCLIDException ue("ELI29543",
+						"Cannot force file status to pending if not queueing!");
+					throw ue;
+				}
+
+				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord = NULL;
+				UCLID_FILEPROCESSINGLib::EActionStatus easCurrent =
+					UCLID_FILEPROCESSINGLib::kActionUnattempted;
+			
+				if (bQueue)
+				{
+					// If queueing, attempt to add the file to the database.
+					VARIANT_BOOL vbAlreadyExists;
+					ipFileRecord = getFPMDB()->AddFile(bstrSourceDocName, m_strAction.c_str(),
+						UCLID_FILEPROCESSINGLib::kPriorityDefault, vbForceProcessing, VARIANT_FALSE,
+						UCLID_FILEPROCESSINGLib::kActionPending, &vbAlreadyExists, &easCurrent);
+
+					// If we are forcing processing or the file didn't already exist, the file status
+					// is now pending... otherwise the status is the same as it was at the time of
+					// the AddFile call.
+					if (bForceProcessing || !asCppBool(vbAlreadyExists))
+					{
+						easCurrent = UCLID_FILEPROCESSINGLib::kActionPending;
+					}
+				}
+				else if (bProcess)
+				{
+					// If not queueing, but processing, attempt to retrieve an existing record for this
+					// file.
+					ipFileRecord = getFPMDB()->GetFileRecord(bstrSourceDocName);
+
+					if (ipFileRecord != NULL)
+					{
+						// If a record was found, retrieve the current actions status of the file.
+						easCurrent = getFPMDB()->GetFileStatus(ipFileRecord->FileID, m_strAction.c_str());
+					}
+				}
+
+				if (bProcess)
+				{
+					if (ipFileRecord == NULL)
+					{
+						UCLIDException ue("ELI29544", "The file cannot be processed because it has not "
+							"been queued!");
+						throw ue;
+					}
+					else
+					{
+						bool bProcessSkippedFiles = asCppBool(m_ipFPMgmtRole->ProcessSkippedFiles);
+
+						// TODO: Special handling for running skipped files for all users?
+						
+						// If file is not in the correct state to process (depending on the skipped file
+						// setting), throw an exception.
+						if ((bProcessSkippedFiles && easCurrent != UCLID_FILEPROCESSINGLib::kActionSkipped) ||
+							(!bProcessSkippedFiles && easCurrent != UCLID_FILEPROCESSINGLib::kActionPending))
+						{
+							UCLIDException ue("ELI29545", string("The file cannot be processed because it ") +
+								"is not currently " + (bProcessSkippedFiles ? "skipped!" : "pending!"));
+							ue.addDebugInfo("Current Status", asString(getFPMDB()->AsStatusString(easCurrent)));
+							throw ue;
+						}
+					}
+
+					// m_ipFPMgmtRole needs a record manager to be able to process files.
+					m_ipFPMgmtRole->SetRecordMgr(&m_recordMgr);
+
+					// Process the specified file only (don't go to the database to retrieve any other
+					// pending files regardless of priority).
+					m_ipFPMgmtRole->ProcessSingleFile(ipFileRecord, getFPMDB(), m_ipFAMTagManager);
+				}
+
+				return S_OK;
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29561");
+		}
+		catch (UCLIDException& ue)
+		{
+			try
+			{
+				ue.addDebugInfo("Database Server", asString(getFPMDB()->DatabaseServer));
+				ue.addDebugInfo("Database Name", asString(getFPMDB()->DatabaseName));
+				ue.addDebugInfo("Action", m_strAction);
+				ue.addDebugInfo("Filename", asString(bstrSourceDocName));
+			}
+			catch (...){}
+
+			throw ue;
+		}
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29562");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IRoleNotifyFAM Methods
