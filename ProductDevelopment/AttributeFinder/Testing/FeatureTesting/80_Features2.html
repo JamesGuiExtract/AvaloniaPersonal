@@ -170,7 +170,19 @@
 <p>
   	   	<LI><b>Automatic Detection / Correction Of Stuck Files - (#08)</b>
 		<ul>
-			<li>
+			<li>Confirm that automatic reversion of locked files is properly 
+			controlled by <b>AutoRevertLockedFiles</b> from the <b>DBInfo</b> 
+			table.
+			<li>Confirm that the timeout for automatic reversion is properly 
+			controlled by <b>AutoRevertTimeoutInMinutes</b> from the 
+			<b>DBInfo</b> table.
+			<li>Confirm that when one or files are reverted, an email is sent 
+			to parties specified by <b>AutoRevertNotifyEmailList</b> from the 
+			<b>DBInfo</b> table.
+			<li>Confirm that an informative exception is logged if one or 
+			more files are reverted.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
   	   	<LI><b>RSD-Based Finders &amp; Splitters - (#09)</b>
@@ -314,7 +326,23 @@
 <p>
 		<li><b>User Authentication In FAM - (#15)</b>
 		<ul>
-			<li>
+			<li>Confirm that authentication is properly controlled by 
+			<b>RequireAuthenticationBeforeRun</b> from the <b>DBInfo</b> table.
+			<li>Confirm that an undefined user cannot start processing an 
+			FPS file.
+			<li>Confirm that a defined user must provide a password before 
+			starting processing of an FPS file.
+			<li>Confirm that a defined user without a password is required to 
+			specify a password before processing will begin.
+			<li>Confirm that <b>User Authentication</b> works properly with 
+			the following features
+			<ul>
+				<li>FAM Service
+				<li>Scheduled processing
+				<li>Queuing without processing
+			</ul>
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
   	   	<LI><b>Redact Fixed Locations - (#16)</b>
@@ -492,7 +520,7 @@
 				<li>Ability to specify redaction text
 				<li>Ability to specify exemption codes
 				<li>Ability to provide redaction types
-				<li>Support for Legislation Guard
+				<li>Support for <b>Legislation Guard</b>
 			</ul>
 			<li>Document the details of additional independent testing of 
 			this feature.
@@ -510,12 +538,51 @@
 <p>
   	   	<LI><b>Support For Dual Monitors During Verification - (#22)</b>
 		<ul>
-			<li>
+			<li>Confirm that the <b>Data window</b> and the <b>Image window</b> can be 
+			docked separately and displayed on separate monitors.
+			<li>Confirm that docked window position is persistent.
+			<li>Confirm that undocked window position is persistent.
+			<li>Confirm that a maximized window on a separate monitor persists across 
+			verification sessions.
+			<li>Exercise changing monitor orientation between verification sessions.  
+			Confirm that appropriate behavior is seen.
+			<li>Confirm that removing the second monitor between verification sessions 
+			is supported by having the user interface display the windows on the single 
+			monitor.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
   	   	<LI><b>ID Shield Statistics Reporter - (#23)</b>
 		<ul>
-			<li>
+			<li>Exercise this task per the updated <b>ID Shield Features</b> 
+			checklist.
+			<li>Confirm that the user interface works as expected.
+			<li>Confirm that correct results are provided for the following options:
+			<ul>
+				<li>Automated redaction
+				<li>Hybrid
+				<li>Standard verification
+			</ul>
+			<li>Confirm that correct results are provided for <b>Automated redaction</b> 
+			when limiting data as follows:
+			<ul>
+				<li>High confidence sensitive data
+				<li>Medium confidence sensitive data
+				<li>Low confidence sensitive data
+			</ul>
+			<li>Confirm that correct results are provided for <b>Verification</b> 
+			when specifying <b>DocTypesToRedact</b>.
+			<li>Confirm that correct results are provided when using an <b>Automated 
+			file selection</b> condition.
+			<li>Confirm that correct results are provided when using an <b>Verification 
+			file selection</b> condition.
+			<li>Confirm that correct results are provided when limiting by <b>type</b>.
+			<li>Confirm that previous analysis results can be loaded and reviewed.
+			<li>Confirm that appropriate entries are provided in the <b>File lists</b> 
+			combo box.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
   	   	<LI><b>Find And Redact User-Specified Text Or Regular Expressions - (#24)</b>
@@ -556,18 +623,54 @@
 <p>
   	   	<LI><b>Printing Cropped Images - (#26)</b>
 		<ul>
-			<li>
+			<li>Confirm existence of <b>File - Print view</b> from the 
+			<b>Redaction: Verify sensitive data</b> user interface.
+			<ul>
+				<li>Confirm that the active viewing area is printed for the 
+				current page.
+				<li>Confirm that unredacted highlights <b>are not</b> 
+				printed.
+				<li>Confirm that redacted highlights <b>are</b> printed in 
+				the appropriate color.
+				<li>Confirm that redaction text and exemption codes <b>are</b> 
+				printed.
+				<li>Confirm that annotations <b>are</b> printed.
+			</ul>
+			<li>Confirm non-existence of <b>File - Print view</b> from the 
+			<b>DataEntry: Verify extracted data</b> user interface.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
   	   	<LI><b>Rule Object To Load List From Database - (#27)</b>
 		<ul>
-			<li>
+			<li>Start with a copy of a blank <b>SQL Compact</b> database.
+			<li>Use <b>SQL Server Management Studio</b> to add a table 
+			and fields to the database.  Make sure one field is designated 
+			as a <b>Primary key</b>.
+			<li>Use <b>SQLCDBEditor.exe</b> add content to the database.
+<p>
+			<li>Confirm that <b>SQLCompactExporter.exe</b> is available in 
+			the <b>CommonComponents</b> folder.
+			<li>Export content from the <b>SQL Compact</b> database to a text 
+			file.  Make sure to use the <b>/fp, /fs, /esc</b> switches so that 
+			the information can be used in a regular expression.
+<p>
+			<li>Create an RSD file to dynamically load the text file into a 
+			rule object.
+			<li>Confirm that proper results are seen.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
   	   	<LI><b>Exporting Debug Data From UEX Viewer - (#28)</b>
 		<ul>
 			<li>Confirm that the UEX Viewer checklist test cases for export 
 			of debug data work properly.
+			<li>Confirm that encrypted data is exported securely if the test 
+			machine <b>is not</b> licensed to expose the information.
+			<li>Confirm that encrypted data is exported in clear text form if the 
+			test machine <b>is</b> licensed to expose the information.
 			<li>Document the details of additional independent testing of 
 			this feature.
 		</ul>
@@ -678,6 +781,24 @@
 <p>
 	<LI><h3>Unnumbered Features</h3>
 	<ul>
+  	   	<LI><b>RunFPSFile</b>
+		<ul>
+			<li>Confirm that the utility will process a specified image file 
+			using tasks and settings defined in a specified FPS file.
+			<li>Confirm that the <b>/ignoreDB</b> switch works properly.
+			<li>Confirm that the <b>/queue</b> switch works properly.
+			<li>Confirm that the <b>/forceprocessing</b> switch works properly.
+			<li>Confirm that the <b>/process</b> switch works properly.
+			<li>Confirm that the utility works properly with the following 
+			features
+			<ul>
+				<li><b>User authentication</b> - TBD
+				<li><b>Scheduled processing</b> - ignores settings
+			</ul>
+			<li>Document the details of additional independent testing of 
+			this feature.
+		</ul>
+<p>
   	   	<LI><b>AnywhereUSB</b>
 		<ul>
 			<li>Confirm that a USB key can be attached to an <b>AnywhereUSB</b> 
