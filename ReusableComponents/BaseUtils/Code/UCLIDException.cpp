@@ -27,6 +27,7 @@
 #include <io.h>
 #include <algorithm>
 #include <comdef.h>
+#include <afxmt.h>
 
 extern AFX_EXTENSION_MODULE BaseUtilsDLL;
 
@@ -56,9 +57,6 @@ const unsigned long gnSIGNATURE_SIZE = 8;
 const unsigned long gnCURRENT_VERSION = 3;
 
 UCLIDExceptionHandler* UCLIDException::ms_pCurrentExceptionHandler = NULL;	
-
-// Stores the name and version of the application throwing the exception
-Win32CriticalSection UCLIDException::ms_csLock;
 
 // Stores the name and version of the application throwing the exception
 string UCLIDException::ms_strApplication = "";
@@ -795,13 +793,10 @@ void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent) cons
 	// Use try/catch block to trap any exception
 	try
 	{
-		Win32CriticalSectionLockGuard lg(ms_csLock);
-		string strOutputLogFile;
-
 		try
 		{
 			// This is the name of the file we are actually going to log this exception to
-			strOutputLogFile = (strFile == "") ? getDefaultLogFileFullPath() : strFile;
+			string strOutputLogFile = (strFile == "") ? getDefaultLogFileFullPath() : strFile;
 
 			// Retrieve folder
 			string strFolder = getDirectoryFromFullPath( strOutputLogFile );
@@ -850,6 +845,9 @@ void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent) cons
 //-------------------------------------------------------------------------------------------------
 void UCLIDException::saveTo(const string& strFile, bool bAppend) const
 {
+	// Mutex for protecting access to the log file
+	static CMutex mutexLogFile(FALSE, gstrLOG_FILE_MUTEX.c_str());
+
 	try
 	{
 		// Get the output string
@@ -858,6 +856,9 @@ void UCLIDException::saveTo(const string& strFile, bool bAppend) const
 		// should be done before the file I/O is started
 		string	strOut;
 		strOut = createLogString();
+
+		// Mutex around log file access
+		CSingleLock lg(&mutexLogFile, TRUE);
 
 		// get the size of the current log file
 		ULONGLONG ullCurrentFileSize = 0;

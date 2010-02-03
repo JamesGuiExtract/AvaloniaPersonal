@@ -698,6 +698,10 @@ DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractE
 			// Wait for the process to end
 			WaitForSingleObject( piw.pi.hProcess, INFINITE );
 
+			// Get the process exit code
+			DWORD dwExitCode = 0;
+			GetExitCodeProcess(piw.pi.hProcess, &dwExitCode);
+
 			// Check if process was killed by the idle process killer
 			if (idleKiller.killedProcess())
 			{
@@ -733,16 +737,12 @@ DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractE
 				}
 			}
 
-			// Get the process exit code
-			DWORD dwExitCode = 0;
-			GetExitCodeProcess(piw.pi.hProcess, &dwExitCode);
-
 			// Return the exit code
 			return dwExitCode;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28889");
 	}
-	catch(UCLIDException uex)
+	catch(UCLIDException& uex)
 	{
 		// Add the executable name, parameters, and working directory
 		uex.addDebugInfo("Executable Name", strExeFullFileName);

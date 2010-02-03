@@ -283,6 +283,9 @@ namespace Extract.FileActionManager.Utilities
 
                 // Empty the processing threads collection since we are done with the threads
                 _processingThreads.Clear();
+
+                // Call the base class OnStop method
+                base.OnStop();
             }
         }
 
@@ -356,6 +359,26 @@ namespace Extract.FileActionManager.Utilities
 
                     // Sleep for 1 second and check dependent services again.
                     Thread.Sleep(1000);
+                }
+
+                // If all dependent services have not started and stop has been called
+                // log an exception listing which services have not started yet.
+                // [DNRCAU #385]
+                if (dependentServices.Count > 0
+                    && _stopProcessing != null && _stopProcessing.WaitOne(0))
+                {
+                    StringBuilder sb =
+                        new StringBuilder(dependentServices[0].ServiceName.ToUpperInvariant());
+                    for (int i = 1; i < dependentServices.Count; i++)
+                    {
+                        sb.Append(", ");
+                        sb.Append(dependentServices[i].ServiceName.ToUpperInvariant());
+                    }
+
+                    ExtractException ee = new ExtractException("ELI29559",
+                        "Application Trace: Service stopped before all dependent services started.");
+                    ee.AddDebugData("Services", sb.ToString(), false);
+                    throw ee;
                 }
 
                 // Check if all the services had started after the sleep time
@@ -522,7 +545,7 @@ namespace Extract.FileActionManager.Utilities
                         {
                             // All threads failed due to authentication requirement
                             // call OnStop to stop the service
-                            base.OnStop();
+                            OnStop();
                         }
                     }
                 }

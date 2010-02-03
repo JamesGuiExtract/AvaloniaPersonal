@@ -86,7 +86,8 @@ CUEXViewerDlg::CUEXViewerDlg(CWnd* pParent /*=NULL*/)
 	m_iUserColumnWidth(100),
 	m_iPidColumnWidth(80),
 	m_iTimeColumnWidth(130),
-	m_bInitialized(false)
+	m_bInitialized(false),
+	m_LogFileMutex(FALSE, gstrLOG_FILE_MUTEX.c_str())
 {
 	m_zDirectory = _T("");
 
@@ -1572,6 +1573,9 @@ void CUEXViewerDlg::addExceptions(string strUEXFile, bool bReplaceMode)
 	string strFileToOpen = strUEXFile;
 	try
 	{
+		// Mutex around log file access
+		CSingleLock lg(&m_LogFileMutex, TRUE);
+
 		copyFile(strUEXFile, tempFile.getName());
 		strFileToOpen = tempFile.getName();
 	}

@@ -44,6 +44,9 @@ const string	gstrLICENSE_CORRUPTION_ELI = "ELI15373";
 // Displayed to user if this debug information is sensitive
 const string gstrENCRYPTED_INDICATOR = "<Encrypted>";
 
+// Mutex name string to be used when accessing the log file
+const string gstrLOG_FILE_MUTEX = "Global\\0A7EF4EA-E618-4A07-9D77-7F4E48D6B224";
+
 // PURPOSE: To provide an external function that can be called from C# via P/Invoke
 //			that will take an array of bytes and a pointer that will point to an 
 //			array of encrypted of bytes that will be encrypted using the internal
@@ -437,9 +440,6 @@ private:
 	// vecResolution stores the developer-provided resolutions associated with the problem that
 	// caused this exception to be raised.
 	vector<string> m_vecResolution;
-
-	// This critical section is for protecting the log file;
-	static Win32CriticalSection ms_csLock;
 
 	vector<NamedValueTypePair> m_vecDebugInfo; //developer-provided debug information associated with this exception
 

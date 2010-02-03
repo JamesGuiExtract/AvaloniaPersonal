@@ -15,11 +15,13 @@
 
 #pragma once
 
+#include <IConfigurationSettingsPersistenceMgr.h>
+#include <UCLIDException.h>
+
+#include <afxmt.h>
+#include <memory>
 #include <string>
 #include <vector>
-#include <IConfigurationSettingsPersistenceMgr.h>
-#include <memory>
-#include <UCLIDException.h>
 
 using namespace std;
 
@@ -198,6 +200,9 @@ private:
 
 	// Folder containing opened UEX file
 	CString	m_zDirectory;
+
+	// Mutex for accessing the log file
+	CMutex m_LogFileMutex;
 
 	// Modeless Find dialog
 	auto_ptr<CUEXFindDlg> ma_pFindDlg;
