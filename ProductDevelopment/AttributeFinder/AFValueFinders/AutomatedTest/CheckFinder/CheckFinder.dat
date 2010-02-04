@@ -1,0 +1,9 @@
+<SETTING>;VerificationCondition=Check
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=Check
+<SETTING>;AutomatedCondition=Check
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;CreateTestOutputVOAFiles=0
+
+//find
+<TESTFOLDER>;.\Test1.rsd;.\Images;$DirOf(<SourceDocName>)\..\ActualVOAs\Test1.voa;$DirOf(<SourceDocName>)\..\ExpectedVOAs\Test1.evoa
