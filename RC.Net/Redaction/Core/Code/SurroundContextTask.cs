@@ -1,6 +1,7 @@
 using Extract.Imaging;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -32,7 +33,7 @@ namespace Extract.Redaction
 
         const string _COMPONENT_DESCRIPTION = "Redaction: Extend redactions to surround context";
 
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
         
         #endregion Constants
 
@@ -192,6 +193,28 @@ namespace Extract.Redaction
             return longRectangle;
         }
 
+        /// <summary>
+        /// Creates a collection of redaction items that should be extended based on the 
+        /// <see cref="SurroundContextSettings"/>.
+        /// </summary>
+        /// <param name="items">The items from which redaction items should be selected.</param>
+        /// <returns>A collection of redaction items that should be extended based on the 
+        /// settings.</returns>
+        List<RedactionItem> GetRedactionsToExtend(ICollection<SensitiveItem> items)
+        {
+            List<RedactionItem> redactions = new List<RedactionItem>(items.Count);
+            foreach (SensitiveItem item in items)
+            {
+                RedactionItem redaction = item.Attribute;
+                if (redaction.Redacted && _settings.IsTypeToExtend(redaction.RedactionType))
+                {
+                    redactions.Add(redaction);
+                }
+            }
+
+            return redactions;
+        }
+
         #endregion Methods
 
         #region ICategorizedComponent Members
@@ -220,7 +243,7 @@ namespace Extract.Redaction
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI29500",
-					_COMPONENT_DESCRIPTION);
+                    _COMPONENT_DESCRIPTION);
 
                 // Allow the user to configure the settings
                 using (SurroundContextSettingsDialog dialog = new SurroundContextSettingsDialog(_settings))
@@ -329,11 +352,8 @@ namespace Extract.Redaction
                     _COMPONENT_DESCRIPTION);
 
                 // Create the voa file loader
-                if (_voaLoader == null)
-                {
-                    InitializationSettings settings = new InitializationSettings();
-                    _voaLoader = new RedactionFileLoader(settings.ConfidenceLevels);
-                }
+                InitializationSettings settings = new InitializationSettings();
+                _voaLoader = new RedactionFileLoader(settings.ConfidenceLevels);
             }
             catch (Exception ex)
             {
@@ -371,7 +391,9 @@ namespace Extract.Redaction
                 source.LoadFrom(bstrFileFullName + ".uss", false);
 
                 // Load the redactions
-                string voaFile = bstrFileFullName + ".voa";
+                FileActionManagerPathTags pathTags = 
+                    new FileActionManagerPathTags(bstrFileFullName, pFAMTM.FPSFileDir);
+                string voaFile = pathTags.Expand(_settings.DataFile);
                 _voaLoader.LoadFrom(voaFile, bstrFileFullName);
 
                 // Create the spatial string searcher
@@ -380,23 +402,19 @@ namespace Extract.Redaction
                 searcher.SetIncludeDataOnBoundary(true);
 
                 // Extend each redaction as necessary
-                int redactedCount = 0;
                 List<RedactionItem> results = new List<RedactionItem>(_voaLoader.Items.Count);
-                foreach (SensitiveItem item in _voaLoader.Items)
+                List<RedactionItem> redactions = GetRedactionsToExtend(_voaLoader.Items);
+                foreach (RedactionItem redaction in redactions)
                 {
-                    if (item.Attribute.Redacted)
+                    RedactionItem result = GetExtendedRedaction(source, searcher, redaction);
+                    if (result != null)
                     {
-                        redactedCount++;
-                        RedactionItem result = GetExtendedRedaction(source, searcher, item.Attribute);
-                        if (result != null)
-                        {
-                            results.Add(result);
-                        }
+                        results.Add(result);
                     }
                 }
 
                 // If no redactions were expanded throw an exception
-                if (redactedCount > 0 && results.Count <= 0)
+                if (redactions.Count > 0 && results.Count <= 0)
                 {
                     throw new ExtractException("ELI29618", 
                         "No redactions could be expanded.");
