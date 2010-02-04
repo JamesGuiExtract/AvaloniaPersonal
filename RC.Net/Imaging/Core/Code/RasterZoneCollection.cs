@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using UCLID_COMUTILSLib;
 
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 
@@ -44,9 +45,48 @@ namespace Extract.Imaging
             _zones = new List<RasterZone>(zones);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RasterZoneCollection"/> class.
+        /// </summary>
+        [CLSCompliant(false)]
+        public RasterZoneCollection(IUnknownVector vector)
+        {
+            int count = vector.Size();
+            _zones = new List<RasterZone>(count);
+            for (int i = 0; i < count; i++)
+            {
+                ComRasterZone zone = (ComRasterZone)vector.At(i);
+                _zones.Add(new RasterZone(zone));
+            }
+        }
+
         #endregion Constructors
 
         #region Methods
+
+        /// <summary>
+        /// Creates an vector of COM raster zones from the <see cref="RasterZoneCollection"/>.
+        /// </summary>
+        /// <returns>A vector of COM raster zone from the <see cref="RasterZoneCollection"/>.
+        /// </returns>
+        [CLSCompliant(false)]
+        public IUnknownVector ToIUnknownVector()
+        {
+            try
+            {
+                IUnknownVector vector = new IUnknownVector();
+                foreach (RasterZone zone in _zones)
+                {
+                    vector.PushBack(zone.ToComRasterZone());
+                }
+
+                return vector;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29566", ex);
+            }
+        }
 
         /// <summary>
         /// Adds the elements of the specified collection to the end of the 
