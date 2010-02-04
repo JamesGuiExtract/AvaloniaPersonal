@@ -9,6 +9,7 @@
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
 #include <ComUtils.h>
+#include <Random.h>
 
 #include <map>
 
@@ -824,12 +825,16 @@ void CSpatialStringSearcher::getLettersAsSubstrings(const vector<int>& vecLetter
 void CSpatialStringSearcher::expandSubstrings(vector<LocalSubstring>& vecSubstrings, 
 											  long lNumWordsToExpand)
 {
+	Random random;
 	unsigned int uiMaxWord = m_vecWords.size() - 1;
 	for (unsigned int i = 0; i < vecSubstrings.size(); i++)
 	{
 		LocalSubstring& substring = vecSubstrings[i];
-		substring.expandLeft(lNumWordsToExpand);
-		substring.expandRight(lNumWordsToExpand, uiMaxWord);
+
+		unsigned long ulLeft = random.uniform(1, lNumWordsToExpand + 1);
+		unsigned long ulRight = random.uniform(1, lNumWordsToExpand + 1);
+		substring.expandLeft(ulLeft);
+		substring.expandRight(ulRight, uiMaxWord);
 	}
 }
 //-------------------------------------------------------------------------------------------------

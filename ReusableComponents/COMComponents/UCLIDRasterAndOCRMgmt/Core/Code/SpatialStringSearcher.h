@@ -3,12 +3,11 @@
 #pragma once
 
 #include "resource.h"       // main symbols
+#include "CPPLetter.h"
 
 #include <vector>
 #include <list>
 #include <string>
-
-#include "CPPLetter.h"
 
 using namespace std;
 
