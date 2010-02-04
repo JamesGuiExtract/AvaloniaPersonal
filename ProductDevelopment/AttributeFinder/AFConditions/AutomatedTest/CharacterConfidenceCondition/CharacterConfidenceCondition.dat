@@ -1,0 +1,33 @@
+// Pass - met avg confidence > 90
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss;;Test1.eav
+
+// DO NOT Pass - not met avg confidence > 90
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss;;Test2.eav
+
+// Pass - met min. conf. < 40
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss;;Test3.eav
+
+// DO NOT Pass - met min. conf. > 40
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss;;Test4.eav
+
+// DO NOT Pass - met max. conf. < 100
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss;;Test5.eav
+
+// Pass - met max. conf. <= 100
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss;;Test6.eav
+
+// Pass - met max conf. >= 92
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss;;Test7.eav
+
+// Pass - met avg. conf. < 40 OR = 92
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss;;Test8.eav
+
+// DO NOT Pass - met avg. conf. < 40 AND = 92
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss;;Test9.eav
+
+// DO NOT pass - not met min. conf. = 100 OR <=30
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss;;Test10.eav
+
+// Pass - met min. conf. = 100 OR <= 30
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image3.tif.uss;;Test11.eav
+
