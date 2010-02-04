@@ -218,7 +218,14 @@ namespace Extract.SQLCDBEditor
         /// <param name="e">The event data associated with the event.</param>
         void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Close();
+			try
+			{
+				Close();
+			}
+			catch (Exception ex)
+			{
+				ExtractException.Display("ELI29626", ex);
+			}
         }
 
         /// <summary>
@@ -393,51 +400,60 @@ namespace Extract.SQLCDBEditor
             // Remove the handler for the SelectedValueChanged event while loading the list box
             listBoxTables.SelectedValueChanged -= ListBoxTables_SelectedValueChanged;
 
-            // If dictionary of tables already exist clear the values it contains.
-            if (_dictionaryOfTables != null)
-            {
-                CollectionMethods.ClearAndDispose(_dictionaryOfTables);
-            }
+			try
+			{
+				// If dictionary of tables already exist clear the values it contains.
+				if (_dictionaryOfTables != null)
+				{
+					CollectionMethods.ClearAndDispose(_dictionaryOfTables);
+				}
 
-            // Create a new dictionary of Tables
-            _dictionaryOfTables = new Dictionary<string, DataTable>();
+				// Create a new dictionary of Tables
+				_dictionaryOfTables = new Dictionary<string, DataTable>();
 
-            // If dictionary of Adapters already exists clear the values it contains
-            if (_dictionaryOfAdapters != null)
-            {
-                CollectionMethods.ClearAndDispose(_dictionaryOfAdapters);
-            }
+				// If dictionary of Adapters already exists clear the values it contains
+				if (_dictionaryOfAdapters != null)
+				{
+					CollectionMethods.ClearAndDispose(_dictionaryOfAdapters);
+				}
 
-            // Create a new dictionary of adapters
-            _dictionaryOfAdapters = new Dictionary<string, SqlCeDataAdapter>();
+				// Create a new dictionary of adapters
+				_dictionaryOfAdapters = new Dictionary<string, SqlCeDataAdapter>();
 
-            // Create a new DataTable for the table names in this database
-            DataTable tableNameTable = new DataTable();
+				// Create a new DataTable for the table names in this database
+				DataTable tableNameTable = new DataTable();
 
-            // Create adapter for the list of tables.
-            SqlCeDataAdapter tableListDataAdapter = 
-                new SqlCeDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", _connection);
+				// Create adapter for the list of tables.
+				SqlCeDataAdapter tableListDataAdapter =
+					new SqlCeDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", _connection);
 
-            // Create the commands for the tableListDataAdapter 
-            SqlCeCommandBuilder commandBuilder = new SqlCeCommandBuilder(tableListDataAdapter);
+				// Create the commands for the tableListDataAdapter 
+				SqlCeCommandBuilder commandBuilder = new SqlCeCommandBuilder(tableListDataAdapter);
 
-            // Fill the tableNameTable with data from the adapter
-            tableListDataAdapter.Fill(tableNameTable);
+				// Fill the tableNameTable with data from the adapter
+				tableListDataAdapter.Fill(tableNameTable);
 
-            // Set the member to display from the table
-            listBoxTables.DisplayMember = "TABLE_NAME";
+				// Set the member to display from the table
+				listBoxTables.DisplayMember = "TABLE_NAME";
 
-            // Set the listbox datasource to the tableNameTable
-            listBoxTables.DataSource = tableNameTable;
+				// Set the listbox datasource to the tableNameTable
+				listBoxTables.DataSource = tableNameTable;
 
-            // Reset the _dirty flag
-            _dirty = false;
+				// Reset the _dirty flag
+				_dirty = false;
 
-            // Update menu and tool strip
-            EnableCommands();
-
-            // Activate the SelectedValueChanged event handler
-            listBoxTables.SelectedValueChanged += ListBoxTables_SelectedValueChanged;
+				// Update menu and tool strip
+				EnableCommands();
+			}
+			catch (Exception ex)
+			{
+				throw new ExtractException("ELI29627", "Unable to load tables.", ex);
+			}
+			finally
+			{
+				// Activate the SelectedValueChanged event handler
+				listBoxTables.SelectedValueChanged += ListBoxTables_SelectedValueChanged;
+			}
         }
 
         /// <summary>
