@@ -1,3 +1,4 @@
 <FILE>;..\DocTypeCondition\DocTypeCondition.dat
 <FILE>;..\RSDFileCondition\RSDFileCondition.dat
 <FILE>;..\FindingRuleCondition\FindingRuleCondition.dat
+<FILE>;..\CharacterConfidenceCondition\CharacterConfidenceCondition.dat
