@@ -38,6 +38,11 @@ namespace Extract.Redaction
         /// <see langword="false"/> if the height of the redactions should not be extended.
         /// </summary>
         readonly bool _extendHeight;
+
+        /// <summary>
+        /// The vector of attributes (VOA) file to modify.
+        /// </summary>
+        readonly string _dataFile;
 		
         #endregion Fields
 
@@ -51,7 +56,7 @@ namespace Extract.Redaction
         /// default settings.
         /// </summary>
         public SurroundContextSettings() 
-            : this(true, null, true, 2, true)
+            : this(true, null, true, 2, true, null)
         {
         }
 
@@ -69,14 +74,16 @@ namespace Extract.Redaction
         /// <param name="extendHeight"><see langword="true"/> if the height of the redactions 
         /// should be extended; <see langword="false"/> if the height of the redactions should not 
         /// be extended.</param>
+        /// <param name="dataFile">The vector of attributes (VOA) file to modify.</param>
         public SurroundContextSettings(bool extendAllTypes, string[] dataTypes, bool redactWords, 
-            int maxWords, bool extendHeight)
+            int maxWords, bool extendHeight, string dataFile)
         {
             _extendAllTypes = extendAllTypes;
             _dataTypes = dataTypes ?? new string[0];
             _redactWords = redactWords;
             _maxWords = maxWords;
             _extendHeight = extendHeight;
+            _dataFile = dataFile ?? @"<SourceDocName>.voa";
         }
 		
         #endregion Constructors
@@ -134,6 +141,18 @@ namespace Extract.Redaction
                 return _extendHeight;
             }
         }
+
+        /// <summary>
+        /// Gets the vector of attributes (VOA) file to modify.
+        /// </summary>
+        /// <value>The vector of attributes (VOA) file to modify.</value>
+        public string DataFile
+        {
+            get
+            {
+                return _dataFile;
+            }
+        }
 		
         #endregion Properties
 
@@ -147,6 +166,37 @@ namespace Extract.Redaction
         public string[] GetDataTypes()
         {
             return (string[])_dataTypes.Clone();
+        }
+
+        /// <summary>
+        /// Determines whether the specified type should be extended.
+        /// </summary>
+        /// <param name="type">The data type to test.</param>
+        /// <returns><see langword="true"/> if the specified type should be extended;
+        /// <see langword="false"/> if the specified type should not be extended.</returns>
+        public bool IsTypeToExtend(string type)
+        {
+            try
+            {
+                if (_extendAllTypes)
+                {
+                    return true;
+                }
+
+                foreach (string dataType in _dataTypes)
+                {
+                    if (dataType.Equals(type, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29624", ex);
+            }
         }
 
         /// <summary>
@@ -166,9 +216,15 @@ namespace Extract.Redaction
                 bool redactWords = reader.ReadBoolean();
                 int maxWords = reader.ReadInt32();
                 bool extendHeight = reader.ReadBoolean();
+                string dataFile = null;
+
+                if (reader.Version > 1)
+                {
+                    dataFile = reader.ReadString();
+                }
 
                 return new SurroundContextSettings(extendAllTypes, dataTypes, redactWords, 
-                    maxWords, extendHeight);
+                    maxWords, extendHeight, dataFile);
             }
             catch (Exception ex)
             {
@@ -192,6 +248,7 @@ namespace Extract.Redaction
                 writer.Write(_redactWords);
                 writer.Write(_maxWords);
                 writer.Write(_extendHeight);
+                writer.Write(_dataFile);
             }
             catch (Exception ex)
             {
