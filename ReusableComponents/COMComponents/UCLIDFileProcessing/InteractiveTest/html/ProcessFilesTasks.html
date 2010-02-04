@@ -1193,6 +1193,51 @@
 			<li>Confirm that <b>no</b> extra file added queue events are seen.</li>
 		</ul>
    	</ul> 
+<p>
+	<li><b>Core: Sleep</b></li>
+   	<ul> 
+      		<li>Confirm that an <b>Core: Sleep</b> task exists.
+      		<li>Confirm that the <b>Core: Sleep</b> task requires only a <b>general</b> 
+		Extract Systems license.
+      		<li>Confirm that the <b>Core: Sleep</b> property page includes an edit box to 
+		specify the length of time to sleep.
+		<li>Confirm that the edit box accepts only digit characters.
+		<li>Confirm that a sleep value above <b>2147483647</b> is invalid.
+      		<li>Confirm that the property page includes a combo box to specify the units 
+		of time for which to sleep
+		<ul>
+			<li>Millisecond(s)
+			<li>Second(s)
+			<li>Minute(s)
+			<li>Hour(s)
+		</ul>
+		<li>Confirm that the default unit is <b>Second(s)</b>.
+      		<li>Confirm that the property page includes a <b>Sleep for a random amount of 
+		time between 1 millisecond and specified time</b> check box.
+		<li>Confirm that settings are persistent.
+<p>
+		<li>Confirm that the task sleeps for an appropriate amount of time
+		<ul>
+			<li>some number of <b>milliseconds</b>.
+			<li>some number of <b>milliseconds</b> with a random sleep.
+			<li>some number of <b>seconds</b>.
+			<li>some number of <b>seconds</b> with a random sleep.
+			<li>some number of <b>minutes</b>.
+			<li>some number of <b>minutes</b> with a random sleep.
+			<li>some number of <b>hours</b>.
+			<li>some number of <b>hours</b> with a random sleep.
+		</ul>
+<p>
+		<li>Sleep is a cancellable task
+		<ul>
+			<li>Configure an FPS file with a <b>Core: Sleep</b> task followed by at 
+			least one additional task.
+			<li>Start processing in the FAM.
+			<li>Stop processing during the time in which the Sleep task is active.
+			<li>Confirm that processing stops immediately.
+			<li>Confirm that subsequent tasks <b>are not</b> executed.
+		</ul>
+   	</ul> 
 </ul>
 </ol>
 </body>
