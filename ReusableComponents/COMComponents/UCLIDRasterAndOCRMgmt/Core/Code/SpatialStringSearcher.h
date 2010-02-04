@@ -41,15 +41,17 @@ public:
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // ISpatialStringSearcher
-	STDMETHOD(SetBoundaryResolution)(/*[in]*/ ESpatialEntity eResolution);
-	STDMETHOD(SetIncludeDataOnBoundary)(/*[in]*/ VARIANT_BOOL bInclude);
-	STDMETHOD(GetDataOutOfRegion)(/*[in]*/ ILongRectangle* ipRect, /*[out, retval]*/ ISpatialString** ipReturnString);
-	STDMETHOD(GetDataInRegion)(/*[in]*/ ILongRectangle *ipRect, 
-		/*[in]*/ VARIANT_BOOL bRotateRectanglePerOCR, /*[out, retval]*/ ISpatialString** ipReturnString);
-	STDMETHOD(InitSpatialStringSearcher)(/*[in]*/ ISpatialString* pSpatialString);
+	STDMETHOD(SetBoundaryResolution)(ESpatialEntity eResolution);
+	STDMETHOD(SetIncludeDataOnBoundary)(VARIANT_BOOL bInclude);
+	STDMETHOD(GetDataOutOfRegion)(ILongRectangle* ipRect, ISpatialString** ipReturnString);
+	STDMETHOD(GetDataInRegion)(ILongRectangle *ipRect, VARIANT_BOOL bRotateRectanglePerOCR, 
+		ISpatialString** ipReturnString);
+	STDMETHOD(InitSpatialStringSearcher)(ISpatialString* pSpatialString);
+	STDMETHOD(ExtendDataInRegion)(ILongRectangle *pRect, long lNumWordsToExtend, 
+		VARIANT_BOOL vbExtendHeight, ISpatialString** ppFound);
 
 // ILicensedComponent
-	STDMETHOD(raw_IsLicensed)(/*[out, retval]*/ VARIANT_BOOL * pbValue);
+	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 	////////////
 	// Enumerations
@@ -108,7 +110,7 @@ private:
 		////////////
 		CPPLetter letter;
 		// The index of the Letter in the spatial string the letter came from
-		unsigned int m_uiLetter; // m_uiIndex as we discussed 
+		unsigned int m_uiLetter;
 		// The index of the zone that this letter belonged to in the string it came from
 		unsigned int m_uiZone;
 		// The index of the zone that this letter belonged to in the string it came from
@@ -117,8 +119,6 @@ private:
 		unsigned int m_uiLine;
 		// The index of the word that this letter belonged to in the string it came from
 		unsigned int m_uiWord;
-		// The character code that this Letter represents
-		long m_lCharacter;
 		// True is this character is spatial (has defines boundaries)
 		bool m_bIsSpatial;
 		// tells whether this letter is the end of a Line(Zone, word... )
@@ -151,7 +151,30 @@ private:
 		unsigned int m_uiStart, m_uiEnd;
 	};
 
-	friend class CLetterPositionSort;
+	// Represents one or more words. May span lines.
+	class LocalSubstring
+	{
+	public:
+		LocalSubstring(unsigned int uiStartWord, unsigned int uiEndWord);
+
+		// Expands the substring to the left by the specified number of words
+		void expandLeft(long lWords);
+
+		// Expands the substring to the left by the specified number of words
+		void expandRight(long lWords, unsigned int uiMaxWord);
+
+		// true if other is adjacent or overlapping with the substring; false otherwise
+		bool isConnectedTo(const LocalSubstring& other) const;
+
+		// Expands the substring the minimum amount possible to incorporate other
+		void combineWith(const LocalSubstring& other);
+
+		////////////
+		// Variables
+		////////////
+		// The starting and ending indexes of the substring in m_vecWords
+		unsigned int m_uiStartWord, m_uiEndWord;
+	};
 
 	////////////
 	// Methods
@@ -177,9 +200,19 @@ private:
 	// This method rotates ipRect based on the orientation of m_ipSpatialString
 	void rotateRectangle(ILongRectanglePtr ipRect);
 
-	// This function sorts the letters in readability order from top to bottom
-	// Left to right.  It uses word and line information to help
-	void sortLettersByPosition(vector<int> &pvecLetters);
+	// Gets a vector of substrings that corresponds to the vector of letter indices
+	void getLettersAsSubstrings(const vector<int>& vecLetters, 
+		vector<LocalSubstring>& vecSubstrings);
+
+	// Expands each substring by the specified number of words
+	void expandSubstrings(vector<LocalSubstring>& vecSubstrings, long lNumWordsToExpand);
+
+	// Combines any substrings that are adjacent or overlap
+	void combineSubstrings(vector<LocalSubstring>& vecSubstrings);
+
+	// Gets a vector of letter index that corresponds to the vector of substrings
+	void getSubstringsAsLetters(const vector<LocalSubstring>& vecSubstrings, 
+		vector<int>& vecLetters);
 
 	// Inserts non spatial character at the end of letters
 	void insertNonSpatialCharacter(char c, long flags, vector<CPPLetter>& vecLetters);

@@ -15,12 +15,6 @@
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------
-// Constants
-//-------------------------------------------------------------------------------------------------
-const unsigned long gnDefaultGridCellHeight = 50;
-const unsigned long gnDefaultGridCellWidth = 50;
-
-//-------------------------------------------------------------------------------------------------
 // LocalEntity
 //-------------------------------------------------------------------------------------------------
 CSpatialStringSearcher::LocalEntity::LocalEntity(long lLeft, long lTop, long lRight, long lBottom)
@@ -85,7 +79,7 @@ bool CSpatialStringSearcher::LocalLetter::operator<(const LocalLetter& l2)
 //-------------------------------------------------------------------------------------------------
 CSpatialStringSearcher::LocalWord::LocalWord() : LocalEntity(),
 	m_uiStart(0), m_uiEnd(0)
-{	
+{
 }
 	
 //-------------------------------------------------------------------------------------------------
@@ -93,7 +87,49 @@ CSpatialStringSearcher::LocalWord::LocalWord() : LocalEntity(),
 //-------------------------------------------------------------------------------------------------
 CSpatialStringSearcher::LocalLine::LocalLine() :  LocalEntity(),
 	m_uiStart(0), m_uiEnd(0)
-{		
+{
+}
+
+//-------------------------------------------------------------------------------------------------
+// LocalSubstring
+//-------------------------------------------------------------------------------------------------
+CSpatialStringSearcher::LocalSubstring::LocalSubstring(unsigned int uiStartWord, 
+													   unsigned int uiEndWord) 
+	: m_uiStartWord(uiStartWord), m_uiEndWord(uiEndWord)
+{
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringSearcher::LocalSubstring::expandLeft(long lWords)
+{
+	long lStartWord = (long)(m_uiStartWord) - lWords;
+	if (lStartWord < 0)
+	{
+		lStartWord = 0;
+	}
+
+	m_uiStartWord = lStartWord;
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringSearcher::LocalSubstring::expandRight(long lWords, unsigned int uiMaxWord)
+{
+	unsigned int uiEndWord = m_uiEndWord + lWords;
+	if (uiEndWord > uiMaxWord)
+	{
+		uiEndWord = uiMaxWord;
+	}
+
+	m_uiEndWord = uiEndWord;
+}
+//-------------------------------------------------------------------------------------------------
+bool CSpatialStringSearcher::LocalSubstring::isConnectedTo(const LocalSubstring& other) const
+{
+	return other.m_uiEndWord + 1 >= m_uiStartWord && other.m_uiStartWord <= m_uiEndWord + 1;
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringSearcher::LocalSubstring::combineWith(const LocalSubstring& other)
+{
+	m_uiStartWord = min(m_uiStartWord, other.m_uiStartWord);
+	m_uiEndWord = max(m_uiEndWord, other.m_uiEndWord);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -267,6 +303,57 @@ STDMETHODIMP CSpatialStringSearcher::GetDataOutOfRegion(ILongRectangle *ipRect, 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialStringSearcher::ExtendDataInRegion(ILongRectangle *pRect, 
+	long lNumWordsToExtend, VARIANT_BOOL vbExtendHeight, ISpatialString** ppFound)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI29540", ppFound != NULL);
+
+		validateLicense();
+
+		ILongRectanglePtr ipRect(pRect);
+		ASSERT_RESOURCE_ALLOCATION("ELI29541", ipRect != NULL);
+
+		// Get a vector of all the letters that fall in the region
+		vector<int> vecLetters;		
+		getUnsortedLettersInRegion(ipRect, vecLetters);
+
+		// Convert the vector of letters to a vector of substrings
+		vector<LocalSubstring> vecSubstrings;
+		getLettersAsSubstrings(vecLetters, vecSubstrings);
+
+		// Expand each substring if necessary
+		if (lNumWordsToExtend > 0)
+		{
+			expandSubstrings(vecSubstrings, lNumWordsToExtend);
+		}
+
+		// Combine substrings that overlap
+		combineSubstrings(vecSubstrings);
+
+		// Convert the substrings to a vector of letters
+		getSubstringsAsLetters(vecSubstrings, vecLetters);
+
+		// sort the letters from top to bottom left to right 
+		// This means that we are basically ignoring zone information
+		sort(vecLetters.begin(), vecLetters.end());
+
+		// Build the SpatialString
+		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipFound =	
+			createStringFromLetterIndexes(vecLetters);
+		ASSERT_RESOURCE_ALLOCATION("ELI29542", ipFound != NULL);
+
+		// Return the string
+		*ppFound = (ISpatialString*) ipFound.Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29539");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialStringSearcher::SetIncludeDataOnBoundary(VARIANT_BOOL bInclude)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -321,53 +408,6 @@ STDMETHODIMP CSpatialStringSearcher::raw_IsLicensed(VARIANT_BOOL * pbValue)
 }
 
 //-------------------------------------------------------------------------------------------------
-// CLetterPositionSort
-//-------------------------------------------------------------------------------------------------
-class CLetterPositionSort
-{
-public:
-	CSpatialStringSearcher* pSearcher;
-	bool operator()(int& rLetter1, int& rLetter2)
-	{
-		CSpatialStringSearcher::LocalLetter* pLetter1 = &(pSearcher->m_vecLetters[rLetter1]);
-		CSpatialStringSearcher::LocalLetter* pLetter2 = &(pSearcher->m_vecLetters[rLetter2]);
-		if (pLetter1->m_uiLine == pLetter2->m_uiLine)
-		{
-			return (pLetter1->m_uiLetter < pLetter2->m_uiLetter);
-		}
-
-		CSpatialStringSearcher::LocalLine* pLine1 = &(pSearcher->m_vecLines[pLetter1->m_uiLine]);
-		CSpatialStringSearcher::LocalLine* pLine2 = &(pSearcher->m_vecLines[pLetter2->m_uiLine]);
-
-		if(pLine1->m_lBottom < pLine2->m_lTop)
-		{
-			return true;
-		}
-		else if(pLine1->m_lTop > pLine2->m_lBottom)
-		{
-			return false;
-		}
-		else if(pLine1->m_lRight < pLine2->m_lLeft)
-		{
-			return true;
-		}
-		else if(pLine1->m_lLeft > pLine2->m_lRight)
-		{
-			return false;
-		}
-
-		if(pLine1->m_lLeft <= pLine2->m_lLeft)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-};
-
-//-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
 void CSpatialStringSearcher::validateLicense()
@@ -418,7 +458,6 @@ void CSpatialStringSearcher::createLocalLetters()
 		LocalLetter& rLocalLetter = m_vecLetters[i];
 		rLocalLetter.letter = letter;
 		
-		rLocalLetter.m_lCharacter = (long)letter.m_usGuess1;
 		// Set the letters properties
 		rLocalLetter.m_uiLetter = i;
 		rLocalLetter.m_uiWord = iCurrWord;
@@ -666,13 +705,10 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 			region.m_lBottom = m_lStringBottom; 
 		}
 
-		int cnt = 0;
-
 		if (m_eBoundaryResolution == kCharacter)
 		{
 			for (unsigned long ui = 0; ui < m_vecLetters.size(); ui++)
 			{
-				cnt++;
 				LocalLetter& rLetter = m_vecLetters[ui];
 				if (!rLetter.m_bIsSpatial)
 				{
@@ -693,7 +729,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 			for (unsigned int ui = 0; ui < m_vecWords.size(); ui++)
 			{	
 				LocalWord& rWord = m_vecWords[ui];
-				cnt++;
+
 				// test the word against the region
 				EIntersection eIntersection =  region.intersect(rWord);
 
@@ -717,7 +753,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 			for (unsigned int ui = 0; ui < m_vecLines.size(); ui++)
 			{
 				LocalLine& rLine = m_vecLines[ui];
-				cnt++;
+
 				// test the word against the region
 				EIntersection eIntersection =  region.intersect(rLine);
 
@@ -739,6 +775,122 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25616");
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringSearcher::getLettersAsSubstrings(const vector<int>& vecLetters, 
+													vector<LocalSubstring>& vecSubstrings)
+{
+	// Clear the vector of substrings to begin
+	vecSubstrings.clear();
+
+	// If there are no letters, there are no substrings
+	if (vecLetters.size() <= 0)
+	{
+		return;
+	}
+
+	// Iterate through each letter looking for substrings
+	unsigned int uiStartSubstring = m_vecLetters[vecLetters[0]].m_uiWord;
+	unsigned int uiEndSubstring = uiStartSubstring;
+	for	(unsigned int i = 1; i < vecLetters.size(); i++)
+	{
+		// Has a new word been encountered?
+		unsigned int uiCurrentWord = m_vecLetters[vecLetters[i]].m_uiWord;
+		if (uiEndSubstring != uiCurrentWord)
+		{
+			if (uiEndSubstring + 1 == uiCurrentWord)
+			{
+				// The new word is the next word, remember this word and keep looking
+				uiEndSubstring = uiCurrentWord;
+			}
+			else
+			{
+				// The new word was not the next word, this is the end of a substring
+				LocalSubstring substring(uiStartSubstring, uiEndSubstring);
+				vecSubstrings.push_back(substring);
+
+				// Start a new substring
+				uiStartSubstring = uiCurrentWord;
+				uiEndSubstring = uiCurrentWord;
+			}
+		}
+	}
+
+	// Add the last substring
+	LocalSubstring substring(uiStartSubstring, uiEndSubstring);
+	vecSubstrings.push_back(substring);
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringSearcher::expandSubstrings(vector<LocalSubstring>& vecSubstrings, 
+											  long lNumWordsToExpand)
+{
+	unsigned int uiMaxWord = m_vecWords.size() - 1;
+	for (unsigned int i = 0; i < vecSubstrings.size(); i++)
+	{
+		LocalSubstring& substring = vecSubstrings[i];
+		substring.expandLeft(lNumWordsToExpand);
+		substring.expandRight(lNumWordsToExpand, uiMaxWord);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringSearcher::combineSubstrings(vector<LocalSubstring>& vecSubstrings)
+{
+	// Need at least two substrings to combine
+	if (vecSubstrings.size() < 2)
+	{
+		return;
+	}
+
+	vector<LocalSubstring>::iterator iterPrevious = vecSubstrings.begin();
+	vector<LocalSubstring>::iterator iterCurrent = iterPrevious + 1;
+	while (iterCurrent < vecSubstrings.end())
+	{
+		LocalSubstring& current = *iterCurrent;
+		if (iterPrevious->isConnectedTo(current))
+		{
+			iterPrevious->combineWith(current);
+			iterCurrent = vecSubstrings.erase(iterCurrent);
+			continue;
+		}
+
+		iterPrevious = iterCurrent;
+		iterCurrent++;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringSearcher::getSubstringsAsLetters(const vector<LocalSubstring>& vecSubstrings, 
+													vector<int>& vecLetters)
+{
+	vecLetters.clear();
+
+	if (vecSubstrings.size() <= 0)
+	{
+		return;
+	}
+
+	// Iterate through each substrings
+	for (unsigned int i = 0; i < vecSubstrings.size(); i++)
+	{
+		const LocalSubstring& substring = vecSubstrings[i];
+
+		// Iterate through each word of the substring
+		for (unsigned int j = substring.m_uiStartWord; j <= substring.m_uiEndWord; j++)
+		{
+			const LocalWord& word = m_vecWords[j];
+
+			// Iterate through each letter of the word
+			for (unsigned int k = word.m_uiStart; k < word.m_uiEnd; k++)
+			{
+				const LocalLetter& letter = m_vecLetters[k];
+
+				// Add the letter if it is spatial
+				if (letter.m_bIsSpatial)
+				{
+					vecLetters.push_back(k);
+				}
+			}
+		}
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialStringSearcher::insertNonSpatialCharacter(char c, long flags, vector<CPPLetter>& vecLetters)
@@ -810,13 +962,6 @@ void CSpatialStringSearcher::rotateRectangle(ILongRectanglePtr ipRect)
 			break;
 		}
 	}
-}
-//-------------------------------------------------------------------------------------------------
-void CSpatialStringSearcher::sortLettersByPosition(vector<int> &rvecLetters)
-{
-	CLetterPositionSort sorter;
-	sorter.pSearcher = this;
-	sort(rvecLetters.begin(), rvecLetters.end(), sorter);
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialStringSearcher::createStringFromLetterIndexes(

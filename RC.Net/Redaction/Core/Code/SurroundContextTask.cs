@@ -1,12 +1,21 @@
+using Extract.Imaging;
 using Extract.Interop;
 using Extract.Licensing;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+
+using ComAttribute = UCLID_AFCORELib.Attribute;
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
+using ESpatialEntity = UCLID_RASTERANDOCRMGMTLib.ESpatialEntity;
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
+using SpatialStringSearcher = UCLID_RASTERANDOCRMGMTLib.SpatialStringSearcher;
 
 namespace Extract.Redaction
 {
@@ -41,6 +50,11 @@ namespace Extract.Redaction
         /// </summary>
         SurroundContextSettings _settings;
 
+        /// <summary>
+        /// Loads redaction voa files.
+        /// </summary>
+        RedactionFileLoader _voaLoader;
+
         #endregion Fields
 
         #region Constructors
@@ -62,7 +76,7 @@ namespace Extract.Redaction
         }
         
         #endregion Constructors
-        
+
         #region Methods
 
         /// <summary>
@@ -96,6 +110,86 @@ namespace Extract.Redaction
         public void CopyFrom(SurroundContextTask task)
         {
             _settings = task._settings;
+        }
+
+        /// <summary>
+        /// Extends the specified redaction based on the settings.
+        /// </summary>
+        /// <param name="source">The source document of the redaction item.</param>
+        /// <param name="searcher">Used to search for text to extend.</param>
+        /// <param name="item">The redaction item to extend.</param>
+        /// <returns>The extended redaction <paramref name="item"/>.</returns>
+        RedactionItem GetExtendedRedaction(SpatialString source, SpatialStringSearcher searcher, 
+            RedactionItem item)
+        {
+            RasterZoneCollection resultZones = new RasterZoneCollection();
+
+            int loadedPage = -1;
+            SpatialString value = item.ComAttribute.Value;
+            RasterZoneCollection zones = GetZonesFromSpatialString(value);
+            foreach (RasterZone zone in zones)
+            {
+                int currentPage = zone.PageNumber;
+                if (currentPage != loadedPage)
+                {
+                    SpatialString page = source.GetSpecifiedPages(currentPage, currentPage);
+                    searcher.InitSpatialStringSearcher(page);
+                    loadedPage = currentPage;
+                }
+
+                // TODO: ExtendDataInRegion should accept an IUnknownVector of Rectangles.
+                // Otherwise there is no guarantee that extending doesn't result in overlapping areas
+                SpatialString extended = searcher.ExtendDataInRegion(
+                    GetLongRectangleFromZone(zone), _settings.MaxWords, _settings.ExtendHeight);
+
+                if (extended.HasSpatialInfo())
+                {
+                    resultZones.AddRange(GetZonesFromSpatialString(extended));
+                }
+            }
+
+            // If no zones were found, return nothing
+            if (resultZones.Count <= 0)
+            {
+                return null;
+            }
+
+            // Create the result for the spatial string
+            SpatialString resultValue = new SpatialString();
+            resultValue.CreateHybridString(resultZones.ToIUnknownVector(), value.String, 
+                source.SourceDocName, source.SpatialPageInfos);
+
+            // Don't modify the original attribute since the RedactionFileLoader is still using it
+            ICopyableObject copy = (ICopyableObject)item.ComAttribute;
+            ComAttribute attribute = (ComAttribute)copy.Clone();
+            attribute.Value = resultValue;
+
+            return new RedactionItem(attribute);
+        }
+
+        /// <summary>
+        /// Get the OCR raster zones of the specified spatial string.
+        /// </summary>
+        /// <param name="value">The spatial string from which to retrieve raster zones.</param>
+        /// <returns>The OCR raster zones of the specified spatial string.</returns>
+        static RasterZoneCollection GetZonesFromSpatialString(SpatialString value)
+        {
+            return new RasterZoneCollection(value.GetOCRImageRasterZones());
+        }
+
+        /// <summary>
+        /// Creates the smallest rectangle that fully contains the specified raster zone.
+        /// </summary>
+        /// <param name="zone">The zone from which to create a rectangle.</param>
+        /// <returns>The smallest rectangle that fully contains the specified raster 
+        /// <paramref name="zone"/>.</returns>
+        static LongRectangle GetLongRectangleFromZone(RasterZone zone)
+        {
+            Rectangle rectangle = zone.GetRectangularBounds();
+            LongRectangle longRectangle = new LongRectangle();
+            longRectangle.SetBounds(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+
+            return longRectangle;
         }
 
         #endregion Methods
@@ -212,6 +306,8 @@ namespace Extract.Redaction
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI29504",
                     _COMPONENT_DESCRIPTION);
+
+                _voaLoader = null;
             }
             catch (Exception ex)
             {
@@ -231,6 +327,13 @@ namespace Extract.Redaction
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI29506",
                     _COMPONENT_DESCRIPTION);
+
+                // Create the voa file loader
+                if (_voaLoader == null)
+                {
+                    InitializationSettings settings = new InitializationSettings();
+                    _voaLoader = new RedactionFileLoader(settings.ConfidenceLevels);
+                }
             }
             catch (Exception ex)
             {
@@ -263,7 +366,48 @@ namespace Extract.Redaction
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI29508",
                     _COMPONENT_DESCRIPTION);
 
-                // TODO: Implement
+                // Load the uss file
+                SpatialString source = new SpatialString();
+                source.LoadFrom(bstrFileFullName + ".uss", false);
+
+                // Load the redactions
+                string voaFile = bstrFileFullName + ".voa";
+                _voaLoader.LoadFrom(voaFile, bstrFileFullName);
+
+                // Create the spatial string searcher
+                SpatialStringSearcher searcher = new SpatialStringSearcher();
+                searcher.SetBoundaryResolution(ESpatialEntity.kWord);
+                searcher.SetIncludeDataOnBoundary(true);
+
+                // Extend each redaction as necessary
+                int redactedCount = 0;
+                List<RedactionItem> results = new List<RedactionItem>(_voaLoader.Items.Count);
+                foreach (SensitiveItem item in _voaLoader.Items)
+                {
+                    if (item.Attribute.Redacted)
+                    {
+                        redactedCount++;
+                        RedactionItem result = GetExtendedRedaction(source, searcher, item.Attribute);
+                        if (result != null)
+                        {
+                            results.Add(result);
+                        }
+                    }
+                }
+
+                // If no redactions were expanded throw an exception
+                if (redactedCount > 0 && results.Count <= 0)
+                {
+                    throw new ExtractException("ELI29618", 
+                        "No redactions could be expanded.");
+                }
+
+                // TODO: Save the results
+                RedactionFileChanges fileChanges = new RedactionFileChanges(new RedactionItem[0],
+                    new RedactionItem[0], results);
+                TimeInterval interval = new TimeInterval(DateTime.Now, 0);
+                _voaLoader.SaveVerificationSession(voaFile, fileChanges, interval, 
+                    new VerificationSettings());
                 
                 return EFileProcessingResult.kProcessingSuccessful;
             }

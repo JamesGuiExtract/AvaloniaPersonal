@@ -1331,7 +1331,9 @@ library UCLID_RASTERANDOCRMGMTLib
 		[id(3), helpstring("method GetDataOutOfRegion")] HRESULT GetDataOutOfRegion([in] ILongRectangle* ipRect, [out, retval] ISpatialString** ipReturnString);
 		[id(4), helpstring("method SetIncludeDataOnBoundary")] HRESULT SetIncludeDataOnBoundary([in] VARIANT_BOOL bInclude);
 		[id(5), helpstring("method SetBoundaryResolution")] HRESULT SetBoundaryResolution([in] ESpatialEntity eResolution);
-		
+		[id(6), helpstring("method ExtendDataInRegion")] HRESULT ExtendDataInRegion(
+			[in] ILongRectangle *pRect, [in] long lNumWordsToExtend, 
+			[in] VARIANT_BOOL vbExtendHeight, [out, retval] ISpatialString** ppFound);
 	};
 	[
 		object,
