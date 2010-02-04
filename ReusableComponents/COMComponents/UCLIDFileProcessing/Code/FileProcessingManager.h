@@ -92,6 +92,7 @@ public:
 	STDMETHOD(get_IsUserAuthenticationRequired)(VARIANT_BOOL* pvbIsAuthenticationRequired);
 	STDMETHOD(ProcessSingleFile)(BSTR bstrSourceDocName,VARIANT_BOOL vbQueue,
 		VARIANT_BOOL vbProcess, VARIANT_BOOL vbForceProcessing);
+	STDMETHOD(AuthenticateForProcessing)(VARIANT_BOOL* pvbAuthenticated);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -223,6 +224,16 @@ private:
 
 	// Log the start and stop processing information
 	void logStatusInfo(EStartStopStatus eStatus);
+
+	// Indicates whether user authentication is required to run.
+	bool isUserAuthenticationRequired();
+
+	// Indicates whether a DB admin password is required to run.
+	bool isDBPasswordRequired();
+
+	// Prompts for user and DB admin passwords as appropriate to run. Returns true if processing is
+	// allowed to run, false if the user was prompted for a password they did not correctly enter.
+	bool authenticateForProcessing();
 
 	// Gets the this pointer as smart com pointer
 	UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr getThisAsCOMPtr();

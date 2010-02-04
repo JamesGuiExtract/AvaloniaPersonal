@@ -195,8 +195,8 @@ public:
 	STDMETHOD(ClearLoginUserPassword)(BSTR bstrUserName);
 	STDMETHOD(GetAutoCreateActions)(VARIANT_BOOL* pvbValue);
 	STDMETHOD(AutoCreateAction)(BSTR bstrActionName);
-	STDMETHOD(GetSkipAuthenticationForServices)(VARIANT_BOOL* pvbSkipAuthentication);
-	STDMETHOD(GetFileRecord)(BSTR bstrFile, IFileRecord** ppFileRecord);
+	STDMETHOD(CanSkipAuthenticationOnThisMachine)(VARIANT_BOOL* pvbSkipAuthentication);
+	STDMETHOD(GetFileRecord)(BSTR bstrFile, BSTR bstrActionName, IFileRecord** ppFileRecord);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);

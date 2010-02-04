@@ -288,24 +288,10 @@ STDMETHODIMP CFileProcessingManagerProcess::get_AuthenticationRequired(VARIANT_B
 
 		ASSERT_ARGUMENT("ELI29192", pvbAuthenticationRequired != NULL);
 
-		bool bCanSkip = true;
-		if (m_ipFPM->IsUserAuthenticationRequired == VARIANT_TRUE)
-		{
-			// Create a FAMDB pointer
-			IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
-			ASSERT_RESOURCE_ALLOCATION("ELI29193", ipDB != NULL);
-
-			// Create the database connection
-			ipDB->DatabaseServer = m_ipFPM->DatabaseServer;
-			ipDB->DatabaseName = m_ipFPM->DatabaseName;
-			ipDB->ResetDBConnection();
-
-			// Check if the current machine can skip authentication
-			bCanSkip = asCppBool(ipDB->GetSkipAuthenticationForServices());
-		}
-
-		// Set the return value
-		*pvbAuthenticationRequired = asVariantBool(!bCanSkip);
+		// Authentication is required if either user authentication is required or if a db admin
+		// password is required (such as to process skipped files from all users).
+		*pvbAuthenticationRequired = asVariantBool(asCppBool(m_ipFPM->IsUserAuthenticationRequired) || 
+												   asCppBool(m_ipFPM->IsDBPasswordRequired));
 
 		return S_OK;
 	}

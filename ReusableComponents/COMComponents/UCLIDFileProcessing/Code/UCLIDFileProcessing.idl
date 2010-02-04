@@ -411,6 +411,12 @@ library UCLID_FILEPROCESSINGLib
 		[id(52), helpstring("method ProcessSingleFile")] HRESULT ProcessSingleFile(
 			[in] BSTR bstrSourceDocName, [in] VARIANT_BOOL vbQueue, [in] VARIANT_BOOL vbProcess,
 			[in] VARIANT_BOOL vbForceProcessing);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Prompts for user and DB admin passwords as appropriate to run. 
+		// RETURNS: VARIANT_TRUE if processing is allowed to run, VARIANT_FALSE if the user was
+		//			prompted for a password they did not correctly enter.
+		[id(53), helpstring("method AuthenticateForProcessing")] HRESULT AuthenticateForProcessing(
+			[out, retval] VARIANT_BOOL* pvbAuthenticated);
 	};
 
 	[
@@ -1047,13 +1053,13 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To get whether user authentication should be skipped for the current machine
 		// when running as a service.
-		[id(91), helpstring("method GetSkipAuthenticationForServices")] HRESULT
-			GetSkipAuthenticationForServices([out, retval] VARIANT_BOOL* pvbSkipAuthentication);
+		[id(91), helpstring("method CanSkipAuthenticationOnThisMachine")] HRESULT
+			CanSkipAuthenticationOnThisMachine([out, retval] VARIANT_BOOL* pvbSkipAuthentication);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To retrieve the IFileRecord* for a file in the database with the specified
 		//			name. Returns NULL if such a record does not exist.
 		[id(92), helpstring("method GetFileRecord")] HRESULT GetFileRecord([in] BSTR bstrFile,
-			[out, retval] IFileRecord** ppFileRecord);
+			[in] BSTR bstrActionName, [out, retval] IFileRecord** ppFileRecord);
 	};
 
 	[

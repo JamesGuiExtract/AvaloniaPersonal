@@ -30,7 +30,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 22;
+const long glFAMDBSchemaVersion = 23;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -1116,7 +1116,7 @@ void CFileProcessingDB::initializeTableValues()
 
 		// Add Skip Authentication For Services On Machines
 		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-			+ gstrSKIP_AUTHENTICATION_FOR_SERVICES + "', '')";
+			+ gstrSKIP_AUTHENTICATION_ON_MACHINES + "', '')";
 		vecQueries.push_back(strSQL);
 
 		// Execute all of the queries
@@ -2855,7 +2855,7 @@ bool CFileProcessingDB::isMachineInListOfMachinesToSkipUserAuthentication(
 	try
 	{
 		// Get the list of machine names
-		string strMachines = getDBInfoSetting(ipConnection, gstrSKIP_AUTHENTICATION_FOR_SERVICES);
+		string strMachines = getDBInfoSetting(ipConnection, gstrSKIP_AUTHENTICATION_ON_MACHINES);
 
 		// Tokenize by either comma, semicolon, or pipe
 		vector<string> vecTokens;

@@ -5058,7 +5058,7 @@ STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29154");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetSkipAuthenticationForServices(VARIANT_BOOL* pvbSkipAuthentication)
+STDMETHODIMP CFileProcessingDB::CanSkipAuthenticationOnThisMachine(VARIANT_BOOL* pvbSkipAuthentication)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -5091,7 +5091,8 @@ STDMETHODIMP CFileProcessingDB::GetSkipAuthenticationForServices(VARIANT_BOOL* p
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29238");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetFileRecord(BSTR bstrFile, IFileRecord** ppFileRecord)
+STDMETHODIMP CFileProcessingDB::GetFileRecord(BSTR bstrFile, BSTR bstrActionName,
+											  IFileRecord** ppFileRecord)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -5144,6 +5145,8 @@ STDMETHODIMP CFileProcessingDB::GetFileRecord(BSTR bstrFile, IFileRecord** ppFil
 			// Get and return the appropriate file record
 			ipFileRecord = getFileRecordFromFields(ipFields);
 			ASSERT_RESOURCE_ALLOCATION("ELI29550", ipFileRecord != NULL);
+
+			ipFileRecord->ActionID = getActionID(ipConnection, asString(bstrActionName));
 
 			*ppFileRecord = (IFileRecord*)ipFileRecord.Detach();
 		}

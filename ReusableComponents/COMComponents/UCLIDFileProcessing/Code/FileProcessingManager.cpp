@@ -934,16 +934,7 @@ STDMETHODIMP CFileProcessingManager::get_IsDBPasswordRequired(VARIANT_BOOL* pvbI
 	{
 		ASSERT_ARGUMENT("ELI28473", pvbIsDBPasswordRequired != NULL);
 
-		// Password is required if:
-		// 1. File processing is enabled [LRCAU #5478]
-		// 2. Skipped files are being processed
-		// 3. Processing skipped files for any user
-		// 4. DBInfo setting requires password to process skipped files for any user
-		*pvbIsDBPasswordRequired = asVariantBool(
-			getActionMgmtRole(m_ipFPMgmtRole)->Enabled == VARIANT_TRUE
-			&& m_ipFPMgmtRole->ProcessSkippedFiles == VARIANT_TRUE
-			&& m_ipFPMgmtRole->SkippedForAnyUser == VARIANT_TRUE
-			&& asString(getFPMDB()->GetDBInfoSetting(gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED.c_str())) == "1");
+		*pvbIsDBPasswordRequired = asVariantBool(isDBPasswordRequired());
 
 		return S_OK;
 	}
@@ -993,12 +984,8 @@ STDMETHODIMP CFileProcessingManager::get_IsUserAuthenticationRequired(
 
 		ASSERT_ARGUMENT("ELI29190", pvbAuthenticationRequired != NULL);
 
-		// Check if authentication is required
-		bool bRequire = asString(getFPMDB()->GetDBInfoSetting(
-			gstrREQUIRE_AUTHENTICATION_BEFORE_RUN.c_str())) == "1";
-
 		// Set the return value
-		*pvbAuthenticationRequired = asVariantBool(bRequire);
+		*pvbAuthenticationRequired = asVariantBool(isUserAuthenticationRequired());
 
 		return S_OK;
 	}
@@ -1017,6 +1004,13 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 			try
 			{
 				validateLicense();
+
+				if (!authenticateForProcessing())
+				{
+					// If a password was required to run, but the user did not enter it
+					// correctly, return immediately without processing.
+					return S_OK;
+				}
 
 				bool bQueue = asCppBool(vbQueue);
 				bool bProcess = asCppBool(vbProcess);
@@ -1053,7 +1047,7 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				{
 					// If not queueing, but processing, attempt to retrieve an existing record for this
 					// file.
-					ipFileRecord = getFPMDB()->GetFileRecord(bstrSourceDocName);
+					ipFileRecord = getFPMDB()->GetFileRecord(bstrSourceDocName, m_strAction.c_str());
 
 					if (ipFileRecord != NULL)
 					{
@@ -1073,8 +1067,6 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 					else
 					{
 						bool bProcessSkippedFiles = asCppBool(m_ipFPMgmtRole->ProcessSkippedFiles);
-
-						// TODO: Special handling for running skipped files for all users?
 						
 						// If file is not in the correct state to process (depending on the skipped file
 						// setting), throw an exception.
@@ -1115,6 +1107,23 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29562");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::AuthenticateForProcessing(VARIANT_BOOL* pvbAuthenticated)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI29564", pvbAuthenticated != NULL);
+
+		*pvbAuthenticated = asVariantBool(authenticateForProcessing());
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29563");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1386,6 +1395,90 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 	default:
 		THROW_LOGIC_ERROR_EXCEPTION("ELI15677");
 	}
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingManager::isUserAuthenticationRequired()
+{
+	// Check if authentication is required
+	bool bRequire = asString(getFPMDB()->GetDBInfoSetting(
+		gstrREQUIRE_AUTHENTICATION_BEFORE_RUN.c_str())) == "1";
+
+	if (bRequire)
+	{
+		bRequire = !asCppBool(getFPMDB()->CanSkipAuthenticationOnThisMachine());
+	}
+
+	return bRequire;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingManager::isDBPasswordRequired()
+{
+	// Password is required if:
+	// 1. File processing is enabled [LRCAU #5478]
+	// 2. Skipped files are being processed
+	// 3. Processing skipped files for any user
+	// 4. DBInfo setting requires password to process skipped files for any user
+	return (getActionMgmtRole(m_ipFPMgmtRole)->Enabled == VARIANT_TRUE
+			&& m_ipFPMgmtRole->ProcessSkippedFiles == VARIANT_TRUE
+			&& m_ipFPMgmtRole->SkippedForAnyUser == VARIANT_TRUE
+			&& asString(getFPMDB()->GetDBInfoSetting(
+				gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED.c_str())) == "1");
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingManager::authenticateForProcessing()
+{
+	// Check if a user login is required before running
+	if (isUserAuthenticationRequired())
+	{
+		VARIANT_BOOL vbCancelled;
+		
+		// Show the DB login prompt for the current user
+		if (!asCppBool(getFPMDB()->ShowLogin(VARIANT_FALSE, &vbCancelled)))
+		{
+			// Check if the user cancelled, only warn about invalid password
+			// if they didn't cancel [LRCAU #5419]
+			if (!asCppBool(vbCancelled))
+			{
+				HWND hParent = NULL;
+				CWnd *pWnd = AfxGetMainWnd();
+				if (pWnd)
+				{
+					hParent = pWnd->m_hWnd;
+				}
+
+				MessageBox(hParent, "Incorrect password", "Invalid Login", MB_OK);
+			}
+			return false;
+		}
+	}
+
+	// Check if authentication is needed for processing skipped files [LRCAU #5413]
+	if (isDBPasswordRequired())
+	{
+		// Show the DB login prompt for admin
+		VARIANT_BOOL vbCancelled;
+		if (getFPMDB()->ShowLogin(VARIANT_TRUE, &vbCancelled) == VARIANT_FALSE)
+		{
+			// Check if the user cancelled, only warn about invalid password
+			// if they didn't cancel [LRCAU #5419]
+			if (vbCancelled == VARIANT_FALSE)
+			{
+				HWND hParent = NULL;
+				CWnd *pWnd = AfxGetMainWnd();
+				if (pWnd)
+				{
+					hParent = pWnd->m_hWnd;
+				}
+
+				MessageBox(hParent, "Invalid password. Cannot process skipped files for all users.",
+					"Authentication Failed", MB_OK | MB_ICONERROR);
+			}
+			return false;
+		}
+	}
+
+	// Either authentication was not required or the password(s) were correctly entered.
+	return true;
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr CFileProcessingManager::getThisAsCOMPtr()

@@ -460,7 +460,7 @@ namespace Extract.FileActionManager.Utilities
                         }
 
                         ExtractException ee = new ExtractException("ELI29208",
-                            "User authentication is required to launch this FPS file.");
+                            "Authentication is required to launch this FPS file.");
                         ee.AddDebugData("FPS File Name", arguments.FPSFileName, false);
                         throw ee;
                     }

@@ -372,21 +372,11 @@ void FileProcessingDlg::OnBtnRun()
 				VARIANT_FALSE);
 		}
 		
-		string strInfoSetting = getDBPointer()->GetDBInfoSetting(gstrREQUIRE_AUTHENTICATION_BEFORE_RUN.c_str());
-		// Check if a login is required before running
-		if ( strInfoSetting == "1")
+		// Prompt for a password if one is needed. If one was needed but not supplied, processing
+		// is not allowed.
+		if (!asCppBool(ipFPM->AuthenticateForProcessing()))
 		{
-			VARIANT_BOOL vbCancelled;
-			
-			// Need to login
-			if (!asCppBool(getDBPointer()->ShowLogin(VARIANT_FALSE, &vbCancelled)))
-			{
-				if (!asCppBool(vbCancelled))
-				{
-					MessageBox("Incorrect password", "Invalid Login", MB_OK);
-				}
-				return;
-			}
+			return;
 		}
 
 		// Get the index of the Queue log, process log and statistics page
@@ -401,24 +391,6 @@ void FileProcessingDlg::OnBtnRun()
 		UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipRole = ipFPM->FileProcessingMgmtRole;
 		ASSERT_RESOURCE_ALLOCATION("ELI26941", ipRole != NULL);
 		m_bProcessingSkippedFiles = asCppBool(ipRole->ProcessSkippedFiles);
-
-		// Check if authentication is needed for processing skipped files [LRCAU #5413]
-		if (ipFPM->IsDBPasswordRequired == VARIANT_TRUE)
-		{
-			// Show the DB login prompt (if password is required) for admin
-			VARIANT_BOOL vbCancelled;
-			if (getDBPointer()->ShowLogin(VARIANT_TRUE, &vbCancelled) == VARIANT_FALSE)
-			{
-				// Check if the user cancelled, only warn about invalid password
-				// if they didn't cancel [LRCAU #5419]
-				if (vbCancelled == VARIANT_FALSE)
-				{
-					MessageBox("Invalid password. Cannot process skipped files for all users.",
-						"Authentication Failed", MB_OK | MB_ICONERROR);
-				}
-				return;
-			}
-		}
 
 		// If the current tab is not one of the log tab or the statistics tab
 		if (iActiveIndex != iQueueLogIndex && iActiveIndex != iProcLogIndex

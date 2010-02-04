@@ -102,8 +102,6 @@ namespace Extract.FileActionManager.RunFPSFile
                 FileProcessingManagerClass fileProcessingManager = new FileProcessingManagerClass();
                 fileProcessingManager.LoadFrom(_fpsFileName, false);
 
-                // TODO: Need decision regarding authentication
-
                 if (_ignoreDb)
                 {
                     // If no database interaction is required, the processingManager does not need

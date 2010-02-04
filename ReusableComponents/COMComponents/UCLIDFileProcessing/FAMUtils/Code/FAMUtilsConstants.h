@@ -26,7 +26,7 @@ static const string gstrENABLE_INPUT_EVENT_TRACKING = "EnableInputEventTracking"
 static const string gstrINPUT_EVENT_HISTORY_SIZE = "InputEventHistorySize";
 static const string gstrREQUIRE_AUTHENTICATION_BEFORE_RUN = "RequireAuthenticationBeforeRun";
 static const string gstrAUTO_CREATE_ACTIONS = "AutoCreateActions";
-static const string gstrSKIP_AUTHENTICATION_FOR_SERVICES = "SkipAuthenticationForServicesOnMachines";
+static const string gstrSKIP_AUTHENTICATION_ON_MACHINES = "SkipAuthenticationOnMachines";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;
