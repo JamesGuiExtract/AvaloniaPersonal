@@ -52,6 +52,9 @@
 #define IDR_MANAGE_TAGS_TASK            149
 #define IDR_MANAGE_TAGS_TASKPP          150
 #define IDD_MANAGE_TAGS_TASKPP          151
+#define IDR_SLEEP_TASK					152
+#define IDR_SLEEP_TASKPP				153
+#define IDD_SLEEP_TASKPP				154
 #define IDC_RADIO_OCR_ALL               201
 #define IDC_RADIO_OCR_SPECIFIED         202
 #define IDC_EDIT_PAGE_NUMBERS           203
@@ -152,14 +155,17 @@
 #define IDC_BTN_ACTION_TAG              298
 #define IDI_ICON_INFO					299
 #define IDC_HELP_PAGENUMBERS			300
+#define IDC_EDIT_SLEEP_TIME				301
+#define IDC_COMBO_SLEEP_UNITS			302
+#define IDC_CHECK_SLEEP_RANDOM			303
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        152
+#define _APS_NEXT_RESOURCE_VALUE        155
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         301
+#define _APS_NEXT_CONTROL_VALUE         304
 #define _APS_NEXT_SYMED_VALUE           145
 #endif
 #endif

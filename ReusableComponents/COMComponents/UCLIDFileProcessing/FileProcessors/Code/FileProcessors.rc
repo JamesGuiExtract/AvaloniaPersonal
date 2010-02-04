@@ -110,6 +110,8 @@ IDR_ARCHIVE_RESTORE_TASK REGISTRY                "ArchiveRestoreTask.rgs"
 IDR_ARCHIVE_RESTORE_TASKPP REGISTRY                "ArchiveRestoreTaskPP.rgs"
 IDR_MANAGE_TAGS_TASK    REGISTRY                "ManageTagsTask.rgs"
 IDR_MANAGE_TAGS_TASKPP  REGISTRY                "ManageTagsTaskPP.rgs"
+IDR_SLEEP_TASK			REGISTRY				"SleepTask.rgs"
+IDR_SLEEP_TASKPP		REGISTRY				"SleepTaskPP.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -321,6 +323,18 @@ BEGIN
     CONTROL         "",IDC_LIST_TAGS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,12,75,226,96
 END
 
+IDD_SLEEP_TASKPP DIALOGEX 0, 0, 164, 51
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+	LTEXT			"Sleep for", IDC_STATIC, 7,5,30,10
+	EDITTEXT		IDC_EDIT_SLEEP_TIME, 38,3,50,13, ES_AUTOHSCROLL | ES_NUMBER | WS_TABSTOP
+	COMBOBOX		IDC_COMBO_SLEEP_UNITS 91,3,60,50, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP 
+	CONTROL			"Sleep for a random amount of time between", IDC_CHECK_SLEEP_RANDOM,
+					"Button", BS_AUTOCHECKBOX | WS_TABSTOP, 7,22,157,12
+	LTEXT			"1 millisecond and specified time.", IDC_STATIC, 17,34,139,10
+END
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -499,6 +499,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SleepTask.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SleepTaskPP.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
@@ -620,6 +628,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SleepConstants.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SleepTask.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SleepTaskPP.h"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.h"
 				>
 			</File>
@@ -677,11 +697,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Code\res\icon_down.ico"
+				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_down.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_down.ico"
+				RelativePath="..\..\Code\res\icon_down.ico"
 				>
 			</File>
 			<File
@@ -689,11 +709,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Code\res\icon_up.ico"
+				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_up.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_up.ico"
+				RelativePath="..\..\Code\res\icon_up.ico"
 				>
 			</File>
 			<File
@@ -730,6 +750,14 @@
 			</File>
 			<File
 				RelativePath=".\SetActionStatusFileProcessorPP.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\SleepTask.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\SleepTaskPP.rgs"
 				>
 			</File>
 		</Filter>

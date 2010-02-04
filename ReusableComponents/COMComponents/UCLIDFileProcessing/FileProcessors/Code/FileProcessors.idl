@@ -95,6 +95,19 @@ library UCLID_FILEPROCESSORSLib
 		kOperationToggleTags = 2
 	} EManageTagsOperationType;
 
+	typedef
+	[
+		uuid(1D2F7CE5-CAAC-4A3E-B7A7-65D2EA5B4258),
+		helpstring("Extract Sleep Time Unit Types")
+	]
+	enum
+	{
+		kSleepMilliseconds = 0,
+		kSleepSeconds = 1,
+		kSleepMinutes = 2,
+		kSleepHours = 3
+	} ESleepTimeUnitType;
+
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -392,6 +405,38 @@ library UCLID_FILEPROCESSORSLib
 			[in] IVariantVector* pvecTags);
 	};
 
+	// ISleepTask
+	[
+		object,
+		uuid(7B9C4393-B5DE-4E38-834B-565B4D9FEE5E),
+		dual,
+		nonextensible,
+		helpstring("ISleepTask Interface"),
+		pointer_default(unique)
+	]
+	interface ISleepTask : IDispatch
+	{
+		// Gets/sets the time to sleep
+		[propget, id(1), helpstring("property SleepTime")] HRESULT SleepTime(
+			[out, retval] long* plSleepTime);
+		[propput, id(1), helpstring("property SleepTime")] HRESULT SleepTime(
+			[in] long lSleepTime);
+
+		// Gets/sets the sleep time units
+		[propget, id(2), helpstring("property TimeUnits")] HRESULT TimeUnits(
+			[out, retval] ESleepTimeUnitType* peTimeUnits);
+		[propput, id(2), helpstring("property TimeUnits")] HRESULT TimeUnits(
+			[in] ESleepTimeUnitType eTimeUnits);
+
+		// Gets/sets whether the sleep time should be a random amount between
+		// 0 and SleepTime. If VARIANT_TRUE then each sleep task will sleep
+		// a random amount of time between 0 and SleepTime
+		[propget, id(3), helpstring("property Random")] HRESULT Random(
+			[out, retval] VARIANT_BOOL* pbRandom);
+		[propput, id(3), helpstring("property Random")] HRESULT Random(
+			[in] VARIANT_BOOL bRandom);
+	};
+
 	//----------------------------------------------------------------------------------------------
 	//-C O C L A S S E S ---------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -621,6 +666,29 @@ library UCLID_FILEPROCESSORSLib
 		helpstring("ManageTagsTaskPP Class")
 	]
 	coclass ManageTagsTaskPP
+	{
+		[default] interface IUnknown;
+	};
+
+	// SleepTask CoClass and its Property page
+	[
+		uuid(9B3A2F27-BDA8-4E7E-B0BD-2D2F319537CC),
+		helpstring("SleepTask Class")
+	]
+	coclass SleepTask
+	{
+		[default] interface IManageTagsTask;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IFileProcessingTask;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(3654B4F5-31CF-4713-A90A-1AF4488EDAD7),
+		helpstring("SleepTaskPP Class")
+	]
+	coclass SleepTaskPP
 	{
 		[default] interface IUnknown;
 	};

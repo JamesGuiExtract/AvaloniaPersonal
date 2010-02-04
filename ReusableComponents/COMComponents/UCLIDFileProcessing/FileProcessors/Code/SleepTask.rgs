@@ -1,0 +1,26 @@
+HKCR
+{
+	FileProcessors.SleepTask.1 = s 'SleepTask Class'
+	{
+		CLSID = s '{9B3A2F27-BDA8-4E7E-B0BD-2D2F319537CC}'
+	}
+	FileProcessors.SleepTask = s 'SleepTask Class'
+	{
+		CLSID = s '{9B3A2F27-BDA8-4E7E-B0BD-2D2F319537CC}'
+		CurVer = s 'FileProcessors.SleepTask.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {9B3A2F27-BDA8-4E7E-B0BD-2D2F319537CC} = s 'SleepTask Class'
+		{
+			ProgID = s 'FileProcessors.SleepTask.1'
+			VersionIndependentProgID = s 'FileProcessors.SleepTask'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}
