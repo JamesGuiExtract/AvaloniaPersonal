@@ -255,6 +255,78 @@
 	       	</ul>
    	</ul> 
 <p>
+	<li><b>Core: Apply password(s) to PDF file</b></li>
+   	<ul> 
+		<li><b>User interface</b>
+		<ul>
+	      		<li>Confirm that an <b>Core: Apply password(s) to PDF file</b> task exists.
+      			<li>Confirm that the <b>Core: Apply password(s) to PDF file</b> task requires 
+			all of the following licensing packages:
+			<ul>
+				<li>a <b>general</b> Extract Systems license
+				<li>a PDF read/write license
+			</ul>
+      			<li>Confirm that the <b>Core: Apply password(s) to PDF file</b> property page 
+			includes a <b>General settings</b> group box.
+			<li>Confirm that the group box contains an edit box for specification of 
+			the PDF file for which passwords will be applied.
+			<li>Confirm that the group box contains an associated <b>tag selector</b> 
+			button.
+			<li>Confirm that the tag selector button provides <b>&lt;FPSFileDir&gt;</b> 
+			and <b>&lt;SourceDocName&gt;</b>.
+			<li>Confirm that the tag selector button provides the usual $ functions.
+			<li>Confirm that selections from the tag selector button are correctly 
+			applied to the edit box.
+			<li>Confirm that the group box contains an associated <b>...</b> browse 
+			button.
+			<li>Confirm that the browse button displays an <b>Open File</b> dialog.
+			<li>Confirm that selections from the browse button are correctly 
+			applied to the edit box.
+			<li>Confirm that the group box contains an <b>Display passwords while entering 
+			them below</b> check box.
+<p>
+			<li>Confirm that the check box is unchecked by default.
+      			<li>Confirm that the <b>Core: Apply password(s) to PDF file</b> property page 
+			includes a <b>User password</b> group box.
+			<li>Confirm that the group box contains an <b>Enable user password</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+<p>
+      			<li>Confirm that the <b>Core: Apply password(s) to PDF file</b> property page 
+			includes an <b>Owner password</b> group box.
+			<li>Confirm that the group box contains an <b>Enable owner password</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that the group box contains a <b>Printing in low level quality</b> 
+			check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that the group box contains a <b>Document modifications</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that the group box contains a <b>Copying / extraction of text and 
+			graphics including support to users with disabilities</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that the group box contains an <b>Addition or modification of text 
+			annotations and filling in form fields</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that the group box contains a <b>Filling in existing form fields</b> 
+			check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that the group box contains an <b>Allow access to text and graphics 
+			to support users with disabilities</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that the group box contains an <b>Allow assembling of document</b> 
+			check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that the group box contains an <b>Allow printing of a high resolution 
+			faithful print out</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+		</ul>
+<p>
+		<li><b>Functionality</b>
+		<ul>
+			<li>Confirm that an informative exception is thrown if the specified PDF 
+			file does not exist.
+		</ul>
+   	</ul> 
+<p>
 	<li><b>Core: Archive or restore associated file</b></li>
    	<ul> 
       		<li>Use the Add button to select <b>Core: Archive or restore associated file</b> as 
@@ -894,7 +966,6 @@
   	   	<LI><b>[FlexIDSCore #3715]</b> Confirm that the <b>Save OCR results to speed up 
 		re-processing</b> check box is cleared and disabled if the <b>Do not OCR any of 
 		the pages</b> radio button is selected.
-	       	</ul>
 	      	<li>Confirm presence of a <b>Use cleaned image if available</b> checkbox.
       		<li>Confirm that settings are persistent.
 <p>
@@ -1041,6 +1112,44 @@
 			<li>Confirm that the user must <b>Cancel</b> out of the 
 			property page.
 		</ul>
+   	</ul> 
+<p>
+	<li><b>Core: Modify PDF file</b></li>
+   	<ul> 
+      		<li>Confirm that an <b>Core: Modify PDF file</b> task exists.
+      		<li>Confirm that the <b>Core: Modify PDF file</b> task requires all of the 
+		following licensing packages:
+		<ul>
+			<li>a <b>general</b> Extract Systems license
+			<li>a PDF read/write license
+			<li>a <b>Pegasus PDF toolkit (remove PDF annotations)</b> license
+		</ul>
+      		<li>Confirm that the <b>Core: Modify PDF file</b> property page includes a 
+		<b>General settings</b> group box.
+		<li>Confirm that the group box contains an edit box for specification of 
+		the PDF file to be modified.
+		<li>Confirm that the group box contains an associated <b>tag selector</b> 
+		button.
+		<li>Confirm that the tag selector button provides <b>&lt;FPSFileDir&gt;</b> 
+		and <b>&lt;SourceDocName&gt;</b>.
+		<li>Confirm that the tag selector button provides the usual $ functions.
+		<li>Confirm that selections from the tag selector button are correctly 
+		applied to the edit box.
+		<li>Confirm that the group box contains an associated <b>...</b> browse 
+		button.
+		<li>Confirm that the browse button displays an <b>Open File</b> dialog.
+		<li>Confirm that selections from the browse button are correctly 
+		applied to the edit box.
+      		<li>Confirm that the <b>Core: Modify PDF file</b> property page includes an 
+		<b>Annotations</b> group box.
+		<li>Confirm that the group box contains a <b>Remove all annotations from 
+		the PDF file</b> check box.
+		<li>Confirm that the check box is checked by default.
+<p>
+		<li>Confirm that an informative exception is thrown if the specified PDF 
+		file does not exist.
+		<li>Confirm that annotations are correctly <b>removed from</b> the PDF file.
+		<li>Confirm that annotations are correctly <b>retained in</b> the PDF file.
    	</ul> 
 <p>
 	<li><b>Core: OCR document</b></li>
