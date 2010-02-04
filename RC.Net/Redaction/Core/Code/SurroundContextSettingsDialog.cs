@@ -73,9 +73,10 @@ namespace Extract.Redaction
             bool redactWords = _redactWordsCheckBox.Checked;
             int maxWords = (int) _maxWordsNumericUpDown.Value;
             bool extendHeight = _extendHeightCheckBox.Checked;
+            string dataFile = _dataFileControl.DataFile;
 
             return new SurroundContextSettings(extendAllTypes, dataTypes, redactWords, maxWords, 
-                extendHeight);
+                extendHeight, dataFile);
         }
 
         /// <summary>
@@ -149,6 +150,7 @@ namespace Extract.Redaction
                 _redactWordsCheckBox.Checked = _settings.RedactWords;
                 _maxWordsNumericUpDown.Value = _settings.MaxWords;
                 _extendHeightCheckBox.Checked = _settings.ExtendHeight;
+                _dataFileControl.DataFile = _settings.DataFile;
             }
             catch (Exception ex)
             {

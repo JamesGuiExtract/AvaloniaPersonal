@@ -49,6 +49,7 @@ namespace Extract.Redaction
             this._redactWordsCheckBox = new System.Windows.Forms.CheckBox();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
+            this._dataFileControl = new Extract.Redaction.DataFileControl();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox2 = new System.Windows.Forms.GroupBox();
             label1 = new System.Windows.Forms.Label();
@@ -170,23 +171,30 @@ namespace Extract.Redaction
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(334, 200);
+            this._cancelButton.Location = new System.Drawing.Point(334, 270);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 3;
+            this._cancelButton.TabIndex = 4;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(253, 200);
+            this._okButton.Location = new System.Drawing.Point(253, 270);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 2;
+            this._okButton.TabIndex = 3;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
+            // 
+            // _dataFileControl
+            // 
+            this._dataFileControl.Location = new System.Drawing.Point(12, 196);
+            this._dataFileControl.Name = "_dataFileControl";
+            this._dataFileControl.Size = new System.Drawing.Size(398, 60);
+            this._dataFileControl.TabIndex = 2;
             // 
             // SurroundContextSettingsDialog
             // 
@@ -194,7 +202,8 @@ namespace Extract.Redaction
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(422, 235);
+            this.ClientSize = new System.Drawing.Size(422, 305);
+            this.Controls.Add(this._dataFileControl);
             this.Controls.Add(groupBox2);
             this.Controls.Add(groupBox1);
             this.Controls.Add(this._okButton);
@@ -225,5 +234,6 @@ namespace Extract.Redaction
         private System.Windows.Forms.NumericUpDown _maxWordsNumericUpDown;
         private System.Windows.Forms.CheckBox _extendHeightCheckBox;
         private System.Windows.Forms.CheckBox _redactWordsCheckBox;
+        private DataFileControl _dataFileControl;
     }
 }
