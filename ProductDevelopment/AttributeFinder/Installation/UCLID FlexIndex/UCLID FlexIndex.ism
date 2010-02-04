@@ -247,6 +247,8 @@
 		<row><td>Leadtools.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{039C1CE0-3745-49EE-9CC3-1BD293E78158}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>leadtools.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{27F1FF87-EB92-48B3-BB63-36A63BBD1DDC}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>AFCommon.rl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{14CB5FC3-E5F2-4793-8E2F-A452B33B01A5}</td><td>STANDARD_REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>detailed_report_for_.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>RunFPSFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{970A05B7-73AB-4075-9520-19866FE2A656}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>runfpsfile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>17</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SQLCDBEditor.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{3CC22EF6-5665-4E49-B71E-A9A9C187DF66}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>sqlcdbeditor.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>17</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SandDock.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{DFB39DD3-B34C-45DC-9CC5-753079C610F5}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>sanddock.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SplitMultiPageImage.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{7E4C4013-F82F-4C29-BEA8-7249CA06DADB}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>splitmultipageimage.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>17</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDAFConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{472A6ABF-B5A3-44C3-B987-EA3CF32DC69A}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>UCLIDAFConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -521,8 +523,10 @@
 		<row><td>leadtools.kernel.ann.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Leadtools.Kernel.Ann.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>LEADTO~1.DLL|Leadtools.Kernel.Annotations.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Leadtools.Kernel.Annotations.dll</td><td>1</td><td/></row>
 		<row><td>leadtools.pdf.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Leadtools.Pdf.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>LEADTO~1.DLL|Leadtools.Pdf.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Leadtools.Pdf.dll</td><td>1</td><td/></row>
 		<row><td>leadtools.winforms.d.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Leadtools.WinForms.d.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>LEADTO~1.DLL|Leadtools.WinForms.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Leadtools.WinForms.dll</td><td>1</td><td/></row>
+		<row><td>runfpsfile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>RunFPSFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>RUNFPS~1.EXE|RunFPSFile.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNETGAC_FILES&gt;\RunFPSFile.exe</td><td>1</td><td/></row>
 		<row><td>sanddock.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SandDock.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SandDock.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\SandDock.dll</td><td>1</td><td/></row>
 		<row><td>splitmultipageimage.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SplitMultiPageImage.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SPLITM~1.EXE|SplitMultiPageImage.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\SplitMultiPageImage.exe</td><td>1</td><td/></row>
+		<row><td>sqlcdbeditor.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SQLCDBEditor.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SQLCDB~1.EXE|SQLCDBEditor.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNETGAC_FILES&gt;\SQLCDBEditor.exe</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -702,6 +706,8 @@
 		<row><td>Leadtools.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_1863DFFC_577A_47F5_B92E_4102011374AA_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_58B22BFE_2B7B_41E1_91C4_FA3CC232A1D6_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_6AE1A17B_7E4E_49B5_A4A1_19D6BFF8C693_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>RunFPSFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_C91760E9_1EEB_4552_884F_8BADE39F5C1D_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SQLCDBEditor.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_92F43219_38C3_449B_B34D_77A3C54874C5_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>SandDock.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_265CAFD9_9D5B_4853_9EEB_9619D1A9E1B6_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>SplitMultiPageImage.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7D077F55_261A_485B_8FDA_36B31EFF677B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UCLIDAFConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_8092811F_A55E_4587_A4E2_B6275094D308_FILTER</td><td/><td/><td/><td/></row>
@@ -968,6 +974,7 @@
 		<row><td>PATH_TO_CLEARIMAGEFILES_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\ClearImageFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CLEARIMAGEFILES_FILES1</td><td>P:\AttributeFinder\ClearImageFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_COMPONENTDATA_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\ComponentData</td><td/><td>2</td></row>
+		<row><td>PATH_TO_DOTNETGAC_FILES</td><td>I:\Common\Engineering\ProductDevelopment\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_FILES_FILES</td><td>P:\AttributeFinder\USBLicenseKey\Files</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCC_FILES</td><td>P:\LicenseManager\Files\NonSelfRegCC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMMON_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegCommonComponents</td><td/><td>2</td></row>
@@ -1382,6 +1389,8 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>Leadtools.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>RunFPSFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>SQLCDBEditor.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>SandDock.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>SplitMultiPageImage.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>UCLIDAFConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>

@@ -327,6 +327,7 @@
 		<row><td>ISRegistryComponent</td><td>{BB5CF529-C4A7-46DD-AC5A-F35EB2E1E0E6}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>{B8FF0255-1CA6-48A0-8BD5-3CFB7A976086}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>interop.extractredactiontest</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>{4EC39FF6-1C91-4E50-B9C5-B3E0AA02D9EA}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>interop.uclid_redactioncusto</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NewComponent1</td><td>{A3DF521C-DEBA-41BF-8AEF-6C0135582703}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionCC.dll</td><td>{609DD8EB-6620-4A9E-AE69-452AE7A103C8}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>RedactionCC.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDTestingComponentCore.dll</td><td>{F2E949E8-E546-4D51-8DBE-827330B11D71}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -383,6 +384,7 @@
 		<col key="yes" def="s72">Component_</col>
 		<row><td>COMMON_COMPONENTS</td><td>FlexIndexComponents</td></row>
 		<row><td>INSTALLDIR</td><td>ISRegistryComponent</td></row>
+		<row><td>INSTALLDIR</td><td>NewComponent1</td></row>
 		<row><td>INSTALLDIR</td><td>UtilitiesShortCuts</td></row>
 	</table>
 
@@ -1167,6 +1169,7 @@
 		<row><td>IDShieldMain</td><td>ISRegistryComponent</td></row>
 		<row><td>IDShieldMain</td><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td></row>
 		<row><td>IDShieldMain</td><td>Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td></row>
+		<row><td>IDShieldMain</td><td>NewComponent1</td></row>
 		<row><td>IDShieldMain</td><td>RedactionCC.dll</td></row>
 		<row><td>IDShieldMain</td><td>RedactionTester.dll</td></row>
 		<row><td>IDShieldMain</td><td>UCLIDTestingComponentCore.dll</td></row>
@@ -1459,6 +1462,7 @@
 		<row><td>ISRegistryComponent</td><td/><td/><td>_731CD13E_7DAC_4B8E_A684_926E3E2A6CCD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td/><td/><td>_7F682677_36CD_4BA5_B4B7_8944329E36E2_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td/><td/><td>_5AC6E320_031F_4671_B482_75FD65290FA3_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>NewComponent1</td><td/><td/><td>_33380527_31DF_4C0E_902B_C8B6EEDE03FE_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RedactionCC.dll</td><td/><td/><td>_03DC90EE_03CF_4902_9272_0C41A69D5B61_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RedactionTester.dll</td><td/><td/><td>_E3C82770_0C8B_4480_812B_48AA19DB7EBA_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UCLIDTestingComponentCore.dll</td><td/><td/><td>_A2608FFE_BAE3_4AD7_9D1F_252EFB35F607_FILTER</td><td/><td/><td/><td/></row>
@@ -3246,6 +3250,7 @@
 		<row><td>ID_STRING30</td><td>1033</td><td>[ProductName] requires that your computer is running Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008 or Windows 7</td><td>0</td><td/><td>-979554771</td></row>
 		<row><td>ID_STRING31</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331803989</td></row>
 		<row><td>ID_STRING32</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331770293</td></row>
+		<row><td>ID_STRING33</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>555630608</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>IDShieldMain</td><td>0</td><td/><td>-216429071</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>EXTRAC~1|Extract Systems IDShield</td><td>0</td><td/><td>194604777</td></row>
 		<row><td>ID_STRING6</td><td>1033</td><td>NEWSHO~1|NewShortcut1</td><td>0</td><td/><td>194593546</td></row>
@@ -3886,6 +3891,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut1</td><td>Help</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut10</td><td>UtilitiesShortCuts</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut11</td><td>FlexIndexComponents</td><td/><td>newfolder2</td><td>2</td></row>
+		<row><td>NewShortcut12</td><td>NewComponent1</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut121</td><td>FlexIndexComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut1211</td><td>FlexIndexComponents</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut2</td><td>FlexIndexComponents</td><td/><td>newfolder1</td><td>2</td></row>
@@ -3985,6 +3991,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut1</td><td>newfolder1</td><td>##ID_STRING11##</td><td>Help</td><td>[HELP]IDShield.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut10</td><td>newfolder2</td><td>##ID_STRING19##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]ImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut111</td><td>newfolder2</td><td>##ID_STRING22##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]DetectAndReportFailure.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut12</td><td>newfolder2</td><td>##ID_STRING33##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]SQLCDBEditor.exe</td><td>[COMMON_COMPONENTS]ESFAMService.sdf</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut121</td><td>newfolder1</td><td>##ID_STRING23##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]FAMDBAdmin.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut1211</td><td>newfolder2</td><td>##ID_STRING28##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]ConvertFAMDB.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut2</td><td>newfolder1</td><td>##ID_STRING7##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]ProcessFiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
