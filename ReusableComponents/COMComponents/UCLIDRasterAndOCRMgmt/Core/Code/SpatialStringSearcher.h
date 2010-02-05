@@ -118,8 +118,6 @@ private:
 		unsigned int m_uiLine;
 		// The index of the word that this letter belonged to in the string it came from
 		unsigned int m_uiWord;
-		// True is this character is spatial (has defines boundaries)
-		bool m_bIsSpatial;
 		// tells whether this letter is the end of a Line(Zone, word... )
 		long m_lEndFlags;
 	};
@@ -216,7 +214,11 @@ private:
 	// Inserts non spatial character at the end of letters
 	void insertNonSpatialCharacter(char c, long flags, vector<CPPLetter>& vecLetters);
 
-	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr createStringFromLetterIndexes(const vector<int> &rveciLetters);
+	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr createStringFromLetterIndexes(
+		const vector<int> &rveciLetters, bool bAdjustHeight=false);
+
+	void addLocalLetter(vector<CPPLetter>& vecLetters, const LocalLetter& letter, 
+		bool bAdjustHeight);
 
 	////////////
 	// Variables

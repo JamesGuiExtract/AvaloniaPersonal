@@ -56,9 +56,11 @@ CSpatialStringSearcher::EIntersection CSpatialStringSearcher::LocalEntity::inter
 // LocalLetter
 //-------------------------------------------------------------------------------------------------
 CSpatialStringSearcher::LocalLetter::LocalLetter() : LocalEntity(),
-
-	m_uiLetter(0), m_uiWord(0), m_uiLine(0), m_uiParagraph(0), m_uiZone(0),
-	m_bIsSpatial(false),
+	m_uiLetter(0), 
+	m_uiWord(0), 
+	m_uiLine(0), 
+	m_uiParagraph(0), 
+	m_uiZone(0),
 	m_lEndFlags(0)
 {
 }
@@ -278,7 +280,7 @@ STDMETHODIMP CSpatialStringSearcher::GetDataOutOfRegion(ILongRectangle *ipRect, 
 		for (unsigned int ui = 0; ui < m_vecLetters.size(); ui++)
 		{
 			// we only add spatial letters
-			if (!m_vecLetters[ui].m_bIsSpatial)
+			if (!m_vecLetters[ui].letter.m_bIsSpatial)
 			{
 				continue;
 			}
@@ -344,7 +346,7 @@ STDMETHODIMP CSpatialStringSearcher::ExtendDataInRegion(ILongRectangle *pRect,
 
 		// Build the SpatialString
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipFound =	
-			createStringFromLetterIndexes(vecLetters);
+			createStringFromLetterIndexes(vecLetters, asCppBool(vbExtendHeight));
 		ASSERT_RESOURCE_ALLOCATION("ELI29542", ipFound != NULL);
 
 		// Return the string
@@ -494,11 +496,8 @@ void CSpatialStringSearcher::createLocalLetters()
 		//ONLY SPATIAL LETTERS MAY PROCEED BEYOND THIS POINT
 		if (!letter.m_bIsSpatial)
 		{
-			rLocalLetter.m_bIsSpatial = false;
 			continue;
 		}
-		// Duh
-		rLocalLetter.m_bIsSpatial = true;
 
 		// Set the bounds
 		rLocalLetter.m_lLeft = letter.m_usLeft;
@@ -548,7 +547,7 @@ void CSpatialStringSearcher::createLocalWords()
 		LocalLetter& rLocalLetter = m_vecLetters[ui];
 
 		// Ignore non-spatial characters
-		if (!rLocalLetter.m_bIsSpatial)
+		if (!rLocalLetter.letter.m_bIsSpatial)
 		{
 			continue;
 		}
@@ -621,7 +620,7 @@ void CSpatialStringSearcher::createLocalLines()
 		LocalLetter& rLocalLetter = m_vecLetters[ui];
 
 		// Ignore non-spatial characters
-		if (!rLocalLetter.m_bIsSpatial)
+		if (!rLocalLetter.letter.m_bIsSpatial)
 		{
 			continue;
 		}
@@ -711,7 +710,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 			for (unsigned long ui = 0; ui < m_vecLetters.size(); ui++)
 			{
 				LocalLetter& rLetter = m_vecLetters[ui];
-				if (!rLetter.m_bIsSpatial)
+				if (!rLetter.letter.m_bIsSpatial)
 				{
 					continue;
 				}
@@ -740,7 +739,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 					for (unsigned int uiLetter = rWord.m_uiStart; uiLetter < rWord.m_uiEnd; uiLetter++)
 					{
 						LocalLetter& rLetter = m_vecLetters[uiLetter];
-						if (!rLetter.m_bIsSpatial)
+						if (!rLetter.letter.m_bIsSpatial)
 						{
 							continue;
 						}
@@ -765,7 +764,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 						uiLetter < rLine.m_uiEnd; uiLetter++)
 					{
 						LocalLetter& rLetter = m_vecLetters[uiLetter];
-						if (!rLetter.m_bIsSpatial)
+						if (!rLetter.letter.m_bIsSpatial)
 						{
 							continue;
 						}
@@ -889,7 +888,7 @@ void CSpatialStringSearcher::getSubstringsAsLetters(const vector<LocalSubstring>
 				const LocalLetter& letter = m_vecLetters[k];
 
 				// Add the letter if it is spatial
-				if (letter.m_bIsSpatial)
+				if (letter.letter.m_bIsSpatial)
 				{
 					vecLetters.push_back(k);
 				}
@@ -970,7 +969,7 @@ void CSpatialStringSearcher::rotateRectangle(ILongRectanglePtr ipRect)
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialStringSearcher::createStringFromLetterIndexes(
-	const vector<int> &rveciLetters)
+	const vector<int> &rveciLetters, bool bAdjustHeight)
 {
 	// Create a new spatial string that will contain all the data in the region
 	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipNewStr(CLSID_SpatialString);
@@ -1065,7 +1064,7 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialStringSearcher::createStrin
 		}
 
 		// Add the current letter to our vector (our string)
-		vecNewLetters.push_back(rCurrLocalLetter.letter);
+		addLocalLetter(vecNewLetters, rCurrLocalLetter, bAdjustHeight);
 
 		// A new spatial letter has been added and now it is the 
 		// last spatialLetter
@@ -1081,16 +1080,17 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialStringSearcher::createStrin
 		for (unsigned int uiLetter = rveciLetters[ui] + 1; uiLetter < m_vecLetters.size(); uiLetter++)
 		{
 			// Stop once a spatial character is reached
-			if (m_vecLetters[uiLetter].m_bIsSpatial)
+			const LocalLetter& localLetter = m_vecLetters[uiLetter];
+			if (localLetter.letter.m_bIsSpatial)
 			{
 				break;
 			}
 			// If the letter isn't spatial add it
-			vecNewLetters.push_back(m_vecLetters[uiLetter].letter);
-			cLastLetter = (char) m_vecLetters[uiLetter].letter.m_usGuess1;
+			addLocalLetter(vecNewLetters, localLetter, bAdjustHeight);
+			cLastLetter = (char) localLetter.letter.m_usGuess1;
 
 			// update the word index for non-spatial letters [P16 #2849]
-			currWord = m_vecLetters[uiLetter].m_uiWord;
+			currWord = localLetter.m_uiWord;
 		}
 	}
 
@@ -1110,3 +1110,27 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialStringSearcher::createStrin
 	return ipNewStr;
 }
 //-------------------------------------------------------------------------------------------------
+void CSpatialStringSearcher::addLocalLetter(vector<CPPLetter>& vecLetters, 
+											const LocalLetter& letter, bool bAdjustHeight)
+{
+	if (bAdjustHeight)
+	{
+		CPPLetter cppLetter = letter.letter;
+
+		const LocalLine& line = m_vecLines[letter.m_uiLine];
+		if (cppLetter.m_usTop > line.m_lTop)
+		{
+			cppLetter.m_usTop = (unsigned short) line.m_lTop;
+		}
+		if (cppLetter.m_usBottom < line.m_lBottom)
+		{
+			cppLetter.m_usBottom = (unsigned short) line.m_lBottom;
+		}
+
+		vecLetters.push_back(cppLetter);
+	}
+	else
+	{
+		vecLetters.push_back(letter.letter);
+	}
+}
