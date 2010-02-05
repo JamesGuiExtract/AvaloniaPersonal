@@ -537,10 +537,27 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 			{
 				_lastCodePos = "100.2";
 
-				// if the previous state is "R" it should not be changed
-				// TODO: Handle the "R" case so that they will be marked as pending after the processing has completed
-				if (*pPrevStatus == kActionProcessing)
+				// If the previous state is "R" it should not be changed unless the FAM that was
+				// processing it has timed out.
+				bool bAttemptedRevert = false;
+				while (*pPrevStatus == kActionProcessing)
 				{
+					// If auto-revert is to be attempted, but we have not attempted it yet.
+					if (m_bAutoRevertLockedFiles && !bAttemptedRevert)
+					{
+						revertTimedOutProcessingFAMs(ipConnection);
+						
+						// Requery to see if the attempt had an effect on the file in question.
+						ipFileSet->Requery(adOptionUnspecified);
+
+						// Update the action status to reflect the attempt.
+						*pPrevStatus = asEActionStatus(getStringField(ipFields, strActionCol));
+
+						// Re-test to see if the record is still marked as processing.
+						bAttemptedRevert = true;
+						continue;
+					}
+
 					UCLIDException ue("ELI15043", "Cannot force status from Processing.");
 					ue.addDebugInfo("File", strFileName);
 					ue.addDebugInfo("Action Name", strActionName);
@@ -856,7 +873,8 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToSkipped(long nFileID, BSTR strAct
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26939");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,  EActionStatus * pStatus)
+STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
+									VARIANT_BOOL vbAttemptRevertIfLocked, EActionStatus * pStatus)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -902,6 +920,28 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,  EA
 			// Set return value to the current Action Status
 			string strStatus = getStringField(ipFileSet->Fields, strActionCol);
 			*pStatus = asEActionStatus(strStatus);
+
+			// If the file status is processing and the caller would like to check if it is a
+			// locked file from a timed-out instance, try reverting before returning the initial
+			// status.
+			if (m_bAutoRevertLockedFiles && *pStatus == kActionProcessing &&
+				asCppBool(vbAttemptRevertIfLocked))
+			{
+				// Begin a transaction
+				TransactionGuard tg(ipConnection);
+
+				revertTimedOutProcessingFAMs(ipConnection);
+
+				// Commit the changes to the database
+				tg.CommitTrans();
+
+				// Re-query to see if the status changed as a result of being auto-revereted.
+				ipFileSet->Requery(adOptionUnspecified);
+
+				// Get the updated status
+				string strStatus = getStringField(ipFileSet->Fields, strActionCol);
+				*pStatus = asEActionStatus(strStatus);
+			}
 		}
 		else
 		{
@@ -1254,97 +1294,8 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 		string strSelectSQL = "SELECT " + strTop
 			+ " FAMFile.ID, FileName, Pages, FileSize, Priority, " + strActionCol + " " + strFrom;
 
-		// IUnknownVector to hold the FileRecords to return
-		IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI19504", ipFiles != NULL);
-
-		// Begin a transaction
-		TransactionGuard tg(ipConnection);
-
-		if (m_bAutoRevertLockedFiles)
-		{
-			revertTimedOutProcessingFAMs(ipConnection);
-		}
-
-		// Get the from state for the queries
-		string strFromState = bGetSkippedFiles ? "S" : "P";
-
-		// Get the machine and user ID
-		string strMachineID = asString(getMachineID(ipConnection));
-		string strUserID = asString(getFAMUserID(ipConnection));
-
-		// Create query to create records in the LockedFile table
-		string strLockedTableSQL =
-			"INSERT INTO LockedFile (FileID, ActionID, UPIID, StatusBeforeLock) SELECT FAMFile.ID, "
-			+ strActionID + ", " + strUPIID + ", '" + strFromState + "' FROM FAMFile WHERE "
-			" FAMFile.ID IN (";
-
-		// Recordset to contain the files to process
-		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI13573", ipFileSet != NULL);
-
-		// get the recordset with the top nMaxFiles 
-		ipFileSet->Open(strSelectSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockPessimistic, adCmdText);
-
-		// Fill the ipFiles collection, also update the FAMFile table and build
-		// the queries to update both the FAST table and the Locked file table
-		string strFileIDIn = "";
-		while (ipFileSet->adoEOF == VARIANT_FALSE)
-		{
-			FieldsPtr ipFields = ipFileSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI28234", ipFields != NULL);
-
-			// Set the record to processing and update the recordset
-			setStringField(ipFields, strActionCol, "R");
-			ipFileSet->Update();
-
-			// Get the file Record from the fields
-			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
-				getFileRecordFromFields(ipFields);
-			ASSERT_RESOURCE_ALLOCATION("ELI28235", ipFileRecord != NULL);
-
-			// Put record in list of records to return
-			ipFiles->PushBack(ipFileRecord);
-
-			// Add the file ID to the list of ID's
-			if (!strFileIDIn.empty())
-			{
-				strFileIDIn += ", ";
-			}
-			strFileIDIn += asString(ipFileRecord->FileID);
-
-			// move to the next record in the recordset
-			ipFileSet->MoveNext();
-		}
-
-		// Check whether any file IDs have been added to the string
-		if (!strFileIDIn.empty())
-		{
-			strFileIDIn += ")";
-
-			// Update the FAST table if necessary
-			if (m_bUpdateFASTTable)
-			{
-				// Create query to update the FAST table
-				string strFASTSql =
-					"INSERT INTO " + gstrFILE_ACTION_STATE_TRANSITION + " (FileID, ActionID, "
-					"ASC_From, ASC_To, DateTimeStamp, FAMUserID, MachineID, Exception, "
-					"Comment) SELECT FAMFile.ID, " + strActionID + ", '" + strFromState
-					+ "', 'R', GETDATE(), " + strUserID + ", " + strMachineID
-					+ ", NULL, NULL FROM FAMFile WHERE FAMFile.ID IN (" + strFileIDIn;
-
-				executeCmdQuery(ipConnection, strFASTSql);
-			}
-
-			// Update the lock table
-			executeCmdQuery(ipConnection, strLockedTableSQL + strFileIDIn);
-		}
-
-		// Commit the changes to the database
-		tg.CommitTrans();
-
 		// return the vector of file records
+		IIUnknownVectorPtr ipFiles = setFilesToProcessing(ipConnection, strSelectSQL, nActionID);
 		*pvecFileRecords = ipFiles.Detach();
 
 		END_CONNECTION_RETRY(ipConnection, "ELI23537");
@@ -5161,6 +5112,44 @@ STDMETHODIMP CFileProcessingDB::GetFileRecord(BSTR bstrFile, BSTR bstrActionName
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29238");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetFileStatusToProcessing(long nFileId, long nActionID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+		
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database for this instance
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Action column to update
+		string strActionCol = "ASC_" + getActionName(ipConnection, nActionID);
+
+		string strSelectSQL = "SELECT ID, FileName, Pages, FileSize, Priority, " +
+			strActionCol + " FROM FAMFile WHERE ID = " + asString(nFileId);
+
+		// Perform all processing related to setting a file as processing.
+		setFilesToProcessing(ipConnection, strSelectSQL, nActionID);
+
+		END_CONNECTION_RETRY(ipConnection, "ELI29619");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29620");
 }
 
 //-------------------------------------------------------------------------------------------------
