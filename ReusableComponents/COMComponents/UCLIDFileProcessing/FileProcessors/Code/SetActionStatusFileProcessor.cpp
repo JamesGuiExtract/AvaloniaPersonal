@@ -222,7 +222,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(BSTR bstrFileFullNam
 		else
 		{
 			// Ensure the file is not in processing
-			if (ipDB->GetFileStatus(nFileID, strActionName.c_str())
+			if (ipDB->GetFileStatus(nFileID, strActionName.c_str(), VARIANT_FALSE)
 				!= kActionProcessing)
 			{
 				ipDB->SetStatusForFile(nFileID, strActionName.c_str(), m_eActionStatus,

@@ -1024,36 +1024,21 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				}
 
 				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord = NULL;
-				UCLID_FILEPROCESSINGLib::EActionStatus easCurrent =
-					UCLID_FILEPROCESSINGLib::kActionUnattempted;
 			
 				if (bQueue)
 				{
 					// If queueing, attempt to add the file to the database.
 					VARIANT_BOOL vbAlreadyExists;
+					UCLID_FILEPROCESSINGLib::EActionStatus easOriginal;
 					ipFileRecord = getFPMDB()->AddFile(bstrSourceDocName, m_strAction.c_str(),
 						UCLID_FILEPROCESSINGLib::kPriorityDefault, vbForceProcessing, VARIANT_FALSE,
-						UCLID_FILEPROCESSINGLib::kActionPending, &vbAlreadyExists, &easCurrent);
-
-					// If we are forcing processing or the file didn't already exist, the file status
-					// is now pending... otherwise the status is the same as it was at the time of
-					// the AddFile call.
-					if (bForceProcessing || !asCppBool(vbAlreadyExists))
-					{
-						easCurrent = UCLID_FILEPROCESSINGLib::kActionPending;
-					}
+						UCLID_FILEPROCESSINGLib::kActionPending, &vbAlreadyExists, &easOriginal);
 				}
 				else if (bProcess)
 				{
 					// If not queueing, but processing, attempt to retrieve an existing record for this
 					// file.
 					ipFileRecord = getFPMDB()->GetFileRecord(bstrSourceDocName, m_strAction.c_str());
-
-					if (ipFileRecord != NULL)
-					{
-						// If a record was found, retrieve the current actions status of the file.
-						easCurrent = getFPMDB()->GetFileStatus(ipFileRecord->FileID, m_strAction.c_str());
-					}
 				}
 
 				if (bProcess)
@@ -1063,21 +1048,6 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 						UCLIDException ue("ELI29544", "The file cannot be processed because it has not "
 							"been queued!");
 						throw ue;
-					}
-					else
-					{
-						bool bProcessSkippedFiles = asCppBool(m_ipFPMgmtRole->ProcessSkippedFiles);
-						
-						// If file is not in the correct state to process (depending on the skipped file
-						// setting), throw an exception.
-						if ((bProcessSkippedFiles && easCurrent != UCLID_FILEPROCESSINGLib::kActionSkipped) ||
-							(!bProcessSkippedFiles && easCurrent != UCLID_FILEPROCESSINGLib::kActionPending))
-						{
-							UCLIDException ue("ELI29545", string("The file cannot be processed because it ") +
-								"is not currently " + (bProcessSkippedFiles ? "skipped!" : "pending!"));
-							ue.addDebugInfo("Current Status", asString(getFPMDB()->AsStatusString(easCurrent)));
-							throw ue;
-						}
 					}
 
 					// m_ipFPMgmtRole needs a record manager to be able to process files.

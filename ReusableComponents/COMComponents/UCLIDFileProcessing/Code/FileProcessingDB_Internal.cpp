@@ -336,7 +336,7 @@ EActionStatus CFileProcessingDB::asEActionStatus  (const string& strStatus)
 	return easRtn;
 }
 //--------------------------------------------------------------------------------------------------
-string CFileProcessingDB::asStatusString (EActionStatus eStatus)
+string CFileProcessingDB::asStatusString(EActionStatus eStatus)
 {
 	switch (eStatus)
 	{
@@ -356,6 +356,26 @@ string CFileProcessingDB::asStatusString (EActionStatus eStatus)
 		THROW_LOGIC_ERROR_EXCEPTION("ELI13562");
 	}
 	return "U";
+}
+//--------------------------------------------------------------------------------------------------
+string CFileProcessingDB::asStatusName(const string& strStatus)
+{
+	if (strStatus.length() != 1)
+	{
+		THROW_LOGIC_ERROR_EXCEPTION("ELI29623");
+	}
+
+	switch (strStatus[0])
+	{
+		case 'U':	return "Unattempted";
+		case 'P':	return "Pending";
+		case 'R':	return "Processing";
+		case 'C':	return "Completed";
+		case 'F':	return "Failed";
+		case 'S':	return "Skipped";
+
+		default: THROW_LOGIC_ERROR_EXCEPTION("ELI29625");
+	}
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nFileID, 
@@ -2997,3 +3017,150 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr &ipConnection,
+														   const string& strSelectSQL,
+														   long nActionID)
+{
+	try
+	{
+		try
+		{
+			// IUnknownVector to hold the FileRecords to return
+			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI19504", ipFiles != NULL);
+
+			// Begin a transaction
+			TransactionGuard tg(ipConnection);
+
+			if (m_bAutoRevertLockedFiles)
+			{
+				revertTimedOutProcessingFAMs(ipConnection);
+			}
+
+			// Action Column to change
+			string strActionName = getActionName(ipConnection, nActionID);
+			string strActionCol = "ASC_" + strActionName;
+
+			// Recordset to contain the files to process
+			_RecordsetPtr ipFileSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI13573", ipFileSet != NULL);
+
+			// Get recordset of files to be set to processing.
+			ipFileSet->Open(strSelectSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+				adLockPessimistic, adCmdText);
+
+			// The state the records were in previous to being marked processing.
+			string strFromState;
+
+			// Fill the ipFiles collection, also update the FAMFile table and build
+			// the queries to update both the FAST table and the Locked file table
+			string strFileIDIn = "";
+			while (ipFileSet->adoEOF == VARIANT_FALSE)
+			{
+				FieldsPtr ipFields = ipFileSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI28234", ipFields != NULL);
+
+				string strFileFromState = getStringField(ipFields, strActionCol);
+
+				// Set the record to processing and update the recordset
+				setStringField(ipFields, strActionCol, "R");
+				ipFileSet->Update();
+
+				// Get the file Record from the fields
+				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
+					getFileRecordFromFields(ipFields);
+				ASSERT_RESOURCE_ALLOCATION("ELI28235", ipFileRecord != NULL);
+
+				// Put record in list of records to return
+				ipFiles->PushBack(ipFileRecord);
+
+				// Add the file ID to the list of ID's
+				if (!strFileIDIn.empty())
+				{
+					strFileIDIn += ", ";
+				}
+
+				string strFileID = asString(ipFileRecord->FileID);
+
+				if (strFileFromState != "P" && strFileFromState != "S")
+				{
+					UCLIDException ue("ELI29629", "Invalid File State Transition!");
+					ue.addDebugInfo("Old Status", asStatusName(strFileFromState));
+					ue.addDebugInfo("New Status", "Processing");
+					ue.addDebugInfo("Action Name", strActionName);
+					ue.addDebugInfo("File ID", strFileID);
+					throw ue;
+				}
+
+				strFileIDIn += strFileID;
+
+				if (strFromState.empty())
+				{
+					strFromState = strFileFromState;
+				}
+				else if (strFromState != strFileFromState)
+				{
+					UCLIDException ue("ELI29622", "Unable to simultaneously set a batch of records "
+						"in multiple action states to processing!");
+					ue.addDebugInfo("Action Name", strActionName);
+					ue.addDebugInfo("File IDs", strFileIDIn);
+					ue.addDebugInfo("Action State A", strFromState);
+					ue.addDebugInfo("Action State B", strFileFromState);
+					throw ue;
+				}
+
+				// move to the next record in the recordset
+				ipFileSet->MoveNext();
+			}
+
+			// Check whether any file IDs have been added to the string
+			if (!strFileIDIn.empty())
+			{
+				strFileIDIn += ")";
+
+				// Get the from state for the queries
+				string strActionID = asString(nActionID);
+				string strUPIID = asString(m_nUPIID);
+
+				// Update the FAST table if necessary
+				if (m_bUpdateFASTTable)
+				{
+					// Get the machine and user ID
+					string strMachineID = asString(getMachineID(ipConnection));
+					string strUserID = asString(getFAMUserID(ipConnection));
+
+					// Create query to update the FAST table
+					string strFASTSql =
+						"INSERT INTO " + gstrFILE_ACTION_STATE_TRANSITION + " (FileID, ActionID, "
+						"ASC_From, ASC_To, DateTimeStamp, FAMUserID, MachineID, Exception, "
+						"Comment) SELECT FAMFile.ID, " + strActionID + ", '" + strFromState
+						+ "', 'R', GETDATE(), " + strUserID + ", " + strMachineID
+						+ ", NULL, NULL FROM FAMFile WHERE FAMFile.ID IN (" + strFileIDIn;
+
+					executeCmdQuery(ipConnection, strFASTSql);
+				}
+
+				// Create query to create records in the LockedFile table
+				string strLockedTableSQL =
+					"INSERT INTO LockedFile (FileID, ActionID, UPIID, StatusBeforeLock) SELECT FAMFile.ID, "
+					+ strActionID + ", " + strUPIID + ", '" + strFromState + "' FROM FAMFile WHERE "
+					" FAMFile.ID IN (";
+
+				// Update the lock table
+				executeCmdQuery(ipConnection, strLockedTableSQL + strFileIDIn);
+			}
+
+			// Commit the changes to the database
+			tg.CommitTrans();
+
+			return ipFiles;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29630");
+	}
+	catch (UCLIDException &ue)
+	{
+		ue.addDebugInfo("Record Query", strSelectSQL, true);
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------

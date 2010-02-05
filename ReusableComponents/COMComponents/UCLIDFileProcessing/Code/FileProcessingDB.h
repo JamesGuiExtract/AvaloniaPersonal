@@ -105,7 +105,8 @@ public:
 	STDMETHOD(SetFileStatusToUnattempted)(long nFileID, BSTR strAction);
 	STDMETHOD(SetFileStatusToSkipped)(long nFileID, BSTR strAction, 
 		VARIANT_BOOL bRemovePreviousSkipped);
-	STDMETHOD(GetFileStatus)(long nFileID, BSTR strAction, EActionStatus* pStatus);
+	STDMETHOD(GetFileStatus)(long nFileID, BSTR strAction, VARIANT_BOOL vbAttemptRevertIfLocked,
+		EActionStatus* pStatus);
 	STDMETHOD(SearchAndModifyFileStatus)(long nWhereActionID, EActionStatus eWhereStatus, 
 		long nToActionID, EActionStatus eToStatus, BSTR bstrSkippedFromUserName, long nFromActionID,
 		long* pnNumRecordsModified);
@@ -197,6 +198,7 @@ public:
 	STDMETHOD(AutoCreateAction)(BSTR bstrActionName);
 	STDMETHOD(CanSkipAuthenticationOnThisMachine)(VARIANT_BOOL* pvbSkipAuthentication);
 	STDMETHOD(GetFileRecord)(BSTR bstrFile, BSTR bstrActionName, IFileRecord** ppFileRecord);
+	STDMETHOD(SetFileStatusToProcessing)(long nFileId, long nActionID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -322,6 +324,10 @@ private:
 
 	// PROMISE:	To return the string representation of the given EActionStatus
 	string asStatusString (EActionStatus eStatus);
+
+	// PROMISE: To return a user-readable name for the specified status string
+	//			("U", "P", "R", "F", "S" or "C")
+	string asStatusName(const string& strStatus);
 
 	// PROMISE:	To add a single record to the QueueEvent table in the database with the given data
 	//			using the connection provided
@@ -606,6 +612,16 @@ private:
 	// Thread function to email message, pData should be allocated with new and be a pointer to
 	// emailThreadData
 	static UINT emailMessageThread(void* pData);
+
+	// Marks all records indicated by the specified query to processing. The processing in this
+	// function includes attempting to auto-revert locked files, recording appropriate entries in
+	// the FAST table and adding an appropriate entry to the locked file table.
+	// REQUIRE:	The query must return the following columns from the FAMFile table:
+	//			SELECT ID, FileName, Pages, FileSize, Priority and the "ASC_" action column for the
+	//			current action.
+	// RETURNS: A vector of IFileRecords for the files that were set to processing.
+	IIUnknownVectorPtr setFilesToProcessing(const _ConnectionPtr &ipConnection,
+		const string& strSelectSQL, long nActionID);
 
 	void validateLicense();
 };

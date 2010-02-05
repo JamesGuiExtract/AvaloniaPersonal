@@ -638,7 +638,7 @@ library UCLID_FILEPROCESSINGLib
 		[id(9), helpstring("method SetFileStatusToUnattempted")] HRESULT SetFileStatusToUnattempted([in] long nFileID, 
 			[in] BSTR strAction);
 		[id(10), helpstring("method GetFileStatus")] HRESULT GetFileStatus([in] long nFileID, [in] BSTR strAction,
-			[out, retval] EActionStatus *pStatus);
+			[in] VARIANT_BOOL vbAttemptRevertIfLocked, [out, retval] EActionStatus *pStatus);
 
 		// PROMISE: To find all of the records that have the status of eFromStatus in the nFromActionID action and change
 		//			the status of the nToActionID action to eToStatus and update the FileActionStateTransistion table.
@@ -1060,6 +1060,13 @@ library UCLID_FILEPROCESSINGLib
 		//			name. Returns NULL if such a record does not exist.
 		[id(92), helpstring("method GetFileRecord")] HRESULT GetFileRecord([in] BSTR bstrFile,
 			[in] BSTR bstrActionName, [out, retval] IFileRecord** ppFileRecord);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the specified file to processing status for the specified action. 
+		//			This call includes all tasks that go along with marking a file as processing
+		//			such as attempting to auto-revert locked files, recording appropriate entries in
+		//			the FAST table and adding an appropriate entry to the locked file table.
+		[id(93), helpstring("method SetFileStatusToProcessing")] HRESULT SetFileStatusToProcessing(
+			[in] long nFileId, [in] long nActionID);
 	};
 
 	[

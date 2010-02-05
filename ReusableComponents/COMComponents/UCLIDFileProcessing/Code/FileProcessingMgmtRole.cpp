@@ -1168,6 +1168,26 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 
 		m_bProcessingSingleFile = true;
 
+		// Register this processing FAM for auto revert
+		getFPMDB()->RegisterProcessingFAM();
+
+		// Get the current action status-- allow an attempt to auto-revert locked files if the file
+		// is in the processing state.
+		string strActionName = getFPMDB()->GetActionName(ipFileRecord->ActionID);
+		UCLID_FILEPROCESSINGLib::EActionStatus easCurrent =
+			getFPMDB()->GetFileStatus(ipFileRecord->FileID, strActionName.c_str(), VARIANT_TRUE);
+
+		// If file is not in the correct state to process (depending on the skipped file
+		// setting), throw an exception.
+		while ((m_bProcessSkippedFiles && easCurrent != UCLID_FILEPROCESSINGLib::kActionSkipped) ||
+			   (!m_bProcessSkippedFiles && easCurrent != UCLID_FILEPROCESSINGLib::kActionPending))
+		{
+			UCLIDException ue("ELI29545", string("The file cannot be processed because it ") +
+				"is not currently " + (m_bProcessSkippedFiles ? "skipped!" : "pending!"));
+			ue.addDebugInfo("Current Status", asString(getFPMDB()->AsStatusString(easCurrent)));
+			throw ue;
+		}
+
 		// Set action ID to the record manager
 		m_pRecordMgr->setActionID(ipFileRecord->ActionID);
 
@@ -1181,10 +1201,6 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		// Do not keep processing regardless of the configured setting.
 		m_pRecordMgr->setKeepProcessingAsAdded(false);
 
-		// Create a FileProcessingRecord for the file and add it to the record manager's queue.
-		FileProcessingRecord task(ipFileRecord);
-		m_pRecordMgr->push(task);
-
 		// Create and initialize a processing thread data struct needed by processTask.
 		ProcessingThreadData threadData;
 		threadData.m_pFPMgmtRole = this;
@@ -1196,10 +1212,22 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		ipExecutor->Init(m_ipFileProcessingTasks, m_pRecordMgr->getActionID(), getFPMDB(),
 			getFAMTagManager());
 
+		// Create a FileProcessingRecord for the file and add it to the record manager's queue.
+		getFPMDB()->SetFileStatusToProcessing(ipFileRecord->FileID, ipFileRecord->ActionID);
+		FileProcessingRecord task(ipFileRecord);
+
+		// Though the record manager is in a sense unnecessary when processing a single file,
+		// because of the close way it is tied to processing, exceptions will be raised if the file
+		// does not follow the same code-path through push and pop prior to processing.
+		m_pRecordMgr->push(task);
+		m_pRecordMgr->pop(task);
+
 		// Process the file
 		processTask(task, &threadData);
 
 		ipExecutor->Close();
+
+		getFPMDB()->UnregisterProcessingFAM();
 
 		m_bProcessingSingleFile = false;
 
