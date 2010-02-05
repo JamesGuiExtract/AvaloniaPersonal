@@ -334,12 +334,15 @@
 			starting processing of an FPS file.
 			<li>Confirm that a defined user without a password is required to 
 			specify a password before processing will begin.
+			<li>Confirm that <b>SkipAuthenticationOnMachines</b> from the 
+			<b>DBInfo</b> table works properly.
 			<li>Confirm that <b>User Authentication</b> works properly with 
 			the following features
 			<ul>
 				<li>FAM Service
 				<li>Scheduled processing
 				<li>Queuing without processing
+				<li>RunFPSFile
 			</ul>
 			<li>Document the details of additional independent testing of 
 			this feature.
@@ -692,12 +695,25 @@
 <p>
 		<li><b>Support For Output Of Password Protected PDFs - (#30)</b>
 		<ul>
-			<li>
+			<li>Exercise this task per the updated <b>File Processing Tasks - 
+			General</b> checklist.
+			<li>Confirm that the property page works as expected.
+			<li>User password functionality
+			<ul>
+				<li>
+			</ul>
+			<li>Owner password functionality
+			<ul>
+				<li>
+			</ul>
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
 		<li><b>Support For Copying Bookmarks Between PDFs - (#31)</b>
 		<ul>
-			<li>
+			<li>This feature will <b>not</b> be included in FLEX Index / 
+			ID Shield 8.0.
 		</ul>
 <p>
 		<li><b>Support Watermarks On All Pages - (#32)</b>
@@ -720,7 +736,13 @@
 <p>
 		<li><b>Support For Removing Annotations And Markups From PDFs - (#33)</b>
 		<ul>
-			<li>
+			<li>Exercise this task per the updated <b>File Processing Tasks - 
+			General</b> checklist.
+			<li>Confirm that the property page works as expected.
+			<li>Confirm that annotations can be removed from PDFs.
+			<li>Confirm that annotations can be retained in PDFs.
+			<li>Document the details of additional independent testing of 
+			this feature.
 		</ul>
 <p>
 		<li><b>Support For Randomly Redacting Additional Context Around Sensitive Data 
@@ -787,6 +809,7 @@
 			using tasks and settings defined in a specified FPS file.
 			<li>Confirm that the <b>/ignoreDB</b> switch works properly.
 			<li>Confirm that the <b>/queue</b> switch works properly.
+			<li>Confirm that the <b>/priority</b> switch works properly.
 			<li>Confirm that the <b>/forceprocessing</b> switch works properly.
 			<li>Confirm that the <b>/process</b> switch works properly.
 			<li>Confirm that the utility works properly with the following 
@@ -795,6 +818,17 @@
 				<li><b>User authentication</b> - TBD
 				<li><b>Scheduled processing</b> - ignores settings
 			</ul>
+			<li>Document the details of additional independent testing of 
+			this feature.
+		</ul>
+<p>
+  	   	<LI><b>Core: Sleep task</b>
+		<ul>
+			<li>Confirm that the property page works as expected.
+			<li>Confirm that <b>Sleep</b> works properly for assigned time 
+			intervals.
+			<li>Confirm that <b>Sleep</b> works properly for random time 
+			intervals.
 			<li>Document the details of additional independent testing of 
 			this feature.
 		</ul>
