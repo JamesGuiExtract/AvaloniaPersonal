@@ -72,6 +72,11 @@ namespace Extract.FileActionManager.RunFPSFile
         static bool _forceProcessing;
 
         /// <summary>
+        /// The priority assigned to a file being queued.
+        /// </summary>
+        static UCLID_FILEPROCESSINGLib.EFilePriority _filePriority = EFilePriority.kPriorityDefault;
+
+        /// <summary>
         /// Specifies a file to which exceptions should be logged rather than displaying them.
         /// </summary>
         static string _logFileName;
@@ -126,7 +131,7 @@ namespace Extract.FileActionManager.RunFPSFile
                     // If database interaction is required, allow fileProcessigManager to manage the
                     // processing.
                     fileProcessingManager.ProcessSingleFile(_sourceDocName, _queue, _process,
-                        _forceProcessing);
+                        _forceProcessing, _filePriority);
                 }
             }
             catch (Exception ex)
@@ -178,7 +183,7 @@ namespace Extract.FileActionManager.RunFPSFile
                 return false;
             }
 
-            if (args.Length < 3 || args.Length > 6)
+            if (args.Length < 3 || args.Length > 8)
             {
                 ShowUsage("Invalid number of command-line arguments.");
                 return false;
@@ -223,9 +228,29 @@ namespace Extract.FileActionManager.RunFPSFile
                 {
                     _forceProcessing = true;
                 }
+                else if (argument.Equals("/priority", StringComparison.Ordinal))
+                {
+                    if (i + 1 >= args.Length)
+                    {
+                        ShowUsage("Priority value required.");
+                        return false;
+                    }
+
+                    i++;
+                    int intValue;
+                    if (int.TryParse(args[i], out intValue) && intValue >= 0 && intValue <= 5)
+                    {
+                        _filePriority = (EFilePriority)intValue;
+                    }
+                    else
+                    {
+                        ShowUsage("Invalid priority value specified: " + args[i]);
+                        return false;
+                    }
+                }
                 else if (argument.Equals("/ef", StringComparison.Ordinal))
                 {
-                    if (i+1 >= args.Length)
+                    if (i + 1 >= args.Length)
                     {
                         ShowUsage("Log file argument required.");
                         return false;
@@ -248,17 +273,25 @@ namespace Extract.FileActionManager.RunFPSFile
                 return false;
             }
 
-            if (_ignoreDb && (_queue || _process || _forceProcessing))
+            if (_ignoreDb && (_queue || _process || _forceProcessing || _filePriority != 0))
             {
-                ShowUsage(
-                    "/ignoreDB is not compatible with /queue, /process or /forceProcessing.");
+                ShowUsage("/ignoreDB is not compatible with /queue, /process /forceProcessing " +
+                    " or /priority.");
                 return false;
             }
 
-            if (_forceProcessing && !_queue)
+            if (!_queue)
             {
-                ShowUsage("/forceProcessing must be used in conjunction with /queue");
-                return false;
+                if (_forceProcessing)
+                {
+                    ShowUsage("/forceProcessing must be used in conjunction with /queue.");
+                    return false;
+                }
+                else if (_filePriority > 0)
+                {
+                    ShowUsage("/priority must be used in conjunction with /queue.");
+                    return false;
+                }
             }
 
             return true;
@@ -288,7 +321,7 @@ namespace Extract.FileActionManager.RunFPSFile
 
             usage.Append(Environment.GetCommandLineArgs()[0]);
             usage.Append(" <FPSFileName> <SourceDocName> [/ignoreDb] [/queue] [/process]");
-            usage.AppendLine(" [/forceProcessing] [/ef <filename>]");
+            usage.AppendLine(" [/forceProcessing] [/priority <integer value>] [/ef <filename>]");
             usage.AppendLine();
 
             usage.Append("FPSFileName: The FPS file to use to process the document.");
@@ -304,9 +337,9 @@ namespace Extract.FileActionManager.RunFPSFile
             usage.Append("settings or action name specified in the FPS file in any way. The file ");
             usage.Append("is processed whether or not it exists in the database and regardless ");
             usage.Append("of what its database status may be. Cannot be combined the /queue, ");
-            usage.Append("/process or /forceProcessing switches. The FPS file cannot contain ");
-            usage.Append("any tasks that depend on access to the FPS file's specified database ");
-            usage.Append("or action.");
+            usage.Append("/process /forceProcessing or /priority switches. The FPS file cannot ");
+            usage.Append("contain any tasks that depend on access to the FPS file's specified ");
+            usage.Append("database or action.");
             usage.AppendLine();
             usage.AppendLine();
 
@@ -324,6 +357,12 @@ namespace Extract.FileActionManager.RunFPSFile
             usage.Append("/forceProcessing: Forces the status of the document to pending ");
             usage.Append("in the database for the FPS file's action if the document was ");
             usage.Append("previously queued. Must be used in conjunction with the /queue switch.");
+            usage.AppendLine();
+            usage.AppendLine();
+
+            usage.Append("/priority: The priority as an integer (where 1 = low and 5 = high and ");
+            usage.Append("0 = default) to assign to a file being queued. Must be used in ");
+            usage.Append("conjunction with the /queue switch.");
             usage.AppendLine();
             usage.AppendLine();
 

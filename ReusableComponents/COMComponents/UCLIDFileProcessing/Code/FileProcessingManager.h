@@ -91,7 +91,7 @@ public:
 	STDMETHOD(put_NumberOfDocsToProcess)(long lNumberOfDocsToProcess);
 	STDMETHOD(get_IsUserAuthenticationRequired)(VARIANT_BOOL* pvbIsAuthenticationRequired);
 	STDMETHOD(ProcessSingleFile)(BSTR bstrSourceDocName,VARIANT_BOOL vbQueue,
-		VARIANT_BOOL vbProcess, VARIANT_BOOL vbForceProcessing);
+		VARIANT_BOOL vbProcess, VARIANT_BOOL vbForceProcessing, EFilePriority eFilePriority);
 	STDMETHOD(AuthenticateForProcessing)(VARIANT_BOOL* pvbAuthenticated);
 
 	// IPersistStream

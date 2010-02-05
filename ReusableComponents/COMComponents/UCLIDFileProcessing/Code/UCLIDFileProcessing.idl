@@ -408,9 +408,11 @@ library UCLID_FILEPROCESSINGLib
 		//			vbForceProcessing- If VARIANT_TRUE and if the file is already present when
 		//			queueing its EActionStatus will be reset to kActionPending. Cannot be
 		//			VARIANT_TRUE if vbQueue is VARIANT_FALSE. 
+		//			nFilePriority- The priority to be assigned to a file being queued. Ignored if
+		//			vbQueue is VARIANT_FALSE
 		[id(52), helpstring("method ProcessSingleFile")] HRESULT ProcessSingleFile(
 			[in] BSTR bstrSourceDocName, [in] VARIANT_BOOL vbQueue, [in] VARIANT_BOOL vbProcess,
-			[in] VARIANT_BOOL vbForceProcessing);
+			[in] VARIANT_BOOL vbForceProcessing, [in] EFilePriority eFilePriority);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Prompts for user and DB admin passwords as appropriate to run. 
 		// RETURNS: VARIANT_TRUE if processing is allowed to run, VARIANT_FALSE if the user was

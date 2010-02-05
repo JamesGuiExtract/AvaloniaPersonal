@@ -993,7 +993,7 @@ STDMETHODIMP CFileProcessingManager::get_IsUserAuthenticationRequired(
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, VARIANT_BOOL vbQueue,
-		VARIANT_BOOL vbProcess, VARIANT_BOOL vbForceProcessing)
+		VARIANT_BOOL vbProcess, VARIANT_BOOL vbForceProcessing, EFilePriority eFilePriority)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -1031,8 +1031,9 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 					VARIANT_BOOL vbAlreadyExists;
 					UCLID_FILEPROCESSINGLib::EActionStatus easOriginal;
 					ipFileRecord = getFPMDB()->AddFile(bstrSourceDocName, m_strAction.c_str(),
-						UCLID_FILEPROCESSINGLib::kPriorityDefault, vbForceProcessing, VARIANT_FALSE,
-						UCLID_FILEPROCESSINGLib::kActionPending, &vbAlreadyExists, &easOriginal);
+						(UCLID_FILEPROCESSINGLib::EFilePriority)eFilePriority, vbForceProcessing,
+						VARIANT_FALSE, UCLID_FILEPROCESSINGLib::kActionPending, &vbAlreadyExists,
+						&easOriginal);
 				}
 				else if (bProcess)
 				{
