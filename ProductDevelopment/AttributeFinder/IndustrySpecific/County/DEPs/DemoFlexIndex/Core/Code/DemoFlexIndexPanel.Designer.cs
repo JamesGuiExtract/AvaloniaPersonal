@@ -237,7 +237,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._legalDescriptionTable.MinimumNumberOfRows = 1;
             this._legalDescriptionTable.Name = "_legalDescriptionTable";
             this._legalDescriptionTable.ParentDataEntryControl = null;
-            this._legalDescriptionTable.RowFormattingRuleFile = "..\\Rules\\LegalDescription\\LegalDescription.rsd.etf";
+            this._legalDescriptionTable.RowFormattingRuleFile = "..\\Rules\\RubberbandSplitters\\LegalDescription.rsd.etf";
             this._legalDescriptionTable.RowSwipingEnabled = true;
             this._legalDescriptionTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._legalDescriptionTable.Size = new System.Drawing.Size(562, 68);
@@ -344,7 +344,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._returnAddressTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._returnAddressTable.Size = new System.Drawing.Size(405, 134);
             this._returnAddressTable.TabIndex = 1;
-            this._returnAddressTable.TableFormattingRuleFile = "..\\Rules\\ReturnAddress\\ReturnAddress.rsd.etf";
+            this._returnAddressTable.TableFormattingRuleFile = "..\\Rules\\RubberbandSplitters\\ReturnAddress.rsd.etf";
             this._returnAddressTable.TableSwipingEnabled = true;
             // 
             // _parcelNumberLabel

@@ -1295,7 +1295,7 @@ namespace Extract.DataEntry
 
                     // If the cell in question has a validation warning assosiated with it, paint
                     // the warning icon instead of the error icon.
-                    if (dataEntryCell != null &&
+                    if (dataEntryCell != null && dataEntryCell.Attribute != null &&
                         (AttributeStatusInfo.GetDataValidity(dataEntryCell.Attribute) ==
                             DataValidity.ValidationWarning))
                     {
