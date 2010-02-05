@@ -141,7 +141,7 @@ namespace Extract.Redaction
                 // TODO: ExtendDataInRegion should accept an IUnknownVector of Rectangles.
                 // Otherwise there is no guarantee that extending doesn't result in overlapping areas
                 SpatialString extended = searcher.ExtendDataInRegion(
-                    GetLongRectangleFromZone(zone), _settings.MaxWords, _settings.ExtendHeight);
+                    GetLongRectangleFromZone(zone), GetMaxWordsToExtend(), _settings.ExtendHeight);
 
                 if (extended.HasSpatialInfo())
                 {
@@ -166,6 +166,15 @@ namespace Extract.Redaction
             attribute.Value = resultValue;
 
             return new RedactionItem(attribute);
+        }
+
+        /// <summary>
+        /// Returns the maximum number of words by which to extend a redaction.
+        /// </summary>
+        /// <returns>The maximum number of words by which to extend a redaction.</returns>
+        int GetMaxWordsToExtend()
+        {
+            return _settings.RedactWords ? _settings.MaxWords : 0;
         }
 
         /// <summary>
