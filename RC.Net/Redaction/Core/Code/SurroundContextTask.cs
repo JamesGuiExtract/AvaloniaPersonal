@@ -123,11 +123,14 @@ namespace Extract.Redaction
         RedactionItem GetExtendedRedaction(SpatialString source, SpatialStringSearcher searcher, 
             RedactionItem item)
         {
-            RasterZoneCollection resultZones = new RasterZoneCollection();
-
-            int loadedPage = -1;
+            // Get the original raster zones
             SpatialString value = item.ComAttribute.Value;
             RasterZoneCollection zones = GetZonesFromSpatialString(value);
+
+            // Include the original zones in the result [FIDSC #4045]
+            RasterZoneCollection resultZones = new RasterZoneCollection(zones);
+
+            int loadedPage = -1;
             foreach (RasterZone zone in zones)
             {
                 int currentPage = zone.PageNumber;
@@ -154,6 +157,9 @@ namespace Extract.Redaction
             {
                 return null;
             }
+
+            // Remove any duplicate zones
+            RemoveDuplicates(resultZones);
 
             // Create the result for the spatial string
             SpatialString resultValue = new SpatialString();
@@ -200,6 +206,34 @@ namespace Extract.Redaction
             longRectangle.SetBounds(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
 
             return longRectangle;
+        }
+
+        /// <summary>
+        /// Removes any zones in the specified collection that are completely contained by the 
+        /// other zones.
+        /// </summary>
+        /// <param name="zones">The collection of zones from which to remove duplicates.</param>
+        static void RemoveDuplicates(RasterZoneCollection zones)
+        {
+            for (int i = 0; i < zones.Count; i++)
+            {
+                RasterZone zoneI = zones[i];
+
+                double overlapArea = 0.0;
+                for (int j = 0; j < zones.Count; j++)
+                {
+                    if (i != j)
+                    {
+                        overlapArea += zoneI.GetAreaOverlappingWith(zones[j]);
+                    }
+                }
+
+                if (overlapArea >= zoneI.Area())
+                {
+                    zones.RemoveAt(i);
+                    i--;
+                }
+            }
         }
 
         /// <summary>
