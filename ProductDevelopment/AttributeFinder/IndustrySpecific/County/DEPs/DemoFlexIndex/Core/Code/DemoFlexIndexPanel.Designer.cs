@@ -216,6 +216,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._legalDescriptionTextBox.Name = "_legalDescriptionTextBox";
             this._legalDescriptionTextBox.ParentDataEntryControl = this._legalDescriptionTable;
             this._legalDescriptionTextBox.RemoveNewLineChars = false;
+            this._legalDescriptionTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._legalDescriptionTextBox.Size = new System.Drawing.Size(562, 87);
             this._legalDescriptionTextBox.TabIndex = 8;
             this._legalDescriptionTextBox.ValidationErrorMessage = "Invalid value";
@@ -301,6 +302,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // 
             // _returnAddressTable
             // 
+            this._returnAddressTable.AllowUserToResizeRows = false;
             this._returnAddressTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._returnAddressTable.AttributeName = "ReturnAddress";
@@ -342,6 +344,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._returnAddressTable.Rows.Add(dataEntryTableRow4);
             this._returnAddressTable.Rows.Add(dataEntryTableRow5);
             this._returnAddressTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this._returnAddressTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this._returnAddressTable.Size = new System.Drawing.Size(405, 134);
             this._returnAddressTable.TabIndex = 1;
             this._returnAddressTable.TableFormattingRuleFile = "..\\Rules\\RubberbandSplitters\\ReturnAddress.rsd.etf";

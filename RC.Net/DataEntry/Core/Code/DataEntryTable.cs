@@ -1383,7 +1383,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="e">Contains information about the key that was pressed.</param>
         /// <returns><see langword="true"/> if the key was processed; otherwise,
-        /// <see langword="false"/>. </returns>
+        /// <see langword="false"/>.</returns>
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         [SuppressMessage("Microsoft.Security", "CA2109:ReviewVisibleEventHandlers", MessageId = "0#")]
         protected override bool ProcessDataGridViewKey(KeyEventArgs e)
@@ -1459,24 +1459,6 @@ namespace Extract.DataEntry
                 if (keyData == Keys.Enter && ProcessEnterKey())
                 {
                     return true;
-                }
-                // If the delete key is pressed while a combo cell is selected or all text
-                // is selected in a text box cell, delete spatial info.
-                else if (keyData == Keys.Delete && EditingControl != null)
-                {
-                    IDataEntryTableCell dataEntryCell = CurrentCell as IDataEntryTableCell;
-
-                    if (dataEntryCell != null)
-                    {
-                        DataGridViewTextBoxEditingControl textBoxEditingControl =
-                            EditingControl as DataGridViewTextBoxEditingControl;
-
-                        if (textBoxEditingControl == null ||
-                            textBoxEditingControl.SelectionLength == textBoxEditingControl.Text.Length)
-                        {
-                            DeleteSelectedCellContents();
-                        }
-                    }
                 }
                 
                 keyProcessed = base.ProcessDialogKey(keyData);
