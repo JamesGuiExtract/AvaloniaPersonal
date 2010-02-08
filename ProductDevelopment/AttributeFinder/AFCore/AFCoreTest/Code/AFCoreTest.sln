@@ -1489,6 +1489,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.F
 	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Test", "..\..\..\..\..\RC.Net\Core\Testing\Automated\Extract.Test.csproj", "{376C679B-8B03-445A-9B63-D0B5261EC533}"

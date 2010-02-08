@@ -57,6 +57,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.Codecs.dll</HintPath>
     </Reference>
+    <Reference Include="PegasusImaging.WinForms.PdfXpress3, Version=3.0.18.0, Culture=neutral, PublicKeyToken=80d669b8b606a2da, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\APIs\Accusoft\PDFExpress\bin\PegasusImaging.WinForms.PdfXpress3.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -72,6 +76,14 @@
     </Compile>
     <Compile Include="ApplyBatesNumberTask.cs" />
     <Compile Include="BatesNumberGeneratorWithDatabase.cs" />
+    <Compile Include="ModifyPdfFileSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ModifyPdfFileSettingsDialog.Designer.cs">
+      <DependentUpon>ModifyPdfFileSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ModifyPdfFileTask.cs" />
+    <Compile Include="ModifyPdfFileTaskSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +158,10 @@
     <EmbeddedResource Include="ApplyBatesNumberSettingsDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ApplyBatesNumberSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ModifyPdfFileSettingsDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ModifyPdfFileSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
