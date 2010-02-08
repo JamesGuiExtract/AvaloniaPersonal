@@ -7,14 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml;
 using UCLID_COMUTILSLib;
 using UCLID_REDACTIONCUSTOMCOMPONENTSLib;
 using UCLID_TESTINGFRAMEWORKINTERFACESLib;
@@ -58,6 +57,13 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         const string _ANAYLYSIS_FOLDER_PREFIX = "Analysis - ";
 
+        /// <summary>
+        /// The full path to the file that contains information about persisting the 
+        /// <see cref="IDShieldStatisticsReporterForm"/>.
+        /// </summary>
+        static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
+            FileSystemMethods.ApplicationDataPath, "ID Shield", "StatisticsReporterForm.xml");
+
         #endregion Constants
 
         #region Fields 
@@ -65,7 +71,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// <summary>
         /// The ID Shield tester settings.
         /// </summary>
-        IDShieldTesterSettings _settings = new IDShieldTesterSettings();
+        readonly IDShieldTesterSettings _settings = new IDShieldTesterSettings();
 
         /// <summary>
         /// The target test folder.
@@ -76,13 +82,13 @@ namespace Extract.IDShieldStatisticsReporter
         /// A <see cref="IDShieldVOAFileContentsCondition"/> used to configure the automated
         /// redation conditions.
         /// </summary>
-        IDShieldVOAFileContentsCondition _automatedConditionObject;
+        readonly IDShieldVOAFileContentsCondition _automatedConditionObject;
 
         /// <summary>
         /// A <see cref="IDShieldVOAFileContentsCondition"/> used to configure the verification
         /// conditions.
         /// </summary>
-        IDShieldVOAFileContentsCondition _verificationConditionObject;
+        readonly IDShieldVOAFileContentsCondition _verificationConditionObject;
 
         /// <summary>
         /// The results folder based on the current feedback folder settings and result
@@ -113,7 +119,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// <summary>
         /// The ID Shield Tester instance used to conduct tests.
         /// </summary>
-        IDShieldTesterClass _idShieldTester = new IDShieldTesterClass();
+        readonly IDShieldTesterClass _idShieldTester = new IDShieldTesterClass();
 
         #endregion Fields
 
@@ -134,14 +140,13 @@ namespace Extract.IDShieldStatisticsReporter
 
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI28534",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 InitializeComponent();
 
                 // Create an condition object so that its configuration screen can be used to
                 // configure the automated condition.
-                _automatedConditionObject =
-                    (IDShieldVOAFileContentsCondition)new IDShieldVOAFileContentsConditionClass();
+                _automatedConditionObject = new IDShieldVOAFileContentsConditionClass();
                 
                 // Don't show the error condition settings; for testing it will always be an error
                 // condition.
@@ -149,14 +154,31 @@ namespace Extract.IDShieldStatisticsReporter
 
                 // Create an condition object so that its configuration screen can be used to
                 // configure the verification condition.
-                _verificationConditionObject =
-                    (IDShieldVOAFileContentsCondition)new IDShieldVOAFileContentsConditionClass();
+                _verificationConditionObject = new IDShieldVOAFileContentsConditionClass();
 
                 // Don't show the error condition settings; for testing it will always be an error
                 // condition.
                 _verificationConditionObject.ConfigureConditionsOnly = true;
 
                 _idShieldTester.SetResultLogger(this);
+
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                {
+                    // Load memento if it exists
+                    if (File.Exists(_FORM_PERSISTENCE_FILE))
+                    {
+                        // Load the XML
+                        XmlDocument document = new XmlDocument();
+                        document.Load(_FORM_PERSISTENCE_FILE);
+
+                        // Convert the XML to the memento
+                        XmlElement element = (XmlElement)document.FirstChild;
+                        FormMemento memento = FormMemento.FromXmlElement(element);
+
+                        // Restore the saved state
+                        memento.Restore(this);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -258,9 +280,43 @@ namespace Extract.IDShieldStatisticsReporter
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI28656", ex);
-                ee.AddDebugData("Event Arguments", e, false);
-                ee.Display();
+                ExtractException.Display("ELI28656", ex);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Form.FormClosing"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="FormClosingEventArgs"/> that contains the event data.
+        /// </param>
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            try
+            {
+                base.OnFormClosing(e);
+
+                // Persist the form window position and size [FIDSC #4016]
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                {
+                    // Get the pertinent information
+                    FormMemento memento = new FormMemento(this);
+
+                    // Convert the memento to XML
+                    XmlDocument document = new XmlDocument();
+                    XmlElement element = memento.ToXmlElement(document);
+                    document.AppendChild(element);
+
+                    // Create the directory for the file if necessary
+                    string directory = Path.GetDirectoryName(_FORM_PERSISTENCE_FILE);
+                    Directory.CreateDirectory(directory);
+
+                    // Save the XML
+                    document.Save(_FORM_PERSISTENCE_FILE);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29668", ex);
             }
         }
 
@@ -358,14 +414,14 @@ namespace Extract.IDShieldStatisticsReporter
             {
                 StringBuilder conditionBuilder = new StringBuilder();
                 conditionBuilder.Append(conditionObject.LookForHCData ? "HCData" : "");
-                conditionBuilder.Append(conditionObject.LookForMCData ?
-                    (conditionBuilder.Length > 0 ? "|MCData" : "MCData") : "");
-                conditionBuilder.Append(conditionObject.LookForLCData ?
-                    (conditionBuilder.Length > 0 ? "|LCData" : "LCData") : "");
-                conditionBuilder.Append(conditionObject.LookForManualData ?
+                conditionBuilder.Append(conditionObject.LookForMCData 
+                    ? (conditionBuilder.Length > 0 ? "|MCData" : "MCData") : "");
+                conditionBuilder.Append(conditionObject.LookForLCData 
+                    ? (conditionBuilder.Length > 0 ? "|LCData" : "LCData") : "");
+                conditionBuilder.Append(conditionObject.LookForManualData ? 
                     (conditionBuilder.Length > 0 ? "|Manual" : "Manual") : "");
-                conditionBuilder.Append(conditionObject.LookForClues ?
-                    (conditionBuilder.Length > 0 ? "|Clues" : "Clues") : "");
+                conditionBuilder.Append(conditionObject.LookForClues 
+                    ? (conditionBuilder.Length > 0 ? "|Clues" : "Clues") : "");
 
                 condition = conditionBuilder.ToString();
 
@@ -425,7 +481,7 @@ namespace Extract.IDShieldStatisticsReporter
                 _settings.OutputFilesFolder = _feedbackFolderTextBox.Text;
                 _settings.OutputHybridStats = _analysisTypeComboBox.Text == _HYBRID;
                 _settings.OutputAutomatedStatsOnly =
-                        (_analysisTypeComboBox.Text == _AUTOMATED_REDACTION);
+                    (_analysisTypeComboBox.Text == _AUTOMATED_REDACTION);
 
                 // Initialize the automated redaction condition
                 if (!_settings.OutputAutomatedStatsOnly && !_settings.OutputHybridStats)
@@ -470,7 +526,7 @@ namespace Extract.IDShieldStatisticsReporter
                         _dataTypesTextBox.SelectAll();
 
                         MessageBox.Show("Specify a comma delimited list of types to be tested or " +
-                            "uncheck  the \"Limit data types to be tested box\".",
+                                        "uncheck  the \"Limit data types to be tested box\".",
                             "Configuration error", MessageBoxButtons.OK, MessageBoxIcon.Warning,
                             MessageBoxDefaultButton.Button1, 0);
                         
@@ -486,10 +542,10 @@ namespace Extract.IDShieldStatisticsReporter
 
                 StringBuilder queryForAutomatedRedaction = new StringBuilder();
                 queryForAutomatedRedaction.Append(_redactHCDataCheckBox.Checked ? "HCData" : "");
-                queryForAutomatedRedaction.Append(_redactMCDataCheckBox.Checked ?
-                    (queryForAutomatedRedaction.Length > 0 ? "|MCData" : "MCData") : "");
-                queryForAutomatedRedaction.Append(_redactLCDataCheckBox.Checked ?
-                    (queryForAutomatedRedaction.Length > 0 ? "|LCData" : "LCData") : "");
+                queryForAutomatedRedaction.Append(_redactMCDataCheckBox.Checked 
+                    ? (queryForAutomatedRedaction.Length > 0 ? "|MCData" : "MCData") : "");
+                queryForAutomatedRedaction.Append(_redactLCDataCheckBox.Checked 
+                    ? (queryForAutomatedRedaction.Length > 0 ? "|LCData" : "LCData") : "");
                 _settings.QueryForAutomatedRedaction = queryForAutomatedRedaction.ToString();
 
                 _settings.Save(settingFileName);
@@ -513,8 +569,7 @@ namespace Extract.IDShieldStatisticsReporter
         {
             try
             {
-                ObjectPropertiesUI configurationScreen =
-                    (ObjectPropertiesUI)new ObjectPropertiesUIClass();
+                ObjectPropertiesUI configurationScreen = new ObjectPropertiesUIClass();
                 configurationScreen.DisplayProperties1(_automatedConditionObject,
                     "Configure automated condition");
             }
@@ -535,8 +590,7 @@ namespace Extract.IDShieldStatisticsReporter
         {
             try
             {
-                ObjectPropertiesUI configurationScreen =
-                    (ObjectPropertiesUI)new ObjectPropertiesUIClass();
+                ObjectPropertiesUI configurationScreen = new ObjectPropertiesUIClass();
                 configurationScreen.DisplayProperties1(_verificationConditionObject,
                     "Configure verification condition");
             }
@@ -608,14 +662,14 @@ namespace Extract.IDShieldStatisticsReporter
 
                     // Display a message to indicate how many test cases were successfully executed.
                     string resultMessage = _testCaseCount.ToString(CultureInfo.CurrentCulture) +
-                        " test cases completed successfully";
+                                           " test cases completed successfully";
                     if (_testCaseFailureCount > 0)
                     {
                         int succeededCount = _testCaseCount - _testCaseFailureCount;
 
                         resultMessage = succeededCount.ToString(CultureInfo.CurrentCulture) +
-                            " of " + _testCaseCount.ToString(CultureInfo.CurrentCulture) +
-                        " test cases completed successfully";
+                                        " of " + _testCaseCount.ToString(CultureInfo.CurrentCulture) +
+                                        " test cases completed successfully";
                     }
 
                     MessageBox.Show(resultMessage, "Test Result", MessageBoxButtons.OK,
@@ -810,7 +864,7 @@ namespace Extract.IDShieldStatisticsReporter
 
                 string sourceDocName = _fileListListBox.SelectedItem.ToString();
                 string commonComponentsDir = Path.GetDirectoryName(
-                        Assembly.GetExecutingAssembly().Location);
+                    Assembly.GetExecutingAssembly().Location);
 
                 // If the failed file list is being displayed, display the exception log.
                 if (_fileListSelectionComboBox.Text.EndsWith("FailedTestCases.txt",
@@ -999,13 +1053,13 @@ namespace Extract.IDShieldStatisticsReporter
                     if (!string.IsNullOrEmpty(_currentTestCaseFile))
                     {
                         string sourceDocName =
-                            _currentTestCaseFile.EndsWith(".nte", StringComparison.OrdinalIgnoreCase) ?
-                                FileSystemMethods.GetFullPathWithoutExtension(_currentTestCaseFile) :
-                                _currentTestCaseFile;
+                            _currentTestCaseFile.EndsWith(".nte", StringComparison.OrdinalIgnoreCase) 
+                            ? FileSystemMethods.GetFullPathWithoutExtension(_currentTestCaseFile) 
+                            : _currentTestCaseFile;
 
                         using (FileStream errorFileListStream =
                             File.Open(Path.Combine(outputFileDirectory, "FailedTestCases.txt"),
-                                FileMode.Append | FileMode.OpenOrCreate, FileAccess.Write))
+                                FileMode.Append, FileAccess.Write))
                         {
                             using (StreamWriter errorFileListWriter =
                                 new StreamWriter(errorFileListStream))
