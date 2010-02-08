@@ -883,7 +883,17 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 				// Don't include metadata, clues or DocumentType attributes from the expected
 				// voa file as expected redactions.
 				m_ipAFUtility->RemoveMetadataAttributes(ipExpectedAttributes);
-				m_ipAFUtility->QueryAttributes(ipExpectedAttributes, "Clues|DocumentType",
+
+				// [DataEntry:3610]
+				// Removing filtering of clues that was added 11/9/2009. At that time, the new
+				// verification task was leaving clues in the output so in order to have the
+				// RedactionTester return reasonable results, clues had to be ignored in the
+				// expected VOA file. Clues are now being moved to metadata by the verification
+				// task unless they are turned on during redaction. Though it should be rare that
+				// clues are actually desired in the expected results, it should be allowed.
+				// Currently, the SpatialProximityAS automated test is configured in a way that
+				// expects clues to be included in the test.
+				m_ipAFUtility->QueryAttributes(ipExpectedAttributes, "DocumentType",
 					VARIANT_TRUE);
 			}
 			// If the file does not exist, there are no expected values, throw an exception

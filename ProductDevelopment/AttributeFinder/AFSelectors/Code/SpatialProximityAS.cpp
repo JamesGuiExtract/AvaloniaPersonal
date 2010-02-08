@@ -753,7 +753,7 @@ vector< pair<CRect, long> > CSpatialProximityAS::getAttributeRects(IAttributePtr
 		long nPage = ipLine->GetFirstPageNumber();
 
 		// Obtain a rect describing the location of this line.
-		ILongRectanglePtr ipRect = ipLine->GetOriginalImageBounds();
+		ILongRectanglePtr ipRect = ipLine->GetOCRImageBounds();
 		ASSERT_RESOURCE_ALLOCATION("ELI22674", ipRect != NULL);
 
 		// Copy the rect to a CRect to make rect comparisons easier.
