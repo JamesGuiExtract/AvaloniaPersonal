@@ -1303,8 +1303,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SRIRImageViewer", "..\..\..
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+		{182A7BEF-E666-42DC-A5F0-34A10A7694F1} = {182A7BEF-E666-42DC-A5F0-34A10A7694F1}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 		{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3} = {1A95338E-9BC0-49A8-B69E-9942DD7CEBB3}
 		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
 		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
@@ -1691,12 +1692,26 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunFPSFile", "..\..\..\..\.
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SubImageHandlers", "..\..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\SubImageHandlers\Code\SubImageHandlers.vcproj", "{182A7BEF-E666-42DC-A5F0-34A10A7694F1}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
+		{C9BEB739-8C91-4201-9E94-2D5F650FB5AE} = {C9BEB739-8C91-4201-9E94-2D5F650FB5AE}
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 130
+		ProjectCount = 131
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcproj
@@ -1827,6 +1842,7 @@ Global
 		ProjectRelativeDiskPath128 = ..\..\..\..\..\RC.Net\Rules\Core\Code\Extract.Rules.csproj
 		ProjectRelativeDiskPath129 = ..\..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcproj
 		ProjectRelativeDiskPath130 = ..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\RunFPSFile\Core\Code\RunFPSFile.csproj
+		ProjectRelativeDiskPath131 = ..\..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\SubImageHandlers\Code\SubImageHandlers.vcproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3139,6 +3155,16 @@ Global
 		{BCF45C18-A833-4ED7-AC2F-78453C6367B1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{BCF45C18-A833-4ED7-AC2F-78453C6367B1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{BCF45C18-A833-4ED7-AC2F-78453C6367B1}.Release|Win32.ActiveCfg = Release|Any CPU
+		{182A7BEF-E666-42DC-A5F0-34A10A7694F1}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{182A7BEF-E666-42DC-A5F0-34A10A7694F1}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{182A7BEF-E666-42DC-A5F0-34A10A7694F1}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{182A7BEF-E666-42DC-A5F0-34A10A7694F1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{182A7BEF-E666-42DC-A5F0-34A10A7694F1}.Debug|Win32.Build.0 = Debug|Win32
+		{182A7BEF-E666-42DC-A5F0-34A10A7694F1}.Release|Any CPU.ActiveCfg = Release|Win32
+		{182A7BEF-E666-42DC-A5F0-34A10A7694F1}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{182A7BEF-E666-42DC-A5F0-34A10A7694F1}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{182A7BEF-E666-42DC-A5F0-34A10A7694F1}.Release|Win32.ActiveCfg = Release|Win32
+		{182A7BEF-E666-42DC-A5F0-34A10A7694F1}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

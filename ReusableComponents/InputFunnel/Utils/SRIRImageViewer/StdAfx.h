@@ -34,14 +34,17 @@ using namespace UCLID_RASTERANDOCRMGMTLib;
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" named_guids
 using namespace UCLID_TESTINGFRAMEWORKINTERFACESLib;
 
-#import "..\\..\\IFCore\\Code\\IFCore.tlb" named_guids
+#import "..\..\IFCore\Code\IFCore.tlb" named_guids
 using namespace UCLID_INPUTFUNNELLib;
 
-#import "..\\..\\InputReceivers\\SpotRecognitionIR\\Code\\Core\\SpotRecognitionIR.tlb" named_guids
+#import "..\..\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.tlb" named_guids
 using namespace UCLID_SPOTRECOGNITIONIRLib;
 
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.tlb" named_guids
 using namespace UCLID_SSOCRLib;
+
+#import "..\..\InputReceivers\SpotRecognitionIR\Code\SubImageHandlers\Code\SubImageHandlers.tlb" named_guids
+using namespace UCLID_SUBIMAGEHANDLERSLib;
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

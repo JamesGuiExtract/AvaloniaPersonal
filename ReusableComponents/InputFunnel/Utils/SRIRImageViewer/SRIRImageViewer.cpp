@@ -371,8 +371,7 @@ BOOL CSRIRImageViewerApp::InitInstance()
 			m_ipInputReceiver->ShowWindow(VARIANT_TRUE);
 
 			// create an instance of the OCR engine
-			IOCREnginePtr m_ipOCREngine;
-			m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR);
+			IOCREnginePtr m_ipOCREngine(CLSID_ScansoftOCR);
 			ASSERT_RESOURCE_ALLOCATION("ELI06305", m_ipOCREngine != NULL);
 
 			// initialize the private license
@@ -382,6 +381,22 @@ BOOL CSRIRImageViewerApp::InitInstance()
 
 			// set the OCR engine in the SRIR
 			m_ipInputReceiver->SetOCREngine(m_ipOCREngine);
+
+			// Create input manager
+			IInputManagerSingletonPtr ipInputMgrSingleton(CLSID_InputManagerSingleton);
+			ASSERT_RESOURCE_ALLOCATION("ELI29665", ipInputMgrSingleton != NULL);
+			IInputManagerPtr ipInputManager = ipInputMgrSingleton->GetInstance();
+			ASSERT_RESOURCE_ALLOCATION("ELI29666", ipInputManager != NULL);
+
+			// Create sub image handler
+			ISRWSubImageHandlerPtr ipSRWSubImageHandler(CLSID_SRWSubImageHandler);
+			ASSERT_RESOURCE_ALLOCATION("ELI29664", ipSRWSubImageHandler != NULL);
+			ipSRWSubImageHandler->SetInputManager(ipInputManager);
+
+			// Set the sub image handler
+			ISubImageHandlerPtr ipSubImageHandler = ipSRWSubImageHandler;
+			ASSERT_RESOURCE_ALLOCATION("ELI29667", ipSubImageHandler != NULL);
+			m_ipSRIR->SetSubImageHandler(ipSubImageHandler, "Open subimage in new ImageViewer", "");
 
 			// Create a new SRIRImageViewer and display it
 			m_apDlg = auto_ptr<CSRIRImageViewerDlg>(new CSRIRImageViewerDlg(m_ipSRIR, bDisplaySearch));
