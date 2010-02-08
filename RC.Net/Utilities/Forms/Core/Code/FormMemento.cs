@@ -186,6 +186,8 @@ namespace Extract.Utilities.Forms
         {
             try
             {
+                control.StartPosition = FormStartPosition.Manual;
+
                 // Check if the form is on-screen
                 if (IntersectsWithScreen(_bounds))
                 {
