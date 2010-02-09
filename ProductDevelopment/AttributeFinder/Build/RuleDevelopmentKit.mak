@@ -150,6 +150,7 @@ CopyTestFiles:
 	@XCOPY "$(ReusableComponentsRootDirectory)\BaseUtils\AutomatedTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\BaseUtils\AutomatedTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\AutomatedTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\AutomatedTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\VendorSpecificUtils\SafeNetUtils\AutomatedTest\TestFiles\" /s /e /y /I
+	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\ESFileSuppliers\AutomatedTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\ESFileSuppliers\AutomatedTest\" /s /e /y /I
 
 DoEverythingNoGet: DoEverything
 
