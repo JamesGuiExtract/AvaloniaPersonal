@@ -130,14 +130,13 @@ STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(BSTR bstrSourceDocNam
 		// Verify required arguments
 		IIUnknownVectorPtr ipFileProcessingTasks(pFileProcessingTasks);
 		ASSERT_ARGUMENT("ELI17863", ipFileProcessingTasks != NULL);
-		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_ARGUMENT("ELI17864", ipDB != NULL);
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(pFAMTagManager);
 		ASSERT_ARGUMENT("ELI17865", ipFAMTagManager != NULL);
 		ASSERT_ARGUMENT("ELI17866", pResult != NULL);
 
-		// ProgressStatus not required.  Won't be used if NULL
+		// ProgressStatus and database not required.  Won't be used if NULL
 		IProgressStatusPtr ipProgressStatus(pProgressStatus);
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(pDB);
 
 		// Initialize the processing tasks
 		init(ipFileProcessingTasks, nActionID, ipDB, ipFAMTagManager);
@@ -478,10 +477,11 @@ void CFileProcessingTaskExecutor::init(const IIUnknownVectorPtr& ipFileProcessin
 
 		// Check arguments
 		ASSERT_ARGUMENT("ELI17698", ipFileProcessingTasks != NULL);
-		m_ipDB = ipDB;
-		ASSERT_ARGUMENT("ELI17700", m_ipDB != NULL);
 		m_ipFAMTagManager = ipFAMTagManager;
 		ASSERT_ARGUMENT("ELI17702", m_ipFAMTagManager != NULL);
+
+		// Store database
+		m_ipDB = ipDB;
 
 		// Build the collection of tasks and initialize each enabled FileProcessingTask
 		int nTaskCount = ipFileProcessingTasks->Size();

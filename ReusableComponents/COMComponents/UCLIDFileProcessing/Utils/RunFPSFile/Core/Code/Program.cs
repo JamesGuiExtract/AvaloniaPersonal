@@ -112,10 +112,6 @@ namespace Extract.FileActionManager.RunFPSFile
                     // If no database interaction is required, the processingManager does not need
                     // to manage the processing. Execute the processingManager tasks directly.
 
-                    // If ignoring the database, create an emply database object, initialize a tag
-                    // manager to use for a task executor
-                    FileProcessingDBClass database = new FileProcessingDBClass();
-
                     FAMTagManagerClass tagManager = new FAMTagManagerClass();
                     tagManager.FPSFileDir = Path.GetDirectoryName(_fpsFileName);
 
@@ -123,7 +119,7 @@ namespace Extract.FileActionManager.RunFPSFile
                     FileProcessingTaskExecutorClass taskExecutor =
                         new FileProcessingTaskExecutorClass();
                     taskExecutor.InitProcessClose(_sourceDocName,
-                        fileProcessingManager.FileProcessingMgmtRole.FileProcessors, 0, 0, database,
+                        fileProcessingManager.FileProcessingMgmtRole.FileProcessors, 0, 0, null,
                         tagManager, null, false);
                 }
                 else
