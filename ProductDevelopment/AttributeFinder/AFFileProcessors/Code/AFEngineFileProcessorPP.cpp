@@ -278,8 +278,9 @@ LRESULT CAFEngineFileProcessorPP::OnClickedRadioAllPages(WORD wNotifyCode, WORD 
 	{
 		m_editSpecificPages.EnableWindow(FALSE);
 
-		// Ensure the save OCR results check box is enabled
+		// Ensure the save OCR results and Use cleaned image check boxes are enabled
 		m_chkSaveOcrResults.EnableWindow(TRUE);
+		m_chkUseCleanedImage.EnableWindow(TRUE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10289");
 
@@ -294,8 +295,9 @@ LRESULT CAFEngineFileProcessorPP::OnClickedRadioSpecificPages(WORD wNotifyCode, 
 	{
 		m_editSpecificPages.EnableWindow(TRUE);
 
-		// Ensure the save OCR results check box is enabled
+		// Ensure the save OCR results and Use cleaned image check boxes are enabled
 		m_chkSaveOcrResults.EnableWindow(TRUE);
+		m_chkUseCleanedImage.EnableWindow(TRUE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10290");
 
@@ -313,6 +315,10 @@ LRESULT CAFEngineFileProcessorPP::OnClickedRadioOcrNone(WORD wNotifyCode, WORD w
 		// Clear and disable the Save OCR results checkbox [FlexIDSCore #3715]
 		m_chkSaveOcrResults.SetCheck(BST_UNCHECKED);
 		m_chkSaveOcrResults.EnableWindow(FALSE);
+
+		// Clear and disable the Use cleaned image checkbox [FlexIDSCore #3745]
+		m_chkUseCleanedImage.SetCheck(BST_UNCHECKED);
+		m_chkUseCleanedImage.EnableWindow(FALSE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28090");
 

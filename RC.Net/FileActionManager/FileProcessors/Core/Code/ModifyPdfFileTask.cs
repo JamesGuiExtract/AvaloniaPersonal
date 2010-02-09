@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -35,28 +36,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         const int _CURRENT_VERSION = 1;
 
-        ///// <summary>
-        ///// Place holder used in the XFDF stream so that the file name can be replaced.
-        ///// </summary>
-        //const string _FILE_NAME_VAR = "{FileName}";
-
-        //readonly string _XFDF_TEXT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xfdf xmlns="
-        //    + "\"http://ns.adobe.com/xfdf/\" xml:space=\"preserve\"><annots/><ids original="
-        //    + "\"0FF75CC9984F9D5DB0952D7ABA83CDE4\" modified=\"0FF75CC9984F9D5DB0952D7ABA83CDE4\"/>"
-        //    + "<f href=\"" + _FILE_NAME_VAR + "\"/></xfdf>";
-
-        /// <summary>
-        /// The xfdf string necessary to remove annotations from a PDF.
-        /// </summary>
-        static readonly string _XFDF_TEXT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xfdf xmlns="
-            + "\"http://ns.adobe.com/xfdf/\" xml:space=\"preserve\"><annots/><ids original="
-            + "\"0FF75CC9984F9D5DB0952D7ABA83CDE4\" modified=\"0FF75CC9984F9D5DB0952D7ABA83CDE4\"/>"
-            + "</xfdf>";
-
         /// <summary>
         /// The XFDF text as a <see cref="T:byte[]"/>.
         /// </summary>
-        static readonly byte[] _xfdfBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(_XFDF_TEXT);
+        static readonly byte[] _xfdfBytes = BuildEmptyXfdfStream();
 
         #endregion Constants
 
@@ -183,6 +166,101 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI29647", ex);
+            }
+        }
+
+        /// <summary>
+        /// Builds an empty xfdf byte array.
+        /// </summary>
+        /// <returns>A <see cref="T:byte[]"/> containing an empty xfdf string.</returns>
+        static byte[] BuildEmptyXfdfStream()
+        {
+            // The xfdf string to remove annotations
+            string xfdfText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xfdf xmlns="
+                + "\"http://ns.adobe.com/xfdf/\" xml:space=\"preserve\"><annots/><ids original="
+                + "\"0FF75CC9984F9D5DB0952D7ABA83CDE4\" modified=\"0FF75CC9984F9D5DB0952D7ABA83CDE4\"/>"
+                + "</xfdf>";
+
+            // Convert the string to a byte array
+            byte[] xfdf = ASCIIEncoding.ASCII.GetBytes(xfdfText);
+
+            return xfdf;
+        }
+
+        /// <summary>
+        /// Removes the annotations from the specified file.
+        /// </summary>
+        /// <param name="pdfFile">The file to remove annotations from.</param>
+        void RemoveAnnotationsFromPdfFile(string pdfFile)
+        {
+            // Ensure a file name was specified and that it exists.
+            ExtractException.Assert("ELI29662", "Specified PDF file does not exist.",
+                !string.IsNullOrEmpty(pdfFile) && File.Exists(pdfFile), "PDF File Name", pdfFile);
+
+            PdfXpress express = null;
+            Document document = null;
+            TemporaryFile tempFile = null;
+            try
+            {
+                // Create a temporary PDF file to write to
+                tempFile = new TemporaryFile(".pdf");
+
+                // Initialize the PdfXpress engine
+                express = new PdfXpress();
+                express.Initialize();
+
+                // Open the file
+                document = new Document(express, pdfFile);
+
+                // Check for remove annotations
+                if (_settings.RemoveAnnotations)
+                {
+                    // Create the Xfdf options (set all annotations on all pages and allow delete)
+                    XfdfOptions xfdfoptions = new XfdfOptions();
+                    xfdfoptions.WhichAnnotation = XfdfOptions.AllAnnotations;
+                    xfdfoptions.WhichPage = XfdfOptions.AllPages;
+                    xfdfoptions.CanDeleteAnnotations = true;
+
+                    // Import the xfdf bytes containing no annotations (this will remove
+                    // the annotations from the document)
+                    document.ImportXfdf(xfdfoptions, _xfdfBytes);
+                }
+
+                // Set the save file options to save to the temp file
+                SaveOptions sfo = new SaveOptions();
+                sfo.Filename = tempFile.FileName;
+                sfo.Overwrite = true;
+
+                // Save the document
+                document.Save(sfo);
+
+                // Dispose of the pdf express document
+                document.Dispose();
+                document = null;
+
+                // Move the temp file to the destination
+                FileSystemMethods.MoveFile(tempFile.FileName, pdfFile, true);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI29663", ex);
+                ee.AddDebugData("PDF File Name", pdfFile, false);
+                throw ee;
+            }
+            finally
+            {
+                if (document != null)
+                {
+                    document.Dispose();
+                }
+                if (tempFile != null)
+                {
+                    tempFile.Dispose();
+                }
+                if (express != null)
+                {
+                    express.Dispose();
+                }
             }
         }
 
@@ -363,59 +441,22 @@ namespace Extract.FileActionManager.FileProcessors
             int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB,
             ProgressStatus pProgressStatus, bool bCancelRequested)
         {
-            PdfXpress express = null;
-            Document document = null;
-            TemporaryFile tempFile = null;
-            string pdfFile = null;
             try
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.PegasusPdfxpressModifyPdf,
                     "ELI29655", _COMPONENT_DESCRIPTION);
 
-                express = new PdfXpress();
-                express.Initialize();
-
-                // Get the file name and initialize a path tags button
+                // Get the file name and initialize a path tags class
                 string fileName = Path.GetFullPath(bstrFileFullName);
                 FileActionManagerPathTags pathTags =
                     new FileActionManagerPathTags(fileName, pFAMTM.FPSFileDir);
 
-                pdfFile = pathTags.Expand(_settings.PdfFile);
+                // Expand any path tags in the file name
+                string pdfFile = pathTags.Expand(_settings.PdfFile);
 
-                // Open the file
-                document = new Document(express, pdfFile);
-
-                // Create the Xfdf options (set all annotations on all pages and allow delete)
-                if (_settings.RemoveAnnotations)
-                {
-                    XfdfOptions xfdfoptions = new XfdfOptions();
-                    xfdfoptions.WhichAnnotation = XfdfOptions.AllAnnotations;
-                    xfdfoptions.WhichPage = XfdfOptions.AllPages;
-                    xfdfoptions.CanDeleteAnnotations = true;
-
-                    // Import the xfdf bytes containing no annotations (this will remove
-                    // the annotations from the document)
-                    document.ImportXfdf(xfdfoptions, _xfdfBytes);
-                }
-
-                // Create a temporary PDF file to write to
-                tempFile = new TemporaryFile(".pdf");
-
-                // Set the save file options to save to the temp file
-                SaveOptions sfo = new SaveOptions();
-                sfo.Filename = tempFile.FileName;
-                sfo.Overwrite = true;
-
-                // Save the document
-                document.Save(sfo);
-
-                // Dispose of the pdf express document
-                document.Dispose();
-                document = null;
-
-                // Move the temp file to the destination
-                FileSystemMethods.MoveFile(tempFile.FileName, pdfFile, true);
+                // Remove the annotations
+                RemoveAnnotationsFromPdfFile(pdfFile);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
@@ -423,24 +464,9 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI29657", ex);
                 ee.AddDebugData("Source Document", bstrFileFullName, false);
-                ee.AddDebugData("PDF File To Process", pdfFile, false);
+                ee.AddDebugData("PDF File From Settings", _settings.PdfFile, false);
 
                 throw ExtractException.CreateComVisible("ELI29658", "Failed Modify pdf task.", ee);
-            }
-            finally
-            {
-                if (document != null)
-                {
-                    document.Dispose();
-                }
-                if (tempFile != null)
-                {
-                    tempFile.Dispose();
-                }
-                if (express != null)
-                {
-                    express.Dispose();
-                }
             }
         }
 

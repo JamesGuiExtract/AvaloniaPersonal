@@ -341,7 +341,7 @@ void SpotRecognitionDlg::OnBTNSave()
 			(FALSE, 
 			"gdd", 
 			strDefaultFileName.c_str(), 
-			OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR,	// no read only file can be overwriten
+			OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR,	// no read only file can be overwritten
 			"GDD files (*.gdd)|*.gdd|"
 			"All files (*.*)|*.*|"
 			"||", 

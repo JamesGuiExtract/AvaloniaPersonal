@@ -236,7 +236,7 @@ void InputCorrectionDlg::OnBTNSaveImageAs()
 			(FALSE, 
 			"bmp", 
 			NULL, 
-			OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR,	// no read only file can be overwriten
+			OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR,	// no read only file can be overwritten
 			"bmp files (*.bmp)|*.bmp|"
 			"||", 
 			NULL);

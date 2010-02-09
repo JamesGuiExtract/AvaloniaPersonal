@@ -261,7 +261,7 @@ LRESULT CReplaceStringsPP::OnClickedBtnLoadReplacementFromFile(WORD wNotifyCode,
 		if (m_listReplacement.GetItemCount() > 0)
 		{
 			// prompt for overwrite
-			int nRes = MessageBox("The existing entries will be overwriten. Do you wish to continue?", "Confirm", MB_YESNO);
+			int nRes = MessageBox("The existing entries will be overwritten. Do you wish to continue?", "Confirm", MB_YESNO);
 			if (nRes == IDNO)
 			{
 				return 0;
