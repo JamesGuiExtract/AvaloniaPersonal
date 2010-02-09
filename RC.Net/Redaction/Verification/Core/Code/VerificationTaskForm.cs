@@ -1367,7 +1367,7 @@ namespace Extract.Redaction.Verification
                 _previousRedactionToolStripButton.Enabled = true;
                 _nextRedactionToolStripButton.Enabled = true;
 
-                _tagFileToolStripButton.Enabled = true;
+                _tagFileToolStripButton.Enabled = _fileDatabase != null;
                 _tagFileToolStripButton.FileId = memento.FileId;
 
                 _skipProcessingToolStripMenuItem.Enabled = !IsInHistory;
@@ -1464,13 +1464,12 @@ namespace Extract.Redaction.Verification
                 _fileDatabase = database;
                 _tagFileToolStripButton.Database = database;
 
-                // Check if the tag file toolstrip button should be displayed
-                // [FlexIDSCore #3886]
-                if (_fileDatabase.GetTagNames().Size == 0
-                    && !_fileDatabase.AllowDynamicTagCreation())
+                // Check if the tag file toolstrip button should be displayed [FlexIDSCore #3886]
+                if (_fileDatabase.GetTagNames().Size > 0
+                    || _fileDatabase.AllowDynamicTagCreation())
                 {
-                    _tagFileToolStripButton.Visible = false;
-                    _tagFileToolStripSeparator.Visible = false;
+                    _tagFileToolStripButton.Visible = true;
+                    _tagFileToolStripSeparator.Visible = true;
                 }
 
                 // Create the IDShield database wrapper

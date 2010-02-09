@@ -627,6 +627,7 @@ namespace Extract.Redaction.Verification
             // 
             this._tagFileToolStripSeparator.Name = "_tagFileToolStripSeparator";
             this._tagFileToolStripSeparator.Size = new System.Drawing.Size(6, 39);
+            this._tagFileToolStripSeparator.Visible = false;
             // 
             // _tagFileToolStripButton
             // 
@@ -636,6 +637,7 @@ namespace Extract.Redaction.Verification
             this._tagFileToolStripButton.Name = "_tagFileToolStripButton";
             this._tagFileToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._tagFileToolStripButton.Text = "Apply tags";
+            this._tagFileToolStripButton.Visible = false;
             // 
             // dockContainer
             // 
