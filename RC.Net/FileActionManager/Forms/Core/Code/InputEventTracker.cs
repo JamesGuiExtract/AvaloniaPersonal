@@ -478,6 +478,7 @@ namespace Extract.FileActionManager.Forms
                     switch (message.Msg)
                     {
                         case WindowsMessage.KeyDown:
+                        case WindowsMessage.SystemKeyDown:
                         case WindowsMessage.LeftButtonDown:
                         case WindowsMessage.RightButtonDown:
                         case WindowsMessage.MiddleButtonDown:
