@@ -199,7 +199,7 @@ private:
 
 	// return actual page content based on the restriction defined
 	ISpatialStringPtr getIndividualPageContent(const ISpatialStringPtr& ipOriginPage,
-		long nPageNum, long nWidth, long nHeight);
+		long nPageNum, long nWidth, long nHeight, bool bPageSpecified);
 
 	IOCREnginePtr getOCREngine();
 

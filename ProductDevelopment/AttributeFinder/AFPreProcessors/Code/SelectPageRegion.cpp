@@ -24,7 +24,8 @@
 // Version 4 - Added ability to choose what is returned, whether it be the existing
 //			   text, text from a ReOCR of the region, or just the spatial region with
 //			   specified text assigned to it.
-const unsigned long gnCurrentVersion = 4;
+// Version 5 - Modified behavior as per [FlexIDSCore #4011] 
+const unsigned long gnCurrentVersion = 5;
 
 // add license management password function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -1016,6 +1017,17 @@ STDMETHODIMP CSelectPageRegion::Load(IStream *pStream)
 			}
 		}
 
+		// Set appropriate settings for old object to reflect actual behavior
+		// [FlexIDSCore #4011]
+		if (nDataVersion < 5 && !isRestrictionDefined())
+		{
+			m_eReturnType = kReturnText;
+			m_bIncludeIntersectingText = true;
+			m_eTextIntersectionType = kCharacter;
+			m_nRegionRotation = 0;
+			m_strTextToAssign = "";
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -1138,9 +1150,9 @@ STDMETHODIMP CSelectPageRegion::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		bool bConfigured = true;
 
 		// Check requirements based on PageSelectionType
-		if (m_ePageSelectionType == kSelectAll)
+		if (m_ePageSelectionType == kSelectAll && !m_bIncludeRegion)
 		{
-			bConfigured = isRestrictionDefined();
+			bConfigured = false;
 		}
 		else if (m_ePageSelectionType == kSelectSpecified)
 		{
@@ -1155,10 +1167,6 @@ STDMETHODIMP CSelectPageRegion::raw_IsConfigured(VARIANT_BOOL *pbValue)
 			{
 				bConfigured = false;
 			}
-		}
-		else
-		{
-			bConfigured = false;
 		}
 
 		// Only need to check return type settings if the object is properly
@@ -1306,21 +1314,19 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 													const IAFDocumentPtr& ipAFDoc)
 {
 	// include region defined
-	bool bRestrictionDefined = isRestrictionDefined();
 	if (m_ePageSelectionType == kSelectAll)
 	{
+		// Reserve enough space for each page number
 		vector<int> vecPages;
-		if (!bRestrictionDefined)
-		{
-			// if all pages are selected and no restriction is posted, it is invalid
-			throw UCLIDException("ELI08023", "You must define restrictions after selecting all pages.");
-		}
-		int i;
-		for(i = 0; i <= nLastPageNumber; i++)
+		vecPages.reserve(nLastPageNumber);
+
+		// Add each page number to the collection
+		for(int i = 1; i <= nLastPageNumber; i++)
 		{
 			vecPages.push_back(i);
 		}
 
+		// Return the collection
 		return vecPages;
 	}
 	else if (m_ePageSelectionType == kSelectSpecified)
@@ -1508,18 +1514,11 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStringPtr& ipOriginPage,
-															  long nPageNum, long nWidth, long nHeight)
+															  long nPageNum, long nWidth,
+															  long nHeight, bool bPageSpecified)
 {
 	try
 	{
-		// if no restriction is defined, assume that inclusion/exclusion has
-		// already been taken care of by the caller
-		if (!isRestrictionDefined())
-		{
-			// just return the original string
-			return ipOriginPage;
-		}
-
 		if (m_ipSpatialStringSearcher == NULL)
 		{
 			m_ipSpatialStringSearcher.CreateInstance(CLSID_SpatialStringSearcher);
@@ -1586,14 +1585,24 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 			{
 				m_ipSpatialStringSearcher->SetIncludeDataOnBoundary(asVariantBool(m_bIncludeIntersectingText));
 				m_ipSpatialStringSearcher->SetBoundaryResolution(m_eTextIntersectionType);
+
+				// If an include region then get text within the specified restriction
 				if (m_bIncludeRegion)
 				{
 					// Rotate the rectangle per OCR results
 					ipResult = m_ipSpatialStringSearcher->GetDataInRegion( ipRect, VARIANT_TRUE );
 				}
-				else
+				// If an exclude region and the current page is a specified page, get the
+				// data outside of the specified restriction
+				else if (bPageSpecified)
 				{
 					ipResult = m_ipSpatialStringSearcher->GetDataOutOfRegion(ipRect);
+				}
+				// Exclude region and the current page is not a specified page, then
+				// return the entire page text
+				else
+				{
+					ipResult = ipOriginPage;
 				}
 				ASSERT_RESOURCE_ALLOCATION( "ELI28124", ipResult != NULL );
 			}
@@ -1611,15 +1620,10 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 					nActualRotation = 360;
 				}
 
-				if (m_bIncludeRegion)
-				{
-					// Get the text from specified area after rotation
-					ipResult = getOCREngine()->RecognizeTextInImageZone(strPath.c_str(), 
-						nPageNum, nPageNum, ipRect, nActualRotation, kNoFilter, "", VARIANT_FALSE, 
-						VARIANT_FALSE, VARIANT_TRUE, NULL );
-					ASSERT_RESOURCE_ALLOCATION( "ELI12698", ipResult != NULL );
-				}
-				else
+				// If excluding the region and this is a specified page, then
+				// whiten the specified exclude region and OCR as per rotation
+				// specification
+				if (!m_bIncludeRegion && bPageSpecified)
 				{
 					// Whiten the specified zone on this page - to a temporary file
 					TemporaryFileName tmpFile2( NULL, strExt.c_str(), true );
@@ -1634,6 +1638,26 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 
 					// Assign original filename to Spatial String
 					ipResult->SourceDocName = strPath.c_str();
+
+					// Update the page number to the appropriate page
+					ipResult->UpdatePageNumber(nPageNum);
+				}
+				// This is either an exclude for a non-specified page OR
+				// an include for a specified page (only enter this function if
+				// m_bIncludeRegion == bPageSpecified || isRestrictionDefined() && !m_bIncludeRegion
+				else
+				{
+					// If excluding then re-OCR the whole page
+					if (!m_bIncludeRegion)
+					{
+						ipRect->SetBounds(0, 0, nWidth, nHeight);
+					}
+
+					// Get the text from specified area after rotation
+					ipResult = getOCREngine()->RecognizeTextInImageZone(strPath.c_str(), 
+						nPageNum, nPageNum, ipRect, nActualRotation, kNoFilter, "", VARIANT_FALSE, 
+						VARIANT_FALSE, VARIANT_TRUE, NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI12698", ipResult != NULL );
 				}
 			}
 			break;
@@ -1665,8 +1689,17 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 					ipPageInfos->Set(nPageNum, ipPageInfo);
 				}
 
-				if (m_bIncludeRegion)
+				// If including this region OR it is not a specified page
+				// return a single image region
+				if (m_bIncludeRegion || !bPageSpecified)
 				{
+					// If not a specified page, return the entire page
+					// as an image region
+					if (!bPageSpecified)
+					{
+						ipRect->SetBounds(0,0,nWidth,nHeight);
+					}
+
 					// Create a pseudo-spatial string
 					IRasterZonePtr ipZone(CLSID_RasterZone);
 					ASSERT_RESOURCE_ALLOCATION("ELI28136", ipZone != NULL);
@@ -1674,6 +1707,8 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 					ipResult->CreatePseudoSpatialString(ipZone, m_strTextToAssign.c_str(),
 						strPath.c_str(), ipPageInfos);
 				}
+				// Exclude for the specified page, build the appropriate
+				// set of raster zones
 				else
 				{
 					IIUnknownVectorPtr ipZones = buildRasterZonesForExcludedRegion(nLeft,
@@ -1733,45 +1768,17 @@ ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& i
 	//	m_bIncludeRegion - this page or region is being included or excluded
 	//	bPageSpecified - this page has been chosen by the caller
 	ISpatialStringPtr ipSS = NULL;
-	if (!bRestrictionDefined && m_bIncludeRegion && bPageSpecified)
+
+	// Get the individual page contents based on the current settings if at least one
+	// of the following is true:
+	// 1. Including the region AND the Page is specified
+	// 2. Excluding the region AND the Page is not specified
+	// 3. Restriction is defined AND Excluding the region
+	if ((m_bIncludeRegion == bPageSpecified) || (bRestrictionDefined && !m_bIncludeRegion))
 	{
-		// No restriction, Include, Page Is specified ---> provide entire page
-		ipSS = ipPageText;
-	}
-	else if (bRestrictionDefined && m_bIncludeRegion && bPageSpecified)
-	{
-		// Restriction, Include, Page Is specified ---> provide desired region
-		ipSS = getIndividualPageContent( ipPageText, nPageNum, nWidth, nHeight );
-	}
-	else if (!bRestrictionDefined && !m_bIncludeRegion && bPageSpecified)
-	{
-		// No restriction, Exclude, Page Is specified ---> do NOT provide page
-		ipSS = NULL;
-	}
-	else if (bRestrictionDefined && !m_bIncludeRegion && bPageSpecified)
-	{
-		// No restriction, Include, Page Is specified ---> provide entire page
-		ipSS = getIndividualPageContent( ipPageText, nPageNum, nWidth, nHeight );
-	}
-	else if (!bRestrictionDefined && m_bIncludeRegion && !bPageSpecified)
-	{
-		// No restriction, Include, Page Not specified ---> do NOT provide page
-		ipSS = NULL;
-	}
-	else if (bRestrictionDefined && m_bIncludeRegion && !bPageSpecified)
-	{
-		// Restriction, Include, Page Not specified ---> do NOT provide page
-		ipSS = NULL;
-	}
-	else if (!bRestrictionDefined && !m_bIncludeRegion && !bPageSpecified)
-	{
-		// No restriction, Exclude, Page Not specified ---> provide entire page
-		ipSS = ipPageText;
-	}
-	else if (bRestrictionDefined && !m_bIncludeRegion && !bPageSpecified)
-	{
-		// Restriction, Exclude, Page Not specified ---> provide entire page
-		ipSS = ipPageText;
+		// If including and the page is specified OR excluding and the page is not
+		// specified, then return the contents of the page based on the current settings
+		ipSS = getIndividualPageContent( ipPageText, nPageNum, nWidth, nHeight, bPageSpecified );
 	}
 
 	// Return the appropriate Spatial String
