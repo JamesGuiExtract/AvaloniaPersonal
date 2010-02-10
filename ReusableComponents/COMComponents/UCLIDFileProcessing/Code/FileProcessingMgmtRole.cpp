@@ -1400,8 +1400,12 @@ UINT CFileProcessingMgmtRole::handleStopRequestAsynchronously(void *pData)
 		ASSERT_RESOURCE_ALLOCATION("ELI19431", pRecordManager != NULL);
 		ASSERT_ARGUMENT("ELI19433", pFPM->m_ipRoleNotifyFAM != NULL );
 		
-		// Notify all of the processors of the stop request
-		pFPM->notifyFileProcessingTasksOfStopRequest();
+		// Notify the FAM that processing is cancelling
+		if (pFPM->m_eCurrentRunningState == kNormalStop)
+		{	
+			// Notify all of the processors of the stop request
+			pFPM->notifyFileProcessingTasksOfStopRequest();
+		};
 		
 		// The user (or OEM application) wants to stop the processing of files as soon as possible.
 		// Indicate to the record manager that the pending files in the queue are to be discarded
@@ -2261,7 +2265,7 @@ unsigned long CFileProcessingMgmtRole::timeTillNextProcessingChange( ERunningSta
 		ue.addDebugInfo("HourOfWeek", nHourOfWeek);
 		throw ue;
 	}
-	
+
 	// The next state should be the opposite of the state for the current hour
 	eNextRunningState = (m_vecScheduledHours[nHourOfWeek]) ? kScheduleStop : kScheduleRun;
 
