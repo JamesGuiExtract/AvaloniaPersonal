@@ -65,13 +65,13 @@ namespace Extract.IDShieldStatisticsReporter
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._foundDataPathTextBox.Location = new System.Drawing.Point(15, 26);
             this._foundDataPathTextBox.Name = "_foundDataPathTextBox";
-            this._foundDataPathTextBox.Size = new System.Drawing.Size(402, 20);
+            this._foundDataPathTextBox.Size = new System.Drawing.Size(404, 20);
             this._foundDataPathTextBox.TabIndex = 1;
             // 
             // _foundDataBrowseButton
             // 
             this._foundDataBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._foundDataBrowseButton.Location = new System.Drawing.Point(448, 25);
+            this._foundDataBrowseButton.Location = new System.Drawing.Point(450, 25);
             this._foundDataBrowseButton.Name = "_foundDataBrowseButton";
             this._foundDataBrowseButton.Size = new System.Drawing.Size(27, 21);
             this._foundDataBrowseButton.TabIndex = 3;
@@ -83,7 +83,7 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             this._foundDataPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._foundDataPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_foundDataPathTagsButton.Image")));
-            this._foundDataPathTagsButton.Location = new System.Drawing.Point(423, 25);
+            this._foundDataPathTagsButton.Location = new System.Drawing.Point(425, 25);
             this._foundDataPathTagsButton.Name = "_foundDataPathTagsButton";
             this._foundDataPathTagsButton.Size = new System.Drawing.Size(18, 22);
             this._foundDataPathTagsButton.TabIndex = 2;
@@ -94,7 +94,7 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             this._expectedDataPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._expectedDataPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_expectedDataPathTagsButton.Image")));
-            this._expectedDataPathTagsButton.Location = new System.Drawing.Point(423, 65);
+            this._expectedDataPathTagsButton.Location = new System.Drawing.Point(425, 65);
             this._expectedDataPathTagsButton.Name = "_expectedDataPathTagsButton";
             this._expectedDataPathTagsButton.Size = new System.Drawing.Size(18, 21);
             this._expectedDataPathTagsButton.TabIndex = 6;
@@ -104,7 +104,7 @@ namespace Extract.IDShieldStatisticsReporter
             // _expectedDataBrowseButton
             // 
             this._expectedDataBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._expectedDataBrowseButton.Location = new System.Drawing.Point(448, 65);
+            this._expectedDataBrowseButton.Location = new System.Drawing.Point(450, 65);
             this._expectedDataBrowseButton.Name = "_expectedDataBrowseButton";
             this._expectedDataBrowseButton.Size = new System.Drawing.Size(27, 21);
             this._expectedDataBrowseButton.TabIndex = 7;
@@ -118,28 +118,30 @@ namespace Extract.IDShieldStatisticsReporter
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._expectedDataPathTextBox.Location = new System.Drawing.Point(15, 65);
             this._expectedDataPathTextBox.Name = "_expectedDataPathTextBox";
-            this._expectedDataPathTextBox.Size = new System.Drawing.Size(402, 20);
+            this._expectedDataPathTextBox.Size = new System.Drawing.Size(404, 20);
             this._expectedDataPathTextBox.TabIndex = 5;
             // 
             // _cancelButton
             // 
-            this._cancelButton.Location = new System.Drawing.Point(400, 92);
+            this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this._cancelButton.Location = new System.Drawing.Point(402, 92);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 9;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
-            this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             // 
-            // okButton
+            // _okButton
             // 
-            this._okButton.Location = new System.Drawing.Point(319, 92);
-            this._okButton.Name = "okButton";
+            this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this._okButton.Location = new System.Drawing.Point(321, 92);
+            this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 8;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
-            this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this._okButton.Click += new System.EventHandler(this.OnOkButtonClick);
             // 
             // FeedbackAdvancedOptionsForm
@@ -158,7 +160,9 @@ namespace Extract.IDShieldStatisticsReporter
             this.Controls.Add(this._foundDataPathTextBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "FeedbackAdvancedOptionsForm";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Advanced Options";
             this.ResumeLayout(false);

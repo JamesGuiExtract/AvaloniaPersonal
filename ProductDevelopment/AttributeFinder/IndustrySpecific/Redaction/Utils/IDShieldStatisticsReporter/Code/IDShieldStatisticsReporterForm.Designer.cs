@@ -456,6 +456,7 @@ namespace Extract.IDShieldStatisticsReporter
             this.Controls.Add(this._tabControl);
             this.MinimumSize = new System.Drawing.Size(529, 350);
             this.Name = "IDShieldStatisticsReporterForm";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.Text = "ID Shield Statistics Reporter";
             this._tabControl.ResumeLayout(false);
             this._feedbackDataTab.ResumeLayout(false);

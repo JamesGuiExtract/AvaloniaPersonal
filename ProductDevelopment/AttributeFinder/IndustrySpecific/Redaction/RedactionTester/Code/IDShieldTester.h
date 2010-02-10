@@ -7,6 +7,7 @@
 #include "RedactionTester.h"
 
 #include <AttributeTester.h>
+#include <SafeTwoDimensionalArray.h>
 
 #include <string>
 #include <vector>
@@ -295,6 +296,20 @@ private:
 											bool bDocumentSelected,
 											const string& strSourceDoc);
 
+	// PROMISE: Determines whether the found redaction at the specified index of the array is an
+	//			over-redaction by comparing it to all expected attributes. This method assumes
+	//			that the found redaction has already been determined to be a "correct" redaction
+	//			which is now required of any redaction to be considered an "over-redaction"
+	//			[FlexIDSCore:4036]
+	// RETURNS: true if the found redaction is an over-redaction
+	bool getIsOverredaction(const SafeTwoDimensionalArray<MatchInfo>& s2dMatchInfos,
+							unsigned long ulFoundIndex, unsigned long ulTotalExpected);
+
+	// PROMISE: Outputs the provided attribute to the testoutput file with the specified label and
+	//			increments the provided statistic count.
+	void RecordStatistic(const string& strLabel, IAttributePtr ipRelatedAttribute,
+						 const string &strSourceVOA, unsigned long& rulCount);
+
 	// PROMISE: Takes 2 unsigned longs and if the second value is > 0, divides the first by the second.
 	//			If the denominator is <= 0, 0.0 is returned. Otherwise the quotient * 100.0 is returned.
 	double getRatioAsPercentOfTwoLongs( unsigned long ulNumerator, 
@@ -330,7 +345,8 @@ private:
 	// PROMISE: to add the specified attribute to the output voa vector with the name
 	//			field prefixed with strPrefix
 	// REQUIRE: m_ipTestOutputVOAVector is not NULL
-	void addAttributeToTestOutputVOA(IAttributePtr ipAttribute, const string& strPrefix);
+	void addAttributeToTestOutputVOA(IAttributePtr ipAttribute, const string& strPrefix,
+		const string &strSourceVOA);
 
 	// PROMISE: to look at all of the attributes contained in the found attributes vector
 	//			and to count up the total number of attributes named HCData, MCData, LCData,

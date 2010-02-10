@@ -15,7 +15,6 @@
 #include <ComponentLicenseIDs.h>
 #include <RegistryPersistenceMgr.h>
 #include <mathUtil.h>
-#include <SafeTwoDimensionalArray.h>
 #include <MiscLeadUtils.h>
 
 #include <cmath>
@@ -65,7 +64,7 @@ const string gstrFILES_WITH_CLUES = "\\Files_AtLeastOneFoundClue.txt";
 const string gstrFILES_CORRECTLY_SELECTED_FOR_REDACTION =
 	"\\SensitiveFiles_AutomaticallyRedacted.txt";
 const string gstrFILES_INCORRECTLY_SELECTED_FOR_REDACTION = 
-	"\\InsensitiveFiles_SelectedForRedaction.txt";
+	"\\InsensitiveFiles_AutomaticallyRedacted.txt";
 const string gstrFILES_MISSED_BEING_SELECTED_FOR_REDACTION =
 	"\\SensitiveFiles_NotSelectedForRedaction.txt";
 
@@ -84,11 +83,11 @@ const string gstrFILES_WITH_UNDER_REDACTIONS = "\\SensitiveFiles_AtLeastOneUnder
 const string gstrFILES_WITH_FALSE_POSITIVES = "\\Files_AtLeastOneFalsePositive.txt";
 const string gstrFILES_WITH_MISSED_REDACTIONS = "\\SensitiveFiles_AtLeastOneMissedRedaction.txt";
 
-// Files output in displaySummaryStatistics  and displayDocumentTypeStats
+// Files output in displaySummaryStatistics and displayDocumentTypeStats
 const string gstrFILE_FOR_STATISTICS = "\\Statistics.txt";
 
-const string gstrTEST_UNDER_REDACTED = "UnderRedacted_";
-const string gstrTEST_OVER_REDACTED = "OverRedacted_";
+const string gstrTEST_UNDER_REDACTED = "UnderRedaction_";
+const string gstrTEST_OVER_REDACTED = "OverRedaction_";
 const string gstrTEST_CORRECT_REDACTED = "Correct_";
 const string gstrTEST_MISSED_REDACTED = "Missed_";
 const string gstrTEST_FALSE_POSITIVE = "FalsePositive_";
@@ -1090,7 +1089,7 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 	{
 		m_ulNumFilesWithOverlappingExpectedRedactions++;
 
-		string strNumOverLappingExpected = "Number of overlapping expected redactions: " +
+		string strNumOverLappingExpected = "Number of overlapping sensitive data items: " +
 			asString(ulNumOverlappingExpected);
 		m_ipResultLogger->AddTestCaseNote(strNumOverLappingExpected.c_str());
 	}
@@ -1394,17 +1393,23 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 			}
 		}
 
+		// Keep track of all found redactions which overlap and expected redaction
+		set<unsigned long> setOverlappingFounds;
+
+		// Keep track of all redactions which are over redactions to at least one expected redaction.
+		set<unsigned long> setOverRedactions;
+
 		//--------------------------------------------------------
 		// Compute data from the expected attribute perspective
 		//--------------------------------------------------------
-		// compute correct redactions, under redactions, and missed redactions
+		// compute correct redactions, over-redactions, under-redactions, and missed redactions
 		for (unsigned long ulExpectedIndex = 0;
 			 ulExpectedIndex < testCaseStatistics.m_ulTotalExpectedRedactions;
 			 ulExpectedIndex++)
 		{
-			// flags for under redactions and covered redactions
-			bool bExpectedCovered = false;
-			bool bUnderRedaction = false;
+			// Only one "correct" redaction count is allowed per expected redaction. Keep track of
+			// whether one has been found for this expected.
+			bool bFoundCorrectRedaction = false;
 
 			for (unsigned long ulFoundIndex = 0;
 				 ulFoundIndex < testCaseStatistics.m_ulFoundRedactions;
@@ -1416,136 +1421,79 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 				// check if there is any area of overlap
 				if (!MathVars::isZero(miTemp.m_dAreaOfOverlap))
 				{
-					// set as covered
-					bExpectedCovered = true;
+					// Keep track of overlapping founds (anything not marked overlapping will be
+					// marked as a false positive).
+					setOverlappingFounds.insert(ulFoundIndex);
 					
 					// check the area of overlap
 					if ((miTemp.getPercentOfExpectedAreaRedacted() < m_dOverlapLeniencyPercent))
 					{
 						// less than the leniency then it is under redacted
-						bUnderRedaction = true;
+						RecordStatistic(gstrTEST_UNDER_REDACTED,
+							s2dMatchInfos(0, ulFoundIndex).m_ipFoundAttribute, "Found",
+							testCaseStatistics.m_ulNumUnderRedactions);
 					}
 					else
 					{
-						// correct redaction, set under redacted to false and exit loop
-						bUnderRedaction = false;
-						break;
+						// The expected redaction is completely covered. Record a "correct" redaction
+						// unless one has already been recorded for this expected redaction.
+						if (!bFoundCorrectRedaction)
+						{
+							bFoundCorrectRedaction = true;
+
+							RecordStatistic(gstrTEST_CORRECT_REDACTED,
+								s2dMatchInfos(ulExpectedIndex, 0).m_ipExpectedAttribute, "Expected",
+								testCaseStatistics.m_ulNumCorrectRedactions);
+						}
+						
+						// Look to see if we have already determined the found attribute to be an
+						// over-redaction.
+						bool bOverRedaction =
+							setOverRedactions.find(ulFoundIndex) != setOverRedactions.end();
+
+						// If not, calculate whether it is an over-redaction.
+						if (!bOverRedaction)
+						{
+							bOverRedaction = getIsOverredaction(s2dMatchInfos, ulFoundIndex,
+								testCaseStatistics.m_ulTotalExpectedRedactions);
+						}
+
+						if (bOverRedaction)
+						{
+							// Record an over-redaction.
+							setOverRedactions.insert(ulFoundIndex);
+
+							RecordStatistic(gstrTEST_OVER_REDACTED,
+								s2dMatchInfos(0, ulFoundIndex).m_ipFoundAttribute, "Found",
+								testCaseStatistics.m_ulNumOverRedactions);
+						}
 					}
 				}
 			}
 
-			// string that will be prepended to the attribute when it is added to the
-			// testOutputVOA file
-			string strTestOutputTag = "";
-
-			// check if expected redaction was covered first
-			if (bExpectedCovered)
+			if (!bFoundCorrectRedaction)
 			{
-				// was it under redacted
-				if (bUnderRedaction) 
-				{
-					// increment the number of under redactions (which also count as misses)
-					testCaseStatistics.m_ulNumUnderRedactions++;
-					testCaseStatistics.m_ulNumMisses++;
-
-					// set the outputVOA tag string
-					strTestOutputTag = gstrTEST_UNDER_REDACTED;
-				}
-				else
-				{
-					// if it was not under redacted then it was correct
-					testCaseStatistics.m_ulNumCorrectRedactions++;
-
-					// set the outputVOA tag string
-					strTestOutputTag = gstrTEST_CORRECT_REDACTED;
-				}
-			}
-			else
-			{
-				// did not cover the attribute at all, this is a miss
-				testCaseStatistics.m_ulNumMisses++;
-
-				// set the outputVOA tag string
-				strTestOutputTag = gstrTEST_MISSED_REDACTED;
-			}
-
-			// check for CreateTestOuputVOAFile
-			if (m_ipTestOutputVOAVector != NULL)
-			{
-				// add this expected attribute to the output VOA vector
-				addAttributeToTestOutputVOA(s2dMatchInfos(ulExpectedIndex, 0).m_ipExpectedAttribute,
-					strTestOutputTag);
+				// Record a missed redaction.
+				RecordStatistic(gstrTEST_MISSED_REDACTED,
+					s2dMatchInfos(ulExpectedIndex, 0).m_ipExpectedAttribute, "Expected",
+					testCaseStatistics.m_ulNumMisses);
 			}
 		}
 
 		//--------------------------------------------------------
-		// Compute data from the found attribute perspective
+		// Record all false positives
 		//--------------------------------------------------------
-		// compute over redactions and false positives
 		for (unsigned long ulFoundIndex = 0;
 			 ulFoundIndex < testCaseStatistics.m_ulFoundRedactions;
 			 ulFoundIndex++)
 		{
-			double dTotalOverlapArea = 0.0;
-			for (unsigned long ulExpectedIndex = 0;
-				 ulExpectedIndex < testCaseStatistics.m_ulTotalExpectedRedactions;
-				 ulExpectedIndex++)
+			// A found redaction is a false positive if it was not already found to overlap an
+			// expected redaction.
+			if (setOverlappingFounds.find(ulFoundIndex) == setOverlappingFounds.end())
 			{
-				// get the match info for these two attributes and add the area of overlap
-				MatchInfo miOverlap = s2dMatchInfos(ulExpectedIndex, ulFoundIndex);
-				dTotalOverlapArea += miOverlap.m_dAreaOfOverlap;
-			}
-
-			// string that will be prepended to the attribute when it is added to the
-			// testOutputVOA file
-			string strTestOutputTag = "";
-
-			if (MathVars::isZero(dTotalOverlapArea))
-			{
-				testCaseStatistics.m_ulNumFalsePositives++;
-
-				// set the outputVOA tag string
-				strTestOutputTag = gstrTEST_FALSE_POSITIVE;
-			}
-			else
-			{
-				// get the area of the found redaction
-				double dAreaOfFoundRedaction = 
-					s2dMatchInfos(0, ulFoundIndex).m_dAreaOfFoundRedaction;
-
-				double dERAP = 0.0;
-
-				// protect against divide by zero
-				if (!MathVars::isZero(dAreaOfFoundRedaction))
-				{
-					// compute the excess redaction area percentage
-					dERAP = (dAreaOfFoundRedaction - dTotalOverlapArea)/dAreaOfFoundRedaction;
-					dERAP *= 100.0;
-
-					// get absolute value
-					dERAP = fabs(dERAP);
-				}
-
-				if (dERAP >= m_dOverRedactionERAP)
-				{
-					testCaseStatistics.m_ulNumOverRedactions++;
-
-					// set the outputVOA tag string
-					strTestOutputTag = gstrTEST_OVER_REDACTED;
-				}
-			}
-
-			// check for CreateTestOuputVOAFile
-			if (m_ipTestOutputVOAVector != NULL)
-			{
-				// only output the found attribute if it was an over redaction or false positive
-				// (all other cases are already handled with the expected redaction output)
-				if (strTestOutputTag != "")
-				{
-					// add this found attribute to the output VOA vector
-					addAttributeToTestOutputVOA(s2dMatchInfos(0, ulFoundIndex).m_ipFoundAttribute, 
-						strTestOutputTag);
-				}
+				RecordStatistic(gstrTEST_FALSE_POSITIVE,
+					s2dMatchInfos(0, ulFoundIndex).m_ipFoundAttribute, "Found",
+					testCaseStatistics.m_ulNumFalsePositives);
 			}
 		}
 	}
@@ -1564,14 +1512,14 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 			for (unsigned long i = 0; i < testCaseStatistics.m_ulTotalExpectedRedactions; i++)
 			{
 				addAttributeToTestOutputVOA(ipExpectedAttributes->At(i),
-					gstrTEST_MISSED_REDACTED);
+					gstrTEST_MISSED_REDACTED, "Expected");
 			}
 
 			// if lFoundSize > 0 then all found attributes are false positives
 			for (unsigned long i = 0; i < testCaseStatistics.m_ulFoundRedactions; i++)
 			{
 				addAttributeToTestOutputVOA(ipAutoRedactedAttributes->At(i),
-					gstrTEST_FALSE_POSITIVE);
+					gstrTEST_FALSE_POSITIVE, "Found");
 			}
 		}
 	}
@@ -1648,6 +1596,59 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 	return testCaseStatistics;
 }
 //-------------------------------------------------------------------------------------------------
+bool CIDShieldTester::getIsOverredaction(const SafeTwoDimensionalArray<MatchInfo>& s2dMatchInfos,
+										 unsigned long ulFoundIndex, unsigned long ulTotalExpected)
+{
+	// Iterate through all expected redactions to determine the total area of overlap with the
+	// specified found redaction.
+	double dTotalOverlapArea = 0.0;
+	for (unsigned long ulExpectedIndex = 0; ulExpectedIndex < ulTotalExpected; ulExpectedIndex++)
+	{
+		// get the match info for these two attributes and add the area of
+		// overlap
+		MatchInfo miOverlap = s2dMatchInfos(ulExpectedIndex, ulFoundIndex);
+		dTotalOverlapArea += miOverlap.m_dAreaOfOverlap;
+	}
+
+	// get the area of the found redaction
+	double dAreaOfFoundRedaction = 
+		s2dMatchInfos(0, ulFoundIndex).m_dAreaOfFoundRedaction;
+
+	double dERAP = 0.0;
+
+	// protect against divide by zero
+	if (!MathVars::isZero(dAreaOfFoundRedaction))
+	{
+		// compute the excess redaction area percentage
+		dERAP = (dAreaOfFoundRedaction - dTotalOverlapArea) / 
+			dAreaOfFoundRedaction;
+		dERAP *= 100.0;
+
+		// get absolute value
+		dERAP = fabs(dERAP);
+
+		if (dERAP >= m_dOverRedactionERAP)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+void CIDShieldTester::RecordStatistic(const string& strLabel, IAttributePtr ipRelatedAttribute,
+									  const string &strSourceVOA, unsigned long& rulCount)
+{
+	// Output the provided attribute as long as an output vector and label are available.
+	if (m_ipTestOutputVOAVector != NULL && strLabel != "")
+	{
+		addAttributeToTestOutputVOA(ipRelatedAttribute, strLabel, strSourceVOA);
+	}
+
+	// Incremement the provided counter.
+	rulCount++;
+}
+//-------------------------------------------------------------------------------------------------
 void CIDShieldTester::displaySummaryStatistics()
 {
 	m_ipResultLogger->StartTestCase("", "Summary Statistics", kOtherTestCase);
@@ -1683,7 +1684,7 @@ void CIDShieldTester::displaySummaryStatistics()
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
 
-	zTemp.Format("Number of documents with overlapping expected redactions: %d ", 
+	zTemp.Format("Number of documents with overlapping sensitive data items: %d ", 
 		m_ulNumFilesWithOverlappingExpectedRedactions);
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticSummary += zTemp + "\r\n";
@@ -1752,20 +1753,7 @@ void CIDShieldTester::displaySummaryStatistics()
 	unsigned long ulTotalNumberOfCorrectRedactions = automatedStatistics.m_ulNumCorrectRedactions +
 		verificationStatistics.m_ulExpectedRedactionsInSelectedFiles;
 
-	strStatisticSummary += "\r\n";
-
-	if (m_bOutputAutomatedStatsOnly)
-	{
-		strStatisticSummary += "Final results of automated workflow:\r\n";
-	}
-	else if (m_bOutputHybridStats)
-	{
-		strStatisticSummary += "Final results of hybrid workflow:\r\n";
-	}
-	else
-	{
-		strStatisticSummary += "Final results of standard workflow:\r\n";
-	}
+	strStatisticSummary += "\r\nFinal results of above workflow:\r\n";
 
 	// Note for number of redactions found
 	zTemp.Format(
@@ -1815,7 +1803,7 @@ void CIDShieldTester::displaySummaryStatistics()
 		{
 			// Make a note for the number of expected redactions in the reviewed files
 			// (This number would be a duplicate statistic in a standard workflow).
-			zTemp.Format("Number of expected redactions in files presented for review: %d (%0.1f%%)",
+			zTemp.Format("Number of sensitive data items in files presented for review: %d (%0.1f%%)",
 				verificationStatistics.m_ulExpectedRedactionsInSelectedFiles,
 				getRatioAsPercentOfTwoLongs(
 					verificationStatistics.m_ulExpectedRedactionsInSelectedFiles,
@@ -1839,7 +1827,7 @@ void CIDShieldTester::displaySummaryStatistics()
 		strStatisticSummary += zTemp + "\r\n";
 
 		// Make a note for the number of expected redactions in the automatically redacted files
-		zTemp.Format("Number of expected redactions in automatically redacted files: %d (%0.1f%%)",
+		zTemp.Format("Number of sensitive data items in automatically redacted files: %d (%0.1f%%)",
 			automatedStatistics.m_ulExpectedRedactionsInSelectedFiles, 
 			getRatioAsPercentOfTwoLongs(automatedStatistics.m_ulExpectedRedactionsInSelectedFiles,
 				m_ulTotalExpectedRedactions));
@@ -1873,16 +1861,11 @@ string CIDShieldTester::displayStatisticsSection(
 	string strStatisticsSection = "";
 	CString zTemp;
 
-	// Section specific false positive data will be duplicating the overall false positive stat
-	// when using automatic mode.
-	if (m_bOutputHybridStats || !m_bOutputAutomatedStatsOnly)
-	{
-		zTemp = CString("Number of correct redactions") +
-			(bVerificationStatistics ? " presented to reviewers" : "");
-		zTemp.Format(zTemp + ": %d", statistics.m_ulNumCorrectRedactions);
-		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
-		strStatisticsSection += zTemp + "\r\n";
-	}
+	zTemp = CString("Number of correct redactions") +
+		(bVerificationStatistics ? " presented to reviewers" : "");
+	zTemp.Format(zTemp + ": %d", statistics.m_ulNumCorrectRedactions);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticsSection += zTemp + "\r\n";
 
 	zTemp = CString("Number of over-redactions") +
 		(bVerificationStatistics ? " presented to reviewers" : "");
@@ -1896,47 +1879,25 @@ string CIDShieldTester::displayStatisticsSection(
 	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
 	strStatisticsSection += zTemp + "\r\n";
 
-	if (bVerificationStatistics)
+	// Note for the number of false positives found
+	zTemp = CString("Number of false positives") +
+		(bVerificationStatistics ? " presented to reviewers" : "");
+	zTemp.Format(zTemp + ": %d ", statistics.m_ulNumFalsePositives);
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticsSection += zTemp + "\r\n";
+
+	if(statistics.m_ulNumFalsePositives <= 0)
 	{
-		zTemp.Format(
-			"Number of items not automatically redacted in files presented to reviewers: %d", 
-			statistics.m_ulNumMisses -
-				(statistics.m_ulTotalExpectedRedactions -
-				 statistics.m_ulExpectedRedactionsInSelectedFiles));
-		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
-		strStatisticsSection += zTemp + "\r\n";
+		zTemp = CString("Ratio of correctly redacted items to false positives: n/a");
 	}
 	else
 	{
-		zTemp.Format("Number of missed redactions: %d", statistics.m_ulNumMisses);
-		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
-		strStatisticsSection += zTemp + "\r\n";
+		zTemp.Format("Ratio of correctly redacted items to false positives: %0.1f",
+			((double)statistics.m_ulNumCorrectRedactions /
+				(double)statistics.m_ulNumFalsePositives));
 	}
-
-	// Section specific false positive data will be duplicating the overall false positive stat
-	// when using automatic mode.
-	if (m_bOutputHybridStats || !m_bOutputAutomatedStatsOnly)
-	{
-		// Note for the number of false positives found
-		zTemp = CString("Number of false positives") +
-			(bVerificationStatistics ? " presented to reviewers" : "");
-		zTemp.Format(zTemp + ": %d ", statistics.m_ulNumFalsePositives);
-		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
-		strStatisticsSection += zTemp + "\r\n";
-
-		if(statistics.m_ulNumFalsePositives <= 0)
-		{
-			zTemp = CString("Ratio of correctly redacted items to false positives: n/a");
-		}
-		else
-		{
-			zTemp.Format("Ratio of correctly redacted items to false positives: %0.1f",
-				((double)statistics.m_ulNumCorrectRedactions /
-					(double)statistics.m_ulNumFalsePositives));
-		}
-		m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
-		strStatisticsSection += zTemp + "\r\n";
-	}
+	m_ipResultLogger->AddTestCaseNote(_bstr_t(zTemp));
+	strStatisticsSection += zTemp + "\r\n";
 
 	return strStatisticsSection;
 }
@@ -1960,28 +1921,12 @@ void CIDShieldTester::displayDocumentTypeStats()
 	string strStatsForLogFile = "";
 	
 	// Display the number of documents classified for each type
-	m_ipResultLogger->StartTestCase("", "Document types found:", kOtherTestCase);
+	string strDocumentTypeLabel = "Document type distribution:";
+	strStatsForLogFile += strDocumentTypeLabel + "\r\n";
+
+	m_ipResultLogger->StartTestCase("", strDocumentTypeLabel.c_str(), kOtherTestCase);
 	map<string,int>::const_iterator iter;
 	long nDocsClassified = 0;
-
-	// Display the number of previously calculated found VOA files that were used.
-	if( m_iNumFilesWithExistingVOA > 0 )
-	{
-		CString zFoundVOAs = "";
-		if( m_iNumFilesWithExistingVOA > 1 )
-		{
-			zFoundVOAs.Format( "There were %d files with found VOAs, so the multiply classified document counts may not be accurate",
-						m_iNumFilesWithExistingVOA);
-		}
-		else
-		{
-			zFoundVOAs.Format( "There was %d file with found VOAs, so the multiply classified document counts may not be accurate",
-						m_iNumFilesWithExistingVOA);
-		}
-
-		m_ipResultLogger->AddTestCaseNote( get_bstr_t( zFoundVOAs ) );
-		strStatsForLogFile += zFoundVOAs + "\r\n";
-	}
 
 	// Iterate through the document classifier map that was created above
 	for( iter = m_mapDocTypeCount.begin(); iter != m_mapDocTypeCount.end(); ++iter )
@@ -2362,7 +2307,8 @@ double CIDShieldTester::computeTotalAreaOfOverlap(IAttributePtr ipExpected, IAtt
 }
 //-------------------------------------------------------------------------------------------------
 void CIDShieldTester::addAttributeToTestOutputVOA(IAttributePtr ipAttribute, 
-												  const string &strPrefix)
+												  const string &strPrefix,
+												  const string &strSourceVOA)
 {
 	ASSERT_ARGUMENT("ELI18437", ipAttribute != NULL);
 
@@ -2380,6 +2326,11 @@ void CIDShieldTester::addAttributeToTestOutputVOA(IAttributePtr ipAttribute,
 	// prefix the name with the prefix string
 	string strName = strPrefix + asString(ipNewAttribute->Name);
 	ipNewAttribute->Name = strName.c_str();
+
+	if (!strSourceVOA.empty())
+	{
+		ipNewAttribute->AddType(get_bstr_t(strSourceVOA));
+	}
 
 	// add this attribute to the output VOA vector
 	m_ipTestOutputVOAVector->PushBack(ipNewAttribute);
