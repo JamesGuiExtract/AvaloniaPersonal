@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -54,6 +55,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// Whether the object is dirty or not.
         /// </summary>
         bool _dirty;
+
+        /// <summary>
+        /// Mutex used to guarantee single threadedness to the remove annotations method
+        /// </summary>
+        static Mutex _mutex = new Mutex(false, @"Global\EC9E480D-BE75-4749-A5DF-2FD6583F8FAC");
 
         #endregion Fields
 
@@ -202,6 +208,9 @@ namespace Extract.FileActionManager.FileProcessors
             TemporaryFile tempFile = null;
             try
             {
+                // Block until the mutex is available
+                _mutex.WaitOne();
+
                 // Create a temporary PDF file to write to
                 tempFile = new TemporaryFile(".pdf");
 
@@ -261,6 +270,10 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     express.Dispose();
                 }
+
+                // Ensure the mutex is released (do this as the last step after
+                // the PdfXpress engine is released)
+                _mutex.ReleaseMutex();
             }
         }
 
