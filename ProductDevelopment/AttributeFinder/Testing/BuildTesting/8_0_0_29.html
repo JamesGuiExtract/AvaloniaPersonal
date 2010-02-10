@@ -1,0 +1,486 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.0.0.29 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.0.0.29 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[DotNet #382, FlexIDSCore #3965, #4040]</b> SQLCDBEditor
+	       	<ul>
+			<li>Confirm that a Start menu (Utilities) shortcut exists to open 
+			<b>ESFAMService.sdf</b> using the new utility.
+			<li>Confirm that the <b>FPSFile</b> table can be edited
+			<ul>
+				<li>Files can be added
+				<li>Files can be deleted
+				<li>Entries can be modified
+				<li>The <b>AutoStart</b> column can be modified
+			</ul>
+			<li>Confirm that the <b>Settings</b> table can be edited
+			<ul>
+				<li><b>SleepTimeOnStart</b> can be modified
+				<li><b>DependentServices</b> can be modified
+				<li><b>NumberOfFilesToProcess</b> can be modified
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #385, #386]</b> FAM Service
+	       	<ul>
+			<li>Confirm that the <b>ESFAMService</b> database has a primary key 
+			defined for each table. 
+			<li>Add an entry to the <b>DependentServices</b> field.  Confirm that the 
+			service is not currently running.
+			<li>Confirm that the FAM service does not start if the specified dependent 
+			service has not started.
+			<li>Stop the FAM service.
+			<li>Confirm that an exception is logged noting which dependent services 
+			have still not started as of the stop request.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #393, #396, #398]</b> Modify PDF file
+	       	<ul>
+	      		<li>Confirm that an <b>Core: Modify PDF file</b> task exists.
+      			<li>Confirm that the <b>Core: Modify PDF file</b> task requires all of the 
+			following licensing packages:
+			<ul>
+				<li>a <b>general</b> Extract Systems license
+				<li>a <b>Modify PDF (Pegasus PDF Annotation Removal)</b> license
+			</ul>
+	      		<li>Confirm that the <b>Core: Modify PDF file</b> property page includes a 
+			<b>General settings</b> group box.
+			<li>Confirm that the group box contains an edit box for specification of 
+			the PDF file to be modified.
+			<li>Confirm that the group box contains an associated <b>tag selector</b> 
+			button.
+			<li>Confirm that the tag selector button provides <b>&lt;FPSFileDir&gt;</b> 
+			and <b>&lt;SourceDocName&gt;</b>.
+			<li>Confirm that the tag selector button provides the usual $ functions.
+			<li>Confirm that selections from the tag selector button are correctly 
+			applied to the edit box.
+			<li>Confirm that the group box contains an associated <b>...</b> browse 
+			button.
+			<li>Confirm that the browse button displays an <b>Open File</b> dialog.
+			<li>Confirm that selections from the browse button are correctly 
+			applied to the edit box.
+      			<li>Confirm that the <b>Core: Modify PDF file</b> property page includes an 
+			<b>Annotations</b> group box.
+			<li>Confirm that the group box contains a <b>Remove all annotations from 
+			the PDF file</b> check box.
+			<li>Confirm that the check box is checked by default.
+<p>
+			<li>Confirm that an informative exception is thrown if the specified PDF 
+			file does not exist.
+			<li>Confirm that annotations are correctly <b>removed from</b> the PDF file.
+			<li>Confirm that annotations are correctly <b>retained in</b> the PDF file.
+			<li>Confirm that no Pegasus error messages are seen - especially about 
+			use of an evaluation license.
+<p>
+			<li>Confirm that <b>only one</b> instance of <b>Core: Modify PDF file</b> can 
+			be running at a time.
+			<li>Exercise the <b>Core: Modify PDF file</b> task with multiple FAMs and 
+			confirm that only one instance will run at a time.
+			<li>Exercise the (new) memory leak test for <b>Core: Modify PDF file</b>.
+	       	</ul>
+<p>
+		<li><b>[FlexIDSCore #3724]</b> Rule object confirmation dialog
+		<ul>
+			<li>Configure a rule object that allows loading a list from a file.
+			<li>Provide a list of clues.
+			<li>Specify a file from which to replace the existing clues.
+			<li>Confirm that the confirmation dialog formatted properly and uses 
+			<b>overwritten</b>.
+		</ul>
+<p>
+		<li><b>[FlexIDSCore #3745]</b> Confirm that the <b>Use cleaned image</b> check box 
+		is disabled in the <b>Core: Execute rules</b> property page if <b>No OCR</b> is 
+		selected.
+<p>
+		<li><b>[FlexIDSCore #3870]</b> Confirm that <b>.NET 3.5</b> can be installed via 
+		<b>Demo Shield</b> on a <b>Windows Server 2008 R2</b> operating system.
+<p>
+		<li><b>[FlexIDSCore #3934]</b> Confirm that the automated tests for 
+		<b>ESFileSuppliers</b> are installed with the <b>RDT</b>.
+<p>
+		<li><b>[FlexIDSCore #3963]</b> Confirm that the <b>Demo Shield</b> text fields 
+		do not overlap when selecting other items.
+<p>
+		<li><b>[FlexIDSCore #3986]</b> Exception log corruption
+		<ul>
+			<li>Run the FAM as a service.
+			<li>Open the <b>UEX Viewer</b> application.
+			<li>Stop the FAM service.
+			<li>Press <b>F5</b> to refresh the UEX Viewer.
+			<li>Confirm that the UEX file and viewer are both refreshed properly.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3991, #4010, #4042, #4045]</b> Redaction: Extend redactions 
+		to surround context
+	       	<ul>
+			<li><b>User Interface</b>
+			<ul>
+				<li>Use the Add button to select <b>Redaction: Extend redactions to 
+				surround context</b> as the task.</li>
+				<li>Confirm presence of an <b>Extend redactions to surround context</b> 
+				group box.
+				<li>Confirm that the group box contains a <b>For all data types</b> 
+				radio button.
+				<li>Confirm that this radio button is selected by default.
+				<li>Confirm that the group box contains a <b>For the following data types 
+				(separate types using a comma)</b> radio button.
+				<li>Confirm presence of an associated edit box.
+				<li>Confirm that the edit box is enabled only when the radio button is 
+				selected.
+				<li>Confirm presence of an <b>Options</b> group box.
+				<li>Confirm that the group box contains a <b>Randomly redact surrounding 
+				context up to</b> checkbox.
+				<li>Confirm presence of an associated edit box and spinner control.
+				<li>Confirm that the associated controls are enabled only when the 
+				checkbox is selected.
+				<li>Confirm that the edit accepts numbers between <b>1</b> and <b>99</b> 
+				inclusive.
+				<li>Confirm that the spinner control is limited between <b>1</b> and 
+				<b>99</b> inclusive.
+				<li>Confirm presence of a following <b>words on each side</b> label.
+				<li>Confirm that the group box contains an <bAdjust height of redaction if 
+				necessary to further obscure content</b> checkbox.
+				<li>Confirm that at least one checkbox must be checked for the 
+				configuration to be valid.
+				<li>Confirm presence of an <b>ID Shield data file location</b> group box.
+				<li>Confirm that the group box contains a label that describes the 
+				configured settings.
+				<li>Confirm that the initial label is <b>You are using default settings.</b>
+				<li>Confirm that the group box contains a <b>Customize...</b> button.
+				<li>Confirm that <b>Customize...</b> displays a <b>Specify ID Shield 
+				data file path</b> dialog.
+				<UL>
+			   		<li>Confirm that the dialog includes an enabled edit box for a 
+					file path.
+				   	<li>Confirm that the dialog includes an associated <b>Tag 
+					Selector</b> button.
+			   		<li>Confirm that the dialog includes an associated <b>...</b> 
+					( Browse ) button.
+			   		<li>Confirm that the dialog includes a <b>Reset</b> button.
+				   	<li>Confirm that the Reset button restores the default file path.
+			   		<li>Confirm that the default file path is 
+					<b>&lt;SourceDocName&gt;.voa</b>.
+				</UL>
+				<li>Confirm that settings are persistent.
+		       	</ul>
+<p>
+			<li><b>Random Redaction Functionality</b>
+			<ul>
+		  	   	<LI>Confirm that an appropriate random number of words are redacted 
+				both <b>before</b> and <b>after</b> the sensitive text.  Note that 
+				<b>0</b> words is acceptable.
+		  	   	<LI>Confirm that the redacted area includes intermediate whitespace 
+				so that it is unclear how many contextual words were redacted.
+	  		   	<LI>Confirm that contextual words are properly redacted on a previous 
+				line and page.
+		  	   	<LI>Confirm that contextual words are properly redacted on a subsequent 
+				line and page.
+	  		   	<LI>Confirm that no error is seen if the <b>first</b> word in the USS 
+				file is sensitive and that preceding context would go past the beginning 
+				of the document.
+	  	   		<LI>Confirm that no error is seen if the <b>last</b> word in the USS 
+				file is sensitive and that preceding context would go past the end 
+				of the document.
+			</ul>
+<p>
+			<li><b>Adjust Height Functionality</b>
+			<ul>
+		  	   	<LI>Confirm that the new height of the redaction area is the height of the 
+				tallest character in the enclosing paragraph.
+				<ul>
+			  	   	<LI>The enclosing paragraph is the natural paragraph if at least 
+					<b>10 times</b> the size of the sensitive area.
+			  	   	<LI>The enclosing paragraph is the entire width of the document 
+					extending <b>1.5 inches</b> above the sensitive area and <b>1.5 
+					inches</b> below the sensitive area if the natural paragraph is 
+					less than <b>10 times</b> the size of the sensitive area.
+				</ul>
+				<li>Confirm that the new height of the redaction is no more than 
+				<b>twice</b> the original height.
+	  		   	<LI>Confirm that no unexpected results are seen when using both options 
+				together.
+				<li><b>[FlexIDSCore #4042]</b> Confirm that adjusting the height allows 
+				for obscuring of redactions that do not contain ascenders and/or 
+				descenders.
+			</ul>
+<p>
+			<li><b>Miscellaneous</b>
+			<ul>
+		  	   	<LI>Confirm that <b>VerificationSession</b> information is added to 
+				the specified VOA file.
+				<li>Confirm that the task always preserves the original redaction zones.
+			</ul>
+	       	</ul>
+<p>
+		<li><b>[FlexIDSCore #4002]</b> Prompt for non-redact
+		<ul>
+			<li>Verify a document.
+			<li>Confirm that the page already contains at least one redaction.
+			<li>Select the redaction.
+			<li>Press <b>Ctrl+F</b> and use the Find or Redact feature to find some 
+			text.
+			<li>Click <b>Find next</b>.
+			<li>Confirm that no confirmation message is presented about wanting to unredact 
+			the selected item.
+		</ul>
+<p>
+		<li><b>[FlexIDSCore #3944, #4011, #4013, #4061]</b> Select Page Region
+		<ul>
+			<li>Configure a <b>Select Page Region</b> object to find an image 
+			region around a rectangle.  This can be done via <b>Exclude</b>.
+			<li>Confirm that the expected region is excluded.
+<p>
+			<li>Confirm that <b>Select Page Region</b> can be configured to select 
+			<b>All pages</b> without a dummy restriction.
+			<li>Confirm that proper results are seen with no restriction and 
+			<b>Re-OCR</b> or <b>Image region</b>.
+			<li>Confirm that an older <b>Select Page Region</b> rule with specified pages 
+			and re-OCR or image region has its settings updated to reflect actual behavior.
+			<li>Confirm that the proper page numbers are provided with the found 
+			attributes when excluding specified pages.
+		</ul>
+<p>
+		<li><b>[FlexIDSCore #4016]</b> ID Shield Statistics Reporter
+		<ul>
+			<li>Confirm that the window size and location are persisted.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4043, LegacyRC #5691, #5701]</b> RunFPSFile
+	       	<ul>
+			<li>Exercise the <b>RunFPSFile</b> checklist.
+			<li>Confirm that an FPS file with a <b>Redaction: Verify sensitive data</b> 
+			task can be used with the <b>/ignoreDB</b> flag.
+			<li>Document any additional creative testing of this utility. 
+	       	</ul>
+<p>
+		<li><b>[FlexIDSCore #4049]</b> Split region into content areas
+		<ul>
+			<li>Exercise the RSD file from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4049</b> with an image 
+			that has no USS file.
+			<li>Confirm that a <b>GetSpatialPageInfos() requires a string with 
+			spatial info</b> exception is not seen.
+		</ul>
+<p>
+		<li><b>[FlexIDSCore #4053, #4063]</b> Verification
+		<ul>
+			<li>Confirm that a user-specified image can be used as the verification 
+			backdrop.  This is important for <b>Legislation Guard</b>.
+			<li>Attempt to stop the FAM while no document is processing.
+			<li>Confirm that a prompt is displayed.
+			<li>Do not close the prompt window.
+			<li>Confirm that <b>Stop processing</b> from the FAM is successful and 
+			that the verification UI will close.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5693]</b> Confirm that the <b>Manage Tags</b> dialog successfully 
+		modifies a tag description without changing the tag name.
+<p>
+  	   	<LI><b>[LegacyRC #5696]</b> Exporting debug data from UEX Viewer
+	       	<ul>
+			<li>Review an expection log from a stress test or an Endurance test that 
+			contains several <b>ELI15935: Application trace information</b> exceptions 
+			with USB key count information.
+	  	   	<LI>Confirm that if the test machine is connected to the network with 
+			a mapped drive to <b>FNP2\Internal</b> then the debug data from 
+			these exceptions <b>is not</b> encrypted.
+	  	   	<LI>Confirm that if the test machine is connected to the network with 
+			a mapped drive to <b>FNP2\Internal</b> then the exported debug data from 
+			these exceptions <b>is not</b> encrypted.
+	  	   	<LI>Confirm that if the test machine is not connected to the network then 
+			the debug data from these exceptions <b>is</b> encrypted.
+	  	   	<LI>Confirm that if the test machine is not connected to the network then 
+			the exported debug data from these exceptions <b>is</b> encrypted.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5700]</b> USer Authentication
+	       	<ul>
+			<li>Set <b>RequireAuthenticationBeforeRun=1</b>.
+			<li>Confirm that the previous <b>SkipAuthenticationForServicesOnMachines</b> 
+			entry in the DBInfo table is now <b>SkipAuthenticationOnMachines</b>.
+			<li>With setting <b>empty</b>
+			<ul>
+				<li>Confirm that an FPS file will not run if the logged in user 
+				is not included via <b>Manage Users</b>.
+				<li>Confirm that an FPS file will not run if the logged in user 
+				is included via <b>Manage Users</b> but does not provide the 
+				appropriate password.
+				<li>Confirm that an FPS file will run if the logged in user 
+				is included via <b>Manage Users</b> and the appropriate password 
+				is provided.
+				<li>Confirm that the FAM will not run as a service in local system 
+				mode.
+				<li>Confirm that the FAM will not run as a service in defined 
+				user mode.
+				<li>Confirm that <b>RunFPSFile</b> will not run if the logged in 
+				user is not included via <b>Manage Users</b>.
+				<li>Confirm that <b>RunFPSFile</b> will not run if the logged in 
+				user is included via <b>Manage Users</b> but does not provide the 
+				appropriate password.
+				<li>Confirm that <b>RunFPSFile</b> will run if the logged in 
+				user is included via <b>Manage Users</b> and the appropriate 
+				password is provided.
+			</ul>
+			<li>With setting <b>non-empty</b>
+			<ul>
+				<li>Confirm that the above tests have the same result if a 
+				different machine is specified in <b>SkipAuthenticationOnMachines</b>.
+				<li>Add the name of the test machine to the 
+				<b>SkipAuthenticationOnMachines</b> field.
+				<li>Confirm that an FPS file will run even if the logged in user 
+				is not included via <b>Manage Users</b>.
+				<li>Confirm that the FAM will run as a service in local system 
+				mode.
+				<li>Confirm that the FAM will run as a service in defined 
+				user mode.
+				<li>Confirm that <b>RunFPSFile</b> will run even if the logged in 
+				user is not included via <b>Manage Users</b>.
+			</ul>
+			<li>Skipping files for <b>all</b> users
+			<ul>
+				<li>Set <b>RequirePasswordToProcessAllSkippedFiles=1</b>
+				<li>Confirm that the FAM service will fail if the associated FPS 
+				file is configured to skip files for all users.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5705]</b> Core: Sleep task
+	       	<ul>
+	      		<li>Confirm that an <b>Core: Sleep</b> task exists.
+      			<li>Confirm that the <b>Core: Sleep</b> task requires only a <b>general</b> 
+			Extract Systems license.
+	      		<li>Confirm that the <b>Core: Sleep</b> property page includes an edit box to 
+			specify the length of time to sleep.
+			<li>Confirm that the edit box accepts only digit characters.
+			<li>Confirm that a sleep value above <b>2147483647</b> is invalid.
+	      		<li>Confirm that the property page includes a combo box to specify the units 
+			of time for which to sleep
+			<ul>
+				<li>Millisecond(s)
+				<li>Second(s)
+				<li>Minute(s)
+				<li>Hour(s)
+			</ul>
+			<li>Confirm that the default unit is <b>Second(s)</b>.
+      			<li>Confirm that the property page includes a <b>Sleep for a random amount of 
+			time between 1 millisecond and specified time</b> check box.
+			<li>Confirm that settings are persistent.
+<p>
+			<li>Confirm that the task sleeps for an appropriate amount of time
+			<ul>
+				<li>some number of <b>milliseconds</b>.
+				<li>some number of <b>milliseconds</b> with a random sleep.
+				<li>some number of <b>seconds</b>.
+				<li>some number of <b>seconds</b> with a random sleep.
+				<li>some number of <b>minutes</b>.
+				<li>some number of <b>minutes</b> with a random sleep.
+				<li>some number of <b>hours</b>.
+				<li>some number of <b>hours</b> with a random sleep.
+			</ul>
+<p>
+			<li>Sleep is a cancellable task
+			<ul>
+				<li>Configure an FPS file with a <b>Core: Sleep</b> task followed by at 
+				least one additional task.
+				<li>Start processing in the FAM.
+				<li>Stop processing during the time in which the Sleep task is active.
+				<li>Confirm that processing stops immediately.
+				<li>Confirm that subsequent tasks <b>are not</b> executed.
+				<li>Confirm that progress status is updated as sleep proceeds.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5712]</b> Image Viewer
+	       	<ul>
+			<li>Exercise the <b>Image Viewer</b> application.
+			<li>Confirm that a selected sub-image can be extracted and displayed in a 
+			new Image Viewer window.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5715]</b> Cancellable tasks and scheduled processing
+	       	<ul>
+			<li>Configure an FPS file with a sleep task and a set file action status task.
+			<li>Also configure the FPS file to use scheduled processing.
+			<li>Confirm that if processing transitions to inactive during a sleep task, 
+			that the associated set file action status task is <b>not</b> executed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5717]</b> Input event tracking
+	       	<ul>
+			<li>Confirm that <b>ALT</b> keys are now handled as input events.
+	       	</ul>
+<p>
+  	   	<LI><b>Demo_FLEXIndex</b>
+	       	<ul>
+			<li>Exercise the FLEX Index demo.
+			<li>Confirm that the current images process properly. 
+			<li>Confirm that document types are provided.
+			<li>Confirm that swiping rules are effective for each field.
+			<li><b>[DataEntry #240, #891]</b> Confirm that the <b>Return Address</b> 
+			controls now use the same font as the rest of the DEP.
+			<li><b>[DataEntry #886]</b> Confirm that the <b>Legal Description</b> 
+			text box has a scroll bar.
+			<li><b>[DataEntry #890]</b> Confirm that the <b>Return Address</b> 
+			table rows are not resizeable.
+			<li><b>[DataEntry #892]</b> Confirm that multiple rows can be selected and 
+			deleted from the <b>Return Address</b> table.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
