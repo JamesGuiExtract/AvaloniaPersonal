@@ -823,6 +823,7 @@ namespace Extract.Redaction.Verification
             bool warn = _userClosing && !_imageViewer.IsImageAvailable;
             if (warn)
             {
+                _userClosing = false;
                 string message = "If you are intending to stop processing, "
                                  + "press the stop button in the File Action Manager.";
                 MessageBox.Show(this, message, "Stop processing", MessageBoxButtons.OK, 

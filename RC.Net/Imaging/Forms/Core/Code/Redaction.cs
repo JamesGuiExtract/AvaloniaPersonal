@@ -1,3 +1,4 @@
+using Extract.Drawing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -44,12 +45,12 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The color that black redactions will be rendered on a hard copy.
         /// </summary>
-        private static readonly Color _BLACK_RENDER = Color.Black;
+        static readonly Color _BLACK_RENDER = Color.Black;
 
         /// <summary>
         /// The color that white redactions will be rendered on a hard copy.
         /// </summary>
-        private static readonly Color _WHITE_RENDER = Color.White;
+        static readonly Color _WHITE_RENDER = Color.White;
 
         #endregion Constants
 
@@ -350,7 +351,7 @@ namespace Extract.Imaging.Forms
                     {
                         // Draw the highlight's region as an opaque color [IDSO #149]
                         highlight.DrawRegion(graphics, graphics.Clip, transform, color,
-                            NativeMethods.BinaryRasterOperations.R2_COPYPEN);
+                            RasterDrawMode.CopyPen);
 
                         // Draw a black border around the highlight if the fill color is white
                         if (_fillColor == RedactionColor.White)

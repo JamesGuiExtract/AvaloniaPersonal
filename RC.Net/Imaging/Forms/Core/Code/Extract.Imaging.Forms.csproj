@@ -464,7 +464,6 @@
     <Compile Include="MenuItems\ZoomWindowToolStripMenuItem.Designer.cs">
       <DependentUpon>ZoomWindowToolStripMenuItem.cs</DependentUpon>
     </Compile>
-    <Compile Include="NativeMethods.cs" />
     <Compile Include="Controls\NextPageToolStripButton.cs">
       <SubType>Component</SubType>
     </Compile>

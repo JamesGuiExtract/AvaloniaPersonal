@@ -724,8 +724,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                DrawRegion(graphics, clip, transform, color, 
-                    NativeMethods.BinaryRasterOperations.R2_MASKPEN);
+                DrawRegion(graphics, clip, transform, color, RasterDrawMode.MaskPen);
 
                 // This is done outside of DrawRegion so it is not rendered in a printed document
                 if (BorderColor != null)
@@ -762,7 +761,7 @@ namespace Extract.Imaging.Forms
         /// <param name="color">The color to paint the highlight.</param>
         /// <param name="drawMode">The mix mode to use when drawing the highlight.</param>
         internal void DrawRegion(Graphics graphics, Region clip, Matrix transform, Color color, 
-            NativeMethods.BinaryRasterOperations drawMode)
+            RasterDrawMode drawMode)
         {
             // Check if this highlight is attached to an image viewer
             ImageViewer imageViewer = base.ImageViewer;
@@ -771,6 +770,7 @@ namespace Extract.Imaging.Forms
                 // Paint the highlight's region
                 if (_color != Color.Transparent)
                 {
+                    GdiGraphics gdiGraphics = new GdiGraphics(graphics, drawMode);
                     using (Region region = Region.Clone())
                     {
                         // Transform region coordinates from logical to destination
@@ -780,7 +780,7 @@ namespace Extract.Imaging.Forms
                         region.Intersect(clip);
 
                         // Draw the highlight
-                        ImageViewer.DrawRegion(region, graphics, color, drawMode);
+                        gdiGraphics.FillRegion(region, color);
                     }
                 }
 

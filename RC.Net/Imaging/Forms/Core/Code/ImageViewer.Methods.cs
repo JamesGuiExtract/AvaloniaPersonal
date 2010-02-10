@@ -14,8 +14,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
 
@@ -2663,28 +2661,7 @@ namespace Extract.Imaging.Forms
                 case CursorTool.AngularHighlight:
                 case CursorTool.AngularRedaction:
 
-                    // Get a drawing surface for the interactive highlight
-                    using (Graphics graphics = CreateGraphics())
-                    {
-                        // Get the appropriate color for drawing the object
-                        Color drawColor = _cursorTool == CursorTool.AngularHighlight 
-                            ? _defaultHighlightColor : _defaultRedactionPaintColor;
-
-                        // Erase the previous highlight if it exists
-                        if (!_trackingData.Region.IsEmpty(graphics))
-                        {
-                            DrawRegion(_trackingData.Region, graphics, drawColor,
-                                NativeMethods.BinaryRasterOperations.R2_NOTXORPEN);
-                        }
-
-                        // Recalculate and redraw the new interactive highlight
-                        _trackingData.UpdateAngularRegion(mouseX, mouseY);
-                        if (!_trackingData.Region.IsEmpty(graphics))
-                        {
-                            DrawRegion(_trackingData.Region, graphics, drawColor,
-                                NativeMethods.BinaryRasterOperations.R2_NOTXORPEN);
-                        }
-                    }
+                    UpdateDrawingHighlight(mouseX, mouseY, true);
                     break;
 
                 case CursorTool.DeleteLayerObjects:
@@ -2720,28 +2697,7 @@ namespace Extract.Imaging.Forms
                 case CursorTool.RectangularHighlight:
                 case CursorTool.RectangularRedaction:
 
-                    // Get a drawing surface for the interactive highlight
-                    using (Graphics graphics = CreateGraphics())
-                    {
-                        // Get the appropriate color for drawing the object
-                        Color drawColor = (_cursorTool == CursorTool.RectangularHighlight 
-                            ? _defaultHighlightColor : _defaultRedactionPaintColor);
-
-                        // Erase the previous highlight if it exists
-                        if (!_trackingData.Region.IsEmpty(graphics))
-                        {
-                            DrawRegion(_trackingData.Region, graphics, drawColor,
-                                NativeMethods.BinaryRasterOperations.R2_NOTXORPEN);
-                        }
-
-                        // Recalculate and redraw the new interactive highlight
-                        _trackingData.UpdateRectangularRegion(mouseX, mouseY);
-                        if (!_trackingData.Region.IsEmpty(graphics))
-                        {
-                            DrawRegion(_trackingData.Region, graphics, drawColor,
-                                NativeMethods.BinaryRasterOperations.R2_NOTXORPEN);
-                        }
-                    }
+                    UpdateDrawingHighlight(mouseX, mouseY, false);
                     break;
 
                 case CursorTool.SelectLayerObject:
@@ -2796,6 +2752,54 @@ namespace Extract.Imaging.Forms
                     // the interactivity is handled by the Leadtools RasterImageViewer
                     break;
             }
+        }
+
+        /// <summary>
+        /// Updates the highlight being drawn during an interactive manual highlight event.
+        /// </summary>
+        /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
+        /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
+        /// <param name="angularHighlight"><see langword="true"/> if the highlight being updated 
+        /// is angular; <see langword="false"/> if it is rectangular.</param>
+        void UpdateDrawingHighlight(int mouseX, int mouseY, bool angularHighlight)
+        {
+            // Get a drawing surface for the interactive highlight
+            using (Graphics graphics = CreateGraphics())
+            {
+                // Get the appropriate color for drawing the object
+                Color drawColor = GetHighlightDrawColor();
+
+                // Erase the previous highlight if it exists
+                GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.NotXorPen);
+                gdiGraphics.FillRegion(_trackingData.Region, drawColor);
+
+                // Recalculate and redraw the new interactive highlight
+                if (angularHighlight)
+                {
+                    _trackingData.UpdateAngularRegion(mouseX, mouseY);
+                }
+                else
+                {
+                    _trackingData.UpdateRectangularRegion(mouseX, mouseY);
+                }
+
+                gdiGraphics.FillRegion(_trackingData.Region, drawColor);
+            }
+        }
+
+        /// <summary>
+        /// Gets the color used to draw highlight during a manual redaction event.
+        /// </summary>
+        /// <returns>The color used to draw highlight during a manual redaction event.</returns>
+        Color GetHighlightDrawColor()
+        {
+            if (_cursorTool == CursorTool.AngularHighlight ||
+                _cursorTool == CursorTool.RectangularHighlight)
+            {
+                return _defaultHighlightColor;
+            }
+            
+            return _defaultRedactionPaintColor;
         }
 
         /// <summary>
@@ -3001,15 +3005,11 @@ namespace Extract.Imaging.Forms
             using (Graphics graphics = CreateGraphics())
             {
                 // Get the appropriate color for drawing the object
-                Color drawColor = (_cursorTool == CursorTool.AngularHighlight 
-                    ? _defaultHighlightColor : _defaultRedactionPaintColor);
+                Color drawColor = GetHighlightDrawColor();
 
                 // Erase the previous highlight if it exists
-                if (!_trackingData.Region.IsEmpty(graphics))
-                {
-                    DrawRegion(_trackingData.Region, graphics, drawColor,
-                        NativeMethods.BinaryRasterOperations.R2_NOTXORPEN);
-                }
+                GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.NotXorPen);
+                gdiGraphics.FillRegion(_trackingData.Region, drawColor);
 
                 // If the event was canceled, there is nothing more to do.
                 if (cancel)
@@ -3553,15 +3553,11 @@ namespace Extract.Imaging.Forms
             using (Graphics graphics = CreateGraphics())
             {
                 // Get the appropriate color for drawing the object
-                Color drawColor = (_cursorTool == CursorTool.RectangularHighlight) 
-                    ? _defaultHighlightColor : _defaultRedactionPaintColor;
+                Color drawColor = GetHighlightDrawColor();
 
                 // Erase the previous highlight if it exists
-                if (!_trackingData.Region.IsEmpty(graphics))
-                {
-                    DrawRegion(_trackingData.Region, graphics, drawColor,
-                        NativeMethods.BinaryRasterOperations.R2_NOTXORPEN);
-                }
+                GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.NotXorPen);
+                gdiGraphics.FillRegion(_trackingData.Region, drawColor);
 
                 // If the event was canceled, there is nothing more to do.
                 if (cancel)
@@ -3600,8 +3596,8 @@ namespace Extract.Imaging.Forms
                     }
 
                     // Draw the new highlight
-                    DrawRegion(_trackingData.Region, graphics, drawColor,
-                        NativeMethods.BinaryRasterOperations.R2_MASKPEN);
+                    gdiGraphics.DrawMode = RasterDrawMode.MaskPen;
+                    gdiGraphics.FillRegion(_trackingData.Region, drawColor);
                 }
             }
 
@@ -4962,7 +4958,7 @@ namespace Extract.Imaging.Forms
                     fileDialog.Filter = filterList.ToString();
                     fileDialog.FilterIndex = 
                         _openImageFilterIndex > _openImageFileTypeFilter.Count 
-                                                ? 1 : _openImageFilterIndex;
+                            ? 1 : _openImageFilterIndex;
                     fileDialog.Title = "Open Image File";
 
                     // Show the dialog and bail if the user selected cancel
@@ -5453,83 +5449,6 @@ namespace Extract.Imaging.Forms
         #endregion Methods
 
         #region Static Methods
-
-        /// <summary>
-        /// Draws the specified region with the specified graphics using the specified options.
-        /// </summary>
-        /// <param name="region">The region to draw. Cannot be <see langword="null"/>.</param>
-        /// <param name="graphics">The graphics with which to draw. Cannot be 
-        /// <see langword="null"/>.</param>
-        /// <param name="color">The color of the region to draw.</param>
-        /// <param name="drawMode">The mix mode of the region to draw.</param>
-        /// <permission cref="SecurityPermission">Demands permission for unmanaged code.
-        /// </permission>
-        [SecurityPermission(SecurityAction.LinkDemand,
-            Flags = SecurityPermissionFlag.UnmanagedCode)]
-        internal static void DrawRegion(Region region, Graphics graphics, Color color,
-            NativeMethods.BinaryRasterOperations drawMode)
-        {
-            // No need to draw transparent regions
-            if (color == Color.Transparent)
-            {
-                return;
-            }
-
-            // Create handles for the the brush, region, and device context
-            SafeGdiHandle brush = null;
-            IntPtr regionHandle = IntPtr.Zero;
-            IntPtr deviceContext = IntPtr.Zero;
-
-            // In try..finally to ensure the handles are released
-            try
-            {
-                // Create a colored brush to draw highlights
-                brush = NativeMethods.CreateSolidBrush(ColorTranslator.ToWin32(color));
-                if (brush.IsInvalid)
-                {
-                    throw new ExtractException("ELI21591", "Unable to create brush for region.",
-                        new Win32Exception(Marshal.GetLastWin32Error()));
-                }
-
-                // Get the region handle
-                regionHandle = region.GetHrgn(graphics);
-
-                // Get the device context
-                deviceContext = graphics.GetHdc();
-
-                // Set the draw mode
-                if (NativeMethods.SetROP2(deviceContext, drawMode) == 0)
-                {
-                    throw new ExtractException("ELI21113", "Unable to set draw mode for region.",
-                        new Win32Exception(Marshal.GetLastWin32Error()));
-                }
-
-                // Draw the region
-                if (!NativeMethods.FillRgn(deviceContext, regionHandle, brush))
-                {
-                    throw new ExtractException("ELI21961", "Unable to set draw mode for region.",
-                        new Win32Exception(Marshal.GetLastWin32Error()));
-                }
-            }
-            finally
-            {
-                // Release the handles
-                if (brush != null)
-                {
-                    brush.Dispose();
-                }
-                if (regionHandle != IntPtr.Zero)
-                {
-                    region.ReleaseHrgn(regionHandle);
-                }
-                if (deviceContext != IntPtr.Zero)
-                {
-                    graphics.ReleaseHdc(deviceContext);
-                }
-            }
-        }
-
-
 
         /// <summary>
         /// Initializes the static <see cref="Dictionary{T,T}"/> of <see cref="ImageViewerCursors"/>
