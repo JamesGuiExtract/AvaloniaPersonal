@@ -43,6 +43,8 @@
 // Find Trailing pages that contain string without case sensitivity
 <TESTCASE>;TrailingPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page3.voa
 
+// Include all pages and return the text (using include all pages as a passthrough)
+<TESTCASE>;IncludeAllPagesReturnText.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;IncludeAllPagesReturnText.voa
 
 //*********************************************************************************
 // Test Include Left or Top Half of various pages
@@ -222,6 +224,13 @@
 // The testcase include rotation angle of 90, 180, 270 degrees.
 // Rotation is excercised in greater detail in the interactive tests
 <TESTCASE>;RotateTest.rsd;Rotated2.tif.uss;;RotateTest.voa
+
+// Excludes the left 3/4 of the page, rotates 270 degress and ReOCRs the document
+<TESTCASE>;ExcludeLeftThreeFourthsReOcrRotate270.rsd;Rotated2.tif.uss;;ExcludeLeftThreeFourthsReOcrRotate270.voa
+
+// Excludes the left 3/4 of pages 1-3, rotates 270 degress and ReOCRs the document, this will rotate and ReOCR
+// all of page 4
+<TESTCASE>;ExcludeLeftThreeFourthsPages1to3ReOcrRotate270.rsd;Rotated.tif.uss;;ExcludeLeftThreeFourthsPages1to3ReOcrRotate270.voa
 
 //*********************************************************************************
 // Test Return Image Region

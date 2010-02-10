@@ -7,6 +7,7 @@ UCLIDAFUtilsTest.EntityFinderTester.1;;..\..\..\AFUtils\AFUtilsTest\TestFiles\Te
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\ImageRegionWithLines\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\BoxFinder\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\LocateImageRegion\IDShieldTester.dat
+EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\SelectPageRegion\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\MicrFinder\MicrFinder.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueModifiers\AutomatedTest\LocateImageRegion\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueModifiers\AutomatedTest\SSNFinder\IDShieldTester.dat

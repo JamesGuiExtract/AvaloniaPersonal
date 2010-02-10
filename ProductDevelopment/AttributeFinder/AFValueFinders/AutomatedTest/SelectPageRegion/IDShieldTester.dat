@@ -1,0 +1,15 @@
+<SETTING>;VerificationCondition=PageTest
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=PageTest
+<SETTING>;AutomatedCondition=PageTest
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;CreateTestOutputVOAFiles=0
+
+// Exclude image region (no OCR results)
+<TESTFOLDER>;ExcludeImageRegionNoOcr.rsd;.\Image1;$DirOf(<SourceDocName>)\..\ActualVOA\ExcludeImageRegionNoOcr.voa;$DirOf(<SourceDocName>)\..\ExcludeImageRegionNoOcr.evoa
+
+// Exclude image region (no OCR results)
+<TESTFOLDER>;ExcludePages1thru2ImageRegionNoOcr.rsd;.\Image2;$DirOf(<SourceDocName>)\..\ActualVOA\ExcludePages1thru2ImageRegionNoOcr.voa;$DirOf(<SourceDocName>)\..\ExcludePages1thru2ImageRegionNoOcr.evoa
+
+// Include image region (no OCR results)
+<TESTFOLDER>;IncludeImageRegionNoOcr.rsd;.\Image2;$DirOf(<SourceDocName>)\..\ActualVOA\IncludeImageRegionNoOcr.voa;$DirOf(<SourceDocName>)\..\IncludeImageRegionNoOcr.evoa
