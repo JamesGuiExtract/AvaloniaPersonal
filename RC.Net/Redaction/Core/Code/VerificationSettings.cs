@@ -26,6 +26,18 @@ namespace Extract.Redaction
         readonly string _inputFile;
 
         /// <summary>
+        /// <see langword="true"/> if the back drop image should be used if available; 
+        /// <see langword="false"/> if the back drop image should be ignored.
+        /// </summary>
+        readonly bool _useBackdropImage;
+
+        /// <summary>
+        /// The path of the back drop image to use if <see cref="_useBackdropImage"/> is 
+        /// <see langword="true"/>. May contain path tags.
+        /// </summary>
+        readonly string _backdropImage;
+
+        /// <summary>
         /// Settings associated with changing the action status of a file once it is committed.
         /// </summary>
         readonly SetFileActionStatusSettings _actionStatusSettings;
@@ -43,7 +55,7 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class.
         /// </summary>
         public VerificationSettings() 
-            : this(null, null, null, null, false)
+            : this(null, null, null, false, null, null, false)
         {
 
         }
@@ -53,11 +65,14 @@ namespace Extract.Redaction
         /// specified settings.
         /// </summary>
         public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback, 
-            string inputFile, SetFileActionStatusSettings actionStatus, bool enableInputTracking)
+            string inputFile, bool useBackdropImage, string backdropImage, 
+            SetFileActionStatusSettings actionStatus, bool enableInputTracking)
         {
             _generalSettings = general ?? new GeneralVerificationSettings();
             _feedbackSettings = feedback ?? new FeedbackSettings();
             _inputFile = inputFile ?? @"<SourceDocName>.voa";
+            _useBackdropImage = useBackdropImage;
+            _backdropImage = backdropImage;
             _actionStatusSettings = actionStatus ?? new SetFileActionStatusSettings();
             _enableInputTracking = enableInputTracking;
         }
@@ -100,6 +115,33 @@ namespace Extract.Redaction
             get
             {
                 return _inputFile;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether to use the <see cref="BackdropImage"/> if it is available.
+        /// </summary>
+        /// <value><see langword="true"/> if to use the <see cref="BackdropImage"/> if it is 
+        /// available; <see langword="false"/> if to ignore the <see cref="BackdropImage"/>.</value>
+        public bool UseBackdropImage
+        {
+            get
+            {
+                return _useBackdropImage;
+            }
+        }
+
+        /// <summary>
+        /// Gets the path of the back drop image to use if <see cref="UseBackdropImage"/> is 
+        /// <see langword="true"/>.
+        /// </summary>
+        /// <value>The path of the back drop image to use if <see cref="UseBackdropImage"/> is 
+        /// <see langword="true"/>.</value>
+        public string BackdropImage
+        {
+            get
+            {
+                return _backdropImage;
             }
         }
 
@@ -149,6 +191,8 @@ namespace Extract.Redaction
                 GeneralVerificationSettings general = GeneralVerificationSettings.ReadFrom(reader);
                 FeedbackSettings feedback = FeedbackSettings.ReadFrom(reader);
                 string inputFile = reader.ReadString();
+                bool useBackdropImage = false;
+                string backdropImage = null;
                 SetFileActionStatusSettings actionStatusSettings = null;
                 bool enableInputTracking = false;
 
@@ -164,10 +208,16 @@ namespace Extract.Redaction
                 }
                 if (reader.Version >= 4)
                 {
-                	actionStatusSettings = SetFileActionStatusSettings.ReadFrom(reader);
+                    actionStatusSettings = SetFileActionStatusSettings.ReadFrom(reader);
+                }
+                if (reader.Version >= 5)
+                {
+                    useBackdropImage = reader.ReadBoolean();
+                    backdropImage = reader.ReadString();
                 }
 
-                return new VerificationSettings(general, feedback, inputFile, actionStatusSettings, enableInputTracking);
+                return new VerificationSettings(general, feedback, inputFile, useBackdropImage, 
+                    backdropImage, actionStatusSettings, enableInputTracking);
             }
             catch (Exception ex)
             {
@@ -191,6 +241,8 @@ namespace Extract.Redaction
                 writer.Write(_inputFile);
                 writer.Write(_enableInputTracking);
                 _actionStatusSettings.WriteTo(writer);
+                writer.Write(_useBackdropImage);
+                writer.Write(_backdropImage);
             }
             catch (Exception ex)
             {

@@ -93,10 +93,13 @@ namespace Extract.Redaction.Verification
             GeneralVerificationSettings general = GetGeneralSettings();
             FeedbackSettings feedback = GetFeedbackSettings();
             string dataFile = _dataFileControl.DataFile;
+            bool useBackdropImage = _backdropImageCheckBox.Checked;
+            string backdropImage = _backdropImageTextBox.Text;
             SetFileActionStatusSettings action = GetActionStatusSettings();
             bool enableInputTracking = _enableInputEventTrackingCheckBox.Checked;
 
-            return new VerificationSettings(general, feedback, dataFile, action, enableInputTracking);
+            return new VerificationSettings(general, feedback, dataFile, useBackdropImage, 
+                backdropImage, action, enableInputTracking);
         }
 
         /// <summary>
@@ -227,8 +230,14 @@ namespace Extract.Redaction.Verification
             // Enable or disable feedback settings
             _feedbackSettingsButton.Enabled = _collectFeedbackCheckBox.Checked;
 
+            // Enable or disable settings
+            bool enabled = _backdropImageCheckBox.Checked;
+            _backdropImageTextBox.Enabled = enabled;
+            _backdropImagePathTagsButton.Enabled = enabled;
+            _backdropImageBrowseButton.Enabled = enabled;
+
             // Enable or disable action status settings
-            bool enabled = _fileActionCheckBox.Checked;
+            enabled = _fileActionCheckBox.Checked;
             _actionNameComboBox.Enabled = enabled;
             _actionNamePathTagsButton.Enabled = enabled;
             _actionStatusComboBox.Enabled = enabled;
@@ -241,15 +250,35 @@ namespace Extract.Redaction.Verification
         /// the settings are valid.</returns>
         bool WarnIfInvalid()
         {
-            bool isEmpty = string.IsNullOrEmpty(_dataFileControl.DataFile);
-            if (isEmpty)
+            // ID Shield data file must be specified
+            if (string.IsNullOrEmpty(_dataFileControl.DataFile))
             {
                 MessageBox.Show("Please enter the ID Shield data file", "Invalid ID Shield data file",
                     MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
                 _dataFileControl.Focus();
+                return true;
             }
 
-            return isEmpty;
+            // Backdrop image must be specified if checked
+            if (_backdropImageCheckBox.Checked)
+            {
+                if (string.IsNullOrEmpty(_backdropImageTextBox.Text))
+                {
+                    MessageBox.Show("Please enter a backdrop image", "Invalid backdrop image",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                    _backdropImageTextBox.Focus();
+                    return true;
+                }
+                if (new FAMTagManager().StringContainsInvalidTags(_backdropImageTextBox.Text))
+                {
+                    MessageBox.Show("Backdrop image contains invalid tags", "Invalid backdrop image",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                    _backdropImageTextBox.Focus();
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         #endregion Methods
@@ -278,6 +307,10 @@ namespace Extract.Redaction.Verification
 
                 // ID Shield data file
                 _dataFileControl.DataFile = _settings.InputFile;
+
+                // Backdrop image
+                _backdropImageCheckBox.Checked = _settings.UseBackdropImage;
+                _backdropImageTextBox.Text = _settings.BackdropImage;
 
                 // Action status settings
                 _fileActionCheckBox.Checked = _settings.ActionStatusSettings.Enabled;
@@ -364,6 +397,63 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ExtractException.Display("ELI29173", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="CheckBox.CheckedChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="CheckBox.CheckedChanged"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="CheckBox.CheckedChanged"/> event.</param>
+        void HandleBackdropImageCheckBoxCheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateControls();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29671", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
+        void HandleBackdropImagePathTagsButtonTagSelected(object sender, TagSelectedEventArgs e)
+        {
+            try
+            {
+                _backdropImageTextBox.SelectedText = e.Tag;
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29669", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="BrowseButton.PathSelected"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="BrowseButton.PathSelected"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="BrowseButton.PathSelected"/> event.</param>
+        void HandleBackdropImageBrowseButtonPathSelected(object sender, PathSelectedEventArgs e)
+        {
+            try
+            {
+                _backdropImageTextBox.Text = e.Path;
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29670", ex);
             }
         }
 

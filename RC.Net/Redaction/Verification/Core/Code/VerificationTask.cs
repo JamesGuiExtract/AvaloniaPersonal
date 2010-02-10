@@ -29,7 +29,7 @@ namespace Extract.Redaction.Verification
         /// <para>Version 3</para>
         /// Added enable input event tracking setting.
         /// </summary>
-        const int _CURRENT_VERSION = 4;
+        const int _CURRENT_VERSION = 5;
         
         #endregion Constants
 

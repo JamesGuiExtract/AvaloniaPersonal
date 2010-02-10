@@ -13,7 +13,12 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The image file associated with the verified document.
         /// </summary>
-        readonly string _imageFile;
+        readonly string _sourceDocument;
+
+        /// <summary>
+        /// The image file to display in the image viewer.
+        /// </summary>
+        readonly string _displayImage;
 
         /// <summary>
         /// The id of the file.
@@ -79,16 +84,16 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Initializes a new instance of the <see cref="VerificationMemento"/> class.
         /// </summary>
-        public VerificationMemento(string imageFile, int fileId, int actionId, 
+        public VerificationMemento(string imageFile, string displayImage, int fileId, int actionId, 
             string attributesFile, string documentType, string feedbackImage)
         {
-            _imageFile = imageFile;
+            _sourceDocument = imageFile;
+            _displayImage = displayImage;
             _fileId = fileId;
             _actionId = actionId;
             _voaFile = attributesFile;
             _documentType = documentType;
 
-            
             if (feedbackImage != null)
             {
                 _feedbackImage = feedbackImage;
@@ -109,11 +114,23 @@ namespace Extract.Redaction.Verification
         /// Gets the image file associated with the verified document.
         /// </summary>
         /// <returns>The image file associated with the verified document.</returns>
-        public string ImageFile
+        public string SourceDocument
         {
             get
             {
-                return _imageFile;
+                return _sourceDocument;
+            }
+        }
+
+        /// <summary>
+        /// Gets the image that should be displayed in the image viewer.
+        /// </summary>
+        /// <value>The image that should be displayed in the image viewer.</value>
+        public string DisplayImage
+        {
+            get
+            {
+                return _displayImage;
             }
         }
 

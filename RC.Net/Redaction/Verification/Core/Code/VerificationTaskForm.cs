@@ -357,7 +357,7 @@ namespace Extract.Redaction.Verification
             if (_actionStatusTask != null)
             {
                 VerificationMemento memento = GetSavedMemento();
-                _actionStatusTask.ProcessFile(memento.ImageFile, memento.FileId, memento.ActionId,
+                _actionStatusTask.ProcessFile(memento.SourceDocument, memento.FileId, memento.ActionId,
                     _tagManager, _fileDatabase, null, false);
             }
         }
@@ -470,8 +470,7 @@ namespace Extract.Redaction.Verification
         /// <param name="screenTime">The duration of time spent verifying the document.</param>
         void SaveAttributesTo(VerificationMemento memento, TimeInterval screenTime)
         {
-            string sourceDocument = _imageViewer.ImageFile;
-            RedactionFileChanges changes = _redactionGridView.SaveChanges(sourceDocument);
+            RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
 
             _currentVoa.SaveVerificationSession(memento.AttributesFile, changes, screenTime, _settings);
 
@@ -545,7 +544,7 @@ namespace Extract.Redaction.Verification
                 if (_settings.Feedback.CollectOriginalDocument)
                 {
                     // Copy the file if the source and destination differ
-                    string originalImage = _imageViewer.ImageFile;
+                    string originalImage = memento.DisplayImage;
                     if (!originalImage.Equals(feedbackImage, StringComparison.OrdinalIgnoreCase))
                     {
                         Directory.CreateDirectory(Path.GetDirectoryName(feedbackImage));
@@ -863,22 +862,43 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Creates a memento to store the last saved state of the processing document.
         /// </summary>
-        /// <param name="imageFile">The name of the processing document.</param>
-        /// <param name="fileId">The file id of the <paramref name="imageFile"/> in File Action 
+        /// <param name="sourceDocument">The name of the processing document.</param>
+        /// <param name="fileId">The file id of the <paramref name="sourceDocument"/> in File Action 
         /// Manager database.</param>
-        /// <param name="actionId">The action id associated with <paramref name="imageFile"/> in 
+        /// <param name="actionId">The action id associated with <paramref name="sourceDocument"/> in 
         /// the File Action Manager database.</param>
         /// <param name="pathTags">Expands File Action Manager path tags.</param>
         /// <returns>A memento to store the last saved state of the processing document.</returns>
-        VerificationMemento CreateSavedMemento(string imageFile, int fileId, int actionId,
+        VerificationMemento CreateSavedMemento(string sourceDocument, int fileId, int actionId,
             IPathTags pathTags)
         {
+            string displayImage = GetDisplayImage(sourceDocument, pathTags);
             string attributesFile = pathTags.Expand(_settings.InputFile);
             string documentType = GetDocumentType(attributesFile);
-            string feedbackImage = GetFeedbackImageFileName(pathTags, imageFile, fileId);
+            string feedbackImage = GetFeedbackImageFileName(pathTags, sourceDocument, fileId);
 
-            return new VerificationMemento(imageFile, fileId, actionId, attributesFile, 
-                documentType, feedbackImage);
+            return new VerificationMemento(sourceDocument, displayImage, fileId, actionId, 
+                attributesFile, documentType, feedbackImage);
+        }
+
+        /// <summary>
+        /// Gets the display image from the specified source document.
+        /// </summary>
+        /// <param name="sourceDocument">The original source document.</param>
+        /// <param name="pathTags">The path tags to use to expand paths.</param>
+        /// <returns>The display image from the specified source document.</returns>
+        string GetDisplayImage(string sourceDocument, IPathTags pathTags)
+        {
+            if (_settings.UseBackdropImage)
+            {
+                string backdrop = pathTags.Expand(_settings.BackdropImage);
+                if (File.Exists(backdrop))
+                {
+                    return backdrop;
+                }
+            }
+
+            return sourceDocument;
         }
 
         /// <summary>
@@ -888,15 +908,16 @@ namespace Extract.Redaction.Verification
         /// </returns>
         VerificationMemento CreateUnsavedMemento()
         {
-            string imageFile = _savedMemento.ImageFile;
+            string sourceDocument = _savedMemento.SourceDocument;
+            string displayImage = _savedMemento.DisplayImage;
             int fileId = _savedMemento.FileId;
             int actionId = _savedMemento.ActionId;
             string attributesFile = FileSystemMethods.GetTemporaryFileName(".voa");
             string documentType = _savedMemento.DocumentType;
             string feedbackImage = _savedMemento.FeedbackImage;
 
-            return new VerificationMemento(imageFile, fileId, actionId, attributesFile, 
-                documentType, feedbackImage);
+            return new VerificationMemento(sourceDocument, displayImage, fileId, actionId, 
+                attributesFile, documentType, feedbackImage);
         }
 
         /// <summary>
@@ -1270,7 +1291,7 @@ namespace Extract.Redaction.Verification
                         UpdateMemento();
 
                         // Prevent outside sources from writing to the processing document
-                        _processingStream = File.Open(_savedMemento.ImageFile, FileMode.Open, 
+                        _processingStream = File.Open(_savedMemento.DisplayImage, FileMode.Open, 
                             FileAccess.Read, FileShare.Read);
                     }
 
@@ -1307,7 +1328,7 @@ namespace Extract.Redaction.Verification
         {
             // Prevent write access to the current image 
             VerificationMemento oldMemento = GetCurrentDocument();
-            using (File.Open(oldMemento.ImageFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (File.Open(oldMemento.DisplayImage, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 // Increment the history
                 _historyIndex += forward ? 1 : -1;
@@ -1316,7 +1337,7 @@ namespace Extract.Redaction.Verification
                 try
                 {
                     // Attempt to open the new image
-                    _imageViewer.OpenImage(newMemento.ImageFile, false);
+                    _imageViewer.OpenImage(newMemento.DisplayImage, false);
                 }
                 catch (Exception ex)
                 {
@@ -1334,7 +1355,7 @@ namespace Extract.Redaction.Verification
                     {
                         _historyIndex--;
                     }
-                    _imageViewer.OpenImage(oldMemento.ImageFile, false);
+                    _imageViewer.OpenImage(oldMemento.DisplayImage, false);
                 }
 
                 // If we have moved to the currently processing document, remove the write lock
@@ -1353,11 +1374,11 @@ namespace Extract.Redaction.Verification
         {
             if (_imageViewer.IsImageAvailable)
             {
-                string imageFile = _imageViewer.ImageFile;
-                _currentDocumentTextBox.Text = imageFile;
-                Text = Path.GetFileName(imageFile) + " - " + _FORM_TITLE;
-
                 VerificationMemento memento = GetCurrentDocument();
+
+                _currentDocumentTextBox.Text = memento.SourceDocument;
+                Text = Path.GetFileName(memento.SourceDocument) + " - " + _FORM_TITLE;
+
                 _documentTypeTextBox.Text = memento.DocumentType;
                 _commentsTextBox.Text = GetFileActionComment(memento);
 
@@ -1411,7 +1432,7 @@ namespace Extract.Redaction.Verification
         void LoadMemento(VerificationMemento memento)
         {
             // Load the voa
-            _currentVoa.LoadFrom(memento.AttributesFile, _imageViewer.ImageFile, 
+            _currentVoa.LoadFrom(memento.AttributesFile, memento.SourceDocument, 
                 memento.ToggleOffRedactions);
 
             // Set the controls
@@ -2309,7 +2330,7 @@ namespace Extract.Redaction.Verification
                 // Reset the unsaved memento
                 ResetUnsavedMemento();
 
-                _imageViewer.OpenImage(fullPath, false);
+                _imageViewer.OpenImage(_savedMemento.DisplayImage, false);
             }
             catch (Exception ex)
             {

@@ -42,6 +42,7 @@ namespace Extract.Redaction.Verification
             System.Windows.Forms.GroupBox groupBox2;
             System.Windows.Forms.Label label1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VerificationSettingsDialog));
+            System.Windows.Forms.GroupBox groupBox3;
             this._enableInputEventTrackingCheckBox = new System.Windows.Forms.CheckBox();
             this._feedbackSettingsButton = new System.Windows.Forms.Button();
             this._collectFeedbackCheckBox = new System.Windows.Forms.CheckBox();
@@ -52,14 +53,20 @@ namespace Extract.Redaction.Verification
             this._actionStatusComboBox = new System.Windows.Forms.ComboBox();
             this._actionNameComboBox = new Extract.Utilities.Forms.BetterComboBox();
             this._fileActionCheckBox = new System.Windows.Forms.CheckBox();
+            this._backdropImagePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._backdropImageBrowseButton = new Extract.Utilities.Forms.BrowseButton();
+            this._backdropImageTextBox = new System.Windows.Forms.TextBox();
+            this._backdropImageCheckBox = new System.Windows.Forms.CheckBox();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._dataFileControl = new Extract.Redaction.DataFileControl();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox2 = new System.Windows.Forms.GroupBox();
             label1 = new System.Windows.Forms.Label();
+            groupBox3 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
+            groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -72,7 +79,7 @@ namespace Extract.Redaction.Verification
             groupBox1.Controls.Add(this._verifyAllPagesCheckBox);
             groupBox1.Location = new System.Drawing.Point(12, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(368, 138);
+            groupBox1.Size = new System.Drawing.Size(369, 138);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "General";
@@ -80,7 +87,7 @@ namespace Extract.Redaction.Verification
             // _enableInputEventTrackingCheckBox
             // 
             this._enableInputEventTrackingCheckBox.AutoSize = true;
-            this._enableInputEventTrackingCheckBox.Location = new System.Drawing.Point(6, 115);
+            this._enableInputEventTrackingCheckBox.Location = new System.Drawing.Point(7, 115);
             this._enableInputEventTrackingCheckBox.Name = "_enableInputEventTrackingCheckBox";
             this._enableInputEventTrackingCheckBox.Size = new System.Drawing.Size(156, 17);
             this._enableInputEventTrackingCheckBox.TabIndex = 5;
@@ -145,10 +152,10 @@ namespace Extract.Redaction.Verification
             groupBox2.Controls.Add(this._actionStatusComboBox);
             groupBox2.Controls.Add(this._actionNameComboBox);
             groupBox2.Controls.Add(this._fileActionCheckBox);
-            groupBox2.Location = new System.Drawing.Point(12, 222);
+            groupBox2.Location = new System.Drawing.Point(12, 305);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new System.Drawing.Size(369, 78);
-            groupBox2.TabIndex = 2;
+            groupBox2.TabIndex = 3;
             groupBox2.TabStop = false;
             groupBox2.Text = "After committing a document";
             // 
@@ -207,24 +214,80 @@ namespace Extract.Redaction.Verification
             this._fileActionCheckBox.UseVisualStyleBackColor = true;
             this._fileActionCheckBox.CheckedChanged += new System.EventHandler(this.HandleFileActionCheckBoxCheckedChanged);
             // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(this._backdropImagePathTagsButton);
+            groupBox3.Controls.Add(this._backdropImageBrowseButton);
+            groupBox3.Controls.Add(this._backdropImageTextBox);
+            groupBox3.Controls.Add(this._backdropImageCheckBox);
+            groupBox3.Location = new System.Drawing.Point(12, 223);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new System.Drawing.Size(369, 76);
+            groupBox3.TabIndex = 2;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Image location";
+            // 
+            // _backdropImagePathTagsButton
+            // 
+            this._backdropImagePathTagsButton.Enabled = false;
+            this._backdropImagePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_backdropImagePathTagsButton.Image")));
+            this._backdropImagePathTagsButton.Location = new System.Drawing.Point(311, 41);
+            this._backdropImagePathTagsButton.Name = "_backdropImagePathTagsButton";
+            this._backdropImagePathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
+            this._backdropImagePathTagsButton.Size = new System.Drawing.Size(18, 20);
+            this._backdropImagePathTagsButton.TabIndex = 2;
+            this._backdropImagePathTagsButton.UseVisualStyleBackColor = true;
+            this._backdropImagePathTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandleBackdropImagePathTagsButtonTagSelected);
+            // 
+            // _backdropImageBrowseButton
+            // 
+            this._backdropImageBrowseButton.Enabled = false;
+            this._backdropImageBrowseButton.Location = new System.Drawing.Point(335, 41);
+            this._backdropImageBrowseButton.Name = "_backdropImageBrowseButton";
+            this._backdropImageBrowseButton.Size = new System.Drawing.Size(27, 20);
+            this._backdropImageBrowseButton.TabIndex = 3;
+            this._backdropImageBrowseButton.Text = "...";
+            this._backdropImageBrowseButton.UseVisualStyleBackColor = true;
+            this._backdropImageBrowseButton.PathSelected += new System.EventHandler<Extract.Utilities.Forms.PathSelectedEventArgs>(this.HandleBackdropImageBrowseButtonPathSelected);
+            // 
+            // _backdropImageTextBox
+            // 
+            this._backdropImageTextBox.Enabled = false;
+            this._backdropImageTextBox.HideSelection = false;
+            this._backdropImageTextBox.Location = new System.Drawing.Point(6, 42);
+            this._backdropImageTextBox.Name = "_backdropImageTextBox";
+            this._backdropImageTextBox.Size = new System.Drawing.Size(298, 20);
+            this._backdropImageTextBox.TabIndex = 1;
+            // 
+            // _backdropImageCheckBox
+            // 
+            this._backdropImageCheckBox.AutoSize = true;
+            this._backdropImageCheckBox.Location = new System.Drawing.Point(7, 19);
+            this._backdropImageCheckBox.Name = "_backdropImageCheckBox";
+            this._backdropImageCheckBox.Size = new System.Drawing.Size(260, 17);
+            this._backdropImageCheckBox.TabIndex = 0;
+            this._backdropImageCheckBox.Text = "Use image as backdrop for verification if available";
+            this._backdropImageCheckBox.UseVisualStyleBackColor = true;
+            this._backdropImageCheckBox.CheckedChanged += new System.EventHandler(this.HandleBackdropImageCheckBoxCheckedChanged);
+            // 
             // _cancelButton
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(306, 313);
+            this._cancelButton.Location = new System.Drawing.Point(306, 394);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 4;
+            this._cancelButton.TabIndex = 5;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(225, 313);
+            this._okButton.Location = new System.Drawing.Point(225, 394);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 3;
+            this._okButton.TabIndex = 4;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -242,7 +305,8 @@ namespace Extract.Redaction.Verification
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(392, 348);
+            this.ClientSize = new System.Drawing.Size(392, 429);
+            this.Controls.Add(groupBox3);
             this.Controls.Add(groupBox2);
             this.Controls.Add(this._dataFileControl);
             this.Controls.Add(this._okButton);
@@ -258,6 +322,8 @@ namespace Extract.Redaction.Verification
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -277,5 +343,9 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.ComboBox _actionStatusComboBox;
         private Extract.Utilities.Forms.BetterComboBox _actionNameComboBox;
         private Extract.Utilities.Forms.PathTagsButton _actionNamePathTagsButton;
+        private System.Windows.Forms.CheckBox _backdropImageCheckBox;
+        private Extract.Utilities.Forms.PathTagsButton _backdropImagePathTagsButton;
+        private Extract.Utilities.Forms.BrowseButton _backdropImageBrowseButton;
+        private System.Windows.Forms.TextBox _backdropImageTextBox;
     }
 }
