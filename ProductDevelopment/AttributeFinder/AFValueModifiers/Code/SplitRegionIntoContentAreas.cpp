@@ -1318,11 +1318,19 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 		// set to false.
 		validateHandwritingLicense();
 
+		// Get the spatial string from the document
+		ISpatialStringPtr ipDocText = ipDoc->Text;
+		ASSERT_RESOURCE_ALLOCATION("ELI22114", ipDocText != NULL);
+
+		// Get the spatial string from the attribute
 		ISpatialStringPtr ipValue = ipAttribute->Value;
 
-		// If this attribute doesn't have a value or the value doesn't have any spatial information,
-		// there is nothing to process.
-		if (ipValue == NULL || !asCppBool(ipValue->HasSpatialInfo()))
+		// If this attribute doesn't have a value or the value doesn't have any spatial information
+		// or the AFDocument string does not have any spatial information,
+		// there is nothing to process. [FlexIDSCore #4049]
+		if (ipValue == NULL
+			|| !asCppBool(ipValue->HasSpatialInfo())
+			|| !asCppBool(ipDocText->HasSpatialInfo()))
 		{
 			return;
 		}
@@ -1333,9 +1341,6 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 
 		IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
 		ASSERT_RESOURCE_ALLOCATION("ELI22104", ipSubAttributes != NULL);
-
-		ISpatialStringPtr ipDocText = ipDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI22114", ipDocText != NULL);
 
 		ILongToObjectMapPtr ipSpatialPageInfos = ipDocText->SpatialPageInfos;
 		ASSERT_RESOURCE_ALLOCATION("ELI28052", ipSpatialPageInfos != NULL);
