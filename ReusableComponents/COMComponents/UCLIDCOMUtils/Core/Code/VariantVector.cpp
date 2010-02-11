@@ -400,11 +400,6 @@ STDMETHODIMP CVariantVector::CopyFrom(IUnknown *pObject)
 				ASSERT_RESOURCE_ALLOCATION("ELI26057", ipCopy != NULL);
 				vtTemp = ipCopy.Detach();
 			}
-			else if(varType == VT_BSTR)
-			{
-				_bstr_t bstrTemp = _bstr_t(vtTemp.bstrVal);
-				vtTemp = _bstr_t(bstrTemp.copy());
-			}
 			
 			m_vecVarCollection.push_back(vtTemp);
 		}
