@@ -3485,6 +3485,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>ISDialogLangID</td><td/></row>
 		<row><td>ISUSLock</td><td>{37CADDDA-7913-4531-AEF9-95C3075E7A81}</td></row>
 		<row><td>ISUSSignature</td><td>{FD3D200A-0DE3-4728-B7E3-6B11D7A707E6}</td></row>
+		<row><td>LockPermissionMode</td><td>1</td></row>
 		<row><td>MsiExecCmdLineOptions</td><td/></row>
 		<row><td>MsiLogFile</td><td/></row>
 		<row><td>OnUpgrade</td><td>0</td></row>

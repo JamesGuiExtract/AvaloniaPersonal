@@ -126,6 +126,7 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
+		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\i386\ISLockPermissions.dll</td></row>
 		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 	</table>
 
@@ -188,6 +189,8 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
+		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{7991E125-96E2-4FD0-8D64-F7CE9A80AD9C}</td><td>ALLUSERSPROFILE</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AllOtherFiles1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{3F048884-A658-4E94-9D8C-C106DF32F590}</td><td>ALL_USER_EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{360A61B5-15DC-4AED-AC50-94984A011457}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>_11111111.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{D0CF33E9-D686-4F96-B168-555C8E384DC5}</td><td>COMPONENT_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td><td/><td>FKBVersion.txt.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CoreComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{72D25589-2960-4BA0-ABF6-90052135E1E1}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>AFCore.rl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -311,6 +314,8 @@
 	<table name="CreateFolder">
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>ALLUSERSPROFILE</td><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
+		<row><td>ALL_USER_EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>AllOtherFiles1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -320,6 +325,8 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
+		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
+		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
@@ -354,6 +361,7 @@
 		<col def="I4">ISAttributes</col>
 		<col def="S255">ISFolderName</col>
 		<row><td>ALLUSERSPROFILE</td><td>TARGETDIR</td><td>.:ALLUSE~1|All Users</td><td/><td>0</td><td/></row>
+		<row><td>ALL_USER_EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ALLUSERSPROFILE</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>AdminToolsFolder</td><td>TARGETDIR</td><td>.:Admint~1|AdminTools</td><td/><td>0</td><td/></row>
 		<row><td>AppDataFolder</td><td>TARGETDIR</td><td>.:APPLIC~1|Application Data</td><td/><td>0</td><td/></row>
 		<row><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>COMMON~1|CommonComponents</td><td/><td>0</td><td/></row>
@@ -649,6 +657,8 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
+		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_C63A882C_3488_4396_8A7C_D92CB9D50F7A_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>AllOtherFiles1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7A5E96F5_4200_4EEA_8803_3AFE921FCC1A_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7691BC11_C729_4DB9_B2E6_3956F2A7CD0A_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_235D7774_6F14_4A35_BF03_0E4CE8C4AE81_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CoreComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_E1BFB16A_DA6B_4489_8455_5F6A7B446B4B_FILTER</td><td/><td/><td/><td/></row>
@@ -903,6 +913,7 @@
 		<col key="yes" def="s255">User</col>
 		<col def="I4">Permission</col>
 		<col def="I4">Attributes</col>
+		<row><td>ALL_USER_EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Users</td><td>1610809791</td><td>0</td></row>
 	</table>
 
 	<table name="ISLogicalDisk">
@@ -1239,6 +1250,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>ISCompilerOption_PreProcessor</td><td/></row>
 		<row><td>ISCompilerOption_WarningsAsErrors</td><td>1</td></row>
 		<row><td>ISDialogLangID</td><td/></row>
+		<row><td>LockPermissionMode</td><td>1</td></row>
 		<row><td>MsiExecCmdLineOptions</td><td/></row>
 		<row><td>MsiLogFile</td><td/></row>
 		<row><td>OnUpgrade</td><td>1</td></row>
@@ -1333,6 +1345,8 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col key="yes" def="s72">Component</col>
 		<col key="yes" def="s72">ModuleID</col>
 		<col key="yes" def="i2">Language</col>
+		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>AllOtherFiles1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>CoreComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
@@ -1455,13 +1469,17 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S64">BaseAction</col>
 		<col def="I2">After</col>
 		<col def="S255">Condition</col>
+		<row><td>ISLockPermissionsCost</td><td/><td>InstallValidate</td><td>1</td><td/></row>
+		<row><td>ISLockPermissionsInstall</td><td/><td>StartServices</td><td>1</td><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td/><td>SelfUnregModules</td><td>1</td><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td/><td>SelfRegModules</td><td>1</td><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
 		<row><td>ISUnSelfRegisterFiles</td><td/><td>ISSelfRegisterCosting</td><td>1</td><td/></row>
 		<row><td>InstallFinalize</td><td>3150</td><td/><td/><td/></row>
+		<row><td>InstallValidate</td><td>1400</td><td/><td/><td/></row>
 		<row><td>SelfRegModules</td><td>2850</td><td/><td/><td/></row>
 		<row><td>SelfUnregModules</td><td>1100</td><td/><td/><td/></row>
+		<row><td>StartServices</td><td>5900</td><td/><td/><td/></row>
 	</table>
 
 	<table name="ModuleInstallUISequence">
