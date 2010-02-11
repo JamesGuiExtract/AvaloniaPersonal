@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="AnchorAlignment.cs" />
     <Compile Include="DrawingMethods.cs" />
+    <Compile Include="GdiPen.cs" />
     <Compile Include="RasterDrawMode.cs" />
     <Compile Include="ExtractBrushes.cs" />
     <Compile Include="ExtractPens.cs" />

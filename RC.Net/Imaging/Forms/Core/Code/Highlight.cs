@@ -738,8 +738,10 @@ namespace Extract.Imaging.Forms
 
                     transform.TransformPoints(vertices);
 
-                    Pen pen = ExtractPens.GetThickPen(BorderColor.Value);
-                    graphics.DrawPolygon(pen, vertices);
+                    // Draw the border
+                    GdiPen pen = ExtractPens.GetThickGdiPen(BorderColor.Value);
+                    GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.MaskPen);
+                    gdiGraphics.DrawPolygon(pen, vertices);
                 }
             }
             catch (Exception ex)

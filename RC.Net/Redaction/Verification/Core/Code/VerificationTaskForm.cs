@@ -237,7 +237,7 @@ namespace Extract.Redaction.Verification
                 _redactionGridView.ConfidenceLevels = _currentVoa.ConfidenceLevels;
 
                 // Set the selection pen
-                LayerObject.SelectionPen = ExtractPens.GetThickPen(Color.Red);
+                LayerObject.SelectionPen = ExtractPens.GetThickGdiPen(Color.Red);
 
                 // Subscribe to layer object events
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;

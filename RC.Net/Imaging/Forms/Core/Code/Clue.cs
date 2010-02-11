@@ -1,3 +1,4 @@
+using Extract.Drawing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -166,7 +167,9 @@ namespace Extract.Imaging.Forms
                 {
                     Point[] vertices = highlight.GetGripVertices();
                     ImageViewer.Transform.TransformPoints(vertices);
-                    graphics.DrawPolygon(SelectionPen, vertices);
+
+                    GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.MaskPen);
+                    gdiGraphics.DrawPolygon(SelectionPen, vertices);
                 }
             }
             catch (Exception ex)

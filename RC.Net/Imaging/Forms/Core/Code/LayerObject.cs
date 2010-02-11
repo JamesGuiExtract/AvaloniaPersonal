@@ -149,7 +149,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The pen used for drawing the selection border around selected layer objects.
         /// </summary>
-        static Pen _selectionPen;
+        static GdiPen _selectionPen;
 
         /// <summary>
         /// The image viewer on which the layer object appears.
@@ -673,13 +673,13 @@ namespace Extract.Imaging.Forms
         /// Gets or sets the pen used to draw the selection border around selected layer objects.
         /// </summary>
         /// <value>The pen used to draw the selection border around selected layer objects.</value>
-        public static Pen SelectionPen
+        public static GdiPen SelectionPen
         {
             get
             {
                 if (_selectionPen == null)
                 {
-                    _selectionPen = ExtractPens.DashedBlack;
+                    _selectionPen = new GdiPen(Color.Black, 1, DashStyle.Dash);
                 }
 
                 return _selectionPen;
@@ -1146,7 +1146,7 @@ namespace Extract.Imaging.Forms
         /// <param name="graphics">The <see cref="Graphics"/> object with which to draw.</param>
         /// <param name="gripPoint">The point in physical (client) coordinates where the grip 
         /// handle should be drawn.</param>
-        internal static void DrawGripHandle(Graphics graphics, Point gripPoint)
+        static void DrawGripHandle(Graphics graphics, Point gripPoint)
         {
             // Calculate the grip handle dimensions
             Rectangle gripHandle = Rectangle.FromLTRB(
@@ -1183,7 +1183,9 @@ namespace Extract.Imaging.Forms
                 {
                     Point[] vertices = GetGripVertices();
                     _imageViewer.Transform.TransformPoints(vertices);
-                    graphics.DrawPolygon(SelectionPen, vertices);
+
+                    GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.MaskPen);
+                    gdiGraphics.DrawPolygon(SelectionPen, vertices);
                 }
 
                 // If there are no grip points, we are done

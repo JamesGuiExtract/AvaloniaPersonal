@@ -78,7 +78,38 @@ namespace Extract.Drawing
         #region Methods
 
         /// <summary>
-        /// Draws the specified region with the specified graphics using the specified options.
+        /// Draws a polygon defined by the specified points. 
+        /// </summary>
+        /// <param name="pen">Pen that determines the color, width, and style of the polygon.</param>
+        /// <param name="points">The vertices of the polygon.</param>
+        public void DrawPolygon(GdiPen pen, Point[] points)
+        {
+            IntPtr deviceContext = IntPtr.Zero;
+            try
+            {
+                deviceContext = _graphics.GetHdc();
+
+                NativeMethods.SetDrawMode(deviceContext, _drawMode);
+
+                NativeMethods.SelectGdiObject(deviceContext, pen.Handle);
+
+                NativeMethods.DrawPolygon(deviceContext, points);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29680", ex);
+            }
+            finally
+            {
+                if (deviceContext != IntPtr.Zero)
+                {
+                    _graphics.ReleaseHdc(deviceContext);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draws the specified region using the specified color.
         /// </summary>
         /// <param name="region">The region to draw. Cannot be <see langword="null"/>.</param>
         /// <param name="color">The color of the region to draw.</param>
@@ -117,11 +148,7 @@ namespace Extract.Drawing
                 deviceContext = _graphics.GetHdc();
 
                 // Set the draw mode
-                if (NativeMethods.SetROP2(deviceContext, _drawMode) == 0)
-                {
-                    throw new ExtractException("ELI21113", "Unable to set draw mode for region.",
-                        new Win32Exception(Marshal.GetLastWin32Error()));
-                }
+                NativeMethods.SetDrawMode(deviceContext, _drawMode);
 
                 // Draw the region
                 if (!NativeMethods.FillRgn(deviceContext, regionHandle, brush))

@@ -24,6 +24,11 @@ namespace Extract.Drawing
         static readonly Dictionary<Color, Pen> _thickPens = new Dictionary<Color, Pen>();
 
         /// <summary>
+        /// A collection of thick GDI pens, keyed by color.
+        /// </summary>
+        static readonly Dictionary<Color, GdiPen> _thickGdiPens = new Dictionary<Color, GdiPen>();
+
+        /// <summary>
         /// A collection of thick dashed pens, keyed by color.
         /// </summary>
         static readonly Dictionary<Color, Pen> _thickDashedPens = new Dictionary<Color, Pen>();
@@ -52,6 +57,11 @@ namespace Extract.Drawing
         /// Mutex object to provide exclusive access to the thick pens collections
         /// </summary>
         static readonly object _lockThick = new object();
+
+        /// <summary>
+        /// Mutex object to provide exclusive access to the thick GDI pens collections
+        /// </summary>
+        static readonly object _lockGdiThick = new object();
 
         /// <summary>
         /// Mutex object to provide exclusive access to the thick dashed pens collections
@@ -164,6 +174,36 @@ namespace Extract.Drawing
                         // Create the pen
                         thickPen = new Pen(color, ThickPenWidth);
                         _thickPens.Add(color, thickPen);
+                    }
+                }
+
+                return thickPen;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26492", ex);
+            }
+        }
+
+        /// <summary>
+        /// Creates a thick GDI pen from the specified color.
+        /// </summary>
+        /// <param name="color">The color of the GDI pen to create.</param>
+        /// <returns>A thick GDI pen from the specified color.</returns>
+        public static GdiPen GetThickGdiPen(Color color)
+        {
+            try
+            {
+                // Mutex around collection to prevent multiple reads and writes
+                GdiPen thickPen;
+                lock (_lockGdiThick)
+                {
+                    // Check if the pen has already been created
+                    if (!_thickGdiPens.TryGetValue(color, out thickPen))
+                    {
+                        // Create the pen
+                        thickPen = new GdiPen(color, ThickPenWidth);
+                        _thickGdiPens.Add(color, thickPen);
                     }
                 }
 
