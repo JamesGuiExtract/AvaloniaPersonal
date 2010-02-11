@@ -149,7 +149,8 @@ BOOL CFAMDBAdminApp::InitInstance()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14890")
 
-	CoUninitialize();
+	// Removing the CoUninitialize call to fix [#LRCAU #5721]
+	//CoUninitialize();
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.
