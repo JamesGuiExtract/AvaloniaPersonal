@@ -660,12 +660,24 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLCDBEditor", "..\..\..\..
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactExporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj", "{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactImporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj", "{DEDE4275-343B-40C2-B336-040D3D182A44}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 66
+		ProjectCount = 68
 		ProjectRelativeDiskPath1 = ..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcproj
 		ProjectRelativeDiskPath2 = ..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcproj
 		ProjectRelativeDiskPath3 = ..\..\ChangeCase\ChangeCase.vcproj
@@ -732,6 +744,8 @@ Global
 		ProjectRelativeDiskPath64 = ..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj
 		ProjectRelativeDiskPath65 = ..\..\OSSpecificInstaller\Code\OSSpecificInstaller.vcproj
 		ProjectRelativeDiskPath66 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Code\SQLCDBEditor.csproj
+		ProjectRelativeDiskPath67 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
+		ProjectRelativeDiskPath68 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1402,6 +1416,26 @@ Global
 		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Release|Win32.ActiveCfg = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Release|Win32.ActiveCfg = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
