@@ -156,6 +156,12 @@ namespace Extract.SQLCDBEditor
             catch (Exception ex)
             {
                 ExtractException.Display("ELI29526", ex);
+
+				if (MessageBox.Show("Do you wish to exit without saving?", "Close", MessageBoxButtons.YesNo,
+					 MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0) != DialogResult.Yes)
+				{
+					e.Cancel = true;
+				}
             }
         }
 
