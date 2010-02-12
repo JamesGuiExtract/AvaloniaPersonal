@@ -15,6 +15,94 @@
 	<li><h2>User Authentication</h2>
 	<ul>
 		<LI>see other test cases in <b>DB Admin</b> checklist.
+<p>
+      		<li><u><b>General Functionality</b></u>
+	       	<ul>
+			<li>Confirm that a <b>RequireAuthenticationBeforeRun</b> field 
+			is defined in the <b>DBInfo</b> table.
+			<li>Confirm that <b>RequireAuthenticationBeforeRun</b> defaults 
+			to <b>0</b>.
+			<li>Confirm that user authentication is only active when 
+			<b>RequireAuthenticationBeforeRun = 1</b>.
+			<li>Confirm that for a user with a cleared password, clicking 
+			the <b>Start processing</b> button prompts the user to define 
+			a password.
+			<li>Confirm that the <b>Login</b> table is updated.
+			<li>Confirm that the new password is not stored in clear text.
+			<li>Confirm that the new password does not need to match the 
+			user's network password.
+			<li>Confirm that processing <b>will not</b> start if an 
+			incorrect password is provided.
+			<li>Confirm that processing <b>will</b> start if a correct 
+			password is provided.
+			<li>Refresh and cleared passwords
+			<ul>
+				<li>Select a user with a defined password.
+				<li>Clear the password.
+				<li>Open a FAM instance as the selected user.
+				<li>Confirm that clicking the <b>Start processing</b> 
+				button prompts the user to define a new password.
+				<li>Confirm that the FAM starts processing after 
+				definition of the new password.
+				<li>Use SQL Management Studio to confirm that a hashed 
+				password exists in the <b>Login</b> table for the 
+				selected user.
+				<li>Click the <b>Refresh</b> button in the <b>Manage 
+				users</b> dialog.
+				<li>Confirm that <b>Password set = Yes</b>.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5700]</b> User Authentication
+	       	<ul>
+			<li>Set <b>RequireAuthenticationBeforeRun=1</b>.
+			<li>Confirm that the previous <b>SkipAuthenticationForServicesOnMachines</b> 
+			entry in the DBInfo table is now <b>SkipAuthenticationOnMachines</b>.
+			<li>With setting <b>empty</b>
+			<ul>
+				<li>Confirm that an FPS file will not run if the logged in user 
+				is not included via <b>Manage Users</b>.
+				<li>Confirm that an FPS file will not run if the logged in user 
+				is included via <b>Manage Users</b> but does not provide the 
+				appropriate password.
+				<li>Confirm that an FPS file will run if the logged in user 
+				is included via <b>Manage Users</b> and the appropriate password 
+				is provided.
+				<li>Confirm that the FAM will not run as a service in local system 
+				mode.
+				<li>Confirm that the FAM will not run as a service in defined 
+				user mode.
+				<li>Confirm that <b>RunFPSFile</b> will not run if the logged in 
+				user is not included via <b>Manage Users</b>.
+				<li>Confirm that <b>RunFPSFile</b> will not run if the logged in 
+				user is included via <b>Manage Users</b> but does not provide the 
+				appropriate password.
+				<li>Confirm that <b>RunFPSFile</b> will run if the logged in 
+				user is included via <b>Manage Users</b> and the appropriate 
+				password is provided.
+			</ul>
+			<li>With setting <b>non-empty</b>
+			<ul>
+				<li>Confirm that the above tests have the same result if a 
+				different machine is specified in <b>SkipAuthenticationOnMachines</b>.
+				<li>Add the name of the test machine to the 
+				<b>SkipAuthenticationOnMachines</b> field.
+				<li>Confirm that an FPS file will run even if the logged in user 
+				is not included via <b>Manage Users</b>.
+				<li>Confirm that the FAM will run as a service in local system 
+				mode.
+				<li>Confirm that the FAM will run as a service in defined 
+				user mode.
+				<li>Confirm that <b>RunFPSFile</b> will run even if the logged in 
+				user is not included via <b>Manage Users</b>.
+			</ul>
+			<li>Skipping files for <b>all</b> users
+			<ul>
+				<li>Set <b>RequirePasswordToProcessAllSkippedFiles=1</b>
+				<li>Confirm that the FAM service will fail if the associated FPS 
+				file is configured to skip files for all users.
+			</ul>
+	       	</ul>
 	</ul>
 <p>
 	<li><h2>File Priority</h2>
