@@ -1852,15 +1852,19 @@ STDMETHODIMP CSpatialString::GetCharConfidence(long* pnMinConfidence, long* pnMa
 			}
 			else
 			{
-				nAvgConfidence = 100;
+				// Empty strings are zero confidence [FIDSC #4009]
+				nMinConfidence = 0;
 			}
 		}
-		// For non-spatial or hybrid strings, the confidence is 100,
 		else
 		{
-			nMinConfidence = 100;
-			nMaxConfidence = 100;
-			nAvgConfidence = 100;
+			// For non-spatial or hybrid strings, the confidence is 100,
+			// unless the string is empty [FIDSC #4009]
+			long lConfidence = m_strString.empty() ? 0 : 100;
+
+			nMinConfidence = lConfidence;
+			nMaxConfidence = lConfidence;
+			nAvgConfidence = lConfidence;
 		}
 
 		// If there is some min confidence, return it.
