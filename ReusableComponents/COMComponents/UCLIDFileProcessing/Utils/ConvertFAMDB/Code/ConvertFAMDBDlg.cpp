@@ -717,7 +717,7 @@ void CConvertFAMDBDlg::copyDBInfoSettings(IFileProcessingDBPtr ipFAMDB, _Connect
 				string strValue = getStringField(ipSourceDBInfoSet->Fields, "Value");
 
 				// Save the setting in the new database
-				ipFAMDB->SetDBInfoSetting(strSetting.c_str(), strValue.c_str());
+				ipFAMDB->SetDBInfoSetting(strSetting.c_str(), strValue.c_str(), VARIANT_TRUE);
 			}
 
 			// Move to the next record

@@ -681,22 +681,13 @@ library UCLID_FILEPROCESSINGLib
 			[out, retval] IIUnknownVector* *pvecFileRecords);
 
 		// -----------------------------------------------------------------------------------------------
-		// Properties to set for opening the database
-		// -----------------------------------------------------------------------------------------------
-		//[propget, id(16), helpstring("property ConnectionString")] HRESULT ConnectionString([out, retval] BSTR *pVal);
-		//[propput, id(16), helpstring("property ConnectionString")] HRESULT ConnectionString([in] BSTR newVal);
-		//[propget, id(17), helpstring("property UserName")] HRESULT UserName([out, retval] BSTR *pVal);
-		//[propput, id(17), helpstring("property UserName")] HRESULT UserName([in] BSTR newVal);
-		//[propget, id(18), helpstring("property DBPassword")] HRESULT DBPassword([out, retval] BSTR *pVal);
-		//[propput, id(18), helpstring("property DBPassword")] HRESULT DBPassword([in] BSTR newVal);
-
-		// -----------------------------------------------------------------------------------------------
 		// PROMISE: To return a IActionStistics pointer that contains the current stats for the given action
 		[id(19), helpstring("method GetStats")] HRESULT GetStats([in] long nActionID, [out, retval] IActionStatistics* *pStats);
 
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: To Clear the database
-		[id(20), helpstring("method Clear")] HRESULT Clear();
+		// PARAMS:  vbRetainUserValues - Retain user specified actions, tags, and DBInfo settings
+		[id(20), helpstring("method Clear")] HRESULT Clear([in] VARIANT_BOOL vbRetainUserValues);
 
 		// PROMISE: To copy the status of the files for the fromAction to the toAction
 		[id(21), helpstring("method CopyActionStatusFromAction")] HRESULT CopyActionStatusFromAction([in] long nFromAction, [in] long nToAction );
@@ -743,11 +734,6 @@ library UCLID_FILEPROCESSINGLib
 			[out] VARIANT_BOOL* pbLoginCancelled, 
 			[out,retval] VARIANT_BOOL* pbLoginValid);
 
-		// PROMISE: To get and put the database configuration filename
-		//			DBConfigFileName property is name of the configuration file to use to obtain the database connection information
-		//[propget, id(31), helpstring("property DBConfigFileName")] HRESULT DBConfigFileName([out, retval] BSTR* pVal);
-		//[propput, id(31), helpstring("property DBConfigFileName")] HRESULT DBConfigFileName([in] BSTR newVal);
-
 		// PROMISE: To get the current database connection status string
 		[id(32), helpstring("method GetCurrentConnectionStatus")] HRESULT GetCurrentConnectionStatus([out, retval] BSTR* pVal);
 
@@ -765,9 +751,13 @@ library UCLID_FILEPROCESSINGLib
 		[id(36), helpstring("method ConnectLastUsedDBThisProcess ")] HRESULT ConnectLastUsedDBThisProcess();
 
 		// PROMISE: To store a setting in the DBInfo table of the database. 
+		// PARAMS:  bstrSettingName - Name of the setting to add
+		//          bstrSettingValue - Value of the setting
+		//          vbSetIfExists - Whether to set the setting if it already exists. 
 		// NOTE:	This is to be used by the product specific database managers to store there settings in the
 		//			DBInfo table.
-		[id(37), helpstring("method SetDBInfoSetting")] HRESULT SetDBInfoSetting([in] BSTR bstrSettingName, [in] BSTR bstrSettingValue );
+		[id(37), helpstring("method SetDBInfoSetting")] HRESULT SetDBInfoSetting(
+			[in] BSTR bstrSettingName, [in] BSTR bstrSettingValue, [in] VARIANT_BOOL vbSetIfExists);
 
 		// PROMISE: To return the value for the setting name from the DBInfo table
 		[id(38), helpstring("method GetDBInfoSetting")] HRESULT GetDBInfoSetting([in] BSTR bstrSettingName, [out, retval] BSTR* pbstrSettingValue );

@@ -179,7 +179,7 @@ STDMETHODIMP CFileProcessingDB::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction,  long * pnID)
+STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction, long* pnID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -190,16 +190,16 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction,  long * pnID)
 		// Validate the new action name
 		validateNewActionName(strActionName);
 
-		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-		ADODB::_ConnectionPtr ipConnection = NULL;
-		
-		BEGIN_CONNECTION_RETRY();
-		
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
-
 		// Check License
 		validateLicense();
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
 
 		// Lock the database for this instance
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
@@ -207,26 +207,10 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction,  long * pnID)
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
-		// Begin a trasaction
+		// Begin a transaction
 		TransactionGuard tg(ipConnection);
 
-		// Create a pointer to a recordset containing the action
-		_RecordsetPtr ipActionSet = getActionSet(ipConnection, strActionName);
-		ASSERT_RESOURCE_ALLOCATION("ELI13517", ipActionSet != NULL);
-
-		// Check to see if action exists
-		if (ipActionSet->adoEOF == VARIANT_FALSE)
-		{
-			// Build error string (P13 #3931)
-			CString zText;
-			zText.Format("The action '%s' already exists, and therefore cannot be added again.", 
-				strActionName.c_str());
-			UCLIDException ue("ELI13946", LPCTSTR(zText));
-			throw ue;
-		}
-
-		// Create a new action and return its ID
-		*pnID = addActionToRecordset(ipConnection, ipActionSet, strActionName);
+		*pnID = defineNewAction(ipConnection, strActionName);
 
 		// Commit this transaction
 		tg.CommitTrans();
@@ -325,38 +309,9 @@ STDMETHODIMP CFileProcessingDB::GetActions(IStrToStrMap * * pmapActionNameToID)
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
-		// Create a pointer to a recordset
-		_RecordsetPtr ipActionSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI13530", ipActionSet != NULL);
-
-		// Open the Action table
-		ipActionSet->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockReadOnly, adCmdTableDirect);
-
 		// Create StrToStrMap to return the list of actions
-		IStrToStrMapPtr ipActions(CLSID_StrToStrMap);
+		IStrToStrMapPtr ipActions = getActions(ipConnection);
 		ASSERT_RESOURCE_ALLOCATION("ELI13529", ipActions != NULL);
-
-		// Step through all records
-		while (ipActionSet->adoEOF == VARIANT_FALSE)
-		{
-			// Get the fields from the action set
-			FieldsPtr ipFields = ipActionSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI26871", ipFields != NULL);
-
-			// get the action name
-			string strActionName = getStringField(ipFields, "ASCName");
-
-			// get the action ID
-			long lID = getLongField(ipFields, "ID");
-			string strID = asString(lID);
-
-			// Put the values in the StrToStrMap
-			ipActions->Set(strActionName.c_str(), strID.c_str());
-
-			// Move to the next record in the table
-			ipActionSet->MoveNext();
-		}
 
 		// return the StrToStrMap containing all actions
 		*pmapActionNameToID = ipActions.Detach();
@@ -1524,7 +1479,7 @@ STDMETHODIMP CFileProcessingDB::RenameAction(long nActionID, BSTR strNewActionNa
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::Clear()
+STDMETHODIMP CFileProcessingDB::Clear(VARIANT_BOOL vbRetainUserValues)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1534,7 +1489,7 @@ STDMETHODIMP CFileProcessingDB::Clear()
 		validateLicense();
 	
 		// Call the internal clear
-		clear();
+		clear(asCppBool(vbRetainUserValues));
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14088");
 
@@ -2064,7 +2019,8 @@ STDMETHODIMP CFileProcessingDB::ConnectLastUsedDBThisProcess()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstrSettingValue)
+STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstrSettingValue, 
+												 VARIANT_BOOL vbSetIfExists)
 {
 	try
 	{
@@ -2105,19 +2061,26 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 		ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
 			adLockOptimistic, adCmdText); 
 
-		// Check if setting record exist
-		if (ipDBInfoSet->adoEOF == VARIANT_TRUE)
+		// Check if setting record exists
+		bool bExists = ipDBInfoSet->adoEOF == VARIANT_FALSE;
+
+		// Continue if the setting is new or we are changing an existing setting
+		if (!bExists || vbSetIfExists == VARIANT_TRUE)
 		{
-			// Setting does not exist so add it
-			ipDBInfoSet->AddNew();
-			setStringField(ipDBInfoSet->Fields, "Name", strSettingName, true);
+			if (!bExists)
+			{
+				// Setting does not exist so add it
+				ipDBInfoSet->AddNew();
+
+				setStringField(ipDBInfoSet->Fields, "Name", strSettingName, true);
+			}
+
+			// Set the value field to the new value
+			setStringField(ipDBInfoSet->Fields, "Value", strSettingValue);
+
+			// Update the database
+			ipDBInfoSet->Update();
 		}
-
-		// Set the value field to the new value
-		setStringField(ipDBInfoSet->Fields, "Value", strSettingValue);
-
-		// Update the database
-		ipDBInfoSet->Update();
 
 		// Commit transaction
 		tg.CommitTrans();
@@ -2125,6 +2088,7 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 		END_CONNECTION_RETRY(ipConnection, "ELI27328");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18936");
+
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------

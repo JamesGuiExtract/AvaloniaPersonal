@@ -116,7 +116,7 @@ public:
 	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
 	STDMETHOD(GetStats)(long nActionID, IActionStatistics** pStats);
-	STDMETHOD(Clear)();
+	STDMETHOD(Clear)(VARIANT_BOOL vbRetainUserValues);
 	STDMETHOD(CopyActionStatusFromAction)(long  nFromAction, long nToAction);
 	STDMETHOD(RenameAction)(long  nActionID, BSTR strNewActionName);
 	STDMETHOD(ExportFileList)(BSTR strQuery, BSTR strOutputFileName,
@@ -137,7 +137,7 @@ public:
 	STDMETHOD(put_DatabaseName)(BSTR newVal);
 	STDMETHOD(CreateNewDB)(BSTR bstrNewDBName);
 	STDMETHOD(ConnectLastUsedDBThisProcess)();
-	STDMETHOD(SetDBInfoSetting)(BSTR bstrSettingName, BSTR bstrSettingValue);
+	STDMETHOD(SetDBInfoSetting)(BSTR bstrSettingName, BSTR bstrSettingValue, VARIANT_BOOL vbSetIfExists);
 	STDMETHOD(GetDBInfoSetting)(BSTR bstrSettingName, BSTR* pbstrSettingValue);
 	STDMETHOD(LockDB)();
 	STDMETHOD(UnlockDB)();
@@ -407,15 +407,15 @@ private:
 
 	// PROMISE:	To drop all tables in the database
 	// NOTE:	If the operation is to be transactional the BeginTransaction should be done before calling
-	void dropTables();
+	void dropTables(bool bRetainUserTables);
 	
 	// PROMISE:	To Add all tables in the database
 	// NOTE:	If the operation is to be transactional the BeginTransaction should be done before calling
-	void addTables();
+	void addTables(bool bAddUserTables);
 	
 	// PROMISE:	To set the initial values for QueueEventCode, ActionState and DBInfo
 	// NOTE:	If the operation is to be transactional the BeginTransaction should be done before calling
-	void initializeTableValues();
+	void initializeTableValues(bool bInitializeUserTables);
 
 	// PROMISE: To copy the status from the strFrom action to the strTo action
 	//			if bAddTransRecords is true records will be added to the transition table
@@ -537,7 +537,13 @@ private:
 	void resetDBConnection();
 
 	// Internal clear DB function
-	void clear();
+	void clear(bool retainUserValues = false);
+
+	// Internal getActions
+	IStrToStrMapPtr getActions(_ConnectionPtr ipConnection);
+
+	// Internal define new action function
+	long defineNewAction(_ConnectionPtr ipConnection, const string& strActionName);
 
 	// Fills a vector with the FileIDs of files skipped by a specific user (or skipped by
 	// all users if strUserName is "")

@@ -907,7 +907,7 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 	ipActionStats->Update();
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::dropTables()
+void CFileProcessingDB::dropTables(bool bRetainUserTables)
 {
 	try
 	{
@@ -921,22 +921,38 @@ void CFileProcessingDB::dropTables()
 		// Remove the login table from the list
 		eraseFromVector(vecTables, gstrLOGIN);
 
+		// Retain the user tables if necessary
+		if (bRetainUserTables)
+		{
+			eraseFromVector(vecTables, gstrDB_INFO);
+			eraseFromVector(vecTables, gstrFAM_TAG);
+			eraseFromVector(vecTables, gstrUSER_CREATED_COUNTER);
+		}
+
 		// Drop the tables in the vector
 		dropTablesInVector(getDBConnection(), vecTables);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27605")
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::addTables()
+void CFileProcessingDB::addTables(bool bAddUserTables)
 {
 	try
 	{
 		vector<string> vecQueries;
 
+		// Add the user tables if necessary
+		if (bAddUserTables)
+		{
+			vecQueries.push_back(gstrCREATE_DB_INFO_TABLE);
+			vecQueries.push_back(gstrCREATE_FAM_TAG_TABLE);
+			vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_TABLE);
+			vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX);
+		}
+
 		// Add queries to create tables to the vector
 		vecQueries.push_back(gstrCREATE_ACTION_TABLE);
 		vecQueries.push_back(gstrCREATE_LOCK_TABLE);
-		vecQueries.push_back(gstrCREATE_DB_INFO_TABLE);
 		vecQueries.push_back(gstrCREATE_ACTION_STATE_TABLE);
 		vecQueries.push_back(gstrCREATE_FAM_FILE_TABLE);
 		vecQueries.push_back(gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX);
@@ -953,14 +969,11 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrCREATE_FAM_SKIPPED_FILE_TABLE);
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_UPI_INDEX);
-		vecQueries.push_back(gstrCREATE_FAM_TAG_TABLE);
 		vecQueries.push_back(gstrCREATE_FAM_FILE_TAG_TABLE);
 		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
 		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_TABLE);
 		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_UPI_INDEX);
 		vecQueries.push_back(gstrCREATE_LOCKED_FILE_TABLE);
-		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_TABLE);
-		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX);
 		vecQueries.push_back(gstrCREATE_FPS_FILE_TABLE);
 		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
 		vecQueries.push_back(gstrCREATE_FAM_SESSION);
@@ -1009,7 +1022,7 @@ void CFileProcessingDB::addTables()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18011");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::initializeTableValues()
+void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 {
 	try
 	{
@@ -1050,94 +1063,98 @@ void CFileProcessingDB::initializeTableValues()
 		vecQueries.push_back("INSERT INTO [QueueEventCode] ([Code], [Description]) "
 			"VALUES('R', 'File was renamed')");
 
-		// Add the schema version to the DBInfo table
-		string strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrFAMDB_SCHEMA_VERSION +
-			"', '" + asString(glFAMDBSchemaVersion) + "')";
-		vecQueries.push_back(strSQL);
+		// Initialize the DB Info settings if necessary
+		if (bInitializeUserTables)
+		{
+			// Add the schema version to the DBInfo table
+			string strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrFAMDB_SCHEMA_VERSION +
+				"', '" + asString(glFAMDBSchemaVersion) + "')";
+			vecQueries.push_back(strSQL);
 
-		// Add Command Timeout setting
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCOMMAND_TIMEOUT +
-			"', '" + asString(glDEFAULT_COMMAND_TIMEOUT) + "')";
-		vecQueries.push_back(strSQL);
+			// Add Command Timeout setting
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCOMMAND_TIMEOUT +
+				"', '" + asString(glDEFAULT_COMMAND_TIMEOUT) + "')";
+			vecQueries.push_back(strSQL);
 
-		// Add Update Queue Event Table setting
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_QUEUE_EVENT_TABLE 
-			+ "', '1')";
-		vecQueries.push_back(strSQL);
+			// Add Update Queue Event Table setting
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_QUEUE_EVENT_TABLE 
+				+ "', '1')";
+			vecQueries.push_back(strSQL);
 
-		// Add Update Queue Event Table setting
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_FAST_TABLE + "', '1')";
-		vecQueries.push_back(strSQL);
+			// Add Update Queue Event Table setting
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_FAST_TABLE + "', '1')";
+			vecQueries.push_back(strSQL);
 
-		// Add Auto Delete File Action Comment On Complete setting
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_DELETE_FILE_ACTION_COMMENT
-			+ "', '0')";
-		vecQueries.push_back(strSQL);
+			// Add Auto Delete File Action Comment On Complete setting
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_DELETE_FILE_ACTION_COMMENT
+				+ "', '0')";
+			vecQueries.push_back(strSQL);
 
-		// Add Require Password To Process All Skipped Files setting (default to true)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED
-			+ "', '1')";
-		vecQueries.push_back(strSQL);
+			// Add Require Password To Process All Skipped Files setting (default to true)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED
+				+ "', '1')";
+			vecQueries.push_back(strSQL);
 
-		// Add Allow Dynamic Tag Creation setting (default to false)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrALLOW_DYNAMIC_TAG_CREATION
-			+ "', '0')";
-		vecQueries.push_back(strSQL);
+			// Add Allow Dynamic Tag Creation setting (default to false)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrALLOW_DYNAMIC_TAG_CREATION
+				+ "', '0')";
+			vecQueries.push_back(strSQL);
 
-		// Add AutoRevertLockedFiles setting (default to true)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_LOCKED_FILES
-			+ "', '1')";
-		vecQueries.push_back(strSQL);
+			// Add AutoRevertLockedFiles setting (default to true)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_LOCKED_FILES
+				+ "', '1')";
+			vecQueries.push_back(strSQL);
 
-		// Add AutoRevertTimeOutInMinutes setting (default to 60 minutes)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_TIME_OUT_IN_MINUTES
-			+ "', '60')";
-		vecQueries.push_back(strSQL);
-		
-		// Add AutoRevertNotifyEmailList setting (default to empy string)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_NOTIFY_EMAIL_LIST
-			+ "', '')";
-		vecQueries.push_back(strSQL);
+			// Add AutoRevertTimeOutInMinutes setting (default to 60 minutes)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_TIME_OUT_IN_MINUTES
+				+ "', '60')";
+			vecQueries.push_back(strSQL);
+			
+			// Add AutoRevertNotifyEmailList setting (default to empy string)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_NOTIFY_EMAIL_LIST
+				+ "', '')";
+			vecQueries.push_back(strSQL);
 
-		// Add NumberOfConnectionRetries setting (default to empy string)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrNUMBER_CONNECTION_RETRIES
-			+ "', '10')";
-		vecQueries.push_back(strSQL);
-		
-		// Add ConnectionRetryTimeout setting (default to empy string)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCONNECTION_RETRY_TIMEOUT
-			+ "', '120')";
-		vecQueries.push_back(strSQL);
+			// Add NumberOfConnectionRetries setting (default to empy string)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrNUMBER_CONNECTION_RETRIES
+				+ "', '10')";
+			vecQueries.push_back(strSQL);
+			
+			// Add ConnectionRetryTimeout setting (default to empy string)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCONNECTION_RETRY_TIMEOUT
+				+ "', '120')";
+			vecQueries.push_back(strSQL);
 
-		// Add StoreFAMSessionHistory setting (default to true)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrSTORE_FAM_SESSION_HISTORY
-			+ "', '1')";
-		vecQueries.push_back(strSQL);
+			// Add StoreFAMSessionHistory setting (default to true)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrSTORE_FAM_SESSION_HISTORY
+				+ "', '1')";
+			vecQueries.push_back(strSQL);
 
-		// Add the EnableInputEventTracking setting (default to false)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrENABLE_INPUT_EVENT_TRACKING
-			+ "', '0')";
-		vecQueries.push_back(strSQL);
+			// Add the EnableInputEventTracking setting (default to false)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrENABLE_INPUT_EVENT_TRACKING
+				+ "', '0')";
+			vecQueries.push_back(strSQL);
 
-		// Add the InputEventHistorySize setting (default to 30 days)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrINPUT_EVENT_HISTORY_SIZE
-			+ "', '30')";
-		vecQueries.push_back(strSQL);
+			// Add the InputEventHistorySize setting (default to 30 days)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrINPUT_EVENT_HISTORY_SIZE
+				+ "', '30')";
+			vecQueries.push_back(strSQL);
 
-		// Add RequireAuthenticationBeforeRun setting (default to false)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_AUTHENTICATION_BEFORE_RUN
-			+ "', '0')";
-		vecQueries.push_back(strSQL);
+			// Add RequireAuthenticationBeforeRun setting (default to false)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_AUTHENTICATION_BEFORE_RUN
+				+ "', '0')";
+			vecQueries.push_back(strSQL);
 
-		// Add Auto Create Actions setting (default to false)
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_CREATE_ACTIONS
-			+ "', '0')";
-		vecQueries.push_back(strSQL);
+			// Add Auto Create Actions setting (default to false)
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_CREATE_ACTIONS
+				+ "', '0')";
+			vecQueries.push_back(strSQL);
 
-		// Add Skip Authentication For Services On Machines
-		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-			+ gstrSKIP_AUTHENTICATION_ON_MACHINES + "', '')";
-		vecQueries.push_back(strSQL);
+			// Add Skip Authentication For Services On Machines
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+				+ gstrSKIP_AUTHENTICATION_ON_MACHINES + "', '')";
+			vecQueries.push_back(strSQL);
+		}
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -2449,7 +2466,7 @@ void CFileProcessingDB::resetDBConnection()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26869");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::clear()
+void CFileProcessingDB::clear(bool retainUserValues)
 {
 	try
 	{
@@ -2458,14 +2475,41 @@ void CFileProcessingDB::clear()
 		// Begin a transaction
 		TransactionGuard tg(getDBConnection());
 
+		// Get a list of the action names to preserve
+		vector<string> vecActionNames;
+		if (retainUserValues)
+		{
+			// Read all actions from the DB
+			IStrToStrMapPtr ipMapActions = getActions(getDBConnection());
+			ASSERT_RESOURCE_ALLOCATION("ELI25184", ipMapActions != NULL);
+			IVariantVectorPtr ipActions = ipMapActions->GetKeys();
+			ASSERT_RESOURCE_ALLOCATION("ELI25185", ipActions != NULL);
+
+			// Iterate over the actions
+			long lSize = ipActions->Size;
+			vecActionNames.reserve(lSize);
+			for (int i = 0; i < lSize; i++)
+			{
+				// Get each action name and add it to the vector
+				_variant_t action = ipActions->Item[i];
+				vecActionNames.push_back( asString(action.bstrVal) );
+			}
+		}
+
 		// Drop the tables
-		dropTables();
+		dropTables(retainUserValues);
 
 		// Add the tables back
-		addTables();
+		addTables(!retainUserValues);
 
 		// Setup the tables that require initial values
-		initializeTableValues();
+		initializeTableValues(!retainUserValues);
+
+		// Add any retained actions
+		for (unsigned int i = 0; i < vecActionNames.size(); i++)
+		{
+			defineNewAction(getDBConnection(), vecActionNames[i]);
+		}
 
 		tg.CommitTrans();
 
@@ -2480,7 +2524,74 @@ void CFileProcessingDB::clear()
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26870");
 }
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+IStrToStrMapPtr CFileProcessingDB::getActions(_ConnectionPtr ipConnection)
+{
+	try
+	{
+		// Create a pointer to a recordset
+		_RecordsetPtr ipActionSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI13530", ipActionSet != NULL);
+
+		// Open the Action table
+		ipActionSet->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockReadOnly, adCmdTableDirect);
+
+		// Create StrToStrMap to return the list of actions
+		IStrToStrMapPtr ipActions(CLSID_StrToStrMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI29687", ipActions != NULL);
+
+		// Step through all records
+		while (ipActionSet->adoEOF == VARIANT_FALSE)
+		{
+			// Get the fields from the action set
+			FieldsPtr ipFields = ipActionSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI26871", ipFields != NULL);
+
+			// get the action name
+			string strActionName = getStringField(ipFields, "ASCName");
+
+			// get the action ID
+			long lID = getLongField(ipFields, "ID");
+			string strID = asString(lID);
+
+			// Put the values in the StrToStrMap
+			ipActions->Set(strActionName.c_str(), strID.c_str());
+
+			// Move to the next record in the table
+			ipActionSet->MoveNext();
+		}
+
+		return ipActions;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29686");
+}
+//-------------------------------------------------------------------------------------------------
+long CFileProcessingDB::defineNewAction(_ConnectionPtr ipConnection, const string& strActionName)
+{
+	try
+	{
+		// Create a pointer to a recordset containing the action
+		_RecordsetPtr ipActionSet = getActionSet(ipConnection, strActionName);
+		ASSERT_RESOURCE_ALLOCATION("ELI13517", ipActionSet != NULL);
+
+		// Check to see if action exists
+		if (ipActionSet->adoEOF == VARIANT_FALSE)
+		{
+			// Build error string (P13 #3931)
+			CString zText;
+			zText.Format("The action '%s' already exists, and therefore cannot be added again.", 
+				strActionName.c_str());
+			UCLIDException ue("ELI13946", LPCTSTR(zText));
+			throw ue;
+		}
+
+		// Create a new action and return its ID
+		return addActionToRecordset(ipConnection, ipActionSet, strActionName);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29681");
+}
+//-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, long nActionID,
 													  string strUserName,
 													  const _ConnectionPtr& ipConnection)

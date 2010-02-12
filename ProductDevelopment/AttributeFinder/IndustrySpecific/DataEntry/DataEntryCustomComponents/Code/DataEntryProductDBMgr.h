@@ -107,7 +107,7 @@ private:
 	void validateDataEntrySchemaVersion();
 
 	// Method to check whether data entry counters are enabled in the database
-	bool areCountersEnabled(const _ConnectionPtr& ipConnection);
+	bool areCountersEnabled();
 
 	// Returns m_ipAFUtility, after initializing it if necessary
 	IAFUtilityPtr getAFUtility();

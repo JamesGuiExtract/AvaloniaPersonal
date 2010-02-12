@@ -160,10 +160,12 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema(IFileProcessing
 		executeVectorOfSQL(ipDBConnection, vecCreateQueries);
 
 		// Set the schema version
-		ipDB->SetDBInfoSetting(gstrID_SHIELD_SCHEMA_VERSION_NAME.c_str(), asString(glIDShieldDBSchemaVersion).c_str());
+		ipDB->SetDBInfoSetting(gstrID_SHIELD_SCHEMA_VERSION_NAME.c_str(), 
+			asString(glIDShieldDBSchemaVersion).c_str(), VARIANT_TRUE);
 
 		// Set the default
-		ipDB->SetDBInfoSetting(gstrSTORE_IDSHIELD_PROCESSING_HISTORY.c_str(), gstrSTORE_HISTORY_DEFAULT_SETTING.c_str());
+		ipDB->SetDBInfoSetting(gstrSTORE_IDSHIELD_PROCESSING_HISTORY.c_str(), 
+			gstrSTORE_HISTORY_DEFAULT_SETTING.c_str(), VARIANT_FALSE);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18686");
 

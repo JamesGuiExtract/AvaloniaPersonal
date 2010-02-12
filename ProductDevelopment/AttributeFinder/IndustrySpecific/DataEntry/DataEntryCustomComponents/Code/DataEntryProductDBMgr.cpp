@@ -25,6 +25,8 @@ static const long glDATAENTRY_DB_SCHEMA_VERSION = 2;
 static const string gstrDATA_ENTRY_SCHEMA_VERSION_NAME = "DataEntrySchemaVersion";
 static const string gstrSTORE_DATAENTRY_PROCESSING_HISTORY = "StoreDataEntryProcessingHistory";
 static const string gstrSTORE_HISTORY_DEFAULT_SETTING = "1"; // TRUE
+static const string gstrENABLE_DATA_ENTRY_COUNTERS = "EnableDataEntryCounters";
+static const string gstrENABLE_DATA_ENTRY_COUNTERS_DEFAULT_SETTING = "0"; // FALSE
 static const string gstrDESCRIPTION = "DataEntry database manager";
 
 //-------------------------------------------------------------------------------------------------
@@ -177,16 +179,21 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_INSTANCE);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_ID);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_TYPE);
-		vecCreateQueries.push_back(gstrADD_DATA_ENTRY_COUNTERS_SETTING);
 
 		// Execute the queries to create the data entry table
 		executeVectorOfSQL(ipDBConnection, vecCreateQueries);
 
 		// Set the schema version
-		ipDB->SetDBInfoSetting(gstrDATA_ENTRY_SCHEMA_VERSION_NAME.c_str(), asString(glDATAENTRY_DB_SCHEMA_VERSION).c_str());
+		ipDB->SetDBInfoSetting(gstrDATA_ENTRY_SCHEMA_VERSION_NAME.c_str(), 
+			asString(glDATAENTRY_DB_SCHEMA_VERSION).c_str(), VARIANT_TRUE);
 
 		// Set the default
-		ipDB->SetDBInfoSetting(gstrSTORE_DATAENTRY_PROCESSING_HISTORY.c_str(), gstrSTORE_HISTORY_DEFAULT_SETTING.c_str());
+		ipDB->SetDBInfoSetting(gstrSTORE_DATAENTRY_PROCESSING_HISTORY.c_str(), 
+			gstrSTORE_HISTORY_DEFAULT_SETTING.c_str(), VARIANT_FALSE);
+
+		// Set data entry counters
+		ipDB->SetDBInfoSetting(gstrENABLE_DATA_ENTRY_COUNTERS.c_str(), 
+			gstrENABLE_DATA_ENTRY_COUNTERS_DEFAULT_SETTING.c_str(), VARIANT_FALSE);
 	
 		return S_OK;
 	}
@@ -377,7 +384,7 @@ STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 		LockGuard<IFileProcessingDBPtr> lg(m_ipFAMDB);
 
 		// Cache the result of areCountersEnabled;
-		static bool countersAreEnabled = areCountersEnabled(getDBConnection());
+		static bool countersAreEnabled = areCountersEnabled();
 		if (!countersAreEnabled)
 		{
 			throw UCLIDException("ELI29053", "Data entry counters are not currently enabled.");
@@ -530,31 +537,12 @@ void CDataEntryProductDBMgr::validateDataEntrySchemaVersion()
 	}
 }
 //--------------------------------------------------------------------------------------------------
-bool CDataEntryProductDBMgr::areCountersEnabled(const _ConnectionPtr& ipConnection)
+bool CDataEntryProductDBMgr::areCountersEnabled()
 {
 	try
 	{
-		// Create a pointer to a recordset
-		_RecordsetPtr ipDBInfoSet(__uuidof( Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI29057", ipDBInfoSet != NULL);
-
-		// Open the record set using the Setting Query		
-		ipDBInfoSet->Open(gstrDBINFO_DATA_ENTRY_COUTERS_QUERY.c_str(),
-			_variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, adLockReadOnly,
-			adCmdText);
-
-		// Check if any data returned
-		if (ipDBInfoSet->adoEOF == VARIANT_FALSE)
-		{
-			// Return the setting value
-			return (getStringField(ipDBInfoSet->Fields, "Value") == "1");
-		}
-		else
-		{
-			UCLIDException ue("ELI29058", "DBInfo setting does not exist!");
-			ue.addDebugInfo("Setting", gstrENABLE_DATA_ENTRY_COUNTERS);
-			throw  ue;
-		}
+		string strValue = asString(m_ipFAMDB->GetDBInfoSetting(gstrENABLE_DATA_ENTRY_COUNTERS.c_str()));
+		return strValue == "1";
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29059");
 }

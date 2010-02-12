@@ -162,13 +162,3 @@ static const string gstrADD_FK_DATAENTRY_COUNTER_VALUE_TYPE =
 // VALUES clause.
 static const string gstrINSERT_DATAENTRY_COUNTER_VALUE =
 	"INSERT INTO [dbo].[DataEntryCounterValue] VALUES"; 
-
-static const string gstrENABLE_DATA_ENTRY_COUNTERS = "EnableDataEntryCounters";
-
-// Add the EnableDataEntryCounters setting (default to false)
-static const string gstrADD_DATA_ENTRY_COUNTERS_SETTING = 
-	"INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrENABLE_DATA_ENTRY_COUNTERS +"', '0')";
-
-// Retrieve the defined data entry queries from the database.
-static const string gstrDBINFO_DATA_ENTRY_COUTERS_QUERY = 
-	"SELECT [Name], [Value] FROM DBInfo WHERE [Name] = '" + gstrENABLE_DATA_ENTRY_COUNTERS + "'";

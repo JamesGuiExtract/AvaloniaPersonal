@@ -269,42 +269,16 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 		// Display wait cursor
 		CWaitCursor wait;
 
-		// Get a list of the action names to preserve
-		vector<string> vecActionNames;
-		bool bRetainActions = prompt.getRetainActions();
-		if (bRetainActions)
-		{
-			// Read all actions from the DB
-			IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
-			ASSERT_RESOURCE_ALLOCATION("ELI25184", ipMapActions != NULL);
-			IVariantVectorPtr ipActions = ipMapActions->GetKeys();
-			ASSERT_RESOURCE_ALLOCATION("ELI25185", ipActions != NULL);
-
-			// Iterate over the actions
-			long lSize = ipActions->Size;
-			vecActionNames.reserve(lSize);
-			for (int i = 0; i < lSize; i++)
-			{
-				// Get each action name and add it to the vector
-				_variant_t action = ipActions->Item[i];
-				vecActionNames.push_back( asString(action.bstrVal) );
-			}
-		}
+		bool bRetainValues = prompt.getRetainActions();
 
 		// Set the database is good flag to false
 		m_bIsDBGood = false;
 		try
 		{
 			// Clear the database
-			m_ipFAMDB->Clear();
-
-			// Add any retained actions
-			for (unsigned int i = 0; i < vecActionNames.size(); i++)
-			{
-				m_ipFAMDB->DefineNewAction(vecActionNames[i].c_str());
-			}
+			m_ipFAMDB->Clear(asVariantBool(bRetainValues));
 		}
-		catch(...)
+		catch (...)
 		{
 			// Enable menus
 			enableMenus();
@@ -324,7 +298,7 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 		uex.addDebugInfo("User Name", getCurrentUserName());
 		uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
 		uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
-		uex.addDebugInfo("Actions", bRetainActions ? "Retained" : "Not retained");
+		uex.addDebugInfo("Settings", bRetainValues ? "Retained" : "Not retained");
 		uex.log();
 
 		// Set the database status
