@@ -11,11 +11,6 @@
 <IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
-
-<h2>NOTE: Additional test cases can be found in the IcoMapESRI/Testing/ITC folder.</h2>
-
-<hr>
-
 <ol>
 
 <!-- *********************************************** -->
@@ -481,26 +476,26 @@ County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.
 	</ul>
 </li>
 
-
+<p>
 <!-- *********************************************** -->
 <li><h3>Automated Rotation Testing</h3>
 <ul>
 	<li>Make a local copy of the image files from <b>I:/Common/Testing/Rotated_Images</b>.</li> 
-	<li>Using the <b>File Action Manager</b>, queue all of the images.</li>   
-    <li>Configure a <b>Redact images (no verification)</b> task to run the redaction demo rules and then create an output image that contains all of the found redactions.
-		<ul>
-			<li>The redaction demo rules can be found in SourceGear under <b>$\Engineering\ProductDevelopment\AttributeFinder\Utils\RedactionDemo\Files\Rules</b></li>
-		</ul>
-	</li>
-	<li>Run this task on the queued images.</li>
+	<li>Using the <b>File Action Manager</b>, queue all of the images.</li>
+	<li>Configure a <b>Core: Execute rules</b> task to run the demo rules against the rotated 
+	images.
+	<ul>
+		<li>The demo rules can be found in <b>.\Demo_IDShield\Rules\Master.rsd.etf</b></li>
+	</ul>
+	<li>Configure a <b>Redaction: Create redacted image</b> task to create an output image that 
+	contains all of the found redactions.
+	<li>Run these tasks on the queued images.</li>
 	<li>Confirm that each image processes without error.</li> 
 	<li>Confirm that each image has an associated VOA file.</li> 
-	<li>Review each output image using the <b>Windows Fax Viewer</b> and confirm the redactions are in the correct locations.</li> 
+	<li>Review each output image using the <b>Windows Fax Viewer</b> and confirm the redactions 
+	are in the correct locations.</li> 
 </ul>
 </li>
-<br />
 </ol>
-
 </body>
-
 </html>
