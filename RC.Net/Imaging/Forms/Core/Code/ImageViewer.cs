@@ -2609,64 +2609,64 @@ namespace Extract.Imaging.Forms
                     {
                         // Zoom in/out
                         case Keys.Control:
+                        {
 
                             // Get the current mouse position in image coordinates
-                            Point[] mousePosition = new Point[] { new Point(e.X, e.Y) };
+                            Point[] mousePosition = new Point[] {new Point(e.X, e.Y)};
                             using (Matrix clientToImage = _transform.Clone())
                             {
                                 clientToImage.Invert();
                                 clientToImage.TransformPoints(mousePosition);
                             }
 
-                            // Suspend the paint event until all changes have been made
-                            base.BeginUpdate();
-                            try
-                            {
-                                // Zoom in based on the direction of the mouse wheel event
-                                Zoom(e.Delta > 0);
+                            // Zoom in based on the direction of the mouse wheel event
+                            Zoom(e.Delta > 0);
 
-                                // Get the mouse position in client coordinates
-                                _transform.TransformPoints(mousePosition);
+                            // Get the mouse position in client coordinates
+                            _transform.TransformPoints(mousePosition);
 
-                                // Adjust the scroll so that the mouse is 
-                                // over the same point on the image
-                                Point scroll = ScrollPosition;
-                                scroll.Offset(mousePosition[0].X - e.X, mousePosition[0].Y - e.Y);
-                                ScrollPosition = scroll;
-                            }
-                            finally
-                            {
-                                base.EndUpdate();
-                            }
+                            // Adjust the scroll so that the mouse is 
+                            // over the same point on the image
+                            Point scroll = ScrollPosition;
+                            scroll.Offset(mousePosition[0].X - e.X, mousePosition[0].Y - e.Y);
+                            ScrollPosition = scroll;
+
                             break;
+                        }
 
                         // Scroll left/right
                         case Keys.Shift:
-
+                        {
                             // Check if a horizontal scroll bar is visible
                             if (HScroll)
                             {
                                 // Scroll horizontally
                                 Point scroll = ScrollPosition;
-                                scroll.X += AutoScrollSmallChange.Width * (e.Delta > 0 ?
-                                    -_MOUSEWHEEL_SCROLL_FACTOR : _MOUSEWHEEL_SCROLL_FACTOR);
+                                scroll.X += AutoScrollSmallChange.Width*
+                                            (e.Delta > 0
+                                                 ? -_MOUSEWHEEL_SCROLL_FACTOR
+                                                 : _MOUSEWHEEL_SCROLL_FACTOR);
                                 ScrollPosition = scroll;
                             }
                             break;
+                        }
 
                         // Scroll up/down
                         default:
-
+                        {
                             // Check if a vertical scroll bar is visible
                             if (VScroll)
                             {
                                 // Scroll vertically
                                 Point scroll = ScrollPosition;
-                                scroll.Y += AutoScrollSmallChange.Height * (e.Delta > 0 ?
-                                    -_MOUSEWHEEL_SCROLL_FACTOR : _MOUSEWHEEL_SCROLL_FACTOR);
+                                scroll.Y += AutoScrollSmallChange.Height*
+                                            (e.Delta > 0
+                                                 ? -_MOUSEWHEEL_SCROLL_FACTOR
+                                                 : _MOUSEWHEEL_SCROLL_FACTOR);
                                 ScrollPosition = scroll;
                             }
                             break;
+                        }
                     }
                 }
                 else

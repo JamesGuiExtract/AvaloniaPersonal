@@ -1433,37 +1433,28 @@ namespace Extract.Imaging.Forms
             // Ensure an image is open.
             ExtractException.Assert("ELI21434", "No image is open.", base.Image != null);
 
-            // Suppress the paint event until all changes have been made
-            base.BeginUpdate();
-            try
+            // Ensure the fit mode is set to none
+            if (_fitMode != FitMode.None)
             {
-                // Ensure the fit mode is set to none
-                if (_fitMode != FitMode.None)
-                {
-                    // Set the fit mode without updating the zoom
-                    SetFitMode(FitMode.None, false, false, true);
-                }
-
-                // Get the current zoom setting
-                ZoomInfo zoomInfo = GetZoomInfo();
-
-                // Calculate the new zoom factor
-                if (zoomIn)
-                {
-                    zoomInfo.ScaleFactor *= _ZOOM_FACTOR;
-                }
-                else
-                {
-                    zoomInfo.ScaleFactor /= _ZOOM_FACTOR;
-                }
-
-                // Apply the new zoom setting
-                SetZoomInfo(zoomInfo, true);
+                // Set the fit mode without updating the zoom
+                SetFitMode(FitMode.None, false, false, true);
             }
-            finally
+
+            // Get the current zoom setting
+            ZoomInfo zoomInfo = GetZoomInfo();
+
+            // Calculate the new zoom factor
+            if (zoomIn)
             {
-                base.EndUpdate();
+                zoomInfo.ScaleFactor *= _ZOOM_FACTOR;
             }
+            else
+            {
+                zoomInfo.ScaleFactor /= _ZOOM_FACTOR;
+            }
+
+            // Apply the new zoom setting
+            SetZoomInfo(zoomInfo, true);
         }
 
         /// <summary>
@@ -1559,33 +1550,24 @@ namespace Extract.Imaging.Forms
                 ImagePageData page = _imagePages[_pageNumber - 1];
                 page.RotateOrientation(angle);
 
-                // Postpone the paint event until all changes have been made
-                base.BeginUpdate();
+                // Get the center of the visible image in logical (image) coordinates
+                Point center = GetVisibleImageCenter();
+
                 try
                 {
-                    // Get the center of the visible image in logical (image) coordinates
-                    Point center = GetVisibleImageCenter();
-
-                    try
-                    {
-                        // Check if the view perspectives are licensed (ID Annotation feature)
-                        RotateImageByDegrees(base.Image, angle);
-                    }
-                    catch (Exception)
-                    {
-                        // Reverse the orientation change
-                        page.RotateOrientation(-angle);
-
-                        throw;
-                    }
-
-                    // Center at the same point as prior to rotation
-                    CenterAtPoint(center, false, false);
+                    // Check if the view perspectives are licensed (ID Annotation feature)
+                    RotateImageByDegrees(base.Image, angle);
                 }
-                finally
+                catch
                 {
-                    base.EndUpdate();
+                    // Reverse the orientation change
+                    page.RotateOrientation(-angle);
+
+                    throw;
                 }
+
+                // Center at the same point as prior to rotation
+                CenterAtPoint(center, false, false);
 
                 // Raise the OrientationChanged event
                 OnOrientationChanged(
@@ -3916,34 +3898,25 @@ namespace Extract.Imaging.Forms
         /// <event cref="ZoomChanged">Method was successful.</event>
         void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory)
         {
-            // Suspend the paint event until the zoom setting has changed
-            base.BeginUpdate();
-            try
+            // Check if the fit mode is specified
+            if (zoomInfo.FitMode != FitMode.None)
             {
-                // Check if the fit mode is specified
-                if (zoomInfo.FitMode != FitMode.None)
+                SetFitMode(zoomInfo.FitMode, updateZoomHistory, true, true);
+            }
+            else
+            {
+                // Reset the fit mode if it is set
+                if (_fitMode != FitMode.None)
                 {
-                    SetFitMode(zoomInfo.FitMode, updateZoomHistory, true, true);
-                }
-                else
-                {
-                    // Reset the fit mode if it is set
-                    if (_fitMode != FitMode.None)
-                    {
-                        SetFitMode(FitMode.None, false, false, true);
-                    }
-
-                    // Set the new scale factor
-                    ScaleFactor = zoomInfo.ScaleFactor;
+                    SetFitMode(FitMode.None, false, false, true);
                 }
 
-                // Center at the specified point
-                CenterAtPoint(zoomInfo.Center, updateZoomHistory, true);
+                // Set the new scale factor
+                ScaleFactor = zoomInfo.ScaleFactor;
             }
-            finally
-            {
-                base.EndUpdate();
-            }
+
+            // Center at the specified point
+            CenterAtPoint(zoomInfo.Center, updateZoomHistory, true);
         }
 
         /// <summary>
