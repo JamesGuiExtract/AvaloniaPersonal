@@ -42,6 +42,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         static readonly byte[] _xfdfBytes = BuildEmptyXfdfStream();
 
+        // Unlock codes for the PdfXpress engine
+        static readonly int[] _ul = new int[] {352502263,995632770,1963445779,32594};
+
         #endregion Constants
 
         #region Fields
@@ -217,6 +220,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // Initialize the PdfXpress engine
                 express = new PdfXpress();
                 express.Initialize();
+                express.Licensing.UnlockRuntime(_ul[0], _ul[1], _ul[2], _ul[3]);
 
                 // Open the file
                 document = new Document(express, pdfFile);
