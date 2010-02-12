@@ -29,4 +29,4 @@ const std::string gstrLEGAL_DESC_INDUSTRY = "Legal Descriptions";
 //////////////////////////////////////////
 const std::string gstrSPECIAL_ANY_UNIQUE = "Any Unique";
 const std::string gstrSPECIAL_MULTIPLE_CLASS = "Multiply Classified";
-const std::string gstrSPECIAL_UNCLASSIFIED = "Unclassified";
+const std::string gstrSPECIAL_UNKNOWN = "Unknown";

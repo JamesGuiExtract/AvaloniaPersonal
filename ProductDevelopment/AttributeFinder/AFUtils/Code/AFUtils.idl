@@ -514,7 +514,7 @@ library UCLID_AFUTILSLib
 			[out, retval] IVariantVector** ppIndustries);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return a list of all the special document types 
-		//          (i.e. AnyUnique, MultiplyClassified, Unclassified)
+		//          (i.e. AnyUnique, MultiplyClassified, Unknown)
 		// REQUIRE: NONE
 		// PROMISE: No special delimiting characters will be added (i.e. <> or [])
 		[id(2), helpstring("method GetSpecialDocTypeTags")] HRESULT GetSpecialDocTypeTags(

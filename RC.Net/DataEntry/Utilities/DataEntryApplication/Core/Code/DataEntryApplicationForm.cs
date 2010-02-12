@@ -58,7 +58,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// The settings for this application.
         /// </summary>
-        readonly Settings _settings;
+        readonly ConfigSettings<Settings> _config;
 
         /// <summary>
         /// The data entry panel control host implementation to be used by the application.
@@ -321,7 +321,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     LicenseIdName.DataEntryCoreComponents, "ELI23668", _OBJECT_NAME);
 
                 // Initialize the configuration settings.
-                _settings = ConfigSettings.InitializeSettings<Settings>(configFileName);
+                _config = new ConfigSettings<Settings>(configFileName, false, false);
 
                 // Initialize the root directory the DataEntry framework should use when resolving
                 // relative paths.
@@ -362,7 +362,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _exitToolStripMenuItem.Text = "Stop processing";
                     _imageViewer.DefaultStatusMessage = "Waiting for next document...";
 
-                    if (_settings.PreventSave)
+                    if (_config.Settings.PreventSave)
                     {
                         _saveAndCommitMenuItem.Text = _COMMIT_WITHOUT_SAVING;
                         _saveAndCommitButton.Text = _COMMIT_WITHOUT_SAVING;
@@ -381,13 +381,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // Retrieve the name of the DEP assembly
                 string dataEntryPanelFileName =
-                    DataEntryMethods.ResolvePath(_settings.DataEntryPanelFileName);
+                    DataEntryMethods.ResolvePath(_config.Settings.DataEntryPanelFileName);
 
                 // Create the data entry control host from the specified assembly
                 DataEntryControlHost = CreateDataEntryControlHost(dataEntryPanelFileName);
 
                 // Apply settings from the config file that pertain to the DEP.
-                ConfigSettings.ApplySettings(configFileName, DataEntryControlHost);
+                _config.ApplyObjectSettings(DataEntryControlHost);
 
                 // If there's a database available, let the control host know about it.
                 if (TryOpenDatabaseConnection())
@@ -1247,7 +1247,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                ExtractException.Assert("ELI29142", "Saving is disabled!", !_settings.PreventSave);
+                ExtractException.Assert("ELI29142", "Saving is disabled!",
+                    !_config.Settings.PreventSave);
 
                 SaveData(false);
             }
@@ -1270,7 +1271,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// not.</returns>
         bool SaveData(bool validateData)
         {
-            if (_settings.PreventSave)
+            if (_config.Settings.PreventSave)
             {
                 return false;
             }
@@ -1333,7 +1334,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 // If in standalone mode and prevent save is active, no need to enable
                 // _saveAndCommitFileCommand
-                if (!_settings.PreventSave || !_standAloneMode)
+                if (!_config.Settings.PreventSave || !_standAloneMode)
                 {
                     // Saving or closing the document or hiding of tooltips should be allowed as long as
                     // a document is available.
@@ -1345,7 +1346,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (!_standAloneMode)
                 {
                     _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
-                    _saveMenuItem.Enabled = _imageViewer.IsImageAvailable && !_settings.PreventSave;
+                    _saveMenuItem.Enabled = _imageViewer.IsImageAvailable &&
+                        !_config.Settings.PreventSave;
                     _tagFileToolStripButton.Enabled = _imageViewer.IsImageAvailable;
                 }
 
@@ -1793,7 +1795,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 Help.ShowHelp(this,
-                    DataEntryMethods.ResolvePath(_settings.HelpFile));
+                    DataEntryMethods.ResolvePath(_config.Settings.HelpFile));
             }
             catch (Exception ex)
             {
@@ -2113,7 +2115,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             // If preventing save, don't save, but also return "Yes" so the application behaves as
             // if it did save correctly.
-            if (_settings.PreventSave)
+            if (_config.Settings.PreventSave)
             {
                 return response;
             }
@@ -2127,13 +2129,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // Turn off commitData if an applied tag matches the SkipValidationIfDocTaggedAs
                     // setting (and save without prompting)
                     if (!_standAloneMode && _fileProcessingDb != null &&
-                        !string.IsNullOrEmpty(_settings.SkipValidationIfDocTaggedAs))
+                        !string.IsNullOrEmpty(_config.Settings.SkipValidationIfDocTaggedAs))
                     {
                         VariantVector appliedTags = _fileProcessingDb.GetTagsOnFile(_fileId);
                         int tagCount = appliedTags.Size;
                         for (int i = 0; i < tagCount; i++)
                         {
-                            if (_settings.SkipValidationIfDocTaggedAs.Equals(
+                            if (_config.Settings.SkipValidationIfDocTaggedAs.Equals(
                                     (string)appliedTags[i], StringComparison.OrdinalIgnoreCase))
                             {
                                 commitData = false;
@@ -2221,11 +2223,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // If HighlightConfidenceBoundary settings has been specified in the config file and
                 // the controlHost has exactly two confidence tiers, use the provided value as the
                 // minimum OCR confidence value in order to highlight text as confidently OCR'd
-                if (!string.IsNullOrEmpty(_settings.HighlightConfidenceBoundary) &&
+                if (!string.IsNullOrEmpty(_config.Settings.HighlightConfidenceBoundary) &&
                     controlHost.HighlightColors.Length == 2)
                 {
                     int confidenceBoundary = Convert.ToInt32(
-                        _settings.HighlightConfidenceBoundary,
+                        _config.Settings.HighlightConfidenceBoundary,
                         CultureInfo.CurrentCulture);
 
                     ExtractException.Assert("ELI25684", "HighlightConfidenceBoundary settings must " +
@@ -2237,9 +2239,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     controlHost.HighlightColors = highlightColors;
                 }
 
-                controlHost.DisabledControls = _settings.DisabledControls;
+                controlHost.DisabledControls = _config.Settings.DisabledControls;
                 controlHost.DisabledValidationControls =
-                    _settings.DisabledValidationControls;
+                    _config.Settings.DisabledValidationControls;
 
                 return controlHost;
             }
@@ -2513,28 +2515,28 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (!string.IsNullOrEmpty(_settings.DatabaseType))
+                if (!string.IsNullOrEmpty(_config.Settings.DatabaseType))
                 {
                     string connectionString = "";
 
                     // A full connection string has been provided.
-                    if (!string.IsNullOrEmpty(_settings.DatabaseConnectionString))
+                    if (!string.IsNullOrEmpty(_config.Settings.DatabaseConnectionString))
                     {
                         ExtractException.Assert("ELI26157", "Either a database connection string " +
                             "can be specified, or a local datasource-- not both.",
-                            string.IsNullOrEmpty(_settings.LocalDataSource));
+                            string.IsNullOrEmpty(_config.Settings.LocalDataSource));
 
-                        connectionString = _settings.DatabaseConnectionString;
+                        connectionString = _config.Settings.DatabaseConnectionString;
                     }
                     // A local datasource has been specfied; compute the connection string.
-                    else if (!string.IsNullOrEmpty(_settings.LocalDataSource))
+                    else if (!string.IsNullOrEmpty(_config.Settings.LocalDataSource))
                     {
                         ExtractException.Assert("ELI26158", "Either a database connection string " +
                             "can be specified, or a local datasource-- not both.",
-                            string.IsNullOrEmpty(_settings.DatabaseConnectionString));
+                            string.IsNullOrEmpty(_config.Settings.DatabaseConnectionString));
 
                         _dataSourcePath =
-                            DataEntryMethods.ResolvePath(_settings.LocalDataSource);
+                            DataEntryMethods.ResolvePath(_config.Settings.LocalDataSource);
                         string dataSourcePath = _dataSourcePath;
 
                         // Use ConvertToNetworkPath to tell if the DB is being accesseed via a
@@ -2565,7 +2567,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             _dbConnection.Dispose();
                         }
 
-                        Type dbType = Type.GetType(_settings.DatabaseType);
+                        Type dbType = Type.GetType(_config.Settings.DatabaseType);
                         _dbConnection = (DbConnection)Activator.CreateInstance(dbType);
                         _dbConnection.ConnectionString = connectionString;
                         _dbConnection.Open();
@@ -2580,10 +2582,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 ExtractException ee = new ExtractException("ELI26159",
                     "Failed to open database connection!", ex);
-                ee.AddDebugData("Database type", _settings.DatabaseType, false);
-                ee.AddDebugData("Local datasource", _settings.LocalDataSource, false);
+                ee.AddDebugData("Database type", _config.Settings.DatabaseType, false);
+                ee.AddDebugData("Local datasource", _config.Settings.LocalDataSource, false);
                 ee.AddDebugData("Connection string",
-                    _settings.DatabaseConnectionString, false);
+                    _config.Settings.DatabaseConnectionString, false);
 
                 throw ee;
             }

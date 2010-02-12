@@ -49,7 +49,8 @@ static const string gstrTEST_CASE_COMPARE = "TestCaseCompareData";
 // CTestResultLogger
 //-------------------------------------------------------------------------------------------------
 CTestResultLogger::CTestResultLogger()
-: m_pDlg(NULL), m_eCurrentTestCaseType(kInvalidTestCaseType), m_bAddEntriesInLogWindow(true)
+: m_pDlg(NULL), m_eCurrentTestCaseType(kInvalidTestCaseType), m_bAddEntriesInLogWindow(true),
+m_bAddEntriesForCurrentTestCase(true)
 #ifdef INCLUDE_DB_SUPPORT
   ,m_tblTestHarness(&m_db), m_tblComponentTest(&m_db), m_tblTestCase(&m_db), 
   m_tblTestCaseNote(&m_db), m_tblTestCaseException(&m_db)
@@ -362,7 +363,7 @@ STDMETHODIMP CTestResultLogger::raw_AddTestCaseNote(BSTR strTestCaseNote)
 			m_outputFile << getEndTag(gstrTEST_CASE_NOTE) << endl;
 		}
 
-		if (m_bAddEntriesInLogWindow)
+		if (m_bAddEntriesForCurrentTestCase)
 		{
 			// update the UI
 			m_pDlg->addTestCaseNote(stdstrTestCaseNote);
@@ -430,7 +431,7 @@ STDMETHODIMP CTestResultLogger::raw_AddTestCaseDetailNote(BSTR strTitle, BSTR st
 			m_outputFile << getEndTag(gstrTEST_CASE_DETAIL_NOTE) << endl;
 		}
 
-		if (m_bAddEntriesInLogWindow)
+		if (m_bAddEntriesForCurrentTestCase)
 		{
 			// update the UI
 			m_pDlg->addTestCaseDetailNote(stdstrTitle, stdstrTestCaseDetailNote);
@@ -498,7 +499,7 @@ STDMETHODIMP CTestResultLogger::raw_AddTestCaseMemo(BSTR strTitle, BSTR strTestC
 			m_outputFile << getEndTag(gstrTEST_CASE_MEMO) << endl;
 		}
 
-		if (m_bAddEntriesInLogWindow)
+		if (m_bAddEntriesForCurrentTestCase)
 		{
 			// Add Compare Data to the tree and the dialog.
 			m_pDlg->addTestCaseMemo(stdstrTitle, stdstrTestCaseMemo);
@@ -551,7 +552,7 @@ STDMETHODIMP CTestResultLogger::raw_AddTestCaseFile(BSTR strFileName)
 			m_outputFile << getEndTag(gstrTEST_CASE_FILE) << endl;
 		}
 
-		if (m_bAddEntriesInLogWindow)
+		if (m_bAddEntriesForCurrentTestCase)
 		{
 			// update the UI
 			m_pDlg->addTestCaseFile(stdstrTestCaseFile);
@@ -662,7 +663,7 @@ STDMETHODIMP CTestResultLogger::raw_EndComponentTest()
 		{
 			// Create a testcase that will display end of component exceptions
 			unsigned long lSize = m_vecComponentTestExceptions.size();
-			startTestCase(asString(lSize), "Component Test Exceptions", kOtherTestCase);
+			startTestCase(asString(lSize), "Component Test Exceptions", kSummaryTestCase);
 
 			for(unsigned long i = 0; i < lSize; i++)
 			{
@@ -804,7 +805,7 @@ HRESULT CTestResultLogger::raw_AddTestCaseCompareData (BSTR strTitle, BSTR strLa
 		}
 
 		// Only update the UI if adding entries to the log window
-		if (m_bAddEntriesInLogWindow)
+		if (m_bAddEntriesForCurrentTestCase)
 		{
 			// update the UI
 			m_pDlg->addTestCaseCompareData(stdstrTitle, stdstrLabel1, stdstrInput1,
@@ -1022,7 +1023,7 @@ void CTestResultLogger::addSummaryTestCase(const TestCaseStats& stats)
 	writeHTMLText(strTimeNote);
 	m_outputFile << getEndTag(gstrID) << endl;
 
-	m_pDlg->startTestCase(strTimeNote, "Summary of Statistics:", kOtherTestCase);
+	m_pDlg->startTestCase(strTimeNote, "Summary of Statistics:", kSummaryTestCase);
 
 	// write the total test cases
 	CString zTemp;
@@ -1138,10 +1139,19 @@ void CTestResultLogger::startTestCase(const string& strTestCaseID,
 			m_outputFile << getEndTag(gstrDESCRIPTION) << endl;
 		}
 
-		if (m_bAddEntriesInLogWindow)
+		// [FlexIDSCore:4003, 4004]
+		// Entries should be added to the log window if either m_bAddEntriesInLogWindow is true or
+		// if the current test case is of type "other" (used for summary statistics).
+		if (m_bAddEntriesInLogWindow || eTestCaseType == kSummaryTestCase)
 		{
+			m_bAddEntriesForCurrentTestCase = true;
+
 			// update the UI
 			m_pDlg->startTestCase(strTestCaseID, strTestCaseDescription, eTestCaseType);
+		}
+		else
+		{
+			m_bAddEntriesForCurrentTestCase = false;
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26645");
@@ -1194,7 +1204,7 @@ void CTestResultLogger::addTestCaseException(const string& strTestCaseException,
 			m_outputFile << getEndTag(gstrTEST_CASE_EXCEPTION) << endl;
 		}
 
-		if (m_bAddEntriesInLogWindow)
+		if (m_bAddEntriesForCurrentTestCase)
 		{
 			// update the UI
 			m_pDlg->addTestCaseException(strTestCaseException);
@@ -1268,7 +1278,7 @@ void CTestResultLogger::endTestCase(bool bResult)
 		// stop the stop watch
 		m_testCaseStopWatch.stop();
 
-		if (m_bAddEntriesInLogWindow)
+		if (m_bAddEntriesForCurrentTestCase)
 		{
 			// add test case note with the time it took to run this test case
 			string strText = "Test case processing time: ";

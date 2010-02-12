@@ -612,7 +612,7 @@ void TestResultLoggerDlg::startTestCase(const string& strTestCaseID,
 	m_bTestCaseActive = true;
 		
 	// whether or not to put the test case node in the logger
-	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kOtherTestCase)
+	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kSummaryTestCase)
 	{	
 		HTREEITEM hFirstItem = m_tree.GetFirstVisibleItem();
 		m_tree.SetRedraw(FALSE);
@@ -639,7 +639,7 @@ void TestResultLoggerDlg::addTestCaseNote(const string& strTestCaseNote)
 	}
 
 	// whether or not to put the test case node in the logger
-	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kOtherTestCase)
+	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kSummaryTestCase)
 	{	
 		HTREEITEM hFirstItem = m_tree.GetFirstVisibleItem();
 		m_tree.SetRedraw(FALSE);
@@ -667,7 +667,7 @@ void TestResultLoggerDlg::addTestCaseDetailNote(const string& strTitle,
 	}
 	
 	// whether or not to put the test case node in the logger
-	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kOtherTestCase)
+	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kSummaryTestCase)
 	{	
 		HTREEITEM hFirstItem = m_tree.GetFirstVisibleItem();
 		m_tree.SetRedraw(FALSE);
@@ -698,7 +698,7 @@ void TestResultLoggerDlg::addTestCaseMemo(const string& strTitle,
 	}
 
 	// whether or not to put the test case node in the logger
-	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kOtherTestCase)
+	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kSummaryTestCase)
 	{	
 		HTREEITEM hFirstItem = m_tree.GetFirstVisibleItem();
 		m_tree.SetRedraw(FALSE);
@@ -728,7 +728,7 @@ void TestResultLoggerDlg::addTestCaseFile(const string& strFileName)
 	}
 
 	// whether or not to put the test case node in the logger
-	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kOtherTestCase)
+	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kSummaryTestCase)
 	{	
 		string strFileExt = ::getExtensionFromFullPath(strFileName, true);
 		if ((strFileExt == ".nte") && isValidFile(strFileName))
@@ -763,7 +763,7 @@ void TestResultLoggerDlg::addTestCaseException(const string& strTestCaseExceptio
 	}
 
 	// whether or not to put the test case node in the logger
-	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kOtherTestCase)
+	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kSummaryTestCase)
 	{	
 		// generate a display string for the exception
 		UCLIDException ue;
@@ -797,7 +797,7 @@ void TestResultLoggerDlg::endTestCase(bool bResult)
 	m_bTestCaseActive = false;
 	
 	// whether or not to put the test case node in the logger
-	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kOtherTestCase)
+	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kSummaryTestCase)
 	{	
 		// if the test case is of invalid type (used for summary, etc), use 
 		// a different bitmap than for regular test cases that either failed or
@@ -808,7 +808,7 @@ void TestResultLoggerDlg::endTestCase(bool bResult)
 		{
 			iBitmapToUse = bResult ? m_iBitmapTestCaseDoneGood : m_iBitmapTestCaseDoneBad;
 		}
-		else if (m_eCurrentTestCaseType == kOtherTestCase)
+		else if (m_eCurrentTestCaseType == kSummaryTestCase)
 		{
 			iBitmapToUse = bResult ? m_iBitmapTestCaseDoneOtherGood :
 									 m_iBitmapTestCaseDoneOtherBad;
@@ -882,7 +882,7 @@ void TestResultLoggerDlg::addTestCaseCompareData(const string& strTitle,
 	}
 	
 	// whether or not to put the test case node in the logger
-	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kOtherTestCase)
+	if (retainTestCaseNodes() || m_eCurrentTestCaseType == kSummaryTestCase)
 	{	
 		HTREEITEM hFirstItem = m_tree.GetFirstVisibleItem();
 		m_tree.SetRedraw(FALSE);		

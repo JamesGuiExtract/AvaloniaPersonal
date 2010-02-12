@@ -391,8 +391,8 @@ bool DocTypeAttributeTester::getResult() const
 	}
 
 	// The document count is zero.
-	// Check for unclassified document condition
-	return m_setDocTypes.find(gstrSPECIAL_UNCLASSIFIED) != m_setDocTypes.end();
+	// Check for unknown document type condition
+	return m_setDocTypes.find(gstrSPECIAL_UNKNOWN) != m_setDocTypes.end();
 }
 //-------------------------------------------------------------------------------------------------
 void DocTypeAttributeTester::reset()

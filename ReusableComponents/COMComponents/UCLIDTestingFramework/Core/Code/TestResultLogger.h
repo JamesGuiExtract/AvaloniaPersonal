@@ -87,6 +87,10 @@ private:
 
 	bool m_bAddEntriesInLogWindow;
 
+	// Keeps track of whether logging should occur for the current test case (may be true even if
+	// m_bAddEntriesInLogWindow is false overall for summary stats).
+	bool m_bAddEntriesForCurrentTestCase;
+
 	// the database objects and the various tables
 #ifdef INCLUDE_DB_SUPPORT
 	CDaoDatabase m_db;

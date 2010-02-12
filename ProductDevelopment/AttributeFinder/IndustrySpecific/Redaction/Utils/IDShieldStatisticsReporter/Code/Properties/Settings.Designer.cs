@@ -22,5 +22,17 @@ namespace Extract.IDShieldStatisticsReporter.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastFeedbackFolder {
+            get {
+                return ((string)(this["LastFeedbackFolder"]));
+            }
+            set {
+                this["LastFeedbackFolder"] = value;
+            }
+        }
     }
 }

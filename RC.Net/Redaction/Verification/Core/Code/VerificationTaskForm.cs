@@ -341,7 +341,7 @@ namespace Extract.Redaction.Verification
                 }
             }
 
-            return "Uncategorized";
+            return "Unknown";
         }
 
         /// <summary>

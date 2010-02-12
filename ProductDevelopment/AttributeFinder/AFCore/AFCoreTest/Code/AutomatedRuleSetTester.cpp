@@ -1692,7 +1692,7 @@ void CAutomatedRuleSetTester::addAttributeResultCase()
 	char szTime[32];
 	iError = asctime_s( szTime, sizeof(szTime), &pTime );
 	string strTimeNote = trim( szTime, "", "\r\n" );
-	m_ipResultLogger->StartTestCase(strTimeNote.c_str(), "Summary of Attribute Statistics:", kOtherTestCase);
+	m_ipResultLogger->StartTestCase(strTimeNote.c_str(), "Summary of Attribute Statistics:", kSummaryTestCase);
 
 	map< string, long >::iterator iterCurr = m_mapTotalExpected.begin();
 	bool bErrorFree = true;

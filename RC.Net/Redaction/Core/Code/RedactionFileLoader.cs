@@ -47,7 +47,7 @@ namespace Extract.Redaction
         string _sourceDocument;
 
         /// <summary>
-        /// The type of the document; or <see langword="null"/> if the document is uncategorized.
+        /// The type of the document; or <see langword="null"/> if the document is unknown.
         /// </summary>
         string _documentType;
 

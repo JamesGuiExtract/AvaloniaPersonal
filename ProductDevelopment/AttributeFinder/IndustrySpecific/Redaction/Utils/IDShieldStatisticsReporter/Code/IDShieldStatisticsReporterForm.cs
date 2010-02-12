@@ -1,3 +1,4 @@
+using Extract.IDShieldStatisticsReporter.Properties;
 using Extract.Licensing;
 using Extract.Redaction;
 using Extract.Utilities;
@@ -71,7 +72,13 @@ namespace Extract.IDShieldStatisticsReporter
         /// <summary>
         /// The ID Shield tester settings.
         /// </summary>
-        readonly IDShieldTesterSettings _settings = new IDShieldTesterSettings();
+        readonly IDShieldTesterSettings _testerSettings = new IDShieldTesterSettings();
+
+        /// <summary>
+        /// The configuration file settings for the statistics reporter
+        /// </summary>
+        readonly ConfigSettings<Settings> _config = new ConfigSettings<Settings>(
+            Path.Combine(FileSystemMethods.ApplicationDataPath, "IDShieldStatisticsReporter.config"));
 
         /// <summary>
         /// The target test folder.
@@ -201,9 +208,18 @@ namespace Extract.IDShieldStatisticsReporter
             {
                 base.OnLoad(e);
 
+                if (LicenseUtilities.IsLicensed(LicenseIdName.RuleDevelopmentToolkitObjects))
+                {
+                    _limitTypesCheckBox.Text += " (separate types using a pipe or comma)";
+                }
+                else
+                {
+                    _limitTypesCheckBox.Text += " (separate types using a comma)";
+                }
+
                 // If at least one test folder specification was found, use the first, otherwise
                 // create a new one to use.
-                Collection<IDShieldTesterFolder> testFolders = _settings.GetTestFolders();
+                Collection<IDShieldTesterFolder> testFolders = _testerSettings.GetTestFolders();
                 if (testFolders.Count > 0)
                 {
                     _testFolder = testFolders[0];
@@ -211,17 +227,17 @@ namespace Extract.IDShieldStatisticsReporter
                 else
                 {
                     _testFolder = new IDShieldTesterFolder();
-                    _settings.AddTestFolder(_testFolder);
+                    _testerSettings.AddTestFolder(_testFolder);
                 }
 
                 // When generating stats with tool, we only want to see the final stats
-                _settings.OutputFinalStatsOnly = true;
+                _testerSettings.OutputFinalStatsOnly = true;
 
                 // We need file lists.
-                _settings.OutputAttributeNamesFileLists = true;
+                _testerSettings.OutputAttributeNamesFileLists = true;
 
                 // We want output files to be created.
-                _settings.CreateTestOutputVoaFiles = true;
+                _testerSettings.CreateTestOutputVoaFiles = true;
 
                 // Initialize the found and expected data locations as necessary.
                 if (string.IsNullOrEmpty(_testFolder.FoundDataLocation))
@@ -236,12 +252,20 @@ namespace Extract.IDShieldStatisticsReporter
                 }
 
                 // Determine the type of test being done.
-                _feedbackFolderTextBox.Text = _testFolder.TestFolderName;
-                if (_settings.OutputHybridStats)
+                if (!string.IsNullOrEmpty(_testFolder.TestFolderName))
+                {
+                    _feedbackFolderTextBox.Text = _testFolder.TestFolderName;
+                }
+                else
+                {
+                    _feedbackFolderTextBox.Text = _config.Settings.LastFeedbackFolder;
+                }
+
+                if (_testerSettings.OutputHybridStats)
                 {
                     _analysisTypeComboBox.Text = _HYBRID;
                 }
-                else if (_settings.OutputAutomatedStatsOnly)
+                else if (_testerSettings.OutputAutomatedStatsOnly)
                 {
                     _analysisTypeComboBox.Text = _AUTOMATED_REDACTION;
                 }
@@ -251,24 +275,24 @@ namespace Extract.IDShieldStatisticsReporter
                 }
 
                 // Populate the types to be tested 
-                if (!string.IsNullOrEmpty(_settings.TypesToBeTested))
+                if (!string.IsNullOrEmpty(_testerSettings.TypesToBeTested))
                 {
                     _limitTypesCheckBox.Checked = true;
-                    _dataTypesTextBox.Text = _settings.TypesToBeTested;
+                    _dataTypesTextBox.Text = _testerSettings.TypesToBeTested;
                 }
 
                 // Initialize the automated and verification condition objects
-                InitializeCondition(_automatedConditionObject, _settings.AutomatedCondition,
-                    _settings.AutomatedConditionQuantifier, _settings.DocTypesToRedact);
+                InitializeCondition(_automatedConditionObject, _testerSettings.AutomatedCondition,
+                    _testerSettings.AutomatedConditionQuantifier, _testerSettings.DocTypesToRedact);
 
-                InitializeCondition(_verificationConditionObject, _settings.VerificationCondition,
-                    _settings.VerificationConditionQuantifier, _settings.DocTypesToVerify);
+                InitializeCondition(_verificationConditionObject, _testerSettings.VerificationCondition,
+                    _testerSettings.VerificationConditionQuantifier, _testerSettings.DocTypesToVerify);
 
                 // Initialize the automated redaction check boxes
-                if (_settings.QueryForAutomatedRedaction != null)
+                if (_testerSettings.QueryForAutomatedRedaction != null)
                 {
                     List<string> attributesToRedact =
-                        new List<string>(_settings.QueryForAutomatedRedaction.Split('|'));
+                        new List<string>(_testerSettings.QueryForAutomatedRedaction.Split('|'));
                     _redactHCDataCheckBox.Checked = (attributesToRedact.IndexOf("HCData") >= 0);
                     _redactMCDataCheckBox.Checked = (attributesToRedact.IndexOf("MCData") >= 0);
                     _redactLCDataCheckBox.Checked = (attributesToRedact.IndexOf("LCData") >= 0);
@@ -478,43 +502,43 @@ namespace Extract.IDShieldStatisticsReporter
                 }
 
                 _testFolder.TestFolderName = _feedbackFolderTextBox.Text;
-                _settings.OutputFilesFolder = _feedbackFolderTextBox.Text;
-                _settings.OutputHybridStats = _analysisTypeComboBox.Text == _HYBRID;
-                _settings.OutputAutomatedStatsOnly =
+                _testerSettings.OutputFilesFolder = _feedbackFolderTextBox.Text;
+                _testerSettings.OutputHybridStats = _analysisTypeComboBox.Text == _HYBRID;
+                _testerSettings.OutputAutomatedStatsOnly =
                     (_analysisTypeComboBox.Text == _AUTOMATED_REDACTION);
 
                 // Initialize the automated redaction condition
-                if (!_settings.OutputAutomatedStatsOnly && !_settings.OutputHybridStats)
+                if (!_testerSettings.OutputAutomatedStatsOnly && !_testerSettings.OutputHybridStats)
                 {
-                    _settings.AutomatedCondition = "";
-                    _settings.AutomatedConditionQuantifier = "any";
-                    _settings.DocTypesToRedact = null;
+                    _testerSettings.AutomatedCondition = "";
+                    _testerSettings.AutomatedConditionQuantifier = "any";
+                    _testerSettings.DocTypesToRedact = null;
                 }
                 else
                 {
                     string automatedCondition, automatedConditionQuantifier, docTypes;
                     ApplyCondition(_automatedConditionObject,
                         out automatedCondition, out automatedConditionQuantifier, out docTypes);
-                    _settings.AutomatedCondition = automatedCondition;
-                    _settings.AutomatedConditionQuantifier = automatedConditionQuantifier;
-                    _settings.DocTypesToRedact = docTypes;
+                    _testerSettings.AutomatedCondition = automatedCondition;
+                    _testerSettings.AutomatedConditionQuantifier = automatedConditionQuantifier;
+                    _testerSettings.DocTypesToRedact = docTypes;
                 }
 
                 // Initialize the verification condition
-                if (_settings.OutputAutomatedStatsOnly)
+                if (_testerSettings.OutputAutomatedStatsOnly)
                 {
-                    _settings.VerificationCondition = "";
-                    _settings.VerificationConditionQuantifier = "any";
-                    _settings.DocTypesToVerify = null;
+                    _testerSettings.VerificationCondition = "";
+                    _testerSettings.VerificationConditionQuantifier = "any";
+                    _testerSettings.DocTypesToVerify = null;
                 }
                 else
                 {
                     string verificationCondition, verificationConditionQuantifier, docTypes;
                     ApplyCondition(_verificationConditionObject, out verificationCondition,
                         out verificationConditionQuantifier, out docTypes);
-                    _settings.VerificationCondition = verificationCondition;
-                    _settings.VerificationConditionQuantifier = verificationConditionQuantifier;
-                    _settings.DocTypesToVerify = docTypes;
+                    _testerSettings.VerificationCondition = verificationCondition;
+                    _testerSettings.VerificationConditionQuantifier = verificationConditionQuantifier;
+                    _testerSettings.DocTypesToVerify = docTypes;
                 }
 
                 if (_limitTypesCheckBox.Checked)
@@ -533,11 +557,11 @@ namespace Extract.IDShieldStatisticsReporter
                         return false;
                     }
 
-                    _settings.TypesToBeTested = _dataTypesTextBox.Text;
+                    _testerSettings.TypesToBeTested = _dataTypesTextBox.Text;
                 }
                 else
                 {
-                    _settings.TypesToBeTested = null;
+                    _testerSettings.TypesToBeTested = null;
                 }
 
                 StringBuilder queryForAutomatedRedaction = new StringBuilder();
@@ -546,9 +570,9 @@ namespace Extract.IDShieldStatisticsReporter
                     ? (queryForAutomatedRedaction.Length > 0 ? "|MCData" : "MCData") : "");
                 queryForAutomatedRedaction.Append(_redactLCDataCheckBox.Checked 
                     ? (queryForAutomatedRedaction.Length > 0 ? "|LCData" : "LCData") : "");
-                _settings.QueryForAutomatedRedaction = queryForAutomatedRedaction.ToString();
+                _testerSettings.QueryForAutomatedRedaction = queryForAutomatedRedaction.ToString();
 
-                _settings.Save(settingFileName);
+                _testerSettings.Save(settingFileName);
 
                 return true;
             }
@@ -935,6 +959,10 @@ namespace Extract.IDShieldStatisticsReporter
 
             if (Directory.Exists(_feedbackFolderTextBox.Text))
             {
+                // If a valid folder is entered, persist the value next time the statistics reporter
+                // is opened.
+                _config.Settings.LastFeedbackFolder = _feedbackFolderTextBox.Text;
+
                 string[] outputFolders = Directory.GetDirectories(_feedbackFolderTextBox.Text,
                     _ANAYLYSIS_FOLDER_PREFIX + "*", SearchOption.TopDirectoryOnly);
 
@@ -1148,9 +1176,9 @@ namespace Extract.IDShieldStatisticsReporter
         [CLSCompliant(false)]
         public void StartTestCase(string strTestCaseID, string strTestCaseDescription, ETestCaseType ETestCaseType)
         {
-            // Note that summary info is added at the end which calls this method with a blank test case ID.
+            // Note that summary info is added at the end which calls this method with a type of kSummaryTestCase.
             // Don't include these in the test case count.
-            if (!string.IsNullOrEmpty(strTestCaseID))
+            if (ETestCaseType != ETestCaseType.kSummaryTestCase)
             {
                 _testCaseCount++;
             }

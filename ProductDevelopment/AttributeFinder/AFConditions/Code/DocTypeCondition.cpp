@@ -12,6 +12,7 @@
 #include <ByteStreamManipulator.h>
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
+#include <SpecialStringDefinitions.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -275,7 +276,7 @@ STDMETHODIMP CDocTypeCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 					string strListDocType = asString(bstrType);
 
 					if (strDocType == strListDocType || 
-						strListDocType == "Any Unique")
+						strListDocType == gstrSPECIAL_ANY_UNIQUE)
 					{
 						bInList = true;
 						break;
@@ -293,7 +294,7 @@ STDMETHODIMP CDocTypeCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 				_bstr_t bstrType = varType.bstrVal;
 				string strListDocType = asString(bstrType);
 
-				if(strListDocType == "Unclassified")
+				if(strListDocType == gstrSPECIAL_UNKNOWN)
 				{
 					bInList = true;
 					break;

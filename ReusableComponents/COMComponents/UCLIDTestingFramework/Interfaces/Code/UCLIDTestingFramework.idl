@@ -34,7 +34,7 @@ library UCLID_TESTINGFRAMEWORKINTERFACESLib
 		kInvalidTestCaseType = 0,
 		kAutomatedTestCase,
 		kInteractiveTestCase,
-		kOtherTestCase // used for summaries, etc
+		kSummaryTestCase
 	} ETestCaseType;
 
 	//----------------------------------------------------------------------------------------------

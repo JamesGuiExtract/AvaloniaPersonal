@@ -71,7 +71,7 @@ const string gstrFILES_MISSED_BEING_SELECTED_FOR_REDACTION =
 // Files output in countDocTypes
 const string gstrFILES_CLASSIFIED_AS_MORE_THAN_ONE_DOC_TYPE = 
 	"\\DocType_MultipleDocTypes.txt";
-const string gstrUNCLASSIFIED_DOC_TYPE_FILES = "\\DocType_Unclassified.txt";
+const string gstrUNKNOWN_DOC_TYPE_FILES = "\\DocType_Unknown.txt";
 // Known DocType files are written to DocType - TypeName.txt (P16 #2769)
 const string gstrDOC_TYPE_PREFIX = "\\DocType_";
 
@@ -680,6 +680,13 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 				// Support both comma and pipe delimiters.
 				vector<string> vecTemp;
 				StringTokenizer::sGetTokens(vecTokens[1], "|,", vecTemp, true);
+
+				// [FlexIDSCore:4005]
+				// Disregard any spaces included in the list
+				for (vector<string>::iterator iter = vecTemp.begin(); iter != vecTemp.end(); iter++)
+				{
+					*iter = trim(*iter, " ", " ");
+				}
 
 				// Insert the doc types into the set of doc types
 				m_setTypesToBeTested.insert(vecTemp.begin(), vecTemp.end());
@@ -1651,7 +1658,7 @@ void CIDShieldTester::RecordStatistic(const string& strLabel, IAttributePtr ipRe
 //-------------------------------------------------------------------------------------------------
 void CIDShieldTester::displaySummaryStatistics()
 {
-	m_ipResultLogger->StartTestCase("", "Summary Statistics", kOtherTestCase);
+	m_ipResultLogger->StartTestCase("", "Summary Statistics", kSummaryTestCase);
 
 	// The string that will be put into gstrFILE_FOR_STATISTICS (statistics file) which is a textual
 	// version of all the statistics
@@ -1924,7 +1931,7 @@ void CIDShieldTester::displayDocumentTypeStats()
 	string strDocumentTypeLabel = "Document type distribution:";
 	strStatsForLogFile += strDocumentTypeLabel + "\r\n";
 
-	m_ipResultLogger->StartTestCase("", strDocumentTypeLabel.c_str(), kOtherTestCase);
+	m_ipResultLogger->StartTestCase("", strDocumentTypeLabel.c_str(), kSummaryTestCase);
 	map<string,int>::const_iterator iter;
 	long nDocsClassified = 0;
 
@@ -2014,19 +2021,19 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 	// Get the number of document types
 	long nDocTypes = ipDocTypes->Size();
 
-	// If there is no doc type, then add this file to the unclassified log file and 
-	// make an entry in the doc type map for the unclassified type.
+	// If there is no doc type, then add this file to the unknown doc type log file and 
+	// make an entry in the doc type map for the unknown type.
 	if( nDocTypes == 0 )
 	{
-		string strDocLogFilePath = m_strOutputFileDirectory + gstrUNCLASSIFIED_DOC_TYPE_FILES;
+		string strDocLogFilePath = m_strOutputFileDirectory + gstrUNKNOWN_DOC_TYPE_FILES;
 		appendToFile( strSourceDoc, strDocLogFilePath );
 
-		const string strDocType = "Unclassified";
+		const string strDocType = "Unknown";
 
-		// Add the Unclassified Doc Type to the test logger as a test case note
+		// Add the unknown doc type to the test logger as a test case note
 		m_ipResultLogger->AddTestCaseNote( strDocType.c_str() );
 
-		// If the unclassified doc type does not yet exist, enter it into the table
+		// If the unknown doc type does not yet exist, enter it into the table
 		if (m_mapDocTypeCount.find(strDocType) == m_mapDocTypeCount.end())
 		{
 			m_mapDocTypeCount[strDocType] = 1;

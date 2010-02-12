@@ -200,7 +200,7 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 			////////////////////////////
 			// Print the summary results
 			////////////////////////////
-			m_ipResultLogger->StartTestCase(_bstr_t(strTimeNote.c_str()), _bstr_t("Summary of attribute-level statistics"), kOtherTestCase); 
+			m_ipResultLogger->StartTestCase(_bstr_t(strTimeNote.c_str()), _bstr_t("Summary of attribute-level statistics"), kSummaryTestCase); 
 			CString zTemp;
 
 			// Test attributes - executed, passed, failed, percentage
@@ -356,7 +356,7 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 
 			bSuccess = false;
 			// Add the stats for name + type
-			m_ipResultLogger->StartTestCase(_bstr_t(strTimeNote.c_str()), _bstr_t("Summary of attribute+type-level statistics"), kOtherTestCase); 
+			m_ipResultLogger->StartTestCase(_bstr_t(strTimeNote.c_str()), _bstr_t("Summary of attribute+type-level statistics"), kSummaryTestCase); 
 			
 			map<string, NamePlusTypeStats>::iterator it;
 			for(it = m_mapNamePlusType.begin(); it != m_mapNamePlusType.end(); it++)

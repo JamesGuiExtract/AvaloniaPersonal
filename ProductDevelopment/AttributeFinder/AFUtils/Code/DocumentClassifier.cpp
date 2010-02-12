@@ -609,7 +609,7 @@ void CDocumentClassifier::appendSpecialTags(vector<string>& rvecTags)
 	// Add each special tag
 	rvecTags.push_back( gstrSPECIAL_ANY_UNIQUE );
 //	rvecTags.push_back( gstrSPECIAL_MULTIPLE_CLASS );
-	rvecTags.push_back( gstrSPECIAL_UNCLASSIFIED );
+	rvecTags.push_back( gstrSPECIAL_UNKNOWN );
 
 	return;
 }
