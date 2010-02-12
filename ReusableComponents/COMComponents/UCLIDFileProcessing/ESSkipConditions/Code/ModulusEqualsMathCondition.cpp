@@ -45,7 +45,8 @@ STDMETHODIMP CModulusEqualsMathCondition::InterfaceSupportsErrorInfo(REFIID riid
 		&IID_IModulusEqualsMathCondition,
 		&IID_ICopyableObject,
 		&IID_IPersistStream,
-		&IID_IMustBeConfiguredObject
+		&IID_IMustBeConfiguredObject,
+		&IID_IMathConditionChecker
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)

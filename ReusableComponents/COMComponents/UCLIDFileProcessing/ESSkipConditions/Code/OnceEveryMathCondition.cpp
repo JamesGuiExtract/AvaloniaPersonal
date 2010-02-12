@@ -52,7 +52,8 @@ STDMETHODIMP COnceEveryMathCondition::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IClipboardCopyable,
 		&IID_IPersistStream,
-		&IID_IMustBeConfiguredObject
+		&IID_IMustBeConfiguredObject,
+		&IID_IMathConditionChecker
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
