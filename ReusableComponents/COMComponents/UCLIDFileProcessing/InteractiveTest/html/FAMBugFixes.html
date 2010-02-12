@@ -138,6 +138,15 @@
 		<li>Process some files using the automatically created action.
 		<li>Confirm that the action can be deleted.
        	</ul>
+<p>
+   	<LI><b>[LegacyRC #5715]</b> Cancellable tasks and scheduled processing
+       	<ul>
+		<li>Configure an FPS file with a sleep task and a set file action status task.
+		<li>Also configure the FPS file to use scheduled processing.
+		<li>Confirm that if processing transitions to inactive during a sleep task, 
+		that the associated set file action status task is <b>not</b> executed.
+		<li>Confirm that processing transitions back to active as expected.
+       	</ul>
 </ul>
 </body> 
 </html>
