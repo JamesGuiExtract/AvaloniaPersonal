@@ -363,6 +363,26 @@ UEXViewer Utility - Testing Checklist<br>
 			exceptions.
 			<li>Confirm that debug data can be exported with scope 
 			narrowed to a specified ELI code.
+			closes the context menu and does nothing to the Clipboard.
+		</ul>
+      		<li><b><u>Miscellaneous</u></b>
+		<ul>
+	  	   	<LI><b>[LegacyRC #5696]</b> Exporting encrypted debug data from UEX Viewer
+		       	<ul>
+				<li>Review an expection log from a stress test or an Endurance test that 
+				contains several <b>ELI15935: Application trace information</b> exceptions 
+				with USB key count information.
+		  	   	<LI>Confirm that if the test machine is connected to the network with 
+				a mapped drive to <b>FNP2\Internal</b> then the debug data from 
+				these exceptions <b>is not</b> encrypted.
+		  	   	<LI>Confirm that if the test machine is connected to the network with 
+				a mapped drive to <b>FNP2\Internal</b> then the exported debug data from 
+				these exceptions <b>is not</b> encrypted.
+	  	   		<LI>Confirm that if the test machine is not connected to the network then 
+				the debug data from these exceptions <b>is</b> encrypted.
+	  		   	<LI>Confirm that if the test machine is not connected to the network then 
+				the exported debug data from these exceptions <b>is</b> encrypted.
+		       	</ul>
 		</ul>
   	</ul>
      	</li>
@@ -393,6 +413,15 @@ UEXViewer Utility - Testing Checklist<br>
 	      		<li>Confirm that the exception does not create an unusually large UEX 
 			file and that the UEX Viewer opens the UEX file without difficulty.
 	       	</ul>
+<p>
+		<li><b>[FlexIDSCore #3986]</b> Exception log corruption
+		<ul>
+			<li>Run the FAM as a service.
+			<li>Open the <b>UEX Viewer</b> application.
+			<li>Stop the FAM service.
+			<li>Press <b>F5</b> to refresh the UEX Viewer.
+			<li>Confirm that the UEX file and viewer are both refreshed properly.
+		</ul>
 <p>
           	<li><b>[LegacyRCAndUtils #4642]</b> Encrypted Debug values
 		<ul>
