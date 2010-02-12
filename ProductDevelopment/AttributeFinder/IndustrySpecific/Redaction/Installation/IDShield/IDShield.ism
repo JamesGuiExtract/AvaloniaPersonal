@@ -245,6 +245,7 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
+		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\i386\ISLockPermissions.dll</td></row>
 		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 		<row><td>ISSetupFilesHelper</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\SFHelper.dll</td></row>
@@ -314,6 +315,8 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
+		<row><td>AllOtherFiles</td><td>{25F44821-B4A3-4899-8923-1DF407CD9581}</td><td>CommonAppDataFolder</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AllOtherFiles1</td><td>{F6336EB2-D7C6-4A82-8F2B-9A769692C1A0}</td><td>EXTRACT_SYSTEMS1</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ExemptionCodes</td><td>{E5331F67-A907-472C-BC93-B4B8CAAD38BB}</td><td>EXEMPTION_CODES_DIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Encryption.dll</td><td>{C40CB946-D860-425B-A9E1-66F19B0C15EC}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.encryption.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td>{DEC2B72C-0860-4D86-80E3-1D0DD6D14F94}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.verificati</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -383,6 +386,8 @@
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>COMMON_COMPONENTS</td><td>FlexIndexComponents</td></row>
+		<row><td>CommonAppDataFolder</td><td>AllOtherFiles</td></row>
+		<row><td>EXTRACT_SYSTEMS1</td><td>AllOtherFiles1</td></row>
 		<row><td>INSTALLDIR</td><td>ISRegistryComponent</td></row>
 		<row><td>INSTALLDIR</td><td>NewComponent1</td></row>
 		<row><td>INSTALLDIR</td><td>UtilitiesShortCuts</td></row>
@@ -395,6 +400,8 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
+		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
+		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
@@ -443,6 +450,7 @@
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXEMPTION_CODES_DIR</td><td>INSTALLDIR</td><td>EXEMPT~1|ExemptionCodes</td><td/><td>0</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
+		<row><td>EXTRACT_SYSTEMS1</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>FILE_PROCESSING_COMPONENTS</td><td>COMMON_COMPONENTS</td><td>FILEPR~1|FileProcessingComponents</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX</td><td>EXTRACT_SYSTEMS</td><td>FLEXIN~1|FlexIndex</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX_BIN</td><td>FLEX_INDEX</td><td>Bin</td><td/><td>0</td><td/></row>
@@ -1156,6 +1164,8 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>Documentation</td><td>AllOtherFiles</td></row>
+		<row><td>Documentation</td><td>AllOtherFiles1</td></row>
 		<row><td>Documentation</td><td>Help</td></row>
 		<row><td>IDShieldMain</td><td>ExemptionCodes</td></row>
 		<row><td>IDShieldMain</td><td>Extract.Encryption.dll</td></row>
@@ -1449,6 +1459,8 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
+		<row><td>AllOtherFiles</td><td/><td/><td>_4B5C452A_C152_488C_AEBC_AA2C8F474299_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>AllOtherFiles1</td><td/><td/><td>_F6B99F40_CB08_48C8_8206_995C08B31EA3_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ExemptionCodes</td><td/><td/><td>_DC4F41A0_2184_486F_85BC_827E04CF07BD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Encryption.dll</td><td/><td/><td>_151FC60A_1FF5_4B21_8F6B_616776C2930F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td/><td/><td>_9455B052_64C2_4C44_BABF_F480528B2F4B_FILTER</td><td/><td/><td/><td/></row>
@@ -1659,6 +1671,7 @@
 		<col key="yes" def="s255">User</col>
 		<col def="I4">Permission</col>
 		<col def="I4">Attributes</col>
+		<row><td>EXTRACT_SYSTEMS1</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Users</td><td>1610809791</td><td>0</td></row>
 	</table>
 
 	<table name="ISLogicalDisk">
@@ -3399,6 +3412,8 @@
 		<row><td>DuplicateFiles</td><td/><td>4210</td><td>DuplicateFiles</td><td/></row>
 		<row><td>FileCost</td><td/><td>900</td><td>FileCost</td><td/></row>
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
+		<row><td>ISLockPermissionsCost</td><td/><td>1401</td><td/><td/></row>
+		<row><td>ISLockPermissionsInstall</td><td/><td>5901</td><td/><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td/><td>2201</td><td/><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td/><td>5601</td><td/><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td/><td>6601</td><td/><td/></row>

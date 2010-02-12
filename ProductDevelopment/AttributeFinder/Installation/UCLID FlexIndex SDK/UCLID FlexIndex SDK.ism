@@ -245,6 +245,7 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
+		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\i386\ISLockPermissions.dll</td></row>
 		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 		<row><td>ISSetupFilesHelper</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\SFHelper.dll</td></row>
@@ -314,6 +315,8 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
+		<row><td>AllOtherFiles</td><td>{01638CE7-1357-47AA-B427-F3203174679C}</td><td>CommonAppDataFolder</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AllOtherFiles1</td><td>{12929570-DF81-4AF7-9460-6C95B71A7E47}</td><td>EXTRACT_SYSTEMS1</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{A9BD080B-7CB4-4954-8BBF-32EA6DADF977}</td><td>TARGET_HELP</td><td>0</td><td/><td>flexindex.chm</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Redist</td><td>{EE4C3899-3218-4C52-A42A-33FD36B7160F}</td><td>TARGET_REDIST</td><td>0</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SDKComponents</td><td>{520CC137-57D4-420C-AF6E-B3F95C8BD13B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -378,6 +381,8 @@
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>COMMON_COMPONENTS</td><td>SDKComponents</td></row>
+		<row><td>CommonAppDataFolder</td><td>AllOtherFiles</td></row>
+		<row><td>EXTRACT_SYSTEMS1</td><td>AllOtherFiles1</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -387,6 +392,8 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
+		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
+		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
@@ -437,6 +444,7 @@
 		<row><td>DATABASE_DIR</td><td>INSTALLDIR</td><td>Database</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
+		<row><td>EXTRACT_SYSTEMS1</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>FILE_PROCESSING_COMPONENTS</td><td>COMMON_COMPONENTS</td><td>FILEPR~1|FileProcessingComponents</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX_BIN</td><td>INSTALLDIR</td><td>Bin</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX_COMPONENTS_BIN</td><td>AF_COMPONENTS</td><td>Bin</td><td/><td>0</td><td/></row>
@@ -1151,6 +1159,8 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>Documentation</td><td>AllOtherFiles</td></row>
+		<row><td>Documentation</td><td>AllOtherFiles1</td></row>
 		<row><td>Documentation</td><td>Help</td></row>
 		<row><td>Documentation</td><td>Tutorial</td></row>
 		<row><td>Redist</td><td>Redist</td></row>
@@ -1419,6 +1429,8 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
+		<row><td>AllOtherFiles</td><td/><td/><td>_F47AEA08_8C7D_40B0_804D_66F575DDFC1A_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>AllOtherFiles1</td><td/><td/><td>_3D4296B5_DAFD_490C_B9E1_4128778DF3BA_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Help</td><td/><td/><td>_4E568C81_CDF3_4602_9111_7E1D69E11C19_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Redist</td><td/><td/><td>_87C1C298_20D3_413C_9D4F_5496D89762B6_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>SDKComponents</td><td/><td/><td>_194782D1_93CC_4676_B268_CA86FF42B50D_FILTER</td><td/><td/><td/><td/></row>
@@ -1616,6 +1628,7 @@
 		<col key="yes" def="s255">User</col>
 		<col def="I4">Permission</col>
 		<col def="I4">Attributes</col>
+		<row><td>EXTRACT_SYSTEMS1</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Users</td><td>1610809791</td><td>0</td></row>
 	</table>
 
 	<table name="ISLogicalDisk">
@@ -4555,6 +4568,8 @@
 		<row><td>FileCost</td><td/><td>900</td><td>FileCost</td><td/></row>
 		<row><td>FileManager.F12958CC_F693_4837_866A_16AE49AE39E2</td><td>Not Installed</td><td>5</td><td/><td>4</td></row>
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
+		<row><td>ISLockPermissionsCost</td><td/><td>1401</td><td/><td/></row>
+		<row><td>ISLockPermissionsInstall</td><td/><td>5901</td><td/><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td/><td>2151</td><td/><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td/><td>5601</td><td/><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td/><td>6601</td><td/><td/></row>
