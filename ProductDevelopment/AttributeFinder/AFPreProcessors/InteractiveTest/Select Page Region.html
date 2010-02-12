@@ -227,6 +227,22 @@
       			<li>Confirm that a <b>GetPages is not valid for a non-spatial string</b> 
 			exception is not seen.
 	       	</ul>
+<p>
+		<li><b>[FlexIDSCore #3944, #4011, #4013, #4061]</b> Select Page Region
+		<ul>
+			<li>Configure a <b>Select Page Region</b> object to find an image 
+			region around a rectangle.  This can be done via <b>Exclude</b>.
+			<li>Confirm that the expected region is excluded.
+<p>
+			<li>Confirm that <b>Select Page Region</b> can be configured to select 
+			<b>All pages</b> without a dummy restriction.
+			<li>Confirm that proper results are seen with no restriction and 
+			<b>Re-OCR</b> or <b>Image region</b>.
+			<li>Confirm that an older <b>Select Page Region</b> rule with specified pages 
+			and re-OCR or image region has its settings updated to reflect actual behavior.
+			<li>Confirm that the proper page numbers are provided with the found 
+			attributes when excluding specified pages.
+		</ul>
 	</ul>
 </ul>
 </body>
