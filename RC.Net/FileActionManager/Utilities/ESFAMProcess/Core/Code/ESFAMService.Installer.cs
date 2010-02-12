@@ -135,7 +135,7 @@ namespace Extract.FileActionManager.Utilities
             {
                 // Create the query for table creation
                 string query = "CREATE TABLE FPSFile (ID int IDENTITY(1,1) PRIMARY KEY, "
-                    + "AutoStart BIT NOT NULL, FileName NVARCHAR(512) NOT NULL)";
+                    + "AutoStart BIT DEFAULT 1 NOT NULL, FileName NVARCHAR(512) NOT NULL)";
 
                 // Create the command to perform the table creation
                 using (SqlCeCommand command = new SqlCeCommand(query, connection))

@@ -470,6 +470,14 @@ namespace Extract.SQLCDBEditor
             // Display wait cursor while saving the changes
             using (new TemporaryWaitCursor())
             {
+				// Check for an edit in progress on the current row in the datagrid
+				if (dataGridView.IsCurrentRowDirty)
+				{
+					// Change the current cell to get the changes to the current cell saved to 
+					// the datasource
+					dataGridView.CurrentCell = null;
+				}
+
                 // Begin a transaction so all or non of the changes are commited
                 SqlCeTransaction transaction = _connection.BeginTransaction();
                 try
@@ -507,7 +515,7 @@ namespace Extract.SQLCDBEditor
                     // Display message that save was successful.
                     MessageBox.Show("Database was saved successfully.", "Database save",
                         MessageBoxButtons.OK, MessageBoxIcon.Information,
-                        MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                        MessageBoxDefaultButton.Button1, 0);
                 }
                 catch (Exception ex)
                 {
