@@ -32,7 +32,9 @@ namespace SplitMultiPageImage
                     return;
                 }
 
-                string input = FileSystemMethods.GetAbsolutePath(args[0]);
+                // Get the path relative to the current working directory
+                // [LRCAU #5590]
+                string input = Path.GetFullPath(args[0]);
                 bool delete = false;
                 bool overwrite = false;
 
@@ -191,6 +193,15 @@ namespace SplitMultiPageImage
         {
             using (ImageReader reader = codecs.CreateReader(input))
             {
+                // Check if the image is a PDF file
+                if (ImageMethods.IsPdf(reader.Format))
+                {
+                    ExtractException ee = new ExtractException("ELI29689",
+                        "This utility will not work on a PDF file.");
+                    ee.AddDebugData("Input File", input, false);
+                    throw ee;
+                }
+
                 // Get the full path of the input file without the extension
                 string baseFileName = FileSystemMethods.GetFullPathWithoutExtension(input);
 

@@ -87,7 +87,7 @@ END
 IDD_IMAGECLEANUPSETTINGSEDITOR_DIALOG DIALOGEX 0, 0, 377, 362
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_ACCEPTFILES | WS_EX_APPWINDOW
-CAPTION "ImageCleanupSettingsEditor"
+CAPTION "Image Cleanup Settings Editor"
 MENU IDR_MENU1
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -150,12 +150,12 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "Extract Systems"
-            VALUE "FileDescription", "ImageCleanupSettingsEditor"
+            VALUE "FileDescription", "Image Cleanup Settings Editor"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "ImageCleanupSettingsEditor.exe"
             VALUE "LegalCopyright", "(c) 2010 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "ImageCleanupSettingsEditor.exe"
-            VALUE "ProductName", "ImageCleanupSettingsEditor"
+            VALUE "ProductName", "Image Cleanup Settings Editor"
             VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END
