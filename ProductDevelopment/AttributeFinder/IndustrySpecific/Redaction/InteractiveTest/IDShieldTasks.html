@@ -368,8 +368,10 @@
 <p>
 		<li><b>Adjust Height Functionality</b>
 		<ul>
-	  	   	<LI>Confirm that the new height of the redaction area is the height of the 
+	  	   	<LI>Confirm that the new top of the redaction area is the top of the 
 			tallest character in the enclosing paragraph.
+	  	   	<LI>Confirm that the new bottom of the redaction area is the bottom of the 
+			lowest character in the enclosing paragraph.
 			<ul>
 		  	   	<LI>The enclosing paragraph is the natural paragraph if at least 
 				<b>10 times</b> the size of the sensitive area.
@@ -392,6 +394,13 @@
 	  	   	<LI>Confirm that <b>VerificationSession</b> information is added to 
 			the specified VOA file.
 			<li>Confirm that the task always preserves the original redaction zones.
+			<li><b>[FlexIDSCore #4046]</b> Original redaction always preserved
+			<ul>
+				<li>Apply redaction of surrounding context to <b>TestImage006.tif</b> 
+				from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4045</b>.
+				<li>Confirm that the original redaction area is not reduced.  Note 
+				the other two images in the folder as examples.
+			</ul>
 		</ul>
 	</UL>
 <p>
@@ -1024,7 +1033,7 @@
 					verifier.
 					<li>Confirm that a confirmation dialog is presented if the 
 					toggle is done via <b>SPACE</b> or via checkbox.
-		      			<li>Confirm that a confirmation message is <b>not<b> presented 
+		      			<li>Confirm that a confirmation message is <b>not</b> presented 
 					to the verifier if the item is toggled back on.
 	      				<li>Modify <b>IDShield.ini</b> to contain 
 					<b>WarnIfRedact=1</b> for Clue items.
@@ -1034,7 +1043,7 @@
 					verifier.
 					<li>Confirm that a confirmation dialog is presented if the 
 					toggle is done via <b>SPACE</b> or via checkbox.
-		      			<li>Confirm that a confirmation message is <b>not<b> presented 
+		      			<li>Confirm that a confirmation message is <b>not</b> presented 
 					to the verifier if the item is toggled back off.
 <p>
 					<li>Confirm that deleting a toggled-off manual redaction does not 
