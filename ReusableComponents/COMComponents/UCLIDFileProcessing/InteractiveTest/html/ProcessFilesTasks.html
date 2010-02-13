@@ -1152,6 +1152,14 @@
 		file does not exist.
 		<li>Confirm that annotations are correctly <b>removed from</b> the PDF file.
 		<li>Confirm that annotations are correctly <b>retained in</b> the PDF file.
+<p>
+		<li><b>[DotNet #398]</b> Single threading
+		<ul>
+			<li>Confirm that even with multiple threads processing in a single FAM, 
+			only one PDF file is being modified at a time.
+			<li>Confirm that with multiple FAMs exercising the <b>Core: Modify pdf 
+			file</b> task, only one PDF file is being modified at a time.
+		</ul>
    	</ul> 
 <p>
 	<li><b>Core: OCR document</b></li>
