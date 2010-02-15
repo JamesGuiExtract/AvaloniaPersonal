@@ -237,7 +237,7 @@ namespace Extract.Redaction.Verification
                 _redactionGridView.ConfidenceLevels = _currentVoa.ConfidenceLevels;
 
                 // Set the selection pen
-                LayerObject.SelectionPen = ExtractPens.GetThickGdiPen(Color.Red);
+                LayerObject.SelectionPen = ExtractPens.GetThickPen(Color.Red);
 
                 // Subscribe to layer object events
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
@@ -824,8 +824,8 @@ namespace Extract.Redaction.Verification
             if (warn)
             {
                 _userClosing = false;
-                string message = "If you are intending to stop processing, "
-                                 + "press the stop button in the File Action Manager.";
+                const string message = "If you are intending to stop processing, "
+                                       + "press the stop button in the File Action Manager.";
                 MessageBox.Show(this, message, "Stop processing", MessageBoxButtons.OK, 
                     MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
             }
