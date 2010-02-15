@@ -74,33 +74,6 @@ namespace Extract.Imaging.Forms
             // Needed for serialization
         }
 
-        /// <overloads>
-        /// Initializes a new instance of the <see cref="Redaction"/> class.
-        /// </overloads>
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Redaction"/> class.
-        /// </summary>
-        /// <param name="imageViewer">The image viewer on which the <see cref="Redaction"/> 
-        /// appears.</param>
-        /// <param name="pageNumber">The one-based page number where this redaction object
-        /// is found.</param>
-        /// <param name="comment">The method by which the <see cref="Redaction"/> was created.
-        /// </param>
-        /// <param name="rasterZones">The collection of raster zones that the 
-        /// <see cref="Redaction"/> covers. All <see cref="RasterZone"/> in the collection
-        /// must be on the same page as <paramref name="pageNumber"/>.
-        /// <para><b>Note:</b></para>
-        /// If this is <see langword="null"/> then will create a redaction with an empty
-        /// zone collection.</param>
-        /// <exception cref="ExtractException">If any <see cref="RasterZone.PageNumber"/>
-        /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public Redaction(ImageViewer imageViewer, int pageNumber, string comment,
-            IEnumerable<RasterZone> rasterZones) 
-            : this(imageViewer, pageNumber, comment, rasterZones,
-            imageViewer.DefaultRedactionFillColor)
-        {
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Redaction"/> class.
         /// </summary>
@@ -318,7 +291,7 @@ namespace Extract.Imaging.Forms
                     foreach (Highlight highlight in Objects)
                     {
                         // Draw a black border around the highlight
-                        Point[] vertices = highlight.GetVertices();
+                        PointF[] vertices = highlight.GetVertices();
                         transform.TransformPoints(vertices);
                         graphics.DrawPolygon(Pens.Black, vertices);
                     }
@@ -356,7 +329,7 @@ namespace Extract.Imaging.Forms
                         // Draw a black border around the highlight if the fill color is white
                         if (_fillColor == RedactionColor.White)
                         {
-                            Point[] vertices = highlight.GetVertices();
+                            PointF[] vertices = highlight.GetVertices();
                             transform.TransformPoints(vertices);
                             graphics.DrawPolygon(Pens.Black, vertices);
                         }
@@ -395,7 +368,7 @@ namespace Extract.Imaging.Forms
                     {
                         // "Erase" the black outline by drawing it white so a black dashed line can be
                         // seen on top of it.
-                        Point[] vertices = highlight.GetVertices();
+                        PointF[] vertices = highlight.GetVertices();
                         ImageViewer.Transform.TransformPoints(vertices);
                         graphics.DrawPolygon(Pens.White, vertices);
                     }

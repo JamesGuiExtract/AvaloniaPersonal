@@ -34,7 +34,7 @@ namespace Extract.Drawing
         /// <remarks>The angle is measured counterclockwise from the horizontal line that contains 
         /// <paramref name="start"/> and the line containing both 
         /// <paramref name="start"/> &amp; <paramref name="end"/>.</remarks>
-        public static double GetAngle(Point start, Point end)
+        public static double GetAngle(PointF start, PointF end)
         {
             try
             {
@@ -134,7 +134,7 @@ namespace Extract.Drawing
         /// <param name="start">The starting <see cref="Point"/> of a line segment.</param>
         /// <param name="end">The ending <see cref="Point"/> of a line segment.</param>
         /// <returns>The center point of a line in logical (image) coordinates.</returns>
-        public static Point GetCenterPoint(Point start, Point end)
+        public static PointF GetCenterPoint(PointF start, PointF end)
         {
             try
             {
@@ -142,9 +142,7 @@ namespace Extract.Drawing
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23164",
 					_OBJECT_NAME);
 
-                return new Point(
-                    (int)((start.X + end.X) / 2.0 + 0.5),
-                    (int)((start.Y + end.Y) / 2.0 + 0.5));
+                return new PointF((start.X + end.X) / 2F, (start.Y + end.Y) / 2F);
             }
             catch (Exception ex)
             {
@@ -152,7 +150,6 @@ namespace Extract.Drawing
             }
         }
 
-        /// <overloads>Retrieves the vertices of a highlight.</overloads>
         /// <summary>
         /// Retrieves the vertices of a rectangle with the specified spatial data.
         /// </summary>
@@ -164,50 +161,7 @@ namespace Extract.Drawing
         /// perpendicular to the line formed by <paramref name="start"/> and 
         /// <paramref name="end"/>.</param>
         /// <returns>An array of the four corners of the rectangle.</returns>
-        public static Point[] GetVertices(Point start, Point end, int height)
-        {
-            try
-            {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23165",
-					_OBJECT_NAME);
-
-                // Calculate the slope of the line
-                double slope = GetAngle(start, end);
-
-                // Calculate the vertical and horizontal modifiers. These are the values to add and 
-                // subtract from the line endpoints to determine the bounds of the rectangle.
-                double xModifier = height / 2.0 * Math.Sin(slope);
-                double yModifier = height / 2.0 * Math.Cos(slope);
-
-                // Calculate the vertices
-                Point[] vertices = new Point[] {
-                    new Point((int)(start.X + xModifier + 0.5), (int)(start.Y - yModifier + 0.5)),
-                    new Point((int)(start.X - xModifier + 0.5), (int)(start.Y + yModifier + 0.5)),
-                    new Point((int)(end.X - xModifier + 0.5), (int)(end.Y + yModifier + 0.5)),
-                    new Point((int)(end.X + xModifier + 0.5), (int)(end.Y - yModifier + 0.5))
-                };
-
-                return vertices;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI22207", ex);
-            }
-        }
-
-        /// <summary>
-        /// Retrieves the vertices of a rectangle with the specified spatial data.
-        /// </summary>
-        /// <param name="start">The midpoint of one side of the rectangle in logical (image) 
-        /// coordinates.</param>
-        /// <param name="end">The midpoint of the opposing side of the rectangle in logical 
-        /// (image) coordinates.</param>
-        /// <param name="height">The distance between two sides of the rectangle measured 
-        /// perpendicular to the line formed by <paramref name="start"/> and 
-        /// <paramref name="end"/>.</param>
-        /// <returns>An array of the four corners of the rectangle.</returns>
-        public static PointF[] GetVertices(PointF start, PointF end, int height)
+        public static PointF[] GetVertices(PointF start, PointF end, float height)
         {
             try
             {
@@ -216,8 +170,7 @@ namespace Extract.Drawing
 					_OBJECT_NAME);
 
                 // Calculate the slope of the line
-                double slope = GetAngle(Point.Truncate(start),
-                    Point.Truncate(end));
+                double slope = GetAngle(start, end);
 
                 // Calculate the vertical and horizontal modifiers. These are the values to add and 
                 // subtract from the line endpoints to determine the bounds of the rectangle.
@@ -382,7 +335,7 @@ namespace Extract.Drawing
         /// <param name="pointA">The first <see cref="Point"/>.</param>
         /// <param name="pointB">The second <see cref="Point"/>.</param>
         /// <returns>The distance between the two points.</returns>
-        public static double Distance(Point pointA, Point pointB)
+        public static double Distance(PointF pointA, PointF pointB)
         {
             try
             {
@@ -395,9 +348,7 @@ namespace Extract.Drawing
                 double dY = pointA.Y - pointB.Y;
 
                 // Compute the distance
-                double distance = Math.Sqrt(Math.Pow(dX, 2) + Math.Pow(dY, 2));
-
-                return distance;
+                return Math.Sqrt(dX * dX + dY * dY);
             }
             catch (Exception ex)
             {
@@ -434,66 +385,6 @@ namespace Extract.Drawing
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI22210", ex);
-            }
-        }
-
-        /// <summary>
-        /// Rotates the specified line segment by the specified number of degrees.
-        /// </summary>
-        /// <param name="start">The start point of reference for the angle.</param>
-        /// <param name="end">The end point of reference for the angle.</param>
-        /// <param name="angleInDegrees">The angle (in degrees) to rotate the
-        /// line segment by.</param>
-        /// <returns>An array of <see cref="Point"/> objects containing the
-        /// rotated start and end points.</returns>
-        // FxCop does not like passing parameters by reference.  The alternative is to return
-        // an order dependent array, or to create a new structure that has a start and end point
-        // that can be returned.  It seems less confusing to pass the parameters as a reference
-        // and to just update their value.
-        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "0#")]
-        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "1#")]
-        public static void RotateLineSegmentByAngle(ref Point start, ref Point end,
-            double angleInDegrees)
-        {
-            try
-            {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23169",
-					_OBJECT_NAME);
-
-                // Check for coordinates validity
-                if (start == end)
-                {
-                    throw new ExtractException("ELI22193", "Invalid line coordinates!");
-                }
-
-                // Calculate the slope in radians
-                double slope = (angleInDegrees * Math.PI) / 180.0;
-                double sinSlope = Math.Sin(slope);
-                double cosSlope = Math.Cos(slope);
-
-                // Calculate mid point of the line joining start and end points
-                Point midpoint = GetCenterPoint(start, end);
-
-                // Rotate the zone coordinates using Rotation and Translation matrix
-                Point newStart = new Point(
-                    (int)((start.X * cosSlope) - (start.Y * sinSlope) - (midpoint.X * cosSlope)
-                    + (midpoint.Y * sinSlope) + midpoint.X),
-                    (int)((start.Y * cosSlope) + (start.X * sinSlope) - (midpoint.X * sinSlope)
-                    - (midpoint.Y * cosSlope) + midpoint.Y));
-                Point newEnd = new Point(
-                    (int)((end.X * cosSlope) - (end.Y * sinSlope) - (midpoint.X * cosSlope)
-                    + (midpoint.Y * sinSlope) + midpoint.X),
-                    (int)((end.Y * cosSlope) + (end.X * sinSlope) - (midpoint.X * sinSlope)
-                    - (midpoint.Y * cosSlope) + midpoint.Y));
-
-                // Set the rotated start and end points
-                start = newStart;
-                end = newEnd;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI22211", ex);
             }
         }
 

@@ -14,13 +14,17 @@ namespace Extract.Imaging.Forms
     /// </summary>
     public class TextLayerObject : AnchoredObject
     {
+        #region Constants
+
         /// <summary>
         /// If a border color is specified, the number of pixels outside the text bounds the 
         /// border should be drawn.
         /// </summary>
         const int _BORDER_PADDING = 4;
 
-        #region TextLayerObject Fields
+        #endregion Constants
+
+        #region Fields
 
         /// <summary>
         /// The text displayed by the <see cref="TextLayerObject"/>.
@@ -58,9 +62,9 @@ namespace Extract.Imaging.Forms
         /// </summary>
         Color? _borderColor;
 
-        #endregion TextLayerObject Fields
+        #endregion Fields
 
-        #region TextLayerObject Constructors
+        #region Constructors
 
         /// <overloads>Initializes a new instance of the <see cref="TextLayerObject"/> class.</overloads>
         /// <summary>
@@ -69,31 +73,6 @@ namespace Extract.Imaging.Forms
         protected TextLayerObject()
         {
             // Needed for serialization
-        }
-
-        /// <overloads>
-        /// Initializes a new instance of the <see cref="TextLayerObject"/> class.
-        /// </overloads>
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TextLayerObject"/> class.
-        /// </summary>
-        /// <param name="imageViewer">The <see cref="ImageViewer"/> on which the 
-        /// <see cref="TextLayerObject"/> appears.</param>
-        /// <param name="pageNumber">The page on which the <see cref="TextLayerObject"/> appears.
-        /// </param>
-        /// <param name="comment">The method by which the <see cref="TextLayerObject"/> was 
-        /// created.</param>
-        /// <param name="text">The text that appears on the <see cref="TextLayerObject"/>.</param>
-        /// <param name="font">The font to use to display the <paramref name="text"/>.</param>
-        /// <param name="anchorPoint">The anchor point of the <see cref="TextLayerObject"/> in 
-        /// logical (image) coordinates.</param>
-        /// <param name="anchorAlignment">The alignment of <paramref name="anchorPoint"/> relative 
-        /// to the <see cref="TextLayerObject"/>.</param>
-        public TextLayerObject(ImageViewer imageViewer, int pageNumber, string comment,
-            string text, Font font, Point anchorPoint, AnchorAlignment anchorAlignment)
-            : this(imageViewer, pageNumber, comment, text, font, anchorPoint, anchorAlignment, null,
-                null)
-        {
         }
 
         /// <summary>
@@ -173,9 +152,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion TextLayerObject Constructors
+        #endregion Constructors
 
-        #region TextLayerObject Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets the text on the <see cref="TextLayerObject"/>.
@@ -390,9 +369,9 @@ namespace Extract.Imaging.Forms
             }
         }
         
-        #endregion TextLayerObject Properties
+        #endregion Properties
 
-        #region TextLayerObject Methods
+        #region Methods
 
         /// <summary>
         /// Sets the <see cref="_font"/> and <see cref="_pixelFont"/> using the specified font.
@@ -540,9 +519,17 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                PointF[] vertices = DrawingMethods.GetVertices(_bounds, _orientation);
+
+                // Round the vertices to the nearest pixel
+                Point[] rounded = new Point[vertices.Length];
+                for (int i = 0; i < vertices.Length; i++)
+                {
+                    rounded[i] = Point.Round(vertices[i]);
+                }
+
                 // Return the bounds of the text layer object
-                return GeometryMethods.GetBoundingRectangle(
-                    DrawingMethods.GetVertices(_bounds, _orientation));
+                return GeometryMethods.GetBoundingRectangle(rounded);
             }
             catch (Exception ex)
             {
@@ -556,7 +543,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <returns>The vertices of the <see cref="TextLayerObject"/> in logical (image) 
         /// coordinates.</returns>
-        public override Point[] GetVertices()
+        public override PointF[] GetVertices()
         {
             try
             {
@@ -572,7 +559,7 @@ namespace Extract.Imaging.Forms
         /// Retrieves the vertices of the selection border in logical (image) coordinates.
         /// </summary>
         /// <returns>The vertices of the selection border in logical (image) coordinates.</returns>
-        public override Point[] GetGripVertices()
+        public override PointF[] GetGripVertices()
         {
             return GetVertices();
         }
@@ -592,7 +579,7 @@ namespace Extract.Imaging.Forms
             return base.IsVisible(rectangle) && GetBounds().IntersectsWith(rectangle);
         }
 
-        #endregion TextLayerObject Methods
+        #endregion Methods
 
         #region IDisposable Members
 

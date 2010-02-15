@@ -1,11 +1,11 @@
-using Extract;
 using Extract.Drawing;
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Text;
+
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 
 namespace Extract.Imaging
 {
@@ -19,8 +19,7 @@ namespace Extract.Imaging
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(RasterZone).ToString();
+        static readonly string _OBJECT_NAME = typeof(RasterZone).ToString();
 
         #endregion Constants
 
@@ -29,22 +28,22 @@ namespace Extract.Imaging
         /// <summary>
         /// The starting point of the <see cref="RasterZone"/>.
         /// </summary>
-        private Point _start;
+        Point _start;
 
         /// <summary>
         /// The end point of the <see cref="RasterZone"/>.
         /// </summary>
-        private Point _end;
+        Point _end;
 
         /// <summary>
         /// The height of the <see cref="RasterZone"/>.
         /// </summary>
-        private int _height;
+        int _height;
 
         /// <summary>
         /// The page number of the <see cref="RasterZone"/>.
         /// </summary>
-        private int _pageNumber;
+        int _pageNumber;
 
         #endregion Fields
 
@@ -93,15 +92,15 @@ namespace Extract.Imaging
 
         /// <summary>
         /// Initializes a new <see cref="RasterZone"/> class from the specified
-        /// UCLID_RASTERANDOCRMGMTLib.RasterZone object.
+        /// RasterZone object.
         /// </summary>
-        /// <param name="comRasterZone">A UCLID_RASTERANDOCRMGMTLib.RasterZone object.</param>
+        /// <param name="comRasterZone">A RasterZone object.</param>
         [CLSCompliant(false)]
-        public RasterZone(UCLID_RASTERANDOCRMGMTLib.RasterZone comRasterZone) 
+        public RasterZone(ComRasterZone comRasterZone) 
         {
             try
             {
-                ExtractException.Assert("ELI22052", "comRasterZone cannot be null!",
+                ExtractException.Assert("ELI22052", "comRasterZone cannot be null.",
                     comRasterZone != null);
 
                 // Validate the license
@@ -146,7 +145,7 @@ namespace Extract.Imaging
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI22055", "Failed to initialize RasterZone!", ex);
+                throw new ExtractException("ELI22055", "Failed to initialize RasterZone.", ex);
             }
         }
 
@@ -184,7 +183,7 @@ namespace Extract.Imaging
         {
             try
             {
-                ExtractException.Assert("ELI22189", "Raster zone cannot be null!",
+                ExtractException.Assert("ELI22189", "Raster zone cannot be null.",
                     otherRasterZone != null);
 
                 // Default overlap to 0.0
@@ -217,11 +216,11 @@ namespace Extract.Imaging
         /// <exception cref="ExtractException">If <paramref name="comRasterZone"/>
         /// is <see langword="null"/>.</exception>
         [CLSCompliant(false)]
-        public double GetAreaOverlappingWith(UCLID_RASTERANDOCRMGMTLib.RasterZone comRasterZone)
+        public double GetAreaOverlappingWith(ComRasterZone comRasterZone)
         {
             try
             {
-                ExtractException.Assert("ELI22289", "Raster zone cannot be null!",
+                ExtractException.Assert("ELI22289", "Raster zone cannot be null.",
                     comRasterZone != null);
 
                 // Default overlap to 0.0
@@ -236,7 +235,7 @@ namespace Extract.Imaging
                     // the area of overlap
 
                     // Get the area of overlap
-                    overlap = this.ToComRasterZone().GetAreaOverlappingWith(comRasterZone);
+                    overlap = ToComRasterZone().GetAreaOverlappingWith(comRasterZone);
                 }
 
                 return overlap;
@@ -253,37 +252,19 @@ namespace Extract.Imaging
         /// </summary>
         /// <returns>The smallest <see cref="Rectangle"/> that contains
         /// this <see cref="RasterZone"/>.</returns>
+        // This method performs a calculation so is better suited as a method
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public Rectangle GetRectangularBounds()
         {
             try
             {
-                // Compute the bounding rectangle
-                Rectangle rectangle = GeometryMethods.GetBoundingRectangle(_start, _end, _height);
-
                 // Return the bounding rectangle
-                return rectangle;
+                return GeometryMethods.GetBoundingRectangle(_start, _end, _height);;
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI22191", ex);
             }
-        }
-
-        /// <summary>
-        /// Computes the smallest <see cref="Rectangle"/> that contains
-        /// this <see cref="RasterZone"/> constrained by <paramref name="pageBoundary"/>.
-        /// </summary>
-        /// <param name="pageBoundary">The bounding <see cref="Rectangle"/> that the computed
-        /// <see cref="Rectangle"/> will be constrained by.</param>
-        /// <returns>The smallest <see cref="Rectangle"/> that contains
-        /// this <see cref="RasterZone"/>.</returns>
-        public Rectangle GetRectangularBounds(Rectangle pageBoundary)
-        {
-            Rectangle rectangle = this.GetRectangularBounds();
-
-            rectangle.Intersect(pageBoundary);
-
-            return rectangle;
         }
 
         /// <summary>
@@ -296,7 +277,7 @@ namespace Extract.Imaging
         {
             try
             {
-                return GeometryMethods.GetVertices((PointF)_start, (PointF)_end, _height);
+                return GeometryMethods.GetVertices(_start, _end, _height);
             }
             catch (Exception ex)
             {
@@ -305,73 +286,26 @@ namespace Extract.Imaging
         }
 
         /// <summary>
-        /// Retrieves the center point of the <see cref="RasterZone"/> in
-        /// logical (image) coordinates.
+        /// Creates a RasterZone from this <see cref="RasterZone"/>.
         /// </summary>
-        /// <returns>The center point of the <see cref="RasterZone"/>
-        /// in logical (image) coordinates.</returns>
-        // This is not a property because it needs to be calculated.
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public Point GetCenterPoint()
-        {
-            try
-            {
-                return GeometryMethods.GetCenterPoint(_start, _end);
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI22221", ex);
-            }
-        }
-
-        /// <summary>
-        /// Rotates the <see cref="RasterZone"/> by the specified number of degrees.
-        /// </summary>
-        /// <param name="angleInDegrees">The angle (in degrees) to rotate the
-        /// <see cref="RasterZone"/> by.</param>
-        /// <exception cref="ExtractException">If the <see cref="RasterZone"/>
-        /// has invalid zone coordinates: start <see cref="Point"/> equals 
-        /// end <see cref="Point"/>.</exception>
-        public void RotateBy(double angleInDegrees)
-        {
-            try
-            {
-                GeometryMethods.RotateLineSegmentByAngle(ref _start, ref _end, angleInDegrees);
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI22194", ex);
-            }
-        }
-
-        /// <summary>
-        /// Creates a UCLID_RASTERANDOCRMGMTLib.RasterZone from this <see cref="RasterZone"/>.
-        /// </summary>
-        /// <returns>A UCLID_RASTERANDOCRMGMTLib.RasterZone created from this
+        /// <returns>A RasterZone created from this
         /// <see cref="RasterZone"/>.</returns>
         [CLSCompliant(false)]
-        public UCLID_RASTERANDOCRMGMTLib.RasterZone ToComRasterZone()
+        public ComRasterZone ToComRasterZone()
         {
             try
             {
                 // Create a new COM RasterZone
-                UCLID_RASTERANDOCRMGMTLib.RasterZone comRasterZone =
-                    new UCLID_RASTERANDOCRMGMTLib.RasterZone();
+                ComRasterZone comRasterZone = new ComRasterZone();
 
                 // Copy the .Net RasterZone data to the COM RasterZone
-                comRasterZone.StartX = _start.X;
-                comRasterZone.StartY = _start.Y;
-                comRasterZone.EndX = _end.X;
-                comRasterZone.EndY = _end.Y;
-                comRasterZone.Height = _height;
-                comRasterZone.PageNumber = _pageNumber;
+                comRasterZone.CreateFromData(_start.X, _start.Y, _end.X, _end.Y, _height, _pageNumber);
 
                 return comRasterZone;
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI22053",
-                    "Unable to convert RasterZone to COMRasterZone!", ex);
+                throw ExtractException.AsExtractException("ELI22053", ex);
             }
         }
 
@@ -404,7 +338,7 @@ namespace Extract.Imaging
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23154",
 					_OBJECT_NAME);
 
-                ExtractException.Assert("ELI22531", "Raster zone collection must not be null!",
+                ExtractException.Assert("ELI22531", "Raster zone collection must not be null.",
                     rasterZones != null);
 
                 // Create a the return dictionary object then iterate through each
@@ -492,7 +426,7 @@ namespace Extract.Imaging
                 else
                 {
                     // Compute the slope of the line
-                    double slope = ((double)(_start.Y - _end.Y)) / ((double)deltaX);
+                    double slope = (_start.Y - _end.Y) / ((double)deltaX);
 
                     // Check which X point is greater and expand
                     if (_start.X > _end.X)
@@ -501,7 +435,7 @@ namespace Extract.Imaging
                         _start.X += halfLength;
                         _start.X += length % 2;
                         _start.Y = (int)
-                            (((slope * (_start.X - _end.X)) + (double)_end.Y) + 0.5);
+                            (((slope * (_start.X - _end.X)) + _end.Y) + 0.5);
 
                         // Compute the new end value
                         _end.X -= halfLength;
@@ -510,7 +444,7 @@ namespace Extract.Imaging
                             _end.X = 0;
                         }
                         _end.Y = (int)
-                            (((-1.0 * slope * (_start.X - _end.X)) + (double)_start.Y) + 0.5);
+                            (((-1.0 * slope * (_start.X - _end.X)) + _start.Y) + 0.5);
                     }
                     else
                     {
@@ -518,7 +452,7 @@ namespace Extract.Imaging
                         _end.X += halfLength;
                         _end.X += length % 2;
                         _end.Y = (int)
-                            (((-1.0 * slope * (_start.X - _end.X)) + (double)_start.Y) + 0.5);
+                            (((-1.0 * slope * (_start.X - _end.X)) + _start.Y) + 0.5);
 
                         // Compute the new end value
                         _start.X -= halfLength;
@@ -527,7 +461,7 @@ namespace Extract.Imaging
                             _start.X = 0;
                         }
                         _start.Y = (int)
-                            (((slope * (_start.X - _end.X)) + (double)_end.Y) + 0.5);
+                            (((slope * (_start.X - _end.X)) + _end.Y) + 0.5);
                     }
                 }
             }
@@ -659,13 +593,13 @@ namespace Extract.Imaging
             try
             {
                 // Check the page number first
-                int returnVal = this.PageNumber.CompareTo(other.PageNumber);
+                int returnVal = PageNumber.CompareTo(other.PageNumber);
 
                 // 0 indicates same page, keep comparing
                 if (returnVal == 0)
                 {
                     // Get the bounds of both raster zones
-                    Rectangle myBounds = this.GetRectangularBounds();
+                    Rectangle myBounds = GetRectangularBounds();
                     Rectangle yourBounds = other.GetRectangularBounds();
 
                     // If the raster zones horizontally overlap the leftmost one comes first,
@@ -761,7 +695,7 @@ namespace Extract.Imaging
         /// <see langword="false"/> otherwise.</returns>
         public static bool operator ==(RasterZone zone1, RasterZone zone2)
         {
-            if (object.ReferenceEquals(zone1, zone2))
+            if (ReferenceEquals(zone1, zone2))
             {
                 return true;
             }

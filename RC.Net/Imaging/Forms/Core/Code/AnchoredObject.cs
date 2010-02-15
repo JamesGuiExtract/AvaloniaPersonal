@@ -1,12 +1,9 @@
 using Extract.Drawing;
-using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -17,7 +14,7 @@ namespace Extract.Imaging.Forms
     /// </summary>
     public abstract class AnchoredObject : LayerObject
     {
-        #region AnchoredObject Fields
+        #region Fields
 
         /// <summary>
         /// The anchor point of the <see cref="AnchoredObject"/> in logical (image) coordinates.
@@ -39,14 +36,14 @@ namespace Extract.Imaging.Forms
         /// </summary>
         AnchorAlignment _originalAnchorAlignment;
 
-        #endregion AnchoredObject Fields
+        #endregion Fields
 
-        #region AnchoredObject Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AnchoredObject"/> class.
         /// </summary>
-        protected AnchoredObject() : base()
+        protected AnchoredObject()
         {
             // Needed for serialization
         }
@@ -72,9 +69,9 @@ namespace Extract.Imaging.Forms
             _anchorAlignment = anchorAlignment;
         }
 
-        #endregion AnchoredObject Constructors
+        #endregion Constructors
 
-        #region AnchoredObject Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets the anchor point of the <see cref="AnchoredObject"/> in logical (image) 
@@ -98,7 +95,7 @@ namespace Extract.Imaging.Forms
             {
                 _anchorPoint = value;
 
-                this.Dirty = true;
+                Dirty = true;
             }
         }
 
@@ -124,21 +121,21 @@ namespace Extract.Imaging.Forms
             {
                 _anchorAlignment = value;
 
-                this.Dirty = true;
+                Dirty = true;
             }
         }
 
-        #endregion AnchoredObject Properties
+        #endregion Properties
 
-        #region AnchoredObject Methods
+        #region Methods
 
         /// <summary>
         /// Retrieves the center points of grip handles in logical (image) coordinates.
         /// </summary>
         /// <returns>The center points of grip handles in logical (image) coordinates.</returns>
-        public override Point[] GetGripPoints()
+        public override PointF[] GetGripPoints()
         {
-            return new Point[0];
+            return new PointF[0];
         }
 
         /// <summary>
@@ -166,7 +163,7 @@ namespace Extract.Imaging.Forms
 
                 if (raiseEvents)
                 {
-                    base.Dirty = true;
+                    Dirty = true;
                 }
             }
             catch (Exception ex)
@@ -244,9 +241,9 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <returns>The vertices of the <see cref="AnchoredObject"/> in logical (image) 
         /// coordinates.</returns>
-        public abstract override Point[] GetVertices();
+        public abstract override PointF[] GetVertices();
 
-        #endregion AnchoredObject Methods
+        #endregion Methods
 
         #region IXmlSerializable Members
 

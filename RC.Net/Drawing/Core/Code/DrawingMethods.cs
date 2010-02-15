@@ -388,7 +388,7 @@ namespace Extract.Drawing
         /// coordinates will be rotated based upon the orientation value.</param>
         /// <returns>The vertices of the <see cref="Rectangle"/>in the specified coordinate
         /// system.</returns>
-        public static Point[] GetVertices(Rectangle bounds, float? orientation)
+        public static PointF[] GetVertices(Rectangle bounds, float? orientation)
         {
             try
             {
@@ -397,12 +397,12 @@ namespace Extract.Drawing
                     _OBJECT_NAME);
 
                 // Construct the vertices using the bounds of the text layer object
-                Point[] vertices =
+                PointF[] vertices =
                 {
-                    new Point(bounds.Left, bounds.Top),
-                    new Point(bounds.Right, bounds.Top),
-                    new Point(bounds.Right, bounds.Bottom),
-                    new Point(bounds.Left, bounds.Bottom)
+                    new PointF(bounds.Left, bounds.Top),
+                    new PointF(bounds.Right, bounds.Top),
+                    new PointF(bounds.Right, bounds.Bottom),
+                    new PointF(bounds.Left, bounds.Bottom)
                 };
 
                 // Rotate the coordinates into the image coordinate system if specified.

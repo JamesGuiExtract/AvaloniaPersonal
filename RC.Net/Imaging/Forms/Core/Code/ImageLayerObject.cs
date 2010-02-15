@@ -425,8 +425,17 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                PointF[] vertices = GetVertices(true);
+
+                // Round the vertices to the nearest pixel
+                Point[] rounded = new Point[vertices.Length];
+                for (int i = 0; i < vertices.Length; i++)
+                {
+                    rounded[i] = Point.Round(vertices[i]);
+                }
+
                 // Return the bounds of the image layer object
-                return GeometryMethods.GetBoundingRectangle(GetVertices(true));
+                return GeometryMethods.GetBoundingRectangle(rounded);
             }
             catch (Exception ex)
             {
@@ -440,7 +449,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <returns>The vertices of the <see cref="ImageLayerObject"/> in logical (image) 
         /// coordinates.</returns>
-        public override Point[] GetVertices()
+        public override PointF[] GetVertices()
         {
             try
             {
@@ -456,7 +465,7 @@ namespace Extract.Imaging.Forms
         /// Retrieves the vertices of the selection border in logical (image) coordinates.
         /// </summary>
         /// <returns>The vertices of the selection border in logical (image) coordinates.</returns>
-        public override Point[] GetGripVertices()
+        public override PointF[] GetGripVertices()
         {
             return GetVertices(true);
         }
@@ -603,15 +612,15 @@ namespace Extract.Imaging.Forms
         /// coordinate system.</param>
         /// <returns>The vertices of the <see cref="ImageLayerObject"/>in the specified coordinate
         /// system.</returns>
-        Point[] GetVertices(bool useImageCoordinates)
+        PointF[] GetVertices(bool useImageCoordinates)
         {
             // Construct the vertices using the bounds of the image layer object
-            Point[] vertices =
+            PointF[] vertices =
             {
-                new Point(_bounds.Left, _bounds.Top),
-                new Point(_bounds.Right, _bounds.Top),
-                new Point(_bounds.Right, _bounds.Bottom),
-                new Point(_bounds.Left, _bounds.Bottom)
+                new PointF(_bounds.Left, _bounds.Top),
+                new PointF(_bounds.Right, _bounds.Top),
+                new PointF(_bounds.Right, _bounds.Bottom),
+                new PointF(_bounds.Left, _bounds.Bottom)
             };
 
             // Rotate the coordinates into the image coordinate system if specified.

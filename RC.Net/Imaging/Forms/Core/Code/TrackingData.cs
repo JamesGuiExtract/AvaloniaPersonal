@@ -1,10 +1,8 @@
 using Extract.Drawing;
 using Extract.Licensing;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.Imaging.Forms
@@ -12,24 +10,23 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Represents data associated with tracking interactive cursor tool events.
     /// </summary>
-    internal class TrackingData : IDisposable
+    internal sealed class TrackingData : IDisposable
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(TrackingData).ToString();
+        static readonly string _OBJECT_NAME = typeof(TrackingData).ToString();
 
         #endregion Constants
 
-        #region TrackingData Fields
+        #region Fields
 
         /// <summary>
         /// The control on which the tracking event takes place.
         /// </summary>
-        Control _control;
+        readonly Control _control;
 
         /// <summary>
         /// The point where the cursor was when the mouse button was first pressed during a 
@@ -57,23 +54,23 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <seealso cref="Rectangle"/>
         /// <seealso cref="UpdateRectangularRegion"/>
-        Rectangle _rectangle = new Rectangle();
+        Rectangle _rectangle;
 
         /// <summary>
         /// An array of two points in screen coordinates describing a line segment.
         /// </summary>
         /// <seealso cref="Line"/>
         /// <seealso cref="UpdateLine"/>
-        Point[] _line;
+        readonly Point[] _line;
 
         /// <summary>
         /// The area within which all tracking data should be contained.
         /// </summary>
-        Rectangle _cropWithin;
+        readonly Rectangle _cropWithin;
 
-        #endregion TrackingData Fields
+        #endregion Fields
 
-        #region TrackingData Constructors
+        #region Constructors
 
         /// <overloads>Initializes a new instance of the <see cref="TrackingData"/> class.
         /// </overloads>
@@ -88,7 +85,7 @@ namespace Extract.Imaging.Forms
         /// interactive event being tracked.</param>
         /// <param name="cropWithin">The rectangle within which all regions must be cropped.
         /// </param>
-        public TrackingData(Control control, int startX, int startY, Rectangle cropWithin)
+        public TrackingData(Control control, float startX, float startY, Rectangle cropWithin)
             : this(control, startX, startY, cropWithin, 0)
         {
 
@@ -107,7 +104,7 @@ namespace Extract.Imaging.Forms
         /// </param>
         /// <param name="height">The height in physical (client) pixel for calculated angular 
         /// regions.</param>
-        public TrackingData(Control control, int startX, int startY, Rectangle cropWithin, 
+        public TrackingData(Control control, float startX, float startY, Rectangle cropWithin, 
             int height)
         {
             try
@@ -118,7 +115,7 @@ namespace Extract.Imaging.Forms
 
                 // Store the parameters
                 _control = control;
-                _startPoint = new Point(startX, startY);
+                _startPoint = new Point((int)(startX + 0.5F), (int)(startY + 0.5F));
                 _cropWithin = cropWithin;
                 _height = height;
 
@@ -138,9 +135,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion TrackingData Constructors
+        #endregion Constructors
 
-        #region TrackingData Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets the starting point of the tracking event in physical (client) coordinates.
@@ -218,9 +215,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion TrackingData Properties
+        #endregion Properties
 
-        #region TrackingData Methods
+        #region Methods
 
         /// <summary>
         /// Updates the <see cref="Region"/> using the point specified.
@@ -306,7 +303,7 @@ namespace Extract.Imaging.Forms
             _line[1] = _control.PointToScreen(endPoint);
         }
 
-        #endregion TrackingData Methods
+        #endregion Methods
 
         #region IDisposable Members
 
@@ -325,7 +322,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        protected virtual void Dispose(bool disposing)
+        void Dispose(bool disposing)
         {
             if (disposing)
             {

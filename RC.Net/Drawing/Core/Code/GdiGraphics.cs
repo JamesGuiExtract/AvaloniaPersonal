@@ -109,6 +109,29 @@ namespace Extract.Drawing
         }
 
         /// <summary>
+        /// Draws a polygon defined by the specified points. 
+        /// </summary>
+        /// <param name="pen">Pen that determines the color, width, and style of the polygon.</param>
+        /// <param name="points">The vertices of the polygon.</param>
+        public void DrawPolygon(GdiPen pen, PointF[] points)
+        {
+            try
+            {
+                Point[] rounded = new Point[points.Length];
+                for (int i = 0; i < points.Length; i++)
+                {
+                    rounded[i] = Point.Round(points[i]);
+                }
+
+                DrawPolygon(pen, rounded);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29693", ex);
+            }
+        }
+
+        /// <summary>
         /// Draws the specified region using the specified color.
         /// </summary>
         /// <param name="region">The region to draw. Cannot be <see langword="null"/>.</param>

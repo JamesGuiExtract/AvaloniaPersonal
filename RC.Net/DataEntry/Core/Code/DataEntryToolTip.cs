@@ -1,13 +1,10 @@
 using Extract.Drawing;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
-using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Text;
-using System.Windows.Forms;
 using UCLID_AFCORELib;
 
 namespace Extract.DataEntry
@@ -19,7 +16,7 @@ namespace Extract.DataEntry
         /// all tooltips on-page and to keep them from overlapping themselves or the highlights with
         /// which they are associated.
         /// </summary>
-        class DataEntryToolTip : IDisposable, IComparable<DataEntryToolTip>
+        sealed class DataEntryToolTip : IDisposable, IComparable<DataEntryToolTip>
         {
             #region Fields
 
@@ -27,24 +24,24 @@ namespace Extract.DataEntry
             /// The <see cref="DataEntryControlHost"/> to which the <see cref="DataEntryToolTip"/>
             /// belongs.
             /// </summary>
-            DataEntryControlHost _host;
+            readonly DataEntryControlHost _host;
 
             /// <summary>
             /// The <see cref="IAttribute"/> the <see cref="DataEntryToolTip"/> is associated with.
             /// </summary>
-            IAttribute _attribute;
+            readonly IAttribute _attribute;
 
             /// <summary>
             /// Specifies whether <see cref="DataEntryToolTip"/>s should be arranged horizontally or
             /// vertically.
             /// </summary>
-            bool _horizontal = true;
+            readonly bool _horizontal = true;
 
             /// <summary>
             /// The smallest bounding rectangle containing the spatial information associated with
             /// this <see cref="DataEntryToolTip"/>'s <see cref="IAttribute"/>.
             /// </summary>
-            Rectangle _attributeBounds;
+            readonly Rectangle _attributeBounds;
 
             /// <summary>
             /// The actual <see cref="TextLayerObject"/> managed by this
@@ -55,7 +52,7 @@ namespace Extract.DataEntry
             /// <summary>
             /// The page this tooltip is on. 
             /// </summary>
-            int _page;
+            readonly int _page;
 
             /// <summary>
             /// The starting x-coordinate of the tooltip when _horizontal, the starting y-coordinate
@@ -353,7 +350,7 @@ namespace Extract.DataEntry
             /// </summary>
             /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
             /// resources; <see langword="false"/> to release only unmanaged resources.</param> 
-            protected virtual void Dispose(bool disposing)
+            void Dispose(bool disposing)
             {
                 if (disposing)
                 {
@@ -399,7 +396,7 @@ namespace Extract.DataEntry
                 set
                 {
                     // Obtain the difference between the current margin and the specified margin.
-                    int offset = value - this.ForwardMargin;
+                    int offset = value - ForwardMargin;
 
                     // Adjust the _maximumExtent using this offset.
                     if (_horizontal)
@@ -437,7 +434,7 @@ namespace Extract.DataEntry
                 set
                 {
                     // Obtain the difference between the current margin and the specified margin.
-                    int offset = value - this.BackwardMargin;
+                    int offset = value - BackwardMargin;
 
                     // Adjust the _maximumExtent using this offset.
                     if (_horizontal)
@@ -574,9 +571,9 @@ namespace Extract.DataEntry
 
                     // If the forward margin is negative, it is extending off-page. Shift it back
                     // on-page.
-                    if (this.ForwardMargin < 0)
+                    if (ForwardMargin < 0)
                     {
-                        Shift(this.ForwardMargin);
+                        Shift(ForwardMargin);
                     }
 
                     _textLayerObject.Selectable = false;
@@ -615,7 +612,7 @@ namespace Extract.DataEntry
                     {
                         // Initialize coordinates that need to be mapped into the ImageViewer
                         // coordinate system.
-                        Point[] cornerPoints = _textLayerObject.GetVertices();
+                        PointF[] cornerPoints = _textLayerObject.GetVertices();
                         Point[] highlightAnchorPoints =
                             { _highlightAnchorPoint, highlightCenterPoint };
                         Point[] coordinateProjectionFactor = new Point[1];
@@ -638,17 +635,19 @@ namespace Extract.DataEntry
                         // points.
                         if (_horizontal)
                         {
-                            _start = cornerPoints[0].X;
-                            _end = cornerPoints[1].X;
-                            coordinateProjectionFactor[0] =
-                                cornerPoints[1] - new Size(cornerPoints[0].X, cornerPoints[0].Y);
+                            _start = (int)(cornerPoints[0].X + 0.5F);
+                            _end = (int)(cornerPoints[1].X + 0.5F);
+                            int height = (int)(cornerPoints[0].Y + 0.5F);
+                            coordinateProjectionFactor[0] = Point.Round(cornerPoints[1])
+                                - new Size(_start, height);
                         }
                         else
                         {
-                            _start = cornerPoints[0].Y;
-                            _end = cornerPoints[3].Y;
-                            coordinateProjectionFactor[0] =
-                                cornerPoints[3] - new Size(cornerPoints[0].X, cornerPoints[0].Y);
+                            _start = (int)(cornerPoints[0].Y + 0.5F);
+                            _end = (int)(cornerPoints[3].Y + 0.5F);
+                            int width = (int)(cornerPoints[0].X + 0.5F);
+                            coordinateProjectionFactor[0] = Point.Round(cornerPoints[3]) 
+                                - new Size(width, _start);
                         }
 
                         // Perform a new translation to map from the ImageViewer coordinate
@@ -664,8 +663,8 @@ namespace Extract.DataEntry
                             // horizontal distance is in the TextLayerObject coordinate system over
                             // the projected distance recorded into the ImageViewer coordinate
                             // system.
-                            _shiftProjectionFactor = (double)(coordinateProjectionFactor[0].X /
-                                (double)(cornerPoints[1].X - cornerPoints[0].X));
+                            _shiftProjectionFactor = coordinateProjectionFactor[0].X /
+                                                     (double)(cornerPoints[1].X - cornerPoints[0].X);
 
                             _highlightCenter = highlightCenterPoint.X;
                         }
@@ -675,8 +674,8 @@ namespace Extract.DataEntry
                             // horizontal distance is in the TextLayerObject coordinate system over
                             // the projected distance recorded into the ImageViewer coordinate
                             // system.
-                            _shiftProjectionFactor = (double)(coordinateProjectionFactor[0].Y /
-                                (double)(cornerPoints[3].Y - cornerPoints[0].Y));
+                            _shiftProjectionFactor = coordinateProjectionFactor[0].Y /
+                                                     (double)(cornerPoints[3].Y - cornerPoints[0].Y);
 
                             _highlightCenter = highlightCenterPoint.Y;
                         }
@@ -684,9 +683,9 @@ namespace Extract.DataEntry
 
                     // Adjust the ForwardMargin to ensure the start of the tooltip will never move
                     // past the midpoint of the attribute's highlight.
-                    if (this.ForwardMargin > (_highlightCenter - _start))
+                    if (ForwardMargin > (_highlightCenter - _start))
                     {
-                        this.ForwardMargin = (_highlightCenter - _start);
+                        ForwardMargin = (_highlightCenter - _start);
                     }
                 }
                 catch (Exception ex)
@@ -764,7 +763,7 @@ namespace Extract.DataEntry
                             // nextToolTip.BackwardMargin since nextToolTip will not shift until the
                             // overlap has been compensated for.
                             int backwardSqueezeAvailable =
-                                Math.Min(this.BackwardMargin, nextToolTip.BackwardMargin + overlap);
+                                Math.Min(BackwardMargin, nextToolTip.BackwardMargin + overlap);
 
                             // Any freeSpace available should not be part of the squeeze available.
                             backwardSqueezeAvailable -= freeSpace;
@@ -807,7 +806,7 @@ namespace Extract.DataEntry
                     // with any separation that might exist between the tooltips is less than its
                     // own BackwardMargin, it must be reduced so that it doesn't try to force this
                     // tooltip back further than it can go.
-                    int alternateBackwardMargin = this.BackwardMargin + GetSeparation(nextToolTip);
+                    int alternateBackwardMargin = BackwardMargin + GetSeparation(nextToolTip);
                     nextToolTip.BackwardMargin =
                         Math.Min(nextToolTip.BackwardMargin, alternateBackwardMargin);
 
@@ -838,7 +837,7 @@ namespace Extract.DataEntry
                 {
                     // If there is no previous tooltip, we can go all the way back to the beginning
                     // of the page.
-                    freeSpace = this.BackwardMargin;
+                    freeSpace = BackwardMargin;
                 }
                 else
                 {

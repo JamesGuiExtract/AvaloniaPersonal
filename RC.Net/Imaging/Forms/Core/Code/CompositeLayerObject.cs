@@ -300,12 +300,12 @@ namespace Extract.Imaging.Forms
         /// Retrieves the center points of grip handles in logical (image) coordinates.
         /// </summary>
         /// <returns>The center points of grip handles in logical (image) coordinates.</returns>
-        public override Point[] GetGripPoints()
+        public override PointF[] GetGripPoints()
         {
             try
             {
                 // Create a list with the capacity to hold all grip handles
-                List<Point> gripPoints = new List<Point>(_objects.Count * 8);
+                List<PointF> gripPoints = new List<PointF>(_objects.Count * 8);
 
                 // Add all the grip handles to the collection
                 foreach (T layerObject in _objects)
@@ -646,12 +646,12 @@ namespace Extract.Imaging.Forms
         /// Retrieves the vertices of the <see cref="CompositeLayerObject{T}"/> in logical image coordinates.
         /// </summary>
         /// <returns>The vertices of the <see cref="CompositeLayerObject{T}"/> in logical image coordinates.</returns>
-        public override Point[] GetVertices()
+        public override PointF[] GetVertices()
         {
             try
             {
                 // Create a list with the capacity to hold all the vertices
-                List<Point> vertices = new List<Point>(_objects.Count * 4);
+                List<PointF> vertices = new List<PointF>(_objects.Count * 4);
 
                 // Add all the vertices to the collection
                 foreach (T layerObject in _objects)
@@ -672,12 +672,12 @@ namespace Extract.Imaging.Forms
         /// Retrieves the vertices of the selection border in logical (image) coordinates.
         /// </summary>
         /// <returns>The vertices of the selection border in logical (image) coordinates.</returns>
-        public override Point[] GetGripVertices()
+        public override PointF[] GetGripVertices()
         {
             try
             {
                 // Create a list with the capacity to hold all the vertices
-                List<Point> vertices = new List<Point>(_objects.Count * 4);
+                List<PointF> vertices = new List<PointF>(_objects.Count * 4);
 
                 // Add all the vertices to the collection
                 foreach (T layerObject in _objects)
