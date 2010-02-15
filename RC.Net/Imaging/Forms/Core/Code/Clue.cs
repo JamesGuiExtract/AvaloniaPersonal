@@ -1,8 +1,8 @@
-using Extract.Drawing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms;
 using System.Xml;
 
 namespace Extract.Imaging.Forms
@@ -141,10 +141,10 @@ namespace Extract.Imaging.Forms
         /// Retrieves the center points of grip handles in logical (image) coordinates.
         /// </summary>
         /// <returns>The center points of grip handles in logical (image) coordinates.</returns>
-        public override Point[] GetGripPoints()
+        public override PointF[] GetGripPoints()
         {
             // Clues do not have grip handles so return an empty array
-            return new Point[0];
+            return new PointF[0];
         }
 
         /// <summary>
@@ -165,11 +165,10 @@ namespace Extract.Imaging.Forms
                 // Just draw the line around the objects, do not draw the grip handles
                 foreach (Highlight highlight in Objects)
                 {
-                    Point[] vertices = highlight.GetGripVertices();
+                    PointF[] vertices = highlight.GetGripVertices();
                     ImageViewer.Transform.TransformPoints(vertices);
 
-                    GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.MaskPen);
-                    gdiGraphics.DrawPolygon(SelectionPen, vertices);
+                    graphics.DrawPolygon(SelectionPen, vertices);
                 }
             }
             catch (Exception ex)
@@ -195,7 +194,7 @@ namespace Extract.Imaging.Forms
         /// Retrieves the cursor when the mouse is over a grip handle.
         /// </summary>
         /// <returns>The cursor when the mouse is over a grip handle.</returns>
-        public override System.Windows.Forms.Cursor GetGripCursor(int gripHandleId)
+        public override Cursor GetGripCursor(int gripHandleId)
         {
             throw new ExtractException("ELI23066", "Clues don't have grip handles.");
         }

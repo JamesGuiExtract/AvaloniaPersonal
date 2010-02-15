@@ -149,7 +149,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The pen used for drawing the selection border around selected layer objects.
         /// </summary>
-        static GdiPen _selectionPen;
+        static Pen _selectionPen;
 
         /// <summary>
         /// The image viewer on which the layer object appears.
@@ -673,13 +673,13 @@ namespace Extract.Imaging.Forms
         /// Gets or sets the pen used to draw the selection border around selected layer objects.
         /// </summary>
         /// <value>The pen used to draw the selection border around selected layer objects.</value>
-        public static GdiPen SelectionPen
+        public static Pen SelectionPen
         {
             get
             {
                 if (_selectionPen == null)
                 {
-                    _selectionPen = new GdiPen(Color.Black, 1, DashStyle.Dash);
+                    _selectionPen = ExtractPens.DashedBlack;
                 }
 
                 return _selectionPen;
@@ -788,10 +788,10 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                Point[] vertices = GetVertices();
+                PointF[] vertices = GetVertices();
                 double sum = 0.0;
                 double count = vertices.Length;
-                foreach (Point vertex in vertices)
+                foreach (PointF vertex in vertices)
                 {
                     sum += GeometryMethods.Distance(vertex, point);
                 }
@@ -847,7 +847,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Get the grip handles in logical (image) coordinates
-                Point[] gripPoints = GetGripPoints();
+                PointF[] gripPoints = GetGripPoints();
 
                 // If there are no grip points, return -1
                 if (gripPoints == null || gripPoints.Length <= 0)
@@ -933,7 +933,7 @@ namespace Extract.Imaging.Forms
         /// Retrieves the center points of grip handles in logical (image) coordinates.
         /// </summary>
         /// <returns>The center points of grip handles in logical (image) coordinates.</returns>
-        public abstract Point[] GetGripPoints();
+        public abstract PointF[] GetGripPoints();
 
         /// <summary>
         /// Retrieves the center points of the link arrows in physical (client) coordinates.
@@ -1146,17 +1146,17 @@ namespace Extract.Imaging.Forms
         /// <param name="graphics">The <see cref="Graphics"/> object with which to draw.</param>
         /// <param name="gripPoint">The point in physical (client) coordinates where the grip 
         /// handle should be drawn.</param>
-        static void DrawGripHandle(Graphics graphics, Point gripPoint)
+        static void DrawGripHandle(Graphics graphics, PointF gripPoint)
         {
             // Calculate the grip handle dimensions
-            Rectangle gripHandle = Rectangle.FromLTRB(
+            RectangleF gripHandle = RectangleF.FromLTRB(
                 gripPoint.X - _HALF_GRIP_HANDLE_SIDE, gripPoint.Y - _HALF_GRIP_HANDLE_SIDE,
                 gripPoint.X + _HALF_GRIP_HANDLE_SIDE, gripPoint.Y + _HALF_GRIP_HANDLE_SIDE);
 
             // Draw the grip handle
             graphics.FillRectangle(Brushes.White, gripHandle);
             gripHandle.Inflate(-1, -1);
-            graphics.DrawRectangle(Pens.Black, gripHandle);
+            graphics.DrawRectangle(Pens.Black, Rectangle.Round(gripHandle));
         }
 
         /// <summary>
@@ -1175,17 +1175,16 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Get the centers of the grip handles in logical (image) coordinates
-                Point[] gripPoints = GetGripPoints();
+                PointF[] gripPoints = GetGripPoints();
 
                 // Draw dashed lines around the layer object, if there is not a single grip point
                 // NOTE: A widthless highlight will only have one grip handle
                 if (gripPoints.Length != 1)
                 {
-                    Point[] vertices = GetGripVertices();
+                    PointF[] vertices = GetGripVertices();
                     _imageViewer.Transform.TransformPoints(vertices);
 
-                    GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.MaskPen);
-                    gdiGraphics.DrawPolygon(SelectionPen, vertices);
+                    graphics.DrawPolygon(SelectionPen, vertices);
                 }
 
                 // If there are no grip points, we are done
@@ -1400,7 +1399,7 @@ namespace Extract.Imaging.Forms
         /// logical (image) coordinates.</returns>
         // This method performs a calculation, so it is better suited as a method.
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public virtual Point GetCenterPoint()
+        public virtual PointF GetCenterPoint()
         {
             try
             {
@@ -1426,13 +1425,13 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <returns>The vertices of the <see cref="LayerObject"/> in logical (image) coordinates.
         /// </returns>
-        public abstract Point[] GetVertices();
+        public abstract PointF[] GetVertices();
 
         /// <summary>
         /// Retrieves the vertices of the selection border in logical (image) coordinates.
         /// </summary>
         /// <returns>The vertices of the selection border in logical (image) coordinates.</returns>
-        public abstract Point[] GetGripVertices();
+        public abstract PointF[] GetGripVertices();
 
         /// <summary>
         /// Determines whether a horizontal line can be drawn such that it intersects this 
@@ -1778,8 +1777,8 @@ namespace Extract.Imaging.Forms
             if (returnVal == 0)
             {
                 // Compare the center points
-                Point thisCenter = GetCenterPoint();
-                Point otherCenter = other.GetCenterPoint();
+                Point thisCenter = Point.Round(GetCenterPoint());
+                Point otherCenter = Point.Round(other.GetCenterPoint());
 
                 // Compare top point first
                 returnVal = thisCenter.Y.CompareTo(otherCenter.Y);

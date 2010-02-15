@@ -240,50 +240,6 @@ namespace Extract.Imaging.Forms
 
         /// <summary>
         /// Initializes a new <see cref="Highlight"/> class on the specified page that contains 
-        /// the specified text and is the default color.
-        /// </summary>
-        /// <remarks>
-        /// <para>The default text is the empty <see cref="string"/> if 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.RecognizeHighlightText"/> 
-        /// property is <see langword="false"/> or recognized text if the 
-        /// <see cref="Forms.ImageViewer.RecognizeHighlightText"/> property is 
-        /// <see langword="true"/>.
-        /// </para>
-        /// <para>The default <see cref="System.Drawing.Color"/> is the value of the 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.DefaultHighlightColor"/> 
-        /// property.</para>
-        /// </remarks>
-        /// <param name="imageViewer">Image viewer on which this highlight appears. Cannot be
-        /// <see langword="null"/>. An image must be open on the viewer.</param>
-        /// <param name="comment">The method by which the <see cref="Highlight"/> was created.
-        /// </param>
-        /// <param name="start">Midpoint of the one side of the highlight in logical (image) 
-        /// coordinates.</param>
-        /// <param name="end">Midpoint of the opposing side of the highlight in logical (image) 
-        /// coordinates.</param>
-        /// <param name="height">Distance between opposing sides of highlight in logical (image) 
-        /// pixels, measured perpendicular to the line segment defined by <paramref name="start"/>
-        /// and <paramref name="end"/>.</param>
-        /// <param name="pageNumber">One-based page number on which the highlight appears.</param>
-        /// <param name="text">Text associated with the highlight. If <see langword="null"/>, the 
-        /// <paramref name="imageViewer"/>'s default highlight text.</param>
-        /// <exception cref="ExtractException"><paramref name="imageViewer"/> is 
-        /// <see langword="null"/>.</exception>
-        /// <exception cref="ExtractException"><paramref name="imageViewer"/> does not contain an 
-        /// open image.</exception>
-        /// <seealso cref="Forms.ImageViewer.PageNumber"/>
-        /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
-        /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
-        public Highlight(ImageViewer imageViewer, string comment, Point start, Point end, 
-            int height, int pageNumber, string text)
-            : this(imageViewer, comment, start, end, height, pageNumber, text, 
-                imageViewer.DefaultHighlightColor)
-        {
-
-        }
-
-        /// <summary>
-        /// Initializes a new <see cref="Highlight"/> class on the specified page that contains 
         /// the specified text and is the specified color.
         /// </summary>
         /// <remarks>
@@ -381,43 +337,6 @@ namespace Extract.Imaging.Forms
             : this(imageViewer, comment, new Point(rasterZone.StartX, rasterZone.StartY), 
                 new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
                 null, imageViewer.DefaultHighlightColor)
-        {
-            
-        }
-
-        /// <summary>
-        /// Initializes a new <see cref="Highlight"/> class from the specified 
-        /// <see cref="RasterZone"/> that contains the specified text and is the default color.
-        /// </summary>
-        /// <remarks>
-        /// <para>The default text is the empty <see cref="string"/> if 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.RecognizeHighlightText"/> 
-        /// property is <see langword="false"/> or recognized text if the 
-        /// <see cref="Forms.ImageViewer.RecognizeHighlightText"/> property is 
-        /// <see langword="true"/>.
-        /// </para>
-        /// <para>The default <see cref="System.Drawing.Color"/> is the value of the 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.DefaultHighlightColor"/> 
-        /// property.</para>
-        /// </remarks>
-        /// <param name="imageViewer">Image viewer on which this highlight appears. Cannot be
-        /// <see langword="null"/>. An image must be open on the viewer.</param>
-        /// <param name="comment">The method by which the <see cref="Highlight"/> was created.
-        /// </param>
-        /// <param name="rasterZone">Raster zone from which to initialize the highlight. Cannot be
-        /// <see langword="null"/>.</param>
-        /// <param name="text">Text associated with the highlight. If <see langword="null"/>, the 
-        /// <paramref name="imageViewer"/>'s default highlight text.</param>
-        /// <exception cref="ExtractException"><paramref name="imageViewer"/> is 
-        /// <see langword="null"/>.</exception>
-        /// <exception cref="ExtractException"><paramref name="imageViewer"/> does not contain an 
-        /// open image.</exception>
-        /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
-        /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
-        public Highlight(ImageViewer imageViewer, string comment, RasterZone rasterZone, string text)
-            : this(imageViewer, comment, new Point(rasterZone.StartX, rasterZone.StartY),
-                new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
-                text, imageViewer.DefaultHighlightColor)
         {
             
         }
@@ -729,12 +648,12 @@ namespace Extract.Imaging.Forms
                 // This is done outside of DrawRegion so it is not rendered in a printed document
                 if (BorderColor != null)
                 {
-                    Point start;
-                    Point end;
-                    int height;
+                    PointF start;
+                    PointF end;
+                    float height;
                     GetBorderZone(out start, out end, out height);
 
-                    Point[] vertices = GeometryMethods.GetVertices(start, end, height);
+                    PointF[] vertices = GeometryMethods.GetVertices(start, end, height);
 
                     transform.TransformPoints(vertices);
 
@@ -790,10 +709,10 @@ namespace Extract.Imaging.Forms
                 if (OutlineColor != null)
                 {
                     // Get the vertices of the highlight in logical (image) coordinates
-                    Point[] vertices = GetVertices();
+                    PointF[] vertices = GetVertices();
 
                     // Get the center of the highlight in logical (image) coordinates
-                    Point center = GetCenterPoint();
+                    PointF center = GetCenterPoint();
 
                     // Inflate each corner by 6 client pixels (expressed in image pixels)
                     double expandBy = 6.0 / ImageViewer.GetScaleFactorY();
@@ -819,8 +738,8 @@ namespace Extract.Imaging.Forms
                         angleExpansion += (Math.PI / 4.0) + _angle;
 
                         // Use the angle of the expansion to expand this vertex
-                        vertices[i].X += (int)Math.Round(expandBy * Math.Cos(angleExpansion));
-                        vertices[i].Y += (int)Math.Round(expandBy * Math.Sin(angleExpansion));
+                        vertices[i].X += (float)(expandBy * Math.Cos(angleExpansion));
+                        vertices[i].Y += (float)(expandBy * Math.Sin(angleExpansion));
                     }
 
                     // Draw the outline
@@ -862,7 +781,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Ensure the grip handle id is valid
-                Point[] gripPoints = GetGripPoints();
+                PointF[] gripPoints = GetGripPoints();
                 if (gripHandleId < 0 || gripHandleId >= gripPoints.Length)
                 {
                     throw new ExtractException("ELI22027", "Invalid grip handle id.");
@@ -878,7 +797,7 @@ namespace Extract.Imaging.Forms
                 base.ImageViewer.Transform.TransformPoints(gripPoints);
 
                 // Get the center of the highlight in client coordinates
-                Point[] center = new Point[] 
+                PointF[] center = new PointF[] 
                 {
                     GetCenterPoint()
                 };
@@ -1001,12 +920,12 @@ namespace Extract.Imaging.Forms
                 Keys modifiers = Control.ModifierKeys;
 
                 // Get the grip handles in image and client coordinates
-                Point[] imageGrips = GetGripPoints();
-                Point[] clientGrips = (Point[])imageGrips.Clone();
+                PointF[] imageGrips = GetGripPoints();
+                PointF[] clientGrips = (PointF[])imageGrips.Clone();
                 base.ImageViewer.Transform.TransformPoints(clientGrips);
 
                 // Store the point of reference for the tracking event
-                Point trackingPoint = new Point(mouseX, mouseY);
+                PointF trackingPoint = new PointF(mouseX, mouseY);
 
                 // Check if this is a corner resize
                 if (gripHandleId >= 4)
@@ -1024,12 +943,12 @@ namespace Extract.Imaging.Forms
                     }
 
                     // Get the center point in image coordinates
-                    Point center = GetCenterPoint();
+                    PointF center = GetCenterPoint();
 
                     // Set the tracking point to the opposing corner
-                    trackingPoint = new Point(
-                        center.X * 2 - imageGrips[gripHandleId].X,
-                        center.Y * 2 - imageGrips[gripHandleId].Y);
+                    trackingPoint = new PointF(
+                        center.X * 2F - imageGrips[gripHandleId].X,
+                        center.Y * 2F - imageGrips[gripHandleId].Y);
                 }
                 else
                 {
@@ -1245,11 +1164,11 @@ namespace Extract.Imaging.Forms
         /// <see cref="Highlight"/>.</param>
         /// <param name="gripHandleId">The index of the point in <paramref name="gripHandles"/> 
         /// that should be the new end point.</param>
-        void MakeGripHandleEndPoint(Point[] gripHandles, int gripHandleId)
+        void MakeGripHandleEndPoint(PointF[] gripHandles, int gripHandleId)
         {
-            Point start;
-            Point end;
-            int height;
+            PointF start;
+            PointF end;
+            float height;
             GetSelectionZone(out start, out end, out height);
 
             // If this grip handle is already the end point, we are done.
@@ -1262,7 +1181,7 @@ namespace Extract.Imaging.Forms
             if (gripHandles[gripHandleId] == start)
             {
                 // Swap the start point and end point
-                QuietSetSpatialData(_endPoint, gripHandles[gripHandleId], _height);
+                QuietSetSpatialData(_endPoint, Point.Round(gripHandles[gripHandleId]), _height);
 
                 // Done.
                 return;
@@ -1275,7 +1194,7 @@ namespace Extract.Imaging.Forms
                 if (gripHandleId != i && gripHandles[i] != start && gripHandles[i] != end)
                 {
                     // Define the new highlight
-                    QuietSetSpatialData(gripHandles[i], gripHandles[gripHandleId],
+                    QuietSetSpatialData(Point.Round(gripHandles[i]), Point.Round(gripHandles[gripHandleId]),
                         (int) GeometryMethods.Distance(_startPoint, _endPoint));
 
                     // Done.
@@ -1559,7 +1478,7 @@ namespace Extract.Imaging.Forms
         internal static Region GetAngularRegion(Point startPoint, Point endPoint, int height)
         {
             // Get the corners of the specified specified region
-            Point[] vertices = GeometryMethods.GetVertices(startPoint, endPoint, height);
+            PointF[] vertices = GeometryMethods.GetVertices(startPoint, endPoint, height);
 
             // Construct and return the region
             return new Region(new GraphicsPath(vertices, _RECTANGULAR_PATH_POINT_TYPE));
@@ -1592,7 +1511,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The center point of the highlight in logical (image) coordinates.</returns>
         // This is not a property because it needs to be calculated.
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public override Point GetCenterPoint()
+        public override PointF GetCenterPoint()
         {
             try
             {
@@ -1609,7 +1528,7 @@ namespace Extract.Imaging.Forms
         /// Retrieves the vertices of the <see cref="Highlight"/> in logical image coordinates.
         /// </summary>
         /// <returns>The vertices of the <see cref="Highlight"/> in logical image coordinates.</returns>
-        public override Point[] GetVertices()
+        public override PointF[] GetVertices()
         {
             try
             {
@@ -1656,22 +1575,22 @@ namespace Extract.Imaging.Forms
         /// <para>The midpoints of the sides are the first four elements. If the highlight is 
         /// rectangular, the vertices are the last four elements.</para>
         /// </remarks>
-        public override Point[] GetGripPoints()
+        public override PointF[] GetGripPoints()
         {
             try
             {
                 // Get the center point of the highlight
-                Point center = GetCenterPoint();
+                PointF center = GetCenterPoint();
 
                 // Handle the special case of an empty highlight
                 if (_startPoint == _endPoint)
                 {
-                    return new Point[] { center };
+                    return new PointF[] { center };
                 }
 
-                Point start;
-                Point end;
-                int height;
+                PointF start;
+                PointF end;
+                float height;
                 GetSelectionZone(out start, out end, out height);
 
                 // Calculate the vertical and horizontal modifiers. These are the values to add and 
@@ -1680,31 +1599,31 @@ namespace Extract.Imaging.Forms
                 double yModifier = height / 2.0 * Math.Cos(_angle);
 
                 // Calculate the grip handles
-                Point[] gripHandles;
+                PointF[] gripHandles;
                 if (Math.Abs(_angle % (Math.PI / 2)) <= 1e-10)
                 {
                     // This is a rectangular highlight. There should be eight grip handles.
-                    gripHandles = new Point[] 
+                    gripHandles = new PointF[] 
                         {
                             start,
-                            new Point((int)(center.X - xModifier + 0.5), (int)(center.Y + yModifier + 0.5)),
+                            new PointF((float)(center.X - xModifier), (float)(center.Y + yModifier)),
                             end,
-                            new Point((int)(center.X + xModifier + 0.5), (int)(center.Y - yModifier + 0.5)),
-                            new Point((int)(start.X + xModifier + 0.5), (int)(start.Y - yModifier + 0.5)),
-                            new Point((int)(start.X - xModifier + 0.5), (int)(start.Y + yModifier + 0.5)),
-                            new Point((int)(end.X - xModifier + 0.5), (int)(end.Y + yModifier + 0.5)),
-                            new Point((int)(end.X + xModifier + 0.5), (int)(end.Y - yModifier + 0.5))
+                            new PointF((float)(center.X + xModifier), (float)(center.Y - yModifier)),
+                            new PointF((float)(start.X + xModifier), (float)(start.Y - yModifier)),
+                            new PointF((float)(start.X - xModifier), (float)(start.Y + yModifier)),
+                            new PointF((float)(end.X - xModifier), (float)(end.Y + yModifier)),
+                            new PointF((float)(end.X + xModifier), (float)(end.Y - yModifier))
                         };
                 }
                 else
                 {
                     // This is an angular highlight. There should be four grip handles.
-                    gripHandles = new Point[] 
+                    gripHandles = new PointF[] 
                         {
                             start,
-                            new Point((int)(center.X - xModifier + 0.5), (int)(center.Y + yModifier + 0.5)),
+                            new PointF((float)(center.X - xModifier), (float)(center.Y + yModifier)),
                             end,
-                            new Point((int)(center.X + xModifier + 0.5), (int)(center.Y - yModifier + 0.5))
+                            new PointF((float)(center.X + xModifier), (float)(center.Y - yModifier))
                         };
                 }
 
@@ -1721,22 +1640,22 @@ namespace Extract.Imaging.Forms
         /// Retrieves the vertices of the selection border in logical (image) coordinates.
         /// </summary>
         /// <returns>The vertices of the selection border in logical (image) coordinates.</returns>
-        public override Point[] GetGripVertices()
+        public override PointF[] GetGripVertices()
         {
             try
             {
                 // Get the center point of the highlight
-                Point center = GetCenterPoint();
+                PointF center = GetCenterPoint();
 
                 // Handle the special case of an empty highlight
                 if (_startPoint == _endPoint)
                 {
-                    return new Point[] { center };
+                    return new PointF[] { center };
                 }
 
-                Point start;
-                Point end;
-                int height;
+                PointF start;
+                PointF end;
+                float height;
                 GetSelectionZone(out start, out end, out height);
 
                 // Calculate the vertical and horizontal modifiers. These are the values to add and 
@@ -1745,12 +1664,12 @@ namespace Extract.Imaging.Forms
                 double yModifier = height / 2.0 * Math.Cos(_angle);
 
                 // Calculate the grip vertices
-                Point[] vertices = new Point[] 
+                PointF[] vertices = new PointF[] 
                     {
-                        new Point((int)(start.X + xModifier + 0.5), (int)(start.Y - yModifier + 0.5)),
-                        new Point((int)(start.X - xModifier + 0.5), (int)(start.Y + yModifier + 0.5)),
-                        new Point((int)(end.X - xModifier + 0.5), (int)(end.Y + yModifier + 0.5)),
-                        new Point((int)(end.X + xModifier + 0.5), (int)(end.Y - yModifier + 0.5))
+                        new PointF((float)(start.X + xModifier), (float)(start.Y - yModifier)),
+                        new PointF((float)(start.X - xModifier), (float)(start.Y + yModifier)),
+                        new PointF((float)(end.X - xModifier), (float)(end.Y + yModifier)),
+                        new PointF((float)(end.X + xModifier), (float)(end.Y - yModifier))
                     };
 
                 return vertices;
@@ -1767,7 +1686,7 @@ namespace Extract.Imaging.Forms
         /// <param name="start">The start point of the zone in image pixels.</param>
         /// <param name="end">The end point of the zone in image pixels.</param>
         /// <param name="height">The height of the zone in image pixels.</param>
-        void GetBorderZone(out Point start, out Point end, out int height)
+        void GetBorderZone(out PointF start, out PointF end, out float height)
         {
             double expandBy = ExtractPens.ThickPenWidth / 2.0 / ImageViewer.GetScaleFactorY();
             GetExpandedZone(expandBy, out start, out end, out height);
@@ -1779,13 +1698,13 @@ namespace Extract.Imaging.Forms
         /// <param name="start">The start point of the zone in image pixels.</param>
         /// <param name="end">The end point of the zone in image pixels.</param>
         /// <param name="height">The height of the zone in image pixels.</param>
-        void GetSelectionZone(out Point start, out Point end, out int height)
+        void GetSelectionZone(out PointF start, out PointF end, out float height)
         {
             // The selection border is around the regular border [FIDSC #3888]
             double expandBy = SelectionPen.Width/2.0;
             if (BorderColor != Color.Transparent)
             {
-                expandBy += ExtractPens.ThickPenWidth - 1;
+                expandBy += ExtractPens.ThickPenWidth;
             }
 
             // Convert to image coordinates
@@ -1801,16 +1720,16 @@ namespace Extract.Imaging.Forms
         /// <param name="start">The start point of the zone in image pixels.</param>
         /// <param name="end">The end point of the zone in image pixels.</param>
         /// <param name="height">The height of the zone in image pixels.</param>
-        void GetExpandedZone(double expandBy, out Point start, out Point end, out int height)
+        void GetExpandedZone(double expandBy, out PointF start, out PointF end, out float height)
         {
             // Get the amount to modify the points
-            Size delta = 
-                new Size((int)(expandBy * Math.Cos(_angle)), (int)(expandBy * Math.Sin(_angle)));
+            SizeF delta =
+                new SizeF((float)(expandBy * Math.Cos(_angle)), (float)(expandBy * Math.Sin(_angle)));
 
             // Expand the zone by expandBy pixels on all sides
-            start = _startPoint - delta;
-            end = _endPoint + delta;
-            height = _height + (int)(expandBy * 2.0);
+            start = (PointF)(_startPoint) - delta;
+            end = (PointF)(_endPoint) + delta;
+            height = _height + (float)(expandBy * 2F);
         }
 
         /// <summary>
