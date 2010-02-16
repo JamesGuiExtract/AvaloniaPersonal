@@ -644,8 +644,8 @@ IRegularExprParserPtr CExtractLine::getParser(const string& strPattern)
 	try
 	{
 		// Get the parser and set the pattern
-		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("BoxFinder");
-		ASSERT_RESOURCE_ALLOCATION("ELI22433", ipParser);
+		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("ExtractLine");
+		ASSERT_RESOURCE_ALLOCATION("ELI29703", ipParser);
 
 		ipParser->Pattern = strPattern.c_str();
 

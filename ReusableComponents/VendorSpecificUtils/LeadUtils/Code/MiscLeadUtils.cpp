@@ -625,7 +625,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 				// Log application trace if annotations added to the document and
 				// output is a PDF [FlexIDSCore #3131 - JDS - 12/18/2008] 
 				UCLIDException uex("ELI23594",
-					"Application trace: Applied or retained annotations on a PDF.");
+					"Application trace: Burned annotations into a PDF.");
 				uex.addDebugInfo("Input Image File", strImageFileName);
 				uex.addDebugInfo("Output Image File", strOutputImageName);
 				uex.log();

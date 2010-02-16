@@ -583,5 +583,55 @@ namespace Extract.Imaging
                     return false;
             }
         }
+
+        /// <summary>
+        /// Determines whether the specified document is a portable document format (PDF) file.
+        /// </summary>
+        /// <param name="fileName">The file to check.</param>
+        /// <returns><see langword="true"/> if <paramref name="fileName"/> is a portable document
+        /// format; <see langword="false"/> if the <paramref name="fileName"/> is not a portable  
+        /// document format.</returns>
+        public static bool IsPdf(string fileName)
+        {
+            try
+            {
+                using (ImageCodecs codecs = new ImageCodecs())
+                {
+                    return IsPdf(fileName, codecs);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29697", ex);
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified document is a portable document format (PDF) file.
+        /// </summary>
+        /// <param name="fileName">The file to check.</param>
+        /// <param name="codecs">The <see cref="ImageCodecs"/> to use to load the image.</param>
+        /// <returns><see langword="true"/> if <paramref name="fileName"/> is a portable document
+        /// format; <see langword="false"/> if the <paramref name="fileName"/> is not a portable  
+        /// document format.</returns>
+        public static bool IsPdf(string fileName, ImageCodecs codecs)
+        {
+            try
+            {
+                ExtractException.Assert("ELI29698", "File name cannot be null or empty.",
+                    !string.IsNullOrEmpty(fileName));
+                ExtractException.Assert("ELI29699", "Codecs cannot be null or empty.",
+                    codecs != null);
+
+                using (ImageReader reader = codecs.CreateReader(fileName))
+                {
+                    return IsPdf(reader.Format);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29700", ex);
+            }
+        }
     }
 }

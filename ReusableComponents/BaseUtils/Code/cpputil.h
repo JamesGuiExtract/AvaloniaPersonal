@@ -161,7 +161,7 @@ EXPORT_BaseUtils const string getFormattedString(const char* szText, ...);
 //-------------------------------------------------------------------------------------------------
 // ******** Operating System - File System ********
 //-------------------------------------------------------------------------------------------------
-EXPORT_BaseUtils string removeLastSlashFromPath(const string& strInput);
+EXPORT_BaseUtils string removeLastSlashFromPath(string strInput);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the filename without the extension.  For instance, if
 //			strFullPathToFile is "c:\\temp\\abc.txt", the returned value is
@@ -217,7 +217,7 @@ EXPORT_BaseUtils string getPathAndFileNameWithoutExtension(const string& strFull
 //			If bMakeLowerCase == true, the value to be returned will be converted 
 //			into lowercase.  If bMakeLowerCase == false, then the value to be 
 //			returned maintains its original case from strFullPathToFile.
-EXPORT_BaseUtils string getDriveFromFullPath(string strFullFileName, 
+EXPORT_BaseUtils string getDriveFromFullPath(const string& strFullFileName, 
 											 bool bMakeLowerCase);
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils bool recursiveRemoveDirectory(const string &strDirectory);

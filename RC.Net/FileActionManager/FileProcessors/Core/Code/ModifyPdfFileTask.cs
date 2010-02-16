@@ -1,3 +1,4 @@
+using Extract.Imaging;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -23,7 +24,7 @@ namespace Extract.FileActionManager.FileProcessors
     [ProgId("Extract.FileActionManager.FileProcessors.ModifyPdfFileTask")]
     public class ModifyPdfFileTask : ICategorizedComponent, IConfigurableObject,
         IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask, ILicensedComponent,
-        IPersistStream
+        IPersistStream, IDisposable
     {
         #region Constants
 
@@ -58,6 +59,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// Whether the object is dirty or not.
         /// </summary>
         bool _dirty;
+
+        /// <summary>
+        /// Used to check whether the document is a PDF file or not.
+        /// </summary>
+        ImageCodecs _codecs;
 
         /// <summary>
         /// Mutex used to guarantee single threadedness to the remove annotations method
@@ -203,8 +209,12 @@ namespace Extract.FileActionManager.FileProcessors
         void RemoveAnnotationsFromPdfFile(string pdfFile)
         {
             // Ensure a file name was specified and that it exists.
-            ExtractException.Assert("ELI29662", "Specified PDF file does not exist.",
+            ExtractException.Assert("ELI29701", "Specified PDF file does not exist.",
                 !string.IsNullOrEmpty(pdfFile) && File.Exists(pdfFile), "PDF File Name", pdfFile);
+
+            // Ensure the file is a PDF file [LRCAU #5729]
+            ExtractException.Assert("ELI29695", "File is not a pdf file.",
+                ImageMethods.IsPdf(pdfFile, _codecs), "PDF File Name", pdfFile);
 
             PdfXpress express = null;
             Document document = null;
@@ -256,7 +266,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI29663", ex);
+                ExtractException ee = ExtractException.AsExtractException("ELI29702", ex);
                 ee.AddDebugData("PDF File Name", pdfFile, false);
                 throw ee;
             }
@@ -415,6 +425,19 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         public void Close()
         {
+            try
+            {
+                if (_codecs != null)
+                {
+                    _codecs.Dispose();
+                    _codecs = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI29696",
+                    "Failed closing Modify pdf task.", ex);
+            }
         }
 
         /// <summary>
@@ -431,6 +454,9 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.PegasusPdfxpressModifyPdf,
                     "ELI29653", _COMPONENT_DESCRIPTION);
+
+                // Create the ImageCodecs object
+                _codecs = new ImageCodecs();
             }
             catch (Exception ex)
             {
@@ -603,5 +629,38 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         #endregion
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="ModifyPdfFileTask"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <overloads>Releases resources used by the <see cref="ModifyPdfFileTask"/>.</overloads>
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="ModifyPdfFileTask"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>		
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_codecs != null)
+                {
+                    _codecs.Dispose();
+                    _codecs = null;
+                }
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable
     }
 }

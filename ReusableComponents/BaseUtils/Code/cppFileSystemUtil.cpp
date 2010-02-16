@@ -157,28 +157,25 @@ void appendToFile(const string& strData, const string& strOutputFileName)
 	waitForFileToBeReadable(strOutputFileName);
 }
 //--------------------------------------------------------------------------------------------------
-string removeLastSlashFromPath(const string& strInput)
+string removeLastSlashFromPath(string strInput)
 {
-	string strTemp = strInput;
-
-	// FIXTHIS: casting
-	char *pszTemp = (char *) strrchr(strTemp.c_str(), '\\');
-	
-	if (pszTemp != NULL && *(pszTemp+1) == NULL)
+	size_t nLastChar = strInput.length()-1;
+	if (strInput[nLastChar] == '\\')
 	{
-		// replace the occurances of slash at the end of the string with nothing.
-		replaceVariable(strTemp, "\\", "", kReplaceLast);
+		strInput.erase(nLastChar);
 	}
 
-	return strTemp;
+	return strInput;
 }
 //--------------------------------------------------------------------------------------------------
 string getFileNameWithoutExtension(const string& strFullPathToFile,
 								   bool bMakeLowerCase)
 {
-	char zDrive[_MAX_DRIVE], zPath[_MAX_PATH], zFileName[_MAX_FNAME], zExt[_MAX_EXT];
-	// Break a path name into components.
-	_splitpath_s(strFullPathToFile.c_str(), zDrive, zPath, zFileName, zExt);
+	char zDrive[_MAX_DRIVE] = {0}, zPath[_MAX_PATH] = {0},
+		zFileName[_MAX_FNAME] = {0}, zExt[_MAX_EXT] = {0};
+
+	// Break a path name into components. Trim quotes from path if they exist
+	_splitpath_s(trim(strFullPathToFile, "\"", "\"").c_str(), zDrive, zPath, zFileName, zExt);
 
 	string strRet = string(zFileName);
 	if (bMakeLowerCase)
@@ -192,9 +189,11 @@ string getFileNameWithoutExtension(const string& strFullPathToFile,
 string getExtensionFromFullPath(const string& strFullFileName,
 								bool bMakeLowerCase)
 {
-	char zDrive[_MAX_DRIVE], zPath[_MAX_PATH], zFileName[_MAX_FNAME], zExt[_MAX_EXT];
-	// Break a path name into components.
-	_splitpath_s(strFullFileName.c_str(), zDrive, zPath, zFileName, zExt);
+	char zDrive[_MAX_DRIVE] = {0}, zPath[_MAX_PATH] = {0},
+		zFileName[_MAX_FNAME] = {0}, zExt[_MAX_EXT] = {0};
+
+	// Break a path name into components. Trim quotes from path if they exist
+	_splitpath_s(trim(strFullFileName, "\"", "\"").c_str(), zDrive, zPath, zFileName, zExt);
 
 	// this extension has a leading "."
 	string strRet = string(zExt);
@@ -209,9 +208,11 @@ string getExtensionFromFullPath(const string& strFullFileName,
 string getDirectoryFromFullPath(const string& strFullFileName,
 								bool bMakeLowerCase)
 {
-	char zDrive[_MAX_DRIVE], zPath[_MAX_PATH], zFileName[_MAX_FNAME], zExt[_MAX_EXT];
-	// Break a path name into components.
-	_splitpath_s(strFullFileName.c_str(), zDrive, zPath, zFileName, zExt);
+	char zDrive[_MAX_DRIVE] = {0}, zPath[_MAX_PATH] = {0},
+		zFileName[_MAX_FNAME] = {0}, zExt[_MAX_EXT] = {0};
+
+	// Break a path name into components. Trim quotes from path if they exist
+	_splitpath_s(trim(strFullFileName, "\"", "\"").c_str(), zDrive, zPath, zFileName, zExt);
 
 	// this directory has a trailing "\"
 	string strRet = string(zDrive) + string(zPath);
@@ -229,9 +230,11 @@ string getDirectoryFromFullPath(const string& strFullFileName,
 string getFileNameFromFullPath(const string& strFullFileName,
 							   bool bMakeLowerCase)
 {
-	char zDrive[_MAX_DRIVE], zPath[_MAX_PATH], zFileName[_MAX_FNAME], zExt[_MAX_EXT];
-	// Break a path name into components.
-	_splitpath_s(strFullFileName.c_str(), zDrive, zPath, zFileName, zExt);
+	char zDrive[_MAX_DRIVE] = {0}, zPath[_MAX_PATH] = {0},
+		zFileName[_MAX_FNAME] = {0}, zExt[_MAX_EXT] = {0};
+
+	// Break a path name into components. Trim quotes from path if they exist
+	_splitpath_s(trim(strFullFileName, "\"", "\"").c_str(), zDrive, zPath, zFileName, zExt);
 
 	string strRet = string(zFileName) + string(zExt);
 	if (bMakeLowerCase)
@@ -245,10 +248,11 @@ string getFileNameFromFullPath(const string& strFullFileName,
 string getPathAndFileNameWithoutExtension(const string& strFullFileName,
 										  bool bMakeLowerCase)
 {
-	char zDrive[_MAX_DRIVE], zPath[_MAX_PATH], zFileName[_MAX_FNAME], zExt[_MAX_EXT];
-	
-	// Break a path name into components.
-	_splitpath_s(strFullFileName.c_str(), zDrive, zPath, zFileName, zExt);
+	char zDrive[_MAX_DRIVE] = {0}, zPath[_MAX_PATH] = {0},
+		zFileName[_MAX_FNAME] = {0}, zExt[_MAX_EXT] = {0};
+
+	// Break a path name into components. Trim quotes from path if they exist
+	_splitpath_s(trim(strFullFileName, "\"", "\"").c_str(), zDrive, zPath, zFileName, zExt);
 
 	string strRet = string(zDrive) + string(zPath) + string(zFileName);
 	if (bMakeLowerCase)
@@ -259,33 +263,45 @@ string getPathAndFileNameWithoutExtension(const string& strFullFileName,
 	return strRet;
 }
 //--------------------------------------------------------------------------------------------------
-string getDriveFromFullPath(string strFullFileName, bool bMakeLowerCase)
+string getDriveFromFullPath(const string& strFullFileName, bool bMakeLowerCase)
 {
-	char zDrive[_MAX_DRIVE], zPath[_MAX_PATH], zFileName[_MAX_FNAME], zExt[_MAX_EXT];
-	// Break a path name into components.
-	_splitpath_s(strFullFileName.c_str(), zDrive, zPath, zFileName, zExt);
+	// Trim any quotes from the path
+	string strFileName = trim(strFullFileName, "\"", "\"");
 
-	string strRet = string(zDrive) + "\\";
-	if (bMakeLowerCase)
-	{
-		makeLowerCase(strRet);
-	}
+	// The return string
+	string strRet;
 
 	// Check for UNC path (P13 #4610, #4611)
-	int nPos = strFullFileName.find( "\\\\", 0 );
+	int nPos = strFileName.find( "\\\\", 0 );
 	if (nPos == 0)
 	{
 		// Full path begins with \\, find the next two backslashes
-		nPos = strFullFileName.find( "\\", nPos + 2 );
+		nPos = strFileName.find( "\\", nPos + 2 );
 		if (nPos != string::npos)
 		{
-			nPos = strFullFileName.find( "\\", nPos + 1 );
+			nPos = strFileName.find( "\\", nPos + 1 );
 			if (nPos != string::npos)
 			{
 				// Found the second backslash, these characters are the Drive
-				strRet = strFullFileName.substr( 0, nPos + 1 );
+				strRet = strFileName.substr( 0, nPos + 1 );
 			}
 		}
+	}
+	else
+	{
+		// Not a unc path, use the split function
+		char zDrive[_MAX_DRIVE] = {0}, zPath[_MAX_PATH] = {0},
+			zFileName[_MAX_FNAME] = {0}, zExt[_MAX_EXT] = {0};
+
+		// Break a path name into components. Trim quotes from path if they exist
+		_splitpath_s(strFileName.c_str(), zDrive, zPath, zFileName, zExt);
+
+		strRet = string(zDrive) + "\\";
+	}
+
+	if (bMakeLowerCase)
+	{
+		makeLowerCase(strRet);
 	}
 
 	return strRet;
