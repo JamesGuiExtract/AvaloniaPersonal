@@ -117,7 +117,7 @@
 <TESTCASE>;Fuzzy5.rsd;.\Fuzzy20.txt;;Test37.eav
 
 //test38 Fuzzy search; 1 method=better_fit; input has repeating substrings, leading non-whitespace chars, 1 deletion
-<TESTCASE>;Fuzzy5.rsd;.\Fuzzy20.txt;;Test38.eav
+<TESTCASE>;Fuzzy6.rsd;.\Fuzzy20.txt;;Test38.eav
 
 //test39 Fuzzy search; 1 method=better_fit 1 method=fast; input has repeating substrings, leading non-whitespace chars, 1 deletion
-<TESTCASE>;Fuzzy6.rsd;.\Fuzzy21.txt;;Test39.eav
+<TESTCASE>;Fuzzy7.rsd;.\Fuzzy21.txt;;Test39.eav
