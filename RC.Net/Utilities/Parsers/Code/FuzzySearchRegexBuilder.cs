@@ -119,14 +119,14 @@ namespace Extract.Utilities.Parsers
                 string termIdentifier = id.ToString(CultureInfo.InvariantCulture);
 
                 // Initialze the stack names using termIdentifier.
-                _initialErrorStack = "__initial_error_stack" + termIdentifier;
-                _initialExtraSpaceStack = "__initial_extra_space_stack" + termIdentifier;
-                _initialMissedStack = "__initial_missed_stack" + termIdentifier;
-                _finalErrorStack = "__final_error_stack" + termIdentifier;
-                _finalExtraSpaceStack = "__final_extra_space_stack" + termIdentifier;
-                _finalMissedStack = "__final_missed_stack" + termIdentifier;
-                _allowableLookAheadStack = "__allowable_lookahead_stack" + termIdentifier;
-                _actualMatchedString = "__actual_matched_string" + termIdentifier;
+                _initialErrorStack = "_ie" + termIdentifier;
+                _initialExtraSpaceStack = "_ies" + termIdentifier;
+                _initialMissedStack = "_im" + termIdentifier;
+                _finalErrorStack = "_fe" + termIdentifier;
+                _finalExtraSpaceStack = "_fes" + termIdentifier;
+                _finalMissedStack = "_fm" + termIdentifier;
+                _allowableLookAheadStack = "_al" + termIdentifier;
+                _actualMatchedString = "_ams" + termIdentifier;
             }
 
             /// <summary>
@@ -381,14 +381,15 @@ namespace Extract.Utilities.Parsers
                         IncrementStack(stackNames.ErrorStack, (int)options.ErrorsAllowed));
                     expandedSearchString.Append(IncrementStack(stackNames.ExtraSpaceStack,
                             (int)options.ExtraWhitespaceAllowed));
+                    expandedSearchString.AppendLine();
 
                     // For better fit method, create named group to store the matched string.
                     if (options.SearchMethod == FuzzySearchOptions.Method.BetterFit)
                     {
-                        expandedSearchString.Append(@"(?=");
                         expandedSearchString.Append(@"(?'");
                         expandedSearchString.Append(stackNames.ActualMatchedString);
                         expandedSearchString.Append(@"'");
+                        expandedSearchString.AppendLine();
                     }
 
                     // Leading whitespace will be allowed for the first token of the fast method.
@@ -402,17 +403,9 @@ namespace Extract.Utilities.Parsers
                         string searchToken = searchTokens[i];
                         bool zeroWidthAssertion = isZeroWidthAssertion(searchToken);
 
-                        // Allow substitution except in the case where better fit method is being
-                        // used and the first token is a zero width assertion.
-                        bool allowSubstitution =
-                            (options.SearchMethod != FuzzySearchOptions.Method.BetterFit ||
-                            i != 0 || !zeroWidthAssertion);
-
-                        bool lastTerm = (i == (searchTokens.Count - 1));
-
                         AddTokenSearchTerm(expandedSearchString, searchToken, stackNames,
                             options.SearchMethod == FuzzySearchOptions.Method.BetterFit,
-                            allowSubstitution, allowLeadingSpace, lastTerm);
+                            allowLeadingSpace);
 
                         // Allow leading whitespace starting with the first token following a
                         // non zero width assertion token.
@@ -424,18 +417,19 @@ namespace Extract.Utilities.Parsers
                     if (options.SearchMethod == FuzzySearchOptions.Method.BetterFit)
                     {
                         // Close the ActualMatchedString search token group
-                        expandedSearchString.Append(@"))");
+                        expandedSearchString.AppendLine(@")");
 
                         // Open a new search token group that attempts to lookahead to avoid
                         // matching any leading chars that are not part of the actual matched string.
+                        expandedSearchString.AppendLine(@"(?<=");
+
                         expandedSearchString.Append(@"(?!");
                         expandedSearchString.Append(
                             IncrementStack(stackNames.FinalErrorStack, -1));
                         expandedSearchString.Append(@"(");
                         expandedSearchString.Append(
                             IncrementStack(stackNames.AllowableLookAheadStack, -1));
-                        expandedSearchString.Append(@".\s*)+?");
-                        expandedSearchString.Append(@"(?>");
+                        expandedSearchString.AppendLine(@".\s*)+?");
 
                         // Switch to use the final stack name set for the following group of token
                         // search terms.
@@ -448,17 +442,10 @@ namespace Extract.Utilities.Parsers
                         for (int i = 0; i < searchTokens.Count; i++)
                         {
                             string searchToken = searchTokens[i];
-                            bool lastTerm = (i == (searchTokens.Count - 1));
                             bool zeroWidthAssertion = isZeroWidthAssertion(searchToken);
 
-                            // Allow substitution except in the case where better fit method is being
-                            // used and the first token is a zero width assertion.
-                            bool allowSubstitution =
-                                (options.SearchMethod != FuzzySearchOptions.Method.BetterFit ||
-                                i != 0 || !zeroWidthAssertion);
-
                             AddTokenSearchTerm(expandedSearchString, searchToken, stackNames,
-                                false, allowSubstitution, allowLeadingSpace, lastTerm);
+                                false, allowLeadingSpace);
 
                             // Allow leading whitespace starting with the first token following a
                             // non zero width assertion token.
@@ -466,10 +453,10 @@ namespace Extract.Utilities.Parsers
                         }
 
                         // End the lookahead term.
-                        expandedSearchString.Append(@"))");
+                        expandedSearchString.AppendLine(@")");
                         expandedSearchString.Append(@"\k'");
                         expandedSearchString.Append(stackNames.ActualMatchedString);
-                        expandedSearchString.Append(@"'");
+                        expandedSearchString.Append(@"')");
                     }
 
                     // End the fuzzy search regex expansion group
@@ -525,68 +512,32 @@ namespace Extract.Utilities.Parsers
         /// </param>
         /// <param name="initialBetterFitTerm"><see langword="true"/> to build a term for the first
         /// part of a better fit expression.</param>
-        /// <param name="allowSubstitution"><see langword="true"/> to build a term that allows
-        /// another character to be substituted in the event of a miss.</param>
         /// <param name="allowLeadingSpace"><see langword="true"/> to allow for a space prior to
         /// matching the search token, <see langword="false"/> to require the next char to match
         /// the search token.</param>
-        /// <param name="lastTerm"><see langword="true"/> if this is the final term in a set.
-        /// </param>
         static void AddTokenSearchTerm(StringBuilder regEx, string searchToken,
-            BalancingRegexStackNames stackNames, bool initialBetterFitTerm, bool allowSubstitution,
-            bool allowLeadingSpace, bool lastTerm)
+            BalancingRegexStackNames stackNames, bool initialBetterFitTerm, bool allowLeadingSpace)
         {
             // Open a group by attempting to match the search token.
-            regEx.Append(@"(");
-            regEx.Append(searchToken);
+            regEx.Append(@"  (");
 
-            // Add mismatched token and missing terms that update the stacks to reflect failed
-            // match to the search token. (The ordering is different for the last token).
-            if (lastTerm)
+            // Add a term to reflect a char that does not correspond to the search token.
+            AddIgnoreTokenTerm(regEx, stackNames, initialBetterFitTerm);
+
+            // Allow for space chars before matching the search token if specified.
+            if (allowLeadingSpace)
             {
-                // Add a term to reflect a char that does not correspond to the search token.
-                AddMismatchedTokenTerm(regEx, stackNames, initialBetterFitTerm);
-
-                // (last term should always allow leading space)
                 AddExtraSpaceTerm(regEx, stackNames, initialBetterFitTerm);
-                regEx.Append(searchToken);
-
-                // Add a term to reflect a char that is missing from the text being searched.
-                AddMissingTokenTerm(regEx, stackNames, initialBetterFitTerm, allowSubstitution);
-            }
-            else
-            {
-                // Add a term to reflect a char that is missing from the text being searched.
-                AddMissingTokenTerm(regEx, stackNames, initialBetterFitTerm, allowSubstitution);
-
-                // Add a term to reflect a char that does not correspond to the search token.
-                AddMismatchedTokenTerm(regEx, stackNames, initialBetterFitTerm);
             }
 
-            // If this is the last term, close the group containing the terms.
-            if (lastTerm)
-            {
-                regEx.Append(@")");
-            }
-            else
-            {
-                // Allow for space chars before matching the search token if specified.
-                if (allowLeadingSpace)
-                {
-                    AddExtraSpaceTerm(regEx, stackNames, initialBetterFitTerm);
-                }
+            AddMatchTokenTerm(regEx, stackNames, searchToken);
 
-                regEx.Append(searchToken);
-                regEx.Append(@")");
+            regEx.Append(@"|");
 
-                // Allow for space chars after matching the search token except if substitution is
-                // not being allowed (in which case allowing a space is more or less like allowing
-                // a substituion).
-                if (allowSubstitution)
-                {
-                    AddExtraSpaceTerm(regEx, stackNames, initialBetterFitTerm);
-                }
-            }
+            // Add a token for allow for a missing token.
+            AddMissingTokenTerm(regEx, stackNames, initialBetterFitTerm);
+
+            regEx.AppendLine(@")");
         }
 
         /// <summary>
@@ -598,17 +549,13 @@ namespace Extract.Utilities.Parsers
         /// <param name="stackNames">The set of stack names to be modified.</param>
         /// <param name="initialBetterFitTerm"><see langword="true"/> to build a term for the first
         /// part of a better fit expression.</param>
-        /// <param name="allowSubstitution"><see langword="true"/> to build a term that allows
-        /// another character to be substituted in the event of a miss.</param>
         static void AddMissingTokenTerm(StringBuilder term, BalancingRegexStackNames stackNames,
-            bool initialBetterFitTerm, bool allowSubstitution)
+            bool initialBetterFitTerm)
         {
             // Decrement the error stack
-            term.Append(@"|");
             term.Append(IncrementStack(stackNames.ErrorStack, -1));
 
-            // Increment the stack of missed chars if allowing substitution
-            term.Append(IncrementStack(stackNames.MissedStack, allowSubstitution ? 1 : 0));
+            term.Append(IncrementStack(stackNames.MissedStack, 1));
 
             // Increment the number of errors the better fit mode will try to remove from the
             // initial match.
@@ -625,28 +572,53 @@ namespace Extract.Utilities.Parsers
         /// <param name="term">A <see cref="StringBuilder"/> to which the regular expression term
         /// should be appended.</param>
         /// <param name="stackNames">The set of stack names to be modified.</param>
-        /// <param name="initialBetterFitTerm"><see langword="true"/> to build a term for the first
-        /// part of a better fit expression.</param>
-        static void AddMismatchedTokenTerm(StringBuilder term, BalancingRegexStackNames stackNames,
+        /// <param name="initialBetterFitTerm"><see langword="true"/> to build a term for the
+        /// first part of a better fit expression.</param>
+        static void AddIgnoreTokenTerm(StringBuilder term, BalancingRegexStackNames stackNames,
             bool initialBetterFitTerm)
         {
             // Decrement the error stack as well the last miss that had been added to the missed
             // chars stack.
-            term.Append(@"|(?>.(");
+            term.Append(@"(?>.(");
             term.Append(IncrementStack(stackNames.MissedStack, -1));
             term.Append(@"|");
             term.Append(IncrementStack(stackNames.ErrorStack, -1));
-            term.Append(@")");
 
             // Increment the number of errors the better fit mode will try to remove from the
             // initial match and distance the better fit mode can look ahead.
             if (initialBetterFitTerm)
             {
                 term.Append(IncrementStack(stackNames.FinalErrorStack, 1));
+                term.Append(@")");
                 term.Append(IncrementStack(stackNames.AllowableLookAheadStack, 1));
             }
+            else
+            {
+                term.Append(@")");
+            }
 
-            term.Append(@")+?");
+            term.Append(@")*?");
+        }
+
+        /// <summary>
+        /// Generates a regular expression token that checks for a character that matches the
+        /// specified search token.
+        /// </summary>
+        /// <param name="term">A <see cref="StringBuilder"/> to which the regular expression term
+        /// should be appended.</param>
+        /// <param name="stackNames">The set of stack names to be modified.</param>
+        /// <param name="searchToken">A character or character class representing a match for the
+        /// current term.</param>
+        static void AddMatchTokenTerm(StringBuilder term, BalancingRegexStackNames stackNames,
+             string searchToken)
+        {
+            term.Append(searchToken);
+            term.Append(@"(?(");
+            term.Append(stackNames.MissedStack);
+            term.Append(@")");
+
+            term.Append(IncrementStack(stackNames.MissedStack, -1));
+            term.Append(@")");
         }
 
         /// <summary>
