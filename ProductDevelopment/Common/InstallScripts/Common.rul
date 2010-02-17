@@ -505,17 +505,6 @@ begin
 		//	abort;
 		//endif;
 	endif;
-
-	// Create the path for the uninstall key
-	strUninstallKey = REG_PATH_UNINSTALL ^ SQL_CE_DATABASE_VIEWER_AND_EDITOR_CODE;
-	                                        
-	if (RegDBKeyExist(strUninstallKey) < 0 ) then
-		szProgram = "msiexec"; 
-		szCmdLine = " /i " + SUPPORTDIR ^ "\\SqlCeEditorSetup.msi /passive";
-		SdShowMsg("Setup is Installing SQL Compact Edition Editor", TRUE);
-		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
-		SdShowMsg("Setup is Installing SQL Compact Edition Editor", FALSE);
-	endif;
 end;
 
             
