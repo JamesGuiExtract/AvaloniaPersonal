@@ -51,7 +51,7 @@
 // 2+ rows, 1+ cols, column width 30, pages 2-4
 <TESTFOLDER>;.\Test12.rsd;.\AutomatedTestImage\;$DirOf(<SourceDocName>)\Test12.tif.voa;$DirOf(<SourceDocName>)\ExpectedVOA\Test12.tif.voa
 
-// 2-3 rows, 1 col, min column width 50, all pages
+// 3 rows, 1 col, min column width 50, all pages
 // Tests:[FlexIDSCore:3040]
 <TESTFOLDER>;.\Test13.rsd;.\AutomatedTestImage\FlexIDSCore-3040\;$DirOf(<SourceDocName>)\Test13.tif.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test13.tif.voa
 
