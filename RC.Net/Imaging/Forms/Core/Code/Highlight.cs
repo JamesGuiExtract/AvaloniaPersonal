@@ -1181,7 +1181,7 @@ namespace Extract.Imaging.Forms
             if (gripHandles[gripHandleId] == start)
             {
                 // Swap the start point and end point
-                QuietSetSpatialData(_endPoint, Point.Round(gripHandles[gripHandleId]), _height);
+                QuietSetSpatialData(_endPoint, _startPoint, _height);
 
                 // Done.
                 return;
@@ -1194,7 +1194,8 @@ namespace Extract.Imaging.Forms
                 if (gripHandleId != i && gripHandles[i] != start && gripHandles[i] != end)
                 {
                     // Define the new highlight
-                    QuietSetSpatialData(Point.Round(gripHandles[i]), Point.Round(gripHandles[gripHandleId]),
+                    PointF[] points = GetGripPoints(_startPoint, _endPoint, _height);
+                    QuietSetSpatialData(Point.Round(points[i]), Point.Round(points[gripHandleId]),
                         (int) GeometryMethods.Distance(_startPoint, _endPoint));
 
                     // Done.
@@ -1579,61 +1580,81 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                // Get the center point of the highlight
-                PointF center = GetCenterPoint();
-
                 // Handle the special case of an empty highlight
                 if (_startPoint == _endPoint)
                 {
-                    return new PointF[] { center };
+                    return new PointF[] { GetCenterPoint() };
                 }
 
+                // Get the midpoints of the sides of the selection border
                 PointF start;
                 PointF end;
                 float height;
                 GetSelectionZone(out start, out end, out height);
 
-                // Calculate the vertical and horizontal modifiers. These are the values to add and 
-                // subtract from the center to determine the "top" and "bottom" of the rectangle.
-                double xModifier = height / 2.0 * Math.Sin(_angle);
-                double yModifier = height / 2.0 * Math.Cos(_angle);
-
-                // Calculate the grip handles
-                PointF[] gripHandles;
-                if (Math.Abs(_angle % (Math.PI / 2)) <= 1e-10)
-                {
-                    // This is a rectangular highlight. There should be eight grip handles.
-                    gripHandles = new PointF[] 
-                        {
-                            start,
-                            new PointF((float)(center.X - xModifier), (float)(center.Y + yModifier)),
-                            end,
-                            new PointF((float)(center.X + xModifier), (float)(center.Y - yModifier)),
-                            new PointF((float)(start.X + xModifier), (float)(start.Y - yModifier)),
-                            new PointF((float)(start.X - xModifier), (float)(start.Y + yModifier)),
-                            new PointF((float)(end.X - xModifier), (float)(end.Y + yModifier)),
-                            new PointF((float)(end.X + xModifier), (float)(end.Y - yModifier))
-                        };
-                }
-                else
-                {
-                    // This is an angular highlight. There should be four grip handles.
-                    gripHandles = new PointF[] 
-                        {
-                            start,
-                            new PointF((float)(center.X - xModifier), (float)(center.Y + yModifier)),
-                            end,
-                            new PointF((float)(center.X + xModifier), (float)(center.Y - yModifier))
-                        };
-                }
-
-                // Return the grip handles
-                return gripHandles;
+                return GetGripPoints(start, end, height);
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI22408", ex);
             }
+        }
+
+
+        /// <summary>
+        /// Retrieves the center points of grip handles appropriate for the highlight in logical 
+        /// (image) coordinates.
+        /// </summary>
+        /// <returns>The center points of grip handles appropriate for the highlight in logical 
+        /// (image) coordinates.</returns>
+        /// <remarks>
+        /// <para>If the highlight is rectangular there will be eight grip handles, one for 
+        /// each side and one for each vertex. If the highlight is angular there will be four grip 
+        /// handles, one for each side.</para>
+        /// <para>The midpoints of the sides are the first four elements. If the highlight is 
+        /// rectangular, the vertices are the last four elements.</para>
+        /// </remarks>
+        PointF[] GetGripPoints(PointF start, PointF end, float height)
+        {
+            // Get the center point of the highlight
+            PointF center = GeometryMethods.GetCenterPoint(start, end);
+
+            // Calculate the vertical and horizontal modifiers. These are the values to add and 
+            // subtract from the center to determine the "top" and "bottom" of the rectangle.
+            double xModifier = height / 2.0 * Math.Sin(_angle);
+            double yModifier = height / 2.0 * Math.Cos(_angle);
+
+            // Calculate the grip handles
+            PointF[] gripHandles;
+            if (Math.Abs(_angle % (Math.PI / 2)) <= 1e-10)
+            {
+                // This is a rectangular highlight. There should be eight grip handles.
+                gripHandles = new PointF[] 
+                {
+                    start,
+                    new PointF((float)(center.X - xModifier), (float)(center.Y + yModifier)),
+                    end,
+                    new PointF((float)(center.X + xModifier), (float)(center.Y - yModifier)),
+                    new PointF((float)(start.X + xModifier), (float)(start.Y - yModifier)),
+                    new PointF((float)(start.X - xModifier), (float)(start.Y + yModifier)),
+                    new PointF((float)(end.X - xModifier), (float)(end.Y + yModifier)),
+                    new PointF((float)(end.X + xModifier), (float)(end.Y - yModifier))
+                };
+            }
+            else
+            {
+                // This is an angular highlight. There should be four grip handles.
+                gripHandles = new PointF[] 
+                {
+                    start,
+                    new PointF((float)(center.X - xModifier), (float)(center.Y + yModifier)),
+                    end,
+                    new PointF((float)(center.X + xModifier), (float)(center.Y - yModifier))
+                };
+            }
+
+            // Return the grip handles
+            return gripHandles;
         }
 
         /// <summary>
