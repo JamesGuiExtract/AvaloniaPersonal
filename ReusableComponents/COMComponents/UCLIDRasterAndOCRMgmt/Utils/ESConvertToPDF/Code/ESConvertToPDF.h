@@ -59,6 +59,9 @@ private:
 	// filename of exception log if exceptions should be logged, "" if exceptions should be displayed
 	string m_strExceptionLogFile;
 
+	// Whether the OCR engine has been initialized or not
+	bool m_bOcrEngineInitialized;
+
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Converts the image file strInputFile into a searchable PDF at strOutputFile.
 	void convertToSearchablePDF();
@@ -87,7 +90,9 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Makes the appropriate RecAPI calls to license the RecAPIPlus layers of the OCR engine.
 	// REQUIRE: A writable convlist.txt file must exist in the same directory as the RecAPIPlus dll.
-	static void licenseOCREngine();
+	void licenseOCREngine();
+	//---------------------------------------------------------------------------------------------
+	void closeOcrEngine();
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Throws an exception if this executable is unlicensed. Returns true otherwise.
 	static void validateLicense();

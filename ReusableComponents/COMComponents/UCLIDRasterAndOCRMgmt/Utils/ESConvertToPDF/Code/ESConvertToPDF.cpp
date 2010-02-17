@@ -71,7 +71,8 @@ CESConvertToPDFApp::CESConvertToPDFApp()
 	  m_bRemoveOriginal(false),
 	  m_bPDFA(false),
 	  m_bIsError(true),          // assume error until successfully completed
-	  m_strExceptionLogFile("")
+	  m_strExceptionLogFile(""),
+	  m_bOcrEngineInitialized(false)
 {
 	// TODO: add construction code here,
 	// Place all significant initialization in InitInstance
@@ -117,11 +118,17 @@ BOOL CESConvertToPDFApp::InitInstance()
 
 			// completed successfully
 			m_bIsError = false;
+
+			// Close the OCR engine
+			closeOcrEngine();
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18536");
 	}
 	catch(UCLIDException ue)
 	{
+		// Ensure the OCR engine is closed
+		closeOcrEngine();
+
 		// check if the exception log parameter was set
 		if (m_strExceptionLogFile.empty())
 		{
@@ -617,6 +624,20 @@ void CESConvertToPDFApp::licenseOCREngine()
 			// this wasn't a warning. it's an error.
 			throw ue;
 		}
+	}
+
+	m_bOcrEngineInitialized = true;
+}
+//-------------------------------------------------------------------------------------------------
+void CESConvertToPDFApp::closeOcrEngine()
+{
+	// Check if the engine was initialized
+	if (m_bOcrEngineInitialized)
+	{
+		// Quit the engine
+		RecQuitPlus();
+
+		m_bOcrEngineInitialized = false;
 	}
 }
 //-------------------------------------------------------------------------------------------------
