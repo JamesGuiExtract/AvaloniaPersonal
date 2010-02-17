@@ -2887,6 +2887,20 @@ bool CSplitRegionIntoContentAreas::loadPageBitmap(IAFDocumentPtr ipDoc, long nPa
 			if (m_bUseLines)
 			{
 				LeadToolsLineFinder ltLineFinder;
+				
+				// [FlexIDSCore:3438]
+				// In most cases when trying to find lines, the emphasis is on not missing lines
+				// and, therefore, having settings that will frequently produce "false-positives"
+				// by identifying printed text and other markings that aren't actually lines as
+				// lines. However, in the split region rule, the emphasis needs to be more on
+				// ensuring content is covered and not on identifying all lines. Therefore, tighten
+				// the line-finding settings for SRICA.
+				// Lowering the GapLength makes it less likely that words will be counted as lines
+				ltLineFinder.m_lr.iGapLength = 5;
+				// Lowering the iWall decreases the chance that handwriting will be interpreted as
+				// a line (and also that thick lines will be found).
+				ltLineFinder.m_lr.iWall = 25;
+
 				ltLineFinder.findLines(&(m_apPageBitmap->m_hBitmap), 
 					LINEREMOVE_HORIZONTAL, m_vecHorizontalLines);
 				ltLineFinder.findLines(&(m_apPageBitmap->m_hBitmap), 
