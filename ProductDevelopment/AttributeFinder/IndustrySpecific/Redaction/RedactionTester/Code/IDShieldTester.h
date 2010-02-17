@@ -209,6 +209,10 @@ private:
 	// an over redaction
 	double m_dOverRedactionERAP;
 
+	// Minimum percentage of overlap consider two zones as overlapping. (as a percentage of the
+	// area of the smaller zone).
+	double m_dOverlapMinimumPercent;
+
 	// Directory for output log files
 	string m_strOutputFileDirectory;
 

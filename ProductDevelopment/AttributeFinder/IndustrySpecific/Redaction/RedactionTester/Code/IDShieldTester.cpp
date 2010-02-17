@@ -35,6 +35,11 @@ const string gstrOVERLAP_DEFAULT_VALUE = "80";
 const string gstrOVER_REDACTION_PERCENT_KEY = "OverRedactionERAP";
 const string gstrOVER_REDACTION_ERAP_DEFAULT_VALUE = "30";
 
+// Minimum percentage of overlap consider two zones as overlapping.
+// (as a percentage of the area of the smaller zone)
+const string gstrOVERLAP_MINUMUM_PERCENT_KEY = "RasterZoneOverlapMinimum";
+const string gstrOVERLAP_MINUMUM_DEFAULT_VALUE = "10";
+
 const string gstrDOCTYPEQUERY = "DocumentType";
 
 //-------------------------------------------------------------------------------------------------
@@ -287,6 +292,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			// Create a persistence manager to get the overlap value from the registry
 			RegistryPersistenceMgr rpm( HKEY_CURRENT_USER, gstrMIN_OVERLAP_REGISTRY_KEY_PATH );
 
+			// Leniency percentage allowed before a redaction is considered an under-redaction.
 			// If a key exists, use the one that is currently in the registry
 			string strOverlapLeniency = "";
 			if( rpm.keyExists(gstrOVERLAP_PERCENT_FOLDER, gstrOVERLAP_PERCENT_KEY) )
@@ -304,6 +310,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			// Use the key that was in the registry, or the default one as the above blocks determine
 			m_dOverlapLeniencyPercent = asDouble( strOverlapLeniency );
 			
+			// Excess redaction area percentage
 			// if a key exists, use the one that is currently in the registry
 			string strOverRedactionERAP = "";
 			if (rpm.keyExists(gstrOVERLAP_PERCENT_FOLDER, gstrOVER_REDACTION_PERCENT_KEY))
@@ -321,6 +328,25 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 
 			// use the key from the registry or the default as set above
 			m_dOverRedactionERAP = asDouble(strOverRedactionERAP);
+
+			// Overlap minumum
+			// If a key exists, use the one that is currently in the registry
+			string strOverlapMinimumPercent = "";
+			if (rpm.keyExists(gstrOVERLAP_PERCENT_FOLDER, gstrOVERLAP_MINUMUM_PERCENT_KEY))
+			{
+				strOverlapMinimumPercent = rpm.getKeyValue(gstrOVERLAP_PERCENT_FOLDER, 
+					gstrOVERLAP_MINUMUM_PERCENT_KEY);
+			}
+			else
+			{
+				// key does not exist, create a key with the default value
+				rpm.createKey(gstrOVERLAP_PERCENT_FOLDER, gstrOVERLAP_MINUMUM_PERCENT_KEY, 
+					gstrOVERLAP_MINUMUM_DEFAULT_VALUE, true);
+				strOverlapMinimumPercent = gstrOVERLAP_MINUMUM_DEFAULT_VALUE;
+			}
+
+			// use the key from the registry or the default as set above
+			m_dOverlapMinimumPercent = asDouble(strOverlapMinimumPercent);
 
 			// reset all variables associated with the test
 			m_mapDocTypeCount.clear();
@@ -2202,10 +2228,17 @@ bool CIDShieldTester::spatialStringsOverlap(ISpatialStringPtr ipSS1, ISpatialStr
 
 			// check the area of overlap, it should be zero
 			// NOTE: GetAreaOverlappingWith checks the page number so no need to do it here
-			if (!MathVars::isZero(ipZone1->GetAreaOverlappingWith(ipZone2)))
+			double dOverlap = ipZone1->GetAreaOverlappingWith(ipZone2);
+			if (!MathVars::isZero(dOverlap))
 			{
-				// area of overlap is not zero - strings overlap so return true
-				return  true;
+				double dOverlapPercent = (dOverlap / min(ipZone1->Area, ipZone2->Area)) * 100;
+
+				// [FlexIDSCore:4104] Ensure at least one raster zone overlaps by
+				// m_dOverlapMinimumPercent before considering the attributes overlapping.
+				if (dOverlapPercent >= m_dOverlapMinimumPercent)
+				{
+					return true;
+				}
 			}
 		}
 	}
@@ -2281,6 +2314,9 @@ double CIDShieldTester::computeTotalAreaOfOverlap(IAttributePtr ipExpected, IAtt
 	// default the overlap area to 0
 	double dAreaOfOverlap = 0.0;
 
+	// Keeps track of whether any raster zone overlaps by m_dOverlapMinimumPercent.
+	bool bAttributesOverlap = false;
+
 	// make sure both strings are spatial
 	if (asCppBool(ipExpectedSS->HasSpatialInfo()) && asCppBool(ipFoundSS->HasSpatialInfo()))
 	{
@@ -2304,13 +2340,30 @@ double CIDShieldTester::computeTotalAreaOfOverlap(IAttributePtr ipExpected, IAtt
 				IRasterZonePtr ipFRZ = ipFoundRZs->At(j);
 				ASSERT_RESOURCE_ALLOCATION("ELI18436", ipFRZ != NULL);
 
-				// add the area of overlap (GetArea checks page number of zone)
-				dAreaOfOverlap += ipERZ->GetAreaOverlappingWith(ipFRZ);
+				double dOverlap = ipERZ->GetAreaOverlappingWith(ipFRZ);
+
+				if (!MathVars::isZero(dOverlap))
+				{
+					// add the area of overlap (GetArea checks page number of zone)
+					dAreaOfOverlap += dOverlap;
+
+					if (!bAttributesOverlap)
+					{
+						double dOverlapPercent = (dOverlap / min(ipERZ->Area, ipFRZ->Area)) * 100;
+
+						// [FlexIDSCore:4104] Ensure at least one raster zone overlaps by
+						// m_dOverlapMinimumPercent before allowing any overlap to be reported.
+						if (dOverlapPercent >= m_dOverlapMinimumPercent)
+						{
+							bAttributesOverlap = true;
+						}
+					}
+				}
 			}
 		}
 	}
 
-	return dAreaOfOverlap;
+	return (bAttributesOverlap ? dAreaOfOverlap : 0);
 }
 //-------------------------------------------------------------------------------------------------
 void CIDShieldTester::addAttributeToTestOutputVOA(IAttributePtr ipAttribute, 
