@@ -1133,18 +1133,21 @@ void pageZoneToPoints( const PageRasterZone &rZone, POINT &p1, POINT &p2, POINT 
 	double dDiffX = rZone.m_nEndX  - rZone.m_nStartX;
 	double dAngle = atan2(dDiffY, dDiffX);
 	
+	double dDeltaX = rZone.m_nHeight / 2.0 * sin(dAngle);
+	double dDeltaY = rZone.m_nHeight / 2.0 * cos(dAngle);
+	
 	// calculate the 4 points
-	p1.x = rZone.m_nStartX - (long) ((rZone.m_nHeight/2) * sin (dAngle));
-	p1.y = rZone.m_nStartY + (long) ((rZone.m_nHeight/2) * cos (dAngle));
+	p1.x = (long)(rZone.m_nStartX - dDeltaX);
+	p1.y = (long)(rZone.m_nStartY + dDeltaY);
 	
-	p2.x = rZone.m_nEndX - (long) ((rZone.m_nHeight/2) * sin (dAngle));
-	p2.y = rZone.m_nEndY + (long) ((rZone.m_nHeight/2) * cos (dAngle));
+	p2.x = (long)(rZone.m_nEndX - dDeltaX);
+	p2.y = (long)(rZone.m_nEndY + dDeltaY);
 	
-	p3.x = rZone.m_nEndX + (long) ((rZone.m_nHeight/2) * sin (dAngle));
-	p3.y = rZone.m_nEndY - (long) ((rZone.m_nHeight/2) * cos (dAngle));
+	p3.x = (long)(rZone.m_nEndX + dDeltaX);
+	p3.y = (long)(rZone.m_nEndY - dDeltaY);
 	
-	p4.x = rZone.m_nStartX + (long) ((rZone.m_nHeight/2) * sin (dAngle));
-	p4.y = rZone.m_nStartY - (long) ((rZone.m_nHeight/2) * cos (dAngle));
+	p4.x = (long)(rZone.m_nStartX + dDeltaX);
+	p4.y = (long)(rZone.m_nStartY - dDeltaY);
 }
 //-------------------------------------------------------------------------------------------------
 bool isTiff(int iFormat)

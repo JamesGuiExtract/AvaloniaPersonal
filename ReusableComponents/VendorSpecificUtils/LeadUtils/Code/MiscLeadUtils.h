@@ -161,7 +161,7 @@ public:
 		HPEN hPen = NULL;
 		if (it == m_mapColorToPen.end())
 		{
-			hPen = CreatePen(PS_SOLID, 2, color);
+			hPen = CreatePen(PS_SOLID, 1, color);
 
 			// Ensure the pen was created
 			if (hPen == NULL)
