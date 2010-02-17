@@ -252,10 +252,19 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		// if the OS was recognized - run the correct install
 		if (strKeyString != "" )
 		{
-			// Determine if the OS is 32 or 64 bit
-			if (IsWow64() == TRUE )
+			// Initialize flag to turn off 64bit file system redirection.
+			bool bTurnOf64FSRedirection = false;
+
+			if (IsWow64() == TRUE)
 			{
 				strKeyString += "_64";
+
+				// Get the TurnOff64BitFSRedirection flag
+				GetPrivateProfileString("SetupApps", "TurnOff64BitFSRedirection", NULL, zBuffer,
+					gnBUFFER_SIZE, ".\\OSSI.ini");
+
+				// Set to true if value equals 1.
+				bTurnOf64FSRedirection = zBuffer[0] == '1';
 			}
 			else
 			{
@@ -273,8 +282,24 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 				string strCommand = zBuffer;
 				replaceVariable(strCommand, "<CurrentDir>", strCurrDir);
 
+				// Pointer used for disable and reverting file system redirection
+				PVOID pRedirection;
+
+				// If OS is 64 bit disable file system redirection
+				if (bTurnOf64FSRedirection)
+				{
+					Wow64DisableWow64FsRedirection(&pRedirection);
+				}
+
 				// Run the command
-				return RunCommand(strCommand, strDescription);
+				int nReturn = RunCommand(strCommand, strDescription);
+
+				// If OS is 64 bit revert file system redirection
+				if (bTurnOf64FSRedirection)
+				{
+					Wow64RevertWow64FsRedirection(&pRedirection);
+				}
+				return nReturn;
 			}
 		}
 		else
