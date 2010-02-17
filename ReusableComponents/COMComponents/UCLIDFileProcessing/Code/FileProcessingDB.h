@@ -604,6 +604,9 @@ private:
 	// Gets a regular expression parser
 	IRegularExprParserPtr getParser();
 
+	// Checks the login table for the given UserName
+	bool doesLoginUserNameExist(const _ConnectionPtr& ipConnection, const string &strUserName);
+
 	// Class to contain the thread data for the emailMessageThread
 	class EmailThreadData
 	{

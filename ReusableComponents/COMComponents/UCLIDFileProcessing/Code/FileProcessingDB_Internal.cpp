@@ -3275,3 +3275,27 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 	}
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::doesLoginUserNameExist(const _ConnectionPtr& ipConnection, const string &strUserName)
+{
+	// Create a pointer to a recordset
+	_RecordsetPtr ipLoginSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI29710", ipLoginSet != NULL);
+
+	// Sql query that should either be empty if the passed in users is not in the table
+	// or will return the record with the given username
+	string strLoginSelect = "Select Username From Login Where UserName = '" + strUserName + "'";
+
+	// Open the sql query
+	ipLoginSet->Open(strLoginSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+		adLockReadOnly, adCmdText);
+
+	// if not at the end of file then there is a user by that name.
+	if (!asCppBool(ipLoginSet->adoEOF))
+	{
+		return true;
+	}
+
+	// No user by that name was found
+	return false;
+}
+//-------------------------------------------------------------------------------------------------

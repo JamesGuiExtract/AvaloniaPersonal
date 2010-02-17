@@ -1696,7 +1696,7 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 		string strUser = (bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName;
 		
 		// Set the user password
-		string strCaption = "Set " + m_strFAMUserName + "'s Password";
+		string strCaption = "Set " + strUser + "'s Password";
 
 		// Set login valid and cancelled to false
 		*pbLoginValid = VARIANT_FALSE;
@@ -4692,23 +4692,11 @@ STDMETHODIMP CFileProcessingDB::AddLoginUser(BSTR bstrUserName)
 		// Set the transaction guard
 		TransactionGuard tg(ipConnection);
 
-		// Create a pointer to a recordset
-		_RecordsetPtr ipLoginSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI29064", ipLoginSet != NULL);
-
-		// Sql query that should either be empty if the passed in users is not in the table
-		// or will return the record with the given username
-		string strLoginSelect = "Select Username From Login Where UserName = '" + strUserName + "'";
-
-		// Open the sql query
-		ipLoginSet->Open(strLoginSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockReadOnly, adCmdText);
-
-		// Check to see if action exists
-		if (!asCppBool(ipLoginSet->adoEOF))
+		// Check to see if the new user already exists in the database
+		if (doesLoginUserNameExist(ipConnection, strUserName))
 		{
 			UCLIDException ue("ELI29065", "Login username already exists.");
-			ue.addDebugInfo("Usename", strUserName);
+			ue.addDebugInfo("Username", strUserName);
 			throw ue;
 		}
 
@@ -4809,6 +4797,14 @@ STDMETHODIMP CFileProcessingDB::RenameLoginUser(BSTR bstrUserNameToRename, BSTR 
 
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
+
+		// Check to see if the new user already exists in the database
+		if (doesLoginUserNameExist(ipConnection, strNewUserName))
+		{
+			UCLIDException ue("ELI29711", "Login username already exists.");
+			ue.addDebugInfo("Username", strNewUserName);
+			throw ue;
+		}
 
 		// Set the transaction guard
 		TransactionGuard tg(ipConnection);
