@@ -71,9 +71,6 @@ const double gdMAX_HORIZONTAL_LINE_SLOPE = 0.02;
 // maximum number of pixels for zones to be considered overlapping
 const int giMAX_ZONE_OVERLAP = 8;
 
-// Constant for storing the OCR engine version [#5512]
-const string gstrOCR_ENGINE_VERSION = "Nuance 16.0";
-
 //-------------------------------------------------------------------------------------------------
 // Macros
 //-------------------------------------------------------------------------------------------------
@@ -799,7 +796,7 @@ void CScansoftOCR2::storeResultAsSpatialString(const string& strFileName,
 	}
 
 	// Store the OCR engine version [LRCAU #5512]
-	m_ipSpatialString->OCREngineVersion = gstrOCR_ENGINE_VERSION.c_str();
+	m_ipSpatialString->OCREngineVersion = m_strVersion.c_str();
 
 	// Trim the spaces from the front and the back of the OCR'text.
 	// P16 2286
@@ -967,6 +964,9 @@ void CScansoftOCR2::init()
 	{
 		// initialize the Scansoft OCR engine and any necessary licensing thereof
 		initEngineAndLicense();
+
+		// Get the RecAPI version number
+		m_strVersion = "Nuance " + asString(kRecGetVersion() / 100.0, 2);
 
 		// Initialize our registry settings manager
 		m_apCfg = auto_ptr<ScansoftOCRCfg>(new ScansoftOCRCfg());

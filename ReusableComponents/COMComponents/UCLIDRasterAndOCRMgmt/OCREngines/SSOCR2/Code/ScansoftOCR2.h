@@ -184,6 +184,9 @@ private:
 	static long ms_lCurrentPageNumber;
 	static unsigned int ms_uiCurrentPageIndex;
 
+	// The version of the RecAPI engine
+	string m_strVersion;
+
 	// these are for controlling the timeout thread
 	// when this (auto reset)event is signaled
 	// the timeout thread will stop running
