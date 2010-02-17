@@ -124,7 +124,7 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 					}
 					else if (ulClosingBracket - ulBracketPos == 1)
 					{
-						UCLIDException uex("ELI0", "Missing token definition.");
+						UCLIDException uex("ELI29709", "Missing token definition.");
 						uex.addDebugInfo("Function String", str.substr(ulNamePos, ulClosingBracket));
 						throw uex;
 					}
