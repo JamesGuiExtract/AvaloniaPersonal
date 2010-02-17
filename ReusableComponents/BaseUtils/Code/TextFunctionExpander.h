@@ -85,10 +85,10 @@ private:
 	const string expandExtOf(const string&) const;
 	const string expandFileOf(const string&) const;
 	const string expandFileNoExtOf(const string&) const;
-	const string expandInsertBeforeExt(const string& str) const;
-	const string expandOffset(const string& str) const;
-	const string expandPadValue(const string& str) const;
-	const string expandReplace(const string& str) const;
+	const string expandInsertBeforeExt(const string& str, const string& strToken) const;
+	const string expandOffset(const string& str, const string& strToken) const;
+	const string expandPadValue(const string& str, const string& strToken) const;
+	const string expandReplace(const string& str, const string& strToken) const;
 	const string expandEnv(const string& str) const;
 	const string expandNow(const string& str) const;
 	const string expandRandomAlphaNumeric(const string& str) const;

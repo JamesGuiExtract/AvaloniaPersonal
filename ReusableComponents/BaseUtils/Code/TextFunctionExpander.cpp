@@ -15,14 +15,25 @@ bool g_bInit = false;
 Win32CriticalSection g_cs;
 vector<string> g_vecFunctions;
 
-class Function
-{
-public:
-	string m_strFunction;
-	string m_strArg;
-	long m_nStartPos;
-	long m_nEndPos;
-};
+//-------------------------------------------------------------------------------------------------
+// Constants
+//-------------------------------------------------------------------------------------------------
+const string gstrFUNC_DIR_NO_DRIVE_OF = "DirNoDriveOf";
+const string gstrFUNC_DIR_OF = "DirOf";
+const string gstrFUNC_DRIVE_OF = "DriveOf";
+const string gstrFUNC_ENV = "Env";
+const string gstrFUNC_EXT_OF = "ExtOf";
+const string gstrFUNC_FILE_NO_EXT_OF = "FileNoExtOf";
+const string gstrFUNC_FILE_OF = "FileOf";
+const string gstrFUNC_FULL_USER_NAME = "FullUserName";
+const string gstrFUNC_INSERT_BEFORE_EXT = "InsertBeforeExt";
+const string gstrFUNC_NOW = "Now";
+const string gstrFUNC_OFFSET = "Offset";
+const string gstrFUNC_PAD_VALUE = "PadValue";
+const string gstrFUNC_RANDOM_ALPHA_NUMERIC = "RandomAlphaNumeric";
+const string gstrFUNC_REPLACE = "Replace";
+const string gstrFUNC_TRIM_AND_CONSOLIDATE_WS = "TrimAndConsolidateWS";
+const string gstrFUNC_USER_NAME = "UserName";
 
 //-------------------------------------------------------------------------------------------------
 // Static initialization
@@ -34,28 +45,31 @@ Random TextFunctionExpander::ms_Rand;
 //-------------------------------------------------------------------------------------------------
 TextFunctionExpander::TextFunctionExpander()
 {
-	Win32CriticalSectionLockGuard lg(g_cs);
 	if (!g_bInit)
 	{
-		// Add the functions in alphabetical order
-		g_vecFunctions.push_back("DirNoDriveOf");
-		g_vecFunctions.push_back("DirOf");
-		g_vecFunctions.push_back("DriveOf");
-		g_vecFunctions.push_back("Env");
-		g_vecFunctions.push_back("ExtOf");
-		g_vecFunctions.push_back("FileNoExtOf");
-		g_vecFunctions.push_back("FileOf");
-		g_vecFunctions.push_back("FullUserName");
-		g_vecFunctions.push_back("InsertBeforeExt");
-		g_vecFunctions.push_back("Now");
-		g_vecFunctions.push_back("Offset");
-		g_vecFunctions.push_back("PadValue");
-		g_vecFunctions.push_back("RandomAlphaNumeric");
-		g_vecFunctions.push_back("Replace");
-		g_vecFunctions.push_back("TrimAndConsolidateWS");
-		g_vecFunctions.push_back("UserName");
+		Win32CriticalSectionLockGuard lg(g_cs);
+		if (!g_bInit)
+		{
+			// Add the functions in alphabetical order
+			g_vecFunctions.push_back(gstrFUNC_DIR_NO_DRIVE_OF);
+			g_vecFunctions.push_back(gstrFUNC_DIR_OF);
+			g_vecFunctions.push_back(gstrFUNC_DRIVE_OF);
+			g_vecFunctions.push_back(gstrFUNC_ENV);
+			g_vecFunctions.push_back(gstrFUNC_EXT_OF);
+			g_vecFunctions.push_back(gstrFUNC_FILE_NO_EXT_OF);
+			g_vecFunctions.push_back(gstrFUNC_FILE_OF);
+			g_vecFunctions.push_back(gstrFUNC_FULL_USER_NAME);
+			g_vecFunctions.push_back(gstrFUNC_INSERT_BEFORE_EXT);
+			g_vecFunctions.push_back(gstrFUNC_NOW);
+			g_vecFunctions.push_back(gstrFUNC_OFFSET);
+			g_vecFunctions.push_back(gstrFUNC_PAD_VALUE);
+			g_vecFunctions.push_back(gstrFUNC_RANDOM_ALPHA_NUMERIC);
+			g_vecFunctions.push_back(gstrFUNC_REPLACE);
+			g_vecFunctions.push_back(gstrFUNC_TRIM_AND_CONSOLIDATE_WS);
+			g_vecFunctions.push_back(gstrFUNC_USER_NAME);
 
-		g_bInit = true;
+			g_bInit = true;
+		}
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -80,23 +94,66 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 
 		// check if the location begins with one of the functions
 		unsigned int nNumFunctions = g_vecFunctions.size();
-		bool bFound = false;
-		for ( unsigned int i = 0; !bFound && i < nNumFunctions ; i++ )
+		unsigned long ulTemp = ulFuncStart + 1;
+		string strFunction = "";
+		string strToken = ",";
+		for ( unsigned int i = 0; i < nNumFunctions ; i++ )
 		{
-			unsigned long ulNamePos = str.find( g_vecFunctions[i], ulFuncStart + 1 );
-			if ( ulNamePos == ulFuncStart + 1 )
+			unsigned long ulNamePos = str.find( g_vecFunctions[i], ulTemp );
+			if ( ulNamePos == ulTemp )
 			{
-				bFound = true;
+				// Set the function
+				strFunction = g_vecFunctions[i];
+
+				// Check for {}
+				unsigned long ulBracketPos = ulNamePos + strFunction.length();
+				if (ulBracketPos < str.length() && str[ulBracketPos] == '{')
+				{
+					// Find the closing bracket
+					unsigned long ulClosingBracket = str.find_first_of("}", ulBracketPos+1);
+					bool bMatched = ulClosingBracket != string::npos;
+					if (!bMatched || ulClosingBracket - ulBracketPos > 2)
+					{
+						string strMessage = bMatched ?
+							"Token length too long (only single token supported) " : "Unmatched '{' ";
+						strMessage += "in function string.";
+						UCLIDException uex("ELI29707", strMessage);
+						uex.addDebugInfo("Function String", str.substr(ulNamePos,
+							bMatched ? ulClosingBracket : ulBracketPos));
+						throw uex;
+					}
+					else if (ulClosingBracket - ulBracketPos == 1)
+					{
+						UCLIDException uex("ELI0", "Missing token definition.");
+						uex.addDebugInfo("Function String", str.substr(ulNamePos, ulClosingBracket));
+						throw uex;
+					}
+
+					// Ensure the function is one that supports an alternate token
+					if (strFunction != gstrFUNC_INSERT_BEFORE_EXT
+						&& strFunction != gstrFUNC_OFFSET
+						&& strFunction != gstrFUNC_PAD_VALUE
+						&& strFunction != gstrFUNC_REPLACE)
+					{
+						UCLIDException uex("ELI29708", "Function does not support alternate token syntax.");
+						uex.addDebugInfo("Function", strFunction);
+						throw uex;
+					}
+
+					// Get the alternate token
+					strToken = str[ulBracketPos+1];
+				}
+
 				break;
 			}
 		}
 
-		if ( !bFound )
+		if (strFunction.empty())
 		{
 			// a function was not found so $ is part of the file name
 			// advance to the next char and continue loop
 			strRet += str.substr( ulSearchPos, ulFuncStart - ulSearchPos + 1);
-			ulSearchPos = ulFuncStart + 1;
+			ulSearchPos = ulTemp;
 			continue;
 		}
 
@@ -107,7 +164,7 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 			strRet += str.substr( ulSearchPos, ulFuncStart - ulSearchPos );
 		}
 
-		ulSearchPos = ulFuncStart + 1;
+		ulSearchPos = ulTemp;
 
 		// find the beginning of the function argument i.e. '('
 		unsigned long ulArgStart = str.find( '(', ulSearchPos );
@@ -117,6 +174,7 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 			ue.addDebugInfo("Text", str);
 			throw ue;
 		}
+
 		ulSearchPos = ulArgStart + 1;
 
 		// find the end of the function argument i.e. the matching ')'
@@ -139,75 +197,69 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 		// recurse to expand any functions in the argument
 		strArg = expandFunctions(strArg);
 
-		// get the function name e.g. "dirof"
-		string strFunction = str.substr( ulFuncStart + 1, ulArgStart - (ulFuncStart + 1) );
-		
-		// case insensitive function names
-		makeLowerCase(strFunction);
-
 		// evaluate the function and append the result to the return 
 		// text (expanded string)
-		if (strFunction == "dirof")
+		if (strFunction == gstrFUNC_DIR_OF)
 		{
 			strRet += expandDirOf(strArg);
 		}
-		else if (strFunction == "filenoextof")
+		else if (strFunction == gstrFUNC_FILE_NO_EXT_OF)
 		{
 			strRet += expandFileNoExtOf(strArg);
 		}
-		else if (strFunction == "fileof")
+		else if (strFunction == gstrFUNC_FILE_OF)
 		{
 			strRet += expandFileOf(strArg);
 		}
-		else if (strFunction == "dirnodriveof")
+		else if (strFunction == gstrFUNC_DIR_NO_DRIVE_OF)
 		{
 			strRet += expandDirNoDriveOf(strArg);
 		}
-		else if (strFunction == "driveof")
+		else if (strFunction == gstrFUNC_DRIVE_OF)
 		{
 			strRet += expandDriveOf(strArg);
 		}
-		else if (strFunction == "extof")
+		else if (strFunction == gstrFUNC_EXT_OF)
 		{
 			strRet += expandExtOf(strArg);
 		}
-		else if (strFunction == "insertbeforeext")
+		else if (strFunction == gstrFUNC_INSERT_BEFORE_EXT)
 		{
-			strRet += expandInsertBeforeExt(strArg);
+			strRet += expandInsertBeforeExt(strArg, strToken);
 		}
-		else if (strFunction == "replace")
+		else if (strFunction == gstrFUNC_REPLACE)
 		{
-			strRet += expandReplace(strArg);
+			strRet += expandReplace(strArg, strToken);
 		}
-		else if (strFunction == "padvalue")
+		else if (strFunction == gstrFUNC_PAD_VALUE)
 		{
-			strRet += expandPadValue(strArg);
+			strRet += expandPadValue(strArg, strToken);
 		}
-		else if (strFunction == "offset")
+		else if (strFunction == gstrFUNC_OFFSET)
 		{
-			strRet += expandOffset(strArg);
+			strRet += expandOffset(strArg, strToken);
 		}
-		else if (strFunction == "trimandconsolidatews")
+		else if (strFunction == gstrFUNC_TRIM_AND_CONSOLIDATE_WS)
 		{
 			strRet += expandTrimAndConsolidateWS( strArg );
 		}
-		else if (strFunction == "env")
+		else if (strFunction == gstrFUNC_ENV)
 		{
 			strRet += expandEnv(strArg);
 		}
-		else if (strFunction == "now")
+		else if (strFunction == gstrFUNC_NOW)
 		{
 			strRet += expandNow(strArg);
 		}
-		else if (strFunction == "randomalphanumeric")
+		else if (strFunction == gstrFUNC_RANDOM_ALPHA_NUMERIC)
 		{
 			strRet += expandRandomAlphaNumeric(strArg);
 		}
-		else if (strFunction == "username")
+		else if (strFunction == gstrFUNC_USER_NAME)
 		{
 			strRet += expandUserName(strArg);
 		}
-		else if (strFunction == "fullusername")
+		else if (strFunction == gstrFUNC_FULL_USER_NAME)
 		{
 			strRet += expandFullUserName(strArg);
 		}
@@ -215,6 +267,7 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 		{
 			UCLIDException ue("ELI11769", "Invalid Text Function!");
 			ue.addDebugInfo("Function", strFunction);
+			throw ue;
 		}
 	}
 	return strRet;
@@ -298,10 +351,10 @@ bool TextFunctionExpander::isValidParameters(const string& strFunction,
 const string TextFunctionExpander::expandDirNoDriveOf(const string& str) const
 {
 	// Retrieve full directory with drive
-	string strFullDir = expandDirOf( str );
+	string strFullDir = getDirectoryFromFullPath(str, false);
 
 	// Retrieve drive letter and backslash
-	string strDrive = expandDriveOf( str );
+	string strDrive = getDriveFromFullPath(str, false);
 
 	// Remove leading drive and backslash
 	long lFullDirLength = strFullDir.length();
@@ -309,7 +362,7 @@ const string TextFunctionExpander::expandDirNoDriveOf(const string& str) const
 	if (lFullDirLength > lDriveLength)
 	{
 		// Return just the directory name
-		return str.substr( lDriveLength, lFullDirLength - lDriveLength );
+		return strFullDir.substr(lDriveLength);
 	}
 	else
 	{
@@ -346,11 +399,12 @@ const string TextFunctionExpander::expandFileNoExtOf(const string& str) const
 	return getFileNameWithoutExtension(str, false);
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandInsertBeforeExt(const string& str) const
+const string TextFunctionExpander::expandInsertBeforeExt(const string& str,
+														 const string& strToken) const
 {
 	// Tokenize the string into strSource, strInsert
 	vector<string> vecTokens;
-	StringTokenizer::sGetTokens(str, ",", vecTokens);
+	StringTokenizer::sGetTokens(str, strToken, vecTokens);
 
 	// Check for proper number of tokens
 	if (vecTokens.size() == 2)
@@ -408,11 +462,11 @@ const string TextFunctionExpander::expandInsertBeforeExt(const string& str) cons
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandOffset(const string& str) const
+const string TextFunctionExpander::expandOffset(const string& str, const string& strToken) const
 {
 	vector<string> vecTokens;
 
-	StringTokenizer::sGetTokens(str, ",", vecTokens);
+	StringTokenizer::sGetTokens(str, strToken, vecTokens);
 
 	unsigned int i = 0;
 	for ( ; i < vecTokens.size(); i++)
@@ -450,11 +504,11 @@ const string TextFunctionExpander::expandOffset(const string& str) const
 	return string(pszValue);
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandPadValue(const string& str) const
+const string TextFunctionExpander::expandPadValue(const string& str, const string& strToken) const
 {
 	vector<string> vecTokens;
 
-	StringTokenizer::sGetTokens(str, ",", vecTokens);
+	StringTokenizer::sGetTokens(str, strToken, vecTokens);
 
 	unsigned int i = 0;
 	for( ; i < vecTokens.size(); i++)
@@ -492,11 +546,11 @@ const string TextFunctionExpander::expandPadValue(const string& str) const
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const string TextFunctionExpander::expandReplace(const string& str) const
+const string TextFunctionExpander::expandReplace(const string& str, const string& strToken) const
 {
 	// Tokenize the string into strSource, strSearch, strReplace
 	vector<string> vecTokens;
-	StringTokenizer::sGetTokens(str, ",", vecTokens);
+	StringTokenizer::sGetTokens(str, strToken, vecTokens);
 
 	// Check for proper number of tokens
 	if (vecTokens.size() == 3)
