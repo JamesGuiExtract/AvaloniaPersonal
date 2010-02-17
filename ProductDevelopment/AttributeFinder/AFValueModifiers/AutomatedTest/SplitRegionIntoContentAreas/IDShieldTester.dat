@@ -12,7 +12,7 @@
 <TESTFOLDER>;.\Test02.rsd;.\AutomatedTestFiles\Images\LineArea\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test02.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test02.voa
 
 // Splitter, Signature line, text overlaps handwritten attribute
-<TESTFOLDER>;.\Test03.rsd;.\AutomatedTestFiles\Images\MDOT_LIR_003\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test03.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test03.voa
+<TESTFOLDER>;.\Test03.rsd;.\AutomatedTestFiles\Images\TestImage010\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test03.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test03.voa
 
 // Splitter, Signature line, text overlaps handwritten attribute, exclude < 20 chars
 <TESTFOLDER>;.\Test04.rsd;.\AutomatedTestFiles\Images\MDOT_LIR_003\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test04.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test04.voa
@@ -26,7 +26,7 @@
 // Splitter, Signature line, text overlaps handwritten attribute, exclude > 60% OCR, UseLines off
 <TESTFOLDER>;.\Test07.rsd;.\AutomatedTestFiles\Images\MDOT_LIR_003\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test07.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test07.voa
 
-// Splitter, 2 parent attributes on same page, mixed content content.
+// Splitter, Finds only very poorly (<30%) OCR'd regions (non-text markings and lines) within a box.
 <TESTFOLDER>;.\Test08.rsd;.\AutomatedTestFiles\Images\FinancingStatement3\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test08.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test08.voa
 
 // Modifier, Tax Liens, test ability to ignore sporatic pixel content.
@@ -47,7 +47,7 @@
 // Modifier, Tests eliminating results of type "Probable Text"
 <TESTFOLDER>;.\Test14.rsd;.\AutomatedTestFiles\Images\O--1992-12-31-1-00957\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test14.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test14.voa
 
-// Modifier, Tests eliminating results of type "Probable Handwriting"
+// Modifier, Tests eliminating results of type "Probable Handwriting" (limits to wide areas to eliminate overlapping results)
 <TESTFOLDER>;.\Test15.rsd;.\AutomatedTestFiles\Images\O--1992-12-31-1-00957\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test15.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test15.voa
 
 // Modifier, Tests using SelectPageRegion Preprocesser that excludes first page
