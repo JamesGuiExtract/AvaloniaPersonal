@@ -317,6 +317,7 @@ namespace Extract.Redaction.Verification
             this.MinimizeBox = false;
             this.Name = "VerificationSettingsDialog";
             this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Verify redactions settings";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();

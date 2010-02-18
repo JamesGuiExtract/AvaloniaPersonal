@@ -147,6 +147,7 @@ namespace Extract.Redaction
             this.MinimizeBox = false;
             this.Name = "MetadataSettingsDialog";
             this.ShowIcon = false;
+		    this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Create redaction metadata";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
