@@ -64,7 +64,7 @@ namespace Extract.Redaction
         /// <summary>
         /// All non-sensitive and metadata attributes.
         /// </summary>
-        List<ComAttribute> _attributes;
+        List<ComAttribute> _metadata;
 
         /// <summary>
         /// The previous verification sessions.
@@ -80,6 +80,11 @@ namespace Extract.Redaction
         /// The previous redaction sessions.
         /// </summary>
         ComAttribute[] _redactionSessions;
+
+        /// <summary>
+        /// Creates COM attributes.
+        /// </summary>
+        AttributeCreator _comAttribute;
 
         /// <summary>
         /// The unique id of the next created attribute.
@@ -224,12 +229,13 @@ namespace Extract.Redaction
             try
             {
                 _sensitiveItems = new List<SensitiveItem>();
-                _attributes = new List<ComAttribute>();
+                _metadata = new List<ComAttribute>();
                 _sessionId = 0;
                 _nextId = 1;
 
                 _fileName = fileName;
                 _sourceDocument = sourceDocument;
+                _comAttribute = new AttributeCreator(sourceDocument);
 
                 if (File.Exists(fileName))
                 {
@@ -301,7 +307,7 @@ namespace Extract.Redaction
             for (int i = 0; i < count; i++)
             {
                 ComAttribute attribute = (ComAttribute)attributes.At(i);
-                _attributes.Add(attribute);
+                _metadata.Add(attribute);
             }
         }
 
@@ -353,16 +359,16 @@ namespace Extract.Redaction
         /// <returns>The file information attribute.</returns>
         ComAttribute CreateFileInfoAttribute()
         {
-            ComAttribute fileInfo = CreateComAttribute("_VOAFileInfo");
+            ComAttribute fileInfo = _comAttribute.Create("_VOAFileInfo");
 
             // Product name
-            ComAttribute productNameAttribute = CreateComAttribute("_ProductName", "IDShield");
+            ComAttribute productNameAttribute = _comAttribute.Create("_ProductName", "IDShield");
 
             // Schema version
             string version = _VERSION.ToString(CultureInfo.CurrentCulture);
-            ComAttribute schemaVersion = CreateComAttribute("_SchemaVersion", version);
+            ComAttribute schemaVersion = _comAttribute.Create("_SchemaVersion", version);
 
-            AppendChildAttributes(fileInfo, productNameAttribute, schemaVersion);
+            AttributeMethods.AppendChildren(fileInfo, productNameAttribute, schemaVersion);
 
             return fileInfo;
         }
@@ -418,7 +424,7 @@ namespace Extract.Redaction
                 }
                 else
                 {
-                    _attributes.Add(attribute);
+                    _metadata.Add(attribute);
                 }
             }
         }
@@ -546,7 +552,7 @@ namespace Extract.Redaction
             if (revisionsAttribute == null)
             {
                 // Create a new revisions attribute
-                revisionsAttribute = CreateComAttribute("_OldRevisions");
+                revisionsAttribute = _comAttribute.Create("_OldRevisions");
                 vector.PushBack(revisionsAttribute);
             }
 
@@ -607,9 +613,16 @@ namespace Extract.Redaction
                 // Get the non output redactions
                 RedactionItem[] oldNonOutput = GetNonOutputRedactions(itemsToVerify);
 
-                // Create other verification attributes that don't undergo verification
-                IUnknownVector attributes = GetUnverifiedAttributes(settings, time, changes, 
-                    oldDeleted, oldModified, oldNonOutput);
+                // Copy the original metadata attributes in to a vector
+                IUnknownVector attributes = CopyMetadataAttributes();
+
+                // Add session attribute
+                ComAttribute session = CreateSessionAttribute(time, settings, changes);
+                attributes.PushBack(session);
+
+                // Update the revisions attribute
+                ComAttribute revisions = GetRevisionsAttribute(attributes);
+                AddRevisions(revisions, oldDeleted, oldModified, oldNonOutput);
 
                 // Save the attributes
                 IUnknownVector output = GetOutputVector(itemsToVerify, attributes);
@@ -619,7 +632,7 @@ namespace Extract.Redaction
                 _sensitiveItems = itemsToVerify;
 
                 // Update the attributes that don't need verification
-                _attributes = GetAttributesFromVector(attributes);
+                _metadata = GetAttributesFromVector(attributes);
 
                 // Update the session id
                 _sessionId++;
@@ -774,37 +787,17 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Creates all the attributes in a verification vector of attributes (VOA) file, other 
-        /// than the ones that were directly verified by the user.
+        /// Creates a copy of all the COM metadata attributes.
         /// </summary>
-        /// <param name="settings">The settings used during verification.</param>
-        /// <param name="time">The amount of screen time spent verifying.</param>
-        /// <param name="changes">The changes made to the original verification file.</param>
-        /// <param name="oldDeleted">The previous version of the deleted attributes.</param>
-        /// <param name="oldModified">The previous version of the modified attributes.</param>
-        /// <param name="oldNonOutput">The previous version of the attributes that are marked to 
-        /// not be output.</param>
-        /// <returns>All the attributes in a verification vector of attributes (VOA) file, other 
-        /// than the ones that were directly verified by the user.</returns>
-        IUnknownVector GetUnverifiedAttributes(VerificationSettings settings, TimeInterval time,
-            RedactionFileChanges changes, RedactionItem[] oldDeleted, RedactionItem[] oldModified, 
-            RedactionItem[] oldNonOutput)
+        /// <returns>A copy of all the COM metadata attributes.</returns>
+        IUnknownVector CopyMetadataAttributes()
         {
-            // Copy the original unverified attributes in to a vector
             IUnknownVector attributes = new IUnknownVector();
-            foreach (ComAttribute attribute in _attributes)
+            foreach (ComAttribute attribute in _metadata)
             {
                 ICopyableObject copy = (ICopyableObject)attribute;
-                attributes.PushBack(copy.Clone());    
+                attributes.PushBack(copy.Clone());
             }
-
-            // Add session attribute
-            ComAttribute session = CreateSessionAttribute(time, settings, changes);
-            attributes.PushBack(session);
-
-            // Copy and update the revision attribute
-            ComAttribute revisions = GetRevisionsAttribute(attributes);
-            AddRevisions(revisions, oldDeleted, oldModified, oldNonOutput);
 
             return attributes;
         }
@@ -824,8 +817,8 @@ namespace Extract.Redaction
             ComAttribute time = CreateScreenTimeAttribute(screenTime);
 
             // File information
-            ComAttribute source = CreateComAttribute("_SourceDocName", _sourceDocument);
-            ComAttribute data = CreateComAttribute("_IDShieldDataFile", _fileName);
+            ComAttribute source = _comAttribute.Create("_SourceDocName", _sourceDocument);
+            ComAttribute data = _comAttribute.Create("_IDShieldDataFile", _fileName);
 
             // Verification options
             ComAttribute options = CreateVerificationOptionsAttribute(settings);
@@ -836,8 +829,9 @@ namespace Extract.Redaction
             ComAttribute modified = CreateChangeEntriesAttribute("_EntriesModified", changes.Modified);
 
             // Session attribute
-            ComAttribute session = CreateComAttribute("_VerificationSession", _sessionId + 1);
-            AppendChildAttributes(session, user, time, source, data, options, added, deleted, modified);
+            ComAttribute session = _comAttribute.Create("_VerificationSession", _sessionId + 1);
+            AttributeMethods.AppendChildren(session, user, time, source, data, options);
+            AttributeMethods.AppendChildren(session, added, deleted, modified);
 
             return session;
         }
@@ -848,10 +842,10 @@ namespace Extract.Redaction
         /// <returns>The user information attribute.</returns>
         ComAttribute CreateUserAttribute()
         {
-            ComAttribute userInfo = CreateComAttribute("_UserInfo");
-            ComAttribute loginId = CreateComAttribute("_LoginID", Environment.UserName);
-            ComAttribute computerName = CreateComAttribute("_Computer", Environment.MachineName);
-            AppendChildAttributes(userInfo, loginId, computerName);
+            ComAttribute userInfo = _comAttribute.Create("_UserInfo");
+            ComAttribute loginId = _comAttribute.Create("_LoginID", Environment.UserName);
+            ComAttribute computerName = _comAttribute.Create("_Computer", Environment.MachineName);
+            AttributeMethods.AppendChildren(userInfo, loginId, computerName);
 
             return userInfo;
         }
@@ -863,11 +857,11 @@ namespace Extract.Redaction
         /// <returns>The verification time attribute.</returns>
         ComAttribute CreateScreenTimeAttribute(TimeInterval time)
         {
-            ComAttribute timeInfo = CreateComAttribute("_TimeInfo");
-            ComAttribute date = CreateComAttribute("_Date", time.Start.ToShortDateString());
-            ComAttribute timeStarted = CreateComAttribute("_TimeStarted", time.Start.ToLongTimeString());
-            ComAttribute totalSeconds = CreateComAttribute("_TotalSeconds", time.ElapsedSeconds);
-            AppendChildAttributes(timeInfo, date, timeStarted, totalSeconds);
+            ComAttribute timeInfo = _comAttribute.Create("_TimeInfo");
+            ComAttribute date = _comAttribute.Create("_Date", time.Start.ToShortDateString());
+            ComAttribute timeStarted = _comAttribute.Create("_TimeStarted", time.Start.ToLongTimeString());
+            ComAttribute totalSeconds = _comAttribute.Create("_TotalSeconds", time.ElapsedSeconds);
+            AttributeMethods.AppendChildren(timeInfo, date, timeStarted, totalSeconds);
 
             return timeInfo;
         }
@@ -879,10 +873,10 @@ namespace Extract.Redaction
         /// <returns>The verification options attribute.</returns>
         ComAttribute CreateVerificationOptionsAttribute(VerificationSettings settings)
         {
-            ComAttribute options = CreateComAttribute("_VerificationOptions");
+            ComAttribute options = _comAttribute.Create("_VerificationOptions");
             string value = settings.General.VerifyAllPages ? "Yes" : "No";
-            ComAttribute verifyAllPages = CreateComAttribute("_VerifyAllPages", value);
-            AppendChildAttributes(options, verifyAllPages);
+            ComAttribute verifyAllPages = _comAttribute.Create("_VerifyAllPages", value);
+            AttributeMethods.AppendChildren(options, verifyAllPages);
 
             return options;
         }
@@ -895,7 +889,7 @@ namespace Extract.Redaction
         /// <returns>An entries changed attribute.</returns>
         ComAttribute CreateChangeEntriesAttribute(string name, ICollection<RedactionItem> entries)
         {
-            ComAttribute changeEntries = CreateComAttribute(name);
+            ComAttribute changeEntries = _comAttribute.Create(name);
 
             // Append entries if necessary
             if (entries.Count > 0)
@@ -951,22 +945,22 @@ namespace Extract.Redaction
             ComAttribute result = (ComAttribute) copy.Clone();
 
             // Append the archive action attribute to this attribute
-            ComAttribute archiveAction = CreateComAttribute("ArchiveAction", "TurnedOff");
-            AppendChildAttributes(result, archiveAction);
+            ComAttribute archiveAction = _comAttribute.Create("ArchiveAction", "TurnedOff");
+            AttributeMethods.AppendChildren(result, archiveAction);
 
             return result;
         }
 
         /// <summary>
-        /// Gets the vector of attributes from combining the verified items with the unverified 
-        /// items.
+        /// Gets the vector of attributes from combining the verified items with the metadata 
+        /// attributes.
         /// </summary>
         /// <param name="verified">The items that were verified.</param>
-        /// <param name="unverified">The attributes that were not verified.</param>
+        /// <param name="metadata">The COM metadata attributes.</param>
         /// <returns>A vector containing the attributes from <paramref name="verified"/> and 
-        /// <paramref name="unverified"/>.</returns>
+        /// <paramref name="metadata"/>.</returns>
         static IUnknownVector GetOutputVector(IEnumerable<SensitiveItem> verified, 
-            IUnknownVector unverified)
+            IUnknownVector metadata)
         {
             // Add the verified attributes to the output vector
             IUnknownVector output = new IUnknownVector();
@@ -979,8 +973,8 @@ namespace Extract.Redaction
                 }
             }
 
-            // Append the unverified attributes
-            output.Append(unverified);
+            // Append the metadata attributes
+            output.Append(metadata);
 
             return output;
         }
@@ -1004,87 +998,6 @@ namespace Extract.Redaction
             }
 
             return attributes;
-        }
-
-        /// <summary>
-        /// Creates a COM attribute with the specified name.
-        /// </summary>
-        /// <param name="name">The name of the COM attribute to create.</param>
-        /// <returns>A COM attribute with the specified <paramref name="name"/>.</returns>
-        ComAttribute CreateComAttribute(string name)
-        {
-            return CreateComAttribute(name, null, null);
-        }
-
-        /// <summary>
-        /// Creates a COM attribute with the specified name and value.
-        /// </summary>
-        /// <param name="name">The name of the COM attribute to create.</param>
-        /// <param name="value">The value of the COM attribute to create. Will be converted to a 
-        /// string.</param>
-        /// <returns>A COM attribute with the specified <paramref name="name"/> and 
-        /// <paramref name="value"/>.</returns>
-        ComAttribute CreateComAttribute(string name, IConvertible value)
-        {
-            return CreateComAttribute(name, value, null);
-        }
-
-        /// <summary>
-        /// Creates a COM attribute with the specified name, value, and type.
-        /// </summary>
-        /// <param name="name">The name of the COM attribute to create.</param>
-        /// <param name="value">The value of the COM attribute to create. Will be converted to a 
-        /// string.</param>
-        /// <param name="type">The type of the COM attribute to create.</param>
-        /// <returns>A COM attribute with the specified <paramref name="name"/>, 
-        /// <paramref name="value"/>, and <paramref name="type"/>.</returns>
-        ComAttribute CreateComAttribute(string name, IConvertible value, string type)
-        {
-            // Create an attribute with the specified name
-            ComAttribute attribute = new ComAttribute();
-            attribute.Name = name;
-
-            // Set the value if specified
-            attribute.Value = CreateNonSpatialString(value ?? "");
-
-            // Set the type if specified
-            if (type != null)
-            {
-                attribute.Type = type;
-            }
-
-            return attribute;
-        }
-
-        /// <summary>
-        /// Creates a non-spatial string with the specified value.
-        /// </summary>
-        /// <param name="value">The value of the non-spatial string to create. Will be converted 
-        /// to a string.</param>
-        /// <returns>A non-spatial string with the specified <paramref name="value"/>.</returns>
-        SpatialString CreateNonSpatialString(IConvertible value)
-        {
-            SpatialString spatialString = new SpatialString();
-            string text = value.ToString(CultureInfo.CurrentCulture);
-            spatialString.CreateNonSpatialString(text, _sourceDocument);
-
-            return spatialString;
-        }
-
-        /// <summary>
-        /// Appends attributes as children of the specified attribute.
-        /// </summary>
-        /// <param name="attribute">The attribute to which attributes should be appended.</param>
-        /// <param name="attributesToAppend">The attributes to append as children to 
-        /// <paramref name="attribute"/>.</param>
-        static void AppendChildAttributes(ComAttribute attribute, 
-            params ComAttribute[] attributesToAppend)
-        {
-            IUnknownVector subAttributes = attribute.SubAttributes;
-            foreach (ComAttribute append in attributesToAppend)
-            {
-                subAttributes.PushBack(append);
-            }
         }
 
         #endregion Methods
