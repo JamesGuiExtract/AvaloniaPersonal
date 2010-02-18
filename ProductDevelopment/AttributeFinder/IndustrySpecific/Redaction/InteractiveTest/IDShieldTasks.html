@@ -63,29 +63,34 @@
 		<ul>
 			<li>Images without VOA files
 			<ul>
-				<li>Output XML files are created without error.
-				<li>XML file contains only an empty <b>TBD</b> node.
+				<li>Processing fails.
+				<li>Output XML files are <b>not</b> created.
 			</ul>
 			<li>Images with VOA files from rules output
 			<ul>
 				<li>Output XML files are created without error.
-				<li>XML file contains only an empty <b>TBD</b> node.
+				<li>XML file contains only a <b>CurrentRevisions</b> node.
 			</ul>
 			<li>Images with VOA files from single verification session
 			<ul>
 				<li>Output XML files are created without error.
-				<li>XML file contains <b>TBD</b> node.
+				<li>XML file also contains an <b>IDShieldVerificationSession</b> 
+				node.
+				<li>XML file also contains a <b>DocumentInfo</b> node if a 
+				<b>DocumentType</b> attribute is included in the VOA file.
 			</ul>
 			<li>Images with VOA files from single verification session with history 
 			navigation
 			<ul>
 				<li>Output XML files are created without error.
-				<li>XML file contains <b>TBD</b> node.
+				<li>XML file contains an additional 
+				<b>IDShieldVerificationSession</b> node.
 			</ul>
 			<li>Images with VOA files from multiple verification sessions
 			<ul>
 				<li>Output XML files are created without error.
-				<li>XML file contains <b>TBD</b> node.
+				<li>XML file contains multiple <b>IDShieldVerificationSession</b> 
+				nodes.
 			</ul>
 <p>
 	  	   	<LI><b>[FlexIDSCore #3790]</b> Redaction: Create metadata xml
@@ -96,15 +101,17 @@
 				<li>Confirm that additional verification session information is added to 
 				the VOA file.
 				<li>Create a redacted image from the verification results.
-				<li>Confirm that redaction session information is added to the VOA file.
+				<li>Confirm that redaction session information is added to the VOA file
+				via <b>RedactedFileOutputSession</b>.
 				<li>Execute different rules on the image (as is done for Legislation 
 				Guard).
 				<li>Reverify the image.
 				<li>Confirm that additional verification session information is added to 
-				the VOA file.
+				the VOA file.  Note that a different VOA file may be created depending 
+				on the rule set.
 				<li>Create another redacted image from the new verification results.
 				<li>Confirm that more redaction session information is added to the 
-				VOA file.
+				VOA file via <b>RedactedFileOutputSession</b>.
 		       	</ul>
 <p>
 			<li><b>[FlexIDSCore #3877]</b> Confirm that the metadata XML includes 
@@ -192,8 +199,6 @@
 			selector</b> button.
   		   	<LI>Confirm that the group box includes an associated <b>...</b> 
 			(browse) button.
-  		   	<LI><b>[FlexIDSCore #3757]</b> Confirm that the Open dialog allows 
-			selection of a <b>PDF</b> output file.
 	  	   	<LI>Confirm that the <b>Tag selector</b> button displays a 
 			drop-down list of tags including:
 			<ul>
@@ -212,8 +217,8 @@
 				<li>$Replace()
 				<li>$TrimAndConsolidateWS()
 			</ul>
-  	   		<LI>Confirm that the browse button displays an Open dialog to 
-			select a <b>TIF</b> or <b>PDF</b> file.
+  		   	<LI><b>[FlexIDSCore #3757]</b> Confirm that the Open dialog allows 
+			selection of a <b>PDF</b> output file.
   		   	<LI>Confirm that the group box includes a <b>Retain any previously 
 			existing redactions in the output file</b> radio button.
 	  	   	<LI>Confirm that the group box includes an <b>Output only 
@@ -227,15 +232,20 @@
   	   		<LI>Confirm that the check boxes are unchecked by default.
 <p>
 	  	   	<LI>Confirm that the configuration dialog includes a <b>Redaction 
-			text and color settings...</b> group box.
+			text and color settings...</b> button.
       			<li>Confirm that the <b>Redaction text and color settings</b> dialog 
 			includes the following elements.
 		       	<ul>
 	      			<li>A group box for <b>Text to place in redaction zones</b>.
 	      			<li>A pre-populated combo box for <b>Redaction text</b>.
-		      		<li>An associated <b>tag selector</b>.
+		      		<li>An associated <b>tag selector</b>
+				<ul>
+					<li><b>&lt;ExemptionCodes&gt;</b>
+					<li><b>&lt;FieldType&gt;</b>
+				</ul>
 		      		<li>An associated read-only edit box for <b>Sample text that uses 
 				the above pattern</b>.
+				<li>Confirm that the edit box updates with combo box changes.
 	      			<li>A group box for <b>Redaction colors</b>.
 		      		<li>A pre-populated combo box for <b>Border color</b>.
 		      		<li>A pre-populated combo box for <b>Fill color</b>.
