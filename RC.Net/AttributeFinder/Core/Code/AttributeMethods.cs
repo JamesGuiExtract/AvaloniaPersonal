@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UCLID_COMUTILSLib;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
+using IAttribute = UCLID_AFCORELib.IAttribute;
 
 namespace Extract.AttributeFinder
 {
     /// <summary>
     /// Represents a grouping of methods for working with COM attribute.
     /// </summary>
+    [CLSCompliant(false)]
     public static class AttributeMethods
     {
         /// <summary>
@@ -19,7 +21,6 @@ namespace Extract.AttributeFinder
         /// <param name="name">The name of the attribute to find.</param>
         /// <returns>The only attribute in <paramref name="attributes"/> with the specified name; 
         /// if no such attribute exists, returns <see langword="null"/>.</returns>
-        [CLSCompliant(false)]
         public static ComAttribute GetSingleAttributeByName(IIUnknownVector attributes, string name)
         {
             try
@@ -54,7 +55,6 @@ namespace Extract.AttributeFinder
         /// <param name="name">The name of the attributes to return.</param>
         /// <returns>An array of COM attributes in <paramref name="attributes"/> that have the 
         /// specified <paramref name="name"/>.</returns>
-        [CLSCompliant(false)]
         public static ComAttribute[] GetAttributesByName(IIUnknownVector attributes, string name)
         {
             try
@@ -83,6 +83,28 @@ namespace Extract.AttributeFinder
                     "Unable to get attribute by name.", ex);
                 ee.AddDebugData("Attribute name", name, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Appends attributes as children of the specified attribute.
+        /// </summary>
+        /// <param name="attribute">The attribute to which attributes should be appended.</param>
+        /// <param name="children">The attributes to append as children to 
+        /// <paramref name="attribute"/>.</param>
+        public static void AppendChildren(IAttribute attribute, params ComAttribute[] children)
+        {
+            try
+            {
+                IUnknownVector subAttributes = attribute.SubAttributes;
+                foreach (ComAttribute child in children)
+                {
+                    subAttributes.PushBack(child);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29737", ex);
             }
         }
     }
