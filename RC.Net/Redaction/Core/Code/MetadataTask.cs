@@ -376,7 +376,7 @@ namespace Extract.Redaction
                 WriteTimeInfo(writer, subAttributes);
 
                 // File Info and Verification Options
-                WriteAttributeAsXml(writer, subAttributes, "FileInfo", "SourceDocName", "IDShieldDataFile");
+                WriteVerificationFileInfo(writer, subAttributes);
                 WriteAttributeAsXml(writer, subAttributes, "VerificationOptions", "VerifyAllPages");
 
                 // Entries Added, Deleted, and Modified
@@ -386,6 +386,22 @@ namespace Extract.Redaction
 
                 writer.WriteEndElement();
             }
+        }
+
+        /// <summary>
+        /// Writes the verification FileInfo metadata attribute.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="attributes">A collection of attributes containing the attribute to write.
+        /// </param>
+        static void WriteVerificationFileInfo(XmlWriter writer, IUnknownVector attributes)
+        {
+            writer.WriteStartElement("FileInfo");
+
+            WriteValueByName(writer, attributes, "SourceDocName");
+            WriteValueByName(writer, attributes, "IDShieldDataFile");
+
+            writer.WriteEndElement();
         }
 
         /// <summary>
@@ -407,7 +423,7 @@ namespace Extract.Redaction
                 WriteTimeInfo(writer, subAttributes);
 
                 // File Info
-                WriteAttributeAsXml(writer, subAttributes, "FileInfo", "SourceDocName", "IDShieldDataFile", "OutputFile");
+                WriteRedactionFileInfo(writer, subAttributes);
                 
                 // Output Options
                 WriteOutputOptions(writer, subAttributes);
@@ -417,6 +433,23 @@ namespace Extract.Redaction
 
                 writer.WriteEndElement();
             }
+        }
+
+        /// <summary>
+        /// Writes the verification FileInfo metadata attribute.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="attributes">A collection of attributes containing the attribute to write.
+        /// </param>
+        static void WriteRedactionFileInfo(XmlWriter writer, IUnknownVector attributes)
+        {
+            writer.WriteStartElement("FileInfo");
+
+            WriteValueByName(writer, attributes, "SourceDocName");
+            WriteValueByName(writer, attributes, "IDShieldDataFile");
+            WriteValueByName(writer, attributes, "OutputFile");
+
+            writer.WriteEndElement();
         }
 
         /// <summary>
