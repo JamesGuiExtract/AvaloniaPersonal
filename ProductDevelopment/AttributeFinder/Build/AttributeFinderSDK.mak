@@ -114,20 +114,17 @@ CreateExtractLMInstallCD: BuildAttributeFinderCore
     @nmake /F LicenseManager.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateFlexLMInstall
     
 CreateFlexDataEntryInstallDir:
-	@ECHO Creating FlexDataEntryInstallDir
-	@IF NOT EXIST "$(FlexDataEntryReleaseDir)\Bin" MKDIR "$(FlexDataEntryReleaseDir)\Bin"
+	@ECHO Creating Demo_FlexIndex
 	@IF NOT EXIST "$(FlexDataEntryReleaseDir)\Input" MKDIR "$(FlexDataEntryReleaseDir)\Input"
 	@IF NOT EXIST "$(FlexDataEntryReleaseDir)\Rules" MKDIR "$(FlexDataEntryReleaseDir)\Rules"
-	@ECHO Copying the FlexDataEntry related files
-	@COPY /v "$(BinariesFolder)\FlexDataEntry.exe" "$(FlexDataEntryReleaseDir)\Bin"
-	@XCOPY "$(DotNetFiles)\*.*" "$(FlexDataEntryReleaseDir)\Bin" /v /s /e /y
+	@ECHO Copying the Demo_FlexIndex related files
 	@XCOPY "$(AFRootDirectory)\Utils\FlexDataEntry\Files\*.*" "$(FlexDataEntryReleaseDir)" /v /s /e /y
 	$(VerifyDir) "$(AFRootDirectory)\Utils\FlexDataEntry\Files" "$(FlexDataEntryReleaseDir)"
 	@XCOPY "$(FlexDataEntryInstallationFilesDir)\Images\*.*" "$(FlexDataEntryReleaseDir)\Input" /v /s /e /y
 	$(VerifyDir) "$(FlexDataEntryInstallationFilesDir)\Images" "$(FlexDataEntryReleaseDir)\Input"
 	@XCOPY "$(FlexDataEntryRulesDir)\*.*" "$(FlexDataEntryReleaseDir)\Rules" /v /s /e /y
 	$(VerifyDir) "$(FlexDataEntryRulesDir)" "$(FlexDataEntryReleaseDir)\Rules"
-	@ECHO Encrypting FlexDataEntry rsd Files
+	@ECHO Encrypting Demo_FlexIndex rsd Files
 	@SendFilesAsArgumentToApplication "$(FlexDataEntryReleaseDir)\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@DeleteFiles "$(FlexDataEntryReleaseDir)\*.rsd"
 	@DeleteFiles "$(FlexDataEntryReleaseDir)\*.scc"
