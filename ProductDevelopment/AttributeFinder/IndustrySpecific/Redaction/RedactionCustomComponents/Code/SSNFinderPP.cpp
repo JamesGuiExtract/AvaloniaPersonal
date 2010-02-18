@@ -7,6 +7,7 @@
 #include <UCLIDException.h>
 #include <ComponentLicenseIDs.h>
 #include <LicenseMgmt.h>
+#include <COMUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // CSSNFinderPP
@@ -49,6 +50,17 @@ STDMETHODIMP CSSNFinderPP::Apply()
 		if(bstrSubattributeName.length() == 0)
 		{
 			MessageBox("Subattribute name must contain a value", "Error", MB_ICONEXCLAMATION);
+			m_editSubattributeName.SetFocus();
+			return S_FALSE;
+		}
+		try
+		{
+			validateIdentifier(asString(bstrSubattributeName));
+		}
+		catch(UCLIDException& uex)
+		{
+			uex.display();
+			m_editSubattributeName.SetFocus();
 			return S_FALSE;
 		}
 		
@@ -125,6 +137,20 @@ LRESULT CSSNFinderPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 		VARIANT_BOOL vbSpatialSubattribute, vbClearIfNoneFound;
 		ipSSNFinder->GetOptions(bstrSubattributeName.GetAddress(), &vbSpatialSubattribute, 
 			&vbClearIfNoneFound);
+
+		// Validate the sub attribute name and prompt the user if it is invalid
+		try
+		{
+			string strSub = asString(bstrSubattributeName);
+			if (!strSub.empty())
+			{
+				validateIdentifier(strSub);
+			}
+		}
+		catch(...)
+		{
+			MessageBox("Sub attribute name is invalid.", "Invalid Name", MB_OK | MB_ICONWARNING);
+		}
 
 		// set the dialog items' values to SSNFinder's options
 		m_editSubattributeName.SetWindowText(bstrSubattributeName);

@@ -29,6 +29,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -41,6 +42,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Leadtools, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
@@ -84,7 +86,13 @@
     <Compile Include="ImageMethods.cs" />
     <Compile Include="AsynchronousOcrManager.cs" />
     <Compile Include="ImageWriter.cs" />
-    <Compile Include="PdfLock.cs" />
+    <Compile Include="PdfPasswordSettings.cs" />
+    <Compile Include="PdfPasswordSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PdfPasswordSettingsDialog.Designer.cs">
+      <DependentUpon>PdfPasswordSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="PixelProbe.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RasterZone.cs" />
@@ -101,6 +109,10 @@
       <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
       <Name>Extract.Drawing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Encryption\Core\Code\Extract.Encryption.vcproj">
+      <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
+      <Name>Extract.Encryption</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
@@ -116,6 +128,10 @@
     <ProjectReference Include="..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Utilities\Core\Code\Extract.Imaging.Utilities.vcproj">
+      <Project>{E610E652-0891-40D4-B5CA-A622B87C7979}</Project>
+      <Name>Extract.Imaging.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +176,10 @@
     <EmbeddedResource Include="BatesNumberFormatPropertyPage.resx">
       <DependentUpon>BatesNumberFormatPropertyPage.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PdfPasswordSettingsDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>PdfPasswordSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

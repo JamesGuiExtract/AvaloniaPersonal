@@ -46,7 +46,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code"
+				AdditionalIncludeDirectories="..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Include;..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code"
 				PreprocessorDefinitions="WIN32;_DEBUG;CODE_ANALYSIS;_ATL_MIXED"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
@@ -130,7 +130,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code"
+				AdditionalIncludeDirectories="..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Include;..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code"
 				PreprocessorDefinitions="WIN32;NDEBUG;CODE_ANALYSIS;_ATL_MIXED"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -206,7 +206,7 @@
 			AssemblyName="System.Windows.Forms, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
 		/>
 		<AssemblyReference
-			RelativePath="..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.dll"
+			RelativePath="..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\DotNet\Leadtools.dll"
 			AssemblyName="Leadtools, Version=16.5.0.0, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86"
 		/>
 		<ProjectReference
@@ -226,6 +226,10 @@
 			</File>
 			<File
 				RelativePath=".\ExtractPdfManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PdfLock.cpp"
 				>
 			</File>
 			<File
@@ -263,7 +267,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PdfLock.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StringHelperFunctions.h"
 				>
 			</File>
 			<File

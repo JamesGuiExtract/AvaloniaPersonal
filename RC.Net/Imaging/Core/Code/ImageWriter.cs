@@ -1,5 +1,6 @@
 using System;
 using Extract.Licensing;
+using Extract.Imaging.Utilities;
 using Extract.Utilities;
 using Leadtools;
 using Leadtools.Codecs;
