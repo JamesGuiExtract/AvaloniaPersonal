@@ -304,6 +304,7 @@ namespace Extract.Imaging
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "PdfPasswordSettingsDialog";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "PdfPasswordSettingsDialog";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();

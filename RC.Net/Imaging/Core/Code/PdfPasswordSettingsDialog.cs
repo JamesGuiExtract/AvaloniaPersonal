@@ -49,6 +49,9 @@ namespace Extract.Imaging
             InitializeComponent();
 
             _settings = new PdfPasswordSettings(settings);
+
+            // Flashing error icons are unnecessary
+            _errorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
         }
 
         #endregion Constructors
@@ -67,6 +70,69 @@ namespace Extract.Imaging
         }
 
         #endregion Properties
+
+        #region Overrides
+
+        /// <summary>
+        /// Raises the <see cref="Form.Load"/> event.
+        /// </summary>
+        /// <param name="e">The data associated with this event.</param>
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            try
+            {
+                // Get the user password
+                string userPassword = _settings.UserPassword;
+                bool enableUserPassword = !string.IsNullOrEmpty(userPassword);
+                _enableUserPasswordCheckBox.Checked = enableUserPassword;
+                if (enableUserPassword)
+                {
+                    _userPasswordText1.Text = userPassword;
+                    _userPasswordText2.Text = userPassword;
+                }
+
+                // Get the owner password
+                string ownerPassword = _settings.OwnerPassword;
+                bool enableOwnerPassword = !string.IsNullOrEmpty(ownerPassword);
+                _enableOwnerPasswordCheckBox.Checked = enableOwnerPassword;
+                if (enableOwnerPassword)
+                {
+                    _ownerPasswordText1.Text = ownerPassword;
+                    _ownerPasswordText2.Text = ownerPassword;
+
+                    // Get the permissions
+                    PdfOwnerPermissions permissions = _settings.OwnerPermissions;
+
+                    _allowAccessibilityCheck.Checked =
+                        (permissions & PdfOwnerPermissions.AllowContentCopyingForAccessibility) == PdfOwnerPermissions.AllowContentCopyingForAccessibility;
+                    _allowAddOrModifyAnnotationsCheck.Checked =
+                        (permissions & PdfOwnerPermissions.AllowAddingModifyingAnnotations) == PdfOwnerPermissions.AllowAddingModifyingAnnotations;
+                    _allowCopyAndExtractionCheck.Checked =
+                        (permissions & PdfOwnerPermissions.AllowContentCopying) == PdfOwnerPermissions.AllowContentCopying;
+                    _allowDocumentAssemblyCheck.Checked =
+                        (permissions & PdfOwnerPermissions.AllowDocumentAssembly) == PdfOwnerPermissions.AllowDocumentAssembly;
+                    _allowDocumentModificationsCheck.Checked =
+                        (permissions & PdfOwnerPermissions.AllowDocumentModifications) == PdfOwnerPermissions.AllowDocumentModifications;
+                    _allowFillInFormFieldsCheck.Checked =
+                        (permissions & PdfOwnerPermissions.AllowFillingInFields) == PdfOwnerPermissions.AllowFillingInFields;
+                    _allowHighQualityPrintingCheck.Checked =
+                        (permissions & PdfOwnerPermissions.AllowHighQualityPrinting) == PdfOwnerPermissions.AllowHighQualityPrinting;
+                    _allowLowQualityPrintCheck.Checked =
+                        (permissions & PdfOwnerPermissions.AllowLowQualityPrinting) == PdfOwnerPermissions.AllowLowQualityPrinting;
+                }
+
+                // Update the controls to set appropriate enabled/disabled states
+                UpdateControls();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29751", ex);
+            }
+        }
+
+        #endregion Overrides
 
         #region Event Handlers
 
@@ -102,7 +168,6 @@ namespace Extract.Imaging
                 {
                     errorString = "Passwords do not match";
                 }
-
                 _errorProvider.SetError(_userPasswordText1, errorString);
                 _errorProvider.SetError(_userPasswordText2, errorString);
             }
@@ -170,6 +235,97 @@ namespace Extract.Imaging
         {
             try
             {
+                string userPassword = "";
+                if (_enableUserPasswordCheckBox.Checked)
+                {
+                    string pass1 = _userPasswordText1.Text;
+                    string pass2 = _userPasswordText2.Text;
+                    if (string.IsNullOrEmpty(pass1) && string.IsNullOrEmpty(pass2))
+                    {
+                        MessageBox.Show("Please specify a user password.", "No User Password",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error,
+                            MessageBoxDefaultButton.Button1, 0);
+                        _userPasswordText1.Focus();
+                        return;
+                    }
+                    if (pass1 != pass2)
+                    {
+                        MessageBox.Show("Passwords do not match.", "Password Mismatch",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error,
+                            MessageBoxDefaultButton.Button1, 0);
+                        _userPasswordText1.Focus();
+                        return;
+                    }
+
+                    userPassword = pass1;
+                }
+
+                string ownerPassword = "";
+                PdfOwnerPermissions permissions = PdfOwnerPermissions.DisallowAll;
+
+                if (_enableOwnerPasswordCheckBox.Checked)
+                {
+                    string pass1 = _ownerPasswordText1.Text;
+                    string pass2 = _ownerPasswordText2.Text;
+                    if (string.IsNullOrEmpty(pass1) && string.IsNullOrEmpty(pass2))
+                    {
+                        MessageBox.Show("Please specify an owner password.", "No Owner Password",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error,
+                            MessageBoxDefaultButton.Button1, 0);
+                        _ownerPasswordText1.Focus();
+                        return;
+                    }
+                    if (pass1 != pass2)
+                    {
+                        MessageBox.Show("Passwords do not match.", "Password Mismatch",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error,
+                            MessageBoxDefaultButton.Button1, 0);
+                        _ownerPasswordText1.Focus();
+                        return;
+                    }
+
+                    ownerPassword = pass1;
+
+                    // Get the check box settings
+                    if (_allowAccessibilityCheck.Checked)
+                    {
+                        permissions |= PdfOwnerPermissions.AllowContentCopyingForAccessibility;
+                    }
+                    if (_allowAddOrModifyAnnotationsCheck.Checked)
+                    {
+                        permissions |= PdfOwnerPermissions.AllowAddingModifyingAnnotations;
+                    }
+                    if (_allowCopyAndExtractionCheck.Checked)
+                    {
+                        permissions |= PdfOwnerPermissions.AllowContentCopying;
+                    }
+                    if (_allowDocumentAssemblyCheck.Checked)
+                    {
+                        permissions |= PdfOwnerPermissions.AllowDocumentAssembly;
+                    }
+                    if (_allowDocumentModificationsCheck.Checked)
+                    {
+                        permissions |= PdfOwnerPermissions.AllowDocumentModifications;
+                    }
+                    if (_allowFillInFormFieldsCheck.Checked)
+                    {
+                        permissions |= PdfOwnerPermissions.AllowFillingInFields;
+                    }
+                    if (_allowHighQualityPrintingCheck.Checked)
+                    {
+                        permissions |= PdfOwnerPermissions.AllowHighQualityPrinting;
+                    }
+                    if (_allowLowQualityPrintCheck.Checked)
+                    {
+                        permissions |= PdfOwnerPermissions.AllowLowQualityPrinting;
+                    }
+                }
+
+                // Store the settings
+                _settings.UserPassword = userPassword;
+                _settings.OwnerPassword = ownerPassword;
+                _settings.OwnerPermissions = permissions;
+
                 DialogResult = DialogResult.OK;
             }
             catch (Exception ex)

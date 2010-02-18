@@ -1,8 +1,8 @@
 using System;
 using System.Drawing;
 using System.IO;
-using Extract.Licensing;
 using Extract.Imaging.Utilities;
+using Extract.Licensing;
 using Leadtools;
 using Leadtools.Codecs;
 

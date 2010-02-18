@@ -81,7 +81,8 @@ namespace Extract.Imaging
     [ComVisible(true)]
     [Guid("F794C26A-23A6-4653-876E-ABEC72FB8C08")]
     [ProgId("Extract.Imaging.PdfPasswordSettings")]
-    public class PdfPasswordSettings : IConfigurableObject, ICopyableObject, IPersistStream
+    public class PdfPasswordSettings : IConfigurableObject, ICopyableObject, IPersistStream,
+        IMustBeConfiguredObject
     {
         #region Constants
 
@@ -263,6 +264,33 @@ namespace Extract.Imaging
             }
         }
 
+        /// <summary>
+        /// Gets all of the settings in one call.
+        /// </summary>
+        /// <param name="userPassword">The user password.</param>
+        /// <param name="ownerPassword">The owner password.</param>
+        /// <param name="ownerPermissions">The owner permissions.</param>
+        // Using out parameters because this method is visible to COM and will allow
+        // COM implementers to retrieve all settings with a single call.
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "0#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
+        public void GetSettings(out string userPassword, out string ownerPassword,
+            out PdfOwnerPermissions ownerPermissions)
+        {
+            try
+            {
+                userPassword = _userPassword;
+                ownerPassword = _ownerPassword;
+                ownerPermissions = _permissions;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI29747",
+                    "Failed to get settings from 'Pdf password settings' object.", ex);
+            }
+        }
+
         #endregion Methods
 
         #region IConfigurableObject Members
@@ -434,6 +462,23 @@ namespace Extract.Imaging
         public void GetSizeMax(out long size)
         {
             size = HResult.NotImplemented;
+        }
+
+        #endregion
+
+        #region IMustBeConfiguredObject Members
+
+        /// <summary>
+        /// Checks if the object has been configured properly.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> if the object has been configured and
+        /// <see langword="false"/> otherwise.
+        /// </returns>
+        public bool IsConfigured()
+        {
+            // Configured if at least 1 password is defined
+            return !string.IsNullOrEmpty(_ownerPassword) || !string.IsNullOrEmpty(_userPassword);
         }
 
         #endregion

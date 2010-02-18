@@ -16,7 +16,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 3;
+const unsigned long gnCurrentVersion = 4;
 
 // component description
 const string gstrCONVERT_TO_PDF_COMPONENT_DESCRIPTION = "Core: Convert to searchable PDF";
@@ -31,7 +31,8 @@ const string gstrDEFAULT_INPUT_IMAGE_FILENAME = "$InsertBeforeExt(<SourceDocName
 //-------------------------------------------------------------------------------------------------
 CConvertToPDFTask::CConvertToPDFTask()
   : m_strInputImage(gstrDEFAULT_INPUT_IMAGE_FILENAME),
-  m_bPDFA(false)
+  m_bPDFA(false),
+  m_ipPdfPassSettings(NULL)
 {
 	try
 	{
@@ -46,6 +47,7 @@ CConvertToPDFTask::~CConvertToPDFTask()
 {
 	try
 	{
+		m_ipPdfPassSettings = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18738");
 }
@@ -53,7 +55,8 @@ CConvertToPDFTask::~CConvertToPDFTask()
 //-------------------------------------------------------------------------------------------------
 // IConvertToPDFTask
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CConvertToPDFTask::SetOptions(BSTR bstrInputFile, VARIANT_BOOL vbPDFA)
+STDMETHODIMP CConvertToPDFTask::SetOptions(BSTR bstrInputFile, VARIANT_BOOL vbPDFA,
+										   _PdfPasswordSettings* pPdfSettings)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -65,16 +68,18 @@ STDMETHODIMP CConvertToPDFTask::SetOptions(BSTR bstrInputFile, VARIANT_BOOL vbPD
 		// store options
 		m_strInputImage = asString(bstrInputFile);
 		m_bPDFA = asCppBool(vbPDFA);
+		m_ipPdfPassSettings = pPdfSettings;
 		
 		// set the dirty flag
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18739");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CConvertToPDFTask::GetOptions(BSTR *pbstrInputFile, VARIANT_BOOL* pvbPDFA)
+STDMETHODIMP CConvertToPDFTask::GetOptions(BSTR *pbstrInputFile, VARIANT_BOOL* pvbPDFA,
+										   _PdfPasswordSettings** ppPdfSettings)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -86,14 +91,17 @@ STDMETHODIMP CConvertToPDFTask::GetOptions(BSTR *pbstrInputFile, VARIANT_BOOL* p
 		// ensure parameters are non-NULL
 		ASSERT_ARGUMENT("ELI18740", pbstrInputFile != NULL);
 		ASSERT_ARGUMENT("ELI28585", pvbPDFA != NULL);
+		ASSERT_ARGUMENT("ELI29743", ppPdfSettings != NULL);
 		
 		// set options
 		*pbstrInputFile = _bstr_t(m_strInputImage.c_str()).Detach();
 		*pvbPDFA = asVariantBool(m_bPDFA);
+		_PdfPasswordSettingsPtr ipShallowCopy = m_ipPdfPassSettings;
+		*ppPdfSettings = ipShallowCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18742");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -109,10 +117,10 @@ STDMETHODIMP CConvertToPDFTask::raw_GetComponentDescription(BSTR* pstrComponentD
 		
 		*pstrComponentDescription = 
 			_bstr_t(gstrCONVERT_TO_PDF_COMPONENT_DESCRIPTION.c_str()).Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18744");
-	
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -134,18 +142,32 @@ STDMETHODIMP CConvertToPDFTask::raw_CopyFrom(IUnknown* pObject)
 		// get the options from the ConvertToPDFTask object 
 		_bstr_t bstrInputFile;
 		VARIANT_BOOL vbPDFA;
-		ipConvertToPDFTask->GetOptions( bstrInputFile.GetAddress(), &vbPDFA );
+		_PdfPasswordSettingsPtr ipSettings = NULL;
+		ipConvertToPDFTask->GetOptions( bstrInputFile.GetAddress(), &vbPDFA, &ipSettings );
 		
 		// store the found options
 		m_strInputImage = asString(bstrInputFile);
 		m_bPDFA = asCppBool(vbPDFA);
 
+		// Clone the settings if they exist
+		ICopyableObjectPtr ipCopy = ipSettings;
+		if (ipCopy != NULL)
+		{
+			m_ipPdfPassSettings = ipCopy->Clone();
+			ASSERT_RESOURCE_ALLOCATION("ELI29748", m_ipPdfPassSettings != NULL);
+		}
+		else
+		{
+			// No settings, clear any settings currently held by this object
+			m_ipPdfPassSettings = NULL;
+		}
+
 		// set the dirty flag
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18746");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConvertToPDFTask::raw_Clone(IUnknown** ppObject)
@@ -171,10 +193,10 @@ STDMETHODIMP CConvertToPDFTask::raw_Clone(IUnknown** ppObject)
 
 		// return the new ConvertToPDFTask to the caller
 		*ppObject = ipObjCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18750");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -189,10 +211,10 @@ STDMETHODIMP CConvertToPDFTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 	{
 		// ensure the executable exists
 		validateFileOrFolderExistence(m_strConvertToPDFEXE);
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18751");
-	
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
@@ -264,10 +286,10 @@ STDMETHODIMP CConvertToPDFTask::raw_Cancel()
 	try
 	{
 		// nothing to do
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18756");
-	
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConvertToPDFTask::raw_Close()
@@ -277,10 +299,10 @@ STDMETHODIMP CConvertToPDFTask::raw_Close()
 	try
 	{
 		// nothing to do
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18757");
-	
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -307,10 +329,10 @@ STDMETHODIMP CConvertToPDFTask::raw_IsLicensed(VARIANT_BOOL* pbValue)
 		{
 			*pbValue = VARIANT_FALSE;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18759");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -329,11 +351,14 @@ STDMETHODIMP CConvertToPDFTask::raw_IsConfigured(VARIANT_BOOL* pbValue)
 		ASSERT_ARGUMENT("ELI18760", pbValue != NULL);
 
 		// the ConvertToPDFTask is configured if it has an input image filename
-		*pbValue = asVariantBool( !m_strInputImage.empty() );
+		// and if there are PdfPassword settings, they are configured
+		IMustBeConfiguredObjectPtr ipConfigured = m_ipPdfPassSettings;
+		*pbValue = asVariantBool( !m_strInputImage.empty()
+			&& (ipConfigured == NULL || ipConfigured->IsConfigured() == VARIANT_TRUE));
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18761");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -348,10 +373,10 @@ STDMETHODIMP CConvertToPDFTask::GetClassID(CLSID* pClassID)
 		ASSERT_ARGUMENT("ELI18762", pClassID != NULL);
 
 		*pClassID = CLSID_ConvertToPDFTask;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18763");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConvertToPDFTask::IsDirty(void)
@@ -368,6 +393,8 @@ STDMETHODIMP CConvertToPDFTask::IsDirty(void)
 //   (added) input image filename
 // Version 3:
 //   (added) pdfa option
+// Version 4:
+//   (added) pdf password settings
 STDMETHODIMP CConvertToPDFTask::Load(IStream* pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -380,6 +407,7 @@ STDMETHODIMP CConvertToPDFTask::Load(IStream* pStream)
 		// clear the options
 		m_strInputImage = gstrDEFAULT_INPUT_IMAGE_FILENAME;
 		m_bPDFA = false;
+		m_ipPdfPassSettings = NULL;
 		
 		// use a smart pointer for the IStream interface
 		IStreamPtr ipStream(pStream);
@@ -442,14 +470,27 @@ STDMETHODIMP CConvertToPDFTask::Load(IStream* pStream)
 				// Read the PDF/A setting
 				dataReader >> m_bPDFA;
 			}
+			if (nDataVersion >= 4)
+			{
+				// Read the Pdf password settings from the stream
+				bool bSettings;
+				dataReader >> bSettings;
+				if (bSettings)
+				{
+					IPersistStreamPtr ipObj;
+					readObjectFromStream(ipObj, pStream, "ELI29749");
+					m_ipPdfPassSettings = ipObj;
+					ASSERT_RESOURCE_ALLOCATION("ELI29750", m_ipPdfPassSettings != NULL);
+				}
+			}
 		}
 
 		// clear the dirty flag since a new object was loaded
 		m_bDirty = false;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18768");
-	
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConvertToPDFTask::Save(IStream* pStream, BOOL fClearDirty)
@@ -467,6 +508,11 @@ STDMETHODIMP CConvertToPDFTask::Save(IStream* pStream, BOOL fClearDirty)
 		dataWriter << gnCurrentVersion;
 		dataWriter << m_strInputImage;
 		dataWriter << m_bPDFA;
+
+		// Write a bool to indicate whether there is a Pdf password settings object
+		bool bSettings = m_ipPdfPassSettings != NULL;
+		dataWriter << bSettings;
+
 		dataWriter.flushToByteStream();
 
 		// use a smart pointer for IStream interface
@@ -480,15 +526,23 @@ STDMETHODIMP CConvertToPDFTask::Save(IStream* pStream, BOOL fClearDirty)
 		HANDLE_HRESULT(ipStream->Write(data.getData(), nDataLength, NULL), "ELI18771", 
 			"Unable to write object to stream.", ipStream, IID_IStream);
 
+		// Write the PDF settings object if it exists
+		if (bSettings)
+		{
+			IPersistStreamPtr ipObj = m_ipPdfPassSettings;
+			ASSERT_RESOURCE_ALLOCATION("ELI29744", ipObj != NULL);
+			writeObjectToStream(ipObj, pStream, "ELI29745", fClearDirty);
+		}
+
 		// clear the flag as specified
 		if(fClearDirty)
 		{
 			m_bDirty = false;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18772");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConvertToPDFTask::GetSizeMax(ULARGE_INTEGER* pcbSize)

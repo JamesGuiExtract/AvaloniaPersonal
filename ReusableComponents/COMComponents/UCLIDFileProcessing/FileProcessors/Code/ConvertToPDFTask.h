@@ -57,8 +57,10 @@ END_CATEGORY_MAP()
 public:
 
 // IConvertToPDFTask
-	STDMETHOD(SetOptions)(BSTR bstrInputFile, VARIANT_BOOL vbPDFA);
-	STDMETHOD(GetOptions)(BSTR* pbstrInputFile, VARIANT_BOOL* pvbPDFA);
+	STDMETHOD(SetOptions)(BSTR bstrInputFile, VARIANT_BOOL vbPDFA,
+		_PdfPasswordSettings* pPdfSettings);
+	STDMETHOD(GetOptions)(BSTR* pbstrInputFile, VARIANT_BOOL* pvbPDFA,
+		_PdfPasswordSettings** ppPdfSettings);
 
 // ICategorizedComponent
 	STDMETHOD(raw_GetComponentDescription)(BSTR* pstrComponentDescription);
@@ -106,6 +108,9 @@ private:
 
 	// dirty flag
 	bool m_bDirty;
+
+	// The pdf password settings object
+	_PdfPasswordSettingsPtr m_ipPdfPassSettings;
 
 // Private methods
 

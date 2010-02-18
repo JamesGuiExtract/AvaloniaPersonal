@@ -158,6 +158,8 @@
 #define IDC_EDIT_SLEEP_TIME				301
 #define IDC_COMBO_SLEEP_UNITS			302
 #define IDC_CHECK_SLEEP_RANDOM			303
+#define IDC_CHECK_PDF_SECURITY			304
+#define IDC_BTN_PDF_SECURITY_SETTINGS	305
 
 // Next default values for new objects
 // 
@@ -165,7 +167,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        155
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         304
+#define _APS_NEXT_CONTROL_VALUE         306
 #define _APS_NEXT_SYMED_VALUE           145
 #endif
 #endif

@@ -903,7 +903,7 @@ void UCLIDException::saveTo(const string& strFile, bool bAppend) const
 				// from the previous log file
 				UCLIDException ue("ELI14818", "Current log file was time stamped and renamed.");
 				ue.addDebugInfo("RenamedLogFile", strRenameFileTo);
-				ue.log();
+				ue.log(strFile, false);
 			}
 		}
 

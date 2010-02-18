@@ -21,6 +21,7 @@ library UCLID_FILEPROCESSORSLib
 	importlib("..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
 	importlib("..\..\..\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
 	importlib("..\..\..\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb");
+	importlib("..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.tlb");
 
 	//----------------------------------------------------------------------------------------------
 	//-E N U M S -----------------------------------------------------------------------------------
@@ -274,10 +275,11 @@ library UCLID_FILEPROCESSORSLib
 		// PURPOSE: To set/get all user options for the convert to pdf task.
 		// PARAMS:  (1) bstrInputFile - input image filename
 		//			(2) vbPDFA - whether the produced pdf should be PDF/A compatible
+		//			(3) PdfPasswordSettings - The settings to use when adding PDF security
 		[id(1), helpstring("method SetOptions")] HRESULT SetOptions([in] BSTR bstrInputFile,
-			[in] VARIANT_BOOL vbPDFA);
+			[in] VARIANT_BOOL vbPDFA, [in] _PdfPasswordSettings* pPdfSettings);
 		[id(2), helpstring("method GetOptions")] HRESULT GetOptions([out] BSTR* pbstrInputFile,
-			[out] VARIANT_BOOL* pvbPDFA);
+			[out] VARIANT_BOOL* pvbPDFA, [out] _PdfPasswordSettings** ppPdfSettings);
 	};
 
 	// IAddWatermarkTask

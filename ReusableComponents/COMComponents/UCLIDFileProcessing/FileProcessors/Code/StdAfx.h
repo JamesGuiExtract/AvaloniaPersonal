@@ -53,6 +53,9 @@ using namespace UCLID_SSOCRLib;
 #import "..\..\..\ESImageCleanup\Code\ESImageCleanup.tlb" named_guids
 using namespace ESImageCleanupLib;
 
+#import "..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.tlb" named_guids
+using namespace Extract_Imaging;
+
 #import "FileProcessors.tlb"
 
 //{{AFX_INSERT_LOCATION}}

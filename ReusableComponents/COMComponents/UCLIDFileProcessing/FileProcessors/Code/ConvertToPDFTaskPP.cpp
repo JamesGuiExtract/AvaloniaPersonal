@@ -21,7 +21,8 @@ const char* gpszPDF_FILE_EXTS = "PDF Files (*.pdf)|*.pdf||";
 //-------------------------------------------------------------------------------------------------
 // CConvertToPDFTaskPP
 //-------------------------------------------------------------------------------------------------
-CConvertToPDFTaskPP::CConvertToPDFTaskPP() 
+CConvertToPDFTaskPP::CConvertToPDFTaskPP() :
+m_ipSettings(NULL)
 {
 	try
 	{
@@ -35,6 +36,10 @@ CConvertToPDFTaskPP::~CConvertToPDFTaskPP()
 {
 	try
 	{
+		if (m_ipSettings != NULL)
+		{
+			m_ipSettings = NULL;
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18777");
 }
@@ -104,14 +109,29 @@ STDMETHODIMP CConvertToPDFTaskPP::Apply()
 			return S_FALSE;
 		}
 
+		// Check that the PdfSettings are valid
+		bool bSecurityChecked = m_checkPDFSecurity.GetCheck() == BST_CHECKED;
+		if (bSecurityChecked)
+		{
+			IMustBeConfiguredObjectPtr ipConfigured = m_ipSettings;
+			if (ipConfigured == NULL || ipConfigured->IsConfigured() == VARIANT_FALSE)
+			{
+				AfxMessageBox("Pdf security settings are not properly configured.",
+					MB_ICONWARNING);
+				return S_FALSE;
+			}
+		}
+
 		// set the options of the associated objects accordingly
 		for(UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_FILEPROCESSORSLib::IConvertToPDFTaskPtr ipConvertToPDFTask(m_ppUnk[i]);
 			ASSERT_RESOURCE_ALLOCATION("ELI18781", ipConvertToPDFTask != NULL);
 
+			_PdfPasswordSettingsPtr ipTemp = bSecurityChecked ? m_ipSettings : NULL;
+
 			VARIANT_BOOL vbPDFA = asVariantBool(m_checkPDFA.GetCheck() == BST_CHECKED);
-			ipConvertToPDFTask->SetOptions(bstrInputImage, vbPDFA);
+			ipConvertToPDFTask->SetOptions(bstrInputImage, vbPDFA, ipTemp);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18782");
@@ -141,11 +161,30 @@ LRESULT CConvertToPDFTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 		m_btnInputImageBrowse = GetDlgItem(IDC_BTN_CONVERT_TO_PDF_BROWSE_INPUT_IMAGE);
 		m_checkPDFA = GetDlgItem(IDC_CHECK_PDFA);
+		m_checkPDFSecurity = GetDlgItem(IDC_CHECK_PDF_SECURITY);
+		m_btnPDFSecuritySettings = GetDlgItem(IDC_BTN_PDF_SECURITY_SETTINGS);
 
 		// get the Convert to PDF task's options
 		_bstr_t bstrInputImage;
 		VARIANT_BOOL vbPDFA;
-		ipConvertToPDFTask->GetOptions( bstrInputImage.GetAddress(), &vbPDFA );
+		_PdfPasswordSettingsPtr ipPdfSettings = NULL;
+		ipConvertToPDFTask->GetOptions( bstrInputImage.GetAddress(), &vbPDFA, &ipPdfSettings );
+
+		// Check for PDF password settings object (if it exists, clone it)
+		// Check/uncheck the check box based on presence of settings object
+		ICopyableObjectPtr ipCopy = ipPdfSettings;
+		if (ipCopy != NULL)
+		{
+			m_checkPDFSecurity.SetCheck(BST_CHECKED);
+			m_btnPDFSecuritySettings.EnableWindow(TRUE);
+			m_ipSettings = ipCopy->Clone();
+			ASSERT_RESOURCE_ALLOCATION("ELI29739", m_ipSettings != NULL);
+		}
+		else
+		{
+			m_checkPDFSecurity.SetCheck(BST_UNCHECKED);
+			m_btnPDFSecuritySettings.EnableWindow(FALSE);
+		}
 
 		// set the input image filename
 		m_editInputImage.SetWindowText(bstrInputImage);
@@ -203,6 +242,45 @@ LRESULT CConvertToPDFTaskPP::OnClickedBtnInputImageBrowse(WORD wNotifyCode, WORD
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19218");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CConvertToPDFTaskPP::OnClickedCheckPdfSecurity(WORD wNotifyCode, WORD wID, HWND hWndCtl,
+													   BOOL &bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Enable/disable the settings button appropriately
+		BOOL bEnabled = asMFCBool(m_checkPDFSecurity.GetCheck() == BST_CHECKED);
+		m_btnPDFSecuritySettings.EnableWindow(bEnabled);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29740");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CConvertToPDFTaskPP::OnClickedBtnPdfSecuritySettings(WORD wNotifyCode, WORD wID,
+															 HWND hWndCtl, BOOL &bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		if (m_ipSettings == NULL)
+		{
+			m_ipSettings.CreateInstance(CLSID_PdfPasswordSettings);
+			ASSERT_RESOURCE_ALLOCATION("ELI29746", m_ipSettings != NULL);
+		}
+
+		// Show the configuration dialog for the PDF password settings
+		IConfigurableObjectPtr ipConfigure = m_ipSettings;
+		ASSERT_RESOURCE_ALLOCATION("ELI29741", ipConfigure != NULL);
+		ipConfigure->RunConfiguration();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29742");
 
 	return 0;
 }
