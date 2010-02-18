@@ -938,7 +938,11 @@ void CLegalDescSplitter::processMuni( ISpatialStringPtr ipInputText, IIUnknownVe
 			IAttributePtr ipCurrSubAttr = ipCurrSubAttrs->At(c);
 			ASSERT_RESOURCE_ALLOCATION("ELI08417", ipCurrSubAttr != NULL );
 			string strName = ipCurrSubAttr->Name;
-			if (( strName == "VILLAGE OF" ) || (strName == "TOWN OF") || (strName == "CITY OF"))
+			// If the attribute name is VillageOf, TownOf or CityOf these will be used for the type
+			// of municipality and not be output as sub attributes.
+			// NOTE: Thes are the attribute names specified in the MuniSplit.rsd file
+			// PVCS: FlexIDSCore #4097
+			if ((strName == "VillageOf" ) || (strName == "TownOf") || (strName == "CityOf"))
 			{
 				ipNameTypes->PushBack(ipCurrSubAttr);
 			}
