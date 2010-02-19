@@ -546,4 +546,8 @@ private:
 	// PURPOSE: To copy the specified spatial string into this spatial string
 	void copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipSource);
 	//----------------------------------------------------------------------------------------------
+	// PURPOSE: Converts a pre-version 8.0 hybrid string (<= SpatialString version 11) which uses
+	//			image coordinates into the OCR coordinate system.
+	void autoConvertLegacyHybridString();
+	//----------------------------------------------------------------------------------------------
 };

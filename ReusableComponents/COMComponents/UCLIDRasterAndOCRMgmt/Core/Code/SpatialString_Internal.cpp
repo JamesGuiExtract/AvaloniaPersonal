@@ -3218,3 +3218,42 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25995");
 }
 //-------------------------------------------------------------------------------------------------
+void CSpatialString::autoConvertLegacyHybridString()
+{
+	// Make a copy of the original page infos (OCR coordinates)
+	ICopyableObjectPtr ipCopyObj = m_ipPageInfoMap;
+	ASSERT_RESOURCE_ALLOCATION("ELI29753", ipCopyObj != NULL);
+
+	ILongToObjectMapPtr ipPageInfoMap = ipCopyObj->Clone();
+	ASSERT_RESOURCE_ALLOCATION("ELI29754", m_ipPageInfoMap != NULL);
+
+	// Remove the any skew or rotation from m_ipPageInfoMap. (image coordinates)
+	IVariantVectorPtr ipKeys = m_ipPageInfoMap->GetKeys();
+	ASSERT_RESOURCE_ALLOCATION("ELI29755", ipKeys != NULL);
+
+	long nCount = ipKeys->Size;
+	for (long i = 0; i < nCount; i++)
+	{
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo =
+			m_ipPageInfoMap->GetValue(ipKeys->GetItem(i));
+		ASSERT_RESOURCE_ALLOCATION("ELI29756", ipPageInfo != NULL);
+
+		ipPageInfo->Deskew = 0;
+		ipPageInfo->Orientation = (UCLID_RASTERANDOCRMGMTLib::EOrientation)0;
+	}
+
+	// Translate the zones to account for the difference between OCR and image coordinate systems
+	// (since the page infos currently represent the image coordinate system, the SpatialString
+	// currently represents the opposite skew/rotation that it originally did.
+	IIUnknownVectorPtr ipZones = getTranslatedImageRasterZones(ipPageInfoMap);
+	ASSERT_RESOURCE_ALLOCATION("ELI29757", ipZones != NULL);
+	
+	// Re-create the string with the original page infos, but with the translated zones which will
+	// cancel out the skew/rotation of the OCR coordinate system (ie, will translate it into the
+	// image coordinate system).
+	string strString = m_strString;
+	string strSourceDocName = m_strSourceDocName;
+	getThisAsCOMPtr()->CreateHybridString(ipZones, _bstr_t(strString.c_str()),
+		_bstr_t(strSourceDocName.c_str()), ipPageInfoMap);
+}
+//-------------------------------------------------------------------------------------------------

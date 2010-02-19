@@ -11,6 +11,8 @@
 // Constants
 //-------------------------------------------------------------------------------------------------
 const unsigned long gnCurrentVersion = 12;
+const string gstrRASTER_OCR_SECTION = "\\ReusableComponents\\COMComponents\\UCLIDRasterAndOCRMgmt";
+const string gstrCONVERT_LEGACY_STRINGS_KEY = "ConvertLegacyHybridStrings";
 
 //-------------------------------------------------------------------------------------------------
 // ISupportsErrorInfo
@@ -730,6 +732,36 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 						nCurrPage = nPage;
 					}
 				}
+			}
+		}
+		
+		// [FlexIDSCore:4006]
+		// Hybrid SpatialStrings through version 7.0 (SpatialString version 11) are saved in image
+		// coordinates not in OCR coordinates as is the case starting in 8.0 (SpatialString
+		// version 12). To allow for backward compatibility, adjust the zones so that they are
+		// stored in OCR coordinates if specified via registry setting.
+		if (nDataVersion < 12 && m_eMode == kHybridMode)
+		{
+			// get registry persistance manager
+			RegistryPersistenceMgr rpmRasterOCR(HKEY_CURRENT_USER, gstrREG_ROOT_KEY);
+
+			bool bConvertLegacyHybridString = true;
+
+			// check for the convert legacy strings key
+			if (rpmRasterOCR.keyExists(gstrRASTER_OCR_SECTION, gstrCONVERT_LEGACY_STRINGS_KEY))
+			{
+				// key exists, so read from the registry
+				string strConvertLegacyStringsKey = rpmRasterOCR.getKeyValue(
+					gstrRASTER_OCR_SECTION, gstrCONVERT_LEGACY_STRINGS_KEY);
+
+				// Is conversion enabled?
+				bConvertLegacyHybridString = (strConvertLegacyStringsKey == "1");
+			}
+
+			// If conversion is turned on, perform the conversion.
+			if (bConvertLegacyHybridString)
+			{
+				autoConvertLegacyHybridString();
 			}
 		}
 
