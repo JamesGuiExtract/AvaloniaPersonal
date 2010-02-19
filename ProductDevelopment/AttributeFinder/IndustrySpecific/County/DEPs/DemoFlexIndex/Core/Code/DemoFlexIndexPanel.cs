@@ -39,7 +39,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
 
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
-                    LicenseIdName.LabDEVerificationUIObject, "ELI29164", _OBJECT_NAME);
+                    LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI29164", _OBJECT_NAME);
 
                 InitializeComponent();
             }
