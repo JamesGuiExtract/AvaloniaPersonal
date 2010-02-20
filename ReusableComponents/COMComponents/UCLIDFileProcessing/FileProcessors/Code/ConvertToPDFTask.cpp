@@ -9,6 +9,9 @@
 #include <cpputil.h>
 #include <COMUtils.h>
 #include <ByteStream.h>
+#include <ByteStreamManipulator.h>
+#include <EncryptionEngine.h>
+#include <PdfSecurityValues.h>
 #include <ComponentLicenseIDs.h>
 #include <IdleProcessKiller.h>
 #include <LicenseMgmt.h>
@@ -56,7 +59,7 @@ CConvertToPDFTask::~CConvertToPDFTask()
 // IConvertToPDFTask
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConvertToPDFTask::SetOptions(BSTR bstrInputFile, VARIANT_BOOL vbPDFA,
-										   _PdfPasswordSettings* pPdfSettings)
+										   IPdfPasswordSettings* pPdfSettings)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -79,7 +82,7 @@ STDMETHODIMP CConvertToPDFTask::SetOptions(BSTR bstrInputFile, VARIANT_BOOL vbPD
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConvertToPDFTask::GetOptions(BSTR *pbstrInputFile, VARIANT_BOOL* pvbPDFA,
-										   _PdfPasswordSettings** ppPdfSettings)
+										   IPdfPasswordSettings** ppPdfSettings)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -96,7 +99,7 @@ STDMETHODIMP CConvertToPDFTask::GetOptions(BSTR *pbstrInputFile, VARIANT_BOOL* p
 		// set options
 		*pbstrInputFile = _bstr_t(m_strInputImage.c_str()).Detach();
 		*pvbPDFA = asVariantBool(m_bPDFA);
-		_PdfPasswordSettingsPtr ipShallowCopy = m_ipPdfPassSettings;
+		IPdfPasswordSettingsPtr ipShallowCopy = m_ipPdfPassSettings;
 		*ppPdfSettings = ipShallowCopy.Detach();
 
 		return S_OK;
@@ -142,7 +145,7 @@ STDMETHODIMP CConvertToPDFTask::raw_CopyFrom(IUnknown* pObject)
 		// get the options from the ConvertToPDFTask object 
 		_bstr_t bstrInputFile;
 		VARIANT_BOOL vbPDFA;
-		_PdfPasswordSettingsPtr ipSettings = NULL;
+		IPdfPasswordSettingsPtr ipSettings = NULL;
 		ipConvertToPDFTask->GetOptions( bstrInputFile.GetAddress(), &vbPDFA, &ipSettings );
 		
 		// store the found options
@@ -258,6 +261,46 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(BSTR bstrFileFullName, long nFil
 			strArgs += " /pdfa";
 		}
 
+		// Check for security settings
+		if (!m_bPDFA && m_ipPdfPassSettings != NULL)
+		{
+			// Get settings from the object
+			_bstr_t bstrUserPass;
+			_bstr_t bstrOwnerPass;
+			PdfOwnerPermissions ePerm;
+			m_ipPdfPassSettings->GetSettings(bstrUserPass.GetAddress(),
+				bstrOwnerPass.GetAddress(), &ePerm);
+			string strUserPass = asString(bstrUserPass);
+			string strOwnerPass = asString(bstrOwnerPass);
+
+			bool bAdded = false;
+			if (!strUserPass.empty())
+			{
+				encryptString(strUserPass);
+				strArgs += " /user \"" + strUserPass + "\"";
+				bAdded = true;
+			}
+			if (!strOwnerPass.empty())
+			{
+				encryptString(strOwnerPass);
+				strArgs += " /owner \"" + strOwnerPass + "\" " + asString((long)ePerm);
+				bAdded = true;
+			}
+
+			if (bAdded)
+			{
+				strArgs += " /enc";
+			}
+		}
+
+		// Log an exception if both security and PDF/A defined
+		if (m_bPDFA && m_ipPdfPassSettings != NULL)
+		{
+			UCLIDException ue("ELI29767",
+				"Cannot create PDF/A and add security settings. Creating file as PDF/A.");
+			ue.addDebugInfo("PDF File", strOutputImage);
+			ue.log();
+		}
 
 		// Execute the utility to convert the PDF
 		DWORD dwExitCode = runExeWithProcessKiller(m_strConvertToPDFEXE, true, strArgs);
@@ -586,6 +629,31 @@ STDMETHODIMP CConvertToPDFTask::InterfaceSupportsErrorInfo(REFIID riid)
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
+//-------------------------------------------------------------------------------------------------
+void CConvertToPDFTask::encryptString(string& rstrString)
+{
+	// Build the key
+	ByteStream bytesKey;
+	ByteStreamManipulator bytesManipulatorKey(
+		ByteStreamManipulator::kWrite, bytesKey);
+	bytesManipulatorKey << gulPdfKey1;
+	bytesManipulatorKey << gulPdfKey2;
+	bytesManipulatorKey << gulPdfKey3;
+	bytesManipulatorKey << gulPdfKey4;
+	bytesManipulatorKey.flushToByteStream( 8 );
+
+	// Encrypt the string
+	ByteStream bytes;
+	ByteStreamManipulator bsmBytes(ByteStreamManipulator::kWrite, bytes);
+	bsmBytes << rstrString;
+	bsmBytes.flushToByteStream(8);
+
+	ByteStream encrypted;
+	EncryptionEngine ee;
+	ee.encrypt(encrypted, bytes, bytesKey);
+
+	rstrString = encrypted.asString();
+}
 //-------------------------------------------------------------------------------------------------
 void CConvertToPDFTask::validateLicense()
 {

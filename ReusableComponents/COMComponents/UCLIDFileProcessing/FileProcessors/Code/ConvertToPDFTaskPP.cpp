@@ -128,7 +128,7 @@ STDMETHODIMP CConvertToPDFTaskPP::Apply()
 			UCLID_FILEPROCESSORSLib::IConvertToPDFTaskPtr ipConvertToPDFTask(m_ppUnk[i]);
 			ASSERT_RESOURCE_ALLOCATION("ELI18781", ipConvertToPDFTask != NULL);
 
-			_PdfPasswordSettingsPtr ipTemp = bSecurityChecked ? m_ipSettings : NULL;
+			IPdfPasswordSettingsPtr ipTemp = bSecurityChecked ? m_ipSettings : NULL;
 
 			VARIANT_BOOL vbPDFA = asVariantBool(m_checkPDFA.GetCheck() == BST_CHECKED);
 			ipConvertToPDFTask->SetOptions(bstrInputImage, vbPDFA, ipTemp);
@@ -167,30 +167,44 @@ LRESULT CConvertToPDFTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 		// get the Convert to PDF task's options
 		_bstr_t bstrInputImage;
 		VARIANT_BOOL vbPDFA;
-		_PdfPasswordSettingsPtr ipPdfSettings = NULL;
+		IPdfPasswordSettingsPtr ipPdfSettings = NULL;
 		ipConvertToPDFTask->GetOptions( bstrInputImage.GetAddress(), &vbPDFA, &ipPdfSettings );
 
-		// Check for PDF password settings object (if it exists, clone it)
-		// Check/uncheck the check box based on presence of settings object
-		ICopyableObjectPtr ipCopy = ipPdfSettings;
-		if (ipCopy != NULL)
+
+		// Cannot have both PDF/A and security settings
+		if (vbPDFA == VARIANT_FALSE)
 		{
-			m_checkPDFSecurity.SetCheck(BST_CHECKED);
-			m_btnPDFSecuritySettings.EnableWindow(TRUE);
-			m_ipSettings = ipCopy->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI29739", m_ipSettings != NULL);
+			m_checkPDFA.SetCheck(BST_UNCHECKED);
+
+			// Check for PDF password settings object (if it exists, clone it)
+			// Check/uncheck the check box based on presence of settings object
+			ICopyableObjectPtr ipCopy = ipPdfSettings;
+			if (ipCopy != NULL)
+			{
+				m_checkPDFA.EnableWindow(FALSE);
+				m_checkPDFSecurity.SetCheck(BST_CHECKED);
+				m_btnPDFSecuritySettings.EnableWindow(TRUE);
+				m_ipSettings = ipCopy->Clone();
+				ASSERT_RESOURCE_ALLOCATION("ELI29739", m_ipSettings != NULL);
+			}
+			else
+			{
+				m_checkPDFSecurity.SetCheck(BST_UNCHECKED);
+				m_btnPDFSecuritySettings.EnableWindow(FALSE);
+			}
 		}
 		else
 		{
+			m_checkPDFA.SetCheck(BST_CHECKED);
+
+			// Disable the security settings
 			m_checkPDFSecurity.SetCheck(BST_UNCHECKED);
+			m_checkPDFSecurity.EnableWindow(FALSE);
 			m_btnPDFSecuritySettings.EnableWindow(FALSE);
 		}
 
 		// set the input image filename
 		m_editInputImage.SetWindowText(bstrInputImage);
-
-		// Set the PDF/A check state
-		m_checkPDFA.SetCheck(asBSTChecked(vbPDFA));
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18784");
 
@@ -246,6 +260,23 @@ LRESULT CConvertToPDFTaskPP::OnClickedBtnInputImageBrowse(WORD wNotifyCode, WORD
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
+LRESULT CConvertToPDFTaskPP::OnClickedCheckPdfA(WORD wNotifyCode, WORD wID, HWND hWndCtl,
+												BOOL &bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Enable/disable the settings button appropriately
+		BOOL bEnable = asMFCBool(m_checkPDFA.GetCheck() != BST_CHECKED);
+		m_checkPDFSecurity.EnableWindow(bEnable);
+		m_btnPDFSecuritySettings.EnableWindow(bEnable);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29740");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
 LRESULT CConvertToPDFTaskPP::OnClickedCheckPdfSecurity(WORD wNotifyCode, WORD wID, HWND hWndCtl,
 													   BOOL &bHandled)
 {
@@ -254,8 +285,11 @@ LRESULT CConvertToPDFTaskPP::OnClickedCheckPdfSecurity(WORD wNotifyCode, WORD wI
 	try
 	{
 		// Enable/disable the settings button appropriately
-		BOOL bEnabled = asMFCBool(m_checkPDFSecurity.GetCheck() == BST_CHECKED);
-		m_btnPDFSecuritySettings.EnableWindow(bEnabled);
+		bool bEnabled = m_checkPDFSecurity.GetCheck() == BST_CHECKED;
+		m_btnPDFSecuritySettings.EnableWindow(asMFCBool(bEnabled));
+
+		// Enable/disable the PDF/A check box as needed
+		m_checkPDFA.EnableWindow(asMFCBool(!bEnabled));
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29740");
 

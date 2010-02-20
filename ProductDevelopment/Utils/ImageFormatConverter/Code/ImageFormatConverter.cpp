@@ -16,6 +16,10 @@
 #include <MiscLeadUtils.h>
 #include <LeadtoolsBitmapFreeer.h>
 #include <StringCSIS.h>
+#include <PdfSecurityValues.h>
+#include <ByteStream.h>
+#include <ByteStreamManipulator.h>
+#include <EncryptionEngine.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -111,12 +115,79 @@ L_INT EXT_CALLBACK BurnRedactions(HANNOBJECT hObject, L_VOID* pUserData)
 	return nRet;
 }
 //-------------------------------------------------------------------------------------------------
+// Will decrypt the specified string using the PdfSecurity values
+void decryptString(string& rstrEncryptedString)
+{
+	// Build the key
+	ByteStream bytesKey;
+	ByteStreamManipulator bytesManipulatorKey(
+		ByteStreamManipulator::kWrite, bytesKey);
+	bytesManipulatorKey << gulPdfKey1;
+	bytesManipulatorKey << gulPdfKey2;
+	bytesManipulatorKey << gulPdfKey3;
+	bytesManipulatorKey << gulPdfKey4;
+	bytesManipulatorKey.flushToByteStream( 8 );
+
+	// Decrypt the string
+	ByteStream bytes(rstrEncryptedString);
+	ByteStream decrypted;
+	EncryptionEngine ee;
+	ee.decrypt(decrypted, bytes, bytesKey);
+
+	// Get the decrypted string
+	ByteStreamManipulator bsm (ByteStreamManipulator::kRead, decrypted);
+	bsm >> rstrEncryptedString;
+}
+//-------------------------------------------------------------------------------------------------
+unsigned int getLtPermissions(long nPermissions)
+{
+	unsigned int uiLtPermissions = 0;
+	if (nPermissions > 0)
+	{
+		if (isFlagSet(nPermissions, giAllowLowQualityPrinting))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_PRINTDOCUMENT;
+		}
+		if (isFlagSet(nPermissions, giAllowHighQualityPrinting))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_PRINTFAITHFUL;
+		}
+		if (isFlagSet(nPermissions, giAllowDocumentModifications))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_MODIFYDOCUMENT;
+		}
+		if (isFlagSet(nPermissions, giAllowContentCopying))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_EXTRACTTEXTGRAPHICS;
+		}
+		if (isFlagSet(nPermissions, giAllowContentCopyingForAccessibility))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_EXTRACTTEXT;
+		}
+		if (isFlagSet(nPermissions, giAllowAddingModifyingAnnotations))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_MODIFYANNOTATION;
+		}
+		if (isFlagSet(nPermissions, giAllowFillingInFields))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_FILLFORM;
+		}
+		if (isFlagSet(nPermissions, giAllowDocumentAssembly))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_ASSEMBLEDOCUMENT;
+		}
+	}
+
+	return uiLtPermissions;
+}
+//-------------------------------------------------------------------------------------------------
 // Will perform the image conversion and will also retain the existing annotations
 // if bRetainAnnotations is true.
 // If the output format is a tif then the annotations will remain as annotations
 // if the output format is a pdf then the redaction annotations will be burned into the image.
 void convertImage(const string strInputFileName, const string strOutputFileName, 
-				  EConverterFileType eOutputType, bool bRetainAnnotations, HINSTANCE hInst)
+				  EConverterFileType eOutputType, bool bRetainAnnotations, HINSTANCE hInst,
+				  const string& strUserPassword, const string& strOwnerPassword, long nPermissions)
 {
 	HANNOBJECT hFileContainer = NULL;
 	ANNENUMCALLBACK pfnCallBack = NULL;
@@ -156,16 +227,56 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			switch (eOutputType)
 			{
 			case kFileType_Pdf:
-				// Set output format
-				nType = FILE_RAS_PDF_JBIG2;
+				{
+					// Check for security settings for PDF files
+					if (!strUserPassword.empty() || !strOwnerPassword.empty())
+					{
+						FILEPDFSAVEOPTIONS pdfsfo = GetLeadToolsSizedStruct<FILEPDFSAVEOPTIONS>(0);
+						throwExceptionIfNotSuccess(
+							L_GetPDFSaveOptions(&pdfsfo, sizeof(FILEPDFSAVEOPTIONS)), "ELI29752",
+							"Failed to get PDF save options.");
 
-				// This flag will cause the out put image to have the same( or nearly the same ) 
-				// dimensions as original input file
-				sfOptions.Flags = ESO_PDF_SAVE_USE_BITMAP_DPI;
+						pdfsfo.b128bit = L_TRUE;
+						if (!strUserPassword.empty())
+						{
+							errno_t err = strncpy_s((char*)pdfsfo.szUserPassword, 255,
+								strUserPassword.c_str(),  strUserPassword.length());
+							if (err != 0)
+							{
+								UCLIDException ue("ELI29762", "Unable to set user password.");
+								ue.addWin32ErrorInfo(err);
+								throw ue;
+							}
+						}
+						if (!strOwnerPassword.empty())
+						{
+							errno_t err = strncpy_s((char*)pdfsfo.szOwnerPassword, 255,
+								strOwnerPassword.c_str(),  strOwnerPassword.length());
+							if (err != 0)
+							{
+								UCLIDException ue("ELI29763", "Unable to set owner password.");
+								ue.addWin32ErrorInfo(err);
+								throw ue;
+							}
 
-				// Set the burn annotations flag to true
-				bBurnAnnotations = true;
-				break;
+							// Set the permissions
+							pdfsfo.dwEncryptFlags = getLtPermissions(nPermissions);
+						}
+
+						L_SetPDFSaveOptions(&pdfsfo);
+					}
+
+					// Set output format
+					nType = FILE_RAS_PDF_JBIG2;
+
+					// This flag will cause the out put image to have the same( or nearly the same ) 
+					// dimensions as original input file
+					sfOptions.Flags = ESO_PDF_SAVE_USE_BITMAP_DPI;
+
+					// Set the burn annotations flag to true
+					bBurnAnnotations = true;
+					break;
+				}
 
 			case kFileType_Tif:
 				// Set output format
@@ -356,7 +467,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 //-------------------------------------------------------------------------------------------------
 void usage()
 {
-	string strUsage = "This application has 3 required arguments and 2 optional arguments:\n";
+	string strUsage = "This application has 3 required arguments and 4 optional arguments:\n";
 		strUsage += "An input image file (.tif or .pdf) and \n"
 					"an output image file (.pdf or .tif) and \n"
 					"an output file type (/pdf, /tif or /jpg).\n\n"
@@ -364,13 +475,29 @@ void usage()
 					"be burned into the resulting image (if the source is tif and destination \n"
 					"is a pdf or jpg, if source and dest are both tif then all annotations are \n"
 					"retained, if the source is pdf then there are no annotations to retain).\n"
+					"The optional arguments for applying passwords only apply if out_type is /pdf.\n"
+					" /user\t\tSpecifies the user password to apply to the PDF.\n"
+					" /owner\t\tSpecified the owner password and permissions to apply to the PDF.\n"
+					" Permissions - An integer that is the sum of all permissions to set.\n"
+					" \t\tAllow low quality printing = 1.\n"
+					" \t\tAllow high quality printing = 2.\n"
+					" \t\tAllow document modifications = 4.\n"
+					" \t\tAllow copying/extraction of contents = 8.\n"
+					" \t\tAllow accessibility access to contents = 16.\n"
+					" \t\tAllow adding/modifying text annotations = 32.\n"
+					" \t\tAllow filling in form fields = 64.\n"
+					" \t\tAllow document assembly = 128.\n"
+					" \t\tAllow all options = 255.\n"
 					"The optional argument (/ef <filename>) fully specifies the location \n"
 					"of an exception log that will store any thrown exception.  Without \n"
 					"an exception log, any thrown exception will be displayed.\n\n";
 		strUsage += "Usage:\n";
-		strUsage += "ImageFormatConverter.exe <strInput> <strOutput> <out_type> [/retain] [/ef <filename>]\n"
+		strUsage += "ImageFormatConverter.exe <strInput> <strOutput> <out_type> [/retain] "
+					"[/user \"<Password>\"] [/owner \"<Password>\" <Permissions>] [/ef <filename>]\n"
 					"where:\n"
 					"out_type is /pdf, /tif or /jpg,\n"
+					"<Password> is the password to apply (user and/or owner) to the PDF (requires out_type = /pdf).\n"
+					"<Permissions> is an integer between 0 and 255.\n"
 					"<filename> is the fully-qualified path to an exception log.\n\n";
 		AfxMessageBox(strUsage.c_str());
 }
@@ -411,9 +538,9 @@ BOOL CImageFormatConverterApp::InitInstance()
 					vecParams.push_back( __argv[i]);
 				}
 
-				// Make sure the number of parameters is 3 or 5
-				unsigned int uiParamCount = (unsigned int)vecParams.size();
-				if ((uiParamCount < 3) || (uiParamCount > 6))
+				// Make sure the number of parameters is 3 or 12
+				size_t uiParamCount = vecParams.size();
+				if ((uiParamCount < 3) || (uiParamCount > 12))
 				{
 					usage();
 					return FALSE;
@@ -453,36 +580,113 @@ BOOL CImageFormatConverterApp::InitInstance()
 					// Set type
 					eOutputType = kFileType_Jpg;
 				}
-
-				// Check for retain annotation flag
-				bool bRetainAnnotations = false;
-				if (uiParamCount == 4 || uiParamCount == 6)
+				else
 				{
-					string strTemp = vecParams[3];
-					makeLowerCase(strTemp);
-					if (strTemp != "/retain")
-					{
-						usage();
-						return FALSE;
-					}
-
-					bRetainAnnotations = true;
+					usage();
+					return FALSE;
 				}
 
-				// Check for exception-to-file option
-				if (uiParamCount == 5 || uiParamCount == 6)
+				// Search the remainder of the parameters for other optional arguments
+				bool bRetainAnnotations = false;
+				string strUserPassword = "";
+				string strOwnerPassword = "";
+				long nOwnerPermissions = 0;
+				bool bEncryptedPasswords = false;
+				for (size_t i=3; i < uiParamCount; i++)
 				{
-					// Retrieve /ef argument string
-					string strArgument = vecParams[uiParamCount-2];
-					makeLowerCase( strArgument );
-					if (strArgument != "/ef")
+					string strTemp = vecParams[i];
+					string strLower = strTemp;
+					if (strTemp == "/retain")
+					{
+						bRetainAnnotations = true;
+					}
+					else if (strTemp == "/user")
+					{
+						i++;
+						if (i >= uiParamCount)
+						{
+							usage();
+							return FALSE;
+						}
+
+						strUserPassword = vecParams[i];
+					}
+					else if (strTemp == "/owner")
+					{
+						i++;
+						if (i >= uiParamCount)
+						{
+							usage();
+							return FALSE;
+						}
+
+						strOwnerPassword = vecParams[i];
+
+						i++;
+						if (i >= uiParamCount)
+						{
+							usage();
+							return FALSE;
+						}
+
+						try
+						{
+							nOwnerPermissions = asLong(vecParams[i]);
+							if (nOwnerPermissions < 0 || nOwnerPermissions > 255)
+							{
+								usage();
+								return FALSE;
+							}
+						}
+						catch(...)
+						{
+							usage();
+							return FALSE;
+						}
+					}
+					else if (strTemp == "/ef")
+					{
+						i++;
+						if (i >= uiParamCount)
+						{
+							usage();
+							return FALSE;
+						}
+						// Retrieve filename
+
+						strLocalExceptionLog = vecParams[i];
+					}
+					// NOTE the /enc argument is an internal use argument and should not
+					// be exposed in the usage message
+					else if (strTemp == "/enc")
+					{
+						bEncryptedPasswords = true;
+					}
+					else
 					{
 						usage();
 						return FALSE;
 					}
+				}
 
-					// Retrieve filename
-					strLocalExceptionLog = vecParams[uiParamCount-1];
+				if (eOutputType != kFileType_Pdf
+					&& (!strUserPassword.empty() || !strOwnerPassword.empty()))
+				{
+					throw UCLIDException("ELI29766",
+						"Cannot apply passwords to non-PDF file type.");
+				}
+
+				// Check if the passwords need to be decrypted
+				if (bEncryptedPasswords)
+				{
+					if (!strUserPassword.empty())
+					{
+						decryptString(strUserPassword);
+					}
+					if (!strOwnerPassword.empty())
+					{
+						decryptString(strOwnerPassword);
+					}
 				}
 
 				// Make sure the image file exists
@@ -503,7 +707,8 @@ BOOL CImageFormatConverterApp::InitInstance()
 				initPDFSupport();
 
 				// Convert the file
-				convertImage( strInputName, strOutputName, eOutputType, bRetainAnnotations, this->m_hInstance );
+				convertImage(strInputName, strOutputName, eOutputType, bRetainAnnotations,
+					this->m_hInstance, strUserPassword, strOwnerPassword, nOwnerPermissions);
 
 				// No UI needed, just return
 			}

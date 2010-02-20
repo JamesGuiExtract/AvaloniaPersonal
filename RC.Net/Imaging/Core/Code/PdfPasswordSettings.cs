@@ -24,7 +24,7 @@ namespace Extract.Imaging
     public enum PdfOwnerPermissions
     {
         /// <summary>
-        /// All options allowed
+        /// Disallows all permissions.
         /// </summary>
         DisallowAll = 0x0,
 
@@ -70,9 +70,64 @@ namespace Extract.Imaging
         AllowDocumentAssembly = 0x80,
         
         /// <summary>
-        /// Disallows all permissions.
+        /// All options allowed
         /// </summary>
         AllowAll = 0x80 + 0x40 + 0x20 + 0x10 + 0x8 + 0x4 + 0x2 + 0x1
+    }
+
+    /// <summary>
+    /// Interface definition for the <see cref="PdfPasswordSettings"/> class.
+    /// </summary>
+    [ComVisible(true)]
+    [Guid("6ADDC0A0-630B-41EF-B0F7-636CC73BE642")]
+    [InterfaceType(ComInterfaceType.InterfaceIsDual)]
+    public interface IPdfPasswordSettings
+    {
+        /// <summary>
+        /// Gets/sets the user password to be applied to the PDF. If <see langword="null"/>
+        /// or empty then no user password will be applied.
+        /// </summary>
+        /// <value>The user password to be applied to the PDF.</value>
+        string UserPassword
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets/sets the owner password to be applied to the PDF. If <see langword="null"/>
+        /// or empty then no owner password will be applied.
+        /// </summary>
+        /// <value>The owner password to be applied to the PDF.</value>
+        string OwnerPassword
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets/sets the owner permissions to be applied to the PDF. If <see cref="OwnerPassword"/>
+        /// is <see langword="null"/> or empty then no permissions will be applied.
+        /// </summary>
+        PdfOwnerPermissions OwnerPermissions
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets all of the settings in one call.
+        /// </summary>
+        /// <param name="userPassword">The user password.</param>
+        /// <param name="ownerPassword">The owner password.</param>
+        /// <param name="ownerPermissions">The owner permissions.</param>
+        // Using out parameters because this method is visible to COM and will allow
+        // COM implementers to retrieve all settings with a single call.
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "0#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
+        void GetSettings(out string userPassword, out string ownerPassword,
+            out PdfOwnerPermissions ownerPermissions);
     }
 
     /// <summary>
@@ -81,7 +136,7 @@ namespace Extract.Imaging
     [ComVisible(true)]
     [Guid("F794C26A-23A6-4653-876E-ABEC72FB8C08")]
     [ProgId("Extract.Imaging.PdfPasswordSettings")]
-    public class PdfPasswordSettings : IConfigurableObject, ICopyableObject, IPersistStream,
+    public class PdfPasswordSettings : IPdfPasswordSettings, IConfigurableObject, ICopyableObject, IPersistStream,
         IMustBeConfiguredObject
     {
         #region Constants
@@ -127,7 +182,7 @@ namespace Extract.Imaging
         /// <summary>
         /// Initializes a new instance of the <see cref="PdfPasswordSettings"/> class.
         /// </summary>
-        public PdfPasswordSettings() : this(null, null, PdfOwnerPermissions.AllowAll)
+        public PdfPasswordSettings() : this(null, null, PdfOwnerPermissions.DisallowAll)
         {
         }
 
@@ -186,7 +241,7 @@ namespace Extract.Imaging
 
         #endregion Constructors
 
-        #region Properties
+        #region IPdfPasswordSettings Members
 
         /// <summary>
         /// Gets/sets the user password to be applied to the PDF. If <see langword="null"/>
@@ -241,7 +296,31 @@ namespace Extract.Imaging
             }
         }
 
-        #endregion Properties
+        /// <summary>
+        /// Gets all of the settings in one call.
+        /// </summary>
+        /// <param name="userPassword">The user password.</param>
+        /// <param name="ownerPassword">The owner password.</param>
+        /// <param name="ownerPermissions">The owner permissions.</param>
+        // Using out parameters because this method is visible to COM and will allow
+        // COM implementers to retrieve all settings with a single call.
+        public void GetSettings(out string userPassword, out string ownerPassword,
+            out PdfOwnerPermissions ownerPermissions)
+        {
+            try
+            {
+                userPassword = _userPassword;
+                ownerPassword = _ownerPassword;
+                ownerPermissions = _permissions;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI29747",
+                    "Failed to get settings from 'Pdf password settings' object.", ex);
+            }
+        }
+
+        #endregion IPdfPasswordSettings Members
 
         #region Methods
 
@@ -261,33 +340,6 @@ namespace Extract.Imaging
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI29724", ex);
-            }
-        }
-
-        /// <summary>
-        /// Gets all of the settings in one call.
-        /// </summary>
-        /// <param name="userPassword">The user password.</param>
-        /// <param name="ownerPassword">The owner password.</param>
-        /// <param name="ownerPermissions">The owner permissions.</param>
-        // Using out parameters because this method is visible to COM and will allow
-        // COM implementers to retrieve all settings with a single call.
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "0#")]
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
-        public void GetSettings(out string userPassword, out string ownerPassword,
-            out PdfOwnerPermissions ownerPermissions)
-        {
-            try
-            {
-                userPassword = _userPassword;
-                ownerPassword = _ownerPassword;
-                ownerPermissions = _permissions;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.CreateComVisible("ELI29747",
-                    "Failed to get settings from 'Pdf password settings' object.", ex);
             }
         }
 

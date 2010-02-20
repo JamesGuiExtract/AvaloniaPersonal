@@ -36,6 +36,7 @@ BEGIN_MSG_MAP(CConvertToPDFTaskPP)
 	MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 	COMMAND_HANDLER(IDC_BTN_CONVERT_TO_PDF_INPUT_IMAGE_DOC_TAG, BN_CLICKED, OnClickedBtnInputImageDocTag)
 	COMMAND_HANDLER(IDC_BTN_CONVERT_TO_PDF_BROWSE_INPUT_IMAGE, BN_CLICKED, OnClickedBtnInputImageBrowse)
+	COMMAND_HANDLER(IDC_CHECK_PDFA, BN_CLICKED, OnClickedCheckPdfA);
 	COMMAND_HANDLER(IDC_CHECK_PDF_SECURITY, BN_CLICKED, OnClickedCheckPdfSecurity)
 	COMMAND_HANDLER(IDC_BTN_PDF_SECURITY_SETTINGS, BN_CLICKED, OnClickedBtnPdfSecuritySettings)
 	// REFLECT_NOTIFICATIONS needed by ImageButtonWithSytle
@@ -52,6 +53,7 @@ END_MSG_MAP()
 	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnClickedBtnInputImageDocTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedBtnInputImageBrowse(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedCheckPdfA(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedCheckPdfSecurity(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedBtnPdfSecuritySettings(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
@@ -69,7 +71,7 @@ private:
 	ATLControls::CButton m_checkPDFSecurity;
 	ATLControls::CButton m_btnPDFSecuritySettings;
 
-	_PdfPasswordSettingsPtr m_ipSettings;
+	IPdfPasswordSettingsPtr m_ipSettings;
 
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Throws an exception if ConvertToPDFTask is not licensed.

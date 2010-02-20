@@ -46,6 +46,15 @@ private:
 	// user-specified output pdf filename
 	string m_strOutputFile;
 	
+	// User password to apply to PDF
+	string m_strUserPassword;
+
+	// Owner password to apply to PDF
+	string m_strOwnerPassword;
+
+	// Permissions to apply to PDF
+	int m_nPermissions;
+
 	// whether to remove original image after conversion (true) or retain the original (false)
 	// user-specified
 	bool m_bRemoveOriginal;
@@ -58,9 +67,6 @@ private:
 
 	// filename of exception log if exceptions should be logged, "" if exceptions should be displayed
 	string m_strExceptionLogFile;
-
-	// Whether the OCR engine has been initialized or not
-	bool m_bOcrEngineInitialized;
 
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Converts the image file strInputFile into a searchable PDF at strOutputFile.
@@ -88,11 +94,25 @@ private:
 	//          were valid but the user cancelled when prompted. 
 	bool getAndValidateArguments(const int argc, char* argv[]);
 	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To decrypt the specified string using the Pdf security values
+	void decryptString(string& rstrEncryptedString);
+	//---------------------------------------------------------------------------------------------
 	// PROMISE: Makes the appropriate RecAPI calls to license the RecAPIPlus layers of the OCR engine.
 	// REQUIRE: A writable convlist.txt file must exist in the same directory as the RecAPIPlus dll.
 	void licenseOCREngine();
 	//---------------------------------------------------------------------------------------------
-	void closeOcrEngine();
+	// Sets a string setting for the OCR engine
+	void setStringSetting(const string& strSetting, const string& strValue);
+	//---------------------------------------------------------------------------------------------
+	// Sets a boolean setting for the OCR engine
+	void setBoolSetting(const string& strSetting, bool bValue);
+	//---------------------------------------------------------------------------------------------
+	// Sets an integer setting for the OCR engine (this is also used to ENUM settings)
+	void setIntSetting(const string& strSetting, int nValue);
+	//---------------------------------------------------------------------------------------------
+	// Checks a security setting value agains the m_nPermissions value to see if it is enabled
+	// or not, returns true if enabled and false if not enabled
+	bool isPdfSecuritySettingEnabled(int nSetting);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Throws an exception if this executable is unlicensed. Returns true otherwise.
 	static void validateLicense();

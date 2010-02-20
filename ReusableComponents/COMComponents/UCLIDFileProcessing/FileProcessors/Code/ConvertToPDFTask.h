@@ -58,9 +58,9 @@ public:
 
 // IConvertToPDFTask
 	STDMETHOD(SetOptions)(BSTR bstrInputFile, VARIANT_BOOL vbPDFA,
-		_PdfPasswordSettings* pPdfSettings);
+		IPdfPasswordSettings* pPdfSettings);
 	STDMETHOD(GetOptions)(BSTR* pbstrInputFile, VARIANT_BOOL* pvbPDFA,
-		_PdfPasswordSettings** ppPdfSettings);
+		IPdfPasswordSettings** ppPdfSettings);
 
 // ICategorizedComponent
 	STDMETHOD(raw_GetComponentDescription)(BSTR* pstrComponentDescription);
@@ -110,10 +110,13 @@ private:
 	bool m_bDirty;
 
 	// The pdf password settings object
-	_PdfPasswordSettingsPtr m_ipPdfPassSettings;
+	IPdfPasswordSettingsPtr m_ipPdfPassSettings;
 
 // Private methods
 
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To encrypt the specified string using the Pdf security values
+	void encryptString(string& rstrString);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Throws an exception if this component is not licensed. Runs successfully otherwise.
 	void validateLicense();

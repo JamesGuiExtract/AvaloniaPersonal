@@ -277,9 +277,9 @@ library UCLID_FILEPROCESSORSLib
 		//			(2) vbPDFA - whether the produced pdf should be PDF/A compatible
 		//			(3) PdfPasswordSettings - The settings to use when adding PDF security
 		[id(1), helpstring("method SetOptions")] HRESULT SetOptions([in] BSTR bstrInputFile,
-			[in] VARIANT_BOOL vbPDFA, [in] _PdfPasswordSettings* pPdfSettings);
+			[in] VARIANT_BOOL vbPDFA, [in] IPdfPasswordSettings* pPdfSettings);
 		[id(2), helpstring("method GetOptions")] HRESULT GetOptions([out] BSTR* pbstrInputFile,
-			[out] VARIANT_BOOL* pvbPDFA, [out] _PdfPasswordSettings** ppPdfSettings);
+			[out] VARIANT_BOOL* pvbPDFA, [out] IPdfPasswordSettings** ppPdfSettings);
 	};
 
 	// IAddWatermarkTask

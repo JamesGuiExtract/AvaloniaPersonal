@@ -15,6 +15,10 @@
 #include <RecAPIPlus.h>
 #include <StringCSIS.h>
 #include <cppUtil.h>
+#include <PdfSecurityValues.h>
+#include <ByteStream.h>
+#include <ByteStreamManipulator.h>
+#include <EncryptionEngine.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -72,7 +76,9 @@ CESConvertToPDFApp::CESConvertToPDFApp()
 	  m_bPDFA(false),
 	  m_bIsError(true),          // assume error until successfully completed
 	  m_strExceptionLogFile(""),
-	  m_bOcrEngineInitialized(false)
+	  m_strUserPassword(""),
+	  m_strOwnerPassword(""),
+	  m_nPermissions(0)
 {
 	// TODO: add construction code here,
 	// Place all significant initialization in InitInstance
@@ -118,17 +124,11 @@ BOOL CESConvertToPDFApp::InitInstance()
 
 			// completed successfully
 			m_bIsError = false;
-
-			// Close the OCR engine
-			closeOcrEngine();
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18536");
 	}
 	catch(UCLIDException ue)
 	{
-		// Ensure the OCR engine is closed
-		closeOcrEngine();
-
 		// check if the exception log parameter was set
 		if (m_strExceptionLogFile.empty())
 		{
@@ -172,28 +172,45 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 		throw ue;
 	}
 
+	string strOutputFormat = pszOutputFormat;
+
+	// If either password is defined, enable 128 bit security
+	if (!m_strUserPassword.empty() || !m_strOwnerPassword.empty())
+	{
+		setIntSetting(strOutputFormat + ".PDFSecurity.Type", R2ID_PDFSECURITY128BITS);
+	}
+
+	// If there is a user password defined, set it
+	if (!m_strUserPassword.empty())
+	{
+		setStringSetting(strOutputFormat + ".PDFSecurity.UserPassword", m_strUserPassword);
+	}
+	// If there is an owner password defined, set it and the associated permissions
+	if (!m_strOwnerPassword.empty())
+	{
+		setStringSetting(strOutputFormat + ".PDFSecurity.OwnerPassword", m_strOwnerPassword);
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnablePrint",
+			isPdfSecuritySettingEnabled(giAllowLowQualityPrinting));
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnablePrintQ",
+			isPdfSecuritySettingEnabled(giAllowHighQualityPrinting));
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableModify",
+			isPdfSecuritySettingEnabled(giAllowDocumentModifications));
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableCopy",
+			isPdfSecuritySettingEnabled(giAllowContentCopying));
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableExtract",
+			isPdfSecuritySettingEnabled(giAllowContentCopyingForAccessibility));
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableAdd",
+			isPdfSecuritySettingEnabled(giAllowAddingModifyingAnnotations));
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableForms",
+			isPdfSecuritySettingEnabled(giAllowFillingInFields));
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableAssemble",
+			isPdfSecuritySettingEnabled(giAllowDocumentAssembly));
+	}
+
 	// If output is to be PDF/A compliant then need to set the PDF/A compatibility mode
 	if (m_bPDFA)
 	{
-		// Get settings manager
-		HSETTING hSetting;
-		rc = kRecSettingGetHandle(NULL, "Converters.Text.PDFImageOnText.Compatibility",
-			&hSetting, NULL);
-		if (rc != REC_OK)
-		{
-			UCLIDException ue("ELI28583", "Unable to get the PDF compatibility setting.");
-			loadScansoftRecErrInfo(ue, rc);
-			throw ue;
-		}
-
-		// Set PDF/A compatible
-		rc = kRecSettingSetInt(0, hSetting, R2ID_PDFA);
-		if (rc != REC_OK)
-		{
-			UCLIDException ue("ELI28584", "Unable to set PDF/A compatibility mode.");
-			loadScansoftRecErrInfo(ue, rc);
-			throw ue;
-		}
+		setIntSetting(strOutputFormat + ".Compatibility", R2ID_PDFA);
 	}
 
 	// create temporary OmniPage document file.
@@ -392,11 +409,25 @@ bool CESConvertToPDFApp::displayUsage(const string& strFileName, const string& s
 	// create the usage message
 	strUsage += "Converts a machine-printed text image file into a searchable pdf file.\n\n";
 	strUsage += strFileName;
-	strUsage += " <source> <destination> [/R] [/pdfa] [/ef <logfile>]\n\n";
+	strUsage += " <source> <destination> [/R] [/pdfa] [/user \"<Password>\"]";
+	strUsage += " [/owner \"<Password>\" <Permissions>] [/ef <logfile>]\n";
+	strUsage += "NOTE: You cannot specify both /pdfa and security settings (/user and/or /owner)\n\n";
 	strUsage += " source\t\tSpecifies the image file to convert into a searchable pdf file.\n";
 	strUsage += " destination\tSpecifies the filename of the searchable pdf file to create.\n";
 	strUsage += " /R\t\tRemove original image file after conversion.\n";
 	strUsage += " /pdfa\t\tSpecifies that the output file should be PDF/A compliant.\n";
+	strUsage += " /user\t\tSpecifies the user password to apply to the PDF.\n";
+	strUsage += " /owner\t\tSpecified the owner password and permissions to apply to the PDF.\n";
+	strUsage += " Permissions - An integer that is the sum of all permissions to set.\n";
+	strUsage += " \t\tAllow low quality printing = 1.\n";
+	strUsage += " \t\tAllow high quality printing = 2.\n";
+	strUsage += " \t\tAllow document modifications = 4.\n";
+	strUsage += " \t\tAllow copying/extraction of contents = 8.\n";
+	strUsage += " \t\tAllow accessibility access to contents = 16.\n";
+	strUsage += " \t\tAllow adding/modifying text annotations = 32.\n";
+	strUsage += " \t\tAllow filling in form fields = 64.\n";
+	strUsage += " \t\tAllow document assembly = 128.\n";
+	strUsage += " \t\tAllow all options = 255.\n";
 	strUsage += " /ef\t\tLog all errors to an exception file.\n";
 	strUsage += " logfile\t\tSpecifies the filename of an exception log to create.\n";
 
@@ -435,12 +466,13 @@ bool CESConvertToPDFApp::getAndValidateArguments(const int argc, char* argv[])
 		m_bIsError = false;
 		return displayUsage(argv[0]);
 	}
-	else if(argc < 3 || argc > 7)
+	else if(argc < 3 || argc > 13)
 	{
 		// invalid number of arguments
 		return displayUsage(argv[0], "Invalid number of arguments.");
 	}
 
+	bool bEncrypted = false;
 	for(int i=3; i<argc; i++)
 	{
 		string curArg(argv[i]);
@@ -469,10 +501,76 @@ bool CESConvertToPDFApp::getAndValidateArguments(const int argc, char* argv[])
 		{
 			m_bPDFA = true;
 		}
+		else if (curArg == "/user")
+		{
+			// Get the password
+			i++;
+			if (i < argc)
+			{
+				// store the password
+				m_strUserPassword = argv[i];
+			}
+			else
+			{
+				return displayUsage(argv[0], "Invalid parameters: user password expected after /user");
+			}
+		}
+		else if (curArg == "/owner")
+		{
+			// Get the password
+			i++;
+			if (i < argc)
+			{
+				// store the password
+				m_strOwnerPassword = argv[i];
+			}
+			else
+			{
+				return displayUsage(argv[0],
+					"Invalid parameters: owner password expected after /owner.");
+			}
+
+			// Get the permissions
+			i++;
+			if (i < argc)
+			{
+				// Get the permissions value and validate it
+				try
+				{
+					m_nPermissions = (int) asLong(argv[i]);
+					if (m_nPermissions < 0 || m_nPermissions > 255)
+					{
+						return displayUsage(argv[0],
+							"Invalid parameters: permissions value must be between 0 and 255.");
+					}
+				}
+				catch(...)
+				{
+					return displayUsage(argv[0],
+						"Invalid parameters: permissions value expected (number between 0 and 255).");
+				}
+			}
+			else
+			{
+				return displayUsage(argv[0],
+					"Invalid parameters: owner permissions expected after password.");
+			}
+		}
+		else if (curArg == "/enc")
+		{
+			bEncrypted = true;
+		}
 		else
 		{
 			return displayUsage(argv[0], "Invalid parameter: " + string(curArg));
 		}
+	}
+
+	// Check for /pdfa and either /user or /owner
+	if (m_bPDFA && (!m_strUserPassword.empty() || !m_strOwnerPassword.empty()))
+	{
+		return displayUsage(argv[0],
+			"Invalid parameters: cannot specify both /pdfa and either /user or /owner.");
 	}
 
 	// get the input file and output file
@@ -547,8 +645,44 @@ bool CESConvertToPDFApp::getAndValidateArguments(const int argc, char* argv[])
 		}
 	}
 
+	// If the passwords were encrypted, decrypt them now
+	if (bEncrypted)
+	{
+		if (!m_strUserPassword.empty())
+		{
+			decryptString(m_strUserPassword);
+		}
+		if (!m_strOwnerPassword.empty())
+		{
+			decryptString(m_strOwnerPassword);
+		}
+	}
+
 	// if we reached this far, the arguments were valid
 	return true;
+}
+//-------------------------------------------------------------------------------------------------
+void CESConvertToPDFApp::decryptString(string& rstrEncryptedString)
+{
+	// Build the key
+	ByteStream bytesKey;
+	ByteStreamManipulator bytesManipulatorKey(
+		ByteStreamManipulator::kWrite, bytesKey);
+	bytesManipulatorKey << gulPdfKey1;
+	bytesManipulatorKey << gulPdfKey2;
+	bytesManipulatorKey << gulPdfKey3;
+	bytesManipulatorKey << gulPdfKey4;
+	bytesManipulatorKey.flushToByteStream( 8 );
+
+	// Decrypt the string
+	ByteStream bytes(rstrEncryptedString);
+	ByteStream decrypted;
+	EncryptionEngine ee;
+	ee.decrypt(decrypted, bytes, bytesKey);
+
+	// Get the decrypted string
+	ByteStreamManipulator bsm (ByteStreamManipulator::kRead, decrypted);
+	bsm >> rstrEncryptedString;
 }
 //-------------------------------------------------------------------------------------------------
 void CESConvertToPDFApp::licenseOCREngine()
@@ -625,20 +759,100 @@ void CESConvertToPDFApp::licenseOCREngine()
 			throw ue;
 		}
 	}
-
-	m_bOcrEngineInitialized = true;
 }
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::closeOcrEngine()
+void CESConvertToPDFApp::setStringSetting(const string& strSetting, const string& strValue)
 {
-	// Check if the engine was initialized
-	if (m_bOcrEngineInitialized)
+	try
 	{
-		// Quit the engine
-		RecQuitPlus();
+		try
+		{
+			HSETTING hSetting;
+			RECERR rc = kRecSettingGetHandle(NULL, strSetting.c_str(), &hSetting, NULL);
+			if (rc != REC_OK)
+			{
+				UCLIDException ue("ELI29758", "Unable to get the OCR engine setting.");
+				loadScansoftRecErrInfo(ue, rc);
+				throw ue;
+			}
 
-		m_bOcrEngineInitialized = false;
+			STSTYPES type;
+			rc = kRecSettingGetType(hSetting, &type);
+			if (rc != REC_OK)
+			{
+				UCLIDException ue("ELI29764", "Unable to get setting type.");
+				loadScansoftRecErrInfo(ue, rc);
+				throw ue;
+			}
+
+			if (type == STS_STRING)
+			{
+				rc = kRecSettingSetString(0, hSetting, strValue.c_str());
+				if (rc != REC_OK)
+				{
+					UCLIDException ue("ELI29759", "Unable to set OCR engine setting value.");
+					loadScansoftRecErrInfo(ue, rc);
+					throw ue;
+				}
+			}
+			else if (type == STS_USTRING)
+			{
+				// Need a wide character string, copy string to _bstr_t
+				_bstr_t bstrTemp = strValue.c_str();
+				rc = kRecSettingSetUString(0, hSetting, bstrTemp);
+				if (rc != REC_OK)
+				{
+					UCLIDException ue("ELI29765", "Unable to set OCR engine setting value.");
+					loadScansoftRecErrInfo(ue, rc);
+					throw ue;
+				}
+			}
+			else
+			{
+				UCLIDException ue("ELI29768", "Specified setting is not a string type.");
+				ue.addDebugInfo("Setting Type", type);
+				throw ue;
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29769");
 	}
+	catch(UCLIDException& ue)
+	{
+		ue.addDebugInfo("Setting Name", strSetting);
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CESConvertToPDFApp::setBoolSetting(const string& strSetting, bool bValue)
+{
+	setIntSetting(strSetting, asMFCBool(bValue));
+}
+//-------------------------------------------------------------------------------------------------
+void CESConvertToPDFApp::setIntSetting(const string& strSetting, int nValue)
+{
+	HSETTING hSetting;
+	RECERR rc = kRecSettingGetHandle(NULL, strSetting.c_str(), &hSetting, NULL);
+	if (rc != REC_OK)
+	{
+		UCLIDException ue("ELI29760", "Unable to get the OCR engine setting.");
+		loadScansoftRecErrInfo(ue, rc);
+		ue.addDebugInfo("Setting Name", strSetting, false);
+		throw ue;
+	}
+
+	rc = kRecSettingSetInt(0, hSetting, nValue);
+	if (rc != REC_OK)
+	{
+		UCLIDException ue("ELI29761", "Unable to set OCR engine setting value.");
+		loadScansoftRecErrInfo(ue, rc);
+		ue.addDebugInfo("Setting Name", strSetting, false);
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+bool CESConvertToPDFApp::isPdfSecuritySettingEnabled(int nSetting)
+{
+	return isFlagSet(m_nPermissions, nSetting);
 }
 //-------------------------------------------------------------------------------------------------
 void CESConvertToPDFApp::validateLicense()
