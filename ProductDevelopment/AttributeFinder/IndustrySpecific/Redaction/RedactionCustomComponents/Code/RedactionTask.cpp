@@ -133,8 +133,6 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 		swProcessingTime.start();
 		_lastCodePos = "20";
 
-		IFileProcessingDBPtr ipFAMDB(pDB);
-		ASSERT_ARGUMENT("ELI19080", ipFAMDB != NULL);
 		ASSERT_ARGUMENT("ELI17928", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI17929", pResult != NULL);
 
@@ -365,14 +363,19 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 		storeMetaData(strVOAFileName, ipVOAAttr, ipFoundAttr, tStartTime, dElapsedSeconds, 
 			strImageName, strOutputName, bOutputFileExists);
 
-		// Set the FAMDB pointer
-		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipIDSDB = getIDShieldDBPtr();
-		ipIDSDB->FAMDB = ipFAMDB;
+		// Add ID Shield data if a database is provided
+		IFileProcessingDBPtr ipFAMDB(pDB);
+		if (ipFAMDB != NULL)
+		{
+			// Set the FAMDB pointer
+			UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipIDSDB = getIDShieldDBPtr();
+			ipIDSDB->FAMDB = ipFAMDB;
 
-		// Add the IDShieldData record to the database
-		ipIDSDB->AddIDShieldData(nFileID, VARIANT_FALSE, swProcessingTime.getElapsedTime(), 
-			idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
-			idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions);
+			// Add the IDShieldData record to the database
+			ipIDSDB->AddIDShieldData(nFileID, VARIANT_FALSE, swProcessingTime.getElapsedTime(), 
+				idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
+				idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions);
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28604")
 }
