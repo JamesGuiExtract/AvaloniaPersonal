@@ -193,6 +193,7 @@ namespace Extract.Redaction.Verification
                         foreach (RedactionLayerObject redaction in _layerObjects)
                         {
                             redaction.Color = color;
+                            redaction.CanRender = _redacted;
                         }
 
                         _redactedDirty = true;
@@ -724,7 +725,7 @@ namespace Extract.Redaction.Verification
                 redaction.BorderColor = item.Level.Color;
                 redaction.Color = item.Attribute.Redacted ? 
                     RedactionGridView.ToggledRedactionColor : Color.Transparent;
-                redaction.CanRender = item.Level.Output;
+                redaction.CanRender = item.Attribute.Redacted;
 
                 layerObjects.Add(redaction);
 
