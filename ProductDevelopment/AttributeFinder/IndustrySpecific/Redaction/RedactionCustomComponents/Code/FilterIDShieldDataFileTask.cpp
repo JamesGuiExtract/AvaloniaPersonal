@@ -92,10 +92,6 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(BSTR bstrFileFullName,
 
 		ASSERT_ARGUMENT("ELI24785", pResult != NULL);
 
-		// Get the FAM DB
-		IFileProcessingDBPtr ipFAMDB(pDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI24786", ipFAMDB != NULL);
-
 		// Get the tag manager
 		IFAMTagManagerPtr ipFamTagManager(pTagManager);
 		ASSERT_RESOURCE_ALLOCATION("ELI24787", ipFamTagManager != NULL);
