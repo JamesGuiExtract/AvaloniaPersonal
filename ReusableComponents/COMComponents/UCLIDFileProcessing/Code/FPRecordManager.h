@@ -202,6 +202,9 @@ private:
 	// The max number of files to get from the database each time the queue is empty
 	long m_nMaxFilesFromDB;
 
+	// The number of milliseconds to sleep between checking database for new files
+	long m_nMillisecondsBetweenDBCheck;
+
 	// This flag indicates that processing should continue waiting for files to be added to the DB
 	bool m_bKeepProcessingAsAdded;
 

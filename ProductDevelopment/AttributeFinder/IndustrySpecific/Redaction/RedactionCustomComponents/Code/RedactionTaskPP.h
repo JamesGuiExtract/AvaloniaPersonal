@@ -18,6 +18,7 @@ class ATL_NO_VTABLE CRedactionTaskPP :
 {
 public:
 	CRedactionTaskPP();
+	~CRedactionTaskPP();
 	
 	enum {IDD = IDD_REDACTIONTASKPP};
 
@@ -41,6 +42,8 @@ BEGIN_MSG_MAP(CRedactionTaskPP)
 	COMMAND_HANDLER(IDC_SELECT_ATTRIBUTES, BN_CLICKED, OnClickedBtnSelectAttributes)
 	COMMAND_HANDLER(IDC_CHK_OCDATA, BN_CLICKED, OnClickedBtnOCData)
 	COMMAND_HANDLER(IDC_BTN_SELECT_IMAGE_FILE_TAG, BN_CLICKED, OnClickedSelectImageFileTag)
+	COMMAND_HANDLER(IDC_CHECK_PDF_SECURITY, BN_CLICKED, OnClickedCheckPdfSecurity)
+	COMMAND_HANDLER(IDC_BTN_PDF_SECURITY_SETTINGS, BN_CLICKED, OnClickedBtnPdfSettings)
 	// REFLECT_NOTIFICATIONS needed by ImageButtonWithSytle
 	REFLECT_NOTIFICATIONS()
 END_MSG_MAP()
@@ -60,6 +63,8 @@ END_MSG_MAP()
 	LRESULT OnClickedSelectImageFileTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnBnClickedButtonRedactAppearance(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedButtonDataFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedCheckPdfSecurity(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedBtnPdfSettings(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	/////////////
@@ -83,6 +88,8 @@ private:
 	ATLControls::CButton m_radioUseOriginalImage;
 	ATLControls::CButton m_chkCarryAnnotation;
 	ATLControls::CButton m_chkRedactionAsAnnotation;
+	ATLControls::CButton m_chkPdfSecurity;
+	ATLControls::CButton m_btnPdfSettings;
 
 	// Data file
 	ATLControls::CStatic m_stcDataFile;
@@ -93,6 +100,9 @@ private:
 	// Variables
 	string m_strVoaFileName;
 	RedactionAppearanceOptions m_redactionAppearance;
+
+	// Pdf password security settings object
+	IPdfPasswordSettingsPtr m_ipPdfSettings;
 
 	/////////////
 	// Methods

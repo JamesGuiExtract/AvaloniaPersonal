@@ -219,7 +219,10 @@ LEADUTILS_API void fillImageArea(const string& strImageFileName,
 								 const string& strOutputImageName,
 								 long nLeft, long nTop, long nRight, long nBottom, 
 								 long nPage, const COLORREF color, bool bRetainAnnotations, 
-								 bool bApplyAsAnnotations);
+								 bool bApplyAsAnnotations,
+								 const string& strUserPassword = "",
+								 const string& strOwnerPassword = "",
+								 int nPermissions = 0);
 //-------------------------------------------------------------------------------------------------
 LEADUTILS_API void fillImageArea(const string& strImageFileName,
 								 const string& strOuputImageName,
@@ -229,7 +232,10 @@ LEADUTILS_API void fillImageArea(const string& strImageFileName,
 								 const string& strText,
 								 const COLORREF crTextColor,
 								 bool bRetainAnnotations, 
-								 bool bApplyAsAnnotations);
+								 bool bApplyAsAnnotations,
+								 const string& strUserPassword = "",
+								 const string& strOwnerPassword = "",
+								 int nPermissions = 0);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To fill (i.e. redact) all areas of the image specified in specified in vecZones,
 //			with the color and text specified within each zone
@@ -239,7 +245,10 @@ LEADUTILS_API void fillImageArea(const string& strImageFileName,
 								 const string& strOutputImageName,
 								 vector<PageRasterZone>& rvecZones, 
 								 bool bRetainAnnotations, 
-								 bool bApplyAsAnnotations);
+								 bool bApplyAsAnnotations,
+								 const string& strUserPassword = "",
+								 const string& strOwnerPassword = "",
+								 int nPermissions = 0);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To take a vector of image file names and combine them into a multipage file with
 //			the name of strOutputFileName
@@ -359,7 +368,9 @@ LEADUTILS_API bool isLeadToolsSerialized();
 //			If bRetainAnnotations is true then any redaction type annotations in the tif will
 //			be burned into the PDF [FIDSC #3131 - JDS - 12/17/2008].
 LEADUTILS_API void convertTIFToPDF(const string& strTIF, const string& strPDF,
-								   bool bRetainAnnotations = false);
+								   bool bRetainAnnotations = false,
+								   const string& strUserPassword = "",
+								   const string& strOwnerPassword = "", int nPermissions = 0);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To convert a PDF image into a TIF image.  This function does not return 
 //			until the conversion is complete.

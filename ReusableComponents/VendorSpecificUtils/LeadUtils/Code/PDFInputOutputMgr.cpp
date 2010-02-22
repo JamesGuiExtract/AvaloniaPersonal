@@ -23,9 +23,9 @@ using namespace std;
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-const std::string gstrLEAD_UTILS_FOLDER		= "\\LeadUtils";
-const std::string gstrCACHE_SIZE_KEY		= "FileCacheSize";
-const std::string gstrDEFAULT_CACHE_SIZE	= "25";
+const string gstrLEAD_UTILS_FOLDER		= "\\LeadUtils";
+const string gstrCACHE_SIZE_KEY		= "FileCacheSize";
+const string gstrDEFAULT_CACHE_SIZE	= "25";
 
 //-------------------------------------------------------------------------------------------------
 // Statics
@@ -34,10 +34,10 @@ const std::string gstrDEFAULT_CACHE_SIZE	= "25";
 CMutex PDFInputOutputMgr::ms_mutex;
 
 // Collection of currently active files
-std::map<std::string, CachedFileData *> PDFInputOutputMgr::ms_mapActiveFiles;
+map<string, CachedFileData *> PDFInputOutputMgr::ms_mapActiveFiles;
 
 // Collection of inactive files to be deleted as queue reaches its capacity
-std::deque<CachedFileData *> PDFInputOutputMgr::ms_quInactiveFiles;
+deque<CachedFileData *> PDFInputOutputMgr::ms_quInactiveFiles;
 
 // Maximum number of inactive files to be stored in deque
 int PDFInputOutputMgr::ms_nMaxCacheSize = 0;
@@ -45,7 +45,7 @@ int PDFInputOutputMgr::ms_nMaxCacheSize = 0;
 //-------------------------------------------------------------------------------------------------
 // CachedFileData
 //-------------------------------------------------------------------------------------------------
-CachedFileData::CachedFileData(const std::string& strPDFName)
+CachedFileData::CachedFileData(const string& strPDFName)
 {
 	try
 	{
@@ -77,10 +77,15 @@ CachedFileData::CachedFileData(const std::string& strPDFName)
 //-------------------------------------------------------------------------------------------------
 // PDFInputOutputMgr
 //-------------------------------------------------------------------------------------------------
-PDFInputOutputMgr::PDFInputOutputMgr(const std::string& strOriginalName, bool bFileUsedAsInput)
+PDFInputOutputMgr::PDFInputOutputMgr(const string& strOriginalName, bool bFileUsedAsInput,
+									 const string& strUserPassword, const string& strOwnerPassword,
+									 int nPermissions)
 : m_apTFN(NULL),
   m_strFileNameInformationString(""),
-  m_bOriginalUsedAsInput(bFileUsedAsInput)
+  m_bOriginalUsedAsInput(bFileUsedAsInput),
+  m_strUserPassword(strUserPassword),
+  m_strOwnerPassword(strOwnerPassword),
+  m_nPermissions(nPermissions)
 {
 	try
 	{
@@ -154,19 +159,21 @@ PDFInputOutputMgr::~PDFInputOutputMgr()
 
 			// Convert the temporary file into the output PDF
 			// (retaining redaction annotations) [FIDSC #3131 - JDS - 12/17/2008]
-			convertTIFToPDF( m_apTFN->getName(), m_strOriginalName, true );
+			// Set the specified security settings
+			convertTIFToPDF( m_apTFN->getName(), m_strOriginalName, true,
+				m_strUserPassword, m_strOwnerPassword, m_nPermissions);
 		}
 		// else this was an output non-PDF and nothing needs to be done
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16470");
 }
 //-------------------------------------------------------------------------------------------------
-const std::string& PDFInputOutputMgr::getFileName()
+const string& PDFInputOutputMgr::getFileName()
 {
 	return m_strWorkingName;
 }
 //-------------------------------------------------------------------------------------------------
-const std::string& PDFInputOutputMgr::getFileNameInformationString()
+const string& PDFInputOutputMgr::getFileNameInformationString()
 {
 	// if m_strFileNameInformationString is empty then build the string
 	// this way the string only needs to be built once
@@ -195,7 +202,7 @@ void PDFInputOutputMgr::sFlushCache()
 	CSingleLock lg( &ms_mutex, TRUE );
 
 	// Remove any remaining active items
-	std::map<std::string, CachedFileData *>::iterator iterMap;
+	map<string, CachedFileData *>::iterator iterMap;
 	for (iterMap = ms_mapActiveFiles.begin(); iterMap != ms_mapActiveFiles.end(); iterMap++)
 	{
 		// Retrieve and delete this item
@@ -219,7 +226,7 @@ void PDFInputOutputMgr::sFlushCache()
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-std::string PDFInputOutputMgr::addActiveFile(std::string strName)
+string PDFInputOutputMgr::addActiveFile(string strName)
 {
 	// No special handling for non-PDF images
 	if (!isPDFFile( strName ))
@@ -369,7 +376,7 @@ void PDFInputOutputMgr::addItemToInactiveQueue(CachedFileData* pCFD)
 	ms_quInactiveFiles.push_front( pCFD );
 }
 //--------------------------------------------------------------------------------------------------
-bool PDFInputOutputMgr::isFileInactive(const std::string &strLCName, bool bMoveToActive)
+bool PDFInputOutputMgr::isFileInactive(const string &strLCName, bool bMoveToActive)
 {
 	// Protect collections against access by other threads
 	CSingleLock lg( &ms_mutex, TRUE );
@@ -403,7 +410,7 @@ bool PDFInputOutputMgr::isFileInactive(const std::string &strLCName, bool bMoveT
 	return false;
 }
 //--------------------------------------------------------------------------------------------------
-bool PDFInputOutputMgr::isFileInMap(const std::string &strLCName)
+bool PDFInputOutputMgr::isFileInMap(const string &strLCName)
 {
 	// Protect collections against access by other threads
 	CSingleLock lg( &ms_mutex, TRUE );
@@ -411,7 +418,7 @@ bool PDFInputOutputMgr::isFileInMap(const std::string &strLCName)
 	return (ms_mapActiveFiles.count(strLCName) > 0);
 }
 //--------------------------------------------------------------------------------------------------
-void PDFInputOutputMgr::removeActiveFile(const std::string &strLCName)
+void PDFInputOutputMgr::removeActiveFile(const string &strLCName)
 {
 	// Protect collections against access by other threads
 	CSingleLock lg( &ms_mutex, TRUE );
@@ -435,7 +442,7 @@ void PDFInputOutputMgr::removeActiveFile(const std::string &strLCName)
 #endif
 
 		// Remove this map entry
-		std::map<std::string, CachedFileData *>::iterator mapIter = ms_mapActiveFiles.find( strLCName );
+		map<string, CachedFileData *>::iterator mapIter = ms_mapActiveFiles.find( strLCName );
 		if (mapIter != ms_mapActiveFiles.end())
 		{
 			ms_mapActiveFiles.erase( mapIter );

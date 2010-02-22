@@ -36,6 +36,7 @@ const string FileProcessingConfigMgr::SCOPE_LAST_OPENED_LIST_NAME = "ScopeLastOp
 const string FileProcessingConfigMgr::MAX_STORED_RECORDS = "MaxStoredRecords";
 const string FileProcessingConfigMgr::RESTRICT_NUM_STORED_RECORDS = "RestrictNumStoredRecords";
 const string FileProcessingConfigMgr::MAX_FILES_FROM_DB = "MaxFilesFromDB";
+const string FileProcessingConfigMgr::MILLISECONDS_BETWEEN_DB_CHECK = "MillisecondsBetweenDBCheck";
 const string FileProcessingConfigMgr::TIMER_TICK_SPEED = "TimerTickSpeed";
 const string FileProcessingConfigMgr::DB_SERVER_HISTORY = "DBServerHistory";
 const string FileProcessingConfigMgr::DB_LOCK_TIMEOUT = "DBLockTimeout";
@@ -78,7 +79,10 @@ static const string gstrSQL_SERVER_REG_PATH = "SOFTWARE\\Microsoft\\Microsoft SQ
 static const string gstrSQL_SERVER_INSTALLED_INSTANCES_KEY = "InstalledInstances";
 
 // Default for Max files from a database
-static const int DEFAULT_MAX_FILES_FROM_DB = 1;
+static const long DEFAULT_MAX_FILES_FROM_DB = 1;
+
+// Default for milliseconds between db checks
+static const long DEFAULT_MS_BETWEEN_DB_CHECK = 2000;
 
 // Default timer tick speed (2000 ms)
 static const unsigned int DEFAULT_TIMER_TICK_SPEED = 2000;
@@ -423,6 +427,26 @@ long FileProcessingConfigMgr::getMaxFilesFromDB()
 	{
 		// Set the default value
 		m_pCfgMgr->setKeyValue(gstrFP_RECORD_MGR_PATH, MAX_FILES_FROM_DB, asString(DEFAULT_MAX_FILES_FROM_DB));
+	}
+	return rtnValue;
+}
+//-------------------------------------------------------------------------------------------------
+long FileProcessingConfigMgr::getMillisecondsBetweenDBCheck()
+{
+	// Set return value to defaultg
+	long rtnValue = DEFAULT_MS_BETWEEN_DB_CHECK;
+	
+	// if key exists get that value other wise set the default value
+	if ( m_pCfgMgr->keyExists(gstrFP_RECORD_MGR_PATH, MILLISECONDS_BETWEEN_DB_CHECK))
+	{
+		rtnValue = asLong(m_pCfgMgr->getKeyValue(gstrFP_RECORD_MGR_PATH,
+			MILLISECONDS_BETWEEN_DB_CHECK));
+	}
+	else
+	{
+		// Set the default value
+		m_pCfgMgr->setKeyValue(gstrFP_RECORD_MGR_PATH, MILLISECONDS_BETWEEN_DB_CHECK,
+			asString(DEFAULT_MS_BETWEEN_DB_CHECK));
 	}
 	return rtnValue;
 }

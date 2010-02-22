@@ -209,34 +209,23 @@ namespace Extract.Imaging
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void HandleDisplayPasswordsChecked(object sender, EventArgs e)
-        {
-            try
-            {
-                bool display = !_displayPasswordsCheck.Checked;
-
-                _userPasswordText1.UseSystemPasswordChar = display;
-                _userPasswordText2.UseSystemPasswordChar = display;
-                _ownerPasswordText1.UseSystemPasswordChar = display;
-                _ownerPasswordText2.UseSystemPasswordChar = display;
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI29732", ex);
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="Control.Click"/> event.
-        /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
         void HandleOkButtonClicked(object sender, EventArgs e)
         {
             try
             {
+                bool userChecked = _enableUserPasswordCheckBox.Checked;
+                bool ownerChecked = _enableOwnerPasswordCheckBox.Checked;
+                if (!userChecked && !ownerChecked)
+                {
+                    MessageBox.Show("At least one password must be specified.", "No Passwords",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error,
+                        MessageBoxDefaultButton.Button1, 0);
+                    _enableUserPasswordCheckBox.Focus();
+                    return;
+                }
+
                 string userPassword = "";
-                if (_enableUserPasswordCheckBox.Checked)
+                if (userChecked)
                 {
                     string pass1 = _userPasswordText1.Text;
                     string pass2 = _userPasswordText2.Text;
@@ -263,7 +252,7 @@ namespace Extract.Imaging
                 string ownerPassword = "";
                 PdfOwnerPermissions permissions = PdfOwnerPermissions.DisallowAll;
 
-                if (_enableOwnerPasswordCheckBox.Checked)
+                if (ownerChecked)
                 {
                     string pass1 = _ownerPasswordText1.Text;
                     string pass2 = _ownerPasswordText2.Text;

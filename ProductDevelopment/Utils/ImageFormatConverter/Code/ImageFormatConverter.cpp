@@ -263,7 +263,8 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 							pdfsfo.dwEncryptFlags = getLtPermissions(nPermissions);
 						}
 
-						L_SetPDFSaveOptions(&pdfsfo);
+						throwExceptionIfNotSuccess(L_SetPDFSaveOptions(&pdfsfo),
+							"ELI29792", "Unable to set PDF save options.");
 					}
 
 					// Set output format

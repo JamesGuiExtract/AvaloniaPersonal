@@ -1,3 +1,5 @@
+#pragma once
+
 // The encryption keys for PDF passwords when passing as arguments to
 // ImageFormatConverter or ESConvertToPDF
 const unsigned long	gulPdfKey1 = 0x3C214A7D;

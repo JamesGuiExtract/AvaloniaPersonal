@@ -33,6 +33,7 @@ FPRecordManager::FPRecordManager()
 		RegistryPersistenceMgr regMgr( HKEY_CURRENT_USER, "");
 		FileProcessingConfigMgr fpCfgMgr(&regMgr, "\\FileProcessingDialog");
 		m_nMaxFilesFromDB = fpCfgMgr.getMaxFilesFromDB();
+		m_nMillisecondsBetweenDBCheck = fpCfgMgr.getMillisecondsBetweenDBCheck();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13993");
 }
@@ -245,9 +246,9 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 		lockGuard.Unlock();
 		lockDBLoad.Unlock();
 
-		// if a file is not available in the queue for processing, just wait for sometime
-		// and check again
-		Sleep(50);
+		// if a file is not available in the queue for processing,
+		// sleep for the specified amount of time.
+		Sleep(m_nMillisecondsBetweenDBCheck);
 	}
 }
 //-------------------------------------------------------------------------------------------------

@@ -21,7 +21,8 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+// Version 2 - Added support for PDF security
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CRedactionTask
@@ -33,6 +34,7 @@ CRedactionTask::CRedactionTask()
 	m_bCarryForwardAnnotations(false),
 	m_bApplyRedactionsAsAnnotations(false),
 	m_ipIDShieldDB(NULL),
+	m_ipPdfSettings(NULL),
 	m_bUseRedactedImage(false)
 {
 	ASSERT_RESOURCE_ALLOCATION("ELI19993", m_ipAttributeNames != NULL);
@@ -54,6 +56,7 @@ CRedactionTask::~CRedactionTask()
 		m_ipAFUtility = NULL;
 		m_ipAttributeNames = NULL;
 		m_ipIDShieldDB = NULL;
+		m_ipPdfSettings = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16479");
 }
@@ -70,6 +73,7 @@ void CRedactionTask::FinalRelease()
 		m_ipAFUtility = NULL;
 		m_ipAttributeNames = NULL;
 		m_ipIDShieldDB = NULL;
+		m_ipPdfSettings = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28331");
 }
@@ -349,9 +353,25 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 		}
 		_lastCodePos = "350";
 
+		// Get the pdf security settings
+		string strUser = "";
+		string strOwner = "";
+		int nPermissions = 0;
+		if (m_ipPdfSettings != NULL)
+		{
+			_bstr_t bstrUserPass, bstrOwnerPass;
+			PdfOwnerPermissions permissions;
+			m_ipPdfSettings->GetSettings(bstrUserPass.GetAddress(), bstrOwnerPass.GetAddress(),
+				&permissions);
+			strUser = asString(bstrUserPass);
+			strOwner = asString(bstrOwnerPass);
+			nPermissions = (int) permissions;
+		}
+
 		// Save redactions
 		fillImageArea(strImageToRedact.c_str(), strOutputName.c_str(), vecZones, 
-			m_bCarryForwardAnnotations, m_bApplyRedactionsAsAnnotations);
+			m_bCarryForwardAnnotations, m_bApplyRedactionsAsAnnotations,
+			strUser, strOwner, nPermissions);
 		_lastCodePos = "400";
 
 		// Stop the stop watch
@@ -524,11 +544,35 @@ STDMETHODIMP CRedactionTask::raw_CopyFrom(IUnknown* pObject)
 		m_redactionAppearance.m_crFillColor = ipSource->FillColor;
 		
 		// Retrieve font settings
-		lstrcpyn(m_redactionAppearance.m_lgFont.lfFaceName, ipSource->FontName, LF_FACESIZE);
-		m_redactionAppearance.m_lgFont.lfItalic = ipSource->IsItalic == VARIANT_TRUE ? gucIS_ITALIC : 0;
-		m_redactionAppearance.m_lgFont.lfWeight = 
-			ipSource->IsBold == VARIANT_TRUE ? FW_BOLD : FW_NORMAL;
-		m_redactionAppearance.m_iPointSize = ipSource->FontSize;
+		_bstr_t bstrFontName;
+		VARIANT_BOOL vbIsBold, vbIsItalic;
+		long nFontSize;
+		ipSource->GetFontData(bstrFontName.GetAddress(), &vbIsBold, &vbIsItalic, &nFontSize);
+		string strFontName = asString(bstrFontName);
+		m_redactionAppearance.m_lgFont.lfItalic = vbIsItalic == VARIANT_TRUE ? gucIS_ITALIC : 0;
+		m_redactionAppearance.m_lgFont.lfWeight = vbIsBold == VARIANT_TRUE ? FW_BOLD : FW_NORMAL;
+		m_redactionAppearance.m_iPointSize = nFontSize;
+		LPTSTR result = lstrcpyn(m_redactionAppearance.m_lgFont.lfFaceName, strFontName.c_str(), LF_FACESIZE);
+		if (result == NULL)
+		{
+			UCLIDException uex("ELI29772", "Unable to copy Font name.");
+			uex.addDebugInfo("Font Name To Copy", strFontName);
+			uex.addDebugInfo("Font Name Length", strFontName.length());
+			uex.addDebugInfo("Max Length", LF_FACESIZE);
+			throw uex;
+		}
+
+		// Retrieve PDF settings
+		ICopyableObjectPtr ipCopy = ipSource->PdfPasswordSettings;
+		if (ipCopy != NULL)
+		{
+			m_ipPdfSettings = ipCopy->Clone();
+			ASSERT_RESOURCE_ALLOCATION("ELI29770", m_ipPdfSettings != NULL);
+		}
+		else
+		{
+			m_ipPdfSettings = NULL;
+		}
 
 		return S_OK;
 	}
@@ -550,7 +594,13 @@ STDMETHODIMP CRedactionTask::raw_IsConfigured(VARIANT_BOOL* pbValue)
 		// Check license
 		validateLicense();
 
-		*pbValue = asVariantBool(!m_strOutputFileName.empty());
+		// Configured if:
+		// 1. Output file name is not empty
+		// 2. Pdf settings are either NULL or properly configured
+		IMustBeConfiguredObjectPtr ipConfigure = m_ipPdfSettings;
+		bool bConfigured = !m_strOutputFileName.empty()
+			&& (ipConfigure == NULL || ipConfigure->IsConfigured() == VARIANT_TRUE);
+		*pbValue = asVariantBool(bConfigured);
 
 		return S_OK;
 	}
@@ -959,7 +1009,16 @@ STDMETHODIMP CRedactionTask::put_FontName(BSTR bstrFontName)
 		// Check license state
 		validateLicense();
 
-		lstrcpyn(m_redactionAppearance.m_lgFont.lfFaceName, asString(bstrFontName).c_str(), LF_FACESIZE);
+		string strFontName = asString(bstrFontName);
+		LPTSTR result = lstrcpyn(m_redactionAppearance.m_lgFont.lfFaceName, strFontName.c_str(), LF_FACESIZE);
+		if (result == NULL)
+		{
+			UCLIDException uex("ELI29773", "Unable to copy Font name.");
+			uex.addDebugInfo("Font Name To Copy", strFontName);
+			uex.addDebugInfo("Font Name Length", strFontName.length());
+			uex.addDebugInfo("Max Length", LF_FACESIZE);
+			throw uex;
+		}
 
 		m_bDirty = true;
 
@@ -1076,7 +1135,73 @@ STDMETHODIMP CRedactionTask::put_FontSize(long lFontSize)
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI24735")
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29735");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRedactionTask::put_PdfPasswordSettings(IPdfPasswordSettings* pPdfSettings)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license state
+		validateLicense();
+
+		// Store the settings (NULL is acceptable setting value)
+		m_ipPdfSettings = pPdfSettings;
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI24784");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRedactionTask::get_PdfPasswordSettings(IPdfPasswordSettings** ppPdfSettings)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license state
+		validateLicense();
+
+		ASSERT_RESOURCE_ALLOCATION("ELI29785", ppPdfSettings != NULL);
+
+		IPdfPasswordSettingsPtr ipShallowCopy = m_ipPdfSettings;
+
+		*ppPdfSettings = ipShallowCopy.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29786");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRedactionTask::GetFontData(BSTR* pbstrFontName, VARIANT_BOOL* pvbIsBold,
+		VARIANT_BOOL* pvbIsItalic, long* plFontSize)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license state
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI29787", pbstrFontName != NULL);
+		ASSERT_ARGUMENT("ELI29788", pvbIsBold != NULL);
+		ASSERT_ARGUMENT("ELI29789", pvbIsItalic != NULL);
+		ASSERT_ARGUMENT("ELI29790", plFontSize != NULL);
+
+		// Return the font data
+		_bstr_t bstrFontName(m_redactionAppearance.m_lgFont.lfFaceName);
+		*pbstrFontName = bstrFontName.Detach();
+		*pvbIsBold = asVariantBool(m_redactionAppearance.m_lgFont.lfWeight >= FW_BOLD);
+		*pvbIsItalic = asVariantBool(m_redactionAppearance.m_lgFont.lfItalic == gucIS_ITALIC);
+		*plFontSize = m_redactionAppearance.m_iPointSize;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29791");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1100,7 +1225,7 @@ STDMETHODIMP CRedactionTask::IsDirty(void)
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactionTask::Load(IStream* pStream)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
@@ -1165,8 +1290,16 @@ STDMETHODIMP CRedactionTask::Load(IStream* pStream)
 
 		string strFontName;
 		dataReader >> strFontName;
-		lstrcpyn(m_redactionAppearance.m_lgFont.lfFaceName, strFontName.c_str(), LF_FACESIZE);
-		
+		LPTSTR result = lstrcpyn(m_redactionAppearance.m_lgFont.lfFaceName, strFontName.c_str(), LF_FACESIZE);
+		if (result == NULL)
+		{
+			UCLIDException uex("ELI29771", "Unable to copy Font name.");
+			uex.addDebugInfo("Font Name To Copy", strFontName);
+			uex.addDebugInfo("Font Name Length", strFontName.length());
+			uex.addDebugInfo("Max Length", LF_FACESIZE);
+			throw uex;
+		}
+
 		bool bItalic;
 		dataReader >> bItalic;
 		m_redactionAppearance.m_lgFont.lfItalic = bItalic ? gucIS_ITALIC : 0;
@@ -1179,12 +1312,26 @@ STDMETHODIMP CRedactionTask::Load(IStream* pStream)
 		dataReader >> lTemp;
 		m_redactionAppearance.m_iPointSize = (int) lTemp;
 
+		if (nDataVersion >= 2)
+		{
+			// Read the Pdf password settings from the stream
+			bool bSettings;
+			dataReader >> bSettings;
+			if (bSettings)
+			{
+				IPersistStreamPtr ipObj;
+				readObjectFromStream(ipObj, pStream, "ELI29774");
+				m_ipPdfSettings = ipObj;
+				ASSERT_RESOURCE_ALLOCATION("ELI29775", m_ipPdfSettings != NULL);
+			}
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11003");
-	
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactionTask::Save(IStream* pStream, BOOL fClearDirty)
@@ -1229,6 +1376,10 @@ STDMETHODIMP CRedactionTask::Save(IStream* pStream, BOOL fClearDirty)
 		dataWriter << asCppBool(m_redactionAppearance.m_lgFont.lfWeight >= FW_BOLD);
 		dataWriter << (long) m_redactionAppearance.m_iPointSize;
 
+		// Write a bool to indicate whether there is a Pdf password settings object
+		bool bSettings = m_ipPdfSettings != NULL;
+		dataWriter << bSettings;
+
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -1236,21 +1387,30 @@ STDMETHODIMP CRedactionTask::Save(IStream* pStream, BOOL fClearDirty)
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
+		// Only save Attribute Names if they exist
 		if (bAttributeNames)
 		{
-			// Only load Attribute Names if they exist
 			IPersistStreamPtr ipObj = m_ipAttributeNames;
 			writeObjectToStream(ipObj, pStream, "ELI11780", fClearDirty);
 		}
+
+		// Write the PDF settings object if it exists
+		if (bSettings)
+		{
+			IPersistStreamPtr ipObj = m_ipPdfSettings;
+			ASSERT_RESOURCE_ALLOCATION("ELI29776", ipObj != NULL);
+			writeObjectToStream(ipObj, pStream, "ELI29777", fClearDirty);
+		}
+
 		// Clear the flag as specified
 		if (fClearDirty)
 		{
 			m_bDirty = false;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11004");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactionTask::GetSizeMax(ULARGE_INTEGER* pcbSize)
@@ -1276,6 +1436,9 @@ void CRedactionTask::clear()
 	// Reset to default values
 	m_redactionAppearance.reset();
 	m_setAttributeNames.clear();
+
+	// Clear PDF settings
+	m_ipPdfSettings = NULL;
 }
 //-------------------------------------------------------------------------------------------------
 IAFUtilityPtr CRedactionTask::getAFUtility()

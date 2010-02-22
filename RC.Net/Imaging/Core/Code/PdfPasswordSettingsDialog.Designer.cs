@@ -59,7 +59,6 @@ namespace Extract.Imaging
             this._enableOwnerPasswordCheckBox = new System.Windows.Forms.CheckBox();
             this._btnOk = new System.Windows.Forms.Button();
             this._btnCancel = new System.Windows.Forms.Button();
-            this._displayPasswordsCheck = new System.Windows.Forms.CheckBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             label1 = new System.Windows.Forms.Label();
             groupBox2 = new System.Windows.Forms.GroupBox();
@@ -76,7 +75,7 @@ namespace Extract.Imaging
             groupBox1.Controls.Add(this._enableUserPasswordCheckBox);
             groupBox1.Location = new System.Drawing.Point(12, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(443, 76);
+            groupBox1.Size = new System.Drawing.Size(529, 76);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "User password";
@@ -135,7 +134,7 @@ namespace Extract.Imaging
             groupBox2.Controls.Add(this._enableOwnerPasswordCheckBox);
             groupBox2.Location = new System.Drawing.Point(12, 94);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new System.Drawing.Size(443, 256);
+            groupBox2.Size = new System.Drawing.Size(529, 256);
             groupBox2.TabIndex = 4;
             groupBox2.TabStop = false;
             groupBox2.Text = "Owner password and permissions to set";
@@ -175,9 +174,9 @@ namespace Extract.Imaging
             this._allowFillInFormFieldsCheck.AutoSize = true;
             this._allowFillInFormFieldsCheck.Location = new System.Drawing.Point(25, 160);
             this._allowFillInFormFieldsCheck.Name = "_allowFillInFormFieldsCheck";
-            this._allowFillInFormFieldsCheck.Size = new System.Drawing.Size(151, 17);
+            this._allowFillInFormFieldsCheck.Size = new System.Drawing.Size(176, 17);
             this._allowFillInFormFieldsCheck.TabIndex = 8;
-            this._allowFillInFormFieldsCheck.Text = "Filling in existing form fields";
+            this._allowFillInFormFieldsCheck.Text = "Allow filling in existing form fields";
             this._allowFillInFormFieldsCheck.UseVisualStyleBackColor = true;
             // 
             // _allowAddOrModifyAnnotationsCheck
@@ -185,9 +184,9 @@ namespace Extract.Imaging
             this._allowAddOrModifyAnnotationsCheck.AutoSize = true;
             this._allowAddOrModifyAnnotationsCheck.Location = new System.Drawing.Point(25, 137);
             this._allowAddOrModifyAnnotationsCheck.Name = "_allowAddOrModifyAnnotationsCheck";
-            this._allowAddOrModifyAnnotationsCheck.Size = new System.Drawing.Size(333, 17);
+            this._allowAddOrModifyAnnotationsCheck.Size = new System.Drawing.Size(360, 17);
             this._allowAddOrModifyAnnotationsCheck.TabIndex = 7;
-            this._allowAddOrModifyAnnotationsCheck.Text = "Addition or modification of text annotations and filling in form fields";
+            this._allowAddOrModifyAnnotationsCheck.Text = "Allow addition or modification of text annotations and filling in form fields";
             this._allowAddOrModifyAnnotationsCheck.UseVisualStyleBackColor = true;
             // 
             // _allowCopyAndExtractionCheck
@@ -195,10 +194,10 @@ namespace Extract.Imaging
             this._allowCopyAndExtractionCheck.AutoSize = true;
             this._allowCopyAndExtractionCheck.Location = new System.Drawing.Point(25, 114);
             this._allowCopyAndExtractionCheck.Name = "_allowCopyAndExtractionCheck";
-            this._allowCopyAndExtractionCheck.Size = new System.Drawing.Size(412, 17);
+            this._allowCopyAndExtractionCheck.Size = new System.Drawing.Size(439, 17);
             this._allowCopyAndExtractionCheck.TabIndex = 6;
-            this._allowCopyAndExtractionCheck.Text = "Copying / extraction of text and graphics including support to users with disabil" +
-                "ities";
+            this._allowCopyAndExtractionCheck.Text = "Allow copying / extraction of text and graphics including support to users with d" +
+                "isabilities";
             this._allowCopyAndExtractionCheck.UseVisualStyleBackColor = true;
             // 
             // _allowDocumentModificationsCheck
@@ -206,9 +205,9 @@ namespace Extract.Imaging
             this._allowDocumentModificationsCheck.AutoSize = true;
             this._allowDocumentModificationsCheck.Location = new System.Drawing.Point(25, 91);
             this._allowDocumentModificationsCheck.Name = "_allowDocumentModificationsCheck";
-            this._allowDocumentModificationsCheck.Size = new System.Drawing.Size(139, 17);
+            this._allowDocumentModificationsCheck.Size = new System.Drawing.Size(165, 17);
             this._allowDocumentModificationsCheck.TabIndex = 5;
-            this._allowDocumentModificationsCheck.Text = "Document modifications";
+            this._allowDocumentModificationsCheck.Text = "Allow document modifications";
             this._allowDocumentModificationsCheck.UseVisualStyleBackColor = true;
             // 
             // _allowLowQualityPrintCheck
@@ -216,9 +215,9 @@ namespace Extract.Imaging
             this._allowLowQualityPrintCheck.AutoSize = true;
             this._allowLowQualityPrintCheck.Location = new System.Drawing.Point(25, 68);
             this._allowLowQualityPrintCheck.Name = "_allowLowQualityPrintCheck";
-            this._allowLowQualityPrintCheck.Size = new System.Drawing.Size(149, 17);
+            this._allowLowQualityPrintCheck.Size = new System.Drawing.Size(176, 17);
             this._allowLowQualityPrintCheck.TabIndex = 4;
-            this._allowLowQualityPrintCheck.Text = "Printing in low level quality";
+            this._allowLowQualityPrintCheck.Text = "Allow printing in low level quality";
             this._allowLowQualityPrintCheck.UseVisualStyleBackColor = true;
             // 
             // _ownerPasswordText2
@@ -261,7 +260,7 @@ namespace Extract.Imaging
             // 
             // _btnOk
             // 
-            this._btnOk.Location = new System.Drawing.Point(299, 356);
+            this._btnOk.Location = new System.Drawing.Point(385, 356);
             this._btnOk.Name = "_btnOk";
             this._btnOk.Size = new System.Drawing.Size(75, 23);
             this._btnOk.TabIndex = 5;
@@ -272,30 +271,18 @@ namespace Extract.Imaging
             // _btnCancel
             // 
             this._btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._btnCancel.Location = new System.Drawing.Point(380, 356);
+            this._btnCancel.Location = new System.Drawing.Point(466, 356);
             this._btnCancel.Name = "_btnCancel";
             this._btnCancel.Size = new System.Drawing.Size(75, 23);
             this._btnCancel.TabIndex = 6;
             this._btnCancel.Text = "Cancel";
             this._btnCancel.UseVisualStyleBackColor = true;
             // 
-            // _displayPasswordsCheck
-            // 
-            this._displayPasswordsCheck.AutoSize = true;
-            this._displayPasswordsCheck.Location = new System.Drawing.Point(18, 360);
-            this._displayPasswordsCheck.Name = "_displayPasswordsCheck";
-            this._displayPasswordsCheck.Size = new System.Drawing.Size(113, 17);
-            this._displayPasswordsCheck.TabIndex = 7;
-            this._displayPasswordsCheck.Text = "Display passwords";
-            this._displayPasswordsCheck.UseVisualStyleBackColor = true;
-            this._displayPasswordsCheck.Click += new System.EventHandler(this.HandleDisplayPasswordsChecked);
-            // 
             // PdfPasswordSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(467, 391);
-            this.Controls.Add(this._displayPasswordsCheck);
+            this.ClientSize = new System.Drawing.Size(553, 391);
             this.Controls.Add(this._btnCancel);
             this.Controls.Add(this._btnOk);
             this.Controls.Add(groupBox2);
@@ -305,13 +292,12 @@ namespace Extract.Imaging
             this.MinimizeBox = false;
             this.Name = "PdfPasswordSettingsDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "PdfPasswordSettingsDialog";
+            this.Text = "Configure Pdf Security Settings";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -333,6 +319,5 @@ namespace Extract.Imaging
         private System.Windows.Forms.CheckBox _enableOwnerPasswordCheckBox;
         private System.Windows.Forms.Button _btnOk;
         private System.Windows.Forms.Button _btnCancel;
-        private System.Windows.Forms.CheckBox _displayPasswordsCheck;
     }
 }

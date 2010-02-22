@@ -15,6 +15,10 @@
 #include <ltann.h>			// LeadTools Annotation functions
 #include <StringCSIS.h>
 #include <TemporaryFileName.h>
+#include <PdfSecurityValues.h>
+#include <ByteStream.h>
+#include <ByteStreamManipulator.h>
+#include <EncryptionEngine.h>
 
 #include <cmath>
 #include <cstdio>
@@ -156,6 +160,9 @@ bool compareZoneByPage(const PageRasterZone& leftZone, const PageRasterZone& rig
 // PROMISE: To convert the specified page zone into an Annotation Rectangle (ANNRECT)
 void pageZoneToAnnRect(const PageRasterZone& rZone, ANNRECT& rect);
 //-------------------------------------------------------------------------------------------------
+// PURPOSE: To encrypt the specified string using the PdfSecurity keys
+string encryptString(const string& strString);
+//-------------------------------------------------------------------------------------------------
 // Exported DLL Functions
 //-------------------------------------------------------------------------------------------------
 string getErrorCodeDescription(int iErrorCode)
@@ -187,16 +194,19 @@ void throwExceptionIfNotSuccess(L_INT iErrorCode, const string& strELICode,
 //-------------------------------------------------------------------------------------------------
 void fillImageArea(const string& strImageFileName, const string& strOutputImageName, long nLeft, 
 	long nTop, long nRight, long nBottom, long nPage, const COLORREF color, 
-	bool bRetainAnnotations, bool bApplyAsAnnotations)
+	bool bRetainAnnotations, bool bApplyAsAnnotations, const string& strUserPassword,
+	const string& strOwnerPassword, int nPermissions)
 {
 	fillImageArea(strImageFileName, strOutputImageName, nLeft, nTop, nRight, nBottom, nPage,
-		color, 0, "", 0, bRetainAnnotations, bApplyAsAnnotations);
+		color, 0, "", 0, bRetainAnnotations, bApplyAsAnnotations, strUserPassword,
+		strOwnerPassword, nPermissions);
 }
 //-------------------------------------------------------------------------------------------------
 void fillImageArea(const string& strImageFileName, const string& strOutputImageName, long nLeft, 
 	long nTop, long nRight, long nBottom, long nPage, const COLORREF crFillColor, 
 	const COLORREF crBorderColor, const string& strText, const COLORREF crTextColor, 
-	bool bRetainAnnotations, bool bApplyAsAnnotations)
+	bool bRetainAnnotations, bool bApplyAsAnnotations, const string& strUserPassword,
+	const string& strOwnerPassword, int nPermissions)
 {
 	vector<PageRasterZone> vecZones;
 	PageRasterZone zone;
@@ -211,12 +221,13 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 	zone.m_crTextColor = crTextColor;
 	vecZones.push_back(zone);
 	fillImageArea(strImageFileName, strOutputImageName, vecZones, bRetainAnnotations, 
-		bApplyAsAnnotations);
+		bApplyAsAnnotations, strUserPassword, strOwnerPassword, nPermissions);
 }
 //-------------------------------------------------------------------------------------------------
 void fillImageArea(const string& strImageFileName, const string& strOutputImageName, 
 				   vector<PageRasterZone>& rvecZones, bool bRetainAnnotations, 
-				   bool bApplyAsAnnotations)
+				   bool bApplyAsAnnotations, const string& strUserPassword,
+				   const string& strOwnerPassword, int nPermissions)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI02774");
 	try
@@ -304,7 +315,8 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 				{
 					// Create PDFOutputManager object to handle file conversion
 					// if result will be PDF
-					PDFInputOutputMgr outMgr( tempOutFile.getName(), false );
+					PDFInputOutputMgr outMgr( tempOutFile.getName(), false,
+						strUserPassword, strOwnerPassword, nPermissions);
 
 					int nRet = FAILURE;
 
@@ -1050,7 +1062,9 @@ bool isLeadToolsSerialized()
 		? true : false;
 }
 //-------------------------------------------------------------------------------------------------
-void convertTIFToPDF(const string& strTIF, const string& strPDF, bool bRetainAnnotations)
+void convertTIFToPDF(const string& strTIF, const string& strPDF, bool bRetainAnnotations,
+					 const string& strUserPassword, const string& strOwnerPassword,
+					 int nPermissions)
 {
 	try
 	{
@@ -1071,6 +1085,27 @@ void convertTIFToPDF(const string& strTIF, const string& strPDF, bool bRetainAnn
 			{
 				strArguments += " ";
 				strArguments += gstrCONVERT_RETAIN_ANNOTATIONS;
+			}
+
+			bool bSecurityAdded = false;
+			if (!strUserPassword.empty())
+			{
+				strArguments += " /user \"";
+				strArguments += encryptString(strUserPassword);
+				strArguments += "\"";
+				bSecurityAdded = true;
+			}
+			if (!strOwnerPassword.empty())
+			{
+				strArguments += " /owner \"";
+				strArguments += encryptString(strOwnerPassword);
+				strArguments += "\" ";
+				strArguments += asString(nPermissions);
+				bSecurityAdded = true;
+			}
+			if (bSecurityAdded)
+			{
+				strArguments += " /enc";
 			}
 
 			// Run the EXE with arguments and appropriate wait time (P13 #4415)
@@ -1946,6 +1981,31 @@ void pageZoneToAnnRect(const PageRasterZone &rZone, ANNRECT& rRect)
 	rRect.left = min(p1.x, min(p2.x, min(p3.x, p4.x)));
 	rRect.bottom = max(p1.y, max(p2.y, max(p3.y, p4.y)));
 	rRect.right = max(p1.x, max(p2.x, max(p3.x, p4.x)));
+}
+//-------------------------------------------------------------------------------------------------
+string encryptString(const string& strString)
+{
+	// Build the key
+	ByteStream bytesKey;
+	ByteStreamManipulator bytesManipulatorKey(
+		ByteStreamManipulator::kWrite, bytesKey);
+	bytesManipulatorKey << gulPdfKey1;
+	bytesManipulatorKey << gulPdfKey2;
+	bytesManipulatorKey << gulPdfKey3;
+	bytesManipulatorKey << gulPdfKey4;
+	bytesManipulatorKey.flushToByteStream( 8 );
+
+	// Encrypt the string
+	ByteStream bytes;
+	ByteStreamManipulator bsmBytes(ByteStreamManipulator::kWrite, bytes);
+	bsmBytes << strString;
+	bsmBytes.flushToByteStream(8);
+
+	ByteStream encrypted;
+	EncryptionEngine ee;
+	ee.encrypt(encrypted, bytes, bytesKey);
+
+	return encrypted.asString();
 }
 //-------------------------------------------------------------------------------------------------
 void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int nYResolution)

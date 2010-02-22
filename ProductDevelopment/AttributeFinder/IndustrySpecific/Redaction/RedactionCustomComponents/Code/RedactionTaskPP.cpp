@@ -27,7 +27,7 @@ static const string gstrDEFAULT_VOA_FILE = "<SourceDocName>.voa";
 //-------------------------------------------------------------------------------------------------
 // CRedactionTaskPP
 //-------------------------------------------------------------------------------------------------
-CRedactionTaskPP::CRedactionTaskPP() 
+CRedactionTaskPP::CRedactionTaskPP() : m_ipPdfSettings(NULL)
 {
 	try
 	{
@@ -39,6 +39,15 @@ CRedactionTaskPP::CRedactionTaskPP()
 		m_dwDocStringID = IDS_DOCSTRINGRedactFileProcessorPP;
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI28586")
+}
+//-------------------------------------------------------------------------------------------------
+CRedactionTaskPP::~CRedactionTaskPP()
+{
+	try
+	{
+		m_ipPdfSettings = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29793");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -133,6 +142,20 @@ STDMETHODIMP CRedactionTaskPP::Apply()
 				throw;
 			}
 
+			// Ensure the PDF password settings are configured properly
+			if (m_chkPdfSecurity.GetCheck() == BST_CHECKED)
+			{
+				IMustBeConfiguredObjectPtr ipConfigure = m_ipPdfSettings;
+				ASSERT_RESOURCE_ALLOCATION("ELI0", ipConfigure != NULL);
+				if (ipConfigure->IsConfigured() == VARIANT_FALSE)
+				{
+					MessageBox("Pdf security settings are not configured properly.",
+						"PDF Security Not Configured", MB_ICONERROR);
+					m_btnPdfSettings.SetFocus();
+					return S_FALSE;
+				}
+			}
+
 			// Retrieve whether to use the redacted image
 			ipRedactFileProc->UseRedactedImage = 
 				asVariantBool(m_radioUseRedactedImage.GetCheck() == BST_CHECKED);
@@ -162,6 +185,16 @@ STDMETHODIMP CRedactionTaskPP::Apply()
 			ipRedactFileProc->IsBold = asVariantBool(m_redactionAppearance.m_lgFont.lfWeight >= FW_BOLD);
 			ipRedactFileProc->IsItalic = asVariantBool(m_redactionAppearance.m_lgFont.lfItalic == gucIS_ITALIC);
 			ipRedactFileProc->FontSize = m_redactionAppearance.m_iPointSize;
+
+			// Set PDF password settings
+			if (m_chkPdfSecurity.GetCheck() == BST_CHECKED)
+			{
+				ipRedactFileProc->PdfPasswordSettings = m_ipPdfSettings;
+			}
+			else
+			{
+				ipRedactFileProc->PdfPasswordSettings = NULL;
+			}
 		}
 
 		m_bDirty = FALSE;
@@ -198,6 +231,8 @@ LRESULT CRedactionTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 		m_radioUseOriginalImage = GetDlgItem(IDC_USE_ORIGINAL_IMAGE);
 		m_chkCarryAnnotation = GetDlgItem(IDC_CHECK_CARRY_ANNOTATIONS);
 		m_chkRedactionAsAnnotation = GetDlgItem(IDC_CHECK_REDACTIONS_AS_ANNOTATIONS);
+		m_chkPdfSecurity = GetDlgItem(IDC_CHECK_PDF_SECURITY);
+		m_btnPdfSettings = GetDlgItem(IDC_BTN_PDF_SECURITY_SETTINGS);
 
 		// Data file
 		m_stcDataFile = GetDlgItem(IDC_STATIC_DATA_FILE_DESCRIPTION);
@@ -260,13 +295,32 @@ LRESULT CRedactionTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 		m_redactionAppearance.m_crFillColor = ipRedactFileProc->FillColor;
 
 		// Get the font
-		lstrcpyn(m_redactionAppearance.m_lgFont.lfFaceName, 
-			asString(ipRedactFileProc->FontName).c_str(), LF_FACESIZE);
+		string strFontName = asString(ipRedactFileProc->FontName);
+		LPTSTR result = lstrcpyn(m_redactionAppearance.m_lgFont.lfFaceName, 
+			strFontName.c_str(), LF_FACESIZE);
+		if (result == NULL)
+		{
+			UCLIDException uex("ELI29782", "Unable to copy Font name.");
+			uex.addDebugInfo("Font Name To Copy", strFontName);
+			uex.addDebugInfo("Font Name Length", strFontName.length());
+			uex.addDebugInfo("Max Length", LF_FACESIZE);
+			throw uex;
+		}
 		m_redactionAppearance.m_lgFont.lfWeight = 
 			 ipRedactFileProc->IsBold == VARIANT_TRUE ? FW_BOLD : FW_NORMAL;
 		m_redactionAppearance.m_lgFont.lfItalic = 
 			ipRedactFileProc->IsItalic == VARIANT_TRUE ? gucIS_ITALIC : 0;
 		m_redactionAppearance.m_iPointSize = ipRedactFileProc->FontSize;
+
+		ICopyableObjectPtr ipCopy = ipRedactFileProc->PdfPasswordSettings;
+		bool bPdfSecurity = ipCopy != NULL;
+		if (bPdfSecurity)
+		{
+			m_ipPdfSettings = ipCopy->Clone();
+			ASSERT_RESOURCE_ALLOCATION("ELI29783", m_ipPdfSettings != NULL);
+		}
+		m_chkPdfSecurity.SetCheck(asBSTChecked(bPdfSecurity));
+		m_btnPdfSettings.EnableWindow(asMFCBool(bPdfSecurity));
 
 		//////////////////////////
 		// Enable/disable controls
@@ -424,6 +478,41 @@ LRESULT CRedactionTaskPP::OnClickedButtonDataFile(WORD wNotifyCode, WORD wID, HW
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28598");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CRedactionTaskPP::OnClickedCheckPdfSecurity(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_btnPdfSettings.EnableWindow(asMFCBool(m_chkPdfSecurity.GetCheck() == BST_CHECKED));
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29778");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CRedactionTaskPP::OnClickedBtnPdfSettings(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		if (m_ipPdfSettings == NULL)
+		{
+			m_ipPdfSettings.CreateInstance(CLSID_PdfPasswordSettings);
+			ASSERT_RESOURCE_ALLOCATION("ELI29779", m_ipPdfSettings != NULL);
+		}
+
+		// Run the configuration for the PDF security settings
+		IConfigurableObjectPtr ipConfigure = m_ipPdfSettings;
+		ASSERT_RESOURCE_ALLOCATION("ELI29780", ipConfigure != NULL);
+		ipConfigure->RunConfiguration();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29781");
 
 	return 0;
 }

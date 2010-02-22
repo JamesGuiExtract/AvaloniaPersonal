@@ -69,6 +69,9 @@ public:
 	// Return the Max number of files to get from the database for the recordmgr Defaults to 1
 	long getMaxFilesFromDB();
 
+	// Return the number of milliseconds to sleep between checking the DB for new files
+	long getMillisecondsBetweenDBCheck();
+
 	// Return the number of seconds to keep trying to obtain a DB Lock
 	long getDBLockTimeout();
 
@@ -105,6 +108,7 @@ private:
 	static const std::string MAX_STORED_RECORDS;
 	static const std::string RESTRICT_NUM_STORED_RECORDS;
 	static const std::string MAX_FILES_FROM_DB;
+	static const std::string MILLISECONDS_BETWEEN_DB_CHECK;
 	static const std::string TIMER_TICK_SPEED;
 	static const std::string DB_SERVER_HISTORY;
 	static const std::string DB_LOCK_TIMEOUT;

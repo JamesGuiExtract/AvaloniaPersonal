@@ -91,6 +91,10 @@ public:
 	STDMETHOD(put_IsItalic)(VARIANT_BOOL vbItalic);
 	STDMETHOD(get_FontSize)(long* plFontSize);
 	STDMETHOD(put_FontSize)(long lFontSize);
+	STDMETHOD(GetFontData)(BSTR* pbstrFontName, VARIANT_BOOL* pvbIsBold,
+		VARIANT_BOOL* pvbIsItalic, long* plFontSize);
+	STDMETHOD(get_PdfPasswordSettings)(IPdfPasswordSettings** ppPdfSettings);
+	STDMETHOD(put_PdfPasswordSettings)(IPdfPasswordSettings* pPdfSettings);
 
 // IFileProcessingTask
 	STDMETHOD(raw_Init)(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB *pDB);
@@ -153,6 +157,9 @@ private:
 
 	// Redaction text and color settings
 	RedactionAppearanceOptions m_redactionAppearance;
+
+	// The password settings used when the output format is PDF
+	IPdfPasswordSettingsPtr m_ipPdfSettings;
 
 	//////////////
 	// Methods

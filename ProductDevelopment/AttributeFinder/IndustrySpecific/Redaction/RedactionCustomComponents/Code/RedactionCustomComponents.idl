@@ -22,6 +22,7 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
 	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFILEPROCESSING.tlb");
 	importlib("..\..\..\..\AFCore\Code\AFCore.tlb");
 	importlib("c:\Program Files\Common Files\System\ADO\msado27.tlb");
+	importlib("..\..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.tlb");
 
 
 	/////////////
@@ -386,6 +387,16 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
 		[propget, id(13), helpstring("property FontSize")] HRESULT FontSize(
 			[out, retval] long *plFontSize);
 		[propput, id(13), helpstring("property FontSize")] HRESULT FontSize([in] long lFontSize);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get all of the font data in a single call
+		[id(14), helpstring("method GetFontData")] HRESULT GetFontData(
+			[out] BSTR* pbstrFontName, [out] VARIANT_BOOL* pvbIsBold,
+			[out] VARIANT_BOOL* pvbIsItalic, [out] long* plFontSize);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(15), helpstring("property PdfPasswordSettings")] HRESULT PdfPasswordSettings(
+			[out, retval] IPdfPasswordSettings** ppPdfSettings);
+		[propput, id(15), helpstring("property PdfPasswordSettings")] HRESULT PdfPasswordSettings(
+			[in] IPdfPasswordSettings* pPdfSettings);
 		//-----------------------------------------------------------------------------------------
 	};
 
