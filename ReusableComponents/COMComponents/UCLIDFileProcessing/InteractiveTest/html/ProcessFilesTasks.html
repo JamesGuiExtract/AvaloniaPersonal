@@ -255,78 +255,6 @@
 	       	</ul>
    	</ul> 
 <p>
-	<li><b>Core: Apply password(s) to PDF file</b></li>
-   	<ul> 
-		<li><b>User interface</b>
-		<ul>
-	      		<li>Confirm that an <b>Core: Apply password(s) to PDF file</b> task exists.
-      			<li>Confirm that the <b>Core: Apply password(s) to PDF file</b> task requires 
-			all of the following licensing packages:
-			<ul>
-				<li>a <b>general</b> Extract Systems license
-				<li>a PDF read/write license
-			</ul>
-      			<li>Confirm that the <b>Core: Apply password(s) to PDF file</b> property page 
-			includes a <b>General settings</b> group box.
-			<li>Confirm that the group box contains an edit box for specification of 
-			the PDF file for which passwords will be applied.
-			<li>Confirm that the group box contains an associated <b>tag selector</b> 
-			button.
-			<li>Confirm that the tag selector button provides <b>&lt;FPSFileDir&gt;</b> 
-			and <b>&lt;SourceDocName&gt;</b>.
-			<li>Confirm that the tag selector button provides the usual $ functions.
-			<li>Confirm that selections from the tag selector button are correctly 
-			applied to the edit box.
-			<li>Confirm that the group box contains an associated <b>...</b> browse 
-			button.
-			<li>Confirm that the browse button displays an <b>Open File</b> dialog.
-			<li>Confirm that selections from the browse button are correctly 
-			applied to the edit box.
-			<li>Confirm that the group box contains an <b>Display passwords while entering 
-			them below</b> check box.
-<p>
-			<li>Confirm that the check box is unchecked by default.
-      			<li>Confirm that the <b>Core: Apply password(s) to PDF file</b> property page 
-			includes a <b>User password</b> group box.
-			<li>Confirm that the group box contains an <b>Enable user password</b> check box.
-			<li>Confirm that the check box is unchecked by default.
-<p>
-      			<li>Confirm that the <b>Core: Apply password(s) to PDF file</b> property page 
-			includes an <b>Owner password</b> group box.
-			<li>Confirm that the group box contains an <b>Enable owner password</b> check box.
-			<li>Confirm that the check box is unchecked by default.
-			<li>Confirm that the group box contains a <b>Printing in low level quality</b> 
-			check box.
-			<li>Confirm that the check box is unchecked by default.
-			<li>Confirm that the group box contains a <b>Document modifications</b> check box.
-			<li>Confirm that the check box is unchecked by default.
-			<li>Confirm that the group box contains a <b>Copying / extraction of text and 
-			graphics including support to users with disabilities</b> check box.
-			<li>Confirm that the check box is unchecked by default.
-			<li>Confirm that the group box contains an <b>Addition or modification of text 
-			annotations and filling in form fields</b> check box.
-			<li>Confirm that the check box is unchecked by default.
-			<li>Confirm that the group box contains a <b>Filling in existing form fields</b> 
-			check box.
-			<li>Confirm that the check box is unchecked by default.
-			<li>Confirm that the group box contains an <b>Allow access to text and graphics 
-			to support users with disabilities</b> check box.
-			<li>Confirm that the check box is unchecked by default.
-			<li>Confirm that the group box contains an <b>Allow assembling of document</b> 
-			check box.
-			<li>Confirm that the check box is unchecked by default.
-			<li>Confirm that the group box contains an <b>Allow printing of a high resolution 
-			faithful print out</b> check box.
-			<li>Confirm that the check box is unchecked by default.
-		</ul>
-<p>
-		<li><b>Functionality</b>
-		<ul>
-			<li>Confirm that an informative exception is thrown if the specified PDF 
-			file does not exist.
-		</ul>
-   	</ul> 
-<p>
 	<li><b>Core: Archive or restore associated file</b></li>
    	<ul> 
       		<li>Use the Add button to select <b>Core: Archive or restore associated file</b> as 
@@ -705,60 +633,196 @@
 <p>
 	<li><b>Core: Convert to searchable PDF</b></li>
    	<ul> 
-      		<li>Use the Add button to select <b>Core: Convert to searchable PDF</b> as the task.</li>
-      		<li>Confirm presence of an edit box to hold the name of the <b>Image (or PDF file) 
-		to convert</b> file.</li>
-		<li><b>[LegacyRC #4717]</b> Confirm that the output filename is always the input file, 
-		less the file extension if present, plus <b>.pdf</b>.
-      		<li>Confirm presence of an associated <b>Tag Selector</b> button.</li>
-      		<li>Confirm presence of an associated <b>...</b> ( Browse ) button.</li>
-		<li>Confirm presence of a <b>Make output PDFA/A compatible (this will increase the 
-		size of the PDF)</b> check box.
-      		<li>Confirm that settings are persistent.</li>
+		<li><b><u>User Interface</u></b>
+		<ul>
+	      		<li>Use the Add button to select <b>Core: Convert to searchable PDF</b> as 
+			the task.</li>
+      			<li>Confirm presence of an edit box to hold the name of the <b>Image (or PDF file) 
+			to convert</b> file.</li>
+			<li><b>[LegacyRC #4717]</b> Confirm that the output filename is always the input 
+			file, less the file extension if present, plus <b>.pdf</b>.
+	      		<li>Confirm presence of an associated <b>Tag Selector</b> button.</li>
+      			<li>Confirm presence of an associated <b>...</b> ( Browse ) button.</li>
+			<li>Confirm presence of a <b>Make output PDFA/A compatible (this will increase the 
+			size of the PDF)</b> check box.
+			<li>Confirm presence of an <b>Enable PDF security</b> check box.
+			<li>Confirm presence of an associated <b>Settings...</b> button.
+			<li>Confirm that the <b>Settings...</b> button is enabled only when the check box 
+			is checked.
+			<li>Confirm that only one of the two check boxes can be checked.
+      			<li>Confirm that settings are persistent.</li>
+		</ul>
 <p>
-		<li>Convert a folder of images to PDF/A-compliant PDFs.
-		<li>Use an updated demo installation of <b>Adobe Preflight</b> to validate compliance.
+		<li><b><u>PDF/A Compliance</u></b>
+		<ul>
+			<li>Convert a folder of images to PDF/A-compliant PDFs.
+			<li>Use an updated demo installation of <b>Adobe Preflight</b> to validate compliance.
+		</ul>
 <p>
-		<li><b>[LegacyRC #4745]</b> Confirm that the image files in the following 
-		folder convert to searchable PDF without error.  
-		I:\Common\Testing\PVCS_Testing\LegacyRC\4745
+		<li><b><u>PDF Security UI</u></b>
+		<ul>
+			<li>Click the <b>Settings...</b> button.
+			<li>Confirm that a <b>Configure PDF Security Settings</b> dialog is displayed.
+			<li>Confirm that the dialog contains an <b>Display passwords</b> check box.
+			<li>Confirm that the check box is unchecked by default.
 <p>
-  	   	<LI><b>[LegacyRC #5581, #5586]</b> PDF/A conversion
-	       	<ul>
-	  	   	<LI>Prepare a large set of images for <b>PDF/A conversion</b>.
-			<li>Exercise the set.
-			<li>Confirm that no error windows appear that force one or more processing 
-			threads to be idle.
-			<li>Examine the UEX log to see if any <b>ELI28833: Convert to PDF task was 
-			killed.</b> messages were logged.
-			<li>Examine the UEX log to see if any <b>ELI28853: Application Trace: Opened 
-			file after retrying.</b> messages were logged.
-	       	</ul>
+      			<li>Confirm that the dialog includes a <b>User password</b> group box.
+			<li>Confirm that the group box contains an <b>Enable user password</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that two associated edit boxes are included: one for the password 
+			and one for confirming the password.
+			<li>Confirm that the edit boxes are enabled only when the check box is checked.
+			<li>Confirm that red error icons are displayed to the right of the edit boxes 
+			if matching passwords have not been entered.
+			<li>Confirm that the passwords <b>are</b> displayed in clear text if the 
+			<b>Display passwords</b> check box is checked.
+			<li>Confirm that the passwords <b>are not</b> displayed in clear text if the 
+			<b>Display passwords</b> check box is not checked.
 <p>
-  	   	<LI><b>[LegacyRC #5595]</b> Core: Convert to searchable PDF
-	       	<ul>
-	  	   	<LI>Exercise the FPS file and image from 
-			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5595</b>, copying the image to 
-			<b>D:\</b>.
-			<li>Confirm that the PDF image is converted to a searchable PDF.
-	       	</ul>
+      			<li>Confirm that the dialog includes an <b>Owner password</b> group box.
+			<li>Confirm that the group box contains an <b>Enable owner password</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that two associated edit boxes are included: one for the password 
+			and one for confirming the password.
+			<li>Confirm that the edit boxes are enabled only when the check box is checked.
+			<li>Confirm that red error icons are displayed to the right of the edit boxes 
+			if matching passwords have not been entered.
+			<li>Confirm that the passwords <b>are</b> displayed in clear text if the 
+			<b>Display passwords</b> check box is checked.
+			<li>Confirm that the passwords <b>are not</b> displayed in clear text if the 
+			<b>Display passwords</b> check box is not checked.
+			<li>Confirm that the associated check boxes are only enabled if matching 
+			owner passwords have been entered.
 <p>
-  	   	<LI><b>[LegacyRC #5599]</b> PDF/A conversion
-	       	<ul>
-	      		<li>Create a set of images for PDF/A conversion testing.  Include several 
-			images that are too big to OCR.
-	  	   	<LI>Confirm that the unusually large images gracefully fail processing.
-			<li>Confirm that the normal images are processed and converted correctly.
-	       	</ul>
+			<li>Confirm that the group box contains an <b>Allow printing in low level 
+			quality</b> check box.
+			<li>Confirm that the group box contains an <b>Allow document modifications</b> 
+			check box.
+			<li>Confirm that the group box contains an <b>Allow copying / extraction of text 
+			and graphics including support to users with disabilities</b> check box.
+			<li>Confirm that the group box contains an <b>Allow addition or modification 
+			of text annotations and filling in form fields</b> check box.
+			<li>Confirm that the group box contains an <b>Allow filling in existing form 
+			fields</b> check box.
+			<li>Confirm that the group box contains an <b>Allow access to text and graphics 
+			to support users with disabilities</b> check box.
+			<li>Confirm that the group box contains an <b>Allow assembling of document</b> 
+			check box.
+			<li>Confirm that the group box contains an <b>Allow printing of a high resolution 
+			faithful print out</b> check box.
+			<li>Confirm that selecting high resolution printing also selects and disables 
+			low resolution printing.
+			<li>Confirm that all of the check boxes are unchecked by default.
+		</ul>
 <p>
-  	   	<LI><b>[LegacyRC #5669]</b> PDF/A conversion failures
-	       	<ul>
-			<LI>Exercise the <b>Core: Convert to searchable PDF</b> task with the 
-			PDF/A conversion option against the 
-			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5669</b> image file.
-			<LI>Confirm that the image cannot be converted to a PDF/A-compliant image.
-			<li>Confirm that a meaningful error message is logged.
-	       	</ul>
+		<li><b><u>PDF Security Functionality</u></b>
+		<ul>
+			<li>Confirm that a <b>User password</b> by itself can be set on a single-page 
+			PDF.
+			<li>Confirm that an <b>Owner password</b> by itself can be set on a single-page 
+			PDF.
+			<li>Confirm that a <b>User password</b> by itself can be set on a multiple-page 
+			PDF.
+			<li>Confirm that an <b>Owner password</b> by itself can be set on a multiple-page 
+			PDF.
+			<li>Confirm that both passwords together can be set on a single-page PDF.
+			<li>Confirm that both passwords together can be set on a mutiple-page PDF.
+<p>
+			<li>Open an appropriately protected file in <b>Adobe Reader</b>.
+			<li>Select <b>File - Properties</b> and click the <b>Security</b> tab.
+			<li>Click the <b>Show Details...</b> button to display the security settings.
+			<li>Confirm that the appropriate permissions are allowed or not allowed either 
+			in the Document Restrictions <b>Summary</b> section of the Security tab or in 
+			the <b>Document Security</b> dialog.
+			<ul>
+				<li>For <b>Allow printing in low level quality</b>
+				<ul>
+					<li>Summary - Printing: Allowed
+					<li>Details - Printing: Low Resolution (150 dpi)
+				</ul>
+				<li>For <b>Allow document modifications</b>
+				<ul>
+					<li>Summary - Filling of form fields: Allowed
+					<li>Details - Changing the Document: Allowed
+					<li>Details - Document Assembly: Allowed
+				</ul>
+				<li>For <b>Allow copying / extraction of text and graphics including 
+				support to users with disabilities</b>
+				<ul>
+					<li>Summary - Content Copying: Allowed
+					<li>Summary - Content Copying for Accessibility: Allowed
+					<li>Details - Content Copying: Allowed
+					<li>Details - Content Accessibility Enabled: Allowed
+				</ul>
+				<li>For <b>Allow addition or modification of text annotations and filling 
+				in form fields</b>
+				<ul>
+					<li>Summary - Filling of form fields: Allowed
+					<li>Details - Commenting: Allowed
+					<li>Details - Form Field Fill-in or Signing: Allowed
+				</ul>
+				<li>For <b>Allow filling in existing form fields</b>
+				<ul>
+					<li>Summary - Filling of form fields: Allowed
+					<li>Details - Form Field Fill-in or Signing: Allowed
+				</ul>
+				<li>For <b>Allow access to text and graphics to support users with 
+				disabilities</b>
+				<ul>
+					<li>Summary - Content Copying for Accessibility: Allowed
+				</ul>
+				<li>For <b>Allow assembling of document</b>
+				<ul>
+					<li>Details - Document Assembly: Allowed
+				</ul>
+				<li>For <b>Allow printing of a high resolution faithful print out</b>
+				<ul>
+					<li>Summary - Printing: Allowed
+					<li>Details - High Resolution
+				</ul>
+			</ul>
+		</ul>
+<p>
+		<li><b><u>Miscellaneous</u></b>
+		<ul>
+			<li><b>[LegacyRC #4745]</b> Confirm that the image files in the following 
+			folder convert to searchable PDF without error.  
+			I:\Common\Testing\PVCS_Testing\LegacyRC\4745
+  		   	<LI><b>[LegacyRC #5581, #5586]</b> PDF/A conversion
+		       	<ul>
+	  		   	<LI>Prepare a large set of images for <b>PDF/A conversion</b>.
+				<li>Exercise the set.
+				<li>Confirm that no error windows appear that force one or more processing 
+				threads to be idle.
+				<li>Examine the UEX log to see if any <b>ELI28833: Convert to PDF task was 
+				killed.</b> messages were logged.
+				<li>Examine the UEX log to see if any <b>ELI28853: Application Trace: Opened 
+				file after retrying.</b> messages were logged.
+	       		</ul>
+	  	   	<LI><b>[LegacyRC #5595]</b> Core: Convert to searchable PDF
+		       	<ul>
+	  		   	<LI>Exercise the FPS file and image from 
+				<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5595</b>, copying the image to 
+				<b>D:\</b>.
+				<li>Confirm that the PDF image is converted to a searchable PDF.
+	       		</ul>
+	  	   	<LI><b>[LegacyRC #5599]</b> PDF/A conversion
+		       	<ul>
+	      			<li>Create a set of images for PDF/A conversion testing.  Include several 
+				images that are too big to OCR.
+		  	   	<LI>Confirm that the unusually large images gracefully fail processing.
+				<li>Confirm that the normal images are processed and converted correctly.
+	       		</ul>
+<p>
+	  	   	<LI><b>[LegacyRC #5669]</b> PDF/A conversion failures
+		       	<ul>
+				<LI>Exercise the <b>Core: Convert to searchable PDF</b> task with the 
+				PDF/A conversion option against the 
+				<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5669</b> image file.
+				<LI>Confirm that the image cannot be converted to a PDF/A-compliant image.
+				<li>Confirm that a meaningful error message is logged.
+		       	</ul>
+		</ul>
    	</ul> 
 <p>
 	<li><b>Core: Convert VOA to XML</b></li>
