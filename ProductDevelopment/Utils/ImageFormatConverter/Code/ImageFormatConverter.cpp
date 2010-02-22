@@ -150,6 +150,8 @@ unsigned int getLtPermissions(long nPermissions)
 		}
 		if (isFlagSet(nPermissions, giAllowHighQualityPrinting))
 		{
+			// Need to allow document printing to allow high quality printing
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_PRINTDOCUMENT;
 			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_PRINTFAITHFUL;
 		}
 		if (isFlagSet(nPermissions, giAllowDocumentModifications))

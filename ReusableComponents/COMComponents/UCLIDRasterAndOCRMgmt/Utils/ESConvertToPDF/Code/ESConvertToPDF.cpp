@@ -189,10 +189,11 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 	if (!m_strOwnerPassword.empty())
 	{
 		setStringSetting(strOutputFormat + ".PDFSecurity.OwnerPassword", m_strOwnerPassword);
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnablePrint",
-			isPdfSecuritySettingEnabled(giAllowLowQualityPrinting));
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnablePrintQ",
-			isPdfSecuritySettingEnabled(giAllowHighQualityPrinting));
+		bool bAllowHighQuality = isPdfSecuritySettingEnabled(giAllowHighQualityPrinting);
+		bool bAllowPrinting = bAllowHighQuality
+			|| isPdfSecuritySettingEnabled(giAllowLowQualityPrinting);
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnablePrint", bAllowPrinting);
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnablePrintQ", bAllowHighQuality);
 		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableModify",
 			isPdfSecuritySettingEnabled(giAllowDocumentModifications));
 		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableCopy",

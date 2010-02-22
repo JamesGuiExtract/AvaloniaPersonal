@@ -105,6 +105,10 @@ namespace Extract.Imaging
                     // Get the permissions
                     PdfOwnerPermissions permissions = _settings.OwnerPermissions;
 
+                    bool allowHighQualityPrint =
+                        (permissions & PdfOwnerPermissions.AllowHighQualityPrinting) == PdfOwnerPermissions.AllowHighQualityPrinting;
+                    bool allowPrinting = allowHighQualityPrint
+                        && (permissions & PdfOwnerPermissions.AllowLowQualityPrinting) == PdfOwnerPermissions.AllowLowQualityPrinting;
                     _allowAccessibilityCheck.Checked =
                         (permissions & PdfOwnerPermissions.AllowContentCopyingForAccessibility) == PdfOwnerPermissions.AllowContentCopyingForAccessibility;
                     _allowAddOrModifyAnnotationsCheck.Checked =
@@ -117,10 +121,8 @@ namespace Extract.Imaging
                         (permissions & PdfOwnerPermissions.AllowDocumentModifications) == PdfOwnerPermissions.AllowDocumentModifications;
                     _allowFillInFormFieldsCheck.Checked =
                         (permissions & PdfOwnerPermissions.AllowFillingInFields) == PdfOwnerPermissions.AllowFillingInFields;
-                    _allowHighQualityPrintingCheck.Checked =
-                        (permissions & PdfOwnerPermissions.AllowHighQualityPrinting) == PdfOwnerPermissions.AllowHighQualityPrinting;
-                    _allowLowQualityPrintCheck.Checked =
-                        (permissions & PdfOwnerPermissions.AllowLowQualityPrinting) == PdfOwnerPermissions.AllowLowQualityPrinting;
+                    _allowHighQualityPrintingCheck.Checked = allowHighQualityPrint;
+                    _allowLowQualityPrintCheck.Checked = allowPrinting;
                 }
 
                 // Update the controls to set appropriate enabled/disabled states
@@ -323,6 +325,23 @@ namespace Extract.Imaging
             }
         }
 
+        /// <summary>
+        /// Handles the check box changed event for the high quality print checkbox.
+        /// </summary>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        void HandleHighQualityPrintCheck(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateControls();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29794", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region Methods
@@ -353,7 +372,16 @@ namespace Extract.Imaging
                 _allowDocumentModificationsCheck.Enabled = permissionEnabled;
                 _allowFillInFormFieldsCheck.Enabled = permissionEnabled;
                 _allowHighQualityPrintingCheck.Enabled = permissionEnabled;
-                _allowLowQualityPrintCheck.Enabled = permissionEnabled;
+
+                if (_allowHighQualityPrintingCheck.Checked)
+                {
+                    _allowLowQualityPrintCheck.Checked = true;
+                    _allowLowQualityPrintCheck.Enabled = false;
+                }
+                else
+                {
+                    _allowLowQualityPrintCheck.Enabled = permissionEnabled;
+                }
             }
             catch (Exception ex)
             {

@@ -148,6 +148,7 @@ namespace Extract.Imaging
             this._allowHighQualityPrintingCheck.TabIndex = 11;
             this._allowHighQualityPrintingCheck.Text = "Allow printing of a high resolution faithful print out";
             this._allowHighQualityPrintingCheck.UseVisualStyleBackColor = true;
+            this._allowHighQualityPrintingCheck.CheckedChanged += new System.EventHandler(this.HandleHighQualityPrintCheck);
             // 
             // _allowDocumentAssemblyCheck
             // 
