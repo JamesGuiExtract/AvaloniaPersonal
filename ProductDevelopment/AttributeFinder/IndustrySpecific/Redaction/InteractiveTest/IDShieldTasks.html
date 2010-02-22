@@ -230,7 +230,63 @@
 			annotations in output file (tiff only)</b> check box.
 	  	   	<LI>Confirm that the group box includes an <b>Apply redactions as  
 			annotations in output file (tiff only)</b> check box.
-  	   		<LI>Confirm that the check boxes are unchecked by default.
+	  	   	<LI>Confirm that the group box includes an <b>Enable PDF security</b> 
+			check box.
+  	   		<LI>Confirm that all three check boxes are unchecked by default.
+			<li>Confirm that the <b>Enable PDF security</b> check box has an 
+			associated <b>Settings...</b> button.
+<p>
+			<li>Confirm that clicking the <b>Settings...</b> button displays 
+			a <b>Configure Pdf Security Settings</b> dialog.
+			<li>Confirm that the dialog contains an <b>Display passwords</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+      			<li>Confirm that the dialog includes a <b>User password</b> group box.
+			<li>Confirm that the group box contains an <b>Enable user password</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that two associated edit boxes are included: one for the password 
+			and one for confirming the password.
+			<li>Confirm that the edit boxes are enabled only when the check box is checked.
+			<li>Confirm that red error icons are displayed to the right of the edit boxes 
+			if matching passwords have not been entered.
+			<li>Confirm that the passwords <b>are</b> displayed in clear text if the 
+			<b>Display passwords</b> check box is checked.
+			<li>Confirm that the passwords <b>are not</b> displayed in clear text if the 
+			<b>Display passwords</b> check box is not checked.
+<p>
+      			<li>Confirm that the dialog includes an <b>Owner password</b> group box.
+			<li>Confirm that the group box contains an <b>Enable owner password</b> check box.
+			<li>Confirm that the check box is unchecked by default.
+			<li>Confirm that two associated edit boxes are included: one for the password 
+			and one for confirming the password.
+			<li>Confirm that the edit boxes are enabled only when the check box is checked.
+			<li>Confirm that red error icons are displayed to the right of the edit boxes 
+			if matching passwords have not been entered.
+			<li>Confirm that the passwords <b>are</b> displayed in clear text if the 
+			<b>Display passwords</b> check box is checked.
+			<li>Confirm that the passwords <b>are not</b> displayed in clear text if the 
+			<b>Display passwords</b> check box is not checked.
+			<li>Confirm that the associated check boxes are only enabled if matching 
+			owner passwords have been entered.
+<p>
+			<li>Confirm that the group box contains an <b>Allow printing in low level 
+			quality</b> check box.
+			<li>Confirm that the group box contains an <b>Allow document modifications</b> 
+			check box.
+			<li>Confirm that the group box contains an <b>Allow copying / extraction of text 
+			and graphics including support to users with disabilities</b> check box.
+			<li>Confirm that the group box contains an <b>Allow addition or modification 
+			of text annotations and filling in form fields</b> check box.
+			<li>Confirm that the group box contains an <b>Allow filling in existing form 
+			fields</b> check box.
+			<li>Confirm that the group box contains an <b>Allow access to text and graphics 
+			to support users with disabilities</b> check box.
+			<li>Confirm that the group box contains an <b>Allow assembling of document</b> 
+			check box.
+			<li>Confirm that the group box contains an <b>Allow printing of a high resolution 
+			faithful print out</b> check box.
+			<li>Confirm that selecting high resolution printing also selects and disables 
+			low resolution printing.
+			<li>Confirm that all of the check boxes are unchecked by default.
 <p>
 	  	   	<LI>Confirm that the configuration dialog includes a <b>Redaction 
 			text and color settings...</b> button.
@@ -287,6 +343,8 @@
 	      		<li>Prepare some images for creation of redacted images.
 			<li>Set some exemption codes for the redactions.
 			<li>Confirm that the output images include the appropriate exemption codes.
+			<li>Confirm that PDF security settings are ignored if TIF images 
+			are output.
 			<li><b>[FlexIDSCore #3751]</b> Confirm that creating a redacted image adds 
 			the following metadata information to the VOA file
 			<ul>
@@ -303,6 +361,74 @@
 				<li>Review the associated database record and confirm that all 
 				attributes were redacted instead of none. 
 		       	</ul>
+		</ul>
+<p>
+		<li><b>PDF Security Functionality</b>
+		<ul>
+			<li>Confirm that a <b>User password</b> by itself can be set on a single-page 
+			PDF.
+			<li>Confirm that an <b>Owner password</b> by itself can be set on a single-page 
+			PDF.
+			<li>Confirm that a <b>User password</b> by itself can be set on a multiple-page 
+			PDF.
+			<li>Confirm that an <b>Owner password</b> by itself can be set on a multiple-page 
+			PDF.
+			<li>Confirm that both passwords together can be set on a single-page PDF.
+			<li>Confirm that both passwords together can be set on a mutiple-page PDF.
+<p>
+			<li>Open an appropriately protected file in <b>Adobe Reader</b>.
+			<li>Select <b>File - Properties</b> and click the <b>Security</b> tab.
+			<li>Click the <b>Show Details...</b> button to display the security settings.
+			<li>Confirm that the appropriate permissions are allowed or not allowed either 
+			in the Document Restrictions <b>Summary</b> section of the Security tab or in 
+			the <b>Document Security</b> dialog.
+			<ul>
+				<li>For <b>Allow printing in low level quality</b>
+				<ul>
+					<li>Summary - Printing: Allowed
+					<li>Details - Printing: Low Resolution (150 dpi)
+				</ul>
+				<li>For <b>Allow document modifications</b>
+				<ul>
+					<li>Summary - Filling of form fields: Allowed
+					<li>Details - Changing the Document: Allowed
+					<li>Details - Document Assembly: Allowed
+				</ul>
+				<li>For <b>Allow copying / extraction of text and graphics including 
+				support to users with disabilities</b>
+				<ul>
+					<li>Summary - Content Copying: Allowed
+					<li>Summary - Content Copying for Accessibility: Allowed
+					<li>Details - Content Copying: Allowed
+					<li>Details - Content Accessibility Enabled: Allowed
+				</ul>
+				<li>For <b>Allow addition or modification of text annotations and filling 
+				in form fields</b>
+				<ul>
+					<li>Summary - Filling of form fields: Allowed
+					<li>Details - Commenting: Allowed
+					<li>Details - Form Field Fill-in or Signing: Allowed
+				</ul>
+				<li>For <b>Allow filling in existing form fields</b>
+				<ul>
+					<li>Summary - Filling of form fields: Allowed
+					<li>Details - Form Field Fill-in or Signing: Allowed
+				</ul>
+				<li>For <b>Allow access to text and graphics to support users with 
+				disabilities</b>
+				<ul>
+					<li>Summary - Content Copying for Accessibility: Allowed
+				</ul>
+				<li>For <b>Allow assembling of document</b>
+				<ul>
+					<li>Details - Document Assembly: Allowed
+				</ul>
+				<li>For <b>Allow printing of a high resolution faithful print out</b>
+				<ul>
+					<li>Summary - Printing: Allowed
+					<li>Details - High Resolution
+				</ul>
+			</ul>
 		</ul>
 	</UL>
 <p>
