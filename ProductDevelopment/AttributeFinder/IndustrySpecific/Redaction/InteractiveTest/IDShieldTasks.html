@@ -69,15 +69,15 @@
 			<li>Images with VOA files from rules output
 			<ul>
 				<li>Output XML files are created without error.
-				<li>XML file contains only a <b>CurrentRevisions</b> node.
+				<li>XML file contains a <b>CurrentRevisions</b> node.
+				<li>XML file contains a <b>DocumentInfo</b> node if 
+				a Document Type was found.
 			</ul>
 			<li>Images with VOA files from single verification session
 			<ul>
 				<li>Output XML files are created without error.
 				<li>XML file also contains an <b>IDShieldVerificationSession</b> 
 				node.
-				<li>XML file also contains a <b>DocumentInfo</b> node if a 
-				<b>DocumentType</b> attribute is included in the VOA file.
 			</ul>
 			<li>Images with VOA files from single verification session with history 
 			navigation
@@ -115,7 +115,8 @@
 		       	</ul>
 <p>
 			<li><b>[FlexIDSCore #3877]</b> Confirm that the metadata XML includes 
-			information about the redactions being turned <b>on</b> or <b>off</b>.
+			information about the redactions being turned <b>on</b> or <b>off</b> via the 
+			<b>Enabled</b> flag.
 <p>
 	  	   	<LI><b>[FlexIDSCore #3967]</b> Confirm that <b>Redaction: Create metadata xml</b> 
 			can successfully process a VOA file that contains non-spatial attributes.
@@ -265,7 +266,8 @@
 				<li>Confirm that existing redactions can be discarded.
 				<li>Confirm that existing annotations can be retained.
 				<li>Confirm that existing annotations can be discarded.
-				<li>Confirm that redactions can be applied as annotations.
+				<li>Confirm that redactions can be applied as either black or 
+				white annotations.
 				<li>Confirm that redaction boxes can include text.
 				<li>Confirm that redactions can be <b>black</b>.
 				<li>Confirm that redactions can be <b>white</b>.
@@ -365,9 +367,13 @@
 	  	   	<LI>Confirm that the redacted area includes intermediate whitespace 
 			so that it is unclear how many contextual words were redacted.
 	  	   	<LI>Confirm that contextual words are properly redacted on a previous 
-			line and page.
+			line.
+	  	   	<LI><b>[FlexIDSCore #4108]</b> Confirm that contextual words are properly 
+			redacted on a previous page.
 	  	   	<LI>Confirm that contextual words are properly redacted on a subsequent 
-			line and page.
+			line.
+	  	   	<LI><b>[FlexIDSCore #4108]</b> Confirm that contextual words are properly 
+			redacted on a subsequent page.
 	  	   	<LI>Confirm that no error is seen if the <b>first</b> word in the USS 
 			file is sensitive and that preceding context would go past the beginning 
 			of the document.
@@ -442,6 +448,7 @@
 				<li>Confirm that the usual functions are provided in the drop down list.</li>
 	   		</ul> 
 			<li>Confirm presence of an associated <b>...</b> ( Browse ) button.</li>
+			<li>Confirm that the Open File dialog finds VOA and EVOA files by default.</li>
 <p>
 			<li>Confirm presence of a <b>check box</b> for each of the following data types.</li>
 		   	<ul> 
@@ -479,6 +486,18 @@
 <p>
 		<li><b>Functionality</b>
 		<ul>
+			<li>Add the appropriate entries to <b>IDShield.ini</b> and confirm that 
+			the specified types are filtered
+		   	<ul> 
+				<li>Social Security numbers : <b>SSN</b></li>
+				<li>Tax ID : <b>TaxID</b></li>
+				<li>Credit/debit card numbers : <b>CCN</b></li>
+				<li>Driver's license numbers : <b>DLN</b></li>
+				<li>Bank account numbers : <b>Bank</b></li>
+				<li>Other account numbers : <b>Account</b></li>
+				<li>Dates of birth : <b>DOB</b></li>
+   			</ul> 
+<p>
 	  	   	<LI><b>[FlexIDSCore #3451]</b> Retain document type attribute
 		       	<ul>
 				<li>Confirm that a specific unfiltered VOA file contains a 
@@ -595,39 +614,37 @@
 <p>
 			<li>Confirm that the <b>Verify redactions settings</b> dialog contains an 
 			<b>ID Shield data file location</b> group box.
-			<li>Confirm that the group box contains an edit box.
-			<li>Confirm that the edit box includes an associated <b>Tag selector</b> button.
-   			<ul> 
-				<li>Confirm that <b>&lt;SourceDocName&gt;</b> is provided in the 
-				drop down list.</li>
-				<li>Confirm that <b>&lt;FPSFileDir&gt;</b> is provided in the drop 
-				down list.</li>
-				<li>Confirm that the usual functions are provided in the drop down list.</li>
-	   		</ul> 
-		   	<li>Confirm that the edit box includes an associated <b>...</b> ( Browse ) button.
-	   		<li>Confirm that the default data file location is 
-			<b>&lt;SourceDocName&gt;.voa</b>.
+		   	<li>Confirm that a <b>Customize...</b> button is enabled.
+   			<li>Confirm that the <b>Customize...</b> button displays a <b>Customize ID Shield Data 
+			File Path</b> dialog.
+			<UL>
+		   		<li>Confirm that the dialog includes an enabled edit box for a file path.
+			   	<li>Confirm that the dialog includes an associated <b>Tag Selector</b> 
+				button.
+		   		<li>Confirm that the dialog includes an associated <b>...</b> ( Browse ) 
+				button.
+	   			<li>Confirm that the dialog includes a <b>Reset</b> button.
+			   	<li>Confirm that the Reset button restores the default file path.
+		   		<li>Confirm that the default file path is <b>&lt;SourceDocName&gt;.voa</b>.
+			</UL>
 <p>
-			<li>Confirm that the <b>Verify redactions settings</b> dialog contains a 
-			<b>Metadata output</b> group box.
-			<li>Confirm that the group box contains a <b>Create metadata output for all 
-			documents</b> radio button.
-			<li>Confirm that this radio button is selected by default.
-			<li>Confirm that the group box contains a <b>Create metadata output only for 
-			documents that contain redactions</b> radio button.
-			<li>Confirm that the group box contains an edit box.
-			<li>Confirm that the edit box includes an associated <b>Tag selector</b> button.
-	   		<ul> 
-				<li>Confirm that <b>&lt;SourceDocName&gt;</b> is provided in the 
-				drop down list.</li>
-				<li>Confirm that <b>&lt;FPSFileDir&gt;</b> is provided in the drop 
-				down list.</li>
-				<li>Confirm that the usual functions are provided in the drop down list.</li>
-   			</ul> 
-		   	<li>Confirm that the edit box includes an associated <b>...</b> ( Browse ) button.
-		   	<li>Confirm that the default data file location is 
-			<b>&lt;SourceDocName&gt;.xml</b>.
-			<li>Confirm that settings are persistent.</li>
+			<li>Confirm that the <b>Verify redactions settings</b> dialog contains an 
+			<b>Image location</b> group box.
+			<li>Confirm that the group box contains a <b>Use image as backdrop for verification 
+			if available</b> check box.
+			<li>Confirm that other controls in the group box are enabled only when the check 
+			box is checked.
+			<li>Confirm that the group box contains an edit box, tag selector and browse button.
+<p>
+			<li>Confirm that the <b>Verify redactions settings</b> dialog contains an 
+			<b>After committing a document</b> group box.
+			<li>Confirm that the group box contains a <b>Set file action status of</b> check box.
+			<li>Confirm that other controls in the group box are enabled only when the check 
+			box is checked.
+			<li>Confirm that the group box contains a combo box containing the defined actions.
+			<li>Confirm that the group box contains a <b>tag selector</b> button.
+			<li>Confirm that the group box contains a combo box containing the defined 
+			action status strings.
 <p>
 			<li><b>Miscellaneous</b>
 			<ul>
@@ -638,6 +655,10 @@
 					<li>Image resolution
 					<li>X position of the cursor in the image
 					<li>Y position of the cursor in the image
+					<li>Confirm that the X and Y percentages are also shown in the 
+					status bar if the <b>HKCU\Software\Extract 
+					Systems\InputFunnel\InputReceivers\SpotRecIR\DisplayPercentageEnabled</b> 
+					key is <b>1</b>.
 				</ul>
 				<li>Confirm that the image filename is displayed in the caption.
 				<li>Confirm that an appropriate toolbar button is present in the image 
@@ -723,7 +744,7 @@
 				<ul>
 	      				<li>Open a document.
 		      			<li>Select <b>File - Save</b>.
-	      				<li>Confirm that the zoom state does not change1:57 PM 12/21/2009.
+	      				<li>Confirm that the zoom state does not change.
 				</ul>
 <p>
 		  	   	<LI><b>[FlexIDSCore #3857, #3863]</b> Commit conditions for skipped 
@@ -752,8 +773,8 @@
 				file contains updated information about the recent verification session
 				<ul>
 					<li>User
-					<li>Session
 					<li>Computer
+					<li>Time
 				</ul>
 			</ul>
 <p>
@@ -781,7 +802,7 @@
 					the first verified image.
 		      			<li>Confirm that the <b>Automatic Zoom</b> settings are read 
 					from and written to <b>IDShield.ini</b>.
-		      			<li>Confirm that the <b>Auto Tool</b> settings are read 
+		      			<li>Confirm that the <b>AutoPan</b> settings are read 
 					from and written to <b>IDShield.ini</b>.
 <p>
 			  	   	<LI><b>[FlexIDSCore #3582, #3622]</b> Confirm that the following 
@@ -928,7 +949,7 @@
 				<li>Confirm that <b>toggled</b> redactions appear the same as 
 				<b>untoggled</b> redactions.
 				<li>Confirm that redaction items that have been turned <b>off</b> are 
-				stored under <b>_OldRedactions</b> in the output VOA file.
+				stored under <b>_OldRevisions</b> in the output VOA file.
 				<li>Confirm that redaction items that are turned <b>off</b> by default 
 				(based on INI file settings) are initially displayed as <b>off</b>.
 <p>
@@ -993,14 +1014,14 @@
 				specify redaction type for redactions</b> disabled, a blank type 
 				is available from the drop-down list and accepted as valid.
 <p>
-		 	   	<LI><b>[FlexIDSCore #3687]</b> Uncategorized document type during 
+		 	   	<LI><b>[FlexIDSCore #3687]</b> Unknown document type during 
 				verification
 			       	<ul>
 			  	   	<LI>Prepare several documents for verification.
       					<li>During verification, confirm that the <b>Document type</b> 
 					field is populated correctly.
 					<li>Confirm that for a document with an unknown document type, 
-					the displayed text is <b>Uncategorized</b>.
+					the displayed text is <b>Unknown</b>.
 				</ul>
 <p>
 		  	   	<LI><b>[FlexIDSCore #3699]</b> File action comment written to DB
@@ -1114,7 +1135,7 @@
 					<li>Confirm that manual redactions created from the above 
 					redaction tools are saved as spatial attributes.
 					<li>Confirm that manual redactions created from the above 
-					redaction tools are printed with the color specified in 
+					redaction tools are highlighted with the color specified in 
 					<b>IDShield.ini</b>.
 				</ul>
 		  	   	<LI>Confirm that the <b>Ctrl+F4</b> shortcut has no effect.
@@ -1287,12 +1308,13 @@
 					original document.
 	      				<li>Confirm that feedback can be saved using <b>original 
 					filenames</b>.
-	      				<li>Confirm that feedback can be saved using <b>file names based 
-					on file ID</b> instead of the original filenames.
-	      				<li>Confirm that <b>all documents</b> can be collected.
-		      			<li>Confirm that <b>documents with redactions</b> can be collected.
-		      			<li>Confirm that <b>documents modified by the verifier</b> can be 
-					collected.
+	      				<li>Confirm that feedback can be saved using <b>file names generated 
+					by ID Shield</b> instead of the original filenames.
+	      				<li>Confirm that <b>all verified documents</b> can be collected.
+		      			<li>Confirm that <b>verified documents with redactions</b> will 
+					be collected.
+		      			<li>Confirm that <b>verified documents modified by the verifier</b> 
+					will be collected.
 	      				<li>Confirm that both <b>documents with redactions</b> and 
 					<b>documents modified by the verifier</b> can be collected.
 		      			<li>Confirm that both expected and found VOA files are collected in 
@@ -1335,6 +1357,7 @@
 <p>
 				<li>Thread safety for PDF images
 				<ul>
+					<li>Configure verification to not require viewing all pages.
 					<li>Verify several multipage PDFs.
 					<li>Save and commit before the thumbnail viewer can load all 
 					of the pages.
@@ -1352,7 +1375,7 @@
 					<li>Confirm that the verification interface closes gracefully 
 					if the FAM settings <b>are not</b> set to listen.
 					<li>Confirm that the verification interface remains 
-					if the FAM settings <b>are not</b> set to listen.
+					if the FAM settings <b>are</b> set to listen.
 				</ul>
 <p>
 				<li>Results when verifying a very large file
