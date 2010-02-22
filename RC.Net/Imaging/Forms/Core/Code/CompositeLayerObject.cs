@@ -418,7 +418,9 @@ namespace Extract.Imaging.Forms
 
                 base.StartTrackingSelection(mouseX, mouseY);
 
-                foreach (T layerObject in _objects)
+                LayerObject layerObject = ImageViewer.GetLayerObjectAtPoint(
+                    EnumerateAsLayerObjects(_objects), mouseX, mouseY);
+                if (layerObject != null)
                 {
                     layerObject.StartTrackingSelection(mouseX, mouseY);
                 }
@@ -426,6 +428,19 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI22764", ex);
+            }
+        }
+
+        /// <summary>
+        /// Enumerates the internal generic-type layer objects as layer objects.
+        /// </summary>
+        /// <param name="layerObjects">The layer objects to enumerate.</param>
+        /// <returns>Enumerates the internal generic-type layer objects as layer objects.</returns>
+        static IEnumerable<LayerObject> EnumerateAsLayerObjects(IEnumerable<T> layerObjects)
+        {
+            foreach (T layerObject in layerObjects)
+            {
+                yield return layerObject;
             }
         }
 

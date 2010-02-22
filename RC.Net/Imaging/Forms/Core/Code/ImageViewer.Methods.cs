@@ -2438,46 +2438,9 @@ namespace Extract.Imaging.Forms
                         }
                     }
 
-                    // Get the mouse position in image coordinates
-                    Point[] mouse = new Point[] { new Point(mouseX, mouseY) };
-                    using (Matrix clientToImage = _transform.Clone())
+                    LayerObject clickedObject = GetLayerObjectAtPoint(_layerObjects, mouseX, mouseY);
+                    if (clickedObject != null)
                     {
-                        clientToImage.Invert();
-                        clientToImage.TransformPoints(mouse);
-                    }
-
-                    Point mousePoint = mouse[0];
-
-                    // Build the list of possible layer objects
-                    List<LayerObject> possibleSelection = new List<LayerObject>();
-                    foreach (LayerObject layerObject in _layerObjects)
-                    {
-                        // Only perform hit test if the layer object is selectable and visible
-                        if (layerObject.Selectable && layerObject.Visible &&
-                            layerObject.HitTest(mousePoint))
-                        {
-                            possibleSelection.Add(layerObject);
-                        }
-                    }
-
-                    bool layerObjectClicked = possibleSelection.Count > 0;
-                    if (layerObjectClicked)
-                    {
-                        // Find the best layer object [DNRCAU #352]
-                        // Best layer object is defined as the one with the lowest average distance
-                        // to the corners of the object
-                        LayerObject clickedObject = null;
-                        double shortestDistance = double.MaxValue;
-                        foreach (LayerObject layerObject in possibleSelection)
-                        {
-                            double distance = layerObject.AverageDistanceToCorners(mousePoint);
-                            if (distance < shortestDistance)
-                            {
-                                shortestDistance = distance;
-                                clickedObject = layerObject;
-                            }
-                        }
-
                         // Select this layer object if it is not already
                         if (!_layerObjects.Selection.Contains(clickedObject))
                         {
@@ -2517,7 +2480,7 @@ namespace Extract.Imaging.Forms
 
                     // Only start a tracking event if a layer object was clicked or banded
                     // selection is enabled.
-                    if (layerObjectClicked || _allowBandedSelection)
+                    if (clickedObject != null || _allowBandedSelection)
                     {
                         // Start a click and drag event
                         _trackingData = new TrackingData(this, mouseX, mouseY,
@@ -2537,6 +2500,62 @@ namespace Extract.Imaging.Forms
                 default:
                     throw new ExtractException("ELI21507", "Unexpected cursor tool.");
             }
+        }
+
+        /// <summary>
+        /// Gets a layer object at the specified point.
+        /// </summary>
+        /// <param name="layerObjects">A collection of layer objects from which to select the 
+        /// result.</param>
+        /// <param name="x">The physical (client) x coordinate of the point.</param>
+        /// <param name="y">The physical (client) y coordinate of the point.</param>
+        /// <returns>A layer object from <paramref name="layerObjects"/>at the specified point. 
+        /// If more than one layer object is at the point, the one with the lowest average distance 
+        /// from its corners to the point is returned. <see langword="null"/> if no layer object 
+        /// is at the point.</returns>
+        internal LayerObject GetLayerObjectAtPoint(IEnumerable<LayerObject> layerObjects, int x, int y)
+        {
+            // Get the mouse position in image coordinates
+            Point[] mouse = new Point[] { new Point(x, y) };
+            using (Matrix clientToImage = _transform.Clone())
+            {
+                clientToImage.Invert();
+                clientToImage.TransformPoints(mouse);
+            }
+
+            Point mousePoint = mouse[0];
+
+            // Build the list of possible layer objects
+            List<LayerObject> possibleSelection = new List<LayerObject>();
+            foreach (LayerObject layerObject in layerObjects)
+            {
+                // Only perform hit test if the layer object is selectable and visible
+                if (layerObject.Selectable && layerObject.Visible &&
+                    layerObject.HitTest(mousePoint))
+                {
+                    possibleSelection.Add(layerObject);
+                }
+            }
+
+            LayerObject clickedObject = null;
+            if (possibleSelection.Count > 0)
+            {
+                // Find the best layer object [DNRCAU #352]
+                // Best layer object is defined as the one with the lowest average distance
+                // to the corners of the object
+                double shortestDistance = double.MaxValue;
+                foreach (LayerObject layerObject in possibleSelection)
+                {
+                    double distance = layerObject.AverageDistanceToCorners(mousePoint);
+                    if (distance < shortestDistance)
+                    {
+                        shortestDistance = distance;
+                        clickedObject = layerObject;
+                    }
+                }
+            }
+
+            return clickedObject;
         }
 
         /// <summary>
