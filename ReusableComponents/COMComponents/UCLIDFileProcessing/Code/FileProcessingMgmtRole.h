@@ -75,8 +75,8 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 // IFileActionMgmtRole
-	STDMETHOD(Start)(IFileProcessingDB *pDB, BSTR bstrAction, long hWndOfUI, IFAMTagManager *pTagManager, 
-		IRoleNotifyFAM *pRoleNotifyFAM);
+	STDMETHOD(Start)(IFileProcessingDB* pDB, long lActionId, BSTR bstrAction, long hWndOfUI, 
+		IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM);
 	STDMETHOD(Stop)(void);
 	STDMETHOD(Pause)(void);
 	STDMETHOD(Resume)(void);
@@ -86,41 +86,41 @@ public:
 	STDMETHOD(ValidateStatus)(void);
 
 // IFileProcessingMgmtRole
-	STDMETHOD(get_FileProcessors)(IIUnknownVector ** pVal);
-	STDMETHOD(put_FileProcessors)(IIUnknownVector * newVal);
-	STDMETHOD(get_NumThreads)(long *pVal);
+	STDMETHOD(get_FileProcessors)(IIUnknownVector** pVal);
+	STDMETHOD(put_FileProcessors)(IIUnknownVector* newVal);
+	STDMETHOD(get_NumThreads)(long* pVal);
 	STDMETHOD(put_NumThreads)(long newVal);
 	STDMETHOD(SetDirty)(VARIANT_BOOL newVal);
-	STDMETHOD(SetRecordMgr)(void *pRecordMgr);
-	STDMETHOD(get_OkToStopWhenQueueIsEmpty)(VARIANT_BOOL *pVal);
+	STDMETHOD(SetRecordMgr)(void* pRecordMgr);
+	STDMETHOD(get_OkToStopWhenQueueIsEmpty)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_OkToStopWhenQueueIsEmpty)(VARIANT_BOOL newVal);
 	STDMETHOD(get_KeepProcessingAsAdded)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_KeepProcessingAsAdded)(VARIANT_BOOL newVal);
 	STDMETHOD(get_LogErrorDetails)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_LogErrorDetails)(VARIANT_BOOL newVal);
-	STDMETHOD(get_ErrorLogName)(BSTR *pVal);
+	STDMETHOD(get_ErrorLogName)(BSTR* pVal);
 	STDMETHOD(put_ErrorLogName)(BSTR newVal);
 	STDMETHOD(get_ExecuteErrorTask)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_ExecuteErrorTask)(VARIANT_BOOL newVal);
-	STDMETHOD(get_ErrorTask)(IObjectWithDescription * *pVal);
-	STDMETHOD(put_ErrorTask)(IObjectWithDescription * newVal);
+	STDMETHOD(get_ErrorTask)(IObjectWithDescription** pVal);
+	STDMETHOD(put_ErrorTask)(IObjectWithDescription* newVal);
 	STDMETHOD(get_ProcessSkippedFiles)(VARIANT_BOOL* pbVal);
 	STDMETHOD(put_ProcessSkippedFiles)(VARIANT_BOOL bNewVal);
 	STDMETHOD(get_SkippedForAnyUser)(VARIANT_BOOL* pbVal);
 	STDMETHOD(put_SkippedForAnyUser)(VARIANT_BOOL bNewVal);
 	STDMETHOD(get_ProcessingSchedule)(IVariantVector** ppHoursSchedule);
 	STDMETHOD(put_ProcessingSchedule)(IVariantVector* pHoursSchedule);
-	STDMETHOD(get_LimitProcessingToSchedule)(VARIANT_BOOL *pbVal);
+	STDMETHOD(get_LimitProcessingToSchedule)(VARIANT_BOOL* pbVal);
 	STDMETHOD(put_LimitProcessingToSchedule)(VARIANT_BOOL bVal);
-	STDMETHOD(ProcessSingleFile)(IFileRecord* pFileRecord, IFileProcessingDB *pFPDB,
+	STDMETHOD(ProcessSingleFile)(IFileRecord* pFileRecord, IFileProcessingDB* pFPDB,
 		IFAMTagManager* pFAMTagManager);
 
 // IPersistStream
-	STDMETHOD(GetClassID)(CLSID *pClassID);
+	STDMETHOD(GetClassID)(CLSID* pClassID);
 	STDMETHOD(IsDirty)(void);
-	STDMETHOD(Load)(IStream *pStm);
-	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
-	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+	STDMETHOD(Load)(IStream* pStm);
+	STDMETHOD(Save)(IStream* pStm, BOOL fClearDirty);
+	STDMETHOD(GetSizeMax)(ULARGE_INTEGER* pcbSize);
 
 private:
 	/////////////////
@@ -128,15 +128,15 @@ private:
 	/////////////////
 
 	// Thread procedure which represents a single file processing thread
-	static UINT CFileProcessingMgmtRole::fileProcessingThreadProc(void *pData);
+	static UINT CFileProcessingMgmtRole::fileProcessingThreadProc(void* pData);
 
 	// Thread procedure which watches all the file processing threads
 	// and waits for them to complete.  When they are done processing, then
 	// some status updates are sent to the UI
-	static UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void *pData);
+	static UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void* pData);
 
 	// Thread procedure which initiates the stopping of processing asynchronously
-	static UINT handleStopRequestAsynchronously(void *pData);
+	static UINT handleStopRequestAsynchronously(void* pData);
 
 	// Thread procedure to handle starting and stopping of the processing. 
 	// If scheduling is on, it will start and stop processing based on the schedule
@@ -145,7 +145,7 @@ private:
 	// If processing is ending because there are no more files to process or a manual stop
 	// has been initiated the UI will be notified that processing is complete or stopped and then
 	// this function will return.
-	static UINT processManager(void *pData);
+	static UINT processManager(void* pData);
 
 	/////////////
 	// Variables
@@ -275,7 +275,7 @@ private:
 	//			simultaneously.  So, we sometimes pass a copy of certain file 
 	//			processors to each thread.  ripFileProcessingTasks represent the 
 	//			file processor objects to be used for the current thread.
-	void processFiles2(ProcessingThreadData *pThreadData);
+	void processFiles2(ProcessingThreadData* pThreadData);
 
 	void processTask(FileProcessingRecord& task, ProcessingThreadData* pThreadData);
 
@@ -292,7 +292,7 @@ private:
 	// Handles logging of error details if this option is enabled.
 	// Handles execution of the error-handling task if this option is enabled.
 	void handleProcessingError(FileProcessingRecord &task, 
-							   const ProcessingThreadData *pThreadData,
+							   const ProcessingThreadData* pThreadData,
 							   const UCLIDException &rUE);
 
 	// Writes specially formatted error information to the specified text file.

@@ -18,9 +18,9 @@ class SupplierThreadData
 {
 public:
 	// ctor
-	SupplierThreadData(UCLID_FILEPROCESSINGLib::IFileSupplier *pFS,
-		UCLID_FILEPROCESSINGLib::IFileSupplierTarget *pFST,
-		UCLID_FILEPROCESSINGLib::IFAMTagManager *pFAMTM);
+	SupplierThreadData(UCLID_FILEPROCESSINGLib::IFileSupplier* pFS,
+		UCLID_FILEPROCESSINGLib::IFileSupplierTarget* pFST,
+		UCLID_FILEPROCESSINGLib::IFAMTagManager* pFAMTM);
 
 	Win32Event m_threadStartedEvent;
 	Win32Event m_threadEndedEvent;
@@ -75,11 +75,11 @@ public:
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // ILicensedComponent
-	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
+	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
 
 // IFileActionMgmtRole
-	STDMETHOD(Start)(IFileProcessingDB *pDB, BSTR bstrAction, long hWndOfUI, IFAMTagManager *pTagManager, 
-		IRoleNotifyFAM *pRoleNotifyFAM);
+	STDMETHOD(Start)(IFileProcessingDB* pDB, long lActionId, BSTR bstrAction, long hWndOfUI, 
+		IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM);
 	STDMETHOD(Stop)(void);
 	STDMETHOD(Pause)(void);
 	STDMETHOD(Resume)(void);
@@ -89,29 +89,29 @@ public:
 	STDMETHOD(ValidateStatus)(void);
 
 // IFileSupplyingMgmtRole
-	STDMETHOD(get_FileSuppliers)(IIUnknownVector ** pVal);
-	STDMETHOD(put_FileSuppliers)(IIUnknownVector * newVal);
-	STDMETHOD(get_FAMCondition)(IObjectWithDescription ** pVal);
-	STDMETHOD(put_FAMCondition)(IObjectWithDescription * newVal);
+	STDMETHOD(get_FileSuppliers)(IIUnknownVector** pVal);
+	STDMETHOD(put_FileSuppliers)(IIUnknownVector* newVal);
+	STDMETHOD(get_FAMCondition)(IObjectWithDescription** pVal);
+	STDMETHOD(put_FAMCondition)(IObjectWithDescription* newVal);
 	STDMETHOD(SetDirty)(VARIANT_BOOL newVal);
 	STDMETHOD(GetSupplyingCounts)(long* plNumSupplied, long* plNumSupplyingErrors);
 
 // IFileSupplierTarget Methods
-	STDMETHOD(NotifyFileAdded)( BSTR bstrFile,  IFileSupplier * pSupplier);
-	STDMETHOD(NotifyFileRemoved)( BSTR bstrFile,  IFileSupplier * pSupplier);
-	STDMETHOD(NotifyFileRenamed)( BSTR bstrOldFile,  BSTR bstrNewFile,  IFileSupplier * pSupplier);
-	STDMETHOD(NotifyFolderDeleted)( BSTR bstrFolder,  IFileSupplier * pSupplier);
-	STDMETHOD(NotifyFolderRenamed)( BSTR bstrOldFolder,  BSTR bstrNewFolder,  IFileSupplier * pSupplier);
-	STDMETHOD(NotifyFileModified)( BSTR bstrFile,  IFileSupplier * pSupplier);
-	STDMETHOD(NotifyFileSupplyingDone)( IFileSupplier * pSupplier);
-	STDMETHOD(NotifyFileSupplyingFailed)(IFileSupplier *pSupplier, BSTR strError );
+	STDMETHOD(NotifyFileAdded)(BSTR bstrFile,  IFileSupplier* pSupplier);
+	STDMETHOD(NotifyFileRemoved)(BSTR bstrFile,  IFileSupplier* pSupplier);
+	STDMETHOD(NotifyFileRenamed)(BSTR bstrOldFile,  BSTR bstrNewFile,  IFileSupplier* pSupplier);
+	STDMETHOD(NotifyFolderDeleted)(BSTR bstrFolder,  IFileSupplier* pSupplier);
+	STDMETHOD(NotifyFolderRenamed)(BSTR bstrOldFolder,  BSTR bstrNewFolder,  IFileSupplier* pSupplier);
+	STDMETHOD(NotifyFileModified)(BSTR bstrFile,  IFileSupplier* pSupplier);
+	STDMETHOD(NotifyFileSupplyingDone)(IFileSupplier* pSupplier);
+	STDMETHOD(NotifyFileSupplyingFailed)(IFileSupplier* pSupplier, BSTR strError );
 
 // IPersistStream
-	STDMETHOD(GetClassID)(CLSID *pClassID);
+	STDMETHOD(GetClassID)(CLSID* pClassID);
 	STDMETHOD(IsDirty)(void);
-	STDMETHOD(Load)(IStream *pStm);
-	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
-	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+	STDMETHOD(Load)(IStream* pStm);
+	STDMETHOD(Save)(IStream* pStm, BOOL fClearDirty);
+	STDMETHOD(GetSizeMax)(ULARGE_INTEGER* pcbSize);
 
 private:
 	/////////////////
@@ -127,8 +127,11 @@ private:
 	// Skip Condition
 	IObjectWithDescriptionPtr m_ipFAMCondition;
 
-	// Action Name being processed
+	// Action Name being supplied
 	string m_strAction;
+
+	// Action ID being supplied
+	long m_lActionId;
 
 	// vector of thread data objects containing data for each of the processing threads, and a method
 	// to release the memory allocated to the objects referenced by pointers in the vector
@@ -176,7 +179,7 @@ private:
 	void validateLicense();
 
 	// this method returns true if the file matches the FAM condition
-	bool fileMatchesFAMCondition(string strFile);
+	bool fileMatchesFAMCondition(const string& strFile);
 
 	// internal method to clear data
 	void clear();
@@ -203,7 +206,7 @@ private:
 	bool stopSupplingIfDBNotConnected();
 
 	// thread procedure that executes each file supplier in a seperate thread
-	static UINT CFileSupplyingMgmtRole::fileSupplyingThreadProc(void *pData);
+	static UINT CFileSupplyingMgmtRole::fileSupplyingThreadProc(void* pData);
 };
 //-------------------------------------------------------------------------------------------------
 

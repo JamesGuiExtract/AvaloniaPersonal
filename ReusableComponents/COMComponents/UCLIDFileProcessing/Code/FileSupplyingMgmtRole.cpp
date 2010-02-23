@@ -303,9 +303,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IFileActionMgmtRole interface implementation
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB *pDB, BSTR bstrAction, long hWndOfUI, 
-										   IFAMTagManager *pTagManager, 
-										   IRoleNotifyFAM *pRoleNotifyFAM)
+STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB* pDB, long lActionId, 
+	BSTR bstrAction, long hWndOfUI, IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -333,8 +332,9 @@ STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB *pDB, BSTR bstrActi
 			// store the pointer to the TagManager so that subsequent calls to getFPMTagManager() will work
 			m_pFAMTagManager = pTagManager;
 
-			// remember the action name
+			// remember the action name and id
 			m_strAction = asString(bstrAction);
+			m_lActionId = lActionId;
 
 			// remember the handle of the UI so that messages can be sent to it
 			m_hWndOfUI = (HWND) hWndOfUI;
@@ -1637,7 +1637,7 @@ UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr CFileSupplyingMgmtRole::getFileSup
 	return NULL;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileSupplyingMgmtRole::fileMatchesFAMCondition(std::string strFile)
+bool CFileSupplyingMgmtRole::fileMatchesFAMCondition(const string& strFile)
 {
 	// check to see if the file meets the FAM condition.  If so, ignore this notification
 	if (m_ipFAMCondition != NULL)
@@ -1648,10 +1648,10 @@ bool CFileSupplyingMgmtRole::fileMatchesFAMCondition(std::string strFile)
 		// check if a skip condition has been specified and is enabled
 		if (ipFAMCondition != NULL && m_ipFAMCondition->Enabled == VARIANT_TRUE)
 		{
-			// TODO: pass in the database manager and the current action
-			if (ipFAMCondition->FileMatchesFAMCondition(strFile.c_str(), getFPMDB(), m_strAction.c_str(), getFAMTagManager()) == VARIANT_TRUE)
+			VARIANT_BOOL vbMatch = ipFAMCondition->FileMatchesFAMCondition(
+				strFile.c_str(), getFPMDB(), -1, m_lActionId, getFAMTagManager());
+			if (vbMatch == VARIANT_TRUE)
 			{
-				// TODO: Do we need to log the fact that we are skipping a file?
 				return true;
 			}
 		}
