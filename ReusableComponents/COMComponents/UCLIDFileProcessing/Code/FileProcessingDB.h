@@ -195,7 +195,7 @@ public:
 	STDMETHOD(RenameLoginUser)(BSTR bstrUserNameToRename, BSTR bstrNewUserName);	
 	STDMETHOD(ClearLoginUserPassword)(BSTR bstrUserName);
 	STDMETHOD(GetAutoCreateActions)(VARIANT_BOOL* pvbValue);
-	STDMETHOD(AutoCreateAction)(BSTR bstrActionName);
+	STDMETHOD(AutoCreateAction)(BSTR bstrActionName, long* plId);
 	STDMETHOD(CanSkipAuthenticationOnThisMachine)(VARIANT_BOOL* pvbSkipAuthentication);
 	STDMETHOD(GetFileRecord)(BSTR bstrFile, BSTR bstrActionName, IFileRecord** ppFileRecord);
 	STDMETHOD(SetFileStatusToProcessing)(long nFileId, long nActionID);

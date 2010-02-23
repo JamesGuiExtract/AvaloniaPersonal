@@ -567,7 +567,7 @@ _RecordsetPtr CFileProcessingDB::getActionSet(_ConnectionPtr ipConnection, const
 	ASSERT_RESOURCE_ALLOCATION("ELI29155", ipActionSet != NULL);
 
 	// Setup select statement to open Action Table
-	string strActionSelect = "SELECT ASCName FROM Action WHERE ASCName = '" + strAction + "'";
+	string strActionSelect = "SELECT ID, ASCName FROM Action WHERE ASCName = '" + strAction + "'";
 
 	// Open the Action table in the database
 	ipActionSet->Open(strActionSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), 

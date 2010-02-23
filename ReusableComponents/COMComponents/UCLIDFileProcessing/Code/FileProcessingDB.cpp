@@ -1557,7 +1557,7 @@ STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFile
 		// Fill the ipFiles collection
 		while (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
-			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", NULL) == VARIANT_TRUE)
+			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", 0, 0) == VARIANT_TRUE)
 			{
 				// Get the FileName
 				string strFile = getStringField(ipFileSet->Fields, "FileName");
@@ -2587,7 +2587,7 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 		long nNumRecordsModified = 0;
 		while (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
-			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", NULL) == VARIANT_TRUE)
+			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", 0, 0) == VARIANT_TRUE)
 			{
 				FieldsPtr ipFields = ipFileSet->Fields;
 				ASSERT_RESOURCE_ALLOCATION("ELI27040", ipFields != NULL);
@@ -3785,7 +3785,7 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 		stack<string> stackIDs;
 		while (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
-			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", NULL) == VARIANT_TRUE)
+			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", 0, 0) == VARIANT_TRUE)
 			{
 				// Get the file ID
 				stackIDs.push(asString(getLongField(ipFileSet->Fields, "ID")));
@@ -4907,13 +4907,15 @@ STDMETHODIMP CFileProcessingDB::GetAutoCreateActions(VARIANT_BOOL* pvbValue)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29120");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName)
+STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName, long* plId)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
 		validateLicense();
+
+		ASSERT_ARGUMENT("ELI29795", plId != NULL);
 
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
@@ -4945,10 +4947,11 @@ STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName)
 		// Check if the action is not yet created
 		if (ipActionSet->adoEOF == VARIANT_TRUE)
 		{
+			// Action is not created
 			if (getDBInfoSetting(ipConnection, gstrAUTO_CREATE_ACTIONS) == "1")
 			{
 				// AutoCreateActions is set, create the action
-				addActionToRecordset(ipConnection, ipActionSet, strActionName);
+				*plId = addActionToRecordset(ipConnection, ipActionSet, strActionName);
 			}
 			else
 			{
@@ -4957,6 +4960,11 @@ STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName)
 				ue.addDebugInfo("Action name", strActionName);
 				throw ue;
 			}
+		}
+		else
+		{
+			// Action is already created, get its ID
+			*plId = getLongField(ipActionSet->Fields, "ID");
 		}
 
 		// Commit the transaction
