@@ -1,0 +1,393 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.0.0.39 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.0.0.39 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[DotNet #369]</b> Confirm that the <b>fuzzy regular expression</b> 
+		functionality now works properly for the <b>better_fit</b> option.
+<p>
+  	   	<LI><b>[DotNet #396]</b> Confirm that the <b>Core: Modify pdf file</b> task 
+		works without a license validation error message.
+<p>
+  	   	<LI><b>[DotNet #400, #402, #405, #409]</b> SQLCDBEditor
+	       	<ul>
+	  	   	<LI>Edit and save a database.
+			<li>Confirm that a message box is presented about a successful save.
+			<li>Close the message box.
+			<li>Confirm that focus returns to the <b>SQLCDBEditor</b> application.
+			<li>Start making another change to the database but leave the edited 
+			cell active when saving.
+			<li>Confirm that the active edits are successfully saved.
+			<li>Add a new FPS file to the FPSFile table.
+			<li>Confirm that the <b>AutoStart</b> field defaults to <b>checked</b>.
+			<li>Confirm that if an error occurs during save, a message is presented 
+			to the user asking if they want to exit without saving.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3438]</b> Split region into content areas
+	       	<ul>
+	  	   	<LI>Load the rules from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3438</b>.  The rules expect 
+			the Demo ID Shield rules to exist in <b>C:\Demo_IDShield\Rules</b>.
+	  	   	<LI>Exercise the rules against <b>TestImage010.tif</b> in the same 
+			folder.
+			<li>Step through the results and confirm proper highlights for the 
+			following
+			<ul>
+				<li>The left part of the second signature in the first column - 
+				per Example01.jpg
+				<li>The right part of the bottom half of the <b>278</b> - 
+				per Example02.jpg
+				<li>The top part of the <b>ORIG___BDLE</b> text - 
+				per Example03.jpg
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3890, #4021, #4080, #4083, #4084, #4085, #4091, #4092, #4110, 
+		#4123, DotNet #371]</b> Verify sensitive data
+	       	<ul>
+			<li>Confirm that the property page appears roughly centered over the 
+			<b>Select Task</b> dialog.
+			<li>Confirm that highlight borders are opaque.
+			<li>Confirm that white slivers <b>are not</b> seen between the redaction area 
+			and the border, even with various zoom levels.
+	  	   	<LI>Confirm that redactions no longer resize when a grip handle is clicked 
+			without the mouse being moved.
+			<li>Confirm that switching to the <b>Selection</b> tool is the default 
+			choice after creating a manual redaction.
+			<li>Confirm that each line of a multi-line redaction can be moved independently.
+<p>
+			<li>Verify an image containing LCData.
+			<li>Toggle the LCData item <b>on</b>.
+			<li>Confirm that the area is redacted if the image is printed via <b>File - 
+			Print...</b>
+			<li>Confirm that the area is redacted if the image is printed via <b>File - 
+			Print view</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3931]</b> Confirm that <b>SQL Server 2008 Management Studio</b> 
+		can be installed on <b>64-bit 2008 Server</b>.
+<p>
+  	   	<LI><b>[FlexIDSCore #4003, #4004, #4005, #4089, #4090, #4097, #4104]</b> 
+		Automated testing
+	       	<ul>
+	  	   	<LI>Confirm that all summary statistics are displayed for the 
+			<b>Automated Rule Set Tester</b> when <b>OUTPUT_FINAL_STATS_ONLY=TRUE</b>.
+	  	   	<LI>Confirm that all summary statistics are displayed for the 
+			<b>ID Shield Tester</b> when <b>OUTPUT_FINAL_STATS_ONLY=TRUE</b>.
+			<li>Confirm that the <b>TypesToBeTested</b> field ignores leading and 
+			trailing spaces in the <b>ID Shield Tester</b>.
+<p>
+			<li>Confirm that the only failure in the <b>Box Finder</b> automated 
+			tests is the test with the GIF image.
+			<li>Confirm that the <b>Image Region With Lines VF</b> automated tests 
+			all pass.
+			<li>Confirm that the tests in the <b>Legal Description Splitter</b> portion 
+			of the Indexing National Rule Set all pass.
+<p>
+			<li>Create some VOA files with slightly overlapping redactions.
+			<li>Confirm that the default overlap before two redactions are considered 
+			overlapping is 10 percent.
+			<li>Confirm that this percentage is controlled by <b>HKCU\Software\Extract Systems\AttributeFinder\IndustrySpecific\Redaction\RedactionTester\RedactionZoneOverlapMinimum</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4006]</b> Old VOA files from skewed images
+	       	<ul>
+			<li>Copy the files from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4006</b>.
+	  	   	<LI>Exercise <b>hybrid.tcl</b>and review the results.
+			<li>Confirm the following results
+			<ul>
+				<li>5 correct redactions
+				<li>1 false positive
+				<li>0 over-redactions
+				<li>0 under-redactions
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4009]</b> Confirm that an empty string scores <b>0</b> for 
+		the <b>Character Confidence Data Scorer</b>.
+<p>
+  	   	<LI><b>[FlexIDSCore #4015, #4017, #4018, #4022, #4023, #4036, #4047, #4054, #4055, 
+		#4056, #4057, #4058, #4060, #4065, LegacyRC #5735]</b> ID Shield Statistics Reporter
+	       	<ul>
+	  	   	<LI>Confirm that the <b>ID Shield Statistics Reporter</b> window is 
+			resizeable.
+			<li>Confirm that the <b>Advanced Options</b> dialog is not resizeable.
+			<li>Confirm that the feedback folder is persisted.
+			<li>Confirm that unclassified documents are presented as <b>Unknown</b>.
+			<li>Confirm that <b>TypesToBeTested</b> accepts the following delimiters
+			<ul>
+				<li>Commas
+				<li>Pipe characters
+			</ul>
+			<li>Confirm that the <b>source VOA file</b> is indicated in the 
+			attribute type
+			<ul>
+				<li><b>Expected</b> - Misses and Correct
+				<li><b>Found</b> - Over-redactions, Under-redactions and 
+				False positives
+			</ul>
+			<li>Confirm that a single found redaction is not counted as both an 
+			over-redaction and an under-redaction for the same expected attribute. 
+			<li>Confirm that the final results label is: <b>Final results of 
+			above workflow</b>.
+			<li>Confirm that a <b>Document type distribution</b> section header is 
+			provided.
+			<li>Confirm that the statistics no longer include specific counts for 
+			<b>missed</b> redactions.
+			<li>Confirm that the <b>Detailed workflow statistic</b> section always 
+			outputs the same statistics, regardless of workflow.
+			<li>Confirm that the <b>Summary statistics</b> file reports the number of 
+			<b>sensitive data items</b>.
+			<li>Confirm that the following statistics are reported for a single 
+			sensitive data item
+			<ul>
+				<li>1 redaction, too large = 1 correct, 1over-redaction
+				<li>2 redactions, 1 too large = 1 correct, 1 over-redaction
+				<li>2 redactions, both too large = 1 correct, 2 over-redactions
+				<li>2 redactions, both correct = 1 correct
+				<li>2 redactions, 1 too little = 1 correct, 1 under-redaction
+			</ul>
+			<li>Confirm that the following statistics are reported for a page with 
+			two sensitive data items and one redaction covering the entire page
+			<ul>
+				<li>2 correct, 2 over-redactions
+			</ul>
+<p>
+			<li>Prepare several thousand files for processing.
+			<li>Configure <b>IDSSR</b> incorrectly so that an error is generated for 
+			each test.  One example is to look for a non-existent VOA file.
+			<li>Exercise <b>IDSSR</b>.
+			<li>Confirm that the <b>FailedTestCases.uex</b> file fills up and is 
+			properly renamed as expected.  <b>ELI14818</b> is expected to be 
+			included at the end of each full UEX file.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4024]</b> Confirm that <b>SQLCompactExporter.exe</b> and 
+		<b>SQLCompactImporter.exe</b> are installed for FLEX Index and ID Shield.
+<p>
+  	   	<LI><b>[FlexIDSCore #4038]</b> Confirm that <b>DataEntry: Verify extracted data</b> 
+		requires only a <b>FLEX Index Client</b> license.
+<p>
+  	   	<LI><b>[FlexIDSCore #4047]</b> Confirm that unclassified documents are displayed 
+		as <b>Unknown</b> in the verification UI.
+<p>
+  	   	<LI><b>[FlexIDSCore #4059]</b> Confirm that <b>FlexDataEntry.exe</b> is no longer 
+		installed with FLEX Index.
+<p>
+  	   	<LI><b>[FlexIDSCore #4070]</b> Zoom and scroll issues during verification
+	       	<ul>
+	  	   	<LI>Confirm that <b>F7</b> zooms in and that the center of the image 
+			remains in the same place.
+	  	   	<LI>Confirm that <b>F8</b> zooms out and that the center of the image 
+			remains in the same place.
+	  	   	<LI>Confirm that <b>Ctrl+Mousewheel Up</b> zooms in and that the center 
+			of the image remains in the same place.
+	  	   	<LI>Confirm that <b>Ctrl+Mousewheel Down</b> zooms out and that the center 
+			of the image remains in the same place.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4099, #4110]</b> Create metadata xml
+		<ul>
+			<li>Confirm that <b>FileInfo</b> nodes are created properly.
+			<li>Confirm that the property page appears roughly centered over the 
+			<b>Select Task</b> dialog.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4102]</b> Confirm that the OCR Engine version reported in the USS 
+		Viewer property page for a new USS file is <b>Nuance 16.3</b>.
+<p>
+  	   	<LI><b>[FlexIDSCore #4103]</b> Confirm that <b>SQL CE Editor</b> is not installed for 
+		FLEX Index or ID Shield.
+<p>
+  	   	<LI><b>[FlexIDSCore #4124, #4125]</b> Run FPS file
+		<ul>
+			<li>Confirm that <b>Redaction: Create redacted image</b> can be exercised 
+			with the <b>/ignoredb</b> switch.
+			<li>Confirm that <b>Redaction: Fileter ID Shield data</b> can be exercised 
+			with the <b>/ignoredb</b> switch.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5481]</b> Confirm that <b>ImageCleanupSettingsEditor.exe</b> displays 
+		an appropriate caption when the application is first opened.
+<p>
+  	   	<LI><b>[LegacyRC #5590, #5591]</b> SplitMultiPageImage
+	       	<ul>
+			<LI>Confirm that a relative path to the image is supported.
+	  	   	<LI>Confirm that a meaningful error message is displayed when trying to split 
+			a PDF image.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5634]</b> Confirm that <b>Manage Users</b> does not allow renaming 
+		a user to a user that already exists in the Login table.
+<p>
+  	   	<LI><b>[LegacyRC #5685]</b> Confirm that the initial DB Admin login is <b>admin</b> 
+		instead of the name of the logged-in user.
+<p>
+  	   	<LI><b>[LegacyRC #5710]</b> Tag selector functions
+	       	<ul>
+			<LI>Prepare some files for processing that include commas in the 
+			filenames.
+			<LI>Exercise <b>TestTextFunctionExpander.exe</b> - espcially for 
+			those functions that require multiple parameters.
+			<LI>Confirm that the <b>{<i>delimiter</i>}</b> syntax works properly.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5716]</b> Confirm that <b>Alt+Y</b> works to copy data from the 
+		<b>Error details</b> dialog in the UEX Viewer.
+<p>
+  	   	<LI><b>[LegacyRC #5720]</b> Clearing databases
+	       	<ul>
+			<LI>Confirm that the confirmation dialog presented when clearing a database \
+			includes a <b>Retain actions, counters, tags, and database settings</b> 
+			check box.
+			<LI>Confirm that each of these items is retained if the check box is 
+			checked.
+			<LI>Confirm that each of these items is removed if the check box is 
+			unchecked.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5721]</b> Confirm that <b>FAMDBAdmin.exe</b> does not crash when 
+		closing the database selection dialog.
+<p>
+  	   	<LI><b>[LegacyRC #5722]</b> Confirm that the FLEX Index Start menu shortcut for 
+		<b>Configure FAM Service</b> works properly.
+<p>
+  	   	<LI><b>[LegacyRC #5726]</b> Confirm that a clear <b>Application trace:</b> exception 
+		is logged when burning annotations into a PDF image.
+<p>
+  	   	<LI><b>[LegacyRC #5729]</b> Confirm that a meaningful exception is presented when 
+		exercising <b>Core: Modify pdf file</b> with a TIF image.
+<p>
+  	   	<LI><b>[LegacyRC #5734]</b> Confirm that PDF image can be simultaneously queued and 
+		verified.
+<p>
+  	   	<LI><b>[LegacyRC #5736, #5739, #5747, #5752]</b> Support for PDF passwords
+		<ul>
+			<li>Exercise the <b>Core: Convert to searchable PDF</b> task section of 
+			the <b>File Processing Tasks - General</b> checklist.
+			<li>Exercise the relevant portion of the <b>Redaction: Create redacted image</b> 
+			task section of the <b>File Processing Tasks - ID Shield</b> checklist.
+			<li>Confirm that the <b>PDF Passwords</b> property page
+			<ul>
+				<li>has an appropriate caption
+				<li>is wide enough to easily display all options
+				<li>requires choosing at least one password
+			</ul>
+			<li>Confirm that <b>ImageFormatConverter.exe</b> supports the following 
+			command-line options
+			<ul>
+				<li><b>/user &quot;&lt;password&gt;&quot;</b> for specifying a user 
+				password
+				<li><b>/owner &quot;&lt;password&gt;&quot; &lt;Permissions&gt;</b> for 
+				specifying an owner password and permissions
+				<ul>
+					<li><b>0</b> for no permissions
+					<li><b>1</b> to allow low quality printing
+					<li><b>2</b> to allow high quality printing
+					<li><b>4</b> to allow document modifications
+					<li><b>8</b> to allow copying/extraction of contents
+					<li><b>16</b> to allow accessibility access to contents
+					<li><b>32</b> to allow adding/modifying text annotations
+					<li><b>64</b> to allow filling in form fields
+					<li><b>128</b> to allow document assembly
+					<li><b>255</b> to allow all permissions
+				</ul>
+				<li><b>/enc</b> to indicate that the specified passwords are encrypted.  
+				Note that the <b>/enc</b> switch is only for private use.
+			</ul>
+			<li>Confirm that <b>ESConvertToPDF.exe</b> supports the following 
+			command-line options
+			<ul>
+				<li><b>/user &quot;&lt;password&gt;&quot;</b> for specifying a user 
+				password
+				<li><b>/owner &quot;&lt;password&gt;&quot; &lt;Permissions&gt;</b> for 
+				specifying an owner password and permissions
+				<ul>
+					<li><b>0</b> for no permissions
+					<li><b>1</b> to allow low quality printing
+					<li><b>2</b> to allow high quality printing
+					<li><b>4</b> to allow document modifications
+					<li><b>8</b> to allow copying/extraction of contents
+					<li><b>16</b> to allow accessibility access to contents
+					<li><b>32</b> to allow adding/modifying text annotations
+					<li><b>64</b> to allow filling in form fields
+					<li><b>128</b> to allow document assembly
+					<li><b>255</b> to allow all permissions
+				</ul>
+				<li><b>/enc</b> to indicate that the specified passwords are encrypted.  
+				Note that the <b>/enc</b> switch is only for private use.
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5745]</b> Default CPU usage when waiting for files
+		<ul>
+			<li>Prepare an FPS file to process files where it will <b>Keep processing 
+			files as they are added to the queue</b>.
+			<li>Confirm that very little CPU usage is noted while the FPS file is just 
+			waiting for a file to process.
+			<li>Examine the <b>MillisecondsBetweenDBCheck</b> registry key under 
+			<b>HKCU/Software/Extract 
+			Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FPRecordManager</b>.
+			<li>Confirm that the default is <b>2000</b>.
+			<li>Confirm that changing the value to <b>20</b> increases to CPU usage while 
+			the FPS file is waiting.
+		</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
