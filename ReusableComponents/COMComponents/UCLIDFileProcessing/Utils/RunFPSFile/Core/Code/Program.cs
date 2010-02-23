@@ -196,10 +196,8 @@ namespace Extract.FileActionManager.RunFPSFile
                 return false;
             }
 
-            if (!Path.IsPathRooted(_sourceDocName))
-            {
-                _sourceDocName = FileSystemMethods.GetAbsolutePath(_sourceDocName);
-            }
+            _sourceDocName =
+                    FileSystemMethods.GetAbsolutePath(_sourceDocName, Environment.CurrentDirectory);
 
             for (int i = 2; i < args.Length; i++)
             {

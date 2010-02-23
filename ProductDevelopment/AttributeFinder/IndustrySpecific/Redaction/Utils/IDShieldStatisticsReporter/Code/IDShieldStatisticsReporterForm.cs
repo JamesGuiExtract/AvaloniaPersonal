@@ -242,13 +242,11 @@ namespace Extract.IDShieldStatisticsReporter
                 // Initialize the found and expected data locations as necessary.
                 if (string.IsNullOrEmpty(_testFolder.FoundDataLocation))
                 {
-                    _testFolder.FoundDataLocation =
-                        "$DirOf(<SourceDocName>)\\$FileNoExtOf(<SourceDocName>).found.voa";
+                    _testFolder.FoundDataLocation = "<SourceDocName>.found.voa";
                 }
                 if (string.IsNullOrEmpty(_testFolder.ExpectedDataLocation))
                 {
-                    _testFolder.ExpectedDataLocation =
-                        "$DirOf(<SourceDocName>)\\$FileNoExtOf(<SourceDocName>).expected.voa";
+                    _testFolder.ExpectedDataLocation = "<SourceDocName>.expected.voa";
                 }
 
                 // Determine the type of test being done.

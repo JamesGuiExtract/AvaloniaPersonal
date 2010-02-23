@@ -100,9 +100,8 @@ namespace Extract.Redaction.Verification
 
                 // Initialize the destination found and expected voa files using the destination
                 // feedbackImage filename as a base.
-                string basePath = FileSystemMethods.GetFullPathWithoutExtension(feedbackImage);
-                _foundAttributesFileName = basePath + ".found.voa";
-                _expectedAttributesFileName = basePath + ".expected.voa";
+                _foundAttributesFileName = feedbackImage + ".found.voa";
+                _expectedAttributesFileName = feedbackImage + ".expected.voa";
             }
         }
 
