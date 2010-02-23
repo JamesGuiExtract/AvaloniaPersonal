@@ -1,14 +1,9 @@
-using Extract;
 using Extract.Licensing;
 using Extract.Utilities;
-using FAMProcessLib;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
@@ -24,7 +19,7 @@ namespace Extract.FileActionManager.RunFPSFile
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        static readonly string _OBJECT_NAME = "RunFPSFile";
+        const string _OBJECT_NAME = "RunFPSFile";
 
         #endregion Constants
 
@@ -74,7 +69,7 @@ namespace Extract.FileActionManager.RunFPSFile
         /// <summary>
         /// The priority assigned to a file being queued.
         /// </summary>
-        static UCLID_FILEPROCESSINGLib.EFilePriority _filePriority = EFilePriority.kPriorityDefault;
+        static EFilePriority _filePriority = EFilePriority.kPriorityDefault;
 
         /// <summary>
         /// Specifies a file to which exceptions should be logged rather than displaying them.
@@ -143,7 +138,9 @@ namespace Extract.FileActionManager.RunFPSFile
                          nextException = nextException.InnerException as ExtractException)
                     {
                         if (nextException.EliCode == "ELI14775" ||
-                            nextException.EliCode == "ELI14973")
+                            nextException.EliCode == "ELI14973" ||
+                            nextException.EliCode == "ELI27530" ||
+                            nextException.EliCode == "ELI29796")
                         {
                             // If so, database access was attempted but is not allowed. Create a new
                             // outer exception that better states the problem.
