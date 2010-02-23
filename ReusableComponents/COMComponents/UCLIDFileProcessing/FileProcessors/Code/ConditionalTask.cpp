@@ -297,25 +297,10 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR bstrFileFullName, long nFile
 		// Check license
 		validateLicense();
 
-		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_ARGUMENT("ELI17909", ipDB != NULL);
 		ASSERT_ARGUMENT("ELI17906", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI17907", asString(bstrFileFullName).empty() == false);
 		ASSERT_ARGUMENT("ELI17908", pTagManager != NULL);
 		ASSERT_ARGUMENT("ELI17910", pResult != NULL);
-
-		// Get the action name
-		_bstr_t bstrActionName = "";
-		map<long, _bstr_t>::iterator it = m_mapActionIDToName.find(nActionID);
-		if (it == m_mapActionIDToName.end())
-		{
-			bstrActionName = ipDB->GetActionName(nActionID);
-			m_mapActionIDToName[nActionID] = bstrActionName;
-		}
-		else
-		{
-			bstrActionName = it->second;
-		}
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
@@ -342,8 +327,8 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR bstrFileFullName, long nFile
 		}
 
 		// Exercise the FAM Condition
-		bool bConditionSatisfied = asCppBool(ipFAMCondition->FileMatchesFAMCondition(bstrFileFullName, pDB, 
-										bstrActionName, pTagManager));
+		bool bConditionSatisfied = asCppBool(ipFAMCondition->FileMatchesFAMCondition(
+			bstrFileFullName, pDB, nFileID, nActionID, pTagManager));
 
 		// Kick off progress status for task execution
 		IProgressStatusPtr ipSubProgressStatus = NULL;

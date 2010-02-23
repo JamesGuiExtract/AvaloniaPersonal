@@ -128,9 +128,6 @@ private:
 
 	bool	m_bDirty;
 
-	// Map for caching action id's and their associated action names
-	map<long, _bstr_t> m_mapActionIDToName;
-
 	/////////////
 	// Methods
 	/////////////
