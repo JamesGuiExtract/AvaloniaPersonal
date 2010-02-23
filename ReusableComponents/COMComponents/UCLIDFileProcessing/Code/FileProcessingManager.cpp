@@ -192,7 +192,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		string strExpandedAction = getExpandedActionName();
 
 		// Validate that the action name exists in the database (auto-create if that setting is set)
-		getFPMDB()->AutoCreateAction(strExpandedAction.c_str());
+		long lActionId = getFPMDB()->AutoCreateAction(strExpandedAction.c_str());
 
 		// start the processing
 		m_bPaused = false;
@@ -232,7 +232,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		{
 			// Set flag indicating that supplying was started
 			m_bSupplying = true;
-			ipSupplyingActionMgmtRole->Start(m_ipFPMDB, strExpandedAction.c_str(), 
+			ipSupplyingActionMgmtRole->Start(m_ipFPMDB, lActionId, strExpandedAction.c_str(), 
 				(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager, ipThis);
 		}
 
@@ -249,7 +249,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 			{
 				m_ipFPMgmtRole->OkToStopWhenQueueIsEmpty = m_bSupplying ? VARIANT_FALSE : VARIANT_TRUE;
 
-				ipProcessingActionMgmtRole->Start(m_ipFPMDB, strExpandedAction.c_str(), 
+				ipProcessingActionMgmtRole->Start(m_ipFPMDB, lActionId, strExpandedAction.c_str(), 
 					(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager, ipThis);
 			}
 			catch (...)
