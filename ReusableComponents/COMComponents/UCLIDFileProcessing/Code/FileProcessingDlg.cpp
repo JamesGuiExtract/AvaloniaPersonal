@@ -498,7 +498,8 @@ void FileProcessingDlg::OnBtnPause()
 		// if the stats are not the only thing running pause or resume the FPM
 		if ( !m_bStatsOnlyRunning )
 		{
-			if ( getFPM()->ProcessingPaused == VARIANT_TRUE)
+			m_bPaused = asCppBool(getFPM()->ProcessingPaused);
+			if (m_bPaused)
 			{
 				// resume the processing
 				getFPM()->StartProcessing();
@@ -592,6 +593,22 @@ void FileProcessingDlg::OnBtnStop()
 		}
 		else
 		{
+			// Disable the buttons so they will not be pressed while the FAM is stopping
+			m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_RUN, FALSE);
+			m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_PAUSE, FALSE);
+			m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_STOP, FALSE);
+
+			// update the menu items
+			CMenu* pMenu = GetMenu();
+			
+			// Disable the menus so they will not be pressed while the FAM is stopping
+			pMenu->EnableMenuItem(ID_PROCESS_STARTPROCESSING, MF_BYCOMMAND | MF_GRAYED);
+			pMenu->EnableMenuItem(ID_PROCESS_PAUSEPROCESSING, MF_BYCOMMAND | MF_GRAYED);
+			pMenu->EnableMenuItem(ID_PROCESS_STOPPROCESSING, MF_BYCOMMAND | MF_GRAYED);
+
+			// Add a status message that the FAM is stopping.
+			m_statusBar.SetText("Stopping", gnSTATUS_TEXT_STATUS_PANE_ID, 0);
+			
 			// Files are processing. Stop them.
 			getFPM()->StopProcessing();
 		}

@@ -229,7 +229,10 @@ STDMETHODIMP CFileProcessingMgmtRole::Pause(void)
 	{
 		validateLicense();
 
-		// Cause processing to wait until this m_eventPause is signaled
+		// Reset the resume event
+		m_eventResume.reset();
+
+		// Cause processing to wait until the m_eventResume is signaled
 		m_eventPause.signal();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14322");
@@ -244,6 +247,9 @@ STDMETHODIMP CFileProcessingMgmtRole::Resume(void)
 	try
 	{
 		validateLicense();
+
+		// Reset the pause event
+		m_eventPause.reset();
 
 		// Cause processing to resume
 		m_eventResume.signal();
@@ -1991,8 +1997,7 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 						// Processing should be running
 						pFPM->m_eCurrentRunningState = kNormalRun;
 					}
-					// Reset the Pause and resume events
-					pFPM->m_eventPause.reset();
+					// Reset resume event
 					pFPM->m_eventResume.reset();
 					break;
 				default:
@@ -2012,16 +2017,33 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 						// Stop the processing
 						pFPM->stopProcessing();
 
-						// Wait for the watcher thread
-						pFPM->m_eventWatcherThreadExited.wait();
-
-						// Reset watcher thread exited event
-						pFPM->m_eventWatcherThreadExited.reset();
-
-						// Notify UI that processing is inactive if not a normal stop
-						if (pFPM->m_eCurrentRunningState != kNormalStop && pFPM->m_hWndOfUI != NULL)
+						// Wait for event watcher thread to exit or a manual stop
+						rtnValue = WaitForMultipleObjects(2, lpHandles, FALSE, INFINITE);
+						switch( rtnValue)
 						{
-							::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_INACTIVE, 0, 0);
+						case WAIT_OBJECT_0:
+							// Set the current running state to normal stop
+							pFPM->m_eCurrentRunningState = kNormalStop;
+
+							// Stop the processing
+							pFPM->stopProcessing();
+
+							// Need to wait for the watcher thread to exit
+							pFPM->m_eventWatcherThreadExited.wait();
+							break;
+						case WAIT_OBJECT_0 + 1:
+							// Reset watcher thread exited event
+							pFPM->m_eventWatcherThreadExited.reset();
+
+							// Notify UI that processing is inactive if not a normal stop
+							if (pFPM->m_eCurrentRunningState != kNormalStop && pFPM->m_hWndOfUI != NULL)
+							{
+								::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_INACTIVE, 0, 0);
+							}
+							break;
+						default:
+							UCLIDException ue("ELI29806", "Stop events are in a bad state.");
+							throw ue;
 						}
 					}
 					break;
