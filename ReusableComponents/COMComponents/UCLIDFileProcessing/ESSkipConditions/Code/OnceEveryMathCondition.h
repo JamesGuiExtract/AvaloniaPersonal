@@ -58,7 +58,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // IMathConditionChecker
-	STDMETHOD(raw_CheckCondition)(BSTR bstrFileName, IFileProcessingDB* pFPDB,
+	STDMETHOD(raw_CheckCondition)(BSTR bstrFileName, long lFileID, long lActionID, 
 		VARIANT_BOOL* pbResult);
 
 // IOnceEveryMathConditionFAMCondition

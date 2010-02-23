@@ -98,8 +98,8 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(raw_IsConfigured)(VARIANT_BOOL * pbValue);
 
 // IFAMCondition
-	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB *pFPDB, BSTR bstrAction, 
-		IFAMTagManager *pFAMTM, VARIANT_BOOL* pRetVal);
+	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB* pFPDB, long lFileID, 
+		long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);

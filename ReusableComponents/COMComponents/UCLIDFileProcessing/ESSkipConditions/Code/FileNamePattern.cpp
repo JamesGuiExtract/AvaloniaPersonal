@@ -592,8 +592,8 @@ STDMETHODIMP CFileNamePattern::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB *pFPDB, 
-												BSTR bstrAction, IFAMTagManager *pFAMTM, VARIANT_BOOL* pRetVal)
+STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB* pFPDB, 
+	long lFileID, long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
 {	
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 

@@ -338,9 +338,8 @@ STDMETHODIMP CModulusEqualsMathCondition::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IMathConditionChecker
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CModulusEqualsMathCondition::raw_CheckCondition(BSTR bstrFileName,
-														 IFileProcessingDB* pFPDB,
-														 VARIANT_BOOL* pbResult)
+STDMETHODIMP CModulusEqualsMathCondition::raw_CheckCondition(BSTR bstrFileName, long lFileID, 
+	long lActionID, VARIANT_BOOL* pbResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -348,15 +347,16 @@ STDMETHODIMP CModulusEqualsMathCondition::raw_CheckCondition(BSTR bstrFileName,
 	{
 		validateLicense();
 
-		IFileProcessingDBPtr ipFPDB(pFPDB);
-		ASSERT_ARGUMENT("ELI27202", ipFPDB != NULL);
-		ASSERT_ARGUMENT("ELI27203", pbResult != NULL);
-
-		// Get the fileID from the database
-		long nFileID = ipFPDB->GetFileID(bstrFileName);
+		// Ensure the file ID is valid
+		if (lFileID <= 0)
+		{
+			UCLIDException ue("ELI29796", "Invalid file ID.");
+			ue.addDebugInfo("File ID", lFileID);
+			throw ue;
+		}
 
 		// Check the modulus result comparison and return as VARIANT_BOOL
-		*pbResult = asVariantBool(nFileID % m_nModulus == m_nModEquals);
+		*pbResult = asVariantBool(lFileID % m_nModulus == m_nModEquals);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27204");
 }

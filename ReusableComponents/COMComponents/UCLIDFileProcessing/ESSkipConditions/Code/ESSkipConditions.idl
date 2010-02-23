@@ -53,7 +53,7 @@ library EXTRACT_FAMCONDITIONSLib
 	interface IFileExistenceFAMCondition : IDispatch
 	{
 		// Indicates that file DOES or DOES NOT exist
-		[propget, id(1), helpstring("property FileExists")] HRESULT FileExists([out, retval] VARIANT_BOOL *pRetVal);
+		[propget, id(1), helpstring("property FileExists")] HRESULT FileExists([out, retval] VARIANT_BOOL* pRetVal);
 		[propput, id(1), helpstring("property FileExists")] HRESULT FileExists([in] VARIANT_BOOL newVal);
 
 		// String may include TextFunctionExpansion substrings to be processed to finally provide 
@@ -73,7 +73,7 @@ library EXTRACT_FAMCONDITIONSLib
 	interface IFileNamePatternFAMCondition : IDispatch
 	{
 		// Indicates that file DOES or DOES NOT Contain/exactly match
-		[propget, id(1), helpstring("property DoesContainOrMatch")] HRESULT DoesContainOrMatch([out, retval] VARIANT_BOOL *pRetVal);
+		[propget, id(1), helpstring("property DoesContainOrMatch")] HRESULT DoesContainOrMatch([out, retval] VARIANT_BOOL* pRetVal);
 		[propput, id(1), helpstring("property DoesContainOrMatch")] HRESULT DoesContainOrMatch([in] VARIANT_BOOL newVal);
 
 		// String may include TextFunctionExpansion substrings to be processed to finally provide 
@@ -82,15 +82,15 @@ library EXTRACT_FAMCONDITIONSLib
 		[propput, id(2), helpstring("property FileString")] HRESULT FileString([in] BSTR strFileString);
 
 		// Indicates that file Contain or exactly match the regular expression
-		[propget, id(3), helpstring("property ContainMatch")] HRESULT ContainMatch([out, retval] VARIANT_BOOL *pRetVal);
+		[propget, id(3), helpstring("property ContainMatch")] HRESULT ContainMatch([out, retval] VARIANT_BOOL* pRetVal);
 		[propput, id(3), helpstring("property ContainMatch")] HRESULT ContainMatch([in] VARIANT_BOOL newVal);
 
 		// Indicates that if regular expression is case sensitive
-		[propget, id(4), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pRetVal);
+		[propget, id(4), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL* pRetVal);
 		[propput, id(4), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
 
 		// Indicates that if regular expression is got from file
-		[propget, id(5), helpstring("property IsRegFromFile")] HRESULT IsRegFromFile([out, retval] VARIANT_BOOL *pRetVal);
+		[propget, id(5), helpstring("property IsRegFromFile")] HRESULT IsRegFromFile([out, retval] VARIANT_BOOL* pRetVal);
 		[propput, id(5), helpstring("property IsRegFromFile")] HRESULT IsRegFromFile([in] VARIANT_BOOL newVal);
 
 		// String may include TextFunctionExpansion substrings to be processed to finally provide 
@@ -168,8 +168,10 @@ library EXTRACT_FAMCONDITIONSLib
 	{
 		// Generic FileMatchesFAMCondition which will called by multi FAM condition
 		// with different logical operators
-		[id(1), helpstring("method FileMatchesFAMCondition")] HRESULT FileMatchesFAMCondition([in] IIUnknownVector *pFAMConditions, [in] ELogicalOperator eLogicalOperator, 
-			[in] BSTR bstrFile, [in] IFileProcessingDB *pFPDB, [in] BSTR bstrAction, [in] IFAMTagManager* pFAMTM, [out, retval] VARIANT_BOOL* pRetVal);
+		[id(1), helpstring("method FileMatchesFAMCondition")] HRESULT FileMatchesFAMCondition(
+			[in] IIUnknownVector* pFAMConditions, [in] ELogicalOperator eLogicalOperator, 
+			[in] BSTR bstrFile, [in] IFileProcessingDB* pFPDB, [in] long lFileID, 
+			[in] long lActionID, [in] IFAMTagManager* pFAMTM, [out, retval] VARIANT_BOOL* pRetVal);
 	};
 
 	[
@@ -183,11 +185,11 @@ library EXTRACT_FAMCONDITIONSLib
 	interface ITaskCondition : IDispatch
 	{
 		// The IFileProcessingTask that should be run to evaluate whether the condition succeeds
-		[propget, id(1), helpstring("property Task")] HRESULT Task([out, retval] IFileProcessingTask **ppVal);
-		[propput, id(1), helpstring("property Task")] HRESULT Task([in] IFileProcessingTask *pNewVal);
+		[propget, id(1), helpstring("property Task")] HRESULT Task([out, retval] IFileProcessingTask** ppVal);
+		[propput, id(1), helpstring("property Task")] HRESULT Task([in] IFileProcessingTask* pNewVal);
 
 		// VARIANT_TRUE if exceptions thrown by the task should be logged.
-		[propget, id(2), helpstring("property LogExceptions")] HRESULT LogExceptions([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(2), helpstring("property LogExceptions")] HRESULT LogExceptions([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(2), helpstring("property LogExceptions")] HRESULT LogExceptions([in] VARIANT_BOOL newVal);
 	};
 

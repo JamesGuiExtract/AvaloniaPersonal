@@ -72,9 +72,9 @@ STDMETHODIMP CGenericMultiFAMCondition::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IGenericMultiFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector *pFAMConditions, ELogicalOperator eLogicalOperator, 
-															BSTR bstrFile, IFileProcessingDB *pFPDB, BSTR bstrAction, 
-															IFAMTagManager *pFAMTM, VARIANT_BOOL* pRetVal)
+STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector* pFAMConditions, 
+	ELogicalOperator eLogicalOperator, BSTR bstrFile, IFileProcessingDB* pFPDB, long lFileID, 
+	long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -139,7 +139,8 @@ STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector 
 				ASSERT_RESOURCE_ALLOCATION("ELI13825", ipFAMConditionHandler != NULL);
 
 				// check if file matches FAM condition
-				VARIANT_BOOL bVal = ipFAMConditionHandler->FileMatchesFAMCondition(bstrFile, pFPDB, bstrAction, pFAMTM);
+				VARIANT_BOOL bVal = ipFAMConditionHandler->FileMatchesFAMCondition(
+					bstrFile, pFPDB, lFileID, lActionID, pFAMTM);
 
 				// Consider different Logical operator as:
 				// "AND"  "OR/ATLEAST ONE"  "EXACTLY ONE"  "NONE"

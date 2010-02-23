@@ -56,35 +56,35 @@ public:
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // IFAMCondition
-	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB *pFPDB, BSTR bstrAction, 
-		IFAMTagManager *pFAMTM, VARIANT_BOOL* pRetVal);
+	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB* pFPDB, long lFileID, 
+		long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
 
 // ILicensedComponent
-	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
+	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
 
 // ICategorizedComponent
-	STDMETHOD(raw_GetComponentDescription)(BSTR * pstrComponentDescription);
+	STDMETHOD(raw_GetComponentDescription)(BSTR* pstrComponentDescription);
 
 // ICopyableObject
-	STDMETHOD(raw_CopyFrom)(IUnknown * pObject);
-	STDMETHOD(raw_Clone)(IUnknown * * pObject);
+	STDMETHOD(raw_CopyFrom)(IUnknown* pObject);
+	STDMETHOD(raw_Clone)(IUnknown** pObject);
 
 // IMustBeConfiguredObject
-	STDMETHOD(raw_IsConfigured)(VARIANT_BOOL * pbValue);
+	STDMETHOD(raw_IsConfigured)(VARIANT_BOOL* pbValue);
 
 // IPersistStream
-	STDMETHOD(GetClassID)(CLSID *pClassID);
+	STDMETHOD(GetClassID)(CLSID* pClassID);
 	STDMETHOD(IsDirty)(void);
-	STDMETHOD(Load)(IStream *pStm);
-	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
-	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+	STDMETHOD(Load)(IStream* pStm);
+	STDMETHOD(Save)(IStream* pStm, BOOL fClearDirty);
+	STDMETHOD(GetSizeMax)(ULARGE_INTEGER* pcbSize);
 
 // IMultipleObjectHolder
-	STDMETHOD(raw_GetObjectCategoryName)(/*[out, retval]*/BSTR *pstrCategoryName);
-	STDMETHOD(get_ObjectsVector)(/*[out, retval]*/IIUnknownVector* *pVal);
-	STDMETHOD(put_ObjectsVector)(/*[in]*/IIUnknownVector *newVal);
-	STDMETHOD(raw_GetObjectType)(/*[out, retval]*/BSTR *pstrObjectType);
-	STDMETHOD(raw_GetRequiredIID)(/*[out, retval]*/ IID *riid);
+	STDMETHOD(raw_GetObjectCategoryName)(BSTR* pstrCategoryName);
+	STDMETHOD(get_ObjectsVector)(IIUnknownVector** pVal);
+	STDMETHOD(put_ObjectsVector)(IIUnknownVector* newVal);
+	STDMETHOD(raw_GetObjectType)(BSTR* pstrObjectType);
+	STDMETHOD(raw_GetRequiredIID)(IID *riid);
 
 private:
 	/////////////

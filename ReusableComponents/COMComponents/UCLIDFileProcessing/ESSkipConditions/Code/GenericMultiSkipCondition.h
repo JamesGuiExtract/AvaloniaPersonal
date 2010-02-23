@@ -43,11 +43,12 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // ILicensedComponent
-	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
+	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
 
 // IGenericMultiFAMCondition
-	STDMETHOD(FileMatchesFAMCondition)(IIUnknownVector *pFAMConditions, ELogicalOperator eLogicalOperator, 
-		BSTR bstrFile, IFileProcessingDB *pFPDB, BSTR bstrAction, IFAMTagManager *pFAMTM, VARIANT_BOOL* pRetVal);
+	STDMETHOD(FileMatchesFAMCondition)(IIUnknownVector* pFAMConditions, ELogicalOperator eLogicalOperator, 
+		BSTR bstrFile, IFileProcessingDB* pFPDB, long lFileID, long lActionID, 
+		IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
 
 private:
 	/////////////

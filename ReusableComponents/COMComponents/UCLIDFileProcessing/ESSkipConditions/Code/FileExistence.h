@@ -68,32 +68,32 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 // IFileExistenceFAMCondition
 	STDMETHOD(get_FileExists)(VARIANT_BOOL* pRetVal);
 	STDMETHOD(put_FileExists)(VARIANT_BOOL newVal);
-	STDMETHOD(get_FileString)(BSTR *strFileString);
+	STDMETHOD(get_FileString)(BSTR* strFileString);
 	STDMETHOD(put_FileString)(BSTR strFileString);
 
 // ILicensedComponent
-	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
+	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
 
 // ICategorizedComponent
-	STDMETHOD(raw_GetComponentDescription)(BSTR * pstrComponentDescription);
+	STDMETHOD(raw_GetComponentDescription)(BSTR* pstrComponentDescription);
 
 // ICopyableObject
-	STDMETHOD(raw_Clone)(IUnknown * * pObject);
-	STDMETHOD(raw_CopyFrom)(IUnknown * pObject);
+	STDMETHOD(raw_Clone)(IUnknown** pObject);
+	STDMETHOD(raw_CopyFrom)(IUnknown* pObject);
 
 // IMustBeConfiguredObject
-	STDMETHOD(raw_IsConfigured)(VARIANT_BOOL * pbValue);
+	STDMETHOD(raw_IsConfigured)(VARIANT_BOOL* pbValue);
 
 // IFAMCondition
-	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB *pFPDB, BSTR bstrAction, 
-		IFAMTagManager *pFAMTM, VARIANT_BOOL* pRetVal);
+	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB* pFPDB, long lFileID, 
+		long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
 
 // IPersistStream
-	STDMETHOD(GetClassID)(CLSID *pClassID);
+	STDMETHOD(GetClassID)(CLSID* pClassID);
 	STDMETHOD(IsDirty)(void);
-	STDMETHOD(Load)(IStream *pStm);
-	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
-	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+	STDMETHOD(Load)(IStream* pStm);
+	STDMETHOD(Save)(IStream* pStm, BOOL fClearDirty);
+	STDMETHOD(GetSizeMax)(ULARGE_INTEGER* pcbSize);
 
 private:
 	//////////////

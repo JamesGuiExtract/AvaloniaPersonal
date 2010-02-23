@@ -59,8 +59,9 @@ STDMETHODIMP CMultiFAMConditionOR::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CMultiFAMConditionOR::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB *pFPDB, BSTR bstrAction, 
-													   IFAMTagManager *pFAMTM, VARIANT_BOOL* pRetVal)
+STDMETHODIMP CMultiFAMConditionOR::raw_FileMatchesFAMCondition(BSTR bstrFile, 
+	IFileProcessingDB* pFPDB, long lFileID, long lActionID, IFAMTagManager* pFAMTM, 
+	VARIANT_BOOL* pRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -75,7 +76,7 @@ STDMETHODIMP CMultiFAMConditionOR::raw_FileMatchesFAMCondition(BSTR bstrFile, IF
 
 		// call FileMatchesFAMCondition inside GenericMultiFAMCondition class
 		*pRetVal = m_ipGenericMultiFAMCondition->FileMatchesFAMCondition(m_ipMultiFAMConditions, 
-			EXTRACT_FAMCONDITIONSLib::kOROperator, bstrFile, pFPDB, bstrAction, pFAMTM);
+			EXTRACT_FAMCONDITIONSLib::kOROperator, bstrFile, pFPDB, lFileID, lActionID, pFAMTM);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13866")
 

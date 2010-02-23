@@ -164,8 +164,8 @@ STDMETHODIMP CTagCondition::put_Tags(IVariantVector *pVecTags)
 //-------------------------------------------------------------------------------------------------
 // IFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CTagCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB *pFPDB, 
-									BSTR bstrAction, IFAMTagManager *pFAMTM, VARIANT_BOOL* pRetVal)
+STDMETHODIMP CTagCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB* pFPDB, 
+	long lFileID, long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -187,12 +187,8 @@ STDMETHODIMP CTagCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProc
 			throw ue;
 		}
 
-		// Get the file ID
-		long nFileID = ipFPDB->GetFileID(bstrFile);
-
-		IVariantVectorPtr ipTagsOnFile = ipFPDB->GetTagsOnFile(nFileID);
+		IVariantVectorPtr ipTagsOnFile = ipFPDB->GetTagsOnFile(lFileID);
 		ASSERT_RESOURCE_ALLOCATION("ELI27534", ipTagsOnFile != NULL);
-
 
 		// Iterate through all of the tags
 		long lSize = m_ipVecTags->Size;
