@@ -142,8 +142,9 @@ library UCLID_FILEPROCESSINGLib
 	interface IMathConditionChecker : IDispatch
 	{
 		// Returns VARIANT_TRUE if the condition is met and VARIANT_FALSE if it is not met
-		[id(10001), helpstring("method CheckCondition")] HRESULT CheckCondition([in] BSTR bstrFileName,
-			[in] IFileProcessingDB* pFPDB, [out, retval] VARIANT_BOOL* pbResult);
+		[id(10001), helpstring("method CheckCondition")] HRESULT CheckCondition(
+			[in] BSTR bstrFileName,	[in] long lFileID, [in] long lActionID, 
+			[out, retval] VARIANT_BOOL* pbResult);
 	};
 
 	[
@@ -228,7 +229,7 @@ library UCLID_FILEPROCESSINGLib
 		//				not per file.
 		//				See note about IFileProcessingTask multithreading above
 		[id(11), helpstring("method Init")] HRESULT Init([in] long nActionID,
-			[in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB *pDB);
+			[in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB* pDB);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE:		To process the file strFileFullName and output a vector of files either generated
 		//				or the file being processed. 
@@ -272,9 +273,9 @@ library UCLID_FILEPROCESSINGLib
 		//					committed or rolled back.
 		// NOTE:		See note about IFileProcessingTask multithreading above
 		[id(12), helpstring("method ProcessFile")] HRESULT ProcessFile([in] BSTR bstrFileFullName, 
-			[in] long nFileID, [in] long nActionID, [in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB *pDB, 
-			[in] IProgressStatus *pProgressStatus, [in] VARIANT_BOOL bCancelRequested, 
-			[out, retval] EFileProcessingResult *pResult);
+			[in] long nFileID, [in] long nActionID, [in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB* pDB, 
+			[in] IProgressStatus* pProgressStatus, [in] VARIANT_BOOL bCancelRequested, 
+			[out, retval] EFileProcessingResult* pResult);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To allow the FileProcessingManager to request that this processor stop processing its current file
 		//			if it is able
@@ -306,11 +307,11 @@ library UCLID_FILEPROCESSINGLib
 		[id(11), helpstring("method StopProcessing")] HRESULT StopProcessing();
 		[id(17), helpstring("method LoadFrom")] HRESULT LoadFrom([in] BSTR strFullFileName, [in] VARIANT_BOOL bSetDirtyFlagToTrue);
 		[id(18), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName, [in] VARIANT_BOOL bClearDirty);
-		[propget, id(19), helpstring("property FPSFileName")] HRESULT FPSFileName([out, retval] BSTR *pVal);
+		[propget, id(19), helpstring("property FPSFileName")] HRESULT FPSFileName([out, retval] BSTR* pVal);
 		[propput, id(19), helpstring("property FPSFileName")] HRESULT FPSFileName([in] BSTR newVal);
-		[propget, id(24), helpstring("property MaxStoredRecords")] HRESULT MaxStoredRecords([out, retval] long *pVal);
+		[propget, id(24), helpstring("property MaxStoredRecords")] HRESULT MaxStoredRecords([out, retval] long* pVal);
 		[propput, id(24), helpstring("property MaxStoredRecords")] HRESULT MaxStoredRecords([in] long newVal);
-		[propget, id(25), helpstring("property RestrictNumStoredRecords")] HRESULT RestrictNumStoredRecords([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(25), helpstring("property RestrictNumStoredRecords")] HRESULT RestrictNumStoredRecords([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(25), helpstring("property RestrictNumStoredRecords")] HRESULT RestrictNumStoredRecords([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE:	To pause the threads that are currently processing files
@@ -326,24 +327,24 @@ library UCLID_FILEPROCESSINGLib
 		//			call to StartProcessing().
 		// NOTES:	The return value of this method has no relevance to whether processing
 		//			is currently paused.
-		[propget, id(28), helpstring("property ProcessingStarted")] HRESULT ProcessingStarted([out, retval] VARIANT_BOOL *pbValue);
+		[propget, id(28), helpstring("property ProcessingStarted")] HRESULT ProcessingStarted([out, retval] VARIANT_BOOL* pbValue);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE:	To return boolean flags indicating whether processing is currently paused
 		// REQUIRE: ProcessingHasStarted() must return VARIANT_TRUE before this function can
 		//			be called.
 		// PROMISE:	To return VARIANT_TRUE if processing is in a paused state
-		[propget, id(29), helpstring("property ProcessingPaused")] HRESULT ProcessingPaused([out, retval] VARIANT_BOOL *pbValue);
+		[propget, id(29), helpstring("property ProcessingPaused")] HRESULT ProcessingPaused([out, retval] VARIANT_BOOL* pbValue);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To load the IndividualFileList from a file
 		[id(31), helpstring("method LoadFilesFromFile")] HRESULT LoadFilesFromFile([in] BSTR bstrFileName);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return the name of the Action to process (May contain tags)
-		[propget, id(34), helpstring("property ActionName")] HRESULT ActionName([out, retval] BSTR *pVal);
+		[propget, id(34), helpstring("property ActionName")] HRESULT ActionName([out, retval] BSTR* pVal);
 		[propput, id(34), helpstring("property ActionName")] HRESULT ActionName([in] BSTR newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set/return the status of the Display check box in action tab,
 		//			indicating whether the statistics tab is displayed or not
-		[propget, id(38), helpstring("property DisplayOfStatisticsEnabled")] HRESULT DisplayOfStatisticsEnabled([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(38), helpstring("property DisplayOfStatisticsEnabled")] HRESULT DisplayOfStatisticsEnabled([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(38), helpstring("property DisplayOfStatisticsEnabled")] HRESULT DisplayOfStatisticsEnabled([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To restore the FileProcessingManager to its default state, where there is no
@@ -355,27 +356,27 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To return com exception if it can not be saved or run
 		[id(40), helpstring("method ValidateStatus")] HRESULT ValidateStatus(void);
 		//-----------------------------------------------------------------------------------------
-		[propget, id(41), helpstring("property FileSupplyingMgmtRole")] HRESULT FileSupplyingMgmtRole([out, retval] IFileSupplyingMgmtRole* *pVal);
+		[propget, id(41), helpstring("property FileSupplyingMgmtRole")] HRESULT FileSupplyingMgmtRole([out, retval] IFileSupplyingMgmtRole** pVal);
 		//-----------------------------------------------------------------------------------------
-		[propget, id(42), helpstring("property FileProcessingMgmtRole")] HRESULT FileProcessingMgmtRole([out, retval] IFileProcessingMgmtRole* *pVal);
+		[propget, id(42), helpstring("property FileProcessingMgmtRole")] HRESULT FileProcessingMgmtRole([out, retval] IFileProcessingMgmtRole** pVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return the Action ID associated with the specified Action Name.
 		// REQUIRE: Registry must contain a valid connection string 
 		// PROMISE: To return the associated Action ID or 0 if not found
 		[id(43), helpstring("method GetActionIDFromName")] HRESULT GetActionIDFromName([in] BSTR bstrActionName, 
-			[out, retval] long *pVal);
+			[out, retval] long* pVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set and get the name of the Database configuration file in the FAMDB object
 		//[propput, id(44), helpstring("property DBConfigFileName")] HRESULT DBConfigFileName([in] BSTR newVal);		
-		//[propget, id(44), helpstring("property DBConfigFileName")] HRESULT DBConfigFileName([out, retval] BSTR *pVal);		
+		//[propget, id(44), helpstring("property DBConfigFileName")] HRESULT DBConfigFileName([out, retval] BSTR* pVal);		
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set and get the database server name
 		[propput, id(45), helpstring("property DatabaseServer")] HRESULT DatabaseServer([in] BSTR newVal);		
-		[propget, id(45), helpstring("property DatabaseServer")] HRESULT DatabaseServer([out, retval] BSTR *pVal);		
+		[propget, id(45), helpstring("property DatabaseServer")] HRESULT DatabaseServer([out, retval] BSTR* pVal);		
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set and get the database name
 		[propput, id(46), helpstring("property DatabaseName")] HRESULT DatabaseName([in] BSTR newVal);		
-		[propget, id(46), helpstring("property DatabaseName")] HRESULT DatabaseName([out, retval] BSTR *pVal);		
+		[propget, id(46), helpstring("property DatabaseName")] HRESULT DatabaseName([out, retval] BSTR* pVal);		
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To get the number of files that processed, failed, where queued and failed to
 		//			queue since StartProcessing was called.
@@ -388,7 +389,7 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Gets the name of the Action to process with tags expanded
 		[id(49), helpstring("method GetExpandedActionName")] HRESULT GetExpandedActionName(
-			[out, retval] BSTR *pbstrAction);
+			[out, retval] BSTR* pbstrAction);
 		//-----------------------------------------------------------------------------------------
 		// Sets the number of documents to process
 		[propput, id(50), helpstring("property NumberOfDocsToProcess")] HRESULT
@@ -430,7 +431,7 @@ library UCLID_FILEPROCESSINGLib
 	]
 	interface IFileSupplier : IDispatch
 	{
-		[id(1), helpstring("method Start")] HRESULT Start([in] IFileSupplierTarget *pTarget, [in] IFAMTagManager *pFAMTM);
+		[id(1), helpstring("method Start")] HRESULT Start([in] IFileSupplierTarget* pTarget, [in] IFAMTagManager* pFAMTM);
 		[id(2), helpstring("method Stop")] HRESULT Stop();
 		[id(3), helpstring("method Pause")] HRESULT Pause();
 		[id(4), helpstring("method Resume")] HRESULT Resume();
@@ -445,16 +446,16 @@ library UCLID_FILEPROCESSINGLib
 	]
 	interface IFileSupplierTarget : IDispatch
 	{
-		[id(1), helpstring("method NotifyFileAdded")] HRESULT NotifyFileAdded([in] BSTR bstrFile, [in] IFileSupplier *pSupplier);
-		[id(2), helpstring("method NotifyFileRemoved")] HRESULT NotifyFileRemoved([in] BSTR bstrFile, [in] IFileSupplier *pSupplier);
+		[id(1), helpstring("method NotifyFileAdded")] HRESULT NotifyFileAdded([in] BSTR bstrFile, [in] IFileSupplier* pSupplier);
+		[id(2), helpstring("method NotifyFileRemoved")] HRESULT NotifyFileRemoved([in] BSTR bstrFile, [in] IFileSupplier* pSupplier);
 		[id(3), helpstring("method NotifyFileRenamed")] HRESULT NotifyFileRenamed([in] BSTR bstrOldFile, [in] BSTR bstrNewFile, 
-			[in] IFileSupplier *pSupplier);
-		[id(4), helpstring("method NotifyFolderDeleted")] HRESULT NotifyFolderDeleted([in] BSTR bstrFolder, [in] IFileSupplier *pSupplier);
+			[in] IFileSupplier* pSupplier);
+		[id(4), helpstring("method NotifyFolderDeleted")] HRESULT NotifyFolderDeleted([in] BSTR bstrFolder, [in] IFileSupplier* pSupplier);
 		[id(5), helpstring("method NotifyFolderRenamed")] HRESULT NotifyFolderRenamed([in] BSTR bstrOldFolder, [in] BSTR bstrNewFolder, 
-			[in] IFileSupplier *pSupplier);
-		[id(6), helpstring("method NotifyFileModified")] HRESULT NotifyFileModified([in] BSTR bstrFile, [in] IFileSupplier *pSupplier);
-		[id(7), helpstring("method NotifyFileSupplyingDone")] HRESULT NotifyFileSupplyingDone( [in] IFileSupplier *pSupplier);
-		[id(8), helpstring("method NotifyFileSupplyingFailed")] HRESULT NotifyFileSupplyingFailed( [in] IFileSupplier *pSupplier, [in] BSTR strError);
+			[in] IFileSupplier* pSupplier);
+		[id(6), helpstring("method NotifyFileModified")] HRESULT NotifyFileModified([in] BSTR bstrFile, [in] IFileSupplier* pSupplier);
+		[id(7), helpstring("method NotifyFileSupplyingDone")] HRESULT NotifyFileSupplyingDone([in] IFileSupplier* pSupplier);
+		[id(8), helpstring("method NotifyFileSupplyingFailed")] HRESULT NotifyFileSupplyingFailed([in] IFileSupplier* pSupplier, [in] BSTR strError);
 	};
 
 	[
@@ -466,8 +467,10 @@ library UCLID_FILEPROCESSINGLib
 	]
 	interface IFAMCondition : IDispatch
 	{
-		[id(1), helpstring("method FileMatchesFAMCondition")] HRESULT FileMatchesFAMCondition([in] BSTR bstrFile, [in] IFileProcessingDB *pFPDB, 
-			[in] BSTR bstrAction, [in] IFAMTagManager *pFAMTagManager, [out, retval] VARIANT_BOOL* pRetVal);
+		[id(1), helpstring("method FileMatchesFAMCondition")] HRESULT FileMatchesFAMCondition(
+			[in] BSTR bstrFile, [in] IFileProcessingDB* pFPDB, [in] long lFileID, 
+			[in] long lActionID, [in] IFAMTagManager* pFAMTagManager, 
+			[out, retval] VARIANT_BOOL* pRetVal);
 	};
 
 	[
@@ -479,29 +482,29 @@ library UCLID_FILEPROCESSINGLib
 		pointer_default(unique)
 	]
 	interface IActionStatistics : IDispatch{
-		[propget, id(1), helpstring("property NumDocuments")] HRESULT NumDocuments([out, retval] long *pVal);
+		[propget, id(1), helpstring("property NumDocuments")] HRESULT NumDocuments([out, retval] long* pVal);
 		[propput, id(1), helpstring("property NumDocuments")] HRESULT NumDocuments([in] long newVal);
-		[propget, id(2), helpstring("property NumDocumentsComplete")] HRESULT NumDocumentsComplete([out, retval] long *pVal);
+		[propget, id(2), helpstring("property NumDocumentsComplete")] HRESULT NumDocumentsComplete([out, retval] long* pVal);
 		[propput, id(2), helpstring("property NumDocumentsComplete")] HRESULT NumDocumentsComplete([in] long newVal);
-		[propget, id(3), helpstring("property NumDocumentsFailed")] HRESULT NumDocumentsFailed([out, retval] long *pVal);
+		[propget, id(3), helpstring("property NumDocumentsFailed")] HRESULT NumDocumentsFailed([out, retval] long* pVal);
 		[propput, id(3), helpstring("property NumDocumentsFailed")] HRESULT NumDocumentsFailed([in] long newVal);
-		[propget, id(4), helpstring("property NumPages")] HRESULT NumPages([out, retval] long *pVal);
+		[propget, id(4), helpstring("property NumPages")] HRESULT NumPages([out, retval] long* pVal);
 		[propput, id(4), helpstring("property NumPages")] HRESULT NumPages([in] long newVal);
-		[propget, id(5), helpstring("property NumPagesComplete")] HRESULT NumPagesComplete([out, retval] long *pVal);
+		[propget, id(5), helpstring("property NumPagesComplete")] HRESULT NumPagesComplete([out, retval] long* pVal);
 		[propput, id(5), helpstring("property NumPagesComplete")] HRESULT NumPagesComplete([in] long newVal);
-		[propget, id(6), helpstring("property NumPagesFailed")] HRESULT NumPagesFailed([out, retval] long *pVal);
+		[propget, id(6), helpstring("property NumPagesFailed")] HRESULT NumPagesFailed([out, retval] long* pVal);
 		[propput, id(6), helpstring("property NumPagesFailed")] HRESULT NumPagesFailed([in] long newVal);
-		[propget, id(7), helpstring("property NumBytes")] HRESULT NumBytes([out, retval] LONGLONG *pVal);
+		[propget, id(7), helpstring("property NumBytes")] HRESULT NumBytes([out, retval] LONGLONG* pVal);
 		[propput, id(7), helpstring("property NumBytes")] HRESULT NumBytes([in] LONGLONG newVal);
-		[propget, id(8), helpstring("property NumBytesComplete")] HRESULT NumBytesComplete([out, retval] LONGLONG *pVal);
+		[propget, id(8), helpstring("property NumBytesComplete")] HRESULT NumBytesComplete([out, retval] LONGLONG* pVal);
 		[propput, id(8), helpstring("property NumBytesComplete")] HRESULT NumBytesComplete([in] LONGLONG newVal);
-		[propget, id(9), helpstring("property NumBytesFailed")] HRESULT NumBytesFailed([out, retval] LONGLONG *pVal);
+		[propget, id(9), helpstring("property NumBytesFailed")] HRESULT NumBytesFailed([out, retval] LONGLONG* pVal);
 		[propput, id(9), helpstring("property NumBytesFailed")] HRESULT NumBytesFailed([in] LONGLONG newVal);
-		[propget, id(10), helpstring("property NumDocumentsSkipped")] HRESULT NumDocumentsSkipped([out, retval] long *pVal);
+		[propget, id(10), helpstring("property NumDocumentsSkipped")] HRESULT NumDocumentsSkipped([out, retval] long* pVal);
 		[propput, id(10), helpstring("property NumDocumentsSkipped")] HRESULT NumDocumentsSkipped([in] long newVal);
-		[propget, id(11), helpstring("property NumPagesSkipped")] HRESULT NumPagesSkipped([out, retval] long *pVal);
+		[propget, id(11), helpstring("property NumPagesSkipped")] HRESULT NumPagesSkipped([out, retval] long* pVal);
 		[propput, id(11), helpstring("property NumPagesSkipped")] HRESULT NumPagesSkipped([in] long newVal);
-		[propget, id(12), helpstring("property NumBytesSkipped")] HRESULT NumBytesSkipped([out, retval] LONGLONG *pVal);
+		[propget, id(12), helpstring("property NumBytesSkipped")] HRESULT NumBytesSkipped([out, retval] LONGLONG* pVal);
 		[propput, id(12), helpstring("property NumBytesSkipped")] HRESULT NumBytesSkipped([in] LONGLONG newVal);
 		[id(13), helpstring("method GetAllStatistics")] HRESULT GetAllStatistics([out] long* plNumDocuments,
 			[out] long* plNumDocsCompleted, [out] long* plNumDocsFailed, [out] long* plNumDocsSkipped,
@@ -586,7 +589,7 @@ library UCLID_FILEPROCESSINGLib
 		//			the FPMFile table should be done within a transaction so that both operations pass or
 		//			fail.
 		[id(1), helpstring("method DefineNewAction")] HRESULT DefineNewAction([in] BSTR strAction,
-			[out, retval] long *pnID);
+			[out, retval] long* pnID);
 		// -----------------------------------------------------------------------------------------------
 		// REQUIRE:	strAction must be a current existing action.
 		// PROMISE:	To delete the record associated with strAction from the Action table, and to delete
@@ -598,7 +601,7 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE:	To return a StringToLong map of all actions and their corresponding IDs in the 
 		//			database.
 		[id(3), helpstring("method GetActions")] HRESULT GetActions(
-			[out,retval] IStrToStrMap * *pmapActionNameToID);
+			[out,retval] IStrToStrMap ** pmapActionNameToID);
 
 		// -----------------------------------------------------------------------------------------------
 		// Methods related to adding/removing files
@@ -615,8 +618,8 @@ library UCLID_FILEPROCESSINGLib
 		// 
 		[id(4), helpstring("method AddFile")] HRESULT AddFile([in] BSTR strFile, [in] BSTR strAction, 
 			[in] EFilePriority ePriority, [in] VARIANT_BOOL bForceStatusChange, [in] VARIANT_BOOL bFileModified, 
-			[in] EActionStatus eNewStatus, [out] VARIANT_BOOL* pbAlreadyExists, [out] EActionStatus *pPrevStatus, 
-			[out, retval] IFileRecord* *ppFileRecord);
+			[in] EActionStatus eNewStatus, [out] VARIANT_BOOL* pbAlreadyExists, [out] EActionStatus* pPrevStatus, 
+			[out, retval] IFileRecord** ppFileRecord);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE:	Remove the file by setting the given actions's status to "U" if the current state is "P"
 		//			Also a record will always be added to the QueueEvent table
@@ -640,14 +643,14 @@ library UCLID_FILEPROCESSINGLib
 		[id(9), helpstring("method SetFileStatusToUnattempted")] HRESULT SetFileStatusToUnattempted([in] long nFileID, 
 			[in] BSTR strAction);
 		[id(10), helpstring("method GetFileStatus")] HRESULT GetFileStatus([in] long nFileID, [in] BSTR strAction,
-			[in] VARIANT_BOOL vbAttemptRevertIfLocked, [out, retval] EActionStatus *pStatus);
+			[in] VARIANT_BOOL vbAttemptRevertIfLocked, [out, retval] EActionStatus* pStatus);
 
 		// PROMISE: To find all of the records that have the status of eFromStatus in the nFromActionID action and change
 		//			the status of the nToActionID action to eToStatus and update the FileActionStateTransistion table.
 		[id(11), helpstring("method SearchAndModifyFileStatus")] HRESULT SearchAndModifyFileStatus(
 			[in] long nWhereActionID, [in] EActionStatus eWhereStatus, [in] long  nToActionID, 
 			[in] EActionStatus eToStatus, [in] BSTR bstrSkippedFromUserName, [in] long nFromActionID,
-			[out, retval] long *pnNumRecordsModified);
+			[out, retval] long* pnNumRecordsModified);
 
 		[id(12), helpstring("method SetStatusForAllFiles")] HRESULT SetStatusForAllFiles([in] BSTR strAction, 
 			[in] EActionStatus eStatus);
@@ -659,7 +662,7 @@ library UCLID_FILEPROCESSINGLib
 		// NOTE:	If pOldStatus != NULL, then two database operations will need to performed (as opposed to
 		//			just one) in order to return the previous status
 		[id(13), helpstring("method SetStatusForFile")] HRESULT SetStatusForFile([in] long nID, [in] BSTR strAction, 
-			[in] EActionStatus eStatus, [out] EActionStatus *poldStatus);
+			[in] EActionStatus eStatus, [out] EActionStatus* poldStatus);
 
 
 		// -----------------------------------------------------------------------------------------------
@@ -678,11 +681,11 @@ library UCLID_FILEPROCESSINGLib
 		[id(14), helpstring("method GetFilesToProcess")] HRESULT GetFilesToProcess([in] BSTR strAction, 
 			[in] long nMaxFiles, [in] VARIANT_BOOL bGetSkippedFiles,
 			[in] BSTR bstrSkippedForUserName,
-			[out, retval] IIUnknownVector* *pvecFileRecords);
+			[out, retval] IIUnknownVector** pvecFileRecords);
 
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: To return a IActionStistics pointer that contains the current stats for the given action
-		[id(19), helpstring("method GetStats")] HRESULT GetStats([in] long nActionID, [out, retval] IActionStatistics* *pStats);
+		[id(19), helpstring("method GetStats")] HRESULT GetStats([in] long nActionID, [out, retval] IActionStatistics** pStats);
 
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: To Clear the database
@@ -690,10 +693,10 @@ library UCLID_FILEPROCESSINGLib
 		[id(20), helpstring("method Clear")] HRESULT Clear([in] VARIANT_BOOL vbRetainUserValues);
 
 		// PROMISE: To copy the status of the files for the fromAction to the toAction
-		[id(21), helpstring("method CopyActionStatusFromAction")] HRESULT CopyActionStatusFromAction([in] long nFromAction, [in] long nToAction );
+		[id(21), helpstring("method CopyActionStatusFromAction")] HRESULT CopyActionStatusFromAction([in] long nFromAction, [in] long nToAction);
 
 		// PROMISE: To Rename an action
-		[id(22), helpstring("method RenameAction")] HRESULT RenameAction([in] long nActionID, [in] BSTR strNewActionName );
+		[id(22), helpstring("method RenameAction")] HRESULT RenameAction([in] long nActionID, [in] BSTR strNewActionName);
 
 		// PROMISE: To output all of the FileName values found by the query strQuery to a file named strOutputFileName
 		//			and return the number of records that were exported
@@ -701,13 +704,13 @@ library UCLID_FILEPROCESSINGLib
 		//			if pRandomComdition != NULL then before each file is exported the condition
 		//			will be checked and the file will only be exported if the condition returns true.
 		[id(23), helpstring("method ExportFileList")] HRESULT ExportFileList([in] BSTR strQuery, [in] BSTR strOutputFileName,
-			[in] IRandomMathCondition* pRandomCondition, [out,retval] long *pnNumRecordsOutput);
+			[in] IRandomMathCondition* pRandomCondition, [out,retval] long* pnNumRecordsOutput);
 
 		// PROMISE: To clear any existing DB lock - clears all records in the LockTable
 		[id(24), helpstring("method ResetDBLock")] HRESULT ResetDBLock(void);
 
 		// PROMISE: To return the ActionID for the given action name, if the action name does not exist an exception will be thrown
-		[id(25), helpstring("method GetActionID")] HRESULT GetActionID([in] BSTR bstrActionName, [out, retval]long* pnActionID );
+		[id(25), helpstring("method GetActionID")] HRESULT GetActionID([in] BSTR bstrActionName, [out, retval]long* pnActionID);
 
 		// PROMISE: To close any existing open connection and reopen with the current settings  
 		//			DatebaseServer and DatabaseName 
@@ -760,7 +763,7 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrSettingName, [in] BSTR bstrSettingValue, [in] VARIANT_BOOL vbSetIfExists);
 
 		// PROMISE: To return the value for the setting name from the DBInfo table
-		[id(38), helpstring("method GetDBInfoSetting")] HRESULT GetDBInfoSetting([in] BSTR bstrSettingName, [out, retval] BSTR* pbstrSettingValue );
+		[id(38), helpstring("method GetDBInfoSetting")] HRESULT GetDBInfoSetting([in] BSTR bstrSettingName, [out, retval] BSTR* pbstrSettingValue);
 
 		// PROMISE: To lock the database 
 		// NOTE:	This method locks the mutex, adds lock record to the database and sends 
@@ -788,7 +791,7 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To get the file ID for a specified file name from the database.
 		// if the action name does not exist an exception will be thrown.
 		[id(44), helpstring("method GetFileIDFromName")] HRESULT GetFileID(
-			[in] BSTR bstrFileName, [out, retval] long *pVal);
+			[in] BSTR bstrFileName, [out, retval] long* pVal);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To get the name of the action from its ID
 		[id(45), helpstring("method GetActionName")] HRESULT GetActionName(
@@ -833,7 +836,7 @@ library UCLID_FILEPROCESSINGLib
 		[id(51), helpstring("method ModifyActionStatusForQuery")] HRESULT ModifyActionStatusForQuery(
 			[in] BSTR bstrQueryFrom, [in] BSTR bstrToAction, [in] EActionStatus eaNewStatus,
 			[in] BSTR bstrFromAction, [in] IRandomMathCondition* pRandomCondition,
-			[out,retval] long *pnNumRecordsModified);
+			[out,retval] long* pnNumRecordsModified);
 
 		// -----------------------------------------------------------------------------------------------
 		// Methods related to file tagging
@@ -938,7 +941,7 @@ library UCLID_FILEPROCESSINGLib
 		//			if pRandomComdition != NULL then before each file is modified the condition
 		//			will be checked and the file will only be modified if the condition returns true.
 		[id(69), helpstring("method SetPriorityForFiles")] HRESULT SetPriorityForFiles([in] BSTR strSelectQuery,
-			[in] EFilePriority eNewPriority, [in] IRandomMathCondition* pRandomCondition, [out,retval] long *pnNumRecordsModified);
+			[in] EFilePriority eNewPriority, [in] IRandomMathCondition* pRandomCondition, [out,retval] long* pnNumRecordsModified);
 		
 		// -----------------------------------------------------------------------------------------------
 		// Methods related to UserCounters
@@ -1040,7 +1043,7 @@ library UCLID_FILEPROCESSINGLib
 		// exist and the AutoCreateActions setting is on, creates the action; if the action does 
 		// not exist and the AutoCreateActions setting is off, throws an exception.
 		[id(90), helpstring("method AutoCreateAction")] HRESULT AutoCreateAction(
-			[in] BSTR bstrActionName);
+			[in] BSTR bstrActionName, [out, retval] long* plId);
 
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To get whether user authentication should be skipped for the current machine
@@ -1072,10 +1075,10 @@ library UCLID_FILEPROCESSINGLib
 	{
 		// PROMISE: To create the required tables and relationships for the product that is 
 		//			implementing this interface.  
-		[id(1), helpstring("method AddProductSpecificSchema")] HRESULT AddProductSpecificSchema([in] IFileProcessingDB *pDB);
+		[id(1), helpstring("method AddProductSpecificSchema")] HRESULT AddProductSpecificSchema([in] IFileProcessingDB* pDB);
 
 		// PROMISE: To remove any relationships and tables that were added in a call to AddProductSpecificSchema
-		[id(2), helpstring("method RemoveProductSpecificSchema")] HRESULT RemoveProductSpecificSchema([in] IFileProcessingDB *pDB);
+		[id(2), helpstring("method RemoveProductSpecificSchema")] HRESULT RemoveProductSpecificSchema([in] IFileProcessingDB* pDB);
 	};
 
 	[
@@ -1094,18 +1097,18 @@ library UCLID_FILEPROCESSINGLib
 		//			- Description
 		//			- Enabled flag
 		//			to provide files to be processed by the defined tasks
-		[propget, id(1), helpstring("property FileSupplier")] HRESULT FileSupplier([out, retval] IObjectWithDescription* *pValue);
+		[propget, id(1), helpstring("property FileSupplier")] HRESULT FileSupplier([out, retval] IObjectWithDescription** pValue);
 		[propput, id(1), helpstring("property FileSupplier")] HRESULT FileSupplier([in] IObjectWithDescription* newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return boolean flag indicating that processing of the files should be 
 		//			forced
-		[propget, id(2), helpstring("property ForceProcessing")] HRESULT ForceProcessing([out, retval] VARIANT_BOOL *pbValue);
+		[propget, id(2), helpstring("property ForceProcessing")] HRESULT ForceProcessing([out, retval] VARIANT_BOOL* pbValue);
 		[propput, id(2), helpstring("property ForceProcessing")] HRESULT ForceProcessing([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return enumeration indicating the processing state of the File Supplier
 		//			{ Inactive, Active, Paused, Stopped, Done }
 		[propget, id(3), helpstring("property FileSupplierStatus")] HRESULT FileSupplierStatus(
-			[out, retval] EFileSupplierStatus *pVal);
+			[out, retval] EFileSupplierStatus* pVal);
 		[propput, id(3), helpstring("property FileSupplierStatus")] HRESULT FileSupplierStatus(
 			[in] EFileSupplierStatus newVal);
 		//-----------------------------------------------------------------------------------------
@@ -1132,8 +1135,9 @@ library UCLID_FILEPROCESSINGLib
 		//			has been specified.  If these two conditions are not met, an exception will
 		//			be raised.
 		//-----------------------------------------------------------------------------------------
-		[id(1), helpstring("method Start")] HRESULT Start([in] IFileProcessingDB *pDB, [in] BSTR bstrAction, 
-			[in] long hWndOfUI, [in] IFAMTagManager *pTagManager, IRoleNotifyFAM *pRoleNotifyFAM );
+		[id(1), helpstring("method Start")] HRESULT Start([in] IFileProcessingDB* pDB, 
+			[in] long lActionId, [in] BSTR bstrAction, [in] long hWndOfUI, 
+			[in] IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM);
 		[id(2), helpstring("method Stop")] HRESULT Stop(void);
 		[id(3), helpstring("method Pause")] HRESULT Pause(void);
 		[id(4), helpstring("method Resume")] HRESULT Resume(void);
@@ -1172,12 +1176,12 @@ library UCLID_FILEPROCESSINGLib
 		//			    + Enabled flag
 		//			  * Force Processing flag
 		//			  * File Supplier Status enumeration
-		[propget, id(1), helpstring("property FileSuppliers")] HRESULT FileSuppliers([out, retval] IIUnknownVector* *pVal);
+		[propget, id(1), helpstring("property FileSuppliers")] HRESULT FileSuppliers([out, retval] IIUnknownVector** pVal);
 		[propput, id(1), helpstring("property FileSuppliers")] HRESULT FileSuppliers([in] IIUnknownVector * newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return IFAMCondition object that determines whether SourceDocName should
 		//			be processed by the defined tasks
-		[propget, id(2), helpstring("property FAMCondition")] HRESULT FAMCondition([out, retval] IObjectWithDescription* *pVal);
+		[propget, id(2), helpstring("property FAMCondition")] HRESULT FAMCondition([out, retval] IObjectWithDescription** pVal);
 		[propput, id(2), helpstring("property FAMCondition")] HRESULT FAMCondition([in] IObjectWithDescription * newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set the state of the dirty flag.
@@ -1205,11 +1209,11 @@ library UCLID_FILEPROCESSINGLib
 
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return the collection of IFileProcessingTask items 
-		[propget, id(1), helpstring("property FileProcessors")] HRESULT FileProcessors([out, retval] IIUnknownVector* *pVal);
+		[propget, id(1), helpstring("property FileProcessors")] HRESULT FileProcessors([out, retval] IIUnknownVector** pVal);
 		[propput, id(1), helpstring("property FileProcessors")] HRESULT FileProcessors([in] IIUnknownVector* newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return the number of threads
-		[propget, id(2), helpstring("property NumThreads")] HRESULT NumThreads([out, retval] long *pVal);
+		[propget, id(2), helpstring("property NumThreads")] HRESULT NumThreads([out, retval] long* pVal);
 		[propput, id(2), helpstring("property NumThreads")] HRESULT NumThreads([in] long newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set the state of the dirty flag.
@@ -1219,34 +1223,34 @@ library UCLID_FILEPROCESSINGLib
 		//			set the state of the dirty flag.
 		[id(3), helpstring("method SetDirty")] HRESULT SetDirty(VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
-		[id(4), helpstring("method SetRecordMgr")] HRESULT SetRecordMgr(void *pRecordMgr);
+		[id(4), helpstring("method SetRecordMgr")] HRESULT SetRecordMgr(void* pRecordMgr);
 		//-----------------------------------------------------------------------------------------
-		[propget, id(5), helpstring("property OkToStopWhenQueueIsEmpty")] HRESULT OkToStopWhenQueueIsEmpty([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(5), helpstring("property OkToStopWhenQueueIsEmpty")] HRESULT OkToStopWhenQueueIsEmpty([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(5), helpstring("property OkToStopWhenQueueIsEmpty")] HRESULT OkToStopWhenQueueIsEmpty([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
 		[propget, id(6), helpstring("property KeepProcessingAsAdded")] HRESULT KeepProcessingAsAdded([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(6), helpstring("property KeepProcessingAsAdded")] HRESULT KeepProcessingAsAdded([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return True if exception information should be appended to a user-specified 
-		//			log file if one of the regular tasks ( see FileProcessingTasks ) fails.
-		[propget, id(7), helpstring("property LogErrorDetails")] HRESULT LogErrorDetails([out, retval] VARIANT_BOOL *pVal);
+		//			log file if one of the regular tasks (see FileProcessingTasks) fails.
+		[propget, id(7), helpstring("property LogErrorDetails")] HRESULT LogErrorDetails([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(7), helpstring("property LogErrorDetails")] HRESULT LogErrorDetails([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return the name of a user-specified log file to which exception information 
-		//			will be appended if one of the regular tasks ( see FileProcessingTasks ) fails.
-		//			Standard document tags ( <SourceDocName>, etc. ) are supported.
-		[propget, id(8), helpstring("property ErrorLogName")] HRESULT ErrorLogName([out, retval] BSTR *pVal);
+		//			will be appended if one of the regular tasks (see FileProcessingTasks) fails.
+		//			Standard document tags (<SourceDocName>, etc.) are supported.
+		[propget, id(8), helpstring("property ErrorLogName")] HRESULT ErrorLogName([out, retval] BSTR* pVal);
 		[propput, id(8), helpstring("property ErrorLogName")] HRESULT ErrorLogName([in] BSTR newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return True if a separate task should be executed if one of the regular tasks 
-		//			( see FileProcessingTasks ) fails.  The setting is stored in the Enabled field 
+		//			(see FileProcessingTasks) fails.  The setting is stored in the Enabled field 
 		//			associated with the ErrorTask ObjectWithDescription.
-		[propget, id(9), helpstring("property ExecuteErrorTask")] HRESULT ExecuteErrorTask([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(9), helpstring("property ExecuteErrorTask")] HRESULT ExecuteErrorTask([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(9), helpstring("property ExecuteErrorTask")] HRESULT ExecuteErrorTask([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return IFileProcessingTask object that will be executed if one of the tasks 
-		//			( see FileProcessingTasks ) fails.
-		[propget, id(10), helpstring("property ErrorTask")] HRESULT ErrorTask([out, retval] IObjectWithDescription* *pVal);
+		//			(see FileProcessingTasks) fails.
+		[propget, id(10), helpstring("property ErrorTask")] HRESULT ErrorTask([out, retval] IObjectWithDescription** pVal);
 		[propput, id(10), helpstring("property ErrorTask")] HRESULT ErrorTask([in] IObjectWithDescription * newVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set the processing management role to process files that are in skipped status
@@ -1265,19 +1269,19 @@ library UCLID_FILEPROCESSINGLib
 			[in] VARIANT_BOOL bNewVal);
 		//-----------------------------------------------------------------------------------------
 		[propget, id(13), helpstring("property ProcessingSchedule")] HRESULT ProcessingSchedule(
-			[out, retval] IVariantVector** ppHoursSchedule );
+			[out, retval] IVariantVector** ppHoursSchedule);
 		[propput, id(13), helpstring("property ProcessingSchedule")] HRESULT ProcessingSchedule(
-			[in] IVariantVector* pHoursSchedule );
+			[in] IVariantVector* pHoursSchedule);
 		//-----------------------------------------------------------------------------------------
 		[propget, id(14), helpstring("property LimitProcessingToSchedule")] 
-			HRESULT LimitProcessingToSchedule([out, retval] VARIANT_BOOL* pbVal );
+			HRESULT LimitProcessingToSchedule([out, retval] VARIANT_BOOL* pbVal);
 		[propput, id(14), helpstring("property LimitProcessingToSchedule")] 
-			HRESULT LimitProcessingToSchedule([in] VARIANT_BOOL bVal );
+			HRESULT LimitProcessingToSchedule([in] VARIANT_BOOL bVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To process only the specified file regardless of what other files are queued in
 		//			the database and what their file priorities are.
 		[id(15), helpstring("method ProcessSingleFile")] HRESULT ProcessSingleFile(
-			[in] IFileRecord* pFileRecord, [in] IFileProcessingDB *pFPDB, [in] IFAMTagManager* pFAMTagManager);
+			[in] IFileRecord* pFileRecord, [in] IFileProcessingDB* pFPDB, [in] IFAMTagManager* pFAMTagManager);
 	};
 
 	[
@@ -1317,23 +1321,23 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: To return a string that is equivalent in content to strInput
 		// bstrSourceName is the source doc name used in expand <SourceDocName>, it should be passed in as a parameter because
 		// different thread will have different source doc name [P13: 3901]
-		[id(2), helpstring("method ExpandTags")] HRESULT ExpandTags([in] BSTR bstrInput, [in] BSTR bstrSourceName, [out, retval] BSTR *pbstrOutput);
+		[id(2), helpstring("method ExpandTags")] HRESULT ExpandTags([in] BSTR bstrInput, [in] BSTR bstrSourceName, [out, retval] BSTR* pbstrOutput);
 		// PROMISE: To return a string that is equivalent in content to strInput
 		// PURPOSE: To return a list of all the tags built-in to AttributeFinder (i.e. FPSFileDir...)
 		// REQUIRE: NONE
 		// PROMISE: If there are no built-in tags an empty vector (not NULL) will be returned
-		[id(3), helpstring("method GetBuiltInTags")] HRESULT GetBuiltInTags( [out, retval] IVariantVector** ppTags);
+		[id(3), helpstring("method GetBuiltInTags")] HRESULT GetBuiltInTags([out, retval] IVariantVector** ppTags);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return a list of all the tags specified by the user in their INI file
 		// REQUIRE: NONE
 		// PROMISE: If there are tags in the .ini file an empty vector (not NULL) will be returned
-		[id(4), helpstring("method GetINIFileTags")] HRESULT GetINIFileTags( [out, retval] IVariantVector** ppTags);
+		[id(4), helpstring("method GetINIFileTags")] HRESULT GetINIFileTags([out, retval] IVariantVector** ppTags);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return a list of all the available AttributeFinderTags
 		// REQUIRE: NONE
 		// PROMISE: This will be a combined list of all the tags in GetBuiltInTags + the tags in 
 		//			GetBuiltINIFileTags
-		[id(5), helpstring("method GetAllTags")] HRESULT GetAllTags( [out, retval] IVariantVector** ppTags);
+		[id(5), helpstring("method GetAllTags")] HRESULT GetAllTags([out, retval] IVariantVector** ppTags);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To return VARIANT_TRUE if there are any invalid or incomplete
 		//			tags in strInput, and to return VARIANT_FALSE otherwise.
@@ -1341,14 +1345,14 @@ library UCLID_FILEPROCESSINGLib
 		//			the predefined tags (like <FPSFileDir> etc), or if there is
 		//			a key in the INI file in the [ExpandableTags]
 		//			section with a non-empty value.
-		[id(6), helpstring("method StringContainsInvalidTags")] HRESULT StringContainsInvalidTags([in] BSTR strInput, [out, retval] VARIANT_BOOL *pbValue);
+		[id(6), helpstring("method StringContainsInvalidTags")] HRESULT StringContainsInvalidTags([in] BSTR strInput, [out, retval] VARIANT_BOOL* pbValue);
 		//-----------------------------------------------------------------------------------------
 		// REQUIRE: strInput must contain no tags, or 1 or more well specified
 		//			tags.  Poorly specified tags in strInput (such as non-matching
 		//			'<' and '>', etc) will cause an exception to be thrown.
 		// PROMISE: To return VARIANT_TRUE if there are any tags in the
 		//			strInput, regardless of whether they are valid tag names
-		[id(7), helpstring("method StringContainsTags")] HRESULT StringContainsTags([in] BSTR strInput, [out, retval] VARIANT_BOOL *pbValue);
+		[id(7), helpstring("method StringContainsTags")] HRESULT StringContainsTags([in] BSTR strInput, [out, retval] VARIANT_BOOL* pbValue);
 
 	};
 
@@ -1366,7 +1370,7 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To be used to notify the FileActionManager that the Processing is complete
 		[id(1), helpstring("method PromptForActionSelection")] HRESULT PromptForActionSelection(
 			[in]IFileProcessingDB* pDB, [in] BSTR strTitle, [in] BSTR strPrompt, 
-			[in]VARIANT_BOOL vbAllowTags, [out, retval] BSTR *pActionName);
+			[in]VARIANT_BOOL vbAllowTags, [out, retval] BSTR* pActionName);
 	};
 	[
 		object,
@@ -1392,8 +1396,8 @@ library UCLID_FILEPROCESSINGLib
 		//			pDB- The database being acted upon
 		//			pFAMTagManager- The tag manager to use when required
 		// REQUIRED: Nothing.
-		[id(1), helpstring("method Init")] HRESULT Init([in] IIUnknownVector *pFileProcessingTasks,
-			[in] long nActionID, [in] IFileProcessingDB *pDB, [in] IFAMTagManager *pFAMTagManager);
+		[id(1), helpstring("method Init")] HRESULT Init([in] IIUnknownVector* pFileProcessingTasks,
+			[in] long nActionID, [in] IFileProcessingDB* pDB, [in] IFAMTagManager* pFAMTagManager);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To process the given file
 		// ARGS:	bstrSourceDocName- The file to act upon
@@ -1406,8 +1410,8 @@ library UCLID_FILEPROCESSINGLib
 		//				doesn't act upon this flag, but passes it on to the tasks it executes
 		// REQUIRED: Init must have been called prior to calling ProcessFile.
 		[id(2), helpstring("method ProcessFile")] HRESULT ProcessFile([in] BSTR bstrSourceDocName,
-			[in] long nFileID, [in] long nActionID, [in] IProgressStatus *pProgressStatus,
-			[in] VARIANT_BOOL bCancelRequested, [out, retval] EFileProcessingResult *pResult);
+			[in] long nFileID, [in] long nActionID, [in] IProgressStatus* pProgressStatus,
+			[in] VARIANT_BOOL bCancelRequested, [out, retval] EFileProcessingResult* pResult);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To process the given file with one call (separate calls to Init and Close not required)
 		// ARGS:	bstrSourceDocName- The file to act upon
@@ -1423,11 +1427,11 @@ library UCLID_FILEPROCESSINGLib
 		//				an error should fire an exception
 		// REQUIRED: Nothing.
 		[id(3), helpstring("method InitProcessClose")] HRESULT InitProcessClose(
-			[in] BSTR bstrSourceDocName, [in] IIUnknownVector *pFileProcessingTasks,
+			[in] BSTR bstrSourceDocName, [in] IIUnknownVector* pFileProcessingTasks,
 			[in] long nFileID, [in] long nActionID,
-			[in] IFileProcessingDB *pDB, [in] IFAMTagManager *pFAMTagManager, 
-			[in] IProgressStatus *pProgressStatus, [in] VARIANT_BOOL bCancelRequested, 
-			[out, retval] EFileProcessingResult *pResult);
+			[in] IFileProcessingDB* pDB, [in] IFAMTagManager* pFAMTagManager, 
+			[in] IProgressStatus* pProgressStatus, [in] VARIANT_BOOL bCancelRequested, 
+			[out, retval] EFileProcessingResult* pResult);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To call cancel on the currently running task.
 		//			Notifies the currently executing task (if there is one) the the user has requested for 
@@ -1448,7 +1452,7 @@ library UCLID_FILEPROCESSINGLib
 		[id(6), helpstring("method GetCurrentTask")] HRESULT GetCurrentTask([out, retval] IFileProcessingTask **ppCurrentTask);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To indicate whether the task executor is currently initialized
-		[propget, id(8), helpstring("property IsInitialized")] HRESULT IsInitialized([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(8), helpstring("property IsInitialized")] HRESULT IsInitialized([out, retval] VARIANT_BOOL* pVal);
 	};
 
 	//----------------------------------------------------------------------------------------------
