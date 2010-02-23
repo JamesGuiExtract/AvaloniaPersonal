@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "cpputil.h"
 #include "ExtractMFCUtils.h"
+#include "Misc.h"
 
 #include <string>
 
@@ -21,19 +22,30 @@ template <class ObjectType, class FileObjectLoader>
 class CachedObjectFromFile
 {
 public:
+	CachedObjectFromFile::CachedObjectFromFile(const string& strAutoEncryptKey = "")
+	{
+		m_strAutoEncryptKey = strAutoEncryptKey;
+	}
+
 	// publicly accessible object member variable
 	ObjectType m_obj;
 
 	// method to load object from a file, if it's not already in the cache
 	void loadObjectFromFile(const std::string& strFile)
 	{
-		// Check if the file exists (do not validate existence, allow
-		// validation to be handled by the object loader - this will
-		// allow for objects which make use of the auto-encryption code
-		// to perform the auto-encryption for non-existent files, see
-		// [FlexIDSCore #3413]). If the file exists and has already been
-		// seen, check the time stamp and load accordingly.
-		if (isValidFile(strFile) && m_strFile == strFile)
+		// If an auto-encryption registry key has been specified, auto-encrypt the file before
+		// loading it.
+		if (!m_strAutoEncryptKey.empty())
+		{
+			autoEncryptFile(strFile, m_strAutoEncryptKey);
+		}
+
+		// [FlexIDSCore:3413]
+		// After the file has been auto-encrypted, we can assert its existance.
+		validateFileOrFolderExistence(strFile);
+
+		// If the file has already been seen, check the time stamp and load accordingly.
+		if (m_strFile == strFile)
 		{
 			// file names are equal
 			// now check timestamp
@@ -69,8 +81,9 @@ public:
 	}
 
 private:
-	std::string m_strFile;
+	string m_strFile;
 	CTime m_fileTimeAtLastLoad;
+	string m_strAutoEncryptKey;
 };
 //-------------------------------------------------------------------------------------------------
 // Example usage:

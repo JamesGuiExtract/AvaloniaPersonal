@@ -456,7 +456,8 @@ CMicrFinder::CMicrFinder()
 m_bSplitRoutingNumber(true),
 m_bSplitAccountNumber(true),
 m_bSplitCheckNumber(false),
-m_bSplitAmount(false)
+m_bSplitAmount(false),
+m_cachedRegExLoader(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
 {
 	try
 	{
@@ -1697,8 +1698,11 @@ IRegularExprParserPtr CMicrFinder::getOtherRoutingNumberRegexParser()
 		// Check if the file exists
 		if (isValidFile(strRoutingRegexFile))
 		{
-			strOtherRoutingRegex = getRegExpFromFile(strRoutingRegexFile,
-				true, gstrAF_AUTO_ENCRYPT_KEY_PATH);
+			// [FlexIDSCore:3643] Load the regular expression from disk if necessary.
+			m_cachedRegExLoader.loadObjectFromFile(strRoutingRegexFile);
+
+			// Retrieve the pattern
+			strOtherRoutingRegex = (string)m_cachedRegExLoader.m_obj;
 		}
 		else
 		{

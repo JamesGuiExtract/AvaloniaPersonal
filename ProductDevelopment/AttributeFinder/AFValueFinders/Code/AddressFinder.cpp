@@ -362,7 +362,10 @@ string CAddressFinder::loadRegExp(string strFileName, IAFDocumentPtr ipAFDoc)
 	// Expand any tags in the file name
 	string strRegExpFile = m_ipAFUtility->ExpandTags(strFileName.c_str(), ipAFDoc );
 	autoEncryptFile(strRegExpFile, gstrAF_AUTO_ENCRYPT_KEY_PATH);
-	return getRegExpFromFile(strRegExpFile);
+	
+	// getRegExpFromFile is obsolete as well.
+	//return getRegExpFromFile(strRegExpFile);
+	return "";
 }
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CAddressFinder::chooseAddressBlocks(IRegularExprParserPtr ipSuffixParser, IIUnknownVectorPtr ipBlocks)

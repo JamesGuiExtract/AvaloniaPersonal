@@ -10,7 +10,7 @@
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <StringTokenizer.h>
-#include <Misc.h>
+#include <RegExLoader.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

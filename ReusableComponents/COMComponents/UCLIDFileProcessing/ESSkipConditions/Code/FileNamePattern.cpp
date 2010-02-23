@@ -35,7 +35,8 @@ m_ipMiscUtils(NULL),
 m_bDoesDoesNot(true),
 m_bContainMatch(true),
 m_bCaseSensitive(false),
-m_bIsRegExpFromFile(false)
+m_bIsRegExpFromFile(false),
+m_cachedRegExLoader(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
 {
 	try
 	{
@@ -618,8 +619,12 @@ STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileP
 			// Call ExpandTagsAndTFE() to expand tags and utility functions
 			string strRegExprFile = CFAMConditionUtils::ExpandTagsAndTFE(pFAMTM, m_strRegFileName, strSourceFileName);
 
-			// Get regular expression from file
-			strRegExp = getRegExpFromFile(strRegExprFile, true, gstrAF_AUTO_ENCRYPT_KEY_PATH);
+			// [FlexIDSCore:3643] Load the regular expression from disk if necessary.
+			m_cachedRegExLoader.loadObjectFromFile(strRegExprFile);
+
+			// Retrieve the pattern
+			strRegExp = (string)m_cachedRegExLoader.m_obj;
+			
 			ipParser->Pattern = strRegExp.c_str();
 		}
 		else

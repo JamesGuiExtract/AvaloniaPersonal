@@ -39,7 +39,8 @@ m_ipAFUtility(NULL),
 m_strCommonWords(""),
 m_bIsCommonWordsLoaded(false),
 m_bLoggingEnabled(false),
-m_bIsInvalidPersonWordsLoaded(false)
+m_bIsInvalidPersonWordsLoaded(false),
+m_cachedRegExLoader(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
 {
 	try
 	{
@@ -746,12 +747,13 @@ string &CEntityNameDataScorer::getCommonWordsPattern()
 	// setup file name to read pattern from
 	string strComponentDataDir = getAFUtility()->GetComponentDataFolder();
 	string strFileName =  strComponentDataDir + "\\EntityNameDataScorer\\" + "\\" + "CommonWords.dat.etf";
-	
-	// make sure the encryption is current
-	autoEncryptFile(strFileName, gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str());
 
-	// Load the pattern
-	m_strCommonWords = getRegExpFromFile(strFileName);
+	// [FlexIDSCore:3643] Load the regular expression from disk if necessary.
+	m_cachedRegExLoader.loadObjectFromFile(strFileName);
+
+	// Retrieve the pattern
+	m_strCommonWords = (string)m_cachedRegExLoader.m_obj;
+
 	m_bIsCommonWordsLoaded = true;
 	return m_strCommonWords;
 }

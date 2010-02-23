@@ -8,6 +8,8 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 
 #include <common.h>
+#include <CachedObjectFromFile.h>
+#include <RegExLoader.h>
 
 #include <string>
 
@@ -97,6 +99,10 @@ private:
 	// Handles configuration persistence
 	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 	auto_ptr<EntityFinderConfigMgr> ma_pEFConfigMgr;
+
+	// Use CachedObjectFromFile so that the regular expression is re-loaded from disk only when the
+	// RegEx file is modified.
+	CachedObjectFromFile<string, RegExLoader> m_cachedRegExLoader;
 
 	// Logging enabled flag
 	bool	m_bLoggingEnabled;

@@ -5,6 +5,10 @@
 
 #include "..\..\Code\FPCategories.h"
 #include "ESSkipConditions.h"
+
+#include <CachedObjectFromFile.h>
+#include <RegExLoader.h>
+
 #include <string>
 #include <map>
 
@@ -124,6 +128,10 @@ private:
 	std::string m_strRegPattern;
 
 	IMiscUtilsPtr	m_ipMiscUtils;
+
+	// Use CachedObjectFromFile so that the regular expression is re-loaded from disk only when the
+	// RegEx file is modified.
+	CachedObjectFromFile<string, RegExLoader> m_cachedRegExLoader;
 
 	/////////////
 	// Methods

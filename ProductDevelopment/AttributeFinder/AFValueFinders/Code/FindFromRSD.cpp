@@ -27,6 +27,7 @@ const unsigned long gnCurrentVersion = 1;
 // CFindFromRSD
 //-------------------------------------------------------------------------------------------------
 CFindFromRSD::CFindFromRSD()
+: m_cachedRuleSet(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
 {
 	try
 	{
@@ -282,12 +283,6 @@ STDMETHODIMP CFindFromRSD::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		IRuleExecutionSessionPtr ipSession(CLSID_RuleExecutionSession);
 		ASSERT_RESOURCE_ALLOCATION("ELI19384", ipSession != NULL);
 		ipSession->SetRSDFileName(strRSDFile.c_str());
-
-		// init rule set from current rsd file, performing any auto-encrypt actions
-		// as necessary
-		_bstr_t _bstrRSDFile(strRSDFile.c_str());
-		autoEncryptFile(strRSDFile, gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str());
-		validateFileOrFolderExistence(strRSDFile);
 	
 		// Create the ruleset if necessary
 		if(m_cachedRuleSet.m_obj == NULL)

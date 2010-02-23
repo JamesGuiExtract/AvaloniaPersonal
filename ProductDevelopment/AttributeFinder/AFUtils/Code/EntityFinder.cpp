@@ -23,6 +23,7 @@ const unsigned long gnCurrentVersion = 1;
 //-------------------------------------------------------------------------------------------------
 CEntityFinder::CEntityFinder()
 : m_bLoggingEnabled(false)
+, m_cachedRegExLoader()
 {
 	try
 	{

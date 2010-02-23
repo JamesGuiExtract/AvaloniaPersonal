@@ -4,6 +4,9 @@
 #include "AFValueFinders.h"
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <CachedObjectFromFile.h>
+#include <RegExLoader.h>
+
 #include <string>
 #include <vector>
 #include <map>
@@ -174,6 +177,10 @@ private:
 	map<int, bool> m_mapRotations;
 
 	IMiscUtilsPtr m_ipMiscUtils;
+
+	// Use CachedObjectFromFile so that the regular expression is re-loaded from disk only when the
+	// RegEx file is modified.
+	CachedObjectFromFile<string, RegExLoader> m_cachedRegExLoader;
 
 	//----------------------------------------------------------------------------------------------
 	// Methods

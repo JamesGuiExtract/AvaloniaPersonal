@@ -6,6 +6,9 @@
 #include "..\\..\\AFCore\\Code\\AFCategories.h"
 
 #include <IConfigurationSettingsPersistenceMgr.h>
+#include <CachedObjectFromFile.h>
+#include <RegExLoader.h>
+
 #include <vector>
 using namespace std;
 
@@ -85,8 +88,13 @@ private:
 
 	// Common Words pattern
 	string m_strCommonWords;
+
 	// Indicates if the m_strCommonWords string is loaded
 	bool m_bIsCommonWordsLoaded;
+
+	// Use CachedObjectFromFile so that the regular expression is re-loaded from disk only when the
+	// RegEx file is modified.
+	CachedObjectFromFile<string, RegExLoader> m_cachedRegExLoader;
 
 	// vector containing words that will invalidate a person
 	vector<string> m_vecInvalidPersonWords;

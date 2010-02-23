@@ -640,7 +640,8 @@ string CReturnAddrFinder::getRegExp(const char* strFileName, IAFDocumentPtr ipAF
 
 	autoEncryptFile(strRegExpFile, gstrAF_AUTO_ENCRYPT_KEY_PATH);
 
-	string strRegExp = getRegExpFromFile(strRegExpFile);
+	// getRegExpFromFile is now obsolete as well.
+	string strRegExp = "";//getRegExpFromFile(strRegExpFile);
 
 	return strRegExp;
 }

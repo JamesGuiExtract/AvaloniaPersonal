@@ -754,6 +754,11 @@ namespace Extract.Redaction
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects,
                     "ELI28647", _OBJECT_NAME);
 
+                // [FlexIDSCore:4048]
+                // Initialize typically used defaults.
+                _verificationCondition.Value = "HCData|MCData|LCData|Clues";
+                _queryForAutomatedRedaction.Value = "HCData|MCData|LCData";
+
                 _settingsFileName = settingsFileName;
 
                 // Initialize the parameters.

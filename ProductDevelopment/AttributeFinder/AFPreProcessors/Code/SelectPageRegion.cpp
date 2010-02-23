@@ -16,6 +16,7 @@
 #include <MiscLeadUtils.h>
 #include <LeadtoolsBitmapFreeer.h>
 #include <ComponentLicenseIDs.h>
+#include <RegExLoader.h>
 
 #include <algorithm>
 #include <math.h>

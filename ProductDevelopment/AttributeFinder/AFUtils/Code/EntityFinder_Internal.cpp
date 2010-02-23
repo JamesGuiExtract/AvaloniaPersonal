@@ -2055,11 +2055,17 @@ string CEntityFinder::getAddressSuffixPattern()
 	string strPatternFile = bstrFolder.operator const char *();
 	strPatternFile += "\\ReturnAddrFinder\\ReturnAddrSuffix.dat.etf";
 
-	// Copy pattern from ReturnAddrSuffix.dat
-	autoEncryptFile( strPatternFile, gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str() );
-	if (isFileOrFolderValid( strPatternFile ))
+	// Attempt auto-encryption separate from loadObjectFromFile since the existing logic here did
+	// not treat a missing file as an exception (which loadObjectFromFile will).
+	autoEncryptFile(strPatternFile, gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str());
+
+	if (isFileOrFolderValid(strPatternFile))
 	{
-		strPattern = getRegExpFromFile( strPatternFile );
+		// [FlexIDSCore:3643] Load the regular expression from disk if necessary.
+		m_cachedRegExLoader.loadObjectFromFile(strPatternFile);
+
+		// Retrieve the pattern
+		strPattern = (string)m_cachedRegExLoader.m_obj;
 	}
 
 	// Provide pattern to caller

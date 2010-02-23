@@ -793,6 +793,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RegExLoader.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\RegistryPersistenceMgr.cpp"
 				>
 			</File>
@@ -1476,6 +1480,10 @@
 			</File>
 			<File
 				RelativePath="RegConstants.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RegExLoader.h"
 				>
 			</File>
 			<File

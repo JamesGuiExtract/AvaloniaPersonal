@@ -4,6 +4,10 @@
 
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
+
+#include <CachedObjectFromFile.h>
+#include <RegExLoader.h>
+
 #include <map>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -68,9 +72,9 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 private:
-
+	
 	// Map containing the Regular Expression strings indexed on file name
-	std::map<std::string, std::string> m_mapFileNameToRegExpString;
+	std::map<std::string, CachedObjectFromFile<string, RegExLoader> > m_mapFileNameToCachedRegExLoader;
 
 	// Map containing rulesets for each Legal Description Type.
 	// The Ruleset is used to apply modifiers to individual subattriubtes

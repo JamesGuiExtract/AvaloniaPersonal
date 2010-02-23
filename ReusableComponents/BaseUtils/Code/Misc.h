@@ -16,33 +16,6 @@ EXPORT_BaseUtils vector<string> convertFileToLines(const string& strFilename);
 EXPORT_BaseUtils void writeLinesToFile(const vector<string>& vecLines, const string& strFileName,
 									   bool bAppend = false);
 //-------------------------------------------------------------------------------------------------
-// PURPOSE: Load a regular expression from a data file
-// REQUIRE: - strFilename must exist unless it is a .XXX.etf file and its corresponding .XXX file
-//			exists.  In the second case autoEncryption must be on both at the c++ and registty level.
-//			- strFilename must also be a valid regular expression file.  This requires that any
-//			#import statements it uses must follow the correct syntax.
-//			SYNTAX:
-//				#import:
-//				<expression> #import <filename>
-//				After a #import is found on a line the rest of the line is assumed to be the 
-//				name of the file to import.  Whitespace is allowed between the end of the #import
-//				text and the beginning of the filename, but not following the filename.
-//				- filename must either be absolute or relative to the directory in which strFileName
-//				resides
-//			
-EXPORT_BaseUtils string getRegExpFromFile(const string& strFilename, bool bAutoEncrypt = false, 
-									   const string& strAutoEncrtyptKey = "");
-//-------------------------------------------------------------------------------------------------
-// PURPOSE: Load a regular expression from a string of text that is in the format of a regular
-//			Expression file.
-// REQUIRE: - strText must be valid regular expression file text as defined above.
-//			- strRootFolder must exist if any #import statements are used in strText
-//			- filename must either be absolute or relative to strRootFolder
-//			
-EXPORT_BaseUtils string getRegExpFromText(const string& strText, const string& strRootFolder,
-										  bool bAutoEncrypt = false,
-										  const string& strAutoEncrtyptKey = "");
-//-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils void autoEncryptFile(const string& strFile, const string& strRegistryKey);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: Validate strSpecifiedPageNumber. Throws exception if the string is invalid

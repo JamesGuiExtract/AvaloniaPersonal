@@ -1232,22 +1232,22 @@ string CLegalDescSplitter::getRegExpForType( string strDocType, string strFileNa
 	string strFileName;
 	string strComponentDataDir = getAFUtility()->GetComponentDataFolder();
 	strFileName =  strComponentDataDir + "\\LegalDescSplitter\\" + strDocType + "\\" + strFileNameWOPath;
-		
+
+	// [FlexIDSCore:3643] Load the regular expression from disk if necessary.
 	// Check for the regular expression being loaded previously
-	map<string, string>::iterator iter = m_mapFileNameToRegExpString.find( strFileName );
-	if ( iter != m_mapFileNameToRegExpString.end() )
+	map<string, CachedObjectFromFile<string, RegExLoader> >::iterator iter =
+		m_mapFileNameToCachedRegExLoader.find(strFileName);
+	if (iter == m_mapFileNameToCachedRegExLoader.end())
 	{
-		if ( getAFUtility()->GetLoadFilePerSession() == VARIANT_TRUE )
-		{
-			// if only loading file once per sesson return the previously loaded RegExp
-			return iter->second;
-		}
+		m_mapFileNameToCachedRegExLoader[strFileName] =
+			CachedObjectFromFile<string, RegExLoader>(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str());
 	}
 
-	// Get Regular Expression from file with auto encrypt
-	string strRegExp = getRegExpFromFile( strFileName, true, gstrAF_AUTO_ENCRYPT_KEY_PATH );
-	m_mapFileNameToRegExpString[ strFileName ] = strRegExp;
-		
+	m_mapFileNameToCachedRegExLoader[strFileName].loadObjectFromFile(strFileName);
+
+	// Retrieve the pattern
+	string strRegExp = (string)m_mapFileNameToCachedRegExLoader[strFileName].m_obj;
+
 	return strRegExp;
 }
 //-------------------------------------------------------------------------------------------------
