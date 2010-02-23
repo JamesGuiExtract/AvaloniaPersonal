@@ -909,8 +909,9 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::GetSizeMax(ULARGE_INTEGER *pcbSi
 //-------------------------------------------------------------------------------------------------
 // IFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB *pFPDB, 
-												BSTR bstrAction, IFAMTagManager *pFAMTM, VARIANT_BOOL* pRetVal)
+STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, 
+	IFileProcessingDB* pFPDB, long lFileID, long lActionID, IFAMTagManager* pFAMTM, 
+	VARIANT_BOOL* pRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
