@@ -123,8 +123,8 @@ STDMETHODIMP CTaskCondition::put_LogExceptions(VARIANT_BOOL newVal)
 //-------------------------------------------------------------------------------------------------
 // IFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB *pFPDB, 
-									BSTR bstrAction, IFAMTagManager *pFAMTM, VARIANT_BOOL* pRetVal)
+STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB* pFPDB, 
+	long lFileID, long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -132,8 +132,6 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFilePro
 	{
 		string strSourceFileName = asString(bstrFile);
 		ASSERT_ARGUMENT("ELI20079", !strSourceFileName.empty());
-		IFileProcessingDBPtr ipFPDB(pFPDB);
-		ASSERT_ARGUMENT("ELI20080", ipFPDB != NULL);
 		ASSERT_ARGUMENT("ELI20082", pFAMTM != NULL);
 		ASSERT_ARGUMENT("ELI20083", pRetVal != NULL);
 
@@ -156,10 +154,6 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFilePro
 		ipTaskOWD->Object = m_ipTask;
 		ipTasks->PushBack(ipTaskOWD);
 
-		// Get the file and action ID's
-		long nFileID = ipFPDB->GetFileID(bstrFile);
-		long nActionID = ipFPDB->GetActionID(bstrAction);
-
 		try
 		{
 			try
@@ -167,7 +161,7 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFilePro
 				// Execute the task.
 				// The condition is satisfied if the task completed without exception or cancellation
 				EFileProcessingResult eResult = m_ipFAMTaskExecutor->InitProcessClose(
-					bstrFile, ipTasks, nFileID, nActionID, pFPDB, pFAMTM, NULL, VARIANT_FALSE);
+					bstrFile, ipTasks, lFileID, lActionID, pFPDB, pFAMTM, NULL, VARIANT_FALSE);
 				*pRetVal = asVariantBool(eResult == kProcessingSuccessful);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20162");

@@ -57,37 +57,37 @@ public:
 	END_CATEGORY_MAP()
 
 // ITaskCondition
-	STDMETHOD(get_Task)(IFileProcessingTask **ppVal);
-	STDMETHOD(put_Task)(IFileProcessingTask *pNewVal);
-	STDMETHOD(get_LogExceptions)(VARIANT_BOOL *pVal);
+	STDMETHOD(get_Task)(IFileProcessingTask** ppVal);
+	STDMETHOD(put_Task)(IFileProcessingTask* pNewVal);
+	STDMETHOD(get_LogExceptions)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_LogExceptions)(VARIANT_BOOL newVal);
 
 // IFAMCondition
-	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB *pFPDB, BSTR bstrAction, 
-		IFAMTagManager *pFAMTM, VARIANT_BOOL* pRetVal);
+	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB* pFPDB, long lFileID, 
+		long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
 
 // ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // IPersistStream
-	STDMETHOD(GetClassID)(CLSID *pClassID);
+	STDMETHOD(GetClassID)(CLSID* pClassID);
 	STDMETHOD(IsDirty)(void);
-	STDMETHOD(Load)(IStream *pStm);
-	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
-	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
+	STDMETHOD(Load)(IStream* pStm);
+	STDMETHOD(Save)(IStream* pStm, BOOL fClearDirty);
+	STDMETHOD(GetSizeMax)(ULARGE_INTEGER* pcbSize);
 
 // ICopyableObject
-	STDMETHOD(raw_Clone)(IUnknown* *pObject);
-	STDMETHOD(raw_CopyFrom)(IUnknown *pObject);
+	STDMETHOD(raw_Clone)(IUnknown** pObject);
+	STDMETHOD(raw_CopyFrom)(IUnknown* pObject);
 
 // ICategorizedComponent
-	STDMETHOD(raw_GetComponentDescription)(BSTR * pstrComponentDescription);
+	STDMETHOD(raw_GetComponentDescription)(BSTR* pstrComponentDescription);
 
 // IMustBeConfiguredObject
-	STDMETHOD(raw_IsConfigured)(VARIANT_BOOL * pbValue);
+	STDMETHOD(raw_IsConfigured)(VARIANT_BOOL* pbValue);
 
 // ILicensedComponent
-	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
+	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
 
 private:
 	/////////////////
