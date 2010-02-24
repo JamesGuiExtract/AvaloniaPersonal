@@ -1,13 +1,13 @@
 <HTML>
 
 <HEAD>
-<TITLE>FLEX Index Demo Testing Checklist</TITLE>
+<TITLE>Demo_FLEXIndex Testing Checklist</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 
 <BODY>
 
-<h1>FLEX Index Demo Testing Checklist<br>
+<h1>Demo_FLEXIndex Testing Checklist<br>
 <IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
@@ -16,339 +16,69 @@
 
 <OL>
 
-<!-- *********************************************** -->
-<LI><h2>Instructions and Installation</h2>
-<UL>
-	<LI>Confirm that the latest <b>Demo_FlexIndex</b> folder can be copied from the current 
-	build folder to C:\.
-</UL>
-<br>
+	<LI><h2>Instructions and Installation</h2>
+	<UL>
+		<LI>Confirm that the latest <b>Demo_FlexIndex</b> folder can be copied from the current 
+		build folder to C:\.
+		<li>Confirm that <b>DataEntry: Verify extracted data</b> requires only a <b>FLEX Index 
+		Client</b> license.
+		<li><b>[FlexIDSCore #3918]</b> Confirm that the <b>Demo_FLEXIndex\Rules</b> folder 
+		contains only <b>Master.rsd.etf</b> and a folder of swiping rules.  All of the main rules 
+		should be used via ComponentData.
+	</UL>
+<p>
+	<LI><h2>General User Interface Features</h2>
+	<UL>
+   		<LI>TBD
+	</UL>
+<p>
+	<LI><h2>Demo Images</h2>
+	<UL>
+		<LI>With a local USB Key confirm that a test image opens and processes without error.
+		<LI>Remove the local USB Key and confirm that processing the test image displays an 
+		error message.  <b>Note</b>: a two-minute timeout is required before the error message 
+		is displayed.
+		<LI>Connect to a remote USB Key and confirm that the test image opens and processes 
+		without error.
+<p>
+		<LI>Confirm that each installed test image opens and processes without error.
+		<li><b>[FlexIDSCore #3918]</b> Confirm that no exceptions have been logged about obsolete 
+		rule objects.
+   		<LI>Confirm that data is missing from no more than one grid for each test image.
+		<LI>Remove or rename the USS file for one test image. Confirm that processing this 
+		image works but presents no found data in the fields.
+	</UL>
+<p>
+	<LI><h2>Editing Grid Data</h2>
+	<UL>
+   		<LI>TBD
+	</UL>
+<p>
 
-<!-- *********************************************** -->
-<LI><h2>General User Interface Features</h2>
-<UL>
-   	<LI>Confirm that if the <b>INI</b> file is missing, a meaningful error message appears and 
-	the application exits gracefully.
-   	<LI>Confirm that FlexDataEntry accepts an image file as a command-line argument.
-  	<LI>Confirm that FlexDataEntry and Spot Recognition Windows appear at startup and that 
-	each cover one-half of the window area.
-  	<LI><b>*[FlexIDSCore #2986]</b> Move the <b>Start menu</b> to the left side of the display area.  Start 
-	a new instance of FlexDataEntry.  Confirm that FlexDataEntry and Spot Recognition Windows 
-	appear properly each covering one-half of the window area.
+	<LI><h2>Demo Application - User Interface</h2>
+	<UL>
+	   	<LI>Copy <b>Demo_FlexIndex</b> from the build folder to C:\Demo_FlexIndex.
 <p>
-   	<LI>Confirm that if <b>Toolbar_Find</b> in the INI file is set to 0, 
-        the Find item will not be visible in the <b>Edit</b> menu.
-   	<LI>Confirm that if <b>Toolbar_Find</b> in the INI file is set to 1, 
-        the Find item will be visible in the <b>Edit</b> menu.
-   	<LI>Confirm that if <b>Toolbar_Find</b> is missing from the INI file, 
-        the Find item will be visible in the <b>Edit</b> menu.
+	   	<LI>Confirm that grid labels include:
+      		<ul>
+        		<li>Grantors</li>
+		        <li>Grantees</li>
+        		<li>Legal Description</li>
+	        	<li>Legal Description (freeform)</li>
+        		<li>Return Address</li>
+		        <li>Other Fields</li>
+	      	</ul>
 <p>
-   	<LI>Confirm that an <b>ImageToolbar_RotateCCW</b> setting in the INI file controls visibility 
-	of the Rotate Counterclockwise toolbar button in the Image Window.
-   	<LI>Confirm that an <b>ImageToolbar_RotateCW</b> setting in the INI file controls visibility 
-	of the Rotate Clockwise toolbar button in the Image Window.
-   	<LI>Confirm that an <b>ImageToolbar_PageFirst</b> setting in the INI file controls visibility 
-	of the First Page toolbar button in the Image Window.
-   	<LI>Confirm that an <b>ImageToolbar_PageLast</b> setting in the INI file controls visibility 
-	of the Last Page toolbar button in the Image Window.
-   	<LI>Confirm that an <b>ImageToolbar_DeleteHighlight</b> setting in the INI file controls 
-	visibility of the Delete Highlights toolbar button in the Image Window.
+	   	<LI>Confirm that the column headings for the <b>Grantors</b> and <b>Grantees</b> grids are: 
+		First, Middle, Last, and Suffix.
+	   	<LI>Confirm that the column headings for the <b>Legal Description</b> grid are: 
+		Lot, Block, and Subdivision.
+	</UL>
 <p>
-   	<LI>Confirm that <b>Ctrl+F</b> is a shortcut for the <b>Edit - Find</b> menu item.
-   	<LI><b>[FlexIDSCore #3019]</b> Confirm that a <b>wait cursor</b> is displayed during 
-	a Find operation.
-   	<LI>Confirm that <b>Ctrl+W</b> is a shortcut for the <b>Edit - Clear</b> menu item.
-   	<LI>Confirm that the <b>Help</b> menu contains an item to show an About box.
-   	<LI>Confirm that the <b>About</b> box displays a FLEX Index version number AND a 
-	FlexDataEntry version number.
-   	<LI><b>[FlexIDSCore #2984]</b> Confirm that the correct version number and patch is displayed in the 
-	<b>About</b> box.
-<p>
-        <LI>Confirm that if <b>AutomaticOpenVOAFile</b> in the INI file is set to 1, 
-        contents of an existing VOA are loaded into the grids when an image is opened.  Note that the 
-	attribute names in the existing VOA file must match the attribute names in the various 
-	INI file queries.
-   	<LI>Confirm that after a VOA is loaded, the active cell is the first cell in the first grid.
-   	<LI>Copy an image and associated VOA file to a new folder.  Open this image in the Image 
-	Window.  Confirm that the grids are populated and that highlighted of selected records still works.
-   	<LI>Confirm that after a VOA is loaded, the Clear item in the Edit menu completely removes the 
-	found attributes and clears the grids.
-        <LI>Confirm that if <b>AutomaticOpenVOAFile</b> in the INI file is set to 0, 
-        contents of an existing VOA are not loaded into the grids when an image is opened.
-<p>
-        <LI>Add a <b>Rows=ParcelNumber:default</b> entry to the [Grid6] of the demo application INI 
-	file.  Test sample image <b>Example07.tif</b> and confirm that a default Parcel Number 
-	attribute is displayed in the <b>Other</b> grid.
-<p>
-   	<LI>Confirm that <b>&lt;</b> and <b>&gt;</b> scroll
-        buttons and associated edit box in the <b>Legal Description (freeform)</b>
-        grid are disabled when no legal descriptions have been found.
-	<LI>Confirm that the <b>&lt;</b> and <b>&gt;</b> scroll buttons in 
-        <b>Legal Description (freeform)</b> grid are enabled appropriately when at 
-        least one legal description is found.
-   	<LI>*Confirm record scrolling functionality for Return Address.
-   	<LI>*Confirm proper enable and disable of record scrolling controls for Return Address.
-<p>
-   	<LI>Confirm that the horizontal and vertical scrollbar for all grids display
-        correctly according to the size of grids.
-   	<LI>Confirm that a large entry in the <b>Legal Description (freeform)</b> grid 
-        displays appropriate scroll bars.
-   	<LI>Confirm that the currently selected cell in grids is easily identified.
-   	<LI>Confirm that when the focus is on the last cell in a row, striking the
-        <b>Tab</b> key should advance the focus to either the first cell in the next row
-        (if there is a next row in the current grid), or to the first cell of the
-        next grid (if there is a grid following the current grid).
-   	<LI>Confirm that subsequent <b>Tab</b> keystrokes should continue the forward navigation.
-   	<LI>Confirm that cell and row selection is as expected during navigation.
-   	<LI>Confirm that when the focus is on the first cell in the first row of a grid, typing 
-	<b>Shift+Tab</b> should move the focus to the last cell in the last row of the previous grid.
-   	<LI>Confirm that subsequent <b>Shift+Tab</b> keystrokes should continue the backward 
-	navigation.
-   	<LI>Confirm that the data in the current row should be highlighted as the user 
-        is navigating through the cells.
-</UL>
-<br>
-
-<!-- *********************************************** -->
-<LI><h2>Demo Application Test Images</h2>
-<UL>
-	<LI>With a local USB Key confirm that a test image opens and processes without error.
-	<LI>Remove the local USB Key and confirm that processing the test image displays an error 
-	message.  <b>Note</b>: a two-minute timeout is required before the error message is displayed.
-	<LI>Connect to a remote USB Key and confirm that the test image opens and processes without error.
-<p>
-	<LI>Confirm that each installed test image opens and processes without error.
-	<LI>Confirm that re-Finding data in the same image processes without error.
-   	<LI>Confirm that data is missing from no more than one grid for each test image.
-	<LI>Remove or rename the USS file for one test image. Confirm that processing this image 
-        runs OCR before finding Attributes.
-</UL>
-<br>
-
-<!-- *********************************************** -->
-<LI><h2>Editing Grid Data</h2>
-<UL>
-	<LI>Confirm that pressing the <b>Remove</b> button has no effect if a row is 
-        not selected in the corresponding grid.
-   	<LI>Confirm that pressing the <b>Add</b> button adds an empty row at the end of the grid.
-   	<LI>Confirm that pressing the <b>Remove</b> button removes the selected row from the grid.
-   	<LI>Confirm that row headers are editable.
-   	<LI>Confirm that individual cells are editable.
-   	<LI>Confirm that when a particular cell is in focus and the <b>Delete</b> key is
-      pressed, only the current cell's contents should be deleted.
-   	<LI>Confirm that when a whole row is selected and the Delete key is pressed,
-      the whole row should be deleted.
-   	<LI><b>[FlexIDSCore #2991]</b> Add a row to the first grid, click in the row header cell, start typing.  
-	Press the <b>Delete</b> key and confirm that no unusual behavior is seen.
-   	<LI>Confirm that typing <b>Ctrl+Z</b> has no effect when a cell is just selected.
-   	<LI>Confirm that typing <b>Ctrl+Z</b> reverts in-progress edits done to a cell.
-</UL>
-  <p>&nbsp;
-
-<!-- *********************************************** -->
-<li><h2>Navigation Controls For Legal Description (freeform) and Return Address grids</h2>
-<UL>
-   	<LI>Confirm that the associated <b>&lt;</b> scroll button is
-      disabled when the <b>Legal Description (freeform)</b> grid displays the
-      first legal description.
-   	<LI>Confirm that the associated <b>&gt;</b> scroll button is
-      disabled when the <b>Legal Description (freeform)</b> grid displays the
-      last legal description.
-   	<LI>Confirm that pressing the <b>&lt;</b> scroll button
-      will display the previous legal description in <b>Legal Description (freeform)</b>.
-   	<LI>Confirm that pressing the <b>&gt;</b> scroll button
-      will display the next legal description in <b>Legal Description (freeform)</b>.
-   	<LI>Confirm that the legal description highlights on the image will change synchronously
-      with the change of <b>Legal Description (freeform)</b> grid when
-      pressing <b>&lt;</b> or <b>&gt;</b> scroll buttons.
-   	<LI>Confirm that when clicking <b>&lt;</b> or <b>&gt;</b>
-      scroll buttons in <b>Legal Description (freeform)</b> grid, the
-      edit box between them displays correctly according to the current legal
-      description and total number of legal descriptions that have been found.
-<p>
-   	<LI>Confirm that a <b>DisableArrowNavigation</b> setting in the appropriate section of 
-	the INI file controls support for <b>UpArrow</b> automatically navigating to the last 
-	cell in the previous grid after reaching the first line of text.
-   	<LI>Confirm that a <b>DisableArrowNavigation</b> setting in the appropriate section of 
-	the INI file controls support for <b>DownArrow</b> automatically navigating to the 
-	first cell in the next grid after reaching the last line of text.
-   	<LI>Confirm similar behavior for <b>LeftArrow</b> and <b>RightArrow</b>.
-<p>
-   	<LI>*Confirm that the associated <b>&lt;</b> scroll button is
-      disabled when the <b>Return Address</b> grid displays the first Return Address.
-   	<LI>*Confirm that the associated <b>&gt;</b> scroll button is
-      disabled when the <b>Return Address</b> grid displays the last Return Address.
-   	<LI>*Confirm that pressing associated <b>&lt;</b> scroll button
-      will display the previous Return Address in the <b>Return Address</b> grid.
-   	<LI>*Confirm that pressing associated <b>&gt;</b> scroll button
-      will display the next Return Address in the <b>Return Address</b> grid.
-   	<LI>*Confirm that the Return Address highlights on the image will change synchronously
-      with the change of <b>Return Address</b> grid when pressing <b>&lt;</b>
-      or <b>&gt;</b> scroll buttons.
-   	<LI>*Confirm that when clicking <b>&lt;</b> or <b>&gt;</b>
-      scroll buttons in the <b>Return Address</b> grid, the edit box between
-      them displays correctly according to the current Return Address and total
-      number of Return Addresses that have been found.</li>
-</UL>
-<br>
-
-<!-- *********************************************** -->
-<LI><h2>Swiping Grid Data - After Appropriate Grid Selection</h2>
-<UL>
-	<LI>Select an entire Grantor or Grantee row.  Confirm that an entity swiped with the 
-	pen-shaped highlighter tool appears in the appropriate grid properly identified and split.
-	<LI>Confirm that an entity swiped with the rectangular highlighter tool appears in 
-	the appropriate grid properly identified and split.
-	<LI>Select the entire contents of a cell within an existing Grantor or Grantee.  Confirm 
-	that text swiped with either highlighter tool replaces the existing sub-attribute text.
-	<LI>Select a cell within an existing Grantor or Grantee.  Leave the edit cursor in a 
-	known position within the text.  Confirm that text swiped with either highlighter tool is 
-	inserted appropriately within the existing sub-attribute text.
-	<LI>Confirm that swiping a new Grantor or Grantee after modifying the name of the RSD file 
-	defined in the <b>DynamicInputRSDFile</b> setting for this grid provokes a meaningful 
-	UCLIDException.
-   	<LI>Confirm that the <b>Recognize Text and Process</b> button on the Image Window is not 
-	enabled for rubber-banding a Grantor or Grantee.
-<p>
-   	<LI>Select an entire Legal Description row.  Confirm that text swiped with either highlighter 
-	tool appears properly split in the appropriate grid.
-	<LI>Select an empty Legal Description sub-attribute cell.  Confirm that text swiped with 
-	either highlighter tool appears in the selected cell.
-	<LI>Select some or all of the text in a non-empty Legal Description sub-attribute cell.  
-	Confirm that text swiped with either highlighter tool appears in the selected cell and 
-	replaces the previously selected text.
-<p>
-   	<LI>Select some or all of the text in the Legal Description (freeform) grid.  Confirm that 
-	text swiped with either highlighter tool replaces the selected text.
-   	<LI>Without selecting any existing text, place the edit cursor at the end of the text in 
-	the Legal Description (freeform) grid.  Confirm that text swiped with either highlighter 
-	tool is appended to the existing text.
-   	<LI>Confirm that text rubber-banded using the <b>Recognize Text and Process</b> button in 
-	the Image Window is added to the Legal Description (freeform) grid as a new item.
-<p>
-   	<LI>Confirm that a rubber-banded Return Address appears properly split in the appropriate grid.
-   	<LI>Confirm that swiped text appears in the selected Return Address row.
-   	<LI>Confirm that rubber-banded text has no effect in the Other Fields grid.
-   	<LI>Confirm that swiped text appears in the selected Other Fields row.
-   	<LI>Confirm that a swiped Grantor or Grantee should have a default name
-      	(Person, Company and Trust) in row headers. (Example03.tif has a Trust entity.)
-   	<LI>Confirm that if selected row is empty and a swipe is done, the swiped text should go 
-	into the selected row, not into a new row.
-   	<LI>Confirm that if selected row contains only the row header and a swipe is done, the 
-	swiped text should go into the selected row, not into a new row.
-<p>
-   	<LI>Confirm that after swiping, <b>Tab</b> and <b>Shift+Tab</b> still allow navigation.
-</UL>
-  <p>&nbsp;
-
-<!-- *********************************************** -->
-<LI><h2>Saving Grid Data - SKIP</h2>
-<UL>
-	<LI>Confirm that selecting <b>File - Save</b> will save the grid data to the folder that 
-	contains the image opened by the current Image Window.
-	<LI>Confirm that the saved file is named and located based on the <b>OutputFileName</b> 
-	setting in the INI file.
-	<LI>Confirm that the saved file contains the correct information obtained from all 
-	visible grids for the image file.
-	<LI>Confirm that the saved file contains no extra white space for all the entries.
-	<LI>Confirm that when the selected grid cell is being edited, <b>File - Save</b> will 
-	save the edited content in that cell.
-	<LI>Confirm that the user is prompted to save grid data before a new image is opened.
-	<LI>Confirm that the above prompt also allows the user to either not save the data or 
-	to cancel the <b>File - Open</b> operation from the Image Window.
-	<LI>Save grid data and make a subsequent edit.  Confirm that the user is prompted to save 
-	grid data before a new image is opened.
-	<LI>Save grid data and delete several grid entries.  Save grid data again.  Confirm that 
-	the new PXT file no longer contains the recently deleted data.
-<p>
-   	<LI>Confirm that a <b>ConfirmationAfterSave</b> setting in the INI file controls display 
-	of a confirmation dialog after saving results to a PXT file.
-   	<LI>Confirm that an <b>AutoPromptToSave</b> setting in the INI file controls display of 
-	a prompt dialog to the user when advancing via Tab key past the last cell.
-</UL>
-  <p>&nbsp;
-
-<!-- *********************************************** -->
-<LI><h2>Demo Application - User Interface</h2>
-<UL>
-   	<LI>Copy <b>Demo_FlexIndex</b> from the build folder to C:\Demo_FlexIndex.
-<p>
-   	<LI>Confirm that grid labels include:
-      	<ul>
-        	<li>Grantors</li>
-	        <li>Grantees</li>
-        	<li>Legal Description</li>
-	        <li>Legal Description (freeform)</li>
-        	<li>Return Address</li>
-	        <li>Other Fields</li>
-      	</ul>
-<p>
-   	<LI>Confirm that the column headings for the <b>Grantors</b> and <b>Grantees</b> grids are: 
-	First, Middle, Last, and Suffix.
-   	<LI>Confirm that the column headings for the <b>Legal Description</b> grid are: 
-	Lot, Block, and Subdivision.
-<p>
-   	<LI>Confirm that each grid except <b> Legal Description (freeform)</b> includes
-       	<b>+</b> and <b>-</b> (Add and Remove) buttons.
-   	<LI>Confirm that <b>Legal Description (freeform)</b> grid includes
-      	<b>&lt</b> and <b>&gt</b> (Previous and Next) buttons plus a page number control 
-	with <b>1 of 1</b> style.
-   	<LI>Confirm that <b>Legal Description (freeform)</b> grid includes
-        a cell-level scrollbar.
-   	<LI>Confirm that <b>File - Save</b> is not available.
-   	<LI>Confirm that <b>Edit - Find</b> is available.
-   	<LI>Confirm that <b>Edit - Find</b> is disabled before a file is opened.
-   	<LI>Confirm that the various <b>Add</b> buttons are disabled before a file is opened.
-<p>
-   	<LI>Confirm that each row in the <b>Return Address</b> grid is selectable and that the 
-	appropriate text is highlighted in the image.
-   	<LI>Confirm that the SRIR <b>Open</b> button allows new files to be loaded.
-</UL>
-<br>
-
-<!-- *********************************************** -->
-<LI><h2>Miscellaneous</h2>
-<UL>
-   	<LI>Click on a populated grid cell and select a subset of the contained text.  Move to the 
-	Image Window and Zoom in.  Confirm that you can select a different subset of text in the 
-	currently active grid cell.
-   	<LI>Delete each row from a Return Address grid.  Add new rows.  Confirm that the new rows 
-	can be deleted.
-   	<LI><b>[FlexIDSCore #2336]</b> Confirm that no Windows error message is presented at 
-	application exit.
-<p>
-	<LI><b>[LegacyRC #5071]</b> Disable Auto-Fitting for Flex Data Entry
-		<ul>
-			<li>Confirm that highlighting multi-line text while holding the <b>Ctrl</b> 
-		key does not create a multi-zone attribute in the Flex Data Entry application.
-		</ul>
-<p>
-	<li><b>[FlexIDSCore #3175]</b> Flex Data Entry - COM exception caught</li>
-	<ul>
-		<li>Open Example01.tif</li>
-		<li>Add an entry in Other Fields and use the <b>create horizontal zone</b> tool to select
-		the legal description paragraph on page 3. Be sure to select plenty of white space along with
-		the text.</li>
-		<li>Confirm that there are no COM exceptions in the exception log.</li>
-		<li>Repeat several times with selected zones of various sizes as the exception did not appear 
-		every time.</li>
-	</ul>
-<p>
-	<li><b>[FlexIDSCore #3178]</b> Flex Data Entry closes with errors when a very small highlight is made</li>
-	<ul>
-		<li>Open an image in Flex Data Entry.</li>
-		<li>Add a blank entry.</li>
-		<li>Use the highlighter tool to create a very small highlight on the page.</li>
-		<li>Confirm that the application does not close and that no exceptions are logged.</li>
-	</ul>
-	
-</UL> 
-<br>
-
+	<LI><h2>Miscellaneous</h2>
+	<UL>
+   		<LI>TBD
+	</UL> 
 </OL>
-<br>
-&nbsp;
-
 </BODY>
-
 </HTML>
