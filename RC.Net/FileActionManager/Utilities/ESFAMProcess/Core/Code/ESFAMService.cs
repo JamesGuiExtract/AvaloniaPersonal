@@ -82,7 +82,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// The setting key to read the number of files to process from.
         /// </summary>
-        internal static readonly string NumberOfFilesToProcess = "FilesToProcessPerFAMInstance";
+        internal static readonly string NumberOfFilesToProcess = "NumberOfFilesToProcessPerFAMInstance";
 
         /// <summary>
         /// The default number of files to process before respawning the FAMProcess
@@ -100,7 +100,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// The current FAM Service database schema version
         /// </summary>
-        internal const int CurrentDatabaseSchemaVersion = 1;
+        internal const int CurrentDatabaseSchemaVersion = 2;
 
         #endregion Constants
 
