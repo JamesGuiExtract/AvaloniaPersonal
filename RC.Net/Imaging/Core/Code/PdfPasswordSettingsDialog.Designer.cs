@@ -40,9 +40,11 @@ namespace Extract.Imaging
         private void InitializeComponent()
         {
             System.Windows.Forms.GroupBox groupBox1;
+            System.Windows.Forms.Label label3;
             System.Windows.Forms.Label label1;
             System.Windows.Forms.GroupBox groupBox2;
             System.Windows.Forms.Label label2;
+            System.Windows.Forms.Label label4;
             this._userPasswordText2 = new System.Windows.Forms.TextBox();
             this._userPasswordText1 = new System.Windows.Forms.TextBox();
             this._enableUserPasswordCheckBox = new System.Windows.Forms.CheckBox();
@@ -60,15 +62,18 @@ namespace Extract.Imaging
             this._btnOk = new System.Windows.Forms.Button();
             this._btnCancel = new System.Windows.Forms.Button();
             groupBox1 = new System.Windows.Forms.GroupBox();
+            label3 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             groupBox2 = new System.Windows.Forms.GroupBox();
             label2 = new System.Windows.Forms.Label();
+            label4 = new System.Windows.Forms.Label();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(label3);
             groupBox1.Controls.Add(this._userPasswordText2);
             groupBox1.Controls.Add(label1);
             groupBox1.Controls.Add(this._userPasswordText1);
@@ -79,6 +84,15 @@ namespace Extract.Imaging
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "User password";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new System.Drawing.Point(22, 20);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(111, 13);
+            label3.TabIndex = 4;
+            label3.Text = "Enable user password";
             // 
             // _userPasswordText2
             // 
@@ -112,14 +126,14 @@ namespace Extract.Imaging
             this._enableUserPasswordCheckBox.AutoSize = true;
             this._enableUserPasswordCheckBox.Location = new System.Drawing.Point(6, 19);
             this._enableUserPasswordCheckBox.Name = "_enableUserPasswordCheckBox";
-            this._enableUserPasswordCheckBox.Size = new System.Drawing.Size(130, 17);
+            this._enableUserPasswordCheckBox.Size = new System.Drawing.Size(15, 14);
             this._enableUserPasswordCheckBox.TabIndex = 0;
-            this._enableUserPasswordCheckBox.Text = "Enable user password";
             this._enableUserPasswordCheckBox.UseVisualStyleBackColor = true;
             this._enableUserPasswordCheckBox.Click += new System.EventHandler(this.HandleEnablePasswordCheckboxClicked);
             // 
             // groupBox2
             // 
+            groupBox2.Controls.Add(label4);
             groupBox2.Controls.Add(this._allowHighQualityPrintingCheck);
             groupBox2.Controls.Add(this._allowDocumentAssemblyCheck);
             groupBox2.Controls.Add(this._allowAccessibilityCheck);
@@ -253,9 +267,8 @@ namespace Extract.Imaging
             this._enableOwnerPasswordCheckBox.AutoSize = true;
             this._enableOwnerPasswordCheckBox.Location = new System.Drawing.Point(6, 19);
             this._enableOwnerPasswordCheckBox.Name = "_enableOwnerPasswordCheckBox";
-            this._enableOwnerPasswordCheckBox.Size = new System.Drawing.Size(139, 17);
+            this._enableOwnerPasswordCheckBox.Size = new System.Drawing.Size(15, 14);
             this._enableOwnerPasswordCheckBox.TabIndex = 0;
-            this._enableOwnerPasswordCheckBox.Text = "Enable owner password";
             this._enableOwnerPasswordCheckBox.UseVisualStyleBackColor = true;
             this._enableOwnerPasswordCheckBox.Click += new System.EventHandler(this.HandleEnablePasswordCheckboxClicked);
             // 
@@ -278,6 +291,15 @@ namespace Extract.Imaging
             this._btnCancel.TabIndex = 6;
             this._btnCancel.Text = "Cancel";
             this._btnCancel.UseVisualStyleBackColor = true;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new System.Drawing.Point(22, 20);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(120, 13);
+            label4.TabIndex = 12;
+            label4.Text = "Enable owner password";
             // 
             // PdfPasswordSettingsDialog
             // 

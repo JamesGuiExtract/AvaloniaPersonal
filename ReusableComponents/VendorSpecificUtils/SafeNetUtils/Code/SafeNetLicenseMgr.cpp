@@ -501,7 +501,7 @@ void SafeNetLicenseMgr::getLicense()
 			}
 
 			// Release the bad license and clean up stuff
-			releaseLicense();
+			releaseLicense("ELI29816");
 		}
 
 		// If this is a retry attempt log an exception
@@ -651,7 +651,7 @@ void SafeNetLicenseMgr::getLicense()
 				catch ( UCLIDException &ue )
 				{
 					// Call releaseLicense to reset all values to defaults
-					releaseLicense();
+					releaseLicense("ELI29817");
 
 					// Set the saved exception everytime through the loop
 					ueSave = UCLIDException ("ELI18243", "Get USB Key License timed out.", ue);
@@ -698,13 +698,13 @@ SafeNetLicenseMgr::~SafeNetLicenseMgr()
 {
 	try
 	{
-		// Release the license
-		releaseLicense();
+		// Release the license (do not log exceptions if the release failed)
+		releaseLicense("ELI29818", false);
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16584");
 }
 //-------------------------------------------------------------------------------------------------
-void SafeNetLicenseMgr::releaseLicense()
+void SafeNetLicenseMgr::releaseLicense(const string& strELICode, bool bLogReleaseException)
 {
 	try
 	{
@@ -720,7 +720,7 @@ void SafeNetLicenseMgr::releaseLicense()
 
 			spsStatus = SFNTsntlReleaseLicense(&m_Packet, m_rusblLicense.m_dwUserLimitAddr, &nLicenses);
 
-			if ( spsStatus != SP_ERR_SUCCESS )
+			if ( spsStatus != SP_ERR_SUCCESS && bLogReleaseException )
 			{
 				UCLIDException ue("ELI11302", "Unable to release USB Key License.");
 				loadSafeNetErrInfo(ue, spsStatus);
@@ -731,7 +731,7 @@ void SafeNetLicenseMgr::releaseLicense()
 			}
 		}
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18190");
+	CATCH_AND_LOG_ALL_EXCEPTIONS(strELICode);
 
 	// Always call cleanup function
 	try
@@ -1025,7 +1025,7 @@ void SafeNetLicenseMgr::validateUSBLicense()
 		if ( !queryLicense( qrpQR ) )
 		{
 			// The license is not good so release it - this will stop heartbeat thread and reset every thing.
-			releaseLicense();
+			releaseLicense("ELI29819");
 			UCLIDException ue("ELI12112", "USB License not valid." );
 			throw ue;
 		}
@@ -1046,7 +1046,7 @@ void SafeNetLicenseMgr::validateHeartbeatActive()
 		if (!isHeartBeatThreadRunning())	
 		{
 			// The license is no longer good so releaseLicense 
-			releaseLicense();
+			releaseLicense("ELI29820");
 
 			if ( m_htdData.m_bException )
 			{

@@ -48,32 +48,49 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                string databaseFile = ESFAMService.DatabaseFile;
+
                 // Check if the database file exists
-                if (!File.Exists(ESFAMService.DatabaseFile))
+                if (File.Exists(databaseFile))
+                {
+                    // Build new database file name (add timestamp before extension)
+                    // and replace ':' with '_'
+                    string fileName = Path.GetFileNameWithoutExtension(databaseFile)
+                        + "." + DateTime.Now.ToString("s", CultureInfo.CurrentCulture)
+                        + Path.GetExtension(databaseFile);
+                    fileName = fileName.Replace(":", "_");
+
+                    // Buld the new file name
+                    fileName = FileSystemMethods.PathCombine(
+                        Path.GetDirectoryName(databaseFile), fileName);
+
+                    FileSystemMethods.MoveFile(databaseFile, fileName, false);
+                }
+                else
                 {
                     // Ensure the path exists
-                    Directory.CreateDirectory(Path.GetDirectoryName(ESFAMService.DatabaseFile));
+                    Directory.CreateDirectory(Path.GetDirectoryName(databaseFile));
+                }
 
-                    using (SqlCeEngine engine = new SqlCeEngine(ESFAMService.DatabaseConnectionString))
+                using (SqlCeEngine engine = new SqlCeEngine(ESFAMService.DatabaseConnectionString))
+                {
+                    // Create the database
+                    engine.CreateDatabase();
+                    _installerCreatedDatabase = true;
+                }
+
+                using (SqlCeConnection connection =
+                    new SqlCeConnection(ESFAMService.DatabaseConnectionString))
+                {
+                    // If the connection is closed, open it
+                    if (connection.State == ConnectionState.Closed)
                     {
-                        // Create the database
-                        engine.CreateDatabase();
-                        _installerCreatedDatabase = true;
+                        connection.Open();
                     }
 
-                    using (SqlCeConnection connection =
-                        new SqlCeConnection(ESFAMService.DatabaseConnectionString))
-                    {
-                        // If the connection is closed, open it
-                        if (connection.State == ConnectionState.Closed)
-                        {
-                            connection.Open();
-                        }
-
-                        // Now add the FPSFile table
-                        AddFPSFileTable(connection);
-                        AddSettingsTable(connection);
-                    }
+                    // Now add the FPSFile table
+                    AddFPSFileTable(connection);
+                    AddSettingsTable(connection);
                 }
 
                 base.OnAfterInstall(savedState);
@@ -201,6 +218,10 @@ namespace Extract.FileActionManager.Utilities
             // Add the number of files to process setting
             defaultSettings.Add(ESFAMService.NumberOfFilesToProcess,
                 ESFAMService.DefaultNumberOfFilesToProcess.ToString(CultureInfo.InvariantCulture));
+
+            // Add the schema version information
+            defaultSettings.Add(ESFAMService.ServiceDatabaseSchemaVersion,
+                ESFAMService.CurrentDatabaseSchemaVersion.ToString(CultureInfo.InvariantCulture));
 
             return defaultSettings;
         }

@@ -116,6 +116,15 @@ namespace Extract.Imaging
         }
 
         /// <summary>
+        /// Gets/sets whether both user and owner passwords are required when configuring the object
+        /// </summary>
+        bool RequireUserAndOwnerPassword
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets all of the settings in one call.
         /// </summary>
         /// <param name="userPassword">The user password.</param>
@@ -145,8 +154,9 @@ namespace Extract.Imaging
         /// The current version of this object.
         /// Versions:
         /// 1. Initial version
+        /// 2. Added RequireUserAndOwner password setting due to bug in Leadtools
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         #endregion Constants
 
@@ -171,6 +181,11 @@ namespace Extract.Imaging
         /// Whether this object is dirty or not.
         /// </summary>
         bool _dirty;
+
+        /// <summary>
+        /// Whether both user and owner passwords are required.
+        /// </summary>
+        bool _requireUserAndOwner;
 
         #endregion Fields
 
@@ -297,6 +312,21 @@ namespace Extract.Imaging
         }
 
         /// <summary>
+        /// Gets/sets whether both user and owner passwords are required.
+        /// </summary>
+        public bool RequireUserAndOwnerPassword
+        {
+            get
+            {
+                return _requireUserAndOwner;
+            }
+            set
+            {
+                _requireUserAndOwner = value;
+            }
+        }
+
+        /// <summary>
         /// Gets all of the settings in one call.
         /// </summary>
         /// <param name="userPassword">The user password.</param>
@@ -335,6 +365,7 @@ namespace Extract.Imaging
                 _userPassword = settings.UserPassword;
                 _ownerPassword = settings.OwnerPassword;
                 _permissions = settings.OwnerPermissions;
+                _requireUserAndOwner = settings.RequireUserAndOwnerPassword;
                 _dirty = true;
             }
             catch (Exception ex)
@@ -456,6 +487,10 @@ namespace Extract.Imaging
                     _userPassword = ExtractEncryption.DecryptString(reader.ReadString(), mapLabel);
                     _ownerPassword = ExtractEncryption.DecryptString(reader.ReadString(), mapLabel);
                     _permissions = (PdfOwnerPermissions)reader.ReadInt32();
+                    if (reader.Version >= 2)
+                    {
+                        _requireUserAndOwner = reader.ReadBoolean();
+                    }
                 }
 
 
@@ -489,6 +524,7 @@ namespace Extract.Imaging
                     writer.Write(ExtractEncryption.EncryptString(_userPassword, mapLabel));
                     writer.Write(ExtractEncryption.EncryptString(_ownerPassword, mapLabel));
                     writer.Write((int)_permissions);
+                    writer.Write(_requireUserAndOwner);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -529,8 +565,28 @@ namespace Extract.Imaging
         /// </returns>
         public bool IsConfigured()
         {
-            // Configured if at least 1 password is defined
-            return !string.IsNullOrEmpty(_ownerPassword) || !string.IsNullOrEmpty(_userPassword);
+            try
+            {
+                // Configured if either:
+                // At least 1 password is defined
+                // OR
+                // _requireUserAndOwner and both are defined
+                bool userDefined = !string.IsNullOrEmpty(_userPassword);
+                bool ownerDefined = !string.IsNullOrEmpty(_ownerPassword);
+                if (_requireUserAndOwner)
+                {
+                    return userDefined && ownerDefined;
+                }
+                else
+                {
+                    return userDefined || ownerDefined;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI29812",
+                    "Unable to check 'Pdf password settings' configuration.", ex);
+            }
         }
 
         #endregion

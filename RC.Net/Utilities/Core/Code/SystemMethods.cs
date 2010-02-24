@@ -99,33 +99,67 @@ namespace Extract.Utilities
         {
             try
             {
-                Process[] procs = null;
+                Process process = null;
+                try
+                {
+                    process = Process.GetProcessById(processId);
 
-                // If a process name is specified, get all the processes with that name
-                if (!string.IsNullOrEmpty(processName))
-                {
-                    procs = Process.GetProcessesByName(processName);
-                }
-                else
-                {
-                    // No name specified, get all processes.
-                    procs = Process.GetProcesses();
-                }
-
-                // Return true if the specified Process ID is in the list of processes.
-                foreach (Process process in procs)
-                {
-                    if (process.Id == processId)
+                    // If a process name is specified, return whether the
+                    // process names are equal
+                    if (!string.IsNullOrEmpty(processName))
                     {
-                        return true;
+                        return process.ProcessName.Equals(processName,
+                            StringComparison.OrdinalIgnoreCase);
+                    }
+
+                    // Found the process so it is running
+                    return true;
+                }
+                catch
+                {
+                    // Exception indicates that the specified process ID is not running
+                    return false;
+                }
+                finally
+                {
+                    // Ensure the process is cleaned up
+                    if (process != null)
+                    {
+                        process.Dispose();
                     }
                 }
-
-                return false;
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28771", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the process name for the specified process ID.
+        /// </summary>
+        /// <param name="processId">The process ID to search for.</param>
+        /// <returns>The name for the specified process ID.</returns>
+        /// <exception cref="ExtractException">If the specified process ID is
+        /// not currently running.</exception>
+        public static string GetProcessName(int processId)
+        {
+            Process process = null;
+            try
+            {
+                process = Process.GetProcessById(processId);
+                return process.ProcessName;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29807", ex);
+            }
+            finally
+            {
+                if (process != null)
+                {
+                    process.Dispose();
+                }
             }
         }
     }

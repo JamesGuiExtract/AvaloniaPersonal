@@ -99,7 +99,7 @@ public:
 	// PURPOSE:		To stop the heartbeat thread if it is running and release any license
 	//				that has been obtained. Any exceptions are logged.
 	// NOTE:		This calls SFNTsntlCleanup().
-	void releaseLicense();
+	void releaseLicense(const string& strELICode = "ELI18190", bool bLogReleaseException = true);
 	bool hasLicense();
 
 	/////////////////////////////////////////////////////////////////////////////////////

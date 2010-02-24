@@ -291,7 +291,7 @@ LRESULT CConvertToPDFTaskPP::OnClickedCheckPdfSecurity(WORD wNotifyCode, WORD wI
 		// Enable/disable the PDF/A check box as needed
 		m_checkPDFA.EnableWindow(asMFCBool(!bEnabled));
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29740");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29805");
 
 	return 0;
 }

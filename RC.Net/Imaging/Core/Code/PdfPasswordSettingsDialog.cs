@@ -85,19 +85,33 @@ namespace Extract.Imaging
             {
                 // Get the user password
                 string userPassword = _settings.UserPassword;
-                bool enableUserPassword = !string.IsNullOrEmpty(userPassword);
-                _enableUserPasswordCheckBox.Checked = enableUserPassword;
-                if (enableUserPassword)
+                bool userPasswordSpecified = !string.IsNullOrEmpty(userPassword);
+
+                // Get the owner password
+                string ownerPassword = _settings.OwnerPassword;
+                bool ownerPasswordSpecified = !string.IsNullOrEmpty(ownerPassword);
+
+                // If both passwords are required then check both boxes
+                // and disable them
+                if (_settings.RequireUserAndOwnerPassword)
+                {
+                    _enableUserPasswordCheckBox.Checked = true;
+                    _enableUserPasswordCheckBox.Enabled = false;
+                    _enableOwnerPasswordCheckBox.Checked = true;
+                    _enableOwnerPasswordCheckBox.Enabled = false;
+                }
+                else
+                {
+                    _enableUserPasswordCheckBox.Checked = userPasswordSpecified;
+                    _enableOwnerPasswordCheckBox.Checked = ownerPasswordSpecified;
+                }
+
+                if (userPasswordSpecified)
                 {
                     _userPasswordText1.Text = userPassword;
                     _userPasswordText2.Text = userPassword;
                 }
-
-                // Get the owner password
-                string ownerPassword = _settings.OwnerPassword;
-                bool enableOwnerPassword = !string.IsNullOrEmpty(ownerPassword);
-                _enableOwnerPasswordCheckBox.Checked = enableOwnerPassword;
-                if (enableOwnerPassword)
+                if (ownerPasswordSpecified)
                 {
                     _ownerPasswordText1.Text = ownerPassword;
                     _ownerPasswordText2.Text = ownerPassword;
@@ -217,7 +231,20 @@ namespace Extract.Imaging
             {
                 bool userChecked = _enableUserPasswordCheckBox.Checked;
                 bool ownerChecked = _enableOwnerPasswordCheckBox.Checked;
-                if (!userChecked && !ownerChecked)
+                if (_settings.RequireUserAndOwnerPassword)
+                {
+                    if (!userChecked || !ownerChecked)
+                    {
+                        MessageBox.Show(
+                            "This object requires both the user and owner passwords to be set.",
+                            "Define both Passwords",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error,
+                            MessageBoxDefaultButton.Button1, 0);
+                        _enableUserPasswordCheckBox.Focus();
+                        return;
+                    }
+                }
+                else if (!userChecked && !ownerChecked)
                 {
                     MessageBox.Show("At least one password must be specified.", "No Passwords",
                         MessageBoxButtons.OK, MessageBoxIcon.Error,
@@ -310,6 +337,17 @@ namespace Extract.Imaging
                     {
                         permissions |= PdfOwnerPermissions.AllowLowQualityPrinting;
                     }
+                }
+
+                // Ensure that both passwords are different
+                if (userPassword == ownerPassword)
+                {
+                    MessageBox.Show("User and owner passwords must be different.",
+                        "User and Owner Passwords Match",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error,
+                        MessageBoxDefaultButton.Button1, 0);
+                    _userPasswordText1.Focus();
+                    return;
                 }
 
                 // Store the settings

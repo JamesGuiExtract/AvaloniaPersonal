@@ -146,7 +146,7 @@ STDMETHODIMP CRedactionTaskPP::Apply()
 			if (m_chkPdfSecurity.GetCheck() == BST_CHECKED)
 			{
 				IMustBeConfiguredObjectPtr ipConfigure = m_ipPdfSettings;
-				ASSERT_RESOURCE_ALLOCATION("ELI0", ipConfigure != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29813", ipConfigure != NULL);
 				if (ipConfigure->IsConfigured() == VARIANT_FALSE)
 				{
 					MessageBox("Pdf security settings are not configured properly.",
@@ -505,6 +505,9 @@ LRESULT CRedactionTaskPP::OnClickedBtnPdfSettings(WORD wNotifyCode, WORD wID, HW
 		{
 			m_ipPdfSettings.CreateInstance(CLSID_PdfPasswordSettings);
 			ASSERT_RESOURCE_ALLOCATION("ELI29779", m_ipPdfSettings != NULL);
+
+			// Enforce setting both passwords due to Leadtools bug [LRCAU #5749]
+			m_ipPdfSettings->RequireUserAndOwnerPassword = VARIANT_TRUE;
 		}
 
 		// Run the configuration for the PDF security settings

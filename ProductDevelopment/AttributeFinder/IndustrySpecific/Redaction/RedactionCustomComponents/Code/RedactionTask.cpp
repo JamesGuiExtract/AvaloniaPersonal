@@ -1135,7 +1135,7 @@ STDMETHODIMP CRedactionTask::put_FontSize(long lFontSize)
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29735");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29804");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactionTask::put_PdfPasswordSettings(IPdfPasswordSettings* pPdfSettings)
@@ -1154,7 +1154,7 @@ STDMETHODIMP CRedactionTask::put_PdfPasswordSettings(IPdfPasswordSettings* pPdfS
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI24784");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29803");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactionTask::get_PdfPasswordSettings(IPdfPasswordSettings** ppPdfSettings)
@@ -1323,6 +1323,9 @@ STDMETHODIMP CRedactionTask::Load(IStream* pStream)
 				readObjectFromStream(ipObj, pStream, "ELI29774");
 				m_ipPdfSettings = ipObj;
 				ASSERT_RESOURCE_ALLOCATION("ELI29775", m_ipPdfSettings != NULL);
+
+				// Ensure the require passwords value is set [LRCAU #5749]
+				m_ipPdfSettings->RequireUserAndOwnerPassword = VARIANT_TRUE;
 			}
 		}
 
