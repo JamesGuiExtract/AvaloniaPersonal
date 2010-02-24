@@ -510,8 +510,17 @@ namespace Extract.FileActionManager.Utilities
             }
             catch (Exception ex)
             {
-                // Just log any exceptions from the process threads
-                ExtractException.Log("ELI28498", ex);
+                if (ex.Message.Contains("The remote procedure call failed"))
+                {
+                    ExtractException ee = new ExtractException("ELI29823",
+                        "Unable to communicate with the underlying FAM process.", ex);
+                    ee.Log();
+                }
+                else
+                {
+                    // Just log any exceptions from the process threads
+                    ExtractException.Log("ELI28498", ex);
+                }
             }
             finally
             {
@@ -608,7 +617,7 @@ namespace Extract.FileActionManager.Utilities
                 string value = "";
                 if (reader.Read())
                 {
-                    value = reader.GetString(0);
+                    value = reader.IsDBNull(0) ? "" : reader.GetString(0);
                 }
 
                 return value;
