@@ -427,6 +427,14 @@ namespace Extract.Utilities
                     xmlDocument.CreateElement(_settings.GetType().ToString());
                 userSettingsElement.AppendChild(typeSpecificElement);
 
+                // [FlexIDSCore:4131]
+                // Create the directory first, if necessary.
+                string directoryName = Path.GetDirectoryName(configFileName);
+                if (!Directory.Exists(directoryName))
+                {
+                    Directory.CreateDirectory(directoryName);
+                }
+
                 xmlDocument.Save(configFileName);
             }
             catch (Exception ex)
