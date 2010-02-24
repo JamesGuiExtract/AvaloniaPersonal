@@ -21,6 +21,8 @@
 	<UL>
 		<li><b>User Interface</b>
 		<ul>
+			<li><b>[FlexIDSCore #4110]</b> Confirm that the dialog appears roughly centered 
+			over the <b>Select Task</b> dialog.
 		   	<li>Confirm that an <b>ID Shield data file location</b> group box is defined.
 		   	<li>Confirm that the initial value for <b>ID Shield data file location</b> is 
 			<b>You are using default settings.</b>
@@ -905,6 +907,10 @@
 					<li>Computer
 					<li>Time
 				</ul>
+<p>
+		  	   	<LI><b>[FlexIDSCore #4092]</b> Confirm that switching to the 
+				<b>Selection</b> tool is the default choice after creating a manual 
+				redaction.
 			</ul>
 <p>
 			<li><b>Thumbnail window</b>
@@ -1248,6 +1254,9 @@
 		      			<li>Confirm that shortcuts such as <b>Ctrl+E</b> or 
 					<b>Ctrl+S</b> work properly with an undocked Grid view.
 				</ul>
+<p>
+		  	   	<LI><b>[FlexIDSCore #4047]</b> Confirm that unclassified documents 
+				are displayed as <b>Unknown</b> in the verification UI.
 			</ul>
 <p>
 			<li><b>Shortcuts</b>
@@ -1452,20 +1461,19 @@
 <p>
 				<li><b>Printing</b>
 				<ul>
-			  	   	<LI><b>[FlexIDSCore #3646]</b> Confirm that <b>HCData</b> items 
-					are printed based on <b>Output=1</b> as specified in 
-					<b>IDShield.ini</b>.
-			  	   	<LI>Confirm that <b>MCData</b> items are printed based on 
-					<b>Output=1</b> as specified in <b>IDShield.ini</b>.
-			  	   	<LI>Confirm that <b>Manual</b> items are printed based on 
-					<b>Output=1</b> as specified in <b>IDShield.ini</b>.
-			  	   	<LI>Confirm that <b>LCData</b> items are not printed based on 
-					<b>Output=o</b> as specified in <b>IDShield.ini</b>.
-			  	   	<LI>Confirm that <b>Clues</b> items are not printed based on 
-					<b>Output=o</b> as specified in <b>IDShield.ini</b>.
-			  	   	<LI><b>[FlexIDSCore #3652]</b> Confirm that redactions 
-					<b>printed</b> from the verification UI are output in the color 
-					specified in the <b>IDShield.ini</b> file.
+			  	   	<LI>Confirm that <b>HCData</b> items are printed if toggled 
+					<b>on</b> and not printed if toggled <b>off</b>.
+			  	   	<LI>Confirm that <b>MCData</b> items are printed if toggled 
+					<b>on</b> and not printed if toggled <b>off</b>.
+			  	   	<LI>Confirm that <b>Manual</b> items are printed if toggled 
+					<b>on</b> and not printed if toggled <b>off</b>.
+			  	   	<LI>Confirm that <b>LCData</b> items are printed if toggled 
+					<b>on</b> and not printed if toggled <b>off</b>.
+			  	   	<LI>Confirm that <b>Clues</b> items are printed if toggled 
+					<b>on</b> and not printed if toggled <b>off</b>.
+					<li><b>[FlexIDSCore #4084]</b> Confirm that the printed 
+					redaction areas are <b>exactly</b> as displayed on the image, 
+					even at various zoom levels.
 				</ul>
 <p>
 				<li>Confirm that verification results can be saved when including 
@@ -1533,6 +1541,22 @@
 					of the regular border.
 					<li>Confirm that <b>zoom level 10</b> zooms out so that at least half 
 					of the page is visible.
+					<li>Confirm that the red selection border is opaque.
+					<li>Confirm that white slivers <b>are not</b> seen between the 
+					redaction area and the border, even with various zoom levels.
+<p>
+			  	   	<LI><b>[FlexIDSCore #4070]</b> Zoom and scroll issues during 
+					verification
+				       	<ul>
+				  	   	<LI>Confirm that <b>F7</b> zooms in and that the center of 
+						the image remains in the same place.
+				  	   	<LI>Confirm that <b>F8</b> zooms out and that the center 
+						of the image remains in the same place.
+				  	   	<LI>Confirm that <b>Ctrl+Mousewheel Up</b> zooms in and that 
+						the center of the image remains in the same place.
+				  	   	<LI>Confirm that <b>Ctrl+Mousewheel Down</b> zooms out and 
+						that the center of the image remains in the same place.
+				       	</ul>
 				</ul>
 <p>
 	  	   		<LI><b>[FlexIDSCore #3510]</b> Interaction with different tools
@@ -1665,12 +1689,14 @@
 					is being drawn.
 				</ul>
 <p>
-		  	   	<LI><b>[FlexIDSCore #3890]</b> Resized highlights
+		  	   	<LI><b>[FlexIDSCore #3890, #4021, #4091]</b> Resized highlights
 				<ul>
 					<li>Select a redaction in the <b>Grid view</b>.
 					<li>Switch to using the <b>Arrow</b> tool.
 					<li>Click on one of the grip handles without moving the mouse.
 					<li>Confirm that the redaction does not change size.
+					<li>Create a multi-line redaction.
+					<li>Confirm that each line can be moved independently.
 	       			</ul>
 			</ul>
 		</ul>
