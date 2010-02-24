@@ -139,6 +139,20 @@
    	<ul> 
       		<li>Confirm the default setting is <b>Stop processing once the queue is empty</b>.</li>
       		<li>Confirm the setting of the radio button is persistent.</li>
+<p>
+  	   	<LI><b>[LegacyRC #5745]</b> Default CPU usage when waiting for files
+		<ul>
+			<li>Prepare an FPS file to process files where it will <b>Keep processing 
+			files as they are added to the queue</b>.
+			<li>Confirm that very little CPU usage is noted while the FPS file is just 
+			waiting for a file to process.
+			<li>Examine the <b>MillisecondsBetweenDBCheck</b> registry key under 
+			<b>HKCU/Software/Extract 
+			Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FPRecordManager</b>.
+			<li>Confirm that the default is <b>2000</b>.
+			<li>Confirm that changing the value to <b>20</b> increases to CPU usage while 
+			the FPS file is waiting.
+		</ul>
    	</ul>
 <p>
    	<li>Confirm the Processing Setup tab has a <b>Threads for processing</b> groupbox with two 
