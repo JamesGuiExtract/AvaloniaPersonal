@@ -36,7 +36,7 @@ IDSRDTInstallMediaDir=$(IDSInstallProjectDirectory)\Media\CD-ROM\DiskImages\Disk
 
 RDTReleaseBleedingEdgeDir=S:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT
 IDSRDTReleaseBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT_IDShieldCustomer
-RCDotNetDir=$(PDRootDir)\RC.Net
+RCDotNetDir=$(EngineeringRootDirectory)\RC.Net
 
 # determine the name of the release output directory based upon the build
 # configuration that is being built
