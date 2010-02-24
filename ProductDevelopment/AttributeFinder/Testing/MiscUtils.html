@@ -68,6 +68,28 @@
    	<LI><b>[LegacyRC #5589]</b> Confirm that ImageFormatConverter.exe requires a <b>FLEX 
 	Index / ID Shield Core</b> license in order to convert a TIF file to a TIF file.
 <p>
+	<li><b>[LegacyRC #5739]</b> Confirm that <b>ImageFormatConverter.exe</b> supports the following 
+	command-line options
+	<ul>
+		<li><b>/user &quot;&lt;password&gt;&quot;</b> for specifying a user password
+		<li><b>/owner &quot;&lt;password&gt;&quot; &lt;Permissions&gt;</b> for 
+		specifying an owner password and permissions
+		<ul>
+			<li><b>0</b> for no permissions
+			<li><b>1</b> to allow low quality printing
+			<li><b>2</b> to allow high quality printing
+			<li><b>4</b> to allow document modifications
+			<li><b>8</b> to allow copying/extraction of contents
+			<li><b>16</b> to allow accessibility access to contents
+			<li><b>32</b> to allow adding/modifying text annotations
+			<li><b>64</b> to allow filling in form fields
+			<li><b>128</b> to allow document assembly
+			<li><b>255</b> to allow all permissions
+		</ul>
+		<li><b>/enc</b> to indicate that the specified passwords are encrypted.  
+		Note that the <b>/enc</b> switch is only for private use.
+	</ul>
+<p>
 	<li><b>Image conversion for same type</b>
 	<ul>
 		<li>Referenced images can be found in 
@@ -150,6 +172,28 @@
 	<ul>
 		<li><b>/ef&lt:logfile&gt;</b> - logs all errors to the specified log file
 		<li><b>/pdfa</b> - the output file will be PDF/A-compliant
+	</ul>
+<p>
+	<li><b>[LegacyRC #5739]</b> Confirm that <b>ESConvertToPDF.exe</b> supports the following 
+	command-line options
+	<ul>
+		<li><b>/user &quot;&lt;password&gt;&quot;</b> for specifying a user password
+		<li><b>/owner &quot;&lt;password&gt;&quot; &lt;Permissions&gt;</b> for 
+		specifying an owner password and permissions
+		<ul>
+			<li><b>0</b> for no permissions
+			<li><b>1</b> to allow low quality printing
+			<li><b>2</b> to allow high quality printing
+			<li><b>4</b> to allow document modifications
+			<li><b>8</b> to allow copying/extraction of contents
+			<li><b>16</b> to allow accessibility access to contents
+			<li><b>32</b> to allow adding/modifying text annotations
+			<li><b>64</b> to allow filling in form fields
+			<li><b>128</b> to allow document assembly
+			<li><b>255</b> to allow all permissions
+		</ul>
+		<li><b>/enc</b> to indicate that the specified passwords are encrypted.  
+		Note that the <b>/enc</b> switch is only for private use.
 	</ul>
 </ul>
 </li>
