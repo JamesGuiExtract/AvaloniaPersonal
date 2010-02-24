@@ -178,6 +178,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         bool _userClosing;
 
+        /// <summary>
+        /// Used to invoke methods on this control.
+        /// </summary>
+        readonly ControlInvoker _invoker;
+
         #endregion Fields
 
         #region Events
@@ -240,13 +245,17 @@ namespace Extract.Redaction.Verification
                 LayerObject.SelectionPen = ExtractPens.GetThickPen(Color.Red);
 
                 // Subscribe to layer object events
-                _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
-                _imageViewer.LayerObjects.LayerObjectDeleted += HandleImageViewerLayerObjectDeleted;
+                _imageViewer.LayerObjects.Selection.LayerObjectAdded += 
+                    HandleImageViewerSelectionLayerObjectAdded;
+                _imageViewer.LayerObjects.Selection.LayerObjectDeleted += 
+                    HandleImageViewerSelectionLayerObjectDeleted;
 
                 if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
                 {
                     LoadState();
                 }
+
+                _invoker = new ControlInvoker(this);
             }
             catch (Exception ex)
             {
@@ -1427,6 +1436,19 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Updates the properties of the exemption code related controls based on the currently 
+        /// selected layer objects.
+        /// </summary>
+        void UpdateExemptionControls()
+        {
+            bool selected = _imageViewer.LayerObjects.Selection.Count > 0;
+
+            _applyExemptionToolStripButton.Enabled = selected;
+            _lastExemptionToolStripButton.Enabled = 
+                selected && _redactionGridView.HasAppliedExemptions;
+        }
+
+        /// <summary>
         /// Loads the specified verification user interface state.
         /// </summary>
         /// <param name="memento">The verification user interface state to load.</param>
@@ -2180,15 +2202,11 @@ namespace Extract.Redaction.Verification
         /// <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.</param>
-        void HandleImageViewerLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
+        void HandleImageViewerSelectionLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
         {
             try
             {
-                if (_imageViewer.LayerObjects.Count == 1)
-                {
-                    _applyExemptionToolStripButton.Enabled = true;
-                    _lastExemptionToolStripButton.Enabled = _redactionGridView.HasAppliedExemptions;
-                }
+                UpdateExemptionControls();
             }
             catch (Exception ex)
             {
@@ -2203,15 +2221,11 @@ namespace Extract.Redaction.Verification
         /// <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.</param>
-        void HandleImageViewerLayerObjectDeleted(object sender, LayerObjectDeletedEventArgs e)
+        void HandleImageViewerSelectionLayerObjectDeleted(object sender, LayerObjectDeletedEventArgs e)
         {
             try
             {
-                if (_imageViewer.LayerObjects.Count == 0)
-                {
-                    _applyExemptionToolStripButton.Enabled = false;
-                    _lastExemptionToolStripButton.Enabled = false;
-                }
+                UpdateExemptionControls();
             }
             catch (Exception ex)
             {
@@ -2298,15 +2312,15 @@ namespace Extract.Redaction.Verification
         public void Open(string fileName, int fileID, int actionID, FAMTagManager tagManager,
             FileProcessingDB fileProcessingDB)
         {
+            if (InvokeRequired)
+            {
+                _invoker.Invoke(new VerificationFormOpen(Open),
+                    new object[] { fileName, fileID, actionID, tagManager, fileProcessingDB });
+                return;
+            }
+
             try
             {
-                if (InvokeRequired)
-                {
-                    Invoke(new VerificationFormOpen(Open),
-                        new object[] { fileName, fileID, actionID, tagManager, fileProcessingDB });
-                    return;
-                }
-
                 // Store the file processing database
                 StoreDatabase(fileProcessingDB);
 
@@ -2338,7 +2352,7 @@ namespace Extract.Redaction.Verification
                 ExtractException ee = new ExtractException("ELI26627",
                     "Unable to open file for verification.", ex);
                 ee.AddDebugData("File name", fileName, false);
-                throw ee;
+                _invoker.HandleException(ee);
             }
         }
 
