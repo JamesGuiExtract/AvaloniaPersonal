@@ -274,6 +274,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         bool _scrollToTopRequired;
 
+        /// <summary>
+        /// Used to invoke methods on this control.
+        /// </summary>
+        readonly ControlInvoker _invoker;
+
         #endregion Fields
 
         #region Constructors
@@ -401,6 +406,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 Icon = _dataEntryControlHost.ApplicationIcon;
                 _appHelpMenuItem.Text = DataEntryControlHost.ApplicationTitle + " &help...";
                 _aboutMenuItem.Text = "&About " + DataEntryControlHost.ApplicationTitle + "...";
+
+                _invoker = new ControlInvoker(this);
             }
             catch (Exception ex)
             {
@@ -599,7 +606,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             if (InvokeRequired)
             {
-                Invoke(new VerificationFormOpen(Open),
+                _invoker.Invoke(new VerificationFormOpen(Open),
                     new object[] { fileName, fileID, actionID, tagManager, fileProcessingDB });
                 return;
             }
@@ -664,7 +671,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI23871", ex);
-                DisplayCriticalException(ee);
+                _invoker.HandleException(ee);
             }
         }
 
