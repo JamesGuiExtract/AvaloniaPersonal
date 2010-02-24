@@ -278,6 +278,19 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		// Cache the file format
 		int iFormat = fileInfo.Format;
 
+		// If the input format is not Tiff and the output is not PDF
+		// and retaining or applying annotations then throw an exception
+		// [FlexIDSCore #4115]
+		if ((bRetainAnnotations || bApplyAsAnnotations)
+			&& !isTiff(iFormat) && !isPDFFile(strOutputImageName))
+		{
+			UCLIDException uex("ELI29824", "Cannot apply annotations to a non-tiff image.");
+			uex.addDebugInfo("Redaction Source", strImageFileName);
+			uex.addDebugInfo("Redaction Target", strOutputImageName);
+			uex.addDebugInfo("Image Format", getStringFromFormat(iFormat));
+			throw uex;
+		}
+
 		// Get initialized LOADFILEOPTION struct.
 		// IgnoreViewPerspective to avoid a black region at the bottom of the image
 		LOADFILEOPTION lfo =
