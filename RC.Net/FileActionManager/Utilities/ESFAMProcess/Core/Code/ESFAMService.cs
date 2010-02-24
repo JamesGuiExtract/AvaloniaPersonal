@@ -581,8 +581,8 @@ namespace Extract.FileActionManager.Utilities
                         if (_threadsThatRequireAuthentication == _processingThreads.Count)
                         {
                             // All threads failed due to authentication requirement
-                            // call OnStop to stop the service
-                            OnStop();
+                            // call Stop to stop the service
+                            Stop();
                         }
                     }
                 }
