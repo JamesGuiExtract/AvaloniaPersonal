@@ -41,11 +41,6 @@ namespace Extract.Redaction.Verification
                         ExtractException.Log("ELI27118", ex);
                     }
                 }
-                if (_filter != null)
-                {
-                    _filter.Dispose();
-                    _filter = null;
-                }
                 if (_inputEventTracker != null)
                 {
                     _inputEventTracker.Dispose();
@@ -660,6 +655,7 @@ namespace Extract.Redaction.Verification
             this._dataWindowDockableWindow.Guid = new System.Guid("9a0fd258-12fb-4a21-9076-d00f8ce8b1c6");
             this._dataWindowDockableWindow.Location = new System.Drawing.Point(0, 25);
             this._dataWindowDockableWindow.Name = "_dataWindowDockableWindow";
+            this._dataWindowDockableWindow.PrimaryControl = this;
             this._dataWindowDockableWindow.Size = new System.Drawing.Size(527, 878);
             this._dataWindowDockableWindow.TabIndex = 0;
             this._dataWindowDockableWindow.Text = "Data window";
@@ -1120,6 +1116,7 @@ namespace Extract.Redaction.Verification
             this._thumbnailDockableWindow.Guid = new System.Guid("ae627741-717d-48f0-8e85-071b39098d21");
             this._thumbnailDockableWindow.Location = new System.Drawing.Point(4, 25);
             this._thumbnailDockableWindow.Name = "_thumbnailDockableWindow";
+            this._thumbnailDockableWindow.PrimaryControl = this;
             this._thumbnailDockableWindow.Size = new System.Drawing.Size(200, 878);
             this._thumbnailDockableWindow.TabIndex = 0;
             this._thumbnailDockableWindow.Text = "Page thumbnails";
