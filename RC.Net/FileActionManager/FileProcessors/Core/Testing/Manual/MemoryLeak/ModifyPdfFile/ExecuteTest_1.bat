@@ -1,5 +1,5 @@
 :: Clean Source and Destination folders
-call Clean.bat
+call Clean.bat Test_1
 
 :: Get the correct program files directory for 32/64-bit OS
 if defined programfiles(x86) set programfiles=%programfiles(x86)%
