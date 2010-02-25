@@ -103,11 +103,8 @@ namespace Extract.Imaging
             {
                 int count = image.PageCount;
 
-                using (new PdfLock(_isPdf))
-                {
-                    _codecs.Save(image, _tempFile.FileName, _format, image.BitsPerPixel, 1, count,
-                                _pageCount + 1, CodecsSavePageMode.Append); 
-                }
+                _codecs.Save(image, _tempFile.FileName, _format, image.BitsPerPixel, 1, count,
+                            _pageCount + 1, CodecsSavePageMode.Append); 
 
                 _pageCount += count;
             }

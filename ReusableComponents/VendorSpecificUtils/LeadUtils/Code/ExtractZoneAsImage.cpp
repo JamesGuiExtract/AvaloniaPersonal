@@ -152,22 +152,14 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 		BITMAPHANDLE hBitmapImageZone;
 		LeadToolsBitmapFreeer freeer( hBitmapImageZone, true );
 
-		{
-			// Provide multi-thread protection for PDF images
-//			LeadToolsPDFLoadLocker ltPDF( false );
-
-			nRet = L_CopyBitmapRect(&hBitmapImageZone, phBitmap, sizeof(BITMAPHANDLE), rectImageZone.left,
-				rectImageZone.top, abs(rectImageZone.right - rectImageZone.left),
-				abs(rectImageZone.top - rectImageZone.bottom)); 
-			throwExceptionIfNotSuccess(nRet, "ELI03351", "Unable to copy portion of bitmap!");
-		}
+		nRet = L_CopyBitmapRect(&hBitmapImageZone, phBitmap, sizeof(BITMAPHANDLE), rectImageZone.left,
+			rectImageZone.top, abs(rectImageZone.right - rectImageZone.left),
+			abs(rectImageZone.top - rectImageZone.bottom)); 
+		throwExceptionIfNotSuccess(nRet, "ELI03351", "Unable to copy portion of bitmap!");
 
 		// if slope is -ve
 		if (dSlope < 0)
 		{
-			// Provide multi-thread protection for PDF images
-//			LeadToolsPDFLoadLocker ltPDF( false );
-
 			// checking start and end Y - coordinates and rotating accordingly
 			if (nEndY < nStartY)
 			{
@@ -187,9 +179,6 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 		// if slope is +ve
 		else
 		{
-			// Provide multi-thread protection for PDF images
-//			LeadToolsPDFLoadLocker ltPDF( false );
-
 			// checking start and end Y - coordinates and rotating accordingly
 			if (nEndY < nStartY)
 			{
@@ -213,9 +202,6 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 			BITMAPWIDTH(&hBitmapImageZone), lHalfBitmapHeight + lHalfZoneHeight};
 
 		{
-			// Provide multi-thread protection for PDF images
-//			LeadToolsPDFLoadLocker ltPDF( false );
-
 			nRet = L_CopyBitmapRect(phSubImageBitmap, &hBitmapImageZone, sizeof(BITMAPHANDLE), finalRect.left,
 				finalRect.top, abs(finalRect.right - finalRect.left),
 				abs(finalRect.top - finalRect.bottom));
@@ -224,9 +210,6 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 	}
 	else
 	{
-		// Provide multi-thread protection for PDF images
-//		LeadToolsPDFLoadLocker ltPDF( false );
-
 		L_INT nRet = L_CopyBitmapRect(phSubImageBitmap, phBitmap, sizeof(BITMAPHANDLE), rectImageZone.left,
 			rectImageZone.top, abs(rectImageZone.right - rectImageZone.left),
 			abs(rectImageZone.top - rectImageZone.bottom));			 

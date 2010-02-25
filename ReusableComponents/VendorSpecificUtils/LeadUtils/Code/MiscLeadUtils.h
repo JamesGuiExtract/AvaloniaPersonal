@@ -321,15 +321,9 @@ LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, PDFInputOutputMgr& outFi
 // PROMISE: To save the bitmap to the specified image based on the SAVEFILEOPTION struct.
 //			If bLockPDF == true then a LeadtoolsPDFLoadLocker will be instantiated.
 // NOTE:	This code will internally perform multiple retry attempts when saving the page.
-LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOuputFile,
-								 FILEINFO& flInfo, SAVEFILEOPTION& sfo, bool bLockPdf);
-//-------------------------------------------------------------------------------------------------
-// PROMISE: To save the bitmap to the specified image based on the SAVEFILEOPTION struct.
-//			If bLockPDF == true then a LeadtoolsPDFLoadLocker will be instantiated.
-// NOTE:	This code will internally perform multiple retry attempts when saving the page.
 LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile,
 								 int nFileFormat, int nCompressionFactor, int nBitsPerPixel,
-								 SAVEFILEOPTION& sfo, bool bLockPdf);
+								 SAVEFILEOPTION& sfo);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the color of the designated pixel
 LEADUTILS_API COLORREF getPixelColor(BITMAPHANDLE &rBitmap, int iRow, int iCol);

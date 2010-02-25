@@ -2331,40 +2331,34 @@ string SpotRecognitionDlg::createSubImage(const std::string& strOriginalImageFil
 	// generate a temp file, but do not delete it automatically
 	TemporaryFileName subImageFile(NULL, strFileExtension.c_str(), false);
 
-	// Individual scope for L_SaveBitmap()
+	// Prepare the default save options
+	int nFileFormat = fileInfo.Format;
+	int nBitsPerPixel = subImageHandle.BitsPerPixel;
+
+	// Get initialized SAVEFILEOPTION struct
+	SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
+
+	// Special settings for PDF input / output image
+	if (strFileExtension == ".pdf")
 	{
-		// Provide multi-thread protection for PDF images
-		LeadToolsPDFLoadLocker ltPDF( subImageFile.getName() );
+		nFileFormat = FILE_RAS_PDF_G4;
+		nBitsPerPixel = 1;
+		sfo.Flags = ESO_PDF_SAVE_USE_BITMAP_DPI;
+	}
 
-		// Prepare the default save options
-		int nFileFormat = fileInfo.Format;
-		int nBitsPerPixel = subImageHandle.BitsPerPixel;
-
-		// Get initialized SAVEFILEOPTION struct
-		SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-
-		// Special settings for PDF input / output image
-		if (strFileExtension == ".pdf")
-		{
-			nFileFormat = FILE_RAS_PDF_G4;
-			nBitsPerPixel = 1;
-			sfo.Flags = ESO_PDF_SAVE_USE_BITMAP_DPI;
-		}
-
-		try
-		{
-			// save the new image file
-			nRet = L_SaveBitmap(const_cast<char*>(subImageFile.getName().c_str()), 
-				&subImageHandle, nFileFormat, nBitsPerPixel, 2, &sfo);
-			throwExceptionIfNotSuccess(nRet, "ELI03248",
-				"Failed to save the sub image into a file.", subImageFile.getName());
-			waitForFileToBeReadable(subImageFile.getName());
-		}
-		catch(UCLIDException& uex)
-		{
-			uex.addDebugInfo("strOriginalImageFileName", strOriginalImageFileName);
-			throw uex;
-		}
+	try
+	{
+		// save the new image file
+		nRet = L_SaveBitmap(const_cast<char*>(subImageFile.getName().c_str()), 
+			&subImageHandle, nFileFormat, nBitsPerPixel, 2, &sfo);
+		throwExceptionIfNotSuccess(nRet, "ELI03248",
+			"Failed to save the sub image into a file.", subImageFile.getName());
+		waitForFileToBeReadable(subImageFile.getName());
+	}
+	catch(UCLIDException& uex)
+	{
+		uex.addDebugInfo("strOriginalImageFileName", strOriginalImageFileName);
+		throw uex;
 	}
 
 	return subImageFile.getName();

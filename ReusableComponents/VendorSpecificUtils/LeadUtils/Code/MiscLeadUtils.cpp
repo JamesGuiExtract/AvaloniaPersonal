@@ -817,7 +817,7 @@ int getNumberOfPagesInImage( const string& strImageFileName )
 		int nRet = FAILURE;
 		while (nNumFailedAttempts < gnNUMBER_ATTEMPTS_BEFORE_FAIL)
 		{
-			// Leadtools pdf support is not thread safe. Lock access if this is a PDF.
+			// Leadtools pdf read support is not thread safe. Lock access if this is a PDF.
 			{
 				LeadToolsPDFLoadLocker ltLocker(strImageFileName);
 
@@ -917,9 +917,6 @@ void initPDFSupport(int nDisplayDepth, int iOpenXRes, int iOpenYRes )
 	}
 	else
 	{
-		// Provide multi-thread protection for PDF images
-		LeadToolsPDFLoadLocker ltPDF( true );
-
 		bool bCouldNotUnlock = false;
 
 		// Only unlock read support if not already unlocked
@@ -969,9 +966,6 @@ void initPDFSupport(int nDisplayDepth, int iOpenXRes, int iOpenYRes )
 	FILEPDFOPTIONS pdfOptions = GetLeadToolsSizedStruct<FILEPDFOPTIONS>(0);
 	// Individual scope for L_GetPDFOptions() and L_SetPDFOptions()
 	{
-		// Provide multi-thread protection for PDF images
-		LeadToolsPDFLoadLocker ltPDF( true );
-
 		// Retrieve default load options
 		L_GetPDFOptions( &pdfOptions, sizeof(pdfOptions) );
 
@@ -1524,7 +1518,12 @@ void saveImagePage(BITMAPHANDLE& hBitmap, PDFInputOutputMgr& outFile,
 			// Check that the PDF manager is in output mode
 			ASSERT_ARGUMENT("ELI27289", !outFile.isInputFile());
 
-			saveImagePage(hBitmap, outFile.getFileName(), flInfo, sfo, false);
+			int nFileFormat = flInfo.Format;
+			int nBitsPerPixel = flInfo.BitsPerPixel;
+			int nCompressionFactor = getCompressionFactor(nFileFormat);
+
+			saveImagePage(hBitmap, outFile.getFileName(), nFileFormat, nCompressionFactor, 
+				nBitsPerPixel, sfo);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28838");
 	}
@@ -1535,34 +1534,13 @@ void saveImagePage(BITMAPHANDLE& hBitmap, PDFInputOutputMgr& outFile,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO& flInfo,
-				   SAVEFILEOPTION& sfo, bool bLockPdf)
-{
-	try
-	{
-		int nFileFormat = flInfo.Format;
-		int nBitsPerPixel = flInfo.BitsPerPixel;
-		int nCompressionFactor = getCompressionFactor(nFileFormat);
-		saveImagePage(hBitmap, strOutputFile, nFileFormat, nCompressionFactor, nBitsPerPixel,
-			sfo, bLockPdf);
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28866");
-}
-//-------------------------------------------------------------------------------------------------
 void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, int nFileFormat,
-				   int nCompressionFactor, int nBitsPerPixel, SAVEFILEOPTION& sfo, bool bLockPdf)
+				   int nCompressionFactor, int nBitsPerPixel, SAVEFILEOPTION& sfo)
 {
 	try
 	{
 		try
 		{
-			// Lock the PDF saving if bLockPdf == true
-			auto_ptr<LeadToolsPDFLoadLocker> apLoadLock;
-			if (bLockPdf)
-			{
-				apLoadLock.reset(new LeadToolsPDFLoadLocker(strOutputFile));
-			}
-
 			// Get the retry count and timeout
 			int iRetryCount(0), iRetryTimeout(0);
 			getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
