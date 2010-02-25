@@ -3,14 +3,14 @@ CALL InitUserEnv.Bat
 CALL InitBuildEnv.Bat
 
 REM Set internal variables
-SET EncryptEXE=D:\temp_6.0.0.77\Flex\Engineering\Binaries\Release\EncryptFile.exe
+SET EncryptEXE=D:\temp\Flex\Engineering\Binaries\Release\EncryptFile.exe
 SET TargetFolder=I:\Common\Engineering\ProductDevelopment\AttributeFinder\FKBUpdateInstallation\Files\ComponentData
 SET EXEBuilder=C:\Program Files\InstallShield\PackageForTheWeb 4\Pftwwiz.exe
 
 ECHO Getting RulePack Labeled "%1"
 if not exist %TargetFolder% md %TargetFolder%
 cd /d %TargetFolder%
-ss get $/Engineering/ProductDevelopment/AttributeFinder/ComponentData -R -I- -W -V%1
+vault GETLABEL -server white -repository Extract -makewritable -nonworkingfolder "%TargetFolder%" "$/Engineering/Rules/ComponentData" "%1"
 
 ECHO Encrypting files...
 SendFilesAsArgumentToApplication *.dat 1 1 "%EncryptEXE%"
