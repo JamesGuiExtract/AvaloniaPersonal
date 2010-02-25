@@ -105,14 +105,7 @@ namespace Extract.Rules
                 LicenseUtilities.ValidateLicense(LicenseIdName.RedactionCoreObjects, "ELI23199",
                     _OBJECT_NAME);
 
-                // Expand each raster zones height and width by 4 pixels [IDSD #177 - JDS]
-                List<RasterZone> zones = new List<RasterZone>();
-                foreach (RasterZone rasterZone in rasterZones)
-                {
-                    rasterZone.ExpandRasterZone(4, 4);
-                    zones.Add(rasterZone);
-                }
-
+                List<RasterZone> zones = new List<RasterZone>(rasterZones);
                 _rasterZones = zones.AsReadOnly();
                 _matchType = matchType;
                 _text = text;
