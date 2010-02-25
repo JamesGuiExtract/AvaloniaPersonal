@@ -1408,12 +1408,22 @@ namespace Extract.DataEntry
 
                 // If the delete key was pressed while not in edit mode and where it won't result in
                 // any rows being deleted, instead delete the contents of all selected cells.
-                if (e.KeyCode == Keys.Delete &&
-                    (SelectedRows.Count == 0 || !AllowUserToDeleteRows))
+                if (e.KeyCode == Keys.Delete)
                 {
-                    // [DataEntry:641]
-                    // Clear the contents as well as the spatial info of all selected cells.
-                    DeleteSelectedCellContents();
+                    if (SelectedRows.Count > 0 && AllowUserToDeleteRows)
+                    {
+                        // [DataEntry:899]
+                        // Due to code to delete the contents of selected cells, a delete key won't
+                        // make it all the way through to the underlying DataGridView class-- we
+                        // need to explicitly delete selected rows.
+                        DeleteSelectedRows();
+                    }   
+                    else
+                    {
+                        // [DataEntry:641]
+                        // Clear the contents as well as the spatial info of all selected cells.
+                        DeleteSelectedCellContents();
+                    }
 
                     return true;
                 }

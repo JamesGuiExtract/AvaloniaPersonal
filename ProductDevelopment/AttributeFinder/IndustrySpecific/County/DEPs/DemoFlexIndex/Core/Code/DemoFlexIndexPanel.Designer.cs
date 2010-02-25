@@ -28,26 +28,20 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DemoFlexIndexPanel));
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow1 = new Extract.DataEntry.DataEntryTableRow();
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow2 = new Extract.DataEntry.DataEntryTableRow();
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow3 = new Extract.DataEntry.DataEntryTableRow();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DemoFlexIndexPanel));
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow4 = new Extract.DataEntry.DataEntryTableRow();
             Extract.DataEntry.DataEntryTableRow dataEntryTableRow5 = new Extract.DataEntry.DataEntryTableRow();
             Extract.DataEntry.HighlightColor highlightColor1 = new Extract.DataEntry.HighlightColor();
             Extract.DataEntry.HighlightColor highlightColor2 = new Extract.DataEntry.HighlightColor();
-            this._grantorTable = new Extract.DataEntry.DataEntryTable();
-            this._grantorFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._grantorMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._grantorLastOrCompanyNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._grantorSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._grantorTypeColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._granteeTable = new Extract.DataEntry.DataEntryTable();
-            this._granteeFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._granteeMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._granteeLastOrCompanyNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._granteeSuffixColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._granteeTypeColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._partiesTable = new Extract.DataEntry.DataEntryTable();
+            this._partyFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._partyMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._partyLastOrCompanyNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._partyTypeColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._partyMappedTo = new Extract.DataEntry.DataEntryTableColumn();
             this._legalDescriptionTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._legalDescriptionTable = new Extract.DataEntry.DataEntryTable();
             this.Lot = new Extract.DataEntry.DataEntryTableColumn();
@@ -59,149 +53,84 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._returnAddressTable = new Extract.DataEntry.DataEntryTwoColumnTable();
             this._parcelNumberLabel = new System.Windows.Forms.Label();
             this._parcelNumberTextBox = new Extract.DataEntry.DataEntryTextBox();
-            this._docTypeTextBox = new Extract.DataEntry.DataEntryTextBox();
             this._grantorsLabel = new System.Windows.Forms.Label();
-            this._granteesLabel = new System.Windows.Forms.Label();
             this._legalDescriptionLabel = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this._grantorTable)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this._granteeTable)).BeginInit();
+            this._documentTypeComboBox = new Extract.DataEntry.DataEntryComboBox();
+            ((System.ComponentModel.ISupportInitialize)(this._partiesTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._legalDescriptionTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._returnAddressTable)).BeginInit();
             this.SuspendLayout();
             // 
-            // _grantorTable
+            // _partiesTable
             // 
-            this._grantorTable.AllowDrop = true;
-            this._grantorTable.AllowTabbingByRow = true;
-            this._grantorTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this._partiesTable.AllowDrop = true;
+            this._partiesTable.AllowTabbingByRow = true;
+            this._partiesTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this._grantorTable.AttributeName = "Grantor";
-            this._grantorTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._grantorTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this._grantorTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._grantorTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this._grantorFirstNameColumn,
-            this._grantorMiddleNameColumn,
-            this._grantorLastOrCompanyNameColumn,
-            this._grantorSuffixColumn,
-            this._grantorTypeColumn});
-            this._grantorTable.CompatibleAttributeNames.Add("Grantee");
-            this._grantorTable.Location = new System.Drawing.Point(3, 164);
-            this._grantorTable.Name = "_grantorTable";
-            this._grantorTable.ParentDataEntryControl = null;
-            this._grantorTable.RowFormattingRuleFile = "..\\Rules\\RubberbandSplitters\\Grantor.rsd.etf";
-            this._grantorTable.RowSwipingEnabled = true;
-            this._grantorTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._grantorTable.Size = new System.Drawing.Size(562, 90);
-            this._grantorTable.TabIndex = 5;
+            this._partiesTable.AttributeName = "Party";
+            this._partiesTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this._partiesTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            this._partiesTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._partiesTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this._partyFirstNameColumn,
+            this._partyMiddleNameColumn,
+            this._partyLastOrCompanyNameColumn,
+            this._partyTypeColumn,
+            this._partyMappedTo});
+            this._partiesTable.CompatibleAttributeNames.Add("Grantee");
+            this._partiesTable.Location = new System.Drawing.Point(3, 208);
+            this._partiesTable.Name = "_partiesTable";
+            this._partiesTable.ParentDataEntryControl = null;
+            this._partiesTable.RowFormattingRuleFile = "..\\Rules\\RubberbandSplitters\\Party.rsd.etf";
+            this._partiesTable.RowSwipingEnabled = true;
+            this._partiesTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._partiesTable.Size = new System.Drawing.Size(615, 156);
+            this._partiesTable.TabIndex = 5;
             // 
-            // _grantorFirstNameColumn
+            // _partyFirstNameColumn
             // 
-            this._grantorFirstNameColumn.AttributeName = "First";
-            this._grantorFirstNameColumn.FillWeight = 80F;
-            this._grantorFirstNameColumn.HeaderText = "First";
-            this._grantorFirstNameColumn.Name = "_grantorFirstNameColumn";
-            this._grantorFirstNameColumn.ValidationErrorMessage = "";
+            this._partyFirstNameColumn.AttributeName = "First";
+            this._partyFirstNameColumn.FillWeight = 40F;
+            this._partyFirstNameColumn.HeaderText = "First";
+            this._partyFirstNameColumn.Name = "_partyFirstNameColumn";
+            this._partyFirstNameColumn.ValidationErrorMessage = "";
             // 
-            // _grantorMiddleNameColumn
+            // _partyMiddleNameColumn
             // 
-            this._grantorMiddleNameColumn.AttributeName = "Middle";
-            this._grantorMiddleNameColumn.FillWeight = 60F;
-            this._grantorMiddleNameColumn.HeaderText = "Middle";
-            this._grantorMiddleNameColumn.Name = "_grantorMiddleNameColumn";
-            this._grantorMiddleNameColumn.ValidationErrorMessage = "";
+            this._partyMiddleNameColumn.AttributeName = "Middle";
+            this._partyMiddleNameColumn.FillWeight = 27F;
+            this._partyMiddleNameColumn.HeaderText = "Middle";
+            this._partyMiddleNameColumn.Name = "_partyMiddleNameColumn";
+            this._partyMiddleNameColumn.ValidationErrorMessage = "";
             // 
-            // _grantorLastOrCompanyNameColumn
+            // _partyLastOrCompanyNameColumn
             // 
-            this._grantorLastOrCompanyNameColumn.AttributeName = "LastOrCompany";
-            this._grantorLastOrCompanyNameColumn.FillWeight = 120F;
-            this._grantorLastOrCompanyNameColumn.HeaderText = "Last / Company";
-            this._grantorLastOrCompanyNameColumn.Name = "_grantorLastOrCompanyNameColumn";
-            this._grantorLastOrCompanyNameColumn.ValidationErrorMessage = "";
+            this._partyLastOrCompanyNameColumn.AttributeName = "LastOrCompany";
+            this._partyLastOrCompanyNameColumn.FillWeight = 120F;
+            this._partyLastOrCompanyNameColumn.HeaderText = "Last / Company";
+            this._partyLastOrCompanyNameColumn.Name = "_partyLastOrCompanyNameColumn";
+            this._partyLastOrCompanyNameColumn.ValidationErrorMessage = "";
             // 
-            // _grantorSuffixColumn
+            // _partyTypeColumn
             // 
-            this._grantorSuffixColumn.AttributeName = "Suffix";
-            this._grantorSuffixColumn.FillWeight = 50F;
-            this._grantorSuffixColumn.HeaderText = "Suffix";
-            this._grantorSuffixColumn.Name = "_grantorSuffixColumn";
-            this._grantorSuffixColumn.ValidationErrorMessage = "";
+            this._partyTypeColumn.AttributeName = "PartyType";
+            this._partyTypeColumn.AutoUpdateQuery = "";
+            this._partyTypeColumn.FillWeight = 80F;
+            this._partyTypeColumn.HeaderText = "Party Type";
+            this._partyTypeColumn.Name = "_partyTypeColumn";
+            this._partyTypeColumn.ValidationErrorMessage = "Party type is not valid for the current document type.";
+            this._partyTypeColumn.ValidationQuery = resources.GetString("_partyTypeColumn.ValidationQuery");
             // 
-            // _grantorTypeColumn
+            // _partyMappedTo
             // 
-            this._grantorTypeColumn.AttributeName = "Type";
-            this._grantorTypeColumn.AutoUpdateQuery = "";
-            this._grantorTypeColumn.FillWeight = 60F;
-            this._grantorTypeColumn.HeaderText = "Type";
-            this._grantorTypeColumn.Name = "_grantorTypeColumn";
-            this._grantorTypeColumn.ValidationErrorMessage = "";
-            // 
-            // _granteeTable
-            // 
-            this._granteeTable.AllowDrop = true;
-            this._granteeTable.AllowTabbingByRow = true;
-            this._granteeTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this._granteeTable.AttributeName = "Grantee";
-            this._granteeTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._granteeTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this._granteeTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._granteeTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this._granteeFirstNameColumn,
-            this._granteeMiddleNameColumn,
-            this._granteeLastOrCompanyNameColumn,
-            this._granteeSuffixColumn,
-            this._granteeTypeColumn});
-            this._granteeTable.CompatibleAttributeNames.Add("Grantor");
-            this._granteeTable.Location = new System.Drawing.Point(3, 282);
-            this._granteeTable.Name = "_granteeTable";
-            this._granteeTable.ParentDataEntryControl = null;
-            this._granteeTable.RowFormattingRuleFile = "..\\Rules\\RubberbandSplitters\\Grantee.rsd.etf";
-            this._granteeTable.RowSwipingEnabled = true;
-            this._granteeTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._granteeTable.Size = new System.Drawing.Size(562, 90);
-            this._granteeTable.TabIndex = 6;
-            // 
-            // _granteeFirstNameColumn
-            // 
-            this._granteeFirstNameColumn.AttributeName = "First";
-            this._granteeFirstNameColumn.FillWeight = 80F;
-            this._granteeFirstNameColumn.HeaderText = "First";
-            this._granteeFirstNameColumn.Name = "_granteeFirstNameColumn";
-            this._granteeFirstNameColumn.ValidationErrorMessage = "";
-            // 
-            // _granteeMiddleNameColumn
-            // 
-            this._granteeMiddleNameColumn.AttributeName = "Middle";
-            this._granteeMiddleNameColumn.FillWeight = 60F;
-            this._granteeMiddleNameColumn.HeaderText = "Middle";
-            this._granteeMiddleNameColumn.Name = "_granteeMiddleNameColumn";
-            this._granteeMiddleNameColumn.ValidationErrorMessage = "";
-            // 
-            // _granteeLastOrCompanyNameColumn
-            // 
-            this._granteeLastOrCompanyNameColumn.AttributeName = "LastOrCompany";
-            this._granteeLastOrCompanyNameColumn.FillWeight = 120F;
-            this._granteeLastOrCompanyNameColumn.HeaderText = "Last / Company";
-            this._granteeLastOrCompanyNameColumn.Name = "_granteeLastOrCompanyNameColumn";
-            this._granteeLastOrCompanyNameColumn.ValidationErrorMessage = "";
-            // 
-            // _granteeSuffixColumn
-            // 
-            this._granteeSuffixColumn.AttributeName = "Suffix";
-            this._granteeSuffixColumn.FillWeight = 50F;
-            this._granteeSuffixColumn.HeaderText = "Suffix";
-            this._granteeSuffixColumn.Name = "_granteeSuffixColumn";
-            this._granteeSuffixColumn.ValidationErrorMessage = "";
-            // 
-            // _granteeTypeColumn
-            // 
-            this._granteeTypeColumn.AttributeName = "Type";
-            this._granteeTypeColumn.AutoUpdateQuery = "";
-            this._granteeTypeColumn.FillWeight = 60F;
-            this._granteeTypeColumn.HeaderText = "Type";
-            this._granteeTypeColumn.Name = "_granteeTypeColumn";
-            this._granteeTypeColumn.ValidationErrorMessage = "";
+            this._partyMappedTo.AttributeName = "MappedTo";
+            this._partyMappedTo.FillWeight = 45F;
+            this._partyMappedTo.HeaderText = "Mapped To";
+            this._partyMappedTo.Name = "_partyMappedTo";
+            this._partyMappedTo.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._partyMappedTo.UseComboBoxCells = true;
+            this._partyMappedTo.ValidationErrorMessage = "Invalid value";
+            this._partyMappedTo.ValidationQuery = "Grantor\r\nGrantee";
             // 
             // _legalDescriptionTextBox
             // 
@@ -211,13 +140,13 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._legalDescriptionTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this._legalDescriptionTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._legalDescriptionTextBox.AutoUpdateQuery = "";
-            this._legalDescriptionTextBox.Location = new System.Drawing.Point(3, 474);
+            this._legalDescriptionTextBox.Location = new System.Drawing.Point(3, 469);
             this._legalDescriptionTextBox.Multiline = true;
             this._legalDescriptionTextBox.Name = "_legalDescriptionTextBox";
             this._legalDescriptionTextBox.ParentDataEntryControl = this._legalDescriptionTable;
             this._legalDescriptionTextBox.RemoveNewLineChars = false;
             this._legalDescriptionTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._legalDescriptionTextBox.Size = new System.Drawing.Size(562, 87);
+            this._legalDescriptionTextBox.Size = new System.Drawing.Size(615, 87);
             this._legalDescriptionTextBox.TabIndex = 8;
             this._legalDescriptionTextBox.ValidationErrorMessage = "Invalid value";
             // 
@@ -234,20 +163,20 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.Lot,
             this.Block,
             this.Subdivision});
-            this._legalDescriptionTable.Location = new System.Drawing.Point(3, 400);
+            this._legalDescriptionTable.Location = new System.Drawing.Point(3, 395);
             this._legalDescriptionTable.MinimumNumberOfRows = 1;
             this._legalDescriptionTable.Name = "_legalDescriptionTable";
             this._legalDescriptionTable.ParentDataEntryControl = null;
             this._legalDescriptionTable.RowFormattingRuleFile = "..\\Rules\\RubberbandSplitters\\LegalDescription.rsd.etf";
             this._legalDescriptionTable.RowSwipingEnabled = true;
             this._legalDescriptionTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._legalDescriptionTable.Size = new System.Drawing.Size(562, 68);
+            this._legalDescriptionTable.Size = new System.Drawing.Size(615, 68);
             this._legalDescriptionTable.TabIndex = 7;
             // 
             // Lot
             // 
             this.Lot.AttributeName = "Lot";
-            this.Lot.FillWeight = 50F;
+            this.Lot.FillWeight = 30F;
             this.Lot.HeaderText = "Lot";
             this.Lot.Name = "Lot";
             this.Lot.ValidationErrorMessage = "";
@@ -255,7 +184,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // Block
             // 
             this.Block.AttributeName = "Block";
-            this.Block.FillWeight = 75F;
+            this.Block.FillWeight = 30F;
             this.Block.HeaderText = "Block";
             this.Block.Name = "Block";
             this.Block.ValidationErrorMessage = "";
@@ -270,9 +199,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // 
             // _considerationAmountLabel
             // 
-            this._considerationAmountLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._considerationAmountLabel.AutoSize = true;
-            this._considerationAmountLabel.Location = new System.Drawing.Point(414, 44);
+            this._considerationAmountLabel.Location = new System.Drawing.Point(154, 3);
             this._considerationAmountLabel.Name = "_considerationAmountLabel";
             this._considerationAmountLabel.Size = new System.Drawing.Size(110, 13);
             this._considerationAmountLabel.TabIndex = 5;
@@ -280,9 +208,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // 
             // _docTypeLabel
             // 
-            this._docTypeLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._docTypeLabel.AutoSize = true;
-            this._docTypeLabel.Location = new System.Drawing.Point(414, 84);
+            this._docTypeLabel.Location = new System.Drawing.Point(308, 3);
             this._docTypeLabel.Name = "_docTypeLabel";
             this._docTypeLabel.Size = new System.Drawing.Size(83, 13);
             this._docTypeLabel.TabIndex = 6;
@@ -290,14 +217,13 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // 
             // _considerationAmountTextBox
             // 
-            this._considerationAmountTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._considerationAmountTextBox.AttributeName = "ConsiderationAmount";
             this._considerationAmountTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this._considerationAmountTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this._considerationAmountTextBox.Location = new System.Drawing.Point(417, 61);
+            this._considerationAmountTextBox.Location = new System.Drawing.Point(157, 19);
             this._considerationAmountTextBox.Name = "_considerationAmountTextBox";
             this._considerationAmountTextBox.Size = new System.Drawing.Size(148, 20);
-            this._considerationAmountTextBox.TabIndex = 3;
+            this._considerationAmountTextBox.TabIndex = 2;
             this._considerationAmountTextBox.ValidationErrorMessage = "";
             // 
             // _returnAddressTable
@@ -310,7 +236,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._returnAddressTable.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             this._returnAddressTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._returnAddressTable.DisplayName = "Return Address";
-            this._returnAddressTable.Location = new System.Drawing.Point(3, 5);
+            this._returnAddressTable.Location = new System.Drawing.Point(3, 45);
             this._returnAddressTable.Name = "_returnAddressTable";
             this._returnAddressTable.ParentDataEntryControl = null;
             this._returnAddressTable.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
@@ -345,16 +271,15 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._returnAddressTable.Rows.Add(dataEntryTableRow5);
             this._returnAddressTable.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this._returnAddressTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this._returnAddressTable.Size = new System.Drawing.Size(405, 134);
-            this._returnAddressTable.TabIndex = 1;
+            this._returnAddressTable.Size = new System.Drawing.Size(615, 134);
+            this._returnAddressTable.TabIndex = 4;
             this._returnAddressTable.TableFormattingRuleFile = "..\\Rules\\RubberbandSplitters\\ReturnAddress.rsd.etf";
             this._returnAddressTable.TableSwipingEnabled = true;
             // 
             // _parcelNumberLabel
             // 
-            this._parcelNumberLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._parcelNumberLabel.AutoSize = true;
-            this._parcelNumberLabel.Location = new System.Drawing.Point(414, 5);
+            this._parcelNumberLabel.Location = new System.Drawing.Point(0, 3);
             this._parcelNumberLabel.Name = "_parcelNumberLabel";
             this._parcelNumberLabel.Size = new System.Drawing.Size(77, 13);
             this._parcelNumberLabel.TabIndex = 3;
@@ -362,67 +287,60 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // 
             // _parcelNumberTextBox
             // 
-            this._parcelNumberTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._parcelNumberTextBox.AttributeName = "ParcelNumber";
             this._parcelNumberTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this._parcelNumberTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this._parcelNumberTextBox.Location = new System.Drawing.Point(417, 21);
+            this._parcelNumberTextBox.Location = new System.Drawing.Point(3, 19);
             this._parcelNumberTextBox.Name = "_parcelNumberTextBox";
             this._parcelNumberTextBox.Size = new System.Drawing.Size(148, 20);
-            this._parcelNumberTextBox.TabIndex = 2;
+            this._parcelNumberTextBox.TabIndex = 1;
             this._parcelNumberTextBox.ValidationErrorMessage = "Invalid value";
-            // 
-            // _docTypeTextBox
-            // 
-            this._docTypeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._docTypeTextBox.AttributeName = "DocumentType";
-            this._docTypeTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._docTypeTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this._docTypeTextBox.Location = new System.Drawing.Point(417, 101);
-            this._docTypeTextBox.Name = "_docTypeTextBox";
-            this._docTypeTextBox.Size = new System.Drawing.Size(148, 20);
-            this._docTypeTextBox.TabIndex = 4;
-            this._docTypeTextBox.ValidationErrorMessage = "Invalid value";
             // 
             // _grantorsLabel
             // 
             this._grantorsLabel.AutoSize = true;
-            this._grantorsLabel.Location = new System.Drawing.Point(3, 148);
+            this._grantorsLabel.Location = new System.Drawing.Point(3, 192);
             this._grantorsLabel.Name = "_grantorsLabel";
-            this._grantorsLabel.Size = new System.Drawing.Size(47, 13);
+            this._grantorsLabel.Size = new System.Drawing.Size(39, 13);
             this._grantorsLabel.TabIndex = 9;
-            this._grantorsLabel.Text = "Grantors";
-            // 
-            // _granteesLabel
-            // 
-            this._granteesLabel.AutoSize = true;
-            this._granteesLabel.Location = new System.Drawing.Point(3, 266);
-            this._granteesLabel.Name = "_granteesLabel";
-            this._granteesLabel.Size = new System.Drawing.Size(50, 13);
-            this._granteesLabel.TabIndex = 10;
-            this._granteesLabel.Text = "Grantees";
+            this._grantorsLabel.Text = "Parties";
             // 
             // _legalDescriptionLabel
             // 
             this._legalDescriptionLabel.AutoSize = true;
-            this._legalDescriptionLabel.Location = new System.Drawing.Point(3, 384);
+            this._legalDescriptionLabel.Location = new System.Drawing.Point(3, 379);
             this._legalDescriptionLabel.Name = "_legalDescriptionLabel";
             this._legalDescriptionLabel.Size = new System.Drawing.Size(89, 13);
             this._legalDescriptionLabel.TabIndex = 11;
             this._legalDescriptionLabel.Text = "Legal Description";
             // 
+            // _documentTypeComboBox
+            // 
+            this._documentTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._documentTypeComboBox.AttributeName = "DocumentType";
+            this._documentTypeComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this._documentTypeComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this._documentTypeComboBox.AutoUpdateQuery = "<Query Default=\'1\'>Unknown</Query>";
+            this._documentTypeComboBox.FormattingEnabled = true;
+            this._documentTypeComboBox.Location = new System.Drawing.Point(311, 19);
+            this._documentTypeComboBox.Name = "_documentTypeComboBox";
+            this._documentTypeComboBox.Size = new System.Drawing.Size(306, 21);
+            this._documentTypeComboBox.TabIndex = 3;
+            this._documentTypeComboBox.ValidationErrorMessage = "";
+            this._documentTypeComboBox.ValidationQuery = "<SQL>SELECT Name FROM DocumentType ORDER BY Name</SQL>Unknown";
+            this._documentTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            // 
             // DemoFlexIndexPanel
             // 
             this.ApplicationTitle = "FlexIndex Demo";
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.Controls.Add(this._documentTypeComboBox);
             this.Controls.Add(this._legalDescriptionLabel);
             this.Controls.Add(this._legalDescriptionTable);
             this.Controls.Add(this._legalDescriptionTextBox);
-            this.Controls.Add(this._granteesLabel);
-            this.Controls.Add(this._granteeTable);
             this.Controls.Add(this._grantorsLabel);
-            this.Controls.Add(this._grantorTable);
-            this.Controls.Add(this._docTypeTextBox);
+            this.Controls.Add(this._partiesTable);
             this.Controls.Add(this._parcelNumberTextBox);
             this.Controls.Add(this._considerationAmountTextBox);
             this.Controls.Add(this._parcelNumberLabel);
@@ -436,10 +354,10 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this.HighlightColors = new Extract.DataEntry.HighlightColor[] {
         highlightColor1,
         highlightColor2};
+            this.MinimumSize = new System.Drawing.Size(500, 543);
             this.Name = "DemoFlexIndexPanel";
-            this.Size = new System.Drawing.Size(568, 564);
-            ((System.ComponentModel.ISupportInitialize)(this._grantorTable)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this._granteeTable)).EndInit();
+            this.Size = new System.Drawing.Size(621, 561);
+            ((System.ComponentModel.ISupportInitialize)(this._partiesTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._legalDescriptionTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._returnAddressTable)).EndInit();
             this.ResumeLayout(false);
@@ -449,32 +367,25 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
 
         #endregion
 
-        private DataEntryTable _grantorTable;
+        private DataEntryTable _partiesTable;
         private DataEntryTextBox _legalDescriptionTextBox;
         private DataEntryTable _legalDescriptionTable;
-        private DataEntryTableColumn Lot;
-        private DataEntryTableColumn Block;
-        private DataEntryTableColumn Subdivision;
-        private DataEntryTableColumn _grantorFirstNameColumn;
-        private DataEntryTableColumn _grantorMiddleNameColumn;
-        private DataEntryTableColumn _grantorLastOrCompanyNameColumn;
-        private DataEntryTableColumn _grantorSuffixColumn;
-        private DataEntryTableColumn _grantorTypeColumn;
-        private DataEntryTable _granteeTable;
-        private DataEntryTableColumn _granteeFirstNameColumn;
-        private DataEntryTableColumn _granteeMiddleNameColumn;
-        private DataEntryTableColumn _granteeLastOrCompanyNameColumn;
-        private DataEntryTableColumn _granteeSuffixColumn;
-        private DataEntryTableColumn _granteeTypeColumn;
         private System.Windows.Forms.Label _considerationAmountLabel;
         private System.Windows.Forms.Label _docTypeLabel;
         private DataEntryTextBox _considerationAmountTextBox;
         private DataEntryTwoColumnTable _returnAddressTable;
         private System.Windows.Forms.Label _parcelNumberLabel;
         private DataEntryTextBox _parcelNumberTextBox;
-        private DataEntryTextBox _docTypeTextBox;
         private System.Windows.Forms.Label _grantorsLabel;
-        private System.Windows.Forms.Label _granteesLabel;
         private System.Windows.Forms.Label _legalDescriptionLabel;
+        private DataEntryTableColumn Lot;
+        private DataEntryTableColumn Block;
+        private DataEntryTableColumn Subdivision;
+        private DataEntryComboBox _documentTypeComboBox;
+        private DataEntryTableColumn _partyFirstNameColumn;
+        private DataEntryTableColumn _partyMiddleNameColumn;
+        private DataEntryTableColumn _partyLastOrCompanyNameColumn;
+        private DataEntryTableColumn _partyTypeColumn;
+        private DataEntryTableColumn _partyMappedTo;
     }
 }

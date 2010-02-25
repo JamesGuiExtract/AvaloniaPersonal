@@ -556,7 +556,13 @@ namespace Extract.DataEntry
                     // displayed wouldn't be displayed in the cell but would be displayed as a tooltip.
                     if (cell is DataEntryComboBoxCell)
                     {
-                        cell.Value = "";
+                        // Only clear the value if it is not already empty to avoid an infinite
+                        // recursion loop by triggering cell validation.
+                        if (!string.IsNullOrEmpty(cell.Value.ToString()))
+                        {
+                            cell.Value = "";
+                        }
+
                         cell.ErrorText = "";
                     }
                     // Otherwise, display an error icon to indicate the data is invalid.
