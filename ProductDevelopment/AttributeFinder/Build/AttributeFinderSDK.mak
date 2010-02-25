@@ -126,7 +126,9 @@ CreateFlexDataEntryInstallDir:
 	$(VerifyDir) "$(FlexDataEntryRulesDir)" "$(FlexDataEntryReleaseDir)\Rules"
 	@ECHO Encrypting Demo_FlexIndex rsd Files
 	@SendFilesAsArgumentToApplication "$(FlexDataEntryReleaseDir)\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+	@SendFilesAsArgumentToApplication "$(FlexDataEntryReleaseDir)\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@DeleteFiles "$(FlexDataEntryReleaseDir)\*.rsd"
+	@DeleteFiles "$(FlexDataEntryReleaseDir)\*.dat"
 	@DeleteFiles "$(FlexDataEntryReleaseDir)\*.scc"
 	
 CreateDemoShieldInstall:
