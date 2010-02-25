@@ -106,7 +106,8 @@ m_bUpdateFASTTable(true),
 m_bAutoDeleteFileActionComment(false),
 m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
 m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
-m_nUPIID(0)
+m_nUPIID(0),
+m_bFAMRegistered(false)
 {
 	try
 	{
@@ -3698,6 +3699,9 @@ STDMETHODIMP CFileProcessingDB::RegisterProcessingFAM()
 		m_eventStopPingThread.reset();
 		m_eventPingThreadExited.reset();
 
+		// set FAM registered flag
+		m_bFAMRegistered = true;
+
 		// Start thread here
 		AfxBeginThread(maintainLastPingTimeForRevert, this);
 	}
@@ -3721,6 +3725,9 @@ STDMETHODIMP CFileProcessingDB::UnregisterProcessingFAM()
 			UCLIDException ue("ELI27857", "Application Trace: Timed out waiting for thread to exit.");
 			ue.log();
 		}
+
+		// set FAMRegistered flag to false since thread has exited
+		m_bFAMRegistered = false;
 
 		// Set the transaction guard
 		TransactionGuard tg(getDBConnection());

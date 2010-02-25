@@ -2048,8 +2048,8 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 
 		_lastCodePos = "10";
 
-		ipDBInfoSet->Open("DBInfo", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockReadOnly, adCmdTable); 
+		ipDBInfoSet->Open("DBInfo", _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdTable); 
 
 		_lastCodePos = "20";
 
@@ -2141,6 +2141,32 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 						_lastCodePos = "190";
 
 						m_nAutoRevertTimeOutInMinutes =  asLong(getStringField(ipFields, "Value"));
+						
+						// if less that a minimum value this should be reset to the minimum value
+						if (m_nAutoRevertTimeOutInMinutes < gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES)
+						{
+							try
+							{
+								string strNewValue = asString(gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
+								// Log application trace exception 
+								UCLIDException ue("ELI29826", "Application trace: AutoRevertTimeOutInMinutes changed to " + 
+									 strNewValue + " minutes.");
+								ue.addDebugInfo("Old value", m_nAutoRevertTimeOutInMinutes);
+								ue.addDebugInfo("New value", gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
+								ue.log();
+
+								// Not sure if this is actually safe here.
+								// if updating this field fails it will be thrown out and rolled back in 
+								// a transaction in the outer scope.  A transaction cannot be created for
+								// this here because there will most likely be a transaction in the
+								// outer scope.
+								setStringField(ipFields, "Value", strNewValue);
+								ipDBInfoSet->Update();
+							}
+							CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
+
+							m_nAutoRevertTimeOutInMinutes = gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES;
+						}
 					}
 					else if (strValue == gstrAUTO_REVERT_NOTIFY_EMAIL_LIST)
 					{
@@ -2849,15 +2875,28 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::pingDB()
 {
+	// if m_bFAMRegistered is false there is nothing to do
+	if ( !m_bFAMRegistered )
+	{
+		return;
+	}
+
+	// Lock mutex so that a call from the connection retry functionality will not collide
+	CSingleLock lock(&m_mutex, TRUE);
+
 	// Always call the getKeyID so that if the record was removed by another
 	// instance because this instance lost the DB for a while
 	long nUPIID = getKeyID(getDBConnection(), "ProcessingFAM", "UPI", m_strUPI);
 	if (nUPIID != m_nUPIID)
 	{
-		UCLIDException ue("ELI27785", "Application Trace: UPIID has changed.");
-		ue.addDebugInfo("Expected", m_nUPIID);
-		ue.addDebugInfo("New UPIID", nUPIID);
-		ue.log();
+		// The only time m_nUPIID is 0 is when there was no previous instance 
+		if (m_nUPIID > 0 )
+		{
+			UCLIDException ue("ELI27785", "Application Trace: UPIID has changed.");
+			ue.addDebugInfo("Expected", m_nUPIID);
+			ue.addDebugInfo("New UPIID", nUPIID);
+			ue.log();
+		}
 
 		// Update the UPIID
 		m_nUPIID = nUPIID;
@@ -2905,6 +2944,10 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::revertTimedOutProcessingFAMs(const _ConnectionPtr& ipConnection)
 {
+	// Make sure the LastPingTime is up to date to keep before reverting so that the
+	// current session doesn't get auto reverted
+	pingDB();
+
 	// Query to show the elapsed time since last ping for all ProcessingFAM records
 	string strElapsedSQL = "SELECT [ID], DATEDIFF(minute,[LastPingTime],GetDate()) as Elapsed "
 			"FROM [ProcessingFAM]";

@@ -306,6 +306,12 @@ private:
 	Win32Event m_eventStopPingThread;
 	Win32Event m_eventPingThreadExited;
 
+	// Flag to indicate that the FAM has been registered for auto revert
+	// if this is false and then pingDB just returns without doing anything
+	// if this is true pingDB updates the LastPingTime in ProcessingFAM record 
+	// and will log changes of the m_nUPIID
+	bool m_bFAMRegistered;
+
 	//-------------------------------------------------------------------------------------------------
 	// Methods
 	//-------------------------------------------------------------------------------------------------
