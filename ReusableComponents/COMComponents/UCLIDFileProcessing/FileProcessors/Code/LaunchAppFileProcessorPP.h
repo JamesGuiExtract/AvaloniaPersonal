@@ -45,6 +45,7 @@ BEGIN_MSG_MAP(CLaunchAppFileProcessorPP)
 	COMMAND_HANDLER(IDC_BTN_BROWSE_WORKING_DIR, BN_CLICKED, OnClickedBtnWorkingDirBrowse)
 	COMMAND_HANDLER(IDC_BTN_PARAMETERS_DOC_TAG, BN_CLICKED, OnClickedBtnParametersSelectTag)
 	COMMAND_HANDLER(IDC_BTN_PARAMETERS_BROWSE, BN_CLICKED, OnClickedBtnParametersBrowse)
+	COMMAND_HANDLER(IDC_CHECK_PROP_ERRORS, BN_CLICKED, OnClickedCheckPropogateErrors)
 	// REFLECT_NOTIFICATIONS needed by ImageButtonWithSytle
 	REFLECT_NOTIFICATIONS()
 END_MSG_MAP()
@@ -66,6 +67,7 @@ END_MSG_MAP()
 	LRESULT OnClickedBtnWorkingDirBrowse(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedBtnParametersSelectTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedBtnParametersBrowse(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedCheckPropogateErrors(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	///////////

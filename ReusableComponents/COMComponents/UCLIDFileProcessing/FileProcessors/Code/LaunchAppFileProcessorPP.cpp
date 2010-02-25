@@ -142,23 +142,32 @@ LRESULT CLaunchAppFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM
 
 			m_checkPropErrors = GetDlgItem(IDC_CHECK_PROP_ERRORS);
 
-			if (ipFP->IsBlocking == VARIANT_TRUE)
+			// Set the propagate errors checkbox
+			bool bPropErrors = asCppBool(ipFP->PropagateErrors);
+			m_checkPropErrors.SetCheck(asBSTChecked(bPropErrors));
+			if (bPropErrors)
 			{
 				m_radioBlocking.SetCheck(BST_CHECKED);
+				m_radioBlocking.EnableWindow(FALSE);
+				m_radioNonBlocking.SetCheck(BST_UNCHECKED);
+				m_radioNonBlocking.EnableWindow(FALSE);
 			}
 			else
 			{
-				m_radioNonBlocking.SetCheck(BST_CHECKED);
+				if (ipFP->IsBlocking == VARIANT_TRUE)
+				{
+					m_radioBlocking.SetCheck(BST_CHECKED);
+				}
+				else
+				{
+					m_radioNonBlocking.SetCheck(BST_CHECKED);
+				}
 			}
 
 			m_editCmdLine.SetWindowText(ipFP->CommandLine);
 			m_editWorkingDir.SetWindowText(ipFP->WorkingDirectory);
 			m_editParameters.SetWindowText(ipFP->Parameters);
-
-			// Set the propagate errors checkbox
-			m_checkPropErrors.SetCheck(asBSTChecked(ipFP->PropagateErrors));
 		}
-		
 		
 		SetDirty(FALSE);
 	}
@@ -297,6 +306,33 @@ LRESULT CLaunchAppFileProcessorPP::OnClickedBtnParametersBrowse(WORD wNotifyCode
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI25476");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CLaunchAppFileProcessorPP::OnClickedCheckPropogateErrors(WORD wNotifyCode, WORD wID,
+																 HWND hWndCtl, BOOL &bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// If propogating errors then the launch app processor must be set to blocking
+		bool bChecked = m_checkPropErrors.GetCheck() == BST_CHECKED;
+		if (bChecked)
+		{
+			m_radioBlocking.SetCheck(BST_CHECKED);
+			m_radioBlocking.EnableWindow(FALSE);
+			m_radioNonBlocking.SetCheck(BST_UNCHECKED);
+			m_radioNonBlocking.EnableWindow(FALSE);
+		}
+		else
+		{
+			m_radioBlocking.EnableWindow(TRUE);
+			m_radioNonBlocking.EnableWindow(TRUE);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29825");
 
 	return 0;
 }
