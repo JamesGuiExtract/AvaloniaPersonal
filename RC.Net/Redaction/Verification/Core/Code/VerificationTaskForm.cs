@@ -1533,6 +1533,7 @@ namespace Extract.Redaction.Verification
         {
             // Get the pertinent information
             FormMemento formMemento = new FormMemento(this);
+            _sandDockManager.SaveLayout();
             ToolStripManager.SaveSettings(this);
             int splitterDistance = _dataWindowSplitContainer.SplitterDistance;
 
@@ -1574,6 +1575,7 @@ namespace Extract.Redaction.Verification
 
                     // Restore the saved state
                     memento.FormMemento.Restore(this);
+                    _sandDockManager.LoadLayout();
                     ToolStripManager.LoadSettings(this);
                     _dataWindowSplitContainer.SplitterDistance = memento.SplitterDistance;
                 }
@@ -1584,19 +1586,6 @@ namespace Extract.Redaction.Verification
                     "Unable to load previous verification setting state.", ex);
                 ee.AddDebugData("Invalid XML file", _FORM_PERSISTENCE_FILE, false);
                 ee.Log();
-            }
-        }
-
-        /// <summary>
-        /// Expands the specified dockable window if it is collapsed. If the window is not 
-        /// collapsed, this method does nothing.
-        /// </summary>
-        /// <param name="window">The window to expand.</param>
-        static void UncollapseWindow(DockControl window)
-        {
-            if (window.DockSituation == DockSituation.Docked && window.Collapsed)
-            {
-                window.Collapsed = false;
             }
         }
 
@@ -1629,16 +1618,12 @@ namespace Extract.Redaction.Verification
 
             try
             {
-                // Uncollapse dockable windows before establishing connections
-                UncollapseWindow(_dataWindowDockableWindow);
-                UncollapseWindow(_thumbnailDockableWindow);
+                _imageViewer.EstablishConnections(this);
 
                 if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
                 {
                     LoadState();
                 }
-
-                _imageViewer.EstablishConnections(this);
 
                 // It is important that this line comes AFTER EstablishConnections, 
                 // because the page summary view needs to handle this event FIRST.
