@@ -151,6 +151,12 @@ namespace Extract.DataEntry
         /// </summary>
         bool _isActive;
 
+        /// <summary>
+        /// Keeps track of a value that was applied or attempted to be applied prior to changing the
+        /// item list when configured as a DropDownList.
+        /// </summary>
+        string _originalValue;
+
         #endregion Fields
 
         #region Constructors
@@ -704,6 +710,19 @@ namespace Extract.DataEntry
                     else if (!_removeNewLineChars)
                     {
                         value = value.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
+                    }
+
+                    // [DataEntry:906]
+                    // If the comboBox is configured as a DropDownList and the specified value is
+                    // not currently a possible value, store the value as "_originalValue" so it
+                    // can be restored if a the value is later added as a possible value.
+                    if (DropDownStyle == ComboBoxStyle.DropDownList && !Items.Contains(value))
+                    {
+                        _originalValue = value;
+                    }
+                    else
+                    {
+                        _originalValue = null;
                     }
 
                     base.Text = value;
@@ -1509,7 +1528,10 @@ namespace Extract.DataEntry
             if (autoCompleteValues != null)
             {
                 // Reseting the item list will clear the value. Preserve the original value.
-                string originalValue = Text;
+                if (!string.IsNullOrEmpty(Text))
+                {
+                    _originalValue = Text;
+                }
 
                 // Auto-complete is supported unless the DropDownStyle is DropDownList
                 if (base.DropDownStyle != ComboBoxStyle.DropDownList)
@@ -1532,9 +1554,9 @@ namespace Extract.DataEntry
                 Items.AddRange(autoCompleteValues);
 
                 // Restore the original value
-                if (Items.Contains(originalValue))
+                if (!string.IsNullOrEmpty(_originalValue) && Items.Contains(_originalValue))
                 {
-                    Text = originalValue;
+                    Text = _originalValue;
                 }
             }
         }

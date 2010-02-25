@@ -292,7 +292,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="configFileName">The name of the configuration file used to supply settings
         /// for the <see cref="DataEntryApplicationForm"/>.</param>
         public DataEntryApplicationForm(string configFileName)
-            : this(configFileName, true, null, false, false)
+            : this(configFileName, true, null, 0, false, false)
         {
         }
 
@@ -303,14 +303,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// for the <see cref="DataEntryApplicationForm"/>.</param>
         /// <param name="standAloneMode"><see langref="true"/> if the created as a standalone 
         /// application; <see langref="false"/> if launched via the COM interface.</param>
-        /// <param name="actionName">The name of the file processing action currently being used.
-        /// (Can be <see langword="null"/> if no file processing action is involved)</param>
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use or
+        /// <see langword="null"/> if no file processing database is being used.</param>
+        /// <param name="actionId">The ID of the file processing action currently being used.
+        /// </param>
         /// <param name="inputEventTrackingEnabled"><see langword="true"/> to record data from user
         /// input, <see langword="false"/> otherwise.</param>
         /// <param name="countersEnabled"><see langword="true"/> to record counts for the defined
         /// data entry counters, <see langword="false"/> otherwise.</param>
         public DataEntryApplicationForm(string configFileName, bool standAloneMode,
-            string actionName, bool inputEventTrackingEnabled, bool countersEnabled)
+            FileProcessingDB fileProcessingDB, int actionId, bool inputEventTrackingEnabled,
+            bool countersEnabled)
         {
             try
             {
@@ -333,9 +336,33 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 DataEntryMethods.SolutionRootDirectory = Path.GetDirectoryName(configFileName);
 
                 _standAloneMode = standAloneMode;
-                _actionName = actionName;
                 _inputEventTrackingEnabled = inputEventTrackingEnabled;
                 _countersEnabled = countersEnabled;
+                _fileProcessingDb = fileProcessingDB;
+                _actionId = actionId;
+
+                if (_inputEventTrackingEnabled || _countersEnabled)
+                {
+                    ExtractException.Assert("ELI29828", "Cannot enable " +
+                        ((_inputEventTrackingEnabled && _countersEnabled) ? "input tracking or data counters" :
+                        _inputEventTrackingEnabled ? "input tracking" : "counters") +
+                        " without access to a file processing database!", _fileProcessingDb != null);
+                }
+
+                // Whether to enable data entry counters depends upon the DBInfo setting as
+                // well as the task configuration.
+                if (_countersEnabled)
+                {
+                    _countersEnabled =
+                        _fileProcessingDb.GetDBInfoSetting("EnableDataEntryCounters").Equals(
+                            "1", StringComparison.OrdinalIgnoreCase);
+                }
+
+                // Get the action name if there is an associated action ID.
+                if (_fileProcessingDb != null)
+                {
+                    _actionName = _fileProcessingDb.GetActionName(_actionId);
+                }
                 
                 InitializeComponent();
 
@@ -361,8 +388,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Add the file tool strip items
                 AddFileToolStripItems(_fileToolStripMenuItem.DropDownItems);
 
-                // Change the text on certain controls if not running in stand alone mode
-                if (!_standAloneMode)
+                // Change the text on certain controls if not running in stand alone mode or running
+                // without a _fileProcessingDb
+                if (!_standAloneMode && _fileProcessingDb != null)
                 {
                     _exitToolStripMenuItem.Text = "Stop processing";
                     _imageViewer.DefaultStatusMessage = "Waiting for next document...";
@@ -513,8 +541,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // Add the save and commit menu item (created in constructor)
             items.Add(_saveAndCommitMenuItem);
 
-            // Only add the save menu item if not running in stand alone
-            if (!_standAloneMode)
+            // Only add the save menu item if not running in stand alone and _fileProcessingDb is
+            // available.
+            if (!_standAloneMode && _fileProcessingDb != null)
 	        {
                 _saveMenuItem = CreateDisabledMenuItem("Save");
                 items.Add(_saveMenuItem);
@@ -523,8 +552,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // Add the print image menu item
             items.AddRange(new ToolStripItem[] { _printMenuItem, new ToolStripSeparator() });
 
-            // Only add skip processing if not in stand alone mode
-            if (!_standAloneMode)
+            // Only add skip processing if not in stand alone mode and _fileProcessingDb is
+            // available.
+            if (!_standAloneMode && _fileProcessingDb != null)
 	        {
                 _skipProcessingMenuItem = CreateDisabledMenuItem("Skip document");
                 items.Add(_skipProcessingMenuItem);
@@ -600,7 +630,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="fileID">The ID of the file being processed.</param>
         /// <param name="actionID">The ID of the action being processed.</param>
         /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if needed.</param>
-        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use or
+        /// <see langword="null"/> if no file processing database is being used.</param>
         public void Open(string fileName, int fileID, int actionID, FAMTagManager tagManager,
             FileProcessingDB fileProcessingDB)
         {
@@ -613,26 +644,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             try
             {
-                ExtractException.Assert("ELI26940", "Null argument exception!",
-                    fileProcessingDB != null);
-
-                if (_fileProcessingDb != fileProcessingDB)
-                {
-                    _fileProcessingDb = fileProcessingDB;
-
-                    // Whether to enable data entry counters depends upon the DBInfo setting as well as
-                    // the task configuration.
-                    if (_countersEnabled)
-                    {
-                        _countersEnabled =
-                            fileProcessingDB.GetDBInfoSetting("EnableDataEntryCounters").Equals(
-                                "1", StringComparison.OrdinalIgnoreCase);
-                    }
-                }
+                ExtractException.Assert("ELI29830", "Unexpected file processing database!",
+                    _fileProcessingDb == fileProcessingDB);
+                ExtractException.Assert("ELI29831", "Unexpected database action ID!",
+                    _fileProcessingDb == null || _actionId == actionID);
                 
                 _fileId = fileID;
-                _actionId = actionID;
-                _actionName = _fileProcessingDb.GetActionName(_actionId);
 
                 _tagFileToolStripButton.Database = fileProcessingDB;
                 _tagFileToolStripButton.FileId = fileID;
@@ -644,7 +661,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _inputEventTracker = new InputEventTracker(fileProcessingDB, actionID);
                 }
 
-                if (_dataEntryDatabaseManager == null)
+                if (_dataEntryDatabaseManager == null && fileProcessingDB != null)
                 {
                     _dataEntryDatabaseManager = new DataEntryProductDBMgrClass();
                     _dataEntryDatabaseManager.FAMDB = fileProcessingDB;
@@ -665,8 +682,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 _imageViewer.OpenImage(fileName, false);
 
-                _dataEntryControlHost.Comment =
-                    _fileProcessingDb.GetFileActionComment(_fileId, _actionId);
+                if (_fileProcessingDb != null)
+                {
+                    _dataEntryControlHost.Comment =
+                        _fileProcessingDb.GetFileActionComment(_fileId, _actionId);
+                }
             }
             catch (Exception ex)
             {
@@ -866,10 +886,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 _saveAndCommitMenuItem.Click += HandleSaveAndCommitClick;
                 _saveAndCommitButton.Click += HandleSaveAndCommitClick;
-                if (!_standAloneMode)
+                if (!_standAloneMode && _fileProcessingDb != null)
                 {
-                    _dataEntryControlHost.DataLoaded += HandleDataLoaded;
                     _saveMenuItem.Click += HandleSaveClick;
+                    _dataEntryControlHost.DataLoaded += HandleDataLoaded;
                     _skipProcessingMenuItem.Click += HandleSkipFileClick;
                 }
                 _exitToolStripMenuItem.Click += HandleExitToolStripMenuItemClick;
@@ -923,10 +943,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     OpenSeparateImageWindow();
                 }
 
-                if (!_standAloneMode)
+                if (!_standAloneMode && _fileProcessingDb != null)
                 {
-                    // If running in FAM mode, when a document is not loaded, indicate that the UI is
-                    // waiting for the next document.
+                    // If running in FAM mode with a _fileProcessingDb, when a document is not
+                    // loaded, indicate that the UI is waiting for the next document.
                     _exitToolStripMenuItem.Enabled = false;
                 }
 
@@ -1067,7 +1087,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // If a document is not loaded, the DataEntryApplicationForm has no way of informing
                 // the FAM of a cancel. Therefore, don't allow the form to be closed in FAM mode
                 // when a document is not loaded.
-                if (!_standAloneMode && !_imageViewer.IsImageAvailable && 
+                if (!_standAloneMode && _fileProcessingDb != null && !_imageViewer.IsImageAvailable &&
                     m.Msg == WindowsMessage.SystemCommand && m.WParam == new IntPtr(SystemCommand.Close))
                 {
                     MessageBox.Show(this, "If you are intending to stop processing, " +
@@ -1105,7 +1125,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     else
                     {
                         // Record statistics to database that needs to happen when a file is closed.
-                        if (!_standAloneMode)
+                        if (!_standAloneMode && _fileProcessingDb != null)
                         {
                             RecordFileProcessingDatabaseStatistics(false, null);
                         }
@@ -1286,7 +1306,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 bool saved = _dataEntryControlHost.SaveData(validateData);
 
-                if (saved && !_standAloneMode)
+                if (saved && !_standAloneMode && _fileProcessingDb != null)
                 {
                     _fileProcessingDb.SetFileActionComment(_fileId, _actionId,
                             _dataEntryControlHost.Comment);
@@ -1350,7 +1370,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
                 _toggleShowAllHighlightsCommand.Enabled = _imageViewer.IsImageAvailable;
 
-                if (!_standAloneMode)
+                if (!_standAloneMode && _fileProcessingDb != null)
                 {
                     _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     _saveMenuItem.Enabled = _imageViewer.IsImageAvailable &&
@@ -1441,7 +1461,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     else
                     {
                         // Record statistics to database that need to happen when a file is closed.
-                        if (!_standAloneMode)
+                        if (!_standAloneMode && _fileProcessingDb != null)
                         {
                             RecordFileProcessingDatabaseStatistics(false, null);
                         }
@@ -2072,8 +2092,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // Treat SaveAndCommit like "Save" for stand-alone mode.
-                if (_standAloneMode)
+                // Treat SaveAndCommit like "Save" for stand-alone mode or when there is no
+                // _fileProcessingDb.
+                if (_standAloneMode || _fileProcessingDb == null)
                 {
                     SaveData(false);
                 }
@@ -2607,6 +2628,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </param>
         void RecordFileProcessingDatabaseStatistics(bool onLoad, IUnknownVector attributes)
         {
+            ExtractException.Assert("ELI29829", "Cannot record database statistics since the " +
+                "database manager has not been initialized!", _dataEntryDatabaseManager != null);
+
             if (onLoad)
             {
                 _fileProcessingStopwatch = new Stopwatch();

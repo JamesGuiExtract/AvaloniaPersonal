@@ -95,7 +95,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// The name of the action currently being processd.
         /// </summary>
-        string _actionName;
+        FileProcessingDB _fileProcessingDB;
+
+        /// <summary>
+        /// The ID of the action being processed.
+        /// </summary>
+        int _actionID;
 
         // Object for mutexing data entry form manager creation
         static object _lock = new object();
@@ -378,7 +383,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
                     "ELI26896", _DEFAULT_FILE_ACTION_TASK_NAME);
 
-                _actionName = pDB.GetActionName(nActionID);
+                if (_inputEventTrackingEnabled || _countersEnabled)
+                {
+                    ExtractException.Assert("ELI29827", "Cannot enable " +
+                        ((_inputEventTrackingEnabled && _countersEnabled) ? "input tracking or data counters" :
+                        _inputEventTrackingEnabled ? "input tracking" : "counters") +
+                        " without access to a file processing database!", pDB != null);
+                }
+
+                _fileProcessingDB = pDB;
+                _actionID = nActionID;
 
                 // Ask the manager to create and display the data entry form.
                 _dataEntryFormManager.ShowForm(CreateDataEntryForm);
@@ -673,8 +687,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <returns>A <see cref="DataEntryApplicationForm"/> using the current settings.</returns>
         IVerificationForm CreateDataEntryForm()
         {
-            return new DataEntryApplicationForm(_configFileName, false, _actionName,
-                _inputEventTrackingEnabled, _countersEnabled);
+            return new DataEntryApplicationForm(_configFileName, false, _fileProcessingDB,
+                _actionID, false, false);
         }
 
         /// <summary>

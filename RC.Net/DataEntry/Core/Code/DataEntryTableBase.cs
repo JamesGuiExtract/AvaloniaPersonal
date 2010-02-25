@@ -544,6 +544,10 @@ namespace Extract.DataEntry
                     string correctedValue;
                     dataValidity =
                         AttributeStatusInfo.Validate(attribute, throwException, out correctedValue);
+                    if (dataValidity == DataValidity.Valid && !string.IsNullOrEmpty(correctedValue))
+                    {
+                        cell.Value = correctedValue;
+                    }
                 }
                 else
                 {
@@ -778,8 +782,19 @@ namespace Extract.DataEntry
 
                 _editingControl = null;
 
+                DataGridViewCell cell = Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+                // [DataEntry:905]
+                // Validate the cell to ensure the cell value is auto-corrected for capitalization,
+                // whitespace.
+                IDataEntryTableCell dataEntryCell = cell as IDataEntryTableCell;
+                if (dataEntryCell != null)
+                {
+                    ValidateCell(dataEntryCell, false);
+                }
+
                 // Update the style now that the cell is out of edit mode
-                UpdateCellStyle(Rows[e.RowIndex].Cells[e.ColumnIndex]);
+                UpdateCellStyle(cell);
             }
             catch (Exception ex)
             {

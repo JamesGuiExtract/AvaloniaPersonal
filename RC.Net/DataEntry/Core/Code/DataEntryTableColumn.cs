@@ -350,6 +350,8 @@ namespace Extract.DataEntry
             set
             {
                 _validatorTemplate.CorrectCase = value;
+
+                UpdateCellTemplate();
             }
         }
 
@@ -372,6 +374,8 @@ namespace Extract.DataEntry
             set
             {
                 _validatorTemplate.CaseSensitive = value;
+
+                UpdateCellTemplate();
             }
         }
 
