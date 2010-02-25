@@ -148,11 +148,6 @@ namespace Extract.Redaction.Verification
         int _historyIndex;
 
         /// <summary>
-        /// Redirects shortcut key message to the main application window.
-        /// </summary>
-        ShortcutsMessageFilter _filter;
-
-        /// <summary>
         /// Tracks user input in the file processing database.
         /// </summary>
         InputEventTracker _inputEventTracker;
@@ -249,11 +244,6 @@ namespace Extract.Redaction.Verification
                     HandleImageViewerSelectionLayerObjectAdded;
                 _imageViewer.LayerObjects.Selection.LayerObjectDeleted += 
                     HandleImageViewerSelectionLayerObjectDeleted;
-
-                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
-                {
-                    LoadState();
-                }
 
                 _invoker = new ControlInvoker(this);
             }
@@ -1543,6 +1533,7 @@ namespace Extract.Redaction.Verification
         {
             // Get the pertinent information
             FormMemento formMemento = new FormMemento(this);
+            ToolStripManager.SaveSettings(this);
             int splitterDistance = _dataWindowSplitContainer.SplitterDistance;
 
             // Create a memento to represent the state
@@ -1583,6 +1574,7 @@ namespace Extract.Redaction.Verification
 
                     // Restore the saved state
                     memento.FormMemento.Restore(this);
+                    ToolStripManager.LoadSettings(this);
                     _dataWindowSplitContainer.SplitterDistance = memento.SplitterDistance;
                 }
             }
@@ -1641,6 +1633,11 @@ namespace Extract.Redaction.Verification
                 UncollapseWindow(_dataWindowDockableWindow);
                 UncollapseWindow(_thumbnailDockableWindow);
 
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                {
+                    LoadState();
+                }
+
                 _imageViewer.EstablishConnections(this);
 
                 // It is important that this line comes AFTER EstablishConnections, 
@@ -1675,10 +1672,6 @@ namespace Extract.Redaction.Verification
                 // Exemption codes
                 _imageViewer.Shortcuts[Keys.E] = SelectPromptForExemptionCode;
                 _imageViewer.Shortcuts[Keys.E | Keys.Control] = SelectApplyLastExemptionCode;
-
-                // Redirect shortcut keys to the main application window [FIDSC #3887]
-                _filter = 
-                    new ShortcutsMessageFilter(ShortcutsEnabled, _imageViewer.Shortcuts, this);
             }
             catch (Exception ex)
             {
