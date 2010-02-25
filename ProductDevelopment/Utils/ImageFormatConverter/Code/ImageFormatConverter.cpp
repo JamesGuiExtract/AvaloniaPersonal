@@ -157,10 +157,13 @@ unsigned int getLtPermissions(long nPermissions)
 		if (isFlagSet(nPermissions, giAllowDocumentModifications))
 		{
 			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_MODIFYDOCUMENT;
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_MODIFYANNOTATION;
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_FILLFORM;
 		}
 		if (isFlagSet(nPermissions, giAllowContentCopying))
 		{
 			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_EXTRACTTEXTGRAPHICS;
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_EXTRACTTEXT;
 		}
 		if (isFlagSet(nPermissions, giAllowContentCopyingForAccessibility))
 		{
@@ -169,6 +172,7 @@ unsigned int getLtPermissions(long nPermissions)
 		if (isFlagSet(nPermissions, giAllowAddingModifyingAnnotations))
 		{
 			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_MODIFYANNOTATION;
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_FILLFORM;
 		}
 		if (isFlagSet(nPermissions, giAllowFillingInFields))
 		{

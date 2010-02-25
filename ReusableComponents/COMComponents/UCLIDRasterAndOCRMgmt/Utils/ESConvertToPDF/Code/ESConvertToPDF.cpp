@@ -188,22 +188,41 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 	// If there is an owner password defined, set it and the associated permissions
 	if (!m_strOwnerPassword.empty())
 	{
+		// Set the owner password
 		setStringSetting(strOutputFormat + ".PDFSecurity.OwnerPassword", m_strOwnerPassword);
+
+		// Get security settings
+
+		// Allow printing if either high quality or low quality is specified
 		bool bAllowHighQuality = isPdfSecuritySettingEnabled(giAllowHighQualityPrinting);
 		bool bAllowPrinting = bAllowHighQuality
 			|| isPdfSecuritySettingEnabled(giAllowLowQualityPrinting);
+
+		// Allow adding/modifying annotations if either allow modifications or
+		// allow adding/modifying annotations is specified
+		bool bAllowDocModify = isPdfSecuritySettingEnabled(giAllowDocumentModifications);
+		bool bAllowAddModifyAnnot = bAllowDocModify ||
+			isPdfSecuritySettingEnabled(giAllowAddingModifyingAnnotations);
+
+		// Allow form fill in if either adding/modifying annotations is allowed or
+		// filling in forms is specified
+		bool bAllowForms = bAllowAddModifyAnnot
+			|| isPdfSecuritySettingEnabled(giAllowFillingInFields);
+
+		// Allow extraction for accessibility if either content copying or accessibility
+		// is specified
+		bool bAllowCopy = isPdfSecuritySettingEnabled(giAllowContentCopying);
+		bool bAllowExtract = bAllowCopy
+			|| isPdfSecuritySettingEnabled(giAllowContentCopyingForAccessibility);
+
+		// Set the security settings
 		setBoolSetting(strOutputFormat + ".PDFSecurity.EnablePrint", bAllowPrinting);
 		setBoolSetting(strOutputFormat + ".PDFSecurity.EnablePrintQ", bAllowHighQuality);
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableModify",
-			isPdfSecuritySettingEnabled(giAllowDocumentModifications));
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableCopy",
-			isPdfSecuritySettingEnabled(giAllowContentCopying));
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableExtract",
-			isPdfSecuritySettingEnabled(giAllowContentCopyingForAccessibility));
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableAdd",
-			isPdfSecuritySettingEnabled(giAllowAddingModifyingAnnotations));
-		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableForms",
-			isPdfSecuritySettingEnabled(giAllowFillingInFields));
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableModify", bAllowDocModify);
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableCopy", bAllowCopy);
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableExtract", bAllowExtract);
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableAdd", bAllowAddModifyAnnot);
+		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableForms", bAllowForms);
 		setBoolSetting(strOutputFormat + ".PDFSecurity.EnableAssemble",
 			isPdfSecuritySettingEnabled(giAllowDocumentAssembly));
 	}

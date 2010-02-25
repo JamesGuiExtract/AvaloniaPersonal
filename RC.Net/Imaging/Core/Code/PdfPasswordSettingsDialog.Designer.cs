@@ -43,8 +43,8 @@ namespace Extract.Imaging
             System.Windows.Forms.Label label3;
             System.Windows.Forms.Label label1;
             System.Windows.Forms.GroupBox groupBox2;
-            System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label4;
+            System.Windows.Forms.Label label2;
             this._userPasswordText2 = new System.Windows.Forms.TextBox();
             this._userPasswordText1 = new System.Windows.Forms.TextBox();
             this._enableUserPasswordCheckBox = new System.Windows.Forms.CheckBox();
@@ -65,8 +65,8 @@ namespace Extract.Imaging
             label3 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             groupBox2 = new System.Windows.Forms.GroupBox();
-            label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
+            label2 = new System.Windows.Forms.Label();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -153,6 +153,15 @@ namespace Extract.Imaging
             groupBox2.TabStop = false;
             groupBox2.Text = "Owner password and permissions to set";
             // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new System.Drawing.Point(22, 20);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(120, 13);
+            label4.TabIndex = 12;
+            label4.Text = "Enable owner password";
+            // 
             // _allowHighQualityPrintingCheck
             // 
             this._allowHighQualityPrintingCheck.AutoSize = true;
@@ -162,7 +171,7 @@ namespace Extract.Imaging
             this._allowHighQualityPrintingCheck.TabIndex = 11;
             this._allowHighQualityPrintingCheck.Text = "Allow printing of a high resolution faithful print out";
             this._allowHighQualityPrintingCheck.UseVisualStyleBackColor = true;
-            this._allowHighQualityPrintingCheck.CheckedChanged += new System.EventHandler(this.HandleHighQualityPrintCheck);
+            this._allowHighQualityPrintingCheck.CheckedChanged += new System.EventHandler(this.HandleCheckBoxChanged);
             // 
             // _allowDocumentAssemblyCheck
             // 
@@ -203,6 +212,7 @@ namespace Extract.Imaging
             this._allowAddOrModifyAnnotationsCheck.TabIndex = 7;
             this._allowAddOrModifyAnnotationsCheck.Text = "Allow addition or modification of text annotations and filling in form fields";
             this._allowAddOrModifyAnnotationsCheck.UseVisualStyleBackColor = true;
+            this._allowAddOrModifyAnnotationsCheck.CheckedChanged += new System.EventHandler(this.HandleCheckBoxChanged);
             // 
             // _allowCopyAndExtractionCheck
             // 
@@ -214,6 +224,7 @@ namespace Extract.Imaging
             this._allowCopyAndExtractionCheck.Text = "Allow copying / extraction of text and graphics including support to users with d" +
                 "isabilities";
             this._allowCopyAndExtractionCheck.UseVisualStyleBackColor = true;
+            this._allowCopyAndExtractionCheck.CheckedChanged += new System.EventHandler(this.HandleCheckBoxChanged);
             // 
             // _allowDocumentModificationsCheck
             // 
@@ -224,6 +235,7 @@ namespace Extract.Imaging
             this._allowDocumentModificationsCheck.TabIndex = 5;
             this._allowDocumentModificationsCheck.Text = "Allow document modifications";
             this._allowDocumentModificationsCheck.UseVisualStyleBackColor = true;
+            this._allowDocumentModificationsCheck.CheckedChanged += new System.EventHandler(this.HandleCheckBoxChanged);
             // 
             // _allowLowQualityPrintCheck
             // 
@@ -291,15 +303,6 @@ namespace Extract.Imaging
             this._btnCancel.TabIndex = 6;
             this._btnCancel.Text = "Cancel";
             this._btnCancel.UseVisualStyleBackColor = true;
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(22, 20);
-            label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(120, 13);
-            label4.TabIndex = 12;
-            label4.Text = "Enable owner password";
             // 
             // PdfPasswordSettingsDialog
             // 

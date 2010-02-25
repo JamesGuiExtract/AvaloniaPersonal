@@ -878,21 +878,17 @@ void UCLIDException::saveTo(const string& strFile, bool bAppend) const
 		const unsigned long ulUEX_FILE_SIZE_THRESHOLD = 2000000;
 		if (ullCurrentFileSize >= ulUEX_FILE_SIZE_THRESHOLD)
 		{
-			// compute the date prefix string
-			CTime currentTime = CTime::GetCurrentTime();
-			CString zDatePrefix = currentTime.Format("%Y-%m-%d ");
-
-			// compute the time prefix string
+			// Compute the date/time prefix string
 			SYSTEMTIME	st;
 			GetLocalTime( &st );
-			CString zTimePrefix;
-			zTimePrefix.Format( "%02dh%02dm%02d.%03ds ", st.wHour, st.wMinute, st.wSecond, st.wMilliseconds );
+			CString zDateTimePrefix;
+			zDateTimePrefix.Format( "%4d-%02d-%02d %02dh%02dm%02d.%03ds ",
+				st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds );
 
 			// compute the full path to the file to which this file needs to be renamed
 			string strRenameFileTo = getDirectoryFromFullPath(strFile);
 			strRenameFileTo += "\\";
-			strRenameFileTo += (LPCTSTR) zDatePrefix;
-			strRenameFileTo += (LPCTSTR) zTimePrefix;
+			strRenameFileTo += (LPCTSTR) zDateTimePrefix;
 			strRenameFileTo += getFileNameFromFullPath(strFile);
 
 			// perform the rename.  If the rename fails, just ignore it (we don't want to cause more 

@@ -364,11 +364,12 @@ namespace Extract.Imaging
         }
 
         /// <summary>
-        /// Handles the check box changed event for the high quality print checkbox.
+        /// Handles the <see cref="CheckBox.CheckedChanged"/> event for
+        /// checkboxes that change.
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        void HandleHighQualityPrintCheck(object sender, EventArgs e)
+        void HandleCheckBoxChanged(object sender, EventArgs e)
         {
             try
             {
@@ -403,14 +404,12 @@ namespace Extract.Imaging
                 _ownerPasswordText1.Enabled = ownerEnabled;
                 _ownerPasswordText2.Enabled = ownerEnabled;
 
-                _allowAccessibilityCheck.Enabled = permissionEnabled;
-                _allowAddOrModifyAnnotationsCheck.Enabled = permissionEnabled;
                 _allowCopyAndExtractionCheck.Enabled = permissionEnabled;
                 _allowDocumentAssemblyCheck.Enabled = permissionEnabled;
                 _allowDocumentModificationsCheck.Enabled = permissionEnabled;
-                _allowFillInFormFieldsCheck.Enabled = permissionEnabled;
                 _allowHighQualityPrintingCheck.Enabled = permissionEnabled;
 
+                // If high quality printing is allowed then need to allow low quality
                 if (_allowHighQualityPrintingCheck.Checked)
                 {
                     _allowLowQualityPrintCheck.Checked = true;
@@ -419,6 +418,41 @@ namespace Extract.Imaging
                 else
                 {
                     _allowLowQualityPrintCheck.Enabled = permissionEnabled;
+                }
+
+                // If document modifications are allowed then need to allow
+                // adding/modifying annotations
+                if (_allowDocumentModificationsCheck.Checked)
+                {
+                    _allowAddOrModifyAnnotationsCheck.Checked = true;
+                    _allowAddOrModifyAnnotationsCheck.Enabled = false;
+                }
+                else
+                {
+                    _allowAddOrModifyAnnotationsCheck.Enabled = permissionEnabled;
+                }
+
+                // If adding/modifying annotations is allowed then need to
+                // allow fill in form fields
+                if (_allowAddOrModifyAnnotationsCheck.Checked)
+                {
+                    _allowFillInFormFieldsCheck.Checked = true;
+                    _allowFillInFormFieldsCheck.Enabled = false;
+                }
+                else
+                {
+                    _allowFillInFormFieldsCheck.Enabled = permissionEnabled;
+                }
+
+                // If allow copy and extraction then need to allow accessibility
+                if (_allowCopyAndExtractionCheck.Checked)
+                {
+                    _allowAccessibilityCheck.Checked = true;
+                    _allowAccessibilityCheck.Enabled = false;
+                }
+                else
+                {
+                    _allowAccessibilityCheck.Enabled = permissionEnabled;
                 }
             }
             catch (Exception ex)
