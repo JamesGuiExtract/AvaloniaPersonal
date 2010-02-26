@@ -55,7 +55,7 @@ SpotRecDlgToolBar::~SpotRecDlgToolBar()
 void SpotRecDlgToolBar::createGoToPageEditBox()
 {
 	int iIndex = CommandToIndex(IDC_BTN_GoToPage);
-	SetButtonInfo(iIndex, IDC_BTN_GoToPage, TBBS_SEPARATOR, 20);
+	SetButtonInfo(iIndex, IDC_BTN_GoToPage, TBBS_BUTTON, 20);
 
 	TBBUTTONINFO bi;
 	bi.cbSize = sizeof(TBBUTTONINFO);
