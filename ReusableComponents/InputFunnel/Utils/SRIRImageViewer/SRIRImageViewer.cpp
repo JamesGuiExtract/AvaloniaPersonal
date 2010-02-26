@@ -245,15 +245,23 @@ BOOL CSRIRImageViewerApp::InitInstance()
 				}
 				else if (strArg == gstrCmdLineExecScript)
 				{
-					// Reuse a current window if one can be found
+					// Get the script file to execute
 					bExecScript = true;
-					if (i == __argc - 1)
+					i++;
+					if (i == __argc)
 					{
 						UCLIDException ue("ELI11858", "The /e option requires an additional argument.");
 						throw ue;
 					}
-					i++;
 					strScriptFileName = __argv[i];
+
+					// Check for the files existence [LRCAU #5359]
+					if (!isValidFile(strScriptFileName))
+					{
+						UCLIDException ue("ELI29853", "Specified script file does not exist.");
+						ue.addDebugInfo("Script File Name", strScriptFileName);
+						throw ue;
+					}
 				}
 				else if (strArg == gstrCmdLineCloseAll)
 				{
