@@ -50,13 +50,18 @@ UINT IdleProcessKiller::monitorProcessLoop(void* pData)
 		IdleProcessKiller* pIdleProcessKiller = (IdleProcessKiller*) pData;
 		ASSERT_RESOURCE_ALLOCATION("ELI25209", pIdleProcessKiller != NULL);
 
+		INIT_EXCEPTION_AND_TRACING("MLI03273");
 		try
 		{
+			_lastCodePos = "10";
+
 			// Wait the specified interval for the stop event
 			while (pIdleProcessKiller->m_eventStopping.wait(pIdleProcessKiller->m_iInterval) == WAIT_TIMEOUT)
 			{
+				_lastCodePos = "20";
 				// We haven't stopped yet, monitor the process
 				pIdleProcessKiller->monitorProcess();
+				_lastCodePos = "30";
 			}
 		}
 		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI25210");
@@ -72,48 +77,61 @@ UINT IdleProcessKiller::monitorProcessLoop(void* pData)
 //-------------------------------------------------------------------------------------------------
 void IdleProcessKiller::monitorProcess()
 {
-	// Check if there is zero cpu usage
-	if (m_cpuUsage.GetCpuUsage(m_ulProcessId) > 0)
+	INIT_EXCEPTION_AND_TRACING("MLI03274");
+	try
 	{
-		// Process isn't idle. Reset the zero cpu count.
-		m_iZeroCpuCount = 0;
-
-		return;
-	}
-
-	// Process may be idle. Increment count.
-	m_iZeroCpuCount++;
-
-	// Check if this the process is considered idle
-	if (m_iZeroCpuCount >= m_iMaxZeroCpuCount)
-	{
-		// Kill the process
-		HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_ulProcessId);
-		if (hProcess != NULL)
+		// Check if there is zero cpu usage
+		if (m_cpuUsage.GetCpuUsage(m_ulProcessId) > 0)
 		{
-			// Get the name of the file that is being terminated
-			string strFileName = getProcessFileName(hProcess);
+			// Process isn't idle. Reset the zero cpu count.
+			m_iZeroCpuCount = 0;
 
-			// Terminate the process
-			TerminateProcess(hProcess, 0);
-			CloseHandle(hProcess);
-			
-			m_bKilledProcess = true;
-
-			// Log an application trace
-			UCLIDException ue("ELI25219", "Application trace: Idle process terminated.");
-			ue.addDebugInfo("Process", strFileName);
-			ue.log();
+			return;
 		}
+		_lastCodePos = "10";
 
-		// Stop monitoring the process
-		m_eventStopping.signal();
+		// Process may be idle. Increment count.
+		m_iZeroCpuCount++;
+
+		// Check if this the process is considered idle
+		if (m_iZeroCpuCount >= m_iMaxZeroCpuCount)
+		{
+			// Kill the process
+			HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_ulProcessId);
+			_lastCodePos = "20";
+			if (hProcess != NULL)
+			{
+				// Get the name of the file that is being terminated
+				string strFileName = getProcessFileName(hProcess);
+				_lastCodePos = "30";
+
+				// Terminate the process
+				TerminateProcess(hProcess, 0);
+				_lastCodePos = "40";
+
+				CloseHandle(hProcess);
+				_lastCodePos = "50";
+
+				m_bKilledProcess = true;
+
+				// Log an application trace
+				UCLIDException ue("ELI29833", "Application trace: Idle process terminated.");
+				ue.addDebugInfo("Process", strFileName);
+				ue.log();
+				_lastCodePos = "60";
+			}
+
+			// Stop monitoring the process
+			m_eventStopping.signal();
+			_lastCodePos = "70";
+		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29834");
 }
 //-------------------------------------------------------------------------------------------------
 string IdleProcessKiller::getProcessFileName(HANDLE hProcess)
 {
-	char buffer[MAX_PATH];
+	char buffer[MAX_PATH] = {0};
 	if (GetModuleFileNameEx(hProcess, 0, buffer, MAX_PATH) != 0)
 	{
 		// Return just the file name

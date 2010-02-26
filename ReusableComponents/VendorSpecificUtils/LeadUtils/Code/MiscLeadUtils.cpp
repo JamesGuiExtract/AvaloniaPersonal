@@ -1446,16 +1446,63 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap, FILEIN
 	{
 		try
 		{
-			// Lock the PDF loading if bLockPdf == true
-			auto_ptr<LeadToolsPDFLoadLocker> apLoadLock;
-			if (bLockPdf)
+			int iRetryCount(0), iRetryTimeout(0);
+			getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
+
+			// Get the file name as a char*
+			char* pszImageFile = (char*) strImageFileName.c_str();
+
+			// Default return to success
+			L_INT nRet = SUCCESS;
+
+			// Perform the save operation in a loop
+			long nNumFailedAttempts = 0;
+			while (nNumFailedAttempts < iRetryCount)
 			{
-				apLoadLock.reset(new LeadToolsPDFLoadLocker(strImageFileName));
+				// Scope for the PDF load locker
+				{
+					// Lock the PDF loading if bLockPdf == true
+					auto_ptr<LeadToolsPDFLoadLocker> apLoadLock;
+					apLoadLock.reset(bLockPdf ? new LeadToolsPDFLoadLocker(strImageFileName) : NULL);
+
+					nRet = L_LoadBitmap(pszImageFile, &rBitmap, sizeof(BITMAPHANDLE), 0,
+						ORDER_RGB, &lfo, &rflInfo);
+				}
+
+				// Check result
+				if (nRet == SUCCESS)
+				{
+					// Exit loop
+					break;
+				}
+				else
+				{
+					// Increment the attempt count and sleep
+					nNumFailedAttempts++;
+					Sleep(iRetryTimeout);
+				}
 			}
 
-			throwExceptionIfNotSuccess(L_LoadBitmap( (char*)( strImageFileName.c_str()), 
-				&rBitmap, sizeof(BITMAPHANDLE), 0, ORDER_RGB, &lfo, &rflInfo),"ELI13284",
-				"Unable to load image page!");
+			// If still not success, throw an exception
+			if (nRet != SUCCESS)
+			{
+				UCLIDException ue("ELI13284", "Cannot load page");
+				ue.addDebugInfo("Actual Error Code", nRet);
+				ue.addDebugInfo("Error Message", getErrorCodeDescription(nRet));
+				ue.addDebugInfo("Number Of Retries", nNumFailedAttempts);
+				ue.addDebugInfo("Max Number Of Retries", iRetryCount);
+				throw ue;
+			}
+			// Check if a retry was necessary, if so log an application trace
+			else if (nNumFailedAttempts > 0)
+			{
+				UCLIDException ue("ELI29835",
+					"Application Trace: Successfully loaded image page after retry.");
+				ue.addDebugInfo("Page Number", lfo.PageNumber);
+				ue.addDebugInfo("Image File Name", strImageFileName);
+				ue.addDebugInfo("Retries", nNumFailedAttempts);
+				ue.log();
+			}
 
 			// If bChangeViewPerspective == true && the view perspective is not TOP_LEFT 
 			// then attempt to change the view perspective
@@ -1466,7 +1513,7 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap, FILEIN
 					"Unable to change bitmap perspective!");
 			}
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27280");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29836");
 	}
 	catch(UCLIDException& ue)
 	{

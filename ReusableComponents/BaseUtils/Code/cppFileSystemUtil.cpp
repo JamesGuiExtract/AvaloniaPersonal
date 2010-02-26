@@ -31,7 +31,7 @@ using namespace std;
 // Defaults for file access
 //--------------------------------------------------------------------------------------------------
 const string gstrDEFAULT_FILE_ACCESS_RETRIES = "50";
-const string gstrDEFAULT_FILE_ACCESS_TIMEOUT = "100"; // milliseconds
+const string gstrDEFAULT_FILE_ACCESS_TIMEOUT = "250"; // milliseconds
 
 const string gstrFILE_ACCESS_RETRIES = "FileAccessRetries";
 const string gstrFILE_ACCESS_TIMEOUT = "FileAccessTimeout";
