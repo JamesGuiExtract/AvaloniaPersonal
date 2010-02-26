@@ -234,9 +234,9 @@
 	Below is a table indicating which file processors that each license type should 
 	be able to access.
 	For each license type, confirm that only the appropriate file processors can be 
-	accessed by following the steps below. (The <b>FLEX Index Client</b> 
-	and <b>Simple Rule Writing</b> licenses should not have access to the <b>File 
-	Action Manager</b>, and thus should have no file processors.)
+	accessed by following the steps below. (The <b>Simple Rule Writing</b> license should 
+	not have access to the <b>File Action Manager</b>, and thus should have no file 
+	processors.)
 <p>
 	<ul>
 		<li>Create the license file using the <b>COM License Generator</b> utility. 
@@ -252,6 +252,7 @@
 		<table border=1 cellpadding="5" cellspacing="0">
 		<tr>
 			<th><font size="2">Task Name
+			<th><font size="2">FlexIndex Client
 			<th><font size="2">FlexIndex Server
 			<th><font size="2">IDShield Client
 			<th><font size="2">IDShield Server
@@ -264,6 +265,16 @@
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
+			<th><font size="2">Core: Apply Bates number
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
 			<td><font size="2"><li>N/A
 		</tr>
 		<tr align="center">
@@ -272,10 +283,12 @@
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
 			<td><font size="2"><li>N/A
 		</tr>
 		<tr align="center">
 			<th><font size="2">Core: Cleanup image
+			<td><font size="2"><li>No
 			<td><font size="2"><li>No
 			<td><font size="2"><li>No
 			<td><font size="2"><li>No
@@ -288,6 +301,7 @@
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
 			<td><font size="2"><li>N/A
 		</tr>
 		<tr align="center">
@@ -295,11 +309,22 @@
 			<td><font size="2"><li>No
 			<td><font size="2"><li>No
 			<td><font size="2"><li>No
+			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Create Searchable PDF
 		</tr>
 		<tr align="center">
+			<th><font size="2">Core: Convert VOA to XML
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
 			<th><font size="2">Core: Copy, move or delete file
+			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
@@ -308,6 +333,7 @@
 		</tr>
 		<tr align="center">
 			<th><font size="2">Core: Execute rules
+			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
@@ -320,10 +346,30 @@
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
 			<td><font size="2"><li>N/A
 		</tr>
 		<tr align="center">
+			<th><font size="2">Core: Manage tags
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
+			<th><font size="2">Core: Modify pdf file
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Modify PDF (Pegasus PDF Annotation Removal)
+		</tr>
+		<tr align="center">
 			<th><font size="2">Core: OCR document
+			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
@@ -336,10 +382,30 @@
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
+			<th><font size="2">Core: Sleep
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
+			<th><font size="2">Data Entry: Verify extracted data
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
 			<td><font size="2"><li>N/A
 		</tr>
 		<tr align="center">
 			<th><font size="2">Redaction: Create metadata xml
+			<td><font size="2"><li>No
 			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
@@ -349,6 +415,16 @@
 		<tr align="center">
 			<th><font size="2">Redaction: Create redacted image
 			<td><font size="2"><li>No
+			<td><font size="2"><li>No
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
+			<th><font size="2">Redaction: Extend redactions to surround context
+			<td><font size="2"><li>No
+			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
@@ -357,13 +433,15 @@
 		<tr align="center">
 			<th><font size="2">Redaction: Filter ID Shield data file
 			<td><font size="2"><li>No
+			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>N/A
 		</tr>
 		<tr align="center">
-			<th><font size="2">Redaction: Redact images (no verification) (legacy)
+			<th><font size="2">Redaction: Redact image without verification (legacy)
+			<td><font size="2"><li>No
 			<td><font size="2"><li>No
 			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
@@ -371,7 +449,8 @@
 			<td><font size="2"><li>N/A
 		</tr>
 		<tr align="center">
-			<th><font size="2">Redaction: Verify redactions (legacy)
+			<th><font size="2">Redaction: Verify and redact image (legacy)
+			<td><font size="2"><li>No
 			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
@@ -380,6 +459,7 @@
 		</tr>
 		<tr align="center">
 			<th><font size="2">Redaction: Verify sensitive data
+			<td><font size="2"><li>No
 			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
@@ -503,7 +583,7 @@
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2">.\CommonComponents\<br>ESOCR.exe
 			</tr>
