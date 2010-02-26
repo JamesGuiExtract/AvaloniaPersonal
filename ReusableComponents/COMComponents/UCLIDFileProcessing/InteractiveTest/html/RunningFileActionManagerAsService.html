@@ -23,7 +23,8 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Make a local copy of <b>CT - Manchester - Cott</b> TIF images from 
 			Set002.
 			<li>Make a local copy of the most recent <b>CT - Manchester - Cott</b> 
-			Indexing rules delivery.
+			Indexing rules delivery.  The most recent rules from the internal branch may 
+			be used instead, if appropriate.
 <p>
 			<li>Create a <b>Queuing</b> FPS file to supply the images for processing.  
 			Use a UNC path for the Folder file supplier.
@@ -33,7 +34,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Create a <b>Processing</b> FPS file to process the images.  Use a 
 			<b>Core: Execute rules</b> task.
 <p>
-			<li>Use the <b>SQL CE Editor</b> to add the FPS files to the 
+			<li>Use the <b>SQLCDBEditor.exe</b> to add the FPS files to the 
 			<b>ESFAMService.sdf</b> database.  The database is created during 
 			installation and is located in the <b>CommonComponents</b> folder.
 			<li>Activate the FPS files appropriate for the test to be executed.
@@ -54,7 +55,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<b>Core: Execute rules</b> task and a <b>Redaction: Create redacted 
 			image</b> task.
 <p>
-			<li>Use the <b>SQL CE Editor</b> to add the FPS files to the 
+			<li>Use the <b>SQLCDBEditor.exe</b> to add the FPS files to the 
 			<b>ESFAMService.sdf</b> database.  The database is created during 
 			installation and is located in the <b>CommonComponents</b> folder.
 			<li>Activate the FPS files appropriate for the test to be executed.
@@ -64,7 +65,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
 	<li><b>FLEX Index Basic: Local system user, single machine</b>
 	<ul>
-		<li>Confirm on the database machine that the database is clear.
+		<li>Confirm that the database is clear.
 		<li>Set the FLEX Index <b>Queuing</b> and <b>Processing</b> FPS files to AutoStart.
 		<li>Set the service startup type to <b>Automatic</b>.
 		<li>Restart the <b>service machine</b>.  Do not login.</li>
@@ -101,7 +102,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
 	<li><b>ID Shield Basic: Local system user, single machine</b>
 	<ul>
-		<li>Confirm on the database machine that the database is clear.
+		<li>Confirm that the database is clear.
 		<li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to AutoStart.
 		<li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
 		<li>Restart the <b>service machine</b>.</li>
@@ -133,10 +134,10 @@ called the <b>service machine</b>.  The machine that contains the database is re
 	<ul>
 		<li><b>Local system user, listening for supplied files</b>
 		<ul>
-			<li>Confirm on the database machine that the database is clear.
-			<li>Prepare the <b>Queuing</b> FPS file to only supply images via 
-			listening to a folder on a different test machine.
-			<li>Set the FLEX Index <b>Queuing</b> and <b>Processing</b> FPS files to 
+			<li>Confirm that the database is clear.
+			<li>Prepare the <b>Listening</b> FPS file to only supply images via 
+			listening to a folder on the local machine.
+			<li>Set the FLEX Index <b>Listening</b> and <b>Processing</b> FPS files to 
 			AutoStart.
 			<li>Set the service startup type to <b>Automatic</b>.
 			<li>Restart the <b>service machine</b>.  Do not login.</li>
@@ -146,13 +147,13 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Add some files to the remote folder to test the listening feature.
 			<li>Confirm that files <b>are</b> queuing and processing.</li>
 		</ul>
-		<li><b>Domain user, non-UNC path for supplying</b>
+		<li><b>Specified user, UNC path for supplying</b>
 		<ul>
 			<li>Confirm on the database machine that the database is clear.
 			<li>Prepare the service to use login information for a specified 
 			domain user.
 			<li>Prepare the <b>Queuing</b> FPS file to supply images from a 
-			non-UNC path.
+			UNC path.
 			<li>Set the FLEX Index <b>Queuing</b> and <b>Processing</b> FPS files 
 			to AutoStart.
 			<li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
@@ -166,7 +167,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
 	<li><b>ID Shield Complex:</b>
 	<ul>
-		<li><b>Local system users, two machines</b>
+		<li><b>Specified users, two machines</b>
 		<ul>
 			<li>Confirm on the database machine that the database is clear.
 			<li>For each service machine, set the ID Shield <b>Queuing</b> and 
@@ -189,7 +190,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Confirm that files are continuing to process.</li>
 			<li>Confirm that redacted images are being created.</li>
 		</ul>
-		<li><b>Local system user, scheduled processing</b>
+		<li><b>Specified user, scheduled processing</b>
 		<ul>
 			<li>Confirm on the database machine that the database is clear.
 			<li>Modify the <b>Processing</b> FPS file to use scheduled processing.  
@@ -207,7 +208,7 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Confirm that files <b>are</b> processing.</li>
 			<li>Confirm that redacted images <b>are</b> being created.</li>
 		</ul>
-		<li><b>Local system user, stop service during processing of large file</b>
+		<li><b>Specified user, stop service during processing of large file</b>
 		<ul>
 			<li>Confirm on the database machine that the database is clear.
 			<li>Provide very large (~100 pages) files for processing.
@@ -250,8 +251,10 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			FAM service</b> service from the Services management console.
 			<li>Confirm that each running <b>FAMProcess.exe</b> instance 
 			finishes processing the active files and then stops gracefully.</li>
-			<li><b>[DotNet #358]</b> Confirm that <b>ELI28498</b> exceptions 
-			are not seen for each previously killed instance of FAMProcess.exe.
+			<li><b>[DotNet #358, #414]</b> Confirm that <b>ELI28498</b> exceptions 
+			are not seen for each previously killed instance of FAMProcess.exe.  It 
+			is acceptable that these exceptions are wrapped in a more meaningful 
+			exception.
 		</ul>
 		<li><b>Restart the stopped service</b>
 		<ul>
@@ -261,21 +264,28 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			processing files.</li>
 		</ul>
 <p>
-		<li><b>Longer timeout during restart of machine</b>
+		<li><b>Auto-revert after restart of machine</b>
 		<ul>
 			<li>Confirm on the database machine that the database is clear.
 			<li>Create one FPS file configured for AutoStart.
+			<li>Set the <b>AutoRevertTimeOutInMinutes</b> field in <b>DBInfo</b> 
+			to <b>5</b>.
 			<li>Provide several large (20-30+ pages) images for processing.
 			<li>Set the service startup type to <b>Automatic</b>.
 			<li>Restart the <b>service machine</b>.</li>
 			<li>Confirm that files are processing.</li>
 			<li><b>Restart</b> the test machine from the Start menu.
 			<li>Confirm that the <b>FAMProcess.exe</b> instance 
-			gracefully finishes its processing.</li>
+			does not gracefully finish its processing.
 			<li>Confirm that an Application trace message is logged for 
 			<b>FAM Service stopping</b>.
 			<li>Confirm that an Application trace message is logged for 
 			<b>FAM Service stopped</b>.
+			<li>Confirm on the database machine that one or more files 
+			are stuck in <b>Processing</b>.</li>
+			<li>Confirm that after approximately 5 minutes, the files that 
+			were stuck in Processing revert to Pending and are processed 
+			by the service.
 		</ul>
 <p>
 		<li><b>[DotNetRC #363] Clear database while processing</b>
@@ -293,27 +303,34 @@ called the <b>service machine</b>.  The machine that contains the database is re
 		<li><b>Run multiple FPS files, then gracefully restart the machine</b>
 		<ul>
 			<li>Confirm on the database machine that the database is clear.
+			<li>Set the <b>AutoRevertTimeOutInMinutes</b> field in <b>DBInfo</b> 
+			to <b>5</b>.
 			<li>Create four or more FPS files configured for AutoStart.
 			<li>Set the service startup type to <b>Automatic</b>.
 			<li>Restart the <b>service machine</b>.</li>
 			<li>Confirm that files are processing.</li>
-			<li><b>Restart</b> the test machine from the Start menu.
-			<li>Confirm that the <b>FAMProcess.exe</b> instances 
-			gracefully finish their processing.</li>
-			<li>Confirm that files are processing normally after restart.</li>
-			<li>Confirm that if files were stuck in <b>Processing</b> mode 
-			during the restart, that they automatically revert to 
-			<b>Pending</b> mode.</li>
+			<li><b>[DotNet #421]</b> Handling the OnShutdown event
+			<ul>
+				<li><b>Restart</b> the test machine from the Start menu.
+				<li>Confirm that the <b>FAMProcess.exe</b> instances 
+				gracefully finish their processing.</li>
+				<li>Confirm that files are processing normally after restart.</li>
+				<li>Confirm that if files were stuck in <b>Processing</b> mode 
+				during the restart, that they automatically revert to 
+				<b>Pending</b> mode.</li>
+			</ul>
 		</ul>
 <p>
 		<li><b>Run multiple FPS files, then ungracefully restart the machine</b>
 		<ul>
 			<li>Confirm on the database machine that the database is clear.
+			<li>Set the <b>AutoRevertTimeOutInMinutes</b> field in <b>DBInfo</b> 
+			to <b>5</b>.
 			<li>Create four or more FPS files configured for AutoStart.
 			<li>Set the service startup type to <b>Automatic</b>.
 			<li>Restart the <b>service machine</b>.</li>
 			<li>Confirm that files are processing.</li>
-			<li><b>Restart</b> the test machine by cycling power.
+			<li><b>Restart</b> the test machine by pressing the power button.
 			<li>Confirm that files are processing normally after restart.</li>
 			<li>Confirm that files stuck in <b>Processing</b> mode during the 
 			restart automatically revert to <b>Pending</b> mode.</li>
@@ -340,12 +357,12 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			start until after the <b>SleepTimeOnStart</b> value.
 			<li>Add an entry to the <b>DependentServices</b> field.  Confirm that the 
 			service is not currently running.
-			<li>Confirm that the FAM service does not start if the specified dependent 
-			service has not started.
+			<li>Confirm that the FAM service does start but that <b>FAMProcess.exe</b> 
+			does not start if the specified dependent service has not started.
 			<li>Confirm that an exception is logged after the sleep time has expired 
 			noting which dependent services have not started.
 			<li>Start the dependent service.
-			<li>Confirm that the FAM service starts.
+			<li>Confirm that <b>FAMProcess.exe</b> starts.
 			<li>Stop the FAM service.
 <p>
 			<li>Add more entries to the <b>DependentServices</b> field using a pipe 
@@ -359,10 +376,10 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			have still not started as of the stop request.
 	       	</ul>
 <p>
-  	   	<LI><b>[DotNet #379, LegacyRC #5670]</b> FAM Service
+  	   	<LI><b>[DotNet #379, #408, #410, LegacyRC #5670]</b> FAM Service
 	       	<ul>
 	  	   	<LI>Confirm that the <b>Settings</b> table in the <b>ESFAMService.sdf</b> 
-			database contains an entry for <b>NumberOfFilesToProcess</b>.
+			database contains an entry for <b>NumberOfFilesToProcessPerFAMInstance</b>.
 			<li>Confirm that the default setting is <b>0</b>.
 			<li>Confirm that for a <b>zero</b> value, the service continues to run as 
 			long as files are available to process.
@@ -396,13 +413,29 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Stop the service.
 			<li>Configure each database to require user authentication.
 			<li>Restart the service.
-			<li>Confirm that the FAM service <b>automatically</b> stops processing 
+			<li>Confirm that the FAM service logs a stop message and stops running 
 			since no FPS file can be exercised without user authentication.
-			<li>Add the test machine to the comma-separated list of machines for 
+			<li>Add the test machine to the comma-separated lists of machines for 
 			<b>SkipAuthenticationForServicesOnMachines</b>.
 			<li>Restart the service.
-			<li>Confirm that the FAM service runs as expected without requiring a 
-			password.
+			<li>Confirm that the FAM service and processing EXEs run as expected 
+			without requiring a password.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #412]</b> Rename ESFAMService.sdf with installation
+	       	<ul>
+	  	   	<LI>Move <b>ESFAMService.sdf</b> from the CommonComponents folder.
+			<li>Uninstall FLEX Index or ID Shield.
+			<li>Restore <b>ESFAMService.sdf</b> to the CommonComponents folder.
+			<li>Install FLEX Index or ID Shield.
+			<Li>Confirm that <b>ESFAMService.sdf</b> is renamed with a meaningful 
+			timestamp.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #413]</b> ESFAMService.sdf schema version
+	       	<ul>
+	  	   	<LI>Confirm that the <b>Settings</b> table in <b>ESFAMService.sdf</b> 
+			includes a <b>DBSchema</b> field.
 	       	</ul>
 	</ul>
 	</li>
