@@ -348,6 +348,36 @@
 			<li>Confirm that <b>Stop processing</b> from the FAM is successful and 
 			that the verification UI will close.
 		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5734]</b> Confirm that PDF images can be simultaneously queued and 
+		verified.
+	</UL>
+<p>
+
+	<LI><h2>ID Shield Tester</h2>
+	<UL>
+  	   	<LI>Confirm that all summary statistics are displayed for the 
+		<b>ID Shield Tester</b> when <b>OUTPUT_FINAL_STATS_ONLY=TRUE</b>.
+		<li>Confirm that the <b>TypesToBeTested</b> field ignores leading and 
+		trailing spaces in the <b>ID Shield Tester</b>.
+<p>
+		<li>Create some VOA files with slightly overlapping redactions.
+		<li>Confirm that the default overlap before two redactions are considered 
+		overlapping is 10 percent.
+		<li>Confirm that this percentage is controlled by <b>HKCU\Software\Extract Systems\AttributeFinder\IndustrySpecific\Redaction\RedactionTester\RedactionZoneOverlapMinimum</b>.
+<p>
+  	   	<LI><b>[FlexIDSCore #4006]</b> Old VOA files from skewed images
+	       	<ul>
+			<li>Copy the files from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4006</b>.
+	  	   	<LI>Exercise <b>hybrid.tcl</b>and review the results.
+			<li>Confirm the following results
+			<ul>
+				<li>5 correct redactions
+				<li>1 false positive
+				<li>0 over-redactions
+				<li>0 under-redactions
+			</ul>
+	       	</ul>
 	</UL>
 <p>
 
