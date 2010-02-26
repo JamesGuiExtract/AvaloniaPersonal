@@ -45,6 +45,16 @@
 			empty.
 			<li>Confirm that the default value for <b>NumberOfFilesToProcess</b> is 
 			<b>0</b>.
+<p>
+			<li><b>[DotNet #425]</b> Checking for DBNull
+			<ul>
+				<li>Add some dependent services and save the changes.
+				<li>Exit the application.
+				<li>Edit the database again and clear the dependent services.
+				<li>Save the changes and exit the application.
+				<li>Confirm that the service will run without logging an 
+				<b>ELI29151</b> exception about a DBNull value.
+			</ul>
 	       	</ul>
    		</LI>
 		<LI><b>Toolbar and Menus</b>
@@ -76,6 +86,9 @@
 			dialog.
 			<li>Confirm that the dialog includes the correct version number and 
 			copyright date.
+<p>
+			<li><b>[DotNet #423]</b> Confirm that the toolbar buttons are <b>32x32</b> 
+			and that they are not autoscaled and looking choppy.
 	       	</ul>
    		</LI>
 		<LI><b>Miscellaneous</b>
