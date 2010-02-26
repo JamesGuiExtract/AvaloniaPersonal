@@ -34,7 +34,8 @@ CRegExprRule::CRegExprRule()
 	m_strRegExpFileName(""),
 	m_ipAFUtility(NULL),
 	m_ipMiscUtils(NULL),
-	m_bAddCapturesAsSubAttributes(false)
+	m_bAddCapturesAsSubAttributes(false),
+	m_cachedRegExLoader(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
 {
 	try
 	{
