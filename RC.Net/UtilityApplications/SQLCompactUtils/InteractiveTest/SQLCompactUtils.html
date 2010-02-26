@@ -1,0 +1,169 @@
+<html>
+<head>
+<title>SQL Compact Utilities Checklist</title>
+	<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>SQL Compact Database Utility Applications<br> Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>	
+<hr>
+
+<ul>
+	<li><h2>SQLCDBEditor</h2>
+	<ul>
+		<LI><b>Start menu</b>
+		<ul>
+			<li>Confirm that a <b>Configure FAM Service</b> shortcut is available 
+			under the <b>Extract Systems FLEX Index</b> start menu.
+			<li>Confirm that the shortcut opens the <b>ESFAMService.sdf</b> database.
+			<li>Confirm that a <b>Configure FAM Service</b> shortcut is available 
+			under the <b>Extract Systems ID Shield</b> start menu.
+			<li>Confirm that the shortcut opens the <b>ESFAMService.sdf</b> database.
+	       	</ul>
+   		</LI>
+		<LI><b>FPSFile table</b>
+		<ul>
+			<li>Confirm that the table contains an <b>ID</b> column.
+			<li>Confirm that the table contains an <b>AutoStart</b> column.
+			<li>Confirm that the table contains an <b>FileName</b> column.
+			<li><b>[DotNet #405]</b> Confirm that new FileName entries default 
+			<b>AutoStart</b> to checked.
+	       	</ul>
+   		</LI>
+		<LI><b>Settings table</b>
+		<ul>
+			<li>Confirm that the table contains an <b>SleepTimeOnStart</b> column.
+			<li>Confirm that the table contains an <b>DependentServices</b> column.
+			<li>Confirm that the table contains an <b>NumberOfFilesToProcess</b> 
+			column.
+			<li>Confirm that the default value for <b>SleepTimeOnStart</b> is 
+			<b>120000</b>.
+			<li>Confirm that the default value for <b>DependentServices</b> is 
+			empty.
+			<li>Confirm that the default value for <b>NumberOfFilesToProcess</b> is 
+			<b>0</b>.
+	       	</ul>
+   		</LI>
+		<LI><b>Toolbar and Menus</b>
+		<ul>
+			<li>Confirm that an <b>Open Database</b> button is provided for opening 
+			a different database.
+			<li>Confirm that a <b>Save Database</b> button is provided for saving 
+			database changes.
+			<li>Confirm that <b>File - Open</b> displays an Open dialog.
+			<li>Confirm that the Open dialog defaults to choosing <b>Database files 
+			(*.sdf)</b>.
+			<li>Confirm that the Open dialog also allows <b>All files (*.*)</b>.
+			<li>Confirm that the selected file is opened.
+			<li>Confirm that the user is prompted to save changes (if necessary) 
+			before the Open dialog is displayed.
+			<li>Confirm that <b>File - Save</b> and the associated toolbar button are 
+			both disabled if no changes have been made to the database.
+			<li>Confirm that a <b>Database was saved successfully</b> message is 
+			displayed after saving changes.
+			<li>Confirm that <b>File - Close</b> closes the open database.
+			<li>Confirm that a confirmation message is presented if unsaved changes 
+			have been made.
+			<li>Confirm that the application stays open.
+			<li>Confirm that <b>File - Exits</b> closes the open database and exits 
+			the application.
+			<li>Confirm that a confirmation message is presented if unsaved changes 
+			have been made.
+			<li>Confirm that <b>Help - About</b> displays the <b>About SQLCDBEditor</b> 
+			dialog.
+			<li>Confirm that the dialog includes the correct version number and 
+			copyright date.
+	       	</ul>
+   		</LI>
+		<LI><b>Miscellaneous</b>
+		<ul>
+			<li><b>[DotNet #400]</b> Confirm that the application retains focus after 
+			closing the <b>Database save</b> message.
+			<li><b>[DotNet #401]</b> Active edits are saved.
+			<ul>
+				<li>Edit a row without moving focus from the row.
+				<li>Confirm that the pencil icon is still visible in the row selector.
+				<li>Save the database.
+				<li>Confirm that the active changes are saved.
+			</ul>
+			<li><b>[DotNet #409]</b> Confirm that the application does not close if after 
+			prompting to save changes after attempting to close the editor, the save 
+			operation fails.
+	       	</ul>
+   		</LI>
+	</ul>
+<p>
+   	<LI><h2>SQLCompactExporter</h2>
+       	<ul>
+      		<li><b><u>Database Creation</u></b>
+		<ul>
+			<li>Make a working copy of the <b>ESFAMService.sdf</b> database.
+			<li>Add entries to the <b>FPSFile</b> table.
+		</ul>
+      		<li><b><u>Options</u></b>
+		<ul>
+			<li>Confirm that <b>DatabaseFile</b> is a required parameter.
+			<li>Confirm that <b>Query</b> is a required parameter.
+			<li>Confirm that <b>OutputFileName</b> is a required parameter.
+			<li>Confirm that <b>/rd &lt;RowDelimiter&gt;</b> is an optional parameter 
+			for specifying a delimiter between rows in the result set.
+			<li>Confirm that the default is <b>\r\n</b>.
+			<li>Confirm that <b>/cd &lt;ColumnDelimiter&gt;</b> is an optional parameter 
+			for specifying a delimiter between each field in the result set.
+			<li>Confirm that the default is <b>\t</b>.
+			<li>Confirm that <b>/fp &lt;FilePrefix&gt;</b> is an optional parameter 
+			for specifying text to be written at the beginning of the output file.
+			<li>Confirm that the default is for no text to be provided.
+			<ul>
+				<li>/fp &quot;<b>ALT+0176\r\n</b>&quot; can be used to provide a 
+				degree symbol on a separate line at the beginning of the output 
+				file.
+			</ul>
+			<li>Confirm that <b>/fs &lt;FileSuffix&gt;</b> is an optional parameter 
+			for specifying text to be written at the end of the output file.
+			<li>Confirm that the default is for no text to be provided.
+			<ul>
+				<li>/fs &quot;<b>ALT+0176\r\n</b>&quot; can be used to provide a 
+				degree symbol on a separate line at the end of the output 
+				file.
+			</ul>
+			<li>Confirm that <b>/enc &lt;CodePage&gt;</b> is an optional parameter for 
+			specifying the code page to use to encode the output.
+			<ul>
+				<li>Use the <b>/fp</b> example given above to exercise various 
+				code pages.
+				<li>Confirm that no <b>/enc</b> option provides a degree symbol.
+				<li>Confirm that <b>/enc Windows-1252</b> provides a degree symbol.
+				<li>Confirm that <b>/enc ansi</b> provides a degree symbol.
+				<li>Confirm that <b>/enc 437</b> provides a slashed zero character.
+				<li>Confirm that <b>/enc utf-8</b> provides a degree symbol.
+				<li>Confirm that <b>/enc unicode</b> provides a degree symbol.  Also 
+				confirm that the file size is approximately twice the size of 
+				an earlier example.
+			</ul>
+			<li>Confirm that the default is <b>ansi</b>.
+			<li>Confirm that <b></b> is an optional parameter for .
+			<li>Confirm that <b></b> is an optional parameter for .
+			<li>Confirm that <b></b> is an optional parameter for .
+		</ul>
+      		<li><b><u>Functionality</u></b>
+		<ul>
+			<li>
+		</ul>
+       	</ul>
+<p>
+   	<LI><h2>SQLCompactImporter</h2>
+       	<ul>
+      		<li>TBD
+       	</ul>
+<p>
+   	<LI><h2>Miscellaneous</h2>
+       	<ul>
+      		<li>TBD
+       	</ul>
+</ul>
+</body> 
+</html>
