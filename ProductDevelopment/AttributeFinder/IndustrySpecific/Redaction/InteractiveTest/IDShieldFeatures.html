@@ -285,6 +285,62 @@
 <p>
 			<li><b>[FlexIDSCore #4016]</b> Confirm that the window size and location are 
 			persisted.
+<p>
+	  	   	<LI><b>[FlexIDSCore #4015, #4017, #4018, #4022, #4023, #4036, #4047, #4054, #4055, 
+			#4056, #4057, #4058, #4060, #4065, LegacyRC #5735]</b> ID Shield Statistics Reporter
+	       		<ul>
+	  	   		<LI>Confirm that the <b>ID Shield Statistics Reporter</b> window is 
+				resizeable.
+				<li>Confirm that the <b>Advanced Options</b> dialog is not resizeable.
+				<li>Confirm that the feedback folder is persisted.
+				<li>Confirm that unclassified documents are presented as <b>Unknown</b>.
+				<li>Confirm that <b>TypesToBeTested</b> accepts the following delimiters
+				<ul>
+					<li>Commas
+					<li>Pipe characters
+				</ul>
+				<li>Confirm that the <b>source VOA file</b> is indicated in the 
+				attribute type
+				<ul>
+					<li><b>Expected</b> - Misses and Correct
+					<li><b>Found</b> - Over-redactions, Under-redactions and 
+					False positives
+				</ul>
+				<li>Confirm that a single found redaction is not counted as both an 
+				over-redaction and an under-redaction for the same expected attribute. 
+				<li>Confirm that the final results label is: <b>Final results of 
+				above workflow</b>.
+				<li>Confirm that a <b>Document type distribution</b> section header is 
+				provided.
+				<li>Confirm that the statistics no longer include specific counts for 
+				<b>missed</b> redactions.
+				<li>Confirm that the <b>Detailed workflow statistic</b> section always 
+				outputs the same statistics, regardless of workflow.
+				<li>Confirm that the <b>Summary statistics</b> file reports the number of 
+				<b>sensitive data items</b>.
+				<li>Confirm that the following statistics are reported for a single 
+				sensitive data item
+				<ul>
+					<li>1 redaction, too large = 1 correct, 1over-redaction
+					<li>2 redactions, 1 too large = 1 correct, 1 over-redaction
+					<li>2 redactions, both too large = 1 correct, 2 over-redactions
+					<li>2 redactions, both correct = 1 correct
+					<li>2 redactions, 1 too little = 1 correct, 1 under-redaction
+				</ul>
+				<li>Confirm that the following statistics are reported for a page with 
+				two sensitive data items and one redaction covering the entire page
+				<ul>
+					<li>2 correct, 2 over-redactions
+				</ul>
+<p>
+				<li>Prepare several thousand files for processing.
+				<li>Configure <b>IDSSR</b> incorrectly so that an error is generated for 
+				each test.  One example is to look for a non-existent VOA file.
+				<li>Exercise <b>IDSSR</b>.
+				<li>Confirm that the <b>FailedTestCases.uex</b> file fills up and is 
+				properly renamed as expected.  <b>ELI14818</b> is expected to be 
+				included at the end of each full UEX file.
+		       	</ul>
 	       	</ul>
 	</ul>
 <p>
