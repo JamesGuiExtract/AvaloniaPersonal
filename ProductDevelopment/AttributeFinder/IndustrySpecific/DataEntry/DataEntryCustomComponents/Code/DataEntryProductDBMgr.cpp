@@ -12,6 +12,7 @@
 #include <LockGuard.h>
 #include <FAMUtilsConstants.h>
 #include <TransactionGuard.h>
+#include <ADOUtils.h>
 
 using namespace ADODB;
 using namespace std;
@@ -38,6 +39,8 @@ CDataEntryProductDBMgr::CDataEntryProductDBMgr()
 , m_bStoreDataEntryProcessingHistory(true)
 , m_ipAFUtility(NULL)
 , m_lNextInstanceToken(0)
+, m_nNumberOfRetries(0)
+, m_dRetryTimeout(0.0)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -247,14 +250,22 @@ STDMETHODIMP CDataEntryProductDBMgr::AddDataEntryData(long lFileID, long nAction
 		// Validate data entry schema
 		validateDataEntrySchemaVersion();
 
+		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+		_ConnectionPtr ipConnection = NULL;
+
+		BEGIN_ADO_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
 		// Lock the database
 		LockGuard<IFileProcessingDBPtr> lg(m_ipFAMDB);
 
 		// Get the file ID as a string
 		string strFileId = asString(lFileID);
 
-		long nUserID = getKeyID( getDBConnection(), "FAMUser", "UserName", getCurrentUserName());
-		long nMachineID = getKeyID( getDBConnection(), "Machine", "MachineName", getComputerName());
+		long nUserID = getKeyID(ipConnection, "FAMUser", "UserName", getCurrentUserName());
+		long nMachineID = getKeyID(ipConnection, "Machine", "MachineName", getComputerName());
 		
 		// -------------------------------------------
 		// Need to get the current TotalDuration value
@@ -268,7 +279,7 @@ STDMETHODIMP CDataEntryProductDBMgr::AddDataEntryData(long lFileID, long nAction
 		ASSERT_RESOURCE_ALLOCATION("ELI29009", ipSet != NULL );
 
 		// Open the recordset
-		ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)getDBConnection(), true),
+		ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
 			adOpenStatic, adLockReadOnly, adCmdText );
 
 		// If there is an entry, then get the total duration from it
@@ -284,8 +295,7 @@ STDMETHODIMP CDataEntryProductDBMgr::AddDataEntryData(long lFileID, long nAction
 			+ asString(nMachineID) + ", GETDATE(), " + asString(lDuration) + ", "
 			+ asString(dTotalDuration) + ")";
 
-		// Get the connetion pointer and create a transaction guard
-		_ConnectionPtr ipConnection = getDBConnection();
+		// Create a transaction guard
 		TransactionGuard tg(ipConnection);
 
 		// If not storing previous history need to delete it
@@ -306,6 +316,9 @@ STDMETHODIMP CDataEntryProductDBMgr::AddDataEntryData(long lFileID, long nAction
 		// Commit the transactions
 		tg.CommitTrans();
 
+		END_ADO_CONNECTION_RETRY(
+			ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29837");
+	
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29008");
@@ -323,6 +336,7 @@ STDMETHODIMP CDataEntryProductDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 		if (m_ipFAMDB != newVal)
 		{
 			m_ipFAMDB = newVal;
+			m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
 		
 			// Reset the database connection
 			m_ipDBConnection = NULL;
@@ -380,6 +394,14 @@ STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 		// Validate data entry schema
 		validateDataEntrySchemaVersion();
 
+		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+		_ConnectionPtr ipConnection = NULL;
+
+		BEGIN_ADO_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
 		// Lock the database
 		LockGuard<IFileProcessingDBPtr> lg(m_ipFAMDB);
 
@@ -401,7 +423,7 @@ STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 			ASSERT_RESOURCE_ALLOCATION("ELI29054", ipRecordSet != NULL);
 
 			// Open the recordset
-			ipRecordSet->Open( strSql.c_str(), _variant_t((IDispatch *)getDBConnection(), true),
+			ipRecordSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
 				adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 			while (ipRecordSet->adoEOF == VARIANT_FALSE)
@@ -433,11 +455,10 @@ STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 		// counts.
 		if (!bOnLoad && !strQueries.empty())
 		{
-			// Get the connetion pointer and create a transaction guard
-			_ConnectionPtr ipConnection = getDBConnection();
+			// Create a transaction guard
 			TransactionGuard tg(ipConnection);
 
-			executeVectorOfSQL(getDBConnection(), strQueries);
+			executeVectorOfSQL(ipConnection, strQueries);
 
 			// Commit the transactions
 			tg.CommitTrans();
@@ -446,6 +467,9 @@ STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 			m_mapVecCounterValueInsertionQueries.erase(
 				m_mapVecCounterValueInsertionQueries.find(*plInstanceToken));
 		}
+
+		END_ADO_CONNECTION_RETRY(
+			ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29838");
 
 		return S_OK;
 	}

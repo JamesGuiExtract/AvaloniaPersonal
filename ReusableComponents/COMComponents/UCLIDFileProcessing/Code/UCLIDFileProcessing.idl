@@ -1062,6 +1062,10 @@ library UCLID_FILEPROCESSINGLib
 		//			the FAST table and adding an appropriate entry to the locked file table.
 		[id(93), helpstring("method SetFileStatusToProcessing")] HRESULT SetFileStatusToProcessing(
 			[in] long nFileId, [in] long nActionID);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get the connection retry settings associated with the database. 
+		[id(94), helpstring("method GetConnectionRetrySettings")] HRESULT GetConnectionRetrySettings(
+			[out] long* pnNumberOfRetries, [out] double* pdRetryTimeout);
 	};
 
 	[

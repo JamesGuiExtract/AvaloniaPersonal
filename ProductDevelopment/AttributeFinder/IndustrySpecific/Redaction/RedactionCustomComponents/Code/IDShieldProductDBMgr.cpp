@@ -12,6 +12,7 @@
 #include <LockGuard.h>
 #include <FAMUtilsConstants.h>
 #include <TransactionGuard.h>
+#include <ADOUtils.h>
 
 using namespace ADODB;
 using namespace std;
@@ -31,6 +32,8 @@ static const string gstrSTORE_HISTORY_DEFAULT_SETTING = "1"; // TRUE
 //-------------------------------------------------------------------------------------------------
 CIDShieldProductDBMgr::CIDShieldProductDBMgr()
 : m_bStoreIDShieldProcessingHistory(true)
+, m_nNumberOfRetries(0)
+, m_dRetryTimeout(0.0)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -217,11 +220,19 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 		// Validate IDShield Schema
 		validateIDShieldSchemaVersion();
 
+		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+		_ConnectionPtr ipConnection = NULL;
+
+		BEGIN_ADO_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
 		// Lock the database
 		LockGuard<IFileProcessingDBPtr> lg(m_ipFAMDB);
 
-		long nUserID = getKeyID( getDBConnection(), "FAMUser", "UserName", getCurrentUserName());
-		long nMachineID = getKeyID( getDBConnection(), "Machine", "MachineName", getComputerName());
+		long nUserID = getKeyID(ipConnection, "FAMUser", "UserName", getCurrentUserName());
+		long nMachineID = getKeyID(ipConnection, "Machine", "MachineName", getComputerName());
 		
 		// Get the file ID as a string
 		string strFileId = asString(lFileID);
@@ -239,7 +250,7 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 		ASSERT_RESOURCE_ALLOCATION("ELI28069", ipSet != NULL );
 
 		// Open the recordset
-		ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)getDBConnection(), true),
+		ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
 			adOpenStatic, adLockReadOnly, adCmdText );
 
 		// If there is an entry, then get the total duration from it
@@ -258,8 +269,7 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 			+ asString(lNumCluesDataFound) + ", " + asString(lTotalRedactions) + ", "
 			+ asString(lTotalManualRedactions) + ")";
 
-		// Get the connetion pointer and create a transaction guard
-		_ConnectionPtr ipConnection = getDBConnection();
+		// Create a transaction guard
 		TransactionGuard tg(ipConnection);
 
 		// If not storing previous history need to delete it
@@ -278,6 +288,9 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 
 		// Commit the transactions
 		tg.CommitTrans();
+
+		END_ADO_CONNECTION_RETRY(
+			ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29858");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19037");
 
@@ -296,6 +309,7 @@ STDMETHODIMP CIDShieldProductDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 		if (m_ipFAMDB != newVal)
 		{
 			m_ipFAMDB = newVal;
+			m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
 		
 			// Reset the database connection
 			m_ipDBConnection = NULL;
@@ -316,15 +330,29 @@ STDMETHODIMP CIDShieldProductDBMgr::GetResultsForQuery(BSTR bstrQuery, _Recordse
 
 		validateLicense();
 
+		// validate IDShield schema
+		validateIDShieldSchemaVersion();
+
+		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+		_ConnectionPtr ipConnection = NULL;
+
+		BEGIN_ADO_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
 		// Create a pointer to a recordset
 		_RecordsetPtr ipResultSet( __uuidof( Recordset ));
 		ASSERT_RESOURCE_ALLOCATION("ELI19531", ipResultSet != NULL );
 
 		// Open the Action table
-		ipResultSet->Open( bstrQuery, _variant_t((IDispatch *)getDBConnection(), true), adOpenStatic, 
+		ipResultSet->Open( bstrQuery, _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 			adLockReadOnly, adCmdText );
 
 		*ppVal = ipResultSet.Detach();
+
+		END_ADO_CONNECTION_RETRY(
+			ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29859");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19530");
 
@@ -346,12 +374,23 @@ STDMETHODIMP CIDShieldProductDBMgr::GetFileID(BSTR bstrFileName, long* plFileID)
 		// validate IDShield schema
 		validateIDShieldSchemaVersion();
 
+		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+		_ConnectionPtr ipConnection = NULL;
+
+		BEGIN_ADO_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
 		// lock the database
 		LockGuard<IFileProcessingDBPtr> lg(m_ipFAMDB);
 
 		// query the database for the file ID
-		*plFileID = getKeyID(getDBConnection(), "FAMFile", "FileName", asString(bstrFileName), 
+		*plFileID = getKeyID(ipConnection, "FAMFile", "FileName", asString(bstrFileName), 
 			false);
+
+		END_ADO_CONNECTION_RETRY(
+			ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29860");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI20179");
 

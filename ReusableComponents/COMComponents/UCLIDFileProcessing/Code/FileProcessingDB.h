@@ -199,6 +199,7 @@ public:
 	STDMETHOD(CanSkipAuthenticationOnThisMachine)(VARIANT_BOOL* pvbSkipAuthentication);
 	STDMETHOD(GetFileRecord)(BSTR bstrFile, BSTR bstrActionName, IFileRecord** ppFileRecord);
 	STDMETHOD(SetFileStatusToProcessing)(long nFileId, long nActionID);
+	STDMETHOD(GetConnectionRetrySettings)(long* pnNumberOfRetries, double* pdRetryTimeout);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);

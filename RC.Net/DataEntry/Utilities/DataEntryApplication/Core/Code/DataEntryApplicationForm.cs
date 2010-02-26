@@ -1125,7 +1125,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     else
                     {
                         // Record statistics to database that needs to happen when a file is closed.
-                        if (!_standAloneMode && _fileProcessingDb != null)
+                        if (!_standAloneMode && _dataEntryDatabaseManager != null)
                         {
                             RecordFileProcessingDatabaseStatistics(false, null);
                         }
@@ -1461,7 +1461,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     else
                     {
                         // Record statistics to database that need to happen when a file is closed.
-                        if (!_standAloneMode && _fileProcessingDb != null)
+                        if (!_standAloneMode && _dataEntryDatabaseManager != null)
                         {
                             RecordFileProcessingDatabaseStatistics(false, null);
                         }
@@ -2628,50 +2628,58 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </param>
         void RecordFileProcessingDatabaseStatistics(bool onLoad, IUnknownVector attributes)
         {
-            ExtractException.Assert("ELI29829", "Cannot record database statistics since the " +
-                "database manager has not been initialized!", _dataEntryDatabaseManager != null);
-
-            if (onLoad)
+            try
             {
-                _fileProcessingStopwatch = new Stopwatch();
-                _fileProcessingStopwatch.Start();
+                ExtractException.Assert("ELI29829", "Cannot record database statistics since the " +
+                    "database manager has not been initialized!", _dataEntryDatabaseManager != null);
 
-                // Enable input event tracking.
-                if (_inputEventTracker != null)
+                if (onLoad)
                 {
-                    _inputEventTracker.RegisterControl(this);
+                    _fileProcessingStopwatch = new Stopwatch();
+                    _fileProcessingStopwatch.Start();
+
+                    // Enable input event tracking.
+                    if (_inputEventTracker != null)
+                    {
+                        _inputEventTracker.RegisterControl(this);
+                    }
+
+                    if (_countersEnabled)
+                    {
+                        // Calculate the initial counter values and receive a token that will allow
+                        // the counts to be stored once the associated DataEntryData table row is
+                        // added.
+                        _counterStatisticsToken = -1;
+                        _dataEntryDatabaseManager.RecordCounterValues(
+                            ref _counterStatisticsToken, 0, attributes);
+                    }
                 }
-
-                if (_countersEnabled)
+                else if (_fileProcessingStopwatch != null)
                 {
-                    // Calculate the initial counter values and receive a token that will allow the
-                    // counts to be stored once the associated DataEntryData table row is added.
-                    _counterStatisticsToken = -1;
-                    _dataEntryDatabaseManager.RecordCounterValues(
-                        ref _counterStatisticsToken, 0, attributes);
+                    // Don't count input when a document is not open.
+                    if (_inputEventTracker != null)
+                    {
+                        _inputEventTracker.UnregisterControl(this);
+                    }
+
+                    double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
+                    int instanceId = _dataEntryDatabaseManager.AddDataEntryData(
+                        _fileId, _actionId, elapsedSeconds);
+
+                    if (_countersEnabled)
+                    {
+                        _dataEntryDatabaseManager.RecordCounterValues(
+                            ref _counterStatisticsToken, instanceId, attributes);
+                    }
+
+                    // Set to null after recording to ensure we never inappropriately record an entry
+                    // for a file.
+                    _fileProcessingStopwatch = null;
                 }
             }
-            else if (_fileProcessingStopwatch != null)
+            catch (Exception ex)
             {
-                // Don't count input when a document is not open.
-                if (_inputEventTracker != null)
-                {
-                    _inputEventTracker.UnregisterControl(this);
-                }
-
-                double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
-                int instanceId =
-                    _dataEntryDatabaseManager.AddDataEntryData(_fileId, _actionId, elapsedSeconds);
-
-                if (_countersEnabled)
-                {
-                    _dataEntryDatabaseManager.RecordCounterValues(
-                        ref _counterStatisticsToken, instanceId, attributes);
-                }
-
-                // Set to null after recording to ensure we never inappropriately record an entry
-                // for a file.
-                _fileProcessingStopwatch = null;
+                throw ExtractException.AsExtractException("ELI29864", ex);
             }
         }
 

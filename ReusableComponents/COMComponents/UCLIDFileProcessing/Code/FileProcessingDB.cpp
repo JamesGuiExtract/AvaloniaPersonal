@@ -5126,6 +5126,26 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToProcessing(long nFileId, long nAc
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29620");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetConnectionRetrySettings(long* pnNumberOfRetries,
+														   double* pdRetryTimeout)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI29861", pnNumberOfRetries != NULL);
+		ASSERT_ARGUMENT("ELI29862", pdRetryTimeout != NULL);
+
+		validateLicense();
+
+		*pnNumberOfRetries = m_iNumberOfRetries;
+		*pdRetryTimeout = m_dRetryTimeout;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29863");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

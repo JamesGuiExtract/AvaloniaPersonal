@@ -92,6 +92,13 @@ private:
 	// The value of the next token to be assigned.
 	volatile long m_lNextInstanceToken;
 
+	// Contains the number of times an attempt to reconnect. Each time the reconnect attempt times
+	// out an exception will be logged.
+	long m_nNumberOfRetries;
+
+	// Contains the time in seconds to keep retrying.  
+	double m_dRetryTimeout;
+
 	//////////////
 	// Methods
 	//////////////

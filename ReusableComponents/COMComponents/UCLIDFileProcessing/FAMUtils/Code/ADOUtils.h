@@ -4,11 +4,129 @@
 
 #include "FAMUtils.h"
 
+#include <StopWatch.h>
+
 #include <string>
 #include <vector>
 
 using namespace ADODB;
 using namespace std;
+
+//-------------------------------------------------------------------------------------------------
+// PURPOSE:	 (Based on the FileProcessingDB macro, but generalized for use with any ADO::Connection)
+//			 The purpose of this macro is to declare and initialize local variables and define the
+//			 beginning of a do...while loop that contains a try...catch block to be used to retry
+//			 the block of code between the BEGIN_ADO_CONNECTION_RETRY macro and the
+//			 END_ADO_CONNECTION_RETRY macro.  If an exception is thrown within the block of code
+//			 between the connection retry macros the connection passed to END_ADO_CONNECTION_RETRY
+//			 macro will be tested to see if it is a good connection if it is the caught exception
+//			 is rethrown, if it is no longer a good connection a check is made to see the retry
+//           count is equal to maximum retries, if not, the exception will be logged if this is
+//			 the first retry and the connection will be reinitialized.  If the number of retires is
+//			 exceeded the exception will be rethrown.
+// REQUIRES: An ADODB::ConnectionPtr variable to be declared before the BEGIN_CONNECTION_RETRY macro
+//			 is used so it can be passed to the END_CONNECTION_RETRY macro.
+//-------------------------------------------------------------------------------------------------
+#define BEGIN_ADO_CONNECTION_RETRY() \
+		int nRetryCount = 0; \
+		bool bRetryExceptionLogged = false; \
+		bool bRetrySuccess = false; \
+		do \
+		{ \
+			try \
+			{\
+				try\
+				{\
+
+//-------------------------------------------------------------------------------------------------
+// PURPOSE:	 To define the end of the block of code to be retried. (see above)
+// NOTE:	 Especially if using IFileProcessingDB::GetConnectionRetrySettings to get the values,
+//			 values for nMaxRetryCount and dRetryTimeout should be obtained before
+//			 BEGIN_ADO_CONNECTION_RETRY to avoid repeated COM calls to get the same settings.
+#define END_ADO_CONNECTION_RETRY(ipRetryConnection, getDBConnection, nMaxRetryCount, dRetryTimeout, strELICode) \
+					bRetrySuccess = true; \
+				}\
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION(strELICode)\
+			} \
+			catch(UCLIDException ue) \
+			{ \
+				bool bConnectionIsAlive = false; \
+				\
+				try \
+				{ \
+					if (ipRetryConnection != NULL) \
+					{ \
+						getSQLServerDateTime(ipRetryConnection); \
+						bConnectionIsAlive = true; \
+					} \
+				} \
+				catch(...){}; \
+				if (bConnectionIsAlive || nRetryCount >= nMaxRetryCount) \
+				{ \
+					throw ue; \
+				}\
+				if (!bRetryExceptionLogged) \
+				{ \
+					UCLIDException uex("ELI29853", "Database connection failed. Attempting to reconnect.", ue); \
+					uex.log(); \
+					bRetryExceptionLogged = true; \
+				} \
+				\
+				StopWatch sw; \
+				sw.start(); \
+				while(true) \
+				{ \
+					try \
+					{ \
+						try \
+						{ \
+							/* Do the close within a try catch because an exception on the close */ \
+							/* could just mean the connection is in a bad state and recreating and */ \
+							/* opening will put it in a good state */ \
+							try \
+							{ \
+								if (ipRetryConnection != NULL && ipRetryConnection->State != adStateClosed) \
+								{ \
+									ipRetryConnection->Close(); \
+								} \
+							} \
+							CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29857") \
+							\
+							/* This will create a new connection for this thread and initialize */ \
+							/* the schema */ \
+							ipRetryConnection = getDBConnection(); \
+							\
+							UCLIDException ueConnected("ELI29854", "Connection retry successful."); \
+							ueConnected.log(); \
+							\
+							break; \
+						} \
+						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29855"); \
+					} \
+					catch(UCLIDException ue) \
+					{ \
+						if (sw.getElapsedTime() > dRetryTimeout) \
+						{ \
+							/* Create exception to indicate retry timed out*/ \
+							UCLIDException uex("ELI29856", "Database connection retry timed out!", ue);  \
+							\
+							/* Log the caught exception. */ \
+							uex.log(); \
+							\
+							break; \
+						} \
+						else \
+						{ \
+							/* Sleep to reduce the number of retries/second*/ \
+							Sleep(100); \
+						} \
+					} \
+				} \
+				nRetryCount++; \
+			} \
+		} \
+		while (!bRetrySuccess);
+
 
 // Query to turn on Identity insert so Identity fields can be copied
 static const string gstrSET_IDENTITY_INSERT_ON = "SET IDENTITY_INSERT <TableName> ON";
