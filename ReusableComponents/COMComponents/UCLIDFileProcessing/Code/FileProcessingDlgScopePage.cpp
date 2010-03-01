@@ -53,7 +53,7 @@ FileProcessingDlgScopePage::FileProcessingDlgScopePage()
 {
 	try
 	{
-		m_zSkipDescription = _T("");
+		m_zConditionDescription = _T("");
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27600");
 }
@@ -74,9 +74,9 @@ FileProcessingDlgScopePage::~FileProcessingDlgScopePage()
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgScopePage::refresh()
 {
-	// Clear listed File Suppliers and the Skip Condition
+	// Clear listed File Suppliers and the FAM Condition
 	m_wndGrid.Clear();
-	m_zSkipDescription = "";
+	m_zConditionDescription = "";
 
 	// Add each File Supplier to the list
 	IIUnknownVectorPtr ipFileSuppliersData = getFSMgmtRole()->FileSuppliers;
@@ -93,13 +93,13 @@ void FileProcessingDlgScopePage::refresh()
 		updateList( i, ipFSD );
 	}
 
-	// Update the Skip Condition
-	IObjectWithDescriptionPtr ipSkipObjWithDesc = getFSMgmtRole()->FAMCondition;
-	if (ipSkipObjWithDesc->Object != NULL)
+	// Update the FAM Condition
+	IObjectWithDescriptionPtr ipConditionObjWithDesc = getFSMgmtRole()->FAMCondition;
+	if (ipConditionObjWithDesc->Object != NULL)
 	{
-		// get the skip condition's description
-		_bstr_t _bstrText = ipSkipObjWithDesc->GetDescription();
-		m_zSkipDescription = (const char*)_bstrText;
+		// get the FAM condition's description
+		_bstr_t _bstrText = ipConditionObjWithDesc->GetDescription();
+		m_zConditionDescription = (const char*)_bstrText;
 	}
 
 	UpdateData( FALSE );
@@ -187,8 +187,8 @@ BOOL FileProcessingDlgScopePage::PreTranslateMessage(MSG* pMsg)
 		// Display the context menu for skip condition
 		if (pMsg->message == WM_RBUTTONDOWN)
 		{
-			// If the user right click on the skip condition text box
-			if(m_bInitialized && GetDlgItem(IDC_EDIT_SKIP)->GetSafeHwnd() == pMsg->hwnd)
+			// If the user right click on the FAM condition text box
+			if(m_bInitialized && m_editSelectCondition.GetSafeHwnd() == pMsg->hwnd)
 			{   
 				// Display the context menu
 				displayContextMenu();   
@@ -203,18 +203,15 @@ BOOL FileProcessingDlgScopePage::PreTranslateMessage(MSG* pMsg)
 void FileProcessingDlgScopePage::DoDataExchange(CDataExchange* pDX)
 {
 	CPropertyPage::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(FileProcessingDlgScopePage)
 	DDX_Control(pDX, IDC_BTN_REMOVE, m_btnRemove);
 	DDX_Control(pDX, IDC_BTN_CONFIGURE, m_btnConfigure);
 	DDX_Control(pDX, IDC_BTN_ADD, m_btnAdd);
-	DDX_Text(pDX, IDC_EDIT_SKIP, m_zSkipDescription);
-	DDX_Control(pDX, IDC_BTN_SKIPCONDITION, m_btnSelectSkip);
-	DDX_Control(pDX, IDC_EDIT_SKIP, m_editSelectSkip);
-	//}}AFX_DATA_MAP
+	DDX_Text(pDX, IDC_EDIT_CONDITION, m_zConditionDescription);
+	DDX_Control(pDX, IDC_BTN_FAMCONDITION, m_btnSelectCondition);
+	DDX_Control(pDX, IDC_EDIT_CONDITION, m_editSelectCondition);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(FileProcessingDlgScopePage, CPropertyPage)
-	//{{AFX_MSG_MAP(FileProcessingDlgScopePage)
 	ON_BN_CLICKED(IDC_BTN_ADD, OnBtnAdd)
 	ON_BN_CLICKED(IDC_BTN_REMOVE, OnBtnRemove)
 	ON_BN_CLICKED(IDC_BTN_CONFIGURE, OnBtnConfigure)
@@ -224,12 +221,11 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgScopePage, CPropertyPage)
 	ON_COMMAND(ID_CONTEXT_COPY, &FileProcessingDlgScopePage::OnContextCopy)
 	ON_COMMAND(ID_CONTEXT_PASTE, &FileProcessingDlgScopePage::OnContextPaste)
 	ON_COMMAND(ID_CONTEXT_DELETE, &FileProcessingDlgScopePage::OnContextDelete)
-	ON_BN_CLICKED(IDC_BTN_SKIPCONDITION, OnBtnSelectSkip)
+	ON_BN_CLICKED(IDC_BTN_FAMCONDITION, OnBtnSelectCondition)
 	ON_MESSAGE(WM_NOTIFY_GRID_LCLICK, OnLButtonClkRowCol)
 	ON_MESSAGE(WM_NOTIFY_CELL_DBLCLK, OnLButtonDblClkRowCol)
 	ON_MESSAGE(WM_NOTIFY_CELL_MODIFIED, OnModifyCell)
-	//}}AFX_MSG_MAP
-	ON_STN_DBLCLK(IDC_EDIT_SKIP, &FileProcessingDlgScopePage::OnDoubleClickSkipCondition)
+	ON_STN_DBLCLK(IDC_EDIT_CONDITION, &FileProcessingDlgScopePage::OnDoubleClickCondition)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -614,7 +610,7 @@ void FileProcessingDlgScopePage::OnSize(UINT nType, int cx, int cy)
 		CRect rectDlg;
 		CRect rectLabelGrid, rectGrid;
 		CRect rectAddButton, rectRemoveButton, rectConfigureButton;
-		CRect rectLabelSkip, rectSkipDescription, rectSelectSkip;
+		CRect rectLabelCondition, rectConditionDescription, rectSelectCondition;
 
 		// Get original sizes and positions
 		getDlgItemWindowRect(IDC_BTN_ADD, rectAddButton);
@@ -628,12 +624,12 @@ void FileProcessingDlgScopePage::OnSize(UINT nType, int cx, int cy)
 		getDlgItemWindowRect(IDC_GRID, rectGrid);
 		ScreenToClient(&rectGrid);
 		
-		getDlgItemWindowRect(IDC_STATIC_SKIP, rectLabelSkip);
-		ScreenToClient(&rectLabelSkip);
-		getDlgItemWindowRect(IDC_EDIT_SKIP, rectSkipDescription);
-		ScreenToClient(&rectSkipDescription);
-		getDlgItemWindowRect(IDC_BTN_SKIPCONDITION, rectSelectSkip);
-		ScreenToClient(&rectSelectSkip);
+		getDlgItemWindowRect(IDC_STATIC_CONDITION, rectLabelCondition);
+		ScreenToClient(&rectLabelCondition);
+		getDlgItemWindowRect(IDC_EDIT_CONDITION, rectConditionDescription);
+		ScreenToClient(&rectConditionDescription);
+		getDlgItemWindowRect(IDC_BTN_FAMCONDITION, rectSelectCondition);
+		ScreenToClient(&rectSelectCondition);
 
 		if (!bInit)
 		{
@@ -641,8 +637,8 @@ void FileProcessingDlgScopePage::OnSize(UINT nType, int cx, int cy)
 
 			// Save distance between Grid and buttons
 			nLen1 = rectAddButton.left - rectGrid.right;
-			// Save distance between Grid and Skip Condition label
-			nLen2 = rectLabelSkip.top - rectGrid.bottom;
+			// Save distance between Grid and FAM Condition label
+			nLen2 = rectLabelCondition.top - rectGrid.bottom;
 			// Save width of Add button
 			nAddButtonWidth = rectAddButton.Width();
 			
@@ -665,37 +661,37 @@ void FileProcessingDlgScopePage::OnSize(UINT nType, int cx, int cy)
 		rectConfigureButton.right = rectAddButton.right;
 		rectConfigureButton.left = rectAddButton.left;
 
-		// Adjust position of Skip Condition description
-		long height = rectSkipDescription.Height();
-		rectSkipDescription.bottom = rectDlg.bottom - nLen1;
-		rectSkipDescription.top = rectSkipDescription.bottom - height;
-		rectSkipDescription.right = rectDlg.right - 2*nLen1 - nAddButtonWidth;
+		// Adjust position of FAM Condition description
+		long height = rectConditionDescription.Height();
+		rectConditionDescription.bottom = rectDlg.bottom - nLen1;
+		rectConditionDescription.top = rectConditionDescription.bottom - height;
+		rectConditionDescription.right = rectDlg.right - 2*nLen1 - nAddButtonWidth;
 
-		// Adjust vertical position of Skip Condition label
-		height = rectLabelSkip.Height();
-		rectLabelSkip.bottom = rectSkipDescription.top - nLen1;
-		rectLabelSkip.top = rectLabelSkip.bottom - height;
+		// Adjust vertical position of FAM Condition label
+		height = rectLabelCondition.Height();
+		rectLabelCondition.bottom = rectConditionDescription.top - nLen1;
+		rectLabelCondition.top = rectLabelCondition.bottom - height;
 
-		// Adjust position of Skip Condition Select button
-		height = rectSelectSkip.Height();
-		rectSelectSkip.top = rectSkipDescription.top;
-		rectSelectSkip.bottom = rectSelectSkip.top + height;
-		rectSelectSkip.right = rectAddButton.right;
-		rectSelectSkip.left = rectAddButton.left;
+		// Adjust position of FAM Condition Select button
+		height = rectSelectCondition.Height();
+		rectSelectCondition.top = rectConditionDescription.top;
+		rectSelectCondition.bottom = rectSelectCondition.top + height;
+		rectSelectCondition.right = rectAddButton.right;
+		rectSelectCondition.left = rectAddButton.left;
 
 		// Resize grid
 		rectGrid.right = rectDlg.right - 2 * nLen1 - nAddButtonWidth;
-		rectGrid.bottom = rectLabelSkip.top - nLen1;
+		rectGrid.bottom = rectLabelCondition.top - nLen1;
 
 		// Move the buttons to their new positions
 		m_btnAdd.MoveWindow( &rectAddButton );
 		m_btnRemove.MoveWindow( &rectRemoveButton );
 		m_btnConfigure.MoveWindow( &rectConfigureButton );
 
-		// Move the Skip Condition controls to their new positions
-		m_btnSelectSkip.MoveWindow(&rectSelectSkip);
-		GetDlgItem(IDC_STATIC_SKIP)->MoveWindow(&rectLabelSkip);
-		m_editSelectSkip.MoveWindow(&rectSkipDescription);
+		// Move the FAM Condition controls to their new positions
+		m_btnSelectCondition.MoveWindow(&rectSelectCondition);
+		GetDlgItem(IDC_STATIC_CONDITION)->MoveWindow(&rectLabelCondition);
+		m_editSelectCondition.MoveWindow(&rectConditionDescription);
 
 		// Update grid position and internal sizing
 		GetDlgItem(IDC_GRID)->MoveWindow(&rectGrid);
@@ -711,30 +707,30 @@ void FileProcessingDlgScopePage::OnSize(UINT nType, int cx, int cy)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08924")	
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgScopePage::OnDoubleClickSkipCondition()
+void FileProcessingDlgScopePage::OnDoubleClickCondition()
 {
 	try
 	{
-		// get the current skip condition
-		IObjectWithDescriptionPtr ipSkipCondition = getFSMgmtRole()->FAMCondition;
-		ASSERT_RESOURCE_ALLOCATION("ELI16087", ipSkipCondition != NULL);
+		// get the current FAM condition
+		IObjectWithDescriptionPtr ipFAMCondition = getFSMgmtRole()->FAMCondition;
+		ASSERT_RESOURCE_ALLOCATION("ELI16087", ipFAMCondition != NULL);
 
-		// allow the user to select and/or configure ipSkipCondition
-		VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(ipSkipCondition,
-			"Skip Condition", get_bstr_t(FP_FAM_CONDITIONS_CATEGORYNAME), VARIANT_TRUE, 0, NULL);
+		// allow the user to select and/or configure ipFAMCondition
+		VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(ipFAMCondition,
+			"Condition", get_bstr_t(FP_FAM_CONDITIONS_CATEGORYNAME), VARIANT_TRUE, 0, NULL);
 
-		// check if the skip condition has been modified
+		// check if the FAM condition has been modified
 		if (vbDirty == VARIANT_TRUE)
 		{
 			// display the updated description
-			m_zSkipDescription = static_cast<const char*> (ipSkipCondition->Description);
+			m_zConditionDescription = static_cast<const char*> (ipFAMCondition->Description);
 			UpdateData( FALSE );
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16086");
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgScopePage::OnBtnSelectSkip() 
+void FileProcessingDlgScopePage::OnBtnSelectCondition() 
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
@@ -742,23 +738,23 @@ void FileProcessingDlgScopePage::OnBtnSelectSkip()
 	try
 	{
 		// get the FAMCondition object-with-description
-		IObjectWithDescriptionPtr ipSkip = getFSMgmtRole()->FAMCondition;
-		ASSERT_RESOURCE_ALLOCATION( "ELI13558", ipSkip != NULL );
+		IObjectWithDescriptionPtr ipCondition = getFSMgmtRole()->FAMCondition;
+		ASSERT_RESOURCE_ALLOCATION( "ELI13558", ipCondition != NULL );
 		
-		// get the dimensions of the skip condition command button
-		RECT rectSkipCommandButton;
-		getDlgItemWindowRect(IDC_BTN_SKIPCONDITION, rectSkipCommandButton);
+		// get the dimensions of the FAM condition command button
+		RECT rectConditionCommandButton;
+		m_btnSelectCondition.GetWindowRect(&rectConditionCommandButton);
 
-		// allow the user to modify the skip condition based on menu selection
-		VARIANT_BOOL vbResult = getMiscUtils()->HandlePlugInObjectCommandButtonClick(ipSkip,
-			"Skip Condition", get_bstr_t(FP_FAM_CONDITIONS_CATEGORYNAME), VARIANT_TRUE, 0, NULL,
-			rectSkipCommandButton.right, rectSkipCommandButton.top);
+		// allow the user to modify the FAM condition based on menu selection
+		VARIANT_BOOL vbResult = getMiscUtils()->HandlePlugInObjectCommandButtonClick(ipCondition,
+			"Condition", get_bstr_t(FP_FAM_CONDITIONS_CATEGORYNAME), VARIANT_TRUE, 0, NULL,
+			rectConditionCommandButton.right, rectConditionCommandButton.top);
 
 		// If the user clicks the OK button
 		if (vbResult == VARIANT_TRUE)
 		{
 			// Display the description
-			m_zSkipDescription = static_cast<const char*> (ipSkip->Description);
+			m_zConditionDescription = static_cast<const char*> (ipCondition->Description);
 			UpdateData( FALSE );
 		}
 	}
@@ -782,7 +778,7 @@ void FileProcessingDlgScopePage::OnContextCopy()
 {
 	try
 	{
-		// Retrieve existing skip condition
+		// Retrieve existing FAM condition
 		IObjectWithDescriptionPtr	ipObject = getFSMgmtRole()->FAMCondition;
 		ASSERT_RESOURCE_ALLOCATION("ELI15815", ipObject != NULL);
 
@@ -796,7 +792,7 @@ void FileProcessingDlgScopePage::OnContextPaste()
 {
 	try
 	{
-		// Test ClipboardManager object to see if it is an skip condition
+		// Test ClipboardManager object to see if it is an FAM condition
 		IUnknownPtr	ipObject(NULL);
 		if (getClipboardManager()->ObjectIsTypeWithDescription(IID_IFAMCondition))
 		{
@@ -806,18 +802,18 @@ void FileProcessingDlgScopePage::OnContextPaste()
 		}
 		else
 		{
-			// Throw exception, object is not an skip condition
-			throw UCLIDException("ELI15818", "Clipboard object is not a Skip Condition.");
+			// Throw exception, object is not an FAM condition
+			throw UCLIDException("ELI15818", "Clipboard object is not a FAM Condition.");
 		}
 
-		// Set the skip condition
+		// Set the FAM condition
 		IObjectWithDescriptionPtr ipSK = ipObject;
 		if (ipSK != NULL)
 		{
 			getFSMgmtRole()->FAMCondition = ipSK;
 
-			// Display the skip condition description
-			m_zSkipDescription = (char *) ipSK->GetDescription();
+			// Display the FAM condition description
+			m_zConditionDescription = (char *) ipSK->GetDescription();
 			UpdateData( FALSE );
 		}
 	}
@@ -829,7 +825,7 @@ void FileProcessingDlgScopePage::OnContextDelete()
 	try
 	{
 		// delete selected items via context menu
-		// Retrieve existing skip condition description
+		// Retrieve existing FAM condition description
 		CString	zDesc;
 		IObjectWithDescriptionPtr ipSK = getFSMgmtRole()->FAMCondition;
 		ASSERT_RESOURCE_ALLOCATION("ELI15819", ipSK != NULL );
@@ -839,7 +835,7 @@ void FileProcessingDlgScopePage::OnContextDelete()
 		// Request confirmation
 		CString	zPrompt;
 		int		iResult;
-		zPrompt.Format( "Are you sure that Skip Condition '%s' should be deleted?", 
+		zPrompt.Format( "Are you sure that FAM Condition '%s' should be deleted?", 
 			zDesc );
 		iResult = MessageBox( (LPCTSTR)zPrompt, "Confirm Delete", 
 			MB_YESNO | MB_ICONQUESTION );
@@ -850,8 +846,8 @@ void FileProcessingDlgScopePage::OnContextDelete()
 			// Clear the FAM condition object
 			getFSMgmtRole()->FAMCondition = NULL;
 				
-			// Display the empty skip condition description
-			m_zSkipDescription = "";
+			// Display the empty FAM condition description
+			m_zConditionDescription = "";
 			UpdateData( FALSE );
 		}
 	}
@@ -911,9 +907,9 @@ void FileProcessingDlgScopePage::displayContextMenu()
 		//////////////////////////
 		UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
 		UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-		bool bEnable = !m_zSkipDescription.IsEmpty();
+		bool bEnable = !m_zConditionDescription.IsEmpty();
 
-		// skip condition is not defined
+		// FAM condition is not defined
 		pContextMenu->EnableMenuItem( ID_CONTEXT_CUT, bEnable ? nEnable : nDisable );
 		pContextMenu->EnableMenuItem( ID_CONTEXT_COPY, bEnable ? nEnable : nDisable );
 		pContextMenu->EnableMenuItem( ID_CONTEXT_DELETE, bEnable ? nEnable : nDisable );
@@ -983,13 +979,13 @@ UCLID_FILEPROCESSINGLib::EFileSupplierStatus FileProcessingDlgScopePage::getStat
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgScopePage::setButtonStates()
 {
-	// The Grid, Add button and Select skip condition button will be disabled while FAM
+	// The Grid, Add button and Select FAM condition button will be disabled while FAM
 	//  is running and enabled when FAM is stopped manually or finished.
 	BOOL bEnabled = asMFCBool(m_bEnabled);
 	m_wndGrid.EnableWindow(bEnabled);
 	m_btnAdd.EnableWindow(bEnabled);
-	m_btnSelectSkip.EnableWindow(bEnabled);
-	m_editSelectSkip.EnableWindow(bEnabled);
+	m_btnSelectCondition.EnableWindow(bEnabled);
+	m_editSelectCondition.EnableWindow(bEnabled);
 
 	// Check for selection of supplier item in the Grid
 	int iSelIndex = m_wndGrid.GetFirstSelectedRow();

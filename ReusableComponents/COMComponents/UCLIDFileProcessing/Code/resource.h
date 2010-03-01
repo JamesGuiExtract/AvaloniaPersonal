@@ -27,7 +27,7 @@
 #define IDC_BTN_CLEAR                   210
 #define IDD_DLG_TASK_PROP               211
 #define IDC_BTN_DOWN                    212
-#define IDC_BTN_SKIPCONDITION           213
+#define IDC_BTN_FAMCONDITION            213
 #define IDI_ICON_DOWN                   214
 #define IDC_RADIO_INDIVIDUAL_FILES      215
 #define IDI_ICON_UP                     216
@@ -76,7 +76,7 @@
 #define IDC_TEXT_TASK_NAME              259
 #define IDC_BTN_SAVE_LIST               260
 #define IDC_EDIT_ATTRIBUTE_SPLITTER     261
-#define IDC_EDIT_SKIP                   262
+#define IDC_EDIT_CONDITION				262
 #define IDC_TEXT_PROCESSING_TIME        263
 #define IDC_EDIT_PATTERN                264
 #define IDC_TEXT_RUN_TIME               265
@@ -103,7 +103,7 @@
 #define IDC_STATIC_THREADS              286
 #define IDC_TEXT_COMPLETION_TIME        287
 #define IDC_SPIN_THREADS                288
-#define IDC_STATIC_SKIP                 289
+#define IDC_STATIC_CONDITION            289
 #define IDC_EDIT_VERSION                290
 #define IDC_STATIC_SUPPLIER             291
 #define IDD_DLG_ABOUT                   292

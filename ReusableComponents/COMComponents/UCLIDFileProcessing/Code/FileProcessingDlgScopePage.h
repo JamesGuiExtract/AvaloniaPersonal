@@ -56,9 +56,9 @@ public:
 	CButton	m_btnAdd;
 	CButton	m_btnRemove;
 	CButton	m_btnConfigure;
-	CString	m_zSkipDescription;
-	CButton	m_btnSelectSkip;
-	CEdit m_editSelectSkip;
+	CString	m_zConditionDescription;
+	CButton	m_btnSelectCondition;
+	CEdit m_editSelectCondition;
 	//}}AFX_DATA
 
 
@@ -77,7 +77,7 @@ protected:
 	afx_msg void OnBtnConfigure();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnBtnSelectSkip();
+	afx_msg void OnBtnSelectCondition();
 	afx_msg void OnContextCut();
 	afx_msg void OnContextCopy();
 	afx_msg void OnContextPaste();
@@ -85,7 +85,7 @@ protected:
 	afx_msg LRESULT OnLButtonClkRowCol(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnLButtonDblClkRowCol(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnModifyCell(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnDoubleClickSkipCondition();
+	afx_msg void OnDoubleClickCondition();
 	DECLARE_MESSAGE_MAP()
 
 private:
