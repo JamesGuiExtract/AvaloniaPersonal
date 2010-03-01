@@ -29,18 +29,6 @@ namespace Extract.Redaction.Verification
                     _processingStream.Dispose();
                     _processingStream = null;
                 }
-                if (_unsavedMemento != null)
-                {
-                    try
-                    {
-                        // This method should never throw exceptions, but wrap in try anyway.
-                        ResetUnsavedMemento();
-                    }
-                    catch (Exception ex)
-                    {
-                        ExtractException.Log("ELI27118", ex);
-                    }
-                }
                 if (_inputEventTracker != null)
                 {
                     _inputEventTracker.Dispose();

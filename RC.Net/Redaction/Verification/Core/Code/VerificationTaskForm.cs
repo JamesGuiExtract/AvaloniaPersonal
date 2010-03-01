@@ -102,12 +102,6 @@ namespace Extract.Redaction.Verification
         VerificationMemento _savedMemento;
 
         /// <summary>
-        /// The unsaved state of currently processing document; if <see langword="null"/> no 
-        /// changes have been made to the currently processing document.
-        /// </summary>
-        VerificationMemento _unsavedMemento;
-
-        /// <summary>
         /// Prevents outside sources from writing to the currently processing document if the 
         /// user navigates away from it.
         /// </summary>
@@ -122,12 +116,6 @@ namespace Extract.Redaction.Verification
         /// The duration of time that has passed since <see cref="_screenTimeStart"/>.
         /// </summary>
         Stopwatch _screenTime;
-
-        /// <summary>
-        /// <see langword="true"/> if the currently processing document has been modified; 
-        /// <see langword="false"/> if the currently processing document has not been modified.
-        /// </summary>
-        bool _dirty;
 
         /// <summary>
         /// <see langword="true"/> if the comment text box has been modified;
@@ -355,7 +343,7 @@ namespace Extract.Redaction.Verification
             // Commit
             if (_actionStatusTask != null)
             {
-                VerificationMemento memento = GetSavedMemento();
+                VerificationMemento memento = GetCurrentDocument();
                 _actionStatusTask.ProcessFile(memento.SourceDocument, memento.FileId, memento.ActionId,
                     _tagManager, _fileDatabase, null, false);
             }
@@ -442,19 +430,12 @@ namespace Extract.Redaction.Verification
             }
 
             // Save the voa
-            VerificationMemento memento = GetSavedMemento();
-            SaveAttributesTo(memento, screenTime);
+            SaveCurrentMemento(screenTime);
 
             // Collect expected data feedback if necessary
             if (collectFeedback)
             {
                 CollectFeedback(false);
-            }
-
-            // Clear the unsaved state
-            if (!IsInHistory)
-            {
-                ResetUnsavedMemento();
             }
 
             // Update visited pages and rows
@@ -464,11 +445,10 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Saves the current vector of attributes file to the specified location.
         /// </summary>
-        /// <param name="memento">The <see cref="VerificationMemento"/> that specifies the file the
-        /// attributes should be saved to.</param>
         /// <param name="screenTime">The duration of time spent verifying the document.</param>
-        void SaveAttributesTo(VerificationMemento memento, TimeInterval screenTime)
+        void SaveCurrentMemento(TimeInterval screenTime)
         {
+            VerificationMemento memento = GetCurrentDocument();
             RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
 
             _currentVoa.SaveVerificationSession(memento.AttributesFile, changes, screenTime, _settings);
@@ -514,7 +494,7 @@ namespace Extract.Redaction.Verification
                     }
 
                     // If this memento has ever contained redactions, collect feedback
-                    VerificationMemento memento = GetSavedMemento();
+                    VerificationMemento memento = GetCurrentDocument();
                     if (memento.HasContainedRedactions)
                     {
                         return true;
@@ -534,7 +514,7 @@ namespace Extract.Redaction.Verification
         void CollectFeedback(bool found)
         {
             // Get the destination for the feedback image
-            VerificationMemento memento = GetSavedMemento();
+            VerificationMemento memento = GetCurrentDocument();
             string feedbackImage = memento.FeedbackImage;
 
             if (found)
@@ -637,9 +617,6 @@ namespace Extract.Redaction.Verification
             }
             else
             {
-                // Reset the dirty flag
-                _dirty = false;
-
                 // If the max document history was reached, drop the first item
                 if (_history.Count == _MAX_DOCUMENT_HISTORY)
                 {
@@ -833,27 +810,10 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets the current document to view from the history. This may be the unsaved memento.
+        /// Gets the current document to view from the history.
         /// </summary>
-        /// <returns>The current document to view from the history. This may be the unsaved 
-        /// memento.</returns>
+        /// <returns>The current document to view from the history.</returns>
         VerificationMemento GetCurrentDocument()
-        {
-            if (IsInHistory)
-            {
-                return _history[_historyIndex];
-            }
-            else
-            {
-                return _unsavedMemento ?? _savedMemento;
-            }
-        }
-
-        /// <summary>
-        /// Gets the memento representing the document to save.
-        /// </summary>
-        /// <returns>The memento representing the document to save.</returns>
-        VerificationMemento GetSavedMemento()
         {
             // Return either the history VOA or the currently processing VOA
             return IsInHistory ? _history[_historyIndex] : _savedMemento;
@@ -899,44 +859,6 @@ namespace Extract.Redaction.Verification
             }
 
             return sourceDocument;
-        }
-
-        /// <summary>
-        /// Creates a memento to store the current (unsaved) state of the processing document.
-        /// </summary>
-        /// <returns>A memento to store the current (unsaved) state of the processing document.
-        /// </returns>
-        VerificationMemento CreateUnsavedMemento()
-        {
-            string sourceDocument = _savedMemento.SourceDocument;
-            string displayImage = _savedMemento.DisplayImage;
-            int fileId = _savedMemento.FileId;
-            int actionId = _savedMemento.ActionId;
-            string attributesFile = FileSystemMethods.GetTemporaryFileName(".voa");
-            string documentType = _savedMemento.DocumentType;
-            string feedbackImage = _savedMemento.FeedbackImage;
-
-            return new VerificationMemento(sourceDocument, displayImage, fileId, actionId, 
-                attributesFile, documentType, feedbackImage);
-        }
-
-        /// <summary>
-        /// Resets <see cref="_unsavedMemento"/> to <see langword="null"/>.
-        /// </summary>
-        void ResetUnsavedMemento()
-        {
-            if (_unsavedMemento != null)
-            {
-                string voaFile = _unsavedMemento.AttributesFile;
-                if (File.Exists(voaFile))
-                {
-                    FileSystemMethods.TryDeleteFile(voaFile);
-                }
-
-                _unsavedMemento = null;
-            }
-
-            _dirty = false;
         }
 
         /// <summary>
@@ -1268,34 +1190,19 @@ namespace Extract.Redaction.Verification
                 _redactionGridView.CommitChanges();
 
                 // Check if changes have been made before moving away from a history document
-                bool inHistory = IsInHistory;
-                if (!inHistory || !WarnIfDirty())
+                if (!WarnIfDirty())
                 {
                     TimeInterval screenTime = StopScreenTime();
-                    if (inHistory)
-                    {
-                        SaveRedactionCounts(screenTime);
-                    }
-                    else
-                    {
-                        // Preserve the currently processing document
-                        if (_unsavedMemento == null)
-                        {
-                            _unsavedMemento = CreateUnsavedMemento();
-                        }
+                    SaveRedactionCounts(screenTime);
 
-                        // Save the state of the current document before moving back
-                        _dirty = _redactionGridView.Dirty;
-                        SaveAttributesTo(_unsavedMemento, screenTime);
-                        
-                        UpdateMemento();
+                    CommitComment();
 
+                    if (!IsInHistory)
+                    {
                         // Prevent outside sources from writing to the processing document
                         _processingStream = File.Open(_savedMemento.DisplayImage, FileMode.Open, 
                             FileAccess.Read, FileShare.Read);
                     }
-
-                    CommitComment();
 
                     // Go to the previous document
                     IncrementHistory(false);
@@ -1439,12 +1346,12 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Loads the specified verification user interface state.
+        /// Loads the verification user interface state from the current memento.
         /// </summary>
-        /// <param name="memento">The verification user interface state to load.</param>
-        void LoadMemento(VerificationMemento memento)
+        void LoadCurrentMemento()
         {
             // Load the voa
+            VerificationMemento memento = GetCurrentDocument();
             _currentVoa.LoadFrom(memento.AttributesFile, memento.SourceDocument, 
                 memento.ToggleOffRedactions);
 
@@ -1888,15 +1795,8 @@ namespace Extract.Redaction.Verification
             {
                 if (_imageViewer.IsImageAvailable)
                 {
-                    // Clear any stored changes
-                    if (!IsInHistory)
-                    {
-                        ResetUnsavedMemento();
-                    }
-
                     // Load the original voa
-                    VerificationMemento memento = GetSavedMemento();
-                    LoadMemento(memento);
+                    LoadCurrentMemento();
                 }
             }
             catch (Exception ex)
@@ -2137,8 +2037,7 @@ namespace Extract.Redaction.Verification
                 if (_imageViewer.IsImageAvailable)
                 {
                     // Load the voa, if it exists
-                    VerificationMemento memento = GetCurrentDocument();
-                    LoadMemento(memento);
+                    LoadCurrentMemento();
 
                     // Go to the first redaction iff:
                     // 1) We are not verifying all pages OR
@@ -2150,12 +2049,6 @@ namespace Extract.Redaction.Verification
                         {
                             _redactionGridView.SelectOnly(0);
                         }
-                    }
-
-                    // If returning to the currently processing document, reset the dirty flag
-                    if (!IsInHistory)
-                    {
-                        _redactionGridView.Dirty = _dirty;
                     }
 
                     // Start recording the screen time
@@ -2319,9 +2212,6 @@ namespace Extract.Redaction.Verification
 
                 // Create the saved memento
                 _savedMemento = CreateSavedMemento(fullPath, fileID, actionID, pathTags);
-
-                // Reset the unsaved memento
-                ResetUnsavedMemento();
 
                 _imageViewer.OpenImage(_savedMemento.DisplayImage, false);
             }
