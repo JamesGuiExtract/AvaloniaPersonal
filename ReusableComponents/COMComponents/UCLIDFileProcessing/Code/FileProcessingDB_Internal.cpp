@@ -2822,7 +2822,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 
 			setFileActionState(ipConnection, getLongField(ipFields, "FileID"), 
 				strActionName, strRevertToStatus, 
-				"Error reverting status", getLongField(ipFields, "ActionID"), false, false,
+				"", getLongField(ipFields, "ActionID"), false, false,
 				strFASTComment);
 
 			ipFileSet->MoveNext();
