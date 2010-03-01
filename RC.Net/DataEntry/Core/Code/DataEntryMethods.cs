@@ -675,6 +675,10 @@ namespace Extract.DataEntry
                     // be combined.
                     if (existingText.HasSpatialInfo() && newText.HasSpatialInfo())
                     {
+                        // TODO: (DataEntry:909)
+                        // SpatialString::MergeAsHybridString could be now be used (it was based on
+                        // the below code).
+
                         // [DataEntry:831] 
                         // Simply appending true spatial info will cause unexpected results if the text
                         // does not fall on the same line. When combining different spatial string

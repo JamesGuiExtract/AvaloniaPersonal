@@ -1270,6 +1270,10 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
 
 	try
 	{
+		// TODO: Changing selection tends to result in multiple calls into this method with the
+		// first containing the old selection. It would be more efficient to if the below processing
+		// took place only when the selection was in its final state.
+
 		// Delete all temporary highlights
 		deleteTemporaryHighlights();
 
@@ -1324,7 +1328,11 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
 				ISpatialStringPtr ipOldValue = iter->second;
 				ASSERT_RESOURCE_ALLOCATION("ELI25594", ipOldValue != NULL);
 				ipOldValue->AppendString("\r\n");
-				ipOldValue->Append(ipClone);
+				
+				// [LegacyRCAndUtils:5361]
+				// Use MergeAsHybridString which will ensure the spatial page infos are compatible
+				// before combining the strings.
+				ipOldValue->MergeAsHybridString(ipClone);
 			}
 		}
 

@@ -1141,6 +1141,15 @@ library UCLID_RASTERANDOCRMGMTLib
 			[out, retval] BSTR* pbstrOCRVersion);
 		[propput, id(94), helpstring("property OCREngineVersion")] HRESULT OCREngineVersion(
 			[in] BSTR bstrOCRVersion);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Appends the provided SpatialString producing a hybrid string result. Similar
+		//			to Append except that the method will compensate for differing page infos which
+		//			would otherwise cause an exception in append.
+		// REQUIRES: Currently only spatial strings are supported by this call; if either string
+		//			is non-spatial, an exception will be thrown.
+		[id(95), helpstring("method MergeAsHybridString")] HRESULT MergeAsHybridString(
+			[in] ISpatialString* pStringToMerge);
+		
 	};
 
 	[

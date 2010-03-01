@@ -899,7 +899,11 @@ void CEAVGeneratorDlg::OnBtnMerge()
 
 			// Append this string to the main one
 			ipMainString->AppendString("\r\n");
-			ipMainString->Append(ipNextSS);
+
+			// [LegacyRCAndUtils:5361]
+			// Use MergeAsHybridString which will ensure the spatial page infos are compatible
+			// before combining the strings.
+			ipMainString->MergeAsHybridString(ipNextSS);
 
 			// Remove this attribute from the list control
 			ipNextAttribute->Release();

@@ -3257,3 +3257,61 @@ void CSpatialString::autoConvertLegacyHybridString()
 		_bstr_t(strSourceDocName.c_str()), ipPageInfoMap);
 }
 //-------------------------------------------------------------------------------------------------
+void CSpatialString::mergeAsHybridString(UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipStringToMerge)
+{
+	if (ipStringToMerge->GetMode() == kNonSpatialMode || m_eMode == kNonSpatialMode)
+	{
+		UCLIDException ue("ELI29866", "Cannot merge a non-spatial string as a hybrid string!");
+		throw ue;
+	}
+
+	// Clone ipStringToMerge so that the source is not modified in any way. 
+	ICopyableObjectPtr ipCopyObj = ipStringToMerge;
+	ASSERT_RESOURCE_ALLOCATION("ELI29870", ipCopyObj != NULL);
+
+	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipStringToMergeCopy =
+		(UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr)ipCopyObj->Clone();
+	ASSERT_RESOURCE_ALLOCATION("ELI29871", ipStringToMergeCopy != NULL);
+
+	// Translating raster zones only works on a hybrid string.
+	ipStringToMergeCopy->DowngradeToHybridMode();
+
+	// A unified spatial page infos needs to be created. Start with ipStringToMerge's
+    // spatial page infos, and replace any shared pages with this string's page info.
+    ipCopyObj = ipStringToMergeCopy->SpatialPageInfos;
+	ASSERT_RESOURCE_ALLOCATION("ELI29872", ipCopyObj != NULL);
+
+	ILongToObjectMapPtr ipUnifiedPageInfoMap = (ILongToObjectMapPtr)ipCopyObj->Clone();
+	ASSERT_RESOURCE_ALLOCATION("ELI29873", ipUnifiedPageInfoMap != NULL);
+
+    IVariantVectorPtr ipExistingSpatialPages = m_ipPageInfoMap->GetKeys();
+	ASSERT_RESOURCE_ALLOCATION("ELI29874", ipExistingSpatialPages != NULL);
+
+    long nPageCount = ipExistingSpatialPages->Size;
+    for (long i = 0; i < nPageCount; i++)
+    {
+        long nPage = (long)ipExistingSpatialPages->Item[i];
+
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo = m_ipPageInfoMap->GetValue(nPage);
+		ASSERT_RESOURCE_ALLOCATION("ELI29875", ipPageInfo != NULL);
+
+        ipUnifiedPageInfoMap->Set(nPage, ipPageInfo);
+    }
+
+    // In order for ipStringToMerge's rasterZones to show up in the correct spot if the spatial page
+	// infos differed at all, we need to convert ipStringToMerge's raster zones into the
+	// ipUnifiedPageInfoMap coordinate system.
+    IIUnknownVectorPtr ipTranslatedRasterZones =
+		ipStringToMergeCopy->GetTranslatedImageRasterZones(ipUnifiedPageInfoMap);
+	ASSERT_RESOURCE_ALLOCATION("ELI29876", ipTranslatedRasterZones != NULL);
+
+    // Recreate ipStringToMergeCopy using the translated raster zones and
+    // unifiedSpatialPageInfos. The two spatial strings are now able to be
+    // merged.
+    ipStringToMergeCopy->CreateHybridString(ipTranslatedRasterZones, ipStringToMergeCopy->String,
+        m_strSourceDocName.c_str(), ipUnifiedPageInfoMap);
+
+	// Append the spatially compatible ipStringToMergeCopy
+	append(ipStringToMergeCopy);
+}
+//-------------------------------------------------------------------------------------------------

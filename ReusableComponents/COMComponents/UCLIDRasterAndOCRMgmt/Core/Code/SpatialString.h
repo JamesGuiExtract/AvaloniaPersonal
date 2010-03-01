@@ -158,6 +158,7 @@ public:
 	STDMETHOD(GetTranslatedImageBounds)(ILongToObjectMap* pPageInfoMap, ILongRectangle** ppBounds);
 	STDMETHOD(get_OCREngineVersion)(BSTR* pbstrOCREngine);
 	STDMETHOD(put_OCREngineVersion)(BSTR bstrOCREngine);
+	STDMETHOD(MergeAsHybridString)(ISpatialString* pStringToMerge);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);
@@ -549,5 +550,10 @@ private:
 	// PURPOSE: Converts a pre-version 8.0 hybrid string (<= SpatialString version 11) which uses
 	//			image coordinates into the OCR coordinate system.
 	void autoConvertLegacyHybridString();
+	//----------------------------------------------------------------------------------------------
+	// PURPOSE: Appends the provided SpatialString producing a hybrid string result. Similar
+	//			to append except that the method will compensate for differing page infos which
+	//			would otherwise cause an exception in append.
+	void mergeAsHybridString(UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipStringToMerge);
 	//----------------------------------------------------------------------------------------------
 };

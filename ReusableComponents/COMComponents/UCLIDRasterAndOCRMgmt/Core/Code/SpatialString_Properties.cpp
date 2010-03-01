@@ -2415,3 +2415,23 @@ STDMETHODIMP CSpatialString::put_OCREngineVersion(BSTR bstrOCREngine)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28310");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::MergeAsHybridString(ISpatialString* pStringToMerge)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipStringToMerge(pStringToMerge);
+		ASSERT_ARGUMENT("ELI29868", ipStringToMerge != NULL);
+
+		mergeAsHybridString(ipStringToMerge);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29869");
+}
+//-------------------------------------------------------------------------------------------------
