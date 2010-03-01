@@ -35,8 +35,8 @@ rem replacestring I:\Common\Engineering\ProductDevelopment\AttributeFinder\FKBUp
 
 REM Copy FlexIndexKBUpdate.exe to Product Releases\Bleeding Edge
 cd I:\Common\Engineering\ProductDevelopment\AttributeFinder\FKBUpdateInstallation\Project
-md I:\Common\Engineering\ProductReleases\FlexIndex\Internal\BleedingEdge\%1
-copy FlexIndexKBUpdate.exe I:\Common\Engineering\ProductReleases\FlexIndex\Internal\BleedingEdge\%1
+md "I:\Common\Engineering\ProductReleases\FlexIndex\Internal\BleedingEdge\%1"
+copy FlexIndexKBUpdate.exe "I:\Common\Engineering\ProductReleases\FlexIndex\Internal\BleedingEdge\%1"
 
 REM Clear out ComponentData folder
 rd %TargetFolder% /s /q
