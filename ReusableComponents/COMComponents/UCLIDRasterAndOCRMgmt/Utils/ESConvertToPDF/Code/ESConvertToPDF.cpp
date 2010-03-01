@@ -5,6 +5,7 @@
 #include "ESConvertToPDF.h"
 #include "ScansoftErr.h"
 #include "RecMemoryReleaser.h"
+#include "OcrMethods.h"
 
 #include <UCLIDException.h>
 #include <UCLIDExceptionDlg.h>
@@ -322,24 +323,7 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 	for(int i=0; i<iPages; i++)  
 	{
 		// load the ith page
-		rc = kRecLoadImg(0, hInputFile, &hPage, i);
-		if (rc != REC_OK && rc != IMG_NOMORE_WARN) 
-		{
-			// log an error
-			UCLIDException ue("ELI18613", "Unable to load page.");
-			loadScansoftRecErrInfo(ue, rc);
-			ue.addDebugInfo("Input filename", m_strInputFile);
-			ue.addDebugInfo("Page number", i+1);
-
-			// add page size information [P13 #4603]
-			if(rc == IMG_SIZE_ERR)
-			{
-				addPageSizeDebugInfo(ue, hInputFile, i);
-			}
-			
-			// throw the error
-			throw ue;
-		}
+		loadPageFromImageHandle(m_strInputFile, hInputFile, i, &hPage);
 
 		try
 		{

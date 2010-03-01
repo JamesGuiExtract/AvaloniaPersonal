@@ -54,6 +54,35 @@ void addPageSizeDebugInfo(UCLIDException& ue, const IMG_INFO& info)
 	// add page size bounds in pixels
 	ue.addDebugInfo( "X,Y Pixels", asString(info.Size.cx) + ", " + 
 		asString(info.Size.cy) );
-	ue.addDebugInfo( "X, Y Limits", "8400 x 8400 pixels" );
+	ue.addDebugInfo( "X,Y Limits", "8400 x 8400 pixels" );
 }
 //--------------------------------------------------------------------------------------------------
+void addPageSizeDebugInfo(UCLIDException& ue, HIMGFILE hImgFile, int iPageIndex)
+{
+	try
+	{
+		// get the image file page information if it is available
+		IMG_INFO imgInfo;
+		RECERR rc = kRecGetImgFilePageInfo(0, hImgFile, iPageIndex, &imgInfo, NULL);
+		if(rc != REC_OK)
+		{
+			UCLIDException ue2("ELI29880", "Unable to get page size information.");
+			loadScansoftRecErrInfo(ue2, rc);
+			throw ue;
+		}
+
+		// add page size bounds in pixels
+		ue.addDebugInfo("X,Y Pixels", asString(imgInfo.Size.cx) + ", " + asString(imgInfo.Size.cy));
+	}
+	catch(UCLIDException ue2)
+	{
+		// unable to determine image size info
+		ue.addDebugInfo("X,Y Pixels", "Unable to determine.");
+		
+		// log the exception thrown by kRecGetImgFilePageInfo
+		ue2.log();
+	}
+
+	ue.addDebugInfo("X,Y Limits", "8400 x 8400 pixels");
+}
+

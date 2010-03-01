@@ -203,6 +203,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OcrMethods.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\RecMemoryReleaser.cpp"
 				>
 				<FileConfiguration
@@ -254,6 +258,10 @@
 			>
 			<File
 				RelativePath=".\ESConvertToPDF.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OcrMethods.h"
 				>
 			</File>
 			<File

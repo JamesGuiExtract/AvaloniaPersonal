@@ -5,6 +5,7 @@
 #include "ScansoftOCRCfg.h"
 #include "ScansoftErr.h"
 #include "OCRConstants.h"
+#include "OcrMethods.h"
 
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
@@ -1558,39 +1559,7 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 {
 	// load the specified page of the image file
 	// NOTE: RecAPI uses zero-based page number indexes
-	RECERR rc = kRecLoadImg(0, m_hImageFile, &m_hPage, nPageNum-1);
-	if (rc != REC_OK && rc != IMF_PASSWORD_WARN && rc != IMG_NOMORE_WARN && rc != IMF_READ_WARN &&
-		rc != IMF_COMP_WARN)
-	{
-		UCLIDException ue("ELI05773", "Unable to load specified image file in the OCR engine!");
-		loadScansoftRecErrInfo(ue, rc);
-		ue.addDebugInfo("ImageFileName", strImageFileName);
-		ue.addDebugInfo("nPageNum", nPageNum);
-
-		// try to add page size information (P13 #4603 - JDS)
-		if (rc == IMG_SIZE_ERR)
-		{
-			IMG_INFO tempInfo;
-			try
-			{
-				THROW_UE_ON_ERROR("ELI18012", "Unable to get page size information!",
-					kRecGetImgFilePageInfo(0, m_hImageFile, nPageNum-1, &tempInfo, NULL));
-
-				// add the page size debug info 
-				addPageSizeDebugInfo(ue, tempInfo);
-			}
-			catch(UCLIDException e)
-			{
-				// unable to determine image size info
-				ue.addDebugInfo("X,Y Pixels", "Unable to determine!");
-				
-				// log the exception thrown by kRecGetImgFilePageInfo
-				e.log();
-			}
-		}
-
-		throw ue;
-	}
+	loadPageFromImageHandle(strImageFileName, m_hImageFile, nPageNum-1, &m_hPage);
 
 	// Ensure that the page image and recognition data are released
 	RecMemoryReleaser<tagRECPAGESTRUCT> PageMemoryReleaser(m_hPage);
@@ -1691,7 +1660,7 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	else if(pZone == NULL)
 	{
 		// OCR Engine will find appropriate zones
-		rc = kRecLocateZones(0, m_hPage);
+		RECERR rc = kRecLocateZones(0, m_hPage);
 
 		// if zones were not located, stop OCRing this page
 		if (rc != REC_OK)
@@ -1718,7 +1687,7 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	// else Zone was defined before RecRotateImg()
 
 	// Recognize the text in the rotated zone or zones
-	rc = kRecRecognize(0, m_hPage, NULL);
+	RECERR rc = kRecRecognize(0, m_hPage, NULL);
 
 	if (rc == REC_OK)
 	{
