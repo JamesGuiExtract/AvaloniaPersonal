@@ -734,6 +734,13 @@ namespace Extract.DataEntry
                     return false;
                 }
 
+                // [DataEntry:912]
+                // Close edit mode before attempting to process swiped data
+                if (EditingControl != null)
+                {
+                    EndEdit();
+                }
+
                 if (base.AreAllCellsSelected(false))
                 {
                     // Table selection mode.

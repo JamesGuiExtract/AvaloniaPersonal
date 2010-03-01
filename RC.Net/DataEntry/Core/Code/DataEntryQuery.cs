@@ -1611,6 +1611,12 @@ namespace Extract.DataEntry
         string _rootAttributeResultName;
 
         /// <summary>
+        /// Specifies whether changes to the attribute should trigger the parent
+        /// <see cref="DataEntryQuery"/> to update.
+        /// </summary>
+        bool _triggerUpdate = true;
+
+        /// <summary>
         /// Initialized a new <see cref="AttributeQueryNode"/> instance.
         /// </summary>
         /// <param name="rootAttribute">The <see cref="IAttribute"/> that should be considered the
@@ -1638,6 +1644,13 @@ namespace Extract.DataEntry
             {
                 base.LoadFromXml(xmlNode, rootQuery);
 
+                // Changes to the attribute should trigger an update unless specified not to.
+                XmlAttribute xmlAttribute = xmlNode.Attributes["TriggerUpdate"];
+                if (xmlAttribute != null && xmlAttribute.Value == "0")
+                {
+                    _triggerUpdate = false;
+                }
+
                 // If the query begins with a slash, search from the root of the attribute
                 // hierarchy, not from the location of the root attribute.
                 if (_query.StartsWith("/", StringComparison.Ordinal))
@@ -1647,7 +1660,7 @@ namespace Extract.DataEntry
                 }
                 else
                 {
-                    XmlAttribute xmlAttribute = xmlNode.Attributes["Root"];
+                    xmlAttribute = xmlNode.Attributes["Root"];
                     if (xmlAttribute != null && !string.IsNullOrEmpty(xmlAttribute.Value))
                     {
                         _rootAttributeResultName = xmlAttribute.Value;
@@ -1940,9 +1953,12 @@ namespace Extract.DataEntry
             statusInfo.AttributeDeleted += HandleAttributeDeleted;
 
             // Set a trigger for the attribute on the root node.
-            _rootQuery.SetTrigger(triggerAttribute,
-                SelectionMode != MultipleQueryResultSelectionMode.None);
-
+            if (_triggerUpdate)
+            {
+                _rootQuery.SetTrigger(triggerAttribute,
+                    SelectionMode != MultipleQueryResultSelectionMode.None);
+            }
+            
             _triggerAttributes.Add(triggerAttribute);
         }
 

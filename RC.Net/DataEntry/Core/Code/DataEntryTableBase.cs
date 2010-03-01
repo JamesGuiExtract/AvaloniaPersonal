@@ -539,7 +539,11 @@ namespace Extract.DataEntry
                 DataGridViewCell cell = dataEntryCell.AsDataGridViewCell;
                 DataValidity dataValidity;
 
-                if (EditingControl == null)
+                // [DataEntry:913]
+                // If someone is typing in a text box cell, we don't want to auto-correct as they
+                // are typing, but if a comboBox cell is in edit mode, we need to auto-correct right
+                // away to exactly match the combo-box value, otherwise an error will result.
+                if (EditingControl == null || dataEntryCell is DataEntryComboBoxCell)
                 {
                     string correctedValue;
                     dataValidity =
@@ -566,19 +570,14 @@ namespace Extract.DataEntry
                         {
                             cell.Value = "";
                         }
-
-                        cell.ErrorText = "";
                     }
-                    // Otherwise, display an error icon to indicate the data is invalid.
-                    else
-                    {
-                        IDataEntryValidator validator =
+                    
+                    // Display an error icon to indicate the data is invalid.
+                    IDataEntryValidator validator =
                             AttributeStatusInfo.GetStatusInfo(attribute).Validator;
-                        ExtractException.Assert("ELI29215", "Null validator exception!",
-                            validator != null);
-
-                        cell.ErrorText = validator.ValidationErrorMessage;
-                    }
+                    ExtractException.Assert("ELI29215", "Null validator exception!",
+                        validator != null);
+                    cell.ErrorText = validator.ValidationErrorMessage;
                 }
                 else
                 {

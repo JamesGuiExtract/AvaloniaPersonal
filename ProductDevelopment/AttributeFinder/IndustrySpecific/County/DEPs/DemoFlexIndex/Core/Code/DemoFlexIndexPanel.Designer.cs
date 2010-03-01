@@ -129,7 +129,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._partyMappedTo.Name = "_partyMappedTo";
             this._partyMappedTo.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this._partyMappedTo.UseComboBoxCells = true;
-            this._partyMappedTo.ValidationErrorMessage = "Invalid value";
+            this._partyMappedTo.ValidationErrorMessage = "Please specify either Grantor or Grantee";
             this._partyMappedTo.ValidationQuery = "Grantor\r\nGrantee";
             // 
             // _legalDescriptionTextBox
@@ -319,9 +319,9 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._documentTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._documentTypeComboBox.AttributeName = "DocumentType";
-            this._documentTypeComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this._documentTypeComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._documentTypeComboBox.AutoUpdateQuery = "<Query Default=\'1\'>Unknown</Query>";
+            this._documentTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._documentTypeComboBox.FormattingEnabled = true;
             this._documentTypeComboBox.Location = new System.Drawing.Point(311, 19);
             this._documentTypeComboBox.Name = "_documentTypeComboBox";
@@ -329,11 +329,10 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._documentTypeComboBox.TabIndex = 3;
             this._documentTypeComboBox.ValidationErrorMessage = "";
             this._documentTypeComboBox.ValidationQuery = "<SQL>SELECT Name FROM DocumentType ORDER BY Name</SQL>Unknown";
-            this._documentTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             // 
             // DemoFlexIndexPanel
             // 
-            this.ApplicationTitle = "FlexIndex Demo";
+            this.ApplicationTitle = "FLEX Index Demo";
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.Controls.Add(this._documentTypeComboBox);
             this.Controls.Add(this._legalDescriptionLabel);
