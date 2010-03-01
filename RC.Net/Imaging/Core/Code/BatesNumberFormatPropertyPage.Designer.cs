@@ -153,12 +153,12 @@ namespace Extract.Imaging
             // 
             // _counterToUseCombo
             // 
+            this._counterToUseCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._counterToUseCombo.FormattingEnabled = true;
             this._counterToUseCombo.Location = new System.Drawing.Point(180, 17);
             this._counterToUseCombo.Name = "_counterToUseCombo";
             this._counterToUseCombo.Size = new System.Drawing.Size(238, 21);
             this._counterToUseCombo.TabIndex = 7;
-            this._counterToUseCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._counterToUseCombo.SelectedIndexChanged += new System.EventHandler(this.HandleUserCounterComboChanged);
             // 
             // _counterToUseLabel
@@ -173,7 +173,7 @@ namespace Extract.Imaging
             // _digitsLabel
             // 
             this._digitsLabel.AutoSize = true;
-            this._digitsLabel.Location = new System.Drawing.Point(123, 97);
+            this._digitsLabel.Location = new System.Drawing.Point(141, 96);
             this._digitsLabel.Name = "_digitsLabel";
             this._digitsLabel.Size = new System.Drawing.Size(31, 13);
             this._digitsLabel.TabIndex = 9;
@@ -193,7 +193,7 @@ namespace Extract.Imaging
             0,
             0});
             this._digitsUpDown.Name = "_digitsUpDown";
-            this._digitsUpDown.Size = new System.Drawing.Size(34, 20);
+            this._digitsUpDown.Size = new System.Drawing.Size(48, 20);
             this._digitsUpDown.TabIndex = 9;
             this._digitsUpDown.Value = new decimal(new int[] {
             1,

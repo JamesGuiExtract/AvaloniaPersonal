@@ -58,9 +58,9 @@ namespace Extract.FileActionManager.FileProcessors
             this._appearanceGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this._appearanceGroupBox.Controls.Add(this._changeAppearanceButton);
             this._appearanceGroupBox.Controls.Add(this._appearanceSummaryText);
-            this._appearanceGroupBox.Location = new System.Drawing.Point(12, 77);
+            this._appearanceGroupBox.Location = new System.Drawing.Point(12, 75);
             this._appearanceGroupBox.Name = "_appearanceGroupBox";
-            this._appearanceGroupBox.Size = new System.Drawing.Size(323, 62);
+            this._appearanceGroupBox.Size = new System.Drawing.Size(323, 72);
             this._appearanceGroupBox.TabIndex = 2;
             this._appearanceGroupBox.TabStop = false;
             this._appearanceGroupBox.Text = "Position and appearance";
@@ -83,11 +83,11 @@ namespace Extract.FileActionManager.FileProcessors
             this._appearanceSummaryText.AcceptsReturn = true;
             this._appearanceSummaryText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this._appearanceSummaryText.Location = new System.Drawing.Point(6, 21);
+            this._appearanceSummaryText.Location = new System.Drawing.Point(6, 19);
             this._appearanceSummaryText.Multiline = true;
             this._appearanceSummaryText.Name = "_appearanceSummaryText";
             this._appearanceSummaryText.ReadOnly = true;
-            this._appearanceSummaryText.Size = new System.Drawing.Size(230, 34);
+            this._appearanceSummaryText.Size = new System.Drawing.Size(230, 46);
             this._appearanceSummaryText.TabIndex = 0;
             this._appearanceSummaryText.TabStop = false;
             // 
@@ -95,7 +95,7 @@ namespace Extract.FileActionManager.FileProcessors
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(179, 145);
+            this._okButton.Location = new System.Drawing.Point(179, 153);
             this._okButton.MaximumSize = new System.Drawing.Size(75, 23);
             this._okButton.MinimumSize = new System.Drawing.Size(75, 23);
             this._okButton.Name = "_okButton";
@@ -108,7 +108,7 @@ namespace Extract.FileActionManager.FileProcessors
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(260, 145);
+            this._cancelButton.Location = new System.Drawing.Point(260, 153);
             this._cancelButton.MaximumSize = new System.Drawing.Size(75, 23);
             this._cancelButton.MinimumSize = new System.Drawing.Size(75, 23);
             this._cancelButton.Name = "_cancelButton";
@@ -125,7 +125,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._fileNameGroupBox.Controls.Add(this._browseButton);
             this._fileNameGroupBox.Controls.Add(this._fileNameTextBox);
             this._fileNameGroupBox.Controls.Add(this.label1);
-            this._fileNameGroupBox.Location = new System.Drawing.Point(12, 12);
+            this._fileNameGroupBox.Location = new System.Drawing.Point(12, 9);
             this._fileNameGroupBox.Name = "_fileNameGroupBox";
             this._fileNameGroupBox.Size = new System.Drawing.Size(322, 60);
             this._fileNameGroupBox.TabIndex = 0;
@@ -182,7 +182,7 @@ namespace Extract.FileActionManager.FileProcessors
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(347, 180);
+            this.ClientSize = new System.Drawing.Size(347, 188);
             this.Controls.Add(this._fileNameGroupBox);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this._okButton);

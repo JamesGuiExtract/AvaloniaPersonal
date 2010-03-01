@@ -54,4 +54,59 @@ namespace Extract.Drawing
         /// </summary>
         RightTop
     }
+
+    /// <summary>
+    /// Class of helper methods for working with the <see cref="AnchorAlignment"/> class.
+    /// </summary>
+    public static class AnchorAlignmentHelper
+    {
+        /// <summary>
+        /// Gets a human readable string representation of the specified alignment."
+        /// </summary>
+        /// <param name="alignment">The alignment to get a string for.</param>
+        /// <returns>A human readble string representation of the specified aligment.</returns>
+        public static string GetAlignmentAsString(AnchorAlignment alignment)
+        {
+            try
+            {
+                switch (alignment)
+                {
+                    case AnchorAlignment.LeftBottom:
+                        return "Left bottom";
+
+                    case AnchorAlignment.Bottom:
+                        return "Center bottom";
+
+                    case AnchorAlignment.RightBottom:
+                        return "Right bottom";
+
+                    case AnchorAlignment.Left:
+                        return "Left center";
+
+                    case AnchorAlignment.Center:
+                        return "Center";
+
+                    case AnchorAlignment.Right:
+                        return "Right center";
+
+                    case AnchorAlignment.LeftTop:
+                        return "Left top";
+
+                    case AnchorAlignment.Top:
+                        return "Center top";
+
+                    case AnchorAlignment.RightTop:
+                        return "Right top";
+
+                    default:
+                        ExtractException.ThrowLogicException("ELI29865");
+                        return ""; // Added so code will compile
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29867", ex);
+            }
+        }
+    }
 }

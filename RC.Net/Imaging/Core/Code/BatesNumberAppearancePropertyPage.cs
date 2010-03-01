@@ -293,47 +293,8 @@ namespace Extract.Imaging
             _selectedAlignmentLabel.Text = _ANCHOR_ALIGNMENT_BASE_TEXT;
 
             // Append the selected alignment
-            switch (e.AnchorAlignment)
-            {
-                case AnchorAlignment.LeftBottom:
-                    _selectedAlignmentLabel.Text += "Left bottom";
-                    break;
-
-                case AnchorAlignment.Bottom:
-                    _selectedAlignmentLabel.Text += "Center bottom";
-                    break;
-
-                case AnchorAlignment.RightBottom:
-                    _selectedAlignmentLabel.Text += "Right bottom";
-                    break;
-
-                case AnchorAlignment.Left:
-                    _selectedAlignmentLabel.Text += "Left center";
-                    break;
-
-                case AnchorAlignment.Center:
-                    _selectedAlignmentLabel.Text += "Center";
-                    break;
-
-                case AnchorAlignment.Right:
-                    _selectedAlignmentLabel.Text += "Right center";
-                    break;
-
-                case AnchorAlignment.LeftTop:
-                    _selectedAlignmentLabel.Text += "Left top";
-                    break;
-
-                case AnchorAlignment.Top:
-                    _selectedAlignmentLabel.Text += "Center top";
-                    break;
-
-                case AnchorAlignment.RightTop:
-                    _selectedAlignmentLabel.Text += "Right top";
-                    break;
-
-                default:
-                    break;
-            }
+            _selectedAlignmentLabel.Text +=
+                AnchorAlignmentHelper.GetAlignmentAsString(e.AnchorAlignment);
 
             // Raise the PropertyPageModified event
             OnPropertyPageModified(new EventArgs());

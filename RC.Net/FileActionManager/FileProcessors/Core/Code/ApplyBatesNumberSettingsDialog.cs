@@ -133,9 +133,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _browseButton.FileFilter = _FILE_FILTERS;
 
                 // Update the description for the appearance
-                _appearanceSummaryText.Text = "Font: "
-                    + FontMethods.GetUserFriendlyFontString(_generator.Format.Font)
-                    + Environment.NewLine + "Position: " + GetPositionOfFont(_generator.Format);
+                UpdateAppearanceSummary();
             }
             catch (Exception ex)
             {
@@ -219,9 +217,7 @@ namespace Extract.FileActionManager.FileProcessors
                 if (result == DialogResult.OK)
                 {
                     // Update the description for the appearance
-                    _appearanceSummaryText.Text = "Font: "
-                        + FontMethods.GetUserFriendlyFontString(_generator.Format.Font)
-                        + Environment.NewLine + "Position: " + GetPositionOfFont(_generator.Format);
+                    UpdateAppearanceSummary();
                 }
             }
             catch (Exception ex)
@@ -261,7 +257,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="batesNumberFormat">The format object containing the PageAnchorAlignment.</param>
         /// <returns>A string representation of the anchor point.</returns>
-        private static string GetPositionOfFont(BatesNumberFormat batesNumberFormat)
+        static string GetPositionOfFont(BatesNumberFormat batesNumberFormat)
         {
             StringBuilder sb = new StringBuilder();
             switch (batesNumberFormat.PageAnchorAlignment)
@@ -298,7 +294,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Adds the <see cref="BatesNumberFormatPropertyPage"/> user control to the
         /// settings dialog.
         /// </summary>
-        private void AddBatesNumberFormatControl()
+        void AddBatesNumberFormatControl()
         {
             // Get the list of database counters
             VariantVector names = _generator.DatabaseManager.GetUserCounterNames();
@@ -345,6 +341,19 @@ namespace Extract.FileActionManager.FileProcessors
 
             // Resize the form appropriately
             Size = new Size(width, height);
+        }
+
+        /// <summary>
+        /// Updates the readonly edit control associated with the Bates number appearance
+        /// settings.
+        /// </summary>
+        void UpdateAppearanceSummary()
+        {
+            _appearanceSummaryText.Text = "Font: "
+                + FontMethods.GetUserFriendlyFontString(_generator.Format.Font)
+                + Environment.NewLine + "Position: " + GetPositionOfFont(_generator.Format)
+                + Environment.NewLine + "Alignment: "
+                + AnchorAlignmentHelper.GetAlignmentAsString(_generator.Format.AnchorAlignment);
         }
 
         #endregion Methods
