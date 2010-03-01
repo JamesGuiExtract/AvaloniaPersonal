@@ -1309,15 +1309,17 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 			ASSERT_RESOURCE_ALLOCATION( "ELI13497", ipNewFP != NULL );
 			string	strDescription( ipNewFP->GetDescription() );
 
+			// Insert the new FP object-with-description into the vector
+			// This MUST be done before setting the checked state in the list
+			// [LRCAU #5603]
+			getFileProcessorsData()->Insert( iIndex, ipNewFP );
+
 			// Insert the item into the list
 			m_fileProcessorList.InsertItem( iIndex, "" );
 
 			// Add the description and update the checkbox setting
 			m_fileProcessorList.SetItemText( iIndex, 1, strDescription.c_str() );
 			m_fileProcessorList.SetCheck( iIndex, asMFCBool( ipNewFP->Enabled ) );
-
-			// Insert the new FP object-with-description into the vector
-			getFileProcessorsData()->Insert( iIndex, ipNewFP );
 
 			// Select the new item
 			m_fileProcessorList.SetItemState( iIndex, LVIS_SELECTED, LVIS_SELECTED );
@@ -1338,15 +1340,17 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 				ASSERT_RESOURCE_ALLOCATION( "ELI13499", ipNewFP != NULL );
 				string	strDescription( ipNewFP->GetDescription() );
 
+				// Insert the new File Processor object-with-description into the vector
+				// This MUST be done before setting the checked state in the list
+				// [LRCAU #5603]
+				getFileProcessorsData()->Insert( iIndex + i, ipNewFP );
+
 				// Insert the item into the list
 				m_fileProcessorList.InsertItem( iIndex + i, "" );
 
 				// Add the description and update the checkbox setting
 				m_fileProcessorList.SetItemText( iIndex + i, 1, strDescription.c_str() );
 				m_fileProcessorList.SetCheck( iIndex + i, asMFCBool( ipNewFP->Enabled ) );
-
-				// Insert the new File Processor object-with-description into the vector
-				getFileProcessorsData()->Insert( iIndex + i, ipNewFP );
 
 				// select the new item
 				m_fileProcessorList.SetItemState( iIndex+i, LVIS_SELECTED, LVIS_SELECTED );

@@ -336,8 +336,7 @@ void PSUpdateThreadManager::updateProgressStatus()
 		}
 		else
 		{
-			throw UCLIDException("ELI16648", 
-				"Application trace: Unable to update OCR progress status.");
+			// Do nothing - LRCAU #5748
 		}
 	}
 }
