@@ -29,7 +29,10 @@ protected:
 	// will be called from the worker thread when the events take place.
 	// Currenlty this will stop listing to previous folders and 
 	// start listening on the given folder
-	void startListening(const std::string strFolder, bool bRecursive);
+	// If eventTypeFlags is specified, the method will only listen for the the OR'd
+	// EFileEventTypes provided.
+	void startListening(const std::string strFolder, bool bRecursive,
+		BYTE eventTypeFlags = 0xFF);
 
 	// stop listening to the folder events.
 	void stopListening();
@@ -55,20 +58,24 @@ protected:
 	// listening thread is no longer running
 	// Derived classes can use this to make sure the listing hasn't exited
 	Win32Event m_eventListeningExited;
-private:
 
 	CMutex m_mutexFolderListen;
 	enum EFileEventType
 	{
-		kFileAdded,
-		kFileRemoved,
-		kFileModified,
-		kFileRenamed,
-		kFolderAdded,
-		kFolderRemoved,
-		kFolderModified,
-		kFolderRenamed
+		kFileAdded		= 0x01,
+		kFileRemoved	= 0x02,
+		kFileModified	= 0x04,
+		kFileRenamed	= 0x08,
+		kFolderAdded	= 0x10,
+		kFolderRemoved  = 0x20,
+		kFolderModified = 0x40,
+		kFolderRenamed  = 0x80
 	};
+
+private:
+
+	// The event types that should be monitored.
+	BYTE m_eventTypeFlags;
 
 	class ThreadData
 	{

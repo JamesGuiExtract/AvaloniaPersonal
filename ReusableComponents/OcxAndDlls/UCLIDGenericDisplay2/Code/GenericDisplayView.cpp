@@ -1065,18 +1065,18 @@ void CGenericDisplayView::OnKeyDownImageeditctrl1(short FAR* KeyCode, short Shif
 	short nKeyCode = *KeyCode;
 	if (!UpdateInteractiveZoneCreation(*KeyCode))
 	{
-		if (scrollImage(getScrollDirectionType(nKeyCode)))
-		{
-			// if the key is processed, then no more process
-			return;
-		}
-
 		// [LegacyRCAndUtils:5032] Don't fire key events in the display control (thereby disabling
 		// shortcut keys) during rubberbanding or zone creation/modification events.
 		if(m_zoneHighltThrd.IsInteractiveZoneEntCreationEnabled() ||
 		   m_zoneAdjustmentThrd.isInteractiveZoneEntAdjustmentEnabled() ||
 		   m_pGenericDisplayCtrl->isRubberbandingEnabled())
 		{
+			return;
+		}
+
+		if (scrollImage(getScrollDirectionType(nKeyCode)))
+		{
+			// if the key is processed, then no more process
 			return;
 		}
 		

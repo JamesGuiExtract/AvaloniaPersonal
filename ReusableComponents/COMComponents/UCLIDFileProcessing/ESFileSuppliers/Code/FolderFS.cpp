@@ -198,10 +198,18 @@ STDMETHODIMP CFolderFS::raw_Start(IFileSupplierTarget * pTarget, IFAMTagManager 
 					// start search thread
 					m_pSearchThread = AfxBeginThread(searchFileThread, this );
 				}
+
 				if ( m_bAddedFiles || m_bModifiedFiles || m_bTargetOfMoveOrRename )
 				{
+					// Renames and deletes always need to be monitored to maintain the database, but
+					// only monitor file/folder add and modify events as required.
+					BYTE byteEventTypes =
+						kFileRemoved | kFileRenamed | kFolderRemoved | kFolderRenamed;
+					byteEventTypes |= m_bAddedFiles ? kFileAdded : 0;
+					byteEventTypes |= m_bModifiedFiles ? kFileModified : 0;
+
 					// start listening
-					startListening( m_strExpandFolderName, m_bRecurseFolders);
+					startListening(m_strExpandFolderName, m_bRecurseFolders, byteEventTypes);
 				}
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15298");

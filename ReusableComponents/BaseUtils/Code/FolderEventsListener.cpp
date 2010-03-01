@@ -30,7 +30,8 @@ m_pthreadDispatch(NULL)
 
 }
 //-------------------------------------------------------------------------------------------------
-void FolderEventsListener::startListening(const std::string strFolder, bool bRecursive)
+void FolderEventsListener::startListening(const std::string strFolder, bool bRecursive,
+										  BYTE eventTypeFlags/* = 0xFF*/)
 {
 	
 	// Currently Folder Events listener supports listening on 
@@ -40,6 +41,9 @@ void FolderEventsListener::startListening(const std::string strFolder, bool bRec
 	{
 		stopListening();
 	}
+
+	m_eventTypeFlags = eventTypeFlags;
+
 	// Create a new thread Data structure that will be used for communication between
 	// this thread and the one we are about to create
 	// the thread function will delete the ThreadData before exiting
@@ -251,10 +255,13 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 		FolderEventsListener* fl = (FolderEventsListener*)pParam;
 		try
 		{
-			vector<FolderEvent> vecEvents;
-
 			while ( fl->m_eventKillDispatchThread.wait(1000) == WAIT_TIMEOUT )
 			{
+				// [LegacyRCAndUtils:5258]
+				// Declare inside the while loop so that after processing a large number of events,
+				// the capacity allocated for FolderEvents in the vector is released.
+				vector<FolderEvent> vecEvents;
+
 				while(fl->m_queEvents.getSize() > 0)
 				{
 					if(fl->m_eventKillDispatchThread.isSignaled())
@@ -400,38 +407,46 @@ void FolderEventsListener::processChanges(string strBaseDir, Win32Event &eventKi
 		// delete result array
 		delete[] result;
 
+		EFileEventType eEventType = (EFileEventType)0;
+
 		// call the appropriate virtual handler based on which action has taken place on the file
 		switch(pFileInfo->Action)
 		{
 		case FILE_ACTION_ADDED:
-			{
-				FolderEvent event((bFileChange) ? kFileAdded : kFolderAdded, strFilename);
-				queEvents.push(event);
-			}
+			eEventType = bFileChange ? kFileAdded : kFolderAdded;
 			break;
 		case FILE_ACTION_REMOVED:
 			{
-				FolderEvent event((bFileChange) ? kFileRemoved : kFolderRemoved, "", strFilename);
-				queEvents.push(event);
+				strOldFilename = strFilename;
+				strFilename = "";
+				eEventType = bFileChange ? kFileRemoved : kFolderRemoved;
 			}
 			break;
 		case FILE_ACTION_MODIFIED:
-			{
-				FolderEvent event((bFileChange) ? kFileModified : kFolderModified, strFilename);
-				queEvents.push(event);
-			}
+			eEventType = bFileChange ? kFileModified : kFolderModified;
 			break;
 		case FILE_ACTION_RENAMED_OLD_NAME:
 			strOldFilename = strFilename;
 			break;
 		case FILE_ACTION_RENAMED_NEW_NAME:
-			{
-				FolderEvent event((bFileChange) ? kFileRenamed : kFolderRenamed, strFilename, strOldFilename);
-				queEvents.push(event);
-			}
+			eEventType = bFileChange ? kFileRenamed : kFolderRenamed;
 			break;
 		default:
 			break;
+		}
+
+		// [LegacyRCAndUtils:5258]
+		// Only process the event types being monitored.
+		if ((m_eventTypeFlags & eEventType) != 0)
+		{
+			FolderEvent event(eEventType, strFilename, strOldFilename);
+			queEvents.push(event);
+		}
+
+		// Reset strOldFilename after an event it which it was used.
+		if ((int)eEventType != 0 && !strOldFilename.empty())
+		{
+			strOldFilename = "";
 		}
 
 		pCurrByte += pFileInfo->NextEntryOffset;
