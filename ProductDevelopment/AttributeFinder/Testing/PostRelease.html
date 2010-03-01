@@ -27,12 +27,12 @@
 		</UL>
   		<li>Add the following folders and their contents to the root of the CD:</li>
 		<UL>
-		  	<li>DotNet 2.0 Framework</li>
+		  	<li>DotNet 3.5 Framework</li>
 		  	<li>Extract Systems LM</li>
 		  	<li>FlexIndex</li>
 		  	<li>FlexIndexInstall</li>
 		  	<li>InliteKeyInstall</li>
-		  	<li>SQLServerExpress2005</li>
+		  	<li>SQLServerExpress2008</li>
 		</UL>
 	  	<li>Create an appropriate ISO image to facilitate creation of copied CDs.</li>
 	</UL>
@@ -47,12 +47,12 @@
 		</UL>
   		<li>Add the following folders and their contents to the root of the CD:</li>
 		<UL>
-		  	<li>DotNet 2.0 Framework</li>
+		  	<li>DotNet 3.5 Framework</li>
 		  	<li>Extract Systems LM</li>
 		  	<li>IDShield</li>
 		  	<li>IDShieldInstall</li>
 		  	<li>InliteKeyInstall</li>
-		  	<li>SQLServerExpress2005</li>
+		  	<li>SQLServerExpress2008</li>
 		</UL>
 	  	<li>Create an appropriate <b>ISO</b> image to facilitate creation of copied CDs.</li>
 	</UL>
@@ -69,11 +69,11 @@
 <LI><h2>Source Code Backup - On the Build Machine</h2>
 <UL>
   	<li>Rename the <b>D:\temp</b> folder on the build machine to <b>temp a.b.c.d</b>.
-  	<li>As VSS and/or domain administrator.
+  	<li>As Vault and/or domain administrator.
 	<UL>
-	  	<li>Undo current SourceSafe checkouts.</li>
-	  	<li>Copy the current VSS folder to an appropriately named folder under 
-		<b>I:\Common\Engineering\VSSReleaseBuilds</b>.</li>
+	  	<li>Undo current checkouts.</li>
+		<li>Create a branch.
+		<li>Create a backup of the new branch.
 	</UL>
 </UL>
 <br>
@@ -83,12 +83,6 @@
 <UL>
   	<li>Zip the <b>I:\Common\Tech Comm\RoboHELP\File Action Manager</b> folder and 
 	store it <b>I:\Common\Tech Comm\RoboHELP\Archives</b>.
-  	<li>As VSS and/or domain administrator.
-	<UL>
-	  	<li>Undo current SourceSafe checkouts.</li>
-	  	<li>Copy the current VSS folder to an appropriately named folder under 
-		<b>I:\Common\Engineering\VSSReleaseBuilds</b>.</li>
-	</UL>
 </UL>
 <br>
 
@@ -104,25 +98,41 @@
 	used to create license files for the new release.
   	<li>Confirm that the new licensing folder cannot be used to create the following 
 	license packages: <b>Disable USB Key Serial Numbers</b>, <b>Rule Development Toolkit</b>, 
-	<b>Simple Rule Writing</b>.
+	<b>FLEX Index Rule Writing</b>, <b>ID Shield Rule Writing</b>.
 </UL>
 <br>
 
 <!-- *********************************************** -->
-<LI><h2>Post-Release Development Activities</h2>
+<LI><h2>Post-Release Development / Testing Activities</h2>
 <UL>
   	<li>Finish exercising any remaining testing checklists.
   	<li>Finish creating and exercising any missing <b>automated</b> tests.
   	<li>Finish creating and exercising any missing <b>Memory Leak</b> tests.
   	<li>Update testing checklists per comments and notes from testers.
 <p>
-  	<li>Review and test the <b>Untested</b> SCRs in <b>P13</b>.
-  	<li>Review and test the <b>Untested</b> SCRs in <b>P16</b>.
+  	<li>Review and test the <b>Untested</b> SCRs in <b>Data Entry</b>.
+  	<li>Review and test the <b>Untested</b> SCRs in <b>DotNetRCAndUtils</b>.
+  	<li>Review and test the <b>Untested</b> SCRs in <b>FlexIDSCore</b>.
+  	<li>Review and test the <b>Untested</b> SCRs in <b>LegacyRCAndUtils</b>.
 </UL>
 <br>
 
 <!-- *********************************************** -->
-<LI><h2>Post-Release Rule Writer Activities</h2>
+<LI><h2>Post-Release Rule Writer / Tester Activities</h2>
+<UL>
+  	<li>Run <b>Customer_Max_Server_Rates_80</b> tests for the specified customers and 
+	update the appropriate spreadsheet.
+  	<li>Run <b>IDShield_Customer_Rates_80</b> tests for the specified customers and 
+	update the appropriate spreadsheet.
+  	<li>Run <b>FLEXIndex_Customer_Rates_80</b> tests for the specified customers and 
+	update the appropriate spreadsheet.
+  	<li>Run <b>Maximum_Server_Rate_Tests_80</b> tests and update the appropriate spreadsheet.
+  	<li>Run <b>Thread_Scalability_80</b> tests and update the appropriate spreadsheet.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Optional Post-Release Rule Writer Activities</h2>
 <UL>
   	<li>Run <b>FLEX Index Capture Rate</b> tests for each current customer and update the 
 	appropriate <b>Performance Results</b> spreadsheet.
