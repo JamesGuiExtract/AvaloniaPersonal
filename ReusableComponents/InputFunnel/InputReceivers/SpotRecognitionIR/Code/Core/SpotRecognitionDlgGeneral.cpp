@@ -2952,7 +2952,9 @@ void SpotRecognitionDlg::createTemporaryHighlightsForLines(IIUnknownVectorPtr ip
 
 		if(ipRasterZones->Size() <= 0)
 		{
-			THROW_LOGIC_ERROR_EXCEPTION("ELI09534");
+			UCLIDException ue("ELI09534",
+				"Raster zone info missing; unable to display highlight.");
+			throw ue;
 		}
 
 		// Create a highlight for each raster zone that is associated 
