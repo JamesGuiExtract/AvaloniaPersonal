@@ -122,7 +122,7 @@ namespace Extract.Imaging
                     bool allowHighQualityPrint =
                         (permissions & PdfOwnerPermissions.AllowHighQualityPrinting) == PdfOwnerPermissions.AllowHighQualityPrinting;
                     bool allowPrinting = allowHighQualityPrint
-                        && (permissions & PdfOwnerPermissions.AllowLowQualityPrinting) == PdfOwnerPermissions.AllowLowQualityPrinting;
+                        || (permissions & PdfOwnerPermissions.AllowLowQualityPrinting) == PdfOwnerPermissions.AllowLowQualityPrinting;
                     _allowAccessibilityCheck.Checked =
                         (permissions & PdfOwnerPermissions.AllowContentCopyingForAccessibility) == PdfOwnerPermissions.AllowContentCopyingForAccessibility;
                     _allowAddOrModifyAnnotationsCheck.Checked =
