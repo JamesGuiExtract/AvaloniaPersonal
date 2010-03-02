@@ -2145,7 +2145,7 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 
 			// clear all the records in the file processing record manager
 			// (i.e. clear the queue of files to process)
-			m_pRecordMgr->clear(m_eCurrentRunningState != kScheduleRun);
+			m_pRecordMgr->clear(false);
 
 			// Set whether processing skipped files or not
 			m_pRecordMgr->setProcessSkippedFiles(m_bProcessSkippedFiles);
