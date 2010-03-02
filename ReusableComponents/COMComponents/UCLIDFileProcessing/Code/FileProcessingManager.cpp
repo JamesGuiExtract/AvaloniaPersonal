@@ -275,26 +275,28 @@ UINT CFileProcessingManager::handleStopRequestAsynchronously(void *pData)
 	try
 	{
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
-
-		CFileProcessingManager *pFPM = static_cast<CFileProcessingManager *>(pData);
-		ASSERT_ARGUMENT("ELI13900", pFPM != NULL);
-
-		// notify all file suppliers to stop supplying
-		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipSupplyingActionMgmtRole =
-			pFPM->getActionMgmtRole(pFPM->m_ipFSMgmtRole);
-		ASSERT_RESOURCE_ALLOCATION("ELI14273", ipSupplyingActionMgmtRole != NULL);
-		if (ipSupplyingActionMgmtRole->Enabled == VARIANT_TRUE)
 		{
-			ipSupplyingActionMgmtRole->Stop();
-		}
 
-		// notify all file processors to stop processing
-		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipProcessingActionMgmtRole =
-			pFPM->getActionMgmtRole(pFPM->m_ipFPMgmtRole);
-		ASSERT_RESOURCE_ALLOCATION("ELI14312", ipProcessingActionMgmtRole != NULL);
-		if (ipProcessingActionMgmtRole->Enabled == VARIANT_TRUE)
-		{
-			ipProcessingActionMgmtRole->Stop();
+			CFileProcessingManager *pFPM = static_cast<CFileProcessingManager *>(pData);
+			ASSERT_ARGUMENT("ELI13900", pFPM != NULL);
+
+			// notify all file suppliers to stop supplying
+			UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipSupplyingActionMgmtRole =
+				pFPM->getActionMgmtRole(pFPM->m_ipFSMgmtRole);
+			ASSERT_RESOURCE_ALLOCATION("ELI14273", ipSupplyingActionMgmtRole != NULL);
+			if (ipSupplyingActionMgmtRole->Enabled == VARIANT_TRUE)
+			{
+				ipSupplyingActionMgmtRole->Stop();
+			}
+
+			// notify all file processors to stop processing
+			UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipProcessingActionMgmtRole =
+				pFPM->getActionMgmtRole(pFPM->m_ipFPMgmtRole);
+			ASSERT_RESOURCE_ALLOCATION("ELI14312", ipProcessingActionMgmtRole != NULL);
+			if (ipProcessingActionMgmtRole->Enabled == VARIANT_TRUE)
+			{
+				ipProcessingActionMgmtRole->Stop();
+			}
 		}
 
 		CoUninitialize();

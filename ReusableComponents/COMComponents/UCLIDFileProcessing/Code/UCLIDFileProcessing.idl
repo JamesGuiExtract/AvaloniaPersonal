@@ -1066,6 +1066,9 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To get the connection retry settings associated with the database. 
 		[id(94), helpstring("method GetConnectionRetrySettings")] HRESULT GetConnectionRetrySettings(
 			[out] long* pnNumberOfRetries, [out] double* pdRetryTimeout);
+		//-----------------------------------------------------------------------------------------
+		[id(95), helpstring("method CloseAllDBConnections")] HRESULT CloseAllDBConnections();
+		//-----------------------------------------------------------------------------------------
 	};
 
 	[

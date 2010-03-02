@@ -2442,6 +2442,33 @@ void CFileProcessingDB::resetDBConnection()
 
 		CSingleLock lock(&m_mutex, TRUE);
 		
+		// Close all the DB connections and clear the map [LRCAU# 5659]
+		closeAllDBConnections();
+
+		_lastCodePos = "40";
+
+		// If there is a non empty server and database name get a connection and validate
+		if (!m_strDatabaseServer.empty() && !m_strDatabaseName.empty())
+		{
+			// This will create a new connection for this thread and initialize the schema
+			getDBConnection();
+
+			_lastCodePos = "50";
+
+			// Validate the schema
+			validateDBSchemaVersion();
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26869");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::closeAllDBConnections()
+{
+	INIT_EXCEPTION_AND_TRACING("MLI03275");
+	try
+	{
+		CSingleLock lock(&m_mutex, TRUE);
+		
 		_lastCodePos = "20";
 		
 		// Initilize count for MLI Code iteration count
@@ -2465,7 +2492,7 @@ void CFileProcessingDB::resetDBConnection()
 					ipDBConnection->Close();
 				}
 			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI15000")
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29884")
 		}
 
 		// Clear all of the connections in all of the threads
@@ -2474,22 +2501,8 @@ void CFileProcessingDB::resetDBConnection()
 
 		// Reset the Current connection status to not connected
 		m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
-
-		_lastCodePos = "40";
-
-		// If there is a non empty server and database name get a connection and validate
-		if (!m_strDatabaseServer.empty() && !m_strDatabaseName.empty())
-		{
-			// This will create a new connection for this thread and initialize the schema
-			getDBConnection();
-
-			_lastCodePos = "50";
-
-			// Validate the schema
-			validateDBSchemaVersion();
-		}
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26869");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29885");
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::clear(bool retainUserValues)

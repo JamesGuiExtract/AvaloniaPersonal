@@ -1668,6 +1668,23 @@ STDMETHODIMP CFileProcessingDB::ResetDBConnection()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::CloseAllDBConnections()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	try
+	{
+		// Validate the license
+		validateLicense();
+
+		// Call the internal close all DB connections
+		closeAllDBConnections();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29883")
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SetNotificationUIWndHandle(long nHandle)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());

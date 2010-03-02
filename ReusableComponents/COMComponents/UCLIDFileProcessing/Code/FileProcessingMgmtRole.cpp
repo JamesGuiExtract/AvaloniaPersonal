@@ -1905,6 +1905,10 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 
 			bool bExit = false;
 
+			// Wrap the FAMDB as a smart pointer
+			UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFamDB(pFPM->m_pDB);
+			ASSERT_RESOURCE_ALLOCATION("ELI29886", ipFamDB != NULL);
+
 			// Set up what the current running state should be
 			if (pFPM->m_bLimitProcessingToSchedule)
 			{
@@ -2030,10 +2034,16 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 
 							// Need to wait for the watcher thread to exit
 							pFPM->m_eventWatcherThreadExited.wait();
+
+							// Close the database connections
+							ipFamDB->CloseAllDBConnections();
 							break;
 						case WAIT_OBJECT_0 + 1:
 							// Reset watcher thread exited event
 							pFPM->m_eventWatcherThreadExited.reset();
+
+							// Close the database connections
+							ipFamDB->CloseAllDBConnections();
 
 							// Notify UI that processing is inactive if not a normal stop
 							if (pFPM->m_eCurrentRunningState != kNormalStop && pFPM->m_hWndOfUI != NULL)

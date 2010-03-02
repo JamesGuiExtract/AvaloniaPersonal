@@ -200,6 +200,7 @@ public:
 	STDMETHOD(GetFileRecord)(BSTR bstrFile, BSTR bstrActionName, IFileRecord** ppFileRecord);
 	STDMETHOD(SetFileStatusToProcessing)(long nFileId, long nActionID);
 	STDMETHOD(GetConnectionRetrySettings)(long* pnNumberOfRetries, double* pdRetryTimeout);
+	STDMETHOD(CloseAllDBConnections)();
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -542,6 +543,10 @@ private:
 
 	// Internal reset DB connection function
 	void resetDBConnection();
+
+	// Internal close all DB connections
+	void closeAllDBConnections();
+
 
 	// Internal clear DB function
 	void clear(bool retainUserValues = false);
