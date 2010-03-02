@@ -191,6 +191,12 @@ namespace Extract.DataEntry
         /// </summary>
         DataGridViewCellStyle _disabledCellStyle;
 
+        /// <summary>
+        /// [DataEntry:920] As a workaround for some table issues, some OnValidating calls will be
+        /// skipped.
+        /// </summary>
+        bool _skipValidating;
+
         #endregion Fields
 
         #region Delegates
@@ -1199,6 +1205,30 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Raises the <see cref="Control.Layout"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="LayoutEventArgs"/> that contains the event data.</param>
+        protected override void OnLayout(LayoutEventArgs e)
+        {
+            try
+            {
+                base.OnLayout(e);
+
+                // [DataEntry:920]
+                // If a layout is called with "Bounds" as the affected property, if the next
+                // base.OnValidating() call is allowed to happen it will trigger an exception.
+                if (e.AffectedProperty == "Bounds")
+                {
+                    _skipValidating = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29882", ex);
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Validating"/> event to prevent edit mode from ending as
         /// a result of the DEP losing focus.
         /// </summary>
@@ -1222,7 +1252,21 @@ namespace Extract.DataEntry
                 }
                 else
                 {
-                    base.OnValidating(e);
+                    // [DataEntry:920]
+                    // Even without the above code, calling into the base class's OnValidating
+                    // here (or in the complete absense of this override) will, under some
+                    // circumstances, result in a null reference exception. I can't find any
+                    // reference to a known .Net issue so I'm not sure if it is a .Net issue or
+                    // perhaps an unexpected state the table is in at the time this is called.
+                    // While it doesn't seem advisable to avoid calling the base OnValidating,
+                    // even if exceptions from base.OnValidating are caught and eaten you can still
+                    // end up with issues such as misplaced dropdowns (#918). As a consequence,
+                    // DataEntry tables will not support raising the Validating event.
+                    // Therefore, skip the base class OnValidating when specified. 
+                    if (!_skipValidating)
+                    {
+                        base.OnValidating(e);
+                    }
                 }
             }
             catch (Exception ex)
@@ -1230,6 +1274,10 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI29181", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
+            }
+            finally
+            {
+                _skipValidating = false;
             }
         }
 
