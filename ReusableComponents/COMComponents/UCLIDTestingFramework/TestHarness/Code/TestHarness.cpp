@@ -63,17 +63,9 @@ void printUsage()
 //-------------------------------------------------------------------------------------------------
 void checkLicensing()
 {
-	// Load license file(s) using Special Simple Rule Writing passwords
+	// Load license file(s) with default passwords
 	LicenseManagement::sGetInstance().loadLicenseFilesFromFolder( LICENSE_MGMT_PASSWORD,
-		gnSIMPLE_RULE_WRITING_PASSWORDS );
-
-	// Check to see if a license file was loaded that licenses Core Rule Writing
-	if (!LicenseManagement::sGetInstance().isLicensed( gnRULE_WRITING_CORE_OBJECTS ))
-	{
-		// Try again with default passwords
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder( LICENSE_MGMT_PASSWORD,
-			gnDEFAULT_PASSWORDS );
-	}
+		gnDEFAULT_PASSWORDS );
 
 	// Check the license one last time
 	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI21334", "Test Harness" );
