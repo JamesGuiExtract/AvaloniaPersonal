@@ -387,8 +387,84 @@
 		finish without failure.
 	</UL>
 	</li>
-	</UL>
+</UL>
 <p>
+
+<LI><h2>Support for AnywhereUSB Device</h2>
+<UL>
+	<li><b>Setup</b>
+	<ul>
+	  	<LI>Confirm that the hardware has power and is connected to an ethernet port.
+		<li>Run <b>I:\Common\Engineering\Tools\Utils\AnywhereUSB\AWSplash.exe</b> to install the 
+		appropriate drivers on the test machine.
+		<li>Run <b>AnywhereUSB Concentrator Configuration Utility</b> from the Start menu 
+		to assign an IP address
+		<ul>
+			<li>Click the <b>Configure</b> button.
+			<ul>
+				<li>Provide a device name such as <b>USBAnywhere</b>.
+				<li>Click the <b>Enable</b> button in the DHCP group box.
+				<li>Click the <b>Update</b> button.
+				<li>Click the <b>Close</b> button.
+			</ul>
+			<li>Click the <b>Connect</b> button.
+		</ul>
+	</ul>
+<p>
+	<li><b>Basic Functionality</b>
+	<ul>
+		<li>Attach a USB key to the <b>AnywhereUSB</b> device.
+		<li>Use the <b>USB License Key Manager</b> utility to confirm that the USB key 
+		is visible as a <b>local</b> device.
+		<li>Confirm that rules will run and properly decrement each USB counter
+		<ul>
+			<li>Indexing
+			<li>Pagination
+			<li>Redaction
+		</ul>
+		<li>Confirm that drivers can be installed on a virtual machine allowing access to 
+		the <b>(local)</b> USB key.
+		<li>Install <b>Extract Systems LM</b> and confirm that the <b>Field Activation Utility</b> 
+		can successfully update each counter value
+		<ul>
+			<li>Indexing
+			<li>Pagination
+			<li>Redaction
+		</ul>
+	</ul>
+<p>
+	<li><b>Complex Functionality</b>
+	<ul>
+		<li>Install the AnywhereUSB drivers on another test machine.
+		<li><u>Single-user key</u>
+		<ul>
+			<li>Confirm that each test machine can see the USB key.
+			<li>Confirm that each test machine can individually run rules and decrement 
+			the USB counter.
+			<li>Confirm that a meaningful exception is displayed if both test machines 
+			attempt to use the key at the same time.
+		</ul>
+		<li><u>Multiple-user key</u>
+		<ul>
+			<li>Confirm that each test machine can see the USB key.
+			<li>Confirm that each test machine can individually run rules and decrement 
+			the USB counter.
+			<li>Confirm that each test machine can simultaneously run rules and decrement 
+			the USB counter.
+		</ul>
+<p>
+		<li>Adjust the <b>NumberOfUSBKeyRetries</b> and <b>WaitTimeoutUSBKeyRetry</b> 
+		keys under <b>HKLM\Software\Extract Systems\SafeNetUtils</b> to make 
+		the following tests more manageable.
+		<li>Confirm that FLEX Index and ID Shield recover gracefully from the removal and later 
+		replacement of the USB key.
+		<li>Confirm that FLEX Index and ID Shield recover gracefully from the stop and later 
+		restart of the <b>Sentinel Protection Server</b> service.
+	</ul>
+</UL>
+</LI>
+<p>
+
 <LI><h2>Miscellaneous</h2>
 <ul>
 	<li><b>[LegacyRC #5098, #5109]</b> Deadlock on USB key
