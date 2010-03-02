@@ -146,8 +146,7 @@ STDMETHODIMP CRedactionTaskPP::Apply()
 			if (m_chkPdfSecurity.GetCheck() == BST_CHECKED)
 			{
 				IMustBeConfiguredObjectPtr ipConfigure = m_ipPdfSettings;
-				ASSERT_RESOURCE_ALLOCATION("ELI29813", ipConfigure != NULL);
-				if (ipConfigure->IsConfigured() == VARIANT_FALSE)
+				if (ipConfigure == NULL || ipConfigure->IsConfigured() == VARIANT_FALSE)
 				{
 					MessageBox("Pdf security settings are not configured properly.",
 						"PDF Security Not Configured", MB_ICONERROR);
