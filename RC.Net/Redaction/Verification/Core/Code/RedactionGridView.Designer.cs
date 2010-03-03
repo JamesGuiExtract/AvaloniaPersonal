@@ -63,6 +63,7 @@ namespace Extract.Redaction.Verification
             // _dataGridView
             // 
             this._dataGridView.AllowUserToAddRows = false;
+            this._dataGridView.AllowUserToDeleteRows = false;
             this._dataGridView.AllowUserToResizeRows = false;
             this._dataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this._dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
