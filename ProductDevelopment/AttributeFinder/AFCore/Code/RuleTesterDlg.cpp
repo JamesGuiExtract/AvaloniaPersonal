@@ -352,6 +352,8 @@ void RuleTesterDlg::OnButtonExecute()
 
 	try
 	{
+		CWaitCursor wait;
+
 		// Disable the tool bar buttons while executing rules
 		updateButtonStates(true);
 
@@ -372,6 +374,10 @@ void RuleTesterDlg::OnButtonExecute()
 		// get the current text from the input property page
 		// also get the current source document name
 		ISpatialStringPtr ipInputText = m_testerDlgInputPage.getText();
+
+		// Redraw the window to update button states and to display new text if the input file has
+		// changed since the text was last loaded.
+		RedrawWindow();
 
 		// if no input text is available, clear the results grid, and return
 		// Allow processing even if ipInputText->IsEmpty() == VARIANT_TRUE
@@ -878,12 +884,10 @@ void RuleTesterDlg::processDroppedFile(char *pszFile)
 	}
 
 	// notify the input property page that a file has been dragged-and-dropped
-	if (m_testerDlgInputPage.notifyFileDropped(pszFile))	
-	{
-		// the file was opened successfully - set the input page as the
-		// active page so that the user can see what the file contents are
-		m_propSheet.SetActivePage(&m_testerDlgInputPage);
-	}
+	m_testerDlgInputPage.inputFileChanged(pszFile);
+
+	// Set the input page as the active page so that the user can see what the file contents are.
+	m_propSheet.SetActivePage(&m_testerDlgInputPage);
 }
 //-------------------------------------------------------------------------------------------------
 ISpotRecognitionWindowPtr RuleTesterDlg::createNewSRIRWindow()

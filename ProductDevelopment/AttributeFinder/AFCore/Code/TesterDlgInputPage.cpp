@@ -18,9 +18,6 @@
 
 #include <io.h>
 
-#include <string>
-using namespace std;
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -38,7 +35,8 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 TesterDlgInputPage::TesterDlgInputPage()
 : CPropertyPage(TesterDlgInputPage::IDD), 
   m_pTesterConfigMgr(NULL),
-  m_ipOCREngine(NULL)
+  m_ipOCREngine(NULL),
+  m_strCurrentInputFile("")
 {
 	try
 	{
@@ -83,6 +81,7 @@ BEGIN_MESSAGE_MAP(TesterDlgInputPage, CPropertyPage)
 	ON_WM_SIZE()
 	ON_BN_CLICKED(ID_BROWSE, OnBrowse)
 	ON_CBN_SELCHANGE(IDC_COMBO_INPUT, OnSelchangeComboInput)
+	ON_EN_KILLFOCUS(IDC_EDIT_FILE, OnKillFocusEditFile)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -281,7 +280,7 @@ void TesterDlgInputPage::OnBrowse()
 			// as what we would want to do if that file was dragged-and-dropped
 			// into this window - so just call that method to prevent
 			// code duplication
-			notifyFileDropped((LPCTSTR) fileDlg.GetPathName());
+			inputFileChanged((LPCTSTR) fileDlg.GetPathName());
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04890")
@@ -344,7 +343,11 @@ void TesterDlgInputPage::OnSelchangeComboInput()
 
 		// set the "new" input type as the current input type
 		m_strCurrentInputType = strNewInputType;
-		
+
+		// Determine if text from file input is being used, but the specified file does not exist.
+		bool bInvalidInputFileSpecified = (m_strCurrentInputFile.empty()  &&
+			m_strCurrentInputType == TesterConfigMgr::gstrTEXTFROMFILE);
+
 		// restore the last text stored for the new input type
 		// if there is no entry in the map of input type to text for the
 		// currently selected, input type, then associate an empty string
@@ -370,9 +373,20 @@ void TesterDlgInputPage::OnSelchangeComboInput()
 		string strText = _bstrText;
 		m_editInput.SetWindowText(strText.c_str());
 
+		// The text input box should be read only if ipSpatialText has spatial info or if file input
+		// is selected but the specified file does not exist.
+		BOOL bMakeTextReadonly =
+			asMFCBool(bInvalidInputFileSpecified || asCppBool(ipSpatialText->HasSpatialInfo()));
+
+		if (bInvalidInputFileSpecified)
+		{
+			// Indicate that the specified file cannot be found
+			m_editInput.SetWindowText("[File not found]");
+		}
+
 		// if the text associated with the current input type is spatial then
 		// make the edit box into a readonly editbox
-		m_editInput.SetReadOnly(asMFCBool( ipSpatialText->HasSpatialInfo() ));
+		m_editInput.SetReadOnly(bMakeTextReadonly);
 
 		// remember the last used input type
 		m_pTesterConfigMgr->setLastInputType(m_strCurrentInputType);
@@ -381,6 +395,18 @@ void TesterDlgInputPage::OnSelchangeComboInput()
 		resizeControls();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04889")
+}
+//--------------------------------------------------------------------------------------------------
+void TesterDlgInputPage::OnKillFocusEditFile()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		inputFileChanged();		
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29888")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -544,9 +570,15 @@ ISpatialStringPtr TesterDlgInputPage::getText()
 		return NULL;
 	}
 
+	// If the input is a file, call inputFileChanged in case the filename has changed since the file
+	// was last loaded.
+	if (m_strCurrentInputType == TesterConfigMgr::gstrTEXTFROMFILE)
+	{
+		inputFileChanged();
+	}
 	// if the edit box is not-readonly, then the user
 	// could have made some changes to it
-	if (!(m_editInput.GetStyle() & ES_READONLY))
+	else if (!(m_editInput.GetStyle() & ES_READONLY))
 	{
 		// get the current text in the editbox
 		CString	zInputText;
@@ -593,14 +625,41 @@ ISpatialStringPtr TesterDlgInputPage::getText()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool TesterDlgInputPage::notifyFileDropped(const string& strFileName)
+void TesterDlgInputPage::inputFileChanged(string strFileName/* = */)
 {
 	try
 	{
 		CWaitCursor wait;
 
-		// open the specified file and update the internal map 
-		ISpatialStringPtr ipSpatialString = openFile(strFileName);
+		ISpatialStringPtr ipSpatialString(CLSID_SpatialString);
+
+		// If no filename is specified, use the text in m_editFile.
+		if (strFileName.empty())
+		{
+			CString	zInputFile;
+			m_editFile.GetWindowText(zInputFile);
+			strFileName = (LPCTSTR)zInputFile;
+		}
+
+		// If the filename has not changed since the last call, just return and use the current
+		// text.
+		if (strFileName == m_strCurrentInputFile)
+		{
+			return;
+		}
+
+		if (isValidFile(strFileName))
+		{
+			// Open the specified file 
+			ipSpatialString = openFile(strFileName);
+			m_strCurrentInputFile = strFileName;
+		}
+		else
+		{
+			m_strCurrentInputFile = "";
+		}
+
+		// Update the internal map 
 		m_mapInputTypeToText[TesterConfigMgr::gstrTEXTFROMFILE] = ipSpatialString;
 
 		// set the current combo box selection to input-from-file
@@ -624,13 +683,8 @@ bool TesterDlgInputPage::notifyFileDropped(const string& strFileName)
 		// Get and store the actual file name
 		string	strFile = getFileNameFromFullPath(strFileName);
 		m_pTesterConfigMgr->setLastFileName(strFile);
-		
-		return true;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05251")
-
-	// if we reached here, then something went wrong.  So, return false
-	return false;
 }
 //-------------------------------------------------------------------------------------------------
 IOCREnginePtr TesterDlgInputPage::getOCREngine()

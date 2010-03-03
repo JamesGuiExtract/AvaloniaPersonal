@@ -7,6 +7,7 @@ class TesterConfigMgr;
 
 #include <string>
 #include <map>
+using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 // TesterDlgInputPage dialog
@@ -22,9 +23,9 @@ public:
 	void setTesterConfigMgr(TesterConfigMgr *pTesterConfigMgr);
 	void notifyImageWindowInputReceived(ISpatialStringPtr ipSpatialText);
 
-	// PROMISE: To return true only if the specified file was successfully
-	//			read in.
-	bool notifyFileDropped(const std::string& strFileName);
+	// PROMISE: Attempts to read in the specified file. If strFileName is not specified or empty it
+	// will use the text in IDC_EDIT_FILE as the source file name.
+	void inputFileChanged(string strFileName = "");
 	
 	// get current text from the input page
 	ISpatialStringPtr getText();
@@ -51,7 +52,7 @@ public:
 
 // Implementation
 protected:
-	ISpatialStringPtr openFile(const std::string& strFileName);
+	ISpatialStringPtr openFile(const string& strFileName);
 
 	// Generated message map functions
 	//{{AFX_MSG(TesterDlgInputPage)
@@ -59,6 +60,7 @@ protected:
 	afx_msg void OnBrowse();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSelchangeComboInput();
+	afx_msg void OnKillFocusEditFile();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
@@ -81,12 +83,14 @@ private:
 	// Variables
 	//////////////////
 
-	std::map<std::string, ISpatialStringPtr> m_mapInputTypeToText;
-	std::string m_strCurrentInputType;
+	map<string, ISpatialStringPtr> m_mapInputTypeToText;
+	string m_strCurrentInputType;
 
 	TesterConfigMgr *m_pTesterConfigMgr;
 
 	IOCREnginePtr m_ipOCREngine;
+
+	string m_strCurrentInputFile;
 };
 
 //{{AFX_INSERT_LOCATION}}
