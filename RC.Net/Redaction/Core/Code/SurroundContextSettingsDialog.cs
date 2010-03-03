@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace Extract.Redaction
 {
@@ -103,10 +104,28 @@ namespace Extract.Redaction
                 if (dataTypes.Length == 0)
                 {
                     _dataTypesTextBox.Focus();
-                    MessageBox.Show("Please specify data types to extend.", "Invalid data types", 
-                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 
+                    MessageBox.Show("Please specify data types to extend.", "Invalid data types",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1,
                         0);
                     return true;
+                }
+                else
+                {
+                    Regex regex = new Regex("^[_a-zA-Z][a-zA-Z0-9_]*");
+
+                    // Need to validate that the specified data types are valid identifiers
+                    foreach (string dataType in dataTypes)
+                    {
+                        if (!regex.IsMatch(dataType))
+                        {
+                            _dataTypesTextBox.Focus();
+                            MessageBox.Show("Data types must be valid identifiers. "
+                                + "Valid identifers must match the pattern ^[_a-zA-Z][_a-zA-Z0-9]*",
+                                "Invalid data types", MessageBoxButtons.OK, MessageBoxIcon.None,
+                                MessageBoxDefaultButton.Button1, 0);
+                            return true;
+                        }
+                    }
                 }
             }
 
