@@ -333,8 +333,9 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             // DemoFlexIndexPanel
             // 
             this.ApplicationTitle = "FLEX Index Demo";
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.ApplicationIcon = Extract.DataEntry.DEP.DemoFlexIndex.Properties.Resources.FlexDataEntryIcon;
+            this.AboutLogo = Extract.DataEntry.DEP.DemoFlexIndex.Properties.Resources._flexIndexLogo;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.Controls.Add(this._documentTypeComboBox);
             this.Controls.Add(this._legalDescriptionLabel);
             this.Controls.Add(this._legalDescriptionTable);
