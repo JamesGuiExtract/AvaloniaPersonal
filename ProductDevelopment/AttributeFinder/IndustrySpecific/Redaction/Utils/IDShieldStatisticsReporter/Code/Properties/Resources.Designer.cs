@@ -59,5 +59,12 @@ namespace Extract.IDShieldStatisticsReporter.Properties {
                 resourceCulture = value;
             }
         }
+        
+        internal static System.Drawing.Icon IDShieldTester {
+            get {
+                object obj = ResourceManager.GetObject("IDShieldTester", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }

@@ -186,6 +186,9 @@ namespace Extract.IDShieldStatisticsReporter
                         memento.Restore(this);
                     }
                 }
+
+                // Set the form Icon to the IDShieldTester Icon
+                Icon = Resources.IDShieldTester;
             }
             catch (Exception ex)
             {
