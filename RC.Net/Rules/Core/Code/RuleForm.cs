@@ -327,11 +327,12 @@ namespace Extract.Rules
                 // Reset the find dialog before hiding
                 ResetFindDialog();
 
+                // Restore the focus to its owner [FIDSC #3952]
+                // This is done before Hide() to prevent flicker.
+                Owner.Focus();
+
                 // Hide the form
                 Hide();
-
-                // Restore the focus to its owner [FIDSC #3952]
-                Owner.Focus();
             }
             catch (Exception ex)
             {
@@ -638,33 +639,8 @@ namespace Extract.Rules
         /// <param name="e">An <see cref="EventArgs"/> containing the event data.</param>
         void HandleCloseButton(object sender, EventArgs e)
         {
-            // Reset the find dialog before hiding the form
-            ResetFindDialog();
-
-            // Hide the form
-            Hide();
+            Close();
         }
-
-        //        /// <summary>
-        //        /// This should eventually  be able to be used to prevent resizing of columns.
-        //        /// However, I was not able to get this to be called. (IDSD:304)
-        //        /// </summary>
-        //        /// <param name="sender">Temp</param>
-        //        /// <param name="e">Temp</param>
-        //        void HandleResultsListColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
-        //        {
-        //            try
-        //            {
-        //                e.Cancel = true;
-        //                e.NewWidth = this._resultsList.Columns[e.ColumnIndex].Width;
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                ExtractException ee = ExtractException.AsExtractException("ELI23323", ex);
-        //                ee.AddDebugData("Event Args", e, false);
-        //                ee.Display();
-        //            }
-        //        }
 
         #endregion Event Handlers
 
