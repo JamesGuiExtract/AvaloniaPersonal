@@ -372,7 +372,7 @@ namespace Extract.Utilities.Parsers
                     List<string> searchTokens = GetSearchTokens(match);
 
                     ExtractException.Assert("ELI28335", "Number of fuzzy search errors allowed " +
-                        "cannot be less than the length of the string to search for.",
+                        "cannot be more than the length of the string to search for.",
                         options.ErrorsAllowed <= searchTokens.Count);
 
                     // Create expression prefix to initialize error and extra space stack counts.

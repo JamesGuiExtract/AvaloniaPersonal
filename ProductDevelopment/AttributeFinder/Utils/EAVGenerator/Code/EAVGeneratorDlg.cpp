@@ -1021,6 +1021,15 @@ void CEAVGeneratorDlg::saveAttributesToVOA(const CString& zFileName)
 			ipAttribute->Name = strAttribName.c_str();
 		}
 
+		IIUnknownVectorPtr ipSubAttributes = ipAttribute->GetSubAttributes();
+		ASSERT_RESOURCE_ALLOCATION("ELI29887", ipSubAttributes != NULL);
+
+		// [LegacyRCAndUtils:5677]
+		// This method will be adding sub-attributes as necessary using the current list, but
+		// sub-attributes may already exist from a previous call to save. Ensure each attribute
+		// processed here starts with an empty set of sub-attributes.
+		ipSubAttributes->Clear();
+
 		// Add Attribute to collection
 		if (uiLevel > 0)
 		{
@@ -1040,7 +1049,7 @@ void CEAVGeneratorDlg::saveAttributesToVOA(const CString& zFileName)
 
 			// Level one collection is the collection of sub-attributes
 			// of the new attribute
-			m_vecCurrentLevels.push_back( ipAttribute->GetSubAttributes() );
+			m_vecCurrentLevels.push_back(ipSubAttributes);
 		}
 	}
 
