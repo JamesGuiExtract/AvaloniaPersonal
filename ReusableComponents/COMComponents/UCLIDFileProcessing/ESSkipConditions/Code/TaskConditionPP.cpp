@@ -325,7 +325,8 @@ bool CTaskConditionPP::updateRequiresConfig(IFileProcessingTaskPtr ipTask)
 
 	// Enable/Disable the configure button as necessary
 	ISpecifyPropertyPagesPtr ipPP(ipTask);
-	m_btnConfigure.EnableWindow(ipPP ? TRUE : FALSE);
+	IConfigurableObjectPtr ipConfigurable(ipTask);
+	m_btnConfigure.EnableWindow((ipPP != NULL || ipConfigurable != NULL) ? TRUE : FALSE);
 
 	// Check configuration status
 	IMustBeConfiguredObjectPtr ipRuleConfig(ipTask);
