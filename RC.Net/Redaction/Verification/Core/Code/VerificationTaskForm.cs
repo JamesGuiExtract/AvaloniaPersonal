@@ -58,6 +58,12 @@ namespace Extract.Redaction.Verification
             FileSystemMethods.ApplicationDataPath, "ID Shield", "VerificationForm.xml");
 
         /// <summary>
+        /// The full path to the ID Shield help file.
+        /// </summary>
+        static readonly string _HELP_FILE = FileSystemMethods.PathCombine(
+            FileSystemMethods.ExtractSystemsPath, "IDShield", "Help", "IDShield.chm");
+
+        /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(VerificationTaskForm).ToString();
@@ -1831,7 +1837,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // TODO: Implement me
+                Help.ShowHelp(this, _HELP_FILE);
             }
             catch (Exception ex)
             {
@@ -1850,7 +1856,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // TODO: Implement me
+                using (VerificationAboutBox about = new VerificationAboutBox())
+                {
+                    about.ShowDialog();
+                }
             }
             catch (Exception ex)
             {
