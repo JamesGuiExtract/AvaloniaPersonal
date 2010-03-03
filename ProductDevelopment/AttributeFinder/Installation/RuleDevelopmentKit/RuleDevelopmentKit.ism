@@ -337,6 +337,7 @@
 		<row><td>StringPatternMatcherAutoTest.dll</td><td>{1E6802EF-175A-4CED-8005-F1EE56BC261E}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>StringPatternMatcherAutoTest</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>TestingFiles</td><td>{C97C3820-7F9D-4F29-82CA-75EB2D334DD2}</td><td>TESTINGFILES</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDTestingComponentCore.dll</td><td>{F2E949E8-E546-4D51-8DBE-827330B11D71}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>VBScriptUtils.dll</td><td>{40C916DB-9296-4317-A747-9D7A0B03D5D7}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>vbscriptutils.dll</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -1173,6 +1174,7 @@
 		<row><td>RDTComponents</td><td>RedactionFiles</td></row>
 		<row><td>RDTComponents</td><td>RedactionTester.dll</td></row>
 		<row><td>RDTComponents</td><td>UCLIDTestingComponentCore.dll</td></row>
+		<row><td>RDTComponents</td><td>VBScriptUtils.dll</td></row>
 		<row><td>TestingFiles</td><td>AFValueFinderTest.dll</td></row>
 		<row><td>TestingFiles</td><td>BaseUtilsTest.dll</td></row>
 		<row><td>TestingFiles</td><td>HighlightedTextIRAutoTest.dll</td></row>
@@ -1215,6 +1217,7 @@
 		<row><td>rasterzonetester.dll</td><td>RasterZoneTester.dll</td><td>RASTER~1.DLL|RasterZoneTester.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\RasterZoneTester.dll</td><td>1</td><td/></row>
 		<row><td>redactioncc.dll</td><td>RedactionCC.dll</td><td>REDACT~1.DLL|RedactionCC.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\RedactionCC.dll</td><td>1</td><td/></row>
 		<row><td>redactiontester.dll</td><td>RedactionTester.dll</td><td>REDACT~1.DLL|RedactionTester.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\RedactionTester.dll</td><td>1</td><td/></row>
+		<row><td>vbscriptutils.dll</td><td>VBScriptUtils.dll</td><td>VBSCRI~1.DLL|VBScriptUtils.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\VBScriptUtils.dll</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -1489,6 +1492,7 @@
 		<row><td>StringPatternMatcherAutoTest.dll</td><td/><td/><td>_AA118805_3A14_4A0E_B7CB_25906C303381_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>TestingFiles</td><td/><td/><td>_81C4664D_777A_47D8_AEA7_A11246505350_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UCLIDTestingComponentCore.dll</td><td/><td/><td>_A2608FFE_BAE3_4AD7_9D1F_252EFB35F607_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>VBScriptUtils.dll</td><td/><td/><td>_B80EBD64_7A94_4F19_AF3D_0473E3344C86_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
