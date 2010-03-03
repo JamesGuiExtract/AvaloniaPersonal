@@ -50,6 +50,8 @@ const string gstrFILES_WITH_EXPECTED_REDACTIONS = "\\SensitiveFiles_All.txt";
 const string gstrFILES_WITH_NO_EXPECTED_REDACTIONS = "\\InsensitiveFiles_All.txt";
 const string gstrFILES_WITH_FOUND_REDACTIONS = "\\Files_AtLeastOneFoundRedaction.txt";
 const string gstrFILES_WITH_NO_FOUND_REDACTIONS = "\\Files_NoFoundRedactions.txt";
+const string gstrFILES_WITH_OVERLAPPING_EXPECTED_REDACTIONS =
+											"\\Files_AtLeastOneOverlappingExpectedRedaction.txt";
 
 // Files output in analyzeDataForVerificationBasedRedaction
 const string gstrFILES_CORRECTLY_SELECTED_FOR_REVIEW = 
@@ -1121,6 +1123,8 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 	if (ulNumOverlappingExpected > 0)
 	{
 		m_ulNumFilesWithOverlappingExpectedRedactions++;
+		appendToFile(strSourceDoc,
+			m_strOutputFileDirectory + gstrFILES_WITH_OVERLAPPING_EXPECTED_REDACTIONS);
 
 		string strNumOverLappingExpected = "Number of overlapping sensitive data items: " +
 			asString(ulNumOverlappingExpected);
