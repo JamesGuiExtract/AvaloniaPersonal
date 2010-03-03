@@ -672,12 +672,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactImporter", "..\..
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VBScriptUtils", "..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcproj", "{68909F26-2CCE-4707-926B-446E931E0D8F}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 68
+		ProjectCount = 69
 		ProjectRelativeDiskPath1 = ..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcproj
 		ProjectRelativeDiskPath2 = ..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcproj
 		ProjectRelativeDiskPath3 = ..\..\ChangeCase\ChangeCase.vcproj
@@ -746,6 +756,7 @@ Global
 		ProjectRelativeDiskPath66 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Code\SQLCDBEditor.csproj
 		ProjectRelativeDiskPath67 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
 		ProjectRelativeDiskPath68 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
+		ProjectRelativeDiskPath69 = ..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1436,6 +1447,16 @@ Global
 		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Win32.ActiveCfg = Release|Any CPU
+		{68909F26-2CCE-4707-926B-446E931E0D8F}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{68909F26-2CCE-4707-926B-446E931E0D8F}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{68909F26-2CCE-4707-926B-446E931E0D8F}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{68909F26-2CCE-4707-926B-446E931E0D8F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{68909F26-2CCE-4707-926B-446E931E0D8F}.Debug|Win32.Build.0 = Debug|Win32
+		{68909F26-2CCE-4707-926B-446E931E0D8F}.Release|Any CPU.ActiveCfg = Release|Win32
+		{68909F26-2CCE-4707-926B-446E931E0D8F}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{68909F26-2CCE-4707-926B-446E931E0D8F}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{68909F26-2CCE-4707-926B-446E931E0D8F}.Release|Win32.ActiveCfg = Release|Win32
+		{68909F26-2CCE-4707-926B-446E931E0D8F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

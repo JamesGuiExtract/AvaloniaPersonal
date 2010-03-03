@@ -5,6 +5,10 @@
 	Name="VBScriptUtils"
 	ProjectGUID="{68909F26-2CCE-4707-926B-446E931E0D8F}"
 	RootNamespace="ExtractVBScriptUtils"
+	SccProjectName="VBScriptUtils"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	Keyword="AtlProj"
 	>
 	<Platforms>
@@ -53,7 +57,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\Utils\Code;..\..\..\BaseUtils\Code;..\..\..\APIs\LeadTools_14\include"
+				AdditionalIncludeDirectories="..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\Utils\Code;..\..\..\BaseUtils\Code;..\..\..\APIs\LeadTools_16.5\include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -150,7 +154,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\Utils\Code;..\..\..\BaseUtils\Code;..\..\..\APIs\LeadTools_14\include"
+				AdditionalIncludeDirectories="..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\Utils\Code;..\..\..\BaseUtils\Code;..\..\..\APIs\LeadTools_16.5\include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
