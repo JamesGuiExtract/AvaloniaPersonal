@@ -81,6 +81,13 @@ namespace Extract.Redaction.Verification.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap IDShield {
+            get {
+                object obj = ResourceManager.GetObject("IDShield", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap LastExemption {
             get {
                 object obj = ResourceManager.GetObject("LastExemption", resourceCulture);

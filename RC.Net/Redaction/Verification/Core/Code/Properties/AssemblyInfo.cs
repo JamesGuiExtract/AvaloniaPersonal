@@ -11,7 +11,7 @@ using System.Resources;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems LLC")]
-[assembly: AssemblyProduct("Extract.Redaction.Verification")]
+[assembly: AssemblyProduct("ID Shield")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

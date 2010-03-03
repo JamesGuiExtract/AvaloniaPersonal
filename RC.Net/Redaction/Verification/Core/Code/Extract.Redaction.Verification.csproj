@@ -158,6 +158,12 @@
       <DependentUpon>RedactionGridView.cs</DependentUpon>
     </Compile>
     <Compile Include="RedactionCounts.cs" />
+    <Compile Include="VerificationAboutBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VerificationAboutBox.Designer.cs">
+      <DependentUpon>VerificationAboutBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="VerificationMemento.cs" />
     <Compile Include="VerificationOptions.cs" />
     <Compile Include="VerificationOptionsDialog.cs">
@@ -342,6 +348,10 @@
       <SubType>Designer</SubType>
       <DependentUpon>RedactionGridView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="VerificationAboutBox.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>VerificationAboutBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VerificationOptionsDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>VerificationOptionsDialog.cs</DependentUpon>
@@ -381,6 +391,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\FindWords.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\IDShield.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
