@@ -459,9 +459,6 @@ namespace Extract.Redaction.Verification
             // Ensure HasContainedRedactions is set to true if the _redactionGridView was saved with
             // redactions present.
             memento.HasContainedRedactions |= _redactionGridView.HasRedactions;
-
-            // The next time the redactions are read, don't toggle off non-output redactions
-            memento.ToggleOffRedactions = false;
         }
 
         /// <summary>
@@ -1352,8 +1349,7 @@ namespace Extract.Redaction.Verification
         {
             // Load the voa
             VerificationMemento memento = GetCurrentDocument();
-            _currentVoa.LoadFrom(memento.AttributesFile, memento.SourceDocument, 
-                memento.ToggleOffRedactions);
+            _currentVoa.LoadFrom(memento.AttributesFile, memento.SourceDocument);
 
             // Set the controls
             _redactionGridView.LoadFrom(_currentVoa, memento.VisitedRedactions);
@@ -1591,7 +1587,7 @@ namespace Extract.Redaction.Verification
                     return; 
                 }
 
-                // TODO: Also check if the main document is dirty, but not in view.
+                // Warn if the currently processing document is dirty
                 if (WarnIfDirty())
                 {
                     e.Cancel = true;

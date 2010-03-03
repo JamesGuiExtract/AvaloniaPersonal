@@ -212,20 +212,6 @@ namespace Extract.Redaction
         /// <paramref name="fileName"/>.</param>
         public void LoadFrom(string fileName, string sourceDocument)
         {
-            LoadFrom(fileName, sourceDocument, true);
-        }
-
-        /// <summary>
-        /// Loads the contents of the voa file from the specified file.
-        /// </summary>
-        /// <param name="fileName">The vector of attributes (VOA) file to load.</param>
-        /// <param name="sourceDocument">The source document corresponding to the 
-        /// <paramref name="fileName"/>.</param>
-        /// <param name="toggleOffRedactions"><see langword="true"/> if non-output redactions 
-        /// should be toggled off; <see langword="false"/> if non-output redactions should remain 
-        /// in their current state.</param>
-        public void LoadFrom(string fileName, string sourceDocument, bool toggleOffRedactions)
-        {
             try
             {
                 _sensitiveItems = new List<SensitiveItem>();
@@ -240,7 +226,7 @@ namespace Extract.Redaction
                 if (File.Exists(fileName))
                 {
                     // Load the attributes from the file
-                    LoadVoa(fileName, toggleOffRedactions);
+                    LoadVoa(fileName);
                 }
             }
             catch (Exception ex)
@@ -256,10 +242,7 @@ namespace Extract.Redaction
         /// Loads the contents of the voa file from the specified file.
         /// </summary>
         /// <param name="fileName">The vector of attributes (VOA) file to load.</param>
-        /// <param name="toggleOffRedactions"><see langword="true"/> if non-output redactions 
-        /// should be toggled off; <see langword="false"/> if non-output redactions should remain 
-        /// in their current state.</param>
-        void LoadVoa(string fileName, bool toggleOffRedactions)
+        void LoadVoa(string fileName)
         {
             // Load the attributes from the file
             IUnknownVector attributes = new IUnknownVector();
@@ -280,17 +263,14 @@ namespace Extract.Redaction
             foreach (ConfidenceLevel level in _levels)
             {
                 IUnknownVector current = utility.QueryAttributes(attributes, level.Query, true);
-                AddAttributes(current, level, toggleOffRedactions);
+                AddAttributes(current, level);
 
                 IUnknownVector previous = utility.QueryAttributes(revisions, level.Query, false);
                 AddNonOutputAttributes(previous, level, revisions);
             }
 
-            // Ensure all sensitive items have attribute ids
-            foreach (SensitiveItem item in _sensitiveItems)
-            {
-                AssignId(item.Attribute);
-            }
+            // Ensure all sensitive items have attribute ids and are in their initial toggled state
+            InitializeSensitiveItems(_sensitiveItems);
 
             // Determine the next attribute id
             _nextId = GetNextId(_sensitiveItems, _revisionsAttribute);
@@ -398,11 +378,7 @@ namespace Extract.Redaction
         /// </summary>
         /// <param name="attributes">The attributes to add.</param>
         /// <param name="level">The confidence level of the <paramref name="attributes"/>.</param>
-        /// <param name="toggleOffRedactions"><see langword="true"/> if non-output redactions 
-        /// should be toggled off; <see langword="false"/> if non-output redactions should remain 
-        /// in their current state.</param>
-        void AddAttributes(IUnknownVector attributes, ConfidenceLevel level, 
-            bool toggleOffRedactions)
+        void AddAttributes(IUnknownVector attributes, ConfidenceLevel level)
         {
             // Iterate over the attributes
             int count = attributes.Size();
@@ -414,13 +390,7 @@ namespace Extract.Redaction
                 SpatialString value = attribute.Value;
                 if (value.HasSpatialInfo())
                 {
-                    SensitiveItem item = new SensitiveItem(level, attribute);
-                    if (toggleOffRedactions && !level.Output)
-                    {
-                        item.Attribute.Redacted = false;
-                    }
-
-                    _sensitiveItems.Add(item);
+                    _sensitiveItems.Add(new SensitiveItem(level, attribute));
                 }
                 else
                 {
@@ -485,17 +455,39 @@ namespace Extract.Redaction
         }
 
         /// <summary>
+        /// Assigns the ID and initial redacted state of the specified sensitive items.
+        /// </summary>
+        /// <param name="sensitiveItems">The sensitive items to initialize.</param>
+        void InitializeSensitiveItems(IEnumerable<SensitiveItem> sensitiveItems)
+        {
+            foreach (SensitiveItem item in sensitiveItems)
+            {
+                bool assigned = AssignId(item.Attribute);
+                if (assigned)
+                {
+                    // Set the toggled state if this is the first time the attribute was loaded
+                    // [FIDSC #4026]
+                    item.Attribute.Redacted = item.Level.Output;
+                }
+            }
+        }
+
+        /// <summary>
         /// Adds an unique id attribute to the specified attribute if it does not already contain 
         /// one.
         /// </summary>
         /// <param name="attribute">The attribute to which an id may be added.</param>
-        void AssignId(RedactionItem attribute)
+        /// <returns><see langword="true"/> if the attribute was assigned an ID;
+        /// <see langword="false"/> if the attribute already had an ID.</returns>
+        bool AssignId(RedactionItem attribute)
         {
             bool idAdded = attribute.AssignIdIfNeeded(_nextId, _sourceDocument);
             if (idAdded)
             {
                 _nextId++;
             }
+
+            return idAdded;
         }
 
         /// <summary>

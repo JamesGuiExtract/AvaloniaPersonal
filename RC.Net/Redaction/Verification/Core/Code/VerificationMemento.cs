@@ -62,12 +62,6 @@ namespace Extract.Redaction.Verification
         bool _hasContainedRedactions;
 
         /// <summary>
-        /// <see langword="true"/> if non-output redactions should be toggled off when loaded; 
-        /// <see langword="false"/> if non-output redactions should not be toggled off.
-        /// </summary>
-        bool _toggleOffRedactions = true;
-
-        /// <summary>
         /// A collection of the visited 0-based page numbers.
         /// </summary>
         VisitedItemsCollection _visitedPages;
@@ -237,23 +231,6 @@ namespace Extract.Redaction.Verification
             set
             {
                 _hasContainedRedactions = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether non-output redactions should be toggled off.
-        /// </summary>
-        /// <value><see langword="true"/> if non-output redactions should be toggled off;
-        /// <see langword="false"/> if non-output redactions should not be toggled off.</value>
-        public bool ToggleOffRedactions
-        {
-            get 
-            {
-                return _toggleOffRedactions;
-            }
-            set
-            {
-                _toggleOffRedactions = value;
             }
         }
 
