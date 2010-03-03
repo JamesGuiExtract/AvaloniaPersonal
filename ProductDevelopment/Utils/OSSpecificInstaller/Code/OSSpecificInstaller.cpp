@@ -9,7 +9,15 @@
 #include <sstream>
 
 using namespace std;
+
+// Type define the function for IsWow64Process
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+
+// Type define the function for both Wow64RevertWow64FsRedirection and Wow64DisableWow64FsRedirection
+// This is done instead of using the functions specifiying the function directly because XP 32 bit 
+// does not have the 2 functions and there for will not run unless the function address is 
+// mapped dynamically in code.
+typedef VOID (WINAPI *LPFN_WOW64_FS_REDIRECTION)(VOID *);
 
 // Constants
 const int gnBUFFER_SIZE = 1024;
@@ -27,7 +35,17 @@ const int gnBUFFER_SIZE = 1024;
 // Define the fnIsWow64Process function as the IsWow64Process function in kernel32
 LPFN_ISWOW64PROCESS 
 fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(
-GetModuleHandle("kernel32"),"IsWow64Process");
+	GetModuleHandle("kernel32"),"IsWow64Process");
+
+// Define the address for the Wow64DisableWow64FsRedirection function
+LPFN_WOW64_FS_REDIRECTION
+fnWow64DisableWow64FsRedirection = (LPFN_WOW64_FS_REDIRECTION)GetProcAddress(
+	GetModuleHandle("kernel32"),"Wow64DisableWow64FsRedirection");
+
+// Define the address for the Wow64RevertWow64FsRedirection function
+LPFN_WOW64_FS_REDIRECTION
+fnWow64RevertWow64FsRedirection = (LPFN_WOW64_FS_REDIRECTION)GetProcAddress(
+	GetModuleHandle("kernel32"),"Wow64RevertWow64FsRedirection");
 
 //-------------------------------------------------------------------------------------------------
 // IsWow64 - function returns TRUE if the current process is running under Wow64, otherwise 
@@ -286,18 +304,18 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 				PVOID pRedirection;
 
 				// If OS is 64 bit disable file system redirection
-				if (bTurnOf64FSRedirection)
+				if (bTurnOf64FSRedirection && fnWow64DisableWow64FsRedirection != NULL)
 				{
-					Wow64DisableWow64FsRedirection(&pRedirection);
+					fnWow64DisableWow64FsRedirection(&pRedirection);
 				}
 
 				// Run the command
 				int nReturn = RunCommand(strCommand, strDescription);
 
 				// If OS is 64 bit revert file system redirection
-				if (bTurnOf64FSRedirection)
+				if (bTurnOf64FSRedirection && fnWow64RevertWow64FsRedirection != NULL)
 				{
-					Wow64RevertWow64FsRedirection(&pRedirection);
+					fnWow64RevertWow64FsRedirection(&pRedirection);
 				}
 				return nReturn;
 			}
