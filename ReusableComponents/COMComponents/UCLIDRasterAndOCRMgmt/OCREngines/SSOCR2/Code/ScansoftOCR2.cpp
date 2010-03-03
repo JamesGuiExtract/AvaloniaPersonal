@@ -90,12 +90,7 @@ const int giMAX_ZONE_OVERLAP = 8;
 #define THROW_UE_ON_ERROR(strELICode, strExceptionText, RecAPICall) \
 	{ \
 		RECERR rc = ##RecAPICall; \
-		if (rc == API_GPFAULT_ERR) \
-		{ \
-			m_bHardKill = true; \
-			THROW_UE(strELICode, strExceptionText, rc); \
-		} \
-		else if (rc != REC_OK) \
+		if (rc != REC_OK) \
 		{ \
 			THROW_UE(strELICode, strExceptionText, rc); \
 		} \
@@ -116,7 +111,6 @@ CScansoftOCR2::CScansoftOCR2()
   m_eFilter(kNoFilter),
   m_bFilterContainsAlpha(true),
   m_bFilterContainsNumeral(true),
-  m_bHardKill(false),
   m_ipSpatialString(CLSID_SpatialString),
   m_hImageFile(NULL),
   m_hPage(NULL),
@@ -1666,7 +1660,7 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 		if (rc != REC_OK)
 		{
 			// log an error, unless no zones were found at all (eg. the image contained no text)
-			if (rc != ZONE_NOTFOUND_ERR)
+			if (rc != ZONE_NOTFOUND_ERR && rc != ZONE_NOTFOUND_WARN)
 			{
 				UCLIDException ue("ELI16769", "Unable to locate zones.");
 				loadScansoftRecErrInfo(ue, rc);
@@ -1713,7 +1707,6 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	}
 	else if (rc == API_GPFAULT_ERR)
 	{
-		m_bHardKill = true;
 		UCLIDException ue("ELI12726", "Unrecoverable Error in the ENGine!");
 		loadScansoftRecErrInfo(ue, rc);
 		ue.addDebugInfo("Image Name", strImageFileName);

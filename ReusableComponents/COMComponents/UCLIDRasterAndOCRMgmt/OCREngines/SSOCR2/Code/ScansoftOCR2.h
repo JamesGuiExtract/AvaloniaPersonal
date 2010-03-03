@@ -150,8 +150,6 @@ private:
 	bool m_bFilterContainsAlpha;
 	bool m_bFilterContainsNumeral;
 	
-	bool m_bHardKill;
-
 	// After OCR is finished this will contain the resultant spatial string
 	ISpatialStringPtr m_ipSpatialString;
 
