@@ -8,7 +8,7 @@
 // Modifier, Well separated content, text & handwritten
 <TESTFOLDER>;.\Test01.rsd;.\AutomatedTestFiles\Images\Handwritten Area\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test01.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test01.voa
 
-// Modifier, Signature areas, multi-page, exclude > 60% OCR
+// Modifier, Signature areas, multi-page, exclude > 70% OCR
 <TESTFOLDER>;.\Test02.rsd;.\AutomatedTestFiles\Images\LineArea\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test02.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test02.voa
 
 // Splitter, Signature line, text overlaps handwritten attribute
@@ -53,5 +53,5 @@
 // Modifier, Tests using SelectPageRegion Preprocesser that excludes first page
 <TESTFOLDER>;.\Test16.rsd;.\AutomatedTestFiles\Images\LabRecord\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test16.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test16.voa
 
-// Modifier, Signature areas, multi-page, exclude > 60% OCR, Merge areas less than 8 chars apart, areas > 10 wide (Derivative of test 2)
+// Modifier, Signature areas, multi-page, exclude > 70% OCR, Merge areas less than 8 chars apart, areas > 10 wide (Derivative of test 2)
 <TESTFOLDER>;.\Test17.rsd;.\AutomatedTestFiles\Images\LineArea\;$DirOf(<SourceDocName>)\..\..\ActualVOA\Test17.voa;$DirOf(<SourceDocName>)\..\..\ExpectedVOA\Test17.voa

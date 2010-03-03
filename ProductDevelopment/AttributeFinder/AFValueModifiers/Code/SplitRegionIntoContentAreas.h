@@ -241,10 +241,9 @@ private:
 		// Specifies the original area bounds prior to any modification.
 		CRect m_rectOriginal;
 
-		// A score indicating the level of confidence that this area was created based upon a
-		// properly OCR'd text. (1 = absolute confidence, 0 = no confidence) (Will be zero
-		// if created via an image area).
-		double m_dOCRConfidence;
+		// The avarage OCR confidence of the area's text (100 = absolute confidence, 0 = no
+		// confidence)(Will be zero if created via an image area).
+		long m_nOCRConfidence;
 
 		// Specifies whether the top edge of content has been found or whether it is locked
 		// at a position deemed to be a likely dividing point between lines.

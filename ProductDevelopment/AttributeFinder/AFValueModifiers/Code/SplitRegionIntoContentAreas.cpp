@@ -25,7 +25,7 @@ const unsigned int gnMIN_CHARS_NEEDED_FOR_SIZE		= 10;
 const double gdMIN_PIXEL_PERCENT_OF_AREA			= 0.05;
 const int gnMIN_CHAR_SEPARATION_OF_LINES			= 4;
 const CPoint gptNULL								= CPoint(-1, -1);
-const double gdCONFIDENT_OCR_TEXT_SCORE				= 0.60;
+const long gnCONFIDENT_OCR_TEXT_SCORE				= 60;
 const double gdDUPLICATE_OVERLAP					= 0.70;
 const double gdREQUIRED_LINE_OVERLAP				= 0.50;
 const int gnAREA_PADDING_SIZE						= 2;
@@ -1231,7 +1231,7 @@ int CSplitRegionIntoContentAreas::PixelEraser::processPixel(int x, int y)
 CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const ISpatialStringPtr &ipString,
 													const ILongToObjectMapPtr &ipSpatialPageInfos) 
 : CRect()
-, m_dOCRConfidence(0)
+, m_nOCRConfidence(0)
 , m_eTopBoundaryState(kNotFound)
 , m_eBottomBoundaryState(kNotFound)
 {
@@ -1257,29 +1257,12 @@ CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const ISpatialStr
 			{
 				// If a content area is based on a hybrid string, there is no confidence that can
 				// be attributed to the OCR.
-				m_dOCRConfidence = 0;
+				m_nOCRConfidence = 0;
 			}
 			else
 			{
-				// Score the word to indicate how likely this string is to represent reasonable OCR
-				// data.  Do this by multiplying the average letter confidence value by a logrithmic
-				// number that approaches 1 as the number of characters goes to infinity. This will 
-				// produce a fraction of the average confidence that is smaller the fewer letters
-				// there are.
-				CPPLetter* pLetters = NULL;
-				long nLetterCount = -1;
-				ipString->GetOCRImageLetterArray(&nLetterCount, (void**)&pLetters);
-				ASSERT_RESOURCE_ALLOCATION("ELI25965", pLetters != NULL);
-
-				for (long i = 0; i < nLetterCount; i++)
-				{
-					const CPPLetter& letter = pLetters[i];
-
-					m_dOCRConfidence += ((double) letter.m_ucCharConfidence / 100.0);
-				}
-
-				m_dOCRConfidence /= nLetterCount;
-				m_dOCRConfidence *= (1 - 1 / pow(1.5, nLetterCount));
+				// Calculate the average OCR confidence of the string.
+				ipString->GetCharConfidence(NULL, NULL, &m_nOCRConfidence);
 			}
 		}
 		else
@@ -1296,7 +1279,7 @@ CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const ISpatialStr
 CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const CRect &rect)
 : CRect(rect)
 , m_rectOriginal(rect)
-, m_dOCRConfidence(0)
+, m_nOCRConfidence(0)
 , m_eTopBoundaryState(kNotFound)
 , m_eBottomBoundaryState(kNotFound)
 {
@@ -1770,8 +1753,8 @@ void CSplitRegionIntoContentAreas::mergeAreas()
 
 					bool bMerge = false;
 
-					if (m_vecContentAreas[i].m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE ||
-						m_vecContentAreas[j].m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE)
+					if (m_vecContentAreas[i].m_nOCRConfidence >= gnCONFIDENT_OCR_TEXT_SCORE ||
+						m_vecContentAreas[j].m_nOCRConfidence >= gnCONFIDENT_OCR_TEXT_SCORE)
 					{
 						// If either area is based on confidently OCR'd text, only merge based on area if
 						// the intersection represents at least gdDUPLICATE_OVERLAP percent of both areas.
@@ -1794,14 +1777,14 @@ void CSplitRegionIntoContentAreas::mergeAreas()
 						// If area i shares mostly the same vertical positioning as area j and not based 
 						// on confidently OCR'd text, merge them as two pieces of the same line of content.
 						if (dHeightIOverlap > gdDUPLICATE_OVERLAP && 
-							m_vecContentAreas[i].m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
+							m_vecContentAreas[i].m_nOCRConfidence < gnCONFIDENT_OCR_TEXT_SCORE)
 						{
 							bMerge = true;
 						}
 						// If area j shares mostly the same vertical positioning as area i and not based
 						// on confidently OCR'd text, merge them as two pieces of the same line of content.
 						else if (dHeightJOverlap > gdDUPLICATE_OVERLAP && 
-							m_vecContentAreas[j].m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
+							m_vecContentAreas[j].m_nOCRConfidence < gnCONFIDENT_OCR_TEXT_SCORE)
 						{
 							bMerge = true;
 						}
@@ -1821,8 +1804,8 @@ void CSplitRegionIntoContentAreas::mergeAreas()
 						// These areas qualify to be merged.  Set m_vecContentAreas[j] to the union
 						// of the two areas, and remove m_vecContentAreas[i].
 						mergedArea.UnionRect(&mergedArea, &m_vecContentAreas[j]);
-						mergedArea.m_dOCRConfidence = 
-							max(mergedArea.m_dOCRConfidence, m_vecContentAreas[j].m_dOCRConfidence);
+						mergedArea.m_nOCRConfidence = 
+							max(mergedArea.m_nOCRConfidence, m_vecContentAreas[j].m_nOCRConfidence);
 
 						// Ensure the resulting area meets the specified size requirements.
 						if (areaMeetsSpecifications(mergedArea))
@@ -2219,8 +2202,8 @@ bool CSplitRegionIntoContentAreas::attemptMerge(ContentAreaInfo &area, bool bUp,
 				ContentAreaInfo &areaLower(bUp ? area : m_vecContentAreas[i]);
 
 				if (rectIntersection.Width() == nNarrowestWidth &&
-					areaHigher.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE &&
-					areaLower.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE &&
+					areaHigher.m_nOCRConfidence < gnCONFIDENT_OCR_TEXT_SCORE &&
+					areaLower.m_nOCRConfidence < gnCONFIDENT_OCR_TEXT_SCORE &&
 					areaHigher.m_eBottomBoundaryState != kLocked &&
 					areaLower.m_eTopBoundaryState != kLocked)
 				{
@@ -2238,14 +2221,14 @@ bool CSplitRegionIntoContentAreas::attemptMerge(ContentAreaInfo &area, bool bUp,
 					// boundary isn't confidently OCR'd text, lock it as well.
 					if (bUp && 
 						areaHigher.m_eBottomBoundaryState == kLocked &&
-						areaLower.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
+						areaLower.m_nOCRConfidence < gnCONFIDENT_OCR_TEXT_SCORE)
 					{
 						areaLower.m_eTopBoundaryState = kLocked;
 						continue;
 					}
 					else if (!bUp &&
 						areaLower.m_eTopBoundaryState == kLocked &&
-						areaHigher.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
+						areaHigher.m_nOCRConfidence < gnCONFIDENT_OCR_TEXT_SCORE)
 					{
 						areaHigher.m_eBottomBoundaryState = kLocked;
 						continue;
@@ -2256,8 +2239,8 @@ bool CSplitRegionIntoContentAreas::attemptMerge(ContentAreaInfo &area, bool bUp,
 					ContentAreaInfo *pConfidentArea = NULL;
 					ContentAreaInfo *pImpressionableArea = NULL;
 
-					if (areaHigher.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE &&
-						areaLower.m_dOCRConfidence < areaHigher.m_dOCRConfidence)
+					if (areaHigher.m_nOCRConfidence > gnCONFIDENT_OCR_TEXT_SCORE &&
+						areaLower.m_nOCRConfidence < areaHigher.m_nOCRConfidence)
 					{
 						rectOCRIntersection = areaHigher.m_rectOriginal;
 						rectOCRIntersection.top = areaHigher.top;
@@ -2271,8 +2254,8 @@ bool CSplitRegionIntoContentAreas::attemptMerge(ContentAreaInfo &area, bool bUp,
 							pImpressionableArea = &areaLower;
 						}
 					}
-					else if (areaLower.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE &&
-						areaHigher.m_dOCRConfidence < areaLower.m_dOCRConfidence)
+					else if (areaLower.m_nOCRConfidence > gnCONFIDENT_OCR_TEXT_SCORE &&
+						areaHigher.m_nOCRConfidence < areaLower.m_nOCRConfidence)
 					{
 						rectOCRIntersection = areaLower.m_rectOriginal;
 						rectOCRIntersection.top = areaLower.top;
@@ -2332,8 +2315,8 @@ bool CSplitRegionIntoContentAreas::attemptMerge(ContentAreaInfo &area, bool bUp,
 					reImpressionableBoundaryState = kLocked;
 					rnImpressionableBoundary = nNewBoundary;
 
-					if ((areaHigher.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE && 
-						areaLower.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE) || 
+					if ((areaHigher.m_nOCRConfidence > gnCONFIDENT_OCR_TEXT_SCORE && 
+						areaLower.m_nOCRConfidence > gnCONFIDENT_OCR_TEXT_SCORE) || 
 						isBigEnough(*pImpressionableArea, true))
 					{
 						// If bRecurse == true and both areas are based on well OCR'd text or if the
@@ -2355,14 +2338,14 @@ bool CSplitRegionIntoContentAreas::attemptMerge(ContentAreaInfo &area, bool bUp,
 						if (pConfidentArea->left < rectIntersection.left - m_sizeAvgChar.cx)
 						{
 							ContentAreaInfo newArea = *pConfidentArea;
-							newArea.m_dOCRConfidence = 0;
+							newArea.m_nOCRConfidence = 0;
 							newArea.right = rectIntersection.left;
 							rvecAreasToAdd.push_back(newArea);
 						}
 						if (pConfidentArea->right > rectIntersection.right + m_sizeAvgChar.cx)
 						{
 							ContentAreaInfo newArea = *pConfidentArea;
-							newArea.m_dOCRConfidence = 0;
+							newArea.m_nOCRConfidence = 0;
 							newArea.left = rectIntersection.right;
 							rvecAreasToAdd.push_back(newArea);
 						}
@@ -2595,13 +2578,13 @@ bool CSplitRegionIntoContentAreas::areaMeetsSpecifications(const ContentAreaInfo
 {
 	// If not including areas based on well-OCR'd text, ensure the area is not based on well OCR'd
 	// text.
-	if (!m_bIncludeGoodOCR && area.m_dOCRConfidence >= (double) m_nOCRThreshold / 100.0)
+	if (!m_bIncludeGoodOCR && area.m_nOCRConfidence >= m_nOCRThreshold)
 	{
 		return false;
 	}
 	// If not including areas based on poorly-OCR'd text, ensure the area is based on well OCR'd
 	// text.
-	else if (!m_bIncludePoorOCR && area.m_dOCRConfidence < (double) m_nOCRThreshold / 100.0)
+	else if (!m_bIncludePoorOCR && area.m_nOCRConfidence < m_nOCRThreshold)
 	{
 		return false;
 	}
@@ -2720,8 +2703,8 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 		// If OCR quality of the text this area is based off of or the OCR quality of text in the
 		// final area is poor, re-OCR the text using handwriting recognition if so specified.
 		if (m_bReOCRWithHandwriting && 
-			(area.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE ||
-			result.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE))
+			(area.m_nOCRConfidence < gnCONFIDENT_OCR_TEXT_SCORE ||
+			result.m_nOCRConfidence < gnCONFIDENT_OCR_TEXT_SCORE))
 		{
 			try
 			{
@@ -2739,7 +2722,7 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 					ContentAreaInfo areaReOCRd(ipZoneText, ipSpatialInfos);
 
 					// Update to use the handwritten result if confidence is higher.
-					if (areaReOCRd.m_dOCRConfidence > result.m_dOCRConfidence)
+					if (areaReOCRd.m_nOCRConfidence > result.m_nOCRConfidence)
 					{
 						ipValue = ipZoneText;
 					}
@@ -2792,7 +2775,7 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 
 				// Assign the type based on the character confidence of the text the area is based on.
 				ipSpatialStringSubAttribute->Type = 
-					(area.m_dOCRConfidence >= (double) (m_nOCRThreshold / 100.0))
+					(area.m_nOCRConfidence >= m_nOCRThreshold)
 					? m_strGoodOCRType.c_str()
 					: m_strPoorOCRType.c_str();
 			}
@@ -2815,7 +2798,7 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 		ipNewAttribute->Name = m_strAttributeName.c_str();
 
 		// Assign the type based on the character confidence of the text the area is based on.
-		ipNewAttribute->Type = (area.m_dOCRConfidence >= (double) (m_nOCRThreshold / 100.0))
+		ipNewAttribute->Type = (area.m_nOCRConfidence >= m_nOCRThreshold)
 			? m_strGoodOCRType.c_str()
 			: m_strPoorOCRType.c_str();
 
