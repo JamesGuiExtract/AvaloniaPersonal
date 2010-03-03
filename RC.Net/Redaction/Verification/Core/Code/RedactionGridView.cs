@@ -559,7 +559,18 @@ namespace Extract.Redaction.Verification
             {
                 _typeColumn.Items.Add(type);
             }
-            _redactions.Add(row);
+
+            // Get the index of the last selected row and insert
+            // the item below that (if there is no selection, insert at the bottom)
+            int index = GetLastSelectedRowIndex();
+            if (index == -1)
+            {
+                _redactions.Add(row);
+            }
+            else
+            {
+                _redactions.Insert(index + 1, row);
+            }
 
             _dirty = true;
         }
