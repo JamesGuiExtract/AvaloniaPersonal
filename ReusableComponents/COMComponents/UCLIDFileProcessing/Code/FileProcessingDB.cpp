@@ -4941,9 +4941,6 @@ STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName, long* plId
 
 		ASSERT_ARGUMENT("ELI29795", plId != NULL);
 
-		// Make sure the DB Schema is the expected version
-		validateDBSchemaVersion();
-
 		// Get the action name as a string
 		string strActionName = asString(bstrActionName);
 
@@ -4960,6 +4957,9 @@ STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName, long* plId
 
 		// Lock the database
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
