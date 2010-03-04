@@ -1755,6 +1755,13 @@ void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserName
 	// Get the encrypted version of the combined string
 	string strEncryptedCombined = getEncryptedString(strUserNameAndPassword);
 
+	storeEncryptedPasswordAndUserName(strEncryptedCombined, bUseAdmin);
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strEncryptedPW,
+														  bool bUseAdmin,
+														  bool bCreateTransactionGuard)
+{
 	string strUser = bUseAdmin ? gstrADMIN_USER : m_strFAMUserName;
 
 	// Lock the mutex for this instance
@@ -1764,8 +1771,14 @@ void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserName
 	_RecordsetPtr ipLoginSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI15722", ipLoginSet != NULL);
 
-	// Begin Transaction
-	TransactionGuard tg(getDBConnection());
+
+	// Begin Transaction if needed
+	auto_ptr<TransactionGuard> apTg;
+	if (bCreateTransactionGuard)
+	{
+		apTg.reset(new TransactionGuard(getDBConnection()));
+		ASSERT_RESOURCE_ALLOCATION("ELI29896", apTg.get() != NULL);
+	}
 
 	// Retrieve records from Login table for the admin or current user
 	string strSQL = "SELECT * FROM LOGIN WHERE UserName = '" + strUser + "'";
@@ -1783,11 +1796,14 @@ void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserName
 	}
 
 	// Update the password field
-	setStringField(ipLoginSet->Fields, "Password", strEncryptedCombined);
+	setStringField(ipLoginSet->Fields, "Password", strEncryptedPW);
 	ipLoginSet->Update();
 
 	// Commit the changes
-	tg.CommitTrans();
+	if (apTg.get() != NULL)
+	{
+		apTg->CommitTrans();
+	}
 }
 //--------------------------------------------------------------------------------------------------
 string CFileProcessingDB::getEncryptedString(const string strInput)
@@ -2533,6 +2549,13 @@ void CFileProcessingDB::clear(bool retainUserValues)
 			}
 		}
 
+		string strAdminPW;
+		if (!retainUserValues)
+		{
+			// Need to store the admin login and add it back after re-adding the table
+			getEncryptedPWFromDB(strAdminPW, true);
+		}
+
 		// Drop the tables
 		dropTables(retainUserValues);
 
@@ -2546,6 +2569,12 @@ void CFileProcessingDB::clear(bool retainUserValues)
 		for (unsigned int i = 0; i < vecActionNames.size(); i++)
 		{
 			defineNewAction(getDBConnection(), vecActionNames[i]);
+		}
+
+		// Add the admin user back with admin PW
+		if (!strAdminPW.empty())
+		{
+			storeEncryptedPasswordAndUserName(strAdminPW, true, false);
 		}
 
 		tg.CommitTrans();

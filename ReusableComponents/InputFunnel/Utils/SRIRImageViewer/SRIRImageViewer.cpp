@@ -258,7 +258,7 @@ BOOL CSRIRImageViewerApp::InitInstance()
 					// Check for the files existence [LRCAU #5359]
 					if (!isValidFile(strScriptFileName))
 					{
-						UCLIDException ue("ELI29853", "Specified script file does not exist.");
+						UCLIDException ue("ELI29895", "Specified script file does not exist.");
 						ue.addDebugInfo("Script File Name", strScriptFileName);
 						throw ue;
 					}

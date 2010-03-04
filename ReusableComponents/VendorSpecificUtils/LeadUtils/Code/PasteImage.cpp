@@ -146,7 +146,7 @@ void pasteImageAtLocation(const string& strInputImage, const string& strOutputIm
 			_lastCodePos = "60";
 
 			// Move the temporary file to the destination file
-			moveFile(tmpOutFile.getName(), strOutputImage, true, true);
+			copyFile(tmpOutFile.getName(), strOutputImage, false, true);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20168");
 	}

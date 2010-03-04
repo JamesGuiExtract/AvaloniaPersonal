@@ -474,7 +474,7 @@ EXPORT_BaseUtils string getCurrentProcessEXEDirectory();
 //			    (a) The read-only attribute on the output file will be removed.
 //              (b) strDstFileName's access and modification times will be set to the current time.
 EXPORT_BaseUtils void copyFile(const string &strSrcFileName, const string &strDstFileName,
-							   bool bUpdateFileSettings=false);
+							   bool bUpdateFileSettings=false, bool bAllowReadonly=false);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To move a file from one location to another
 //			overwriting an existing file if bOverwrite = true

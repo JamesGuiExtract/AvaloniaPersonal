@@ -1707,17 +1707,26 @@ bool isValidFolder(const string& strFolder)
 }
 //--------------------------------------------------------------------------------------------------
 void copyFile(const string &strSrcFileName, const string &strDstFileName, 
-			  bool bUpdateFileSettings)
+			  bool bUpdateFileSettings, bool bAllowReadonly)
 {
 	try
 	{
+		if (bAllowReadonly)
+		{
+			if (fileExistsAndIsReadOnly(strDstFileName))
+			{
+				setFileAttributes(strDstFileName, FILE_ATTRIBUTE_NORMAL);
+			}
+		}
+
 		const char* pszOutputFile = strDstFileName.c_str();
+		const char* pszSourceFile = strSrcFileName.c_str();
 
 		// copy the file  (retry if the copy fails due to a share violation)
 		int iRetryCount(-1),iTimeout(-1);
 		getFileAccessRetryCountAndTimeout(iRetryCount, iTimeout);
 		int iRetries = 0;
-		while(!asCppBool(CopyFile(strSrcFileName.c_str(), pszOutputFile, FALSE)))
+		while(!asCppBool(CopyFile(pszSourceFile, pszOutputFile, FALSE)))
 		{
 			// Failed to copy, get the last error
 			DWORD dwError = GetLastError();
@@ -1890,7 +1899,8 @@ void deleteFile(const string strFileName, const bool bAllowReadonly)
 		int iRetryCount(-1),iTimeout(-1);
 		getFileAccessRetryCountAndTimeout(iRetryCount, iTimeout);
 		int iRetries = 0;
-		while(!asCppBool(DeleteFile(strFileName.c_str())))
+		const char* pszFileName = strFileName.c_str();
+		while(!asCppBool(DeleteFile(pszFileName)))
 		{
 			// Failed to delete, get the last error
 			DWORD dwError = GetLastError();
