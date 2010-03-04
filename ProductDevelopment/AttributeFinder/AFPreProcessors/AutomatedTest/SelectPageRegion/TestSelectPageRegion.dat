@@ -210,7 +210,7 @@
 <TESTCASE>;TopHalfTrailingPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;TopHalfTrailingPagesContainingString.voa
 
 // Include Image Region With No OCR text
-<TESTCASE>;IncludeImageRegionWithNoOCR.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.noocr.uss;;IncludeImageRegionWithNoOCR.voa
+<TESTCASE>;IncludeImageRegionWithNoOCR.rsd;..\..\..\AFCore\AutomatedTest\images\image2.noocr.tif.uss;;IncludeImageRegionWithNoOCR.voa
 
 // Exclude Image Region With No OCR text
-<TESTCASE>;ExcludeImageRegionWithNoOCR.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.noocr.uss;;ExcludeImageRegionWithNoOCR.voa
+<TESTCASE>;ExcludeImageRegionWithNoOCR.rsd;..\..\..\AFCore\AutomatedTest\images\image1.noocr.tif.uss;;ExcludeImageRegionWithNoOCR.voa
