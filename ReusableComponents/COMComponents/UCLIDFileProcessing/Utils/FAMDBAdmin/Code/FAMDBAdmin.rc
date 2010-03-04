@@ -272,7 +272,7 @@ CAPTION "Title"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Caption",IDC_CAPTION,7,7,270,86
-    CONTROL         "Retain actions, counters, tags, and database settings",IDC_CHECK_RETAIN_ACTIONS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,99,200,10
+    CONTROL         "Retain actions, counters, tags, users, and database settings",IDC_CHECK_RETAIN_ACTIONS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,99,210,10
     PUSHBUTTON      "Yes",IDYES,90,112,50,14
     DEFPUSHBUTTON   "No",IDNO,144,112,50,14
 END

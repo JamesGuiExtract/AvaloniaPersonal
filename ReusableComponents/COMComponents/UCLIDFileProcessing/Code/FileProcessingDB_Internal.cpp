@@ -918,15 +918,13 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 		vector<string> vecTables; 
 		getExpectedTables(vecTables);
 
-		// Remove the login table from the list
-		eraseFromVector(vecTables, gstrLOGIN);
-
 		// Retain the user tables if necessary
 		if (bRetainUserTables)
 		{
 			eraseFromVector(vecTables, gstrDB_INFO);
 			eraseFromVector(vecTables, gstrFAM_TAG);
 			eraseFromVector(vecTables, gstrUSER_CREATED_COUNTER);
+			eraseFromVector(vecTables, gstrLOGIN);
 		}
 
 		// Drop the tables in the vector
