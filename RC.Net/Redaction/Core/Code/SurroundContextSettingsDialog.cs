@@ -168,6 +168,7 @@ namespace Extract.Redaction
                 _dataTypesTextBox.Text = string.Join(", ", _settings.GetDataTypes());
                 _redactWordsCheckBox.Checked = _settings.RedactWords;
                 _maxWordsNumericUpDown.Value = _settings.MaxWords;
+                _maxWordsNumericUpDown.ValueChanged += HandleMaxWordsNumericUpDown_ValueChanged;
                 _extendHeightCheckBox.Checked = _settings.ExtendHeight;
                 _dataFileControl.DataFile = _settings.DataFile;
             }
@@ -176,7 +177,34 @@ namespace Extract.Redaction
                 ExtractException.Display("ELI29513", ex);
             }
         }
-		 
+
+        /// <summary>
+        /// Handles the case that _maxWordsNumericUpDown's value has changed.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleMaxWordsNumericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // [FlexIDSCore:4046]
+                // If a decimal value is typed in, the control's text will be updated to reflect the
+                // NumericUpDown settings (resulting in rounding), but the control's actual value
+                // will not change. Depending upon how the value is stored, this can result in a
+                // different value being stored than is displayed. Therefore, take matters into our
+                // own hands and programatically round any non-interger value.
+                decimal roundedValue = decimal.Round(_maxWordsNumericUpDown.Value);
+                if (roundedValue != _maxWordsNumericUpDown.Value)
+                {
+                    _maxWordsNumericUpDown.Value = roundedValue;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29894", ex);
+            }
+        }
+
         #endregion Overrides
 
         #region Event Handlers
