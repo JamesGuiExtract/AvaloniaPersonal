@@ -1143,90 +1143,81 @@ namespace Extract.Imaging.Forms
                 // Prepare variable for whether the zoom history should be stored
                 bool updateZoomHistory = false;
 
-                // Don't update the image viewer until all changes have been made
-                base.BeginUpdate();
-                try
+                // Add a zoom history entry for the current page so that when the user navigates
+                // back to this page, they will be looking at the same region they were before
+                // they moved away.
+                if (updateZoom && _pageNumber != pageNumber)
                 {
-                    // Add a zoom history entry for the current page so that when the user navigates
-                    // back to this page, they will be looking at the same region they were before
-                    // they moved away.
-                    if (updateZoom && _pageNumber != pageNumber)
-                    {
-                        UpdateZoom(true, false);
-                    }
+                    UpdateZoom(true, false);
+                }
 
-                    // Go to the specified page
-                    _pageNumber = pageNumber;
-                    base.Image = GetPage(pageNumber);
+                // Go to the specified page
+                _pageNumber = pageNumber;
+                base.Image = GetPage(pageNumber);
 
-                    // Check whether the zoom setting should be updated, too.
-                    if (updateZoom)
+                // Check whether the zoom setting should be updated, too.
+                if (updateZoom)
+                {
+                    // Check if this is the first time this page has been viewed
+                    if (_imagePages[pageNumber - 1].ZoomHistoryCount == 0)
                     {
-                        // Check if this is the first time this page has been viewed
-                        if (_imagePages[pageNumber - 1].ZoomHistoryCount == 0)
+                        // Update the zoom history
+                        updateZoomHistory = true;
+
+                        // If this is the first time the page is viewed, display the whole page
+                        // [DotNetRCAndUtils #102]
+                        if (_fitMode == FitMode.None)
                         {
-                            // Update the zoom history
+                            ShowFitToPage();
+                        }
+                        else if (_fitMode == FitMode.FitToWidth)
+                        {
+                            // This is the first time the page is viewed, show the top of the page
+                            // [DotNetRCAndUtils #202]
+                            ScrollPosition = Point.Empty;
+                        }
+                    }
+                    else
+                    {
+                        // Get the previous zoom history entry
+                        ZoomInfo zoomInfo = _imagePages[pageNumber - 1].ZoomInfo;
+
+                        // This page has been viewed before, restore the previous zoom setting
+                        // [DotNetRCAndUtils #107]
+                        if (_fitMode == FitMode.None)
+                        {
+                            switch (zoomInfo.FitMode)
+                            {
+                                case FitMode.None:
+                                    SetZoomInfo(zoomInfo, false);
+                                    break;
+
+                                case FitMode.FitToPage:
+
+                                    ShowFitToPage();
+                                    break;
+
+                                case FitMode.FitToWidth:
+
+                                    ShowFitToWidth();
+                                    break;
+
+                                default:
+                                    throw new ExtractException("ELI21787",
+                                        "Unexpected fit mode.");
+                            }
+                        }
+                        else if (_fitMode != zoomInfo.FitMode)
+                        {
+                            // The previous zoom entry had a different zoom history. 
+                            // Update the zoom history.
                             updateZoomHistory = true;
-
-                            // If this is the first time the page is viewed, display the whole page
-                            // [DotNetRCAndUtils #102]
-                            if (_fitMode == FitMode.None)
-                            {
-                                ShowFitToPage();
-                            }
-                            else if (_fitMode == FitMode.FitToWidth)
-                            {
-                                // This is the first time the page is viewed, show the top of the page
-                                // [DotNetRCAndUtils #202]
-                                ScrollPosition = Point.Empty;
-                            }
-                        }
-                        else
-                        {
-                            // Get the previous zoom history entry
-                            ZoomInfo zoomInfo = _imagePages[pageNumber - 1].ZoomInfo;
-
-                            // This page has been viewed before, restore the previous zoom setting
-                            // [DotNetRCAndUtils #107]
-                            if (_fitMode == FitMode.None)
-                            {
-                                switch (zoomInfo.FitMode)
-                                {
-                                    case FitMode.None:
-                                        SetZoomInfo(zoomInfo, false);
-                                        break;
-
-                                    case FitMode.FitToPage:
-
-                                        ShowFitToPage();
-                                        break;
-
-                                    case FitMode.FitToWidth:
-
-                                        ShowFitToWidth();
-                                        break;
-
-                                    default:
-                                        throw new ExtractException("ELI21787",
-                                            "Unexpected fit mode.");
-                                }
-                            }
-                            else if (_fitMode != zoomInfo.FitMode)
-                            {
-                                // The previous zoom entry had a different zoom history. 
-                                // Update the zoom history.
-                                updateZoomHistory = true;
-                            }
                         }
                     }
+                }
 
-                    // Update the annotations
-                    UpdateAnnotations();
-                }
-                finally
-                {
-                    base.EndUpdate();
-                }
+                // Update the annotations
+                UpdateAnnotations();
 
                 if (raisePageChanged)
                 {
