@@ -3411,9 +3411,6 @@ STDMETHODIMP CFileProcessingDB::GetTagsOnFile(long nFileID, IVariantVector** ppv
 
 		validateDBSchemaVersion();
 
-		// Validate the file ID
-		validateFileID(ipConnection, nFileID);
-
 		// Create a pointer to a recordset
 		_RecordsetPtr ipTagSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI27375", ipTagSet != NULL);
