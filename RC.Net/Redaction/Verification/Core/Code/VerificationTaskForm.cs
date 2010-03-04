@@ -157,6 +157,11 @@ namespace Extract.Redaction.Verification
         RuleForm _findOrRedactForm;
 
         /// <summary>
+        /// Provides OCR results to the find or redact form.
+        /// </summary>
+        VerificationRuleFormHelper _helper;
+
+        /// <summary>
         /// Expands file action manager path tags.
         /// </summary>
         FAMTagManager _tagManager;
@@ -889,13 +894,22 @@ namespace Extract.Redaction.Verification
         {
             if (_imageViewer.IsImageAvailable)
             {
+                if (_helper == null)
+                {
+                    _helper = new VerificationRuleFormHelper(_imageViewer);
+                }
+
+                if (_helper.GetOcrResults() == null)
+                {
+                    return;
+                }
+
                 if (_findOrRedactForm == null)
                 {
-                    VerificationRuleFormHelper helper = new VerificationRuleFormHelper(_imageViewer);
 
                     RuleForm ruleForm = new RuleForm("Find or redact text", 
-                        new WordOrPatternListRule(), _imageViewer, helper, this);
-                    ruleForm.MatchRedacted += helper.HandleMatchRedacted;
+                        new WordOrPatternListRule(), _imageViewer, _helper, this);
+                    ruleForm.MatchRedacted += _helper.HandleMatchRedacted;
 
                     _findOrRedactForm = ruleForm;
                 }

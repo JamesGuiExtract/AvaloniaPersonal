@@ -1,9 +1,10 @@
-using System.Collections.Generic;
-using System.IO;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Rules;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
 
 using RedactionLayerObject = Extract.Imaging.Forms.Redaction;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
@@ -54,14 +55,21 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                SpatialString ocrResults = new SpatialString();
+                SpatialString ocrResults = null;
 
                 if (_imageViewer.IsImageAvailable)
                 {
                     string ussFile = _imageViewer.ImageFile + ".uss";
                     if (File.Exists(ussFile))
                     {
+                        ocrResults = new SpatialString();
                         ocrResults.LoadFrom(ussFile, false);
+                    }
+                    else
+                    {
+                        MessageBox.Show("The 'Find and redact' feature can't be used on this document because OCR data is not available.", 
+                            "No OCR data", MessageBoxButtons.OK, MessageBoxIcon.None, 
+                            MessageBoxDefaultButton.Button1, 0);
                     }
                 }
 
