@@ -3239,7 +3239,7 @@
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>479668549</td></row>
 		<row><td>ID_STRING1</td><td>1033</td><td>http://www.ExtractSystems.com</td><td>0</td><td/><td>-216427599</td></row>
 		<row><td>ID_STRING10</td><td>1033</td><td>USERLI~1|User License</td><td>0</td><td/><td>194599914</td></row>
-		<row><td>ID_STRING11</td><td>1033</td><td>IDSHIE~1|IDShield Help</td><td>0</td><td/><td>865697353</td></row>
+		<row><td>ID_STRING11</td><td>1033</td><td>IDSHIE~1|ID Shield Help</td><td>0</td><td/><td>564042991</td></row>
 		<row><td>ID_STRING12</td><td>1033</td><td>UTILIT~1|Utilities</td><td>0</td><td/><td>-1382406358</td></row>
 		<row><td>ID_STRING13</td><td>1033</td><td>VIEWEX~1|View Exception Log</td><td>0</td><td/><td>-1382414229</td></row>
 		<row><td>ID_STRING14</td><td>1033</td><td>CONVER~1|Convert FPS File</td><td>0</td><td/><td>-442839695</td></row>
@@ -3265,7 +3265,7 @@
 		<row><td>ID_STRING32</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331770293</td></row>
 		<row><td>ID_STRING33</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>555630608</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>IDShieldMain</td><td>0</td><td/><td>-216429071</td></row>
-		<row><td>ID_STRING5</td><td>1033</td><td>EXTRAC~1|Extract Systems IDShield</td><td>0</td><td/><td>194604777</td></row>
+		<row><td>ID_STRING5</td><td>1033</td><td>EXTRAC~1|Extract Systems ID Shield</td><td>0</td><td/><td>564036847</td></row>
 		<row><td>ID_STRING6</td><td>1033</td><td>NEWSHO~1|NewShortcut1</td><td>0</td><td/><td>194593546</td></row>
 		<row><td>ID_STRING7</td><td>1033</td><td>FILEPR~1|File Action Manager</td><td>0</td><td/><td>-1382359510</td></row>
 		<row><td>ID_STRING8</td><td>1033</td><td>USBLIC~1|USB License Key Manager</td><td>0</td><td/><td>194626442</td></row>
