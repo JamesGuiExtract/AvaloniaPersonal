@@ -1131,7 +1131,6 @@ namespace Extract.Redaction.Verification
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ID Shield Verification (Waiting for file)";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             dataGridToolStripContainer.ContentPanel.ResumeLayout(false);
             dataGridToolStripContainer.TopToolStripPanel.ResumeLayout(false);
             dataGridToolStripContainer.TopToolStripPanel.PerformLayout();
