@@ -76,7 +76,7 @@
 
 
 FLEX Index,0
--    Client (read voa files),$FlexIndex:$OCROnClient
+-    Client (read & verify voa files),$FlexIndex:$OCROnClient:5047
 -    Server/SDK,$FlexServer
 
 ID Shield,0
