@@ -32,13 +32,16 @@ STDMETHODIMP CObjectPropertiesUI::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IObjectPropertiesUI
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CObjectPropertiesUI::DisplayProperties1(IUnknown *pObj, BSTR strTitle)
+STDMETHODIMP CObjectPropertiesUI::DisplayProperties1(IUnknown *pObj, BSTR strTitle,
+													 VARIANT_BOOL *pAppliedChanges)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	TemporaryResourceOverride rcOverride(_Module.m_hInstResource);
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI29891", pAppliedChanges != NULL);
+
 		// validate license
 		validateLicense();
 
@@ -72,21 +75,18 @@ STDMETHODIMP CObjectPropertiesUI::DisplayProperties1(IUnknown *pObj, BSTR strTit
 				bSettingsApplied = asCppBool(ipConfigurableObject->RunConfiguration());
 			}
 
-			return (bSettingsApplied ? S_OK : S_FALSE);
+			*pAppliedChanges = bSettingsApplied ? VARIANT_TRUE : VARIANT_FALSE;
+			
+			return S_OK;
 		}
 
 		// create and show the property page container dialog 
 		ObjPropertiesDlg dlg(pObj, asString( strTitle ).c_str() );
 		int ret = dlg.DoModal();
-		if(ret == IDOK)
-		{
-			return S_OK;
-		}
-		else // IDCANCEL
-		{
-			return S_FALSE;
-		}
 		
+		*pAppliedChanges = (ret == IDOK) ? VARIANT_TRUE : VARIANT_FALSE;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04175")
 }

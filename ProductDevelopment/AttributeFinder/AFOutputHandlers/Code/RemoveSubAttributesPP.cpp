@@ -286,8 +286,7 @@ LRESULT CRemoveSubAttributesPP::OnBnClickedButtonConfigureSelector(WORD /*wNotif
 			string strTitle = string( "Configure " ) + strComponentDesc;
 			_bstr_t	bstrTitle( strTitle.c_str() );
 
-			HRESULT hr = ipProperties->DisplayProperties1( ipCopy, bstrTitle );
-			if(hr == S_OK)
+			if(asCppBool(ipProperties->DisplayProperties1(ipCopy, bstrTitle)))
 			{
 				m_ipObject = ipCopy;
 			}

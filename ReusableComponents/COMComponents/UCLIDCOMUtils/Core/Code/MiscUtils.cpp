@@ -380,21 +380,15 @@ STDMETHODIMP CMiscUtils::AllowUserToConfigureObjectProperties(IObjectWithDescrip
 		UCLID_COMUTILSLib::IObjectPropertiesUIPtr ipPropertiesUI(CLSID_ObjectPropertiesUI);
 		ASSERT_RESOURCE_ALLOCATION("ELI15980", ipPropertiesUI != NULL);
 
-		// display UI using the copy of the categorized component
-		HRESULT hr = ipPropertiesUI->DisplayProperties1(ipCopy, strTitle.c_str());
-
-		// retain changes if OK was selected
-		if (hr == S_OK)
+		// Display UI using the copy of the categorized component and retain changes if OK was
+		// selected.
+		if(asCppBool(ipPropertiesUI->DisplayProperties1(ipCopy, strTitle.c_str())))
 		{
 			// retain changes
 			ipCopyableObject->CopyFrom(ipCopy);
 
 			// mark object as modified
 			*pvbDirty = VARIANT_TRUE;
-		}
-		else if (hr != S_FALSE) // if something other than 'Cancel' or 'OK' was selected
-		{
-			throw UCLIDException("ELI16044", "Unexpected exit condition from object properties dialog.");
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16034")

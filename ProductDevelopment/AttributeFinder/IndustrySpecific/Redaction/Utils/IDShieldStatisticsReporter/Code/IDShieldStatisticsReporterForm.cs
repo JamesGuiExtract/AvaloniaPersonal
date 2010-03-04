@@ -89,13 +89,13 @@ namespace Extract.IDShieldStatisticsReporter
         /// A <see cref="IDShieldVOAFileContentsCondition"/> used to configure the automated
         /// redation conditions.
         /// </summary>
-        readonly IDShieldVOAFileContentsCondition _automatedConditionObject;
+        IDShieldVOAFileContentsCondition _automatedConditionObject;
 
         /// <summary>
         /// A <see cref="IDShieldVOAFileContentsCondition"/> used to configure the verification
         /// conditions.
         /// </summary>
-        readonly IDShieldVOAFileContentsCondition _verificationConditionObject;
+       IDShieldVOAFileContentsCondition _verificationConditionObject;
 
         /// <summary>
         /// The results folder based on the current feedback folder settings and result
@@ -595,8 +595,16 @@ namespace Extract.IDShieldStatisticsReporter
             try
             {
                 ObjectPropertiesUI configurationScreen = new ObjectPropertiesUIClass();
-                configurationScreen.DisplayProperties1(_automatedConditionObject,
-                    "Configure automated condition");
+
+                ICopyableObject conditionCopySource = (ICopyableObject)_automatedConditionObject;
+                IDShieldVOAFileContentsCondition conditionCopy =
+                    (IDShieldVOAFileContentsCondition)conditionCopySource.Clone();
+
+                if (configurationScreen.DisplayProperties1(
+                        conditionCopy, "Configure automated condition"))
+                {
+                    _automatedConditionObject = conditionCopy;
+                }
             }
             catch (Exception ex)
             {
@@ -616,8 +624,16 @@ namespace Extract.IDShieldStatisticsReporter
             try
             {
                 ObjectPropertiesUI configurationScreen = new ObjectPropertiesUIClass();
-                configurationScreen.DisplayProperties1(_verificationConditionObject,
-                    "Configure verification condition");
+
+                ICopyableObject conditionCopySource = (ICopyableObject)_verificationConditionObject;
+                IDShieldVOAFileContentsCondition conditionCopy =
+                    (IDShieldVOAFileContentsCondition)conditionCopySource.Clone();
+
+                if (configurationScreen.DisplayProperties1(
+                        conditionCopy, "Configure verification condition"))
+                {
+                    _verificationConditionObject = conditionCopy;
+                }
             }
             catch (Exception ex)
             {

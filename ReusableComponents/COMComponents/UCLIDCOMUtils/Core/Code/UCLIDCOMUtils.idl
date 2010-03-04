@@ -346,7 +346,7 @@ library UCLID_COMUTILSLib
 	interface IObjectPropertiesUI : IDispatch
 	{
 		[id(1), helpstring("method DisplayProperties1")] HRESULT DisplayProperties1(
-			[in] IUnknown *pObj, [in] BSTR strTitle);
+			[in] IUnknown *pObj, [in] BSTR strTitle, [out, retval] VARIANT_BOOL *pAppliedChanges);
 	};
 	[
 		object,

@@ -204,7 +204,7 @@ void CAddRuleDlg::OnBtnConfigureRule2()
 				_bstr_t	bstrTitle( strTitle.c_str() );
 
 				// Display the Property Page and check if the settings were applied
-				if (ipProperties->DisplayProperties1( ipRule, bstrTitle ) == S_OK)
+				if (asCppBool(ipProperties->DisplayProperties1(ipRule, bstrTitle)))
 				{
 					// Set the configured rule object to be the finding rule
 					m_ipAFRule = ipRule;

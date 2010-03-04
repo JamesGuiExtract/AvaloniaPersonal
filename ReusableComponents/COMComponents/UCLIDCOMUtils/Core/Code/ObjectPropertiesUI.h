@@ -30,7 +30,7 @@ public:
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // IObjectPropertiesUI
-	STDMETHOD(DisplayProperties1)(/*[in]*/ IUnknown *pObj, /*[in]*/ BSTR strTitle);
+	STDMETHOD(DisplayProperties1)(IUnknown *pObj, BSTR strTitle, VARIANT_BOOL *pAppliedChanges);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

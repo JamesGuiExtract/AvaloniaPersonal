@@ -152,8 +152,7 @@ LRESULT CFindingRuleConditionPP::OnConfigure(WORD wNotifyCode, WORD wID, HWND hW
 		string strComponentDesc = asString(ipCopy->GetComponentDescription());
 		string strTitle = string( "Configure " ) + strComponentDesc;
 
-		HRESULT hr = ipProperties->DisplayProperties1(ipCopy, strTitle.c_str());
-		if(hr == S_OK)
+		if(asCppBool(ipProperties->DisplayProperties1(ipCopy, strTitle.c_str())))
 		{
 			// Store the object now the user has applied configuration settings
 			IAttributeFindingRulePtr ipConfiguredRule(ipCopy);
