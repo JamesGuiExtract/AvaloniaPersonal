@@ -1754,6 +1754,46 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Determines whether the <see cref="Highlight"/> is positioned in a valid place.
+        /// </summary>
+        /// <returns><see langword="true"/> if the layer object is positioned in a valid place; 
+        /// <see langword="false"/> if the layer object is not positioned in a valid place.
+        /// </returns>
+        public override bool IsValid()
+        {
+            try
+            {
+                // TODO: This code can be removed when the SpotRecognitionWindow is retired for 
+                // the .Net ImageViewer and the SpatialString code that adjusts the endpoints 
+                // onto the page is also removed.
+
+                // At least one endpoint must be on the page [FIDSC #3746]
+                if (!IsPointOnPage(_startPoint) && !IsPointOnPage(_endPoint))
+                {
+                    return false;
+                }
+
+                return base.IsValid();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29892", ex);
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified point is on the page.
+        /// </summary>
+        /// <param name="point">The point to test for containment.</param>
+        /// <returns><see langword="true"/> if the point is on the page; <see langword="false"/> 
+        /// if the point is not on the page.</returns>
+        bool IsPointOnPage(Point point)
+        {
+            return point.X >= 0 && point.Y >= 0 && point.X < ImageViewer.ImageWidth &&
+                   point.Y < ImageViewer.ImageHeight;
+        }
+
+        /// <summary>
         /// Reads the zone data as XML.
         /// </summary>
         /// <param name="reader">The stream from which the zone should be read.</param>
