@@ -138,8 +138,10 @@ CreateDemoShieldInstall:
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008Mgr" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008Mgr"
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell"
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller"
+	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServer2008_SP1" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServer2008_SP1"
 	@XCOPY "$(AFRequiredInstallsDir)\DotNet 3.5 Framework\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework" /v /s /e /y
 	@XCOPY "$(AFRequiredInstallsDir)\SQLServerExpress2008\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008" /v /s /e /y
+	@XCOPY "$(AFRequiredInstallsDir)\SQLServer2008_SP1\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServer2008_SP1" /v /s /e /y
 	@XCOPY "$(AFRequiredInstallsDir)\SQLServerExpress2008Mgr\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008Mgr" /v /s /e /y
 	@XCOPY "$(AFRequiredInstallsDir)\WindowsInstaller\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller" /v /s /e /y
 	@XCOPY "$(AFRequiredInstallsDir)\Powershell\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell" /v /s /e /y
