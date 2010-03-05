@@ -449,6 +449,11 @@ namespace Extract.FileActionManager.Utilities
                     {
                         // Set the object to NULL so that the EXE will exit
                         famProcess = null;
+
+                        // Perform a GC to force the object to clean up
+                        // [DNRCAU #429]
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
                     }
 
                     // Create the FAM process

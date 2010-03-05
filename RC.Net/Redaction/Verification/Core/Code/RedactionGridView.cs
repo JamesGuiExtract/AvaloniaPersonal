@@ -1354,7 +1354,9 @@ namespace Extract.Redaction.Verification
                     {
                         counts[index]++;
 
-                        if (index != (int)CategoryIndex.Clues)
+                        // Only add to total redaction count if the object is set
+                        // to be redacted
+                        if (row.Redacted)
                         {
                             total++;
                         }
