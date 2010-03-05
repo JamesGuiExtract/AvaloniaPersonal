@@ -163,15 +163,15 @@ BEGIN
     PUSHBUTTON      "Commands >",IDC_BTN_SELECT_ATTRIBUTE_SPLITTER,212,258,60,13
     LTEXT           "Use the following AttributeSplitter to split the value into sub-parts:",IDC_STATIC_SPLIT,14,248,208,10
     LTEXT           "Use the following Input Validator:",IDC_STATIC_IV,14,216,151,10
-    LTEXT           "",IDC_EDIT_IV,27,228,175,10,SS_NOTIFY | SS_SUNKEN
-    LTEXT           "",IDC_EDIT_ATTRIBUTE_SPLITTER,27,259,175,10,SS_NOTIFY | SS_SUNKEN
+    LTEXT           "",IDC_EDIT_IV,27,228,175,10,SS_NOTIFY | SS_SUNKEN | SS_NOPREFIX
+    LTEXT           "",IDC_EDIT_ATTRIBUTE_SPLITTER,27,259,175,10,SS_NOTIFY | SS_SUNKEN | SS_NOPREFIX
     LTEXT           "Use the following Document Preprocessor:",IDC_STATIC_PP,7,7,151,10
-    LTEXT           "",IDC_EDIT_PREPROCESSOR,20,19,182,10,SS_NOTIFY | SS_SUNKEN
+    LTEXT           "",IDC_EDIT_PREPROCESSOR,20,19,182,10,SS_NOTIFY | SS_SUNKEN | SS_NOPREFIX
     CTEXT           "The Rule Set is encrypted and cannot be viewed or modified.\r\n\r\nTesting is available from the Tools menu.",IDC_STATIC_PROMPT,35,78,204,27
     CONTROL         "",IDC_CHECK_OUTPUT_HANDLER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,300,8,10
     PUSHBUTTON      "Commands >",IDC_BTN_SELECTOH,212,299,60,13
     LTEXT           "Use the following Output Handler:",IDC_STATIC_OH,7,288,151,10
-    LTEXT           "",IDC_EDIT_OH,20,300,182,10,SS_NOTIFY | SS_SUNKEN
+    LTEXT           "",IDC_EDIT_OH,20,300,182,10,SS_NOTIFY | SS_SUNKEN | SS_NOPREFIX
 END
 
 IDD_DLG_ADDRULE DIALOGEX 0, 0, 346, 314
@@ -198,7 +198,7 @@ BEGIN
     CONTROL         "",IDC_CHECK_AFRULE_DOC_PP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,18,8,10
     PUSHBUTTON      "Commands >",IDC_BTN_SELECTPP,279,18,60,13
     LTEXT           "Use the following Document Preprocessor:",IDC_STATIC,7,7,151,10
-    LTEXT           "",IDC_EDIT_PREPROCESSOR,20,18,249,12,SS_NOTIFY | SS_SUNKEN
+    LTEXT           "",IDC_EDIT_PREPROCESSOR,20,18,249,12,SS_NOTIFY | SS_SUNKEN | SS_NOPREFIX
 END
 
 IDD_DLG_TESTER DIALOGEX 0, 0, 248, 174

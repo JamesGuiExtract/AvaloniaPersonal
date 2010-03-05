@@ -211,7 +211,7 @@ BEGIN
     CONTROL         "",IDC_LIST_TRUE,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,7,48,184,90
     PUSHBUTTON      "Commands >",IDC_BTN_SELECT_CONDITION,199,18,50,14
     LTEXT           "Evaluate the following condition",IDC_STATIC,7,7,101,8
-    LTEXT           "",IDC_EDIT_CONDITION,7,19,184,10,SS_NOTIFY | SS_SUNKEN
+    LTEXT           "",IDC_EDIT_CONDITION,7,19,184,10,SS_NOTIFY | SS_SUNKEN | SS_NOPREFIX
     LTEXT           "Execute these tasks if the condition is met",IDC_STATIC,7,36,133,8
     PUSHBUTTON      "&Add...",IDC_BTN_ADD2,199,158,50,14
     PUSHBUTTON      "&Remove",IDC_BTN_REMOVE2,199,178,50,14
