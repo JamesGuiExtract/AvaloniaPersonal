@@ -333,34 +333,6 @@
 			<b>$DirOf(&lt;SourceDocName&gt;)\newfolder\$FileOf(&lt;SourceDocName&gt;).voa</b>. 
 			Confirm that the task was successful.</li>
 	   	</ul>
-<p>
-		<li><b>Archive and Restore Stress Test [LegacyRCAndUtils #5247]</b></li>
-	   	<ul>
-	   		<li>Check out the test machine HPQC2 and on this machine open <b>G:\ArchiveTest</b>.</li>
-			<li>Confirm the existence of <b>ArchiveRestore_Test.fps</b> and <b>Test.voa</b>.
-	   		<li>If present, delete the folders <b>Archive</b> and <b>Restore</b>. Create a new 
-			empty <b>Archive</b> and <b>Restore</b> folders. Note: Deleting these folders may take 
-			some time as they are probably very big.</li>
-			<li>Confirm the existence of 1M+ images on <b>F:\</b>.
-	   		<li>Log into the <b>ArchiveTest</b> database, if it exists.  If it does not exist, 
-			use Database Administration to create one.</li>
-	   		<li>Set all the files in the ArchiveTest database to pending.  If the database is new, 
-			create a new task called "ArchiveRestore."</li>
-	   		<li>Open <b>ArchiveRestore_Test.fps</b>. Confirm that a connection is successfully 
-			established to the "ArchiveTest" database with database server, "(local)."</li>
-			<li>If a new database was created add a queue task to recursively add files 
-			from <b>F:\</b>.</li>
-			<li>Confirm that <b>ArchiveRestore_Test.fps</b> has three processing tasks: 
-			"Create Source voa," "Archive Source voa," and "Restore voa."</li>
-			<li>Confirm that <b>ArchiveRestore_Test.fps</b> is correctly configured to copy 
-			<b>Test.voa</b> to create <b>&lt;SourceDocName&gt;.voa</b> in the input folder.</li>
-			<li>Confirm that <b>ArchiveRestore_Test.fps</b> is configured to archive the voa files 
-			in the <b>Archive</b> folder and restore these voa's to the <b>Restore</b> folder.</li>
-			<li>During processing, periodically clear the Restore folder to prevent it from getting 
-			too big.</li>
-			<li>Verify that an appropriate file structure is created by the archive task and that 
-			the restore task is restoring files correctly.</li>
-	   	</ul>
    	</ul> 
 <p>
 	<li><b>Core: Cleanup Image</b></li>
