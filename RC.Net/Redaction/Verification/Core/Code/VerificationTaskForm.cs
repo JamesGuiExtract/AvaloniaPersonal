@@ -317,7 +317,7 @@ namespace Extract.Redaction.Verification
             // 1) The comments text box is active OR
             // 2) A cell of the redaction grid view is being edited
             // 3) The find or redact form has focus
-            return !_commentsTextBox.Focused && !_redactionGridView.IsInEditMode && 
+            return !_commentsTextBox.Focused && !_redactionGridView.IsInEditMode &&
                    (_findOrRedactForm == null || !_findOrRedactForm.ContainsFocus);
         }
 
@@ -874,7 +874,9 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void SelectSaveAndCommit()
         {
-            if (_imageViewer.IsImageAvailable)
+            // Do not allow saving and commiting if the imageviewer is
+            // processing a tracking event
+            if (_imageViewer.IsImageAvailable && !_imageViewer.IsTracking)
             {
                 _redactionGridView.CommitChanges();
 
@@ -1730,7 +1732,9 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                if (!IsInHistory)
+                // Do not allow saving if the image viewer is currently processing
+                // a tracking event (i.e. Drawing a redaction)
+                if (!IsInHistory && !_imageViewer.IsTracking)
                 {
                     _redactionGridView.CommitChanges();
 
@@ -1757,19 +1761,24 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                _redactionGridView.CommitChanges();
-
-                if (!WarnIfDirty())
+                // Only allow skipping a document if there is no tracking event taking place
+                // in the image viewer (i.e. Drawing a redaction)
+                if (!_imageViewer.IsTracking)
                 {
-                    TimeInterval screenTime = StopScreenTime();
-                    SaveRedactionCounts(screenTime);
+                    _redactionGridView.CommitChanges();
 
-                    CommitComment();
+                    if (!WarnIfDirty())
+                    {
+                        TimeInterval screenTime = StopScreenTime();
+                        SaveRedactionCounts(screenTime);
 
-                    // Close current image before opening a new one. [FIDSC #3824]
-                    _imageViewer.CloseImage();
+                        CommitComment();
 
-                    OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSkipped));
+                        // Close current image before opening a new one. [FIDSC #3824]
+                        _imageViewer.CloseImage();
+
+                        OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSkipped));
+                    }
                 }
             }
             catch (Exception ex)
@@ -1789,8 +1798,13 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                _userClosing = true;
-                Close();
+                // Do not allow closing the form if a tracking event is taking place
+                // in the image viewer (i.e. Drawing a redaction)
+                if (!_imageViewer.IsTracking)
+                {
+                    _userClosing = true;
+                    Close();
+                }
             }
             catch (Exception ex)
             {
@@ -1809,7 +1823,9 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                if (_imageViewer.IsImageAvailable)
+                // Do not allow discarding changes if a tracking event is
+                // currently taking place in the image viewer (i.e. Drawing a redaction)
+                if (_imageViewer.IsImageAvailable && !_imageViewer.IsTracking)
                 {
                     // Load the original voa
                     LoadCurrentMemento();

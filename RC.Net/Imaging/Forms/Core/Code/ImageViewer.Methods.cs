@@ -4751,7 +4751,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                if (base.Image != null)
+                // Do not switch to the selection tool if it is already the current tool
+                if (base.Image != null && CursorTool != CursorTool.SelectLayerObject)
                 {
                     CursorTool = CursorTool.SelectLayerObject;
                 }

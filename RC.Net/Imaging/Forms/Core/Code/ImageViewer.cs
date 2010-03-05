@@ -1793,6 +1793,22 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Gets whether there is a current tracking event taking place.
+        /// (i.e. drawing a highlight).
+        /// </summary>
+        /// <returns><see langword="true"/> if a tracking event is occurring and
+        /// <see langword="false"/> if no tracking event is occurring.</returns>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool IsTracking
+        {
+            get
+            {
+                return _trackingData != null;
+            }
+        }
+
         #endregion Properties
 
         #region OnEvents
