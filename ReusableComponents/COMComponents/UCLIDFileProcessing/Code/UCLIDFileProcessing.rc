@@ -304,7 +304,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,287,29,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,287,47,50,14
-    LTEXT           "Select individual cells or range of cells in the schedule below to indicate when processing should be active",IDC_STATIC,10,8,270,18
+    LTEXT           "Select individual cells or a range of cells in the schedule below to indicate when processing should be active. Green indicates that processing will be active.",IDC_STATIC,10,8,270,18
     CONTROL         "ListSchedule",IDC_LIST_SCHEDULE,"GXWND",WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,10,29,272,253
     PUSHBUTTON      "Select all",IDC_BUTTON_SELECT_ALL,287,77,50,14
     PUSHBUTTON      "Select none",IDC_BUTTON_SELECT_NONE,287,95,50,14
