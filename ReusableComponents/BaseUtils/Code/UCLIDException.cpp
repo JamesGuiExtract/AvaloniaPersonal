@@ -920,7 +920,6 @@ void UCLIDException::saveTo(const string& strFile, bool bAppend) const
 
 		// Close the output file
 		outfile.close();
-		waitForFileToBeReadable(strFile);
 	}
 	catch(...)
 	{
