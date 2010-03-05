@@ -2273,57 +2273,54 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 				ipNames->PushBack( ipName2 );
 			}
 		}
-		// Else if a second last name was found that is not the last word, 
-		// add the second whole name and add the remaining words as a third name.
-		else if (lSecondDuplicateWordIndex > -1 && lSize > lSecondDuplicateWordIndex + 1)
-		{
-			// Retrieve the second copy of the duplicate word
-			ipMatch = IObjectPairPtr( ipMatches->At(lSecondDuplicateWordIndex) );
-			ASSERT_RESOURCE_ALLOCATION( "ELI24014", ipMatch != NULL );
-			ipToken = ITokenPtr( ipMatch->Object1 );
-			ASSERT_RESOURCE_ALLOCATION( "ELI24015", ipToken != NULL );
-			ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
-
-			// Matching words were found, treat the duplicates as last names and
-			// divide the pending name into two parts
-			ISpatialStringPtr	ipSecond = ipText->GetSubString( 
-				iLastCharUsed + 1, lEndPos );
-			ASSERT_RESOURCE_ALLOCATION( "ELI24016", ipSecond != NULL );
-
-			// Trim leading and trailing whitespace
-			ipSecond->Trim( _bstr_t( " " ), _bstr_t( " " ) );
-
-			// Add the second name to the vector,
-			ipNames->PushBack( ipSecond );
-
-			// Update the last used variables
-			iLastWordUsed = lSecondDuplicateWordIndex;
-			iLastCharUsed = lEndPos;
-
-			// Build the final name string
-			ISpatialStringPtr	ipName = ipText->GetSubString( 
-				iLastCharUsed + 1, ipText->GetSize() - 1 );
-			ASSERT_RESOURCE_ALLOCATION( "ELI24018", ipName != NULL );
-
-			// Trim leading and trailing whitespace
-			ipName->Trim( _bstr_t( " " ), _bstr_t( " " ) );
-
-			// Add the name to the vector
-			ipNames->PushBack( ipName );
-		}
-		// Else just package up the remaining words into a single name
 		else
 		{
-			// Build the complete name string
-			ISpatialStringPtr	ipName = ipText->GetSubString( 
-				iLastCharUsed + 1, ipText->GetSize() - 1 );
-			ASSERT_RESOURCE_ALLOCATION( "ELI24019", ipName != NULL );
+			// Else if a second last name was found that is not the last word, 
+			// add the second whole name and add the remaining words as a third name.
+			if (lSecondDuplicateWordIndex > -1 && lSize > lSecondDuplicateWordIndex + 1)
+			{
+				// Retrieve the second copy of the duplicate word
+				ipMatch = IObjectPairPtr( ipMatches->At(lSecondDuplicateWordIndex) );
+				ASSERT_RESOURCE_ALLOCATION( "ELI24014", ipMatch != NULL );
+				ipToken = ITokenPtr( ipMatch->Object1 );
+				ASSERT_RESOURCE_ALLOCATION( "ELI24015", ipToken != NULL );
+				ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
-			// Trim leading and trailing whitespace
-			ipName->Trim( _bstr_t( " " ), _bstr_t( " " ) );
+				if (iLastCharUsed < lEndPos)
+				{
+					// Matching words were found, treat the duplicates as last names and
+					// divide the pending name into two parts
+					ISpatialStringPtr	ipSecond = ipText->GetSubString( 
+						iLastCharUsed + 1, lEndPos );
+					ASSERT_RESOURCE_ALLOCATION( "ELI24016", ipSecond != NULL );
 
-			// Add the name to the vector
-			ipNames->PushBack( ipName );
+					// Trim leading and trailing whitespace
+					ipSecond->Trim( _bstr_t( " " ), _bstr_t( " " ) );
+
+					// Add the second name to the vector,
+					ipNames->PushBack( ipSecond );
+
+					// Update the last used variables
+					iLastWordUsed = lSecondDuplicateWordIndex;
+					iLastCharUsed = lEndPos;
+				}
+			}
+
+			// Package up the remaining words into a single name
+			long lTextEndPos = ipText->GetSize() - 1;
+			if (iLastCharUsed < lTextEndPos)
+			{
+				// Build the complete name string
+				ISpatialStringPtr	ipName = ipText->GetSubString( 
+					iLastCharUsed + 1, lTextEndPos );
+				ASSERT_RESOURCE_ALLOCATION( "ELI24019", ipName != NULL );
+
+				// Trim leading and trailing whitespace
+				ipName->Trim( _bstr_t( " " ), _bstr_t( " " ) );
+
+				// Add the name to the vector
+				ipNames->PushBack( ipName );
+			}
 		}
 	}
 

@@ -191,6 +191,18 @@ Names|John Smith\r\nMary Smith\r\nPeter Smith
 ..First|Peter
 ..Last|Smith
 
+<TESTCASE>|Two names and an alias [FlexIDSCore:4086]|Sambit Nanda Amite Nanda Aka Amita Rath|
+Names|Sambit Nanda Amite Nanda Aka Amita Rath
+.Person|Sambit Nanda
+..First|Sambit
+..Last|Nanda
+.Person|Amite Nanda
+..First|Amite
+..Last|Nanda
+..PersonAlias|Amita Rath|AKA
+...First|Amita
+...Last|Rath
+
 // P16 #2960
 //<TESTCASE>|Three Names on Three Lines2|JEANENE MARGARET RUMSEY\r\nDAN H. RUMSEY\r\nMINUTEMAN PRESS OF SANTA CLARA
 //Names|JEANENE MARGARET RUMSEY\r\nDAN H. RUMSEY\r\nMINUTEMAN PRESS OF SANTA CLARA
