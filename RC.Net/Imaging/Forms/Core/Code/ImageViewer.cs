@@ -2437,6 +2437,10 @@ namespace Extract.Imaging.Forms
             {
                 ImageFileChanged(this, e);
             }
+
+            // Update the anti-aliasing behavior based on registry settings
+            // [DNRCAU #422]
+            UseAntiAliasing = RegistryManager.UseAntiAliasing;
         }
 
         /// <summary>

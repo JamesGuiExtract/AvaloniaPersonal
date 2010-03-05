@@ -25,6 +25,12 @@ namespace Extract.Imaging.Forms
         const string _MRU_LIST_USER_SUBKEY = _SPOT_RECOGNITION_IR_SUBKEY
             + @"\MRUList";
 
+        /// <summary>
+        /// The current user registry subkey for the image edit settings settings
+        /// </summary>
+        const string _IMAGE_EDIT_SUBKEY =
+            @"Software\Extract Systems\ReusableComponents\OcxAndDlls\ImageEdit";
+
         #endregion RegistryManager Subkeys
 
         #region RegistryManager Keys
@@ -54,6 +60,12 @@ namespace Extract.Imaging.Forms
         /// to get a device context [IDSD #331]
         /// </summary>
         const string _SAVE_RETRY = "SaveRetries";
+
+        /// <summary>
+        /// The key that contains whether anti-aliasing should be turned on or not.
+        /// [DNRCAU #422]
+        /// </summary>
+        const string _USE_ANTI_ALIASING_KEY = "AntiAliasing";
 
         #endregion RegistryManager Keys
 
@@ -102,6 +114,12 @@ namespace Extract.Imaging.Forms
             Registry.CurrentUser.CreateSubKey(_SPOT_RECOGNITION_IR_SUBKEY);
 
         /// <summary>
+        /// The current user registry subkey for the image edit settings.
+        /// </summary>
+        static readonly RegistryKey _userImageEditSubkey =
+            Registry.CurrentUser.CreateSubKey(_IMAGE_EDIT_SUBKEY);
+
+        /// <summary>
         /// Mutex used to make access to the MRU image list in the registry thread safe.
         /// </summary>
         static readonly Mutex _mruMutex = 
@@ -122,6 +140,23 @@ namespace Extract.Imaging.Forms
             {
                 string registryValue = (string)_userSpotRecognitionSubkey.GetValue(
                     _DISPLAY_PERCENTAGES_USER_KEY, "1");
+
+                return registryValue == "1";
+            }
+        }
+
+        /// <summary>
+        /// Gets whether or not to turn anti-aliasing on in the Image viewer
+        /// </summary>
+        /// <returns><see langword="true"/> if anti-aliasing should be turned on;
+        /// <see langword="false"/> if anti-aliasing should be turned off.
+        /// </returns>
+        public static bool UseAntiAliasing
+        {
+            get
+            {
+                string registryValue = (string)_userImageEditSubkey.GetValue(
+                    _USE_ANTI_ALIASING_KEY, "1");
 
                 return registryValue == "1";
             }
