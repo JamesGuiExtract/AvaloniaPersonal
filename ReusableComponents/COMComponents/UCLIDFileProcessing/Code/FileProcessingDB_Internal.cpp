@@ -1721,33 +1721,37 @@ void CFileProcessingDB::unlockDB(_ConnectionPtr ipConnection)
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseAdmin)
 {
-	// Open the Login Table
-	// Lock the mutex for this instance
-	CSingleLock lock(&m_mutex, TRUE);
-
-	// Create a pointer to a recordset
-	_RecordsetPtr ipLoginSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI15103", ipLoginSet != NULL);
-
-	// setup the SQL Query to get the encrypted combo for admin or user
-	string strSQL = "SELECT * FROM LOGIN WHERE UserName = '" + 
-		((bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName) + "'";
-
-	// Open the set for the user being logged in
-	ipLoginSet->Open(strSQL.c_str(), _variant_t((IDispatch *)getDBConnection(), true), 
-		adOpenStatic, adLockReadOnly, adCmdText);
-
-	// user was in the DB if not at the end of file
-	if (ipLoginSet->adoEOF == VARIANT_FALSE)
+	try
 	{
-		// Return the encrypted password that is stored in the DB
-		rstrEncryptedPW = getStringField(ipLoginSet->Fields, "Password");
-		return true;
-	}
+		// Open the Login Table
+		// Lock the mutex for this instance
+		CSingleLock lock(&m_mutex, TRUE);
 
-	// record not found in DB for user or admin
-	rstrEncryptedPW = "";
-	return false;
+		// Create a pointer to a recordset
+		_RecordsetPtr ipLoginSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI15103", ipLoginSet != NULL);
+
+		// setup the SQL Query to get the encrypted combo for admin or user
+		string strSQL = "SELECT * FROM LOGIN WHERE UserName = '" + 
+			((bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName) + "'";
+
+		// Open the set for the user being logged in
+		ipLoginSet->Open(strSQL.c_str(), _variant_t((IDispatch *)getDBConnection(), true), 
+			adOpenStatic, adLockReadOnly, adCmdText);
+
+		// user was in the DB if not at the end of file
+		if (ipLoginSet->adoEOF == VARIANT_FALSE)
+		{
+			// Return the encrypted password that is stored in the DB
+			rstrEncryptedPW = getStringField(ipLoginSet->Fields, "Password");
+			return true;
+		}
+
+		// record not found in DB for user or admin
+		rstrEncryptedPW = "";
+		return false;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29897");
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserNameAndPassword, bool bUseAdmin)
@@ -2550,7 +2554,10 @@ void CFileProcessingDB::clear(bool retainUserValues)
 		}
 
 		string strAdminPW;
-		if (!retainUserValues)
+
+		// Only get the admin password if we are not retaining user values and the
+		// Login table already exists [LRCAU #5780]
+		if (!retainUserValues && doesTableExist(getDBConnection(), "Login"))
 		{
 			// Need to store the admin login and add it back after re-adding the table
 			getEncryptedPWFromDB(strAdminPW, true);
