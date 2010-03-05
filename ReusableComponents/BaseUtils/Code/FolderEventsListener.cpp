@@ -255,13 +255,10 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 		FolderEventsListener* fl = (FolderEventsListener*)pParam;
 		try
 		{
+			vector<FolderEvent> vecEvents;
+
 			while ( fl->m_eventKillDispatchThread.wait(1000) == WAIT_TIMEOUT )
 			{
-				// [LegacyRCAndUtils:5258]
-				// Declare inside the while loop so that after processing a large number of events,
-				// the capacity allocated for FolderEvents in the vector is released.
-				vector<FolderEvent> vecEvents;
-
 				while(fl->m_queEvents.getSize() > 0)
 				{
 					if(fl->m_eventKillDispatchThread.isSignaled())
@@ -294,6 +291,14 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 					fl->dispatchEvent(event);
 					vecEvents.erase(vecEvents.begin() + i);
 					i--;
+				}
+
+				// [LegacyRCAndUtils:5258]
+				// Call swap to free excess capacity so that after processing a large number
+				// of events, the capacity allocated for FolderEvents in the vector is released.
+				if (vecEvents.empty() && vecEvents.capacity() > 1000)
+				{
+					vecEvents.swap(vector<FolderEvent>());
 				}
 			}
 		}
@@ -376,6 +381,12 @@ void FolderEventsListener::processChanges(string strBaseDir, Win32Event &eventKi
 	// names
 	string strOldFilename = "";
 
+	// Add file events will be immediately followed by a modify event for the same file. Keep track
+	// of add file events so that if both events are being monitored, the modify event is considered
+	// part of the add event rather than a stand-alone modify event.
+	static string strLastAddedFilename = "";
+	static DWORD dwAddFileTickTime = 0;
+
 	// ierate through the buffer extracting the information that we need
 	do
 	{
@@ -437,7 +448,28 @@ void FolderEventsListener::processChanges(string strBaseDir, Win32Event &eventKi
 
 		// [LegacyRCAndUtils:5258]
 		// Only process the event types being monitored.
-		if ((m_eventTypeFlags & eEventType) != 0)
+		EFileEventType eFilteredEventType = (EFileEventType)(m_eventTypeFlags & eEventType);
+
+		// [FlexIDSCore:3737]
+		// Any modify/add events that immediately follow an add event on the same file
+		// (and occurs within a second of the original add event) should be ignored.
+		if ((eFilteredEventType == kFileModified  || eFilteredEventType == kFileAdded) &&
+			strLastAddedFilename == strFilename && (GetTickCount() - dwAddFileTickTime) < 1000)
+		{
+			eFilteredEventType = (EFileEventType)0;
+		}
+		else if (eFilteredEventType == kFileAdded)
+		{
+			// If this is a new add event, keep track of the filename
+			strLastAddedFilename = strFilename;
+			dwAddFileTickTime = GetTickCount();
+		}
+		else
+		{
+			strLastAddedFilename = "";
+		}
+
+		if (eFilteredEventType != 0)
 		{
 			FolderEvent event(eEventType, strFilename, strOldFilename);
 			queEvents.push(event);
