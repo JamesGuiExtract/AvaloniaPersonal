@@ -88,7 +88,7 @@ void printUsage()
 	cout << "The single page images are expected to be named as described below." << endl;
 	cout << "The starting page number is required to be 1." << endl;
 	cout << endl;
-	cout << "This application operates with either 2 or 7 arguments:" << endl;
+	cout << "This application operates with either 2, 3, 5 or 6 arguments:" << endl;
 	cout << " Filename and folder based usage:" << endl;
 	cout << "	arg1: Root directory for searching (e.g. \"C:\\ImageFiles\")" << endl;
 	cout << "	arg2: <Optional> Use /s to indicate recursive search." << endl;
@@ -105,10 +105,10 @@ void printUsage()
 	cout << " Input file usage:" << endl;
 	cout << "	arg1: Input file name" << endl;
 	cout << "	arg2: Delimiter" << endl;
-	cout << "	arg3: Image name column position in the input file" << endl;
-	cout << "	arg4: Image page column position in the input file" << endl;
-	cout << "	arg5: Input path to image pages" << endl;
-	cout << "	arg6: Output path for completed images" << endl;
+	cout << "	arg3: Output image name column position in the input file" << endl;
+	cout << "	arg4: Single page input image name column position in the input file" << endl;
+	cout << "	arg5: Output path for completed images" << endl;
+	cout << "	[arg6]: Input path to single page image files" << endl;
 }
 //-------------------------------------------------------------------------------------------------
 string getMultiPageImageName(const string& strPage1, const EFileNameType eFileType)
@@ -483,28 +483,27 @@ void process(const string& strRootDir, bool bRecursive)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void processInputFile(std::ifstream &inputFile, std::string &strDelim, int iImageNamePos, int iImagePagePos, std::string &strInputPath, std::string &strOutputPath)
+void processInputFile(ifstream &inputFile, string &strDelim, int iImageNamePos, int iImagePagePos, string &strInputPath, string &strOutputPath)
 {
-	// map used to store the pages in a vector under the image name
-	std::map<std::string, std::vector<std::string> > mapMultiPageImages;
-
 	if(!isValidFolder(strOutputPath))
 	{
 		createDirectory(strOutputPath);
 	}
 
+	map<string, vector<string>> mapMultiPageImages;
+
 	// read input file
 	while (!inputFile.eof())
 	{
-		char buffer[1024];
+		char buffer[1024] = {0};
 
 		inputFile.getline(buffer, 1024);
 
-		std::string strBuffer(buffer);
+		string strBuffer(buffer);
 
 		if(strBuffer != "")
 		{
-			std::vector<std::string> vecTokens;
+			vector<string> vecTokens;
 			
 			// extract tokens from each line of the input file
 			StringTokenizer::sGetTokens(strBuffer, strDelim, vecTokens);
@@ -512,10 +511,19 @@ void processInputFile(std::ifstream &inputFile, std::string &strDelim, int iImag
 			// confirm that the column positions specified are within range
 			if(((int)vecTokens.size() >= iImagePagePos) && ((int)vecTokens.size() >= iImageNamePos))
 			{
-				std::string strSubFileName(strInputPath + vecTokens[iImagePagePos - 1]);
-				std::string strFileName(vecTokens[iImageNamePos - 1]);
+				string strOutputFile = vecTokens[iImageNamePos-1];
+				makeLowerCase(strOutputFile);
+				string strInputFileName = strInputPath + vecTokens[iImagePagePos-1];
+				simplifyPathName(strInputFileName);
+				if (!isAbsolutePath(strInputFileName))
+				{
+					UCLIDException ue("ELI29899",
+						"Must specify absolute path in text file or specify input path on command line.");
+					ue.addDebugInfo("Input File Name", vecTokens[iImagePagePos-1]);
+					throw ue;
+				}
 
-				mapMultiPageImages[strFileName].push_back(strSubFileName);
+				mapMultiPageImages[strOutputFile].push_back(strInputFileName);
 			}
 			else
 			{
@@ -529,16 +537,12 @@ void processInputFile(std::ifstream &inputFile, std::string &strDelim, int iImag
 		}
 	}
 
-	std::map<std::string, std::vector<std::string> >::iterator mapIter;
+	map<string, vector<string> >::iterator mapIter;
 
 	// cycle through the map and create the multi-page images
 	for(mapIter = mapMultiPageImages.begin(); mapIter != mapMultiPageImages.end(); mapIter++)
 	{
-		std::string strOutputFileName(std::string(strOutputPath + mapIter->first + ".tif"));
-
-		// sort the vector to ensure pages are in proper order
-		std::sort(mapIter->second.begin(), mapIter->second.end()); 
-
+		string strOutputFileName = strOutputPath + (mapIter->first) + ".tif";
 		createMultiPageImage(mapIter->second, strOutputFileName, false);	
 	}
 }
@@ -564,27 +568,52 @@ int main(int argc, char *argv[])
 		validateLicense();
 
 		// check for correct # of arguments
-		if (argc < 2 || ((argc > 3) && (argc != 7)))
+		if (argc != 2 && argc != 3 && argc != 6 && argc != 7)
 		{
 			cout << "ERROR: Incorrect usage!" << endl;
 			printUsage();
 			return EXIT_FAILURE;
 		}
 
-		if (argc == 7)
+		if (argc == 6 || argc == 7)
 		{
-			std::string strDelim(argv[2]);
+			string strDelim(argv[2]);
 			int iImageNamePos = atoi(argv[3]);
 			int iImageFilePos = atoi(argv[4]);
-			std::string strInputPath(argv[5]);
-			std::string strOutputPath(argv[6]);
 
-			std::ifstream inputFile(argv[1]);
+			// Get the absolute path for the output folder and ensure the directory
+			// ends in a '\'
+			string strOutputPath = buildAbsolutePath(argv[5]);
+			if (strOutputPath[strOutputPath.length()-1] != '\\')
+			{
+				strOutputPath += "\\";
+			}
+
+			// Check for optional input path argument
+			string strInputPath;
+			if (argc == 7)
+			{
+				strInputPath = buildAbsolutePath(argv[6]);
+				if (strInputPath[strInputPath.length()-1] != '\\')
+				{
+					strInputPath += "\\";
+				}
+
+				if (!isValidFolder(strInputPath))
+				{
+					UCLIDException ue("ELI29898", "Input folder does not exist.");
+					ue.addDebugInfo("Input Folder", strInputPath);
+					throw ue;
+				}
+			}
+
+			string strInputFile(argv[1]);
+			ifstream inputFile(strInputFile.c_str());
 
 			if (inputFile.fail()) 
 			{
 				UCLIDException ue("ELI11798", "Unable to open file!");
-				ue.addDebugInfo("Filename", argv[1]);
+				ue.addDebugInfo("Filename", strInputFile);
 				throw ue;
 			}
 			else
