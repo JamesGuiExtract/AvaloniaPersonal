@@ -841,9 +841,12 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 							ITokenPtr ipSubToken = ipSubMatches->At(s);
 							ASSERT_RESOURCE_ALLOCATION("ELI22477", ipSubToken != NULL);
 							
-							// Don't create attributes if name begins with a number or is empty.
+							// Don't create attributes if name begins with a number,
+							// an '_' [FlexIDSCore #4095]
+							// or is empty.
 							string strName = asString(ipSubToken->Name);
-							if ( !isDigitChar( strName[0] ) && !asString(ipSubToken->Value).empty() )
+							char cFirstChar = strName[0];
+							if ( !isDigitChar(cFirstChar) && cFirstChar != '_' && !asString(ipSubToken->Value).empty() )
 							{
 								IAttributePtr ipSubAttribute = createAttribute(ipSubToken, ipInputText);
 								ASSERT_RESOURCE_ALLOCATION("ELI22478", ipSubAttribute != NULL);
