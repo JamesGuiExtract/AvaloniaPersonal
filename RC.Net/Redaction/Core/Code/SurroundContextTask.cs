@@ -14,7 +14,9 @@ using UCLID_FILEPROCESSINGLib;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
+using EOrientation = UCLID_RASTERANDOCRMGMTLib.EOrientation;
 using ESpatialEntity = UCLID_RASTERANDOCRMGMTLib.ESpatialEntity;
+using SpatialPageInfo = UCLID_RASTERANDOCRMGMTLib.SpatialPageInfo;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 using SpatialStringSearcher = UCLID_RASTERANDOCRMGMTLib.SpatialStringSearcher;
 
@@ -123,15 +125,15 @@ namespace Extract.Redaction
         RedactionItem GetExtendedRedaction(SpatialString source, SpatialStringSearcher searcher, 
             RedactionItem item)
         {
-            // Get the original raster zones
+            // Get the spatial string
             SpatialString value = item.ComAttribute.Value;
-            RasterZoneCollection zones = GetZonesFromSpatialString(value);
 
             // Include the original zones in the result [FIDSC #4045]
-            RasterZoneCollection resultZones = new RasterZoneCollection(zones);
+            RasterZoneCollection imageZones = GetImageZonesFromSpatialString(value);
+            RasterZoneCollection resultZones = new RasterZoneCollection(imageZones);
 
             int loadedPage = -1;
-            foreach (RasterZone zone in zones)
+            foreach (RasterZone zone in GetOcrZonesFromSpatialString(value))
             {
                 int currentPage = zone.PageNumber;
                 if (currentPage != loadedPage)
@@ -148,7 +150,7 @@ namespace Extract.Redaction
 
                 if (extended.HasSpatialInfo())
                 {
-                    resultZones.AddRange(GetZonesFromSpatialString(extended));
+                    resultZones.AddRange(GetImageZonesFromSpatialString(extended));
                 }
             }
 
@@ -163,8 +165,9 @@ namespace Extract.Redaction
 
             // Create the result for the spatial string
             SpatialString resultValue = new SpatialString();
+            LongToObjectMap pageInfoMap = GetUnrotatedSpatialPageInfoMap(source);
             resultValue.CreateHybridString(resultZones.ToIUnknownVector(), value.String, 
-                source.SourceDocName, source.SpatialPageInfos);
+                source.SourceDocName, pageInfoMap);
 
             // Don't modify the original attribute since the RedactionFileLoader is still using it
             ICopyableObject copy = (ICopyableObject)item.ComAttribute;
@@ -188,9 +191,19 @@ namespace Extract.Redaction
         /// </summary>
         /// <param name="value">The spatial string from which to retrieve raster zones.</param>
         /// <returns>The OCR raster zones of the specified spatial string.</returns>
-        static RasterZoneCollection GetZonesFromSpatialString(SpatialString value)
+        static RasterZoneCollection GetOcrZonesFromSpatialString(SpatialString value)
         {
             return new RasterZoneCollection(value.GetOCRImageRasterZones());
+        }
+
+        /// <summary>
+        /// Get the raster zones of the specified spatial string in image coordinates.
+        /// </summary>
+        /// <param name="value">The spatial string from which to retrieve raster zones.</param>
+        /// <returns>The raster zones of the specified spatial string in image coordinates.</returns>
+        static RasterZoneCollection GetImageZonesFromSpatialString(SpatialString value)
+        {
+            return new RasterZoneCollection(value.GetOriginalImageRasterZones());
         }
 
         /// <summary>
@@ -234,6 +247,54 @@ namespace Extract.Redaction
                     i--;
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the spatial page info map of the spatial string without any deskew or rotation 
+        /// applied.
+        /// </summary>
+        /// <param name="value">The spatial string from which to retrieve the unrotated spatial 
+        /// info map.</param>
+        /// <returns>The spatial page info map of <paramref name="value"/> without any deskew or 
+        /// rotation applied.</returns>
+        static LongToObjectMap GetUnrotatedSpatialPageInfoMap(SpatialString value)
+        {
+            LongToObjectMap pageInfoMap = value.SpatialPageInfos;
+            LongToObjectMap result = new LongToObjectMap();
+
+            int size = pageInfoMap.Size;
+            for (int i = 0; i < size; i++)
+            {
+                int page;
+                object pageInfoObject;
+                pageInfoMap.GetKeyValue(i, out page, out pageInfoObject);
+
+                SpatialPageInfo pageInfo = (SpatialPageInfo)pageInfoObject;
+
+                SpatialPageInfo newPageInfo = GetUnrotatedPageInfo(pageInfo);
+
+                result.Set(page, newPageInfo);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the spatial page info without any deskew or rotation applied.
+        /// </summary>
+        /// <param name="pageInfo">The spatial string from which to retrieve the unrotated spatial 
+        /// info map.</param>
+        /// <returns>The <paramref name="pageInfo"/> without any deskew or rotation applied.
+        /// </returns>
+        static SpatialPageInfo GetUnrotatedPageInfo(SpatialPageInfo pageInfo)
+        {
+            int width, height;
+            pageInfo.GetWidthAndHeight(out width, out height);
+
+            SpatialPageInfo newPageInfo = new SpatialPageInfo();
+            newPageInfo.SetPageInfo(width, height, EOrientation.kRotNone, 0);
+
+            return newPageInfo;
         }
 
         /// <summary>
@@ -441,7 +502,7 @@ namespace Extract.Redaction
 
                 // Create the spatial string searcher
                 SpatialStringSearcher searcher = new SpatialStringSearcher();
-                searcher.SetBoundaryResolution(ESpatialEntity.kWord);
+                searcher.SetBoundaryResolution(ESpatialEntity.kCharacter);
                 searcher.SetIncludeDataOnBoundary(true);
 
                 // Extend each redaction as necessary
