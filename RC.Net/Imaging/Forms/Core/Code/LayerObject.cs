@@ -1160,11 +1160,13 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Draws the grip handles on the specified <see cref="Graphics"/> object.
+        /// Draws the selection border on the specified <see cref="Graphics"/> object.
         /// </summary>
         /// <param name="graphics">The graphics with which to draw. Cannot be 
-        /// <see langword="null"/>.</param>
-        public virtual void DrawGripHandles(Graphics graphics)
+        ///   <see langword="null"/>.</param>
+        /// <param name="drawGripPoints"><see langword="true"/> if grip points should be drawn; 
+        ///   <see langword="false"/> if grip points should not be drawn.</param>
+        public virtual void DrawSelection(Graphics graphics, bool drawGripPoints)
         {
             try
             {
@@ -1188,7 +1190,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // If there are no grip points, we are done
-                if (gripPoints.Length <= 0)
+                if (!drawGripPoints || gripPoints.Length <= 0)
                 {
                     return;
                 }
@@ -1234,11 +1236,11 @@ namespace Extract.Imaging.Forms
 
                     // Calculate the vertices of the link arrow
                     Point[] vertices = new Point[]
-                {
-                    new Point(x, linkPoints[0].Y - _HALF_LINK_ARROW_SIDE),
-                    new Point(x, linkPoints[0].Y + _HALF_LINK_ARROW_SIDE),
-                    new Point(linkPoints[0].X - _HALF_LINK_ARROW_SIDE, linkPoints[0].Y)
-                };
+                    {
+                        new Point(x, linkPoints[0].Y - _HALF_LINK_ARROW_SIDE),
+                        new Point(x, linkPoints[0].Y + _HALF_LINK_ARROW_SIDE),
+                        new Point(linkPoints[0].X - _HALF_LINK_ARROW_SIDE, linkPoints[0].Y)
+                    };
 
                     // Draw the arrow
                     graphics.FillPolygon(Brushes.Red, vertices);
@@ -1253,11 +1255,11 @@ namespace Extract.Imaging.Forms
 
                     // Calculate the vertices of the link arrow
                     Point[] vertices = new Point[]
-                {
-                    new Point(x, linkPoints[1].Y - _HALF_LINK_ARROW_SIDE),
-                    new Point(x, linkPoints[1].Y + _HALF_LINK_ARROW_SIDE),
-                    new Point(linkPoints[1].X + _HALF_LINK_ARROW_SIDE, linkPoints[1].Y)
-                };
+                    {
+                        new Point(x, linkPoints[1].Y - _HALF_LINK_ARROW_SIDE),
+                        new Point(x, linkPoints[1].Y + _HALF_LINK_ARROW_SIDE),
+                        new Point(linkPoints[1].X + _HALF_LINK_ARROW_SIDE, linkPoints[1].Y)
+                    };
 
                     // Draw the arrow
                     graphics.FillPolygon(Brushes.Red, vertices);
@@ -1472,7 +1474,7 @@ namespace Extract.Imaging.Forms
             {
                 // Returns true iff the object is visible and on the currently visible page
                 return Visible && _imageViewer != null
-                    && _imageViewer.PageNumber == PageNumber;
+                       && _imageViewer.PageNumber == PageNumber;
             }
             catch (Exception ex)
             {
@@ -1868,10 +1870,10 @@ namespace Extract.Imaging.Forms
             }
 
             return (
-                layerObject1.PageNumber == layerObject2.PageNumber
-                && layerObject1.Location == layerObject2.Location
-                && layerObject1.GetCenterPoint() == layerObject2.GetCenterPoint()
-            );
+                       layerObject1.PageNumber == layerObject2.PageNumber
+                       && layerObject1.Location == layerObject2.Location
+                       && layerObject1.GetCenterPoint() == layerObject2.GetCenterPoint()
+                   );
         }
 
         /// <summary>

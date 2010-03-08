@@ -148,11 +148,13 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Clues don't have grip handles, just draw the dashed pen around the highlights.
+        /// Draws the selection border on the specified <see cref="Graphics"/> object.
         /// </summary>
         /// <param name="graphics">The graphics with which to draw. Cannot be 
-        /// <see langword="null"/>.</param>
-        public override void DrawGripHandles(Graphics graphics)
+        ///   <see langword="null"/>.</param>
+        /// <param name="drawGripPoints"><see langword="true"/> if grip points should be drawn; 
+        ///   <see langword="false"/> if grip points should not be drawn.</param>
+        public override void DrawSelection(Graphics graphics, bool drawGripPoints)
         {
             try
             {

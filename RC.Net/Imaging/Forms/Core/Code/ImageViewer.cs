@@ -678,6 +678,9 @@ namespace Extract.Imaging.Forms
 
                             // Store this as the last active continuous use cursor tool
                             _lastContinuousUseTool = value;
+
+                            // Redraw the grip handles of any layer objects [FIDSC #3993]
+                            Invalidate();
                             break;
 
                         default:
@@ -2403,10 +2406,11 @@ namespace Extract.Imaging.Forms
                     }
                 }
 
-                // Draw the grip handles
+                // Draw the grip handles if the selection tool is activated [FIDSC #3993]
+                bool drawGripPoints = _cursorTool == CursorTool.SelectLayerObject;
                 foreach (LayerObject layerObject in _layerObjects.Selection)
                 {
-                    layerObject.DrawGripHandles(e.Graphics);
+                    layerObject.DrawSelection(e.Graphics, drawGripPoints);
                 }
 
                 // Draw the link arrows

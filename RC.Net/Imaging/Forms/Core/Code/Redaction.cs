@@ -343,12 +343,13 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Updates the redaction's border as necessary to ensure the dashed line of
-        /// CompositeLayerObject will be visible.
+        /// Draws the selection border on the specified <see cref="Graphics"/> object.
         /// </summary>
-        /// <param name="graphics">The graphics with which to draw. Cannot be
-        /// <see langword="null"/>.</param>
-        public override void DrawGripHandles(Graphics graphics)
+        /// <param name="graphics">The graphics with which to draw. Cannot be 
+        ///   <see langword="null"/>.</param>
+        /// <param name="drawGripPoints"><see langword="true"/> if grip points should be drawn; 
+        ///   <see langword="false"/> if grip points should not be drawn.</param>
+        public override void DrawSelection(Graphics graphics, bool drawGripPoints)
         {
             try
             {
@@ -375,7 +376,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Now the base class to proceed with DrawGripHandles as it normally would.
-                base.DrawGripHandles(graphics);
+                base.DrawSelection(graphics, drawGripPoints);
             }
             catch (Exception ex)
             {
