@@ -36,9 +36,18 @@ CSpotRecognitionWindow::~CSpotRecognitionWindow()
 	
 	try
 	{
-		// force deletion of the dialog object within the scope of this destructor
-		// so that we know the destruction is happening with the correct AFX module state
-		m_apDlg.reset(NULL);
+		// [LegacyRCAndUtils:5743]
+		// Subimage windows may have already been destroyed if a parent subimage window was closed.
+		// Resetting it here (calling its destructor) will cause an exception... while not a
+		// completely correct fix (it causes a short-lived memory leak when exiting the
+		// application), avoiding the reset call on dialogs that have already been destroyed avoids
+		// the exception.
+		if (m_apDlg.get() != NULL && m_apDlg->m_hWnd != NULL)
+		{
+			// force deletion of the dialog object within the scope of this destructor
+			// so that we know the destruction is happening with the correct AFX module state
+			m_apDlg.reset(NULL);
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16501");
 }
