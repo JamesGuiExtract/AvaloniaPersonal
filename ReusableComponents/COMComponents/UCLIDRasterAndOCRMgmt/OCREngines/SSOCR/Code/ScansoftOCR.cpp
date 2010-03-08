@@ -685,8 +685,8 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 				if (pProgressStatus)
 				{
 					// create thread to handle progress status updates
-					apPSUpdateThread = auto_ptr<PSUpdateThreadManager> 
-						(new PSUpdateThreadManager(pProgressStatus, ipOcrEngine, ipPageNumbers->Size));
+					apPSUpdateThread.reset(new PSUpdateThreadManager(pProgressStatus, ipOcrEngine, 
+						ipPageNumbers->Size));
 					ASSERT_RESOURCE_ALLOCATION("ELI16207", apPSUpdateThread.get() != NULL);
 				}
 
@@ -816,8 +816,8 @@ ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFil
 	auto_ptr<PSUpdateThreadManager> apPSUpdateThread;
 	if (pProgressStatus)
 	{
-		apPSUpdateThread = auto_ptr<PSUpdateThreadManager> 
-			(new PSUpdateThreadManager(pProgressStatus, ipOcrEngine, ipPageNumbers->Size));
+		apPSUpdateThread.reset(new PSUpdateThreadManager(pProgressStatus, ipOcrEngine, 
+			ipPageNumbers->Size));
 		ASSERT_RESOURCE_ALLOCATION("ELI17315", apPSUpdateThread.get() != NULL);
 	}
 
