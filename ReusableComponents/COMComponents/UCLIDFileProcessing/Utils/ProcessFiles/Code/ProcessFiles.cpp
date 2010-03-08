@@ -82,10 +82,12 @@ void usage()
 						"\t/m:<nnn> - will process <nnn> documents and stop\n"
 						"\t/fc - automatically close the dialog after a processing batch with or without failures\n"
 						"\t/d <Directory Name> - changes the scope to folder with the given directory name\n"
+						"\t\tthis option requires a .fps file with exactly one 'Files from folder' file supplier\n"
 						"\t\tthis option can not be specified with the /l option\n"
 						"\t\tIt is recommended that the /service switch is used with this option\n"
 						"\t\toverriding folder specified in <filename>\n"
 						"\t/l <ListFileName> - loads list of files to process from <ListFileName>\n"
+						"\t\tthis option requires a .fps file with exactly one 'Files from dynamic list' file supplier\n"
 						"\t\tthis option cannot be specified with the /d option\n"
 						"\t\tIt is recommended that the /service switch is used with this option\n"
 						"\t/service - disables the autosave of the FPS file, will close when processing completes\n"
@@ -134,7 +136,7 @@ void setupFolderSupplier ( IFileProcessingManagerPtr ipFPM, std::string strFolde
 
 	if ( ipFolderFS == NULL )
 	{
-		UCLIDException ue("ELI15383", "There must be only a FolderFS defined in the FPS file.");
+		UCLIDException ue("ELI15383", "There must be only a 'Files from folder' file supplier defined in the FPS file.");
 		throw ue;
 	}
 
@@ -155,7 +157,7 @@ void setupDynamicListSupplier(IFileProcessingManagerPtr ipFPM, std::string strFi
 
 	if ( ipDynamicFS == NULL )
 	{
-		UCLIDException ue("ELI15390", "There must be only a DynamicFileListFS defined in the FPS file.");
+		UCLIDException ue("ELI15390", "There must be only a 'Files from dynamic list' file supplier defined in the FPS file.");
 		throw ue;
 	}
 
