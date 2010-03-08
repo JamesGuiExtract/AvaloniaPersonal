@@ -289,6 +289,18 @@ namespace Extract.Imaging.Forms
                 // TODO: actually perform OCR
                 _text = (text == null && imageViewer.RecognizeHighlightText ? "OCR text" : text);
                 
+                // [DataEntry:3860]
+                // Ensure the newly created highlight is of minimum size.
+                Rectangle bounds = GetBounds();
+                if (bounds.Width < MinSize.Width)
+                {
+                    _endPoint.Offset(1, 0);
+                }
+                if (bounds.Height < MinSize.Height)
+                {
+                    _height = MinSize.Height;
+                }
+
                 // Calculate the region
                 CalculateRegion();
             }
