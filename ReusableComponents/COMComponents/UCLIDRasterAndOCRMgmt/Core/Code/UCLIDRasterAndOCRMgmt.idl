@@ -308,12 +308,12 @@ library UCLID_RASTERANDOCRMGMTLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To get both the width and height of the page in a single call
 		[id(6), helpstring("method GetWidthAndHeight")] HRESULT GetWidthAndHeight(
-			[in] long *pWidth, [in] long *pHeight);
+			[out] long *pWidth, [out] long *pHeight);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To get all page info (width, height, orientation, and deskew) in a single call
 		[id(7), helpstring("method GetPageInfo")] HRESULT GetPageInfo(
-			[in] long* plWidth, [in] long* plHeight, [in] EOrientation* peOrientation,
-			[in] double* pdDeskew);
+			[out] long* plWidth, [out] long* plHeight, [out] EOrientation* peOrientation,
+			[out] double* pdDeskew);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To check if this spatial page info is equal to a specified spatial page info.
 		//			Equal means all values are the same (width, height, orientation and deskew)
