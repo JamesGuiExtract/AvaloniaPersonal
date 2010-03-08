@@ -403,18 +403,21 @@ STDMETHODIMP CArchiveRestoreTask::raw_ProcessFile(BSTR bstrFileFullName, long nF
 		string strFileToArchiveRestore = 
 			CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strFileToArchive, strSourceDoc);
 		_lastCodePos = "40";
+		string strArchiveFolder = 
+			CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strArchiveFolder, "");
+		_lastCodePos = "50";
 
 		// Ensure there is a '\' on the archive folder
-		if (m_strArchiveFolder[m_strArchiveFolder.length()-1] != '\\')
+		if (strArchiveFolder[strArchiveFolder.length()-1] != '\\')
 		{
-			m_strArchiveFolder += "\\";
+			strArchiveFolder += "\\";
 		}
 		_lastCodePos = "60";
 
 		// Build the path to where the file should be archived to/restored from
 		// <ArchiveRoot>\((FileID/1,000,000) * 1,000,000)\((FileID/10,000) * 10,000)\
 		// ((FileID/100) * 100)\FileID\<Tag>
-		string strArchiveFileName = m_strArchiveFolder
+		string strArchiveFileName = strArchiveFolder
 			+ padCharacter(asString((nFileID/1000000) * 1000000), true, '0', giARCHIVE_FOLDER_DIGIT_COUNT) + "\\"
 			+ padCharacter(asString((nFileID/10000) * 10000), true, '0', giARCHIVE_FOLDER_DIGIT_COUNT) + "\\"
 			+ padCharacter(asString((nFileID/100) * 100), true, '0', giARCHIVE_FOLDER_DIGIT_COUNT) + "\\"

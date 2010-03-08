@@ -144,8 +144,12 @@ STDMETHODIMP CArchiveRestoreTaskPP::Apply()
 			ipArchiveRestore->DeleteFileAfterArchive =
 				asVariantBool(m_checkDeleteFile.GetCheck() == BST_CHECKED);
 
-			// Update the tags file
-			saveTagToTagsFile(asString(bstrTag), getTagFile(asString(bstrArchiveFolder)));
+			// Update the tags file if it does not contain a tag [LRCAU #5242]
+			string strArchiveFolder = asString(bstrArchiveFolder);
+			if (strArchiveFolder.find_first_of("<$") == string::npos)
+			{
+				saveTagToTagsFile(asString(bstrTag), getTagFile(strArchiveFolder));
+			}
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24606");
