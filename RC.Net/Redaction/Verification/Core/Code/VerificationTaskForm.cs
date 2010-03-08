@@ -1327,16 +1327,37 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Updates the properties of the exemption code related controls based on the currently 
-        /// selected layer objects.
+        /// Updates the properties controls based on the currently selected layer objects.
         /// </summary>
-        void UpdateExemptionControls()
+        void UpdateControlsBasedOnSelection()
         {
             bool selected = _imageViewer.LayerObjects.Selection.Count > 0;
 
             _applyExemptionToolStripButton.Enabled = selected;
             _lastExemptionToolStripButton.Enabled = 
                 selected && _redactionGridView.HasAppliedExemptions;
+
+            _previousRedactionToolStripButton.Enabled = selected && !IsFirstRowSelected();
+        }
+
+        /// <summary>
+        /// Determines whether the first row of the data grid is selected.
+        /// </summary>
+        /// <returns><see langword="true"/> if the first row is selected; <see langword="false"/> 
+        /// if the first row is not selected.</returns>
+        bool IsFirstRowSelected()
+        {
+            bool selected = false;
+            foreach (LayerObject layerObject in _redactionGridView.Rows[0].LayerObjects)
+            {
+                if (layerObject.Selected)
+                {
+                    selected = true;
+                    break;
+                }
+            }
+
+            return selected;
         }
 
         /// <summary>
@@ -1378,7 +1399,7 @@ namespace Extract.Redaction.Verification
         string GetFileActionComment(VerificationMemento memento)
         {
             return _fileDatabase == null 
-                ? "" : _fileDatabase.GetFileActionComment(memento.FileId, memento.ActionId);
+                       ? "" : _fileDatabase.GetFileActionComment(memento.FileId, memento.ActionId);
         }
 
         /// <summary>
@@ -2087,7 +2108,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                UpdateExemptionControls();
+                UpdateControlsBasedOnSelection();
             }
             catch (Exception ex)
             {
@@ -2106,7 +2127,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                UpdateExemptionControls();
+                UpdateControlsBasedOnSelection();
             }
             catch (Exception ex)
             {
