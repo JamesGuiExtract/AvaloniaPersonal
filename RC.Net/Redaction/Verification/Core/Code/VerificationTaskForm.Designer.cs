@@ -651,6 +651,7 @@ namespace Extract.Redaction.Verification
             // 
             // _sandDockManager
             // 
+            this._sandDockManager.AllowKeyboardNavigation = false;
             this._sandDockManager.DockSystemContainer = this;
             this._sandDockManager.MaximumDockContainerSize = 2000;
             this._sandDockManager.MinimumDockContainerSize = 220;
