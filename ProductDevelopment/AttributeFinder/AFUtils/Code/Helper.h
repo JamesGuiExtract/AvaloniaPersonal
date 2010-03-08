@@ -13,7 +13,8 @@ bool findDuplicateEntry(const CString& zEntry, ATLControls::CListViewCtrl lst);
 // Return false if the user dismisses the prompt for value dialog
 // The third param is the header of the file name, used to judge if the string is a file name
 // The fourth param is the current selected item's index in the list box, -1 means adding a new item
-bool promptForValue(CString& zEntry, ATLControls::CListViewCtrl lst, const CString zHeader = "", int nItemIndex = 0);
+bool promptForValue(CString& zEntry, ATLControls::CListViewCtrl lst, const CString zHeader = "",
+					int nItemIndex = 0, bool bValidateIdentifier = false);
 
 // Return true if the first entry in the list box is a file name with proper header
 bool isFirstEntryDynamicFile(ATLControls::CListViewCtrl lst, const CString zHeader);

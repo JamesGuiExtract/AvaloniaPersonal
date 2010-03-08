@@ -117,7 +117,7 @@ LRESULT CMergeAttributesPP::OnBnClickedBtnAdd(WORD wNotifyCode, WORD wID, HWND h
 	{
 		// Prompt user to enter a new value
 		CString zValue;
-		if (promptForValue(zValue, m_listNameMergePriority, "", -1))
+		if (promptForValue(zValue, m_listNameMergePriority, "", -1, true))
 		{
 			int nTotal = m_listNameMergePriority.GetItemCount();
 				
@@ -137,13 +137,13 @@ LRESULT CMergeAttributesPP::OnBnClickedBtnAdd(WORD wNotifyCode, WORD wID, HWND h
 			m_listNameMergePriority.GetClientRect(&rect);			
 			m_listNameMergePriority.SetColumnWidth(0, rect.Width());
 
-			// Call updateButtons to update the related buttons
-			updateButtons();
-
 			SetDirty(TRUE);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI22851");
+
+	// Call updateButtons to update the related buttons
+	updateButtons();
 
 	return 0;
 }
@@ -390,14 +390,27 @@ STDMETHODIMP CMergeAttributesPP::Apply(void)
 			
 			if ((m_btnSpecifyName.GetCheck() == BST_CHECKED))
 			{
-				ipRule->NameMergeMode = (UCLID_AFOUTPUTHANDLERSLib::EFieldMergeMode) kSpecifyField;
-				ipRule->SpecifiedName = verifyControlValueAsBSTR(m_editSpecifiedName,
+				// Get the specified name and validate it
+				_bstr_t bstrName = verifyControlValueAsBSTR(m_editSpecifiedName,
 					"Specify a name for the merged attribute!");
+				try
+				{
+					validateIdentifier(asString(bstrName));
+				}
+				catch(...)
+				{
+					m_editSpecifiedName.SetFocus();
+					throw;
+				}
+
+				ipRule->NameMergeMode = (UCLID_AFOUTPUTHANDLERSLib::EFieldMergeMode) kSpecifyField;
+				ipRule->SpecifiedName = bstrName;
 			}
 			else
 			{
 				ipRule->NameMergeMode = (UCLID_AFOUTPUTHANDLERSLib::EFieldMergeMode) kPreserveField;
 				ipRule->SpecifiedName = verifyControlValueAsBSTR(m_editSpecifiedName);
+
 				if (ipNamePrioirtyList->Size == 0)
 				{
 					m_btnAdd.SetFocus();
@@ -409,14 +422,26 @@ STDMETHODIMP CMergeAttributesPP::Apply(void)
 
 			if (m_btnSpecifyType.GetCheck() == BST_CHECKED)
 			{
+				_bstr_t bstrType = verifyControlValueAsBSTR(m_editSpecifiedType);
+
+				try
+				{
+					validateIdentifier(asString(bstrType));
+				}
+				catch(...)
+				{
+					m_editSpecifiedType.SetFocus();
+					throw;
+				}
+
 				ipRule->TypeMergeMode = (UCLID_AFOUTPUTHANDLERSLib::EFieldMergeMode) kSpecifyField;
+				ipRule->SpecifiedType = bstrType;
 			}
 			else
 			{
 				ipRule->TypeMergeMode = (UCLID_AFOUTPUTHANDLERSLib::EFieldMergeMode) kCombineField;
+				ipRule->SpecifiedType = verifyControlValueAsBSTR(m_editSpecifiedType);
 			}
-
-			ipRule->SpecifiedType = verifyControlValueAsBSTR(m_editSpecifiedType);
 
 			ipRule->SpecifiedValue = verifyControlValueAsBSTR(m_editSpecifiedValue,
 				"Specify a value for the merged attribute!");
@@ -496,11 +521,12 @@ IVariantVectorPtr CMergeAttributesPP::retrieveListValues(ATLControls::CListViewC
 	IVariantVectorPtr ipEntries(CLSID_VariantVector);
 	ASSERT_RESOURCE_ALLOCATION("ELI22874", ipEntries != NULL);
 
-	// Retrieve the entries from listControl
+	// Retrieve the entries from listControl (validate each entry)
 	for (long i = 0; i < listControl.GetItemCount(); i++)
 	{
 		CComBSTR bstrValue;
 		listControl.GetItemText(i, 0, bstrValue.m_str);
+		validateIdentifier(asString(bstrValue));
 		ipEntries->PushBack(bstrValue.m_str);
 	}
 	

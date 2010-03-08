@@ -29,7 +29,8 @@ bool findDuplicateEntry(const CString& zEntry, ATLControls::CListViewCtrl lst)
 	return false;
 }
 //--------------------------------------------------------------------------------------------------
-bool promptForValue(CString& zEntry, ATLControls::CListViewCtrl lst, const CString zHeader, int nItemIndex)
+bool promptForValue(CString& zEntry, ATLControls::CListViewCtrl lst, const CString zHeader,
+					int nItemIndex, bool bValidateIdentifier)
 {
 	CString	zCopy(zEntry);
 
@@ -47,6 +48,20 @@ bool promptForValue(CString& zEntry, ATLControls::CListViewCtrl lst, const CStri
 				continue;
 			}
 
+			if (bValidateIdentifier)
+			{
+				try
+				{
+					validateIdentifier((LPCTSTR) zEntry);
+				}
+				catch(...)
+				{
+					CString zMsg("");
+					zMsg.Format("<%s> is not a valid identifier. Please specify another identifier.", zEntry);
+					AfxMessageBox(zMsg);
+					continue;
+				}
+			}
 			// If header string is specified, we need to check if the string is a file name
 			if (zHeader != "")
 			{
@@ -70,7 +85,7 @@ bool promptForValue(CString& zEntry, ATLControls::CListViewCtrl lst, const CStri
 						CString zPrompt = "If a file name is specified for dynamically loading strings, \nit should be the only entry in the list box.\n\n Do you want to overwrite the existing entries with this file name?";
 
 						int iResult;
-						iResult = MessageBox(NULL, zPrompt.operator LPCTSTR(), "Confirm file selection", MB_YESNO|MB_ICONINFORMATION);
+						iResult = MessageBox(NULL, (LPCTSTR)zPrompt, "Confirm file selection", MB_YESNO|MB_ICONINFORMATION);
 						if (iResult == IDYES)
 						{
 							// Delete all items in the list box

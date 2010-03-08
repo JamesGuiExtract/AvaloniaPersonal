@@ -842,6 +842,7 @@ void readStorageFromUnencryptedFile(IStorage** ppStorage, BSTR bstrFileName)
 	{
 		UCLIDException ue("ELI25392", "Unable to open file storage object.");
 		ue.addDebugInfo("File name", asString(bstrFileName));
+		ue.addDebugInfo("Pointer Value", *ppStorage == NULL ? "Null" : "Not Null");
 		ue.addHresult(hr);
 		throw ue;
 	}

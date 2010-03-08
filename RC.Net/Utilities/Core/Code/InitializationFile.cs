@@ -33,7 +33,7 @@ namespace Extract.Utilities
             if (!File.Exists(fullPath))
             {
                 ExtractException ee = new ExtractException("ELI27073", 
-                    "Invalid initialization file.");
+                    "Specified initialization file does not exist.");
                 ee.AddDebugData("File", fullPath, false);
                 throw ee;
             }
