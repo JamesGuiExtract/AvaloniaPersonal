@@ -490,6 +490,9 @@ namespace Extract.Redaction
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI29508",
                     _COMPONENT_DESCRIPTION);
 
+                // Start the timer
+                IntervalTimer timer = IntervalTimer.StartNew();
+
                 // Load the uss file
                 SpatialString source = new SpatialString();
                 source.LoadFrom(bstrFileFullName + ".uss", false);
@@ -524,12 +527,11 @@ namespace Extract.Redaction
                         "No redactions could be expanded.");
                 }
 
-                // TODO: Save the results
+                // Save the results
                 RedactionFileChanges fileChanges = new RedactionFileChanges(new RedactionItem[0],
                     new RedactionItem[0], results);
-                TimeInterval interval = new TimeInterval(DateTime.Now, 0);
-                _voaLoader.SaveVerificationSession(voaFile, fileChanges, interval, 
-                    new VerificationSettings());
+                TimeInterval interval = timer.Stop();
+                _voaLoader.SaveSurroundContextSession(voaFile, fileChanges, interval, _settings);
                 
                 return EFileProcessingResult.kProcessingSuccessful;
             }

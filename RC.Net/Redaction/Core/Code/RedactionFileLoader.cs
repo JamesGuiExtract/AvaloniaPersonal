@@ -74,12 +74,22 @@ namespace Extract.Redaction
         /// <summary>
         /// The unique verification session id.
         /// </summary>
-        int _sessionId;
+        int _verificationSessionId;
 
         /// <summary>
         /// The previous redaction sessions.
         /// </summary>
         ComAttribute[] _redactionSessions;
+
+        /// <summary>
+        /// The previous surround context sessions.
+        /// </summary>
+        ComAttribute[] _surroundContextSessions;
+
+        /// <summary>
+        /// The unique surround context session id.
+        /// </summary>
+        int _surroundContextSessionId;
 
         /// <summary>
         /// Creates COM attributes.
@@ -216,7 +226,7 @@ namespace Extract.Redaction
             {
                 _sensitiveItems = new List<SensitiveItem>();
                 _metadata = new List<ComAttribute>();
-                _sessionId = 0;
+                _verificationSessionId = 0;
                 _nextId = 1;
 
                 _fileName = fileName;
@@ -277,10 +287,15 @@ namespace Extract.Redaction
 
             // Get the previous verification sessions
             _verificationSessions = AttributeMethods.GetAttributesByName(attributes, "_VerificationSession");
-            _sessionId = GetSessionId(_verificationSessions);
+            _verificationSessionId = GetSessionId(_verificationSessions);
 
-            // Get the previous redaction session
+            // Get the previous redaction sessions
             _redactionSessions = AttributeMethods.GetAttributesByName(attributes, "_RedactedFileOutputSession");
+
+            // Get the previous surround context sessions
+            _surroundContextSessions = AttributeMethods.GetAttributesByName(attributes,
+                "_SurroundContextSession");
+            _surroundContextSessionId = GetSessionId(_surroundContextSessions);
 
             // Store the remaining attributes
             int count = attributes.Size();
@@ -594,40 +609,14 @@ namespace Extract.Redaction
         {
             try
             {
-                // Calculate the new items to verify
-                List<SensitiveItem> itemsToVerify = new List<SensitiveItem>(_sensitiveItems);
+                ComAttribute sessionData = CreateVerificationOptionsAttribute(settings);
 
-                // Update any changed items (deleted, modified, and added)
-                RedactionItem[] oldDeleted = UpdateDeletedItems(itemsToVerify, changes.Deleted);
-                RedactionItem[] oldModified = UpdateModifiedItems(itemsToVerify, changes.Modified);
-                UpdateAddedItems(itemsToVerify, changes.Added);
-
-                // Get the non output redactions
-                RedactionItem[] oldNonOutput = GetNonOutputRedactions(itemsToVerify);
-
-                // Copy the original metadata attributes in to a vector
-                IUnknownVector attributes = CopyMetadataAttributes();
-
-                // Add session attribute
-                ComAttribute session = CreateSessionAttribute(time, settings, changes);
-                attributes.PushBack(session);
-
-                // Update the revisions attribute
-                ComAttribute revisions = GetRevisionsAttribute(attributes);
-                AddRevisions(revisions, oldDeleted, oldModified, oldNonOutput);
-
-                // Save the attributes
-                IUnknownVector output = GetOutputVector(itemsToVerify, attributes);
-                output.SaveTo(fileName, false);
-
-                // Update the items to verify
-                _sensitiveItems = itemsToVerify;
-
-                // Update the attributes that don't need verification
-                _metadata = GetAttributesFromVector(attributes);
+                // Calculate the new sensitive items
+                SaveSession("_VerificationSession", _verificationSessionId, 
+                    fileName, changes, time, sessionData);
 
                 // Update the session id
-                _sessionId++;
+                _verificationSessionId++;
             }
             catch (Exception ex)
             {
@@ -636,6 +625,112 @@ namespace Extract.Redaction
                 ee.AddDebugData("Voa file", fileName, false);
                 throw ee;
             }
+        }
+
+        /// <summary>
+        /// Saves the <see cref="RedactionFileLoader"/> with the specified changes and information. 
+        /// </summary>
+        /// <param name="fileName">The full path to location where the file should be saved.</param>
+        /// <param name="changes">The attributes that have been added, modified, and deleted.</param>
+        /// <param name="time">The interval of screen time spent verifying the file.</param>
+        /// <param name="settings">The settings used during verification.</param>
+        [CLSCompliant(false)]
+        public void SaveSurroundContextSession(string fileName, RedactionFileChanges changes,
+            TimeInterval time, SurroundContextSettings settings)
+        {
+            try
+            {
+                ComAttribute sessionData = CreateSurroundContextOptionsAttribute(settings);
+
+                // Calculate the new sensitive items
+                SaveSession("_SurroundContextSession", _surroundContextSessionId,
+                    fileName, changes, time, sessionData);
+
+                // Update the session id
+                _surroundContextSessionId++;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI29900",
+                    "Unable to save updated VOA file.", ex);
+                ee.AddDebugData("Voa file", fileName, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Modifies the VOA file and appends a session metadata COM attribute.
+        /// </summary>
+        /// <param name="sessionName">The name of the session metadata COM attribute.</param>
+        /// <param name="lastSessionId">The unique ID of the previous session.</param>
+        /// <param name="fileName">The full path of the VOA file to save.</param>
+        /// <param name="changes">The changes made to the original VOA file.</param>
+        /// <param name="time">The time elapsed during the session being saved.</param>
+        /// <param name="sessionData">Additional session data to add as a sub attribute.</param>
+        void SaveSession(string sessionName, int lastSessionId, string fileName, 
+            RedactionFileChanges changes, TimeInterval time, ComAttribute sessionData)
+        {
+            List<SensitiveItem> sensitiveItems = new List<SensitiveItem>(_sensitiveItems);
+
+            // Update any changed items (deleted, modified, and added)
+            IUnknownVector attributes = GetChangedAttributes(sensitiveItems, changes);
+
+            // Create session attribute
+            ComAttribute session = 
+                CreateSessionAttribute(sessionName, lastSessionId, time);
+
+            // Append additional session information
+            AttributeMethods.AppendChildren(session, sessionData);
+
+            // Append change entries
+            AppendChangeEntries(session, changes);
+            attributes.PushBack(session);
+
+            // Save the attributes
+            SaveAttributesTo(sensitiveItems, attributes, fileName);
+        }
+
+        /// <summary>
+        /// Gets the changes made to the VOA file.
+        /// </summary>
+        /// <param name="sensitiveItems">The sensitive items after changes were made.</param>
+        /// <param name="changes">The changes that were made.</param>
+        /// <returns>The attributes after changes are made.</returns>
+        IUnknownVector GetChangedAttributes(List<SensitiveItem> sensitiveItems, RedactionFileChanges changes)
+        {
+            RedactionItem[] oldDeleted = UpdateDeletedItems(sensitiveItems, changes.Deleted);
+            RedactionItem[] oldModified = UpdateModifiedItems(sensitiveItems, changes.Modified);
+            UpdateAddedItems(sensitiveItems, changes.Added);
+
+            // Get the non output redactions
+            RedactionItem[] oldNonOutput = GetNonOutputRedactions(sensitiveItems);
+
+            // Copy the original metadata attributes in to a vector
+            IUnknownVector attributes = CopyMetadataAttributes();
+
+            // Update the revisions attribute
+            ComAttribute revisions = GetRevisionsAttribute(attributes);
+            AddRevisions(revisions, oldDeleted, oldModified, oldNonOutput);
+            return attributes;
+        }
+
+        /// <summary>
+        /// Saves the sensitive items and other attributes to the specified file.
+        /// </summary>
+        /// <param name="sensitiveItems">The sensitive items to save.</param>
+        /// <param name="attributes">The non-sensitive items to save.</param>
+        /// <param name="fileName">The file to which the attributes should be saved.</param>
+        void SaveAttributesTo(List<SensitiveItem> sensitiveItems, IUnknownVector attributes, 
+            string fileName)
+        {
+            IUnknownVector output = GetOutputVector(sensitiveItems, attributes);
+            output.SaveTo(fileName, false);
+
+            // Update the sensitive items
+            _sensitiveItems = sensitiveItems;
+
+            // Update the attributes that don't need verification
+            _metadata = GetAttributesFromVector(attributes);
         }
 
         /// <summary>
@@ -797,12 +892,11 @@ namespace Extract.Redaction
         /// <summary>
         /// Creates a new session attribute.
         /// </summary>
+        /// <param name="sessionName">The name of the session attribute to create.</param>
+        /// <param name="lastSessionId">The unique ID of the last session in the file</param>
         /// <param name="screenTime">The duration of time spent during verification.</param>
-        /// <param name="settings">The verification settings used.</param>
-        /// <param name="changes">The changes made during verification.</param>
         /// <returns>A new session attribute.</returns>
-        ComAttribute CreateSessionAttribute(TimeInterval screenTime, VerificationSettings settings,
-            RedactionFileChanges changes)
+        ComAttribute CreateSessionAttribute(string sessionName, int lastSessionId, TimeInterval screenTime)
         {
             // User and screenTime information
             ComAttribute user = CreateUserAttribute();
@@ -812,20 +906,26 @@ namespace Extract.Redaction
             ComAttribute source = _comAttribute.Create("_SourceDocName", _sourceDocument);
             ComAttribute data = _comAttribute.Create("_IDShieldDataFile", _fileName);
 
-            // Verification options
-            ComAttribute options = CreateVerificationOptionsAttribute(settings);
+            // Session attribute
+            ComAttribute session = _comAttribute.Create(sessionName, lastSessionId + 1);
+            AttributeMethods.AppendChildren(session, user, time, source, data);
 
-            // Entries changed
+            return session;
+        }
+
+        /// <summary>
+        /// Appends metadata about what changes were made.
+        /// </summary>
+        /// <param name="session">The session metadata COM attribute to which the changes should 
+        /// be appended.</param>
+        /// <param name="changes">The changes that were made.</param>
+        void AppendChangeEntries(ComAttribute session, RedactionFileChanges changes)
+        {
             ComAttribute added = CreateChangeEntriesAttribute("_EntriesAdded", changes.Added);
             ComAttribute deleted = CreateChangeEntriesAttribute("_EntriesDeleted", changes.Deleted);
             ComAttribute modified = CreateChangeEntriesAttribute("_EntriesModified", changes.Modified);
 
-            // Session attribute
-            ComAttribute session = _comAttribute.Create("_VerificationSession", _sessionId + 1);
-            AttributeMethods.AppendChildren(session, user, time, source, data, options);
             AttributeMethods.AppendChildren(session, added, deleted, modified);
-
-            return session;
         }
 
         /// <summary>
@@ -871,6 +971,46 @@ namespace Extract.Redaction
             AttributeMethods.AppendChildren(options, verifyAllPages);
 
             return options;
+        }
+
+        /// <summary>
+        /// Creates a metadata attribute describing <see cref="SurroundContextSettings"/>.
+        /// </summary>
+        /// <param name="settings">The settings to add.</param>
+        /// <returns>A metadata attribute describing <see cref="SurroundContextSettings"/>.
+        /// </returns>
+        ComAttribute CreateSurroundContextOptionsAttribute(SurroundContextSettings settings)
+        {
+            ComAttribute options = _comAttribute.Create("_Options");
+            ComAttribute typesToExtend = _comAttribute.Create("_TypesToExtend",
+                GetTypesToExtend(settings));
+
+            int words = settings.RedactWords ? settings.MaxWords : 0;
+            ComAttribute wordsToExtend = _comAttribute.Create("_WordsToExtend", words);
+
+            string value = settings.ExtendHeight ? "Yes" : "No";
+            ComAttribute extendHeight = _comAttribute.Create("_ExtendHeight", value);
+
+            AttributeMethods.AppendChildren(options, typesToExtend, wordsToExtend, extendHeight);
+
+            return options;
+        }
+
+        /// <summary>
+        /// Gets the data types to extend from the <see cref="SurroundContextSettings"/> object.
+        /// </summary>
+        /// <param name="settings">The <see cref="SurroundContextSettings"/> object from which to 
+        /// get data types.</param>
+        /// <returns>The data types to extend.</returns>
+        static string GetTypesToExtend(SurroundContextSettings settings)
+        {
+            if (settings.ExtendAllTypes)
+            {
+                return "All types";
+            }
+
+            string[] types = settings.GetDataTypes();
+            return string.Join(", ", types);
         }
 
         /// <summary>
