@@ -609,13 +609,6 @@ namespace Extract.Imaging.Forms
                             // Allow for the animation of the rectangular region 
                             AnimateRegion = true;
 
-                            // Clear selections if necessary
-                            if (_cursorTool == CursorTool.SelectLayerObject)
-                            {
-                                _layerObjects.Selection.Clear();
-                                Invalidate();
-                            }
-
                             // Store this as the last active continuous use cursor tool
                             _lastContinuousUseTool = value;
                             break;
@@ -624,13 +617,6 @@ namespace Extract.Imaging.Forms
 
                             // Allow the user to pan the image using drag and drop
                             base.InteractiveMode = RasterViewerInteractiveMode.Pan;
-
-                            // Clear selections if necessary
-                            if (_cursorTool == CursorTool.SelectLayerObject)
-                            {
-                                _layerObjects.Selection.Clear();
-                                Invalidate();
-                            }
 
                             // Store this as the last active continuous use cursor tool
                             _lastContinuousUseTool = value;
@@ -642,12 +628,6 @@ namespace Extract.Imaging.Forms
                             // Turn off interactive mode
                             base.InteractiveMode = RasterViewerInteractiveMode.None;
 
-                            // Clear selections if necessary
-                            if (_cursorTool == CursorTool.SelectLayerObject)
-                            {
-                                _layerObjects.Selection.Clear();
-                                Invalidate();
-                            }
                             break;
 
                         case CursorTool.None:
@@ -660,13 +640,6 @@ namespace Extract.Imaging.Forms
                             // Turn off interactive mode
                             base.InteractiveMode = RasterViewerInteractiveMode.None;
 
-                            // Clear selections if necessary
-                            if (_cursorTool == CursorTool.SelectLayerObject)
-                            {
-                                _layerObjects.Selection.Clear();
-                                Invalidate();
-                            }
-
                             // Store this as the last active continuous use cursor tool
                             _lastContinuousUseTool = value;
                             break;
@@ -678,9 +651,7 @@ namespace Extract.Imaging.Forms
 
                             // Store this as the last active continuous use cursor tool
                             _lastContinuousUseTool = value;
-
-                            // Redraw the grip handles of any layer objects [FIDSC #3993]
-                            Invalidate();
+                            
                             break;
 
                         default:
@@ -688,6 +659,9 @@ namespace Extract.Imaging.Forms
                             throw new ExtractException("ELI21233",
                                 "Unrecognized CursorTool value.");
                     }
+
+                    // Redraw the grip handles of any layer objects [FIDSC #3993]
+                    Invalidate();
 
                     // Disable the active linked layer object unless using select layer object
                     if (value != CursorTool.SelectLayerObject)
