@@ -88,6 +88,13 @@ namespace Extract.Redaction.Verification.Properties {
             }
         }
         
+        internal static System.Drawing.Icon IDShieldIcon {
+            get {
+                object obj = ResourceManager.GetObject("IDShieldIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap LastExemption {
             get {
                 object obj = ResourceManager.GetObject("LastExemption", resourceCulture);

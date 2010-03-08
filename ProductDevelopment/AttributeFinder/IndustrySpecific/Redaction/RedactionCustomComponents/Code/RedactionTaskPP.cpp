@@ -342,7 +342,7 @@ LRESULT CRedactionTaskPP::OnClickedBtnBrowseOutput(WORD wNotifyCode, WORD wID, H
 
 	try
 	{
-		const static string s_strAllFiles = "TIF Files (*.tif)|*.tif||";
+		const static string s_strAllFiles = "TIF Files (*.tif)|*.tif|PDF files (*.pdf)|*.pdf||";
 
 		// bring open file dialog
 		CFileDialogEx fileDlg(TRUE, ".tif", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 

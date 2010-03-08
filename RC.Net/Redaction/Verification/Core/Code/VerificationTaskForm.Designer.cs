@@ -1137,10 +1137,11 @@ namespace Extract.Redaction.Verification
             this.Controls.Add(imageViewerToolStripContainer);
             this.Controls.Add(dockContainer1);
             this.Controls.Add(dockContainer);
+            this.Icon = Extract.Redaction.Verification.Properties.Resources.IDShieldIcon;
             this.MainMenuStrip = this._menuStrip;
             this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "VerificationTaskForm";
-            this.ShowIcon = false;
+            this.ShowIcon = true;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ID Shield Verification (Waiting for file)";
             dataGridToolStripContainer.ContentPanel.ResumeLayout(false);

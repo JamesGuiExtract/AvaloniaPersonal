@@ -2052,10 +2052,6 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 
 	try
 	{
-		// Create a pointer to a recordset
-		_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI18171", ipDBInfoSet != NULL);
-
 		// Initialize settings to default values
 		m_iDBSchemaVersion = 0;
 		m_iCommandTimeout = glDEFAULT_COMMAND_TIMEOUT;
@@ -2064,157 +2060,165 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 		m_iNumberOfRetries = giDEFAULT_RETRY_COUNT;
 		m_dRetryTimeout = gdDEFAULT_RETRY_TIMEOUT;
 
-		_lastCodePos = "10";
-
-		ipDBInfoSet->Open("DBInfo", _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdTable); 
-
-		_lastCodePos = "20";
-
-		// Loop through all of the records in the DBInfo table
-		while (!asCppBool(ipDBInfoSet->adoEOF))
+		// Only load the settings if the table exists
+		if (doesTableExist(getDBConnection(), "DBInfo"))
 		{
-			FieldsPtr ipFields = ipDBInfoSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI18172", ipFields != NULL);
+			// Create a pointer to a recordset
+			_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI18171", ipDBInfoSet != NULL);
 
-			_lastCodePos = "30";
+			_lastCodePos = "10";
 
-			// Check all of the fields
-			int nFields = ipFields->Count;
-			for (long l = 0; l < nFields; l++)
+			ipDBInfoSet->Open("DBInfo", _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+				adLockOptimistic, adCmdTable); 
+
+			_lastCodePos = "20";
+
+			// Loop through all of the records in the DBInfo table
+			while (!asCppBool(ipDBInfoSet->adoEOF))
 			{
-				// Setup the variant with the current loop count
-				variant_t vt = l;
+				FieldsPtr ipFields = ipDBInfoSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI18172", ipFields != NULL);
 
-				_lastCodePos = "40";
+				_lastCodePos = "30";
 
-				// Get field with that index
-				FieldPtr ipField = ipFields->Item[vt];
-
-				_lastCodePos = "50";
-
-				// If the "Name" field exist
-				if (ipField->Name == _bstr_t("Name"))
+				// Check all of the fields
+				int nFields = ipFields->Count;
+				for (long l = 0; l < nFields; l++)
 				{
-					_lastCodePos = "60";
+					// Setup the variant with the current loop count
+					variant_t vt = l;
 
-					// Get the Setting name
-					string strValue = getStringField(ipFields, "Name");
-					if (strValue == gstrFAMDB_SCHEMA_VERSION)
+					_lastCodePos = "40";
+
+					// Get field with that index
+					FieldPtr ipField = ipFields->Item[vt];
+
+					_lastCodePos = "50";
+
+					// If the "Name" field exist
+					if (ipField->Name == _bstr_t("Name"))
 					{
-						_lastCodePos = "70";
+						_lastCodePos = "60";
 
-						// Get the schema version
-						m_iDBSchemaVersion = asLong(getStringField(ipFields, "Value"));
-					}
-					else if (strValue == gstrCOMMAND_TIMEOUT)
-					{
-						_lastCodePos = "80";
-
-						// Get the commmand timeout
-						m_iCommandTimeout =  asLong(getStringField(ipFields, "Value"));
-					}
-					else if (strValue == gstrUPDATE_QUEUE_EVENT_TABLE)
-					{
-						_lastCodePos = "90";
-
-						// Get the Update Queue flag
-						m_bUpdateQueueEventTable = getStringField(ipFields, "Value") == "1";
-					}
-					else if (strValue == gstrUPDATE_FAST_TABLE)
-					{
-						_lastCodePos = "100";
-
-						// get the Update FAST flag
-						m_bUpdateFASTTable = getStringField(ipFields, "Value") == "1";
-					}
-					else if (strValue == gstrNUMBER_CONNECTION_RETRIES)
-					{
-						_lastCodePos = "150";
-
-						// Get the Connection retry count
-						m_iNumberOfRetries = asLong(getStringField(ipFields, "Value"));
-					}
-					else if (strValue == gstrCONNECTION_RETRY_TIMEOUT)
-					{
-						_lastCodePos = "160";
-
-						// Get the connection retry timeout
-						m_dRetryTimeout =  asDouble(getStringField(ipFields, "Value"));
-					}
-					else if (strValue == gstrAUTO_DELETE_FILE_ACTION_COMMENT)
-					{
-						_lastCodePos = "170";
-
-						m_bAutoDeleteFileActionComment = getStringField(ipFields, "Value") == "1";
-					}
-					else if (strValue == gstrAUTO_REVERT_LOCKED_FILES)
-					{
-						_lastCodePos = "180";
-
-						m_bAutoRevertLockedFiles = getStringField(ipFields, "Value") == "1";
-					}
-					else if (strValue == gstrAUTO_REVERT_TIME_OUT_IN_MINUTES)
-					{
-						_lastCodePos = "190";
-
-						m_nAutoRevertTimeOutInMinutes =  asLong(getStringField(ipFields, "Value"));
-						
-						// if less that a minimum value this should be reset to the minimum value
-						if (m_nAutoRevertTimeOutInMinutes < gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES)
+						// Get the Setting name
+						string strValue = getStringField(ipFields, "Name");
+						if (strValue == gstrFAMDB_SCHEMA_VERSION)
 						{
-							try
+							_lastCodePos = "70";
+
+							// Get the schema version
+							m_iDBSchemaVersion = asLong(getStringField(ipFields, "Value"));
+						}
+						else if (strValue == gstrCOMMAND_TIMEOUT)
+						{
+							_lastCodePos = "80";
+
+							// Get the commmand timeout
+							m_iCommandTimeout =  asLong(getStringField(ipFields, "Value"));
+						}
+						else if (strValue == gstrUPDATE_QUEUE_EVENT_TABLE)
+						{
+							_lastCodePos = "90";
+
+							// Get the Update Queue flag
+							m_bUpdateQueueEventTable = getStringField(ipFields, "Value") == "1";
+						}
+						else if (strValue == gstrUPDATE_FAST_TABLE)
+						{
+							_lastCodePos = "100";
+
+							// get the Update FAST flag
+							m_bUpdateFASTTable = getStringField(ipFields, "Value") == "1";
+						}
+						else if (strValue == gstrNUMBER_CONNECTION_RETRIES)
+						{
+							_lastCodePos = "150";
+
+							// Get the Connection retry count
+							m_iNumberOfRetries = asLong(getStringField(ipFields, "Value"));
+						}
+						else if (strValue == gstrCONNECTION_RETRY_TIMEOUT)
+						{
+							_lastCodePos = "160";
+
+							// Get the connection retry timeout
+							m_dRetryTimeout =  asDouble(getStringField(ipFields, "Value"));
+						}
+						else if (strValue == gstrAUTO_DELETE_FILE_ACTION_COMMENT)
+						{
+							_lastCodePos = "170";
+
+							m_bAutoDeleteFileActionComment = getStringField(ipFields, "Value") == "1";
+						}
+						else if (strValue == gstrAUTO_REVERT_LOCKED_FILES)
+						{
+							_lastCodePos = "180";
+
+							m_bAutoRevertLockedFiles = getStringField(ipFields, "Value") == "1";
+						}
+						else if (strValue == gstrAUTO_REVERT_TIME_OUT_IN_MINUTES)
+						{
+							_lastCodePos = "190";
+
+							m_nAutoRevertTimeOutInMinutes =  asLong(getStringField(ipFields, "Value"));
+
+							// if less that a minimum value this should be reset to the minimum value
+							if (m_nAutoRevertTimeOutInMinutes < gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES)
 							{
-								string strNewValue = asString(gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
-								// Log application trace exception 
-								UCLIDException ue("ELI29826", "Application trace: AutoRevertTimeOutInMinutes changed to " + 
-									 strNewValue + " minutes.");
-								ue.addDebugInfo("Old value", m_nAutoRevertTimeOutInMinutes);
-								ue.addDebugInfo("New value", gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
-								ue.log();
+								try
+								{
+									string strNewValue = asString(gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
+									// Log application trace exception 
+									UCLIDException ue("ELI29826", "Application trace: AutoRevertTimeOutInMinutes changed to " + 
+										strNewValue + " minutes.");
+									ue.addDebugInfo("Old value", m_nAutoRevertTimeOutInMinutes);
+									ue.addDebugInfo("New value", gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
+									ue.log();
 
-								// Not sure if this is actually safe here.
-								// if updating this field fails it will be thrown out and rolled back in 
-								// a transaction in the outer scope.  A transaction cannot be created for
-								// this here because there will most likely be a transaction in the
-								// outer scope.
-								setStringField(ipFields, "Value", strNewValue);
-								ipDBInfoSet->Update();
+									// Not sure if this is actually safe here.
+									// if updating this field fails it will be thrown out and rolled back in 
+									// a transaction in the outer scope.  A transaction cannot be created for
+									// this here because there will most likely be a transaction in the
+									// outer scope.
+									setStringField(ipFields, "Value", strNewValue);
+									ipDBInfoSet->Update();
+								}
+								CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
+
+								m_nAutoRevertTimeOutInMinutes = gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES;
 							}
-							CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
+						}
+						else if (strValue == gstrAUTO_REVERT_NOTIFY_EMAIL_LIST)
+						{
+							_lastCodePos = "200";
 
-							m_nAutoRevertTimeOutInMinutes = gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES;
+							m_strAutoRevertNotifyEmailList = getStringField(ipFields, "Value");
 						}
 					}
-					else if (strValue == gstrAUTO_REVERT_NOTIFY_EMAIL_LIST)
+					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
 					{
-						_lastCodePos = "200";
+						_lastCodePos = "110";
 
-						m_strAutoRevertNotifyEmailList = getStringField(ipFields, "Value");
+						// Get the schema version for the previous Database version
+						m_iDBSchemaVersion = getLongField(ipFields, "FAMDBSchemaVersion");
+					}
+					else if (ipField->Name == _bstr_t("FPMDBSchemaVersion"))
+					{
+						_lastCodePos = "120";
+
+						// This is for an even older schema version
+						m_iDBSchemaVersion = getLongField(ipFields, "FPMDBSchemaVersion");
 					}
 				}
-				else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
-				{
-					_lastCodePos = "110";
 
-					// Get the schema version for the previous Database version
-					m_iDBSchemaVersion = getLongField(ipFields, "FAMDBSchemaVersion");
-				}
-				else if (ipField->Name == _bstr_t("FPMDBSchemaVersion"))
-				{
-					_lastCodePos = "120";
+				_lastCodePos = "130";
 
-					// This is for an even older schema version
-					m_iDBSchemaVersion = getLongField(ipFields, "FPMDBSchemaVersion");
-				}
+				// Move the next record
+				ipDBInfoSet->MoveNext();
+
+				_lastCodePos = "140";
 			}
-
-			_lastCodePos = "130";
-
-			// Move the next record
-			ipDBInfoSet->MoveNext();
-			
-			_lastCodePos = "140";
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18146");
