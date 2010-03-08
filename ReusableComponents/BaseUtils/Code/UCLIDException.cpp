@@ -864,8 +864,11 @@ void UCLIDException::saveTo(const string& strFile, bool bAppend) const
 		ULONGLONG ullCurrentFileSize = 0;
 		try
 		{
-			// the getSizeOfFile method may throw exceptions (for example if filename is not valid)
-			ullCurrentFileSize = getSizeOfFile(strFile);
+			if (isValidFile(strFile))
+			{
+				// the getSizeOfFile method may throw exceptions (for example if filename is not valid)
+				ullCurrentFileSize = getSizeOfFile(strFile);
+			}
 		}
 		catch (...)
 		{
@@ -903,23 +906,21 @@ void UCLIDException::saveTo(const string& strFile, bool bAppend) const
 			}
 		}
 
-		// Open an output file
-		ofstream outfile( strFile.c_str(), 
-			bAppend ? (ios::out | ios::app) : (ios::out | ios::trunc) );
-
-		// Check to ensure that the output stream was successfully opened
-		if (!outfile)
+		// Set the flags for the file open
+		UINT uiFlags = CFile::modeWrite | CFile::modeCreate | CFile::osWriteThrough | CFile::shareExclusive;
+		if (bAppend)
 		{
-			UCLIDException ue("ELI16105", "Unable to write to exception log file!");
-			ue.addDebugInfo("LogFile", strFile);
-			throw ue;
+			uiFlags |= CFile::modeNoTruncate;
 		}
 
-		// Write string to output file
-		outfile << strOut << endl;
+		// Open the file and seek to the end
+		CStdioFile cOutFile(strFile.c_str(), uiFlags);
+		cOutFile.SeekToEnd();
 
-		// Close the output file
-		outfile.close();
+		// Write the line to the file and close the file
+		cOutFile.WriteString(strOut.c_str());
+		cOutFile.WriteString("\n");
+		cOutFile.Close();
 	}
 	catch(...)
 	{
