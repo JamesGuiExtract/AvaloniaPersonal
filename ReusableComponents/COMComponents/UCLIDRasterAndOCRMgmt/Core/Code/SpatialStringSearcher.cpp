@@ -96,43 +96,46 @@ CSpatialStringSearcher::LocalLine::LocalLine() :  LocalEntity(),
 //-------------------------------------------------------------------------------------------------
 // LocalSubstring
 //-------------------------------------------------------------------------------------------------
-CSpatialStringSearcher::LocalSubstring::LocalSubstring(unsigned int uiStartWord, 
-													   unsigned int uiEndWord) 
-	: m_uiStartWord(uiStartWord), m_uiEndWord(uiEndWord)
+CSpatialStringSearcher::LocalSubstring::LocalSubstring(unsigned int uiStartLetter, 
+													   unsigned int uiEndLetter) 
+	: m_uiStartLetter(uiStartLetter), m_uiEndLetter(uiEndLetter)
 {
 }
 //-------------------------------------------------------------------------------------------------
-void CSpatialStringSearcher::LocalSubstring::expandLeft(long lWords)
+void CSpatialStringSearcher::LocalSubstring::expandLeft(long lWords, 
+	const vector<LocalLetter>& vecLetters, const vector<LocalWord>& vecWords)
 {
-	long lStartWord = (long)(m_uiStartWord) - lWords;
+	long lStartWord = (long)(vecLetters[m_uiStartLetter].m_uiWord) - lWords;
 	if (lStartWord < 0)
 	{
 		lStartWord = 0;
 	}
 
-	m_uiStartWord = lStartWord;
+	m_uiStartLetter = vecWords[lStartWord].m_uiStart;
 }
 //-------------------------------------------------------------------------------------------------
-void CSpatialStringSearcher::LocalSubstring::expandRight(long lWords, unsigned int uiMaxWord)
+void CSpatialStringSearcher::LocalSubstring::expandRight(long lWords,
+	const vector<LocalLetter>& vecLetters, const vector<LocalWord>& vecWords)
 {
-	unsigned int uiEndWord = m_uiEndWord + lWords;
+	unsigned int uiEndWord = vecLetters[m_uiEndLetter].m_uiWord + lWords;
+	unsigned int uiMaxWord = vecWords.size() - 1;
 	if (uiEndWord > uiMaxWord)
 	{
 		uiEndWord = uiMaxWord;
 	}
 
-	m_uiEndWord = uiEndWord;
+	m_uiEndLetter = vecWords[uiEndWord].m_uiEnd;
 }
 //-------------------------------------------------------------------------------------------------
 bool CSpatialStringSearcher::LocalSubstring::isConnectedTo(const LocalSubstring& other) const
 {
-	return other.m_uiEndWord + 1 >= m_uiStartWord && other.m_uiStartWord <= m_uiEndWord + 1;
+	return other.m_uiEndLetter + 1 >= m_uiStartLetter && other.m_uiStartLetter <= m_uiEndLetter + 1;
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialStringSearcher::LocalSubstring::combineWith(const LocalSubstring& other)
 {
-	m_uiStartWord = min(m_uiStartWord, other.m_uiStartWord);
-	m_uiEndWord = max(m_uiEndWord, other.m_uiEndWord);
+	m_uiStartLetter = min(m_uiStartLetter, other.m_uiStartLetter);
+	m_uiEndLetter = max(m_uiEndLetter, other.m_uiEndLetter);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -790,29 +793,26 @@ void CSpatialStringSearcher::getLettersAsSubstrings(const vector<int>& vecLetter
 	}
 
 	// Iterate through each letter looking for substrings
-	unsigned int uiStartSubstring = m_vecLetters[vecLetters[0]].m_uiWord;
+	unsigned int uiStartSubstring = m_vecLetters[vecLetters[0]].m_uiLetter;
 	unsigned int uiEndSubstring = uiStartSubstring;
 	for	(unsigned int i = 1; i < vecLetters.size(); i++)
 	{
-		// Has a new word been encountered?
-		unsigned int uiCurrentWord = m_vecLetters[vecLetters[i]].m_uiWord;
-		if (uiEndSubstring != uiCurrentWord)
+		// Has a new substring been encountered?
+		unsigned int uiCurrentLetter = vecLetters[i];
+		if (uiCurrentLetter == uiEndSubstring + 1)
 		{
-			if (uiEndSubstring + 1 == uiCurrentWord)
-			{
-				// The new word is the next word, remember this word and keep looking
-				uiEndSubstring = uiCurrentWord;
-			}
-			else
-			{
-				// The new word was not the next word, this is the end of a substring
-				LocalSubstring substring(uiStartSubstring, uiEndSubstring);
-				vecSubstrings.push_back(substring);
+			// This is the next letter in the same substring, remember it and keep looking
+			uiEndSubstring = uiCurrentLetter;
+		}
+		else
+		{
+			// This is the end of a substring
+			LocalSubstring substring(uiStartSubstring, uiEndSubstring);
+			vecSubstrings.push_back(substring);
 
-				// Start a new substring
-				uiStartSubstring = uiCurrentWord;
-				uiEndSubstring = uiCurrentWord;
-			}
+			// Start a new substring
+			uiStartSubstring = uiCurrentLetter;
+			uiEndSubstring = uiCurrentLetter;
 		}
 	}
 
@@ -825,15 +825,14 @@ void CSpatialStringSearcher::expandSubstrings(vector<LocalSubstring>& vecSubstri
 											  long lNumWordsToExpand)
 {
 	Random random;
-	unsigned int uiMaxWord = m_vecWords.size() - 1;
 	for (unsigned int i = 0; i < vecSubstrings.size(); i++)
 	{
 		LocalSubstring& substring = vecSubstrings[i];
 
 		unsigned long ulLeft = random.uniform(1, lNumWordsToExpand + 1);
 		unsigned long ulRight = random.uniform(1, lNumWordsToExpand + 1);
-		substring.expandLeft(ulLeft);
-		substring.expandRight(ulRight, uiMaxWord);
+		substring.expandLeft(ulLeft, m_vecLetters, m_vecWords);
+		substring.expandRight(ulRight, m_vecLetters, m_vecWords);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -872,26 +871,20 @@ void CSpatialStringSearcher::getSubstringsAsLetters(const vector<LocalSubstring>
 		return;
 	}
 
-	// Iterate through each substrings
+	// Iterate through each substring
 	for (unsigned int i = 0; i < vecSubstrings.size(); i++)
 	{
 		const LocalSubstring& substring = vecSubstrings[i];
 
-		// Iterate through each word of the substring
-		for (unsigned int j = substring.m_uiStartWord; j <= substring.m_uiEndWord; j++)
+		// Iterate through each letter of the substring
+		for (unsigned int j = substring.m_uiStartLetter; j <= substring.m_uiEndLetter; j++)
 		{
-			const LocalWord& word = m_vecWords[j];
+			const LocalLetter& letter = m_vecLetters[j];
 
-			// Iterate through each letter of the word
-			for (unsigned int k = word.m_uiStart; k < word.m_uiEnd; k++)
+			// Add the letter if it is spatial
+			if (letter.letter.m_bIsSpatial)
 			{
-				const LocalLetter& letter = m_vecLetters[k];
-
-				// Add the letter if it is spatial
-				if (letter.letter.m_bIsSpatial)
-				{
-					vecLetters.push_back(k);
-				}
+				vecLetters.push_back(j);
 			}
 		}
 	}

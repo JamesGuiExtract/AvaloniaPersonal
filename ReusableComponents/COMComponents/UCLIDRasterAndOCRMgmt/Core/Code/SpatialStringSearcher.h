@@ -148,17 +148,19 @@ private:
 		unsigned int m_uiStart, m_uiEnd;
 	};
 
-	// Represents one or more words. May span lines.
+	// Represents one or more letters. May span lines.
 	class LocalSubstring
 	{
 	public:
-		LocalSubstring(unsigned int uiStartWord, unsigned int uiEndWord);
+		LocalSubstring(unsigned int uiStartLetter, unsigned int uiEndLetter);
 
 		// Expands the substring to the left by the specified number of words
-		void expandLeft(long lWords);
+		void expandLeft(long lWords, const vector<LocalLetter>& vecLetters, 
+			const vector<LocalWord>& vecWords);
 
 		// Expands the substring to the left by the specified number of words
-		void expandRight(long lWords, unsigned int uiMaxWord);
+		void expandRight(long lWords, const vector<LocalLetter>& vecLetters, 
+			const vector<LocalWord>& vecWords);
 
 		// true if other is adjacent or overlapping with the substring; false otherwise
 		bool isConnectedTo(const LocalSubstring& other) const;
@@ -169,8 +171,8 @@ private:
 		////////////
 		// Variables
 		////////////
-		// The starting and ending indexes of the substring in m_vecWords
-		unsigned int m_uiStartWord, m_uiEndWord;
+		// The starting and ending indexes of the substring in m_vecLetters
+		unsigned int m_uiStartLetter, m_uiEndLetter;
 	};
 
 	////////////
