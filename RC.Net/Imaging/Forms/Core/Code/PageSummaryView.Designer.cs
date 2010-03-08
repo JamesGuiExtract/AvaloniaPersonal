@@ -98,61 +98,81 @@ namespace Extract.Imaging.Forms
             // 
             // First
             // 
+            this.First.FillWeight = 100.0F;
             this.First.HeaderText = "First";
+            this.First.MinimumWidth = 10;
             this.First.Name = "First";
             this.First.ReadOnly = true;
             // 
             // Second
             // 
+            this.Second.FillWeight = 100.0F;
             this.Second.HeaderText = "Second";
+            this.Second.MinimumWidth = 10;
             this.Second.Name = "Second";
             this.Second.ReadOnly = true;
             // 
             // Third
             // 
+            this.Third.FillWeight = 100.0F;
             this.Third.HeaderText = "Third";
+            this.Third.MinimumWidth = 10;
             this.Third.Name = "Third";
             this.Third.ReadOnly = true;
             // 
             // Fourth
             // 
+            this.Fourth.FillWeight = 100.0F;
             this.Fourth.HeaderText = "Fourth";
+            this.Fourth.MinimumWidth = 10;
             this.Fourth.Name = "Fourth";
             this.Fourth.ReadOnly = true;
             // 
             // Fifth
             // 
+            this.Fifth.FillWeight = 100.0F;
             this.Fifth.HeaderText = "Fifth";
+            this.Fifth.MinimumWidth = 10;
             this.Fifth.Name = "Fifth";
             this.Fifth.ReadOnly = true;
             // 
             // Sixth
             // 
+            this.Sixth.FillWeight = 100.0F;
             this.Sixth.HeaderText = "Sixth";
+            this.Sixth.MinimumWidth = 10;
             this.Sixth.Name = "Sixth";
             this.Sixth.ReadOnly = true;
             // 
             // Seventh
             // 
+            this.Seventh.FillWeight = 100.0F;
             this.Seventh.HeaderText = "Seventh";
+            this.Seventh.MinimumWidth = 10;
             this.Seventh.Name = "Seventh";
             this.Seventh.ReadOnly = true;
             // 
             // Eighth
             // 
+            this.Eighth.FillWeight = 100.0F;
             this.Eighth.HeaderText = "Eighth";
+            this.Eighth.MinimumWidth = 10;
             this.Eighth.Name = "Eighth";
             this.Eighth.ReadOnly = true;
             // 
             // Ninth
             // 
+            this.Ninth.FillWeight = 100.0F;
             this.Ninth.HeaderText = "Ninth";
+            this.Ninth.MinimumWidth = 10;
             this.Ninth.Name = "Ninth";
             this.Ninth.ReadOnly = true;
             // 
             // Tenth
             // 
+            this.Tenth.FillWeight = 100.0F;
             this.Tenth.HeaderText = "Tenth";
+            this.Tenth.MinimumWidth = 10;
             this.Tenth.Name = "Tenth";
             this.Tenth.ReadOnly = true;
             // 
