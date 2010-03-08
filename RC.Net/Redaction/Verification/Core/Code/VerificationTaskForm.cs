@@ -114,14 +114,10 @@ namespace Extract.Redaction.Verification
         FileStream _processingStream;
 
         /// <summary>
-        /// The time the current displayed image was first displayed.
+        /// Measures the duration of time that has passed since the current document was first 
+        /// viewed.
         /// </summary>
-        DateTime _screenTimeStart;
-
-        /// <summary>
-        /// The duration of time that has passed since <see cref="_screenTimeStart"/>.
-        /// </summary>
-        Stopwatch _screenTime;
+        IntervalTimer _screenTime = new IntervalTimer();
 
         /// <summary>
         /// <see langword="true"/> if the comment text box has been modified;
@@ -348,7 +344,7 @@ namespace Extract.Redaction.Verification
         void Commit()
         {
             // Save
-            TimeInterval screenTime = StopScreenTime();
+            TimeInterval screenTime = _screenTime.Stop();
             Save(screenTime);
 
             // Commit
@@ -389,27 +385,6 @@ namespace Extract.Redaction.Verification
             _idShieldDatabase.AddIDShieldData(fileId, true, screenTime.ElapsedSeconds, 
                 counts.HighConfidence, counts.MediumConfidence, counts.LowConfidence, 
                 counts.Clues, counts.Total, counts.Manual);
-        }
-
-        /// <summary>
-        /// Starts the screen verification time clock.
-        /// </summary>
-        void StartScreenTime()
-        {
-            _screenTimeStart = DateTime.Now;
-            _screenTime = new Stopwatch();
-            _screenTime.Start();
-        }
-
-        /// <summary>
-        /// Stops the screen verification time clock.
-        /// </summary>
-        /// <returns>The total elapsed time of screen verification.</returns>
-        TimeInterval StopScreenTime()
-        {
-            _screenTime.Stop();
-            double elapsedSeconds = _screenTime.ElapsedMilliseconds/1000.0;
-            return new TimeInterval(_screenTimeStart, elapsedSeconds);
         }
 
         /// <summary>
@@ -613,7 +588,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void AdvanceToNextDocument()
         {
-            TimeInterval screenTime = StopScreenTime();
+            TimeInterval screenTime = _screenTime.Stop();
             SaveRedactionCounts(screenTime);
 
             CommitComment();
@@ -734,7 +709,7 @@ namespace Extract.Redaction.Verification
                         }
                         else
                         {
-                            TimeInterval screenTime = StopScreenTime();
+                            TimeInterval screenTime = _screenTime.Stop();
                             Save(screenTime);
                         }
                     }
@@ -1211,7 +1186,7 @@ namespace Extract.Redaction.Verification
                 // Check if changes have been made before moving away from a history document
                 if (!WarnIfDirty())
                 {
-                    TimeInterval screenTime = StopScreenTime();
+                    TimeInterval screenTime = _screenTime.Stop();
                     SaveRedactionCounts(screenTime);
 
                     CommitComment();
@@ -1738,7 +1713,7 @@ namespace Extract.Redaction.Verification
                 {
                     _redactionGridView.CommitChanges();
 
-                    TimeInterval screenTime = StopScreenTime();
+                    TimeInterval screenTime = _screenTime.Stop();
                     Save(screenTime);
 
                     SaveRedactionCounts(screenTime);
@@ -1769,7 +1744,7 @@ namespace Extract.Redaction.Verification
 
                     if (!WarnIfDirty())
                     {
-                        TimeInterval screenTime = StopScreenTime();
+                        TimeInterval screenTime = _screenTime.Stop();
                         SaveRedactionCounts(screenTime);
 
                         CommitComment();
@@ -2087,7 +2062,7 @@ namespace Extract.Redaction.Verification
                     }
 
                     // Start recording the screen time
-                    StartScreenTime();
+                    _screenTime.Start();
                 }
                 else
                 {
