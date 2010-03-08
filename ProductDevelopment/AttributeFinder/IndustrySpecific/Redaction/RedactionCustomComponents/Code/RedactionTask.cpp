@@ -1804,17 +1804,17 @@ IAttributePtr CRedactionTask::createTimeInfoAttribute(const string& strSourceDoc
 	try
 	{
 		// Start date
-		string strDate = tStartTime.Format("%m/%d/%Y");
+		string strDate = tStartTime.Format("%#m/%#d/%Y");
 		IAttributePtr ipDate = createAttribute(strSourceDocument, "_Date", strDate);
 		ASSERT_RESOURCE_ALLOCATION("ELI28390", ipDate != NULL);
 
 		// Start time
-		string strTimeStarted = tStartTime.Format("%H:%M:%S");
+		string strTimeStarted = tStartTime.Format("%I:%M:%S %p");
 		IAttributePtr ipTime = createAttribute(strSourceDocument, "_TimeStarted", strTimeStarted);
 		ASSERT_RESOURCE_ALLOCATION("ELI28391", ipTime != NULL);
 
 		// Elapsed seconds
-		string strSeconds = asString(dElapsedSeconds);
+		string strSeconds = asString(dElapsedSeconds, 3);
 		IAttributePtr ipSeconds = createAttribute(strSourceDocument, "_TotalSeconds", strSeconds);
 		ASSERT_RESOURCE_ALLOCATION("ELI28392", ipSeconds != NULL);
 
