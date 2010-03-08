@@ -371,6 +371,14 @@ PageRasterZone CRedactFromXMLApp::getRasterZonePrototypeFromNode(MSXML::IXMLDOME
 			MSXML::IXMLDOMNodeListPtr ipChildren = ipNode->childNodes;
 			ASSERT_RESOURCE_ALLOCATION("ELI25111", ipChildren != NULL);
 
+			// Get the children of the output options node
+			MSXML::IXMLDOMNodePtr ipOutputNode = getFirstNodeNamed(ipChildren, "OutputOptions");
+			if (ipOutputNode != NULL)
+			{
+				ipChildren = ipOutputNode->childNodes;
+				ASSERT_RESOURCE_ALLOCATION("ELI29902", ipChildren != NULL);
+			}
+
 			// Get the redaction appearance settings
 			MSXML::IXMLDOMNodePtr ipSettingsNode = 
 				getFirstNodeNamed(ipChildren, "RedactionTextAndColorSettings");
