@@ -231,7 +231,7 @@ namespace Extract.Redaction.Verification
             // 
             this._dataWindowSplitContainer.Panel2.Controls.Add(label4);
             this._dataWindowSplitContainer.Panel2.Controls.Add(this._pageSummaryView);
-            this._dataWindowSplitContainer.Panel2MinSize = 50;
+            this._dataWindowSplitContainer.Panel2MinSize = 150;
             this._dataWindowSplitContainer.Size = new System.Drawing.Size(527, 815);
             this._dataWindowSplitContainer.SplitterDistance = 500;
             this._dataWindowSplitContainer.TabIndex = 0;
