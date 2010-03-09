@@ -33,9 +33,22 @@
 	      		<li>Confirm that the metadata XML file for document 2 shows a total verification 
 			time of approximately one minute.
 	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4000, #4026, #4171]</b> Create metadata XML
+	       	<ul>
+			<li>Verify an image that contains one or more <b>Clue</b> attributes.
+			<li>Toggle a Clue on for redaction.
+			<li>Create the redacted image and confirm that the Clue is redacted.
+			<li>Create the metadata XML file.
+	  	   	<LI>Confirm that the Clue includes <b>Enabled=&quot;0quot;</b>.
+			<li>Confirm that time and date formats in the metadata are the same for 
+			attributes created via <b>Redaction: Create redacted image</b> as for 
+			<b>Redaction: Verify sensitive data</b>.
+			<li>Confirm that redactions created via <b>Redaction: Extend redactions to 
+			surround context</b> are included in a <b>SurroundContextSession</b> node.
+	       	</ul>
 	</UL>
 <p>
-
 	<LI><h2>Redaction: Create redacted image</h2>
 	<UL>
   	   	<LI><b>[FlexIDSCore #3435]</b> Persisting Bold font
@@ -63,6 +76,36 @@
 			<li>Confirm that if <b>ELI09202, Could not save image.</b> is seen in the exception 
 			log, then <b>&lt;OutputName&gt;</b> does not exist.
 	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4115]</b> Applying redactions as annotations
+	       	<ul>
+			<li>Run rules on a bitmap file copied from 
+			<b>I:\Common\Engineering\ProductTesting\UniqueImageTypes</b>.
+	  	   	<LI>Create the redacted image applying redactions as annotations.
+			<li>Confirm that the task fails and that annotations cannot be applied to 
+			a bitmap.
+	       	</ul>
+	</UL>
+<p>
+	<LI><h2>Redaction: Extend redactions to surround context</h2>
+	<UL>
+  	   	<LI><b>[FlexIDSCore #4046, #4127, #4128]</b> Redact surrounding context
+	       	<ul>
+			<li>Configure the task to redact context up to <b>1.5</b> words.
+			<li>Click on the <b>For all data types</b> radio button.
+			<li>Confirm that the spin control now says <b>2</b>.
+			<li>Click OK and reopen the property page.
+	  	   	<LI>Confirm that the spin control still says <b>2</b>.
+			<li>Confirm that adjusting redaction height <b>does not</b> adjust the 
+			redaction width to include the entire word.
+			<li>Redact an instance of the word - <b>the</b>.
+			<li>Save the document and navigate back to review the results.
+			<li>Confirm that the redacted text <b>does not</b> include multiple 
+			overlapping zones.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4075, #4077]</b> Confirm that the <b>Redaction: Extend redactions 
+		to surround context</b> task cannot be configured to act on invalid data types.
 	</UL>
 <p>
 
@@ -283,6 +326,33 @@
 			<li>Confirm that only one copy of the exemption code is present.
 	       	</ul>
 <p>
+  	   	<LI><b>[FlexIDSCore #3773, #3778, #3893, #4066, #4073, 
+		#4081, #4170, DotNet #422]</b> Verification UI
+		<ul>
+			<li>Confirm that toolbar location is persisted.
+			<li>Confirm that splitter location is persisted.
+			<li>Confirm that <b>Shift+Del</b> no longer deletes rows from the grid window.
+			<li>Confirm that image display obeys the anti-aliasing registry setting from 
+			<b>HKCU/Software/Extract 
+			Systems/ReusableComponents/PcxAndDlls/ImageEdit/AntiAliasing</b>.
+			<li>Confirm that the verification context menu includes an option for 
+			<b>rectangular redactions</b>.
+			<li>Confirm that page navigation in Vista correctly restores the previous view.
+			<li>Confirm that the following actions are disallowed while drawing a redaction
+			<ul>
+				<li>saving changes 
+				<li>discarding changes 
+				<li>skipping the file
+				<li>stopping processing
+			</ul>
+			<li>Confirm that the user is not allowed to switch to the selection tool while 
+			moving a redaction.
+			<li>Confirm that the <b>ESC</b> key is handled correctly when a dockable 
+			window has focus.
+			<li>Confirm that changing the cursor tool does not change the current 
+			selection.
+	       	</ul>
+<p>
   	   	<LI><b>[FlexIDSCore #3885, #3995]</b> Verification warning
 	       	<ul>
 	  	   	<LI>Queue one file for verification, listening for more files.
@@ -299,6 +369,25 @@
 			<li>Verify a sensitive document adding some manual redactions.
 			<li>Print the document.
 			<li>Confirm that the redaction border is not rendered in the print output.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3966]</b> Redaction accuracy feedback
+		<ul>
+			<li>Configure a verification FPS file to collect redaction accuracy feedback.
+			<li>Supply and run rules on a collection of files with names such as 
+			<b>123.001</b>, <b>123.002</b>, <b>123.003</b> and <b>123.004</b>.
+			<li>Verify the documents.
+			<li>Confirm that appropriate output files are seen for each input file.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3983, LegacyRC #5741]</b> Stop processing after Pause and Unpause
+		<ul>
+			<li>Configure a verification FPS file.
+			<li>Confirm that processing can be paused.
+			<li>Confirm that processing can be unpaused.
+			<li>Confirm that processing can be stopped from the FAM.
+			<li>Confirm that FAM toolbar buttons are properly enabled and disabled 
+			during this test.
 	       	</ul>
 <p>
   	   	<LI><b>[FlexIDSCore #3993]</b> Grip handles visible during zoom operation
