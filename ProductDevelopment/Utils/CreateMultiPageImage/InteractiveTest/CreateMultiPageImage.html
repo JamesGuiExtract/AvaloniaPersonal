@@ -15,7 +15,7 @@
            	<li><b>[LegacyRCAndUtils #4345]</b> Confirm that <b>CreateMultiPageImage /?</b> displays 
 		usage text.
           	<li>Confirm that CreateMultiPageImage displays a <b>usage</b> message if other 
-		than 1, 2, 3, or 7 arguments are provided on the command-line.
+		than 2, 3, 5, or 6 arguments are provided on the command-line.
       	</ul>
      	</li>
 <p>
@@ -78,7 +78,23 @@
 <p>
      	<li><h2>CMPI - File Names From Input File - using InputFiles.txt</h2>
       	<ul>
-           	<li><b>Command-line Arguments</b>.  TBD.
+		<li>Create a collection of single page images and an associated text file 
+		to exercise the following command-line arguments.
+           	<li><b>Command-line Arguments</b>
+		<ul>
+			<ul><b>Input file name</b> - the text file that is the source of the 
+			following data items
+			<ul><b>Delimiter</b> - the character used to separate one column of 
+			data from another
+			<ul><b>Column number for output image name</b> - which 1-relative column 
+			of data from the input file will be used to provide output filenames
+			<ul><b>Column number for input image name</b> - which 1-relative column 
+			of data from the input file will be used to provide input filenames
+			<ul><b>Output path</b> - the folder that will receive the output images
+			<ul><b>Input path</b> - optional argument to specify the folder that 
+			contains the input images, allows input image name to use relative paths 
+			instead of absolute paths
+		</ul>
        	</ul>
      	</li>
 <p>
