@@ -56,6 +56,10 @@
 			<li>The Continuous Processing option on the Processing Setup page should be 
 			set to <b>Keep processing files as they are added to the queue</b>.  
 		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5659]</b> Confirm that running <b>Core: Convert to searchable PDF</b> 
+		with the <b>Make output PDF/A compatible</b> option does not display a handle leak 
+		when running with scheduled processing.
 	</ul>
 <p>
 	<li><h2>Schedule Reports</h2>
@@ -128,6 +132,19 @@
 			</ul>
 			<li>Save the spreadsheet with a meaningful name to include the major 
 			version number.
+<p>
+			<li>Spot check a random subset of the output files and confirm 
+			that they are PDF/A-compliant.  
+			<li>Check at least 1,000 files if the check must be done manually.
+			<li>Check at least 50,000 files if the check can be done 
+			automatically.
+			<li>Make sure to check some of each of the following files:
+			<ul>
+				<li>Single-page TIF
+				<li>Multiple-page TIF
+				<li>Single-page PDF
+				<li>Multiple-page PDF
+			</ul>
 		</ul>
 <p>
 	   	<LI><b>[LegacyRC #5581, #5586]</b> PDF/A conversion
