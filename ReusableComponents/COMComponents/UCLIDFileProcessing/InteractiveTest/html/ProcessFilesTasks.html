@@ -179,6 +179,8 @@
       		<li>Confirm that the radio button includes an associated check box 
 		and spinner control for zero-padding the page number to a specified 
 		number of digits.
+		<li>Confirm that edit box for the zero-padding spinner has enough 
+		room to display the maximum number of digits.
       		<li>Confirm that the page number separator is not used if 
 		not selected.
       		<li>Confirm that the page number separator is used properly if 
@@ -200,8 +202,8 @@
       		<li>Confirm that the property page includes a <b>Position and  
 		appearance</b> group box.
       		<li>Confirm that the group box contains a read-only edit box.
-      		<li>Confirm that the edit box contains <b>Font</b> and 
-		<b>Position</b> settings.
+      		<li>Confirm that the edit box contains <b>Font</b>, <b>Position</b> 
+		and <b>Alignment</b> settings.
       		<li>Confirm that the group box contains a <b>Change...</b> 
 		button.
       		<li>Confirm that the <b>Change...</b> button displays a 
@@ -668,6 +670,8 @@
 <p>
 			<li>Confirm that the group box contains an <b>Allow printing in low level 
 			quality</b> check box.
+	  	   	<LI><b>[LegacyRC #5769]</b> Confirm that setting the <b>low-resolution 
+			printing</b> item is persistent.
 			<li>Confirm that the group box contains an <b>Allow document modifications</b> 
 			check box.
 			<li>Confirm that the group box contains an <b>Allow copying / extraction of text 
@@ -1085,6 +1089,8 @@
           	<b>Non_Blocking</b> in the Configure Launch Application dialog.</li> 
       		<li>Confirm there is a check box for <b>Propagate errors back to the File Action 
 		Manager</b>.
+  	   	<LI><b>[LegacyRC #5764]</b> Confirm that the property page requires <b>blocking</b> 
+		if the <b>Propagate errors</b> checkbox is checked.
       		<li>Confirm that the settings of the radio buttons and check box are persistent.</li> 
 <p>
       		<li>Create two Launch Application tasks with <b>one</b> processing thread and set 
@@ -1284,7 +1290,21 @@
 				number(s) of the failed page(s).
 	       		</ul>
 		</ul>
-</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5559]</b> Confirm that an <b>Unable to locate zones</b> exception 
+		is not logged when OCR'ing a blank page.
+<p>
+  	   	<LI><b>[LegacyRC #5728]</b> OCR Engine
+		<ul>
+			<li>OCR the images from <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5728</b>.
+			<li>Confirm that text is recognized.
+			<li>Confirm that <b>Application trace</b> exceptions are logged for some 
+			of the images.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5781]</b> Confirm that the <b>OCR progress status dialog</b> displays 
+		the correct page information even after the previous document failed to OCR.
+	</ul>
 <p>
 	<li><b>Core: Set file action status in database</b></li>
    	<ul> 
