@@ -761,6 +761,29 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Displays a warning to the user if the user is deleting a row that is marked to display 
+        /// a warning.
+        /// </summary>
+        /// <returns><see langword="true"/> if a warning was displayed and the user chose to 
+        /// cancel; <see langword="false"/> if no warning needed to be displayed or if a warning 
+        /// was displayed and the user chose to continue.</returns>
+        bool WarnIfDeletingRedaction()
+        {
+            // Determine whether a warning should be displayed
+            if (!ShouldWarnAboutRedactedState(false))
+            {
+                return false;
+            }
+
+            // Display the warning
+            DialogResult result = MessageBox.Show(
+                "Are you sure you want to delete the selected item(s)?", "Delete redaction?",
+                MessageBoxButtons.OKCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+
+            return result == DialogResult.Cancel;
+        }
+
+        /// <summary>
         /// Determines whether a warning should be displayed when the redacted state of selected 
         /// rows are being changed.
         /// </summary>
@@ -1827,7 +1850,7 @@ namespace Extract.Redaction.Verification
                     }
                 }
 
-                if (deletingRedactions && WarnIfSettingRedactedState(false))
+                if (deletingRedactions && WarnIfDeletingRedaction())
                 {
                     e.Cancel = true;
                 }
