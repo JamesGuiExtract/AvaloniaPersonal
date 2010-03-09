@@ -65,8 +65,8 @@
    	<li>Press the <b>Commands &gt;</b> button in Queue Setup tab.
    	<ul> 
       		<li>Confirm it brings up a drop-down menu.</li> 
-      		<li>Confirm that <b>Select Skip Condition...</b> is enabled.</li> 
-      		<li>Confirm that <b>Configure Skip Condition...</b> is disabled.</li> 
+      		<li>Confirm that <b>Select Condition...</b> is enabled.</li> 
+      		<li>Confirm that <b>Configure Condition...</b> is disabled.</li> 
       		<li>Confirm that <b>Configure description...</b> is disabled.</li> 
       		<li>Confirm that <b>Cancel</b> is enabled.</li> 
    	</ul>
@@ -85,11 +85,27 @@
 <p>
    	<LI><b>[LegacyRC #5312]</b> Modifying skip conditions
        	<ul>
-      		<li>Exercise an FPS file with a skip condition that is queuing a large 
+      		<li>Exercise an FPS file with a supply condition that is queuing a large 
 		number of images.
-      		<li>Confirm that the skip condition <b>cannot</b> be modified while 
+      		<li>Confirm that the condition <b>cannot</b> be modified while 
 		queuing continues.
        	</ul>
+<p>
+   	<LI><b>[LegacyRC #5770]</b> Tag condition
+	<ul>
+		<li>Create an FPS file to supply files that are not already in the database.
+		<li>Add a <b>Tag condition</b> to the Queue Setup tab.
+		<li>Confirm that all of the files are successfully queued.
+	</ul>
+<p>
+   	<LI><b>[LegacyRC #5772]</b> Confirm that the following tasks can be configured from 
+	both the Conditional task and the Task condition property pages
+	<ul>
+		<li>Core: Apply Bates number
+		<li>Core: Modify PDF file
+		<li>Redaction: Create metadata XML
+		<li>Redaction: Extend redactions to surround context
+	</ul>
 </ul>
 <p>
 <b>Queue Log Tab</b>
