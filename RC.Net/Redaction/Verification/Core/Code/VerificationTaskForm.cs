@@ -6,10 +6,10 @@ using Extract.Licensing;
 using Extract.Rules;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -43,7 +43,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The maximum number of documents to store in the history.
         /// </summary>
-        const int _MAX_DOCUMENT_HISTORY = 20;
+        const int _DEFAULT_MAX_DOCUMENT_HISTORY = 20;
 
         /// <summary>
         /// The title to display for the verification task form.
@@ -67,6 +67,12 @@ namespace Extract.Redaction.Verification
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(VerificationTaskForm).ToString();
+
+        /// <summary>
+        /// The registry sub key where verification settings are stored.
+        /// </summary>
+        static readonly string _VERIFICATION_SUB_KEY = 
+            @"Software\Extract Systems\AttributeFinder\IndustrySpecific\Redaction\RedactionCustomComponents\IDShield";
 
         #endregion Constants
 
@@ -128,7 +134,8 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The previously verified documents.
         /// </summary>
-        readonly List<VerificationMemento> _history = new List<VerificationMemento>(_MAX_DOCUMENT_HISTORY);
+        readonly List<VerificationMemento> _history = 
+            new List<VerificationMemento>(GetMaxDocumentHistory());
 
         /// <summary>
         /// Represents the index in <see cref="_history"/> of the currently displayed document. 
@@ -300,6 +307,32 @@ namespace Extract.Redaction.Verification
             }
 
             return (IFileProcessingTask) processor;
+        }
+
+        /// <summary>
+        /// Gets the maximum number of documents to store in document history queue.
+        /// </summary>
+        /// <returns>The maximum number of documents to store in document history queue.</returns>
+        static int GetMaxDocumentHistory()
+        {
+            using (RegistryKey subKey = Registry.CurrentUser.CreateSubKey(_VERIFICATION_SUB_KEY))
+            {
+                if (subKey != null)
+                {
+                    string value = subKey.GetValue("NumPreviousDocsToQueue") as string;
+                    if (value != null)
+                    {
+                        int maxDocuments;
+                        if (int.TryParse(value, NumberStyles.Integer, 
+                            CultureInfo.InvariantCulture, out maxDocuments) && maxDocuments >= 0)
+                        {
+                            return maxDocuments;
+                        }
+                    }
+                }
+
+                return _DEFAULT_MAX_DOCUMENT_HISTORY;
+            }
         }
 
         /// <summary>
@@ -601,7 +634,7 @@ namespace Extract.Redaction.Verification
             else
             {
                 // If the max document history was reached, drop the first item
-                if (_history.Count == _MAX_DOCUMENT_HISTORY)
+                if (_history.Count == _history.Capacity)
                 {
                     _history.RemoveAt(0);
                     _historyIndex--;
