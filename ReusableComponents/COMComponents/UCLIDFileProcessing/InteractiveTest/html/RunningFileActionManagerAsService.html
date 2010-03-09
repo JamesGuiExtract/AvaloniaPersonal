@@ -437,6 +437,43 @@ called the <b>service machine</b>.  The machine that contains the database is re
 	  	   	<LI>Confirm that the <b>Settings</b> table in <b>ESFAMService.sdf</b> 
 			includes a <b>DBSchema</b> field.
 	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #415, #417, #418, FlexIDSCore #3848]</b> FAM Service
+	       	<ul>
+	  	   	<LI>Confirm that the <b>DependentServices</b> field works properly with 
+			<b>real</b> names of services.
+	  	   	<LI>Confirm that the <b>DependentServices</b> field works properly with 
+			<b>display</b> names of services.
+			<li>Configure the FAM service so that no processing is taking place, just 
+			waiting for files to be dropped into a listening folder.
+			<li>Confirm that CPU usage is approximately zero.
+			<li>Confirm that an exception is logged each time a new FAM instance is 
+			created.
+			<ul>
+				<li>Confirm that the FPS filename is included.
+				<li>Confirm that the process ID is included.
+			</ul>
+			<li>Configure the FAM service to use multiple FPS files.
+			<li>Process some files and kill at least one of the running instances of 
+			<b>FAMProcess.exe</b>.
+			<li>Stop the Extract Systems FAM service.
+			<li>Confirm that the exceptions logged about an inability to communicate 
+			with the killed instances include meaningful text.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #419, #420, LegacyRC #5500, #5738, #5750]</b> Auto Revert
+	       	<ul>
+			<li>Configure the FAM Service to process 4 sets of the <b>Demo_IDShield</b> 
+			images.
+			<li>Prepare two FPS files to queue and process the images.
+			<li>Configure the auto revert timeout to <b>5</b> minutes.
+	  	   	<LI>Process the images with the FAM service.
+	  	   	<LI>Confirm that all of the files process without error.
+			<li>Modify the auto revert timeout to <b>2</b> minutes.
+			<li>Confirm that the auto revert timeout changes back to <b>5</b> minutes.
+			<li>Confirm that no text is present in the <b>Exception</b> field of 
+			the FAST table after a file has been auto-reverted.
+	       	</ul>
 	</ul>
 	</li>
 </ul>
