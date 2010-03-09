@@ -808,75 +808,10 @@ namespace Extract.Imaging.Forms
                 // Get the grip handles in client coordinates
                 base.ImageViewer.Transform.TransformPoints(gripPoints);
 
-                // Get the center of the highlight in client coordinates
-                PointF[] center = new PointF[] 
-                {
-                    GetCenterPoint()
-                };
-                base.ImageViewer.Transform.TransformPoints(center);
 
-                // Check if this is a rectangular highlight's vertex
-                if (gripHandleId >= 4)
-                {
-                    // Return the cursor based on whether the vertex 
-                    // is to the top-left/bottom-right of the center.
-                    return gripPoints[gripHandleId].X < center[0].X ^ 
-                           gripPoints[gripHandleId].Y < center[0].Y
-                               ? Cursors.SizeNESW : Cursors.SizeNWSE;
-                }
-
-                // Get the angle in degrees between the highlight's 
-                // center and the center of the selected grip handle.
-                double angle = GeometryMethods.GetAngle(center[0], gripPoints[gripHandleId])
-                               * 180.0 / Math.PI;
-
-                // Express the angle as a positive number greater than 22.5
-                // NOTE: This is done so that when the number is divided by 45,
-                // it will round to a number between one and eight.
-                if (angle < 22.5)
-                {
-                    angle += 360;
-                }
-
-                // Set the cursor based on the nearest 45 degree angle
-                // NOTE: The degree measured is expressed in a Cartesian
-                // coordinate system, not the top-left client coordinate
-                // system. For this reason the result is mirrored on the 
-                // y-axis, and the first & third quadrants become the
-                // second & fourth quadrants respectively and vice versa.
-                switch ((int)Math.Round(angle / 45.0))
-                {
-                    // Closest to 45 or 225 degrees
-                    case 1:
-                    case 5:
-
-                        // Second and fourth quadrant
-                        return Cursors.SizeNWSE;
-
-                    // Closest to 90 or 270 degrees
-                    case 2:
-                    case 6:
-
-                        return Cursors.SizeNS;
-
-                    // Closest to 135 or 315 degrees
-                    case 3:
-                    case 7:
-
-                        // First and third quadrant
-                        return Cursors.SizeNESW;
-
-                    // Closest to 0 or 180 degrees
-                    case 4:
-                    case 8:
-
-                        return Cursors.SizeWE;
-
-                    default:
-
-                        // This is a non-serious logic error. Return the default cursor.
-                        return Cursors.Default;
-                }
+                // Return the appropriate resize cursor
+                bool cornerResize = gripHandleId >= 4;
+                return GetResizeCursor(gripPoints[gripHandleId], cornerResize);
             }
             catch
             {
@@ -884,6 +819,88 @@ namespace Extract.Imaging.Forms
                     "Unable to get grip handle cursor.");
                 ee.AddDebugData("Grip handle id", gripHandleId, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Determines the direction of the resize cursor based on the mouse position and the 
+        /// type of resize event.
+        /// </summary>
+        /// <param name="point">The position of the mouse.</param>
+        /// <param name="cornerResize"><see langword="true"/> if it is a corner resize; 
+        /// <see langword="false"/> if it is a side resize.</param>
+        /// <returns>The resize cursor to use based on the mouse <paramref name="point"/> and 
+        /// whether it is a <paramref name="cornerResize"/>.</returns>
+        Cursor GetResizeCursor(PointF point, bool cornerResize)
+        {
+            // Get the center of the highlight in client coordinates
+            PointF[] center = new PointF[] 
+            {
+                GetCenterPoint()
+            };
+            base.ImageViewer.Transform.TransformPoints(center);
+
+            // Check if this is a rectangular highlight's vertex
+            if (cornerResize)
+            {
+                // Return the cursor based on whether the vertex 
+                // is to the top-left/bottom-right of the center.
+                return point.X < center[0].X ^ 
+                       point.Y < center[0].Y
+                           ? Cursors.SizeNESW : Cursors.SizeNWSE;
+            }
+
+            // Get the angle in degrees between the highlight's 
+            // center and the center of the selected grip handle.
+            double angle = GeometryMethods.GetAngle(center[0], point)
+                           * 180.0 / Math.PI;
+
+            // Express the angle as a positive number greater than 22.5
+            // NOTE: This is done so that when the number is divided by 45,
+            // it will round to a number between one and eight.
+            if (angle < 22.5)
+            {
+                angle += 360;
+            }
+
+            // Set the cursor based on the nearest 45 degree angle
+            // NOTE: The degree measured is expressed in a Cartesian
+            // coordinate system, not the top-left client coordinate
+            // system. For this reason the result is mirrored on the 
+            // y-axis, and the first & third quadrants become the
+            // second & fourth quadrants respectively and vice versa.
+            switch ((int)Math.Round(angle / 45.0))
+            {
+                    // Closest to 45 or 225 degrees
+                case 1:
+                case 5:
+
+                    // Second and fourth quadrant
+                    return Cursors.SizeNWSE;
+
+                    // Closest to 90 or 270 degrees
+                case 2:
+                case 6:
+
+                    return Cursors.SizeNS;
+
+                    // Closest to 135 or 315 degrees
+                case 3:
+                case 7:
+
+                    // First and third quadrant
+                    return Cursors.SizeNESW;
+
+                    // Closest to 0 or 180 degrees
+                case 4:
+                case 8:
+
+                    return Cursors.SizeWE;
+
+                default:
+
+                    // This is a non-serious logic error. Return the default cursor.
+                    return Cursors.Default;
             }
         }
 
@@ -928,8 +945,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                // Get the modifier keys immediately
-                Keys modifiers = Control.ModifierKeys;
+                // Determine whether the highlight is being rotated
+                bool isRotation = Control.ModifierKeys == Keys.Control;
 
                 // Get the grip handles in image and client coordinates
                 PointF[] imageGrips = GetGripPoints();
@@ -966,7 +983,7 @@ namespace Extract.Imaging.Forms
                 {
                     // Set the cross cursor if necessary
                     base.ImageViewer.Cursor =
-                        modifiers == Keys.Control
+                        isRotation
                             ? ExtractCursors.ActiveRotate
                             : base.ImageViewer.GetSelectionCursor(mouseX, mouseY);
 
@@ -975,8 +992,8 @@ namespace Extract.Imaging.Forms
                     MakeGripHandleEndPoint(imageGrips, gripHandleId);
                 }
 
-                // Store whether this is an angular highlight
-                _originalIsAngular = imageGrips.Length <= 4;
+                // Preserve the angularity of the highlight unless it is being rotated
+                _originalIsAngular = isRotation || imageGrips.Length <= 4;
 
                 // Ensure that rectangular highlights are truly rectangular
                 // [DotNetRCAndUtils #91]
@@ -1103,7 +1120,10 @@ namespace Extract.Imaging.Forms
                     if (Control.ModifierKeys != Keys.Control)
                     {
                         // Reset the highlight cursor
-                        imageViewer.Cursor = imageViewer.GetSelectionCursor(mouseX, mouseY);
+                        imageViewer.Cursor = GetResizeCursor(_endPoint, false);
+
+                        // Don't preserve the angularity of the original highlight
+                        _originalIsAngular = true;
 
                         // Update the highlight vector
                         UpdateHighlightVector();
@@ -1698,12 +1718,12 @@ namespace Extract.Imaging.Forms
 
                 // Calculate the grip vertices
                 PointF[] vertices = new PointF[] 
-                    {
-                        new PointF((float)(start.X + xModifier), (float)(start.Y - yModifier)),
-                        new PointF((float)(start.X - xModifier), (float)(start.Y + yModifier)),
-                        new PointF((float)(end.X - xModifier), (float)(end.Y + yModifier)),
-                        new PointF((float)(end.X + xModifier), (float)(end.Y - yModifier))
-                    };
+                {
+                    new PointF((float)(start.X + xModifier), (float)(start.Y - yModifier)),
+                    new PointF((float)(start.X - xModifier), (float)(start.Y + yModifier)),
+                    new PointF((float)(end.X - xModifier), (float)(end.Y + yModifier)),
+                    new PointF((float)(end.X + xModifier), (float)(end.Y - yModifier))
+                };
 
                 return vertices;
             }
