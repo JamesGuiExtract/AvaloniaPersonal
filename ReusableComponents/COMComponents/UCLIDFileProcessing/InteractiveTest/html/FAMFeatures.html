@@ -260,31 +260,17 @@
 			<b>with</b> being PDF/A-compliant.
 			<li>Confirm that output filename is the same as the input filename.
 	       	</ul>
+	</ul>
 <p>
-      		<li><u><b>Large-Scale Test</u></b>
+	<li><h2>PDF Security</h2>
+	<ul>
+      		<li><u><b>Miscellaneous</b></u>
 	       	<ul>
-			<li>Prepare at least 1M image files for this test.  Include 
-			single-page and multiple-page images.  Include TIF and PDF images.
-			<li>Prepare an FPS file to queue and process these images:
-			<ul>
-				<li>Use the <b>Core: Convert to searchable PDF</b> task.
-				<li>Include a listening file supplier in order to 
-				confirm that added files can be converted to searchable 
-				PDF/A format.
-			</ul>
-			<li>Process the images.
-			<li>Spot check a random subset of the output files and confirm 
-			that they are PDF/A-compliant.  
-			<li>Check at least 1,000 files if the check must be done manually.
-			<li>Check at least 50,000 files if the check can be done 
-			automatically.
-			<li>Make sure to check some of each of the following files:
-			<ul>
-				<li>Single-page TIF
-				<li>Multiple-page TIF
-				<li>Single-page PDF
-				<li>Multiple-page PDF
-			</ul>
+			<li>Confirm that within the PDF security settings for <b>Redaction: Create 
+			redacted image</b>, both the user and the owner passwords must be set for 
+			a multiple-page PDF.
+			<li>Confirm that within the PDF security settings for <b>Core: Convert to 
+			searchable PDF</b>, the user and the owner passwords must be different.
 	       	</ul>
 	</ul>
 </ul>
