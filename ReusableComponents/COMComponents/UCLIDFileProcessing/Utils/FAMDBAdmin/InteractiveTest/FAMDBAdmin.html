@@ -208,15 +208,16 @@
 		<li>Confirm that choosing <b>No</b> from the Final Confirmation dialog makes 
 		no change to the database.
 		<li>Confirm that choosing <b>Yes</b> from the Final Confirmation dialog removes 
-		all files and all Actions (depending on the <b>Retain actions</b> checkbox) 
-		from the database.
+		all files and all actions (depending on the <b>Retain actions, counters, tags, users, 
+		and database settings</b> checkbox) from the database.
 		<ul>
 			<li>Export a list of all files via <b>Tools - Export File Lists...</b>.
 			<li>Confirm that <b>0</b> files were exported to the 
 			selected output file.
-			<li>Attempt to rename an Action via <b>Action - Rename...</b>
+			<li>Attempt to rename an Action via <b>Manage - Actions...</b>
 			<li>Confirm that <b>There are no actions inside the current database</b>.
-			<li><b>[LegacyRC #4111]</b> Confirm that the original login password is 
+			<li>Confirm that counters, tags and users have been removed from the database.
+			<li><b>[LegacyRC #4111, #5777]</b> Confirm that the original login password is 
 			still effective.
 		</ul>
 	</ul>
