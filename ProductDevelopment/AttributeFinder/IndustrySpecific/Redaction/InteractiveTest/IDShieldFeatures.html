@@ -283,6 +283,24 @@
 				<li>Confirm that no error is seen.
 	       		</ul>
 <p>
+	  	   	<LI><b>[FlexIDSCore #3908, #3978, #4012, #4048, #4131, #4140]</b> ID Shield 
+			Statistics Reporter
+	       		<ul>
+				<li>Confirm that the application opens properly after a clean installation.
+				<li>Confirm that <b>ID Shield Statistics Reporter</b> has a non-trivial icon.
+		  	   	<LI>Confirm that the default data types for the <b>Verification condition</b> 
+				include HCData, MCData, LCData and Clues.
+				<li>Confirm that an output file is now created listing the images with 
+				overlapping expected redactions.
+				<li>Configure the verification condition to include some of the pre-defined 
+				data types.
+				<li>Reopen the property page and unselect the data type check boxes.  Leave 
+				the <b>ID Shield data file</b> check box checked.
+				<li>Click OK and close the exception.
+				<li>Cancel the changes and reopen the configuration page.
+				<li>Confirm that the originally selected data types are checked.
+		       	</ul>
+<p>
 			<li><b>[FlexIDSCore #4016]</b> Confirm that the window size and location are 
 			persisted.
 <p>
@@ -512,6 +530,12 @@
 				<li>Confirm that no confirmation message is presented about wanting to 
 				unredact the selected item.
 			</ul>
+<p>
+	  	   	<LI><b>[FlexIDSCore #4129]</b> Confirm that the redacted areas from <b>Find or 
+			redact text</b> are no larger than necessary to cover the found text.
+<p>
+	  	   	<LI><b>[FlexIDSCore #4143]</b> Confirm that closing the <b>Find or redact text</b> 
+			window returns focus to the verification UI.
 		</ul>
 	</ul>
 <p>
@@ -614,6 +638,39 @@
 			metadata.
 			<li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 3</b> 
 			metadata.
+		</ul>
+<p>
+		<li><u>Miscellaneous</u>
+		<ul>
+	  	   	<LI><b>[FlexIDSCore #4032]</b> Confirm that <b>Redact From XML</b> outputs 
+			redaction text.
+		</ul>
+	</ul>
+<p>
+	<li><h2>Support for Multiple Monitors</h2>
+	<ul>
+		<li><u>Functionality</u>
+		<ul>
+			<li>Confirm that the <b>Data window</b> and the <b>Image window</b> can be 
+			docked separately and displayed on separate monitors.
+			<li>Confirm that docked window position is persistent.
+			<li>Confirm that undocked window position is persistent.
+			<li>Confirm that a maximized window on a separate monitor persists across 
+			verification sessions.
+			<li>Exercise changing monitor orientation between verification sessions.  
+			Confirm that appropriate behavior is seen.
+			<li>Confirm that removing the second monitor between verification sessions 
+			is supported by having the user interface display the windows on the single 
+			monitor.
+<p>
+	  	   	<LI><b>[FlexIDSCore #4161]</b> Multi-monitor support
+		       	<ul>
+				<li>Run verification on a multiple monitors.
+				<li>Maximize the verification window on the secondary monitor.
+				<li>Close and restart verification.
+				<li>Confirm that the verification window is maximized on the 
+				secondary monitor.
+	       		</ul>
 		</ul>
 	</ul>
 </ul>
