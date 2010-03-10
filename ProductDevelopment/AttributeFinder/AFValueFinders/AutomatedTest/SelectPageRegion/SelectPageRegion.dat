@@ -237,7 +237,7 @@
 //*********************************************************************************
 
 // Include Image Region With No OCR
-<TESTCASE>;IncludeImageRegionNoOcr.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.noocr.uss;;IncludeImageRegionNoOcr.voa
+<TESTCASE>;IncludeImageRegionNoOcr.rsd;..\..\..\AFCore\AutomatedTest\images\image2.noocr.tif.uss;;IncludeImageRegionNoOcr.voa
 
 // Exclude Image Region With No OCR
-<TESTCASE>;ExcludeImageRegionNoOcr.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.noocr.uss;;ExcludeImageRegionNoOcr.voa
+<TESTCASE>;ExcludeImageRegionNoOcr.rsd;..\..\..\AFCore\AutomatedTest\images\image1.noocr.tif.uss;;ExcludeImageRegionNoOcr.voa
