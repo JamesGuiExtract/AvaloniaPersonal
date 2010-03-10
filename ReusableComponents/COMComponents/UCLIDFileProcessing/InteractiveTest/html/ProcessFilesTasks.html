@@ -244,6 +244,12 @@
 		seen if an invalid tag such as <b>&lt;SourceDocName</b> is entered in the 
 		property page.
 <p>
+  	   	<LI><b>[LegacyRC #5484]</b> Confirm that <b>Core: Apply Bates number</b> updates 
+		progress status.
+<p>
+  	   	<LI><b>[LegacyRC #5489]</b> Confirm that exceptions about an image not being GDI 
+		compatible are not seen during testing of <b>Core: Apply Bates number</b>.
+<p>
   	   	<LI><b>[LegacyRC #5579, #5580]</b> Apply Bates number
 	       	<ul>
 	  	   	<LI>Prepare an FPS file to act on a database without any defined counters.
@@ -630,6 +636,10 @@
 		<li><b><u>PDF/A Compliance</u></b>
 		<ul>
 			<li>Convert a folder of images to PDF/A-compliant PDFs.
+			<li><b>[LegacyRC #5572]</b> confirm that <b>ELI21032: Unable to create new temporary 
+			file</b> exceptions are not seen.
+			<li><b>[LegacyRC #5598]</b> confirm that <b>ELI24978: File cannot be deleted</b> 
+			exceptions are not seen.
 			<li>Use an updated demo installation of <b>Adobe Preflight</b> to validate compliance.
 		</ul>
 <p>
@@ -1251,12 +1261,14 @@
 		Use the file in I:\Common\Testing\PVCS_Testing\LegacyRC\4398.  Confirm that the file 
 		fails to OCR and is moved to the <b>Failed</b> grid on the Processing Log tab.
 		Note that this task takes a long time.
-		<li><b>[LegacyRC #4845]</b> Confirm that the image files in the following 
-		folder OCR without error.  I:\Common\Testing\PVCS_Testing\LegacyRC\4845
-		<li><b>[LegacyRC #4832]</b> Process the files in the list file attached to the SCR.  
-		Confirm that the files OCR without error.
-		<li><b>[LegacyRC #4830]</b> Confirm that the image files in the following 
-		folder provide meaningful OCR output.  I:\Common\Testing\PVCS_Testing\LegacyRC\4830
+		<li>Bad images - confirm that the following images OCR without error
+		<ul>
+			<li><b>I:\Common\Testing\PVCS_Testing\LegacyRC\4830</b>
+			<li><b>I:\Common\Testing\PVCS_Testing\LegacyRC\4832</b>
+			<li><b>I:\Common\Testing\PVCS_Testing\LegacyRC\4845</b>
+			<li><b>I:\Common\Testing\PVCS_Testing\LegacyRC\5118</b>
+			<li><b>I:\Common\Testing\PVCS_Testing\LegacyRC\5128</b>
+		</ul>
 		<li><b>[FlexIDSCore #3242]</b> FAM crashes when uss files are queued and OCRed
 		<ul>
 			<li>Create an FPS file to supply and process <b>USS</b> files for OCR.
@@ -1361,6 +1373,16 @@
 			rules</b> task and a <b>Core: Set file action status</b> task to set 
 			<b>CleanUp</b> status to <b>Pending</b>.</li>
 			<li>Confirm that <b>no</b> extra file added queue events are seen.</li>
+		</ul>
+<p>
+		<li><b>[LegacyRC #5648]</b> Support for AutoCreateAction
+		<ul>
+			<li>Enable <b>AutoCreateAction</b> in the <b>DBInfo</b> table.</li>
+			<li>Queue some files to the database.
+			<li>Process the files such <b>Core: Set file action status</b> set file 
+			action status for an action that does not exist in the database.
+			<li>Confirm that processing is successful and that the action is 
+			automatically created.
 		</ul>
    	</ul> 
 <p>

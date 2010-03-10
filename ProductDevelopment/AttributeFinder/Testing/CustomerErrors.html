@@ -13,94 +13,54 @@
 <hr>
 
 <OL>
-
-<!-- *********************************************** -->
-<LI><h2>[LegacyRC #4434] - FACC - Exits Without Completing Processing</h2>
-<UL>
-  	<li><b>Test Setup</b> - Follow instructions in 
-	\\fnp\internal\Common\Testing\PVCS_Testing\P13\4434\Readme.txt</li>
+	<LI><h2>[FlexIDSCore #3609, LegacyRC #5778] - CA - Santa Barbara - DFM : Various out-of-memory errors 
+	during processing</h2>
+	<UL>
+  		<li><b>Test Setup</b>
+		<ul>
+			<li>Prepare a server-class machine such as <b>UltraTester</b> for this test.
+			<li>Both <b>Indexing</b> and <b>Redaction</b> rules will be exercised on the 
+			Santa Barbara images.
+			<li>Note that separate databases are used for <b>DayForward</b> and for 
+			<b>BackFile</b> processing.
+			<li>Note that the testing scenerio does not include any verification since 
+			the out-of-memory errors were already reproducible.
+			<li>Review the multiple FPS files found at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3609</b>
+			<ul>
+				<li>Queue_Process.fps - watches a UNC share to supply images for 
+				processing against Indexing rules
+				<li>Process.fps - OCR's images, runs Indexing rules, copies the image 
+				to another folder, copies the XML output from the rules to yet another 
+				folder, and sets the Redaction action to Pending
+				<li>Process_Redaction.fps - runs the Redaction rules, has a conditional 
+				task to set Verify to Pending if this is a sensitive document, otherwise 
+				sets the Cleanup action to Pending.
+				<li>Cleanup.fps - sleeps for 5 minutes to give verifiers an opportunity 
+				to navigate the historical documents; deletes the metadata XML, USS, VOA, 
+				and source documents
+				<li>QueueBackRedaction.fps - watches a UNC share
+				<li>ProcessBackRedaction.fps - OCR's images, runs the Redaction rules
+				<li>CleanupBackRedaction.fps - sleeps, deletes unnecessary files
+			</ul>
+			<li>Copy a set of CA - Santa Barbara images to a testing folder.  Prepare other 
+			sets for copying into the listening folders.
+			<li>Exercise the FPS files for at least a few days.
+		</ul>
 <p>
-   	<li>Exercise the test at least 50 times on <b>SuperTester</b> or <b>UltraTester</b> and 
-	review results to see if processing failed.
-</UL>
-<br>
-
-<!-- *********************************************** -->
-<LI><h2>[FlexIDSCore #2482, #2485, #2487, #2488] - Cott - Various Errors During Processing</h2>
-<UL>
-  	<li><b>Test Setup</b>
-	<ul>
-		<li>Use the latest rules delivery from <b>PA - Adams - Cott</b>.
-		<li>Copy several thousand PA - Adams images to the test machine.
-		<li>Create an FPS file to supply and process these images.
-		<li>Exercise the FPS file for several hours - at least overnight.
-	</ul>
+	  	<li><b>Test Results - the following errors should NOT be seen</b>
+		<ul>
+	   		<li><b>ELI04217</b> - Exception of type 'System.OutOfMemoryException' was thrown
+	   		<li><b>ELI05716</b> - Exception of type 'System.OutOfMemoryException' was thrown
+	   		<li><b>ELI06432</b> - Out of memory 
+	   		<li><b>ELI08206</b> - Out of memory 
+	   		<li><b>ELI12967</b> - COM Exception caught 
+	   		<li><b>ELI15668</b> - Exception of type 'System.OutOfMemoryException' was thrown
 <p>
-  	<li><b>Test Results - the following errors should NOT be seen</b>
-	<ul>
-	   	<li><b>ELI14973</b> - not enough storage is available to complete this operation 
-	   	<li><b>ELI06970</b> - unable to create file storage object 
-	   	<li><b>ELI03837</b> - COM Exception caught 
-	   	<li><b>ELI04367</b> - COM Exception caught 
-	</ul>
-</UL>
-<br>
-
-<!-- *********************************************** -->
-<LI><h2>[LegacyRC #4937] - Cott - Delayed-Write Errors During Processing</h2>
-<UL>
-  	<li><b>Test Setup</b>
-	<ul>
-		<li>Create a <b>DelayedWrite_Verify</b> database on UltraTester or another 
-		server-class machine.  Add two actions: <b>Compute</b> and <b>Verify</b>.
-		<li>Confirm that the test machine has delayed-write caching enabled.  This 
-		setting is displayed via the <b>Policies</b> tab on the disk drive 
-		<b>Properties</b> dialog and can be accessed from the <b>Device 
-		Manager</b> window.
-		<li>Copy at least <b>100,000</b> redaction samples images to the test machine.
-		<li>Copy a current <b>Redaction customer</b> ruleset to the test machine.
-		<li>Create an FPS file to supply and process these images.  Two processing tasks 
-		should be defined: <b>Execute Rules</b> and <b>Conditionally execute task(s)</b>.  
-		The conditional task should use the <b>ID Shield Data File Contents</b> condition 
-		with a <b>Set File Action Status</b> task to set the <b>Verify</b> action to 
-		<b>Pending</b> if sensitive data is found.
-	</ul>
+			<li><b>[LegacyRC #5778]</b> There also should not be any situations where the 
+			exception log is stuck with multiple processes trying to write at the same time.
+		</ul>
+	</UL>
 <p>
-  	<li><b>Test Execution</b>
-	<ul>
-		<li>Exercise the FPS file for several days and confirm that no processing failures 
-		due to a sharing violation were seen.  During initial pre-fix testing, <b>M</b> 
-		failures were seen during a test of <b>N</b> images.
-	</ul>
-</UL>
-<br>
-
-<LI><h2>[LegacyRC #5050, #5078, #5088, #5092] - Internal - File Access Errors During Processing</h2>
-<UL>
-  	<li><b>Test Setup</b>
-	<ul>
-      		<li>Locate a collection of several thousand sample images on <b>FNP2</b>.
-      		<li>Create an FPS file to <b>queue</b> the images.
-      		<li>Create an FPS file to <b>process</b> the images.  Include an <b>OCR document</b> 
-		task, an <b>Execute rules</b> task and a <b>Conditionally evaluate VOA file</b> task.  
-		If the file is sensitive, set the <b>Verify</b> action to Pending.  If the file is not 
-		sensitive, set the <b>Export</b> action to Pending.
-      		<li>Create an FPS file to <b>Export</b> the images.  The FPS file should include 
-		several <b>Delete</b> tasks to remove the image file, the USS file, the VOA file, 
-		and the XML file.
-	</ul>
-<p>
-  	<li><b>Test Execution</b>
-	<ul>
-		<li>Exercise the FPS file for several days and confirm that <b>no</b> file access 
-		exceptions are seen in the UEX logs.
-      		<li>Note that occasional <b>ELI24062</b> exceptions noting retries for file reading 
-		are expected.  Other related ELI codes may also be seen.
-	</ul>
-</UL>
-<br>
-
-<!-- *********************************************** -->
 </OL>
-
 </HTML>

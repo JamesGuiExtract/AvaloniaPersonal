@@ -47,6 +47,15 @@
 			<li>Confirm that redactions created via <b>Redaction: Extend redactions to 
 			surround context</b> are included in a <b>SurroundContextSession</b> node.
 	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5187]</b> Metadata from line-fitted redaction
+	       	<ul>
+			<li>Verify an image.
+			<li>Draw an auto-fitted redaction that splits into multiple lines.
+			<li>Save the VOA file.
+			<li>Create the metadata XML file.
+	  	   	<LI>Confirm that the multiple-line redaction was handled correctly.
+	       	</ul>
 	</UL>
 <p>
 	<LI><h2>Redaction: Create redacted image</h2>
@@ -84,6 +93,16 @@
 	  	   	<LI>Create the redacted image applying redactions as annotations.
 			<li>Confirm that the task fails and that annotations cannot be applied to 
 			a bitmap.
+	       	</ul>
+<p>
+	   	<LI><b>[LegacyRC #5301]</b> JPEG formatted TIFs
+       		<ul>
+			<li>Make a local copy of the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5301</b> 
+			image files.
+			<li>Verify these images and draw a manual redaction on each image.
+			<li>Create redacted images for each image.
+			<li>Confirm that each page of each output image can be viewed in the <b>Image 
+			Viewer</b>.
 	       	</ul>
 	</UL>
 <p>
@@ -446,6 +465,26 @@
 			<li>Do not close the prompt window.
 			<li>Confirm that <b>Stop processing</b> from the FAM is successful and 
 			that the verification UI will close.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5200]</b> Highlights appear and disappear
+		<ul>
+			<li>Verify an image with one or more HC/MC/LC/Clue items.
+			<li>Draw a manual redaction and move the mousewheel while drawing.
+			<li>Confirm that existing and new highlights remain visible during the 
+			drawing operation.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5204, #5241]</b> Angular redactions becoming rectangular
+		<ul>
+			<li>Create a manual redaction with a slight angle.
+			<li>Click on the selection tool.
+			<li>Move the top grip handle toward the bottom until the redaction zone is 
+			as narrow as possible.
+			<li>Confirm that the redaction zone remains angular throughout the move.
+			<li>Release the grip handle.
+			<li>Move the top grip handle back to the original position.
+			<li>Confirm that the redaction is still angular.
 		</ul>
 <p>
   	   	<LI><b>[LegacyRC #5734]</b> Confirm that PDF images can be simultaneously queued and 

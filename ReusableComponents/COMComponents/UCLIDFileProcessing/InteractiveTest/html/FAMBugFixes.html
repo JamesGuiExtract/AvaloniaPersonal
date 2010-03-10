@@ -90,7 +90,7 @@
    		</LI>
 	</ul>
 <p>
-   	<LI><h2>[LegacyRC #5478] - Processing all skipped files when only queuing</h2>
+   	<LI><b>[LegacyRC #5478]</b> Processing all skipped files when only queuing
        	<ul>
       		<li>Prepare an FPS file to queue files and to process files skipped by 
 		<b>all users</b>.
@@ -137,6 +137,31 @@
 		<li>Execute an FPS file such that an action is automatically created.
 		<li>Process some files using the automatically created action.
 		<li>Confirm that the action can be deleted.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #5660]</b> Failure in Core: Convert to searchable PDF
+       	<ul>
+		<LI>Exercise the task for the sample image in 
+		<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5660</b>.  
+		<li>Confirm that the file cannot be converted to a searchable PDF.
+		<li>Confirm that the exception log can be opened in the <b>UEX Viewer</b>.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #5661]</b> Simultaneous queuing and processing
+       	<ul>
+		<LI>Create an FPS file to both queue and process files.
+  	   	<LI>Confirm that the <b>Recent queue events</b> grid displays all of 
+		the files.
+  	   	<LI>Confirm that the <b>Files added or updated in the queue</b> grid 
+		displays all of the files.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #5687]</b> Set file action status on pre-queued files
+       	<ul>
+		<li>Queue some files.
+      		<li>Prepare an FPS file to set file action status.
+		<li>Confirm that <b>ELI14775: Unable to obtain DB schema version</b> is not 
+		seen for the first file.
        	</ul>
 <p>
    	<LI><b>[LegacyRC #5715]</b> Cancellable tasks and scheduled processing
