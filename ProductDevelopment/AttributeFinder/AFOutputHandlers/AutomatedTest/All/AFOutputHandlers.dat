@@ -1,7 +1,8 @@
 <FILE>;..\ChangeCase\ChangeCase.dat
 <FILE>;..\ConditionalOutputHandler\ConditionalOutputHandler.dat
 <FILE>;..\EliminateDuplicates\EliminateDuplicates.dat
-<FILE>;..\LabDEOrderMapper\LabDEOrderMapper.dat
+// LabDEOrderMapper tests are removed for FLEX Index / ID Shield testing
+//<FILE>;..\LabDEOrderMapper\LabDEOrderMapper.dat
 <FILE>;..\MergeAttributeTrees\MergeAttributeTrees.dat
 <FILE>;..\ModifyAttributes\ModifyAttributes.dat
 <FILE>;..\MoveAndModifyAttributes\MoveAndModifyAttributes.dat
