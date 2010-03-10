@@ -190,7 +190,9 @@ DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall
 
 GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetComponentDataFiles GetDemo_IDShieldRules GetDemo_FLEXIndexRules GetDataEntryInstall
 
-DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildAttributeFinderCore CreateInstalls CopyComponentVersionFile DoDemos
+DoBuilds: DisplayTimeStamp SetupBuildEnv BuildAttributeFinderCore
+
+DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos
     @ECHO.
     @DATE /T
     @TIME /T
