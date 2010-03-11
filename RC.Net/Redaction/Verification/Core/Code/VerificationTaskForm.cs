@@ -662,8 +662,11 @@ namespace Extract.Redaction.Verification
             // Prompt for verification of all pages
             if (_settings.General.VerifyAllPages && !_pageSummaryView.HasVisitedAllPages)
             {
+                VisitPage(_pageSummaryView.GetNextUnvisitedPage(1));
+
                 MessageBox.Show("Must visit all pages before saving.", "Must visit all pages", 
                     MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+
                 return true;
             }
             
@@ -674,9 +677,12 @@ namespace Extract.Redaction.Verification
                 {
                     if (string.IsNullOrEmpty(row.RedactionType))
                     {
+                        _redactionGridView.SelectOnly(row);
+
                         MessageBox.Show("Must specify type for all redactions before saving.", 
                             "Must specify type", MessageBoxButtons.OK, MessageBoxIcon.None,
                             MessageBoxDefaultButton.Button1, 0);
+
                         return true;
                     }
                 }
@@ -689,9 +695,12 @@ namespace Extract.Redaction.Verification
                 {
                     if (row.Exemptions.IsEmpty)
                     {
+                        _redactionGridView.SelectOnly(row);
+
                         MessageBox.Show("Must specify exemption codes for all redactions before saving.", 
                             "Must specify exemption codes", MessageBoxButtons.OK, 
                             MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+
                         return true;
                     }
                 }

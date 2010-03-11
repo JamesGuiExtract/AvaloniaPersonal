@@ -1658,6 +1658,9 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <overloads>
+        /// Selects the specified row and deselects all other rows.
+        /// </overloads>
         /// <summary>
         /// Selects the specified row by index and deselects all other rows.
         /// </summary>
@@ -1679,6 +1682,23 @@ namespace Extract.Redaction.Verification
                     "Unable to select row.", ex);
                 ee.AddDebugData("Row index", index, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Selects the specified row by <see cref="RedactionGridViewRow"/> and deselects all other
+        /// rows.
+        /// </summary>
+        /// <param name="row">The <see cref="RedactionGridViewRow"/> in the row to select.</param>
+        public void SelectOnly(RedactionGridViewRow row)
+        {
+            try
+            {
+                SelectOnly(_redactions.IndexOf(row));
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI29907", ex);
             }
         }
 
