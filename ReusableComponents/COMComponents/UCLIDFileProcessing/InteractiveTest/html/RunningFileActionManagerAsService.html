@@ -224,15 +224,26 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
 			<li>Login to the service machine and <b>Stop</b> the <b>ESFAMProcess.exe</b> 
 			service.
-			<li>Confirm that the service continues processing until the large image 
+			<li>Confirm that the service stops processing before the large image 
 			has finished.
-			<li>Confirm that the redacted image is created.</li>
+			<li>Confirm that the redacted image is not created.</li>
 		</ul>
 	</ul>
 	</li>
 <p>
 	<li><b>Error Handling:</b>
 	<ul>
+		<li><b>Run multiple FPS files, then stop the service</b>
+		<ul>
+			<li>Confirm on the database machine that the database is clear.
+			<li>Create four or more FPS files configured for AutoStart.
+			<li>Set the service startup type to <b>Automatic</b>.
+			<li>Restart the <b>service machine</b>.</li>
+			<li>Confirm that files are processing.</li>
+			<li><b>Stop</b> the service.
+			<li>Confirm that all of the <b>FAMProcess.exe</b> instances 
+			stop processing.</li>
+		</ul>
 		<li><b>Run multiple FPS files, then kill some</b>
 		<ul>
 			<li>Confirm on the database machine that the database is clear.
@@ -477,6 +488,19 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
   	   	<LI><b>[DotNet #429]</b> Confirm that completed instances of <b>FAMProcess.exe</b> 
 		are removed from memory in a timely fashion.
+<p>
+  	   	<LI><b>[FlexIDSCore #3848, #4126]</b> Unable to release USB key
+	       	<ul>
+	  	   	<LI>Configure the FAM service to use two FPS files
+			<ul>
+				<li>One runs redaction rules
+				<li>One creates redacted images and metadata XML
+			</ul>
+	  	   	<LI>Start with a clean database.
+			<li>Process the <b>Demo_IDShield</b> images.
+			<li>Confirm that <b>ELI11302: Unable to release USB Key License</b> exceptions 
+			are not seen.
+	       	</ul>
 <p>
   	   	<LI><b>[LegacyRC #5645]</b> Confirm that the FAM service honors the <b>MaxFilesFromDB</b> 
 		setting found at <b>HKCU/Extract 

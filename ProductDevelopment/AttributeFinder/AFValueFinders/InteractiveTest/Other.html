@@ -242,6 +242,12 @@
 			this taking more than one day.
   			<li>Confirm that no unusual exceptions are thrown.
   		</ul>
+  		<li><b>[FlexIDSCore #3326]</b> Finding vertical check
+  		<ul>
+  			<li>Exercise the <b>MICR Finder</b> against the image in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3326</b>.
+  			<li>Confirm that the vertical check and MICR text are found.
+  		</ul>
   		<li><b>[FlexIDSCore #3490]</b> MICR Finder - registry control for speed / accuracy
   		<ul>
   			<li>Create an RSD file and an FPS file configured to run a MICR finder rule.
@@ -266,6 +272,12 @@
 			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3522</b>.
 	      		<li>Confirm that the <b>MICR Finder</b> rules run only on page 3.
 	       	</ul>
+  		<li><b>[FlexIDSCore #3620]</b> Obeying preprocessor limits
+  		<ul>
+  			<li>Exercise the RSD file and image in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3620</b>.
+  			<li>Confirm that nothing is found since a check is not on page 1.
+  		</ul>
     	</ul>
   	</li>
 <p>
@@ -346,6 +358,17 @@
     	<ul>
       		<li><b>Configure</b> button displays <b>Configure Return Address Finder</b> dialog.</li>
     		<li>Confirm that an RSD file using <b>Return address finder</b> will not run.</li>
+    	</ul>
+  	</li>
+<p>
+  	<li><h2><b>Select Page Region</b></h2>
+    	<ul>
+      		<li><b>[FlexIDSCore #4013]</b> Broken donut redaction
+		<ul>
+			<li>Exercise the RSD file and image from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4013</b>.
+			<li>Confirm that the finding rules work properly.
+		</ul>
     	</ul>
   	</li>
 </ol>

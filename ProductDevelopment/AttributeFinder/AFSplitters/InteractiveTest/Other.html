@@ -57,6 +57,14 @@
       		</li>
       		<li><b>Cancel</b> button ignores changes and exits dialog.</li>
       		<li><b>X</b> button ignores changes and exits dialog.</li>
+<p>
+  	   	<LI><b>[FlexIDSCore #3875]</b> Internal logic error
+	       	<ul>
+	      		<li>Exercise the image and RSD file in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3875</b>.
+	      		<li>Confirm that an <b>ELI09534: Internal logic error</b> exception is 
+			not seen.
+	       	</ul>
       	</ul>
 <p>
     	<li><h2>Split Attributes Using Tokens</h2>
@@ -230,25 +238,31 @@
 			box is enabled.</li>
 			<ul>
 				<li>Associated edit box is editable when the check box is checked.</li>
-				<li><b>[FlexIDSCore #3171]</b> Associated edit box is not editable 							when the check box is unchecked.</li>
+				<li><b>[FlexIDSCore #3171]</b> Associated edit box is not editable 
+				when the check box is unchecked.</li>
 				<li>Default value is <b>ProbableText</b>.</li>
 			</ul>
-			<li><b>Include areas based on poorly OCR'd text or un-OCR'd markings with this 						type:</b> check box is selectable.</li>
+			<li><b>Include areas based on poorly OCR'd text or un-OCR'd markings with this 
+			type:</b> check box is selectable.</li>
 			<ul>
 				<li>Associated edit box is editable when the check box is checked.</li>
-				<li><b>[FlexIDSCore #3171]</b> Associated edit box is not editable 							when the check box is unchecked.</li>
+				<li><b>[FlexIDSCore #3171]</b> Associated edit box is not editable 
+				when the check box is unchecked.</li>
 				<li>Default value is <b>ProbableHandwriting</b>.</li>
 			</ul>
-			<li><b>Treat text as well OCRed if the character confidence is at least:</b> edit box 					is editable.</li>
+			<li><b>Treat text as well OCRed if the character confidence is at least:</b> edit box 
+			is editable.</li>
 			<ul>
 				<li>Default value is <b>60</b>.</li>
 			</ul>
 		</ul>
       		<li>Result properties</li>
 		<ul>
-			<li><b>Exclude pixel content of lines from content areas</b> check box is 						enabled.</li>
-			<li><b>If the text in the final area is not OCR'd well, attempt to re-OCR the are 						with handwriting recognition</b> check box is enabled.</li>
-			<li><b>Include the area's OCR'd text as a true spatial string in a grandchild 						attribute</b> check box is enabled.</li>
+			<li><b>Exclude pixel content of lines from content areas</b> check box is enabled.</li>
+			<li><b>If the text in the final area is not OCR'd well, attempt to re-OCR the are 
+			with handwriting recognition</b> check box is enabled.</li>
+			<li><b>Include the area's OCR'd text as a true spatial string in a grandchild 
+			attribute</b> check box is enabled.</li>
 			<li><b>Sub-attribute name:</b> edit box is editable.</li>
 			<ul>
 				<li>Default value is <b>Content</b>.</li>
@@ -270,7 +284,7 @@
 			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3144\splitregion.rsd</b>.</li>
 	      		<li>Exercise the rules against 
 			<b>I:\Common\Testing\Rotated_Images\Image152_VP6.tif</b>.
-			<li>Ensure that highlights are over text and rotated correctly. 							<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3144\screenshot.bmp</b>
+			<li>Ensure that highlights are over text and rotated correctly. 									<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3144\screenshot.bmp</b>
 			is an example of incorrect behavior.</li>
 	      		<li>Exercise the <b>test.rsd</b> rules against the test image 
 			(both) found in <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3439</b>.
@@ -324,6 +338,14 @@
 			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3828</b>.
 	      		<li>Confirm that an <b>ELI22068: Unexpected exception caught!</b> 
 			exception is not thrown.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3829]</b> Used with Locate Image Region
+	       	<ul>
+	      		<li>Exercise the RSD file and image from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3829</b>.
+	      		<li>Confirm that an <b>ELI16742: Invalid bounds for Long Rectangle after 
+			rotation</b> exception is not thrown.
 	       	</ul>
 <p>
 		<li><b>[FlexIDSCore #4049]</b> Split region into content areas

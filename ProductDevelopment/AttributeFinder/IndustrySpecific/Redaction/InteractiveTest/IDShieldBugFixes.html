@@ -60,6 +60,16 @@
 <p>
 	<LI><h2>Redaction: Create redacted image</h2>
 	<UL>
+  	   	<LI><b>[FlexIDSCore #3414]</b> Confirm that the default output files created after 
+		redacting PDF images do not change the case of the filenames.
+<p>
+  	   	<LI><b>[FlexIDSCore #3434]</b> Redaction text within redactions
+	       	<ul>
+	      		<li>Configure an FPS file to create redacted images with redaction text.
+			<li>Confirm that the redaction text is completely contained within the 
+			redactions.
+	       	</ul>
+<p>
   	   	<LI><b>[FlexIDSCore #3435]</b> Persisting Bold font
 	       	<ul>
 	      		<li>Create an FPS file with a <b>Redaction: Create redacted image</b> task.
@@ -226,6 +236,9 @@
 			removed Social Security Number.
 	       	</ul>
 <p>
+  	   	<LI><b>[FlexIDSCore #3282]</b> Confirm that a minimally narrow highlight can still 
+		be resized in the other direction.
+<p>
   	   	<LI><b>[FlexIDSCore #3320]</b> Selection of redactions while selecting exemption codes
 	       	<ul>
 	      		<li>Exercise <b>verification</b>.
@@ -263,6 +276,9 @@
 			<li>Confirm that the active document is still the next most recent 
 			document in the history.
 	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3447]</b> Confirm that drawing a manual redaction on a PDF 
+		<b>does not</b> cause a long delay.
 <p>
   	   	<LI><b>[FlexIDSCore #3448]</b> No auto-zoom for new redactions
 	       	<ul>
@@ -355,6 +371,25 @@
 			<li>Confirm that only one copy of the exemption code is present.
 	       	</ul>
 <p>
+  	   	<LI><b>[FlexIDSCore #3626]</b> Window focus issues
+	       	<ul>
+			<li>Configure an FPS file for verification with the following settings
+			<ul>
+				<li>Review all pages
+				<li>Specify types
+				<li>Require exemption codes
+			</ul>
+			<li>Verify a document without reviewing all pages.
+			<li>Confirm that the verification window changes to the first unviewed page 
+			after closing the error message.
+			<li>Verify a document without setting a redaction type.
+			<li>Confirm that focus changes to the first redaction without a type and 
+			drops down the combo box.
+			<li>Verify a document without setting an exemption code.
+			<li>Confirm that focus changes to the first redaction without an exemption 
+			code.
+	       	</ul>
+<p>
   	   	<LI><b>[FlexIDSCore #3773, #3778, #3893, #4066, #4073, 
 		#4081, #4170, DotNet #422]</b> Verification UI
 		<ul>
@@ -417,6 +452,16 @@
 			<li>Confirm that processing can be stopped from the FAM.
 			<li>Confirm that FAM toolbar buttons are properly enabled and disabled 
 			during this test.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3992, #4041]</b> Releasing CTRL while rotating a redaction
+	       	<ul>
+	      		<li>Verify an image.
+			<li>Hold <b>Ctrl<b> and click on a grip handle to rotate a redaction.
+	      		<li>Release <b>Ctrl</b> before moving the mouse.
+			<li>Move the mouse.
+			<li>Confirm that the redaction does not move down and to the right.
+			<li>Confirm that the redaction starts a resize event.
 	       	</ul>
 <p>
   	   	<LI><b>[FlexIDSCore #3993]</b> Grip handles visible during zoom operation

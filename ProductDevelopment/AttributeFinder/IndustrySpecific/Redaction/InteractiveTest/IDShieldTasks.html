@@ -348,6 +348,8 @@
 	      		<li>Prepare some images for creation of redacted images.
 			<li>Set some exemption codes for the redactions.
 			<li>Confirm that the output images include the appropriate exemption codes.
+			<li><b>[FlexIDSCore #3431]</b> Confirm that an output file can be created 
+			with a redaction containing all FOIA exemption codes.
 			<li>Confirm that PDF security settings are ignored if TIF images 
 			are output.
 			<li><b>[FlexIDSCore #3751]</b> Confirm that creating a redacted image adds 
@@ -818,6 +820,7 @@
 				height.
 				<li>Confirm that <b>Clues</b> and <b>Redactions</b> appear 
 				differently in the image viewer.
+				<li>Confirm that redactions can be rotated and resized.
 <p>
 		  	   	<LI><b>[FlexIDSCore #3616]</b> Confirm that a Page summary grid is 
 				provided that displays visited pages with a green background.
@@ -1315,11 +1318,22 @@
 			<ul>
 		  	   	<LI>Confirm that a verification history of <b>20</b> previous 
 				documents is supported.
-      				<li>Confirm that the number of supported documents in controlled by 
-				the <b>HKCU/Software/Extract Systems/AttributeFinder/IndustrySpecific/Redaction/RedactionCustomComponents/IDShield/NumPreviousDocsToQueue</b> 
-				registry key.
+      				<li><b>[FlexIDSCore #4121]</b> Confirm that the number of supported 
+				documents is controlled by the <b>HKCU/Software/Extract 
+				Systems/AttributeFinder/IndustrySpecific/Redaction/RedactionCustomComponents
+				/IDShield/NumPreviousDocsToQueue</b> registry key.
 				<li>Confirm that navigation to previous documents displays each 
 				of the saved documents.
+<p>
+	      			<li><b>[FlexIDSCore #3398]</b> Default to page 1
+				<ul>
+					<li>Verify some documents without <b>Include all pages in redaction 
+					review</b>.
+					<li>Verify a multi-page document without sensitive items on page 1.
+					<li>Save the document.
+					<li>Confirm that the displayed page is the first page containing 
+					sensitive items.
+				</ul>
 <p>
 	      			<li><b>[FlexIDSCore #3636]</b> Confirm that a warning message is 
 				presented if the user attempts to navigate away from a modified 
@@ -1450,6 +1464,9 @@
 <p>
 		  	   	<LI><b>[FlexIDSCore #3022]</b> Confirm that verification is successful 
 				for a filename that contains an apostrophe.
+<p>
+		  	   	<LI><b>[FlexIDSCore #3415]</b> Confirm that redaction outlines are displayed 
+				correctly after rotating an image.
 <p>
 		  	   	<LI><b>[FlexIDSCore #3641]</b> Support for feedback collection
 				<ul>
@@ -1712,6 +1729,21 @@
 					<li>Create a multi-line redaction.
 					<li>Confirm that each line can be moved independently.
 	       			</ul>
+<p>
+	  	   		<LI><b>[FlexIDSCore #4079]</b> Unviewably large redactions
+			       	<ul>
+					<li>Verify a document.
+					<li>Draw a new manual redaction.
+					<li>Resize the redaction to be the size of the page.
+					<li>Zoom out a lot and resize the redaction to fill the empty space.
+					<li>Move the redaction up and left and continue stretching it out so 
+					that it extends beyond the image in every direction.
+					<li>Save the document.
+      					<li>Navigate back to the document.
+					<li>Continue to resize the redaction, save the document, and 
+					navigate back.
+					<li>Confirm that no unusual exceptions are seen.
+			       	</ul>
 			</ul>
 		</ul>
 	</UL>
@@ -1776,6 +1808,9 @@
 		   	<li>Confirm that one option is <b>Consider condition satisfied (without error)</b>.
 		   	<li>Confirm that one option is <b>Consider condition unsatisfied (without error)</b>.
 		</UL>
+<p>
+	   	<li><b>[FlexIDSCore #3445]</b> Confirm that this condition object works in conjunction with 
+		the <b>AND</b> condition.
 	</UL>
 </UL>
 <p>
