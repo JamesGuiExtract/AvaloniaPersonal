@@ -539,7 +539,7 @@ void FileProcessingDlg::OnBtnStop()
 		CWaitCursor wait;
 
 		// Log a message indicating that the user is stopping the FAM
-		UCLIDException ue("ELI15679", "The user has stopped File Action Manager processing!");
+		UCLIDException ue("ELI15679", "Application trace: The user has stopped File Action Manager processing.");
 		ue.addDebugInfo("FPS File",
 			m_strCurrFPSFilename.empty() ? "<Not Saved>" : m_strCurrFPSFilename);
 		ue.log();
@@ -1157,6 +1157,18 @@ LRESULT FileProcessingDlg::OnScheduleInactive(WPARAM wParam, LPARAM lParam)
 	{
 		m_strProcessingStateString = "Processing Inactive";
 		setCurrFPSFile(m_strCurrFPSFilename);
+
+		// This method may be called after processing has stopped. Only log an application trace
+		// if the FAM is currently running.
+		if (asCppBool(getFPM()->ProcessingStarted))
+		{
+			UCLIDException ue("ELI29903",
+				"Application trace: File Action Manager processing now inactive per schedule.");
+			ue.addDebugInfo("FPS File",
+				m_strCurrFPSFilename.empty() ? "<Not Saved>" : m_strCurrFPSFilename);
+			ue.log();
+		}
+
 		updateUI();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28343");
@@ -1173,6 +1185,18 @@ LRESULT FileProcessingDlg::OnScheduleActive(WPARAM wParam, LPARAM lParam)
 	{
 		m_strProcessingStateString = "";
 		setCurrFPSFile(m_strCurrFPSFilename);
+
+		// This method may be called after processing has stopped. Only log an application trace
+		// if the FAM is currently running.
+		if (asCppBool(getFPM()->ProcessingStarted))
+		{
+			UCLIDException ue("ELI29904",
+				"Application trace: File Action Manager processing now active per schedule.");
+			ue.addDebugInfo("FPS File",
+				m_strCurrFPSFilename.empty() ? "<Not Saved>" : m_strCurrFPSFilename);
+			ue.log();
+		}
+
 		updateUI();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28342");
@@ -2243,7 +2267,8 @@ void FileProcessingDlg::setCurrFPSFile(const string& strFileName)
 	// Add the Processing state string if 
 	if (!m_strProcessingStateString.empty())
 	{
-		szTitle.Format("%s (%s)", szTitle, m_strProcessingStateString.c_str());
+		string strTitle = szTitle;
+		szTitle.Format("%s (%s)", strTitle.c_str(), m_strProcessingStateString.c_str());
 	}
 	SetWindowText(szTitle);
 }
