@@ -832,7 +832,7 @@ namespace Extract.FileActionManager.Utilities
                     displayNames.Add(controller.DisplayName.ToUpperInvariant(), controller);
 
                     // Add the service name to the collection (these are unique)
-                    serviceNames.Add(controller.ServiceName.ToUpperInvariant(), controller);
+                    serviceNames.Add(controller.ServiceName.ToUpperInvariant(), new ServiceController(controller.ServiceName));
                 }
             }
             catch (Exception ex)
