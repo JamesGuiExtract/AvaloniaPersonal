@@ -1,6 +1,6 @@
-<ExtractReportParameterData Version="1">
+<ExtractReportParameterData Version="2">
 	<ReportParameters>
 		<DateRangeParameter Name="ReportingPeriod" Default="" />
-		<TextParameter Name="VerifyUserName" Default="" />
+		<ValueListParameter Name="VerifyUserName" Query="Select FAMUser.UserName FROM FAMUser" Default="" />
 	</ReportParameters>
 </ExtractReportParameterData>
