@@ -10,4 +10,14 @@
 		<Email></Email>
 		<Owner></Owner>
 	</Rule>
+	<Rule TypeName="MethodsShouldContainValidEliCodes" Category="ExtractRules" CheckId="ES0002">
+		<Name>Methods should contain valid ELI codes.</Name>
+		<Description>All ELI codes should contain the string "ELI" followed by 5 digits.</Description>
+		<Resolution>Replace the invalid ELI code with a valid one.</Resolution>
+		<MessageLevel Certainty="90">Error</MessageLevel>
+		<FixCategories>NonBreaking</FixCategories>
+		<Url></Url>
+		<Email></Email>
+		<Owner></Owner>
+	</Rule>
 </Rules>
