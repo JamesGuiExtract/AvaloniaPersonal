@@ -111,7 +111,9 @@ namespace Extract.Redaction
                 }
                 else
                 {
-                    Regex regex = new Regex("^[_a-zA-Z][a-zA-Z0-9_]*");
+                    // TODO: Move the identifier validation to Extract.Utilities so it is reusable
+                    // [DNRCAU #433]
+                    Regex regex = new Regex(@"^[_a-zA-Z]\w*$");
 
                     // Need to validate that the specified data types are valid identifiers
                     foreach (string dataType in dataTypes)
@@ -120,7 +122,7 @@ namespace Extract.Redaction
                         {
                             _dataTypesTextBox.Focus();
                             MessageBox.Show("Data types must be valid identifiers. "
-                                + "Valid identifers must match the pattern ^[_a-zA-Z][_a-zA-Z0-9]*",
+                                + @"Valid identifers must match the pattern ^[_a-zA-Z]\w*$",
                                 "Invalid data types", MessageBoxButtons.OK, MessageBoxIcon.None,
                                 MessageBoxDefaultButton.Button1, 0);
                             return true;
