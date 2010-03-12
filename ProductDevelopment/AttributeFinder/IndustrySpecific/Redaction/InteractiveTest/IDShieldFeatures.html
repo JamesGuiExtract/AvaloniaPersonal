@@ -178,55 +178,88 @@
 			<li>Confirm that the <b>Statistics</b> tab includes a multi-line 
 			edit box that includes the following information:
 			<ul>
+				<li>Number of files tested
+				<li>Number of pages tested
+				<li>Number of files containing sensitive data
+				<li>Number of pages containing sensitive data
+				<li>Number of sensitive data items
+				<li>Number of documents with overlapping sensitive data items
 				<li>Analysis type
-				<li>Analysis scope
-				<li>Verification Condition
-				<li>Verification Quantifier
-				<li>Redaction Condition
-				<li>Redaction Quantifier
-				<li>Redaction Query
-				<li>Total files processed
-				<li>Total pages processed
-				<li>Total Expected Redactions
-				<li>Number of files with expected redactions
-				<li>Number of pages with expected redactions
-				<li>Statistics for automated redaction process: <b>OR</b>
+				<li>Manually review... (Standard or Hybrid only)
+				<li>Automatically redact... (Automated or Hybrid only)
+				<li>Default to redacting the following...
+                                <li>Number of sensitive data items redacted after processing
+                                <li>Number of false positives in redacted images (Automated or Hybrid only)
+                                <li>Ratio of correctly redacted items to false positives (Automated or Hybrid only)
+				<li>Automated redaction efficiency:
 				<ul>
-					<li>TBD
-				</ul>
-				<li>Statistics for standard verification process: <b>OR</b>
-				<ul>
-					<li>TBD
-				</ul>
-				<li>Statistics for hybrid process:
-				<ul>
-					<li>Number of automated redactions
+					<li>Number of automatically redacted files
+					<li>Number of sensitive data items in automatically redacted files
+					<li>Number of correct redactions
 					<li>Number of over-redactions
 					<li>Number of under-redactions
-					<li>Number of missed redactions
-					<li>Number of correct redactions
 					<li>Number of false positives
-					<li>Number of documents with overlapping 
-					expected redactions
-					<li>Number of files selected for review
-					<li>Number of expected redactions among 
-					reviewed files
+					<li>Ratio of correctly redacted items to false positives
+				</ul>
+				<li><b>OR</b> Verification efficiency: (If standard work-flow is selected)
+				<ul>
+                                        <li>Number of files selected for review
+                                        <li>Number of correct redactions presented to reviewers
+                                        <li>Number of over-redactions presented to reviewers
+                                        <li>Number of under-redactions presented to reviewers
+                                        <li>Number of false positives presented to reviewers
+					<li>Ratio of correctly redacted items to false positives
+
+				</ul>
+				<li><b>OR</b> (If hybrid work-flow is selected) Verification efficiency:
+				<ul>
+                                        <li>Number of files selected for review
+                                        <li>Number of sensitive data items in files presented for review
+                                        <li>Number of correct redactions presented to reviewers
+                                        <li>Number of over-redactions presented to reviewers
+                                        <li>Number of under-redactions presented to reviewers
+                                        <li>Number of false positives presented to reviewers
+					<li>Ratio of correctly redacted items to false positives
+				</ul>
+				<li><b>AND</b> Automated redaction efficiency:
+				<ul>
+					<li>Number of automatically redacted files
+					<li>Number of sensitive data items in automatically redacted files
+					<li>Number of correct redactions
+					<li>Number of over-redactions
+					<li>Number of under-redactions
+					<li>Number of false positives
+					<li>Ratio of correctly redacted items to false positives
 				</ul>
 				<li>Counts of documents for each found document type
 			</ul>
 	      		<li>Confirm that the <b>Review</b> tab includes a 
 			<b>File lists</b> tab.
-			<li>Confirm that the <b>File lists</b> tab includes a <b>Sensitive 
+			<li>Confirm that the <b>File lists</b> tab includes a <b>Select 
 			file list</b> combo box with the following choices:
 			<ul>
-				<li>SensitiveFiles_SelectedForReview
-				<li>TBD
+				<li>Various DocType_*.txt
+                                <li>Files_AtLeastOneFalsePositive.txt
+                                <li>Files_AtLeastOneFoundRedaction.txt
+                                <li>Files_NoFoundRedactions.txt
+                                <li>InsensitiveFiles_All.txt
+                                <li>InsensitiveFiles_AutomaticallyRedacted.txt (Automated or Hybrid only)
+                                <li>InsensitiveFiles_SelectedForReview.txt (Standard or Hybrid only)
+                                <li>SensitiveFiles_All.txt
+                                <li>SensitiveFiles_AtLeastOneCorrectRedaction.txt
+                                <li>SensitiveFiles_AtLeastOneMissedRedaction.txt
+                                <li>SensitiveFiles_AtLeastOneOverRedaction.txt
+                                <li>SensitiveFiles_AtLeastOneUnderRedaction.txt
+                                <li>SensitiveFiles_AutomaticallyRedacted.txt (Automated or Hybrid only)
+                                <li>SensitiveFiles_NotSelectedForReview.txt (Standard or Hybrid only)
+                                <li>SensitiveFiles_NotSelectedForRedaction.txt (Automated only)
+                                <li>SensitiveFiles_SelectedForReview.txt (Standard or Hybrid only)
 			</ul>
 			<li>Confirm that the <b>File lists</b> tab includes a multi-line 
 			edit box for <b>Entries in selected file list</b>.
 			<li>Confirm that double-clicking on a line in the edit box 
 			displays the selected image in the <b>Image Viewer</b> plus 
-			the associated VOA file in the <b>VOA Viewer</b>.
+			the associated TestOutput VOA file in the <b>VOA Viewer</b>.
 	       	</ul>
 <p>
   	   	<LI><b>Miscellaneous</b>
