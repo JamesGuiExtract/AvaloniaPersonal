@@ -962,14 +962,29 @@ namespace Extract.Imaging.Forms
                     // Restructure the highlight so that the left or right 
                     // center grip handle (from the client perspective) is
                     // the end point of the highlight.
-                    for (int j = 0; j < clientGrips.Length; j++)
+                    // Choose the center grip handle with the smallest X value difference
+                    // with the selected corner grip handle to be the new end point.
+                    // [FlexIDSCore #4184]
+                    float minimumDiff = float.MaxValue;
+                    int index = -1;
+                    float x = clientGrips[gripHandleId].X;
+                    for (int j = 0; j < 4; j++)
                     {
-                        if (clientGrips[gripHandleId].X == clientGrips[j].X)
+                        float diff = Math.Abs(x - clientGrips[j].X);
+                        if (diff < minimumDiff)
                         {
-                            MakeGripHandleEndPoint(imageGrips, j);
-                            break;
+                            minimumDiff = diff;
+                            index = j;
                         }
                     }
+
+                    // Ensure an index has been selected
+                    if (index == -1)
+                    {
+                        ExtractException.ThrowLogicException("ELI29908");
+                    }
+
+                    MakeGripHandleEndPoint(imageGrips, index);
 
                     // Get the center point in image coordinates
                     PointF center = GetCenterPoint();
