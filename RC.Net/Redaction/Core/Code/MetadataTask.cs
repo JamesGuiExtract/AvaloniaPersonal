@@ -192,6 +192,11 @@ namespace Extract.Redaction
                 WriteRedactionSessions(writer, _voaFile.RedactionSessions);
             }
 
+            if (_voaFile.SurroundContextSessions.Count > 0)
+            {
+                WriteSurroundContextSessions(writer, _voaFile.SurroundContextSessions);
+            }
+
             writer.WriteEndElement();
             writer.WriteEndDocument();
         }
@@ -430,6 +435,36 @@ namespace Extract.Redaction
 
                 // Entries Added, Deleted, Modified
                 WriteEntries(writer, subAttributes, "EntriesRedacted");
+
+                writer.WriteEndElement();
+            }
+        }
+
+        /// <summary>
+        /// Writes the surround context sessions to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="sessions">The attributes containing the surround context data.</param>
+        static void WriteSurroundContextSessions(XmlWriter writer, IEnumerable<ComAttribute> sessions)
+        {
+            foreach (ComAttribute session in sessions)
+            {
+                writer.WriteStartElement("SurroundContextSession");
+                writer.WriteAttributeString("ID", session.Value.String);
+
+                IUnknownVector subAttributes = session.SubAttributes;
+
+                // User Info and Time Info
+                WriteUserInfo(writer, subAttributes);
+                WriteTimeInfo(writer, subAttributes);
+
+                // File Info and Options
+                WriteVerificationFileInfo(writer, subAttributes);
+                WriteAttributeAsXml(writer, subAttributes, "Options", 
+                    "TypesToExtend", "WordsToExtend", "ExtendHeight");
+
+                // Entries Modified
+                WriteEntries(writer, subAttributes, "EntriesModified");
 
                 writer.WriteEndElement();
             }

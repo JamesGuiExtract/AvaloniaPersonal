@@ -209,6 +209,19 @@ namespace Extract.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets the surround context session attributes.
+        /// </summary>
+        /// <value>The surround context session attributes.</value>
+        [CLSCompliant(false)]
+        public ReadOnlyCollection<ComAttribute> SurroundContextSessions
+        {
+            get
+            {
+                return new ReadOnlyCollection<ComAttribute>(_surroundContextSessions);
+            }
+        }
+
         #endregion Properties
 
         #region Methods
