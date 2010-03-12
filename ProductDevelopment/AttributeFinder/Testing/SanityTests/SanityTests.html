@@ -120,8 +120,6 @@
 			redaction</b> tool.
 			<li>Confirm that each field type can be swiped using the <b>rectangular 
 			redaction</b> tool.
-			<li>Confirm that both Return Address and Legal Description types can be 
-			swiped via <b>Recognize text and process</b>.
 		</ul>
 		<li>Confirm that verification and swiping require only a <b>FLEX Index 
 		Client</b> license.
@@ -129,6 +127,7 @@
 <p>
 	<li><h2>New Features</h2>
 	<ul>
+		<li><b>Note:</b> These feature tests can be tested in combination and in any order.
 		<li><b>Automatic detection and handling of stuck files</b>
 		<ul>
 	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
@@ -142,6 +141,27 @@
 	      		<li>Use <b>DB Admin</b> after auto-reversion to confirm that 
 			the files are back in <b>Pending</b> mode.
 		</ul>
+		<li><b>FAM Service</b>
+		<ul>
+	      		<li>Confirm that the service is installed.
+			<li>Confirm that a utility shortcut exists to edit a <b>SQL Compact</b> 
+			database.
+			<li>Confirm that the utility can be used to edit <b>ESFAMService.sdf</b>.
+			<li>Confirm that files can be processed using the FAM Service.
+		</ul>
+		<li><b>File processing priority</b>
+		<ul>
+	      		<li>Prepare a collection of files for supplying with 
+			<b>Normal</b> priority.
+	      		<li>Prepare a listening file supplier with 
+			<b>Above normal</b> priority.
+			<li>Configure a processing task to run with a single thread.
+			<li>Start processing
+			<li>Confirm that files with <b>Normal</b> priority begin 
+			processing.
+			<li>Drop one or more files into the listening folder.
+			<li>Confirm that the dropped files are processed next.
+		</ul>
 		<li><b>Find and redact user text or regular expression</b>
 		<ul>
 	      		<li>Prepare a collection of files for <b>verification</b>.
@@ -153,6 +173,28 @@
 			<li>Confirm that each button in the <b>Find and Redact Text</b> 
 			window works as expected.
 			<li>Confirm that VOA files show the expected redactions. 
+		</ul>
+		<li><b>Input event tracking</b>
+		<ul>
+	      		<li>Prepare a collection of files for <b>verification</b>.
+			<li>Enable input event tracking in DBInfo and for the task.
+	      		<li>Process the images.
+			<li>Run the <b>Detailed usage report for specific user for specific 
+			day</b> report.
+			<li>Confirm that appropriate results are seen.
+			<li>Run the <b>Usage report during custom date range broken down by 
+			user</b> report.
+			<li>Confirm that appropriate results are seen.
+		</ul>
+		<li><b>PDF/A conversion and PDF security</b>
+		<ul>
+	      		<li>Exercise <b>Core: Convert to searchble PDF</b> and enable 
+			PDF/A conversion.
+			<li>Confirm that PDF/A-compliant files are created.
+			<li>Exercise <b>PDF security</b> from <b>Redaction: Create redacted 
+			image</b>.
+			<li>Confirm that <b>User</b> and <b>Owner</b> passwords can be applied.
+			<li>Confirm that other security settings are also applied as expected.
 		</ul>
 		<li><b>Scheduled processing</b>
 		<ul>
@@ -177,13 +219,21 @@
 	      		<li>Confirm that <b>Bates numbers</b> appear on the output 
 			images as expected.
 		</ul>
-		<li><b>FAM Service</b>
+		<li><b>User authentication</b>
 		<ul>
-	      		<li>Confirm that the service is installed.
-			<li>Confirm that a utility shortcut exists to edit a <b>SQL Compact</b> 
-			database.
-			<li>Confirm that the utility can be used to edit <b>ESFAMService.sdf</b>.
-			<li>Confirm that files can be processed using the FAM Service.
+			<li>Log in to the test machine as a domain user.
+			<li>Create a simple FPS file.
+	      		<li>Add a make-believe user via <b>DB Admin</b>.
+	      		<li>Modify <b>RequireAuthenticationBeforeRun</b> in the 
+			<b>DBInfo</b> table.
+			<li>Confirm that a meaningful error message appears and that 
+			processing does not start.
+	      		<li>Add the logged-in user via <b>DB Admin</b>.
+			<li>Confirm that processing starts without error.
+			<li>Remove the logged-in user via <b>DB Admin</b>.
+	      		<li>Modify <b>SkipAuthenticationOnMachines</b> in the 
+			<b>DBInfo</b> table to include the test machine.
+			<li>Confirm that processing starts without error.
 		</ul>
 	</ul>
 <p>
@@ -204,7 +254,6 @@
 			<li>Confirm that an action can be <b>added</b> to the database.
 			<li>Confirm that an action can be <b>removed</b> from the database.
 			<li>Confirm that an action can be <b>renamed</b> in the database.
-			<li>Confirm that action status can be <b>modified</b>.
 <p>
 			<li>Confirm that a tag can be <b>added</b> to the database.
 			<li>Confirm that a tag can be <b>modified</b> in the database.
@@ -282,6 +331,7 @@
 	<ul>
 		<li><b>Miscellaneous Utilities</b>
 		<ul>
+			<li>Configure FAM Service - successfully edits <b>ESFAMService.sdf</b>.
 			<li>Convert FAM Database - opens without error.
 			<li>Convert FPS File - opens without error.
 		</ul>
@@ -388,7 +438,8 @@
 	<ul>
 		<li>Install and license the RDT.
 		<li>Confirm that <b>Automated Tests - Run all tests</b> works.
-		<li>Update test results
+		<li>Update test results - <b>only if</b> this build or a newer build 
+		has not already been tested
 		<ul>
 			<li>In <b>I:\Common\Testing\Product 
 			Testing\FLEX_Index_80\AutomatedTests\Automated_NRS_Tests.xls</b>
@@ -407,8 +458,7 @@
 			<li>Image Cleanup Settings Editor - opens without error.
 			<li>Index Converter - opens without error.
 			<li>RDT Configuration - opens without error.
-			<li>Test Harness - opens without error.  Note that <b>Unable to 
-			decrypt license file!</b> is a benign error here.
+			<li>Test Harness - opens without error.
 		</ul>
 <p>
 		<li><b>Rule Set Editor</b>
