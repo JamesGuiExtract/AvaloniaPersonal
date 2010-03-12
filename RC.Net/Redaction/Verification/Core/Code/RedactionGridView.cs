@@ -1,5 +1,6 @@
 using Extract.Imaging;
 using Extract.Imaging.Forms;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -443,6 +444,21 @@ namespace Extract.Redaction.Verification
             get
             {
                 return _dataGridView.IsCurrentCellInEditMode && !IsRedactedColumnActive;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the redaction type combo box is dropped down.
+        /// </summary>
+        /// <value><see langword="true"/> if the redaction type combo box is dropped down;
+        /// <see langword="false"/> if the redaction type combo box is not dropped down.</value>
+        bool IsComboBoxDroppedDown
+        {
+            get
+            {
+                DataGridViewComboBoxEditingControl control =
+                    _dataGridView.EditingControl as DataGridViewComboBoxEditingControl;
+                return control != null && control.DroppedDown;
             }
         }
 
@@ -1439,6 +1455,39 @@ namespace Extract.Redaction.Verification
             finally
             {
                 _dataGridView.SelectionChanged += HandleDataGridViewSelectionChanged;
+            }
+        }
+
+        /// <summary>
+        /// Processes a command key.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> if the character was processed by the control; otherwise, 
+        /// <see langword="false"/>.
+        /// </returns>
+        /// <param name="msg">The window message to process.</param>
+        /// <param name="keyData">The key to process.</param>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            try
+            {
+                // Attempt to handle this as a shortcut key first 
+                // unless the combo box is dropped down [FIDSC #4186]
+                if (!IsComboBoxDroppedDown)
+                {
+                    bool keyProcessed = _imageViewer.Shortcuts.ProcessKey(keyData);
+                    if (keyProcessed)
+                    {
+                        return true;
+                    }
+                }
+
+                return base.ProcessCmdKey(ref msg, keyData);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI27670", ex);
+                return true;
             }
         }
 
