@@ -1156,8 +1156,8 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 
 		if (m_bProcessing || m_bProcessingSingleFile)
 		{
-			throw new UCLIDException("ELI29554", "Cannot process single file when processing "
-				"is already in progress!");
+			throw UCLIDException("ELI29554", 
+				"Cannot process single file when processing is already in progress.");
 		}
 
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(pFileRecord);
@@ -2111,8 +2111,8 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 {
 	if (m_bProcessingSingleFile)
 	{
-		throw new UCLIDException("ELI29556", "Cannot start processing; currently processing a file "
-			"independently!");
+		throw UCLIDException("ELI29556", 
+			"Cannot start processing; currently processing a file independently.");
 	}
 
 	// Obtain this lock since both semaphores are needed
