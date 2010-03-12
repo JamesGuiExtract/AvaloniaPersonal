@@ -98,81 +98,91 @@ namespace Extract.Imaging.Forms
             // 
             // First
             // 
+            this.First.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.First.FillWeight = 100.0F;
             this.First.HeaderText = "First";
-            this.First.MinimumWidth = 10;
+            this.First.MinimumWidth = 30;
             this.First.Name = "First";
             this.First.ReadOnly = true;
             // 
             // Second
             // 
+            this.Second.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Second.FillWeight = 100.0F;
             this.Second.HeaderText = "Second";
-            this.Second.MinimumWidth = 10;
+            this.Second.MinimumWidth = 30;
             this.Second.Name = "Second";
             this.Second.ReadOnly = true;
             // 
             // Third
             // 
+            this.Third.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Third.FillWeight = 100.0F;
             this.Third.HeaderText = "Third";
-            this.Third.MinimumWidth = 10;
+            this.Third.MinimumWidth = 30;
             this.Third.Name = "Third";
             this.Third.ReadOnly = true;
             // 
             // Fourth
             // 
+            this.Fourth.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Fourth.FillWeight = 100.0F;
             this.Fourth.HeaderText = "Fourth";
-            this.Fourth.MinimumWidth = 10;
+            this.Fourth.MinimumWidth = 30;
             this.Fourth.Name = "Fourth";
             this.Fourth.ReadOnly = true;
             // 
             // Fifth
             // 
+            this.Fifth.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Fifth.FillWeight = 100.0F;
             this.Fifth.HeaderText = "Fifth";
-            this.Fifth.MinimumWidth = 10;
+            this.Fifth.MinimumWidth = 30;
             this.Fifth.Name = "Fifth";
             this.Fifth.ReadOnly = true;
             // 
             // Sixth
             // 
+            this.Sixth.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Sixth.FillWeight = 100.0F;
             this.Sixth.HeaderText = "Sixth";
-            this.Sixth.MinimumWidth = 10;
+            this.Sixth.MinimumWidth = 30;
             this.Sixth.Name = "Sixth";
             this.Sixth.ReadOnly = true;
             // 
             // Seventh
             // 
+            this.Seventh.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Seventh.FillWeight = 100.0F;
             this.Seventh.HeaderText = "Seventh";
-            this.Seventh.MinimumWidth = 10;
+            this.Seventh.MinimumWidth = 30;
             this.Seventh.Name = "Seventh";
             this.Seventh.ReadOnly = true;
             // 
             // Eighth
             // 
+            this.Eighth.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Eighth.FillWeight = 100.0F;
             this.Eighth.HeaderText = "Eighth";
-            this.Eighth.MinimumWidth = 10;
+            this.Eighth.MinimumWidth = 30;
             this.Eighth.Name = "Eighth";
             this.Eighth.ReadOnly = true;
             // 
             // Ninth
             // 
+            this.Ninth.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Ninth.FillWeight = 100.0F;
             this.Ninth.HeaderText = "Ninth";
-            this.Ninth.MinimumWidth = 10;
+            this.Ninth.MinimumWidth = 30;
             this.Ninth.Name = "Ninth";
             this.Ninth.ReadOnly = true;
             // 
             // Tenth
             // 
+            this.Tenth.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Tenth.FillWeight = 100.0F;
             this.Tenth.HeaderText = "Tenth";
-            this.Tenth.MinimumWidth = 10;
+            this.Tenth.MinimumWidth = 30;
             this.Tenth.Name = "Tenth";
             this.Tenth.ReadOnly = true;
             // 
@@ -184,7 +194,6 @@ namespace Extract.Imaging.Forms
             this.Size = new System.Drawing.Size(100, 100);
             ((System.ComponentModel.ISupportInitialize)(this._dataGridView)).EndInit();
             this.ResumeLayout(false);
-
         }
 
         #endregion
