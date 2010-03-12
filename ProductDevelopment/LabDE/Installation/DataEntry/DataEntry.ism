@@ -120,6 +120,7 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
+		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 	</table>
 
 	<table name="BindImage">
@@ -241,6 +242,10 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
+		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
+		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
+		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
+		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%SystemRoot]\Profiles\All Users</td><td/><td/></row>
 		<row><td>setAllUsersProfile2K</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%ALLUSERSPROFILE]</td><td/><td/></row>
 		<row><td>setUserProfileNT</td><td>51</td><td>USERPROFILE</td><td>[%USERPROFILE]</td><td/><td/></row>
@@ -359,10 +364,10 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
-		<row><td>dataentryapplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DATAEN~1.EXE|DataEntryApplication.exe</td><td>0</td><td/><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\DataEntryApplication.exe</td><td>1</td><td/></row>
-		<row><td>dataentrycc.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DATAEN~1.DLL|DataEntryCC.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\DataEntryCC.dll</td><td>1</td><td/></row>
-		<row><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>EXTRAC~1.DLL|Extract.DataEntry.dll</td><td>0</td><td/><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.DataEntry.dll</td><td>1</td><td/></row>
-		<row><td>interop.uclid_dataentrycusto.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>INTERO~1.DLL|Interop.UCLID_DATAENTRYCUSTOMCOMPONENTSLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Interop.UCLID_DATAENTRYCUSTOMCOMPONENTSLib.dll</td><td>1</td><td/></row>
+		<row><td>dataentryapplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DATAEN~1.EXE|DataEntryApplication.exe</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\DataEntryApplication.exe</td><td>17</td><td/></row>
+		<row><td>dataentrycc.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DATAEN~1.DLL|DataEntryCC.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\DataEntryCC.dll</td><td>17</td><td/></row>
+		<row><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>EXTRAC~1.DLL|Extract.DataEntry.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.DataEntry.dll</td><td>17</td><td/></row>
+		<row><td>interop.uclid_dataentrycusto.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>INTERO~1.DLL|Interop.UCLID_DATAENTRYCUSTOMCOMPONENTSLib.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Interop.UCLID_DATAENTRYCUSTOMCOMPONENTSLib.dll</td><td>17</td><td/></row>
 	</table>
 
 	<table name="Font">
@@ -1116,6 +1121,13 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S64">BaseAction</col>
 		<col def="I2">After</col>
 		<col def="S255">Condition</col>
+		<row><td>ISSelfRegisterCosting</td><td/><td>SelfUnregModules</td><td>1</td><td/></row>
+		<row><td>ISSelfRegisterFiles</td><td/><td>SelfRegModules</td><td>1</td><td/></row>
+		<row><td>ISSelfRegisterFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
+		<row><td>ISUnSelfRegisterFiles</td><td/><td>ISSelfRegisterCosting</td><td>1</td><td/></row>
+		<row><td>InstallFinalize</td><td>3150</td><td/><td/><td/></row>
+		<row><td>SelfRegModules</td><td>2850</td><td/><td/><td/></row>
+		<row><td>SelfUnregModules</td><td>1100</td><td/><td/><td/></row>
 	</table>
 
 	<table name="ModuleInstallUISequence">

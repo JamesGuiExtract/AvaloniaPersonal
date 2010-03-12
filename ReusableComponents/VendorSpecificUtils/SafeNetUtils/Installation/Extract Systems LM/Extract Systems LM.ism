@@ -1168,7 +1168,7 @@
 		<row><td>baseutils.dll</td><td>LMRequiredFiles</td><td>BASEUT~1.DLL|BaseUtils.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGCOMMO_FILES1&gt;\BaseUtils.dll</td><td>1</td><td/></row>
 		<row><td>comlmcore.dll</td><td>LMRequiredFiles</td><td>COMLMC~1.DLL|COMLMCore.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGCOMMO_FILES1&gt;\COMLMCore.dll</td><td>1</td><td/></row>
 		<row><td>extracttrp2.exe</td><td>ExtractTRP2.exe</td><td>EXTRAC~1.EXE|ExtractTRP2.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGCOMMO_FILES1&gt;\ExtractTRP2.exe</td><td>1</td><td/></row>
-		<row><td>lm.rl</td><td>RegistrationListFile</td><td>LM.rl</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGCC_FILES&gt;\LM.rl</td><td>1</td><td/></row>
+		<row><td>lm.rl</td><td>RegistrationListFile</td><td>LM.rl</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_NONSELFREGCC_FILES&gt;\LM.rl</td><td>17</td><td/></row>
 		<row><td>ltcml13n.dll</td><td>LTCML13n.dll</td><td>LTCML13n.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\LTCML13n.dll</td><td>1</td><td/></row>
 		<row><td>og1000as.dll</td><td>RogueWave</td><td>og1000as.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_ROGUEWAVEDLLS_FILES1&gt;\og1000as.dll</td><td>1</td><td/></row>
 		<row><td>registerall.bat</td><td>LMRequiredFiles</td><td>REGIST~1.BAT|RegisterAll.bat</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGCOMMO_FILES1&gt;\RegisterAll.bat</td><td>1</td><td/></row>

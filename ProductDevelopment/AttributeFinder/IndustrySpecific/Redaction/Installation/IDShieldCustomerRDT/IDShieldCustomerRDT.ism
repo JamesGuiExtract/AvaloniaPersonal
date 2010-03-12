@@ -1164,10 +1164,10 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
-		<row><td>AFCoreTest.dll</td><td>AFCoreTest.dll</td><td>AFCORE~1.DLL|AFCoreTest.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\AFCoreTest.dll</td><td>1</td><td/></row>
+		<row><td>AFCoreTest.dll</td><td>AFCoreTest.dll</td><td>AFCORE~1.DLL|AFCoreTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\AFCoreTest.dll</td><td>17</td><td/></row>
 		<row><td>encryptfile.exe</td><td>Binaries</td><td>ENCRYP~1.EXE|EncryptFile.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGRDTCO_FILES&gt;\EncryptFile.exe</td><td>1</td><td/></row>
 		<row><td>modifyvoa.exe</td><td>Binaries</td><td>MODIFY~1.EXE|ModifyVOA.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGRDTCO_FILES&gt;\ModifyVOA.exe</td><td>1</td><td/></row>
-		<row><td>redactiontester.dll</td><td>RedactionTester.dll</td><td>REDACT~1.DLL|RedactionTester.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\RedactionTester.dll</td><td>1</td><td/></row>
+		<row><td>redactiontester.dll</td><td>RedactionTester.dll</td><td>REDACT~1.DLL|RedactionTester.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\RedactionTester.dll</td><td>17</td><td/></row>
 		<row><td>ruleseteditor.exe</td><td>Binaries</td><td>RULESE~1.EXE|RuleSetEditor.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGRDTCO_FILES&gt;\RuleSetEditor.exe</td><td>1</td><td/></row>
 		<row><td>testharness.exe</td><td>Binaries</td><td>TESTHA~1.EXE|TestHarness.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGRDTCO_FILES&gt;\TestHarness.exe</td><td>1</td><td/></row>
 	</table>
