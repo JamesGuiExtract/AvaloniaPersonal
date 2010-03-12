@@ -98,9 +98,12 @@ void FolderEventsListener::stopListening()
 //-------------------------------------------------------------------------------------------------
 UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 {
+	INIT_EXCEPTION_AND_TRACING("MLI03277");
+
 	FolderEventsListener* fl = NULL;
 	try
 	{
+		_lastCodePos = "10";
 		// this is an autoptr to delete the data so that the caller doesn't have to
 		auto_ptr<ThreadData> pTD((ThreadData*)pParam);
 		ASSERT_RESOURCE_ALLOCATION("ELI25255", pTD.get() != NULL);
@@ -110,11 +113,14 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 		fl = pTD->m_pListener;
 		ASSERT_RESOURCE_ALLOCATION("ELI25256", fl != NULL);
 
+		_lastCodePos = "20";
+
 		bool bRecursive = pTD->m_bRecursive;
 		
 		// let the the creating thread know it is ok to continue
 		fl->m_eventFolderThreadBegin.signal();
 		unsigned long ulTimeBetweenRestarts = gulDEFAULT_TIME_BETWEEN_RESTARTS;
+		_lastCodePos = "30";
 
 		// Variable to track the number of times listening is started
 		// This will be used to track the number of calls to getListeningHandle
@@ -128,20 +134,25 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 			// Overlapped structures to contain the event and buffer info for each 
 			// change process
 			OVERLAPPED oFileChanges;
-			
+			_lastCodePos = "40";
+
 			// initialize to zero
 			memset( &oFileChanges, 0, sizeof(oFileChanges));
+			_lastCodePos = "50";
 
 			// set the event to signal completion of the overlapped IO
 			oFileChanges.hEvent = eventFileChangesReady.getHandle();
+			_lastCodePos = "60";
 
 			// Allocate buffers for the change operations
 			LPBYTE lpFileBuffer = new BYTE[gulFOLDER_LISTENER_BUF_SIZE];
+			_lastCodePos = "70";
 
 			// set up handle array for the handles to wait for
 			HANDLE handles[2];
 			handles[0] = oFileChanges.hEvent;
 			handles[1] = pTD->m_eventKillThread.getHandle();
+			_lastCodePos = "80";
 
 			// Listening handle for changes in the files
 			HANDLE hFile;
@@ -150,6 +161,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 			{
 				// Handle for file changes
 				hFile = fl->getListeningHandle( pTD->m_strFilename );
+				_lastCodePos = "90";
 
 				nListeningStartCount++;
 
@@ -167,19 +179,23 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 					fl->beginChangeListen(hFile, 
 						FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE,
 						lpFileBuffer, oFileChanges,  bRecursive);
+					_lastCodePos = "100";
 
 					// Wait for changes or a kill signal
 					DWORD dwWaitResult = WaitForMultipleObjects( 2, (HANDLE *)&handles, FALSE, INFINITE );
+					_lastCodePos = "110";
 
 					if ( dwWaitResult == WAIT_OBJECT_0 )
 					{
 						// File changes were detected
+						_lastCodePos = "120";
 
 						DWORD dwBytesTransfered;
 
 						// This call will wait for the event in the oChanges to be signalled so don't 
 						// reset it until after this call
 						int iResult = GetOverlappedResult( hFile, &oFileChanges, &dwBytesTransfered, TRUE );
+						_lastCodePos = "130";
 						if ( iResult == FALSE )
 						{
 							// Error geting the results
@@ -193,42 +209,57 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 
 						// reset the event
 						eventFileChangesReady.reset();
+						_lastCodePos = "140";
 
 						CSingleLock lg ( pTD->m_pmutexFolderListen, TRUE );
+						_lastCodePos = "150";
 
 						// Process the changes
 						fl->processChanges(pTD->m_strFilename, pTD->m_eventKillThread, lpFileBuffer, fl->m_queEvents, true );
+						_lastCodePos = "160";
 
 						// Check to see if Kill thread event was signaled
 						bDone = pTD->m_eventKillThread.isSignaled();
+						_lastCodePos = "170";
 					}
 					else
 					{
 						// The kill event was signaled
 						bDone = true;
+						_lastCodePos = "180";
 					}
 				}
 				while (!bDone);
 			}
 			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI13161");
 
+			_lastCodePos = "190";
 			// Clean up
 			// Cancel any pending overlapped operations
 			CancelIo( hFile );
+			_lastCodePos = "200";
 			CloseHandle( hFile );
+			_lastCodePos = "210";
 			delete [] lpFileBuffer;
+			_lastCodePos = "220";
 			
 			// Get the time to wait before restarting
 			FolderEventsListener* pListener = pTD->m_pListener;
 			ASSERT_RESOURCE_ALLOCATION("ELI25237", pListener != NULL);
+			_lastCodePos = "230";
 			ulTimeBetweenRestarts = pListener->getTimeBetweenListeningRestarts();
+			_lastCodePos = "240";
 		}
 		while ( pTD->m_eventKillThread.wait( ulTimeBetweenRestarts ) == WAIT_TIMEOUT );
 
+		_lastCodePos = "250";
+
 		CSingleLock lg ( pTD->m_pmutexFolderListen, TRUE );
+		_lastCodePos = "260";
 		FolderEventsListener* pListener = pTD->m_pListener;
 		ASSERT_RESOURCE_ALLOCATION("ELI25238", pListener != NULL);
 		pListener->m_pCurrThreadData = NULL;
+		_lastCodePos = "270";
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI12780");
 	
@@ -333,32 +364,36 @@ bool FolderEventsListener::fileReadyForAccess(std::string strFileName)
 //-------------------------------------------------------------------------------------------------
 void FolderEventsListener::dispatchEvent(const FolderEvent& event)
 {
-	switch(event.m_nEvent)
+	try
 	{
-	case kFileAdded:
-		onFileAdded(event.m_strFileNameNew);
-		break;
-	case kFileRemoved:
-		onFileRemoved(event.m_strFileNameOld);
-		break;
-	case kFileModified:
-		onFileModified(event.m_strFileNameNew);
-		break;
-	case kFileRenamed:
-		onFileRenamed(event.m_strFileNameOld, event.m_strFileNameNew);
-		break;
-	case kFolderAdded:
-		onFolderAdded(event.m_strFileNameNew );
-		break;
-	case kFolderRemoved:
-		onFolderRemoved(event.m_strFileNameOld );
-		break;
-	case kFolderRenamed:
-		onFolderRenamed(event.m_strFileNameOld, event.m_strFileNameNew);
-		break;
-	default:
-		break;
+		switch(event.m_nEvent)
+		{
+		case kFileAdded:
+			onFileAdded(event.m_strFileNameNew);
+			break;
+		case kFileRemoved:
+			onFileRemoved(event.m_strFileNameOld);
+			break;
+		case kFileModified:
+			onFileModified(event.m_strFileNameNew);
+			break;
+		case kFileRenamed:
+			onFileRenamed(event.m_strFileNameOld, event.m_strFileNameNew);
+			break;
+		case kFolderAdded:
+			onFolderAdded(event.m_strFileNameNew );
+			break;
+		case kFolderRemoved:
+			onFolderRemoved(event.m_strFileNameOld );
+			break;
+		case kFolderRenamed:
+			onFolderRenamed(event.m_strFileNameOld, event.m_strFileNameNew);
+			break;
+		default:
+			break;
+		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29912");
 }
 //-------------------------------------------------------------------------------------------------
 unsigned long FolderEventsListener::getTimeBetweenListeningRestarts()
@@ -372,161 +407,173 @@ unsigned long FolderEventsListener::getTimeBetweenListeningRestarts()
 //-------------------------------------------------------------------------------------------------
 void FolderEventsListener::processChanges(string strBaseDir, Win32Event &eventKill, LPBYTE & rlpBuffer, MTSafeQueue<FolderEvent> & queEvents, bool bFileChange )
 {
-	LPBYTE pCurrByte = rlpBuffer;
-	PFILE_NOTIFY_INFORMATION pFileInfo = NULL;
-
-	// rename events happen in two peices, rename old and rename new
-	// when a rename old event happens we keep track of it so that we 
-	// can have one event handler for rename that takes the old and new
-	// names
-	string strOldFilename = "";
-
-	// Add file events will be immediately followed by a modify event for the same file. Keep track
-	// of add file events so that if both events are being monitored, the modify event is considered
-	// part of the add event rather than a stand-alone modify event.
-	static string strLastAddedFilename = "";
-	static DWORD dwAddFileTickTime = 0;
-
-	// ierate through the buffer extracting the information that we need
-	do
+	try
 	{
-		// has this thread been instructed to terminate ?? 
-		if(eventKill.isSignaled())
-		{
-			// exit 
-			return;
-		}
-		pFileInfo = (PFILE_NOTIFY_INFORMATION)pCurrByte;
-		string strFilename;
-		// get the name of the affected file
-		int len = WideCharToMultiByte(CP_ACP, 0, pFileInfo->FileName, pFileInfo->FileNameLength / sizeof(WCHAR), 0, 0, 0, 0);
-		LPSTR result = new char[len+1];
-		ASSERT_RESOURCE_ALLOCATION("ELI12935", result != NULL);
+		LPBYTE pCurrByte = rlpBuffer;
+		PFILE_NOTIFY_INFORMATION pFileInfo = NULL;
 
-		try
-		{
-			WideCharToMultiByte(CP_ACP, 0, pFileInfo->FileName, pFileInfo->FileNameLength / sizeof(WCHAR), result, len, 0, 0);
-			result[len] = '\0';
-			strFilename = removeLastSlashFromPath(strBaseDir)+ "\\" + result;
-		}
-		catch (...)
-		{
-			// delete result array if exception is thrown
-			delete[] result;
-			throw;
-		}
-		// delete result array
-		delete[] result;
+		// rename events happen in two peices, rename old and rename new
+		// when a rename old event happens we keep track of it so that we 
+		// can have one event handler for rename that takes the old and new
+		// names
+		string strOldFilename = "";
 
-		EFileEventType eEventType = (EFileEventType)0;
+		// Add file events will be immediately followed by a modify event for the same file. Keep track
+		// of add file events so that if both events are being monitored, the modify event is considered
+		// part of the add event rather than a stand-alone modify event.
+		static string strLastAddedFilename = "";
+		static DWORD dwAddFileTickTime = 0;
 
-		// call the appropriate virtual handler based on which action has taken place on the file
-		switch(pFileInfo->Action)
+		// ierate through the buffer extracting the information that we need
+		do
 		{
-		case FILE_ACTION_ADDED:
-			eEventType = bFileChange ? kFileAdded : kFolderAdded;
-			break;
-		case FILE_ACTION_REMOVED:
+			// has this thread been instructed to terminate ?? 
+			if(eventKill.isSignaled())
 			{
-				strOldFilename = strFilename;
-				strFilename = "";
-				eEventType = bFileChange ? kFileRemoved : kFolderRemoved;
+				// exit 
+				return;
 			}
-			break;
-		case FILE_ACTION_MODIFIED:
-			eEventType = bFileChange ? kFileModified : kFolderModified;
-			break;
-		case FILE_ACTION_RENAMED_OLD_NAME:
-			strOldFilename = strFilename;
-			break;
-		case FILE_ACTION_RENAMED_NEW_NAME:
-			eEventType = bFileChange ? kFileRenamed : kFolderRenamed;
-			break;
-		default:
-			break;
-		}
+			pFileInfo = (PFILE_NOTIFY_INFORMATION)pCurrByte;
+			string strFilename;
+			// get the name of the affected file
+			int len = WideCharToMultiByte(CP_ACP, 0, pFileInfo->FileName, pFileInfo->FileNameLength / sizeof(WCHAR), 0, 0, 0, 0);
+			LPSTR result = new char[len+1];
+			ASSERT_RESOURCE_ALLOCATION("ELI12935", result != NULL);
 
-		// [LegacyRCAndUtils:5258]
-		// Only process the event types being monitored.
-		EFileEventType eFilteredEventType = (EFileEventType)(m_eventTypeFlags & eEventType);
+			try
+			{
+				WideCharToMultiByte(CP_ACP, 0, pFileInfo->FileName, pFileInfo->FileNameLength / sizeof(WCHAR), result, len, 0, 0);
+				result[len] = '\0';
+				strFilename = removeLastSlashFromPath(strBaseDir)+ "\\" + result;
+			}
+			catch (...)
+			{
+				// delete result array if exception is thrown
+				delete[] result;
+				throw;
+			}
+			// delete result array
+			delete[] result;
 
-		// [FlexIDSCore:3737]
-		// Any modify/add events that immediately follow an add event on the same file
-		// (and occurs within a second of the original add event) should be ignored.
-		if ((eFilteredEventType == kFileModified  || eFilteredEventType == kFileAdded) &&
-			strLastAddedFilename == strFilename && (GetTickCount() - dwAddFileTickTime) < 1000)
-		{
-			eFilteredEventType = (EFileEventType)0;
-		}
-		else if (eFilteredEventType == kFileAdded)
-		{
-			// If this is a new add event, keep track of the filename
-			strLastAddedFilename = strFilename;
-			dwAddFileTickTime = GetTickCount();
-		}
-		else
-		{
-			strLastAddedFilename = "";
-		}
+			EFileEventType eEventType = (EFileEventType)0;
 
-		if (eFilteredEventType != 0)
-		{
-			FolderEvent event(eEventType, strFilename, strOldFilename);
-			queEvents.push(event);
-		}
+			// call the appropriate virtual handler based on which action has taken place on the file
+			switch(pFileInfo->Action)
+			{
+			case FILE_ACTION_ADDED:
+				eEventType = bFileChange ? kFileAdded : kFolderAdded;
+				break;
+			case FILE_ACTION_REMOVED:
+				{
+					strOldFilename = strFilename;
+					strFilename = "";
+					eEventType = bFileChange ? kFileRemoved : kFolderRemoved;
+				}
+				break;
+			case FILE_ACTION_MODIFIED:
+				eEventType = bFileChange ? kFileModified : kFolderModified;
+				break;
+			case FILE_ACTION_RENAMED_OLD_NAME:
+				strOldFilename = strFilename;
+				break;
+			case FILE_ACTION_RENAMED_NEW_NAME:
+				eEventType = bFileChange ? kFileRenamed : kFolderRenamed;
+				break;
+			default:
+				break;
+			}
 
-		// Reset strOldFilename after an event it which it was used.
-		if ((int)eEventType != 0 && !strOldFilename.empty())
-		{
-			strOldFilename = "";
-		}
+			// [LegacyRCAndUtils:5258]
+			// Only process the event types being monitored.
+			EFileEventType eFilteredEventType = (EFileEventType)(m_eventTypeFlags & eEventType);
 
-		pCurrByte += pFileInfo->NextEntryOffset;
+			// [FlexIDSCore:3737]
+			// Any modify/add events that immediately follow an add event on the same file
+			// (and occurs within a second of the original add event) should be ignored.
+			if ((eFilteredEventType == kFileModified  || eFilteredEventType == kFileAdded) &&
+				strLastAddedFilename == strFilename && (GetTickCount() - dwAddFileTickTime) < 1000)
+			{
+				eFilteredEventType = (EFileEventType)0;
+			}
+			else if (eFilteredEventType == kFileAdded)
+			{
+				// If this is a new add event, keep track of the filename
+				strLastAddedFilename = strFilename;
+				dwAddFileTickTime = GetTickCount();
+			}
+			else
+			{
+				strLastAddedFilename = "";
+			}
+
+			if (eFilteredEventType != 0)
+			{
+				FolderEvent event(eEventType, strFilename, strOldFilename);
+				queEvents.push(event);
+			}
+
+			// Reset strOldFilename after an event it which it was used.
+			if ((int)eEventType != 0 && !strOldFilename.empty())
+			{
+				strOldFilename = "";
+			}
+
+			pCurrByte += pFileInfo->NextEntryOffset;
+		}
+		while(pFileInfo->NextEntryOffset != 0);
 	}
-	while(pFileInfo->NextEntryOffset != 0);
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29911");
 }
 //-------------------------------------------------------------------------------------------------
 HANDLE FolderEventsListener::getListeningHandle (std::string strDir )
 {
-	HANDLE hDir = CreateFile(	strDir.c_str(),								
-		FILE_LIST_DIRECTORY,
-		FILE_SHARE_READ|FILE_SHARE_DELETE|FILE_SHARE_WRITE,
-		NULL,
-		OPEN_EXISTING,
-		FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OVERLAPPED,
-		NULL );
-
-	if ( hDir == INVALID_HANDLE_VALUE )
+	try
 	{
-		UCLIDException ue("ELI13086", "Invalid Directory Handle!");
-		ue.addDebugInfo("Directory Name", strDir);
-		ue.addWin32ErrorInfo();
-		throw ue;
+		HANDLE hDir = CreateFile(	strDir.c_str(),								
+			FILE_LIST_DIRECTORY,
+			FILE_SHARE_READ|FILE_SHARE_DELETE|FILE_SHARE_WRITE,
+			NULL,
+			OPEN_EXISTING,
+			FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OVERLAPPED,
+			NULL );
+
+		if ( hDir == INVALID_HANDLE_VALUE )
+		{
+			UCLIDException ue("ELI13086", "Invalid Directory Handle!");
+			ue.addDebugInfo("Directory Name", strDir);
+			ue.addWin32ErrorInfo();
+			throw ue;
+		}
+		return hDir;
 	}
-	return hDir;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29909");
 }
 //-------------------------------------------------------------------------------------------------
 void FolderEventsListener::beginChangeListen( HANDLE hDir, DWORD dwNotifyFilter, LPBYTE &lpBuffer, OVERLAPPED &oOverLapped, bool bRecursive)
 {
-	int iResult;
-	DWORD dwBytesReturned;
-	
-	// Start listening for changes, the dwBytesReturned value can be
-	// ignored because the changes will be returned asynchronously
-	iResult = ::ReadDirectoryChangesW(	hDir, 
-		(LPVOID)lpBuffer, 
-		gulFOLDER_LISTENER_BUF_SIZE, 
-		bRecursive, 
-		dwNotifyFilter,
-		&dwBytesReturned, &oOverLapped, NULL);
-
-	if ( iResult == 0 )
+	try
 	{
-		DWORD dwErrCode = GetLastError();
-		UCLIDException ue ( "ELI13016", "Error Listening to directory.");
-		ue.addDebugInfo( "ErrorCode", dwErrCode );
-		throw ue;
+		int iResult;
+		DWORD dwBytesReturned;
+
+		// Start listening for changes, the dwBytesReturned value can be
+		// ignored because the changes will be returned asynchronously
+		iResult = ::ReadDirectoryChangesW(	hDir, 
+			(LPVOID)lpBuffer, 
+			gulFOLDER_LISTENER_BUF_SIZE, 
+			bRecursive, 
+			dwNotifyFilter,
+			&dwBytesReturned, &oOverLapped, NULL);
+
+		if ( iResult == 0 )
+		{
+			DWORD dwErrCode = GetLastError();
+			UCLIDException ue ( "ELI13016", "Error Listening to directory.");
+			ue.addDebugInfo( "ErrorCode", dwErrCode );
+			throw ue;
+		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29910");
 }
 //-------------------------------------------------------------------------------------------------
 
