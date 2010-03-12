@@ -46,34 +46,41 @@
 	<li>Confirm that <b>Enable Auto Scrolling of the Test Logger window as test runs</b> is 
 	unchecked by default.</li>
 <p>
-	<li>Clear the <b>DisplayPercentageEnabled</b> key under HKCU\Software\Extract Systems\InputFunnel\InputReceivers\SpotRecIR.</li>
+	<li>Clear the <b>DisplayPercentageEnabled</b> key under HKCU\Software\Extract 
+	Systems\InputFunnel\InputReceivers\SpotRecIR.</li>
 	<li>Confirm that <b>Display X, Y percentages in Image Viewer</b> is 
 	unchecked by default.</li>
 <p>
-	<li>Clear the <b>AutoOpenImage</b> key under HKCU\Software\Extract Systems\AttributeFinder\Utils\EAVGenerator.</li>
+	<li>Clear the <b>AutoOpenImage</b> key under HKCU\Software\Extract 
+	Systems\AttributeFinder\Utils\EAVGenerator.</li>
 	<li><b>[FlexIDSCore #3799]</b> Confirm that <b>Automatically open image in VOA File Viewer</b> 
 	is checked by default.</li>
 <p>
-	<li>Clear the <b>AutoExpandAttributes</b> key under HKCU\Software\Extract Systems\AttributeFinder\AFCore\RuleTester.</li>
+	<li>Clear the <b>AutoExpandAttributes</b> key under HKCU\Software\Extract 
+	Systems\AttributeFinder\AFCore\RuleTester.</li>
 	<li>Confirm that <b>Automatically expand attributes in Rule Tester</b> is 
 	unchecked by default.</li>
 <p>
-	<li>Clear the <b>Prefix</b> key under HKCU\Software\Extract Systems\AttributeFinder\Settings.</li>
+	<li>Clear the <b>Prefix</b> key under HKCU\Software\Extract 
+	Systems\AttributeFinder\Settings.</li>
 	<li>Confirm that <b>Optional prefix for .dcc and .dat files</b> combo box is cleared by default.</li>
 <p>
-	<li>Clear the <b>TBD</b> key under HKCU\Software\Extract Systems\AttributeFinder\Settings.</li>
+	<li>Clear the <b>RFolder_1</b> key under HKCU\Software\Extract 
+	Systems\AttributeFinder\Utils\RDTConfig\RootFolderList.</li>
 	<li>Confirm that <b>Root folder for automated testing files</b> combo box is cleared by default.</li>
 <p>
-	<li>Clear the <b>ComponentDataFolder</b> key under HKCU\Software\Extract Systems\AttributeFinder\Settings.</li>
+	<li>Clear the <b>ComponentDataFolder</b> key under HKCU\Software\Extract 
+	Systems\AttributeFinder\Settings.</li>
 	<li>Confirm that <b>Full path to component data folder</b> combo box is cleared by default.</li>
 <p>
-	<li>Clear the <b>TBD</b> key under HKCU\Software\Extract Systems\AttributeFinder\Settings.</li>
+	<li>Clear the <b>DiffCommandLine</b> key under HKCU\Software\Extract 
+	Systems\TestingFramework\Settings.</li>
 	<li>Confirm that <b>Diff tool command line</b> combo box is cleared by default.</li>
 <p>
 	<li>Make a change to each item and click the <b>Restore Defaults</b> button.
 	<li>Confirm that <b>each item</b> has been restored to the default settings.</li>
 </ul>
-<br>
+<p>
 
 <!-- *********************************************** -->
 <li><h2>Functionality</h2>
@@ -95,40 +102,63 @@
 	<li><b>Load .dcc and .dat files only once per session</b> 
 	<ul>
 		<li>Confirm that the checkbox is <b>checked</b>.</li>
-		<li>TBD.</li>
+		<li>Exercise the <b>DocumentClassification</b> National Rule Set test.</li>
+		<li>Do not close the Test Harness.
+		<li>Retrieve an unencrypted copy of <b>Mortgage.dcc</b>
+		<li>Modify the DCC file.
+		<li>Exercise the <b>DocumentClassification</b> National Rule Set test again.</li>
+		<li>Confirm that the classification results for <b>Mortgage</b> are unchanged.
 <p>
 		<li>Confirm that the checkbox is <b>unchecked</b>.</li>
-		<li>TBD.</li>
+		<li>Exercise the <b>DocumentClassification</b> National Rule Set test.</li>
+		<li>Do not close the Test Harness.
+		<li>Retrieve an unencrypted copy of <b>Mortgage.dcc</b>
+		<li>Modify the DCC file.
+		<li>Exercise the <b>DocumentClassification</b> National Rule Set test again.</li>
+		<li>Confirm that the classification results for <b>Mortgage</b> are changed.
 	</ul>
 <p>
 	<li><b>Enable logging in the Entity Finder object</b> 
 	<ul>
+		<li>Modify <b>C:\Program Files\Extract 
+		Systems\TestingFiles\ProductDevelopment\AttributeFinder\AFUtils\AFUtilsTest\TestFiles\TestEntityFinder.dat</b> 
+		to comment out all of the <b>&lt;FILE&gt;</b> lines except for one.
+		<li> Modify <b>C:\Program Files\Extract 
+		Systems\TestingFiles\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\All\AFCore.tcl</b> 
+		to comment out all lines except for the line starting with 
+		<b>UCLIDAFUtilsTest.EntityFinderTester.1;;</b>.
+<p>
 		<li>Confirm that the checkbox is <b>checked</b>.</li>
-		<li>TBD.</li>
+		<li>Exercise <b>Run All Tests</b> from the RDT Start menu.</li>
+		<li>Confirm that <b>EFALog.dat</b> is updated in the <b>CommonComponents</b> folder.</li>
 <p>
 		<li>Confirm that the checkbox is <b>unchecked</b>.</li>
-		<li>TBD.</li>
+		<li>Exercise <b>Run All Tests</b> from the RDT Start menu.</li>
+		<li>Confirm that <b>EFALog.dat</b> is not updated in the <b>CommonComponents</b> folder.</li>
 	</ul>
 <p>
 	<li><b>Enable logging in the Entity Name Data Scorer object</b> 
 	<ul>
+		<li> Modify <b>C:\Program Files\Extract 
+		Systems\TestingFiles\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\All\AFCore.tcl</b> 
+		to comment out all lines except for the line starting with 
+		<b>UCLIDAFDataScorersTest.EntityNameDataScorerTester.1;;</b>.
+<p>
 		<li>Confirm that the checkbox is <b>checked</b>.</li>
-		<li>TBD.</li>
+		<li>Exercise <b>Run All Tests</b> from the RDT Start menu.</li>
+		<li>Confirm that <b>gstrENDSLog.dat</b> is updated in the <b>CommonComponents</b> folder.</li>
 <p>
 		<li>Confirm that the checkbox is <b>unchecked</b>.</li>
-		<li>TBD.</li>
+		<li>Exercise <b>Run All Tests</b> from the RDT Start menu.</li>
+		<li>Confirm that <b>gstrENDSLog.dat</b> is not updated in the <b>CommonComponents</b> folder.</li>
 	</ul>
 <p>
 	<li><b>Add document tag with RuleID for rule that captured data when using the Grantor-Grantee Finder</b> 
 	<ul>
-		<li>Confirm that the checkbox is <b>checked</b>.</li>
-		<li>TBD.</li>
-<p>
-		<li>Confirm that the checkbox is <b>unchecked</b>.</li>
-		<li>TBD.</li>
+		<li>This option is no longer since <b>Grantor-Grantee Finder</b> is obsolete.
 	</ul>
 <p>
-	<li><b>Enable Auto Scrolling of the Test Logger window as test runs</b> 
+	<li><b>Enable Auto Scrolling of the Test Logger window as test runs</b>
 	<ul>
 		<li>Confirm that the checkbox is <b>checked</b>.</li>
 		<li>Execute a long-running test in the <b>Test Harness</b>.</li>
@@ -136,7 +166,9 @@
 		as the window fills.</li>
 <p>
 		<li>Confirm that the checkbox is <b>unchecked</b>.</li>
-		<li>TBD.</li>
+		<li>Execute a long-running test in the <b>Test Harness</b>.</li>
+		<li>Confirm that the <b>Test Result Logger</b> window does not automatically scroll up 
+		as the test runs.</li>
 	</ul>
 <p>
 	<li><b>Display X, Y percentages in Image Viewer</b> 
@@ -155,10 +187,15 @@
 	<li><b>Automatically open image in VOA File Viewer</b> 
 	<ul>
 		<li>Confirm that the checkbox is <b>checked</b>.</li>
-		<li>TBD.</li>
+		<li>Double-click on a <b>VOA</b> file to open it in the <b>VOA Viewer</b>.</li>
+		<li>Confirm that the associated image is also opened in the <b>Image Viewer</b>.
+		<li>Close the <b>VOA Viewer</b>.
+		<li>Confirm that the <b>Image Viewer</b> also closes automatically.
 <p>
 		<li>Confirm that the checkbox is <b>unchecked</b>.</li>
-		<li>TBD.</li>
+		<li>Double-click on a <b>VOA</b> file to open it in the <b>VOA Viewer</b>.</li>
+		<li>Confirm that the associated image is not automatically opened in the <b>Image 
+		Viewer</b>.
 	</ul>
 <p>
 	<li><b>Automatically expand attributes in Rule Tester</b> 
@@ -181,7 +218,14 @@
 <p>
 	<li><b>Root folder for automated testing files</b> 
 	<ul>
-		<li>TBD.</li>
+		<li>Copy the installed <b>TestingFiles</b> folder installed with the RDT to 
+		<b>TestingFiles2</b>.</li>
+		<li>Make some changes to TCL or DAT files, perhaps similar to those described 
+		above for logging in the Entity Finder object.
+		<li>Use <b>RDTConfig.exe</b> to modify the root folder setting.
+		<li>Exercise the changed file(s) and confirm that the expected results are seen.
+		<li>Restore the previous root folder.
+		<li>Exercise the same file(s) and confirm that the changed results are not seen.
 	</ul>
 <p>
 	<li><b>Full path to component data folder</b> 
@@ -196,7 +240,5 @@
 
 <!-- *********************************************** -->
 </OL>
-
 </BODY>
-
 </HTML>
