@@ -71,7 +71,7 @@ namespace Extract.Drawing
         /// <summary>
         /// The width of thick pens.
         /// </summary>
-        public static readonly int ThickPenWidth = 5;
+        public static readonly int ThickPenWidth = 4;
 
         #endregion Fields
 
