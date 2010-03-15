@@ -44,16 +44,14 @@
 			<li>Verify the <b>USB License Key Manager</b> is pointed to a USB key with redaction 
 			counts available (usually LISA).
 <p>
-			<li>Use of <b>Redaction Demo</b> rules?
+			<li><b>Rules</b>
 			<ul>
-				<li>Assess whether or not they are appropriate for use in this testing.
-				<li>If so, confirm that the RedactionDemo folder has been copied to C:\.
-				Modify <b>Auto-Redact.fps</b> so that the Redact images task uses the 
-				RedactionDemo rules.
-<p>
-				<li>If not, confirm that the desired rules have been copied to the test 
-				machine.  Modify <b>Compute.fps</b> so that the Execute rules task uses the 
-				desired rules.
+				<li>Assess whether or not the <b>Demo_IDShield</b> rules are appropriate 
+				for use in this testing.
+				<li>If so, copy the <b>Rules</b> folder from <b>Demo_IDShield</b> to 
+				the sanity test destination folder defined above.
+				<li>If not, copy an appropriate <b>Rules</b> folder to 
+				the sanity test destination folder defined above.
 			</ul>
 		</ul>
 <p>
@@ -92,7 +90,7 @@
 			<li>Provide comments for some files during verification.
 			<li>Confirm that reports correctly indicate which files were <b>skipped</b>.
 			<li>Confirm that reports correctly indicate which files were <b>tagged</b>.
-			<li>Confirm that reports correctly indicate which files were <b>commented</b>.
+			<li>Confirm that reports correctly indicate which <b>comments</b> are defined.
 			<li>Modify the FPS file to process the skipped files.
 			<li>Finish verifying the sensitive documents and confirm that the verification UI 
 			automatically closes.
@@ -136,6 +134,7 @@
 			<b>Execute rules</b>.
 	      		<li>Use Task Manager to kill <b>ProcessFiles.exe</b> 
 			while documents are being processed.
+			<li>Use <b>DB Admin</b> to reset the database lock.
 	      		<li>Use <b>DB Admin</b> to confirm that some files 
 			are stuck in <b>Processing</b>.
 	      		<li>Use <b>DB Admin</b> after auto-reversion to confirm that 
@@ -467,8 +466,8 @@
 			<ul>
 				<li>choice of counters to decrement
 				<li>specification of USB Key Serial #'s 
-				<li>setting of a Swiping rule flag
 				<li>setting of an Internal Use Only flag.
+				<li>setting of a Swiping rule flag
 			</ul>
 			<li>Confirm that <b>Tools - Rule Tester</b> displays the Rule Tester dialog.
 			<li>Confirm that <b>Tools - Execute Test Harnesss</b> displays the Test Harness dialog 
