@@ -1756,7 +1756,7 @@ namespace Extract.Imaging.Forms
         /// <param name="height">The height of the zone in image pixels.</param>
         void GetBorderZone(out PointF start, out PointF end, out float height)
         {
-            double expandBy = ExtractPens.ThickPenWidth / 2.0 / ImageViewer.GetScaleFactorY();
+            double expandBy = (ExtractPens.ThickPenWidth-1) / 2.0 / ImageViewer.GetScaleFactorY();
             GetExpandedZone(expandBy, out start, out end, out height);
         }
 
@@ -1772,7 +1772,7 @@ namespace Extract.Imaging.Forms
             double expandBy = SelectionPen.Width/2.0;
             if (BorderColor != Color.Transparent)
             {
-                expandBy += ExtractPens.ThickPenWidth;
+                expandBy += ExtractPens.ThickPenWidth - 1;
             }
 
             // Convert to image coordinates
