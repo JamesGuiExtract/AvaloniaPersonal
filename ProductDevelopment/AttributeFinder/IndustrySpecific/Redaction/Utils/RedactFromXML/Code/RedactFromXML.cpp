@@ -240,15 +240,14 @@ string CRedactFromXMLApp::getRedactionTextFromRedactionNode(MSXML::IXMLDOMNodePt
 
 		// Get the exemption code node under this redaction node
 		MSXML::IXMLDOMNodePtr ipExemptions = getFirstNodeNamed(ipChildren, "ExemptionCode");
-		if (ipExemptions == NULL)
+		string strExemptions;
+		if (ipExemptions != NULL)
 		{
-			return "";
+			// Get the exemption codes for this redaction
+			MSXML::IXMLDOMNamedNodeMapPtr ipExemptionAttributes = ipExemptions->attributes;
+			ASSERT_RESOURCE_ALLOCATION("ELI25119", ipExemptionAttributes != NULL);
+			strExemptions = getAttributeAsString(ipExemptionAttributes, "Code");
 		}
-
-		// Get the exemption codes for this redaction
-		MSXML::IXMLDOMNamedNodeMapPtr ipExemptionAttributes = ipExemptions->attributes;
-		ASSERT_RESOURCE_ALLOCATION("ELI25119", ipExemptionAttributes != NULL);
-		string strExemptions = getAttributeAsString(ipExemptionAttributes, "Code");
 
 		// Get the type of this redaction
 		MSXML::IXMLDOMNamedNodeMapPtr ipRedactionAttributes = ipRedaction->attributes;
