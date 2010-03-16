@@ -142,7 +142,7 @@ namespace Extract.Utilities.Test
 
                     if (!exceptionThrown)
                     {
-                        throw ee;
+                        throw;
                     }
                 }
 
