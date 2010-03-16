@@ -1,7 +1,9 @@
 <NUnitProject>
-  <Settings activeconfig="Testing" appbase="..\..\..\..\binaries" />
-  <Config name="Testing" appbase="testing" binpathtype="Auto">
+  <Settings activeconfig="Default" />
+  <Config name="Default" binpathtype="Auto">
     <assembly path="Extract.Test.dll" />
+    <assembly path="Extract.Encryption.Test.dll" />
     <assembly path="Extract.Imaging.Forms.Test.dll" />
+    <assembly path="Extract.Utilities.Test.dll" />
   </Config>
 </NUnitProject>
