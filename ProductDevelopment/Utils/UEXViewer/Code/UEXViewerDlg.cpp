@@ -1737,7 +1737,7 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 
 				// Check that the top text is not just the token passed in
 				// if it is, then this line could not be parsed
-				if (ue.getTopText() == strToken)
+				if (ue.getTopText() == strToken || ue.getTopELI().empty())
 				{
 					UCLIDException uex("ELI29918", "*Unparsable exception*");
 					uex.addDebugInfo("Exception String",
