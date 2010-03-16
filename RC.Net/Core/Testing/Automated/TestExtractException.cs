@@ -100,6 +100,9 @@ namespace Extract.Test
         // StringizedByteStream is from the COM side and so does not conform to .Net conventions.
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", 
             MessageId="Stringized")]
+        // This class is testing the exception class and so uses fake ELI codes
+        // while testing different scenarios
+        [SuppressMessage("ExtractRules", "ES0002:MethodsShouldContainValidEliCodes")]
         [Test]
         public static void InnerExceptionFromStringizedException()
         {

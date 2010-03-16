@@ -1739,15 +1739,20 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 				// if it is, then this line could not be parsed
 				if (ue.getTopText() == strToken)
 				{
-					m_listUEX.DeleteItem(iIndex);
-					return false;
+					UCLIDException uex("ELI29918", "*Unparsable exception*");
+					uex.addDebugInfo("Exception String",
+						strToken.empty() ? "<Empty String>" : strToken);
+					strToken = uex.asStringizedByteStream();
+					ue = uex;
 				}
 			}
 			catch (...)
 			{
-				// remove the bad item from the list.
-				m_listUEX.DeleteItem(iIndex);
-				return false;
+				UCLIDException uex("ELI29919", "*Unparsable exception*");
+				uex.addDebugInfo("Exception String",
+					strToken.empty() ? "<Empty String>" : strToken);
+				strToken = uex.asStringizedByteStream();
+				ue = uex;
 			}
 
 			// Display Top ELI code and Top Exception
@@ -1765,8 +1770,26 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 		}
 		else
 		{
-			// This line could not be parsed properly return false
-			return false;
+			// Dummy text for 0-width column
+			iIndex = m_listUEX.InsertItem( 0, "a" );
+
+			// Invalid number of tokens, set the exception text to invalid token count
+			UCLIDException ue("ELI29920", "*Exception line had invalid number of tokens.*");
+			ue.addDebugInfo("Exception Line", strText);
+			strToken = ue.asStringizedByteStream();
+
+			// Display Top ELI code and Top Exception
+			setItemText( iIndex, TOP_ELI_COLUMN, ue.getTopELI() );
+			setItemText( iIndex, TOP_EXCEPTION_COLUMN, ue.getTopText() );
+
+			// Set all text items, now set the item data
+			ITEMINFO*	pData = new ITEMINFO;
+			ASSERT_RESOURCE_ALLOCATION("ELI29921", pData != NULL);
+
+			pData->iIndex = iIndex;
+			pData->ulTime = 0;
+			pData->strData = strToken;
+			m_listUEX.SetItemData( iIndex, (DWORD)pData );
 		}
 
 		return true;

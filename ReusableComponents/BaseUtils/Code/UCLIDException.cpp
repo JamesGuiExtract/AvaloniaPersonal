@@ -50,6 +50,15 @@ const string gstrSTRINGIZED_BYTE_STREAM_OF_SIGNATURE_OLD = "15000000";
 
 const string gstrEMPTY_STRING = "";
 
+// A stringized byte stream of the exception used as the return string from
+// asStringizedByteStream if an exception occurred while converting the exception
+// into a stringized byte stream.
+// ELI29917: Exception caught in UCLIDException::asStringizedByteStream.
+const string gstrAS_STRINGIZED_BYTESTREAM_EXCEPTION_STRING = "1f00000055434c4944457863657074696f"
+	"6e204f626a6563742056657273696f6e20320300000008000000454c4932393931373b000000457863657074696"
+	"f6e2063617567687420696e2055434c4944457863657074696f6e3a3a6173537472696e67697a65644279746553"
+	"747265616d2e00000000000000000000000000";
+
 // Size of the signature at the beginning of a stringized exception.
 const unsigned long gnSIGNATURE_SIZE = 8;
 
@@ -474,12 +483,23 @@ string UCLIDException::asStringizedByteStream() const
 	try
 	{
 		ByteStream byteStream = asByteStream();
+
+		// If the returned byte stream had a length of 0, this indicates
+		// that an exception occurred in the asByteStream call. Return
+		// a static exception string indicating an exception occurred
+		// in the asStringizedByteStream call. [LRCAU #5792]
+		if (byteStream.getLength() == 0)
+		{
+			return gstrAS_STRINGIZED_BYTESTREAM_EXCEPTION_STRING;
+		}
+
 		return byteStream.asString();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI25378");
 
-	// There was an exception so return empty string
-	return gstrEMPTY_STRING;
+	// If an exception occurred, return an exception indicating an error
+	// occurred in the asStringizedByteStream method. [LRCAU #5792]
+	return gstrAS_STRINGIZED_BYTESTREAM_EXCEPTION_STRING;
 }
 //-------------------------------------------------------------------------------------------------
 void UCLIDException::addDebugInfo(const string& strKeyName, const ValueTypePair& keyValue, 
@@ -676,7 +696,10 @@ string UCLIDException::createLogString() const
 
 		return strResult;
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20300");
+	catch(...)
+	{
+		// Do not want to log an exception when creating an exception to log
+	}
 	
 	return gstrEMPTY_STRING;
 }

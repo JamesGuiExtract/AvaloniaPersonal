@@ -117,6 +117,7 @@ void IdleProcessKiller::monitorProcess()
 				// Log an application trace
 				UCLIDException ue("ELI29833", "Application trace: Idle process terminated.");
 				ue.addDebugInfo("Process", strFileName);
+				ue.addDebugInfo("Process ID", m_ulProcessId);
 				ue.log();
 				_lastCodePos = "60";
 			}
