@@ -1391,7 +1391,12 @@ namespace Extract.Redaction.Verification
                     int index = GetCategoryIndex(row);
                     if (index >= 0)
                     {
-                        counts[index]++;
+                        // Only count manual redactions if they are enabled
+                        // [FlexIDSCore #4198]
+                        if (index != (int)CategoryIndex.Manual || row.Redacted)
+                        {
+                            counts[index]++;
+                        }
 
                         // Only add to total redaction count if the object is set
                         // to be redacted
