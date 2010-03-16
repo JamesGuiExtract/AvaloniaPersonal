@@ -1150,12 +1150,9 @@ STDMETHODIMP CSelectPageRegion::raw_IsConfigured(VARIANT_BOOL *pbValue)
 
 		bool bConfigured = true;
 
-		// Check requirements based on PageSelectionType
-		if (m_ePageSelectionType == kSelectAll && !m_bIncludeRegion)
-		{
-			bConfigured = false;
-		}
-		else if (m_ePageSelectionType == kSelectSpecified)
+		// m_ePageSelectionType == kSelectAll && !m_bIncludeRegion is to be intentionally allowed
+		// per [FlexIDSCore:3944, 4100]
+		if (m_ePageSelectionType == kSelectSpecified)
 		{
 			if (m_strSpecificPages.empty())
 			{
