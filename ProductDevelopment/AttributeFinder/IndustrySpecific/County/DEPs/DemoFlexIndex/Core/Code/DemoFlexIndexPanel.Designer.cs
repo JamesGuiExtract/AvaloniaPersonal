@@ -172,6 +172,7 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             this._legalDescriptionTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._legalDescriptionTable.Size = new System.Drawing.Size(615, 68);
             this._legalDescriptionTable.TabIndex = 7;
+            this._legalDescriptionTable.AllowTabbingByRow = true;
             // 
             // Lot
             // 
