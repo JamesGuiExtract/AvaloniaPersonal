@@ -28,20 +28,20 @@
 			<li>Review the multiple FPS files found at 
 			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3609</b>
 			<ul>
-				<li>Queue_Process.fps - watches a UNC share to supply images for 
+				<li><b>Queue-Process.fps</b> - watches a UNC share to supply images for 
 				processing against Indexing rules
-				<li>Process.fps - OCR's images, runs Indexing rules, copies the image 
+				<li><b>Process.fps</b> - OCR's images, runs Indexing rules, copies the image 
 				to another folder, copies the XML output from the rules to yet another 
 				folder, and sets the Redaction action to Pending
-				<li>Process_Redaction.fps - runs the Redaction rules, has a conditional 
+				<li><b>Process-Redaction.fps</b> - runs the Redaction rules, has a conditional 
 				task to set Verify to Pending if this is a sensitive document, otherwise 
 				sets the Cleanup action to Pending.
-				<li>Cleanup.fps - sleeps for 5 minutes to give verifiers an opportunity 
+				<li><b>CleanUp.fps</b> - sleeps for 5 minutes to give verifiers an opportunity 
 				to navigate the historical documents; deletes the metadata XML, USS, VOA, 
 				and source documents
-				<li>QueueBackRedaction.fps - watches a UNC share
-				<li>ProcessBackRedaction.fps - OCR's images, runs the Redaction rules
-				<li>CleanupBackRedaction.fps - sleeps, deletes unnecessary files
+				<li><b>Queue-BackRedaction.fps</b> - watches a UNC share
+				<li><b>Process-BackRedaction.fps</b> - OCR's images, runs the Redaction rules
+				<li><b>CleanUp-BackRedaction.fps</b> - sleeps, deletes unnecessary files
 			</ul>
 			<li>Copy a set of CA - Santa Barbara images to a testing folder.  Prepare other 
 			sets for copying into the listening folders.
