@@ -93,6 +93,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				AdditionalManifestFiles="$(InputDir)$(ProjectName).exe.merge.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -191,6 +192,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				AdditionalManifestFiles="$(InputDir)$(ProjectName).exe.merge.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -282,6 +284,10 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 		</Filter>
+		<File
+			RelativePath=".\OSSpecificInstaller.exe.merge.manifest"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
