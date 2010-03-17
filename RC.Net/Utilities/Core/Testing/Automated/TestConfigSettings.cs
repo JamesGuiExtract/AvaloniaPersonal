@@ -28,7 +28,10 @@ namespace Extract.Utilities.Test
             try
             {
                 // Ensure there is no previously existing config file.
-                File.Delete(configFileName);
+                if (File.Exists(configFileName))
+                {
+                    File.Delete(configFileName);
+                }
 
                 // Initialize a dynamic ConfigSettings instance and ensure the proper default value.
                 ConfigSettings<Settings> dynamicConfig =
@@ -65,7 +68,10 @@ namespace Extract.Utilities.Test
             }
             finally
             {
-                File.Delete(configFileName);
+                if (File.Exists(configFileName))
+                {
+                    File.Delete(configFileName);
+                }
             }
         }
 
@@ -81,7 +87,10 @@ namespace Extract.Utilities.Test
             try
             {
                 // Ensure there is no previously existing config file.
-                File.Delete(configFileName);
+                if (File.Exists(configFileName))
+                {
+                    File.Delete(configFileName);
+                }
 
                 // Test that a config file is automatically generated.
                 ConfigSettings<Settings> autoFileCreationConfig =
@@ -100,7 +109,10 @@ namespace Extract.Utilities.Test
             }
             finally
             {
-                File.Delete(configFileName);
+                if (File.Exists(configFileName))
+                {
+                    File.Delete(configFileName);
+                }
             }
         }
 
@@ -121,7 +133,10 @@ namespace Extract.Utilities.Test
                 try
                 {
                     // Ensure there is no previously existing config file.
-                    File.Delete(configFileName);
+                    if (File.Exists(configFileName))
+                    {
+                        File.Delete(configFileName);
+                    }
 
                     // Test that an execption is thrown if a ConfigSettings instance is initialized
                     // with no existing config file and createIfMissing set to false. 
@@ -150,7 +165,10 @@ namespace Extract.Utilities.Test
             }
             finally
             {
-                File.Delete(configFileName);
+                if (File.Exists(configFileName))
+                {
+                    File.Delete(configFileName);
+                }
             }
         }
     }
