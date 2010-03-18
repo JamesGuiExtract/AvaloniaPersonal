@@ -4,6 +4,10 @@
 
 #include "resource.h"       // main symbols
 
+#include <map>
+#include <set>
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CSRWSubImageHandler
 class ATL_NO_VTABLE CSRWSubImageHandler : 
@@ -40,16 +44,27 @@ public:
 // ISubImageHandler
 	STDMETHOD(raw_NotifySubImageCreated)(ISpotRecognitionWindow *pSourceSRWindow, 
 		IRasterZone *pSubImageZone, double dRotationAngle);
+	STDMETHOD(raw_NotifyAboutToDestroy)(IInputReceiver* pIR);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 private:
-//	IInputManagerPtr m_ipInputManager;
+	////////////////////
+	// Variables
+	////////////////////
+
 	IInputManager* m_ipInputManager;
 
+	// Keep track of the sub-image window hierarchy so that when a sub-image window is closed, any
+	// child sub-image windows are cleaned up properly.
+	map<IInputReceiver*, set<IInputReceiver*>> m_mapSubImageHierarchy;
+
 	////////////////////
-	// Helper functions
+	// Methods
+	////////////////////
+	void notifyAboutToDestroy(IInputReceiver* pIR);
+
 	void validateLicense();
 };
 

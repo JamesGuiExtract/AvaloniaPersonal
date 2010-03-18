@@ -120,10 +120,33 @@ STDMETHODIMP CSRWSubImageHandler::raw_NotifySubImageCreated(ISpotRecognitionWind
 		ipSRWindow->SetSubImageHandler(ipSubImageHandler, _bstr_t(bstrTooltip), _bstr_t(bstrTrainingFile));
 
 		ipSRWindow->OpenImagePortion( ipSourceSRWindow->GetImageFileName(), pSubImageZone, dRotationAngle );
+
+		// Keep track of all children of pSourceSRWindow for proper disposal later on.
+		IInputReceiverPtr ipParentIR(pSourceSRWindow);
+		set<IInputReceiver*>& rsetChildren = m_mapSubImageHierarchy[ipParentIR];
+		rsetChildren.insert(ipIR);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI03252")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSRWSubImageHandler::raw_NotifyAboutToDestroy(IInputReceiver* pIR)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
-	return S_OK;
+	try
+	{
+		ASSERT_ARGUMENT("ELI29927", pIR != NULL);
+
+		// ensure that this component is licensed.
+		validateLicense();
+
+		notifyAboutToDestroy(pIR);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29925")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -174,6 +197,43 @@ STDMETHODIMP CSRWSubImageHandler::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 //-------------------------------------------------------------------------------------------------
 // Helper functions
+//-------------------------------------------------------------------------------------------------
+void CSRWSubImageHandler::notifyAboutToDestroy(IInputReceiver* pIR)
+{
+	IIREventHandlerPtr ipEventHandler = m_ipInputManager;
+	ASSERT_RESOURCE_ALLOCATION("ELI29928", ipEventHandler != NULL);
+
+	// Inform all child windows (input receivers) of their impending destruction.
+	// (maniacal laughter ensues...)
+	set<IInputReceiver*> setChildren = m_mapSubImageHierarchy[pIR];
+
+	for (set<IInputReceiver*>::iterator iter = setChildren.begin();
+		 iter != setChildren.end();
+		 iter++)
+	{
+		// Call notifyAboutToDestroy recursively on each child to ensure all decendents are freed.
+		notifyAboutToDestroy(*iter);
+
+		ipEventHandler->NotifyAboutToDestroy(*iter);
+	}
+	
+	// After the windows have been notified, the m_mapSubImageHierarchy entry can be removed.
+	m_mapSubImageHierarchy.erase(pIR);
+
+	// If this window is itself a child of another sub-image window, remove it from its parent's
+	// child list so that this window is not freed again.
+	for (map<IInputReceiver*, set<IInputReceiver*>>::iterator iter =
+			m_mapSubImageHierarchy.begin();
+		 iter != m_mapSubImageHierarchy.end();
+		 iter++)
+	{
+		if (iter->second.find(pIR) != iter->second.end())
+		{
+			iter->second.erase(pIR);
+			break;
+		}
+	}
+}
 //-------------------------------------------------------------------------------------------------
 void CSRWSubImageHandler::validateLicense()
 {

@@ -168,6 +168,8 @@ library UCLID_SPOTRECOGNITIONIRLib
 		[id(1), helpstring("method NotifySubImageCreated")] HRESULT NotifySubImageCreated(
 			[in] ISpotRecognitionWindow *pSourceSRWindow, [in] IRasterZone* pSubImageZone, 
 			[in] double dRotationAngle);
+		[id(2), helpstring("method NotifyAboutToDestroy")] HRESULT NotifyAboutToDestroy(
+			[in] IInputReceiver* pIR);
 	};
 
 	[

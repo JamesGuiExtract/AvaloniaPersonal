@@ -1703,18 +1703,28 @@ void SpotRecognitionDlg::OnClose()
 			m_apCurrentDragOperation.reset(NULL);
 		}
 
-		// remeber current zone height
+		// remember current zone height
 		ma_pSRIRCfgMgr->setZoneHeight(m_UCLIDGenericDisplayCtrl.getZoneHighlightHeight());
 		// remember window position
 		saveWindowPosition();
 		
+		IInputReceiverPtr ipReceiver = m_pInputEntityManager;
+			
+		// [LegacyRCAndUtils:5743]
+		// Allow the m_ipSubImageHandler to handle the pending destruction to ensure child
+		// subImage windows to ipReceiver are cleaned up to prevent memory leaks or a crash on
+		// close.
+		if (m_ipSubImageHandler != NULL)
+		{
+			m_ipSubImageHandler->NotifyAboutToDestroy(ipReceiver);
+		}
+
 		// when the user wants to close the window, send a message to the event handler
 		// telling it that the user wants to close the window.  Do not actually close the IR window
 		// the Window will automatically disappear when this dialog object is destructed by the 
 		// owning ATL object.
-		if (m_ipEventHandler)
+		if (m_ipEventHandler != NULL)
 		{
-			IInputReceiverPtr ipReceiver = m_pInputEntityManager;
 			m_ipEventHandler->NotifyAboutToDestroy(ipReceiver);
 		}
 	}
