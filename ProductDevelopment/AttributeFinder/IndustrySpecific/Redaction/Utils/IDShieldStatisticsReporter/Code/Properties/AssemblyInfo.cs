@@ -10,9 +10,9 @@ using System.Resources;
 [assembly: AssemblyTitle("IDShieldStatisticsReporter")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract System, LLC")]
+[assembly: AssemblyCompany("Extract Systems, LLC")]
 [assembly: AssemblyProduct("ID Shield Statistics Reporter")]
-[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2010")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

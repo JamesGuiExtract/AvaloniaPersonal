@@ -10,9 +10,9 @@ using System;
 [assembly: AssemblyTitle("Extract.DataEntry.DEP.DemoFlexIndex")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract System, LLC")]
+[assembly: AssemblyCompany("Extract Systems, LLC")]
 [assembly: AssemblyProduct("Extract.DataEntry.DEP.DemoFlexIndex")]
-[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2010")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
