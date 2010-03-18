@@ -39,6 +39,11 @@ namespace Extract.Imaging.Forms
             (byte)PathPointType.Line    // the last corner
         };
 
+        /// <summary>
+        /// The minimum length in image pixels a highlight can be during an interactive resize.
+        /// </summary>
+        const int _MINIMUM_LENGTH = 10;
+
         #endregion Constants
 
         #region Fields
@@ -1118,7 +1123,7 @@ namespace Extract.Imaging.Forms
                 ImageViewer imageViewer = base.ImageViewer;
 
                 // Get the mouse position as a point in image coordinates
-                Point[] mouse = new Point[] { new Point(mouseX, mouseY) };
+                PointF[] mouse = new PointF[] { new PointF(mouseX, mouseY) };
                 using (Matrix clientToImage = imageViewer.Transform.Clone())
                 {
                     clientToImage.Invert();
@@ -1129,7 +1134,7 @@ namespace Extract.Imaging.Forms
                 if (imageViewer.Cursor == ExtractCursors.ActiveRotate)
                 {
                     // Update the end point
-                    QuietSetEndPoint(mouse[0]);
+                    QuietSetEndPoint(Point.Round(mouse[0]));
 
                     // Check if the control key is still active
                     if (Control.ModifierKeys != Keys.Control)
@@ -1149,7 +1154,7 @@ namespace Extract.Imaging.Forms
                           || imageViewer.Cursor == Cursors.SizeNESW))
                 {
                     // This is a corner resize event
-                    TrackingData.UpdateRectangle(mouse[0].X, mouse[0].Y);
+                    TrackingData.UpdateRectangle((int)(mouse[0].X + 0.5F), (int)(mouse[0].Y + 0.5F));
 
                     // Get the y-coordinate for the raster points
                     int y = (int)(TrackingData.Rectangle.Y
@@ -1186,16 +1191,22 @@ namespace Extract.Imaging.Forms
         /// <param name="mouse">The position in logical (image) coordinates.</param>
         /// <remarks>The highlight maintains its start point, height, and angle. Only the end 
         /// point of the highlight is changed.</remarks>
-        void ResizeActiveHighlight(Point mouse)
+        void ResizeActiveHighlight(PointF mouse)
         {
             // Construct the vector components for a vector from the start point to the mouse
-            int x = mouse.X - _startPoint.X;
-            int y = mouse.Y - _startPoint.Y;
+            double x = mouse.X - _startPoint.X;
+            double y = mouse.Y - _startPoint.Y;
 
             // Compute the dot product of the vectors
             // NOTE: Because the active highlight vector is a unit vector, this is equivalent 
             // to the the scalar projection of the mouse vector onto the active highlight vector.
             double dotProduct = x * _activeHighlightVector.X + y * _activeHighlightVector.Y;
+
+            // Enforce a minimum projection [DNRCAU #440]
+            if (Math.Abs(dotProduct) < _MINIMUM_LENGTH)
+            {
+                dotProduct = dotProduct < 0 ? -_MINIMUM_LENGTH : _MINIMUM_LENGTH;
+            }
 
             // Compute the new point
             QuietSetEndPoint(new Point(
