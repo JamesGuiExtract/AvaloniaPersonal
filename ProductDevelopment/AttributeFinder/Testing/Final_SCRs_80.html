@@ -1,0 +1,243 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.0 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield  8.0 Testing<br> 
+Final SCRs </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of DataEntry Changes</h3>
+       	<ul>
+  	   	<LI><b>[DataEntry #927]</b> Confirm that the <b>Legal description</b> table in 
+		<b>Demo_FLEXIndex</b> supports tabbing by row.
+       	</ul>
+<p>
+	<LI><h3>Descriptions of DotNet Changes</h3>
+       	<ul>
+  	   	<LI><b>[DotNet #440]</b> Wobbly highlights
+		<ul>
+			<li>Verify an image
+			<li>Draw an angular redaction
+			<li>Click a grip handle on one of the long sides
+			<li>Resize the highlight inward to make a narrow redaction
+			<li>Confirm that the highlight does not woblle between angular and rectangular.
+		</ul>
+       	</ul>
+<p>
+	<LI><h3>Descriptions of FlexIDSCore Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3038]</b> VOA Viewer displays multiple selected highlights
+	       	<ul>
+	      		<li>Open a VOA file that contains multiple attributes from a single page.
+			<li>Confirm that more than one of the attributes can be selected at 
+			one time.
+			<li>Confirm that the group of selected attributes is highlighted in 
+			the Image Viewer.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3794]</b> Scheduled processing
+		<ul>
+	      		<li>Confirm that application trace messages are logged when processing is 
+			started or stopped due to the configured processing schedule.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3916]</b> Confirm that <b>ID Shield Statistics Reporter</b> has 
+		the correct copyright date.
+<p>
+  	   	<LI><b>[FlexIDSCore #4032]</b> Confirm that <b>Redact From XML</b> can apply static 
+		text to redactions that <b>do not</b> contain exemption codes.
+<p>
+  	   	<LI><b>[FlexIDSCore #4068]</b> Demo database schema
+	       	<ul>
+			<li>Confirm that the blank database provided with <b>Demo_FLEXIndex</b> has 
+			the correct database schema version.
+			<li>Confirm that the blank database provided with <b>Demo_IDShield</b> has 
+			the correct database schema version.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4106]</b> Confirm that <b>SQL Server Management Studion</b> will 
+		install on 64-bit operating systems from the DemoShield application.
+<p>
+  	   	<LI><b>[FlexIDSCore #4192]</b> Confirm that the <b>FLEX Index</b> utilities Start 
+		menu item is properly spelled as <b>Feedback Manager</b>.
+<p>
+      		<li><b>[FlexIDSCore #4196]</b> Confirm that the <b>LoopFinder</b> automated tests 
+		all pass.
+<p>
+      		<li><b>[FlexIDSCore #4198]</b> Confirm that <b>toggled off</b> manual redactions 
+		are not added to the <b>IDShieldData</b> table.
+<p>
+  	   	<LI><b>Select page region</b>
+	       	<ul>
+			<li><b>[FlexIDSCore #3944, #4100]</b> Confirm that the property page allows 
+			<b>Exclude</b> with <b>All pages</b>.
+	  	   	<LI><b>[FlexIDSCore #4195]</b> Confirm that automated test results for 
+			the preprocessor and the value finder all pass.
+	       	</ul>
+<p>
+  	   	<LI><b>Surround context</b>
+	       	<ul>
+			<li><b>[FlexIDSCore #4075]</b> Confirm that the <b>For the following data 
+			types</b> edit box properly validates user input for the specified data types.
+	  	   	<LI><b>[FlexIDSCore #4185]</b> Confirm that <b>SurroundContextSession</b> 
+			metadata is output by the <b>Redaction: Create metadata xml</b> task.
+	       	</ul>
+<p>
+  	   	<LI><b>Various reports</b>
+	       	<ul>
+	      		<li>Confirm that the <b>ID Shield list of documents verified by specific user</b> 
+			report works properly.  Also confirm that the correct thumbnail image is 
+			displayed.
+	      		<li>Confirm that the <b>ID Shield redaction counts (by document)</b> 
+			report works properly.  Also confirm that the correct thumbnail image is 
+			displayed.
+	      		<li>Confirm that the <b>ID Shield verification document, page, redaction counts 
+			(by user)</b> report works properly.  *Also confirm that the correct thumbnail 
+			image is displayed.
+	      		<li><b>[FlexIDSCore #3722]</b> Confirm that the <b>ID Shield verification times 
+			and rates (by user)</b> works properly.
+	      		<li><b>[FlexIDSCore #4188]</b> Confirm that the <b>ID Shield project summary</b> 
+			report works properly with verification data from multiple users on multiple 
+			machines.
+	      		<li><b>[FlexIDSCore #4189]</b> Confirm that the border around the filename in 
+			the <b>ID Shield redaction counts (by document)</b> report is correct.
+	      		<li><b>[FlexIDSCore #4190, #4199]</b> ID Shield verification document, page and 
+			redaction counts (by user)
+			<ul>
+				<li>Verify several documents as multiple users.
+				<li>Modify the found data so that some previously sensitive documents 
+				are no longer sensitive.
+				<li>Include some manual redactions.
+				<li>Confirm that the report provides correct results.
+				<li>Confirm that the results include only the data from the last time 
+				an image was verified.
+			</ul>
+	      		<li><b>[FlexIDSCore #4191]</b> Confirm that the <b>ID Shield verification times 
+			and rates (by user)</b> includes the <b>*</b> footnote.
+	       	</ul>
+<p>
+      		<li><b>Verification UI</b>
+		<ul>
+	      		<li><b>[FlexIDSCore #3626]</b> Confirm that if one of the required commit 
+			settings has not been met when advancing to a new document, the user is 
+			directed to the missing requirement.
+	      		<li><b>[FlexIDSCore #3775]</b> Confirm that the <b>Page summary</b> grid has 
+			proper control spacing after vertical resizing.
+	      		<li><b>[FlexIDSCore #3836]</b> Confirm that the toolbar button for <b>Previous 
+			redaction</b> is disabled for the first entry in the Grid window.
+	      		<li><b>[FlexIDSCore #3858]</b> Confirm that <b>Page summary</b> grid cells 
+			stay properly sized when the Data window is resized.
+	      		<li><b>[FlexIDSCore #3994]</b> Confirm that no gaps are present between the 
+			redaction border and the selection border.
+	      		<li><b>[FlexIDSCore #4051]</b> Confirm that an appropriate warning message 
+			is displayed when a redaction is deleted.  Note that a different warning 
+			message is displayed when a redaction is toggled off.
+	      		<li><b>[FlexIDSCore #4121]</b> Confirm that size of the verification history 
+			is determined by the <b>HKCU/Software/Extract 
+			Systems/AttributeFinder/IndustrySpecific/Redaction/RedactionCustomComponents/NumPreviousDocsToQueue</b>
+			registry key.
+	      		<li><b>[FlexIDSCore #4184]</b> Resizing redactions
+			<ul>
+				<li>Verify an image.
+				<li>Rotate the image 270 degrees clockwise.
+				<li>Draw a manual redaction.
+				<li>Resize the redaction using the corner grip handles.
+				<li>Confirm that resizing works as expected.
+			</ul>
+	      		<li><b>[FlexIDSCore #4186]</b> Shortcuts with Type combo active
+			<ul>
+				<li>Verify an image.
+				<li>Create a manual redaction.
+				<li>Set the type to <b>TaxID</b>.
+				<li>Click <b>Ctrl+S</b>.
+				<li>Confirm that verification results are saved.
+				<li>Confirm that the manual redaction type remains <b>TaxID</b>.
+			</ul>
+	       	</ul>
+    	</ul>
+<p>
+	<LI><h3>Descriptions of LegacyRCAndUtils Changes</h3>
+       	<ul>
+  	   	<LI><b>[LegacyRC #5242]</b> Core: Archive or restore associated file
+	       	<ul>
+	      		<li>Confirm that the tag selector button associated with <b>Root of 
+			archive folder</b> works properly.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5791]</b> Confirm that <b>.TIF</b> files are associated with 
+		<b>ImageViewer.exe</b> after FLEX Index installation.
+<p>
+  	   	<LI><b>[LegacyRC #5792, #5793, #5794]</b> Bad exception log
+	       	<ul>
+	      		<li>Open the exception log at 
+			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5792</b> using 
+			<b>Notepad.exe</b> or another text editor.
+			<li>Confirm that some exception lines are incomplete or corrupt.
+			<li>Open the UEX file using <b>UEXViewer.exe</b>.
+			<li>Confirm that the incomplete lines are presented as 
+			<b>**Unparseable exception**</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>Various reports</b>
+	       	<ul>
+	      		<li><b>[LegacyRC #5256]</b> Confirm that the <b>Summary of processing times (by 
+			action)</b> report has correct DB info if run against an empty database.  Also 
+			confirm that the thumbnail image is correct.
+	      		<li><b>[LegacyRC #5401]</b> Confirm that the thumbnail image for the <b>Summary of 
+			actions and associated ... page and document counts</b> report is correct.
+	      		<li><b>[LegacyRC #5635]</b> Confirm that the <b>List of file action comments</b> 
+			report has the following items corrected.
+			<ul>
+				<li>Bottom part of main table has a border
+				<li>Bottom border of all blue rows does not extend out to the right
+				<li>Also test this report with at least two pages worth of comments
+				<li>Also test this report with a long comment that extends to at least 
+				two lines
+			</ul>
+	      		<li><b>[LegacyRC #5635]</b> Confirm that the <b>List of all tags in the project</b> 
+			report has the following items corrected
+			<ul>
+				<li>Tag list header does not extend out to the left
+			</ul>
+	      		<li><b>[LegacyRC #5635]</b> Confirm that the <b>Usage report during custom date 
+			range</b> report has the following items corrected
+			<ul>
+				<li>Line dividing <b>Total:</b> and <b>Average:</b> rows does not extend 
+				out to the right
+			</ul>
+	      		<li><b>[LegacyRC #5643]</b> Confirm that the <b>List of all tagged documents</b> 
+			report has enough space for the DB info and tag titles.
+	  	   	<LI><b>[LegacyRC #5743]</b> Image Viewer subimages
+			<ul>
+				<li>Open an image in the Image Viewer.
+				<li>Open one or more subimages.
+				<li>Confirm that the parent <b>Image Viewer</b> can be closed without error.
+			</ul>
+	      		<li><b>[LegacyRC #5786]</b> Confirm that files with long filenames are properly 
+			displayed on the <b>List of all skipped documents in the project</b> report.
+	      		<li><b>[LegacyRC #5796]</b> Confirm that installation of <b>Extract Systems LM</b> 
+			requests administrator privileges.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h3>Descriptions of Miscellaneous Changes</h3>
+       	<ul>
+  	   	<LI><b>Overwrite of Interop DLLs with new install</b>
+	       	<ul>
+			<li>Uninstall a previous build.
+			<li>Do not delete the leftover <b>*.Interop.dll</b> files from CommonComponents.
+			<li>Install a newer build.
+			<li>Confirm that the various Interop DLLs are overwritten with the corresponding 
+			new versions.
+	       	</ul>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
