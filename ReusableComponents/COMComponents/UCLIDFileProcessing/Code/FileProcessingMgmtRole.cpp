@@ -2087,7 +2087,10 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 			// message is removed
 			if (pFPM->m_hWndOfUI != NULL)
 			{
-				::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_ACTIVE, 0, 0);
+				// Pass 1 as WPARAM to indicate that an Application Trace about
+				// processing becoming active at this point should not be logged
+				// [LRCAU #5805]
+				::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_ACTIVE, 1, 0);
 			}
 
 			// Notify the FAM that processing is complete

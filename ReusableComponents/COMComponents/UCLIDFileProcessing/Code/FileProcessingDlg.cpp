@@ -1187,8 +1187,8 @@ LRESULT FileProcessingDlg::OnScheduleActive(WPARAM wParam, LPARAM lParam)
 		setCurrFPSFile(m_strCurrFPSFilename);
 
 		// This method may be called after processing has stopped. Only log an application trace
-		// if the FAM is currently running.
-		if (asCppBool(getFPM()->ProcessingStarted))
+		// if the FAM is currently running and wParam != 1 [LRCAU #5805].
+		if (asCppBool(getFPM()->ProcessingStarted) && wParam != 1)
 		{
 			UCLIDException ue("ELI29904",
 				"Application trace: File Action Manager processing now active per schedule.");
