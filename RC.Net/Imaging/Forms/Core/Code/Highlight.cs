@@ -7,6 +7,11 @@ using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Windows.Forms;
 using System.Xml;
+using UCLID_COMUTILSLib;
+
+using EOrientation = UCLID_RASTERANDOCRMGMTLib.EOrientation;
+using SpatialPageInfo = UCLID_RASTERANDOCRMGMTLib.SpatialPageInfo;
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
 namespace Extract.Imaging.Forms
 {
@@ -42,7 +47,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The minimum length in image pixels a highlight can be during an interactive resize.
         /// </summary>
-        const int _MINIMUM_LENGTH = 10;
+        const int _MINIMUM_LENGTH = 1;
 
         #endregion Constants
 
@@ -305,6 +310,16 @@ namespace Extract.Imaging.Forms
                 {
                     _height = MinSize.Height;
                 }
+
+                // Create a temporary raster zone to ensure that highlight
+                // will be rendered and saved the same way (ie. WYSIWYG)
+                // TODO: This code can be removed when the SpotRecognitionWindow is retired for 
+                // the .Net ImageViewer and the SpatialString code that adjusts the endpoints 
+                // onto the page is also removed.
+                RasterZone zone = GetTempRasterZone();
+                _startPoint = new Point(zone.StartX, zone.StartY);
+                _endPoint = new Point(zone.EndX, zone.EndY);
+                _height = zone.Height;
 
                 // Calculate the region
                 CalculateRegion();
@@ -631,6 +646,61 @@ namespace Extract.Imaging.Forms
         #region Methods
 
         /// <summary>
+        /// Creates a temporary raster zone to ensure the highlight will be saved the same way 
+        /// it is rendered.
+        /// </summary>
+        /// <returns>A temporary raster zone to ensure the highlight will be saved the same way 
+        /// it is rendered.</returns>
+        RasterZone GetTempRasterZone()
+        {
+            SpatialString spatialString = GetTempSpatialString();
+            IUnknownVector vector = spatialString.GetOriginalImageRasterZones();
+            RasterZoneCollection zones = new RasterZoneCollection(vector);
+            return zones[0];
+        }
+
+        /// <summary>
+        /// Creates a temporary spatial string to ensure the highlight will be saved the same way 
+        /// it is rendered.
+        /// </summary>
+        /// <returns>A temporary spatial string to ensure the highlight will be saved the same way 
+        /// it is rendered.</returns>
+        SpatialString GetTempSpatialString()
+        {
+            RasterZone zone = ToRasterZone();
+
+            IUnknownVector zones = new IUnknownVector();
+            zones.PushBack(zone.ToComRasterZone());
+
+            SpatialString spatialString = new SpatialString();
+            spatialString.CreateHybridString(zones, "Temp", "Temp", GetPageInfoMap());
+
+            return spatialString;
+        }
+
+        /// <summary>
+        /// Gets the page info map for the currently open image.
+        /// </summary>
+        /// <returns>The page info map for the currently open image.</returns>
+        LongToObjectMap GetPageInfoMap()
+        {
+            // Iterate over each page of the image.
+            LongToObjectMap pageInfoMap = new LongToObjectMap();
+            ImagePageProperties pageProperties = ImageViewer.GetPageProperties(PageNumber);
+
+            // Create the spatial page info for this page
+            SpatialPageInfo pageInfo = new SpatialPageInfo();
+            int width = pageProperties.Width;
+            int height = pageProperties.Height;
+            pageInfo.SetPageInfo(width, height, EOrientation.kRotNone, 0);
+
+            // Add it to the map
+            pageInfoMap.Set(PageNumber, pageInfo);
+
+            return pageInfoMap;
+        }
+
+        /// <summary>
         /// Paints the highlight within the specified region using the specified 
         /// <see cref="Graphics"/> object.
         /// </summary>
@@ -804,15 +874,14 @@ namespace Extract.Imaging.Forms
                     throw new ExtractException("ELI22027", "Invalid grip handle id.");
                 }
 
-                // Check if the control key is pressed and rotational grip handled is selected
-                if (Control.ModifierKeys == Keys.Control && gripHandleId < 4)
+                // Check if the highlight is being rotated
+                if (GetIsRotation(gripPoints, gripHandleId))
                 {
                     return ExtractCursors.Rotate;
                 }
 
                 // Get the grip handles in client coordinates
                 base.ImageViewer.Transform.TransformPoints(gripPoints);
-
 
                 // Return the appropriate resize cursor
                 bool cornerResize = gripHandleId >= 4;
@@ -950,13 +1019,18 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                // Determine whether the highlight is being rotated
-                bool isRotation = Control.ModifierKeys == Keys.Control;
+                // Store the original spatial data
+                Store();
 
                 // Get the grip handles in image and client coordinates
                 PointF[] imageGrips = GetGripPoints();
                 PointF[] clientGrips = (PointF[])imageGrips.Clone();
                 base.ImageViewer.Transform.TransformPoints(clientGrips);
+
+                // The highlight is being rotated if:
+                // 1) The side of a rectangular highlight is clicked with the CTRL key OR
+                // 2) The start or end point of an angular highlight is clicked
+                bool isRotation = GetIsRotation(imageGrips, gripHandleId);
 
                 // Store the point of reference for the tracking event
                 PointF trackingPoint = new PointF(mouseX, mouseY);
@@ -1009,7 +1083,10 @@ namespace Extract.Imaging.Forms
 
                     // Restructure the highlight so that the selected 
                     // grip handle is the end point of the highlight.
-                    MakeGripHandleEndPoint(imageGrips, gripHandleId);
+                    if (isRotation || imageGrips.Length > 4)
+                    {
+                        MakeGripHandleEndPoint(imageGrips, gripHandleId);
+                    }
                 }
 
                 // Preserve the angularity of the highlight unless it is being rotated
@@ -1035,9 +1112,6 @@ namespace Extract.Imaging.Forms
                     }
                 }
 
-                // Store the original spatial data
-                Store();
-
                 // Store the active highlight vector
                 UpdateHighlightVector();
 
@@ -1057,6 +1131,19 @@ namespace Extract.Imaging.Forms
             {
                 throw ExtractException.AsExtractException("ELI22396", ex);
             }
+        }
+
+        /// <summary>
+        /// Determines whether the current interactive grip handle event is rotation.
+        /// </summary>
+        /// <param name="imageGrips">The coordinates of the grip handles.</param>
+        /// <param name="gripHandleId">The id of the grip handle that was clicked.</param>
+        /// <returns><see langword="true"/> if the grip handle event is rotation; 
+        /// <see langword="false"/> if it is resizing or adjusting the height.</returns>
+        static bool GetIsRotation(PointF[] imageGrips, int gripHandleId)
+        {
+            return imageGrips.Length > 4 
+                       ? gripHandleId < 4 && Control.ModifierKeys == Keys.Control : gripHandleId == 0 || gripHandleId == 2;
         }
 
         /// <summary>
@@ -1101,8 +1188,18 @@ namespace Extract.Imaging.Forms
         void UpdateHighlightVector()
         {
             // Get the vector components of the current highlight
-            float x = _endPoint.X - _startPoint.X;
-            float y = _endPoint.Y - _startPoint.Y;
+            float x, y;
+            if (_originalIsAngular)
+            {
+                PointF[] gripPoints = GetGripPoints();
+                x = gripPoints[3].X - gripPoints[1].X;
+                y = gripPoints[3].Y - gripPoints[1].Y;
+            }
+            else
+            {
+                x = _endPoint.X - _startPoint.X;
+                y = _endPoint.Y - _startPoint.Y;
+            }
 
             // Convert the vector to a unit vector and store it
             float magnitude = (float)Math.Sqrt(x * x + y * y);
@@ -1135,19 +1232,6 @@ namespace Extract.Imaging.Forms
                 {
                     // Update the end point
                     QuietSetEndPoint(Point.Round(mouse[0]));
-
-                    // Check if the control key is still active
-                    if (Control.ModifierKeys != Keys.Control)
-                    {
-                        // Reset the highlight cursor
-                        imageViewer.Cursor = GetResizeCursor(_endPoint, false);
-
-                        // Don't preserve the angularity of the original highlight
-                        _originalIsAngular = true;
-
-                        // Update the highlight vector
-                        UpdateHighlightVector();
-                    }
                 }
                 else if (!_originalIsAngular &&
                          (imageViewer.Cursor == Cursors.SizeNWSE
@@ -1167,13 +1251,14 @@ namespace Extract.Imaging.Forms
                 }
                 else if (imageViewer.Cursor != Cursors.SizeAll)
                 {
-                    // Resize the highlight
-                    ResizeActiveHighlight(mouse[0]);
-
-                    // Check if the adjust highlight tool has been activated
-                    if (Control.ModifierKeys == Keys.Control)
+                    if (_originalIsAngular)
                     {
-                        imageViewer.Cursor = ExtractCursors.ActiveRotate;
+                        AdjustHeight(mouse[0]);
+                    }
+                    else
+                    {
+                        // Resize the highlight
+                        ResizeActiveHighlight(mouse[0]);
                     }
                 }
 
@@ -1183,6 +1268,28 @@ namespace Extract.Imaging.Forms
             {
                 throw ExtractException.AsExtractException("ELI22399", ex);
             }
+        }
+
+        /// <summary>
+        /// Adjusts the height of the highlight using the specified mouse position.
+        /// </summary>
+        /// <param name="mouse">The mouse position in logical (image) coordinates.</param>
+        void AdjustHeight(PointF mouse)
+        {
+            PointF center = GetCenterPoint();
+            double x = mouse.X - center.X;
+            double y = mouse.Y - center.Y;
+
+            double dotProduct = Math.Abs(x*_activeHighlightVector.X + y*_activeHighlightVector.Y);
+
+            double distance = GetGripPointDistance();
+            int height = (int)((dotProduct-distance)*2);
+            if (height < 5)
+            {
+                height = 5;
+            }
+
+            QuietSetHeight(height);
         }
 
         /// <summary>
@@ -1289,6 +1396,20 @@ namespace Extract.Imaging.Forms
         internal void QuietSetEndPoint(Point endPoint)
         {
             _endPoint = endPoint;
+
+            if (base.ImageViewer != null)
+            {
+                CalculateRegion();
+            }
+        }
+
+        /// <summary>
+        /// Sets the <see cref="Height"/> without raising any events.
+        /// </summary>
+        /// <param name="height">The height of the highlight in image pixels.</param>
+        internal void QuietSetHeight(int height)
+        {
+            _height = height;
 
             if (base.ImageViewer != null)
             {
@@ -1780,6 +1901,19 @@ namespace Extract.Imaging.Forms
         void GetSelectionZone(out PointF start, out PointF end, out float height)
         {
             // The selection border is around the regular border [FIDSC #3888]
+            double expandBy = GetGripPointDistance();
+
+            GetExpandedZone(expandBy, out start, out end, out height);
+        }
+
+        /// <summary>
+        /// Gets the distance between the side of the highlight and its grip handle in image 
+        /// pixels.
+        /// </summary>
+        /// <returns>The distance between the side of the highlight and its grip handle in image 
+        /// pixels.</returns>
+        double GetGripPointDistance()
+        {
             double expandBy = SelectionPen.Width/2.0;
             if (BorderColor != Color.Transparent)
             {
@@ -1788,8 +1922,7 @@ namespace Extract.Imaging.Forms
 
             // Convert to image coordinates
             expandBy /= ImageViewer.GetScaleFactorY();
-            
-            GetExpandedZone(expandBy, out start, out end, out height);
+            return expandBy;
         }
 
         /// <summary>
@@ -1825,8 +1958,8 @@ namespace Extract.Imaging.Forms
                 // the .Net ImageViewer and the SpatialString code that adjusts the endpoints 
                 // onto the page is also removed.
 
-                // At least one endpoint must be on the page [FIDSC #3746]
-                if (!IsPointOnPage(_startPoint) && !IsPointOnPage(_endPoint))
+                // Both endpoints must be on the page [FIDSC #3746]
+                if (!IsPointOnPage(_startPoint) || !IsPointOnPage(_endPoint))
                 {
                     return false;
                 }
