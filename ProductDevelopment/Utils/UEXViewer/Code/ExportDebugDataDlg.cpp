@@ -97,7 +97,7 @@ void CExportDebugDataDlg::OnBnClickedOk()
 		if ( m_iScope == RADIO_ALL)
 		{
 			int iStartIndex = 0;
-			int iStopIndex = m_pUEXDlg->GetExceptionCount() - 1;
+			int iStopIndex = m_pUEXDlg->GetExceptionCount();
 
 			for (int i = iStartIndex; i < iStopIndex; i++)
 			{
