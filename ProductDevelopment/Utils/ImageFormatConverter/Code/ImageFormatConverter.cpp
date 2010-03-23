@@ -187,6 +187,31 @@ unsigned int getLtPermissions(long nPermissions)
 	return uiLtPermissions;
 }
 //-------------------------------------------------------------------------------------------------
+// Gets the padding distance necessary when converting to a PDF
+int getPadDistance(int iDimension)
+{
+	int iPadDistance = 0;
+	int iMod = iDimension % 25;
+	if (iMod > 8)
+	{
+		iPadDistance = 25 - iMod;
+	}
+	else if (iMod == 1 || iMod == 5)
+	{
+		iPadDistance = 3;
+	}
+	else if (iMod == 2 || iMod == 6)
+	{
+		iPadDistance = 2;
+	}
+	else if (iMod == 3 || iMod == 7)
+	{
+		iPadDistance = 1;
+	}
+
+	return iPadDistance;
+}
+//-------------------------------------------------------------------------------------------------
 // Will perform the image conversion and will also retain the existing annotations
 // if bRetainAnnotations is true.
 // If the output format is a tif then the annotations will remain as annotations
@@ -393,6 +418,44 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 					hFileContainer = NULL;
 				}
 				// else container is NULL, so nothing to save
+
+				// Ensure PDF will load/save with same width and height, may need to pad pixels
+				if (eOutputType == kFileType_Pdf)
+				{
+					// Get the amount of width and height padding needed
+					int iPadWidth = getPadDistance(fileInfo.Width);
+					int iPadHeight = getPadDistance(fileInfo.Height);
+
+					// If padding is necessary, pad the bitmap
+					if (iPadWidth > 0 || iPadHeight > 0)
+					{
+						// Create a new bitmap handle
+						BITMAPHANDLE tmpBmp = {0};
+						LeadToolsBitmapFreeer tmpFree(tmpBmp);
+						nRet = L_CreateBitmap(&tmpBmp, sizeof(BITMAPHANDLE), TYPE_CONV,
+							fileInfo.Width + iPadWidth, fileInfo.Height + iPadHeight,
+							fileInfo.BitsPerPixel, fileInfo.Order, hBitmap.pPalette, TOP_LEFT, NULL, 0);
+						throwExceptionIfNotSuccess(nRet, "ELI29936", "Unable to create empty bitmap.");
+						tmpBmp.XResolution = 300;
+						tmpBmp.YResolution = 300;
+
+						// Set the bitmap to all white pixels
+						nRet = L_FillBitmap(&tmpBmp, RGB(255,255,255));
+						throwExceptionIfNotSuccess(nRet, "ELI29937", "Unable to fill bitmap.");
+
+						// Combine the bitmaps to get the resized bitmap
+						nRet = L_CombineBitmap(&tmpBmp, 0, 0, tmpBmp.Width, tmpBmp.Height, &hBitmap,
+							0, 0, CB_OP_OR, 0);
+						throwExceptionIfNotSuccess(nRet, "ELI29938", "Unable to combine bitmaps.");
+
+						// Free the original bitmap
+						L_FreeBitmap(&hBitmap);
+
+						// Copy back the new larger bitmap
+						nRet = L_CopyBitmap(&hBitmap, &tmpBmp, sizeof(BITMAPHANDLE));
+						throwExceptionIfNotSuccess(nRet, "ELI29939", "Unable to copy bitmap.");
+					}
+				}
 
 				// Set the page number
 				sfOptions.PageNumber = i;
