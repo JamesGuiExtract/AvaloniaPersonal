@@ -22,11 +22,31 @@ Final SCRs </h1>
        	<ul>
   	   	<LI><b>[DotNet #440]</b> Wobbly highlights
 		<ul>
-			<li>Verify an image
-			<li>Draw an angular redaction
-			<li>Click a grip handle on one of the long sides
-			<li>Resize the highlight inward to make a narrow redaction
+			<li>Verify an image.
+			<li>Draw an angular redaction.
+			<li>Click a grip handle on one of the long sides.
+			<li>Resize the highlight inward to make a narrow redaction.
 			<li>Confirm that the highlight does not woblle between angular and rectangular.
+		</ul>
+  	   	<LI><b>[DotNet #445]</b> Highlights on the page
+		<ul>
+			<li>Verify an image
+			<li>Draw an angular redaction to extend off the edge of the page.
+			<li>Confirm that the redaction snaps back such that each end point remains on 
+			the page.
+			<li>Move a highlight.
+			<li>Confirm that each end point remains on the page.
+		</ul>
+  	   	<LI><b>[DotNet #446]</b> Grip handle behavior for highlights
+		<ul>
+			<li>Verify an image with a redaction.
+			<li>Click the start or end grip handle.
+			<li>Confirm that the cursor changes to rotation mode.
+			<li>Confirm that the redaction rotates as the mouse moves.
+			<li>Click the top or bottom grip handle.
+			<li>Confirm that the height changes simultaneously in each direction, the same 
+			way that redaction height changes by pressing <b>+</b> or <b>-</b> while 
+			srawing the redaction.
 		</ul>
        	</ul>
 <p>
@@ -182,6 +202,21 @@ Final SCRs </h1>
 			<li>Open the UEX file using <b>UEXViewer.exe</b>.
 			<li>Confirm that the incomplete lines are presented as 
 			<b>**Unparseable exception**</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5805]</b> FAM processing now active per schedule
+	       	<ul>
+	      		<li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.
+			<li>Confirm that after completion, the exception log does not contain 
+			an entry for <b>File Action Manager now active per schedule</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5808]</b> Export debug data from UEX Viewer
+	       	<ul>
+	      		<li>Open <b>export.uex</b> from 
+			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5808</b>.
+			<li>Export debug data for debug values with the name <b>File</b>.
+			<li>Confirm that <b>3</b> entries are present in the output file.
 	       	</ul>
 <p>
   	   	<LI><b>Various reports</b>
