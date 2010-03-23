@@ -9,4 +9,4 @@ FlexIndexVersion=FlexIndex Ver. 8.0.0.61
 IDShieldOfficeVersion=IDShield Office Ver. 1.0.5.61
 LabDEVersion=LabDE Ver. 1.0.4.61
 RulesVersion=Rules Ver. 2.0.0.61
-FKBVersion=FKB Ver. 10.1+
+FKBVersion=FKB Ver. 10.2
