@@ -27,6 +27,11 @@ public:
 
 	// Returns true if no further testing is necessary and testing should short circuit evaluation.
 	virtual bool test(const string& strName, const string& strValue) = 0;
+
+protected:
+
+	// Returns true if the specified attribute name is a metadata attribute, false otherwise.
+	bool isMetadataName(const string& strName);
 };
 
 // Represents the ORing of a series of attribute testers

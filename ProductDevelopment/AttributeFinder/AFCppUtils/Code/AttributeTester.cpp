@@ -26,6 +26,25 @@ IAttributeTester::~IAttributeTester()
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI25140")
 }
+//-------------------------------------------------------------------------------------------------
+bool IAttributeTester::isMetadataName(const string& strName)
+{
+	if (strName.length() > 0)
+	{
+		if (strName[0] == '_')
+		{
+			// This is metadata if it starts with an underscore
+			return true;
+		}
+		else if (strName == gstrATTRIBUTE_DOCTYPE)
+		{
+			// The document type attribute is metadata
+			return true;
+		}
+	}
+
+	return false;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Attribute Tester
@@ -189,8 +208,8 @@ void NoneDataTypeAttributeTester::reset()
 //-------------------------------------------------------------------------------------------------
 bool NoneDataTypeAttributeTester::test(const string& strName, const string& strValue)
 {
-	// Ignore doctype attributes
-	if (strName != gstrATTRIBUTE_DOCTYPE)
+	// Ignore metadata attributes [FIDSC #4233]
+	if (!isMetadataName(strName))
 	{
 		// Copy the name and if not case sensitive make the string lowercase
 		string strTest = strName;
@@ -225,8 +244,8 @@ AnyDataTypeAttributeTester::AnyDataTypeAttributeTester(const set<string>& setDat
 //-------------------------------------------------------------------------------------------------
 bool AnyDataTypeAttributeTester::test(const string& strName, const string& strValue)
 {
-	// Ignore doctype attributes
-	if (strName != gstrATTRIBUTE_DOCTYPE)
+	// Ignore metadata attributes [FIDSC #4233]
+	if (!isMetadataName(strName))
 	{
 		// Copy the name and if not case sensitive make the string lowercase
 		string strTest = strName;
@@ -277,8 +296,8 @@ void OneOfEachDataTypeAttributeTester::reset()
 //-------------------------------------------------------------------------------------------------
 bool OneOfEachDataTypeAttributeTester::test(const string& strName, const string& strValue)
 {
-	//  Ignore doctype attributes
-	if (strName != gstrATTRIBUTE_DOCTYPE)
+	// Ignore metadata attributes [FIDSC #4233]
+	if (!isMetadataName(strName))
 	{
 		// Copy the name and if not case sensitive make the string lowercase
 		string strTest = strName;
@@ -322,8 +341,8 @@ OnlyAnyDataTypeAttributeTester::OnlyAnyDataTypeAttributeTester(const set<string>
 //-------------------------------------------------------------------------------------------------
 bool OnlyAnyDataTypeAttributeTester::test(const string& strName, const string& strValue)
 {
-	// Ignore doctype attributes
-	if (strName != gstrATTRIBUTE_DOCTYPE)
+	// Ignore metadata attributes [FIDSC #4233]
+	if (!isMetadataName(strName))
 	{
 		// Copy the name and if not case sensitive make the string lowercase
 		string strTest = strName;
