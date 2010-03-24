@@ -20,6 +20,8 @@
 #include <ByteStream.h>
 #include <ByteStreamManipulator.h>
 #include <EncryptionEngine.h>
+#include <RegistryPersistenceMgr.h>
+#include <RegConstants.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -36,6 +38,10 @@ const COLORREF gCOLOR_WHITE = 0xFFFFFF;
 
 // Default jpg compression
 const L_INT giJPG_COMPRESS_DEFAULT = 50;
+
+// Registry settings for whether an image should be expanded or not when converting to PDF
+const string gstrIMAGE_FORMAT_CONVERTER = "\\ImageFormatConverter";
+const string gstrEXPAND_FOR_PDF = "ExpandImageForPdfConversion";
 
 //-------------------------------------------------------------------------------------------------
 // CImageFormatConverterApp
@@ -212,6 +218,17 @@ int getPadDistance(int iDimension)
 	return iPadDistance;
 }
 //-------------------------------------------------------------------------------------------------
+bool expandImageWhenConvertingPdf()
+{
+	RegistryPersistenceMgr regMgr(HKEY_CURRENT_USER, gstrREG_ROOT_KEY + "\\Utilities");
+	if (!regMgr.keyExists(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF))
+	{
+		regMgr.createKey(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF, "1");
+	}
+
+	return regMgr.getKeyValue(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF) == "1";
+}
+//-------------------------------------------------------------------------------------------------
 // Will perform the image conversion and will also retain the existing annotations
 // if bRetainAnnotations is true.
 // If the output format is a tif then the annotations will remain as annotations
@@ -346,6 +363,10 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			// Get the input file name as a char*
 			char* pszInputFile = (char*) strInputFileName.c_str();
 
+			// Whether the bitmap needs to be expanded before converting it to a PDF
+			bool bExpandForPdfConversion =
+				eOutputType == kFileType_Pdf && expandImageWhenConvertingPdf();
+
 			// Handle pages individually to deal with situation where existing annotations
 			// need to be retained
 			for (int i = 1; i <= nPages; i++)
@@ -420,11 +441,15 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 				// else container is NULL, so nothing to save
 
 				// Ensure PDF will load/save with same width and height, may need to pad pixels
-				if (eOutputType == kFileType_Pdf)
+				if (bExpandForPdfConversion)
 				{
 					// Get the amount of width and height padding needed
 					int iPadWidth = getPadDistance(fileInfo.Width);
 					int iPadHeight = getPadDistance(fileInfo.Height);
+
+					// Adjust bitmap resolution to 300x300
+					hBitmap.XResolution = 300;
+					hBitmap.YResolution = 300;
 
 					// If padding is necessary, pad the bitmap
 					if (iPadWidth > 0 || iPadHeight > 0)
