@@ -72,7 +72,17 @@ namespace Extract.Imaging
                 _codecs = codecs;
 
                 // Prevent write access while reading
-                _stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                FileShare sharing = RegistryManager.LockFiles
+                                        ? FileShare.Read : FileShare.ReadWrite | FileShare.Delete;
+                _stream = File.Open(fileName, FileMode.Open, FileAccess.Read, sharing);
+
+                // Log that the image reader was created if necessary
+                if (RegistryManager.LogFileLocking)
+                {
+                    ExtractException ee = new ExtractException("ELI29941",
+                        "Application trace: Image reader created");
+                    ee.Log();
+                }
 
                 using (new PdfLock())
                 {
@@ -327,6 +337,13 @@ namespace Extract.Imaging
                 {
                     _stream.Dispose();
                     _stream = null;
+                }
+                // Log that the lock was released if necessary
+                if (RegistryManager.LogFileLocking)
+                {
+                    ExtractException ee = new ExtractException("ELI29944",
+                        "Application trace: Image reader disposed");
+                    ee.Log();
                 }
             }
 

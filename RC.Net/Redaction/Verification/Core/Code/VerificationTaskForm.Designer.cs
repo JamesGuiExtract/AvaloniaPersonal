@@ -29,6 +29,13 @@ namespace Extract.Redaction.Verification
                     _processingStream.Dispose();
                     _processingStream = null;
                 }
+                // Log that the lock was released if necessary
+                if (RegistryManager.LogFileLocking)
+                {
+                    ExtractException ee = new ExtractException("ELI29943",
+                        "Application trace: Processing document unlocked");
+                    ee.Log();
+                }
                 if (_inputEventTracker != null)
                 {
                     _inputEventTracker.Dispose();

@@ -1236,8 +1236,19 @@ namespace Extract.Redaction.Verification
                     if (!IsInHistory)
                     {
                         // Prevent outside sources from writing to the processing document
-                        _processingStream = File.Open(_savedMemento.DisplayImage, FileMode.Open, 
-                            FileAccess.Read, FileShare.Read);
+                        if (RegistryManager.LockFiles)
+                        {
+                            _processingStream = File.Open(_savedMemento.DisplayImage, FileMode.Open,
+                                FileAccess.Read, FileShare.Read);
+                        }
+
+                        // Log that the document was locked if necessary
+                        if (RegistryManager.LogFileLocking)
+                        {
+                            ExtractException ee = new ExtractException("ELI29942",
+                                "Application trace: Processing document locked");
+                            ee.Log();
+                        }
                     }
 
                     // Go to the previous document
@@ -1306,6 +1317,14 @@ namespace Extract.Redaction.Verification
                 {
                     _processingStream.Dispose();
                     _processingStream = null;
+                }
+
+                // Log that the document was unlocked if necessary
+                if (RegistryManager.LogFileLocking)
+                {
+                    ExtractException ee = new ExtractException("ELI29945",
+                        "Application trace: Processing document unlocked");
+                    ee.Log();
                 }
             }
         }

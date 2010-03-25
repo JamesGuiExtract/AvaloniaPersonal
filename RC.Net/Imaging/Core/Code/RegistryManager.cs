@@ -34,6 +34,16 @@ namespace Extract.Imaging
         #region RegistryManager Keys
 
         /// <summary>
+        /// The key for logging image-related file locking.
+        /// </summary>
+        static readonly string _LOG_LOCKING_KEY = "Log image locking";
+
+        /// <summary>
+        /// The key for image-related file locking.
+        /// </summary>
+        static readonly string _LOCK_IMAGE_FILES_KEY = "Lock image files";
+
+        /// <summary>
         /// The key for the alignment of the anchor point relative to a Bates number.
         /// </summary>
         static readonly string _BATES_ANCHOR_ALIGNMENT_KEY = "Bates anchor alignment";
@@ -260,6 +270,42 @@ namespace Extract.Imaging
         #endregion RegistryManager Fields
 
         #region RegistryManager Properties
+
+        /// <summary>
+        /// Gets whether to log image-related file locking.
+        /// </summary>
+        /// <value>Whether to log image-related file locking.</value>
+        public static bool LogFileLocking
+        {
+            get
+            {
+                int? registryValue = _userExtractImaging.GetValue(_LOG_LOCKING_KEY) as int?;
+                if (registryValue == null)
+                {
+                    _userExtractImaging.SetValue(_LOG_LOCKING_KEY, 0, RegistryValueKind.DWord);
+                }
+
+                return registryValue == 1;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether to lock image files when reading.
+        /// </summary>
+        /// <value>Whether to lock image file when reading.</value>
+        public static bool LockFiles
+        {
+            get
+            {
+                int? registryValue = _userExtractImaging.GetValue(_LOCK_IMAGE_FILES_KEY) as int?;
+                if (registryValue == null)
+                {
+                    _userExtractImaging.SetValue(_LOCK_IMAGE_FILES_KEY, 0, RegistryValueKind.DWord);
+                }
+
+                return registryValue == 1;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the next Bates number.
