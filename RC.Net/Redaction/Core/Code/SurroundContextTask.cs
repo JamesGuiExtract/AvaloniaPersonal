@@ -222,29 +222,26 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Removes any zones in the specified collection that are completely contained by the 
-        /// other zones.
+        /// Removes any zone in the specified collection that is completely contained by one 
+        /// other zone.
         /// </summary>
         /// <param name="zones">The collection of zones from which to remove duplicates.</param>
         static void RemoveDuplicates(RasterZoneCollection zones)
         {
             for (int i = 0; i < zones.Count; i++)
             {
-                RasterZone zoneI = zones[i];
-
-                double overlapArea = 0.0;
                 for (int j = 0; j < zones.Count; j++)
                 {
                     if (i != j)
                     {
-                        overlapArea += zoneI.GetAreaOverlappingWith(zones[j]);
+                        double overlapArea = zones[i].GetAreaOverlappingWith(zones[j]);
+                        if (overlapArea >= zones[i].Area())
+                        {
+                            zones.RemoveAt(i);
+                            i--;
+                            break;
+                        }
                     }
-                }
-
-                if (overlapArea >= zoneI.Area())
-                {
-                    zones.RemoveAt(i);
-                    i--;
                 }
             }
         }
