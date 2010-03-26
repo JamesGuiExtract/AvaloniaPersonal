@@ -223,7 +223,7 @@ bool expandImageWhenConvertingPdf()
 	RegistryPersistenceMgr regMgr(HKEY_CURRENT_USER, gstrREG_ROOT_KEY + "\\Utilities");
 	if (!regMgr.keyExists(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF))
 	{
-		regMgr.createKey(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF, "0");
+		regMgr.createKey(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF, "1");
 	}
 
 	return regMgr.getKeyValue(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF) == "1";
@@ -468,9 +468,8 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 						nRet = L_FillBitmap(&tmpBmp, RGB(255,255,255));
 						throwExceptionIfNotSuccess(nRet, "ELI29937", "Unable to fill bitmap.");
 
-						// Combine the bitmaps to get the resized bitmap
-						nRet = L_CombineBitmap(&tmpBmp, 0, 0, tmpBmp.Width, tmpBmp.Height, &hBitmap,
-							0, 0, CB_OP_OR, 0);
+						// Copy in the original image pixels
+						nRet = L_CopyBitmapRect(&tmpBmp, &hBitmap, sizeof(BITMAPHANDLE), 0, 0, fileInfo.Width, fileInfo.Height);
 						throwExceptionIfNotSuccess(nRet, "ELI29938", "Unable to combine bitmaps.");
 
 						// Free the original bitmap
