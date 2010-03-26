@@ -223,7 +223,7 @@ bool expandImageWhenConvertingPdf()
 	RegistryPersistenceMgr regMgr(HKEY_CURRENT_USER, gstrREG_ROOT_KEY + "\\Utilities");
 	if (!regMgr.keyExists(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF))
 	{
-		regMgr.createKey(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF, "1");
+		regMgr.createKey(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF, "0");
 	}
 
 	return regMgr.getKeyValue(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF) == "1";
