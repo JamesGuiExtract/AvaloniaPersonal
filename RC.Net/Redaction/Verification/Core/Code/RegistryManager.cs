@@ -75,7 +75,8 @@ namespace Extract.Redaction.Verification
                 int? registryValue = _userExtractImaging.GetValue(_LOCK_IMAGE_FILES_KEY) as int?;
                 if (registryValue == null)
                 {
-                    _userExtractImaging.SetValue(_LOCK_IMAGE_FILES_KEY, 0, RegistryValueKind.DWord);
+                    _userExtractImaging.SetValue(_LOCK_IMAGE_FILES_KEY, 1, RegistryValueKind.DWord);
+                    registryValue = 1;
                 }
 
                 return registryValue == 1;
