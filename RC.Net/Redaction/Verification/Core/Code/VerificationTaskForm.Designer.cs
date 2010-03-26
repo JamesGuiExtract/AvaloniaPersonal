@@ -46,6 +46,14 @@ namespace Extract.Redaction.Verification
                     _findOrRedactForm.Dispose();
                     _findOrRedactForm = null;
                 }
+                if (_thumbnailViewer != null)
+                {
+                    _thumbnailViewer.Dispose();
+                }
+                if (_imageViewer != null)
+                {
+                    _imageViewer.Dispose();
+                }
             }
 
             // Release unmanaged resources
