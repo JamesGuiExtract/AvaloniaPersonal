@@ -1,0 +1,97 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.0 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield  8.0 Testing<br> 
+Final final SCRs<br>
+<img src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<UL>
+   	<LI><b>[FlexIDSCore #3722]</b> Thumbnails for ID Shield reports
+       	<ul>
+      		<li>Exercise verification.
+		<li>Exercise each <b>ID Shield</b> report.
+		<li>Confirm that each thumbnail is an accurate representation of the 
+		actual report.
+       	</ul>
+<p>
+	<li><b>[FlexIDSCore #4084]</b> WYSIWYG redactions
+	<ul>
+      		<li>Exercise verification for the PDF and VOA file located at 
+		<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4084</b>.
+		<li>Confirm that the redactions provided during verification exactly match 
+		the final output redactions.
+       	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4230]</b> Zone disappears for surround context
+       	<ul>
+		<li>Prepare an FPS file to include verification and extending redactions to 
+		surround context.
+		<li>Verify some images.
+		<ul>
+			<li>Draw manual redactions to cover portions of words.
+			<li>Draw manual redactions to extend beyond the ends of words.
+		</ul>
+		<li>Extend redactions to surround context, adjusting redaction height.
+		<li>Review the resulting VOA files to confirm that overlapping redaction zones 
+		exist.
+		<li>Create redacted images.
+		<li>Review the redacted images and confirm that none of the original redactions 
+		have been discarded.
+       	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4233]</b> Metadata attributes ignored by ID Shield data file 
+	condition
+       	<ul>
+		<li>Exercise verification for <b>Demo_IDShield</b> images such as TestImage001.tif 
+		that contain only HCData items.
+		<li>Create a redacted output file.
+		<li>Confirm that the VOA file includes one or more metadata nodes such as 
+		<b>_RedactedFileOutputSession</b>.
+		<li>Create an FPS file to re-process the original TIF with a conditional 
+		processing task to copy <b>&lt;SourceDocName&gt;</b> to 
+		<b>&lt;SourceDocName&gt;.123</b> if the ID Shield data file condition is true 
+		for <b>file contains ONLY ANY of HCData</b>.
+		<li>Exercise the FPS file.
+		<li>Confirm that the file copy occurs as expected.
+       	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #4246]</b> Verification locking files while the FAM remains active
+       	<ul>
+		<li>Create a folder with 3 ID Shield demo images.
+		<li>Create an FPS file to queue the 3 files - with Force processing turned on.
+		<li>Add a <b>Redaction: Verify sensitive data</b> task to the FPS file.
+		<li>Run the FPS file and stop processing for the first file while leaving the 
+		FAM active.
+		<li>Use <b>Windows Explorer</b> to confirm that the first file can be renamed.
+		<li>Start processing again in the FAM and save the first image.
+		<li>Stop processing for the second image while leaving the FAM active.
+		<li>Use <b>Windows Explorer</b> to confirm that the second file can be renamed.
+		<li>Start processing again in the FAM and save the second image.
+		<li>Stop processing for the third image while leaving the FAM active.
+		<li>Use <b>Windows Explorer</b> to confirm that the third file can be renamed.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #5822]</b> ImageViewer swipes on PDF documents
+       	<ul>
+		<li>Use <b>ImageViewer.exe</b> to open a PDF.
+		<li>Confirm that swiping with the angular highlight tool produces OCR output.
+		<li>Confirm that swiping with the rectangular highlight tool produces OCR output.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #5823]</b> Multipage TIF converts to blank PDF
+       	<ul>
+		<li>Use <b>ImageFormatConverter.exe</b> to convert the image from 
+		<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5823</b> to a PDF.
+		<li>Confirm that the output PDF does not have blank pages.
+       	</ul>
+</UL>
+</BODY>
+</HTML>
