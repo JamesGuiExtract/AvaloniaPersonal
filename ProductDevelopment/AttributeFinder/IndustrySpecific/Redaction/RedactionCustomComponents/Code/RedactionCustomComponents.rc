@@ -428,9 +428,8 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,219,200,8
     CONTROL         "Apply redactions as annotations in output file (tiff only)",IDC_CHECK_REDACTIONS_AS_ANNOTATIONS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,233,200,8
-	CONTROL			"Enable PDF security", IDC_CHECK_PDF_SECURITY, "Button",
-					BS_AUTOCHECKBOX | WS_TABSTOP,12,247,75,10
-	PUSHBUTTON		"Settings...", IDC_BTN_PDF_SECURITY_SETTINGS, 94,246,60,12
+    CONTROL         "Enable PDF security",IDC_CHECK_PDF_SECURITY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,247,78,10
+    PUSHBUTTON      "Settings...",IDC_BTN_PDF_SECURITY_SETTINGS,94,246,60,12
     PUSHBUTTON      "Redaction text and color settings...",IDC_BUTTON_REDACT_APPEARANCE,11,267,124,14
 END
 

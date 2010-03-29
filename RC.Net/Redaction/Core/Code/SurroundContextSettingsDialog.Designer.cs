@@ -129,7 +129,7 @@ namespace Extract.Redaction
             0,
             0});
             this._maxWordsNumericUpDown.Name = "_maxWordsNumericUpDown";
-            this._maxWordsNumericUpDown.Size = new System.Drawing.Size(35, 20);
+            this._maxWordsNumericUpDown.Size = new System.Drawing.Size(38, 20);
             this._maxWordsNumericUpDown.TabIndex = 2;
             this._maxWordsNumericUpDown.Value = new decimal(new int[] {
             2,
