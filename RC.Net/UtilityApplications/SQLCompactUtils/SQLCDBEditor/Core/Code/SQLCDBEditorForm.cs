@@ -70,7 +70,7 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         BindingSource bindingSource = new BindingSource();
 
-        #endregion Fields
+		#endregion Fields
 
         #region Constructors 
         
@@ -354,23 +354,23 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// Method loads the given table into the dataGridView.
         /// </summary>
-        /// <param name="strTableName">Name of the table to load.</param>
+        /// <param name="tableName">Name of the table to load.</param>
         [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "commandBuilder")]
         [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
-        void LoadTable(string strTableName)
+        void LoadTable(string tableName)
         {
             DataTable table;
 
             // Check if the table to be loaded has been loaded before
-            if (!String.IsNullOrEmpty(strTableName))
+            if (!String.IsNullOrEmpty(tableName))
             {
-				if (!_dictionaryOfTables.TryGetValue(strTableName, out table))
+				if (!_dictionaryOfTables.TryGetValue(tableName, out table))
 				{
 					// Table has not been loaded before so load it
 					table = new DataTable();
 
 					// Setup dataAdapter to get the data
-					SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter("SELECT * FROM " + strTableName, _connection);
+					SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter("SELECT * FROM " + tableName, _connection);
 
 					// Setup of the commands for Select, Update, and Delete
 					SqlCeCommandBuilder commandBuilder = new SqlCeCommandBuilder(dataAdapter);
@@ -378,12 +378,73 @@ namespace Extract.SQLCDBEditor
 					// Fill the table with the data from the dataAdapter
 					dataAdapter.Fill(table);
 
+					// Fill the schema for the table for the database
+					dataAdapter.FillSchema(table, SchemaType.Source);
+
+					// Check for auto increment fields and default column values
+					foreach (DataColumn c in table.Columns)
+					{
+						// Get the information for the current column
+						using (SqlCeCommand sqlcmd = new SqlCeCommand(
+							"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" +
+							tableName + "' AND COLUMN_NAME = '" + c.ColumnName + "'", _connection))
+						{
+							using (SqlCeResultSet columnsResult = 
+								sqlcmd.ExecuteResultSet(ResultSetOptions.Scrollable))
+							{
+								int colPos;
+
+								// Get the first record in the result set - should only be one
+								if (columnsResult.ReadFirst())
+								{
+									// If the column is an auto increment column set the seed value to next
+									// auto increment value for the column
+									if (c.AutoIncrement)
+									{
+										// Get the position of the AUTOINC_NEXT field
+										colPos = columnsResult.GetOrdinal("AUTOINC_NEXT");
+
+										// Set the seed to the value in the AUTOINC_NEXT field
+										c.AutoIncrementSeed = (long)columnsResult.GetValue(colPos);
+									}
+
+									// Set the default for a column if one is defined
+									colPos = columnsResult.GetOrdinal("COLUMN_HASDEFAULT");
+									if (columnsResult.GetBoolean(colPos))
+									{
+										// Set the default value for the column
+										colPos = columnsResult.GetOrdinal("COLUMN_DEFAULT");
+										c.DefaultValue = columnsResult.GetValue(colPos);
+									}
+								}
+							}
+						}
+					}
+
 					// Add the new adapter to the list of adapters
-					_dictionaryOfAdapters.Add(strTableName, dataAdapter);
+					_dictionaryOfAdapters.Add(tableName, dataAdapter);
 
 					// Add the new table to the list of tables
-	               _dictionaryOfTables.Add(strTableName, table);
+	               _dictionaryOfTables.Add(tableName, table);
 				}
+
+				// Check for unique constraints
+				bool _hasUniqueContraint = false;
+				foreach (Constraint c in table.Constraints)
+				{
+					// Check if current constraint is unique					
+					if (c is UniqueConstraint)
+					{
+						// set Flag to true;
+						_hasUniqueContraint = true;
+						break;
+					}
+				}
+
+				// Set the ReadOnly and AllowUserToAddRows so that if no unique constraint
+				// the grid cannot be modified and rows cannot be added
+				dataGridView.ReadOnly = !_hasUniqueContraint;
+				dataGridView.AllowUserToAddRows = _hasUniqueContraint;
             }
 			else
             {
@@ -392,6 +453,9 @@ namespace Extract.SQLCDBEditor
             }
             // Set the bindingSoure dataSource to the table
             bindingSource.DataSource = table;
+			
+			// Reset the current cell
+			dataGridView.CurrentCell = null;
         }
 
         /// <summary>
