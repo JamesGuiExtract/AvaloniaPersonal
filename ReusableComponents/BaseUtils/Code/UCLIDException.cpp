@@ -77,6 +77,9 @@ string UCLIDException::ms_strSerial = "";
 // [LRCAU #5028 - 11/18/2008 JDS]
 const string gstrLOG_FILE_APP_DATA_PATH = "\\Extract Systems\\LogFiles\\Misc";
 
+// Mutex for protecting access to the log file
+static CMutex mutexLogFile(FALSE, gstrLOG_FILE_MUTEX.c_str());
+
 //-------------------------------------------------------------------------------------------------
 // Exported encrypt method for P/Invoke calls from C#
 //-------------------------------------------------------------------------------------------------
@@ -811,6 +814,70 @@ const vector<string>& UCLIDException::getPossibleResolutions() const
 	return m_vecResolution;
 }
 //-------------------------------------------------------------------------------------------------
+void UCLIDException::renameLogFile(const string& strFileName, bool bUserRenamed,
+								   const string& strComment, bool bThrowExceptionOnFailure)
+{
+	try
+	{
+		validateFileOrFolderExistence(strFileName, "ELI29950");
+
+		// Compute the date/time prefix string
+		SYSTEMTIME	st;
+		GetLocalTime( &st );
+		CString zDateTimePrefix;
+		zDateTimePrefix.Format( "%4d-%02d-%02d %02dh%02dm%02d.%03ds ",
+			st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds );
+
+		// compute the full path to the file to which this file needs to be renamed
+		string strRenameFileTo = getDirectoryFromFullPath(strFileName);
+		strRenameFileTo += "\\";
+		strRenameFileTo += (LPCTSTR) zDateTimePrefix;
+		strRenameFileTo += getFileNameFromFullPath(strFileName);
+
+		// Mutex around log file access
+		CSingleLock lg(&mutexLogFile, TRUE);
+
+		// perform the rename.  If the rename fails, just ignore it (we don't want to cause more 
+		// errors in the logging process)
+		if (MoveFile(strFileName.c_str(), strRenameFileTo.c_str()) != 0)
+		{
+			string strELICode = "ELI14818";
+			string strMessage = "Current log file was time stamped and renamed.";
+			if (bUserRenamed)
+			{
+				strELICode = "ELI29952";
+				strMessage = "User renamed log file.";
+			}
+
+			// log an entry in the new log file indicating the file has been renamed.
+			UCLIDException ue(strELICode, strMessage);
+			ue.addDebugInfo("RenamedLogFile", strRenameFileTo);
+			if (!strComment.empty())
+			{
+				ue.addDebugInfo("User Comment", strComment);
+			}
+			ue.log(strFileName, false);
+		}
+		// Only need to build an exception and throw it if bThrowExceptionOnFailure == true
+		else if (bThrowExceptionOnFailure)
+		{
+			UCLIDException uex("ELI29951", "Unable to rename log file.");
+			uex.addWin32ErrorInfo();
+			uex.addDebugInfo("Log File Name", strFileName);
+			uex.addDebugInfo("New Log File Name", strRenameFileTo);
+			throw uex;
+		}
+	}
+	catch(...)
+	{
+		// Check if the exception should be thrown or just eaten
+		if (bThrowExceptionOnFailure)
+		{
+			throw;
+		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
 void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent) const
 {
 	// Use try/catch block to trap any exception
@@ -868,9 +935,6 @@ void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent) cons
 //-------------------------------------------------------------------------------------------------
 void UCLIDException::saveTo(const string& strFile, bool bAppend) const
 {
-	// Mutex for protecting access to the log file
-	static CMutex mutexLogFile(FALSE, gstrLOG_FILE_MUTEX.c_str());
-
 	try
 	{
 		// Get the output string
@@ -904,29 +968,8 @@ void UCLIDException::saveTo(const string& strFile, bool bAppend) const
 		const unsigned long ulUEX_FILE_SIZE_THRESHOLD = 2000000;
 		if (ullCurrentFileSize >= ulUEX_FILE_SIZE_THRESHOLD)
 		{
-			// Compute the date/time prefix string
-			SYSTEMTIME	st;
-			GetLocalTime( &st );
-			CString zDateTimePrefix;
-			zDateTimePrefix.Format( "%4d-%02d-%02d %02dh%02dm%02d.%03ds ",
-				st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds );
-
-			// compute the full path to the file to which this file needs to be renamed
-			string strRenameFileTo = getDirectoryFromFullPath(strFile);
-			strRenameFileTo += "\\";
-			strRenameFileTo += (LPCTSTR) zDateTimePrefix;
-			strRenameFileTo += getFileNameFromFullPath(strFile);
-
-			// perform the rename.  If the rename fails, just ignore it (we don't want to cause more 
-			// errors in the logging process)
-			if (MoveFile(strFile.c_str(), strRenameFileTo.c_str()))
-			{
-				// log an entry in the new log file indicating the continuation 
-				// from the previous log file
-				UCLIDException ue("ELI14818", "Current log file was time stamped and renamed.");
-				ue.addDebugInfo("RenamedLogFile", strRenameFileTo);
-				ue.log(strFile, false);
-			}
+			// Rename the log file
+			renameLogFile(strFile);
 		}
 
 		// Set the flags for the file open

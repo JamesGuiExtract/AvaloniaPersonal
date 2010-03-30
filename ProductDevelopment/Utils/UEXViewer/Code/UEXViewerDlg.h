@@ -113,6 +113,7 @@ protected:
 	afx_msg void OnCopyELICode();
 	afx_msg void OnNMRclickListUex(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnToolsExportDebugData();
+	afx_msg void OnFileStartNewLogFile();
 
 	DECLARE_MESSAGE_MAP()
 

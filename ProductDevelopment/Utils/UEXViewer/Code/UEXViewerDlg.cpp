@@ -30,6 +30,7 @@
 #include <ClipboardManager.h>
 #include <SuspendWindowUpdates.h>
 #include <TemporaryFileName.h>
+#include <PromptDlg.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -163,6 +164,7 @@ BEGIN_MESSAGE_MAP(CUEXViewerDlg, CDialog)
 	ON_BN_CLICKED(ID_BTN_NEXT_LOG_FILE, &CUEXViewerDlg::OnBnClickedBtnNextLogFile)
 	ON_CBN_SELCHANGE(IDC_COMBO_EXCEPTION_FILE_LIST, &CUEXViewerDlg::OnCbnSelchangeComboExceptionFileList)
 	ON_COMMAND(ID_FILE_REFRESHCURRENTLOGFILE, &CUEXViewerDlg::OnFileRefreshCurrentLogfile)
+	ON_COMMAND(ID_FILE_START_NEW_LOG_FILE, &CUEXViewerDlg::OnFileStartNewLogFile)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_UEX, &CUEXViewerDlg::OnNMRclickListUex)
 	ON_COMMAND(ID_TOOLS_EXPORTDEBUGDATA, &CUEXViewerDlg::OnToolsExportDebugData)
 END_MESSAGE_MAP()
@@ -681,6 +683,22 @@ void CUEXViewerDlg::OnFileRefreshCurrentLogfile()
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16835")
+}
+//-------------------------------------------------------------------------------------------------
+void CUEXViewerDlg::OnFileStartNewLogFile()
+{
+	try
+	{
+		// Prompt the user for a comment
+		PromptDlg dlg("Add Rename Comment", "Comment", "", true, true, true, this);
+		if (dlg.DoModal() == IDOK)
+		{
+			// Rename the log file
+			UCLIDException::renameLogFile(UCLIDException::getDefaultLogFileFullPath(),
+				true, (LPCTSTR) dlg.m_zInput, true);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29953");
 }
 //-------------------------------------------------------------------------------------------------
 void CUEXViewerDlg::OnEditClear() 
@@ -1720,7 +1738,14 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 			setItemText(iIndex, PID_LIST_COLUMN, vecTokens[PID_VALUE]);
 
 			// Get the time value and set the time column
-			long lTime = asLong(vecTokens[TIME_VALUE]);
+			long lTime = 0;
+			try
+			{
+				lTime = asLong(vecTokens[TIME_VALUE]);
+			}
+			catch(...)
+			{
+			}
 			CTime	time( lTime );
 			CString	zTime = lTime > 0 ? time.Format("%m/%d/%Y %H:%M:%S") : "N/A";
 			setItemText( iIndex, TIME_LIST_COLUMN, (LPCTSTR) zTime );

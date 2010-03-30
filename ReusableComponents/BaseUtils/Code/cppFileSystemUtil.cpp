@@ -419,6 +419,9 @@ void createDirectory(const string& strDirectory)
 			//call windows API function to create directory
 			if(CreateDirectory(strTempDir.c_str(), NULL)==0)
 			{
+				// Get the error code
+				DWORD errorCode = GetLastError();
+
 				// if two threads are trying to create the same directory at the same time, 
 				// both threads could have entered the "if (!directoryExists(strTempDir))"
 				// code block above, and one of the threads may have executed the CreateDirectory()
@@ -432,7 +435,9 @@ void createDirectory(const string& strDirectory)
 					strMessage += strDirectory;
 					strMessage += "\" could not be created!\nPlease specify a valid "
 						"and complete path of the directory to create.";
-					throw UCLIDException("ELI00258", strMessage);
+					UCLIDException uex("ELI00258", strMessage);
+					uex.addWin32ErrorInfo(errorCode);
+					throw uex;
 				}
 			}
 		}

@@ -1521,6 +1521,12 @@ STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFile
 			throw ue;
 		}
 
+		// Ensure the output file name is fully qualified
+		strOutFileName = buildAbsolutePath(strOutFileName);
+
+		// Create the directory if needed
+		createDirectory(getDirectoryFromFullPath(strOutFileName));
+
 		// Check License
 		validateLicense();
 

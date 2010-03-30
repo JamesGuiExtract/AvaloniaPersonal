@@ -236,6 +236,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Refresh current log file\tF5", ID_FILE_REFRESHCURRENTLOGFILE
         MENUITEM SEPARATOR
+		MENUITEM "Start &new log file...", ID_FILE_START_NEW_LOG_FILE
+        MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_FILE_EXIT
     END
     POPUP "&Edit"

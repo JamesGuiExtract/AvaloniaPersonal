@@ -313,6 +313,19 @@ public:
 	// ARGS:	None.
 	const vector<NamedValueTypePair>& getDebugVector() const;
 	//----------------------------------------------------------------------------------------------	
+	// PURPOSE: To rename the current log file to a timestamped version and logs an exception
+	//			in the current log file with the specified message and the name of the renamed
+	//			log file in the debug data.
+	// ARGS:	strFileName - The exception file to rename.
+	//			bUserRenamed - Whether the user initiated the log file rename or it was
+	//				auto-renamed.
+	//			strComment - The comment that will be added as debug data in the
+	//				rename exception trace.
+	//			bThrowExceptionOnFailure - Whether an exception should be thrown if the file
+	//				cannot be renamed.
+	static void renameLogFile(const string& strFileName, bool bUserRenamed = false,
+		const string& strComment = "", bool bThrowExceptionOnFailure = false);
+	//----------------------------------------------------------------------------------------------	
 	// PURPOSE: Writes the exception information to UCLIDException.log file
 	// REQUIRE: Nothing
 	// PROMISE: The exception will be logged and the FailureDetectionAndReporting System (FDRS)
