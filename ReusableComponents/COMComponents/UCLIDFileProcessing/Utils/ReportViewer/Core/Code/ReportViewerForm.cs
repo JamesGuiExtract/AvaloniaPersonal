@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -233,6 +234,44 @@ namespace Extract.ReportViewer
             {
                 ExtractException.Display("ELI24746", ex);
             }
+        }
+
+        /// <summary>
+        /// Processes a command key.
+        /// </summary>
+        /// <param name="msg">The window message to process.</param>
+        /// <param name="keyData">The key to process.</param>
+        /// <returns><see langword="true"/> if the character was processed by the control; 
+        /// otherwise, <see langword="false"/>.</returns>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.UnmanagedCode)]
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            try
+            {
+                if (msg.Msg == WindowsMessage.KeyDown
+                    && (keyData != Keys.Control || keyData != Keys.Alt || keyData != Keys.Shift)
+                    && _crystalReportViewer.ReportSource != null)
+                {
+                    if (keyData == Keys.PageDown)
+                    {
+                        _crystalReportViewer.ShowNextPage();
+                        return true;
+                    }
+                    else if (keyData == Keys.PageUp)
+                    {
+                        _crystalReportViewer.ShowPreviousPage();
+                        return true;
+                    }
+                }
+
+                return base.ProcessCmdKey(ref msg, keyData);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29949", ex);
+            }
+
+            return true;
         }
 
         /// <summary>
