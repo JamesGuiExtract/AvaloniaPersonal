@@ -1668,12 +1668,9 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                for (int i = 0; i < _dataGridView.Rows.Count; i++)
+                if (_dataGridView.SelectedRows.Count > 0)
                 {
-                    if (_dataGridView.Rows[i].Selected)
-                    {
-                        return i;
-                    }
+                    return _dataGridView.SelectedRows[0].Index;
                 }
 
                 return -1;
@@ -1695,12 +1692,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                for (int i = _dataGridView.Rows.Count - 1; i >= 0; i--)
+                int count = _dataGridView.SelectedRows.Count;
+                if (count > 0)
                 {
-                    if (_dataGridView.Rows[i].Selected)
-                    {
-                        return i;
-                    }
+                    return _dataGridView.SelectedRows[count - 1].Index;
                 }
 
                 return -1;
@@ -1968,6 +1963,10 @@ namespace Extract.Redaction.Verification
                     {
                         _imageViewer.CursorTool = GetAutoCursorTool();
                     }
+
+                    // Auto select the new layer object [FlexIDSCore #4206]
+                    _imageViewer.LayerObjects.Selection.Clear();
+                    _imageViewer.LayerObjects.Selection.Add(redaction);
                 }
             }
             catch (Exception ex)
@@ -2046,6 +2045,12 @@ namespace Extract.Redaction.Verification
             {
                 // Select the row containing the layer object
                 SelectRowContainingLayerObject(e.LayerObject, true);
+
+                // Ensure the top row in the selection is visible
+                if (_dataGridView.SelectedRows.Count > 0)
+                {
+                    _dataGridView.FirstDisplayedScrollingRowIndex = _dataGridView.SelectedRows[0].Index;
+                }
             }
             catch (Exception ex)
             {
