@@ -152,7 +152,7 @@ namespace SQLServerInfo
                         if (iCurrOption + 1 < args.Length)
                         {
                             // Save the list of servers to the file
-                            OutputToFile(ExtractDB.GetSqlServerList(), args[iCurrOption + 1]);
+                            OutputToFile(SqlDatabaseMethods.GetSqlServerList(), args[iCurrOption + 1]);
                         }
                         else
                         {
@@ -171,7 +171,7 @@ namespace SQLServerInfo
                             if (iCurrOption + 2 < args.Length)
                             {
                                 // Save the list of databases to the file
-                                OutputToFile(ExtractDB.GetDBNameList(args[iCurrOption + 1]), args[iCurrOption + 2]);
+                                OutputToFile(SqlDatabaseMethods.GetDBNameList(args[iCurrOption + 1]), args[iCurrOption + 2]);
                             }
                             else
                             {
