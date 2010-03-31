@@ -10,7 +10,10 @@ using System.Text;
 
 namespace CSharpDatabaseUtilities
 {
-    public static class ExtractDB
+    /// <summary>
+    /// Represents a grouping of methods for accessing SQL databases.
+    /// </summary>
+    public static class SqlDatabaseMethods
     {
         #region Static Public Methods
         
@@ -33,21 +36,22 @@ namespace CSharpDatabaseUtilities
                 SqlDataSourceEnumerator sqldseServers = SqlDataSourceEnumerator.Instance;
 
                 // Get the DataTable of database servers
-                DataTable dtServers = sqldseServers.GetDataSources();
-
-                // Add the servers to the return list
-                foreach (DataRow dr in dtServers.Rows)
+                using (DataTable dtServers = sqldseServers.GetDataSources())
                 {
-                    // Need to build the server string with the server name and the instance name
-                    StringBuilder strBld = new StringBuilder(dr["ServerName"].ToString());
-                    if (dr["InstanceName"].ToString().Length != 0)
+                    foreach (DataRow dr in dtServers.Rows)
                     {
-                        strBld.Append("\\");
-                        strBld.Append(dr["InstanceName"].ToString());
-                    }
+                        // Need to build the server string with the server name and the instance name
+                        StringBuilder strBld = new StringBuilder(dr["ServerName"].ToString());
+                        string instanceName = dr["InstanceName"].ToString();
+                        if (instanceName.Length != 0)
+                        {
+                            strBld.Append("\\");
+                            strBld.Append(instanceName);
+                        }
 
-                    // Add server to the list
-                    serverList.Add(strBld.ToString());
+                        // Add server to the list
+                        serverList.Add(strBld.ToString());
+                    }
                 }
 
                 return serverList.AsReadOnly();
@@ -86,63 +90,62 @@ namespace CSharpDatabaseUtilities
                 sqlConnStrBld.ConnectTimeout = 10;
 
                 // Get the data table of databses
-                DataTable dtDatabases = GetDBDataTable(sqlConnStrBld.ConnectionString);
-
-                // Process the list of databases
-                using (SqlConnection sqlTableConn = new SqlConnection(sqlConnStrBld.ConnectionString))
+                using (DataTable dtDatabases = GetDataTable(sqlConnStrBld.ConnectionString))
                 {
-                    sqlTableConn.Open();
-                    foreach (DataRow dr in dtDatabases.Rows)
+                    using (SqlConnection sqlTableConn = new SqlConnection(sqlConnStrBld.ConnectionString))
                     {
-                        string strDB = dr["database_name"].ToString();
+                        sqlTableConn.Open();
+                        foreach (DataRow dr in dtDatabases.Rows)
+                        {
+                            string strDB = dr["database_name"].ToString();
 
-                        // Need to skip the system databases
-                        if (strDB == "master" || strDB == "model" || strDB == "msdb" || strDB == "tempdb")
-                        {
-                            continue;
-                        }
-
-                        try
-                        {
-                            // Change to that DB
-                            sqlTableConn.ChangeDatabase(strDB);
-                        }
-                        catch (Exception ex)
-                        {
-                            // Log this exception if verbose logging is enabled
-                            if (RegistryManager.VerboseLogging)
+                            // Need to skip the system databases
+                            if (strDB == "master" || strDB == "model" || strDB == "msdb" || strDB == "tempdb")
                             {
-                                ExtractException.Log("ELI23470", ex);
+                                continue;
                             }
 
-                            // If there is an error changing the db, the database should not
-                            // be available for selection, so continue to the next database.
-                            continue;
-                        }
+                            try
+                            {
+                                // Change to that DB
+                                sqlTableConn.ChangeDatabase(strDB);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Log this exception if verbose logging is enabled
+                                if (RegistryManager.VerboseLogging)
+                                {
+                                    ExtractException.Log("ELI23470", ex);
+                                }
 
-                        // Get the tables in that DB
-                        DataTable dtTables = sqlTableConn.GetSchema("Tables");
+                                // If there is an error changing the db, the database should not
+                                // be available for selection, so continue to the next database.
+                                continue;
+                            }
 
-                        // Check for empty database
-                        // Get the rows that have a table type of 'BASE TABLE'
-                        DataRow[] dtExistingTables = dtTables.Select("table_type='BASE TABLE'");
+                            // Get the tables in that DB
+                            using (DataTable dtTables = sqlTableConn.GetSchema("Tables"))
+                            {
+                                DataRow[] dtExistingTables = dtTables.Select("table_type='BASE TABLE'");
 
-                        // if no rows with 'BASE TABLE' type db is empty
-                        if (dtExistingTables.GetLength(0) == 0)
-                        {
-                            // Include the empty database in the list
-                            listResults.Add(dr["database_name"].ToString());
-                        }
+                                // if no rows with 'BASE TABLE' type db is empty
+                                if (dtExistingTables.GetLength(0) == 0)
+                                {
+                                    // Include the empty database in the list
+                                    listResults.Add(strDB);
+                                }
 
-                        // Check for our database
-                        // Get rows that have table name of 'DBInfo'
-                        dtExistingTables = dtTables.Select("table_name='DBInfo'");
+                                // Check for our database
+                                // Get rows that have table name of 'DBInfo'
+                                dtExistingTables = dtTables.Select("table_name='DBInfo'");
 
-                        // if there is one the database is an Extract Database
-                        if (dtExistingTables.GetLength(0) == 1)
-                        {
-                            // Add database to list
-                            listResults.Add(dr["database_name"].ToString());
+                                // if there is one the database is an Extract Database
+                                if (dtExistingTables.GetLength(0) == 1)
+                                {
+                                    // Add database to list
+                                    listResults.Add(strDB);
+                                }
+                            }
                         }
                     }
                 }
@@ -154,10 +157,11 @@ namespace CSharpDatabaseUtilities
                 throw new ExtractException("ELI21248", "Unable to obtain database list.", ex);
             }
         }
-        
-        #endregion
+
+        #endregion Static Public Methods
 
         #region Private Methods
+
         /// <summary>
         /// getDBDataTable returns a DataTable object that contains the databases that are on the server that 
         /// is connected to using given connection string.
@@ -168,7 +172,7 @@ namespace CSharpDatabaseUtilities
         /// <returns>
         /// DataTable that contains the databases on the server
         /// </returns>
-        private static DataTable GetDBDataTable(string strConnectionString)
+        static DataTable GetDataTable(string strConnectionString)
         {
             DataTable dtDatabases;
             using (SqlConnection sqlConn = new SqlConnection())
@@ -191,9 +195,10 @@ namespace CSharpDatabaseUtilities
                 // Setup the DataTable of databases
                 dtDatabases = sqlConn.GetSchema("Databases");
             }
+
             return dtDatabases;
         }
 
-        #endregion
+        #endregion Private Methods
     }
 }
