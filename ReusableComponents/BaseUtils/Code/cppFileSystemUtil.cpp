@@ -1567,12 +1567,12 @@ ULONGLONG getSizeOfFiles(const vector<string>& vecFileNames)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-bool doesFileMatchPatterns(const vector<string>& strMatchPatterns, const string& strFileName, 
-						   bool bCaseSensitive)
+bool doesFileMatchPatterns(const vector<string>& strMatchPatterns, const string& strFileName) 
 {
-	for (unsigned int i = 0; i < strMatchPatterns.size(); i++)
+	for (vector<string>::const_iterator it = strMatchPatterns.begin();
+		it != strMatchPatterns.end(); it++)
 	{
-		if(doesFileMatchPattern(strMatchPatterns[i], strFileName, bCaseSensitive))
+		if (doesFileMatchPattern(*it, strFileName))
 		{
 			return true;
 		}
@@ -1580,62 +1580,12 @@ bool doesFileMatchPatterns(const vector<string>& strMatchPatterns, const string&
 	return false;
 }
 //--------------------------------------------------------------------------------------------------
-bool doesFileMatchPattern(const string& strMatchPattern, const string& strFileName, 
-						  bool bCaseSensitive)
+bool doesFileMatchPattern(const string& strMatchPattern, const string& strFileName)
 {
-	string strTmpMatchPattern = strMatchPattern;
-	string strTmpFileName = strFileName;
-	const char* wild;
-	const char* text;
-	if(!bCaseSensitive)
-	{
-		makeLowerCase(strTmpMatchPattern);
-		makeLowerCase(strTmpFileName);
-	}
-
-	wild = strTmpMatchPattern.c_str();
-	text = strTmpFileName.c_str();
-	
-	const char *cp, *mp;
-	
-	while ((*text) && (*wild != '*')) 
-	{
-		if ((*wild != *text) && (*wild != '?')) 
-		{
-			return false;
-		}
-		wild++;
-		text++;
-	}
-	
-	while (*text) 
-	{
-		if (*wild == '*') 
-		{
-			if (!*++wild) 
-			{
-				return true;
-			}
-			mp = wild;
-			cp = text+1;
-		} 
-		else if ((*wild == *text) || (*wild == '?')) 
-		{
-			wild++;
-			text++;
-		} 
-		else 
-		{
-			wild = mp;
-			text = cp++;
-		}
-	}
-	
-	while (*wild == '*') 
-	{
-		wild++;
-	}
-	return !*wild;
+	ASSERT_ARGUMENT("ELI29955", strMatchPattern.length() < MAX_PATH);
+	ASSERT_ARGUMENT("ELI29956", strFileName.length() < MAX_PATH);
+	bool bMatch = asCppBool(PathMatchSpec(strFileName.c_str(), strMatchPattern.c_str()));
+	return bMatch;
 }
 //--------------------------------------------------------------------------------------------------
 void getTempDir(string& strPath)

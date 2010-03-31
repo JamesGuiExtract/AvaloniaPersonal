@@ -22,6 +22,7 @@
 #include <vector>
 #include <string>
 
+using namespace std;
 
 class EXPORT_BaseUtils FileDirectorySearcherBase
 {
@@ -38,7 +39,7 @@ public:
 	//			bRecursive:	If true, do recursive search deep into the directory from input till 
 	//						reaches the end
 	//
-	void findFiles(const std::string& strFileSpec, bool bRecursive);
+	void findFiles(const string& strFileSpec, bool bRecursive);
 
 	//==============================================================================================
 	// PURPOSE:	Find all subdirectories under the current directory
@@ -52,11 +53,11 @@ public:
 	//			bRecursive: if false -- get all subfolders one level down
 	//						if true --  get all subfolders recursively till exhausted
 	//
-	std::vector<std::string> getSubDirectories(const std::string& strCurDir, bool bRecursive);
+	vector<string> getSubDirectories(const string& strCurDir, bool bRecursive);
 
 protected:
 	// This function is to be overridden to place the file in the collection being used
-	virtual void addFile ( const std::string &strFile ) = 0;
+	virtual void addFile ( const string &strFile ) = 0;
 	
 	// This function is called within the file search to determine if the search should be stopped
 	// This should be overridden if the search should be stoppable
@@ -79,7 +80,7 @@ private:
 	//			strPath: Returns valid file path
 	//			strFileName: Return file name
 	//
-	void parseFileName(const std::string& strFile, std::string& strPath, std::string& strFileName);
+	void parseFileName(const string& strFile, string& strPath, string& strFileName);
 	//==============================================================================================
 	// PURPOSE:	Find all files(and directories) from current dir and put them in a vector
 	//
@@ -89,8 +90,9 @@ private:
 	//
 	// PARAMETERS:  
 	//			strFileSpec: Holds the name of the input string of file directory
+	//			strPath:	Holds the path parsed from the strFileSpec value
 	//
-	void getFilesFromCurDirectory(const std::string& strFileSpec);
+	void getFilesFromCurDirectory(const string& strFileSpec, const string& strPath);
 	//==============================================================================================
 };
 
@@ -123,13 +125,13 @@ public:
 	//			bRecursive:	If true, do recursive search deep into the directory from input till 
 	//						reaches the end
 	//
-	std::vector<std::string> searchFiles(const std::string& strFileSpec, bool bRecursive);
+	vector<string> searchFiles(const string& strFileSpec, bool bRecursive);
 
 protected:
 	// Override addFile to put the file in the m_vecFiles vector
-	virtual void addFile( const std::string &strFile );
+	virtual void addFile( const string &strFile );
 
 private:
-	std::vector<std::string> m_vecFiles;
+	vector<string> m_vecFiles;
 
 };

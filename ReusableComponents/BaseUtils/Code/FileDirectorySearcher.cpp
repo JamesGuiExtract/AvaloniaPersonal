@@ -34,7 +34,7 @@ void FileDirectorySearcherBase::findFiles(const string& strFileSpec, bool bRecur
 	//strPath now has the valid dir, and strFileName has the file name only
 	parseFileName(strFileSpec, strPath, strFileName);
 
-	getFilesFromCurDirectory( strFileSpec );
+	getFilesFromCurDirectory( strFileSpec, strPath );
 
 	if( !shouldStop() && bRecursive)
 	{
@@ -151,13 +151,9 @@ void FileDirectorySearcherBase::parseFileName(const string& strFile,
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void FileDirectorySearcherBase::getFilesFromCurDirectory(const string& strFileSpec)
+void FileDirectorySearcherBase::getFilesFromCurDirectory(const string& strFileSpec,
+														 const string& strPath)
 {
-	//strings to hold directory part and filename as part of the input string
-	string strPath = "";
-	string strFileName = "";
-	parseFileName(strFileSpec, strPath, strFileName);
-
 	FileIterator iter(strFileSpec);
 
 	//put all found files(and valid directories into the vector)
@@ -167,8 +163,14 @@ void FileDirectorySearcherBase::getFilesFromCurDirectory(const string& strFileSp
 		string strFileName = iter.getFileName();
 		if (strFileName != "." && strFileName != ".." && !iter.isDirectory())
 		{
-			//put the string in the struct(including the whole path)
-			addFile(strPath + strFileName);
+			// Check that the file accurately matches the specified pattern
+			// TODO: Move this check into the FileIterator class [LRCAU #5825]
+			string strTemp = strPath + strFileName;
+			if (doesFileMatchPattern(strFileSpec, strTemp))
+			{
+				//put the string in the struct(including the whole path)
+				addFile(strPath + strFileName);
+			}
 		}
 	}
 	//remember to put a try..catch in the caller's (or main)body

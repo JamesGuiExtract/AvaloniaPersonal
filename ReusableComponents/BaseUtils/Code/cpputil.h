@@ -360,18 +360,15 @@ EXPORT_BaseUtils ULONGLONG getSizeOfFiles(const vector<string>& vecFileNames);
 //			The name criteria (strMatch) is a typical windows filename that can include wildcards
 //			like * and ?.  Valid values for strMatch would be *.* or 1101??.txt or *.tif.  
 //			strFileName is just a filename name with no wild cards.
-//			 
-// REQUIRE: neither strMatch nor strFileName may have any directory path in their name
+// REQUIRE: strMatchPattern and strFileName length must be less than MAX_PATH
 EXPORT_BaseUtils bool doesFileMatchPattern(const string& strMatchPattern, 
-										   const string& strFileName, 
-										   bool bCaseSensitive = false);
+										   const string& strFileName);
 //-------------------------------------------------------------------------------------------------
 // PUPROSE:	Works like doesFileMatchPattern but attempts to match strFileName against multiple
 //			patterns
-// REQUIRE: Neither strMatch nor strFileName may have any directory path in their name
+// REQUIRE: strMatchPatterns values and strFileName length must be less than MAX_PATH
 EXPORT_BaseUtils bool doesFileMatchPatterns(const vector<string>& strMatchPatterns, 
-											const string& strFileName, 
-											bool bCaseSensitive = false);
+											const string& strFileName);
 //-------------------------------------------------------------------------------------------------
 // PROMISE:	Returns the path to the temp directory as defined by windows
 //			 
