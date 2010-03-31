@@ -14,7 +14,7 @@ namespace Extract.Imaging.Forms
     /// </summary>
     public partial class ThumbnailViewer : UserControl, IImageViewerControl
     {
-        #region ThumbnailViewer Constants
+        #region Constants
 
         /// <summary>
         /// Licensing key to unlock document (anti-aliasing) support
@@ -28,9 +28,9 @@ namespace Extract.Imaging.Forms
 
         static readonly string _OBJECT_NAME = typeof(ThumbnailViewer).ToString();
 
-        #endregion ThumbnailViewer Constants
+        #endregion Constants
 
-        #region ThumbnailViewer Fields
+        #region Fields
 
         /// <summary>
         /// The image viewer associated with the <see cref="ThumbnailViewer"/>.
@@ -42,9 +42,9 @@ namespace Extract.Imaging.Forms
         /// </summary>
         ThumbnailWorker _worker;
 
-        #endregion ThumbnailViewer Fields
+        #endregion Fields
 
-        #region ThumbnailViewer Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="ThumbnailViewer"/> class.
@@ -63,9 +63,9 @@ namespace Extract.Imaging.Forms
             _imageList.PaintProperties = properties;
         }
 
-        #endregion ThumbnailViewer Constructors
+        #endregion Constructors
 
-        #region ThumbnailViewer Methods
+        #region Methods
 
         /// <summary>
         /// Gets the default image to use for thumbnails that have not yet been loaded.
@@ -74,8 +74,10 @@ namespace Extract.Imaging.Forms
         /// </returns>
         static RasterImage GetLoadingImage()
         {
-            Image image = new Bitmap(typeof(ThumbnailViewer), "Resources.Loading.png");
-            return new RasterImage(image);
+            using (Image image = new Bitmap(typeof(ThumbnailViewer), "Resources.Loading.png"))
+            {
+                return new RasterImage(image);
+            }
         }
 
         /// <summary>
@@ -241,9 +243,9 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion ThumbnailViewer Methods
+        #endregion Methods
 
-        #region ThumbnailViewer Event Handlers
+        #region Event Handlers
 
         /// <summary>
         /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
@@ -260,9 +262,7 @@ namespace Extract.Imaging.Forms
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27918", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27918", ex);
             }
         }
 
@@ -294,9 +294,7 @@ namespace Extract.Imaging.Forms
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27919", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27919", ex);
             }
         }
 
@@ -328,9 +326,7 @@ namespace Extract.Imaging.Forms
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27920", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27920", ex);
             }
         }
 
@@ -372,13 +368,11 @@ namespace Extract.Imaging.Forms
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27965", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ExtractException.Display("ELI27965", ex);
             }
         }
 
-        #endregion ThumbnailViewer Event Handlers
+        #endregion Event Handlers
 
         #region IImageViewerControl Members
 
