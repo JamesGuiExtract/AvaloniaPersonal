@@ -1704,6 +1704,7 @@ void CUEXViewerDlg::setNewCurrentFile(string strNewCurrentFile)
 //-------------------------------------------------------------------------------------------------
 bool CUEXViewerDlg::parseLine(const string& strText)
 {
+	int iIndex = -1;
 	try
 	{
 		// Parse the string
@@ -1714,14 +1715,14 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 		// Step through tokens and add item to list
 		unsigned long ulCount = vecTokens.size();
 		string	strToken;
-		int		iIndex = 0;
+
+		// Dummy text for 0-width column
+		iIndex = m_listUEX.InsertItem( 0, "a" );
+		long lTime = 0;
 
 		// Only parse lines with expected number of tokens
 		if (ulCount == OLD_UEX_TOKEN_COUNT)
 		{
-			// Dummy text for 0-width column
-			iIndex = m_listUEX.InsertItem( 0, "a" );
-
 			// Set the serial column
 			setItemText(iIndex, SERIAL_LIST_COLUMN, vecTokens[SERIAL_VALUE]);
 
@@ -1738,7 +1739,6 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 			setItemText(iIndex, PID_LIST_COLUMN, vecTokens[PID_VALUE]);
 
 			// Get the time value and set the time column
-			long lTime = 0;
 			try
 			{
 				lTime = asLong(vecTokens[TIME_VALUE]);
@@ -1783,21 +1783,9 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 			// Display Top ELI code and Top Exception
 			setItemText( iIndex, TOP_ELI_COLUMN, ue.getTopELI() );
 			setItemText( iIndex, TOP_EXCEPTION_COLUMN, ue.getTopText() );
-
-			// Set all text items, now set the item data
-			ITEMINFO*	pData = new ITEMINFO;
-			ASSERT_RESOURCE_ALLOCATION("ELI28710", pData != NULL);
-
-			pData->iIndex = iIndex;
-			pData->ulTime = lTime;
-			pData->strData = strToken;
-			m_listUEX.SetItemData( iIndex, (DWORD)pData );
 		}
 		else
 		{
-			// Dummy text for 0-width column
-			iIndex = m_listUEX.InsertItem( 0, "a" );
-
 			// Invalid number of tokens, set the exception text to invalid token count
 			UCLIDException ue("ELI29920", "*Exception line had invalid number of tokens.*");
 			ue.addDebugInfo("Exception Line", strText);
@@ -1807,20 +1795,26 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 			setItemText( iIndex, TOP_ELI_COLUMN, ue.getTopELI() );
 			setItemText( iIndex, TOP_EXCEPTION_COLUMN, ue.getTopText() );
 
-			// Set all text items, now set the item data
-			ITEMINFO*	pData = new ITEMINFO;
-			ASSERT_RESOURCE_ALLOCATION("ELI29921", pData != NULL);
-
-			pData->iIndex = iIndex;
-			pData->ulTime = 0;
-			pData->strData = strToken;
-			m_listUEX.SetItemData( iIndex, (DWORD)pData );
 		}
+
+		// Set all text items, now set the item data
+		ITEMINFO*	pData = new ITEMINFO;
+		ASSERT_RESOURCE_ALLOCATION("ELI29921", pData != NULL);
+
+		pData->iIndex = iIndex;
+		pData->ulTime = lTime;
+		pData->strData = strToken;
+		m_listUEX.SetItemData( iIndex, (DWORD)pData );
 
 		return true;
 	}
 	catch(...)
 	{
+		// Exception occurred, remove the bad item from the list and return false
+		if (iIndex != -1)
+		{
+			m_listUEX.DeleteItem(iIndex);
+		}
 		return false;
 	}
 }

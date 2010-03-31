@@ -207,6 +207,7 @@ private:
 	UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr getActionMgmtRole(IUnknownPtr ipUnknown);
 
 	// Returns the action name with the tags expanded
+	// NOTE: This method also sets the FPSFileDir value for the tag manager
 	string getExpandedActionName();
 
 	// Returns the value of m_ipFPMDB. If it is NULL a new instance will be created if

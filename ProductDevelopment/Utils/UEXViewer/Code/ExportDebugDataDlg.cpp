@@ -160,9 +160,9 @@ void CExportDebugDataDlg::OnBnClickedButtonBrowse()
 		UpdateData(TRUE);
 
 		// Open the file selection dialog
-		CFileDialogEx fileDlg(TRUE, NULL, m_zExportfile, 
+		CFileDialogEx fileDlg(TRUE, "*.txt", m_zExportfile, 
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
-			"All Files (*.*)|*.*||", NULL);
+			"Text Files (*.txt)|*.txt|All Files (*.*)|*.*||", NULL);
 		
 		//  if OK was selected set the new file name
 		if (fileDlg.DoModal() == IDOK)

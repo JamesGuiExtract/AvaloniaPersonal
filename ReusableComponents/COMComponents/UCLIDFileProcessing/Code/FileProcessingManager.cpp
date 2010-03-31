@@ -1025,14 +1025,20 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 					throw ue;
 				}
 
+				// Expand the action name (note this also sets the FPSFileDir value for the
+				// tag manager) [LRCAU #5813]
+				_bstr_t bstrActionName(getExpandedActionName().c_str());
+
+				// Validate that the action name exists in the database (auto-create if that setting is set)
+				getFPMDB()->AutoCreateAction(bstrActionName);
+
 				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord = NULL;
-			
 				if (bQueue)
 				{
 					// If queueing, attempt to add the file to the database.
 					VARIANT_BOOL vbAlreadyExists;
 					UCLID_FILEPROCESSINGLib::EActionStatus easOriginal;
-					ipFileRecord = getFPMDB()->AddFile(bstrSourceDocName, m_strAction.c_str(),
+					ipFileRecord = getFPMDB()->AddFile(bstrSourceDocName, bstrActionName,
 						(UCLID_FILEPROCESSINGLib::EFilePriority)eFilePriority, vbForceProcessing,
 						VARIANT_FALSE, UCLID_FILEPROCESSINGLib::kActionPending, &vbAlreadyExists,
 						&easOriginal);
@@ -1041,7 +1047,7 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				{
 					// If not queueing, but processing, attempt to retrieve an existing record for this
 					// file.
-					ipFileRecord = getFPMDB()->GetFileRecord(bstrSourceDocName, m_strAction.c_str());
+					ipFileRecord = getFPMDB()->GetFileRecord(bstrSourceDocName, bstrActionName);
 				}
 
 				if (bProcess)

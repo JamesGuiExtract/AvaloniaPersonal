@@ -35,6 +35,7 @@ const int giMIN_WINDOW_WIDTH = 700;
 const int giMIN_WINDOW_HEIGHT = 320;
 const string gstrFILE_ACTION_MANAGER_FILENAME = "ProcessFiles.exe";
 const string gstrREPORT_VIEWER_EXE = "ReportViewer.exe";
+const string gstrTITLE = "File Action Manager Database Administration";
 
 //-------------------------------------------------------------------------------------------------
 // CFAMDBAdminDlg dialog
@@ -149,6 +150,9 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 		// Get the server and datatabase from the FAMDB
 		string strServer = asString(m_ipFAMDB->DatabaseServer);
 		string strDatabase = asString(m_ipFAMDB->DatabaseName);
+
+		string strCaption = strServer + ":" + strDatabase + " - " + gstrTITLE;
+		SetWindowText(strCaption.c_str());
 
 		// Save the good settings to the registry
 		ma_pCfgMgr->setLastGoodDBSettings(strServer, strDatabase);
