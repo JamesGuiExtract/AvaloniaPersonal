@@ -1,4 +1,5 @@
 using System;
+using TD.SandDock;
 
 namespace Extract.Redaction.Verification
 {
@@ -46,13 +47,18 @@ namespace Extract.Redaction.Verification
                     _findOrRedactForm.Dispose();
                     _findOrRedactForm = null;
                 }
-                if (_thumbnailViewer != null)
+
+                // Collapsed or hidden dockable windows must be disposed explicitly [FIDSC #4246]
+                // TODO: Can be removed when Divelements corrects this in the next release (3.0.7+)
+                if (_dataWindowDockableWindow != null)
                 {
-                    _thumbnailViewer.Dispose();
+                    _dataWindowDockableWindow.Dispose();
+                    _dataWindowDockableWindow = null;
                 }
-                if (_imageViewer != null)
+                if (_thumbnailDockableWindow != null)
                 {
-                    _imageViewer.Dispose();
+                    _thumbnailDockableWindow.Dispose();
+                    _thumbnailDockableWindow = null;
                 }
             }
 
