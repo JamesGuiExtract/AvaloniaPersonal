@@ -230,12 +230,14 @@ namespace Extract.Redaction
         {
             for (int i = 0; i < zones.Count; i++)
             {
+                RasterZone zoneI = zones[i];
+                double zoneArea = zoneI.Area();
                 for (int j = 0; j < zones.Count; j++)
                 {
                     if (i != j)
                     {
-                        double overlapArea = zones[i].GetAreaOverlappingWith(zones[j]);
-                        if (overlapArea >= zones[i].Area())
+                        double overlapArea = zoneI.GetAreaOverlappingWith(zones[j]);
+                        if (overlapArea >= zoneArea)
                         {
                             zones.RemoveAt(i);
                             i--;
