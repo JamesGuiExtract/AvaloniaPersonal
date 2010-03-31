@@ -12,9 +12,9 @@ public:
 
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Initializes the FileIterator
-	// PARAMS:  strPath - The full path in which to search. May include wildcard characters, 
+	// PARAMS:  strPathAndSpec - The full path in which to search. May include wildcard characters, 
 	//          for example, an asterisk (*) or a question mark (?).
-	FileIterator(const string& strPath);
+	FileIterator(const string& strPathAndSpec);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Closes all handles opened during iteration.
 	~FileIterator();
@@ -25,11 +25,12 @@ public:
 	bool moveNext();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Closes all open handles. It is safe to call this method multiple times.
-	// PARAMS:  strPath - A new directory or path in which to search.
+	// PARAMS:  strPathAndSpec - A new directory or path in which to search. May include wildcard
+	//			characters, for example, an asterisk (*) or a question mark (?).
 	// NOTE:    This method is called automatically by the destructor, but errors are logged 
 	//          in the destructor. Call this method directly if you want errors to be thrown.
 	void reset();
-	void reset(const string& strPath);
+	void reset(const string& strPathAndSpec);
 
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Gets the name of the current file being iterated.
@@ -47,7 +48,10 @@ public:
 private:
 
 	// The search path for finding files.
-	string m_strPath;
+	string m_strPathAndSpec;
+
+	// The file search spec (taken from m_strPathAndSpec)
+	string m_strSpec;
 
 	// Handle to the current file being iterated. NULL if iteration has not yet begun.
 	HANDLE m_hCurrent;

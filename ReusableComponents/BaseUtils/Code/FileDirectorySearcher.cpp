@@ -163,14 +163,8 @@ void FileDirectorySearcherBase::getFilesFromCurDirectory(const string& strFileSp
 		string strFileName = iter.getFileName();
 		if (strFileName != "." && strFileName != ".." && !iter.isDirectory())
 		{
-			// Check that the file accurately matches the specified pattern
-			// TODO: Move this check into the FileIterator class [LRCAU #5825]
-			string strTemp = strPath + strFileName;
-			if (doesFileMatchPattern(strFileSpec, strTemp))
-			{
-				//put the string in the struct(including the whole path)
-				addFile(strPath + strFileName);
-			}
+			//put the string in the struct(including the whole path)
+			addFile(strPath + strFileName);
 		}
 	}
 	//remember to put a try..catch in the caller's (or main)body
