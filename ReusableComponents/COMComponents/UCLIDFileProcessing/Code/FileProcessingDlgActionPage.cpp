@@ -294,18 +294,18 @@ void FileProcessingDlgActionPage::ResetInitialized()
 	m_bInitialized = false;
 }
 //-------------------------------------------------------------------------------------------------
-std::string FileProcessingDlgActionPage::GetCurrentActionName()
+string FileProcessingDlgActionPage::GetCurrentActionName()
 {
-	std::string strAction((LPCTSTR)m_zActionName);
+	string strAction((LPCTSTR)m_zActionName);
 	return strAction;
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgActionPage::refresh()
+void FileProcessingDlgActionPage::refresh(bool bWarnIfActionNotFound)
 {
 	try
 	{
 		// Get the action name from FileProcessingManager
-		std::string strActionName = asString(getFPM()->GetActionName());
+		string strActionName = asString(getFPM()->GetActionName());
 
 		// Check for recently converted FPS file
 		bool bResetPage = false;
@@ -338,15 +338,19 @@ void FileProcessingDlgActionPage::refresh()
 				}
 				catch (UCLIDException& ue)
 				{
-					// Log the exception just in case it is not related to the action name 
-					ue.log();
+					// Only log and notify the user if required
+					if (bWarnIfActionNotFound)
+					{
+						// Log the exception just in case it is not related to the action name 
+						ue.log();
 
-					// Notify the user that they must select another action
-					std::string	strPrompt;
-					strPrompt = "The action '" + strActionName + 
-						"' does not exist in the database any more, \nplease select another action.";
+						// Notify the user that they must select another action
+						string	strPrompt;
+						strPrompt = "The action '" + strActionName + 
+							"' does not exist in the database any more, \nplease select another action.";
 
-					MessageBox(strPrompt.c_str(), "Action not found", MB_OK | MB_ICONINFORMATION);
+						MessageBox(strPrompt.c_str(), "Action not found", MB_OK | MB_ICONINFORMATION);
+					}
 
 					// Reset page elements
 					bResetPage = true;

@@ -5,6 +5,8 @@
 
 #include "FPRecordManager.h"
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // FileProcessingDlgActionPage dialog
 
@@ -31,10 +33,12 @@ public:
 	void ResetInitialized();
 
 	// This method return the Name of the current action
-	std::string GetCurrentActionName();
+	string GetCurrentActionName();
 	
 	// Reload page from File Processing Manager items
-	void refresh();
+	// bWarnIfActionNotFound - If true then a warning will be displayed and an exception will
+	// be logged if the action is not found, if false no warning will be displayed.
+	void refresh(bool bWarnIfActionNotFound = false);
 	
 	// Set the File Processing Manager pointer
 	void setFPMgr(UCLID_FILEPROCESSINGLib::IFileProcessingManager* pFPMgr);

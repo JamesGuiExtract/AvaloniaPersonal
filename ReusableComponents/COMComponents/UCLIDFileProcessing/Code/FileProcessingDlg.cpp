@@ -2290,7 +2290,8 @@ void FileProcessingDlg::loadSettingsFromManager()
 	// If the action page is displayed refresh the data 
 	if (isPageDisplayed(kActionPage))
 	{
-		m_propActionPage.refresh();
+		// Warn the user if the action name no longer exists [LRCAU #4825]
+		m_propActionPage.refresh(true);
 	}
 
 	// Set the File processors & number of threads
