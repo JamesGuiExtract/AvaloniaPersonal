@@ -9,6 +9,8 @@
 #include <UCLIDException.h>
 #include <FileDialogEx.h>
 #include <string>
+#include <set>
+#include <algorithm>
 
 using namespace std;
 
@@ -30,6 +32,7 @@ CExportDebugDataDlg::CExportDebugDataDlg(CWnd* pParent /*=NULL*/)
 	, m_iAppendToFile(0)
 	, m_iScope(RADIO_ALL)
 	, m_iLimitScope(0)
+	, m_iUniqueValues(0)
 	, m_zELICodeToLimit(_T(""))
 {
 
@@ -51,6 +54,7 @@ void CExportDebugDataDlg::DoDataExchange(CDataExchange* pDX)
 		DDX_Check(pDX, IDC_CHECK_NARROW_SCOPE, m_iLimitScope);
 		DDX_Text(pDX, IDC_EDIT_ELICODE, m_zELICodeToLimit);
 		DDX_Control(pDX, IDC_EDIT_ELICODE, m_editELICode);
+		DDX_Check(pDX, IDC_CHECK_UNIQUE_VALUES, m_iUniqueValues);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28747");
 }
@@ -121,6 +125,19 @@ void CExportDebugDataDlg::OnBnClickedOk()
 		// Output the data to the file if data was found
 		if ( !vecDebugParams.empty())
 		{
+			// Sort the vector
+			sort(vecDebugParams.begin(), vecDebugParams.end());
+
+			if (m_iUniqueValues == BST_CHECKED)
+			{
+				// Remove duplicates from the vector
+				set<string> setParams;
+				setParams.insert(vecDebugParams.begin(), vecDebugParams.end());
+				
+				vecDebugParams.clear();
+				vecDebugParams.insert(vecDebugParams.begin(), setParams.begin(), setParams.end());
+			}
+
 			// open the file in write mode
 			ofstream outfile(m_zExportfile, ios::binary | 
 				((m_iAppendToFile == BST_CHECKED) ? ios::app : ios::out));

@@ -35,6 +35,7 @@ private:
 	int m_iAppendToFile;
 	int m_iScope;
 	int m_iLimitScope;
+	int m_iUniqueValues;
 	CString m_zELICodeToLimit;
 	CEdit m_editELICode;
 

@@ -113,7 +113,7 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON,14,125,137,12
 END
 
-IDD_DIALOG_EXPORT_DEBUG_DATA DIALOGEX 0, 0, 328, 193
+IDD_DIALOG_EXPORT_DEBUG_DATA DIALOGEX 0, 0, 330, 204
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "Export Debug Data"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -124,15 +124,17 @@ BEGIN
     PUSHBUTTON      "...",IDC_BUTTON_BROWSE,300,60,20,14
     CONTROL         "If the file already exists, append to it rather than overwriting it",IDC_CHECK_APPEND,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,78,294,10
-    GROUPBOX        "Export scope",IDC_STATIC,6,102,318,60,WS_GROUP
+    GROUPBOX        "Export scope",IDC_STATIC,6,102,318,75,WS_GROUP
     CONTROL         "All displayed exceptions",IDC_RADIO_DISPLAY_ALL,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,12,115,92,10
     CONTROL         "All selected exceptions",IDC_RADIO_DISPLAY_SELECTED,
                     "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,130,89,10
     CONTROL         "Narrow above scope to those with this top level ELI code:",IDC_CHECK_NARROW_SCOPE,
                     "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,12,145,198,10
     EDITTEXT        IDC_EDIT_ELICODE,216,144,54,14,ES_AUTOHSCROLL | WS_DISABLED
-    DEFPUSHBUTTON   "OK",IDOK,217,169,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,273,169,50,14
+	CONTROL			"Only export unique values", IDC_CHECK_UNIQUE_VALUES, "Button",
+					BS_AUTOCHECKBOX | WS_TABSTOP, 12,160,198,10
+    DEFPUSHBUTTON   "OK",IDOK,217,184,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,273,184,50,14
     LTEXT           "Name of debug parameter to export if found",IDC_STATIC,12,18,144,8
     LTEXT           "Specify filename to export data to",IDC_STATIC,12,48,110,8
 END
