@@ -16,6 +16,7 @@ const string gstrANY_USER = "<any user>";
 
 enum FileSelectScope { eAllFiles, eAllFilesForWhich, eAllFilesTag,
 						eAllFilesQuery, eAllFilesPriority };
+enum TagMatchType { eAnyTag = 0, eAllTag = 1, eNoneTag = 2 };
 
 class SelectFileSettings
 {
@@ -31,7 +32,7 @@ private:
 	string m_strUser; // The user (specified if choosing skipped files)
 
 	// Values for the eAllFilesTag scope
-	bool m_bAnyTags; // Whether the user choose any tags or all tags
+	TagMatchType m_eTagType; // Whether the user choose any tags or all tags
 	vector<string> m_vecTags; // The list of tags selected
 
 	// Value for the eAllFilesQuery scope
@@ -71,8 +72,8 @@ public:
 	void setUser(const string& strUser) { m_strUser = strUser; }
 	string getUser() { return m_strUser; }
 
-	void setAnyTags(bool bAnyTags) { m_bAnyTags = bAnyTags; }
-	bool getAnyTags() { return m_bAnyTags; }
+	void setTagType(TagMatchType eTagType) { m_eTagType = eTagType; }
+	TagMatchType getTagType() { return m_eTagType; }
 
 	void setTags(const vector<string>& vecTags) { m_vecTags = vecTags; }
 	vector<string> getTags() { return m_vecTags; }

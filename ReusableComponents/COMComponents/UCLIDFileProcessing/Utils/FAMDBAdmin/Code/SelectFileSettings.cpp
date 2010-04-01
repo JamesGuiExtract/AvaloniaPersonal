@@ -47,7 +47,20 @@ string SelectFileSettings::getSummaryString()
 	case eAllFilesTag:
 		{
 			strSummary += "associated with ";
-			strSummary += (m_bAnyTags ? "any" : "all");
+			switch(m_eTagType)
+			{
+			case eAnyTag:
+				strSummary += "any";
+				break;
+			case eAllTag:
+				strSummary += "all";
+				break;
+			case eNoneTag:
+				strSummary += "none";
+				break;
+			default:
+				THROW_LOGIC_ERROR_EXCEPTION("ELI29964");
+			}
 			strSummary += " of the following tags: ";
 			string strTagString = "";
 			for (vector<string>::iterator it = m_vecTags.begin(); it != m_vecTags.end(); it++)
@@ -154,12 +167,21 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			}
 
 			string strMainQueryTemp = gstrQUERY_FILES_WITH_TAGS;
+
 			replaceVariable(strMainQueryTemp, gstrTAG_QUERY_SELECT,
 				strSelect);
 
-			// Get the conjunction for the where clause
-			string strConjunction = m_bAnyTags ? "\nUNION\n" : "\nINTERSECT\n";
+			// Get the conjunction for the where clause (want the "any" behavior for
+			// both the "any" and "none" case - to achieve none just negate the any)
+			string strConjunction =
+				m_eTagType == eAnyTag || m_eTagType == eNoneTag ? "\nUNION\n" : "\nINTERSECT\n";
 
+			// For the "none" case select all files NOT in the "any" list
+			if (m_eTagType == eNoneTag)
+			{
+				strQueryPart2 =
+					"(SELECT [FileName] FROM [FAMFile] WHERE [FAMFile].[FileName] NOT IN ";
+			}
 			strQueryPart2 += "(" + strMainQueryTemp;
 			replaceVariable(strQueryPart2, gstrTAG_NAME_VALUE, m_vecTags[0]);
 
@@ -171,6 +193,11 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 				strQueryPart2 += strConjunction + strTemp;
 			}
 
+			// Need to add an extra paren in the "none" case
+			if (m_eTagType == eNoneTag)
+			{
+				strQueryPart2 += ")";
+			}
 			strQueryPart2 += ") AS FAMFile";
 		}
 		break;

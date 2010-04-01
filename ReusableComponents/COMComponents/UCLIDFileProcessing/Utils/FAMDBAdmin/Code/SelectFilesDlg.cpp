@@ -21,6 +21,7 @@ static char THIS_FILE[] = __FILE__;
 //-------------------------------------------------------------------------------------------------
 static const int giANY_TAG = 0;
 static const int giALL_TAG = 1;
+static const int giNONE_TAG = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CSelectFilesDlg dialog
@@ -112,6 +113,7 @@ BOOL CSelectFilesDlg::OnInitDialog()
 		// Add the any and all values to the combo box
 		m_comboTagsAnyAll.InsertString(giANY_TAG, "Any");
 		m_comboTagsAnyAll.InsertString(giALL_TAG, "All");
+		m_comboTagsAnyAll.InsertString(giNONE_TAG, "None");
 		m_comboTagsAnyAll.SetCurSel(giANY_TAG);
 
 		// Read all actions from the DB
@@ -455,7 +457,7 @@ bool CSelectFilesDlg::saveSettings()
 
 			m_settings.setTags(vecTags);
 			m_settings.setScope(eAllFilesTag);
-			m_settings.setAnyTags(m_comboTagsAnyAll.GetCurSel() == giANY_TAG);
+			m_settings.setTagType((TagMatchType) m_comboTagsAnyAll.GetCurSel());
 		}
 		else if (m_radioFilesFromQuery.GetCheck() == BST_CHECKED)
 		{
@@ -636,7 +638,7 @@ void CSelectFilesDlg::setControlsFromSettings()
 				nSetAllFilesWithTags = BST_CHECKED;
 
 				// Set the any/all value
-				m_comboTagsAnyAll.SetCurSel(m_settings.getAnyTags() ? giANY_TAG : giALL_TAG); 
+				m_comboTagsAnyAll.SetCurSel((int) m_settings.getTagType());
 
 				// Now attempt to select the appropriate tag names
 				vector<string> vecTags = m_settings.getTags();

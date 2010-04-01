@@ -26,12 +26,15 @@ const string gstrFUNC_EXT_OF = "ExtOf";
 const string gstrFUNC_FILE_NO_EXT_OF = "FileNoExtOf";
 const string gstrFUNC_FILE_OF = "FileOf";
 const string gstrFUNC_FULL_USER_NAME = "FullUserName";
+const string gstrFUNC_LEFT = "Left";
 const string gstrFUNC_INSERT_BEFORE_EXT = "InsertBeforeExt";
+const string gstrFUNC_MID = "Mid";
 const string gstrFUNC_NOW = "Now";
 const string gstrFUNC_OFFSET = "Offset";
 const string gstrFUNC_PAD_VALUE = "PadValue";
 const string gstrFUNC_RANDOM_ALPHA_NUMERIC = "RandomAlphaNumeric";
 const string gstrFUNC_REPLACE = "Replace";
+const string gstrFUNC_RIGHT = "Right";
 const string gstrFUNC_TRIM_AND_CONSOLIDATE_WS = "TrimAndConsolidateWS";
 const string gstrFUNC_USER_NAME = "UserName";
 
@@ -59,12 +62,15 @@ TextFunctionExpander::TextFunctionExpander()
 			g_vecFunctions.push_back(gstrFUNC_FILE_NO_EXT_OF);
 			g_vecFunctions.push_back(gstrFUNC_FILE_OF);
 			g_vecFunctions.push_back(gstrFUNC_FULL_USER_NAME);
+			g_vecFunctions.push_back(gstrFUNC_LEFT);
 			g_vecFunctions.push_back(gstrFUNC_INSERT_BEFORE_EXT);
+			g_vecFunctions.push_back(gstrFUNC_MID);
 			g_vecFunctions.push_back(gstrFUNC_NOW);
 			g_vecFunctions.push_back(gstrFUNC_OFFSET);
 			g_vecFunctions.push_back(gstrFUNC_PAD_VALUE);
 			g_vecFunctions.push_back(gstrFUNC_RANDOM_ALPHA_NUMERIC);
 			g_vecFunctions.push_back(gstrFUNC_REPLACE);
+			g_vecFunctions.push_back(gstrFUNC_RIGHT);
 			g_vecFunctions.push_back(gstrFUNC_TRIM_AND_CONSOLIDATE_WS);
 			g_vecFunctions.push_back(gstrFUNC_USER_NAME);
 
@@ -133,7 +139,10 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 					if (strFunction != gstrFUNC_INSERT_BEFORE_EXT
 						&& strFunction != gstrFUNC_OFFSET
 						&& strFunction != gstrFUNC_PAD_VALUE
-						&& strFunction != gstrFUNC_REPLACE)
+						&& strFunction != gstrFUNC_REPLACE
+						&& strFunction != gstrFUNC_LEFT
+						&& strFunction != gstrFUNC_MID
+						&& strFunction != gstrFUNC_RIGHT)
 					{
 						UCLIDException uex("ELI29708", "Function does not support alternate token syntax.");
 						uex.addDebugInfo("Function", strFunction);
@@ -223,13 +232,25 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 		{
 			strRet += expandExtOf(strArg);
 		}
+		else if (strFunction == gstrFUNC_LEFT)
+		{
+			strRet += expandLeft(strArg, strToken);
+		}
 		else if (strFunction == gstrFUNC_INSERT_BEFORE_EXT)
 		{
 			strRet += expandInsertBeforeExt(strArg, strToken);
 		}
+		else if (strFunction == gstrFUNC_MID)
+		{
+			strRet += expandMid(strArg, strToken);
+		}
 		else if (strFunction == gstrFUNC_REPLACE)
 		{
 			strRet += expandReplace(strArg, strToken);
+		}
+		else if (strFunction == gstrFUNC_RIGHT)
+		{
+			strRet += expandRight(strArg, strToken);
 		}
 		else if (strFunction == gstrFUNC_PAD_VALUE)
 		{
@@ -716,5 +737,161 @@ const string TextFunctionExpander::expandFullUserName(const string& str) const
 
 	bool bThrowException = str != "1";
 	return getFullUserName(bThrowException);
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandLeft(const string& str, const string& strToken) const
+{
+	// Tokenize the string into strSource, strSearch, strReplace
+	vector<string> vecTokens;
+	StringTokenizer::sGetTokens(str, strToken, vecTokens);
+
+	// Check for appropriate number of tokens
+	if (vecTokens.size() == 2)
+	{
+		// Get the count of characters
+		long lCount = 0;
+		try
+		{
+			lCount = asLong(vecTokens[1]);
+			if (lCount <= 0)
+			{
+				throw 42;
+			}
+		}
+		catch(...)
+		{
+			UCLIDException ue("ELI29957", "Invalid length argument specified for $Left().");
+			ue.addDebugInfo("Length Argument", vecTokens[1]);
+			throw ue;
+		}
+
+		// Return the first lCount characters of the string
+		return vecTokens[0].substr(0, lCount);
+	}
+	else
+	{
+		// Create and throw exception
+		UCLIDException ue( "ELI29958", "Left function has invalid number of arguments!");
+		ue.addDebugInfo("Arguments", str);
+		ue.addDebugInfo("NumOfArgs", vecTokens.size());
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandMid(const string& str, const string& strToken) const
+{
+	// Tokenize the string into strSource, strSearch, strReplace
+	vector<string> vecTokens;
+	StringTokenizer::sGetTokens(str, strToken, vecTokens);
+
+	// Check for appropriate number of tokens
+	if (vecTokens.size() == 3)
+	{
+		// Get the count of characters
+		long lStart = 0;
+		try
+		{
+			lStart = asLong(vecTokens[1]);
+			if (lStart < 0)
+			{
+				throw 42;
+			}
+		}
+		catch(...)
+		{
+			UCLIDException ue("ELI29959", "Invalid starting position specified for $Mid().");
+			ue.addDebugInfo("Start Position", vecTokens[1]);
+			throw ue;
+		}
+
+		// Get the count of characters
+		long lCount = 0;
+		try
+		{
+			lCount = asLong(vecTokens[2]);
+			if (lCount <= 0)
+			{
+				throw 42;
+			}
+		}
+		catch(...)
+		{
+			UCLIDException ue("ELI29960", "Invalid count value specified for $Mid().");
+			ue.addDebugInfo("Count", vecTokens[2]);
+			throw ue;
+		}
+
+		// Get the string
+		const string& strTemp = vecTokens[0];
+
+		// If the count is -1, then return from the start to the end of the string
+		if (lCount == -1)
+		{
+			return strTemp.substr(lStart);
+		}
+		else
+		{
+			// Return the substring starting at lStart and containing lCount characters
+			return strTemp.substr(lStart, lCount);
+		}
+	}
+	else
+	{
+		// Create and throw exception
+		UCLIDException ue( "ELI29961", "Mid function has invalid number of arguments!");
+		ue.addDebugInfo("Arguments", str);
+		ue.addDebugInfo("NumOfArgs", vecTokens.size());
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandRight(const string& str, const string& strToken) const
+{
+	// Tokenize the string into strSource, strSearch, strReplace
+	vector<string> vecTokens;
+	StringTokenizer::sGetTokens(str, strToken, vecTokens);
+
+	// Check for appropriate number of tokens
+	if (vecTokens.size() == 2)
+	{
+		// Get the count of characters
+		long lCount = 0;
+		try
+		{
+			lCount = asLong(vecTokens[1]);
+			if (lCount <= 0)
+			{
+				throw 42;
+			}
+		}
+		catch(...)
+		{
+			UCLIDException ue("ELI29962", "Invalid length argument specified for $Right().");
+			ue.addDebugInfo("Length Argument", vecTokens[1]);
+			throw ue;
+		}
+
+		// Get the string
+		const string& strTemp = vecTokens[0];
+
+		// Compute the starting point for the substring
+		long lStart = strTemp.length() - lCount;
+		if (lStart < 0)
+		{
+			return strTemp;
+		}
+		else
+		{
+			return strTemp.substr(lStart);
+		}
+	}
+	else
+	{
+		// Create and throw exception
+		UCLIDException ue( "ELI29963", "Right function has invalid number of arguments!");
+		ue.addDebugInfo("Arguments", str);
+		ue.addDebugInfo("NumOfArgs", vecTokens.size());
+		throw ue;
+	}
 }
 //-------------------------------------------------------------------------------------------------

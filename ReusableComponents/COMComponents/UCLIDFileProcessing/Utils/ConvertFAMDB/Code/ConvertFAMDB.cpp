@@ -109,6 +109,7 @@ BOOL CConvertFAMDBApp::InitInstance()
 //-------------------------------------------------------------------------------------------------
 void CConvertFAMDBApp::validateLicense()
 {
-	VALIDATE_LICENSE( gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI20158", "Convert FAM Database" );
+	// [LRCAU #5783] - Require server license
+	VALIDATE_LICENSE( gnFLEXINDEX_IDSHIELD_SERVER_CORE, "ELI20158", "Convert FAM Database" );
 }
 //-------------------------------------------------------------------------------------------------
