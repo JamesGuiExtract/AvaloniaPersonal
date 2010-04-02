@@ -27,17 +27,18 @@
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
+// Default to all image files for the add watermark task
 const string gstrFILE_FILTER =
-	"BMP files (*.bmp;*.rle;*.dib)|*.bmp*;*.rle*;*.dib*|"
-	"GIF files (*.gif)|*.gif*|"
-	"JFIF files (*.jpg)|*.jpg*|"
-	"PCX files (*.pcx)|*.pcx*|"
-	"PICT files (*.pct)|*.pct*|"
-	"PNG files (*.png)|*.png*|"
-	"TIFF files (*.tif)|*.tif*|"
-	"PDF files (*.pdf)|*.pdf*|"
-	"All image files|*.bmp*;*.rle*;*.dib*;*.rst*;*.gp4*;*.mil*;*.cal*;*.cg4*;*.flc*;*.fli*;*.gif*;"
-	"*.jpg*;*.pcx*;*.pct*;*.png*;*.tga*;*.tif*;*.pdf*|"
+	"All image files|*.bmp;*.rle;*.dib;*.rst;*.gp4;*.mil;*.cal;*.cg4;*.flc;*.fli;*.gif;"
+	"*.jpg;*.jpeg;*.pcx;*.pct;*.png;*.tga;*.tif;*.tiff;*.pdf|"
+	"BMP files (*.bmp;*.rle;*.dib)|*.bmp;*.rle;*.dib|"
+	"GIF files (*.gif)|*.gif|"
+	"JFIF files (*.jpg;*.jpeg)|*.jpg;*.jpeg|"
+	"PCX files (*.pcx)|*.pcx|"
+	"PICT files (*.pct)|*.pct|"
+	"PNG files (*.png)|*.png|"
+	"TIFF files (*.tif;*.tiff)|*.tif;*.tiff|"
+	"PDF files (*.pdf)|*.pdf|"
 	"All files (*.*)|*.*||";
 //--------------------------------------------------------------------------------------------------
 // CAddWatermarkTaskPP

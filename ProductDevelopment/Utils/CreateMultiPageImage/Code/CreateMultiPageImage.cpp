@@ -495,11 +495,12 @@ void processInputFile(ifstream &inputFile, string &strDelim, int iImageNamePos, 
 	// read input file
 	while (!inputFile.eof())
 	{
-		char buffer[1024] = {0};
-
-		inputFile.getline(buffer, 1024);
-
-		string strBuffer(buffer);
+		string strBuffer;
+		getline(inputFile, strBuffer);
+		if (inputFile.fail())
+		{
+			throw UCLIDException("ELI29966", "Error reading from input file.");
+		}
 
 		if(strBuffer != "")
 		{

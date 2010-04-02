@@ -1892,11 +1892,13 @@ void convertFileToListOfStrings(ifstream &file, list<string> &lstFileContents)
 {
 	while (!file.eof())
 	{
-		char buffer[1024];
-
-		file.getline(buffer, 1024);
-				
-		lstFileContents.push_back(buffer);
+		string strTemp;
+		getline(file, strTemp);
+		if (file.fail())
+		{
+			throw UCLIDException("ELI29965", "Error encountered while reading file.");
+		}
+		lstFileContents.push_back(strTemp);
 	}
 }
 //--------------------------------------------------------------------------------------------------

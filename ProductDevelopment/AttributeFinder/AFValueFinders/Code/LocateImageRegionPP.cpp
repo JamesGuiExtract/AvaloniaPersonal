@@ -691,7 +691,7 @@ LRESULT CLocateImageRegionPP::OnBnClickedBtnLoadList(WORD wNotifyCode, WORD wID,
 		// show pick file dialog, do not show delimiter related windows
 		CFileDialogEx openDialog( TRUE, ".txt", NULL, 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
-			"Text files (*.txt)|*.txt;*.dat|All files (*.*)|*.*||", NULL);
+			"Text files (*.txt;*.dat)|*.txt;*.dat|All files (*.*)|*.*||", NULL);
 		
 		if (openDialog.DoModal() == IDOK)
 		{
