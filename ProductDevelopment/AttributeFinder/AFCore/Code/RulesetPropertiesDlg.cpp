@@ -27,6 +27,8 @@ const int giPAGINATION_ITEM = 1;
 const int giREDACTION_PAGES_ITEM = 2;
 const int giREDACTION_DOCS_ITEM = 3;
 
+const int giTARGET_STATE_UNCHECKED = 2;
+
 //-------------------------------------------------------------------------------------------------
 // CRuleSetPropertiesDlg dialog
 //-------------------------------------------------------------------------------------------------
@@ -34,8 +36,6 @@ CRuleSetPropertiesDlg::CRuleSetPropertiesDlg(UCLID_AFCORELib::IRuleSetPtr ipRule
 											 CWnd* pParent /*=NULL*/)
 	: CDialog(CRuleSetPropertiesDlg::IDD, pParent), m_ipRuleSet(ipRuleSet)
 {
-	//{{AFX_DATA_INIT(CRuleSetPropertiesDlg)
-	//}}AFX_DATA_INIT
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSetPropertiesDlg::DoDataExchange(CDataExchange* pDX)
@@ -51,9 +51,7 @@ void CRuleSetPropertiesDlg::DoDataExchange(CDataExchange* pDX)
 //-------------------------------------------------------------------------------------------------
 
 BEGIN_MESSAGE_MAP(CRuleSetPropertiesDlg, CDialog)
-	//{{AFX_MSG_MAP(CRuleSetPropertiesDlg)
-	ON_NOTIFY(NM_CLICK, IDC_COUNTER_LIST, &CRuleSetPropertiesDlg::OnNMClickCounterList)
-	//}}AFX_MSG_MAP
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_COUNTER_LIST, &CRuleSetPropertiesDlg::OnCounterListItemChanged)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -254,67 +252,39 @@ void CRuleSetPropertiesDlg::OnOK()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI11553")
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSetPropertiesDlg::OnNMClickCounterList(NMHDR *pNMHDR, LRESULT *pResult)
+void CRuleSetPropertiesDlg::OnCounterListItemChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	try
 	{
-		////////////////////////////
-		// Check for check box click
-		////////////////////////////
-		// Retrieve position of click
-		CPoint	p;
-		GetCursorPos( &p );
-		m_CounterList.ScreenToClient( &p );
+		// Get the list view item structure from the message
+		LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 
-		UINT	uiFlags;
-		int		iIndex = m_CounterList.HitTest( p, &uiFlags );
-
-		// Was the click on the checkbox?
-		// Note: if the item is clicked on anywhere but the check box,
-		// the flag contains LVHT_ONITEMSTATEICON, LVHT_ONITEMICON and 
-		// LVHT_ONITEMLABEL. If the item is clicked on only the check box
-		// part, the flag will only contain LVHT_ONITEMSTATEICON 
-		if (iIndex >= 0
-			&& (uiFlags & LVHT_ONITEMSTATEICON)
-			&& !(uiFlags & LVHT_ONITEMICON)
-			&& !(uiFlags & LVHT_ONITEMLABEL))
+		// Check if the item state has changed and it is changing to checked
+		// AND it is one of the redaction check boxes
+		if (pNMLV->uChanged & LVIF_STATE
+			&& (pNMLV->uNewState & LVIS_STATEIMAGEMASK) == INDEXTOSTATEIMAGEMASK(giTARGET_STATE_UNCHECKED))
 		{
-			// Retrieve the Item Data for the clicked item
-			int iItemData = m_CounterList.GetItemData( iIndex );
+			// Get the index of the checked/unchecked item and the item data for the item
+			int iIndex = pNMLV->iItem;
+			int iItemData = m_CounterList.GetItemData(iIndex);
 
-			// If the click was either of the redaction checkboxes make sure the other one
-			// is un-checked.
-			if( iItemData == giREDACTION_PAGES_ITEM )
+			// Check if this is one of the redaction check boxes
+			if (iItemData == giREDACTION_PAGES_ITEM)
 			{
-				// User checked redaction by pages, uncheck redaction by docs
+				// Need to uncheck the redaction count by doc item
 				if (m_iRedactDocsCounterItem != -1)
 				{
-					// Redaction by document exists, make sure it is unchecked
-					if(! m_CounterList.SetCheck( m_iRedactDocsCounterItem, 0) )
-					{
-						// If there is an error, throw an exception
-						UCLIDException ue("ELI14497", "Invalid redaction selection!");
-						ue.addDebugInfo("Un-checking:", "Redaction Docs");
-						ue.display();
-					}
+					m_CounterList.SetCheck(m_iRedactDocsCounterItem, FALSE);
 				}
 			}
-			
-			if( iItemData == giREDACTION_DOCS_ITEM )
+			else if (iItemData == giREDACTION_DOCS_ITEM)
 			{
-				// User checked redaction by docs, uncheck redaction by pages
+				// Need to uncheck the redaction count by page item
 				if (m_iRedactPagesCounterItem != -1)
 				{
-					// Redaction by page exists, make sure it is unchecked
-					if(! m_CounterList.SetCheck( m_iRedactPagesCounterItem, 0) )
-					{
-						// If there is an error, throw an exception
-						UCLIDException ue("ELI14498", "Invalid redaction selection!");
-						ue.addDebugInfo("Un-checking:", "Redaction Pages");
-						ue.display();
-					}
+					m_CounterList.SetCheck(m_iRedactPagesCounterItem, FALSE);
 				}
-			}			
+			}
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14496")

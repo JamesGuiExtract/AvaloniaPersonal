@@ -30,7 +30,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 
-	afx_msg void OnNMClickCounterList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnCounterListItemChanged(NMHDR* pNMHDR, LRESULT* pResult);
 
 	DECLARE_MESSAGE_MAP()
 
