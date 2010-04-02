@@ -200,7 +200,9 @@ private:
 	// PROMISE: None.
 	// ARGS:	ipAttribute - parent Attribute
 	//             hItem - element in Tree List associated with ipAttribute
-	void	addSubAttributes(UCLID_AFCORELib::IAttributePtr ipAttribute, HTREEITEM hItem);
+	//			bAutoExpand - whether elements should be auto-expanded or not
+	void	addSubAttributes(UCLID_AFCORELib::IAttributePtr ipAttribute, HTREEITEM hItem,
+							bool bAutoExpand);
 
 	//=============================================================================
 	// PURPOSE: To create a brand new spot rec window

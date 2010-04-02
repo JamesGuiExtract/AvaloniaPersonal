@@ -1091,7 +1091,7 @@ void RuleTesterDlg::updateList(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 			m_wndTreeList.m_tree.SetItemData( hTmp, (DWORD)&(*ipAttr) );
 
 			// Add any sub attributes
-			addSubAttributes( ipAttr, hTmp );
+			addSubAttributes( ipAttr, hTmp, bAutoExpand );
 
 			// If auto expand is true, expand the attribute
 			if (bAutoExpand)
@@ -1100,6 +1100,11 @@ void RuleTesterDlg::updateList(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 			}
 		}
 	}
+
+	// Scroll tree view to top
+	int nMin(0), nMax(0);
+	m_wndTreeList.m_tree.GetScrollRange(SB_VERT, &nMin, &nMax);
+	m_wndTreeList.m_tree.SetScrollPos(SB_VERT,nMin, TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 string RuleTesterDlg::docProbabilityAsText(const string &strValueAsLong)
@@ -1138,7 +1143,8 @@ string RuleTesterDlg::docProbabilityAsText(const string &strValueAsLong)
 	return strTextValue;
 }
 //-------------------------------------------------------------------------------------------------
-void RuleTesterDlg::addSubAttributes(UCLID_AFCORELib::IAttributePtr ipAttribute, HTREEITEM hItem)
+void RuleTesterDlg::addSubAttributes(UCLID_AFCORELib::IAttributePtr ipAttribute, HTREEITEM hItem,
+									 bool bAutoExpand)
 {
 	// Retrieve collection of sub-attributes
 	IIUnknownVectorPtr	ipSubAttributes = ipAttribute->GetSubAttributes();
@@ -1189,7 +1195,13 @@ void RuleTesterDlg::addSubAttributes(UCLID_AFCORELib::IAttributePtr ipAttribute,
 		//////////////////////////////
 		// Add any grandchildren items
 		//////////////////////////////
-		addSubAttributes( ipThisSub, hTmp );
+		addSubAttributes( ipThisSub, hTmp, bAutoExpand );
+
+		// If auto expand is true, expand the attribute
+		if (bAutoExpand)
+		{
+			m_wndTreeList.m_tree.Expand(hTmp, TVE_EXPAND);
+		}
 	}
 }
 //-------------------------------------------------------------------------------------------------
