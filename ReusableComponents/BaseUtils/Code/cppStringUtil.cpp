@@ -361,6 +361,77 @@ unsigned long asUnsignedLong(const string& strValue)
 	return ulValue;
 }
 //--------------------------------------------------------------------------------------------------
+LONGLONG asLongLong(const string& strValue)
+{
+	// ensure that the string is not empty
+	if (strValue.empty())
+	{
+		UCLIDException ue( "ELI29969", "Cannot convert an empty string to a longlong value!" );
+		throw ue;
+	}
+
+	char*	pszError;
+	long	lValue = 0;
+	string strExtractValue = trim(strValue, " ", " ");
+
+	if (strExtractValue.find(',') != string::npos)
+	{
+		validateRemoveCommaInteger(strExtractValue);
+	}
+
+	// Convert to a longlong value
+	LONGLONG llVal = _strtoi64(strExtractValue.c_str(), &pszError, 10);
+	if (pszError[0] != 0)
+	{
+		UCLIDException ue( "ELI29970", "Invalid longlong!" );
+		ue.addDebugInfo( "Input string", strValue );
+		ue.addWin32ErrorInfo(errno);
+		throw ue;
+	}
+
+	return llVal;
+}
+//--------------------------------------------------------------------------------------------------
+ULONGLONG asUnsignedLongLong(const string& strValue)
+{
+	// ensure that the string is not empty
+	if (strValue.empty())
+	{
+		UCLIDException ue( "ELI29971",
+			"Cannot convert an empty string to an unsigned longlong value!" );
+		throw ue;
+	}
+
+	char*	pszError;
+	long	lValue = 0;
+	string strExtractValue = trim(strValue, " ", " ");
+
+	if (strExtractValue.find(',') != string::npos)
+	{
+		validateRemoveCommaInteger(strExtractValue);
+	}
+
+	// Check first character
+	if (strExtractValue[0] == '-')
+	{
+		UCLIDException ue( "ELI29972", "Invalid unsigned longlong!" );
+		ue.addDebugInfo( "Input string", strValue );
+		throw ue;
+	}
+
+	// Convert to a longlong value
+	ULONGLONG ullVal = _strtoui64(strExtractValue.c_str(), &pszError, 10);
+	if (pszError[0] != 0)
+	{
+		UCLIDException ue( "ELI29973", "Invalid unsigned longlong!" );
+		ue.addDebugInfo( "Input string", strValue );
+		ue.addWin32ErrorInfo(errno);
+		throw ue;
+	}
+
+	return ullVal;
+}
+//--------------------------------------------------------------------------------------------------
 int getNextDelimiterPosition(const string &strText, int iStartingPosition, 
 							 const string& strDelimiters)
 {

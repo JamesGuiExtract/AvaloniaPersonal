@@ -25,11 +25,11 @@ static const int giCOUNTER_COLUMN_WIDTH = 150;
 // CAddModifyUserCountersDlg dialog
 //-------------------------------------------------------------------------------------------------
 CManageUserCountersDlg::CAddModifyUserCountersDlg::CAddModifyUserCountersDlg(const string &strCounterName,
-													 long nCounterValue, bool bAllowModifyName,
+													 LONGLONG llCounterValue, bool bAllowModifyName,
 													 bool bAllowModifyValue, CWnd *pParent) :
 CDialog(CManageUserCountersDlg::CAddModifyUserCountersDlg::IDD, pParent),
 m_strCounterName(strCounterName),
-m_nValue(nCounterValue),
+m_llValue(llCounterValue),
 m_bEnableCounterName(bAllowModifyName),
 m_bEnableCounterValue(bAllowModifyValue)
 {
@@ -72,7 +72,7 @@ BOOL CManageUserCountersDlg::CAddModifyUserCountersDlg::OnInitDialog()
 
 		// Set the counter name and the value
 		m_editCounterName.SetWindowText(m_strCounterName.c_str());
-		m_editCounterValue.SetWindowText(asString(m_nValue).c_str());
+		m_editCounterValue.SetWindowText(asString(m_llValue).c_str());
 
 		if (m_bEnableCounterName)
 		{
@@ -93,7 +93,7 @@ BOOL CManageUserCountersDlg::CAddModifyUserCountersDlg::OnInitDialog()
 
 		// Limit the text in the edit boxes
 		m_editCounterName.SetLimitText(50);
-		m_editCounterValue.SetLimitText(13);
+		m_editCounterValue.SetLimitText(22);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27788");
 
@@ -132,13 +132,13 @@ void CManageUserCountersDlg::CAddModifyUserCountersDlg::OnBtnOK()
 			// Try to convert the value to a long
 			try
 			{
-				m_nValue = asLong((LPCTSTR) zValue);
+				m_llValue = asLongLong((LPCTSTR) zValue);
 
-				// Ensure the value was not bigger or smaller than a long
-				if ((m_nValue == LONG_MAX || m_nValue == LONG_MIN) && errno == ERANGE)
+				// Ensure the value was not bigger or smaller than a longlong
+				if ((m_llValue == _I64_MAX || m_llValue == _I64_MIN) && errno == ERANGE)
 				{
 					string strMessage = "The value you entered is too large, number must be between: "
-						+ asString(LONG_MIN) + " and " + asString(LONG_MAX) + ".";
+						+ asString(_I64_MAX) + " and " + asString(_I64_MIN) + ".";
 					MessageBox(strMessage.c_str(), "Number Out Of Range", MB_OK | MB_ICONWARNING);
 					m_editCounterValue.SetSel(0, -1);
 					m_editCounterValue.SetFocus();
@@ -292,10 +292,10 @@ void CManageUserCountersDlg::OnBtnAdd()
 			// Get the counter name and value from the dialog
 			// (Trim leading and trailing whitespace from the name [LRCAU #5516])
 			string strCounterName = trim(dlg.getCounterName(), " \t", " \t");
-			long nValue = dlg.getValue();
+			LONGLONG llValue = dlg.getValue();
 
 			// Add the new counter
-			m_ipFAMDB->AddUserCounter(strCounterName.c_str(), nValue);
+			m_ipFAMDB->AddUserCounter(strCounterName.c_str(), llValue);
 
 			// Log an application trace about the database change
 			UCLIDException uex("ELI27795", "Application trace: Database change");
@@ -304,7 +304,7 @@ void CManageUserCountersDlg::OnBtnAdd()
 			uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
 			uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
 			uex.addDebugInfo("Counter Name", strCounterName);
-			uex.addDebugInfo("Counter Value", nValue);
+			uex.addDebugInfo("Counter Value", llValue);
 			uex.log();
 
 			// Refresh list for new tag
@@ -386,10 +386,10 @@ void CManageUserCountersDlg::OnBtnSetValue()
 			// Get the strings from the current selection
 			CString zCounterName = m_listCounters.GetItemText(iIndex, giCOUNTER_COLUMN);
 			CString zValue = m_listCounters.GetItemText(iIndex, giVALUE_COLUMN);
-			long nValue = asLong((LPCTSTR)zValue);
+			LONGLONG llValue = asLongLong((LPCTSTR)zValue);
 
 			// Create the dialog and enable the value control
-			CAddModifyUserCountersDlg dlg((LPCTSTR)zCounterName, nValue, false, true);
+			CAddModifyUserCountersDlg dlg((LPCTSTR)zCounterName, llValue, false, true);
 
 			// Display the dialog
 			if (dlg.DoModal() == IDOK)
@@ -397,10 +397,10 @@ void CManageUserCountersDlg::OnBtnSetValue()
 				// Show the wait cursor while updating the dialog
 				CWaitCursor wait;
 
-				long nNewValue = dlg.getValue();
+				LONGLONG llNewValue = dlg.getValue();
 
 				// Modify the existing tag
-				m_ipFAMDB->SetUserCounterValue((LPCTSTR)zCounterName, nNewValue);
+				m_ipFAMDB->SetUserCounterValue((LPCTSTR)zCounterName, llNewValue);
 
 				// Log an application trace about the database change
 				UCLIDException uex("ELI27799", "Application trace: Database change");
@@ -409,8 +409,8 @@ void CManageUserCountersDlg::OnBtnSetValue()
 				uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
 				uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
 				uex.addDebugInfo("Counter Name", (LPCTSTR) zCounterName);
-				uex.addDebugInfo("Original Counter value", nValue);
-				uex.addDebugInfo("New Counter value", nNewValue);
+				uex.addDebugInfo("Original Counter value", llValue);
+				uex.addDebugInfo("New Counter value", llNewValue);
 				uex.log();
 
 				// Refresh list
@@ -650,7 +650,7 @@ void CManageUserCountersDlg::refreshCounterList(const string& strNameToSelect)
 			// Add the info into the list
 			m_listCounters.InsertItem(i, (const char*)bstrCounterName);
 			m_listCounters.SetItemText(i, giVALUE_COLUMN,
-				commaFormatNumber((LONGLONG)asLong(asString(bstrCounterValue))).c_str());
+				commaFormatNumber(asLongLong(asString(bstrCounterValue))).c_str());
 		}
 
 		// Select either the last selected item position or select the first item

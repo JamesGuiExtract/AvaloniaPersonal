@@ -55,12 +55,12 @@ private:
 		enum { IDD = IDD_DIALOG_ADDMODIFY_COUNTER };
 
 		CAddModifyUserCountersDlg(const string& strCounterToModify,
-			long nValueToModify, bool bAllowModifyName, bool bAllowModifyValue,
+			LONGLONG llValueToModify, bool bAllowModifyName, bool bAllowModifyValue,
 			CWnd* pParent = NULL);
 		virtual ~CAddModifyUserCountersDlg();
 
 		string getCounterName() { return m_strCounterName; }
-		long getValue() { return m_nValue; }
+		LONGLONG getValue() { return m_llValue; }
 
 	protected:
 		virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -73,7 +73,7 @@ private:
 
 	private:
 		string m_strCounterName;
-		long m_nValue;
+		LONGLONG m_llValue;
 		bool m_bEnableCounterName;
 		bool m_bEnableCounterValue;
 

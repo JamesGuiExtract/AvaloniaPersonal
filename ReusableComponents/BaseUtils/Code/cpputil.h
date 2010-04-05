@@ -641,6 +641,12 @@ EXPORT_BaseUtils long asLong(const string &strValue);
 // PROMISE: return unsigned long quantity if valid string, else throw UCLID Exception
 EXPORT_BaseUtils unsigned long asUnsignedLong(const string &strValue);
 //-------------------------------------------------------------------------------------------------
+// PROMISE: return longlong quantity if valid string, else throw UCLID Exception
+EXPORT_BaseUtils LONGLONG asLongLong(const string& strValue);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: return unsigned longlong quantity if valid string, else throw UCLID Exception
+EXPORT_BaseUtils ULONGLONG asUnsignedLongLong(const string& strValue);
+//-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils string trim(const string& s, 
 							 const string& strBefore, 
 							 const string& strAfter);
