@@ -439,11 +439,12 @@ STDMETHODIMP CRasterZone::CreateFromLongRectangle(ILongRectangle *pRectangle, lo
 		ipLongRectangle->GetBounds(&lLeft, &lTop, &lRight, &lBottom);
 
 		// copy data as specified
+		// Ensure odd heights are fully covered by the resulting raster zone [LRCAU #5827]
 		m_nStartX = lLeft;
-		m_nStartY = (lTop + lBottom) / 2;
+		m_nStartY = (lTop + lBottom + 1) / 2;
 		m_nEndX = lRight;
 		m_nEndY = m_nStartY;
-		m_nHeight = abs(lTop - lBottom);
+		m_nHeight = lBottom - lTop + 1;
 
 		// Ensure height is odd
 		if (m_nHeight % 2 == 0)
