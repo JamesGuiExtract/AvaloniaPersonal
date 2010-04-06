@@ -49,7 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CSharpDatabaseUtilities.cs" />
+    <Compile Include="SqlDatabaseMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistryManager.cs" />
   </ItemGroup>
