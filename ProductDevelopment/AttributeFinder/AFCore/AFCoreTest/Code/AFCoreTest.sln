@@ -1718,12 +1718,24 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Test", ".
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Geometry", "..\..\..\..\..\RC.Net\Geometry\Core\Code\Extract.Geometry.csproj", "{30A7D378-C87D-4A46-B5E2-A2B186319519}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Geometry.Test", "..\..\..\..\..\RC.Net\Geometry\Core\Testing\Automated\Extract.Geometry.Test.csproj", "{5E17E478-0658-419C-95B7-C65A7024D0D0}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 132
+		ProjectCount = 134
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcproj
@@ -1855,7 +1867,9 @@ Global
 		ProjectRelativeDiskPath129 = ..\..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcproj
 		ProjectRelativeDiskPath130 = ..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\RunFPSFile\Core\Code\RunFPSFile.csproj
 		ProjectRelativeDiskPath131 = ..\..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\SubImageHandlers\Code\SubImageHandlers.vcproj
-		ProjectRelativeDiskPath132 = ..\..\..\..\..\RC.Net\Utilities\Core\Testing\Automated\Extract.Test.csproj
+		ProjectRelativeDiskPath132 = ..\..\..\..\..\RC.Net\Utilities\Core\Testing\Automated\Extract.Utilities.Test.csproj
+		ProjectRelativeDiskPath133 = ..\..\..\..\..\RC.Net\Geometry\Core\Code\Extract.Geometry.csproj
+		ProjectRelativeDiskPath134 = ..\..\..\..\..\RC.Net\Geometry\Core\Testing\Automated\Extract.Geometry.Test.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3188,6 +3202,26 @@ Global
 		{160F85ED-2A01-422C-98DD-AD062C084F92}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{160F85ED-2A01-422C-98DD-AD062C084F92}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{160F85ED-2A01-422C-98DD-AD062C084F92}.Release|Win32.ActiveCfg = Release|Any CPU
+		{30A7D378-C87D-4A46-B5E2-A2B186319519}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30A7D378-C87D-4A46-B5E2-A2B186319519}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30A7D378-C87D-4A46-B5E2-A2B186319519}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{30A7D378-C87D-4A46-B5E2-A2B186319519}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{30A7D378-C87D-4A46-B5E2-A2B186319519}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{30A7D378-C87D-4A46-B5E2-A2B186319519}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30A7D378-C87D-4A46-B5E2-A2B186319519}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30A7D378-C87D-4A46-B5E2-A2B186319519}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{30A7D378-C87D-4A46-B5E2-A2B186319519}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{30A7D378-C87D-4A46-B5E2-A2B186319519}.Release|Win32.ActiveCfg = Release|Any CPU
+		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
