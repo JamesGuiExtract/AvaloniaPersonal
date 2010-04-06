@@ -71,7 +71,7 @@ void pasteImageAtLocation(const string& strInputImage, const string& strOutputIm
 
 				// Get the vector of page numbers to stamp
 				validatePageNumbers(strPagesToStamp);
-				set<int> setPages = getPageNumbersAsSet(nPageCount, strPagesToStamp);
+				set<int> setPages = getPageNumbersAsSet(nPageCount, strPagesToStamp, true);
 
 				// create a load files option
 				LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(
@@ -256,17 +256,6 @@ void validateStampImageSize(long lDestWidth, long lDestHeight, long lStampWidth,
 		ue.addDebugInfo("Destination Height", lDestHeight);
 		ue.addDebugInfo("Stamp Width", lStampWidth);
 		ue.addDebugInfo("Stamp Height", lStampHeight);
-		throw ue;
-	}
-}
-//--------------------------------------------------------------------------------------------------
-void validatePageNumber(long lPageNumber, long lNumberOfPages)
-{
-	if (lPageNumber > lNumberOfPages)
-	{
-		UCLIDException ue("ELI20067", "Invalid page number to apply stamp on!");
-		ue.addDebugInfo("Page to stamp", lPageNumber);
-		ue.addDebugInfo("Pages in image", lNumberOfPages);
 		throw ue;
 	}
 }

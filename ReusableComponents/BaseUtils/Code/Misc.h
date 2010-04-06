@@ -33,11 +33,13 @@ EXPORT_BaseUtils void validatePageNumbers(const string& strSpecifiedPageNumbers)
 //			must have already called validatePageNumbers() to make sure the validity of 
 //			strSpecifiedPageNumbers.
 // 
-EXPORT_BaseUtils vector<int> getPageNumbers(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers);
+EXPORT_BaseUtils vector<int> getPageNumbers(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers,
+											bool bThrowExceptionOnPageOutOfRange = false);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: Same as above with all above requirements, but instead of returning a sorted vector
 //			of page numbers, this method will return a set of page numbers.
-EXPORT_BaseUtils set<int> getPageNumbersAsSet(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers);
+EXPORT_BaseUtils set<int> getPageNumbersAsSet(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers,
+											bool bThrowExceptionOnPageOutOfRange = false);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: Load a list of files from a file vector of files
 // ARGUMENT:	strFileName is the name of the file with the list. Any lines or blocks with comments (// or /* */) are ignored

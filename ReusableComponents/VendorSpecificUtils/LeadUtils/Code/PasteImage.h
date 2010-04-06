@@ -91,15 +91,6 @@ void validateStampLocation(long lX, long lY, long lDestWidth, long lDestHeight,
 // PROMISE:	To throw an exception if the stamp image is bigger than the source image
 void validateStampImageSize(long lDestWidth, long lDestHeight, long lStampWidth, long lStampHeight);
 //--------------------------------------------------------------------------------------------------
-// PURPOSE:	To validate the page number specified to apply the stamp on
-//
-// ARGS:	lPageNumber		- the page to apply the stamp to
-//			lNumberOfPages	- the number of pages in the source bitmap
-//
-// PROMISE:	To throw an exception if the pagenumber requested to place the stamp on
-//			is greater than the number of pages in the image
-void validatePageNumber(long lPageNumber, long lNumberOfPages);
-//--------------------------------------------------------------------------------------------------
 // PURPOSE: To paste the stamp image onto the source image
 //
 // ARGS:	hPasteBmp		- the BITMAPHANDLE for the stamp image

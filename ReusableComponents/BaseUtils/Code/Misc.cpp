@@ -85,10 +85,19 @@ void getStartAndEndPage(const string& strPageRange, int& nStartPage, int& nEndPa
 void updatePageNumbers(vector<int>& rvecPageNubmers, 
 					   int nTotalNumberOfPages, 
 					   int nStartPage, 
-					   int nEndPage)
+					   int nEndPage,
+					   bool bThrowExceptionOnPageOutOfRange)
 {
-	int nLastPageNumber = (nEndPage < nTotalNumberOfPages && nEndPage > 0)? 
-							nEndPage : nTotalNumberOfPages;
+	bool bEndOutOfRange = nEndPage > nTotalNumberOfPages;
+	if (bEndOutOfRange && bThrowExceptionOnPageOutOfRange)
+	{
+		UCLIDException ue("ELI29980", "Specified end page number is out of range.");
+		ue.addDebugInfo("End Page Number", nEndPage);
+		ue.addDebugInfo("Total Number Of Pages", nTotalNumberOfPages);
+		throw ue;
+	}
+
+	int nLastPageNumber = (!bEndOutOfRange && nEndPage > 0)? nEndPage : nTotalNumberOfPages;
 	for (int n=nStartPage; n<=nLastPageNumber; n++)
 	{
 		::vectorPushBackIfNotContained(rvecPageNubmers, n);
@@ -101,11 +110,30 @@ void updatePageNumbers(vector<int>& rvecPageNubmers,
 void updatePageNumbers(vector<int>& rvecPageNubmers, 
 					   int nTotalNumberOfPages, 
 					   int nPageNumber,
+					   bool bThrowExceptionOnPageOutOfRange,
 					   bool bLastPagesDefined = false)
 {
+	// Check if the page number is valid
+	bool bPageOutOfRange = nPageNumber > nTotalNumberOfPages;
+	if (bPageOutOfRange)
+	{
+		// Throw exception if specified
+		if (bThrowExceptionOnPageOutOfRange)
+		{
+			UCLIDException ue("ELI29981", "Specified page number is out of range.");
+			ue.addDebugInfo("Page Number", nPageNumber);
+			ue.addDebugInfo("Total Number Of Pages", nTotalNumberOfPages);
+			throw ue;
+		}
+		// Check if not last page defined just return
+		else if (!bLastPagesDefined)
+		{
+			return;
+		}
+	}
 	if (bLastPagesDefined)
 	{
-		int n = nPageNumber < nTotalNumberOfPages ? nTotalNumberOfPages-nPageNumber+1 : 1;
+		int n = !bPageOutOfRange ? (nTotalNumberOfPages - nPageNumber) + 1 : 1;
 		for (; n<=nTotalNumberOfPages; n++)
 		{
 			::vectorPushBackIfNotContained(rvecPageNubmers, n);
@@ -113,23 +141,21 @@ void updatePageNumbers(vector<int>& rvecPageNubmers,
 	}
 	else
 	{
-		if (nPageNumber > nTotalNumberOfPages)
-		{
-			return;
-		}
-		
 		::vectorPushBackIfNotContained(rvecPageNubmers, nPageNumber);
 	}
 }
 //-------------------------------------------------------------------------------------------------
 void fillPageNumberVector(vector<int>& rvecPageNumbers,
-					int nTotalNumberOfPages, const string strSpecifiedPageNumbers)
+					int nTotalNumberOfPages, const string strSpecifiedPageNumbers,
+					bool bThrowExceptionOnPageOutOfRange)
 {
 	// Assume before this methods is called, the caller has already called validatePageNumbers()
 	vector<string> vecTokens;
+
 	// parse string into tokens
 	StringTokenizer::sGetTokens(strSpecifiedPageNumbers, ",", vecTokens);
-	for (unsigned int n=0; n<vecTokens.size(); n++)
+	size_t nLength = vecTokens.size();
+	for (size_t n=0; n < nLength; n++)
 	{
 		// trim any leading/trailing white spaces
 		string strToken = ::trim(vecTokens[n], " \t", " \t");
@@ -145,12 +171,14 @@ void fillPageNumberVector(vector<int>& rvecPageNumbers,
 				(nEndPage > nStartPage || nEndPage <= 0))
 			{
 				// range of pages
-				updatePageNumbers(rvecPageNumbers, nTotalNumberOfPages, nStartPage, nEndPage);
+				updatePageNumbers(rvecPageNumbers, nTotalNumberOfPages, nStartPage, nEndPage,
+					bThrowExceptionOnPageOutOfRange);
 			}
 			else
 			{
 				// last X number of pages
-				updatePageNumbers(rvecPageNumbers, nTotalNumberOfPages, nEndPage, true);
+				updatePageNumbers(rvecPageNumbers, nTotalNumberOfPages, nEndPage,
+					bThrowExceptionOnPageOutOfRange, true);
 			}
 		}
 		else
@@ -165,7 +193,8 @@ void fillPageNumberVector(vector<int>& rvecPageNumbers,
 			}
 
 			// single page number
-			updatePageNumbers(rvecPageNumbers, nTotalNumberOfPages, nPageNumber);
+			updatePageNumbers(rvecPageNumbers, nTotalNumberOfPages, nPageNumber,
+				bThrowExceptionOnPageOutOfRange);
 		}
 	}
 }
@@ -321,11 +350,13 @@ void validatePageNumbers(const string& strSpecifiedPageNumbers)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-vector<int> getPageNumbers(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers)
+vector<int> getPageNumbers(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers,
+						   bool bThrowExceptionPageOutOfRange)
 {
 	// vector of page numbers in ascending order, no duplicates allowed
 	vector<int> vecSortedPageNumbers;
-	fillPageNumberVector(vecSortedPageNumbers, nTotalNumberOfPages, strSpecifiedPageNumbers);
+	fillPageNumberVector(vecSortedPageNumbers, nTotalNumberOfPages, strSpecifiedPageNumbers,
+		bThrowExceptionPageOutOfRange);
 
 	// sort the vector in ascending order
 	sort(vecSortedPageNumbers.begin(), vecSortedPageNumbers.end());
@@ -333,11 +364,13 @@ vector<int> getPageNumbers(int nTotalNumberOfPages, const string& strSpecifiedPa
 	return vecSortedPageNumbers;
 }
 //-------------------------------------------------------------------------------------------------
-set<int> getPageNumbersAsSet(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers)
+set<int> getPageNumbersAsSet(int nTotalNumberOfPages, const string& strSpecifiedPageNumbers,
+						   bool bThrowExceptionPageOutOfRange)
 {
 	// vector of page numbers in ascending order, no duplicates allowed
 	vector<int> vecPageNumbers;
-	fillPageNumberVector(vecPageNumbers, nTotalNumberOfPages, strSpecifiedPageNumbers);
+	fillPageNumberVector(vecPageNumbers, nTotalNumberOfPages, strSpecifiedPageNumbers,
+		bThrowExceptionPageOutOfRange);
 
 	set<int> setPageNumbers;
 	setPageNumbers.insert(vecPageNumbers.begin(), vecPageNumbers.end());
