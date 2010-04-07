@@ -1,0 +1,248 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.4 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.4 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[DotNet #387, #406, FlexIDSCore #4139]</b> SQLCDBEditor
+	       	<ul>
+	      		<li>Confirm that the utility does not allow Identity files to be edited.
+	      		<li>Confirm that the utility does not allow editing of tables that do not 
+			have a unique key.
+			<ul>
+				<li>Confirm that records cannot be added. 
+				<li>Confirm that records cannot be deleted. 
+				<li>Confirm that records cannot be modified. 
+			</ul>
+			<li>Confirm that new records are prepropulated with default values for 
+			the column.
+			<ul>
+				<li>FPSFile table in ESFAMService.sdf : ID column
+				<li>FPSFile table in ESFAMService.sdf : AutoStart column
+			</ul>
+	       	</ul>
+<p>
+		<li><b>[FlexIDSCore #2636]</b> Confirm that <b>Rule Tester</b> properly expands both 
+		top-level attributes and all sub-attributes if the appropriate <b>RDTConfig.exe</b> 
+		option is checked.
+<p>
+		<li><b>[FlexIDSCore #2973]</b> Confirm that <b>Ruleset Editor</b> properly handles 
+		checking and unchecking redaction counters using the space bar.
+<p>
+		<li><b>[FlexIDSCore #2999]</b> Confirm that <b>Core: Add watermark</b> does not show 
+		USS and VOA files when showing files of type: <b>All image files</b>.
+<p>
+		<li><b>[FlexIDSCore #3083]</b> Confirm that <b>Core: Add watermark</b> defaults to showing 
+		files of type: <b>All image files</b> in the Open dialog.
+<p>
+		<li><b>[FlexIDSCore #4193]</b> Confirm that the <b>Redaction: Create redacted 
+		image</b> property page has enough space for all of the <b>Enable PDF security</b> 
+		label.
+<p>
+		<li><b>[FlexIDSCore #4193]</b> Confirm that the <b>Core: Convert to searchable PDF</b> 
+		property page has enough space for all of the <b>Enable PDF security</b> label.
+<p>
+  	   	<LI><b>[FlexIDSCore #4205]</b> Selected redaction should scroll into view
+	       	<ul>
+	      		<li>Verify a document with a large number of sensitive items so that a scroll 
+			bar is present in the <b>Data grid</b>.
+			<li>Select an item in the <b>Image Viewer</b> that is not in view in the 
+			<b>Data grid</b>.
+			<li>Confirm that the item is scrolled into view in the <b>Data grid</b>.
+			<li>Confirm that the <b>T</b> shortcut works to drop down the Type combo 
+			box for the selected item.
+			<li>Select multiple items in the <b>Image Viewer</b> such that none are in 
+			view in the <b>Data grid</b>.
+			<li>Confirm that the first item is scrolled into view in the <b>Data grid</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4206]</b> Manual redaction should be automatically selected
+	       	<ul>
+	      		<li>Verify an image.
+			<li>Create a manual redaction.
+			<li>Confirm that the manual redaction is automatically selected in the 
+			<b>Data grid</b>.
+	       	</ul>
+<p>
+		<li><b>[FlexIDSCore #4224]</b> Confirm that <b>Core: Add watermark</b> fails the 
+		processing image if the requested page number does not exist.
+<p>
+		<li><b>[FlexIDSCore #4225]</b> Confirm that the <b>Redaction: Extend redactions to 
+		surround context</b> property page has enough space in the spinner edit control to 
+		display two-digit numbers.
+<p>
+		<li><b>[FlexIDSCore #4226]</b> Confirm that the <b>Select page region</b> property 
+		page has enough space for all of the <b>Re-OCR and return text</b> label.
+<p>
+  	   	<LI><b>[LegacyRC #4825]</b> Extra errors for FPS file with missing action
+	       	<ul>
+	      		<li>Create and save a valid FPS file.
+			<li>Close the FAM.
+			<li>Use <b>DB Admin</b> to remove the action used in the FPS file.
+			<li>Double-click on the FPS file to open it.
+			<li>Confirm that only one <b>Action not found</b> error is presented.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5122]</b> Export file list from DB Admin
+	       	<ul>
+	      		<li>Confirm that exporting a file list to a non-existent folder automatically 
+			creates the folder.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5492]</b> None of the following tags
+	       	<ul>
+	      		<li>Confirm that the <b>Select Files</b> dialog in DB Admin supports selecting 
+			all files associated with <b>None</b> of the following tags.
+	      		<li>Confirm that equivalent functionality is available in the <b>Tag condition</b> 
+			object by using <b>not met</b> and <b>any</b> of the following tags.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5558, #5797, #5800, #5804]</b> UEX Viewer
+	       	<ul>
+	      		<li>Open an exception log in the UEX Viewer.
+			<li>Double-click on an exception.
+			<li>Click the <b>Details...</b> button.
+			<li>Click the <b>Copy to Clipboard</b> button.
+			<li>Close the exception.
+			<li>Select the <b>Edit - Paste</b> menu item.
+			<li>Confirm that an appropriate row is inserted into the UEX Viewer.  Complete 
+			information should be available.
+<p>
+			<li>Confirm that a <b>File - Start new log file...</b> menu item exists.
+			<li>Confirm that an <b>Add Rename Comment</b> dialog is presented.
+			<li>Confirm that an added comment is stored as debug data.
+			<li>Confirm that an added comment is not required.
+<p>
+			<li>Confirm that the default file extension for exporting debug data is 
+			<b>*.txt</b>.
+			<li>Confirm that the <b>Export Debug Data</b> dialog includes an <b>Only 
+			export unique values</b> checkbox.
+			<li>Confirm that the checkbox is unchecked by default.
+			<li>Confirm that with the checkbox <b>unchecked</b>, duplicate entries can be seen 
+			in the exported debug data.
+			<li>Confirm that with the checkbox <b>checked</b>, duplicate entries are not seen 
+			in the exported debug data.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5564, #5565, #5566]</b> Text function expander
+	       	<ul>
+	      		<li>Confirm that <b>$Left()</b> is available and functions properly.
+			<ul>
+				<li>The first parameter is the input string.
+				<li>The second parameter is the number of characters to extract from the 
+				left side of the input string.
+			</ul>
+	      		<li>Confirm that <b>$Right()</b> is available and functions properly.
+			<ul>
+				<li>The first parameter is the input string.
+				<li>The second parameter is the number of characters to extract from the 
+				right side of the input string.
+			</ul>
+	      		<li>Confirm that <b>$Mid()</b> is available and functions properly.
+			<ul>
+				<li>The first parameter is the input string.
+				<li>The second parameter is the first (1-relative) character to take from 
+				the left side of the input string.
+				<li>The third parameter is the number of characters to take from 
+				the input string.
+				<li>Confirm that <b>-1</b> for the third parameter extracts the remainder 
+				of the string.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5652]</b> Confirm that <b>PgDn</b> and <b>PgUp</b> are supported 
+		in ReportViewer.exe to navigate between pages within multi-page reports.
+<p>
+  	   	<LI><b>[LegacyRC #5708]</b> Large Bates number counter values
+	       	<ul>
+	      		<li>Confirm that <b>DB Admin</b> supports creating a user counter with an 
+			initial value larger than <b>2,147,483,647</b>.
+			<li>Confirm that after applying Bates numbers larger than the above value, 
+			the <b>Manage Counters</b> correctly displays the current value.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5751, #5825]</b> FAM queuing
+	       	<ul>
+	      		<li>Prepare a folder of <b>PDF</b> images for queuing.
+			<li>Add an additional <b>*.pdf1</b> image to the folder.
+			<li>Prepare an FPS file to queue the <b>*.pdf</b> images.
+			<li>Confirm that the <b>*.pdf1</b> image does not get queued.
+			<li>Confirm the same proper behavior for <b>*.tif</b> and <b>*.tif1</b> files.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5783]</b> Confirm that <b>ConvertFAMDB.exe</b> will not run without 
+		a <b>Server</b> license.
+<p>
+  	   	<LI><b>[LegacyRC #5803]</b> DB Admin title bar
+	       	<ul>
+	      		<li>Confirm that the caption includes the database server and database name 
+			before <b>File Action Manager Database Administration</b>.
+			<li>Confirm that titlebar format is <b>server:database - File Action Manager 
+			Database Administration</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5813]</b> Run FPS File and &lt;FPSFileDir&gt;
+	       	<ul>
+	      		<li>Confirm that <b>RunFPSFile</b> supports <b>&lt;FPSFileDir&gt;</b> when 
+			/ignoreDB is not used.
+	      		<li>Confirm that <b>RunFPSFile</b> supports automatic creation of action names.
+	      		<li>Confirm that <b>RunFPSFile</b> supports action names that contain 
+			document tags (i.e. <b>Compute_$Username()</b>).
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
