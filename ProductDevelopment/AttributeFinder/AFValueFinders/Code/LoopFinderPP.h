@@ -46,9 +46,7 @@ BEGIN_MSG_MAP(CLoopFinderPP)
 	COMMAND_HANDLER(IDC_RADIO_DO, BN_CLICKED, OnBnClickedRadioDo)
 	COMMAND_HANDLER(IDC_RADIO_WHILE, BN_CLICKED, OnBnClickedRadioWhile)
 	COMMAND_HANDLER(IDC_RADIO_FOR, BN_CLICKED, OnBnClickedRadioFor)
-	COMMAND_HANDLER(IDC_EDIT_FINDING_RULE, STN_DBLCLK, OnStnDblclickEditFindingRule)
-	COMMAND_HANDLER(IDC_EDIT_PREPROCESSOR, STN_DBLCLK, OnStnDblclickEditPreprocessor)
-	COMMAND_HANDLER(IDC_EDIT_CONDITION, STN_DBLCLK, OnStnDblclickEditCondition)
+	MESSAGE_HANDLER(WM_LBUTTONDBLCLK, OnLButtonDblClk)
 	CHAIN_MSG_MAP(IPropertyPageImpl<CLoopFinderPP>)
 	MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 END_MSG_MAP()
@@ -64,9 +62,7 @@ END_MSG_MAP()
 	LRESULT OnBnClickedRadioDo(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnBnClickedRadioWhile(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnBnClickedRadioFor(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-	LRESULT OnStnDblclickEditFindingRule(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-	LRESULT OnStnDblclickEditPreprocessor(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-	LRESULT OnStnDblclickEditCondition(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnLButtonDblClk(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 
 // IPropertyPage
 	STDMETHOD(Apply)(void);

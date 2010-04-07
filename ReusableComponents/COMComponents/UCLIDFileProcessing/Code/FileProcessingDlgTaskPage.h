@@ -110,11 +110,11 @@ protected:
 	afx_msg void OnBtnBrowseErrorLog();
 	afx_msg void OnCheckExecuteErrorTask();
 	afx_msg void OnBtnAddErrorTask();
-	afx_msg void OnStnDblClkEditExecuteTask();
 	afx_msg void OnBtnProcessAllOrSkipped();
 	afx_msg void OnComboSkippedChange();
 	afx_msg void OnBtnClickedCheckLimitProcessing();
 	afx_msg void OnBnClickedButtonSetSchedule();
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	
 	DECLARE_MESSAGE_MAP()
 

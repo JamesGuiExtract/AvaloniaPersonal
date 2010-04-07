@@ -329,42 +329,41 @@ LRESULT CLoopFinderPP::OnBnClickedRadioFor(WORD /*wNotifyCode*/, WORD /*wID*/, H
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
-LRESULT CLoopFinderPP::OnStnDblclickEditFindingRule(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+LRESULT CLoopFinderPP::OnLButtonDblClk(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		configureObjectForDblClick(m_ipSelectedRule, m_editFindingRule, "Finding Rule", 
-			AFAPI_VALUE_FINDERS_CATEGORYNAME);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24767");
+		// Handling the Left button dbl click on the property page was implemented instead
+		// of having the different methods for the controls, to fix the issue with double click 
+		// copying the label contents to the clipboard FlexIDSCore #4227
 
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
-LRESULT CLoopFinderPP::OnStnDblclickEditPreprocessor(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	try
-	{
-		configureObjectForDblClick(m_ipSelectedPreprocessor, m_editPreprocessor, "Preprocessor", 
-			AFAPI_DOCUMENT_PREPROCESSORS_CATEGORYNAME);
+		// Get the window ID that the mouse is in
+		POINT pointMouse;
+		pointMouse.x = GET_X_LPARAM(lParam); 
+		pointMouse.y = GET_Y_LPARAM(lParam); 
+		int iID = ChildWindowFromPointEx(pointMouse,CWP_SKIPTRANSPARENT).GetDlgCtrlID();
+		
+		// If the mouse was double clicked in finding rule, preprocessor, or condition - configure
+		if (iID == IDC_EDIT_FINDING_RULE)
+		{
+			configureObjectForDblClick(m_ipSelectedRule, m_editFindingRule, "Finding Rule", 
+				AFAPI_VALUE_FINDERS_CATEGORYNAME);
+			bHandled = TRUE;
+		}
+		else if (iID == IDC_EDIT_PREPROCESSOR )
+		{
+			configureObjectForDblClick(m_ipSelectedPreprocessor, m_editPreprocessor, "Preprocessor", 
+				AFAPI_DOCUMENT_PREPROCESSORS_CATEGORYNAME);
+			bHandled = TRUE;
+		}
+		else if (iID == IDC_EDIT_CONDITION)
+		{
+			configureObjectForDblClick(m_ipSelectedCondition, m_editCondition, "Condition", 
+				AFAPI_CONDITIONS_CATEGORYNAME);
+			bHandled = TRUE;
+		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24771");
-
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
-LRESULT CLoopFinderPP::OnStnDblclickEditCondition(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	try
-	{
-		configureObjectForDblClick(m_ipSelectedCondition, m_editCondition, "Condition", 
-			AFAPI_CONDITIONS_CATEGORYNAME);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24772");
-
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29968");
 	return 0;
 }
 

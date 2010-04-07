@@ -159,12 +159,12 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_COMMAND(ID_CONTEXT_DELETE, &FileProcessingDlgTaskPage::OnContextDelete)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_FP, &FileProcessingDlgTaskPage::OnLvnItemchangedListFp)
 	ON_EN_CHANGE(IDC_EDIT_THREADS, &FileProcessingDlgTaskPage::OnEnChangeEditThreads)
-	ON_STN_DBLCLK(IDC_EDIT_EXECUTE_TASK, &FileProcessingDlgTaskPage::OnStnDblClkEditExecuteTask)
 	ON_BN_CLICKED(IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
 	ON_BN_CLICKED(IDC_RADIO_PROCESS_SKIPPED_FILES, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
 	ON_CBN_SELCHANGE(IDC_COMBO_SKIPPED_SCOPE, &FileProcessingDlgTaskPage::OnComboSkippedChange)
 	ON_BN_CLICKED(IDC_CHECK_LIMIT_PROCESSING, &FileProcessingDlgTaskPage::OnBtnClickedCheckLimitProcessing)
 	ON_BN_CLICKED(IDC_BUTTON_SET_SCHEDULE, &FileProcessingDlgTaskPage::OnBnClickedButtonSetSchedule)
+	ON_WM_LBUTTONDBLCLK()
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -1448,45 +1448,61 @@ void FileProcessingDlgTaskPage::OnLvnItemchangedListFp(NMHDR *pNMHDR, LRESULT *p
 	*pResult = 0;
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnStnDblClkEditExecuteTask()
+void FileProcessingDlgTaskPage::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
 
 	try
 	{
-		// get the error task
-		IObjectWithDescriptionPtr ipErrorTask = getFPMgmtRole()->ErrorTask;
-		ASSERT_RESOURCE_ALLOCATION("ELI16114", ipErrorTask != NULL);
+		// Handling the Left button dbl click on the property page was implemented instead
+		// of having the different methods for the controls, to fix the issue with double click 
+		// copying the label contents to the clipboard FlexIDSCore #4227
 
-		// select a file processor
-		VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(
-			getFPMgmtRole()->ErrorTask, "Task", get_bstr_t(FP_FILE_PROC_CATEGORYNAME), 
-			VARIANT_TRUE, 0, NULL);
+		// Get the child window the mouse was double clicked in
+		CWnd *tmpChild = ChildWindowFromPoint(point, CWP_SKIPTRANSPARENT);
 
-		// check result
-		if (vbDirty == VARIANT_TRUE)
+		// if the child was returned check if it is the execute task control
+		if (tmpChild != NULL && tmpChild->GetDlgCtrlID() == IDC_EDIT_EXECUTE_TASK)
 		{
-			// Update the description
-			m_zErrorTaskDescription = ipErrorTask->Description.operator const char *();
+			// get the error task
+			IObjectWithDescriptionPtr ipErrorTask = getFPMgmtRole()->ErrorTask;
+			ASSERT_RESOURCE_ALLOCATION("ELI16114", ipErrorTask != NULL);
 
-			if (ipErrorTask->Object == NULL)
+			// select a file processor
+			VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(
+				getFPMgmtRole()->ErrorTask, "Task", get_bstr_t(FP_FILE_PROC_CATEGORYNAME), 
+				VARIANT_TRUE, 0, NULL);
+
+			// check result
+			if (vbDirty == VARIANT_TRUE)
 			{
-				// If the user selected "<NONE>", disable the error task
-				m_bExecuteErrorTask = false;
-				getFPMgmtRole()->ExecuteErrorTask = asVariantBool(m_bExecuteErrorTask);
+				// Update the description
+				m_zErrorTaskDescription = ipErrorTask->Description.operator const char *();
+
+				if (ipErrorTask->Object == NULL)
+				{
+					// If the user selected "<NONE>", disable the error task
+					m_bExecuteErrorTask = false;
+					getFPMgmtRole()->ExecuteErrorTask = asVariantBool(m_bExecuteErrorTask);
+				}
+
+				// Temporary solution to set the MgmtRole's dirty flag. (This call is not otherwise necessary)
+				// The long run solution should be that all ICopyableObjects set their dirty flag in CopyFrom.
+				// See P13:4627
+				getFPMgmtRole()->ErrorTask = ipErrorTask;
+
+				UpdateData( FALSE );
 			}
 
-			// Temporary solution to set the MgmtRole's dirty flag. (This call is not otherwise necessary)
-			// The long run solution should be that all ICopyableObjects set their dirty flag in CopyFrom.
-			// See P13:4627
-			getFPMgmtRole()->ErrorTask = ipErrorTask;
-
-			UpdateData( FALSE );
+			// Enable / disable controls as appropriate
+			setButtonStates();
+			updateUI();
 		}
-
-		// Enable / disable controls as appropriate
-		setButtonStates();
-		updateUI();
+		else
+		{
+			// Not in a control that needs special handling so call the base class method
+			CPropertyPage::OnLButtonDblClk(nFlags, point);
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16113");
 }

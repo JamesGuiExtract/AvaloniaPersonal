@@ -294,29 +294,35 @@ LRESULT CLoopPreprocessorPP::OnBnClickedRadioFor(WORD /*wNotifyCode*/, WORD /*wI
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
-LRESULT CLoopPreprocessorPP::OnStnDblclickEditPreprocessor(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+LRESULT CLoopPreprocessorPP::OnLButtonDblClk(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		configureObjectForDblClick(m_ipSelectedPreprocessor, m_editPreprocessor, "Preprocessor", 
-			AFAPI_DOCUMENT_PREPROCESSORS_CATEGORYNAME);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24777");
+		// Handling the Left button dbl click on the property page was implemented instead
+		// of having the different methods for the controls, to fix the issue with double click 
+		// copying the label contents to the clipboard FlexIDSCore #4227
 
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
-LRESULT CLoopPreprocessorPP::OnStnDblclickEditCondition(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	try
-	{
-		configureObjectForDblClick(m_ipSelectedCondition, m_editCondition, "Condition", 
-			AFAPI_CONDITIONS_CATEGORYNAME);
+		// Get the window ID that the mouse is in
+		POINT pointMouse;
+		pointMouse.x = GET_X_LPARAM(lParam); 
+		pointMouse.y = GET_Y_LPARAM(lParam); 
+		int iID = ChildWindowFromPointEx(pointMouse,CWP_SKIPTRANSPARENT).GetDlgCtrlID();
+		
+		// If the mouse was double clicked in preprocessor or condition - configure
+		if (iID == IDC_EDIT_PREPROCESSOR )
+		{
+			configureObjectForDblClick(m_ipSelectedPreprocessor, m_editPreprocessor, "Preprocessor", 
+				AFAPI_DOCUMENT_PREPROCESSORS_CATEGORYNAME);
+			bHandled = TRUE;
+		}
+		else if (iID == IDC_EDIT_CONDITION)
+		{
+			configureObjectForDblClick(m_ipSelectedCondition, m_editCondition, "Condition", 
+				AFAPI_CONDITIONS_CATEGORYNAME);
+			bHandled = TRUE;
+		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24778");
-
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29979");
 	return 0;
 }
 
