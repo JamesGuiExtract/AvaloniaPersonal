@@ -1730,12 +1730,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Geometry.Test", "..
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.StandardMedDE", "..\..\..\..\MedDE\DEPs\StandardMedDE\Core\Code\Extract.DataEntry.DEP.StandardMedDE.csproj", "{2647A3A7-B595-44B3-A563-33E130CDF117}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
+		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 134
+		ProjectCount = 135
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcproj
@@ -1870,6 +1883,7 @@ Global
 		ProjectRelativeDiskPath132 = ..\..\..\..\..\RC.Net\Utilities\Core\Testing\Automated\Extract.Utilities.Test.csproj
 		ProjectRelativeDiskPath133 = ..\..\..\..\..\RC.Net\Geometry\Core\Code\Extract.Geometry.csproj
 		ProjectRelativeDiskPath134 = ..\..\..\..\..\RC.Net\Geometry\Core\Testing\Automated\Extract.Geometry.Test.csproj
+		ProjectRelativeDiskPath135 = ..\..\..\..\MedDE\DEPs\StandardMedDE\Core\Code\Extract.DataEntry.DEP.StandardMedDE.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3222,6 +3236,16 @@ Global
 		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{5E17E478-0658-419C-95B7-C65A7024D0D0}.Release|Win32.ActiveCfg = Release|Any CPU
+		{2647A3A7-B595-44B3-A563-33E130CDF117}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2647A3A7-B595-44B3-A563-33E130CDF117}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2647A3A7-B595-44B3-A563-33E130CDF117}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{2647A3A7-B595-44B3-A563-33E130CDF117}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{2647A3A7-B595-44B3-A563-33E130CDF117}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{2647A3A7-B595-44B3-A563-33E130CDF117}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2647A3A7-B595-44B3-A563-33E130CDF117}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2647A3A7-B595-44B3-A563-33E130CDF117}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{2647A3A7-B595-44B3-A563-33E130CDF117}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{2647A3A7-B595-44B3-A563-33E130CDF117}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
