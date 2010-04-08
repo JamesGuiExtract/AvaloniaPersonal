@@ -1822,6 +1822,27 @@
 					navigate back.
 					<li>Confirm that no unusual exceptions are seen.
 			       	</ul>
+<p>
+			   	<LI><b>[FlexIDSCore #4246]</b> Verification locking files while the FAM 
+				remains active
+			       	<ul>
+					<li>Create a folder with 3 ID Shield demo images.
+					<li>Create an FPS file to queue the 3 files - with Force processing 
+					turned on.
+					<li>Add a <b>Redaction: Verify sensitive data</b> task to the FPS file.
+					<li>Run the FPS file and stop processing for the first file while 
+					leaving the FAM active.
+					<li>Use <b>Windows Explorer</b> to confirm that the first file can be 
+					renamed.
+					<li>Start processing again in the FAM and save the first image.
+					<li>Stop processing for the second image while leaving the FAM active.
+					<li>Use <b>Windows Explorer</b> to confirm that the second file can be 
+					renamed.
+					<li>Start processing again in the FAM and save the second image.
+					<li>Stop processing for the third image while leaving the FAM active.
+					<li>Use <b>Windows Explorer</b> to confirm that the third file can be 
+					renamed.
+			       	</ul>
 			</ul>
 		</ul>
 	</UL>
@@ -1889,6 +1910,22 @@
 <p>
 	   	<li><b>[FlexIDSCore #3445]</b> Confirm that this condition object works in conjunction with 
 		the <b>AND</b> condition.
+<p>
+	   	<LI><b>[FlexIDSCore #4233]</b> Metadata attributes ignored by ID Shield data file 
+		condition
+	       	<ul>
+			<li>Exercise verification for <b>Demo_IDShield</b> images such as TestImage001.tif 
+			that contain only HCData items.
+			<li>Create a redacted output file.
+			<li>Confirm that the VOA file includes one or more metadata nodes such as 
+			<b>_RedactedFileOutputSession</b>.
+			<li>Create an FPS file to re-process the original TIF with a conditional 
+			processing task to copy <b>&lt;SourceDocName&gt;</b> to 
+			<b>&lt;SourceDocName&gt;.123</b> if the ID Shield data file condition is true 
+			for <b>file contains ONLY ANY of HCData</b>.
+			<li>Exercise the FPS file.
+			<li>Confirm that the file copy occurs as expected.
+	       	</ul>
 	</UL>
 </UL>
 <p>

@@ -34,7 +34,7 @@
 			time of approximately one minute.
 	       	</ul>
 <p>
-  	   	<LI><b>[FlexIDSCore #4000, #4026, #4171]</b> Create metadata XML
+  	   	<LI><b>[FlexIDSCore #4000, #4026, #4171, #4185]</b> Create metadata XML
 	       	<ul>
 			<li>Verify an image that contains one or more <b>Clue</b> attributes.
 			<li>Toggle a Clue on for redaction.
@@ -135,6 +135,23 @@
 <p>
   	   	<LI><b>[FlexIDSCore #4075, #4077]</b> Confirm that the <b>Redaction: Extend redactions 
 		to surround context</b> task cannot be configured to act on invalid data types.
+<p>
+	   	<LI><b>[FlexIDSCore #4230]</b> Zone disappears for surround context
+       		<ul>
+			<li>Prepare an FPS file to include verification and extending redactions to 
+			surround context.
+			<li>Verify some images.
+			<ul>
+				<li>Draw manual redactions to cover portions of words.
+				<li>Draw manual redactions to extend beyond the ends of words.
+			</ul>
+			<li>Extend redactions to surround context, adjusting redaction height.
+			<li>Review the resulting VOA files to confirm that overlapping redaction zones 
+			exist.
+			<li>Create redacted images.
+			<li>Review the redacted images and confirm that none of the original redactions 
+			have been discarded.
+	       	</ul>
 	</UL>
 <p>
 
@@ -195,6 +212,37 @@
 			<li>Confirm that the mouse position stays in the center of the selected 
 			character.
 	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #440]</b> Wobbly highlights
+		<ul>
+			<li>Verify an image.
+			<li>Draw an angular redaction.
+			<li>Click a grip handle on one of the long sides.
+			<li>Resize the highlight inward to make a narrow redaction.
+			<li>Confirm that the highlight does not woblle between angular and rectangular.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #445]</b> Highlights on the page
+		<ul>
+			<li>Verify an image
+			<li>Draw an angular redaction to extend off the edge of the page.
+			<li>Confirm that the redaction snaps back such that each end point remains on 
+			the page.
+			<li>Move a highlight.
+			<li>Confirm that each end point remains on the page.
+		</ul>
+<p>
+  	   	<LI><b>[DotNet #446]</b> Grip handle behavior for highlights
+		<ul>
+			<li>Verify an image with a redaction.
+			<li>Click the start or end grip handle.
+			<li>Confirm that the cursor changes to rotation mode.
+			<li>Confirm that the redaction rotates as the mouse moves.
+			<li>Click the top or bottom grip handle.
+			<li>Confirm that the height changes simultaneously in each direction, the same 
+			way that redaction height changes by pressing <b>+</b> or <b>-</b> while 
+			srawing the redaction.
+		</ul>
 <p>
   	   	<LI><b>[FlexIDSCore #2939]</b> Summary grid automatic scrolling
 	       	<ul>
@@ -512,6 +560,15 @@
 			that the verification UI will close.
 		</ul>
 <p>
+      		<li><b>[FlexIDSCore #4184]</b> Resizing redactions
+		<ul>
+			<li>Verify an image.
+			<li>Rotate the image 270 degrees clockwise.
+			<li>Draw a manual redaction.
+			<li>Resize the redaction using the corner grip handles.
+			<li>Confirm that resizing works as expected.
+		</ul>
+<p>
   	   	<LI><b>[FlexIDSCore #4186]</b> Ctrl+S for save
 	       	<ul>
 	      		<li>Verify an image.
@@ -521,6 +578,9 @@
 	      		<li>Confirm that the changes are saved and that the next document is presented.  
 			It is an error condition for the redaction type to change to <b>SSN</b>.
 	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #4198]</b> Confirm that <b>toggled off</b> manual redactions 
+		are not added to the <b>IDShieldData</b> table.
 <p>
   	   	<LI><b>[LegacyRC #5200]</b> Highlights appear and disappear
 		<ul>
