@@ -385,6 +385,14 @@ UEXViewer Utility - Testing Checklist<br>
 	  		   	<LI>Confirm that if the test machine is not connected to the network then 
 				the exported debug data from these exceptions <b>is</b> encrypted.
 		       	</ul>
+<p>
+	  	   	<LI><b>[LegacyRC #5808]</b> Export debug data from UEX Viewer
+		       	<ul>
+	      			<li>Open <b>export.uex</b> from 
+				<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5808</b>.
+				<li>Export debug data for debug values with the name <b>File</b>.
+				<li>Confirm that <b>3</b> entries are present in the output file.
+	       		</ul>
 		</ul>
   	</ul>
      	</li>
@@ -482,6 +490,17 @@ UEXViewer Utility - Testing Checklist<br>
 			<li>Confirm that the exception log can still be opened by the 
 			<b>UEX Viewer</b> utility.
 			<li>Confirm that error messages are presented for each incorrect line.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5792, #5793, #5794]</b> Bad exception log
+	       	<ul>
+	      		<li>Open the exception log at 
+			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5792</b> using 
+			<b>Notepad.exe</b> or another text editor.
+			<li>Confirm that some exception lines are incomplete or corrupt.
+			<li>Open the UEX file using <b>UEXViewer.exe</b>.
+			<li>Confirm that the incomplete lines are presented as 
+			<b>**Unparseable exception**</b>.
 	       	</ul>
     	</ul>
    	</li>
