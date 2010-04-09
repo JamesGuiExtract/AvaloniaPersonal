@@ -244,7 +244,7 @@ BEGIN
     PUSHBUTTON      "...",IDC_BTN_CONVERT_TO_PDF_BROWSE_INPUT_IMAGE,310,17,15,12
     CONTROL         "Make output PDF/A compatible (this will increase the size of the PDF)",IDC_CHECK_PDFA,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,34,230,10
-    CONTROL         "Enable PDF security",IDC_CHECK_PDF_SECURITY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,51,75,10
+    CONTROL         "Enable PDF security",IDC_CHECK_PDF_SECURITY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,51,78,10
     PUSHBUTTON      "Settings...",IDC_BTN_PDF_SECURITY_SETTINGS,89,50,60,12
     LTEXT           "Note: This task will replace the unsearchable image (or PDF file) with the searchable PDF file.\r\n\r\nIf the above file is an image file, it will be deleted after the searchable PDF file is created.",3,7,68,306,25
     LTEXT           "If the above file is a PDF file, it will be overwritten with the corresponding searchable version.",IDC_STATIC,7,99,308,10
