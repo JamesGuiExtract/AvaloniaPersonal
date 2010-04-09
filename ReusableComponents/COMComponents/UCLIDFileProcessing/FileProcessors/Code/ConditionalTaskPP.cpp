@@ -194,37 +194,50 @@ LRESULT CConditionalTaskPP::OnBtnSelectCondition(WORD wNotifyCode, WORD wID, HWN
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
-LRESULT CConditionalTaskPP::OnStnDblclickEditCondition(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
-													   BOOL& bHandled)
+LRESULT CConditionalTaskPP::OnLButtonDblClk(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		// Prompt user to configure FAM Condition
-		VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(
-			m_ipConditionalTaskFP->FAMCondition, gbstrFAM_CONDITION_DISPLAY_NAME, 
-			FP_FAM_CONDITIONS_CATEGORYNAME.c_str(), VARIANT_TRUE, 0, NULL);
+		// Handling the Left button dbl click on the property page was implemented instead
+		// of having the different methods for the controls, to fix the issue with double click 
+		// copying the label contents to the clipboard FlexIDSCore #4227
 
-		// Check if FAM Condition has been modified
-		if (vbDirty == VARIANT_TRUE)
+		// Get the window ID that the mouse is in
+		POINT pointMouse;
+		pointMouse.x = GET_X_LPARAM(lParam); 
+		pointMouse.y = GET_Y_LPARAM(lParam); 
+		int iID = ChildWindowFromPointEx(pointMouse,CWP_SKIPTRANSPARENT).GetDlgCtrlID();
+
+		// If the mouse was double clicked in condition control - configure
+		if (iID == IDC_EDIT_CONDITION)
 		{
-			// Retrieve FAM Condition
-			IObjectWithDescriptionPtr ipOWD = m_ipConditionalTaskFP->FAMCondition;
-			if (ipOWD == NULL)
-			{
-				// Clear description if no FAM Condition object
-				m_editConditionDescription.SetWindowText( "" );
-			}
-			else
-			{
-				// Update control text to match description
-				m_editConditionDescription.SetWindowText( 
-					static_cast<const char*>(ipOWD->Description) );
-			}
-		}
+			// Prompt user to configure FAM Condition
+			VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(
+				m_ipConditionalTaskFP->FAMCondition, gbstrFAM_CONDITION_DISPLAY_NAME, 
+				FP_FAM_CONDITIONS_CATEGORYNAME.c_str(), VARIANT_TRUE, 0, NULL);
 
-		bHandled = TRUE;
+			// Check if FAM Condition has been modified
+			if (vbDirty == VARIANT_TRUE)
+			{
+				// Retrieve FAM Condition
+				IObjectWithDescriptionPtr ipOWD = m_ipConditionalTaskFP->FAMCondition;
+				if (ipOWD == NULL)
+				{
+					// Clear description if no FAM Condition object
+					m_editConditionDescription.SetWindowText( "" );
+				}
+				else
+				{
+					// Update control text to match description
+					m_editConditionDescription.SetWindowText( 
+						static_cast<const char*>(ipOWD->Description) );
+				}
+			}
+
+			bHandled = TRUE;
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19111");
 

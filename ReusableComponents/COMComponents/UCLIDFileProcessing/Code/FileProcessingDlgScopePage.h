@@ -85,7 +85,8 @@ protected:
 	afx_msg LRESULT OnLButtonClkRowCol(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnLButtonDblClkRowCol(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnModifyCell(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnDoubleClickCondition();
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+
 	DECLARE_MESSAGE_MAP()
 
 private:

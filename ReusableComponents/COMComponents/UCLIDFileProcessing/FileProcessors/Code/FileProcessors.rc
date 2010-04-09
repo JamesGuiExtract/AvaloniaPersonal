@@ -110,8 +110,8 @@ IDR_ARCHIVE_RESTORE_TASK REGISTRY                "ArchiveRestoreTask.rgs"
 IDR_ARCHIVE_RESTORE_TASKPP REGISTRY                "ArchiveRestoreTaskPP.rgs"
 IDR_MANAGE_TAGS_TASK    REGISTRY                "ManageTagsTask.rgs"
 IDR_MANAGE_TAGS_TASKPP  REGISTRY                "ManageTagsTaskPP.rgs"
-IDR_SLEEP_TASK			REGISTRY				"SleepTask.rgs"
-IDR_SLEEP_TASKPP		REGISTRY				"SleepTaskPP.rgs"
+IDR_SLEEP_TASK          REGISTRY                "SleepTask.rgs"
+IDR_SLEEP_TASKPP        REGISTRY                "SleepTaskPP.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -177,14 +177,14 @@ BEGIN
     EDITTEXT        IDC_EDIT_WORKING_DIR,5,40,259,12,ES_AUTOHSCROLL
     PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_WORKING_DIR_DOC_TAG,270,39,10,14,BS_ICON
     PUSHBUTTON      "...",IDC_BTN_BROWSE_WORKING_DIR,285,39,15,14
-	LTEXT			"Parameters (Any parameter that contains spaces must be quoted)", IDC_STATIC,5,55,230,10
-	EDITTEXT		IDC_EDIT_PARAMETERS,5,65,259,12,ES_AUTOHSCROLL
-	PUSHBUTTON		"SelectDocTag",IDC_BTN_PARAMETERS_DOC_TAG,270,64,10,14,BS_ICON
-	PUSHBUTTON		"...",IDC_BTN_PARAMETERS_BROWSE,285,64,15,14
+    LTEXT           "Parameters (Any parameter that contains spaces must be quoted)",IDC_STATIC,5,55,230,10
+    EDITTEXT        IDC_EDIT_PARAMETERS,5,65,259,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_PARAMETERS_DOC_TAG,270,64,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_PARAMETERS_BROWSE,285,64,15,14
     CONTROL         "Blocking",IDC_RADIO_BLOCKING,"Button",BS_AUTORADIOBUTTON,5,81,85,10
     CONTROL         "Non-Blocking",IDC_RADIO_NON_BLOCKING,"Button",BS_AUTORADIOBUTTON,5,92,85,10
-	CONTROL			"Propagate errors back to the File Action Manager", IDC_CHECK_PROP_ERRORS, "Button",
-					BS_AUTOCHECKBOX | WS_TABSTOP,5,105,168,10
+    CONTROL         "Propagate errors back to the File Action Manager",IDC_CHECK_PROP_ERRORS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,105,168,10
 END
 
 IDD_SETACTIONSTATUSFILEPROCESSORPP DIALOGEX 0, 0, 296, 62
@@ -193,7 +193,7 @@ FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     LTEXT           "For the document being processed, set the",IDC_STATIC,6,6,144,9
     LTEXT           "Status of the action",IDC_STATIC,6,24,72,9
-    COMBOBOX        IDC_COMBO_ACTION,78,22,199,68,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | CBS_AUTOHSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_ACTION,78,22,199,68,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      ">",IDC_BTN_ACTION_TAG,279,22,10,14,BS_ICON
     LTEXT           "To",IDC_STATIC,6,42,53,9
     COMBOBOX        IDC_COMBO_STATUS,78,42,114,66,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -211,7 +211,7 @@ BEGIN
     CONTROL         "",IDC_LIST_TRUE,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,7,48,184,90
     PUSHBUTTON      "Commands >",IDC_BTN_SELECT_CONDITION,199,18,50,14
     LTEXT           "Evaluate the following condition",IDC_STATIC,7,7,101,8
-    LTEXT           "",IDC_EDIT_CONDITION,7,19,184,10,SS_NOTIFY | SS_SUNKEN | SS_NOPREFIX
+    LTEXT           "",IDC_EDIT_CONDITION,7,19,184,10,SS_NOPREFIX | SS_SUNKEN
     LTEXT           "Execute these tasks if the condition is met",IDC_STATIC,7,36,133,8
     PUSHBUTTON      "&Add...",IDC_BTN_ADD2,199,158,50,14
     PUSHBUTTON      "&Remove",IDC_BTN_REMOVE2,199,178,50,14
@@ -244,9 +244,8 @@ BEGIN
     PUSHBUTTON      "...",IDC_BTN_CONVERT_TO_PDF_BROWSE_INPUT_IMAGE,310,17,15,12
     CONTROL         "Make output PDF/A compatible (this will increase the size of the PDF)",IDC_CHECK_PDFA,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,34,230,10
-	CONTROL			"Enable PDF security", IDC_CHECK_PDF_SECURITY, "Button",
-					BS_AUTOCHECKBOX | WS_TABSTOP,7,51,75,10
-	PUSHBUTTON		"Settings...", IDC_BTN_PDF_SECURITY_SETTINGS, 89,50,60,12
+    CONTROL         "Enable PDF security",IDC_CHECK_PDF_SECURITY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,51,75,10
+    PUSHBUTTON      "Settings...",IDC_BTN_PDF_SECURITY_SETTINGS,89,50,60,12
     LTEXT           "Note: This task will replace the unsearchable image (or PDF file) with the searchable PDF file.\r\n\r\nIf the above file is an image file, it will be deleted after the searchable PDF file is created.",3,7,68,306,25
     LTEXT           "If the above file is a PDF file, it will be overwritten with the corresponding searchable version.",IDC_STATIC,7,99,308,10
 END
@@ -331,13 +330,14 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-	LTEXT			"Sleep for", IDC_STATIC, 7,5,30,10
-	EDITTEXT		IDC_EDIT_SLEEP_TIME, 38,3,50,13, ES_AUTOHSCROLL | ES_NUMBER | WS_TABSTOP
-	COMBOBOX		IDC_COMBO_SLEEP_UNITS 91,3,60,50, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP 
-	CONTROL			"Sleep for a random amount of time between", IDC_CHECK_SLEEP_RANDOM,
-					"Button", BS_AUTOCHECKBOX | WS_TABSTOP, 7,22,157,12
-	LTEXT			"1 millisecond and specified time.", IDC_STATIC, 17,34,139,10
+    LTEXT           "Sleep for",IDC_STATIC,7,5,30,10
+    EDITTEXT        IDC_EDIT_SLEEP_TIME,38,3,50,13,ES_AUTOHSCROLL | ES_NUMBER
+    COMBOBOX        IDC_COMBO_SLEEP_UNITS,91,3,60,50,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Sleep for a random amount of time between",IDC_CHECK_SLEEP_RANDOM,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,22,157,12
+    LTEXT           "1 millisecond and specified time.",IDC_STATIC,17,34,139,10
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -350,7 +350,6 @@ IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
 IDI_ICON_UP             ICON                    "..\\..\\Code\\res\\icon_up.ico"
 IDI_ICON_DOWN           ICON                    "..\\..\\Code\\res\\icon_down.ico"
 IDI_ICON_INFO           ICON                    "..\\..\\..\\..\\BaseUtils\\Code\\res\\icon_info_middle.ico"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //

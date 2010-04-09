@@ -225,7 +225,7 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgScopePage, CPropertyPage)
 	ON_MESSAGE(WM_NOTIFY_GRID_LCLICK, OnLButtonClkRowCol)
 	ON_MESSAGE(WM_NOTIFY_CELL_DBLCLK, OnLButtonDblClkRowCol)
 	ON_MESSAGE(WM_NOTIFY_CELL_MODIFIED, OnModifyCell)
-	ON_STN_DBLCLK(IDC_EDIT_CONDITION, &FileProcessingDlgScopePage::OnDoubleClickCondition)
+	ON_WM_LBUTTONDBLCLK()
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -707,25 +707,44 @@ void FileProcessingDlgScopePage::OnSize(UINT nType, int cx, int cy)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08924")	
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgScopePage::OnDoubleClickCondition()
+void FileProcessingDlgScopePage::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
 	try
 	{
-		// get the current FAM condition
-		IObjectWithDescriptionPtr ipFAMCondition = getFSMgmtRole()->FAMCondition;
-		ASSERT_RESOURCE_ALLOCATION("ELI16087", ipFAMCondition != NULL);
+		// Handling the Left button dbl click on the property page was implemented instead
+		// of having the different methods for the controls, to fix the issue with double click 
+		// copying the label contents to the clipboard FlexIDSCore #4257
 
-		// allow the user to select and/or configure ipFAMCondition
-		VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(ipFAMCondition,
-			"Condition", get_bstr_t(FP_FAM_CONDITIONS_CATEGORYNAME), VARIANT_TRUE, 0, NULL);
+		// Get the child window the mouse was double clicked in
+		CWnd *tmpChild = ChildWindowFromPoint(point, CWP_SKIPTRANSPARENT);
 
-		// check if the FAM condition has been modified
-		if (vbDirty == VARIANT_TRUE)
+		// if the child was returned check if it is the condition control
+		if (tmpChild != NULL && tmpChild->GetDlgCtrlID() == IDC_EDIT_CONDITION)
 		{
-			// display the updated description
-			m_zConditionDescription = static_cast<const char*> (ipFAMCondition->Description);
-			UpdateData( FALSE );
+			// get the current FAM condition
+			IObjectWithDescriptionPtr ipFAMCondition = getFSMgmtRole()->FAMCondition;
+			ASSERT_RESOURCE_ALLOCATION("ELI16087", ipFAMCondition != NULL);
+
+			// allow the user to select and/or configure ipFAMCondition
+			VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(ipFAMCondition,
+				"Condition", get_bstr_t(FP_FAM_CONDITIONS_CATEGORYNAME), VARIANT_TRUE, 0, NULL);
+
+			// check if the FAM condition has been modified
+			if (vbDirty == VARIANT_TRUE)
+			{
+				// display the updated description
+				m_zConditionDescription = static_cast<const char*> (ipFAMCondition->Description);
+				UpdateData( FALSE );
+			}
 		}
+		else
+		{
+			// Not in a control that needs special handling so call the base class method
+			CPropertyPage::OnLButtonDblClk(nFlags, point);
+		}
+
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16086");
 }

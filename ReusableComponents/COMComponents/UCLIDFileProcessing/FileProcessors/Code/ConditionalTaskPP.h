@@ -37,7 +37,7 @@ public:
 		CHAIN_MSG_MAP(IPropertyPageImpl<CConditionalTaskPP>)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 		COMMAND_HANDLER(IDC_BTN_SELECT_CONDITION, BN_CLICKED, OnBtnSelectCondition)
-		COMMAND_HANDLER(IDC_EDIT_CONDITION, STN_DBLCLK, OnStnDblclickEditCondition) // P16 #2583
+		MESSAGE_HANDLER(WM_LBUTTONDBLCLK, OnLButtonDblClk) 
 		COMMAND_HANDLER(IDC_BTN_ADD, BN_CLICKED, OnClickedBtnAdd)
 		COMMAND_HANDLER(IDC_BTN_ADD2, BN_CLICKED, OnClickedBtnAdd)
 		COMMAND_HANDLER(IDC_BTN_REMOVE, BN_CLICKED, OnClickedBtnRemove)
@@ -89,8 +89,8 @@ public:
 	LRESULT OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnEditDelete(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
-	// added as per P16 #2583
-	LRESULT OnStnDblclickEditCondition(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	// added as per P16 #2583 and changed per FlexIDSCore #4257
+	LRESULT OnLButtonDblClk(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 private:
 	// Clears selection state for specified list
