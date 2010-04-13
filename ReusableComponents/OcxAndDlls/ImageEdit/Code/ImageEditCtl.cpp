@@ -226,12 +226,8 @@ CImageEditCtrl::CImageEditCtrl()
 	// if PDF is licensed initialize support
 	if ( LicenseManagement::sGetInstance().isPDFLicensed() )
 	{
-		// Retrieve desired PDF resolution for loading
-		int iResolutionInDPI = m_apSettings->getPDFResolution();
-
-		// Set default Display depth to 24, Do not use 1, this will cause some PDF files
-		// to not load and cause an application crash
-		initPDFSupport(24, iResolutionInDPI, iResolutionInDPI);
+		// Init pdf support (use default PDF initialization settings)
+		initPDFSupport();
 	}
 }
 //-------------------------------------------------------------------------------------------------

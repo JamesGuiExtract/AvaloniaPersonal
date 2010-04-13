@@ -335,7 +335,7 @@ LEADUTILS_API COLORREF getPixelColor(BITMAPHANDLE &rBitmap, int iRow, int iCol);
 //					have there own anti aliasing.
 //				iOpenXRes - this is the X resolution to open the PDF images
 //				iOpenYRes - this it the Y resolution to open the PDF Images
-LEADUTILS_API void initPDFSupport(int nDisplayDepth = 24, int iOpenXRes = 300, int iOpenYRes = 300);
+LEADUTILS_API void initPDFSupport();
 //-------------------------------------------------------------------------------------------------
 // PROMISE: Returns ViewPerspective field from the FILEINFO structure.
 //			1 = TOP_LEFT

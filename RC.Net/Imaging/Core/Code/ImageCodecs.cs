@@ -17,6 +17,10 @@ namespace Extract.Imaging
 
         static readonly string _OBJECT_NAME = typeof(ImageCodecs).ToString();
 
+        static readonly int _DEFAULT_PDF_DISPLAY_DEPTH = 24;
+
+        static readonly int _DEFAULT_PDF_RESOLUTION = 300;
+
         #endregion Constants
 
         #region Fields
@@ -78,7 +82,7 @@ namespace Extract.Imaging
             {
                 codecs = GetCodecs();
 
-                return new ImageReader(fileName, codecs);
+                return new ImageReader(fileName, codecs, _loadPdfAsBitonal);
             }
             catch (Exception ex)
             {
@@ -129,6 +133,8 @@ namespace Extract.Imaging
         /// <returns>Codecs used to encode or decode an image.</returns>
         RasterCodecs GetCodecs()
         {
+            ExtractException.Assert("ELI30000", "Codecs has been disposed.", !_disposed);
+
             RasterCodecs codecs = new RasterCodecs();
             SetOptions(codecs.Options);
 
@@ -138,21 +144,16 @@ namespace Extract.Imaging
         /// <summary>
         /// Sets the options used when loading or saving image files.
         /// </summary>
-        void SetOptions(CodecsOptions options)
+        static void SetOptions(CodecsOptions options)
         {
             options.Pdf.InitialPath = _PDF_INITIALIZATION_DIRECTORY;
             options.Pdf.Save.UseImageResolution = true;
             options.Tiff.Load.IgnoreViewPerspective = true;
 
-            // Load PDF as bitonal images if necessary
-            if (_loadPdfAsBitonal)
-            {
-                options.Pdf.Load.DisplayDepth = 1;
-
-                // Use high dpi to preserve image quality
-                options.Pdf.Load.XResolution = 300;
-                options.Pdf.Load.YResolution = 300;
-            }
+            // Use default DPI and display depth
+            options.Pdf.Load.DisplayDepth = _DEFAULT_PDF_DISPLAY_DEPTH;
+            options.Pdf.Load.XResolution = _DEFAULT_PDF_RESOLUTION;
+            options.Pdf.Load.YResolution = _DEFAULT_PDF_RESOLUTION;
         }
 
         /// <summary>

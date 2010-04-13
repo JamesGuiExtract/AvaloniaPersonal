@@ -39,6 +39,9 @@ const string gstrLEADTOOLS_COMPRESSION_VALUE_FOLDER =
 // maintaining fairly high image quality)
 const int giDEFAULT_JPEG_COMPRESSION_FLAG = 80;
 
+const int giDEFAULT_PDF_DISPLAY_DEPTH = 24;
+const int giDEFAULT_PDF_RESOLUTION = 300;
+
 //-------------------------------------------------------------------------------------------------
 // Private class - LeadToolsPDFLoadLocker
 //-------------------------------------------------------------------------------------------------
@@ -907,8 +910,11 @@ void getImagePixelHeightAndWidth(const string& strImageFileName, int& riHeight, 
 	riWidth = fileInfo.Width;
 }
 //-------------------------------------------------------------------------------------------------
-void initPDFSupport(int nDisplayDepth, int iOpenXRes, int iOpenYRes )
+void initPDFSupport()
 {
+	int nDisplayDepth = giDEFAULT_PDF_DISPLAY_DEPTH;
+	int iOpenXRes(giDEFAULT_PDF_RESOLUTION), iOpenYRes(giDEFAULT_PDF_RESOLUTION);
+
 	// check if PDF is licensed to initialize support
 	if ( !LicenseManagement::sGetInstance().isPDFLicensed() )
 	{

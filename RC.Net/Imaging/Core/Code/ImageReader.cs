@@ -5,6 +5,7 @@ using Extract.Imaging.Utilities;
 using Extract.Licensing;
 using Leadtools;
 using Leadtools.Codecs;
+using Leadtools.ImageProcessing;
 
 namespace Extract.Imaging
 {
@@ -47,10 +48,20 @@ namespace Extract.Imaging
         readonly RasterImageFormat _format;
 
         /// <summary>
+        /// Whether pdf should load as bitonal or not
+        /// </summary>
+        readonly bool _loadPdfAsBitonal;
+
+        /// <summary>
         /// <see langword="true"/> if the image is a portable document format (PDF) file;
         /// <see langword="false"/> if the image is not a PDF file.
         /// </summary>
         readonly bool _isPdf;
+
+        /// <summary>
+        /// The command used to modify PDF files back to 1 bit per pixel after loading
+        /// </summary>
+        ColorResolutionCommand _conversionCommand;
 
         #endregion Fields
 
@@ -61,7 +72,8 @@ namespace Extract.Imaging
         /// </summary>
         /// <param name="fileName">The name of the file to read.</param>
         /// <param name="codecs">Used when decoding the image file.</param>
-        internal ImageReader(string fileName, RasterCodecs codecs)
+        /// <param name="loadPdfAsBitonal"></param>
+        internal ImageReader(string fileName, RasterCodecs codecs, bool loadPdfAsBitonal)
         {
             try
             {
@@ -70,6 +82,7 @@ namespace Extract.Imaging
 
                 _fileName = fileName;
                 _codecs = codecs;
+                _loadPdfAsBitonal = loadPdfAsBitonal;
 
                 // Prevent write access while reading
                 FileShare sharing = RegistryManager.LockFiles
@@ -153,7 +166,16 @@ namespace Extract.Imaging
             {
                 using (new PdfLock(_isPdf))
                 {
-                    return _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber);
+                    RasterImage image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
+                        pageNumber, pageNumber);
+
+                    // If loading PDF as bitonal and this file is a PDF, set bits per pixel to 1
+                    if (_loadPdfAsBitonal && _isPdf)
+                    {
+                        GetConversionCommand().Run(image);
+                    }
+
+                    return image;
                 }
             }
             catch (Exception ex)
@@ -164,6 +186,25 @@ namespace Extract.Imaging
                 ee.AddDebugData("Page number", pageNumber, false);
                 throw ee;
             }
+        }
+
+        /// <summary>
+        /// Gets the conversion command to use to convert a PDF file from 24 bpp to 1 bpp.
+        /// </summary>
+        /// <returns>A conversion command.</returns>
+        ColorResolutionCommand GetConversionCommand()
+        {
+            if (_conversionCommand == null)
+            {
+                _conversionCommand = new ColorResolutionCommand();
+                _conversionCommand.Mode = ColorResolutionCommandMode.InPlace;
+                _conversionCommand.BitsPerPixel = 1;
+                _conversionCommand.DitheringMethod = RasterDitheringMethod.FloydStein;
+                _conversionCommand.PaletteFlags = ColorResolutionCommandPaletteFlags.Fixed;
+                _conversionCommand.Colors = 0;
+            }
+
+            return _conversionCommand;
         }
 
         /// <summary>

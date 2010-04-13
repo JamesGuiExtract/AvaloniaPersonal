@@ -18,10 +18,6 @@ const string& gstrIMAGE_EDIT_REGISTRY_FOLDER = gstrRC_REG_PATH + "\\OcxAndDlls\\
 const string& gstrANTI_ALIASING = "AntiAliasing";
 const string& gstrANNOTATION = "Annotation";
 
-const string& gstrPDF_RESOLUTION = "PDFResolution";
-// Default PDF resolution in dots per inch
-const string& gstrDEFAULT_PDF_RESOLUTION = "300";
-
 //-------------------------------------------------------------------------------------------------
 // ImageEditCtrlCfg
 //-------------------------------------------------------------------------------------------------
@@ -43,34 +39,6 @@ ImageEditCtrlCfg::~ImageEditCtrlCfg()
 	{
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16468");
-}
-//-------------------------------------------------------------------------------------------------
-int ImageEditCtrlCfg::getPDFResolution()
-{
-	// Check key existence
-	if (!m_apCfgMgr->keyExists( gstrIMAGE_EDIT_REGISTRY_FOLDER, gstrPDF_RESOLUTION ))
-	{
-		// Use default if empty
-		m_apCfgMgr->createKey( gstrIMAGE_EDIT_REGISTRY_FOLDER, gstrPDF_RESOLUTION, 
-			gstrDEFAULT_PDF_RESOLUTION );
-	}
-
-	// Convert found string to integer
-	int iResolutionInDPI = asLong( m_apCfgMgr->getKeyValue( gstrIMAGE_EDIT_REGISTRY_FOLDER, 
-		gstrPDF_RESOLUTION ) );
-
-	// Return result
-	return iResolutionInDPI;
-}
-//-------------------------------------------------------------------------------------------------
-void ImageEditCtrlCfg::setPDFResolution(int iResolutionInDPI)
-{
-	// Apply setting
-	string strSetting = asString( iResolutionInDPI );
-
-	// Save the setting
-	m_apCfgMgr->setKeyValue( gstrIMAGE_EDIT_REGISTRY_FOLDER, gstrPDF_RESOLUTION, 
-		strSetting );
 }
 //-------------------------------------------------------------------------------------------------
 bool ImageEditCtrlCfg::isAntiAliasingEnabled()

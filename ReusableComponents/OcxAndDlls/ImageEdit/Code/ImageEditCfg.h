@@ -10,10 +10,6 @@ public:
 	//---------------------------------------------------------------------------------------------
 	ImageEditCtrlCfg();
 	~ImageEditCtrlCfg();
-	//---------------------------------------------------------------------------------------------
-	// PROMISE:	To get or set the dots-per-inch resolution for PDF images
-	int getPDFResolution();
-	void setPDFResolution(int iResolutionInDPI);
 
 	//---------------------------------------------------------------------------------------------
 	// PROMISE:	To get or set the anti-aliasing functionality
