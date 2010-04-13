@@ -23,6 +23,7 @@
 #include "TemporaryFileName.h"
 #include "EncryptionEngine.h"
 #include "LicenseUtils.h"
+#include "MutexUtils.h"
 
 #include <io.h>
 #include <algorithm>
@@ -78,7 +79,31 @@ string UCLIDException::ms_strSerial = "";
 const string gstrLOG_FILE_APP_DATA_PATH = "\\Extract Systems\\LogFiles\\Misc";
 
 // Mutex for protecting access to the log file
-static CMutex mutexLogFile(FALSE, gstrLOG_FILE_MUTEX.c_str());
+static auto_ptr<CMutex> apmutexLogFile;
+static CMutex smutexCreate;
+
+//-------------------------------------------------------------------------------------------------
+// Local helper methods
+//-------------------------------------------------------------------------------------------------
+CMutex* getLogFileMutex()
+{
+	// Check if the log file mutex has been created yet
+	if (apmutexLogFile.get() == NULL)
+	{
+		// Lock around creating the log file mutex
+		CSingleLock lgTemp(&smutexCreate, TRUE);
+
+		// Check again if it has been created
+		if (apmutexLogFile.get() == NULL)
+		{
+			// Create the log file mutex
+			apmutexLogFile.reset(getGlobalNamedMutex(gstrLOG_FILE_MUTEX));
+			ASSERT_RESOURCE_ALLOCATION("ELI29994", apmutexLogFile.get() != NULL);
+		}
+	}
+
+	return apmutexLogFile.get();
+}
 
 //-------------------------------------------------------------------------------------------------
 // Exported encrypt method for P/Invoke calls from C#
@@ -835,7 +860,7 @@ void UCLIDException::renameLogFile(const string& strFileName, bool bUserRenamed,
 		strRenameFileTo += getFileNameFromFullPath(strFileName);
 
 		// Mutex around log file access
-		CSingleLock lg(&mutexLogFile, TRUE);
+		CSingleLock lg(getLogFileMutex(), TRUE);
 
 		// perform the rename.  If the rename fails, just ignore it (we don't want to cause more 
 		// errors in the logging process)
@@ -945,7 +970,7 @@ void UCLIDException::saveTo(const string& strFile, bool bAppend) const
 		strOut = createLogString();
 
 		// Mutex around log file access
-		CSingleLock lg(&mutexLogFile, TRUE);
+		CSingleLock lg(getLogFileMutex(), TRUE);
 
 		// get the size of the current log file
 		ULONGLONG ullCurrentFileSize = 0;

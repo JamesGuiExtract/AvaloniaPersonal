@@ -68,7 +68,8 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Mutex used to guarantee single threadedness to the remove annotations method
         /// </summary>
-        static Mutex _mutex = new Mutex(false, @"Global\EC9E480D-BE75-4749-A5DF-2FD6583F8FAC");
+        static Mutex _mutex =
+            ThreadingMethods.GetGlobalNamedMutex(@"Global\EC9E480D-BE75-4749-A5DF-2FD6583F8FAC");
 
         #endregion Fields
 

@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
@@ -30,6 +31,14 @@ namespace Extract.Imaging.Forms
         /// </summary>
         const string _IMAGE_EDIT_SUBKEY =
             @"Software\Extract Systems\ReusableComponents\OcxAndDlls\ImageEdit";
+
+        /// <summary>
+        /// The name for the MRU mutex.
+        /// </summary>
+        // DO NOT make this a const string, static readonly means that it will be
+        // encrypted by the obfuscator, if it is changed to a const it will not be
+        // encrypted.
+        static readonly string _MRU_MUTEX_NAME = @"Global\D7AFD341-3D38-4C57-BEBA-52DD56EC7E5A";
 
         #endregion RegistryManager Subkeys
 
@@ -122,8 +131,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Mutex used to make access to the MRU image list in the registry thread safe.
         /// </summary>
-        static readonly Mutex _mruMutex = 
-            new Mutex(false, @"Global\D7AFD341-3D38-4C57-BEBA-52DD56EC7E5A");
+        static readonly Mutex _mruMutex = ThreadingMethods.GetGlobalNamedMutex(_MRU_MUTEX_NAME);
 
         #endregion RegistryManager Fields
 

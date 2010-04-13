@@ -259,7 +259,7 @@ namespace Extract.Imaging
         /// A mutex that provides exclusive access to the next number registry value.
         /// </summary>
         static Mutex _nextNumberMutex =
-            new Mutex(false, @"Global\{F3FF0B9C-4E0D-427e-B7DD-E257F3013E70}");
+            ThreadingMethods.GetGlobalNamedMutex(@"Global\{F3FF0B9C-4E0D-427e-B7DD-E257F3013E70}");
 
         /// <summary>
         /// The path to the next bates number file stored in the

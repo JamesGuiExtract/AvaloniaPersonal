@@ -633,6 +633,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MutexUtils.cpp"
+				>
+			</File>
+			<File
 				RelativePath="NamedObject.cpp"
 				>
 				<FileConfiguration
@@ -1380,6 +1384,10 @@
 			</File>
 			<File
 				RelativePath=".\MTSafeQueue.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MutexUtils.h"
 				>
 			</File>
 			<File

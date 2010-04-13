@@ -203,7 +203,7 @@ private:
 	CString	m_zDirectory;
 
 	// Mutex for accessing the log file
-	CMutex m_LogFileMutex;
+	auto_ptr<CMutex> m_apLogFileMutex;
 
 	// Modeless Find dialog
 	auto_ptr<CUEXFindDlg> ma_pFindDlg;

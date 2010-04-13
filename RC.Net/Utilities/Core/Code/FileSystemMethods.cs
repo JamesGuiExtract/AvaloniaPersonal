@@ -22,8 +22,10 @@ namespace Extract.Utilities
         /// A static object used as a mutex in the temp file name generation to prevent
         /// multiple threads from generating the same temporary file name.
         /// </summary>
-        static readonly Mutex _tempFileLock = new Mutex(false,
-            "C6D3EB7D-5DB9-4FC7-BEAD-0DBA39DBDB4B");
+        // Note: This mutex name has been copied from TemporaryFile class in BaseUtils.  Do
+        // not change this mutex name without changing the other mutex name.
+        static readonly Mutex _tempFileLock =
+            ThreadingMethods.GetGlobalNamedMutex("Global\\260BA215-4090-4172-B696-FC86B52269B4");
 
         /// <summary>
         /// Either "C:\Program Files\Extract Systems" or "C:\Program Files (x86)\Extract Systems"

@@ -149,7 +149,7 @@ private:
 	CTime	m_tmLastUpdate;
 
 	// Mutex to protect reading and writing of licensing items
-	static CMutex ms_mutexReadWrite;
+	auto_ptr<CMutex> m_apmutexReadWrite;
 
 	// Time to wait for mutex to read or write the file
 	unsigned long m_ulRWTimeout;
@@ -170,4 +170,6 @@ private:
 	static const std::string UNLOCK_SECTION_NAME;
 	static const std::string LAST_TIME_USED;
 	static const std::string COUNT;
+
+	CMutex* getReadWriteMutex();
 };

@@ -22,6 +22,7 @@
 #include "ExtractMFCUtils.h"
 #include "cpputil.h"
 #include "RegConstants.h"
+#include "MutexUtils.h"
 
 #include <shlobj.h>
 #include <iostream>
@@ -76,8 +77,6 @@ const char gpszLicenseIsCorrupt[] =
 const string strCOMLM_CORE_SETTINGS = gstrBASEUTILS_REG_PATH;
 const string strTRP_RW_TIMEOUT_KEY = "TRP_ReadWriteTimeOut";
 const unsigned long ulDEFAULT_RW_TIME0UT = 60000; // 1 minute
-
-CMutex TimeRollbackPreventer::ms_mutexReadWrite(FALSE, "UCLID_Licensing");
 
 // Define twelve UCLID passwords used for Date-Time encryption
 // 1 - 4 : For Date-Time File
@@ -219,6 +218,9 @@ TimeRollbackPreventer::~TimeRollbackPreventer()
 			// delete the thread
 			m_apThread.reset();
 		}
+
+		// Reset the read/write mutex auto pointer
+		m_apmutexReadWrite.reset();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16412");
 }
@@ -258,7 +260,7 @@ void TimeRollbackPreventer::checkDateTimeItems()
 	string	strRemoteData2;
 	{
 		// Protect the read accesses
-		CSingleLock lg( &ms_mutexReadWrite );
+		CSingleLock lg( getReadWriteMutex() );
 		if ( lg.Lock(m_ulRWTimeout) == 0 )
 		{
 			// unable to lock the mutex signal bad state and throw exception
@@ -903,7 +905,7 @@ void TimeRollbackPreventer::handleUnlockCode()
 					if (bLocal && bRemote)
 					{
 						// Protect the write accesses
-						CSingleLock lg( &ms_mutexReadWrite );
+						CSingleLock lg( getReadWriteMutex() );
 						if ( lg.Lock(m_ulRWTimeout) == 0 )
 						{
 							// unable to lock the mutex:
@@ -1123,7 +1125,7 @@ void TimeRollbackPreventer::updateDateTimeItems(bool bForceCreation)
 	if (bLocal && bRemote)
 	{
 		// Protect the write accesses
-		CSingleLock lg( &ms_mutexReadWrite );
+		CSingleLock lg( getReadWriteMutex() );
 		if ( lg.Lock(m_ulRWTimeout) == 0)
 		{
 			// Unable to lock the mutex, signal bad state and throw exception
@@ -1221,5 +1223,16 @@ const ByteStream& TimeRollbackPreventer::getUnlockPassword()
 	}
 
 	return passwordBytes3;
+}
+//-------------------------------------------------------------------------------------------------
+CMutex* TimeRollbackPreventer::getReadWriteMutex()
+{
+	if (m_apmutexReadWrite.get() == NULL)
+	{
+		m_apmutexReadWrite.reset(getGlobalNamedMutex("Global\\UCLID_Licensing"));
+		ASSERT_RESOURCE_ALLOCATION("ELI29993", m_apmutexReadWrite.get() != NULL);
+	}
+
+	return m_apmutexReadWrite.get();
 }
 //-------------------------------------------------------------------------------------------------

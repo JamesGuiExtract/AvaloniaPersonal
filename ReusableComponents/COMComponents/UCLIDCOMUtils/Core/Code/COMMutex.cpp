@@ -3,7 +3,9 @@
 #include "stdafx.h"
 #include "COMMutex.h"
 #include "COMUtils.h"
+
 #include <UCLIDException.h>
+#include <MutexUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // CCOMMutex
@@ -65,7 +67,7 @@ STDMETHODIMP CCOMMutex::CreateNamed(BSTR bstrMutexName)
 			m_strMutexName = asString (bstrMutexName);
 			if ( m_strMutexName != "" )
 			{
-				m_pMutex = new CMutex (FALSE, m_strMutexName.c_str());
+				m_pMutex = getGlobalNamedMutex(m_strMutexName);
 				ASSERT_RESOURCE_ALLOCATION("ELI13245", m_pMutex != NULL );
 			}
 			else

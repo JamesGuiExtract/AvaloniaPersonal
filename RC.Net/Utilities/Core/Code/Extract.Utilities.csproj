@@ -67,6 +67,7 @@
     <Compile Include="StringMethods.cs" />
     <Compile Include="SystemMethods.cs" />
     <Compile Include="TemporaryFile.cs" />
+    <Compile Include="ThreadingMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">

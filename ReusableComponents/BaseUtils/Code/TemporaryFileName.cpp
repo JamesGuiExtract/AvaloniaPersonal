@@ -3,6 +3,7 @@
 #include "TemporaryFileName.h"
 #include "UCLIDException.h"
 #include "cpputil.h"
+#include "MutexUtils.h"
 
 #include <io.h>
 #include <fstream>
@@ -115,9 +116,11 @@ void TemporaryFileName::init(string strDir, const char *pszPrefix, const char* p
 	// Modified as per [LegacyRCAndUtils #4975] changed to use a global named
 	// mutex rather than a static mutex which is only thread safe for a specific
 	// process.  This should make this thread safe system wide. - JDS - 10/03/2008
-	CMutex mutex(FALSE, gmutMUTEX_NAME.c_str());
-	CSingleLock lock(&mutex, TRUE);
+	auto_ptr<CMutex> pMutex;
+	pMutex.reset(getGlobalNamedMutex(gmutMUTEX_NAME));
+	ASSERT_RESOURCE_ALLOCATION("ELI29992", pMutex.get() != NULL);
 
+	CSingleLock lock(pMutex.get(), TRUE);
 	do
 	{
 		// Build a random file name
@@ -146,5 +149,6 @@ void TemporaryFileName::init(string strDir, const char *pszPrefix, const char* p
 
 	// ensure file is created before releasing lock
 	waitForFileToBeReadable(m_strFileName);
+	lock.Unlock();
 }
 //--------------------------------------------------------------------------------------------------

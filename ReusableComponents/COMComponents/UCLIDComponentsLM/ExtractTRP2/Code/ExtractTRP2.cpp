@@ -18,7 +18,12 @@
 // Constants
 //-------------------------------------------------------------------------------------------------
 // unique mutex name
-const string gstrMUTEX_NAME = gstrTRP_WINDOW_TITLE + "{AC2EA0A5-312D-4251-BEAB-1AAB9A8FB738}";
+// This is a global mutex.  You will not be able to run via terminal services with
+// a temporary license due to this global mutex.  This is a known issue and if we
+// need to support running under terminal services with a temporary license we will
+// need to change this mutex and also test what happens if the license state gets
+// corrupt and multiple people are running and we drop in an unlock file, etc.
+const string gstrMUTEX_NAME = "Global\\" + gstrTRP_WINDOW_TITLE + "{AC2EA0A5-312D-4251-BEAB-1AAB9A8FB738}";
 
 //-------------------------------------------------------------------------------------------------
 // CExtractTRPApp

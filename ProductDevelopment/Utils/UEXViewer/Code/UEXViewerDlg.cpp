@@ -20,6 +20,7 @@
 #include "AboutDlg.h"
 #include "ExceptionListControlHelper.h"
 #include "ExportDebugDataDlg.h"
+#include "MutexUtils.h"
 
 #include <StringTokenizer.h>
 #include <UCLIDException.h>
@@ -87,17 +88,23 @@ CUEXViewerDlg::CUEXViewerDlg(CWnd* pParent /*=NULL*/)
 	m_iUserColumnWidth(100),
 	m_iPidColumnWidth(80),
 	m_iTimeColumnWidth(130),
-	m_bInitialized(false),
-	m_LogFileMutex(FALSE, gstrLOG_FILE_MUTEX.c_str())
+	m_bInitialized(false)
 {
-	m_zDirectory = _T("");
+	try
+	{
+		m_zDirectory = _T("");
 
-	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
-	m_hIcon = AfxGetApp()->LoadIcon( IDR_UEXVIEW );
+		// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
+		m_hIcon = AfxGetApp()->LoadIcon( IDR_UEXVIEW );
 
-	// Use Registry for data persistence
-	string strRootFolder = gstrREG_ROOT_KEY + "\\Utilities\\UEXViewer";
-	m_pCfgMgr = new RegistryPersistenceMgr( HKEY_CURRENT_USER, strRootFolder );
+		// Use Registry for data persistence
+		string strRootFolder = gstrREG_ROOT_KEY + "\\Utilities\\UEXViewer";
+		m_pCfgMgr = new RegistryPersistenceMgr( HKEY_CURRENT_USER, strRootFolder );
+
+		m_apLogFileMutex.reset(getGlobalNamedMutex(gstrLOG_FILE_MUTEX));
+		ASSERT_RESOURCE_ALLOCATION("ELI29995", m_apLogFileMutex.get() != NULL); 
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29996");
 }
 //-------------------------------------------------------------------------------------------------
 CUEXViewerDlg::~CUEXViewerDlg()
@@ -1592,7 +1599,7 @@ void CUEXViewerDlg::addExceptions(string strUEXFile, bool bReplaceMode)
 	try
 	{
 		// Mutex around log file access
-		CSingleLock lg(&m_LogFileMutex, TRUE);
+		CSingleLock lg(m_apLogFileMutex.get(), TRUE);
 
 		copyFile(strUEXFile, tempFile.getName());
 		strFileToOpen = tempFile.getName();
