@@ -330,11 +330,6 @@ LEADUTILS_API COLORREF getPixelColor(BITMAPHANDLE &rBitmap, int iRow, int iCol);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To unlock PDF Read/Write capabilities and to set the default open Resolution,
 //          if and only if PDF Read/Write support is licensed.
-// ARGUMENTS:	nDisplayDepth - this is the display depth to open PDF images. if anti aliasing is
-//					required this should be set to 1. some PDFs are saved with gray scale and 
-//					have there own anti aliasing.
-//				iOpenXRes - this is the X resolution to open the PDF images
-//				iOpenYRes - this it the Y resolution to open the PDF Images
 LEADUTILS_API void initPDFSupport();
 //-------------------------------------------------------------------------------------------------
 // PROMISE: Returns ViewPerspective field from the FILEINFO structure.
