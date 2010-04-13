@@ -1,0 +1,210 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.5A Crash Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.5 Patch A<br>Crash Testing <br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Exercise various scenarios that had caused reliable or sporadic 
+	FAM crashes with LabDE 1.5
+   	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
+	present within the collected checklists.  One part of validating a <b>LabDE 1.5 Patch A</b> 
+	release candidate is to explicitly exercise these otherwise untested recent changes.
+</ul>
+<p>
+<h3>Scenarios</h3>
+<OL>
+	<LI><b>Phase 1 Setup</b>
+	<ul>
+		<li>Exercise <b>ExtractData.fps</b> from Demo_LabDE.
+		<li>Enable <b>gflags</b> for <b>ProcessFiles</b> via 
+		<b>gflags /p /enable ProcessFiles.exe /full</b>.
+		<li>gflags can be found at 
+		<b>I:\users\Jeff_Shergalis\Public\WinDebugx86\gflags.exe</b>.
+		<li>Rename a few of the first VOA files so that data is not loaded and 
+		presented during verification.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Test A</b> - Medical Record Number
+	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Right-click in the <b>Medical Record #</b> field.
+		<li>Confirm that LabDE does not crash.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Test B</b> - Gender Combo Box
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Click on the edit box portion of the <b>Gender</b> combo box.
+		<li>Confirm that LabDE does not crash.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Phase 2 Setup</b>
+	<ul>
+		<li>Correct the filenames for the renamed VOA files from Phase I.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Test C</b> - Ordering Physician table
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Click in the <b>Code</b> field of the <b>Ordering Physician</b> table.
+		<li>Press <b>Shift+Space</b> to select the whole row.
+		<li>Confirm that LabDE does not crash.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Test D</b> - Dragging test rows
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Drag multiple test rows from one order on top of the row header for a 
+		<b>new</b> order.
+		<li>Confirm that LabDE does not crash.
+		<li>Copy and paste text into a different cell after dropping the test rows.
+		<li>Confirm that the open document can be <b>saved</b> or <b>skipped</b>.
+		<li>Confirm that LabDE does not crash.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Test E</b> - Copying data from another application
+       	<ul>
+		<li>Open a text editor and type text for a sample <b>Patient name</b>, 
+		<b>Medical Record #</b>, and <b>Order Number</b>.
+		<li>Open a Demo_LabDE sample image.
+		<li>Copy text from the text editor and paste it into the appropriate 
+		fields.
+		<li>Use shortcut keys and the context menu.
+		<li>Exercise several sample images.
+		<li>Confirm that LabDE does not crash.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Test F</b> - Pasting into Medical Record number field
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Add a number to the <b>Medical Record #</b> field.
+		<li>Select the text.
+		<li>Click in the <b>Image Viewer</b> to change focus.
+		<li>Switch to another application and copy numeric text to the 
+		<b>Clipboard</b>.
+		<li>Click on the <b>LabDE</b> title bar to restore focus.
+		<li>Press <b>Ctrl+V</b> to paste the number into the field.
+		<li>Confirm that LabDE does not crash.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Test G</b> - Gender Combo Box
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Click on the drop-down arrow of the <b>Gender</b> combo box.
+		<li>Confirm that LabDE does not crash.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Test H</b> - Typing in the new row
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Select the first cell of the new row of the <b>Order</b> table.
+		<li>Type <b>crea</b> as fast as possible.
+		<li>Confirm that LabDE does not crash.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Test I</b> - Lab Name field
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Right-click in the <b>Lab Name</b> field.
+		<li>Confirm that LabDE does not crash.
+       	</ul>
+   	</LI>
+</OL>
+<p>
+<h3>Enhancements and Bug Fixes</h3>
+<UL>
+	<li>Confirm that <b>gflags</b> is enabled.
+<p>
+	<LI><b>[DataEntry #934]</b> Edit mode
+	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Select a <b>Flag</b> cell in the <b>Test Details</b> table.
+		<li>Change the flag to ensure edit mode.
+		<li>Click on the row header to select the entire row.
+		<li>Press the <b>Down</b> arrow.
+		<li>Confirm that the next row is selected.
+		<li>Confirm that the flag value is not changed again.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #935]</b> Case-insensitive smart tags
+	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<LI>Select and clear an edit box.
+		<LI>Type a <b>period</b> character.
+		<LI>Confirm that a drop-down list appears at the cursor location.
+		<li>Confirm that the initial list contains all of the defined smart tags.
+		<li>Confirm that as characters are typed by the user, the list of available smart 
+		tags automatically adjusts to retain just the tags that begin with the typed text.
+		<li>Confirm that typing a <b>space</b> character after the smart tags list is 
+		provided automatically expands the selected tag into the associated text.
+<p>
+		<li>Confirm that typing text that matches the beginning of a smart tag except for 
+		differences in case works properly.
+		<li>Confirm that text is correctly expanded even though the case is different 
+		than the database string.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #936]</b> Smart tags in a bad state
+	<ul>
+		<li>Open a Demo_LabDE sample image in a <b>new</b> FAM instance.
+		<li>Type <b>.comments</b> followed by a space in the <b>Comments</b> field.
+		<li>Confirm that the text is expanded.
+		<li>Skip the document without saving changes.
+		<li>Type <b>.comments</b> followed by a space in the <b>Comments</b> field for 
+		the second document.
+		<li>Confirm that the text is expanded.
+		<li>Confirm that subsequent text is completely visible as it is being typed.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #937]</b> Unexpected exception
+	<ul>
+		<li>Open a Demo_LabDE sample image in a <b>new</b> FAM instance.
+		<li>Right-click in the <b>Medical Record #</b> field.
+		<li>Close the verification UI without saving changes.
+		<li>Start processing again.
+		<li>Right-click in the <b>Medical Record #</b> field.
+		<li>Close the verification UI without saving changes.
+		<li>Confirm that no exception is thrown and that the FAM remains in a good state.
+<p>
+		<li>Repeat the above tests by clicking in the Order Name cell and typing <b>CMP</b> 
+		before closing without saving.
+		<li>Confirm that no exception is thrown and that the FAM remains in a good state.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #941]</b> Crash on Alt+Tab
+	<ul>
+		<li>Open a Demo_LabDE sample image in a <b>new</b> FAM instance.
+		<li>Drop-down the <b>Gender</b> combo box.
+		<li>While the combo box is dropped down, navigate back to the FAM via <b>Alt+Tab</b>.
+		<li>Confirm that the FAM does not crash.
+		<li>Navigate back and forth between the FAM and the verification UI via <b>Alt+Tab</b>.
+		<li>Confirm that the FAM does not crash.
+       	</ul>
+   	</LI>
+</UL>
+</BODY>
+</HTML>
