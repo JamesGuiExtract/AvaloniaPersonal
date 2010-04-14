@@ -787,15 +787,18 @@ const string TextFunctionExpander::expandMid(const string& str, const string& st
 	// Check for appropriate number of tokens
 	if (vecTokens.size() == 3)
 	{
-		// Get the count of characters
-		long lStart = 0;
+		// Get the start character
+		long lStart = 1;
 		try
 		{
 			lStart = asLong(vecTokens[1]);
-			if (lStart < 0)
+			if (lStart < 1)
 			{
 				throw 42;
 			}
+
+			// Convert 1 based start to 0 based
+			lStart--;
 		}
 		catch(...)
 		{
@@ -809,7 +812,7 @@ const string TextFunctionExpander::expandMid(const string& str, const string& st
 		try
 		{
 			lCount = asLong(vecTokens[2]);
-			if (lCount <= 0)
+			if (lCount <= -2 || lCount == 0)
 			{
 				throw 42;
 			}

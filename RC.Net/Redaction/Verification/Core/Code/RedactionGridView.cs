@@ -1670,7 +1670,17 @@ namespace Extract.Redaction.Verification
             {
                 if (_dataGridView.SelectedRows.Count > 0)
                 {
-                    return _dataGridView.SelectedRows[0].Index;
+                    int index = int.MaxValue;
+                    foreach (DataGridViewRow row in _dataGridView.SelectedRows)
+                    {
+                        int temp = row.Index;
+                        if (temp < index)
+                        {
+                            index = temp;
+                        }
+                    }
+
+                    return index;
                 }
 
                 return -1;
@@ -1695,7 +1705,17 @@ namespace Extract.Redaction.Verification
                 int count = _dataGridView.SelectedRows.Count;
                 if (count > 0)
                 {
-                    return _dataGridView.SelectedRows[count - 1].Index;
+                    int index = int.MinValue;
+                    foreach (DataGridViewRow row in _dataGridView.SelectedRows)
+                    {
+                        int temp = row.Index;
+                        if (temp > index)
+                        {
+                            index = temp;
+                        }
+                    }
+
+                    return index;
                 }
 
                 return -1;
@@ -2049,7 +2069,7 @@ namespace Extract.Redaction.Verification
                 // Ensure the top row in the selection is visible
                 if (_dataGridView.SelectedRows.Count > 0)
                 {
-                    _dataGridView.FirstDisplayedScrollingRowIndex = _dataGridView.SelectedRows[0].Index;
+                    _dataGridView.FirstDisplayedScrollingRowIndex = GetFirstSelectedRowIndex();
                 }
             }
             catch (Exception ex)
