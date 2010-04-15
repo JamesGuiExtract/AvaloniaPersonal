@@ -13,7 +13,7 @@
 <h3>Purpose and Details</h3>
 <ul>
    	<LI><b>Customer:</b> CA - Santa Barbara - DFM
-   	<LI><b>SCRs:</b> FlexIDSCore #4264
+   	<LI><b>SCRs:</b> FlexIDSCore #4261, #4264
    	<LI><b>Issue:</b> The customer is processing images and running multiple verification 
 	instances on the same server via Terminal Services.  Problems with the named mutex 
 	used in 8.0.0.70 result in only one verification user being able to run at a time.  
@@ -57,6 +57,16 @@
 			<li>Modify the new processing FPS file to process files only after hours.
 			<li>Configure <b>ESFAMService.sdf</b> to run this FPS via FAM Service.
 		</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Exercise verification</b>
+	<ul>
+		<li>Create an FPS file to verify images processed by the FAM service.
+		<li>Confirm that the same user account that is configured to run the FAM Service can 
+		exercise the verification FPS file.
+		<li>Confirm that a different user account that is configured to run the FAM Service 
+		can exercise the verification FPS file.
        	</ul>
    	</LI>
 <p>
