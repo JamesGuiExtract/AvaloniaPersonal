@@ -1,0 +1,114 @@
+<HTML>
+
+<HEAD>
+<TITLE>Terminal Services Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.0.1.x<br> Terminal Services Testing </h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> CA - Santa Barbara - DFM
+   	<LI><b>SCRs:</b> FlexIDSCore #4264
+   	<LI><b>Issue:</b> The customer is processing images and running multiple verification 
+	instances on the same server via Terminal Services.  Problems with the named mutex 
+	used in 8.0.0.70 result in only one verification user being able to run at a time.  
+	Further testing indicated that only one user can open the UEX Viewer at a time.
+   	<LI><b>Solution:</b> Code was added to adjust the security descriptor for the named 
+	mutex.
+</ul>
+<p>
+<h3>Tests</h3>
+<OL>
+	<LI><b>General setup</b>
+	<ul>
+		<li>Provide a non-expiring FLEX Index Server and ID Shield Server license 
+		file for the test machine.
+		<li>Create a folder with several thousand images to be processed.
+		<li>Select an associated ID Shield rule set for processing the images.
+	</ul>
+<p>
+	<LI><b>Exercise FAM Service</b>
+	<ul>
+		<li>General setup
+		<ul>
+			<li>Configure <b>ESFAMService.sdf</b> to restart processing after 
+			<b>100</b> files.
+			<li>Configure the FAM Service to run under a specific user account.
+		</ul>
+		<li>Queuing files
+		<ul>
+			<li>Create an FPS file to supply the files.
+			<li>Configure <b>ESFAMService.sdf</b> to run this FPS via FAM Service.
+		</ul>
+		<li>Processing files - part 1
+		<ul>
+			<li>Create an FPS file to process the files.
+			<li>Configure the FPS file to run with half the maximum number of threads.
+			<li>Configure <b>ESFAMService.sdf</b> to run this FPS via FAM Service.
+		</ul>
+		<li>Processing files - part 2
+		<ul>
+			<li>Copy and rename the FPS file created above to process the files.
+			<li>Modify the new processing FPS file to process files only after hours.
+			<li>Configure <b>ESFAMService.sdf</b> to run this FPS via FAM Service.
+		</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Exercise related utilities</b>
+	<ul>
+		<li>Confirm that the following utilities can be exercised by the same user account that 
+		is configured for the FAM Service
+		<ul>
+			<li>DB Admin
+			<li>UEX Viewer
+			<li>USS Viewer
+			<li>VOA Viewer
+		</ul>
+		<li>Confirm that the following utilities can be exercised by a different user account than 
+		is configured for the FAM Service
+		<ul>
+			<li>DB Admin
+			<li>UEX Viewer
+			<li>USS Viewer
+			<li>VOA Viewer
+		</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Failure testing</b>
+	<ul>
+		<li>Supply a different (large) group of files to a different database.
+		<li>Create an FPS file to copy the files.
+		<li>Delete the files before beginning processing.
+		<li>Test simultaneous users processing the missing files
+		<ul>
+			<li>Many errors should be created.
+			<li>Confirm that the exception log is updated properly.
+			<li>Confirm that statistics are updated properly.
+		</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Miscellaneous</b>
+	<ul>
+		<li>Confirm that a separate FAM instance will successfully exercise the following tasks
+		<ul>
+			<li>Core: Apply Bates number
+			<li>Core: Conditionally execute task(s)
+			<li>Core: Convert to searchable PDF
+			<li>Redaction: Create metadata xml image
+			<li>Redaction: Create redacted image
+		</ul>
+		<li>Confirm that a separate statistics-only FAM instance will successfully display 
+		updated statistics during processing.
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
