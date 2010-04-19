@@ -1775,10 +1775,11 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 				return S_OK;
 			}
 
-			// Update password in database Login table
+			// Update password in database Login table (fail if not the admin user
+			// and the user doesn't exist)
 			string strPassword = dlgPW.m_zNewPassword;
 			string strCombined = strUser + strPassword;
-			encryptAndStoreUserNamePassword(strCombined, bUseAdmin);
+			encryptAndStoreUserNamePassword(strCombined, bUseAdmin, !bUseAdmin);
 
 			// Just added password to the db so it is valid
 			*pbLoginValid = VARIANT_TRUE;

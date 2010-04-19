@@ -1754,16 +1754,18 @@ bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseA
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29897");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserNameAndPassword, bool bUseAdmin)
+void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserNameAndPassword,
+														bool bUseAdmin, bool bFailIfUserDoesNotExist)
 {
 	// Get the encrypted version of the combined string
 	string strEncryptedCombined = getEncryptedString(strUserNameAndPassword);
 
-	storeEncryptedPasswordAndUserName(strEncryptedCombined, bUseAdmin);
+	storeEncryptedPasswordAndUserName(strEncryptedCombined, bUseAdmin, bFailIfUserDoesNotExist);
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strEncryptedPW,
 														  bool bUseAdmin,
+														  bool bFailIfUserDoesNotExist,
 														  bool bCreateTransactionGuard)
 {
 	string strUser = bUseAdmin ? gstrADMIN_USER : m_strFAMUserName;
@@ -1792,6 +1794,13 @@ void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strEncry
 	// User not in DB if at the end of file
 	if (ipLoginSet->adoEOF == VARIANT_TRUE)
 	{
+		if (bFailIfUserDoesNotExist)
+		{
+			UCLIDException ue("ELI30012", "The specified user was not found, cannot set password.");
+			ue.addDebugInfo("User Name", strUser);
+			throw ue;
+		}
+
 		// Insert a new record
 		ipLoginSet->AddNew();
 
@@ -1906,8 +1915,13 @@ bool  CFileProcessingDB::isPasswordValid(const string& strPassword, bool bUseAdm
 	
 	// Get the stored password (if it exists)
 	string strStoredEncryptedCombined;
-	getEncryptedPWFromDB(strStoredEncryptedCombined, bUseAdmin);
-
+	if (!getEncryptedPWFromDB(strStoredEncryptedCombined, bUseAdmin))
+	{
+		UCLIDException uex("ELI30013",
+			"The specified user was not found, cannot authenticate password.");
+		uex.addDebugInfo("User Name", strUser);
+		throw uex;
+	}
 
 	// Check for no password
 	if (strStoredEncryptedCombined.empty())
