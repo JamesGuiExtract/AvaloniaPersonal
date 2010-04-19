@@ -37,9 +37,10 @@ namespace Extract.Utilities
         /// <returns>A <see cref="Mutex"/> for the specified name.</returns>
         public static Mutex GetGlobalNamedMutex(string mutexName)
         {
+            // Get the global named mutex for the "Everyone" group with
+            // the default permissions
             return GetGlobalNamedMutex(mutexName,
-                new SecurityIdentifier(WellKnownSidType.WorldSid, null),
-                MutexRights.Synchronize | MutexRights.Modify);
+                new SecurityIdentifier(WellKnownSidType.WorldSid, null));
         }
 
         /// <summary>
@@ -57,7 +58,9 @@ namespace Extract.Utilities
         /// for.</param>
         public static Mutex GetGlobalNamedMutex(string mutexName, SecurityIdentifier sid)
         {
-            return GetGlobalNamedMutex(mutexName, sid, MutexRights.Synchronize | MutexRights.Modify);
+            // Get the global named mutex for the specified SID with
+            // the default rights of FullControl [FlexIDSCore #4261]
+            return GetGlobalNamedMutex(mutexName, sid, MutexRights.FullControl);
         }
 
         /// <summary>
@@ -105,14 +108,17 @@ namespace Extract.Utilities
 
                     if (!exists)
                     {
-                        // Get the sid for "Everyone"
+                        // Create an access rule to allow the specified rights for
+                        // the specified SID
                         MutexAccessRule rule = new MutexAccessRule(sid, rights,
                             AccessControlType.Allow);
+
+                        // Add the access rule
                         MutexSecurity security = new MutexSecurity();
                         security.AddAccessRule(rule);
 
-                        // Create the mutex since it did not exist. Create it with permissions
-                        // such that all users have full access to the mutex [FlexIDSCore #4261]
+                        // Create the mutex since it did not exist. Create it with the specified
+                        // access rule.
                         bool createdNew = false;
                         mutex = new Mutex(false, mutexName, out createdNew, security);
                     }
