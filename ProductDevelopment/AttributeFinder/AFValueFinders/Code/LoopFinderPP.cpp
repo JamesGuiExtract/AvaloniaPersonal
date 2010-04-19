@@ -576,6 +576,9 @@ void CLoopFinderPP::enableControls()
 
 	// Enable or disable the log Exception based on the state of the condition visiblity
 	m_checkLogExceptionForMaxIterations.EnableWindow(iShowOrHide == SW_HIDE ? FALSE:TRUE);
+
+	// Refresh the form so the button states are displayed correctly PVCS FlexIDSCore #4259
+	Invalidate();
 }
 //-------------------------------------------------------------------------------------------------
 IObjectWithDescriptionPtr CLoopFinderPP::updateUIForSelected(IObjectWithDescriptionPtr ipSelected, 
