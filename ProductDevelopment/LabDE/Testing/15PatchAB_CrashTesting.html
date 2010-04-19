@@ -1,13 +1,13 @@
 <HTML>
 
 <HEAD>
-<TITLE>LabDE 1.5A Crash Testing</TITLE>
+<TITLE>LabDE 1.5B Crash Testing</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 
 <BODY>
 
-<h1> LabDE 1.5 Patch A<br>Crash Testing <br>
+<h1> LabDE 1.5 Patch A and B<br>Crash Testing <br>
 <IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
@@ -17,7 +17,7 @@
    	<LI><b>Purpose:</b> Exercise various scenarios that had caused reliable or sporadic 
 	FAM crashes with LabDE 1.5
    	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
-	present within the collected checklists.  One part of validating a <b>LabDE 1.5 Patch A</b> 
+	present within the collected checklists.  One part of validating a <b>LabDE 1.5 Patch B</b> 
 	release candidate is to explicitly exercise these otherwise untested recent changes.
 </ul>
 <p>
@@ -203,6 +203,28 @@
 		<li>Confirm that the FAM does not crash.
 		<li>Navigate back and forth between the FAM and the verification UI via <b>Alt+Tab</b>.
 		<li>Confirm that the FAM does not crash.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #954]</b> Gender changes on click
+	<ul>
+		<li>Begin testing the <b>Demo_LabDE</b> images with fresh VOA files.
+		<li>Skip <b>A003.tif</b>.
+		<li>Verify <b>B221.tif</b>.
+		<li>Click in the gender combo box.
+		<li>Confirm that Gender does not change to <b>F</b>.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #958]</b> Auto-complete list in wrong place after Shift+Space
+	<ul>
+		<li>Verify an image.
+		<li>Click in a populated cell that contains an auto-complete list.  An example is the 
+		<b>Units</b> column in the <b>Test</b> table.
+		<li>Confirm that all the text in the cell is selected.
+		<li>Press <b>Shift+Space</b> to select the entire row.
+		<li>Confirm that an auto-complete list is not displayed near the upper left corner of 
+		the display.
        	</ul>
    	</LI>
 </UL>
