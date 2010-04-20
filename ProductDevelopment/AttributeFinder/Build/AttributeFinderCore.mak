@@ -152,6 +152,7 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@DeleteFiles "$(ClearImageInstallFilesDir)\*.*"
 	@DeleteFiles "$(AFCoreInstallFilesRootDir)\DotNetGAC\*.*"
 	@DeleteFiles "$(AFCoreInstallFilesRootDir)\Reports\*.*"
+	@DeleteFiles "$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\*.*"
 	
 	@COPY /v  "$(BinariesFolder)\UCLIDAFConditions.dll" "$(AFCoreInstallFilesRootDir)\SelfRegCoreComponents"
     @COPY /v  "$(BinariesFolder)\UCLIDAFCore.dll" "$(AFCoreInstallFilesRootDir)\SelfRegCoreComponents"
