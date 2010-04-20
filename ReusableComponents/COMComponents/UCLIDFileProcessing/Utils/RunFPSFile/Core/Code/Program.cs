@@ -319,7 +319,7 @@ namespace Extract.FileActionManager.RunFPSFile
             usage.AppendLine();
             usage.AppendLine();
 
-            usage.Append("SourcDocName: The document to be processed.");
+            usage.Append("SourceDocName: The document to be processed.");
             usage.AppendLine();
             usage.AppendLine();
 

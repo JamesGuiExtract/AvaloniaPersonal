@@ -163,7 +163,6 @@ private:
 	CSize m_sizeMinimumPropPage;
 	long m_nCurrentBottomOfPropPage;
 
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 	auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 	
 	CToolTipCtrl m_ToolTipCtrl;

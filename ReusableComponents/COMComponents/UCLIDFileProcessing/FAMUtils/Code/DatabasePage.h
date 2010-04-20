@@ -9,6 +9,8 @@
 #include <string>
 #include "afxwin.h"
 
+using namespace std;
+
 //-------------------------------------------------------------------------------------------------
 // INotifyDBConfigChanged class
 //-------------------------------------------------------------------------------------------------
@@ -21,7 +23,7 @@ public:
 	//			a new server and database have been selected.  
 	// NOTE:	When implementing this method the setDBConnectionStatus should be called 
 	//			to update the DB status field on the database page
-	virtual void OnDBConfigChanged(const std::string& strServer, const std::string& strDatabase) = 0;
+	virtual void OnDBConfigChanged(const string& strServer, const string& strDatabase) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -41,12 +43,12 @@ public:
 	// PROMISE: To set the text that is displayed in the connection status edit box 
 	// NOTE:	This should be called by the implementation of OnDBConfigChanged on the
 	//			Notify object.
-	void setDBConnectionStatus(const std::string& strStatusString);
+	void setDBConnectionStatus(const string& strStatusString);
 
 	// PROMISE: Set the name SQL server and DBName
 	//			If the bNotifyObjects flag is true and an object has been set with 
 	//			setNotifyDBConfigChanged then the OnDBConfigChanged method will be called
-	void setServerAndDBName(const std::string& strSQLServer, const std::string& strDBName, bool bNotifyObjects = true);
+	void setServerAndDBName(const string& strSQLServer, const string& strDBName, bool bNotifyObjects = true);
 
 	// PROMISE: To set the object to notify when the configuration file has changed.
 	void setNotifyDBConfigChanged(IDBConfigNotifications* pNotifyObject );
@@ -104,8 +106,7 @@ private:
 	bool m_bBrowseEnabled;
 
 	// Registry Persistence managers
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	std::auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
+	auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 
 	////////////////////
 	// Methods

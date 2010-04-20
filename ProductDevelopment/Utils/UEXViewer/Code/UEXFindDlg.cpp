@@ -182,6 +182,8 @@ void CUEXFindDlg::OnBtnFind()
 		// Set or Clear the selection
 		m_pUEXDlg->SelectExceptions( vecFoundIndices );
 
+		this->SetFocus();
+
 		// Retrieve and store settings
 		storeSettings();
 	}

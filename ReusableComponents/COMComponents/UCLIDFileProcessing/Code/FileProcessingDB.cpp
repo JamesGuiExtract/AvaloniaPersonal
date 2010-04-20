@@ -92,8 +92,6 @@ std::string CFileProcessingDB::ms_strCurrDBName = "";
 CFileProcessingDB::CFileProcessingDB()
 : m_iDBSchemaVersion(0),
 m_bDBLocked(false),
-m_regUserCfgMgr(HKEY_CURRENT_USER, ""),
-m_regFPCfgMgr(&m_regUserCfgMgr, "\\FileProcessingDB"),
 m_hUIWindow(NULL),
 m_strCurrentConnectionStatus(gstrNOT_CONNECTED),
 m_strDatabaseServer(""),

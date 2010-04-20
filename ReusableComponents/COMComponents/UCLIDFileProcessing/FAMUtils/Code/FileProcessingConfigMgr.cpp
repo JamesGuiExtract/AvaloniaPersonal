@@ -93,13 +93,13 @@ static const long DEFAULT_DB_LOCK_TIMEOUT = 300; // 5 min
 //-------------------------------------------------------------------------------------------------
 // FileProcessingConfigMgr
 //-------------------------------------------------------------------------------------------------
-FileProcessingConfigMgr::FileProcessingConfigMgr(IConfigurationSettingsPersistenceMgr* pConfigMgr, 
-												 const string& strSectionName)
-:m_pCfgMgr(pConfigMgr), m_strSectionFolderName(strSectionName)
+FileProcessingConfigMgr::FileProcessingConfigMgr() 
 {
-	// TODO: The "strSectionName" parameter should no longer be required.
-	// This is a hack since most of the files are checked out. 
-	m_strSectionFolderName = gstrCOM_COMPONENTS_REG_PATH + "\\UCLIDFileProcessing";
+	try
+	{
+		initHKCU();
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30016");
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::getWindowPos(long &lPosX, long &lPosY)
@@ -108,30 +108,30 @@ void FileProcessingConfigMgr::getWindowPos(long &lPosX, long &lPosY)
 	string	strY;
 
 	// Check for existence of X position
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X))
 	{
 		// Not found, just default to 10
-		m_pCfgMgr->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X, "10");
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X, "10");
 		lPosX = 10;
 	}
 	else
 	{
 		// Retrieve X position
-		strX = m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X);
+		strX = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X);
 		lPosX = asLong(strX);
 	}
 
 	// Check for existence of Y position
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y))
 	{
 		// Not found, just default to 10
-		m_pCfgMgr->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y, "10");
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y, "10");
 		lPosY = 10;
 	}
 	else
 	{
 		// Retrieve Y position
-		strY = m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y);
+		strY = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y);
 		lPosY = asLong(strY);
 	}
 }
@@ -145,8 +145,8 @@ void FileProcessingConfigMgr::setWindowPos(long lPosX, long lPosY)
 	pszY.Format("%ld", lPosY);
 
 	// Store strings
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X, (LPCTSTR)pszX);
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y, (LPCTSTR)pszY);
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X, (LPCTSTR)pszX);
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y, (LPCTSTR)pszY);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::getWindowSize(long &lSizeX, long &lSizeY)
@@ -155,30 +155,30 @@ void FileProcessingConfigMgr::getWindowSize(long &lSizeX, long &lSizeY)
 	string	strY;
 
 	// Check for existence of width
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X))
 	{
 		// Not found, just default to 280
-		m_pCfgMgr->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X, "280");
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X, "280");
 		lSizeX = 280;
 	}
 	else
 	{
 		// Retrieve width
-		strX = m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X);
+		strX = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X);
 		lSizeX = asLong(strX);
 	}
 
 	// Check for existence of height
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y))
 	{
 		// Not found, just default to 170
-		m_pCfgMgr->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y, "170");
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y, "170");
 		lSizeY = 170;
 	}
 	else
 	{
 		// Retrieve height
-		strY = m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y);
+		strY = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y);
 		lSizeY = asLong(strY);
 	}
 
@@ -217,8 +217,8 @@ void FileProcessingConfigMgr::setWindowSize(long lSizeX, long lSizeY)
 	pszY.Format("%ld", lActualY);
 
 	// Store strings
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X, (LPCTSTR)pszX);
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y, (LPCTSTR)pszY);
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X, (LPCTSTR)pszX);
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y, (LPCTSTR)pszY);
 }
 //-------------------------------------------------------------------------------------------------
 bool FileProcessingConfigMgr::getWindowMaximized()
@@ -227,15 +227,15 @@ bool FileProcessingConfigMgr::getWindowMaximized()
 	string strValue;
 
 	// Check for existence of maximized key
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED))
 	{
 		// Not found, just default to false
-		m_pCfgMgr->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED, "0");
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED, "0");
 	}
 	else
 	{
 		// Retrieve setting
-		strValue = m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED);
+		strValue = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED);
 		if (strValue.length() > 0)
 		{
 			bMaximized = (strValue == "1");
@@ -248,37 +248,37 @@ bool FileProcessingConfigMgr::getWindowMaximized()
 void FileProcessingConfigMgr::setWindowMaximized(bool bMaximized)
 {
 	// Store setting
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED, bMaximized ? "1" : "0");
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED, bMaximized ? "1" : "0");
 }
 //-------------------------------------------------------------------------------------------------
 string FileProcessingConfigMgr::getLastOpenedFileNameFromScope()
 {
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FILE_NAME))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FILE_NAME))
 	{
 		return "";
 	}
 
-	return m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FILE_NAME);
+	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FILE_NAME);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::setLastOpenedFileNameFromScope(const string& strFileName)
 {
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FILE_NAME, strFileName);
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FILE_NAME, strFileName);
 }
 //-------------------------------------------------------------------------------------------------
 string FileProcessingConfigMgr::getLastOpenedFolderNameFromScope()
 {
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FOLDER_NAME))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FOLDER_NAME))
 	{
 		return "";
 	}
 
-	return m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FOLDER_NAME);
+	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FOLDER_NAME);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::setLastOpenedFolderNameFromScope(const string& strFolderName)
 {
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FOLDER_NAME, strFolderName);
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FOLDER_NAME, strFolderName);
 }
 //-------------------------------------------------------------------------------------------------
 vector<string> FileProcessingConfigMgr::getFileExtensionList()
@@ -286,19 +286,19 @@ vector<string> FileProcessingConfigMgr::getFileExtensionList()
 	vector<string> vecExtList;
 	// default set of images support by our current SSOCR
 	string strList("");
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST))
 	{
 		strList = "*.tif"
 				  "|*.bmp"
 				  "|*.bmp*;*.rle*;*.dib*;*.rst*;*.gp4*;*.mil*;*.cal*;*.cg4*;"
 				  "*.flc*;*.fli*;*.gif*;*.jpg*;*.pcx*;*.pct*;*.png*;*.tga*;*.tif*"
 				  "|*.*";
-		m_pCfgMgr->createKey(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST, strList);
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST, strList);
 	}
 
 	if (strList.empty())
 	{
-		strList = m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST);
+		strList = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST);
 	}
 
 	// each item in the list is separated by a pipe (|) character, parse them
@@ -320,24 +320,24 @@ void FileProcessingConfigMgr::setFileExtensionList(const vector<string>& vecFile
 		strList += vecFileExtensionList[n];
 	}
 
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST, strList);
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST, strList);
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::getOpenedFolderHistoryFromScope(std::vector<std::string>& rvecHistory)
+void FileProcessingConfigMgr::getOpenedFolderHistoryFromScope(vector<string>& rvecHistory)
 {
 	string strList("");
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY))
 	{
-		m_pCfgMgr->createKey(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY, strList);
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY, strList);
 	}
-	strList = m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY);
+	strList = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY);
 	
 
 	// each item in the list is separated by a pipe (|) character, parse them
 	StringTokenizer::sGetTokens(strList, "|", rvecHistory);
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::setOpenedFolderHistoryFromScope(const std::vector<std::string>& vecHistory)
+void FileProcessingConfigMgr::setOpenedFolderHistoryFromScope(const vector<string>& vecHistory)
 {
 	string strList("");
 	for (unsigned int n = 0; n<vecHistory.size(); n++)
@@ -350,67 +350,67 @@ void FileProcessingConfigMgr::setOpenedFolderHistoryFromScope(const std::vector<
 		strList += vecHistory[n];
 	}
 
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY, strList);
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY, strList);
 }
 //-------------------------------------------------------------------------------------------------
-std::string FileProcessingConfigMgr::getLastUsedFileExtension()
+string FileProcessingConfigMgr::getLastUsedFileExtension()
 {
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_USED_FILE_EXTENSION))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_USED_FILE_EXTENSION))
 	{
 		return "*.*";
 	}
 
-	return m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_USED_FILE_EXTENSION);
+	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_USED_FILE_EXTENSION);
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::setLastUsedFileExtension(const std::string& strExt)
+void FileProcessingConfigMgr::setLastUsedFileExtension(const string& strExt)
 {
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_USED_FILE_EXTENSION, strExt);
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_USED_FILE_EXTENSION, strExt);
 }
 //-------------------------------------------------------------------------------------------------
-std::string FileProcessingConfigMgr::getLastOpenedListNameFromScope()
+string FileProcessingConfigMgr::getLastOpenedListNameFromScope()
 {
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_LIST_NAME))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_LIST_NAME))
 	{
 		return "";
 	}
 
-	return m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_LIST_NAME);
+	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_LIST_NAME);
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::setLastOpenedListNameFromScope(const std::string& strListName)
+void FileProcessingConfigMgr::setLastOpenedListNameFromScope(const string& strListName)
 {
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FILE_NAME, strListName);
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FILE_NAME, strListName);
 }
 //-------------------------------------------------------------------------------------------------
 long FileProcessingConfigMgr::getMaxStoredRecords()
 {
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS))
 	{
-		m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS, asString(DEFAULT_MAX_STORED_RECORDS));
+		m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS, asString(DEFAULT_MAX_STORED_RECORDS));
 	}
 
-	return asLong(m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS));
+	return asLong(m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS));
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::setMaxStoredRecords(long nMaxStoredRecords)
 {
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS, asString(nMaxStoredRecords));
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS, asString(nMaxStoredRecords));
 }
 //-------------------------------------------------------------------------------------------------
 bool FileProcessingConfigMgr::getRestrictNumStoredRecords()
 {
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS))
 	{
-		m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS, DEFAULT_RESTRICT_NUM_STORED_RECORDS);
+		m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS, DEFAULT_RESTRICT_NUM_STORED_RECORDS);
 	}
 
-	return m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS) != "0";
+	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS) != "0";
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::setRestrictNumStoredRecords(bool bRestrict)
 {
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS, bRestrict ? "1" : "0");
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS, bRestrict ? "1" : "0");
 }
 //-------------------------------------------------------------------------------------------------
 long FileProcessingConfigMgr::getMaxFilesFromDB()
@@ -419,14 +419,14 @@ long FileProcessingConfigMgr::getMaxFilesFromDB()
 	long rtnValue = DEFAULT_MAX_FILES_FROM_DB;
 	
 	// if key exists get that value other wise set the default value
-	if ( m_pCfgMgr->keyExists(gstrFP_RECORD_MGR_PATH, MAX_FILES_FROM_DB))
+	if ( m_apHKCU->keyExists(gstrFP_RECORD_MGR_PATH, MAX_FILES_FROM_DB))
 	{
-		rtnValue = asLong(m_pCfgMgr->getKeyValue(gstrFP_RECORD_MGR_PATH, MAX_FILES_FROM_DB));
+		rtnValue = asLong(m_apHKCU->getKeyValue(gstrFP_RECORD_MGR_PATH, MAX_FILES_FROM_DB));
 	}
 	else
 	{
 		// Set the default value
-		m_pCfgMgr->setKeyValue(gstrFP_RECORD_MGR_PATH, MAX_FILES_FROM_DB, asString(DEFAULT_MAX_FILES_FROM_DB));
+		m_apHKCU->setKeyValue(gstrFP_RECORD_MGR_PATH, MAX_FILES_FROM_DB, asString(DEFAULT_MAX_FILES_FROM_DB));
 	}
 	return rtnValue;
 }
@@ -437,15 +437,15 @@ long FileProcessingConfigMgr::getMillisecondsBetweenDBCheck()
 	long rtnValue = DEFAULT_MS_BETWEEN_DB_CHECK;
 	
 	// if key exists get that value other wise set the default value
-	if ( m_pCfgMgr->keyExists(gstrFP_RECORD_MGR_PATH, MILLISECONDS_BETWEEN_DB_CHECK))
+	if ( m_apHKCU->keyExists(gstrFP_RECORD_MGR_PATH, MILLISECONDS_BETWEEN_DB_CHECK))
 	{
-		rtnValue = asLong(m_pCfgMgr->getKeyValue(gstrFP_RECORD_MGR_PATH,
+		rtnValue = asLong(m_apHKCU->getKeyValue(gstrFP_RECORD_MGR_PATH,
 			MILLISECONDS_BETWEEN_DB_CHECK));
 	}
 	else
 	{
 		// Set the default value
-		m_pCfgMgr->setKeyValue(gstrFP_RECORD_MGR_PATH, MILLISECONDS_BETWEEN_DB_CHECK,
+		m_apHKCU->setKeyValue(gstrFP_RECORD_MGR_PATH, MILLISECONDS_BETWEEN_DB_CHECK,
 			asString(DEFAULT_MS_BETWEEN_DB_CHECK));
 	}
 	return rtnValue;
@@ -453,10 +453,10 @@ long FileProcessingConfigMgr::getMillisecondsBetweenDBCheck()
 //-------------------------------------------------------------------------------------------------
 unsigned int FileProcessingConfigMgr::getTimerTickSpeed()
 {
-	if(m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED) )
+	if(m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED) )
 	{
 		// If the registry key exists, return it
-		string strTemp = m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED);
+		string strTemp = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED);
 		if (strTemp != "")
 		{
 			unsigned long ulTemp = asUnsignedLong( strTemp );
@@ -472,33 +472,33 @@ unsigned int FileProcessingConfigMgr::getTimerTickSpeed()
 	else
 	{
 		// If the registry key does not exist, set the default value and return it
-		m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED, 
+		m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED, 
 							asString( DEFAULT_TIMER_TICK_SPEED ) );
 		return DEFAULT_TIMER_TICK_SPEED ;
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::setTimerTickSpeed(std::string strTickSpeed)
+void FileProcessingConfigMgr::setTimerTickSpeed(string strTickSpeed)
 {
 	// Set the new tick speed
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED, strTickSpeed );
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED, strTickSpeed );
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::getDBServerHistory(std::vector<std::string>& rvecHistory)
+void FileProcessingConfigMgr::getDBServerHistory(vector<string>& rvecHistory)
 {
 	string strList("");
-	if (!m_pCfgMgr->keyExists(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY))
+	if (!m_apHKCU->keyExists(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY))
 	{
-		m_pCfgMgr->createKey(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY, strList);
+		m_apHKCU->createKey(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY, strList);
 	}
-	strList = m_pCfgMgr->getKeyValue(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY);
+	strList = m_apHKCU->getKeyValue(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY);
 	
 
 	// each item in the list is separated by a pipe (|) character, parse them
 	StringTokenizer::sGetTokens(strList, "|", rvecHistory);
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::setDBServerHistory(const std::vector<std::string>& vecHistory)
+void FileProcessingConfigMgr::setDBServerHistory(const vector<string>& vecHistory)
 {
 	// Set the registry key for the database server history
 	string strList("");
@@ -518,19 +518,19 @@ void FileProcessingConfigMgr::setDBServerHistory(const std::vector<std::string>&
 	}
 
 	// Set the registry key
-	m_pCfgMgr->setKeyValue(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY, strList);
+	m_apHKCU->setKeyValue(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY, strList);
 }
 //-------------------------------------------------------------------------------------------------
 long FileProcessingConfigMgr::getDBLockTimeout()
 {
 	// Check if key exists
-	if (!m_pCfgMgr->keyExists(gstrFP_DB_REGISTRY_PATH, DB_LOCK_TIMEOUT))
+	if (!m_apHKCU->keyExists(gstrFP_DB_REGISTRY_PATH, DB_LOCK_TIMEOUT))
 	{
 		// if not create key and give it a default value of DEFAULT_DB_LOCK_TIMEOUT
-		m_pCfgMgr->createKey(gstrFP_DB_REGISTRY_PATH, DB_LOCK_TIMEOUT, asString(DEFAULT_DB_LOCK_TIMEOUT));
+		m_apHKCU->createKey(gstrFP_DB_REGISTRY_PATH, DB_LOCK_TIMEOUT, asString(DEFAULT_DB_LOCK_TIMEOUT));
 	}
 	// Get the DB Lock time out from the registry
-	long lDBLockTimeout = asLong(m_pCfgMgr->getKeyValue(gstrFP_DB_REGISTRY_PATH, DB_LOCK_TIMEOUT));
+	long lDBLockTimeout = asLong(m_apHKCU->getKeyValue(gstrFP_DB_REGISTRY_PATH, DB_LOCK_TIMEOUT));
 
 	// Return the time out
 	return lDBLockTimeout;
@@ -543,15 +543,15 @@ bool FileProcessingConfigMgr::getAutoScrolling()
 	string strValue;
 
 	// Check for existence of auto scrolling key
-	if (!m_pCfgMgr->keyExists(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING))
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING))
 	{
 		// Not found, just default to true
-		m_pCfgMgr->createKey(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING, "1");
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING, "1");
 	}
 	else
 	{
 		// Retrieve setting
-		strValue = m_pCfgMgr->getKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING);
+		strValue = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING);
 		if (strValue.length() > 0)
 		{
 			bAutoScroll = (strValue == "1");
@@ -564,38 +564,38 @@ bool FileProcessingConfigMgr::getAutoScrolling()
 void FileProcessingConfigMgr::setAutoScrolling(bool bAutoScroll)
 {
 	// Store setting
-	m_pCfgMgr->setKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING, bAutoScroll ? "1" : "0");
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING, bAutoScroll ? "1" : "0");
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::getLastGoodDBSettings(std::string& strServer, std::string& strDatabase)
+void FileProcessingConfigMgr::getLastGoodDBSettings(string& strServer, string& strDatabase)
 {
 	// Set server and datbase to empty values
 	strServer = "";
 	strDatabase = "";
 	
 	// Get the server
-	if(m_pCfgMgr->keyExists(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_SERVER)) 
+	if(m_apHKCU->keyExists(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_SERVER)) 
 	{
-		strServer = m_pCfgMgr->getKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_SERVER);
+		strServer = m_apHKCU->getKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_SERVER);
 	}
 
 	// Get the databse
-	if(m_pCfgMgr->keyExists(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_DATABASE)) 
+	if(m_apHKCU->keyExists(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_DATABASE)) 
 	{
-		strDatabase = m_pCfgMgr->getKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_DATABASE);
+		strDatabase = m_apHKCU->getKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_DATABASE);
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::setLastGoodDBSettings(const std::string& strServer, const std::string& strDatabase)
+void FileProcessingConfigMgr::setLastGoodDBSettings(const string& strServer, const string& strDatabase)
 {
 	// Store Server
-	m_pCfgMgr->setKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_SERVER, strServer);
+	m_apHKCU->setKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_SERVER, strServer);
 
 	// Store Database
-	m_pCfgMgr->setKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_DATABASE, strDatabase);
+	m_apHKCU->setKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_DATABASE, strDatabase);
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingConfigMgr::getLocalSQLServerInstances(std::vector<std::string>& vecLocalInstances)
+void FileProcessingConfigMgr::getLocalSQLServerInstances(vector<string>& vecLocalInstances)
 {
 	// If there is an exception trying to get the instances names just return an
 	// empty vector but log the exception to track possible problems
@@ -605,12 +605,34 @@ void FileProcessingConfigMgr::getLocalSQLServerInstances(std::vector<std::string
 		vecLocalInstances.clear();
 
 		// check if the SQL Server InstalledInstances key exists
-		if (m_pCfgMgr->keyExists(gstrSQL_SERVER_REG_PATH, gstrSQL_SERVER_INSTALLED_INSTANCES_KEY))
+		if (getHKLM()->keyExists(gstrSQL_SERVER_REG_PATH, gstrSQL_SERVER_INSTALLED_INSTANCES_KEY))
 		{
 			// Get the instances from the registry
-			vecLocalInstances = m_pCfgMgr->getKeyMultiStringValue(gstrSQL_SERVER_REG_PATH, gstrSQL_SERVER_INSTALLED_INSTANCES_KEY);
+			vecLocalInstances = getHKLM()->getKeyMultiStringValue(gstrSQL_SERVER_REG_PATH, gstrSQL_SERVER_INSTALLED_INSTANCES_KEY);
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20376");
 }
+
 //-------------------------------------------------------------------------------------------------
+// Private methods
+//-------------------------------------------------------------------------------------------------
+RegistryPersistenceMgr* FileProcessingConfigMgr::getHKLM()
+{
+	if (m_apHKLM.get() == NULL)
+	{
+		m_apHKLM.reset(new RegistryPersistenceMgr(HKEY_LOCAL_MACHINE, ""));
+		ASSERT_RESOURCE_ALLOCATION("ELI30014", m_apHKLM.get() != NULL);
+	}
+
+	return m_apHKLM.get();
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingConfigMgr::initHKCU()
+{
+	if (m_apHKCU.get() == NULL)
+	{
+		m_apHKCU.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
+		ASSERT_RESOURCE_ALLOCATION("ELI30015", m_apHKCU.get() != NULL);
+	}
+}

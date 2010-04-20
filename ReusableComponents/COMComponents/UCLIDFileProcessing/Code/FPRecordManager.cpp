@@ -30,8 +30,7 @@ FPRecordManager::FPRecordManager()
 	try
 	{
 		// Get the max number of files to load in the record manager from the database
-		RegistryPersistenceMgr regMgr( HKEY_CURRENT_USER, "");
-		FileProcessingConfigMgr fpCfgMgr(&regMgr, "\\FileProcessingDialog");
+		FileProcessingConfigMgr fpCfgMgr;
 		m_nMaxFilesFromDB = fpCfgMgr.getMaxFilesFromDB();
 		m_nMillisecondsBetweenDBCheck = fpCfgMgr.getMillisecondsBetweenDBCheck();
 	}

@@ -179,8 +179,7 @@ void DBInfoCombo::addLocalInstances()
 		vector<string> vecInstances;
 
 		// Set up registry managers
-		RegistryPersistenceMgr rpm(HKEY_LOCAL_MACHINE, "");
-		FileProcessingConfigMgr fpCfgMgr(&rpm, "");
+		FileProcessingConfigMgr fpCfgMgr;
 
 		// Get the Local SQL server instances for the local machine
 		fpCfgMgr.getLocalSQLServerInstances(vecInstances);

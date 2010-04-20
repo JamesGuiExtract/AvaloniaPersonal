@@ -124,11 +124,8 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
 		m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_PROCESS);
 		ASSERT_RESOURCE_ALLOCATION("ELI14999", m_hIcon != NULL);
 
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(new
-			RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
-		
 		ma_pCfgMgr = auto_ptr<FileProcessingConfigMgr>(new
-			FileProcessingConfigMgr(ma_pUserCfgMgr.get(), "\\FileProcessingDialog"));
+			FileProcessingConfigMgr());
 
 		m_dlgOptions.setConfigManager(ma_pCfgMgr.get());
 

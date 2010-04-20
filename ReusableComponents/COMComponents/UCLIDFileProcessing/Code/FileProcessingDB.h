@@ -255,8 +255,7 @@ private:
 	// The DB Lock time out in seconds
 	long m_lDBLockTimeout;
 
-	// Registry configuration managers
-	RegistryPersistenceMgr m_regUserCfgMgr;
+	// Registry configuration manager
 	FileProcessingConfigMgr m_regFPCfgMgr;
 
 	// This string should always contain the current status string

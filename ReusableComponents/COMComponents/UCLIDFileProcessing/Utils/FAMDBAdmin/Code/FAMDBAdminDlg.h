@@ -11,6 +11,8 @@
 
 #include <memory>
 
+using namespace std;
+
 // CFAMDBAdminDlg dialog
 class CFAMDBAdminDlg : public CDialog, public IDBConfigNotifications
 {
@@ -58,7 +60,7 @@ protected:
 
 	//INotifyDBConfigChanged
 public:
-	virtual void OnDBConfigChanged(const std::string& strServer, const std::string& strDatabase);
+	virtual void OnDBConfigChanged(const string& strServer, const string& strDatabase);
 
 	// Method called to cause the summary tab to refresh its data
 	void NotifyStatusChanged();
@@ -81,8 +83,7 @@ private:
 	bool m_bIsDBGood;
 
 	// Registry Persistence managers
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	std::auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
+	auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 
 	// Misc utils object for calling AllowUserToSelectAndConfigureObject2
 	IMiscUtilsPtr m_ipMiscUtils;
@@ -116,7 +117,7 @@ private:
 	// Obtain and verify licensing of a categorized component with the given ID
 	// Returns the pointer if successful, NULL otherwise.  It will display
 	// (but not throw) an exception for the first problem instantiating each class.
-	ICategorizedComponentPtr getCategorizedComponent(const std::string& strProgID);
+	ICategorizedComponentPtr getCategorizedComponent(const string& strProgID);
 
 	// Gets the status from the database and updates the status on the Database page
 	void setUIDatabaseStatus();

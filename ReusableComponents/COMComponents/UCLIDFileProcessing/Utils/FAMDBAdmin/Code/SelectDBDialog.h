@@ -9,6 +9,8 @@
 
 #include <memory>
 
+using namespace std;
+
 // SelectDBDialog dialog
 
 class SelectDBDialog : public CDialog
@@ -52,8 +54,7 @@ private:
 	// FAMDB pointer to perform operations on the database
 	IFileProcessingDBPtr m_ipFAMDB;
 
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	std::auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
+	auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 public:
 	afx_msg void OnCbnKillfocusComboSelectDbServer();
 };

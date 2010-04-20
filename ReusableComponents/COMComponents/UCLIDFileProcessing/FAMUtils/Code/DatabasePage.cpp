@@ -47,12 +47,8 @@ DatabasePage::DatabasePage()
 {
 	try
 	{
-		// Set up registry managers
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(new
-			RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
-		
 		ma_pCfgMgr = auto_ptr<FileProcessingConfigMgr>(new
-			FileProcessingConfigMgr(ma_pUserCfgMgr.get(), "\\FAMDBAdmin"));
+			FileProcessingConfigMgr());
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI16730");
 }

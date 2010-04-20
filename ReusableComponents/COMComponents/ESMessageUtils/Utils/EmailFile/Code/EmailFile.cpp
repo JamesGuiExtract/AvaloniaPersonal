@@ -235,8 +235,8 @@ void CEmailFileApp::displayUsage(const string &strErrorMessage)
 	strUsage += "Arg2:\tEmail address(es) to send the file.\r\n";
 	strUsage += "\tMultiple addresses should be separated by either ; or ,\r\n";
 	strUsage +=  "\r\n";
-	strUsage += "If this application is run and the SMTP server has not been setup\r\n";
-	strUsage += "The UI for entering the SMTP server will be displayed\r\n";
+	strUsage += "If this application is run and the SMTP server has not been setup,\r\n";
+	strUsage += "the UI for entering the SMTP server will be displayed\r\n";
 
 	// display the message
 	AfxMessageBox(strUsage.c_str(), MB_ICONINFORMATION);

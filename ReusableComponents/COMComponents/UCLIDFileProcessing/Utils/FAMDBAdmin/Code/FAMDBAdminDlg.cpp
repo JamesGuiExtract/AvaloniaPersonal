@@ -55,11 +55,8 @@ m_bInitialized(false)
 
 		m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_FAMDBADMIN);
 
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(new
-			RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
-		
 		ma_pCfgMgr = auto_ptr<FileProcessingConfigMgr>(new
-			FileProcessingConfigMgr(ma_pUserCfgMgr.get(), "\\FAMDBAdmin"));
+			FileProcessingConfigMgr());
 
 		// Set the Database Page notify to this object ( so the status can be updated )
 		m_propDatabasePage.setNotifyDBConfigChanged(this);
