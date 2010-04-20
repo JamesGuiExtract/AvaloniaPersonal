@@ -32,6 +32,7 @@
 #include <SuspendWindowUpdates.h>
 #include <TemporaryFileName.h>
 #include <PromptDlg.h>
+#include <StringCSIS.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -703,6 +704,9 @@ void CUEXViewerDlg::OnFileStartNewLogFile()
 			// Rename the log file
 			UCLIDException::renameLogFile(UCLIDException::getDefaultLogFileFullPath(),
 				true, (LPCTSTR) dlg.m_zInput, true);
+
+			// Open the new log file
+			addExceptions(m_strCurrentFile, true);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29953");
@@ -1537,6 +1541,11 @@ void CUEXViewerDlg::updateEnabledStateForControls()
 	// Enable/disable File refresh
 	pMenu->EnableMenuItem(ID_FILE_REFRESHCURRENTLOGFILE, MF_BYCOMMAND | (
 		(m_strCurrentFile != "") ? MF_ENABLED: MF_GRAYED) );
+
+	// Enable/disable File start new log file depending on whether current file is default log file
+	pMenu->EnableMenuItem(ID_FILE_START_NEW_LOG_FILE, MF_BYCOMMAND | (
+		stringCSIS::sEqual(m_strCurrentFile,UCLIDException::getDefaultLogFileFullPath())
+		&& bNonZeroCount ? MF_ENABLED : MF_GRAYED));
 
 	// Enable/disable View button
 	bool bExactlyOneRowSelected = (m_listUEX.GetSelectedCount() == 1);
