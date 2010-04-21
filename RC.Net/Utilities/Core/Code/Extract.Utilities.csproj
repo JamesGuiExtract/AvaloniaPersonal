@@ -64,7 +64,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourceDocumentPathTags.cs" />
     <Compile Include="StreamMethods.cs" />
-    <Compile Include="StringMethods.cs" />
     <Compile Include="SystemMethods.cs" />
     <Compile Include="TemporaryFile.cs" />
     <Compile Include="ThreadingMethods.cs" />

@@ -11,7 +11,6 @@
 
 using namespace Extract;
 using namespace Extract::Licensing;
-using namespace Extract::Utilities;
 
 #pragma unmanaged
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;

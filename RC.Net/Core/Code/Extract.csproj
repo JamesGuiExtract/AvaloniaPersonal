@@ -56,6 +56,9 @@
     <Compile Include="ArgumentRequirement.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringMethods.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="UCLID_EXCEPTIONMGMTLib">

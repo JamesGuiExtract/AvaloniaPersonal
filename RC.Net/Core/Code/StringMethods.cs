@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace Extract.Utilities
+namespace Extract
 {
     /// <summary>
     /// A static class containing useful string manipulation routines.

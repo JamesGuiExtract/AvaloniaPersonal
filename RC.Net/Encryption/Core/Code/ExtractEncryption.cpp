@@ -7,7 +7,6 @@
 
 using namespace Extract;
 using namespace Extract::Encryption;
-using namespace Extract::Utilities;
 using namespace System;
 using namespace System::IO;
 using namespace System::Reflection;
