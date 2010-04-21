@@ -562,7 +562,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (_autoCompleteValues == null)
+                if (_autoCompleteValues == null || _autoCompleteValues.Count == 0)
                 {
                     return null;
                 }

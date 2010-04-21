@@ -175,6 +175,16 @@ namespace Extract.DataEntry
 
         #endregion Fields
 
+        #region Delegates
+
+        /// <summary>
+        /// Signature to use for invoking methods that accept one <see langword="string"/> parameter.
+        /// </summary>
+        /// <param name="value">An <see langword="string"/> parameter.</param>
+        delegate void StringDelegate(string value);
+
+        #endregion Delegates
+
         #region Constructors
 
         /// <summary>
@@ -634,6 +644,17 @@ namespace Extract.DataEntry
 
             if (rowSelectionMode)
             {
+                // [DataEntry:934]
+                // If an entire row is selected, end edit mode to avoid confusion about what
+                // happens when attempting to navigate while edit mode is still active.
+                if (EditingControl != null)
+                {
+                    // [DataEntry:958]
+                    // Perform the EndEdit asynchronously to avoid an issue where a auto-complete
+                    // list is incorrectly displayed.
+                    EndEditAsync();
+                }
+
                 // Indicates whether the only selected row is the new row.
                 bool newRowSelection = false;
 
@@ -792,8 +813,6 @@ namespace Extract.DataEntry
         /// data.</param>
         protected override void OnUserAddedRow(DataGridViewRowEventArgs e)
         {
-            DataGridViewEditMode originalEditMode = EditMode;
-
             try
             {
                 base.OnUserAddedRow(e);
@@ -821,41 +840,13 @@ namespace Extract.DataEntry
                     return;
                 }
 
-                // If the initial value is a single character, assume it is typed and re-send it 
-                // as WindowsMessage.Character message via SendCharacterToControl to trigger 
-                // auto-complete to display.
-                if (initialValue.Length == 1)
-                {
-                    base.BeginEdit(false);
-
-                    KeyMethods.SendCharacterToControl(initialValue[0], EditingControl);
-                }
-                // For initial values > 1 char (ie, pasted text), simply re-apply the initial value
-                // and refresh the attribute.
-                else if (initialValue.Length > 1)
-                {
-                    IDataEntryTableCell dataEntryCell = CurrentCell as IDataEntryTableCell;
-                    if (dataEntryCell != null)
-                    {
-                        CurrentCell.Value = initialValue;
-                        base.RefreshAttributes(false, dataEntryCell.Attribute);
-                    }
-
-                    base.BeginEdit(false);
-                }
+                BeginInvoke(new StringDelegate(BeginEdit), new object[] { initialValue });
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI24244", ex);
                 ee.AddDebugData("Event Data", e, false);
                 ee.Display();
-            }
-            finally
-            {
-                // Edit mode can once again be initiated by the use.
-                EditMode = originalEditMode;
-
-                OnUpdateEnded(new EventArgs());
             }
         }
 
@@ -966,7 +957,7 @@ namespace Extract.DataEntry
 
                         // Paste selected rows
                         case Keys.V:
-                            if (enableRowOptions && GetDataType(Clipboard.GetDataObject()) != null)
+                            if (enableRowOptions && GetDataFormatName(Clipboard.GetDataObject()) != null)
                             {
                                 PasteRowData(Clipboard.GetDataObject());
 
@@ -1175,7 +1166,7 @@ namespace Extract.DataEntry
                 drgevent.Effect = DragDropEffects.None;
 
                 // Determine if a drop is supported for the data being dragged.
-                string dataType = GetDataType(drgevent.Data);
+                string dataType = GetDataFormatName(drgevent.Data);
 
                 // If the dragged data is compatible with the rows of this table.
                 if (dataType != null)
@@ -1289,7 +1280,7 @@ namespace Extract.DataEntry
             try
             {
                 // If this table supports the data type being dragged
-                if (GetDataType(drgevent.Data) != null)
+                if (GetDataFormatName(drgevent.Data) != null)
                 {
                     // When dropping data into a compatible table control that allows rows to be
                     // added, insert it before the selected row, not over top of it.
@@ -1299,7 +1290,7 @@ namespace Extract.DataEntry
                     }
 
                     // Paste the dropped data in.
-                    PasteRowData(drgevent.Data);
+                    PasteRowData(drgevent.Data, true);
 
                     Focus();
                 }
@@ -1875,7 +1866,7 @@ namespace Extract.DataEntry
 
                 // [DataEntry:378]
                 // Prevent copying and pasting table data between different documents.
-                string rowDataType = GetDataType(Clipboard.GetDataObject());
+                string rowDataType = GetDataFormatName(Clipboard.GetDataObject());
                 if (!string.IsNullOrEmpty(rowDataType) && rowDataType != "System.String")
                 {
                     Clipboard.Clear();
@@ -1908,7 +1899,7 @@ namespace Extract.DataEntry
                 // can be added to the table or there is only one possible row the data could go.
                 // (Don't use any compatible type since that data should be handled by either
                 // the parent or the control associated with the data type).
-                if (GetDataType(e.DragDropEventArgs.Data) == RowDataType &&
+                if (GetDataFormatName(e.DragDropEventArgs.Data) == RowDataFormatName &&
                     (AllowUserToAddRows || Rows.Count == 0))
                 {
                     // As long as this table is from the same table from which the data was
@@ -1940,7 +1931,7 @@ namespace Extract.DataEntry
                 // If the dropped data is the data type used by this table's rows.
                 // (Don't use any compatible type since that data should be handled by either
                 // the parent or the control associated with the data type).
-                if (GetDataType(e.Data) == RowDataType)
+                if (GetDataFormatName(e.Data) == RowDataFormatName)
                 {
                     if (AllowUserToAddRows)
                     {
@@ -2212,7 +2203,7 @@ namespace Extract.DataEntry
                 // the current table cell.
                 bool enableRowOptions = AllowRowTasks(hit.RowIndex, hit.ColumnIndex);
                 bool enablePasteOptions = false;
-                if (enableRowOptions && GetDataType(Clipboard.GetDataObject()) != null)
+                if (enableRowOptions && GetDataFormatName(Clipboard.GetDataObject()) != null)
                 {
                     enablePasteOptions = true;
                 }
@@ -2243,30 +2234,37 @@ namespace Extract.DataEntry
         #region Private Members
 
         /// <summary>
-        /// Gets a <see langword="string"/> value to identify data on the clipboard that was copied
-        /// by this control.
+        /// Gets the name of a <see cref="DataFormats.Format"/> value for placing items on the
+        /// clipboard or into a <see cref="DataObject"/> class.
         /// </summary>
-        /// <returns>A <see langword="string"/> value to identify data on the clipboard that was
-        /// copied from this control.</returns>
-        string RowDataType
+        /// <returns>
+        /// The name of a <see cref="DataFormats.Format"/> value for placing items on the clipboard
+        /// or into a <see cref="DataObject"/> class.
+        /// </returns>
+        string RowDataFormatName
         {
             get
             {
-                return _OBJECT_NAME + AttributeName;
+                DataFormats.Format format = DataFormats.GetFormat(_OBJECT_NAME + AttributeName);
+
+                return format.Name;
             }
         }
 
         /// <summary>
-        /// Gets a <see langword="string"/> value to identify multiple columns of data on the
-        /// clipboard that was copied by this control.
+        /// Gets the name of a  <see langword="DataFormats.Format"/> value to identify multiple
+        /// columns of data on the clipboard that was copied by this control.
         /// </summary>
-        /// <returns>A <see langword="string"/> value to identify multiple columns of data on the
-        /// clipboard that was copied from this control.</returns>
-        string MultiColumnDataType
+        /// <returns>The name of a <see langword="DataFormats.Format"/> value to identify multiple
+        /// columns of data on the clipboard that was copied from this control.</returns>
+        string MultiColumnDataFormatName
         {
             get
             {
-                return _OBJECT_NAME + AttributeName + "<MultiColumnSelection>";
+                DataFormats.Format format = DataFormats.GetFormat(
+                    _OBJECT_NAME + base.AttributeName + "<MultiColumnSelection>");
+
+                return format.Name;
             }
         }
         
@@ -2279,14 +2277,14 @@ namespace Extract.DataEntry
         /// <returns>A <see langword="string"/> indicating the type of data on the clipboard
         /// as long as it is usable by this <see cref="DataEntryTable"/>. If the data is not usable
         /// by this table, <see langword="null"/> is returned.</returns>
-        string GetDataType(IDataObject dataObject)
+        string GetDataFormatName(IDataObject dataObject)
         {
             if (dataObject != null)
             {
                 // Check for data from this table.
-                if (dataObject.GetDataPresent(RowDataType))
+                if (dataObject.GetDataPresent(RowDataFormatName))
                 {
-                    return RowDataType;
+                    return RowDataFormatName;
                 }
                 // Check for data from compatible tables.
                 else
@@ -2325,7 +2323,7 @@ namespace Extract.DataEntry
                 if (!string.IsNullOrEmpty(rowData))
                 {
                     // Create a dataObject containing the rows' data.
-                    rowDataObject = new DataObject(RowDataType, rowData);
+                    rowDataObject = new DataObject(RowDataFormatName, rowData);
                    
                     // Maintain an internal list of the rows being dragged.
                     _draggedRows = new List<DataEntryTableRow>();
@@ -2976,7 +2974,7 @@ namespace Extract.DataEntry
             if (rowData != null)
             {
                 // Add the copied attributes to the clipboard
-                Clipboard.SetData(RowDataType, rowData);
+                Clipboard.SetData(RowDataFormatName, rowData);
             }
         }
 
@@ -3045,7 +3043,7 @@ namespace Extract.DataEntry
                         }
                     }
 
-                    Clipboard.SetData(MultiColumnDataType, data);
+                    Clipboard.SetData(MultiColumnDataFormatName, data);
 
                     return true;
                 } 
@@ -3099,6 +3097,9 @@ namespace Extract.DataEntry
             return null;
         }
 
+        /// <overloads>
+        /// Pastes attributes currently in the clipboard into the currently selected rows.
+        /// </overloads>
         /// <summary>
         /// Pastes attributes currently in the clipboard into the currently selected rows.
         /// <list type="bullet">
@@ -3122,12 +3123,40 @@ namespace Extract.DataEntry
         /// into the currently selected row(s).</param>
         void PasteRowData(IDataObject dataObject)
         {
+            PasteRowData(dataObject, false);
+        }
+
+        /// <summary>
+        /// Pastes attributes currently in the clipboard into the currently selected rows.
+        /// <list type="bullet">
+        /// <bullet>If no attributes are in the clipboard, no action will be taken.</bullet>
+        /// <bullet>If the number of attributes in the clipboard equals the number of rows
+        /// selected, the selected rows will be replaced with the clipboard attributes.</bullet>
+        /// <bullet>If the number of attributes in the clipboard is greater than the number of rows
+        /// selected, if <see cref="DataGridView.AllowUserToAddRows"/> is <see langword="true"/>, 
+        /// the selected rows will be replaced with the clipboard attributes, then new rows will be 
+        /// inserted immediately following the last selected row as needed.  If 
+        /// <see cref="DataGridView.AllowUserToAddRows"/> is <see langword="false"/>, at least one
+        /// attribute found in the clipboard will not be added to the table.</bullet>
+        /// <bullet>If the number of attributes in the clipboard is less than the number of rows 
+        /// selected then the clipboard attributes will replace the selected rows until there are no 
+        /// more clipboard attributes. If <see cref="DataGridView.AllowUserToDeleteRows"/> is 
+        /// <see langword="true"/>, the remaining selected rows will then be deleted (otherwise,
+        /// they will remain.</bullet>
+        /// </list>
+        /// </summary>
+        /// <param name="dataObject">The <see cref="IDataObject"/> containing the data to be pasted
+        /// into the currently selected row(s).</param>
+        /// <param name="dragAndDrop">If <see langword="true"/> then the paste is being called
+        /// from a drag and drop event.</param>
+        void PasteRowData(IDataObject dataObject, bool dragAndDrop)
+        {
             try
             {
                 // Delay processing of changes in the control host until PasteRowData is complete.
                 OnUpdateStarted(new EventArgs());
 
-                string dataType = GetDataType(dataObject);
+                string dataType = GetDataFormatName(dataObject);
 
                 // If the data on the clipboard is a string, use the row formatting rule to parse the
                 // text into the row.
@@ -3147,13 +3176,14 @@ namespace Extract.DataEntry
                     IUnknownVector attributesToPaste = (IUnknownVector)
                         MiscUtils.GetObjectFromStringizedByteStream(stringizedAttributes);
 
+                    bool renameAttributesFromOtherTable = dataType != RowDataFormatName;
                     int count = attributesToPaste.Size();
                     for (int i = 0; i < count; i++)
                     {
                         IAttribute attribute = (IAttribute)attributesToPaste.At(i);
 
                         // If the attributes are not from this table, rename them.
-                        if (dataType != RowDataType)
+                        if (renameAttributesFromOtherTable)
                         {
                             attribute.Name = AttributeName;
                         }
@@ -3166,7 +3196,7 @@ namespace Extract.DataEntry
                 // [DataEntry:757]
                 // DataEntryControlHost will be unable to determine when clipboard data needs to be
                 // cleared for row pasting. Clear the clipboard if specified.
-                if (ClearClipboardOnPaste && Clipboard.ContainsText())
+                if (!dragAndDrop && ClearClipboardOnPaste && Clipboard.ContainsText())
                 {
                     Clipboard.Clear();
                 }
@@ -3201,10 +3231,10 @@ namespace Extract.DataEntry
 
                 // If multicolumn data from this table is on the clipboard, try to paste it into the
                 // current selection.
-                if (dataObject.GetDataPresent(MultiColumnDataType))
+                if (dataObject.GetDataPresent(MultiColumnDataFormatName))
                 {
                     // Extract the pasted data
-                    string[][] data = (string[][])dataObject.GetData(MultiColumnDataType);
+                    string[][] data = (string[][])dataObject.GetData(MultiColumnDataFormatName);
                     bool pastedData = false;
 
                     // Prevent edit control from handling paste.
@@ -3667,6 +3697,44 @@ namespace Extract.DataEntry
             {
                 return (_draggedRows != null && _activeCachedRows != null &&
                         _activeCachedRows.ContainsValue(_draggedRows[0]));
+            }
+        }
+
+        /// <summary>
+        /// Begins edit mode using the specified value as the initial value and initializes the
+        /// auto-complete list if appropriate.
+        /// </summary>
+        /// <param name="initialValue">The initial value the cell should have after entering edit
+        /// mode. If the specified value is a single character, the auto-complete list will be
+        /// displayed as appropriate.</param>
+        void BeginEdit(string initialValue)
+        {
+            try
+            {
+                base.BeginEdit(false);
+
+                if (initialValue.Length == 1)
+                {
+                    // If the initial value is a single character, assume it is typed and re-send it
+                    // as WindowsMessage.Character message via SendCharacterToControl to trigger
+                    // auto-complete to display.
+                    KeyMethods.SendCharacterToControl(initialValue[0], EditingControl);
+                }
+                else if (initialValue.Length > 1)
+                {
+                    // For initial values > 1 char (ie, pasted text), simply re-apply the initial
+                    // value and refresh the attribute.
+                    IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
+                    if (dataEntryCell != null)
+                    {
+                        base.CurrentCell.Value = initialValue;
+                        base.RefreshAttributes(false, dataEntryCell.Attribute);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29988", ex);
             }
         }
 

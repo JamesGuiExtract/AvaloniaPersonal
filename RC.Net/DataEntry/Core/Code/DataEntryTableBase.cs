@@ -192,10 +192,10 @@ namespace Extract.DataEntry
         DataGridViewCellStyle _disabledCellStyle;
 
         /// <summary>
-        /// [DataEntry:920] As a workaround for some table issues, some OnValidating calls will be
-        /// skipped.
+        /// [DataEntry:920] We need to prevent programatic calls to EndEdit in some circumstances
+        /// to prevent the table from getting into a bad state.
         /// </summary>
-        bool _skipValidating;
+        bool _preventProgrammaticEndEdit;
 
         #endregion Fields
 
@@ -207,7 +207,12 @@ namespace Extract.DataEntry
         /// <param name="e">An <see cref="EventArgs"/> parameter.</param>
         delegate void EventArgsDelegate(EventArgs e);
 
-        #endregion
+        /// <summary>
+        /// Signature to use for invoking parameterless methods.
+        /// </summary>
+        delegate void ParameterlessDelegate();
+
+        #endregion Delegates
 
         #region SelectionProcessingSuppressor
 
@@ -943,15 +948,6 @@ namespace Extract.DataEntry
                         }
                     }
                 }
-                // [DataEntry:747]
-                // If using shift+space to select a row, end edit mode.
-                else if (m.WParam == (IntPtr)Keys.Space && ModifierKeys == Keys.Shift)
-                {
-                    if (EditingControl != null)
-                    {
-                        EndEdit();
-                    }
-                }
             }
             catch (Exception ex)
             {
@@ -1175,25 +1171,26 @@ namespace Extract.DataEntry
                                 // list twice, once as it is in the validation list, and the second
                                 // time with a leading space. This way, a user can press space in an
                                 // empty cell to see all possible values.
-                                string[] autoCompleteList =
-                                    new string[autoCompleteValues.Length * 2];
+                                AutoCompleteStringCollection autoCompleteList = new AutoCompleteStringCollection();
                                 for (int i = 0; i < autoCompleteValues.Length; i++)
                                 {
-                                    autoCompleteList[i] = " " + autoCompleteValues[i];
+                                    autoCompleteList.Add(" " + autoCompleteValues[i]);
                                 }
-                                autoCompleteValues.CopyTo(autoCompleteList,
-                                    autoCompleteValues.Length);
+                                autoCompleteList.AddRange(autoCompleteValues);
 
                                 textEditingControl.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                                 textEditingControl.AutoCompleteSource = AutoCompleteSource.CustomSource;
-                                textEditingControl.AutoCompleteCustomSource.AddRange(autoCompleteList);
+                                textEditingControl.AutoCompleteCustomSource = autoCompleteList;
                                 textEditingControl.PreviewKeyDown += HandleEditingControlPreviewKeyDown;
-                                textEditingControl.VisibleChanged += HandleEditingControlVisibleChanged;
                             }
-                            else
+                            else if (textEditingControl.AutoCompleteMode != AutoCompleteMode.None)
                             {
                                 textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
                             }
+                        }
+                        else if (textEditingControl.AutoCompleteMode != AutoCompleteMode.None)
+                        {
+                            textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
                         }
                     }
                 }
@@ -1201,30 +1198,6 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI24986", ex);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="Control.Layout"/> event.
-        /// </summary>
-        /// <param name="e">A <see cref="LayoutEventArgs"/> that contains the event data.</param>
-        protected override void OnLayout(LayoutEventArgs e)
-        {
-            try
-            {
-                base.OnLayout(e);
-
-                // [DataEntry:920]
-                // If a layout is called with "Bounds" as the affected property, if the next
-                // base.OnValidating() call is allowed to happen it will trigger an exception.
-                if (e.AffectedProperty == "Bounds")
-                {
-                    _skipValidating = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI29882", ex);
             }
         }
 
@@ -1239,34 +1212,14 @@ namespace Extract.DataEntry
             {
                 // If in edit mode and the DEP doesn't contain focus, eat the OnValidating event.
                 // This will prevent edit mode from ending.
-                if (EditingControl != null && !DataEntryControlHost.ContainsFocus)
-                {
-                    // If the active cell is a text box control, continue to show the current
-                    // selection and caret so that it is clear the cell can still receive input.
-                    TextBoxBase textBoxEditingControl = EditingControl as TextBoxBase;
-                    if (textBoxEditingControl != null)
-                    {
-                        textBoxEditingControl.HideSelection = false;
-                        NativeMethods.ShowCaret(textBoxEditingControl);
-                    }
-                }
-                else
+                if (EditingControl == null || DataEntryControlHost.ContainsFocus)
                 {
                     // [DataEntry:920]
-                    // Even without the above code, calling into the base class's OnValidating
-                    // here (or in the complete absense of this override) will, under some
-                    // circumstances, result in a null reference exception. I can't find any
-                    // reference to a known .Net issue so I'm not sure if it is a .Net issue or
-                    // perhaps an unexpected state the table is in at the time this is called.
-                    // While it doesn't seem advisable to avoid calling the base OnValidating,
-                    // even if exceptions from base.OnValidating are caught and eaten you can still
-                    // end up with issues such as misplaced dropdowns (#918). As a consequence,
-                    // DataEntry tables will not support raising the Validating event.
-                    // Therefore, skip the base class OnValidating when specified. 
-                    if (!_skipValidating)
-                    {
-                        base.OnValidating(e);
-                    }
+                    // When in the process of validating, prevent IndicateActive(false) from
+                    // programatically ending edit mode as this will result in null object
+                    // reference exceptions
+                    _preventProgrammaticEndEdit = true;
+                    base.OnValidating(e);
                 }
             }
             catch (Exception ex)
@@ -1277,7 +1230,7 @@ namespace Extract.DataEntry
             }
             finally
             {
-                _skipValidating = false;
+                _preventProgrammaticEndEdit = false;
             }
         }
 
@@ -1616,7 +1569,7 @@ namespace Extract.DataEntry
             try
             {
                 // Ensure edit mode ends once this control is no longer active.
-                if (!setActive && EditingControl != null)
+                if (!setActive && !_preventProgrammaticEndEdit && EditingControl != null)
                 {
                     EndEdit();
                 }
@@ -2383,6 +2336,21 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// EndsEdit mode asynchrously (in a new message handler).
+        /// </summary>
+        protected void EndEditAsync()
+        {
+            if (EditingControl != null)
+            {
+                // Commit the current value.
+                CommitEdit(DataGridViewDataErrorContexts.Commit);
+
+                // Use BeginInvoke so the EndEdit call happens in a new message handler.
+                BeginInvoke(new ParameterlessDelegate(EndEditAsyncInvoked));
+            }
+        }
+
         #endregion Protected Members
 
         #region Event Handlers
@@ -2474,43 +2442,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.VisibleChanged"/> event of the editing control in order
-        /// to clear the auto-complete list which, in turn, prevents handle and memory leaks.
-        /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
-        void HandleEditingControlVisibleChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                // If the editing control is being hidden.
-                if (!EditingControl.Visible)
-                {
-                    DataGridViewTextBoxEditingControl textEditingControl =
-                                    _editingControl as DataGridViewTextBoxEditingControl;
-
-                    // Clear an auto-complete list before closing to prevent handle and memory leaks.
-                    if (textEditingControl != null &&
-                        textEditingControl.AutoCompleteMode != AutoCompleteMode.None)
-                    {
-                        textEditingControl.AutoCompleteCustomSource.Clear();
-                        textEditingControl.AutoCompleteSource = AutoCompleteSource.None;
-                        textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
-
-                        textEditingControl.PreviewKeyDown -= HandleEditingControlPreviewKeyDown;
-                        textEditingControl.VisibleChanged -= HandleEditingControlVisibleChanged;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI27849", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
         /// Handles any <see cref="Control.PreviewKeyDown"/> events raised by an active
         /// <see cref="DataGridViewTextBoxEditingControl"/> in order to prevent a situation
         /// where the up and down arrows can apparently cause buffer overrun problems.
@@ -2537,14 +2468,14 @@ namespace Extract.DataEntry
                         textEditingControl.SelectionStart == textEditingControl.Text.Length &&
                         !FormsMethods.IsAutoCompleteDisplayed())
                     {
+                        // It is important to turn off auto-complete here. Though ending the edit
+                        // mode prevents the user from seeing corrupted characters, gflags indicates
+                        // that memory has still been stomped on. If auto-complete is disabled
+                        // first, gflags does not detect any memory corruption.
+                        textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
+
                         // Ensure the arrow key changes cell selection in this circumstance by first
                         // ending edit mode...
-                        EndEdit();
-
-                        // Hack: If nothing else is done with respect to edit mode right now, the
-                        // pencil edit icon remains displayed even though the table is no longer in
-                        // edit mode.  Re-entering and exiting edit mode corrects this situation.
-                        BeginEdit(false);
                         EndEdit();
 
                         // ... and then manually specifiying the new CurrentCell based on the arrow
@@ -2917,6 +2848,21 @@ namespace Extract.DataEntry
             _disabledCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
             _disabledCellStyle.SelectionBackColor = SystemColors.Control;
             _disabledCellStyle.BackColor = SystemColors.Control;
+        }
+
+        /// <summary>
+        /// A helper method for EndEditAsync that performs EndEdit after being invoked.
+        /// </summary>
+        void EndEditAsyncInvoked()
+        {
+            try
+            {
+                EndEdit();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30011", ex);
+            }
         }
 
         #endregion Private Members

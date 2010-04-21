@@ -127,8 +127,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._laboratoryIdentifier.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._laboratoryIdentifier.AttributeName = "LabIdentifier";
-            this._laboratoryIdentifier.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._laboratoryIdentifier.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._laboratoryIdentifier.AutoUpdateQuery = resources.GetString("_laboratoryIdentifier.AutoUpdateQuery");
             this._laboratoryIdentifier.Location = new System.Drawing.Point(7, 70);
             this._laboratoryIdentifier.Name = "_laboratoryIdentifier";
@@ -142,8 +140,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // _labInfoPassThrough
             // 
             this._labInfoPassThrough.AttributeName = "LabInfo";
-            this._labInfoPassThrough.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._labInfoPassThrough.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._labInfoPassThrough.Location = new System.Drawing.Point(208, 54);
             this._labInfoPassThrough.Name = "_labInfoPassThrough";
             this._labInfoPassThrough.ParentDataEntryControl = this._laboratoryTestTable;
@@ -247,8 +243,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // 
             this._labID.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._labID.AttributeName = "LabCode";
-            this._labID.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._labID.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._labID.AutoUpdateQuery = "<SQL>SELECT LabCode FROM LabAddresses WHERE LabName = SUBSTRING(<Attribute>../Lab" +
                 "Identifier</Attribute>,1,50)</SQL>";
             this._labID.Location = new System.Drawing.Point(457, 70);
@@ -352,7 +346,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._epicPatientMiddleNameColumn,
             this._epicPatientLastNameColumn,
             this._epicPatientSuffixColumn});
-            this._epicPatientNameTable.CompatibleAttributeNames.Add("Name");
             this._epicPatientNameTable.Location = new System.Drawing.Point(7, 101);
             this._epicPatientNameTable.MinimumNumberOfRows = 1;
             this._epicPatientNameTable.Name = "_epicPatientNameTable";
@@ -420,7 +413,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._patientMiddleNameColumn,
             this._patientLastNameColumn,
             this._patientSuffixColumn});
-            this._patientNameTable.CompatibleAttributeNames.Add("EpicName");
             this._patientNameTable.Location = new System.Drawing.Point(7, 34);
             this._patientNameTable.MinimumNumberOfRows = 1;
             this._patientNameTable.Name = "_patientNameTable";
@@ -484,8 +476,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // 
             this._patientGender.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._patientGender.AttributeName = "Gender";
-            this._patientGender.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._patientGender.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._patientGender.Location = new System.Drawing.Point(313, 166);
             this._patientGender.Name = "_patientGender";
             this._patientGender.ParentDataEntryControl = this._patientInfoGroupBox;
@@ -499,8 +489,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._patientBirthDate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._patientBirthDate.AttributeName = "DOB";
-            this._patientBirthDate.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._patientBirthDate.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._patientBirthDate.Location = new System.Drawing.Point(7, 166);
             this._patientBirthDate.Name = "_patientBirthDate";
             this._patientBirthDate.ParentDataEntryControl = this._patientInfoGroupBox;
@@ -523,8 +511,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // 
             this._patientRecordNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._patientRecordNum.AttributeName = "MR_Number";
-            this._patientRecordNum.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._patientRecordNum.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._patientRecordNum.ClearClipboardOnPaste = true;
             this._patientRecordNum.Location = new System.Drawing.Point(388, 166);
             this._patientRecordNum.Name = "_patientRecordNum";
@@ -769,8 +755,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._orderNumber.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._orderNumber.AttributeName = "OrderNumber";
-            this._orderNumber.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._orderNumber.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._orderNumber.ClearClipboardOnPaste = true;
             this._orderNumber.FormattingRuleFile = "Rules\\Swiping\\ResultDate.rsd.etf";
             this._orderNumber.Location = new System.Drawing.Point(7, 32);
@@ -796,8 +780,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._testComment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._testComment.AttributeName = "Comment";
-            this._testComment.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._testComment.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._testComment.AutoUpdateQuery = "<Query Default=\'1\'>Verified by $FullUserName() on $Now(%m/%d/%Y).</Query>";
             this._testComment.Location = new System.Drawing.Point(6, 110);
             this._testComment.Multiline = true;
@@ -824,8 +806,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // 
             this._testResultTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._testResultTime.AttributeName = "ResultTime";
-            this._testResultTime.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._testResultTime.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._testResultTime.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>../../ResultTime</Attribute></Query>";
             this._testResultTime.FormattingRuleFile = "Rules\\Swiping\\ResultTime.rsd.etf";
             this._testResultTime.Location = new System.Drawing.Point(421, 32);
@@ -850,8 +830,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // 
             this._testResultDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._testResultDate.AttributeName = "ResultDate";
-            this._testResultDate.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._testResultDate.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._testResultDate.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>../CollectionDate</Attribute></Query>\r\n<Query><Attr" +
                 "ibute>../../ResultDate</Attribute></Query>";
             this._testResultDate.FormattingRuleFile = "Rules\\Swiping\\ResultDate.rsd.etf";
@@ -879,7 +857,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // 
             this._resultStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._resultStatus.AttributeName = "ResultStatus";
-            this._resultStatus.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._resultStatus.DisplayMember = "Original";
             this._resultStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._resultStatus.Items.AddRange(new object[] {
@@ -920,8 +897,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._operatorComments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._operatorComments.AttributeName = "OperatorComments";
-            this._operatorComments.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._operatorComments.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._operatorComments.Enabled = false;
             this._operatorComments.Location = new System.Drawing.Point(7, 27);
             this._operatorComments.Multiline = true;
@@ -947,8 +922,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._filename.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._filename.AttributeName = "Filename";
-            this._filename.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._filename.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._filename.AutoUpdateQuery = "<SourceDocName/>";
             this._filename.BackColor = System.Drawing.SystemColors.Control;
             this._filename.ForeColor = System.Drawing.Color.Black;
@@ -980,8 +953,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // _messageSequenceNumberFile
             // 
             this._messageSequenceNumberFile.AttributeName = "MessageSequenceNumberFile";
-            this._messageSequenceNumberFile.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this._messageSequenceNumberFile.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._messageSequenceNumberFile.AutoUpdateQuery = "<Query><SolutionDirectory/>\\MessageSequenceNumber.txt</Query>";
             this._messageSequenceNumberFile.Location = new System.Drawing.Point(208, 0);
             this._messageSequenceNumberFile.Name = "_messageSequenceNumberFile";

@@ -151,6 +151,16 @@ namespace Extract.DataEntry
 
         #endregion Fields
 
+        #region Delegates
+
+        /// <summary>
+        /// Signature to use for invoking methods that accept one <see cref="FontStyle"/> parameter.
+        /// </summary>
+        /// <param name="fontStyle">A <see cref="FontStyle"/> parameter.</param>
+        delegate void FontStyleDelegate(FontStyle fontStyle);
+
+        #endregion Delegates
+
         #region Constructors
 
         /// <summary>
@@ -174,10 +184,6 @@ namespace Extract.DataEntry
                     LicenseIdName.DataEntryCoreComponents, "ELI23689", _OBJECT_NAME);
 
                 InitializeComponent();
-
-                // Initialize auto-complete mode incase validation lists are used.
-                AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                AutoCompleteSource = AutoCompleteSource.CustomSource;
             }
             catch (Exception ex)
             {
@@ -588,15 +594,6 @@ namespace Extract.DataEntry
             {
                 base.OnLostFocus(e);
 
-                // If the DEP has lost focus (as when click occurs in image viewer), keyboard input
-                // will continue to be directed back to this control, so keep the caret and current
-                // selection visible.
-                if (!DataEntryControlHost.ContainsFocus)
-                {
-                    HideSelection = false;
-                    NativeMethods.ShowCaret(this);
-                }
-
                 // If a validation list is supplied, this will correct capitalization differences
                 // with a list item.
                 Validate(true);
@@ -692,7 +689,7 @@ namespace Extract.DataEntry
 
                     // Add carriage returns back so that caller will not know they were replaced
                     // internally.
-                    if (!_removeNewLineChars)
+                    if (!_removeNewLineChars && !string.IsNullOrEmpty(value))
                     {
                         return value.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
                     }
@@ -709,18 +706,21 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    // Permanently replace newline chars with spaces if specified.
-                    if (_removeNewLineChars && 
-                        value.IndexOf("\r\n", StringComparison.Ordinal) >= 0)
+                    if (!string.IsNullOrEmpty(value))
                     {
-                        // Replace a group of CRLFs with just a single space.
-                        value = Regex.Replace(value, "(\r\n)+", " ");
-                    }
-                    // Temporarily replace carriage returns or line feeds with no break spaces to
-                    // prevent the unprintable "boxes" from appearing.
-                    else if (!_removeNewLineChars && !Multiline)
-                    {
-                        value = value.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
+                        // Permanently replace newline chars with spaces if specified.
+                        if (_removeNewLineChars &&
+                            value.IndexOf("\r\n", StringComparison.Ordinal) >= 0)
+                        {
+                            // Replace a group of CRLFs with just a single space.
+                            value = Regex.Replace(value, "(\r\n)+", " ");
+                        }
+                        // Temporarily replace carriage returns or line feeds with no break spaces
+                        // to prevent the unprintable "boxes" from appearing.
+                        else if (!_removeNewLineChars && !Multiline)
+                        {
+                            value = value.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
+                        }
                     }
 
                     base.Text = value;
@@ -777,7 +777,7 @@ namespace Extract.DataEntry
 
                 // If auto-complete was temporarily disabled to prevent arrow keys from exposing
                 // memory issues with auto-complete, re-enable autocomplete now.
-                if (AutoCompleteMode == AutoCompleteMode.None)
+                if (AutoCompleteMode == AutoCompleteMode.None && AutoCompleteCustomSource.Count > 0)
                 {
                     AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                 }
@@ -1084,8 +1084,7 @@ namespace Extract.DataEntry
                     bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
                     if (Font.Bold == hasBeenViewed)
                     {
-                        Font = new Font(base.Font,
-                            hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
+                        SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
                     }
                 }
 
@@ -1140,13 +1139,12 @@ namespace Extract.DataEntry
                                 SelectionStart++;
                             }
                         }
-                            
-                        Font = new Font(Font, FontStyle.Regular);
+
+                        SetFontStyle(FontStyle.Regular);
                     }
                 }
                 else
                 {
-                    HideSelection = true;
                     ResetBackColor();
                 }
 
@@ -1211,12 +1209,14 @@ namespace Extract.DataEntry
                         // check validation here.
                         UpdateValidation();
 
-                        // Update the font according to the viewed status.
+                        // Update the font according to the viewed status. Perform the font change
+                        // asynchronously othersize the it results in memory corruption related to
+                        // auto-complete lists (probably related to the window handle recreation it
+                        // triggers).
                         bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
                         if (Font.Bold == hasBeenViewed)
                         {
-                            Font = new Font(Font,
-                                hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
+                            SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
                         }
 
                         return;
@@ -1550,8 +1550,15 @@ namespace Extract.DataEntry
                     autoCompleteList.Add(" " + autoCompleteValues[i]);
                 }
                 autoCompleteList.AddRange(autoCompleteValues);
-                
+
+                // Initialize auto-complete mode in case validation lists are used.
+                base.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                base.AutoCompleteSource = AutoCompleteSource.CustomSource;
                 AutoCompleteCustomSource = autoCompleteList;
+            }
+            else if (base.AutoCompleteMode != AutoCompleteMode.None)
+            {
+                base.AutoCompleteMode = AutoCompleteMode.None;
             }
         }
 
@@ -1576,6 +1583,36 @@ namespace Extract.DataEntry
                         dataValidity == DataValidity.ValidationWarning ? 
                             _activeValidator.ValidationErrorMessage : "");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Applies a new font style to the control.
+        /// </summary>
+        /// <param name="fontStyle">The new <see cref="FontStyle"/> to apply.</param>
+        void SetFontStyle(FontStyle fontStyle)
+        {
+            // Perform the font change asynchronously othersize it results in memory corruption
+            // related to auto-complete lists (probably related to the window handle recreation it
+            // triggers).
+            base.BeginInvoke(new FontStyleDelegate(SetFontStyleDirect),
+                        new object[] { fontStyle });
+        }
+
+        /// <summary>
+        /// Applies a new font style to the control. This method is a helper for SetFontStyle and
+        /// should not be called directly.
+        /// </summary>
+        /// <param name="fontStyle">The new <see cref="FontStyle"/> to apply.</param>
+        void SetFontStyleDirect(FontStyle fontStyle)
+        {
+            try
+            {
+                Font = new Font(Font, fontStyle);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29998", ex);
             }
         }
 

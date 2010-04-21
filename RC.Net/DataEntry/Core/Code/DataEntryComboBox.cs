@@ -157,7 +157,23 @@ namespace Extract.DataEntry
         /// </summary>
         string _originalValue;
 
+        /// <summary>
+        /// To prevent a problem where the value can inadvertenly be changed during a font change,
+        /// the value the control has before a font change will be stored.
+        /// </summary>
+        string _valueBeforeFontChange;
+
         #endregion Fields
+
+        #region Delegates
+
+        /// <summary>
+        /// Signature to use for invoking methods that accept one <see cref="FontStyle"/> parameter.
+        /// </summary>
+        /// <param name="fontStyle">A <see cref="FontStyle"/> parameter.</param>
+        delegate void FontStyleDelegate(FontStyle fontStyle);
+
+        #endregion Delegates
 
         #region Constructors
 
@@ -182,13 +198,6 @@ namespace Extract.DataEntry
                     LicenseIdName.DataEntryCoreComponents, "ELI25534", _OBJECT_NAME);
 
                 InitializeComponent();
-
-                // Initialize auto-complete mode if not using a drop-list.
-                if (DropDownStyle != ComboBoxStyle.DropDownList)
-                {
-                    AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    AutoCompleteSource = AutoCompleteSource.CustomSource;
-                }
             }
             catch (Exception ex)
             {
@@ -682,7 +691,7 @@ namespace Extract.DataEntry
 
                     // Add carriage returns back so that caller will not know they were replaced
                     // internally.
-                    if (!_removeNewLineChars)
+                    if (!_removeNewLineChars && !string.IsNullOrEmpty(value))
                     {
                         return value.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
                     }
@@ -699,30 +708,34 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    // Permanently replace newline chars with spaces if specified.
-                    if (_removeNewLineChars && value.IndexOf("\r\n", StringComparison.Ordinal) >= 0)
+                    if (!string.IsNullOrEmpty(value))
                     {
-                        // Replace a group of CRLFs with just a single space.
-                        value = Regex.Replace(value, "(\r\n)+", " ");
-                    }
-                    // Temporarily replace carriage returns or line feeds with no break spaces to
-                    // prevent the unprintable "boxes" from appearing.
-                    else if (!_removeNewLineChars)
-                    {
-                        value = value.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
-                    }
+                        // Permanently replace newline chars with spaces if specified.
+                        if (_removeNewLineChars &&
+                            value.IndexOf("\r\n", StringComparison.Ordinal) >= 0)
+                        {
+                            // Replace a group of CRLFs with just a single space.
+                            value = Regex.Replace(value, "(\r\n)+", " ");
+                        }
+                        // Temporarily replace carriage returns or line feeds with no break spaces
+                        // to prevent the unprintable "boxes" from appearing.
+                        else if (!_removeNewLineChars)
+                        {
+                            value = value.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
+                        }
 
-                    // [DataEntry:906]
-                    // If the comboBox is configured as a DropDownList and the specified value is
-                    // not currently a possible value, store the value as "_originalValue" so it
-                    // can be restored if a the value is later added as a possible value.
-                    if (DropDownStyle == ComboBoxStyle.DropDownList && !Items.Contains(value))
-                    {
-                        _originalValue = value;
-                    }
-                    else
-                    {
-                        _originalValue = null;
+                        // [DataEntry:906]
+                        // If the comboBox is configured as a DropDownList and the specified value
+                        // is not currently a possible value, store the value as "_originalValue" so
+                        // it can be restored if a the value is later added as a possible value.
+                        if (DropDownStyle == ComboBoxStyle.DropDownList && !Items.Contains(value))
+                        {
+                            _originalValue = value;
+                        }
+                        else
+                        {
+                            _originalValue = null;
+                        }
                     }
 
                     base.Text = value;
@@ -780,8 +793,8 @@ namespace Extract.DataEntry
 
                 // If auto-complete was temporarily disabled to prevent arrow keys from exposing
                 // memory issues with auto-complete, re-enable autocomplete now.
-                if (DropDownStyle != ComboBoxStyle.DropDownList && 
-                    AutoCompleteMode == AutoCompleteMode.None)
+                if (DropDownStyle != ComboBoxStyle.DropDownList &&
+                    AutoCompleteMode == AutoCompleteMode.None && AutoCompleteCustomSource.Count > 0)
                 {
                     AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                 }
@@ -1079,10 +1092,9 @@ namespace Extract.DataEntry
                     // If the attribute has not been viewed, apply bold font.  Otherwise, use
                     // regular font.
                     bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
-                    if (base.Font.Bold == hasBeenViewed)
+                    if (Font.Bold == hasBeenViewed)
                     {
-                        base.Font = new Font(base.Font,
-                            hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
+                        SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
                     }
 
                     // If the text value is not editable (DropDownList style), use the first value in
@@ -1131,9 +1143,9 @@ namespace Extract.DataEntry
                     // Mark the attribute as having been viewed and update the attribute's status
                     // info accordingly.
                     AttributeStatusInfo.MarkAsViewed(_attribute, true);
-                    if (base.Font.Bold)
+                    if (Font.Bold)
                     {
-                        base.Font = new Font(base.Font, FontStyle.Regular);
+                        SetFontStyle(FontStyle.Regular);
                     }
                 }
                 else
@@ -1206,10 +1218,9 @@ namespace Extract.DataEntry
 
                         // Update the font according to the viewed status.
                         bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
-                        if (base.Font.Bold == hasBeenViewed)
+                        if (Font.Bold == hasBeenViewed)
                         {
-                            base.Font = new Font(base.Font,
-                                hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
+                            SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
                         }
 
                         return;
@@ -1547,6 +1558,8 @@ namespace Extract.DataEntry
                     }
                     autoCompleteList.AddRange(autoCompleteValues);
 
+                    base.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                    base.AutoCompleteSource = AutoCompleteSource.CustomSource;
                     base.AutoCompleteCustomSource = autoCompleteList;
                 }
 
@@ -1558,6 +1571,10 @@ namespace Extract.DataEntry
                 {
                     Text = _originalValue;
                 }
+            }
+            else if (base.AutoCompleteMode != AutoCompleteMode.None)
+            {
+                base.AutoCompleteMode = AutoCompleteMode.None;
             }
         }
 
@@ -1582,6 +1599,48 @@ namespace Extract.DataEntry
                         dataValidity == DataValidity.ValidationWarning ?
                             _activeValidator.ValidationErrorMessage : "");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Applies a new font style to the control.
+        /// </summary>
+        /// <param name="fontStyle">The new <see cref="FontStyle"/> to apply.</param>
+        void SetFontStyle(FontStyle fontStyle)
+        {
+            // [DataEntry:954]
+            // Changing the font will cause an open list to collapse and re-display. At times this
+            // results in a different value getting inadvertently selected. Record the original
+            // value so that it can be restored after changing the font.
+            _valueBeforeFontChange = Text;
+
+            // Perform the font change asynchronously othersize it results in memory corruption
+            // related to auto-complete lists (probably related to the window handle recreation it
+            // triggers).
+            base.BeginInvoke(new FontStyleDelegate(SetFontStyleDirect),
+                        new object[] { fontStyle });
+        }
+
+        /// <summary>
+        /// Applies a new font style to the control. This method is a helper for SetFontStyle and
+        /// should not be called directly.
+        /// </summary>
+        /// <param name="fontStyle">The new <see cref="FontStyle"/> to apply.</param>
+        void SetFontStyleDirect(FontStyle fontStyle)
+        {
+            try
+            {
+                Font = new Font(Font, fontStyle);
+
+                // Restore the value the control had before the font change (if it had one).
+                if (!string.IsNullOrEmpty(_valueBeforeFontChange) && Text != _valueBeforeFontChange)
+                {
+                    Text = _valueBeforeFontChange;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29999", ex);
             }
         }
 

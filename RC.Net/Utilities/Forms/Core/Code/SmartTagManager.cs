@@ -8,6 +8,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
@@ -149,8 +150,6 @@ namespace Extract.Utilities.Forms
                 BorderStyle = BorderStyle.None;
 
                 // Initialize the auto-complete list
-                AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                AutoCompleteSource = AutoCompleteSource.CustomSource;
                 UpdateSmartTags(smartTags);
 
                 // Register for necesssary events to watch for smart-tag entry.
@@ -213,18 +212,27 @@ namespace Extract.Utilities.Forms
                 // Update _smartkey dictionary and the auto-complete list with a sorted list of tag
                 // names.
                 _smartTags.Clear();
-                AutoCompleteStringCollection autoCompleteList = new AutoCompleteStringCollection();
-                
-                List<string> smartTagNames = new List<string>(smartTags.Keys);
-                smartTagNames.Sort();
-                foreach (string smartTagName in smartTagNames)
-                {
-                    string tagKey = "." + smartTagName;
-                    autoCompleteList.Add(tagKey);
-                    _smartTags[tagKey] = smartTags[smartTagName];
-                }
 
-                AutoCompleteCustomSource = autoCompleteList;
+                if (smartTags.Count > 0)
+                {
+                    AutoCompleteStringCollection autoCompleteList = new AutoCompleteStringCollection();
+                    List<string> smartTagNames = new List<string>(smartTags.Keys);
+                    smartTagNames.Sort();
+                    foreach (string smartTagName in smartTagNames)
+                    {
+                        string tagKey = "." + smartTagName.ToLower(CultureInfo.CurrentCulture);
+                        autoCompleteList.Add(tagKey);
+                        _smartTags[tagKey] = smartTags[smartTagName];
+                    }
+
+                    AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                    AutoCompleteSource = AutoCompleteSource.CustomSource;
+                    AutoCompleteCustomSource = autoCompleteList;
+                }
+                else if (AutoCompleteMode != AutoCompleteMode.None)
+                {
+                    AutoCompleteMode = AutoCompleteMode.None;
+                }
             }
             catch (Exception ex)
             {
@@ -292,23 +300,26 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Raises the <see cref="Control.TextChanged"/> event.
+        /// Raises the <see cref="Control.KeyUp"/> event.
         /// </summary>
-        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        protected override void OnTextChanged(EventArgs e)
+        /// <param name="e">A <see cref="KeyEventArgs"/> that contains the event data.</param>
+        protected override void OnKeyUp(KeyEventArgs e)
         {
             try
             {
-                base.OnTextChanged(e);
+                base.OnKeyUp(e);
 
                 // If text has changed and the auto-complete list is no longer visible we want to
-                // apply the smart tag. However, at this point in the message queue, the
-                // auto-complete list is still visible even if this text change will result in it
-                // closing. Therefore, invoke TryApplyTag so it will be called after all events
-                // in the current queue have been processed and the auto-complete list is gone.
+                // apply the smart tag. 
+                // [DataEntry:936]
+                // This used to be called in OnTextChanged. However, there are some situations in
+                // which the OnTextChanged method did not seem to be called. In addition to being
+                // more consistent, using OnKeyUp has the advantage that the auto-complete list
+                // will have already closed if it is going to close and, therefore, TryApplyTag can
+                // be called directly rather than invoking it.
                 if (IsActive)
                 {
-                    BeginInvoke(new TryApplyTagDelegate(TryApplyTag), false, false);
+                    TryApplyTag(false, false);
                 }
             }
             catch (Exception ex)
@@ -568,11 +579,6 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Delegate for TryApplyTag
-        /// </summary>
-        delegate void TryApplyTagDelegate(bool forceClose, bool cancel);
-
-        /// <summary>
         /// Attempts to apply the current value back to the active text control. If the value
         /// matches that of a tag name, the associated value will be applied; otherwise the
         /// current text will be applied.
@@ -606,8 +612,9 @@ namespace Extract.Utilities.Forms
                     {
                         // Look up the smart tag value
                         bool smartTagSelected = true;
+                        string lowerCaseText = Text.ToLower(CultureInfo.CurrentCulture);
                         string value;
-                        if (!_smartTags.TryGetValue(Text, out value))
+                        if (!_smartTags.TryGetValue(lowerCaseText, out value))
                         {
                             smartTagSelected = false;
                             value = Text;

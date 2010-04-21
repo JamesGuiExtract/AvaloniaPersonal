@@ -550,7 +550,7 @@ namespace Extract.DataEntry
             // Do not unnecessarily call SourceDocumentPathTags.Expand()-- this method is called a
             // lot and SourceDocumentPathTags.Expand() uses an expensive COM call.
             bool containsPossiblePathTag = (_query.Contains("$") || 
-                _query.IndexOf("<SourceDocName>",StringComparison.OrdinalIgnoreCase) >= 0);
+                _query.IndexOf("<SourceDocName>", StringComparison.Ordinal) >= 0);
             string expandedQuery = containsPossiblePathTag ?
                 AttributeStatusInfo.SourceDocumentPathTags.Expand(_query) : _query;
 
