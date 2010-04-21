@@ -65,6 +65,7 @@ private:
 	//				Now() = 11/25/2009 09:01:03:257
 	//				Logged in user name = jsmith
 	//				Human readable user name = John Smith
+	// $ChangeExt(path, pdf) = C:\temp1\temp2\filename.pdf
 	// $DirNoDriveOf(path) = temp1\temp2
 	// $DirOf(path) = C:\temp1\temp2
 	// $DriveOf(path) = C:\
@@ -79,6 +80,7 @@ private:
 	// $RandomAlphaNumeric(5) = A10FP
 	// &UserName() = jsmith
 	// &FullUserName() = John Smith
+	const string expandChangeExt(const string& str, const string& strToken) const;
 	const string expandDirOf(const string&) const;
 	const string expandDirNoDriveOf(const string&) const;
 	const string expandDriveOf(const string&) const;

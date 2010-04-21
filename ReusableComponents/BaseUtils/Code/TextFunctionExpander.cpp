@@ -18,6 +18,7 @@ vector<string> g_vecFunctions;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
+const string gstrFUNC_CHANGE_EXT = "ChangeExt";
 const string gstrFUNC_DIR_NO_DRIVE_OF = "DirNoDriveOf";
 const string gstrFUNC_DIR_OF = "DirOf";
 const string gstrFUNC_DRIVE_OF = "DriveOf";
@@ -54,6 +55,7 @@ TextFunctionExpander::TextFunctionExpander()
 		if (!g_bInit)
 		{
 			// Add the functions in alphabetical order
+			g_vecFunctions.push_back(gstrFUNC_CHANGE_EXT);
 			g_vecFunctions.push_back(gstrFUNC_DIR_NO_DRIVE_OF);
 			g_vecFunctions.push_back(gstrFUNC_DIR_OF);
 			g_vecFunctions.push_back(gstrFUNC_DRIVE_OF);
@@ -142,7 +144,8 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 						&& strFunction != gstrFUNC_REPLACE
 						&& strFunction != gstrFUNC_LEFT
 						&& strFunction != gstrFUNC_MID
-						&& strFunction != gstrFUNC_RIGHT)
+						&& strFunction != gstrFUNC_RIGHT
+						&& strFunction != gstrFUNC_CHANGE_EXT)
 					{
 						UCLIDException uex("ELI29708", "Function does not support alternate token syntax.");
 						uex.addDebugInfo("Function", strFunction);
@@ -239,6 +242,10 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 		else if (strFunction == gstrFUNC_INSERT_BEFORE_EXT)
 		{
 			strRet += expandInsertBeforeExt(strArg, strToken);
+		}
+		else if (strFunction == gstrFUNC_CHANGE_EXT)
+		{
+			strRet += expandChangeExt(strArg, strToken);
 		}
 		else if (strFunction == gstrFUNC_MID)
 		{
@@ -892,6 +899,64 @@ const string TextFunctionExpander::expandRight(const string& str, const string& 
 	{
 		// Create and throw exception
 		UCLIDException ue( "ELI29963", "Right function has invalid number of arguments!");
+		ue.addDebugInfo("Arguments", str);
+		ue.addDebugInfo("NumOfArgs", vecTokens.size());
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandChangeExt(const string& str, const string& strToken) const
+{
+	// Tokenize the string into strSource, strInsert
+	vector<string> vecTokens;
+	StringTokenizer::sGetTokens(str, strToken, vecTokens);
+
+	// Check for proper number of tokens
+	if (vecTokens.size() == 2)
+	{
+		// Retrieve each string
+		string strSource = vecTokens[0];
+		string strExtension = vecTokens[1];
+
+		// Source string cannot be empty
+		if (strSource.length() == 0)
+		{
+			// Create and throw exception
+			UCLIDException ue( "ELI30019", "ChangeExt function cannot operate on an empty string!");
+			ue.addDebugInfo("Arguments", str);
+			throw ue;
+		}
+
+		string strExt = getExtensionFromFullPath( strSource );
+		if (strExt.length() == 0)
+		{
+			// Create and throw exception
+			UCLIDException ue( "ELI30020",
+				"Source text in ChangeExt function does not have a file extension!");
+			ue.addDebugInfo("Source Text", strSource);
+			throw ue;
+		}
+
+		// Find starting position of this file extension
+		long lPos = strSource.rfind( strExt );
+		if (lPos != string::npos)
+		{
+			// Replace the extension
+			strSource = strSource.substr(0, lPos+1) + strExtension;
+		}
+		else
+		{
+			// We are expecting to find the previously located extension
+			THROW_LOGIC_ERROR_EXCEPTION( "ELI30021" );
+		}
+
+		// Return the result of the string insert
+		return strSource;
+	}
+	else
+	{
+		// Create and throw exception
+		UCLIDException ue( "ELI30022", "ChangeExt function has invalid number of arguments!");
 		ue.addDebugInfo("Arguments", str);
 		ue.addDebugInfo("NumOfArgs", vecTokens.size());
 		throw ue;

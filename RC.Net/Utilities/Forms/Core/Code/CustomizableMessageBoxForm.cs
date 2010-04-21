@@ -566,6 +566,7 @@ namespace Extract.Utilities.Forms
             this._rtbMessage.ReadOnly = true;
             this._rtbMessage.Size = new System.Drawing.Size(100, 48);
             this._rtbMessage.TabIndex = 4;
+            this._rtbMessage.TabStop = false;
             this._rtbMessage.Text = "";
             this._rtbMessage.Visible = false;
             // 
