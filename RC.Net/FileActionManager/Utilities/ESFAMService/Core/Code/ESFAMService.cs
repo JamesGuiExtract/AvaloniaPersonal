@@ -750,32 +750,21 @@ namespace Extract.FileActionManager.Utilities
             {
                 string serviceName = dependentServiceNames[i];
                 ServiceController controller = null;
-                bool found = false;
-                if (serviceNames.TryGetValue(serviceName, out controller))
+                bool foundByServiceName = serviceNames.TryGetValue(serviceName, out controller);
+                if (foundByServiceName || displayNames.TryGetValue(serviceName, out controller))
                 {
                     // If the service was found in the dependency list, add it to the list
                     // of controllers
                     dependentServices.Add(controller);
-                    found = true;
 
-                    // Remove the controller from the dictionary
-                    serviceNames.Remove(serviceName);
-                }
-                else if (displayNames.TryGetValue(serviceName, out controller))
-                {
-                    // If the service was found in the dependency list, add it to the list
-                    // of controllers
-                    dependentServices.Add(controller);
-                    found = true;
+                    // Remove the controller from the dictionaries
+                    serviceNames.Remove(foundByServiceName ?
+                        serviceName : controller.ServiceName.ToUpperInvariant());
+                    displayNames.Remove(foundByServiceName ?
+                        controller.DisplayName.ToUpperInvariant() : serviceName);
 
-                    // Remove the controller from the dictionary
-                    displayNames.Remove(serviceName);
-                }
-
-                // If the service name was found, remove it from the list and
-                // decrement the index
-                if (found)
-                {
+                    // Remove the service name from the dependent services list
+                    // and decrement the index
                     dependentServiceNames.RemoveAt(i);
                     i--;
                 }
@@ -793,15 +782,17 @@ namespace Extract.FileActionManager.Utilities
                 ee.Log();
             }
 
-            // Need to dispose of all other controllers
-            foreach (ServiceController controller in displayNames.Values)
-            {
-                controller.Dispose();
-            }
+            // Need to dispose of all other controllers (it is sufficient to only dispose
+            // of the controllers in one collection since they mirror each other and
+            // contain the same references
             foreach (ServiceController controller in serviceNames.Values)
             {
                 controller.Dispose();
             }
+
+            // Clear the collections
+            serviceNames.Clear();
+            displayNames.Clear();
 
             // Return the list of ServiceControllers
             return dependentServices;
@@ -832,7 +823,7 @@ namespace Extract.FileActionManager.Utilities
                     displayNames.Add(controller.DisplayName.ToUpperInvariant(), controller);
 
                     // Add the service name to the collection (these are unique)
-                    serviceNames.Add(controller.ServiceName.ToUpperInvariant(), new ServiceController(controller.ServiceName));
+                    serviceNames.Add(controller.ServiceName.ToUpperInvariant(), controller);
                 }
             }
             catch (Exception ex)
