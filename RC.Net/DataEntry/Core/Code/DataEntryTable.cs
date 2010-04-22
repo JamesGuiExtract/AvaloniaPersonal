@@ -1279,6 +1279,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                OnUpdateStarted(new EventArgs());
+
                 // If this table supports the data type being dragged
                 if (GetDataFormatName(drgevent.Data) != null)
                 {
@@ -1312,6 +1314,10 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI26967", ex);
                 ee.AddDebugData("Event Data", drgevent, false);
                 ee.Display();
+            }
+            finally
+            {
+                OnUpdateEnded(new EventArgs());
             }
         }
 
@@ -1493,6 +1499,25 @@ namespace Extract.DataEntry
             _carriageReturnColumn = CurrentCell == null ? 0 : CurrentCell.ColumnIndex;
         }
 
+        /// <summary>
+        /// Deletes the attributes that aren't needed anymore (via AttributeStatusInfo), and ensures
+        /// the deleted attribute is no longer referenced by any table member.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to be deleted.</param>
+        protected override void DeleteAttributeData(IAttribute attribute)
+        {
+            foreach (Dictionary<IAttribute, DataEntryTableRow> cachedSet in
+                _cachedRows.Values)
+            {
+                if (cachedSet.ContainsKey(attribute))
+                {
+                    cachedSet.Remove(attribute);
+                }
+            }
+
+            base.DeleteAttributeData(attribute);
+        }
+
         #endregion Overrides
 
         #region Event Handlers
@@ -1518,8 +1543,7 @@ namespace Extract.DataEntry
                         ExtractException.Assert("ELI26142", "Uninitialized data!",
                             _sourceAttributes != null);
 
-                        AttributeStatusInfo.DeleteAttribute(attributeToRemove);
-                        _activeCachedRows.Remove(attributeToRemove);
+                        DeleteAttributeData(attributeToRemove);
                     }
                 }
             }
@@ -1612,6 +1636,15 @@ namespace Extract.DataEntry
                 // IDataEntryControl interface.
                 Enabled = sourceAttributes != null && !Disabled;
 
+                // Ensure _tabOrderPlaceholderAttribute is cleared so that if a parent attribute is
+                // deleted, we don't try to use a deleted. Also, this ensures doesn't get assigned
+                // to more than one hierarchy at a time.
+                if (_tabOrderPlaceholderAttribute != null)
+                {
+                    DeleteAttributeData(_tabOrderPlaceholderAttribute);
+                    _tabOrderPlaceholderAttribute = null;
+                }
+
                 _sourceAttributes = sourceAttributes;
 
                 // Retrieve the cached rows that correspond to sourceAttributes (if available).
@@ -1637,11 +1670,6 @@ namespace Extract.DataEntry
                     // If no data is being assigned, clear the existing attribute mappings and do not
                     // attempt to map a new attribute.
                     ClearAttributeMappings(false);
-
-                    // Ensure _tabOrderPlaceholderAttribute is cleared when propagating null so that
-                    // if a parent attribute is deleted, we don't try to use a deleted
-                    // _tabOrderPlaceholderAttribute
-                    _tabOrderPlaceholderAttribute = null;
                 }
                 else
                 {
@@ -1687,6 +1715,10 @@ namespace Extract.DataEntry
                             "PlaceholderAttribute_" + Name, MultipleMatchSelectionMode.First,
                             true, _sourceAttributes, null, this, 1, true, TabStopMode.Always,
                             null, null, null);
+
+                        AttributeStatusInfo placeholderStatusInfo =
+                            AttributeStatusInfo.GetStatusInfo(_tabOrderPlaceholderAttribute);
+                        placeholderStatusInfo.AttributeDeleted += HandlePlaceholderAttributeDeleted;
 
                         // Don't persist placeholder attributes in output.
                         AttributeStatusInfo.SetAttributeAsPersistable(
@@ -1862,7 +1894,11 @@ namespace Extract.DataEntry
 
                 _activeCachedRows = null;
 
-                _tabOrderPlaceholderAttribute = null;
+                if (_tabOrderPlaceholderAttribute != null)
+                {
+                    DeleteAttributeData(_tabOrderPlaceholderAttribute);
+                    _tabOrderPlaceholderAttribute = null;
+                }
 
                 // [DataEntry:378]
                 // Prevent copying and pasting table data between different documents.
@@ -2229,6 +2265,22 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Handles the case that the _tabOrderPlaceholderAttribute has been deleted.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="AttributeDeletedEventArgs"/> that contains the event data.
+        /// </param>
+        void HandlePlaceholderAttributeDeleted(object sender, AttributeDeletedEventArgs e)
+        {
+            // Ensure that wherever _tabOrderPlaceholderAttribute is deleted from, it is no longer
+            // referenced.
+            if (e.DeletedAttribute == _tabOrderPlaceholderAttribute)
+            {
+                _tabOrderPlaceholderAttribute = null;
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -2316,6 +2368,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                OnUpdateStarted(new EventArgs());
+
                 IDataObject rowDataObject;
                 string rowData = GetSelectedRowData();
 
@@ -2417,6 +2471,7 @@ namespace Extract.DataEntry
             finally
             {
                 _draggedRows = null;
+                OnUpdateEnded(new EventArgs());
             }
         }
 
@@ -2451,10 +2506,10 @@ namespace Extract.DataEntry
                         // to be updated.
                         else
                         {
-                            AttributeStatusInfo.DeleteAttribute(draggedRow.Attribute);
                             DataEntryTableRow row = cachedSet[draggedRow.Attribute];
-                            cachedSet.Remove(draggedRow.Attribute);
                             row.Dispose();
+
+                            DeleteAttributeData(draggedRow.Attribute);
                         }
                     }
 
@@ -2712,8 +2767,7 @@ namespace Extract.DataEntry
                 if (DataEntryMethods.InsertOrReplaceAttribute(_sourceAttributes, attribute,
                     attributeToReplace, insertBeforeAttribute))
                 {
-                    AttributeStatusInfo.DeleteAttribute(attributeToReplace);
-                    _activeCachedRows.Remove(attributeToReplace);
+                    DeleteAttributeData(attributeToReplace);
                 }
 
                 if (HasDependentControls)

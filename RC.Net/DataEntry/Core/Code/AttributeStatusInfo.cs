@@ -1140,7 +1140,6 @@ namespace Extract.DataEntry
                 if (_validationTriggers.TryGetValue(attribute, out validationTrigger))
                 {
                     _validationTriggers.Remove(attribute);
-
                     validationTrigger.Dispose();
                 }
 

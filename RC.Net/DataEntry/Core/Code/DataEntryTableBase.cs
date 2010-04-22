@@ -1957,6 +1957,23 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Deletes the attributes that aren't needed anymore (via AttributeStatusInfo), and ensures
+        /// the deleted attribute is no longer referenced by any table member.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to be deleted.</param>
+        protected virtual void DeleteAttributeData(IAttribute attribute)
+        {
+            // If the attribute being deleted is the currently propagated attribute, propagate null
+            // to clear dependent controls.
+            if (_currentlyPropagatedAttribute == attribute)
+            {
+                OnPropagateAttributes(null);
+            }
+
+            AttributeStatusInfo.DeleteAttribute(attribute);
+        }
+
+        /// <summary>
         /// Raises the <see cref="AttributesSelected"/> event.
         /// </summary>
         /// <param name="attributes">The set of attributes whose spatial information should

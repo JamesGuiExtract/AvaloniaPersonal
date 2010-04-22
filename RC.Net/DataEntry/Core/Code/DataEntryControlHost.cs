@@ -590,10 +590,11 @@ namespace Extract.DataEntry
         readonly List<IAttribute> _newlyAddedAttributes = new List<IAttribute>();
 
         /// <summary>
-        /// Indicates whether a control is in the middle of processing an updated.  DrawHighlights
-        /// and other general processing that can be delayed should be until the update is complete.
+        /// Indicates the number of updates controls have indicated are in progress. DrawHighlights
+        /// and other general processing that can be delayed should be until there are no more
+        /// updates in progress.
         /// </summary>
-        bool _controlUpdateInProgress;
+        uint _controlUpdateReferenceCount;
 
         /// <summary>
         /// Indicates whether DrawHighlights is currently being processed.
@@ -1704,7 +1705,7 @@ namespace Extract.DataEntry
                 try
                 {
                     // Prevent multiple re-draws from being triggered with each cell processed.
-                    _controlUpdateInProgress = true;
+                    _controlUpdateReferenceCount++;
 
                     // Loop through every attribute in the active control.
                     if (_activeDataControl != null &&
@@ -1724,7 +1725,7 @@ namespace Extract.DataEntry
                 }
                 finally
                 {
-                    _controlUpdateInProgress = false;
+                    _controlUpdateReferenceCount--;
                 }
 
                 // Re-display the highlights if changes were made.
@@ -2199,8 +2200,11 @@ namespace Extract.DataEntry
                         CreateAllAttributeHighlights(_attributes);
                     }
 
+                    ExtractException.Assert("ELI30028",
+                        "Application trace: Control update reference count non-zero",
+                        _controlUpdateReferenceCount == 0);
+                    _controlUpdateReferenceCount = 0;
                     _refreshActiveControlHighlights = false;
-                    _controlUpdateInProgress = false;
                     _dirty = false;
 
                     _changingImage = false;
@@ -2314,9 +2318,12 @@ namespace Extract.DataEntry
                     return;
                 }
 
-                // If a control update was in progress, consider it complete if a new control is now
-                // active.
-                _controlUpdateInProgress = false;
+                // If a refresh of the highlights is needed and the control is going out of focus,
+                // refresh the highlights now.
+                if (_refreshActiveControlHighlights)
+                {
+                    RefreshActiveControlHighlights();
+                }
 
                 // If focus has changed to another control, it is up to that control to indicate via
                 // the AttributesSelected event whether an attribute group is selected.
@@ -2462,7 +2469,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                _controlUpdateInProgress = true;
+                _controlUpdateReferenceCount++;
             }
             catch (Exception ex)
             {
@@ -2480,7 +2487,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                _controlUpdateInProgress = false;
+                _controlUpdateReferenceCount--;
 
                 DrawHighlights(true);
             }
@@ -2677,7 +2684,7 @@ namespace Extract.DataEntry
                             {
                                 // Delay calls to DrawHighlights until processing of the swipe is
                                 // complete.
-                                _controlUpdateInProgress = true;
+                                _controlUpdateReferenceCount++;
 
                                 // If a swipe did not produce any results usable by the control,
                                 // notify the user.
@@ -2700,7 +2707,7 @@ namespace Extract.DataEntry
                             }
                             finally
                             {
-                                _controlUpdateInProgress = false;
+                                _controlUpdateReferenceCount--;
                             }
 
                             try
@@ -3810,7 +3817,7 @@ namespace Extract.DataEntry
                 // To avoid unnecessary drawing, wait until we are done loading a document or a
                 // control is done with an update before attempting to display any layer objects.
                 // Also, ensure against resursive calls.
-                if (_changingImage || _controlUpdateInProgress || _drawingHighlights)
+                if (_changingImage || _drawingHighlights || _controlUpdateReferenceCount > 0)
                 {
                     return;
                 }
@@ -4847,6 +4854,12 @@ namespace Extract.DataEntry
             for (int i = 0; i < count; i++)
             {
                 IAttribute attribute = (IAttribute)deletedAttributes.At(i);
+
+                // If the attribute is part of _newlyAddedAttributes, remove it.
+                if (_newlyAddedAttributes.Contains(attribute))
+                {
+                    _newlyAddedAttributes.Remove(attribute);
+                }
 
                 // Remove the highlight for this attribute
                 RemoveAttributeHighlight(attribute);
