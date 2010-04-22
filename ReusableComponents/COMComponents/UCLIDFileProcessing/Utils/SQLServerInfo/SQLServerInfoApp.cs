@@ -1,21 +1,20 @@
 using CSharpDatabaseUtilities;
 using Extract;
+using Extract.Licensing;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Text;
 
 namespace SQLServerInfo
 {
-    class SQLServerInfoApp
+    static class SQLServerInfoApp
     {
         #region Constants
 
         /// <summary>
         /// string constant with the usage
         /// </summary>
-        private const string strUsage =
+        const string _USAGE =
             "USAGE:\r\n" +
             " SQLServerInfo [/?] | [/s <ServerFileName>] | [/d <ServerName> <DatabaseFileName>] [/ef <ExceptionFileName>]\r\n" +
                     "\t/s <ServerFileName>\r\n" +
@@ -26,6 +25,11 @@ namespace SQLServerInfo
                         "\t\t- If there is an exception it is saved to <ExceptionFileName>.\r\n" +
                     "\t/? - Displays this help message.";
 
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        static readonly string _OBJECT_NAME = typeof(SQLServerInfoApp).ToString();
+
         #endregion Constants
 
         #region Methods
@@ -33,10 +37,10 @@ namespace SQLServerInfo
         /// <summary>
         /// Displays usage string
         /// </summary>
-        private static void Usage()
+        static void Usage()
         {
             // Display the usage string
-            Console.WriteLine(strUsage);
+            Console.WriteLine(_USAGE);
         }
 
         /// <summary>
@@ -48,7 +52,7 @@ namespace SQLServerInfo
         /// <param name="strOutputFile">
         ///     The name of the file to save the list to.
         /// </param>
-        private static void OutputToFile(IEnumerable<string> listOutput, string strOutputFile)
+        static void OutputToFile(IEnumerable<string> listOutput, string strOutputFile)
         {
             // Open the stream writer to save the list to
             using (StreamWriter sw = new StreamWriter(strOutputFile, false))
@@ -73,7 +77,7 @@ namespace SQLServerInfo
         /// <returns>
         ///     If option found the index is returned else returns -1
         /// </returns>
-        private static int FindOption(string strOption, string[] args)
+        static int FindOption(string strOption, string[] args)
         {
             // Search the arguments for the option
             for (int i = 0; i < args.Length; i++)
@@ -99,7 +103,7 @@ namespace SQLServerInfo
         ///     If /ef switch is found the filename that follows it is returned
         ///     else returns an empty string
         /// </returns>
-        private static string GetExceptionFile(string[] args)
+        static string GetExceptionFile(string[] args)
         {
             // Find the /ef option in the argument list
             int iOption = FindOption("/ef", args);
@@ -132,6 +136,13 @@ namespace SQLServerInfo
 
             try
             {
+                // Load the license files from folder
+                LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel()); 
+
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI29984",
+                    _OBJECT_NAME);
+
                 // get the exception filename if it is there
                 strExceptionFilename = GetExceptionFile(args);
 
@@ -171,7 +182,7 @@ namespace SQLServerInfo
                             if (iCurrOption + 2 < args.Length)
                             {
                                 // Save the list of databases to the file
-                                OutputToFile(SqlDatabaseMethods.GetDBNameList(args[iCurrOption + 1]), args[iCurrOption + 2]);
+                                OutputToFile(SqlDatabaseMethods.GetDatabaseNameList(args[iCurrOption + 1]), args[iCurrOption + 2]);
                             }
                             else
                             {
