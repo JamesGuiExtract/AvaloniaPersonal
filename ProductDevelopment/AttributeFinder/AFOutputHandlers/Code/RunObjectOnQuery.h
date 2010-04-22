@@ -141,6 +141,12 @@ private:
 	void runAttributeSplitter(IIUnknownVectorPtr ipAttributes, IAFDocumentPtr ipAFDoc);
 	// REQUIRE: m_ipObject implements IOutputHandler
 	// PROMISE: the m_ipObject IOutputHandler will be run on each attribute in 
-	//			ipAttributes
-	void runOutputHandler(IIUnknownVectorPtr ipAttributes, IAFDocumentPtr ipAFDoc);
+	//			ipAttributesSelected, if attributes are added or removed from ipAttributesSelected
+	//			by the output handler those attributes will be added or removed from the ipAttributesOut
+	// ARGS:	ipAttributesOut - The vector of attributes that were passed into this CRunObjectOnQuery object
+	//			ipAttributesSelected - The vector of attributes that have been selected from ipAttributesOut
+	//					by the query for this CRunObjectOnQuery object
+	//			ipAFDoc - The AFDoc passed into this CRunObjectOnQuery object.
+	void runOutputHandler(IIUnknownVectorPtr ipAttributesOut, IIUnknownVectorPtr ipAttributesSelected,
+		IAFDocumentPtr ipAFDoc);
 };

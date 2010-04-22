@@ -458,8 +458,10 @@ STDMETHODIMP CIUnknownVector::RemoveValue(IUnknown *pObj)
 		}
 
 		// erase all matches in the vector to pObj
-		vector<vector<IUnknownPtr>::iterator>::iterator iter2;
-		for (iter2 = vecEraseIter.begin(); iter2 != vecEraseIter.end(); iter2++)
+		// The vecEraseIter vector should be traversed in reverse order so the
+		// iterators it contains are valid after items are erased from the m_vecIUnknowns vector
+		vector<vector<IUnknownPtr>::iterator>::reverse_iterator iter2;
+		for (iter2 = vecEraseIter.rbegin(); iter2 != vecEraseIter.rend(); ++iter2)
 		{
 			m_vecIUnknowns.erase(*iter2);
 		}

@@ -252,7 +252,7 @@ STDMETHODIMP CRunObjectOnQuery::raw_ProcessOutput(IIUnknownVector* pAttributes, 
 		}
 		else if(m_objectIID == IID_IOutputHandler)
 		{
-			runOutputHandler(ipQueriedAttributes, ipAFDoc);
+			runOutputHandler(ipOrigAttributes, ipQueriedAttributes, ipAFDoc);
 		}
 		else
 		{
@@ -583,11 +583,55 @@ void CRunObjectOnQuery::runAttributeSplitter(IIUnknownVectorPtr ipAttributes, IA
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CRunObjectOnQuery::runOutputHandler(IIUnknownVectorPtr ipAttributes, IAFDocumentPtr ipAFDoc)
+void CRunObjectOnQuery::runOutputHandler(IIUnknownVectorPtr ipAttributesOut, 
+										 IIUnknownVectorPtr ipAttributesSelected, IAFDocumentPtr ipAFDoc)
 {
 	IOutputHandlerPtr ipOH(m_ipObject);
 	ASSERT_RESOURCE_ALLOCATION("ELI10421", ipOH != NULL);
 
-	ipOH->ProcessOutput(ipAttributes, ipAFDoc, NULL);
+	// Save the original contents of the ipAttributesSelected so removed or added attributes can
+	// be added or removed from the ipAttributesOut vector
+	vector<IAttributePtr> vecOriginalSelectedAttributes;
+	long lSize = ipAttributesSelected->Size();
+	for (long l = 0; l < lSize; l++)
+	{
+		vecOriginalSelectedAttributes.push_back(ipAttributesSelected->At(l));
+	}
+
+	// Run the Output handler
+	ipOH->ProcessOutput(ipAttributesSelected, ipAFDoc, NULL);
+
+	// Need to add or remove attributes from the ipAttributesOut that have
+	// been added or removed from the ipAttributesSelected
+	// After this loop, the vecOriginalSelectedAttributes will contain all the attributes that
+	// have been removed by the Output handler and will need to be removed from the output
+	lSize = ipAttributesSelected->Size();
+	for (long i = 0; i < lSize; i++ )
+	{
+		// get the attribute
+		IAttributePtr iAttr = ipAttributesSelected->At(i);
+		
+		// If the attribute is not in the vecOriginalSelectedAttributes it will need to 
+		// be added to the output
+		if (!vectorContainsElement(vecOriginalSelectedAttributes, iAttr))
+		{
+			ipAttributesOut->PushBack(iAttr);
+		}
+		else
+		{
+			// The attribute is in both the Original selected and the selected that has 
+			// been modified by the output handler so remove it from the vecOriginalSelectedAttributes
+			eraseFromVector(vecOriginalSelectedAttributes, iAttr);
+		}
+	}
+
+	// Remove any remaining items in vecOriginalSelectedAttributes from ipAttributesOut vector
+	vector<IAttributePtr>::iterator iterAttribute = vecOriginalSelectedAttributes.begin();
+	while (iterAttribute != vecOriginalSelectedAttributes.end())
+	{
+		// Remove the attribute from the output vector
+		ipAttributesOut->RemoveValue(*iterAttribute);
+		iterAttribute++;
+	}
 }
 //-------------------------------------------------------------------------------------------------
