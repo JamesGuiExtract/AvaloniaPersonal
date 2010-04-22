@@ -85,15 +85,10 @@ namespace Extract.Utilities.Test
         public void ChangeExtNoExt()
         {
             string tag = "$ChangeExt(" + _TEST_FILE_NO_EXT + ",pdf)";
-            try
+            Assert.Throws<ExtractException>(delegate
             {
                 _fileTags.Expand(tag);
-                Assert.Fail();
-            }
-            catch (Exception ex)
-            {
-                Assert.IsInstanceOf<ExtractException>(ex);
-            }
+            });
         }
 
         /// <summary>
@@ -171,18 +166,11 @@ namespace Extract.Utilities.Test
             MessageId = "Env")]
         public void EnvDoesNotExist()
         {
-            try
+            string tag = @"$Env(THISVARIABLEDOESNOTEXISTASANENVIRONMENTVARIABLE)";
+            Assert.Throws<ExtractException>(delegate
             {
-                string tag = @"$Env(THISVARIABLEDOESNOTEXISTASANENVIRONMENTVARIABLE)";
                 _fileTags.Expand(tag);
-
-                // If we get here then the test failed
-                Assert.Fail();
-            }
-            catch (Exception ex)
-            {
-                Assert.IsInstanceOf<ExtractException>(ex);
-            }
+            });
         }
 
         /// <summary>
@@ -239,16 +227,11 @@ namespace Extract.Utilities.Test
         [Test, Category("Automated")]
         public void InsertBeforeExtException()
         {
-            try
+            string tag = @"$InsertBeforeExt(" + _TEST_FILE_NO_EXT + ",.test)";
+            Assert.Throws<ExtractException>(delegate
             {
-                string tag = @"$InsertBeforeExt(" + _TEST_FILE_NO_EXT + ",.test)";
                 _fileTags.Expand(tag);
-                Assert.Fail();
-            }
-            catch (Exception ex)
-            {
-                Assert.IsInstanceOf<ExtractException>(ex);
-            }
+            });
         }
 
         /// <summary>
@@ -266,6 +249,24 @@ namespace Extract.Utilities.Test
             Assert.That(_fileTags.Expand(tag).Equals(
                 value.Substring(0, Math.Min(count, value.Length))));
         }
+
+        /// <summary>
+        /// Tests the Left function with bad inputs.
+        /// </summary>
+        /// <param name="value">The string to pull characters from.</param>
+        /// <param name="count">The value to pass as an argument to the Left function.</param>
+        [Test, Sequential, Category("Automated")]
+        [CLSCompliant(false)]
+        public void LeftBadInput([Values("test", "test", "test", @"c:\test\test,filename.tif")] string value,
+            [Values("-1", "0", "a", "3")] string count)
+        {
+            string tag = @"$Left(" + value + "," + count + ")";
+            Assert.Throws<ExtractException>(delegate
+            {
+                _fileTags.Expand(tag);
+            });
+        }
+
         /// <summary>
         /// Tests the Mid function.
         /// </summary>
@@ -345,6 +346,23 @@ namespace Extract.Utilities.Test
                 + ")";
             Assert.That(_fileTags.Expand(tag).Equals(
                 value.Substring(value.Length - Math.Min(count, value.Length))));
+        }
+
+        /// <summary>
+        /// Tests the Right function with bad inputs.
+        /// </summary>
+        /// <param name="value">The string to pull characters from.</param>
+        /// <param name="count">The value to pass as an argument to the Left function.</param>
+        [Test, Sequential, Category("Automated")]
+        [CLSCompliant(false)]
+        public void RightBadInput([Values("test", "test", "test", @"c:\test\test,filename.tif")] string value,
+            [Values("-1", "0", "a", "3")] string count)
+        {
+            string tag = @"$Right(" + value + "," + count + ")";
+            Assert.Throws<ExtractException>(delegate
+            {
+                _fileTags.Expand(tag);
+            });
         }
 
         /// <summary>
@@ -454,6 +472,37 @@ namespace Extract.Utilities.Test
         {
             string tag = @"$UserName()";
             Assert.That(_fileTags.Expand(tag).Equals(Environment.UserName));
+        }
+
+        /// <summary>
+        /// Tests each function that supports the alternate delimiter syntax.
+        /// </summary>
+        [Test, Sequential, Category("Automated")]
+        [CLSCompliant(false)]
+        public void AlternateDelimiterSyntax([Values("InsertBeforeExt", "Offset", "PadValue",
+            "Replace", "Left", "Mid", "Right", "ChangeExt")] string function,
+            [Values(".test", "2", "a,25", "te,bli", "2", "2,3", "2", "pdf")] string argument)
+        {
+            string [] tokens = argument.Split(',');
+            StringBuilder sb = new StringBuilder("$");
+            sb.Append(function);
+            sb.Append("{|}(");
+            if (function.Equals("Offset"))
+            {
+                sb.Append("1,234");
+            }
+            else
+            {
+                sb.Append(@"C:\temp\temp,123.tif");
+            }
+            foreach(string token in tokens)
+            {
+                sb.Append("|");
+                sb.Append(token);
+            }
+            sb.Append(")");
+
+            _fileTags.Expand(sb.ToString());
         }
 
         #endregion Tests

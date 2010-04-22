@@ -428,29 +428,8 @@ namespace Extract.FileActionManager.Utilities
                 ProcessingThreadArguments arguments = (ProcessingThreadArguments)threadParameters;
 
                 // Run FAMProcesses in a loop respawning them if needed
-                while(_stopProcessing != null && !_stopProcessing.WaitOne(0))
+                do
                 {
-                    // If there is a valid Process handle, dispose of it
-                    if (process != null)
-                    {
-                        process.Dispose();
-                        process = null;
-                    }
-
-                    // If we are spawning a new fam process, release the old
-                    // one so that the memory is released before spawning the new
-                    // process.
-                    if (famProcess != null)
-                    {
-                        // Set the object to NULL so that the EXE will exit
-                        famProcess = null;
-
-                        // Perform a GC to force the object to clean up
-                        // [DNRCAU #429]
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
-                    }
-
                     // Create the FAM process
                     famProcess = new FileProcessingManagerProcessClass();
                     int pid = famProcess.ProcessID;
@@ -489,15 +468,78 @@ namespace Extract.FileActionManager.Utilities
 
                     // Sleep for two seconds and check if processing has stopped
                     // or the FAMProcess has exited
-                    while (_stopProcessing != null && !_stopProcessing.WaitOne(2000)
-                        && !process.HasExited && famProcess.IsRunning);
+                    while (_stopProcessing != null && !_stopProcessing.WaitOne(0)
+                        && !process.HasExited && famProcess.IsRunning)
+                    {
+                        Thread.Sleep(2000);
+                    }
 
-                    // Only loop back around if the number of files to process is not 0
-                    if (_numberOfFilesToProcess == 0)
+                    // Get the count of files processed (if limiting processing to a
+                    // specified number of files)
+                    int filesProcessed = 0;
+                    if (_numberOfFilesToProcess != 0 && !process.HasExited && famProcess != null)
+                    {
+                        int processingErrors;
+                        int filesSupplied;
+                        int supplyingErrors;
+                        famProcess.GetCounts(out filesProcessed, out processingErrors,
+                            out filesSupplied, out supplyingErrors);
+                    }
+
+                    // If the number of files to proces is 0 OR the number of files actually
+                    // processed is less than the number of files specified, then just
+                    // exit the loop and do not respawn a new FAM instance
+                    if (_numberOfFilesToProcess == 0 || filesProcessed < _numberOfFilesToProcess)
                     {
                         break;
                     }
+
+                    // Release the current FAM process before looping around and spawning a new one
+                    // this way the memory is released and we are not leaving extra orphaned
+                    // EXE's lying around.
+                    if (famProcess != null) // Sanity check, it should never be null at this point
+                    {
+                        // Set the object to NULL so that the EXE will exit
+                        famProcess = null;
+
+                        // Perform a GC to force the object to clean up
+                        // [DNRCAU #429]
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+
+                        // Wait for the process to exit
+                        while (process != null && !process.HasExited)
+                        {
+                            Thread.Sleep(1000);
+                            if (_stopProcessing != null && _stopProcessing.WaitOne(0))
+                            {
+                                // If stop processing has been called and this process is
+                                // still hanging around, kill it
+                                if (!process.HasExited)
+                                {
+                                    try
+                                    {
+                                        process.Kill();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        ExtractException.Log("ELI30030", ex);
+                                    }
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+
+                    // If there is a valid Process handle, dispose of it
+                    if (process != null)
+                    {
+                        process.Dispose();
+                        process = null;
+                    }
                 }
+                while (_stopProcessing != null && !_stopProcessing.WaitOne(0));
 
                 // Check if the process is still running
                 if (process != null && !process.HasExited && famProcess.IsRunning)
