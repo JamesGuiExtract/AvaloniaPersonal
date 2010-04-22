@@ -507,10 +507,20 @@ const string TextFunctionExpander::expandOffset(const string& str, const string&
 
 	if (vecTokens.size() == 2)
 	{
-		lValue = asLong(vecTokens[0]);
-		long lOffset = asLong(vecTokens[1]);
+		try
+		{
+			lValue = asLong(vecTokens[0]);
+			long lOffset = asLong(vecTokens[1]);
 
-		lValue += lOffset;
+			lValue += lOffset;
+		}
+		catch(...)
+		{
+			UCLIDException uex("ELI30027", "Invalid long value(s) for Offset function.");
+			uex.addDebugInfo("Value", vecTokens[0]);
+			uex.addDebugInfo("Offset Value", vecTokens[1]);
+			throw uex;
+		}
 	}
 	else
 	{
@@ -521,15 +531,17 @@ const string TextFunctionExpander::expandOffset(const string& str, const string&
 		throw ue;
 	}
 
-	char pszValue[50];
-	if (_ltoa_s(lValue, pszValue, sizeof(pszValue), 10) != 0)
+	try
+	{
+		string strVal = asString(lValue);
+		return strVal;
+	}
+	catch(...)
 	{
 		UCLIDException ue("ELI12936", "Unable to convert long to string!");
-		ue.addDebugInfo("lValue", lValue);
+		ue.addDebugInfo("Value", lValue);
 		throw ue;
 	}
-
-	return string(pszValue);
 }
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandPadValue(const string& str, const string& strToken) const
@@ -561,7 +573,17 @@ const string TextFunctionExpander::expandPadValue(const string& str, const strin
 			throw ue;
 		}
 
-		int iPadLength = (int)asUnsignedLong(vecTokens[2]);
+		int iPadLength = 0;
+		try
+		{
+			iPadLength = (int)asUnsignedLong(vecTokens[2]);
+		}
+		catch(...)
+		{
+			UCLIDException uex("ELI30026", "Invalid padding length specified.");
+			uex.addDebugInfo("Padding Length", vecTokens[2]);
+			throw uex;
+		}
 		
 		return padCharacter(vecTokens[0], true, cPadWithChar, iPadLength);
 	}
@@ -791,6 +813,9 @@ const string TextFunctionExpander::expandMid(const string& str, const string& st
 	vector<string> vecTokens;
 	StringTokenizer::sGetTokens(str, strToken, vecTokens);
 
+	// Get the string
+	const string& strTemp = vecTokens[0];
+
 	// Check for appropriate number of tokens
 	if (vecTokens.size() == 3)
 	{
@@ -799,7 +824,7 @@ const string TextFunctionExpander::expandMid(const string& str, const string& st
 		try
 		{
 			lStart = asLong(vecTokens[1]);
-			if (lStart < 1)
+			if (lStart < 1 || ((unsigned long) lStart > strTemp.length()))
 			{
 				throw 42;
 			}
@@ -830,9 +855,6 @@ const string TextFunctionExpander::expandMid(const string& str, const string& st
 			ue.addDebugInfo("Count", vecTokens[2]);
 			throw ue;
 		}
-
-		// Get the string
-		const string& strTemp = vecTokens[0];
 
 		// If the count is -1, then return from the start to the end of the string
 		if (lCount == -1)

@@ -1708,6 +1708,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Test", ".
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Geometry", "..\..\..\..\..\RC.Net\Geometry\Core\Code\Extract.Geometry.csproj", "{30A7D378-C87D-4A46-B5E2-A2B186319519}"
 	ProjectSection(WebsiteProperties) = preProject

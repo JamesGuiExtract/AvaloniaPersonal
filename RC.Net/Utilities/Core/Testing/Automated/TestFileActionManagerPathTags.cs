@@ -60,7 +60,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests that SourceDocName is expanded correctly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void SourceDocName()
         {
             string tag = "<SourceDocName>";
@@ -70,7 +70,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests that FPSFileDir is expanded correctly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void FpsFileDir()
         {
             string tag = "<FPSFileDir>";
@@ -81,7 +81,7 @@ namespace Extract.Utilities.Test
         /// Tests whether or not the ChangeExt function throws an exception
         /// when a file name has no extension.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void ChangeExtNoExt()
         {
             string tag = "$ChangeExt(" + _TEST_FILE_NO_EXT + ",pdf)";
@@ -99,7 +99,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests the ChangeExt function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void ChangeExtWithExt()
         {
             string tag = "$ChangeExt(" + _TEST_FILE_PATH + ",pdf)";
@@ -109,7 +109,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests the DirNoDriveOf function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void DirNoDriveOf()
         {
             string tag = @"$DirNoDriveOf(" + _TEST_FILE_PATH + ")";
@@ -119,7 +119,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests the DirOf function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void DirOf()
         {
             string tag = @"$DirOf(" + _TEST_FILE_PATH + ")";
@@ -129,7 +129,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests the DriveOf function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void DriveOf()
         {
             string tag = @"$DriveOf(" + _TEST_FILE_PATH + ")";
@@ -139,7 +139,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests the ExtOf function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void ExtOf()
         {
             string tag = @"$ExtOf(" + _TEST_FILE_PATH + ")";
@@ -149,7 +149,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests the Env function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly",
             MessageId = "Env")]
         public void Env()
@@ -166,7 +166,7 @@ namespace Extract.Utilities.Test
         /// Tests whether or not the Env function throws an exception if the
         /// specified environment variable does not exist.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly",
             MessageId = "Env")]
         public void EnvDoesNotExist()
@@ -188,7 +188,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests the FileNoExtOf function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void FileNoExtOf()
         {
             string tag = @"$FileNoExtOf(" + _TEST_FILE_PATH + ")";
@@ -198,7 +198,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests the FileOf function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void FileOf()
         {
             string tag = @"$FileOf(" + _TEST_FILE_PATH + ")";
@@ -208,7 +208,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests the FullUserName function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void FullUserName()
         {
             string tag = @"$FullUserName()";
@@ -225,7 +225,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests the InsertBeforeExt function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void InsertBeforeExt()
         {
             string tag = @"$InsertBeforeExt(" + _TEST_FILE_PATH + ",.test)";
@@ -236,7 +236,7 @@ namespace Extract.Utilities.Test
         /// Tests whether InsertBeforeExt throws an exception if the specified string has
         /// no file extension.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void InsertBeforeExtException()
         {
             try
@@ -252,12 +252,50 @@ namespace Extract.Utilities.Test
         }
 
         /// <summary>
+        /// Tests the Left function.
+        /// </summary>
+        /// <param name="value">The string to pull characters from.</param>
+        /// <param name="count">The value to pass as an argument to the Left function.</param>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public void Left([Values("123456789")] string value,
+            [Values(3,5,7,9,11)] int count)
+        {
+            string tag = @"$Left(" + value + "," + count.ToString(CultureInfo.InvariantCulture)
+                + ")";
+            Assert.That(_fileTags.Expand(tag).Equals(
+                value.Substring(0, Math.Min(count, value.Length))));
+        }
+        /// <summary>
+        /// Tests the Mid function.
+        /// </summary>
+        /// <param name="value">The string to pull characters from.</param>
+        /// <param name="start">The starting point for the mid function.</param>
+        /// <param name="count">The count of characters for the mid function.</param>
+        [Test, Sequential, Category("Automated")]
+        [CLSCompliant(false)]
+        public void Mid(
+            [Values("123456789","123456789","123456789","123456789","123456789")] string value,
+            [Values(2,3,5,7,9)] int start,
+            [Values(-1,2,2,2,2)] int count)
+        {
+            string tag = @"$Mid(" + value + "," + start.ToString(CultureInfo.InvariantCulture)
+                + "," + count.ToString(CultureInfo.InvariantCulture) + ")";
+            checked
+            {
+                int begin = Math.Min(start - 1, value.Length);
+                int length = Math.Min(value.Length - begin, count == -1 ? value.Length : count);
+                Assert.That(_fileTags.Expand(tag).Equals(value.Substring(begin, length)));
+            }
+        }
+
+        /// <summary>
         /// Tests the Now function with the default and a specified format.
         /// </summary>
         /// <param name="format">The format argument.</param>
         /// <param name="expression">The regular expression that the resulting date
         /// time string should be formatted like.</param>
-        [Test, Sequential]
+        [Test, Sequential, Category("Automated")]
         public void Now([Values("", "%m/%d/%Y %H:%M")] string format,
             [Values(@"\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}-\d{3}",
                 @"\d{2}/\d{2}/\d{4} \d{2}:\d{2}")] string expression)
@@ -267,10 +305,53 @@ namespace Extract.Utilities.Test
         }
 
         /// <summary>
+        /// Tests the Offset function.
+        /// </summary>
+        [Test, Sequential, Category("Automated")]
+        [CLSCompliant(false)]
+        public void Offset([Random(1, 23000, 5)] int value,
+            [Random(1, 23000, 5)] int offsetValue)
+        {
+            string tag = @"$Offset(" + value.ToString(CultureInfo.InvariantCulture) + ","
+                + offsetValue.ToString(CultureInfo.InvariantCulture) + ")";
+            int result = int.Parse(_fileTags.Expand(tag), CultureInfo.InvariantCulture);
+            Assert.That(result == (value + offsetValue));
+        }
+
+        /// <summary>
+        /// Tests the PadValue function.
+        /// </summary>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public void PadValue([Values("12345")] string value,
+            [Values(5,8,10,42)] int length)
+        {
+            string tag = @"$PadValue(" + value + ",a,"
+                + length.ToString(CultureInfo.InvariantCulture) + ")";
+            Assert.That(_fileTags.Expand(tag).Equals(value.PadLeft(length, 'a')));
+        }
+
+        /// <summary>
+        /// Tests the Right function.
+        /// </summary>
+        /// <param name="value">The string to pull characters from.</param>
+        /// <param name="count">The value to pass as an argument to the Right function.</param>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public void Right([Values("123456789")] string value,
+            [Values(3,5,7,9,11)] int count)
+        {
+            string tag = @"$Right(" + value + "," + count.ToString(CultureInfo.InvariantCulture)
+                + ")";
+            Assert.That(_fileTags.Expand(tag).Equals(
+                value.Substring(value.Length - Math.Min(count, value.Length))));
+        }
+
+        /// <summary>
         /// Tests the RandomAlphaNumeric function that repeated execution produces a different
         /// string
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "AlphaNumeric")]
         public void RandomAlphaNumeric()
@@ -295,7 +376,7 @@ namespace Extract.Utilities.Test
         /// Tests the RandomAlphaNumeric function and checks whether the resulting string
         /// is the proper format.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "AlphaNumeric")]
         public void RandomAlphaNumericProperFormat()
@@ -309,7 +390,7 @@ namespace Extract.Utilities.Test
         /// is the correct length.
         /// </summary>
         /// <param name="length">The length of the string to produce.</param>
-        [Test]
+        [Test, Category("Automated")]
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "AlphaNumeric")]
         [CLSCompliant(false)]
@@ -324,7 +405,7 @@ namespace Extract.Utilities.Test
         /// Tests whether the RandomAlphaNumeric function throws an exception with an invalid
         /// length string.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "AlphaNumeric")]
         public void RandomAlphaNumericException()
@@ -344,7 +425,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Tests the Replace function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void Replace()
         {
             string temp = @"C:\temp1\temp2\filename.tif";
@@ -353,9 +434,22 @@ namespace Extract.Utilities.Test
         }
 
         /// <summary>
+        /// Tests the TrimAndConsolidateWS function.
+        /// </summary>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public void TrimAndConsolidateWS([Values("\t\n\r\nThis is  A \t test\r\nstring",
+            "This is also a test  string", "abc\t def gh   ")] string value)
+        {
+            string tag = "$TrimAndConsolidateWS(" + value + ")";
+            string temp = Regex.Replace(value, @"[\s]{2,}", " ").Trim();
+            Assert.That(_fileTags.Expand(tag).Equals(temp));
+        }
+
+        /// <summary>
         /// Tests the UserName function.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public void UserName()
         {
             string tag = @"$UserName()";
