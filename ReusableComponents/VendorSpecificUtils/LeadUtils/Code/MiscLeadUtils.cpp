@@ -273,7 +273,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		// Get the file info
 		throwExceptionIfNotSuccess(L_FileInfo(pszInputFile, &fileInfo,
 			sizeof(FILEINFO), FILEINFO_TOTALPAGES, NULL), "ELI27301",
-			"Unable to get file info!", ltPDF.getFileNameInformationString());
+			"Unable to get file info.", ltPDF.getFileNameInformationString());
 
 		// Get the number of pages
 		long nNumberOfPages = fileInfo.TotalPages;
@@ -339,7 +339,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 					// Get initialized SAVEFILEOPTION struct
 					SAVEFILEOPTION sfOptions = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
 					nRet = L_GetDefaultSaveFileOption(&sfOptions, sizeof(sfOptions));
-					throwExceptionIfNotSuccess(nRet, "ELI27299", "Unable to get default save options!");
+					throwExceptionIfNotSuccess(nRet, "ELI27299", "Unable to get default save options.");
 					_lastCodePos = "60";
 
 					// Get the pointer to the first raster zone (we will remember the
@@ -641,7 +641,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		// failed after retrying, throw a failure exception
 		if (!bSuccessful)
 		{
-			UCLIDException ue("ELI23563", "Failed to properly write the output image!");
+			UCLIDException ue("ELI23563", "Failed to properly write the output image.");
 			ue.addDebugInfo("Source Image", strImageFileName);
 			ue.addDebugInfo("Output Image", strOutputImageName);
 			throw ue;
@@ -672,7 +672,7 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 		// if file exists, set flag to not write the file
 		if (isFileOrFolderValid(strOutputFileName))
 		{
-			UCLIDException ue("ELI12853", "File already exists!");
+			UCLIDException ue("ELI12853", "File already exists.");
 			ue.addDebugInfo("ImageName", strOutputFileName);
 			throw ue;
 		}
@@ -682,124 +682,71 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 	int nNumImages = vecImageFiles.size();
 	if (nNumImages == 0)
 	{
-		UCLIDException ue("ELI12855", "Vector containing sub-image filenames is empty!");
+		UCLIDException ue("ELI12855", "Vector containing sub-image filenames is empty.");
 		ue.addDebugInfo("NumOfImages", nNumImages);
 		ue.addDebugInfo("OutputImage", strOutputFileName);
 		throw ue;
 	}
-	// Handle single-page case
-	else if (nNumImages == 1)
-	{
-		// for single page images, just copy the old image into the new name
-		copyFile(vecImageFiles[0], strOutputFileName);
-	}
-	// Handle multi-page case
 
-	HBITMAPLIST	hBmpList = NULL; // create a bitmap list for the multi-page image
-	try
+	// Create a temporary file for the output
+	TemporaryFileName tmpOutput("", NULL, getExtensionFromFullPath(strOutputFileName).c_str(), true);
+
+	// Get initialized FILEINFO for first page
+	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
+	L_INT nRet = L_FileInfo((char*)vecImageFiles[0].c_str(), &fileInfo, sizeof(FILEINFO), 0, NULL);
+	throwExceptionIfNotSuccess(nRet, "ELI30029", "Unable to get file information.");
+
+	// Get the appropriate compression factor for the specified format [LRCAU #5284]
+	L_INT nCompression = getCompressionFactor(fileInfo.Format);
+
+	// Get initialized SAVEFILEOPTION struct
+	SAVEFILEOPTION sfOptions = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
+	L_GetDefaultSaveFileOption( &sfOptions, sizeof ( sfOptions ));
+
+	// for each page that exists for this image, if an image file
+	// exists with the corresponding name, then load it and add it
+	// to the multi-page image
+
+	// Loop through each image page
+	for (int i = 0; i < nNumImages; i++ )
 	{
-		try
+		// Retrieve this filename and update page number
+		const string& strPage = vecImageFiles[i];
+
+		// if the image page file exists, load it and add it to the
+		// bitmap list.
+		if (isFileOrFolderValid(strPage))
 		{
-			// Create PDFOutputManager object to handle file conversion
-			// If result will be PDF
-			// - Each page processed in the vector will be appended to an internal temporary file
-			// - Desired PDF output file will be created from conversion of this temporary TIF
-			PDFInputOutputMgr outMgr( strOutputFileName, false );
+			// Temporary holder for a bitmap
+			BITMAPHANDLE hTmpBmp = {0};
+			LeadToolsBitmapFreeer freer(hTmpBmp);
 
-			L_INT nRet;
-			nRet = L_CreateBitmapList(&hBmpList);
-			throwExceptionIfNotSuccess(nRet, "ELI09042", "Unable to create bitmap list!");
+			// Convert the PDF input image to a temporary TIF
+			LeadToolsPDFLoadLocker ltPDF(strPage);
 
-			// for each page that exists for this image, if an image file
-			// exists with the corresponding name, then load it and add it
-			// to the multi-page image
+			// Set flags to get file information when loading bitmap
+			nRet = L_LoadBitmap( (char*)strPage.c_str(), &hTmpBmp, 
+				sizeof(BITMAPHANDLE), 0, ORDER_RGB, NULL, 0);
+			throwExceptionIfNotSuccess(nRet, "ELI09044", "Unable to load bitmap.", strPage);
 
-			// Get initialized FILEINFO struct
-			FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-
-			// Loop through each image page
-			for (int i = 0; i < nNumImages; i++ )
-			{
-				// Retrieve this filename and update page number
-				string strPage = vecImageFiles[i];
-
-				// if the image page file exists, load it and add it to the
-				// bitmap list.
-				if (isFileOrFolderValid(strPage))
-				{
-					// Temporary holder for a bitmap
-					BITMAPHANDLE hTmpBmp;
-
-					// Convert the PDF input image to a temporary TIF
-					PDFInputOutputMgr ltPDF( strPage, true );
-
-					// Set flags to get file information when loading bitmap
-					fileInfo.Flags = 0;
-					nRet = L_LoadBitmap( (char*)(ltPDF.getFileName().c_str()), &hTmpBmp,
-						sizeof(BITMAPHANDLE), 0, ORDER_RGB, NULL, &fileInfo);
-					throwExceptionIfNotSuccess(nRet, "ELI09044", "Unable to load bitmap!", strPage);
-
-					try
-					{
-						// Add this page to the list
-						nRet = L_InsertBitmapListItem(hBmpList, -1, &hTmpBmp);
-						throwExceptionIfNotSuccess(nRet, "ELI09045",
-							"Unable to insert page in image!");
-					}
-					catch(UCLIDException& uex)
-					{
-						if (hTmpBmp.Flags.Allocated)
-						{
-							L_FreeBitmap(&hTmpBmp);
-						}
-
-						throw uex;
-					}
-				}
-				else
-				{
-					UCLIDException ue("ELI12851", "Unable to locate page image!");
-					ue.addDebugInfo("Filename", strPage);
-					ue.addDebugInfo("PageNumber", i + 1);
-					throw ue; 
-				}
-			}
-
-			// Get the appropriate compression factor for the specified format [LRCAU #5284]
-			L_INT nCompression = getCompressionFactor(fileInfo.Format);
-
-			// save the bitmap list as a multi-page tif image using the format of the
-			// last page of the image 
-			nRet = L_SaveBitmapList( (char*)(outMgr.getFileName().c_str()), hBmpList, 
-				fileInfo.Format, fileInfo.BitsPerPixel, nCompression, NULL);
-			if (nRet != SUCCESS)
-			{
-				UCLIDException ue("ELI09046", "Unable to save multi-page image!");
-				ue.addDebugInfo("Original File Name", strOutputFileName);
-				ue.addDebugInfo("PDF Manager Name", outMgr.getFileName());
-				ue.addDebugInfo("Actual Error Code", nRet);
-				ue.addDebugInfo("Error String", getErrorCodeDescription(nRet));
-				ue.addDebugInfo("Compression Flag", nCompression);
-				addFormatDebugInfo(ue, fileInfo.Format);
-				throw ue;
-			}
-
-			// release the memory associated with bitmap list
-			L_DestroyBitmapList(hBmpList);
-			hBmpList = NULL;
+			// Save the page to the multipage image using the format of the first page of the image
+			sfOptions.PageNumber = i + 1;
+			nRet = L_SaveBitmap((char*)tmpOutput.getName().c_str(), &hTmpBmp, fileInfo.Format, 
+				fileInfo.BitsPerPixel, nCompression, &sfOptions);
+			throwExceptionIfNotSuccess(nRet, "ELI09045",
+				"Unable to insert page in image.", strPage);
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI23569");
-	}
-	catch(UCLIDException& uex)
-	{
-		if (hBmpList != NULL)
+		else
 		{
-			L_DestroyBitmapList(hBmpList);
-			hBmpList = NULL;
+			UCLIDException ue("ELI12851", "Unable to locate page image.");
+			ue.addDebugInfo("Filename", strPage);
+			ue.addDebugInfo("PageNumber", i + 1);
+			throw ue; 
 		}
-
-		throw uex;
 	}
+
+	// Move the temporary file to its final destination
+	copyFile(tmpOutput.getName(), strOutputFileName, bOverwriteExistingFile);
 
 	// Make sure the file can be read
 	waitForFileToBeReadable(strOutputFileName);
@@ -862,7 +809,7 @@ int getNumberOfPagesInImage( const string& strImageFileName )
 	}
 	catch (UCLIDException& ue)
 	{
-		UCLIDException uexOuter("ELI15314", "Unable to determine image page count!", ue);
+		UCLIDException uexOuter("ELI15314", "Unable to determine image page count.", ue);
 		uexOuter.addDebugInfo("Retries attempted", nNumFailedAttempts);
 		throw uexOuter;
 	}
@@ -882,7 +829,7 @@ void getImageXAndYResolution(const string& strImageFileName, int& riXResolution,
 	// Get File Information
 	throwExceptionIfNotSuccess(L_FileInfo( (char*)( ltPDF.getFileName().c_str() ), &fileInfo, 
 		sizeof(FILEINFO), FILEINFO_TOTALPAGES, NULL ), 
-		"ELI20250", "Could not obtain image info!", ltPDF.getFileNameInformationString());
+		"ELI20250", "Could not obtain image info.", ltPDF.getFileNameInformationString());
 
 	riXResolution = fileInfo.XResolution;
 	riYResolution = fileInfo.YResolution;
@@ -904,7 +851,7 @@ void getImagePixelHeightAndWidth(const string& strImageFileName, int& riHeight, 
 	// Get File Information
 	throwExceptionIfNotSuccess(L_FileInfo( (char*)( strImageFileName.c_str() ), &fileInfo, 
 		sizeof(FILEINFO), 0, &lfo), 
-		"ELI20247", "Could not obtain image info!", strImageFileName);
+		"ELI20247", "Could not obtain image info.", strImageFileName);
 
 	riHeight = fileInfo.Height;
 	riWidth = fileInfo.Width;
@@ -1053,7 +1000,7 @@ void unlockDocumentSupport()
 	}
 	else
 	{
-		UCLIDException ue( "ELI16799", "Document toolkit support is not licensed!" );
+		UCLIDException ue( "ELI16799", "Document toolkit support is not licensed." );
 		throw ue;
 	}
 }
@@ -1516,7 +1463,7 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap, FILEIN
 			{
 				throwExceptionIfNotSuccess(L_ChangeBitmapViewPerspective(NULL, &rBitmap,
 					sizeof(BITMAPHANDLE), TOP_LEFT),"ELI14634",
-					"Unable to change bitmap perspective!");
+					"Unable to change bitmap perspective.");
 			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29836");
@@ -1537,7 +1484,7 @@ void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO&
 		// Create default save file options and set the page number
 		SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
 		throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
-			"ELI27292", "Unable to get default save file options!");
+			"ELI27292", "Unable to get default save file options.");
 		sfo.PageNumber = lPageNumber;
 
 		// Wrap the output file in a PDF manager
@@ -1893,7 +1840,7 @@ void validateRedactionZones(const vector<PageRasterZone>& vecZones, long nNumber
 			// Validate non-empty zone
 			if (it->isEmptyZone()) 
 			{
-				UCLIDException ue("ELI09200", "Empty zone!");
+				UCLIDException ue("ELI09200", "Empty zone.");
 				throw ue;
 			}
 
@@ -1901,7 +1848,7 @@ void validateRedactionZones(const vector<PageRasterZone>& vecZones, long nNumber
 			long nPage = it->m_nPage;
 			if( nPage > nNumberOfPages || nPage < 1 )
 			{
-				UCLIDException ue("ELI09201", "Page number selected does not exist!");
+				UCLIDException ue("ELI09201", "Page number selected does not exist.");
 				ue.addDebugInfo("Page", nPage );
 				ue.addDebugInfo("Total number of pages", nNumberOfPages);
 				throw ue;
