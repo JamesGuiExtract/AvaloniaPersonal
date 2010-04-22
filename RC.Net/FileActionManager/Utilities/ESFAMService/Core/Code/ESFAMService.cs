@@ -3,14 +3,10 @@ using Extract.Utilities;
 using FAMProcessLib;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SqlServerCe;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
@@ -46,7 +42,7 @@ namespace Extract.FileActionManager.Utilities
             /// <summary>
             /// Gets the fps file name.
             /// </summary>
-            public string FPSFileName
+            public string FpsFileName
             {
                 get
                 {
@@ -132,7 +128,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// The collection of threads which are running.
         /// </summary>
-        List<Thread> _processingThreads = new List<Thread>();
+        readonly List<Thread> _processingThreads = new List<Thread>();
 
         /// <summary>
         /// Thread which will sleep for the initial sleep time value and then set the
@@ -163,7 +159,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Mutex to provide synchronized access to data.
         /// </summary>
-        object _lock = new object();
+        readonly object _lock = new object();
 
         #endregion Fields
 
@@ -206,7 +202,7 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 // Get the list of FPS files to run
-                List<string> fpsFiles = GetFPSFilesToRun();
+                List<string> fpsFiles = GetFpsFilesToRun();
 
                 // [DNRCAU #357] - Log application trace when service is starting
                 ExtractException ee2 = new ExtractException("ELI28772",
@@ -419,7 +415,6 @@ namespace Extract.FileActionManager.Utilities
         void ProcessFiles(object threadParameters)
         {
             FileProcessingManagerProcessClass famProcess = null;
-            int pid = -1;
             Process process = null;
             try
             {
@@ -458,11 +453,11 @@ namespace Extract.FileActionManager.Utilities
 
                     // Create the FAM process
                     famProcess = new FileProcessingManagerProcessClass();
-                    pid = famProcess.ProcessID;
+                    int pid = famProcess.ProcessID;
                     process = Process.GetProcessById(pid);
 
                     // Set the FPS file name
-                    famProcess.FPSFile = arguments.FPSFileName;
+                    famProcess.FPSFile = arguments.FpsFileName;
 
                     // Check if authentication is required
                     if (famProcess.AuthenticationRequired)
@@ -475,16 +470,8 @@ namespace Extract.FileActionManager.Utilities
 
                         ExtractException ee = new ExtractException("ELI29208",
                             "Authentication is required to launch this FPS file.");
-                        ee.AddDebugData("FPS File Name", arguments.FPSFileName, false);
+                        ee.AddDebugData("FPS File Name", arguments.FpsFileName, false);
                         throw ee;
-                    }
-
-                    {
-                        ExtractException ee = new ExtractException("ELI29808",
-                            "Application trace: Started new FAM instance.");
-                        ee.AddDebugData("FPS Filename", arguments.FPSFileName, false);
-                        ee.AddDebugData("Process ID", pid, false);
-                        ee.Log();
                     }
 
                     // Ensure that processing has not been stopped before starting processing
@@ -492,12 +479,18 @@ namespace Extract.FileActionManager.Utilities
                     {
                         // Start processing
                         famProcess.Start(_numberOfFilesToProcess);
+
+                        ExtractException ee = new ExtractException("ELI29808",
+                            "Application trace: Started new FAM instance.");
+                        ee.AddDebugData("FPS Filename", arguments.FpsFileName, false);
+                        ee.AddDebugData("Process ID", pid, false);
+                        ee.Log();
                     }
 
                     // Sleep for two seconds and check if processing has stopped
                     // or the FAMProcess has exited
                     while (_stopProcessing != null && !_stopProcessing.WaitOne(2000)
-                        && !process.HasExited && famProcess.IsRunning) ;
+                        && !process.HasExited && famProcess.IsRunning);
 
                     // Only loop back around if the number of files to process is not 0
                     if (_numberOfFilesToProcess == 0)
@@ -547,7 +540,7 @@ namespace Extract.FileActionManager.Utilities
                         {
                             while (!process.HasExited)
                             {
-                                System.Threading.Thread.Sleep(500);
+                                Thread.Sleep(500);
                             }
                         }
                     }
@@ -739,8 +732,8 @@ namespace Extract.FileActionManager.Utilities
             dependentServiceNames.Sort();
 
             // Get the list of all services
-            Dictionary<string, ServiceController> displayNames = null;
-            Dictionary<string, ServiceController> serviceNames = null;
+            Dictionary<string, ServiceController> displayNames;
+            Dictionary<string, ServiceController> serviceNames;
             GetCollectionOfServiceAndDisplayNames(out displayNames, out serviceNames);
 
             // Iterate through the list of dependent services and get the controllers
@@ -749,7 +742,7 @@ namespace Extract.FileActionManager.Utilities
             for (int i=0; i < dependentServiceNames.Count; i++)
             {
                 string serviceName = dependentServiceNames[i];
-                ServiceController controller = null;
+                ServiceController controller;
                 bool foundByServiceName = serviceNames.TryGetValue(serviceName, out controller);
                 if (foundByServiceName || displayNames.TryGetValue(serviceName, out controller))
                 {
@@ -836,7 +829,7 @@ namespace Extract.FileActionManager.Utilities
         /// Goes to the database and gets the list of FPS files to run.
         /// </summary>
         /// <returns></returns>
-        static List<string> GetFPSFilesToRun()
+        static List<string> GetFpsFilesToRun()
         {
             SqlCeConnection dbConnection = null;
             SqlCeCommand command = null;
@@ -893,7 +886,7 @@ namespace Extract.FileActionManager.Utilities
                 string schemaVersionString = GetSettingFromDatabase(ServiceDatabaseSchemaVersion);
                 if (!string.IsNullOrEmpty(schemaVersionString))
                 {
-                    int schemaVersion = 0;
+                    int schemaVersion;
                     if (!int.TryParse(schemaVersionString, out schemaVersion) ||
                         schemaVersion < 0)
                     {
@@ -967,12 +960,9 @@ namespace Extract.FileActionManager.Utilities
                 _stopProcessing.Set();
 
                 // Only wait if there is a wait handle
-                if (_threadsStopped != null)
+                while (_threadsStopped != null && !_threadsStopped.WaitOne(1000))
                 {
-                    while (_threadsStopped != null && !_threadsStopped.WaitOne(1000))
-                    {
-                        RequestAdditionalTime(1200);
-                    }
+                    RequestAdditionalTime(1200);
                 }
 
                 // [DNRCAU #357] - Log application trace when service has shutdown
