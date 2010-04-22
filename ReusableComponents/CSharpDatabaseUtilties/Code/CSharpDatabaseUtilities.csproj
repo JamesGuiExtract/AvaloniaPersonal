@@ -43,6 +43,7 @@
     <DocumentationFile>..\..\..\Binaries\Release\CSharpDatabaseUtilities.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Extract.Licensing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />

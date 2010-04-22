@@ -1,4 +1,5 @@
 using Extract;
+using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,6 +16,15 @@ namespace CSharpDatabaseUtilities
     /// </summary>
     public static class SqlDatabaseMethods
     {
+        #region Constants
+
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        static readonly string _OBJECT_NAME = typeof(SqlDatabaseMethods).ToString();
+
+        #endregion Constants
+
         #region Static Public Methods
         
         /// <summary>
@@ -29,6 +39,10 @@ namespace CSharpDatabaseUtilities
         {
             try
             {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI29982",
+                    _OBJECT_NAME);
+
                 // Initialize server list
                 List<string> serverList = new List<string>();
 
@@ -72,10 +86,14 @@ namespace CSharpDatabaseUtilities
         /// <returns>
         /// List of string that contains the databases that are on the server.
         /// </returns>
-        public static ReadOnlyCollection<string> GetDBNameList(string server)
+        public static ReadOnlyCollection<string> GetDatabaseNameList(string server)
         {
             try
             {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI29983",
+                    _OBJECT_NAME);
+
                 SqlConnectionStringBuilder sqlConnStrBld = new SqlConnectionStringBuilder();
 
                 // Setup SQL connections settings
@@ -86,7 +104,7 @@ namespace CSharpDatabaseUtilities
                 // Initialize Database name list
                 List<string> listResults = new List<string>();
 
-                // Set the connection timeou to 10 seconds
+                // Set the connection timeout to 10 seconds
                 sqlConnStrBld.ConnectTimeout = 10;
 
                 // Get the data table of databses
@@ -97,10 +115,10 @@ namespace CSharpDatabaseUtilities
                         sqlTableConn.Open();
                         foreach (DataRow dr in dtDatabases.Rows)
                         {
-                            string strDB = dr["database_name"].ToString();
+                            string name = dr["database_name"].ToString();
 
                             // Need to skip the system databases
-                            if (strDB == "master" || strDB == "model" || strDB == "msdb" || strDB == "tempdb")
+                            if (name == "master" || name == "model" || name == "msdb" || name == "tempdb")
                             {
                                 continue;
                             }
@@ -108,7 +126,7 @@ namespace CSharpDatabaseUtilities
                             try
                             {
                                 // Change to that DB
-                                sqlTableConn.ChangeDatabase(strDB);
+                                sqlTableConn.ChangeDatabase(name);
                             }
                             catch (Exception ex)
                             {
@@ -132,7 +150,7 @@ namespace CSharpDatabaseUtilities
                                 if (dtExistingTables.GetLength(0) == 0)
                                 {
                                     // Include the empty database in the list
-                                    listResults.Add(strDB);
+                                    listResults.Add(name);
                                 }
 
                                 // Check for our database
@@ -143,7 +161,7 @@ namespace CSharpDatabaseUtilities
                                 if (dtExistingTables.GetLength(0) == 1)
                                 {
                                     // Add database to list
-                                    listResults.Add(strDB);
+                                    listResults.Add(name);
                                 }
                             }
                         }
