@@ -36,22 +36,23 @@ END_COM_MAP()
 
 // ISpatialPageInfo
 public:
-	STDMETHOD(get_Deskew)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(put_Deskew)(/*[in]*/ double newVal);
+	STDMETHOD(get_Deskew)(double *pVal);
+	STDMETHOD(put_Deskew)(double newVal);
 
-	STDMETHOD(get_Orientation)(/*[out, retval]*/ EOrientation *pVal);
-	STDMETHOD(put_Orientation)(/*[in]*/ EOrientation newVal);
+	STDMETHOD(get_Orientation)(EOrientation *pVal);
+	STDMETHOD(put_Orientation)(EOrientation newVal);
 
-	STDMETHOD(get_Width)(/*[out, retval]*/ long *pVal);
-	STDMETHOD(put_Width)(/*[in]*/ long newVal);
+	STDMETHOD(get_Width)(long *pVal);
+	STDMETHOD(put_Width)(long newVal);
 
-	STDMETHOD(get_Height)(/*[out, retval]*/ long *pVal);
-	STDMETHOD(put_Height)(/*[in]*/ long newVal);
+	STDMETHOD(get_Height)(long *pVal);
+	STDMETHOD(put_Height)(long newVal);
 	STDMETHOD(SetPageInfo)(long lWidth, long lHeight, EOrientation eOrientation, double dDeskew);
 	STDMETHOD(GetWidthAndHeight)(long* plWidth, long* plHeight);
 	STDMETHOD(GetPageInfo)(long* plWidth, long* plHeight,
 		EOrientation* peOrientation, double* pdDeskew);
 	STDMETHOD(Equal)(ISpatialPageInfo* pPageInfo, VARIANT_BOOL* pEqual);
+	STDMETHOD(GetTheta)(double* pdTheta);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);

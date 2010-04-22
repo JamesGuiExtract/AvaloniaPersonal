@@ -242,6 +242,58 @@ STDMETHODIMP CSpatialPageInfo::Equal(ISpatialPageInfo *pPageInfo, VARIANT_BOOL *
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25767");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialPageInfo::GetTheta(double* pdTheta)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI29948", pdTheta != NULL);
+
+		// Determine theta (ie. rotation + deskew)
+		// NOTE: A positive deskew means the original image was rotated counter-clockwise.
+		double dTheta = m_fDeskew;
+		switch (m_eOrientation)
+		{
+		case kRotNone:
+			{		
+				// the image was not rotated, theta is the deskew
+				break;
+			}
+		case kRotRight:
+			{
+				dTheta -= 90;
+				break;
+			}
+		case kRotDown:
+			{
+				dTheta -= 180;
+				break;
+			}
+		case kRotLeft:
+			{
+				dTheta -= 270;
+				break;
+			}
+		case kRotFlipped:
+		case kRotFlippedRight:
+		case kRotFlippedDown:
+		case kRotFlippedLeft:
+			{
+				UCLIDException ue("ELI09162", "Cannot handle flipped images.");
+				throw ue;
+				break;
+			}
+		}
+
+		// Convert theta to radians
+		*pdTheta = convertDegreesToRadians(dTheta);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29947");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ICopyableObject

@@ -2028,11 +2028,10 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
 		p2Y = pointCenter.y - p2Y;
 
 		// The angle associated with the current coordinate system.
-		double dOrigTheta = getTheta(eOrient, deskew);
+		double dOrigTheta = ipOrigPageInfo->GetTheta();
 
 		// The angle associated with the coordinate system we are converting to.
-		double dNewTheta = (ipNewPageInfo == NULL) ? 0 :
-			getTheta(ipNewPageInfo->Orientation, ipNewPageInfo->Deskew);
+		double dNewTheta = (ipNewPageInfo == NULL) ? 0 : ipNewPageInfo->GetTheta();
 
 		// The angle difference between the new and old coordinate systems.
 		double theta = dNewTheta - dOrigTheta;
@@ -2095,53 +2094,6 @@ CPoint CSpatialString::getImageCenterPoint(int nImageWidth, int nImageHeight, bo
 	}
 
 	return pointCenter;
-}
-//-------------------------------------------------------------------------------------------------
-double CSpatialString::getTheta(UCLID_RASTERANDOCRMGMTLib::EOrientation eOrient, double deskew)
-{
-	try
-	{
-		// determine theta (ie. rotation + deskew)
-		// NOTE: A positive deskew means the original image was rotated 
-		// counter-clockwise.
-		double theta = deskew;
-		switch (eOrient)
-		{
-		case kRotNone:
-			{		
-				// the image was not rotated, theta is the deskew
-				break;
-			}
-		case kRotRight:
-			{
-				theta -= 90;
-				break;
-			}
-		case kRotDown:
-			{
-				theta -= 180;
-				break;
-			}
-		case kRotLeft:
-			{
-				theta -= 270;
-				break;
-			}
-		case kRotFlipped:
-		case kRotFlippedRight:
-		case kRotFlippedDown:
-		case kRotFlippedLeft:
-			{
-				UCLIDException ue("ELI09162", "Cannot handle flipped images.");
-				throw ue;
-				break;
-			}
-		}
-
-		// convert theta to radians
-		return convertDegreesToRadians(theta);
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28030");
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialString::downgradeToHybrid()

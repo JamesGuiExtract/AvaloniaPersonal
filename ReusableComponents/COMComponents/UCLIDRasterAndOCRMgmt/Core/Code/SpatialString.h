@@ -421,9 +421,6 @@ private:
 	//			x and y coordinates inverted if specified.
 	CPoint getImageCenterPoint(int nImageWidth, int nImageHeight, bool invertCoordinates);
 	//----------------------------------------------------------------------------------------------
-	// PURPOSE: Obtains the angle represented by the combination of the specified orientation and skew.
-	double getTheta(UCLID_RASTERANDOCRMGMTLib::EOrientation eOrient, double deskew);
-	//----------------------------------------------------------------------------------------------
 	// REQUIRE: HasSpatialInfo() == true
 	// PURPOSE: To return a vector of raster zones in the OCR coordinate system
 	vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> getOCRImageRasterZones();

@@ -320,6 +320,8 @@ library UCLID_RASTERANDOCRMGMTLib
 		[id(8), helpstring("method Equal")] HRESULT Equal([in] ISpatialPageInfo* pPageInfo,
 			[out, retval] VARIANT_BOOL* pEqual);
 		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets the angle in radians that describes the rotation and deskew together.
+		[id(9), helpstring("method GetTheta")] HRESULT GetTheta([out, retval] double* pdTheta);
 	};
 
 	[
