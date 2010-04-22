@@ -207,11 +207,6 @@ namespace Extract.DataEntry
         /// <param name="e">An <see cref="EventArgs"/> parameter.</param>
         delegate void EventArgsDelegate(EventArgs e);
 
-        /// <summary>
-        /// Signature to use for invoking parameterless methods.
-        /// </summary>
-        delegate void ParameterlessDelegate();
-
         #endregion Delegates
 
         #region SelectionProcessingSuppressor
@@ -2353,21 +2348,6 @@ namespace Extract.DataEntry
             }
         }
 
-        /// <summary>
-        /// EndsEdit mode asynchrously (in a new message handler).
-        /// </summary>
-        protected void EndEditAsync()
-        {
-            if (EditingControl != null)
-            {
-                // Commit the current value.
-                CommitEdit(DataGridViewDataErrorContexts.Commit);
-
-                // Use BeginInvoke so the EndEdit call happens in a new message handler.
-                BeginInvoke(new ParameterlessDelegate(EndEditAsyncInvoked));
-            }
-        }
-
         #endregion Protected Members
 
         #region Event Handlers
@@ -2865,21 +2845,6 @@ namespace Extract.DataEntry
             _disabledCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
             _disabledCellStyle.SelectionBackColor = SystemColors.Control;
             _disabledCellStyle.BackColor = SystemColors.Control;
-        }
-
-        /// <summary>
-        /// A helper method for EndEditAsync that performs EndEdit after being invoked.
-        /// </summary>
-        void EndEditAsyncInvoked()
-        {
-            try
-            {
-                EndEdit();
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI30011", ex);
-            }
         }
 
         #endregion Private Members

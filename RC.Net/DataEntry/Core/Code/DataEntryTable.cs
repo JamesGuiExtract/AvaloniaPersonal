@@ -649,10 +649,7 @@ namespace Extract.DataEntry
                 // happens when attempting to navigate while edit mode is still active.
                 if (EditingControl != null)
                 {
-                    // [DataEntry:958]
-                    // Perform the EndEdit asynchronously to avoid an issue where a auto-complete
-                    // list is incorrectly displayed.
-                    EndEditAsync();
+                    EndEdit();
                 }
 
                 // Indicates whether the only selected row is the new row.
@@ -1465,6 +1462,19 @@ namespace Extract.DataEntry
                 // Handle the enter key manually in order to mimic Excel's behavior.
                 if (keyData == Keys.Enter && ProcessEnterKey())
                 {
+                    return true;
+                }
+
+                if (IsCurrentCellInEditMode && keyData == (Keys.Shift | Keys.Space))
+                {
+                    // [DataEntry:958, 959]
+                    // Unhandled, Shift+Space will trigger full row selection which will, in turn,
+                    // trigger an EndEdit call in ProcessSelectionChange. This sequence seems to
+                    // cause a couple different problems that both seem related to the editing
+                    // control handling the space before the grid does. I cannot find a solution
+                    // that involves the grid handling the row selection "naturally". Forcing the
+                    // selection at this point, however, works.
+                    ClearSelection(-1, CurrentCell.RowIndex, true);
                     return true;
                 }
                 
