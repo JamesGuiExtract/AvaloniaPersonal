@@ -56,9 +56,9 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Database\Core\Code\CSharpDatabaseUtilities.csproj">
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj">
       <Project>{D0465C3D-527B-4B21-8E07-79A6CB762CC9}</Project>
-      <Name>CSharpDatabaseUtilities</Name>
+      <Name>Extract.Database</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>

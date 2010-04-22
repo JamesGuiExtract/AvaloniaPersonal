@@ -1751,7 +1751,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFAMService", "..\..\..\..
 		{E07E00CC-656A-424A-977E-27B8B8D2C286} = {E07E00CC-656A-424A-977E-27B8B8D2C286}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpDatabaseUtilities", "..\..\..\..\..\RC.Net\Database\Core\Code\CSharpDatabaseUtilities.csproj", "{D0465C3D-527B-4B21-8E07-79A6CB762CC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Database", "..\..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj", "{D0465C3D-527B-4B21-8E07-79A6CB762CC9}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
@@ -1898,7 +1898,7 @@ Global
 		ProjectRelativeDiskPath133 = ..\..\..\..\MedDE\DEPs\StandardMedDE\Core\Code\Extract.DataEntry.DEP.StandardMedDE.csproj
 		ProjectRelativeDiskPath134 = ..\..\..\..\DataEntry\TEReceipts\DEPs\TEReceiptsPanel\Core\Code\Extract.DataEntry.DEP.TEReceipts.csproj
 		ProjectRelativeDiskPath135 = ..\..\..\..\..\RC.Net\FileActionManager\Utilities\ESFAMService\Core\Code\ESFAMService.csproj
-		ProjectRelativeDiskPath136 = ..\..\..\..\..\RC.Net\Database\Core\Code\CSharpDatabaseUtilities.csproj
+		ProjectRelativeDiskPath136 = ..\..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
