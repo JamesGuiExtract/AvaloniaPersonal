@@ -1,4 +1,3 @@
-using Extract;
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
@@ -9,7 +8,7 @@ using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace CSharpDatabaseUtilities
+namespace Extract.Database
 {
     /// <summary>
     /// Represents a grouping of methods for accessing SQL databases.

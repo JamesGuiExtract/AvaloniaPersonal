@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CSharpDatabaseUtilities")]
+[assembly: AssemblyTitle("Extract.Database")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems LLC")]
-[assembly: AssemblyProduct("CSharpDatabaseUtilities")]
+[assembly: AssemblyProduct("Extract.Database")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

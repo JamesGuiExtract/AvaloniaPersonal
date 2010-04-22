@@ -1,50 +1,47 @@
-using Extract;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace CSharpDatabaseUtilities
+namespace Extract.Database
 {
     /// <summary>
-    /// Manages registry settings for the CSharpDatabaseUtilities project. 
+    /// Manages registry settings for the Extract.Database project. 
     /// </summary>
     internal static class RegistryManager
     {
-        #region RegistryManager Constants
+        #region Constants
 
-        #region RegistryManager SubKeys
+        #region SubKeys
 
         /// <summary>
-        /// The sub key for CSharpDatabaseUtilities keys.
+        /// The sub key for Extract.Database keys.
         /// </summary>
-        const string _CSHARP_DATABASE_UTILITIES_SUBKEY =
-            @"Software\Extract Systems\ReusableComponents\CSharpDatabaseUtilities";
+        const string _EXTRACT_DATABASE_SUBKEY =
+            @"Software\Extract Systems\ReusableComponents\Extract.Database";
 
-        #endregion RegistryManager SubKeys
+        #endregion SubKeys
 
-        #region RegistryManager Keys
+        #region Keys
 
         /// <summary>
         /// The key for verbose logging of exceptions.
         /// </summary>
         const string _VERBOSE_LOGGING_KEY = "Verbose logging";
 
-        #endregion RegistryManager Keys
+        #endregion Keys
 
-        #endregion RegistryManager Constants
+        #endregion Constants
 
-        #region RegistryManager Fields
+        #region Fields
 
         /// <summary>
-        /// The current user registry sub key for CSharpDatabaseUtilities keys.
+        /// The current user registry sub key for Extract.Database keys.
         /// </summary>     
-        static RegistryKey _cSharpDatabaseUtilitiesSubKey =
-            Registry.CurrentUser.CreateSubKey(_CSHARP_DATABASE_UTILITIES_SUBKEY);
+        static readonly RegistryKey _databaseSubKey =
+            Registry.CurrentUser.CreateSubKey(_EXTRACT_DATABASE_SUBKEY);
 
-        #endregion RegistryManager Fields
+        #endregion Fields
 
-        #region RegistryManager Properties
+        #region Properties
 
         /// <summary>
         /// Gets whether verbose logging is enabled.
@@ -57,7 +54,7 @@ namespace CSharpDatabaseUtilities
             {
                 try
                 {
-                    int? reg = _cSharpDatabaseUtilitiesSubKey.GetValue(_VERBOSE_LOGGING_KEY, 0) as int?;
+                    int? reg = _databaseSubKey.GetValue(_VERBOSE_LOGGING_KEY, 0) as int?;
                     return reg != null && reg.Value == 1;
                 }
                 catch (Exception ex)
@@ -68,6 +65,6 @@ namespace CSharpDatabaseUtilities
             }
         }
 
-        #endregion RegistryManager Properties
+        #endregion Properties
     }
 }

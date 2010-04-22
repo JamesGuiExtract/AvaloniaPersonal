@@ -1,13 +1,13 @@
-using CSharpDatabaseUtilities;
 using Extract;
+using Extract.Database;
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace SQLServerInfo
+namespace SqlServerInfo
 {
-    static class SQLServerInfoApp
+    static class SqlServerInfoApp
     {
         #region Constants
 
@@ -28,7 +28,7 @@ namespace SQLServerInfo
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        static readonly string _OBJECT_NAME = typeof(SQLServerInfoApp).ToString();
+        static readonly string _OBJECT_NAME = typeof(SqlServerInfoApp).ToString();
 
         #endregion Constants
 

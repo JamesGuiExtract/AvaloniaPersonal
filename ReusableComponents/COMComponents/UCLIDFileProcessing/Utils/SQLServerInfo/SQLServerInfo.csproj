@@ -7,8 +7,8 @@
     <ProjectGuid>{8D5A15AB-D01C-4F24-9B0B-7FBB0D2A3F95}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SQLServerInfo</RootNamespace>
-    <AssemblyName>SQLServerInfo</AssemblyName>
+    <RootNamespace>SqlServerInfo</RootNamespace>
+    <AssemblyName>SqlServerInfo</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
@@ -28,7 +28,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\Binaries\Debug\SQLServerInfo.xml</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\Binaries\Debug\SqlServerInfo.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,7 +40,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\Binaries\Release\SQLServerInfo.xml</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\Binaries\Release\SqlServerInfo.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
