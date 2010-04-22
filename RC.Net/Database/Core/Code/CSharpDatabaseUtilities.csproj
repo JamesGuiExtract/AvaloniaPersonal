@@ -7,8 +7,8 @@
     <ProjectGuid>{D0465C3D-527B-4B21-8E07-79A6CB762CC9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CSharpDatabaseUtilities</RootNamespace>
-    <AssemblyName>CSharpDatabaseUtilities</AssemblyName>
+    <RootNamespace>Extract.Database</RootNamespace>
+    <AssemblyName>Extract.Database</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <SccProjectName>CSharpDatabaseUtilities</SccProjectName>
@@ -21,26 +21,26 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\Binaries\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\Binaries\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\Binaries\Debug\CSharpDatabaseUtilities.xml</DocumentationFile>
+    <DocumentationFile>..\..\..\..\Binaries\Debug\Extract.Database.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\Binaries\Release\</OutputPath>
+    <OutputPath>..\..\..\..\Binaries\Release\</OutputPath>
     <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\Binaries\Release\CSharpDatabaseUtilities.xml</DocumentationFile>
+    <DocumentationFile>..\..\..\..\Binaries\Release\Extract.Database.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
