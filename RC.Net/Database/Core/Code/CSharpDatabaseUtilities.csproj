@@ -10,7 +10,7 @@
     <RootNamespace>CSharpDatabaseUtilities</RootNamespace>
     <AssemblyName>CSharpDatabaseUtilities</AssemblyName>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <SccProjectName>CSharpDatabaseUtilities</SccProjectName>
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
@@ -43,7 +43,6 @@
     <DocumentationFile>..\..\..\Binaries\Release\CSharpDatabaseUtilities.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Extract.Licensing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -55,9 +54,13 @@
     <Compile Include="RegistryManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\RC.Net\Core\Code\Extract.csproj">
+    <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcproj">
+      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
+      <Name>Extract.Licensing</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
