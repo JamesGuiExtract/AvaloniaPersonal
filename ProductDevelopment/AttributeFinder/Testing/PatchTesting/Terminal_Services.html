@@ -7,23 +7,33 @@
 
 <BODY>
 
-<h1> FLEX Index / ID Shield 8.0.1.x<br> Terminal Services Testing </h1>
+<h1> FLEX Index / ID Shield 8.0.1.104<br> Terminal Services Testing </h1>
 <hr>
 
 <h3>Purpose and Details</h3>
 <ul>
    	<LI><b>Customer:</b> CA - Santa Barbara - DFM
-   	<LI><b>SCRs:</b> FlexIDSCore #4261, #4264
+   	<LI><b>SCRs:</b> FlexIDSCore #4261, #4264, DotNet #452, #453
    	<LI><b>Issue:</b> The customer is processing images and running multiple verification 
 	instances on the same server via Terminal Services.  Problems with the named mutex 
 	used in 8.0.0.70 result in only one verification user being able to run at a time.  
 	Further testing indicated that only one user can open the UEX Viewer at a time.
+	<li><b>Second issue:</b> During testing it was found that the FAM service was rapidly 
+	spawning new <b>FAMProcess.exe</b> instances.  In some cases, orphaned 
+	<b>FAMProcess.exe</b> instances were also noted.
    	<LI><b>Solution:</b> Code was added to adjust the security descriptor for the named 
-	mutex.
+	mutex.  The FAM service code was restructured to avoid problems when processing 
+	specified numbers of files.
 </ul>
 <p>
 <h3>Tests</h3>
 <OL>
+	<LI><b>Installation</b>
+	<ul>
+		<li>Confirm that the installation batch file runs without error.
+		<li>Confirm that updated files exist on the test machine.
+	</ul>
+<p>
 	<LI><b>General setup</b>
 	<ul>
 		<li>Provide a non-expiring FLEX Index Server and ID Shield Server license 
@@ -67,6 +77,7 @@
 		exercise the verification FPS file.
 		<li>Confirm that a different user account that is configured to run the FAM Service 
 		can exercise the verification FPS file.
+		<li>Confirm that a large number of users can verify at the same time.
        	</ul>
    	</LI>
 <p>
