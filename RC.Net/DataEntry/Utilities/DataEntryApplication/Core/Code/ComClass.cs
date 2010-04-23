@@ -102,6 +102,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         int _actionID;
 
+        /// <summary>
+        /// Indicates whether DEP settings are currently being validated.
+        /// </summary>
+        bool _validatingSettings;
+
         // Object for mutexing data entry form manager creation
         static object _lock = new object();
 
@@ -687,8 +692,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <returns>A <see cref="DataEntryApplicationForm"/> using the current settings.</returns>
         IVerificationForm CreateDataEntryForm()
         {
-            return new DataEntryApplicationForm(_configFileName, false, _fileProcessingDB,
-                _actionID, false, false);
+            // [DataEntry:928]
+            // If in the process of validating settings, don't enable either input tracking or
+            // counters since A) they are not necessary to validate the DEP can be loaded and
+            // B) there will not be a database available (as these features require).
+            if (_validatingSettings)
+            {
+                return new DataEntryApplicationForm(_configFileName, false, _fileProcessingDB,
+                    _actionID, false, false);
+            }
+            else
+            {
+                return new DataEntryApplicationForm(_configFileName, false, _fileProcessingDB,
+                    _actionID, _inputEventTrackingEnabled, _countersEnabled);
+            }
         }
 
         /// <summary>
@@ -702,6 +719,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 using (new TemporaryWaitCursor())
                 {
+                    _validatingSettings = true;
+
                     // Ask the manager to validate the DEP can be initialize using the specified
                     // config file
                     _dataEntryFormManager.ValidateForm(CreateDataEntryForm);
@@ -710,6 +729,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI25491", ex);
+            }
+            finally
+            {
+                _validatingSettings = false;
             }
         }
 

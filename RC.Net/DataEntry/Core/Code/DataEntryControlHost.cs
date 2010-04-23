@@ -1752,6 +1752,20 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Clear any existing data in the controls. Do this before clearing any of the
+                // host's fields to avoid any possibility that clearing the controls triggers
+                // attributes to be added to already cleared fields.
+                foreach (IDataEntryControl dataControl in _rootLevelControls)
+                {
+                    dataControl.SetAttributes(null);
+                }
+
+                // Clear any data the controls have cached.
+                foreach (IDataEntryControl dataControl in _dataControls)
+                {
+                    dataControl.ClearCachedData();
+                }
+
                 // Dispose of all tooltips
                 List<IAttribute> tooltipAttributes = new List<IAttribute>(_attributeToolTips.Keys);
                 foreach (IAttribute attribute in tooltipAttributes)
@@ -1766,7 +1780,7 @@ namespace Extract.DataEntry
                     RemoveAttributeErrorIcon(attribute);
                 }
 
-                // Dispose of all icons
+                // Dispose of all highlights
                 foreach (CompositeHighlightLayerObject highlight in _highlightAttributes.Keys)
                 {
                     if (_imageViewer.LayerObjects.Contains(highlight))
@@ -1796,18 +1810,6 @@ namespace Extract.DataEntry
                 _hoverAttribute = null;
                 _displayedAttributeHighlights.Clear();
                 _attributeHighlights.Clear();
-
-                // Clear any existing data in the controls.
-                foreach (IDataEntryControl dataControl in _rootLevelControls)
-                {
-                    dataControl.SetAttributes(null);
-                }
-
-                // Clear any data the controls have cached.
-                foreach (IDataEntryControl dataControl in _dataControls)
-                {
-                    dataControl.ClearCachedData();
-                }
 
                 // AttributeStatusInfo cannot persist any data from one document to the next as it can
                 // cause COM threading exceptions in FAM mode. Unload its data now.
@@ -2320,7 +2322,7 @@ namespace Extract.DataEntry
 
                 // If a refresh of the highlights is needed and the control is going out of focus,
                 // refresh the highlights now.
-                if (_refreshActiveControlHighlights)
+                if (_refreshActiveControlHighlights && !_changingImage)
                 {
                     RefreshActiveControlHighlights();
                 }
@@ -2529,7 +2531,10 @@ namespace Extract.DataEntry
                     }
                 }
 
-                OnDataChanged();
+                if (AttributeStatusInfo.IsAttributePersistable(e.Attribute))
+                {
+                    OnDataChanged();
+                }
 
                 // If the spatial info for the attribute has changed, re-create the highlight for
                 // the attribute with the new spatial information.
@@ -2602,10 +2607,16 @@ namespace Extract.DataEntry
         {
             try
             {
-                OnDataChanged();
+                if (AttributeStatusInfo.IsAttributePersistable(e.DeletedAttribute))
+                {
+                    OnDataChanged();
+                }
 
-                // A refresh of highlights is needed now that attributes have been deleted.
-                _refreshActiveControlHighlights = true;
+                if (e.DeletedAttribute.Value.HasSpatialInfo())
+                {
+                    // A refresh of highlights is needed now that attributes have been deleted.
+                    _refreshActiveControlHighlights = true;
+                }
 
                 ProcessDeletedAttributes(DataEntryMethods.AttributeAsVector(e.DeletedAttribute));
             }
@@ -2804,7 +2815,10 @@ namespace Extract.DataEntry
         {
             try
             {
-                OnDataChanged();
+                if (AttributeStatusInfo.IsAttributePersistable(e.Attribute))
+                {
+                    OnDataChanged();
+                }
 
                 // Disable validation on any controls in the _disabledValidationControls list.
                 Control control = e.DataEntryControl as Control;

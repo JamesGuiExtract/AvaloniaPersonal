@@ -144,6 +144,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         double _angle;
 
+        /// <summary>
+        /// Indicates whether highlights need to be created such that they are WYSIWYG compatible
+        /// with the Spot recognition window.
+        /// </summary>
+        static bool? _spotIRCompatible;
+
         #endregion Fields
 
         #region Constructors
@@ -311,15 +317,18 @@ namespace Extract.Imaging.Forms
                     _height = MinSize.Height;
                 }
 
-                // Create a temporary raster zone to ensure that highlight
-                // will be rendered and saved the same way (ie. WYSIWYG)
-                // TODO: This code can be removed when the SpotRecognitionWindow is retired for 
-                // the .Net ImageViewer and the SpatialString code that adjusts the endpoints 
-                // onto the page is also removed.
-                RasterZone zone = GetTempRasterZone();
-                _startPoint = new Point(zone.StartX, zone.StartY);
-                _endPoint = new Point(zone.EndX, zone.EndY);
-                _height = zone.Height;
+                if (SpotIRCompatible)
+                {
+                    // Create a temporary raster zone to ensure that highlight
+                    // will be rendered and saved the same way (ie. WYSIWYG)
+                    // TODO: This code can be removed when the SpotRecognitionWindow is retired for 
+                    // the .Net ImageViewer and the SpatialString code that adjusts the endpoints 
+                    // onto the page is also removed.
+                    RasterZone zone = GetTempRasterZone();
+                    _startPoint = new Point(zone.StartX, zone.StartY);
+                    _endPoint = new Point(zone.EndX, zone.EndY);
+                    _height = zone.Height;
+                }
 
                 // Calculate the region
                 CalculateRegion();
@@ -638,6 +647,41 @@ namespace Extract.Imaging.Forms
             get
             {
                 return GetBounds().Location;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether highlights need to be created such that they are WYSIWYG compatible
+        /// with the Spot recognition window.
+        /// </summary>
+        /// <value><see langword="true"/> if the highlights need to be guaranteed to appear at the
+        /// same pixel coordinates as they would in the Spot window, <see langword="false"/> if this
+        /// guarantee is unnecessary.</value>
+        /// <remarks>If a large number of highlights (hundreds+) need to be displayed, there will be
+        /// a noticeable performance hit for compatibility. If the property is set to conflicting
+        /// values, the property will remain <see langword="true"/> regardless of which value was
+        /// set first.</remarks>
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
+        public static bool SpotIRCompatible
+        {
+            get
+            {
+                return _spotIRCompatible == null ? true : _spotIRCompatible.Value;
+            }
+
+            set
+            {
+                if (_spotIRCompatible == null)
+                {
+                    _spotIRCompatible = value;
+                }
+                else if (_spotIRCompatible.Value != value)
+                {
+                    new ExtractException("ELI30033", "Application trace: " +
+                        "Conflicting SpotIRCompatible modes; setting value to true").Log();
+
+                    _spotIRCompatible = true;
+                }
             }
         }
 

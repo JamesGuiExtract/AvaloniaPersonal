@@ -335,6 +335,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // relative paths.
                 DataEntryMethods.SolutionRootDirectory = Path.GetDirectoryName(configFileName);
 
+                // Since SpotIR compatibility is not required for data entry applications, avoid the
+                // performance hit it exacts.
+                Highlight.SpotIRCompatible = false;
+
                 _standAloneMode = standAloneMode;
                 _inputEventTrackingEnabled = inputEventTrackingEnabled;
                 _countersEnabled = countersEnabled;
