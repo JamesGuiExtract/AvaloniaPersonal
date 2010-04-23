@@ -208,6 +208,22 @@ called the <b>service machine</b>.  The machine that contains the database is re
 			<li>Confirm that files <b>are</b> processing.</li>
 			<li>Confirm that redacted images <b>are</b> being created.</li>
 		</ul>
+		<li><b>Specified user, process specific number of files</b>
+		<ul>
+			<li>Confirm on the database machine that the database is clear.
+			<li>Modify the <b>NumberOfFilesToProcessPerFAMInstance</b> setting in 
+			<b>ESFAMService.sdf</b> to <b>100</b>.
+			<li>Confirm that the <b>Processing</b> FPS file is configured to use 
+			half of the available number of threads. 
+			<li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to 
+			AutoStart.
+			<li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
+			<li>Restart the <b>service machine</b>.</li>
+			<li>Log in as the specified user and confirm that new instances of 
+			<b>FAMProcess.exe</b> are being created appropriately.
+			<li><b>[DotNet #453]</b> Confirm that after a period of processing, there 
+			are no <b>FAMProcess.exe</b> instances left orphaned on the system.
+		</ul>
 		<li><b>Specified user, stop service during processing of large file</b>
 		<ul>
 			<li>Confirm on the database machine that the database is clear.
@@ -488,6 +504,17 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <p>
   	   	<LI><b>[DotNet #429]</b> Confirm that completed instances of <b>FAMProcess.exe</b> 
 		are removed from memory in a timely fashion.
+<p>
+  	   	<LI><b>[DotNet #452]</b> Rapid spawning of new FAMProcess.exe instances
+	       	<ul>
+	  	   	<LI>Configure the service to process a limited number of files per FAM instance.
+			<li>Confirm that the <b>Processing</b> FPS file is configured to stop 
+			processing once the queue is empty. 
+			<li>Use <b>FAMDBAdmin.exe</b> to ensure that there are no files to process.
+			<li>Launch the service.
+			<Li>Use <b>Task Manager</b> to confirm that <b>FAMProcess.exe</b> instances 
+			are not being rapidly created.
+	       	</ul>
 <p>
   	   	<LI><b>[FlexIDSCore #3848, #4126]</b> Unable to release USB key
 	       	<ul>
