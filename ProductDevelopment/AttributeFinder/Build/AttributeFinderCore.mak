@@ -193,7 +193,7 @@ CopyFilesToInstallFolder: ObfuscateFiles
     @COPY /v "$(BinariesFolder)\USSFileViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegCoreComponents"
     @COPY /v "$(BinariesFolder)\VOAFileViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegCoreComponents"
 	@COPY /v  "$(BinariesFolder)\GetFullUserName.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\CSharpDatabaseUtilities.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents"
+	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Database.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\SQLServerInfo.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Utilities.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
