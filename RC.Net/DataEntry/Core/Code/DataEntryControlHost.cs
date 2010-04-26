@@ -386,10 +386,29 @@ namespace Extract.DataEntry
         bool _shiftKeyDown;
 
         /// <summary>
+        /// To determine the appropriate times to switch from tabbing-by-field to tabbing-by-group,
+        /// keep track of whether the tab key is down.
+        /// </summary>
+        bool _tabKeyDown;
+
+        /// <summary>
         /// Inidicates when a manual focus change is taking place (tab key was pressed or a
         /// highlight was selected in the image viewer).
         /// </summary>
         bool _manualFocusEvent;
+
+        /// <summary>
+        /// The <see cref="Control"/> that has most recently gained focus and is scheduled for
+        /// processing based on the focus change (via DataEntryControlGotFocusInvoked).
+        /// </summary>
+        IDataEntryControl _focusingControl;
+
+        /// <summary>
+        /// A <see cref="Control"/> for which a second attempt at focusing is taking place since
+        /// the first attempt failed to switch focus (usually/always due to edit mode in a table
+        /// ending and putting focus back in the table that should be losing focus).
+        /// </summary>
+        IDataEntryControl _refocusingControl;
 
         /// <summary>
         /// To manage tab order when the control host is regaining focus, keep track of any data
@@ -608,6 +627,14 @@ namespace Extract.DataEntry
         bool _allowTabbingByGroup = true;
 
         /// <summary>
+        /// Indicates whether the last navigation (selection change) that occured was done via the
+        /// tab key, and if so in which direction. <see langword="null"/> if the last navigation was
+        /// not via the tab key, <see langword="true"/> if the last navigation was via tab
+        /// (forward), <see langword="false"/> if the last navigation was shift + tab (backward).
+        /// </summary>
+        bool? _lastNavigationViaTabKey;
+
+        /// <summary>
         /// Indicates any currently selected attribute tab group.
         /// </summary>
         IAttribute _currentlySelectedGroupAttribute;
@@ -623,6 +650,21 @@ namespace Extract.DataEntry
         bool _isLoaded;
 
         #endregion Fields
+
+        #region Delegates
+
+        /// <summary>
+        /// Delegate for a function that does not take any parameters.
+        /// </summary>
+        delegate void ParameterlessDelegate();
+
+        /// <summary>
+        /// Delegate for a function that takes a single <see cref="IDataEntryControl"/> parameter.
+        /// </summary>
+        /// <param name="dataEntryControl">The <see cref="IDataEntryControl"/> parameter.</param>
+        delegate void DataEntryControlDelegate(IDataEntryControl dataEntryControl);
+
+        #endregion Delegates
 
         #region Constructors
 
@@ -1389,6 +1431,8 @@ namespace Extract.DataEntry
                     else if (m.WParam == (IntPtr)Keys.Tab && 
                         (_smartTagManager == null || !_smartTagManager.IsActive))
                     {
+                        _tabKeyDown = (m.Msg == WindowsMessage.KeyDown);
+
                         // [DataEntry:346]
                         // If a shift tab is being sent via KeyMethods.SendKeyToControl the tab key
                         // will be received before the shift key. If _shiftKeyDown if false, test
@@ -1402,7 +1446,7 @@ namespace Extract.DataEntry
                         // propagate selection to the next attribute in the tab order.
                         if (m.Msg == WindowsMessage.KeyDown)
                         {
-                            ProcessTabKey();
+                            AdvanceToNextTabStop(!_shiftKeyDown);
 
                             // So that the input tracker is able to track this input
                             OnMessageHandled(new MessageHandledEventArgs(m));
@@ -2277,9 +2321,44 @@ namespace Extract.DataEntry
         {
             try
             {
-                Control lastActiveDataControl = (Control) _activeDataControl;
+                // Keep track of the control that should be gaining focus.
+                _focusingControl = (IDataEntryControl)sender;
 
-                IDataEntryControl newActiveDataControl = sender as IDataEntryControl;
+                // Schedule the focus change to be handled via the message que. This prevents
+                // situations where focus can be called from within the GotFocus handler as warned
+                // against here:
+                // http://msdn.microsoft.com/en-us/library/system.windows.forms.control.enter.aspx
+                BeginInvoke(new DataEntryControlDelegate(DataEntryControlGotFocusInvoked),
+                    new object[] { sender as IDataEntryControl });
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI24093", ex);
+            } 
+        }
+
+        /// <summary>
+        /// Handles a <see cref="IDataEntryControl"/> gaining focus, invoked via the message que.
+        /// </summary>
+        /// <param name="newActiveDataControl">The <see cref="IDataEntryControl"/> that is gaining
+        /// focus.</param>
+        void DataEntryControlGotFocusInvoked(IDataEntryControl newActiveDataControl)
+        {
+            try
+            {
+                // In some cases one control may initially gain focus before focus is redirected.
+                // This is usually due to .Net initially trying to direct focus (such as to the
+                // first control in the form), before the DataEntryControlHost directs focus to
+                // the appropriate data entry control.
+                // In this case, ignore handling of the original focus change (handle only the most
+                // recent focus change).
+                if (newActiveDataControl != _focusingControl)
+                {
+                    return;
+                }
+                _focusingControl = null;
+
+                Control lastActiveDataControl = (Control)_activeDataControl;
 
                 // If a manual focus event is in progress, don't treat this as a regaining focus
                 // event. The sender is the control programatically given focus.
@@ -2289,7 +2368,7 @@ namespace Extract.DataEntry
                     _manualFocusEvent = false;
                 }
                 // If the control host is getting focus back from an outside control, focus needs 
-                // to be manually directred to the appropriate data entry control to override the 
+                // to be manually directed to the appropriate data entry control to override the 
                 // default tab behavior which will otherwise assign focus to the first control 
                 // within the control host.
                 else if (_regainingFocus)
@@ -2340,6 +2419,30 @@ namespace Extract.DataEntry
                 // Notify AttributeStatusInfo that the current edit is over so that a
                 // non-incremental value modified event can be raised.
                 AttributeStatusInfo.EndEdit();
+
+                // If this method was attempting to change focus, there is at least once case where
+                // the control that was to gain focus does not yet have it. That case is where a
+                // table was in edit mode-- moving focus away from the table ends edit mode which
+                // triggers the table to re-focus the table. Make a second attempt at focusing the
+                // desired control if it does not yet have focus.
+                if (!((Control)newActiveDataControl).Focused)
+                {
+                    // Keep track of refocus attempts to prevent the possibility of infinite
+                    // recursion.
+                    if (_refocusingControl == newActiveDataControl)
+                    {
+                        new ExtractException("ELI30036",
+                            "Application trace: Failed to activate control").Log();
+                    }
+                    else
+                    {
+                        _refocusingControl = newActiveDataControl;
+                        ((Control)newActiveDataControl).Focus();
+                        return;
+                    }
+                }
+
+                _refocusingControl = null;
 
                 // If an image is loaded, activate the new control. (Prevent controls from being
                 // active with no loaded document)
@@ -2397,6 +2500,17 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Note whether the current selection was due to tabbing (used by the tabbing-by-row
+                // logic).
+                if (_tabKeyDown)
+                {
+                    _lastNavigationViaTabKey = !_shiftKeyDown;
+                }
+                else
+                {
+                    _lastNavigationViaTabKey = null;
+                }
+
                 IDataEntryControl dataControl = (IDataEntryControl)sender;
                
                 ExtractException endEditException = null;
@@ -3618,9 +3732,12 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the tab key by advancing field selection appropriately.
+        /// Advances field selection to the next or previous tab stop. Selection will "wrap around"
+        /// appropriately after reaching the last tab stop (or first when navigating backwards).
         /// </summary>
-        void ProcessTabKey()
+        /// <param name="forward"><see langword="true"/> to go to the next tab stop or
+        /// <see langword="false"/> to go to the previous tab stop.</param>
+        void AdvanceToNextTabStop(bool forward)
         {
             // Notify AttributeStatusInfo that the current edit is over.
             // This will also be called as part of a focus change event, but it needs
@@ -3643,8 +3760,8 @@ namespace Extract.DataEntry
                 {
                     nextTabStopGenealogy =
                         AttributeStatusInfo.GetNextTabGroupAttribute(_attributes,
-                            ActiveAttributeGenealogy(_shiftKeyDown,
-                                _currentlySelectedGroupAttribute), !_shiftKeyDown);
+                            ActiveAttributeGenealogy(!forward,
+                                _currentlySelectedGroupAttribute), forward);
                 }
                 // If no attribute group is currently selected, use
                 // GetNextTabStopOrGroupAttribute to find either the next tab
@@ -3655,10 +3772,12 @@ namespace Extract.DataEntry
                 else
                 {
                     // If the active attribute is already a tab group attribute but the tab group
-                    // is not currently selected, select the tab group without advancing the active
-                    // attribute.
-                    IAttribute activeAttribute = GetActiveAttribute(_shiftKeyDown);
-                    if (activeAttribute != null)
+                    // is not currently selected and the previous navigation was via tab in the same
+                    // direction as the current navigation, select the tab group without advancing
+                    // the active attribute.
+                    IAttribute activeAttribute = GetActiveAttribute(!forward);
+                    if (activeAttribute != null && _lastNavigationViaTabKey != null &&
+                        _lastNavigationViaTabKey.Value == forward)
                     {
                         List<IAttribute> tabGroup =
                             AttributeStatusInfo.GetAttributeTabGroup(activeAttribute);
@@ -3673,8 +3792,8 @@ namespace Extract.DataEntry
                     {
                         nextTabStopGenealogy =
                             AttributeStatusInfo.GetNextTabStopOrGroupAttribute(_attributes,
-                                ActiveAttributeGenealogy(_shiftKeyDown,
-                                    _currentlySelectedGroupAttribute), !_shiftKeyDown);
+                                ActiveAttributeGenealogy(!forward,
+                                    _currentlySelectedGroupAttribute), forward);
 
                         // [DataEntry:754]
                         // If the next tab stop attribute represents an attribute group and that
@@ -3715,7 +3834,7 @@ namespace Extract.DataEntry
             {
                 nextTabStopGenealogy =
                     AttributeStatusInfo.GetNextTabStopAttribute(_attributes,
-                        ActiveAttributeGenealogy(true, null), !_shiftKeyDown);
+                        ActiveAttributeGenealogy(!forward, null), forward);
             }
 
             if (nextTabStopGenealogy != null)
@@ -6236,103 +6355,34 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Delegate for a function that does not take any parameters.
-        /// </summary>
-        delegate void ParameterlessDelegate();
-
-        /// <summary>
         /// Preforms any operations that need to occur after ImageFileChanged has been called for
         /// a newly loaded document.
         /// </summary>
         void FinalizeDocumentLoad()
         {
-            if (_imageViewer.IsImageAvailable)
+            try
             {
-                // Initialize _currentlySelectedGroupAttribute as null. 
-                _currentlySelectedGroupAttribute = null;
-
-                // Select the first control on the form.
-                Focus();
-                SelectNextControl(null, true, true, true, true);
-
-                // If there is an active data control, ensure the initially selected attribute is
-                // appropriate based on its TabStopMode
-                IAttribute activeAttribute = GetActiveAttribute(true);
-                if (activeAttribute != null)
+                if (_imageViewer.IsImageAvailable)
                 {
-                    // We found an active attribute.  Specify advanceSelection based on the
-                    // attribute's TabStopMode.
-                    bool advanceSelection = false;
+                    // Initialize _currentlySelectedGroupAttribute as null. 
+                    _currentlySelectedGroupAttribute = null;
+                    _lastNavigationViaTabKey = true;
 
-                    switch (AttributeStatusInfo.GetStatusInfo(activeAttribute).TabStopMode)
-                    {
-                        case TabStopMode.OnlyWhenPopulatedOrInvalid:
-                            {
-                                if (string.IsNullOrEmpty(activeAttribute.Value.String) &&
-                                    (AttributeStatusInfo.GetDataValidity(activeAttribute) 
-                                        == DataValidity.Valid))
-                                {
-                                    advanceSelection = true;
-                                }
-                            }
-                            break;
-
-                        case TabStopMode.OnlyWhenInvalid:
-                            {
-                                if (AttributeStatusInfo.GetDataValidity(activeAttribute)
-                                        == DataValidity.Valid)
-                                {
-                                    advanceSelection = true;
-                                }
-                            }
-                            break;
-
-                        case TabStopMode.Never:
-                            {
-                                advanceSelection = true;
-                            }
-                            break;
-                    }
-
-                    // If selection should be advanced based on the attribute's TabStopMode,
-                    // do so.
-                    if (advanceSelection)
-                    {
-                        Stack<IAttribute> nextTabStopAttribute;
-                        // Advance to the next attribute group if _allowTabbingByGroup and
-                        // the first attributes are within a control that supports attribute
-                        // groups.
-                        if (_allowTabbingByGroup)
-                        {
-                            nextTabStopAttribute =
-                                AttributeStatusInfo.GetNextTabGroupAttribute(_attributes, 
-                                    ActiveAttributeGenealogy(false, 
-                                        _currentlySelectedGroupAttribute), 
-                                    true);
-                        }
-                        // Otherwise advance to the first tab stop.
-                        else
-                        {
-                            nextTabStopAttribute =
-                                AttributeStatusInfo.GetNextTabStopAttribute(_attributes,
-                                ActiveAttributeGenealogy(true, null), false);
-                        }
-
-                        if (nextTabStopAttribute != null)
-                        {
-                            PropagateAttributes(nextTabStopAttribute, true,
-                                _allowTabbingByGroup);
-                        }
-                    }
+                    // Select the first tab stop in the DEP
+                    AdvanceToNextTabStop(true);
                 }
-            }
-            else
-            {
-                // Clear any existing validation errors
-                _validationErrorProvider.Clear();
-            }
+                else
+                {
+                    // Clear any existing validation errors
+                    _validationErrorProvider.Clear();
+                }
 
-            OnItemSelectionChanged();
+                OnItemSelectionChanged();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30037", ex);
+            }
         }
 
         /// <summary>

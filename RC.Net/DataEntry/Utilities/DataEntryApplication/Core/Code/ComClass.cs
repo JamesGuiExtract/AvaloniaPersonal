@@ -643,9 +643,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // If no exception was thrown, the calls is properly configured.
                     return true;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    ExtractException.Log("ELI25488", ex);
+                    // [DataEntry:369]
+                    // Eat any exception; just trying to report if we are properly configured.
+                    // If the user needs to know why, they can re-attempt configuration.
                 }
 
                 // An exception was thrown from ValidateSettings; the class is not properly

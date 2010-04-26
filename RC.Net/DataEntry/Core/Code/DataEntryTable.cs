@@ -114,10 +114,11 @@ namespace Extract.DataEntry
         IUnknownVector _sourceAttributes;
 
         /// <summary>
-        /// An attribute used to direct focus to the first cell of the "new" row of the table before
-        /// focus leaves the control.  This attribute will not store any data useful as output.
+        /// The attributes used to direct focus to the first cell of the "new" row of the table before
+        /// focus leaves the control.  These attributes will not store any data useful as output.
         /// </summary>
-        IAttribute _tabOrderPlaceholderAttribute;
+        Dictionary<IUnknownVector, IAttribute> _tabOrderPlaceholderAttributes =
+            new Dictionary<IUnknownVector, IAttribute>();
 
         /// <summary>
         /// A cache of DataEntryTableRows that have been populated so that when parent control
@@ -677,10 +678,10 @@ namespace Extract.DataEntry
                 {
                     // [DataEntry:346]
                     // If the new row is the only row selected, report 
-                    // _tabOrderPlaceholderAttribute as the selected attribute so that the
+                    // TabOrderPlaceholderAttribute as the selected attribute so that the
                     // control host will be able to correctly direct tab order forward and
                     // backward from this point.
-                    selectedAttributes.PushBack(_tabOrderPlaceholderAttribute);
+                    selectedAttributes.PushBack(TabOrderPlaceholderAttribute);
                 }
 
                 // Allow all selected cells to be viewed with tooltips only if exactly one row
@@ -712,7 +713,7 @@ namespace Extract.DataEntry
             }
             else if (SelectedCells.Count > 0)
             {
-                // _tabOrderPlaceholderAttribute may represent an attribute group if selected.
+                // TabOrderPlaceholderAttribute may represent an attribute group if selected.
                 IAttribute selectedGroupAttribute = null;
 
                 // Create a collection to keep track of the attributes for each row in which a cell
@@ -747,20 +748,20 @@ namespace Extract.DataEntry
                 OnPropagateAttributes(selectedRowAttributes);
 
                 // If a cell of the "new" row is selected, report 
-                // _tabOrderPlaceholderAttribute as the selected attribute so that the control host
+                // TabOrderPlaceholderAttribute as the selected attribute so that the control host
                 // will be able to correctly direct tab order forward and backward from this point.
-                if (_tabOrderPlaceholderAttribute != null &&
+                if (TabOrderPlaceholderAttribute != null &&
                     selectedRowAttributes.Size() == 0 &&
                     CurrentCell != null && CurrentCell.RowIndex == NewRowIndex)
                 {
-                    selectedAttributes.PushBack(_tabOrderPlaceholderAttribute);
+                    selectedAttributes.PushBack(TabOrderPlaceholderAttribute);
 
-                    // If the only attribute selected is _tabOrderPlaceholderAttribute, it should be
+                    // If the only attribute selected is TabOrderPlaceholderAttribute, it should be
                     // considered a selected group. (The new row as a whole will not be selected
                     // when tabbing by row... only the first cell).
                     if (SelectedCells.Count == 1)
                     {
-                        selectedGroupAttribute = _tabOrderPlaceholderAttribute;
+                        selectedGroupAttribute = TabOrderPlaceholderAttribute;
                     }
                 }
 
@@ -969,9 +970,12 @@ namespace Extract.DataEntry
                         // Insert new row
                         case Keys.I:
                             {
-                                InsertNewRow(true);
-                                
-                                e.Handled = true;
+                                if (AllowUserToAddRows)
+                                {
+                                    InsertNewRow(true);
+
+                                    e.Handled = true;
+                                }
                             }
                             break;
                     }                 
@@ -1646,15 +1650,6 @@ namespace Extract.DataEntry
                 // IDataEntryControl interface.
                 Enabled = sourceAttributes != null && !Disabled;
 
-                // Ensure _tabOrderPlaceholderAttribute is cleared so that if a parent attribute is
-                // deleted, we don't try to use a deleted. Also, this ensures doesn't get assigned
-                // to more than one hierarchy at a time.
-                if (_tabOrderPlaceholderAttribute != null)
-                {
-                    DeleteAttributeData(_tabOrderPlaceholderAttribute);
-                    _tabOrderPlaceholderAttribute = null;
-                }
-
                 _sourceAttributes = sourceAttributes;
 
                 // Retrieve the cached rows that correspond to sourceAttributes (if available).
@@ -1716,37 +1711,6 @@ namespace Extract.DataEntry
 
                         // Apply the new attribute to the added row.
                         ApplyAttributeToRow(addedRowIndex, null, null);
-                    }
-
-                    if (AllowUserToAddRows && Visible)
-                    {
-                        // If there is a "new" row, initialize the _tabOrderPlaceholderAttribute.
-                        _tabOrderPlaceholderAttribute = DataEntryMethods.InitializeAttribute(
-                            "PlaceholderAttribute_" + Name, MultipleMatchSelectionMode.First,
-                            true, _sourceAttributes, null, this, 1, true, TabStopMode.Always,
-                            null, null, null);
-
-                        AttributeStatusInfo placeholderStatusInfo =
-                            AttributeStatusInfo.GetStatusInfo(_tabOrderPlaceholderAttribute);
-                        placeholderStatusInfo.AttributeDeleted += HandlePlaceholderAttributeDeleted;
-
-                        // Don't persist placeholder attributes in output.
-                        AttributeStatusInfo.SetAttributeAsPersistable(
-                            _tabOrderPlaceholderAttribute, false);
-
-                        // Mark this attribute as viewable even thought it will not be used to store any
-                        // useful data so that focus will be directed to it.
-                        AttributeStatusInfo.MarkAsViewable(_tabOrderPlaceholderAttribute, true);
-
-                        // If this table supports tabbing by row, assign the row attribute a group
-                        // consisting of all column attributes.
-                        if (_allowTabbingByRow && !Disabled)
-                        {
-                            List<IAttribute> tabGroup = new List<IAttribute>(
-                                new IAttribute[] { _tabOrderPlaceholderAttribute });
-                            AttributeStatusInfo.SetAttributeTabGroup(
-                                _tabOrderPlaceholderAttribute, tabGroup);
-                        }
                     }
                 }
 
@@ -1837,9 +1801,9 @@ namespace Extract.DataEntry
                 // Needed if selecting a row (selectTabGroup)
                 DataEntryTableRow selectedRow;
 
-                // Special handling is needed for the case where the _tabOrderPlaceholderAttribute
+                // Special handling is needed for the case where the TabOrderPlaceholderAttribute
                 // is to be propagated.
-                if (attribute == _tabOrderPlaceholderAttribute)
+                if (attribute == TabOrderPlaceholderAttribute)
                 {
                     // If selectAttribute is specified, activate the first cell in the new row.
                     if (selectAttribute)
@@ -1849,10 +1813,10 @@ namespace Extract.DataEntry
                         CurrentCell.Selected = true;
 
                         OnAttributesSelected(
-                            DataEntryMethods.AttributeAsVector(_tabOrderPlaceholderAttribute),
-                            false, false, _tabOrderPlaceholderAttribute);
+                            DataEntryMethods.AttributeAsVector(TabOrderPlaceholderAttribute),
+                            false, false, TabOrderPlaceholderAttribute);
                     }
-                    // Otherwise, propagate null since _tabOrderPlaceholderAttribute will
+                    // Otherwise, propagate null since TabOrderPlaceholderAttribute will
                     // never have children.
                     else
                     {
@@ -1867,7 +1831,7 @@ namespace Extract.DataEntry
                     ClearSelection(-1, selectedRow.Index, true);
                     CurrentCell = Rows[selectedRow.Index].Cells[0];
                 }
-                // If _tabOrderPlaceholderAttribute is not the attribute to propagate, allow the
+                // If TabOrderPlaceholderAttribute is not the attribute to propagate, allow the
                 // base class to handle the propagation.
                 else
                 {
@@ -1904,11 +1868,7 @@ namespace Extract.DataEntry
 
                 _activeCachedRows = null;
 
-                if (_tabOrderPlaceholderAttribute != null)
-                {
-                    DeleteAttributeData(_tabOrderPlaceholderAttribute);
-                    _tabOrderPlaceholderAttribute = null;
-                }
+                _tabOrderPlaceholderAttributes.Clear();
 
                 // [DataEntry:378]
                 // Prevent copying and pasting table data between different documents.
@@ -2276,18 +2236,22 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the case that the _tabOrderPlaceholderAttribute has been deleted.
+        /// Handles the case that a TabOrderPlaceholderAttribute has been deleted.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="AttributeDeletedEventArgs"/> that contains the event data.
         /// </param>
         void HandlePlaceholderAttributeDeleted(object sender, AttributeDeletedEventArgs e)
         {
-            // Ensure that wherever _tabOrderPlaceholderAttribute is deleted from, it is no longer
+            // Ensure that wherever a TabOrderPlaceholderAttribute is deleted from, it is no longer
             // referenced.
-            if (e.DeletedAttribute == _tabOrderPlaceholderAttribute)
+            foreach (KeyValuePair<IUnknownVector, IAttribute> pair in _tabOrderPlaceholderAttributes)
             {
-                _tabOrderPlaceholderAttribute = null;
+                if (e.DeletedAttribute == pair.Value)
+                {
+                    _tabOrderPlaceholderAttributes.Remove(pair.Key);
+                    break;
+                }
             }
         }
 
@@ -2794,12 +2758,12 @@ namespace Extract.DataEntry
                     AttributeStatusInfo.MarkAsPropagated(attribute, true, true);
                 }
 
-                // If _tabOrderPlaceholderAttribute is being used, make sure it remains the last
+                // If TabOrderPlaceholderAttribute is being used, make sure it remains the last
                 // attribute from this control in _sourceAttributes.
-                if (_tabOrderPlaceholderAttribute != null)
+                if (TabOrderPlaceholderAttribute != null)
                 {
                     DataEntryMethods.ReorderAttributes(_sourceAttributes,
-                        DataEntryMethods.AttributeAsVector(_tabOrderPlaceholderAttribute));
+                        DataEntryMethods.AttributeAsVector(TabOrderPlaceholderAttribute));
                 }
 
                 // If a new attribute was created for this row, ensure that it propagates all its
@@ -3616,12 +3580,12 @@ namespace Extract.DataEntry
                     // need to be updated.
                     UpdateHints(false);
 
-                    // If _tabOrderPlaceholderAttribute is being used, make sure it remains the last
+                    // If TabOrderPlaceholderAttribute is being used, make sure it remains the last
                     // attribute from this control in _sourceAttributes.
-                    if (_tabOrderPlaceholderAttribute != null)
+                    if (TabOrderPlaceholderAttribute != null)
                     {
                         DataEntryMethods.ReorderAttributes(_sourceAttributes,
-                            DataEntryMethods.AttributeAsVector(_tabOrderPlaceholderAttribute));
+                            DataEntryMethods.AttributeAsVector(TabOrderPlaceholderAttribute));
                     }
                 }
 
@@ -3799,6 +3763,62 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException.Display("ELI29988", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets a tab order place-holder attribute for the currently propagated _sourceAttributes.
+        /// </summary>
+        /// <returns>An <see cref="IAttribute"/> to use as a placeholder for tab order. May be
+        /// <see langword="null"/> if no attributes are currently propagated, the table doesn't have
+        /// a "new" row or the table is not visible.</returns>
+        IAttribute TabOrderPlaceholderAttribute
+        {
+            get
+            {
+                // A TabOrderPlaceholderAttribute is not needed if there is no currently propagated
+                // attributes, the table does not support new rows or the table is not visible.
+                if (_sourceAttributes == null || !AllowUserToAddRows || !Visible)
+                {
+                    return null;
+                }
+
+                // Look up a previously created placeholder attribute for the current
+                // _sourceAttributes set, if one is available.
+                IAttribute tabOrderPlaceholderAttribute;
+                if (!_tabOrderPlaceholderAttributes.TryGetValue(
+                    _sourceAttributes, out tabOrderPlaceholderAttribute))
+                {
+                    // If no placeholder attribute has been created for this set, create one now.
+                    tabOrderPlaceholderAttribute = DataEntryMethods.InitializeAttribute(
+                        "PlaceholderAttribute_" + Name, MultipleMatchSelectionMode.First,
+                        true, _sourceAttributes, null, this, 1, true, TabStopMode.Always,
+                        null, null, null);
+
+                    AttributeStatusInfo placeholderStatusInfo =
+                        AttributeStatusInfo.GetStatusInfo(tabOrderPlaceholderAttribute);
+                    placeholderStatusInfo.AttributeDeleted += HandlePlaceholderAttributeDeleted;
+
+                    // Don't persist placeholder attributes in output.
+                    AttributeStatusInfo.SetAttributeAsPersistable(
+                        tabOrderPlaceholderAttribute, false);
+
+                    // Mark this attribute as viewable even though it will not be used to store any
+                    // useful data so that focus will be directed to it.
+                    AttributeStatusInfo.MarkAsViewable(tabOrderPlaceholderAttribute, true);
+
+                    // If this table supports tabbing by row, assign the row attribute a group
+                    // consisting of all column attributes.
+                    if (_allowTabbingByRow && !Disabled)
+                    {
+                        List<IAttribute> tabGroup = new List<IAttribute>(
+                            new IAttribute[] { tabOrderPlaceholderAttribute });
+                        AttributeStatusInfo.SetAttributeTabGroup(
+                            tabOrderPlaceholderAttribute, tabGroup);
+                    }
+                }
+
+                return tabOrderPlaceholderAttribute;
             }
         }
 

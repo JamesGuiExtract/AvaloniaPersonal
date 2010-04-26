@@ -144,7 +144,10 @@ namespace Extract.Utilities
                         }
                         else
                         {
-                            throw new ExtractException("ELI29688", "Missing configuration file!");
+                            ExtractException ee =
+                                new ExtractException("ELI29688", "Missing configuration file!");
+                            ee.AddDebugData("Filename", configFileName, false);
+                            throw ee;
                         }
                     }
 

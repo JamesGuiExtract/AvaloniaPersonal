@@ -1783,9 +1783,12 @@ namespace Extract.DataEntry
 
                 // Find the control indicated by startingPoint.
                 IDataEntryControl startingControl = null;
-                foreach (IAttribute attribute in startingPoint)
+                if (startingPoint != null)
                 {
-                    startingControl = AttributeStatusInfo.GetOwningControl(attribute);
+                    foreach (IAttribute attribute in startingPoint)
+                    {
+                        startingControl = AttributeStatusInfo.GetOwningControl(attribute);
+                    }
                 }
 
                 Stack<IAttribute> nextTabStopOrGroupAttributeGenealogy = new Stack<IAttribute>();
