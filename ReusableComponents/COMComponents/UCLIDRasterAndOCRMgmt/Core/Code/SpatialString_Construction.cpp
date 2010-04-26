@@ -219,7 +219,7 @@ STDMETHODIMP CSpatialString::CreatePseudoSpatialString(IRasterZone *pZone, BSTR 
 				(unsigned short) nBottom,
 				(unsigned short) ufLeftBound,
 				(unsigned short) (ufLeftBound + ufCharWidth),
-				(unsigned char) nPageNum,
+				(unsigned short) nPageNum,
 				false, false, true, (unsigned char) ufCharWidth, 100, 0));
 
 			ufLeftBound += ufCharWidth;
