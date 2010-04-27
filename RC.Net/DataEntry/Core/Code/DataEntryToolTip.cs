@@ -612,7 +612,7 @@ namespace Extract.DataEntry
                     {
                         // Initialize coordinates that need to be mapped into the ImageViewer
                         // coordinate system.
-                        PointF[] cornerPoints = _textLayerObject.GetVertices();
+                        Point[] cornerPoints = _textLayerObject.GetVertices();
                         Point[] highlightAnchorPoints =
                             { _highlightAnchorPoint, highlightCenterPoint };
                         Point[] coordinateProjectionFactor = new Point[1];
