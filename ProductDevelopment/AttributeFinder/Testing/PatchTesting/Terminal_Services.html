@@ -7,13 +7,12 @@
 
 <BODY>
 
-<h1> FLEX Index / ID Shield 8.0.1.104<br> Terminal Services Testing </h1>
+<h1> FLEX Index / ID Shield 8.0.1.106<br>Patch/Upgrade Testing </h1>
 <hr>
 
 <h3>Purpose and Details</h3>
 <ul>
-   	<LI><b>Customer:</b> CA - Santa Barbara - DFM
-   	<LI><b>SCRs:</b> FlexIDSCore #4261, #4264, DotNet #452, #453
+   	<LI><b>SCRs:</b> FlexIDSCore #4248, #4261, #4264, #4269, DotNet #452, #453
    	<LI><b>Issue:</b> The customer is processing images and running multiple verification 
 	instances on the same server via Terminal Services.  Problems with the named mutex 
 	used in 8.0.0.70 result in only one verification user being able to run at a time.  
@@ -21,9 +20,19 @@
 	<li><b>Second issue:</b> During testing it was found that the FAM service was rapidly 
 	spawning new <b>FAMProcess.exe</b> instances.  In some cases, orphaned 
 	<b>FAMProcess.exe</b> instances were also noted.
+	<LI><b>Third issue:</b> During verification of the HI project PDF's it was discovered
+	that some of the PDF's showed up with blank pages when displayed in the .Net image
+	viewer.  They were not blank in our legacy viewer or when viewed in Adobe Reader.
+	The same pages OCR'd just fine and some of them contained sensitive data.
+	<LI><b>Fourth issue:</b> Some rule objects caused invalid page number exceptions when executed
+	on a document containing over 255 pages.
    	<LI><b>Solution:</b> Code was added to adjust the security descriptor for the named 
 	mutex.  The FAM service code was restructured to avoid problems when processing 
-	specified numbers of files.
+	specified numbers of files. The .Net ImageReader class was modified to load PDF's
+	with a resolution of 300 dpi and a bit depth of 24 bits per pixel (this mirrors the
+	behavior in our legacy C++ imaging program). CreatePseudoSpatial string was modified to
+	pass the page number as an unsigned short (max value 65535) as opposed to an unsigned
+	char (max value 255).
 </ul>
 <p>
 <h3>Tests</h3>
@@ -71,6 +80,9 @@
    	</LI>
 <p>
 	<LI><b>Exercise verification</b>
+309 should have three redactions-- top left "LIR_Finding_Rule", 
+top right "LIR_Preprocessor", and a small one redacting a line from a 
+stamp "SplitRegionIntoContentAreas"
 	<ul>
 		<li>Create an FPS file to verify images processed by the FAM service.
 		<li>Confirm that the same user account that is configured to run the FAM Service can 
@@ -130,6 +142,46 @@
 		updated statistics during processing.
        	</ul>
    	</LI>
+	<LI><b>Exercise verification with PDF's from FlexIDSCore #4248 (Blank PDF pages issue)</b>
+	<ul>
+		<li>Using the PDF's located at <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4248</b>
+		confirm that each page of the PDF can be viewed in a verification window.
+		<li>Confirm that each page of the PDF is loaded in the thumbnail viewer of
+		the verification window.
+	</ul>
+	</LI>
+<p>
+	<LI><b>Excercise the test cases from FlexIDSCore #4269 (Invalid page numbers issue)</b>
+	<ul>
+		<li> Excercise Master.rsd.etf from the rules folder in <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4269\Test1</b>
+		on all images in the images folder.
+		<li> Excercise Master.rsd from the rules folder in <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4269\Test2</b>
+		on all images in the images folder.
+		<ul>
+			<li> You should be able to excercise Test.fps in the folder without any errors.
+			<b>Note:</b> This will require a <b>MICR</b> license.
+			<li> You should be able to view all attributes in the resulting VOA file without error
+			(either using the VOA viewer or running the files through verification)
+			<li> Review the .redacted output, the following redactions should be visible. </li>
+			<ul>
+				<li> Pages 256-258 should be redacted with the text "Select_Page_Region_Preprocessor".
+				<li> Page 301, there should be a redaction with the text "ImageRegionWithLines".
+				There will also be a number of other black boxes.
+				<li> Page 302 should be redacted with the text "Spatial_Proximity" on
+				the right side of the page.
+				<li> Page 303 should have a redaction with the text "Box_Finder". 
+				<li> Page 304 should have a redaction with the text "MergedAttributes". 
+				<li> Page 305 should have a "MICR" redaction.
+				<li> Page 308 should have a redaction on the right side that says
+				"Select_Page_Region_Finding".
+				<li> Page 309 should have three redactions-- top left "LIR_Finding_Rule", 
+				top right "LIR_Preprocessor", and a small one redacting a line from a 
+				stamp "SplitRegionIntoContentAreas"
+				<li> There should <b>not</b> be any other redactions.
+			</ul>
+		</ul>
+	</ul>
+	</LI>
 </OL>
 </BODY>
 </HTML>
