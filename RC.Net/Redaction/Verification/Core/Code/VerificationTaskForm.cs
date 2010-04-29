@@ -1617,6 +1617,9 @@ namespace Extract.Redaction.Verification
                 // Disable the close image
                 _imageViewer.Shortcuts[Keys.F4 | Keys.Control] = null;
 
+                // Disable open image [FlexIDSCore #4262]
+                _imageViewer.Shortcuts[Keys.O | Keys.Control] = null;
+
                 // Next/previous redaction
                 _imageViewer.Shortcuts[Keys.Tab] = SelectNextRedaction;
                 _imageViewer.Shortcuts[Keys.Tab | Keys.Shift] = SelectPreviousRedaction;
