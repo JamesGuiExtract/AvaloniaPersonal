@@ -248,7 +248,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                StopService("ELI28773");
+                StopService("ELI28773", true);
             }
             catch (Exception ex)
             {
@@ -268,7 +268,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                StopService("ELI29822");
+                StopService("ELI29822", false);
             }
             catch (Exception ex)
             {
@@ -479,11 +479,13 @@ namespace Extract.FileActionManager.Utilities
                     int filesProcessed = 0;
                     if (_numberOfFilesToProcess != 0 && !process.HasExited && famProcess != null)
                     {
+                        int processedSuccessfully;
                         int processingErrors;
                         int filesSupplied;
                         int supplyingErrors;
-                        famProcess.GetCounts(out filesProcessed, out processingErrors,
+                        famProcess.GetCounts(out processedSuccessfully, out processingErrors,
                             out filesSupplied, out supplyingErrors);
+                        filesProcessed = processedSuccessfully + processingErrors;
                     }
 
                     // If the number of files to proces is 0 OR the number of files actually
@@ -570,6 +572,19 @@ namespace Extract.FileActionManager.Utilities
                     // from the finally block.
                     try
                     {
+                        // Ensure stop has been called on the fam process
+                        if (process != null && !process.HasExited && famProcess.IsRunning)
+                        {
+                            famProcess.Stop();
+                        }
+
+                        // Wait for the famprocess to stop
+                        while (process != null && !process.HasExited
+                            && famProcess != null && famProcess.IsRunning)
+                        {
+                            Thread.Sleep(1000);
+                        }
+                        
                         // Release the COM object so the FAMProcess.exe is cleaned up
                         famProcess = null;
                         
@@ -580,9 +595,25 @@ namespace Extract.FileActionManager.Utilities
                         // Wait for the process to exit
                         if (process != null)
                         {
-                            while (!process.HasExited)
+                            // Wait for up to a minute for the process to stop
+                            int i = 0;
+                            while (!process.HasExited && i < 60)
                             {
-                                Thread.Sleep(500);
+                                Thread.Sleep(1000);
+                                i++;
+                            }
+
+                            // If after a minute the process has not exited, then kill it
+                            if (!process.HasExited)
+                            {
+                                try
+                                {
+                                    process.Kill();
+                                }
+                                catch (Exception ex)
+                                {
+                                    ExtractException.Log("ELI30038", ex);
+                                }
                             }
                         }
                     }
@@ -989,7 +1020,11 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="eliCode">The ELI code to log when adding the FAM Service stopping
         /// application trace (this way we can distinguish between OnStop and OnShutdown).</param>
-        void StopService(string eliCode)
+        /// <param name="canRequestAdditionalTime">If <see langword="true"/> then will request additional
+        /// stop time from the service manager when stopping processing.
+        /// <para><b>Note:</b></para>This should only be called with <see langword="true"/>
+        /// if the method is being called from OnStop.</param>
+        void StopService(string eliCode, bool canRequestAdditionalTime)
         {
             try
             {
@@ -1002,7 +1037,8 @@ namespace Extract.FileActionManager.Utilities
                 _stopProcessing.Set();
 
                 // Only wait if there is a wait handle
-                while (_threadsStopped != null && !_threadsStopped.WaitOne(1000))
+                // and the caller has specified to wait
+                while (canRequestAdditionalTime && _threadsStopped != null && !_threadsStopped.WaitOne(1000))
                 {
                     RequestAdditionalTime(1200);
                 }
@@ -1010,6 +1046,8 @@ namespace Extract.FileActionManager.Utilities
                 // [DNRCAU #357] - Log application trace when service has shutdown
                 ExtractException ee2 = new ExtractException("ELI28774",
                     "Application trace: FAM Service stopped.");
+                ee2.AddDebugData("Threads Stopped",
+                    _threadsStopped != null ? _threadsStopped.WaitOne(0) : true, false);
                 ee2.Log();
 
                 // Set successful exit code

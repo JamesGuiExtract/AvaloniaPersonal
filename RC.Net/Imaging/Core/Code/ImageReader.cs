@@ -61,7 +61,7 @@ namespace Extract.Imaging
         /// <summary>
         /// The command used to modify PDF files back to 1 bit per pixel after loading
         /// </summary>
-        ColorResolutionCommand _conversionCommand;
+        ColorResolutionCommand _bitonalConversionCommand;
 
         #endregion Fields
 
@@ -72,7 +72,8 @@ namespace Extract.Imaging
         /// </summary>
         /// <param name="fileName">The name of the file to read.</param>
         /// <param name="codecs">Used when decoding the image file.</param>
-        /// <param name="loadPdfAsBitonal"></param>
+        /// <param name="loadPdfAsBitonal">Whether or not the PDF should be loaded as a bitonal
+        /// image or not.</param>
         internal ImageReader(string fileName, RasterCodecs codecs, bool loadPdfAsBitonal)
         {
             try
@@ -172,7 +173,7 @@ namespace Extract.Imaging
                     // If loading PDF as bitonal and this file is a PDF, set bits per pixel to 1
                     if (_loadPdfAsBitonal && _isPdf)
                     {
-                        GetConversionCommand().Run(image);
+                        ConvertToBitonalImage(image);
                     }
 
                     return image;
@@ -189,22 +190,23 @@ namespace Extract.Imaging
         }
 
         /// <summary>
-        /// Gets the conversion command to use to convert a PDF file from 24 bpp to 1 bpp.
+        /// Converts the specified <see cref="RasterImage"/> to a bitonal image.
         /// </summary>
-        /// <returns>A conversion command.</returns>
-        ColorResolutionCommand GetConversionCommand()
+        /// <param name="image">The <see cref="RasterImage"/> to convert to a bitonal
+        /// image.</param>
+        void ConvertToBitonalImage(RasterImage image)
         {
-            if (_conversionCommand == null)
+            if (_bitonalConversionCommand == null)
             {
-                _conversionCommand = new ColorResolutionCommand();
-                _conversionCommand.Mode = ColorResolutionCommandMode.InPlace;
-                _conversionCommand.BitsPerPixel = 1;
-                _conversionCommand.DitheringMethod = RasterDitheringMethod.FloydStein;
-                _conversionCommand.PaletteFlags = ColorResolutionCommandPaletteFlags.Fixed;
-                _conversionCommand.Colors = 0;
+                _bitonalConversionCommand = new ColorResolutionCommand();
+                _bitonalConversionCommand.Mode = ColorResolutionCommandMode.InPlace;
+                _bitonalConversionCommand.BitsPerPixel = 1;
+                _bitonalConversionCommand.DitheringMethod = RasterDitheringMethod.FloydStein;
+                _bitonalConversionCommand.PaletteFlags = ColorResolutionCommandPaletteFlags.Fixed;
+                _bitonalConversionCommand.Colors = 0;
             }
 
-            return _conversionCommand;
+            _bitonalConversionCommand.Run(image);
         }
 
         /// <summary>

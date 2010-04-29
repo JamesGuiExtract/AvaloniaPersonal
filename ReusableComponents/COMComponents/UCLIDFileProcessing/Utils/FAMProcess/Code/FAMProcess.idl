@@ -28,9 +28,9 @@ interface IFileProcessingManagerProcess : IDispatch
 	// Stops the processing.  If no processing is being done, does nothing.
 	[id(3), helpstring("method Stop")] HRESULT Stop();
 	//----------------------------------------------------------------------------------------------
-	[id(4), helpstring("method GetCounts")] HRESULT GetCounts([out] LONG* plNumFilesProcessed,
-		[out] LONG* plNumProcessingErrors, [out] LONG* plNumFilesSupplied,
-		[out] LONG* plNumeSupplyingErrors);
+	[id(4), helpstring("method GetCounts")] HRESULT GetCounts(
+		[out] LONG* plNumFilesProcessedSuccessfully, [out] LONG* plNumProcessingErrors,
+		[out] LONG* plNumFilesSupplied, [out] LONG* plNumSupplyingErrors);
 	//----------------------------------------------------------------------------------------------
 	// Gets the current process ID
 	[propget, id(5), helpstring("property ProcessID")] HRESULT ProcessID([out, retval] LONG* plID);

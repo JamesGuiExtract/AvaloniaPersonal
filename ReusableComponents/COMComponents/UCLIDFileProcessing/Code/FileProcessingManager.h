@@ -84,7 +84,7 @@ public:
 	STDMETHOD(put_DatabaseServer)(BSTR newVal);
 	STDMETHOD(get_DatabaseName)(BSTR *pVal);
 	STDMETHOD(put_DatabaseName)(BSTR newVal);
-	STDMETHOD(GetCounts)(long* plNumFilesProcessed, long* plNumProcessingErrors,
+	STDMETHOD(GetCounts)(long* plNumFilesProcessedSuccessfully, long* plNumProcessingErrors,
 		long* plNumFilesSupplied, long* plNumSupplyingErrors);
 	STDMETHOD(get_IsDBPasswordRequired)(VARIANT_BOOL* pvbIsDBPasswordRequired);
 	STDMETHOD(GetExpandedActionName)(BSTR *pbstrAction);

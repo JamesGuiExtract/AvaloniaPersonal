@@ -136,7 +136,7 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return the number of files that have been processed successfully (this includes
 	// the number of skipped files).
-	long getNumberOfFilesProcessed();
+	long getNumberOfFilesProcessedSuccessfully();
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return the number of files that have failed processing
 	long getNumberOfFilesFailed();

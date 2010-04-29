@@ -889,16 +889,16 @@ STDMETHODIMP CFileProcessingManager::put_DatabaseName(/*[in]*/ BSTR newVal)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManager::GetCounts(long *plNumFilesProcessed, long *plNumProcessingErrors,
+STDMETHODIMP CFileProcessingManager::GetCounts(long *plNumFilesProcessedSuccessfully, long *plNumProcessingErrors,
 											   long *plNumFilesSupplied, long *plNumSupplyingErrors)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		if (plNumFilesProcessed != NULL)
+		if (plNumFilesProcessedSuccessfully != NULL)
 		{
-			*plNumFilesProcessed = m_recordMgr.getNumberOfFilesProcessed();
+			*plNumFilesProcessedSuccessfully = m_recordMgr.getNumberOfFilesProcessedSuccessfully();
 		}
 		if (plNumProcessingErrors != NULL)
 		{

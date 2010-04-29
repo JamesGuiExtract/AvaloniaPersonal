@@ -362,7 +362,7 @@ void FPRecordManager::setSkippedForCurrentUser(bool bSkippedForCurrentUser)
 	m_bSkippedFilesForCurrentUser = bSkippedForCurrentUser;
 }
 //-------------------------------------------------------------------------------------------------
-long FPRecordManager::getNumberOfFilesProcessed()
+long FPRecordManager::getNumberOfFilesProcessedSuccessfully()
 {
 	return m_nNumberOfFilesProcessedSuccessfully;
 }

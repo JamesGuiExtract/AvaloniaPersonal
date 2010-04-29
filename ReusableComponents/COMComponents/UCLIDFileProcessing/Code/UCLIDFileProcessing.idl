@@ -380,7 +380,7 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To get the number of files that processed, failed, where queued and failed to
 		//			queue since StartProcessing was called.
-		[id(47), helpstring("method GetCounts")] HRESULT GetCounts([out] long* plNumProcessed,
+		[id(47), helpstring("method GetCounts")] HRESULT GetCounts([out] long* plNumProcessedSuccessfully,
 			[out] long* plNumProcessingErrors, [out] long* plNumSupplied, [out] long* plNumSupplyingErrors);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Gets whether the DB password is required to perform processing.

@@ -55,7 +55,7 @@ END_COM_MAP()
 	STDMETHOD(Ping)();
 	STDMETHOD(Start)(LONG lNumberOfFilesToProcess);
 	STDMETHOD(Stop)();
-	STDMETHOD(GetCounts)(LONG* plNumFilesProcessed, LONG* plNumProcessingErrors,
+	STDMETHOD(GetCounts)(LONG* plNumFilesProcessedSuccessfully, LONG* plNumProcessingErrors,
 		LONG* plNumFilesSupplied, LONG* plNumSupplyingErrors);
 	STDMETHOD(get_ProcessID)(LONG* plPID);
 	STDMETHOD(get_IsRunning)(VARIANT_BOOL* pvbRunning);

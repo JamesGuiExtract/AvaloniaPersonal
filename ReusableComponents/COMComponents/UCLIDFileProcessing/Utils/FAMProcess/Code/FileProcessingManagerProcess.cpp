@@ -178,7 +178,7 @@ STDMETHODIMP CFileProcessingManagerProcess::Stop()
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28446");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManagerProcess::GetCounts(LONG *plNumFilesProcessed,
+STDMETHODIMP CFileProcessingManagerProcess::GetCounts(LONG *plNumFilesProcessedSuccessfully,
 													  LONG *plNumProcessingErrors,
 													  LONG *plNumFilesSupplied,
 													  LONG *plNumSupplyingErrors)
@@ -189,8 +189,8 @@ STDMETHODIMP CFileProcessingManagerProcess::GetCounts(LONG *plNumFilesProcessed,
 		validateLicense();
 
 		// Get the counts from the File processing manager
-		m_ipFPM->GetCounts(plNumFilesProcessed, plNumProcessingErrors, plNumFilesSupplied,
-			plNumSupplyingErrors);
+		m_ipFPM->GetCounts(plNumFilesProcessedSuccessfully, plNumProcessingErrors,
+			plNumFilesSupplied, plNumSupplyingErrors);
 
 		return S_OK;
 	}
