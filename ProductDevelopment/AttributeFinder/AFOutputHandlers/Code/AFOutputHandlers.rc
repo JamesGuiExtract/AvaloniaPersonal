@@ -144,6 +144,7 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     LTEXT           "Please provide a list of values you wish to be removed from the result :",IDC_STATIC,9,7,175,17
+    ICON            IDI_ICON_INFO,IDC_CLUE_DYNAMIC_LIST_HELP,60,16,21,20,SS_NOTIFY
     CONTROL         "List1",IDC_LIST_ENTRIES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,8,27,175,134
     CONTROL         "Above defined text is Case-Sensitive",IDC_CHK_CASE_SENSITIVE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,168,131,10
@@ -342,6 +343,7 @@ BEGIN
 	CONTROL			"Remove empty attribute hierarchy", IDC_CHECK_MERGE_REMOVE_EMPTY, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 5, 249, 120, 10
     ICON            IDI_ICON_INFO,IDC_MERGE_REMOVE_INFO,130,250,15,10,SS_NOTIFY
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

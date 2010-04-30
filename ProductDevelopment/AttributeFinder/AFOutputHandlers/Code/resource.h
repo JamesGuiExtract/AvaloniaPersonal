@@ -125,6 +125,7 @@
 #define IDC_BTN_SELECT_DOC_TAG          251
 #define IDC_GRID                        260
 #define IDC_PICTURE                     261
+#define IDC_CLUE_DYNAMIC_LIST_HELP      283
 #define IDC_BTN_BROWSE_FILE             303
 #define IDC_NAME_FORMAT_INFO            303
 #define IDC_EDIT_FILENAME               304

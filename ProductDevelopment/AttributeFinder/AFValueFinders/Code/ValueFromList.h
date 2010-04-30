@@ -6,6 +6,8 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 #include "..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCategories.h"
 
+#include <CachedListLoader.h>
+
 /////////////////////////////////////////////////////////////////////////////
 // CValueFromList
 class ATL_NO_VTABLE CValueFromList : 
@@ -99,6 +101,9 @@ private:
 	/////////////
 	IVariantVectorPtr m_ipValueList;
 	bool m_bCaseSensitive;
+
+	// Cached list loader object to read values from files
+	CCachedListLoader m_cachedListLoader;
 
 	// whether the current object is modified
 	bool m_bDirty;

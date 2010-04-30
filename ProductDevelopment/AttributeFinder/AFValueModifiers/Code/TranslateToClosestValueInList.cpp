@@ -90,9 +90,14 @@ STDMETHODIMP CTranslateToClosestValueInList::raw_ModifyValue(IAttribute* pAttrib
 
 		LevenshteinDistance editDistance;
 		editDistance.SetFlags(false, m_bCaseSensitive);
+
+		// Get a list of values that includes values from any specified files.
+		IVariantVectorPtr ipExpandedValuesList =
+				m_cachedListLoader.expandList(m_ipClosestValuesList, pOriginInput);
+			ASSERT_RESOURCE_ALLOCATION("ELI30069", ipExpandedValuesList != NULL)
 		
 		string strInput = asString(ipInputText->String);
-		string strToMatch = getIthMatchValue(0);
+		string strToMatch = asString(ipExpandedValuesList->GetItem(0).bstrVal);
 		double dLeastDifference = editDistance.GetPercent(strInput, strToMatch);
 		string strWithLeastDifference(strToMatch);
 
@@ -100,11 +105,11 @@ STDMETHODIMP CTranslateToClosestValueInList::raw_ModifyValue(IAttribute* pAttrib
 		if (dLeastDifference != 0)
 		{
 			// Iterate through all available values
-			long nSize = m_ipClosestValuesList->Size;
+			long nSize = ipExpandedValuesList->Size;
 			
 			for (long n=1; n<nSize; n++)
 			{
-				strToMatch = getIthMatchValue(n);
+				strToMatch = asString(ipExpandedValuesList->GetItem(n).bstrVal);
 
 				// Get the edit distance
 				double dPercentDifference = editDistance.GetPercent(strInput, strToMatch);
@@ -597,12 +602,6 @@ STDMETHODIMP CTranslateToClosestValueInList::GetSizeMax(ULARGE_INTEGER *pcbSize)
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
-//-------------------------------------------------------------------------------------------------
-string CTranslateToClosestValueInList::getIthMatchValue(int i)
-{
-	_variant_t value = m_ipClosestValuesList->GetItem(i);
-	return asString(value.bstrVal);
-}
 //-------------------------------------------------------------------------------------------------
 void CTranslateToClosestValueInList::validateLicense()
 {

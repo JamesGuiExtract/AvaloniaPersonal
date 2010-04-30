@@ -6,7 +6,8 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 #include "..\..\AFCore\Code\StringLoader.h"
 
-#include <CachedObjectFromFile.h>
+#include <CachedListLoader.h>
+
 #include <map>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -233,9 +234,8 @@ private:
 	// since the last save-to-stream operation
 	bool m_bDirty;
 
-	// This array of CachedObjectFromFile objects will used to read
-	// the clue list from file
-	CachedObjectFromFile<IVariantVectorPtr, StringLoader> m_cachedClue[4];
+	// Cached list loader object to read clues from files
+	CCachedListLoader m_cachedListLoader;
 
 	IMiscUtilsPtr m_ipMisc;
 
@@ -337,9 +337,6 @@ private:
 	// When there is a file name inside the list box as a clue, it will be replaced by the real clues inside this file. 
 	// This file name will be covered after processing is finished.
 	void recoverClueList(IVariantVectorPtr *ppvecClues);
-
-	// Return the string that will be replaced
-	IVariantVectorPtr getClueList(std::string strFile, const int iIndex);
 
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Combine the specified vector of image regions into a single spatial string.

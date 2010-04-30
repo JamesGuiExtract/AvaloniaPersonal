@@ -1978,50 +1978,9 @@ IVariantVectorPtr CBoxFinder::getExpandedClueList(IAFDocumentPtr ipAFDoc)
 {
 	ASSERT_ARGUMENT("ELI20220", ipAFDoc != NULL);
 
-	IVariantVectorPtr ipExpandedList(CLSID_VariantVector);
+	// Get a list of values that includes values from any specified files.
+	IVariantVectorPtr ipExpandedList = m_cachedListLoader.expandList(m_ipClues, ipAFDoc);
 	ASSERT_RESOURCE_ALLOCATION("ELI20217", ipExpandedList != NULL);
-
-	// Create a misc utils object to load specified files
-	IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI20216", ipMiscUtils != NULL);
-
-	int nNumClues = m_ipClues->Size;
-	for (int i = 0; i < nNumClues; i++)
-	{
-		_bstr_t bstrEntry = _bstr_t(m_ipClues->Item[i]);
-
-		// Remove the header of the string if it is a file name,
-		// return the original string if it is not a file name
-		_bstr_t bstrAfterRemoveHeader = ipMiscUtils->GetFileNameWithoutHeader(bstrEntry);
-
-		// Compare the new string with the original string
-		if (bstrAfterRemoveHeader == bstrEntry)
-		{
-			// Not a file; add this entry to the expanded clue list as is
-			ipExpandedList->PushBack(bstrEntry);
-		}
-		else
-		{
-			string strAfterRemoveHeader = asString(bstrAfterRemoveHeader);
-
-			// Define a tag manager object to expand tags
-			AFTagManager tagMgr;
-			// Expand tags and functions in the file name
-			strAfterRemoveHeader = tagMgr.expandTagsAndFunctions(strAfterRemoveHeader, ipAFDoc);
-
-			// Perform any appropriate auto-encrypt actions on the input file
-			ipMiscUtils->AutoEncryptFile(get_bstr_t(strAfterRemoveHeader.c_str()),
-				get_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
-
-			// Load clues from the specified file
-			m_cachedStringLoader.loadObjectFromFile(strAfterRemoveHeader);
-			IVariantVectorPtr ipFileClues = m_cachedStringLoader.m_obj;
-			ASSERT_RESOURCE_ALLOCATION("ELI20219", ipFileClues != NULL);
-
-			// Add the loaded clues to the expanded clue list
-			ipExpandedList->Append(ipFileClues);
-		}
-	}
 
 	return ipExpandedList;
 }

@@ -82,6 +82,11 @@ STDMETHODIMP CRemoveEntriesFromList::raw_ProcessOutput(IIUnknownVector* pAttribu
 		IIUnknownVectorPtr ipReturnAttributes(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI06770", ipReturnAttributes != NULL);
 
+		// Get a list of values that includes values from any specified files.
+		IVariantVectorPtr ipExpandedEntriesList =
+			m_cachedListLoader.expandList(m_ipEntriesList, pAFDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI30064", ipExpandedEntriesList != NULL);
+
 		// go through all attributes and valid them
 		long nSize = ipOrignAttributes->Size();
 		for (long n=0; n<nSize; n++)
@@ -97,9 +102,10 @@ STDMETHODIMP CRemoveEntriesFromList::raw_ProcessOutput(IIUnknownVector* pAttribu
 			// if the attribute value is one of the entries
 			// in the list, do not add it to the return list
 			string strFoundValue = ipValue->String;
-			for (long m = 0; m < m_ipEntriesList->Size; m++)
+			long nSize = ipExpandedEntriesList->Size;
+			for (long m = 0; m < nSize; m++)
 			{
-				string strEntryToBeRemoved = asString(_bstr_t(m_ipEntriesList->GetItem(m)));
+				string strEntryToBeRemoved = asString(_bstr_t(ipExpandedEntriesList->GetItem(m)));
 				if (!m_bCaseSensitive)
 				{
 					::makeUpperCase(strFoundValue);

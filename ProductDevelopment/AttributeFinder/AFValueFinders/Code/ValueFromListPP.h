@@ -4,6 +4,8 @@
 
 #include "resource.h"       // main symbols
 
+#include <XInfoTip.h>
+
 EXTERN_C const CLSID CLSID_ValueFromListPP;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -42,6 +44,7 @@ BEGIN_MSG_MAP(CValueFromListPP)
 	COMMAND_HANDLER(IDC_BTN_MODIFY_VALUE_IN_LIST, BN_CLICKED, OnClickedBtnModifyValueInList)
 	COMMAND_HANDLER(IDC_BTN_REMOVE_VALUE_FROM_LIST, BN_CLICKED, OnClickedBtnRemoveValueFromList)
 	COMMAND_HANDLER(IDC_CHK_CASE_FROM_LIST, BN_CLICKED, OnClickedChkCaseValueFromList)
+	COMMAND_HANDLER(IDC_CLUE_DYNAMIC_LIST_HELP, STN_CLICKED, OnClickedClueDynamicListInfo)
 END_MSG_MAP()
 // Handler prototypes:
 //  LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -65,12 +68,14 @@ END_MSG_MAP()
 	LRESULT OnDblClkList(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 	LRESULT OnKeyDownList(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 	LRESULT OnListItemChanged(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
+	LRESULT OnClickedClueDynamicListInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	/////////////
 	// Variables
 	/////////////
 	UCLID_AFVALUEFINDERSLib::IValueFromListPtr m_ipInternalObject;
+	CXInfoTip m_infoTip;
 
 	//////////
 	// Methods

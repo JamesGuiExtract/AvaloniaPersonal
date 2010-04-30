@@ -795,11 +795,13 @@ LRESULT CLocateImageRegionPP::OnClickedClueDynamicListInfo(WORD wNotifyCode, WOR
 	{
 		// show tooltip info
 		CString zText("- Dynamically loading a string list from a file is supported.\n"
-					  "- For example, if the first row in the list box is\n"
-					  "  file://D:\\list.txt, the contents of the file will be loaded\n" 
-					  "  dynamically at run time.\n\n"
-					  "- The string should begin with \"file://\" and should be\n"
-					  "  the only entry in the list box.\n");
+					  "- To specify a dynamic file, an entry must begin with \"file://\".\n"
+					  "- A file may be specified in combination with static entries or\n"
+					  "  additional dynamic lists.\n"
+					  "- Path tags such as <RSDFileDir> and <ComponentDataDir> may be used.\n"
+					  "- For example, if an entry in the list is file://<RSDFileDir>\\list.txt,\n"
+					  "  the entry will be replaced dynamically at runtime with the contents\n"
+					  "  of the file.\n");
 		m_infoTip.Show(zText);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14602");
@@ -1490,20 +1492,6 @@ void CLocateImageRegionPP::updateListButtons()
 	m_btnUp.EnableWindow(FALSE);
 	m_btnDown.EnableWindow(FALSE);
 
-	// If the string in the first row and first column of the list box is a valid file name
-	// and if the string in the first row and first column of the list box doesn't contain only the header
-	if (isFirstEntryDynamicFile(m_listClues, m_strFileHeader.c_str()))
-	{
-		// Disable the Add and Save List button
-		m_btnAdd.EnableWindow(FALSE);
-		m_btnSaveList.EnableWindow(FALSE);
-	}
-	else
-	{
-		// Enable the Add and Save List button
-		m_btnAdd.EnableWindow(TRUE);
-		m_btnSaveList.EnableWindow(TRUE);
-	}	
 	// get current selected item index
 	int nSelectedItemIndex = m_listClues.GetNextItem(-1, LVNI_ALL | LVNI_SELECTED);
 	int nSelCount = m_listClues.GetSelectedCount();

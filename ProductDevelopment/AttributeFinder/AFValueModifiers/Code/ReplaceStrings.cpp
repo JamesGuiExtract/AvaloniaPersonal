@@ -37,8 +37,6 @@ CReplaceStrings::CReplaceStrings()
 
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
 		ASSERT_RESOURCE_ALLOCATION("ELI13085", m_ipMiscUtils != NULL );
-
-		m_cachedStringListLoader.m_obj == NULL;
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI06629")
 }
@@ -701,124 +699,11 @@ void CReplaceStrings::modifyValue(ISpatialString* pText, IAFDocument* pDocument,
 	ISpatialStringPtr ipInputText(pText);
 	ASSERT_RESOURCE_ALLOCATION( "ELI09305", ipInputText != NULL );
 
-	// Get the string key value pair in the first row of the list box
-	IStringPairPtr ipKeyValuePair(m_ipReplaceInfos->At(0));
-	ASSERT_RESOURCE_ALLOCATION("ELI14557", ipKeyValuePair != NULL);
-	
-	//Define an IMiscUtilsPtr object used to get string from file
-	IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI14558", ipMiscUtils != NULL );
+	IIUnknownVectorPtr ipExpandedReplaceList = m_cachedListLoader.expandTwoColumnList(
+		m_ipReplaceInfos, ';', ipAFDoc);
+	ASSERT_RESOURCE_ALLOCATION("ELI30068", ipExpandedReplaceList != NULL);
 
-	// Remove the header of the string if it is a file name,
-	// return the original string if it is not a file name
-	_bstr_t bstrFirstEntry = ipKeyValuePair->StringKey;
-	_bstr_t bstrAfterRemoveHeader = ipMiscUtils->GetFileNameWithoutHeader(bstrFirstEntry);
-
-	// Expand tags only happens when the string is a file name
-	// if it is not, all tags will be treated as common strings [P16: 2118]
-
-	// Compare the new string with the original string
-	// If different, which means the header has been removed, we should
-	// try to load string pairs from the file
-	if (bstrAfterRemoveHeader != bstrFirstEntry)
-	{
-		string strFileNameWithDelimiter = asString(bstrAfterRemoveHeader);
-
-		// Define a tag manager object to expand tags
-		AFTagManager tagMgr;
-		// Expand tags and functions in the file name
-		strFileNameWithDelimiter = tagMgr.expandTagsAndFunctions(strFileNameWithDelimiter, ipAFDoc);
-
-		// Get the position of the first ";"
-		int nIndexEndFileName = strFileNameWithDelimiter.find_first_of(';');
-		if (nIndexEndFileName < 0)
-		{
-			UCLIDException uclidException("ELI14567", "The delimiter and the file name should be separated by ';'.");
-			uclidException.addDebugInfo("Separator", ";");
-			throw uclidException;
-		}
-
-		// Remove the delimiter and return the real file name
-		string strFileName = strFileNameWithDelimiter.substr(0, nIndexEndFileName);
-		strFileName = trim(strFileName, "", " ");
-
-		// Get the delimiter string
-		string strDelimiter = strFileNameWithDelimiter.substr(nIndexEndFileName + 1, string::npos);
-		strDelimiter = trim(strDelimiter, " ", "");
-
-		// Check if the delimiter is more than one character
-		if (strDelimiter.length() != 1)
-		{
-			UCLIDException uclidException("ELI14569", "Delimiter shall be one character long.");
-			uclidException.addDebugInfo("Delimiter", strDelimiter);
-			throw uclidException;
-		}
-
-		if (m_cachedStringListLoader.m_obj == NULL)
-		{
-			m_cachedStringListLoader.m_obj.CreateInstance(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI14627", m_cachedStringListLoader.m_obj != NULL );
-		}
-
-		// perform any appropriate auto-encrypt actions on the clue list file
-		ipMiscUtils->AutoEncryptFile(get_bstr_t(strFileName.c_str()),
-			get_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
-
-		// If the header has been removed, call getStringList() to load the strings inside the file
-		IVariantVectorPtr ipDynamicRepInfo = getStringList(strFileName);
-		ASSERT_RESOURCE_ALLOCATION("ELI14629", ipDynamicRepInfo != NULL );
-
-		// Create IIUnknownVectorPtr object to put string pairs
-		UCLID_COMUTILSLib::IIUnknownVectorPtr ipDynamicVector(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI14566", ipDynamicVector != NULL);
-
-		// Create a tokenizer
-		StringTokenizer tokenizer(strDelimiter[0]);
-
-		for (int i = 0; i < ipDynamicRepInfo->Size; i++)
-		{
-			// Get one line of text of string
-			_bstr_t bstrLine = (ipDynamicRepInfo->Item[i]).bstrVal;
-			string strLine = bstrLine;
-
-			// Tokenize the line text
-			vector<string> vecTokens;
-			tokenizer.parse(strLine, vecTokens);
-
-			// If the size of the tokenized vector is not 2
-			if (vecTokens.size() != 2)
-			{
-				UCLIDException uclidException("ELI14570", "This line of text can not be parsed successfully with provided delimiter.");
-				uclidException.addDebugInfo("LineText", strLine);
-				uclidException.addDebugInfo("Delimiter", strDelimiter);
-				throw uclidException;
-			}
-			
-			// Create an IStringPairPtr object
-			UCLID_COMUTILSLib::IStringPairPtr ipReplacement(CLSID_StringPair);
-			ASSERT_RESOURCE_ALLOCATION("ELI14577", ipReplacement != NULL);
-
-			// Put the tokens into string pair object
-			ipReplacement->StringKey = get_bstr_t(vecTokens[0].c_str());
-			ipReplacement->StringValue = get_bstr_t(vecTokens[1].c_str());
-
-			// Push the string pair object into IUnknownVector
-			ipDynamicVector->PushBack(ipReplacement);
-		}
-		// If the return IUnknownVector is not empty, which means we have successfully read string pairs out of a file,
-		// just do the replacement using this IUnknownVector.
-		if (ipDynamicVector->Size() > 0)
-		{
-			 //Call replaceValue() method to do replacement
-			replaceValue(ipInputText, ipDynamicVector, pProgressStatus);
-		}
-	}
-	// If the string is not a file name, treated as a common string to do replacement
-	else
-	{
-		//Call replaceValue() method to do replacement
-		replaceValue(ipInputText, m_ipReplaceInfos, pProgressStatus);
-	}
+	replaceValue(ipInputText, ipExpandedReplaceList, pProgressStatus);
 }
 //-------------------------------------------------------------------------------------------------
 void CReplaceStrings::replaceValue(ISpatialStringPtr ipInputText, IIUnknownVectorPtr ipReplaceInfos, 
@@ -874,15 +759,6 @@ void CReplaceStrings::replaceValue(ISpatialStringPtr ipInputText, IIUnknownVecto
 	{
 		ipProgressStatus->CompleteCurrentItemGroup();
 	}
-}
-//-------------------------------------------------------------------------------------------------
-IVariantVectorPtr CReplaceStrings::getStringList(std::string strFile)
-{
-	// Call loadObjectFromFile() to load the string list from the file
-	m_cachedStringListLoader.loadObjectFromFile(strFile);
-
-	// Return IVariantVector which contains string list
-	return m_cachedStringListLoader.m_obj;
 }
 //-------------------------------------------------------------------------------------------------
 void CReplaceStrings::validateLicense()

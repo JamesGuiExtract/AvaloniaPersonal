@@ -30,15 +30,10 @@ const long gnMAXIMUM_DIMENSION_UPPER_LIMIT = 100;
 //-------------------------------------------------------------------------------------------------
 // CBoxFinderPP
 //-------------------------------------------------------------------------------------------------
-CBoxFinderPP::CBoxFinderPP() :
-	m_bUsingCluesFromFile(false)
+CBoxFinderPP::CBoxFinderPP()
 {
 	try
 	{
-		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI20323", m_ipMiscUtils != NULL);
-		
-		m_strFileHeader = m_ipMiscUtils->GetFileHeader();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI20335");
 }
@@ -47,7 +42,6 @@ CBoxFinderPP::~CBoxFinderPP()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19677");
 }
@@ -260,19 +254,10 @@ LRESULT CBoxFinderPP::OnBnClickedBtnAddClue(WORD wNotifyCode, WORD wID, HWND hWn
 	{
 		// Prompt user to enter a new clue
 		CString zClue;
-		bool bSuccess = promptForValue(zClue, m_listClues, m_strFileHeader.c_str(), -1);
+		bool bSuccess = promptForValue(zClue, m_listClues, "", -1);
 
 		if (bSuccess)
 		{
-			// [P16:2878] For consistency with other rules that support loading from files, the BoxFinder will
-			// now prevent clues from a file to be used in combination with other clues. [P16:2881] has been 
-			// added to change this behavior for all rules by allowing files to be specified in combination 
-			// with additional entries and/or files. At that time, this code can be removed.
-			if (isClueLoadingFromFile((char *)(LPCTSTR) zClue))
-			{
-				m_bUsingCluesFromFile = true;
-			}
-
 			int nTotal = m_listClues.GetItemCount();
 				
 			// new item index
@@ -321,24 +306,9 @@ LRESULT CBoxFinderPP::OnBnClickedBtnModifyClue(WORD wNotifyCode, WORD wID, HWND 
 
 		// Prompt user to modify the current value
 		CString zEnt(pszValue);
-		bool bSuccess = promptForValue(zEnt, m_listClues, m_strFileHeader.c_str(), -1);
+		bool bSuccess = promptForValue(zEnt, m_listClues, "", -1);
 		if (bSuccess)
 		{
-			// [P16:2878] For consistency with other rules that support loading from files, the BoxFinder will
-			// now prevent clues from a file to be used in combination with other clues. [P16:2881] has been 
-			// added to change this behavior for all rules by allowing files to be specified in combination 
-			// with additional entries and/or files. At that time, this code can be removed.
-			if (isClueLoadingFromFile((char *)(LPCTSTR) zEnt))
-			{
-				m_bUsingCluesFromFile = true;
-			}
-			else if (m_bUsingCluesFromFile == true)
-			{
-				// Since all possibilities of having file added in combination with other entries
-				// have been blocked, we can assume this entry was the one that specified a file.
-				m_bUsingCluesFromFile = false;
-			}
-
 			// If the user OK'd the box, save the new value
 			m_listClues.DeleteItem(nSelectedItemIndex);
 			
@@ -374,14 +344,6 @@ LRESULT CBoxFinderPP::OnBnClickedBtnRemoveClue(WORD wNotifyCode, WORD wID, HWND 
 			{
 				// remove selected items
 				int nFirstItem = nItem;
-
-				// Added for [P16:2878]
-				if (m_bUsingCluesFromFile == true)
-				{
-					// Since all possibilities of having file added in combination with other entries
-					// have been blocked, we can assume this entry was the one that specified a file.
-					m_bUsingCluesFromFile = false;
-				}
 				
 				// delete any selected item since this list ctrl allows multiple selection
 				while(nItem != -1)
@@ -518,7 +480,7 @@ LRESULT CBoxFinderPP::OnDblclkListClues(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandl
 		{
 			OnBnClickedBtnModifyClue(0, 0, 0, bHandled);
 		}
-		else if (m_listClues.GetSelectedCount() == 0 && !m_bUsingCluesFromFile)
+		else if (m_listClues.GetSelectedCount() == 0)
 		{
 			OnBnClickedBtnAddClue(0, 0, 0, bHandled);
 		}
@@ -536,11 +498,13 @@ LRESULT CBoxFinderPP::OnClickedClueDynamicListInfo(WORD wNotifyCode, WORD wID, H
 	{
 		// show tooltip info
 		CString zText("- Dynamically loading a string list from a file is supported.\n"
-					  "- For example, if the first row in the list box is\n"
-					  "  file://D:\\list.txt, the contents of the file will be loaded\n" 
-					  "  dynamically at run time.\n\n"
-					  "- The string should begin with \"file://\" and should be\n"
-					  "  the only entry in the list box.\n");
+					  "- To specify a dynamic file, an entry must begin with \"file://\".\n"
+					  "- A file may be specified in combination with static entries or\n"
+					  "  additional dynamic lists.\n"
+					  "- Path tags such as <RSDFileDir> and <ComponentDataDir> may be used.\n"
+					  "- For example, if an entry in the list is file://<RSDFileDir>\\list.txt,\n"
+					  "  the entry will be replaced dynamically at runtime with the contents\n"
+					  "  of the file.\n");
 		m_infoTip.Show(zText);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI20215");
@@ -746,27 +710,6 @@ void CBoxFinderPP::initializeClueList(IVariantVectorPtr ipClues)
 		for (int n = 0; n < nSize; n++)
 		{
 			string strClue = asString(_bstr_t(ipClues->GetItem(n)));
-			
-			// [P16:2878] For consistency with other rules that support loading from files, the BoxFinder will
-			// now prevent clues from a file to be used in combination with other clues. [P16:2881] has been 
-			// added to change this behavior for all rules by allowing files to be specified in combination 
-			// with additional entries and/or files. At that time, this code can be removed.
-			if (isClueLoadingFromFile(strClue))
-			{
-				if (nSize > 1)
-				{
-					m_listClues.DeleteAllItems();
-
-					MessageBox("When reading clues from a file, the file is the only entry allowed "
-							   "in the clue list.  All clues have been removed except the first "
-							   "specified file.", "Invalid Configuration", MB_OK|MB_ICONWARNING);
-				}
-
-				m_listClues.InsertItem(0, strClue.c_str());
-
-				m_bUsingCluesFromFile = true;
-				break;
-			}
 
 			m_listClues.InsertItem(n, strClue.c_str());
 		}
@@ -966,7 +909,6 @@ void CBoxFinderPP::updateClueButtons()
 	// enable/disable up and down arrow key buttons appropriately
 	m_btnUp.EnableWindow(FALSE);
 	m_btnDown.EnableWindow(FALSE);
-	m_btnAdd.EnableWindow(asMFCBool(!m_bUsingCluesFromFile));
 
 	// get current selected item index
 	int nSelectedItemIndex = m_listClues.GetNextItem(-1, LVNI_ALL | LVNI_SELECTED);
@@ -1010,25 +952,6 @@ void CBoxFinderPP::updateClueButtons()
 				m_btnDown.EnableWindow(FALSE);
 			}
 		}
-	}
-}
-//-------------------------------------------------------------------------------------------------
-bool CBoxFinderPP::isClueLoadingFromFile(string strClue)
-{
-	_bstr_t bstrClue(strClue.c_str());
-
-	// Remove the header of the string if it is a file name,
-	// return the original string if it is not a file name
-	_bstr_t bstrAfterRemoveHeader = m_ipMiscUtils->GetFileNameWithoutHeader(bstrClue);
-
-	// Compare the new string with the original string
-	if (bstrAfterRemoveHeader == bstrClue)
-	{
-		return false;
-	}
-	else
-	{
-		return true;
 	}
 }
 //-------------------------------------------------------------------------------------------------

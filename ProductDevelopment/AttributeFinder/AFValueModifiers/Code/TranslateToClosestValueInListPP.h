@@ -4,6 +4,8 @@
 
 #include "resource.h"       // main symbols
 
+#include <XInfoTip.h>
+
 EXTERN_C const CLSID CLSID_TranslateToClosestValueInListPP;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -43,11 +45,8 @@ BEGIN_MSG_MAP(CTranslateToClosestValueInListPP)
 	MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 	COMMAND_HANDLER(IDC_CHK_FORCE, BN_CLICKED, OnClickedChkForceMatch)
 	COMMAND_HANDLER(IDC_BTN_SAVE_FILE_VALUES, BN_CLICKED, OnClickedBtnSaveFile)
+	COMMAND_HANDLER(IDC_CLUE_DYNAMIC_LIST_HELP, STN_CLICKED, OnClickedClueDynamicListInfo)
 END_MSG_MAP()
-// Handler prototypes:
-//  LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-//  LRESULT CommandHandler(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
-//  LRESULT NotifyHandler(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 
 // IPropertyPage
 	STDMETHOD(Apply)(void);
@@ -68,12 +67,14 @@ END_MSG_MAP()
 	LRESULT OnDblClkList(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 	LRESULT OnKeyDownList(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 	LRESULT OnListItemChanged(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
+	LRESULT OnClickedClueDynamicListInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	////////////
 	// Variables
 	////////////
 	UCLID_AFVALUEMODIFIERSLib::ITranslateToClosestValueInListPtr m_ipInternalValueList;
+	CXInfoTip m_infoTip;
 
 	///////////
 	// Methods

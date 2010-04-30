@@ -98,18 +98,22 @@ STDMETHODIMP CValueFromList::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus 
 			vector<int> vecPositions;
 			string strItem("");
 
+			// Get a list of values that includes values from any specified files.
+			IVariantVectorPtr ipExpandedList = m_cachedListLoader.expandList(m_ipValueList, ipAFDoc);
+			ASSERT_RESOURCE_ALLOCATION("ELI30066", ipExpandedList != NULL);
+
 			// Check each item in list
-			long nSize = m_ipValueList->Size;
+			long nSize = ipExpandedList->Size;
 			for (long n = 0; n < nSize; n++)
 			{
 				// Retrieve this list item
-				_bstr_t _bstrItem( m_ipValueList->GetItem( n ) );
-				strItem = string( _bstrItem );
-				if (strItem.empty())
+				_bstr_t _bstrItem( ipExpandedList->GetItem( n ) );
+				if (_bstrItem.length() == 0)
 				{
 					continue;
 				}
-	
+				string strItem = asString(_bstrItem);
+
 				// Change text to upper case if not case-sensitive
 				if (!m_bCaseSensitive)
 				{

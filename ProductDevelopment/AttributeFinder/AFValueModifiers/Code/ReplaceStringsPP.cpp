@@ -587,12 +587,14 @@ LRESULT CReplaceStringsPP::OnClickedClueDynamicListInfo(WORD /*wNotifyCode*/, WO
 	try
 	{
 		// show tooltip info
-		CString zText("- Dynamically loading a list of string pairs from a file is supported.\n"
-					  "- For example, if the first row in the list box is\n"
-					  "  file://D:\\list.txt;*, the contents of the file will be loaded\n" 
-					  "  dynamically at run time using * as a delimiter.\n\n"
-					  "- The string should begin with \"file://\" and should be \n"
-					  "  the only entry in the list box.\n");
+		CString zText("- Dynamically loading a string list from a file is supported.\n"
+					  "- To specify a dynamic file, an entry must begin with \"file://\".\n"
+					  "- A file may be specified in combination with static entries or\n"
+					  "  additional dynamic lists.\n"
+					  "- Path tags such as <RSDFileDir> and <ComponentDataDir> may be used.\n"
+					  "- For example, if an entry in the list is file://<RSDFileDir>\\list.txt,\n"
+					  "  the entry will be replaced dynamically at runtime with the contents\n"
+					  "  of the file.\n");
 		m_infoTip.Show(zText);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14604");
@@ -706,8 +708,8 @@ bool CReplaceStringsPP::promptForReplacements(CString& zEnt1, CString& zEnt2, in
 				AfxMessageBox("Please provide non-empty string to be replaced.");
 				continue;
 			}
-			
-			// Get the first m_iLengthOfHeader characters of the string
+
+			// Get the first length(m_strFileHeader) characters of the value
 			string strHeader((LPCTSTR)zEnt1.Left(m_strFileHeader.length()));
 			makeLowerCase(strHeader);
 
@@ -715,29 +717,6 @@ bool CReplaceStringsPP::promptForReplacements(CString& zEnt1, CString& zEnt2, in
 			// this string doesn't contain only the header, it will not be treated as a file name
 			if (strHeader == m_strFileHeader && zEnt1.CompareNoCase(m_strFileHeader.c_str()) != 0)
 			{
-				// We need to check if we can put a file name into the list box
-				// 1. If there is more than one items inside the list box
-				// 2. If there is only one item inside the list box but the user want to add a file name to the list
-				// we can not add a file name into list box in the above two cases
-				if (m_listReplacement.GetItemCount() > 1 || 
-					(m_listReplacement.GetItemCount() == 1 && nItemIndex == -1))
-				{
-					// Create prompt string
-					string strPrompt = "If a file name is specified for dynamically loading strings, \nit should be the only entry in the list box.\n\n Do you want to overwrite the existing entries with this file name?";
-
-					int iResult;
-					iResult = MessageBox(strPrompt.c_str(), "Confirm file selection", MB_YESNO|MB_ICONINFORMATION);
-					if (iResult == IDYES)
-					{
-						// Delete all items in the list box
-						m_listReplacement.DeleteAllItems();
-					}
-					else
-					{
-						continue;
-					}
-				}
-
 				// If there is a string specified in the second edit box (string to replace)
 				if (!zEnt2.IsEmpty())
 				{
@@ -850,21 +829,6 @@ void CReplaceStringsPP::updateUpAndDownButtons()
 //-------------------------------------------------------------------------------------------------
 void CReplaceStringsPP::updateButtons()
 {
-	// If the string in the first row and first column of the list box is a valid file name
-	// and if the string in the first row and first column of the list box doesn't contain only the header
-	if (isFirstEntryDynamicFile(m_listReplacement, m_strFileHeader.c_str()))
-	{
-		// Disable the Add and Save List button
-		m_btnAdd.EnableWindow(FALSE);
-		m_btnSaveFile.EnableWindow(FALSE);
-	}
-	else
-	{
-		// Enable the Add and Save List button
-		m_btnAdd.EnableWindow(TRUE);
-		m_btnSaveFile.EnableWindow(TRUE);
-	}
-
 	int nSelCount = m_listReplacement.GetSelectedCount();
 	int nCount = m_listReplacement.GetItemCount();
 	

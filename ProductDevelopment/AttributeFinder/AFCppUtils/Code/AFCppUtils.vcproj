@@ -54,7 +54,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\AFUtils\Code;..\..\..\..\ReusableComponents\BaseUtils\Code"
+				AdditionalIncludeDirectories="..\..\AFUtils\Code;..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\AFCore\Code"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;_AFXEXT;EXPORT_AFCPPUTILS_DLL"
 				StringPooling="true"
 				ExceptionHandling="2"
@@ -155,7 +155,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\AFUtils\Code;..\..\..\..\ReusableComponents\BaseUtils\Code"
+				AdditionalIncludeDirectories="..\..\AFUtils\Code;..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\AFCore\Code"
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;_AFXEXT;EXPORT_AFCPPUTILS_DLL"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -306,6 +306,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CachedListLoader.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
@@ -329,6 +333,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\..\AFCore\Code\StringLoader.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -344,6 +352,10 @@
 			</File>
 			<File
 				RelativePath=".\AttributeTester.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CachedListLoader.h"
 				>
 			</File>
 			<File

@@ -5,8 +5,7 @@
 #include "AFValueFinders.h"
 #include "..\..\AFCore\Code\AFCategories.h"
 
-#include <CachedObjectFromFile.h>
-#include <StringLoader.h>
+#include <CachedListLoader.h>
 
 #include <string>
 #include <vector>
@@ -180,8 +179,8 @@ private:
 	// The spatial string searcher is used to locate clues within boxes
 	ISpatialStringSearcherPtr m_ipSpatialStringSearcher;
 
-	// cached string loader object to read clues from files
-	CachedObjectFromFile<IVariantVectorPtr, StringLoader> m_cachedStringLoader;
+	// Cached list loader object to read clues from files
+	CCachedListLoader m_cachedListLoader;
 
 	/////////////////
 	// Methods
@@ -273,7 +272,7 @@ private:
 		ILongRectanglePtr ipClueBounds, bool bTextIsHorizontal);
 
 	// PROMISE: Returns a clues list with any instances of files from the clue list ("file://") 
-	// with the clues from that file in place of the file specifier
+	// with the clues from that file in place of the file specifier.
 	IVariantVectorPtr getExpandedClueList(IAFDocumentPtr ipAFDoc);
 
 	// PROMISE: Returns a vector of page numbers to search from the specified document text

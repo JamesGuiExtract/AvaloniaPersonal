@@ -45,8 +45,6 @@ CLocateImageRegion::CLocateImageRegion()
 			// default to the page edge
 			boundInfo.m_eCondition = kPage;
 			m_mapBoundaryToInfo[eRegionBoundary] = boundInfo;
-
-			m_cachedClue[n-1].m_obj = NULL;
 		}
 
 		m_mapBoundaryToInfo[kTop].m_eExpandDirection = kExpandUp;
@@ -1132,52 +1130,12 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 		IVariantVectorPtr ipClues = itClueLists->second.m_ipClues;
 		ASSERT_RESOURCE_ALLOCATION("ELI25235", ipClues != NULL);
 		ipCopy[i] = ipClues;
-
-		// Get the first entry inside the list box
-		_variant_t var = ipClues->Item[0];
-		_bstr_t bstrFirstEntry = var.bstrVal;
-
-		// Remove the header of the string if it is a file name,
-		// return the original string if it is not a file name
-		_bstr_t bstrAfterRemoveHeader = m_ipMisc->GetFileNameWithoutHeader(bstrFirstEntry);
-
-		// Expand tags only happens when the string is a file name
-		// if it is not, all tags will be treated as common strings [P16: 2118]
-
-		// Compare the new string with the original string
-		if (bstrAfterRemoveHeader != bstrFirstEntry)
-		{
-			string strAfterRemoveHeader = asString(bstrAfterRemoveHeader);
-
-			// Define a tag manager object to expand tags
-			AFTagManager tagMgr;
-			// Expand tags and functions in the file name
-			strAfterRemoveHeader = tagMgr.expandTagsAndFunctions(strAfterRemoveHeader, ipAFDoc);
-
-			// perform any appropriate auto-encrypt actions on the input file
-			m_ipMisc->AutoEncryptFile(get_bstr_t(strAfterRemoveHeader.c_str()),
-				get_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
-
-			if (m_cachedClue[i].m_obj == NULL)
-			{
-				m_cachedClue[i].m_obj.CreateInstance(CLSID_VariantVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI14615", m_cachedClue[i].m_obj != NULL );
-			}
-			// If the header has been removed, call getClueList() to load the strings inside the file
-			IVariantVectorPtr ipClueList = getClueList(strAfterRemoveHeader, i);
-			ASSERT_RESOURCE_ALLOCATION("ELI14589", ipClueList != NULL );
-
-			// If the return IVariantVector is not empty
-			if (ipClueList->Size > 0)
-			{
-				// Assign the new clues 
-				itClueLists->second.m_ipClues = ipClueList;
-			}
-		}
+		
+		// Get a list of values that includes values from any specified files.
+		itClueLists->second.m_ipClues = m_cachedListLoader.expandList(ipClues, ipAFDoc);
 	}
 
-	// Restore the clue lists to their original values 
-	// when clgClues goes out of scope.
+	// Restore the clue lists to their original values when clgClues goes out of scope.
 	ClueListGuard clgClues(this, ipCopy);
 
 	// The call to GetPages() requires a spatial string in kSpatialMode.
@@ -1904,15 +1862,6 @@ void CLocateImageRegion::recoverClueList(IVariantVectorPtr* ppvecClues)
 			itClueLists->second.m_ipClues = ppvecClues[i];
 		}
 	}
-}
-//-------------------------------------------------------------------------------------------------
-IVariantVectorPtr CLocateImageRegion::getClueList(std::string strFile, const int iIndex)
-{
-	// Call loadObjectFromFile() to load the string list from the file
-	m_cachedClue[iIndex].loadObjectFromFile(strFile);
-
-	// Return the IVariantVectorPtr object contains the list got from file
-	return m_cachedClue[iIndex].m_obj;
 }
 //-------------------------------------------------------------------------------------------------
 void CLocateImageRegion::validateLicense()

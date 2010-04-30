@@ -5,8 +5,9 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
-#include <string>
+#include <CachedListLoader.h>
 
+#include <string>
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -99,14 +100,14 @@ private:
 	bool m_bForceMatch;
 	IVariantVectorPtr m_ipClosestValuesList;
 
+	// Cached list loader object to read values from files
+	CCachedListLoader m_cachedListLoader;
+
 	bool m_bDirty;
 
 	//////////
 	// Methods
 	///////////
-
-	// Returns the value of the ith element in the closest values list
-	string getIthMatchValue(int i);
 
 	void validateLicense();
 };

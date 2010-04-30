@@ -146,6 +146,10 @@ LRESULT CRemoveEntriesFromListPP::OnInitDialog(UINT uMsg, WPARAM wParam,
 		// adjust the column width in case there is a vertical scrollbar now
 		m_listEntries.SetColumnWidth(0, rect.Width());
 
+		// Create and initialize the info tip control
+		m_infoTip.Create(CWnd::FromHandle(m_hWnd));
+		m_infoTip.SetShowDelay(0);
+
 		updateButtons();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06759");
@@ -400,6 +404,29 @@ LRESULT CRemoveEntriesFromListPP::OnDblclkList(int idCtrl, LPNMHDR pnmh, BOOL& b
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	return OnClickedBtnModify(pnmh->code, pnmh->idFrom, pnmh->hwndFrom, bHandled);
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CRemoveEntriesFromListPP::OnClickedClueDynamicListInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl,
+													   BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// show tooltip info
+		CString zText("- Dynamically loading a string list from a file is supported.\n"
+					  "- To specify a dynamic file, an entry must begin with \"file://\".\n"
+					  "- A file may be specified in combination with static entries or\n"
+					  "  additional dynamic lists.\n"
+					  "- Path tags such as <RSDFileDir> and <ComponentDataDir> may be used.\n"
+					  "- For example, if an entry in the list is file://<RSDFileDir>\\list.txt,\n"
+					  "  the entry will be replaced dynamically at runtime with the contents\n"
+					  "  of the file.\n");
+		m_infoTip.Show(zText);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30065");
+
+	return 0;
 }
 
 //-------------------------------------------------------------------------------------------------

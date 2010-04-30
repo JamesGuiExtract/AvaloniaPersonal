@@ -35,6 +35,13 @@ CTranslateValuePP::CTranslateValuePP()
 		m_dwTitleID = IDS_TITLETranslateValuePP;
 		m_dwHelpFileID = IDS_HELPFILETranslateValuePP;
 		m_dwDocStringID = IDS_DOCSTRINGTranslateValuePP;
+
+		// Create an IMiscUtilsPtr object
+		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI30074", ipMiscUtils != NULL );
+
+		// Get the file header string and its length from IMiscUtilsPtr object
+		m_strFileHeader = ipMiscUtils->GetFileHeader();
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI07722")
 }
@@ -78,8 +85,15 @@ STDMETHODIMP CTranslateValuePP::Apply(void)
 					_bstr_t bstrValue(ipPair->StringValue);
 					string strKey = asString(bstrKey);
 					string strValue = asString(bstrValue);
-					ipAttr->Type = bstrKey;
-					ipAttr->Type = bstrValue;
+
+					// If a dynamic list has not been supplied, check to see that the replacement
+					// value is permitted.
+					if (_stricmp(strKey.substr(0, m_strFileHeader.length()).c_str(), 
+								 m_strFileHeader.c_str()) != 0)
+					{
+						ipAttr->Type = bstrKey;
+						ipAttr->Type = bstrValue;
+					}
 				}
 			}
 			// copy all contents from internal object to the 
@@ -170,6 +184,9 @@ LRESULT CTranslateValuePP::OnInitDialog(UINT uMsg, WPARAM wParam,
 			}
 		}
 
+		// Create and initialize the info tip control
+		m_infoTip.Create(CWnd::FromHandle(m_hWnd));
+		m_infoTip.SetShowDelay(0);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19286");
 
@@ -499,6 +516,29 @@ LRESULT CTranslateValuePP::OnListItemChanged(int idCtrl, LPNMHDR pnmh, BOOL& bHa
 
 	return 0;
 }
+//-------------------------------------------------------------------------------------------------
+LRESULT CTranslateValuePP::OnClickedClueDynamicListInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl,
+														BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// show tooltip info
+		CString zText("- Dynamically loading a string list from a file is supported.\n"
+					  "- To specify a dynamic file, an entry must begin with \"file://\".\n"
+					  "- A file may be specified in combination with static entries or\n"
+					  "  additional dynamic lists.\n"
+					  "- Path tags such as <RSDFileDir> and <ComponentDataDir> may be used.\n"
+					  "- For example, if an entry in the list is file://<RSDFileDir>\\list.txt,\n"
+					  "  the entry will be replaced dynamically at runtime with the contents\n"
+					  "  of the file.\n");
+		m_infoTip.Show(zText);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30075");
+
+	return 0;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
@@ -632,7 +672,7 @@ bool CTranslateValuePP::promptForTranslations(CString& zEnt1, CString& zEnt2, in
 {
 	Prompt2Dlg promptDlg("Enter Translation String Pair",
 				"Specify string to be translated from : ", zEnt1,
-				"Specify string to be translated to : ", zEnt2);
+				"Specify string to be translated to : ", zEnt2, true, m_strFileHeader.c_str());
 
 	while (true)
 	{
@@ -642,6 +682,25 @@ bool CTranslateValuePP::promptForTranslations(CString& zEnt1, CString& zEnt2, in
 			// Retrieve the two strings
 			zEnt1 = promptDlg.m_zInput1;
 			zEnt2 = promptDlg.m_zInput2;
+
+			// Get the first length(m_strFileHeader) characters of the value
+			string strHeader((LPCTSTR)zEnt1.Left(m_strFileHeader.length()));
+			makeLowerCase(strHeader);
+
+			// If the string in the first edit box is a valid file name (has a valid header), and
+			// this string doesn't contain only the header, it will not be treated as a file name
+			if (strHeader == m_strFileHeader && zEnt1.CompareNoCase(m_strFileHeader.c_str()) != 0)
+			{
+				// If there is a string specified in the second edit box (string to replace)
+				if (!zEnt2.IsEmpty())
+				{
+					// Create prompt string
+					string strPrompt = "Since you have specified a dynamic file reference, the replacement string will be ignored.";
+					MessageBox(strPrompt.c_str(), "Confirm file selection", MB_OK|MB_ICONINFORMATION);
+					// Set the string to replace to empty string
+					zEnt2 = "";
+				}
+			}
 
 			// If translating type validate the type name
 			if (m_radioTranslateType.GetCheck() == BST_CHECKED)

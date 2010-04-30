@@ -5,6 +5,8 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <CachedListLoader.h>
+
 /////////////////////////////////////////////////////////////////////////////
 // CRemoveEntriesFromList
 class ATL_NO_VTABLE CRemoveEntriesFromList : 
@@ -91,7 +93,10 @@ private:
 	///////////////
 	bool m_bCaseSensitive;
 
-	IVariantVectorPtr	m_ipEntriesList;
+	IVariantVectorPtr m_ipEntriesList;
+
+	// Cached list loader object to read values from files
+	CCachedListLoader m_cachedListLoader;
 
 	bool m_bDirty;
 

@@ -4,7 +4,10 @@
 
 #include "resource.h"       // main symbols
 
+#include <XInfoTip.h>
+
 #include <string>
+using namespace std;
 
 EXTERN_C const CLSID CLSID_TranslateValuePP;
 
@@ -46,11 +49,8 @@ BEGIN_MSG_MAP(CTranslateValuePP)
 	NOTIFY_HANDLER(IDC_LIST_TRANS_VALUE, LVN_KEYDOWN, OnKeydownListTransValue)
 	NOTIFY_HANDLER(IDC_LIST_TRANS_VALUE, LVN_ITEMCHANGED, OnListItemChanged)
 	COMMAND_HANDLER(IDC_BTN_SAVE_TO_FILE, BN_CLICKED, OnClickedBtnSaveFile)
+	COMMAND_HANDLER(IDC_CLUE_DYNAMIC_LIST_HELP, STN_CLICKED, OnClickedClueDynamicListInfo)
 END_MSG_MAP()
-// Handler prototypes:
-//  LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-//  LRESULT CommandHandler(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
-//  LRESULT NotifyHandler(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 
 // IPropertyPage
 	STDMETHOD(Apply)(void);
@@ -71,6 +71,7 @@ END_MSG_MAP()
 	LRESULT OnKeydownListTransValue(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 	LRESULT OnListItemChanged(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 	LRESULT OnClickedBtnSaveFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedClueDynamicListInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	/////////////////
@@ -84,16 +85,21 @@ private:
 	ATLControls::CButton m_radioTranslateValue;
 	ATLControls::CButton m_radioTranslateType;
 
+	CXInfoTip m_infoTip;
+
+	// Contains the file header string got from MiscUtils
+	string m_strFileHeader;
+
 	////////////////
 	// Methods
 	///////////////
 	// check whether the string passed in already exists in the translate from column
 	// if does not exists, return -1, else return the index of the item
-	int existsTranslateFromString(const std::string& strTranslateFrom);
+	int existsTranslateFromString(const string& strTranslateFrom);
 	// store all items in the list into a map
 	bool saveAllTranslationPairsFromList();
 	// get item text based on its item index and the column index
-	std::string getItemText(int nIndex, int nColumnNum);
+	string getItemText(int nIndex, int nColumnNum);
 	// get vector of translations from TranslateValue object
 	// and populate the list view
 	void loadTranslations();

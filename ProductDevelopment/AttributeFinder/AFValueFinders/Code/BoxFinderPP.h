@@ -117,11 +117,6 @@ private:
 	ATLControls::CButton m_chkIncludeClueText;
 	ATLControls::CButton m_chkIncludeLines;
 
-	// Added for [P16:2878]  Can be removed when [P16:2881] is addressed.
-	IMiscUtilsPtr m_ipMiscUtils;
-	bool m_bUsingCluesFromFile;
-	string m_strFileHeader;
-
 	///////////
 	// Methods
 	///////////
@@ -148,10 +143,6 @@ private:
 
 	// Update the state of the clue buttons based on the items in the clue list
 	void updateClueButtons();
-
-	// Check to see if the specified clue is specifying a file to load.
-	// Added for [P16:2878]
-	bool isClueLoadingFromFile(string strClue);
 
 	void validateLicense();
 };

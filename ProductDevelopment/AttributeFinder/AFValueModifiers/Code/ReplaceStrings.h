@@ -6,7 +6,7 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 #include "..\..\AFCore\Code\StringLoader.h"
 
-#include <CachedObjectFromFile.h>
+#include <CachedListLoader.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CReplaceStrings
@@ -115,8 +115,8 @@ private:
 
 	bool m_bDirty;
 
-	// This object will used to read the string list inside the file
-	CachedObjectFromFile<IVariantVectorPtr, StringLoader> m_cachedStringListLoader;
+	// Cached list loader object to read values from files
+	CCachedListLoader m_cachedListLoader;
 
 	// progress status object
 	IProgressStatusPtr m_ipProgressStatus;
@@ -144,9 +144,6 @@ private:
 	// Local method to do the replacement of the string list
 	void	replaceValue(ISpatialStringPtr ipInputText, IIUnknownVectorPtr ipReplaceInfos, 
 		IProgressStatus* pProgressStatus);
-
-	// Return the string list that will be parsed to get pairs
-	IVariantVectorPtr getStringList(std::string strFile);
 
 	void validateLicense();
 };

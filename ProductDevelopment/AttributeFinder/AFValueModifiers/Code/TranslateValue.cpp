@@ -77,6 +77,9 @@ STDMETHODIMP CTranslateValue::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 		IAttributePtr	ipAttribute(pAttribute);
 		ASSERT_RESOURCE_ALLOCATION("ELI09295", ipAttribute != NULL );
 
+		IAFDocumentPtr ipAFDoc(pOriginInput);
+		ASSERT_RESOURCE_ALLOCATION("ELI30071", ipAFDoc != NULL);
+
 		ISpatialStringPtr ipInputText;
 		string strInputText;
 		if (m_eTranslateFieldType == kTranslateValue)
@@ -102,10 +105,15 @@ STDMETHODIMP CTranslateValue::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 				{
 					::makeUpperCase(strInputText);
 				}
-				long nSize = m_ipTranslationStringPairs->Size();
+				
+				IIUnknownVectorPtr ipExpandedTranslationPairs =
+					m_cachedListLoader.expandTwoColumnList(m_ipTranslationStringPairs, ';', ipAFDoc);
+				ASSERT_RESOURCE_ALLOCATION("ELI30072", ipExpandedTranslationPairs != NULL);
+
+				long nSize = ipExpandedTranslationPairs->Size();
 				for (long n=0; n<nSize; n++)
 				{
-					IStringPairPtr ipStringPair(m_ipTranslationStringPairs->At(n));
+					IStringPairPtr ipStringPair(ipExpandedTranslationPairs->At(n));
 					if (ipStringPair)
 					{
 						// get the string to be translated from
@@ -165,10 +173,14 @@ STDMETHODIMP CTranslateValue::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 						::makeUpperCase(strCmp);
 					}
 
-					long nSize = m_ipTranslationStringPairs->Size();
+					IIUnknownVectorPtr ipExpandedTranslationPairs =
+						m_cachedListLoader.expandTwoColumnList(m_ipTranslationStringPairs, ';', ipAFDoc);
+					ASSERT_RESOURCE_ALLOCATION("ELI30073", ipExpandedTranslationPairs != NULL);
+
+					long nSize = ipExpandedTranslationPairs->Size();
 					for (long n = 0; n < nSize; n++)
 					{
-						IStringPairPtr ipStringPair(m_ipTranslationStringPairs->At(n));
+						IStringPairPtr ipStringPair(ipExpandedTranslationPairs->At(n));
 						if (ipStringPair)
 						{
 							// get the string to be translated from

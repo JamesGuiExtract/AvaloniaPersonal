@@ -4,6 +4,8 @@
 
 #include "resource.h"       // main symbols
 
+#include <XInfoTip.h>
+
 EXTERN_C const CLSID CLSID_RemoveEntriesFromListPP;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -42,6 +44,7 @@ BEGIN_MSG_MAP(CRemoveEntriesFromListPP)
 	NOTIFY_HANDLER(IDC_LIST_ENTRIES, LVN_ITEMCHANGED, OnItemListChanged)
 	NOTIFY_HANDLER(IDC_LIST_ENTRIES, LVN_KEYDOWN, OnKeydownList)
 	NOTIFY_HANDLER(IDC_LIST_ENTRIES, NM_DBLCLK, OnDblclkList)
+	COMMAND_HANDLER(IDC_CLUE_DYNAMIC_LIST_HELP, STN_CLICKED, OnClickedClueDynamicListInfo)
 END_MSG_MAP()
 // Handler prototypes:
 //  LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -64,6 +67,7 @@ END_MSG_MAP()
 	LRESULT OnItemListChanged(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 	LRESULT OnKeydownList(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 	LRESULT OnDblclkList(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
+	LRESULT OnClickedClueDynamicListInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	////////////
@@ -71,6 +75,7 @@ private:
 	////////////
 	UCLID_AFOUTPUTHANDLERSLib::IRemoveEntriesFromListPtr m_ipInternalObject;
 	ATLControls::CListViewCtrl m_listEntries;
+	CXInfoTip m_infoTip;
 
 	//////////
 	// Methods

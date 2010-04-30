@@ -5,6 +5,8 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <CachedListLoader.h>
+
 #include <string>
 #include <map>
 
@@ -114,6 +116,9 @@ private:
 	bool m_bCaseSensitive;
 
 	ETranslateFieldType m_eTranslateFieldType;
+
+	// Cached list loader object to read values from files
+	CCachedListLoader m_cachedListLoader;
 
 	bool m_bDirty;
 };
