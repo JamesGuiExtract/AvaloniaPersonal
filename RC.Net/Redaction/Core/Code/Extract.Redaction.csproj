@@ -73,7 +73,6 @@
     <Compile Include="GeneralVerificationSettings.cs" />
     <Compile Include="IDShieldTesterSettings.cs" />
     <Compile Include="InitializationSettings.cs" />
-    <Compile Include="IntervalTimer.cs" />
     <Compile Include="MasterExemptionCodeList.cs" />
     <Compile Include="MetadataSettings.cs" />
     <Compile Include="MetadataSettingsDialog.cs">
@@ -97,7 +96,6 @@
       <DependentUpon>SurroundContextSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="SurroundContextTask.cs" />
-    <Compile Include="TimeInterval.cs" />
     <Compile Include="VerificationSettings.cs" />
   </ItemGroup>
   <ItemGroup>

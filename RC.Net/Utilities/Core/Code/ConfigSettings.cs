@@ -1,4 +1,5 @@
 using Extract;
+using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -125,6 +126,10 @@ namespace Extract.Utilities
         {
             try
             {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI30041", this.GetType().ToString());
+
                 // Create a new instance (will have the default settings)
                 _settings = new T();
 

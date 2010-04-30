@@ -1,3 +1,4 @@
+using Extract.Licensing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,6 +32,10 @@ namespace Extract.Utilities
         /// </param>
         protected PathTagsBase(IDictionary<string, string> tagsToValues)
         {
+            // Validate the license
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                "ELI30040", this.GetType().ToString());
+
             _tagsToValues = tagsToValues ?? new Dictionary<string, string>();
         }
 

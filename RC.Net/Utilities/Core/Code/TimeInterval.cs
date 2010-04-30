@@ -1,6 +1,6 @@
 using System;
 
-namespace Extract.Redaction
+namespace Extract.Utilities
 {
     /// <summary>
     /// Represents a start time and end time.

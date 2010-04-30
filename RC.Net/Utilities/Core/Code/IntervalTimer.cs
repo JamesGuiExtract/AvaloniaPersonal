@@ -1,8 +1,9 @@
+using Extract.Licensing;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Extract.Redaction
+namespace Extract.Utilities
 {
     /// <summary>
     /// Represents a timer that measures a <see cref="TimeInterval"/>.
@@ -10,6 +11,8 @@ namespace Extract.Redaction
     public class IntervalTimer
     {
         #region Fields
+
+        static readonly string _OBJECT_NAME = typeof(IntervalTimer).ToString();
 
         /// <summary>
         /// The last time that the <see cref="Start"/> method was called.
@@ -35,6 +38,10 @@ namespace Extract.Redaction
         [SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
         public static IntervalTimer StartNew()
         {
+            // Validate licensing
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                "ELI30039", _OBJECT_NAME);
+
             IntervalTimer timer = new IntervalTimer();
             timer.Start();
             return timer;

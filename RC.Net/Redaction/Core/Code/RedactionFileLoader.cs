@@ -1,5 +1,6 @@
 using Extract.AttributeFinder;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
