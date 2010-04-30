@@ -647,6 +647,10 @@ namespace Extract.Redaction.Verification
                 // Close current image before opening a new one. [FIDSC #3824]
                 _imageViewer.CloseImage();
 
+                // Clear the current memo when closing the image
+                // [FIDSC #4237]
+                _savedMemento = null;
+
                 // Successfully complete this file
                 OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSuccessful));
             }
@@ -693,7 +697,8 @@ namespace Extract.Redaction.Verification
             {
                 foreach (RedactionGridViewRow row in _redactionGridView.Rows)
                 {
-                    if (row.Exemptions.IsEmpty)
+                    // Only prompt for rows that are being redacted [FlexIDSCore #4223]
+                    if (row.Redacted && row.Exemptions.IsEmpty)
                     {
                         _redactionGridView.SelectOnly(row);
 
@@ -1447,9 +1452,12 @@ namespace Extract.Redaction.Verification
             if (_commentChanged && _fileDatabase != null)
             {
                 VerificationMemento memento = GetCurrentDocument();
-                string comment = _commentsTextBox.Text;
-                _fileDatabase.SetFileActionComment(memento.FileId, memento.ActionId, comment);
-                _commentChanged = false;
+                if (memento != null)
+                {
+                    string comment = _commentsTextBox.Text;
+                    _fileDatabase.SetFileActionComment(memento.FileId, memento.ActionId, comment);
+                    _commentChanged = false;
+                }
             }
         }
 
