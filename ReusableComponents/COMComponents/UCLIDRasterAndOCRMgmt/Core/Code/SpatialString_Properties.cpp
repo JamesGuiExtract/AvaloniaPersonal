@@ -372,7 +372,7 @@ STDMETHODIMP CSpatialString::GetParagraphs(IIUnknownVector **pvecParagraphs)
 	{
 		// TODO: This method should work for any type of string
 		// including non spatial strings, using double newlines or double \r\n as 
-		// paragraph seperators.
+		// paragraph separators.
 
 		ASSERT_ARGUMENT("ELI20660", pvecParagraphs != NULL);
 

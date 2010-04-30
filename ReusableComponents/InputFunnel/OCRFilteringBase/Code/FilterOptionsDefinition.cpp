@@ -296,10 +296,10 @@ void FilterOptionsDefinition::writeToFile(const string& strFODFileFullName)
 	for (unsigned int ui = 0; ui < vecChoiceIDs.size(); ui++)
 	{
 		string strChoiceID(vecChoiceIDs[ui]);
-		// choice id first, seperated by a pipe
+		// choice id first, separated by a pipe
 		strLine = strChoiceID + "|";
 		InputChoiceInfo* pChoiceInfo = getInputChoiceInfo(strChoiceID);
-		// description second, seperated by a pipe
+		// description second, separated by a pipe
 		strLine += pChoiceInfo->m_strDescription + "|";
 		// last the chars set
 		strLine += pChoiceInfo->m_strChars;

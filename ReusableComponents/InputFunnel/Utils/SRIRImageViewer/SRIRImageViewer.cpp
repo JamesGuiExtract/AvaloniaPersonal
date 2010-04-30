@@ -163,7 +163,7 @@ BOOL CSRIRImageViewerApp::InitInstance()
 		// C:\Program Files\My App\Temp.jpg
 		// is passed to our application
 		// To deal with this problem, we will try to put all the arguments
-		// together into a string, seperated with spaces.  If the resulting
+		// together into a string, separated with spaces.  If the resulting
 		// string is a valid filename, then lets assume that the surrounding
 		// quotes were omitted by the calling application.
 		

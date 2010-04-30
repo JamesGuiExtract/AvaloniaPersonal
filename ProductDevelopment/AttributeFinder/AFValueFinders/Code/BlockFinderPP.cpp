@@ -48,8 +48,8 @@ STDMETHODIMP CBlockFinderPP::Apply(void)
 			{
 				ipBlockFinder->DefineBlocksType = UCLID_AFVALUEFINDERSLib::kSeparatorString;
 				ipBlockFinder->InputAsOneBlock = m_chkAllIfNoSeparator.GetCheck() == BST_CHECKED ? VARIANT_TRUE : VARIANT_FALSE;
-				// get block seperator
-				if (!storeSeperator(ipBlockFinder))
+				// get block separator
+				if (!storeSeparator(ipBlockFinder))
 				{
 					return S_FALSE;
 				}
@@ -58,12 +58,12 @@ STDMETHODIMP CBlockFinderPP::Apply(void)
 			{
 				ipBlockFinder->DefineBlocksType = UCLID_AFVALUEFINDERSLib::kBeginAndEndString;
 				ipBlockFinder->PairBeginAndEnd = m_chkPairBeginEnd.GetCheck() == BST_CHECKED ? VARIANT_TRUE : VARIANT_FALSE;
-				// get block seperator
+				// get block separator
 				if (!storeBlockBegin(ipBlockFinder))
 				{
 					return S_FALSE;
 				}
-				// get block seperator
+				// get block separator
 				if (!storeBlockEnd(ipBlockFinder))
 				{
 					return S_FALSE;
@@ -182,30 +182,30 @@ LRESULT CBlockFinderPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			m_listClues.InsertColumn(0, "Dummy Header", LVCFMT_LEFT, rect.Width(), 0);
 
 			m_chkAllIfNoSeparator = GetDlgItem(IDC_CHK_INPUT_AS_BLOCK);
-			m_editSeparator = GetDlgItem(IDC_EDIT_SEPERATOR);
+			m_editSeparator = GetDlgItem(IDC_EDIT_SEPARATOR);
 
-			m_radioDefineSeparator = GetDlgItem(IDC_RADIO_DEFINE_BLOCKS_SEPERATOR);
+			m_radioDefineSeparator = GetDlgItem(IDC_RADIO_DEFINE_BLOCKS_SEPARATOR);
 			m_radioDefineBeginEnd = GetDlgItem(IDC_RADIO_DEFINE_BLOCKS_BEGINEND);
 			m_editBlockBegin = GetDlgItem(IDC_EDIT_BLOCK_BEGIN);
 			m_editBlockEnd = GetDlgItem(IDC_EDIT_BLOCK_END);
 			m_chkPairBeginEnd = GetDlgItem(IDC_CHK_PAIRBEGINEND);
 
-			// get the seperator
-			string strSeperator = asString(ipBlockFinder->BlockSeperator);
-			// convert the seperator to normal readable format for display purpose
-			::convertCppStringToNormalString(strSeperator);
-			m_editSeparator.SetWindowText(strSeperator.c_str());
+			// get the separator
+			string strSeparator = asString(ipBlockFinder->BlockSeparator);
+			// convert the separator to normal readable format for display purpose
+			::convertCppStringToNormalString(strSeparator);
+			m_editSeparator.SetWindowText(strSeparator.c_str());
 	
-			// if no block seperator is found, what to do?
+			// if no block separator is found, what to do?
 			m_chkAllIfNoSeparator.SetCheck(ipBlockFinder->InputAsOneBlock==VARIANT_TRUE ? BST_CHECKED : BST_UNCHECKED);
 
 			string strBlockBegin = asString(ipBlockFinder->BlockBegin);
-			// convert the seperator to normal readable format for display purpose
+			// convert the separator to normal readable format for display purpose
 			::convertCppStringToNormalString(strBlockBegin);
 			m_editBlockBegin.SetWindowText(strBlockBegin.c_str());
 
 			string strBlockEnd = asString(ipBlockFinder->BlockEnd);
-			// convert the seperator to normal readable format for display purpose
+			// convert the separator to normal readable format for display purpose
 			::convertCppStringToNormalString(strBlockEnd);
 			m_editBlockEnd.SetWindowText(strBlockEnd.c_str());
 
@@ -215,7 +215,7 @@ LRESULT CBlockFinderPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			if (ipBlockFinder->DefineBlocksType == UCLID_AFVALUEFINDERSLib::kSeparatorString)
 			{
 				BOOL bTmp;
-				OnClickedRadioDefineSeperator(0, 0, 0, bTmp);
+				OnClickedRadioDefineSeparator(0, 0, 0, bTmp);
 				m_radioDefineSeparator.SetCheck(1);
 			}
 			else if (ipBlockFinder->DefineBlocksType == UCLID_AFVALUEFINDERSLib::kBeginAndEndString)
@@ -464,7 +464,7 @@ LRESULT CBlockFinderPP::OnDblclkListClues(int idCtrl, LPNMHDR pnmh, BOOL& bHandl
 	return OnClickedBtnModify(pnmh->code, pnmh->idFrom, pnmh->hwndFrom, bHandled);
 }
 //-------------------------------------------------------------------------------------------------
-LRESULT CBlockFinderPP::OnClickedSeperatorInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+LRESULT CBlockFinderPP::OnClickedSeparatorInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -540,7 +540,7 @@ LRESULT CBlockFinderPP::OnClickedMaxCluesInfo(WORD wNotifyCode, WORD wID, HWND h
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
-LRESULT CBlockFinderPP::OnClickedRadioDefineSeperator(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+LRESULT CBlockFinderPP::OnClickedRadioDefineSeparator(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -578,18 +578,18 @@ LRESULT CBlockFinderPP::OnClickedRadioDefineBeginEnd(WORD wNotifyCode, WORD wID,
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-bool CBlockFinderPP::storeSeperator(UCLID_AFVALUEFINDERSLib::IBlockFinderPtr ipBlockFinder)
+bool CBlockFinderPP::storeSeparator(UCLID_AFVALUEFINDERSLib::IBlockFinderPtr ipBlockFinder)
 {
 	try
 	{
-		// get block seperator
-		CComBSTR bstrSeperators;
-		m_editSeparator.GetWindowText(&bstrSeperators);
-		string strSeperator = asString(bstrSeperators);
+		// get block separator
+		CComBSTR bstrSeparators;
+		m_editSeparator.GetWindowText(&bstrSeparators);
+		string strSeparator = asString(bstrSeparators);
 		// if user input some escape squence, convert them into cpp recognizable string
 		// ex. \\n -> \n, \\ -> \, etc.
-		::convertNormalStringToCppString(strSeperator);
-		ipBlockFinder->BlockSeperator = _bstr_t(strSeperator.c_str());
+		::convertNormalStringToCppString(strSeparator);
+		ipBlockFinder->BlockSeparator = _bstr_t(strSeparator.c_str());
 
 		return true;
 	}
@@ -603,7 +603,7 @@ bool CBlockFinderPP::storeBlockBegin(UCLID_AFVALUEFINDERSLib::IBlockFinderPtr ip
 {
 	try
 	{
-		// get block seperator
+		// get block separator
 		CComBSTR bstrBlockBegin;
 		m_editBlockBegin.GetWindowText(&bstrBlockBegin);
 		string strBlockBegin = asString(bstrBlockBegin);
@@ -625,7 +625,7 @@ bool CBlockFinderPP::storeBlockEnd(UCLID_AFVALUEFINDERSLib::IBlockFinderPtr ipBl
 {
 	try
 	{
-		// get block seperator
+		// get block separator
 		CComBSTR bstrBlockEnd;
 		m_editBlockEnd.GetWindowText(&bstrBlockEnd);
 		string strBlockEnd = asString(bstrBlockEnd);

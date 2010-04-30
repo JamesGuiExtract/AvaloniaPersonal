@@ -171,7 +171,7 @@ void INIFilePersistenceMgr::renameKey(const string& strFolderFullPath,
 string  INIFilePersistenceMgr::getSectionName(const std::string &strFolderFullPath)
 {
 	string strSectionName(strFolderFullPath);
-	// find last seperator, then get the string from there on
+	// find last separator, then get the string from there on
 	unsigned int uiPos = strSectionName.find_last_of("\\");
 	// if "\\" is the last charactor, remove it
 	if (uiPos == strSectionName.size() - 1)

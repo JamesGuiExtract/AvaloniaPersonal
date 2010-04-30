@@ -75,8 +75,8 @@ public:
 	STDMETHOD(put_FindAllBlocks)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_InputAsOneBlock)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_InputAsOneBlock)(/*[in]*/ VARIANT_BOOL newVal);
-	STDMETHOD(get_BlockSeperator)(/*[out, retval]*/ BSTR *pVal);
-	STDMETHOD(put_BlockSeperator)(/*[in]*/ BSTR newVal);
+	STDMETHOD(get_BlockSeparator)(/*[out, retval]*/ BSTR *pVal);
+	STDMETHOD(put_BlockSeparator)(/*[in]*/ BSTR newVal);
 	STDMETHOD(get_DefineBlocksType)(/*[out, retval]*/ EDefineBlocksType *pVal);
 	STDMETHOD(put_DefineBlocksType)(/*[in]*/ EDefineBlocksType newVal);
 	STDMETHOD(get_BlockBegin)(/*[out, retval]*/ BSTR *pVal);
@@ -133,8 +133,8 @@ private:
 	// since the last save-to-stream operation
 	bool m_bDirty;
 
-	std::string m_strBlockSeperator;
-	// If no seperator is found in the input text, whether or not
+	std::string m_strBlockSeparator;
+	// If no separator is found in the input text, whether or not
 	// the entire input text shall be treated as a block
 	bool m_bInputAsOneBlock;
 	// find all blocks or find those blocks that meet certain criteria

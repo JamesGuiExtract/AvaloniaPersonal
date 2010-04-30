@@ -458,7 +458,7 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 
 				// Temporary fix for [P16:2317]: Merge the string tags from the document copy into 
 				// the string tags for the orginal document.
-				// Long term solution should involve making a seperate hierarchical 
+				// Long term solution should involve making a separate hierarchical 
 				// <RuleTesterDebugInfo> tag proposed by Arvind
 				IStrToStrMapPtr ipStrMap = ipAFDoc->StringTags;
 				ASSERT_RESOURCE_ALLOCATION("ELI20203", ipStrMap != NULL);

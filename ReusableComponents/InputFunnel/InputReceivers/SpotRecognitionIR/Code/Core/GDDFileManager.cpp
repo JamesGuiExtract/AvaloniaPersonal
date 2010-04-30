@@ -161,7 +161,7 @@ map<string, string> GDDFileManager::getEntityAttributesFromString(const std::str
 		if (ui < 1 || ui > 2)
 		{
 			// string for each attribute consists two parts: name of the attribute, value.
-			// They are seperated by ":"
+			// They are separated by ":"
 			vector<string> vecValues;
 			StringTokenizer::sGetTokens(vecAttributes[ui], ':', vecValues);
 			// first item is the name for the attribute, second is the value
@@ -527,7 +527,7 @@ CString GDDFileManager::retrieveEntityData(unsigned long nEntityID)
 	long nColor = m_pSpotRecognitionDlg->m_UCLIDGenericDisplayCtrl.getEntityColor(nEntityID);
 	cstrToReturn.Format("%d.%d.%d,", GetRValue(nColor), GetGValue(nColor), GetBValue(nColor));
 	
-	// get the attribute string for each entity, each attribute is seperated by "\\n\\n" and "="
+	// get the attribute string for each entity, each attribute is separated by "\\n\\n" and "="
 	string strEntityAttributes(m_pSpotRecognitionDlg->m_UCLIDGenericDisplayCtrl.getEntityAttributes(nEntityID));
 	replaceVariable(strEntityAttributes, "\n\n", "/");
 	replaceVariable(strEntityAttributes, "=", ":");

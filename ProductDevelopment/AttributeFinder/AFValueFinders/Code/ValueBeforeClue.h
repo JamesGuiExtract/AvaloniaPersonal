@@ -109,7 +109,7 @@ private:
 
 	// If m_eRefiningType is up to x words
 	long m_nNumOfWords;
-	// If m_eRefiningType is up to x words, what are the punctuations that seperate
+	// If m_eRefiningType is up to x words, what are the punctuations that separate
 	// each word? By default, it is the space, tab and new line chars.
 	std::string m_strPunctuations;
 	// If m_eRefiningType is up to x words, if new line character is encountered,

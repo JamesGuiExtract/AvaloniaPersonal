@@ -492,7 +492,7 @@ void BooleanExpression::replaceFunctionsInExpression(string& strExpression,
 			//vec for storing all parameters parsed out from within the parenthesis
 			vector<string> vecParameters;
 			
-			//parameters are seperated by commas
+			//parameters are separated by commas
 			unsigned int uiCommaPos = strSub.find(",");
 			if (uiCommaPos != string::npos)
 			{

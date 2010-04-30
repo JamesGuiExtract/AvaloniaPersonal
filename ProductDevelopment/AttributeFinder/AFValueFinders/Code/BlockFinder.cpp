@@ -19,7 +19,7 @@ const unsigned long gnCurrentVersion = 2;
 // CBlockFinder
 //-------------------------------------------------------------------------------------------------
 CBlockFinder::CBlockFinder()
-: m_strBlockSeperator(""),
+: m_strBlockSeparator(""),
   m_bInputAsOneBlock(false),
   m_bFindAllBlocks(true),
   m_bIsClueRegularExpression(false),
@@ -176,7 +176,7 @@ STDMETHODIMP CBlockFinder::raw_IsConfigured(VARIANT_BOOL * pbValue)
 
 		if(m_eDefineBlocks == kSeparatorString)
 		{
-			if (m_strBlockSeperator.empty())
+			if (m_strBlockSeparator.empty())
 			{
 				bConfigured = false;
 			}
@@ -270,7 +270,7 @@ STDMETHODIMP CBlockFinder::raw_CopyFrom(IUnknown *pObject)
 		UCLID_AFVALUEFINDERSLib::IBlockFinderPtr ipSource(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI08244", ipSource != NULL);
 
-		m_strBlockSeperator = asString(ipSource->GetBlockSeperator());
+		m_strBlockSeparator = asString(ipSource->GetBlockSeparator());
 		m_bInputAsOneBlock = (ipSource->GetInputAsOneBlock() == VARIANT_TRUE) ? true : false;
 		m_bFindAllBlocks = (ipSource->GetFindAllBlocks() == VARIANT_TRUE) ? true : false;
 		m_bIsClueRegularExpression = (ipSource->GetIsClueRegularExpression()==VARIANT_TRUE) ? true : false;
@@ -344,7 +344,7 @@ STDMETHODIMP CBlockFinder::Load(IStream *pStream)
 		// Check license state
 		validateLicense();
 		
-		m_strBlockSeperator = "";
+		m_strBlockSeparator = "";
 		m_bInputAsOneBlock = false;
 		m_bFindAllBlocks = true;
 		m_bIsClueRegularExpression = false;
@@ -377,7 +377,7 @@ STDMETHODIMP CBlockFinder::Load(IStream *pStream)
 
 		if (nDataVersion >= 1)
 		{
-			dataReader >> m_strBlockSeperator;
+			dataReader >> m_strBlockSeparator;
 			dataReader >> m_bInputAsOneBlock;
 			dataReader >> m_bFindAllBlocks;
 			dataReader >> m_bIsClueRegularExpression;
@@ -428,7 +428,7 @@ STDMETHODIMP CBlockFinder::Save(IStream *pStream, BOOL fClearDirty)
 		ByteStreamManipulator dataWriter(ByteStreamManipulator::kWrite, data);
 
 		dataWriter << gnCurrentVersion;
-		dataWriter << m_strBlockSeperator;
+		dataWriter << m_strBlockSeparator;
 		dataWriter << m_bInputAsOneBlock;
 		dataWriter << m_bFindAllBlocks;
 		dataWriter << m_bIsClueRegularExpression;
@@ -476,7 +476,7 @@ STDMETHODIMP CBlockFinder::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IBlockFinder
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CBlockFinder::get_BlockSeperator(BSTR *pVal)
+STDMETHODIMP CBlockFinder::get_BlockSeparator(BSTR *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -484,14 +484,14 @@ STDMETHODIMP CBlockFinder::get_BlockSeperator(BSTR *pVal)
 	{
 		validateLicense();
 
-		*pVal = _bstr_t(m_strBlockSeperator.c_str()).copy();
+		*pVal = _bstr_t(m_strBlockSeparator.c_str()).copy();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05704");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CBlockFinder::put_BlockSeperator(BSTR newVal)
+STDMETHODIMP CBlockFinder::put_BlockSeparator(BSTR newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -508,7 +508,7 @@ STDMETHODIMP CBlockFinder::put_BlockSeperator(BSTR newVal)
 			throw ue;
 		}
 
-		m_strBlockSeperator = strSep;
+		m_strBlockSeparator = strSep;
 
 		m_bDirty = true;
 	}
@@ -1011,9 +1011,9 @@ IIUnknownVectorPtr CBlockFinder::getBlocksSeparator(ISpatialStringPtr ipSS)
 {
 	// Tokenize the string
 	IIUnknownVectorPtr	ipItems = ipSS->Tokenize( 
-		_bstr_t(m_strBlockSeperator.c_str()));
+		_bstr_t(m_strBlockSeparator.c_str()));
 
-	// if there's no seperator found and the entire input
+	// if there's no separator found and the entire input
 	// text shall not be treated as one block
 	if (ipItems->Size() == 0 && !m_bInputAsOneBlock)
 	{

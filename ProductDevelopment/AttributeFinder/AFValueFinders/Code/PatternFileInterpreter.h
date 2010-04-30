@@ -97,7 +97,7 @@ private:
 								  const std::string& strCurrentFileName);
 
 	// if a #ifdef is encountered, its following lines need to be
-	// treated seperately until its #endif is encountered
+	// treated separately until its #endif is encountered
 	// bSkipThisBlock - whether or not to skip this block
 	// Note: "this block" refers to the block text inside #ifdef - #else,
 	// #else - #endif or #ifdef - #endif

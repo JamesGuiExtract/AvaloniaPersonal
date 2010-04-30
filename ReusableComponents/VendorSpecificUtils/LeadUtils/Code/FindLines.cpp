@@ -412,7 +412,7 @@ void LeadToolsLineFinder::extendLines()
 		bool bModified = extendLine(*prectLine, -1);
 		bModified |= extendLine(*prectLine, 1);
 
-		// If the line was extended, add it to a seperate vector
+		// If the line was extended, add it to a separate vector
 		if (bModified)
 		{
 			vecExtendedLines.push_back(*prectLine);

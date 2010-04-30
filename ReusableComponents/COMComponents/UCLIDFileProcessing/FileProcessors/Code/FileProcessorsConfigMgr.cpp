@@ -58,7 +58,7 @@ void FileProcessorsConfigMgr::getOpenedSourceHistoryFromScope(std::vector<std::s
 	}
 	strList = m_pCfgMgr->getKeyValue(m_strCopyMoveDeleteFolderName, gstrOPENED_SOURCE_HISTORY);
 	
-	// each item in the list is seperated by a pipe (|) character, parse them
+	// each item in the list is separated by a pipe (|) character, parse them
 	StringTokenizer::sGetTokens(strList, "|", rvecHistory);
 }
 //-------------------------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ void FileProcessorsConfigMgr::getOpenedDestHistoryFromScope(std::vector<std::str
 	}
 	strList = m_pCfgMgr->getKeyValue(m_strCopyMoveDeleteFolderName, gstrOPENED_DEST_HISTORY);
 	
-	// each item in the list is seperated by a pipe (|) character, parse them
+	// each item in the list is separated by a pipe (|) character, parse them
 	StringTokenizer::sGetTokens(strList, "|", rvecHistory);
 }
 //-------------------------------------------------------------------------------------------------

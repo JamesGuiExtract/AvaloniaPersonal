@@ -55,7 +55,7 @@ STDMETHODIMP CSPMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		
 		setTestFileFolder( pParams, asString( strTCLFile ) );
 
-		// load the test data (treat as a seperate test case)
+		// load the test data (treat as a separate test case)
 		TestData td(m_strTestFilesFolder);
 
 		m_ipResultLogger->EndTestCase(VARIANT_TRUE); 

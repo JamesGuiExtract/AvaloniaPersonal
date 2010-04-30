@@ -554,7 +554,7 @@ STDMETHODIMP CMiscUtils::HandlePlugInObjectCommandButtonClick(IObjectWithDescrip
 		menu.InsertMenu(-1, uiConfigureObjectFlags, 
 			ID_MENU_CONFIGURE_OBJECT_DESCRIPTION, "Configure description...");
 
-		// add a seperator
+		// add a separator
 		menu.InsertMenu(-1, MF_BYPOSITION | MF_SEPARATOR, 0, "");
 
 		// add cancel option

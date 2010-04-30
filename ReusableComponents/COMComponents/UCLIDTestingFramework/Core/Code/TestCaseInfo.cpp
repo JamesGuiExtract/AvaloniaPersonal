@@ -67,7 +67,7 @@ istream& operator >> (istream& is, TestCaseInfo& testCaseInfo)
 	{
 		if (strTemp != "")
 		{
-			// ensure that the file contains exactly three fields seperated by commas
+			// ensure that the file contains exactly three fields separated by commas
 			vector<string> vecTokens;
 			StringTokenizer st;
 			st.parse(strTemp, vecTokens);

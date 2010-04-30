@@ -1150,7 +1150,7 @@ bool CStringPatternMatcher::findNextInstanceOfLiteralIgnoreMWS(
 				return false;
 			}
 
-			// there are multiple words seperated by spaces.
+			// there are multiple words separated by spaces.
 			// find each word, and then ignore all following whitespace chars
 			// and then search for the the next word and ensure that the next
 			// word immediately follows the last whitespace char.

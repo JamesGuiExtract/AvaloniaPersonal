@@ -42,11 +42,11 @@ BEGIN_MSG_MAP(CBlockFinderPP)
 	COMMAND_HANDLER(IDC_RADIO_FIND_ALL, BN_CLICKED, OnClickedRadioFindAll)
 	NOTIFY_HANDLER(IDC_LIST_CLUES, LVN_ITEMCHANGED, OnItemchangedListClues)
 	NOTIFY_HANDLER(IDC_LIST_CLUES, NM_DBLCLK, OnDblclkListClues)
-	COMMAND_HANDLER(IDC_BLOCK_SEPERATOR_HELP_BF, BN_CLICKED, OnClickedSeperatorInfo)
+	COMMAND_HANDLER(IDC_BLOCK_SEPARATOR_HELP_BF, BN_CLICKED, OnClickedSeparatorInfo)
 	COMMAND_HANDLER(IDC_CLUES_HELP_BF, BN_CLICKED, OnClickedCluesInfo)
 	COMMAND_HANDLER(IDC_PART_WORD_HELP_BF, BN_CLICKED, OnClickedWordPartInfo)
 	COMMAND_HANDLER(IDC_MAX_HELP_BF, BN_CLICKED, OnClickedMaxCluesInfo)
-	COMMAND_HANDLER(IDC_RADIO_DEFINE_BLOCKS_SEPERATOR, BN_CLICKED, OnClickedRadioDefineSeperator)
+	COMMAND_HANDLER(IDC_RADIO_DEFINE_BLOCKS_SEPARATOR, BN_CLICKED, OnClickedRadioDefineSeparator)
 	COMMAND_HANDLER(IDC_RADIO_DEFINE_BLOCKS_BEGINEND, BN_CLICKED, OnClickedRadioDefineBeginEnd)
 END_MSG_MAP()
 
@@ -70,19 +70,19 @@ END_MSG_MAP()
 	LRESULT OnClickedRadioFindAll(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnItemchangedListClues(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 	LRESULT OnDblclkListClues(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
-	LRESULT OnClickedSeperatorInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedSeparatorInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedCluesInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedWordPartInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedMaxCluesInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
-	LRESULT OnClickedRadioDefineSeperator(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedRadioDefineSeparator(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedRadioDefineBeginEnd(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	//////////////
 	// Methods
 	//////////////
-	bool storeSeperator(UCLID_AFVALUEFINDERSLib::IBlockFinderPtr ipBlockFinder);
+	bool storeSeparator(UCLID_AFVALUEFINDERSLib::IBlockFinderPtr ipBlockFinder);
 	bool storeMinNumber(UCLID_AFVALUEFINDERSLib::IBlockFinderPtr ipBlockFinder);
 
 	bool storeBlockBegin(UCLID_AFVALUEFINDERSLib::IBlockFinderPtr ipBlockFinder);

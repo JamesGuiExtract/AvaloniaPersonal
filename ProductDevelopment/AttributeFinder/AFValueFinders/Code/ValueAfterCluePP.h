@@ -60,7 +60,7 @@ BEGIN_MSG_MAP(CValueAfterCluePP)
 	COMMAND_HANDLER(IDC_EDIT_OTHER_STOP_AC, EN_CHANGE, OnChangeEditOtherStopsAC)
 	COMMAND_HANDLER(IDC_EDIT_STRING_SPEC_AC, EN_CHANGE, OnChangeEditSpecStringAC)
 	COMMAND_HANDLER(IDC_STOP_CHAR_HELP_VA, BN_CLICKED, OnClickedStopCharInfo)
-	COMMAND_HANDLER(IDC_SEPERATOR_HELP_VA, BN_CLICKED, OnClickedSeperateCharInfo)
+	COMMAND_HANDLER(IDC_SEPARATOR_HELP_VA, BN_CLICKED, OnClickedSeparateCharInfo)
 END_MSG_MAP()
 // Handler prototypes:
 //  LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -98,7 +98,7 @@ END_MSG_MAP()
 	LRESULT OnKeyDownList(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 	LRESULT OnListItemChanged(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 	LRESULT OnClickedStopCharInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
-	LRESULT OnClickedSeperateCharInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedSeparateCharInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	/////////////

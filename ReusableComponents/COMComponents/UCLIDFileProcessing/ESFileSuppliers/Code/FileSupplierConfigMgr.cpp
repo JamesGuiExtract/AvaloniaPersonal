@@ -59,7 +59,7 @@ vector<string> FileSupplierConfigMgr::getFileExtensionList()
 		strList = m_pCfgMgr->getKeyValue(m_strSectionFolderName, gstrFILE_EXTENSION_LIST);
 	}
 
-	// each item in the list is seperated by a pipe (|) character, parse them
+	// each item in the list is separated by a pipe (|) character, parse them
 	StringTokenizer::sGetTokens(strList, "|", vecExtList);
 
 	return vecExtList;
@@ -91,7 +91,7 @@ void FileSupplierConfigMgr::getOpenedFolderHistoryFromScope(std::vector<std::str
 	strList = m_pCfgMgr->getKeyValue(m_strSectionFolderName, gstrOPENED_FOLDER_HISTORY);
 	
 
-	// each item in the list is seperated by a pipe (|) character, parse them
+	// each item in the list is separated by a pipe (|) character, parse them
 	StringTokenizer::sGetTokens(strList, "|", rvecHistory);
 }
 //-------------------------------------------------------------------------------------------------

@@ -560,7 +560,7 @@ void CAFUtility::getQueryPatterns(string strQuery,
 	}
 	
 	// tokenize the query into individual parts which
-	// are seperated by slashes
+	// are separated by slashes
 	vector<string> vecTokens;
 	StringTokenizer st('/');
 	st.parse(strQuery, vecTokens);
@@ -647,7 +647,7 @@ IIUnknownVectorPtr CAFUtility::getCandidateAttributes(const IIUnknownVectorPtr& 
 
 		// if the query contains a pipe character then an OR query
 		// has been defined - in which case, get each of the OR'ed 
-		// parts as a seperate query in vecQueries
+		// parts as a separate query in vecQueries
 		vector<string> vecQueries;
 		StringTokenizer st('|');
 		st.parse(strMainQuery, vecQueries);

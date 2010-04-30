@@ -1212,7 +1212,7 @@ library UCLID_RASTERANDOCRMGMTLib
 		// REQUIRE: strPageNumbers must not be empty.
 		// ARG:		strPageNumbers - a string containing specified page numbers. Valid 
 		//			format: single page (eg. 2, 5), a range of pages (eg. 3-9), last X number 
-		//			of pages (eg. -3). They are seperated by comma(,).
+		//			of pages (eg. -3). They are separated by comma(,).
 		//			pProgressStatus - a pointer to a valid ProgressStatus object or NULL. If it is
 		//          set to NULL, no progress updates will be available, otherwise it will be updated.
 		[id(2), helpstring("method RecognizeTextInImage2")] HRESULT RecognizeTextInImage2(

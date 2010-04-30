@@ -20,7 +20,7 @@
 //		o Normal control tooltips
 //
 //		The tip window can display an icon and multi-line
-//		tip text.  Seperate multiple text lines with a '\n'.
+//		tip text.  Separate multiple text lines with a '\n'.
 //		The tip window's colors are derrived from
 //		system window, window text, and scroll bar colors.
 //

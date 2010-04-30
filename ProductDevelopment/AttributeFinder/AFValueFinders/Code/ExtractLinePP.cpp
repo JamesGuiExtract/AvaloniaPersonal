@@ -213,7 +213,7 @@ LRESULT CExtractLinePP::OnClickedLineInfo(WORD wNotifyCode, WORD wID, HWND hWndC
 	{
 		// show tooltip info
 		CString zText("- For option 1 and 2, specify one or more line numbers\n"
-					  "  seperated by comma (,).\n\n"
+					  "  separated by comma (,).\n\n"
 					  "- A range of lines can be specified by using a hyphen (-).\n"
 					  "  For example, \"2,4,6,7-9\" means line 2, 4, 6 and line 7\n"
 					  "  through line 9 need to be extracted. \"3-1\" will \n"

@@ -269,7 +269,7 @@ STDMETHODIMP CValueBeforeClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatu
 								else
 								{
 									ipValue = ipValue->GetSubString(nStartWordPos, ipValue->Size-1);
-									// trim off any leading/trailing word seperator(s), such as space, etc.
+									// trim off any leading/trailing word separator(s), such as space, etc.
 									ipValue->Trim(_bstr_t(m_strPunctuations.c_str()), _bstr_t(m_strPunctuations.c_str()));
 								}
 							}

@@ -593,7 +593,7 @@ STDMETHODIMP CFolderFS::get_FileExtensions(BSTR *pVal )
 		ASSERT_ARGUMENT("ELI13772", pVal );
 
 		// form a string that contains user defined extensions 
-		// seperated by ;
+		// separated by ;
 		string strFileExtensions("");
 		for (unsigned int n = 0; n < m_vecFileExtensions.size(); n++)
 		{

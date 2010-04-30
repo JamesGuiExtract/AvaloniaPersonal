@@ -188,7 +188,7 @@ private:
 	//			A literal is defined as a string that needs to be found with 
 	//			optional word-boundary-required indicating characters at the 
 	//			beginning or end.
-	// REQUIRE: Literals in a literal or-list are required to be seperated by 
+	// REQUIRE: Literals in a literal or-list are required to be separated by 
 	//			the | (pipe) character.
 	//			There must be at least two literals in strLiteralOrList
 	// PROMISE:	To return the earliest position in m_strText beginning at nStartSearchPos

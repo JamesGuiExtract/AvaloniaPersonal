@@ -205,7 +205,7 @@ private:
 	// NOTE: This function does not throw exceptions. It will log any exceptions and return true;
 	bool stopSupplingIfDBNotConnected();
 
-	// thread procedure that executes each file supplier in a seperate thread
+	// thread procedure that executes each file supplier in a separate thread
 	static UINT CFileSupplyingMgmtRole::fileSupplyingThreadProc(void* pData);
 };
 //-------------------------------------------------------------------------------------------------

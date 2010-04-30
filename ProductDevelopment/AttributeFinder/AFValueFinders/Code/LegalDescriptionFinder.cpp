@@ -124,11 +124,11 @@ STDMETHODIMP CLegalDescriptionFinder::raw_ParseText(IAFDocument* pAFDoc, IProgre
 		string strInput = ipInputText->String;
 
 		// get the line break string (ex. \r\n\r\n, or \n\n, etc.) from input
-		string strSeperator = getLineBreakString(strInput);
-		// assume that the paragraph seperator has at least two line breaks
-		strSeperator = strSeperator + strSeperator;
-		// block seperator will be dependent on the input text
-		m_ipBlockFinder->BlockSeperator = _bstr_t(strSeperator.c_str());
+		string strSeparator = getLineBreakString(strInput);
+		// assume that the paragraph separator has at least two line breaks
+		strSeparator = strSeparator + strSeparator;
+		// block separator will be dependent on the input text
+		m_ipBlockFinder->BlockSeparator = _bstr_t(strSeparator.c_str());
 		
 		IIUnknownVectorPtr ipAttributes(NULL);
 

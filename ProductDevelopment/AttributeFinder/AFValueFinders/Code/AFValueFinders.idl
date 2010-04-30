@@ -288,7 +288,7 @@ library	UCLID_AFVALUEFINDERSLib
 		[propput, id(1), helpstring("property EachLineAsUniqueValue")] HRESULT EachLineAsUniqueValue([in] VARIANT_BOOL newVal);
 		// If EachLineAsUniqueValue is false, this property shall be used for storing
 		// all specific line numbers for extracting. This vector will contain line numbers in the format of string
-		// individual line numbers are seperated by comma(,). A range of lines will be in the format
+		// individual line numbers are separated by comma(,). A range of lines will be in the format
 		// of line#-line#, ex, 3-9, etc.
 		[propget, id(2), helpstring("property LineNumbers")] HRESULT LineNumbers([out, retval] BSTR *pVal);
 		[propput, id(2), helpstring("property LineNumbers")] HRESULT LineNumbers([in] BSTR newVal);
@@ -316,9 +316,9 @@ library	UCLID_AFVALUEFINDERSLib
 	]
 	interface IBlockFinder : IDispatch
 	{
-		[propget, id(1), helpstring("property BlockSeperator")] HRESULT BlockSeperator([out, retval] BSTR *pVal);
-		[propput, id(1), helpstring("property BlockSeperator")] HRESULT BlockSeperator([in] BSTR newVal);
-		// If no seperator is found in the input text, whether the entire input text will be treated as a block
+		[propget, id(1), helpstring("property BlockSeparator")] HRESULT BlockSeparator([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property BlockSeparator")] HRESULT BlockSeparator([in] BSTR newVal);
+		// If no separator is found in the input text, whether the entire input text will be treated as a block
 		[propget, id(2), helpstring("property InputAsOneBlock")] HRESULT InputAsOneBlock([out, retval] VARIANT_BOOL *pVal);
 		[propput, id(2), helpstring("property InputAsOneBlock")] HRESULT InputAsOneBlock([in] VARIANT_BOOL newVal);
 		// true -- get all the blocks

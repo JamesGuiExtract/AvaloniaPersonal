@@ -7,7 +7,7 @@
 #include <l_bitmap.h>		// LeadTools Imaging library
 
 //-------------------------------------------------------------------------------------------------
-// PURPOSE: To extract a portion of an image as a seperate image file
+// PURPOSE: To extract a portion of an image as a separate image file
 // REQUIRE: hBitmap is the handle of an image currently loaded in memory by the
 //			LeadTools library
 //			All the "long" type arguments conform to UCLID's way of defining a

@@ -489,9 +489,10 @@ const std::string CCopyMoveDeleteFileProcessorPP::chooseFile(bool bIsSource)
 	const static string s_strAllFiles = "All Files (*.*)|*.*||";
 	string strFileExtension(s_strAllFiles);
 
-	// bring open file dialog
+	// bring open file dialog (if browse for source then require file to exist) [FlexIDSCore #4254]
 	CFileDialogEx fileDlg(TRUE, NULL, strDefFile.c_str(), 
-		OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		OFN_HIDEREADONLY | (bIsSource ? OFN_FILEMUSTEXIST : 0)
+		| OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 		s_strAllFiles.c_str(), CWnd::FromHandle(m_hWnd));
 	
 	// Pass the pointer of dialog to create ThreadFileDlg object

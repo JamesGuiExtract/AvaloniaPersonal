@@ -12,7 +12,7 @@ class EXPORT_BaseUtils StringTokenizer
 {
 public:
 	StringTokenizer();
-	// cDelimeter describes the seperator between the token characters.
+	// cDelimeter describes the separator between the token characters.
 	// If bInputTerminatedWith2Delimiters == true, then the input string
 	// is expected to be terminated with two cDelimeter characters.  If
 	// bInputTerminatedWith2Delimiters ==  false, then the input string is 

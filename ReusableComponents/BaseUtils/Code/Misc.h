@@ -21,7 +21,7 @@ EXPORT_BaseUtils void autoEncryptFile(const string& strFile, const string& strRe
 // PURPOSE: Validate strSpecifiedPageNumber. Throws exception if the string is invalid
 // ARGUMENT: strSpecifiedPageNumbers - string containing specified page numbers in vary format.
 // REQUIRE: Valid page number format: single pages (eg. 2, 5), a range of pages (eg. 4-8),
-//			or last X number of pages (eg. -3). They must be seperated by comma (,). When
+//			or last X number of pages (eg. -3). They must be separated by comma (,). When
 //			a range of pages is specified, starting page number must be less than ending page number.
 // 
 EXPORT_BaseUtils void validatePageNumbers(const string& strSpecifiedPageNumbers);

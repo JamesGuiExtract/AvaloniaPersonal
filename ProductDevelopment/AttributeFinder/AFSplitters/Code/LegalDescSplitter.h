@@ -136,7 +136,7 @@ private:
 	// Adds each spatial string in the ipAttributeStrings Vector to the ipAttributeList object \
 	// using strAttributeName as the name
 	// if bMultiple is true each value is another attribute with the same name
-	// if bMultiple is false the ipAttributeStrings are appended to each other with a , seperator
+	// if bMultiple is false the ipAttributeStrings are appended to each other with a , separator
 	void addAsAttributes( std::string strAttributeName, IIUnknownVectorPtr ipAttributeStrings, 
 		IIUnknownVectorPtr ipAttributeList, bool bAsMultiple, std::string strLegalType = "",
 		bool bApplyModifiers = false, std::string strAttrType = "");

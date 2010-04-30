@@ -236,7 +236,7 @@ LRESULT CStringTokenizerSplitterPP::OnClickedDelimiterHelp(WORD wNotifyCode,
 		// show tooltip info
 		CString zText("Please specify exactly one character as the delimiter.\n"
 					  "\n"
-			          "A delimiter is a character that seperates text into multiple parts.\n"
+			          "A delimiter is a character that separates text into multiple parts.\n"
 					  "Examples of delimiters are the comma (,), semi-colon (;), hypen (-), etc.");
 		m_infoTip.Show(zText);
 	}

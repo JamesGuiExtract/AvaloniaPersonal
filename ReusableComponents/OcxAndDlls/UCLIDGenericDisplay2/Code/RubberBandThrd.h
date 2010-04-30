@@ -29,7 +29,7 @@ class CGenericDisplayView;
 //
 // CLASS:	CRubberBandThrd
 //
-// PURPOSE:	This class is used to create a seperate thread from MFC class CWinThread.
+// PURPOSE:	This class is used to create a separate thread from MFC class CWinThread.
 //			This derived class is attached to GenericDisplayView.  Object of this class is 
 //			created in GenericDisplayView.cpp.
 //

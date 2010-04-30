@@ -96,7 +96,7 @@ void CIndexConverterDlg::runTask(IProgress* pProgress, int nTaskID)
 			continue;
 		}
 
-		// parse the line into tokens, which are seperated by delimiter defined
+		// parse the line into tokens, which are separated by delimiter defined
 		vector<string> vecTokens;
 		StringTokenizer::sGetTokens(strLine, (LPCTSTR)m_zDelimiter, (LPCTSTR)m_zBeginString, (LPCTSTR)m_zEndString, vecTokens);
 

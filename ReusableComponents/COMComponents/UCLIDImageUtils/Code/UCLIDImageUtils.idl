@@ -64,7 +64,7 @@ library UCLID_IMAGEUTILSLib
 		// Interprets the string of specified page numbers and returns a vector of page numbers for the current image.
 		// strImageFileName - the image file name
 		// strSpecificPages - a string containing specified page numbers. Valid format: single page (eg. 2, 5),
-		// a range of pages (eg. 3-9), last X number of pages (eg. -3). They are seperated by comma(,).
+		// a range of pages (eg. 3-9), last X number of pages (eg. -3). They are separated by comma(,).
 		[id(6), helpstring("method GetImagePageNumbers")] HRESULT GetImagePageNumbers([in] BSTR strImageFileName, 
 			[in] BSTR strSpecificPages, [out, retval] IVariantVector **pvecPageNumbers);
 		//-----------------------------------------------------------------------------------------

@@ -321,7 +321,7 @@ library UCLID_FILEPROCESSORSLib
 			VerticalPercentage([out, retval] double* dVertPercentage);
 		//------------------------------------------------------------------------------------------
 		// REQUIRE: Valid page number format: single pages (eg. 2, 5), a range of pages (eg. 4-8),
-		//			or last X number of pages (eg. -3). They must be seperated by comma (,). When
+		//			or last X number of pages (eg. -3). They must be separated by comma (,). When
 		//			a range of pages is specified,
 		//			starting page number must be less than ending page number.
 		[propput, id(6), helpstring("property PagesToStamp")] HRESULT

@@ -69,7 +69,8 @@ STDMETHODIMP CValueBeforeCluePP::Apply(void)
 					int nSize = lst.GetItemCount();
 					if (nSize<=0)
 					{
-						MessageBox("Please provide one or more clue text.", "Configuration");
+						MessageBox("Please provide one or more clue text.",
+							"Invalid Configuration", MB_OK | MB_ICONERROR);
 						lst.SetFocus();
 						return S_FALSE;
 					}
@@ -106,7 +107,8 @@ STDMETHODIMP CValueBeforeCluePP::Apply(void)
 						// must be a positive number
 						if (m_nNumOfWords<=0)
 						{
-							AfxMessageBox("Please specify a positive number of words.");
+							MessageBox("Please specify a positive number of words.",
+								"Invalid Configuration", MB_OK | MB_ICONERROR);
 							ATLControls::CEdit editNumOfWords(GetDlgItem(IDC_EDIT_NUM_OF_WORDS_BC));
 							editNumOfWords.SetSel(0, -1);
 							editNumOfWords.SetFocus();
@@ -116,8 +118,9 @@ STDMETHODIMP CValueBeforeCluePP::Apply(void)
 
 						if (!m_bSpacesAsPunctuations && !m_bSpecifyOtherPunctuations)
 						{
-							AfxMessageBox("No punctuation characters were specified for seperating "
-								"words.\r\nSpace, tab and new line characters will be used by default.");
+							MessageBox("No punctuation characters were specified for seperating "
+								"words.\r\nSpace, tab and new line characters will be used by default.",
+								"Default Setting", MB_OK | MB_ICONWARNING);
 							m_bSpacesAsPunctuations = true;
 						}
 
@@ -130,7 +133,8 @@ STDMETHODIMP CValueBeforeCluePP::Apply(void)
 						{
 							if (m_strOtherPunctuations.empty())
 							{
-								AfxMessageBox("Please specify character(s) as word seperator(s).");
+								MessageBox("Please specify character(s) as word separator(s).",
+									"Invalid Configuration", MB_OK | MB_ICONERROR);
 								ATLControls::CEdit editOthers(GetDlgItem(IDC_EDIT_OTHER_PUNC_BC));
 								editOthers.SetSel(0, -1);
 								editOthers.SetFocus();
@@ -144,7 +148,8 @@ STDMETHODIMP CValueBeforeCluePP::Apply(void)
 						{
 							if (m_strOtherStops.empty())
 							{
-								AfxMessageBox("Please specify character(s) after which to stop searching.");
+								MessageBox("Please specify character(s) after which to stop searching.",
+									"Invalid Configuration", MB_OK | MB_ICONERROR);
 								ATLControls::CEdit editStops( GetDlgItem(IDC_EDIT_OTHER_STOP_BC) );
 								editStops.SetSel(0, -1);
 								editStops.SetFocus();
@@ -167,7 +172,8 @@ STDMETHODIMP CValueBeforeCluePP::Apply(void)
 						// must be a positive number
 						if (m_nNumOfLines<=0)
 						{
-							AfxMessageBox("Please specify a positive number of lines.");
+							MessageBox("Please specify a positive number of lines.",
+								"Invalid Configuration", MB_OK | MB_ICONERROR);
 							ATLControls::CEdit editNumOfLines(GetDlgItem(IDC_EDIT_NUM_OF_LINES_BC));
 							editNumOfLines.SetSel(0, -1);
 							editNumOfLines.SetFocus();
@@ -182,7 +188,8 @@ STDMETHODIMP CValueBeforeCluePP::Apply(void)
 					{
 						if (m_strSpecifiedString.empty())
 						{
-							AfxMessageBox("Please provide non-empty string.");
+							MessageBox("Please provide non-empty string.",
+								"Invalid Configuration", MB_OK | MB_ICONERROR);
 							ATLControls::CEdit editString(GetDlgItem(IDC_EDIT_STRING_SPEC_BC));
 							editString.SetSel(0, -1);
 							editString.SetFocus();
@@ -887,7 +894,7 @@ LRESULT CValueBeforeCluePP::OnClickedStopCharInfo(WORD wNotifyCode, WORD wID, HW
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
-LRESULT CValueBeforeCluePP::OnClickedSeperateCharInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+LRESULT CValueBeforeCluePP::OnClickedSeparateCharInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 

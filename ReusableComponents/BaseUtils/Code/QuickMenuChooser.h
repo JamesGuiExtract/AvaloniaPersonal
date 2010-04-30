@@ -15,13 +15,13 @@ public:
 	~QuickMenuChooser();
 
 	// Reset the popup menu choices
-	// a string with the value "" will be treated as a seperator
+	// a string with the value "" will be treated as a separator
 	void setChoices(const std::vector<std::string>& vecChoices);
 
 	// Displays a popup menu with the choices at position x, y
 	// it will return the index of the selected menu item or
 	// -1 if no item was selected.
-	// Seperators do count as menu items
+	// Separators do count as menu items
 	long getChoice(CWnd* pParent, long x, long y);
 
 	// Displays a popup menu with the choices at position x, y

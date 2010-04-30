@@ -35,7 +35,7 @@ const std::string AFTagManager::displayTagsForSelection(CWnd* pWnd, long nLeft, 
 		string str = asString(var.bstrVal);
 		vecChoices.push_back(str);
 	}
-	// Add a seperator
+	// Add a separator
 	vecChoices.push_back("");
 
 	// Add the ini file in tags
@@ -46,7 +46,7 @@ const std::string AFTagManager::displayTagsForSelection(CWnd* pWnd, long nLeft, 
 		string str = asString(var.bstrVal);
 		vecChoices.push_back(str);
 	}
-	// Add a seperator
+	// Add a separator
 	vecChoices.push_back("");
 
 	//add the functions

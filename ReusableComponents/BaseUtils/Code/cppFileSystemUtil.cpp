@@ -556,7 +556,7 @@ bool directoryExists(const string &strDir)
 //--------------------------------------------------------------------------------------------------
 string getClosestNonExistentUniqueFileName(const string& strOriginalFileName)
 {
-	// seperate the input string into the directory, and
+	// separate the input string into the directory, and
 	// the filename
 	string strOriginalFileNameDir = getDirectoryFromFullPath(strOriginalFileName);
 	string strFileName = getFileNameWithoutExtension(strOriginalFileName);

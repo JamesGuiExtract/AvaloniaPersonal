@@ -786,7 +786,7 @@ std::string CStringCSISTester::getSetValueString( const std::string strSetName, 
 	// Create the return string
 	string strRtn = strSetName + " ( ";
 	
-	// If the set is not empty add the values seperated by a ", "
+	// If the set is not empty add the values separated by a ", "
 	if ( !setValues.empty() ) 
 	{
 		// Do not want the first value preceded by a comma 
