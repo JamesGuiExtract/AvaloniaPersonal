@@ -33,7 +33,18 @@ namespace Extract.SQLCDBEditor
                 else
                 {
                     string databaseFileName = args[0];
-                    Application.Run(new SQLCDBEditorForm(databaseFileName));
+					if (args[0] == "/?")
+					{
+						MessageBox.Show("SQLCDBEditor <DatabaseFileName> | /?\n\r"
+							+ "\t<DatabaseFileName> - sdf file to open.\r\n"
+							+ "\t</? - Displays this message.\r\n\r\n"
+							+ "\tIf no arguments are specified SQLCDBEditor will be opened without a file."
+							, "Usage");
+					}
+					else
+					{
+						Application.Run(new SQLCDBEditorForm(databaseFileName));
+					}
                 }
             }
             catch (Exception ex)
