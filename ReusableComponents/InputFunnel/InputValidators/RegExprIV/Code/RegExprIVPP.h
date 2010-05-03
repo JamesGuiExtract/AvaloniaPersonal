@@ -30,10 +30,6 @@ BEGIN_MSG_MAP(CRegExprIVPP)
 	CHAIN_MSG_MAP(IPropertyPageImpl<CRegExprIVPP>)
 	MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 END_MSG_MAP()
-// Handler prototypes:
-//  LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-//  LRESULT CommandHandler(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
-//  LRESULT NotifyHandler(int idCtrl, LPNMHDR pnmh, BOOL& bHandled);
 
 	STDMETHOD(Apply)(void);
 	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);

@@ -25,19 +25,8 @@ STDMETHODIMP CRegExprIVPP::Apply()
 	{
 		ATLTRACE(_T("CRegExprIVPP::Apply\n"));
 
-		char pszInputType[512];
-		GetDlgItemText(IDC_EDIT_INPUT_TYPE, pszInputType, sizeof(pszInputType));
-		if (_strcmpi(pszInputType, "") == 0)
-		{
-			MessageBox("Please provide non-empty input type.", "Configuration");
-			ATLControls::CEdit editBox(GetDlgItem(IDC_EDIT_INPUT_TYPE));
-			editBox.SetSel(0, -1);
-			editBox.SetFocus();
-			return S_FALSE;
-		}
-
 		// get the pattern string, and verify it is not empty
-		char pszPattern[1024];
+		char pszPattern[4096] = {0};
 		GetDlgItemText(IDC_EDIT_REGEXPR, pszPattern, sizeof(pszPattern));
 		if (_strcmpi(pszPattern, "") == 0)
 		{
@@ -60,7 +49,7 @@ STDMETHODIMP CRegExprIVPP::Apply()
 			{
 				ipRegExprIV->Pattern = get_bstr_t(pszPattern);
 				ipRegExprIV->IgnoreCase = (nChecked == BST_CHECKED) ? VARIANT_FALSE : VARIANT_TRUE;
-				ipRegExprIV->SetInputType(get_bstr_t(pszInputType));
+				ipRegExprIV->SetInputType("");
 			}
 		}
 		m_bDirty = FALSE;
@@ -80,15 +69,15 @@ LRESULT CRegExprIVPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 		if (ipRegExprIV)
 		{	
 			IInputValidatorPtr ipInputValidator(ipRegExprIV);
-			// input type
-			_bstr_t _bstrInputTypeName(ipInputValidator->GetInputType());
-			SetDlgItemText(IDC_EDIT_INPUT_TYPE, (char*)_bstrInputTypeName);
+			ASSERT_RESOURCE_ALLOCATION("ELI30077", ipInputValidator != NULL);
+
 			// pattern string
 			_bstr_t _bstrPattern(ipRegExprIV->Pattern);
 			SetDlgItemText(IDC_EDIT_REGEXPR, (char*)_bstrPattern);
+
 			// case sensitivity
 			bool bCaseSensitive = ipRegExprIV->IgnoreCase==VARIANT_FALSE;
-			CheckDlgButton(IDC_CHK_REG_EXP_CASE, bCaseSensitive?BST_CHECKED:BST_UNCHECKED);
+			CheckDlgButton(IDC_CHK_REG_EXP_CASE, asBSTChecked(bCaseSensitive));
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04882");

@@ -10,7 +10,6 @@
 #define IDR_REGEXPRIVPP                 106
 #define IDD_REGEXPRIVPP                 107
 #define IDC_EDIT_REGEXPR                201
-#define IDC_EDIT_INPUT_TYPE             202
 #define IDC_CHK_REG_EXP_CASE            208
 
 // Next default values for new objects

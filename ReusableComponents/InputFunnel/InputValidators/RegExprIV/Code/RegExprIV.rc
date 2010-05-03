@@ -103,19 +103,17 @@ IDR_REGEXPRIVPP         REGISTRY DISCARDABLE    "RegExprIVPP.rgs"
 // Dialog
 //
 
-IDD_REGEXPRIVPP DIALOGEX 0, 0, 267, 138
+IDD_REGEXPRIVPP DIALOGEX 0, 0, 267, 103
 STYLE WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif"
 BEGIN
-    LTEXT           "Please specify the input type",IDC_STATIC,6,6,91,8
-    EDITTEXT        IDC_EDIT_INPUT_TYPE,6,18,255,14,ES_AUTOHSCROLL
     LTEXT           "Please specify regular expression that should be used to validate input text",
-                    IDC_STATIC,6,41,225,9
-    EDITTEXT        IDC_EDIT_REGEXPR,6,53,255,60,ES_MULTILINE | 
+                    IDC_STATIC,6,6,225,9
+    EDITTEXT        IDC_EDIT_REGEXPR,6,18,255,60,ES_MULTILINE | 
                     ES_AUTOHSCROLL
     CONTROL         "Case Sensitive",IDC_CHK_REG_EXP_CASE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,7,122,63,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,89,63,10
 END
 
 

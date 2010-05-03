@@ -283,7 +283,7 @@ STDMETHODIMP CRegExprInputValidator::raw_IsConfigured(VARIANT_BOOL * pbValue)
 		// Check license
 		validateLicense();
 
-		*pbValue = asVariantBool(!m_strPattern.empty() && !m_strInputTypeName.empty()); 
+		*pbValue = asVariantBool(!m_strPattern.empty()); 
 
 		return S_OK;
 	}
