@@ -178,11 +178,6 @@ namespace Extract.Redaction.Verification
         /// </summary>
         DataGridViewCellStyle _visitedPageCellStyle;
 
-        /// <summary>
-        /// Whether to ignore the next cell content click event.
-        /// </summary>
-        bool _ignoreCellContentClick;
-
         #endregion Fields
 
         #region Events
@@ -741,12 +736,6 @@ namespace Extract.Redaction.Verification
                         DataGridViewCheckBoxCell cell = 
                             (DataGridViewCheckBoxCell) _dataGridView.CurrentCell;
                         cell.EditingCellFormattedValue = redacted;
-                    }
-                    else
-                    {
-                        // If no warning was displayed, then the space bar will trigger
-                        // a cell content click event which must be ignored.
-                        _ignoreCellContentClick = true;    
                     }
                 }
             }
@@ -1480,6 +1469,14 @@ namespace Extract.Redaction.Verification
                 // unless the combo box is dropped down [FIDSC #4186]
                 if (!IsComboBoxDroppedDown)
                 {
+                    // If the key press is the space bar then end editing (if it is active)
+                    // in the check box column [FlexIDSCore #3998 & #4267]
+                    if (keyData == Keys.Space &&
+                        _dataGridView.IsCurrentCellInEditMode && IsRedactedColumnActive)
+                    {
+                        _dataGridView.EndEdit();
+                    }
+
                     bool keyProcessed = _imageViewer.Shortcuts.ProcessKey(keyData);
                     if (keyProcessed)
                     {
@@ -2187,13 +2184,12 @@ namespace Extract.Redaction.Verification
                 {
                     // Warn if necessary about the redacted state
                     bool redacted = Rows[e.RowIndex].Redacted;
-                    if (_ignoreCellContentClick || WarnIfSettingRedactedState(!redacted))
+                    if (WarnIfSettingRedactedState(!redacted))
                     {
                         // Restore the checkbox to its initial state
                         DataGridViewCheckBoxCell cell = (DataGridViewCheckBoxCell) 
                                                         _dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
                         cell.EditingCellFormattedValue = redacted;
-                        _ignoreCellContentClick = false;
                     }
                     else
                     {
