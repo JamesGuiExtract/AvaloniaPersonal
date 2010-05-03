@@ -1894,7 +1894,7 @@ void convertFileToListOfStrings(ifstream &file, list<string> &lstFileContents)
 	{
 		string strTemp;
 		getline(file, strTemp);
-		if (file.fail())
+		if (!file.eof() && file.fail())
 		{
 			throw UCLIDException("ELI29965", "Error encountered while reading file.");
 		}
