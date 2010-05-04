@@ -2329,7 +2329,7 @@ namespace Extract.DataEntry
                 // against here:
                 // http://msdn.microsoft.com/en-us/library/system.windows.forms.control.enter.aspx
                 BeginInvoke(new DataEntryControlDelegate(DataEntryControlGotFocusInvoked),
-                    new object[] { sender as IDataEntryControl });
+                    new object[] { _focusingControl });
             }
             catch (Exception ex)
             {
@@ -2425,7 +2425,8 @@ namespace Extract.DataEntry
                 // table was in edit mode-- moving focus away from the table ends edit mode which
                 // triggers the table to re-focus the table. Make a second attempt at focusing the
                 // desired control if it does not yet have focus.
-                if (!((Control)newActiveDataControl).Focused)
+                Control newActiveControl = (Control)newActiveDataControl;
+                if (!newActiveControl.Focused)
                 {
                     // Keep track of refocus attempts to prevent the possibility of infinite
                     // recursion.
@@ -2437,7 +2438,7 @@ namespace Extract.DataEntry
                     else
                     {
                         _refocusingControl = newActiveDataControl;
-                        ((Control)newActiveDataControl).Focus();
+                        newActiveControl.Focus();
                         return;
                     }
                 }

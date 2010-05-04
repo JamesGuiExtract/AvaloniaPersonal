@@ -5,8 +5,6 @@
 
 #include <UCLIDException.h>
 
-using namespace std;
-
 StringLoader::StringLoader()
 {
 	if(m_ipMiscUtils == NULL)
@@ -26,13 +24,13 @@ StringLoader::~StringLoader()
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27085");
 }
 //--------------------------------------------------------------------------------------------------
-void StringLoader::loadObjectFromFile(std::string& strFromFile, const std::string& strFile)
+void StringLoader::loadObjectFromFile(string& strFromFile, const string& strFile)
 {
 	// Call GetStringOptionallyFromFile() to load the string
 	strFromFile = asString( m_ipMiscUtils->GetStringOptionallyFromFile(strFile.c_str()) );
 }
 //--------------------------------------------------------------------------------------------------
-void StringLoader::loadObjectFromFile(IVariantVectorPtr & ipVector, const std::string& strFile)
+void StringLoader::loadObjectFromFile(IVariantVectorPtr & ipVector, const string& strFile)
 {
 	// Call GetColumnStringsOptionallyFromFile() to load the string list
 	ipVector = m_ipMiscUtils->GetColumnStringsOptionallyFromFile(strFile.c_str()) ;
