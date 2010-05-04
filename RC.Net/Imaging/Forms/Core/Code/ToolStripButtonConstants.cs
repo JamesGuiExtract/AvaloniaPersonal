@@ -928,6 +928,17 @@ namespace Extract.Imaging.Forms
         public const string _DELETE_SELECTION_MENU_ITEM_TEXT =
             "&Delete selection";
 
+        /// <summary>
+        /// Constant string for the block fit selections menu item image.
+        /// </summary>
+        public const string _BLOCK_FIT_SELECTION_MENU_ITEM_IMAGE = null;
+
+        /// <summary>
+        /// Constant string for the block fit selections menu item text.
+        /// </summary>
+        public const string _BLOCK_FIT_SELECTION_MENU_ITEM_TEXT =
+            "&Block fit selection";
+
         #endregion
 
         #region ImageViewer

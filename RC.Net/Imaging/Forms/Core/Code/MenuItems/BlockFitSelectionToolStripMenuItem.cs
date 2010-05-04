@@ -1,40 +1,36 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.Imaging.Forms
 {
     /// <summary>
     /// Represents a <see cref="ImageViewerCommandToolStripMenuItem"/> that allows the user to 
-    /// delete all selected layer objects.
+    /// block fit all selected layer objects.
     /// </summary>
-    [ToolboxBitmap(typeof(DeleteSelectionToolStripMenuItem),
-       ToolStripButtonConstants._DELETE_SELECTION_BUTTON_IMAGE_SMALL)]
-    public partial class DeleteSelectionToolStripMenuItem : ImageViewerCommandToolStripMenuItem
+    public partial class BlockFitSelectionToolStripMenuItem : ImageViewerCommandToolStripMenuItem
     {
-        #region DeleteSelectionToolStripMenuItem Constructors
+        #region BlockFitSelectionToolStripMenuItem Constructors
 
         /// <summary>
-        /// Initializes a new <see cref="DeleteSelectionToolStripMenuItem"/> class.
+        /// Initializes a new <see cref="BlockFitSelectionToolStripMenuItem"/> class.
         /// </summary>
         // Don't fight with auto-generated code.
         [SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]
-        public DeleteSelectionToolStripMenuItem()
-            : base(ToolStripButtonConstants._DELETE_SELECTION_MENU_ITEM_TEXT,
-            ToolStripButtonConstants._DELETE_SELECTION_BUTTON_IMAGE_SMALL,
-            typeof(DeleteSelectionToolStripMenuItem))
+        public BlockFitSelectionToolStripMenuItem()
+            : base(ToolStripButtonConstants._BLOCK_FIT_SELECTION_MENU_ITEM_TEXT,
+            ToolStripButtonConstants._BLOCK_FIT_SELECTION_MENU_ITEM_IMAGE,
+            typeof(BlockFitSelectionToolStripMenuItem))
         {
             InitializeComponent();
         }
 
-        #endregion DeleteSelectionToolStripMenuItem Constructors
+        #endregion BlockFitSelectionToolStripMenuItem Constructors
 
-        #region DeleteSelectionToolStripMenuItem Methods
+        #region BlockFitSelectionToolStripMenuItem Methods
 
         /// <summary>
         /// Retrieves an array of the shortcut keys associated with the menu item.
@@ -45,11 +41,11 @@ namespace Extract.Imaging.Forms
         {
             ImageViewer imageViewer = base.ImageViewer;
             return imageViewer == null ? null :
-                imageViewer.Shortcuts.GetKeys(imageViewer.SelectRemoveSelectedLayerObjects);
+                imageViewer.Shortcuts.GetKeys(imageViewer.BlockFitSelectedZones);
         }
 
         /// <summary>
-        /// Sets the enabled state of the <see cref="DeleteSelectionToolStripMenuItem"/>.
+        /// Sets the enabled state of the <see cref="BlockFitSelectionToolStripMenuItem"/>.
         /// </summary>
         protected override void SetEnabledState()
         {
@@ -58,9 +54,9 @@ namespace Extract.Imaging.Forms
                 base.ImageViewer.LayerObjects.Selection.Count > 0;
         }
 
-        #endregion DeleteSelectionToolStripMenuItem Methods
+        #endregion BlockFitSelectionToolStripMenuItem Methods
 
-        #region DeleteSelectionToolStripMenuItem OnEvents
+        #region BlockFitSelectionToolStripMenuItem OnEvents
 
         /// <summary>
         /// Raises the <see cref="ToolStripItem.Click"/> event.
@@ -76,20 +72,19 @@ namespace Extract.Imaging.Forms
                 ImageViewer imageViewer = base.ImageViewer;
                 if (imageViewer != null && imageViewer.IsImageAvailable)
                 {
-                    imageViewer.SelectRemoveSelectedLayerObjects();
+                    imageViewer.BlockFitSelectedZones();
                 }
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI22340", ex);
-                ee.AddDebugData("Event data", e, false);
+                ExtractException ee = ExtractException.AsExtractException("ELI30082", ex);
                 ee.Display();
             }
         }
 
-        #endregion DeleteSelectionToolStripMenuItem OnEvents
+        #endregion BlockFitSelectionToolStripMenuItem OnEvents
 
-        #region DeleteSelectionToolStripMenuItem Event Handlers
+        #region BlockFitSelectionToolStripMenuItem Event Handlers
 
         /// <summary>
         /// Handles the <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.
@@ -106,8 +101,7 @@ namespace Extract.Imaging.Forms
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI22332", ex);
-                ee.AddDebugData("Event data", e, false);
+                ExtractException ee = ExtractException.AsExtractException("ELI30083", ex);
                 ee.Display();
             }
         }
@@ -127,23 +121,22 @@ namespace Extract.Imaging.Forms
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI22333", ex);
-                ee.AddDebugData("Event data", e, false);
+                ExtractException ee = ExtractException.AsExtractException("ELI30084", ex);
                 ee.Display();
             }
         }
 
-        #endregion DeleteSelectionToolStripMenuItem Event Handlers
+        #endregion BlockFitSelectionToolStripMenuItem Event Handlers
 
         #region IImageViewerControl Members
 
         /// <summary>
-        /// Gets or sets the image viewer to which the <see cref="DeleteSelectionToolStripMenuItem"/> 
+        /// Gets or sets the image viewer to which the <see cref="BlockFitSelectionToolStripMenuItem"/> 
         /// is connected.
         /// </summary>
-        /// <value>The image viewer to which the <see cref="DeleteSelectionToolStripMenuItem"/> is 
+        /// <value>The image viewer to which the <see cref="BlockFitSelectionToolStripMenuItem"/> is 
         /// connected. <see langword="null"/> if connection should be disconnected.</value>
-        /// <returns>The image viewer to which the <see cref="DeleteSelectionToolStripMenuItem"/> is 
+        /// <returns>The image viewer to which the <see cref="BlockFitSelectionToolStripMenuItem"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
         public override ImageViewer ImageViewer
@@ -177,7 +170,7 @@ namespace Extract.Imaging.Forms
                 }
                 catch (Exception ex)
                 {
-                    ExtractException ee = new ExtractException("ELI23247",
+                    ExtractException ee = new ExtractException("ELI30085",
                         "Unable to establish connection to image viewer.", ex);
                     ee.AddDebugData("Image viewer", value, false);
                     throw ee;

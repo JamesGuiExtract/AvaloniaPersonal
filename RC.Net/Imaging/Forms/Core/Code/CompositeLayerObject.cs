@@ -150,17 +150,17 @@ namespace Extract.Imaging.Forms
         /// <see cref="CompositeLayerObject{T}"/>.
         /// </summary>
         /// <returns>A <see cref="List{T}"/> of objects.</returns>
-        // This is a protected property only intended to be accessed by derived
-        // classes.  The derived classes may need access to the underlying list
-        // so that they can add to, or remove from the underlying list.  It also
+        // This is an internal property only intended to be accessed by derived
+        // classes or classes within this assembly. The derived classes may need access to the
+        // underlying list so that they can add to, or remove from the underlying list.  It also
         // will enhance the performance of this property if it is not wrapping
         // the list as readonly or placing it into a more generic collection. Since
-        // this is intended to be used by the derived class only, we can focus
+        // this is intended to be used by the derived or internal classes, we can focus
         // on performance and expose the underlying list here.
         // For more information on this FxCop violation being suppressed see:
         // http://msdn.microsoft.com/en-us/library/ms182142(VS.80).aspx
         [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
-        protected List<T> Objects
+        internal List<T> Objects
         {
             get
             {

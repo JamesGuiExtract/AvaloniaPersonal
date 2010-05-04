@@ -1510,6 +1510,44 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Sets all the spatial properties of the highlight.
         /// </summary>
+        /// <param name="rasterZone">The <see cref="RasterZone"/> to use to set
+        /// the spatial data.
+        /// <para><b>Note:</b></para>
+        /// The <paramref name="rasterZone"/> specified must be on the same page
+        /// as this <see cref="Highlight"/>.</param>
+        /// <param name="quietSetData">If <see langword="true"/> then will quietly
+        /// update the spatial data, if <see langword="false"/> then a layer object
+        /// changed event will be raised.</param>
+        /// <exception cref="ExtractException">If the <paramref name="rasterZone"/>
+        /// is on a different page than this <see cref="Highlight"/>.</exception>
+        public void SetSpatialData(RasterZone rasterZone, bool quietSetData)
+        {
+            try
+            {
+                ExtractException.Assert("ELI30079", "Raster zone page mismatch.",
+                    rasterZone.PageNumber == PageNumber, "Raster Zone Page", rasterZone.PageNumber,
+                    "Highlight Page", PageNumber);
+
+                Point startPoint = new Point(rasterZone.StartX, rasterZone.StartY);
+                Point endPoint = new Point(rasterZone.EndX, rasterZone.EndY);
+                if (quietSetData)
+                {
+                    QuietSetSpatialData(startPoint, endPoint, rasterZone.Height);
+                }
+                else
+                {
+                    SetSpatialData(startPoint, endPoint, rasterZone.Height);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30080", ex);
+            }
+        }
+
+        /// <summary>
+        /// Sets all the spatial properties of the highlight.
+        /// </summary>
         /// <param name="startPoint">The midpoint of one side of the highlight in logical (image) 
         /// coordinates.</param>
         /// <param name="endPoint">The midpoint of the opposing side of the highlight in logical 

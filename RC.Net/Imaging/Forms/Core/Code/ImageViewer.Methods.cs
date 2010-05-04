@@ -3070,6 +3070,83 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Performs block fitting for all <see cref="Highlight"/> or
+        /// <see cref="CompositeHighlightLayerObject"/> objects in the
+        /// current selection.
+        /// </summary>
+        internal void BlockFitSelectedZones()
+        {
+            try
+            {
+                using (new TemporaryWaitCursor())
+                {
+                    // Get the list of selected layer objects
+                    List<LayerObject> objects = new List<LayerObject>(_layerObjects.Selection);
+
+                    // Iterate through the list of selected objects
+                    foreach (LayerObject layerObject in objects)
+                    {
+                        // If the object is a single highlight, attempt to block fit it.
+                        Highlight highlight = layerObject as Highlight;
+                        if (highlight != null)
+                        {
+                            // Fit the highlight (pass false so that layer object changed
+                            // events are raised)
+                            BlockFitHighlight(highlight, false);
+
+                            continue;
+                        }
+
+                        // If the object is a composite highlight object, attempt
+                        // to fit each internal highlight
+                        CompositeHighlightLayerObject composite =
+                            layerObject as CompositeHighlightLayerObject;
+                        if (composite != null)
+                        {
+                            foreach (Highlight compositeHighlight in composite.Objects)
+                            {
+                                // Fit the highlight (pass true so that layer object
+                                // changed events are not raised)
+                                BlockFitHighlight(compositeHighlight, true);
+                            }
+
+                            // Set the dirty flag (which will also raise
+                            // the layer object changed event).
+                            composite.Dirty = true;
+                        }
+                    }
+
+                    Invalidate();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30081", ex);
+            }
+        }
+
+        /// <summary>
+        /// Performs block fitting on the specified <see cref="Highlight"/> object.  If
+        /// a block fitted zone can be found the <see cref="Highlight"/> will be modified
+        /// to fit that zone.  If no zone can be found the <see cref="Highlight"/> will
+        /// be unchanged.
+        /// </summary>
+        /// <param name="highlight">The <see cref="Highlight"/> to fit.</param>
+        /// <param name="quietSetData">Whether or not the
+        /// <see cref="Highlight.SetSpatialData(RasterZone, bool)"/> call should raise a
+        /// layer object changed event.</param>
+        void BlockFitHighlight(Highlight highlight, bool quietSetData)
+        {
+            // Get the fitted zone (do not delete zones if the returned fitted zone is null)
+            RasterZone zone = GetBlockFittedZone(highlight.ToRasterZone());
+            if (zone != null)
+            {
+                // Update the highlights spatial data with the fitted zone
+                highlight.SetSpatialData(zone, quietSetData);
+            }
+        }
+
+        /// <summary>
         /// Determines an array of raster zones that fit within the specified zone using the 
         /// appropriate auto fitting algorithm based on the modifier key pressed.
         /// </summary>
@@ -3104,7 +3181,7 @@ namespace Extract.Imaging.Forms
         /// <paramref name="zone"/>.</returns>
         RasterZone GetBlockFittedZone(RasterZone zone)
         {
-            using (PixelProbe probe = _reader.CreatePixelProbe(_pageNumber))
+            using (PixelProbe probe = _reader.CreatePixelProbe(zone.PageNumber))
             {
                 FittingData data = GetFittingData(zone);
 
@@ -3119,12 +3196,14 @@ namespace Extract.Imaging.Forms
         /// <param name="leftTop">The left top coordinates of the area to block fit.</param>
         /// <param name="rightBottom">The right bottom coordinates of the area to block fit.</param>
         /// <param name="theta">The angle of the resultant raster zone.</param>
+        /// <param name="pageNumber">The page number of the image to search.</param>
         /// <param name="probe">A probe to use to test for black pixels.</param>
         /// <returns>The smallest raster zone that contains all the black pixels of the specified 
         /// data.</returns>
-        RasterZone GetBlockFittedZone(PointF leftTop, PointF rightBottom, PointF theta, PixelProbe probe)
+        static RasterZone GetBlockFittedZone(PointF leftTop, PointF rightBottom, PointF theta,
+            int pageNumber, PixelProbe probe)
         {
-            FittingData data = new FittingData(leftTop, rightBottom, theta);
+            FittingData data = new FittingData(leftTop, rightBottom, theta, pageNumber);
 
             return GetBlockFittedZone(data, probe);
         }
@@ -3136,7 +3215,7 @@ namespace Extract.Imaging.Forms
         /// <param name="probe">A probe to use to test for black pixels.</param>
         /// <returns>The smallest raster zone that contains all the black pixels of the specified 
         /// data.</returns>
-        RasterZone GetBlockFittedZone(FittingData data, PixelProbe probe)
+        static RasterZone GetBlockFittedZone(FittingData data, PixelProbe probe)
         {
             // Shrink each side of the highlight
             ShrinkLeftSide(data, probe);
@@ -3162,7 +3241,7 @@ namespace Extract.Imaging.Forms
                 return null;
             }
 
-            return new RasterZone(startX, startY, endX, endY, height, _pageNumber);
+            return new RasterZone(startX, startY, endX, endY, height, data.PageNumber);
         }
 
         /// <summary>
@@ -3174,7 +3253,7 @@ namespace Extract.Imaging.Forms
         RasterZone[] GetLineFittedZones(RasterZone zone)
         {
             List<RasterZone> zones = new List<RasterZone>();
-            using (PixelProbe probe = _reader.CreatePixelProbe(_pageNumber))
+            using (PixelProbe probe = _reader.CreatePixelProbe(zone.PageNumber))
             {
                 FittingData data = GetFittingData(zone);
 
@@ -3191,7 +3270,8 @@ namespace Extract.Imaging.Forms
                 {
                     // Create the zone entity
                     PointF rightBottom = new PointF(data.RightBottom.X, rowToSplit);
-                    blockFittedZone = GetBlockFittedZone(data.LeftTop, rightBottom, data.Theta, probe);
+                    blockFittedZone = GetBlockFittedZone(data.LeftTop, rightBottom, data.Theta,
+                        zone.PageNumber, probe);
 
                     // Check if there was an error
                     if (blockFittedZone == null)
@@ -3372,7 +3452,7 @@ namespace Extract.Imaging.Forms
             }
 
             // Return the fitting data
-            return new FittingData(leftTop, rightBottom, theta);
+            return new FittingData(leftTop, rightBottom, theta, zone.PageNumber);
         }
 
         /// <summary>

@@ -244,6 +244,12 @@
     <Compile Include="MenuItems\AngularRedactionToolStripMenuItem.Designer.cs">
       <DependentUpon>AngularRedactionToolStripMenuItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="MenuItems\BlockFitSelectionToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\BlockFitSelectionToolStripMenuItem.Designer.cs">
+      <DependentUpon>BlockFitSelectionToolStripMenuItem.cs</DependentUpon>
+    </Compile>
     <Compile Include="MenuItems\CloseImageToolStripMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>

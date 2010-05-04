@@ -90,6 +90,7 @@ namespace Extract.Redaction.Verification
             System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
             TD.SandDock.DockContainer dockContainer;
             System.Windows.Forms.ToolStripContainer imageViewerToolStripContainer;
+            System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator11;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
@@ -168,6 +169,7 @@ namespace Extract.Redaction.Verification
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
             this.rectangularRedactionToolStripMenuItem1 = new Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem();
+            this.blockFitSelectionToolStripMenuItem1 = new Extract.Imaging.Forms.BlockFitSelectionToolStripMenuItem();
             dataGridToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             label3 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
@@ -186,6 +188,7 @@ namespace Extract.Redaction.Verification
             toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
             dockContainer1 = new TD.SandDock.DockContainer();
             dataGridToolStripContainer.ContentPanel.SuspendLayout();
             dataGridToolStripContainer.TopToolStripPanel.SuspendLayout();
@@ -730,7 +733,9 @@ namespace Extract.Redaction.Verification
             this.panToolStripMenuItem1,
             toolStripSeparator11,
             this.angularRedactionToolStripMenuItem1,
-            this.rectangularRedactionToolStripMenuItem1});
+            this.rectangularRedactionToolStripMenuItem1,
+            toolStripSeparator12,
+            this.blockFitSelectionToolStripMenuItem1});
             this._imageViewerContextMenu.Name = "_imageViewerContextMenu";
             this._imageViewerContextMenu.Size = new System.Drawing.Size(256, 120);
             // 
@@ -768,6 +773,11 @@ namespace Extract.Redaction.Verification
             // 
             toolStripSeparator11.Name = "toolStripSeparator11";
             toolStripSeparator11.Size = new System.Drawing.Size(252, 6);
+            // 
+            // toolStripSeparator12
+            // 
+            toolStripSeparator12.Name = "toolStripSeparator12";
+            toolStripSeparator12.Size = new System.Drawing.Size(252, 6);
             // 
             // angularRedactionToolStripMenuItem1
             // 
@@ -1149,6 +1159,14 @@ namespace Extract.Redaction.Verification
             this.rectangularRedactionToolStripMenuItem1.Name = "rectangularRedactionToolStripMenuItem1";
             this.rectangularRedactionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
             this.rectangularRedactionToolStripMenuItem1.Text = "&Rectangular redaction";
+            //
+            // blockFitSelectionToolStripMenuItem1
+            //
+            this.blockFitSelectionToolStripMenuItem1.Enabled = false;
+            this.blockFitSelectionToolStripMenuItem1.ImageViewer = null;
+            this.blockFitSelectionToolStripMenuItem1.Name = "blockFitSelectionToolStripMenuItem1";
+            this.blockFitSelectionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
+            this.blockFitSelectionToolStripMenuItem1.Text = "&Block fit selection";
             // 
             // VerificationTaskForm
             // 
@@ -1276,5 +1294,6 @@ namespace Extract.Redaction.Verification
         private Extract.Imaging.Forms.PanToolStripMenuItem panToolStripMenuItem1;
         private Extract.Imaging.Forms.AngularRedactionToolStripMenuItem angularRedactionToolStripMenuItem1;
         private Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem rectangularRedactionToolStripMenuItem1;
+        private Extract.Imaging.Forms.BlockFitSelectionToolStripMenuItem blockFitSelectionToolStripMenuItem1;
     }
 }
