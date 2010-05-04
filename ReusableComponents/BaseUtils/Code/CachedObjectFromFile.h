@@ -29,10 +29,6 @@ public:
 	{
 	}
 
-	// Loads a regular expression from a file.
-	// The input file is auto-encrypted if out of date and if specified by the RDT settings.
-	virtual void loadObjectFromFile(string& strRegEx, const string& strFileName) abstract;
-
 	// PURPOSE:	Indicates whether a file has been modified since it was last loaded.
 	// RETURNS:	true if the file is modified and needs to be reloaded, false otherwise.
 	virtual bool isModified(const string& strFile)
