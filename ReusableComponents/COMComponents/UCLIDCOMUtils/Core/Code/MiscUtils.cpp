@@ -16,6 +16,7 @@
 #include <ComponentLicenseIDs.h>
 #include <PromptDlg.h>
 #include <TextFunctionExpander.h>
+#include <Misc.h>
 
 // add license management function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -77,82 +78,6 @@ STDMETHODIMP CMiscUtils::AutoEncryptFile(BSTR strFile, BSTR strRegistryKey)
 	{
 		validateLicense();
 
-		// convert the arguments into STL strings
-		string stdstrFile = asString( strFile );
-		string stdstrRegFullKey = asString( strRegistryKey );
-
-		// compute the folder and keyname from the registry key
-		// for use with the RegistryPersistenceMgr class
-		long nLastPos = stdstrRegFullKey.find_last_of('\\');
-		if (nLastPos == string::npos)
-		{
-			UCLIDException ue("ELI07701", "Invalid registry key!");
-			ue.addDebugInfo("RegKey", stdstrRegFullKey);
-			throw ue;
-		}
-		string strRegFolder(stdstrRegFullKey, 0, nLastPos);
-		string strRegKey(stdstrRegFullKey, nLastPos + 1, 
-			stdstrRegFullKey.length() - nLastPos - 1);
-
-		// if the extension is not .etf, then just return
-		string strExt = getExtensionFromFullPath(stdstrFile, true);
-		if (strExt != ".etf")
-		{
-			return S_OK;
-		}
-
-		// Get name for the base file,
-		// for instance, if stdstrFile = "XYZ.dcc.etf" 
-		// then the base file will be "XYZ.dcc"
-		string strBaseFile = getPathAndFileNameWithoutExtension(stdstrFile);
-
-		// File must exist to continue
-		if (!isFileOrFolderValid(strBaseFile.c_str()))
-		{
-			return S_OK;
-		}
-
-		bool bAutoEncryptOn = false;
-		
-		// Protect the m_apSettings data member
-		{
-			CSingleLock lg( &m_mutex, TRUE );
-			// check if the registry key for auto-encrypt exists.
-			// if it does not, create the key with a default value of "0"
-			if (!m_apSettings->keyExists(strRegFolder, strRegKey))
-			{
-				m_apSettings->createKey(strRegFolder, strRegKey, "0");
-			}
-			else
-			{
-				// get the key value. If it is "1", then auto-encrypt 
-				// setting is on
-				if (m_apSettings->getKeyValue(strRegFolder, strRegKey) == "1")
-				{
-					bAutoEncryptOn = true;
-				}
-			}
-		}
-		// AutoEncrypt must be ON in registry to continue
-		if (!bAutoEncryptOn)
-		{
-			return S_OK;
-		}
-
-		// If ETF already exists, compare the last modification
-		// on both the base file and the etf file
-		if (::isFileOrFolderValid(stdstrFile.c_str()))
-		{
-			// Compare timestamps
-			CTime tmBaseFile(getFileModificationTimeStamp(strBaseFile));
-			CTime tmETFFile(getFileModificationTimeStamp(stdstrFile));
-			if (tmBaseFile <= tmETFFile)
-			{
-				// no need to encrypt the file again
-				return S_OK;
-			}
-		}
-				
 		// the auto-encrypt can only be done if
 		// that functionality is licensed
 		try
@@ -165,13 +90,11 @@ STDMETHODIMP CMiscUtils::AutoEncryptFile(BSTR strFile, BSTR strRegistryKey)
 			return S_OK;
 		}
 
-		// Encrypt the base file
-		static EncryptedFileManager efm;
-		efm.encrypt(strBaseFile, stdstrFile);
+		autoEncryptFile(asString(strFile), asString(strRegistryKey));
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07619")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::GetRegExpData(IIUnknownVector* pFoundData, 
@@ -210,10 +133,9 @@ STDMETHODIMP CMiscUtils::GetRegExpData(IIUnknownVector* pFoundData,
 			*pnEndPos = ipTok->GetEndPosition();
 		}
 
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08919")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::AllowUserToSelectAndConfigureObject(IObjectWithDescription* pObject, 
@@ -272,11 +194,11 @@ STDMETHODIMP CMiscUtils::AllowUserToSelectAndConfigureObject(IObjectWithDescript
 			// set dirty flag
 			*pvbDirty = VARIANT_TRUE;
 		}
+
+		// success
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16015")
-
-	// success
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::AllowUserToSelectAndConfigureObject2(BSTR bstrTitleAfterSelect, BSTR bstrCategory, BSTR bstrAFAPICategory, 
@@ -328,11 +250,11 @@ STDMETHODIMP CMiscUtils::AllowUserToSelectAndConfigureObject2(BSTR bstrTitleAfte
 
 			*ppObject = (IUnknown *)ipObjectWithDescription->Object.Detach();
 		}
+
+		// success
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18096")
-
-	// success
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::AllowUserToConfigureObjectProperties(IObjectWithDescription* pObject, 
@@ -390,11 +312,11 @@ STDMETHODIMP CMiscUtils::AllowUserToConfigureObjectProperties(IObjectWithDescrip
 			// mark object as modified
 			*pvbDirty = VARIANT_TRUE;
 		}
+
+		// success
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16034")
-
-	// success
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::AllowUserToConfigureObjectDescription(IObjectWithDescription* pObject, 
@@ -449,12 +371,11 @@ STDMETHODIMP CMiscUtils::AllowUserToConfigureObjectDescription(IObjectWithDescri
 			// mark object has modified
 			*pvbDirty = VARIANT_TRUE;
 		}
-		
+	
+		// finished
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15993")
-
-	// finished
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::HandlePlugInObjectDoubleClick(IObjectWithDescription* pObject, 
@@ -500,11 +421,11 @@ STDMETHODIMP CMiscUtils::HandlePlugInObjectDoubleClick(IObjectWithDescription* p
 			// prompt and allow the user to modify ipCategorizedComponent's properties
 			*pvbDirty = getThisAsCOMPtr()->AllowUserToConfigureObjectProperties(ipObject);
 		}
+
+		// success
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16035")
-
-	// success
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::HandlePlugInObjectCommandButtonClick(IObjectWithDescription* pObject, 
@@ -586,11 +507,11 @@ STDMETHODIMP CMiscUtils::HandlePlugInObjectCommandButtonClick(IObjectWithDescrip
 		{
 			*pvbDirty = getThisAsCOMPtr()->AllowUserToConfigureObjectDescription(ipObject);
 		}
+
+		// done
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16053");
-
-	// done
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::GetNewRegExpParserInstance(BSTR strComponentName, 
@@ -607,10 +528,10 @@ STDMETHODIMP CMiscUtils::GetNewRegExpParserInstance(BSTR strComponentName,
 		ASSERT_RESOURCE_ALLOCATION("ELI12966", ipTempRegExpParser != NULL);
 
 		*pRegExpParser = (IRegularExprParser *)ipTempRegExpParser.Detach();
+
+		return S_OK; 
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12967")
-
-	return S_OK; 
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::GetStringOptionallyFromFile(BSTR bstrFileName, BSTR *pbstrFromFile)
@@ -670,10 +591,10 @@ STDMETHODIMP CMiscUtils::GetStringOptionallyFromFile(BSTR bstrFileName, BSTR *pb
 		}
 
 		*pbstrFromFile = get_bstr_t(strFromFile).Detach();
+
+		return S_OK; 
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14530")
-
-	return S_OK; 
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::GetFileHeader(BSTR *pbstrFileHeader)
@@ -685,10 +606,10 @@ STDMETHODIMP CMiscUtils::GetFileHeader(BSTR *pbstrFileHeader)
 		validateLicense();
 
 		*pbstrFileHeader = get_bstr_t(gstrFILE_NAME_HEADER).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14543")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::GetColumnStringsOptionallyFromFile(BSTR bstrFileName, IVariantVector* *pVal)
@@ -753,10 +674,10 @@ STDMETHODIMP CMiscUtils::GetColumnStringsOptionallyFromFile(BSTR bstrFileName, I
 		}
 
 		*pVal = (IVariantVector*)ipVector.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14592")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::GetFileNameWithoutHeader(BSTR bstrText, BSTR *pbstrFileName)
@@ -789,10 +710,10 @@ STDMETHODIMP CMiscUtils::GetFileNameWithoutHeader(BSTR bstrText, BSTR *pbstrFile
 		strFileName = trim(strFileName, " ", " ");
 
 		*pbstrFileName = get_bstr_t(strFileName).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14617")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::CountEnabledObjectsIn(IIUnknownVector* pVector, long* lNumEnabledObjects)
@@ -826,6 +747,8 @@ STDMETHODIMP CMiscUtils::CountEnabledObjectsIn(IIUnknownVector* pVector, long* l
 
 		// set the return value
 		*lNumEnabledObjects = lEnabledObjectsCount;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16260");
 }
@@ -853,6 +776,8 @@ STDMETHODIMP CMiscUtils::GetEnabledState(IIUnknownVector* pVector, LONG nItemInd
 
 		// Provide Enabled setting
 		*pvbEnabled = ipOWD->Enabled;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16612");
 }
@@ -880,6 +805,8 @@ STDMETHODIMP CMiscUtils::SetEnabledState(IIUnknownVector* pVector, LONG nItemInd
 
 		// Apply the Enabled setting
 		ipOWD->Enabled = bEnabled;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16613");
 }
@@ -911,6 +838,8 @@ STDMETHODIMP CMiscUtils::IsAnyObjectDirty1(IUnknown* pObject, VARIANT_BOOL* pvbD
 			// Object is not dirty
 			*pvbDirty = VARIANT_FALSE;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16294");
 }
@@ -938,6 +867,8 @@ STDMETHODIMP CMiscUtils::IsAnyObjectDirty2(IUnknown* pObject1, IUnknown* pObject
 			// Neither object is dirty
 			*pvbDirty = VARIANT_FALSE;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16295");
 }
@@ -966,6 +897,8 @@ STDMETHODIMP CMiscUtils::IsAnyObjectDirty3(IUnknown* pObject1, IUnknown* pObject
 			// None of the objects are dirty
 			*pvbDirty = VARIANT_FALSE;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16630");
 }
@@ -977,10 +910,10 @@ STDMETHODIMP CMiscUtils::ShellOpenDocument(BSTR bstrFilename)
 	try
 	{
 		shellOpenDocument(asString(bstrFilename));
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18163");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CMiscUtils::GetObjectAsStringizedByteStream(IUnknown *pObject, BSTR *pbstrByteStream)
@@ -1048,6 +981,8 @@ STDMETHODIMP CMiscUtils::GetObjectAsStringizedByteStream(IUnknown *pObject, BSTR
 
 			throw uex;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22015");
 }
@@ -1082,6 +1017,8 @@ STDMETHODIMP CMiscUtils::GetObjectFromStringizedByteStream(BSTR bstrByteStream, 
 
 		// Return the object
 		*ppObject = ipPersistObj.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22023");
 }
@@ -1121,6 +1058,8 @@ STDMETHODIMP CMiscUtils::GetExpandedTags(BSTR bstrString, BSTR bstrSourceDocName
 
 		// Return the result
 		*pbstrExpanded = _bstr_t(strExpanded.c_str()).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22712");
 }
@@ -1146,6 +1085,8 @@ STDMETHODIMP CMiscUtils::GetExpansionFunctionNames(IVariantVector** ppFunctionNa
 
 		// Return the result
 		*ppFunctionNames = (IVariantVector*) ipFunctions.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22716");
 }

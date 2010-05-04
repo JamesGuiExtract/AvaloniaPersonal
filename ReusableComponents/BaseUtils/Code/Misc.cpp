@@ -9,6 +9,7 @@
 #include "cpputil.h"
 #include "UCLIDException.h"
 #include "stringCSIS.h"
+#include "TemporaryFileName.h"
 
 #include <io.h>
 #include <fstream>
@@ -205,14 +206,6 @@ void fillPageNumberVector(vector<int>& rvecPageNumbers,
 void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 {
 	string strRegFullKey = strRegistryKey;
-	
-	static auto_ptr<IConfigurationSettingsPersistenceMgr> pSettings(NULL);
-	if (pSettings.get() == NULL)
-	{
-		pSettings = auto_ptr<IConfigurationSettingsPersistenceMgr>(
-			new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
-		ASSERT_RESOURCE_ALLOCATION("ELI08827", pSettings.get() != NULL);
-	}
 
 	// compute the folder and keyname from the registry key
 	// for use with the RegistryPersistenceMgr class
@@ -247,19 +240,33 @@ void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 
 	bool bAutoEncryptOn = false;
 
-	// check if the registry key for auto-encrypt exists.
-	// if it does not, create the key with a default value of "0"
-	if (!pSettings->keyExists(strRegFolder, strRegKey))
+	// Protect access to the IConfigurationSettingsPersistenceMgr
 	{
-		pSettings->createKey(strRegFolder, strRegKey, "0");
-	}
-	else
-	{
-		// get the key value. If it is "1", then auto-encrypt 
-		// setting is on
-		if (pSettings->getKeyValue(strRegFolder, strRegKey) == "1")
+		static CMutex mutex;
+		CSingleLock lg(&mutex, TRUE );
+
+		static auto_ptr<IConfigurationSettingsPersistenceMgr> pSettings(NULL);
+		if (pSettings.get() == NULL)
 		{
-			bAutoEncryptOn = true;
+			pSettings = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+				new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
+			ASSERT_RESOURCE_ALLOCATION("ELI08827", pSettings.get() != NULL);
+		}
+	
+		// check if the registry key for auto-encrypt exists.
+		// if it does not, create the key with a default value of "0"
+		if (!pSettings->keyExists(strRegFolder, strRegKey))
+		{
+			pSettings->createKey(strRegFolder, strRegKey, "0");
+		}
+		else
+		{
+			// get the key value. If it is "1", then auto-encrypt 
+			// setting is on
+			if (pSettings->getKeyValue(strRegFolder, strRegKey) == "1")
+			{
+				bAutoEncryptOn = true;
+			}
 		}
 	}
 
@@ -269,23 +276,65 @@ void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 		return;
 	}
 
-	// If ETF already exists, compare the last modification
-	// on both the base file and the etf file
-	if (::isFileOrFolderValid(strFile.c_str()))
+	// Use a temporary file alongside the target etf file to use a flag that the file is currently
+	// being encrypted.
 	{
-		// Compare timestamps
-		CTime tmBaseFile(getFileModificationTimeStamp(strBaseFile));
-		CTime tmETFFile(getFileModificationTimeStamp(strFile));
-		if (tmBaseFile <= tmETFFile)
-		{
-			// no need to encrypt the file again
-			return;
-		}
-	}
+		auto_ptr<TemporaryFileName> apTempFile(NULL);
 
-	// Encrypt the base file
-	static EncryptedFileManager efm;
-	efm.encrypt(strBaseFile, strFile);
+		// If there is a temporary encryption file it means the file is currently being encrypted.
+		// Wait up to 10 seconds for the file to go away.
+		string strTempEncryptionFile = strFile + ".encryption.tmp";
+		int nWaitTime = 0;
+		while (apTempFile.get() == NULL)
+		{
+			if (!isValidFile(strTempEncryptionFile))
+			{
+				try
+				{
+					apTempFile.reset(new TemporaryFileName(strTempEncryptionFile));
+				}
+				catch (...)
+				{
+					apTempFile.reset(NULL);
+				}
+			}
+
+			if (nWaitTime > 10000)
+			{
+				UCLIDException ue("ELI07701", "Timeout waiting for file to be encyrypted!");
+				ue.addDebugInfo("Filename", strFile);
+				ue.addDebugInfo("Temp filename", strTempEncryptionFile);
+				throw ue;
+			}
+
+			Sleep(100);
+			nWaitTime += 100;
+		}
+
+		// If ETF already exists, compare the last modification
+		// on both the base file and the etf file
+		if (::isFileOrFolderValid(strFile.c_str()))
+		{
+			// Compare timestamps
+			CTime tmBaseFile(getFileModificationTimeStamp(strBaseFile));
+			CTime tmETFFile(getFileModificationTimeStamp(strFile));
+			if (tmBaseFile <= tmETFFile)
+			{
+				// no need to encrypt the file again
+				return;
+			}
+		}
+
+		// Encrypt the base file to the temporary filename
+		static EncryptedFileManager efm;
+		efm.encrypt(strBaseFile, strTempEncryptionFile);
+
+		// Once the encryption process is complete, copy it into the real destination.
+		copyFile(strTempEncryptionFile, strFile);
+
+		// strTempEncryptionFile goes out of scope here, allowing auto-encryption from other threads
+		// and processes access here.
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void writeLinesToFile(const vector<string>& vecLines, const string& strFileName, bool bAppend)

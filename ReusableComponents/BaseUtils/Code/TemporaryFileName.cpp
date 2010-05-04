@@ -26,7 +26,7 @@ m_bAutoDelete(bAutoDelete)
 {
 	try
 	{
-		init("", pszPrefix, pszSuffix);
+		init("", pszPrefix, pszSuffix, true);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20700");
 }
@@ -38,7 +38,19 @@ m_bAutoDelete(bAutoDelete)
 {
 	try
 	{
-		init(strDir, pszPrefix, pszSuffix);
+		init(strDir, pszPrefix, pszSuffix, true);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20701");
+}
+//--------------------------------------------------------------------------------------------------
+TemporaryFileName::TemporaryFileName(const string& strFileName, bool bAutoDelete/* = true*/) :
+m_strFileName(""),
+m_bAutoDelete(bAutoDelete)
+{
+	try
+	{
+		init(getDirectoryFromFullPath(strFileName), getFileNameWithoutExtension(strFileName).c_str(),
+			 getExtensionFromFullPath(strFileName).c_str(), false);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20701");
 }
@@ -63,7 +75,8 @@ TemporaryFileName::~TemporaryFileName()
 // moved from constuctor as per [p13 #4951] - JDS 04/09/2008
 // along with this change changed from using _tempnam to GetTempFileName
 // which allows specification of a directory (and is more secure than _tempnam)
-void TemporaryFileName::init(string strDir, const char *pszPrefix, const char* pszSuffix)
+void TemporaryFileName::init(string strDir, const char *pszPrefix, const char* pszSuffix,
+							 bool bRandomFileName)
 {
 	string strSuffix = ".tmp";
 	string strPrefix = (pszPrefix != NULL ? pszPrefix : "");
@@ -121,12 +134,20 @@ void TemporaryFileName::init(string strDir, const char *pszPrefix, const char* p
 	ASSERT_RESOURCE_ALLOCATION("ELI29992", pMutex.get() != NULL);
 
 	CSingleLock lock(pMutex.get(), TRUE);
-	do
+
+	if (bRandomFileName)
 	{
-		// Build a random file name
-		strFileName = strDir + strPrefix + m_Rand.getRandomString(8, true, false, true) + strSuffix;
+		do
+		{
+			// Build a random file name
+			strFileName = strDir + strPrefix + m_Rand.getRandomString(8, true, false, true) + strSuffix;
+		}
+		while (isValidFile(strFileName));
 	}
-	while (isValidFile(strFileName));
+	else
+	{
+		strFileName = strDir + strPrefix + strSuffix;
+	}
 
 	HANDLE hFileHandle = CreateFile(strFileName.c_str(), GENERIC_WRITE | GENERIC_READ,
 		0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL |

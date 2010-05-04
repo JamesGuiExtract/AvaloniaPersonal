@@ -20,6 +20,9 @@ public:
 	TemporaryFileName(const char *pszPrefix = NULL, const char *pszSuffix = NULL, 
 		bool bAutoDelete = true);
 	//----------------------------------------------------------------------------------------------
+	// constructor
+	TemporaryFileName(const string& strFileName, bool bAutoDelete = true);
+	//----------------------------------------------------------------------------------------------
 	// destructor
 	// PROMISE: to delete the file whose name is getName(), if the file exists, and
 	// if m_bAutoDelete == true.
@@ -44,8 +47,10 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: To create a unique temporary file in the specified directory (if no directory
 	//			is specified then will create the file in the TEMP directory).  Also
-	//			sets the m_strFileName to point to the specified file.  
+	//			sets the m_strFileName to point to the specified file. If bRandomFileName is true,
+	//			random characters will be inserted between the prefix and suffix, if false, the
+	//			filename will simply be dir + prefix + suffix.
 	//
 	// PROMISE: To throw an exception if unable to create the temporary file.
-	void init(string strDir, const char* pszPrefix, const char* pszSuffix);
+	void init(string strDir, const char* pszPrefix, const char* pszSuffix, bool bRandomFileName);
 };
