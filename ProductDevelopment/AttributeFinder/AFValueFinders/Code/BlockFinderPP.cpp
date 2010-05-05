@@ -492,7 +492,15 @@ LRESULT CBlockFinderPP::OnClickedCluesInfo(WORD wNotifyCode, WORD wID, HWND hWnd
 		// show tooltip info
 		CString zText("- Interpretation : String literal or regular expression,\n"
 					  "  depends upon the state of regular expression checkbox.\n\n"
-					  "- Case sensitive : No");
+					  "- Case sensitive : No\n\n"
+					  "- Dynamically loading a string list from a file is supported.\n"
+					  "- To specify a dynamic file, an entry must begin with \"file://\".\n"
+					  "- A file may be specified in combination with static entries or\n"
+					  "  additional dynamic lists.\n"
+					  "- Path tags such as <RSDFileDir> and <ComponentDataDir> may be used.\n"
+					  "- For example, if an entry in the list is file://<RSDFileDir>\\list.txt,\n"
+					  "  the entry will be replaced dynamically at runtime with the contents\n"
+					  "  of the file.\n");
 		m_infoTip.Show(zText);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06849");

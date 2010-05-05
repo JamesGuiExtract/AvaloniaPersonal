@@ -5,6 +5,8 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <CachedListLoader.h>
+
 #include <string>
 #include <vector>
 
@@ -64,7 +66,8 @@ public:
 	STDMETHOD(put_IsCluePartOfAWord)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_Clues)(/*[out, retval]*/ IVariantVector **pVal);
 	STDMETHOD(put_Clues)(/*[in]*/ IVariantVector *newVal);
-	STDMETHOD(GetBlockScore)(/*[in]*/ BSTR strBlockText, /*[out, retval]*/ long *pScore);
+	STDMETHOD(GetBlockScore)(/*[in]*/ BSTR strBlockText, /*[in]*/ IAFDocument* pAFDoc,
+		/*[out, retval]*/ long *pScore);
 	STDMETHOD(get_GetMaxOnly)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_GetMaxOnly)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_MinNumberOfClues)(/*[out, retval]*/ long *pVal);
@@ -123,7 +126,7 @@ private:
 	IIUnknownVectorPtr getBlocksBeginEnd(ISpatialStringPtr ipSS);
 	IIUnknownVectorPtr getBlocksSeparator(ISpatialStringPtr ipSS);
 
-	IIUnknownVectorPtr chooseBlocks(IIUnknownVectorPtr ipItems);
+	IIUnknownVectorPtr chooseBlocks(IIUnknownVectorPtr ipItems, const IAFDocumentPtr& ipAFDoc);
 	IIUnknownVectorPtr getBlocks(ISpatialStringPtr ipSS);
 
 	////////////
@@ -157,4 +160,7 @@ private:
 	IVariantVectorPtr m_ipClues;
 
 	IMiscUtilsPtr m_ipMiscUtils;
+
+	// Cached list loader object to read clues from files
+	CCachedListLoader m_cachedListLoader;
 };

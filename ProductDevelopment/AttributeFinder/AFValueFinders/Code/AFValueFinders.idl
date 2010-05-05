@@ -335,7 +335,8 @@ library	UCLID_AFVALUEFINDERSLib
 		[propget, id(6), helpstring("property GetMaxOnly")] HRESULT GetMaxOnly([out, retval] VARIANT_BOOL *pVal);
 		[propput, id(6), helpstring("property GetMaxOnly")] HRESULT GetMaxOnly([in] VARIANT_BOOL newVal);
 		// with clues set, get the score for strBlockText.
-		[id(7), helpstring("method GetBlockScore")] HRESULT GetBlockScore([in] BSTR strBlockText, [out, retval] long *pScore);
+		[id(7), helpstring("method GetBlockScore")] HRESULT GetBlockScore([in] BSTR strBlockText,
+			[in] IAFDocument* pAFDoc, [out, retval] long *pScore);
 		[propget, id(8), helpstring("property Clues")] HRESULT Clues([out, retval] IVariantVector **pVal);
 		[propput, id(8), helpstring("property Clues")] HRESULT Clues([in] IVariantVector *newVal);
 		// whether or not each clue is a word by its own. In other words, if false, the clue text to be found

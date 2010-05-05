@@ -88,9 +88,11 @@ STDMETHODIMP CBlockFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 
 		// Create local Document pointer
 		IAFDocumentPtr ipAFDoc(pAFDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI30086", ipAFDoc != NULL);
 
 		// Get the text out from the spatial string
 		ISpatialStringPtr ipInputText(ipAFDoc->Text);
+		ASSERT_RESOURCE_ALLOCATION("ELI30087", ipInputText != NULL);
 		
 		IIUnknownVectorPtr ipItems( CLSID_IUnknownVector );
 		ASSERT_RESOURCE_ALLOCATION("ELI11005", ipItems != NULL);
@@ -98,7 +100,7 @@ STDMETHODIMP CBlockFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		if (ipInputText->IsEmpty() == VARIANT_FALSE)
 		{
 			ipItems = getBlocks(ipInputText);
-			ipItems = chooseBlocks(ipItems);
+			ipItems = chooseBlocks(ipItems, ipAFDoc);
 		}
 
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
@@ -136,13 +138,18 @@ STDMETHODIMP CBlockFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* 
 	{
 		IAttributePtr ipAttribute(pAttribute);
 		ASSERT_RESOURCE_ALLOCATION("ELI10079", ipAttribute != NULL);
+
 		ISpatialStringPtr ipInputText(ipAttribute->Value);
+		ASSERT_RESOURCE_ALLOCATION("ELI30088", ipAttribute != NULL);
+
+		IAFDocumentPtr ipOriginInput(pOriginInput);
+		// Not required to be non-NULL
 		
 		IIUnknownVectorPtr ipItems(NULL);
 		if (ipInputText->IsEmpty() == VARIANT_FALSE)
 		{
 			ipItems = getBlocks(ipInputText);
-			ipItems = chooseBlocks(ipItems);
+			ipItems = chooseBlocks(ipItems, ipOriginInput);
 		}
 
 		ISpatialStringPtr ipNewValue(CLSID_SpatialString);
@@ -684,13 +691,16 @@ STDMETHODIMP CBlockFinder::put_GetMaxOnly(VARIANT_BOOL newVal)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CBlockFinder::GetBlockScore(BSTR strBlockText, long *pScore)
+STDMETHODIMP CBlockFinder::GetBlockScore(BSTR strBlockText, IAFDocument* pAFDoc, long *pScore)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
 		validateLicense();
+
+		IAFDocumentPtr ipAFDoc(pAFDoc);
+		// Not required to be non-NULL
 
 		// Get a regular expression parser
 		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("BlockFinder");
@@ -699,14 +709,18 @@ STDMETHODIMP CBlockFinder::GetBlockScore(BSTR strBlockText, long *pScore)
 		// All comparisons are case insensitive
 		ipParser->IgnoreCase = VARIANT_TRUE;
 
+		// Get a list of values that includes values from any specified files.
+		IVariantVectorPtr ipExpandedClues = m_cachedListLoader.expandList(m_ipClues, ipAFDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI30089", ipExpandedClues != NULL);
+
 		string strBlock = asString( strBlockText );
-		long nCluesSize = m_ipClues->Size;
+		long nCluesSize = ipExpandedClues->Size;
 		string strClue("");
 		long nScore = 0;
 		for (int n = 0; n < nCluesSize; n++)
 		{
 			// get each clue
-			strClue = asString(_bstr_t(m_ipClues->GetItem(n)));
+			strClue = asString(_bstr_t(ipExpandedClues->GetItem(n)));
 			if (!m_bIsClueRegularExpression)
 			{
 				// replace any special characters
@@ -1045,7 +1059,8 @@ IIUnknownVectorPtr CBlockFinder::getBlocks(ISpatialStringPtr ipSS)
 	return ipItems;
 }
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CBlockFinder::chooseBlocks(IIUnknownVectorPtr ipItems)
+IIUnknownVectorPtr CBlockFinder::chooseBlocks(IIUnknownVectorPtr ipItems,
+											  const IAFDocumentPtr& ipAFDoc)
 {
 	// final returning vec
 	IIUnknownVectorPtr ipFoundBlocks(NULL);
@@ -1083,7 +1098,7 @@ IIUnknownVectorPtr CBlockFinder::chooseBlocks(IIUnknownVectorPtr ipItems)
 			_bstr_t	bstrBlock(ipString->GetString());
 
 			// Get score of this Block
-			nCurrentScore = ipThis->GetBlockScore(bstrBlock);
+			nCurrentScore = ipThis->GetBlockScore(bstrBlock, ipAFDoc);
 
 			// score must be at least same as minimum score
 			if (nCurrentScore >= m_nMinNumberOfClues)
