@@ -424,14 +424,17 @@ STDMETHODIMP CMergeAttributesPP::Apply(void)
 			{
 				_bstr_t bstrType = verifyControlValueAsBSTR(m_editSpecifiedType);
 
-				try
+				if (bstrType.length() > 0)
 				{
-					validateIdentifier(asString(bstrType));
-				}
-				catch(...)
-				{
-					m_editSpecifiedType.SetFocus();
-					throw;
+					try
+					{
+						validateIdentifier(asString(bstrType));
+					}
+					catch(...)
+					{
+						m_editSpecifiedType.SetFocus();
+						throw;
+					}
 				}
 
 				ipRule->TypeMergeMode = (UCLID_AFOUTPUTHANDLERSLib::EFieldMergeMode) kSpecifyField;
