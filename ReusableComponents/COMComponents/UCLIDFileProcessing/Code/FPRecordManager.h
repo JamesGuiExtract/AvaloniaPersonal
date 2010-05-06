@@ -141,6 +141,12 @@ public:
 	// PROMISE: To return the number of files that have failed processing
 	long getNumberOfFilesFailed();
 	//---------------------------------------------------------------------------------------------
+	// PROMISE: To signal the stop processing event.
+	void stopProcessingQueue();
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To return true if stop processing has been signaled and false otherwise.
+	bool processingIsStopped();
+	//---------------------------------------------------------------------------------------------
 
 private:
 
@@ -160,6 +166,12 @@ private:
 	// This is like a bank employee telling customers in the queue inside the bank that
 	// their computers are down and so no customers can be served for now.
 	Win32Event m_queueDiscardedEvent;
+
+	// This event controls whether more files should be added to the queue.  If the
+	// queue is in the stop state, that means that we will not let any more files be added
+	// to the queue nor will we let any more files be removed from the queue (threads in the
+	// pop method will return without getting a file).
+	Win32Event m_queueStopEvent;
 
 	// A handle to the File Processing dialog that will be sent update messages as 
 	// the queues status changes

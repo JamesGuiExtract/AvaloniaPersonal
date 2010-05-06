@@ -1406,6 +1406,10 @@ UINT CFileProcessingMgmtRole::handleStopRequestAsynchronously(void *pData)
 		ASSERT_RESOURCE_ALLOCATION("ELI19431", pRecordManager != NULL);
 		ASSERT_ARGUMENT("ELI19433", pFPM->m_ipRoleNotifyFAM != NULL );
 		
+		// Notify the queue that processing is stopping so it will no longer satisfy file
+		// requests
+		pRecordManager->stopProcessingQueue();
+
 		// Notify the FAM that processing is cancelling
 		if (pFPM->m_eCurrentRunningState == kNormalStop)
 		{	

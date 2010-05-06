@@ -121,8 +121,11 @@ void CManageUsersDlg::OnBtnAdd()
 
 	try
 	{
+		// Get the current user name
+		CString zUserName = getCurrentUserName().c_str();
+
 		// Prompt for new user
-		PromptDlg dlgAddUser("Add User", "Username");
+		PromptDlg dlgAddUser("Add User", "Username", zUserName);
 		if (dlgAddUser.DoModal() == IDOK)
 		{
 			string strUserToAdd = (LPCSTR)dlgAddUser.m_zInput;

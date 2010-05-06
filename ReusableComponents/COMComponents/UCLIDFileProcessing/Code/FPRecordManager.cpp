@@ -70,6 +70,17 @@ void FPRecordManager::closeProcessingQueue()
 	m_queueClosedEvent.signal();
 }
 //-------------------------------------------------------------------------------------------------
+void FPRecordManager::stopProcessingQueue()
+{
+	m_queueStopEvent.signal();
+}
+//-------------------------------------------------------------------------------------------------
+bool FPRecordManager::processingIsStopped()
+{
+	// Check the status of the processing is stopped event
+	return m_queueStopEvent.isSignaled();
+}
+//-------------------------------------------------------------------------------------------------
 bool FPRecordManager::processingQueueIsDiscarded()
 {
 	// check the status of the queue discarded event and return boolean value
@@ -155,7 +166,7 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 {
 	// keep waiting until either the queue is closed, or a file is available in the
 	// queue for processing
-	while (true)
+	while (!processingIsStopped())
 	{
 		// if the queue is discarded, then return false immediately
 		if (processingQueueIsDiscarded())
@@ -197,6 +208,13 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 			// files left to process in this run.
 			nNumberToLoad = min(m_nMaxFilesFromDB, 
 				m_nNumberOfFilesToProcess - m_nNumberOfFilesProcessed);
+		}
+
+		// Check if processing has stopped before loading new tasks or grabbing a new file
+		// from the queue. [LRCAU #5610]
+		if (processingIsStopped())
+		{
+			return false;
 		}
 
 		if (m_queTaskIds.size() <= 0 && !processingQueueIsDiscarded())
@@ -249,6 +267,8 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 		// sleep for the specified amount of time.
 		Sleep(m_nMillisecondsBetweenDBCheck);
 	}
+
+	return false;
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::clear(bool bClearUI)
@@ -278,6 +298,7 @@ void FPRecordManager::clearEvents()
 
 	m_queueClosedEvent.reset();
 	m_queueDiscardedEvent.reset();
+	m_queueStopEvent.reset();
 }
 //-------------------------------------------------------------------------------------------------
 const FileProcessingRecord& FPRecordManager::getTask(long nTaskID)
