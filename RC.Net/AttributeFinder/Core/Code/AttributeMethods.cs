@@ -52,10 +52,10 @@ namespace Extract.AttributeFinder
         /// Gets an array of COM attributes that have the specified name.
         /// </summary>
         /// <param name="attributes">A vector of COM attributes to search.</param>
-        /// <param name="name">The name of the attributes to return.</param>
-        /// <returns>An array of COM attributes in <paramref name="attributes"/> that have the 
-        /// specified <paramref name="name"/>.</returns>
-        public static ComAttribute[] GetAttributesByName(IIUnknownVector attributes, string name)
+        /// <param name="names">The name(s) of the attributes to return.</param>
+        /// <returns>An array of COM attributes in <paramref name="attributes"/> that matches one of
+        /// the specified <paramref name="names"/>.</returns>
+        public static ComAttribute[] GetAttributesByName(IIUnknownVector attributes, params string[] names)
         {
             try
             {
@@ -69,9 +69,13 @@ namespace Extract.AttributeFinder
 
                     // If this attribute matches the specified name, add it to the result
                     string attributeName = attribute.Name;
-                    if (attributeName.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    foreach (string name in names)
                     {
-                        result.Add(attribute);
+                        if (attributeName.Equals(name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            result.Add(attribute);
+                            break;
+                        }
                     }
                 }
 
@@ -81,7 +85,13 @@ namespace Extract.AttributeFinder
             {
                 ExtractException ee = new ExtractException("ELI28540",
                     "Unable to get attribute by name.", ex);
-                ee.AddDebugData("Attribute name", name, false);
+                string nameList = "";
+                try
+                {
+                    nameList = StringMethods.ConvertArrayToDelimitedList(names, ", ");
+                }
+                catch (Exception){}
+                ee.AddDebugData("Attribute names", nameList, false);
                 throw ee;
             }
         }

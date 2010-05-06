@@ -181,20 +181,10 @@ namespace Extract.Redaction
             WriteCurrentItems(writer, _voaFile.Items);
             WriteRevisions(writer, _voaFile.RevisionsAttribute);
 
-            // Verification and redaction sessions
-            if (_voaFile.VerificationSessions.Count > 0)
+            // Verification, redaction and surround context sessions
+            if (_voaFile.AllSessions.Count > 0)
             {
-                WriteVerificationSessions(writer, _voaFile.VerificationSessions);
-            }
-
-            if (_voaFile.RedactionSessions.Count > 0)
-            {
-                WriteRedactionSessions(writer, _voaFile.RedactionSessions);
-            }
-
-            if (_voaFile.SurroundContextSessions.Count > 0)
-            {
-                WriteSurroundContextSessions(writer, _voaFile.SurroundContextSessions);
+                WriteSessions(writer, _voaFile.AllSessions);
             }
 
             writer.WriteEndElement();
@@ -363,34 +353,64 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Writes the verification sessions to xml.
+        /// Writes all sessions to xml
         /// </summary>
-        /// <param name="writer">The writer to write the xml.</param>
-        /// <param name="sessions">The attributes containing the verification session data.</param>
-        static void WriteVerificationSessions(XmlWriter writer, IEnumerable<ComAttribute> sessions)
+        /// <param name="writer"></param>
+        /// <param name="sessions"></param>
+        static void WriteSessions(XmlWriter writer, IEnumerable<ComAttribute> sessions)
         {
             foreach (ComAttribute session in sessions)
             {
-                writer.WriteStartElement("IDShieldVerificationSession");
-                writer.WriteAttributeString("ID", session.Value.String);
+                string sessionName = session.Name;
 
-                IUnknownVector subAttributes = session.SubAttributes;
-
-                // User Info and Time Info
-                WriteUserInfo(writer, subAttributes);
-                WriteTimeInfo(writer, subAttributes);
-
-                // File Info and Verification Options
-                WriteVerificationFileInfo(writer, subAttributes);
-                WriteAttributeAsXml(writer, subAttributes, "VerificationOptions", "VerifyAllPages");
-
-                // Entries Added, Deleted, and Modified
-                WriteEntries(writer, subAttributes, "EntriesAdded");
-                WriteEntries(writer, subAttributes, "EntriesDeleted");
-                WriteEntries(writer, subAttributes, "EntriesModified");
-
-                writer.WriteEndElement();
+                if (sessionName.Equals(Constants.VerificationSessionMetaDataName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    WriteVerificationSession(writer, session);
+                }
+                else if (sessionName.Equals(Constants.RedactionSessionMetaDataName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    WriteRedactionSession(writer, session);
+                }
+                else if (sessionName.Equals(Constants.SurroundContextSessionMetaDataName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    WriteSurroundContextSession(writer, session);
+                }
+                else
+                {
+                    ExtractException.ThrowLogicException("ELI30095");
+                }
             }
+        }
+
+        /// <summary>
+        /// Writes the verification sessions to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="session">The attribute containing the verification session data.</param>
+        static void WriteVerificationSession(XmlWriter writer, ComAttribute session)
+        {
+            writer.WriteStartElement("IDShieldVerificationSession");
+            writer.WriteAttributeString("ID", session.Value.String);
+
+            IUnknownVector subAttributes = session.SubAttributes;
+
+            // User Info and Time Info
+            WriteUserInfo(writer, subAttributes);
+            WriteTimeInfo(writer, subAttributes);
+
+            // File Info and Verification Options
+            WriteVerificationFileInfo(writer, subAttributes);
+            WriteAttributeAsXml(writer, subAttributes, "VerificationOptions", "VerifyAllPages");
+
+            // Entries Added, Deleted, and Modified
+            WriteEntries(writer, subAttributes, "EntriesAdded");
+            WriteEntries(writer, subAttributes, "EntriesDeleted");
+            WriteEntries(writer, subAttributes, "EntriesModified");
+
+            writer.WriteEndElement();
         }
 
         /// <summary>
@@ -410,64 +430,58 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Writes the redaction sessions to xml.
+        /// Writes the redaction session to xml.
         /// </summary>
         /// <param name="writer">The writer to write the xml.</param>
-        /// <param name="sessions">The attributes containing the redaction session data.</param>
-        static void WriteRedactionSessions(XmlWriter writer, IEnumerable<ComAttribute> sessions)
+        /// <param name="session">The attribute containing the redaction session data.</param>
+        static void WriteRedactionSession(XmlWriter writer, ComAttribute session)
         {
-            foreach (ComAttribute session in sessions)
-            {
-                writer.WriteStartElement("RedactedFileOutputSession");
-                writer.WriteAttributeString("ID", session.Value.String);
+            writer.WriteStartElement("RedactedFileOutputSession");
+            writer.WriteAttributeString("ID", session.Value.String);
 
-                IUnknownVector subAttributes = session.SubAttributes;
+            IUnknownVector subAttributes = session.SubAttributes;
 
-                // User Info and Time Info
-                WriteUserInfo(writer, subAttributes);
-                WriteTimeInfo(writer, subAttributes);
+            // User Info and Time Info
+            WriteUserInfo(writer, subAttributes);
+            WriteTimeInfo(writer, subAttributes);
 
-                // File Info
-                WriteRedactionFileInfo(writer, subAttributes);
-                
-                // Output Options
-                WriteOutputOptions(writer, subAttributes);
+            // File Info
+            WriteRedactionFileInfo(writer, subAttributes);
+            
+            // Output Options
+            WriteOutputOptions(writer, subAttributes);
 
-                // Entries Added, Deleted, Modified
-                WriteEntries(writer, subAttributes, "EntriesRedacted");
+            // Entries Added, Deleted, Modified
+            WriteEntries(writer, subAttributes, "EntriesRedacted");
 
-                writer.WriteEndElement();
-            }
+            writer.WriteEndElement();
         }
 
         /// <summary>
-        /// Writes the surround context sessions to xml.
+        /// Writes the surround context session to xml.
         /// </summary>
         /// <param name="writer">The writer to write the xml.</param>
-        /// <param name="sessions">The attributes containing the surround context data.</param>
-        static void WriteSurroundContextSessions(XmlWriter writer, IEnumerable<ComAttribute> sessions)
+        /// <param name="session">The attribute containing the surround context data.</param>
+        static void WriteSurroundContextSession(XmlWriter writer, ComAttribute session)
         {
-            foreach (ComAttribute session in sessions)
-            {
-                writer.WriteStartElement("SurroundContextSession");
-                writer.WriteAttributeString("ID", session.Value.String);
+            writer.WriteStartElement("SurroundContextSession");
+            writer.WriteAttributeString("ID", session.Value.String);
 
-                IUnknownVector subAttributes = session.SubAttributes;
+            IUnknownVector subAttributes = session.SubAttributes;
 
-                // User Info and Time Info
-                WriteUserInfo(writer, subAttributes);
-                WriteTimeInfo(writer, subAttributes);
+            // User Info and Time Info
+            WriteUserInfo(writer, subAttributes);
+            WriteTimeInfo(writer, subAttributes);
 
-                // File Info and Options
-                WriteVerificationFileInfo(writer, subAttributes);
-                WriteAttributeAsXml(writer, subAttributes, "Options", 
-                    "TypesToExtend", "WordsToExtend", "ExtendHeight");
+            // File Info and Options
+            WriteVerificationFileInfo(writer, subAttributes);
+            WriteAttributeAsXml(writer, subAttributes, "Options", 
+                "TypesToExtend", "WordsToExtend", "ExtendHeight");
 
-                // Entries Modified
-                WriteEntries(writer, subAttributes, "EntriesModified");
+            // Entries Modified
+            WriteEntries(writer, subAttributes, "EntriesModified");
 
-                writer.WriteEndElement();
-            }
+            writer.WriteEndElement();
         }
 
         /// <summary>

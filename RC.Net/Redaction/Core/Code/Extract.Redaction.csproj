@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoTool.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="EventArgs.cs" />
     <Compile Include="ConfidenceLevel.cs" />
     <Compile Include="ConfidenceLevelsCollection.cs" />

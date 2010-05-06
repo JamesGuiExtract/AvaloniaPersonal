@@ -68,6 +68,11 @@ namespace Extract.Redaction
         List<ComAttribute> _metadata;
 
         /// <summary>
+        /// All previous sessions.
+        /// </summary>
+        ComAttribute[] _allSessions;
+
+        /// <summary>
         /// The previous verification sessions.
         /// </summary>
         ComAttribute[] _verificationSessions;
@@ -181,6 +186,19 @@ namespace Extract.Redaction
             get 
             {
                 return _revisionsAttribute;
+            }
+        }
+
+        /// <summary>
+        /// Gets all session attributes.
+        /// </summary>
+        /// <value>The verification session attributes.</value>
+        [CLSCompliant(false)]
+        public ReadOnlyCollection<ComAttribute> AllSessions
+        {
+            get
+            {
+                return new ReadOnlyCollection<ComAttribute>(_allSessions);
             }
         }
 
@@ -299,16 +317,22 @@ namespace Extract.Redaction
             // Determine the next attribute id
             _nextId = GetNextId(_sensitiveItems, _revisionsAttribute);
 
+            // Get all previous sessions
+            _allSessions = AttributeMethods.GetAttributesByName(attributes,
+                Constants.AllSessionMetaDataNames);
+
             // Get the previous verification sessions
-            _verificationSessions = AttributeMethods.GetAttributesByName(attributes, "_VerificationSession");
+            _verificationSessions = AttributeMethods.GetAttributesByName(attributes,
+                Constants.VerificationSessionMetaDataName);
             _verificationSessionId = GetSessionId(_verificationSessions);
 
             // Get the previous redaction sessions
-            _redactionSessions = AttributeMethods.GetAttributesByName(attributes, "_RedactedFileOutputSession");
+            _redactionSessions = AttributeMethods.GetAttributesByName(attributes,
+                Constants.RedactionSessionMetaDataName);
 
             // Get the previous surround context sessions
             _surroundContextSessions = AttributeMethods.GetAttributesByName(attributes,
-                "_SurroundContextSession");
+                Constants.SurroundContextSessionMetaDataName);
             _surroundContextSessionId = GetSessionId(_surroundContextSessions);
 
             // Store the remaining attributes
@@ -626,7 +650,7 @@ namespace Extract.Redaction
                 ComAttribute sessionData = CreateVerificationOptionsAttribute(settings);
 
                 // Calculate the new sensitive items
-                SaveSession("_VerificationSession", _verificationSessionId, 
+                SaveSession(Constants.VerificationSessionMetaDataName, _verificationSessionId, 
                     fileName, changes, time, sessionData);
 
                 // Update the session id
@@ -657,7 +681,7 @@ namespace Extract.Redaction
                 ComAttribute sessionData = CreateSurroundContextOptionsAttribute(settings);
 
                 // Calculate the new sensitive items
-                SaveSession("_SurroundContextSession", _surroundContextSessionId,
+                SaveSession(Constants.SurroundContextSessionMetaDataName, _surroundContextSessionId,
                     fileName, changes, time, sessionData);
 
                 // Update the session id
