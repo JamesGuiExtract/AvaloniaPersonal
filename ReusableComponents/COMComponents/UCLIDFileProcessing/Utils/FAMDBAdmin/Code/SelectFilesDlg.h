@@ -62,7 +62,6 @@ protected:
 	afx_msg void OnClickedCheckRandomSubset();
 	afx_msg void OnFilesUnderActionChange();
 	afx_msg void OnFilesUnderStatusChange();
-	afx_msg void OnCancel();
 	afx_msg void OnClose();
 	afx_msg void OnOK();
 	afx_msg void OnClickedOK();

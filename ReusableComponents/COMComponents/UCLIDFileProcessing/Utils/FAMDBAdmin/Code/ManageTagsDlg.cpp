@@ -51,12 +51,8 @@ END_MESSAGE_MAP()
 //-------------------------------------------------------------------------------------------------
 void CManageTagsDlg::CAddModifyTagsDlg::OnOK()
 {
-	// Do nothing - stubbed in to prevent close on enter
-}
-//-------------------------------------------------------------------------------------------------
-void CManageTagsDlg::CAddModifyTagsDlg::OnCancel()
-{
-	// Do nothing - stubbed in to prevent close on escape
+	// Allow the user to use the enter key to close the dialog
+	OnBtnOK();
 }
 //-------------------------------------------------------------------------------------------------
 BOOL CManageTagsDlg::CAddModifyTagsDlg::OnInitDialog()
@@ -180,11 +176,6 @@ BEGIN_MESSAGE_MAP(CManageTagsDlg, CDialog)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
-void CManageTagsDlg::OnOK()
-{
-	// Stubbed in to prevent close on enter
-}
-//-------------------------------------------------------------------------------------------------
 BOOL CManageTagsDlg::PreTranslateMessage(MSG *pMsg)
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -199,12 +190,6 @@ BOOL CManageTagsDlg::PreTranslateMessage(MSG *pMsg)
 			if (TranslateAccelerator(m_hWnd, hAccel, pMsg))
 			{
 				// since the message has been handled, no further dispatch is needed
-				return TRUE;
-			}
-
-			// Find and eat an Escape character
-			if (pMsg->wParam == VK_ESCAPE)
-			{
 				return TRUE;
 			}
 		}

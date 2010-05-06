@@ -39,7 +39,6 @@ protected:
 	afx_msg void OnBtnDelete();
 	afx_msg void OnBtnRefresh();
 	afx_msg void OnBtnClose();
-	afx_msg void OnOK();
 	afx_msg void OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnLvnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult);
 
@@ -66,7 +65,6 @@ private:
 		virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 		virtual BOOL OnInitDialog();
 		afx_msg void OnOK();
-		afx_msg void OnCancel();
 		afx_msg void OnBtnOK();
 		afx_msg void OnBtnCancel();
 		DECLARE_MESSAGE_MAP()

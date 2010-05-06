@@ -40,7 +40,6 @@ protected:
 	afx_msg void OnBtnRefresh();
 	afx_msg void OnBtnClearPassword();
 	afx_msg void OnBtnClose();
-	afx_msg void OnOK();
 	afx_msg void OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnLvnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult);
 

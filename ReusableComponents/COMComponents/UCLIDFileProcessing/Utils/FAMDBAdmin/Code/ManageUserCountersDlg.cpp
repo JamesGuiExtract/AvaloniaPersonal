@@ -51,17 +51,6 @@ BEGIN_MESSAGE_MAP(CManageUserCountersDlg::CAddModifyUserCountersDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTN_ADD_COUNTER_CANCEL, CManageUserCountersDlg::CAddModifyUserCountersDlg::OnBtnCancel)
 END_MESSAGE_MAP()
 //-------------------------------------------------------------------------------------------------
-void CManageUserCountersDlg::CAddModifyUserCountersDlg::OnOK()
-{
-	// Allow the user to use the enter key to close the dialog
-	OnBtnOK();
-}
-//-------------------------------------------------------------------------------------------------
-void CManageUserCountersDlg::CAddModifyUserCountersDlg::OnCancel()
-{
-	// Do nothing - stubbed in to prevent close on escape
-}
-//-------------------------------------------------------------------------------------------------
 BOOL CManageUserCountersDlg::CAddModifyUserCountersDlg::OnInitDialog()
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -98,6 +87,12 @@ BOOL CManageUserCountersDlg::CAddModifyUserCountersDlg::OnInitDialog()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27788");
 
 	return FALSE;
+}
+//-------------------------------------------------------------------------------------------------
+void CManageUserCountersDlg::CAddModifyUserCountersDlg::OnOK()
+{
+	// Allow the user to use the enter key to close the dialog
+	OnBtnOK();
 }
 //-------------------------------------------------------------------------------------------------
 void CManageUserCountersDlg::CAddModifyUserCountersDlg::OnBtnOK()
@@ -221,11 +216,6 @@ BEGIN_MESSAGE_MAP(CManageUserCountersDlg, CDialog)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
-void CManageUserCountersDlg::OnOK()
-{
-	// Stubbed in to prevent close on enter
-}
-//-------------------------------------------------------------------------------------------------
 BOOL CManageUserCountersDlg::PreTranslateMessage(MSG *pMsg)
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -240,12 +230,6 @@ BOOL CManageUserCountersDlg::PreTranslateMessage(MSG *pMsg)
 			if (TranslateAccelerator(m_hWnd, hAccel, pMsg))
 			{
 				// since the message has been handled, no further dispatch is needed
-				return TRUE;
-			}
-
-			// Find and eat an Escape character
-			if (pMsg->wParam == VK_ESCAPE)
-			{
 				return TRUE;
 			}
 		}

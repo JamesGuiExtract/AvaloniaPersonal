@@ -1933,11 +1933,6 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToOriginalIma
 {
 	try
 	{
-		// TODO: It looks like the intention was to pass ipPageInfo to translateToNewPageInfo, but
-		// don't want to make this change late in the development cycle. [LRCAU #5775]
-		//UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo = m_ipPageInfoMap->GetValue(nPage);
-		//ASSERT_RESOURCE_ALLOCATION("ELI25363", ipPageInfo != NULL);
-
 		return translateToNewPageInfo(lStartX, lStartY, lEndX, lEndY, lHeight, nPage);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25823");

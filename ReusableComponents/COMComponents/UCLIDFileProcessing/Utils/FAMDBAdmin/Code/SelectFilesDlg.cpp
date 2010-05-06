@@ -242,12 +242,8 @@ void CSelectFilesDlg::OnClickedRadioFilesWithPriority()
 //-------------------------------------------------------------------------------------------------
 void CSelectFilesDlg::OnOK()
 {
-	// Stubbed in to prevent dialog closing when enter is pressed
-}
-//-------------------------------------------------------------------------------------------------
-void CSelectFilesDlg::OnCancel()
-{
-	// Stubbed in to prevent dialog closing when escape is pressed
+	// Allow the user to use the enter key to close the dialog
+	OnClickedOK();
 }
 //-------------------------------------------------------------------------------------------------
 void CSelectFilesDlg::OnClose()

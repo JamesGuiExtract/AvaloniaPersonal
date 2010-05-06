@@ -70,11 +70,6 @@ BEGIN_MESSAGE_MAP(CManageActionsDlg, CDialog)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
-void CManageActionsDlg::OnOK()
-{
-	// Stubbed in to prevent close on enter
-}
-//-------------------------------------------------------------------------------------------------
 BOOL CManageActionsDlg::PreTranslateMessage(MSG *pMsg)
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
@@ -89,12 +84,6 @@ BOOL CManageActionsDlg::PreTranslateMessage(MSG *pMsg)
 			if (TranslateAccelerator(m_hWnd, hAccel, pMsg))
 			{
 				// since the message has been handled, no further dispatch is needed
-				return TRUE;
-			}
-
-			// Find and eat an Escape character
-			if (pMsg->wParam == VK_ESCAPE)
-			{
 				return TRUE;
 			}
 		}
