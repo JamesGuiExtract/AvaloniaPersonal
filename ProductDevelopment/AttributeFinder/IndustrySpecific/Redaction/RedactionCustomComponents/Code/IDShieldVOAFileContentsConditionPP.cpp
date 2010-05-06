@@ -297,7 +297,7 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnClickedDocType(WORD wNotifyCode, 
 		// Display the dialog - with variable industry, multiple selection and special types
 		_bstr_t	bstrIndustry = get_bstr_t(m_strDocCategory.c_str());
 		IVariantVectorPtr ipTypes = ipDocUtils->GetDocTypeSelection(
-			&(bstrIndustry.GetBSTR()), VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE);
+			&(bstrIndustry.GetBSTR()), VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, VARIANT_FALSE);
 
 		// if cancel or nothing selected ipTypes will be NULL or have a size of zero 
 		if (ipTypes != NULL && ipTypes->Size > 0)

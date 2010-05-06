@@ -247,36 +247,29 @@ STDMETHODIMP CDocTypeCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 		// only bother to check the document types if the probability is close
 		if (eConfidence >= m_eMinConfidence)
 		{
-			// get the <DocType> from the document
-			string strDocTypeTag = "<" + DOC_TYPE + ">";
+			IStrToObjectMapPtr ipDocTags(ipAFDoc->ObjectTags);
+			ASSERT_RESOURCE_ALLOCATION("ELI30096", ipDocTags != NULL);
 
-			// ExpandTags throws an exception if the document is mulitply classified
-			// in the case of mulitple classification we want to return false so we will 
-			// put a try catch around this call
-			bool bHasType = true;
-			string strDocType;
-			try
-			{
-				strDocType = asString(m_ipAFUtility->ExpandTags(strDocTypeTag.c_str(), ipAFDoc));
-			}
-			catch(...)
-			{
-				bHasType = false;
-			}
+			// get the vector of document type names
+			IVariantVectorPtr ipVecDocTypes = ipDocTags->TryGetValue(DOC_TYPE.c_str());
+			ASSERT_RESOURCE_ALLOCATION("ELI30097", ipVecDocTypes != NULL);
 
-			// See if the document type is in our list
-			if (bHasType)
+			// See if any of the document types are in our list
+			long nDocTypeCount = ipVecDocTypes->Size;
+			for (long i = 0; !bInList && i < nDocTypeCount; i++)
 			{
+				string strDocType = asString(ipVecDocTypes->GetItem(i).bstrVal);
+
 				long nCount = m_ipTypes->Size;
-
-				for (long i = 0; i < nCount; i++)
+				for (long j = 0; j < nCount; j++)
 				{	
-					_variant_t varType = m_ipTypes->GetItem(i);
+					_variant_t varType = m_ipTypes->GetItem(j);
 					_bstr_t bstrType = varType.bstrVal;
 					string strListDocType = asString(bstrType);
 
-					if (strDocType == strListDocType || 
-						strListDocType == gstrSPECIAL_ANY_UNIQUE)
+					if (strDocType == strListDocType ||
+						(nDocTypeCount == 1 && strListDocType == gstrSPECIAL_ANY_UNIQUE) ||
+						(nDocTypeCount > 1 && strListDocType == gstrSPECIAL_MULTIPLE_CLASS))
 					{
 						bInList = true;
 						break;

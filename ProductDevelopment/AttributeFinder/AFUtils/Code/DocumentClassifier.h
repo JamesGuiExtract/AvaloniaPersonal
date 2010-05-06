@@ -97,6 +97,7 @@ public:
 	STDMETHOD(GetDocumentIndustries)(
 		/*[out, retval]*/ IVariantVector** ppIndustries);
 	STDMETHOD(GetSpecialDocTypeTags)(
+		/*[in]*/ VARIANT_BOOL bAllowMultiplyClassified,
 		/*[out, retval]*/ IVariantVector** ppTags);
 	STDMETHOD(GetDocumentTypes)(
 		/*[in]*/ BSTR strIndustry, 
@@ -106,6 +107,7 @@ public:
 		/*[in]*/ VARIANT_BOOL bAllowIndustryModification,
 		/*[in]*/ VARIANT_BOOL bAllowMultipleSelection,
 		/*[in]*/ VARIANT_BOOL bAllowSpecialTags,
+		/*[in]*/ VARIANT_BOOL bAllowMultiplyClassified,
 		/*[out, retval]*/ IVariantVector** ppTypes);
 
 private:
@@ -132,7 +134,7 @@ private:
 	// Methods
 	//////////
 	// Adds special document type tags to rvecTags
-	void	appendSpecialTags(vector<string>& rvecTags);
+	void	appendSpecialTags(vector<string>& rvecTags, bool bIncludeMultiplyClassified);
 
 	// create document probability and confidence level in pAFDoc
 	void createDocTags(IAFDocumentPtr ipAFDoc, const string& strSpecificIndustryName);

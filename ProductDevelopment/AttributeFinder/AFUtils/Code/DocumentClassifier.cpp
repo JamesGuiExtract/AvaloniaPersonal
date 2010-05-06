@@ -448,7 +448,8 @@ STDMETHODIMP CDocumentClassifier::GetDocumentIndustries(IVariantVector** ppIndus
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDocumentClassifier::GetSpecialDocTypeTags(IVariantVector** ppTags)
+STDMETHODIMP CDocumentClassifier::GetSpecialDocTypeTags(VARIANT_BOOL bAllowMultiplyClassified,
+														IVariantVector** ppTags)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -459,7 +460,7 @@ STDMETHODIMP CDocumentClassifier::GetSpecialDocTypeTags(IVariantVector** ppTags)
 
 		// Get special tags
 		vector<string>	vecSpecial;
-		appendSpecialTags( vecSpecial );
+		appendSpecialTags(vecSpecial, asCppBool(bAllowMultiplyClassified));
 
 		// Create the VariantVector to contain tags
 		IVariantVectorPtr ipVec( CLSID_VariantVector );
@@ -521,6 +522,7 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 													  VARIANT_BOOL bAllowIndustryModification,
 													  VARIANT_BOOL bAllowMultipleSelection,
 													  VARIANT_BOOL bAllowSpecialTags,
+													  VARIANT_BOOL bAllowMultiplyClassified,
 													  IVariantVector** ppTypes)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -540,29 +542,10 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 		IVariantVectorPtr ipVec( CLSID_VariantVector );
 		ASSERT_RESOURCE_ALLOCATION("ELI11925", ipVec != NULL);
 
-		// Retrieve the industry-specific collection of document types
-		vector<string>	vecTypes = m_mapNameToVecDocTypes[strName];
-
-		// Add special type tags
-		vector<string>	vecSpecial;
-		int n;
-		if ( asCppBool(bAllowSpecialTags) )
-		{
-			// Get special tags
-			appendSpecialTags( vecSpecial );
-
-			// Append regular doc types
-			long lSize = vecTypes.size();
-			for (n = 0; n < lSize; n++)
-			{
-				vecSpecial.push_back( vecTypes[n] );
-			}
-		}
-
 		// Create the selection dialog with multi-selection parameter
 		// Provide list of available types
-		AddDocTypesDlg	dlg( strName, asCppBool(bAllowSpecialTags), 
-			asCppBool(bAllowMultipleSelection) );
+		AddDocTypesDlg dlg(strName, asCppBool(bAllowSpecialTags), 
+			asCppBool(bAllowMultipleSelection), asCppBool(bAllowMultiplyClassified));
 
 		// Disable industry selection, if desired
 		if ( asCppBool(bAllowIndustryModification) )
@@ -578,7 +561,7 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 
 			// Add each doc type name to vector
 			long lSize = vecFinal.size();
-			for (n = 0; n < lSize; n++)
+			for (long n = 0; n < lSize; n++)
 			{
 				ipVec->PushBack( get_bstr_t(vecFinal[n]) );
 			}
@@ -604,12 +587,15 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 //-------------------------------------------------------------------------------------------------
 // private / helper methods
 //-------------------------------------------------------------------------------------------------
-void CDocumentClassifier::appendSpecialTags(vector<string>& rvecTags)
+void CDocumentClassifier::appendSpecialTags(vector<string>& rvecTags, bool bIncludeMultiplyClassified)
 {
 	// Add each special tag
-	rvecTags.push_back( gstrSPECIAL_ANY_UNIQUE );
-//	rvecTags.push_back( gstrSPECIAL_MULTIPLE_CLASS );
-	rvecTags.push_back( gstrSPECIAL_UNKNOWN );
+	rvecTags.push_back(gstrSPECIAL_ANY_UNIQUE);
+	if (bIncludeMultiplyClassified)
+	{
+		rvecTags.push_back(gstrSPECIAL_MULTIPLE_CLASS);
+	}
+	rvecTags.push_back(gstrSPECIAL_UNKNOWN);
 
 	return;
 }

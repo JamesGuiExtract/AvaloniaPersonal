@@ -515,10 +515,12 @@ library UCLID_AFUTILSLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return a list of all the special document types 
 		//          (i.e. AnyUnique, MultiplyClassified, Unknown)
+		// PARAMS:  -bAllowMultiplyClassified: If VARIANT_TRUE, MultiplyClassified will be included
+		//			in the list.
 		// REQUIRE: NONE
 		// PROMISE: No special delimiting characters will be added (i.e. <> or [])
 		[id(2), helpstring("method GetSpecialDocTypeTags")] HRESULT GetSpecialDocTypeTags(
-			[out, retval] IVariantVector** ppTags);
+			[in] VARIANT_BOOL bAllowMultiplyClassified, [out, retval] IVariantVector** ppTags);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return a list of document types associated with the specified industry
 		// REQUIRE: NONE
@@ -535,12 +537,14 @@ library UCLID_AFUTILSLib
 		//			will be shown as the default industry.
 		//			if pbstrIndustry points to a non-empty string, then bAllowIndustryModification
 		//			dictates whether the industry selection drop down list is enabled.
+		//			If bAllowMultiplyClassified is VARIANT_TRUE, MultiplyClassified will be included
+		//			in the list of special tags assuming bAllowSpecialTags is also VARIANT_TRUE.
 		// PROMISE: If there are no doc types an empty vector (not NULL) will be returned.  
 		//			pbstrIndustry will always provide the selected industry.
 		[id(4), helpstring("method GetDocTypeSelection")] HRESULT GetDocTypeSelection(
 			[in, out] BSTR *pbstrIndustry, [in] VARIANT_BOOL bAllowIndustryModification,
 			[in] VARIANT_BOOL bAllowMultipleSelection, [in] VARIANT_BOOL bAllowSpecialTags, 
-			[out, retval] IVariantVector** ppTypes);
+			[in] VARIANT_BOOL bAllowMultiplyClassified, [out, retval] IVariantVector** ppTypes);
 		//-----------------------------------------------------------------------------------------
 	};
 

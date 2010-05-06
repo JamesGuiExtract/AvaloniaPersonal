@@ -230,8 +230,8 @@ LRESULT CDocTypeConditionPP::OnClickedBtnAddTypes(WORD wNotifyCode,
 
 		// Display the dialog - with variable industry, multiple selection and special types
 		_bstr_t	bstrIndustry = get_bstr_t( m_strCategory.c_str() );
-		IVariantVectorPtr	ipTypes = m_ipDocUtils->GetDocTypeSelection( 
-			&(bstrIndustry.GetBSTR()), VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE );
+		IVariantVectorPtr ipTypes = m_ipDocUtils->GetDocTypeSelection( 
+			&(bstrIndustry.GetBSTR()), VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE);
 
 		// Store the returned industry
 		m_strCategory = asString(bstrIndustry);

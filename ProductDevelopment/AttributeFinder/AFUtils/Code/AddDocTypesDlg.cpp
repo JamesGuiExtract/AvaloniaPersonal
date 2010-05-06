@@ -26,11 +26,12 @@ static char THIS_FILE[] = __FILE__;
 // AddDocTypesDlg dialog
 //-------------------------------------------------------------------------------------------------
 AddDocTypesDlg::AddDocTypesDlg(std::string strIndustry, bool bAllowSpecial, bool bAllowMultiSelect, 
-							   CWnd* pParent)
+							   bool bAllowMultiplyClassified, CWnd* pParent)
 : CDialog(AddDocTypesDlg::IDD, pParent),
   m_strCategory(strIndustry),
   m_bAllowSpecial(bAllowSpecial),
   m_bAllowMultipleSelection(bAllowMultiSelect),
+  m_bAllowMultiplyClassified(bAllowMultiplyClassified),
   m_bLockIndustry(false)
 {
 	//{{AFX_DATA_INIT(AddDocTypesDlg)
@@ -212,7 +213,8 @@ void AddDocTypesDlg::populateListBox()
 	long lCount;
 	if (m_bAllowSpecial)
 	{
-		IVariantVectorPtr ipSpecial = m_ipDocUtils->GetSpecialDocTypeTags();
+		IVariantVectorPtr ipSpecial =
+			m_ipDocUtils->GetSpecialDocTypeTags(asVariantBool(m_bAllowMultiplyClassified));
 		ASSERT_RESOURCE_ALLOCATION("ELI11939", ipSpecial != NULL);
 
 		lCount = ipSpecial->Size;

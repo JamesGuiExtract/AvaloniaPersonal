@@ -16,7 +16,7 @@ class AddDocTypesDlg : public CDialog
 // Construction
 public:
 	AddDocTypesDlg(std::string strIndustry, bool bAllowSpecialTags, 
-		bool bAllowMultiSelect, CWnd* pParent = NULL);
+		bool bAllowMultiSelect, bool bAllowMultiplyClassified, CWnd* pParent = NULL);
 
 	// Returns collection of selected document types
 	std::vector<std::string>& getChosenTypes();
@@ -79,6 +79,10 @@ private:
 
 	// Multiple document types can be selected
 	bool		m_bAllowMultipleSelection;
+
+	// Allow an option to match a multiply classified document.
+	// This option is only useful when m_bAllowSpecial==true since it is a special tag.
+	bool		m_bAllowMultiplyClassified;
 
 	// Industry combo box will be disabled
 	bool		m_bLockIndustry;
