@@ -1,0 +1,193 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.5.0.113 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.5.1.132 (1.5.1 RC3) Testing <br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Exercise recent fixed SCRs
+   	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
+	present within the collected checklists.
+</ul>
+<p>
+<h3>Fixes for Patches A and B</h3>
+<ul>
+	<li>Exercise the <b>15PatchAB_CrashTesting.html</b> checklist.
+</ul>
+<p>
+<h3>Fixes for Patch C and RC3</h3>
+<OL>
+	<LI><b>[DataEntry #240, 891]</b> Font should be Verdana
+	<ul>
+		<li>Confirm that all data is displayed in Verdana.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #702]</b> Repeated pasting sometimes clears text
+	<ul>
+		<li>Copy the plain text of a name.
+		<li>Select the Epic Care patient name row.
+		<li>Paste into it.
+		<li>Continue pasting ad nauseum.
+		<li>Confirm that pasting does not clear the row.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #908]</b> Run with no files pending
+	<ul>
+		<li>Create an .fps file with a Verify extracted data task.
+	   	<LI>Ensure that there are no files pending in the queue and no file suppliers are enabled. 
+	   	<LI>Run the .fps file. 
+		<li>Confirm no exceptions are seen.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #841]</b> Inserting rows in name tables
+	<ul>
+		<li>Open a document with a populated .voa file.
+		<li>For the <b>ordering physician</b> table and each of the <b>patient name</b> tables:
+		<ul>
+			<li>Select the row in the table.
+			<li>Press ctrl+i.
+			<li>Confirm that no row is inserted.
+		</ul>
+		<li>Confirm that the ctrl+i shortcut can be used to insert a row in a multi-row table.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #856]</b> Tab order
+	<ul>
+		<li>Open a document with at least one test.
+		<li>Confirm that tabbing by row is enabled.
+		<li>Select a test name cell.
+		<li>Press tab.
+		<li>Confirm that selection advances by a single cell.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #861, #932, #957]</b> Validation
+	<ul>
+		<li>Open the image in <b>I:\Common\Testing\PVCS_Testing\DataEntry\932</b> for verification.
+		<li>In the COMPREHENSIVE PANEL order, select and cut the CREATININE row of the test table.
+		<li>Select the C REACTIVE PROTEIN order.
+		<li>Right-click in the row header for the C-Reactive Protein row in the test table and <b>
+		Insert copied row(s)</b>.
+		<li>Select the C REACTIVE PROTEIN cell in the order table and type <b>Creatinine</b>, then
+		press tab.
+		<li>Confirm that the test name and code cells for the Creatinine row of the test table are
+		marked valid.
+<p>
+		<li>Open a document with a valid ordering physician and a different valid copy-to physician.
+		<li>Drag and drop the copy-to physician onto the ordering physician.
+		<li>Confirm that the ordering physician is not flagged as invalid.
+<p>
+		<li>Open an image for verification that contains the name of a valid physician.
+		<li>Manually enter a different valid physician into the <b>ordering</b> physician table.
+		<li>Select that row of the table and swipe the valid physician name from the document.
+		<li>Confirm that the newly-swiped physician is not flagged as invalid.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #870]</b> Object reference not set to an instance of an object
+	<ul>
+      		<li>Open an document with an associated .voa file for verification.
+      		<li>Select an empty cell.
+      		<li>Switch focus to the FAM and press the stop button.
+      		<li>Confirm that no exception is seen.
+      		<ul>
+	      		<li>If an exception was seen, close the exception window and press play again.
+	      		<li>Note whether or not further exceptions are seen.
+	      	</ul>
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #874]</b> Smart tags in lab name/code/units fields
+	<ul>
+      		<li>Select the lab name field.
+      		<li>Type <b>.</b> to activate the smart tag drop down.
+      		<li>Press the down arrow.
+      		<li>Confirm that the first item in the list is <b>not</b> immediately expanded.
+      		<li>Repeat test in the <b>lab code</b> field.
+      		<li>Repeat test in the <b>units</b> field.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #882]</b> Order mapper mapping tests w/ no AKAs
+	<ul>
+      		<li>Get a copy of the OrderMappingDB from the 1.5 release.
+      		<li>Put the .rsd file from <b>I:\Common\Testing\PVCS_Testing\DataEntry\882</b> in the same
+      		directory as the database.
+      		<li>Exercise that .rsd file in the rule tester.
+      		<li>Confirm that a Manual Diff order is found.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #885]</b> Confirm that the font size for tooltips is automatically reduced to
+	ensure that the entire text of the tooltip will be visible when zoomed fit-to-page.
+<p>
+	<LI><b>[DataEntry #899]</b> For rows in multi-row tables, confirm that selecting an entire row and
+	pressing the <b>delete</b> key removes the row from the table.
+<p>
+	<LI><b>[DataEntry #933]</b> F2 entering edit mode in wrong cell
+	<ul>
+		<li>Select a cell in a table and enter edit mode.
+		<li>Select a populated cell in a different table such that it does <b>not</b> enter edit mode.
+		<li>Press F2.
+		<li>Confirm that edit mode is activated in the currently selected cell.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #961]</b> Ctrl+a clears autocomplete field in edit mode
+	<ul>
+		<li>Select an order name cell that is populated with a valid entry.
+		<li>Enter edit mode in that cell.
+		<li>Press ctrl+a, then ctrl+a again.
+		<li>Confirm that the cell is not cleared.
+	</ul>
+   	</LI>
+</OL>
+<p>
+&nbsp;
+<UL>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests - LabDE Order Mapper
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : LabDE
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</UL>
+</BODY>
+</HTML>
