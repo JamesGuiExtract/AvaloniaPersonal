@@ -535,6 +535,9 @@ void FileProcessingDlg::OnBtnStop()
 	{
 		CWaitCursor wait;
 
+		// Do not auto-terminate the dialog
+		m_bStoppedManually = true;
+
 		// Log a message indicating that the user is stopping the FAM
 		UCLIDException ue("ELI15679", "Application trace: The user has stopped File Action Manager processing.");
 		ue.addDebugInfo("FPS File",

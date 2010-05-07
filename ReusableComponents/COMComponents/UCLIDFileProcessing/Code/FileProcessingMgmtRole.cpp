@@ -2269,12 +2269,6 @@ void CFileProcessingMgmtRole::stopProcessing()
 		ASSERT_ARGUMENT("ELI28209", m_ipFileProcessingTasks->Size() > 0);
 		ASSERT_ARGUMENT("ELI28210", m_pRecordMgr != NULL);
 
-		// Notify the FAM that processing is cancelling
-		if (m_eCurrentRunningState == kNormalStop)
-		{
-			m_ipRoleNotifyFAM->NotifyProcessingCancelling();
-		}
-
 		// The Processing needs to be stopped asynchronously
 		// to keep the UI from being blocked
 		AfxBeginThread(handleStopRequestAsynchronously, this);
