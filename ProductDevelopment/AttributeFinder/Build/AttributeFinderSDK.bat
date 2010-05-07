@@ -35,6 +35,13 @@ GOTO init_build
 CALL InitUserEnv.Bat
 CALL InitBuildEnv.Bat
 
+REM Get the build version number from the argument string
+set VERSION_NUMBER=%1
+:: Strip the quotes
+set VERSION_NUMBER=%VERSION_NUMBER:~1,-1%
+:: Remove the FlexIndex Ver. string
+set VERSION_NUMBER=%VERSION_NUMBER:FlexIndex Ver. =%
+
 REM Get specified version of files from Common dir as well as AttributeFinder\build dir
 IF NOT EXIST ..\..\Common mkdir ..\..\Common
 
@@ -54,8 +61,8 @@ Rem Remove previous build directory if it exists
 IF EXIST %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT% RMDIR /S /Q %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%
 
 IF NOT EXIST %BUILD_DRIVE%%BUILD_DIRECTORY% MKDIR %BUILD_DRIVE%%BUILD_DIRECTORY%
-SET LOGFILE=%BUILD_DRIVE%%BUILD_DIRECTORY%\AttributeFinderSDK.log
-SET LOGFILE2=%BUILD_DRIVE%%BUILD_DIRECTORY%\RDT.log
+SET LOGFILE=%BUILD_DRIVE%%BUILD_DIRECTORY%\%VERSION_NUMBER% AttributeFinderSDK.log
+SET LOGFILE2=%BUILD_DRIVE%%BUILD_DIRECTORY%\%VERSION_NUMBER% RDT.log
 
 REM Copy the license file to the release folder for EncryptFile will work
 IF NOT EXIST %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%\Engineering\Binaries\Release MKDIR %BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%\Engineering\Binaries\Release
@@ -72,4 +79,3 @@ net use P: /DELETE
 net use R: /DELETE
 
 pause
-
