@@ -18,3 +18,6 @@
 
 // Use 'require mandatory' checkbox
 <TESTCASE>;Test2.rsd;test7.txt;;test7.eav
+
+// A failure I noticed during the 1.5.1 cycle
+<TESTCASE>;Test.rsd;test8.txt;;test8.eav
