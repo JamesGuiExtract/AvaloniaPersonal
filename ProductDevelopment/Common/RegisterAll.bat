@@ -11,7 +11,7 @@ if not [%1]==[/s] (
 	echo.
 )
 
-for /R ..\ %%r in (*.rl,*.nl) do (
+for /R .\ %%r in (*.rl,*.nl) do (
 	for /F "tokens=1 delims=," %%i in (%%~sr) do (
 		if "%%~xr" == ".rl" (
 			if not [%1]==[/s] (
