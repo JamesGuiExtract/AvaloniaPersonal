@@ -12,3 +12,9 @@
 
 // Map many to many
 <TESTCASE>;Test.rsd;test5.txt;;test5.eav
+
+// Ensure TieBreaker column is used
+<TESTCASE>;Test.rsd;test6.txt;;test6.eav
+
+// Use 'require mandatory' checkbox
+<TESTCASE>;Test2.rsd;test7.txt;;test7.eav
