@@ -1,0 +1,77 @@
+Test|N/A
+.Name|CHEMISTRY PROFILE
+.CollectionDate|12/23/2009
+.CollectionTime|11:15
+.Component|GLUCOSE BLOOD
+..Range|74-105
+..Units|mg/dL
+..Value|92
+.Component|BLOOD UREA NITROGEN
+..Flag|H
+..Range|5-20
+..Units|mg/dL
+..Value|31
+.Component|CREATININE BLOOD
+..Range|0.50-1.06
+..Units|mg/dL
+..Value|0.75
+.Component|CALCIUM BLOOD
+..Range|8.4-10.2
+..Units|mg/dL
+..Value|9.2
+.Component|PHOSPHATE BLOOD
+..Range|2.5-4.8
+..Units|mg/dL
+..Value|3.5
+.Component|TOTAL PROTEIN BLOOD
+..Range|5.9-7.7
+..Units|g/dL
+..Value|7.0
+.Component|ALBUMIN BLOOD
+..Range|3.8-5.4
+..Units|g/dL
+..Value|4.4
+.Component|A/G RATIO
+..Range|>0.9
+..Value|1.7
+.Component|AST
+..Flag|H
+..Range|5-35
+..Units|IU/L
+..Value|38
+.Component|ALT
+..Range|3-35
+..Units|IU/L
+..Value|16
+.Component|ALK PHOSPHATASE
+..Range|65-260
+..Units|IU/L
+..Value|87
+.Component|BILIRUBIN TOTAL
+..Range|0.0-1.1
+..Units|mg/dL
+..Value|0.4
+Test|N/A
+.Name|ELECTROLYTE PANEL
+.CollectionDate|12/23/2009
+.CollectionTime|11:15
+.Component|SODIUM
+..Range|135-145
+..Units|mEq/L
+..Value|139
+.Component|POTASSIUM
+..Range|3.5-5.0
+..Units|mEq/L
+..Value|4.5
+.Component|CHLORIDE
+..Range|98-108
+..Units|mEq/L
+..Value|107
+.Component|CARBON DIOXIDE
+..Range|20.0-28.0
+..Units|mEq/L
+..Value|27.7
+.Component|ANION GAP
+..Flag|L
+..Range|10-20
+..Value|9
