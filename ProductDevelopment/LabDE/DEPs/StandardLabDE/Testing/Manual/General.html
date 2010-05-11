@@ -62,13 +62,6 @@
 			<LI>Confirm that the appropriate DEP is loaded in <b>FAM</b> mode.
 		</ul>
 <p>
-		<LI>Modify <b>StandardLabDE_Phase1.config</b> in the appropriate Solution 
-		folder so that <b>ApplicationTitle</b> is set to a unique string.
-		<LI>Exercise LabDE in <b>stand-alone</b> mode.
-		<LI>Confirm that the specified title is visible in the <b>Image Viewer</b> 
-		title bar and the <b>task bar</b>.
-		<LI>Exercise LabDE in <b>FAM</b> mode.
-		<LI>Confirm that the specified title is visible in the <b>Image Viewer</b> title bar.
 		<LI><b>[DataEntry #560]</b> Confirm that the config files include 
 		<b>[PFESFolder]</b> settings allowing paths to be specified relative to the 
 		installation folder instead of the Solution folder.
@@ -203,16 +196,13 @@
 			<li>Confirm that <b>File - Open</b> adds a file to the MRU list.
 			<li>Confirm that a file selected from the MRU list is opened.
 			<li>Confirm that <b>File - Close</b> closes the open file.
-			<li>Confirm that <b>File - Save</b> saves changes to a VOA file when all 
-			data items are valid.
-			<li>Confirm that the <b>Save</b> toolbar button saves changes to a VOA file 
-			when all data items are valid.
+			<li>Confirm that <b>File - Save</b> saves changes to a VOA file.
+			<li>Confirm that the <b>Save</b> toolbar button saves changes to a VOA file.
 			<li>Confirm that the <b>Save</b> toolbar button does not display a Save dialog.
 			<li>Confirm that <b>File - Print</b> allows a file to be be printed.
 			<li><b>[DataEntry #461]</b> Items not printing correctly
 			<ul>
-				<li>Confirm that the document prints as expected with highlights appropriately
-				located.
+				<li>Confirm that the document prints as expected with no highlights printed.
 			</ul>
 			<li>Confirm that the <b>Print image</b> toolbar button allows a file to 
 			be printed.
@@ -395,8 +385,7 @@
 			<li>Confirm that <b>Ctrl+O</b> displays the File - Open dialog with no image open.
 			<li>Confirm that <b>Ctrl+O</b> displays the File - Open dialog with an image open.
 			<li>Confirm that <b>Ctrl+F4</b> closes an open image.
-			<li>Confirm that <b>Ctrl+S</b> saves an open image.  Note that validation messages 
-			may be presented if invalid data are present.
+			<li>Confirm that <b>Ctrl+S</b> saves an open image.
 			<li>Confirm that <b>Ctrl+P</b> does not display the File - Print dialog with 
 			no image open.
 			<li>Confirm that <b>Ctrl+P</b> displays the File - Print dialog with an image open.
@@ -503,10 +492,6 @@
 			<ul>
       				<li>Verify an image.
 	      			<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
-				<b>Ordering Physician</b> table.
-      				<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
-				<b>CopyTo Physician</b> table.
-	      			<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
 				<b>Orders</b> table.
 	      			<li>Confirm that <b>Ctrl+I</b> will add a new row to the 
 				<b>Tests</b> table.
@@ -576,17 +561,6 @@
 			or <b>Reviewed</b>, respectively.
 			<LI><b>[DataEntry #743]</b> Confirm that the <b>Result Status</b> field is not 
 			a tab stop.
-			<LI><b>[DataEntry #683]</b> Result Status Of Delete
-			<ul>
-  	   			<LI>Open a <b>LabDE</b> demo image.
-		  	   	<LI>Confirm that the <b>Result Status</b> field includes a 
-				<b>Delete</b> option.
-		  	   	<LI>Set <b>Result Status</b> to	<b>Delete</b> during second-stage 
-				verification.
-		  	   	<LI>Process the document via <b>SendToEMR</b>.
-		  	   	<LI>Confirm that an HL7 message <b>is not</b> sent for 
-				this document.
-		       	</ul>
 		</ul>
 <p>
 		<li><b>Image Path and Copy button</b>
@@ -595,8 +569,6 @@
 			box containing the full path to the image.
   	   		<LI>Confirm that the DEP includes a <b>Copy</b> button that allows the 
 			filename to be copied to the Clipboard.
-  		   	<LI>Confirm that the Copy button is disabled during <b>Phase 1</b> verification.
-  	   		<LI>Confirm that the Copy button is enabled during <b>Phase 2</b> verification.
 		</ul>
 <p>
 		<li><b>Patient Information</b>
@@ -605,12 +577,6 @@
 			Name</b>, <b>Middle Name</b>, <b>Last Name</b>, and <b>Suffix</b>.
 			<li>Confirm that text can be swiped into the <b>Patient Name</b> table.
 			<li>Confirm that text can be typed into cells of the <b>Patient Name</b> table.
-			<LI><b>[DataEntry #634]</b> Tab stops for middle name and suffix
-	       		<ul>
-				<li>Open a Demo_LabDE sample image.
-		  	   	<LI>Confirm that the <b>Middle Name</b> and <b>Suffix</b> cells are tab 
-				stops only if they contain text.
-		       	</ul>
 			<li>Confirm that a name copied to the clipboard can be pasted into a row of the
 			<b>Patient Name</b> table.
 	      		<li>Confirm that the Clipboard is cleared after pasting into the 
@@ -623,7 +589,7 @@
 			edit box is empty.
 			<LI><b>[DataEntry #742, #814, #815]</b> Validation of medical record number
        			<ul>
-				<li>Exercise second-stage verification.
+				<li>Open a LabDE image for verification.
 		  	   	<LI>Confirm that the medical record number is valid with or without a 
 				leading <b>m</b> or <b>M</b> or <b>z</b> or <b>Z</b>.
 	  		   	<LI>Confirm that the medical record number is valid with or without a 
@@ -705,7 +671,7 @@
 				<li>Confirm that a blank entry is not included at the beginning of 
 				the drop-down list.
 			</ul>
-			<LI><b>[DataEntry #654]</b> Auto complete
+			<LI><b>[DataEntry #801]</b> Auto complete
 		       	<ul>
 				<li>Open a Demo_LabDE sample image.
 				<li>Ensure that the <b>Physician</b> row is empty.
@@ -769,11 +735,16 @@
 				information so as to allow the user to save a file that contains 
 				one or more validation warnings.
 				<ul>
-					<li>&lt;objectSettings&gt;
-					<li>&lt;Extract.LabDE.StandardLabDE.StandardLabDEPanel&gt;
-					<li>&lt;Property name="InvalidDataSaveMode"&gt;AllowWithWarnings&lt;/Property&gt;
-					<li>&lt;/Extract.LabDE.StandardLabDE.StandardLabDEPanel&gt;
-					<li>&lt;/objectSettings&gt;
+					<li>If necessary, add &lt;sectionGroup name="objectSettings"/&gt; to the 
+					configSections section of the config file.
+				</ul>
+				<ul>
+					<li>Add the following object settings:
+					<br>&lt;objectSettings&gt;
+					<br>&lt;Extract.LabDE.StandardLabDE.StandardLabDEPanel&gt;
+					<br>&lt;Property name="InvalidDataSaveMode"&gt;AllowWithWarnings&lt;/Property&gt;
+					<br>&lt;/Extract.LabDE.StandardLabDE.StandardLabDEPanel&gt;
+					<br>&lt;/objectSettings&gt;
 				</ul>
 				<li>Verify a document containing a <b>CBC</b> order.
 				<li>Delete the <b>RBC</b> test.
@@ -798,7 +769,7 @@
 			<li>Confirm that text can be typed into the <b>Result Date</b> edit box.
 			<li>Confirm that a validation icon is displayed if an invalid date 
 			is provided in the <b>Result Date</b> edit box.
-			<li>Confirm that a validation icon is not displayed if the 
+			<li>Confirm that a validation icon is displayed if the 
 			<b>Result Date</b> edit box is empty.
 			<li>Confirm that text can be swiped into the <b>Result Time</b> edit box.
 			<li><b>[DataEntry #258]</b> Confirm that the swiped highlight is visible.
@@ -807,7 +778,7 @@
 			is provided in the <b>Result Time</b> edit box.
 			<li>Confirm that a validation icon is not displayed if the 
 			<b>Result Time</b> edit box is empty.
-			<li>Confirm that text can be swiped into the <b>Order Number</b> edit box.
+			<li>Confirm that text can not be swiped into the <b>Order Number</b> edit box.
 			<li>Confirm that text can be typed into the <b>Order Number</b> edit box.
 			<li>Confirm that a validation icon is displayed if the <b>Order Number</b>
 			edit box is empty.
@@ -820,8 +791,8 @@
 		   	</LI>
 	      		<li>Confirm that the Clipboard is cleared after pasting into the 
 			<b>Order Number</b> field.
-			<li>Confirm that typing into the <b>Lab Name</b> combo box cycles through
-			available lab names.
+			<li>Confirm that typing into the <b>Lab Name</b> combo box brings up a drop-down list of valid
+			lab names.
 			<li><b>[DataEntry #513]</b> Hybrid data for auto-updated values
 			<ul>
 				<li>Open an image where the <b>Lab Name</b> is found.
@@ -844,7 +815,7 @@
 		  	   	<LI>Confirm that the <b>Lab Name</b> control is an edit box instead 
 				of as a combo box.
 		       	</ul>
-			<li>Confirm that text can be swiped into the <b>Lab Code</b> edit box.
+			<li>Confirm that text can not be swiped into the <b>Lab Code</b> edit box.
 			<li>Confirm that text can be typed into the <b>Lab Code</b> edit box.
 			<li>Confirm that a validation icon is displayed if the <b>Lab Code</b> edit
 			box is empty.
@@ -875,7 +846,7 @@
 	       		<ul>
 				<li>Process several documents.
 	  	   		<LI>Confirm that the default value for the order-level comment is 
-				<b>Order entered by $FullUserName() on $Now()</b>.
+				<b>Verified by $FullUserName() on $Now()</b>.
 				<li>Confirm that the order-level comment field can be modified.
 	       		</ul>
    			</LI>
@@ -893,10 +864,10 @@
 			<li><b>[DataEntry #795]</b> Cursor position for unviewed fields
 			<ul>
 				<li>Open a Demo_LabDE image.
-				<li>Select a <b>Test Name</b> cell that has not been viewed.
+				<li>Select a <b>text box</b> that has not been viewed.
 				<li>Confirm that the cursor is located at the position 
 				appropriate with where the mouse clicked.
-				<li>Select a different <b>Test Name</b> cell that has already 
+				<li>Select a different <b>text box</b> that has already 
 				been viewed.
 				<li>Confirm that the cursor is located at the position 
 				appropriate with where the mouse clicked.
@@ -913,13 +884,6 @@
 			<li>Confirm that text can be typed into the <b>Ref. Range</b> cell.
 			<li>Confirm that a validation icon is not displayed even if the 
 			<b>Ref. Range</b> cell is empty.
-			<li><b>[DataEntry #463]</b> Validation for numeric results
-			<ul>
-				<li>Open a Demo_LabDE image.
-				<li>Select a <b>Ref. Range</b> cell.
-				<li>Confirm that <b>&lt;60</b> is a valid entry.
-				<li>Confirm that <b>1.1.1.1</b> is an invalid entry.
-			</ul>
 			<li>Confirm that text can be swiped into the <b>Flag</b> cell.
 			<li>Confirm that text can be typed into the <b>Flag</b> cell.
 			<li>Confirm that a validation icon is not displayed even if the 
@@ -1008,8 +972,8 @@
 			<li>Click <b>Enter</b> and confirm that the active cell is the corresponding 
 			cell in the new row of the <b>Test</b> table.
 			<li>Click <b>Tab</b>. 
-	  	   	<LI>Confirm that the active cell is the next cell in the new row of the 
-			<b>Test</b> table.
+	  	   	<LI>Confirm that the active cell is either the next row or next cell of the <b>Order</b>
+	  	   	table, depending on the current TabByRow setting.
 	       	</ul>
 <p>
 		<LI><b>[DataEntry #745]</b> Left and right arrows in edit mode
