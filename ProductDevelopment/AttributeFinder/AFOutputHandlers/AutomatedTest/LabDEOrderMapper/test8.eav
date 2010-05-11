@@ -1,5 +1,6 @@
 Test|N/A
 .Name|COMPREHENSIVE PANEL
+.EpicCode|80053
 .CollectionDate|11/13/2009
 .CollectionTime|09:45
 .Component|CALCIUM
@@ -67,6 +68,7 @@ Test|N/A
 
 Test|N/A
 .Name|LDH
+.EpicCode|83615
 .CollectionDate|11/13/2009
 .CollectionTime|09:45
 .Component|LDH
@@ -76,6 +78,7 @@ Test|N/A
 
 Test|N/A
 .Name|CBC
+.EpicCode|85025
 .CollectionDate|11/13/2009
 .CollectionTime|09:45
 .Component|WBC

@@ -21,3 +21,6 @@
 
 // A failure I noticed during the 1.5.1 cycle
 <TESTCASE>;Test.rsd;test8.txt;;test8.eav
+
+// Ensure unknown orders are created when using 'require mandatory' option
+<TESTCASE>;Test2.rsd;test9.txt;;test9.eav
