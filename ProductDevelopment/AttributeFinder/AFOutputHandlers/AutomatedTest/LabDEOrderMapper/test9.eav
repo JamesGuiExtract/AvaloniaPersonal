@@ -1,0 +1,103 @@
+Test|N/A
+.CollectionDate|12/11/2009
+.CollectionTime|13:50
+.Component|PLT
+..Range|130-420
+..Units|K/cumm
+..Value|60
+..OriginalName|Platelet Count
+.Name|PLATELET
+.EpicCode|85595
+Test|N/A
+.CollectionDate|12/11/2009
+.CollectionTime|13:50
+.Component|SEGS
+..Flag|L
+..Range|36-70
+..Units|%
+..Value|2
+..OriginalName|Segs
+.Component|LYMPH
+..Range|12-44
+..Units|%
+..Value|42
+..OriginalName|Lymphocytes
+.Component|MONO
+..Flag|H
+..Range|0-12
+..Units|%
+..Value|38
+..OriginalName|Monocytes
+.Component|META
+..Flag|H
+..Range|0-0
+..Units|%
+..Value|1
+..OriginalName|Metamyelocytes
+.Component|MYELO
+..Flag|H
+..Range|0-0
+..Units|%
+..Value|1
+..OriginalName|Myelocytes
+.Component|BLASTS
+..Flag|H
+..Range|0-0
+..Units|%
+..Value|10
+..OriginalName|Blasts
+.Component|RBC MORPHOLOGY
+..Flag|A
+..Value|3+
+..OriginalName|Anisocytosis
+.EpicCode|85097.01
+.Name|MANUAL DIFF
+Test|N/A
+.CollectionDate|12/11/2009
+.CollectionTime|13:50
+.Component|EOSIN
+..Range|0-6
+..Units|%
+..Value|2
+..OriginalName|Eosinophils
+.Name|UnknownOrder
+Test|N/A
+.CollectionDate|12/11/2009
+.CollectionTime|13:50
+.Component|SEG,ABS (AUTO)
+..Flag|L
+..Range|1.6-7.0
+..Units|K/cumm
+..Value|0.1
+..OriginalName|Absolute Neut (Segs and Bands)
+.Name|ABSOLUTE NEUTROPHIL
+.EpicCode|85048.03
+Test|N/A
+.CollectionDate|12/11/2009
+.CollectionTime|13:50
+.Component|LYMPH,ABS (AUTO)
+..Range|1.0-3.0
+..Units|K/cumm
+..Value|2.2
+..OriginalName|Absolute Lymph and Variant
+.Name|UnknownOrder
+Test|N/A
+.CollectionDate|12/11/2009
+.CollectionTime|13:50
+.Component|MONO,ABS (AUTO)
+..Flag|H
+..Range|0.2-0.9
+..Units|K/cumm
+..Value|1.8
+..OriginalName|Absolute Monocytes
+.Name|UnknownOrder
+Test|N/A
+.CollectionDate|12/11/2009
+.CollectionTime|13:50
+.Component|EOSIN,ABS (AUTO)
+..Range|0.0-0.4
+..Units|K/cumm
+..Value|0.1
+..OriginalName|Absolute Eosinophils
+.Name|EOSINOPHIL COUNT, AB
+.EpicCode|85008

@@ -1,0 +1,64 @@
+Test|N/A
+.Component|Platelet Count
+..Range|130-420
+..Units|K/cumm
+..Value|60
+.Component|Segs
+..Flag|L
+..Range|36-70
+..Units|%
+..Value|2
+.Component|Lymphocytes
+..Range|12-44
+..Units|%
+..Value|42
+.Component|Monocytes
+..Flag|H
+..Range|0-12
+..Units|%
+..Value|38
+.Component|Eosinophils
+..Range|0-6
+..Units|%
+..Value|2
+.Component|Metamyelocytes
+..Flag|H
+..Range|0-0
+..Units|%
+..Value|1
+.Component|Myelocytes
+..Flag|H
+..Range|0-0
+..Units|%
+..Value|1
+.Component|Blasts
+..Flag|H
+..Range|0-0
+..Units|%
+..Value|10
+.Component|Absolute Neut (Segs and Bands)
+..Flag|L
+..Range|1.6-7.0
+..Units|K/cumm
+..Value|0.1
+.Component|Absolute Lymph and Variant
+..Range|1.0-3.0
+..Units|K/cumm
+..Value|2.2
+.Component|Absolute Monocytes
+..Flag|H
+..Range|0.2-0.9
+..Units|K/cumm
+..Value|1.8
+.Component|Absolute Eosinophils
+..Range|0.0-0.4
+..Units|K/cumm
+..Value|0.1
+.CollectionDate|12/11/2009
+.CollectionTime|13:50
+Test|N/A
+.Component|Anisocytosis
+..Flag|A
+..Value|3+
+.CollectionDate|12/11/2009
+.CollectionTime|13:50
