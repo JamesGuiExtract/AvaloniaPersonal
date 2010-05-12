@@ -1,13 +1,13 @@
 <HTML>
 
 <HEAD>
-<TITLE>LabDE 1.5.1.133 Testing</TITLE>
+<TITLE>LabDE 1.5.1.137 Testing</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 
 <BODY>
 
-<h1> LabDE 1.5.1.133 (1.5.1 RC4) Testing <br>
+<h1> LabDE 1.5.1.137 (1.5.1 RC8) Testing <br>
 <IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
@@ -155,6 +155,19 @@
 		<li>Select the first name cell in patient name (from document) table.
 		<li>Press tab 3 times and confirm that tabbing proceeds to each cell in the table
 		<li>Repeat for the patient name (from Epic) table.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #975]</b> Flag table column is not properly updated when copying/pasting entire rows.
+	<ul>
+		<li>Open a document that contains tests with at least 2 different values in the flag column of
+		the test table.
+		<li>Copy a test row with a flag value.
+		<li>Paste the row into the new row of the table.
+		<li>Confirm the flag value of the pasted row is matches that of the copied row.
+		<li>Paste the row into an existing row with a different flag value.
+		<li>Confirm the flag value of the pasted row is matches that of the copied row. (not the previous
+		value of the flag cell)
 	</ul>
    	</LI>
 </OL>
