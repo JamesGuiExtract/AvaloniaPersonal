@@ -22,7 +22,7 @@
 				and <b>Test Results</b> are slightly skewed.
 				<LI>Zoom in to various fields and confirm that the associated highlights 
 				match the image skew.
-				<LI>Confirm that the hint <b>does not</b> follow the skew.
+				<LI>Confirm that the hint <b>does</b> follow the skew.
 			</ul>
 <p>
 			<LI>Select the <b>Patient Information - Name</b> field.
@@ -54,23 +54,19 @@
 		<LI><b>Highlights and OCR confidence</b>
 		<ul>
 			<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
-			<LI>Select the first <b>ECO2</b> row in the <b>Orders</b> table.
-			<LI>Confirm that in the <b>Carbon Dioxide</b> text that the word <b>Carbon</b> has
-			a red background indicating lower OCR confidence.
+			<LI>Select the <b>ECO2</b> row in the <b>Selected Order Details</b> table.
+			<LI>Confirm that either OCRed incorrectly with a mix of red and green highlights indicating
+			OCR confidence or OCRed correctly and was autoupdated to ECO2.
 			<LI>Swipe <b>Carbon Dioxide</b> to replace the Order Name.
-			<LI>Confirm that the text OCRs correctly. <b>Dioxide</b> may mis-ocr.
-			<LI>Confirm that some individual characters in <b>Carbon Dioxide</b> have red 
-			backgrounds indicating lower OCR confidence.
+			<LI>Confirm that the text is autoupdated if it OCRs correctly. If it OCRs incorrectly, confirm
+			that some individual characters in the OCR output have red backgrounds indicating lower OCR
+			confidence.
 			<LI>Manually edit the <b>Order Name</b> cell such that <b>Carbon Dioxide</b> becomes 
 			<b>Carbon Monoxide</b>.
 			<ul>
 				<LI>Confirm that the tooltip changes to <b>Carbon Monoxide</b>.
 				<LI>Confirm that the highlight is now completely <b>green</b>.
 			</ul>
-			<LI>Re-swipe <b>Carbon Dioxide</b> to replace the Order Name.
-			<LI>Confirm that the text OCRs correctly. <b>Dioxide</b> may mis-ocr.
-			<LI>Confirm that the word <b>Carbon</b> again has a red background indicating 
-			lower OCR confidence. <b>Dioxide</b> may also be in red at this time.
 			<li><b>[DataEntry #297]</b> Confidence highlight threshold should be configurable
 			<ul>
 				<li>Open a document that has a .voa file.
@@ -100,11 +96,11 @@
 		<LI><b>Highlights and hints on tables</b>
 		<ul>
 			<LI>Open image <b>Z151.tif</b> from Demo_LabDE.
-			<li>Select the <b>UnknownOrder</b> cell in the bottom row.
+			<li>Select the <b>Basic Metabolic Panel</b> cell in the bottom row.
 			<LI>Select the <b>Anion Gap</b> cell in the 
 			<b>Selected Order Details</b> table.
 			<LI>Confirm that the <b>Anion Gap</b> text is highlighted.
-			<LI>Select the entire <b>Unknown Order</b> row in the 
+			<LI>Select the entire <b>Basic Metabolic Panel</b> row in the 
 			<b>Order</b> table.
 			<ul>
 				<LI>Confirm that all of the test results for the <b>Order</b> are 
@@ -124,10 +120,10 @@
 			around the <b>TEST NAME</b>, <b>IN RANGE</b> or <b>OUT OF RANGE</b>, 
 			<b>UNITS</b> and <b>REFERENCE RANGE</b> columns.
 <p>
-			<LI>Select the entire <b>Potassium</b> row from the test details in the 
-			<b>Potassium</b> order.
+			<LI>If Potassium was not found as a separate order, swipe it into the order table. Select the
+			entire <b>Potassium</b> row from the test details in the <b>Potassium</b> order. 
 			<LI>Right-click and select <b>Copy row(s)</b>.
-			<LI>Select the <b>UnknownOrder</b> order.
+			<LI>Select the <b>Basic Metabolic Panel</b> order.
 			<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
 			<ul>
 				<LI>Confirm that the <b>Potassium</b> data appears in the <b>Selected Test 
@@ -138,7 +134,7 @@
 				proper highlights and tooltips. 
 			</ul>
 			<LI>Select <b>multiple</b> rows from the test details in the  
-			<b>UnknownOrder</b> order.
+			<b>Basic Metabolic Panel</b> order.
 			<LI>Right-click and select <b>Copy row(s)</b>.
 			<LI>Select the <b>Potassium</b> order.
 			<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
@@ -149,25 +145,6 @@
 				and tooltips. 
 				<LI>Confirm that selecting individual rows display
 				proper highlights and tooltips. 
-			</ul>
-<p>
-			<LI><b>[DataEntry #467]</b> Missing highlights
-		       	<ul>
-				<li>Exercise the image and VOA file located at 
-				<b>I:\Common\Testing\PVCS_Testing\DataEntry\467</b>.
-				<li>Select the first <b>Reference Range</b> cell for the first order.
-		  	   	<LI>Confirm that a highlight / tooltip is displayed.
-		       	</ul>
-<p>
-			<li><b>[DataEntry #547]</b> Spatial info deletion propagating to indirect hints.
-			<ul>
-				<li>Open a document with a populated .voa file.
-				<li>Select a test comment cell. Note that the indirect hint shows dotted-line
-				boxes around the other items in the row.
-				<li>Select a populated cell in the same row and delete its spatial information.
-				<li>Select the test comment cell again. Confirm that the indirect hint no longer
-				includes the spatial information for the cell whose spatial information was
-				deleted.
 			</ul>
 <p>
 			<LI><b>[DataEntry #587]</b> Highlights for newly pasted text
@@ -182,12 +159,34 @@
 				<li>Confirm that the highlights for the pasted row are also visible.
 		       	</ul>
 <p>
+			<LI><b>[DataEntry #467]</b> Missing highlights
+		       	<ul>
+				<li>Exercise the image and VOA file located at 
+				<b>I:\Common\Testing\PVCS_Testing\DataEntry\467</b>.
+				<li>Select the first <b>Reference Range</b> cell for the first order.
+		  	   	<LI>Confirm that a highlight / tooltip is displayed.
+		       	</ul>
+<p>
+			<li><b>[DataEntry #547, #696]</b> Spatial info deletion propagating to indirect hints.
+			<ul>
+				<li>Open a document with a populated .voa file.
+				<li>Select a test comment cell. Note that the indirect hint shows dotted-line
+				boxes around the other items in the row.
+				<li>Select a populated cell in the same row and delete its spatial information with
+				<b>ctrl+d</b>.
+				<li>Select the test comment cell again. Confirm that the indirect hint no longer
+				includes the spatial information for the cell whose spatial information was
+				deleted.
+				<li>Repeat the above test using the <b>delete</b> key to remove spatial information.
+			</ul>
+<p>
 			<LI><b>[DataEntry #637]</b> Narrow hints become triangular when zoomed out
 		       	<ul>
 				<li>Open the <b>A003.tif</b> image from Demo_LabDE.
-				<li>Select all of the <b>Orders</b>.
-		  	   	<LI>Review the highlights and confirm that no triangular hints are 
-				displayed.
+				<li>Select the <b>test name</b> cell of the new row of a populated test table.
+				<li>Make a swipe into the cell such that it OCRs as a single punctuation mark.
+				<li>Confirm that long rectangular direct hints are provided for other cells in that row.
+				<li>Confirm that regardless of zoom level, the hints are not presented as triangles.
 		       	</ul>
 		</ul>
 	</ul>
@@ -302,7 +301,7 @@
 			<li><b>[DataEntry #332]</b> Tooltips from angled swipes not positioned correctly
 			<ul>
 				<LI>Open image <b>B221.tif</b> from Demo_LabDE.
-				<LI>Select the <b>Patient Information - Name</b> field.
+				<LI>Select the <b>Operator Comment</b> field.
 				<LI>Zoom in to the <b>Pathologists</b> area of the document.
 				<LI>Use the <b>Angular Swipe</b> tool to swipe multiple lines of names.  
 				Swipe the text at a distinct angle.
@@ -344,20 +343,19 @@
 <p>
 		<LI><b>Tooltips and selection</b>
 		<ul>
-			<LI>Open image <b>Z151.tif</b> from Demo_LabDE.  Note that highlights 
-			are available.
-			<LI>Click the <b>Select object</b> toolbar button.
-			<LI>Select the entire <b>Potassium</b> row.
-			<LI>Hover the mouse over the <b>Units</b> value.
+			<LI>Open a LabDE demo image.  Note that highlights are available.
+			<LI>Click the <b>Review and select</b> toolbar button.
+			<LI>Select an entire order row.
+			<LI>Hover the mouse over a <b>Units</b> value in the associated test table.
 			<LI>Confirm that a tooltip is displayed.
-			<LI>Click on the highlighted <b>Units</b> value.
+			<LI>Click on the <b>Units</b> value.
 			<LI>Confirm that selection changes from the entire row to just the 
 			<b>Units</b> cell.
 			<LI>Confirm that the tooltip is still displayed above the highlight.
 <p>
 			<LI><b>[DataEntry #342]</b> Tooltips for the whole row
 			<ul>
-				<LI>Select the entire <b>Potassium</b> row.
+				<LI>Select an entire test row.
 				<LI>Confirm that tooltips are displayed for each entry 
 				in the row.
 				<LI>Select a single cell.
@@ -400,7 +398,7 @@
 				<li>Repeat the previous steps for <b>page 3</b>.
 <p>
 				<li>On page 2, use the angular highlight tool to swipe <b>ACCESSION #:   A003388367  
-				PATIENT ID #:</b> into the <b>Medical Record</b> field.
+				PATIENT ID #:</b> into the <b>Operator Comment</b> field.
 				<li>Confirm that the tooltip is <b>4 lines high</b> and that it was moved 
 				below the text so that it remained on the page.
 				<li>Add characters to the end of the field until it is long enough to extend 
@@ -527,7 +525,7 @@
 		<LI>Confirm that the angle of the highlight is maintained.
 		<li><b>[DataEntry #185]</b> Allow a swipe to be cancelled
 		<ul>
-			<li>Use the rectangular highlight tool to begin a swipe. Before releasing the
+			<li>Use the angular highlight tool to begin a swipe. Before releasing the
 			left mouse button, press the right mouse buttong.
 			<li>Confirm that the swipe is cancelled and that there is no change in the
 			spatial or textual information of the selected field.
@@ -588,7 +586,7 @@
 	       	</ul>
    		</LI>
 <p>
-		<LI><b>[DataEntry #645]</b> Highlights with mixed row And cell selection
+		<LI><b>[DataEntry #645]</b> Highlights with mixed row and cell selection
 		<ul>
 			<li>Open a Demo_LabDE sample image that contains an order with multiple tests.
 			<li>Click in the row header of the first test to select the first test row.
@@ -643,18 +641,6 @@
 	  	   	<LI>Confirm that the error icon <b>is not</b> on top of the tooltip.
        		</ul>
 	   	</LI>
-<p>
-		<LI><b>[DataEntry #696]</b> Deleting spatial information and indirect hints
-       		<ul>
-			<li>Open a Demo_LabDE sample image.
-	  	   	<LI>Select a <b>Test - Comment</b> cell.
-  		   	<LI>Confirm that the indirect hint shows dotted-line boxes around other items 
-			in the row.
-	  	   	<LI>Select a populated cell in the same row and press <b>Delete</b>.
-  		   	<LI>Select the <b>Test - Comment</b> cell again.
-  	   		<LI>Confirm that the indirect hint does not show a dotted-line boxes around the 
-			information from the deleted cell.
-       		</ul>
    	</LI>
 	</ul>
 </UL>
