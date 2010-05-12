@@ -19,6 +19,17 @@
       	</ul>
      	</li>
 <p>
+	<li><h2>CMPI - Can handle large number of files properly</h2>
+	<ul>
+		<li>The batch file <b>test_2000and11000pages.bat</b> that is found in
+		the <b>InteractiveTest</b> folder will run the following tests automatically.
+		In order to use it, copy the three images and the batch file to a local folder
+		and run it.</li>
+		<li>Check that the 2000Pages folder contains an image called <b>2000Pages.tif</b>
+		and confirm that the image contains 2000 pages.</li>
+		<li>Check that the 11000Pages folder contains an image called <b>11000Pages.tif</b>
+		and confirm that the image contains 11000 pages.</li>
+<p>
      	<li><h2>CMPI - File Name Formats - using InteractiveTest folder as command-line argument</h2>
 	The batch file <b>test_CreateMultiPageImage.bat</b> that is found in
 	the <b>InteractiveTest</b> folder will run the following tests
@@ -71,6 +82,21 @@
                     	<li>Delete any existing <b>A.tif</b>.</li>  
                     	<li>Copy test pages as <b>00000001.tif</b>, <b>00000002.tif</b>, 
 			<b>00000003.tif</b>.  Run the application.</li>
+                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
+             	</ul>
+             	<li><b>Name_Dot_DDDD [LRCAU #5845]</b>.  
+             	<ul>
+                    	<li>Delete any existing <b>A.tif</b>.</li>  
+                    	<li>Copy test pages as <b>A.0001</b>, <b>A.0002</b>, <b>A.0003</b>.  
+			Run the application.</li>
+                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
+             	</ul>
+<p>
+             	<li><b>Name_Dot_DDDDD [LRCAU #5845]</b>.  
+             	<ul>
+                    	<li>Delete any existing <b>A.tif</b>.</li>  
+                    	<li>Copy test pages as <b>A.00001</b>, <b>A.00002</b>, <b>A.00003</b>.  
+			Run the application.</li>
                     	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
              	</ul>
      	</ul>
