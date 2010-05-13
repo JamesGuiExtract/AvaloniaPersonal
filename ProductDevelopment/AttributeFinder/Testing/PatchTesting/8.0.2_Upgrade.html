@@ -1,0 +1,56 @@
+<HTML>
+
+<HEAD>
+<TITLE>8.0.1 Patch/Upgrade Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.0.2<br>Patch/Upgrade Testing </h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>SCRs:</b> LRCAU #5830 & #5845 
+	<LI><b>Issue:</b> CreateMultiPageImage when a machine is busy and we are
+	creating a large image sometimes the image has an incorrect number of pages.</li>
+	<li><b>Second issue:</b> Add support for 4 and 5 digit file extensions (.0001 & .00001).</li>
+	<LI><b>Solution:</b> CreateMultiPageImage was updated to create the new image one page at a time
+	rather than writing the whole image into memory and then streaming it to disk.  It has also
+	been updated to process to a temporary file and only copy the temporary file to the destination
+	if there were no errors and the correct number of pages were written out.  The utility has also
+	been modified to report failures on the command line as well as logging a more clear top level
+	exception to the exception file so that files that failed can easily be exported from the UEX
+	log.  Support has been added to look for both 4 digit and 5 digit page number extensions.</li>
+</ul>
+<p>
+<h3>Tests</h3>
+<OL>
+	<LI><b>Installation</b>
+	<ul>
+		<li>Confirm that the installation batch file runs without error.
+		<li>Confirm that the batch file can be run from a drive other than the
+		drive containing the CommonComponents folder (i.e. if the CommonComponents
+		folder is on the C drive, confirm that the install can be run on the D drive).
+		<li>Confirm that the batch file can be run from a folder within the Extract Systems
+		folder in ProgramFiles (Joe and Mike sometimes create a folder parallel to
+		CommonComponents called Patches with subfolders for each patch applied and
+		will run the install.bat from the subfolder).
+		<li>Confirm that updated files exist on the test machine.
+	</ul>
+
+	<LI><b>Testing</b>
+	<ul>
+		<li>Excercise the <a href="../SanityTests/SanityTests.html">Sanity Test</a>
+		checklist on a 32 bit desktop OS.</li>
+		<li>Excercise the <a href="../SanityTests/SanityTests.html">Sanity Test</a>
+		checklist on a 64 bit server OS.</li>
+		<li>While the sanity test is running, excercise the
+		<a href="../../../Utils\CreateMultiPageImage\InteractiveTest\CreateMultiPageImage.html">Create Multi Page Image</a>
+		checklist on the same machine. <b>NOTE:</b>You only need to excercise the Create multi page image tests from
+		the checklist, not the Split multi page image section.</li>
+<p>
+</OL>
+</BODY>
+</HTML>
