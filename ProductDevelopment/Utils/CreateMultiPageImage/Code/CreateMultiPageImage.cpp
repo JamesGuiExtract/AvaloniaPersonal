@@ -459,8 +459,9 @@ void createMultiPageImage(string strPage1, EFileNameType eFileType)
 		{
 			try
 			{
+				cout << "Creating " << strOutputFileName << endl;
 				createMultiPageImage(vecImageFiles, strOutputFileName, false );
-				cout << "Created " << strOutputFileName << endl;
+				cout << "Created " << strOutputFileName << endl << endl;
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30101");
 		}
@@ -468,7 +469,7 @@ void createMultiPageImage(string strPage1, EFileNameType eFileType)
 		{
 			uex.addDebugInfo("MultiPage Image File Name", strOutputFileName);
 			uex.log();
-			cout << "Error creating " << strOutputFileName << endl;
+			cout << "Error creating " << strOutputFileName << endl << endl;
 		}
 	}
 }
