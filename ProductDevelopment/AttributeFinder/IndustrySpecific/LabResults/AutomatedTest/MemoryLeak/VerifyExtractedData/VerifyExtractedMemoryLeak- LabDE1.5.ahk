@@ -29,12 +29,6 @@ Loop,
 		WinActivate, % LabDEWindowTitle,
 	;;WinWaitActive, % LabDEWindowTitle,
 	Sleep, SleepTime
-
-	;Press "Copy" button
-	MouseClick, left,  531,  201
-	Sleep, 2000
-	MouseClick, left,  531,  201
-	Sleep, SleepTime
 	
 	; Select name row From EpicCare:
 	MouseClick, left, 35, 350, 1	
@@ -96,7 +90,7 @@ Loop,
 	;; Go back to the order table
 	Send, ^{Down}
 	Sleep, SleepTime
-	Send, {Tab}{F3}
+	Send, {Tab}{F3}{F3}
 
 	;; Create a new order
 	Send, {Home}
@@ -168,6 +162,14 @@ Loop,
 	Send, {F10}
 	Sleep, SleepTime
 	Send, {F10}
+	Sleep, SleepTime
+
+	;Press "Copy" button
+	Send, {F3}
+	Sleep, SleepTime
+	MouseClick, left,  531,  104
+	Sleep, 3000
+	MouseClick, left,  531,  104
 	Sleep, SleepTime
 
 	;;Save

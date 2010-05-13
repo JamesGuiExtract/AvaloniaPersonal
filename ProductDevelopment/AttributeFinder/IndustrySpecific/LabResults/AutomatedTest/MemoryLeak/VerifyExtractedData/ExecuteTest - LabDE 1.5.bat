@@ -1,7 +1,7 @@
 @echo off
 
 REM Start AutoHotkey script
-START "VerifyExtractedMemoryLeak- LabDE1.5.ahk"
+START VerifyExtractedMemoryLeak-LabDE1.5.ahk
 
 REM Clean Source folder
 call Clean.bat Test_1
