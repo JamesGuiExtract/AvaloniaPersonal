@@ -41,6 +41,8 @@ enum EFileNameType
 	kName_Underscore_P_Ds_Dot_Tif,	// 0000123_P1.tif, 0000123_P2.tif, etc
 	kName_Underscore_DDDD_Dot_Tif,  // ImgA_0001.tif, ImgA_0002.tif, etc
 	kDDDDDDDD_Dot_Tif,				// 00000001.tif, 00000002.tif, etc
+	kName_Dot_DDDD,					// 000123.0001
+	kName_Dot_DDDDD,				// 000123.00001
 	// NOTE: add new future entries here...
 	kLastFileNameType
 };
@@ -61,6 +63,8 @@ EFileNameType getFirstPageFiles(const string& strRootDir, bool bRecursive,
 		ls_mapFileNameTypeToWildCard[kName_Underscore_P_Ds_Dot_Tif] = "*_P1.tif";
 		ls_mapFileNameTypeToWildCard[kName_Underscore_DDDD_Dot_Tif] = "*_0001.tif";
 		ls_mapFileNameTypeToWildCard[kDDDDDDDD_Dot_Tif] = "00000001.tif";
+		ls_mapFileNameTypeToWildCard[kName_Dot_DDDD] = "*.0001";
+		ls_mapFileNameTypeToWildCard[kName_Dot_DDDDD] = "*.00001";
 	}
 
 	// iterate through each of the various filename types and see if files matching
@@ -146,6 +150,8 @@ string getMultiPageImageName(const string& strPage1, const EFileNameType eFileTy
 		break;
 
 	case kName_Dot_DDD:
+	case kName_Dot_DDDD:
+	case kName_Dot_DDDDD:
 		{
 			// get the location of the last period
 			size_t lastDot = strPage1.find_last_of('.');
@@ -157,7 +163,7 @@ string getMultiPageImageName(const string& strPage1, const EFileNameType eFileTy
 				throw ue;
 			}
 
-			// erase the "001" after the period in "12312321.001"
+			// erase the "[0]+1" after the period in "12312321.[0]+1"
 			string strRootFileName(strPage1, 0, lastDot);
 			
 			// append .tif and return
@@ -280,9 +286,21 @@ string getSinglePageImageName(string strMultiPageImageFileName,
 		break;
 
 	case kName_Dot_DDD:
+	case kName_Dot_DDDD:
+	case kName_Dot_DDDDD:
 		{
-			// build the 3 digit zero padded page number extension like ".001"
-			string strDDDPage = padCharacter(asString(ulPage), true, '0', 3);
+			int nPadCharacterCount = 3;
+			if (eFileType == kName_Dot_DDDD)
+			{
+				nPadCharacterCount = 4;
+			}
+			else if (eFileType == kName_Dot_DDDDD)
+			{
+				nPadCharacterCount = 5;
+			}
+
+			// build the 3 digit zero padded page number extension like ".[0]+1"
+			string strDDDPage = padCharacter(asString(ulPage), true, '0', nPadCharacterCount);
 
 			// find the last dot in the multi-page tif file
 			size_t lastDot = strMultiPageImageFileName.find_last_of('.');
@@ -436,23 +454,21 @@ void createMultiPageImage(string strPage1, EFileNameType eFileType)
 
 	if (iPage >= 1)
 	{
-		// sometimes the create-multi-page image call fails with ELI09046
-		// and it is unclear why that happens.  Just retrying the operation
-		// has always succeeded during our testing.  So, if the createMultiPageImage
-		// call fails, try it up to 3 times.
-		cout << "Creating " << strOutputFileName << endl;
 
-		int iTotalTries = 0;
-		while (iTotalTries < 3)
+		try
 		{
 			try
 			{
 				createMultiPageImage(vecImageFiles, strOutputFileName, false );
-				break;
+				cout << "Created " << strOutputFileName << endl;
 			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI12622");
-
-			iTotalTries++;
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30101");
+		}
+		catch(UCLIDException& uex)
+		{
+			uex.addDebugInfo("MultiPage Image File Name", strOutputFileName);
+			uex.log();
+			cout << "Error creating " << strOutputFileName << endl;
 		}
 	}
 }
