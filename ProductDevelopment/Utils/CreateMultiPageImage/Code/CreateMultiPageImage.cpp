@@ -28,7 +28,9 @@ static char THIS_FILE[] = __FILE__;
 // add license management password function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
-int giNumImagesCreated = 0;
+int giTotalImagesProcessed = 0;
+int giImagesCreated = 0;
+int giImagesFailed = 0;
 
 // enumeration to capture the various filename types in which single-page images
 // can be stored in a folder
@@ -36,13 +38,14 @@ enum EFileNameType
 {
 	kNone,
 	kName_Dot_DDD_Dot_Tif,		// 0000123.001.tif, 0000123.002.tif, etc
+	// NOTE: The order is very important when searching for the 5 digit, 4 digit, and 3 digit ext
+	kName_Dot_DDDDD,				// 000123.00001
+	kName_Dot_DDDD,					// 000123.0001
 	kName_Dot_DDD,				// 0000123.001, 0000123.002, etc
 	kName_Hypen_Ds_Dot_Tif,		// 0000123-1.tif, 0000123-2.tif
 	kName_Underscore_P_Ds_Dot_Tif,	// 0000123_P1.tif, 0000123_P2.tif, etc
 	kName_Underscore_DDDD_Dot_Tif,  // ImgA_0001.tif, ImgA_0002.tif, etc
 	kDDDDDDDD_Dot_Tif,				// 00000001.tif, 00000002.tif, etc
-	kName_Dot_DDDD,					// 000123.0001
-	kName_Dot_DDDDD,				// 000123.00001
 	// NOTE: add new future entries here...
 	kLastFileNameType
 };
@@ -462,14 +465,17 @@ void createMultiPageImage(string strPage1, EFileNameType eFileType)
 				cout << "Creating " << strOutputFileName << endl;
 				createMultiPageImage(vecImageFiles, strOutputFileName, false );
 				cout << "Created " << strOutputFileName << endl << endl;
+				giImagesCreated++;
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30101");
 		}
 		catch(UCLIDException& uex)
 		{
-			uex.addDebugInfo("MultiPage Image File Name", strOutputFileName);
-			uex.log();
+			UCLIDException ue("ELI30102", "Unable to create multi page image.", uex);
+			ue.addDebugInfo("MultiPage Image File Name", strOutputFileName);
+			ue.log();
 			cout << "Error creating " << strOutputFileName << endl << endl;
+			giImagesFailed++;
 		}
 	}
 }
@@ -496,7 +502,7 @@ void process(const string& strRootDir, bool bRecursive)
 	{
 		const string& strFile = *iter;
 		createMultiPageImage(strFile, eFileType);
-		giNumImagesCreated++;
+		giTotalImagesProcessed++;
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -674,8 +680,14 @@ int main(int argc, char *argv[])
 			CTime end = CTime::GetCurrentTime();
 			CTimeSpan duration = end - start;
 			cout << endl;
-			cout << giNumImagesCreated << " images processed in " << 
+			cout << giTotalImagesProcessed << " image(s) processed in " << 
 				duration.GetTotalSeconds() << " seconds." << endl;
+			cout << giImagesCreated << " image(s) created successfully, " <<
+				giImagesFailed << " image(s) failed." << endl;
+			if (giImagesFailed > 0)
+			{
+				cout << "See exception log for details on failed images." << endl;
+			}
 			cout << endl;
 			return EXIT_SUCCESS;
 		}
