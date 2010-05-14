@@ -694,7 +694,7 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 	// Get initialized FILEINFO for first page
 	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 	L_INT nRet = L_FileInfo((char*)vecImageFiles[0].c_str(), &fileInfo, sizeof(FILEINFO), 0, NULL);
-	throwExceptionIfNotSuccess(nRet, "ELI30029", "Unable to get file information.");
+	throwExceptionIfNotSuccess(nRet, "ELI30029", "Unable to get file information.", vecImageFiles[0]);
 
 	// Get the appropriate compression factor for the specified format [LRCAU #5284]
 	L_INT nCompression = getCompressionFactor(fileInfo.Format);
@@ -743,6 +743,17 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 			ue.addDebugInfo("PageNumber", i + 1);
 			throw ue; 
 		}
+	}
+
+	// Ensure the image has the correct number of pages
+	int nNumberWritten = getNumberOfPagesInImage(tmpOutput.getName());
+	if (nNumImages != nNumberWritten)
+	{
+		UCLIDException ue("ELI30100", "Page count mismatch.");
+		ue.addDebugInfo("Expected Number Of Pages", nNumImages);
+		ue.addDebugInfo("Number Of Pages Written", nNumberWritten);
+		ue.addDebugInfo("Output File Name", strOutputFileName);
+		throw ue;
 	}
 
 	// Move the temporary file to its final destination
