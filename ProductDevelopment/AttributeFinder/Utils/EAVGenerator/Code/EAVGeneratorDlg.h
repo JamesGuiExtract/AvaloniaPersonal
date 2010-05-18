@@ -177,6 +177,10 @@ private:
 						  int iNumItemsUnderInsertionPoint, 
 						  int iSubLevel);
 
+	// Moves subattributes at a level >= uiLevelToMove starting at the nMoveFrom position 
+	// to after the nInsertAfter position.  The move stops at the first item < uiLevelToMove
+	void moveSubAttributes (int nInsertAfter, int nMoveFrom, unsigned int uiLevelToMove);
+
 	// Creates the toolbar
 	void createToolBar();
 

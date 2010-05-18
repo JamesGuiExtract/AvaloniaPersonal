@@ -863,6 +863,19 @@ void CEAVGeneratorDlg::OnBtnMerge()
 		addToSetIfNonEmpty(setNames, ipMainAttribute->Name);
 		addToSetIfNonEmpty(setTypes, ipMainAttribute->Type);
 
+		// Find the last subattribute of the first attribute being merged to be used
+		// as the insert after position for moving subattributes
+		int nLastSubAttribute = i;
+		int nListCount = m_listAttributes.GetItemCount();
+		for ( int x = nLastSubAttribute + 1; x <nListCount; x++)
+		{
+			if ( getAttributeLevel(x) == uiLevel)
+			{
+				break;
+			}
+			nLastSubAttribute++;
+		}
+
 		// Iterate over the remaining attributes
 		while (true)
 		{
@@ -908,6 +921,10 @@ void CEAVGeneratorDlg::OnBtnMerge()
 			// Remove this attribute from the list control
 			ipNextAttribute->Release();
 			m_listAttributes.DeleteItem(i);
+
+			// Move the subattributes to the item the attribute was merged with
+			// Subattributes of the just deleted item i will now be at position i
+			moveSubAttributes (nLastSubAttribute, i, uiLevel+1);
 			
 			// Iterate until position is NULL
 			if (pos == NULL)

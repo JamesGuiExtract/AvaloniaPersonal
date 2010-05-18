@@ -571,8 +571,6 @@ void CEAVGeneratorDlg::displayAttributes(IIUnknownVectorPtr ipAttributes)
 			// convert the attribute value to user displayable text [P16 #2860]
 			convertCppStringToNormalString(strValue);
 
-			string strSourceDocName = asString(ipValue->SourceDocName);
-
 			// Get current list count
 			long nTotalCount = m_listAttributes.GetItemCount();
 
@@ -1780,6 +1778,50 @@ string CEAVGeneratorDlg::getModeAsString(ESpatialStringMode eMode)
 
 	default:
 		THROW_LOGIC_ERROR_EXCEPTION("ELI27590");
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CEAVGeneratorDlg::moveSubAttributes(int nInsertAfter, int nMoveFrom, unsigned int uiLevelToMove)
+{
+	// This method is only to be used if nMoveFrom is after nInsertAfter.
+	ASSERT_ARGUMENT("ELI30103", nMoveFrom > nInsertAfter);
+
+	int nInsertAt = nInsertAfter + 1;
+	
+	int nListCount = m_listAttributes.GetItemCount();
+	while(nMoveFrom < nListCount)
+	{
+		// need to check if the level of the attribute is the same as the 
+		if (getAttributeLevel(nMoveFrom) < uiLevelToMove)
+		{
+			// no more subattributes
+			break;
+		}
+
+		// Info for the subattribute to move
+		string strName = m_listAttributes.GetItemText(nMoveFrom, NAME_COLUMN);
+		string strValue = m_listAttributes.GetItemText(nMoveFrom, VALUE_COLUMN);
+		string strType = m_listAttributes.GetItemText(nMoveFrom, TYPE_COLUMN);
+		string strSpatialness = m_listAttributes.GetItemText(nMoveFrom, SPATIALNESS_COLUMN);
+		
+		// Used to hold the current attribute - just need to move the pointers 
+		IAttribute *pAttribute = (IAttribute *)m_listAttributes.GetItemData(nMoveFrom);
+
+		// Delete subattribute from the move from location
+		m_listAttributes.DeleteItem(nMoveFrom);
+		
+		// Insert the attribute at the end of the sub attributes
+		int nNewItem = m_listAttributes.InsertItem(nInsertAt, strName.c_str());
+
+		// Set the data to the same as the deleted subattribute
+		m_listAttributes.SetItemData(nNewItem, (DWORD_PTR)pAttribute);
+		m_listAttributes.SetItemText(nNewItem, VALUE_COLUMN, strValue.c_str());
+		m_listAttributes.SetItemText(nNewItem, TYPE_COLUMN, strType.c_str());
+		m_listAttributes.SetItemText(nNewItem, SPATIALNESS_COLUMN, strSpatialness.c_str());
+
+		// Advance the item numbers
+		nInsertAt++;
+		nMoveFrom++;
 	}
 }
 //-------------------------------------------------------------------------------------------------
