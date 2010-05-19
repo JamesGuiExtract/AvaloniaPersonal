@@ -1,1 +1,0 @@
-#error This file has moved to SSOCR2. It is no longer used in SSOCR.

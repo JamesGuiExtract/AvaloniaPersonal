@@ -12,17 +12,22 @@
 
 <h3>Purpose and Details</h3>
 <ul>
-   	<LI><b>SCRs:</b> LRCAU #5830 & #5845 
+   	<LI><b>SCRs:</b> LRCAU #5830, #5845 & #5846
 	<LI><b>Issue:</b> CreateMultiPageImage when a machine is busy and we are
 	creating a large image sometimes the image has an incorrect number of pages.</li>
 	<li><b>Second issue:</b> Add support for 4 and 5 digit file extensions (.0001 & .00001).</li>
+	<li><b>Third issue:</b> CreateMultiPageImage does not report the number of files that
+	were successfully created and the number of files that failed.  It only reports the total number
+	of files processed.
 	<LI><b>Solution:</b> CreateMultiPageImage was updated to create the new image one page at a time
 	rather than writing the whole image into memory and then streaming it to disk.  It has also
 	been updated to process to a temporary file and only copy the temporary file to the destination
 	if there were no errors and the correct number of pages were written out.  The utility has also
 	been modified to report failures on the command line as well as logging a more clear top level
 	exception to the exception file so that files that failed can easily be exported from the UEX
-	log.  Support has been added to look for both 4 digit and 5 digit page number extensions.</li>
+	log.  Support has been added to look for both 4 digit and 5 digit page number extensions.
+	The final output has been modified to report the total number of files processed, as well
+	as the total number of successes and failures.</li>
 </ul>
 <p>
 <h3>Tests</h3>

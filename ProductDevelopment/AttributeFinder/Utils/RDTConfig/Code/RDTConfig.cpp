@@ -76,7 +76,9 @@ BOOL CRDTConfigApp::InitInstance()
 			dlg.DoModal();
 		}
 		
-		CoUninitialize();
+		// This is commented out to fix FlexIDSCore #2256 - so that RDTConfig does not
+		// cause an MFC exception when it exits
+		//CoUninitialize();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07697")
 
