@@ -206,11 +206,11 @@ STDMETHODIMP CLegalDescSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFD
 			// Fix up OCR errors for the keywords
 			ipValue->Replace("(\\b.ot(s)?\\b|\\bL.t(s)?\\b|\\bLo.(s)\\b)(?=.{1,30}\\d)", 
 				"LOT", VARIANT_FALSE, 0, m_ipRegExParser);
-			ipValue->Replace("(\\b.nit|\\bU.it|\\bUn.t|\\bUni.)(?=.{1,30}\\d)", 
+			ipValue->Replace("(\\b.nit|\\bU.it|\\bUn.t|\\bUni.(?=s?\\b))(?=.{1,30}\\d)", 
 				"UNIT", VARIANT_FALSE, 0, m_ipRegExParser);
 			ipValue->Replace("(\\b.uilding|\\bB.ilding|\\bBu.lding|\\bBui.ding|\\bBuil.ing|\\bBuild.ng|\\bBuildi.g|\\bBuildin.)(?=.{1,30}\\d)",
 				"BUILDING", VARIANT_FALSE, 0, m_ipRegExParser);
-			ipValue->Replace("(\\b.utlot|\\bO.tlot|\\bOu[\\s\\S]{0,4}?ot|\\bOutl.t|\\bOutlo.)(?=.{1,30}\\d)", 
+			ipValue->Replace("(\\b.utlot|\\bO.tlot|\\bOu[\\s\\S]{0,4}?ot|\\bOutl.t|\\bOutlo.\\b)(?=.{1,30}\\d)", 
 				"OUTLOT", VARIANT_FALSE, 0, m_ipRegExParser);
 			ipValue->Replace("(\\b.lock\\b|\\bB.ock\\b|\\bBl.ck\\b|\\bBlo.k\\b|\\bBloc.\\b)(?=.{1,30}\\d)", 
 				"BLOCK", VARIANT_FALSE, 0, m_ipRegExParser);
