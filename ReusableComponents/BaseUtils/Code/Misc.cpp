@@ -205,135 +205,168 @@ void fillPageNumberVector(vector<int>& rvecPageNumbers,
 //-------------------------------------------------------------------------------------------------
 void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 {
-	string strRegFullKey = strRegistryKey;
-
-	// compute the folder and keyname from the registry key
-	// for use with the RegistryPersistenceMgr class
-	unsigned long ulLastPos = strRegFullKey.find_last_of('\\');
-	if (ulLastPos == string::npos)
+	try
 	{
-		UCLIDException ue("ELI08826", "Invalid registry key!");
-		ue.addDebugInfo("RegKey", strRegFullKey);
-		throw ue;
-	}
-	string strRegFolder(strRegFullKey, 0, ulLastPos);
-	string strRegKey(strRegFullKey, ulLastPos + 1, 
-		strRegFullKey.length() - ulLastPos - 1);
-
-	// if the extension is not .etf, then just return
-	string strExt = getExtensionFromFullPath(strFile, true);
-	if (strExt != ".etf")
-	{
-		return;
-	}
-
-	// Get name for the base file,
-	// for instance, if strFile = "XYZ.dcc.etf" 
-	// then the base file will be "XYZ.dcc"
-	string strBaseFile = getPathAndFileNameWithoutExtension(strFile);
-
-	// File must exist to continue
-	if (!isFileOrFolderValid(strBaseFile.c_str()))
-	{
-		return;
-	}
-
-	bool bAutoEncryptOn = false;
-
-	// Protect access to the IConfigurationSettingsPersistenceMgr
-	{
-		static CMutex mutex;
-		CSingleLock lg(&mutex, TRUE );
-
-		static auto_ptr<IConfigurationSettingsPersistenceMgr> pSettings(NULL);
-		if (pSettings.get() == NULL)
+		try
 		{
-			pSettings = auto_ptr<IConfigurationSettingsPersistenceMgr>(
-				new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
-			ASSERT_RESOURCE_ALLOCATION("ELI08827", pSettings.get() != NULL);
-		}
-	
-		// check if the registry key for auto-encrypt exists.
-		// if it does not, create the key with a default value of "0"
-		if (!pSettings->keyExists(strRegFolder, strRegKey))
-		{
-			pSettings->createKey(strRegFolder, strRegKey, "0");
-		}
-		else
-		{
-			// get the key value. If it is "1", then auto-encrypt 
-			// setting is on
-			if (pSettings->getKeyValue(strRegFolder, strRegKey) == "1")
+			string strRegFullKey = strRegistryKey;
+
+			// compute the folder and keyname from the registry key
+			// for use with the RegistryPersistenceMgr class
+			unsigned long ulLastPos = strRegFullKey.find_last_of('\\');
+			if (ulLastPos == string::npos)
 			{
-				bAutoEncryptOn = true;
-			}
-		}
-	}
-
-	// AutoEncrypt must be ON in registry to continue
-	if (!bAutoEncryptOn)
-	{
-		return;
-	}
-
-	// Use a temporary file alongside the target etf file to use a flag that the file is currently
-	// being encrypted.
-	{
-		auto_ptr<TemporaryFileName> apTempFile(NULL);
-
-		// If there is a temporary encryption file it means the file is currently being encrypted.
-		// Wait up to 10 seconds for the file to go away.
-		string strTempEncryptionFile = strFile + ".encryption.tmp";
-		int nWaitTime = 0;
-		while (apTempFile.get() == NULL)
-		{
-			if (!isValidFile(strTempEncryptionFile))
-			{
-				try
-				{
-					apTempFile.reset(new TemporaryFileName(strTempEncryptionFile));
-				}
-				catch (...)
-				{
-					apTempFile.reset(NULL);
-				}
-			}
-
-			if (nWaitTime > 10000)
-			{
-				UCLIDException ue("ELI07701", "Timeout waiting for file to be encyrypted!");
-				ue.addDebugInfo("Filename", strFile);
-				ue.addDebugInfo("Temp filename", strTempEncryptionFile);
+				UCLIDException ue("ELI08826", "Invalid registry key!");
+				ue.addDebugInfo("RegKey", strRegFullKey);
 				throw ue;
 			}
+			string strRegFolder(strRegFullKey, 0, ulLastPos);
+			string strRegKey(strRegFullKey, ulLastPos + 1, 
+				strRegFullKey.length() - ulLastPos - 1);
 
-			Sleep(100);
-			nWaitTime += 100;
-		}
-
-		// If ETF already exists, compare the last modification
-		// on both the base file and the etf file
-		if (::isFileOrFolderValid(strFile.c_str()))
-		{
-			// Compare timestamps
-			CTime tmBaseFile(getFileModificationTimeStamp(strBaseFile));
-			CTime tmETFFile(getFileModificationTimeStamp(strFile));
-			if (tmBaseFile <= tmETFFile)
+			// if the extension is not .etf, then just return
+			string strExt = getExtensionFromFullPath(strFile, true);
+			if (strExt != ".etf")
 			{
-				// no need to encrypt the file again
 				return;
 			}
+
+			// Get name for the base file,
+			// for instance, if strFile = "XYZ.dcc.etf" 
+			// then the base file will be "XYZ.dcc"
+			string strBaseFile = getPathAndFileNameWithoutExtension(strFile);
+
+			// File must exist to continue
+			if (!isFileOrFolderValid(strBaseFile.c_str()))
+			{
+				return;
+			}
+
+			bool bAutoEncryptOn = false;
+
+			// Protect access to the IConfigurationSettingsPersistenceMgr
+			{
+				static CMutex mutex;
+				CSingleLock lg(&mutex, TRUE );
+
+				static auto_ptr<IConfigurationSettingsPersistenceMgr> pSettings(NULL);
+				if (pSettings.get() == NULL)
+				{
+					pSettings = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+						new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
+					ASSERT_RESOURCE_ALLOCATION("ELI08827", pSettings.get() != NULL);
+				}
+
+				// check if the registry key for auto-encrypt exists.
+				// if it does not, create the key with a default value of "0"
+				if (!pSettings->keyExists(strRegFolder, strRegKey))
+				{
+					pSettings->createKey(strRegFolder, strRegKey, "0");
+				}
+				else
+				{
+					// get the key value. If it is "1", then auto-encrypt 
+					// setting is on
+					if (pSettings->getKeyValue(strRegFolder, strRegKey) == "1")
+					{
+						bAutoEncryptOn = true;
+					}
+				}
+			}
+
+			// AutoEncrypt must be ON in registry to continue
+			if (!bAutoEncryptOn)
+			{
+				return;
+			}
+
+			// Get the base file time stamp
+			CTime tmBaseFile(getFileModificationTimeStamp(strBaseFile));
+
+			// If ETF already exists, compare the last modification
+			// on both the base file and the etf file
+			if (isFileOrFolderValid(strFile.c_str()))
+			{
+				// Compare timestamps
+				CTime tmETFFile(getFileModificationTimeStamp(strFile));
+				if (tmBaseFile <= tmETFFile)
+				{
+					// no need to encrypt the file again
+					return;
+				}
+			}
+
+			// Use a temporary file alongside the target etf file to use a flag that the file is currently
+			// being encrypted.
+			{
+				auto_ptr<TemporaryFileName> apTempFile(NULL);
+
+				// If there is a temporary encryption file it means the file is currently being encrypted.
+				// Wait up to 20 seconds for the file to go away.
+				string strTempEncryptionFile = strFile + ".encryption.tmp";
+				int nWaitTime = 0;
+				while (true)
+				{
+					if (!isValidFile(strTempEncryptionFile))
+					{
+						try
+						{
+							// Create the temporary file
+							apTempFile.reset(new TemporaryFileName(strTempEncryptionFile));
+
+							// Temporary file was created, break from the loop
+							// (this skips the sleep statement below)
+							break;
+						}
+						catch (...)
+						{
+							apTempFile.reset(NULL);
+						}
+					}
+
+					if (nWaitTime > 20000)
+					{
+						UCLIDException ue("ELI07701", "Timeout waiting for file to be encyrypted!");
+						ue.addDebugInfo("Filename", strFile);
+						ue.addDebugInfo("Temp filename", strTempEncryptionFile);
+						throw ue;
+					}
+
+					Sleep(100);
+					nWaitTime += 100;
+				}
+
+				// If ETF already exists, compare the last modification
+				// on both the base file and the etf file
+				if (::isFileOrFolderValid(strFile.c_str()))
+				{
+					// Compare timestamps
+					CTime tmETFFile(getFileModificationTimeStamp(strFile));
+					if (tmBaseFile <= tmETFFile)
+					{
+						// no need to encrypt the file again
+						return;
+					}
+				}
+
+				// Encrypt the base file to the temporary filename
+				static EncryptedFileManager efm;
+				efm.encrypt(strBaseFile, strTempEncryptionFile);
+
+				// Once the encryption process is complete, copy it into the real destination.
+				copyFile(strTempEncryptionFile, strFile);
+
+				// strTempEncryptionFile goes out of scope here, allowing auto-encryption from other threads
+				// and processes access here.
+			}
 		}
-
-		// Encrypt the base file to the temporary filename
-		static EncryptedFileManager efm;
-		efm.encrypt(strBaseFile, strTempEncryptionFile);
-
-		// Once the encryption process is complete, copy it into the real destination.
-		copyFile(strTempEncryptionFile, strFile);
-
-		// strTempEncryptionFile goes out of scope here, allowing auto-encryption from other threads
-		// and processes access here.
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30118");
+	}
+	catch(UCLIDException& uex)
+	{
+		UCLIDException ue("ELI30119", "Unable to update encrypted file.", uex);
+		ue.addDebugInfo("File To Encrypt", strFile);
+		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------

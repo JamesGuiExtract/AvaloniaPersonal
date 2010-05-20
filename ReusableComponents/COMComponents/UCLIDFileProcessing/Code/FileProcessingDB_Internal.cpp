@@ -1603,14 +1603,16 @@ void CFileProcessingDB::validateDBSchemaVersion()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 {
-	CSingleLock lock(&m_mutex, TRUE);
-
 	// If DB is already locked return
 	if (m_bDBLocked)
 	{
 		return;
 	}
 
+	// Lock insertion string for this process
+	string strAddLockSQL = "INSERT INTO LockTable (LockID, UPI) VALUES (1, '" 
+		+  m_strUPI + "')";
+				
 	// Keep trying to lock the DB until it is locked
 	while (!m_bDBLocked)
 	{
@@ -1625,6 +1627,15 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 		{
 			try
 			{
+				// Lock while updating the lock table and m_bDBLocked variable
+				CSingleLock lock(&m_mutex, TRUE);
+
+				// Check again to ensure no one else set the m_bDBLocked to true
+				if (m_bDBLocked)
+				{
+					break;
+				}
+
 				TransactionGuard tg(ipConnection);
 
 				// Create a pointer to a recordset
@@ -1668,9 +1679,6 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 					}
 				}
 
-				string strAddLockSQL = "INSERT INTO LockTable (LockID, UPI) VALUES (1, '" 
-					+  m_strUPI + "')";
-				
 				// Add the lock
 				executeCmdQuery(ipConnection, strAddLockSQL);
 
@@ -1680,6 +1688,9 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 
 				// Update the lock flag to indicate the DB is locked
 				m_bDBLocked = true;
+
+				// Lock obtained, break from the loop to avoid sleep call below
+				break;
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI14973");
 		}

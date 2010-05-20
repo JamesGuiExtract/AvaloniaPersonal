@@ -86,56 +86,82 @@ void EncryptedFileManager::encrypt(const string& strInputFile, const string& str
 unsigned char * EncryptedFileManager::decryptBinaryFile(const string& strInputFile, 
 														unsigned long *pulByteCount)
 {
-	// Check for existence of file
-	validateFileOrFolderExistence( strInputFile );
+	try
+	{
+		try
+		{
+			// Check for existence of file
+			validateFileOrFolderExistence( strInputFile );
 
-	// Read the encrypted data from the specified input file
-	// Bytestream from input file is assumed to be padded to 8-byte boundary
-	ByteStream encryptedBytes;
-	encryptedBytes.loadFrom( strInputFile.c_str() );
-	
-	// Create a bytestream to represent the encryption password 
-	ByteStream passwordBytes;
-	getPassword( passwordBytes );
+			// Read the encrypted data from the specified input file
+			// Bytestream from input file is assumed to be padded to 8-byte boundary
+			ByteStream encryptedBytes;
+			encryptedBytes.loadFrom( strInputFile );
 
-	// Create the encryption engine and decrypt the bytestream
-	EncryptionEngine ee;
-	ByteStream decryptedBytes;
-	ee.decrypt( decryptedBytes, encryptedBytes, passwordBytes );
+			// Create a bytestream to represent the encryption password 
+			ByteStream passwordBytes;
+			getPassword( passwordBytes );
 
-	// Retrieve the unpadded ByteStream
-	ByteStream bsUnpadded;
-	ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBytes );
-	bsm.read( bsUnpadded );
+			// Create the encryption engine and decrypt the bytestream
+			EncryptionEngine ee;
+			ByteStream decryptedBytes;
+			ee.decrypt( decryptedBytes, encryptedBytes, passwordBytes );
 
-	// Copy data to new block of bytes
-	// NOTE: Caller is responsible for deleting pNewData
-	unsigned long ulSize = bsUnpadded.getLength();
-	unsigned char *pNewData = new unsigned char[ulSize];
-	memcpy( pNewData, bsUnpadded.getData(), ulSize );
+			// Retrieve the unpadded ByteStream
+			ByteStream bsUnpadded;
+			ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBytes );
+			bsm.read( bsUnpadded );
 
-	// Return the result
-	*pulByteCount = ulSize;
-	return pNewData;
+			// Copy data to new block of bytes
+			// NOTE: Caller is responsible for deleting pNewData
+			unsigned long ulSize = bsUnpadded.getLength();
+			unsigned char *pNewData = new unsigned char[ulSize];
+			memcpy( pNewData, bsUnpadded.getData(), ulSize );
+
+			// Return the result
+			*pulByteCount = ulSize;
+			return pNewData;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30108");
+	}
+	catch(UCLIDException& uex)
+	{
+		UCLIDException ue("ELI30109", "Unable to read binary file.", uex);
+		ue.addDebugInfo("File To Read", strInputFile);
+		throw ue;
+	}
 }
 //-------------------------------------------------------------------------------------------------
 std::vector<std::string> EncryptedFileManager::decryptTextFile(const string& strInputFile)
 {
-	// Retrieve binary data from the text file
-	unsigned long ulLength = 0;
-	unsigned char* pszData = decryptBinaryFile( strInputFile, &ulLength );
+	try
+	{
+		try
+		{
+			// Retrieve binary data from the text file
+			unsigned long ulLength = 0;
+			unsigned char* pszData = decryptBinaryFile( strInputFile, &ulLength );
 
-	// Get the string from the decrypted bytes
-	string strLines( (const char *)pszData, ulLength );
-	delete [] pszData;
+			// Get the string from the decrypted bytes
+			string strLines( (const char *)pszData, ulLength );
+			delete [] pszData;
 
-	// Replace all \r before proceeding
-	::replaceVariable( strLines, "\r", "" );
+			// Replace all \r before proceeding
+			::replaceVariable( strLines, "\r", "" );
 
-	vector<string> vecTokens;
-	// Tokenize the lines using the newline character
-	StringTokenizer st( '\n' );
-	st.parse( strLines, vecTokens );
-	return vecTokens;
+			vector<string> vecTokens;
+			// Tokenize the lines using the newline character
+			StringTokenizer st( '\n' );
+			st.parse( strLines, vecTokens );
+			return vecTokens;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30106");
+	}
+	catch(UCLIDException& uex)
+	{
+		UCLIDException ue("ELI30107", "Unable to read text file.", uex);
+		ue.addDebugInfo("File To Read", strInputFile);
+		throw ue;
+	}
 }
 //-------------------------------------------------------------------------------------------------

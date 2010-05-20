@@ -275,26 +275,56 @@ void ByteStream::saveTo(const string& strFileName)
 //-------------------------------------------------------------------------------------------------
 void ByteStream::loadFrom(const string& strFileName)
 {
-	// open the file in read mode
-	ifstream infile(strFileName.c_str(), ios::binary | ios::in);
-	if (!infile)
+	try
 	{
-		UCLIDException ue("ELI06605", "Unable to open file in read mode!");
-		ue.addDebugInfo("strFileName", strFileName);
-		throw ue;
+		try
+		{
+			// Pointer to an ifstream
+			ifstream* pinFile = NULL;
+
+			// Open the file, retrying if necessary
+			waitForFileToBeReadable(strFileName, true, &pinFile, ios::in | ios::binary);
+
+			// Create an auto pointer to manage the pinFile
+			auto_ptr<ifstream> apInFile(pinFile);
+
+			// If pointer is null then file was not opened, make one more attempt to open the file
+			if (apInFile.get() == NULL)
+			{
+				// Open the file
+				apInFile.reset(new ifstream(strFileName.c_str(), ios::in | ios::binary));
+			}
+
+			if (apInFile.get() == NULL || !apInFile->is_open())
+			{
+				UCLIDException ue("ELI06605", "Unable to open file in read mode.");
+				throw ue;
+			}
+
+			// get the number of bytes associated with the file
+			apInFile->seekg(0, ios::end);
+			streampos nFileSize = apInFile->tellg();
+
+			// read the bytes from the file
+			setSize(nFileSize);
+			apInFile->seekg(0, ios::beg);
+
+			if(nFileSize > 0)
+			{
+				apInFile->read((char *)getData(), nFileSize);
+			}
+
+			// Close the file and reset the auto pointer
+			apInFile->close();
+			apInFile.reset();
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30110");
 	}
-
-	// get the number of bytes associated with the file
-	infile.seekg(0, ios::end);
-	streampos nFileSize = infile.tellg();
-
-	// read the bytes from the file
-	setSize(nFileSize);
-	infile.seekg(0, ios::beg);
-	
-	if(nFileSize > 0)
+	catch(UCLIDException& uex)
 	{
-		infile.read((char *)getData(), nFileSize);
+		UCLIDException ue("ELI30111", "Unable to load bytestream from file.", uex);
+		ue.addDebugInfo("File To Load", strFileName);
+		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------

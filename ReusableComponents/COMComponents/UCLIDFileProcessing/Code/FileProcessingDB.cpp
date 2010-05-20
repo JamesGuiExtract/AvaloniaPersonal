@@ -1183,30 +1183,14 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 
 	try
 	{
+		static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
+
 		// Check License
 		validateLicense();
-
-		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-		ADODB::_ConnectionPtr ipConnection = NULL;
-		
-		BEGIN_CONNECTION_RETRY();
-		
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
-
-		// Lock the database for this instance
-		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
-
-		// Make sure the DB Schema is the expected version
-		validateDBSchemaVersion();
 
 		// Set the action name from the parameter
 		string strActionName = asString(strAction);
 		
-		// Get the action ID and update the strActionName to stored value
-		long nActionID = getActionID(ipConnection, strActionName);
-		string strActionID = asString(nActionID);
-
 		string strUPIID = asString(m_nUPIID);
 
 		// Action Column to change
@@ -1217,7 +1201,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 		if (bGetSkippedFiles == VARIANT_TRUE)
 		{
 			strWhere = " INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID "
-				"WHERE (SkippedFile.ActionID = " + strActionID
+				"WHERE (SkippedFile.ActionID = " + strActionIDPlaceHolder
 				+ " AND FAMFile." + strActionCol + " = 'S'";
 
 			string strUserName = asString(bstrSkippedForUserName);
@@ -1247,6 +1231,26 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 		// create query to select top records;
 		string strSelectSQL = "SELECT " + strTop
 			+ " FAMFile.ID, FileName, Pages, FileSize, Priority, " + strActionCol + " " + strFrom;
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+		
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database for this instance
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Get the action ID 
+		long nActionID = getActionID(ipConnection, strActionName);
+
+		// Update the select statement with the action ID
+		replaceVariable(strSelectSQL, strActionIDPlaceHolder, asString(nActionID));
 
 		// return the vector of file records
 		IIUnknownVectorPtr ipFiles = setFilesToProcessing(ipConnection, strSelectSQL, nActionID);

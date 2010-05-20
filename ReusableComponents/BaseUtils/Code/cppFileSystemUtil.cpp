@@ -1947,7 +1947,8 @@ void waitForFileAccess(const string& strFileName, int iAccess)
 	while (!bRtnValue);
 }
 //--------------------------------------------------------------------------------------------------
-void waitForFileToBeReadable(const string& strFileName, bool bLogException, ifstream** ppinFile)
+void waitForFileToBeReadable(const string& strFileName, bool bLogException, ifstream** ppinFile,
+							 int nOpenMode)
 {
 	// Static variables
 	int iTimeout = -1;
@@ -1962,7 +1963,7 @@ void waitForFileToBeReadable(const string& strFileName, bool bLogException, ifst
 		// Scope for the auto_ptr
 		{
 			auto_ptr<ifstream> apIn;
-			apIn.reset(new ifstream(strFileName.c_str(), ios::in));
+			apIn.reset(new ifstream(strFileName.c_str(), nOpenMode));
 
 			// Check if the file was successfully opened
 			if (!apIn->fail())

@@ -513,7 +513,8 @@ EXPORT_BaseUtils void waitForFileAccess(const string& strFileName, int iAccess);
 //			ppinFile != NULL then ppinFile will point to the open ifstream object.
 EXPORT_BaseUtils void waitForFileToBeReadable(const string& strFileName,
 											  bool bLogException = true,
-											  ifstream** ppinFile = NULL);
+											  ifstream** ppinFile = NULL,
+											  int nOpenMode = ios::in);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To set the attributes of a particular file.  If bThrowExceptionIfNotSuccess = true
 //			then will throw a UCLIDException if the operation fails, otherwise the error is
