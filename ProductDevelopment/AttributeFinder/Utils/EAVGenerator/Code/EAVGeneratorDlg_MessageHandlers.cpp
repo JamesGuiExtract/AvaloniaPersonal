@@ -20,8 +20,14 @@ using namespace std;
 const string gstrOPEN_FILE_FILTER =
 	"Attribute files (*.eav; *.voa; *.evoa)|*.eav;*.voa;*.evoa"
 	"|EAV files (*.eav)|*.eav|VOA files (*.voa; *.evoa)|*.voa;*.evoa||";
+
+// Save filter and the related index constants, if this filter is modified be sure
+// to update the index constants as well as the OnBtnSaveas code
 const string gstrSAVE_FILE_FILTER =
 	"EAV files (*.eav)|*.eav|VOA files (*.voa)|*.voa|Expected VOA Files (*.evoa)|*.evoa||";
+const int gnEAV_INDEX = 1;
+const int gnVOA_INDEX = 2;
+const int gnEVOA_INDEX = 3;
 
 // add license management function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -579,37 +585,68 @@ void CEAVGeneratorDlg::OnBtnSaveas()
 		strEAVFileName = getFileNameWithoutExtension( strEAVFileName );
 		
 		// save file dialog
-		CFileDialogEx saveFileDlg(FALSE, ".eav", strEAVFileName.c_str(), 
-			OFN_FILEMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
-			gstrSAVE_FILE_FILTER.c_str(), NULL);
-
-		if (saveFileDlg.DoModal() == IDOK)
+		CFileDialogEx saveFileDlg(FALSE, "eav", strEAVFileName.c_str(), 
+			OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR, gstrSAVE_FILE_FILTER.c_str(), NULL);
+		while(true)
 		{
-			// Get the selected file complete path
-			CString zFileName = saveFileDlg.GetPathName();
-
-			// [DataEntry:326] Ensure the output filename matches the extension from the selected
-			// filter to prevent confusion concerning why a file failed to save.
-			CString zExt;
-			if (AfxExtractSubString(zExt, saveFileDlg.m_ofn.lpstrFilter,
-					2 * saveFileDlg.m_ofn.nFilterIndex - 1, (TCHAR)'\0'))
+			if (saveFileDlg.DoModal() == IDOK)
 			{
-				zExt.TrimLeft('*');
-				if (zFileName.Right(zExt.GetLength()).CompareNoCase(zExt) != 0)
+				// Get the selected file complete path
+				CString zFileName = saveFileDlg.GetPathName();
+
+				// Get the select file extension and the filter index
+				CString zExt = saveFileDlg.GetFileExt();
+				int iIndex = saveFileDlg.m_ofn.nFilterIndex;
+				CString zExpectedExt;
+				switch(iIndex)
 				{
-					zFileName += zExt;
+				case gnEAV_INDEX:
+					zExpectedExt = "eav";
+					break;
+
+				case gnVOA_INDEX:
+					zExpectedExt = "voa";
+					break;
+
+				case gnEVOA_INDEX:
+					zExpectedExt = "evoa";
+					break;
 				}
+
+				// If the file names extension is not the expected extension, append it
+				if (zExt.CompareNoCase(zExpectedExt) != 0)
+				{
+					zExpectedExt.Insert(0, ".");
+					zFileName.Append(zExpectedExt);
+				}
+
+				string strFileName = (LPCTSTR)zFileName;
+
+				// Check to see that the file doesn't exist
+				if (isValidFile(strFileName))
+				{
+					// Prompt the user
+					if (MessageBox(zFileName + " already exists, overwrite?", "File Exists",
+						MB_YESNO | MB_ICONWARNING) == IDNO)
+					{
+						// Continue to reprompt the user
+						continue;
+					}
+				}
+
+				// save all attributes accordingly
+				saveAttributes(zFileName);
+
+				m_strCurrentFileName = strFileName;
+
+				// Set window caption
+				updateWindowCaption(zFileName);
+
+				setModified(false);
 			}
 
-			// save all attributes accordingly
-			saveAttributes(zFileName);
-
-			m_strCurrentFileName = (LPCTSTR)zFileName;
-
-			// Set window caption
-			updateWindowCaption(zFileName);
-
-			setModified(false);
+			// Break out of the loop
+			break;
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07414");
