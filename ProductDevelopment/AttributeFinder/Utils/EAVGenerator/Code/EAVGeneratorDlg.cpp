@@ -14,6 +14,7 @@
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
 #include <MiscLeadUtils.h>
+#include <TemporaryFileName.h>
 
 #include <io.h>
 
@@ -962,6 +963,12 @@ void CEAVGeneratorDlg::saveAttributes(const CString& zFileName)
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::saveAttributesToEAV(const CString& zFileName)
 {
+	// Validate that the attributes and levels are appropriate
+	{
+		TemporaryFileName tempFile;
+		saveAttributesToVOA(tempFile.getName().c_str());
+	}
+
 	// open the output EAV file
 	ofstream ofs(zFileName, ios::out | ios::trunc);
 
