@@ -199,6 +199,17 @@ STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB* pDB, long lAction
 
 		// start the processing thread
 		AfxBeginThread(processManager, this);	
+
+		// Wait for up to a second for the processing to actually start
+		// This is so that the method does not return until processing
+		// has started and thus if a user calls Pause the processing will
+		// be able to pause - [LRCAU #5835]
+		int nCount = 0;
+		while (!m_bProcessing && nCount < 10)
+		{
+			Sleep(100);
+			nCount++;
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09825");
 	
