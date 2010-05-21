@@ -2364,40 +2364,34 @@ namespace Extract.Imaging.Forms
                     break;
 
                 case CursorTool.EditHighlightText:
-                {
-                    // Convert the mouse click point from client to image coordinates
-                    Point[] mouseClick = new Point[] { new Point(mouseX, mouseY) };
-                    using (Matrix clientToImage = _transform.Clone())
                     {
-                        clientToImage.Invert();
-                        clientToImage.TransformPoints(mouseClick);
-                    }
-
-                    // Iterate through all the layer objects
-                    foreach (LayerObject layerObject in _layerObjects)
-                    {
-                        // Check if this layer object was clicked
-                        if (layerObject.HitTest(mouseClick[0]))
+                        // Convert the mouse click point from client to image coordinates
+                        Point[] mouseClick = new Point[] { new Point(mouseX, mouseY) };
+                        using (Matrix clientToImage = _transform.Clone())
                         {
-                            // Check if this was a highlight
-                            Highlight highlight = layerObject as Highlight;
-                            if (highlight == null)
-                            {
-                                continue;
-                            }
+                            clientToImage.Invert();
+                            clientToImage.TransformPoints(mouseClick);
+                        }
 
+                        // Find the highlight that was clicked on (if any)
+                        // and present the edit text dialog to the user
+                        LayerObject layerObject = GetLayerObjectAtPoint<Highlight>(_layerObjects,
+                            mouseX, mouseY, false);
+                        if (layerObject != null)
+                        {
+                            Highlight highlight = layerObject as Highlight;
                             // Prompt the user for the new highlight text
-                            EditHighlightTextForm dialog =
-                                new EditHighlightTextForm(highlight.Text);
-                            if (dialog.ShowDialog() == DialogResult.OK)
+                            using (EditHighlightTextForm dialog =
+                                new EditHighlightTextForm(highlight.Text))
                             {
-                                // Store the new highlight text
-                                highlight.Text = dialog.HighlightText;
+                                if (dialog.ShowDialog() == DialogResult.OK)
+                                {
+                                    // Store the new highlight text
+                                    highlight.Text = dialog.HighlightText;
+                                }
                             }
-                            break;
                         }
                     }
-                }
                     break;
 
                 case CursorTool.SelectLayerObject:
@@ -2438,7 +2432,8 @@ namespace Extract.Imaging.Forms
                         }
                     }
 
-                    LayerObject clickedObject = GetLayerObjectAtPoint(_layerObjects, mouseX, mouseY);
+                    LayerObject clickedObject = GetLayerObjectAtPoint<LayerObject>(_layerObjects,
+                        mouseX, mouseY, true);
                     if (clickedObject != null)
                     {
                         // Select this layer object if it is not already
@@ -2505,15 +2500,22 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Gets a layer object at the specified point.
         /// </summary>
+        /// <typeparam name="T">The type of <see cref="LayerObject"/> to perform the
+        /// hit test on, to check all types just use <see cref="LayerObject"/> to
+        /// limit to just <see cref="Highlight"/> objects pass that as the type parameter.</typeparam>
         /// <param name="layerObjects">A collection of layer objects from which to select the 
         /// result.</param>
         /// <param name="x">The physical (client) x coordinate of the point.</param>
         /// <param name="y">The physical (client) y coordinate of the point.</param>
+        /// <param name="onlySelectableObjects">If <see langword="true"/> will only
+        /// check for objects that are selectable, if <see langword="false"/> all
+        /// objects will be considered candidates for selection.</param>
         /// <returns>A layer object from <paramref name="layerObjects"/>at the specified point. 
         /// If more than one layer object is at the point, the one with the lowest average distance 
         /// from its corners to the point is returned. <see langword="null"/> if no layer object 
         /// is at the point.</returns>
-        internal LayerObject GetLayerObjectAtPoint(IEnumerable<LayerObject> layerObjects, int x, int y)
+        internal LayerObject GetLayerObjectAtPoint<T>(IEnumerable<LayerObject> layerObjects, int x, int y,
+            bool onlySelectableObjects) where T : LayerObject
         {
             // Get the mouse position in image coordinates
             Point[] mouse = new Point[] { new Point(x, y) };
@@ -2529,11 +2531,16 @@ namespace Extract.Imaging.Forms
             List<LayerObject> possibleSelection = new List<LayerObject>();
             foreach (LayerObject layerObject in layerObjects)
             {
-                // Only perform hit test if the layer object is selectable and visible
-                if (layerObject.Selectable && layerObject.Visible &&
-                    layerObject.HitTest(mousePoint))
+                // Only check if the layer object is visible and selectable (if selectable
+                // is being checked)
+                if ((!onlySelectableObjects || layerObject.Selectable) && layerObject.Visible)
                 {
-                    possibleSelection.Add(layerObject);
+                    // Check that the object is of the appropriate type
+
+                    if (layerObject is T && layerObject.HitTest(mousePoint))
+                    {
+                        possibleSelection.Add(layerObject);
+                    }
                 }
             }
 
@@ -3003,14 +3010,17 @@ namespace Extract.Imaging.Forms
         void EndAngularHighlightOrRedaction(int mouseX, int mouseY, bool cancel)
         {
             // Get a drawing surface for the interactive highlight
-            using (Graphics graphics = CreateGraphics())
+            Region tempRegion = null;
+            Graphics graphics = null;
+            try
             {
+                graphics = CreateGraphics();
+
                 // Get the appropriate color for drawing the object
                 Color drawColor = GetHighlightDrawColor();
 
-                // Erase the previous highlight if it exists
-                GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.NotXorPen);
-                gdiGraphics.FillRegion(_trackingData.Region, drawColor);
+                // Save the current tracking region
+                tempRegion = _trackingData.Region.Clone();
 
                 // If the event was canceled, there is nothing more to do.
                 if (cancel)
@@ -3044,7 +3054,7 @@ namespace Extract.Imaging.Forms
                         {
                             // Instantiate the new highlight and add it to _layerObjects
                             Highlight highlight =
-                                new Highlight(this, LayerObject.ManualComment, points[0], 
+                                new Highlight(this, LayerObject.ManualComment, points[0],
                                     points[1], _defaultHighlightHeight);
                             _layerObjects.Add(highlight);
                         }
@@ -3062,6 +3072,21 @@ namespace Extract.Imaging.Forms
                             }
                         }
                     }
+                }
+
+                // Erase the previous highlight if it exists
+                GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.NotXorPen);
+                gdiGraphics.FillRegion(tempRegion, drawColor);
+            }
+            finally
+            {
+                if (tempRegion != null)
+                {
+                    tempRegion.Dispose();
+                }
+                if (graphics != null)
+                {
+                    graphics.Dispose();
                 }
             }
 
@@ -3630,15 +3655,17 @@ namespace Extract.Imaging.Forms
         /// <see langword="false"/> if the event is to be completed.</param>
         void EndRectangularHighlightOrRedaction(int mouseX, int mouseY, bool cancel)
         {
-            // Get a drawing surface for the interactive highlight
-            using (Graphics graphics = CreateGraphics())
+            Region tempRegion = null;
+            Graphics graphics = null;
+            try
             {
+                graphics = CreateGraphics();
+
                 // Get the appropriate color for drawing the object
                 Color drawColor = GetHighlightDrawColor();
 
-                // Erase the previous highlight if it exists
-                GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.NotXorPen);
-                gdiGraphics.FillRegion(_trackingData.Region, drawColor);
+                // Store the current tracking region
+                tempRegion = _trackingData.Region.Clone();
 
                 // If the event was canceled, there is nothing more to do.
                 if (cancel)
@@ -3649,6 +3676,8 @@ namespace Extract.Imaging.Forms
                 // Calculate the new region and rectangle
                 _trackingData.UpdateRectangularRegion(mouseX, mouseY);
 
+                GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.MaskPen);
+
                 // Retain the new highlight if it is not empty                        
                 if (!_trackingData.Region.IsEmpty(graphics))
                 {
@@ -3657,6 +3686,9 @@ namespace Extract.Imaging.Forms
                     int height;
                     GetSpatialDataFromClientRectangle(_trackingData.Rectangle,
                         out points, out height);
+
+                    // Draw the new highlight
+                    gdiGraphics.FillRegion(_trackingData.Region, drawColor);
 
                     if (_cursorTool == CursorTool.RectangularHighlight)
                     {
@@ -3675,10 +3707,21 @@ namespace Extract.Imaging.Forms
                                 LayerObject.ManualComment, zones, _defaultRedactionFillColor));
                         }
                     }
+                }
 
-                    // Draw the new highlight
-                    gdiGraphics.DrawMode = RasterDrawMode.MaskPen;
-                    gdiGraphics.FillRegion(_trackingData.Region, drawColor);
+                // Erase the previous highlight if it exists
+                gdiGraphics.DrawMode = RasterDrawMode.NotXorPen;
+                gdiGraphics.FillRegion(tempRegion, drawColor);
+            }
+            finally
+            {
+                if (tempRegion != null)
+                {
+                    tempRegion.Dispose();
+                }
+                if (graphics != null)
+                {
+                    graphics.Dispose();
                 }
             }
 

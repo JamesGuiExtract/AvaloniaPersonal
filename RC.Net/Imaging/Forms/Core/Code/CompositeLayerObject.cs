@@ -418,8 +418,8 @@ namespace Extract.Imaging.Forms
 
                 base.StartTrackingSelection(mouseX, mouseY);
 
-                LayerObject layerObject = ImageViewer.GetLayerObjectAtPoint(
-                    EnumerateAsLayerObjects(_objects), mouseX, mouseY);
+                LayerObject layerObject = ImageViewer.GetLayerObjectAtPoint<LayerObject>(
+                    EnumerateAsLayerObjects(_objects), mouseX, mouseY, true);
                 if (layerObject != null)
                 {
                     layerObject.StartTrackingSelection(mouseX, mouseY);

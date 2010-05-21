@@ -343,6 +343,37 @@ namespace Extract.Imaging
 
         }
 
+        /// <summary>
+        /// Gets the OCR output data as a <see cref="System.String"/>.
+        /// </summary>
+        /// <param name="fileName">The file on which text recognition is needed.</param>
+        /// <param name="rasterZone">The <see cref="RasterZone"/> defining the image region where
+        /// text recognition is needed.</param>
+        /// <param name="thresholdAngle">If less than zero, the smallest
+        /// <see cref="Rectangle"/> containing the <see cref="RasterZone"/> is OCR'd (which may 
+        /// contain significantly more area than the actual raster zone if the raster zone is at 
+        /// a steep angle). Otherwise, the smallest <see cref="Rectangle"/> containing the 
+        /// <see cref="RasterZone"/> is OCR'd for if the <see cref="RasterZone"/> is at an angle 
+        /// less than the specified angle. For <see cref="RasterZone"/>s at a steeper angle
+        /// than specified, the angle of the swipe is taken into account and only the text within
+        /// the <see cref="RasterZone"/> itself is OCR'd.</param>
+        /// <returns>A <see cref="System.String"/> containing the OCR output.</returns>
+        public string GetOcrTextAsString(string fileName, RasterZone rasterZone, double thresholdAngle)
+        {
+            try
+            {
+                SpatialString temp = GetOcrText(fileName, rasterZone, thresholdAngle);
+                return temp.String;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI30121",
+                    "Failed to recognize text.", ex);
+                ee.AddDebugData("Filename", fileName, false);
+                throw ee;
+            }
+        }
+
         #endregion Methods
 
         #region IDisposable Members

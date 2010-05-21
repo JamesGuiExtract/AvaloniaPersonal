@@ -47,7 +47,7 @@ namespace Extract.Imaging.Forms
             // _okButton
             // 
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(124, 56);
+            this._okButton.Location = new System.Drawing.Point(346, 288);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 0;
@@ -57,7 +57,7 @@ namespace Extract.Imaging.Forms
             // _cancelButton
             // 
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(205, 56);
+            this._cancelButton.Location = new System.Drawing.Point(427, 288);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 1;
@@ -76,17 +76,20 @@ namespace Extract.Imaging.Forms
             // _highlightTextBox
             // 
             this._highlightTextBox.Location = new System.Drawing.Point(12, 30);
+            this._highlightTextBox.Multiline = true;
             this._highlightTextBox.Name = "_highlightTextBox";
-            this._highlightTextBox.Size = new System.Drawing.Size(268, 20);
+            this._highlightTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._highlightTextBox.Size = new System.Drawing.Size(490, 252);
             this._highlightTextBox.TabIndex = 3;
             // 
             // EditHighlightTextForm
             // 
-            this.ClientSize = new System.Drawing.Size(292, 86);
+            this.ClientSize = new System.Drawing.Size(514, 318);
             this.Controls.Add(this._highlightTextBox);
             this.Controls.Add(this._label);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this._okButton);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "EditHighlightTextForm";
             this.Text = "Edit Highlight Text";
             this.ResumeLayout(false);
