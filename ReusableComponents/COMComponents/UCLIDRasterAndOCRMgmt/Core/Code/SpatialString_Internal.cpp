@@ -8,8 +8,10 @@
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
 #include <LicenseMgmt.h>
+#include <MiscLeadUtils.h>
 
 #include <math.h>
+#include <set>
 
 //--------------------------------------------------------------------------------------------------
 // Constants
@@ -3174,21 +3176,69 @@ void CSpatialString::autoConvertLegacyHybridString()
 	ASSERT_RESOURCE_ALLOCATION("ELI29753", ipCopyObj != NULL);
 
 	ILongToObjectMapPtr ipPageInfoMap = ipCopyObj->Clone();
-	ASSERT_RESOURCE_ALLOCATION("ELI29754", m_ipPageInfoMap != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI29754", ipPageInfoMap != NULL);
 
 	// Remove the any skew or rotation from m_ipPageInfoMap. (image coordinates)
 	IVariantVectorPtr ipKeys = m_ipPageInfoMap->GetKeys();
 	ASSERT_RESOURCE_ALLOCATION("ELI29755", ipKeys != NULL);
 
+	// Check for empty PageInfoMap (Hybrid strings created in 5.0 have an empty info map)
+	// [FlexIDSCore #4281]
 	long nCount = ipKeys->Size;
-	for (long i = 0; i < nCount; i++)
+	if (nCount == 0)
 	{
-		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo =
-			m_ipPageInfoMap->GetValue(ipKeys->GetItem(i));
-		ASSERT_RESOURCE_ALLOCATION("ELI29756", ipPageInfo != NULL);
+		// Look for the original image to build a spatial page info map from
+		if (!isValidFile(m_strSourceDocName))
+		{
+			UCLIDException ue("ELI30133",
+				"Spatial page info map was empty and original source image was not found.");
+			ue.addDebugInfo("Original File Name", m_strSourceDocName);
+			throw ue;
+		}
 
-		ipPageInfo->Deskew = 0;
-		ipPageInfo->Orientation = (UCLID_RASTERANDOCRMGMTLib::EOrientation)0;
+		// Get the page numbers from all raster zones
+		set<int> setPageNumbers;
+		for (size_t i = 0; i < m_vecRasterZones.size(); i++)
+		{
+			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = m_vecRasterZones[i];
+			ASSERT_RESOURCE_ALLOCATION("ELI30134", ipZone != NULL);
+
+			setPageNumbers.insert(ipZone->PageNumber);
+		}
+
+		// For each page, go to the original image and build the spatial page info with
+		// no rotation and 0 deskew
+		for(set<int>::iterator it = setPageNumbers.begin(); it != setPageNumbers.end(); it++)
+		{
+			// Create a new spatial page info
+			UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipInfo(CLSID_SpatialPageInfo);
+			ASSERT_RESOURCE_ALLOCATION("ELI30135", ipInfo != NULL);
+
+			// Get the image dimensions and set the page info
+			int nWidth(0), nHeight(0);
+			getImagePixelHeightAndWidth(m_strSourceDocName, nHeight, nWidth, *it);
+			ipInfo->SetPageInfo(nWidth, nHeight,
+				(UCLID_RASTERANDOCRMGMTLib::EOrientation) kRotNone, 0.0);
+
+			// Update both the new info map and the original info map
+			// (Need to update both maps for this case since the page info is not
+			// contained in the original map either)
+			ipPageInfoMap->Set(*it, ipInfo);
+			m_ipPageInfoMap->Set(*it, ipInfo);
+		}
+	}
+	else
+	{
+		// 0 the deskew and set the rotation to 0 for all page infos
+		for (long i = 0; i < nCount; i++)
+		{
+			UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo =
+				m_ipPageInfoMap->GetValue(ipKeys->GetItem(i));
+			ASSERT_RESOURCE_ALLOCATION("ELI29756", ipPageInfo != NULL);
+
+			ipPageInfo->Deskew = 0;
+			ipPageInfo->Orientation = (UCLID_RASTERANDOCRMGMTLib::EOrientation)0;
+		}
 	}
 
 	// Translate the zones to account for the difference between OCR and image coordinate systems

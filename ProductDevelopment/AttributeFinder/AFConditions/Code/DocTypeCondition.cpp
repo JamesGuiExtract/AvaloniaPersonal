@@ -252,27 +252,28 @@ STDMETHODIMP CDocTypeCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 
 			// get the vector of document type names
 			IVariantVectorPtr ipVecDocTypes = ipDocTags->TryGetValue(DOC_TYPE.c_str());
-			ASSERT_RESOURCE_ALLOCATION("ELI30097", ipVecDocTypes != NULL);
-
-			// See if any of the document types are in our list
-			long nDocTypeCount = ipVecDocTypes->Size;
-			for (long i = 0; !bInList && i < nDocTypeCount; i++)
+			if (ipVecDocTypes != NULL)
 			{
-				string strDocType = asString(ipVecDocTypes->GetItem(i).bstrVal);
+				// See if any of the document types are in our list
+				long nDocTypeCount = ipVecDocTypes->Size;
+				for (long i = 0; !bInList && i < nDocTypeCount; i++)
+				{
+					string strDocType = asString(ipVecDocTypes->GetItem(i).bstrVal);
 
-				long nCount = m_ipTypes->Size;
-				for (long j = 0; j < nCount; j++)
-				{	
-					_variant_t varType = m_ipTypes->GetItem(j);
-					_bstr_t bstrType = varType.bstrVal;
-					string strListDocType = asString(bstrType);
+					long nCount = m_ipTypes->Size;
+					for (long j = 0; j < nCount; j++)
+					{	
+						_variant_t varType = m_ipTypes->GetItem(j);
+						_bstr_t bstrType = varType.bstrVal;
+						string strListDocType = asString(bstrType);
 
-					if (strDocType == strListDocType ||
-						(nDocTypeCount == 1 && strListDocType == gstrSPECIAL_ANY_UNIQUE) ||
-						(nDocTypeCount > 1 && strListDocType == gstrSPECIAL_MULTIPLE_CLASS))
-					{
-						bInList = true;
-						break;
+						if (strDocType == strListDocType ||
+							(nDocTypeCount == 1 && strListDocType == gstrSPECIAL_ANY_UNIQUE) ||
+							(nDocTypeCount > 1 && strListDocType == gstrSPECIAL_MULTIPLE_CLASS))
+						{
+							bInList = true;
+							break;
+						}
 					}
 				}
 			}
