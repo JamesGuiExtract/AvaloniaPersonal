@@ -29,6 +29,7 @@
     <DocumentationFile>..\..\..\..\..\..\Binaries\Debug\ExtractImageViewer.XML</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -124,11 +125,21 @@
     <Compile Include="ExtractImageViewerForm.Designer.cs">
       <DependentUpon>ExtractImageViewerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ImageSearchForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImageSearchForm.Designer.cs">
+      <DependentUpon>ImageSearchForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ExtractImageViewerForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ExtractImageViewerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImageSearchForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ImageSearchForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

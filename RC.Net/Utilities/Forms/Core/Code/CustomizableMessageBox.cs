@@ -449,6 +449,7 @@ namespace Extract.Utilities.Forms
                 }
                 else
                 {
+                    _msgBox.StartPosition = FormStartPosition.CenterParent;
                     _msgBox.ShowDialog(owner);
                 }
 

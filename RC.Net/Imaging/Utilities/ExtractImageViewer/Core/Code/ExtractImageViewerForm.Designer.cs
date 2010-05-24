@@ -22,6 +22,11 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 _ocrManager.Dispose();
                 _ocrManager = null;
             }
+            if (_imageSearchForm != null)
+            {
+                _imageSearchForm.Dispose();
+                _imageSearchForm = null;
+            }
 
             base.Dispose(disposing);
         }
@@ -41,6 +46,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openImageToolStripMenuItem = new Extract.Imaging.Forms.OpenImageToolStripMenuItem();
+            this._searchForImagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this._printImageToolStripMenuItem = new Extract.Imaging.Forms.PrintImageToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
@@ -173,6 +179,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._openImageToolStripMenuItem,
+            this._searchForImagesToolStripMenuItem,
             this.toolStripSeparator1,
             this._printImageToolStripMenuItem,
             this.toolStripSeparator6,
@@ -188,13 +195,20 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._openImageToolStripMenuItem.ImageViewer = null;
             this._openImageToolStripMenuItem.Name = "_openImageToolStripMenuItem";
             this._openImageToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._openImageToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._openImageToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this._openImageToolStripMenuItem.Text = "&Open image";
+            // 
+            // _searchForImagesToolStripMenuItem
+            // 
+            this._searchForImagesToolStripMenuItem.Name = "_searchForImagesToolStripMenuItem";
+            this._searchForImagesToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this._searchForImagesToolStripMenuItem.Text = "Search for images...";
+            this._searchForImagesToolStripMenuItem.Click += new System.EventHandler(this.HandleSearchForImageFilesClick);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(180, 6);
             // 
             // _printImageToolStripMenuItem
             // 
@@ -203,13 +217,13 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._printImageToolStripMenuItem.ImageViewer = null;
             this._printImageToolStripMenuItem.Name = "_printImageToolStripMenuItem";
             this._printImageToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._printImageToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._printImageToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this._printImageToolStripMenuItem.Text = "&Print";
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(180, 6);
             // 
             // _openImageMruToolStripMenuItem
             // 
@@ -218,7 +232,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._openImageMruToolStripMenuItem.ImageViewer = null;
             this._openImageMruToolStripMenuItem.Name = "_openImageMruToolStripMenuItem";
             this._openImageMruToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._openImageMruToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._openImageMruToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this._openImageMruToolStripMenuItem.Text = "Recent images";
             // 
             // toolsToolStripMenuItem
@@ -904,6 +918,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         private Extract.Imaging.Forms.RotateClockwiseToolStripButton rotateClockwiseToolStripButton1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator11;
         private Extract.Imaging.Forms.EditHighlightTextToolStripButton editHighlightTextToolStripButton1;
+        private System.Windows.Forms.ToolStripMenuItem _searchForImagesToolStripMenuItem;
     }
 }
 

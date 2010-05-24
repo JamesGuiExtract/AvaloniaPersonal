@@ -1,14 +1,15 @@
+using Extract.Imaging.Forms;
 using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
-using Extract.Imaging.Forms;
-using Extract.Utilities.Forms;
 
 namespace Extract.Imaging.Utilities.ExtractImageViewer
 {
@@ -17,12 +18,46 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
     /// </summary>
     public partial class ExtractImageViewerForm : Form
     {
+        #region Constants
+
+        /// <summary>
+        /// The default text for the title bar of the application.
+        /// </summary>
+        const string _DEFAULT_TITLE_TEXT = "Extract Image Viewer";
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
         /// The OCR manager to use when performing OCR of highlights
         /// </summary>
         SynchronousOcrManager _ocrManager = new SynchronousOcrManager(OcrTradeoff.Accurate);
+
+        /// <summary>
+        /// Whether OCR text should be sent to the clipboard or not.
+        /// </summary>
+        bool _sendOcrTextToClipboard;
+
+        /// <summary>
+        /// The text file where OCR results should be sent.
+        /// </summary>
+        string _ocrTextFile;
+
+        /// <summary>
+        /// Whether OCR text should be sent to a message box.
+        /// </summary>
+        bool _sendOcrToMessageBox;
+
+        /// <summary>
+        /// The search form used to search for image files.
+        /// </summary>
+        ImageSearchForm _imageSearchForm;
+
+        /// <summary>
+        /// Whether or not the image search form should be opened on load.
+        /// </summary>
+        bool _openImageSearchForm;
 
         #endregion Fields
 
@@ -34,21 +69,46 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// Initializes a new instance of the <see cref="ExtractImageViewerForm"/> class.
         /// </summary>
         public ExtractImageViewerForm()
-            : this(null)
+            : this(null, null, false, false)
         {
         }
             
         /// <summary>
 	    /// Initializes a new instance of the <see cref="ExtractImageViewerForm"/> class opened 
         /// with the specified image file.
+        /// <para><b>Note:</b></para>
+        /// OCR results by default will be sent to a message box.  If
+        /// <paramref name="sendOcrTextToClipboard"/> is <see langword="true"/> AND/OR
+        /// <paramref name="ocrTextFile"/> is not <see langword="null"/> then
+        /// text will not be sent to a message box.
 	    /// </summary>
         /// <param name="fileName">The image file to open. <see langword="null"/> if no image file 
         /// should be opened.</param>
-	    public ExtractImageViewerForm(string fileName)
+        /// <param name="ocrTextFile">If not <see langword="null"/> then when text is
+        /// highlighted and OCR is performed, the results will be sent to the specified
+        /// text file, otherwise the results will be sent to a message box.</param>
+        /// <param name="sendOcrTextToClipboard">If not <see langword="true"/> then OCR
+        /// results will be copied into the clipboard, if <see langword="false"/> then
+        /// OCR results will be displayed in a message box.</param>
+        /// <param name="openImageSearchForm">If <see langword="true"/> then the
+        /// <see cref="ImageSearchForm"/> will be displayed when the form is loaded.</param>
+	    public ExtractImageViewerForm(string fileName, string ocrTextFile,
+            bool sendOcrTextToClipboard, bool openImageSearchForm)
         {
             try
             {
                 InitializeComponent();
+
+                // Set whether the image search form should be opened
+                _openImageSearchForm = openImageSearchForm;
+
+                // Get the OCR destination information
+                _ocrTextFile = ocrTextFile;
+                _sendOcrTextToClipboard = sendOcrTextToClipboard;
+
+                // Set whether or not OCR text should be sent to the message box
+                _sendOcrToMessageBox =
+                    !_sendOcrTextToClipboard && string.IsNullOrEmpty(_ocrTextFile);
 
                 // Set the icon
                 Icon =
@@ -86,6 +146,11 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                 // Establish connections with all controls on this form.
                 _imageViewer.EstablishConnections(this);
+
+                if (_openImageSearchForm)
+                {
+                    _searchForImagesToolStripMenuItem.PerformClick();
+                }
             }
             catch (Exception ex)
             {
@@ -118,6 +183,22 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             return true;
         }
 
+        ///// <summary>
+        ///// Raises the <see cref="Form.FormClosing"/> event.
+        ///// </summary>
+        ///// <param name="e">The data associated with the event.</param>
+        //protected override void OnClosing(CancelEventArgs e)
+        //{
+        //    try
+        //    {
+        //        base.OnClosing(e);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ExtractException.Display("ELI30130", ex);
+        //    }
+        //}
+
         /// <summary>
         /// Handles the <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.
         /// </summary>
@@ -133,18 +214,37 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     string temp;
                     using (TemporaryWaitCursor wait = new TemporaryWaitCursor())
                     {
-                        temp = _ocrManager.GetOcrTextAsString(_imageViewer.ImageFile, highlight.ToRasterZone(), 0.2);
+                        temp = _ocrManager.GetOcrTextAsString(_imageViewer.ImageFile,
+                            highlight.ToRasterZone(), 0.2);
                     }
 
                     highlight.Text = temp;
-                    using (CustomizableMessageBox message = new CustomizableMessageBox())
+                    if (_sendOcrToMessageBox)
                     {
-                        // Display the OCR result to the user
-                        message.Caption = "OCR Result";
-                        message.StandardIcon = MessageBoxIcon.None;
-                        message.AddStandardButtons(MessageBoxButtons.OK);
-                        message.Text = temp;
-                        message.Show();
+                        using (CustomizableMessageBox message = new CustomizableMessageBox())
+                        {
+                            // Display the OCR result to the user
+                            message.Caption = "OCR Result";
+                            message.StandardIcon = MessageBoxIcon.None;
+                            message.AddStandardButtons(MessageBoxButtons.OK);
+                            message.Text = temp;
+                            message.Show(this);
+                        }
+                    }
+                    else
+                    {
+                        if (_sendOcrTextToClipboard)
+                        {
+                            Clipboard.SetText(temp);
+                        }
+                        if (!string.IsNullOrEmpty(_ocrTextFile))
+                        {
+                            // Ensure the output directory exists
+                            Directory.CreateDirectory(Path.GetDirectoryName(_ocrTextFile));
+
+                            // Write the text to the specified file (overwrite any existing text)
+                            File.WriteAllText(_ocrTextFile, temp);
+                        }
                     }
                 }
             }
@@ -163,11 +263,56 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         {
             try
             {
+                // Update the title bar with the name of the open image
+                StringBuilder sb = new StringBuilder(_DEFAULT_TITLE_TEXT);
+                if (_imageViewer.IsImageAvailable)
+                {
+                    sb.Append(" - ");
+                    sb.Append(_imageViewer.ImageFile);
+                }
+                Text = sb.ToString();
+
+                // Save is enabled if an image is available
                 _saveGddImageButton.Enabled = _imageViewer.IsImageAvailable;
+
             }
             catch (Exception ex)
             {
                 ExtractException.Display("ELI30126", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event for the search for
+        /// images tool strip menu item.
+        /// </summary>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        void HandleSearchForImageFilesClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // Lazy instantiation of the form
+                if (_imageSearchForm == null)
+                {
+                    // Create the search form and set the icon
+                    _imageSearchForm = new ImageSearchForm(_imageViewer);
+                    _imageSearchForm.Icon = Icon;
+                }
+
+                if (_imageSearchForm.Visible)
+                {
+                    _imageSearchForm.BringToFront();
+                }
+                else
+                {
+                    // Show the image search form
+                    _imageSearchForm.Show(this);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30128", ex);
             }
         }
 

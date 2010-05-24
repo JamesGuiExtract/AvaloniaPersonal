@@ -3022,53 +3022,51 @@ namespace Extract.Imaging.Forms
                 // Save the current tracking region
                 tempRegion = _trackingData.Region.Clone();
 
-                // If the event was canceled, there is nothing more to do.
-                if (cancel)
+                // If the event was not canceled process the end of the tracking
+                if (!cancel)
                 {
-                    return;
-                }
+                    // Calculate the new region and rectangle
+                    _trackingData.UpdateAngularRegion(mouseX, mouseY);
 
-                // Calculate the new region and rectangle
-                _trackingData.UpdateAngularRegion(mouseX, mouseY);
-
-                // Retain the new highlight if it is not empty                        
-                if (!_trackingData.Region.IsEmpty(graphics))
-                {
-                    // Get the points of the highlight's bisecting line
-                    Point[] points = new Point[] 
+                    // Retain the new highlight if it is not empty                        
+                    if (!_trackingData.Region.IsEmpty(graphics))
+                    {
+                        // Get the points of the highlight's bisecting line
+                        Point[] points = new Point[] 
                     {
                         _trackingData.StartPoint, 
                         new Point(mouseX, mouseY)
                     };
 
-                    // Convert the points from physical to logical coordinates
-                    using (Matrix inverseMatrix = _transform.Clone())
-                    {
-                        // Invert the transformation matrix
-                        inverseMatrix.Invert();
-
-                        // Transform the midpoints of the sides of the highlight
-                        inverseMatrix.TransformPoints(points);
-
-                        if (_cursorTool == CursorTool.AngularHighlight)
+                        // Convert the points from physical to logical coordinates
+                        using (Matrix inverseMatrix = _transform.Clone())
                         {
-                            // Instantiate the new highlight and add it to _layerObjects
-                            Highlight highlight =
-                                new Highlight(this, LayerObject.ManualComment, points[0],
-                                    points[1], _defaultHighlightHeight);
-                            _layerObjects.Add(highlight);
-                        }
-                        else
-                        {
-                            // Instantiate a new redaction and add it to _layerObjects
-                            RasterZone zone = new RasterZone(points[0], points[1],
-                                _defaultHighlightHeight, _pageNumber);
-                            RasterZone[] zones = GetFittedZones(zone);
-                            if (zones != null)
+                            // Invert the transformation matrix
+                            inverseMatrix.Invert();
+
+                            // Transform the midpoints of the sides of the highlight
+                            inverseMatrix.TransformPoints(points);
+
+                            if (_cursorTool == CursorTool.AngularHighlight)
                             {
-                                Redaction redaction = new Redaction(this, PageNumber,
-                                    LayerObject.ManualComment, zones, _defaultRedactionFillColor);
-                                _layerObjects.Add(redaction);
+                                // Instantiate the new highlight and add it to _layerObjects
+                                Highlight highlight =
+                                    new Highlight(this, LayerObject.ManualComment, points[0],
+                                        points[1], _defaultHighlightHeight);
+                                _layerObjects.Add(highlight);
+                            }
+                            else
+                            {
+                                // Instantiate a new redaction and add it to _layerObjects
+                                RasterZone zone = new RasterZone(points[0], points[1],
+                                    _defaultHighlightHeight, _pageNumber);
+                                RasterZone[] zones = GetFittedZones(zone);
+                                if (zones != null)
+                                {
+                                    Redaction redaction = new Redaction(this, PageNumber,
+                                        LayerObject.ManualComment, zones, _defaultRedactionFillColor);
+                                    _layerObjects.Add(redaction);
+                                }
                             }
                         }
                     }
@@ -3667,44 +3665,41 @@ namespace Extract.Imaging.Forms
                 // Store the current tracking region
                 tempRegion = _trackingData.Region.Clone();
 
-                // If the event was canceled, there is nothing more to do.
-                if (cancel)
-                {
-                    return;
-                }
-
-                // Calculate the new region and rectangle
-                _trackingData.UpdateRectangularRegion(mouseX, mouseY);
-
                 GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.MaskPen);
 
-                // Retain the new highlight if it is not empty                        
-                if (!_trackingData.Region.IsEmpty(graphics))
+                // If the event was not canceled process the end of the tracking
+                if (!cancel)
                 {
-                    // Get the spatial data in image coordinates for the rectangle
-                    Point[] points;
-                    int height;
-                    GetSpatialDataFromClientRectangle(_trackingData.Rectangle,
-                        out points, out height);
-
-                    // Draw the new highlight
-                    gdiGraphics.FillRegion(_trackingData.Region, drawColor);
-
-                    if (_cursorTool == CursorTool.RectangularHighlight)
+                    // Calculate the new region and rectangle
+                    _trackingData.UpdateRectangularRegion(mouseX, mouseY);
+                    // Retain the new highlight if it is not empty                        
+                    if (!_trackingData.Region.IsEmpty(graphics))
                     {
-                        // Add a new highlight to _layerObjects
-                        _layerObjects.Add(new Highlight(this, LayerObject.ManualComment, points[0],
-                            points[1], height));
-                    }
-                    else
-                    {
-                        // Add a new redaction to _layerObjects
-                        RasterZone zone = new RasterZone(points[0], points[1], height, _pageNumber);
-                        RasterZone[] zones = GetFittedZones(zone);
-                        if (zones != null)
+                        // Get the spatial data in image coordinates for the rectangle
+                        Point[] points;
+                        int height;
+                        GetSpatialDataFromClientRectangle(_trackingData.Rectangle,
+                            out points, out height);
+
+                        // Draw the new highlight
+                        gdiGraphics.FillRegion(_trackingData.Region, drawColor);
+
+                        if (_cursorTool == CursorTool.RectangularHighlight)
                         {
-                            _layerObjects.Add(new Redaction(this, PageNumber,
-                                LayerObject.ManualComment, zones, _defaultRedactionFillColor));
+                            // Add a new highlight to _layerObjects
+                            _layerObjects.Add(new Highlight(this, LayerObject.ManualComment, points[0],
+                                points[1], height));
+                        }
+                        else
+                        {
+                            // Add a new redaction to _layerObjects
+                            RasterZone zone = new RasterZone(points[0], points[1], height, _pageNumber);
+                            RasterZone[] zones = GetFittedZones(zone);
+                            if (zones != null)
+                            {
+                                _layerObjects.Add(new Redaction(this, PageNumber,
+                                    LayerObject.ManualComment, zones, _defaultRedactionFillColor));
+                            }
                         }
                     }
                 }
