@@ -420,7 +420,7 @@ private:
 	// content which otherwise would have been included in the image area.
 	// 2) Areas which span a line with sufficient area on either side will be dissected into two 
 	// separate content areas.
-	void makeFlushWithLines(ContentAreaInfo &area);
+	ContentAreaInfo makeFlushWithLines(ContentAreaInfo area);
 
 	// Returns true if rrect overlaps some part of the current page area.  If it does not, false
 	// is returned or an exception is thrown according to the bThrowException value specified.

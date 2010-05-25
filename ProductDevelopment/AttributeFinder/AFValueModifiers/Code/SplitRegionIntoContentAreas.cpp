@@ -1273,7 +1273,7 @@ CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const ISpatialStr
 		
 		m_rectOriginal = *this;
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI22172");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI22172");
 }
 //--------------------------------------------------------------------------------------------------
 CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const CRect &rect)
@@ -1697,7 +1697,8 @@ void CSplitRegionIntoContentAreas::finalizeContentAreas(const CRect& rectRegion)
 			shrinkToFit(m_vecContentAreas[i]);
 
 			// If lines are involved with the area, adjust the areas accordingly.
-			makeFlushWithLines(m_vecContentAreas[i]);
+			// Store the modified area back to the vector
+			m_vecContentAreas[i] = makeFlushWithLines(m_vecContentAreas[i]);
 		}
 
 		// Merge any areas whose shared area is similar or that share similar y coordinates (in other 
@@ -2399,7 +2400,8 @@ bool CSplitRegionIntoContentAreas::attemptMerge(ContentAreaInfo &area, bool bUp,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26616");
 }
 //--------------------------------------------------------------------------------------------------
-void CSplitRegionIntoContentAreas::makeFlushWithLines(ContentAreaInfo &area)
+CSplitRegionIntoContentAreas::ContentAreaInfo CSplitRegionIntoContentAreas::makeFlushWithLines(
+	ContentAreaInfo area)
 {
 	try
 	{
@@ -2495,6 +2497,8 @@ void CSplitRegionIntoContentAreas::makeFlushWithLines(ContentAreaInfo &area)
 			//			}
 			//		}
 		}
+
+		return area;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26617");
 }
