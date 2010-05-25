@@ -99,34 +99,27 @@ namespace Extract.Utilities
         {
             try
             {
-                Process process = null;
                 try
                 {
-                    process = Process.GetProcessById(processId);
-
-                    // If a process name is specified, return whether the
-                    // process names are equal
-                    if (!string.IsNullOrEmpty(processName))
+                    using (Process process = Process.GetProcessById(processId))
                     {
-                        return process.ProcessName.Equals(processName,
-                            StringComparison.OrdinalIgnoreCase);
-                    }
 
-                    // Found the process so it is running
-                    return true;
+                        // If a process name is specified, return whether the
+                        // process names are equal
+                        if (!string.IsNullOrEmpty(processName))
+                        {
+                            return process.ProcessName.Equals(processName,
+                                StringComparison.OrdinalIgnoreCase);
+                        }
+
+                        // Found the process so it is running
+                        return true;
+                    }
                 }
                 catch
                 {
                     // Exception indicates that the specified process ID is not running
                     return false;
-                }
-                finally
-                {
-                    // Ensure the process is cleaned up
-                    if (process != null)
-                    {
-                        process.Dispose();
-                    }
                 }
             }
             catch (Exception ex)
@@ -144,22 +137,35 @@ namespace Extract.Utilities
         /// not currently running.</exception>
         public static string GetProcessName(int processId)
         {
-            Process process = null;
             try
             {
-                process = Process.GetProcessById(processId);
-                return process.ProcessName;
+                using (Process process = Process.GetProcessById(processId))
+                {
+                    return process.ProcessName;
+                }
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI29807", ex);
             }
-            finally
+        }
+
+        /// <summary>
+        /// Gets the current process's ID.
+        /// </summary>
+        /// <returns>The ID for the current process.</returns>
+        public static int GetCurrentProcessId()
+        {
+            try
             {
-                if (process != null)
+                using (Process process = Process.GetCurrentProcess())
                 {
-                    process.Dispose();
+                    return process.Id;
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30136", ex);
             }
         }
     }

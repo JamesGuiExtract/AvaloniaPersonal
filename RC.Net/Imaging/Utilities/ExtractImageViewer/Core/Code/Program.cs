@@ -1,6 +1,8 @@
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
@@ -94,12 +96,16 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     {
                         // Close all open image viewers
                         CloseAllOpenImageViewers();
+                        return;
                     }
                     else if (argument.Equals("/e", StringComparison.OrdinalIgnoreCase))
                     {
                     }
                     else if (argument.Equals("/script?", StringComparison.OrdinalIgnoreCase))
                     {
+                        // Show the script usage message and exit
+                        ShowScriptUsage();
+                        return;
                     }
                     else if (argument.Equals("/ctrlid?", StringComparison.OrdinalIgnoreCase))
                     {
@@ -150,8 +156,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// Displays the usage message prepended with the specified error message.
         /// </summary>
         /// <param name="errorMessage">The error message to display before the usage message.</param>
-        // This code will not be localized for a culture that uses right to left reading order.
-        [SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
         static void ShowUsage(string errorMessage)
         {
             // Check if there is an error message
@@ -191,7 +195,8 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
             // Display the usage as an error or as an information box
             MessageBox.Show(usage.ToString(), isError ? "Error" : "Usage", MessageBoxButtons.OK,
-                isError ? MessageBoxIcon.Error : MessageBoxIcon.Information);
+                isError ? MessageBoxIcon.Error : MessageBoxIcon.Information,
+                MessageBoxDefaultButton.Button1, 0);
         }
 
         /// <summary>
@@ -211,11 +216,54 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         } 
 
         /// <summary>
-        /// 
+        /// Closes all open Extract Image Viewers
         /// </summary>
         static void CloseAllOpenImageViewers()
         {
-            // TODO: Implement this method
+            int currentID = SystemMethods.GetCurrentProcessId();
+            string name = SystemMethods.GetProcessName(currentID);
+            foreach (Process process in Process.GetProcessesByName(name))
+            {
+                if (process.Id != currentID)
+                {
+                    process.CloseMainWindow();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Displays the scripting usage help to the user.
+        /// </summary>
+        static void ShowScriptUsage()
+        {
+            StringBuilder usage = new StringBuilder();
+            usage.AppendLine("Script commands:");
+            usage.AppendLine("    SetWindowPos <position> - Set the position and size of the image viewer");
+            usage.AppendLine("        <position> - May be one of the following values:");
+            usage.AppendLine("            Full - Fullscreen");
+            usage.AppendLine("            Left - Left half of the screen");
+            usage.AppendLine("            Top - Top half of the screen");
+            usage.AppendLine("            Right - Right half of the screen");
+            usage.AppendLine("            Bottom - Bottom half of the screen");
+            usage.AppendLine("            <left>,<right>,<top>,<bottom> - Sized to specified pixel coordinates");
+            usage.AppendLine("    HideButtons <ctrlid> - Hide a toolbar control");
+            usage.AppendLine("        <ctrlid> - Comma separated list of toolbar control id numbers");
+            usage.AppendLine("    OpenFile <filename> - Opens the specified file");
+            usage.AppendLine("    AddTempHighlight <startX>,<startY>,<endX>,<endY>,<height>,<pagenumber> -");
+            usage.AppendLine("        Creates a temporary highlight at the specified location");
+            usage.AppendLine("    ClearTempHighlights - Clears all highlights created by AddTempHighlight");
+            usage.AppendLine("    ClearImage - Closes any open image in the image window");
+            usage.AppendLine("    SetCurrentPageNumber <pagenumber> - Goes to the specified page");
+            usage.AppendLine("    ZoomIn - Zooms in");
+            usage.AppendLine("    ZoomOut - Zooms out");
+            usage.AppendLine("    ZoomExtents - Toggles fit to page mode");
+            usage.AppendLine("    CenterOnTempHighlight - Centers on the first temporary highlight");
+            usage.AppendLine("    ZoomToTempHighlight - Centers on the first temporary highlight and");
+            usage.AppendLine("        zooms in around the highlight.");
+
+            // Display the usage to the user
+            MessageBox.Show(usage.ToString(), "Script Usage", MessageBoxButtons.OK,
+                MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
         }
     }
 }
