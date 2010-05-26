@@ -2,7 +2,7 @@
 
 <HEAD>
 <TITLE>8.0.3 Patch/Upgrade Testing</TITLE>
-<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 
 <BODY>
@@ -43,10 +43,36 @@
 
 	<LI><b>Testing</b>
 	<ul>
-		<li>Excercise the <a href="../SanityTests/SanityTests.html">Sanity Test</a>
+		<li>Excercise the <a href="../../SanityTests/SanityTests.html">Sanity Test</a>
 		checklist on a 32 bit desktop OS.</li>
-		<li>Excercise the <a href="../SanityTests/SanityTests.html">Sanity Test</a>
+		<li>Excercise the <a href="../../SanityTests/SanityTests.html">Sanity Test</a>
 		checklist on a 64 bit server OS.</li>
+		<li>Excercise <b>Test1</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4278</b>
+		<br><b>Note:</b> This test requires the <b>RDT</b> be installed and licensed.</li>
+		<ul>
+			<li>Run <b>Enable gflags.bat</b></li>
+			<li>Open <b>Test.rsd</b></li>
+			<li>Open <b>Rule tester</b></li>
+			<li>Load <b>1848657.tif</b> into <b>Rule tester</b></li>
+			<li>Run <b>Rule tester</b></li>
+			<li>Confirm no exceptions displayed or logged</li>
+			<li>Run <b>Disable gflags.bat</b></li>
+		</ul>
+		<li>Excercise <b>Test2</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4278</b>
+		<br><b>Note:</b> This test requires the <b>RDT</b> be installed and licensed.
+		This test also requires that you have the <b>Demo_IDShield</b> database on the local machine.</li>
+		<ul>
+			<li>Copy <b>Test2.zip</b> to your processing location.</li>
+			<li>Unzip the contents of <b>Test2.zip</b></li>
+			<li>Run <b>CopyFileSets.bat</b> - <b>NOTE:</b> you will need around <b>5GB</b> of
+			free space for the copied files</li>
+			<li>Clear the <b>Demo_IDShield</b> database</li>
+			<li>Run <b>ComputeRedactions.fps</b>
+			<li>This should take close to 2 days to complete
+			<li>Check that there are no exceptions being displayed</li>
+			<li>Check that there are no unexpected exceptions being logged</li>
+		</ul>
+	</ul>
 <p>
 </OL>
 </BODY>
