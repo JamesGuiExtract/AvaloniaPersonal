@@ -125,6 +125,31 @@
        	</ul>
      	</li>
 <p>
+	<li><h2>CMPI - Lists count of files that succeeded and failed [LRCAU #5846]</h2></li>
+	<ul>
+		<li>Create a temporary folder for this test</li>
+		<li>Open a command window and change to the temporary folder</li>
+		<li>Run the dir command and pipe the result into two files a.001 and a.002
+		(ex. dir > a.001)</li>
+		<li>Run CreateMultiPageImage against this folder.</li>
+		<li>Confirm that the output says that 1 file was processed, that 0 files
+		completed successfully and 1 file failed.</li>
+		<li>Open the exception log and confirm that there is a new entry with ELICode
+		<b>ELI3012</b> and a message that says <b>Unable to create multi page image</b>.</li>
+		<li>Copy Page1.tif and Page2.tif from the earlier testing into the temp folder.</li>
+		<li>Rename Page1.tif to b.001 and rename Page2.tif to b.002.</li>
+		<li>Run CreateMultiPageImage against this folder.</li>
+		<li>Confirm that the output says that 2 file was processed, that 1 file
+		completed successfully and 1 file failed.</li>
+		<li>Open the exception log and confirm that there is a new entry with ELICode
+		<b>ELI3012</b> and a message that says <b>Unable to create multi page image</b>.</li>
+		<li>Run CreateMultiPageImage against this folder.</li>
+		<li>Confirm that the output says that 2 file was processed, that 0 files
+		completed successfully and 2 files failed.</li>
+		<li>Open the exception log and confirm that there are 2 new entries with ELICode
+		<b>ELI3012</b> and a message that says <b>Unable to create multi page image</b>.</li>
+	</ul>
+<p>
      	<li><h2>CMPI - Miscellaneous Items</h2>
       	<ul>
             	<li>Confirm that CreateMultiPageImage documentation is available in the 
