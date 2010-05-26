@@ -1,0 +1,53 @@
+<HTML>
+
+<HEAD>
+<TITLE>8.0.3 Patch/Upgrade Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.0.3<br>Patch/Upgrade Testing </h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>SCRs:</b> FlexIDSCore #4278
+	<LI><b>Issue:</b> Unexpected exception being thrown and displayed for certain images when
+		Split region into content areas rule is being excercised. (<b>Note:</b> This
+		issue was more reproducible on Windows Vista 32, although it was reproduced
+		on other systems as well). The bug was due to a data object reference to an item
+		contained within a vector being passed to a local method that added more items
+		to the vector, which in turn caused the vector to resize and thus invalidate the
+		referenced item.</li>
+	<LI><b>Solution:</b> The code in Split region into content areas was modified to pass
+		a copy of the data object to the local method. The local method now returns
+		the modified object which is then placed back into the vector at the same
+		location. </li>
+</ul>
+<p>
+<h3>Tests</h3>
+<OL>
+	<LI><b>Installation</b>
+	<ul>
+		<li>Confirm that the installation batch file runs without error.
+		<li>Confirm that the batch file can be run from a drive other than the
+		drive containing the CommonComponents folder (i.e. if the CommonComponents
+		folder is on the C drive, confirm that the install can be run on the D drive).
+		<li>Confirm that the batch file can be run from a folder within the Extract Systems
+		folder in ProgramFiles (Joe and Mike sometimes create a folder parallel to
+		CommonComponents called Patches with subfolders for each patch applied and
+		will run the install.bat from the subfolder).
+		<li>Confirm that updated files exist on the test machine.
+	</ul>
+
+	<LI><b>Testing</b>
+	<ul>
+		<li>Excercise the <a href="../SanityTests/SanityTests.html">Sanity Test</a>
+		checklist on a 32 bit desktop OS.</li>
+		<li>Excercise the <a href="../SanityTests/SanityTests.html">Sanity Test</a>
+		checklist on a 64 bit server OS.</li>
+<p>
+</OL>
+</BODY>
+</HTML>
