@@ -1,13 +1,13 @@
 <HTML>
 
 <HEAD>
-<TITLE>LabDE 1.5.1.137 Testing</TITLE>
+<TITLE>LabDE 1.5.1.144 Testing</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 
 <BODY>
 
-<h1> LabDE 1.5.1.137 (1.5.1 RC8) Testing <br>
+<h1> LabDE 1.5.1.144 (1.5.1 RC10) Testing <br>
 <IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
@@ -19,7 +19,7 @@
 	present within the collected checklists.
 </ul>
 <p>
-<h3>Fixes for Patch C and RC4</h3>
+<h3>Fixes for Patch C thru RC10</h3>
 <OL>
 	<LI><b>[DataEntry #240, 891]</b> Font should be Verdana
 	<ul>
@@ -170,40 +170,17 @@
 		value of the flag cell)
 	</ul>
    	</LI>
-</OL>
 <p>
-&nbsp;
-<UL>
-	<LI><h3>Automated Testing</h3>
-       	<ul>
-  	   	<LI>Automated Tests - LabDE Order Mapper
-	       	<ul>
-	      		<li>Date, Test Machine, Number of Failures
-	      		<li>Notes
-	       	</ul>
-		<LI>National Ruleset : LabDE
-	       	<ul>
-	      		<li>Date, Test Machine, Number of Failures
-	      		<li>Notes
-	       	</ul>
-       	</ul>
-   	</LI>
-<p>
-	<LI><h3>Sanity Testing</h3>
+	<LI><b>[FlexIDSCore:4278]</b> Split Region into Content Areas crash
 	<ul>
-		<li>32-bit Operating System</li>
-		<ul>
-	      		<li>Date, Tester, Test Machine
-	      		<li>Notes
-		</ul>						 
-<p>
-		<li>64-bit Operating System</li>
-		<ul>
-	      		<li>Date, Tester, Test Machine
-	      		<li>Notes
-		</ul>						 
-	</ul>						 
-	</LI>
-</UL>
+		<li>Enable <b>gflags</b> for <b>ProcessFiles</b> via <b>gflags /p /enable ProcessFiles.exe /full</b>.
+		<li>gflags can be found at <b>I:\Common\Engineering\Tools\Debugging Tools for Windows (x86)</b>.
+		<li>Open the testing files folder: <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4278\</b>.
+		<li>Exercise <b>DomesticRelations\DomesticRelations.rsd</b>.
+		<li>Run this test on at least 2 OS's, Vista being one of them.
+		<li>Run this test both with the <b>Rule Tester</b> directly and with the Rule Tester via the <b>Rule Set Editor</b>.
+	</ul>
+   	</LI>
+</OL>
 </BODY>
 </HTML>
