@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Ipc;
 using System.Text;
 using System.Windows.Forms;
 
@@ -41,7 +43,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 //string scriptFile = null;
                 string ocrTextFile = null;
                 bool sendOcrToClipboard = false;
-                //bool reuseAlreadyOpenImageViewer = false;
+                bool reuseAlreadyOpenImageViewer = false;
                 bool showSearchWindow = false;
                 for (int i=0; i < args.Length; i++)
                 {
@@ -90,7 +92,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     }
                     else if (argument.Equals("/l", StringComparison.OrdinalIgnoreCase))
                     {
-                        // TODO: Send all argument values to existing ExtractImageViewer
+                        reuseAlreadyOpenImageViewer = true;
                     }
                     else if (argument.Equals("/closeall", StringComparison.OrdinalIgnoreCase))
                     {
@@ -132,13 +134,22 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
                     "ELI21841", "Extract Image Viewer");
 
+                if (reuseAlreadyOpenImageViewer)
+                {
+                    // If there are other imageviewers open, send data to them
+                    if (UseOpenImageViewers(fileToOpen))
+                    {
+                        // Just return since the open image viewer is handling the object
+                        return;
+                    }
+                }
                 Application.Run(new ExtractImageViewerForm(fileToOpen, ocrTextFile,
                     sendOcrToClipboard, showSearchWindow));
             }
             catch (Exception ex)
             {
                 ExtractException ee = new ExtractException("ELI21972",
-                    "Failed while opening Extract Image Viewer!", ex);
+                    "Failed while opening Extract Image Viewer.", ex);
                 ee.Display();
             }
         }
@@ -228,7 +239,63 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 {
                     process.CloseMainWindow();
                 }
+
+                // Dispose of the process object
+                process.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Will attempt to send all options/commands to the already open image viewer.
+        /// </summary>
+        /// <param name="fileToOpen">The image file to open.</param>
+        /// <returns><see langword="true"/> if another image viewer was open and has
+        /// handled the options, <see langword="false"/> otherwise.</returns>
+        static bool UseOpenImageViewers(string fileToOpen)
+        {
+            IpcChannel channel = new IpcChannel();
+            bool channelRegistered = false;
+            bool sentToImageViewer = false;
+            try
+            {
+                ChannelServices.RegisterChannel(channel, true);
+                channelRegistered = true;
+                int currentID = SystemMethods.GetCurrentProcessId();
+                string name = SystemMethods.GetProcessName(currentID);
+                foreach (Process process in Process.GetProcessesByName(name))
+                {
+                    int id = process.Id;
+                    if (id != currentID)
+                    {
+                        // Get the remote handler object.
+                        // NOTE: Do not dispose of this handler since it is a reference to
+                        // the one held in the remote image viewer
+                        RemoteMessageHandler handler = (RemoteMessageHandler)Activator.GetObject(
+                            typeof(RemoteMessageHandler),
+                            RemoteMessageHandler.BuildRemoteObjectUri(id));
+
+                        // Open the image in the image viewer
+                        handler.OpenImage(fileToOpen);
+                        sentToImageViewer = true;
+                    }
+
+                    // Dispose of the process
+                    process.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30144", ex);
+            }
+            finally
+            {
+                if (channelRegistered)
+                {
+                    ChannelServices.UnregisterChannel(channel);
+                }
+            }
+
+            return sentToImageViewer;
         }
 
         /// <summary>

@@ -1,3 +1,6 @@
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+
 namespace Extract.Imaging.Utilities.ExtractImageViewer
 {
     partial class ExtractImageViewerForm
@@ -26,6 +29,16 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             {
                 _imageSearchForm.Dispose();
                 _imageSearchForm = null;
+            }
+            if (_remoteHandler != null)
+            {
+                _remoteHandler.Dispose();
+                _remoteHandler = null;
+            }
+            if (_ipcChannel != null)
+            {
+                ChannelServices.UnregisterChannel(_ipcChannel);
+                _ipcChannel = null;
             }
 
             base.Dispose(disposing);

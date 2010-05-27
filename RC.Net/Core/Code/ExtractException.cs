@@ -1088,6 +1088,16 @@ namespace Extract
                     return ee;
                 }
 
+                // Check if e is a RemoteExtractException
+                RemoteExtractException re = ex as RemoteExtractException;
+                if (re != null)
+                {
+                    // Return the remote extract exception as an extract exception
+                    ee = re.Exception;
+                    ee.AddDebugData("CatchELI", eliCode, false);
+                    return ee;
+                }
+
                 // Check if e is an Exception object that was created on the .NET side because
                 // a UCLIDException object was thrown from one of our C++/COM objects
                 if (ex.Message.StartsWith("15000000", StringComparison.Ordinal) ||

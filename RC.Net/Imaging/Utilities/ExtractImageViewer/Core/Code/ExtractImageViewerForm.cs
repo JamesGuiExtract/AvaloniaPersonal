@@ -7,6 +7,9 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Ipc;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
@@ -59,6 +62,17 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// </summary>
         bool _openImageSearchForm;
 
+        /// <summary>
+        /// The .Net remoting object used to communicate between this
+        /// instance of the <see cref="ExtractImageViewer"/> and other processes.
+        /// </summary>
+        RemoteMessageHandler _remoteHandler;
+
+        /// <summary>
+        /// The channel used for remote communications.
+        /// </summary>
+        IpcChannel _ipcChannel;
+
         #endregion Fields
 
         #region Constructors
@@ -98,6 +112,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             try
             {
                 InitializeComponent();
+
+                // Initialize the remoting objects
+                _remoteHandler = new RemoteMessageHandler(this);
+                _ipcChannel = new IpcChannel(
+                    BuildExtractImageViewerUri(SystemMethods.GetCurrentProcessId()));
+                ChannelServices.RegisterChannel(_ipcChannel, true);
 
                 // Set whether the image search form should be opened
                 _openImageSearchForm = openImageSearchForm;
@@ -255,7 +275,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         }
 
         /// <summary>
-        /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
@@ -317,5 +337,39 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         }
 
         #endregion Event Handlers
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the <see cref="ImageViewer"/> <see cref="Control"/> from the <see cref="Form"/>.
+        /// </summary>
+        /// <returns>The <see cref="ImageViewer"/> <see cref="Control"/> from the
+        /// <see cref="Form"/>.</returns>
+        internal ImageViewer ImageViewer
+        {
+            get
+            {
+                return _imageViewer;
+            }
+        }
+
+        #endregion Properties
+
+        #region Methods
+
+        /// <summary>
+        /// Builds the IPC channel remoting URI for the specified process ID.
+        /// </summary>
+        /// <param name="processId">The process ID to use for generating
+        /// the URI.</param>
+        /// <returns>The URI for the specified process ID.</returns>
+        internal static string BuildExtractImageViewerUri(int processId)
+        {
+            StringBuilder sb = new StringBuilder("ExtractImageViewer_");
+            sb.Append(processId);
+            return sb.ToString();
+        }
+
+        #endregion Methods
     }
 }

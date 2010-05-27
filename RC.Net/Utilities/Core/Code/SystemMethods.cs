@@ -2,6 +2,7 @@ using Extract;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Management;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -154,6 +155,9 @@ namespace Extract.Utilities
         /// Gets the current process's ID.
         /// </summary>
         /// <returns>The ID for the current process.</returns>
+        // This method is performing a calculation and so is better suited as a method
+        // as opposed to a property.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public static int GetCurrentProcessId()
         {
             try
