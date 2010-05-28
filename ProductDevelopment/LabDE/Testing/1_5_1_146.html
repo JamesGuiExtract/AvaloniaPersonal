@@ -1,13 +1,13 @@
 <HTML>
 
 <HEAD>
-<TITLE>LabDE 1.5.1.144 Testing</TITLE>
+<TITLE>LabDE 1.5.1.146 Testing</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 
 <BODY>
 
-<h1> LabDE 1.5.1.144 (1.5.1 RC10) Testing <br>
+<h1> LabDE 1.5.1.146 (1.5.1 RC12) Testing <br>
 <IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
@@ -19,7 +19,7 @@
 	present within the collected checklists.
 </ul>
 <p>
-<h3>Fixes for Patch C thru RC10</h3>
+<h3>Fixes for Patch C thru RC12</h3>
 <OL>
 	<LI><b>[DataEntry #240, 891]</b> Font should be Verdana
 	<ul>
@@ -171,6 +171,57 @@
 	</ul>
    	</LI>
 <p>
+	<LI><b>[DataEntry:369]</b> 
+	<ul>
+		<li>Open the FAM and start a new FPS file.
+		<li>Configure file processing.
+		<li>Add a <b>DataEntry: Verify Extracted Data</b> task.
+		<li>Press the <b>Configure</b> button.
+		<li>Without entering a config file, press <b>Cancel</b>
+		<li>Check the exception log and confirm no exceptions have been logged.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry:959]</b> Shift + space clears active cell
+	<ul>
+		<li>Open a document with a populated .voa file for verification.
+		<li>Select an order name cell.
+		<li>Type "C".
+		<li>When the autocomplete list pops up, use the arrow keys to navigate to a valid order name
+		that is not the original value of the cell.
+		<li>Press shift+space.
+		<li>Confirm that whole row is selected and the order name is still correct (hasn't been cleared).
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry:963]</b> RCW exceptions from table operations.
+	<ul>
+		<li>In FAM mode, queue 2 documents with multiple test and order rows
+		<li><b>Dragging</b>
+		<ul>		
+			<li>Drag one order row to a different position in the table.
+			<li>Tab and ensure the first cell of the new row of both the order and test tables are
+			in the tab order.
+			<li>Drag one test component row to a different position in the same table.
+			<li>Tab and ensure the first cell of the new row of the test table is in the tab order.
+			<li>Drag one test component row into a different order.
+			<li>Tab and ensure the first cell of the new row of both the order and test table are
+			in the tab order.
+		</ul>
+		<li><b>Swiping</b>
+		<ul>
+			<li>Select an entire order row.
+			<li>Re-swipe the order's tests.
+			<li>Ensure the tests are parsed correctly and that no tooltip is displayed indicating
+			an error.
+			<li>Tab and ensure the first cell of the new row of both the order and test table are
+			in the tab order.
+		</ul>
+		<li>Save the document, and skip/commit to proceed to the next document.
+		<li>Repeat the <b>Dragging</b> and <b>Swiping</b> tests above.
+	</ul>
+   	</LI>
+<p>
 	<LI><b>[FlexIDSCore:4278]</b> Split Region into Content Areas crash
 	<ul>
 		<li>Enable <b>gflags</b> for <b>ProcessFiles</b> via <b>gflags /p /enable ProcessFiles.exe /full</b>.
@@ -181,6 +232,8 @@
 		<li>Run this test both with the <b>Rule Tester</b> directly and with the Rule Tester via the <b>Rule Set Editor</b>.
 	</ul>
    	</LI>
+
+
 </OL>
 </BODY>
 </HTML>
