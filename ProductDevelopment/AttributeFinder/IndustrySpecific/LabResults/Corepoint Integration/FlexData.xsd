@@ -356,7 +356,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="OriginalName">
+                    <xs:element name="OriginalName" minOccurs="0">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="FullText" type="xs:string" />
