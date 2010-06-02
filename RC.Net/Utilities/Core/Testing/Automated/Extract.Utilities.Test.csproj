@@ -56,6 +56,7 @@
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="TestCommentedTextFileReader.cs" />
     <Compile Include="TestConfigSettings.cs" />
     <Compile Include="TestFileActionManagerPathTags.cs" />
   </ItemGroup>

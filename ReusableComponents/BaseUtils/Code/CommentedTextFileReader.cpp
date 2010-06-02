@@ -35,8 +35,7 @@ CommentedTextFileReader::CommentedTextFileReader(ifstream& rif,
 {
 	// pair of comment string must be in-sync, i.e. either all are empty
 	// or none is empty
-	if ((!m_strStartComment.empty() && m_strEndComment.empty())
-		|| (m_strStartComment.empty() && !m_strEndComment.empty()))
+	if (m_strStartComment.empty() ^ m_strEndComment.empty())
 	{
 		UCLIDException ue("ELI10125", "Start and End comment string must be either all empty, or all non-empty.");
 		ue.addDebugInfo("Start Comment String", m_strStartComment);
@@ -45,9 +44,11 @@ CommentedTextFileReader::CommentedTextFileReader(ifstream& rif,
 	}
 
 	// make sure m_strSingleComment and m_strStartComment/m_strEndComment 
-	// can't be empty at same time
+	// can't be empty at same time (sufficient to just check startComment
+	// since earlier check guarantees that start and end are either both
+	// empty or full
 	if (m_strSingleComment.empty() 
-		&& (m_strStartComment.empty() || m_strEndComment.empty()))
+		&& (m_strStartComment.empty()))
 	{
 		UCLIDException ue("ELI10123", "You must specify at least one set of comment string.");
 		ue.addDebugInfo("Single Comment String", m_strSingleComment);

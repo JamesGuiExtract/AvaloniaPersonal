@@ -1,3 +1,4 @@
+using Extract.Drawing;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -27,6 +28,16 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// The default text for the title bar of the application.
         /// </summary>
         const string _DEFAULT_TITLE_TEXT = "Extract Image Viewer";
+
+        /// <summary>
+        /// Height restriction in inches for sending OCR to a text file or clipboard.
+        /// </summary>
+        const double _OCR_TO_TEXT_HEIGHT_LIMIT = 8.0;
+
+        /// <summary>
+        /// Width restriction in inches for sending OCR to a text file or clipboard.
+        /// </summary>
+        const double _OCR_TO_TEXT_WIDTH_LIMIT = 8.5;
 
         #endregion Constants
 
@@ -83,7 +94,16 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// Initializes a new instance of the <see cref="ExtractImageViewerForm"/> class.
         /// </summary>
         public ExtractImageViewerForm()
-            : this(null, null, false, false)
+            : this(null, null, false, false, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExtractImageViewerForm"/> class.
+        /// </summary>
+        /// <param name="scriptFile">The name of the script file to open.</param>
+        public ExtractImageViewerForm(string scriptFile)
+            : this(null, null, false, false, scriptFile)
         {
         }
             
@@ -106,8 +126,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// OCR results will be displayed in a message box.</param>
         /// <param name="openImageSearchForm">If <see langword="true"/> then the
         /// <see cref="ImageSearchForm"/> will be displayed when the form is loaded.</param>
+        /// <param name="scriptFile">If not <see langword="null"/> then the file will
+        /// be read and the script commands will be processed.</param>
 	    public ExtractImageViewerForm(string fileName, string ocrTextFile,
-            bool sendOcrTextToClipboard, bool openImageSearchForm)
+            bool sendOcrTextToClipboard, bool openImageSearchForm, string scriptFile)
         {
             try
             {
@@ -138,9 +160,14 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
 
                 // Check if a filename was specified
-                if (fileName != null)
+                if (!string.IsNullOrEmpty(fileName))
                 {
                     _imageViewer.OpenImage(fileName, true);
+                }
+
+                if (!string.IsNullOrEmpty(scriptFile))
+                {
+                    ProcessScriptFile(scriptFile);
                 }
             }
             catch (Exception ex)
@@ -228,42 +255,70 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         {
             try
             {
-                Highlight highlight = e.LayerObject as Highlight;
-                if (highlight != null)
+                using (new TemporaryWaitCursor())
                 {
-                    string temp;
-                    using (TemporaryWaitCursor wait = new TemporaryWaitCursor())
+                    Highlight highlight = e.LayerObject as Highlight;
+                    if (highlight != null)
                     {
-                        temp = _ocrManager.GetOcrTextAsString(_imageViewer.ImageFile,
+                        // Check the restrictions if not sending to message box
+                        if (!_sendOcrToMessageBox)
+                        {
+                            double width = GeometryMethods.Distance(highlight.StartPoint, highlight.EndPoint);
+                            double height = highlight.Height;
+                            if (width > height)
+                            {
+                                UtilityMethods.Swap(ref width, ref height);
+                            }
+                            width /= _imageViewer.ImageDpiX;
+                            height /= _imageViewer.ImageDpiY;
+
+                            // Get the resolution from the image viewer
+                            if (width > _OCR_TO_TEXT_WIDTH_LIMIT || height > _OCR_TO_TEXT_HEIGHT_LIMIT)
+                            {
+                                ExtractException ee = new ExtractException("ELI30154",
+                                    "Selected region too large to send results to file or clipboard.");
+                                ee.AddDebugData("Height In Inches", height, false);
+                                ee.AddDebugData("Width In Inches", width, false);
+                                ee.AddDebugData("Max Height In Inches",
+                                    _OCR_TO_TEXT_HEIGHT_LIMIT, false);
+                                ee.AddDebugData("Max Width In Inches",
+                                    _OCR_TO_TEXT_WIDTH_LIMIT, false);
+                                throw ee;
+                            }
+                        }
+
+                        string temp = _ocrManager.GetOcrTextAsString(_imageViewer.ImageFile,
                             highlight.ToRasterZone(), 0.2);
-                    }
 
-                    highlight.Text = temp;
-                    if (_sendOcrToMessageBox)
-                    {
-                        using (CustomizableMessageBox message = new CustomizableMessageBox())
+                        highlight.Text = temp;
+                        if (_sendOcrToMessageBox)
                         {
-                            // Display the OCR result to the user
-                            message.Caption = "OCR Result";
-                            message.StandardIcon = MessageBoxIcon.None;
-                            message.AddStandardButtons(MessageBoxButtons.OK);
-                            message.Text = temp;
-                            message.Show(this);
+                            using (CustomizableMessageBox message = new CustomizableMessageBox())
+                            {
+                                // Display the OCR result to the user.
+                                // Disable selection of text in the message box.
+                                message.Caption = "OCR Result";
+                                message.StandardIcon = MessageBoxIcon.None;
+                                message.AddStandardButtons(MessageBoxButtons.OK);
+                                message.Text = temp;
+                                message.AllowTextSelection = false;
+                                message.Show(this);
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (_sendOcrTextToClipboard)
+                        else
                         {
-                            Clipboard.SetText(temp);
-                        }
-                        if (!string.IsNullOrEmpty(_ocrTextFile))
-                        {
-                            // Ensure the output directory exists
-                            Directory.CreateDirectory(Path.GetDirectoryName(_ocrTextFile));
+                            if (_sendOcrTextToClipboard)
+                            {
+                                Clipboard.SetText(temp);
+                            }
+                            if (!string.IsNullOrEmpty(_ocrTextFile))
+                            {
+                                // Ensure the output directory exists
+                                Directory.CreateDirectory(Path.GetDirectoryName(_ocrTextFile));
 
-                            // Write the text to the specified file (overwrite any existing text)
-                            File.WriteAllText(_ocrTextFile, temp);
+                                // Write the text to the specified file (overwrite any existing text)
+                                File.WriteAllText(_ocrTextFile, temp);
+                            }
                         }
                     }
                 }
@@ -353,6 +408,49 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             }
         }
 
+        /// <summary>
+        /// Gets/sets whether OCR text should be sent to the clipboard rather than
+        /// being displayed in a message box.
+        /// </summary>
+        /// <returns>Whether OCR text will be sent to the clipboard or not.</returns>
+        internal bool SendOcrTextToClipboard
+        {
+            get
+            {
+                return _sendOcrTextToClipboard;
+            }
+            set
+            {
+                _sendOcrTextToClipboard = value;
+
+                // Set whether or not OCR text should be sent to the message box
+                _sendOcrToMessageBox =
+                    !_sendOcrTextToClipboard && string.IsNullOrEmpty(_ocrTextFile);
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets the name of the text file that will receive OCR text. If
+        /// not <see langword="null"/> then OCR results will be sent to the
+        /// specified text file, otherwise they will be displayed in a message box.
+        /// </summary>
+        /// <returns>The text file to send OCR results to.</returns>
+        internal string OcrTextFile
+        {
+            get
+            {
+                return _ocrTextFile;
+            }
+            set
+            {
+                _ocrTextFile = value;
+
+                // Set whether or not OCR text should be sent to the message box
+                _sendOcrToMessageBox =
+                    !_sendOcrTextToClipboard && string.IsNullOrEmpty(_ocrTextFile);
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -368,6 +466,72 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             StringBuilder sb = new StringBuilder("ExtractImageViewer_");
             sb.Append(processId);
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Process the specified script file.
+        /// </summary>
+        /// <param name="scriptFile">The name of the script file to process.</param>
+        internal void ProcessScriptFile(string scriptFile)
+        {
+            ExtractException.Assert("ELI30159", "Specified script file does not exist.",
+                File.Exists(scriptFile), "Script File Name", scriptFile);
+
+            // Load the script file into a commented text file reader
+            CommentedTextFileReader reader = new CommentedTextFileReader(scriptFile);
+
+            string[] spaceToken = new string[] {" "};
+
+            // Iterate the script commands and execute them
+            foreach (string scriptCommand in reader)
+            {
+                string[] line = scriptCommand.Split(spaceToken, StringSplitOptions.RemoveEmptyEntries);
+                string command = line[0];
+                if (command.Equals("SetWindowPos", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else if (command.Equals("HideButtons", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else if (command.Equals("OpenFile", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else if (command.Equals("AddTempHighlight", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else if (command.Equals("ClearTempHighlights", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else if (command.Equals("ClearImage", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else if (command.Equals("SetCurrentPageNumber", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else if (command.Equals("ZoomIn", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else if (command.Equals("ZoomOut", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else if (command.Equals("ZoomExtents", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else if (command.Equals("CenterOnTempHighlight", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else if (command.Equals("ZoomToTempHighlight", StringComparison.OrdinalIgnoreCase))
+                {
+                }
+                else
+                {
+                    ExtractException ee = new ExtractException("ELI30160",
+                        "Unrecognized script command.");
+                    ee.AddDebugData("Script File Name", scriptFile, false);
+                    ee.AddDebugData("Script Command Line", scriptCommand, false);
+                    throw ee;
+                }
+            }
         }
 
         #endregion Methods

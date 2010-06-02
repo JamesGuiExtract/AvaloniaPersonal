@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CollectionMethods.cs" />
+    <Compile Include="CommentedTextFileReader.cs" />
     <Compile Include="ConfigSettings.cs" />
     <Compile Include="FileActionManagerPathTags.cs" />
     <Compile Include="FileSystemMethods.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="TemporaryFile.cs" />
     <Compile Include="ThreadingMethods.cs" />
     <Compile Include="TimeInterval.cs" />
+    <Compile Include="UtilityMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">

@@ -166,6 +166,16 @@ namespace Extract.Utilities.Forms
         /// Middle button double click in non-client area message.
         /// </summary>
         public const int NonClientMiddleButtonDoubleClick = 0x00A9;
+
+        /// <summary>
+        /// Set focus message
+        /// </summary>
+        public const int SetFocus = 0x0007;
+
+        /// <summary>
+        /// Kill focus message
+        /// </summary>
+        public const int KillFocus = 0x0008;
     }
 
 }

@@ -91,7 +91,7 @@ namespace Extract.Utilities.Forms
         private int _timeout;
         private TimeoutResult _timeoutResult = TimeoutResult.Default;
         private System.Windows.Forms.Panel _panelIcon;
-        private System.Windows.Forms.RichTextBox _rtbMessage;
+        private Extract.Utilities.Forms.BetterRichTextBox _rtbMessage;
 
         /// <summary>
         /// Maps CustomizableMessageBox buttons to Button controls
@@ -530,7 +530,7 @@ namespace Extract.Utilities.Forms
             this.chbSaveResponse = new System.Windows.Forms.CheckBox();
             this.imageListIcons = new System.Windows.Forms.ImageList(this.components);
             this.buttonToolTip = new System.Windows.Forms.ToolTip(this.components);
-            this._rtbMessage = new System.Windows.Forms.RichTextBox();
+            this._rtbMessage = new Extract.Utilities.Forms.BetterRichTextBox();
             this.SuspendLayout();
             // 
             // panelIcon
@@ -559,6 +559,7 @@ namespace Extract.Utilities.Forms
             // 
             // rtbMessage
             // 
+            this._rtbMessage.AllowSelection = true;
             this._rtbMessage.BackColor = System.Drawing.SystemColors.Control;
             this._rtbMessage.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this._rtbMessage.Location = new System.Drawing.Point(200, 8);
@@ -1333,5 +1334,24 @@ namespace Extract.Utilities.Forms
         }
 
         #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets/sets whether selection is allowed in the <see cref="RichTextBox"/> control.
+        /// </summary>
+        internal bool AllowSelection
+        {
+            get
+            {
+                return _rtbMessage.AllowSelection;
+            }
+            set
+            {
+                _rtbMessage.AllowSelection = value;
+            }
+        }
+
+        #endregion Properties
     }
 }

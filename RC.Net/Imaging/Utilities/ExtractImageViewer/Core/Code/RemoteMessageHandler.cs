@@ -105,6 +105,60 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         }
 
         /// <summary>
+        /// Sets whether OCR text results should be sent to the clipboard.
+        /// </summary>
+        /// <param name="sendToClipboard">If <see langword="true"/> then OCR
+        /// results will be sent to the clipboard.</param>
+        public void SendOcrTextToClipboard(bool sendToClipboard)
+        {
+            try
+            {
+                _extractImageForm.SendOcrTextToClipboard = sendToClipboard;
+            }
+            catch (Exception ex)
+            {
+                throw new RemoteExtractException(
+                    ExtractException.AsExtractException("ELI30156", ex));
+            }
+        }
+
+        /// <summary>
+        /// Sets the name of the file to send OCR results to. If <paramref name="fileName"/>
+        /// is <see langword="null"/> or <see cref="String.Empty"/> then results will
+        /// be sent to a messagebox.
+        /// </summary>
+        /// <param name="fileName">The file to send OCR results to.</param>
+        public void SendOcrTextToFile(string fileName)
+        {
+            try
+            {
+                _extractImageForm.OcrTextFile = fileName;
+            }
+            catch (Exception ex)
+            {
+                throw new RemoteExtractException(
+                    ExtractException.AsExtractException("ELI30157", ex));
+            }
+        }
+
+        /// <summary>
+        /// Executes the specified script file in the <see cref="ExtractImageViewerForm"/>.
+        /// </summary>
+        /// <param name="scriptFile">The script file to execute.</param>
+        public void ExecuteScriptFile(string scriptFile)
+        {
+            try
+            {
+                _extractImageForm.ProcessScriptFile(scriptFile);
+            }
+            catch (Exception ex)
+            {
+                throw new RemoteExtractException(
+                    ExtractException.AsExtractException("ELI30158", ex));
+            }
+        }
+
+        /// <summary>
         /// Builds the remote object uri for the <see cref="RemoteMessageHandler"/> for the
         /// specified process ID.
         /// </summary>

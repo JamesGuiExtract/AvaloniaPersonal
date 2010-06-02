@@ -9,9 +9,10 @@
 using Extract;
 using Extract.Licensing;
 using System;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Extract.Utilities.Forms
 {
@@ -399,6 +400,22 @@ namespace Extract.Utilities.Forms
             get
             {
                 return _msgBox.Visible;
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets whether text selection is allowed in the message box.
+        /// </summary>
+        [DefaultValue(true)]
+        public bool AllowTextSelection
+        {
+            get
+            {
+                return _msgBox.AllowSelection;
+            }
+            set
+            {
+                _msgBox.AllowSelection = value;
             }
         }
 

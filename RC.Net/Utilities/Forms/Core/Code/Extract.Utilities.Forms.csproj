@@ -64,6 +64,12 @@
     <Compile Include="BetterComboBox.Designer.cs">
       <DependentUpon>BetterComboBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="BetterRichTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BetterRichTextBox.Designer.cs">
+      <DependentUpon>BetterRichTextBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="BrowseButton.cs">
       <SubType>Component</SubType>
     </Compile>

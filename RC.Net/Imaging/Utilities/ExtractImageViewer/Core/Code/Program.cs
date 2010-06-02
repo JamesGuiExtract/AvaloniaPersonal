@@ -26,7 +26,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 Application.SetCompatibleTextRenderingDefault(false);
 
                 // Check for a valid number of arguments
-                if (args.Length > 3)
+                if (args.Length > 4)
                 {
                     ShowUsage("Too many arguments.");
                     return;
@@ -40,7 +40,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 }
 
                 string fileToOpen = null;
-                //string scriptFile = null;
+                string scriptFile = null;
                 string ocrTextFile = null;
                 bool sendOcrToClipboard = false;
                 bool reuseAlreadyOpenImageViewer = false;
@@ -137,14 +137,15 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 if (reuseAlreadyOpenImageViewer)
                 {
                     // If there are other imageviewers open, send data to them
-                    if (UseOpenImageViewers(fileToOpen))
+                    if (UseOpenImageViewers(fileToOpen, sendOcrToClipboard, ocrTextFile))
                     {
                         // Just return since the open image viewer is handling the object
                         return;
                     }
                 }
+
                 Application.Run(new ExtractImageViewerForm(fileToOpen, ocrTextFile,
-                    sendOcrToClipboard, showSearchWindow));
+                    sendOcrToClipboard, showSearchWindow, scriptFile));
             }
             catch (Exception ex)
             {
@@ -251,7 +252,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <param name="fileToOpen">The image file to open.</param>
         /// <returns><see langword="true"/> if another image viewer was open and has
         /// handled the options, <see langword="false"/> otherwise.</returns>
-        static bool UseOpenImageViewers(string fileToOpen)
+        /// <param name="sendToClipboard">If <see langword="true"/> then OCR results will
+        /// be sent to the clipboard rather than displayed in a message box.</param>
+        /// <param name="ocrTextFile">The file name to send OCR text results to. If
+        /// <see langword="null"/> or <see cref="String.Empty"/> then results will be
+        /// sent to a message box.</param>
+        static bool UseOpenImageViewers(string fileToOpen, bool sendToClipboard, string ocrTextFile)
         {
             IpcChannel channel = new IpcChannel();
             bool channelRegistered = false;
@@ -273,6 +279,11 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         RemoteMessageHandler handler = (RemoteMessageHandler)Activator.GetObject(
                             typeof(RemoteMessageHandler),
                             RemoteMessageHandler.BuildRemoteObjectUri(id));
+
+                        // Set whether text should be sent to the clipboard or to
+                        // a text file rather than to a message box.
+                        handler.SendOcrTextToClipboard(sendToClipboard);
+                        handler.SendOcrTextToFile(ocrTextFile);
 
                         // Open the image in the image viewer
                         handler.OpenImage(fileToOpen);

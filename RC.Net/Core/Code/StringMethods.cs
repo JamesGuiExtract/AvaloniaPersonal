@@ -111,7 +111,7 @@ namespace Extract
         /// Converts the specified array of bytes into a string.
         /// </summary>
         /// <param name="data">The array of bytes to convert.  Must not be null or empty.</param>
-        /// <returns>A string built from the array of bites.</returns>
+        /// <returns>A string built from the array of bytes.</returns>
         /// <exception cref="ExtractException">If <paramref name="data"/>
         /// is <see langword="null"/> or empty.</exception>
         public static string ConvertBytesToString(byte[] data)
@@ -203,7 +203,7 @@ namespace Extract
         /// <param name="delimiter">The delimeter that should be inserted between each value. Can be
         /// <see langword="null"/> or empty if all values should be run together.</param>
         /// <returns>A <see langword="string"/> containing all values from
-        /// <see paramref="values"/></returns>
+        /// <see paramref="values"/>A delimited list containing each of the strings in the array.</returns>
         public static string ConvertArrayToDelimitedList(IList<string> values, string delimiter)
         {
             try
@@ -227,6 +227,67 @@ namespace Extract
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI29149", ex);
+            }
+        }
+
+        /// <summary>
+        /// Finds the first index of any of the specified search strings.
+        /// <para><b>Note:</b></para>
+        /// This uses a default <see cref="StringComparison"/> of
+        /// <see cref="StringComparison.CurrentCulture"/>.
+        /// </summary>
+        /// <param name="valueToSearch">The string to search for the values.</param>
+        /// <param name="valuesToFind">The values to search for.</param>
+        /// <returns>The first index of any of the specified values.</returns>
+        public static int FindIndexOfAny(string valueToSearch, IList<string> valuesToFind)
+        {
+            return FindIndexOfAny(valueToSearch, valuesToFind, StringComparison.CurrentCulture);
+        }
+
+        /// <summary>
+        /// Finds the first index of any of the specified search strings.
+        /// </summary>
+        /// <param name="valueToSearch">The string to search for the values.</param>
+        /// <param name="valuesToFind">The values to search for.</param>
+        /// <param name="comparisonType">The <see cref="StringComparison"/> type to use.</param>
+        /// <returns>The first index of any of the specified values.</returns>
+        public static int FindIndexOfAny(string valueToSearch, IList<string> valuesToFind,
+            StringComparison comparisonType)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(valueToSearch) || valuesToFind == null
+                    || valuesToFind.Count == 0)
+                {
+                    return -1;
+                }
+
+                int index = int.MaxValue;
+                foreach(string value in valuesToFind)
+                {
+                    // Break from the loop if the string becomes null or empty
+                    if (string.IsNullOrEmpty(valueToSearch))
+                    {
+                        break;
+                    }
+
+                    // Find the first index of the string
+                    int temp = valueToSearch.IndexOf(value, comparisonType);
+                    if (temp != -1 && temp < index)
+                    {
+                        index = temp;
+                    }
+                }
+                if (index == int.MaxValue)
+                {
+                    index = -1;
+                }
+
+                return index;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30153", ex);
             }
         }
     }

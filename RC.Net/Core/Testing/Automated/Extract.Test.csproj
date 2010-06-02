@@ -57,6 +57,7 @@
     <Compile Include="TestDerivedExtractException.cs" />
     <Compile Include="TestExtractException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestStringMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Code\Extract.csproj">
