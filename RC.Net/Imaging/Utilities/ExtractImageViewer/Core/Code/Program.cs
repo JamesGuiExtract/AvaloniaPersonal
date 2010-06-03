@@ -102,6 +102,17 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     }
                     else if (argument.Equals("/e", StringComparison.OrdinalIgnoreCase))
                     {
+                        // Check for file name
+                        i++;
+                        if (i < args.Length)
+                        {
+                            scriptFile = Path.GetFullPath(args[i]);
+                        }
+                        else
+                        {
+                            ShowUsage("Must specify a file name with /e option.");
+                            return;
+                        }
                     }
                     else if (argument.Equals("/script?", StringComparison.OrdinalIgnoreCase))
                     {
@@ -137,7 +148,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 if (reuseAlreadyOpenImageViewer)
                 {
                     // If there are other imageviewers open, send data to them
-                    if (UseOpenImageViewers(fileToOpen, sendOcrToClipboard, ocrTextFile))
+                    if (UseOpenImageViewers(fileToOpen, sendOcrToClipboard, ocrTextFile, scriptFile))
                     {
                         // Just return since the open image viewer is handling the object
                         return;
@@ -257,7 +268,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <param name="ocrTextFile">The file name to send OCR text results to. If
         /// <see langword="null"/> or <see cref="String.Empty"/> then results will be
         /// sent to a message box.</param>
-        static bool UseOpenImageViewers(string fileToOpen, bool sendToClipboard, string ocrTextFile)
+        /// <param name="scriptFile">The script file to execute in the open image viewer.</param>
+        static bool UseOpenImageViewers(string fileToOpen, bool sendToClipboard, string ocrTextFile,
+            string scriptFile)
         {
             IpcChannel channel = new IpcChannel();
             bool channelRegistered = false;
@@ -286,7 +299,17 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         handler.SendOcrTextToFile(ocrTextFile);
 
                         // Open the image in the image viewer
-                        handler.OpenImage(fileToOpen);
+                        if (!string.IsNullOrEmpty(fileToOpen))
+                        {
+                            handler.OpenImage(fileToOpen);
+                        }
+
+                        // Process the script file if there is one
+                        if (!string.IsNullOrEmpty(scriptFile))
+                        {
+                            handler.ExecuteScriptFile(scriptFile);
+                        }
+
                         sentToImageViewer = true;
                     }
 
@@ -337,7 +360,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             usage.AppendLine("    ZoomExtents - Toggles fit to page mode");
             usage.AppendLine("    CenterOnTempHighlight - Centers on the first temporary highlight");
             usage.AppendLine("    ZoomToTempHighlight - Centers on the first temporary highlight and");
-            usage.AppendLine("        zooms in around the highlight.");
+            usage.AppendLine("        zooms in around the highlight");
+            usage.AppendLine("    Pause [Text] - Pauses the script and displays a message box");
+            usage.AppendLine("        containing the optional text");
 
             // Display the usage to the user
             MessageBox.Show(usage.ToString(), "Script Usage", MessageBoxButtons.OK,

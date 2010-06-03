@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
@@ -14,6 +15,7 @@ using System.Runtime.Remoting.Channels.Ipc;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace Extract.Imaging.Utilities.ExtractImageViewer
 {
@@ -42,6 +44,14 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         #endregion Constants
 
         #region Fields
+
+        /// <summary>
+        /// The full path to the file that contains information about persisting the 
+        /// <see cref="ExtractImageViewerForm"/>.
+        /// </summary>
+        static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
+            FileSystemMethods.ApplicationDataPath, "Extract Image Viewer",
+            "ExtractImageViewerForm.xml");
 
         /// <summary>
         /// The OCR manager to use when performing OCR of highlights
@@ -83,6 +93,21 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// The channel used for remote communications.
         /// </summary>
         IpcChannel _ipcChannel;
+
+        /// <summary>
+        /// The initial image file to open when the form loads.
+        /// </summary>
+        string _initialImageFile;
+
+        /// <summary>
+        /// The script file to process when the form loads.
+        /// </summary>
+        string _scriptFile;
+
+        /// <summary>
+        /// Collection of temporary highlights.
+        /// </summary>
+        List<LayerObject> _tempHighlights = new List<LayerObject>();
 
         #endregion Fields
 
@@ -156,19 +181,13 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 Icon =
                     Extract.Imaging.Utilities.ExtractImageViewer.Properties.Resources.ExtractImageViewer;
 
-                // Add the event handler for layer objects being added
+                // Add the event handler for layer objects being added and deleted
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
+                _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
 
-                // Check if a filename was specified
-                if (!string.IsNullOrEmpty(fileName))
-                {
-                    _imageViewer.OpenImage(fileName, true);
-                }
-
-                if (!string.IsNullOrEmpty(scriptFile))
-                {
-                    ProcessScriptFile(scriptFile);
-                }
+                // Store the initial image file and script file names
+                _initialImageFile = fileName;
+                _scriptFile = scriptFile;
             }
             catch (Exception ex)
             {
@@ -194,14 +213,54 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 // Establish connections with all controls on this form.
                 _imageViewer.EstablishConnections(this);
 
+                // If not design time, load the saved state of the extract image viewer
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                {
+                    LoadState();
+                }
+
                 if (_openImageSearchForm)
                 {
                     _searchForImagesToolStripMenuItem.PerformClick();
+                }
+
+                // Check if a filename was specified
+                if (!string.IsNullOrEmpty(_initialImageFile))
+                {
+                    _imageViewer.OpenImage(_initialImageFile, true);
+                }
+
+                // Check if a script file was specified
+                if (!string.IsNullOrEmpty(_scriptFile))
+                {
+                    ProcessScriptFile(_scriptFile);
                 }
             }
             catch (Exception ex)
             {
                 ExtractException.Display("ELI30123", ex);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Form.FormClosing"/> event.
+        /// </summary>
+        /// <param name="e">The data associated with the event.</param>
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            try
+            {
+                base.OnClosing(e);
+
+                // If not design time, save the extract image viewer state
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                {
+                    SaveState();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30130", ex);
             }
         }
 
@@ -229,22 +288,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
             return true;
         }
-
-        ///// <summary>
-        ///// Raises the <see cref="Form.FormClosing"/> event.
-        ///// </summary>
-        ///// <param name="e">The data associated with the event.</param>
-        //protected override void OnClosing(CancelEventArgs e)
-        //{
-        //    try
-        //    {
-        //        base.OnClosing(e);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ExtractException.Display("ELI30130", ex);
-        //    }
-        //}
 
         /// <summary>
         /// Handles the <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.
@@ -330,6 +373,33 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         }
 
         /// <summary>
+        /// Handles the <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.
+        /// </summary>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The arguments associated with the event.</param>
+        void HandleLayerObjectDeleted(object sender, LayerObjectDeletedEventArgs e)
+        {
+            try
+            {
+                // Check if the deleted object is a highlight
+                if (e.LayerObject is Highlight)
+                {
+                    // Check if the deleted highlight is one of the temporary highlights
+                    int index = _tempHighlights.IndexOf(e.LayerObject);
+                    if (index != -1)
+                    {
+                        // Remove the temporary highlight from the collection
+                        _tempHighlights.RemoveAt(index);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30165", ex);
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
@@ -346,10 +416,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     sb.Append(_imageViewer.ImageFile);
                 }
                 Text = sb.ToString();
-
-                // Save is enabled if an image is available
-                _saveGddImageButton.Enabled = _imageViewer.IsImageAvailable;
-
             }
             catch (Exception ex)
             {
@@ -474,7 +540,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <param name="scriptFile">The name of the script file to process.</param>
         internal void ProcessScriptFile(string scriptFile)
         {
-            ExtractException.Assert("ELI30159", "Specified script file does not exist.",
+            ExtractException.Assert("ELI30169", "Specified script file does not exist.",
                 File.Exists(scriptFile), "Script File Name", scriptFile);
 
             // Load the script file into a commented text file reader
@@ -485,43 +551,145 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             // Iterate the script commands and execute them
             foreach (string scriptCommand in reader)
             {
-                string[] line = scriptCommand.Split(spaceToken, StringSplitOptions.RemoveEmptyEntries);
+                string[] line = scriptCommand.Split(spaceToken,
+                    StringSplitOptions.RemoveEmptyEntries);
                 string command = line[0];
                 if (command.Equals("SetWindowPos", StringComparison.OrdinalIgnoreCase))
                 {
+                    if (line.Length <= 1)
+                    {
+                        throw new ExtractException("ELI30170", "SetWindowPos is missing argument.");
+                    }
+
+                    // Set the window position
+                    HandleSetWindowPosition(line[1].Trim());
                 }
                 else if (command.Equals("HideButtons", StringComparison.OrdinalIgnoreCase))
                 {
+                    // TODO: Implement button hiding
                 }
                 else if (command.Equals("OpenFile", StringComparison.OrdinalIgnoreCase))
                 {
+                    if (line.Length <= 1)
+                    {
+                        throw new ExtractException("ELI30171", "OpenFile is missing argument.");
+                    }
+
+                    // Open the image file
+                    _imageViewer.OpenImage(line[1].Trim(), true);
                 }
                 else if (command.Equals("AddTempHighlight", StringComparison.OrdinalIgnoreCase))
                 {
+                    if (line.Length <= 1)
+                    {
+                        throw new ExtractException("ELI30172", "AddTempHighlight is missing argument.");
+                    }
+                    if (!_imageViewer.IsImageAvailable)
+                    {
+                        throw new ExtractException("ELI30173",
+                            "Cannot add a temporary highlight without an open image.");
+                    }
+
+                    // Add a temporary highlight
+                    HandleAddTemporaryHighlight(line[1].Trim());
                 }
                 else if (command.Equals("ClearTempHighlights", StringComparison.OrdinalIgnoreCase))
                 {
+                    HandleClearTemporaryHighlights();
                 }
                 else if (command.Equals("ClearImage", StringComparison.OrdinalIgnoreCase))
                 {
+                    // Check if there is an open image
+                    if (_imageViewer.IsImageAvailable)
+                    {
+                        // Close the open image
+                        _imageViewer.CloseImage();
+                    }
                 }
                 else if (command.Equals("SetCurrentPageNumber", StringComparison.OrdinalIgnoreCase))
                 {
+                    if (line.Length <= 1)
+                    {
+                        throw new ExtractException("ELI30174", "SetCurrentPageNumber is missing argument.");
+                    }
+                    int pageNumber = int.Parse(line[1].Trim(), CultureInfo.CurrentCulture);
+                    if (_imageViewer.IsImageAvailable)
+                    {
+                        // Go to the specified page
+                        _imageViewer.PageNumber = pageNumber;
+                    }
+                    else
+                    {
+                        throw new ExtractException("ELI30175", "Cannot change page, no image is open.");
+                    }
                 }
                 else if (command.Equals("ZoomIn", StringComparison.OrdinalIgnoreCase))
                 {
+                    if (_imageViewer.IsImageAvailable)
+                    {
+                        // Zoom in
+                        _imageViewer.ZoomIn();
+                    }
                 }
                 else if (command.Equals("ZoomOut", StringComparison.OrdinalIgnoreCase))
                 {
+                    if (_imageViewer.IsImageAvailable)
+                    {
+                        // Zoom out
+                        _imageViewer.ZoomOut();
+                    }
                 }
                 else if (command.Equals("ZoomExtents", StringComparison.OrdinalIgnoreCase))
                 {
+                    // Toggle fit to page mode
+                    _imageViewer.FitMode = _imageViewer.FitMode == FitMode.FitToPage ?
+                        FitMode.None : FitMode.FitToPage;
                 }
                 else if (command.Equals("CenterOnTempHighlight", StringComparison.OrdinalIgnoreCase))
                 {
+                    if (_tempHighlights.Count > 0)
+                    {
+                        // Change to page for first highlight if necessary
+                        if (_imageViewer.PageNumber != _tempHighlights[0].PageNumber)
+                        {
+                            _imageViewer.PageNumber = _tempHighlights[0].PageNumber;
+                        }
+
+                        _imageViewer.CenterOnLayerObjects(_tempHighlights[0]);
+                    }
                 }
                 else if (command.Equals("ZoomToTempHighlight", StringComparison.OrdinalIgnoreCase))
                 {
+                    if (_tempHighlights.Count > 0)
+                    {
+                        // Change to page for first highlight if necessary
+                        if (_imageViewer.PageNumber != _tempHighlights[0].PageNumber)
+                        {
+                            _imageViewer.PageNumber = _tempHighlights[0].PageNumber;
+                        }
+
+                        Rectangle rectangle = _imageViewer.GetTransformedRectangle(
+                            _tempHighlights[0].GetBounds(), false);
+                        _imageViewer.ZoomToRectangle(rectangle);
+                    }
+                }
+                else if (command.Equals("Pause", StringComparison.OrdinalIgnoreCase))
+                {
+                    StringBuilder sb = new StringBuilder("File: ");
+                    sb.Append(scriptFile);
+                    sb.AppendLine();
+                    sb.Append("Paused:");
+
+                    // Add any text following the Pause command
+                    for (int i = 1; i < line.Length; i++)
+                    {
+                        sb.Append(" ");
+                        sb.Append(line[i]);
+                    }
+
+                    MessageBox.Show(sb.ToString(), "Script Paused",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information,
+                        MessageBoxDefaultButton.Button1, 0);
                 }
                 else
                 {
@@ -531,6 +699,233 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     ee.AddDebugData("Script Command Line", scriptCommand, false);
                     throw ee;
                 }
+
+                // Invalidate the image viewer after each command is processed
+                _imageViewer.Invalidate();
+            }
+        }
+
+        /// <summary>
+        /// Handles setting the window position for the <see cref="Form"/>.
+        /// </summary>
+        /// <param name="argument">The window position argument.
+        /// <list type="bullet">
+        /// <item>Full</item>
+        /// <item>Left</item>
+        /// <item>Top</item>
+        /// <item>Right</item>
+        /// <item>Bottom</item>
+        /// <item>left,right,top,bottom - coordinates</item>
+        /// </list>
+        /// <example>argument = 0,100,0,500</example>
+        /// </param>
+        void HandleSetWindowPosition(string argument)
+        {
+            Screen screen = Screen.PrimaryScreen;
+            Rectangle workingArea = screen.WorkingArea;
+            Rectangle bounds = workingArea;
+            if (argument.Contains(","))
+            {
+                // Get the specified coordinates
+                string[] coords = argument.Split(',');
+                if (coords.Length != 4)
+                {
+                    ExtractException ee = new ExtractException("ELI30161",
+                        "Invalid coordinates specified for SetWindowPos.");
+                    ee.AddDebugData("Coordinates", argument, false);
+                    throw ee;
+                }
+                int left = int.Parse(coords[0].Trim(), CultureInfo.CurrentCulture);
+                int right = int.Parse(coords[1].Trim(), CultureInfo.CurrentCulture);
+                int top = int.Parse(coords[2].Trim(), CultureInfo.CurrentCulture);
+                int bottom = int.Parse(coords[3].Trim(), CultureInfo.CurrentCulture);
+                bounds = Rectangle.FromLTRB(left, top, right, bottom);
+            }
+            else if (argument.Equals("Left", StringComparison.OrdinalIgnoreCase))
+            {
+                bounds.Width /= 2;
+            }
+            else if (argument.Equals("Right", StringComparison.OrdinalIgnoreCase))
+            {
+                bounds.Width /= 2;
+                bounds.Location = new Point(bounds.Width, bounds.Top);
+            }
+            else if (argument.Equals("Top", StringComparison.OrdinalIgnoreCase))
+            {
+                bounds.Height /= 2;
+            }
+            else if (argument.Equals("Bottom", StringComparison.OrdinalIgnoreCase))
+            {
+                bounds.Height /= 2;
+                bounds.Location = new Point(bounds.Left, bounds.Height);
+            }
+            else if (argument.Equals("Full", StringComparison.OrdinalIgnoreCase))
+            {
+                // Nothing to do, bounds are already set
+            }
+            else
+            {
+                ExtractException ee = new ExtractException("ELI30162",
+                    "Invalid position argument for SetWindowPos.");
+                ee.AddDebugData("Position Argument", argument, false);
+                throw ee;
+            }
+
+            // Set the bounds for the form
+            Bounds = bounds;
+
+            // Ensure the start position for the form is set to manual
+            StartPosition = FormStartPosition.Manual;
+        }
+
+        /// <summary>
+        /// Handles adding a temporary highlight to the <see cref="ExtractImageViewerForm"/>
+        /// </summary>
+        /// <param name="argument">The argument containing the coordinates and page number
+        /// for the highlight.</param>
+        void HandleAddTemporaryHighlight(string argument)
+        {
+            try
+            {
+                string[] data = argument.Split(',');
+                if (data.Length != 6)
+                {
+                    ExtractException ee = new ExtractException("ELI30166",
+                        "AddTemporaryHighlight coordinates argument is invalid.");
+                    ee.AddDebugData("Coordinates", argument, false);
+                    throw ee;
+                }
+
+                // Get the coordinates, height and page number
+                Point startPoint = new Point(int.Parse(data[0], CultureInfo.CurrentCulture),
+                    int.Parse(data[1], CultureInfo.CurrentCulture));
+                Point endPoint = new Point(int.Parse(data[2], CultureInfo.CurrentCulture),
+                    int.Parse(data[3], CultureInfo.CurrentCulture));
+                int height = int.Parse(data[4], CultureInfo.CurrentCulture);
+                int pageNumber = int.Parse(data[5], CultureInfo.CurrentCulture);
+
+                try
+                {
+                    // Remove the layer object added handler while the temp highlight is added
+                    _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
+
+                    // Add the highlight to the image viewer
+                    Highlight highlight = new Highlight(_imageViewer, "Temp Highlight",
+                        startPoint, endPoint, height, pageNumber);
+                    _imageViewer.LayerObjects.Add(highlight);
+                    _tempHighlights.Add(highlight);
+
+                    // Move to the page containing the highlight if it is not visible
+                    if (_imageViewer.PageNumber != pageNumber)
+                    {
+                        _imageViewer.PageNumber = pageNumber;
+                    }
+                }
+                finally
+                {
+                    // Add the layer object added handler back now that the temp highlight
+                    // has been added
+                    _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI30167",
+                    "Unable to add new temporary highlight to image.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles clearing all temporary highlights on the <see cref="ExtractImageViewerForm"/>.
+        /// </summary>
+        void HandleClearTemporaryHighlights()
+        {
+            try
+            {
+                if (_tempHighlights.Count > 0)
+                {
+                    try
+                    {
+                        // Remove the layer objects deleted event handler while removing
+                        // the temporary highlights
+                        _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
+                        _imageViewer.LayerObjects.Remove(_tempHighlights);
+                        _tempHighlights.Clear();
+                    }
+                    finally
+                    {
+                        _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI30168",
+                    "Unable to clear temporary highlights.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Loads the previously saved state of the user interface.
+        /// </summary>
+        void LoadState()
+        {
+            try
+            {
+                // Load memento if it exists
+                if (File.Exists(_FORM_PERSISTENCE_FILE))
+                {
+                    // Load the XML
+                    XmlDocument document = new XmlDocument();
+                    document.Load(_FORM_PERSISTENCE_FILE);
+
+                    // Convert the XML to the memento
+                    XmlElement element = (XmlElement)document.FirstChild;
+                    FormMemento memento = FormMemento.FromXmlElement(element);
+
+                    // Restore the saved state
+                    memento.Restore(this);
+                    ToolStripManager.LoadSettings(this);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI30163",
+                    "Unable to load previous extract image viewer setting state.", ex);
+                ee.AddDebugData("Invalid XML file", _FORM_PERSISTENCE_FILE, false);
+                ee.Log();
+            }
+        }
+
+        /// <summary>
+        /// Saves the state of the user interface.
+        /// </summary>
+        void SaveState()
+        {
+            try
+            {
+                // Get the pertinent information
+                FormMemento memento = new FormMemento(this);
+                ToolStripManager.SaveSettings(this);
+
+                // Convert the memento to XML
+                XmlDocument document = new XmlDocument();
+                XmlElement element = memento.ToXmlElement(document);
+                document.AppendChild(element);
+
+                // Create the directory for the file if necessary
+                string directory = Path.GetDirectoryName(_FORM_PERSISTENCE_FILE);
+                Directory.CreateDirectory(directory);
+
+                // Save the XML
+                document.Save(_FORM_PERSISTENCE_FILE);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI30164",
+                    "Unable to persist extract image viewer state settings.", ex);
+                ee.AddDebugData("XML File Name", _FORM_PERSISTENCE_FILE, false);
+                ee.Log();
             }
         }
 

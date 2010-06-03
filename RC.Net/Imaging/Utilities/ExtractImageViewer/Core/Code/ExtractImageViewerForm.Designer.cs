@@ -55,7 +55,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExtractImageViewerForm));
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
-            this._imageViewerContextMenuStrip = new Extract.Imaging.Forms.ImageViewerContextMenuStrip();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openImageToolStripMenuItem = new Extract.Imaging.Forms.OpenImageToolStripMenuItem();
@@ -98,7 +97,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.editHighlightTextToolStripButton1 = new Extract.Imaging.Forms.EditHighlightTextToolStripButton();
             this._fileCommands = new System.Windows.Forms.ToolStrip();
             this.openImageToolStripSplitButton1 = new Extract.Imaging.Forms.OpenImageToolStripSplitButton();
-            this._saveGddImageButton = new System.Windows.Forms.ToolStripButton();
             this.printImageToolStripButton1 = new Extract.Imaging.Forms.PrintImageToolStripButton();
             this._navigationTools = new System.Windows.Forms.ToolStrip();
             this.firstPageToolStripButton1 = new Extract.Imaging.Forms.FirstPageToolStripButton();
@@ -121,6 +119,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.rotateCounterclockwiseToolStripButton1 = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton();
             this.rotateClockwiseToolStripButton1 = new Extract.Imaging.Forms.RotateClockwiseToolStripButton();
             this._imageViewerStatusStrip = new Extract.Imaging.Forms.ImageViewerStatusStrip();
+            this._imageViewerContextMenuStrip = new Extract.Imaging.Forms.ImageViewerContextMenuStrip();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
@@ -169,11 +168,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._imageViewer.Text = "imageViewer1";
             this._imageViewer.UseDefaultShortcuts = true;
             this._imageViewer.ImageFileChanged += new System.EventHandler<Extract.Imaging.Forms.ImageFileChangedEventArgs>(this.HandleImageViewerImageFileChanged);
-            // 
-            // _imageViewerContextMenuStrip
-            // 
-            this._imageViewerContextMenuStrip.Name = "_imageViewerContextMenuStrip";
-            this._imageViewerContextMenuStrip.Size = new System.Drawing.Size(156, 126);
             // 
             // menuStrip1
             // 
@@ -569,11 +563,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._fileCommands.ImageScalingSize = new System.Drawing.Size(32, 32);
             this._fileCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openImageToolStripSplitButton1,
-            this._saveGddImageButton,
             this.printImageToolStripButton1});
             this._fileCommands.Location = new System.Drawing.Point(3, 63);
             this._fileCommands.Name = "_fileCommands";
-            this._fileCommands.Size = new System.Drawing.Size(132, 39);
+            this._fileCommands.Size = new System.Drawing.Size(96, 39);
             this._fileCommands.TabIndex = 6;
             // 
             // openImageToolStripSplitButton1
@@ -586,17 +579,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.openImageToolStripSplitButton1.Size = new System.Drawing.Size(48, 36);
             this.openImageToolStripSplitButton1.Text = "openImageToolStripSplitButton1";
             this.openImageToolStripSplitButton1.ToolTipText = "Open image";
-            // 
-            // _saveGddImageButton
-            // 
-            this._saveGddImageButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._saveGddImageButton.Enabled = false;
-            this._saveGddImageButton.Image = global::Extract.Imaging.Utilities.ExtractImageViewer.Properties.Resources.SaveAsGddFile;
-            this._saveGddImageButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._saveGddImageButton.Name = "_saveGddImageButton";
-            this._saveGddImageButton.Size = new System.Drawing.Size(36, 36);
-            this._saveGddImageButton.Text = "Save Gdd Image";
-            this._saveGddImageButton.ToolTipText = "Save highlights in a new image file";
             // 
             // printImageToolStripButton1
             // 
@@ -832,6 +814,11 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._imageViewerStatusStrip.TabIndex = 2;
             this._imageViewerStatusStrip.Text = "_imageViewerStatusStrip";
             // 
+            // _imageViewerContextMenuStrip
+            // 
+            this._imageViewerContextMenuStrip.Name = "_imageViewerContextMenuStrip";
+            this._imageViewerContextMenuStrip.Size = new System.Drawing.Size(156, 126);
+            // 
             // ExtractImageViewerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -870,7 +857,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
-        private Extract.Imaging.Forms.ImageViewerContextMenuStrip _imageViewerContextMenuStrip;
         private Extract.Imaging.Forms.ImageViewerStatusStrip _imageViewerStatusStrip;
         private Extract.Imaging.Forms.OpenImageToolStripMenuItem _openImageToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
@@ -907,7 +893,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         private Extract.Imaging.Forms.SelectLayerObjectToolStripButton selectLayerObjectToolStripButton1;
         private System.Windows.Forms.ToolStrip _fileCommands;
         private Extract.Imaging.Forms.OpenImageToolStripSplitButton openImageToolStripSplitButton1;
-        private System.Windows.Forms.ToolStripButton _saveGddImageButton;
         private Extract.Imaging.Forms.PrintImageToolStripButton printImageToolStripButton1;
         private System.Windows.Forms.ToolStrip _navigationTools;
         private Extract.Imaging.Forms.FirstPageToolStripButton firstPageToolStripButton1;
@@ -932,6 +917,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator11;
         private Extract.Imaging.Forms.EditHighlightTextToolStripButton editHighlightTextToolStripButton1;
         private System.Windows.Forms.ToolStripMenuItem _searchForImagesToolStripMenuItem;
+        private Extract.Imaging.Forms.ImageViewerContextMenuStrip _imageViewerContextMenuStrip;
     }
 }
 

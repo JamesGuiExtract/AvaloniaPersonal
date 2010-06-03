@@ -66,12 +66,5 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer.Properties {
                 return ((System.Drawing.Icon)(obj));
             }
         }
-        
-        internal static System.Drawing.Bitmap SaveAsGddFile {
-            get {
-                object obj = ResourceManager.GetObject("SaveAsGddFile", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
     }
 }
