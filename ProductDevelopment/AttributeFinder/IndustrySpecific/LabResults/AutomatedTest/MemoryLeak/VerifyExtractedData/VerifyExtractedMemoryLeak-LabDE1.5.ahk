@@ -10,7 +10,7 @@ DetectHiddenText, on
 LabDEWindowTitle := "350_"	
 
 ; Default time in milliseconds to wait for lag between mouse clicks/text entry
-SleepTime := 500
+SleepTime := 600
 
 Loop,
 {
@@ -52,7 +52,7 @@ Loop,
 	Sleep, SleepTime
 
 	;;Edit a table cell and use shift+tab to exit edit mode
-	Send, {TAB 2}
+	Send, {TAB 3}
 	Sleep, SleepTime
 	Send, 1/01/2010
 	Sleep, SleepTime
@@ -120,7 +120,7 @@ Loop,
 	MouseClick, left, 620, 180, , , d	;swipe bigger box in order to get Collection Date/Time
 	Sleep, SleepTime
 	MouseClick, left, 916, 280, , , u
-	Sleep, 15000
+	Sleep, 12000
 
 	; Select Order Number edit box
 	Send, {Tab}
