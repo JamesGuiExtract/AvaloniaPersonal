@@ -61,6 +61,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.WinForms.dll</HintPath>
     </Reference>
+    <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\APIs\Divelements\SandDock\bin\SandDock.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
@@ -174,6 +178,12 @@
     </Compile>
     <Compile Include="Controls\SelectLayerObjectToolStripButton.Designer.cs">
       <DependentUpon>SelectLayerObjectToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ThumbnailViewerToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ThumbnailViewerToolStripButton.Designer.cs">
+      <DependentUpon>ThumbnailViewerToolStripButton.cs</DependentUpon>
     </Compile>
     <Compile Include="CursorTool.cs" />
     <Compile Include="EditHighlightTextForm.cs">
@@ -860,8 +870,15 @@
     <EmbeddedResource Include="Resources\Loading.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\ThumbnailViewerToolStripButton.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ThumbnailViewerToolStripButton.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\PrintViewButton.png" />
     <EmbeddedResource Include="Resources\PrintViewButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ThumbnailViewerButton.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

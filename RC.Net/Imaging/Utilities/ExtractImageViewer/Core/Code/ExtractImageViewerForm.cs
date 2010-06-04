@@ -1,5 +1,6 @@
 using Extract.Drawing;
 using Extract.Imaging.Forms;
+using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -16,6 +17,7 @@ using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
+using TD.SandDock;
 
 namespace Extract.Imaging.Utilities.ExtractImageViewer
 {
@@ -44,6 +46,16 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         #endregion Constants
 
         #region Fields
+
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        static readonly string _OBJECT_NAME = typeof(ExtractImageViewerForm).ToString();
+
+        /// <summary>
+        /// The license string for the SandDock manager
+        /// </summary>
+        static readonly string _SANDDOCK_LICENSE_STRING = @"1970|siE7SnF/jzINQg1AOTIaCXLlouA=";
 
         /// <summary>
         /// The full path to the file that contains information about persisting the 
@@ -112,7 +124,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         #endregion Fields
 
         #region Constructors
-        
+
         /// <overloads>Initializes a new instance of the <see cref="ExtractImageViewerForm"/> 
         /// class.</overloads>
         /// <summary>
@@ -131,16 +143,16 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             : this(null, null, false, false, scriptFile)
         {
         }
-            
+
         /// <summary>
-	    /// Initializes a new instance of the <see cref="ExtractImageViewerForm"/> class opened 
+        /// Initializes a new instance of the <see cref="ExtractImageViewerForm"/> class opened 
         /// with the specified image file.
         /// <para><b>Note:</b></para>
         /// OCR results by default will be sent to a message box.  If
         /// <paramref name="sendOcrTextToClipboard"/> is <see langword="true"/> AND/OR
         /// <paramref name="ocrTextFile"/> is not <see langword="null"/> then
         /// text will not be sent to a message box.
-	    /// </summary>
+        /// </summary>
         /// <param name="fileName">The image file to open. <see langword="null"/> if no image file 
         /// should be opened.</param>
         /// <param name="ocrTextFile">If not <see langword="null"/> then when text is
@@ -153,11 +165,24 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <see cref="ImageSearchForm"/> will be displayed when the form is loaded.</param>
         /// <param name="scriptFile">If not <see langword="null"/> then the file will
         /// be read and the script commands will be processed.</param>
-	    public ExtractImageViewerForm(string fileName, string ocrTextFile,
+        public ExtractImageViewerForm(string fileName, string ocrTextFile,
             bool sendOcrTextToClipboard, bool openImageSearchForm, string scriptFile)
         {
             try
             {
+                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                {
+                    // Load the license files from folder
+                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                }
+
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.InputFunnelCoreObjects,
+                    "ELI30181", _OBJECT_NAME);
+
+                // License SandDock before creating the form
+                SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
+
                 InitializeComponent();
 
                 // Initialize the remoting objects
@@ -219,6 +244,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     LoadState();
                 }
 
+                // Set the dockable window that the thumbnail toolstrip button controls
+                _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
+
                 if (_openImageSearchForm)
                 {
                     _searchForImagesToolStripMenuItem.PerformClick();
@@ -271,7 +299,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <param name="keyData">The key to process.</param>
         /// <returns><see langword="true"/> if the character was processed by the control; 
         /// <see langword="false"/> if the character was not processed.</returns>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.UnmanagedCode)]
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             try
@@ -546,7 +574,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             // Load the script file into a commented text file reader
             CommentedTextFileReader reader = new CommentedTextFileReader(scriptFile);
 
-            string[] spaceToken = new string[] {" "};
+            string[] spaceToken = new string[] { " " };
 
             // Iterate the script commands and execute them
             foreach (string scriptCommand in reader)
@@ -567,6 +595,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 else if (command.Equals("HideButtons", StringComparison.OrdinalIgnoreCase))
                 {
                     // TODO: Implement button hiding
+                    throw new NotImplementedException("HideButtons has not been implemented yet.");
                 }
                 else if (command.Equals("OpenFile", StringComparison.OrdinalIgnoreCase))
                 {
@@ -886,6 +915,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     // Restore the saved state
                     memento.Restore(this);
                     ToolStripManager.LoadSettings(this);
+                    _sandDockManager.LoadLayout();
                 }
             }
             catch (Exception ex)
@@ -907,6 +937,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 // Get the pertinent information
                 FormMemento memento = new FormMemento(this);
                 ToolStripManager.SaveSettings(this);
+                _sandDockManager.SaveLayout();
 
                 // Convert the memento to XML
                 XmlDocument document = new XmlDocument();

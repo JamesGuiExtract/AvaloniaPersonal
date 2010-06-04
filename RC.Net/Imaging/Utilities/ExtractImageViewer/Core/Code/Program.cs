@@ -122,6 +122,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     }
                     else if (argument.Equals("/ctrlid?", StringComparison.OrdinalIgnoreCase))
                     {
+                        // Show the control ID help and exit
+                        ShowControlIdHelp();
+                        return;
                     }
                     else
                     {
@@ -366,6 +369,17 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
             // Display the usage to the user
             MessageBox.Show(usage.ToString(), "Script Usage", MessageBoxButtons.OK,
+                MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+        }
+
+        /// <summary>
+        /// Displays the control ID help to the user
+        /// </summary>
+        static void ShowControlIdHelp()
+        {
+            // Display the control ID usage to the user
+            string usage = ImageViewerControlId.BuildControlIdHelp();
+            MessageBox.Show(usage, "Control Ids", MessageBoxButtons.OK,
                 MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
         }
     }

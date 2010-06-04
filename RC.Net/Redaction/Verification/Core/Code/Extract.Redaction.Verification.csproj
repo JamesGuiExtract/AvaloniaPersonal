@@ -385,9 +385,6 @@
     <None Include="Resources\PreviousRedaction.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\ThumbnailViewer.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\FindWordsSmall.png" />
   </ItemGroup>
   <ItemGroup>

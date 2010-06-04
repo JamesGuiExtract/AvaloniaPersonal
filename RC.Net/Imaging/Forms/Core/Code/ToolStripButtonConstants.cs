@@ -977,5 +977,15 @@ namespace Extract.Imaging.Forms
         public const string _NAVIGATION_TOOLS_TOOLSTRIP_IMAGE =
             "Resources.PageNavigationToolStripTextBox.png";
         #endregion
+
+        #region OtherToolStripButtons
+
+        /// <summary>
+        /// Constant string for the thumbnail viewer button image.
+        /// </summary>
+        public const string _THUMBNAIL_VIEWER_BUTTON_IMAGE =
+            "Resources.ThumbnailViewerButton.png";
+
+        #endregion OtherToolStripButtons
     }
 }

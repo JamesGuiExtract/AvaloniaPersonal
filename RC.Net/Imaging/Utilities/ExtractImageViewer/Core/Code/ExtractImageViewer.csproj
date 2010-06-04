@@ -111,9 +111,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.WinForms.dll</HintPath>
     </Reference>
+    <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Windows.Forms" />
@@ -132,6 +134,7 @@
     <Compile Include="ImageSearchForm.Designer.cs">
       <DependentUpon>ImageSearchForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ImageViewerControlId.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ExtractImageViewerForm.resx">
@@ -142,6 +145,7 @@
       <SubType>Designer</SubType>
       <DependentUpon>ImageSearchForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

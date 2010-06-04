@@ -129,12 +129,5 @@ namespace Extract.Redaction.Verification.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
-        internal static System.Drawing.Bitmap ThumbnailViewer {
-            get {
-                object obj = ResourceManager.GetObject("ThumbnailViewer", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
     }
 }

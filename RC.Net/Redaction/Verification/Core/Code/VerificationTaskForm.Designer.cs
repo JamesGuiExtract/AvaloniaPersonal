@@ -151,7 +151,7 @@ namespace Extract.Redaction.Verification
             this._nextTileToolStripButton = new Extract.Imaging.Forms.NextTileToolStripButton();
             this._rotateCounterclockwiseToolStripButton = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton();
             this._rotateClockwiseToolStripButton = new Extract.Imaging.Forms.RotateClockwiseToolStripButton();
-            this._thumbnailsToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._thumbnailsToolStripButton = new Extract.Imaging.Forms.ThumbnailViewerToolStripButton();
             this._pageNavigationToolStrip = new System.Windows.Forms.ToolStrip();
             this._firstPageToolStripButton = new Extract.Imaging.Forms.FirstPageToolStripButton();
             this._previousPageToolStripButton = new Extract.Imaging.Forms.PreviousPageToolStripButton();
@@ -946,13 +946,10 @@ namespace Extract.Redaction.Verification
             // 
             // _thumbnailsToolStripButton
             // 
-            this._thumbnailsToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._thumbnailsToolStripButton.Image = global::Extract.Redaction.Verification.Properties.Resources.ThumbnailViewer;
             this._thumbnailsToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._thumbnailsToolStripButton.Name = "_thumbnailsToolStripButton";
             this._thumbnailsToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._thumbnailsToolStripButton.Text = "Show/Hide thumbnails";
-            this._thumbnailsToolStripButton.Click += new System.EventHandler(this.HandleThumbnailsToolStripButtonClick);
             // 
             // _pageNavigationToolStrip
             // 
@@ -1279,7 +1276,7 @@ namespace Extract.Redaction.Verification
         private Extract.Imaging.Forms.ImageViewerStatusStrip _imageViewerStatusStrip;
         private System.Windows.Forms.ToolStripMenuItem _toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _optionsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripButton _thumbnailsToolStripButton;
+        private Extract.Imaging.Forms.ThumbnailViewerToolStripButton _thumbnailsToolStripButton;
         private Extract.FileActionManager.Forms.TagFileToolStripButton _tagFileToolStripButton;
         private Extract.Imaging.Forms.PreviousTileToolStripButton _previousTileToolStripButton;
         private Extract.Imaging.Forms.NextTileToolStripButton _nextTileToolStripButton;

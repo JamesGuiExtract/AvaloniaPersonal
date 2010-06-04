@@ -1615,6 +1615,9 @@ namespace Extract.Redaction.Verification
                     LoadState();
                 }
 
+                // Set the dockable window that the thumbnail toolstrip button controls
+                _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
+
                 // It is important that this line comes AFTER EstablishConnections, 
                 // because the page summary view needs to handle this event FIRST.
                 _imageViewer.ImageFileChanged += HandleImageViewerImageFileChanged;
@@ -2242,32 +2245,6 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ExtractException.Display("ELI29240", ex);
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ToolStripItem.Click"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="ToolStripItem.Click"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="ToolStripItem.Click"/> event.</param>
-        void HandleThumbnailsToolStripButtonClick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_thumbnailDockableWindow.IsOpen || _thumbnailDockableWindow.Collapsed)
-                {
-                    _thumbnailDockableWindow.Close();
-                }
-                else
-                {
-                    _thumbnailDockableWindow.Open();
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI28508", ex);
             }
         }
 
