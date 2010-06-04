@@ -31,6 +31,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         public const int SelectLayerObjectButton = 25;
         public const int PreviousTileButton = 26;
         public const int NextTileButton = 27;
+        public const int ThumbnailViewerButton = 28;
 
         /// <summary>
         /// Collection of descriptions for each button ID.
@@ -68,6 +69,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             descriptions[SelectLayerObjectButton] = "Select highlight";
             descriptions[PreviousTileButton] = "Go to previous image tile";
             descriptions[NextTileButton] = "Go to next image tile";
+            descriptions[ThumbnailViewerButton] = "Toggle display of thumbnails window";
 
             return descriptions;
         }

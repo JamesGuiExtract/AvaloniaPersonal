@@ -1,5 +1,6 @@
 using Extract.Licensing;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -121,6 +122,84 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28868", ex);
+            }
+        }
+
+        /// <summary>
+        /// Searches the specified collections for <see cref="ToolStrip"/> objects containing
+        /// <see cref="ToolStripSeparator"/> objects and hides the separators if they
+        /// are the last item in the list or proceeded by another separator. If no visible
+        /// items are left in the <see cref="ToolStrip"/> then the <see cref="ToolStrip"/>
+        /// will be hidden.
+        /// </summary>
+        /// <param name="controls">The control collection to search for <see cref="ToolStrip"/> and
+        /// <see cref="ToolStripSeparator"/>.</param>
+        public static void HideUnnecessaryToolStripSeperators(
+            System.Windows.Forms.Control.ControlCollection controls)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI30186",
+                    _OBJECT_NAME);
+
+                // Iterate each control looking for a toolstrip
+                foreach (Control control in controls)
+                {
+                    ToolStrip toolStrip = control as ToolStrip;
+                    if (toolStrip != null)
+                    {
+                        // Add each visible item to a temporary collection
+                        List<ToolStripItem> items = new List<ToolStripItem>();
+                        foreach (ToolStripItem item in toolStrip.Items)
+                        {
+                            if (item.Visible)
+                            {
+                                items.Add(item);
+                            }
+                        }
+
+                        // Iterate each item in the toolstrip looking for seperators
+                        for (int i = 0; i < items.Count; i++)
+                        {
+                            ToolStripItem item = items[i];
+                            if (item is ToolStripSeparator)
+                            {
+                                // Check if either first item, last item, or
+                                // followed by seperator
+                                if (i == 0 || i + 1 == items.Count
+                                    || items[i + 1] is ToolStripSeparator)
+                                {
+                                    // No item to the right or the next item is a separator
+                                    // no need to see this separator so hide it
+                                    item.Visible = false;
+                                }
+                            }
+                        }
+
+                        // Check for any remaining visible items
+                        bool visibleItem = false;
+                        foreach (ToolStripItem item in items)
+                        {
+                            if (item.Visible)
+                            {
+                                visibleItem = true;
+                                break;
+                            }
+                        }
+
+                        // No visible items left in the toolstrip, hide it
+                        if (!visibleItem)
+                        {
+                            // Hide the toolstrip
+                            toolStrip.Visible = false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30187", ex);
             }
         }
 

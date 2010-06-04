@@ -364,6 +364,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             usage.AppendLine("    CenterOnTempHighlight - Centers on the first temporary highlight");
             usage.AppendLine("    ZoomToTempHighlight - Centers on the first temporary highlight and");
             usage.AppendLine("        zooms in around the highlight");
+            usage.AppendLine("    HideMenu - Hides the image viewer menu bar");
             usage.AppendLine("    Pause [Text] - Pauses the script and displays a message box");
             usage.AppendLine("        containing the optional text");
 

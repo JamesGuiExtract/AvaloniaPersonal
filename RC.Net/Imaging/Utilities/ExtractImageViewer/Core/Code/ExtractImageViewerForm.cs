@@ -121,6 +121,13 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// </summary>
         List<LayerObject> _tempHighlights = new List<LayerObject>();
 
+        /// <summary>
+        /// Flag to indicate whether a tool strip was hidden when a script was processed.
+        /// If it is <see langword="true"/> then the toolstrips will not be persisted
+        /// when the form closes.
+        /// </summary>
+        bool _buttonOrMenuHidden;
+
         #endregion Fields
 
         #region Constructors
@@ -485,6 +492,23 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event for the file menu exit command.
+        /// </summary>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        void HandleFileMenuExitClick(object sender, EventArgs e)
+        {
+            try
+            {
+                Close();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30182", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region Properties
@@ -590,12 +614,28 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     }
 
                     // Set the window position
-                    HandleSetWindowPosition(line[1].Trim());
+                    ScriptSetWindowPosition(line[1].Trim());
                 }
                 else if (command.Equals("HideButtons", StringComparison.OrdinalIgnoreCase))
                 {
-                    // TODO: Implement button hiding
-                    throw new NotImplementedException("HideButtons has not been implemented yet.");
+                    if (line.Length <= 1)
+                    {
+                        throw new ExtractException("ELI30185", "HideButtons is missing argument.");
+                    }
+
+                    // Indicate that a button or menu was hidden
+                    _buttonOrMenuHidden = true;
+
+                    // Hide the specified buttons
+                    ScriptHideButtons(line[1].Trim());
+                }
+                else if (command.Equals("HideMenu", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Indicate that a button or menu was hidden
+                    _buttonOrMenuHidden = true;
+
+                    // Hide the menu strip
+                    _menuStrip.Visible = false;
                 }
                 else if (command.Equals("OpenFile", StringComparison.OrdinalIgnoreCase))
                 {
@@ -620,11 +660,11 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     }
 
                     // Add a temporary highlight
-                    HandleAddTemporaryHighlight(line[1].Trim());
+                    ScriptAddTemporaryHighlight(line[1].Trim());
                 }
                 else if (command.Equals("ClearTempHighlights", StringComparison.OrdinalIgnoreCase))
                 {
-                    HandleClearTemporaryHighlights();
+                    ScriptClearTemporaryHighlights();
                 }
                 else if (command.Equals("ClearImage", StringComparison.OrdinalIgnoreCase))
                 {
@@ -748,7 +788,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// </list>
         /// <example>argument = 0,100,0,500</example>
         /// </param>
-        void HandleSetWindowPosition(string argument)
+        void ScriptSetWindowPosition(string argument)
         {
             Screen screen = Screen.PrimaryScreen;
             Rectangle workingArea = screen.WorkingArea;
@@ -812,7 +852,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// </summary>
         /// <param name="argument">The argument containing the coordinates and page number
         /// for the highlight.</param>
-        void HandleAddTemporaryHighlight(string argument)
+        void ScriptAddTemporaryHighlight(string argument)
         {
             try
             {
@@ -867,7 +907,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <summary>
         /// Handles clearing all temporary highlights on the <see cref="ExtractImageViewerForm"/>.
         /// </summary>
-        void HandleClearTemporaryHighlights()
+        void ScriptClearTemporaryHighlights()
         {
             try
             {
@@ -891,6 +931,136 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             {
                 throw new ExtractException("ELI30168",
                     "Unable to clear temporary highlights.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles hiding the buttons on the <see cref="ExtractImageViewerForm"/>.
+        /// </summary>
+        /// <param name="argument">The argument containing the ID's of the buttons to hide.</param>
+        void ScriptHideButtons(string argument)
+        {
+            try
+            {
+                string[] buttonIds = argument.Split(',');
+                foreach (string buttonId in buttonIds)
+                {
+                    // Get the id
+                    int id = int.Parse(buttonId, CultureInfo.CurrentCulture);
+
+                    switch (id)
+                    {
+                        case ImageViewerControlId.FirstPageButton:
+                            _firstPageToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.FitToPageButton:
+                            _fitToPageToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.FitToWidthButton:
+                            _fitToWidthToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.HighlightTextSplitButton:
+                            _highlightToolStripSplitButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.LastPageButton:
+                            _lastPageToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.NavigateToPageEditBox:
+                            _pageNavigationToolStripTextBox.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.NextPageButton:
+                            _nextPageToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.NextTileButton:
+                            _nextTileToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.OpenImageButton:
+                            _openImageToolStripSplitButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.OpenSubImageWindowButton:
+                            // TODO: Hide this button
+                            break;
+
+                        case ImageViewerControlId.PanButton:
+                            _panToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.PreviousPageButton:
+                            _previousPageToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.PreviousTileButton:
+                            _previousTileToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.PrintButton:
+                            _printImageToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.RotateClockwiseButton:
+                            _rotateClockwiseToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.RotateCounterClockwiseButton:
+                            _rotateCounterclockwiseToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.SelectLayerObjectButton:
+                            _selectLayerObjectToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.ThumbnailViewerButton:
+                            _thumbnailsToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.ZoomInButton:
+                            _zoomInToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.ZoomNextButton:
+                            _zoomNextToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.ZoomOutButton:
+                            _zoomOutToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.ZoomPreviousButton:
+                            _zoomPreviousToolStripButton.Visible = false;
+                            break;
+
+                        case ImageViewerControlId.ZoomWindowButton:
+                            _zoomWindowToolStripButton.Visible = false;
+                            break;
+
+                        default:
+                            ExtractException ee = new ExtractException("ELI30183",
+                                "Invalid button id specified");
+                            ee.AddDebugData("Invalid ID", id, false);
+                            throw ee;
+                    }
+                }
+
+                // After hiding the buttons, ensure that there are no extra tool strip separators
+                FormsMethods.HideUnnecessaryToolStripSeperators(
+                    toolStripContainer1.TopToolStripPanel.Controls);
+                FormsMethods.HideUnnecessaryToolStripSeperators(
+                    toolStripContainer1.BottomToolStripPanel.Controls);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI30184", ex);
+                ee.AddDebugData("Argument", argument, false);
+                throw ee;
             }
         }
 
@@ -936,8 +1106,13 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             {
                 // Get the pertinent information
                 FormMemento memento = new FormMemento(this);
-                ToolStripManager.SaveSettings(this);
                 _sandDockManager.SaveLayout();
+                
+                // Only save the toolstrip settings if a toolstrip was not hidden
+                if (!_buttonOrMenuHidden)
+                {
+                    ToolStripManager.SaveSettings(this);
+                }
 
                 // Convert the memento to XML
                 XmlDocument document = new XmlDocument();
