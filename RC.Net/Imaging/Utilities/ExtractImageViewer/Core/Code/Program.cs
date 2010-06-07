@@ -14,6 +14,22 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 {
     static class Program
     {
+        #region Constants
+
+        /// <summary>
+        /// The tif file extension that will be registered if the application
+        /// is run with the /r option.
+        /// </summary>
+        const string _TIF_FILE_EXTENSION = ".tif";
+
+        /// <summary>
+        /// The tif file description that will be registered if the application
+        /// is run with the /r option.
+        /// </summary>
+        const string _TIF_FILE_DESCRIPTION = "TIF Image File";
+
+        #endregion Constants
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -39,6 +55,11 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     return;
                 }
 
+                // Load the licenses
+                // NOTE: Need to do this before processing command line arguments since
+                // some of the options call into licensed code (i.e. RegisterTifFileAssociation)
+                LicenseUtilities.LoadLicenseFilesFromFolder(0, new Extract.Licensing.MapLabel());
+
                 string fileToOpen = null;
                 string scriptFile = null;
                 string ocrTextFile = null;
@@ -51,10 +72,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     if (argument.Equals("/r", StringComparison.OrdinalIgnoreCase))
                     {
                         RegisterTifFileAssociation();
+                        return;
                     }
                     else if (argument.Equals("/u", StringComparison.OrdinalIgnoreCase))
                     {
                         UnregisterTifFileAssociation();
+                        return;
                     }
                     else if (argument.Equals("/o", StringComparison.OrdinalIgnoreCase))
                     {
@@ -140,10 +163,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     }
                 }
 
-                // Run the image viewer, opening the image file if specified
-                // Load the licenses
-                LicenseUtilities.LoadLicenseFilesFromFolder(0, new Extract.Licensing.MapLabel());
-
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
                     "ELI21841", "Extract Image Viewer");
@@ -158,6 +177,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     }
                 }
 
+                // Run the image viewer, opening the image file if specified
                 Application.Run(new ExtractImageViewerForm(fileToOpen, ocrTextFile,
                     sendOcrToClipboard, showSearchWindow, scriptFile));
             }
@@ -226,19 +246,23 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         }
 
         /// <summary>
-        /// 
+        /// Unregisters the .tif file extension with ExtractImageViewer.exe
         /// </summary>
         static void UnregisterTifFileAssociation()
         {
-            // TODO: Implement this method
+            // Unregister the tif file extension
+            RegistryMethods.UnregisterFileAssociation(_TIF_FILE_EXTENSION,
+                _TIF_FILE_DESCRIPTION);
         }
 
         /// <summary>
-        /// 
+        /// Registers the .tif file extension with ExtractImageViewer.exe
         /// </summary>
         static void RegisterTifFileAssociation()
         {
-            // TODO: Implement this method
+            // Register the application with the tif file extension
+            RegistryMethods.RegisterFileAssociation(_TIF_FILE_EXTENSION,
+                _TIF_FILE_DESCRIPTION, Application.ExecutablePath, false);
         } 
 
         /// <summary>

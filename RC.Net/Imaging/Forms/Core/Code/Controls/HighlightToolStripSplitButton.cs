@@ -316,14 +316,18 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                // Adjust both the image and the last tool when the cursor tool changes
+                // [DNRCAU #458]
                 switch (e.CursorTool)
                 {
                     case CursorTool.AngularHighlight:
                         SetImage(_angularHighlightButtonImage);
+                        _highlightTool = CursorTool.AngularHighlight;
                         break;
 
                     case CursorTool.RectangularHighlight:
                         SetImage(_rectangularHighlightButtonImage);
+                        _highlightTool = CursorTool.RectangularHighlight;
                         break;
 
                     default:

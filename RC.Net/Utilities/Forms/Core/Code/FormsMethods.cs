@@ -134,7 +134,7 @@ namespace Extract.Utilities.Forms
         /// </summary>
         /// <param name="controls">The control collection to search for <see cref="ToolStrip"/> and
         /// <see cref="ToolStripSeparator"/>.</param>
-        public static void HideUnnecessaryToolStripSeperators(
+        public static void HideUnnecessaryToolStripSeparators(
             System.Windows.Forms.Control.ControlCollection controls)
         {
             try

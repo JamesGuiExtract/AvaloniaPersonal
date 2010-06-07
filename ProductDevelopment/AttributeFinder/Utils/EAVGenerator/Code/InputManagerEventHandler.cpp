@@ -1,2 +1,2 @@
 #include "StdAfx.h"
-#include "..\\..\\..\\..\\InputFunnel\\IFCore\\Code\\InputManagerEventHandler.cpp"
+#include "..\..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\InputManagerEventHandler.cpp"

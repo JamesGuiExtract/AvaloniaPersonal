@@ -172,5 +172,43 @@ namespace Extract.Utilities
                 throw ExtractException.AsExtractException("ELI30136", ex);
             }
         }
+
+        /// <summary>
+        /// Gets whether the current executing process is running under Wow64 or not.
+        /// </summary>
+        /// <returns><see langword="true"/> if it is running under Wow64 and
+        /// <see langword="false"/> otherwise.</returns>
+        public static bool IsCurrentProcessWow64()
+        {
+            try
+            {
+                using (Process process = Process.GetCurrentProcess())
+                {
+                    return IsProcessWow64(process);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30189", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the specified process is running under Wow64 or not.
+        /// </summary>
+        /// <param name="process">The process to check.</param>
+        /// <returns><see langword="true"/> if it is running under Wow64 and
+        /// <see langword="false"/> otherwise.</returns>
+        public static bool IsProcessWow64(Process process)
+        {
+            try
+            {
+                return NativeMethods.IsProcessRunningWow64(process);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30190", ex);
+            }
+        }
     }
 }

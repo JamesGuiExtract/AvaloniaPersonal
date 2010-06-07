@@ -285,13 +285,13 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         {
             try
             {
-                base.OnClosing(e);
-
                 // If not design time, save the extract image viewer state
                 if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
                 {
                     SaveState();
                 }
+
+                base.OnClosing(e);
             }
             catch (Exception ex)
             {
@@ -1051,9 +1051,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 }
 
                 // After hiding the buttons, ensure that there are no extra tool strip separators
-                FormsMethods.HideUnnecessaryToolStripSeperators(
+                FormsMethods.HideUnnecessaryToolStripSeparators(
                     toolStripContainer1.TopToolStripPanel.Controls);
-                FormsMethods.HideUnnecessaryToolStripSeperators(
+                FormsMethods.HideUnnecessaryToolStripSeparators(
                     toolStripContainer1.BottomToolStripPanel.Controls);
             }
             catch (Exception ex)
