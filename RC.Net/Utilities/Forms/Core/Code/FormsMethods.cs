@@ -203,6 +203,62 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Helper method to correctly load persisted <see cref="ToolStrip"/> objects.
+        /// <para><b>Note:</b></para>
+        /// Do not call this method before <see cref="Form.Load"/>. You can call
+        /// it from <see cref="Form.Load"/>.
+        /// This code is based on:
+        /// http://social.msdn.microsoft.com/forums/en-US/winforms/thread/656f5332-610d-42c3-ae2d-0ffb84a74b34/
+        /// For related bug in ToolStripManager see:
+        /// http://connect.microsoft.com/VisualStudio/feedback/details/128042/toolstripmanager-loadsettings-does-not-restore-toolstrip-locations
+        /// </summary>
+        /// <param name="container">The <see cref="ToolStripContainer"/> to
+        /// load <see cref="ToolStrip"/> items into.</param>
+        public static void ToolStripManagerLoadHelper(ToolStripContainer container)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI30199",
+                    _OBJECT_NAME);
+
+                // Load the toolstrip settings
+                ToolStripManager.LoadSettings(container.ParentForm);
+
+                // Cache references to the top and bottom panel
+                ToolStripPanel top = container.TopToolStripPanel;
+                using (ToolStripPanel temp = new ToolStripPanel())
+                {
+                    container.ParentForm.Controls.Add(temp);
+
+                    // Iterate the top toolstrip panel. For any toolstrip on the top panel
+                    // move it to the bottom panel.
+                    for (int i = 0; i < top.Controls.Count; i++)
+                    {
+                        ToolStrip item = top.Controls[i] as ToolStrip;
+                        if (item != null)
+                        {
+                            // Move control to the bottom toolstrip panel
+                            // decrement i since moving the control modifies
+                            // the top control collection
+                            item.Parent = temp;
+                            i--;
+                        }
+                    }
+
+                    // Now reload the toolstrips, this should move them to the correct location
+                    ToolStripManager.LoadSettings(container.ParentForm);
+
+                    container.ParentForm.Controls.Remove(temp);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30200", ex);
+            }
+        }
+
         #endregion Methods
     }
 }

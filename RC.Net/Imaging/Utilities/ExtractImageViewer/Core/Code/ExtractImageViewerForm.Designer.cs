@@ -61,7 +61,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExtractImageViewerForm));
-            this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
+            this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._imageViewerContextMenuStrip = new Extract.Imaging.Forms.ImageViewerContextMenuStrip();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
@@ -134,9 +134,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
             this.dockContainer1 = new TD.SandDock.DockContainer();
-            this.toolStripContainer1.ContentPanel.SuspendLayout();
-            this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
-            this.toolStripContainer1.SuspendLayout();
+            this._toolStripContainer.ContentPanel.SuspendLayout();
+            this._toolStripContainer.TopToolStripPanel.SuspendLayout();
+            this._toolStripContainer.SuspendLayout();
             this._menuStrip.SuspendLayout();
             this._basicTools.SuspendLayout();
             this._fileCommands.SuspendLayout();
@@ -151,25 +151,25 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             // 
             // toolStripContainer1.ContentPanel
             // 
-            this.toolStripContainer1.ContentPanel.Controls.Add(this._imageViewer);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(538, 264);
-            this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.toolStripContainer1.LeftToolStripPanelVisible = false;
-            this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
-            this.toolStripContainer1.Name = "toolStripContainer1";
-            this.toolStripContainer1.RightToolStripPanelVisible = false;
-            this.toolStripContainer1.Size = new System.Drawing.Size(538, 444);
-            this.toolStripContainer1.TabIndex = 0;
-            this.toolStripContainer1.TabStop = false;
-            this.toolStripContainer1.Text = "toolStripContainer1";
+            this._toolStripContainer.ContentPanel.Controls.Add(this._imageViewer);
+            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(538, 264);
+            this._toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._toolStripContainer.LeftToolStripPanelVisible = false;
+            this._toolStripContainer.Location = new System.Drawing.Point(0, 0);
+            this._toolStripContainer.Name = "toolStripContainer1";
+            this._toolStripContainer.RightToolStripPanelVisible = false;
+            this._toolStripContainer.Size = new System.Drawing.Size(538, 444);
+            this._toolStripContainer.TabIndex = 0;
+            this._toolStripContainer.TabStop = false;
+            this._toolStripContainer.Text = "toolStripContainer1";
             // 
             // toolStripContainer1.TopToolStripPanel
             // 
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this._menuStrip);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this._basicTools);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this._fileCommands);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this._navigationTools);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this._viewCommands);
+            this._toolStripContainer.TopToolStripPanel.Controls.Add(this._menuStrip);
+            this._toolStripContainer.TopToolStripPanel.Controls.Add(this._basicTools);
+            this._toolStripContainer.TopToolStripPanel.Controls.Add(this._fileCommands);
+            this._toolStripContainer.TopToolStripPanel.Controls.Add(this._navigationTools);
+            this._toolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommands);
             // 
             // _imageViewer
             // 
@@ -895,17 +895,17 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(742, 466);
-            this.Controls.Add(this.toolStripContainer1);
+            this.Controls.Add(this._toolStripContainer);
             this.Controls.Add(this.dockContainer1);
             this.Controls.Add(this._imageViewerStatusStrip);
             this.MainMenuStrip = this._menuStrip;
             this.Name = "ExtractImageViewerForm";
             this.Text = "Extract Image Viewer";
-            this.toolStripContainer1.ContentPanel.ResumeLayout(false);
-            this.toolStripContainer1.TopToolStripPanel.ResumeLayout(false);
-            this.toolStripContainer1.TopToolStripPanel.PerformLayout();
-            this.toolStripContainer1.ResumeLayout(false);
-            this.toolStripContainer1.PerformLayout();
+            this._toolStripContainer.ContentPanel.ResumeLayout(false);
+            this._toolStripContainer.TopToolStripPanel.ResumeLayout(false);
+            this._toolStripContainer.TopToolStripPanel.PerformLayout();
+            this._toolStripContainer.ResumeLayout(false);
+            this._toolStripContainer.PerformLayout();
             this._menuStrip.ResumeLayout(false);
             this._menuStrip.PerformLayout();
             this._basicTools.ResumeLayout(false);
@@ -925,7 +925,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
         #endregion
 
-        private System.Windows.Forms.ToolStripContainer toolStripContainer1;
+        private System.Windows.Forms.ToolStripContainer _toolStripContainer;
         private Extract.Imaging.Forms.ImageViewer _imageViewer;
         private System.Windows.Forms.MenuStrip _menuStrip;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;

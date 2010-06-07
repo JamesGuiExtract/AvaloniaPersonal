@@ -1052,9 +1052,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                 // After hiding the buttons, ensure that there are no extra tool strip separators
                 FormsMethods.HideUnnecessaryToolStripSeparators(
-                    toolStripContainer1.TopToolStripPanel.Controls);
+                    _toolStripContainer.TopToolStripPanel.Controls);
                 FormsMethods.HideUnnecessaryToolStripSeparators(
-                    toolStripContainer1.BottomToolStripPanel.Controls);
+                    _toolStripContainer.BottomToolStripPanel.Controls);
             }
             catch (Exception ex)
             {
@@ -1084,7 +1084,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                     // Restore the saved state
                     memento.Restore(this);
-                    ToolStripManager.LoadSettings(this);
+                    FormsMethods.ToolStripManagerLoadHelper(_toolStripContainer);
                     _sandDockManager.LoadLayout();
                 }
             }
