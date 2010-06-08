@@ -986,6 +986,12 @@ namespace Extract.Imaging.Forms
         public const string _THUMBNAIL_VIEWER_BUTTON_IMAGE =
             "Resources.ThumbnailViewerButton.png";
 
+        /// <summary>
+        /// Constant string for the thumnail viewer button text.
+        /// </summary>
+        public const string _THUMBNAIL_VIEWER_BUTTON_TEXT =
+            "Show/Hide thumbnails";
+
         #endregion OtherToolStripButtons
     }
 }

@@ -37,11 +37,28 @@ namespace Extract.Imaging.Forms
             : base(typeof(ThumbnailViewerToolStripButton),
             ToolStripButtonConstants._THUMBNAIL_VIEWER_BUTTON_IMAGE)
         {
+            base.Text = ToolStripButtonConstants._THUMBNAIL_VIEWER_BUTTON_TEXT;
         }
 
         #endregion Constructors
 
         #region Properties
+
+        /// <summary>
+        /// Gets/sets the text associated with this button.
+        /// </summary>
+        [DefaultValue(ToolStripButtonConstants._THUMBNAIL_VIEWER_BUTTON_TEXT)]
+        public override string Text
+        {
+            get
+            {
+                return base.Text;
+            }
+            set
+            {
+                base.Text = value;
+            }
+        }
 
         /// <summary>
         /// Gets/sets the <see cref="DockableWindow"/> that this control is

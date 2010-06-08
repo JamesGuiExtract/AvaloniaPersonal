@@ -137,7 +137,11 @@ namespace Extract.Imaging
                     }
                     else
                     {
-                        ocrText.Append(GetOcrText(fileName, rasterZone, thresholdAngle));
+                        SpatialString temp = GetOcrText(fileName, rasterZone, thresholdAngle);
+                        if (temp != null)
+                        {
+                            ocrText.Append(temp);
+                        }
                     }
                 }
 
@@ -363,7 +367,7 @@ namespace Extract.Imaging
             try
             {
                 SpatialString temp = GetOcrText(fileName, rasterZone, thresholdAngle);
-                return temp.String;
+                return temp != null ? temp.String : string.Empty;
             }
             catch (Exception ex)
             {

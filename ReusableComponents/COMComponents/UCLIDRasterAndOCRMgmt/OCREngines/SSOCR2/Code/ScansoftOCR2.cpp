@@ -1596,9 +1596,25 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 		zone.type = WT_FLOW;
 		zone.filter = FILTER_DEFAULT;
 
-		// Insert the new zone
-		THROW_UE_ON_ERROR("ELI12721", "Unable to insert zone!",
-			kRecInsertZone(m_hPage, II_CURRENT, &zone, 0) );
+		try
+		{
+			// Insert the new zone
+			THROW_UE_ON_ERROR("ELI12721", "Unable to insert zone.",
+				kRecInsertZone(m_hPage, II_CURRENT, &zone, 0) );
+		}
+		catch(UCLIDException& uex)
+		{
+			// Add zone debug info
+			uex.addDebugInfo("Zone left", zone.rectBBox.left);
+			uex.addDebugInfo("Zone top", zone.rectBBox.top);
+			uex.addDebugInfo("Zone right", zone.rectBBox.right);
+			uex.addDebugInfo("Zone bottom", zone.rectBBox.bottom);
+			uex.addDebugInfo("pZone left", pZone->left);
+			uex.addDebugInfo("pZone top", pZone->top);
+			uex.addDebugInfo("pZone right", pZone->right);
+			uex.addDebugInfo("pZone bottom", pZone->bottom);
+			throw uex;
+		}
 	}
 	// else OCR engine will locate the zones
 

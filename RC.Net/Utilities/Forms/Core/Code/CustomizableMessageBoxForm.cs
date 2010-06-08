@@ -647,9 +647,14 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                if ((int)keyData == (int)(Keys.Alt | Keys.F4) && !_allowCancel)
+                if (!_allowCancel && keyData == (Keys.Alt | Keys.F4))
                 {
                     return true;
+                }
+                else if (_allowCancel && keyData == Keys.Escape)
+                {
+                    // Set the dialog result
+                    DialogResult = DialogResult.Cancel;
                 }
             }
             catch (Exception ex)

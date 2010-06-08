@@ -14,6 +14,7 @@ using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Ipc;
 using System.Security.Permissions;
+using System.Threading;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
@@ -42,6 +43,11 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// Width restriction in inches for sending OCR to a text file or clipboard.
         /// </summary>
         const double _OCR_TO_TEXT_WIDTH_LIMIT = 8.5;
+
+        /// <summary>
+        /// Name for the mutex used to serialize persistance of the control and form layout.
+        /// </summary>
+        static readonly string _MUTEX_STRING = "9428776E-99DE-470D-A44E-587933A1CE59";
 
         #endregion Constants
 
@@ -127,6 +133,11 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// when the form closes.
         /// </summary>
         bool _buttonOrMenuHidden;
+
+        /// <summary>
+        /// Mutex used to serialize persistance of control and form layout.
+        /// </summary>
+        Mutex _layoutMutex = new Mutex(false, _MUTEX_STRING);
 
         #endregion Fields
 
@@ -251,6 +262,18 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     LoadState();
                 }
 
+                // Disable selection, select all, next layer object, and previous layer
+                // object short cut keys
+                _imageViewer.Shortcuts[Keys.Escape] = null;
+                _imageViewer.Shortcuts[Keys.A | Keys.Control] = null;
+                _imageViewer.Shortcuts[Keys.F3] = null;
+                _imageViewer.Shortcuts[Keys.Control | Keys.OemPeriod] = null;
+                _imageViewer.Shortcuts[Keys.F3 | Keys.Shift] = null;
+                _imageViewer.Shortcuts[Keys.Control | Keys.Oemcomma] = null;
+
+                // Add shortcut handler for Delete objects button
+                _imageViewer.Shortcuts[Keys.D] = _imageViewer.SelectDeleteLayerObjectsTool;
+
                 // Set the dockable window that the thumbnail toolstrip button controls
                 _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
 
@@ -338,6 +361,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     Highlight highlight = e.LayerObject as Highlight;
                     if (highlight != null)
                     {
+                        // Do not allow the highlight to be selected
+                        highlight.Selectable = false;
+
                         // Check the restrictions if not sending to message box
                         if (!_sendOcrToMessageBox)
                         {
@@ -387,7 +413,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         {
                             if (_sendOcrTextToClipboard)
                             {
-                                Clipboard.SetText(temp);
+                                // Do not paste null OR empty text into clipboard
+                                // [DNRCAU #473]
+                                if (!string.IsNullOrEmpty(temp))
+                                {
+                                    Clipboard.SetText(temp);
+                                }
                             }
                             if (!string.IsNullOrEmpty(_ocrTextFile))
                             {
@@ -878,9 +909,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     // Remove the layer object added handler while the temp highlight is added
                     _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
 
-                    // Add the highlight to the image viewer
+                    // Add the highlight to the image viewer (make the highlight
+                    // non-selectable)
                     Highlight highlight = new Highlight(_imageViewer, "Temp Highlight",
                         startPoint, endPoint, height, pageNumber);
+                    highlight.Selectable = false;
+
                     _imageViewer.LayerObjects.Add(highlight);
                     _tempHighlights.Add(highlight);
 
@@ -950,6 +984,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                     switch (id)
                     {
+                        case ImageViewerControlId.DeleteLayerObjectsButton:
+                            _deleteLayerObjectsToolStripButton.Visible = false;
+                            break;
+
                         case ImageViewerControlId.FirstPageButton:
                             _firstPageToolStripButton.Visible = false;
                             break;
@@ -1014,10 +1052,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                             _rotateCounterclockwiseToolStripButton.Visible = false;
                             break;
 
-                        case ImageViewerControlId.SelectLayerObjectButton:
-                            _selectLayerObjectToolStripButton.Visible = false;
-                            break;
-
                         case ImageViewerControlId.ThumbnailViewerButton:
                             _thumbnailsToolStripButton.Visible = false;
                             break;
@@ -1071,6 +1105,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         {
             try
             {
+                // Synchronize access to persistance data [DNRCAU #???]
+                _layoutMutex.WaitOne();
+
                 // Load memento if it exists
                 if (File.Exists(_FORM_PERSISTENCE_FILE))
                 {
@@ -1095,6 +1132,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 ee.AddDebugData("Invalid XML file", _FORM_PERSISTENCE_FILE, false);
                 ee.Log();
             }
+            finally
+            {
+                _layoutMutex.ReleaseMutex();
+            }
         }
 
         /// <summary>
@@ -1104,10 +1145,13 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         {
             try
             {
+                // Synchronize access to persistance data [DNRCAU #???]
+                _layoutMutex.WaitOne();
+
                 // Get the pertinent information
                 FormMemento memento = new FormMemento(this);
                 _sandDockManager.SaveLayout();
-                
+
                 // Only save the toolstrip settings if a toolstrip was not hidden
                 if (!_buttonOrMenuHidden)
                 {
@@ -1132,6 +1176,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     "Unable to persist extract image viewer state settings.", ex);
                 ee.AddDebugData("XML File Name", _FORM_PERSISTENCE_FILE, false);
                 ee.Log();
+            }
+            finally
+            {
+                _layoutMutex.ReleaseMutex();
             }
         }
 

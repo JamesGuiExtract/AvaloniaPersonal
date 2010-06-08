@@ -17,6 +17,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         public const int ZoomNextButton = 6;
         public const int PanButton = 8;
         public const int HighlightTextSplitButton = 9;
+        public const int DeleteLayerObjectsButton = 12;
         public const int OpenSubImageWindowButton = 14;
         public const int RotateCounterClockwiseButton = 15;
         public const int RotateClockwiseButton = 16;
@@ -28,7 +29,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         public const int PrintButton = 22;
         public const int FitToPageButton = 23;
         public const int FitToWidthButton = 24;
-        public const int SelectLayerObjectButton = 25;
         public const int PreviousTileButton = 26;
         public const int NextTileButton = 27;
         public const int ThumbnailViewerButton = 28;
@@ -55,6 +55,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             descriptions[ZoomNextButton] = "Zoom next";
             descriptions[PanButton] = "Pan";
             descriptions[HighlightTextSplitButton] = "Highlight text";
+            descriptions[DeleteLayerObjectsButton] = "Delete highlights";
             descriptions[OpenSubImageWindowButton] = "Open portion of the image in another window";
             descriptions[RotateCounterClockwiseButton] = "Rotate 90° left";
             descriptions[RotateClockwiseButton] = "Rotate 90° right";
@@ -66,7 +67,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             descriptions[PrintButton] = "Print document";
             descriptions[FitToPageButton] = "Toggle fit to page mode";
             descriptions[FitToWidthButton] = "Toggle fit to width mode";
-            descriptions[SelectLayerObjectButton] = "Select highlight";
             descriptions[PreviousTileButton] = "Go to previous image tile";
             descriptions[NextTileButton] = "Go to next image tile";
             descriptions[ThumbnailViewerButton] = "Toggle display of thumbnails window";

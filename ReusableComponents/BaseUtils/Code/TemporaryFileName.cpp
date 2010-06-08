@@ -52,7 +52,7 @@ m_bAutoDelete(bAutoDelete)
 		init(getDirectoryFromFullPath(strFileName), getFileNameWithoutExtension(strFileName).c_str(),
 			 getExtensionFromFullPath(strFileName).c_str(), false);
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20701");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30201");
 }
 //--------------------------------------------------------------------------------------------------
 TemporaryFileName::~TemporaryFileName()

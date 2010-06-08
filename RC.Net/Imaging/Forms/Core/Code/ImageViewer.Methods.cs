@@ -2345,6 +2345,8 @@ namespace Extract.Imaging.Forms
                     // Calculate the default highlight height in physical (client) coordinates
                     int height = (int)(_defaultHighlightHeight * GetScaleFactorY(_transform) +
                                        0.5);
+                    // Ensure the height is at least the minimum for a layer object
+                    height = Math.Max(height, LayerObject.MinSize.Height);
 
                     // Begin interactive region tracking
                     _trackingData = new TrackingData(this, mouseX, mouseY,
@@ -4182,8 +4184,8 @@ namespace Extract.Imaging.Forms
                 // Convert the highlight height to physical (client) coordinates
                 int height = (int)(_defaultHighlightHeight * GetScaleFactorY(_transform) + 0.5);
 
-                // Update the tracking data
-                _trackingData.Height = height;
+                // Update the tracking data (ensure the height is at least the minimum)
+                _trackingData.Height = Math.Max(height, LayerObject.MinSize.Height);
                 UpdateTracking(mouseX, mouseY);
             }
         }
