@@ -117,13 +117,32 @@
 	       	<ul>
 			<li>TBD
 	       	</ul>
-  	   	<LI><b>Testing:</b> 
+  	   	<LI><b>Testing the order mapper:</b> 
 	       	<ul>
-			<li>Process an image.
-			<li>Make a modification to the original database.
-			<li>Process another image.
-			<li>Confirm that the temporary database has been updated to reflect the recent 
-			change.
+			<li>Configure ExtractData such that the Demo_LabDE rules are run via a local path.
+			<li>Queue 2 copies of the test image <b>Z004</b>.
+			<li>Remove (but backup) the "ABS# BASO" entries in the AlternateTestName table.
+			<li>Prepare queries to re-add the entries to the database and have the DB open.
+			<li>Start processing on a single thread.
+			<li>As soon as the first document finishes processing, apply the queries to
+			re-add the "ABS# BASO" rows in AlternateTestName table.
+			<li>After processing completes, verify the documents.
+			<li>Confirm that in the first copy the "ABS# BASO" test is mapped to an unknown
+			order, while in the second it maps correctly under "CBC".
+			<li>Reconfigure ExtractData such that the Demo_LabDE rules are run via a network (UNC) path.
+			<li>Repeat the steps above.
+	       	</ul>
+  	   	<LI><b>Testing the UI:</b> 
+	       	<ul>
+			<li>Run a LabDE verification task that is configured using a local path to the config file.
+			<li>On the first image, use one of the defined smart tags.
+			<li>While the first document is still open, modify the TagValue of the smart tag that was
+			used in the database. (Ensure the modified time of OrderMapper.sdf is updated)
+			<li>Advance to the next document.
+			<li>Use the same SmartTag that was used in the first document.
+			<li>Ensure the modified tag value is inserted instead of the original TagValue.
+			<li>Reconfigure LabDE verification task that is configured using a network (UNC) path
+			to the config file.
 	       	</ul>
        	</ul>
 <p>

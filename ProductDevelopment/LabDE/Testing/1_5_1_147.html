@@ -1,13 +1,13 @@
 <HTML>
 
 <HEAD>
-<TITLE>LabDE 1.5.1.147 Testing</TITLE>
+<TITLE>LabDE 1.5.1.148 Testing</TITLE>
 <link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 
 <BODY>
 
-<h1> LabDE 1.5.1.147 (1.5.1 RC13) Testing <br>
+<h1> LabDE 1.5.1.148 (1.5.1 RC14) Testing <br>
 <IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
@@ -222,9 +222,10 @@
 	</ul>
    	</LI>
 <p>
-	<LI><b>[DataEntry:837]</b> Image viewer exceptions when minimized or very small
+	<LI><b>[DataEntry:837, 983]</b> Image viewer issues when minimized or very small
 	<ul>
 		<li>In FAM mode, queue at least 3 documents for verification and start verifying.
+		<li>Set the auto-zoom setting is set to "Zoom out if necessary to fit current selection"
 		<li>Press F11 to move the image viewer to a separate window.
 		<li>Minimize the image viewer window.
 		<li>Minimize the image window.
@@ -233,6 +234,8 @@
 		<li>Press <b>Ctrl + R</b> to rotate the open image clockwise.
 		<li>Press <b>Alt + W</b> to set fit-to-width mode.
 		<li>Restore the image window and ensure the image is rotated clockwise and fit-to-width is set.
+		<li>Tab to the next field with spatial information and ensure the image viewer doesnt' automatically
+		zoom in as far as possible on the highlight/tooltip (ie, full auto-zoom with no context).
 		<li>Resize the image window as small as possible (so only a small part of the title bar is visible).
 		<li>Skip the current document and ensure the next document's data is loaded without exception.
 		<li>Use both <b>F7</b> and <b>F8</b> (zoom in/out) and ensure no exceptions are thrown.
@@ -240,11 +243,36 @@
 		<li>Press <b>Alt + P</b> to set fit-to-page mode.
 		<li>Restore the image window to a reasonable size and ensure the image is rotated
 		counter-clockwise and fit-to-page is set.
+		<li>Tab to the next field with spatial information and ensure the image viewer doesnt' automatically
+		zoom in as far as possible on the highlight/tooltip (ie, full auto-zoom with no context).
 		<li>Resize the image window as small as possible (so only a small part of the title bar is visible).
 		<li>Press the <b>Stop</b> button in the FAM to stop processing.
 		<li>Press the <b>Start</b> button to restart verification.
 		<li>Ensure the document data is loaded without exception.
 		<li>Restore the image window to a reasonable size and ensure the image is loaded.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry:984]</b> Swipe error tooltips do not display when image viewer is in a separate window.
+	<ul>
+		<li>Open a document in LabDE.
+		<li>Press F11 to move the image viewer to a separate window.
+		<li>Select a field that allows swiping.
+		<li>Swipe a blank area of the page.
+		<li>Ensure a tooltip that reads "No text was recognized" appears.
+		<li>Select an entire row from one of the name tables.
+		<li>Swipe a single word from the image.
+		<li>Ensure a tooltip that reads "Unable to format swiped text into the current selection" appears.
+	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry:985]</b> Cannot insert swipe before the last character in a field
+	<ul>
+		<li>Select a field that supports swiping and that has an existing value.
+		<li>Place the cursor before the last character.
+		<li>Swipe some text from the document.
+		<li>Ensure the new text is appended before the last character rather than to the very end of the
+		previous string.
 	</ul>
    	</LI>
 <p>
