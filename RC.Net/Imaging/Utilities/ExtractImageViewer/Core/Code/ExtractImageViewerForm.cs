@@ -123,6 +123,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         string _scriptFile;
 
         /// <summary>
+        /// Whether or not OCR'd text should be output in an XML format to either
+        /// the clipboard or an output file.
+        /// </summary>
+        bool _formatOcrResultAsXml;
+
+        /// <summary>
         /// Collection of temporary highlights.
         /// </summary>
         List<LayerObject> _tempHighlights = new List<LayerObject>();
@@ -139,7 +145,28 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// </summary>
         Mutex _layoutMutex = new Mutex(false, _MUTEX_STRING);
 
+        /// <summary>
+        /// Used to invoke methods on this control.
+        /// </summary>
+        ControlInvoker _invoker;
+
         #endregion Fields
+
+        #region InvokeDelegates
+
+        /// <summary>
+        /// Delegate for the <see cref="ExtractImageViewerForm.OpenImage"/> method.
+        /// </summary>
+        /// <param name="fileName">The file name to open.</param>
+        delegate void ExtractImageViewerOpenImage(string fileName);
+
+        /// <summary>
+        /// Delegate for the <see cref="ExtractImageViewerForm.ProcessScriptFile"/> method.
+        /// </summary>
+        /// <param name="scriptFile">The script file to process.</param>
+        delegate void ExtractImageViewerProcessScript(string scriptFile);
+
+        #endregion InvokeDelegates
 
         #region Constructors
 
@@ -149,7 +176,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// Initializes a new instance of the <see cref="ExtractImageViewerForm"/> class.
         /// </summary>
         public ExtractImageViewerForm()
-            : this(null, null, false, false, null)
+            : this(null, null, false, false, null, false)
         {
         }
 
@@ -158,7 +185,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// </summary>
         /// <param name="scriptFile">The name of the script file to open.</param>
         public ExtractImageViewerForm(string scriptFile)
-            : this(null, null, false, false, scriptFile)
+            : this(null, null, false, false, scriptFile, false)
         {
         }
 
@@ -183,8 +210,14 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <see cref="ImageSearchForm"/> will be displayed when the form is loaded.</param>
         /// <param name="scriptFile">If not <see langword="null"/> then the file will
         /// be read and the script commands will be processed.</param>
+        /// <param name="formatOcrResultAsXml">If <see langword="true"/> then OCRed text will
+        /// be formatted as XML before being copied to the clipboard or output to
+        /// a text file. If <see langword="true"/> then either
+        /// <paramref name="sendOcrTextToClipboard"/> must also be <see langword="true"/>
+        /// or ocrTextFile must be specified.</param>
         public ExtractImageViewerForm(string fileName, string ocrTextFile,
-            bool sendOcrTextToClipboard, bool openImageSearchForm, string scriptFile)
+            bool sendOcrTextToClipboard, bool openImageSearchForm, string scriptFile,
+            bool formatOcrResultAsXml)
         {
             try
             {
@@ -215,6 +248,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 // Get the OCR destination information
                 _ocrTextFile = ocrTextFile;
                 _sendOcrTextToClipboard = sendOcrTextToClipboard;
+                _formatOcrResultAsXml = formatOcrResultAsXml;
 
                 // Set whether or not OCR text should be sent to the message box
                 _sendOcrToMessageBox =
@@ -231,6 +265,8 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 // Store the initial image file and script file names
                 _initialImageFile = fileName;
                 _scriptFile = scriptFile;
+
+                _invoker = new ControlInvoker(this);
             }
             catch (Exception ex)
             {
@@ -391,6 +427,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                             }
                         }
 
+
                         // Get the OCR text as a string.  Pass in a bounding rectangle
                         // with the dimensions of the image to ensure that no illegal
                         // coordinates are passed to the OCR engine. (Note, the passing
@@ -398,11 +435,14 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         // always be valid due to a change in how a rectangular highlight
                         // is now created - see ImageViewer.GetSpatialDataFromClientRectangle).
                         // [DNRCAU #468]
+                        RasterZone zoneToOcr = highlight.ToRasterZone();
                         string temp = _ocrManager.GetOcrTextAsString(_imageViewer.ImageFile,
-                            highlight.ToRasterZone(), 0.2,
+                            zoneToOcr, 0.2,
                             new Rectangle(0, 0, _imageViewer.ImageWidth, _imageViewer.ImageHeight));
-
+                            
+                        // Store the result back to the highlight
                         highlight.Text = temp;
+
                         if (_sendOcrToMessageBox)
                         {
                             using (CustomizableMessageBox message = new CustomizableMessageBox())
@@ -419,6 +459,13 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         }
                         else
                         {
+                            // If needed, convert the OCR result to XML text
+                            if (_formatOcrResultAsXml)
+                            {
+                                temp = ConvertOcrTextToXmlString(_imageViewer.ImageFile,
+                                    temp, zoneToOcr);
+                            }
+
                             if (_sendOcrTextToClipboard)
                             {
                                 // Do not paste null OR empty text into clipboard
@@ -580,9 +627,18 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             {
                 _sendOcrTextToClipboard = value;
 
-                // Set whether or not OCR text should be sent to the message box
-                _sendOcrToMessageBox =
-                    !_sendOcrTextToClipboard && string.IsNullOrEmpty(_ocrTextFile);
+                // If changing to send text to clipboard, clear ocr text file
+                if (_sendOcrTextToClipboard)
+                {
+                    _ocrTextFile = null;
+                    _sendOcrToMessageBox = false;
+                }
+                else
+                {
+                    // Set whether or not OCR text should be sent to the message box
+                    _sendOcrToMessageBox =
+                        !_sendOcrTextToClipboard && string.IsNullOrEmpty(_ocrTextFile);
+                }
             }
         }
 
@@ -602,9 +658,34 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             {
                 _ocrTextFile = value;
 
-                // Set whether or not OCR text should be sent to the message box
-                _sendOcrToMessageBox =
-                    !_sendOcrTextToClipboard && string.IsNullOrEmpty(_ocrTextFile);
+                // If changing the output file, ensure not sending text to clipboard
+                if (!string.IsNullOrEmpty(_ocrTextFile))
+                {
+                    _sendOcrTextToClipboard = false;
+                    _sendOcrToMessageBox = false;
+                }
+                else
+                {
+                    // Set whether or not OCR text should be sent to the message box
+                    _sendOcrToMessageBox =
+                        !_sendOcrTextToClipboard && string.IsNullOrEmpty(_ocrTextFile);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets whether OCRed text should be formatted as XML before being output.
+        /// </summary>
+        /// <return>Whether OCRed text will be output as XML.</return>
+        internal bool FormatOcrResultAsXml
+        {
+            get
+            {
+                return _formatOcrResultAsXml;
+            }
+            set
+            {
+                _formatOcrResultAsXml = value;
             }
         }
 
@@ -626,190 +707,228 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         }
 
         /// <summary>
+        /// Opens the specified image in the <see cref="ImageViewer"/>.
+        /// </summary>
+        /// <param name="fileName">The file to open.</param>
+        internal void OpenImage(string fileName)
+        {
+            try
+            {
+                if (InvokeRequired)
+                {
+                    _invoker.Invoke(new ExtractImageViewerOpenImage(OpenImage),
+                        new object[] { fileName });
+                    return;
+                }
+                _imageViewer.OpenImage(fileName, true);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee =  ExtractException.AsExtractException("ELI30210", ex);
+                _invoker.HandleException(ee);
+            }
+        }
+
+        /// <summary>
         /// Process the specified script file.
         /// </summary>
         /// <param name="scriptFile">The name of the script file to process.</param>
         internal void ProcessScriptFile(string scriptFile)
         {
-            ExtractException.Assert("ELI30169", "Specified script file does not exist.",
-                File.Exists(scriptFile), "Script File Name", scriptFile);
-
-            // Load the script file into a commented text file reader
-            CommentedTextFileReader reader = new CommentedTextFileReader(scriptFile);
-
-            string[] spaceToken = new string[] { " " };
-
-            // Iterate the script commands and execute them
-            foreach (string scriptCommand in reader)
+            try
             {
-                string[] line = scriptCommand.Split(spaceToken,
-                    StringSplitOptions.RemoveEmptyEntries);
-                string command = line[0];
-                if (command.Equals("SetWindowPos", StringComparison.OrdinalIgnoreCase))
+                if (InvokeRequired)
                 {
-                    if (line.Length <= 1)
-                    {
-                        throw new ExtractException("ELI30170", "SetWindowPos is missing argument.");
-                    }
+                    _invoker.Invoke(new ExtractImageViewerProcessScript(ProcessScriptFile),
+                        new object[] { scriptFile });
+                    return;
+                }
 
-                    // Set the window position
-                    ScriptSetWindowPosition(line[1].Trim());
-                }
-                else if (command.Equals("HideButtons", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (line.Length <= 1)
-                    {
-                        throw new ExtractException("ELI30185", "HideButtons is missing argument.");
-                    }
+                ExtractException.Assert("ELI30169", "Specified script file does not exist.",
+                    File.Exists(scriptFile), "Script File Name", scriptFile);
 
-                    // Indicate that a button or menu was hidden
-                    _buttonOrMenuHidden = true;
+                // Load the script file into a commented text file reader
+                CommentedTextFileReader reader = new CommentedTextFileReader(scriptFile);
 
-                    // Hide the specified buttons
-                    ScriptHideButtons(line[1].Trim());
-                }
-                else if (command.Equals("HideMenu", StringComparison.OrdinalIgnoreCase))
-                {
-                    // Indicate that a button or menu was hidden
-                    _buttonOrMenuHidden = true;
+                string[] spaceToken = new string[] { " " };
 
-                    // Hide the menu strip
-                    _menuStrip.Visible = false;
-                }
-                else if (command.Equals("OpenFile", StringComparison.OrdinalIgnoreCase))
+                // Iterate the script commands and execute them
+                foreach (string scriptCommand in reader)
                 {
-                    if (line.Length <= 1)
+                    string[] line = scriptCommand.Split(spaceToken,
+                        StringSplitOptions.RemoveEmptyEntries);
+                    string command = line[0];
+                    if (command.Equals("SetWindowPos", StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new ExtractException("ELI30171", "OpenFile is missing argument.");
-                    }
+                        if (line.Length <= 1)
+                        {
+                            throw new ExtractException("ELI30170", "SetWindowPos is missing argument.");
+                        }
 
-                    // Open the image file
-                    _imageViewer.OpenImage(line[1].Trim(), true);
-                }
-                else if (command.Equals("AddTempHighlight", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (line.Length <= 1)
-                    {
-                        throw new ExtractException("ELI30172", "AddTempHighlight is missing argument.");
+                        // Set the window position
+                        ScriptSetWindowPosition(line[1].Trim());
                     }
-                    if (!_imageViewer.IsImageAvailable)
+                    else if (command.Equals("HideButtons", StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new ExtractException("ELI30173",
-                            "Cannot add a temporary highlight without an open image.");
-                    }
+                        if (line.Length <= 1)
+                        {
+                            throw new ExtractException("ELI30185", "HideButtons is missing argument.");
+                        }
 
-                    // Add a temporary highlight
-                    ScriptAddTemporaryHighlight(line[1].Trim());
-                }
-                else if (command.Equals("ClearTempHighlights", StringComparison.OrdinalIgnoreCase))
-                {
-                    ScriptClearTemporaryHighlights();
-                }
-                else if (command.Equals("ClearImage", StringComparison.OrdinalIgnoreCase))
-                {
-                    // Check if there is an open image
-                    if (_imageViewer.IsImageAvailable)
-                    {
-                        // Close the open image
-                        _imageViewer.CloseImage();
+                        // Indicate that a button or menu was hidden
+                        _buttonOrMenuHidden = true;
+
+                        // Hide the specified buttons
+                        ScriptHideButtons(line[1].Trim());
                     }
-                }
-                else if (command.Equals("SetCurrentPageNumber", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (line.Length <= 1)
+                    else if (command.Equals("HideMenu", StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new ExtractException("ELI30174", "SetCurrentPageNumber is missing argument.");
+                        // Indicate that a button or menu was hidden
+                        _buttonOrMenuHidden = true;
+
+                        // Hide the menu strip
+                        _menuStrip.Visible = false;
                     }
-                    int pageNumber = int.Parse(line[1].Trim(), CultureInfo.CurrentCulture);
-                    if (_imageViewer.IsImageAvailable)
+                    else if (command.Equals("OpenFile", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Go to the specified page
-                        _imageViewer.PageNumber = pageNumber;
+                        if (line.Length <= 1)
+                        {
+                            throw new ExtractException("ELI30171", "OpenFile is missing argument.");
+                        }
+
+                        // Open the image file
+                        _imageViewer.OpenImage(line[1].Trim(), true);
+                    }
+                    else if (command.Equals("AddTempHighlight", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (line.Length <= 1)
+                        {
+                            throw new ExtractException("ELI30172", "AddTempHighlight is missing argument.");
+                        }
+                        if (!_imageViewer.IsImageAvailable)
+                        {
+                            throw new ExtractException("ELI30173",
+                                "Cannot add a temporary highlight without an open image.");
+                        }
+
+                        // Add a temporary highlight
+                        ScriptAddTemporaryHighlight(line[1].Trim());
+                    }
+                    else if (command.Equals("ClearTempHighlights", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ScriptClearTemporaryHighlights();
+                    }
+                    else if (command.Equals("ClearImage", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Check if there is an open image
+                        if (_imageViewer.IsImageAvailable)
+                        {
+                            // Close the open image
+                            _imageViewer.CloseImage();
+                        }
+                    }
+                    else if (command.Equals("SetCurrentPageNumber", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (line.Length <= 1)
+                        {
+                            throw new ExtractException("ELI30174", "SetCurrentPageNumber is missing argument.");
+                        }
+                        int pageNumber = int.Parse(line[1].Trim(), CultureInfo.CurrentCulture);
+                        if (_imageViewer.IsImageAvailable)
+                        {
+                            // Go to the specified page
+                            _imageViewer.PageNumber = pageNumber;
+                        }
+                        else
+                        {
+                            throw new ExtractException("ELI30175", "Cannot change page, no image is open.");
+                        }
+                    }
+                    else if (command.Equals("ZoomIn", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (_imageViewer.IsImageAvailable)
+                        {
+                            // Zoom in
+                            _imageViewer.ZoomIn();
+                        }
+                    }
+                    else if (command.Equals("ZoomOut", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (_imageViewer.IsImageAvailable)
+                        {
+                            // Zoom out
+                            _imageViewer.ZoomOut();
+                        }
+                    }
+                    else if (command.Equals("ZoomExtents", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Toggle fit to page mode
+                        _imageViewer.FitMode = _imageViewer.FitMode == FitMode.FitToPage ?
+                            FitMode.None : FitMode.FitToPage;
+                    }
+                    else if (command.Equals("CenterOnTempHighlight", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (_tempHighlights.Count > 0)
+                        {
+                            // Change to page for first highlight if necessary
+                            if (_imageViewer.PageNumber != _tempHighlights[0].PageNumber)
+                            {
+                                _imageViewer.PageNumber = _tempHighlights[0].PageNumber;
+                            }
+
+                            _imageViewer.CenterOnLayerObjects(_tempHighlights[0]);
+                        }
+                    }
+                    else if (command.Equals("ZoomToTempHighlight", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (_tempHighlights.Count > 0)
+                        {
+                            // Change to page for first highlight if necessary
+                            if (_imageViewer.PageNumber != _tempHighlights[0].PageNumber)
+                            {
+                                _imageViewer.PageNumber = _tempHighlights[0].PageNumber;
+                            }
+
+                            Rectangle rectangle = _imageViewer.GetTransformedRectangle(
+                                _tempHighlights[0].GetBounds(), false);
+                            _imageViewer.ZoomToRectangle(rectangle);
+                        }
+                    }
+                    else if (command.Equals("Pause", StringComparison.OrdinalIgnoreCase))
+                    {
+                        StringBuilder sb = new StringBuilder("File: ");
+                        sb.Append(scriptFile);
+                        sb.AppendLine();
+                        sb.Append("Paused:");
+
+                        // Add any text following the Pause command
+                        for (int i = 1; i < line.Length; i++)
+                        {
+                            sb.Append(" ");
+                            sb.Append(line[i]);
+                        }
+
+                        MessageBox.Show(sb.ToString(), "Script Paused",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information,
+                            MessageBoxDefaultButton.Button1, 0);
                     }
                     else
                     {
-                        throw new ExtractException("ELI30175", "Cannot change page, no image is open.");
-                    }
-                }
-                else if (command.Equals("ZoomIn", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (_imageViewer.IsImageAvailable)
-                    {
-                        // Zoom in
-                        _imageViewer.ZoomIn();
-                    }
-                }
-                else if (command.Equals("ZoomOut", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (_imageViewer.IsImageAvailable)
-                    {
-                        // Zoom out
-                        _imageViewer.ZoomOut();
-                    }
-                }
-                else if (command.Equals("ZoomExtents", StringComparison.OrdinalIgnoreCase))
-                {
-                    // Toggle fit to page mode
-                    _imageViewer.FitMode = _imageViewer.FitMode == FitMode.FitToPage ?
-                        FitMode.None : FitMode.FitToPage;
-                }
-                else if (command.Equals("CenterOnTempHighlight", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (_tempHighlights.Count > 0)
-                    {
-                        // Change to page for first highlight if necessary
-                        if (_imageViewer.PageNumber != _tempHighlights[0].PageNumber)
-                        {
-                            _imageViewer.PageNumber = _tempHighlights[0].PageNumber;
-                        }
-
-                        _imageViewer.CenterOnLayerObjects(_tempHighlights[0]);
-                    }
-                }
-                else if (command.Equals("ZoomToTempHighlight", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (_tempHighlights.Count > 0)
-                    {
-                        // Change to page for first highlight if necessary
-                        if (_imageViewer.PageNumber != _tempHighlights[0].PageNumber)
-                        {
-                            _imageViewer.PageNumber = _tempHighlights[0].PageNumber;
-                        }
-
-                        Rectangle rectangle = _imageViewer.GetTransformedRectangle(
-                            _tempHighlights[0].GetBounds(), false);
-                        _imageViewer.ZoomToRectangle(rectangle);
-                    }
-                }
-                else if (command.Equals("Pause", StringComparison.OrdinalIgnoreCase))
-                {
-                    StringBuilder sb = new StringBuilder("File: ");
-                    sb.Append(scriptFile);
-                    sb.AppendLine();
-                    sb.Append("Paused:");
-
-                    // Add any text following the Pause command
-                    for (int i = 1; i < line.Length; i++)
-                    {
-                        sb.Append(" ");
-                        sb.Append(line[i]);
+                        ExtractException ee = new ExtractException("ELI30160",
+                            "Unrecognized script command.");
+                        ee.AddDebugData("Script File Name", scriptFile, false);
+                        ee.AddDebugData("Script Command Line", scriptCommand, false);
+                        throw ee;
                     }
 
-                    MessageBox.Show(sb.ToString(), "Script Paused",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information,
-                        MessageBoxDefaultButton.Button1, 0);
+                    // Invalidate the image viewer after each command is processed
+                    _imageViewer.Invalidate();
                 }
-                else
-                {
-                    ExtractException ee = new ExtractException("ELI30160",
-                        "Unrecognized script command.");
-                    ee.AddDebugData("Script File Name", scriptFile, false);
-                    ee.AddDebugData("Script Command Line", scriptCommand, false);
-                    throw ee;
-                }
-
-                // Invalidate the image viewer after each command is processed
-                _imageViewer.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee =  ExtractException.AsExtractException("ELI30211", ex);
+                _invoker.HandleException(ee);
             }
         }
 
@@ -1189,6 +1308,32 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             {
                 _layoutMutex.ReleaseMutex();
             }
+        }
+
+        /// <summary>
+        /// Converts the OCR result string into an XML formatted string. 
+        /// </summary>
+        /// <param name="fileName">The name of the file that the text was OCRed from.</param>
+        /// <param name="ocrText">The OCR text.</param>
+        /// <param name="zone">The bounding zone for the text.</param>
+        /// <returns>An XML string for the ocr result.</returns>
+        static string ConvertOcrTextToXmlString(string fileName, string ocrText, RasterZone zone)
+        {
+            StringBuilder sb = new StringBuilder();
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Encoding = Encoding.ASCII;
+            settings.Indent = true;
+            using (XmlWriter writer = XmlWriter.Create(sb, settings))
+            {
+                writer.WriteStartElement("OcrResults");
+                writer.WriteAttributeString("FileName", fileName);
+                zone.WriteXml(writer);
+                writer.WriteElementString("Text", ocrText ?? string.Empty);
+                writer.WriteEndElement();
+                writer.Flush();
+            }
+
+            return sb.ToString();
         }
 
         #endregion Methods

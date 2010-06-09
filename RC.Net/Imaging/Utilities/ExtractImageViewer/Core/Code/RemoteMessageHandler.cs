@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.Remoting;
 using System.Security.Permissions;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Extract.Imaging.Utilities.ExtractImageViewer
 {
@@ -88,6 +89,25 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         }
 
         /// <summary>
+        /// Restores the image viewer form to the normal state if it is minimized.
+        /// </summary>
+        public void UnminimizeForm()
+        {
+            try
+            {
+                if (_extractImageForm.WindowState == FormWindowState.Minimized)
+                {
+                    _extractImageForm.WindowState = FormWindowState.Normal;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new RemoteExtractException(
+                     ExtractException.AsExtractException("ELI30209", ex));
+            }
+        }
+
+        /// <summary>
         /// Opens the specified image file in the <see cref="ExtractImageViewer"/>.
         /// </summary>
         /// <param name="fileName">The image file to open.</param>
@@ -95,7 +115,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         {
             try
             {
-                _extractImageForm.ImageViewer.OpenImage(fileName, true);
+                _extractImageForm.OpenImage(fileName);
             }
             catch (Exception ex)
             {
@@ -138,6 +158,25 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             {
                 throw new RemoteExtractException(
                     ExtractException.AsExtractException("ELI30157", ex));
+            }
+        }
+
+        /// <summary>
+        /// Sets whether OCRed text in the image viewer should be formatted as XML
+        /// when it is output.
+        /// </summary>
+        /// <param name="formatTextAsXml">Whether OCRed text should be formatted
+        /// as XML when output.</param>
+        public void FormatOcrResultAsXml(bool formatTextAsXml)
+        {
+            try
+            {
+                _extractImageForm.FormatOcrResultAsXml = formatTextAsXml;
+            }
+            catch (Exception ex)
+            {
+                throw new RemoteExtractException(
+                    ExtractException.AsExtractException("ELI30207", ex));
             }
         }
 

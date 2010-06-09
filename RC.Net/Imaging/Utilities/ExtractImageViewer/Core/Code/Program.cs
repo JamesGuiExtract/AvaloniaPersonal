@@ -66,6 +66,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 bool sendOcrToClipboard = false;
                 bool reuseAlreadyOpenImageViewer = false;
                 bool showSearchWindow = false;
+                bool formatOcrTextAsXml = false;
                 for (int i=0; i < args.Length; i++)
                 {
                     string argument = args[i];
@@ -109,6 +110,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                         sendOcrToClipboard = true;
                     }
+                    else if (argument.Equals("/xml", StringComparison.OrdinalIgnoreCase))
+                    {
+                        formatOcrTextAsXml = true;
+                    }
                     else if (argument.Equals("/s", StringComparison.OrdinalIgnoreCase))
                     {
                         showSearchWindow = true;
@@ -130,6 +135,15 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         if (i < args.Length)
                         {
                             scriptFile = Path.GetFullPath(args[i]);
+
+                            // Ensure the file exists [DNRCAU #477]
+                            if (!File.Exists(scriptFile))
+                            {
+                                ExtractException ee = new ExtractException("ELI30208",
+                                    "Script file cannot be found.");
+                                ee.AddDebugData("Script File Name", scriptFile, false);
+                                throw ee;
+                            }
                         }
                         else
                         {
@@ -149,6 +163,11 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         ShowControlIdHelp();
                         return;
                     }
+                    else if (argument.StartsWith("/", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ShowUsage("Unrecognized command line option: " + argument);
+                        return;
+                    }
                     else
                     {
                         if (!string.IsNullOrEmpty(fileToOpen))
@@ -163,6 +182,14 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     }
                 }
 
+                // Check that if /xml is specified either /o or /c has been specified
+                if (formatOcrTextAsXml && !sendOcrToClipboard && string.IsNullOrEmpty(ocrTextFile))
+                {
+                    ShowUsage(
+                        "Cannot specify /xml option without specifying either /c or /o options.");
+                    return;
+                }
+
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
                     "ELI21841", "Extract Image Viewer");
@@ -170,7 +197,8 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 if (reuseAlreadyOpenImageViewer)
                 {
                     // If there are other imageviewers open, send data to them
-                    if (UseOpenImageViewers(fileToOpen, sendOcrToClipboard, ocrTextFile, scriptFile))
+                    if (UseOpenImageViewers(fileToOpen, sendOcrToClipboard, ocrTextFile,
+                        scriptFile, formatOcrTextAsXml))
                     {
                         // Just return since the open image viewer is handling the object
                         return;
@@ -179,7 +207,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                 // Run the image viewer, opening the image file if specified
                 Application.Run(new ExtractImageViewerForm(fileToOpen, ocrTextFile,
-                    sendOcrToClipboard, showSearchWindow, scriptFile));
+                    sendOcrToClipboard, showSearchWindow, scriptFile, formatOcrTextAsXml));
             }
             catch (Exception ex)
             {
@@ -230,6 +258,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             usage.AppendLine("         written to <ocrfile> rather than displayed in a message box");
             usage.AppendLine("    /c - Text that is OCRed in the Image Viewer will be copied to the");
             usage.AppendLine("         clipboard rather than displayed in a message box");
+            usage.AppendLine("    /xml - Must be combined with either /c or /o <ocrfile>. Specifies");
+            usage.AppendLine("         that OCRed text will be written in an XML format to either");
+            usage.AppendLine("         the clipboard or the specified file.");
             usage.AppendLine("    /s - Display the search window");
             usage.AppendLine("    /l - Reuse a current Image Viewer if one already exists");
             usage.AppendLine("    /closeall - Close any currently open Image Viewer");
@@ -296,8 +327,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <see langword="null"/> or <see cref="String.Empty"/> then results will be
         /// sent to a message box.</param>
         /// <param name="scriptFile">The script file to execute in the open image viewer.</param>
+        /// <param name="formatOcrTextAsXml">Whether or not OCRed text should be formatted
+        /// as XML before being output.</param>
         static bool UseOpenImageViewers(string fileToOpen, bool sendToClipboard, string ocrTextFile,
-            string scriptFile)
+            string scriptFile, bool formatOcrTextAsXml)
         {
             IpcChannel channel = new IpcChannel();
             bool channelRegistered = false;
@@ -320,10 +353,17 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                             typeof(RemoteMessageHandler),
                             RemoteMessageHandler.BuildRemoteObjectUri(id));
 
+                        // If the image viewer is currently minimized then restore it
+                        // [DNRCAU #465]
+                        handler.UnminimizeForm();
+
                         // Set whether text should be sent to the clipboard or to
                         // a text file rather than to a message box.
                         handler.SendOcrTextToClipboard(sendToClipboard);
                         handler.SendOcrTextToFile(ocrTextFile);
+
+                        // Set whether output text should be formatted as XML
+                        handler.FormatOcrResultAsXml(formatOcrTextAsXml);
 
                         // Open the image in the image viewer
                         if (!string.IsNullOrEmpty(fileToOpen))

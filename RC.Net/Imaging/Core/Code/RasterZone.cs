@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
 using System.Text;
+using System.Xml;
 
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 
@@ -521,6 +523,39 @@ namespace Extract.Imaging
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI30203", ex);
+            }
+        }
+
+        /// <summary>
+        /// Writes the zone data as XML.
+        /// </summary>
+        /// <param name="writer">The stream to which the zone should be written.</param>
+        public void WriteXml(XmlWriter writer)
+        {
+            try
+            {
+                writer.WriteStartElement("Zone");
+
+                // Only write zone information if the zone is not empty
+                if (this != new RasterZone())
+                {
+                    writer.WriteStartElement("Start");
+                    writer.WriteAttributeString("X", _start.X.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("Y", _start.Y.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteEndElement();
+                    writer.WriteStartElement("End");
+                    writer.WriteAttributeString("X", _end.X.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("Y", _end.Y.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteEndElement();
+                    writer.WriteElementString("Height", _height.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteElementString("Page", _pageNumber.ToString(CultureInfo.CurrentCulture));
+                }
+
+                writer.WriteEndElement();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30206", ex);
             }
         }
 
