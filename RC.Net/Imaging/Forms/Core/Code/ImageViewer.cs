@@ -2256,12 +2256,15 @@ namespace Extract.Imaging.Forms
         /// measured perpendicular to the line formed by <paramref name="points"/>.</param>
         void GetSpatialDataFromClientRectangle(Rectangle rectangle, out Point[] points, out int height)
         {
-            // Calculate the points of the raster zone's bisecting line
-            int rasterLineY = rectangle.Top + rectangle.Height / 2;
-            points = new Point[] 
+            // NOTE: As per [DNRCAU #468] This code has been refactored to translate
+            // the rectangular bounds into image coordinates first and then compute
+            // the height and y intersect in image coordinates.
+
+            // Calculate the top left and bottom right points in physical coordinates
+            Point[] topAndBottom = new Point[] 
             {
-               new Point(rectangle.Left, rasterLineY), 
-               new Point(rectangle.Right, rasterLineY)
+               new Point(rectangle.Left, rectangle.Top), 
+               new Point(rectangle.Right, rectangle.Bottom)
             };
 
             // Convert the points from physical to logical coordinates
@@ -2270,16 +2273,21 @@ namespace Extract.Imaging.Forms
                 // Invert the transformation matrix
                 inverseMatrix.Invert();
 
-                // Transform the midpoints of the sides of the highlight
-                inverseMatrix.TransformPoints(points);
+                // Transform the top left and bottom right points to image coordinates
+                inverseMatrix.TransformPoints(topAndBottom);
 
-                // Calculate the height
-                // NOTE: The height is in physical (client) coordinates, so is 
-                // scaled and rounded to the nearest logical (image) coordinates.
-                // ALSO NOTE: base.ScaleFactor is incorrect in FitToPage or 
-                // FitToWidth modes, so the correct scale factor must be computed. 
-                // [DotNetRCAndUtils #24]
-                height = (int)(rectangle.Height * GetScaleFactorY(inverseMatrix) + 0.5);
+                // Compute the height
+                height = topAndBottom[1].Y - topAndBottom[0].Y;
+
+                // Get the y-intersect
+                int yIntersect = topAndBottom[0].Y + height / 2;
+
+                // Compute the start and end points in image coordinates
+                points = new Point[]
+                {
+                    new Point(topAndBottom[0].X, yIntersect),
+                    new Point(topAndBottom[1].X, yIntersect)
+                };
             }
         }
 

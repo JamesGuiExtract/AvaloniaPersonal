@@ -3449,7 +3449,7 @@ namespace Extract.Imaging.Forms
 
             // Thetas should be relative to the side that is closest to the viewer's horizontal. 
             // [LegacyRCAndUtils #5066]
-            angle += Orientation * Math.PI / 180.0;
+            angle += GeometryMethods.ConvertDegreesToRadians(Orientation);
 
             // Express the angle from horizontal as a number between -PI/2 and PI/2 [LegacyRCAndUtils #5205]
             angle = GeometryMethods.GetAngleFromHorizontal(angle);

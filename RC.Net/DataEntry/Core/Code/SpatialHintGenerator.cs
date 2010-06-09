@@ -394,12 +394,9 @@ namespace Extract.DataEntry
             // Compile the orientations of provided raster zones.
             double?[] orientations = new double?[zones.Count];
             double totalOrientation = 0;
-            double radiansToDegressFactor = 180.0 / Math.PI;
             for (int i = 0; i < zones.Count; i++)
             {
-                orientations[i] = (radiansToDegressFactor * GeometryMethods.GetAngle(
-                    new Point(zones[i].StartX, zones[i].StartY), 
-                    new Point(zones[i].EndX, zones[i].EndY)));
+                orientations[i] = zones[i].ComputeSkew(true);
                 totalOrientation += orientations[i].Value;
             }
 

@@ -197,20 +197,15 @@ namespace Extract.Imaging
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28013",
 					_OBJECT_NAME);
 
-                // Calculate the skew of the raster zone.
-                skew = GeometryMethods.GetAngle(
-                    new Point(zone.StartX, zone.StartY),
-                    new Point(zone.EndX, zone.EndY));
-
-                // Convert to degrees
-                skew *= (180.0 / Math.PI);
+                // Calculate the skew of the raster zone in degrees.
+                skew = zone.ComputeSkew(true);
 
                 // Calculate whether the start and end points of the raster zone fall within the
                 // image page.  If either are off the image page, find a start and end point
                 // along the raster zone's plane that are within the image to work with.
                 Rectangle pageArea = new Rectangle(0, 0, page.Width, page.Height);
-                Point startPoint = new Point(zone.StartX, zone.StartY);
-                Point endPoint = new Point(zone.EndX, zone.EndY);
+                Point startPoint = zone.Start;
+                Point endPoint = zone.End;
 
                 if (!pageArea.Contains(startPoint))
                 {

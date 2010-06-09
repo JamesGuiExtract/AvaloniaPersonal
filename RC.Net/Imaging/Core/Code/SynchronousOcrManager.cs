@@ -172,6 +172,33 @@ namespace Extract.Imaging
         public SpatialString GetOcrText(string fileName, RasterZone rasterZone,
             double thresholdAngle)
         {
+            return GetOcrText(fileName, rasterZone, thresholdAngle, null);
+        }
+
+        /// <summary>
+        /// Gets the OCR output data as a <see cref="SpatialString"/>.
+        /// </summary>
+        /// <param name="fileName">The file on which text recognition is needed.</param>
+        /// <param name="rasterZone">The <see cref="RasterZone"/> defining the image region where
+        /// text recognition is needed.</param>
+        /// <param name="thresholdAngle">If less than zero, the smallest
+        /// <see cref="Rectangle"/> containing the <see cref="RasterZone"/> is OCR'd (which may 
+        /// contain significantly more area than the actual raster zone if the raster zone is at 
+        /// a steep angle). Otherwise, the smallest <see cref="Rectangle"/> containing the 
+        /// <see cref="RasterZone"/> is OCR'd for if the <see cref="RasterZone"/> is at an angle 
+        /// less than the specified angle. For <see cref="RasterZone"/>s at a steeper angle
+        /// than specified, the angle of the swipe is taken into account and only the text within
+        /// the <see cref="RasterZone"/> itself is OCR'd.</param>
+        /// <param name="bounds">If not <see langword="null"/> and the skew does not
+        /// require special handling (less than <paramref name="thresholdAngle"/>
+        /// or <paramref name="thresholdAngle"/> is less than 0) then the bounding
+        /// rectangle of the <paramref name="rasterZone"/> will be restricted by this
+        /// <see cref="Rectangle"/>.</param>
+        /// <returns>A <see cref="SpatialString"/> containing the OCR output.</returns>
+        [CLSCompliant(false)]
+        public SpatialString GetOcrText(string fileName, RasterZone rasterZone,
+            double thresholdAngle, Rectangle? bounds)
+        {
             // Declare raster images outside the try scope to enable disposal via the finally block.
             RasterImage page = null;
             RasterImage rasterZoneImage = null;
@@ -180,26 +207,24 @@ namespace Extract.Imaging
             try
             {
                 // If no angle is specified, always use the smallest bounding rectangle.
-                if (thresholdAngle < 0)
-                {
-                    return GetOcrText(fileName, rasterZone.PageNumber, rasterZone.PageNumber,
-                        rasterZone.GetRectangularBounds());
-                }
-
-                // Calculate the skew of the raster zone.
-                double skew = GeometryMethods.GetAngle(
-                    new Point(rasterZone.StartX, rasterZone.StartY),
-                    new Point(rasterZone.EndX, rasterZone.EndY));
-
-                // Convert to degrees
-                skew *= (180.0 / Math.PI);
-
+                // OR
                 // If the raster zone's skew is not sufficient to require special handling, 
                 // use the smallest bounding rectangle.
-                if (Math.Abs(skew) <= thresholdAngle)
+                if (thresholdAngle < 0
+                    || Math.Abs(rasterZone.ComputeSkew(true)) <= thresholdAngle)
                 {
+                    // Get the bounding rectangle for the zone
+                    Rectangle zoneBounds = rasterZone.GetRectangularBounds();
+
+                    // Ensure the bounding rectangle is contained within the bounds
+                    // specified (if they were specified)
+                    if (bounds.HasValue)
+                    {
+                        zoneBounds.Intersect(bounds.Value);
+                    }
+
                     return GetOcrText(fileName, rasterZone.PageNumber, rasterZone.PageNumber,
-                        rasterZone.GetRectangularBounds());
+                        zoneBounds);
                 }
 
                 // To compensate for an angled raster zone, load the image for manipulation.
@@ -212,6 +237,7 @@ namespace Extract.Imaging
                 // zone's angle.
                 Size offset;
                 int orientation;
+                double skew;
                 rasterZoneImage = ImageMethods.ExtractZoneFromPage(rasterZone, page, 
                     out orientation, out skew, out offset);
 
@@ -361,12 +387,19 @@ namespace Extract.Imaging
         /// less than the specified angle. For <see cref="RasterZone"/>s at a steeper angle
         /// than specified, the angle of the swipe is taken into account and only the text within
         /// the <see cref="RasterZone"/> itself is OCR'd.</param>
+        /// <param name="bounds">If not <see langword="null"/> and the skew does not
+        /// require special handling (less than <paramref name="thresholdAngle"/>
+        /// or <paramref name="thresholdAngle"/> is less than 0) then the bounding
+        /// rectangle of the <paramref name="rasterZone"/> will be restricted by this
+        /// <see cref="Rectangle"/>.</param>
         /// <returns>A <see cref="System.String"/> containing the OCR output.</returns>
-        public string GetOcrTextAsString(string fileName, RasterZone rasterZone, double thresholdAngle)
+        public string GetOcrTextAsString(string fileName, RasterZone rasterZone,
+            double thresholdAngle, Rectangle? bounds)
         {
             try
             {
-                SpatialString temp = GetOcrText(fileName, rasterZone, thresholdAngle);
+                SpatialString temp = GetOcrText(fileName, rasterZone, thresholdAngle,
+                    bounds);
                 return temp != null ? temp.String : string.Empty;
             }
             catch (Exception ex)
@@ -374,6 +407,7 @@ namespace Extract.Imaging
                 ExtractException ee = new ExtractException("ELI30121",
                     "Failed to recognize text.", ex);
                 ee.AddDebugData("Filename", fileName, false);
+                ee.AddDebugData("Raster Zone", rasterZone.ToString(), false);
                 throw ee;
             }
         }

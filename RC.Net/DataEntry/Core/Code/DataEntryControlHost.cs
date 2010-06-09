@@ -5660,9 +5660,7 @@ namespace Extract.DataEntry
                             (int)Math.Round(currentZoneVertices[j].Y));
                 }
 
-                double rasterZoneRotation = GeometryMethods.GetAngle(
-                    new Point(rasterZones[i].StartX, rasterZones[i].StartY),
-                    new Point(rasterZones[i].EndX, rasterZones[i].EndY));
+                double rasterZoneRotation = rasterZones[i].ComputeSkew(false);
 
                 // [DataEntry:352]
                 // Ensure the angle of each zone is relative to the initial raster zone rotation so
@@ -5683,7 +5681,7 @@ namespace Extract.DataEntry
             }
 
             // Convert to degrees
-            averageRotation *= (180.0 / Math.PI);
+            averageRotation = GeometryMethods.ConvertRadiansToDegrees(averageRotation);
 
             // Obtain the average rotation of the zones.
             averageRotation /= rasterZones.Count;

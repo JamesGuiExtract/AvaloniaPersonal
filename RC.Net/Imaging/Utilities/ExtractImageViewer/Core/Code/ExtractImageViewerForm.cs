@@ -391,8 +391,16 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                             }
                         }
 
+                        // Get the OCR text as a string.  Pass in a bounding rectangle
+                        // with the dimensions of the image to ensure that no illegal
+                        // coordinates are passed to the OCR engine. (Note, the passing
+                        // of the bounds is just a sanity check, the coordinates should
+                        // always be valid due to a change in how a rectangular highlight
+                        // is now created - see ImageViewer.GetSpatialDataFromClientRectangle).
+                        // [DNRCAU #468]
                         string temp = _ocrManager.GetOcrTextAsString(_imageViewer.ImageFile,
-                            highlight.ToRasterZone(), 0.2);
+                            highlight.ToRasterZone(), 0.2,
+                            new Rectangle(0, 0, _imageViewer.ImageWidth, _imageViewer.ImageHeight));
 
                         highlight.Text = temp;
                         if (_sendOcrToMessageBox)

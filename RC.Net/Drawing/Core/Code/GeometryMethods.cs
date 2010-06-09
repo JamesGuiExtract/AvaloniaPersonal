@@ -543,5 +543,25 @@ namespace Extract.Drawing
                 throw ExtractException.AsExtractException("ELI28619", ex);
             }
         }
+
+        /// <summary>
+        /// Converts a measurement in radians into the equivalent measurement in degrees.
+        /// </summary>
+        /// <param name="radians">The measurement to convert to degrees.</param>
+        /// <returns>The radians converted to degrees.</returns>
+        public static double ConvertRadiansToDegrees(double radians)
+        {
+            return radians * (180.0 / Math.PI);
+        }
+
+        /// <summary>
+        /// Converts a measurement in degrees into the equivalent measurement in radians.
+        /// </summary>
+        /// <param name="degrees">The measurement to convert to radians.</param>
+        /// <returns>The radians converted to radians.</returns>
+        public static double ConvertDegreesToRadians(double degrees)
+        {
+            return (Math.PI * degrees) / 180.0;
+        }
     }
 }

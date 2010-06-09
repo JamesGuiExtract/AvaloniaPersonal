@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Text;
 
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 
@@ -471,9 +472,73 @@ namespace Extract.Imaging
             }
         }
 
+        /// <summary>
+        /// Computes the skew of this <see cref="RasterZone"/> in either degrees
+        /// or radians. If <paramref name="degrees"/> is <see langword="true"/>
+        /// then the returned skew will be in degrees, if it is <see langword="false"/>
+        /// then the returned skew will be in radians.
+        /// </summary>
+        /// <param name="degrees">Whether results should be returned in degrees or radians.</param>
+        /// <returns>The skew of the <see cref="RasterZone"/> in degrees or radians.</returns>
+        public double ComputeSkew(bool degrees)
+        {
+            try
+            {
+                double skew = GeometryMethods.GetAngle(_start, _end);
+
+                if (degrees)
+                {
+                    skew = GeometryMethods.ConvertRadiansToDegrees(skew);
+                }
+
+                return skew;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30204", ex);
+            }
+        }
+
+        /// <summary>
+        /// Returns the <see cref="RasterZone"/> as a comma separated string of values.
+        /// </summary>
+        /// <returns>The <see cref="RasterZone"/> as a comma separated string of values.</returns>
+        public override string ToString()
+        {
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append("StartPoint=");
+                sb.Append(_start.ToString());
+                sb.Append("; EndPoint=");
+                sb.Append(_end.ToString());
+                sb.Append("; Height=");
+                sb.Append(_height);
+                sb.Append("; Page=");
+                sb.Append(_pageNumber);
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30203", ex);
+            }
+        }
+
         #endregion Methods
 
         #region Properties
+
+        /// <summary>
+        /// Gets the start point of the <see cref="RasterZone"/>.
+        /// </summary>
+        /// <return>Start point of the <see cref="RasterZone"/>.</return>
+        public Point Start
+        {
+            get
+            {
+                return _start;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the X-coordinate for the start point of the <see cref="RasterZone"/>.
@@ -506,6 +571,18 @@ namespace Extract.Imaging
             set
             {
                 _start.Y = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the end point of the <see cref="RasterZone"/>.
+        /// </summary>
+        /// <return>End point of the <see cref="RasterZone"/>.</return>
+        public Point End
+        {
+            get
+            {
+                return _end;
             }
         }
 
