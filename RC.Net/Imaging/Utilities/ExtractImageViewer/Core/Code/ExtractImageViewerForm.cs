@@ -704,7 +704,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 ExtractImageViewerForm subImage = new ExtractImageViewerForm(true);
 
                 StringBuilder sb = new StringBuilder(ImageViewer.ImageFile);
-                if (!ImageViewer.ImageFile.EndsWith(" - Portion"))
+                if (!ImageViewer.ImageFile.EndsWith(" - Portion", StringComparison.OrdinalIgnoreCase))
                 {
                     sb.Append(" - Portion");
                 }
