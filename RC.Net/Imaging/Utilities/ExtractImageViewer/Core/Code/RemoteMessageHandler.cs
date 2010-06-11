@@ -1,6 +1,7 @@
 using Extract.Imaging.Forms;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.Remoting;
 using System.Security.Permissions;
 using System.Text;
@@ -91,14 +92,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <summary>
         /// Restores the image viewer form to the normal state if it is minimized.
         /// </summary>
+        [ObfuscationAttribute(Exclude=true, Feature="renaming", StripAfterObfuscation=true)]
         public void UnminimizeForm()
         {
             try
             {
-                if (_extractImageForm.WindowState == FormWindowState.Minimized)
-                {
-                    _extractImageForm.WindowState = FormWindowState.Normal;
-                }
+                _extractImageForm.UnminimizeForm();
             }
             catch (Exception ex)
             {
@@ -111,6 +110,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// Opens the specified image file in the <see cref="ExtractImageViewer"/>.
         /// </summary>
         /// <param name="fileName">The image file to open.</param>
+        [ObfuscationAttribute(Exclude=true, Feature="renaming", StripAfterObfuscation=true)]
         public void OpenImage(string fileName)
         {
             try
@@ -129,6 +129,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// </summary>
         /// <param name="sendToClipboard">If <see langword="true"/> then OCR
         /// results will be sent to the clipboard.</param>
+        [ObfuscationAttribute(Exclude=true, Feature="renaming", StripAfterObfuscation=true)]
         public void SendOcrTextToClipboard(bool sendToClipboard)
         {
             try
@@ -148,6 +149,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// be sent to a messagebox.
         /// </summary>
         /// <param name="fileName">The file to send OCR results to.</param>
+        [ObfuscationAttribute(Exclude=true, Feature="renaming", StripAfterObfuscation=true)]
         public void SendOcrTextToFile(string fileName)
         {
             try
@@ -167,6 +169,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// </summary>
         /// <param name="formatTextAsXml">Whether OCRed text should be formatted
         /// as XML when output.</param>
+        [ObfuscationAttribute(Exclude=true, Feature="renaming", StripAfterObfuscation=true)]
         public void FormatOcrResultAsXml(bool formatTextAsXml)
         {
             try
@@ -184,6 +187,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// Executes the specified script file in the <see cref="ExtractImageViewerForm"/>.
         /// </summary>
         /// <param name="scriptFile">The script file to execute.</param>
+        [ObfuscationAttribute(Exclude=true, Feature="renaming", StripAfterObfuscation=true)]
         public void ExecuteScriptFile(string scriptFile)
         {
             try

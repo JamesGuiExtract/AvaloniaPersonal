@@ -177,6 +177,11 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <param name="scriptFile">The script file to process.</param>
         delegate void ExtractImageViewerProcessScript(string scriptFile);
 
+        /// <summary>
+        /// Delegate for the <see cref="ExtractImageViewerForm.UnminimizeForm"/> method.
+        /// </summary>
+        delegate void ExtractImageViewerUnminimizeForm();
+
         #endregion InvokeDelegates
 
         #region Constructors
@@ -828,6 +833,33 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             StringBuilder sb = new StringBuilder("ExtractImageViewer_");
             sb.Append(processId);
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Method to handle unminimizing the <see cref="ExtractImageViewerForm"/>
+        /// if it is minimized.  If the <see cref="Form"/> is not minimized then
+        /// this method does nothing.
+        /// </summary>
+        internal void UnminimizeForm()
+        {
+            try
+            {
+                if (InvokeRequired)
+                {
+                    _invoker.Invoke(new ExtractImageViewerUnminimizeForm(UnminimizeForm));
+                    return;
+                }
+
+                if (WindowState == FormWindowState.Minimized)
+                {
+                    WindowState = FormWindowState.Normal;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI30239", ex);
+                _invoker.HandleException(ee);
+            }
         }
 
         /// <summary>
