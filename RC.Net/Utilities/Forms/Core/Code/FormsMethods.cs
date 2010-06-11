@@ -259,6 +259,34 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Centers the <paramref name="formToCenter"/> <see cref="Form"/>
+        /// in the <paramref name="formToCenterIn"/> <see cref="Form"/>.
+        /// </summary>
+        /// <param name="formToCenter">The <see cref="Form"/> to be centered.</param>
+        /// <param name="formToCenterIn">The <see cref="Form"/> to be centered on.</param>
+        public static void CenterFormInForm(Form formToCenter, Form formToCenterIn)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23144",
+                    _OBJECT_NAME);
+
+                // Get the location and size of the parent form
+                Point formToCenterInLocation = formToCenterIn.Location;
+                Size formToCenterInSize = formToCenterIn.Size;
+
+                // Compute and set the location for this form
+                formToCenter.Location = new Point(
+                    formToCenterInLocation.X + ((formToCenterInSize.Width / 2) - (formToCenter.Width / 2)),
+                    formToCenterInLocation.Y + ((formToCenterInSize.Height / 2) - (formToCenter.Height / 2)));
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI22220", ex);
+            }
+        }
         #endregion Methods
     }
 }

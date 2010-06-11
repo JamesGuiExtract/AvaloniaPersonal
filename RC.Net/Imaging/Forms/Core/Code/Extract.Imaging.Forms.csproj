@@ -107,6 +107,12 @@
     <Compile Include="Controls\EditHighlightTextToolStripButton.Designer.cs">
       <DependentUpon>EditHighlightTextToolStripButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ExtractImageToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ExtractImageToolStripButton.Designer.cs">
+      <DependentUpon>ExtractImageToolStripButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\FirstPageToolStripButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -879,6 +885,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\ThumbnailViewerButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ExtractImageButton.png" />
+    <EmbeddedResource Include="Resources\ExtractImageButtonSmall.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

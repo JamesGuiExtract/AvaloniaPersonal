@@ -31,6 +31,9 @@ namespace Extract.Imaging.Forms
                     _timer.Dispose();
                     _timer = null;
                 }
+
+                // Clear the image viewer
+                ImageViewer = null;
             }
 
             // Release unmanaged resources

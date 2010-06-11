@@ -1,5 +1,7 @@
+using Leadtools;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Extract.Imaging.Forms
 {
@@ -386,6 +388,42 @@ namespace Extract.Imaging.Forms
             {
                 return _layerObject;
             }
+        }
+    }
+
+    /// <summary>
+    /// Provides data for an <see cref="ImageViewer.ImageExtracted"/> event.
+    /// </summary>
+    public class ImageExtractedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// The extracted image.
+        /// </summary>
+        private readonly RasterImage _image;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageExtractedEventArgs"/>
+        /// class.
+        /// </summary>
+        /// <param name="image">The extracted image that was created.</param>
+        public ImageExtractedEventArgs(RasterImage image)
+        {
+            _image = image;
+        }
+
+        /// <summary>
+        /// Gets a clone of the extracted image.  The caller of this method is
+        /// responsible for disposing <see cref="RasterImage.Dispose"/> of
+        /// the image object.
+        /// </summary>
+        /// <returns>A clone of the extracted image.</returns>
+        // This is intentionally being listed as a method to help reinforce
+        // the concept that the image coming back is a clone and that the caller
+        // is repsonsible to dispose of the image.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public RasterImage GetExtractedImage()
+        {
+            return _image.Clone();
         }
     }
 }

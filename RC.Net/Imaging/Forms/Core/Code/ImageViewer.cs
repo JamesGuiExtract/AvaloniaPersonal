@@ -404,6 +404,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         bool _allowBandedSelection = true;
 
+        /// <summary>
+        /// Specifies whether highlight/redaction tools are enabled or not.
+        /// </summary>
+        bool _allowHighlight = true;
+
         #endregion Fields
 
         #region Image Viewer Events
@@ -489,6 +494,16 @@ namespace Extract.Imaging.Forms
         /// <see cref="LayerObject"/>s that should be ignored.
         /// </summary>
         public event EventHandler<LayerObjectEventArgs> SelectionToolLeftLayerObject;
+
+        /// <summary>
+        /// Occurs when a sub image has been extracted from the present image.
+        /// </summary>
+        public event EventHandler<ImageExtractedEventArgs> ImageExtracted;
+
+        /// <summary>
+        /// Occurs when the <see cref="AllowHighlight"/> property changes.
+        /// </summary>
+        public event EventHandler<EventArgs> AllowHighlightStatusChanged;
 
         #endregion
 
@@ -624,6 +639,7 @@ namespace Extract.Imaging.Forms
 
                         case CursorTool.DeleteLayerObjects:
                         case CursorTool.SetHighlightHeight:
+                        case CursorTool.ExtractImage:
 
                             // Turn off interactive mode
                             base.InteractiveMode = RasterViewerInteractiveMode.None;
@@ -1216,6 +1232,92 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Sets a <see cref="RasterImage"/> to be displayed in the image viewer.
+        /// <para><b>Note:</b></para>
+        /// This will also disable highlight/redaction creation. This method
+        /// is intended to be used to display sub images that have been extracted
+        /// from a larger image.
+        /// </summary>
+        /// <param name="image">The image to display.</param>
+        /// <param name="imageFileName">The file name for the image.</param>
+        public void DisplayRasterImage(RasterImage image, string imageFileName)
+        {
+            try
+            {
+                ExtractException.Assert("ELI30221",
+                    "Image must be a single page to use this method.", image.PageCount == 1);
+
+                // Raise the opening image event
+                OpeningImageEventArgs opening = new OpeningImageEventArgs(imageFileName, false);
+                OnOpeningImage(opening);
+
+                // Check if the event was cancelled
+                if (opening.Cancel)
+                {
+                    return;
+                }
+
+                // Close the currently open image without raising
+                // the image file changed event.
+                if (IsImageAvailable && !CloseImage(false))
+                {
+                    return;
+                }
+
+                // Raise the LoadingNewImage event
+                OnLoadingNewImage(new LoadingNewImageEventArgs());
+
+                // Refresh the image viewer before opening the new image
+                RefreshImageViewerAndParent();
+                using (new TemporaryWaitCursor())
+                {
+                    _validAnnotations = true;
+
+                    _pageNumber = 1;
+                    _pageCount = 1;
+                    _imagePages = new List<ImagePageData>(1);
+                    _imagePages.Add(new ImagePageData());
+
+                    _imageFile = imageFileName;
+
+                    base.Image = image;
+
+                    // If a fit mode is not specified, display the whole page 
+                    // [DotNetRCAndUtils #102]
+                    if (_fitMode == FitMode.None)
+                    {
+                        ShowFitToPage();
+                    }
+
+                    // Set the cursor tool to zoom window if none is set
+                    if (_cursorTool == CursorTool.None)
+                    {
+                        CursorTool = CursorTool.ZoomWindow;
+                    }
+
+                    // Disable adding highlights
+                    AllowHighlight = false;
+                }
+
+                // Raise the image file changed event
+                OnImageFileChanged(new ImageFileChangedEventArgs(imageFileName));
+
+                // Raise the on page changed event
+                OnPageChanged(new PageChangedEventArgs(_pageNumber));
+
+                // Update the zoom history and raise the zoom changed event
+                UpdateZoom(true, true);
+
+                // Restore the cursor for the active cursor tool.
+                Cursor = _toolCursor ?? Cursors.Default;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30222", ex);
+            }
+        }
+
+        /// <summary>
         /// Gets an image for the specified page of the currently open image.
         /// </summary>
         /// <param name="pageNumber">The 1-based page number to open.</param>
@@ -1713,6 +1815,28 @@ namespace Extract.Imaging.Forms
             set
             {
                 _allowBandedSelection = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets whether highlight/redaction tools are allowed or not.
+        /// </summary>
+        /// <value><see langword="true"/> to allow drawing of highlights/redactions,
+        /// <see langword="false"/> otherwise.</value>
+        /// <returns>Whether highlight/redaction tools are allowed.</returns>
+        [DefaultValue(true)]
+        public bool AllowHighlight
+        {
+            get
+            {
+                return _allowHighlight;
+            }
+            set
+            {
+                _allowHighlight = value;
+
+                // Raise the Highlight status changed event
+                OnAllowHighlightStatusChanged();
             }
         }
 
@@ -2582,6 +2706,29 @@ namespace Extract.Imaging.Forms
             if (SelectionToolLeftLayerObject != null)
             {
                 SelectionToolLeftLayerObject(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ImageExtracted"/> event.
+        /// </summary>
+        /// <param name="e">The data associated with the event.</param>
+        void OnImageExtracted(ImageExtractedEventArgs e)
+        {
+            if (ImageExtracted != null)
+            {
+                ImageExtracted(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="AllowHighlightStatusChanged"/> event.
+        /// </summary>
+        void OnAllowHighlightStatusChanged()
+        {
+            if (AllowHighlightStatusChanged != null)
+            {
+                AllowHighlightStatusChanged(this, new EventArgs());
             }
         }
 

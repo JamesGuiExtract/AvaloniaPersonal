@@ -60,6 +60,11 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Allows the user to select a layer object.
         /// </summary>
-        SelectLayerObject
+        SelectLayerObject,
+
+        /// <summary>
+        /// Allows the user to extract a rectangular region of the image.
+        /// </summary>
+        ExtractImage
     }
 }

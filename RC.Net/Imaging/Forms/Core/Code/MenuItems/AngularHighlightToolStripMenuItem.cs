@@ -47,7 +47,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                if (base.ImageViewer != null && base.ImageViewer.IsImageAvailable)
+                if (base.ImageViewer != null && base.ImageViewer.IsImageAvailable
+                    && base.ImageViewer.AllowHighlight)
                 {
                     base.ImageViewer.CursorTool = CursorTool.AngularHighlight;
                 }
@@ -64,6 +65,23 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.AllowHighlightStatusChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        void HandleAllowHighlightStatusChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                SetMenuItemState();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30230", ex);
+            }
+        }
+
         #endregion
 
         #region AngularHighlightToolStripMenuItem Methods
@@ -77,6 +95,55 @@ namespace Extract.Imaging.Forms
         {
             return base.ImageViewer == null ? null :
                 base.ImageViewer.Shortcuts.GetKeys(base.ImageViewer.SelectAngularHighlightTool);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="ToolStripItem.Enabled"/> and <see cref="ToolStripMenuItem.Checked"/> 
+        /// properties depending on the state of the associated image viewer control.
+        /// </summary>
+        protected override void SetMenuItemState()
+        {
+            base.SetMenuItemState();
+            Enabled = Enabled && ImageViewer.AllowHighlight;
+        }
+
+        /// <summary>
+        /// Gets or sets the image viewer with which to establish a connection.
+        /// </summary>
+        /// <value>The image viewer with which to establish a connection. <see langword="null"/> 
+        /// indicates the connection should be disconnected from the current image viewer.</value>
+        /// <returns>The image viewer with which a connection is established. 
+        /// <see langword="null"/> if no image viewer is connected.</returns>
+        /// <seealso cref="IImageViewerControl"/>
+        public override ImageViewer ImageViewer
+        {
+            get
+            {
+                return base.ImageViewer;
+            }
+            set
+            {
+                try
+                {
+                    if (base.ImageViewer != null)
+                    {
+                        base.ImageViewer.AllowHighlightStatusChanged -=
+                            HandleAllowHighlightStatusChanged;
+                    }
+
+                    base.ImageViewer = value;
+
+                    if (base.ImageViewer != null)
+                    {
+                        base.ImageViewer.AllowHighlightStatusChanged +=
+                            HandleAllowHighlightStatusChanged;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI30229", ex);
+                }
+            }
         }
 
         #endregion AngularHighlightToolStripMenuItem Methods

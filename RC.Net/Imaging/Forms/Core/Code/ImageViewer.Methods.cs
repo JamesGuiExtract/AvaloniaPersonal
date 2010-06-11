@@ -2360,6 +2360,7 @@ namespace Extract.Imaging.Forms
                 case CursorTool.RectangularRedaction:
                 case CursorTool.SetHighlightHeight:
                 case CursorTool.ZoomWindow:
+                case CursorTool.ExtractImage:
 
                     // Begin interactive region tracking
                     _trackingData = new TrackingData(this, mouseX, mouseY, GetVisibleImageArea());
@@ -2675,6 +2676,7 @@ namespace Extract.Imaging.Forms
                     break;
 
                 case CursorTool.DeleteLayerObjects:
+                case CursorTool.ExtractImage:
 
                     // Erase the previous frame if it exists
                     Rectangle rectangle = _trackingData.Rectangle;
@@ -2860,6 +2862,10 @@ namespace Extract.Imaging.Forms
                     case CursorTool.SetHighlightHeight:
 
                         EndSetHighlightHeight(mouseX, mouseY, cancel);
+                        break;
+
+                    case CursorTool.ExtractImage:
+                        EndExtractImageRegion(mouseX, mouseY, cancel);
                         break;
 
                     default:
@@ -3767,6 +3773,31 @@ namespace Extract.Imaging.Forms
 
             // Restore the last continuous use cursor tool
             CursorTool = _lastContinuousUseTool;
+        }
+
+        /// <summary>
+        /// Ends the tracking of the extract image interactive event.
+        /// </summary>
+        /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
+        /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
+        /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
+        /// <see langword="false"/> if the event is to be completed.</param>
+        void EndExtractImageRegion(int mouseX, int mouseY, bool cancel)
+        {
+            // If the event was not canceled process the end of the tracking
+            if (!cancel)
+            {
+                // Calculate the new region and rectangle
+                _trackingData.UpdateRectangularRegion(mouseX, mouseY);
+                Rectangle region = GetTransformedRectangle(_trackingData.Rectangle, true);
+
+                // Extract the sub image
+                using (RasterImage image = base.Image.Clone(region))
+                {
+                    // Raise the image extracted event
+                    OnImageExtracted(new ImageExtractedEventArgs(image));
+                }
+            }
         }
 
         /// <summary>
@@ -4733,7 +4764,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                if (base.Image != null)
+                if (base.Image != null && _allowHighlight)
                 {
                     // If the current tool is a highlight tool, toggle it
                     if (_cursorTool == CursorTool.RectangularHighlight)

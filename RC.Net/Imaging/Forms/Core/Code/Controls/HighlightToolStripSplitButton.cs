@@ -151,7 +151,8 @@ namespace Extract.Imaging.Forms
         /// </summary>
         private void SetEnabledState()
         {
-            base.Enabled = _imageViewer != null && _imageViewer.IsImageAvailable;
+            base.Enabled = _imageViewer != null && _imageViewer.IsImageAvailable
+                && _imageViewer.AllowHighlight;
         }
 
         /// <summary>
@@ -205,7 +206,9 @@ namespace Extract.Imaging.Forms
                 // Ensure the drop down gets hidden [DotNetRCAndUtils #49]
                 base.HideDropDown();
 
-                if (_imageViewer != null)
+                // Only allow setting the tool if there is an image viewer
+                // and it allows highlights
+                if (_imageViewer != null && _imageViewer.AllowHighlight)
                 {
                     _imageViewer.CursorTool = _highlightTool;
                 }
@@ -343,6 +346,23 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.AllowHighlightStatusChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        void HandleAllowHighlightStatusChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                SetEnabledState();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30225", ex);
+            }
+        }
+
         #endregion
 
         #region IImageViewerControl Members
@@ -371,6 +391,7 @@ namespace Extract.Imaging.Forms
                         _imageViewer.ImageFileChanged -= HandleImageChanged;
                         _imageViewer.CursorToolChanged -= HandleCursorToolChanged;
                         _imageViewer.Shortcuts.ShortcutKeyChanged -= HandleShortcutKeyChanged;
+                        _imageViewer.AllowHighlightStatusChanged -= HandleAllowHighlightStatusChanged;
                     }
 
                     // Store the new image viewer internally
@@ -382,6 +403,7 @@ namespace Extract.Imaging.Forms
                         _imageViewer.ImageFileChanged += HandleImageChanged;
                         _imageViewer.CursorToolChanged += HandleCursorToolChanged;
                         _imageViewer.Shortcuts.ShortcutKeyChanged += HandleShortcutKeyChanged;
+                        _imageViewer.AllowHighlightStatusChanged += HandleAllowHighlightStatusChanged;
                     }
 
                     // Set the button state

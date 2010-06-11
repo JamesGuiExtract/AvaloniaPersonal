@@ -41,6 +41,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         string _baseToolTipText;
 
+        /// <summary>
+        /// Flag that allows child classes to disallow the cursor tool change
+        /// in the <see cref="Control.Click"/> handler.
+        /// </summary>
+        bool _allowCursorToolChangeOnClick = true;
 
         #endregion
 
@@ -141,7 +146,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                if (_imageViewer != null && _imageViewer.IsImageAvailable)
+                if (_allowCursorToolChangeOnClick
+                    && _imageViewer != null && _imageViewer.IsImageAvailable)
                 {
                     _imageViewer.CursorTool = _cursorTool;
                 }
@@ -286,6 +292,23 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Gets/sets whether cursor tool changes are allowed when the OnClick is handled.
+        /// </summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        protected bool AllowCursorToolChangeOnClick
+        {
+            get
+            {
+                return _allowCursorToolChangeOnClick;
+            }
+            set
+            {
+                _allowCursorToolChangeOnClick = value;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -297,7 +320,7 @@ namespace Extract.Imaging.Forms
         /// <param name="updateEnabledStatus"><see langword="true"/> to update the enabled status
         /// of the button based on whether an image is open; <see langword="false"/> to update only
         /// the checked state of the button.</param>
-        void SetButtonState(bool updateEnabledStatus)
+        protected virtual void SetButtonState(bool updateEnabledStatus)
         {
             // Check whether an image is open on an associated image viewer control.
             bool imageIsOpen = _imageViewer != null && _imageViewer.IsImageAvailable;
@@ -355,7 +378,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer with which a connection is established. 
         /// <see langword="null"/> if no image viewer is connected.</returns>
         /// <seealso cref="IImageViewerControl"/>
-        public ImageViewer ImageViewer
+        public virtual ImageViewer ImageViewer
         {
             get
             {

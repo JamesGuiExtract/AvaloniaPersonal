@@ -67,6 +67,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 bool reuseAlreadyOpenImageViewer = false;
                 bool showSearchWindow = false;
                 bool formatOcrTextAsXml = false;
+                bool resetToolStrips = false;
                 for (int i=0; i < args.Length; i++)
                 {
                     string argument = args[i];
@@ -163,6 +164,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         ShowControlIdHelp();
                         return;
                     }
+                    else if (argument.Equals("/reset", StringComparison.OrdinalIgnoreCase))
+                    {
+                        resetToolStrips = true;
+                    }
                     else if (argument.StartsWith("/", StringComparison.OrdinalIgnoreCase))
                     {
                         ShowUsage("Unrecognized command line option: " + argument);
@@ -207,7 +212,8 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                 // Run the image viewer, opening the image file if specified
                 Application.Run(new ExtractImageViewerForm(fileToOpen, ocrTextFile,
-                    sendOcrToClipboard, showSearchWindow, scriptFile, formatOcrTextAsXml));
+                    sendOcrToClipboard, showSearchWindow, scriptFile, formatOcrTextAsXml,
+                    resetToolStrips));
             }
             catch (Exception ex)
             {
@@ -267,6 +273,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             usage.AppendLine("    /e <scriptfile> - Execute script commands specified in <scriptfile>");
             usage.AppendLine("    /script? - Displays help for script commands");
             usage.AppendLine("    /ctrlid? - Lists the toolbar control ID numbers");
+            usage.AppendLine("    /reset - Resets the toolstrips to their default locations.");
             usage.AppendLine();
             usage.AppendLine("<filename> - The image file to open");
 

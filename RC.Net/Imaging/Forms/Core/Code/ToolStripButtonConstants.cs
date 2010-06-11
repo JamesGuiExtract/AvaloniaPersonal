@@ -212,6 +212,30 @@ namespace Extract.Imaging.Forms
         public const string _ZOOM_WINDOW_BUTTON_TOOL_TIP =
             "Zoom window";
 
+        /// <summary>
+        /// Constant string for the extract image button image
+        /// </summary>
+        public const string _EXTRACT_IMAGE_BUTTON_IMAGE =
+            "Resources.ExtractImageButton.png";
+
+        /// <summary>
+        /// Constant string for a small version of the extract image button image
+        /// </summary>
+        public const string _EXTRACT_IMAGE_BUTTON_IMAGE_SMALL =
+            "Resources.ExtractImageButtonSmall.png";
+
+        /// <summary>
+        /// Constant string for the extract image button text.
+        /// </summary>
+        public const string _EXTRACT_IMAGE_BUTTON_TEXT =
+            "Extract image";
+
+        /// <summary>
+        /// Constant string for the extract image button tool tip text.
+        /// </summary>
+        public const string _EXTRACT_IMAGE_BUTTON_TOOL_TIP =
+            "Extract image";
+
         #endregion
 
         #region Commands

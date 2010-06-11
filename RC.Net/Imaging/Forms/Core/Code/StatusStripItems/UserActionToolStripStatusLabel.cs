@@ -147,6 +147,10 @@ namespace Extract.Imaging.Forms
                         base.Text = "Click and drag to zoom in on a region.";
                         break;
 
+                    case CursorTool.ExtractImage:
+                        base.Text = "Click and drag to extract a subimage.";
+                        break;
+
                     case CursorTool.None:
                         base.Text = "";
                         break;

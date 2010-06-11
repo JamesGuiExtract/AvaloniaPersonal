@@ -96,7 +96,8 @@ namespace Extract.Imaging.Forms
         /// </summary>
         private void SetMenuItemState()
         {
-            base.Enabled = _imageViewer != null && _imageViewer.IsImageAvailable;
+            base.Enabled = _imageViewer != null && _imageViewer.IsImageAvailable
+                && _imageViewer.AllowHighlight;
             base.Checked = _imageViewer != null &&
                 (_imageViewer.CursorTool == CursorTool.AngularHighlight ||
                 _imageViewer.CursorTool == CursorTool.RectangularHighlight);
@@ -135,7 +136,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                if (_imageViewer != null)
+                if (_imageViewer != null && _imageViewer.AllowHighlight)
                 {
                     // If the current cursor tool is one of the highlight tools, set
                     // the _cursorTool value to the opposite tool
@@ -233,6 +234,23 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.AllowHighlightStatusChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        void HandleAllowHighlightStatusChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                SetMenuItemState();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30233", ex);
+            }
+        }
+
         #endregion
 
         #region IImageViewerControl Members
@@ -261,6 +279,7 @@ namespace Extract.Imaging.Forms
                         _imageViewer.ImageFileChanged -= HandleImageChanged;
                         _imageViewer.CursorToolChanged -= HandleCursorToolChanged;
                         _imageViewer.Shortcuts.ShortcutKeyChanged -= HandleShortcutKeyChanged;
+                        _imageViewer.AllowHighlightStatusChanged -= HandleAllowHighlightStatusChanged;
                     }
 
                     // Store the new image viewer internally
@@ -272,6 +291,7 @@ namespace Extract.Imaging.Forms
                         _imageViewer.ImageFileChanged += HandleImageChanged;
                         _imageViewer.CursorToolChanged += HandleCursorToolChanged;
                         _imageViewer.Shortcuts.ShortcutKeyChanged += HandleShortcutKeyChanged;
+                        _imageViewer.AllowHighlightStatusChanged += HandleAllowHighlightStatusChanged;
                     }
 
                     // Set the menu item state

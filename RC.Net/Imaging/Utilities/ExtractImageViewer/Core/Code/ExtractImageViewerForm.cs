@@ -129,6 +129,17 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         bool _formatOcrResultAsXml;
 
         /// <summary>
+        /// Whether toolstrips should be "reset" (not be loaded from their persisted state)
+        /// when the image viewer loads.
+        /// </summary>
+        bool _resetToolStrips;
+
+        /// <summary>
+        /// Whether this control is being used as a sub image handler or not.
+        /// </summary>
+        bool _subImageHandler;
+
+        /// <summary>
         /// Collection of temporary highlights.
         /// </summary>
         List<LayerObject> _tempHighlights = new List<LayerObject>();
@@ -176,7 +187,18 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// Initializes a new instance of the <see cref="ExtractImageViewerForm"/> class.
         /// </summary>
         public ExtractImageViewerForm()
-            : this(null, null, false, false, null, false)
+            : this(null, null, false, false, null, false, false, false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExtractImageViewerForm"/> class.
+        /// </summary>
+        /// <param name="subImageHandler">If <see langword="true"/> then
+        /// this form is being used as a subimage viewer and thus should not instantiate
+        /// the <see cref="RemoteMessageHandler"/> necessary for .Net remoting calls.</param>
+        public ExtractImageViewerForm(bool subImageHandler)
+            :this(null, null, false, false, null, false, false, subImageHandler)
         {
         }
 
@@ -185,7 +207,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// </summary>
         /// <param name="scriptFile">The name of the script file to open.</param>
         public ExtractImageViewerForm(string scriptFile)
-            : this(null, null, false, false, scriptFile, false)
+            : this(null, null, false, false, scriptFile, false, false, false)
         {
         }
 
@@ -215,9 +237,52 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// a text file. If <see langword="true"/> then either
         /// <paramref name="sendOcrTextToClipboard"/> must also be <see langword="true"/>
         /// or ocrTextFile must be specified.</param>
+        /// <param name="resetToolStrips">If <see langword="true"/> then toolstrips will
+        /// be restored to the default locations rather than being loaded from their persisted
+        /// state.</param>
         public ExtractImageViewerForm(string fileName, string ocrTextFile,
             bool sendOcrTextToClipboard, bool openImageSearchForm, string scriptFile,
-            bool formatOcrResultAsXml)
+            bool formatOcrResultAsXml, bool resetToolStrips)
+            : this(fileName, ocrTextFile, sendOcrTextToClipboard, openImageSearchForm,
+            scriptFile, formatOcrResultAsXml, resetToolStrips, false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExtractImageViewerForm"/> class opened 
+        /// with the specified image file.
+        /// <para><b>Note:</b></para>
+        /// OCR results by default will be sent to a message box.  If
+        /// <paramref name="sendOcrTextToClipboard"/> is <see langword="true"/> AND/OR
+        /// <paramref name="ocrTextFile"/> is not <see langword="null"/> then
+        /// text will not be sent to a message box.
+        /// </summary>
+        /// <param name="fileName">The image file to open. <see langword="null"/> if no image file 
+        /// should be opened.</param>
+        /// <param name="ocrTextFile">If not <see langword="null"/> then when text is
+        /// highlighted and OCR is performed, the results will be sent to the specified
+        /// text file, otherwise the results will be sent to a message box.</param>
+        /// <param name="sendOcrTextToClipboard">If not <see langword="true"/> then OCR
+        /// results will be copied into the clipboard, if <see langword="false"/> then
+        /// OCR results will be displayed in a message box.</param>
+        /// <param name="openImageSearchForm">If <see langword="true"/> then the
+        /// <see cref="ImageSearchForm"/> will be displayed when the form is loaded.</param>
+        /// <param name="scriptFile">If not <see langword="null"/> then the file will
+        /// be read and the script commands will be processed.</param>
+        /// <param name="formatOcrResultAsXml">If <see langword="true"/> then OCRed text will
+        /// be formatted as XML before being copied to the clipboard or output to
+        /// a text file. If <see langword="true"/> then either
+        /// <paramref name="sendOcrTextToClipboard"/> must also be <see langword="true"/>
+        /// or ocrTextFile must be specified.</param>
+        /// <param name="resetToolStrips">If <see langword="true"/> then toolstrips will
+        /// be restored to the default locations rather than being loaded from their persisted
+        /// state.</param>
+        /// <param name="subImageHandler">If <see langword="true"/> then
+        /// this form is being used as a subimage viewer and thus should not instantiate
+        /// the <see cref="RemoteMessageHandler"/> necessary for .Net remoting calls.</param>
+        private ExtractImageViewerForm(string fileName, string ocrTextFile,
+            bool sendOcrTextToClipboard, bool openImageSearchForm, string scriptFile,
+            bool formatOcrResultAsXml, bool resetToolStrips, bool subImageHandler)
         {
             try
             {
@@ -236,11 +301,15 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                 InitializeComponent();
 
-                // Initialize the remoting objects
-                _remoteHandler = new RemoteMessageHandler(this);
-                _ipcChannel = new IpcChannel(
-                    BuildExtractImageViewerUri(SystemMethods.GetCurrentProcessId()));
-                ChannelServices.RegisterChannel(_ipcChannel, true);
+                _subImageHandler = subImageHandler;
+                if (!subImageHandler)
+                {
+                    // Initialize the remoting objects
+                    _remoteHandler = new RemoteMessageHandler(this);
+                    _ipcChannel = new IpcChannel(
+                        BuildExtractImageViewerUri(SystemMethods.GetCurrentProcessId()));
+                    ChannelServices.RegisterChannel(_ipcChannel, true);
+                }
 
                 // Set whether the image search form should be opened
                 _openImageSearchForm = openImageSearchForm;
@@ -249,6 +318,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 _ocrTextFile = ocrTextFile;
                 _sendOcrTextToClipboard = sendOcrTextToClipboard;
                 _formatOcrResultAsXml = formatOcrResultAsXml;
+                _resetToolStrips = resetToolStrips;
 
                 // Set whether or not OCR text should be sent to the message box
                 _sendOcrToMessageBox =
@@ -261,6 +331,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 // Add the event handler for layer objects being added and deleted
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
                 _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
+                _imageViewer.ImageExtracted += HandleImageViewerImageExtracted;
 
                 // Store the initial image file and script file names
                 _initialImageFile = fileName;
@@ -298,6 +369,32 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     LoadState();
                 }
 
+                // Remove the thumbnail viewer button and the thumbnail window
+                if (_subImageHandler)
+                {
+                    // Dispose of the thumbnail controls
+                    Controls.Remove(_thumbnailDockableWindow);
+                    _thumbnailDockableWindow.Dispose();
+                    _thumbnailDockableWindow = null;
+                    _basicTools.Items.Remove(_thumbnailsToolStripButton);
+                    _thumbnailsToolStripButton.Dispose();
+                    _thumbnailsToolStripButton = null;
+
+                    // Hide the navigation tools (they make no sense since the image is 1 page)
+                    _navigationTools.Visible = false;
+
+                    // Remove toolstrip separators after removing the thumbnails button.
+                    FormsMethods.HideUnnecessaryToolStripSeparators(
+                        _toolStripContainer.TopToolStripPanel.Controls);
+                    FormsMethods.HideUnnecessaryToolStripSeparators(
+                        _toolStripContainer.BottomToolStripPanel.Controls);
+                }
+                else
+                {
+                    // Set the dockable window that the thumbnail toolstrip button controls
+                    _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
+                }
+
                 // Disable selection, select all, next layer object, and previous layer
                 // object short cut keys
                 _imageViewer.Shortcuts[Keys.Escape] = null;
@@ -309,9 +406,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                 // Add shortcut handler for Delete objects button
                 _imageViewer.Shortcuts[Keys.D] = _imageViewer.SelectDeleteLayerObjectsTool;
-
-                // Set the dockable window that the thumbnail toolstrip button controls
-                _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
 
                 if (_openImageSearchForm)
                 {
@@ -344,8 +438,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         {
             try
             {
-                // If not design time, save the extract image viewer state
-                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                // If not design time and not a subimage viewer,
+                // save the extract image viewer state
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime
+                    && !_subImageHandler)
                 {
                     SaveState();
                 }
@@ -592,6 +688,34 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             catch (Exception ex)
             {
                 ExtractException.Display("ELI30182", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageExtracted"/> event.
+        /// </summary>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        void HandleImageViewerImageExtracted(object sender, ImageExtractedEventArgs e)
+        {
+            try
+            {
+                // Create the sub image windows
+                ExtractImageViewerForm subImage = new ExtractImageViewerForm(true);
+
+                StringBuilder sb = new StringBuilder(ImageViewer.ImageFile);
+                if (!ImageViewer.ImageFile.EndsWith(" - Portion"))
+                {
+                    sb.Append(" - Portion");
+                }
+                // Show the form and open the subimage in it
+                subImage.Show(this);
+                subImage.ImageViewer.DisplayRasterImage(e.GetExtractedImage(),
+                    sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30220", ex);
             }
         }
 
@@ -1238,17 +1362,34 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 // Load memento if it exists
                 if (File.Exists(_FORM_PERSISTENCE_FILE))
                 {
-                    // Load the XML
-                    XmlDocument document = new XmlDocument();
-                    document.Load(_FORM_PERSISTENCE_FILE);
+                    // Only restore the form to its last location if it is not a subimage handler
+                    if (!_subImageHandler)
+                    {
+                        // Load the XML
+                        XmlDocument document = new XmlDocument();
+                        document.Load(_FORM_PERSISTENCE_FILE);
 
-                    // Convert the XML to the memento
-                    XmlElement element = (XmlElement)document.FirstChild;
-                    FormMemento memento = FormMemento.FromXmlElement(element);
+                        // Convert the XML to the memento
+                        XmlElement element = (XmlElement)document.FirstChild;
+                        FormMemento memento = FormMemento.FromXmlElement(element);
 
-                    // Restore the saved state
-                    memento.Restore(this);
-                    FormsMethods.ToolStripManagerLoadHelper(_toolStripContainer);
+                        // Restore the saved state
+                        memento.Restore(this);
+                    }
+                    else
+                    {
+                        // Subimage handler, start in center of parent
+                        if (Owner != null)
+                        {
+                            StartPosition = FormStartPosition.Manual;
+                            FormsMethods.CenterFormInForm(this, Owner);
+                        }
+                    }
+
+                    if (!_resetToolStrips)
+                    {
+                        FormsMethods.ToolStripManagerLoadHelper(_toolStripContainer);
+                    }
                     _sandDockManager.LoadLayout();
                 }
             }
