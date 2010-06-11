@@ -137,10 +137,10 @@ namespace Extract.FileActionManager.RunFPSFile
                          nextException != null;
                          nextException = nextException.InnerException as ExtractException)
                     {
-                        if (nextException.EliCode == "ELI14775" ||
-                            nextException.EliCode == "ELI14973" ||
-                            nextException.EliCode == "ELI27530" ||
-                            nextException.EliCode == "ELI29796")
+                        if (nextException.EliCode.EndsWith("14775", StringComparison.Ordinal) ||
+                            nextException.EliCode.EndsWith("14973", StringComparison.Ordinal) ||
+                            nextException.EliCode.EndsWith("27530", StringComparison.Ordinal) ||
+                            nextException.EliCode.EndsWith("29796", StringComparison.Ordinal))
                         {
                             // If so, database access was attempted but is not allowed. Create a new
                             // outer exception that better states the problem.

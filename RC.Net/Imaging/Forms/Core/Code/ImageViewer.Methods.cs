@@ -3787,15 +3787,21 @@ namespace Extract.Imaging.Forms
             // If the event was not canceled process the end of the tracking
             if (!cancel)
             {
-                // Calculate the new region and rectangle
+                // Update the rectangle
                 _trackingData.UpdateRectangularRegion(mouseX, mouseY);
-                Rectangle region = GetTransformedRectangle(_trackingData.Rectangle, true);
 
-                // Extract the sub image
-                using (RasterImage image = base.Image.Clone(region))
+                // Do nothing if the rectangle is empty
+                if (!_trackingData.Rectangle.IsEmpty)
                 {
-                    // Raise the image extracted event
-                    OnImageExtracted(new ImageExtractedEventArgs(image));
+                    // Transform the rectangle to image coordinates
+                    Rectangle region = GetTransformedRectangle(_trackingData.Rectangle, true);
+
+                    // Extract the sub image
+                    using (RasterImage image = base.Image.Clone(region))
+                    {
+                        // Raise the image extracted event
+                        OnImageExtracted(new ImageExtractedEventArgs(image));
+                    }
                 }
             }
         }
