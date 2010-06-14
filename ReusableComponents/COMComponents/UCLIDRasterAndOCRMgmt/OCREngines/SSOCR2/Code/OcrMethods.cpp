@@ -11,7 +11,7 @@ void loadPageFromImageHandle(const string& strImage, HIMGFILE hImage, int iPageI
 		rc != IMF_COMP_WARN)
 	{
 		// Determine whether this page was able to be loaded despite errors in the document
-		bool bFail = phPage == NULL;
+		bool bFail = phPage == NULL || *phPage == NULL; 
 
 		// Create a scary or friendly exception based on whether page was loaded
 		string strEli; 

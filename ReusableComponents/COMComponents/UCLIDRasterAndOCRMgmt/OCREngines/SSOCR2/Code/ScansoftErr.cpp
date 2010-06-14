@@ -83,6 +83,7 @@ void addPageSizeDebugInfo(UCLIDException& ue, HIMGFILE hImgFile, int iPageIndex)
 		ue2.log();
 	}
 
-	ue.addDebugInfo("X,Y Limits", "8400 x 8400 pixels");
+	ue.addDebugInfo("X,Y Max Limits", "8400 x 8400 pixels");
+	ue.addDebugInfo("X,Y Min Limits", "16 x 16 pixels");
 }
 

@@ -409,6 +409,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         bool _allowHighlight = true;
 
+        /// <summary>
+        /// Specifies what the minimum highlight height is for angular highlights.
+        /// Note: This cannot be set less than the LayerObject.MinSize.Height
+        /// </summary>
+        int _minimumAngularHighlightHeight = LayerObject.MinSize.Height;
+
         #endregion Fields
 
         #region Image Viewer Events
@@ -1837,6 +1843,25 @@ namespace Extract.Imaging.Forms
 
                 // Raise the Highlight status changed event
                 OnAllowHighlightStatusChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets the minimum height for an angular highlight.
+        /// <para><b>Note:</b></para>
+        /// Cannot be less than LayerObject.MinSize.Height.
+        /// </summary>
+        /// <value>The minimum height for an angular highlight.</value>
+        /// <returns>The minimum height for an angular highlight.</returns>
+        public int MinimumAngularHighlightHeight
+        {
+            get
+            {
+                return _minimumAngularHighlightHeight;
+            }
+            set
+            {
+                _minimumAngularHighlightHeight = Math.Max(LayerObject.MinSize.Height, value);
             }
         }
 

@@ -4252,16 +4252,21 @@ namespace Extract.Imaging.Forms
                     increaseHeight ? _MOUSEWHEEL_HEIGHT_INCREMENT : -_MOUSEWHEEL_HEIGHT_INCREMENT;
 
                 // Enforce a minimum highlight height
-                if (_defaultHighlightHeight < LayerObject.MinSize.Height)
+                if (_defaultHighlightHeight < MinimumAngularHighlightHeight)
                 {
-                    _defaultHighlightHeight = LayerObject.MinSize.Height;
+                    _defaultHighlightHeight = MinimumAngularHighlightHeight;
                 }
 
+                double scaleFactor = GetScaleFactorY(_transform);
+
                 // Convert the highlight height to physical (client) coordinates
-                int height = (int)(_defaultHighlightHeight * GetScaleFactorY(_transform) + 0.5);
+                int height = (int)(_defaultHighlightHeight * scaleFactor + 0.5);
+
+                // Convert the minimum height to physical coordinates
+                int minHeight = (int)(MinimumAngularHighlightHeight * scaleFactor + 0.5);
 
                 // Update the tracking data (ensure the height is at least the minimum)
-                _trackingData.Height = Math.Max(height, LayerObject.MinSize.Height);
+                _trackingData.Height = Math.Max(height, minHeight);
                 UpdateTracking(mouseX, mouseY);
             }
         }
