@@ -707,6 +707,35 @@ namespace Extract.Imaging.Forms.Test
 
             Assert.That(failedCount == 0);
         }
+
+
+        /// <summary>
+        /// Tests whether the <see cref="ImageViewer"/> will open the associated image
+        /// file when supplied with a uss file.
+        /// </summary>
+        [Test, Category("Automated")]
+        public void Automated_ImageFileOpensIfUssSpecified()
+        {
+            // Get the image viewer from the form
+            ImageViewer imageViewer = FormMethods.GetFormComponent<ImageViewer>(_imageViewerForm);
+
+            // Get the image file name
+            string imageFile = _testImages.GetFile(_TEST_IMAGE_FILE);
+
+            // Get the uss file
+            string ussFile = _testImages.GetFile(_TEST_IMAGE_USS_FILE,
+                imageFile + ".uss");
+
+            // Show the image viewer form
+            _imageViewerForm.Show();
+
+            // Open the uss file
+            imageViewer.OpenImage(ussFile, false);
+
+            // Assert that an image is open
+            Assert.That(imageViewer.IsImageAvailable);
+        }
+
         #endregion OpenImage
 
         #region Rotate

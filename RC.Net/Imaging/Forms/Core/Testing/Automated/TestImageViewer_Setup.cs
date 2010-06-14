@@ -37,6 +37,11 @@ namespace Extract.Imaging.Forms.Test
         private static readonly string _TEST_IMAGE_FILE = "Resources.TestImage.tif";
 
         /// <summary>
+        /// The name of the embedded resource test image uss file.
+        /// </summary>
+        private static readonly string _TEST_IMAGE_USS_FILE = "Resources.TestImage.tif.uss";
+
+        /// <summary>
         /// The name of the embedded resource annotation test image file.
         /// </summary>
         private static readonly string _TEST_ANNOTATION_IMAGE_FILE =

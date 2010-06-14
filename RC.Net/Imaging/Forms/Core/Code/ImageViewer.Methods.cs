@@ -16,6 +16,7 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.Imaging.Forms
 {
@@ -181,6 +182,36 @@ namespace Extract.Imaging.Forms
 
                 // [IDSD:193] Convert to the full path name otherwise OCR will fail
                 fileName = Path.GetFullPath(fileName);
+
+                // Check if this is a USS file
+                // [DNRCAU #478]
+                if (Path.GetExtension(fileName).Equals(".uss", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Attempt to find the image file for the uss file
+                    string tempName = Path.Combine(Path.GetDirectoryName(fileName),
+                        Path.GetFileNameWithoutExtension(fileName));
+                    if (File.Exists(tempName))
+                    {
+                        fileName = tempName;
+                    }
+                    else
+                    {
+                        // Try to get the image file from the USS file
+                        SpatialString spatialString = new SpatialString();
+                        spatialString.LoadFrom(fileName, false);
+                        tempName = spatialString.SourceDocName;
+
+                        if (!File.Exists(tempName))
+                        {
+                            ExtractException ee = new ExtractException("ELI30242",
+                                "Cannot find source image to open.");
+                            ee.AddDebugData("Source Document", tempName, false);
+                            throw ee;
+                        }
+
+                        fileName = tempName;
+                    }
+                }
 
                 // Raise the opening image event
                 OpeningImageEventArgs opening = new OpeningImageEventArgs(fileName, updateMruList);
@@ -3790,8 +3821,11 @@ namespace Extract.Imaging.Forms
                 // Update the rectangle
                 _trackingData.UpdateRectangularRegion(mouseX, mouseY);
 
-                // Do nothing if the rectangle is empty
-                if (!_trackingData.Rectangle.IsEmpty)
+                // Only raise the event if the rectangle is not empty
+                // NOTE: Cannot use the IsEmpty method since a rectangle is
+                // not considered "Empty" if it has a location other than 0,0
+                // even when it has 0 width and height
+                if (_trackingData.Rectangle.Width > 0 && _trackingData.Rectangle.Height > 0)
                 {
                     // Transform the rectangle to image coordinates
                     Rectangle region = GetTransformedRectangle(_trackingData.Rectangle, true);

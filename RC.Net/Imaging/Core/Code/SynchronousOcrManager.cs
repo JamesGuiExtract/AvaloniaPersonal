@@ -6,10 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Globalization;
 using System.IO;
+using System.Text;
+using System.Xml;
 using UCLID_RASTERANDOCRMGMTLib;
 using UCLID_SSOCRLib;
 using UCLID_COMUTILSLib;
+
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 
 namespace Extract.Imaging
 {
@@ -387,6 +392,9 @@ namespace Extract.Imaging
         /// less than the specified angle. For <see cref="RasterZone"/>s at a steeper angle
         /// than specified, the angle of the swipe is taken into account and only the text within
         /// the <see cref="RasterZone"/> itself is OCR'd.</param>
+        /// <param name="formatAsXml">If <see langword="true"/> then the returned text
+        /// will be formatted as an XML string containing each line broken down with zonal
+        /// coordinates and the text, otherwise just returns the OCR'd text.</param>
         /// <param name="bounds">If not <see langword="null"/> and the skew does not
         /// require special handling (less than <paramref name="thresholdAngle"/>
         /// or <paramref name="thresholdAngle"/> is less than 0) then the bounding
@@ -394,13 +402,27 @@ namespace Extract.Imaging
         /// <see cref="Rectangle"/>.</param>
         /// <returns>A <see cref="System.String"/> containing the OCR output.</returns>
         public string GetOcrTextAsString(string fileName, RasterZone rasterZone,
-            double thresholdAngle, Rectangle? bounds)
+            double thresholdAngle, bool formatAsXml, Rectangle? bounds)
         {
             try
             {
                 SpatialString temp = GetOcrText(fileName, rasterZone, thresholdAngle,
                     bounds);
-                return temp != null ? temp.String : string.Empty;
+                if (temp != null)
+                {
+                    if (formatAsXml)
+                    {
+                        return ConvertOcrTextToXmlString(temp);
+                    }
+                    else
+                    {
+                        return temp.String;
+                    }
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
             catch (Exception ex)
             {
@@ -409,6 +431,133 @@ namespace Extract.Imaging
                 ee.AddDebugData("Filename", fileName, false);
                 ee.AddDebugData("Raster Zone", rasterZone.ToString(), false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Converts the OCR result string into an XML formatted string. 
+        /// </summary>
+        /// <param name="spatialString">The string to convert to XML format.</param>
+        /// <returns>An XML string for the ocr result.</returns>
+        static string ConvertOcrTextToXmlString(SpatialString spatialString)
+        {
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                XmlWriterSettings settings = new XmlWriterSettings();
+                settings.Encoding = Encoding.ASCII;
+                settings.Indent = true;
+                settings.OmitXmlDeclaration = true;
+                using (XmlWriter writer = XmlWriter.Create(sb, settings))
+                {
+                    writer.WriteStartElement("OcrResults");
+
+                    // Check for spatial info
+                    if (spatialString.HasSpatialInfo())
+                    {
+                        // Get the full text and average confidence for the whole string
+                        string text = spatialString.String;
+                        int max = 0, min = 0, averageConfidence = 0;
+                        spatialString.GetCharConfidence(ref max, ref min, ref averageConfidence);
+
+                        // Write the full text element
+                        writer.WriteStartElement("FullText");
+                        writer.WriteAttributeString("AverageCharConfidence",
+                            averageConfidence.ToString(CultureInfo.CurrentCulture));
+                        writer.WriteString(text);
+                        writer.WriteEndElement(); // Ends the full text element
+
+                        IIUnknownVector lines = spatialString.GetLines();
+                        int count = lines.Size();
+                        for (int i = 0; i < count; i++)
+                        {
+                            SpatialString line = (SpatialString) lines.At(i);
+
+                            // Only write the spatial lines
+                            if (line.HasSpatialInfo())
+                            {
+                                AddSpatialLineXmlInformation(writer, line);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Non-spatial, just write the full text element
+                        writer.WriteElementString("FullText", spatialString.String);
+                    }
+
+                    writer.WriteEndElement();
+                    writer.Flush();
+                }
+
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30241", ex);
+            }
+        }
+
+        /// <summary>
+        /// Writes the spatial line text, zonal, and bounds information for the
+        /// spatial string line to the specified <see cref="XmlWriter"/>
+        /// </summary>
+        /// <param name="writer">The writer to write the data to.</param>
+        /// <param name="line">The spatial line to write to XML.</param>
+        static void AddSpatialLineXmlInformation(XmlWriter writer, SpatialString line)
+        {
+            try
+            {
+                // Get the page number, text, character confidence, zones, and bounds from the line
+                int pageNumber = line.GetFirstPageNumber();
+                string text = line.String;
+                int max = 0, min = 0, averageConfidence = 0;
+                line.GetCharConfidence(ref max, ref min, ref averageConfidence);
+                IIUnknownVector zones = line.GetOriginalImageRasterZones();
+                LongRectangle rect = line.GetOriginalImageBounds();
+
+                // Get the bounds from the rectangle
+                int top, left, right, bottom;
+                rect.GetBounds(out left, out top, out right, out bottom);
+
+                writer.WriteStartElement("SpatialLine");
+                writer.WriteAttributeString("PageNumber", pageNumber.ToString(CultureInfo.CurrentCulture));
+
+                // Write the line text
+                writer.WriteStartElement("LineText");
+                writer.WriteAttributeString("AverageCharConfidence", averageConfidence.ToString(CultureInfo.CurrentCulture));
+                writer.WriteString(text);
+                writer.WriteEndElement(); // Ends the LineText element
+
+                // Write each zone
+                int count = zones.Size();
+                for (int i = 0; i < count; i++)
+                {
+                    ComRasterZone zone = (ComRasterZone) zones.At(i);
+                    int startX = 0, startY = 0, endX = 0, endY = 0, height = 0, page = 0;
+                    zone.GetData(ref startX, ref startY, ref endX, ref endY, ref height, ref page);
+                    writer.WriteStartElement("SpatialLineZone");
+                    writer.WriteAttributeString("StartX", startX.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("StartY", startY.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("EndX", startX.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("EndY", startY.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("Height", height.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteEndElement(); // Ends the zone element
+                }
+
+                // Write the bounds
+                writer.WriteStartElement("SpatialLineBounds");
+                writer.WriteAttributeString("Top", top.ToString(CultureInfo.CurrentCulture));
+                writer.WriteAttributeString("Left", left.ToString(CultureInfo.CurrentCulture));
+                writer.WriteAttributeString("Bottom", bottom.ToString(CultureInfo.CurrentCulture));
+                writer.WriteAttributeString("Right", right.ToString(CultureInfo.CurrentCulture));
+                writer.WriteEndElement(); // Ends the bounds element
+
+                writer.WriteEndElement(); // Ends the spatial line element
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30240", ex);
             }
         }
 

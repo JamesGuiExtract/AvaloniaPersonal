@@ -538,7 +538,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         // [DNRCAU #468]
                         RasterZone zoneToOcr = highlight.ToRasterZone();
                         string temp = _ocrManager.GetOcrTextAsString(_imageViewer.ImageFile,
-                            zoneToOcr, 0.2,
+                            zoneToOcr, 0.2, _formatOcrResultAsXml && !_sendOcrToMessageBox,
                             new Rectangle(0, 0, _imageViewer.ImageWidth, _imageViewer.ImageHeight));
                             
                         // Store the result back to the highlight
@@ -560,13 +560,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         }
                         else
                         {
-                            // If needed, convert the OCR result to XML text
-                            if (_formatOcrResultAsXml)
-                            {
-                                temp = ConvertOcrTextToXmlString(_imageViewer.ImageFile,
-                                    temp, zoneToOcr);
-                            }
-
                             if (_sendOcrTextToClipboard)
                             {
                                 // Do not paste null OR empty text into clipboard
