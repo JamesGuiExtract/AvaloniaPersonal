@@ -2400,18 +2400,60 @@ namespace Extract.Imaging.Forms
                 // Transform the top left and bottom right points to image coordinates
                 inverseMatrix.TransformPoints(topAndBottom);
 
-                // Compute the height
-                height = topAndBottom[1].Y - topAndBottom[0].Y;
-
-                // Get the y-intersect
-                int yIntersect = topAndBottom[0].Y + height / 2;
-
-                // Compute the start and end points in image coordinates
-                points = new Point[]
+                // Compute height and start & end points based on image rotation.
+                // NOTE: The coordinates that were translated above are in original
+                // non-rotated image coordinates
+                switch (Orientation)
                 {
-                    new Point(topAndBottom[0].X, yIntersect),
-                    new Point(topAndBottom[1].X, yIntersect)
-                };
+                        // If rotated 90 or 270 then compute X intercept and
+                        // height in relation to X coordinates
+                    case 90:
+                    case 270:
+                        {
+                            // Compute the height from the X perspective
+                            height = Math.Abs(topAndBottom[1].X - topAndBottom[0].X);
+
+                            // Get the X intersect
+                            int xIntersect =
+                                Math.Min(topAndBottom[0].X, topAndBottom[1].X) + height / 2;
+                            points = new Point[]
+                            {
+                                new Point(xIntersect, Math.Min(topAndBottom[0].Y, topAndBottom[1].Y)),
+                                new Point(xIntersect, Math.Max(topAndBottom[0].Y, topAndBottom[1].Y))
+                            };
+                        }
+                        break;
+
+                        // If rotated 0 or 180 compute Y intercept and height in relation to
+                        // Y coordinates
+                    case 0:
+                    case 180:
+                        {
+                            // Compute the height from Y perspective
+                            height = Math.Abs(topAndBottom[1].Y - topAndBottom[0].Y);
+
+                            // Get the y intersect
+                            int yIntersect = Math.Min(topAndBottom[0].Y, topAndBottom[1].Y) + height / 2;
+
+                            // Compute the start and end points in image coordinates
+                            points = new Point[]
+                            {
+                                new Point(Math.Min(topAndBottom[0].X, topAndBottom[1].X), yIntersect),
+                                new Point(Math.Max(topAndBottom[0].X, topAndBottom[1].X), yIntersect)
+                            };
+                        }
+                        break;
+
+                    default:
+                        ExtractException.ThrowLogicException("ELI30243");
+
+                        // Dummy code since compiler can't figure out that ThrowLogicException
+                        // throws an exception
+                        points = new Point[] { Point.Empty };
+                        height = 0;
+                        break;
+                }
+
             }
         }
 

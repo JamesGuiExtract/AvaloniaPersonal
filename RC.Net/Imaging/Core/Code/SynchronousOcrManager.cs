@@ -539,8 +539,8 @@ namespace Extract.Imaging
                     writer.WriteStartElement("SpatialLineZone");
                     writer.WriteAttributeString("StartX", startX.ToString(CultureInfo.CurrentCulture));
                     writer.WriteAttributeString("StartY", startY.ToString(CultureInfo.CurrentCulture));
-                    writer.WriteAttributeString("EndX", startX.ToString(CultureInfo.CurrentCulture));
-                    writer.WriteAttributeString("EndY", startY.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("EndX", endX.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("EndY", endY.ToString(CultureInfo.CurrentCulture));
                     writer.WriteAttributeString("Height", height.ToString(CultureInfo.CurrentCulture));
                     writer.WriteEndElement(); // Ends the zone element
                 }

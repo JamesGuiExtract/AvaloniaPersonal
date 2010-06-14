@@ -3815,6 +3815,11 @@ namespace Extract.Imaging.Forms
         /// <see langword="false"/> if the event is to be completed.</param>
         void EndExtractImageRegion(int mouseX, int mouseY, bool cancel)
         {
+            // Erase the previous frame if it exists
+            Rectangle rectangle = _trackingData.Rectangle;
+            ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
+                Color.Black, FrameStyle.Thick);
+
             // If the event was not canceled process the end of the tracking
             if (!cancel)
             {

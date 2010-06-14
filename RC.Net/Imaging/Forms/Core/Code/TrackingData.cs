@@ -1,5 +1,6 @@
 using Extract.Drawing;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -270,8 +271,7 @@ namespace Extract.Imaging.Forms
             int right = x;
             if (_startPoint.X > x)
             {
-                left = x;
-                right = _startPoint.X;
+                UtilityMethods.Swap(ref left, ref right);
             }
 
             // Calculate the y coordinates of the rectangle
@@ -279,8 +279,7 @@ namespace Extract.Imaging.Forms
             int bottom = y;
             if (_startPoint.Y > y)
             {
-                top = y;
-                bottom = _startPoint.Y;
+                UtilityMethods.Swap(ref top, ref bottom);
             }
 
             // Create the new rectangle

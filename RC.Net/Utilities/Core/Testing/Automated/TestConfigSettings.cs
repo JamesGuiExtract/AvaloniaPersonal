@@ -148,7 +148,7 @@ namespace Extract.Utilities.Test
                     for (ExtractException eeNext = ee; eeNext != null;
                             eeNext = eeNext.InnerException as ExtractException)
                     {
-                        if (eeNext.EliCode == "ELI29688")
+                        if (eeNext.EliCode.EndsWith("29688", StringComparison.Ordinal))
                         {
                             exceptionThrown = true;
                             break;
