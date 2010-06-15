@@ -1245,13 +1245,16 @@ namespace Extract.Imaging.Forms
         /// from a larger image.
         /// </summary>
         /// <param name="image">The image to display.</param>
+        /// <param name="orientation">The orientation to set for this image.</param>
         /// <param name="imageFileName">The file name for the image.</param>
-        public void DisplayRasterImage(RasterImage image, string imageFileName)
+        public void DisplayRasterImage(RasterImage image, int orientation, string imageFileName)
         {
             try
             {
                 ExtractException.Assert("ELI30221",
                     "Image must be a single page to use this method.", image.PageCount == 1);
+                ExtractException.Assert("ELI30249", "Orientation must be multiple of 90.",
+                    orientation % 90 == 0, "Orientation", orientation);
 
                 // Raise the opening image event
                 OpeningImageEventArgs opening = new OpeningImageEventArgs(imageFileName, false);
@@ -1301,6 +1304,12 @@ namespace Extract.Imaging.Forms
                         CursorTool = CursorTool.ZoomWindow;
                     }
 
+                    // If the orientation is not 0, rotate the image by the orientation
+                    if (orientation != 0)
+                    {
+                        Rotate(orientation);
+                    }
+
                     // Disable adding highlights
                     AllowHighlight = false;
                 }
@@ -1337,7 +1346,7 @@ namespace Extract.Imaging.Forms
                 image = _reader.ReadPage(pageNumber);
 
                 int rotation = _imagePages[pageNumber - 1].Orientation;
-                RotateImageByDegrees(image, rotation);
+                ImageMethods.RotateImageByDegrees(image, rotation);
             }
             catch (Exception)
             {

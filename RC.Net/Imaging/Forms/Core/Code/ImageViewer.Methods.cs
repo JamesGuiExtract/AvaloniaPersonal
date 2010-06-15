@@ -1587,7 +1587,7 @@ namespace Extract.Imaging.Forms
                 try
                 {
                     // Check if the view perspectives are licensed (ID Annotation feature)
-                    RotateImageByDegrees(base.Image, angle);
+                    ImageMethods.RotateImageByDegrees(base.Image, angle);
                 }
                 catch
                 {
@@ -1611,35 +1611,6 @@ namespace Extract.Imaging.Forms
                 ee.AddDebugData("Rotation", angle, false);
                 ee.AddDebugData("Page number", _pageNumber, false);
                 throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Rotates the specified image by the specified number of degrees.
-        /// </summary>
-        /// <param name="image">The image to rotate.</param>
-        /// <param name="angle">The number of degrees to rotate the image.</param>
-        static void RotateImageByDegrees(RasterImage image, int angle)
-        {
-            if (angle != 0)
-            {
-                bool viewPerspectiveLicensed = !RasterSupport.IsLocked(RasterSupportType.Document);
-
-                // Rotate the image.
-                // It is faster to rotate using the view perspective, so rotate that 
-                // way if it is licensed. Otherwise, use the slower rotate command.
-                if (viewPerspectiveLicensed)
-                {
-                    // Fast rotation
-                    image.RotateViewPerspective(angle % 360);
-                }
-                else
-                {
-                    // Not as fast rotation
-                    RotateCommand rotate = new RotateCommand((angle % 360) * 100,
-                        RotateCommandFlags.Resize, RasterColor.FromGdiPlusColor(Color.White));
-                    rotate.Run(image);
-                }
             }
         }
 
@@ -3835,11 +3806,41 @@ namespace Extract.Imaging.Forms
                     // Transform the rectangle to image coordinates
                     Rectangle region = GetTransformedRectangle(_trackingData.Rectangle, true);
 
-                    // Extract the sub image
-                    using (RasterImage image = base.Image.Clone(region))
+                    // Extract the subimage
+                    RasterImage clone = null;
+                    RasterImage image = null;
+                    try
                     {
+                        clone = base.Image.Clone();
+
+                        // Rotate the image back to original coordinates
+                        // since the region is in original image coordinates
+                        if (Orientation != 0)
+                        {
+                            int degrees = (-1 * Orientation) % 360;
+                            if (degrees < 0)
+                            {
+                                degrees += 360;
+                            }
+
+                            ImageMethods.RotateImageByDegrees(clone, degrees);
+                        }
+
+                        image = ImageMethods.ExtractSubImageFromPage(region, clone);
+
                         // Raise the image extracted event
-                        OnImageExtracted(new ImageExtractedEventArgs(image));
+                        OnImageExtracted(new ImageExtractedEventArgs(image, Orientation));
+                    }
+                    finally
+                    {
+                        if (clone != null)
+                        {
+                            clone.Dispose();
+                        }
+                        if (image != null)
+                        {
+                            image.Dispose();
+                        }
                     }
                 }
             }

@@ -708,7 +708,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 }
                 // Show the form and open the subimage in it
                 subImage.Show(this);
-                subImage.ImageViewer.DisplayRasterImage(e.GetExtractedImage(),
+                subImage.ImageViewer.DisplayRasterImage(e.GetExtractedImage(), e.Orientation,
                     sb.ToString());
             }
             catch (Exception ex)

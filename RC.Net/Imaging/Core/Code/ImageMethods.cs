@@ -160,6 +160,100 @@ namespace Extract.Imaging
         }
 
         /// <summary>
+        /// Rotates the specified image by the specified number of degrees.
+        /// </summary>
+        /// <param name="image">The image to rotate.</param>
+        /// <param name="angle">The number of degrees to rotate the image.</param>
+        public static void RotateImageByDegrees(RasterImage image, int angle)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI30248",
+					_OBJECT_NAME);
+
+                if (angle != 0)
+                {
+                    bool viewPerspectiveLicensed = !RasterSupport.IsLocked(RasterSupportType.Document);
+
+                    // Rotate the image.
+                    // It is faster to rotate using the view perspective, so rotate that 
+                    // way if it is licensed. Otherwise, use the slower rotate command.
+                    if (viewPerspectiveLicensed)
+                    {
+                        // Fast rotation
+                        image.RotateViewPerspective(angle % 360);
+                    }
+                    else
+                    {
+                        // Not as fast rotation
+                        RotateCommand rotate = new RotateCommand((angle % 360) * 100,
+                            RotateCommandFlags.Resize, RasterColor.FromGdiPlusColor(Color.White));
+                        rotate.Run(image);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30244", ex);
+            }
+        }
+
+        /// <summary>
+        /// Extracts a sub image from from the specified <paramref name="page"/>.
+        /// </summary>
+        /// <param name="bounds">The bounds of the sub image to extract.</param>
+        /// <param name="source">The source image to extract the sub image from.</param>
+        /// <returns>A sub image that has been extracted from the <paramref name="page"/>.</returns>
+        public static RasterImage ExtractSubImageFromPage(Rectangle bounds, RasterImage source)
+        {
+            RasterImage subImage = null;
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI30247",
+					_OBJECT_NAME);
+
+                // Clip the bounds within the bounds of the image
+                bounds.Intersect(new Rectangle(new Point(0,0), new Size(source.Width, source.Height)));
+
+                // Source point is the top left of the rotated rectangle
+                Point sourcePoint = bounds.Location;
+                bounds.Location = new Point(0,0);
+
+                // Create the destination image and set matching resolution
+                subImage = new RasterImage(RasterMemoryFlags.Conventional, bounds.Width,
+                    bounds.Height, source.BitsPerPixel, source.Order,
+                    RasterViewPerspective.TopLeft, source.GetPalette(), IntPtr.Zero, 0);
+                subImage.XResolution = source.XResolution;
+                subImage.YResolution = source.YResolution;
+
+                // Initialize the destination image to all white.
+                FillCommand fillCommand = new FillCommand(new RasterColor(Color.White));
+                fillCommand.Run(subImage);
+
+                // Copy the content from the source image into the raster zone image.
+                CombineFastCommand combineCommand = new CombineFastCommand(subImage,
+                    bounds, sourcePoint, CombineFastCommandFlags.SourceCopy);
+                combineCommand.Run(source);
+
+                return subImage;
+            }
+            catch (Exception ex)
+            {
+                // Ensure image is disposed if exception is thrown
+                if (subImage != null)
+                {
+                    subImage.Dispose();
+                }
+                ExtractException ee = new ExtractException("ELI30246",
+                    "Unable to extract image.", ex);
+                ee.AddDebugData("Bounds", bounds, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
         /// Extracts into a separate <see cref="RasterImage"/> the specified <see cref="RasterZone"/>
         /// The extracted image will be oriented with the <see cref="RasterZone"/> so that the start
         /// and end point lie along a horizontal line that bisects the resulting image.
@@ -191,6 +285,7 @@ namespace Extract.Imaging
         public static RasterImage ExtractZoneFromPage(RasterZone zone, RasterImage page, 
             out int orientation, out double skew, out Size offset)
         {
+            RasterImage rasterZoneImage = null;
             try
             {
                 // Validate the license
@@ -226,13 +321,12 @@ namespace Extract.Imaging
                 // important that it is the same size as the bounding rectangle since the raster zone
                 // is centered in the bounding rectangle and we will be rotating the destination 
                 // raster zone about it's center.
-                RasterImage rasterZoneImage = new RasterImage(RasterMemoryFlags.Conventional, 
+                rasterZoneImage = new RasterImage(RasterMemoryFlags.Conventional, 
                     boundingRectangle.Width, boundingRectangle.Height, page.BitsPerPixel, 
                     RasterByteOrder.Rgb, page.ViewPerspective, page.GetPalette(), IntPtr.Zero, 0);
 
                 // Initialize the destination image to all white.
-                FillCommand fillCommand = new FillCommand();
-                fillCommand.Color = new RasterColor(Color.White);
+                FillCommand fillCommand = new FillCommand(new RasterColor(Color.White));
                 fillCommand.Run(rasterZoneImage);
 
                 // Since the bounding rectangle may extend offpage but we can't copy from offpage
@@ -255,7 +349,6 @@ namespace Extract.Imaging
                 // Copy the content from the source image into the raster zone image.
                 CombineFastCommand combineCommand = new CombineFastCommand(rasterZoneImage, 
                     adjustedBoundingRectangle, sourcePoint, CombineFastCommandFlags.SourceCopy);
-                combineCommand.DestinationImage = rasterZoneImage;
                 combineCommand.Run(page);
 
                 // Since the center point of the raster zone's on-page content is at the exact 
@@ -272,9 +365,7 @@ namespace Extract.Imaging
                 // lost from the source image during transfer and rotation, we now need to calculate
                 // how much content to clip from the edges of the raster zone image to leave us
                 // with only the content in the raster zone itself.
-                int finalImageAreaWidth = (int) Math.Sqrt(
-                    Math.Pow(endPoint.X - startPoint.X, 2) + 
-                    Math.Pow(endPoint.Y - startPoint.Y, 2));
+                int finalImageAreaWidth = (int) GeometryMethods.Distance(endPoint, startPoint);
                 int xOffset = (rasterZoneImage.Width - finalImageAreaWidth) / 2;
                 int yOffset = (rasterZoneImage.Height - zone.Height) / 2;
 
@@ -338,8 +429,15 @@ namespace Extract.Imaging
             }
             catch (Exception ex)
             {
+                // Ensure image is disposed if an exception is thrown
+                if (rasterZoneImage != null)
+                {
+                    rasterZoneImage.Dispose();
+                }
+
                 ExtractException ee = new ExtractException("ELI24087",
                     "Failed to extract raster zone image!", ex);
+                ee.AddDebugData("Raster Zone", zone.ToString(), false);
                 throw ee;
             }
         }

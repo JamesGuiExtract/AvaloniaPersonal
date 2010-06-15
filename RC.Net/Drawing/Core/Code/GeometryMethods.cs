@@ -458,8 +458,6 @@ namespace Extract.Drawing
             }
         }
 
-        #endregion GeometryMethods Methods
-
         /// <summary>
         /// Gets the specified angle as an angle between -PI/2 (exclusive) and PI/2 (inclusive)
         /// from horizontal.
@@ -563,5 +561,7 @@ namespace Extract.Drawing
         {
             return (Math.PI * degrees) / 180.0;
         }
+
+        #endregion GeometryMethods Methods
     }
 }

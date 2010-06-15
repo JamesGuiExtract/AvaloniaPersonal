@@ -402,13 +402,21 @@ namespace Extract.Imaging.Forms
         private readonly RasterImage _image;
 
         /// <summary>
+        /// The orientation of the original source image.
+        /// </summary>
+        private readonly int _orientation;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ImageExtractedEventArgs"/>
         /// class.
         /// </summary>
         /// <param name="image">The extracted image that was created.</param>
-        public ImageExtractedEventArgs(RasterImage image)
+        /// <param name="orientation">The orientation of the original image.
+        /// Will always be 0, 90, 180, or 270.</param>
+        public ImageExtractedEventArgs(RasterImage image, int orientation)
         {
             _image = image;
+            _orientation = orientation;
         }
 
         /// <summary>
@@ -424,6 +432,17 @@ namespace Extract.Imaging.Forms
         public RasterImage GetExtractedImage()
         {
             return _image.Clone();
+        }
+
+        /// <summary>
+        /// Gets the orientation that the original image is displayed with.
+        /// </summary>
+        public int Orientation
+        {
+            get
+            {
+                return _orientation;
+            }
         }
     }
 }
