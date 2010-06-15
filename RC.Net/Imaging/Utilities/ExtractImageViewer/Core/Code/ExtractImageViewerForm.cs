@@ -129,10 +129,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         bool _formatOcrResultAsXml;
 
         /// <summary>
-        /// Whether toolstrips should be "reset" (not be loaded from their persisted state)
+        /// Whether the image viewer should be "reset" (not be loaded from persisted state)
         /// when the image viewer loads.
         /// </summary>
-        bool _resetToolStrips;
+        bool _resetLayout;
 
         /// <summary>
         /// Whether this control is being used as a sub image handler or not.
@@ -242,14 +242,14 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// a text file. If <see langword="true"/> then either
         /// <paramref name="sendOcrTextToClipboard"/> must also be <see langword="true"/>
         /// or ocrTextFile must be specified.</param>
-        /// <param name="resetToolStrips">If <see langword="true"/> then toolstrips will
-        /// be restored to the default locations rather than being loaded from their persisted
+        /// <param name="resetLayout">If <see langword="true"/> then the image viewer will
+        /// be restored to the default layout settings rather than loading from the persisted
         /// state.</param>
         public ExtractImageViewerForm(string fileName, string ocrTextFile,
             bool sendOcrTextToClipboard, bool openImageSearchForm, string scriptFile,
-            bool formatOcrResultAsXml, bool resetToolStrips)
+            bool formatOcrResultAsXml, bool resetLayout)
             : this(fileName, ocrTextFile, sendOcrTextToClipboard, openImageSearchForm,
-            scriptFile, formatOcrResultAsXml, resetToolStrips, false)
+            scriptFile, formatOcrResultAsXml, resetLayout, false)
         {
         }
 
@@ -279,15 +279,15 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// a text file. If <see langword="true"/> then either
         /// <paramref name="sendOcrTextToClipboard"/> must also be <see langword="true"/>
         /// or ocrTextFile must be specified.</param>
-        /// <param name="resetToolStrips">If <see langword="true"/> then toolstrips will
-        /// be restored to the default locations rather than being loaded from their persisted
+        /// <param name="resetLayout">If <see langword="true"/> then the image viewer will
+        /// be restored to the default layout settings rather than loading from the persisted
         /// state.</param>
         /// <param name="subImageHandler">If <see langword="true"/> then
         /// this form is being used as a subimage viewer and thus should not instantiate
         /// the <see cref="RemoteMessageHandler"/> necessary for .Net remoting calls.</param>
         private ExtractImageViewerForm(string fileName, string ocrTextFile,
             bool sendOcrTextToClipboard, bool openImageSearchForm, string scriptFile,
-            bool formatOcrResultAsXml, bool resetToolStrips, bool subImageHandler)
+            bool formatOcrResultAsXml, bool resetLayout, bool subImageHandler)
         {
             try
             {
@@ -323,7 +323,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 _ocrTextFile = ocrTextFile;
                 _sendOcrTextToClipboard = sendOcrTextToClipboard;
                 _formatOcrResultAsXml = formatOcrResultAsXml;
-                _resetToolStrips = resetToolStrips;
+                _resetLayout = resetLayout;
 
                 // Set whether or not OCR text should be sent to the message box
                 _sendOcrToMessageBox =
@@ -369,7 +369,8 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 _imageViewer.EstablishConnections(this);
 
                 // If not design time, load the saved state of the extract image viewer
-                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime
+                    && !_resetLayout)
                 {
                     LoadState();
                 }
@@ -1411,10 +1412,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         }
                     }
 
-                    if (!_resetToolStrips)
-                    {
-                        FormsMethods.ToolStripManagerLoadHelper(_toolStripContainer);
-                    }
+                    FormsMethods.ToolStripManagerLoadHelper(_toolStripContainer);
                     _sandDockManager.LoadLayout();
                 }
             }

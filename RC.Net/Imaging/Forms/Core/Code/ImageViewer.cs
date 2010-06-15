@@ -2627,6 +2627,9 @@ namespace Extract.Imaging.Forms
             // Update the anti-aliasing behavior based on registry settings
             // [DNRCAU #422]
             UseAntiAliasing = RegistryManager.UseAntiAliasing;
+
+            // Update the annotation behavior based on registry settings
+            DisplayAnnotations = RegistryManager.DisplayAnnotations;
         }
 
         /// <summary>

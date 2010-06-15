@@ -76,6 +76,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         const string _USE_ANTI_ALIASING_KEY = "AntiAliasing";
 
+        /// <summary>
+        /// The key that contains whether annotations should be displayed or not.
+        /// [DNRCAU #494]
+        /// </summary>
+        const string _DISPLAY_ANNOTATIONS_KEY = "Annotation";
+
         #endregion RegistryManager Keys
 
         #region RegistryManager Values
@@ -166,6 +172,21 @@ namespace Extract.Imaging.Forms
                 string registryValue = (string)_userImageEditSubkey.GetValue(
                     _USE_ANTI_ALIASING_KEY, "1");
 
+                return registryValue == "1";
+            }
+        }
+
+        /// <summary>
+        /// Gets whether or not annotations should be displayed in the Image viewer.
+        /// </summary>
+        /// <returns><see langword="true"/> if annotations should be displayed;
+        /// <see langword="false"/> if annotations should not be displayed.</returns>
+        public static bool DisplayAnnotations
+        {
+            get
+            {
+                string registryValue = (string)_userImageEditSubkey.GetValue(
+                    _DISPLAY_ANNOTATIONS_KEY, "1");
                 return registryValue == "1";
             }
         }
