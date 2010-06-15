@@ -987,6 +987,51 @@
 	   	</LI>
 	</ul>
 <p>
+	<LI><h3>Smart tags</h3>
+	<ul>
+		<li>Confirm that the <b>SmartTags</b> table contains entries.
+		<LI>Open an image.
+		<LI>Select and clear and clear the <b>Comment</b> box in the <b>Selected Order Details</b>
+		section.
+		<LI>Type a <b>period</b> character.
+		<LI>Confirm that a drop-down list appears at the cursor location.
+		<li>Confirm that the initial list contains all of the defined smart tags.
+		<li>Confirm that as characters are typed by the user, the list of available smart 
+		tags automatically adjusts to retain just the tags that begin with the typed text.
+		<li>Confirm that pressing <b>Tab</b> after the smart tags list is provided automatically
+		expands the selected tag into the associated text.
+		<li>Confirm that pressing <b>Enter</b> after the smart tags list is provided automatically
+		expands the selected tag into the associated text.
+		<li>Confirm that after typing the entire tag name the text is automatically expanded into
+		the associated text.
+		<li>Confirm that typing in an undefined smart tag such as <b>.abc123</b> 
+		leaves the text with the unexpanded string.
+		<li>Confirm that backspacing through the unexpanded string eventually provides 
+		a drop-down list once defined tags are again available.
+		<li>Confirm that smart tag text containing $ functions such as <b>$Now()</b> 
+		are properly expanded. (such as .verified).
+		<li>Confirm that the smart tag list will also drop down if a <b>period</b> 
+		character is typed after whitespace.
+		<li>Confirm that the smart tag list will <b>not</b> drop down if a period 
+		character is typed after non-whitespace.
+		<li>Repeat the above steps in a cell in the <b>Comment</b> column of the test
+		component table.
+		<li>Repeat the above steps in the <b>Lab Name</b> text box.
+<p>
+		<li><b>[DataEntry #760]</b> Confirm that the following smart tags are defined in 
+		the LabDE database
+		<ul>
+			<li><b>.verified</b> - Verified by (user) on (current date)
+			<li><b>.test</b> - Please see (test) from (date) for scanned report
+			<li><b>.reviewed</b> - Please see (test) from (date) for scanned 
+			report - Reviewed
+			<li><b>.normal</b> - Normal Lipemia, Normal Icterus, Normal Hemolysis
+			<li><b>.comments</b> - See scan for comments
+			<li><b>.range</b> - See scan for reference range
+			<li><b>.see</b> - See scan for reference range and comments
+		</ul>
+	</ul>
+<p>
 	<li><h3>Uninstall</h3>
 	<ul>
 		<li>Uninstall <b>LabDE</b>.
