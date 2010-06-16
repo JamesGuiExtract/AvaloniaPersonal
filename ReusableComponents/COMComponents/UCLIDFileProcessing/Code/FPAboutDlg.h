@@ -5,6 +5,8 @@
 #include <memory.h>
 #include <IConfigurationSettingsPersistenceMgr.h>
 
+using namespace std;
+
 // FPAboutDlg.h : header file
 //
 
@@ -45,16 +47,19 @@ private:
 	// Variables
 	////////////
 	// Handles Registry items
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;
+	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;
 
 	////////////
 	// Methods
 	////////////
 	// Retrieve the FPM version
-	std::string getFileProcessingManagerVersion();
+	string getFileProcessingManagerVersion();
 
 	// Retrieve the FKB update version
-	std::string getFKBUpdateVersion();
+	string getFKBUpdateVersion();
+
+	string getComponentDataDirectory();
+
 };
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

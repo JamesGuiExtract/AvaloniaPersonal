@@ -19,9 +19,9 @@ static char THIS_FILE[] = __FILE__;
 /////////////
 // Constants
 /////////////
-const std::string gstrSETTINGS_FOLDER = "\\AttributeFinder\\Settings";
-const std::string gstrCOMPONENT_DATA_FOLDER = "ComponentDataFolder";
-const std::string gstrFKBTextFile = "\\FKBVersion.txt";
+const string gstrSETTINGS_FOLDER = "\\AttributeFinder\\Settings";
+const string gstrCOMPONENT_DATA_FOLDER = "ComponentDataFolder";
+const string gstrFKBTextFile = "\\FKBVersion.txt";
 
 //-------------------------------------------------------------------------------------------------
 // CFPAboutDlg dialog
@@ -81,7 +81,7 @@ BOOL CFPAboutDlg::OnInitDialog(void)
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-std::string CFPAboutDlg::getFileProcessingManagerVersion()
+string CFPAboutDlg::getFileProcessingManagerVersion()
 {
 	// Get module path and filename
 	char zFileName[MAX_PATH];
@@ -99,12 +99,12 @@ std::string CFPAboutDlg::getFileProcessingManagerVersion()
 	return strVersion;
 }
 //-------------------------------------------------------------------------------------------------
-std::string CFPAboutDlg::getFKBUpdateVersion()
+string CFPAboutDlg::getFKBUpdateVersion()
 {
-	std::string strFKBVersion = "";
+	string strFKBVersion = "";
 
 	// Get the Component data folder
-	string strComponentDataFolder = ma_pSettingsCfgMgr->getKeyValue(gstrSETTINGS_FOLDER, gstrCOMPONENT_DATA_FOLDER);
+	string strComponentDataFolder = getComponentDataDirectory();
 
 	// Get the complete path to the FKBVersion text file
 	string strFKBVersionFile = strComponentDataFolder + string(gstrFKBTextFile);
@@ -114,7 +114,7 @@ std::string CFPAboutDlg::getFKBUpdateVersion()
 	if (infile.good())
 	{
 		// read the version line
-		std::string strVersionLine;
+		string strVersionLine;
 		getline(infile, strVersionLine);
 
 		// ensure that the version information is in the expected format
@@ -125,20 +125,56 @@ std::string CFPAboutDlg::getFKBUpdateVersion()
 		else
 		{
 			// version file was found, but content is not as excepted
-			UCLIDException ue("ELI15707", "Unexpected FKB version information in FKB version file!");
+			UCLIDException ue("ELI15707", "Unexpected FKB version information in FKB version file.");
 			ue.addDebugInfo("VersionLine", strVersionLine);
 			ue.log();
 
-			return string("ERROR: Unexpected FKB version!");
+			return string("ERROR: Unexpected FKB version.");
 		}
 	}
 	else
 	{
 		// version file not found.  Log exception, and return appropriate message
-		UCLIDException ue("ELI15708", "Unable to detect FKB version!");
+		UCLIDException ue("ELI15708", "Unable to detect FKB version.");
+		ue.addDebugInfo("FKBInfoFile", strFKBVersionFile, true);
 		ue.log();
 
-		return string("ERROR: Unknown FKB version!");
+		return string("ERROR: Unknown FKB version.");
 	}
 }
 //-------------------------------------------------------------------------------------------------
+string CFPAboutDlg::getComponentDataDirectory()
+{
+	try
+	{
+		string strComponentDataDir = "";
+
+		if (ma_pSettingsCfgMgr->keyExists(gstrSETTINGS_FOLDER, gstrCOMPONENT_DATA_FOLDER))
+		{
+			strComponentDataDir = ma_pSettingsCfgMgr->getKeyValue(gstrSETTINGS_FOLDER,
+				gstrCOMPONENT_DATA_FOLDER);
+		}
+
+		// If string is not empty then return the value found from the registry
+		if (!strComponentDataDir.empty())
+		{
+			return strComponentDataDir;
+		}
+
+		// Registry key was not defined or the definition was empty
+		// build default path to ComponentData
+		const string COMPONENT_DATA = "ComponentData";
+		string strThisModulePath = ::getModuleDirectory(_Module.m_hInst);
+
+		// Go up one level
+		int nLastSlash = strThisModulePath.find_last_of("\\");
+		strComponentDataDir = strThisModulePath.substr(0, nLastSlash+1);
+
+		// All modules should be installed in CommonComponents folder, go
+		// up one level and into FlexIndexComponents (parallel to CommonComponents)
+		strComponentDataDir += "FlexIndexComponents\\" + COMPONENT_DATA;
+
+		return strComponentDataDir;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30250");
+}
