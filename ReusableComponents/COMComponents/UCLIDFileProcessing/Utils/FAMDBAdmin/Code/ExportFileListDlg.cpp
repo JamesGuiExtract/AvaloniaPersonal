@@ -185,7 +185,8 @@ void CExportFileListDlg::OnClickedOK()
 		CWaitCursor wait;
 
 		// Build the query from the settings
-		string strQuery = m_settings.buildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUES);
+		string strQuery = m_settings.buildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUES)
+			+ " ORDER BY [FAMFile].[ID]";
 
 		// Call ExportFileList() to export the file list and get a count of exported files
 		long lNumFilesExported = m_ipFAMDB->ExportFileList(strQuery.c_str(), _bstrFileName,
