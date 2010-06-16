@@ -1774,7 +1774,7 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 			try
 			{
 				// make sure there is a valid string
-				ue.createFromString( "ELI12736", strToken );
+				ue.createFromString( "ELI12736", strToken, false );
 
 				// Check that the top text is not just the token passed in
 				// if it is, then this line could not be parsed

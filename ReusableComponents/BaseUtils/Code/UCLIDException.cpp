@@ -273,37 +273,49 @@ UCLIDException::UCLIDException(void)
 	// Default constructor has no data associated with it.
 }
 //-------------------------------------------------------------------------------------------------
-void UCLIDException::createFromString(const string& strELI, const string& strData)
+void UCLIDException::createFromString(const string& strELI, const string& strData,
+									  bool bLogExceptions)
 {
-	INIT_EXCEPTION_AND_TRACING("MLI00035");
 	try
 	{
-		// clear internal data
-		clear();
-
-		// see if the leading characters of the string match the expected
-		// signature
-		string::size_type nOldSignaturePos = strData.find(gstrSTRINGIZED_BYTE_STREAM_OF_SIGNATURE_OLD);
-		string::size_type nSignaturePos = strData.find(gstrSTRINGIZED_BYTE_STREAM_OF_SIGNATURE);
-		_lastCodePos = "40";
-
-		// If a valid signature is not found just set the ELI code and the description.
-		if (nSignaturePos != 0 && nOldSignaturePos != 0)
+		INIT_EXCEPTION_AND_TRACING("MLI00035");
+		try
 		{
-			// strdata does not represent stringized bytestream data of a UCLIDexception object
-			m_strELI = strELI;
-			m_strDescription = strData;
-			return;
+			// clear internal data
+			clear();
+
+			// see if the leading characters of the string match the expected
+			// signature
+			string::size_type nOldSignaturePos = strData.find(gstrSTRINGIZED_BYTE_STREAM_OF_SIGNATURE_OLD);
+			string::size_type nSignaturePos = strData.find(gstrSTRINGIZED_BYTE_STREAM_OF_SIGNATURE);
+			_lastCodePos = "40";
+
+			// If a valid signature is not found just set the ELI code and the description.
+			if (nSignaturePos != 0 && nOldSignaturePos != 0)
+			{
+				// strdata does not represent stringized bytestream data of a UCLIDexception object
+				m_strELI = strELI;
+				m_strDescription = strData;
+				return;
+			}
+			_lastCodePos = "50";
+
+			// Load the exception from the string
+			loadFromString(strData);
+
+			// add the CatchID debug info
+			addDebugInfo("CatchID", strELI);
 		}
-		_lastCodePos = "50";
-
-		// Load the exception from the string
-		loadFromString(strData);
-
-		// add the CatchID debug info
-		addDebugInfo("CatchID", strELI);
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20286");
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20286");
+	catch(UCLIDException& uex)
+	{
+		// Only log exceptions if required
+		if (bLogExceptions)
+		{
+			uex.log();
+		}
+	}
 }
 //-------------------------------------------------------------------------------------------------
 UCLIDException::UCLIDException(const string& strELI, const string& strText)

@@ -200,7 +200,10 @@ public:
 	//			strData.
 	// ARGS:	strData - exception data in a stringized form.  strData could be a simple error
 	//			message or a stringized bytestream representing a complex UCLIDException object.
-	void createFromString(const string& strELI, const string& strData);
+	//			bLogExceptions - if true then any exceptions thrown while creating the exception
+	//				from string will be logged to the exception file.  If false then any
+	//				exceptions thrown while creating the exception will be eaten.
+	void createFromString(const string& strELI, const string& strData, bool bLogExceptions = true);
 	//----------------------------------------------------------------------------------------------		
 	// PURPOSE: To return a stringized bytestream representing this object.
 	// REQUIRE: Nothing.
