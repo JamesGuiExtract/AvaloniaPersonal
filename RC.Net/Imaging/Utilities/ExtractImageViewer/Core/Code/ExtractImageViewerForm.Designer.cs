@@ -188,6 +188,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._imageViewer.FrameColor = System.Drawing.Color.Transparent;
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
             this._imageViewer.MinimumAngularHighlightHeight = 16;
+            this._imageViewer.MinimumSize = new System.Drawing.Size(5, 5);
             this._imageViewer.Name = "_imageViewer";
             this._imageViewer.Size = new System.Drawing.Size(566, 442);
             this._imageViewer.TabIndex = 0;

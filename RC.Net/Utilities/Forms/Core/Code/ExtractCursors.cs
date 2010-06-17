@@ -261,6 +261,17 @@ namespace Extract.Utilities.Forms
         /// <overloads>Creates a cursor object from the specified object(s).</overloads>
         /// <summary>
         /// Creates a cursor object from a stream of bytes.
+        /// <para><b>Note:</b></para>
+        /// The cursor returned from this method contains a handle that was created via
+        /// a P/Invoke call.  This handle is not owned by the cursor and will not be cleaned
+        /// up when the cursor is disposed.  To clean up this handle, copy the
+        /// <see cref="Cursor.Handle"/> value before disposing of the cursor. After
+        /// the cursor is disposed call <see cref="NativeMethods.DestroyCursorHandle"/>
+        /// to clean up the cursor. Alternately you can call 
+        /// <see cref="ExtractCursors.DisposeCursorAndNativeHandle"/> to both dispose of the
+        /// cursor object and clean up the native handle (do not call 
+        /// <see cref="ExtractCursors.DisposeCursorAndNativeHandle"/> unless the cursor
+        /// has been explicitely created by this method.
         /// </summary>
         /// <param name="stream">A stream containing the cursor to load. Cannot be 
         /// <see langword="null"/>.</param>
@@ -291,6 +302,8 @@ namespace Extract.Utilities.Forms
                         throw new ExtractException("ELI21594", "Unable to load cursor handle.",
                             new Win32Exception(Marshal.GetLastWin32Error()));
                     }
+
+
                     Cursor cursor = new Cursor(cursorHandle);
 
                     // Return the new cursor
@@ -305,6 +318,17 @@ namespace Extract.Utilities.Forms
 
         /// <summary>
         /// Creates a cursor object from an embedded resource.
+        /// <para><b>Note:</b></para>
+        /// The cursor returned from this method contains a handle that was created via
+        /// a P/Invoke call.  This handle is not owned by the cursor and will not be cleaned
+        /// up when the cursor is disposed.  To clean up this handle, copy the
+        /// <see cref="Cursor.Handle"/> value before disposing of the cursor. After
+        /// the cursor is disposed call <see cref="NativeMethods.DestroyCursorHandle"/>
+        /// to clean up the cursor. Alternately you can call 
+        /// <see cref="ExtractCursors.DisposeCursorAndNativeHandle"/> to both dispose of the
+        /// cursor object and clean up the native handle (do not call 
+        /// <see cref="ExtractCursors.DisposeCursorAndNativeHandle"/> unless the cursor
+        /// has been explicitely created by this method.
         /// </summary>
         /// <param name="type">The <see cref="Type"/> whose namespace is used to scope the 
         /// cursor resource.</param>
@@ -334,6 +358,42 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Disposes of the specified cursor and also cleans up the native handle
+        /// that underlies the cursor.
+        /// </summary>
+        /// <param name="cursor">The cursor to be disposed of.</param>
+        public static void DisposeCursorAndNativeHandle(Cursor cursor)
+        {
+            try
+            {
+                // Validate license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI30251",
+                    _OBJECT_NAME);
+
+                // Get the handle from the cursor
+                IntPtr handle = cursor.Handle;
+
+                // Check if the cursor owns the handle or not
+                bool ownsHandle = (bool)cursor.GetType().InvokeMember("ownHandle",
+                    BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance, null,
+                    cursor, null);
+
+                // Dispose of the cursor
+                cursor.Dispose();
+
+                // If the handle was not IntPtr.Zero and the cursor
+                // did not own it, then destroy the handle
+                if (handle != IntPtr.Zero && !ownsHandle)
+                {
+                    NativeMethods.DestroyCursorHandle(handle);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30252", ex);
+            }
+        }
         #endregion ExtractCursors Methods
     }
 }

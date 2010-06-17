@@ -63,6 +63,9 @@ namespace Extract.Imaging.Forms
                     _codecs.Dispose();
                     _codecs = null;
                 }
+
+                // Decrement the active form count
+                DecrementFormCount();
             }
             base.Dispose(disposing);
         }

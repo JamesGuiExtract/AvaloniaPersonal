@@ -1,5 +1,6 @@
 using Extract.Drawing;
 using Extract.Licensing;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Leadtools;
 using Leadtools.Annotations;
@@ -5646,6 +5647,44 @@ namespace Extract.Imaging.Forms
         #region Static Methods
 
         /// <summary>
+        /// Increments the active form count and also loads the cursors for the
+        /// <see cref="CursorTool"/> if they have not been loaded yet.
+        /// </summary>
+        static void IncrementFormCount()
+        {
+            lock (_lock)
+            {
+                // Load the cursors if they have not been loaded
+                if (_cursorsForCursorTools == null)
+                {
+                    _cursorsForCursorTools = LoadCursorsForCursorTools();
+                }
+
+                _activeFormCount++;
+            }
+        }
+
+        /// <summary>
+        /// Decrements the active form count and disposes of the cursors for the
+        /// <see cref="CursorTool"/> if there are no active forms left.
+        /// </summary>
+        static void DecrementFormCount()
+        {
+            lock (_lock)
+            {
+                _activeFormCount--;
+
+                // This was the last form, dispose of the cursors
+                if (_activeFormCount == 0)
+                {
+                    // Dispose of the cursors and set the collection to null
+                    CollectionMethods.ClearAndDispose(_cursorsForCursorTools);
+                    _cursorsForCursorTools = null;
+                }
+            }
+        }
+
+        /// <summary>
         /// Initializes the static <see cref="Dictionary{T,T}"/> of <see cref="ImageViewerCursors"/>
         /// member of the <see cref="ImageViewer"/> class.
         /// </summary>
@@ -5733,6 +5772,31 @@ namespace Extract.Imaging.Forms
                 throw new ExtractException("ELI21232", "Unable to initialize cursor objects.",
                     ex);
             }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ImageViewerCursors"/> for the specified <see cref="CursorTool"/>
+        /// </summary>
+        /// <param name="tool">The <see cref="CursorTool"/> to retrieve the cursors for.</param>
+        /// <returns>The cursors for the specified cursor tool.</returns>
+        static ImageViewerCursors GetCursorForTool(CursorTool tool)
+        {
+            // Ensure the cursors have been loaded.
+            if (_cursorsForCursorTools == null)
+            {
+                _cursorsForCursorTools = LoadCursorsForCursorTools();
+            }
+
+            ImageViewerCursors cursor = null;
+            if (!_cursorsForCursorTools.TryGetValue(tool, out cursor))
+            {
+                ExtractException ee = new ExtractException("ELI30256",
+                    "Unable to retrieve cursor for specified tool.");
+                ee.AddDebugData("CursorTool", tool, false);
+                throw ee;
+            }
+
+            return cursor;
         }
 
         /// <summary>

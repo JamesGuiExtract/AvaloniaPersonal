@@ -143,8 +143,17 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Contains the <see cref="ImageViewerCursors"/> for each <see cref="CursorTool"/>.
         /// </summary>
-        static readonly Dictionary<CursorTool, ImageViewerCursors> _cursorsForCursorTools =
-            LoadCursorsForCursorTools();
+        static Dictionary<CursorTool, ImageViewerCursors> _cursorsForCursorTools;
+
+        /// <summary>
+        /// Mutex used to increment the form count
+        /// </summary>
+        static object _lock = new object();
+
+        /// <summary>
+        /// Variable to monitor the form count
+        /// </summary>
+        volatile static int _activeFormCount = 0;
 
         #endregion Static Fields
 
@@ -529,6 +538,9 @@ namespace Extract.Imaging.Forms
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23109",
                     _OBJECT_NAME);
 
+                // Increment the active form count
+                IncrementFormCount();
+
                 // Attempt to unlock PDF support (returns an extract exception if unlocking failed).
                 ExtractException ee = UnlockLeadtools.UnlockPdfSupport(false);
                 if (ee != null)
@@ -700,7 +712,7 @@ namespace Extract.Imaging.Forms
                     _cursorTool = value;
 
                     // Get the cursor values for the current tool
-                    ImageViewerCursors cursors = _cursorsForCursorTools[value];
+                    ImageViewerCursors cursors = GetCursorForTool(value);
 
                     // Set the cursor values for the current tool
                     _toolCursor = cursors.Tool;

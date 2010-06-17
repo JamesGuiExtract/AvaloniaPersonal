@@ -26,6 +26,17 @@ namespace Extract.Utilities.Forms
         public static extern IntPtr LoadCursorFromFile(string lpFileName);
 
         /// <summary>
+        /// Destroys a cursor and frees any memory the cursor occupied. Do not use this
+        /// function to destroy a shared cursor.
+        /// </summary>
+        /// <param name="hCursor">The handle of the cursor to destroy.</param>
+        /// <returns><see langword="true"/> if the function succeeded and
+        /// <see langword="false"/> if it failed.</returns>
+        [DllImport("user32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool DestroyCursor(IntPtr hCursor);
+
+        /// <summary>
         /// Gets the window rectangle associated with the provided window handle.
         /// </summary>
         /// <param name="hWnd">Window handle to get the rectangle for.</param>
@@ -441,6 +452,24 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Destroys the cursor handle and frees the memory occupied by the handle.
+        /// </summary>
+        /// <param name="handle">The cursor handle to destroy.</param>
+        public static void DestroyCursorHandle(IntPtr handle)
+        {
+            try
+            {
+                if (!DestroyCursor(handle))
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30253", ex);
+            }
+        }
         #endregion Methods
     }
 }

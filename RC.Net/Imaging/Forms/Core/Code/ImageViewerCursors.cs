@@ -1,3 +1,5 @@
+using Extract.Utilities.Forms;
+using System;
 using System.Windows.Forms;
 
 namespace Extract.Imaging.Forms
@@ -5,8 +7,11 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Represents a collection of mouse cursors associated with a particular
     /// <see cref="CursorTool"/>.
+    /// <para>Note:</para>
+    /// Only call the dispose method of this class if the <see cref="Cursor"/>
+    /// objects maintained by this class are not shared.
     /// </summary>
-    struct ImageViewerCursors
+    internal class ImageViewerCursors : IDisposable
     {
         /// <summary>
         /// The normal <see cref="Cursor"/> to be displayed by the
@@ -54,5 +59,57 @@ namespace Extract.Imaging.Forms
                 _active = value;
             }
         }
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="ImageViewerCursors"/>. Also deletes
+        /// the temporary file being managed by this class.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <overloads>Releases resources used by the <see cref="ImageViewerCursors"/>.</overloads>
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="ImageViewerCursors"/>. Also
+        /// deletes the temporary file being managed by this class.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_tool != null)
+                {
+                    try
+                    {
+                        ExtractCursors.DisposeCursorAndNativeHandle(_tool);
+                    }
+                    catch (Exception ex)
+                    {
+                        ExtractException.Log("ELI30254", ex);
+                    }
+                    _tool = null;
+                }
+                if (_active != null)
+                {
+                    try
+                    {
+                        ExtractCursors.DisposeCursorAndNativeHandle(_active);
+                    }
+                    catch (Exception ex)
+                    {
+                        ExtractException.Log("ELI30255", ex);
+                    }
+                    _active = null;
+                }
+            }
+        }
+
+        #endregion IDisposable Members
     }
 }
