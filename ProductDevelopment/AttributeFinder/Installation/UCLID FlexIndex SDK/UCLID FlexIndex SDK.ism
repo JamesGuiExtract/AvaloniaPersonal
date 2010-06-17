@@ -4379,7 +4379,7 @@
 		<row><td>ID_STRING35</td><td>0</td><td>CONFIG~1|Configure Email Settings</td><td>0</td><td/><td>178112137</td></row>
 		<row><td>ID_STRING35</td><td>1033</td><td>CONFIG~1|Configure Email Settings</td><td>0</td><td/><td>-912409910</td></row>
 		<row><td>ID_STRING36</td><td>0</td><td>[ProductName] requires that your computer is running Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008 or Windows 7</td><td>0</td><td/><td>-979544531</td></row>
-		<row><td>ID_STRING36</td><td>1033</td><td>[ProductName] requires that your computer is running Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008 or Windows 7</td><td>0</td><td/><td>-979544531</td></row>
+		<row><td>ID_STRING36</td><td>1033</td><td>[ProductName] requires that your computer be running Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008 or Windows 7</td><td>0</td><td/><td>186539561</td></row>
 		<row><td>ID_STRING37</td><td>0</td><td>NEWSHO~1|NewShortcut15</td><td>0</td><td/><td>-1331801781</td></row>
 		<row><td>ID_STRING37</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331775157</td></row>
 		<row><td>ID_STRING38</td><td>0</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331819989</td></row>

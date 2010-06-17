@@ -3256,7 +3256,7 @@
 		<row><td>ID_STRING28</td><td>1033</td><td>CONVER~1|Convert FAM Database</td><td>0</td><td/><td>370922414</td></row>
 		<row><td>ID_STRING29</td><td>1033</td><td>CONFIG~1|Configure Email Settings</td><td>0</td><td/><td>-912450806</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>Documentation</td><td>0</td><td/><td>-216449551</td></row>
-		<row><td>ID_STRING30</td><td>1033</td><td>[ProductName] requires that your computer is running Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008 or Windows 7</td><td>0</td><td/><td>-979554771</td></row>
+		<row><td>ID_STRING30</td><td>1033</td><td>[ProductName] requires that your computer be running Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008 or Windows 7</td><td>0</td><td/><td>186560041</td></row>
 		<row><td>ID_STRING31</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331803989</td></row>
 		<row><td>ID_STRING32</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331770293</td></row>
 		<row><td>ID_STRING33</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>555630608</td></row>
