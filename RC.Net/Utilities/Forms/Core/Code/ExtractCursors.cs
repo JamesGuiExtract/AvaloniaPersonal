@@ -270,7 +270,6 @@ namespace Extract.Utilities.Forms
             Flags = SecurityPermissionFlag.UnmanagedCode)]
         public static Cursor GetCursor(Stream stream)
         {
-            string tempFile = null;
             try
             {
                 // Validate license
@@ -279,44 +278,28 @@ namespace Extract.Utilities.Forms
 
                 ExtractException.Assert("ELI21217", "Stream must be specified.", stream != null);
 
-                // Get a temporary file name
-                tempFile = Path.GetTempFileName();
-
-                // Write the stream to the temporary file
-                File.WriteAllBytes(tempFile, StreamMethods.ConvertStreamToByteArray(stream));
-
-                // Load a cursor from the temporary file (using P/Invoke method)
-                IntPtr cursorHandle = NativeMethods.LoadCursorFromFile(tempFile);
-                if (cursorHandle == IntPtr.Zero)
+                using (TemporaryFile tempFile = new TemporaryFile())
                 {
-                    throw new ExtractException("ELI21594", "Unable to load cursor handle.",
-                        new Win32Exception(Marshal.GetLastWin32Error()));
-                }
-                Cursor cursor = new Cursor(cursorHandle);
+                    // Write the stream to the temporary file
+                    File.WriteAllBytes(tempFile.FileName,
+                        StreamMethods.ConvertStreamToByteArray(stream));
 
-                // Return the new cursor
-                return cursor;
+                    // Load a cursor from the temporary file (using P/Invoke method)
+                    IntPtr cursorHandle = NativeMethods.LoadCursorFromFile(tempFile.FileName);
+                    if (cursorHandle == IntPtr.Zero)
+                    {
+                        throw new ExtractException("ELI21594", "Unable to load cursor handle.",
+                            new Win32Exception(Marshal.GetLastWin32Error()));
+                    }
+                    Cursor cursor = new Cursor(cursorHandle);
+
+                    // Return the new cursor
+                    return cursor;
+                }
             }
             catch (Exception e)
             {
                 throw new ExtractException("ELI21207", "Unable to load cursor from stream.", e);
-            }
-            finally
-            {
-                // Clean up the temporary file
-                if (!string.IsNullOrEmpty(tempFile))
-                {
-                    try
-                    {
-                        // Remove the temporary file
-                        File.Delete(tempFile);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Do not throw exceptions from the finally block
-                        ExtractException.Log("ELI23231", ex);
-                    }
-                }
             }
         }
 

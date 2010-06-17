@@ -374,6 +374,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 {
                     LoadState();
                 }
+                else if (_resetLayout)
+                {
+                    // Persist the default state so that sub image viewers load properly
+                    // [DNRCAU #495]
+                    SaveState();
+                }
 
                 // Remove the thumbnail viewer button and the thumbnail window
                 if (_subImageHandler)
