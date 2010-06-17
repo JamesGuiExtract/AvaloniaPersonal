@@ -152,7 +152,8 @@ namespace Extract.FileActionManager.Utilities
             {
                 // Create the query for table creation
                 string query = "CREATE TABLE FPSFile (ID int IDENTITY(1,1) PRIMARY KEY, "
-                    + "AutoStart BIT DEFAULT 1 NOT NULL, FileName NVARCHAR(512) NOT NULL)";
+                    + "AutoStart BIT DEFAULT 1 NOT NULL, FileName NVARCHAR(512) NOT NULL, "
+                    + ESFAMService.NumberOfFilesToProcess + " NVARCHAR(50))";
 
                 // Create the command to perform the table creation
                 using (SqlCeCommand command = new SqlCeCommand(query, connection))
@@ -216,7 +217,7 @@ namespace Extract.FileActionManager.Utilities
             defaultSettings.Add(ESFAMService.DependentServices, "");
 
             // Add the number of files to process setting
-            defaultSettings.Add(ESFAMService.NumberOfFilesToProcess,
+            defaultSettings.Add(ESFAMService.NumberOfFilesToProcessGlobal,
                 ESFAMService.DefaultNumberOfFilesToProcess.ToString(CultureInfo.InvariantCulture));
 
             // Add the schema version information

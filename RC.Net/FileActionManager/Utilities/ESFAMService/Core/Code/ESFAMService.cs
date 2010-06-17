@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.ServiceProcess;
@@ -31,12 +32,20 @@ namespace Extract.FileActionManager.Utilities
             readonly string _fpsFileName;
 
             /// <summary>
+            /// The number of files to process before respawning the FAM instance.
+            /// </summary>
+            readonly int _numberOfFilesToProcess;
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="ProcessingThreadArguments"/> class.
             /// </summary>
             /// <param name="fpsFileName">The fps file to process.</param>
-            public ProcessingThreadArguments(string fpsFileName)
+            /// <param name="numberOfFilesToProcess">The number of files to process for
+            /// this processing thread, before respawning the FAM process.</param>
+            public ProcessingThreadArguments(string fpsFileName, int numberOfFilesToProcess)
             {
                 _fpsFileName = fpsFileName;
+                _numberOfFilesToProcess = numberOfFilesToProcess;
             }
 
             /// <summary>
@@ -47,6 +56,17 @@ namespace Extract.FileActionManager.Utilities
                 get
                 {
                     return _fpsFileName;
+                }
+            }
+
+            /// <summary>
+            /// Gets the number of files to process
+            /// </summary>
+            public int NumberOfFilesToProcess
+            {
+                get
+                {
+                    return _numberOfFilesToProcess;
                 }
             }
         }
@@ -78,7 +98,13 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// The setting key to read the number of files to process from.
         /// </summary>
-        internal static readonly string NumberOfFilesToProcess = "NumberOfFilesToProcessPerFAMInstance";
+        internal static readonly string NumberOfFilesToProcessGlobal =
+            "NumberOfFilesToProcessPerFAMInstance";
+
+        /// <summary>
+        /// The column name for the number of files to process specified for each FPS file.
+        /// </summary>
+        internal static readonly string NumberOfFilesToProcess = "NumberOfFilesToProcess";
 
         /// <summary>
         /// The default number of files to process before respawning the FAMProcess
@@ -96,7 +122,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// The current FAM Service database schema version
         /// </summary>
-        internal const int CurrentDatabaseSchemaVersion = 2;
+        internal const int CurrentDatabaseSchemaVersion = 3;
 
         #endregion Constants
 
@@ -152,11 +178,6 @@ namespace Extract.FileActionManager.Utilities
         volatile int _threadsThatRequireAuthentication;
 
         /// <summary>
-        /// The number of files to process
-        /// </summary>
-        int _numberOfFilesToProcess;
-
-        /// <summary>
         /// Mutex to provide synchronized access to data.
         /// </summary>
         readonly object _lock = new object();
@@ -201,8 +222,9 @@ namespace Extract.FileActionManager.Utilities
                     throw ee;
                 }
 
-                // Get the list of FPS files to run
-                List<string> fpsFiles = GetFpsFilesToRun();
+                // Get the list of FPS file processing arguments from the database
+                List<ProcessingThreadArguments> fpsFileArguments =
+                    GetFpsFileProcessingArguments(GetGlobalNumberOfFilesToProcess());
 
                 // [DNRCAU #357] - Log application trace when service is starting
                 ExtractException ee2 = new ExtractException("ELI28772",
@@ -213,14 +235,11 @@ namespace Extract.FileActionManager.Utilities
                 _sleepThread = new Thread(SleepAndCheckDependentServices);
                 _sleepThread.Start();
 
-                // Get the number of files to process
-                _numberOfFilesToProcess = GetNumberOfFilesToProcess();
-
                 lock (_lock)
                 {
                     // Create and launch a processing thread for each fps file.
-                    _threadsStopped = new ManualResetEvent(fpsFiles.Count == 0);
-                    for (int i = 0; i < fpsFiles.Count; i++)
+                    _threadsStopped = new ManualResetEvent(fpsFileArguments.Count == 0);
+                    for (int i = 0; i < fpsFileArguments.Count; i++)
                     {
                         // Create a new thread and add it to the collection.
                         Thread thread = new Thread(ProcessFiles);
@@ -228,7 +247,7 @@ namespace Extract.FileActionManager.Utilities
 
                         // Start the thread in a Multithreaded apartment
                         thread.SetApartmentState(ApartmentState.MTA);
-                        thread.Start(new ProcessingThreadArguments(fpsFiles[i]));
+                        thread.Start(fpsFileArguments[i]);
                         _activeProcessingThreadCount++;
                     }
                 }
@@ -426,6 +445,7 @@ namespace Extract.FileActionManager.Utilities
 
                 // Get the processing thread arguments
                 ProcessingThreadArguments arguments = (ProcessingThreadArguments)threadParameters;
+                int numberOfFilesToProcess = arguments.NumberOfFilesToProcess;
 
                 // Run FAMProcesses in a loop respawning them if needed
                 do
@@ -457,12 +477,13 @@ namespace Extract.FileActionManager.Utilities
                     if (_stopProcessing != null && !_stopProcessing.WaitOne(0))
                     {
                         // Start processing
-                        famProcess.Start(_numberOfFilesToProcess);
+                        famProcess.Start(numberOfFilesToProcess);
 
                         ExtractException ee = new ExtractException("ELI29808",
                             "Application trace: Started new FAM instance.");
                         ee.AddDebugData("FPS Filename", arguments.FpsFileName, false);
                         ee.AddDebugData("Process ID", pid, false);
+                        ee.AddDebugData("Number Of Files To Process", numberOfFilesToProcess, false);
                         ee.Log();
                     }
 
@@ -477,7 +498,7 @@ namespace Extract.FileActionManager.Utilities
                     // Get the count of files processed (if limiting processing to a
                     // specified number of files)
                     int filesProcessed = 0;
-                    if (_numberOfFilesToProcess != 0 && !process.HasExited && famProcess != null)
+                    if (numberOfFilesToProcess != 0 && !process.HasExited && famProcess != null)
                     {
                         int processedSuccessfully;
                         int processingErrors;
@@ -491,7 +512,7 @@ namespace Extract.FileActionManager.Utilities
                     // If the number of files to proces is 0 OR the number of files actually
                     // processed is less than the number of files specified, then just
                     // exit the loop and do not respawn a new FAM instance
-                    if (_numberOfFilesToProcess == 0 || filesProcessed < _numberOfFilesToProcess)
+                    if (numberOfFilesToProcess == 0 || filesProcessed < numberOfFilesToProcess)
                     {
                         break;
                     }
@@ -899,17 +920,23 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Goes to the database and gets the list of FPS files to run.
+        /// Goes to the database and gets the list of <see cref="ProcessingThreadArguments"/>
+        /// for each row in the FPSFile table that has AutoStart = 1.
         /// </summary>
-        /// <returns></returns>
-        static List<string> GetFpsFilesToRun()
+        /// <param name="globalNumberOfFilesToProcess">The global number of files to
+        /// process per instance setting.  This is used as the default value for the
+        /// number of files to process for each thread.</param> 
+        /// <returns>A list containing the processing thread arguments for each
+        /// FPS file that will be launched when the processing threads are started.</returns>
+        static List<ProcessingThreadArguments> GetFpsFileProcessingArguments(
+            int globalNumberOfFilesToProcess)
         {
             SqlCeConnection dbConnection = null;
             SqlCeCommand command = null;
             SqlCeDataReader reader = null;
             try
             {
-                List<string> fpsFiles = new List<string>();
+                List<ProcessingThreadArguments> fpsFiles = new List<ProcessingThreadArguments>();
 
                 // Connect to the database
                 dbConnection = new SqlCeConnection(_connection);
@@ -917,12 +944,38 @@ namespace Extract.FileActionManager.Utilities
 
                 // Get a data adapter connected to the FPSFile table
                 command = new SqlCeCommand(
-                    "SELECT [FileName] FROM [FPSFile] WHERE [AutoStart] = 1", dbConnection);
+                    "SELECT [FileName], [" + NumberOfFilesToProcess
+                    + "] FROM [FPSFile] WHERE [AutoStart] = 1", dbConnection);
 
                 reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    fpsFiles.Add(reader.GetString(0));
+                    // Get the file name
+                    string fileName = reader.GetString(0).Trim();
+
+                    // Default the number of files to process to the global number
+                    int numberOfFilesToProcess = globalNumberOfFilesToProcess;
+
+                    // If a different value has been specified for this FPS file, read it.
+                    if (!reader.IsDBNull(1))
+                    {
+                        string temp = reader.GetString(1).Trim();
+                        if (!string.IsNullOrEmpty(temp))
+                        {
+                            // Parse the number
+                            if (!int.TryParse(temp, out numberOfFilesToProcess) ||
+                                numberOfFilesToProcess < 0)
+                            {
+                                ExtractException ee = new ExtractException("ELI30257",
+                                    "NumberOfFilesToProcess is not a valid positive integer.");
+                                ee.AddDebugData("FPS File Name", fileName, false);
+                                ee.AddDebugData("NumberOfFilesToProcess", temp, false);
+                                throw ee;
+                            }
+                        }
+                    }
+
+                    fpsFiles.Add(new ProcessingThreadArguments(fileName, numberOfFilesToProcess));
                 }
 
                 return fpsFiles;
@@ -985,13 +1038,13 @@ namespace Extract.FileActionManager.Utilities
         /// Gets the number of files to process from the database setting.
         /// </summary>
         /// <returns>The number of files to process.</returns>
-        static int GetNumberOfFilesToProcess()
+        static int GetGlobalNumberOfFilesToProcess()
         {
             string numberString = "";
             try
             {
                 int numberOfFiles = DefaultNumberOfFilesToProcess;
-                numberString = GetSettingFromDatabase(NumberOfFilesToProcess);
+                numberString = GetSettingFromDatabase(NumberOfFilesToProcessGlobal);
                 if (!string.IsNullOrEmpty(numberString))
                 {
                     if (!int.TryParse(numberString, out numberOfFiles) ||
