@@ -1777,12 +1777,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractImageViewer", "..\..
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESPrintManager", "..\..\..\..\..\ReusableComponents\COMComponents\ESPrintCapture\Utils\ESPrintManager\Code\ESPrintManager.vcproj", "{0A8FD35A-F15B-490C-8244-2E5746A7CF46}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESOfficePrintHandler", "..\..\..\..\..\RC.Net\Office\Utilities\ESOfficePrintHandler\Core\Code\ESOfficePrintHandler.csproj", "{44D5B3C3-7197-4E5A-835E-C138DDCB5FEC}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 138
+		ProjectCount = 140
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcproj
@@ -1921,6 +1936,8 @@ Global
 		ProjectRelativeDiskPath136 = ..\..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj
 		ProjectRelativeDiskPath137 = ..\..\..\..\DataEntry\Generic\DEPs\GenericPanel\Core\Code\Extract.DataEntry.DEP.Generic.csproj
 		ProjectRelativeDiskPath138 = ..\..\..\..\..\RC.Net\Imaging\Utilities\ExtractImageViewer\Core\Code\ExtractImageViewer.csproj
+		ProjectRelativeDiskPath139 = ..\..\..\..\..\ReusableComponents\COMComponents\ESPrintCapture\Utils\ESPrintManager\Code\ESPrintManager.vcproj
+		ProjectRelativeDiskPath140 = ..\..\..\..\..\RC.Net\Office\Utilities\ESOfficePrintHandler\Core\Code\ESOfficePrintHandler.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -3313,6 +3330,26 @@ Global
 		{92FCA28F-7FE3-47FC-BC50-4D51C4DFF999}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{92FCA28F-7FE3-47FC-BC50-4D51C4DFF999}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{92FCA28F-7FE3-47FC-BC50-4D51C4DFF999}.Release|Win32.ActiveCfg = Release|Any CPU
+		{0A8FD35A-F15B-490C-8244-2E5746A7CF46}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{0A8FD35A-F15B-490C-8244-2E5746A7CF46}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{0A8FD35A-F15B-490C-8244-2E5746A7CF46}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{0A8FD35A-F15B-490C-8244-2E5746A7CF46}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0A8FD35A-F15B-490C-8244-2E5746A7CF46}.Debug|Win32.Build.0 = Debug|Win32
+		{0A8FD35A-F15B-490C-8244-2E5746A7CF46}.Release|Any CPU.ActiveCfg = Release|Win32
+		{0A8FD35A-F15B-490C-8244-2E5746A7CF46}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{0A8FD35A-F15B-490C-8244-2E5746A7CF46}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{0A8FD35A-F15B-490C-8244-2E5746A7CF46}.Release|Win32.ActiveCfg = Release|Win32
+		{0A8FD35A-F15B-490C-8244-2E5746A7CF46}.Release|Win32.Build.0 = Release|Win32
+		{44D5B3C3-7197-4E5A-835E-C138DDCB5FEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44D5B3C3-7197-4E5A-835E-C138DDCB5FEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44D5B3C3-7197-4E5A-835E-C138DDCB5FEC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{44D5B3C3-7197-4E5A-835E-C138DDCB5FEC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{44D5B3C3-7197-4E5A-835E-C138DDCB5FEC}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{44D5B3C3-7197-4E5A-835E-C138DDCB5FEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44D5B3C3-7197-4E5A-835E-C138DDCB5FEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44D5B3C3-7197-4E5A-835E-C138DDCB5FEC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{44D5B3C3-7197-4E5A-835E-C138DDCB5FEC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{44D5B3C3-7197-4E5A-835E-C138DDCB5FEC}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

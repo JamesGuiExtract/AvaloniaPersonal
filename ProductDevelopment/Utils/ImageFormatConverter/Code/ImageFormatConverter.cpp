@@ -316,7 +316,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 					}
 
 					// Set output format
-					nType = FILE_RAS_PDF_JBIG2;
+					nType = FILE_RAS_PDF_G4;
 
 					// This flag will cause the out put image to have the same( or nearly the same ) 
 					// dimensions as original input file

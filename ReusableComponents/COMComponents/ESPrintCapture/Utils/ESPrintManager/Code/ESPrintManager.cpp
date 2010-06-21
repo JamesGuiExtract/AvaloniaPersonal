@@ -19,11 +19,11 @@ using namespace std;
 #define new DEBUG_NEW
 #endif
 
-
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
 const string gstrFILE_KEY = "File";
+const string gstrORIGINAL_FILE = "{Original}";
 
 const string gstrESPRINTMANAGER_ROOT_FOLDER_PATH = gstrCOM_COMPONENTS_REG_PATH
 	+ "\\ESPrintCapture\\Utils\\ESPrintManager";
@@ -101,10 +101,10 @@ BOOL CESPrintManagerApp::InitInstance()
 		readSettingsFromRegistry();
 
 		// Process the INI file
-		string strImageFile = processPrintedINIFile();
+		PrintedImageResults results = processPrintedINIFile();
 
 		// Launch the application
-		launchApplication(strImageFile);
+		launchApplication(results);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI22141");
 
@@ -116,14 +116,16 @@ BOOL CESPrintManagerApp::InitInstance()
 //--------------------------------------------------------------------------------------------------
 // Private methods
 //--------------------------------------------------------------------------------------------------
-string CESPrintManagerApp::processPrintedINIFile()
+PrintedImageResults CESPrintManagerApp::processPrintedINIFile()
 {
 	// Create an INIFilePersistenceMgr from the INI file
 	INIFilePersistenceMgr imgrPrintedINI(m_strPrintedINIFile);
 	string strFolder = m_strPrintedINIFile + "\\";
 
+	PrintedImageResults results;
+
 	// Get the original document 
-	string strOriginalDocument = imgrPrintedINI.getKeyValue(strFolder + "Info", "DocumentName");
+	results.OriginalDocument = imgrPrintedINI.getKeyValue(strFolder + "Info", "DocumentName");
 
 	// Get the count of output files
 	strFolder += "Output";
@@ -147,22 +149,34 @@ string CESPrintManagerApp::processPrintedINIFile()
 
 		// Build an exception and throw it
 		UCLIDException uex("ELI22143", "Too many files created by print driver!");
-		uex.addDebugInfo("Original file", strOriginalDocument);
+		uex.addDebugInfo("Original file", results.OriginalDocument);
 		uex.addDebugInfo("File count", lFileCount);
 		throw uex;
 	}
 
 	// Return the generated image file
-	return imgrPrintedINI.getKeyValue(strFolder, gstrFILE_KEY + "0");
+	results.ImageFile = imgrPrintedINI.getKeyValue(strFolder, gstrFILE_KEY + "0");
+
+	return results;
 }
 //--------------------------------------------------------------------------------------------------
-void CESPrintManagerApp::launchApplication(const string& strImageFile)
+void CESPrintManagerApp::launchApplication(const PrintedImageResults& results)
 {
 	try
 	{
+		// Check if the command line args contains {Original}, if so
+		// replace it with the original document name
+		string strCommandLineArgs = m_strCommandLineArgs;
+		if (!strCommandLineArgs.empty()
+			&& strCommandLineArgs.find(gstrORIGINAL_FILE) != string.npos)
+		{
+			replaceVariable(strCommandLineArgs, gstrORIGINAL_FILE,
+				"\"" + results.OriginalDocument + "\"");
+		}
+
 		// Build command line arguments
-		string strCommandLine = "\"" + strImageFile + "\"" +
-			(m_strCommandLineArgs.empty() ? "" : (" " + m_strCommandLineArgs));
+		string strCommandLine = "\"" + results.ImageFile + "\"" +
+			(strCommandLineArgs.empty() ? "" : (" " + strCommandLineArgs));
 
 		// Create a SHELLEXECUTEINFO struct
 		SHELLEXECUTEINFO shellExecuteInfo = {0};

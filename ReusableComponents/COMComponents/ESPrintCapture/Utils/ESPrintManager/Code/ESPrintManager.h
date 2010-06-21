@@ -16,10 +16,15 @@
 
 using namespace std;
 
+struct PrintedImageResults
+{
+	string ImageFile;
+	string OriginalDocument;
+};
+
 // CESPrintManagerApp:
 // See ESPrintManager.cpp for the implementation of this class
 //
-
 class CESPrintManagerApp : public CWinApp
 {
 public:
@@ -48,11 +53,11 @@ private:
 	// methods
 	//----------------------------------------------------------------------------------------------
 	// Processes the INI file
-	string processPrintedINIFile();
+	PrintedImageResults processPrintedINIFile();
 	//----------------------------------------------------------------------------------------------
 	// Launches the specified application with the tif image specified
 	// in the INI file
-	void launchApplication(const string& strImageFile);
+	void launchApplication(const PrintedImageResults& results);
 	//----------------------------------------------------------------------------------------------
 	// Reads the Application and ApplicationArgs key from the registry to know what application
 	// to launch after processing the INI file.  Will throw an exception if the Application
