@@ -1,3 +1,4 @@
+using Extract.Licensing;
 using System;
 using System.IO;
 
@@ -18,6 +19,11 @@ namespace Extract.Utilities
     public sealed class TemporaryFile : IDisposable
     {
         #region Fields
+
+        /// <summary>
+        /// The object name used in licensing calls.
+        /// </summary>
+        static readonly string _OBJECT_NAME = typeof(TemporaryFile).ToString();
 
         /// <summary>
         /// The name of the temporary file that was generated
@@ -60,6 +66,9 @@ namespace Extract.Utilities
         {
             try
             {
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI30260", _OBJECT_NAME);
+
                 _fileName = FileSystemMethods.GetTemporaryFileName(folder, extension);
             }
             catch (Exception ex)
@@ -78,6 +87,9 @@ namespace Extract.Utilities
         {
             try
             {
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI30261", _OBJECT_NAME);
+
                 _fileName = fileInfo.FullName;
             }
             catch (Exception ex)
@@ -118,6 +130,50 @@ namespace Extract.Utilities
         }
 
         #endregion Properties
+
+        #region Methods
+
+        /// <summary>
+        /// Copies the specified file to a temporary file having the same extension
+        /// and returns the <see cref="TemporaryFile"/> containing the reference
+        /// to the temporary file.
+        /// </summary>
+        /// <param name="fileName">The name of the file to copy.</param>
+        /// <returns>The temporary file that was created and copied to.</returns>
+        public static TemporaryFile CopyToTemporaryFile(string fileName)
+        {
+            TemporaryFile tempFile = null;
+            try
+            {
+                // Check that the argument is valid
+                bool isNullOrEmpty = string.IsNullOrEmpty(fileName);
+                if (isNullOrEmpty || !File.Exists(fileName))
+                {
+                    throw new ArgumentException(
+                        (isNullOrEmpty ? "Argument cannot be null or empty." : "File must exist."),
+                        "fileName");
+                }
+
+                tempFile = new TemporaryFile(Path.GetExtension(fileName));
+                File.Copy(fileName, tempFile.FileName, true);
+
+                return tempFile;
+            }
+            catch (Exception ex)
+            {
+                // If an exception occurred, ensure the temp file is cleaned up.
+                if (tempFile != null)
+                {
+                    tempFile.Dispose();
+                }
+
+                ExtractException ee = ExtractException.AsExtractException("ELI30262", ex);
+                ee.AddDebugData("File Name", fileName, false);
+                throw ee;
+            }
+        }
+
+        #endregion Methods
 
         #region IDisposable Members
 

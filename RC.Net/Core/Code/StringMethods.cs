@@ -231,6 +231,18 @@ namespace Extract
         }
 
         /// <summary>
+        /// Converts the specified value to a string.
+        /// This method will return <see cref="String.Empty"/> if <paramref name="value"/>
+        /// is <see langword="null"/>.
+        /// </summary>
+        /// <param name="value">The value to convert to a string.</param>
+        /// <returns><paramref name="value"/> converted to a string.</returns>
+        public static string ConvertObjectToString(object value)
+        {
+            return value != null ? value.ToString() : string.Empty;
+        }
+
+        /// <summary>
         /// Finds the first index of any of the specified search strings.
         /// <para><b>Note:</b></para>
         /// This uses a default <see cref="StringComparison"/> of

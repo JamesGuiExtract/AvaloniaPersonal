@@ -72,6 +72,7 @@
     <Compile Include="ThreadingMethods.cs" />
     <Compile Include="TimeInterval.cs" />
     <Compile Include="UtilityMethods.cs" />
+    <Compile Include="WindowsPrinterInformation.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
