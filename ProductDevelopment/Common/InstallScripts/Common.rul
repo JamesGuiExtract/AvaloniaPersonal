@@ -369,12 +369,12 @@ begin
 		// Add the leading 0 if the month is only 1 digit
 		if (StrLengthChars(strMonth) = 1) then
 			strMonth = '0' + strMonth;
-		endif
+		endif;
 		                                                 
 		// Add the leading 0 if the day is only 1 digit
 		if (StrLengthChars(strDay) = 1) then
 			strDay = '0' + strDay;
-		endif
+		endif;
 			
 		// Create the new filename for the exception file
 		strDest = LOG_FILE_PATH ^ "\\";
