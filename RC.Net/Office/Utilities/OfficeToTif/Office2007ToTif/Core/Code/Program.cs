@@ -1,3 +1,5 @@
+using Extract.Encryption;
+using Extract.Licensing;
 using Extract.Office.Utilities.OfficeToTif;
 using Microsoft.Office.Interop;
 using System;
@@ -22,6 +24,8 @@ namespace Extract.Utilities.Office.OfficeToTif.Office2007ToTif
         [STAThread]
         static void Main(string[] args)
         {
+            // Constants needed to pass empty and missing arguments to some of the
+            // office COM methods
             object missing = System.Reflection.Missing.Value;
             object oFalse = false;
             object oTrue = true;
@@ -32,21 +36,34 @@ namespace Extract.Utilities.Office.OfficeToTif.Office2007ToTif
             MSPowerPoint._Application pp = null;
             try
             {
-                if (args.Length != 4)
+                // License map code
+                string mapCode = LicenseUtilities.GetMapLabelValue(new MapLabel());
+
+                // Get the arguments from the file
+                string[] args2 =
+                    args.Length == 1 ? File.ReadAllLines(Path.GetFullPath(args[0])) : null;
+                
+                // Ensure there is the proper number of arguments and that the
+                // fifth argument matches the LicenseUtilities.MapLabelValue
+                if (args2 == null
+                    || !mapCode.Equals(ExtractEncryption.DecryptString(args2[4], new MapLabel()),
+                    StringComparison.Ordinal))
                 {
                     ExtractException ee = new ExtractException("ELI30263",
-                        "Invalid number of arguments specified.");
-                    ee.AddDebugData("Number Of Arguments", args.Length, false);
-                    ee.AddDebugData("Number Of Arguments Expected", 4, false);
+                        "Invalid command line.");
                     throw ee;
                 }
 
                 // Get the arguments
-                string fileName = Path.GetFullPath(args[0]);
+                // 1. File name
+                // 2. The office application value (from the OfficeApplication enum)
+                // 3. The name of the printer (formatted properly for the office application)
+                // 4. The exception file to log exceptions to if an exception occurs
+                string fileName = Path.GetFullPath(args2[0]);
                 OfficeApplication application = (OfficeApplication) Enum.Parse(
-                    typeof(OfficeApplication), args[1]);
-                string printerName = args[2];
-                exceptionFile = Path.GetFullPath(args[3]);
+                    typeof(OfficeApplication), args2[1]);
+                string printerName = args2[2];
+                exceptionFile = Path.GetFullPath(args2[3]);
 
                 switch (application)
                 {

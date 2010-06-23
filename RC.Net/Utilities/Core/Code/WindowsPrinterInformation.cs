@@ -366,7 +366,7 @@ namespace Extract.Utilities
             try
             {
                 string query = "Select DriverName, Location, Name, Network, PortName, "
-                    + "ServerName, Shared, Status, WorkOffline From Win32_Printer";
+                    + "ServerName, Shared, PrinterStatus, WorkOffline From Win32_Printer";
 
                 using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(query))
                 using (ManagementObjectCollection results = searcher.Get())

@@ -84,6 +84,14 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\Encryption\Core\Code\Extract.Encryption.vcproj">
+      <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
+      <Name>Extract.Encryption</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcproj">
+      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
+      <Name>Extract.Licensing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Core\Code\OfficeToTif.csproj">
       <Project>{694CDE1A-BD19-4C80-90DF-AD751AEEE381}</Project>
       <Name>OfficeToTif</Name>

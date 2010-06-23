@@ -1349,6 +1349,75 @@ namespace Extract
             throw new ExtractException(eliCode, "Internal logic error.");
         }
 
+        /// <overloads>
+        /// Loads an extract exception from an exception log file.
+        /// </overloads>
+        /// <summary>
+        /// Loads the first extract exception from an exception log file.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to associate with the loaded exception.</param>
+        /// <param name="fileName">The name of the exception file
+        /// to load the exception from.</param>
+        /// <returns>The exception loaded from the file.</returns>
+        /// <exception cref="ExtractException">If <paramref name="fileName"/>
+        /// is <see langword="null"/> or <see cref="String.Empty"/>, or if
+        /// <paramref name="fileName"/> does not exist.</exception> 
+        public static ExtractException LoadFromFile(string eliCode, string fileName)
+        {
+            return LoadFromFile(eliCode, fileName, 1);
+        }
+
+        /// <summary>
+        /// Loads the specified extract exception from an exception log file.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to associate with the loaded exception.</param>
+        /// <param name="fileName">The name of the exception file
+        /// to load the exception from.</param>
+        /// <param name="line">The 1-based line number in the file to load.</param>
+        /// <exception cref="ExtractException">If <paramref name="fileName"/>
+        /// is <see langword="null"/> or <see cref="String.Empty"/>, or if
+        /// <paramref name="fileName"/> does not exist, or if <paramref name="line"/>
+        /// is &lt; 1 or &gt; the number of lines in <paramref name="fileName"/>.
+        /// </exception>
+        public static ExtractException LoadFromFile(string eliCode, string fileName, int line)
+        {
+            try
+            {
+                Assert("ELI30275", "Filename cannot be null or empty and must exist.",
+                    !string.IsNullOrEmpty(fileName) && File.Exists(fileName));
+
+                string[] lines = File.ReadAllLines(fileName);
+                if (line < 0 || line > lines.Length)
+                {
+                    ExtractException ee = new ExtractException("ELI30276",
+                        "Invalid line specification.");
+                    ee.AddDebugData("Line", line, false);
+                    ee.AddDebugData("Total Lines In File", lines.Length, false);
+                    throw ee;
+                }
+
+                string[] tokens = lines[line-1].Split(',');
+                if (tokens.Length != 7)
+                {
+                    ExtractException ee = new ExtractException("ELI30277",
+                        "Invalid number of tokens in the exception file.");
+                    ee.AddDebugData("Number of tokens", tokens.Length, false);
+                    ee.AddDebugData("Line Parsed", lines[line-1], false);
+                    throw ee;
+                }
+
+                // The exception is the last token
+                string exception = tokens[tokens.Length - 1];
+                return new ExtractException(eliCode, exception);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = AsExtractException("ELI30279", ex);
+                ee.AddDebugData("File Name", fileName, false);
+                throw ee;
+            }
+        }
+
         #endregion Static methods
     }
 }
