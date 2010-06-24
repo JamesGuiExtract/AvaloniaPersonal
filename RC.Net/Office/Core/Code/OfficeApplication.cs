@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Extract.Office.Utilities.OfficeToTif
+namespace Extract.Office
 {
     /// <summary>
-    /// Enumeration to list what MS Office application to target.
+    /// Enumeration of MS Office applications
     /// </summary>
     public enum OfficeApplication
     {
@@ -27,6 +27,26 @@ namespace Extract.Office.Utilities.OfficeToTif
         /// <summary>
         /// MS PowerPoint.
         /// </summary>
-        PowerPoint = 3
+        PowerPoint = 3,
+
+        /// <summary>
+        /// MS Access
+        /// </summary>
+        Access = 4,
+
+        /// <summary>
+        /// MS Outlook
+        /// </summary>
+        Outlook = 5,
+
+        /// <summary>
+        /// MS Publisher
+        /// </summary>
+        Publisher = 6,
+
+        /// <summary>
+        /// MS OneNote
+        /// </summary>
+        OneNote = 7
     }
 }

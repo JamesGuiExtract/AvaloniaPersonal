@@ -2,6 +2,7 @@ using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -377,7 +378,7 @@ namespace Extract.Utilities.Forms
                 // Check if the cursor owns the handle or not
                 bool ownsHandle = (bool)cursor.GetType().InvokeMember("ownHandle",
                     BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance, null,
-                    cursor, null);
+                    cursor, null, CultureInfo.InvariantCulture);
 
                 // Dispose of the cursor
                 cursor.Dispose();

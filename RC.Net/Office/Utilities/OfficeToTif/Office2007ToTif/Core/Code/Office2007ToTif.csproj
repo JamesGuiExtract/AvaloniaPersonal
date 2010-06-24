@@ -7,7 +7,7 @@
     <ProjectGuid>{D67C14AB-310A-4E96-B5CE-35875B04059C}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.Utilities.Office.OfficeToTif.Office2007ToTif</RootNamespace>
+    <RootNamespace>Extract.Office.Utilities.OfficeToTif.Office2007ToTif</RootNamespace>
     <AssemblyName>Office2007ToTif</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
@@ -84,17 +84,17 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\Encryption\Core\Code\Extract.Encryption.vcproj">
-      <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
-      <Name>Extract.Encryption</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Core\Code\OfficeToTif.csproj">
-      <Project>{694CDE1A-BD19-4C80-90DF-AD751AEEE381}</Project>
-      <Name>OfficeToTif</Name>
+    <ProjectReference Include="..\..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Core\Code\Extract.Office.csproj">
+      <Project>{1EAB4E8F-1BE0-460B-B35D-99994BD1245D}</Project>
+      <Name>Extract.Office</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

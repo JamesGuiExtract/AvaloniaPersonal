@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace Extract.Office.Utilities.OfficeToTif
+namespace Extract.Office
 {
     /// <summary>
     /// Manages reading/writing registry keys for the OfficeToTif application.
