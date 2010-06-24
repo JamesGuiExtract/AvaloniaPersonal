@@ -360,7 +360,7 @@ namespace IDShieldOffice
                         // Add and increment Bates number
                         TextLayerObject batesNumber = new TextLayerObject(_imageViewer, i, 
                             "Bates number", _generator.GetNextNumberString(i), (Font)_font.Clone(), 
-                            GetAnchorPoint(), _anchorAlignment);
+                            GetAnchorPoint(), _anchorAlignment, null, null);
                         batesNumber.Tags.Add(_BATES_NUMBER_TAG);
                         batesNumbers.Add(batesNumber);
 

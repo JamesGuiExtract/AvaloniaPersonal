@@ -215,7 +215,7 @@ namespace Extract.Rules
                 string regularExpression = _GROUP_NAME + string.Join("|", lines) + ")";
 
                 // Check if the casing should be matched
-                RegexOptions options = RegexOptions.Compiled | RegexOptions.ExplicitCapture;
+                RegexOptions options = RegexOptions.ExplicitCapture;
                 if (!_matchCase)
                 {
                     options |= RegexOptions.IgnoreCase;

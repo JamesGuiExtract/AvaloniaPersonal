@@ -43,7 +43,7 @@ namespace IDShieldOffice.Test
         /// The license string for the SandDock manager
         /// </summary>
         private static readonly string _SANDOCK_LICENSE_STRING =
-            @"1970|FmYPlfMJx5y4I4w2mqXzIDiFUPM=";
+            @"1970|siE7SnF/jzINQg1AOTIaCXLlouA=";
 
         // All other account number types
         private static readonly string _ACCOUNT_NUMBER = "Resources.AccountNumber.tif";
@@ -309,14 +309,6 @@ namespace IDShieldOffice.Test
                 StringBuilder resultString = new StringBuilder();
                 foreach (RasterZone rasterZone in match.RasterZones)
                 {
-                    // Need to remove 2 from each end of the raster zone to account
-                    // for raster zone expansion [IDSD #177]
-                    if (rasterZone.StartX != 0)
-                    {
-                        rasterZone.StartX += 2;
-                    }
-                    rasterZone.EndX -= 2;
-
                     // Get the page number
                     int pageNumber = rasterZone.PageNumber;
 

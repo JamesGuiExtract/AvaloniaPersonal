@@ -115,7 +115,7 @@ namespace Extract.Rules
                 {
                     string regex = ExtractEncryption.DecryptTextFile(_dataFile, Encoding.Default, 
                         new MapLabel());
-                    _dataRegex = new Regex(regex, RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+                    _dataRegex = new Regex(regex, RegexOptions.ExplicitCapture);
                 }
 
                 return _dataRegex;
@@ -136,7 +136,7 @@ namespace Extract.Rules
                 {
                     string regex = ExtractEncryption.DecryptTextFile(_cluesFile, Encoding.Default,
                         new MapLabel());
-                    _cluesRegex = new Regex(regex, RegexOptions.Compiled);
+                    _cluesRegex = new Regex(regex);
                 }
 
                 return _cluesRegex;

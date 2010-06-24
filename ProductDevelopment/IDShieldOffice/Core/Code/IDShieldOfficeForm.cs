@@ -639,7 +639,8 @@ namespace IDShieldOffice
                 else if (typeof(T) == typeof(Redaction))
                 {
                     // Create a new redaction.
-                    Redaction redactionToAdd = new Redaction(_imageViewer, pair.Key, comment, pair.Value);
+                    Redaction redactionToAdd = new Redaction(_imageViewer, pair.Key, comment,
+                        pair.Value, _imageViewer.DefaultRedactionFillColor);
                     objectToAdd = redactionToAdd as T;
                 }
                 

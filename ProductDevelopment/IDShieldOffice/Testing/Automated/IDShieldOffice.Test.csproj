@@ -109,7 +109,7 @@
     <EmbeddedResource Include="Resources\FindTextTest.tif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="IDShieldOffice.Test.config">
+    <None Include="IDShieldOffice.Test.dll.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="IDShieldOffice.Test.nunit">

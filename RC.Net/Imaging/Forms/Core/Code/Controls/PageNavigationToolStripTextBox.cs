@@ -27,6 +27,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         ImageViewer _imageViewer;
 
+        /// <summary>
+        /// Regular expression used to validate the user input.
+        /// </summary>
+        Regex _userInputValidator = new Regex("[0-9]+");
+
         #endregion PageNavigationToolStripTextBox Fields
 
         #region PageNavigationToolStripTextBox Constructors
@@ -85,8 +90,7 @@ namespace Extract.Imaging.Forms
         private void ProcessUserInput()
         {
             // Check if the text box starts with a number
-            Regex regex = new Regex("[0-9]+", RegexOptions.Compiled);
-            Match match = regex.Match(base.Text);
+            Match match = _userInputValidator.Match(base.Text);
             if (match.Success)
             {
                 // Set the page number

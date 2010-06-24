@@ -355,7 +355,6 @@ namespace IDShieldOffice
             try
             {
                 ShowBracketedTextFinderWindow();
-
             }
             catch (Exception ex)
             {

@@ -234,12 +234,11 @@ namespace Extract.Rules
                 builder.Append(_MATCH_CURVED_BRACKETS);
             }
 
-            // If there is at least 1 regex, create a new compiled regex
+            // If there is at least 1 regular expression, create a new regex object
             if (builder.Length > 0)
             {
                 _regex = new Regex(builder.ToString(),
-                    RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace
-                    | RegexOptions.ExplicitCapture);
+                    RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture);
             }
             else
             {
