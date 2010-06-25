@@ -249,7 +249,7 @@ namespace Extract.Imaging
                 // Save the raster zone to a temporary file.
                 tempFile = new TemporaryFile();
                 using (ImageWriter writer = 
-                    Codecs.CreateWriter(tempFile.FileName, RasterImageFormat.CcittGroup4))
+                    Codecs.CreateWriter(tempFile.FileName, rasterZoneImage.OriginalFormat))
                 {
                     writer.AppendImage(rasterZoneImage);
                     writer.Commit(true);

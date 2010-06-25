@@ -323,7 +323,8 @@ namespace Extract.Imaging
                 // raster zone about it's center.
                 rasterZoneImage = new RasterImage(RasterMemoryFlags.Conventional, 
                     boundingRectangle.Width, boundingRectangle.Height, page.BitsPerPixel, 
-                    RasterByteOrder.Rgb, page.ViewPerspective, page.GetPalette(), IntPtr.Zero, 0);
+                    page.Order, page.ViewPerspective, page.GetPalette(), IntPtr.Zero, 0);
+                rasterZoneImage.OriginalFormat = page.OriginalFormat;
 
                 // Initialize the destination image to all white.
                 FillCommand fillCommand = new FillCommand(new RasterColor(Color.White));

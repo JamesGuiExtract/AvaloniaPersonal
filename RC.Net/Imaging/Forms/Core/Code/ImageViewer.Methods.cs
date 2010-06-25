@@ -3812,6 +3812,12 @@ namespace Extract.Imaging.Forms
                     // Transform the rectangle to image coordinates
                     Rectangle region = GetTransformedRectangle(_trackingData.Rectangle, true);
 
+                    // Ensure the region is not empty
+                    if (region.Width <= 0 || region.Height <= 0)
+                    {
+                        return;
+                    }
+
                     // Extract the subimage
                     RasterImage clone = null;
                     RasterImage image = null;
