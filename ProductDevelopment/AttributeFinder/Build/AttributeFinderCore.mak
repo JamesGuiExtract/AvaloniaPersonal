@@ -67,12 +67,12 @@ BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 LabelCommonFolder: 
     $(Label) $$/Engineering/ProductDevelopment/Common -I- -L"$(FlexIndexVersion)" -O
 
-BuildPDUtils: 
+BuildPDUtils: BuildAttributeFinderCore
 	@ECHO Building PD Utils...
     @CD "$(PDUtilsRootDir)\UCLIDUtilApps\Code"
     @devenv Utils.sln /BUILD $(BuildConfig) /USEENV
 
-BuildAttributeFinderCore: BuildPDUtils 
+BuildAttributeFinderCore:  
 	@ECHO Building AFCore...
     @CD "$(AFRootDirectory)\AFCore\AFCoreTest\Code"
     @devenv AFCoreTest.sln /BUILD $(BuildConfig) /USEENV
@@ -136,7 +136,7 @@ EncryptAndCopyComponentDataFiles:
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
     @ECHO $(FKBVersion) > "$(AFCoreInstallFilesRootDir)\ComponentData\FKBVersion.txt"
 
-CopyFilesToInstallFolder: CleanupPreviousBuildFolders ObfuscateFiles
+CopyFilesToInstallFolder: BuildPDUtils CleanupPreviousBuildFolders ObfuscateFiles
     @ECHO Copying the AttributeFinderCore files to installation directory...
 	@COPY /v  "$(BinariesFolder)\COMLM.dll" "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\ESMessageUtils.dll" "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles"
@@ -342,7 +342,7 @@ CreateExtractCommonMergeModule: BuildAttributeFinderCore
 	$(SetProductVerScript) "$(PDCommonDir)\ExtractCommon\ExtractCommon.ism" "$(ReusableComponentsVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(PDCommonDir)\ExtractCommon\ExtractCommon.ism"
 	
-BuildAFCoreMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles CreateExtractCommonMergeModule
+BuildAFCoreMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles CreateExtractCommonMergeModule 
     @ECHO Buliding the UCLIDFlexIndex Merge Module installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(AFCoreMergeModuleInstallRoot)\UCLID FlexIndex.ism" "$(FlexIndexVersion)"
