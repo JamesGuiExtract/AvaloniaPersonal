@@ -157,6 +157,11 @@ begin
  	
 	// Install the 64 bit drivers if required	
 	//install64SentinelDriversIfRequired();
+
+    // Register Dlls
+	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
+	szCmd = "cmd";
+	//LaunchAppAndWait( szRegAllCmdLine, "/s", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
    
     Disable(STATUSEX);
 
