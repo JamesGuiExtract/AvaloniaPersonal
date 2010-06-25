@@ -58,14 +58,7 @@ CopyFilesToExtractLMInstall:
     @DeleteFiles "$(LMInstallFilesRootDir)\NonSelfRegCC\*.*"
     @XCOPY "$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\FieldActivationUtility\*.*" "$(LMInstallFilesRootDir)\FieldActivation" /v /y
     $(VerifyDir) "$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\FieldActivationUtility" "$(LMInstallFilesRootDir)\FieldActivation"
-    @COPY /v  "$(BinariesFolder)\SafeNetUtils.dll" "$(LMInstallFilesRootDir)\NonSelfRegCC"
     @COPY /v  "$(BinariesFolder)\USBLicenseKeyManager.exe" "$(LMInstallFilesRootDir)\NonSelfRegCC"
-    @COPY /v  "$(BinariesFolder)\RWUtils.dll" "$(LMInstallFilesRootDir)\NonSelfRegCC"
-	@COPY /V "$(CommonDirectory)\RegisterAll.bat" "$(LMInstallFilesRootDir)\NonSelfRegCC"
-    @COPY /v  "$(BinariesFolder)\COMLMCore.dll" "$(LMInstallFilesRootDir)\NonSelfRegCC"
-	@ECHO COMLM.dll >"$(LMInstallFilesRootDir)\NonSelfRegCC\LM.rl"
-	@ECHO ESMessageUtils.dll >>"$(LMInstallFilesRootDir)\NonSelfRegCC\LM.rl"
-	@ECHO UCLIDCOMUtils.DLL >>"$(LMInstallFilesRootDir)\NonSelfRegCC\LM.rl"
 
 BuildExtractLMInstall:CopyFilesToExtractLMInstall
     @ECHO Building Extract Systems LM installation...
