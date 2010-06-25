@@ -3792,6 +3792,11 @@ namespace Extract.Imaging.Forms
             ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
                 Color.Black, FrameStyle.Thick);
 
+            // Invalidate the image viewer so that the frame is erased even
+            // if an exception is thrown by the image extraction
+            // [DNRCAU #489]
+            Invalidate();
+
             // If the event was not canceled process the end of the tracking
             if (!cancel)
             {

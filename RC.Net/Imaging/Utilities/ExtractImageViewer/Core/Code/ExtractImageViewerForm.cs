@@ -336,6 +336,8 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 // Add the event handler for layer objects being added and deleted
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
                 _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
+
+                // Add the event handle for the image extracted
                 _imageViewer.ImageExtracted += HandleImageViewerImageExtracted;
 
                 // Store the initial image file and script file names
@@ -478,6 +480,13 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         {
             try
             {
+                // Do not allow the menu strip to activate while the image viewer
+                // is tracking
+                if (_imageViewer.IsTracking && (keyData & Keys.Alt) == Keys.Alt)
+                {
+                    return true;
+                }
+
                 // Allow the image viewer to handle this keyboard shortcut.
                 // If the image viewer does not process it, bubble it up to the base class.
                 return _imageViewer.Shortcuts.ProcessKey(keyData) ||
