@@ -270,6 +270,8 @@
 		<row><td>UCLIDAFValueFinders.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{7BC4F0B5-96D8-4565-B15C-CBD92433E4E1}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>UCLIDAFValueFinders.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{01B9E00A-7218-499B-A44F-539BD89D1BBD}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{6B7EE5F1-41C6-4893-ABF8-8EFD200A8D39}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>UCLIDTestingFramework.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{A8BC2B5F-20B3-465D-AB1B-EB428B53B5F6}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>uclidtestingframework.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>UCLIDTestingFrameworkCore.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{3B36BC3E-5A44-42D5-84A7-59621FD055FD}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>uclidtestingframeworkcore.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -541,6 +543,8 @@
 		<row><td>sanddock.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SandDock.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SandDock.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\SandDock.dll</td><td>17</td><td/></row>
 		<row><td>splitmultipageimage.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SplitMultiPageImage.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SPLITM~1.EXE|SplitMultiPageImage.exe</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\SplitMultiPageImage.exe</td><td>17</td><td/></row>
 		<row><td>sqlcdbeditor.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SQLCDBEditor.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>SQLCDB~1.EXE|SQLCDBEditor.exe</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_DOTNETGAC_FILES&gt;\SQLCDBEditor.exe</td><td>17</td><td/></row>
+		<row><td>uclidtestingframework.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDTestingFramework.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDT~1.DLL|UCLIDTestingFramework.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\UCLIDTestingFramework.dll</td><td>1</td><td/></row>
+		<row><td>uclidtestingframeworkcore.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDTestingFrameworkCore.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDT~1.DLL|UCLIDTestingFrameworkCore.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\UCLIDTestingFrameworkCore.dll</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -742,6 +746,8 @@
 		<row><td>UCLIDAFValueFinders.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_F6E01A1E_7F90_4E2F_B896_49DB3B6E4FE6_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_00F57E2E_6B14_4A5D_BC42_F26FF3582154_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_62801D0A_409A_4218_B4E3_77BB41A1A3C9_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>UCLIDTestingFramework.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_28D65F4F_B664_4280_9B77_CFD00BC89B2E_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>UCLIDTestingFrameworkCore.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_6064F27F_884F_4617_9897_A0DD1C40F9B4_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -1428,6 +1434,8 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>UCLIDAFValueFinders.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>UCLIDTestingFramework.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>UCLIDTestingFrameworkCore.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 	</table>
 
 	<table name="ModuleConfiguration">
