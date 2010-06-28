@@ -120,6 +120,7 @@ namespace Extract.SQLCDBEditor
             this.dataGridView.TabIndex = 0;
             this.dataGridView.UserDeletedRow += new System.Windows.Forms.DataGridViewRowEventHandler(this.DataGridView_UserDeletedRow);
             this.dataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.DataGridView_CurrentCellDirtyStateChanged);
+            this.dataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.HandleDataGridViewError);
             // 
             // menuStrip
             // 

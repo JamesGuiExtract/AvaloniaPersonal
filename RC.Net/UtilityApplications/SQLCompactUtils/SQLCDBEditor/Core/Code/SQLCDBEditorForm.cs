@@ -347,6 +347,31 @@ namespace Extract.SQLCDBEditor
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="DataGridView.DataError"/> event.
+        /// </summary>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        void HandleDataGridViewError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            try
+            {
+                // Set throw exception to false so that the exception is not rethrown
+                // after it has been displayed here
+                e.ThrowException = false;
+
+                // Wrap the exception as an ExtractException and display it
+                ExtractException ee = ExtractException.AsExtractException("ELI30291", e.Exception);
+                ee.AddDebugData("Data Row", e.RowIndex, false);
+                ee.AddDebugData("Data Column", e.ColumnIndex, false);
+                ee.Display();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30292", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods

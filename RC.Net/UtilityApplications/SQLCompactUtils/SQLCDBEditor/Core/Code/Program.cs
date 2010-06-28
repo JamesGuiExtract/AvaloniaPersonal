@@ -39,7 +39,8 @@ namespace Extract.SQLCDBEditor
 							+ "\t<DatabaseFileName> - sdf file to open.\r\n"
 							+ "\t</? - Displays this message.\r\n\r\n"
 							+ "\tIf no arguments are specified SQLCDBEditor will be opened without a file."
-							, "Usage");
+							, "Usage", MessageBoxButtons.OK, MessageBoxIcon.Information,
+                            MessageBoxDefaultButton.Button1, 0);
 					}
 					else
 					{

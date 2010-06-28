@@ -122,7 +122,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// The current FAM Service database schema version
         /// </summary>
-        internal const int CurrentDatabaseSchemaVersion = 3;
+        internal const int CurrentDatabaseSchemaVersion = 4;
 
         #endregion Constants
 
@@ -951,7 +951,12 @@ namespace Extract.FileActionManager.Utilities
                 while (reader.Read())
                 {
                     // Get the file name
-                    string fileName = reader.GetString(0).Trim();
+                    string fileName =
+                        reader.IsDBNull(0) ? string.Empty : reader.GetString(0).Trim();
+                    if (string.IsNullOrEmpty(fileName))
+                    {
+                        continue;
+                    }
 
                     // Default the number of files to process to the global number
                     int numberOfFilesToProcess = globalNumberOfFilesToProcess;
