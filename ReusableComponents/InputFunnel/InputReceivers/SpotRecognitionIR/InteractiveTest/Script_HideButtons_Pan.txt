@@ -1,0 +1,5 @@
+// Open image file
+openfile .\Image1.tif
+
+// Hide buttons : Pan
+HideButtons 8
