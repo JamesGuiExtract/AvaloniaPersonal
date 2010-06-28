@@ -314,6 +314,7 @@ CleanupPreviousBuildFolders:
 	@IF NOT EXIST "$(InternalUseBuildFilesArchive)" @MKDIR "$(InternalUseBuildFilesArchive)"
 	@IF NOT EXIST "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles" @MKDIR "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@IF NOT EXIST "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles" @MKDIR "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles"
+	@IF NOT EXIST "$(IDShieldInstallFilesRootDir)\NonSelfRegFiles" @MKDIR "$(IDShieldInstallFilesRootDir)\NonSelfRegFiles"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\*.*"
     @DeleteFiles "$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\*.*"
