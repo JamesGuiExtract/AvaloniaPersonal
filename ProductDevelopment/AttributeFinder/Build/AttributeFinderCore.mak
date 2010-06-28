@@ -67,12 +67,12 @@ BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 LabelCommonFolder: 
     $(Label) $$/Engineering/ProductDevelopment/Common -I- -L"$(FlexIndexVersion)" -O
 
-BuildPDUtils: BuildAttributeFinderCore
+BuildPDUtils: 
 	@ECHO Building PD Utils...
     @CD "$(PDUtilsRootDir)\UCLIDUtilApps\Code"
     @devenv Utils.sln /BUILD $(BuildConfig) /USEENV
 
-BuildAttributeFinderCore:  
+BuildAttributeFinderCore: BuildPDUtils 
 	@ECHO Building AFCore...
     @CD "$(AFRootDirectory)\AFCore\AFCoreTest\Code"
     @devenv AFCoreTest.sln /BUILD $(BuildConfig) /USEENV
@@ -136,7 +136,7 @@ EncryptAndCopyComponentDataFiles:
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
     @ECHO $(FKBVersion) > "$(AFCoreInstallFilesRootDir)\ComponentData\FKBVersion.txt"
 
-CopyFilesToInstallFolder: BuildPDUtils CleanupPreviousBuildFolders ObfuscateFiles
+CopyFilesToInstallFolder: CleanupPreviousBuildFolders ObfuscateFiles
     @ECHO Copying the AttributeFinderCore files to installation directory...
 	@COPY /v  "$(BinariesFolder)\COMLM.dll" "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\ESMessageUtils.dll" "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles"
@@ -264,7 +264,6 @@ CopyFilesToInstallFolder: BuildPDUtils CleanupPreviousBuildFolders ObfuscateFile
     @COPY /V "$(BinariesFolder)\SpotRecognitionIR.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @COPY /V "$(BinariesFolder)\GeneralIV.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @COPY /V "$(BinariesFolder)\RegExprIV.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
-    @COPY /V "$(BinariesFolder)\InputContexts.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
 #    @COPY /V "$(BinariesFolder)\SpeechIRs.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
 
     @COPY /V "$(BinariesFolder)\LeadUtils.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
@@ -282,6 +281,7 @@ CopyFilesToInstallFolder: BuildPDUtils CleanupPreviousBuildFolders ObfuscateFile
 	@COPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)" 
 	
 # Create .rl files for registration
+	@DIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.rl"
 	@DIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCommon.rl"
 	@DIR "$(IDShieldInstallFilesRootDir)\SelfRegIDShieldComponents\*.*" /b >"$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\IDShield.rl"
 	@DIR "$(ClearImageInstallFilesDir)\*Image.dll" /b >"$(AFCoreInstallFilesRootDir)\ClearImage.rl"
@@ -298,8 +298,14 @@ CopyFilesToInstallFolder: BuildPDUtils CleanupPreviousBuildFolders ObfuscateFile
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.DataEntry.dll" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\DataEntryApplication.exe" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.nl"
 		
+# Create RegList.dat file for SelfRegFiles
+	@DIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\IFCommon.rl"
+	@DIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\IFCore.rl"
 #    @COPY /V "$(BinariesFolder)\sit_grammar.xml" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V "$(BinariesFolder)\ImageViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+    @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
+    @DeleteFiles "$(AFCoreInstallFilesRootDir)\mssccprj.scc"
+    @DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\vssver.scc" 
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\mssccprj.scc"
 	@DeleteFiles "$(ClearImageInstallFilesDir)\vssver.scc"
@@ -309,19 +315,25 @@ CleanupPreviousBuildFolders:
 	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\SelfRegFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\SelfRegFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-    @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+    @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\pdf"
 	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\DotNetGAC" @MKDIR "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\Reports" @MKDIR "$(AFCoreInstallFilesRootDir)\Reports"
 	@IF NOT EXIST "$(InternalUseBuildFilesArchive)" @MKDIR "$(InternalUseBuildFilesArchive)"
 	@IF NOT EXIST "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles" @MKDIR "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@IF NOT EXIST "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles" @MKDIR "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*"
+    @DeleteFiles "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*"
+    @DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\*.*"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\*.*"
     @DeleteFiles "$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\*.*"
 	@DeleteFiles "$(IDShieldInstallFilesRootDir)\Reports\*.*"
 	@DeleteFiles "$(IDShieldInstallFilesRootDir)\ExemptionCodes\*.*"
 	@DeleteFiles "$(IDShieldInstallFilesRootDir)\SelfRegIDShieldComponents\*.*"
 	@DeleteFiles "$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\*.*"
+    @DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\*.*"
+	@DeleteFiles "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*"
+	@DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@DeleteFiles "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*"
 	@DeleteFiles "$(ClearImageInstallFilesDir)\*.*"
 	@DeleteFiles "$(AFCoreInstallFilesRootDir)\DotNetGAC\*.*"
 	@DeleteFiles "$(AFCoreInstallFilesRootDir)\Reports\*.*"
@@ -342,7 +354,7 @@ CreateExtractCommonMergeModule: BuildAttributeFinderCore
 	$(SetProductVerScript) "$(PDCommonDir)\ExtractCommon\ExtractCommon.ism" "$(ReusableComponentsVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(PDCommonDir)\ExtractCommon\ExtractCommon.ism"
 	
-BuildAFCoreMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles CreateExtractCommonMergeModule 
+BuildAFCoreMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles CreateExtractCommonMergeModule
     @ECHO Buliding the UCLIDFlexIndex Merge Module installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(AFCoreMergeModuleInstallRoot)\UCLID FlexIndex.ism" "$(FlexIndexVersion)"
