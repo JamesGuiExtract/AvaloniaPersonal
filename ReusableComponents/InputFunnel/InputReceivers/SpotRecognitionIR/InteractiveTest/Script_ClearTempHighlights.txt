@@ -1,5 +1,5 @@
 // Open image file
-openfile D:\Engineering\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif
+openfile .\Image1.tif
 
 // Add temporary highlights to page 2 (StartX, StartY, EndX, EndY, Height as odd number, Page)
 AddTempHighlight 1250,800,1600,810,141,2

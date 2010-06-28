@@ -1,5 +1,5 @@
 // Open image file
-openfile D:\Engineering\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif
+openfile .\Image1.tif
 
 // Set window position to specified position Left, Right, Top, Bottom
 SetWindowPos 50,800,50,600
