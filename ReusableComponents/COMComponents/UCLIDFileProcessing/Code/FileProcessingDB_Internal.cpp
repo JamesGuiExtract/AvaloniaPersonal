@@ -96,6 +96,123 @@ void CFileProcessingDB::postStatusUpdateNotification(EDatabaseWrapperObjectStatu
 	}
 }
 //--------------------------------------------------------------------------------------------------
+set<long> CFileProcessingDB::getSkippedFilesForAction(const _ConnectionPtr& ipConnection,
+													  long nActionId)
+{
+	try
+	{
+		string strQuery = "SELECT FileID FROM SkippedFile WHERE ActionID = " + asString(nActionId);
+
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI30293", ipFileSet != NULL);
+
+		// Open the file set
+		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+		set<long> setFileIds;
+		while (ipFileSet->adoEOF == VARIANT_FALSE)
+		{
+			setFileIds.insert(getLongField(ipFileSet->Fields, "FileID"));
+			ipFileSet->MoveNext();
+		}
+
+		return setFileIds;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30294");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
+										   const vector<SetFileActionData>& vecSetData,
+										   string strAction, const string& strState)
+{
+	try
+	{
+		// Get the ActionID
+		long nActionID = getActionID(ipConnection, strAction);
+		string strActionID = asString(nActionID);
+		string strActionCol = "ASC_" + strAction;
+		string strFAMUser = asString(getFAMUserID(ipConnection));
+		string strMachine = asString(getMachineID(ipConnection));
+		EActionStatus eaTo = asEActionStatus(strState);
+
+		// Get the set of all skipped files for the specified action
+		set<long> setSkippedIds = getSkippedFilesForAction(ipConnection, nActionID);
+
+		// Build main queries
+		string strUpdateFamFile = "Update FAMFile Set " + strActionCol + " = '" + 
+			strState + "' WHERE ID IN (";
+		string strDeleteLockedFile = "DELETE FROM LockedFile WHERE ActionID = "
+			+ strActionID + " AND UPIID = " + asString(m_nUPIID)
+			+ " AND FileID IN (";
+		string strRemoveSkippedFile = "DELETE FROM SkippedFile WHERE ActionID = "
+			+ strActionID + " AND FileID IN (";
+		string strFastQuery = "INSERT INTO " + gstrFILE_ACTION_STATE_TRANSITION
+			+ " (FileID, ActionID, ASC_From, ASC_To, DateTimeStamp, FAMUserID, MachineID"
+			+ ") SELECT FAMFile.ID, " + strActionID + " AS ActionID, FAMFile."
+			+ strActionCol + " AS ASC_From, '" + strState + "' AS ASC_To, "
+			+ "GETDATE() AS DateTimeStamp, " + strFAMUser + " AS FAMUserID, " + strMachine
+			+ " AS MachineID FROM FAMFile WHERE FAMFile.ID IN (";
+		string strClearComments = m_bAutoDeleteFileActionComment && strState == "C" ?
+			"DELETE FROM FileActionComment WHERE ActionID = " + strActionID + " AND FileID IN("
+			: "";
+		string strAddSkipRecord = strState == "S" ?
+			"INSERT INTO SkippedFile (UserName, FileID, ActionID) SELECT '"
+			+ getCurrentUserName() + "' AS UserName, FAMFile.ID, "
+			+ strActionID + " AS ActionID FROM FAMFile WHERE FAMFile.ID IN (" : "";
+
+		// Reload the action statistics from the database
+		loadStats(ipConnection, nActionID);
+
+		// Execute the queries in groups of 10000 File IDs
+		size_t i=0;
+		size_t count = vecSetData.size();
+		while (i < count)
+		{
+			string strFileIdList;
+			for(int j=0; i < count && j < 10000; j++)
+			{
+				const SetFileActionData& data = vecSetData[i++];
+				if (!strFileIdList.empty())
+				{
+					strFileIdList += ", ";
+				}
+				strFileIdList += asString(data.FileID);
+
+				// Update the stats
+				// If the current status for the file is processing but it is listed
+				// in the skipped table, then set the from action status to skipped so
+				// that skipped file counts are correctly computed
+				// do not push to the database yet
+				updateStats(ipConnection, nActionID,
+					data.FromStatus == kActionProcessing
+					&& setSkippedIds.find(data.FileID) != setSkippedIds.end() ?
+					kActionSkipped : data.FromStatus,
+					eaTo, data.FileRecord, data.FileRecord, false);
+			}
+			strFileIdList += ")";
+			
+			// Execute the queries (execute the FAMFile update last)
+			executeCmdQuery(ipConnection, strFastQuery + strFileIdList);
+			executeCmdQuery(ipConnection, strDeleteLockedFile + strFileIdList);
+			executeCmdQuery(ipConnection, strRemoveSkippedFile + strFileIdList);
+			if (!strClearComments.empty())
+			{
+				executeCmdQuery(ipConnection, strClearComments + strFileIdList);
+			}
+			if (!strAddSkipRecord.empty())
+			{
+				executeCmdQuery(ipConnection, strAddSkipRecord + strFileIdList);
+			}
+			executeCmdQuery(ipConnection, strUpdateFamFile + strFileIdList);
+		}
+
+		// Done setting all file states and updating statistics, push to the database now
+		saveStats(ipConnection, nActionID);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30295");
+}
+//--------------------------------------------------------------------------------------------------
 EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection, long nFileID, 
 													string strAction, const string& strState,
 													const string& strException,
@@ -1258,7 +1375,8 @@ void CFileProcessingDB::removeActionColumn(const _ConnectionPtr& ipConnection,
 void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID, 
 									EActionStatus eFromStatus, EActionStatus eToStatus, 
 									UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewRecord, 
-									UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord)
+									UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord,
+									bool bUpdateAndSaveStats)
 {
 	// Only time a ipOldRecord can be NULL is if the from status is kActionUnattempted
 	if (eFromStatus != kActionUnattempted && ipOldRecord == NULL)
@@ -1321,12 +1439,15 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 	}
 
 	// load the record from the ActionStatistics table
-	bool bRecalculated = loadStats(ipConnection, nActionID);
-	if (bRecalculated)
+	if (bUpdateAndSaveStats)
 	{
-		// if the stats were recalculated the all added on changed records have been included
-		return;
+		if (loadStats(ipConnection, nActionID))
+		{
+			// if the stats were recalculated the all added on changed records have been included
+			return;
+		}
 	}
+
 	// Create an ActionStatistics pointer to return the values
 	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats;
 	ipActionStats = m_mapActionIDtoStats[nActionID];
@@ -1432,8 +1553,10 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 			llNumBytesTotal - llOldFileSize);
 	}
 
-	// Save the stats
-	saveStats(ipConnection, nActionID);
+	if (bUpdateAndSaveStats)
+	{
+		saveStats(ipConnection, nActionID);
+	}
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::loadStats(_ConnectionPtr ipConnection, long nActionID)
@@ -1498,6 +1621,16 @@ bool CFileProcessingDB::loadStats(_ConnectionPtr ipConnection, long nActionID)
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::saveStats(_ConnectionPtr ipConnection, long nActionID)
 {
+	// Find the stats for the given action
+	map<long, UCLID_FILEPROCESSINGLib::IActionStatisticsPtr>::iterator it =
+		m_mapActionIDtoStats.find(nActionID);
+	if (it == m_mapActionIDtoStats.end())
+	{
+		UCLIDException ue("ELI14104", "No Statistics to save.");
+		ue.addDebugInfo("ActionID", nActionID);
+		throw ue;
+	}
+
 	// Create a pointer to a recordset
 	_RecordsetPtr ipActionStatSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI19506", ipActionStatSet != NULL);
@@ -1509,19 +1642,10 @@ void CFileProcessingDB::saveStats(_ConnectionPtr ipConnection, long nActionID)
 	ipActionStatSet->Open(strSelectStat.c_str(), _variant_t((IDispatch *)ipConnection, true), 
 		adOpenDynamic, adLockOptimistic, adCmdText);
 
-	// Find the stats for the given action
-	if (m_mapActionIDtoStats.find(nActionID) == m_mapActionIDtoStats.end())
-	{
-		UCLIDException ue("ELI14104", "No Statistics to save.");
-		ue.addDebugInfo("ActionID", nActionID);
-		throw ue;
-	}
-
 	if (ipActionStatSet->adoEOF == VARIANT_FALSE)
 	{
 		// Create an ActionStatistics pointer to return the values
-		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats;
-		ipActionStats = m_mapActionIDtoStats[nActionID];
+		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats = it->second;
 
 		// Get all the statistics
 		long lNumDocs(-1), lNumDocsComplete(-1), lNumDocsFailed(-1), lNumDocsSkipped(-1),
@@ -1551,8 +1675,6 @@ void CFileProcessingDB::saveStats(_ConnectionPtr ipConnection, long nActionID)
 
 		// Update the action statistics
 		ipActionStatSet->Update();
-
-		m_mapActionIDtoStats[nActionID] = ipActionStats;
 	}
 	else
 	{
@@ -1864,7 +1986,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingDB::getThisAsCOMPtr
 }
 //--------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileRecordPtr CFileProcessingDB::getFileRecordFromFields(
-	const FieldsPtr& ipFields)
+	const FieldsPtr& ipFields, bool bGetPriority)
 {
 	// Make sure the ipFields argument is not NULL
 	ASSERT_ARGUMENT("ELI17028", ipFields != NULL);
@@ -1875,8 +1997,8 @@ UCLID_FILEPROCESSINGLib::IFileRecordPtr CFileProcessingDB::getFileRecordFromFiel
 	// Set the file data from the fields collection (set ActionID to 0)
 	ipFileRecord->SetFileData(getLongField(ipFields, "ID"), 0,
 		getStringField(ipFields, "FileName").c_str(), getLongLongField(ipFields, "FileSize"),
-		getLongField(ipFields, "Pages"),
-		(UCLID_FILEPROCESSINGLib::EFilePriority)getLongField(ipFields, "Priority"));
+		getLongField(ipFields, "Pages"), (UCLID_FILEPROCESSINGLib::EFilePriority)
+		(bGetPriority ? getLongField(ipFields, "Priority") : 0));
 
 	return ipFileRecord;
 }

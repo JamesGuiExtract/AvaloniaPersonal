@@ -206,6 +206,30 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
 
 private:
+	class SetFileActionData
+	{
+	public:
+		SetFileActionData(long fileId, UCLID_FILEPROCESSINGLib::IFileRecordPtr ipRecord,
+			EActionStatus eaFromStatus)
+			: FileID(fileId),
+			FileRecord(ipRecord),
+			FromStatus(eaFromStatus)
+		{
+		}
+		~SetFileActionData()
+		{
+			try
+			{
+				FileRecord = NULL;
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI30296");
+		}
+
+		UCLID_FILEPROCESSINGLib::IFileRecordPtr FileRecord;
+		long FileID;
+		EActionStatus FromStatus;
+	};
+
 	friend class DBLockGuard;
 	// Variables
 
@@ -318,7 +342,8 @@ private:
 	//-------------------------------------------------------------------------------------------------
 	
 	// PROMISE: returns a pointer to a new FileRecord object filled from ipFields
-	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecordFromFields(const FieldsPtr& ipFields);
+	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecordFromFields(const FieldsPtr& ipFields,
+		bool bGetPriority = true);
 
 	// PROMISE: To transfer the data from the ipFileRecord object to the appropriate Field in ipFields
 	// NOTE: This does not set the ID field from the ipFileRecord.
@@ -409,6 +434,14 @@ private:
 		long nActionID = -1, bool bLockDB = true, bool bRemovePreviousSkipped = false, 
 		const string& strFASTComment = "");
 
+	// PROMISE: To set the specified group of files' action state for the specified action.
+	// NOTE:	This will clear the skipped file state for any file ID in the list if
+	//			the file is currently in a skipped state.
+	//			The outer scope that calls this function must lock the DB and
+	//			create a transaction guard.
+	void setFileActionState(_ConnectionPtr ipConnection,
+		const vector<SetFileActionData>& vecFileData, string strAction, const string& strState);
+
 	// PROMISE: Recalculates the statistics for the given Action ID using the connection provided.
 	void reCalculateStats(_ConnectionPtr ipConnection, long nActionID);
 
@@ -443,7 +476,7 @@ private:
 	//			Only time a ipOldRecord can be NULL is if the from status is kActionUnattempted
 	void updateStats(_ConnectionPtr ipConnection, long nActionID, EActionStatus eFromStatus, 
 		EActionStatus eToStatus, UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewRecord, 
-		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord);
+		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord, bool bUpdateAndSaveStats = true);
 					
 	// PROMISE: To load the current stats record from the db from ActionStatistics table using the
 	//			connection provided.
@@ -650,6 +683,9 @@ private:
 	// RETURNS: A vector of IFileRecords for the files that were set to processing.
 	IIUnknownVectorPtr setFilesToProcessing(const _ConnectionPtr &ipConnection,
 		const string& strSelectSQL, long nActionID);
+
+	// Gets a set containing the File ID's for all files that are skipped for the specified action
+	set<long> getSkippedFilesForAction(const _ConnectionPtr& ipConnection, long nActionId);
 
 	void validateLicense();
 };

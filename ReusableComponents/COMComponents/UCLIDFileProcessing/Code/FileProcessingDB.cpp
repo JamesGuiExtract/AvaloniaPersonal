@@ -2610,17 +2610,52 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 		ipFileSet->Open(strQueryFrom.c_str(), _variant_t((IDispatch*)ipConnection, true),
 			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
-		// Loop through each record
+		// Get the list of file ID's to modify
 		long nNumRecordsModified = 0;
+		vector<long> vecFileIds;
 		while (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
 			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", 0, 0) == VARIANT_TRUE)
 			{
+				// Get the file ID
+				vecFileIds.push_back(getLongField(ipFileSet->Fields, "ID"));
+
+				nNumRecordsModified++;
+			}
+
+			// Move to next record
+			ipFileSet->MoveNext();
+		}
+		ipFileSet->Close();
+
+		// The action column to change
+		string strToActionCol = "ASC_" + strToAction;
+
+		// Loop through the file Ids to change in groups of 10000 populating the SetFileActionData
+		map<string, vector<SetFileActionData>> mapFromStatusToId;
+		size_t count = vecFileIds.size();
+		size_t i = 0;
+		while (i < count)
+		{
+			string strQuery = "SELECT * FROM FAMFile WHERE FAMFile.ID IN (";
+			string strFileIds = asString(vecFileIds[i++]);
+			for (int j=1; i < count && j < 10000; j++)
+			{
+				strFileIds += ", " + asString(vecFileIds[i++]);
+			}
+			strQuery += strFileIds;
+			strQuery += ")";
+			ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
+				adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+			// Loop through each record
+			while (ipFileSet->adoEOF == VARIANT_FALSE)
+			{
 				FieldsPtr ipFields = ipFileSet->Fields;
 				ASSERT_RESOURCE_ALLOCATION("ELI27040", ipFields != NULL);
 
-				// Get the file ID
 				long nFileID = getLongField(ipFields, "ID");
+				EActionStatus fromStatus = asEActionStatus(getStringField(ipFields, strToActionCol));
 
 				// If copying from an action, get the status for the action
 				if (bFromSpecified)
@@ -2628,13 +2663,18 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 					strStatus = getStringField(ipFields, strFromAction);
 				}
 
-				// Set the file action state
-				setFileActionState(ipConnection, nFileID, strToAction, strStatus, "", -1, false, true);
-				nNumRecordsModified++;
-			}
+				mapFromStatusToId[strStatus].push_back(SetFileActionData(nFileID,
+					getFileRecordFromFields(ipFields, false), fromStatus));
 
-			// Move to next record
-			ipFileSet->MoveNext();
+				ipFileSet->MoveNext();
+			}
+		}
+
+		// Set the file action state for each vector of file data
+		for(map<string, vector<SetFileActionData>>::iterator it = mapFromStatusToId.begin();
+			it != mapFromStatusToId.end(); it++)
+		{
+			setFileActionState(ipConnection, it->second, strToAction, it->first); 
 		}
 
 		// Commit the transaction

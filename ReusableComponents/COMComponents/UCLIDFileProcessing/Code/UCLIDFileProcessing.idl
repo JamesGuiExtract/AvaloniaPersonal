@@ -822,8 +822,7 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To set all files which match the specified query to the specified status
 		//			for the specified action.
-		// ARGS:	bstrQueryFrom - This is the FROM clause for the following select query:
-		//							SELECT FAMFile.ID FROM 
+		// ARGS:	bstrQuery -		The select query which selects the FAMFile.ID
 		//			bstrToAction -	The action to set the new status for
 		//			eaNewStatus -	The status to set for the action (ignored if bstrFromAction
 		//							is specified)
@@ -834,7 +833,7 @@ library UCLID_FILEPROCESSINGLib
 		// REQUIRE: If bstrFromAction is specified, the bstrQueryFrom query must include the column name
 		//			the status is to be copied from.
 		[id(51), helpstring("method ModifyActionStatusForQuery")] HRESULT ModifyActionStatusForQuery(
-			[in] BSTR bstrQueryFrom, [in] BSTR bstrToAction, [in] EActionStatus eaNewStatus,
+			[in] BSTR bstrQuery, [in] BSTR bstrToAction, [in] EActionStatus eaNewStatus,
 			[in] BSTR bstrFromAction, [in] IRandomMathCondition* pRandomCondition,
 			[out,retval] long* pnNumRecordsModified);
 

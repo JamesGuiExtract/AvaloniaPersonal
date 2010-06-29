@@ -292,11 +292,6 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		{
 			// Get the query for updating files
 			string strSelect = "FAMFile.ID";
-			if (lFromActionID != -1)
-			{
-				strSelect += ", ASC_";
-				strSelect += (LPCTSTR)zFromAction;
-			}
 			string strQuery = m_settings.buildQuery(m_ipFAMDB, strSelect);
 			uex.addDebugInfo("Query", strQuery);
 
