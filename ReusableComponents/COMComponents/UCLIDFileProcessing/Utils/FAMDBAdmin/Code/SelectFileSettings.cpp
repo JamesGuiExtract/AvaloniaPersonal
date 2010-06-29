@@ -180,7 +180,7 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			if (m_eTagType == eNoneTag)
 			{
 				strQueryPart2 =
-					"(SELECT [FileName] FROM [FAMFile] WHERE [FAMFile].[FileName] NOT IN ";
+					"(SELECT [ID] FROM [FAMFile] WHERE [FAMFile].[ID] NOT IN ";
 			}
 			strQueryPart2 += "(" + strMainQueryTemp;
 			replaceVariable(strQueryPart2, gstrTAG_NAME_VALUE, m_vecTags[0]);
