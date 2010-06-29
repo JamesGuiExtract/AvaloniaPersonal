@@ -164,7 +164,7 @@ namespace Extract.Utilities
                     "ELI30198", _OBJECT_NAME);
 
                 RegistryKey root = Registry.ClassesRoot;
-                root.DeleteSubKey(fileExtension, false);
+                root.DeleteSubKeyTree(fileExtension);
                 root.DeleteSubKeyTree(fileTypeDescription);
                 root.Close();
 

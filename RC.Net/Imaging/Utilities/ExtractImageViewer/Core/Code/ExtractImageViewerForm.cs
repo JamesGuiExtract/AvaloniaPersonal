@@ -1317,7 +1317,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                             break;
 
                         case ImageViewerControlId.OpenSubImageWindowButton:
-                            // TODO: Hide this button
+                            _extractImageToolStripButton.Visible = false;
                             break;
 
                         case ImageViewerControlId.PanButton:
