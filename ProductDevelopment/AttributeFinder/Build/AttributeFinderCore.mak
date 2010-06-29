@@ -285,7 +285,7 @@ CopyFilesToInstallFolder: BuildPDUtils CleanupPreviousBuildFolders ObfuscateFile
 	@DIR "$(IDShieldInstallFilesRootDir)\SelfRegIDShieldComponents\*.*" /b >"$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\IDShield.rl"
 	@DIR "$(ClearImageInstallFilesDir)\*Image.dll" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\ClearImage.rl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\DataEntryCC.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.rl"
-	@DIR "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles"\*.*" /b >"$(ExtractCommonInstallFilesRootDir)\SelfRegFiles\ExtractCommon.rl"
+	@DIR "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles"\*.*" /b >"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.rl"
 
 # Add .net com objects to the .nl file
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Utilities.Parsers.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl
@@ -315,6 +315,7 @@ CleanupPreviousBuildFolders:
 	@IF NOT EXIST "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles" @MKDIR "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@IF NOT EXIST "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles" @MKDIR "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles"
 	@IF NOT EXIST "$(IDShieldInstallFilesRootDir)\NonSelfRegFiles" @MKDIR "$(IDShieldInstallFilesRootDir)\NonSelfRegFiles"
+	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles" @MKDIR "$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\*.*"
     @DeleteFiles "$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\*.*"
