@@ -999,6 +999,9 @@ void CEAVGeneratorDlg::saveAttributesToEAV(const CString& zFileName)
 	// Close file and wait for file to be readable
 	ofs.close();
 	waitForFileToBeReadable((LPCTSTR)zFileName);
+
+	// Now reopen the file (this ensures that spatial information is cleared) [LRCAU #5854]
+	openEAVFile(zFileName);
 }
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::saveAttributesToVOA(const CString& zFileName)

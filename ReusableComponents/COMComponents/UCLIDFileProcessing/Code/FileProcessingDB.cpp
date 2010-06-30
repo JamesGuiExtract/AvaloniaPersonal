@@ -697,25 +697,39 @@ STDMETHODIMP CFileProcessingDB::NotifyFileProcessed(long nFileID,  BSTR strActio
 
 	try
 	{
-		// Check License
-		validateLicense();
+		try
+		{
+			try
+			{
+				// Check License
+				validateLicense();
 
-		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-		ADODB::_ConnectionPtr ipConnection = NULL;
-		
-		BEGIN_CONNECTION_RETRY();
-		
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
+				// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+				ADODB::_ConnectionPtr ipConnection = NULL;
 
-		// change the given files state to completed
-		setFileActionState(ipConnection, nFileID, asString(strAction), "C", "");
+				BEGIN_CONNECTION_RETRY();
 
-		END_CONNECTION_RETRY(ipConnection, "ELI23529");
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// change the given files state to completed
+				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "");
+
+				END_CONNECTION_RETRY(ipConnection, "ELI23529");
+
+				return S_OK;
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30305");
+		}
+		catch(UCLIDException& uex)
+		{
+			uex.addDebugInfo("File ID", nFileID);
+			uex.addDebugInfo("Action Name", asString(strAction));
+			throw uex;
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13541");
-
-	return S_OK;}
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::NotifyFileFailed(long nFileID,  BSTR strAction,  BSTR strException)
 {
@@ -3798,7 +3812,9 @@ STDMETHODIMP CFileProcessingDB::UnregisterProcessingFAM()
 		// Make sure there are no linked records in the LockedFile table 
 		// and if there are records reset there status to StatusBeforeLock if there current
 		// state for the action is processing.
-		revertLockedFilesToPreviousState(getDBConnection(), m_nUPIID);
+		UCLIDException uex("ELI30304", "Application Trace: Files were reverted to original status.");
+		revertLockedFilesToPreviousState(getDBConnection(), m_nUPIID,
+			"Processing FAM is exiting.", &uex);
 
 		// Reset m_nUPIID to 0 to specify that it is not registered.
 		m_nUPIID = 0;
