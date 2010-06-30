@@ -85,8 +85,9 @@ CopyFilesToInstallFolder:
     @ECHO Copying the AttributeFinder files to installation directory...
 	@DeleteFiles "$(AFInstallFilesRootDir)\NonSelfRegSDKComponents\*.*" /S /Q
 	@DeleteFiles "$(AFInstallFilesRootDir)\Redist"\*.*" /S /Q
-    @COPY /v "$(MergeModuleRootDir)\UCLIDInputFunnel.msm" "$(AFInstallFilesRootDir)\Redist"
+    @COPY /v "$(MergeModuleRootDir)\ExtractCommonMM.msm" "$(AFInstallFilesRootDir)\Redist"
     @COPY /v "$(MergeModuleRootDir)\UCLIDFlexIndex.msm" "$(AFInstallFilesRootDir)\Redist"
+    @COPY /v "$(MergeModuleRootDir)\DataEntry.msm" "$(AFInstallFilesRootDir)\Redist"
     @DeleteFiles "$(AFInstallFilesRootDir)\vssver.scc"
     @DeleteFiles "$(AFInstallFilesRootDir)\mssccprj.scc"
 
