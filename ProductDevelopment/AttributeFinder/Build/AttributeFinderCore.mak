@@ -335,13 +335,13 @@ CleanUpMergeModulesFromPreviousBuilds:
 	@DeleteFiles "$(MergeModuleDir)\DataEntry.msm"
 	@DeleteFiles "$(MergeModuleDir)\UCLIDFlexIndex.msm"
 	@DeleteFiles "$(MergeModuleDir)\UCLIDInputFunnel.msm"
-	@DeleteFiles "$(MergeModuleDir)\ExtractCommon.msm"
+	@DeleteFiles "$(MergeModuleDir)\ExtractCommonMM.msm"
 
 CreateExtractCommonMergeModule: BuildAttributeFinderCore
 	@ECHO Creating ExtractCommon merge module...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
-	$(SetProductVerScript) "$(PDCommonDir)\ExtractCommon\ExtractCommon.ism" "$(ReusableComponentsVersion)"
-    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(PDCommonDir)\ExtractCommon\ExtractCommon.ism"
+	$(SetProductVerScript) "$(PDCommonDir)\ExtractCommon\ExtractCommonMM.ism" "$(ReusableComponentsVersion)"
+    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(PDCommonDir)\ExtractCommon\ExtractCommonMM.ism"
 	
 BuildAFCoreMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles CreateExtractCommonMergeModule 
     @ECHO Buliding the UCLIDFlexIndex Merge Module installation...
