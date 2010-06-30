@@ -216,6 +216,24 @@ STDMETHODIMP CFolderFS::raw_Start(IFileSupplierTarget * pTarget, IFAMTagManager 
 		}
 		catch (UCLIDException ue)
 		{
+			// Need to stop everything that could have started
+			// Signal stop event to stop the search for files if adding existing files
+			if (!m_bNoExistingFiles)
+			{
+				m_StopEvent.signal();
+			}
+
+			// Stop listening for files if listening
+			if ( m_bAddedFiles || m_bModifiedFiles || m_bTargetOfMoveOrRename )
+			{
+				// stopListening call can throw an exception so it needs to be handled
+				try
+				{
+					stopListening();
+				}
+				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI30031");
+			}
+
 			// Notify the supplying target that the supplying failed
 			pTarget->NotifyFileSupplyingFailed(this, ue.asStringizedByteStream().c_str());
 		}

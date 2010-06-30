@@ -31,7 +31,7 @@ protected:
 	// start listening on the given folder
 	// If eventTypeFlags is specified, the method will only listen for the the OR'd
 	// EFileEventTypes provided.
-	void startListening(const std::string strFolder, bool bRecursive,
+	void startListening(const std::string &strFolder, bool bRecursive,
 		BYTE eventTypeFlags = 0xFF);
 
 	// stop listening to the folder events.
@@ -53,13 +53,6 @@ protected:
 	virtual void onFolderModified(const std::string& strFolderName ) {};
 	virtual void onFolderRenamed(const std::string& strOldName, const std::string strNewName) {};
 
-	// This event is signaled when the Listening thread exits
-	// This is to be used as an indicator listening exited and the 
-	// listening thread is no longer running
-	// Derived classes can use this to make sure the listing hasn't exited
-	Win32Event m_eventListeningExited;
-
-	CMutex m_mutexFolderListen;
 	enum EFileEventType
 	{
 		kFileAdded		= 0x01,
@@ -77,17 +70,11 @@ private:
 	// The event types that should be monitored.
 	BYTE m_eventTypeFlags;
 
-	class ThreadData
-	{
-	public:
-		CMutex * m_pmutexFolderListen;
-		FolderEventsListener* m_pListener;
-
-		CWinThread* m_pThread;
-		Win32Event m_eventKillThread;
-		string m_strFilename;
-		volatile bool m_bRecursive;
-	};
+	// The folder being listened to
+	string m_strFolderToListenTo;
+	
+	// Specifies it the listening should be for all subfolders of the folder being listened to
+	volatile bool m_bRecursive;
 
 	class FolderEvent
 	{
@@ -98,7 +85,6 @@ private:
 		EFileEventType m_nEvent;
 	};
 
-
 	// used to get the time between restarts of the listening if an exception
 	// is thrown in the listening thread
 	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pCfgMgr;
@@ -108,6 +94,9 @@ private:
 	// handlers
 	MTSafeQueue<FolderEvent> m_queEvents;
 
+	// Event used to signal that both listening and dispatch threads should stop.
+	Win32Event m_eventKillThreads;
+
 	///////////////////////
 	// the listen thread
 	///////////////////////
@@ -116,9 +105,11 @@ private:
 	// the dispatch queue (m_queEvents) for processing
 	// If this class is expanded to listen on multiple folders it
 	// will do so by creating multiple listen threads
-	ThreadData* m_pCurrThreadData;
 	static UINT threadFuncListen(LPVOID pParam);
-	Win32Event	m_eventFolderThreadBegin;
+
+	// Events used to indicate that the thread has started and exited
+	Win32Event m_eventListeningExited;
+	Win32Event m_eventListeningStarted;
 
 	///////////////////////
 	// the dispatch thread
@@ -128,11 +119,12 @@ private:
 	// like onFileAdded() and so on.  In addition the dispatch thread 
 	// ensures that when a file added event occurs that the file
 	// is accessible (READABLE) before calling onFileAdded
-	CWinThread* m_pthreadDispatch;
-	Win32Event m_eventKillDispatchThread;
-	Win32Event m_eventDispatchThreadExit;
 	static UINT threadDispatchEvents(LPVOID pParam);
 	void dispatchEvent(const FolderEvent& event);
+
+	// Events to indicate that the dispatch thread has started and exited
+	Win32Event m_eventDispatchThreadExited;
+	Win32Event m_eventDispatchThreadStarted;
 
 	// Utility functions
 	bool fileReadyForAccess(std::string strFileName);

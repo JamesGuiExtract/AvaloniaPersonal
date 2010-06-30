@@ -10,6 +10,7 @@
 const unsigned long gulFOLDER_LISTENER_BUF_SIZE	 = 65536;
 const string gstrTIME_BETWEEN_LISTENING_RESTARTS_KEY = "FEL_TimeBetweenListeningRestarts";
 const unsigned long gulDEFAULT_TIME_BETWEEN_RESTARTS = 60000; // 60 seconds
+const unsigned long gulTIME_TO_WAIT_FOR_THREAD_EXIT = 10000; // 10 seconds
 
 //-------------------------------------------------------------------------------------------------
 FolderEventsListener::FolderEvent::FolderEvent(EFileEventType nEvent, string strFileNameNew, string strFileNameOld)
@@ -21,76 +22,95 @@ m_strFileNameOld(strFileNameOld)
 }
 //-------------------------------------------------------------------------------------------------
 FolderEventsListener::FolderEventsListener() 
-: 
-m_pCurrThreadData(NULL),
-m_pthreadDispatch(NULL)
 {
 	ma_pCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
 		new RegistryPersistenceMgr(HKEY_LOCAL_MACHINE, gstrBASEUTILS_REG_PATH ));
 
 }
 //-------------------------------------------------------------------------------------------------
-void FolderEventsListener::startListening(const std::string strFolder, bool bRecursive,
+void FolderEventsListener::startListening(const std::string &strFolder, bool bRecursive,
 										  BYTE eventTypeFlags/* = 0xFF*/)
 {
-	
-	// Currently Folder Events listener supports listening on 
-	// only one folder at a time so if we are to start listening on 
-	// and new folder we need to any folder we are currently listening on
-	if(m_pCurrThreadData)
+	try
 	{
+		// stop listening
 		stopListening();
+
+		m_eventTypeFlags = eventTypeFlags;
+
+		// Reset the events for the Listening thread
+		m_eventKillThreads.reset();
+		m_eventListeningExited.reset();
+		m_eventListeningStarted.reset();
+
+		m_strFolderToListenTo = strFolder;
+		m_bRecursive = bRecursive;
+		AfxBeginThread(threadFuncListen, this);
+
+		// Wait for listening thread to start
+		if (m_eventListeningStarted.wait(gulTIME_TO_WAIT_FOR_THREAD_EXIT) == WAIT_TIMEOUT)
+		{
+			// signal the kill event so threads will be in known state
+			// need to stop the listening thread
+			m_eventKillThreads.signal();
+
+			// There was a problem starting the thread
+			UCLIDException ue("ELI30297", "Listening thread did not start.");
+			ue.addDebugInfo("Folder", strFolder);
+			throw ue;
+		}
+
+		// make sure the events are reset for the dispatch thread
+		m_eventDispatchThreadExited.reset();
+		m_eventDispatchThreadStarted.reset();
+		AfxBeginThread(threadDispatchEvents, this);
+
+		// Wait for thread to start
+		if (m_eventDispatchThreadStarted.wait(gulTIME_TO_WAIT_FOR_THREAD_EXIT) == WAIT_TIMEOUT)
+		{
+			// need to stop the listening thread
+			m_eventKillThreads.signal();
+
+			// There was a problem starting the dispatch thread
+			UCLIDException ue("ELI30298", "Listening dispatch thread did not start.");
+			ue.addDebugInfo("Folder", strFolder);
+			throw ue;
+		}
 	}
-
-	m_eventTypeFlags = eventTypeFlags;
-
-	// Create a new thread Data structure that will be used for communication between
-	// this thread and the one we are about to create
-	// the thread function will delete the ThreadData before exiting
-	m_pCurrThreadData = new ThreadData();
-	m_pCurrThreadData->m_eventKillThread.reset();
-	m_eventListeningExited.reset();
-
-	m_pCurrThreadData->m_strFilename = strFolder;
-	m_pCurrThreadData->m_bRecursive = bRecursive;
-	m_pCurrThreadData->m_pListener = this;
-	m_pCurrThreadData->m_pmutexFolderListen = &m_mutexFolderListen;
-	CSingleLock lg( &m_mutexFolderListen, TRUE );
-	m_pCurrThreadData->m_pThread = AfxBeginThread(threadFuncListen, m_pCurrThreadData);
-
-	// make sure the events are reset for the dispatch thread
-	m_eventKillDispatchThread.reset();
-	m_eventDispatchThreadExit.reset();
-	m_pthreadDispatch = AfxBeginThread(threadDispatchEvents, this);
-
-	// Wait for the thread to begin executing before returning 
-	m_eventFolderThreadBegin.wait(10000);
-	m_eventFolderThreadBegin.reset();
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30299");
 }
 //-------------------------------------------------------------------------------------------------
 void FolderEventsListener::stopListening()
 {
 	try
 	{
-		CSingleLock lg( &m_mutexFolderListen, TRUE );
-		if ( m_eventListeningExited.isSignaled() ) 
+		// Signal the kill threads event
+		m_eventKillThreads.signal();
+
+		bool bWaitTimeout = false;
+
+		// Check if Listening was started
+		if (m_eventListeningStarted.isSignaled())
 		{
-			// Thread has stopped and so this has already been deleted
-			m_pCurrThreadData = NULL;
-		}
-		if(m_pCurrThreadData)
-		{
+			// Wait for listening to exit
+			if (m_eventListeningExited.wait(gulTIME_TO_WAIT_FOR_THREAD_EXIT) == WAIT_TIMEOUT )
 			{
-				m_pCurrThreadData->m_eventKillThread.signal();
+				UCLIDException ue("ELI30307", "Application Trace: Listening thread did not exit properly.");
+				ue.addDebugInfo("Folder", m_strFolderToListenTo);
+				ue.log();
 			}
-			m_pCurrThreadData = NULL;
 		}
 
-		if(m_pthreadDispatch)
+		// Check if Dispatch thread was started
+		if (m_eventDispatchThreadStarted.isSignaled())
 		{
-			m_eventKillDispatchThread.signal();
-			m_eventDispatchThreadExit.wait(2000);
-			m_pthreadDispatch = NULL;
+			// Wait for dispatch thread to stop
+			if (m_eventDispatchThreadExited.wait(gulTIME_TO_WAIT_FOR_THREAD_EXIT) == WAIT_TIMEOUT)
+			{
+				UCLIDException ue("ELI30300", "Application Trace: Listening dispatch thread did not exit properly.");
+				ue.addDebugInfo("Folder", m_strFolderToListenTo);
+				ue.log();
+			}
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27786");
@@ -101,30 +121,34 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 	INIT_EXCEPTION_AND_TRACING("MLI03277");
 
 	FolderEventsListener* fl = NULL;
+	LPBYTE lpFileBuffer = NULL;
 	try
 	{
 		_lastCodePos = "10";
-		// this is an autoptr to delete the data so that the caller doesn't have to
-		auto_ptr<ThreadData> pTD((ThreadData*)pParam);
-		ASSERT_RESOURCE_ALLOCATION("ELI25255", pTD.get() != NULL);
 		
 		// the Listener is the caller and will still be a valid pointer after the try...catch
 		// this will be used to set the thread exit event
-		fl = pTD->m_pListener;
+		fl = (FolderEventsListener *)pParam;
 		ASSERT_RESOURCE_ALLOCATION("ELI25256", fl != NULL);
 
 		_lastCodePos = "20";
 
-		bool bRecursive = pTD->m_bRecursive;
-		
+		bool bRecursive = fl->m_bRecursive;
+
 		// let the the creating thread know it is ok to continue
-		fl->m_eventFolderThreadBegin.signal();
+		fl->m_eventListeningStarted.signal();
+		
 		unsigned long ulTimeBetweenRestarts = gulDEFAULT_TIME_BETWEEN_RESTARTS;
 		_lastCodePos = "30";
 
 		// Variable to track the number of times listening is started
 		// This will be used to track the number of calls to getListeningHandle
 		int nListeningStartCount = 0;
+		
+		// Allocate buffers for the change operations
+		lpFileBuffer = new BYTE[gulFOLDER_LISTENER_BUF_SIZE];
+		ASSERT_RESOURCE_ALLOCATION("ELI30306", lpFileBuffer != NULL);
+		_lastCodePos = "70";
 
 		do
 		{
@@ -144,23 +168,19 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 			oFileChanges.hEvent = eventFileChangesReady.getHandle();
 			_lastCodePos = "60";
 
-			// Allocate buffers for the change operations
-			LPBYTE lpFileBuffer = new BYTE[gulFOLDER_LISTENER_BUF_SIZE];
-			_lastCodePos = "70";
-
 			// set up handle array for the handles to wait for
 			HANDLE handles[2];
 			handles[0] = oFileChanges.hEvent;
-			handles[1] = pTD->m_eventKillThread.getHandle();
+			handles[1] = fl->m_eventKillThreads.getHandle();
 			_lastCodePos = "80";
 
 			// Listening handle for changes in the files
-			HANDLE hFile;
+			HANDLE hFile = NULL;
 
 			try
 			{
 				// Handle for file changes
-				hFile = fl->getListeningHandle( pTD->m_strFilename );
+				hFile = fl->getListeningHandle(fl->m_strFolderToListenTo);
 				_lastCodePos = "90";
 
 				nListeningStartCount++;
@@ -168,7 +188,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 				// Log an exception each time listening starts 
 				UCLIDException ueStart("ELI29123", "Application trace: Listening started.");
 				ueStart.addDebugInfo("Number times started", nListeningStartCount);
-				ueStart.addDebugInfo("Folder",  pTD->m_strFilename);
+				ueStart.addDebugInfo("Folder",  fl->m_strFolderToListenTo);
 				ueStart.log();
 
 				bool bDone = false;
@@ -200,10 +220,8 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 						{
 							// Error geting the results
 							UCLIDException ue ("ELI13017", "Error getting file changes.");
-							ue.addDebugInfo("Directory Name",
-								(pTD.get() != NULL ? pTD->m_strFilename : "<Empty>"));
 							ue.addWin32ErrorInfo();
-							ue.addDebugInfo("Folder",  pTD->m_strFilename);
+							ue.addDebugInfo("Folder", fl->m_strFolderToListenTo);
 							throw ue;
 						}
 
@@ -211,15 +229,14 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 						eventFileChangesReady.reset();
 						_lastCodePos = "140";
 
-						CSingleLock lg ( pTD->m_pmutexFolderListen, TRUE );
 						_lastCodePos = "150";
 
 						// Process the changes
-						fl->processChanges(pTD->m_strFilename, pTD->m_eventKillThread, lpFileBuffer, fl->m_queEvents, true );
+						fl->processChanges(fl->m_strFolderToListenTo, fl->m_eventKillThreads, lpFileBuffer, fl->m_queEvents, true );
 						_lastCodePos = "160";
 
 						// Check to see if Kill thread event was signaled
-						bDone = pTD->m_eventKillThread.isSignaled();
+						bDone = fl->m_eventKillThreads.isSignaled();
 						_lastCodePos = "170";
 					}
 					else
@@ -234,35 +251,43 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI13161");
 
 			_lastCodePos = "190";
+
 			// Clean up
+			//Check to make sure the hFile was opened before trying to close it
 			// Cancel any pending overlapped operations
-			CancelIo( hFile );
-			_lastCodePos = "200";
-			CloseHandle( hFile );
-			_lastCodePos = "210";
-			delete [] lpFileBuffer;
-			_lastCodePos = "220";
+			if (hFile != NULL)
+			{
+				CancelIo( hFile );
+				_lastCodePos = "200";
+				CloseHandle( hFile );
+				_lastCodePos = "210";
+			}
 			
-			// Get the time to wait before restarting
-			FolderEventsListener* pListener = pTD->m_pListener;
-			ASSERT_RESOURCE_ALLOCATION("ELI25237", pListener != NULL);
 			_lastCodePos = "230";
-			ulTimeBetweenRestarts = pListener->getTimeBetweenListeningRestarts();
+			ulTimeBetweenRestarts = fl->getTimeBetweenListeningRestarts();
 			_lastCodePos = "240";
+
+			// Log Application trace exception so there is an indication when listening has stopped
+			UCLIDException ueStop("ELI30303", "Application trace: Listening stopped.");
+			ueStop.addDebugInfo("Folder",  fl->m_strFolderToListenTo);
+			ueStop.log();
 		}
-		while ( pTD->m_eventKillThread.wait( ulTimeBetweenRestarts ) == WAIT_TIMEOUT );
-
-		_lastCodePos = "250";
-
-		CSingleLock lg ( pTD->m_pmutexFolderListen, TRUE );
-		_lastCodePos = "260";
-		FolderEventsListener* pListener = pTD->m_pListener;
-		ASSERT_RESOURCE_ALLOCATION("ELI25238", pListener != NULL);
-		pListener->m_pCurrThreadData = NULL;
-		_lastCodePos = "270";
+		while (fl->m_eventKillThreads.wait( ulTimeBetweenRestarts ) == WAIT_TIMEOUT );
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI12780");
 	
+
+	// deallocate the file buffer
+	try
+	{
+		if (lpFileBuffer != NULL)
+		{
+			// Delete the file buffer
+			delete [] lpFileBuffer;
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI30302");
+
 	// Signal that the thread has exited this always needs to be done
 	try
 	{
@@ -284,15 +309,18 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 	{
 
 		FolderEventsListener* fl = (FolderEventsListener*)pParam;
+		ASSERT_RESOURCE_ALLOCATION("ELI30301", fl != NULL);
+
+		fl->m_eventDispatchThreadStarted.signal();
 		try
 		{
 			vector<FolderEvent> vecEvents;
 
-			while ( fl->m_eventKillDispatchThread.wait(1000) == WAIT_TIMEOUT )
+			while ( fl->m_eventKillThreads.wait(1000) == WAIT_TIMEOUT )
 			{
 				while(fl->m_queEvents.getSize() > 0)
 				{
-					if(fl->m_eventKillDispatchThread.isSignaled())
+					if(fl->m_eventKillThreads.isSignaled())
 					{
 						break;
 					}
@@ -304,7 +332,7 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 				unsigned int i;
 				for(i = 0; i < vecEvents.size(); i++)
 				{
-					if(fl->m_eventKillDispatchThread.isSignaled())
+					if(fl->m_eventKillThreads.isSignaled())
 					{
 						break;
 					}
@@ -335,10 +363,10 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 		}
 		catch(...)
 		{
-			fl->m_eventDispatchThreadExit.signal();
+			fl->m_eventDispatchThreadExited.signal();
 			throw;
 		}
-		fl->m_eventDispatchThreadExit.signal();
+		fl->m_eventDispatchThreadExited.signal();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI10197");
 	CoUninitialize();
