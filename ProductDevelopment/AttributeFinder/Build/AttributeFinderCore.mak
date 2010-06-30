@@ -285,7 +285,7 @@ CopyFilesToInstallFolder: BuildPDUtils CleanupPreviousBuildFolders ObfuscateFile
 	@DIR "$(IDShieldInstallFilesRootDir)\SelfRegIDShieldComponents\*.*" /b >"$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\IDShield.rl"
 	@DIR "$(ClearImageInstallFilesDir)\*Image.dll" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\ClearImage.rl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\DataEntryCC.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.rl"
-	@DIR "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles"\*.*" /b >"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.rl"
+	@DIR "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles\*.*" /b >"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.rl"
 
 # Add .net com objects to the .nl file
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Utilities.Parsers.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl
