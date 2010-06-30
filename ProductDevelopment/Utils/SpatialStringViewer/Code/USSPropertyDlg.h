@@ -62,8 +62,8 @@ private:
 	// puts the data into the list control
 	void populateListControl();
 	
-	// converts the deskew from radians to degrees and returns as a string
-	string getDeskewInDegrees(const double& rdDeskewInRadians);
+	// returns a string rounded to 1 decimal place from the deskew in degrees
+	string getDeskew(double dDeskewInDegrees);
 
 	// process the orientation enum and convert it to a string
 	string getOrientationString(const EOrientation& reOrientation);

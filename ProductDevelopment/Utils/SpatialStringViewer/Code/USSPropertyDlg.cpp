@@ -197,7 +197,7 @@ void USSPropertyDlg::populateListControl()
 		m_lstPageInfo.SetItemText(nItem, gnWIDTH_COLUMN,
 			asString(ipPageInfo->GetWidth()).c_str());
 		m_lstPageInfo.SetItemText(nItem, gnDESKEW_COLUMN,
-			getDeskewInDegrees(ipPageInfo->GetDeskew()).c_str());
+			getDeskew(ipPageInfo->GetDeskew()).c_str());
 
 		// get the enum for the orientation and set our string based on that
 		EOrientation eoOrient = ipPageInfo->GetOrientation();
@@ -271,13 +271,10 @@ std::string USSPropertyDlg::getOrientationString(const EOrientation& reOrientati
 	return strOrient;
 }
 //-------------------------------------------------------------------------------------------------
-std::string USSPropertyDlg::getDeskewInDegrees(const double& rdDeskewInRadians)
+std::string USSPropertyDlg::getDeskew(double dDeskewInDegrees)
 {
-	// convert the radians to degrees
-	double dDeskewDegrees = convertRadiansToDegrees(rdDeskewInRadians);
-
 	// convert to a string with 1 decimal place
-	string strReturn = asString(dDeskewDegrees, 1);
+	string strReturn = asString(dDeskewInDegrees, 1);
 	
 	// append the degree symbol
 	strReturn.append("°");

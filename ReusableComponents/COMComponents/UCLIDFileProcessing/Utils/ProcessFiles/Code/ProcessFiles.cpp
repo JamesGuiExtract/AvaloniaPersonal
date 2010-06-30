@@ -250,7 +250,9 @@ BOOL CProcessFilesApp::InitInstance()
 				}
 				else
 				{
-					strFileName =  __argv[1];
+					// Build the absolute path to the file name so that
+					// it will be loaded with the fully qualified path name
+					strFileName =  buildAbsolutePath(__argv[1]);
 
 					int i;
 					for (i = 2; i < __argc; i++)
