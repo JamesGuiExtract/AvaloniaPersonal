@@ -2682,6 +2682,7 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 
 				ipFileSet->MoveNext();
 			}
+			ipFileSet->Close();
 		}
 
 		// Set the file action state for each vector of file data
