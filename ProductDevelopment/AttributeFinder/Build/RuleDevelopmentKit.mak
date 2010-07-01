@@ -79,7 +79,6 @@ CopyFilesToInstallFolder:
     @COPY /V  "$(BinariesFolder)\UCLIDTestingFrameworkCore.dll" "$(RDTInstallFilesRootDir)\SelfRegCommonComponents"
     @COPY /V  "$(BinariesFolder)\AFDataScorersTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
 	@COPY /V  "$(BinariesFolder)\AFValueFinderTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
-	@COPY /V  "$(BinariesFolder)\HighlightedTextIRAutoTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
 	@COPY /V  "$(BinariesFolder)\SafeNetUtilsTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
 	@COPY /V  "$(BinariesFolder)\SpatialStringAutomatedTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
 	@COPY /V  "$(BinariesFolder)\SpatialStringSearcherTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
@@ -143,8 +142,6 @@ CopyTestFiles:
 	@XCOPY "$(AFRootDirectory)\AFValueModifiers\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\AFValueModifiers\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\InputValidators\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\InputValidators\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\IndustrySpecific\Redaction\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\AutomatedTest\" /s /e /y /I
-	@XCOPY "$(ReusableComponentsRootDirectory)\InputFunnel\InputReceivers\HighlightedTextIR\Test\HighlightedTextIRAutoTest\TestFiles\AutomatedTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\InputFunnel\InputReceivers\HighlightedTextIR\Test\HighlightedTextIRAutoTest\TestFiles\AutomatedTest\" /s /e /y /I
-	@XCOPY "$(ReusableComponentsRootDirectory)\InputFunnel\InputReceivers\SpotRecognitionIR\Test\SpotRecIRAutoTest\TestFiles\AutomatedTest\*.*" "$(TestingFilesDirectory)\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Test\SpotRecIRAutoTest\TestFiles\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\SpatialStringAutomatedTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\SpatialStringAutomatedTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\SpatialStringSearcherTest\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\SpatialStringSearcherTest\TestFiles\" /s /e /y /I
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\RasterZoneTester\TestFiles\*.*" "$(TestingFilesDirectory)\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Test\RasterZoneTester\TestFiles\" /s /e /y /I
