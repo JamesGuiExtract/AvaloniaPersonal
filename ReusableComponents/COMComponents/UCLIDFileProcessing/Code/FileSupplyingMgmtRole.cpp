@@ -304,7 +304,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::raw_IsLicensed(VARIANT_BOOL * pbValue)
 // IFileActionMgmtRole interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB* pDB, long lActionId, 
-	BSTR bstrAction, long hWndOfUI, IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM)
+	BSTR bstrAction, long hWndOfUI, IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM,
+	BSTR bstrFpsFileName)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 

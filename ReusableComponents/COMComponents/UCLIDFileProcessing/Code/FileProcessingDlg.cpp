@@ -1158,17 +1158,6 @@ LRESULT FileProcessingDlg::OnScheduleInactive(WPARAM wParam, LPARAM lParam)
 		m_strProcessingStateString = "Processing Inactive";
 		setCurrFPSFile(m_strCurrFPSFilename);
 
-		// This method may be called after processing has stopped. Only log an application trace
-		// if the FAM is currently running.
-		if (asCppBool(getFPM()->ProcessingStarted))
-		{
-			UCLIDException ue("ELI29903",
-				"Application trace: File Action Manager processing now inactive per schedule.");
-			ue.addDebugInfo("FPS File",
-				m_strCurrFPSFilename.empty() ? "<Not Saved>" : m_strCurrFPSFilename);
-			ue.log();
-		}
-
 		updateUI();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28343");
@@ -1185,17 +1174,6 @@ LRESULT FileProcessingDlg::OnScheduleActive(WPARAM wParam, LPARAM lParam)
 	{
 		m_strProcessingStateString = "";
 		setCurrFPSFile(m_strCurrFPSFilename);
-
-		// This method may be called after processing has stopped. Only log an application trace
-		// if the FAM is currently running and wParam != 1 [LRCAU #5805].
-		if (asCppBool(getFPM()->ProcessingStarted) && wParam != 1)
-		{
-			UCLIDException ue("ELI29904",
-				"Application trace: File Action Manager processing now active per schedule.");
-			ue.addDebugInfo("FPS File",
-				m_strCurrFPSFilename.empty() ? "<Not Saved>" : m_strCurrFPSFilename);
-			ue.log();
-		}
 
 		updateUI();
 	}

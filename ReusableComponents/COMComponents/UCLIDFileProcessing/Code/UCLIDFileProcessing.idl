@@ -1143,7 +1143,8 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		[id(1), helpstring("method Start")] HRESULT Start([in] IFileProcessingDB* pDB, 
 			[in] long lActionId, [in] BSTR bstrAction, [in] long hWndOfUI, 
-			[in] IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM);
+			[in] IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM,
+			[in] BSTR bstrFpsFileName);
 		[id(2), helpstring("method Stop")] HRESULT Stop(void);
 		[id(3), helpstring("method Pause")] HRESULT Pause(void);
 		[id(4), helpstring("method Resume")] HRESULT Resume(void);

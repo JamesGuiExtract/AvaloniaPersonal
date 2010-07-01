@@ -79,7 +79,7 @@ public:
 
 // IFileActionMgmtRole
 	STDMETHOD(Start)(IFileProcessingDB* pDB, long lActionId, BSTR bstrAction, long hWndOfUI, 
-		IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM);
+		IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM, BSTR bstrFpsFileName);
 	STDMETHOD(Stop)(void);
 	STDMETHOD(Pause)(void);
 	STDMETHOD(Resume)(void);

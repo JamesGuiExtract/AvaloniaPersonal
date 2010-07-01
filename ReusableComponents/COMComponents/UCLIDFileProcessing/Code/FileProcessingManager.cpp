@@ -179,13 +179,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		// Make sure that the FPS file includes directory information (P13 #4502)
 		if ((m_strFPSFileName != "") && (!isAbsolutePath(m_strFPSFileName)))
 		{
-			// Append filename to the current directory
-			string strWholePath = getCurrentDirectory();
-			strWholePath += "\\";
-			strWholePath += m_strFPSFileName.c_str();
-
-			// Replace filename with whole-path version
-			m_strFPSFileName = strWholePath;
+			m_strFPSFileName = buildAbsolutePath(m_strFPSFileName);
 		}
 
 		// Expand the action name
@@ -233,7 +227,8 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 			// Set flag indicating that supplying was started
 			m_bSupplying = true;
 			ipSupplyingActionMgmtRole->Start(m_ipFPMDB, lActionId, strExpandedAction.c_str(), 
-				(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager, ipThis);
+				(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager, ipThis,
+				m_strFPSFileName.c_str());
 		}
 
 		// start the file processing
@@ -250,7 +245,8 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 				m_ipFPMgmtRole->OkToStopWhenQueueIsEmpty = m_bSupplying ? VARIANT_FALSE : VARIANT_TRUE;
 
 				ipProcessingActionMgmtRole->Start(m_ipFPMDB, lActionId, strExpandedAction.c_str(), 
-					(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager, ipThis);
+					(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager,
+					ipThis, m_strFPSFileName.c_str());
 			}
 			catch (...)
 			{

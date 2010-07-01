@@ -76,7 +76,7 @@ public:
 
 // IFileActionMgmtRole
 	STDMETHOD(Start)(IFileProcessingDB* pDB, long lActionId, BSTR bstrAction, long hWndOfUI, 
-		IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM);
+		IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM, BSTR bstrFpsFileName);
 	STDMETHOD(Stop)(void);
 	STDMETHOD(Pause)(void);
 	STDMETHOD(Resume)(void);
@@ -256,6 +256,9 @@ private:
 
 	// Event to indicate that the thread watcher thread has exited.
 	Win32Event m_eventWatcherThreadExited;
+
+	// The name of the FPS file that is running (this value is set in the Start method)
+	string m_strFpsFile;
 
 	///////////
 	// Methods

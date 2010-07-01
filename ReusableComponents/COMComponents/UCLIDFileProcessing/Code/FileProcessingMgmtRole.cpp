@@ -149,7 +149,8 @@ STDMETHODIMP CFileProcessingMgmtRole::raw_IsLicensed(VARIANT_BOOL * pbValue)
 // IFileActionMgmtRole interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB* pDB, long lActionId, 
-	BSTR bstrAction, long hWndOfUI, IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM)
+	BSTR bstrAction, long hWndOfUI, IFAMTagManager* pTagManager, IRoleNotifyFAM* pRoleNotifyFAM,
+	BSTR bstrFpsFileName)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -162,6 +163,8 @@ STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB* pDB, long lAction
 		ASSERT_ARGUMENT("ELI14301", m_ipFileProcessingTasks != NULL);
 		ASSERT_ARGUMENT("ELI14302", m_ipFileProcessingTasks->Size() > 0);
 		ASSERT_ARGUMENT("ELI14344", m_pRecordMgr != NULL);
+
+		m_strFpsFile = asString(bstrFpsFileName);
 
 		// Before starting the processManager thread, make sure it is not already started
 		if (m_eventProcessManagerStarted.isSignaled() && !m_eventProcessManagerExited.isSignaled())
@@ -1722,6 +1725,8 @@ void CFileProcessingMgmtRole::clear()
 
 	// Default the schedule to all on
 	m_vecScheduledHours.resize(giNUMBER_OF_HOURS_IN_WEEK, true);
+
+	m_strFpsFile = "";
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingMgmtRole::getFPMDB()
@@ -2060,10 +2065,21 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 							// Close the database connections
 							ipFamDB->CloseAllDBConnections();
 
-							// Notify UI that processing is inactive if not a normal stop
-							if (pFPM->m_eCurrentRunningState != kNormalStop && pFPM->m_hWndOfUI != NULL)
+							// If not a normal stop, log processing inactive message
+							if (pFPM->m_eCurrentRunningState != kNormalStop)
 							{
-								::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_INACTIVE, 0, 0);
+								UCLIDException ue("ELI30308",
+									"Application trace: File Action Manager processing now "
+									"inactive per schedule.");
+								ue.addDebugInfo("FPS File",
+									pFPM->m_strFpsFile.empty() ? "<Not Saved>" : pFPM->m_strFpsFile);
+								ue.log();
+
+								// Notify the UI of processing inactive
+								if (pFPM->m_hWndOfUI != NULL)
+								{
+									::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_INACTIVE, 0, 0);
+								}
 							}
 							break;
 						default:
@@ -2079,10 +2095,18 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 					{
 						pFPM->startProcessing();
 
+						UCLIDException ue("ELI30309",
+							"Application trace: File Action Manager processing now "
+							"active per schedule.");
+						ue.addDebugInfo("FPS File",
+							pFPM->m_strFpsFile.empty() ? "<Not Saved>" : pFPM->m_strFpsFile);
+						ue.log();
+
 						// Notify UI that processing is running
 						if (pFPM->m_hWndOfUI != NULL)
 						{
 							::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_ACTIVE, 0, 0);
+
 						}
 					}
 					break;
@@ -2102,10 +2126,9 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 			// message is removed
 			if (pFPM->m_hWndOfUI != NULL)
 			{
-				// Pass 1 as WPARAM to indicate that an Application Trace about
-				// processing becoming active at this point should not be logged
-				// [LRCAU #5805]
-				::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_ACTIVE, 1, 0);
+				// Do not log the schedule active trace here as processing has stopped
+				// this is just to ensure the inactive message is cleared out
+				::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_ACTIVE, 0, 0);
 			}
 
 			// Notify the FAM that processing is complete
