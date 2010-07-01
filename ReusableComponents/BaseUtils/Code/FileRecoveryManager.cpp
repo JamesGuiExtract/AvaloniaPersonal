@@ -13,10 +13,14 @@ FileRecoveryManager::FileRecoveryManager(HMODULE hEXEModule,
 										 const string& strSuffix, 
 										 const string& strPrefix)
 :m_strRecoveryFileSuffix(strSuffix), m_strRecoveryFilePrefix(strPrefix),
-m_hEXEModule(hEXEModule)
+m_hEXEModule(hEXEModule), m_strRecoveryFileName("")
 {
+	// Get the user app data folder
+	getSpecialFolderPath(CSIDL_LOCAL_APPDATA, m_strRecoveryFileFolder);
+	m_strRecoveryFileFolder += "\\Extract Systems\\RecoveryFiles\\";
+
 	// get this EXE's full path
-	char pszThisModuleFullPath[MAX_PATH + 1];
+	char pszThisModuleFullPath[MAX_PATH + 1] = {0};
 	GetModuleFileName(NULL, pszThisModuleFullPath, 
 		sizeof(pszThisModuleFullPath));
 	m_strThisEXEName = getFileNameFromFullPath(pszThisModuleFullPath);
@@ -58,10 +62,15 @@ bool FileRecoveryManager::isCurrentlyExecutingSimilarProcess(DWORD dwProcessID)
 //-------------------------------------------------------------------------------------------------
 bool FileRecoveryManager::recoveryFileExists(string& strFile)
 {
+	// Ensure the recovery directory exists
+	if (!isValidFolder(m_strRecoveryFileFolder))
+	{
+		return false;
+	}
+
 	// create a file search specification that looks like
 	// c:\somedir\SomePrefix*SomeSuffix"
-	string strThisModuleDir = getModuleDirectory(m_hEXEModule) + "\\";
-	string strFileSearchSpec = strThisModuleDir + m_strRecoveryFilePrefix;
+	string strFileSearchSpec = m_strRecoveryFileFolder + m_strRecoveryFilePrefix;
 	strFileSearchSpec += "*";
 	strFileSearchSpec += m_strRecoveryFileSuffix;
 	
@@ -96,8 +105,7 @@ bool FileRecoveryManager::recoveryFileExists(string& strFile)
 				if (!isCurrentlyExecutingSimilarProcess(dwProcessID))
 				{
 					// we found a file that needs to be recovered
-					strFile = strThisModuleDir;
-					strFile += strFileName;
+					strFile = m_strRecoveryFileFolder + strFileName;
 					return true;
 				}
 			}
@@ -129,22 +137,36 @@ void FileRecoveryManager::deleteRecoveryFile(const string& strFile)
 //-------------------------------------------------------------------------------------------------
 string FileRecoveryManager::getRecoveryFileName()
 {
-	string strFileName = "";
-	
-	// if we have not yet computed the recover ruleset filename, do so
-	if (strFileName.empty())
+	// if we have not yet computed the recovery file name, compute it 
+	if (m_strRecoveryFileName.empty())
 	{
-		strFileName = getModuleDirectory(m_hEXEModule) + "\\";
-		strFileName += m_strRecoveryFilePrefix;
-		strFileName += asString(GetCurrentProcessId());
-		strFileName += m_strRecoveryFileSuffix;
+		m_strRecoveryFileName = m_strRecoveryFileFolder;
+		m_strRecoveryFileName += m_strRecoveryFilePrefix;
+		m_strRecoveryFileName += asString(GetCurrentProcessId());
+		m_strRecoveryFileName += m_strRecoveryFileSuffix;
 	}
 
-	return strFileName;
+	return m_strRecoveryFileName;
 }
 //-------------------------------------------------------------------------------------------------
 bool FileRecoveryManager::isRecoveryFolderWritable()
 {
+	// Check if the folder exists
+	if (!isValidFolder(m_strRecoveryFileFolder))
+	{
+		// Attempt to create it
+		try
+		{
+			createDirectory(m_strRecoveryFileFolder);
+		}
+		catch(...)
+		{
+			// If a directory can't be created than a file can't be written
+			// so just return false
+			return false;
+		}
+	}
+
 	// Test file creation
 	return canCreateFile(getRecoveryFileName());
 }
