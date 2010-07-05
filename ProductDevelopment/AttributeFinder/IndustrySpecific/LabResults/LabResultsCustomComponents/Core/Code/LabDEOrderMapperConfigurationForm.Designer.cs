@@ -35,6 +35,7 @@ namespace Extract.LabResultsCustomComponents
             this._buttonBrowse = new Extract.Utilities.Forms.BrowseButton();
             this._buttonOk = new System.Windows.Forms.Button();
             this._buttonCancel = new System.Windows.Forms.Button();
+            this._checkRequireMandatoryTests = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -79,7 +80,7 @@ namespace Extract.LabResultsCustomComponents
             // 
             // _buttonOk
             // 
-            this._buttonOk.Location = new System.Drawing.Point(328, 53);
+            this._buttonOk.Location = new System.Drawing.Point(328, 74);
             this._buttonOk.Name = "_buttonOk";
             this._buttonOk.Size = new System.Drawing.Size(75, 23);
             this._buttonOk.TabIndex = 4;
@@ -89,7 +90,7 @@ namespace Extract.LabResultsCustomComponents
             // 
             // _buttonCancel
             // 
-            this._buttonCancel.Location = new System.Drawing.Point(409, 53);
+            this._buttonCancel.Location = new System.Drawing.Point(409, 74);
             this._buttonCancel.Name = "_buttonCancel";
             this._buttonCancel.Size = new System.Drawing.Size(75, 23);
             this._buttonCancel.TabIndex = 5;
@@ -97,11 +98,22 @@ namespace Extract.LabResultsCustomComponents
             this._buttonCancel.UseVisualStyleBackColor = true;
             this._buttonCancel.Click += new System.EventHandler(this.HandleCancelClicked);
             // 
+            // _checkRequireMandatoryTests
+            // 
+            this._checkRequireMandatoryTests.AutoSize = true;
+            this._checkRequireMandatoryTests.Location = new System.Drawing.Point(15, 51);
+            this._checkRequireMandatoryTests.Name = "_checkRequireMandatoryTests";
+            this._checkRequireMandatoryTests.Size = new System.Drawing.Size(317, 17);
+            this._checkRequireMandatoryTests.TabIndex = 6;
+            this._checkRequireMandatoryTests.Text = "Require mandatory tests during second pass of order mapping";
+            this._checkRequireMandatoryTests.UseVisualStyleBackColor = true;
+            // 
             // LabDEOrderMapperConfigurationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(496, 88);
+            this.ClientSize = new System.Drawing.Size(496, 109);
+            this.Controls.Add(this._checkRequireMandatoryTests);
             this.Controls.Add(this._buttonCancel);
             this.Controls.Add(this._buttonOk);
             this.Controls.Add(this._buttonBrowse);
@@ -128,5 +140,6 @@ namespace Extract.LabResultsCustomComponents
         private Extract.Utilities.Forms.BrowseButton _buttonBrowse;
         private System.Windows.Forms.Button _buttonOk;
         private System.Windows.Forms.Button _buttonCancel;
+        private System.Windows.Forms.CheckBox _checkRequireMandatoryTests;
     }
 }

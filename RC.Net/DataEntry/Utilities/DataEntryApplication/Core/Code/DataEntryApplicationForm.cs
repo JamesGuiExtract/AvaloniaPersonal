@@ -279,6 +279,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         readonly ControlInvoker _invoker;
 
+		/// <summary>
+        /// The number of document that have been loaded in this session of the
+        /// <see cref="DataEntryApplicationForm"/>.
+        /// </summary>
+        uint _documentLoadCount;
+
         #endregion Fields
 
         #region Constructors
@@ -1412,6 +1418,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 if (_imageViewer.IsImageAvailable)
                 {
+                    _documentLoadCount++;
+
+                    // [DataEntry:693]
+                    // On WindowsXP, recources associated with the auto-complete list (
+                    // particularily GDI objects) do not seem to be cleaned up and eventually 
+                    // "Error creating window handle" exceptions will result. Calling GC.Collect
+                    // cleans up these resources. (GCFrequency default == 1)
+                    if (_imageViewer.IsImageAvailable && _config.Settings.GCFrequency > 0 &&
+                        _documentLoadCount % _config.Settings.GCFrequency == 0)
+                    {
+                        GC.Collect();
+                    }
+
                     string imageName = Path.GetFileName(_imageViewer.ImageFile);
                     base.Text = imageName + " - " + base.Text;
                     if (_imageViewerForm != null)
@@ -2569,25 +2588,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         _dataSourcePath =
                             DataEntryMethods.ResolvePath(_config.Settings.LocalDataSource);
-                        string dataSourcePath = _dataSourcePath;
+                        _lastDbModificationTime = File.GetLastWriteTime(_dataSourcePath);
 
-                        // Use ConvertToNetworkPath to tell if the DB is being accesseed via a
-                        // network share.
-                        FileSystemMethods.ConvertToNetworkPath(ref _dataSourcePath, false);
-
-                        // [DataEntry:399, 688]
-                        // Whether or not the file is local, if it is being accessed via a network share
-                        // a local copy must be created since SQL Compact does not support multiple
-                        // connections via a network share.
-                        if (dataSourcePath.StartsWith(@"\\", StringComparison.Ordinal))
+                        // [DataEntry:399, 688, 986]
+                        // Whether or not the file is accessed via a network share, create and use a
+                        // local copy. Though multiple connections are allowed to a local file, the
+                        // connections cannot see each other's changes.
+                        if (_localDbCopy == null)
                         {
                             _localDbCopy = new TemporaryFile();
-                            _lastDbModificationTime = File.GetLastWriteTime(dataSourcePath);
-                            File.Copy(_dataSourcePath, _localDbCopy.FileName, true);
-                            dataSourcePath = _localDbCopy.FileName;
                         }
+                        File.Copy(_dataSourcePath, _localDbCopy.FileName, true);
 
-                        connectionString = "Data Source='" + dataSourcePath + "';";
+                        connectionString = "Data Source='" + _localDbCopy.FileName + "';";
                     }
 
                     // As long as connection information was provieded one way or another,

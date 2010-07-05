@@ -1037,15 +1037,11 @@ namespace Extract.Imaging.Forms
                 if (_isSelectable && _isVisible && _isMovable)
                 {
                     // Get the mouse position in image coordinates
-                    Point[] mouse = new Point[] { new Point(mouseX, mouseY) };
-                    using (Matrix clientToImage = _imageViewer.Transform.Clone())
-                    {
-                        clientToImage.Invert();
-                        clientToImage.TransformPoints(mouse);
-                    }
+                    Point mouse = GeometryMethods.InvertPoint(_imageViewer.Transform,
+                        new Point(mouseX, mouseY));
 
                     // Start the tracking event
-                    TrackingData = new TrackingData(_imageViewer, mouse[0].X, mouse[0].Y,
+                    TrackingData = new TrackingData(_imageViewer, mouse.X, mouse.Y,
                         _imageViewer.GetTransformedRectangle(_imageViewer.GetVisibleImageArea(), true));
 
                     // Store the spatial data associated with the layer object
@@ -1071,19 +1067,15 @@ namespace Extract.Imaging.Forms
                 if (_imageViewer.Cursor == Cursors.SizeAll)
                 {
                     // Get the mouse position as a point in image coordinates
-                    Point[] mouse = new Point[] { new Point(mouseX, mouseY) };
-                    using (Matrix clientToImage = _imageViewer.Transform.Clone())
-                    {
-                        clientToImage.Invert();
-                        clientToImage.TransformPoints(mouse);
-                    }
+                    Point mouse = GeometryMethods.InvertPoint(_imageViewer.Transform,
+                        new Point(mouseX, mouseY));
 
                     // Compute the distance moved in the x and y direction
-                    int xDist = mouse[0].X - _trackingData.StartPoint.X;
-                    int yDist = mouse[0].Y - _trackingData.StartPoint.Y;
+                    int xDist = mouse.X - _trackingData.StartPoint.X;
+                    int yDist = mouse.Y - _trackingData.StartPoint.Y;
 
                     // Update the tracking data
-                    _trackingData.StartPoint = mouse[0];
+                    _trackingData.StartPoint = mouse;
 
                     // Now adjust the layer object accordingly
                     Offset(xDist, yDist, false);

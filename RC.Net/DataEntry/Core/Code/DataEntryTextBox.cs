@@ -149,9 +149,21 @@ namespace Extract.DataEntry
         /// </summary>
         bool _isActive;
 
+        /// <summary>
+        /// Indicates whether an update of the auto-complete list was requested, but the update was
+        /// postponed because <see cref="DataEntryControlHost"/> UpdateInProgress returned.
+        /// <see langword="true"/>.
+        /// </summary>
+        bool _autoCompleteUpdatePending;
+
         #endregion Fields
 
         #region Delegates
+
+        /// <summary>
+        /// Signature to use for invoking parameterless methods.
+        /// </summary>
+        delegate void ParameterlessDelegate();
 
         /// <summary>
         /// Signature to use for invoking methods that accept one <see cref="FontStyle"/> parameter.
@@ -1525,40 +1537,73 @@ namespace Extract.DataEntry
         /// </summary>
         void UpdateAutoCompleteValues()
         {
-            // If there is no active validator, clear the auto-complete list and return.
-            if (_activeValidator == null)
+            // Post a message to update the autocomplete values on the message queue. This way we
+            // can be sure that the list will not be updated as part of a key event handler (which
+            // can lead to access violations.
+            BeginInvoke(new ParameterlessDelegate(UpdateAutoCompleteValuesDirect));
+        }
+
+        /// <summary>
+        /// Helper method for UpdateAutoCompleteValues. UpdateAutoCompleteValuesDirect should not be
+        /// called directly to ensure auto-complete lists are never updated during a keystroke event.
+        /// </summary>
+        void UpdateAutoCompleteValuesDirect()
+        {
+            // If the host reports that an update is in progress, delay updating the auto-complete
+            // list since the update may otherwise result in the auto-complete list being changed
+            // multiple times before the update is over.
+            if (DataEntryControlHost != null && DataEntryControlHost.UpdateInProgress)
             {
-                if (AutoCompleteCustomSource.Count > 0)
+                if (!_autoCompleteUpdatePending)
                 {
-                    AutoCompleteCustomSource.Clear();
+                    _autoCompleteUpdatePending = true;
+                    DataEntryControlHost.UpdateEnded += HandleDataEntryControlHostUpdateEnded;
                 }
 
                 return;
             }
-
-            // If auto-complete values have been supplied, use them.
-            string[] autoCompleteValues = _activeValidator.GetAutoCompleteValues();
-            if (autoCompleteValues != null)
+            else if (_autoCompleteUpdatePending)
             {
-                // [DataEntry:443]
-                // Add each item from the auto-complete values to the auto-complete list twice, once
-                // as it is in the validation list, and the second time with a leading space.
-                // This way, a user can press space in an empty cell to see all possible values.
-                AutoCompleteStringCollection autoCompleteList = new AutoCompleteStringCollection();
-                for (int i = 0; i < autoCompleteValues.Length; i++)
-                {
-                    autoCompleteList.Add(" " + autoCompleteValues[i]);
-                }
-                autoCompleteList.AddRange(autoCompleteValues);
+                DataEntryControlHost.UpdateEnded -= HandleDataEntryControlHostUpdateEnded;
+                _autoCompleteUpdatePending = false;
+            }
 
-                // Initialize auto-complete mode in case validation lists are used.
-                base.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                base.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            // Get updated values for the auto-complete fields if an update is required.
+            AutoCompleteMode autoCompleteMode = AutoCompleteMode;
+            AutoCompleteSource autoCompleteSource = AutoCompleteSource;
+            AutoCompleteStringCollection autoCompleteList = AutoCompleteCustomSource;
+            string[] autoCompleteValues;
+            if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
+                    ref autoCompleteSource, ref autoCompleteList, out autoCompleteValues))
+            {
+                AutoCompleteMode = autoCompleteMode;
+                AutoCompleteSource = autoCompleteSource;
                 AutoCompleteCustomSource = autoCompleteList;
             }
             else if (base.AutoCompleteMode != AutoCompleteMode.None)
             {
                 base.AutoCompleteMode = AutoCompleteMode.None;
+            }
+        }
+
+        /// <summary>
+        /// Handles the case the a significant update of control data as reported by
+        /// <see cref="DataEntryControlHost"/> UpdateInProgress has ended.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        void HandleDataEntryControlHostUpdateEnded(object sender, EventArgs e)
+        {
+            try
+            {
+                DataEntryControlHost.UpdateEnded -= HandleDataEntryControlHostUpdateEnded;
+                _autoCompleteUpdatePending = false;
+
+                UpdateAutoCompleteValues();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30116", ex);
             }
         }
 

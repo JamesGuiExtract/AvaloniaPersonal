@@ -165,7 +165,8 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Initializes a new instance of the <see cref="Highlight"/> class.
         /// </summary>
-        internal Highlight(string comment, int pageNumber) : base(pageNumber, comment)
+        internal Highlight(string comment, int pageNumber)
+            : base(pageNumber, comment)
         {
             // Used by the composite highlight layer object
         }
@@ -207,7 +208,7 @@ namespace Extract.Imaging.Forms
         /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
         /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
         public Highlight(ImageViewer imageViewer, string comment, Point start, Point end, int height)
-            : this(imageViewer, comment, start, end, height, imageViewer.PageNumber, null, 
+            : this(imageViewer, comment, start, end, height, imageViewer.PageNumber, null,
                 imageViewer.DefaultHighlightColor)
         {
 
@@ -246,9 +247,9 @@ namespace Extract.Imaging.Forms
         /// open image.</exception>
         /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
         /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
-        public Highlight(ImageViewer imageViewer, string comment, Point start, Point end, 
+        public Highlight(ImageViewer imageViewer, string comment, Point start, Point end,
             int height, int pageNumber)
-            : this(imageViewer, comment, start, end, height, pageNumber, null, 
+            : this(imageViewer, comment, start, end, height, pageNumber, null,
                 imageViewer.DefaultHighlightColor)
         {
 
@@ -289,7 +290,7 @@ namespace Extract.Imaging.Forms
         /// <exception cref="ExtractException"><paramref name="imageViewer"/> does not contain an 
         /// open image.</exception>
         /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
-        public Highlight(ImageViewer imageViewer, string comment, Point start, Point end, 
+        public Highlight(ImageViewer imageViewer, string comment, Point start, Point end,
             int height, int pageNumber, string text, Color color)
             : base(imageViewer, pageNumber, comment)
         {
@@ -304,7 +305,7 @@ namespace Extract.Imaging.Forms
                 // OCR the area if that was requested, otherwise set the text specified
                 // TODO: actually perform OCR
                 _text = (text == null && imageViewer.RecognizeHighlightText ? "OCR text" : text);
-                
+
                 // [DataEntry:3860]
                 // Ensure the newly created highlight is of minimum size.
                 Rectangle bounds = GetBounds();
@@ -375,11 +376,11 @@ namespace Extract.Imaging.Forms
         /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
         /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
         public Highlight(ImageViewer imageViewer, string comment, RasterZone rasterZone)
-            : this(imageViewer, comment, new Point(rasterZone.StartX, rasterZone.StartY), 
+            : this(imageViewer, comment, new Point(rasterZone.StartX, rasterZone.StartY),
                 new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
                 null, imageViewer.DefaultHighlightColor)
         {
-            
+
         }
 
         /// <summary>
@@ -411,7 +412,7 @@ namespace Extract.Imaging.Forms
         /// <exception cref="ExtractException"><paramref name="imageViewer"/> does not contain an 
         /// open image.</exception>
         /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
-        public Highlight(ImageViewer imageViewer, string comment, RasterZone rasterZone, 
+        public Highlight(ImageViewer imageViewer, string comment, RasterZone rasterZone,
             string text, Color color)
             : this(imageViewer, comment, new Point(rasterZone.StartX, rasterZone.StartY),
                 new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
@@ -472,14 +473,14 @@ namespace Extract.Imaging.Forms
         /// coordinates.</returns>
         // This is not the compound word "endpoint". This is the "end point", meant in contrast to
         // "start point".
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", 
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "EndPoint")]
         public Point EndPoint
         {
             get
             {
                 return _endPoint;
-            }   
+            }
             set
             {
                 try
@@ -812,7 +813,7 @@ namespace Extract.Imaging.Forms
         /// destination coordinates.</param>
         /// <param name="color">The color to paint the highlight.</param>
         /// <param name="drawMode">The mix mode to use when drawing the highlight.</param>
-        internal void DrawRegion(Graphics graphics, Region clip, Matrix transform, Color color, 
+        internal void DrawRegion(Graphics graphics, Region clip, Matrix transform, Color color,
             RasterDrawMode drawMode)
         {
             // Check if this highlight is attached to an image viewer
@@ -933,7 +934,7 @@ namespace Extract.Imaging.Forms
             }
             catch
             {
-                ExtractException ee = new ExtractException("ELI22028", 
+                ExtractException ee = new ExtractException("ELI22028",
                     "Unable to get grip handle cursor.");
                 ee.AddDebugData("Grip handle id", gripHandleId, false);
                 throw ee;
@@ -963,7 +964,7 @@ namespace Extract.Imaging.Forms
             {
                 // Return the cursor based on whether the vertex 
                 // is to the top-left/bottom-right of the center.
-                return point.X < center[0].X ^ 
+                return point.X < center[0].X ^
                        point.Y < center[0].Y
                            ? Cursors.SizeNESW : Cursors.SizeNWSE;
             }
@@ -989,27 +990,27 @@ namespace Extract.Imaging.Forms
             // second & fourth quadrants respectively and vice versa.
             switch ((int)Math.Round(angle / 45.0))
             {
-                    // Closest to 45 or 225 degrees
+                // Closest to 45 or 225 degrees
                 case 1:
                 case 5:
 
                     // Second and fourth quadrant
                     return Cursors.SizeNWSE;
 
-                    // Closest to 90 or 270 degrees
+                // Closest to 90 or 270 degrees
                 case 2:
                 case 6:
 
                     return Cursors.SizeNS;
 
-                    // Closest to 135 or 315 degrees
+                // Closest to 135 or 315 degrees
                 case 3:
                 case 7:
 
                     // First and third quadrant
                     return Cursors.SizeNESW;
 
-                    // Closest to 0 or 180 degrees
+                // Closest to 0 or 180 degrees
                 case 4:
                 case 8:
 
@@ -1186,7 +1187,7 @@ namespace Extract.Imaging.Forms
         /// <see langword="false"/> if it is resizing or adjusting the height.</returns>
         static bool GetIsRotation(PointF[] imageGrips, int gripHandleId)
         {
-            return imageGrips.Length > 4 
+            return imageGrips.Length > 4
                        ? gripHandleId < 4 && Control.ModifierKeys == Keys.Control : gripHandleId == 0 || gripHandleId == 2;
         }
 
@@ -1264,25 +1265,21 @@ namespace Extract.Imaging.Forms
                 ImageViewer imageViewer = base.ImageViewer;
 
                 // Get the mouse position as a point in image coordinates
-                PointF[] mouse = new PointF[] { new PointF(mouseX, mouseY) };
-                using (Matrix clientToImage = imageViewer.Transform.Clone())
-                {
-                    clientToImage.Invert();
-                    clientToImage.TransformPoints(mouse);
-                }
+                PointF mouse =
+                    GeometryMethods.InvertPoint(imageViewer.Transform, new PointF(mouseX, mouseY));
 
                 // Check if the adjust angle tool is being used
                 if (imageViewer.Cursor == ExtractCursors.ActiveRotate)
                 {
                     // Update the end point
-                    QuietSetEndPoint(Point.Round(mouse[0]));
+                    QuietSetEndPoint(Point.Round(mouse));
                 }
                 else if (!_originalIsAngular &&
                          (imageViewer.Cursor == Cursors.SizeNWSE
                           || imageViewer.Cursor == Cursors.SizeNESW))
                 {
                     // This is a corner resize event
-                    TrackingData.UpdateRectangle((int)(mouse[0].X + 0.5F), (int)(mouse[0].Y + 0.5F));
+                    TrackingData.UpdateRectangle((int)(mouse.X + 0.5F), (int)(mouse.Y + 0.5F));
 
                     // Get the y-coordinate for the raster points
                     int y = (int)(TrackingData.Rectangle.Y
@@ -1297,12 +1294,12 @@ namespace Extract.Imaging.Forms
                 {
                     if (_originalIsAngular)
                     {
-                        AdjustHeight(mouse[0]);
+                        AdjustHeight(mouse);
                     }
                     else
                     {
                         // Resize the highlight
-                        ResizeActiveHighlight(mouse[0]);
+                        ResizeActiveHighlight(mouse);
                     }
                 }
 
@@ -1324,10 +1321,10 @@ namespace Extract.Imaging.Forms
             double x = mouse.X - center.X;
             double y = mouse.Y - center.Y;
 
-            double dotProduct = Math.Abs(x*_activeHighlightVector.X + y*_activeHighlightVector.Y);
+            double dotProduct = Math.Abs(x * _activeHighlightVector.X + y * _activeHighlightVector.Y);
 
             double distance = GetGripPointDistance();
-            int height = (int)((dotProduct-distance)*2);
+            int height = (int)((dotProduct - distance) * 2);
             if (height < 5)
             {
                 height = 5;
@@ -1405,7 +1402,7 @@ namespace Extract.Imaging.Forms
                     // Define the new highlight
                     PointF[] points = GetGripPoints(_startPoint, _endPoint, _height);
                     QuietSetSpatialData(Point.Round(points[i]), Point.Round(points[gripHandleId]),
-                        (int) GeometryMethods.Distance(_startPoint, _endPoint));
+                        (int)GeometryMethods.Distance(_startPoint, _endPoint));
 
                     // Done.
                     return;
@@ -1557,8 +1554,8 @@ namespace Extract.Imaging.Forms
         /// <paramref name="endPoint"/>.</param>
         // This is not the compound word "endpoint". This is the "end point", meant in contrast to
         // "start point".
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", 
-            MessageId="endPoint")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
+            MessageId = "endPoint")]
         public void SetSpatialData(Point startPoint, Point endPoint, int height)
         {
             try
@@ -1970,7 +1967,7 @@ namespace Extract.Imaging.Forms
         /// <param name="height">The height of the zone in image pixels.</param>
         void GetBorderZone(out PointF start, out PointF end, out float height)
         {
-            double expandBy = (ExtractPens.ThickPenWidth-1) / 2.0 / ImageViewer.GetScaleFactorY();
+            double expandBy = (ExtractPens.ThickPenWidth - 1) / 2.0 / ImageViewer.GetScaleFactorY();
             GetExpandedZone(expandBy, out start, out end, out height);
         }
 
@@ -1996,7 +1993,7 @@ namespace Extract.Imaging.Forms
         /// pixels.</returns>
         double GetGripPointDistance()
         {
-            double expandBy = SelectionPen.Width/2.0;
+            double expandBy = SelectionPen.Width / 2.0;
             if (BorderColor != Color.Transparent)
             {
                 expandBy += ExtractPens.ThickPenWidth - 1;

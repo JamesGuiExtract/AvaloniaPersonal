@@ -562,6 +562,99 @@ namespace Extract.Drawing
             return (Math.PI * degrees) / 180.0;
         }
 
+        /// <summary>
+        /// Inverts the specified point using the specified transform <see cref="Matrix"/>.
+        /// </summary>
+        /// <param name="transform">The <see cref="Matrix"/> to be used to transform the
+        /// <see paramref="point"/>.</param>
+        /// <param name="point">The <see cref="Point"/> to be transformed.</param>
+        /// <returns>The inverted <see cref="Point"/>.</returns>
+        public static Point InvertPoint(Matrix transform, Point point)
+        {
+            try
+            {
+                Point[] pointArray = new Point[] { point };
+                InvertPoints(transform, pointArray);
+                return pointArray[0];
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30177", ex);
+            }
+        }
+
+        /// <summary>
+        /// Inverts the specified point using the specified transform <see cref="Matrix"/>.
+        /// </summary>
+        /// <param name="transform">The <see cref="Matrix"/> to be used to transform the
+        /// <see paramref="point"/>.</param>
+        /// <param name="point">The <see cref="PointF"/> to be transformed.</param>
+        /// <returns>The inverted <see cref="PointF"/>.</returns>
+        public static PointF InvertPoint(Matrix transform, PointF point)
+        {
+            try
+            {
+                PointF[] pointArray = new PointF[] { point };
+                InvertPoints(transform, pointArray);
+                return pointArray[0];
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30178", ex);
+            }
+        }
+
+        /// <summary>
+        /// Inverts the specified points using the specified transform <see cref="Matrix"/>.
+        /// </summary>
+        /// <param name="transform">The <see cref="Matrix"/> to be used to transform the
+        /// <see paramref="points"/>.</param>
+        /// <param name="points">The <see cref="Point"/>s to be transformed.</param>
+        public static void InvertPoints(Matrix transform, Point[] points)
+        {
+            try
+            {
+                if (transform.IsInvertible)
+                {
+                    using (Matrix inverseMatrix = transform.Clone())
+                    {
+                        inverseMatrix.Invert();
+                        inverseMatrix.TransformPoints(points);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30179", ex);
+            }
+        }
+
+        /// <summary>
+        /// Inverts the specified points using the specified transform <see cref="Matrix"/>.
+        /// </summary>
+        /// <param name="transform">The <see cref="Matrix"/> to be used to transform the
+        /// <see paramref="points"/>.</param>
+        /// <param name="points">The <see cref="PointF"/>s to be transformed.</param>
+        public static void InvertPoints(Matrix transform, PointF[] points)
+        {
+            try
+            {
+                if (transform.IsInvertible)
+                {
+                    using (Matrix inverseMatrix = transform.Clone())
+                    {
+                        inverseMatrix.Invert();
+                        inverseMatrix.TransformPoints(points);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30180", ex);
+            }
+        }
+
         #endregion GeometryMethods Methods
     }
 }

@@ -373,7 +373,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._epicPatientMiddleNameColumn.HeaderText = "Middle Name";
             this._epicPatientMiddleNameColumn.Name = "_epicPatientMiddleNameColumn";
             this._epicPatientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientMiddleNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
             this._epicPatientMiddleNameColumn.ValidationErrorMessage = "Bad value";
             // 
             // _epicPatientLastNameColumn
@@ -392,7 +391,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._epicPatientSuffixColumn.HeaderText = "Suffix";
             this._epicPatientSuffixColumn.Name = "_epicPatientSuffixColumn";
             this._epicPatientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientSuffixColumn.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
             this._epicPatientSuffixColumn.ValidationErrorMessage = "";
             // 
             // _patientNameTable
@@ -440,7 +438,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._patientMiddleNameColumn.HeaderText = "Middle Name";
             this._patientMiddleNameColumn.Name = "_patientMiddleNameColumn";
             this._patientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientMiddleNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
             this._patientMiddleNameColumn.ValidationErrorMessage = "Bad value";
             // 
             // _patientLastNameColumn
@@ -459,7 +456,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             this._patientSuffixColumn.HeaderText = "Suffix";
             this._patientSuffixColumn.Name = "_patientSuffixColumn";
             this._patientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientSuffixColumn.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
             this._patientSuffixColumn.ValidationErrorMessage = "";
             // 
             // _genderLabel

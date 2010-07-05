@@ -24,7 +24,7 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Initializes a new instance of the <see cref="LabDEOrderMapperConfigurationForm"/> class.
         /// </summary>
-        public LabDEOrderMapperConfigurationForm() : this(null)
+        public LabDEOrderMapperConfigurationForm() : this(null, false)
         {
         }
 
@@ -33,7 +33,8 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="databaseFile">The name of the database file to display in the
         /// text box.</param>
-        public LabDEOrderMapperConfigurationForm(string databaseFile)
+        /// <param name="requireMandatoryTests">Whether mandatory tests are required or not.</param>
+        public LabDEOrderMapperConfigurationForm(string databaseFile, bool requireMandatoryTests)
         {
             try
             {
@@ -42,6 +43,8 @@ namespace Extract.LabResultsCustomComponents
                 _databaseFile = databaseFile;
 
                 _textDatabaseFile.Text = _databaseFile ?? "";
+
+                _checkRequireMandatoryTests.Checked = requireMandatoryTests;
             }
             catch (Exception ex)
             {
@@ -59,6 +62,17 @@ namespace Extract.LabResultsCustomComponents
             get
             {
                 return _databaseFile;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether mandatory tests are required or not.
+        /// </summary>
+        public bool RequireMandatoryTests
+        {
+            get
+            {
+                return _checkRequireMandatoryTests.Checked;
             }
         }
 

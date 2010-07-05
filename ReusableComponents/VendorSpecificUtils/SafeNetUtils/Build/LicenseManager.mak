@@ -66,7 +66,7 @@ BuildExtractLMInstall:CopyFilesToExtractLMInstall
 	$(SetProductVerScript) "$(ExtractLMInstallRootDir)\Extract Systems LM.ism" "$(ReusableComponentsVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(ExtractLMInstallRootDir)\Extract Systems LM.ism"
 	
-CopyLMInstallToProductInstallFolder:
+CopyLMInstallToProductInstallFolder: BuildExtractLMInstall
 #This label requires the ProductInstallFolder macro to be defined
 	@ECHO Copying LM Install to $(ProductInstallFolder) Directory...
     @IF NOT EXIST "$(ProductInstallFolder)" MKDIR "$(ProductInstallFolder)"

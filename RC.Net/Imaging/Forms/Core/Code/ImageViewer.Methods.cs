@@ -1016,35 +1016,41 @@ namespace Extract.Imaging.Forms
         /// event should be raised; <see langword="false"/> if it should not be raised.</param>
         void CenterAtPoint(Point pt, bool updateZoomHistory, bool raiseZoomChanged)
         {
-            // Normalize the point if it is off the image
-            int x = pt.X;
-            int y = pt.Y;
-            if (x < 0)
+            // [DataEntry:837]
+            // If a zero-size rectangle has been specified (as is the case with a minimized
+            // window), centering is not possible and would throw an exception if attempted.
+            if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
             {
-                x = 0;
-            }
-            else if (x > ImageWidth)
-            {
-                x = ImageWidth - 1;
-            }
-            if (y < 0)
-            {
-                y = 0;
-            }
-            else if (y > ImageHeight)
-            {
-                y = ImageHeight - 1;
-            }
+                // Normalize the point if it is off the image
+                int x = pt.X;
+                int y = pt.Y;
+                if (x < 0)
+                {
+                    x = 0;
+                }
+                else if (x > ImageWidth)
+                {
+                    x = ImageWidth - 1;
+                }
+                if (y < 0)
+                {
+                    y = 0;
+                }
+                else if (y > ImageHeight)
+                {
+                    y = ImageHeight - 1;
+                }
 
-            // Convert the point to client coordinates
-            Point[] client = new Point[] { new Point(x,y) };
-            _transform.TransformPoints(client);
+                // Convert the point to client coordinates
+                Point[] client = new Point[] { new Point(x, y) };
+                _transform.TransformPoints(client);
 
-            // Center at the point
-            base.CenterAtPoint(client[0]);
+                // Center at the point
+                base.CenterAtPoint(client[0]);
 
-            // Update the zoom as necessary
-            UpdateZoom(updateZoomHistory, raiseZoomChanged);
+                // Update the zoom as necessary
+                UpdateZoom(updateZoomHistory, raiseZoomChanged);
+            }
         }
 
         /// <summary>
@@ -2292,6 +2298,14 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 ExtractException.Assert("ELI21455", "No image is open.", base.Image != null);
 
+                // [DataEntry:837]
+                // If a zero-size rectangle has been specified (as is the case with a minimized
+                // window), zooming is not possible and would throw an exception if attempted.
+                if (rc.Width < 1 || rc.Height < 1)
+                {
+                    return;
+                }
+
                 // Change the fit mode if it is not fit mode none
                 if (updateFitMode && _fitMode != FitMode.None)
                 {
@@ -2371,13 +2385,6 @@ namespace Extract.Imaging.Forms
 
                 case CursorTool.EditHighlightText:
                     {
-                        // Convert the mouse click point from client to image coordinates
-                        Point[] mouseClick = new Point[] { new Point(mouseX, mouseY) };
-                        using (Matrix clientToImage = _transform.Clone())
-                        {
-                            clientToImage.Invert();
-                            clientToImage.TransformPoints(mouseClick);
-                        }
 
                         // Find the highlight that was clicked on (if any)
                         // and present the edit text dialog to the user
@@ -2524,14 +2531,7 @@ namespace Extract.Imaging.Forms
             bool onlySelectableObjects) where T : LayerObject
         {
             // Get the mouse position in image coordinates
-            Point[] mouse = new Point[] { new Point(x, y) };
-            using (Matrix clientToImage = _transform.Clone())
-            {
-                clientToImage.Invert();
-                clientToImage.TransformPoints(mouse);
-            }
-
-            Point mousePoint = mouse[0];
+            Point mousePoint = GeometryMethods.InvertPoint(_transform, new Point(x, y));
 
             // Build the list of possible layer objects
             List<LayerObject> possibleSelection = new List<LayerObject>();
@@ -2622,15 +2622,10 @@ namespace Extract.Imaging.Forms
                 Point linkRelative = GetRelativeLinkPoint(previous, _activeLinkedLayerObject);
 
                 // Calculate the new center point in logical (image) coordinates
-                Point[] newCenter = new Point[] { linkRelative + delta };
-                using(Matrix clientToImage = _transform.Clone())
-                {
-                    clientToImage.Invert();
-                    clientToImage.TransformPoints(newCenter);
-                }
+                Point newCenter = GeometryMethods.InvertPoint(_transform, linkRelative + delta);
 
                 // Set the center point
-                zoomInfo.Center = newCenter[0];
+                zoomInfo.Center = newCenter;
                 SetZoomInfo(zoomInfo, true);
             }
         }
@@ -3044,40 +3039,33 @@ namespace Extract.Imaging.Forms
                     {
                         // Get the points of the highlight's bisecting line
                         Point[] points = new Point[] 
-                    {
-                        _trackingData.StartPoint, 
-                        new Point(mouseX, mouseY)
-                    };
+                        {
+                            _trackingData.StartPoint, 
+                            new Point(mouseX, mouseY)
+                        };
 
                         // Convert the points from physical to logical coordinates
-                        using (Matrix inverseMatrix = _transform.Clone())
+                        GeometryMethods.InvertPoints(_transform, points);
+
+                        if (_cursorTool == CursorTool.AngularHighlight)
                         {
-                            // Invert the transformation matrix
-                            inverseMatrix.Invert();
-
-                            // Transform the midpoints of the sides of the highlight
-                            inverseMatrix.TransformPoints(points);
-
-                            if (_cursorTool == CursorTool.AngularHighlight)
+                            // Instantiate the new highlight and add it to _layerObjects
+                            Highlight highlight =
+                                new Highlight(this, LayerObject.ManualComment, points[0],
+                                    points[1], _defaultHighlightHeight);
+                            _layerObjects.Add(highlight);
+                        }
+                        else
+                        {
+                            // Instantiate a new redaction and add it to _layerObjects
+                            RasterZone zone = new RasterZone(points[0], points[1],
+                                _defaultHighlightHeight, _pageNumber);
+                            RasterZone[] zones = GetFittedZones(zone);
+                            if (zones != null)
                             {
-                                // Instantiate the new highlight and add it to _layerObjects
-                                Highlight highlight =
-                                    new Highlight(this, LayerObject.ManualComment, points[0],
-                                        points[1], _defaultHighlightHeight);
-                                _layerObjects.Add(highlight);
-                            }
-                            else
-                            {
-                                // Instantiate a new redaction and add it to _layerObjects
-                                RasterZone zone = new RasterZone(points[0], points[1],
-                                    _defaultHighlightHeight, _pageNumber);
-                                RasterZone[] zones = GetFittedZones(zone);
-                                if (zones != null)
-                                {
-                                    Redaction redaction = new Redaction(this, PageNumber,
-                                        LayerObject.ManualComment, zones, _defaultRedactionFillColor);
-                                    _layerObjects.Add(redaction);
-                                }
+                                Redaction redaction = new Redaction(this, PageNumber,
+                                    LayerObject.ManualComment, zones, _defaultRedactionFillColor);
+                                _layerObjects.Add(redaction);
                             }
                         }
                     }
@@ -3098,7 +3086,6 @@ namespace Extract.Imaging.Forms
                     graphics.Dispose();
                 }
             }
-
             // Invalidate the image viewer so the object is updated
             Invalidate();
         }
@@ -3764,11 +3751,7 @@ namespace Extract.Imaging.Forms
             line = new Point[] { _trackingData.StartPoint, PointToClient(_trackingData.Line[1]) };
 
             // Convert the line from client to image coordinates
-            using (Matrix clientToImage = _transform.Clone())
-            {
-                clientToImage.Invert();
-                clientToImage.TransformPoints(line);
-            }
+            GeometryMethods.InvertPoints(_transform, line);
 
             // Set the new highlight height (distance formula)
             _defaultHighlightHeight = (int)(Math.Sqrt(Math.Pow(line[0].X - line[1].X, 2) +
@@ -3939,16 +3922,11 @@ namespace Extract.Imaging.Forms
             // Get the image area of the client in physical (client) coordinates.
             Rectangle imageArea = GetVisibleImageArea();
 
-            // Get the center point of the zoom window in physical (client) coordinates
-            Point[] center = new Point[] { new Point(imageArea.Width / 2, imageArea.Height / 2) };
+            // Get the center point of the zoom window in logical (image) coordinates
+            Point center = GeometryMethods.InvertPoint(_transform,
+                new Point(imageArea.Width / 2, imageArea.Height / 2));
 
-            // Convert the center point to logical (image) coordinates
-            using (Matrix clientToImage = _transform.Clone())
-            {
-                clientToImage.Invert();
-                clientToImage.TransformPoints(center);
-            }
-            return center[0];
+            return center;
         }
 
         /// <summary>
@@ -4009,11 +3987,7 @@ namespace Extract.Imaging.Forms
                 if (invertMatrix)
                 {
                     // Convert the corners from client coordinates to image coordinates
-                    using (Matrix clientToImageMatrix = transform.Clone())
-                    {
-                        clientToImageMatrix.Invert();
-                        clientToImageMatrix.TransformPoints(corners);
-                    }
+                    GeometryMethods.InvertPoints(transform, corners);
                 }
                 else
                 {
@@ -4093,8 +4067,14 @@ namespace Extract.Imaging.Forms
 
                 case FitMode.None:
 
-                    // Zoom the specified rectangle
-                    base.ZoomToRectangle(DisplayRectangle);
+                    // [DataEntry:837]
+                    // If a zero-size rectangle has been specified (as is the case with a minimized
+                    // window), zooming is not possible and would throw an exception if attempted.
+                    if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
+                    {
+                        // Zoom the specified rectangle
+                        base.ZoomToRectangle(DisplayRectangle);
+                    }
                     break;
 
                 default:

@@ -31,6 +31,12 @@ namespace Extract.LabResultsCustomComponents
         readonly string _epicCode;
 
         /// <summary>
+        /// The tiebreaker string to use in deciding which order to map to in phase 2 when the
+        /// number of combined groups for 2 different orders is the same.
+        /// </summary>
+        readonly string _tieBreakerString;
+
+        /// <summary>
         /// A collection of mandatory tests mapping all possible test names
         /// (the official and alternate names) to their test code.
         /// </summary>
@@ -80,14 +86,18 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="orderCode">The order code.</param>
         /// <param name="orderName">The order name.</param>
         /// <param name="epicCode">The epic code.</param>
+        /// <param name="tieBreakerString">The tiebreaker string to use in deciding which order to
+        /// map to in phase 2 when the number of combined groups for 2 different orders is the same.
+        /// </param>
         /// <param name="dbConnection">The database connection to use to fill the collections
         /// of tests.</param>
         public LabOrder(string orderCode, string orderName, string epicCode,
-            SqlCeConnection dbConnection)
+            string tieBreakerString, SqlCeConnection dbConnection)
         {
             _orderCode = orderCode.ToUpperInvariant();
             _orderName = orderName.ToUpperInvariant();
             _epicCode = epicCode.ToUpperInvariant();
+            _tieBreakerString = tieBreakerString.ToUpperInvariant();
 
             // Fill the test collections
             FillMandatoryCollection(dbConnection);
@@ -124,12 +134,6 @@ namespace Extract.LabResultsCustomComponents
                         _mandatoryTests.Add(testName, testCode);
                     }
                 }
-
-                // Add the code itself as a test name
-                if (!_mandatoryTestCodes.ContainsKey(testCode))
-                {
-                    _mandatoryTests.Add(testCode, testCode);
-                }
             }
         }
 
@@ -158,12 +162,6 @@ namespace Extract.LabResultsCustomComponents
                         // Add each name for this test code to the other collection
                         _otherTests.Add(testName, testCode);
                     }
-                }
-
-                // Add the code itself as a test name
-                if (!_otherTestCodes.ContainsKey(testCode))
-                {
-                    _otherTests.Add(testCode, testCode);
                 }
             }
         }
@@ -358,6 +356,18 @@ namespace Extract.LabResultsCustomComponents
             get
             {
                 return _epicCode;
+            }
+        }
+
+        /// <summary>
+        /// Gets the tiebreaker string to use in deciding which order to map to in phase 2 when the
+        /// number of combined groups for 2 different orders is the same.
+        /// </summary>
+        public string TieBreakerString
+        {
+            get
+            {
+                return _tieBreakerString;
             }
         }
 

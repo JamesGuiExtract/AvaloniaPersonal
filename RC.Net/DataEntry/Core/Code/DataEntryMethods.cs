@@ -720,7 +720,7 @@ namespace Extract.DataEntry
                     // If the current selection is not at the end of the existing text,
                     // insert the new text in place of the current selection.
                     int selectionStart = textBoxControl.SelectionStart;
-                    if (selectionStart < textBoxControl.Text.Length - 1)
+                    if (selectionStart < textBoxControl.Text.Length)
                     {
                         // Remove the existing selection if necessary.
                         if (textBoxControl.SelectionLength > 0)
@@ -1042,6 +1042,126 @@ namespace Extract.DataEntry
                 }
 
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Updates the provided auto-complete parameters using the provided
+        /// <see cref="IDataEntryValidator"/> (if an update is required).
+        /// </summary>
+        /// <param name="validator">The <see cref="IDataEntryValidator"/> that is to provide the
+        /// autocomplete values.</param>
+        /// <param name="autoCompleteMode">The <see cref="AutoCompleteMode"/> field to be updated.
+        /// </param>
+        /// <param name="autoCompleteSource">The <see cref="AutoCompleteSource"/> field to be
+        /// updated.</param>
+        /// <param name="autoCompleteList">The <see cref="AutoCompleteStringCollection"/> of
+        /// auto-complete values. A copy of every value will be prefixed with a space to enable the
+        /// space bar to open the auto-complete list.</param>
+        /// <param name="autoCompleteValues">The auto-complete values provided by the
+        /// <see paramref="validator"/>. Note: This does not include copies of the values prefixed
+        /// with a space as with <see paramref="autoCompleteList"/>.</param>
+        /// <returns><see langword="true"/> if any of the auto-complete settings were updated,
+        /// <see langword="false"/> if the auto-complete settings are untouched.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "1#")]
+        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "2#")]
+        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "3#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "4#")]
+        public static bool UpdateAutoCompleteList(IDataEntryValidator validator,
+            ref AutoCompleteMode autoCompleteMode, ref AutoCompleteSource autoCompleteSource,
+            ref AutoCompleteStringCollection autoCompleteList, out string[] autoCompleteValues)
+        {
+            try
+            {
+                autoCompleteValues = new string[] { };
+
+                // If there is no active validator, simply turn off auto-complete if it is not
+                // already off.
+                if (validator == null)
+                {
+                    if (autoCompleteMode != AutoCompleteMode.None)
+                    {
+                        autoCompleteMode = AutoCompleteMode.None;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                // If available, use the validation list values to initialize the
+                // auto-complete values.
+                autoCompleteValues = validator.GetAutoCompleteValues();
+                if (autoCompleteValues != null)
+                {
+                    // [DataEntry:443]
+                    // Add each item from the auto-complete values to the auto-complete list twice,
+                    // once as it is in the validation list, and the second time with a leading
+                    // space. This way, a user can press space in an empty cell to see all possible
+                    // values.
+                    AutoCompleteStringCollection newAutoCompleteList =
+                        new AutoCompleteStringCollection();
+                    for (int i = 0; i < autoCompleteValues.Length; i++)
+                    {
+                        newAutoCompleteList.Add(" " + autoCompleteValues[i]);
+                    }
+                    newAutoCompleteList.AddRange(autoCompleteValues);
+
+                    // If autoCompleteMode or autoCompleteSource have changed, an update is needed.
+                    bool updateRequired = (autoCompleteMode != AutoCompleteMode.SuggestAppend ||
+                                           autoCompleteSource != AutoCompleteSource.CustomSource);
+
+                    // Otherwise, compare the existing list with the new list... if they are
+                    // different, an update is required.
+                    if (!updateRequired)
+                    {
+                        if (newAutoCompleteList.Count != autoCompleteList.Count)
+                        {
+                            // If they are not the same size, an update is required.
+                            updateRequired = true;
+                        }
+                        else
+                        {
+                            // ...or if any value in the new list is not found in the old list, the
+                            // lists are different.
+                            foreach (string value in newAutoCompleteList)
+                            {
+                                if (!autoCompleteList.Contains(value))
+                                {
+                                    updateRequired = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // Only change auto-complete settings if required... the act of doing so
+                    // triggers GDI object leaks (at least on Windows XP).
+                    // https://connect.microsoft.com/VisualStudio/feedback/details/116641
+                    if (updateRequired)
+                    {
+                        // Initialize auto-complete mode in case validation lists are used.
+                        autoCompleteMode = AutoCompleteMode.SuggestAppend;
+                        autoCompleteSource = AutoCompleteSource.CustomSource;
+                        autoCompleteList = newAutoCompleteList;
+
+                        return true;
+                    }
+                }
+                // If a null list was provided, simply turn off auto-complete if it is not already
+                // off.
+                else if (autoCompleteMode != AutoCompleteMode.None)
+                {
+                    autoCompleteMode = AutoCompleteMode.None;
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30115", ex);
             }
         }
 

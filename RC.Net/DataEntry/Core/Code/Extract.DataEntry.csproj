@@ -239,6 +239,10 @@
       <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
       <Name>Extract.Drawing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
+      <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
+      <Name>Extract.FileActionManager.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
       <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
       <Name>Extract.Imaging</Name>

@@ -125,24 +125,29 @@ namespace Extract.DataEntry
                                 HandleAutoCompleteValuesChanged;
                             _activeValidator = null;
                         }
-
-                        _attribute = value;
-
+                        
                         // Update the combo box using the new attribute's validator (if there is
                         // one).
-                        if (_attribute != null)
+                        if (value != null)
                         {
                             _activeValidator =
-                                AttributeStatusInfo.GetStatusInfo(_attribute).Validator;
+                                AttributeStatusInfo.GetStatusInfo(value).Validator;
 
                             if (_activeValidator != null)
                             {
-                                UpdateItemList();
+                                // [DataEntry:975]
+                                // We are about set a new value for the cell; don't perserve the
+                                // original value; this ensures there is no chance for the new value
+                                // to be overwritten with the original value as happened when the
+                                // _attribute was set prior to calling UpdateItemList.
+                                UpdateItemList(false);
 
                                 _activeValidator.AutoCompleteValuesChanged +=
                                     HandleAutoCompleteValuesChanged;
                             }
                         }
+
+                        _attribute = value;
                     }
                 }
                 catch (Exception ex)
@@ -528,7 +533,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                UpdateItemList();
+                UpdateItemList(true);
             }
             catch (Exception ex)
             {
@@ -541,7 +546,11 @@ namespace Extract.DataEntry
         /// <summary>
         /// Updates the items in the combo box using the validator (if there is one).
         /// </summary>
-        void UpdateItemList()
+        /// <param name="preserveValue">If <see langword="true"/>, as long as the new list contains
+        /// the cell's current value, the current value will be restored before this method exits.
+        /// If <see langword="false"/> the cells value will be cleared assuming a new item list was
+        /// applied.</param>
+        void UpdateItemList(bool preserveValue)
         {
             if (_activeValidator != null)
             {
@@ -549,14 +558,15 @@ namespace Extract.DataEntry
 
                 if (autoCompleteValues != null)
                 {
-                    // Reseting the item list will clear the value. Preserve the original value.
-                    string originalValue = Value.ToString();
-
+                    // Reseting the item list will clear the value. If requested, preserve the
+                    // original value.
+                    string originalValue = preserveValue ? Value.ToString() : "";
+                 
                     Items.Clear();
                     Items.AddRange(autoCompleteValues);
 
                     // Restore the original value
-                    if (Items.Contains(originalValue))
+                    if (preserveValue && Items.Contains(originalValue))
                     {
                         Value = originalValue;
                     }

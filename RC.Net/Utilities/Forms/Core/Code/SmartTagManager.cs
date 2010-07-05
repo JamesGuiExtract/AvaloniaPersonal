@@ -130,6 +130,17 @@ namespace Extract.Utilities.Forms
 
         #endregion Fields
 
+        #region Delegates
+
+        /// <summary>
+        /// Delegate for a function that takes two <see langword="bool"/> parameters.
+        /// </summary>
+        /// <param name="arg1">The first argument.</param>
+        /// <param name="arg2">The second argument.</param>
+        delegate void TwoBoolParametersDelegate(bool arg1, bool arg2);
+
+        #endregion Delegates
+
         #region Constructors
 
         /// <summary>
@@ -291,7 +302,11 @@ namespace Extract.Utilities.Forms
 
                 // If the smart tag manager has lost focus, ensure whatever has been entered thus
                 // far is applied to any active text control.
-                TryApplyTag(true, false);
+                // Invoke TryApplyTag to run asynchronously from the mesage que to conform with
+                // Mircrosoft guidelines for calling Focus as specified on this page:
+                // http://msdn.microsoft.com/en-us/library/system.windows.forms.control.enter.aspx
+                BeginInvoke(new TwoBoolParametersDelegate(TryApplyTag),
+                    new object[] { true, false });
             }
             catch (Exception ex)
             {

@@ -1,5 +1,6 @@
-using Extract.Licensing;
+using Extract.Drawing;
 using Extract.Imaging.Utilities;
+using Extract.Licensing;
 using Extract.Utilities.Forms;
 using Leadtools;
 using Leadtools.Annotations;
@@ -1408,7 +1409,15 @@ namespace Extract.Imaging.Forms
         {
             base.SizeMode = RasterPaintSizeMode.FitAlways;
             ScaleFactor = _DEFAULT_SCALE_FACTOR;
-            base.ZoomToRectangle(DisplayRectangle);
+
+            // [DataEntry:837]
+            // If a zero-size rectangle has been specified (as is the case with a minimized
+            // window), zooming is not possible and would throw an exception if attempted.
+            if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
+            {
+                // Zoom the specified rectangle
+                base.ZoomToRectangle(DisplayRectangle);
+            }
         }
 
         /// <summary>
@@ -1420,7 +1429,15 @@ namespace Extract.Imaging.Forms
         {
             base.SizeMode = RasterPaintSizeMode.FitWidth;
             ScaleFactor = _DEFAULT_SCALE_FACTOR;
-            base.ZoomToRectangle(DisplayRectangle);
+
+            // [DataEntry:837]
+            // If a zero-size rectangle has been specified (as is the case with a minimized
+            // window), zooming is not possible and would throw an exception if attempted.
+            if (DisplayRectangle.Width >= 1 && DisplayRectangle.Height >= 1)
+            {
+                // Zoom the specified rectangle
+                base.ZoomToRectangle(DisplayRectangle);
+            }
         }
 
 
@@ -2178,16 +2195,8 @@ namespace Extract.Imaging.Forms
             Point imagePoint = new Point();
             if (lookForLayerObjectsUnderSelectionTool)
             {
-                // Convert the physical point to image coordinates
-                Point[] transformPoint = new Point[] { e.Location };
-                using (Matrix clientToImage = _transform.Clone())
-                {
-                    clientToImage.Invert();
-                    clientToImage.TransformPoints(transformPoint);
-
-                    // Obtain the mouse position in image coordinates.
-                    imagePoint = transformPoint[0];
-                }
+                // Obtain the mouse position in image coordinates.
+                imagePoint = GeometryMethods.InvertPoint(_transform, e.Location);
             }
 
             // For all current members of _layerObjectsUnderSelectionTool, ensure they are still
@@ -2303,18 +2312,13 @@ namespace Extract.Imaging.Forms
             else
             {
                 // Convert the mouse position to image coordinates
-                Point[] hitPoint = new Point[] { mousePoint };
-                using (Matrix clientToImage = _transform.Clone())
-                {
-                    clientToImage.Invert();
-                    clientToImage.TransformPoints(hitPoint);
-                }
+                Point hitPoint = GeometryMethods.InvertPoint(_transform, mousePoint);
 
                 // Check if the mouse is over a visible linked layer object
                 foreach (LayerObject layerObject in _layerObjects)
                 {
                     if (layerObject.IsLinked && layerObject.Visible &&
-                        layerObject.HitTest(hitPoint[0]))
+                        layerObject.HitTest(hitPoint))
                     {
                         _activeLinkedLayerObject = layerObject;
                         Invalidate(layerObject.GetLinkArea());
@@ -2390,12 +2394,7 @@ namespace Extract.Imaging.Forms
             else
             {
                 // Convert the mouse click to image coordinates
-                Point[] hitPoint = new Point[] { mousePoint };
-                using (Matrix clientToImage = _transform.Clone())
-                {
-                    clientToImage.Invert();
-                    clientToImage.TransformPoints(hitPoint);
-                }
+                Point hitPoint = GeometryMethods.InvertPoint(_transform, mousePoint);
 
                 // Iterate through all layer objects
                 foreach (LayerObject layerObject in _layerObjects)
@@ -2403,7 +2402,7 @@ namespace Extract.Imaging.Forms
                     // Check if the mouse cursor is over a layer object
                     // Only perform hit test if object is selectable and visible
                     if (layerObject.Selectable && layerObject.Visible
-                        && layerObject.HitTest(hitPoint[0]))
+                        && layerObject.HitTest(hitPoint))
                     {
                         // Return the sizing mouse cursor
                         return Cursors.SizeAll;
@@ -2437,69 +2436,84 @@ namespace Extract.Imaging.Forms
                new Point(rectangle.Right, rectangle.Bottom)
             };
 
+            height = rectangle.Height;
+
             // Convert the points from physical to logical coordinates
-            using (Matrix inverseMatrix = _transform.Clone())
+            if (_transform.IsInvertible)
             {
-                // Invert the transformation matrix
-                inverseMatrix.Invert();
-
-                // Transform the top left and bottom right points to image coordinates
-                inverseMatrix.TransformPoints(topAndBottom);
-
-                // Compute height and start & end points based on image rotation.
-                // NOTE: The coordinates that were translated above are in original
-                // non-rotated image coordinates
-                switch (Orientation)
+                using (Matrix inverseMatrix = _transform.Clone())
                 {
+                    // Invert the transformation matrix
+                    inverseMatrix.Invert();
+
+                    // Transform the top left and bottom right points to image coordinates
+                    inverseMatrix.TransformPoints(topAndBottom);
+
+                    // Compute height and start & end points based on image rotation.
+                    // NOTE: The coordinates that were translated above are in original
+                    // non-rotated image coordinates
+                    switch (Orientation)
+                    {
                         // If rotated 90 or 270 then compute X intercept and
                         // height in relation to X coordinates
-                    case 90:
-                    case 270:
-                        {
-                            // Compute the height from the X perspective
-                            height = Math.Abs(topAndBottom[1].X - topAndBottom[0].X);
-
-                            // Get the X intersect
-                            int xIntersect =
-                                Math.Min(topAndBottom[0].X, topAndBottom[1].X) + height / 2;
-                            points = new Point[]
+                        case 90:
+                        case 270:
                             {
-                                new Point(xIntersect, Math.Min(topAndBottom[0].Y, topAndBottom[1].Y)),
-                                new Point(xIntersect, Math.Max(topAndBottom[0].Y, topAndBottom[1].Y))
-                            };
-                        }
-                        break;
+                                // Compute the height from the X perspective
+                                height = Math.Abs(topAndBottom[1].X - topAndBottom[0].X);
+
+                                // Get the X intersect
+                                int xIntersect =
+                                    Math.Min(topAndBottom[0].X, topAndBottom[1].X) + height / 2;
+                                points = new Point[]
+                                {
+                                    new Point(xIntersect, Math.Min(topAndBottom[0].Y, topAndBottom[1].Y)),
+                                    new Point(xIntersect, Math.Max(topAndBottom[0].Y, topAndBottom[1].Y))
+                                };
+                            }
+                            break;
 
                         // If rotated 0 or 180 compute Y intercept and height in relation to
                         // Y coordinates
-                    case 0:
-                    case 180:
-                        {
-                            // Compute the height from Y perspective
-                            height = Math.Abs(topAndBottom[1].Y - topAndBottom[0].Y);
-
-                            // Get the y intersect
-                            int yIntersect = Math.Min(topAndBottom[0].Y, topAndBottom[1].Y) + height / 2;
-
-                            // Compute the start and end points in image coordinates
-                            points = new Point[]
+                        case 0:
+                        case 180:
                             {
-                                new Point(Math.Min(topAndBottom[0].X, topAndBottom[1].X), yIntersect),
-                                new Point(Math.Max(topAndBottom[0].X, topAndBottom[1].X), yIntersect)
-                            };
-                        }
-                        break;
+                                // Compute the height from Y perspective
+                                height = Math.Abs(topAndBottom[1].Y - topAndBottom[0].Y);
 
-                    default:
-                        ExtractException.ThrowLogicException("ELI30243");
+                                // Get the y intersect
+                                int yIntersect = Math.Min(topAndBottom[0].Y, topAndBottom[1].Y) + height / 2;
 
-                        // Dummy code since compiler can't figure out that ThrowLogicException
-                        // throws an exception
-                        points = new Point[] { Point.Empty };
-                        height = 0;
-                        break;
+                                // Compute the start and end points in image coordinates
+                                points = new Point[]
+                                {
+                                    new Point(Math.Min(topAndBottom[0].X, topAndBottom[1].X), yIntersect),
+                                    new Point(Math.Max(topAndBottom[0].X, topAndBottom[1].X), yIntersect)
+                                };
+                            }
+                            break;
+
+                        default:
+                            ExtractException.ThrowLogicException("ELI30243");
+
+                            // Dummy code since compiler can't figure out that ThrowLogicException
+                            // throws an exception
+                            points = new Point[] { Point.Empty };
+                            height = 0;
+                            break;
+                    }
                 }
-
+            }
+            else
+            {
+                // If the matrix is not invertible, these points are probably meaningless,
+                // but they need to be set to something.
+                int rasterLineY = rectangle.Top + rectangle.Height / 2;
+                points = new Point[] 
+                {
+                    new Point(rectangle.Left, rasterLineY), 
+                    new Point(rectangle.Right, rasterLineY)
+                };
             }
         }
 
@@ -2848,11 +2862,7 @@ namespace Extract.Imaging.Forms
 
                             // Get the current mouse position in image coordinates
                             Point[] mousePosition = new Point[] {new Point(e.X, e.Y)};
-                            using (Matrix clientToImage = _transform.Clone())
-                            {
-                                clientToImage.Invert();
-                                clientToImage.TransformPoints(mousePosition);
-                            }
+                            GeometryMethods.InvertPoints(_transform, mousePosition);
 
                             // Zoom in based on the direction of the mouse wheel event
                             Zoom(e.Delta > 0);

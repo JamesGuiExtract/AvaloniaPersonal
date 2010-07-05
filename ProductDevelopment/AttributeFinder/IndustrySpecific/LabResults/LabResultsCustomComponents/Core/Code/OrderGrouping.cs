@@ -52,6 +52,25 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Initializes a new instance of the <see cref="OrderGrouping"/> class.
         /// </summary>
+        /// <param name="grouping">The <see cref="OrderGrouping"/> to initialize
+        /// the group from.</param>
+        public OrderGrouping(OrderGrouping grouping)
+        {
+            _attribute = grouping._attribute;
+            _collectionDate = grouping._collectionDate;
+            _collectionTime = grouping._collectionTime;
+            _labTests.AddRange(grouping._labTests);
+            _nameToAttributes = new Dictionary<string,List<IAttribute>>();
+            foreach (KeyValuePair<string, List<IAttribute>> pair in grouping._nameToAttributes)
+            {
+                _nameToAttributes.Add(pair.Key, new List<IAttribute>(pair.Value));
+            }
+            _labOrder = grouping._labOrder;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrderGrouping"/> class.
+        /// </summary>
         /// <param name="attribute">The attribute to initialize the group from.</param>
         public OrderGrouping(IAttribute attribute)
             : this(attribute, null)
@@ -148,9 +167,9 @@ namespace Extract.LabResultsCustomComponents
         /// group.
         /// </summary>
         /// <param name="group">The group to get the map from.</param>
-        public void InsertNameAttributeMap(OrderGrouping group)
+        internal void InsertNameAttributeMap(OrderGrouping group)
         {
-            foreach(KeyValuePair<string, List<IAttribute>> pair in group.NameToAttributes)
+            foreach (KeyValuePair<string, List<IAttribute>> pair in group.NameToAttributes)
             {
                 string key = pair.Key;
 
@@ -192,7 +211,7 @@ namespace Extract.LabResultsCustomComponents
         /// (all of the attributes in the <see cref="OrderGrouping.NameToAttributes"/>
         /// collection)
         /// </returns>
-        public IUnknownVector GetAllAttributesAsIUnknownVector()
+        internal IUnknownVector GetAllAttributesAsIUnknownVector()
         {
             IUnknownVector subAttributes = new IUnknownVector();
             foreach(List<IAttribute> list in _nameToAttributes.Values)
@@ -214,7 +233,7 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="group2">The second group to compare.</param>
         /// <returns><see langword="true"/> if the collection dates are the same and
         /// <see langword="false"/> if they are not.</returns>
-        public static bool CollectionDatesEqual(OrderGrouping group1, OrderGrouping group2)
+        internal static bool CollectionDatesEqual(OrderGrouping group1, OrderGrouping group2)
         {
             bool equal = (group1.CollectionDate == group1.CollectionTime)
                     && (group2.CollectionDate == group2.CollectionTime);
@@ -255,7 +274,7 @@ namespace Extract.LabResultsCustomComponents
         /// This should only be called as the last step before adding this list to the final
         /// order grouping collection.
         /// </summary>
-        public void UpdateLabTestsToOfficialName(SqlCeConnection dbConnection)
+        internal void UpdateLabTestsToOfficialName(SqlCeConnection dbConnection)
         {
             // Only perform mapping if the LabOrder has been set (this group may be
             // an unknown order)
@@ -307,6 +326,29 @@ namespace Extract.LabResultsCustomComponents
                     // Add the official name subattribute
                     attribute.SubAttributes.PushBack(officialName);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Checks whether this order grouping contains all mandatory tests.
+        /// <para><b>Note:</b></para>
+        /// Do not call this method until this group has been mapped to an order (i.e.
+        /// <see cref="OrderGrouping.LabOrder"/> does not equal <see langword="null"/>).
+        /// </summary>
+        /// <returns>Whether all mandatory tests are present or not.</returns>
+        internal bool ContainsAllMandatoryTests()
+        {
+            try
+            {
+                ExtractException.Assert("ELI30093",
+                    "Cannot check for mandatory tests when order has not been mapped.",
+                    _labOrder != null);
+
+                return _labOrder.ContainsAllMandatoryTests(_labTests);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30094", ex);
             }
         }
 

@@ -163,9 +163,21 @@ namespace Extract.DataEntry
         /// </summary>
         string _valueBeforeFontChange;
 
+        /// <summary>
+        /// Indicates whether an update of the auto-complete list was requested, but the update was
+        /// postponed because <see cref="DataEntryControlHost"/> UpdateInProgress returned.
+        /// <see langword="true"/>.
+        /// </summary>
+        bool _autoCompleteUpdatePending;
+
         #endregion Fields
 
         #region Delegates
+
+        /// <summary>
+        /// Signature to use for invoking parameterless methods.
+        /// </summary>
+        delegate void ParameterlessDelegate();
 
         /// <summary>
         /// Signature to use for invoking methods that accept one <see cref="FontStyle"/> parameter.
@@ -1064,7 +1076,7 @@ namespace Extract.DataEntry
 
                         if (_activeValidator != null)
                         {
-                            UpdateComboBoxItemsViaAutoCompleteValues();
+                            UpdateComboBoxItems();
 
                             _activeValidator.AutoCompleteValuesChanged +=
                                 HandleAutoCompleteValuesChanged;
@@ -1514,7 +1526,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                UpdateComboBoxItemsViaAutoCompleteValues();
+                UpdateComboBoxItems();
             }
             catch (Exception ex)
             {
@@ -1528,40 +1540,50 @@ namespace Extract.DataEntry
         /// Updates the items in the ComboBox list to reflect the current values in the
         /// auto-complete list.
         /// </summary>
-        void UpdateComboBoxItemsViaAutoCompleteValues()
+        void UpdateComboBoxItems()
         {
-            string[] autoCompleteValues = null;
-            if (_activeValidator != null)
+            // Post a message to update the autocomplete values on the message queue. This way we
+            // can be sure that the list will not be updated as part of a key event handler (which
+            // can lead to access violations.
+            BeginInvoke(new ParameterlessDelegate(UpdateComboBoxItemsDirect));
+        }
+
+        /// <summary>
+        /// Helper method for UpdateComboBoxItems. UpdateComboBoxItemsDirect should not be called 
+        /// directly to ensure auto-complete lists are never updated during a keystroke event.
+        /// </summary>
+        void UpdateComboBoxItemsDirect()
+        {
+            // If the host reports that an update is in progress, delay updating the auto-complete
+            // list since the update may otherwise result in the auto-complete list being changed
+            // multiple times before the update is over.
+            if (DataEntryControlHost != null && DataEntryControlHost.UpdateInProgress)
             {
-                autoCompleteValues = _activeValidator.GetAutoCompleteValues();
+                if (!_autoCompleteUpdatePending)
+                {
+                    _autoCompleteUpdatePending = true;
+                    DataEntryControlHost.UpdateEnded += HandleDataEntryControlHostUpdateEnded;
+                }
+
+                return;
+            }
+            else if (_autoCompleteUpdatePending)
+            {
+                DataEntryControlHost.UpdateEnded -= HandleDataEntryControlHostUpdateEnded;
+                _autoCompleteUpdatePending = false;
             }
 
-            if (autoCompleteValues != null)
+            // Get updated values for the auto-complete fields if an update is required.
+            AutoCompleteMode autoCompleteMode = AutoCompleteMode;
+            AutoCompleteSource autoCompleteSource = AutoCompleteSource;
+            AutoCompleteStringCollection autoCompleteCollection = AutoCompleteCustomSource;
+            string[] autoCompleteValues;
+            if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
+                    ref autoCompleteSource, ref autoCompleteCollection, out autoCompleteValues))
             {
-                // Reseting the item list will clear the value. Preserve the original value.
-                if (!string.IsNullOrEmpty(Text))
-                {
-                    _originalValue = Text;
-                }
-
-                // Auto-complete is supported unless the DropDownStyle is DropDownList
-                if (base.DropDownStyle != ComboBoxStyle.DropDownList)
-                {
-                    // [DataEntry:443]
-                    // Add each item from the validation list to the auto-complete list twice, once
-                    // as it is in the validation list, and the second time with a leading space.
-                    // This way, a user can press space in an empty cell to see all possible values.
-                    AutoCompleteStringCollection autoCompleteList = new AutoCompleteStringCollection();
-                    for (int i = 0; i < autoCompleteValues.Length; i++)
-                    {
-                        autoCompleteList.Add(" " + autoCompleteValues[i]);
-                    }
-                    autoCompleteList.AddRange(autoCompleteValues);
-
-                    base.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    base.AutoCompleteSource = AutoCompleteSource.CustomSource;
-                    base.AutoCompleteCustomSource = autoCompleteList;
-                }
+                AutoCompleteMode = autoCompleteMode;
+                AutoCompleteSource = autoCompleteSource;
+                AutoCompleteCustomSource = autoCompleteCollection;
 
                 Items.Clear();
                 Items.AddRange(autoCompleteValues);
@@ -1572,9 +1594,26 @@ namespace Extract.DataEntry
                     Text = _originalValue;
                 }
             }
-            else if (base.AutoCompleteMode != AutoCompleteMode.None)
+        }
+
+        /// <summary>
+        /// Handles the case the a significant update of control data as reported by
+        /// <see cref="DataEntryControlHost"/> UpdateInProgress has ended.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        void HandleDataEntryControlHostUpdateEnded(object sender, EventArgs e)
+        {
+            try
             {
-                base.AutoCompleteMode = AutoCompleteMode.None;
+                DataEntryControlHost.UpdateEnded -= HandleDataEntryControlHostUpdateEnded;
+                _autoCompleteUpdatePending = false;
+
+                UpdateComboBoxItems();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30112", ex);
             }
         }
 

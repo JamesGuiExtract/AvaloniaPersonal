@@ -1154,38 +1154,34 @@ namespace Extract.DataEntry
                         IDataEntryValidator validator =
                             AttributeStatusInfo.GetStatusInfo(dataEntryCell.Attribute).Validator;
 
-                        // If available, use the validation list values to initialize the
-                        // auto-complete values.
-                        if (validator != null)
+                        AutoCompleteMode autoCompleteMode = textEditingControl.AutoCompleteMode;
+                        AutoCompleteSource autoCompleteSource =
+                            textEditingControl.AutoCompleteSource;
+                        AutoCompleteStringCollection autoCompleteList =
+                            textEditingControl.AutoCompleteCustomSource;
+                        string[] autoCompleteValues;
+                        if (DataEntryMethods.UpdateAutoCompleteList(validator, ref autoCompleteMode,
+                                ref autoCompleteSource, ref autoCompleteList, out autoCompleteValues))
                         {
-                            string[] autoCompleteValues = validator.GetAutoCompleteValues();
-                            if (autoCompleteValues != null)
+                            // If auto-complete has been turned on/off from its previous state,
+                            // update the registration for the EditingControlPreviewKeyDown event.
+                            if (textEditingControl.AutoCompleteMode != autoCompleteMode)
                             {
-                                // [DataEntry:443]
-                                // Add each item from the auto-complete values to the auto-complete
-                                // list twice, once as it is in the validation list, and the second
-                                // time with a leading space. This way, a user can press space in an
-                                // empty cell to see all possible values.
-                                AutoCompleteStringCollection autoCompleteList = new AutoCompleteStringCollection();
-                                for (int i = 0; i < autoCompleteValues.Length; i++)
+                                if (autoCompleteMode == AutoCompleteMode.None)
                                 {
-                                    autoCompleteList.Add(" " + autoCompleteValues[i]);
+                                    textEditingControl.PreviewKeyDown -=
+                                        HandleEditingControlPreviewKeyDown;
                                 }
-                                autoCompleteList.AddRange(autoCompleteValues);
+                                else
+                                {
+                                    textEditingControl.PreviewKeyDown +=
+                                        HandleEditingControlPreviewKeyDown;
+                                }
+                            }
 
-                                textEditingControl.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                                textEditingControl.AutoCompleteSource = AutoCompleteSource.CustomSource;
-                                textEditingControl.AutoCompleteCustomSource = autoCompleteList;
-                                textEditingControl.PreviewKeyDown += HandleEditingControlPreviewKeyDown;
-                            }
-                            else if (textEditingControl.AutoCompleteMode != AutoCompleteMode.None)
-                            {
-                                textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
-                            }
-                        }
-                        else if (textEditingControl.AutoCompleteMode != AutoCompleteMode.None)
-                        {
-                            textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
+                            textEditingControl.AutoCompleteMode = autoCompleteMode;
+                            textEditingControl.AutoCompleteSource = autoCompleteSource;
+                            textEditingControl.AutoCompleteCustomSource = autoCompleteList;
                         }
                     }
                 }

@@ -1712,6 +1712,15 @@ namespace Extract.DataEntry
                         // Apply the new attribute to the added row.
                         ApplyAttributeToRow(addedRowIndex, null, null);
                     }
+
+                    // [DataEntry:263]
+                    // If the TabOrderPlaceholderAttribute has not yet been added, do it now.
+                    if (!_tabOrderPlaceholderAttributes.ContainsKey(sourceAttributes) &&
+                        TabOrderPlaceholderAttribute != null)
+                    {
+                        DataEntryMethods.ReorderAttributes(_sourceAttributes,
+                            DataEntryMethods.AttributeAsVector(TabOrderPlaceholderAttribute));
+                    }
                 }
 
                 // Since the spatial information for this cell has likely changed, spatial hints need 
@@ -3816,6 +3825,8 @@ namespace Extract.DataEntry
                         AttributeStatusInfo.SetAttributeTabGroup(
                             tabOrderPlaceholderAttribute, tabGroup);
                     }
+
+                    _tabOrderPlaceholderAttributes[_sourceAttributes] = tabOrderPlaceholderAttribute;
                 }
 
                 return tabOrderPlaceholderAttribute;

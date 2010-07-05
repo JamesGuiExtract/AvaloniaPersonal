@@ -3151,6 +3151,7 @@
 		<row><td>ID_STRING12</td><td>1033</td><td>USERLI~1|User License</td><td>0</td><td/><td>1788725928</td></row>
 		<row><td>ID_STRING13</td><td>1033</td><td>USBLIC~1|USB License Key Manager</td><td>0</td><td/><td>1788709576</td></row>
 		<row><td>ID_STRING14</td><td>1033</td><td>Extract Systems, LLC</td><td>0</td><td/><td>2057138863</td></row>
+		<row><td>ID_STRING15</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>1394518507</td></row>
 		<row><td>ID_STRING2</td><td>1033</td><td>UTILIT~1|Utilities</td><td>0</td><td/><td>1788731720</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>NEWSHO~1|NewShortcut1</td><td>0</td><td/><td>1788699080</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>VEWEXC~1|Vew Exception Log</td><td>0</td><td/><td>1788721640</td></row>
@@ -3782,6 +3783,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="L255">FileName</col>
 		<col def="s72">DirProperty</col>
 		<col def="i2">InstallMode</col>
+		<row><td>NewShortcut1</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut10</td><td>Help</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut11</td><td>Help</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut2</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
@@ -3877,6 +3879,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">ISComments</col>
 		<col def="S255">ISShortcutName</col>
 		<col def="I4">ISAttributes</col>
+		<row><td>NewShortcut1</td><td>newfolder2</td><td>##ID_STRING15##</td><td>Help</td><td>[INSTALLDIR]SQLCDBEditor</td><td>"[COMMON_COMPONENTS]ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut10</td><td>newfolder1</td><td>##ID_STRING12##</td><td>Help</td><td>[COMMON_COMPONENTS]UserLicense.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut11</td><td>newfolder1</td><td>##ID_STRING13##</td><td>Help</td><td>[COMMON_COMPONENTS]USBLicenseKeyManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut2</td><td>newfolder2</td><td>##ID_STRING4##</td><td>Help</td><td>[COMMON_COMPONENTS]UEXViewer.exe</td><td>"[CommonAppDataFolder]Extract Systems\LogFiles\Misc\ExtractException.UEX"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>

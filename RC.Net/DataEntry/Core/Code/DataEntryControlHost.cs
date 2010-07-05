@@ -1313,6 +1313,27 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Indicates whether an update of control values is currently in-progress.
+        /// <para><b>Note</b></para>
+        /// Not all control updates are indicated by this property, but ones that require a
+        /// significant amount of processing which may cause certain calls to be needlessly repeated
+        /// unless skipped/postponed while this property is <see langword="true"/>.
+        /// Some examples of updates indicated by this property are: Loading a document or 
+        /// selecting/creating a new table row on a table that has dependent controls.
+        /// If <see langword="true"/>, the <see cref="UpdateEnded"/> event can be used to be
+        /// notified when the update is complete.
+        /// </summary>
+        /// <returns><see langword="true"/> if a signficant update of control values is in progress,
+        /// <see langword="false"/> otherwise.</returns>
+        public bool UpdateInProgress
+        {
+            get
+            {
+                return (_changingImage || ControlUpdateReferenceCount > 0);
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -1749,7 +1770,7 @@ namespace Extract.DataEntry
                 try
                 {
                     // Prevent multiple re-draws from being triggered with each cell processed.
-                    _controlUpdateReferenceCount++;
+                    ControlUpdateReferenceCount++;
 
                     // Loop through every attribute in the active control.
                     if (_activeDataControl != null &&
@@ -1769,7 +1790,7 @@ namespace Extract.DataEntry
                 }
                 finally
                 {
-                    _controlUpdateReferenceCount--;
+                    ControlUpdateReferenceCount--;
                 }
 
                 // Re-display the highlights if changes were made.
@@ -1942,6 +1963,13 @@ namespace Extract.DataEntry
         /// handled the <see cref="Message"/> and will return true.
         /// </summary>
         public event EventHandler<MessageHandledEventArgs> MessageHandled;
+
+        /// <summary>
+        /// Indicates that a siginficant update of control values has ended. Examples include
+        /// loading a new document or selecting/creating a new table row on a table with dependent
+        /// controls.
+        /// </summary>
+        public event EventHandler<EventArgs> UpdateEnded;
 
         #endregion Events
 
@@ -2246,9 +2274,14 @@ namespace Extract.DataEntry
                         CreateAllAttributeHighlights(_attributes);
                     }
 
-                    ExtractException.Assert("ELI30028",
-                        "Application trace: Control update reference count non-zero",
-                        _controlUpdateReferenceCount == 0);
+                    if (ControlUpdateReferenceCount != 0)
+                    {
+                        ExtractException ee = new ExtractException("ELI30028",
+                            "Application trace: Control update reference count non-zero");
+                        ee.Log();
+                    }
+                    // Set the _controlUpdateReferenceCount field rather than the property to avoid the
+                    // possibility of an UpdateEnded event until the document has finished loading.
                     _controlUpdateReferenceCount = 0;
                     _refreshActiveControlHighlights = false;
                     _dirty = false;
@@ -2425,8 +2458,8 @@ namespace Extract.DataEntry
                 // table was in edit mode-- moving focus away from the table ends edit mode which
                 // triggers the table to re-focus the table. Make a second attempt at focusing the
                 // desired control if it does not yet have focus.
-                Control newActiveControl = (Control)newActiveDataControl;
-                if (!newActiveControl.Focused)
+                Control newControl = (Control)newActiveDataControl;
+                if (!newControl.Focused)
                 {
                     // Keep track of refocus attempts to prevent the possibility of infinite
                     // recursion.
@@ -2438,7 +2471,7 @@ namespace Extract.DataEntry
                     else
                     {
                         _refocusingControl = newActiveDataControl;
-                        newActiveControl.Focus();
+                        newControl.Focus();
                         return;
                     }
                 }
@@ -2479,7 +2512,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI24093", ex);
+                ExtractException.Display("ELI30202", ex);
             }
             finally
             {
@@ -2586,7 +2619,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                _controlUpdateReferenceCount++;
+                ControlUpdateReferenceCount++;
             }
             catch (Exception ex)
             {
@@ -2604,7 +2637,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                _controlUpdateReferenceCount--;
+                ControlUpdateReferenceCount--;
 
                 DrawHighlights(true);
             }
@@ -2810,7 +2843,7 @@ namespace Extract.DataEntry
                             {
                                 // Delay calls to DrawHighlights until processing of the swipe is
                                 // complete.
-                                _controlUpdateReferenceCount++;
+                                ControlUpdateReferenceCount++;
 
                                 // If a swipe did not produce any results usable by the control,
                                 // notify the user.
@@ -2833,7 +2866,7 @@ namespace Extract.DataEntry
                             }
                             finally
                             {
-                                _controlUpdateReferenceCount--;
+                                ControlUpdateReferenceCount--;
                             }
 
                             try
@@ -3263,8 +3296,15 @@ namespace Extract.DataEntry
             {
                 if (!_performingProgrammaticZoom)
                 {
-                    _lastManualZoomSize = _imageViewer.GetTransformedRectangle(
+                    Size zoomSize = _imageViewer.GetTransformedRectangle(
                         _imageViewer.GetVisibleImageArea(), true).Size;
+
+                    // Before assigning _lastManualZoomSize, be sure the size > 0 in both dimensions
+                    // (will be zero if image viewer window is minimized).
+                    if (zoomSize.Width > 0 && zoomSize.Height > 0)
+                    {
+                        _lastManualZoomSize = zoomSize;
+                    }
                 }
             }
             catch (Exception ex)
@@ -3553,6 +3593,39 @@ namespace Extract.DataEntry
         #endregion Internal Members
 
         #region Private Members
+
+        /// <summary>
+        /// Indicates the number of updates controls have indicated are in progress. DrawHighlights
+        /// and other general processing that can be delayed should be until there are no more
+        /// updates in progress.
+        /// </summary>
+        uint ControlUpdateReferenceCount
+        {
+            get
+            {
+                return _controlUpdateReferenceCount;
+            }
+
+            set
+            {
+                try
+                {
+                    if (_controlUpdateReferenceCount != value)
+                    {
+                        _controlUpdateReferenceCount = value;
+
+                        if (_controlUpdateReferenceCount == 0)
+                        {
+                            OnUpdateEnded(new EventArgs());
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI30113", ex);
+                }
+            }
+        }
 
         /// <summary>
         /// Loops through all controls contained in the specified control looking for controls 
@@ -3951,7 +4024,7 @@ namespace Extract.DataEntry
                 // To avoid unnecessary drawing, wait until we are done loading a document or a
                 // control is done with an update before attempting to display any layer objects.
                 // Also, ensure against resursive calls.
-                if (_changingImage || _drawingHighlights || _controlUpdateReferenceCount > 0)
+                if (_changingImage || _drawingHighlights || ControlUpdateReferenceCount > 0)
                 {
                     return;
                 }
@@ -6377,6 +6450,8 @@ namespace Extract.DataEntry
                 }
 
                 OnItemSelectionChanged();
+
+                OnUpdateEnded(new EventArgs());
             }
             catch (Exception ex)
             {
@@ -6402,13 +6477,13 @@ namespace Extract.DataEntry
             // Since the angular highlight cursor extends above the cursor position and would
             // otherwise be drawn on top of the tooltip, shift the tooltip below the cursor
             // position if the angular highlight cursor tool is active.
-            Point toolTipPosition = TopLevelControl.PointToClient(MousePosition);
+            Point toolTipPosition = ImageViewer.TopLevelControl.PointToClient(MousePosition);
             if (_imageViewer.CursorTool == CursorTool.AngularHighlight)
             {
                 toolTipPosition.Offset(0, 35);
             }
 
-            _userNotificationTooltip.Show(message, TopLevelControl, toolTipPosition, 5000);
+            _userNotificationTooltip.Show(message, ImageViewer.TopLevelControl, toolTipPosition, 5000);
         }
 
         /// <summary>
@@ -6453,6 +6528,25 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException.Log("ELI29134", ex);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="UpdateEnded"/> event.
+        /// </summary>
+        /// <param name="e"></param>
+        void OnUpdateEnded(EventArgs e)
+        {
+            try
+            {
+                if (UpdateEnded != null)
+                {
+                    UpdateEnded(this, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI30114", ex);
             }
         }
 

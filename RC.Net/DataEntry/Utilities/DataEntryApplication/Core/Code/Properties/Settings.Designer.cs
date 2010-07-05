@@ -113,5 +113,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication.Properties {
                 return ((bool)(this["PreventSave"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public uint GCFrequency {
+            get {
+                return ((uint)(this["GCFrequency"]));
+            }
+        }
     }
 }
