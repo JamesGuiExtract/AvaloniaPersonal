@@ -1836,9 +1836,15 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::unlockDB(_ConnectionPtr ipConnection)
 {
+	// if DB is already unlocked return
+	if (!m_bDBLocked)
+	{
+		return;
+	}
+
 	CSingleLock lock(&m_mutex, TRUE);
 
-	// if DB is already unlocked return
+	// Check unlocked status again after getting the mutex
 	if (!m_bDBLocked)
 	{
 		return;

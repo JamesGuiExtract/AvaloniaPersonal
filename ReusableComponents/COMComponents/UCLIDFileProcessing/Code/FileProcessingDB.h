@@ -260,7 +260,7 @@ private:
 	int m_nUPIID;
 
 	// Flag indicating that this instance has the lock on the DB
-	bool m_bDBLocked;
+	volatile bool m_bDBLocked;
 
 	// Machine username
 	string m_strFAMUserName;

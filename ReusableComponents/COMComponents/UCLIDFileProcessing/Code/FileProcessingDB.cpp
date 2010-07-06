@@ -2196,8 +2196,6 @@ STDMETHODIMP CFileProcessingDB::UnlockDB()
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		CSingleLock lg(&m_mutex, TRUE);
-
 		// Need to catch any exceptions and log them because this could be called within a catch
 		// and don't want to throw an exception from a catch
 		try
