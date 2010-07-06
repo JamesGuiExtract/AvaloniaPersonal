@@ -385,10 +385,14 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 					else 
 					{
 						_lastCodePos = "320";
-						// Update the UPIID so to current process so it will be not be selected
+						// Update the UPIID to current process so it will be not be selected
 						// again as a skipped file for the current process
+						// Also update the time stamp and the UserName (since the user
+						// could be processing all files skipped by any user)
+						// [LRCAU #5853]
 						executeCmdQuery(ipConnection, "Update SkippedFile Set UPIID = " + 
-							asString(m_nUPIID) + ", DateTimeStamp = GETDATE() WHERE FileID = " + asString(nFileID));
+							asString(m_nUPIID) + ", DateTimeStamp = GETDATE(), UserName = '"
+							+ getCurrentUserName() + "' WHERE FileID = " + asString(nFileID));
 					}
 				}
 			}
