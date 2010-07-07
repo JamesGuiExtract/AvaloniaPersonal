@@ -189,6 +189,21 @@ namespace Extract.Rules
 
         #region Methods
 
+        /// <summary>
+        /// Validates the current rule settings.
+        /// </summary>
+        public void ValidateSettings()
+        {
+            try
+            {
+                UpdateRegex();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30311", ex);
+            }
+        }
+
         void UpdateRegex()
         {
             // Ensure pattern is valid.

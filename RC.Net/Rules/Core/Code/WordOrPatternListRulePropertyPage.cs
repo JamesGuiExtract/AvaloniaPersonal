@@ -146,6 +146,9 @@ namespace Extract.Rules
                 _rule.MatchCase = _matchCaseCheckBox.Checked;
                 _rule.TreatAsRegularExpression = _isRegexCheckBox.Checked;
 
+                // Ensure the settings are valid
+                _rule.ValidateSettings();
+
                 // Reset the dirty flag
                 _dirty = false;
             }
