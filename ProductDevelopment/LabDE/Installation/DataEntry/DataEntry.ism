@@ -120,7 +120,6 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
-		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 	</table>
 
 	<table name="BindImage">
@@ -183,10 +182,10 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{26431AF3-29B3-4D12-9672-40A5214682D4}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>dataentryapplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{AC48C02C-A4E0-4362-B219-4E05B2AC825D}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>dataentrycc.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{AC48C02C-A4E0-4362-B219-4E05B2AC825D}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>dataentrycc.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{0A06E51C-1038-4613-AACE-79E968210746}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{5B173D58-7D91-43A5-BCE8-16447E2EF734}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>interop.uclid_dataentrycusto.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>NonSelfRegisteredComponents.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{9681B55A-3FCF-4928-914C-2AEB433FB11A}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{5B173D58-7D91-43A5-BCE8-16447E2EF734}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>interop.uclid_dataentrycusto.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>NonSelfRegisteredComponents.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{9681B55A-3FCF-4928-914C-2AEB433FB11A}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -242,10 +241,6 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
-		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%SystemRoot]\Profiles\All Users</td><td/><td/></row>
 		<row><td>setAllUsersProfile2K</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%ALLUSERSPROFILE]</td><td/><td/></row>
 		<row><td>setUserProfileNT</td><td>51</td><td>USERPROFILE</td><td>[%USERPROFILE]</td><td/><td/></row>
@@ -1121,13 +1116,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S64">BaseAction</col>
 		<col def="I2">After</col>
 		<col def="S255">Condition</col>
-		<row><td>ISSelfRegisterCosting</td><td/><td>SelfUnregModules</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td/><td>SelfRegModules</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td/><td>ISSelfRegisterCosting</td><td>1</td><td/></row>
-		<row><td>InstallFinalize</td><td>3150</td><td/><td/><td/></row>
-		<row><td>SelfRegModules</td><td>2850</td><td/><td/><td/></row>
-		<row><td>SelfUnregModules</td><td>1100</td><td/><td/><td/></row>
 	</table>
 
 	<table name="ModuleInstallUISequence">
