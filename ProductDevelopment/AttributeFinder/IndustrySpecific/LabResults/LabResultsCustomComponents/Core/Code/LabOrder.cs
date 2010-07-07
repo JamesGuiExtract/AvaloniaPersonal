@@ -316,17 +316,6 @@ namespace Extract.LabResultsCustomComponents
         #region Properties
 
         /// <summary>
-        /// Gets the count of mandatory tests
-        /// </summary>
-        public int MandatoryCount
-        {
-            get
-            {
-                return _mandatoryTestCodes.Count;
-            }
-        }
-
-        /// <summary>
         /// Gets the order code for this order.
         /// </summary>
         public string OrderCode

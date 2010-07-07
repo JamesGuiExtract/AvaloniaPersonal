@@ -67,7 +67,7 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// A class to manage temporary local copies of remote databases.
         /// <para><b>Note</b></para>
-        /// This class is not thread-safe.
+        /// This class is only thread-safe when always accessed within a lock.
         /// </summary>
         class LocalDatabaseCopy : IDisposable
         {
@@ -87,9 +87,18 @@ namespace Extract.LabResultsCustomComponents
             DateTime _lastDBModificationTime;
 
             /// <summary>
-            /// Keeps track of all <see cref="LabDEOrderMapper"/> instances referencing this copy.
+            /// Keeps track of the DB copy each <see cref="LabDEOrderMapper"/> instance is
+            /// referencing.
             /// </summary>
-            Dictionary<int, bool> _orderMapperReferences = new Dictionary<int, bool>();
+            Dictionary<int, TemporaryFile> _temporaryFileReferences =
+                new Dictionary<int, TemporaryFile>();
+
+            /// <summary>
+            /// Keeps track of all <see cref="LabDEOrderMapper"/> instances referencing each local
+            /// DB copy.
+            /// </summary>
+            Dictionary<TemporaryFile, List<int>> _orderMapperReferences =
+                new Dictionary<TemporaryFile, List<int>>();
 
             #region Constructors
 
@@ -134,32 +143,37 @@ namespace Extract.LabResultsCustomComponents
             /// name if the original database is not accessed via a network share (UNC path).
             /// <para><b>Note</b></para>
             /// If the original database file has been updated since the local copy was last created
-            /// or updated, the local copy will be updated before returning the filename.
+            /// or updated, a new local copy created from the updated original and the path of the
+            /// new local copy will be returned.
             /// </summary>
+            /// <param name="orderMapperInstance">The <see cref="LabDEOrderMapper"/> instance for
+            /// which the path to the local database copy is needed. The database at the path
+            /// specified is guaranteed to exist unmodified until the next call to GetFileName from
+            /// the specified instance. (or until this <see cref="LocalDatabaseCopy"/> instance is
+            /// disposed)</param>
             /// <returns>The filename of the local database copy to use.</returns>
-            public string GetFileName()
+            public string GetFileName(LabDEOrderMapper orderMapperInstance)
             {
                 try
                 {
-                    if (_localTemporaryFile != null)
-                    {
-                        DateTime dbModificationTime =
-                            File.GetLastWriteTime(_originalDatabaseFileName);
+                    DateTime dbModificationTime = File.GetLastWriteTime(_originalDatabaseFileName);
 
-                        // If the original DB has been modified, re-copy it to the temporary
-                        // location.
-                        if (dbModificationTime != _lastDBModificationTime)
-                        {
-                            dbModificationTime = _lastDBModificationTime;
-                            File.Copy(_originalDatabaseFileName, _localTemporaryFile.FileName, true);
-                        }
-
-                        return _localTemporaryFile.FileName;
-                    }
-                    else
+                    // If the original DB has been modified, copy it to a new temporary file.
+                    if (dbModificationTime != _lastDBModificationTime)
                     {
-                        return _originalDatabaseFileName;
+                        _localTemporaryFile = new TemporaryFile();
+
+                        _lastDBModificationTime = dbModificationTime;
+                        File.Copy(_originalDatabaseFileName, _localTemporaryFile.FileName, true);
                     }
+                    
+                    // Update the reference for the specified orderMapperInstance so that it
+                    // references the new _localTemporaryFile and not the now outdated
+                    // temporary file (the outdated one will be deleted if this is the last
+                    // instance that was referencing it).
+                    UpdateReference(orderMapperInstance);
+
+                    return _localTemporaryFile.FileName;
                 }
                 catch (Exception ex)
                 {
@@ -175,9 +189,23 @@ namespace Extract.LabResultsCustomComponents
             /// referencing the <see cref="LocalDatabaseCopy"/>.</param>
             public void AddReference(LabDEOrderMapper orderMapperInstance)
             {
-                _orderMapperReferences[orderMapperInstance._instanceID] = true;
+                _temporaryFileReferences[orderMapperInstance._instanceID] = _localTemporaryFile;
+                
+                List<int> fileReferences;
+                if (!_orderMapperReferences.TryGetValue(_localTemporaryFile, out fileReferences))
+                {
+                    fileReferences = new List<int>(new int[] { orderMapperInstance._instanceID });
+                    _orderMapperReferences[_localTemporaryFile] = fileReferences;
+                }
+                else if (!fileReferences.Contains(orderMapperInstance._instanceID))
+                {
+                    fileReferences.Add(orderMapperInstance._instanceID);
+                }
             }
 
+            /// <overloads>Notifies the <see cref="LocalDatabaseCopy"/> of a
+            /// <see cref="LabDEOrderMapper"/> instance that is not longer referencing it
+            /// </overloads>
             /// <summary>
             /// Notifies the <see cref="LocalDatabaseCopy"/> of a <see cref="LabDEOrderMapper"/>
             /// instance that is not longer referencing it.
@@ -189,8 +217,66 @@ namespace Extract.LabResultsCustomComponents
             /// otherwise.</returns>
             public bool Dereference(LabDEOrderMapper orderMapperInstance)
             {
-                _orderMapperReferences.Remove(orderMapperInstance._instanceID);
-                return _orderMapperReferences.Count == 0;
+                return Dereference(orderMapperInstance._instanceID);
+            }
+
+            /// <summary>
+            /// Notifies the <see cref="LocalDatabaseCopy"/> of a <see cref="LabDEOrderMapper"/>
+            /// instance that is not longer referencing it.
+            /// </summary>
+            /// <param name="orderMapperReferenceID">The ID of the <see cref="LabDEOrderMapper"/>
+            /// that is no longer referencing the <see cref="LocalDatabaseCopy"/>.</param>
+            /// <returns><see langword="true"/> if there are no more <see cref="LabDEOrderMapper"/>
+            /// instances referencing the <see cref="LocalDatabaseCopy"/>; <see langword="false"/>
+            /// otherwise.</returns>
+            bool Dereference(int orderMapperReferenceID)
+            {
+                TemporaryFile temporaryFile;
+                if (_temporaryFileReferences.TryGetValue(orderMapperReferenceID, out temporaryFile))
+                {
+                    // If the orderMapperInstance still references an existing temporary file,
+                    // remove the reference.
+                    _temporaryFileReferences.Remove(orderMapperReferenceID);
+
+                    List<int> orderMapperReferences = _orderMapperReferences[temporaryFile];
+                    orderMapperReferences.Remove(orderMapperReferenceID);
+
+                    // If no other references are found for this temporary file, the temporary file
+                    // can be disposed of.
+                    if (orderMapperReferences.Count == 0)
+                    {
+                        if (_localTemporaryFile == temporaryFile)
+                        {
+                            _localTemporaryFile = null;
+                        }
+
+                        _orderMapperReferences.Remove(temporaryFile);
+                        temporaryFile.Dispose();
+                    }
+                }
+                
+                return _temporaryFileReferences.Count == 0;
+            }
+
+            /// <summary>
+            /// Ensures the specified <see paramref="orderMapperInstance"/> is referencing the
+            /// current local DB copy. Removes references to old DB copies if necessary.
+            /// </summary>
+            /// <param name="orderMapperInstance">The <see cref="LabDEOrderMapper"/> instance for
+            /// which local DB reference need to be updated.</param>
+            void UpdateReference(LabDEOrderMapper orderMapperInstance)
+            {
+                TemporaryFile temporaryFile;
+                if (!_temporaryFileReferences.TryGetValue(
+                    orderMapperInstance._instanceID, out temporaryFile))
+                {
+                    AddReference(orderMapperInstance);
+                }
+                else if (temporaryFile != _localTemporaryFile)
+                {
+                    Dereference(orderMapperInstance);
+                    AddReference(orderMapperInstance);
+                }
             }
 
             #endregion Methods
@@ -219,6 +305,12 @@ namespace Extract.LabResultsCustomComponents
                 if (disposing)
                 {
                     // Dispose of managed objects
+                    List<int> orderMapperInstanceIDs = new List<int>(_temporaryFileReferences.Keys);
+                    foreach (int orderMapperInstanceID in orderMapperInstanceIDs)
+                    {
+                        Dereference(orderMapperInstanceID);
+                    }
+
                     if (_localTemporaryFile != null)
                     {
                         _localTemporaryFile.Dispose();
@@ -429,7 +521,6 @@ namespace Extract.LabResultsCustomComponents
         public LabDEOrderMapper()
             : this(null, false)
         {
-            _instanceID = _nextInstanceID++;
         }
 
         /// <summary>
@@ -442,6 +533,7 @@ namespace Extract.LabResultsCustomComponents
         {
             try
             {
+                _instanceID = _nextInstanceID++;
                 _databaseFile = databaseFile;
                 _requireMandatory = requireMandatory;
                 _dirty = true;
@@ -1605,27 +1697,22 @@ namespace Extract.LabResultsCustomComponents
                     throw ee;
                 }
 
-                // Lock to ensure multiple copies of the same database aren't created.
-                LocalDatabaseCopy localDatabaseCopy;
+                // Lock to ensure multiple copies of the same database aren't created.                
                 string connectionString;
                 lock (_lock)
                 {
+                    LocalDatabaseCopy localDatabaseCopy;
+
                     // If there is not an existing LocalDatabaseCopy instance available for the
                     // specified database, create a new one.                    
-                    if (!_localDatabaseCopies.TryGetValue(databaseFile, out localDatabaseCopy) ||
-                        !File.Exists(localDatabaseCopy.GetFileName()))
+                    if (!_localDatabaseCopies.TryGetValue(databaseFile, out localDatabaseCopy))
                     {
                         localDatabaseCopy = new LocalDatabaseCopy(this, databaseFile);
                         _localDatabaseCopies[databaseFile] = localDatabaseCopy;
                     }
-                    else
-                    {
-                        // Otherwise, reference the existing LocalDatabaseCopy instance.
-                        localDatabaseCopy.AddReference(this);
-                    }
 
                     // Build the connection string
-                    connectionString = "Data Source='" + localDatabaseCopy.GetFileName() + "';";
+                    connectionString = "Data Source='" + localDatabaseCopy.GetFileName(this) + "';";
                 }
 
                 // Try to open the database connection, if there is a sqlce exception,
@@ -1694,15 +1781,18 @@ namespace Extract.LabResultsCustomComponents
         {
             if (disposing)
             {
-                // Remove any existing reference to a local database copy. Dispose of the
-                // local database copy if this was the last instance referencing it.
-                LocalDatabaseCopy localDatabaseCopy;
-                if (_localDatabaseCopies.TryGetValue(_databaseFile, out localDatabaseCopy))
+                lock (_lock)
                 {
-                    if (localDatabaseCopy.Dereference(this))
+                    // Remove any existing reference to a local database copy. Dispose of the
+                    // local database copy if this was the last instance referencing it.
+                    LocalDatabaseCopy localDatabaseCopy;
+                    if (_localDatabaseCopies.TryGetValue(_databaseFile, out localDatabaseCopy))
                     {
-                        _localDatabaseCopies.Remove(_databaseFile);
-                        localDatabaseCopy.Dispose();
+                        if (localDatabaseCopy.Dereference(this))
+                        {
+                            _localDatabaseCopies.Remove(_databaseFile);
+                            localDatabaseCopy.Dispose();
+                        }
                     }
                 }
             }
