@@ -28,7 +28,6 @@ RulesDir=$(EngineeringRootDirectory)\Rules
 
 AFCoreInstallFilesRootDir=P:\AttributeFinder\CoreInstallation\Files
 LMInstallFilesRootDir=P:\LicenseManager\Files
-USBLicenseKeyRootDir=P:\AttributeFinder\USBLicenseKey\Files 
 AFCoreMergeModuleInstallRoot=$(PDRootDir)\AttributeFinder\Installation\UCLID FlexIndex
 
 InputFunnelBuildDir=$(ReusableComponentsRootDirectory)\InputFunnel\Build
@@ -146,6 +145,7 @@ CopyFilesToInstallFolder: BuildPDUtils CleanupPreviousBuildFolders ObfuscateFile
 	@COPY /v  "$(BinariesFolder)\COMLMCore.dll" "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\ExtractTRP2.exe" "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\RWUtils.dll" "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
+    @COPY /v  "$(BinariesFolder)\USBLicenseKeyManager.exe" "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\SafeNetUtils.dll" "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin\*.*" "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y	
 	@COPY /V "$(PDCommonDir)\RegisterAll.bat" "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
@@ -229,7 +229,6 @@ CopyFilesToInstallFolder: BuildPDUtils CleanupPreviousBuildFolders ObfuscateFile
 	@COPY /V  "$(BinariesFolder)\Obfuscated\TestTextFunctionExpander.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\FAMUtils.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\ConvertFAMDB.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-    @COPY /v  "$(BinariesFolder)\USBLicenseKeyManager.exe" "$(USBLicenseKeyRootDir)\NonSelfRegFiles"
     @COPY /v  "$(BinariesFolder)\EmailFile.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\ESOCR.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /v "$(BinariesFolder)\SplitFile.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
