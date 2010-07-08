@@ -246,7 +246,6 @@
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
 		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\i386\ISLockPermissions.dll</td></row>
-		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 		<row><td>ISSetupFilesHelper</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\SFHelper.dll</td></row>
 	</table>
@@ -315,24 +314,24 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>AllOtherFiles</td><td>{25F44821-B4A3-4899-8923-1DF407CD9581}</td><td>CommonAppDataFolder</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AllOtherFiles1</td><td>{F6336EB2-D7C6-4A82-8F2B-9A769692C1A0}</td><td>EXTRACT_SYSTEMS1</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ExemptionCodes</td><td>{E5331F67-A907-472C-BC93-B4B8CAAD38BB}</td><td>EXEMPTION_CODES_DIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.Encryption.dll</td><td>{C40CB946-D860-425B-A9E1-66F19B0C15EC}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.encryption.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AllOtherFiles</td><td>{25F44821-B4A3-4899-8923-1DF407CD9581}</td><td>CommonAppDataFolder</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AllOtherFiles1</td><td>{F6336EB2-D7C6-4A82-8F2B-9A769692C1A0}</td><td>EXTRACT_SYSTEMS1</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ExemptionCodes</td><td>{E5331F67-A907-472C-BC93-B4B8CAAD38BB}</td><td>EXEMPTION_CODES_DIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Extract.Encryption.dll</td><td>{C40CB946-D860-425B-A9E1-66F19B0C15EC}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.encryption.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td>{DEC2B72C-0860-4D86-80E3-1D0DD6D14F94}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.verificati</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.Redaction.dll</td><td>{BE1E239C-C3B7-4027-8488-645FC27F5851}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.Rules.dll</td><td>{1A392698-ACEB-43F5-9A89-24A6003D9C7D}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.rules.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>FlexIndexComponents</td><td>{964AC833-306B-4B9B-9FFC-C7E885AB040B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td>This is for shortcuts to files installed with Flex Index Merge Module</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Help</td><td>{D0D6E5DA-8D44-45F0-8FDD-325E3C7EE9D6}</td><td>HELP</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>IDShieldComponents</td><td>{0B818341-9DC6-4923-B336-2FBC659BCF44}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>IDShieldReports</td><td>{EBD8982B-68E8-41A2-AF73-CC50371C0B4B}</td><td>STANDARD_REPORTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Extract.Redaction.dll</td><td>{BE1E239C-C3B7-4027-8488-645FC27F5851}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Extract.Rules.dll</td><td>{1A392698-ACEB-43F5-9A89-24A6003D9C7D}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.rules.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>FlexIndexComponents</td><td>{964AC833-306B-4B9B-9FFC-C7E885AB040B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td>This is for shortcuts to files installed with Flex Index Merge Module</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Help</td><td>{D0D6E5DA-8D44-45F0-8FDD-325E3C7EE9D6}</td><td>HELP</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>IDShieldComponents</td><td>{0B818341-9DC6-4923-B336-2FBC659BCF44}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>IDShieldReports</td><td>{EBD8982B-68E8-41A2-AF73-CC50371C0B4B}</td><td>STANDARD_REPORTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldStatisticsReporter.exe</td><td>{E4593422-EE49-4A44-94A0-0FC9C230817E}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>idshieldstatisticsreporter.e</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISRegistryComponent</td><td>{BB5CF529-C4A7-46DD-AC5A-F35EB2E1E0E6}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>{B8FF0255-1CA6-48A0-8BD5-3CFB7A976086}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>interop.extractredactiontest</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISRegistryComponent</td><td>{BB5CF529-C4A7-46DD-AC5A-F35EB2E1E0E6}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>{B8FF0255-1CA6-48A0-8BD5-3CFB7A976086}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>interop.extractredactiontest</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>{4EC39FF6-1C91-4E50-B9C5-B3E0AA02D9EA}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>interop.uclid_redactioncusto</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>RedactionCC.dll</td><td>{609DD8EB-6620-4A9E-AE69-452AE7A103C8}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>RedactionCC.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>UtilitiesShortCuts</td><td>{682A75A7-D1DE-495C-A7B3-D28EC49EC35E}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>RedactionCC.dll</td><td>{609DD8EB-6620-4A9E-AE69-452AE7A103C8}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>RedactionCC.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>UtilitiesShortCuts</td><td>{682A75A7-D1DE-495C-A7B3-D28EC49EC35E}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -399,12 +398,8 @@
 		<col def="S255">ISComments</col>
 		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td>257</td><td>ISSetupFilesHelper</td><td>SFCleanupEx</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td>257</td><td>ISSetupFilesHelper</td><td>SFStartupEx</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISVerifyScriptingRuntime</td><td>19</td><td/><td>[STANDARD_USE_SETUPEXE]</td><td/><td>Required for installations using InstallScript.</td></row>
 		<row><td>SetARPINSTALLLOCATION</td><td>51</td><td>ARPINSTALLLOCATION</td><td>[INSTALLDIR]</td><td/><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%SystemRoot]\Profiles\All Users</td><td/><td/></row>
@@ -3406,12 +3401,8 @@
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
 		<row><td>ISLockPermissionsCost</td><td/><td>1401</td><td/><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td/><td>5901</td><td/><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td/><td>2201</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td/><td>5601</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td/><td>6601</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td/><td>6606</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td/><td>3</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td/><td>2202</td><td/><td/></row>
 		<row><td>InstallFiles</td><td/><td>4000</td><td>InstallFiles</td><td/></row>
 		<row><td>InstallFinalize</td><td/><td>6600</td><td>InstallFinalize</td><td/></row>
 		<row><td>InstallInitialize</td><td/><td>1501</td><td>InstallInitialize</td><td/></row>
