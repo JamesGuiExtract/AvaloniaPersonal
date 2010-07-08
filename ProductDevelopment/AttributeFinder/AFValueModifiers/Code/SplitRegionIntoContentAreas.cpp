@@ -1423,7 +1423,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 
 				// Now that we have attempted to expand all OCR'd text, search the pixels in
 				// the region for qualifying content areas that don't contain any OCR'd text.
-				processRegionPixels(rectRegion);
+				processRegionPixels(rectRegion, ipSearcher);
 
 				// Create a new subattribute for each qualifying content area.
 				for each (ContentAreaInfo area in m_vecContentAreas)
@@ -1542,7 +1542,8 @@ void CSplitRegionIntoContentAreas::splitLineFragments(IIUnknownVectorPtr ipLines
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26607");
 }
 //--------------------------------------------------------------------------------------------------
-void CSplitRegionIntoContentAreas::processRegionPixels(const CRect& rect)
+void CSplitRegionIntoContentAreas::processRegionPixels(const CRect& rect,
+													   ISpatialStringSearcherPtr ipSearcher)
 {
 	try
 	{
@@ -1555,7 +1556,7 @@ void CSplitRegionIntoContentAreas::processRegionPixels(const CRect& rect)
 		expandAndMergeAreas();
 
 		// Clean up the area bounds, ensure area qualifications, and eliminate duplicates, 
-		finalizeContentAreas(rect);
+		finalizeContentAreas(rect, ipSearcher);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26608");
 }
@@ -1677,7 +1678,8 @@ void CSplitRegionIntoContentAreas::expandAndMergeAreas()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26609");
 }
 //--------------------------------------------------------------------------------------------------
-void CSplitRegionIntoContentAreas::finalizeContentAreas(const CRect& rectRegion)
+void CSplitRegionIntoContentAreas::finalizeContentAreas(const CRect& rectRegion,
+														ISpatialStringSearcherPtr ipSearcher)
 {
 	try
 	{
@@ -1703,13 +1705,16 @@ void CSplitRegionIntoContentAreas::finalizeContentAreas(const CRect& rectRegion)
 
 		// Merge any areas whose shared area is similar or that share similar y coordinates (in other 
 		// words, that appear to represent different fragments of the same line).
-		mergeAreas();
+		mergeAreas(ipSearcher);
 
 		// Loop through each content area candidate to ensure it meets specified requirements to be
 		// kept.
 		for (size_t i = 0; i < m_vecContentAreas.size(); i++)
 		{
-			if (!areaMeetsSpecifications(m_vecContentAreas[i]))
+			// Update the confidence of all remaining areas from spatial string searcher
+			ContentAreaInfo& area = m_vecContentAreas[i];
+			area.m_nOCRConfidence = getOcrConfidenceForRegion(area, ipSearcher);
+			if (!areaMeetsSpecifications(area))
 			{
 				m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
 				i--;
@@ -1722,7 +1727,7 @@ void CSplitRegionIntoContentAreas::finalizeContentAreas(const CRect& rectRegion)
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26610");
 }
 //--------------------------------------------------------------------------------------------------
-void CSplitRegionIntoContentAreas::mergeAreas()
+void CSplitRegionIntoContentAreas::mergeAreas(ISpatialStringSearcherPtr ipSearcher)
 {
 	try
 	{
@@ -1805,8 +1810,8 @@ void CSplitRegionIntoContentAreas::mergeAreas()
 						// These areas qualify to be merged.  Set m_vecContentAreas[j] to the union
 						// of the two areas, and remove m_vecContentAreas[i].
 						mergedArea.UnionRect(&mergedArea, &m_vecContentAreas[j]);
-						mergedArea.m_nOCRConfidence = 
-							max(mergedArea.m_nOCRConfidence, m_vecContentAreas[j].m_nOCRConfidence);
+						mergedArea.m_nOCRConfidence = getOcrConfidenceForRegion(mergedArea,
+							ipSearcher);
 
 						// Ensure the resulting area meets the specified size requirements.
 						if (areaMeetsSpecifications(mergedArea))
@@ -1832,6 +1837,22 @@ void CSplitRegionIntoContentAreas::mergeAreas()
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26611");
+}
+//--------------------------------------------------------------------------------------------------
+long CSplitRegionIntoContentAreas::getOcrConfidenceForRegion(const CRect& rectRegion,
+															 ISpatialStringSearcherPtr ipSearcher)
+{
+	ILongRectanglePtr ipRect(CLSID_LongRectangle);
+	ASSERT_RESOURCE_ALLOCATION("ELI30329", ipRect != NULL);
+	ipRect->SetBounds(rectRegion.left, rectRegion.top, rectRegion.right, rectRegion.bottom);
+
+	ISpatialStringPtr ipString = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
+	ASSERT_RESOURCE_ALLOCATION("ELI30330", ipString != NULL);
+
+	long nAvgConfidence = 0;
+	ipString->GetCharConfidence(NULL, NULL, &nAvgConfidence);
+
+	return nAvgConfidence;
 }
 //--------------------------------------------------------------------------------------------------
 CRect CSplitRegionIntoContentAreas::centerAreaRegionOnBlack(CPoint ptStart, CRect &rrect, 

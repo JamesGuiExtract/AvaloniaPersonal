@@ -357,7 +357,7 @@ private:
 	void splitLineFragments(IIUnknownVectorPtr ipLines);
 
 	// Uses raw image pixel data to find content areas within the specified ipRect.
-	void processRegionPixels(const CRect& rect);
+	void processRegionPixels(const CRect& rect, ISpatialStringSearcherPtr ipSearcher);
 
 	// Given the current set of content area candidates already expanded horizontally,
 	// attempts to expand each vertically to the edge of pixel content.  If area borders
@@ -365,11 +365,14 @@ private:
 	void expandAndMergeAreas();
 
 	// Finalizes the area boundary borders and removes any duplicate or invalid candidate areas.
-	void finalizeContentAreas(const CRect& rectRegion);
+	void finalizeContentAreas(const CRect& rectRegion, ISpatialStringSearcherPtr ipSearcher);
 
 	// Merge any areas whose shared area is similar or that share similar y coordinates (in other 
 	// words, that appear to represent different fragments of the same line).
-	void mergeAreas();
+	void mergeAreas(ISpatialStringSearcherPtr ipSearcher);
+
+	// Gets the OCR confidence for the specified region from the Spatial string
+	long getOcrConfidenceForRegion(const CRect& rectRegion, ISpatialStringSearcherPtr ipSearcher);
 
 	// Given the specified starting point, shift the specified rrect so that it is centered
 	// as much as possible on the pixels it contains.  rrect will never be shifted such that any
