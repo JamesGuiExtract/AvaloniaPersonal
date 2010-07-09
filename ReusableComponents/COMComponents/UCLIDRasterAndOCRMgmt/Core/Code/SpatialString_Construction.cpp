@@ -189,11 +189,16 @@ STDMETHODIMP CSpatialString::CreatePseudoSpatialString(IRasterZone *pZone, BSTR 
 		reset(true, true);
 
 		// Set the page info map
+		// NOTE: This must be set before the call to getPageBounds.
 		m_ipPageInfoMap = pPageInfoMap;
+
+		// Get the page bounds (for use by GetRectangularBounds)
+		ILongRectanglePtr ipPageBounds = getPageBounds(ipZone->PageNumber, true);
+		ASSERT_RESOURCE_ALLOCATION("ELI30320", ipPageBounds != NULL);
 
 		// Calculate dimensions needed to generate the letter array
 		// [FlexIDSCore #3555] - Pass page info map so that bounds are clipped by page dimensions
-		ILongRectanglePtr ipBounds = ipZone->GetRectangularBounds(m_ipPageInfoMap);
+		ILongRectanglePtr ipBounds = ipZone->GetRectangularBounds(ipPageBounds);
 		ASSERT_RESOURCE_ALLOCATION("ELI19908", ipBounds != NULL);
 
 		long nTop, nBottom, nLeft, nRight;

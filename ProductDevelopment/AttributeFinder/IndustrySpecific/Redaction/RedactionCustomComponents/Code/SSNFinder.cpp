@@ -176,6 +176,8 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 		long lSize = ipZones->Size();
 		IOCREnginePtr ipOCREngine(lSize > 0 ? getOCREngine() : NULL);
 
+		map<int, ILongRectanglePtr> mapPageBounds;
+
 		// iterate through each zone in the attribute
 		for(long i=0; i<lSize; i++)
 		{
@@ -186,10 +188,17 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 			// Get the page number of this raster zone
 			long lPage = ipZone->PageNumber;
 
+			// Get the page bounds (for use by GetRectangularBounds)
+			if (mapPageBounds.find(lPage) == mapPageBounds.end())
+			{
+				mapPageBounds[lPage] = ipSpatialString->GetOriginalImagePageBounds(lPage);
+			}
+			ASSERT_RESOURCE_ALLOCATION("ELI30318", mapPageBounds[lPage] != NULL);
+
 			// find handwritten numerals within the specified bounds of the spatial string
 			ISpatialStringPtr ipZoneText = ipOCREngine->RecognizeTextInImageZone(
 				strSourceDocName.c_str(), lPage, lPage, 
-				ipZone->GetRectangularBounds(ipPageInfoMap), 0, eFILTER_CHARS, "", 
+				ipZone->GetRectangularBounds(mapPageBounds[lPage]), 0, eFILTER_CHARS, "", 
 				VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, pProgressStatus);
 			ASSERT_RESOURCE_ALLOCATION("ELI18063", ipZoneText != NULL);
 

@@ -57,7 +57,7 @@ public:
 	STDMETHOD(RotateBy)(/*[in]*/ double dAngleInDegrees);
 	STDMETHOD(GetData)(/*[in]*/ long *pStartX, /*[in]*/ long *pStartY, /*[in]*/ long *pEndX, /*[in]*/ long *pEndY, /*[in]*/ long *pHeight, /*[in]*/ long *pPageNum);
 	STDMETHOD(CreateFromLongRectangle)(/*[in]*/ ILongRectangle *pRectangle, /*[in]*/ long nPageNum);
-	STDMETHOD(GetRectangularBounds)(/*[in]*/ ILongToObjectMap *pPageInfoMap, 
+	STDMETHOD(GetRectangularBounds)(/*[in]*/ ILongRectangle *pPageBounds, 
 		/*[out, retval]*/ ILongRectangle* *pRectangle);
 	STDMETHOD(GetBoundaryPoints)(/*[out, retval]*/ IIUnknownVector** pRetVal);
 	STDMETHOD(get_Area)(/*[out, retval]*/ long *pVal);

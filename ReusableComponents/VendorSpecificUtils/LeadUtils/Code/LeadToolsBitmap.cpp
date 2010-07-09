@@ -71,7 +71,7 @@ LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ul
 		throwExceptionIfNotSuccess(nRet, "ELI22117", 
 			"Internal error: Unable to apply rotation to image!", m_strImageFileName);
 
-		// If the image was rotated and allowed to resized, it needs to be trimmed back to the
+		// If the image was rotated and allowed to be resized, it needs to be trimmed back to the
 		// original page dimensions so that OCR coordinates remain valid. (Otherwise they will
 		// be offset by the amount of space that was added to the left & top edges of the image.
 		if (perpendicular)

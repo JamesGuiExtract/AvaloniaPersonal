@@ -197,6 +197,8 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 		long lSize = ipZones->Size();
 		IOCREnginePtr ipOCREngine(lSize > 0 ? getOCREngine() : NULL);
 
+		map<int, ILongRectanglePtr> mapPageBounds;
+
 		// iterate through each zone in the attribute
 		for(long i=0; i<lSize; i++)
 		{
@@ -205,12 +207,19 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 			ASSERT_RESOURCE_ALLOCATION("ELI19573", ipZone != NULL);
 
 			// Get the page number of this zone
-			long pageNumber = ipZone->PageNumber;
+			long nPageNumber = ipZone->PageNumber;
+
+			// Get the page bounds (for use by GetRectangularBounds)
+			if (mapPageBounds.find(nPageNumber) == mapPageBounds.end())
+			{
+				mapPageBounds[nPageNumber] = ipSpatialString->GetOriginalImagePageBounds(nPageNumber);
+			}
+			ASSERT_RESOURCE_ALLOCATION("ELI30333", mapPageBounds[nPageNumber] != NULL);
 
 			// get the text inside this raster zone
 			ISpatialStringPtr ipZoneText = ipOCREngine->RecognizeTextInImageZone(
-				strSourceDocName.c_str(), pageNumber, pageNumber,
-				ipZone->GetRectangularBounds(ipPageInfoMap), 0, m_eFilter, 
+				strSourceDocName.c_str(), nPageNumber, nPageNumber,
+				ipZone->GetRectangularBounds(mapPageBounds[nPageNumber]), 0, m_eFilter, 
 				m_strCustomFilterCharacters.c_str(), asVariantBool(m_bDetectHandwriting), 
 				asVariantBool(m_bReturnUnrecognized), VARIANT_TRUE, pProgressStatus);
 			ASSERT_RESOURCE_ALLOCATION("ELI19537", ipZoneText != NULL);

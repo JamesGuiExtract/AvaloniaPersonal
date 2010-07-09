@@ -2806,6 +2806,48 @@ IIUnknownVectorPtr CSpatialString::getTranslatedImageRasterZones(
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28181");
 }
 //-------------------------------------------------------------------------------------------------
+ILongRectanglePtr CSpatialString::getPageBounds(long nPage, bool bUseOCRImageCoordinates)
+{
+	try
+	{
+		if (m_ipPageInfoMap == NULL)
+		{
+			throw UCLIDException("ELI30321", "Page info missing, failed to get page bounds!");
+		}
+
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo = m_ipPageInfoMap->GetValue(nPage);
+		ASSERT_RESOURCE_ALLOCATION("ELI30322", ipPageInfo != NULL);
+
+		long nWidth(-1), nHeight(-1);
+		UCLID_RASTERANDOCRMGMTLib::EOrientation ePageOrientation;
+		double dDeskew;
+		ipPageInfo->GetPageInfo(&nWidth, &nHeight, &ePageOrientation, &dDeskew);
+
+		if (bUseOCRImageCoordinates)
+		{
+			// Determine which way to orient the search based on the page text orientation.
+			bool bTextIsHorizontal = ePageOrientation == kRotNone ||								 
+									 ePageOrientation == kRotDown ||
+									 ePageOrientation == kRotFlipped ||
+									 ePageOrientation == kRotFlippedDown;
+
+			// If the page is rotated to the right or left, in terms of OCR coordinates, the page
+			// dimensions need to be swapped.
+			if (!bTextIsHorizontal)
+			{
+				swap(nWidth, nHeight);
+			}
+		}
+
+		ILongRectanglePtr ipRect(CLSID_LongRectangle);
+		ASSERT_RESOURCE_ALLOCATION("ELI30323", ipRect != NULL);
+		ipRect->SetBounds(0, 0, nWidth, nHeight);
+
+		return ipRect;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30324");
+}
+//-------------------------------------------------------------------------------------------------
 void CSpatialString::remove(long nStart, long nEnd)
 {
 	try

@@ -1740,11 +1740,34 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 	// If the specified rotation is >= gnMIN_ROTATION, rotate the image as requested 
 	if (abs(nRotation) >= gnMIN_ROTATION)
 	{
-		// Rotate the bitmap.  Do not use ROTATE_RESIZE parameter: if we change the 
-		// dimensions of the page we are working on, it will cause problems.
-		nRet = L_RotateBitmap(&hBitmap, nRotation, 0, RGB(255, 255, 255));
+		// Determine if the image is to be rotated such that it is to be closer to perpendicular
+		// to the original orientation than parallel.
+		bool perpendicular = (round(dRotation / 90) % 2 != 0);
+		CSize sizeOrig(hBitmap.Width, hBitmap.Height);
+
+		// Rotate the bitmap.
+		// Allow resizing of the image if it is to be rotated perpendicular to the original
+		// orientation-- otherwise unless the image is square, text is likely to extend out of the
+		// image bounds in one direction while there will be empty whitespace at either end in the
+		// other direction.
+		nRet = L_RotateBitmap(&hBitmap, nRotation, perpendicular ? ROTATE_RESIZE : 0, 
+			RGB(255, 255, 255));
 		throwExceptionIfNotSuccess(nRet, "ELI20465", 
 			"Internal error: Unable to apply rotation to image!", strImageFileName);
+
+		// If the image was rotated and allowed to be resized, it needs to be trimmed back to the
+		// original page dimensions so that OCR coordinates remain valid. (Otherwise they will
+		// be offset by the amount of space that was added to the left & top edges of the image.
+		if (perpendicular)
+		{
+			int	nXTrimAmount = (hBitmap.Width - sizeOrig.cy) / 2;
+			int	nYTrimAmount = (hBitmap.Height - sizeOrig.cx) / 2;
+
+			nRet = L_TrimBitmap(&hBitmap, nXTrimAmount, nYTrimAmount,
+				hBitmap.Width - (2 * nXTrimAmount), hBitmap.Height - (2 * nYTrimAmount));
+			throwExceptionIfNotSuccess(nRet, "ELI30319", 
+				"Internal error: Unable to trim rotated image!", strImageFileName);
+		}
 	}
 
 	// Populate the page bounds rect (if provided).  

@@ -2435,3 +2435,41 @@ STDMETHODIMP CSpatialString::MergeAsHybridString(ISpatialString* pStringToMerge)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29869");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::GetOriginalImagePageBounds(long nPageNum, ILongRectangle** ppBounds)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI30331", ppBounds != NULL);
+
+		ILongRectanglePtr ipBounds = getPageBounds(nPageNum, false);
+		
+		*ppBounds = ipBounds.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30325");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::GetOCRImagePageBounds(long nPageNum, ILongRectangle** ppBounds)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI30332", ppBounds != NULL);
+
+		ILongRectanglePtr ipBounds = getPageBounds(nPageNum, true);
+
+		*ppBounds = ipBounds.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30326");
+}
+//-------------------------------------------------------------------------------------------------

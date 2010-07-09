@@ -159,6 +159,8 @@ public:
 	STDMETHOD(get_OCREngineVersion)(BSTR* pbstrOCREngine);
 	STDMETHOD(put_OCREngineVersion)(BSTR bstrOCREngine);
 	STDMETHOD(MergeAsHybridString)(ISpatialString* pStringToMerge);
+	STDMETHOD(GetOriginalImagePageBounds)(long nPageNum, ILongRectangle** ppBounds);
+	STDMETHOD(GetOCRImagePageBounds)(long nPageNum, ILongRectangle** ppBounds);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);
@@ -438,6 +440,12 @@ private:
 	// PURPOSE: To return an IUknownVector of raster zones in the coordinate system of the specified
 	//			page infos.
 	IIUnknownVectorPtr getTranslatedImageRasterZones(ILongToObjectMapPtr ipNewPageInfoMap);
+	//----------------------------------------------------------------------------------------------
+	// PURPORE: To get the bounds of the specified page number.
+	// PARAMS:  If bUseOCRImageCoordinates is true and the specified page is rotated either 90 or 270
+	//			degrees, the width and height will be swapped so that the width is the width relative
+	//			to the text not relative to the physicial image.
+	ILongRectanglePtr getPageBounds(long nPage, bool bUseOCRImageCoordinates);
 	//----------------------------------------------------------------------------------------------
 	// REQUIRE: GetMode == kSpatialMode
 	// PURPOSE: Returns a vector of IRasterZones that represent the spatial string where the

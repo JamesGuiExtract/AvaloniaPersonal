@@ -229,33 +229,22 @@ private:
 	IIUnknownVectorPtr getCluesOnPage(IVariantVectorPtr ipClues, ISpatialStringPtr ipDocText, 
 		int nPageNum, bool &rbPageContainsText, IRegularExprParserPtr ipParser);
 
-	// PROMISE: Returns a rectangle representing the string's bounds relative to the native
-	//			document (rather than relative to the page text's page info)
-	ILongRectanglePtr getNativeStringBounds(ISpatialStringPtr ipString);
-
 	// PROMISE: Searches for a box using the provided instance of a clue that was found
 	// ARGS:	ripClueRect- Rectangle representing the clue bounds relative to the native
 	//				document (rather than relative to the page text's page info)
 	//			ipHorzLineRects- The horizontal lines from the document page
 	//			ipVertLineRects- The vertical lines from the document page
-	//			ePageOrientation- The orientation of the document page
 	//			rbIncompleteResults- If false, the algorithm short-circuited after 
 	//								 encountering too many potential boxes.
 	ILongRectanglePtr findBoxContainingClue(ILongRectanglePtr ipNativeClueRect,
 											IIUnknownVectorPtr ipHorzLineRects,
 											IIUnknownVectorPtr ipVertLineRects,
-											EOrientation ePageOrientation,
 											bool &rbIncompleteResult);
 
 	// PROMISE: Given a retangle indicating the location of a box containing a clue, returns a
 	//			rectangle that specifyies where to search for the box that contains the desired 
 	//			data.
-	ILongRectanglePtr createDataSearchRect(ILongRectanglePtr ipClueRect, 
-										   EClueLocation eClueLocation);
-
-	// PROMISE: Converts the location of the clue according to the page orientation.
-	EClueLocation getClueLocationRelativeToOrientation(
-		EOrientation ePageOrientation);
+	ILongRectanglePtr createDataSearchRect(ILongRectanglePtr ipClueRect);
 
 	// PROMISE: Returns true if the indicated box meets the required dimensions and
 	//			if we haven't already found the same box. ripExistingBoxes is vector of
@@ -267,9 +256,8 @@ private:
 	// PROMISE: Returns a rectangle that excludes the vertical extent of the clue used to 
 	//			find the box.  If the entire rectangle is excluded, NULL is returned.
 	//			Relevant only if m_eClueLocation is kSameBox, kBoxToLeft or kBoxToRight.
-	//			bTextIsHorizontal indicates the orientation of text on the page
 	ILongRectanglePtr excludeVerticalSpatialAreaOfClue(ILongRectanglePtr ipFoundBox, 
-		ILongRectanglePtr ipClueBounds, bool bTextIsHorizontal);
+		ILongRectanglePtr ipClueBounds);
 
 	// PROMISE: Returns a clues list with any instances of files from the clue list ("file://") 
 	// with the clues from that file in place of the file specifier.

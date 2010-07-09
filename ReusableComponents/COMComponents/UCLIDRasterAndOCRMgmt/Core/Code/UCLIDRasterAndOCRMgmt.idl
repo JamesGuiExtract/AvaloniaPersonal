@@ -136,10 +136,10 @@ library UCLID_RASTERANDOCRMGMTLib
 		[id(12), helpstring("method CreateFromLongRectangle")] HRESULT CreateFromLongRectangle([in] ILongRectangle *pRectangle, [in] long nPageNum);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To return the smallest non-rotated rectangle that can envelope the this raster 
-		//          zone object. Will fit raster zones within page if PageInfoMap is provided.
-		// NOTE:	If pPageInfoMap == NULL, the returned object may exceed page boundaries.
+		//          zone object. Will fit raster zones within page if pPageBounds is provided.
+		// NOTE:	If pPageBounds == NULL, the returned object may exceed page boundaries.
 		[id(13), helpstring("method GetRectangularBounds")] HRESULT GetRectangularBounds(
-			[in] ILongToObjectMap *pPageInfoMap, [out, retval] ILongRectangle* *pRectangle);
+			[in] ILongRectangle *pPageBounds, [out, retval] ILongRectangle* *pRectangle);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To return an IIUnknownVector of IDoublePoint where the points are the corners of the 
 		//			RasterZone's oriented rectangle
@@ -1151,7 +1151,17 @@ library UCLID_RASTERANDOCRMGMTLib
 		//			is non-spatial, an exception will be thrown.
 		[id(95), helpstring("method MergeAsHybridString")] HRESULT MergeAsHybridString(
 			[in] ISpatialString* pStringToMerge);
-		
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To get the bounds of the specified page number.
+		[id(96), helpstring("method GetOriginalImagePageBounds")] HRESULT GetOriginalImagePageBounds(
+			[in] long nPageNum, [out, retval] ILongRectangle** ppBounds);	
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get the bounds of the specified page number.
+		// NOTE:	If the text on the specified page is rotated either 90 or 270 degrees, the
+		//			width and height will be swapped so that the width is the width relative to the
+		//			text not relative to the physicial image.
+		[id(97), helpstring("method GetOCRImagePageBounds")] HRESULT GetOCRImagePageBounds(
+			[in] long nPageNum, [out, retval] ILongRectangle** ppBounds);	
 	};
 
 	[

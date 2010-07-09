@@ -462,7 +462,7 @@ STDMETHODIMP CRasterZone::CreateFromLongRectangle(ILongRectangle *pRectangle, lo
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRasterZone::GetRectangularBounds(ILongToObjectMap *pPageInfoMap, 
+STDMETHODIMP CRasterZone::GetRectangularBounds(ILongRectangle *pPageBounds, 
 											   ILongRectangle* *pRectangle)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -505,16 +505,14 @@ STDMETHODIMP CRasterZone::GetRectangularBounds(ILongToObjectMap *pPageInfoMap,
 		rect.right = max(p1.x, max(p2.x, max(p3.x, p4.x)));
 
 		// fit the rectangular bounds within the page if page info map was specified
-		if(pPageInfoMap != NULL)
+		if(pPageBounds != NULL)
 		{
 			// usa a smart pointer for the spatial page info
-			ILongToObjectMapPtr ipPageInfoMap(pPageInfoMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI19861", ipPageInfoMap != NULL);
+			ILongRectanglePtr ipPageBounds(pPageBounds);
+			ASSERT_RESOURCE_ALLOCATION("ELI30334", ipPageBounds != NULL);
 
-			// get the spatial page info for this raster zone's page
-			UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo = 
-				ipPageInfoMap->GetValue(m_nPage);
-			ASSERT_RESOURCE_ALLOCATION("ELI19862", ipPageInfo != NULL);
+			long lLeftBound(-1), lTopBound(-1), lRightBound(-1), lBottomBound(-1);
+			ipPageBounds->GetBounds(&lLeftBound, &lTopBound, &lRightBound, &lBottomBound);
 
 			// crop the top and left to their minimum values if needed
 			if(rect.top < 0)
@@ -527,15 +525,13 @@ STDMETHODIMP CRasterZone::GetRectangularBounds(ILongToObjectMap *pPageInfoMap,
 			}
 
 			// crop the bottom and right to their maximum values if needed
-			long lMaxBottom = ipPageInfo->Height;
-			if(rect.bottom > lMaxBottom)
+			if(rect.bottom > lBottomBound)
 			{
-				rect.bottom = lMaxBottom;
+				rect.bottom = lBottomBound;
 			}
-			long lMaxWidth = ipPageInfo->Width;
-			if(rect.right > lMaxWidth)
+			if(rect.right > lRightBound)
 			{
-				rect.right = lMaxWidth;
+				rect.right = lRightBound;
 			}
 		}
 

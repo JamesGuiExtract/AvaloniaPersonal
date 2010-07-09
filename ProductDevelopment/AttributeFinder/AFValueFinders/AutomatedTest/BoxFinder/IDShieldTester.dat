@@ -119,3 +119,7 @@
 // Searches for a box from a document whose pages have all been excluded via an Select Page Region preprocessor
 // Tests: [FlexIDSCore:3069]
 <TESTFOLDER>;.\Test24.rsd;.\AutomatedTestFiles\00010\;$DirOf(<SourceDocName>)\..\ActualVOA\Test24.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test24.voa
+
+// Searches for a box from a document whose pages have all been excluded via an Select Page Region preprocessor
+// Tests: [FlexIDSCore:4296, 2988]
+<TESTFOLDER>;.\Test25.rsd;.\AutomatedTestFiles\r_362_4_scan_2805\;$DirOf(<SourceDocName>)\..\ActualVOA\Test25.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test25.voa

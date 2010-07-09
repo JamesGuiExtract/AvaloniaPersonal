@@ -780,12 +780,15 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 			ASSERT_RESOURCE_ALLOCATION("ELI19992", ipPageInfo != NULL);
 
 			// Determine which way to orient the search based on the page text orientation.
-			EOrientation ePageOrientation = ipPageInfo->Orientation;
+			double dRotation = ipPageInfo->Deskew;
 
-			bool bTextIsHorizontal = ePageOrientation == kRotNone ||								 
-									 ePageOrientation == kRotDown ||
-									 ePageOrientation == kRotFlipped ||
-									 ePageOrientation == kRotFlippedDown;
+			switch (ipPageInfo->Orientation)
+			{
+				case kRotNone: dRotation += 0; break;
+				case kRotLeft: dRotation += 90; break;
+				case kRotDown: dRotation += 180; break;
+				case kRotRight: dRotation += 270; break;
+			}
 
 			// If any clues were found or lines are requested in output, search for lines.
 			if (ipFoundClues->Size() > 0 || m_bIncludeLines)
@@ -797,23 +800,16 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 				// This is less efficient, so the issue may need to be revisited.
 				getImageLineUtility()->LineBridgeGap = gnLINEUTIL_HORZ_LINE_BRIDGE_GAP;
 
-				// If the page text is horizontal, look for horizontal lines first, otherwise get 
-				// the vertical lines using the setting intended for horizontal lines since
-				// the vertical lines would be horizontal if the page were oriented normally.
-				getImageLineUtility()->FindLines(ipDocText->SourceDocName, nPageNum, 
-					- ipPageInfo->Deskew,
-					(bTextIsHorizontal ? &ipHorzLineRects : NULL),
-					(bTextIsHorizontal ? NULL : &ipVertLineRects));
+				// Look for horizontal lines first
+				getImageLineUtility()->FindLines(
+					ipDocText->SourceDocName, nPageNum, -dRotation, &ipHorzLineRects, NULL);
 
 				// Reset line bridge setting for vertical lines
 				getImageLineUtility()->LineBridgeGap = gnLINEUTIL_VERT_LINE_BRIDGE_GAP;
 
-				// If the page text is horizontal, look for vertical lines now, otherwise get the
-				// horizontal lines.
-				getImageLineUtility()->FindLines(ipDocText->SourceDocName, nPageNum, 
-					- ipPageInfo->Deskew,
-					(bTextIsHorizontal ? NULL : &ipHorzLineRects),
-					(bTextIsHorizontal ? &ipVertLineRects : NULL));
+				// Look for vertical lines now
+				getImageLineUtility()->FindLines(
+					ipDocText->SourceDocName, nPageNum, -dRotation, NULL, &ipVertLineRects);
 			}
 
 			// If lines are requested, create an attribute from the rects of the found lines.
@@ -851,12 +847,12 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 					continue;
 				}
 
-				ILongRectanglePtr ipClueRect = getNativeStringBounds(ipFoundClue);
+				ILongRectanglePtr ipClueRect = ipFoundClue->GetOCRImageBounds();
 
 				bool bIncompleteBoxResult = false;
 
 				ILongRectanglePtr ipDataBox = findBoxContainingClue(ipClueRect,
-					ipHorzLineRects, ipVertLineRects, ePageOrientation, bIncompleteBoxResult);
+					ipHorzLineRects, ipVertLineRects, bIncompleteBoxResult);
 
 				// If there was a problem searching for this box, set the PageResultsIncomplete flag.
 				if (bIncompleteBoxResult)
@@ -877,7 +873,7 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 						{
 							// Exclude the vertical extent of the clue from area the spatial string
 							// will occupy
-							ipDataBox = excludeVerticalSpatialAreaOfClue(ipDataBox, ipClueRect, bTextIsHorizontal);
+							ipDataBox = excludeVerticalSpatialAreaOfClue(ipDataBox, ipClueRect);
 							if (ipDataBox == NULL)
 							{
 								// If the exclusion process eliminated the found region entirely
@@ -1473,21 +1469,9 @@ IIUnknownVectorPtr CBoxFinder::getCluesOnPage(IVariantVectorPtr ipClues, ISpatia
 	return ipFoundClues;
 }
 //-------------------------------------------------------------------------------------------------
-ILongRectanglePtr CBoxFinder::getNativeStringBounds(ISpatialStringPtr ipString)
-{
-	ASSERT_ARGUMENT("ELI20232", ipString != NULL);
-
-	// Get string bounds relative to the page orientation
-	ILongRectanglePtr ipBounds = ipString->GetOriginalImageBounds();
-	ASSERT_RESOURCE_ALLOCATION("ELI20466", ipBounds != NULL);
-	
-	return ipBounds;
-}
-//-------------------------------------------------------------------------------------------------
 ILongRectanglePtr CBoxFinder::findBoxContainingClue(ILongRectanglePtr ipNativeClueRect,
 													IIUnknownVectorPtr ipHorzLineRects,
 													IIUnknownVectorPtr ipVertLineRects,
-													EOrientation ePageOrientation,
 													bool &rbIncompleteResult)
 {
 	ASSERT_ARGUMENT("ELI20234", ipNativeClueRect != NULL);
@@ -1516,12 +1500,9 @@ ILongRectanglePtr CBoxFinder::findBoxContainingClue(ILongRectanglePtr ipNativeCl
 		}
 		else
 		{
-			// Convert the location of the clue according to the page orientation.
-			EClueLocation eClueLocation = getClueLocationRelativeToOrientation(ePageOrientation);
-
 			// Create a rectangle describing where to look for the data box
 			// based on the location of the clue box
-			ILongRectanglePtr ipDataSearchRect = createDataSearchRect(ipClueBox, eClueLocation);
+			ILongRectanglePtr ipDataSearchRect = createDataSearchRect(ipClueBox);
 
 			// Attempt to find the box containing the desired data
 			ipDataBox = getImageLineUtility()->FindBoxContainingRect(
@@ -1538,8 +1519,7 @@ ILongRectanglePtr CBoxFinder::findBoxContainingClue(ILongRectanglePtr ipNativeCl
 	return ipDataBox;
 }
 //-------------------------------------------------------------------------------------------------
-ILongRectanglePtr CBoxFinder::createDataSearchRect(ILongRectanglePtr ipClueRect, 
-												   EClueLocation eClueLocation)
+ILongRectanglePtr CBoxFinder::createDataSearchRect(ILongRectanglePtr ipClueRect)
 {
 	ASSERT_ARGUMENT("ELI19838", ipClueRect != NULL);
 
@@ -1549,7 +1529,7 @@ ILongRectanglePtr CBoxFinder::createDataSearchRect(ILongRectanglePtr ipClueRect,
 
 	// Set bounds to match clue rects bounds where appropriate.  On the other bounds, offset them
 	// from the ClueRect by gnDATA_SEARCH_RECT_SIZE pixels.
-	switch (eClueLocation)
+	switch (m_eClueLocation)
 	{
 		case kBoxToTopLeft:
 			{
@@ -1622,66 +1602,6 @@ ILongRectanglePtr CBoxFinder::createDataSearchRect(ILongRectanglePtr ipClueRect,
 	return ipDataSearchRect;
 }
 //-------------------------------------------------------------------------------------------------
-EClueLocation CBoxFinder::getClueLocationRelativeToOrientation(EOrientation ePageOrientation)
-{
-	EClueLocation eConvertedLocation;
-
-	if (ePageOrientation == kRotNone || ePageOrientation == kRotFlipped)
-	{
-		// Page is hoziontal, use the existing location value
-		eConvertedLocation = m_eClueLocation;
-	}
-	else if (ePageOrientation == kRotLeft || ePageOrientation == kRotFlippedLeft)
-	{
-		// Convert location setting by rotating 90 degrees to the right to match the 
-		// page orientation
-		switch (m_eClueLocation)
-		{
-			case kBoxToTopLeft:		eConvertedLocation = kBoxToTopRight; break;
-			case kBoxToTop:			eConvertedLocation = kBoxToRight; break;
-			case kBoxToTopRight:	eConvertedLocation = kBoxToBottomRight; break;
-			case kBoxToRight:		eConvertedLocation = kBoxToBottom; break;
-			case kBoxToBottomRight:	eConvertedLocation = kBoxToBottomLeft; break;
-			case kBoxToBottom:		eConvertedLocation = kBoxToLeft; break;
-			case kBoxToBottomLeft:	eConvertedLocation = kBoxToTopLeft; break;
-			case kBoxToLeft:		eConvertedLocation = kBoxToTop; break;
-		}
-	}
-	else if (ePageOrientation == kRotDown || ePageOrientation == kRotFlippedDown)
-	{
-		// Convert location setting by rotating 180 degrees to match the page orientation
-		switch (m_eClueLocation)
-		{
-			case kBoxToTopLeft:		eConvertedLocation = kBoxToBottomRight; break;
-			case kBoxToTop:			eConvertedLocation = kBoxToBottom; break;
-			case kBoxToTopRight:	eConvertedLocation = kBoxToBottomLeft; break;
-			case kBoxToRight:		eConvertedLocation = kBoxToLeft; break;
-			case kBoxToBottomRight:	eConvertedLocation = kBoxToTopLeft; break;
-			case kBoxToBottom:		eConvertedLocation = kBoxToTop; break;
-			case kBoxToBottomLeft:	eConvertedLocation = kBoxToTopRight; break;
-			case kBoxToLeft:		eConvertedLocation = kBoxToRight; break;
-		}
-	}
-	else if (ePageOrientation == kRotRight || ePageOrientation == kRotFlippedRight)
-	{
-		// Convert location setting by rotating 90 degrees to the left to match the 
-		// page orientation
-		switch (m_eClueLocation)
-		{
-			case kBoxToTopLeft:		eConvertedLocation = kBoxToBottomLeft; break;
-			case kBoxToTop:			eConvertedLocation = kBoxToLeft; break;
-			case kBoxToTopRight:	eConvertedLocation = kBoxToTopLeft; break;
-			case kBoxToRight:		eConvertedLocation = kBoxToTop; break;
-			case kBoxToBottomRight:	eConvertedLocation = kBoxToTopRight; break;
-			case kBoxToBottom:		eConvertedLocation = kBoxToRight; break;
-			case kBoxToBottomLeft:	eConvertedLocation = kBoxToBottomRight; break;
-			case kBoxToLeft:		eConvertedLocation = kBoxToBottom; break;
-		}
-	}
-
-	return eConvertedLocation;
-}
-//-------------------------------------------------------------------------------------------------
 bool CBoxFinder::qualifyBox(ILongRectanglePtr ipRect, ISpatialPageInfoPtr ipPageInfo,
 							  IIUnknownVectorPtr &ripExistingBoxes)
 {
@@ -1689,7 +1609,13 @@ bool CBoxFinder::qualifyBox(ILongRectanglePtr ipRect, ISpatialPageInfoPtr ipPage
 	ASSERT_ARGUMENT("ELI19802", ipPageInfo != NULL);
 	ASSERT_ARGUMENT("ELI19859", ripExistingBoxes != NULL);
 
-	EOrientation eOrientation = ipPageInfo->Orientation;
+	long nPageWidth(-1), nPageHeight(-1);
+	EOrientation eOrientation;
+	double dDeskew;
+	ipPageInfo->GetPageInfo(&nPageWidth, &nPageHeight, &eOrientation, &dDeskew);
+
+	long nRectLeft(-1), nRectTop(-1), nRectRight(-1), nRectBottom(-1);
+	ipRect->GetBounds(&nRectLeft, &nRectTop, &nRectRight, &nRectBottom);
 
 	bool bTextIsHorizontal = eOrientation == kRotNone ||											 
 							 eOrientation == kRotDown ||
@@ -1699,9 +1625,8 @@ bool CBoxFinder::qualifyBox(ILongRectanglePtr ipRect, ISpatialPageInfoPtr ipPage
 	// Test the width of the box against specs if necessary
 	if (m_nBoxWidthMin != gnUNSPECIFIED || m_nBoxWidthMax != gnUNSPECIFIED)
 	{
-		double dPageWidth = (bTextIsHorizontal ? ipPageInfo->Width : ipPageInfo->Height);
-		double dBoxWidth = (bTextIsHorizontal ? ipRect->Right - ipRect->Left
-									   : ipRect->Bottom - ipRect->Top);
+		double dPageWidth = (bTextIsHorizontal ? nPageWidth : nPageHeight);
+		double dBoxWidth = nRectRight - nRectLeft;
 		double dWidthPercent = 100.0 * dBoxWidth / dPageWidth;
 
 		if (m_nBoxWidthMin != gnUNSPECIFIED && dWidthPercent < (double) m_nBoxWidthMin)
@@ -1717,9 +1642,8 @@ bool CBoxFinder::qualifyBox(ILongRectanglePtr ipRect, ISpatialPageInfoPtr ipPage
 	// Test the height of the box against specs if necessary
 	if (m_nBoxHeightMin != gnUNSPECIFIED || m_nBoxHeightMax != gnUNSPECIFIED)
 	{
-		double dPageHeight = (bTextIsHorizontal ? ipPageInfo->Height : ipPageInfo->Width);
-		double dBoxHeight = (bTextIsHorizontal ? ipRect->Bottom - ipRect->Top
-									        : ipRect->Right - ipRect->Left);
+		double dPageHeight = (bTextIsHorizontal ? nPageHeight : nPageWidth);
+		double dBoxHeight = nRectBottom - nRectTop;
 		double dHeightPercent = 100.0 * dBoxHeight / dPageHeight;
 
 		if (m_nBoxHeightMin != gnUNSPECIFIED && dHeightPercent < (double) m_nBoxHeightMin)
@@ -1738,11 +1662,14 @@ bool CBoxFinder::qualifyBox(ILongRectanglePtr ipRect, ISpatialPageInfoPtr ipPage
 	{
 		ILongRectanglePtr ipExistingBox = ripExistingBoxes->At(i);
 		ASSERT_RESOURCE_ALLOCATION("ELI19860", ipExistingBox);
+
+		long nBoxLeft(-1), nBoxTop(-1), nBoxRight(-1), nBoxBottom(-1);
+		ipExistingBox->GetBounds(&nBoxLeft, &nBoxTop, &nBoxRight, &nBoxBottom);
 		
-		if (ipExistingBox->Left == ipRect->Left &&
-			ipExistingBox->Top == ipRect->Top &&
-			ipExistingBox->Right == ipRect->Right &&
-			ipExistingBox->Bottom == ipRect->Bottom)
+		if (nBoxLeft == nRectLeft &&
+			nBoxTop == nRectTop &&
+			nBoxRight == nRectRight &&
+			nBoxBottom == nRectBottom)
 		{
 			// We've already found this box
 			return false;
@@ -1756,8 +1683,7 @@ bool CBoxFinder::qualifyBox(ILongRectanglePtr ipRect, ISpatialPageInfoPtr ipPage
 }
 //-------------------------------------------------------------------------------------------------
 ILongRectanglePtr CBoxFinder::excludeVerticalSpatialAreaOfClue(ILongRectanglePtr ipFoundBox, 
-															   ILongRectanglePtr ipClueBounds,
-															   bool bTextIsHorizontal)
+															   ILongRectanglePtr ipClueBounds)
 {
 	ASSERT_ARGUMENT("ELI19779", ipFoundBox != NULL);
 	ASSERT_ARGUMENT("ELI19783", ipClueBounds != NULL);
@@ -1776,66 +1702,30 @@ ILongRectanglePtr CBoxFinder::excludeVerticalSpatialAreaOfClue(ILongRectanglePtr
 		CRect rectBox(ipFoundBox->Left, ipFoundBox->Top, ipFoundBox->Right, ipFoundBox->Bottom);
 		CRect rectClue(ipClueBounds->Left, ipClueBounds->Top, ipClueBounds->Right, ipClueBounds->Bottom);
 
-		if (bTextIsHorizontal) // Page text is oriented horizontally
+		// If the clue is to the top side of the data
+		if (rectClue.CenterPoint().y <= rectBox.CenterPoint().y)
 		{
-			// If the clue is to the top side of the data
-
-			if (rectClue.CenterPoint().y <= rectBox.CenterPoint().y)
+			if (rectClue.bottom >= rectBox.bottom)
 			{
-				if (rectClue.bottom >= rectBox.bottom)
-				{
-					// The clue area excludes the entire result.
-					return NULL;
-				}
-				else
-				{
-					ipResult->Top = rectClue.bottom;
-				}
+				// The clue area excludes the entire result.
+				return NULL;
 			}
 			else
 			{
-				// If the clue is to the bottom side of the data
-
-				if (rectClue.top <= rectBox.top)
-				{
-					// The clue area excludes the entire result.
-					return NULL;
-				}
-				else
-				{
-					ipResult->Bottom = rectClue.top;
-				}
+				ipResult->Top = rectClue.bottom;
 			}
 		}
-		else  // Page text is oriented vertically
+		// If the clue is to the bottom side of the data
+		else
 		{
-			if (rectClue.CenterPoint().x <= rectBox.CenterPoint().x)
+			if (rectClue.top <= rectBox.top)
 			{
-				// If the clue is to the left side of the data
-
-				if (rectClue.right >= rectBox.right)
-				{
-					// The clue area excludes the entire result.
-					return NULL;
-				}
-				else
-				{
-					ipResult->Left = rectClue.right;
-				}
+				// The clue area excludes the entire result.
+				return NULL;
 			}
 			else
 			{
-				// If the clue is to the right side of the data
-
-				if (rectClue.left <= rectBox.left)
-				{
-					// The clue area excludes the entire result.
-					return NULL;
-				}
-				else
-				{
-					ipResult->Right = rectClue.left;
-				}
+				ipResult->Bottom = rectClue.top;
 			}
 		}
 	}
@@ -1860,29 +1750,10 @@ IAttributePtr CBoxFinder::createRegionResult(ISpatialStringPtr ipDocText, int nP
 	ISpatialStringPtr ipSpatialString(CLSID_SpatialString);
 	ASSERT_RESOURCE_ALLOCATION("ELI19770", ipSpatialString);
 
-	// We want to modify the existing page's PageInfo for the attribute, but we don't want
-	// to affect the existing page, so obtain a copy.
-	ICopyableObjectPtr ipCloneThis = ipDocText->GetPageInfo(nPageNum);
-	ASSERT_RESOURCE_ALLOCATION("ELI19777", ipCloneThis != NULL);
-
-	ISpatialPageInfoPtr ipPageInfoClone = ipCloneThis->Clone();
-	ASSERT_RESOURCE_ALLOCATION("ELI19996", ipPageInfoClone != NULL);
-	
-	// The line coordinates we used to create the raster zone were based on the original orientation,
-	// not rotated coordinates.  Therefore use no rotation to ensure the attribute appears in the 
-	// correct location.  Do not touch the deskew value since we already accounted for skew by passing
-	// the deskew value into the FindLines call.
-	ipPageInfoClone->Orientation = kRotNone;
-
-	// create a spatial page info map for the new spatial string
-	ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
-	ASSERT_RESOURCE_ALLOCATION("ELI20242", ipPageInfoMap != NULL);
-	ipPageInfoMap->Set(nPageNum, ipPageInfoClone);
-
 	// Build a spatial string (in spatial mode) that occupies the full extent of ipZone with
 	// the letters of m_strAttributeText spread evenly across it.
 	ipSpatialString->CreatePseudoSpatialString(ipZone, m_strAttributeText.c_str(),
-		ipDocText->SourceDocName, ipPageInfoMap);
+		ipDocText->SourceDocName, ipDocText->SpatialPageInfos);
 
 	// Create the attribute
 	IAttributePtr ipAttribute(CLSID_Attribute);

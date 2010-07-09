@@ -343,8 +343,16 @@ MSXML::IXMLDOMElementPtr XMLVersion2Writer::getRectBoundsElement(
 		createElement( gstrBOUNDS_LEVEL_ATTRIBUTE_NAME.c_str() );
 	ASSERT_RESOURCE_ALLOCATION("ELI15426", ipRectBoundsElement != NULL);
 
+	ISpatialPageInfoPtr ipPageInfo = ipPageInfoMap->GetValue(ipZone->PageNumber);
+	ASSERT_RESOURCE_ALLOCATION("ELI30328", ipPageInfo != NULL);
+
+	// Get the page bounds (for use by GetRectangularBounds)
+	ILongRectanglePtr ipPageBounds(CLSID_LongRectangle);
+	ASSERT_RESOURCE_ALLOCATION("ELI30314", ipPageBounds != NULL);
+	ipPageBounds->SetBounds(0, 0, ipPageInfo->Width, ipPageInfo->Height);
+
 	// Get the rectangular bounds
-	ILongRectanglePtr ipBounds = ipZone->GetRectangularBounds(ipPageInfoMap);
+	ILongRectanglePtr ipBounds = ipZone->GetRectangularBounds(ipPageBounds);
 	ASSERT_RESOURCE_ALLOCATION("ELI15427", ipBounds != NULL);
 	
 	// Set the attributes of the rectangular bounds element

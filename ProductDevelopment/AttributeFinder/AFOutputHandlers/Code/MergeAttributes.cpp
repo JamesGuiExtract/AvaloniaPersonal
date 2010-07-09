@@ -949,13 +949,23 @@ void CMergeAttributes::loadAttributeInfo(IAttributePtr ipAttribute)
 
 		// Cycle through each raster zone and obtain a CRect representing each.
 		long nCount = ipRasterZones->Size();
+		
+		ILongRectanglePtr ipPageBounds = NULL;
+		if (nCount > 0)
+		{
+			// Get the page bounds (for use by GetRectangularBounds).
+			// NOTE: All zones will be on the same page, so we only need to get the bounds once.
+			ipPageBounds = ipValue->GetOriginalImagePageBounds(nPage);
+			ASSERT_RESOURCE_ALLOCATION("ELI30312", ipPageBounds != NULL);
+		}
+
 		for (long i = 0; i < nCount; i++)
 		{
 			IRasterZonePtr ipRasterZone = ipRasterZones->At(i);
 			ASSERT_RESOURCE_ALLOCATION("ELI22881", ipRasterZone != NULL);
 
 			// Obtain a rect describing the location of this raster zone.
-			ILongRectanglePtr ipRect = ipRasterZone->GetRectangularBounds(ipValue->SpatialPageInfos);
+			ILongRectanglePtr ipRect = ipRasterZone->GetRectangularBounds(ipPageBounds);
 			ASSERT_RESOURCE_ALLOCATION("ELI22882", ipRect != NULL);
 
 			// Copy the ILongRectangle to a CRect to make rect comparisons easier.
