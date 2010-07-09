@@ -47,21 +47,21 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="VaultClientIntegrationLib, Version=5.0.3.18802, Culture=neutral, PublicKeyToken=500623c275bd78a9, processorArchitecture=MSIL">
+    <Reference Include="VaultClientIntegrationLib, Version=5.0.4.18845, Culture=neutral, PublicKeyToken=500623c275bd78a9, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APIs\Vault\5.0.3\VaultClientIntegrationLib.dll</HintPath>
+      <HintPath>..\..\..\APIs\Vault\5.0.4\VaultClientIntegrationLib.dll</HintPath>
     </Reference>
-    <Reference Include="VaultClientNetLib, Version=5.0.3.18802, Culture=neutral, PublicKeyToken=e372e94840f8a4d3, processorArchitecture=MSIL">
+    <Reference Include="VaultClientNetLib, Version=5.0.4.18845, Culture=neutral, PublicKeyToken=e372e94840f8a4d3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APIs\Vault\5.0.3\VaultClientNetLib.dll</HintPath>
+      <HintPath>..\..\..\APIs\Vault\5.0.4\VaultClientNetLib.dll</HintPath>
     </Reference>
-    <Reference Include="VaultClientOperationsLib, Version=5.0.3.18802, Culture=neutral, PublicKeyToken=e372e94840f8a4d3, processorArchitecture=MSIL">
+    <Reference Include="VaultClientOperationsLib, Version=5.0.4.18845, Culture=neutral, PublicKeyToken=e372e94840f8a4d3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APIs\Vault\5.0.3\VaultClientOperationsLib.dll</HintPath>
+      <HintPath>..\..\..\APIs\Vault\5.0.4\VaultClientOperationsLib.dll</HintPath>
     </Reference>
-    <Reference Include="VaultLib, Version=5.0.3.18802, Culture=neutral, PublicKeyToken=a74d7badb9387c36, processorArchitecture=MSIL">
+    <Reference Include="VaultLib, Version=5.0.4.18845, Culture=neutral, PublicKeyToken=a74d7badb9387c36, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APIs\Vault\5.0.3\VaultLib.dll</HintPath>
+      <HintPath>..\..\..\APIs\Vault\5.0.4\VaultLib.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
