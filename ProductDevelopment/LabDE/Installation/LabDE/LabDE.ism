@@ -1131,6 +1131,8 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>DefaultFeature</td><td>AllOtherFiles</td></row>
+		<row><td>DefaultFeature</td><td>Extract.LabDE.StandardLabDE.dll</td></row>
+		<row><td>DefaultFeature</td><td>Extract.LabResultsCustomComponents</td></row>
 		<row><td>DefaultFeature</td><td>Help</td></row>
 		<row><td>DefaultFeature</td><td>Reports</td></row>
 	</table>
