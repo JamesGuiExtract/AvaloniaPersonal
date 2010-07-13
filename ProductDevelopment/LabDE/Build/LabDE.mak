@@ -190,7 +190,7 @@ CreateDemo_LabDE:
 
 GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetComponentDataFiles GetLabDEFiles GetDemo_LabDERules
 
-DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildDataEntryMergeModule  BuildLabDEApplication CreateDemoShieldInstall CopyRDTToInstallFolder CreateDemo_LabDE
+DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildLabDEApplication CreateDemoShieldInstall CopyRDTToInstallFolder CreateDemo_LabDE
     @ECHO.
     @DATE /T
     @TIME /T
