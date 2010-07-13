@@ -4,6 +4,6 @@
     <assembly path="Extract.Test.dll" />
     <assembly path="Extract.Encryption.Test.dll" />
     <assembly path="Extract.Imaging.Forms.Test.dll" />
-    <assembly path="Extract.LabDE.StandardLabDE.Test.dll" />
+    <assembly path="Extract.DataEntry.DEP.StandardLabDE.Test.dll" />
   </Config>
 </NUnitProject>
