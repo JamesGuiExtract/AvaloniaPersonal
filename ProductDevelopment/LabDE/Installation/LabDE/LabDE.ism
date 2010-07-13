@@ -245,7 +245,6 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
-		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 		<row><td>ISSetupFilesHelper</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\SFHelper.dll</td></row>
 	</table>
@@ -314,10 +313,10 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>AllOtherFiles</td><td>{BF13F1DD-ACE5-414A-97D2-8A7CEE2DAC71}</td><td>COMMON_COMPONENTS</td><td>8</td><td>VersionNT&gt;=600</td><td>disabledthemes.sdb</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.LabDE.StandardLabDE.dll</td><td>{2124E4F3-D821-48C7-AD99-01BC8E9CE602}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.labde.standa</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Extract.DataEntry.DEP.StandardLabDE.dll</td><td>{DAF7F71B-7533-4E2B-8F3C-74BBEC214E00}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.dataentry.dep.standa</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.LabResultsCustomComponents</td><td>{39AF42D5-575F-4A4F-8BF0-0C3319DAE366}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.labresultscu</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Help</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td>labde.chm</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Reports</td><td>{54169BEE-5EA8-44BD-A6E1-2AC7380B9DDA}</td><td>STANDARD_REPORTS</td><td>8</td><td/><td>labde_high_effort_files_by_u1</td><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Help</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td>labde.chm</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Reports</td><td>{54169BEE-5EA8-44BD-A6E1-2AC7380B9DDA}</td><td>STANDARD_REPORTS</td><td>8</td><td/><td>labde_high_effort_files_by_u1</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -377,12 +376,8 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
-		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td>257</td><td>ISSetupFilesHelper</td><td>SFCleanupEx</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td>257</td><td>ISSetupFilesHelper</td><td>SFStartupEx</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISVerifyScriptingRuntime</td><td>19</td><td/><td>[STANDARD_USE_SETUPEXE]</td><td/><td>Required for installations using InstallScript.</td></row>
 		<row><td>SetARPINSTALLLOCATION</td><td>51</td><td>ARPINSTALLLOCATION</td><td>[INSTALLDIR]</td><td/><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%SystemRoot]\Profiles\All Users</td><td/><td/></row>
@@ -1131,7 +1126,7 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>DefaultFeature</td><td>AllOtherFiles</td></row>
-		<row><td>DefaultFeature</td><td>Extract.LabDE.StandardLabDE.dll</td></row>
+		<row><td>DefaultFeature</td><td>Extract.DataEntry.DEP.StandardLabDE.dll</td></row>
 		<row><td>DefaultFeature</td><td>Extract.LabResultsCustomComponents</td></row>
 		<row><td>DefaultFeature</td><td>Help</td></row>
 		<row><td>DefaultFeature</td><td>Reports</td></row>
@@ -1150,7 +1145,7 @@
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
 		<row><td>disabledthemes.sdb</td><td>AllOtherFiles</td><td>DISABL~1.SDB|DisabledThemes.sdb</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DATAENTRY_MISC&gt;\DisabledThemes.sdb</td><td>1</td><td/></row>
-		<row><td>extract.labde.standa</td><td>Extract.LabDE.StandardLabDE.dll</td><td>EXTRAC~1.DLL|Extract.LabDE.StandardLabDE.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.LabDE.StandardLabDE.dll</td><td>1</td><td/></row>
+		<row><td>extract.dataentry.dep.standa</td><td>Extract.DataEntry.DEP.StandardLabDE.dll</td><td>EXTRAC~1.DLL|Extract.DataEntry.DEP.StandardLabDE.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.DataEntry.DEP.StandardLabDE.dll</td><td>1</td><td/></row>
 		<row><td>extract.labresultscu</td><td>Extract.LabResultsCustomComponents</td><td>EXTRAC~1.DLL|Extract.LabResultsCustomComponents.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.LabResultsCustomComponents.dll</td><td>1</td><td/></row>
 		<row><td>labde.chm</td><td>Help</td><td>LabDE.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDE_HELP_FILES&gt;\LabDE.chm</td><td>1</td><td/></row>
 		<row><td>labde_data_entry_rates_by_us</td><td>Reports</td><td>LABDED~1.JPG|LabDE data entry rates by user.jpg</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES&gt;\LabDE data entry rates by user.jpg</td><td>1</td><td/></row>
@@ -1407,7 +1402,7 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>AllOtherFiles</td><td/><td/><td>_2609E52D_0837_45AF_AB4E_609D37B72624_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Extract.LabDE.StandardLabDE.dll</td><td/><td/><td>_289B4052_0DE8_4907_BA40_F09ACBE814E1_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Extract.DataEntry.DEP.StandardLabDE.dll</td><td/><td/><td>_89E482A2_8239_4551_BA24_07F6784E8F7F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.LabResultsCustomComponents</td><td/><td/><td>_778BE2D2_CB4F_4383_9D0D_3A3DDEE5587C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Help</td><td/><td/><td>_10883AA1_60F1_460D_A0E0_D91F6169AF21_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Reports</td><td/><td/><td>_D2822A61_C91B_40B5_9F32_E99BF4A6A776_FILTER</td><td/><td/><td/><td/></row>
@@ -3304,12 +3299,8 @@
 		<row><td>DuplicateFiles</td><td/><td>4210</td><td>DuplicateFiles</td><td/></row>
 		<row><td>FileCost</td><td/><td>900</td><td>FileCost</td><td/></row>
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td/><td>2201</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td/><td>5601</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td/><td>6601</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td/><td>6602</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td/><td>3</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td/><td>2202</td><td/><td/></row>
 		<row><td>InstallFiles</td><td/><td>4000</td><td>InstallFiles</td><td/></row>
 		<row><td>InstallFinalize</td><td/><td>6600</td><td>InstallFinalize</td><td/></row>
 		<row><td>InstallInitialize</td><td/><td>1501</td><td>InstallInitialize</td><td/></row>
