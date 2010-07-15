@@ -1,0 +1,518 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Template|Win32">
+      <Configuration>Template</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}</ProjectGuid>
+    <RootNamespace>BaseUtils</RootNamespace>
+    <SccProjectName>BaseUtils</SccProjectName>
+    <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
+    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
+    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
+    <Keyword>MFCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\Binaries\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\Debug\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\Binaries\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\Release\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\..\Debug/BaseUtils.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_AFXEXT;EXPORT_BASEUTILS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>.\..\Debug/BaseUtils.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\..\Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\Debug/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;advapi32.lib;netapi32.lib;version.lib;mpr.lib;shlwapi.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\..\..\Binaries\Debug/BaseUtils.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreSpecificDefaultLibraries>LIBCMTD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ModuleDefinitionFile>.\BaseUtils.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>.\..\Debug/BaseUtils.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>.\..\Debug/BaseUtils.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\..\Debug/BaseUtils.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\..\Release/BaseUtils.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_AFXEXT;EXPORT_BASEUTILS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>.\..\Release/BaseUtils.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\Release/</AssemblerListingLocation>
+      <ObjectFileName>.\..\Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\Release/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;advapi32.lib;netapi32.lib;version.lib;mpr.lib;shlwapi.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\..\..\Binaries\Release/BaseUtils.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ModuleDefinitionFile>.\BaseUtils.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>.\..\Release/BaseUtils.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\..\Release/BaseUtils.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="AfxAppMainWindowRestorer.cpp" />
+    <ClCompile Include="Arguments.cpp" />
+    <ClCompile Include="BaseUtils.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="BlockExtractor.cpp" />
+    <ClCompile Include="BooleanExpression.cpp" />
+    <ClCompile Include="ByteStream.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="ByteStreamManipulator.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="ChangePasswordDlg.cpp" />
+    <ClCompile Include="ClipboardManager.cpp" />
+    <ClCompile Include="CommentedTextFileReader.cpp" />
+    <ClCompile Include="COMUtils.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="cppFileSystemUtil.cpp" />
+    <ClCompile Include="cppStringUtil.cpp" />
+    <ClCompile Include="cpputil.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="CpuUsage.cpp" />
+    <ClCompile Include="CursorToolTipCtrl.cpp" />
+    <ClCompile Include="DateUtil.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="DefaultHandlers.cpp" />
+    <ClCompile Include="EncryptedFileManager.cpp" />
+    <ClCompile Include="EncryptionEngine.cpp" />
+    <ClCompile Include="ErrorInfo.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="EventData.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="EventID.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="ExtractMFCUtils.cpp" />
+    <ClCompile Include="FailureDetectionAndReportingMgr.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="FileDateTimeRestorer.cpp" />
+    <ClCompile Include="FileDialogEx.cpp" />
+    <ClCompile Include="FileDirectorySearcher.cpp" />
+    <ClCompile Include="FileIterator.cpp" />
+    <ClCompile Include="FileRecoveryManager.cpp" />
+    <ClCompile Include="FolderDialog.cpp" />
+    <ClCompile Include="FolderEventsListener.cpp" />
+    <ClCompile Include="GenericTask.cpp" />
+    <ClCompile Include="GenericTextEntity.cpp" />
+    <ClCompile Include="GuardedHourglassCursor.cpp" />
+    <ClCompile Include="HyperLink.cpp" />
+    <ClCompile Include="IceKey.Cpp" />
+    <ClCompile Include="IdleProcessKiller.cpp" />
+    <ClCompile Include="ImageButtonWithStyle.cpp" />
+    <ClCompile Include="INIFilePersistenceMgr.cpp" />
+    <ClCompile Include="KeywordListReader.cpp" />
+    <ClCompile Include="LevenshteinDistance.cpp" />
+    <ClCompile Include="LicenseUtils.cpp" />
+    <ClCompile Include="LineSegment.cpp" />
+    <ClCompile Include="ListControlSelectionRestorer.cpp" />
+    <ClCompile Include="LoadFileDlgThread.cpp" />
+    <ClCompile Include="LoginDlg.cpp" />
+    <ClCompile Include="LoopCurve.cpp" />
+    <ClCompile Include="LoopTrace.cpp" />
+    <ClCompile Include="MathUtil.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="Misc.cpp" />
+    <ClCompile Include="MRUList.cpp" />
+    <ClCompile Include="MutexUtils.cpp" />
+    <ClCompile Include="NamedObject.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="NamedValueTypePair.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="ObservableEvent.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="ObservableSubject.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="OEExceptionCaught.cpp" />
+    <ClCompile Include="OEStatusUpdate.cpp" />
+    <ClCompile Include="OptionsProcessor.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="PasswordDlg.cpp" />
+    <ClCompile Include="PickFileAndDelimiterDlg.cpp" />
+    <ClCompile Include="Point.cpp" />
+    <ClCompile Include="Points.cpp" />
+    <ClCompile Include="ProcessInformationWrapper.cpp" />
+    <ClCompile Include="ProcessStatisticsManager.cpp" />
+    <ClCompile Include="ProgressData.cpp" />
+    <ClCompile Include="ProgressDialog.cpp" />
+    <ClCompile Include="ProgressDlgTaskRunner.cpp" />
+    <ClCompile Include="Prompt2Dlg.cpp" />
+    <ClCompile Include="PromptDlg.cpp" />
+    <ClCompile Include="QuickMenuChooser.cpp" />
+    <ClCompile Include="Random.cpp" />
+    <ClCompile Include="RegExLoader.cpp" />
+    <ClCompile Include="RegistryPersistenceMgr.cpp" />
+    <ClCompile Include="ResizablePropertySheet.cpp" />
+    <ClCompile Include="ShellExecuteThread.cpp" />
+    <ClCompile Include="SplashWindow.cpp" />
+    <ClCompile Include="SplitterControl.cpp" />
+    <ClCompile Include="StdAfx.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="StopWatch.cpp" />
+    <ClCompile Include="StringCSIS.cpp" />
+    <ClCompile Include="StringTokenizer.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="SuspendWindowUpdates.cpp" />
+    <ClCompile Include="SystemHookMsgManager.cpp" />
+    <ClCompile Include="TaskManager.cpp" />
+    <ClCompile Include="TemporaryFileName.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="TemporaryResourceOverride.cpp" />
+    <ClCompile Include="TextFunctionExpander.cpp" />
+    <ClCompile Include="ThreadSafeLogFile.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="TimedRetryDlg.cpp" />
+    <ClCompile Include="TimeIntervalMerger.cpp" />
+    <ClCompile Include="TimeRollbackPreventer.cpp" />
+    <ClCompile Include="TimeRollbackPreventerWrapper.cpp" />
+    <ClCompile Include="UCLIDException.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="UCLIDExceptionDetailsDlg.cpp" />
+    <ClCompile Include="UCLIDExceptionDlg.cpp" />
+    <ClCompile Include="UMapStrStr.cpp" />
+    <ClCompile Include="UMapStrStrIter.cpp" />
+    <ClCompile Include="UniquelyIdentifiableObject.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="UPI.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="ValueTypePair.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="VariableRegistry.cpp" />
+    <ClCompile Include="VisualStylesXP.cpp" />
+    <ClCompile Include="Win32CriticalSection.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="Win32Event.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="Win32GlobalAtom.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="Win32Mutex.cpp" />
+    <ClCompile Include="Win32Semaphore.cpp" />
+    <ClCompile Include="Win32Timer.cpp" />
+    <ClCompile Include="Win32Util.cpp" />
+    <ClCompile Include="XBrowseForFolder.cpp" />
+    <ClCompile Include="XInfoTip.cpp" />
+    <ClCompile Include="NewHeaderCtrl.cpp" />
+    <ClCompile Include="NewTreeListCtrl.cpp" />
+    <ClCompile Include="TLFrame.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BaseUtils.def" />
+    <None Include="res\BaseUtils.rc2" />
+    <None Include="res\bitmap_i.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BaseUtils.rc">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AfxAppMainWindowRestorer.h" />
+    <ClInclude Include="Arguments.h" />
+    <ClInclude Include="BaseUtils.h" />
+    <ClInclude Include="BlockExtractor.h" />
+    <ClInclude Include="BooleanExpression.h" />
+    <ClInclude Include="ByteStream.h" />
+    <ClInclude Include="ByteStreamManipulator.h" />
+    <ClInclude Include="CachedObjectFromFile.h" />
+    <ClInclude Include="ChangePasswordDlg.h" />
+    <ClInclude Include="ClipboardManager.h" />
+    <ClInclude Include="CommentedTextFileReader.h" />
+    <ClInclude Include="CommonToExtractProducts.h" />
+    <ClInclude Include="COMUtils.h" />
+    <ClInclude Include="cpputil.h" />
+    <ClInclude Include="CpuUsage.h" />
+    <ClInclude Include="CursorToolTipCtrl.h" />
+    <ClInclude Include="DateUtil.h" />
+    <ClInclude Include="EncryptedFileManager.h" />
+    <ClInclude Include="EncryptionEngine.h" />
+    <ClInclude Include="ErrorInfo.h" />
+    <ClInclude Include="EventData.h" />
+    <ClInclude Include="EventID.h" />
+    <ClInclude Include="ExtractMFCUtils.h" />
+    <ClInclude Include="FailureDetectionAndReportingConstants.h" />
+    <ClInclude Include="FailureDetectionAndReportingMgr.h" />
+    <ClInclude Include="FileDateTimeRestorer.h" />
+    <ClInclude Include="FileDialogEx.h" />
+    <ClInclude Include="FileDirectorySearcher.h" />
+    <ClInclude Include="FileIterator.h" />
+    <ClInclude Include="FileRecoveryManager.h" />
+    <ClInclude Include="FolderDialog.h" />
+    <ClInclude Include="FolderEventsListener.h" />
+    <ClInclude Include="GenericObjectCloser.h" />
+    <ClInclude Include="GenericTask.h" />
+    <ClInclude Include="GenericTextEntity.h" />
+    <ClInclude Include="GuardedHourglassCursor.h" />
+    <ClInclude Include="HyperLink.h" />
+    <ClInclude Include="IceKey.h" />
+    <ClInclude Include="IConfigurationSettingsPersistenceMgr.h" />
+    <ClInclude Include="IdleProcessKiller.h" />
+    <ClInclude Include="ImageButtonWithStyle.h" />
+    <ClInclude Include="INIFilePersistenceMgr.h" />
+    <ClInclude Include="IProgress.h" />
+    <ClInclude Include="IProgressTask.h" />
+    <ClInclude Include="KeywordListReader.h" />
+    <ClInclude Include="LevenshteinDistance.h" />
+    <ClInclude Include="LicenseUtils.h" />
+    <ClInclude Include="LineSegment.h" />
+    <ClInclude Include="ListControlSelectionRestorer.h" />
+    <ClInclude Include="LoadFileDlgThread.h" />
+    <ClInclude Include="LoginDlg.h" />
+    <ClInclude Include="LoopCurve.h" />
+    <ClInclude Include="LoopTrace.h" />
+    <ClInclude Include="mathUtil.h" />
+    <ClInclude Include="Misc.h" />
+    <ClInclude Include="MRUList.h" />
+    <ClInclude Include="MTSafeQueue.h" />
+    <ClInclude Include="MutexUtils.h" />
+    <ClInclude Include="NamedObject.h" />
+    <ClInclude Include="NamedValueTypePair.h" />
+    <ClInclude Include="ObjectWithDebugInfo.h" />
+    <ClInclude Include="ObservableEvent.h" />
+    <ClInclude Include="ObservableSubject.h" />
+    <ClInclude Include="Observer.h" />
+    <ClInclude Include="OEExceptionCaught.h" />
+    <ClInclude Include="OEStatusUpdate.h" />
+    <ClInclude Include="OptionsProcessor.h" />
+    <ClInclude Include="PasswordDlg.h" />
+    <ClInclude Include="PerfCounters.h" />
+    <ClInclude Include="PersistStreamDefaultImpl.h" />
+    <ClInclude Include="PickFileAndDelimiterDlg.h" />
+    <ClInclude Include="Point.h" />
+    <ClInclude Include="Points.h" />
+    <ClInclude Include="ProcessInformationWrapper.h" />
+    <ClInclude Include="ProcessStatisticsManager.h" />
+    <ClInclude Include="ProgressData.h" />
+    <ClInclude Include="ProgressDialog.h" />
+    <ClInclude Include="ProgressDlgTaskRunner.h" />
+    <ClInclude Include="Prompt2Dlg.h" />
+    <ClInclude Include="PromptDlg.h" />
+    <ClInclude Include="QuickMenuChooser.h" />
+    <ClInclude Include="Random.h" />
+    <ClInclude Include="RegConstants.h" />
+    <ClInclude Include="RegExLoader.h" />
+    <ClInclude Include="RegistryPersistenceMgr.h" />
+    <ClInclude Include="ResizablePropertySheet.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="SafeTwoDimensionalArray.h" />
+    <ClInclude Include="ShellExecuteThread.h" />
+    <ClInclude Include="Singleton.h" />
+    <ClInclude Include="SplashWindow.h" />
+    <ClInclude Include="SplitterControl.h" />
+    <ClInclude Include="Stack2.h" />
+    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="StopWatch.h" />
+    <ClInclude Include="StringCSIS.h" />
+    <ClInclude Include="StringTokenizer.h" />
+    <ClInclude Include="SuspendWindowUpdates.h" />
+    <ClInclude Include="SystemHookMsgManager.h" />
+    <ClInclude Include="TaskManager.h" />
+    <ClInclude Include="TemporaryFileName.h" />
+    <ClInclude Include="TemporaryResourceOverride.h" />
+    <ClInclude Include="TextFunctionExpander.h" />
+    <ClInclude Include="ThreadSafeLogFile.h" />
+    <ClInclude Include="TimedRetryDlg.h" />
+    <ClInclude Include="TimeIntervalMerger.h" />
+    <ClInclude Include="TimeRollbackPreventer.h" />
+    <ClInclude Include="TimeRollbackPreventerWrapper.h" />
+    <ClInclude Include="TSSingleton.h" />
+    <ClInclude Include="UCLIDException.h" />
+    <ClInclude Include="UCLIDExceptionDetailsDlg.h" />
+    <ClInclude Include="UCLIDExceptionDlg.h" />
+    <ClInclude Include="UMapStrStr.h" />
+    <ClInclude Include="UMapStrStrIter.h" />
+    <ClInclude Include="UniquelyIdentifiableObject.h" />
+    <ClInclude Include="UPI.h" />
+    <ClInclude Include="ValueRestorer.h" />
+    <ClInclude Include="ValueTypePair.h" />
+    <ClInclude Include="VariableRegistry.h" />
+    <ClInclude Include="VersionInfo.h" />
+    <ClInclude Include="VisualStylesXP.h" />
+    <ClInclude Include="Win32CriticalSection.h" />
+    <ClInclude Include="Win32Event.h" />
+    <ClInclude Include="Win32GlobalAtom.h" />
+    <ClInclude Include="Win32Mutex.h" />
+    <ClInclude Include="Win32Semaphore.h" />
+    <ClInclude Include="Win32Timer.h" />
+    <ClInclude Include="Win32Util.h" />
+    <ClInclude Include="WindowsHookHandler.h" />
+    <ClInclude Include="XBrowseForFolder.h" />
+    <ClInclude Include="XInfoTip.h" />
+    <ClInclude Include="NewHeaderCtrl.h" />
+    <ClInclude Include="NewTreeListCtrl.h" />
+    <ClInclude Include="TLFrame.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\ProductDevelopment\Utils\GetFullUserName\Code\GetFullUserName.vcxproj">
+      <Project>{4fac64ad-4684-4fd9-88ab-e629e0561e68}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="BaseUtils.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
