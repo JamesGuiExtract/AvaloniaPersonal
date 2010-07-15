@@ -1,0 +1,369 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Template|Win32">
+      <Configuration>Template</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D3FEDB6F-D1FC-4098-8C18-BBF6C28803A9}</ProjectGuid>
+    <RootNamespace>RedactionCustomComponents</RootNamespace>
+    <SccProjectName>RedactionCustomComponents</SccProjectName>
+    <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
+    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
+    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
+    <Keyword>MFCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfAtl>Dynamic</UseOfAtl>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\..\..\binaries\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\Release\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\..\..\binaries\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\Debug\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">..\..\..\..\..\..\binaries\$(Configuration)\</OutDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">RedactionCC</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">RedactionCC</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">RedactionCC</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <CustomBuildStep>
+      <Message>Performing registration</Message>
+      <Command>regsvr32 /s /c "$(TargetPath)"
+echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
+</Command>
+      <Outputs>$(OutDir)regsvr32.trg;%(Outputs)</Outputs>
+    </CustomBuildStep>
+    <Midl>
+      <TypeLibraryName>.\..\Release/RedactionCustomComponents.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code;..\..\..\..\AFCore\Code;..\..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Include;..\..\..\..\AFUtils\Code;..\..\..\..\AFCppUtils\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_GXDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>.\..\Release/RedactionCustomComponents.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\Release/</AssemblerListingLocation>
+      <ObjectFileName>.\..\Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\Release/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>..\..\..\..\..\..\Binaries\Release/RedactionCC.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>..\..\..\..\..\..\ReusableComponents\APIs\RogueWave\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>.\RedactionCustomComponents.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>.\..\Release/RedactionCC.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\..\Release/RedactionCustomComponents.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CustomBuildStep>
+      <Message>Performing registration</Message>
+      <Command>regsvr32 /s /c "$(TargetPath)"
+echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
+</Command>
+      <Outputs>$(OutDir)regsvr32.trg;%(Outputs)</Outputs>
+    </CustomBuildStep>
+    <Midl>
+      <TypeLibraryName>.\..\Debug/RedactionCustomComponents.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code;..\..\..\..\AFCore\Code;..\..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Include;..\..\..\..\AFUtils\Code;..\..\..\..\AFCppUtils\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_GXDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>.\..\Debug/RedactionCustomComponents.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\..\Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\Debug/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>..\..\..\..\..\..\Binaries\Debug/RedactionCC.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>..\..\..\..\..\..\ReusableComponents\APIs\RogueWave\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>.\RedactionCustomComponents.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>.\..\Debug/RedactionCC.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>.\..\Debug/RedactionCC.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\..\Debug/RedactionCustomComponents.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="FeedbackDlg.cpp" />
+    <ClCompile Include="FilterIDShieldDataFileTask.cpp" />
+    <ClCompile Include="FilterIDShieldDataFileTaskPP.cpp" />
+    <ClCompile Include="IDShieldData.cpp" />
+    <ClCompile Include="IDShieldProductDBMgr.cpp" />
+    <ClCompile Include="IDShieldVOAFileContentsCondition.cpp" />
+    <ClCompile Include="IDShieldVOAFileContentsConditionPP.cpp" />
+    <ClCompile Include="ImageOutputDlg.cpp" />
+    <ClCompile Include="InputManagerEventHandler.cpp" />
+    <ClCompile Include="MetadataDlg.cpp" />
+    <ClCompile Include="RedactFileProcessor.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="RedactFileProcessorPP.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="RedactionAppearanceDlg.cpp" />
+    <ClCompile Include="RedactionCCUtils.cpp" />
+    <ClCompile Include="RedactionCustomComponents.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="RedactionTask.cpp" />
+    <ClCompile Include="RedactionTaskPP.cpp" />
+    <ClCompile Include="RedactionUISettings.cpp" />
+    <ClCompile Include="RedactionVerificationUI.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="RedactionVerificationUIPP.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="SelectTargetFileUI.cpp" />
+    <ClCompile Include="SelectTargetFileUIDlg.cpp" />
+    <ClCompile Include="SSNFinder.cpp" />
+    <ClCompile Include="SSNFinderPP.cpp" />
+    <ClCompile Include="StdAfx.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="RedactionCustomComponents.def" />
+    <None Include="res\dataarea.bmp" />
+    <None Include="res\DataAreaDialog.ico" />
+    <None Include="FilterIDShieldDataFileTask.rgs" />
+    <None Include="FilterIDShieldDataFileTaskPP.rgs" />
+    <None Include="res\icon_na.ico" />
+    <None Include="res\icon_noredact.ico" />
+    <None Include="res\icon_redact.ico" />
+    <None Include="res\icon_sel.ico" />
+    <None Include="IDShieldProductDBMgr.rgs" />
+    <None Include="IDShieldVOAFileContentsCondition.rgs" />
+    <None Include="IDShieldVOAFileContentsConditionPP.rgs" />
+    <None Include="RedactFileProcessor.rgs" />
+    <None Include="RedactFileProcessorPP.rgs" />
+    <None Include="RedactionTask.rgs" />
+    <None Include="RedactionTaskPP.rgs" />
+    <None Include="RedactionVerificationUI.rgs" />
+    <None Include="RedactionVerificationUIPP.rgs" />
+    <None Include="res\SelectDocTagArrow.ico" />
+    <None Include="SelectTargetFileUI.rgs" />
+    <None Include="SSNFinder.rgs" />
+    <None Include="SSNFinderPP.rgs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="RedactionCustomComponents.idl">
+      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateStublessProxies>
+      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\RedactionCustomComponents.tlb</TypeLibraryName>
+      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">RedactionCustomComponents.h</HeaderFileName>
+      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">RedactionCustomComponents_i.c</InterfaceIdentifierFileName>
+      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateStublessProxies>
+      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\RedactionCustomComponents.tlb</TypeLibraryName>
+      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">RedactionCustomComponents.h</HeaderFileName>
+      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">RedactionCustomComponents_i.c</InterfaceIdentifierFileName>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="RedactionCustomComponents.rc">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FeedbackDlg.h" />
+    <ClInclude Include="FilterIDShieldDataFileTask.h" />
+    <ClInclude Include="FilterIDShieldDataFileTaskPP.h" />
+    <ClInclude Include="IDShield_DB_SQL.h" />
+    <ClInclude Include="IDShieldData.h" />
+    <ClInclude Include="IDShieldProductDBMgr.h" />
+    <ClInclude Include="IDShieldVOAFileContentsCondition.h" />
+    <ClInclude Include="IDShieldVOAFileContentsConditionPP.h" />
+    <ClInclude Include="ImageOutputDlg.h" />
+    <ClInclude Include="MetadataDlg.h" />
+    <ClInclude Include="RedactFileProcessor.h" />
+    <ClInclude Include="RedactFileProcessorPP.h" />
+    <ClInclude Include="RedactionAppearanceDlg.h" />
+    <ClInclude Include="RedactionCCConstants.h" />
+    <ClInclude Include="RedactionCCUtils.h" />
+    <ClInclude Include="RedactionTask.h" />
+    <ClInclude Include="RedactionTaskPP.h" />
+    <ClInclude Include="RedactionUISettings.h" />
+    <ClInclude Include="RedactionVerificationUI.h" />
+    <ClInclude Include="RedactionVerificationUIPP.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="SelectTargetFileUI.h" />
+    <ClInclude Include="SelectTargetFileUIDlg.h" />
+    <ClInclude Include="Shortcuts.h" />
+    <ClInclude Include="SSNFinder.h" />
+    <ClInclude Include="SSNFinderPP.h" />
+    <ClInclude Include="StdAfx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj">
+      <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcxproj">
+      <Project>{91b17d62-305c-4ea4-add2-72ac7fe8d0af}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcxproj">
+      <Project>{6fa06b83-ac26-49b7-8138-9342792eacc4}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj">
+      <Project>{4a3a15dd-5c9d-4921-8d7e-3baf065fe984}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcxproj">
+      <Project>{7f591058-6dc9-4787-ae25-5a45ae78e3fa}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.vcxproj">
+      <Project>{2bb6c6e0-02ae-4bb0-aa61-bce9f226fbc9}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code\FAMUtils.vcxproj">
+      <Project>{5a74ecb3-8b17-42b5-b77f-44c35d489a64}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcxproj">
+      <Project>{6e3eeaf2-30a3-42be-be62-9cf2ba3702d2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.vcxproj">
+      <Project>{1a95338e-9bc0-49a8-b69e-9942dd7cebb3}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.vcxproj">
+      <Project>{037f8051-5f5f-48c4-9bf3-34aa990aa5de}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcxproj">
+      <Project>{08cc1afb-7b9d-42e5-b823-dc72cdc06631}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\AFCore\Code\AFCore.vcxproj">
+      <Project>{83c2c49f-e325-4abf-b4eb-8125ee2dd4fa}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\AFCppUtils\Code\AFCppUtils.vcxproj">
+      <Project>{1bdb2a4e-7678-42c1-9828-5ef4f522ab21}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\AFUtils\Code\AFUtils.vcxproj">
+      <Project>{80e248c0-9aff-42bc-9cbf-b4274d19298c}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\AFValueModifiers\Code\AFValueModifiers.vcxproj">
+      <Project>{1af05090-95c1-48bf-8e74-3f05844b63b0}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="RedactionCustomComponents.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
