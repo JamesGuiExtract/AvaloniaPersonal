@@ -27,6 +27,7 @@ EngineeringRootDirectory=$(BuildRootDirectory)\Engineering
 ReusableComponentsRootDirectory=$(EngineeringRootDirectory)\ReusableComponents
 CommonDirectory=$(EngineeringRootDirectory)\ProductDevelopment\Common
 FXCopAppDirectory=C:\Program Files\Microsoft FxCop 1.36
+MergeModuleDir=C:\InstallShield 2010 Projects\MergeModules
 
 # Create macros for the Visual C++ include and lib directories
 VcppIncludeDirs=$(VCPP_DIR)\ATLMFC\INCLUDE;$(VCPP_DIR)\INCLUDE;$(VCPP_DIR)\PlatformSDK\include;$(VISUAL_STUDIO)\SDK\v2.0\include;

@@ -316,57 +316,14 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>COMLM.dll</td><td>{79D7362E-FA2D-4EC7-B1F4-FAE84000689A}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>comlm.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>CaereDlls</td><td>{FBEB188F-F0BE-4377-9713-3E345F7F24FC}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>DeskTopIcon</td><td>{ABCD5C05-A57A-4F28-88A8-3C38E85BF27F}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>DotNetCode</td><td>{FDF537A9-4ECE-4A92-8073-70BF186C385E}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESActMaskPCE.dll</td><td>{1AC7E1E0-DDF2-43AD-A209-8A09264CED90}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>esactmaskpce.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESPrintCaptureCore.dll</td><td>{71231F76-E1C1-4B9A-A0E2-AD1FAD8CCD99}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>esprintcapturecore.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extact.Drawing.dll</td><td>{DE4D40CF-F2C8-4C1F-9BE0-D6DBFAE04BA5}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>extract.drawing.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.Encryption.dll</td><td>{95B126C0-111F-45CA-B93B-CA74DE2A3E12}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>extract.encryption.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.Imaging.Forms.dll</td><td>{342D8280-9EFD-4477-99AD-1BCD897756D2}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>extract.imaging.forms.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.Licensing.dll</td><td>{B6FF3C21-F31E-48B9-B1FD-FEDBD027119B}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>extract.licensing.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.Utilities.Forms.dll</td><td>{11022491-7D7A-4887-B875-7A1AA82B3FF9}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>extract.utilities.forms.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.Utilities.dll</td><td>{B9C2BF84-53AC-4EE2-95AA-0CECFFB49505}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>extract.utilities.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.dll</td><td>{340A9568-F93E-422B-A57B-B923E1B01086}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>extract.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{00B64C4B-345A-4AB0-A6AB-B7836E9A3EF7}</td><td>HELP</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>IEVBScriptParser.dll</td><td>{2009A3C8-6843-425A-A449-6448028C0C2A}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>ievbscriptparser.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Interop.UCLID_COMLMLib.dll</td><td>{25D0B708-B16F-4BCE-ACBC-0342C0C2B53F}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>interop.uclid_comlmlib.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Interop.UCLID_COMUTILSLib.dll</td><td>{B93CD2DF-5652-491E-BFD8-58032839A04D}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>interop.uclid_comutilslib.dl</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Interop.UCLID_EXCEPTIONMGMTLib.dll</td><td>{97F4DC59-6FB4-4B7C-95CE-6758C2E409C4}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>interop.uclid_exceptionmgmtl</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Interop.UCLID_RASTERANDOCRMGMTLib.dll</td><td>{A902C2FB-12C6-4A99-86AF-AC2F94049969}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>interop.uclid_rasterandocrmg</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Interop.UCLID_SSOCRLib.dll</td><td>{777A0F50-8253-4635-94BC-455D67CFD6DA}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>interop.uclid_ssocrlib.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>LeadTools</td><td>{BE53B3E5-8C9F-4210-A21E-06196C7C5875}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Annotations.dll</td><td>{312A54DC-CAAD-432A-83AF-100B5641DB0D}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.annotations.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Bmp.dll</td><td>{98C2C3C8-E2D2-4D53-9473-0B35A788A61C}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.bmp.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Cal.dll</td><td>{0EA6D2F1-EA60-438B-8DDD-C093FB6B23F1}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.cal.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Cmp.dll</td><td>{8E079C56-D54D-4D07-B700-FAAFFFF084ED}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.cmp.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Eps.dll</td><td>{C9C64384-1903-49AC-8E5E-649E918F622E}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.eps.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Fax.dll</td><td>{CA296E35-D195-437B-B426-38843B355DF2}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.fax.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Gif.dll</td><td>{800704BB-A4BC-4DA1-99E9-3E213A00374C}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.gif.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Pcx.dll</td><td>{8EF3D602-A2B5-4866-AAC4-13B6D86CA07C}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.pcx.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Pdf.dll</td><td>{6E9E23C0-DDC7-483B-926C-A80676BA3872}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.pdf.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Png.dll</td><td>{C39D1DA2-7FD9-4D9F-9AE2-8A6366695531}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.png.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Psd.dll</td><td>{A1CE85E7-1BE7-4BAB-AC5F-767963AB784F}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.psd.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Raw.dll</td><td>{62D8269A-A8A5-4C16-A8BC-D69DF60319E5}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.raw.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Tif.dll</td><td>{D9C15683-CB6B-4381-9592-CA190D1D6169}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.tif.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.Wmf.dll</td><td>{28410D68-C64F-482C-873F-B7117E035AB3}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.wmf.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Codecs.dll</td><td>{15505E3F-F0D5-4508-90BA-42C154E801B4}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.codecs.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Kernel.Annotations.dll</td><td>{E6C89A86-233F-4584-890A-BF70BF590726}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.kernel.annotations</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.Pdf.dll</td><td>{23218806-CE9C-41B8-8194-1DF33BFA6B4A}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.pdf.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.WinForms.dll</td><td>{F36A959F-0DF0-4FA0-91C8-9F581B7A9BF9}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.winforms.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Leadtools.dll</td><td>{C74BF86A-A7A0-4791-A5F6-438455BE50A2}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>leadtools.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>QuickLaunchIcon</td><td>{7D0EE19A-C754-4D98-B47E-EF47F4E9DDF2}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>RogueWave</td><td>{204B5D90-C450-43CD-A08F-61A972ABBE10}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Rules</td><td>{128AE738-2044-4CDE-B2BD-B8023546EE78}</td><td>RULES</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>SSOCR.dll</td><td>{1FB11CEC-062B-47BB-A3DA-07D464410D38}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>ssocr.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>SSOCR2.exe</td><td>{A3D930BB-CAA8-49CB-A480-2692CB316181}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>ssocr2.exe</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>SandDock.dll</td><td>{73DC10D9-9B05-4020-9C60-EC53F6B71BA9}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>sanddock.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Shared</td><td>{44CD9FA0-1E44-4F01-AA58-C5EDD4E9269A}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>UCLIDCOMUtils.dll</td><td>{CED838A5-7236-4C90-BC7F-9B08C87F59E5}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>uclidcomutils.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>UCLIDExceptionMgmt.dll</td><td>{6638E054-E7EF-4A78-85FF-A9653DAEF835}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>uclidexceptionmgmt.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>UCLIDImageUtils.dll</td><td>{3390C39E-F910-4D93-8001-D0CE7B6B101B}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>uclidimageutils.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>UCLIDRasterAndOCRMgmt.dll</td><td>{D75FF1C3-957F-4419-AEA1-7019517D1EE4}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>uclidrasterandocrmgmt.dll</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -543,7 +500,6 @@
 		<col def="l255">Name</col>
 		<col def="L255">Value</col>
 		<col def="s72">Component_</col>
-		<row><td>NewEnvironment1</td><td>##ID_STRING10##</td><td>##ID_STRING11##</td><td>COMLM.dll</td></row>
 	</table>
 
 	<table name="Error">
@@ -1200,55 +1156,12 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>DefaultFeature</td><td>COMLM.dll</td></row>
-		<row><td>DefaultFeature</td><td>CaereDlls</td></row>
 		<row><td>DefaultFeature</td><td>DotNetCode</td></row>
 		<row><td>DefaultFeature</td><td>ESActMaskPCE.dll</td></row>
 		<row><td>DefaultFeature</td><td>ESPrintCaptureCore.dll</td></row>
-		<row><td>DefaultFeature</td><td>Extact.Drawing.dll</td></row>
-		<row><td>DefaultFeature</td><td>Extract.Encryption.dll</td></row>
-		<row><td>DefaultFeature</td><td>Extract.Imaging.Forms.dll</td></row>
-		<row><td>DefaultFeature</td><td>Extract.Licensing.dll</td></row>
-		<row><td>DefaultFeature</td><td>Extract.Utilities.Forms.dll</td></row>
-		<row><td>DefaultFeature</td><td>Extract.Utilities.dll</td></row>
-		<row><td>DefaultFeature</td><td>Extract.dll</td></row>
 		<row><td>DefaultFeature</td><td>Help</td></row>
-		<row><td>DefaultFeature</td><td>IEVBScriptParser.dll</td></row>
-		<row><td>DefaultFeature</td><td>Interop.UCLID_COMLMLib.dll</td></row>
-		<row><td>DefaultFeature</td><td>Interop.UCLID_COMUTILSLib.dll</td></row>
-		<row><td>DefaultFeature</td><td>Interop.UCLID_EXCEPTIONMGMTLib.dll</td></row>
-		<row><td>DefaultFeature</td><td>Interop.UCLID_RASTERANDOCRMGMTLib.dll</td></row>
-		<row><td>DefaultFeature</td><td>Interop.UCLID_SSOCRLib.dll</td></row>
-		<row><td>DefaultFeature</td><td>LeadTools</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Annotations.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Bmp.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Cal.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Cmp.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Eps.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Fax.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Gif.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Pcx.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Pdf.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Png.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Psd.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Raw.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Tif.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.Wmf.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Codecs.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Kernel.Annotations.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.Pdf.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.WinForms.dll</td></row>
-		<row><td>DefaultFeature</td><td>Leadtools.dll</td></row>
-		<row><td>DefaultFeature</td><td>RogueWave</td></row>
 		<row><td>DefaultFeature</td><td>Rules</td></row>
-		<row><td>DefaultFeature</td><td>SSOCR.dll</td></row>
-		<row><td>DefaultFeature</td><td>SSOCR2.exe</td></row>
-		<row><td>DefaultFeature</td><td>SandDock.dll</td></row>
 		<row><td>DefaultFeature</td><td>Shared</td></row>
-		<row><td>DefaultFeature</td><td>UCLIDCOMUtils.dll</td></row>
-		<row><td>DefaultFeature</td><td>UCLIDExceptionMgmt.dll</td></row>
-		<row><td>DefaultFeature</td><td>UCLIDImageUtils.dll</td></row>
-		<row><td>DefaultFeature</td><td>UCLIDRasterAndOCRMgmt.dll</td></row>
 		<row><td>Desktop</td><td>DeskTopIcon</td></row>
 		<row><td>QuickLaunch</td><td>QuickLaunchIcon</td></row>
 	</table>
@@ -1265,49 +1178,9 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
-		<row><td>comlm.dll</td><td>COMLM.dll</td><td>COMLM.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGISTERING_FILES&gt;\COMLM.dll</td><td>1</td><td/></row>
 		<row><td>esactmaskpce.dll</td><td>ESActMaskPCE.dll</td><td>ESACTM~1.DLL|ESActMaskPCE.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGISTERING_FILES&gt;\ESActMaskPCE.dll</td><td>1</td><td/></row>
 		<row><td>esprintcapturecore.dll</td><td>ESPrintCaptureCore.dll</td><td>ESPRIN~1.DLL|ESPrintCaptureCore.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGISTERING_FILES&gt;\ESPrintCaptureCore.dll</td><td>1</td><td/></row>
-		<row><td>extract.dll</td><td>Extract.dll</td><td>Extract.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Extract.dll</td><td>1</td><td/></row>
-		<row><td>extract.drawing.dll</td><td>Extact.Drawing.dll</td><td>EXTRAC~1.DLL|Extract.Drawing.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Extract.Drawing.dll</td><td>1</td><td/></row>
-		<row><td>extract.encryption.dll</td><td>Extract.Encryption.dll</td><td>EXTRAC~1.DLL|Extract.Encryption.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Extract.Encryption.dll</td><td>1</td><td/></row>
-		<row><td>extract.imaging.forms.dll</td><td>Extract.Imaging.Forms.dll</td><td>EXTRAC~1.DLL|Extract.Imaging.Forms.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Extract.Imaging.Forms.dll</td><td>1</td><td/></row>
-		<row><td>extract.licensing.dll</td><td>Extract.Licensing.dll</td><td>EXTRAC~1.DLL|Extract.Licensing.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Extract.Licensing.dll</td><td>1</td><td/></row>
-		<row><td>extract.utilities.dll</td><td>Extract.Utilities.dll</td><td>EXTRAC~1.DLL|Extract.Utilities.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Extract.Utilities.dll</td><td>1</td><td/></row>
-		<row><td>extract.utilities.forms.dll</td><td>Extract.Utilities.Forms.dll</td><td>EXTRAC~1.DLL|Extract.Utilities.Forms.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Extract.Utilities.Forms.dll</td><td>1</td><td/></row>
 		<row><td>idshieldoffice.exe</td><td>DotNetCode</td><td>IDSHIE~1.EXE|IDShieldOffice.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\IDShieldOffice.exe</td><td>1</td><td/></row>
-		<row><td>ievbscriptparser.dll</td><td>IEVBScriptParser.dll</td><td>IEVBSC~1.DLL|IEVBScriptParser.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGISTERING_FILES&gt;\IEVBScriptParser.dll</td><td>1</td><td/></row>
-		<row><td>interop.uclid_comlmlib.dll</td><td>Interop.UCLID_COMLMLib.dll</td><td>INTERO~1.DLL|Interop.UCLID_COMLMLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Interop.UCLID_COMLMLib.dll</td><td>1</td><td/></row>
-		<row><td>interop.uclid_comutilslib.dl</td><td>Interop.UCLID_COMUTILSLib.dll</td><td>INTERO~1.DLL|Interop.UCLID_COMUTILSLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Interop.UCLID_COMUTILSLib.dll</td><td>1</td><td/></row>
-		<row><td>interop.uclid_exceptionmgmtl</td><td>Interop.UCLID_EXCEPTIONMGMTLib.dll</td><td>INTERO~1.DLL|Interop.UCLID_EXCEPTIONMGMTLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Interop.UCLID_EXCEPTIONMGMTLib.dll</td><td>1</td><td/></row>
-		<row><td>interop.uclid_rasterandocrmg</td><td>Interop.UCLID_RASTERANDOCRMGMTLib.dll</td><td>INTERO~1.DLL|Interop.UCLID_RASTERANDOCRMGMTLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Interop.UCLID_RASTERANDOCRMGMTLib.dll</td><td>1</td><td/></row>
-		<row><td>interop.uclid_ssocrlib.dll</td><td>Interop.UCLID_SSOCRLib.dll</td><td>INTERO~1.DLL|Interop.UCLID_SSOCRLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\Interop.UCLID_SSOCRLib.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.annotations.dll</td><td>Leadtools.Annotations.dll</td><td>LEADTO~1.DLL|Leadtools.Annotations.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Annotations.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.bmp.dll</td><td>Leadtools.Codecs.Bmp.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Bmp.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Bmp.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.cal.dll</td><td>Leadtools.Codecs.Cal.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Cal.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Cal.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.cmp.dll</td><td>Leadtools.Codecs.Cmp.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Cmp.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Cmp.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.dll</td><td>Leadtools.Codecs.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.eps.dll</td><td>Leadtools.Codecs.Eps.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Eps.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Eps.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.fax.dll</td><td>Leadtools.Codecs.Fax.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Fax.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Fax.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.gif.dll</td><td>Leadtools.Codecs.Gif.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Gif.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Gif.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.pcx.dll</td><td>Leadtools.Codecs.Pcx.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Pcx.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Pcx.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.pdf.dll</td><td>Leadtools.Codecs.Pdf.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Pdf.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Pdf.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.png.dll</td><td>Leadtools.Codecs.Png.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Png.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Png.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.psd.dll</td><td>Leadtools.Codecs.Psd.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Psd.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Psd.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.raw.dll</td><td>Leadtools.Codecs.Raw.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Raw.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Raw.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.tif.dll</td><td>Leadtools.Codecs.Tif.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Tif.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Tif.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.codecs.wmf.dll</td><td>Leadtools.Codecs.Wmf.dll</td><td>LEADTO~1.DLL|Leadtools.Codecs.Wmf.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Codecs.Wmf.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.dll</td><td>Leadtools.dll</td><td>LEADTO~1.DLL|Leadtools.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.kernel.annotations</td><td>Leadtools.Kernel.Annotations.dll</td><td>LEADTO~1.DLL|Leadtools.Kernel.Annotations.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Kernel.Annotations.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.pdf.dll</td><td>Leadtools.Pdf.dll</td><td>LEADTO~1.DLL|Leadtools.Pdf.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.Pdf.dll</td><td>1</td><td/></row>
-		<row><td>leadtools.winforms.dll</td><td>Leadtools.WinForms.dll</td><td>LEADTO~1.DLL|Leadtools.WinForms.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LEADTOOLSDOTNET_FILES&gt;\Leadtools.WinForms.dll</td><td>1</td><td/></row>
-		<row><td>sanddock.dll</td><td>SandDock.dll</td><td>SandDock.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNET_FILES&gt;\SandDock.dll</td><td>1</td><td/></row>
-		<row><td>ssocr.dll</td><td>SSOCR.dll</td><td>SSOCR.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGISTERING_FILES&gt;\SSOCR.dll</td><td>1</td><td/></row>
-		<row><td>ssocr2.exe</td><td>SSOCR2.exe</td><td>SSOCR2.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGISTERING_FILES&gt;\SSOCR2.exe</td><td>1</td><td/></row>
-		<row><td>uclidcomutils.dll</td><td>UCLIDCOMUtils.dll</td><td>UCLIDC~1.DLL|UCLIDCOMUtils.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGISTERING_FILES&gt;\UCLIDCOMUtils.dll</td><td>1</td><td/></row>
-		<row><td>uclidexceptionmgmt.dll</td><td>UCLIDExceptionMgmt.dll</td><td>UCLIDE~1.DLL|UCLIDExceptionMgmt.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGISTERING_FILES&gt;\UCLIDExceptionMgmt.dll</td><td>1</td><td/></row>
-		<row><td>uclidimageutils.dll</td><td>UCLIDImageUtils.dll</td><td>UCLIDI~1.DLL|UCLIDImageUtils.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGISTERING_FILES&gt;\UCLIDImageUtils.dll</td><td>1</td><td/></row>
-		<row><td>uclidrasterandocrmgmt.dll</td><td>UCLIDRasterAndOCRMgmt.dll</td><td>UCLIDR~1.DLL|UCLIDRasterAndOCRMgmt.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGISTERING_FILES&gt;\UCLIDRasterAndOCRMgmt.dll</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -1556,57 +1429,14 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
-		<row><td>COMLM.dll</td><td/><td/><td>_F85CE63A_747E_4A57_AAE2_2755E4BD38CB_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>CaereDlls</td><td/><td/><td>_70C9F8EF_5A92_4B05_AEA2_D509031CD98E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>DeskTopIcon</td><td/><td/><td>_9A5309A5_839B_472A_985D_ABFA361F9F28_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>DotNetCode</td><td/><td/><td>_34D7466B_8E5E_427C_B947_A46DAADCC2FD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ESActMaskPCE.dll</td><td/><td/><td>_54F74631_DF97_4924_8B71_42520DA352BC_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ESPrintCaptureCore.dll</td><td/><td/><td>_3E02522B_CB20_47C7_98AE_08CD4B114A21_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Extact.Drawing.dll</td><td/><td/><td>_BEC7318B_A7CE_4B81_9862_7F3415695C1C_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Extract.Encryption.dll</td><td/><td/><td>_0703C989_85E2_4C9E_AFC8_64DED02B7042_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Extract.Imaging.Forms.dll</td><td/><td/><td>_75E2F9F8_462B_4A5E_954A_E6544EDFC9AA_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Extract.Licensing.dll</td><td/><td/><td>_E047AE86_B99D_4249_B1F0_4A67529F3D2C_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Extract.Utilities.Forms.dll</td><td/><td/><td>_3D99B28E_87B1_4EB7_9C3C_C8150E99E938_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Extract.Utilities.dll</td><td/><td/><td>_43068BAB_86A3_4874_A23C_429641CE4FD0_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Extract.dll</td><td/><td/><td>_E2305EC9_1D07_4299_9483_7519A2E22613_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Help</td><td/><td/><td>_738738F8_F35D_43B5_A636_23543F5BEB5E_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>IEVBScriptParser.dll</td><td/><td/><td>_5AF531AA_E65F_4E83_B4AA_EB437E1BE3CA_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Interop.UCLID_COMLMLib.dll</td><td/><td/><td>_D2DF226E_ABB2_4DAF_88F2_0C58C7DB15E9_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Interop.UCLID_COMUTILSLib.dll</td><td/><td/><td>_533A5262_2CCF_4037_BE63_84F91BEAB655_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Interop.UCLID_EXCEPTIONMGMTLib.dll</td><td/><td/><td>_9F314164_8054_4585_B551_7901202105F4_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Interop.UCLID_RASTERANDOCRMGMTLib.dll</td><td/><td/><td>_6E5FA520_AEC1_45C1_881C_F62C0517697F_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Interop.UCLID_SSOCRLib.dll</td><td/><td/><td>_37877A60_FB70_4C32_84DE_38C9F107FE4E_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>LeadTools</td><td/><td/><td>_3FC2F04A_D869_489C_BE71_C27598AA5292_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Annotations.dll</td><td/><td/><td>_8F8CD2E2_E068_48B6_877F_8BDC29583544_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Bmp.dll</td><td/><td/><td>_82AB92E3_D304_443D_9BE2_345E08012F5A_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Cal.dll</td><td/><td/><td>_655733AE_44E4_4A81_8AAC_8AA0E9808CB6_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Cmp.dll</td><td/><td/><td>_47AA46F4_9073_4828_850F_E0EF021F6E91_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Eps.dll</td><td/><td/><td>_BA8D32AA_91BF_4F25_945F_E81394C76933_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Fax.dll</td><td/><td/><td>_0ADE3E4F_643E_446C_A784_DDA81625B836_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Gif.dll</td><td/><td/><td>_F4E41C34_4ED6_4945_A436_81556446A997_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Pcx.dll</td><td/><td/><td>_DF5F1A73_A4F8_43C2_BFF3_EDBFE5B26183_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Pdf.dll</td><td/><td/><td>_331BC8B0_0B52_4FCA_AB80_C464D52955C6_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Png.dll</td><td/><td/><td>_61B08FBE_E06C_43A7_AFC2_F96CEBC41475_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Psd.dll</td><td/><td/><td>_9A953CC0_05FF_4EF6_B83B_82018A00F388_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Raw.dll</td><td/><td/><td>_97B4DF15_840D_4D0B_8E12_2C1830663B54_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Tif.dll</td><td/><td/><td>_1B0330BE_E266_4CB7_BF00_974333EE7D48_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.Wmf.dll</td><td/><td/><td>_74DC879F_359D_47AA_A2BC_D731AFC7DAAE_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Codecs.dll</td><td/><td/><td>_1B22BFB7_5A59_4E7E_B871_7BFB1FC8160D_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Kernel.Annotations.dll</td><td/><td/><td>_C36B83A8_DDC5_4F06_B4F8_1B56650DB69E_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.Pdf.dll</td><td/><td/><td>_0FD15CE8_3420_48D6_9D37_1D6304FA0A40_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.WinForms.dll</td><td/><td/><td>_80696C26_CC0A_4CA6_B87A_E531B210532A_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Leadtools.dll</td><td/><td/><td>_5A059377_D467_4BD7_A87D_94D6B0BE450E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>QuickLaunchIcon</td><td/><td/><td>_FA7AD3FE_C709_47A9_B6F1_52CDED29D695_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>RogueWave</td><td/><td/><td>_32D9B76F_2270_45B2_8E7F_710CA9C407E2_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Rules</td><td/><td/><td>_D36E7AD1_B5F8_4259_B7FA_14BC81570B73_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>SSOCR.dll</td><td/><td/><td>_1C1A7727_55F8_4E0E_8F8D_152BAD054B39_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>SSOCR2.exe</td><td/><td/><td>_A31D21ED_E1AE_4C98_993C_555F09A70201_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>SandDock.dll</td><td/><td/><td>_BFB240EA_82DE_4648_92FF_7D39A3BFD1A8_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Shared</td><td/><td/><td>_E8DDBB52_D08D_4D6D_8A14_531661F3BFD9_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>UCLIDCOMUtils.dll</td><td/><td/><td>_2833B097_313F_4319_94EF_E26EE0C6209D_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>UCLIDExceptionMgmt.dll</td><td/><td/><td>_00A62C70_1EDD_47EF_9BD9_5B323DF925A1_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>UCLIDImageUtils.dll</td><td/><td/><td>_AB6546BF_223E_4B77_820F_73C5CE24AC13_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>UCLIDRasterAndOCRMgmt.dll</td><td/><td/><td>_1C4F4C17_EDA3_4B31_9A44_AB07977A3550_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -1665,10 +1495,7 @@
 		<col def="S0">IncludeFiles</col>
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>CaereDlls</td><td>&lt;PATH_TO_CAEREDLLS_FILES&gt;</td><td>4</td><td/><td/><td>2</td></row>
 		<row><td>Help</td><td>&lt;PATH_TO_HELP_FILES&gt;</td><td>4</td><td/><td/><td>2</td></row>
-		<row><td>LeadTools</td><td>&lt;PATH_TO_LEADTOOLS_FILES&gt;</td><td>4</td><td/><td/><td>2</td></row>
-		<row><td>RogueWave</td><td>&lt;PATH_TO_ROGUEWAVEDLLS_FILES&gt;</td><td>4</td><td/><td/><td>2</td></row>
 		<row><td>Rules</td><td>&lt;PATH_RULES&gt;</td><td>4</td><td>*.ese, *.etf</td><td/><td>2</td></row>
 		<row><td>Shared</td><td>&lt;PATH_TO_NONSELFREGCOMMO_FILES&gt;</td><td>4</td><td/><td/><td>2</td></row>
 	</table>
@@ -1703,12 +1530,8 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s255">ISMergeModule_</col>
 		<col key="yes" def="i2">Language_</col>
-		<row><td>DefaultFeature</td><td>ATL.97F81AF1_0E47_DC99_FF1F_C8B3B9A1E18E</td><td>0</td></row>
-		<row><td>DefaultFeature</td><td>CRT.98CB24AD_52FB_DB5F_FF1F_C8B3B9A1E18E</td><td>0</td></row>
-		<row><td>DefaultFeature</td><td>MFC.9BAE13A2_E7AF_D6C3_FF1F_C8B3B9A1E18E</td><td>0</td></row>
 		<row><td>DefaultFeature</td><td>VC_User_ATL71.15ACF2F5_9BDB_4FFF_9C85_9814946343FF</td><td>0</td></row>
-		<row><td>DefaultFeature</td><td>VC_User_CRT71.07D8793C_DC93_47EF_8FDA_3517BC941A0F</td><td>0</td></row>
-		<row><td>DefaultFeature</td><td>VC_User_STL71.09528776_2EA8_4A65_AA88_693146381D7D</td><td>0</td></row>
+		<row><td>Shortcuts</td><td>ExtractFlexCommonMM.BCD531AF_AE91_4ED0_8B2F_F7EA7D90E806</td><td>0</td></row>
 	</table>
 
 	<table name="ISFeatureSetupPrerequisites">
@@ -1832,12 +1655,8 @@
 		<col def="s255">Name</col>
 		<col def="S255">Destination</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>ATL.97F81AF1_0E47_DC99_FF1F_C8B3B9A1E18E</td><td>0</td><td>Visual C++ 8.0 ATL (x86) WinSXS MSM</td><td/><td/></row>
-		<row><td>CRT.98CB24AD_52FB_DB5F_FF1F_C8B3B9A1E18E</td><td>0</td><td>Visual C++ 8.0 CRT (x86) WinSXS MSM</td><td/><td/></row>
-		<row><td>MFC.9BAE13A2_E7AF_D6C3_FF1F_C8B3B9A1E18E</td><td>0</td><td>Visual C++ 8.0 MFC (x86) WinSXS MSM</td><td/><td/></row>
+		<row><td>ExtractFlexCommonMM.BCD531AF_AE91_4ED0_8B2F_F7EA7D90E806</td><td>0</td><td>Extract Flex Common Merge Module</td><td/><td/></row>
 		<row><td>VC_User_ATL71.15ACF2F5_9BDB_4FFF_9C85_9814946343FF</td><td>0</td><td>VC User ATL71 RTL X86 ---</td><td>[COMMONCOMPONENTS]</td><td/></row>
-		<row><td>VC_User_CRT71.07D8793C_DC93_47EF_8FDA_3517BC941A0F</td><td>0</td><td>VC User CRT71 RTL X86 ---</td><td>[COMMONCOMPONENTS]</td><td/></row>
-		<row><td>VC_User_STL71.09528776_2EA8_4A65_AA88_693146381D7D</td><td>0</td><td>VC User STL71 RTL X86 ---</td><td>[COMMONCOMPONENTS]</td><td/></row>
 	</table>
 
 	<table name="ISMergeModuleCfgValues">
@@ -4021,8 +3840,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>Registry10</td><td>0</td><td>ID Shield Office File\shell\open\command</td><td/><td>"[BIN]IDShieldOffice.exe" "%1"</td><td>DotNetCode</td><td>0</td></row>
 		<row><td>Registry11</td><td>2</td><td>Software\Extract Systems\ReusableComponents\BaseUtils</td><td>TRP_ReadWriteTimeOut</td><td>60000</td><td>Shared</td><td>0</td></row>
 		<row><td>Registry12</td><td>2</td><td>Software\Extract Systems\ReusableComponents\BaseUtils</td><td>ExceptionAutoTimeout</td><td>0</td><td>Shared</td><td>0</td></row>
-		<row><td>Registry16</td><td>2</td><td>SOFTWARE\Extract Systems\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2</td><td/><td/><td>SSOCR2.exe</td><td>0</td></row>
-		<row><td>Registry17</td><td>2</td><td>SOFTWARE\Extract Systems\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2</td><td>MaxFilesPerInstance</td><td>1000</td><td>SSOCR2.exe</td><td>0</td></row>
 		<row><td>Registry2</td><td>2</td><td>SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\IDShieldOffice.exe</td><td>Path</td><td>[BIN];[COMMONCOMPONENTS]</td><td>DotNetCode</td><td>0</td></row>
 		<row><td>Registry3</td><td>0</td><td>.uex</td><td/><td>Extract Systems UEX File</td><td>DotNetCode</td><td>0</td></row>
 		<row><td>Registry4</td><td>0</td><td>Extract Systems UEX File\DefaultIcon</td><td/><td>[COMMONCOMPONENTS]UEXViewer.exe,0</td><td>DotNetCode</td><td>0</td></row>

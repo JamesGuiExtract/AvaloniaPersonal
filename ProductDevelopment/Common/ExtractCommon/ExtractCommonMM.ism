@@ -1092,10 +1092,19 @@ QwBEAFIATwBNAAEATQBlAGQAaQBhAA==
 		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>ATL.Policy.66332652_9C28_58B1_FF1F_C8B3B9A1E18E</td><td>0</td><td>8.0.50727.762</td></row>
 		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>CRT.98CB24AD_52FB_DB5F_FF1F_C8B3B9A1E18E</td><td>0</td><td>8.0.50727.762</td></row>
 		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>CRT.Policy.63E949F6_03BC_5C40_FF1F_C8B3B9A1E18E</td><td>0</td><td>8.0.50727.762</td></row>
+		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>MDAC27ENU.C9C35FC7_5AEE_4C1E_8BD2_80ED9FA87FFF</td><td>0</td><td>1.1.0.0</td></row>
 		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>MFC.9BAE13A2_E7AF_D6C3_FF1F_C8B3B9A1E18E</td><td>0</td><td>8.0.50727.762</td></row>
 		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>MFC.Policy.68B7C6D9_1DF2_54C1_FF1F_C8B3B9A1E18E</td><td>0</td><td>8.0.50727.762</td></row>
+		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>MFCLOC.74FD3CE6_2A8D_0E9C_FF1F_C8B3B9A1E18E</td><td>0</td><td>8.0.50727.762</td></row>
+		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>MFCLOC.Policy.D2730D3F_3C41_5884_FF1F_C8B3B9A1E18E</td><td>0</td><td>8.0.50727.762</td></row>
+		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>MSVCIRT.3CE1F932_C090_11D2_977B_006097C4DE24</td><td>0</td><td>6.0.8168.0</td></row>
 		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>MSVCP60.51D569E3_8A28_11D2_B962_006097C4DE24</td><td>0</td><td>6.0.8168.0</td></row>
 		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>MSVCRT.51D569E0_8A28_11D2_B962_006097C4DE24</td><td>0</td><td>6.0.8797.0</td></row>
+		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>OpenMP.1E507087_0819_45E0_FF1F_C8B3B9A1E18E</td><td>0</td><td>8.0.50727.762</td></row>
+		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>OpenMP.Policy.04B9F3B6_9645_7658_FF1F_C8B3B9A1E18E</td><td>0</td><td>8.0.50727.762</td></row>
+		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>VC_User_ATL71.15ACF2F5_9BDB_4FFF_9C85_9814946343FF</td><td>0</td><td>1.0</td></row>
+		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>VC_User_CRT71.07D8793C_DC93_47EF_8FDA_3517BC941A0F</td><td>0</td><td>1.0</td></row>
+		<row><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>VC_User_MFC71.211ADFCA_ED54_4E97_A0C1_80845B72BE77</td><td>0</td><td>1.0</td></row>
 	</table>
 
 	<table name="ModuleExclusion">

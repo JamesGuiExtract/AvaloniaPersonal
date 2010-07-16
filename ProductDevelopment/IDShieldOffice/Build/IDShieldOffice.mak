@@ -26,7 +26,7 @@ RCNETDir=$(EngineeringRootDirectory)\RC.Net
 IDShieldOfficeDir=$(PDRootDir)\IDShieldOffice
 IDShieldOfficeBuildDir=$(IDShieldOfficeDir)\Build
 PDCommonDir=$(PDRootDir)\Common
-
+AFRootDirectory=$(PDRootDir)\AttributeFinder
 
 ObfuscatorInfo=P:\IDShieldOffice\Archive\ObfuscatorFiles\InternalBuilds\$(IDShieldOfficeVersion)
 IDShieldOfficeInstallRootDir=P:\IDShieldOffice
@@ -103,51 +103,26 @@ CopyFilesToBuildInstall: ObfuscateFiles
 	@IF NOT EXIST "$(IDShieldOfficeInstallFilesRootDir)\LeadtoolsDlls\pdf" @MKDIR "$(IDShieldOfficeInstallFilesRootDir)\LeadtoolsDlls\pdf"
 	@IF NOT EXIST "$(IDShieldOfficeInstallFilesRootDir)\RogueWaveDlls" @MKDIR "$(IDShieldOfficeInstallFilesRootDir)\RogueWaveDlls"
 	@IF NOT EXIST "$(IDShieldOfficeInstallFilesRootDir)\CaereDlls" @MKDIR "$(IDShieldOfficeInstallFilesRootDir)\CaereDlls"
-	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Bin\*.*" "$(IDShieldOfficeInstallFilesRootDir)\LeadToolsDlls" /v /s /e /y
-	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\pdf\*.*" "$(IDShieldOfficeInstallFilesRootDir)\LeadToolsDlls\pdf" /v /s /e /y
-	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin\*.*" "$(IDShieldOfficeInstallFilesRootDir)\RogueWaveDlls" /v /s /e /y
-    @XCOPY "$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin\*.*" "$(IDShieldOfficeInstallFilesRootDir)\CaereDLLs" /v /s /e /y
 	@COPY /V "$(BinariesFolder)$(ObfuscatedPath)\IDShieldOffice.exe" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(BinariesFolder)$(ObfuscatedPath)\Extract.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(BinariesFolder)$(ObfuscatedPath)\Extract.Utilities.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(BinariesFolder)$(ObfuscatedPath)\Extract.Imaging.Forms.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(BinariesFolder)$(ObfuscatedPath)\Extract.Licensing.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(BinariesFolder)$(ObfuscatedPath)\Extract.Utilities.Forms.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(BinariesFolder)$(ObfuscatedPath)\Extract.Drawing.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(BinariesFolder)$(ObfuscatedPath)\Extract.Encryption.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(BinariesFolder)\Interop.UCLID_EXCEPTIONMGMTLib.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMUTILSLib.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(BinariesFolder)\Interop.UCLID_RASTERANDOCRMGMTLib.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(BinariesFolder)\Interop.UCLID_SSOCRLib.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"	
-	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMLMLib.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"	
-	@COPY /V "$(RCNETDir)\APIs\Divelements\SandDock\bin\sandDock.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Dotnet\leadtools*.dll" "$(IDShieldOfficeInstallFilesRootDir)\LeadtoolsDotNetDlls"
-	@COPY /V "$(BinariesFolder)\BaseUtils.dll" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V "$(BinariesFolder)\ZLibUtils.dll" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V "$(BinariesFolder)\TopoUtils.dll" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V "$(BinariesFolder)\leadutils.dll" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V "$(BinariesFolder)\COMLMCore.dll" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V "$(BinariesFolder)\ExtractTRP2.exe" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"	
 	@COPY /V "$(BinariesFolder)\InstallPCE.exe" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V "$(BinariesFolder)\ESPrintManager.exe" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V "$(BinariesFolder)\UserLicense.exe" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\ActMask Virtual Printer\virtual-printer-sdk-image-full.exe" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V "$(BinariesFolder)\UEXViewer.exe" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"	
-	@COPY /V "$(BinariesFolder)\UCLIDExceptionMgmt.dll" "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents"
-	@COPY /V "$(BinariesFolder)\COMLM.dll" "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents"
-	@COPY /V "$(BinariesFolder)\UCLIDCOMUtils.dll" "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents"
-	@COPY /V "$(BinariesFolder)\SSOCR2.Exe" "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents"
-    @COPY /V "$(BinariesFolder)\SSOCR.dll" "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents"
-    @COPY /V "$(BinariesFolder)\IEVBScriptParser.dll" "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents"
-    @COPY /V "$(BinariesFolder)\UCLIDImageUtils.dll" "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents"
-    @COPY /V "$(BinariesFolder)\ssocr2.Exe" "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents"
-    @COPY /V "$(BinariesFolder)\UCLIDRasterAndOCRMgmt.dll" "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents"
 	@COPY /V "$(BinariesFolder)\ESActMaskPCE.dll" "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents"
 	@COPY /V "$(BinariesFolder)\ESPrintCaptureCore.dll" "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents"
 	@COPY /V "$(PDCommonDir)\RegisterAll.bat" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@DIR "$(IDShieldOfficeInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents\IDShieldOffice.rl"
 
-BuildIDShieldOfficeInstall:CopyFilesToBuildInstall EncryptRuleFiles CreateVersionISImportFile
+MakeExtractCommonMergeModule: ObfuscateFiles
+	@ECHO Making ExtractCommonMM...
+	@CD "$(PDCommonDir)\"
+    @nmake /F ExtractCommon.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateExtractCommonMergeModule
+
+MakeExtractFlexCommonMergeModule: MakeExtractCommonMergeModule
+	@ECHO Making ExtractFlexCommonMM...
+    @CD "$(AFRootDirectory)\Build
+    @nmake /F ExtractFlexCommon.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateExtractFlexCommonMergeModule
+	
+BuildIDShieldOfficeInstall:CopyFilesToBuildInstall EncryptRuleFiles CreateVersionISImportFile MakeExtractFlexCommonMergeModule
     @ECHO Building Extract Systems IDShield Office installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(IDShieldOfficeDir)\Installation\IDShieldOffice\IDShieldOffice.ism" "$(IDShieldOfficeVersion)"
