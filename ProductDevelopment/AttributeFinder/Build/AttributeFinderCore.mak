@@ -291,7 +291,7 @@ CleanUpMergeModulesFromPreviousBuilds:
 
 MakeExtractCommonMergeModule: BuildAttributeFinderCore
 	@ECHO Making ExtractCommonMM...
-	@CD "$(PDCommonDir)\"
+	@CD "$(PDCommonDir)"
     @nmake /F ExtractCommon.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateExtractCommonMergeModule
 
 MakeExtractFlexCommonMergeModule: MakeExtractCommonMergeModule
@@ -299,7 +299,7 @@ MakeExtractFlexCommonMergeModule: MakeExtractCommonMergeModule
     @CD "$(AFRootDirectory)\Build
     @nmake /F ExtractFlexCommon.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateExtractFlexCommonMergeModule
 	
-BuildAFCoreMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles MakeExtractCommonMergeModule 
+BuildAFCoreMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles MakeExtractFlexCommonMergeModule 
     @ECHO Buliding the UCLIDFlexIndex Merge Module installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(AFCoreMergeModuleInstallRoot)\UCLID FlexIndex.ism" "$(FlexIndexVersion)"
