@@ -86,5 +86,5 @@ CopyExtractFlexCommonFiles: CleanupExtractFlexCommonFiles
 CreateExtractFlexCommonMergeModule: CopyExtractFlexCommonFiles
 	@ECHO Creating ExtractFlexCommon merge module...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
-	$(SetProductVerScript) "$(ExtractFlexCommonInstallDir)\\ExtractFlexCommonMM.ism" "$(ReusableComponentsVersion)"
-    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(ExtractFlexCommonInstallDir)\\ExtractFlexCommonMM.ism"
+	$(SetProductVerScript) "$(ExtractFlexCommonInstallDir)\ExtractFlexCommonMM.ism" "$(ReusableComponentsVersion)"
+    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(ExtractFlexCommonInstallDir)\ExtractFlexCommonMM.ism"
