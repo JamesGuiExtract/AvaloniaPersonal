@@ -5,7 +5,6 @@
 
 #include "SafeNetLicenseCfg.h"
 #include "SafeNetLicenseMgr.h"
-#include <BasicGridWnd.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CUSBLicenseKeyManagerDlg dialog
@@ -48,12 +47,12 @@ protected:
 	afx_msg void OnRefresh();
 	afx_msg void OnResetLock();
 	virtual void OnOK();
-	virtual void OnCancel();
 	afx_msg void OnMachineChanged();
 	afx_msg void OnApply();
 	afx_msg void OnServerStatus();
 	afx_msg void OnEmailsettings();
 	afx_msg void OnEmailAlert();
+	afx_msg void OnNMDblclkCounterValues(NMHDR *pNMHDR, LRESULT *pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
@@ -81,7 +80,8 @@ private:
 	SafeNetLicenseCfg m_snlcSafeNetCfg;
 	// For the Email Settings
 	IEmailSettingsPtr m_ipEmailSettings;
-	CBasicGridWnd	m_listCounterValues;
+	
+	CListCtrl m_listCounterValues;
 };
 
 //{{AFX_INSERT_LOCATION}}

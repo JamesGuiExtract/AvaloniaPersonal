@@ -54,7 +54,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\..\APIs\SafeNetUltraPro\Inc;..\..\..\..\BaseUtils\Code;..\..\Code;..\..\..\RWUtils\Code;..\..\..\..\APIs\RogueWave\inc;..\..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code"
+				AdditionalIncludeDirectories="..\..\..\..\APIs\SafeNetUltraPro\Inc;..\..\..\..\BaseUtils\Code;..\..\Code;..\..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_GXEXT"
 				StringPooling="true"
 				ExceptionHandling="2"
@@ -87,7 +87,7 @@
 				OutputFile="..\..\..\..\..\Binaries\Release/USBLicenseKeyManager.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\..\..\APIs\RogueWave\lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
@@ -155,7 +155,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\APIs\SafeNetUltraPro\Inc;..\..\..\..\BaseUtils\Code;..\..\Code;..\..\..\RWUtils\Code;..\..\..\..\APIs\RogueWave\inc;..\..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code"
+				AdditionalIncludeDirectories="..\..\..\..\APIs\SafeNetUltraPro\Inc;..\..\..\..\BaseUtils\Code;..\..\Code;..\..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_GXEXT"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -187,7 +187,7 @@
 				OutputFile="..\..\..\..\..\Binaries\Debug/USBLicenseKeyManager.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\..\..\APIs\RogueWave\lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Debug/USBLicenseKeyManager.pdb"
 				SubSystem="2"
@@ -229,6 +229,10 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
+			<File
+				RelativePath=".\AlertLevelDlg.cpp"
+				>
+			</File>
 			<File
 				RelativePath="StdAfx.cpp"
 				>
@@ -322,6 +326,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\AlertLevelDlg.h"
+				>
+			</File>
 			<File
 				RelativePath="Resource.h"
 				>

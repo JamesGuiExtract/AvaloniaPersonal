@@ -6,6 +6,7 @@
 #define IDD_USBLICENSEKEYMANAGER_DIALOG 102
 #define IDR_USBKEY_ICON                 128
 #define IDD_EMAIL_SETTINGS_DLG          131
+#define IDD_ALERT_LEVEL_DLG             132
 #define IDC_REMOTE_MACHINE              1001
 #define IDC_SERVER_STATUS               1002
 #define IDC_COUNTER_VALUES_LIST         1004
@@ -28,14 +29,16 @@
 #define IDC_MSG_PHONE                   1021
 #define IDC_HARD_LIMIT                  1022
 #define IDC_SOFT_LIMIT                  1023
+#define IDC_EDIT_ALERT_LEVEL            1024
+#define IDC_EDIT_ALERT_MULTIPLE         1025
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        132
+#define _APS_NEXT_RESOURCE_VALUE        133
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1024
+#define _APS_NEXT_CONTROL_VALUE         1026
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

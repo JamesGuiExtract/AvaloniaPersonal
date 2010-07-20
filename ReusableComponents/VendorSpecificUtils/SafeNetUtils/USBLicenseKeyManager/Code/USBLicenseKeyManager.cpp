@@ -54,9 +54,6 @@ BOOL CUSBLicenseKeyManagerApp::InitInstance()
 	
 	try
 	{
-		// Initialize the Rogue Wave Utils library
-		RWInitializer	rwInit;
-
 		CUSBLicenseKeyManagerDlg dlg;
 		m_pMainWnd = &dlg;
 		int nResponse = dlg.DoModal();
