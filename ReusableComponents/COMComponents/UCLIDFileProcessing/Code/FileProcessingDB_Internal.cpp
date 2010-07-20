@@ -128,6 +128,13 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 {
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			setFileActionState2(ipConnection, vecSetData, strAction, strState);
+			return;
+		}
+
 		// Get the ActionID
 		long nActionID = getActionID(ipConnection, strAction);
 		string strActionID = asString(nActionID);
@@ -220,14 +227,21 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 													bool bRemovePreviousSkipped,
 													const string& strFASTComment)
 {
-	INIT_EXCEPTION_AND_TRACING("MLI03270");
+	// Execute the pre normalized code if indicated
+	if (m_bUsePreNormalized)
+	{
+		return setFileActionState2( ipConnection,  nFileID, strAction, strState, strException,
+			nActionID, bLockDB,	bRemovePreviousSkipped, strFASTComment);
+	}	
+
+	INIT_EXCEPTION_AND_TRACING("MLI03279");
 
 	auto_ptr<LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr>> apDBlg;
 	auto_ptr<TransactionGuard> apTG;
 	try
 	{
-		ASSERT_ARGUMENT("ELI26796", ipConnection != NULL);
-		ASSERT_ARGUMENT("ELI26795", !strAction.empty() || nActionID != -1);
+		ASSERT_ARGUMENT("ELI30390", ipConnection != NULL);
+		ASSERT_ARGUMENT("ELI30391", !strAction.empty() || nActionID != -1);
 
 		_lastCodePos = "10";
 		EActionStatus easRtn = kActionUnattempted;
@@ -270,7 +284,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		_lastCodePos = "70";
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI13542", ipFileSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30392", ipFileSet != NULL);
 		_lastCodePos = "80";
 
 		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
@@ -290,7 +304,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		{
 			_lastCodePos = "120";
 			FieldsPtr ipFileSetFields = ipFileSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI26867", ipFileSetFields != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30393", ipFileSetFields != NULL);
 
 			_lastCodePos = "130";
 			// Get the previous state
@@ -411,7 +425,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			_lastCodePos = "360";
 
 			// No file with the given id
-			UCLIDException ue("ELI13543", "File ID was not found.");
+			UCLIDException ue("ELI30394", "File ID was not found.");
 			ue.addDebugInfo ("File ID", nFileID);
 			throw ue;
 		}
@@ -419,7 +433,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 
 		return easRtn;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26912");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30395");
 }
 //--------------------------------------------------------------------------------------------------
 EActionStatus CFileProcessingDB::asEActionStatus  (const string& strStatus)
@@ -730,6 +744,14 @@ void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
 {
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			addASTransFromSelect2(ipConnection, strAction, nActionID, strToState, strException,
+											  strComment, strWhereClause, strTopClause);
+			return;
+		}
+
 		if (!m_bUpdateFASTTable)
 		{
 			return;
@@ -885,6 +907,13 @@ void CFileProcessingDB::validateLicense()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActionID)
 {
+	// Execute the pre normalized code if indicated
+	if (m_bUsePreNormalized)
+	{
+		reCalculateStats2(ipConnection, nActionID);
+		return;
+	}
+
 	// Get the name of the action for the ID
 	string strActionName = getActionName(ipConnection, nActionID);	
 
@@ -899,7 +928,7 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 
 	// Create a pointer to a recordset
 	_RecordsetPtr ipCalcStatsSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI14048", ipCalcStatsSet != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30396", ipCalcStatsSet != NULL);
 
 	// Open the Calc set table in the database
 	ipCalcStatsSet->Open(strCalcSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
@@ -907,7 +936,7 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 
 	// Create a pointer to a recordset
 	_RecordsetPtr ipActionStats(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI14049", ipActionStats != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30397", ipActionStats != NULL);
 
 	// Select the existing Statistics record if it exists
 	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID);
@@ -926,7 +955,7 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 
 		// Get the fields from the new record
 		ipActionFields = ipActionStats->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI26865", ipActionFields != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30398", ipActionFields != NULL);
 
 		//  Set Action ID
 		setLongField(ipActionFields, "ActionID", nActionID);
@@ -935,7 +964,7 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 	{
 		// Get the action fields
 		ipActionFields = ipActionStats->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI26866", ipActionFields != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30399", ipActionFields != NULL);
 	}
 
 	// Initialize totals
@@ -960,7 +989,7 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 	{
 		// Get the fields from the calc stat set
 		FieldsPtr ipCalcFields = ipCalcStatsSet->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI26864", ipCalcFields != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30400", ipCalcFields != NULL);
 
 		// Get the action state
 		string strActionState = getStringField(ipCalcFields, strActionColName); 
@@ -1058,6 +1087,13 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 {
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			addTables2(bAddUserTables);
+			return;
+		}
+
 		vector<string> vecQueries;
 
 		// Add the user tables if necessary
@@ -1286,6 +1322,13 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 {
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			copyActionStatus2(ipConnection, strFrom, strTo, bAddTransRecords, nToActionID);
+			return;
+		}	
+		
 		if (bAddTransRecords)
 		{
 			string strToActionID = asString(nToActionID == -1 ? getActionID(ipConnection, strTo) : nToActionID);
@@ -1327,6 +1370,12 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addActionColumn(const _ConnectionPtr& ipConnection, const string& strAction)
 {
+	// Execute the pre normalized code if indicated
+	if (m_bUsePreNormalized)
+	{
+		addActionColumn2(ipConnection, strAction);
+		return;
+	}	
 
 	// Add new Column to FAMFile table
 	// Create SQL statement to add the column to FAMFile
@@ -1361,6 +1410,13 @@ void CFileProcessingDB::addActionColumn(const _ConnectionPtr& ipConnection, cons
 void CFileProcessingDB::removeActionColumn(const _ConnectionPtr& ipConnection,
 										   const string& strAction)
 {
+	// Execute the pre normalized code if indicated
+	if (m_bUsePreNormalized)
+	{
+		removeActionColumn2(ipConnection, strAction);
+		return;
+	}
+
 	// Remove the Foreign key relationship
 	dropConstraint(ipConnection, gstrFAM_FILE, "FK_ASC_" + strAction);
 
@@ -2137,6 +2193,13 @@ void CFileProcessingDB::initializeIfBlankDB()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 {
+	// Execute the pre normalized code if indicated
+	if (m_bUsePreNormalized)
+	{
+		getExpectedTables2(vecTables);
+		return;
+	}
+
 	// Add Tables
 	vecTables.push_back(gstrACTION);
 	vecTables.push_back(gstrACTION_STATE);
@@ -3383,13 +3446,19 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 														   const string& strSelectSQL,
 														   long nActionID)
 {
+	// Execute the pre normalized code if indicated
+	if (m_bUsePreNormalized)
+	{
+		return setFilesToProcessing2(ipConnection, strSelectSQL, nActionID);
+	}	
+	
 	try
 	{
 		try
 		{
 			// IUnknownVector to hold the FileRecords to return
 			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI19504", ipFiles != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30401", ipFiles != NULL);
 
 			// Begin a transaction
 			TransactionGuard tg(ipConnection);
@@ -3405,7 +3474,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 
 			// Recordset to contain the files to process
 			_RecordsetPtr ipFileSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI13573", ipFileSet != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30402", ipFileSet != NULL);
 
 			// Get recordset of files to be set to processing.
 			ipFileSet->Open(strSelectSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
@@ -3420,7 +3489,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 			while (ipFileSet->adoEOF == VARIANT_FALSE)
 			{
 				FieldsPtr ipFields = ipFileSet->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI28234", ipFields != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI30403", ipFields != NULL);
 
 				string strFileFromState = getStringField(ipFields, strActionCol);
 
@@ -3431,7 +3500,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 				// Get the file Record from the fields
 				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
 					getFileRecordFromFields(ipFields);
-				ASSERT_RESOURCE_ALLOCATION("ELI28235", ipFileRecord != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI30404", ipFileRecord != NULL);
 
 				// Put record in list of records to return
 				ipFiles->PushBack(ipFileRecord);
@@ -3446,7 +3515,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 
 				if (strFileFromState != "P" && strFileFromState != "S")
 				{
-					UCLIDException ue("ELI29629", "Invalid File State Transition!");
+					UCLIDException ue("ELI30405", "Invalid File State Transition!");
 					ue.addDebugInfo("Old Status", asStatusName(strFileFromState));
 					ue.addDebugInfo("New Status", "Processing");
 					ue.addDebugInfo("Action Name", strActionName);
@@ -3462,7 +3531,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 				}
 				else if (strFromState != strFileFromState)
 				{
-					UCLIDException ue("ELI29622", "Unable to simultaneously set a batch of records "
+					UCLIDException ue("ELI30406", "Unable to simultaneously set a batch of records "
 						"in multiple action states to processing!");
 					ue.addDebugInfo("Action Name", strActionName);
 					ue.addDebugInfo("File IDs", strFileIDIn);
@@ -3517,7 +3586,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 
 			return ipFiles;
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29630");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30407");
 	}
 	catch (UCLIDException &ue)
 	{

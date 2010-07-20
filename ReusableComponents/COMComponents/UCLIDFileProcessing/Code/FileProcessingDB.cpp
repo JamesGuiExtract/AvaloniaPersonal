@@ -105,7 +105,8 @@ m_bAutoDeleteFileActionComment(false),
 m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
 m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
 m_nUPIID(0),
-m_bFAMRegistered(false)
+m_bFAMRegistered(false),
+m_bUsePreNormalized(true)
 {
 	try
 	{
@@ -184,6 +185,13 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction, long* pnID)
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			DefineNewAction2(strAction, pnID);
+			return S_OK;
+		}
+
 		string strActionName = asString(strAction);
 
 		// Validate the new action name
@@ -214,7 +222,7 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction, long* pnID)
 		// Commit this transaction
 		tg.CommitTrans();
 
-		END_CONNECTION_RETRY(ipConnection, "ELI23524");
+		END_CONNECTION_RETRY(ipConnection, "ELI30356");
 
 		return S_OK;
 	}
@@ -227,6 +235,13 @@ STDMETHODIMP CFileProcessingDB::DeleteAction(BSTR strAction)
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			DeleteAction2(strAction);
+			return S_OK;
+		}
+
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
 		
@@ -248,7 +263,7 @@ STDMETHODIMP CFileProcessingDB::DeleteAction(BSTR strAction)
 
 		// Create a pointer to a recordset
 		_RecordsetPtr ipActionSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI13528", ipActionSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30357", ipActionSet != NULL);
 
 		// Open the Action table
 		ipActionSet->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
@@ -278,7 +293,7 @@ STDMETHODIMP CFileProcessingDB::DeleteAction(BSTR strAction)
 			// Commit the change to the database
 			tg.CommitTrans();
 		}
-		END_CONNECTION_RETRY(ipConnection, "ELI23525");
+		END_CONNECTION_RETRY(ipConnection, "ELI30358");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13527");
 
@@ -329,10 +344,18 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	INIT_EXCEPTION_AND_TRACING("MLI00006");
+	INIT_EXCEPTION_AND_TRACING("MLI03278");
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			AddFile2(strFile, strAction, ePriority, bForceStatusChange, bFileModified, 
+				eNewStatus, pbAlreadyExists, pPrevStatus, ppFileRecord);
+			return S_OK;
+		}
+
 		// Check License
 		validateLicense();
 
@@ -348,7 +371,7 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 
 		// Create the file record to return
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewFileRecord(CLSID_FileRecord);
-		ASSERT_RESOURCE_ALLOCATION("ELI14203", ipNewFileRecord != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30359", ipNewFileRecord != NULL);
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
@@ -368,7 +391,7 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 
 		// Create a pointer to a recordset
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI13535", ipFileSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30360", ipFileSet != NULL);
 
 		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
 			adLockOptimistic, adCmdText);
@@ -449,7 +472,7 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 
 			// Get the fields from the file set
 			FieldsPtr ipFields = ipFileSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI26872", ipFields != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30361", ipFields != NULL);
 
 			// Set the fields from the new file record
 			setFieldsFromFileRecord(ipFields, ipNewFileRecord);
@@ -475,11 +498,11 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 		{
 			// Get the fields from the file set
 			FieldsPtr ipFields = ipFileSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI26873", ipFields != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30362", ipFields != NULL);
 
 			// Get the file record from the fields
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord = getFileRecordFromFields(ipFields);
-			ASSERT_RESOURCE_ALLOCATION("ELI27657", ipOldRecord != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30363", ipOldRecord != NULL);
 
 			// Set the Current file Records ID
 			nID = ipOldRecord->FileID;
@@ -512,7 +535,7 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 						continue;
 					}
 
-					UCLIDException ue("ELI15043", "Cannot force status from Processing.");
+					UCLIDException ue("ELI30364", "Cannot force status from Processing.");
 					ue.addDebugInfo("File", strFileName);
 					ue.addDebugInfo("Action Name", strActionName);
 					throw ue;
@@ -585,7 +608,7 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 		// Return the file record
 		*ppFileRecord = (IFileRecord*)ipNewFileRecord.Detach();
 
-		END_CONNECTION_RETRY(ipConnection, "ELI23527");
+		END_CONNECTION_RETRY(ipConnection, "ELI30365");
 
 		return S_OK;
 	}
@@ -598,6 +621,13 @@ STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			RemoveFile2(strFile, strAction);
+			return S_OK;
+		}
+
 		// Check License
 		validateLicense();
 
@@ -617,7 +647,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 
 		// Create a pointer to a recordset
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI13537", ipFileSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30366", ipFileSet != NULL);
 
 		// Replace any occurances of ' with '' this is because SQL Server use the ' to indicate the beginning and end of a string
 		string strFileName = asString(strFile);
@@ -640,7 +670,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 		{
 			// Get the fields from the file set
 			FieldsPtr ipFields = ipFileSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI26874", ipFields != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30367", ipFields != NULL);
 
 			// Get the old Record from the fields
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord;
@@ -685,7 +715,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 		// Commit the changes
 		tg.CommitTrans();
 
-		END_CONNECTION_RETRY(ipConnection, "ELI23528");
+		END_CONNECTION_RETRY(ipConnection, "ELI30368");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13538");
 	return S_OK;
@@ -848,6 +878,14 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			GetFileStatus2(nFileID, strAction, vbAttemptRevertIfLocked, pStatus);
+			return S_OK;
+		}
+
+
 		// Check License
 		validateLicense();
 
@@ -867,7 +905,7 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
 
 		// Create a pointer to a recordset
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI13551", ipFileSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30369", ipFileSet != NULL);
 
 		// Open Recordset that contains only the record with the given ID
 		string strFileSQL = "SELECT * FROM FAMFile WHERE ID = " + asString (nFileID);
@@ -914,11 +952,11 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
 		else
 		{
 			// File ID did not exist
-			UCLIDException ue("ELI13553", "File ID was not found.");
+			UCLIDException ue("ELI30370", "File ID was not found.");
 			ue.addDebugInfo ("File ID", nFileID);
 			throw ue;
 		}
-		END_CONNECTION_RETRY(ipConnection, "ELI23533");
+		END_CONNECTION_RETRY(ipConnection, "ELI30371");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13550");
 
@@ -934,13 +972,21 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus(long nWhereActionID,  
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			SearchAndModifyFileStatus2( nWhereActionID,  eWhereStatus, nToActionID, eToStatus,
+				bstrSkippedFromUserName, nFromActionID, pnNumRecordsModified);
+			return S_OK;
+		}
+
 		// Check License
 		validateLicense();
 
 		// Changing an Action status to failed should only be done on an individual file bases
 		if (eToStatus == kActionFailed)
 		{
-			UCLIDException ue ("ELI13603", "Cannot change status Failed.");
+			UCLIDException ue ("ELI30372", "Cannot change status Failed.");
 			throw ue;
 		}
 
@@ -1018,7 +1064,7 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus(long nWhereActionID,  
 
 		// Get a recordset to fill with the File IDs
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI26913", ipFileSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30373", ipFileSet != NULL);
 
 		// Open the recordset
 		ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -1054,7 +1100,7 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus(long nWhereActionID,  
 		// Commit the changes
 		tg.CommitTrans();
 
-		END_CONNECTION_RETRY(ipConnection, "ELI23534");
+		END_CONNECTION_RETRY(ipConnection, "ELI30374");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13565");
 
@@ -1067,6 +1113,13 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			SetStatusForAllFiles2(strAction, eStatus);
+			return S_OK;
+		}
+
 		// Check License
 		validateLicense();
 
@@ -1086,7 +1139,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 
 		if (eStatus == kActionFailed)
 		{
-			UCLIDException ue ("ELI13604", "Transition to Failed state is not allowed.");
+			UCLIDException ue ("ELI30375", "Transition to Failed state is not allowed.");
 			throw ue;
 		}
 
@@ -1155,7 +1208,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 		// Commit the changes
 		tg.CommitTrans();
 
-		END_CONNECTION_RETRY(ipConnection, "ELI23535");
+		END_CONNECTION_RETRY(ipConnection, "ELI30376");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13571");
 
@@ -1197,6 +1250,14 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			GetFilesToProcess2(strAction, nMaxFiles, bGetSkippedFiles, bstrSkippedForUserName,
+				pvecFileRecords);
+			return S_OK;
+		}
+
 		static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
 
 		// Check License
@@ -1270,7 +1331,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 		IIUnknownVectorPtr ipFiles = setFilesToProcessing(ipConnection, strSelectSQL, nActionID);
 		*pvecFileRecords = ipFiles.Detach();
 
-		END_CONNECTION_RETRY(ipConnection, "ELI23537");
+		END_CONNECTION_RETRY(ipConnection, "ELI30377");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13574");
 
@@ -1283,6 +1344,13 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder(BSTR strFolder, BSTR strAction)
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			RemoveFolder2(strFolder, strAction);
+			return S_OK;
+		}
+
 		// Check License
 		validateLicense();
 
@@ -1346,7 +1414,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder(BSTR strFolder, BSTR strAction)
 		// Commit the changes to the database
 		tg.CommitTrans();
 
-		END_CONNECTION_RETRY(ipConnection, "ELI23538");
+		END_CONNECTION_RETRY(ipConnection, "ELI30378");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13611");
 
@@ -1451,6 +1519,13 @@ STDMETHODIMP CFileProcessingDB::RenameAction(long nActionID, BSTR strNewActionNa
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			RenameAction2(nActionID, strNewActionName);
+			return S_OK;
+		}
+
 		validateLicense();
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
@@ -1489,7 +1564,7 @@ STDMETHODIMP CFileProcessingDB::RenameAction(long nActionID, BSTR strNewActionNa
 		// Commit the transaction
 		tg.CommitTrans();
 
-		END_CONNECTION_RETRY(ipConnection, "ELI23541");
+		END_CONNECTION_RETRY(ipConnection, "ELI30379");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19505");
 
@@ -2574,11 +2649,19 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			ModifyActionStatusForQuery2(bstrQueryFrom, bstrToAction, eaStatus, bstrFromAction,
+				pRandomCondition, pnNumRecordsModified);
+			return S_OK;
+		}
+
 		// Check that an action name and a FROM clause have been passed in
 		string strQueryFrom = asString(bstrQueryFrom);
-		ASSERT_ARGUMENT("ELI27037", !strQueryFrom.empty());
+		ASSERT_ARGUMENT("ELI30380", !strQueryFrom.empty());
 		string strToAction = asString(bstrToAction);
-		ASSERT_ARGUMENT("ELI27038", !strToAction.empty());
+		ASSERT_ARGUMENT("ELI30381", !strToAction.empty());
 
 		validateLicense();
 
@@ -2616,7 +2699,7 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 		TransactionGuard tg(ipConnection);
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI27039", ipFileSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30382", ipFileSet != NULL);
 
 		// Open the file set
 		ipFileSet->Open(strQueryFrom.c_str(), _variant_t((IDispatch*)ipConnection, true),
@@ -2664,7 +2747,7 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 			while (ipFileSet->adoEOF == VARIANT_FALSE)
 			{
 				FieldsPtr ipFields = ipFileSet->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI27040", ipFields != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI30383", ipFields != NULL);
 
 				long nFileID = getLongField(ipFields, "ID");
 				EActionStatus fromStatus = asEActionStatus(getStringField(ipFields, strToActionCol));
@@ -2699,7 +2782,7 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 			*pnNumRecordsModified = nNumRecordsModified;
 		}
 
-		END_CONNECTION_RETRY(ipConnection, "ELI27041");
+		END_CONNECTION_RETRY(ipConnection, "ELI30384");
 
 		return S_OK;
 	}
@@ -3548,10 +3631,18 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTa
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			SetStatusForFilesWithTags2(pvecTagNames, vbAndOperation, nToActionID, 
+				eaNewStatus, nFromActionID);
+			return S_OK;
+		}
+
 		validateLicense();
 
 		IVariantVectorPtr ipVecTagNames(pvecTagNames);
-		ASSERT_ARGUMENT("ELI27427", ipVecTagNames != NULL);
+		ASSERT_ARGUMENT("ELI30385", ipVecTagNames != NULL);
 
 		long lSize = ipVecTagNames->Size;
 
@@ -3613,7 +3704,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTa
 		TransactionGuard tg(ipConnection);
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI27428", ipFileSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30386", ipFileSet != NULL);
 
 		// Open the file set
 		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
@@ -3623,7 +3714,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTa
 		while (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
 			FieldsPtr ipFields = ipFileSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI27429", ipFields != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30387", ipFields != NULL);
 
 			// Get the file ID
 			long nFileID = getLongField(ipFields, "ID");
@@ -3645,7 +3736,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTa
 		// Commit the transaction
 		tg.CommitTrans();
 
-		END_CONNECTION_RETRY(ipConnection, "ELI27430");
+		END_CONNECTION_RETRY(ipConnection, "ELI30388");
 
 		return S_OK;
 	}
@@ -5173,6 +5264,13 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToProcessing(long nFileId, long nAc
 
 	try
 	{
+		// Execute the pre normalized code if indicated
+		if (m_bUsePreNormalized)
+		{
+			SetFileStatusToProcessing2(nFileId, nActionID);
+			return S_OK;
+		}
+
 		validateLicense();
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
@@ -5198,7 +5296,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToProcessing(long nFileId, long nAc
 		// Perform all processing related to setting a file as processing.
 		setFilesToProcessing(ipConnection, strSelectSQL, nActionID);
 
-		END_CONNECTION_RETRY(ipConnection, "ELI29619");
+		END_CONNECTION_RETRY(ipConnection, "ELI30389");
 
 		return S_OK;
 	}
