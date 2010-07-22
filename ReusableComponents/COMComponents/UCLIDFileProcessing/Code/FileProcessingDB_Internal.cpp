@@ -30,7 +30,8 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 23;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 23;
+const long CFileProcessingDB::ms_lFAMDBNormalizedSchemaVersion = 100;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -1134,7 +1135,9 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FAM_SESSION);
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT);
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX);
-
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX);
+		
 		// Only create the login table if it does not already exist
 		if (!doesTableExist(getDBConnection(), "Login"))
 		{
@@ -1170,6 +1173,9 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_INPUT_EVENT_ACTION_FK);
 		vecQueries.push_back(gstrADD_INPUT_EVENT_MACHINE_FK);
 		vecQueries.push_back(gstrADD_INPUT_EVENT_FAMUSER_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1223,7 +1229,7 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		{
 			// Add the schema version to the DBInfo table
 			string strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrFAMDB_SCHEMA_VERSION +
-				"', '" + asString(glFAMDBSchemaVersion) + "')";
+				"', '" + asString(m_lExpectedSchemaVersion) + "')";
 			vecQueries.push_back(strSQL);
 
 			// Add Command Timeout setting
@@ -1771,14 +1777,14 @@ void CFileProcessingDB::validateDBSchemaVersion()
 {
 	// Get the Schema Version from the database
 	int iDBSchemaVersion = getDBSchemaVersion();
-	if (iDBSchemaVersion != glFAMDBSchemaVersion)
+	if (iDBSchemaVersion != m_lExpectedSchemaVersion)
 	{
 		// Update the current connection status string
 		m_strCurrentConnectionStatus = gstrWRONG_SCHEMA;
 
 		UCLIDException ue("ELI14380", "DB Schema version does not match.");
 		ue.addDebugInfo("SchemaVer in Database", iDBSchemaVersion);
-		ue.addDebugInfo("SchemaVer expected", glFAMDBSchemaVersion);
+		ue.addDebugInfo("SchemaVer expected", m_lExpectedSchemaVersion);
 		throw ue;
 	}
 }
@@ -2223,6 +2229,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrFPS_FILE);
 	vecTables.push_back(gstrFAM_SESSION);
 	vecTables.push_back(gstrINPUT_EVENT);
+	vecTables.push_back(gstrFILE_ACTION_STATUS);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

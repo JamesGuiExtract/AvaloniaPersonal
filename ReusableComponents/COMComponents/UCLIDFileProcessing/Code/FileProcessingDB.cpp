@@ -126,6 +126,17 @@ m_bUsePreNormalized(true)
 		m_strMachineName = getComputerName();
 		m_strFAMUserName = getCurrentUserName();
 		m_lDBLockTimeout = m_regFPCfgMgr.getDBLockTimeout();
+		m_bUsePreNormalized = m_regFPCfgMgr.getUsePreNormalized();
+
+		// Set the expected schema version based on the UsePreNormalized flag
+		if (m_bUsePreNormalized)
+		{
+			m_lExpectedSchemaVersion = ms_lFAMDBSchemaVersion;
+		}
+		else
+		{
+			m_lExpectedSchemaVersion = ms_lFAMDBNormalizedSchemaVersion;
+		}
 
 		// If PDF support is licensed initialize support
 		// NOTE: no exception is thrown or logged if PDF support is not licensed.

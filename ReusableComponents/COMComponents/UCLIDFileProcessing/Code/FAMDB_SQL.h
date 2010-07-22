@@ -164,6 +164,17 @@ static const string gstrCREATE_INPUT_EVENT =
 	"[PID] int NOT NULL, "
 	"[SecondsWithInputEvents] int NOT NULL)";
 
+static const string gstrCREATE_FILE_ACTION_STATUS = 
+	"CREATE TABLE [FileActionStatus]( "
+	"[ActionID] [int] NOT NULL, "
+	"[FileID] [int] NOT NULL, "
+	"[ActionStatus] [nvarchar](1) NOT NULL, "
+	"CONSTRAINT [PK_FileActionStatus] PRIMARY KEY CLUSTERED "
+	"( "
+	"	[ActionID] ASC, "
+	"	[FileID] ASC "
+	")) ";
+
 // Create table indexes SQL
 static const string gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_PriorityID] "
 	"ON [FAMFile]([Priority] DESC, [ID] ASC)";
@@ -197,6 +208,11 @@ static const string gstrCREATE_FPS_FILE_NAME_INDEX = "CREATE NONCLUSTERED INDEX 
 
 static const string gstrCREATE_INPUT_EVENT_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_Input_Event] ON [InputEvent]([TimeStamp], [ActionID], [MachineID], [FAMUserID], [PID])";
+
+static const string gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX = 
+	"CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_FileActionStatus_ActionID_ActionStatus] ON [dbo].[FileActionStatus] "
+	"([ActionID] ASC, [ActionStatus] ASC)";
 
 // Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
@@ -380,6 +396,27 @@ static const string gstrADD_INPUT_EVENT_FAMUSER_FK =
 	"ALTER TABLE [dbo].[InputEvent] "
 	"WITH CHECK ADD CONSTRAINT [FK_InputEvent_User] FOREIGN KEY([FAMUserID]) "
 	"REFERENCES [dbo].[FAMUser]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FILE_ACTION_STATUS_ACTION_FK = 
+	"ALTER TABLE [dbo].[FileActionStatus]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_FileActionStatus_Action] FOREIGN KEY([ActionID]) "
+	"REFERENCES [dbo].[Action] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FILE_ACTION_STATUS_FAMFILE_FK = 
+	"ALTER TABLE [dbo].[FileActionStatus]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_FileActionStatus_FAMFile] FOREIGN KEY([FileID]) "
+	"REFERENCES [dbo].[FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK = 
+	"ALTER TABLE [dbo].[FileActionStatus]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_FileActionStatus_ActionStatus] FOREIGN KEY([ActionStatus]) "
+	"REFERENCES [dbo].[ActionState] ([Code]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 

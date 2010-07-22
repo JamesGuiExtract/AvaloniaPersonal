@@ -43,6 +43,7 @@ const string FileProcessingConfigMgr::DB_LOCK_TIMEOUT = "DBLockTimeout";
 const string FileProcessingConfigMgr::AUTO_SCROLLING = "AutoScrolling";
 const string FileProcessingConfigMgr::LAST_GOOD_SERVER = "LastGoodServer";
 const string FileProcessingConfigMgr::LAST_GOOD_DATABASE = "LastGoodDatabase";
+const string FileProcessingConfigMgr::USE_PRE_NORMALIZED = "UsePreNormalized";
 
 // Minimum width and height for the dialog
 const int FileProcessingConfigMgr::DLG_MIN_WIDTH = 380;
@@ -612,6 +613,31 @@ void FileProcessingConfigMgr::getLocalSQLServerInstances(vector<string>& vecLoca
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20376");
+}
+//-------------------------------------------------------------------------------------------------
+bool FileProcessingConfigMgr::getUsePreNormalized()
+{
+	// Default to true
+	bool bUsePreNormalized = true;
+	string strValue;
+
+	// Check for existence of UsePreNormalized key
+	if (!m_apHKCU->keyExists(gstrFP_DB_REGISTRY_PATH, USE_PRE_NORMALIZED))
+	{
+		// Not found, just default to true
+		m_apHKCU->createKey(gstrFP_DB_REGISTRY_PATH, USE_PRE_NORMALIZED, "1");
+	}
+	else
+	{
+		// Retrieve setting
+		strValue = m_apHKCU->getKeyValue(gstrFP_DB_REGISTRY_PATH, USE_PRE_NORMALIZED);
+		if (strValue.length() > 0)
+		{
+			bUsePreNormalized = (strValue == "1");
+		}
+	}
+
+	return bUsePreNormalized;
 }
 
 //-------------------------------------------------------------------------------------------------

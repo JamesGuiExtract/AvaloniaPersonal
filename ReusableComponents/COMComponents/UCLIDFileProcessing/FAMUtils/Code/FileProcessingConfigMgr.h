@@ -93,6 +93,9 @@ public:
 	bool getAutoScrolling();
 	void setAutoScrolling(bool bAutoScroll);
 
+	// Gets the UsePreNormalized setting from the registry;
+	bool getUsePreNormalized();
+
 private:
 	static const string WINDOW_POS_X;
 	static const string WINDOW_POS_Y;
@@ -116,6 +119,7 @@ private:
 	static const string AUTO_SCROLLING;
 	static const string FileProcessingConfigMgr::LAST_GOOD_SERVER;
 	static const string FileProcessingConfigMgr::LAST_GOOD_DATABASE;
+	static const string USE_PRE_NORMALIZED;
 
 	// Dialog size bounds
 	static const int DLG_MIN_WIDTH;

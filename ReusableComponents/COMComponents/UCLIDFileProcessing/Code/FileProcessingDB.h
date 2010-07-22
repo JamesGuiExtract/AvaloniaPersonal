@@ -53,6 +53,7 @@ static const string gstrUSER_CREATED_COUNTER = "UserCreatedCounter";
 static const string gstrFPS_FILE = "FPSFile";
 static const string gstrFAM_SESSION = "FAMSession";
 static const string gstrINPUT_EVENT = "InputEvent";
+static const string gstrFILE_ACTION_STATUS = "FileActionStatus";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -206,6 +207,16 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
 
 private:
+	// Current schema version for the non normailized DB
+	static const long ms_lFAMDBSchemaVersion;
+
+	// Current schema version for the normalized DB
+	static const long ms_lFAMDBNormalizedSchemaVersion;
+
+	// Expected schema version  - this is set based on the
+	// value of the UsePreNormalized setting in registry
+	long m_lExpectedSchemaVersion;
+
 	class SetFileActionData
 	{
 	public:
