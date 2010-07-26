@@ -31,6 +31,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <iterator>
 
 using namespace std;
 

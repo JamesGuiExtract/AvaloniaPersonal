@@ -1,763 +1,154 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoIncrementVssLabel", "..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcproj", "{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoIncrementVssLabel", "..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj", "{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CalcTotalMemLeak", "..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcproj", "{3F49F480-CCD2-4EDE-A749-C1BF40160343}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CalcTotalMemLeak", "..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcxproj", "{3F49F480-CCD2-4EDE-A749-C1BF40160343}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChangeCase", "..\..\ChangeCase\ChangeCase.vcproj", "{96F81DFA-8150-4CA7-85D9-2DB8A981C638}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChangeCase", "..\..\ChangeCase\ChangeCase.vcxproj", "{96F81DFA-8150-4CA7-85D9-2DB8A981C638}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChangeWindowTitle", "..\..\ChangeWindowTitle\ChangeWindowTitle.vcproj", "{9A06614A-0F67-4828-846B-824DBE1151F0}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChangeWindowTitle", "..\..\ChangeWindowTitle\ChangeWindowTitle.vcxproj", "{9A06614A-0F67-4828-846B-824DBE1151F0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLicenseEval", "..\..\COMLicenseEvaluation\Code\COMLicenseEval.vcproj", "{0D494CBA-0C43-4291-B52F-8D77DF44C4C4}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLicenseEval", "..\..\COMLicenseEvaluation\Code\COMLicenseEval.vcxproj", "{0D494CBA-0C43-4291-B52F-8D77DF44C4C4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLicenseGenerator", "..\..\COMLicenseGenerator\Code\COMLicenseGenerator.vcproj", "{91B48DD4-870F-4F24-947A-BE4C63F74B5D}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLicenseGenerator", "..\..\COMLicenseGenerator\Code\COMLicenseGenerator.vcxproj", "{91B48DD4-870F-4F24-947A-BE4C63F74B5D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CopyNewerFiles", "..\..\CopyNewerFiles\Code\CopyNewerFiles.vcproj", "{A13D5F5C-F3E5-47E8-9F0B-A4217C7643E0}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CopyNewerFiles", "..\..\CopyNewerFiles\Code\CopyNewerFiles.vcxproj", "{A13D5F5C-F3E5-47E8-9F0B-A4217C7643E0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CorruptLicenseUtility", "..\..\CorruptLicenseUtility\Code\CorruptLicenseUtility.vcproj", "{F52ECC6A-65A3-48BF-A4A8-2EA561E33883}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CorruptLicenseUtility", "..\..\CorruptLicenseUtility\Code\CorruptLicenseUtility.vcxproj", "{F52ECC6A-65A3-48BF-A4A8-2EA561E33883}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CountImagePages", "..\..\CountImagePages\Code\CountImagePages.vcproj", "{95A3647D-DE0D-4097-96E5-D4DD75FE05E9}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CountImagePages", "..\..\CountImagePages\Code\CountImagePages.vcxproj", "{95A3647D-DE0D-4097-96E5-D4DD75FE05E9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPUHog", "..\..\CPUHog\Code\CPUHog.vcproj", "{F24B07CE-83CA-4A00-AC50-D8673399B44F}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPUHog", "..\..\CPUHog\Code\CPUHog.vcxproj", "{F24B07CE-83CA-4A00-AC50-D8673399B44F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CreateMultiPageImage", "..\..\CreateMultiPageImage\Code\CreateMultiPageImage.vcproj", "{480FCA0D-4008-4368-8151-EDAD064E27E4}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CreateMultiPageImage", "..\..\CreateMultiPageImage\Code\CreateMultiPageImage.vcxproj", "{480FCA0D-4008-4368-8151-EDAD064E27E4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DetectAndReportFailure", "..\..\DetectAndReportFailure\Code\DetectAndReportFailure.vcproj", "{A96917AB-80A9-44A7-AC3B-6EA28075CE38}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{A1474E20-9B5F-4DF9-A400-490270BC7999} = {A1474E20-9B5F-4DF9-A400-490270BC7999}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DetectAndReportFailure", "..\..\DetectAndReportFailure\Code\DetectAndReportFailure.vcxproj", "{A96917AB-80A9-44A7-AC3B-6EA28075CE38}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DisplayCOMDllLocation", "..\..\DisplayCOMDllLocation\Code\DisplayCOMDllLocation.vcproj", "{848A5567-552D-409B-A7E8-BEF38293190A}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DisplayCOMDllLocation", "..\..\DisplayCOMDllLocation\Code\DisplayCOMDllLocation.vcxproj", "{848A5567-552D-409B-A7E8-BEF38293190A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DisplayELISources", "..\..\DisplayELISources\Code\DisplayELISources.vcproj", "{3E878534-57A3-43A6-92F3-6697F02C3F70}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DisplayELISources", "..\..\DisplayELISources\Code\DisplayELISources.vcxproj", "{3E878534-57A3-43A6-92F3-6697F02C3F70}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ELIChecker", "..\..\ELIChecker\Code\ELIChecker.vcproj", "{A0DF2A8D-B54D-4361-A197-24ECD098542C}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ELIChecker", "..\..\ELIChecker\Code\ELIChecker.vcxproj", "{A0DF2A8D-B54D-4361-A197-24ECD098542C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EncryptTextFile", "..\..\EncryptTextFile\Code\EncryptTextFile.vcproj", "{23286748-A945-43F3-96DE-608B982703B4}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EncryptTextFile", "..\..\EncryptTextFile\Code\EncryptTextFile.vcxproj", "{23286748-A945-43F3-96DE-608B982703B4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FindFileDistribution", "..\..\FindFileDistribution\Code\FindFileDistribution.vcproj", "{10C930E2-5840-4BF1-995D-22D728097DE9}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FindFileDistribution", "..\..\FindFileDistribution\Code\FindFileDistribution.vcxproj", "{10C930E2-5840-4BF1-995D-22D728097DE9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FindString", "..\..\FindString\Code\FindString.vcproj", "{183983D3-B837-4726-AA11-82E5A6870F18}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FindString", "..\..\FindString\Code\FindString.vcxproj", "{183983D3-B837-4726-AA11-82E5A6870F18}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenerateELISourceList", "..\..\GenerateELISourceList\Code\GenerateELISourceList.vcproj", "{D5EBDBF3-2736-41F4-8194-DDE70CF10880}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenerateELISourceList", "..\..\GenerateELISourceList\Code\GenerateELISourceList.vcxproj", "{D5EBDBF3-2736-41F4-8194-DDE70CF10880}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetNextELICode", "..\..\GetNextELICode\GetNextELICode.vcproj", "{B18B59A0-3BE1-4C4D-9864-01D6DFAC6FA0}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetNextELICode", "..\..\GetNextELICode\GetNextELICode.vcxproj", "{B18B59A0-3BE1-4C4D-9864-01D6DFAC6FA0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetRandomFileSample", "..\..\GetRandomFileSample\Code\GetRandomFileSample.vcproj", "{40F52829-079C-49CF-8B9E-42B331D46FC5}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetRandomFileSample", "..\..\GetRandomFileSample\Code\GetRandomFileSample.vcxproj", "{40F52829-079C-49CF-8B9E-42B331D46FC5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModifyFile", "..\..\ModifyFile\ModifyFile.vcproj", "{18D4E906-74C0-4E25-A7E6-FD7F8CB8B6B8}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModifyFile", "..\..\ModifyFile\ModifyFile.vcxproj", "{18D4E906-74C0-4E25-A7E6-FD7F8CB8B6B8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MsgBox", "..\..\MsgBox\MsgBox.vcproj", "{704D5ABB-D3DE-4A9D-A9EB-D29F089F3C51}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MsgBox", "..\..\MsgBox\MsgBox.vcxproj", "{704D5ABB-D3DE-4A9D-A9EB-D29F089F3C51}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemovePage", "..\..\RemovePage\Code\RemovePage.vcproj", "{065331B3-4784-4D3F-9FE4-F6FFD142B9CA}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemovePage", "..\..\RemovePage\Code\RemovePage.vcxproj", "{065331B3-4784-4D3F-9FE4-F6FFD142B9CA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReplaceString", "..\..\ReplaceString\ReplaceString.vcproj", "{A0E5C99D-0BB1-4689-82CA-452B490E9DA0}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReplaceString", "..\..\ReplaceString\ReplaceString.vcxproj", "{A0E5C99D-0BB1-4689-82CA-452B490E9DA0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Semaphore", "..\..\Semaphore\Semaphore.vcproj", "{E0DB70AC-6532-4D70-AD7A-41039C640D34}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Semaphore", "..\..\Semaphore\Semaphore.vcxproj", "{E0DB70AC-6532-4D70-AD7A-41039C640D34}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SendFilesAsArgumentToApplication", "..\..\SendFilesAsArgumentToApplication\SendFilesAsArgumentToApplication.vcproj", "{8684B283-2288-42D6-8071-E3133478ECAD}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SendFilesAsArgumentToApplication", "..\..\SendFilesAsArgumentToApplication\SendFilesAsArgumentToApplication.vcxproj", "{8684B283-2288-42D6-8071-E3133478ECAD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShowStringCharPosition", "..\..\ShowStringCharPosition\ShowStringCharPosition.vcproj", "{939DE987-4AED-4595-B32A-10987C003431}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShowStringCharPosition", "..\..\ShowStringCharPosition\ShowStringCharPosition.vcxproj", "{939DE987-4AED-4595-B32A-10987C003431}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpatialStringViewer", "..\..\SpatialStringViewer\Code\SpatialStringViewer.vcproj", "{297FDCDE-69CE-4601-9F05-BB9116A2E196}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpatialStringViewer", "..\..\SpatialStringViewer\Code\SpatialStringViewer.vcxproj", "{297FDCDE-69CE-4601-9F05-BB9116A2E196}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SplitFile", "..\..\SplitFile\Code\SplitFile.vcproj", "{E69433E9-2D2D-41E9-87F5-2B971B2C9B9A}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SplitFile", "..\..\SplitFile\Code\SplitFile.vcxproj", "{E69433E9-2D2D-41E9-87F5-2B971B2C9B9A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SplitLines", "..\..\SplitLines\SplitLines.vcproj", "{DE6FC7C8-FFFA-439D-9D7C-22BF53A3D978}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SplitLines", "..\..\SplitLines\SplitLines.vcxproj", "{DE6FC7C8-FFFA-439D-9D7C-22BF53A3D978}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDUtilApps", "UCLIDUtilApps.vcproj", "{B565FA1F-656A-49B6-90EE-075AE3EF7DCF}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{96F81DFA-8150-4CA7-85D9-2DB8A981C638} = {96F81DFA-8150-4CA7-85D9-2DB8A981C638}
-		{D5EBDBF3-2736-41F4-8194-DDE70CF10880} = {D5EBDBF3-2736-41F4-8194-DDE70CF10880}
-		{E69433E9-2D2D-41E9-87F5-2B971B2C9B9A} = {E69433E9-2D2D-41E9-87F5-2B971B2C9B9A}
-		{10C930E2-5840-4BF1-995D-22D728097DE9} = {10C930E2-5840-4BF1-995D-22D728097DE9}
-		{297FDCDE-69CE-4601-9F05-BB9116A2E196} = {297FDCDE-69CE-4601-9F05-BB9116A2E196}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{91B48DD4-870F-4F24-947A-BE4C63F74B5D} = {91B48DD4-870F-4F24-947A-BE4C63F74B5D}
-		{F24B07CE-83CA-4A00-AC50-D8673399B44F} = {F24B07CE-83CA-4A00-AC50-D8673399B44F}
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678} = {CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}
-		{DE6FC7C8-FFFA-439D-9D7C-22BF53A3D978} = {DE6FC7C8-FFFA-439D-9D7C-22BF53A3D978}
-		{704D5ABB-D3DE-4A9D-A9EB-D29F089F3C51} = {704D5ABB-D3DE-4A9D-A9EB-D29F089F3C51}
-		{0D494CBA-0C43-4291-B52F-8D77DF44C4C4} = {0D494CBA-0C43-4291-B52F-8D77DF44C4C4}
-		{065331B3-4784-4D3F-9FE4-F6FFD142B9CA} = {065331B3-4784-4D3F-9FE4-F6FFD142B9CA}
-		{E0DB70AC-6532-4D70-AD7A-41039C640D34} = {E0DB70AC-6532-4D70-AD7A-41039C640D34}
-		{A96917AB-80A9-44A7-AC3B-6EA28075CE38} = {A96917AB-80A9-44A7-AC3B-6EA28075CE38}
-		{B18B59A0-3BE1-4C4D-9864-01D6DFAC6FA0} = {B18B59A0-3BE1-4C4D-9864-01D6DFAC6FA0}
-		{A0E5C99D-0BB1-4689-82CA-452B490E9DA0} = {A0E5C99D-0BB1-4689-82CA-452B490E9DA0}
-		{B36F3199-54E2-44AF-8378-7829C06D4997} = {B36F3199-54E2-44AF-8378-7829C06D4997}
-		{A0DF2A8D-B54D-4361-A197-24ECD098542C} = {A0DF2A8D-B54D-4361-A197-24ECD098542C}
-		{939DE987-4AED-4595-B32A-10987C003431} = {939DE987-4AED-4595-B32A-10987C003431}
-		{86E2C884-39F0-42BB-9AB5-6926E904A9E2} = {86E2C884-39F0-42BB-9AB5-6926E904A9E2}
-		{8684B283-2288-42D6-8071-E3133478ECAD} = {8684B283-2288-42D6-8071-E3133478ECAD}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{3F49F480-CCD2-4EDE-A749-C1BF40160343} = {3F49F480-CCD2-4EDE-A749-C1BF40160343}
-		{95A3647D-DE0D-4097-96E5-D4DD75FE05E9} = {95A3647D-DE0D-4097-96E5-D4DD75FE05E9}
-		{F52ECC6A-65A3-48BF-A4A8-2EA561E33883} = {F52ECC6A-65A3-48BF-A4A8-2EA561E33883}
-		{848A5567-552D-409B-A7E8-BEF38293190A} = {848A5567-552D-409B-A7E8-BEF38293190A}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{A13D5F5C-F3E5-47E8-9F0B-A4217C7643E0} = {A13D5F5C-F3E5-47E8-9F0B-A4217C7643E0}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{C281E357-8EF2-4738-B88E-7F867FBDB6E0} = {C281E357-8EF2-4738-B88E-7F867FBDB6E0}
-		{9A06614A-0F67-4828-846B-824DBE1151F0} = {9A06614A-0F67-4828-846B-824DBE1151F0}
-		{23286748-A945-43F3-96DE-608B982703B4} = {23286748-A945-43F3-96DE-608B982703B4}
-		{3E878534-57A3-43A6-92F3-6697F02C3F70} = {3E878534-57A3-43A6-92F3-6697F02C3F70}
-		{40F52829-079C-49CF-8B9E-42B331D46FC5} = {40F52829-079C-49CF-8B9E-42B331D46FC5}
-		{A1474E20-9B5F-4DF9-A400-490270BC7999} = {A1474E20-9B5F-4DF9-A400-490270BC7999}
-		{480FCA0D-4008-4368-8151-EDAD064E27E4} = {480FCA0D-4008-4368-8151-EDAD064E27E4}
-		{18D4E906-74C0-4E25-A7E6-FD7F8CB8B6B8} = {18D4E906-74C0-4E25-A7E6-FD7F8CB8B6B8}
-		{24365F79-6711-43AC-9141-BFE2A2A35744} = {24365F79-6711-43AC-9141-BFE2A2A35744}
-		{1DB9ECF5-3E68-46BF-9DEA-5B282235ED99} = {1DB9ECF5-3E68-46BF-9DEA-5B282235ED99}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDUtilApps", "UCLIDUtilApps.vcxproj", "{B565FA1F-656A-49B6-90EE-075AE3EF7DCF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UEXViewer", "..\..\UEXViewer\Code\UEXViewer.vcproj", "{86E2C884-39F0-42BB-9AB5-6926E904A9E2}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UEXViewer", "..\..\UEXViewer\Code\UEXViewer.vcxproj", "{86E2C884-39F0-42BB-9AB5-6926E904A9E2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UpdateFileVersion", "..\..\UpdateFileVersion\UpdateFileVersion.vcproj", "{C281E357-8EF2-4738-B88E-7F867FBDB6E0}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UpdateFileVersion", "..\..\UpdateFileVersion\UpdateFileVersion.vcxproj", "{C281E357-8EF2-4738-B88E-7F867FBDB6E0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UserLicense", "..\..\UserLicense\Code\UserLicense.vcproj", "{B36F3199-54E2-44AF-8378-7829C06D4997}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UserLicense", "..\..\UserLicense\Code\UserLicense.vcxproj", "{B36F3199-54E2-44AF-8378-7829C06D4997}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseUtils", "..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcproj", "{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseUtils", "..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcxproj", "{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDCOMUtils", "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcproj", "{7F591058-6DC9-4787-AE25-5A45AE78E3FA}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDCOMUtils", "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcxproj", "{7F591058-6DC9-4787-AE25-5A45AE78E3FA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLM", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcproj", "{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLM", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj", "{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLMCore", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcproj", "{6FA06B83-AC26-49B7-8138-9342792EACC4}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLMCore", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcxproj", "{6FA06B83-AC26-49B7-8138-9342792EACC4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZLibUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcproj", "{A1474E20-9B5F-4DF9-A400-490270BC7999}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZLibUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcxproj", "{A1474E20-9B5F-4DF9-A400-490270BC7999}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDRasterAndOCRMgmt", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcproj", "{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{EBE90516-603A-4562-8B47-51234CBB9903} = {EBE90516-603A-4562-8B47-51234CBB9903}
-		{A1474E20-9B5F-4DF9-A400-490270BC7999} = {A1474E20-9B5F-4DF9-A400-490270BC7999}
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDRasterAndOCRMgmt", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcxproj", "{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeadUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcproj", "{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeadUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcxproj", "{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSOCR2", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\SSOCR2.vcproj", "{660413BE-8631-4C18-92C6-A28B3E550A57}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{CC01AE64-6B4C-4FEE-8A87-B13941098A6A} = {CC01AE64-6B4C-4FEE-8A87-B13941098A6A}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{D026CB45-DFA8-4FD7-AE12-C6F05978187A} = {D026CB45-DFA8-4FD7-AE12-C6F05978187A}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSOCR2", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\SSOCR2.vcxproj", "{660413BE-8631-4C18-92C6-A28B3E550A57}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDImageUtils", "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcproj", "{CC01AE64-6B4C-4FEE-8A87-B13941098A6A}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDImageUtils", "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcxproj", "{CC01AE64-6B4C-4FEE-8A87-B13941098A6A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSOCR", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.vcproj", "{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{660413BE-8631-4C18-92C6-A28B3E550A57} = {660413BE-8631-4C18-92C6-A28B3E550A57}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSOCR", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.vcxproj", "{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESMessageUtils", "..\..\..\..\ReusableComponents\COMComponents\ESMessageUtils\Code\ESMessageUtils.vcproj", "{D026CB45-DFA8-4FD7-AE12-C6F05978187A}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESMessageUtils", "..\..\..\..\ReusableComponents\COMComponents\ESMessageUtils\Code\ESMessageUtils.vcxproj", "{D026CB45-DFA8-4FD7-AE12-C6F05978187A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtractTRP2", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\ExtractTRP2\Code\ExtractTRP2.vcproj", "{14D4D963-B656-4B04-ADD7-8F98FC4F664D}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtractTRP2", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\ExtractTRP2\Code\ExtractTRP2.vcxproj", "{14D4D963-B656-4B04-ADD7-8F98FC4F664D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TopoUtils", "..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code\TopoUtils.vcproj", "{EBE90516-603A-4562-8B47-51234CBB9903}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TopoUtils", "..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code\TopoUtils.vcxproj", "{EBE90516-603A-4562-8B47-51234CBB9903}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageFormatConverter", "..\..\ImageFormatConverter\Code\ImageFormatConverter.vcproj", "{24365F79-6711-43AC-9141-BFE2A2A35744}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageFormatConverter", "..\..\ImageFormatConverter\Code\ImageFormatConverter.vcxproj", "{24365F79-6711-43AC-9141-BFE2A2A35744}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CopyNumberedFiles", "..\..\CopyNumberedFiles\Code\CopyNumberedFiles.vcproj", "{1DB9ECF5-3E68-46BF-9DEA-5B282235ED99}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CopyNumberedFiles", "..\..\CopyNumberedFiles\Code\CopyNumberedFiles.vcxproj", "{1DB9ECF5-3E68-46BF-9DEA-5B282235ED99}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetAllSampleImageTypes", "..\..\GetAllSampleImageTypes\Code\GetAllSampleImageTypes.vcproj", "{7DEBCE89-F997-40D9-BEE4-451323197CB3}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetAllSampleImageTypes", "..\..\GetAllSampleImageTypes\Code\GetAllSampleImageTypes.vcxproj", "{7DEBCE89-F997-40D9-BEE4-451323197CB3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LogProcessStats", "..\..\LogProcessStats\Code\LogProcessStats.vcproj", "{019EE5EB-D6A9-4231-9807-E485DF279745}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LogProcessStats", "..\..\LogProcessStats\Code\LogProcessStats.vcxproj", "{019EE5EB-D6A9-4231-9807-E485DF279745}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SetOp", "..\..\SetOp\Code\SetOp.vcproj", "{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SetOp", "..\..\SetOp\Code\SetOp.vcxproj", "{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetWordLengthDist", "..\..\GetWordLengthDist\Code\GetWordLengthDist.vcproj", "{49DCB86A-B4B4-421B-B7F4-C3EF46644875}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetWordLengthDist", "..\..\GetWordLengthDist\Code\GetWordLengthDist.vcxproj", "{49DCB86A-B4B4-421B-B7F4-C3EF46644875}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sleep", "..\..\Sleep\Code\Sleep.vcproj", "{9326A24D-1BDB-4745-BBF6-27BDA2C3C284}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sleep", "..\..\Sleep\Code\Sleep.vcxproj", "{9326A24D-1BDB-4745-BBF6-27BDA2C3C284}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenerateDotNetLicenseIDFiles", "..\..\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcproj", "{E297A14B-8612-41EE-B811-9E64BE1D5606}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenerateDotNetLicenseIDFiles", "..\..\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcxproj", "{E297A14B-8612-41EE-B811-9E64BE1D5606}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcrSingleDocument", "..\..\..\..\RC.Net\UtilityApplications\OCRSingleDocument\Core\Code\OcrSingleDocument.csproj", "{238DFA75-37D8-49D8-8D00-22A8063451A7}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract", "..\..\..\..\RC.Net\Core\Code\Extract.csproj", "{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Licensing", "..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcproj", "{212E31D9-5F02-43AA-8625-BCB86B15CF8F}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
 		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Licensing", "..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj", "{212E31D9-5F02-43AA-8625-BCB86B15CF8F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities", "..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj", "{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmbedPageNumber", "..\..\..\..\RC.Net\UtilityApplications\CustomApplications\EmbedPageNumber\Core\Code\EmbedPageNumber.csproj", "{3EF20B91-1AE1-46D1-BAFF-4ED8FC9DF166}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTextFunctionExpander", "..\..\..\..\ReusableComponents\BaseUtils\TestApps\TestTextFunctionExpander\Code\TestTextFunctionExpander.csproj", "{C7660820-989F-4266-A2A6-5CC3CD5CF089}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Forms", "..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj", "{76781DE2-21D2-470C-B41D-598DC0C2640B}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Drawing", "..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj", "{865B9A25-1D27-4445-9CC7-7BF88D736BA8}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OSSpecificInstaller", "..\..\OSSpecificInstaller\Code\OSSpecificInstaller.vcproj", "{15ABFF7E-907A-4131-8532-847B60E1A987}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OSSpecificInstaller", "..\..\OSSpecificInstaller\Code\OSSpecificInstaller.vcxproj", "{15ABFF7E-907A-4131-8532-847B60E1A987}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLCDBEditor", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Code\SQLCDBEditor.csproj", "{4A3328DB-8492-467C-9EC9-D84EE38432EA}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactExporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj", "{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactImporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj", "{DEDE4275-343B-40C2-B336-040D3D182A44}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VBScriptUtils", "..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcproj", "{68909F26-2CCE-4707-926B-446E931E0D8F}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VBScriptUtils", "..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcxproj", "{68909F26-2CCE-4707-926B-446E931E0D8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Interop", "..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj", "{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}"
 EndProject
 Global
-	GlobalSection(VaultVsipSolution-v2) = preSolution
-		VaultHost = http://white.extract.local/VaultService
-		VaultRepositoryID = 2
-		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 69
-		ProjectRelativeDiskPath1 = ..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcproj
-		ProjectRelativeDiskPath2 = ..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcproj
-		ProjectRelativeDiskPath3 = ..\..\ChangeCase\ChangeCase.vcproj
-		ProjectRelativeDiskPath4 = ..\..\ChangeWindowTitle\ChangeWindowTitle.vcproj
-		ProjectRelativeDiskPath5 = ..\..\COMLicenseEvaluation\Code\COMLicenseEval.vcproj
-		ProjectRelativeDiskPath6 = ..\..\COMLicenseGenerator\Code\COMLicenseGenerator.vcproj
-		ProjectRelativeDiskPath7 = ..\..\CopyNewerFiles\Code\CopyNewerFiles.vcproj
-		ProjectRelativeDiskPath8 = ..\..\CorruptLicenseUtility\Code\CorruptLicenseUtility.vcproj
-		ProjectRelativeDiskPath9 = ..\..\CountImagePages\Code\CountImagePages.vcproj
-		ProjectRelativeDiskPath10 = ..\..\CPUHog\Code\CPUHog.vcproj
-		ProjectRelativeDiskPath11 = ..\..\CreateMultiPageImage\Code\CreateMultiPageImage.vcproj
-		ProjectRelativeDiskPath12 = ..\..\DetectAndReportFailure\Code\DetectAndReportFailure.vcproj
-		ProjectRelativeDiskPath13 = ..\..\DisplayCOMDllLocation\Code\DisplayCOMDllLocation.vcproj
-		ProjectRelativeDiskPath14 = ..\..\DisplayELISources\Code\DisplayELISources.vcproj
-		ProjectRelativeDiskPath15 = ..\..\ELIChecker\Code\ELIChecker.vcproj
-		ProjectRelativeDiskPath16 = ..\..\EncryptTextFile\Code\EncryptTextFile.vcproj
-		ProjectRelativeDiskPath17 = ..\..\FindFileDistribution\Code\FindFileDistribution.vcproj
-		ProjectRelativeDiskPath18 = ..\..\FindString\Code\FindString.vcproj
-		ProjectRelativeDiskPath19 = ..\..\GenerateELISourceList\Code\GenerateELISourceList.vcproj
-		ProjectRelativeDiskPath20 = ..\..\GetNextELICode\GetNextELICode.vcproj
-		ProjectRelativeDiskPath21 = ..\..\GetRandomFileSample\Code\GetRandomFileSample.vcproj
-		ProjectRelativeDiskPath22 = ..\..\ModifyFile\ModifyFile.vcproj
-		ProjectRelativeDiskPath23 = ..\..\MsgBox\MsgBox.vcproj
-		ProjectRelativeDiskPath24 = ..\..\RemovePage\Code\RemovePage.vcproj
-		ProjectRelativeDiskPath25 = ..\..\ReplaceString\ReplaceString.vcproj
-		ProjectRelativeDiskPath26 = ..\..\Semaphore\Semaphore.vcproj
-		ProjectRelativeDiskPath27 = ..\..\SendFilesAsArgumentToApplication\SendFilesAsArgumentToApplication.vcproj
-		ProjectRelativeDiskPath28 = ..\..\ShowStringCharPosition\ShowStringCharPosition.vcproj
-		ProjectRelativeDiskPath29 = ..\..\SpatialStringViewer\Code\SpatialStringViewer.vcproj
-		ProjectRelativeDiskPath30 = ..\..\SplitFile\Code\SplitFile.vcproj
-		ProjectRelativeDiskPath31 = ..\..\SplitLines\SplitLines.vcproj
-		ProjectRelativeDiskPath32 = UCLIDUtilApps.vcproj
-		ProjectRelativeDiskPath33 = ..\..\UEXViewer\Code\UEXViewer.vcproj
-		ProjectRelativeDiskPath34 = ..\..\UpdateFileVersion\UpdateFileVersion.vcproj
-		ProjectRelativeDiskPath35 = ..\..\UserLicense\Code\UserLicense.vcproj
-		ProjectRelativeDiskPath36 = ..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcproj
-		ProjectRelativeDiskPath37 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcproj
-		ProjectRelativeDiskPath38 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcproj
-		ProjectRelativeDiskPath39 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcproj
-		ProjectRelativeDiskPath40 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcproj
-		ProjectRelativeDiskPath41 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcproj
-		ProjectRelativeDiskPath42 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcproj
-		ProjectRelativeDiskPath43 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\SSOCR2.vcproj
-		ProjectRelativeDiskPath44 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcproj
-		ProjectRelativeDiskPath45 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.vcproj
-		ProjectRelativeDiskPath46 = ..\..\..\..\ReusableComponents\COMComponents\ESMessageUtils\Code\ESMessageUtils.vcproj
-		ProjectRelativeDiskPath47 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\ExtractTRP2\Code\ExtractTRP2.vcproj
-		ProjectRelativeDiskPath48 = ..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code\TopoUtils.vcproj
-		ProjectRelativeDiskPath49 = ..\..\ImageFormatConverter\Code\ImageFormatConverter.vcproj
-		ProjectRelativeDiskPath50 = ..\..\CopyNumberedFiles\Code\CopyNumberedFiles.vcproj
-		ProjectRelativeDiskPath51 = ..\..\GetAllSampleImageTypes\Code\GetAllSampleImageTypes.vcproj
-		ProjectRelativeDiskPath52 = ..\..\LogProcessStats\Code\LogProcessStats.vcproj
-		ProjectRelativeDiskPath53 = ..\..\SetOp\Code\SetOp.vcproj
-		ProjectRelativeDiskPath54 = ..\..\GetWordLengthDist\Code\GetWordLengthDist.vcproj
-		ProjectRelativeDiskPath55 = ..\..\Sleep\Code\Sleep.vcproj
-		ProjectRelativeDiskPath56 = ..\..\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcproj
-		ProjectRelativeDiskPath57 = ..\..\..\..\RC.Net\UtilityApplications\OCRSingleDocument\Core\Code\OcrSingleDocument.csproj
-		ProjectRelativeDiskPath58 = ..\..\..\..\RC.Net\Core\Code\Extract.csproj
-		ProjectRelativeDiskPath59 = ..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcproj
-		ProjectRelativeDiskPath60 = ..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj
-		ProjectRelativeDiskPath61 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\EmbedPageNumber\Core\Code\EmbedPageNumber.csproj
-		ProjectRelativeDiskPath62 = ..\..\..\..\ReusableComponents\BaseUtils\TestApps\TestTextFunctionExpander\Code\TestTextFunctionExpander.csproj
-		ProjectRelativeDiskPath63 = ..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj
-		ProjectRelativeDiskPath64 = ..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj
-		ProjectRelativeDiskPath65 = ..\..\OSSpecificInstaller\Code\OSSpecificInstaller.vcproj
-		ProjectRelativeDiskPath66 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Code\SQLCDBEditor.csproj
-		ProjectRelativeDiskPath67 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
-		ProjectRelativeDiskPath68 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
-		ProjectRelativeDiskPath69 = ..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcproj
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -1457,6 +848,16 @@ Global
 		{68909F26-2CCE-4707-926B-446E931E0D8F}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{68909F26-2CCE-4707-926B-446E931E0D8F}.Release|Win32.ActiveCfg = Release|Win32
 		{68909F26-2CCE-4707-926B-446E931E0D8F}.Release|Win32.Build.0 = Release|Win32
+		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
