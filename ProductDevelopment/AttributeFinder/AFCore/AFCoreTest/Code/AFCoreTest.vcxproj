@@ -363,10 +363,6 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
       <Project>{f46fef85-53fd-4491-80ff-3afb4aee544b}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Utils\FlexDataEntry\Code\FlexDataEntry.vcxproj">
-      <Project>{9f1976ba-e68b-425c-8d7e-2df5ed4cd2d0}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Utils\IndexConverter\Code\IndexConverter.vcxproj">
       <Project>{642f78cd-19b0-4b31-a0bf-246371c326eb}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

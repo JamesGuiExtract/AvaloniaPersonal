@@ -1401,7 +1401,92 @@ private:
 //			exception into an UCLIDException, adding available information as debug info, and 
 //			displaying the UCLIDException using the default exception handler.
 #define CATCH_AND_DISPLAY_ALL_EXCEPTIONS(strELI) \
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS_ROOT(strELI, false)
+	catch (UCLIDException& ue) \
+	{ \
+		ue.addDebugInfo("CatchID", strELI); \
+		__if_exists(_lastCodePos) \
+		{ \
+			ue.addDebugInfo(_lastCodePos); \
+		} \
+		ue.display(); \
+	} \
+	catch (_com_error& e) \
+	{ \
+		UCLIDException ue; \
+		_bstr_t _bstrDescription = e.Description(); \
+		char *pszDescription = _bstrDescription; \
+		if (pszDescription) \
+			ue.createFromString(strELI, pszDescription); \
+		else \
+			ue.createFromString(strELI, "COM exception caught!"); \
+		ue.addHresult(e.Error()); \
+		ue.addDebugInfo("err.WCode", e.WCode()); \
+		__if_exists(_lastCodePos) \
+		{ \
+			ue.addDebugInfo(_lastCodePos); \
+		} \
+		ue.display(); \
+	} \
+	catch (COleDispatchException *pEx) \
+	{ \
+		string strDesc = (LPCTSTR) pEx->m_strDescription; \
+		UCLIDException ue; \
+		ue.createFromString(strELI, strDesc.empty() ? "OLE dispatch exception caught." : strDesc); \
+		ue.addDebugInfo("Error Code", pEx->m_wCode); \
+		pEx->Delete(); \
+		__if_exists(_lastCodePos) \
+		{ \
+			ue.addDebugInfo(_lastCodePos); \
+		} \
+		ue.display(); \
+	} \
+	catch (COleDispatchException& ex) \
+	{ \
+		string strDesc = (LPCTSTR) ex.m_strDescription; \
+		UCLIDException ue; \
+		ue.createFromString(strELI, strDesc.empty() ? "OLE dispatch exception caught." : strDesc); \
+		ue.addDebugInfo("Error Code", ex.m_wCode); \
+		__if_exists(_lastCodePos) \
+		{ \
+			ue.addDebugInfo(_lastCodePos); \
+		} \
+		ue.display(); \
+	} \
+	catch (COleException& ex) \
+	{ \
+		char pszCause[256] = {0}; \
+		ex.GetErrorMessage(pszCause, 255); \
+		UCLIDException ue; \
+		ue.createFromString(strELI, pszCause == "" ? "OLE exception caught." : pszCause); \
+		ue.addDebugInfo("Status Code", ex.m_sc); \
+		__if_exists(_lastCodePos) \
+		{ \
+			ue.addDebugInfo(_lastCodePos); \
+		} \
+		ue.display(); \
+	} \
+	catch (CException* pEx) \
+	{ \
+		char pszCause[256] = {0}; \
+		pEx->GetErrorMessage(pszCause, 255); \
+		pEx->Delete(); \
+		UCLIDException ue; \
+		ue.createFromString(strELI, pszCause == "" ? "C Exception caught." : pszCause); \
+		__if_exists(_lastCodePos) \
+		{ \
+			ue.addDebugInfo(_lastCodePos); \
+		} \
+		ue.display(); \
+	} \
+	catch (...) \
+	{ \
+		UCLIDException ue(strELI, "Unexpected exception caught."); \
+		__if_exists(_lastCodePos) \
+		{ \
+			ue.addDebugInfo(_lastCodePos); \
+		} \
+		ue.display(); \
+	}
 //--------------------------------------------------------------------------------------------------
 // PURPOSE:	This macro has the same use as the above macro, except that it is intended for
 //			use in projects where there is no MFC support (e.g. services, or ATL COM EXE projects)

@@ -384,7 +384,6 @@ namespace Extract.Imaging.Forms
         /// <param name="keyData">The key to process.</param>
         /// <returns><see langword="true"/> if the character was processed by the control; 
         /// otherwise, <see langword="false"/>.</returns>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (msg.Msg == WindowsMessage.KeyDown || msg.Msg == WindowsMessage.SystemKeyDown)

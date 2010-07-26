@@ -333,7 +333,7 @@ namespace Extract.Utilities.Parsers
         /// </summary>
         /// <param name="bstrInput">The <see cref="String"/> to search for replacements.</param>
         /// <param name="bstrReplacement">The string to use to replace matches in 
-        /// <paramref name="input"/>. May contain capture groups (e.g. "$1 $2").</param>
+        /// <paramref name="bstrInput"/>. May contain capture groups (e.g. "$1 $2").</param>
         /// <param name="bFindFirstMatchOnly"><see langword="true"/> if only the first match should 
         /// be found; <see langword="false"/> if more than one match should be found.</param>
         /// <returns>An <see cref="IUnknownVector"/> of <see cref="Token"/>s, where the 

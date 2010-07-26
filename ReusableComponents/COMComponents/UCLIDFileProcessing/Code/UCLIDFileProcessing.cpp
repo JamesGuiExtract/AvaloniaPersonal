@@ -18,7 +18,6 @@
 #include "FileProcessingTaskExecutor.h"
 
 #include <ComUtils.h>
-#include <RWUtils.h>
 
 CComModule _Module;
 
@@ -61,18 +60,12 @@ BOOL CUCLIDFileProcessingApp::InitInstance()
 {
     _Module.Init(ObjectMap, m_hInstance, &LIBID_UCLID_FILEPROCESSINGLib);
 
-	// Initialize the Rogue Wave Utils library
-	RWInitializer	rwInit;
-
     return CWinApp::InitInstance();
 }
 
 int CUCLIDFileProcessingApp::ExitInstance()
 {
     _Module.Term();
-
-	// Cleanup the Rogue Wave Utils library
-	RWCleanup	rwClean;
 
     return CWinApp::ExitInstance();
 }

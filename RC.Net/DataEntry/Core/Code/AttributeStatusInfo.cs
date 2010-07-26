@@ -99,7 +99,7 @@ namespace Extract.DataEntry
     /// An object that represents the current state of a particular <see cref="IAttribute"/>
     /// This includes whether the attribute's data has been validated, fully propagated and whether it
     /// has been viewed by the user. The object is intended to occupy the 
-    /// <see cref="IAttribute.DataObject"/> field of the <see cref="IAttribute"/> it is associated
+    /// IAttribute.DataObject field of the <see cref="IAttribute"/> it is associated
     /// with.
     /// </summary>
     [Guid("BC86C004-F2C7-4a90-80F7-F6C49B201AD4")]

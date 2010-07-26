@@ -200,11 +200,11 @@ namespace Extract.Imaging
         }
 
         /// <summary>
-        /// Extracts a sub image from from the specified <paramref name="page"/>.
+        /// Extracts a sub image from from the specified <paramref name="source"/>.
         /// </summary>
         /// <param name="bounds">The bounds of the sub image to extract.</param>
         /// <param name="source">The source image to extract the sub image from.</param>
-        /// <returns>A sub image that has been extracted from the <paramref name="page"/>.</returns>
+        /// <returns>A sub image that has been extracted from the <paramref name="source"/>.</returns>
         public static RasterImage ExtractSubImageFromPage(Rectangle bounds, RasterImage source)
         {
             RasterImage subImage = null;

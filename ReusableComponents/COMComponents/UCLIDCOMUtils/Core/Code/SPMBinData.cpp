@@ -49,7 +49,7 @@ long SPMBinData::execBinarySearch(long nStartPos)
 	}
 
 	// if we reached here, there's no match
-	return stringCSIS::npos;
+	return string::npos;
 }
 //------------------------------------------------------------------------------------------------
 long SPMBinData::execLinearSearch(long nStartPos)
@@ -72,7 +72,7 @@ long SPMBinData::execLinearSearch(long nStartPos)
 	}
 
 	// if we reached here, there's no match
-	return stringCSIS::npos;
+	return string::npos;
 }
 //------------------------------------------------------------------------------------------------
 long SPMBinData::find(const stringCSIS& strText, 
@@ -123,7 +123,7 @@ long SPMBinData::find(const stringCSIS& strText,
 			//	and marked as "search complete"
 			//}
 		}
-		while (nCurPos != stringCSIS::npos && nCurPos < nNextBinStartPos);
+		while (nCurPos != string::npos && nCurPos < nNextBinStartPos);
 
 		m_bSearchComplete = true;
 		m_ulVecSize = m_vecPositions.size();
@@ -136,7 +136,7 @@ long SPMBinData::find(const stringCSIS& strText,
 	// of approximately 25 or less.
 	if (m_ulVecSize == 0)
 	{
-		return stringCSIS::npos;
+		return string::npos;
 	}
 	else if (m_ulVecSize < 25)
 	{

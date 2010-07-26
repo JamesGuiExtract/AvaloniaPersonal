@@ -217,6 +217,8 @@ namespace Extract.Utilities.Forms
         /// </summary>
         /// <param name="document">The XML document to use when creating the XML element.</param>
         /// <returns>An XML element the represents the instance of this object.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes",
+            MessageId="System.Xml.XmlNode")]
         public XmlElement ToXmlElement(XmlDocument document)
         {
             try

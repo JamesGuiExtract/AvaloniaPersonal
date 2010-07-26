@@ -112,7 +112,6 @@ IDR_LONGTOLONGMAP       REGISTRY                "LongToLongMap.rgs"
 IDR_COMMUTEX            REGISTRY                "COMMutex.rgs"
 IDR_DOUBLEPOINT         REGISTRY                "DoublePoint.rgs"
 IDR_PROGRESSSTATUS      REGISTRY                "ProgressStatus.rgs"
-IDR_PROGRESSSTATUSDIALOG REGISTRY                "ProgressStatusDialog.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -157,17 +156,6 @@ BEGIN
     PUSHBUTTON      "",IDC_BUTTON_UP,325,75,25,20,BS_ICON
     PUSHBUTTON      "",IDC_BUTTON_DOWN,360,75,25,20,BS_ICON
 END
-
-IDD_DIALOG_PROGRESS_STATUS DIALOGEX 0, 0, 264, 90
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
-EXSTYLE WS_EX_TOOLWINDOW
-CAPTION "Progress Status Dialog"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    PUSHBUTTON      "Stop",IDC_STOP,107,72,50,14,NOT WS_VISIBLE
-    CONTROL         "Custom1",IDC_PROGRESS_GRID,"GXWND",WS_TABSTOP,6,6,252,60
-END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //

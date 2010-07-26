@@ -268,7 +268,7 @@ namespace Extract.DataEntry
         /// this call.
         /// <para><b>Requirements:</b></para>
         /// The <see cref="IAttribute"/> must contain a valid <see cref="AttributeStatusInfo"/> 
-        /// instance in <see cref="IAttribute.DataObject"/></param>
+        /// instance in IAttribute.DataObject</param>
         /// <param name="throwException">If <see langword="true"/> if the method will throw an
         /// exception if the provided value does not meet validation requirements.</param>
         /// <param name="correctValue"><see langword="true"/> if the value is valid, to remove any

@@ -4,7 +4,6 @@
 //
 
 #include "resource.h"
-#include <CheckGridWnd.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CImportRuleSetDlg dialog
@@ -52,13 +51,13 @@ private:
 
 	// Populate Attribute Names and Imported/Exported Attribute Names
 	// from the Rule Set
-	void	populateGrid();
+	void	populateList();
 
 	///////////////
 	// Data Members
 	///////////////
 	// Grid window
-	CCheckGridWnd	m_wndGrid;
+	CkListCtrl	m_wndList;
 
 	// Is this an Import or Export dialog
 	bool			m_bDoImport;

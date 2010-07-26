@@ -243,18 +243,6 @@ BEGIN
     PUSHBUTTON      "Cancel",ID_CANCEL_SEARCH,121,130,55,15
 END
 
-IDD_DLG_IMPORT_ATTRIBUTES DIALOG  0, 0, 254, 177
-STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "Import Attributes"
-FONT 8, "MS Sans Serif"
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,138,156,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,197,156,50,14
-    LTEXT           "Select attributes to import",IDC_STATIC_SELECT,7,7,111,9
-    CONTROL         "Custom1",IDC_GRID,"GXWND",WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,7,17,240,133
-    CONTROL         "",IDC_PICTURE,"Static",SS_BLACKFRAME,27,155,39,15
-END
-
 IDD_TESTERDLG_SETTINGS_PAGE DIALOG  0, 0, 117, 49
 STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
 CAPTION "General Settings"
@@ -444,9 +432,6 @@ BEGIN
     BEGIN
         MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
         MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
-        MENUITEM SEPARATOR
-        MENUITEM "&Import...\tCtrl+I",          ID_FILE_IMPORT
-        MENUITEM "&Export...\tCtrl+E",          ID_FILE_EXPORT
         MENUITEM SEPARATOR
         MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
         MENUITEM "Save &As...",                 ID_FILE_SAVEAS

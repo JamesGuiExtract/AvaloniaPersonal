@@ -13,7 +13,6 @@
 #include <LoadFileDlgThread.h>
 #include <SuspendWindowUpdates.h>
 
-#include <IconControl.h>
 #include <FileDialogEx.h>
 
 #include <cpputil.h>

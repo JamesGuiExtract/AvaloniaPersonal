@@ -7,8 +7,11 @@
 #include <string>
 #include <vector>
 #include <QuickMenuChooser.h>
-#include <CheckCheckComboGridWnd.h>
-#include <Notifications.h>
+//#include <CheckCheckComboGridWnd.h>
+#include <Uglibsel.h>
+//#include <UGCtrl.h>
+
+#include "QueueGrid.h"
 
 class FileProcessingConfigMgr;
 class FileProcessingManager;
@@ -110,7 +113,7 @@ private:
 	bool m_bEnabled;
 
 	// Grid window with two checkbox and a combo box column
-	CCheckCheckComboGridWnd	m_wndGrid;
+	CQueueGrid m_wndGrid;
 
 	// This variable is initialized to false so that the first call of OnSize()
 	// before OnInitDialog() will be skipped, then it will be set to true inside 

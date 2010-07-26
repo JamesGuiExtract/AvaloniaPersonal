@@ -168,7 +168,7 @@ void CESPrintManagerApp::launchApplication(const PrintedImageResults& results)
 		// replace it with the original document name
 		string strCommandLineArgs = m_strCommandLineArgs;
 		if (!strCommandLineArgs.empty()
-			&& strCommandLineArgs.find(gstrORIGINAL_FILE) != string.npos)
+			&& strCommandLineArgs.find(gstrORIGINAL_FILE) != string::npos)
 		{
 			replaceVariable(strCommandLineArgs, gstrORIGINAL_FILE,
 				"\"" + results.OriginalDocument + "\"");

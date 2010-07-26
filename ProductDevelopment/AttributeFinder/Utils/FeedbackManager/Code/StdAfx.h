@@ -5,9 +5,6 @@
 #pragma once
 
 #define STRICT 1
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0400
-#endif
 #define _ATL_APARTMENT_THREADED
 
 // DAO support conflicts with ADO support, so remove it

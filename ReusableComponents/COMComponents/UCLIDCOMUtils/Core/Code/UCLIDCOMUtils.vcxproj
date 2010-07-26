@@ -74,8 +74,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\APIs\RogueWave\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_GXEXT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -96,7 +96,7 @@
     <Link>
       <OutputFile>..\..\..\..\..\Binaries\Release/UCLIDCOMUtils.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\..\APIs\RogueWave\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\UCLIDCOMUtils.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -128,8 +128,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\APIs\RogueWave\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_GXEXT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -151,7 +151,7 @@
     <Link>
       <OutputFile>..\..\..\..\..\Binaries\Debug/UCLIDCOMUtils.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\..\APIs\RogueWave\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\UCLIDCOMUtils.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/UCLIDCOMUtils.pdb</ProgramDatabaseFile>
@@ -267,8 +267,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="ProgressStatus.cpp" />
-    <ClCompile Include="ProgressStatusDialog.cpp" />
-    <ClCompile Include="ProgressStatusMFCDlg.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -359,7 +357,6 @@
     <None Include="ObjectSelectorUI.rgs" />
     <None Include="ObjectWithDescription.rgs" />
     <None Include="ProgressStatus.rgs" />
-    <None Include="ProgressStatusDialog.rgs" />
     <None Include="StringPair.rgs" />
     <None Include="StringPatternMatcher.rgs" />
     <None Include="StrToObjectMap.rgs" />
@@ -407,8 +404,6 @@
     <ClInclude Include="ObjPropertiesDlg.h" />
     <ClInclude Include="ObjSelectDlg.h" />
     <ClInclude Include="ProgressStatus.h" />
-    <ClInclude Include="ProgressStatusDialog.h" />
-    <ClInclude Include="ProgressStatusMFCDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="StringPair.h" />

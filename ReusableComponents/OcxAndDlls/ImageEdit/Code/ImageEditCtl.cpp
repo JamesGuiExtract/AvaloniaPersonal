@@ -18,16 +18,11 @@
 //
 
 #include "stdafx.h"
-#include <math.h>
 #include "ImageEdit.h"
 #include "ImageEditCtl.h"
 #include "ImageEditPpg.h"
-#include <io.h>  // to use access method
 
 #include <ltWrappr.h>
-
-#include <string>
-using namespace std;
 
 #include <ExtractZoneAsImage.h>
 #include <MiscLeadUtils.h>
@@ -35,6 +30,10 @@ using namespace std;
 #include <ComUtils.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
+
+#include <string>
+using namespace std;
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

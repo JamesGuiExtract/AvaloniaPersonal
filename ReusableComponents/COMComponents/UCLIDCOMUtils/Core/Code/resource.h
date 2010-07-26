@@ -33,7 +33,6 @@
 #define IDR_COMMUTEX                    129
 #define IDR_DOUBLEPOINT                 131
 #define IDR_PROGRESSSTATUS              132
-#define IDR_PROGRESSSTATUSDIALOG        133
 #define IDC_STATIC_PROPERTIES           201
 #define IDD_DLG_OBJ_PROPERTIES          202
 #define IDD_DLG_OBJ_SELECT              203
@@ -57,8 +56,6 @@
 #define IDC_PROGRESS1                   220
 #define IDC_STATIC_MESSAGE              221
 #define IDI_ICON_DYNAMIC_LIST           222
-#define IDD_DIALOG_PROGRESS_STATUS      223
-#define IDC_PROGRESS_GRID               224
 #define IDC_STOP                        225
 // Use resource value previously defined in BaseUtils
 #define ID_EDIT_DELETE                  6023

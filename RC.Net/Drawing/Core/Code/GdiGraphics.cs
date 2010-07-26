@@ -138,8 +138,6 @@ namespace Extract.Drawing
         /// <param name="color">The color of the region to draw.</param>
         /// <permission cref="SecurityPermission">Demands permission for unmanaged code.
         /// </permission>
-        [SecurityPermission(SecurityAction.LinkDemand,
-            Flags = SecurityPermissionFlag.UnmanagedCode)]
         public void FillRegion(Region region, Color color)
         {
             // No need to draw transparent or empty regions

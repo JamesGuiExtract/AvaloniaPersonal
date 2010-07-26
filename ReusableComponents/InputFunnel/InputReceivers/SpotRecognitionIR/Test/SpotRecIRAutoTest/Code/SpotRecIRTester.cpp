@@ -44,20 +44,24 @@ STDMETHODIMP CSpotRecIRTester::raw_RunAutomatedTests(IVariantVector* pParams, BS
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpotRecIRTester::raw_RunInteractiveTests()
 {
-	UCLIDException ue("ELI12062", "Interactive test for this component are disabled!");
-	throw ue;
+	try
+	{
+		UCLIDException ue("ELI12062", "Interactive test for this component are disabled!");
+		throw ue;
 
-	// open the helper app
-	string strHelperApp = "";
-//	strHelperApp += "\\Engineering\\ProductDevelopment\\InputFunnel\\InputReceivers\\SpotRecognitionIR\\Test\\SpotRecIRAutoTest\\TestHelperApps\\VBTest\\TestSpotRecIR.exe";
-	runEXE(strHelperApp, "");
+		// open the helper app
+		string strHelperApp = "";
+		//	strHelperApp += "\\Engineering\\ProductDevelopment\\InputFunnel\\InputReceivers\\SpotRecognitionIR\\Test\\SpotRecIRAutoTest\\TestHelperApps\\VBTest\\TestSpotRecIR.exe";
+		runEXE(strHelperApp, "");
 
-	// bring up the interactive test case executer
-	string strITCFile = m_strInteractiveTestFilesFolder;
-	strITCFile += "\\spotrec.itc";
-	m_ipITCExecuter->ExecuteITCFile(_bstr_t(strITCFile.c_str()));
+		// bring up the interactive test case executer
+		string strITCFile = m_strInteractiveTestFilesFolder;
+		strITCFile += "\\spotrec.itc";
+		m_ipITCExecuter->ExecuteITCFile(_bstr_t(strITCFile.c_str()));
 
-	return S_OK;
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30417");
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpotRecIRTester::raw_SetResultLogger(ITestResultLogger * pLogger)

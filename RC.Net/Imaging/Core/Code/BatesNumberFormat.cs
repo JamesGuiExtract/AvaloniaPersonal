@@ -764,7 +764,6 @@ namespace Extract.Imaging
         /// object to.</param>
         /// <param name="context">The <see cref="StreamingContext"/> for the
         /// serialization stream.</param>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             try

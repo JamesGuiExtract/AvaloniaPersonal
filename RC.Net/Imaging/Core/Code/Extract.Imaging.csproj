@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -16,6 +17,27 @@
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccAuxPath>http://white.extract.local/VaultService</SccAuxPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+    <PublishUrl>http://localhost/Extract.Imaging/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,7 +51,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <RegisterForComInterop>false</RegisterForComInterop>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -42,7 +64,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <RegisterForComInterop>false</RegisterForComInterop>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Leadtools, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
@@ -109,7 +131,7 @@
       <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
       <Name>Extract.Drawing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Encryption\Core\Code\Extract.Encryption.vcproj">
+    <ProjectReference Include="..\..\..\Encryption\Core\Code\Extract.Encryption.vcxproj">
       <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
       <Name>Extract.Encryption</Name>
     </ProjectReference>
@@ -117,7 +139,7 @@
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcproj">
+    <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>
@@ -129,7 +151,7 @@
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Utilities\Core\Code\Extract.Imaging.Utilities.vcproj">
+    <ProjectReference Include="..\..\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj">
       <Project>{E610E652-0891-40D4-B5CA-A622B87C7979}</Project>
       <Name>Extract.Imaging.Utilities</Name>
     </ProjectReference>
@@ -182,6 +204,23 @@
       <DependentUpon>PdfPasswordSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -191,7 +230,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>$(FrameworkDir)$(FrameworkVersion)\RegAsm "$(TargetPath)" /tlb:"$(ProjectDir)$(TargetName).tlb"
-CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

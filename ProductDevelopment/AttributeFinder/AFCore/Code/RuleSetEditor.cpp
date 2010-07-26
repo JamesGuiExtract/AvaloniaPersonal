@@ -16,7 +16,6 @@
 #include "stdafx.h"
 #include "afcore.h"
 #include "RuleSetEditor.h"
-#include "ImportRuleSetDlg.h"
 #include "Common.h"
 #include "RuleTesterDlg.h"
 
@@ -218,8 +217,6 @@ BEGIN_MESSAGE_MAP(CRuleSetEditor, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO_ATTRIBUTES, OnSelchangeComboAttributes)
 	ON_BN_CLICKED(IDC_CHECK_STOP, OnCheckStop)
 	ON_WM_CLOSE()
-	ON_COMMAND(ID_FILE_IMPORT, OnFileImport)
-	ON_COMMAND(ID_FILE_EXPORT, OnFileExport)
 	ON_WM_DROPFILES()
 	ON_BN_CLICKED(IDC_BTN_SELECT_ATTRIBUTE_SPLITTER, OnBtnSelectAttributeSplitter)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_RULES, OnRclickListRules)
@@ -279,20 +276,9 @@ void CRuleSetEditor::processDroppedFile(char *pszFile)
 	string strExt = getExtensionFromFullPath(pszFile, true);
 	if (strExt == ".rsd" || strExt == ".etf")
 	{
-		// if the CTRL key is pressed during a drag-and-drop, then
-		// the user wants to import attributes from the file, otherwise
-		// it is assumed that the user wants to just open the .RSD file
-		// directly
-		if (::isVirtKeyCurrentlyPressed(VK_CONTROL))
-		{
-			importFromFile(pszFile);
-		}
-		else
-		{
-			// open the .RSD file as if the user clicked on File-Open and
-			// selected the .RSD file
-			openFile(pszFile);
-		}
+		// open the .RSD file as if the user clicked on File-Open and
+		// selected the .RSD file
+		openFile(pszFile);
 	}
 	else
 	{
@@ -305,81 +291,6 @@ void CRuleSetEditor::processDroppedFile(char *pszFile)
 
 		// delegate the drop call to the tester dialog
 		m_apRuleTesterDlg->processDroppedFile(pszFile);
-	}
-}
-//-------------------------------------------------------------------------------------------------
-void CRuleSetEditor::importFromFile(const string& strFileName) 
-{
-	// Create a vector of reserved attribute names
-	vector<string> vecAttributes;
-	int iCount = m_comboAttr.GetCount();
-	CString	zAttribute;
-	for (int j = 0; j < iCount; j++)
-	{
-		// Retrieve this attribute
-		m_comboAttr.GetLBText( j, zAttribute );
-
-		// Add this attribute to the vector
-		vecAttributes.push_back( string( LPCTSTR(zAttribute) ) );
-	}
-
-	// Create a temporary ruleset object
-	UCLID_AFCORELib::IRuleSetPtr ipImportRuleSet( CLSID_RuleSet );
-	ASSERT_RESOURCE_ALLOCATION( "ELI05060", ipImportRuleSet != NULL );
-
-	// verify extension is RSD
-	string strExt = getExtensionFromFullPath( strFileName );
-	makeUpperCase( strExt );
-	if ( strExt != ".RSD" )
-	{
-		throw UCLIDException("ELI07656", "File is not an RSD file.");
-	}
-
-	// Load the ruleset object from the specified file 
-	_bstr_t bstrFileName = get_bstr_t( strFileName.c_str() );
-	ipImportRuleSet->LoadFrom( bstrFileName, VARIANT_FALSE );
-
-	// Create and display the Import dialog
-	CImportRuleSetDlg	dlgImport( ipImportRuleSet, vecAttributes, true );
-	int iReturn = dlgImport.DoModal();
-	if (iReturn == IDOK)
-	{
-		// Retrieve map of attribute names and attribute infos
-		// to be imported
-		IStrToObjectMapPtr ipImportMap;
-		ipImportMap = ipImportRuleSet->AttributeNameToInfoMap;
-		ASSERT_RESOURCE_ALLOCATION( "ELI05017", ipImportMap != NULL );
-
-		// Add the selected rules to this rule set
-		IVariantVectorPtr ipKeys = ipImportMap->GetKeys();
-		long lNumKeys = ipKeys->Size;
-		for (int i = 0; i < lNumKeys; i++)
-		{
-			// Retrieve the attribute name
-			_bstr_t bstrName = ipKeys->GetItem( i );
-
-			// Check for an attribute with the specified name already in the map
-			if (m_ipAttributeNameToInfoMap->Contains(bstrName))
-			{
-				// Throw exception indicating that attribute already exists
-				UCLIDException ue( "ELI05018", "Specified attribute is already in the list." );
-				ue.addDebugInfo("Attribute name", (const char *) bstrName);
-				throw ue;
-			}
-
-			// Retrieve the associated AttributeFindInfo object
-			UCLID_AFCORELib::IAttributeFindInfoPtr ipInfo = ipImportMap->GetValue( bstrName );
-			ASSERT_RESOURCE_ALLOCATION( "ELI05019", ipInfo != NULL );
-
-			// Add the Name and Info pair to the map
-			m_ipAttributeNameToInfoMap->Set(bstrName, ipInfo);
-
-			// Add the Attribute Name to the combo box
-			int iIndex = m_comboAttr.AddString(bstrName);
-		}
-
-		// Refresh the UI
-		refreshUIFromRuleSet();
 	}
 }
 //-------------------------------------------------------------------------------------------------

@@ -319,7 +319,8 @@ STDMETHODIMP CEAVGeneratorDlg::raw_GetPTHDescription(BSTR *pstrDescription)
 
 	try
 	{
-		*pstrDescription = _bstr_t("Send text to VOA File Viewer window").copy();
+		ASSERT_ARGUMENT("ELI30413", pstrDescription != NULL);
+		*pstrDescription = _bstr_t("Send text to VOA File Viewer window").Detach();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07370")
 

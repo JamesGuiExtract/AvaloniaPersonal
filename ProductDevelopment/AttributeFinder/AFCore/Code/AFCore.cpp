@@ -20,7 +20,6 @@
 #include "AFAboutDlg.h"
 #include "AFCategories.h"
 #include <ComUtils.h>
-#include <RWUtils.h>
 #include "AFDocument.h"
 #include "RuleExecutionEnv.h"
 #include "RuleExecutionSession.h"
@@ -87,9 +86,6 @@ BOOL CAFCoreApp::InitInstance()
 		UCLIDException::setExceptionHandler(&exceptionDlg);
 		UCLIDException::setApplication( getAttributeFinderEngineVersion( 
 			kFlexIndexHelpAbout ) );
-
-		// Initialize the Rogue Wave Utils library
-		RWInitializer	rwInit;
 	}
 	catch(...)
 	{
@@ -104,15 +100,6 @@ BOOL CAFCoreApp::InitInstance()
 int CAFCoreApp::ExitInstance()
 {
     _Module.Term();
-
-	try
-	{
-		// Cleanup the Rogue Wave Utils library
-		RWCleanup	rwClean;
-	}
-	catch(...)
-	{
-	}
 
     return CWinApp::ExitInstance();
 }

@@ -14,7 +14,7 @@
 #include "FPCategories.h"
 #include "FileProcessingUtils.h"
 #include "FileProcessingDlg.h"
-#include "ScheduleDialog.h"
+#include "CommonConstants.h"
 
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
@@ -44,6 +44,9 @@ const int giCOMBO_INDEX_ANYONE = 1;
 // The upper bound for the threads dialog box
 const int giTHREADS_UPPER_RANGE = 100;
 
+// ProgID for the set schedule COM object
+const string gstrSET_SCHEDULE_PROG_ID = "Extract.FileActionManager.Forms.SetProcessingSchedule";
+
 //-------------------------------------------------------------------------------------------------
 // FileProcessingDlgTaskPage property page
 //-------------------------------------------------------------------------------------------------
@@ -53,6 +56,7 @@ FileProcessingDlgTaskPage::FileProcessingDlgTaskPage()
 : CPropertyPage(FileProcessingDlgTaskPage::IDD), 
   m_ipClipboardMgr(NULL),
   m_ipMiscUtils(NULL),
+  m_ipSchedule(NULL),
   m_dwSel(0),
   m_bEnabled(true),
   m_bInitialized(false),
@@ -69,6 +73,7 @@ FileProcessingDlgTaskPage::~FileProcessingDlgTaskPage()
 	{
 		m_ipClipboardMgr = NULL;
 		m_ipMiscUtils = NULL;
+		m_ipSchedule = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16529");
 }
@@ -1583,28 +1588,22 @@ void FileProcessingDlgTaskPage::OnBnClickedButtonSetSchedule()
 
 	try
 	{
-		ScheduleDialog schedDlg;
-		schedDlg.SetScheduledHours(m_vecSchedule);
-
-		if (schedDlg.DoModal() == IDOK )
+		if (m_ipSchedule == NULL)
 		{
-			// Get the new schedule
-			schedDlg.GetScheduledHours(m_vecSchedule);
+			m_ipSchedule = getFPMgmtRole()->ProcessingSchedule;
+		}
 
-			// Create the variant vector to pass the new schedule to the FPMgmt role
-			IVariantVectorPtr ipSchedule(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI28163", ipSchedule != NULL);
-			
-			// Put the schedule in the variant vector
-			int nSize = m_vecSchedule.size();
-			for (int i = 0; i < nSize; i++)
-			{
-				variant_t v(m_vecSchedule[i]);
-				ipSchedule->PushBack(v);
-			}
-			
-			// Update the FPMgmtRoll schedule
+		// Get the set schedule COM object
+		UCLID_FILEPROCESSINGLib::ISetProcessingSchedulePtr ipSet(gstrSET_SCHEDULE_PROG_ID.c_str());
+		ASSERT_RESOURCE_ALLOCATION("ELI30412", ipSet != NULL);
+
+		// Prompt the user to set the new schedule
+		IVariantVectorPtr ipSchedule = ipSet->PromptForSchedule(m_ipSchedule);
+		if (ipSchedule != NULL)
+		{
+			// Update the FPMgmtRole schedule
 			getFPMgmtRole()->ProcessingSchedule = ipSchedule;
+			m_ipSchedule = ipSchedule;
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28063");
@@ -1692,32 +1691,13 @@ void FileProcessingDlgTaskPage::refresh()
 	// Get the limit processing times flag
 	m_bLimitProcessingTimes = asMFCBool(ipMgmtRole->LimitProcessingToSchedule);
 
-	m_vecSchedule.clear();
-	m_vecSchedule.resize(giNUMBER_OF_HOURS_IN_WEEK, true);
+	m_ipSchedule = NULL;
 
 	// If limiting the processing get the schedule
 	if (asCppBool(m_bLimitProcessingTimes))
 	{
-		// Get the schedule
-		IVariantVectorPtr ipSchedule = ipMgmtRole->ProcessingSchedule;
-		ASSERT_RESOURCE_ALLOCATION("ELI28164", ipSchedule != NULL);
-
-		// Copy the schedule to the local vector
-		nSize = ipSchedule->Size;
-		for (i = 0; i < nSize; i++)
-		{
-			variant_t v(ipSchedule->Item[i]);
-			if (v.vt == VT_BOOL)
-			{
-				m_vecSchedule[i] = asCppBool(v.boolVal);
-			}
-			else
-			{
-				UCLIDException ue("ELI28183", "Unexpected variant type.");
-				ue.addDebugInfo("VariantType", v.vt);
-				throw ue;
-			}
-		}
+		m_ipSchedule = ipMgmtRole->ProcessingSchedule;
+		ASSERT_RESOURCE_ALLOCATION("ELI28164", m_ipSchedule != NULL);
 	}
 }
 //-------------------------------------------------------------------------------------------------

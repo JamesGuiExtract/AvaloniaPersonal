@@ -131,7 +131,6 @@ namespace Extract.Utilities.Forms
         /// <param name="keyData">One of the <see cref="Keys"/> values that represents the key to 
         /// process.</param>
         /// <param name="msg">The window message to process.</param>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (!_hideSelection && Focused)

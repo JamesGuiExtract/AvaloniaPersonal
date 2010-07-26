@@ -75,7 +75,8 @@ FileProcessingDlgScopePage::~FileProcessingDlgScopePage()
 void FileProcessingDlgScopePage::refresh()
 {
 	// Clear listed File Suppliers and the FAM Condition
-	m_wndGrid.Clear();
+//	m_wndGrid.Clear();
+	m_wndGrid.ResetAll();
 	m_zConditionDescription = "";
 
 	// Add each File Supplier to the list
@@ -143,22 +144,22 @@ void FileProcessingDlgScopePage::updateSupplierStatus(WPARAM wParam, LPARAM lPar
 	}
 	else
 	{
-		// Step through each file supplier
-		long lCount = m_wndGrid.GetRowCount();
-		for (int i = 1; i <= lCount; i++)
-		{
-			// Retrieve this File Supplier
-			UCLID_FILEPROCESSINGLib::IFileSupplierPtr ipThisFS = getFileSupplier( i );
-			ASSERT_RESOURCE_ALLOCATION("ELI14043", ipThisFS != NULL);
-
-			// Compare File Suppliers
-			if ((LPARAM)ipThisFS.GetInterfacePtr() == lParam)
-			{
-				// Update the status
-				setStatus( i, eNewStatus );
-				break;
-			}
-		}
+//		// Step through each file supplier
+//		long lCount = m_wndGrid.GetRowCount();
+//		for (int i = 1; i <= lCount; i++)
+//		{
+//			// Retrieve this File Supplier
+//			UCLID_FILEPROCESSINGLib::IFileSupplierPtr ipThisFS = getFileSupplier( i );
+//			ASSERT_RESOURCE_ALLOCATION("ELI14043", ipThisFS != NULL);
+//
+//			// Compare File Suppliers
+//			if ((LPARAM)ipThisFS.GetInterfacePtr() == lParam)
+//			{
+//				// Update the status
+//				setStatus( i, eNewStatus );
+//				break;
+//			}
+//		}
 	}
 
 	// Update action buttons
@@ -197,7 +198,7 @@ BOOL FileProcessingDlgScopePage::PreTranslateMessage(MSG* pMsg)
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15270")
 
-	return CDialog::PreTranslateMessage(pMsg);
+	return CPropertyPage::PreTranslateMessage(pMsg);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgScopePage::DoDataExchange(CDataExchange* pDX)
@@ -222,9 +223,6 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgScopePage, CPropertyPage)
 	ON_COMMAND(ID_CONTEXT_PASTE, &FileProcessingDlgScopePage::OnContextPaste)
 	ON_COMMAND(ID_CONTEXT_DELETE, &FileProcessingDlgScopePage::OnContextDelete)
 	ON_BN_CLICKED(IDC_BTN_FAMCONDITION, OnBtnSelectCondition)
-	ON_MESSAGE(WM_NOTIFY_GRID_LCLICK, OnLButtonClkRowCol)
-	ON_MESSAGE(WM_NOTIFY_CELL_DBLCLK, OnLButtonDblClkRowCol)
-	ON_MESSAGE(WM_NOTIFY_CELL_MODIFIED, OnModifyCell)
 	ON_WM_LBUTTONDBLCLK()
 END_MESSAGE_MAP()
 
@@ -240,12 +238,16 @@ BOOL FileProcessingDlgScopePage::OnInitDialog()
 
 	try
 	{
-		// Please refer to the MFC documentation on 
-		// SubclassDlgItem for information on this 
-		// call. This makes sure that our C++ grid 
-		// window class subclasses the window that 
-		// is created with the User Control.
-		m_wndGrid.SubclassDlgItem( IDC_GRID, this );
+//		// Please refer to the MFC documentation on 
+//		// SubclassDlgItem for information on this 
+//		// call. This makes sure that our C++ grid 
+//		// window class subclasses the window that 
+//		// is created with the User Control.
+//		m_wndGrid.SubclassDlgItem( IDC_GRID, this );
+
+		m_wndGrid.AttachGrid(this, IDC_GRID);
+		//m_wndGrid.AdjustComponentSizes();
+		//m_wndGrid.MoveWindow(7,19,222,139);
 
 		// Prepare Header labels
 		vector<string>	vecHeader;
@@ -267,13 +269,13 @@ BOOL FileProcessingDlgScopePage::OnInitDialog()
 		vector<string> vecPriorities;
 		getPrioritiesVector(vecPriorities);
 
-		// Setup the grid control
-		//    5 columns of header labels
-		//    5 columns of column widths
-		//	  A list of priorities for the drop down column
-		m_wndGrid.PrepareGrid( vecHeader, vecWidths, vecPriorities );
-		m_wndGrid.SetControlID( IDC_GRID );
-		m_wndGrid.GetParam()->EnableUndo(TRUE);
+//		// Setup the grid control
+//		//    5 columns of header labels
+//		//    5 columns of column widths
+//		//	  A list of priorities for the drop down column
+//		m_wndGrid.PrepareGrid( vecHeader, vecWidths, vecPriorities );
+//		m_wndGrid.SetControlID( IDC_GRID );
+//		m_wndGrid.GetParam()->EnableUndo(TRUE);
 
 		// Resize the Picture control around the Grid
 		CWnd*	pPicture = GetDlgItem( IDC_PICTURE );
@@ -329,43 +331,43 @@ void FileProcessingDlgScopePage::OnBtnAdd()
 			_bstr_t	bstrText = ipObject->GetDescription();
 			CString	zText((const char*)bstrText);
 
-			// Get list count and index of previously selected File Supplier
-			int iCount = m_wndGrid.GetRowCount();
-			int iSelectedRow = m_wndGrid.GetFirstSelectedRow();
-
-			// Populate vector of strings for text cells
-			vector<string>	vecText;
-			vecText.push_back( (LPCTSTR)zText );
-			vecText.push_back( gstrINACTIVE.c_str() );
-
-			// Determine index of new row
-			// Insert position is after the first selected item (P13 #4732)
-			int iNewIndex = (iSelectedRow > 0) ? iSelectedRow + 1 : iCount + 1;
-
-			// Insert or append a new row
-			m_wndGrid.InsertRows( iNewIndex, 1 );
-			
-			// Add info: Enabled, not Forced, Priority, Description, Inactive
-			m_wndGrid.SetRowInfo( iNewIndex, true, false,
-				getPriorityString((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault),
-				vecText );
-
-			// Create a new FileSupplierData object with Not Forced
-			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD( CLSID_FileSupplierData );
-			ASSERT_RESOURCE_ALLOCATION( "ELI13730", ipFSD != NULL );
-			ipFSD->ForceProcessing = VARIANT_FALSE;
-
-			// Insert the object-with-description into the File Supplier Data object and
-			// Insert the File Supplier Data object into the vector
-			ipFSD->FileSupplier = ipObject;
-			getFileSuppliersData()->Insert( iNewIndex - 1, ipFSD );
-
-			// Select the new entry
-			m_wndGrid.SetSelection( 0 );
-			CGXRangeList* pList = m_wndGrid.GetParam()->GetRangeList();
-			ASSERT_RESOURCE_ALLOCATION("ELI15639", pList != NULL);
-			POSITION area = pList->AddTail(new CGXRange);
-			m_wndGrid.SetSelection( area, iNewIndex, 1, iNewIndex, 5 );
+//			// Get list count and index of previously selected File Supplier
+//			int iCount = m_wndGrid.GetRowCount();
+//			int iSelectedRow = m_wndGrid.GetFirstSelectedRow();
+//
+//			// Populate vector of strings for text cells
+//			vector<string>	vecText;
+//			vecText.push_back( (LPCTSTR)zText );
+//			vecText.push_back( gstrINACTIVE.c_str() );
+//
+//			// Determine index of new row
+//			// Insert position is after the first selected item (P13 #4732)
+//			int iNewIndex = (iSelectedRow > 0) ? iSelectedRow + 1 : iCount + 1;
+//
+//			// Insert or append a new row
+//			m_wndGrid.InsertRows( iNewIndex, 1 );
+//			
+//			// Add info: Enabled, not Forced, Priority, Description, Inactive
+//			m_wndGrid.SetRowInfo( iNewIndex, true, false,
+//				getPriorityString((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault),
+//				vecText );
+//
+//			// Create a new FileSupplierData object with Not Forced
+//			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD( CLSID_FileSupplierData );
+//			ASSERT_RESOURCE_ALLOCATION( "ELI13730", ipFSD != NULL );
+//			ipFSD->ForceProcessing = VARIANT_FALSE;
+//
+//			// Insert the object-with-description into the File Supplier Data object and
+//			// Insert the File Supplier Data object into the vector
+//			ipFSD->FileSupplier = ipObject;
+//			getFileSuppliersData()->Insert( iNewIndex - 1, ipFSD );
+//
+//			// Select the new entry
+//			m_wndGrid.SetSelection( 0 );
+//			CGXRangeList* pList = m_wndGrid.GetParam()->GetRangeList();
+//			ASSERT_RESOURCE_ALLOCATION("ELI15639", pList != NULL);
+//			POSITION area = pList->AddTail(new CGXRange);
+//			m_wndGrid.SetSelection( area, iNewIndex, 1, iNewIndex, 5 );
 
 			// Update the display
 			UpdateData( FALSE );
@@ -387,51 +389,51 @@ void FileProcessingDlgScopePage::OnBtnRemove()
 
 	try
 	{
-		// Handle single-selection case, 
-		// get index of selected File Supplier
-		int iSelectedRow = m_wndGrid.GetFirstSelectedRow();
-		if (iSelectedRow > 0)
-		{
-			// Retrieve current file processor description
-			int		iResult;
-			CString	zDescription = m_wndGrid.GetValueRowCol( iSelectedRow, 3 );
-
-			// Create prompt for confirmation
-			CString	zPrompt;
-			zPrompt.Format( "Are you sure that file supplier '%s' should be deleted?", 
-				zDescription );
-
-			// Present MessageBox
-			iResult = MessageBox( (LPCTSTR)zPrompt, "Confirm Delete", 
-				MB_YESNO | MB_ICONQUESTION );
-
-			// Act on response
-			if (iResult == IDYES)
-			{
-				// Remove this FSD object from the collection
-				getFileSuppliersData()->Remove( iSelectedRow - 1 );
-
-				// Refresh the display
-				refresh();
-
-				// Select next or last File Supplier
-				int iSize = m_wndGrid.GetRowCount();
-				if (iSelectedRow > iSize)
-				{
-					iSelectedRow = iSize;
-				}
-				if (iSelectedRow > 0)
-				{
-					m_wndGrid.SelectRow( iSelectedRow );
-				}
-
-				// Update button states
-				setButtonStates();
-
-				// Update the UI, menu and toolbar items
-				updateUI();
-			}
-		}
+//		// Handle single-selection case, 
+//		// get index of selected File Supplier
+//		int iSelectedRow = m_wndGrid.GetFirstSelectedRow();
+//		if (iSelectedRow > 0)
+//		{
+//			// Retrieve current file processor description
+//			int		iResult;
+//			CString	zDescription = m_wndGrid.GetValueRowCol( iSelectedRow, 3 );
+//
+//			// Create prompt for confirmation
+//			CString	zPrompt;
+//			zPrompt.Format( "Are you sure that file supplier '%s' should be deleted?", 
+//				zDescription );
+//
+//			// Present MessageBox
+//			iResult = MessageBox( (LPCTSTR)zPrompt, "Confirm Delete", 
+//				MB_YESNO | MB_ICONQUESTION );
+//
+//			// Act on response
+//			if (iResult == IDYES)
+//			{
+//				// Remove this FSD object from the collection
+//				getFileSuppliersData()->Remove( iSelectedRow - 1 );
+//
+//				// Refresh the display
+//				refresh();
+//
+//				// Select next or last File Supplier
+//				int iSize = m_wndGrid.GetRowCount();
+//				if (iSelectedRow > iSize)
+//				{
+//					iSelectedRow = iSize;
+//				}
+//				if (iSelectedRow > 0)
+//				{
+//					m_wndGrid.SelectRow( iSelectedRow );
+//				}
+//
+//				// Update button states
+//				setButtonStates();
+//
+//				// Update the UI, menu and toolbar items
+//				updateUI();
+//			}
+//		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08910")
 }
@@ -443,46 +445,46 @@ void FileProcessingDlgScopePage::OnBtnConfigure()
 
 	try
 	{
-		// Handle single-selection case, 
-		// get index of selected File Supplier
-		int iSelectedRow = m_wndGrid.GetFirstSelectedRow();
-		if (iSelectedRow > 0)
-		{
-			// Just return if this row is Locked
-			if (m_wndGrid.GetRowLock( iSelectedRow ))
-			{
-				return;
-			}
-
-			// Retrieve selected File Supplier Data
-			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr	ipFSD = getFileSuppliersData()->At( iSelectedRow - 1 );
-			ASSERT_RESOURCE_ALLOCATION( "ELI13936", ipFSD != NULL );
-
-			// get the position and dimensions of the command button
-			RECT rectCommandButton;
-			getDlgItemWindowRect(IDC_BTN_CONFIGURE, rectCommandButton);
-
-			// allow the user to modify the file supplier
-			VARIANT_BOOL vbResult = getMiscUtils()->HandlePlugInObjectCommandButtonClick(
-				ipFSD->FileSupplier, "File Supplier", get_bstr_t(FP_FILE_SUPP_CATEGORYNAME),
-				VARIANT_FALSE, 0, NULL, rectCommandButton.right, rectCommandButton.top);
-
-			// Check result
-			if (vbResult == VARIANT_TRUE)
-			{
-				// remove and re-insert the associated FileSupplierData object in the
-				// vector so that the vector becomes dirty (and therefore subsequent attempts to
-				// discard the changes will cause a user confirmation)
-				getFileSuppliersData()->Remove(iSelectedRow - 1 );
-				getFileSuppliersData()->Insert(iSelectedRow - 1, ipFSD);
-
-				// Refresh the list
-				refresh();
-
-				// Retain selection
-				m_wndGrid.SelectRow( iSelectedRow );
-			}
-		}
+//		// Handle single-selection case, 
+//		// get index of selected File Supplier
+//		int iSelectedRow = m_wndGrid.GetFirstSelectedRow();
+//		if (iSelectedRow > 0)
+//		{
+//			// Just return if this row is Locked
+//			if (m_wndGrid.GetRowLock( iSelectedRow ))
+//			{
+//				return;
+//			}
+//
+//			// Retrieve selected File Supplier Data
+//			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr	ipFSD = getFileSuppliersData()->At( iSelectedRow - 1 );
+//			ASSERT_RESOURCE_ALLOCATION( "ELI13936", ipFSD != NULL );
+//
+//			// get the position and dimensions of the command button
+//			RECT rectCommandButton;
+//			getDlgItemWindowRect(IDC_BTN_CONFIGURE, rectCommandButton);
+//
+//			// allow the user to modify the file supplier
+//			VARIANT_BOOL vbResult = getMiscUtils()->HandlePlugInObjectCommandButtonClick(
+//				ipFSD->FileSupplier, "File Supplier", get_bstr_t(FP_FILE_SUPP_CATEGORYNAME),
+//				VARIANT_FALSE, 0, NULL, rectCommandButton.right, rectCommandButton.top);
+//
+//			// Check result
+//			if (vbResult == VARIANT_TRUE)
+//			{
+//				// remove and re-insert the associated FileSupplierData object in the
+//				// vector so that the vector becomes dirty (and therefore subsequent attempts to
+//				// discard the changes will cause a user confirmation)
+//				getFileSuppliersData()->Remove(iSelectedRow - 1 );
+//				getFileSuppliersData()->Insert(iSelectedRow - 1, ipFSD);
+//
+//				// Refresh the list
+//				refresh();
+//
+//				// Retain selection
+//				m_wndGrid.SelectRow( iSelectedRow );
+//			}
+//		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13941")
 }
@@ -512,28 +514,28 @@ LRESULT FileProcessingDlgScopePage::OnLButtonClkRowCol(WPARAM wParam, LPARAM lPa
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD = getFileSuppliersData()->At( nRow - 1 );
 		ASSERT_RESOURCE_ALLOCATION( "ELI14085", ipFSD != NULL );
 
-		// Get the new setting
-		CString zTemp = m_wndGrid.GetCellValue( nRow, nCol );
-		long nCheck = asLong( (LPCTSTR)zTemp );
-
-		// Update Enabled flag
-		if (nCol == 1)
-		{
-			// Retrieve the Object With Description
-			IObjectWithDescriptionPtr ipObjWD = ipFSD->FileSupplier;
-			ASSERT_RESOURCE_ALLOCATION( "ELI14086", ipObjWD != NULL );
-
-			// Update the Enabled flag
-			ipObjWD->Enabled = asVariantBool(nCheck == 1);
-			// Update the UI
-			updateUI();
-		}
-		// Update Force Processing flag
-		else if (nCol == 2)
-		{
-			// Update the Force Processing flag
-			ipFSD->ForceProcessing = asVariantBool(nCheck == 1);
-		}
+//		// Get the new setting
+//		CString zTemp = m_wndGrid.GetCellValue( nRow, nCol );
+//		long nCheck = asLong( (LPCTSTR)zTemp );
+//
+//		// Update Enabled flag
+//		if (nCol == 1)
+//		{
+//			// Retrieve the Object With Description
+//			IObjectWithDescriptionPtr ipObjWD = ipFSD->FileSupplier;
+//			ASSERT_RESOURCE_ALLOCATION( "ELI14086", ipObjWD != NULL );
+//
+//			// Update the Enabled flag
+//			ipObjWD->Enabled = asVariantBool(nCheck == 1);
+//			// Update the UI
+//			updateUI();
+//		}
+//		// Update Force Processing flag
+//		else if (nCol == 2)
+//		{
+//			// Update the Force Processing flag
+//			ipFSD->ForceProcessing = asVariantBool(nCheck == 1);
+//		}
 
 		// Update button states based on selected File Supplier
 		setButtonStates();
@@ -549,40 +551,40 @@ LRESULT FileProcessingDlgScopePage::OnLButtonDblClkRowCol(WPARAM wParam, LPARAM 
 	
 	try
 	{
-		// get the index of the selected row
-		int iSelectedRow = m_wndGrid.GetFirstSelectedRow();
-		if (iSelectedRow > 0)
-		{
-			// exit if the row is locked
-			if (m_wndGrid.GetRowLock( iSelectedRow ))
-			{
-				return 0;
-			}
-
-			// retrieve the selected file supplier data
-			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr 
-				ipFileSuppliersData = getFileSuppliersData()->At( iSelectedRow - 1 );
-			ASSERT_RESOURCE_ALLOCATION("ELI16085", ipFileSuppliersData != NULL );
-
-			// allow the user to configure the selected file supplier
-			VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(ipFileSuppliersData->FileSupplier,
-				"File Supplier", get_bstr_t(FP_FILE_SUPP_CATEGORYNAME), VARIANT_FALSE, 0, NULL);
-
-			if (vbDirty == VARIANT_TRUE)
-			{
-				// remove and re-insert the associated FileSupplierData object in the
-				// vector so that the vector becomes dirty (and therefore subsequent attempts to
-				// discard the changes will cause a user confirmation)
-				getFileSuppliersData()->Remove(iSelectedRow - 1 );
-				getFileSuppliersData()->Insert(iSelectedRow - 1, ipFileSuppliersData);
-
-				// Refresh the list
-				refresh();
-
-				// Retain selection
-				m_wndGrid.SelectRow( iSelectedRow );
-			}
-		}
+//		// get the index of the selected row
+//		int iSelectedRow = m_wndGrid.GetFirstSelectedRow();
+//		if (iSelectedRow > 0)
+//		{
+//			// exit if the row is locked
+//			if (m_wndGrid.GetRowLock( iSelectedRow ))
+//			{
+//				return 0;
+//			}
+//
+//			// retrieve the selected file supplier data
+//			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr 
+//				ipFileSuppliersData = getFileSuppliersData()->At( iSelectedRow - 1 );
+//			ASSERT_RESOURCE_ALLOCATION("ELI16085", ipFileSuppliersData != NULL );
+//
+//			// allow the user to configure the selected file supplier
+//			VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(ipFileSuppliersData->FileSupplier,
+//				"File Supplier", get_bstr_t(FP_FILE_SUPP_CATEGORYNAME), VARIANT_FALSE, 0, NULL);
+//
+//			if (vbDirty == VARIANT_TRUE)
+//			{
+//				// remove and re-insert the associated FileSupplierData object in the
+//				// vector so that the vector becomes dirty (and therefore subsequent attempts to
+//				// discard the changes will cause a user confirmation)
+//				getFileSuppliersData()->Remove(iSelectedRow - 1 );
+//				getFileSuppliersData()->Insert(iSelectedRow - 1, ipFileSuppliersData);
+//
+//				// Refresh the list
+//				refresh();
+//
+//				// Retain selection
+//				m_wndGrid.SelectRow( iSelectedRow );
+//			}
+//		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19417");
 
@@ -695,7 +697,7 @@ void FileProcessingDlgScopePage::OnSize(UINT nType, int cx, int cy)
 
 		// Update grid position and internal sizing
 		GetDlgItem(IDC_GRID)->MoveWindow(&rectGrid);
-		m_wndGrid.DoResize();
+//		m_wndGrid.DoResize();
 
 		// Update position of Picture control that provides a border for the grid
 		rectGrid.left -= 1;
@@ -887,18 +889,18 @@ LRESULT FileProcessingDlgScopePage::OnModifyCell(WPARAM wParam, LPARAM lParam)
 		// check the column ID, just get the cell value
 		if (wParam == IDC_GRID)
 		{
-			// Get the new priority value from the grid
-			string strPriority = (LPCTSTR) m_wndGrid.GetCellValue(nRow, nCol);
-			
-			// Get the priority value
-			UCLID_FILEPROCESSINGLib::EFilePriority ePriority = getPriorityFromString(strPriority);
-
-			// Get the file supplier for this row
-			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFD =
-				getFileSuppliersData()->At(nRow-1);
-
-			// Set the priority
-			ipFD->Priority = ePriority;
+//			// Get the new priority value from the grid
+//			string strPriority = (LPCTSTR) m_wndGrid.GetCellValue(nRow, nCol);
+//			
+//			// Get the priority value
+//			UCLID_FILEPROCESSINGLib::EFilePriority ePriority = getPriorityFromString(strPriority);
+//
+//			// Get the file supplier for this row
+//			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFD =
+//				getFileSuppliersData()->At(nRow-1);
+//
+//			// Set the priority
+//			ipFD->Priority = ePriority;
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27601");
@@ -978,15 +980,15 @@ UCLID_FILEPROCESSINGLib::IFileSupplierPtr FileProcessingDlgScopePage::getFileSup
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::EFileSupplierStatus FileProcessingDlgScopePage::getStatus(int iRow)
 {
-	// Validate row number
-	int iCount = m_wndGrid.GetRowCount();
-	if ((iRow <= 0) || (iRow > iCount))
-	{
-		UCLIDException ue( "ELI13685", "Invalid row number." );
-		ue.addDebugInfo( "Row Number", iRow );
-		ue.addDebugInfo( "Row Count", iCount );
-		throw ue;
-	}
+//	// Validate row number
+//	int iCount = m_wndGrid.GetRowCount();
+//	if ((iRow <= 0) || (iRow > iCount))
+//	{
+//		UCLIDException ue( "ELI13685", "Invalid row number." );
+//		ue.addDebugInfo( "Row Number", iRow );
+//		ue.addDebugInfo( "Row Count", iCount );
+//		throw ue;
+//	}
 
 	// Get desired File Supplier Data item
 	UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD = getFileSuppliersData()->At( iRow - 1 );
@@ -1006,20 +1008,20 @@ void FileProcessingDlgScopePage::setButtonStates()
 	m_btnSelectCondition.EnableWindow(bEnabled);
 	m_editSelectCondition.EnableWindow(bEnabled);
 
-	// Check for selection of supplier item in the Grid
-	int iSelIndex = m_wndGrid.GetFirstSelectedRow();
-	if (iSelIndex > 0)
-	{
-		// Enable the remove and configure buttons if FAM is stopped or finished
-		m_btnRemove.EnableWindow(bEnabled);
-		m_btnConfigure.EnableWindow(bEnabled);
-	}
-	else
-	{
-		// Disable the remove and configure buttons if nothing is selected
-		m_btnRemove.EnableWindow(FALSE);
-		m_btnConfigure.EnableWindow(FALSE);
-	}
+//	// Check for selection of supplier item in the Grid
+//	int iSelIndex = m_wndGrid.GetFirstSelectedRow();
+//	if (iSelIndex > 0)
+//	{
+//		// Enable the remove and configure buttons if FAM is stopped or finished
+//		m_btnRemove.EnableWindow(bEnabled);
+//		m_btnConfigure.EnableWindow(bEnabled);
+//	}
+//	else
+//	{
+//		// Disable the remove and configure buttons if nothing is selected
+//		m_btnRemove.EnableWindow(FALSE);
+//		m_btnConfigure.EnableWindow(FALSE);
+//	}
 }
 //-------------------------------------------------------------------------------------------------
 BOOL FileProcessingDlgScopePage::OnSetActive()
@@ -1057,23 +1059,23 @@ void FileProcessingDlgScopePage::setStatus(int iRow,
 			break;
 	}
 
-	// Lock the row unless in INACTIVE, STOP OR DONE status
-	if (eNewStatus == UCLID_FILEPROCESSINGLib::kInactiveStatus
-		|| eNewStatus == UCLID_FILEPROCESSINGLib::kStoppedStatus
-		|| eNewStatus == UCLID_FILEPROCESSINGLib::kDoneStatus)
-	{
-		m_wndGrid.SetRowLock( iRow, false );
-	}
-	else
-	{
-		m_wndGrid.SetRowLock( iRow, true );
-	}
-
-	// Set the new status value
-	m_wndGrid.SetStyleRange(CGXRange( iRow, 5 ),
-							CGXStyle()
-								.SetValue( strNewStatus.c_str() )
-					);
+//	// Lock the row unless in INACTIVE, STOP OR DONE status
+//	if (eNewStatus == UCLID_FILEPROCESSINGLib::kInactiveStatus
+//		|| eNewStatus == UCLID_FILEPROCESSINGLib::kStoppedStatus
+//		|| eNewStatus == UCLID_FILEPROCESSINGLib::kDoneStatus)
+//	{
+//		m_wndGrid.SetRowLock( iRow, false );
+//	}
+//	else
+//	{
+//		m_wndGrid.SetRowLock( iRow, true );
+//	}
+//
+//	// Set the new status value
+//	m_wndGrid.SetStyleRange(CGXRange( iRow, 5 ),
+//							CGXStyle()
+//								.SetValue( strNewStatus.c_str() )
+//					);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgScopePage::updateList(int nRow, 
@@ -1104,9 +1106,9 @@ void FileProcessingDlgScopePage::updateList(int nRow,
 	vecText.push_back( strDescription.c_str() );
 	vecText.push_back( gstrINACTIVE.c_str() );
 
-	// Update the row
-	m_wndGrid.SetRowInfo(nRow, bEnabled, bForce,
-		getPriorityString(ipFSD->Priority), vecText);
+//	// Update the row
+//	m_wndGrid.SetRowInfo(nRow, bEnabled, bForce,
+//		getPriorityString(ipFSD->Priority), vecText);
 
 	// Set the proper status in the row
 	if (eStatus != UCLID_FILEPROCESSINGLib::kInactiveStatus)

@@ -15,13 +15,11 @@
 #include "RemoveInvalidEntries.h"
 #include "SelectOnlyUniqueValues.h"
 #include "SelectUsingMajority.h"
-#include "SelectWithUI.h"
 #include "OutputHandlerSequence.h"
 #include "RemoveEntriesFromList.h"
 #include "KeepAttributesInMemory.h"
 #include "RemoveEntriesFromListPP.h"
 
-#include <RWUtils.h>
 #include "OutputToXML.h"
 #include "OutputToXMLPP.h"
 #include "ModifyAttributeValueOH.h"
@@ -44,7 +42,6 @@ OBJECT_ENTRY(CLSID_EliminateDuplicates, CEliminateDuplicates)
 OBJECT_ENTRY(CLSID_RemoveInvalidEntries, CRemoveInvalidEntries)
 OBJECT_ENTRY(CLSID_SelectOnlyUniqueValues, CSelectOnlyUniqueValues)
 OBJECT_ENTRY(CLSID_SelectUsingMajority, CSelectUsingMajority)
-OBJECT_ENTRY(CLSID_SelectWithUI, CSelectWithUI)
 OBJECT_ENTRY(CLSID_OutputHandlerSequence, COutputHandlerSequence)
 OBJECT_ENTRY(CLSID_RemoveEntriesFromList, CRemoveEntriesFromList)
 OBJECT_ENTRY(CLSID_KeepAttributesInMemory, CKeepAttributesInMemory)
@@ -98,17 +95,6 @@ BOOL CAFOutputHandlersApp::InitInstance()
 {
     _Module.Init(ObjectMap, m_hInstance, &LIBID_UCLID_AFOUTPUTHANDLERSLib);
 
-	// We don't want grid failure to cause the dll not to load
-	// so we eat any exceptions from grid initialization errors
-	try
-	{
-		// Initialize the Rogue Wave Utils library
-		RWInitializer	rwInit;
-
-	}
-	catch(...)
-	{
-	}
     return CWinApp::InitInstance();
 }
 
@@ -116,16 +102,6 @@ int CAFOutputHandlersApp::ExitInstance()
 {
     _Module.Term();
 
-	// We don't want grid failure to cause the dll not to unload
-	// so we eat any exceptions from grid termination errors
-	try
-	{
-		// Cleanup the Rogue Wave Utils library
-		RWCleanup	rwClean;
-	}
-	catch(...)
-	{
-	}
     return CWinApp::ExitInstance();
 }
 

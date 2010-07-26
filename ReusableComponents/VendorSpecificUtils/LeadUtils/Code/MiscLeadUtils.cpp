@@ -13,7 +13,6 @@
 #include <LicenseMgmt.h>
 #include <LtWrappr.h>
 #include <ltann.h>			// LeadTools Annotation functions
-#include <StringCSIS.h>
 #include <TemporaryFileName.h>
 #include <PdfSecurityValues.h>
 #include <ByteStream.h>
@@ -23,6 +22,7 @@
 #include <cmath>
 #include <cstdio>
 #include <algorithm>
+#include <string>
 
 //-------------------------------------------------------------------------------------------------
 // Constants

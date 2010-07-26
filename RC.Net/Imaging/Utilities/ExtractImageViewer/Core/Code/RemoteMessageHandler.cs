@@ -83,7 +83,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// Overridden to indicate that this remote object does not expire.
         /// </summary>
         /// <returns><see langword="null"/>.</returns>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.Infrastructure)] 
         public override object InitializeLifetimeService()
         {
             return null;

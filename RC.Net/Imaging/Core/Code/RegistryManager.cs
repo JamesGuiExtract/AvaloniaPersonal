@@ -713,7 +713,7 @@ namespace Extract.Imaging
         /// Retrieves the string value of the specified key as a float.
         /// </summary>
         /// <param name="subkey">The subkey to which <paramref name="key"/> belongs.</param>
-        /// <param name="key">The key corresponding to the <paramref name="value"/> to retrieve.
+        /// <param name="key">The key corresponding to the value to retrieve.
         /// </param>
         /// <param name="defaultValue">The default value to return if <paramref name="key"/> does 
         /// not exist.</param>

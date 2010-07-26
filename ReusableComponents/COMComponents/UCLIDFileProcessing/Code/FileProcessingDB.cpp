@@ -4518,7 +4518,7 @@ STDMETHODIMP CFileProcessingDB::IsUserCounterValid(BSTR bstrCounterName,
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27911");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27911");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::OffsetUserCounter(BSTR bstrCounterName, LONGLONG llOffsetValue,

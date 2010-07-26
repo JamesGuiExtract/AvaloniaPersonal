@@ -17,7 +17,6 @@
 #include "afcore.h"
 #include "RuleSetEditor.h"
 #include "AddRuleDlg.h"
-#include "ImportRuleSetDlg.h"
 #include "AFCategories.h"
 #include "RuleTesterDlg.h"
 #include "RequiredInterfaces.h"
@@ -128,85 +127,6 @@ void CRuleSetEditor::OnFileOpen()
 		openFile("");
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04417")
-}
-//-------------------------------------------------------------------------------------------------
-void CRuleSetEditor::OnFileImport() 
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
-
-	try
-	{	
-		// Ask user to select file to examine for imports
-		CFileDialogEx fileDlg( TRUE, ".rsd", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
-			OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST,
-			"Ruleset definition files (*.rsd)|*.rsd|All Files (*.*)|*.*||", this );
-		
-		string strDir = ::getDirectoryFromFullPath(m_strLastFileOpened) + "\\";
-		fileDlg.m_ofn.lpstrInitialDir = strDir.c_str();
-
-		// Only continue if user actually selected a file
-		if (fileDlg.DoModal() != IDOK)
-		{
-			return;
-		}
-
-		string strFileName = fileDlg.GetPathName();
-		importFromFile(strFileName);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05020")
-}
-//-------------------------------------------------------------------------------------------------
-void CRuleSetEditor::OnFileExport() 
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
-
-	try
-	{
-		// Just return if no attributes defined yet
-		if (m_comboAttr.GetCount() == 0)
-		{
-			return;
-		}
-
-		// Validate that the rule set is unencrypted and licensed to be saved
-		validateRuleSetCanBeSaved();
-
-		// Create a copy of the current rule set
-		ICopyableObjectPtr ipCopyableObject = m_ipRuleSet;
-		if (ipCopyableObject == NULL)
-		{
-			throw UCLIDException( "ELI05061", "Rule Set does not support copying." );
-		}
-		UCLID_AFCORELib::IRuleSetPtr ipExportRuleSet = ipCopyableObject->Clone();
-
-		// Create an empty vector of reserved attribute names
-		vector<string> vecAttributes;
-
-		// Create and display the Export dialog
-		CImportRuleSetDlg	dlgExport( ipExportRuleSet, vecAttributes, false );
-		int iReturn = dlgExport.DoModal();
-		if (iReturn == IDOK)
-		{
-			// Ask user to select file as target for exports
-			CFileDialogEx fileDlg( FALSE, ".rsd", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
-				OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
-				"Ruleset definition files (*.rsd)|*.rsd|All Files (*.*)|*.*||", this );
-
-			string strDir = ::getDirectoryFromFullPath(m_strLastFileOpened) + "\\";
-			fileDlg.m_ofn.lpstrInitialDir = strDir.c_str();
-			
-			// Only continue if user actually selected a file
-			if (fileDlg.DoModal() == IDOK)
-			{
-				// Save the ruleset object to the specified file
-				_bstr_t bstrFileName = get_bstr_t( fileDlg.GetPathName() );
-				ipExportRuleSet->SaveTo(bstrFileName, VARIANT_TRUE);
-			}
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05021")
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::OnFileSave() 

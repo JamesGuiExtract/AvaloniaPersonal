@@ -30,6 +30,7 @@ library UCLID_FILEPROCESSINGLib
 	interface IFileProcessingMgmtRole;
 	interface IFAMTagManager;
 	interface IRoleNotifyFAM;
+	interface ISetProcessingSchedule;
 
 	//----------------------------------------------------------------------------------------------
 	//-E N U M S -----------------------------------------------------------------------------------
@@ -119,7 +120,7 @@ library UCLID_FILEPROCESSINGLib
 			uuid(8BEC1731-CD1A-4931-809D-C53FDF9BA21F),
 			helpstring("Extract EFilePriority")
 		]
-	enum
+	enum EFilePriority
 	{
 		kPriorityDefault = 0,
 		kPriorityLow = 1,
@@ -1460,6 +1461,21 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To indicate whether the task executor is currently initialized
 		[propget, id(8), helpstring("property IsInitialized")] HRESULT IsInitialized([out, retval] VARIANT_BOOL* pVal);
+	};
+
+	[
+		object,
+		uuid(B43F3C65-BAA5-4AC1-BF47-5B9250F88192),
+		dual,
+		helpstring("ISetProcessingSchedule Interface"),
+		pointer_default(unique)
+	]
+	interface ISetProcessingSchedule : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To be used to notify the FileActionManager that the Processing is complete
+		[id(1), helpstring("method PromptForSchedule")] HRESULT PromptForSchedule(
+			[in]IVariantVector* pSchedule, [out, retval] IVariantVector** ppNewSchedule); 
 	};
 
 	//----------------------------------------------------------------------------------------------

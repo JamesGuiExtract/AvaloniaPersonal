@@ -54,8 +54,8 @@ bool LineSegment::contains(const Point& p) const
 		{
 			// the target point is on the imaginary line that extends infinitely, 
 			// but we need to check to see if it is in the line segment
-			if (p.getY() >= _MIN(p1.getY(), p2.getY()) &&
-				p.getY() <= _MAX(p1.getY(), p2.getY()))
+			if (p.getY() >= min(p1.getY(), p2.getY()) &&
+				p.getY() <= max(p1.getY(), p2.getY()))
 			{
 				// the point lies on the line segment
 				return true;
@@ -84,8 +84,8 @@ bool LineSegment::contains(const Point& p) const
 		{
 			// the specified point is someone on the imaginary line, but
 			// is it on the line segment?
-			if (dY >= _MIN(p1.getY(), p2.getY()) &&
-				dY <= _MAX(p1.getY(), p2.getY()))
+			if (dY >= min(p1.getY(), p2.getY()) &&
+				dY <= max(p1.getY(), p2.getY()))
 			{
 				// the point lies on the line segment
 				return true;
@@ -139,21 +139,21 @@ bool LineSegment::intersects(const LineSegment& line2, Point& intersectionPoint)
 
 		// there's intersection only if the intersection point's Y 
 		// is within my Y's and within line2's Y's
-//		bool b1 = dIntersectionPointY - _MIN(p1.getY(), p2.getY()) >= -ZERO_PLUS;
-//		bool b2 = _MAX(p1.getY(), p2.getY()) - dIntersectionPointY >= -ZERO_PLUS;
-//		bool b3 = dIntersectionPointY - _MIN(line2.p1.getY(), line2.p2.getY()) >= -ZERO_PLUS;
-//		bool b4 = _MAX(line2.p1.getY(), line2.p2.getY()) - dIntersectionPointY >= -ZERO_PLUS;
+//		bool b1 = dIntersectionPointY - min(p1.getY(), p2.getY()) >= -ZERO_PLUS;
+//		bool b2 = max(p1.getY(), p2.getY()) - dIntersectionPointY >= -ZERO_PLUS;
+//		bool b3 = dIntersectionPointY - min(line2.p1.getY(), line2.p2.getY()) >= -ZERO_PLUS;
+//		bool b4 = max(line2.p1.getY(), line2.p2.getY()) - dIntersectionPointY >= -ZERO_PLUS;
 
-//		double d1 = dIntersectionPointY - _MIN(p1.getY(), p2.getY());
-//		double d2 = _MAX(p1.getY(), p2.getY()) - dIntersectionPointY;
-//		double d3 = dIntersectionPointY - _MIN(line2.p1.getY(), line2.p2.getY());
-//		double d4 = _MAX(line2.p1.getY(), line2.p2.getY()) - dIntersectionPointY;
+//		double d1 = dIntersectionPointY - min(p1.getY(), p2.getY());
+//		double d2 = max(p1.getY(), p2.getY()) - dIntersectionPointY;
+//		double d3 = dIntersectionPointY - min(line2.p1.getY(), line2.p2.getY());
+//		double d4 = max(line2.p1.getY(), line2.p2.getY()) - dIntersectionPointY;
 
 		bool bIntersectionYOK = false;
-		if ((dIntersectionPointY - _MIN(p1.getY(), p2.getY()) >= -ZERO_PLUS) &&
-			(_MAX(p1.getY(), p2.getY()) - dIntersectionPointY >= -ZERO_PLUS) &&
-			(dIntersectionPointY - _MIN(line2.p1.getY(), line2.p2.getY()) >= -ZERO_PLUS) &&
-			(_MAX(line2.p1.getY(), line2.p2.getY()) - dIntersectionPointY >= -ZERO_PLUS))
+		if ((dIntersectionPointY - min(p1.getY(), p2.getY()) >= -ZERO_PLUS) &&
+			(max(p1.getY(), p2.getY()) - dIntersectionPointY >= -ZERO_PLUS) &&
+			(dIntersectionPointY - min(line2.p1.getY(), line2.p2.getY()) >= -ZERO_PLUS) &&
+			(max(line2.p1.getY(), line2.p2.getY()) - dIntersectionPointY >= -ZERO_PLUS))
 		{
 			bIntersectionYOK = true;
 		}
@@ -161,15 +161,15 @@ bool LineSegment::intersects(const LineSegment& line2, Point& intersectionPoint)
 		// there's intersection only if the intersection point's Y 
 		// is within my Y's and within line2's Y's
 		bool bIntersectionXOK = false;
-		if ((dIntersectionPointX - _MIN(p1.getX(), p2.getX()) >= -ZERO_PLUS) &&
-			(_MAX(p1.getX(), p2.getX()) - dIntersectionPointX >= -ZERO_PLUS) &&
-			(dIntersectionPointX - _MIN(line2.p1.getX(), line2.p2.getX()) >= -ZERO_PLUS) &&
-			(_MAX(line2.p1.getX(), line2.p2.getX()) - dIntersectionPointX >= -ZERO_PLUS))
+		if ((dIntersectionPointX - min(p1.getX(), p2.getX()) >= -ZERO_PLUS) &&
+			(max(p1.getX(), p2.getX()) - dIntersectionPointX >= -ZERO_PLUS) &&
+			(dIntersectionPointX - min(line2.p1.getX(), line2.p2.getX()) >= -ZERO_PLUS) &&
+			(max(line2.p1.getX(), line2.p2.getX()) - dIntersectionPointX >= -ZERO_PLUS))
 		{
 			bIntersectionXOK = true;
 		}
 
-//		double d = _MIN(line2.p1.getY(), line2.p2.getY());
+//		double d = min(line2.p1.getY(), line2.p2.getY());
 
 		// there's intersection only if the intersection point is already part
 		// of the two line segments
@@ -181,8 +181,8 @@ bool LineSegment::intersects(const LineSegment& line2, Point& intersectionPoint)
 
 		// if line2's x is inbetween my starting and ending x's, there's a chance 
 		// that we intersesect
-		if (line2.p1.getX() >= _MIN(p1.getX(), p2.getX()) && 
-			line2.p1.getX() <= _MAX(p1.getX(), p2.getX()))
+		if (line2.p1.getX() >= min(p1.getX(), p2.getX()) && 
+			line2.p1.getX() <= max(p1.getX(), p2.getX()))
 		{
 			// calculate the intersection point
 			double dIntersectionPointY = p1.getY() + (line2.p1.getX() - p1.getX()) * getSlope();
@@ -190,10 +190,10 @@ bool LineSegment::intersects(const LineSegment& line2, Point& intersectionPoint)
 
 			// line2's x is in the range of my x, but there's intersection only if 
 			// the intersection point's Y is within my Y's and within line2's Y's
-			if ((dIntersectionPointY - _MIN(p1.getY(), p2.getY()) >= -ZERO_PLUS) &&
-				(_MAX(p1.getY(), p2.getY()) - dIntersectionPointY >= -ZERO_PLUS) &&
-				(dIntersectionPointY - _MIN(line2.p1.getY(), line2.p2.getY()) >= -ZERO_PLUS) &&
-				(_MAX(line2.p1.getY(), line2.p2.getY()) - dIntersectionPointY >= -ZERO_PLUS))
+			if ((dIntersectionPointY - min(p1.getY(), p2.getY()) >= -ZERO_PLUS) &&
+				(max(p1.getY(), p2.getY()) - dIntersectionPointY >= -ZERO_PLUS) &&
+				(dIntersectionPointY - min(line2.p1.getY(), line2.p2.getY()) >= -ZERO_PLUS) &&
+				(max(line2.p1.getY(), line2.p2.getY()) - dIntersectionPointY >= -ZERO_PLUS))
 				return true;
 			else
 				return false;
@@ -212,8 +212,8 @@ bool LineSegment::intersects(const LineSegment& line2, Point& intersectionPoint)
 
 		// if my x is inbetween the starting and ending x's of line2, there's a chance 
 		// that we intersesect
-		if (p1.getX() >= _MIN(line2.p1.getX(), line2.p2.getX()) && 
-			p1.getX() <= _MAX(line2.p1.getX(), line2.p2.getX()))
+		if (p1.getX() >= min(line2.p1.getX(), line2.p2.getX()) && 
+			p1.getX() <= max(line2.p1.getX(), line2.p2.getX()))
 		{
 			// calculate the intersection point
 			double dIntersectionPointY = line2.p1.getY() + (p1.getX() - line2.p1.getX()) * line2.getSlope();
@@ -221,10 +221,10 @@ bool LineSegment::intersects(const LineSegment& line2, Point& intersectionPoint)
 
 			// my x is in the range of line2's x, but there's intersection only if 
 			// the intersection point's Y is within my Y's and within line2's Y's
-			if ((dIntersectionPointY - _MIN(p1.getY(), p2.getY()) >= -ZERO_PLUS) &&
-				(_MAX(p1.getY(), p2.getY()) - dIntersectionPointY >= -ZERO_PLUS) &&
-				(dIntersectionPointY - _MIN(line2.p1.getY(), line2.p2.getY()) >= -ZERO_PLUS) &&
-				(_MAX(line2.p1.getY(), line2.p2.getY()) - dIntersectionPointY >= -ZERO_PLUS))
+			if ((dIntersectionPointY - min(p1.getY(), p2.getY()) >= -ZERO_PLUS) &&
+				(max(p1.getY(), p2.getY()) - dIntersectionPointY >= -ZERO_PLUS) &&
+				(dIntersectionPointY - min(line2.p1.getY(), line2.p2.getY()) >= -ZERO_PLUS) &&
+				(max(line2.p1.getY(), line2.p2.getY()) - dIntersectionPointY >= -ZERO_PLUS))
 				return true;
 			else
 				return false;
@@ -249,8 +249,8 @@ bool LineSegment::intersects(const LineSegment& line2, Point& intersectionPoint)
 			// the x's are the same, but that does not mean that the line
 			// segments intersect because the line segments can be on top
 			// of each other.
-			if (_MIN(p1.getY(), p2.getY()) > _MIN(line2.p1.getY(), line2.p2.getY()) &&
-				_MAX(p1.getY(), p2.getY()) < _MAX(line2.p1.getY(), line2.p2.getY()))
+			if (min(p1.getY(), p2.getY()) > min(line2.p1.getY(), line2.p2.getY()) &&
+				max(p1.getY(), p2.getY()) < max(line2.p1.getY(), line2.p2.getY()))
 			{
 				// TODO: what to do with the intesection point????
 				return true;

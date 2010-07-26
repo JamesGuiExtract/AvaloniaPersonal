@@ -474,7 +474,7 @@ UCLID_COMUTILSLib::IStrToObjectMapPtr CStringPatternMatcher::getMatches() const
 			ASSERT_RESOURCE_ALLOCATION("ELI05917", ipToken != NULL);
 
 			// extract the match text and add to result vector
-			string strMatch(m_strText, tokenInfo.m_nMatchStartPos, 
+			string strMatch(static_cast<string>(m_strText), tokenInfo.m_nMatchStartPos, 
 				tokenInfo.m_nMatchEndPos - tokenInfo.m_nMatchStartPos + 1);
 
 			// initialize the token with the match position and value
@@ -823,8 +823,8 @@ void CStringPatternMatcher::validateCharList(const stringCSIS& strCharList,
 	{
 		UCLIDException ue("ELI05942", "Invalid character list invoked in pattern!");
 		ue.addDebugInfo("Token#", iTokenNum);
-		ue.addDebugInfo("Token", strToken);
-		ue.addDebugInfo("CharList", strCharList);
+		ue.addDebugInfo("Token", static_cast<string>(strToken));
+		ue.addDebugInfo("CharList", static_cast<string>(strCharList));
 		throw ue;
 	}
 
@@ -833,8 +833,8 @@ void CStringPatternMatcher::validateCharList(const stringCSIS& strCharList,
 	{
 		UCLIDException ue("ELI05958", "Invalid syntax in pattern - cannot use special characters in character list!");
 		ue.addDebugInfo("Token#", iTokenNum);
-		ue.addDebugInfo("Token", strToken);
-		ue.addDebugInfo("CharList", strCharList);
+		ue.addDebugInfo("Token", static_cast<string>(strToken));
+		ue.addDebugInfo("CharList", static_cast<string>(strCharList));
 		throw ue;
 	}
 
@@ -853,8 +853,8 @@ void CStringPatternMatcher::validateExpressionName(const stringCSIS& strExpressi
 	{
 		UCLIDException ue("ELI05941", "Invalid named expression in pattern!");
 		ue.addDebugInfo("Token#", iTokenNum);
-		ue.addDebugInfo("Token", strToken);
-		ue.addDebugInfo("ExpressionName", strExpressionName);
+		ue.addDebugInfo("Token", static_cast<string>(strToken));
+		ue.addDebugInfo("ExpressionName", static_cast<string>(strExpressionName));
 		throw ue;
 	}
 
@@ -863,8 +863,8 @@ void CStringPatternMatcher::validateExpressionName(const stringCSIS& strExpressi
 	{
 		UCLIDException ue("ELI05959", "Invalid syntax in pattern - cannot use special characters in character list!");
 		ue.addDebugInfo("Token#", iTokenNum);
-		ue.addDebugInfo("Token", strToken);
-		ue.addDebugInfo("CharList", strExpressionName);
+		ue.addDebugInfo("Token", static_cast<string>(strToken));
+		ue.addDebugInfo("CharList", static_cast<string>(strExpressionName));
 		throw ue;
 	}
 }
@@ -878,7 +878,7 @@ void CStringPatternMatcher::validateLiteralOrList(const stringCSIS& strLiteralOr
 	{
 		UCLIDException ue("ELI05882", "Invalid token in pattern - token is empty!");
 		ue.addDebugInfo("Token#", iTokenNum);
-		ue.addDebugInfo("Token", strToken);
+		ue.addDebugInfo("Token", static_cast<string>(strToken));
 		throw ue;
 	}
 
@@ -887,8 +887,8 @@ void CStringPatternMatcher::validateLiteralOrList(const stringCSIS& strLiteralOr
 	{
 		UCLIDException ue("ELI05944", "Invalid syntax in pattern - cannot use special characters in literals!");
 		ue.addDebugInfo("Token#", iTokenNum);
-		ue.addDebugInfo("Token", strToken);
-		ue.addDebugInfo("LiteralOrList", strLiteralOrList);
+		ue.addDebugInfo("Token", static_cast<string>(strToken));
+		ue.addDebugInfo("LiteralOrList", static_cast<string>(strLiteralOrList));
 		throw ue;
 	}
 }
@@ -921,14 +921,14 @@ void CStringPatternMatcher::validateTokens(const vector<string>& vecTokens)
 			{
 				UCLIDException ue("ELI06417", "There cannot be more than one tilde (~) in a token!");
 				ue.addDebugInfo("Token#", i);
-				ue.addDebugInfo("Token", tokenInfo.m_strToken);
+				ue.addDebugInfo("Token", static_cast<string>(tokenInfo.m_strToken));
 				throw ue;
 			}
 			else if (tokenInfo.m_strToken.find('?') != string::npos)
 			{
 				UCLIDException ue("ELI06419", "Maximum number of ignore characters cannot be specified for a match-variable token!");
 				ue.addDebugInfo("Token#", i);
-				ue.addDebugInfo("Token", tokenInfo.m_strToken);
+				ue.addDebugInfo("Token", static_cast<string>(tokenInfo.m_strToken));
 				throw ue;
 			}
 		}
@@ -947,7 +947,7 @@ void CStringPatternMatcher::validateTokens(const vector<string>& vecTokens)
 			{
 				UCLIDException ue("ELI06265", "Invalid usage of '?' in pattern!");
 				ue.addDebugInfo("Token#", i);
-				ue.addDebugInfo("Token", tokenInfo.m_strToken);
+				ue.addDebugInfo("Token", static_cast<string>(tokenInfo.m_strToken));
 				throw ue;
 			}
 			else
@@ -1016,7 +1016,7 @@ void CStringPatternMatcher::validateTokens(const vector<string>& vecTokens)
 		{
 			UCLIDException ue("ELI05943", "Invalid usage of '@' in pattern!");
 			ue.addDebugInfo("Token#", i);
-			ue.addDebugInfo("Token", tokenInfo.m_strToken);
+			ue.addDebugInfo("Token", static_cast<string>(tokenInfo.m_strToken));
 			throw ue;
 		}
 

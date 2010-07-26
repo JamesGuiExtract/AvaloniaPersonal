@@ -5,13 +5,13 @@
 #include "FileProcessingMgmtRole.h"
 #include "FP_UI_Notifications.h"
 #include "FileProcessingUtils.h"
+#include "CommonConstants.h"
 
 #include <LicenseMgmt.h>
 #include <COMUtils.h>
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
 #include <ThreadSafeLogFile.h>
-#include <ScheduleGrid.h>
 #include <ValueRestorer.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -802,40 +802,43 @@ STDMETHODIMP CFileProcessingMgmtRole::GetClassID(CLSID *pClassID)
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingMgmtRole::IsDirty(void)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	// if the directly held data is dirty, then indicate to the caller that
-	// this object is dirty
-	if (m_bDirty)
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	try
 	{
-		return S_OK;
-	}
-
-	// check if the file processors vector object is dirty
-	if (m_ipFileProcessingTasks != NULL)
-	{
-		IPersistStreamPtr ipFPStream = m_ipFileProcessingTasks;
-		ASSERT_RESOURCE_ALLOCATION("ELI14333", ipFPStream != NULL);
-		if (ipFPStream->IsDirty() == S_OK)
+		// if the directly held data is dirty, then indicate to the caller that
+		// this object is dirty
+		if (m_bDirty)
 		{
 			return S_OK;
 		}
-	}
 
-	// check if the error task is dirty
-	if (m_ipErrorTask != NULL)
-	{
-		IPersistStreamPtr ipFPStream = m_ipErrorTask;
-		ASSERT_RESOURCE_ALLOCATION("ELI18064", ipFPStream != NULL);
-		if (ipFPStream->IsDirty() == S_OK)
+		// check if the file processors vector object is dirty
+		if (m_ipFileProcessingTasks != NULL)
 		{
-			return S_OK;
+			IPersistStreamPtr ipFPStream = m_ipFileProcessingTasks;
+			ASSERT_RESOURCE_ALLOCATION("ELI14333", ipFPStream != NULL);
+			if (ipFPStream->IsDirty() == S_OK)
+			{
+				return S_OK;
+			}
 		}
-	}
 
-	// if we reached here, it means that the object is not dirty
-	// indicate to the caller that this object is not dirty
-	return S_FALSE;
+		// check if the error task is dirty
+		if (m_ipErrorTask != NULL)
+		{
+			IPersistStreamPtr ipFPStream = m_ipErrorTask;
+			ASSERT_RESOURCE_ALLOCATION("ELI18064", ipFPStream != NULL);
+			if (ipFPStream->IsDirty() == S_OK)
+			{
+				return S_OK;
+			}
+		}
+
+		// if we reached here, it means that the object is not dirty
+		// indicate to the caller that this object is not dirty
+		return S_FALSE;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30415");
 }
 //-------------------------------------------------------------------------------------------------
 // Version 3:

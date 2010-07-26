@@ -204,7 +204,6 @@ namespace Extract.Utilities.Forms
         /// <see langword="false"/> to allow the message to continue to the next filter or control.
         /// </returns>
         /// <param name="m">The message to be dispatched. You cannot modify this message.</param>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         public bool PreFilterMessage(ref Message m)
         {
             try

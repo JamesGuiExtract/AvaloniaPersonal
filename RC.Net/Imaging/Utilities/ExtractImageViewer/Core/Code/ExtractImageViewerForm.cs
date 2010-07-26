@@ -475,7 +475,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <param name="keyData">The key to process.</param>
         /// <returns><see langword="true"/> if the character was processed by the control; 
         /// <see langword="false"/> if the character was not processed.</returns>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             try

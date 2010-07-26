@@ -1434,40 +1434,44 @@ STDMETHODIMP CFileSupplyingMgmtRole::GetClassID(CLSID *pClassID)
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::IsDirty(void)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	// if the directly held data is dirty, then indicate to the caller that
-	// this object is dirty
-	if (m_bDirty)
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	try
 	{
-		return S_OK;
-	}
 
-	// check if the file suppliers vector object is dirty
-	if (m_ipFileSuppliers != NULL)
-	{
-		IPersistStreamPtr ipFSStream = m_ipFileSuppliers;
-		ASSERT_RESOURCE_ALLOCATION("ELI14254", ipFSStream != NULL);
-		if (ipFSStream->IsDirty() == S_OK)
+		// if the directly held data is dirty, then indicate to the caller that
+		// this object is dirty
+		if (m_bDirty)
 		{
 			return S_OK;
 		}
-	}
 
-	// check if the FAM condition obj-with-desc is dirty
-	if (m_ipFAMCondition != NULL)
-	{
-		IPersistStreamPtr ipFSStream = m_ipFAMCondition;
-		ASSERT_RESOURCE_ALLOCATION("ELI14255", ipFSStream != NULL);
-		if (ipFSStream->IsDirty() == S_OK)
+		// check if the file suppliers vector object is dirty
+		if (m_ipFileSuppliers != NULL)
 		{
-			return S_OK;
+			IPersistStreamPtr ipFSStream = m_ipFileSuppliers;
+			ASSERT_RESOURCE_ALLOCATION("ELI14254", ipFSStream != NULL);
+			if (ipFSStream->IsDirty() == S_OK)
+			{
+				return S_OK;
+			}
 		}
-	}
 
-	// if we reached here, it means that the object is not dirty
-	// indicate to the caller that this object is not dirty
-	return S_FALSE;
+		// check if the FAM condition obj-with-desc is dirty
+		if (m_ipFAMCondition != NULL)
+		{
+			IPersistStreamPtr ipFSStream = m_ipFAMCondition;
+			ASSERT_RESOURCE_ALLOCATION("ELI14255", ipFSStream != NULL);
+			if (ipFSStream->IsDirty() == S_OK)
+			{
+				return S_OK;
+			}
+		}
+
+		// if we reached here, it means that the object is not dirty
+		// indicate to the caller that this object is not dirty
+		return S_FALSE;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30416");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::Load(IStream *pStream)

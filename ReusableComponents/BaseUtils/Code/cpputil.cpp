@@ -36,12 +36,6 @@
 
 using namespace std;
 
-// TESTTHIS: these constants need to be defined only because of setting WINVER
-// to Windows 2000.  How does the code that uses these constants work under
-// windows 2000?
-const int WS_EX_LAYERED = 0x00080000;
-const int LWA_ALPHA = 0x00000002;
-
 // Adapter status structure - used for MAC Address
 typedef struct _ASTAT_
 {

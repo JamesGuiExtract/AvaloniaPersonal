@@ -28,40 +28,44 @@ STDMETHODIMP CFileProcessingManager::GetClassID(CLSID *pClassID)
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingManager::IsDirty(void)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	// if the directly held data is dirty, then indicate to the caller that
-	// this object is dirty
-	if (m_bDirty)
+	try
 	{
-		return S_OK;
-	}
-
-	// check if the file supplying role object is dirty
-	if (m_ipFSMgmtRole != NULL)
-	{
-		IPersistStreamPtr ipFSStream = m_ipFSMgmtRole;
-		ASSERT_RESOURCE_ALLOCATION("ELI14197", ipFSStream != NULL);
-		if (ipFSStream->IsDirty() == S_OK)
+		// if the directly held data is dirty, then indicate to the caller that
+		// this object is dirty
+		if (m_bDirty)
 		{
 			return S_OK;
 		}
-	}
 
-	// if the file processors container is dirty, then indicate to the caller that
-	// this object is dirty
-	if (m_ipFPMgmtRole != NULL)
-	{
-		IPersistStreamPtr ipFPStream = m_ipFPMgmtRole;
-		ASSERT_RESOURCE_ALLOCATION("ELI14159", ipFPStream != NULL);
-		if (ipFPStream->IsDirty() == S_OK)
+		// check if the file supplying role object is dirty
+		if (m_ipFSMgmtRole != NULL)
 		{
-			return S_OK;
+			IPersistStreamPtr ipFSStream = m_ipFSMgmtRole;
+			ASSERT_RESOURCE_ALLOCATION("ELI14197", ipFSStream != NULL);
+			if (ipFSStream->IsDirty() == S_OK)
+			{
+				return S_OK;
+			}
 		}
-	}
 
-	// indicate to the caller that this object is not dirty
-	return S_FALSE;
+		// if the file processors container is dirty, then indicate to the caller that
+		// this object is dirty
+		if (m_ipFPMgmtRole != NULL)
+		{
+			IPersistStreamPtr ipFPStream = m_ipFPMgmtRole;
+			ASSERT_RESOURCE_ALLOCATION("ELI14159", ipFPStream != NULL);
+			if (ipFPStream->IsDirty() == S_OK)
+			{
+				return S_OK;
+			}
+		}
+
+		// indicate to the caller that this object is not dirty
+		return S_FALSE;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30414");
 }
 //-------------------------------------------------------------------------------------------------
 // Version 7:

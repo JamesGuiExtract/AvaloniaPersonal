@@ -8,28 +8,31 @@
 // stringCSIS Contructors
 //-------------------------------------------------------------------------------------------------
 stringCSIS::stringCSIS()
-: string(), m_bCaseSensitive( stringCSIS::isCaseSensitiveByDefault() )
+: m_bCaseSensitive( stringCSIS::isCaseSensitiveByDefault() ),
+m_strSource("")
 {
 }
 //-------------------------------------------------------------------------------------------------
 stringCSIS::stringCSIS(const stringCSIS& s)
-: string(s)
+	: m_strSource(static_cast<string>(s))
 { 
 	m_bCaseSensitive = s.m_bCaseSensitive;
 }
 //-------------------------------------------------------------------------------------------------
 stringCSIS::stringCSIS(const bool bIsCS )
-: string(), m_bCaseSensitive(bIsCS)
+: m_bCaseSensitive(bIsCS),
+m_strSource("")
 {
 }
 //-------------------------------------------------------------------------------------------------
 stringCSIS::stringCSIS(const char* s)
-: string(s), m_bCaseSensitive( stringCSIS::isCaseSensitiveByDefault() )
+: m_bCaseSensitive( stringCSIS::isCaseSensitiveByDefault() ),
+m_strSource(s)
 {
 }
 //-------------------------------------------------------------------------------------------------
 stringCSIS::stringCSIS(const string &s, bool bIsCS )
-: string(s), m_bCaseSensitive(bIsCS)
+: m_strSource(s), m_bCaseSensitive(bIsCS)
 {
 }
 
@@ -65,33 +68,33 @@ bool stringCSIS::sEqual(const string &strA, const string &strB, bool bCaseSensit
 	}
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find( value_type _Ch, size_t _Off ) const
+size_t stringCSIS::find( char c, size_t _Off ) const
 {
 	// If case insensitive search look fro both the upper and lower case of _Ch
 	if ( !m_bCaseSensitive )
 	{
-		string strLowerUpperChars = getLowerUpperChars(_Ch);
+		string strLowerUpperChars = getLowerUpperChars(c);
 		if (!strLowerUpperChars.empty())
 		{
 			// Find chars in string with string::find_first_of
-			return string::find_first_of(strLowerUpperChars.c_str(), _Off );
+			return m_strSource.find_first_of(strLowerUpperChars, _Off );
 		}
 	}
 
 	// Return the base class results ( case sensitive )
-	return string::find ( _Ch, _Off );
+	return m_strSource.find(c, _Off);
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find( const value_type* _Ptr, size_t _Off ) const
+size_t stringCSIS::find( const char* _Ptr, size_t _Off ) const
 {
 	// Get the length of the string to find
-	size_t nFindStrLen = strlen(_Ptr);
+	size_t nFindStrLen = strnlen(_Ptr, UINT_MAX);
 
 	// Call find using the length of the find string for the count
 	return find(_Ptr, _Off, nFindStrLen);
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find( const value_type* _Ptr, size_t _Off, size_t _Count ) const
+size_t stringCSIS::find( const char* _Ptr, size_t _Off, size_t _Count ) const
 {
 	// if _Off == string::npos or _Count == string::npos, the return value will be string::npos 
 	if ( _Off == string::npos || _Count == string::npos )
@@ -102,11 +105,11 @@ size_t stringCSIS::find( const value_type* _Ptr, size_t _Off, size_t _Count ) co
 	// if case sensitive find return the string::find results
 	if ( m_bCaseSensitive )
 	{
-		return string::find(_Ptr, _Off, _Count );
+		return m_strSource.find(_Ptr, _Off, _Count );
 	}
 
 	// get the length of the string
-	size_t nStrLen = length();
+	size_t nStrLen = m_strSource.length();
 
 	// if the position to start looking plus the Count of chars to compare
 	// is greather than the string length the string will not be found
@@ -117,7 +120,7 @@ size_t stringCSIS::find( const value_type* _Ptr, size_t _Off, size_t _Count ) co
 	}
 
 	// create a temp pointer to the c string
-	const value_type* vtTmpPtr = c_str();
+	const char* vtTmpPtr = m_strSource.c_str();
 
 	// Search the string for the subsring
 	for ( size_t i = _Off; i <= nStrLen - _Count; i++ )
@@ -133,43 +136,48 @@ size_t stringCSIS::find( const value_type* _Ptr, size_t _Off, size_t _Count ) co
 	return string::npos;
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find( const basic_string& _Str, size_t _Off ) const
+size_t stringCSIS::find( const string& _Str, size_t _Off ) const
 {
 	// Get the length of the string to find
 	size_t nFindStrLen = _Str.length();
 
-	// return results of find using c_str(), _Off and the lenght of the string to find
+	// return results of find using c_str(), _Off and the length of the string to find
 	return find ( _Str.c_str(), _Off, nFindStrLen );
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_first_not_of( value_type _Ch, size_t _Off ) const
+size_t stringCSIS::find(const stringCSIS& _Str, size_t _Off) const
 {
-	// If case insensitive search look for both the upper and lower case of _Ch
+	return find(_Str.c_str(), _Off, _Str.length());
+}
+//-------------------------------------------------------------------------------------------------
+size_t stringCSIS::find_first_not_of( char c, size_t _Off ) const
+{
+	// If case insensitive search look for both the upper and lower case of c
 	if ( !m_bCaseSensitive )
 	{
-		string strLowerUpperChars = getLowerUpperChars(_Ch);
+		string strLowerUpperChars = getLowerUpperChars(c);
 		if (!strLowerUpperChars.empty())
 		{
 			// Find chars in string with string::find_first_not_of
-			return string::find_first_not_of(strLowerUpperChars.c_str(), _Off );
+			return m_strSource.find_first_not_of(strLowerUpperChars, _Off );
 		}
 	}
 
 	// if case sensitive, return the string::find_first_not_of results
-	return string::find_first_not_of(_Ch, _Off );
+	return m_strSource.find_first_not_of(c, _Off );
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_first_not_of( value_type * _Ptr, size_t _Off ) const
+size_t stringCSIS::find_first_not_of( const char* _Ptr, size_t _Off ) const
 {
 	// Get the length of the string with chars to find
-	size_t nFindStrLen = strlen(_Ptr);
+	size_t nFindStrLen = strnlen(_Ptr, UINT_MAX);
 
 	// return results from find_first_not_of with chars to find, starting location and 
 	// lenght of find string
 	return find_first_not_of(_Ptr, _Off, nFindStrLen);
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_first_not_of( const value_type* _Ptr, size_t _Off, size_t _Count) const
+size_t stringCSIS::find_first_not_of( const char* _Ptr, size_t _Off, size_t _Count) const
 {
 	// Create strFind to contain the char to search
 	string strFind;
@@ -190,39 +198,44 @@ size_t stringCSIS::find_first_not_of( const value_type* _Ptr, size_t _Off, size_
 	}
 	
 	// return results of string::find_first_not_of with the search string
-	return string::find_first_not_of( strFind.c_str(), _Off, ulCharsToSearch);
+	return m_strSource.find_first_not_of( strFind.c_str(), _Off, ulCharsToSearch);
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_first_not_of( const basic_string& _Str, size_t _Off) const
+size_t stringCSIS::find_first_not_of( const string& _Str, size_t _Off) const
 {
 	// Return the value from call to find_first_not_of with the string, offset and count of chars
 	return find_first_not_of(_Str.c_str(), _Off, _Str.length());
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_first_of( value_type _Ch, size_t _Off) const
+size_t stringCSIS::find_first_not_of(const stringCSIS& _Str, size_t _Off) const
 {
-	// If case insensitive search look fro both the upper and lower case of _Ch
+	return find_first_not_of(_Str.c_str(), _Off, _Str.length());
+}
+//-------------------------------------------------------------------------------------------------
+size_t stringCSIS::find_first_of( char c, size_t _Off) const
+{
+	// If case insensitive search look fro both the upper and lower case of c
 	if ( !m_bCaseSensitive )
 	{
-		string strLowerUpperChars = getLowerUpperChars(_Ch);
+		string strLowerUpperChars = getLowerUpperChars(c);
 		if (!strLowerUpperChars.empty())
 		{
 			// Find chars in string with string::find_first_of
-			return string::find_first_of(strLowerUpperChars.c_str(), _Off );
+			return m_strSource.find_first_of(strLowerUpperChars, _Off );
 		}
 	}
 
 	// Just need to look for the char case sensitive search
-	return string::find_first_of(_Ch, _Off );
+	return m_strSource.find_first_of(c, _Off );
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_first_of( value_type * _Ptr, size_t _Off ) const
+size_t stringCSIS::find_first_of( const char* _Ptr, size_t _Off ) const
 {
 	// Call find_first_of with the string, offset and lenght of the search string for count
-	return find_first_of(_Ptr, _Off, strlen(_Ptr));
+	return find_first_of(_Ptr, _Off, strnlen(_Ptr, UINT_MAX));
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_first_of( const value_type* _Ptr, size_t _Off, size_t _Count) const
+size_t stringCSIS::find_first_of( const char* _Ptr, size_t _Off, size_t _Count) const
 {
 	// Set string find to the string passed in
 	string strFind;
@@ -243,39 +256,44 @@ size_t stringCSIS::find_first_of( const value_type* _Ptr, size_t _Off, size_t _C
 	}
 
 	// Use string::find_first_of to find the char in string using strFind
-	return string::find_first_of( strFind.c_str(), _Off, ulCharsToSearch);
+	return m_strSource.find_first_of( strFind.c_str(), _Off, ulCharsToSearch);
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_first_of( const basic_string& _Str, size_t _Off ) const
+size_t stringCSIS::find_first_of( const string& _Str, size_t _Off ) const
 {
 	// Call find_first_of with the string, offset and length of string to find
 	return find_first_of(_Str.c_str(), _Off, _Str.length());
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_last_not_of( value_type _Ch, size_t _Off) const
+size_t stringCSIS::find_first_of(const stringCSIS& _Str, size_t _Off) const
+{
+	return find_first_of(_Str.c_str(), _Off, _Str.length());
+}
+//-------------------------------------------------------------------------------------------------
+size_t stringCSIS::find_last_not_of(const char c, size_t _Off) const
 {
 	// If case insensitive search look fro both the upper and lower case of _Ch
 	if ( !m_bCaseSensitive )
 	{
-		string strLowerUpperChars = getLowerUpperChars(_Ch);
+		string strLowerUpperChars = getLowerUpperChars(c);
 		if (!strLowerUpperChars.empty())
 		{
 			// Find chars in string with string::find_last_not_of
-			return string::find_last_not_of(strLowerUpperChars.c_str(), _Off );
+			return m_strSource.find_last_not_of(strLowerUpperChars, _Off );
 		}
 	}
 
 	// use string class find_last_not_of for case sensitive search
-	return string::find_last_not_of(_Ch, _Off );
+	return m_strSource.find_last_not_of(c, _Off);
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_last_not_of( value_type * _Ptr, size_t _Off) const
+size_t stringCSIS::find_last_not_of( const char* _Ptr, size_t _Off) const
 {
 	// Call find_last_not_of with the string, offset and the length of the string to find for count
-	return find_last_not_of( _Ptr, _Off, strlen(_Ptr));
+	return find_last_not_of( _Ptr, _Off, strnlen(_Ptr, UINT_MAX));
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_last_not_of( const value_type* _Ptr, size_t _Off, size_t _Count) const
+size_t stringCSIS::find_last_not_of( const char* _Ptr, size_t _Off, size_t _Count) const
 {
 	// Set string find to the string passed in
 	string strFind;
@@ -296,38 +314,45 @@ size_t stringCSIS::find_last_not_of( const value_type* _Ptr, size_t _Off, size_t
 	}
 
 	// call string::find_last_not_of to get results
-	return string::find_last_not_of( strFind.c_str(), _Off, ulCharsToSearch);
+	return m_strSource.find_last_not_of( strFind.c_str(), _Off, ulCharsToSearch);
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_last_not_of( const basic_string& _Str, size_t _Off ) const
+size_t stringCSIS::find_last_not_of( const string& _Str, size_t _Off ) const
 {
 	// call find_last_not_of with the string, offset and length of the string to find as count
 	return find_last_not_of( _Str.c_str(), _Off, _Str.length());
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_last_of( value_type _Ch, size_t _Off) const
+size_t stringCSIS::find_last_not_of( const stringCSIS& _Str, size_t _Off ) const
 {
-	// If case insensitive search look for both the upper and lower case of _Ch
+	// call find_last_not_of with the string, offset and length of the string to find as count
+	return find_last_not_of( _Str.c_str(), _Off, _Str.length());
+}
+//-------------------------------------------------------------------------------------------------
+size_t stringCSIS::find_last_of( char c, size_t _Off) const
+{
+	// If case insensitive search look for both the upper and lower case of c
 	if ( !m_bCaseSensitive )
 	{
-		string strLowerUpperChars = getLowerUpperChars(_Ch);
+		string strLowerUpperChars = getLowerUpperChars(c);
 		if (!strLowerUpperChars.empty())
 		{
 			// Find chars in string with string::find_last_of
-			return string::find_last_of(strLowerUpperChars.c_str(), _Off );
+			return m_strSource.find_last_of(strLowerUpperChars, _Off );
 		}
 	}
 
 	// find_last_of with case sensitive
-	return string::find_last_of(_Ch, _Off );}
-//-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_last_of( value_type * _Ptr, size_t _Off) const
-{
-	// return results from find_last_of with the string, offset and the length of the find string as count
-	return find_last_of( _Ptr, _Off, strlen(_Ptr));
+	return m_strSource.find_last_of(c, _Off );
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_last_of( const value_type* _Ptr, size_t _Off, size_t _Count) const
+size_t stringCSIS::find_last_of( const char* _Ptr, size_t _Off) const
+{
+	// return results from find_last_of with the string, offset and the length of the find string as count
+	return find_last_of( _Ptr, _Off, strnlen(_Ptr, UINT_MAX));
+}
+//-------------------------------------------------------------------------------------------------
+size_t stringCSIS::find_last_of( const char* _Ptr, size_t _Off, size_t _Count) const
 {
 	// Set string find to the string passed in
 	string strFind;
@@ -347,34 +372,46 @@ size_t stringCSIS::find_last_of( const value_type* _Ptr, size_t _Off, size_t _Co
 		strFind = _Ptr;
 	}
 
-	return string::find_last_of( strFind.c_str(), _Off, ulCharsToSearch);
+	return m_strSource.find_last_of( strFind.c_str(), _Off, ulCharsToSearch);
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::find_last_of( const basic_string& _Str, size_t _Off ) const
+size_t stringCSIS::find_last_of( const string& _Str, size_t _Off ) const
 {
 	// return results from find_last_of using string, offset and length of string to find as count
 	return find_last_of( _Str.c_str(), _Off, _Str.length());
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::rfind( const basic_string& _Str, size_t _Off ) const
+size_t stringCSIS::find_last_of( const stringCSIS& _Str, size_t _Off ) const
+{
+	// return results from find_last_of using string, offset and length of string to find as count
+	return find_last_of( _Str.c_str(), _Off, _Str.length());
+}
+//-------------------------------------------------------------------------------------------------
+size_t stringCSIS::rfind( const string& _Str, size_t _Off ) const
 {
 	// return results from rfind with sting, offset and length of string to find as count
 	return rfind(_Str.c_str(), _Off, _Str.length());
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::rfind(	value_type _Ch, size_t _Off ) const
-{
-	// return results of find_last_of with the char
-	return find_last_of( _Ch, _Off);
-}
-//-------------------------------------------------------------------------------------------------
-size_t stringCSIS::rfind(	const value_type* _Ptr,	size_t _Off ) const
+size_t stringCSIS::rfind( const stringCSIS& _Str, size_t _Off ) const
 {
 	// return results from rfind with sting, offset and length of string to find as count
-	return rfind(_Ptr, _Off, strlen(_Ptr));
+	return rfind(_Str.c_str(), _Off, _Str.length());
 }
 //-------------------------------------------------------------------------------------------------
-size_t stringCSIS::rfind(	const value_type* _Ptr, size_t _Off, size_t _Count) const
+size_t stringCSIS::rfind(	char c, size_t _Off ) const
+{
+	// return results of find_last_of with the char
+	return find_last_of( c, _Off);
+}
+//-------------------------------------------------------------------------------------------------
+size_t stringCSIS::rfind(	const char* _Ptr,	size_t _Off ) const
+{
+	// return results from rfind with sting, offset and length of string to find as count
+	return rfind(_Ptr, _Off, strnlen(_Ptr, UINT_MAX));
+}
+//-------------------------------------------------------------------------------------------------
+size_t stringCSIS::rfind(	const char* _Ptr, size_t _Off, size_t _Count) const
 {
 	// if the _Off == 0 or _Count == string::npos then return string::npos
 	if ( _Off == 0 || _Count == string::npos )
@@ -385,12 +422,12 @@ size_t stringCSIS::rfind(	const value_type* _Ptr, size_t _Off, size_t _Count) co
 	// if case sensitive just pass the call to the string class
 	if ( m_bCaseSensitive )
 	{
-		return string::rfind(_Ptr, _Off, _Count );
+		return m_strSource.rfind(_Ptr, _Off, _Count );
 	}
 
 	// get length of string
-	size_t nFindStrLen = strlen(_Ptr);
-	size_t nStrLen = length();
+	size_t nFindStrLen = strnlen(_Ptr, UINT_MAX);
+	size_t nStrLen = m_strSource.length();
 
 	// if the _Off is string::npos it should be changed to the length of the string to search
 	if ( _Off == string::npos )
@@ -443,13 +480,14 @@ size_t stringCSIS::rfind(	const value_type* _Ptr, size_t _Off, size_t _Count) co
 	// string was not found so return npos
 	return string::npos;
 }
+
 //-------------------------------------------------------------------------------------------------
 // Operator =
 //-------------------------------------------------------------------------------------------------
 stringCSIS& stringCSIS::operator =(const stringCSIS &m)
 {
 	// call string = operator to set string properties
-	string::operator =( m );
+	m_strSource = m.m_strSource;
 
 	// set the case sensitive flag
 	m_bCaseSensitive = m.m_bCaseSensitive;
@@ -461,15 +499,34 @@ stringCSIS& stringCSIS::operator =(const stringCSIS &m)
 stringCSIS & stringCSIS::operator = (const string &s)
 {
 	// just set the string properties
-	string::operator = ( s );
+	m_strSource = s;
 	return *this;
 }
 //-------------------------------------------------------------------------------------------------
 stringCSIS & stringCSIS::operator = (const char* s)
 {
 	// set the string properties
-	string::operator = ( s );
+	m_strSource = s;
 	return *this;
+}
+
+//-------------------------------------------------------------------------------------------------
+// Operator +=
+//-------------------------------------------------------------------------------------------------
+stringCSIS& stringCSIS::operator += (const string& strSource)
+{
+	m_strSource += strSource;
+
+	return *this;
+}
+
+//-------------------------------------------------------------------------------------------------
+// Operator <<
+//-------------------------------------------------------------------------------------------------
+ostream& operator<<(ostream& output, const stringCSIS& strText)
+{
+	output << strText.m_strSource;
+	return output;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -527,11 +584,11 @@ string stringCSIS::convertCharsToFind( const string &strCharFind, unsigned long 
 	return strRtn;
 }
 //-------------------------------------------------------------------------------------------------
-string stringCSIS::getLowerUpperChars(value_type _Ch) const
+string stringCSIS::getLowerUpperChars(char c) const
 {
 	// get the upper and lower case values
-	int iUpper = toupper(_Ch);
-	int iLower = tolower(_Ch);
+	int iUpper = toupper(c);
+	int iLower = tolower(c);
 
 	// if not equal search for both
 	if ( iUpper != iLower )

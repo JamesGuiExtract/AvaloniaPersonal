@@ -42,7 +42,6 @@ namespace Extract.Utilities.Forms
         /// Raises the WndProc message.
         /// </summary>
         /// <param name="m">The message being processed.</param>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
         {
             if (!_allowSelection && m.Msg == WindowsMessage.SetFocus)

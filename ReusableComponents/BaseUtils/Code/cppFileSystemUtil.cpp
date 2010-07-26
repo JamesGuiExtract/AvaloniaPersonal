@@ -902,8 +902,8 @@ string getTextFileContentsAsString(const string& strTextFileName)
 {
 	string strRet;
 
-	int length;
-	char *buffer;
+	size_t length;
+	char *buffer = NULL;
 	ifstream ifs;
 	// if we dont read as binary the newlines will get screwed up
 	ifs.open (strTextFileName.c_str(), ifstream::in | ifstream::binary);
@@ -921,9 +921,9 @@ string getTextFileContentsAsString(const string& strTextFileName)
 
 	// allocate memory:
 	buffer = new char[length + 1];
+	ZeroMemory(buffer, length+1);
 	try
 	{
-
 		// read data as a block:
 		ifs.read (buffer, length);
 		// close the file
@@ -2059,9 +2059,6 @@ string getCSIDLAsString(int CLSID)
 		break;
 	case CSIDL_STARTMENU:
 		strReturn = "CSIDL_STARTMENU";
-		break;
-	case CSIDL_MYDOCUMENTS:
-		strReturn = "CSIDL_MYDOCUMENTS";
 		break;
 	case CSIDL_MYMUSIC:
 		strReturn = "CSIDL_MYMUSIC";

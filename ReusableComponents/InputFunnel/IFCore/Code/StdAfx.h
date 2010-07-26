@@ -7,10 +7,9 @@
 #endif // _MSC_VER > 1000
 
 #define STRICT 1
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0400
-#endif
 #define _ATL_APARTMENT_THREADED
+
+#include <CommonToExtractProducts.h>
 
 #include <afxwin.h>
 #include <afxdisp.h>

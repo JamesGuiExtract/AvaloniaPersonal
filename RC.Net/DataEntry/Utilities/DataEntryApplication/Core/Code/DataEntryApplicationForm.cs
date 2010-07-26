@@ -279,7 +279,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         readonly ControlInvoker _invoker;
 
-		/// <summary>
+        /// <summary>
         /// The number of document that have been loaded in this session of the
         /// <see cref="DataEntryApplicationForm"/>.
         /// </summary>
@@ -554,10 +554,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // Only add the save menu item if not running in stand alone and _fileProcessingDb is
             // available.
             if (!_standAloneMode && _fileProcessingDb != null)
-	        {
+            {
                 _saveMenuItem = CreateDisabledMenuItem("Save");
                 items.Add(_saveMenuItem);
-	        }
+            }
 
             // Add the print image menu item
             items.AddRange(new ToolStripItem[] { _printMenuItem, new ToolStripSeparator() });
@@ -565,10 +565,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // Only add skip processing if not in stand alone mode and _fileProcessingDb is
             // available.
             if (!_standAloneMode && _fileProcessingDb != null)
-	        {
+            {
                 _skipProcessingMenuItem = CreateDisabledMenuItem("Skip document");
                 items.Add(_skipProcessingMenuItem);
-	        }
+            }
 
             // Add the exit menu item
             items.Add(_exitToolStripMenuItem);
@@ -1056,7 +1056,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="keyData">The key to process.</param>
         /// <returns><see langword="true"/> if the character was processed by the control; 
         /// <see langword="false"/> if the character was not processed.</returns>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             try
@@ -1089,7 +1088,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Processes windows messages.
         /// </summary>
         /// <param name="m">The Windows <see cref="Message"/> to process.</param>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
         {
             try

@@ -278,8 +278,6 @@ namespace Extract.Utilities.Forms
         /// <see langword="null"/>.</param>
         /// <returns>A <see cref="System.Windows.Forms.Cursor"/> loaded from the specified stream.
         /// </returns>
-        [SecurityPermission(SecurityAction.LinkDemand,
-            Flags = SecurityPermissionFlag.UnmanagedCode)]
         public static Cursor GetCursor(Stream stream)
         {
             try

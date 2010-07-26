@@ -95,7 +95,7 @@ STDMETHODIMP CStrToObjectMap::IsDirty(void)
 				if (ipPersistStream == NULL)
 				{
 					UCLIDException ue("ELI19309", "Object does not support persistence!");
-					ue.addDebugInfo("Key", itMap->first);
+					ue.addDebugInfo("Key", static_cast<string>(itMap->first));
 					throw ue;
 				}
 
@@ -229,7 +229,7 @@ STDMETHODIMP CStrToObjectMap::Save(IStream *pStream, BOOL fClearDirty)
 			if (ipObj == NULL)
 			{
 				UCLIDException ue("ELI19306", "Object does not support persistence!");
-				ue.addDebugInfo("Key", iter->first);
+				ue.addDebugInfo("Key", static_cast<string>(iter->first));
 				throw ue;
 			}
 			else
@@ -302,7 +302,7 @@ STDMETHODIMP CStrToObjectMap::GetValue(BSTR key, IUnknown **pObject)
 		else
 		{
 			UCLIDException ue("ELI11225", "Map does not contain the specific key!");
-			ue.addDebugInfo("Key", stdstrKey);
+			ue.addDebugInfo("Key", static_cast<string>(stdstrKey));
 			throw ue;
 		}
 	}
@@ -478,7 +478,7 @@ STDMETHODIMP CStrToObjectMap::RenameKey(BSTR strKey, BSTR strNewKeyName)
 			if (iter1 == m_mapKeyToValue.end())
 			{
 				UCLIDException ue("ELI19298", "Invalid map key!");
-				ue.addDebugInfo("Key", stdstrKey );
+				ue.addDebugInfo("Key", static_cast<string>(stdstrKey) );
 				throw ue;
 			}
 
@@ -487,8 +487,8 @@ STDMETHODIMP CStrToObjectMap::RenameKey(BSTR strKey, BSTR strNewKeyName)
 			if (iter2 != m_mapKeyToValue.end())
 			{
 				UCLIDException ue("ELI19299", "Specified key already exists in map!");
-				ue.addDebugInfo("Old Key", stdstrKey);
-				ue.addDebugInfo("New Key", stdstrNewKeyName);
+				ue.addDebugInfo("Old Key", static_cast<string>(stdstrKey));
+				ue.addDebugInfo("New Key", static_cast<string>(stdstrNewKeyName));
 				throw ue;
 			}
 

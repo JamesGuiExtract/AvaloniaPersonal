@@ -157,6 +157,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AlertLevelDlg.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -185,6 +186,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AlertLevelDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="USBLicenseKeyManager.h" />
@@ -205,10 +207,6 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcxproj">
       <Project>{6fa06b83-ac26-49b7-8138-9342792eacc4}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\RWUtils\Code\RWUtils.vcxproj">
-      <Project>{cf85ab16-a29d-49ca-8367-50e3f4d4af7b}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\Code\SafeNetUtils.vcxproj">

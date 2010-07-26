@@ -126,7 +126,7 @@ namespace Extract.Test
         /// <summary>
         /// Test to verify that 
         /// <see cref="ExtractException.AddDebugData(string, string, bool)"/> where value is a 
-        /// <see cref="System.String"/> and where <paramref name="encrypt"/> is 
+        /// <see cref="System.String"/> and where encrypt is 
         /// <see langword="true"/> will encrypt the associated value before adding it to the data 
         /// collection.
         /// </summary>
@@ -156,7 +156,7 @@ namespace Extract.Test
         /// <summary>
         /// Test to verify that 
         /// <see cref="ExtractException.AddDebugData(string, System.ValueType, bool)"/>
-        /// where value is a <see cref="System.Int64"/> and where <paramref name="encrypt"/>
+        /// where value is a <see cref="System.Int64"/> and where encrypt
         /// is <see langword="true"/> will encrypt the associated value before adding it to
         /// the data collection.
         /// </summary>
@@ -186,7 +186,7 @@ namespace Extract.Test
 
         /// <summary>
         /// Test to verify that <see cref="ExtractException.AddDebugData(string, string, bool)"/>
-        /// where value is a <see cref="System.String"/> and where <paramref name="encrypt"/>
+        /// where value is a <see cref="System.String"/> and where encrypt
         /// is <see langword="false"/> will not encrypt the associated value before adding it to
         /// the data collection.
         /// </summary>
@@ -214,7 +214,7 @@ namespace Extract.Test
         /// <summary>
         /// Test to verify that 
         /// <see cref="ExtractException.AddDebugData(string, System.ValueType, bool)"/>
-        /// where value is a <see cref="System.Int64"/> and where <paramref name="encrypt"/>
+        /// where value is a <see cref="System.Int64"/> and where encrypt
         /// is <see langword="false"/> will not encrypt the associated value before adding it to
         /// the data collection.
         /// </summary>

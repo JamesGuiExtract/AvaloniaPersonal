@@ -33,24 +33,17 @@ CImportRuleSetDlg::CImportRuleSetDlg(UCLID_AFCORELib::IRuleSetPtr ipRuleSet,
 	m_bDoImport(bDoImport),
 	m_ipRuleSet(ipRuleSet)
 {
-	//{{AFX_DATA_INIT(CImportRuleSetDlg)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
 }
 //--------------------------------------------------------------------------------------------------
 void CImportRuleSetDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CImportRuleSetDlg)
-		// NOTE: the ClassWizard will add DDX and DDV calls here
-	//}}AFX_DATA_MAP
+	DDX_Control(pDX, IDC_GRID, m_wndList);
 }
 //--------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CImportRuleSetDlg, CDialog)
-	//{{AFX_MSG_MAP(CImportRuleSetDlg)
 	ON_WM_SIZE()
 	ON_WM_GETMINMAXINFO()
-	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 //--------------------------------------------------------------------------------------------------
@@ -65,13 +58,6 @@ BOOL CImportRuleSetDlg::OnInitDialog()
 
 	try
 	{
-		// Please refer to the MFC documentation on 
-		// SubclassDlgItem for information on this 
-		// call. This makes sure that our C++ grid 
-		// window class subclasses the window that 
-		// is created with the User Control.
-		m_wndGrid.SubclassDlgItem( IDC_GRID, this );
-		
 		// Set the dialog title and prompt
 		if (m_bDoImport)
 		{
@@ -108,15 +94,8 @@ BOOL CImportRuleSetDlg::OnInitDialog()
 		vecWidths.push_back( 80 );
 		vecWidths.push_back( 0 );		// Will be resized by DoResize()
 		
-		// Setup the grid control
-		//    3 columns of header labels
-		//    3 columns of column widths
-		//    DO     use checkboxes in column 1
-		//    DO NOT use group information for checkboxes
-		m_wndGrid.PrepareGrid( vecHeader, vecWidths, true, false );
-		
 		// Add real entries from Rule Set
-		populateGrid();
+		populateList();
 		
 		// Resize the cell heights and the Value column width
 		m_wndGrid.SetValueColumn( gVALUE_COLUMN );
@@ -343,7 +322,20 @@ std::string CImportRuleSetDlg::getUnreservedString(std::string strOldValue)
 	return strNewValue;
 }
 //--------------------------------------------------------------------------------------------------
-void CImportRuleSetDlg::populateGrid() 
+void CImportRulesSetDlg::prepareList()
+{
+	CRect recList;
+	m_wndList.GetClientRect(&recList);
+	int nTotalWidth = recList.Width();
+
+	int nColWidth = nTotalWidth/(gnNUMBER_OF_COLUMNS+2);
+	int nCol = 0;
+
+	LVCOLUMN lvColumn;
+
+}
+//--------------------------------------------------------------------------------------------------
+void CImportRuleSetDlg::populateList() 
 {
 	// Retrieve map of attribute names and attribute infos
 	// to be imported

@@ -43,7 +43,6 @@ namespace Extract.Drawing
         /// <see langword="true"/> if the handle is released successfully; otherwise, in the event 
         /// of a catastrophic failure, <see langword="false"/>.
         /// </returns>
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         protected override bool ReleaseHandle()
         {
             try
@@ -68,12 +67,8 @@ namespace Extract.Drawing
         /// <returns>
         /// true if the handle is valid; otherwise, false.
         /// </returns>
-        /// <PermissionSet><IPermission class="System.Security.Permissions.SecurityPermission, 
-        /// mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" 
-        /// version="1" Flags="UnmanagedCode"/></PermissionSet>
         public override bool IsInvalid
         {
-            [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
             get
             {
                 return handle == IntPtr.Zero;

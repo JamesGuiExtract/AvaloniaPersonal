@@ -74,7 +74,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\RWUtils\Code;..\..\..\APIs\RogueWave\Inc;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;_GXDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -96,7 +96,7 @@
     <Link>
       <OutputFile>..\..\..\..\Binaries\Release/UCLIDFileProcessing.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\APIs\RogueWave\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\UCLIDFileProcessing.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -125,8 +125,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\RWUtils\Code;..\..\..\APIs\RogueWave\Inc;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_USRDLL;_GXDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include;..\..\..\APIs\UltimateGrid\Include;..\..\..\APIs\UltimateGrid\Lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -148,7 +148,7 @@
     <Link>
       <OutputFile>..\..\..\..\Binaries\Debug/UCLIDFileProcessing.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\APIs\RogueWave\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\APIs\UltimateGrid\Lib;..\..\..\APIs\UltimateGrid\DLLs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\UCLIDFileProcessing.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/UCLIDFileProcessing.pdb</ProgramDatabaseFile>
@@ -174,6 +174,7 @@
     <ClCompile Include="FAMTagManager.cpp" />
     <ClCompile Include="FileProcessingDB.cpp" />
     <ClCompile Include="FileProcessingDB_Internal.cpp" />
+    <ClCompile Include="FileProcessingDB_PreNormalized.cpp" />
     <ClCompile Include="FileProcessingDlg.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -241,7 +242,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="HelperFunctions.cpp" />
-    <ClCompile Include="ScheduleDialog.cpp" />
+    <ClCompile Include="QueueGrid.cpp" />
     <ClCompile Include="SelectActionDlg.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -317,6 +318,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionStatistics.h" />
+    <ClInclude Include="CommonConstants.h" />
     <ClInclude Include="DatabaseStatusIconUpdater.h" />
     <ClInclude Include="FAMDB_SQL.h" />
     <ClInclude Include="FAMDBUtils.h" />
@@ -345,8 +347,8 @@
     <ClInclude Include="FPCategories.h" />
     <ClInclude Include="FPRecordManager.h" />
     <ClInclude Include="HelperFunctions.h" />
+    <ClInclude Include="QueueGrid.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="ScheduleDialog.h" />
     <ClInclude Include="SelectActionDlg.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="TaskEvent.h" />
@@ -363,10 +365,6 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcxproj">
       <Project>{08cc1afb-7b9d-42e5-b823-dc72cdc06631}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\VendorSpecificUtils\RWUtils\Code\RWUtils.vcxproj">
-      <Project>{cf85ab16-a29d-49ca-8367-50e3f4d4af7b}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\ESMessageUtils\Code\ESMessageUtils.vcxproj">

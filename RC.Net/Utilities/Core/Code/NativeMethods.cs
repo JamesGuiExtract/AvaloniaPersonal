@@ -286,7 +286,7 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="lpAppName">The name of the section containing the key name. If 
         /// <see langword="null"/>, copies all section names in the file to 
-        /// <paramref name="lpRetunedString"/>.</param>
+        /// <paramref name="lpReturnedString"/>.</param>
         /// <param name="lpKeyName">The name of the key whose associated string is to be retrieved. 
         /// If <see langword="null"/>, all key names in the section specified by 
         /// <paramref name="lpAppName"/> are copied to <paramref name="lpReturnedString"/>.</param>

@@ -125,7 +125,8 @@ BEGIN
     PUSHBUTTON      "Commands >",IDC_BTN_FAMCONDITION,235,175,50,14
     LTEXT           "",IDC_EDIT_CONDITION,7,177,222,12,SS_NOPREFIX | SS_SUNKEN
     LTEXT           "Do not queue any file that meets the following condition",IDC_STATIC_CONDITION,7,165,200,8
-    CONTROL         "Custom1",IDC_GRID,"GXWND",WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,7,19,222,139
+    //CONTROL         "",IDC_GRID,"",WS_TABSTOP,7,19,222,139
+    LTEXT           "",IDC_GRID,7,19,222,139,SS_SUNKEN
     CONTROL         "",IDC_PICTURE,"Static",SS_BLACKFRAME,246,138,39,15
     LTEXT           "Select file suppliers",IDC_STATIC_SUPPLIER,7,7,90,8
     PUSHBUTTON      "Commands >",IDC_BTN_CONFIGURE,235,55,50,14

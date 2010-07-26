@@ -29,9 +29,7 @@
 #include "LongPoint.h"
 #include "LongToLongMap.h"
 #include "DoublePoint.h"
-#include "ProgressStatus.h"
 
-#include <grid\gxall.h>
 #include <initguid.h>
 
 CComModule _Module;
@@ -57,7 +55,6 @@ OBJECT_ENTRY(CLSID_LongToObjectMap, CLongToObjectMap)
 OBJECT_ENTRY(CLSID_LongPoint, CLongPoint)
 OBJECT_ENTRY(CLSID_LongToLongMap, CLongToLongMap)
 OBJECT_ENTRY(CLSID_DoublePoint, CDoublePoint)
-OBJECT_ENTRY(CLSID_ProgressStatus, CProgressStatus)
 END_OBJECT_MAP()
 
 class CUCLIDCOMUtilsApp : public CWinApp
@@ -90,10 +87,6 @@ CUCLIDCOMUtilsApp theApp;
 
 BOOL CUCLIDCOMUtilsApp::InitInstance()
 {
-	// Initialize RogueWave library components
-	GXInit();
-	GXSetNewGridLineMode(TRUE);
-
 	_Module.Init(ObjectMap, m_hInstance, &LIBID_UCLID_COMUTILSLib);
     return CWinApp::InitInstance();
 }

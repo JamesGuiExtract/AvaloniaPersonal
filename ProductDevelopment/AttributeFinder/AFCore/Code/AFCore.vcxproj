@@ -76,7 +76,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\RWUtils\Code;..\..\..\..\ReusableComponents\APIs\RogueWave\Inc;..\..\..\..\ReusableComponents\APIs\SafeNetUltraPro\Inc;..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;..\..\AFUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\SafeNetUltraPro\Inc;..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;..\..\AFUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_GXDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -99,7 +99,7 @@
     <Link>
       <OutputFile>..\..\..\..\Binaries\Debug/UCLIDAFCore.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\..\ReusableComponents\APIs\RogueWave\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\AFCore.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/UCLIDAFCore.pdb</ProgramDatabaseFile>
@@ -128,7 +128,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\RWUtils\Code;..\..\..\..\ReusableComponents\APIs\RogueWave\Inc;..\..\..\..\ReusableComponents\APIs\SafeNetUltraPro\Inc;..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;..\..\AFUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\SafeNetUltraPro\Inc;..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;..\..\AFUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_GXDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -150,7 +150,7 @@
     <Link>
       <OutputFile>..\..\..\..\Binaries\Release/UCLIDAFCore.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\..\ReusableComponents\APIs\RogueWave\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\AFCore.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -226,12 +226,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="ConditionalRulePP.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="ImportRuleSetDlg.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -395,7 +389,6 @@
     <ClInclude Include="AttributeRule.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="ConditionalRulePP.h" />
-    <ClInclude Include="ImportRuleSetDlg.h" />
     <ClInclude Include="msword9.h" />
     <ClInclude Include="RequiredInterfaces.h" />
     <ClInclude Include="Resource.h" />
@@ -449,10 +442,6 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.vcxproj">
       <Project>{c9beb739-8c91-4201-9e94-2d5f650fb5ae}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\ReusableComponents\VendorSpecificUtils\RWUtils\Code\RWUtils.vcxproj">
-      <Project>{cf85ab16-a29d-49ca-8367-50e3f4d4af7b}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code\SafeNetUtils.vcxproj">

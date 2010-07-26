@@ -719,6 +719,9 @@ namespace Extract.DataEntry
                         graphics.DrawImage(SystemIcons.Warning.ToBitmap(), 0, 0, 16, 16);
                         using (Icon warningIcon = Icon.FromHandle(scaledBitmap.GetHicon()))
                         {
+                            // TODO: Handle the HIcon that is created here since it is a leaked GDI resource
+                            // http://realfiction.net/go/169 and
+                            // http://dotnetfacts.blogspot.com/2008/03/things-you-must-dispose.html
                             _validationWarningErrorProvider.Icon = warningIcon;
                         }
                     }
@@ -1429,7 +1432,6 @@ namespace Extract.DataEntry
         /// to be filtered.</param>
         /// <returns><see langword="true"/> if the message has been handled and should not be
         /// dispatched, <see langword="false"/> if the message should be dispatched.</returns>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         public bool PreFilterMessage(ref Message m)
         {
             try

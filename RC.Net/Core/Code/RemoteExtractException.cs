@@ -126,7 +126,6 @@ namespace Extract
         /// </summary>
         /// <param name="info">The info object to read the data from.</param>
         /// <param name="context">The serialization context for the object.</param>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             // Call the base class first

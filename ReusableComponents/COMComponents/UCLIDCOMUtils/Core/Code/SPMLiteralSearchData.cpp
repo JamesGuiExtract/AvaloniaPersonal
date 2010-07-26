@@ -68,6 +68,6 @@ long SPMLiteralSearchData::find(const stringCSIS& strText, const stringCSIS& str
 	}
 
 	// if we reached here, that's because we didn't find a match
-	return stringCSIS::npos;
+	return string::npos;
 }
 //------------------------------------------------------------------------------------------------

@@ -1046,14 +1046,14 @@ void CGrantorGranteeFinderV2::removeInvalidDocMappings()
 			else
 			{
 				UCLIDException ue("ELI10480", "Duplicate Document type Removed." );
-				ue.addDebugInfo( "Document Type", strDocType );
+				ue.addDebugInfo( "Document Type", static_cast<string>(strDocType) );
 				ue.log();
 			}
 		}
 		else
 		{
 			UCLIDException ue("ELI10484", "Doc type not valid." );
-			ue.addDebugInfo( "Document Type", strDocType );
+			ue.addDebugInfo( "Document Type", static_cast<string>(strDocType) );
 			ue.log();
 		}
 	}

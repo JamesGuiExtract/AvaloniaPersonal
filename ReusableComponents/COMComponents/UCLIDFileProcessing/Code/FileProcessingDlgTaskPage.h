@@ -200,5 +200,5 @@ private:
 	bool m_bInitialized;
 
 	// Vector to hold the hourly schedule
-	vector<bool>  m_vecSchedule;
+	IVariantVectorPtr  m_ipSchedule;
 };

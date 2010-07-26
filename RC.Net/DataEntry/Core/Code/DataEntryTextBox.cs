@@ -750,8 +750,7 @@ namespace Extract.DataEntry
         /// <param name="e">A <see cref="PreviewKeyDownEventArgs"/> containing the event data.
         /// </param>
         // This event handler has undergone a security review.
-        [SuppressMessage("Microsoft.Security", "CA2109:ReviewVisibleEventHandlers", MessageId = "0#")]
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        //[SuppressMessage("Microsoft.Security", "CA2109:ReviewVisibleEventHandlers", MessageId = "0#")]
         protected override void OnPreviewKeyDown(PreviewKeyDownEventArgs e)
         {
             try

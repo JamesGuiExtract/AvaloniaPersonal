@@ -915,7 +915,6 @@ namespace Extract.DataEntry
         /// message to process.</param>
         /// <returns><see langword="true"/> if the message was processed; otherwise, 
         /// <see langword="false"/>.</returns>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessKeyPreview(ref Message m)
         {
             try
@@ -1327,8 +1326,7 @@ namespace Extract.DataEntry
         /// <param name="e">Contains information about the key that was pressed.</param>
         /// <returns><see langword="true"/> if the key was processed; otherwise,
         /// <see langword="false"/>.</returns>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-        [SuppressMessage("Microsoft.Security", "CA2109:ReviewVisibleEventHandlers", MessageId = "0#")]
+        //[SuppressMessage("Microsoft.Security", "CA2109:ReviewVisibleEventHandlers", MessageId = "0#")]
         protected override bool ProcessDataGridViewKey(KeyEventArgs e)
         {
             bool keyProcessed = false;
@@ -1364,7 +1362,6 @@ namespace Extract.DataEntry
         /// process.</param>
         /// <returns><see langword="true"/> if the key was processed by the control; otherwise,
         /// <see langword="false"/>.</returns>
-        [UIPermission(SecurityAction.LinkDemand, Window = UIPermissionWindow.AllWindows)]
         protected override bool ProcessDialogKey(Keys keyData)
         {
             bool keyProcessed = false;

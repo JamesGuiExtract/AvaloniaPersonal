@@ -122,8 +122,6 @@ protected:
 	afx_msg void OnClose();
 	afx_msg void OnOK();
 	afx_msg void OnCancel();
-	afx_msg void OnFileImport();
-	afx_msg void OnFileExport();
 	afx_msg void OnDropFiles( HDROP hDropInfo );
 	afx_msg void OnBtnSelectAttributeSplitter();
 	afx_msg void OnRclickListRules(NMHDR* pNMHDR, LRESULT* pResult);
@@ -259,10 +257,6 @@ private:
 	//			If strFileName == "", will prompt user to select filename with
 	//			the standard file-open dialog box.
 	void openFile(string strFileName);
-
-	// PURPOSE: Allow the user to select and import attributes 
-	// from the specified file
-	void importFromFile(const string& strFileName);
 
 	// Deletes Attribute rules that have been marked for deletion via SetItemData
 	void deleteMarkedRules();

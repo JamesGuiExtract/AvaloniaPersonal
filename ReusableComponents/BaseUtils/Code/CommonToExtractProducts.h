@@ -1,6 +1,11 @@
 #pragma once
 
-// Default target to Windows 2000
-#if !defined(WINVER)
-#define WINVER 0x0400
+// Default target to Windows XP
+#ifndef WINVER
+#define WINVER 0x0501
+#endif
+
+
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0501
 #endif

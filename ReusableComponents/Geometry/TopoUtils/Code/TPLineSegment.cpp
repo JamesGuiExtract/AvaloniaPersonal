@@ -66,8 +66,8 @@ bool TPLineSegment::contains(const TPPoint& p) const
 		{
 			// the target TPPoint is on the imaginary line that extends infinitely, 
 			// but we need to check to see if it is in the line segment
-			if (p.m_dY >= _MIN(m_p1.m_dY, m_p2.m_dY) &&
-				p.m_dY <= _MAX(m_p1.m_dY, m_p2.m_dY))
+			if (p.m_dY >= min(m_p1.m_dY, m_p2.m_dY) &&
+				p.m_dY <= max(m_p1.m_dY, m_p2.m_dY))
 			{
 				// the TPPoint lies on the line segment
 				return true;
@@ -97,13 +97,13 @@ bool TPLineSegment::contains(const TPPoint& p) const
 			// the specified TPPoint is somewhere on the imaginary line, but
 			// is it on the line segment?
 			// check the Y coordinates first
-			if (dY >= _MIN(m_p1.m_dY, m_p2.m_dY) &&
-				dY <= _MAX(m_p1.m_dY, m_p2.m_dY))
+			if (dY >= min(m_p1.m_dY, m_p2.m_dY) &&
+				dY <= max(m_p1.m_dY, m_p2.m_dY))
 			{
 				// need to also check if it is within the X boundaries of the segment
 				// [p16 #2691 & #2692]
-				if (p.m_dX >= _MIN(m_p1.m_dX, m_p2.m_dX) &&
-					p.m_dX <= _MAX(m_p1.m_dX, m_p2.m_dX))
+				if (p.m_dX >= min(m_p1.m_dX, m_p2.m_dX) &&
+					p.m_dX <= max(m_p1.m_dX, m_p2.m_dX))
 				{
 					// the TPPoint lies on the line segment
 					return true;
@@ -162,21 +162,21 @@ bool TPLineSegment::intersects(const TPLineSegment& line2, TPPoint& intersection
 
 		// there's intersection only if the intersection TPPoint's Y 
 		// is within my Y's and within line2's Y's
-		bool b1 = dIntersectionTPPointY - _MIN(m_p1.m_dY, m_p2.m_dY) >= -MathVars::ZERO;
-		bool b2 = _MAX(m_p1.m_dY, m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO;
-		bool b3 = dIntersectionTPPointY - _MIN(line2.m_p1.m_dY, line2.m_p2.m_dY) >= -MathVars::ZERO;
-		bool b4 = _MAX(line2.m_p1.m_dY, line2.m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO;
+		bool b1 = dIntersectionTPPointY - min(m_p1.m_dY, m_p2.m_dY) >= -MathVars::ZERO;
+		bool b2 = max(m_p1.m_dY, m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO;
+		bool b3 = dIntersectionTPPointY - min(line2.m_p1.m_dY, line2.m_p2.m_dY) >= -MathVars::ZERO;
+		bool b4 = max(line2.m_p1.m_dY, line2.m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO;
 
-		double d1 = dIntersectionTPPointY - _MIN(m_p1.m_dY, m_p2.m_dY);
-		double d2 = _MAX(m_p1.m_dY, m_p2.m_dY) - dIntersectionTPPointY;
-		double d3 = dIntersectionTPPointY - _MIN(line2.m_p1.m_dY, line2.m_p2.m_dY);
-		double d4 = _MAX(line2.m_p1.m_dY, line2.m_p2.m_dY) - dIntersectionTPPointY;
+		double d1 = dIntersectionTPPointY - min(m_p1.m_dY, m_p2.m_dY);
+		double d2 = max(m_p1.m_dY, m_p2.m_dY) - dIntersectionTPPointY;
+		double d3 = dIntersectionTPPointY - min(line2.m_p1.m_dY, line2.m_p2.m_dY);
+		double d4 = max(line2.m_p1.m_dY, line2.m_p2.m_dY) - dIntersectionTPPointY;
 
 		bool bIntersectionYOK = false;
-		if ((dIntersectionTPPointY - _MIN(m_p1.m_dY, m_p2.m_dY) >= -MathVars::ZERO) &&
-			(_MAX(m_p1.m_dY, m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO) &&
-			(dIntersectionTPPointY - _MIN(line2.m_p1.m_dY, line2.m_p2.m_dY) >= -MathVars::ZERO) &&
-			(_MAX(line2.m_p1.m_dY, line2.m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO))
+		if ((dIntersectionTPPointY - min(m_p1.m_dY, m_p2.m_dY) >= -MathVars::ZERO) &&
+			(max(m_p1.m_dY, m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO) &&
+			(dIntersectionTPPointY - min(line2.m_p1.m_dY, line2.m_p2.m_dY) >= -MathVars::ZERO) &&
+			(max(line2.m_p1.m_dY, line2.m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO))
 		{
 			bIntersectionYOK = true;
 		}
@@ -184,15 +184,15 @@ bool TPLineSegment::intersects(const TPLineSegment& line2, TPPoint& intersection
 		// there's intersection only if the intersection TPPoint's Y 
 		// is within my Y's and within line2's Y's
 		bool bIntersectionXOK = false;
-		if ((dIntersectionTPPointX - _MIN(m_p1.m_dX, m_p2.m_dX) >= -MathVars::ZERO) &&
-			(_MAX(m_p1.m_dX, m_p2.m_dX) - dIntersectionTPPointX >= -MathVars::ZERO) &&
-			(dIntersectionTPPointX - _MIN(line2.m_p1.m_dX, line2.m_p2.m_dX) >= -MathVars::ZERO) &&
-			(_MAX(line2.m_p1.m_dX, line2.m_p2.m_dX) - dIntersectionTPPointX >= -MathVars::ZERO))
+		if ((dIntersectionTPPointX - min(m_p1.m_dX, m_p2.m_dX) >= -MathVars::ZERO) &&
+			(max(m_p1.m_dX, m_p2.m_dX) - dIntersectionTPPointX >= -MathVars::ZERO) &&
+			(dIntersectionTPPointX - min(line2.m_p1.m_dX, line2.m_p2.m_dX) >= -MathVars::ZERO) &&
+			(max(line2.m_p1.m_dX, line2.m_p2.m_dX) - dIntersectionTPPointX >= -MathVars::ZERO))
 		{
 			bIntersectionXOK = true;
 		}
 
-		double d = _MIN(line2.m_p1.m_dY, line2.m_p2.m_dY);
+		double d = min(line2.m_p1.m_dY, line2.m_p2.m_dY);
 
 		// there's intersection only if the intersection TPPoint is already part
 		// of the two line segments
@@ -204,8 +204,8 @@ bool TPLineSegment::intersects(const TPLineSegment& line2, TPPoint& intersection
 
 		// if line2's x is inbetween my starting and ending x's, there's a chance 
 		// that we intersesect
-		if (line2.m_p1.m_dX >= _MIN(m_p1.m_dX, m_p2.m_dX) && 
-			line2.m_p1.m_dX <= _MAX(m_p1.m_dX, m_p2.m_dX))
+		if (line2.m_p1.m_dX >= min(m_p1.m_dX, m_p2.m_dX) && 
+			line2.m_p1.m_dX <= max(m_p1.m_dX, m_p2.m_dX))
 		{
 			// calculate the intersection TPPoint
 			double dIntersectionTPPointY = m_p1.m_dY + (line2.m_p1.m_dX - m_p1.m_dX) * getSlope();
@@ -213,10 +213,10 @@ bool TPLineSegment::intersects(const TPLineSegment& line2, TPPoint& intersection
 
 			// line2's x is in the range of my x, but there's intersection only if 
 			// the intersection TPPoint's Y is within my Y's and within line2's Y's
-			if ((dIntersectionTPPointY - _MIN(m_p1.m_dY, m_p2.m_dY) >= -MathVars::ZERO) &&
-				(_MAX(m_p1.m_dY, m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO) &&
-				(dIntersectionTPPointY - _MIN(line2.m_p1.m_dY, line2.m_p2.m_dY) >= -MathVars::ZERO) &&
-				(_MAX(line2.m_p1.m_dY, line2.m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO))
+			if ((dIntersectionTPPointY - min(m_p1.m_dY, m_p2.m_dY) >= -MathVars::ZERO) &&
+				(max(m_p1.m_dY, m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO) &&
+				(dIntersectionTPPointY - min(line2.m_p1.m_dY, line2.m_p2.m_dY) >= -MathVars::ZERO) &&
+				(max(line2.m_p1.m_dY, line2.m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO))
 			{
 				return true;
 			}
@@ -239,8 +239,8 @@ bool TPLineSegment::intersects(const TPLineSegment& line2, TPPoint& intersection
 
 		// if my x is inbetween the starting and ending x's of line2, there's a chance 
 		// that we intersesect
-		if (m_p1.m_dX >= _MIN(line2.m_p1.m_dX, line2.m_p2.m_dX) && 
-			m_p1.m_dX <= _MAX(line2.m_p1.m_dX, line2.m_p2.m_dX))
+		if (m_p1.m_dX >= min(line2.m_p1.m_dX, line2.m_p2.m_dX) && 
+			m_p1.m_dX <= max(line2.m_p1.m_dX, line2.m_p2.m_dX))
 		{
 			// calculate the intersection TPPoint
 			double dIntersectionTPPointY = line2.m_p1.m_dY + (m_p1.m_dX - line2.m_p1.m_dX) * line2.getSlope();
@@ -248,10 +248,10 @@ bool TPLineSegment::intersects(const TPLineSegment& line2, TPPoint& intersection
 
 			// my x is in the range of line2's x, but there's intersection only if 
 			// the intersection TPPoint's Y is within my Y's and within line2's Y's
-			if ((dIntersectionTPPointY - _MIN(m_p1.m_dY, m_p2.m_dY) >= -MathVars::ZERO) &&
-				(_MAX(m_p1.m_dY, m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO) &&
-				(dIntersectionTPPointY - _MIN(line2.m_p1.m_dY, line2.m_p2.m_dY) >= -MathVars::ZERO) &&
-				(_MAX(line2.m_p1.m_dY, line2.m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO))
+			if ((dIntersectionTPPointY - min(m_p1.m_dY, m_p2.m_dY) >= -MathVars::ZERO) &&
+				(max(m_p1.m_dY, m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO) &&
+				(dIntersectionTPPointY - min(line2.m_p1.m_dY, line2.m_p2.m_dY) >= -MathVars::ZERO) &&
+				(max(line2.m_p1.m_dY, line2.m_p2.m_dY) - dIntersectionTPPointY >= -MathVars::ZERO))
 			{
 				return true;
 			}

@@ -63,9 +63,9 @@ namespace Extract.Utilities.Forms
         /// last error flag.  You can create a new <see cref="Win32Exception"/>
         /// with the return value of <see cref="Marshal.GetLastWin32Error"/> to
         /// get the extended error information.</returns>
-		[DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)]
+        [DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool MessageBeep(uint type);
+        public static extern bool MessageBeep(uint type);
 
         /// <summary>
         /// Gets the non-client metrics system parameter information.
@@ -86,9 +86,9 @@ namespace Extract.Utilities.Forms
         /// last error flag.  You can create a new <see cref="Win32Exception"/>
         /// with the return value of <see cref="Marshal.GetLastWin32Error"/> to
         /// get the extended error information.</returns>
-		[DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)]
+        [DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool SystemParametersInfo(int uiAction, int uiParam, 
+        static extern bool SystemParametersInfo(int uiAction, int uiParam, 
             ref NONCLIENTMETRICS ncMetrics, int fWinIni);
 
         /// <summary>
@@ -97,8 +97,8 @@ namespace Extract.Utilities.Forms
         /// <param name="hWnd">The handle for the window.</param>
         /// <param name="bRevert">Whether to reset the menu back to default state.</param>
         // This function will not set the last error flag, no need to specify SetLastError
-		[DllImport("user32.dll", CharSet=CharSet.Auto)]
-		static extern IntPtr GetSystemMenu(IntPtr hWnd, 
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+        static extern IntPtr GetSystemMenu(IntPtr hWnd, 
             [MarshalAs(UnmanagedType.Bool)] bool bRevert);
 
         /// <summary>
@@ -108,9 +108,9 @@ namespace Extract.Utilities.Forms
         /// <param name="uIDEnableItem">The menu item to enable/disable.</param>
         /// <param name="uEnable">Whether to enable/disable/gray the specified menu item.</param>
         // This function will not set the last error flag, no need to specify SetLastError
-		[DllImport("user32.dll", CharSet=CharSet.Auto)]
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool EnableMenuItem(IntPtr hMenu, uint uIDEnableItem, uint uEnable);
+        static extern bool EnableMenuItem(IntPtr hMenu, uint uIDEnableItem, uint uEnable);
 
         /// <summary>
         /// Sends the specified message to a window or windows. The SendMessage function calls the
@@ -182,6 +182,16 @@ namespace Extract.Utilities.Forms
         /// the function fails, the return value is zero.</returns>
         [DllImport("user32.dll", SetLastError = true)]
         static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+
+        /// <summary>
+        /// Sets the specified event object to the signaled state.
+        /// </summary>
+        /// <param name="hEvent">The event handle to set.</param>
+        /// <returns><see langword="true"/> if the function succeeds and
+        /// <see langword="false"/> if the function fails.</returns>
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool SetEvent(IntPtr hEvent);
 
         #endregion P/Invokes
 
@@ -317,7 +327,7 @@ namespace Extract.Utilities.Forms
                     "Unable to get caption font!", ex);
                 ee.Log();
             }
-			
+            
             return null;
         }
 
@@ -470,6 +480,26 @@ namespace Extract.Utilities.Forms
                 throw ExtractException.AsExtractException("ELI30253", ex);
             }
         }
+
+        /// <summary>
+        /// Sets the specified event handle to a signaled state.
+        /// </summary>
+        /// <param name="eventHandle">The event handle to set to a signaled state.</param>
+        public static void SignalEvent(IntPtr eventHandle)
+        {
+            try
+            {
+                if (!SetEvent(eventHandle))
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30339", ex);
+            }
+        }
+
         #endregion Methods
     }
 }
