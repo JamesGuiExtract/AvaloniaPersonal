@@ -53,7 +53,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\RWUtils\Code;..\..\..\APIs\RogueWave\Inc;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include"
+				AdditionalIncludeDirectories="..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\RWUtils\Code;..\..\..\APIs\RogueWave\Inc;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include;..\..\..\VendorSpecificUtils\UltimateGrid\Include"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;_USRDLL;_GXDLL"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
@@ -153,7 +153,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\RWUtils\Code;..\..\..\APIs\RogueWave\Inc;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include"
+				AdditionalIncludeDirectories="..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\RWUtils\Code;..\..\..\APIs\RogueWave\Inc;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include;..\..\..\VendorSpecificUtils\UltimateGrid\Include"
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;_USRDLL;_GXDLL"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -507,6 +507,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\QueueGrid.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ScheduleDialog.cpp"
 				>
 			</File>
@@ -634,6 +638,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\..\..\VendorSpecificUtils\UltimateGrid\Source\UGXPThemes.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -753,6 +761,10 @@
 			</File>
 			<File
 				RelativePath=".\HelperFunctions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\QueueGrid.h"
 				>
 			</File>
 			<File

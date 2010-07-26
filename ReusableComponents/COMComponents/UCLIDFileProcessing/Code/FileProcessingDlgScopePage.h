@@ -7,9 +7,7 @@
 #include <string>
 #include <vector>
 #include <QuickMenuChooser.h>
-//#include <CheckCheckComboGridWnd.h>
-#include <Uglibsel.h>
-//#include <UGCtrl.h>
+#include <Notifications.h>
 
 #include "QueueGrid.h"
 
@@ -85,9 +83,8 @@ protected:
 	afx_msg void OnContextCopy();
 	afx_msg void OnContextPaste();
 	afx_msg void OnContextDelete();
-	afx_msg LRESULT OnLButtonClkRowCol(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnLButtonDblClkRowCol(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnModifyCell(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnCellValueChange(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnGridDblClick(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 
 	DECLARE_MESSAGE_MAP()

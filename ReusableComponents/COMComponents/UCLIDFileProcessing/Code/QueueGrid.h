@@ -1,7 +1,16 @@
 // CQueueGrid.h : interface of the CQueueGrid class
 //
-/////////////////////////////////////////////////////////////////////////////
-#include "ugctrl.h"
+// The following code is code a modification of the Ultimate Grid source available here:
+// http://www.codeproject.com/KB/MFC/UltimateGrid.aspx
+////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <ugctrl.h>
+
+#include <set>
+#include <vector>
+using namespace std;
+
+const int WM_QUEUE_GRID_CELL_VALUE_CHANGE	= WM_USER + 101;
+const int WM_QUEUE_GRID_DBLCLICK			= WM_USER + 102;
 
 class CQueueGrid:public CUGCtrl
 {
@@ -10,6 +19,7 @@ public:
 	~CQueueGrid();
 
 protected:
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 
 private:
 
@@ -141,4 +151,16 @@ public:
 
 	//trackig window
 	virtual void OnTrackingWindowMoved(RECT *origRect,RECT *newRect);
+
+	void InsertRow(int index);
+	void SetRowInfo(int nRow, bool bEnabled, bool bForceProcessing,
+		UCLID_FILEPROCESSINGLib::EFilePriority ePriority, const string &strDescription,
+		const string &strStatus);
+
+private:
+
+	CFont m_font;
+	set<int> m_setInitializedRows;
+	
+	static string m_strPriorities;
 };

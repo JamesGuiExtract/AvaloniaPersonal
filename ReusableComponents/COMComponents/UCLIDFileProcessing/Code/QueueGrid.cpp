@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "QueueGrid.h"
+#include "FilePriorityHelper.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -13,54 +14,118 @@ static char THIS_FILE[] = __FILE__;
 
 BEGIN_MESSAGE_MAP(CQueueGrid,CUGCtrl)
 	//{{AFX_MSG_MAP(CQueueGrid)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-		//    DO NOT EDIT what you see in these blocks of generated code !
+		ON_WM_SIZE()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
+#define CHECK_UG_RETURN_VALUE(strELI, strCommand) \
+	{ \
+		int nUG_RETURN_VALUE = strCommand; \
+		if (nUG_RETURN_VALUE != UG_SUCCESS) \
+		{ \
+			UCLIDException ue(strELI, "Grid error."); \
+			ue.addDebugInfo("Command", #strCommand, true); \
+			ue.addDebugInfo("Return value", nUG_RETURN_VALUE); \
+			throw ue; \
+		} \
+	}
 
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// Statics
+//--------------------------------------------------------------------------------------------------
+string CQueueGrid::m_strPriorities;
+
+//--------------------------------------------------------------------------------------------------
 // Standard CQueueGrid construction/destruction
+//--------------------------------------------------------------------------------------------------
 CQueueGrid::CQueueGrid()
 {
-}
+	try
+	{
+		vector<string> vecPriorities;
+		getPrioritiesVector(vecPriorities);
+		m_strPriorities = asString(vecPriorities, false, "\n");
+		m_strPriorities = trim(m_strPriorities, "\n", "") + "\n";
 
+		HFONT hFont = (HFONT)GetStockObject(ANSI_VAR_FONT);
+		ASSERT_RESOURCE_ALLOCATION("ELI30499", hFont != NULL);
+
+		LOGFONT logfont;
+		if (GetObject(hFont, sizeof(logfont), &logfont) == 0)
+		{
+			UCLIDException ue("ELI30500", "Failed to retrieve font info.");
+			ue.addWin32ErrorInfo();
+			throw ue;
+		}
+		
+		bool bFontCreated = asCppBool(m_font.CreateFontIndirect(&logfont));
+		DeleteObject(&logfont);
+	
+		if (!bFontCreated)
+		{
+			throw UCLIDException("ELI30502", "Failed to create font.");
+		}
+
+		
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30434");
+}
+//--------------------------------------------------------------------------------------------------
 CQueueGrid::~CQueueGrid()
 {
+	try
+	{
+		UGXPThemes::CleanUp();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI30498");
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnSetup
 //		This function is called just after the grid window 
 //		is created or attached to a dialog item.
 //		It can be used to initially setup the grid
 void CQueueGrid::OnSetup()
 {
-	SetNumberCols(5);
-	CUGCell cell;
+	AFX_MANAGE_STATE(AfxGetModuleState());
 
-	cell.SetText("Enabled");
-	SetColWidth(0, 70);
-	SetCell(0, -1, &cell);
+	try
+	{
+		UGXPThemes::UseThemes(true);
+		UGXPThemes::SetGridStyle(Style2);
+	
+		CHECK_UG_RETURN_VALUE("ELI30444", SetHighlightRow(TRUE));
+		CHECK_UG_RETURN_VALUE("ELI30445", SetSH_Width(0));
+		CHECK_UG_RETURN_VALUE("ELI30446", SetNumberCols(5));
 
-	cell.SetText("Force Processing");
-	SetColWidth(0, 120);
-	SetCell(1, -1, &cell);
+		CUGCell cell;
+		cell.UseThemes(true);
+		CHECK_UG_RETURN_VALUE("ELI30447", cell.CopyInfoFrom(m_GI->m_hdgDefaults));
+		cell.SetXPStyle(XPCellTypeTopCol);
+		CHECK_UG_RETURN_VALUE("ELI30449", cell.SetFont(&m_font));
 
-	cell.SetText("Priority");
-	SetColWidth(0, 100);
-	SetCell(2, -1, &cell);
+		CHECK_UG_RETURN_VALUE("ELI30450", cell.SetText("Enabled"));
+		CHECK_UG_RETURN_VALUE("ELI30451", SetColWidth(0, 70));
+		CHECK_UG_RETURN_VALUE("ELI30452", SetCell(0, -1, &cell));
 
-	cell.SetText("Description");
-	SetColWidth(0, 0);
-	SetCell(3, -1, &cell);
+		CHECK_UG_RETURN_VALUE("ELI30453", cell.SetText("Force Processing"));
+		CHECK_UG_RETURN_VALUE("ELI30454", SetColWidth(1, 120));
+		CHECK_UG_RETURN_VALUE("ELI30455", SetCell(1, -1, &cell));
 
-	cell.SetText("Status");
-	SetColWidth(0, 80);
-	SetCell(4, -1, &cell);
+		CHECK_UG_RETURN_VALUE("ELI30456", cell.SetText("Priority"));
+		CHECK_UG_RETURN_VALUE("ELI30457", SetColWidth(2, 100));
+		CHECK_UG_RETURN_VALUE("ELI30458", SetCell(2, -1, &cell));
+
+		CHECK_UG_RETURN_VALUE("ELI30459", cell.SetText("Description"));
+		CHECK_UG_RETURN_VALUE("ELI30460", SetColWidth(3, 0));
+		CHECK_UG_RETURN_VALUE("ELI30461", SetCell(3, -1, &cell));
+
+		CHECK_UG_RETURN_VALUE("ELI30462", cell.SetText("Status"));
+		CHECK_UG_RETURN_VALUE("ELI30463", SetColWidth(4, 80));
+		CHECK_UG_RETURN_VALUE("ELI30464", SetCell(4, -1, &cell));
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30435");
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnSheetSetup	
 //		This notification is called for each additional sheet that the grid
 //		might contain, here you can customize each sheet in the grid.
@@ -72,8 +137,7 @@ void CQueueGrid::OnSheetSetup(int sheetNumber)
 {
 	UNREFERENCED_PARAMETER(sheetNumber);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCanMove
 //		is sent when a cell change action was instigated
 //		( user clicked on another cell, used keyboard arrows,
@@ -92,8 +156,7 @@ int CQueueGrid::OnCanMove(int oldcol,long oldrow,int newcol,long newrow)
 	UNREFERENCED_PARAMETER(newrow);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCanViewMove
 //		is called when current grid's view is about to be scrolled.
 //	Params:
@@ -110,8 +173,7 @@ int CQueueGrid::OnCanViewMove(int oldcol,long oldrow,int newcol,long newrow)
 	UNREFERENCED_PARAMETER(newrow);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnHitBottom
 //		This notification allows for dynamic row loading, it will be called
 //		when the grid's drawing function has hit the last row.  It allows the grid
@@ -133,8 +195,7 @@ void CQueueGrid::OnHitBottom(long numrows,long rowspast,long rowsfound)
 		SetNumberRows( numrows + rowsfound, FALSE );
 	}*/
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnHitTop
 //		Is called when the user has scrolled all the way to the top of the grid.
 //	Params:
@@ -147,8 +208,7 @@ void CQueueGrid::OnHitTop(long numrows,long rowspast)
 	UNREFERENCED_PARAMETER(numrows);
 	UNREFERENCED_PARAMETER(rowspast);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCanSizeCol
 //		is sent when the mouse was moved in the area between
 //		columns on the top heading, indicating that the user
@@ -163,8 +223,7 @@ int CQueueGrid::OnCanSizeCol(int col)
 	UNREFERENCED_PARAMETER(col);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnColSizing
 //		is sent continuously when user is sizing a column.
 //		This notification is ideal to provide min/max width checks.
@@ -178,8 +237,7 @@ void CQueueGrid::OnColSizing(int col,int *width)
 	UNREFERENCED_PARAMETER(col);
 	UNREFERENCED_PARAMETER(*width);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnColSized
 //		This is sent when the user finished sizing the 
 //		given column.(see above for more information)
@@ -193,8 +251,7 @@ void CQueueGrid::OnColSized(int col,int *width)
 	UNREFERENCED_PARAMETER(col);
 	UNREFERENCED_PARAMETER(*width);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCanSizeRow
 //		is sent when the mouse was moved in the area between
 //		rows on the side heading, indicating that the user
@@ -209,8 +266,7 @@ int CQueueGrid::OnCanSizeRow(long row)
 	UNREFERENCED_PARAMETER(row);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnRowSizing
 //		Sent during user sizing of a row, can provide
 //		feed back on current height
@@ -224,8 +280,7 @@ void CQueueGrid::OnRowSizing(long row,int *height)
 	UNREFERENCED_PARAMETER(row);
 	UNREFERENCED_PARAMETER(*height);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnRowSized
 //		This is sent when the user is finished sizing the
 //		given row.
@@ -239,8 +294,7 @@ void CQueueGrid::OnRowSized(long row,int *height)
 	UNREFERENCED_PARAMETER(row);
 	UNREFERENCED_PARAMETER(*height);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCanSizeSideHdg
 //		Sent when the user is about to start sizing of the side heading
 //	Params:
@@ -250,10 +304,9 @@ void CQueueGrid::OnRowSized(long row,int *height)
 //		FALSE - to prevent sizing
 int CQueueGrid::OnCanSizeSideHdg()
 {
-	return TRUE;
+	return FALSE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnSideHdgSizing
 //		Sent while the heading is being sized
 //	Params:
@@ -266,8 +319,7 @@ int CQueueGrid::OnSideHdgSizing(int *width)
 	UNREFERENCED_PARAMETER(*width);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnSideHdgSized
 //		Sent when the user has completed the sizing of the side heading
 //	Params:
@@ -280,8 +332,7 @@ int CQueueGrid::OnSideHdgSized(int *width)
 	UNREFERENCED_PARAMETER(*width);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCanSizeTopHdg
 //		Sent when the user is about to start sizing of the top heading
 //	Params:
@@ -293,8 +344,7 @@ int CQueueGrid::OnCanSizeTopHdg()
 {
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnTopHdgSizing
 //		Sent while the top heading is being sized
 //	Params:
@@ -307,8 +357,7 @@ int CQueueGrid::OnTopHdgSizing(int *height)
 	UNREFERENCED_PARAMETER(*height);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnTopHdgSized
 //		Sent when the user has completed the sizing of the top heading
 //	Params:
@@ -321,8 +370,7 @@ int CQueueGrid::OnTopHdgSized(int *height)
 	UNREFERENCED_PARAMETER(*height);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnColChange
 //		Sent whenever the current column changes
 //	Params:
@@ -335,8 +383,7 @@ void CQueueGrid::OnColChange(int oldcol,int newcol)
 	UNREFERENCED_PARAMETER(oldcol);
 	UNREFERENCED_PARAMETER(newcol);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnRowChange
 //		Sent whenever the current row changes
 //	Params:
@@ -346,11 +393,18 @@ void CQueueGrid::OnColChange(int oldcol,int newcol)
 //		<none>
 void CQueueGrid::OnRowChange(long oldrow,long newrow)
 {
-	UNREFERENCED_PARAMETER(oldrow);
-	UNREFERENCED_PARAMETER(newrow);
-}
+	AFX_MANAGE_STATE(AfxGetModuleState());
 
-/////////////////////////////////////////////////////////////////////////////
+	try
+	{
+		UNREFERENCED_PARAMETER(oldrow);
+
+		CHECK_UG_RETURN_VALUE("ELI30467", ClearSelections());
+		CHECK_UG_RETURN_VALUE("ELI30468", Select(-1, newrow));
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30466");
+}
+//--------------------------------------------------------------------------------------------------
 //	OnCellChange
 //		Sent whenever the current cell changes
 //	Params:
@@ -365,8 +419,7 @@ void CQueueGrid::OnCellChange(int oldcol,int newcol,long oldrow,long newrow)
 	UNREFERENCED_PARAMETER(oldrow);
 	UNREFERENCED_PARAMETER(newrow);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnLeftColChange
 //		Sent whenever the left visible column in the grid changes, indicating
 //		that the view was scrolled horizontally
@@ -380,8 +433,7 @@ void CQueueGrid::OnLeftColChange(int oldcol,int newcol)
 	UNREFERENCED_PARAMETER(oldcol);
 	UNREFERENCED_PARAMETER(newcol);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnTopRowChange
 //		Sent whenever the top visible row in the grid changes, indicating
 //		that the view was scrolled vertically
@@ -395,8 +447,7 @@ void CQueueGrid::OnTopRowChange(long oldrow,long newrow)
 	UNREFERENCED_PARAMETER(oldrow);
 	UNREFERENCED_PARAMETER(newrow);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnViewMoved
 //		This notification is fired after the current viewing area
 //		was scrolled.
@@ -418,8 +469,7 @@ void CQueueGrid::OnViewMoved( int nScrolDir, long oldPos, long newPos )
 	UNREFERENCED_PARAMETER(oldPos);
 	UNREFERENCED_PARAMETER(newPos);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnSelectionChanged
 //		The OnSelectionChanged notification is called by the multiselect
 //		class when a change occurred in current selection (i.e. user clicks
@@ -440,8 +490,7 @@ void CQueueGrid::OnSelectionChanged(int startCol,long startRow,int endCol,long e
 	UNREFERENCED_PARAMETER(endRow);
 	UNREFERENCED_PARAMETER(blockNum);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnLClicked
 //		Sent whenever the user clicks the left mouse button within the grid
 //		this message is sent when the button goes down then again when the button goes up
@@ -461,9 +510,8 @@ void CQueueGrid::OnLClicked(int col,long row,int updn,RECT *rect,POINT *point,in
 	UNREFERENCED_PARAMETER(*rect);
 	UNREFERENCED_PARAMETER(*point);
 	UNREFERENCED_PARAMETER(processed);
-}
-		
-/////////////////////////////////////////////////////////////////////////////
+}	
+//--------------------------------------------------------------------------------------------------
 //	OnRClicked
 //		Sent whenever the user clicks the right mouse button within the grid
 //		this message is sent when the button goes down then again when the button goes up
@@ -484,8 +532,7 @@ void CQueueGrid::OnRClicked(int col,long row,int updn,RECT *rect,POINT *point,in
 	UNREFERENCED_PARAMETER(*point);
 	UNREFERENCED_PARAMETER(processed);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnDClicked
 //		Sent whenever the user double clicks the left mouse button within the grid
 //	Params:
@@ -497,14 +544,20 @@ void CQueueGrid::OnRClicked(int col,long row,int updn,RECT *rect,POINT *point,in
 //		<none>
 void CQueueGrid::OnDClicked(int col,long row,RECT *rect,POINT *point,BOOL processed)
 {
-	UNREFERENCED_PARAMETER(col);
-	UNREFERENCED_PARAMETER(row);
-	UNREFERENCED_PARAMETER(*rect);
-	UNREFERENCED_PARAMETER(*point);
-	UNREFERENCED_PARAMETER(processed);
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		UNREFERENCED_PARAMETER(*rect);
+		UNREFERENCED_PARAMETER(*point);
+		UNREFERENCED_PARAMETER(processed);
+
+		GetParent()->PostMessage(WM_QUEUE_GRID_DBLCLICK, ::GetDlgCtrlID(m_hWnd),
+			MAKELPARAM(row, col));
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30436");
 }	
-			 
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnMouseMove
 //		is sent when the user moves mouse over the grid area.
 //	Params:
@@ -522,8 +575,7 @@ void CQueueGrid::OnMouseMove(int col,long row,POINT *point,UINT nFlags,BOOL proc
 	UNREFERENCED_PARAMETER(nFlags);
 	UNREFERENCED_PARAMETER(processed);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnTH_LClicked
 //		Sent whenever the user clicks the left mouse button within the top heading
 //		this message is sent when the button goes down then again when the button goes up
@@ -544,8 +596,7 @@ void CQueueGrid::OnTH_LClicked(int col,long row,int updn,RECT *rect,POINT *point
 	UNREFERENCED_PARAMETER(*point);
 	UNREFERENCED_PARAMETER(processed);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnTH_RClicked
 //		Sent whenever the user clicks the right mouse button within the top heading
 //		this message is sent when the button goes down then again when the button goes up
@@ -566,8 +617,7 @@ void CQueueGrid::OnTH_RClicked(int col,long row,int updn,RECT *rect,POINT *point
 	UNREFERENCED_PARAMETER(*point);
 	UNREFERENCED_PARAMETER(processed);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnTH_DClicked
 //		Sent whenever the user double clicks the left mouse
 //		button within the top heading
@@ -586,8 +636,7 @@ void CQueueGrid::OnTH_DClicked(int col,long row,RECT *rect,POINT *point,BOOL pro
 	UNREFERENCED_PARAMETER(*point);
 	UNREFERENCED_PARAMETER(processed);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnSH_LClicked
 //		Sent whenever the user clicks the left mouse button within the side heading
 //		this message is sent when the button goes down then again when the button goes up
@@ -608,8 +657,7 @@ void CQueueGrid::OnSH_LClicked(int col,long row,int updn,RECT *rect,POINT *point
 	UNREFERENCED_PARAMETER(*point);
 	UNREFERENCED_PARAMETER(processed);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnSH_RClicked
 //		Sent whenever the user clicks the right mouse button within the side heading
 //		this message is sent when the button goes down then again when the button goes up
@@ -630,8 +678,7 @@ void CQueueGrid::OnSH_RClicked(int col,long row,int updn,RECT *rect,POINT *point
 	UNREFERENCED_PARAMETER(*point);
 	UNREFERENCED_PARAMETER(processed);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnSH_DClicked
 //		Sent whenever the user double clicks the left mouse button within the side heading
 //	Params:
@@ -649,8 +696,7 @@ void CQueueGrid::OnSH_DClicked(int col,long row,RECT *rect,POINT *point,BOOL pro
 	UNREFERENCED_PARAMETER(*point);
 	UNREFERENCED_PARAMETER(processed);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCB_LClicked
 //		Sent whenever the user clicks the left mouse button within the top corner button
 //		this message is sent when the button goes down then again when the button goes up
@@ -668,8 +714,7 @@ void CQueueGrid::OnCB_LClicked(int updn,RECT *rect,POINT *point,BOOL processed)
 	UNREFERENCED_PARAMETER(*point);
 	UNREFERENCED_PARAMETER(processed);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCB_RClicked
 //		Sent whenever the user clicks the right mouse button within the top corner button
 //		this message is sent when the button goes down then again when the button goes up
@@ -687,8 +732,7 @@ void CQueueGrid::OnCB_RClicked(int updn,RECT *rect,POINT *point,BOOL processed)
 	UNREFERENCED_PARAMETER(*point);
 	UNREFERENCED_PARAMETER(processed);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCB_DClicked
 //		Sent whenever the user double clicks the left mouse
 //		button within the top corner button
@@ -704,8 +748,7 @@ void CQueueGrid::OnCB_DClicked(RECT *rect,POINT *point,BOOL processed)
 	UNREFERENCED_PARAMETER(*point);
 	UNREFERENCED_PARAMETER(processed);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnKeyDown
 //		Sent when grid received a WM_KEYDOWN message, usually as a result
 //		of a user pressing any key on the keyboard.
@@ -720,8 +763,7 @@ void CQueueGrid::OnKeyDown(UINT *vcKey,BOOL processed)
 	UNREFERENCED_PARAMETER(processed);
 //	GetScrollBarCtrl(SB_HORZ)->EnableScrollBar(ESB_DISABLE_BOTH);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnKeyUp
 //		Sent when grid received a WM_KEYUP message, usually as a result
 //		of a user releasing a key.
@@ -736,8 +778,7 @@ void CQueueGrid::OnKeyUp(UINT *vcKey,BOOL processed)
 	UNREFERENCED_PARAMETER(processed);
 //	GetScrollBarCtrl(SB_HORZ)->EnableScrollBar(ESB_DISABLE_BOTH);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCharDown
 //		Sent when grid received a WM_CHAR message, usually as a result
 //		of a user pressing any key that represents a printable character.
@@ -752,8 +793,7 @@ void CQueueGrid::OnCharDown(UINT *vcKey,BOOL processed)
 	UNREFERENCED_PARAMETER(processed);
 //	GetScrollBarCtrl(SB_HORZ)->EnableScrollBar(ESB_DISABLE_BOTH);
 }
-	
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnGetCell
 //		This message is sent every time the grid needs to
 //		draw a cell in the grid. At this point the cell
@@ -774,8 +814,7 @@ void CQueueGrid::OnGetCell(int col,long row,CUGCell *cell)
 	UNREFERENCED_PARAMETER(row);
 	UNREFERENCED_PARAMETER(*cell);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnSetCell
 //		This notification is sent every time a cell is set,
 //		here you have a chance to make final modification
@@ -787,12 +826,18 @@ void CQueueGrid::OnGetCell(int col,long row,CUGCell *cell)
 //		<none>
 void CQueueGrid::OnSetCell(int col,long row,CUGCell *cell)
 {
-	UNREFERENCED_PARAMETER(col);
-	UNREFERENCED_PARAMETER(row);
-	UNREFERENCED_PARAMETER(*cell);
-}
+	AFX_MANAGE_STATE(AfxGetModuleState());
 
-/////////////////////////////////////////////////////////////////////////////
+	try
+	{
+		UNREFERENCED_PARAMETER(*cell);
+
+		GetParent()->PostMessage(WM_QUEUE_GRID_CELL_VALUE_CHANGE, ::GetDlgCtrlID(m_hWnd),
+			MAKELPARAM(row, col));
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30437");
+}
+//--------------------------------------------------------------------------------------------------
 //	OnDataSourceNotify
 //		This message is sent from a data source and this message
 //		depends on the data source - check the information
@@ -810,8 +855,7 @@ void CQueueGrid::OnDataSourceNotify(int ID,long msg,long param)
 	UNREFERENCED_PARAMETER(msg);
 	UNREFERENCED_PARAMETER(param);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCellTypeNotify
 //		This notification is sent by the celltype and it is different from cell-type
 //		to celltype and even from notification to notification.  It is usually used to
@@ -834,8 +878,7 @@ int CQueueGrid::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
 	UNREFERENCED_PARAMETER(param);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnEditStart
 //		This message is sent whenever the grid is ready to start editing a cell
 //	Params:
@@ -853,8 +896,7 @@ int CQueueGrid::OnEditStart(int col, long row,CWnd **edit)
 	UNREFERENCED_PARAMETER(**edit);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnEditVerify
 //		This notification is sent every time the user hits a key while in edit mode.
 //		It is mostly used to create custom behavior of the edit control, because it is
@@ -874,8 +916,7 @@ int CQueueGrid::OnEditVerify(int col, long row,CWnd *edit,UINT *vcKey)
 	UNREFERENCED_PARAMETER(*vcKey);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnEditFinish
 //		This notification is sent when the edit is being finished
 //	Params:
@@ -895,8 +936,7 @@ int CQueueGrid::OnEditFinish(int col, long row,CWnd *edit,LPCTSTR string,BOOL ca
 	UNREFERENCED_PARAMETER(cancelFlag);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnEditContinue
 //		This notification is called when the user pressed 'tab' or 'enter' keys
 //		Here you have a chance to modify the destination cell
@@ -915,8 +955,7 @@ int CQueueGrid::OnEditContinue(int oldcol,long oldrow,int* newcol,long* newrow)
 	UNREFERENCED_PARAMETER(*newrow);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnMenuCommand
 //		This notification is called when the user has selected a menu item
 //		in the pop-up menu.
@@ -936,8 +975,7 @@ void CQueueGrid::OnMenuCommand(int col,long row,int section,int item)
 	UNREFERENCED_PARAMETER(section);
 	UNREFERENCED_PARAMETER(item);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnMenuStart
 //		Is called when the pop up menu is about to be shown
 //	Params:
@@ -956,8 +994,7 @@ int CQueueGrid::OnMenuStart(int col,long row,int section)
 	UNREFERENCED_PARAMETER(section);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnGetContextHelpID 
 //		this notification is called as result of context help bing activated
 //		over the UG area and should return context help ID to be displayed
@@ -973,8 +1010,7 @@ DWORD CQueueGrid::OnGetContextHelpID( int col, long row, int section )
 	UNREFERENCED_PARAMETER(section);
 	return 0;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnHint
 //		Is called whent the hint is about to be displayed on the main grid area,
 //		here you have a chance to set the text that will be shown
@@ -986,12 +1022,14 @@ DWORD CQueueGrid::OnGetContextHelpID( int col, long row, int section )
 //		FALSE - to prevent the hint from showing
 int CQueueGrid::OnHint(int col,long row,int section,CString *string)
 {
+	UNREFERENCED_PARAMETER(col);
+	UNREFERENCED_PARAMETER(row);
 	UNREFERENCED_PARAMETER(section);
-	string->Format( _T("Col:%d Row:%ld") ,col,row);
-	return TRUE;
+	UNREFERENCED_PARAMETER(*string);
+	
+	return FALSE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnVScrollHint
 //		Is called when the hint is about to be displayed on the vertical scroll bar,
 //		here you have a chance to set the text that will be shown
@@ -1007,8 +1045,7 @@ int CQueueGrid::OnVScrollHint(long row,CString *string)
 	UNREFERENCED_PARAMETER(*string);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnHScrollHint
 //		Is called whent the hint is about to be displayed on the horizontal scroll bar,
 //		here you have a chance to set the text that will be shown
@@ -1026,10 +1063,10 @@ int CQueueGrid::OnHScrollHint(int col,CString *string)
 }
 
 #ifdef __AFXOLE_H__
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OLE
 //		following 3 functions are to be used with drag and drop functionality
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnDragEnter
 //	Params:
 //		pDataObject - 
@@ -1041,8 +1078,7 @@ DROPEFFECT CQueueGrid::OnDragEnter(COleDataObject* pDataObject)
 	UNREFERENCED_PARAMETER(*pDataObject);
 	return DROPEFFECT_NONE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnDragOver
 //	Params:
 //		col, row	-
@@ -1057,8 +1093,7 @@ DROPEFFECT CQueueGrid::OnDragOver(COleDataObject* pDataObject,int col,long row)
 	UNREFERENCED_PARAMETER(row);
 	return DROPEFFECT_NONE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnDragDrop
 //	Params:
 //		col, row	-
@@ -1074,8 +1109,7 @@ DROPEFFECT CQueueGrid::OnDragDrop(COleDataObject* pDataObject,int col,long row)
 	return DROPEFFECT_NONE;
 }
 #endif
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnScreenDCSetup
 //		Is called when each of the components are painted.
 //	Params:
@@ -1091,8 +1125,7 @@ void CQueueGrid::OnScreenDCSetup(CDC *dc,int section)
 	UNREFERENCED_PARAMETER(*dc);
 	UNREFERENCED_PARAMETER(section);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnSortEvaluate
 //		Sent as a result of the 'SortBy' call, this is called for each cell
 //		comparison and allows for customization of the sorting routines.
@@ -1107,55 +1140,62 @@ void CQueueGrid::OnScreenDCSetup(CDC *dc,int section)
 //		value greater than zero to identify that the cell1 comes after cell2
 int CQueueGrid::OnSortEvaluate(CUGCell *cell1,CUGCell *cell2,int flags)
 {
-	// if one of the cells is NULL, do not compare its text
-	if ( cell1 == NULL && cell2 == NULL )
-		return 0;
-	else if ( cell1 == NULL )
-		return 1;
-	else if ( cell2 == NULL )
-		return -1;
+	AFX_MANAGE_STATE(AfxGetModuleState());
 
-	if(flags&UG_SORT_DESCENDING)
+	try
 	{
-		CUGCell *ptr = cell1;
-		cell1 = cell2;
-		cell2 = ptr;
-	}
-
-	// initialize variables for numeric check
-	double num1, num2;
-	// compare the cells, with respect to the cell's datatype
-	switch(cell1->GetDataType())
-	{
-		case UGCELLDATA_STRING:
-			if(NULL == cell1->GetText() && NULL == cell2->GetText())
-				return 0;
-			if(NULL == cell1->GetText())
-				return 1;
-			if(NULL == cell2->GetText())
-				return -1;
-			return _tcscmp(cell1->GetText(),cell2->GetText());	
-		case UGCELLDATA_NUMBER:
-		case UGCELLDATA_BOOL:
-		case UGCELLDATA_CURRENCY:
-			num1 = cell1->GetNumber();
-			num2 = cell2->GetNumber();
-			if(num1 < num2)
-				return -1;
-			if(num1 > num2)
-				return 1;
+		// if one of the cells is NULL, do not compare its text
+		if ( cell1 == NULL && cell2 == NULL )
 			return 0;
-		default:
-			// if datatype is not recognized, compare cell's text
-			if(NULL == cell1->GetText())
-				return 1;
-			if(NULL == cell2->GetText())
-				return -1;
-			return _tcscmp(cell1->GetText(),cell2->GetText());	
-	}
-}
+		else if ( cell1 == NULL )
+			return 1;
+		else if ( cell2 == NULL )
+			return -1;
 
-/////////////////////////////////////////////////////////////////////////////
+		if(flags&UG_SORT_DESCENDING)
+		{
+			CUGCell *ptr = cell1;
+			cell1 = cell2;
+			cell2 = ptr;
+		}
+
+		// initialize variables for numeric check
+		double num1, num2;
+		// compare the cells, with respect to the cell's datatype
+		switch(cell1->GetDataType())
+		{
+			case UGCELLDATA_STRING:
+				if(NULL == cell1->GetText() && NULL == cell2->GetText())
+					return 0;
+				if(NULL == cell1->GetText())
+					return 1;
+				if(NULL == cell2->GetText())
+					return -1;
+				return _tcscmp(cell1->GetText(),cell2->GetText());	
+			case UGCELLDATA_NUMBER:
+			case UGCELLDATA_BOOL:
+			case UGCELLDATA_CURRENCY:
+				num1 = cell1->GetNumber();
+				num2 = cell2->GetNumber();
+				if(num1 < num2)
+					return -1;
+				if(num1 > num2)
+					return 1;
+				return 0;
+			default:
+				// if datatype is not recognized, compare cell's text
+				if(NULL == cell1->GetText())
+					return 1;
+				if(NULL == cell2->GetText())
+					return -1;
+				return _tcscmp(cell1->GetText(),cell2->GetText());	
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30439");
+
+	return 0;
+}
+//--------------------------------------------------------------------------------------------------
 //	OnTabSelected
 //		Called when the user selects one of the tabs on the bottom of the screen
 //	Params:
@@ -1166,8 +1206,7 @@ void CQueueGrid::OnTabSelected(int ID)
 {
 	UNREFERENCED_PARAMETER(ID);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnAdjustComponentSizes
 //		Called when the grid components are being created,
 //		sized, and arranged.  This notification provides
@@ -1189,8 +1228,7 @@ void CQueueGrid::OnAdjustComponentSizes(RECT *grid,RECT *topHdg,RECT *sideHdg,
 	UNREFERENCED_PARAMETER(*hScroll);
 	UNREFERENCED_PARAMETER(*tabs);
 } 
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnDrawFocusRect
 //		Called when the focus rect needs to be painted.
 //	Params:
@@ -1200,14 +1238,19 @@ void CQueueGrid::OnAdjustComponentSizes(RECT *grid,RECT *topHdg,RECT *sideHdg,
 //		<none>
 void CQueueGrid::OnDrawFocusRect(CDC *dc,RECT *rect)
 {
-	//DrawExcelFocusRect(dc,rect);
-	
-	rect->bottom --;
-	rect->right --;	
-	dc->DrawFocusRect(rect);
-}
+	AFX_MANAGE_STATE(AfxGetModuleState());
 
-/////////////////////////////////////////////////////////////////////////////
+	try
+	{
+		//DrawExcelFocusRect(dc,rect);
+
+		rect->bottom --;
+		rect->right --;	
+		dc->DrawFocusRect(rect);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30440");
+}
+//--------------------------------------------------------------------------------------------------
 //	OnGetDefBackColor
 //		Sent when the area behind the grid needs to be painted.
 //	Params:
@@ -1221,8 +1264,7 @@ COLORREF CQueueGrid::OnGetDefBackColor(int section)
 	UNREFERENCED_PARAMETER(section);
 	return RGB(255,255,255);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnSetFocus
 //		Sent when the grid is gaining focus.
 //	Note:
@@ -1238,8 +1280,7 @@ void CQueueGrid::OnSetFocus(int section)
 {
 	UNREFERENCED_PARAMETER(section);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnKillFocus
 //		Sent when the grid is loosing focus.
 //	Params:
@@ -1253,8 +1294,7 @@ void CQueueGrid::OnKillFocus(int section, CWnd *pNewWnd)
 {
 	UNREFERENCED_PARAMETER(section);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnColSwapStart
 //		Called to inform the grid that the col swap was started on given col.
 //	Params:
@@ -1267,8 +1307,7 @@ BOOL CQueueGrid::OnColSwapStart(int col)
 	UNREFERENCED_PARAMETER(col);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnCanColSwap
 //		Called when col swap is about to take place, here you can 'lock' certain
 //		cols in place so that are not swappable.
@@ -1284,8 +1323,7 @@ BOOL CQueueGrid::OnCanColSwap(int fromCol,int toCol)
 	UNREFERENCED_PARAMETER(toCol);
 	return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnColSwapped
 //		Called just after column-swap operation was completed.
 //	Params:
@@ -1298,8 +1336,7 @@ void CQueueGrid::OnColSwapped(int fromCol,int toCol)
 	UNREFERENCED_PARAMETER(fromCol);
 	UNREFERENCED_PARAMETER(toCol);
 }
-
-/////////////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
 //	OnTrackingWindowMoved
 //		Called to notify the grid that the tracking window was moved
 //	Params:
@@ -1311,4 +1348,106 @@ void CQueueGrid::OnTrackingWindowMoved(RECT *origRect,RECT *newRect)
 {
 	UNREFERENCED_PARAMETER(*origRect);
 	UNREFERENCED_PARAMETER(*newRect);
+}
+//--------------------------------------------------------------------------------------------------
+void CQueueGrid::OnSize(UINT nType, int cx, int cy)
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		// Determine the combined width of all columns except the description column.
+		int nTotalWidth = 0;
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == 3)
+			{
+				continue;
+			}
+
+			nTotalWidth += GetColWidth(i);
+		}
+
+		// Set the description column to occupy the remaining width.
+		CHECK_UG_RETURN_VALUE("ELI30472", SetColWidth(3, cx - nTotalWidth));
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30441");
+}
+//--------------------------------------------------------------------------------------------------
+void CQueueGrid::InsertRow(int index)
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI30442", index >= 0 && index <= GetNumberRows())
+
+		CHECK_UG_RETURN_VALUE("ELI30473", EnableUpdate(FALSE));
+
+		CHECK_UG_RETURN_VALUE("ELI30489", CUGCtrl::InsertRow(index));
+
+		CUGCell cell;
+		cell.UseThemes(true);
+		CHECK_UG_RETURN_VALUE("ELI30490", cell.CopyInfoFrom(m_GI->m_gridDefaults));
+		cell.SetXPStyle(XPCellTypeData);
+		CHECK_UG_RETURN_VALUE("ELI30474", cell.SetFont(&m_font));
+
+		// Enabled
+		CHECK_UG_RETURN_VALUE("ELI30475", cell.SetCellType(UGCT_CHECKBOX));
+		CHECK_UG_RETURN_VALUE("ELI30476",
+			cell.SetCellTypeEx(UGCT_CHECKBOX3DRECESS | UGCT_CHECKBOXCHECKMARK));
+		CHECK_UG_RETURN_VALUE("ELI30477", SetCell(0, index, &cell));
+
+		// Force Processing
+		CHECK_UG_RETURN_VALUE("ELI30478", cell.SetCellTypeEx(UGCT_CHECKBOX));
+		CHECK_UG_RETURN_VALUE("ELI30479",
+			cell.SetCellTypeEx(UGCT_CHECKBOX3DRECESS | UGCT_CHECKBOXCHECKMARK));
+		CHECK_UG_RETURN_VALUE("ELI30480", SetCell(1, index, &cell));
+
+		// Priority
+		CHECK_UG_RETURN_VALUE("ELI30481", cell.SetCellType(UGCT_DROPLIST));
+		CHECK_UG_RETURN_VALUE("ELI30482", cell.SetLabelText(m_strPriorities.c_str()));
+		CHECK_UG_RETURN_VALUE("ELI30483", SetCell(2, index, &cell));
+
+		// Description
+		CHECK_UG_RETURN_VALUE("ELI30506", cell.SetCellType(UGCT_NORMAL));
+		CHECK_UG_RETURN_VALUE("ELI30507", cell.SetAlignment(UG_ALIGNLEFT));
+		CHECK_UG_RETURN_VALUE("ELI30508", SetCell(3, index, &cell));
+
+		// Status
+		CHECK_UG_RETURN_VALUE("ELI30484", cell.SetCellType(UGCT_NORMAL));
+		CHECK_UG_RETURN_VALUE("ELI30485", cell.SetAlignment(UG_ALIGNCENTER));
+		CHECK_UG_RETURN_VALUE("ELI30486", SetCell(4, index, &cell));
+
+		CHECK_UG_RETURN_VALUE("ELI30487", EnableUpdate(TRUE));
+		CHECK_UG_RETURN_VALUE("ELI30488", RedrawAll());
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30443");
+}
+//--------------------------------------------------------------------------------------------------
+void CQueueGrid::SetRowInfo(int nRow, bool bEnabled, bool bForceProcessing,
+						   UCLID_FILEPROCESSINGLib::EFilePriority ePriority,
+						   const string &strDescription, const string &strStatus)
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		CHECK_UG_RETURN_VALUE("ELI30491", EnableUpdate(FALSE));
+
+		if (nRow >= GetNumberRows())
+		{
+			InsertRow(nRow);
+		}
+
+		CHECK_UG_RETURN_VALUE("ELI30492", QuickSetText(0, nRow, bEnabled ? "1" : "0"));
+		CHECK_UG_RETURN_VALUE("ELI30493", QuickSetText(1, nRow, bForceProcessing ? "1" : "0"));
+		CHECK_UG_RETURN_VALUE("ELI30494", QuickSetText(2, nRow, getPriorityString(ePriority).c_str()));
+		CHECK_UG_RETURN_VALUE("ELI30495", QuickSetText(3, nRow, strDescription.c_str()));
+		CHECK_UG_RETURN_VALUE("ELI30496", QuickSetText(4, nRow, strStatus.c_str()));
+
+		CHECK_UG_RETURN_VALUE("ELI30497", EnableUpdate(TRUE));
+		Invalidate();
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30465");
 }
