@@ -569,8 +569,6 @@ bool UGXPThemes::GetThemeRect(LPCWSTR theme, int iPartId, int iStateId, RECT *pR
 
 		if (themeHandle)
 		{
-
-			const int TMT_DEFAULTPANESIZE = 5002;
 			HRESULT hr = GetThemeRect(themeHandle, iPartId, iStateId, TMT_DEFAULTPANESIZE, pRect);
 			success = SUCCEEDED(hr);
 		}
