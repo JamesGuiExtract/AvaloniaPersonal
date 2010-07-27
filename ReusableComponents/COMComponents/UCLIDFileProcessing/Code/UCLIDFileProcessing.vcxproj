@@ -75,7 +75,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include;..\..\..\VendorSpecificUtils\UltimateGrid\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -126,7 +126,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\..\InputFunnel\IFCore\Code;..\FAMUtils\Code;..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include;..\..\..\VendorSpecificUtils\UltimateGrid\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_USRDLL;_LINK_TO_UG_IN_EXTDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -148,7 +148,8 @@
     <Link>
       <OutputFile>..\..\..\..\Binaries\Debug/UCLIDFileProcessing.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\APIs\UltimateGrid\Lib;..\..\..\APIs\UltimateGrid\DLLs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\UCLIDFileProcessing.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/UCLIDFileProcessing.pdb</ProgramDatabaseFile>
@@ -366,6 +367,9 @@
     <ProjectReference Include="..\..\..\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcxproj">
       <Project>{08cc1afb-7b9d-42e5-b823-dc72cdc06631}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\VendorSpecificUtils\UltimateGrid\BuildDLL\UltimateGrid.vcxproj">
+      <Project>{5c786bc2-6c22-4a5c-9c41-30f49780d966}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\ESMessageUtils\Code\ESMessageUtils.vcxproj">
       <Project>{d026cb45-dfa8-4fd7-ae12-c6f05978187a}</Project>
