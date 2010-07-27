@@ -50,21 +50,19 @@ const string gstrLOG_FILE_MUTEX = "Global\\0A7EF4EA-E618-4A07-9D77-7F4E48D6B224"
 // PURPOSE: To provide an external function that can be called from C# via P/Invoke
 //			that will take an array of bytes and a pointer that will point to an 
 //			array of encrypted of bytes that will be encrypted using the internal
-//			Systems passwords.  The length parameter should be passed in to describe
-//			the length of the input array and will be changed to reflect the size
-//			of the newly allocated array of encrypted bytes.  The memory allocated
-//			for the encrypted bytes must be released by the caller (unless there
-//			was an exception thrown in which case the method itself will have
-//			cleaned it up).  The caller must release the memory with a call to
-//			CoTaskMemFree(pBuffer) in C++ or Marshal.FreeCoTaskMem(buffer) in C#.
+//			Systems passwords. The memory allocated for the encrypted bytes must be
+//			released by the caller (unless there was an exception thrown in which case
+//			the method itself will have cleaned it up).  The caller must release the memory
+//			with a call to CoTaskMemFree(pBuffer) in C++ or Marshal.FreeCoTaskMem(buffer) in C#.
 //			Added as per [LegacyRCAndUtils #4974] - JDS - 05/08/2008.
+//			After the call has returned, pulLength will contain the length of the newly
+//			allocated buffer that has been returned.
 //
 // ARGS:	pszInput - A pointer to an array of bytes to be encrypted
-//			pszOutput - A pointer to a pointer to an array of bytes containing the encrypted data
-//			pulLength - Initially should contain the size of the pszInput buffer, upon
-//						exiting the function will now contain the size of the pszOutput buffer.
-extern EXPORT_BaseUtils void externManipulator(unsigned char* pszInput, unsigned char** pszOutput,
-											   unsigned long* pulLength);
+//			pulLength - A pointer to an unsigned long that will contain the length
+//				of the returned buffer containing the encrypted bytes.
+extern EXPORT_BaseUtils unsigned char* externManipulator(const char* pszInput,
+	unsigned long* pulLength);
 
 // PURPOSE: To provide a way to log an exception from C# if the COMUCLIDException object fails
 //			in some way.

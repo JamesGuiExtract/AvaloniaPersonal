@@ -16,15 +16,17 @@ namespace Extract
         //          the full name from the output (the output is organized by columns,
         //          there should be three columns of numbers (1 decimal, 2 HEX) and then
         //          the mangled name of the function followed by a space and '='.
-        [DllImport("BaseUtils.dll", 
-            EntryPoint="?externManipulator@@YAXPAEPAPAEPAK@Z")]
-#if DEBUG 
+        [DllImport("BaseUtils.dll",
+            EntryPoint = "?externManipulator@@YAPAEPBDPAK@Z", CharSet = CharSet.Ansi,
+            BestFitMapping = false, ThrowOnUnmappableChar = true)]
+#if DEBUG
         // Need to suppress the AvoidUncalledPrivateCode message in DEBUG builds because
         // these methods (currently) are only accessed when the code is built in Release mode.
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 #endif
-        internal static extern void EncryptBytes(byte[] plainText, ref IntPtr cipherText, 
+        internal static extern IntPtr EncryptBytes([MarshalAs(UnmanagedType.LPStr)] string text,
             ref uint length);
+
         // P/Invoke the LogException method in BaseUtils so a simple exception can be logged.
         // NOTE:    This is needed to allow logging information if the COMUCLIDException object
         //          either cannot be created or it throws an exception in the process of logging
@@ -55,11 +57,8 @@ namespace Extract
 #endif
         internal static string EncryptString(string plainText)
         {
-            // Convert the plain text string to an array of bytes
-            byte[] plainBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(plainText);
-
-            // Get the length of the the byte array
-            uint dataLength = (uint)plainBytes.Length;
+            string plainHexText = StringMethods.ConvertBytesToHexString(
+                StringMethods.ConvertStringToBytes(plainText));
 
             string encryptedText = "";
 
@@ -72,8 +71,8 @@ namespace Extract
             // 3) Memory allocated for the buffer will be released.
             try
             {
-                // Call the encrypt method
-                EncryptBytes(plainBytes, ref buffer, ref dataLength);
+                uint dataLength = 0;
+                buffer = EncryptBytes(plainHexText, ref dataLength);
 
                 // Create a byte array to hold the encrypted text
                 byte[] cipherText = new byte[dataLength];

@@ -144,6 +144,10 @@
       <Project>{7600c4fc-aec9-46d2-a4c2-aa4af0420f28}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\ESPrintManager\Code\ESPrintManager.vcxproj">
+      <Project>{0a8fd35a-f15b-490c-8244-2e5746a7cf46}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

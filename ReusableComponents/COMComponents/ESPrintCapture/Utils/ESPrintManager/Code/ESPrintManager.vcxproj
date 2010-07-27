@@ -137,6 +137,14 @@
       <Project>{91b17d62-305c-4ea4-add2-72ac7fe8d0af}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Core\Code\ESPrintCaptureCore.vcxproj">
+      <Project>{40f9980d-0f9a-4f61-8cc9-d9dd7ae64abd}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\ESActMaskPCE\Code\ESActMaskPCE.vcxproj">
+      <Project>{7600c4fc-aec9-46d2-a4c2-aa4af0420f28}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

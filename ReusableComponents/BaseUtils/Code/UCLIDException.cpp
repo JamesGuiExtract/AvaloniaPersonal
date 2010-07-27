@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <comdef.h>
 #include <afxmt.h>
+#include <string>
 
 extern AFX_EXTENSION_MODULE BaseUtilsDLL;
 
@@ -108,9 +109,9 @@ CMutex* getLogFileMutex()
 //-------------------------------------------------------------------------------------------------
 // Exported encrypt method for P/Invoke calls from C#
 //-------------------------------------------------------------------------------------------------
-void externManipulator(unsigned char* pszInput, unsigned char** pszOutput, unsigned long* pulLength)
+unsigned char* externManipulator(const char* pszInput, unsigned long* pulLength)
 {
-	unsigned char* pszEncrypted = NULL;
+	unsigned char* pszOutput = NULL;
 
 	INIT_EXCEPTION_AND_TRACING("MLI00417");
 
@@ -119,16 +120,12 @@ void externManipulator(unsigned char* pszInput, unsigned char** pszOutput, unsig
 		try
 		{
 			ASSERT_ARGUMENT("ELI21087", pszInput != NULL);
-			ASSERT_ARGUMENT("ELI21088", pszOutput != NULL);
 			ASSERT_ARGUMENT("ELI21089", pulLength != NULL);
 
-			// Set the [out] value to NULL
-			*pszOutput = NULL;
-			_lastCodePos = "10";
+			string strInput(pszInput);
 
 			// Load the byte stream from the input string
-			ByteStream bsInput(pszInput, *pulLength);
-			*pulLength = 0;
+			ByteStream bsInput(strInput);
 			_lastCodePos = "20";
 
 			// Create the 8-byte padded input
@@ -149,38 +146,30 @@ void externManipulator(unsigned char* pszInput, unsigned char** pszOutput, unsig
 			ee.encrypt(bsEncryptedBytes, bsPaddedInput, bsPassword);
 			_lastCodePos = "50";
 
-			// Get the length of the encrypted data
 			*pulLength = bsEncryptedBytes.getLength();
-			_lastCodePos = "60";
 
 			// Allocate a buffer to hold the encrypted data.
 			// NOTE: Need to use CoTaskMemAlloc to allocate the memory so that it can be
 			// released on the C# side, CANNOT USE NEW
-			pszEncrypted = (unsigned char*)CoTaskMemAlloc(sizeof(unsigned char) * *pulLength); 
-			ASSERT_RESOURCE_ALLOCATION("ELI21614", pszEncrypted != NULL);
-			_lastCodePos = "70";
-
+			pszOutput = (unsigned char*) CoTaskMemAlloc(sizeof(char) * *pulLength);
+			ASSERT_RESOURCE_ALLOCATION("ELI21614", pszOutput != NULL);
+			
 			// Copy the encrypted bytes into the newly allocated buffer
-			memcpy(pszEncrypted, bsEncryptedBytes.getData(), *pulLength);
+			memcpy(pszOutput, bsEncryptedBytes.getData(), *pulLength);
 			_lastCodePos = "80";
 
-			// Return the buffer containing the encrypted data
-			*pszOutput = pszEncrypted;
+			return pszOutput;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI21090");
 	}
 	catch(UCLIDException& ue)
 	{
-		// Ensure all allocated memory is cleaned up
-		if (pszEncrypted != NULL)
-		{
-			CoTaskMemFree(pszEncrypted);	
-		}
+		*pulLength = 0;
 
-		// Set the length to zero
-		if (pulLength != NULL)
+		// Ensure all allocated memory is cleaned up
+		if (pszOutput != NULL)
 		{
-			pulLength = 0;
+			CoTaskMemFree(pszOutput);	
 		}
 
 		// Log this exception to the standard exception log
