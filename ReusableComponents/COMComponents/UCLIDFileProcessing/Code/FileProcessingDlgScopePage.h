@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 #include <QuickMenuChooser.h>
-#include <Notifications.h>
 
 #include "QueueGrid.h"
 
