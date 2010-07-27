@@ -1,41 +1,17 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.VisualStudio.AddIns", "Extract.VisualStudio.AddIns.csproj", "{981AB0AA-D788-484A-A2BA-984426022F51}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.SourceControl", "..\..\..\..\SourceControl\Core\Code\Extract.SourceControl.csproj", "{3019DD00-4096-4158-B1AE-09E537B6A520}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LICode", "..\..\..\..\..\ProductDevelopment\VisualStudioAddins\LICode\Code\LICode.csproj", "{3C704CA9-B489-4FFE-BAAC-6E7DEA7594F9}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "LICodeSetup", "..\..\..\..\..\ProductDevelopment\VisualStudioAddins\LICode\Setup\LICodeSetup.vdproj", "{9775CA3F-83D2-4E51-BDC0-9C6E46B26853}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceControl", "..\..\..\..\..\ProductDevelopment\VisualStudioAddins\SourceControl\Code\SourceControl.csproj", "{052DB25A-500B-4E48-95EA-63086C3B1C2A}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SourceControlAddIn", "..\..\..\..\..\ProductDevelopment\VisualStudioAddins\SourceControl\Setup\SourceControlAddIn.vdproj", "{BBA2D9AB-56C6-4801-88D3-675E144D9EA6}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution

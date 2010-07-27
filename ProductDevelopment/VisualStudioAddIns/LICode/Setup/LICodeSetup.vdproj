@@ -52,19 +52,7 @@
         "Entry"
         {
         "MsmKey" = "8:_6F91177C10D34797F6FAB7B41C90D6C9"
-        "OwnerKey" = "8:_76D6DDC5C6AA3F5AC6A50F19E7044D5A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_6F91177C10D34797F6FAB7B41C90D6C9"
-        "OwnerKey" = "8:_2B3D4EA60A16217E4110D90D6C04CD09"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_6F91177C10D34797F6FAB7B41C90D6C9"
-        "OwnerKey" = "8:_887D1D571BEA321495A1319E24D9C7B3"
+        "OwnerKey" = "8:_CAA75CAD03BAB97BE4D42FA9E41F672D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -76,7 +64,19 @@
         "Entry"
         {
         "MsmKey" = "8:_6F91177C10D34797F6FAB7B41C90D6C9"
-        "OwnerKey" = "8:_CAA75CAD03BAB97BE4D42FA9E41F672D"
+        "OwnerKey" = "8:_887D1D571BEA321495A1319E24D9C7B3"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6F91177C10D34797F6FAB7B41C90D6C9"
+        "OwnerKey" = "8:_2B3D4EA60A16217E4110D90D6C04CD09"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6F91177C10D34797F6FAB7B41C90D6C9"
+        "OwnerKey" = "8:_76D6DDC5C6AA3F5AC6A50F19E7044D5A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -136,13 +136,13 @@
         "Entry"
         {
         "MsmKey" = "8:_A20CFFBEC3666D0F77AE7A826D029CF9"
-        "OwnerKey" = "8:_887D1D571BEA321495A1319E24D9C7B3"
+        "OwnerKey" = "8:_CAA75CAD03BAB97BE4D42FA9E41F672D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_A20CFFBEC3666D0F77AE7A826D029CF9"
-        "OwnerKey" = "8:_CAA75CAD03BAB97BE4D42FA9E41F672D"
+        "OwnerKey" = "8:_887D1D571BEA321495A1319E24D9C7B3"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -154,13 +154,13 @@
         "Entry"
         {
         "MsmKey" = "8:_CAA75CAD03BAB97BE4D42FA9E41F672D"
-        "OwnerKey" = "8:_76D6DDC5C6AA3F5AC6A50F19E7044D5A"
+        "OwnerKey" = "8:_887D1D571BEA321495A1319E24D9C7B3"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_CAA75CAD03BAB97BE4D42FA9E41F672D"
-        "OwnerKey" = "8:_887D1D571BEA321495A1319E24D9C7B3"
+        "OwnerKey" = "8:_76D6DDC5C6AA3F5AC6A50F19E7044D5A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -184,13 +184,13 @@
         "Entry"
         {
         "MsmKey" = "8:_D618F28E5B178CBC3871CA672C460B54"
-        "OwnerKey" = "8:_3F43AD7B5E200BE00DB646A6977C2363"
+        "OwnerKey" = "8:_9A406FBCF18C4E859C1FE76C143BFE28"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_D618F28E5B178CBC3871CA672C460B54"
-        "OwnerKey" = "8:_9A406FBCF18C4E859C1FE76C143BFE28"
+        "OwnerKey" = "8:_3F43AD7B5E200BE00DB646A6977C2363"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -202,55 +202,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9A406FBCF18C4E859C1FE76C143BFE28"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_3F43AD7B5E200BE00DB646A6977C2363"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7C1FA3A3371D7E55F10C1B30F7625EEE"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_76D6DDC5C6AA3F5AC6A50F19E7044D5A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2B3D4EA60A16217E4110D90D6C04CD09"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_887D1D571BEA321495A1319E24D9C7B3"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_CAA75CAD03BAB97BE4D42FA9E41F672D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D5B02A3FB8D3EE16A7A18E326ED9C71F"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_A20CFFBEC3666D0F77AE7A826D029CF9"
+        "OwnerKey" = "8:_3AF1B177010EC53C5C8A3E245E759EAA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -262,7 +214,55 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_3AF1B177010EC53C5C8A3E245E759EAA"
+        "OwnerKey" = "8:_A20CFFBEC3666D0F77AE7A826D029CF9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_D5B02A3FB8D3EE16A7A18E326ED9C71F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_CAA75CAD03BAB97BE4D42FA9E41F672D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_887D1D571BEA321495A1319E24D9C7B3"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_2B3D4EA60A16217E4110D90D6C04CD09"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_76D6DDC5C6AA3F5AC6A50F19E7044D5A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_7C1FA3A3371D7E55F10C1B30F7625EEE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_3F43AD7B5E200BE00DB646A6977C2363"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_9A406FBCF18C4E859C1FE76C143BFE28"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -347,7 +347,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "Version" = "8:2.0.50727"
+                "FrameworkVersion" = "8:2.0.50727  "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=9832"
                 }
@@ -382,11 +382,6 @@
             "AssemblyAsmDisplayName" = "8:VaultClientIntegrationLib, Version=4.1.4.18402, Culture=neutral, PublicKeyToken=500623c275bd78a9, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_2B3D4EA60A16217E4110D90D6C04CD09"
-                    {
-                    "Name" = "8:VaultClientIntegrationLib.DLL"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:VaultClientIntegrationLib.DLL"
             "TargetName" = "8:"
@@ -444,11 +439,6 @@
             "AssemblyAsmDisplayName" = "8:Extract.VisualStudio.AddIns, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
-                    "_3F43AD7B5E200BE00DB646A6977C2363"
-                    {
-                    "Name" = "8:Extract.VisualStudio.AddIns.DLL"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:Extract.VisualStudio.AddIns.DLL"
             "TargetName" = "8:"
@@ -475,11 +465,6 @@
             "AssemblyAsmDisplayName" = "8:VaultLib, Version=4.1.4.18402, Culture=neutral, PublicKeyToken=a74d7badb9387c36, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_6F91177C10D34797F6FAB7B41C90D6C9"
-                    {
-                    "Name" = "8:VaultLib.DLL"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:VaultLib.DLL"
             "TargetName" = "8:"
@@ -506,11 +491,6 @@
             "AssemblyAsmDisplayName" = "8:Extract.SourceControl, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
-                    "_76D6DDC5C6AA3F5AC6A50F19E7044D5A"
-                    {
-                    "Name" = "8:Extract.SourceControl.DLL"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:Extract.SourceControl.DLL"
             "TargetName" = "8:"
@@ -588,11 +568,6 @@
             "AssemblyAsmDisplayName" = "8:VaultClientOperationsLib, Version=4.1.4.18402, Culture=neutral, PublicKeyToken=e372e94840f8a4d3, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_887D1D571BEA321495A1319E24D9C7B3"
-                    {
-                    "Name" = "8:VaultClientOperationsLib.DLL"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:VaultClientOperationsLib.DLL"
             "TargetName" = "8:"
@@ -690,11 +665,6 @@
             "AssemblyAsmDisplayName" = "8:DragnetLib, Version=4.1.4.18402, Culture=neutral, PublicKeyToken=14a8075ce88af4e0, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_A20CFFBEC3666D0F77AE7A826D029CF9"
-                    {
-                    "Name" = "8:DragnetLib.DLL"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:DragnetLib.DLL"
             "TargetName" = "8:"
@@ -721,11 +691,6 @@
             "AssemblyAsmDisplayName" = "8:VaultClientNetLib, Version=4.1.4.18402, Culture=neutral, PublicKeyToken=e372e94840f8a4d3, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_CAA75CAD03BAB97BE4D42FA9E41F672D"
-                    {
-                    "Name" = "8:VaultClientNetLib.DLL"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:VaultClientNetLib.DLL"
             "TargetName" = "8:"
@@ -752,11 +717,6 @@
             "AssemblyAsmDisplayName" = "8:VCDiff, Version=4.1.4.18402, Culture=neutral, PublicKeyToken=4f75799f06837886, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_D5B02A3FB8D3EE16A7A18E326ED9C71F"
-                    {
-                    "Name" = "8:VCDiff.DLL"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:VCDiff.DLL"
             "TargetName" = "8:"
@@ -849,7 +809,7 @@
             }
             "{994432C3-9487-495D-8656-3E829A8DBDDE}:_F0DF89A642794BBCA93BD3D46A0F7262"
             {
-            "DefaultLocation" = "8:[PersonalFolder]\\Visual Studio 2005\\Addins"
+            "DefaultLocation" = "8:[PersonalFolder]\\Visual Studio 2010\\Addins"
             "Name" = "8:AddIns Folder"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -869,14 +829,16 @@
         "MsiBootstrapper"
         {
         "LangId" = "3:1033"
+        "RequiresElevation" = "11:FALSE"
         }
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:LICodeSetup"
-        "ProductCode" = "8:{F6B41C53-6C3A-4130-BB76-54223C57C156}"
+        "ProductName" = "8:Extract LI Code Addin 2010"
+        "ProductCode" = "8:{410CED28-6043-452D-BBB2-F0E0C00FB82A}"
         "PackageCode" = "8:{C92560C8-CE01-421C-ACD6-2C8FD0C26E54}"
-        "UpgradeCode" = "8:{0994F89E-DBD2-4510-AF23-54B0D8FEA023}"
+        "UpgradeCode" = "8:{6E23BF59-406C-462B-8C2B-7001A977AE3A}"
+        "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
@@ -885,7 +847,7 @@
         "Manufacturer" = "8:Extract Systems LLC"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:LICodeSetup"
+        "Title" = "8:Extract LI Code Addin 2010"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Extract Systems LLC"
         "Keywords" = "8:"
@@ -1335,9 +1297,6 @@
         {
         }
         "ProjectOutput"
-        {
-        }
-        "VJSharpPlugin"
         {
         }
     }
