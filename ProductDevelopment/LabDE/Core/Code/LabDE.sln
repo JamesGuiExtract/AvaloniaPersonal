@@ -1,11 +1,17 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AFCore", "AFCore", "{C176C2B6-E77F-46FC-A935-A1177777F43D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RC.Net", "RC.Net", "{4977A12F-F460-43CA-A8D4-908A2B1A41BC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AFRules", "AFRules", "{FB0F348E-FB92-4F0E-8A7F-61911BDA41CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ESCore", "ESCore", "{8CB8015B-0F66-423A-BD40-AABED74DE2CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{4D159D4B-37E4-4188-8490-9D1F2FA476B9}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandardLabDE", "..\..\DEPs\StandardLabDE\Core\Code\StandardLabDE.csproj", "{BF0F59FD-40E2-4DD2-9EFB-924A72E3045F}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F} = {7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}
 		{9D9996E1-50BE-4506-B4A6-08F6B9D3F839} = {9D9996E1-50BE-4506-B4A6-08F6B9D3F839}
@@ -16,10 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandardLabDE", "..\..\DEPs
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry", "..\..\..\..\RC.Net\DataEntry\Core\Code\Extract.DataEntry.csproj", "{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -32,10 +34,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry", "..\..\
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging.Forms", "..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj", "{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -44,562 +42,97 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging.Forms", "..
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract", "..\..\..\..\RC.Net\Core\Code\Extract.csproj", "{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
 		{E7889662-1B92-485D-AFF2-AC673DD433BC} = {E7889662-1B92-485D-AFF2-AC673DD433BC}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Drawing", "..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj", "{865B9A25-1D27-4445-9CC7-7BF88D736BA8}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseUtils", "..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcproj", "{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseUtils", "..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcxproj", "{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLMCore", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcproj", "{6FA06B83-AC26-49B7-8138-9342792EACC4}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{14D4D963-B656-4B04-ADD7-8F98FC4F664D} = {14D4D963-B656-4B04-ADD7-8F98FC4F664D}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLMCore", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcxproj", "{6FA06B83-AC26-49B7-8138-9342792EACC4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDRasterAndOCRMgmt", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcproj", "{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{EBE90516-603A-4562-8B47-51234CBB9903} = {EBE90516-603A-4562-8B47-51234CBB9903}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{A1474E20-9B5F-4DF9-A400-490270BC7999} = {A1474E20-9B5F-4DF9-A400-490270BC7999}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDRasterAndOCRMgmt", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcxproj", "{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFCore", "..\..\..\AttributeFinder\AFCore\Code\AFCore.vcproj", "{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{C9BEB739-8C91-4201-9E94-2D5F650FB5AE} = {C9BEB739-8C91-4201-9E94-2D5F650FB5AE}
-		{D026CB45-DFA8-4FD7-AE12-C6F05978187A} = {D026CB45-DFA8-4FD7-AE12-C6F05978187A}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3} = {1A95338E-9BC0-49A8-B69E-9942DD7CEBB3}
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B} = {CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{3EDFA52F-F37C-4417-A818-EF4D254796FE} = {3EDFA52F-F37C-4417-A818-EF4D254796FE}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFCore", "..\..\..\AttributeFinder\AFCore\Code\AFCore.vcxproj", "{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RWUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\RWUtils\Code\RWUtils.vcproj", "{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SafeNetUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code\SafeNetUtils.vcxproj", "{3EDFA52F-F37C-4417-A818-EF4D254796FE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SafeNetUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code\SafeNetUtils.vcproj", "{3EDFA52F-F37C-4417-A818-EF4D254796FE}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{D026CB45-DFA8-4FD7-AE12-C6F05978187A} = {D026CB45-DFA8-4FD7-AE12-C6F05978187A}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESMessageUtils", "..\..\..\..\ReusableComponents\COMComponents\ESMessageUtils\Code\ESMessageUtils.vcxproj", "{D026CB45-DFA8-4FD7-AE12-C6F05978187A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESMessageUtils", "..\..\..\..\ReusableComponents\COMComponents\ESMessageUtils\Code\ESMessageUtils.vcproj", "{D026CB45-DFA8-4FD7-AE12-C6F05978187A}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDCOMUtils", "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcxproj", "{7F591058-6DC9-4787-AE25-5A45AE78E3FA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDCOMUtils", "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcproj", "{7F591058-6DC9-4787-AE25-5A45AE78E3FA}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{DC72C952-D6ED-42F6-893D-8262BC9D183E} = {DC72C952-D6ED-42F6-893D-8262BC9D183E}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFUtils", "..\..\..\AttributeFinder\AFUtils\Code\AFUtils.vcxproj", "{80E248C0-9AFF-42BC-9CBF-B4274D19298C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFUtils", "..\..\..\AttributeFinder\AFUtils\Code\AFUtils.vcproj", "{80E248C0-9AFF-42BC-9CBF-B4274D19298C}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeadUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcxproj", "{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeadUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcproj", "{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZLibUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcxproj", "{A1474E20-9B5F-4DF9-A400-490270BC7999}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZLibUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcproj", "{A1474E20-9B5F-4DF9-A400-490270BC7999}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TopoUtils", "..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code\TopoUtils.vcxproj", "{EBE90516-603A-4562-8B47-51234CBB9903}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TopoUtils", "..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code\TopoUtils.vcproj", "{EBE90516-603A-4562-8B47-51234CBB9903}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSOCR", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.vcxproj", "{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSOCR", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.vcproj", "{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{CC01AE64-6B4C-4FEE-8A87-B13941098A6A} = {CC01AE64-6B4C-4FEE-8A87-B13941098A6A}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{660413BE-8631-4C18-92C6-A28B3E550A57} = {660413BE-8631-4C18-92C6-A28B3E550A57}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSOCR2", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\SSOCR2.vcxproj", "{660413BE-8631-4C18-92C6-A28B3E550A57}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSOCR2", "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\SSOCR2.vcproj", "{660413BE-8631-4C18-92C6-A28B3E550A57}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLM", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj", "{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLM", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcproj", "{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AFCore", "AFCore", "{C176C2B6-E77F-46FC-A935-A1177777F43D}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Licensing", "..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcproj", "{212E31D9-5F02-43AA-8625-BCB86B15CF8F}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Licensing", "..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj", "{212E31D9-5F02-43AA-8625-BCB86B15CF8F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities", "..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj", "{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Forms", "..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj", "{76781DE2-21D2-470C-B41D-598DC0C2640B}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDExceptionMgmt", "..\..\..\..\ReusableComponents\COMComponents\UCLIDExceptionMgmt\Code\UCLIDExceptionMgmt.vcproj", "{E7889662-1B92-485D-AFF2-AC673DD433BC}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDExceptionMgmt", "..\..\..\..\ReusableComponents\COMComponents\UCLIDExceptionMgmt\Code\UCLIDExceptionMgmt.vcxproj", "{E7889662-1B92-485D-AFF2-AC673DD433BC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IFCore", "..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.vcproj", "{037F8051-5F5F-48C4-9BF3-34AA990AA5DE}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
-		{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3} = {1A95338E-9BC0-49A8-B69E-9942DD7CEBB3}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{47D4FFB4-9E64-4B78-8C36-F1B615F1B5AC} = {47D4FFB4-9E64-4B78-8C36-F1B615F1B5AC}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IFCore", "..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.vcxproj", "{037F8051-5F5F-48C4-9BF3-34AA990AA5DE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OCRFilteringBase", "..\..\..\..\ReusableComponents\InputFunnel\OCRFilteringBase\Code\OCRFilteringBase.vcproj", "{47D4FFB4-9E64-4B78-8C36-F1B615F1B5AC}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OCRFilteringBase", "..\..\..\..\ReusableComponents\InputFunnel\OCRFilteringBase\Code\OCRFilteringBase.vcxproj", "{47D4FFB4-9E64-4B78-8C36-F1B615F1B5AC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDImageUtils", "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcproj", "{CC01AE64-6B4C-4FEE-8A87-B13941098A6A}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDImageUtils", "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcxproj", "{CC01AE64-6B4C-4FEE-8A87-B13941098A6A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDTestingFramework", "..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.vcproj", "{B1376860-A6F2-432F-AA51-C14AEC90AFCF}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDTestingFramework", "..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.vcxproj", "{B1376860-A6F2-432F-AA51-C14AEC90AFCF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpotRecognitionIR", "..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.vcproj", "{C9BEB739-8C91-4201-9E94-2D5F650FB5AE}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{A2E13543-A708-49E3-BA6E-4FC6DFE31E7C} = {A2E13543-A708-49E3-BA6E-4FC6DFE31E7C}
-		{EBE90516-603A-4562-8B47-51234CBB9903} = {EBE90516-603A-4562-8B47-51234CBB9903}
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3} = {1A95338E-9BC0-49A8-B69E-9942DD7CEBB3}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpotRecognitionIR", "..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.vcxproj", "{C9BEB739-8C91-4201-9E94-2D5F650FB5AE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDTestingFrameworkCore", "..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Core\Code\UCLIDTestingFrameworkCore.vcproj", "{A2E13543-A708-49E3-BA6E-4FC6DFE31E7C}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDTestingFrameworkCore", "..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Core\Code\UCLIDTestingFrameworkCore.vcxproj", "{A2E13543-A708-49E3-BA6E-4FC6DFE31E7C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GeneralIV", "..\..\..\..\ReusableComponents\InputFunnel\InputValidators\GeneralIV\Code\GeneralIV.vcproj", "{A7A54D3D-9716-469B-998C-5288B957B8F9}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
-		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GeneralIV", "..\..\..\..\ReusableComponents\InputFunnel\InputValidators\GeneralIV\Code\GeneralIV.vcxproj", "{A7A54D3D-9716-469B-998C-5288B957B8F9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtractTRP2", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\ExtractTRP2\Code\ExtractTRP2.vcproj", "{14D4D963-B656-4B04-ADD7-8F98FC4F664D}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtractTRP2", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\ExtractTRP2\Code\ExtractTRP2.vcxproj", "{14D4D963-B656-4B04-ADD7-8F98FC4F664D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RC.Net", "RC.Net", "{4977A12F-F460-43CA-A8D4-908A2B1A41BC}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFConditions", "..\..\..\AttributeFinder\AFConditions\Code\AFConditions.vcxproj", "{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AFRules", "AFRules", "{FB0F348E-FB92-4F0E-8A7F-61911BDA41CE}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFDataScorers", "..\..\..\AttributeFinder\AFDataScorers\Code\AFDataScorers.vcxproj", "{0D4ADC4E-90BB-4AAE-B89F-2CDE13306C62}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFConditions", "..\..\..\AttributeFinder\AFConditions\Code\AFConditions.vcproj", "{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{1BDB2A4E-7678-42C1-9828-5EF4F522AB21} = {1BDB2A4E-7678-42C1-9828-5EF4F522AB21}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFOutputHandlers", "..\..\..\AttributeFinder\AFOutputHandlers\Code\AFOutputHandlers.vcxproj", "{835D9667-E21E-460F-BC05-EE5E39551CFA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFDataScorers", "..\..\..\AttributeFinder\AFDataScorers\Code\AFDataScorers.vcproj", "{0D4ADC4E-90BB-4AAE-B89F-2CDE13306C62}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{CC46B68D-C36D-4AFE-BD17-69A99D465E3D} = {CC46B68D-C36D-4AFE-BD17-69A99D465E3D}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFPreProcessors", "..\..\..\AttributeFinder\AFPreProcessors\Code\AFPreProcessors.vcxproj", "{C2101648-5B5C-4AD9-9710-46452425335C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFOutputHandlers", "..\..\..\AttributeFinder\AFOutputHandlers\Code\AFOutputHandlers.vcproj", "{835D9667-E21E-460F-BC05-EE5E39551CFA}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B} = {CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}
-		{1BDB2A4E-7678-42C1-9828-5EF4F522AB21} = {1BDB2A4E-7678-42C1-9828-5EF4F522AB21}
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{25EFCFE6-2909-4433-A195-D5223F6D17EC} = {25EFCFE6-2909-4433-A195-D5223F6D17EC}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFSelectors", "..\..\..\AttributeFinder\AFSelectors\Code\AFSelectors.vcxproj", "{25EFCFE6-2909-4433-A195-D5223F6D17EC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFPreProcessors", "..\..\..\AttributeFinder\AFPreProcessors\Code\AFPreProcessors.vcproj", "{C2101648-5B5C-4AD9-9710-46452425335C}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFSplitters", "..\..\..\AttributeFinder\AFSplitters\Code\AFSplitters.vcxproj", "{CC46B68D-C36D-4AFE-BD17-69A99D465E3D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFSelectors", "..\..\..\AttributeFinder\AFSelectors\Code\AFSelectors.vcproj", "{25EFCFE6-2909-4433-A195-D5223F6D17EC}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFValueFinders", "..\..\..\AttributeFinder\AFValueFinders\Code\AFValueFinders.vcxproj", "{DD123185-5805-4DE9-9CA7-B69E2D14F0BA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFSplitters", "..\..\..\AttributeFinder\AFSplitters\Code\AFSplitters.vcproj", "{CC46B68D-C36D-4AFE-BD17-69A99D465E3D}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
-		{1BDB2A4E-7678-42C1-9828-5EF4F522AB21} = {1BDB2A4E-7678-42C1-9828-5EF4F522AB21}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFValueModifiers", "..\..\..\AttributeFinder\AFValueModifiers\Code\AFValueModifiers.vcxproj", "{1AF05090-95C1-48BF-8E74-3F05844B63B0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFValueFinders", "..\..\..\AttributeFinder\AFValueFinders\Code\AFValueFinders.vcproj", "{DD123185-5805-4DE9-9CA7-B69E2D14F0BA}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{1BDB2A4E-7678-42C1-9828-5EF4F522AB21} = {1BDB2A4E-7678-42C1-9828-5EF4F522AB21}
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{CC01AE64-6B4C-4FEE-8A87-B13941098A6A} = {CC01AE64-6B4C-4FEE-8A87-B13941098A6A}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{CC46B68D-C36D-4AFE-BD17-69A99D465E3D} = {CC46B68D-C36D-4AFE-BD17-69A99D465E3D}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CountyCustomComponents", "..\..\..\AttributeFinder\IndustrySpecific\County\CountyCustomComponents\Code\CountyCustomComponents.vcxproj", "{A29CD5B4-BFDC-44D4-B3FE-9A73248FCAB3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFValueModifiers", "..\..\..\AttributeFinder\AFValueModifiers\Code\AFValueModifiers.vcproj", "{1AF05090-95C1-48BF-8E74-3F05844B63B0}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
-		{660413BE-8631-4C18-92C6-A28B3E550A57} = {660413BE-8631-4C18-92C6-A28B3E550A57}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3} = {1A95338E-9BC0-49A8-B69E-9942DD7CEBB3}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
-		{1BDB2A4E-7678-42C1-9828-5EF4F522AB21} = {1BDB2A4E-7678-42C1-9828-5EF4F522AB21}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFCppUtils", "..\..\..\AttributeFinder\AFCppUtils\Code\AFCppUtils.vcxproj", "{1BDB2A4E-7678-42C1-9828-5EF4F522AB21}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CountyCustomComponents", "..\..\..\AttributeFinder\IndustrySpecific\County\CountyCustomComponents\Code\CountyCustomComponents.vcproj", "{A29CD5B4-BFDC-44D4-B3FE-9A73248FCAB3}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{CC46B68D-C36D-4AFE-BD17-69A99D465E3D} = {CC46B68D-C36D-4AFE-BD17-69A99D465E3D}
-		{DD123185-5805-4DE9-9CA7-B69E2D14F0BA} = {DD123185-5805-4DE9-9CA7-B69E2D14F0BA}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{0D4ADC4E-90BB-4AAE-B89F-2CDE13306C62} = {0D4ADC4E-90BB-4AAE-B89F-2CDE13306C62}
-		{23286748-A945-43F3-96DE-608B982703B4} = {23286748-A945-43F3-96DE-608B982703B4}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EncryptTextFile", "..\..\..\Utils\EncryptTextFile\Code\EncryptTextFile.vcxproj", "{23286748-A945-43F3-96DE-608B982703B4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFCppUtils", "..\..\..\AttributeFinder\AFCppUtils\Code\AFCppUtils.vcproj", "{1BDB2A4E-7678-42C1-9828-5EF4F522AB21}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UserLicense", "..\..\..\Utils\UserLicense\Code\UserLicense.vcxproj", "{B36F3199-54E2-44AF-8378-7829C06D4997}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ESCore", "ESCore", "{8CB8015B-0F66-423A-BD40-AABED74DE2CE}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EncryptTextFile", "..\..\..\Utils\EncryptTextFile\Code\EncryptTextFile.vcproj", "{23286748-A945-43F3-96DE-608B982703B4}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UserLicense", "..\..\..\Utils\UserLicense\Code\UserLicense.vcproj", "{B36F3199-54E2-44AF-8378-7829C06D4997}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "USBLicenseKeyManager", "..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\USBLicenseKeyManager\Code\USBLicenseKeyManager.vcproj", "{62844206-C3AE-4992-A13E-0EDC60B85E07}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B} = {CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}
-		{3EDFA52F-F37C-4417-A818-EF4D254796FE} = {3EDFA52F-F37C-4417-A818-EF4D254796FE}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "USBLicenseKeyManager", "..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\USBLicenseKeyManager\Code\USBLicenseKeyManager.vcxproj", "{62844206-C3AE-4992-A13E-0EDC60B85E07}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Parsers", "..\..\..\..\RC.Net\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj", "{DC72C952-D6ED-42F6-893D-8262BC9D183E}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEntryApplication", "..\..\..\..\RC.Net\DataEntry\Utilities\DataEntryApplication\Core\Code\DataEntryApplication.csproj", "{25920A74-6A5D-4054-BEA5-F4ADE228D864}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{63FCAC1B-4562-469C-B7C3-DF1D4386FB45} = {63FCAC1B-4562-469C-B7C3-DF1D4386FB45}
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
@@ -607,71 +140,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEntryApplication", "..\
 		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDFileProcessing", "..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.vcproj", "{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B} = {CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}
-		{5A74ECB3-8B17-42B5-B77F-44C35D489A64} = {5A74ECB3-8B17-42B5-B77F-44C35D489A64}
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDFileProcessing", "..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.vcxproj", "{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMUtils", "..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code\FAMUtils.vcproj", "{5A74ECB3-8B17-42B5-B77F-44C35D489A64}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{8D5A15AB-D01C-4F24-9B0B-7FBB0D2A3F95} = {8D5A15AB-D01C-4F24-9B0B-7FBB0D2A3F95}
-		{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F} = {7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}
-		{D0465C3D-527B-4B21-8E07-79A6CB762CC9} = {D0465C3D-527B-4B21-8E07-79A6CB762CC9}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMUtils", "..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code\FAMUtils.vcxproj", "{5A74ECB3-8B17-42B5-B77F-44C35D489A64}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLServerInfo", "..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\SQLServerInfo\SQLServerInfo.csproj", "{8D5A15AB-D01C-4F24-9B0B-7FBB0D2A3F95}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging", "..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj", "{B2D07DE4-9192-4531-8854-DE03CE9B0B57}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegExprIV", "..\..\..\..\ReusableComponents\InputFunnel\InputValidators\RegExprIV\Code\RegExprIV.vcproj", "{D6FB7556-7F3C-4E40-BE84-46803C9C059B}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegExprIV", "..\..\..\..\ReusableComponents\InputFunnel\InputValidators\RegExprIV\Code\RegExprIV.vcxproj", "{D6FB7556-7F3C-4E40-BE84-46803C9C059B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandardLabDE.Test", "..\..\DEPs\StandardLabDE\Testing\Automated\StandardLabDE.Test.csproj", "{135A1E4D-B8B4-468E-A01F-34B6238EAB64}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
@@ -679,16 +161,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandardLabDE.Test", "..\..
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Testing.Utilities", "..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj", "{F3314BBE-B008-488D-A2E0-351C49D914D7}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabResultsCustomComponents", "..\..\..\AttributeFinder\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj", "{89C9999B-D0EB-4516-A2E2-F6DC87638839}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -698,154 +172,97 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabResultsCustomComponents"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Interop", "..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj", "{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder", "..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj", "{6DD0855C-6031-49F4-874C-667F3A576345}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{4D159D4B-37E4-4188-8490-9D1F2FA476B9}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactExporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj", "{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactImporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj", "{DEDE4275-343B-40C2-B336-040D3D182A44}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Imaging.Utilities", "..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcproj", "{E610E652-0891-40D4-B5CA-A622B87C7979}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Imaging.Utilities", "..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj", "{E610E652-0891-40D4-B5CA-A622B87C7979}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataEntryCustomComponents", "..\..\..\AttributeFinder\IndustrySpecific\DataEntry\DataEntryCustomComponents\Code\DataEntryCustomComponents.vcproj", "{63FCAC1B-4562-469C-B7C3-DF1D4386FB45}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
-		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
-		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
-		{5A74ECB3-8B17-42B5-B77F-44C35D489A64} = {5A74ECB3-8B17-42B5-B77F-44C35D489A64}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataEntryCustomComponents", "..\..\..\AttributeFinder\IndustrySpecific\DataEntry\DataEntryCustomComponents\Code\DataEntryCustomComponents.vcxproj", "{63FCAC1B-4562-469C-B7C3-DF1D4386FB45}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Forms", "..\..\..\..\RC.Net\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj", "{05449E7C-D300-4A2A-AD14-57CE9630B49B}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Database", "..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj", "{D0465C3D-527B-4B21-8E07-79A6CB762CC9}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Encryption", "..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcproj", "{C79815C7-A80A-41AA-AB02-F6AC83EFA579}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Encryption", "..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcxproj", "{C79815C7-A80A-41AA-AB02-F6AC83EFA579}"
 EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 69
-		ProjectRelativeDiskPath1 = ..\..\..\AttributeFinder\AFValueModifiers\Code\AFValueModifiers.vcproj
-		ProjectRelativeDiskPath2 = ..\..\..\AttributeFinder\AFValueFinders\Code\AFValueFinders.vcproj
-		ProjectRelativeDiskPath3 = ..\..\..\AttributeFinder\AFSelectors\Code\AFSelectors.vcproj
-		ProjectRelativeDiskPath4 = ..\..\..\AttributeFinder\AFPreProcessors\Code\AFPreProcessors.vcproj
-		ProjectRelativeDiskPath5 = ..\..\..\AttributeFinder\AFDataScorers\Code\AFDataScorers.vcproj
-		ProjectRelativeDiskPath6 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Core\Code\UCLIDTestingFrameworkCore.vcproj
-		ProjectRelativeDiskPath7 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.vcproj
-		ProjectRelativeDiskPath8 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcproj
-		ProjectRelativeDiskPath9 = ..\..\..\..\ReusableComponents\InputFunnel\OCRFilteringBase\Code\OCRFilteringBase.vcproj
-		ProjectRelativeDiskPath10 = ..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.vcproj
-		ProjectRelativeDiskPath11 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDExceptionMgmt\Code\UCLIDExceptionMgmt.vcproj
-		ProjectRelativeDiskPath12 = ..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj
-		ProjectRelativeDiskPath13 = ..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj
-		ProjectRelativeDiskPath14 = ..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcproj
-		ProjectRelativeDiskPath15 = ..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code\TopoUtils.vcproj
-		ProjectRelativeDiskPath16 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcproj
-		ProjectRelativeDiskPath17 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcproj
-		ProjectRelativeDiskPath18 = ..\..\..\AttributeFinder\AFConditions\Code\AFConditions.vcproj
-		ProjectRelativeDiskPath19 = ..\..\..\AttributeFinder\AFUtils\Code\AFUtils.vcproj
-		ProjectRelativeDiskPath20 = ..\..\..\..\ReusableComponents\COMComponents\ESMessageUtils\Code\ESMessageUtils.vcproj
-		ProjectRelativeDiskPath21 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code\SafeNetUtils.vcproj
-		ProjectRelativeDiskPath22 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\RWUtils\Code\RWUtils.vcproj
-		ProjectRelativeDiskPath23 = ..\..\..\AttributeFinder\AFCore\Code\AFCore.vcproj
-		ProjectRelativeDiskPath24 = ..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcproj
-		ProjectRelativeDiskPath25 = ..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj
-		ProjectRelativeDiskPath26 = ..\..\..\..\RC.Net\Core\Code\Extract.csproj
-		ProjectRelativeDiskPath27 = ..\..\..\..\RC.Net\DataEntry\Core\Code\Extract.DataEntry.csproj
-		ProjectRelativeDiskPath28 = ..\..\..\..\RC.Net\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj
-		ProjectRelativeDiskPath29 = ..\..\..\AttributeFinder\IndustrySpecific\DataEntry\DataEntryCustomComponents\Code\DataEntryCustomComponents.vcproj
-		ProjectRelativeDiskPath30 = ..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcproj
-		ProjectRelativeDiskPath31 = ..\..\..\AttributeFinder\AFSplitters\Code\AFSplitters.vcproj
-		ProjectRelativeDiskPath32 = ..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj
-		ProjectRelativeDiskPath33 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\SQLServerInfo\SQLServerInfo.csproj
-		ProjectRelativeDiskPath34 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code\FAMUtils.vcproj
-		ProjectRelativeDiskPath35 = ..\..\..\..\RC.Net\DataEntry\Utilities\DataEntryApplication\Core\Code\DataEntryApplication.csproj
-		ProjectRelativeDiskPath36 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\USBLicenseKeyManager\Code\USBLicenseKeyManager.vcproj
-		ProjectRelativeDiskPath37 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\ExtractTRP2\Code\ExtractTRP2.vcproj
-		ProjectRelativeDiskPath38 = ..\..\..\..\ReusableComponents\InputFunnel\InputValidators\GeneralIV\Code\GeneralIV.vcproj
-		ProjectRelativeDiskPath39 = ..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.vcproj
-		ProjectRelativeDiskPath40 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcproj
-		ProjectRelativeDiskPath41 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\SSOCR2.vcproj
-		ProjectRelativeDiskPath42 = ..\..\..\AttributeFinder\AFOutputHandlers\Code\AFOutputHandlers.vcproj
-		ProjectRelativeDiskPath43 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.vcproj
-		ProjectRelativeDiskPath44 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcproj
-		ProjectRelativeDiskPath45 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcproj
-		ProjectRelativeDiskPath46 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcproj
-		ProjectRelativeDiskPath47 = ..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj
-		ProjectRelativeDiskPath48 = ..\..\..\AttributeFinder\IndustrySpecific\County\CountyCustomComponents\Code\CountyCustomComponents.vcproj
-		ProjectRelativeDiskPath49 = ..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj
-		ProjectRelativeDiskPath50 = ..\..\..\AttributeFinder\AFCppUtils\Code\AFCppUtils.vcproj
-		ProjectRelativeDiskPath51 = ..\..\..\Utils\EncryptTextFile\Code\EncryptTextFile.vcproj
-		ProjectRelativeDiskPath52 = ..\..\..\..\RC.Net\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj
-		ProjectRelativeDiskPath53 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.vcproj
-		ProjectRelativeDiskPath54 = ..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj
-		ProjectRelativeDiskPath55 = ..\..\..\..\ReusableComponents\InputFunnel\InputValidators\RegExprIV\Code\RegExprIV.vcproj
-		ProjectRelativeDiskPath56 = ..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj
-		ProjectRelativeDiskPath57 = ..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj
-		ProjectRelativeDiskPath58 = ..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcproj
-		ProjectRelativeDiskPath59 = ..\..\DEPs\StandardLabDE\Core\Code\StandardLabDE.csproj
-		ProjectRelativeDiskPath60 = ..\..\..\Utils\UserLicense\Code\UserLicense.vcproj
-		ProjectRelativeDiskPath61 = ..\..\DEPs\StandardLabDE\Testing\Automated\StandardLabDE.Test.csproj
-		ProjectRelativeDiskPath62 = ..\..\..\AttributeFinder\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj
-		ProjectRelativeDiskPath63 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
-		ProjectRelativeDiskPath64 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
-		ProjectRelativeDiskPath65 = LabDE.sln
-		ProjectRelativeDiskPath66 = LabDE.sln
-		ProjectRelativeDiskPath67 = LabDE.sln
-		ProjectRelativeDiskPath68 = LabDE.sln
-		ProjectRelativeDiskPath69 = LabDE.sln
+		ProjectCount = 68
+		ProjectRelativeDiskPath1 = ..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcxproj
+		ProjectRelativeDiskPath2 = ..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj
+		ProjectRelativeDiskPath3 = ..\..\..\..\RC.Net\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj
+		ProjectRelativeDiskPath4 = ..\..\..\AttributeFinder\IndustrySpecific\DataEntry\DataEntryCustomComponents\Code\DataEntryCustomComponents.vcxproj
+		ProjectRelativeDiskPath5 = ..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj
+		ProjectRelativeDiskPath6 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
+		ProjectRelativeDiskPath7 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
+		ProjectRelativeDiskPath8 = ..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj
+		ProjectRelativeDiskPath9 = ..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj
+		ProjectRelativeDiskPath10 = ..\..\..\AttributeFinder\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj
+		ProjectRelativeDiskPath11 = ..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj
+		ProjectRelativeDiskPath12 = ..\..\DEPs\StandardLabDE\Testing\Automated\StandardLabDE.Test.csproj
+		ProjectRelativeDiskPath13 = ..\..\..\..\ReusableComponents\InputFunnel\InputValidators\RegExprIV\Code\RegExprIV.vcxproj
+		ProjectRelativeDiskPath14 = ..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj
+		ProjectRelativeDiskPath15 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\SQLServerInfo\SQLServerInfo.csproj
+		ProjectRelativeDiskPath16 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code\FAMUtils.vcxproj
+		ProjectRelativeDiskPath17 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.vcxproj
+		ProjectRelativeDiskPath18 = ..\..\..\..\RC.Net\DataEntry\Utilities\DataEntryApplication\Core\Code\DataEntryApplication.csproj
+		ProjectRelativeDiskPath19 = ..\..\..\..\RC.Net\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj
+		ProjectRelativeDiskPath20 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\USBLicenseKeyManager\Code\USBLicenseKeyManager.vcxproj
+		ProjectRelativeDiskPath21 = ..\..\..\Utils\UserLicense\Code\UserLicense.vcxproj
+		ProjectRelativeDiskPath22 = ..\..\..\Utils\EncryptTextFile\Code\EncryptTextFile.vcxproj
+		ProjectRelativeDiskPath23 = ..\..\..\AttributeFinder\AFCppUtils\Code\AFCppUtils.vcxproj
+		ProjectRelativeDiskPath24 = ..\..\..\AttributeFinder\IndustrySpecific\County\CountyCustomComponents\Code\CountyCustomComponents.vcxproj
+		ProjectRelativeDiskPath25 = ..\..\..\AttributeFinder\AFValueModifiers\Code\AFValueModifiers.vcxproj
+		ProjectRelativeDiskPath26 = ..\..\..\AttributeFinder\AFValueFinders\Code\AFValueFinders.vcxproj
+		ProjectRelativeDiskPath27 = ..\..\..\AttributeFinder\AFSplitters\Code\AFSplitters.vcxproj
+		ProjectRelativeDiskPath28 = ..\..\..\AttributeFinder\AFSelectors\Code\AFSelectors.vcxproj
+		ProjectRelativeDiskPath29 = ..\..\..\AttributeFinder\AFPreProcessors\Code\AFPreProcessors.vcxproj
+		ProjectRelativeDiskPath30 = ..\..\..\AttributeFinder\AFOutputHandlers\Code\AFOutputHandlers.vcxproj
+		ProjectRelativeDiskPath31 = ..\..\..\AttributeFinder\AFDataScorers\Code\AFDataScorers.vcxproj
+		ProjectRelativeDiskPath32 = LabDE.sln
+		ProjectRelativeDiskPath33 = LabDE.sln
+		ProjectRelativeDiskPath34 = LabDE.sln
+		ProjectRelativeDiskPath35 = LabDE.sln
+		ProjectRelativeDiskPath36 = LabDE.sln
+		ProjectRelativeDiskPath37 = ..\..\DEPs\StandardLabDE\Core\Code\StandardLabDE.csproj
+		ProjectRelativeDiskPath38 = ..\..\..\..\RC.Net\DataEntry\Core\Code\Extract.DataEntry.csproj
+		ProjectRelativeDiskPath39 = ..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj
+		ProjectRelativeDiskPath40 = ..\..\..\..\RC.Net\Core\Code\Extract.csproj
+		ProjectRelativeDiskPath41 = ..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj
+		ProjectRelativeDiskPath42 = ..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcxproj
+		ProjectRelativeDiskPath43 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcxproj
+		ProjectRelativeDiskPath44 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcxproj
+		ProjectRelativeDiskPath45 = ..\..\..\AttributeFinder\AFCore\Code\AFCore.vcxproj
+		ProjectRelativeDiskPath46 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\SafeNetUtils\Code\SafeNetUtils.vcxproj
+		ProjectRelativeDiskPath47 = ..\..\..\..\ReusableComponents\COMComponents\ESMessageUtils\Code\ESMessageUtils.vcxproj
+		ProjectRelativeDiskPath48 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcxproj
+		ProjectRelativeDiskPath49 = ..\..\..\AttributeFinder\AFUtils\Code\AFUtils.vcxproj
+		ProjectRelativeDiskPath50 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcxproj
+		ProjectRelativeDiskPath51 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcxproj
+		ProjectRelativeDiskPath52 = ..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code\TopoUtils.vcxproj
+		ProjectRelativeDiskPath53 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.vcxproj
+		ProjectRelativeDiskPath54 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\SSOCR2.vcxproj
+		ProjectRelativeDiskPath55 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj
+		ProjectRelativeDiskPath56 = ..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj
+		ProjectRelativeDiskPath57 = ..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj
+		ProjectRelativeDiskPath58 = ..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj
+		ProjectRelativeDiskPath59 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDExceptionMgmt\Code\UCLIDExceptionMgmt.vcxproj
+		ProjectRelativeDiskPath60 = ..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.vcxproj
+		ProjectRelativeDiskPath61 = ..\..\..\..\ReusableComponents\InputFunnel\OCRFilteringBase\Code\OCRFilteringBase.vcxproj
+		ProjectRelativeDiskPath62 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcxproj
+		ProjectRelativeDiskPath63 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.vcxproj
+		ProjectRelativeDiskPath64 = ..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.vcxproj
+		ProjectRelativeDiskPath65 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Core\Code\UCLIDTestingFrameworkCore.vcxproj
+		ProjectRelativeDiskPath66 = ..\..\..\..\ReusableComponents\InputFunnel\InputValidators\GeneralIV\Code\GeneralIV.vcxproj
+		ProjectRelativeDiskPath67 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\ExtractTRP2\Code\ExtractTRP2.vcxproj
+		ProjectRelativeDiskPath68 = ..\..\..\AttributeFinder\AFConditions\Code\AFConditions.vcxproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -994,21 +411,6 @@ Global
 		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}.Testing|Mixed Platforms.Build.0 = Release|Win32
 		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}.Testing|Win32.ActiveCfg = Release|Win32
 		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}.Testing|Win32.Build.0 = Release|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Debug|Win32.ActiveCfg = Debug|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Debug|Win32.Build.0 = Debug|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Release|Any CPU.ActiveCfg = Release|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Release|Win32.ActiveCfg = Release|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Release|Win32.Build.0 = Release|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Testing|Any CPU.ActiveCfg = Debug|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Testing|Mixed Platforms.ActiveCfg = Debug|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Testing|Mixed Platforms.Build.0 = Debug|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Testing|Win32.ActiveCfg = Debug|Win32
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B}.Testing|Win32.Build.0 = Debug|Win32
 		{3EDFA52F-F37C-4417-A818-EF4D254796FE}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{3EDFA52F-F37C-4417-A818-EF4D254796FE}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{3EDFA52F-F37C-4417-A818-EF4D254796FE}.Debug|Mixed Platforms.Build.0 = Debug|Win32
@@ -1824,12 +1226,33 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{FB0F348E-FB92-4F0E-8A7F-61911BDA41CE} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{3EDFA52F-F37C-4417-A818-EF4D254796FE} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{D026CB45-DFA8-4FD7-AE12-C6F05978187A} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{660413BE-8631-4C18-92C6-A28B3E550A57} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{47D4FFB4-9E64-4B78-8C36-F1B615F1B5AC} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{CC01AE64-6B4C-4FEE-8A87-B13941098A6A} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{C9BEB739-8C91-4201-9E94-2D5F650FB5AE} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{A2E13543-A708-49E3-BA6E-4FC6DFE31E7C} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{A7A54D3D-9716-469B-998C-5288B957B8F9} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{1BDB2A4E-7678-42C1-9828-5EF4F522AB21} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{23286748-A945-43F3-96DE-608B982703B4} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{B36F3199-54E2-44AF-8378-7829C06D4997} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{62844206-C3AE-4992-A13E-0EDC60B85E07} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{D6FB7556-7F3C-4E40-BE84-46803C9C059B} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
+		{9D9996E1-50BE-4506-B4A6-08F6B9D3F839} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{865B9A25-1D27-4445-9CC7-7BF88D736BA8} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{212E31D9-5F02-43AA-8625-BCB86B15CF8F} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{76781DE2-21D2-470C-B41D-598DC0C2640B} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
-		{9D9996E1-50BE-4506-B4A6-08F6B9D3F839} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{DC72C952-D6ED-42F6-893D-8262BC9D183E} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{B2D07DE4-9192-4531-8854-DE03CE9B0B57} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{F3314BBE-B008-488D-A2E0-351C49D914D7} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
@@ -1839,39 +1262,6 @@ Global
 		{05449E7C-D300-4A2A-AD14-57CE9630B49B} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{D0465C3D-527B-4B21-8E07-79A6CB762CC9} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
 		{C79815C7-A80A-41AA-AB02-F6AC83EFA579} = {4977A12F-F460-43CA-A8D4-908A2B1A41BC}
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{CF85AB16-A29D-49CA-8367-50E3F4D4AF7B} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{A1474E20-9B5F-4DF9-A400-490270BC7999} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{EBE90516-603A-4562-8B47-51234CBB9903} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{E7889662-1B92-485D-AFF2-AC673DD433BC} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{14D4D963-B656-4B04-ADD7-8F98FC4F664D} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{5A74ECB3-8B17-42B5-B77F-44C35D489A64} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{8D5A15AB-D01C-4F24-9B0B-7FBB0D2A3F95} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
-		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{3EDFA52F-F37C-4417-A818-EF4D254796FE} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{D026CB45-DFA8-4FD7-AE12-C6F05978187A} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{660413BE-8631-4C18-92C6-A28B3E550A57} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{47D4FFB4-9E64-4B78-8C36-F1B615F1B5AC} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{CC01AE64-6B4C-4FEE-8A87-B13941098A6A} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{C9BEB739-8C91-4201-9E94-2D5F650FB5AE} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{A2E13543-A708-49E3-BA6E-4FC6DFE31E7C} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{A7A54D3D-9716-469B-998C-5288B957B8F9} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{FB0F348E-FB92-4F0E-8A7F-61911BDA41CE} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{1BDB2A4E-7678-42C1-9828-5EF4F522AB21} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{23286748-A945-43F3-96DE-608B982703B4} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{B36F3199-54E2-44AF-8378-7829C06D4997} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{62844206-C3AE-4992-A13E-0EDC60B85E07} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
-		{D6FB7556-7F3C-4E40-BE84-46803C9C059B} = {C176C2B6-E77F-46FC-A935-A1177777F43D}
 		{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149} = {FB0F348E-FB92-4F0E-8A7F-61911BDA41CE}
 		{0D4ADC4E-90BB-4AAE-B89F-2CDE13306C62} = {FB0F348E-FB92-4F0E-8A7F-61911BDA41CE}
 		{835D9667-E21E-460F-BC05-EE5E39551CFA} = {FB0F348E-FB92-4F0E-8A7F-61911BDA41CE}
@@ -1881,6 +1271,17 @@ Global
 		{DD123185-5805-4DE9-9CA7-B69E2D14F0BA} = {FB0F348E-FB92-4F0E-8A7F-61911BDA41CE}
 		{1AF05090-95C1-48BF-8E74-3F05844B63B0} = {FB0F348E-FB92-4F0E-8A7F-61911BDA41CE}
 		{A29CD5B4-BFDC-44D4-B3FE-9A73248FCAB3} = {FB0F348E-FB92-4F0E-8A7F-61911BDA41CE}
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
+		{A1474E20-9B5F-4DF9-A400-490270BC7999} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
+		{EBE90516-603A-4562-8B47-51234CBB9903} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
+		{E7889662-1B92-485D-AFF2-AC673DD433BC} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
+		{14D4D963-B656-4B04-ADD7-8F98FC4F664D} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
+		{5A74ECB3-8B17-42B5-B77F-44C35D489A64} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
+		{8D5A15AB-D01C-4F24-9B0B-7FBB0D2A3F95} = {8CB8015B-0F66-423A-BD40-AABED74DE2CE}
 		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2} = {4D159D4B-37E4-4188-8490-9D1F2FA476B9}
 		{DEDE4275-343B-40C2-B336-040D3D182A44} = {4D159D4B-37E4-4188-8490-9D1F2FA476B9}
 	EndGlobalSection

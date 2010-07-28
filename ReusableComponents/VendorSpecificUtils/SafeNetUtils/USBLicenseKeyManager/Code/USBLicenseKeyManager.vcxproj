@@ -211,6 +211,10 @@
       <Project>{6fa06b83-ac26-49b7-8138-9342792eacc4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj">
+      <Project>{4a3a15dd-5c9d-4921-8d7e-3baf065fe984}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\..\Code\SafeNetUtils.vcxproj">
       <Project>{3edfa52f-f37c-4417-a818-ef4d254796fe}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

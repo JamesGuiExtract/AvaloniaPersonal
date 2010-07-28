@@ -275,6 +275,10 @@
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\BaseUtils\Code\BaseUtils.vcxproj">
+      <Project>{91b17d62-305c-4ea4-add2-72ac7fe8d0af}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcxproj">
       <Project>{7f591058-6dc9-4787-ae25-5a45ae78e3fa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

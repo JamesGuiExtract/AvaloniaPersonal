@@ -37,6 +37,9 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>Windows7.1SDK</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -240,6 +243,18 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code\FAMUtils.vcxproj">
       <Project>{5a74ecb3-8b17-42b5-b77f-44c35d489a64}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcxproj">
+      <Project>{6e3eeaf2-30a3-42be-be62-9cf2ba3702d2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\AFCore\Code\AFCore.vcxproj">
+      <Project>{83c2c49f-e325-4abf-b4eb-8125ee2dd4fa}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\AFUtils\Code\AFUtils.vcxproj">
+      <Project>{80e248c0-9aff-42bc-9cbf-b4274d19298c}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
