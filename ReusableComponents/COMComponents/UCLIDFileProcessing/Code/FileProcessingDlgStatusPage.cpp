@@ -61,6 +61,9 @@ static const int giFILE_PRIORITY_WIDTH = 80;
 static const int giPROGRESS_REFRESH_EVENTID = 1000;
 static const int giTIME_BETWEEN_PROGRESS_REFRESHES = 250; // milli-seconds
 
+static const char* gzPROGRESS_STATUS_DIALOG_PROG_ID =
+	"Extract.Utilties.Forms.ProgressStatusDialog";
+
 //-------------------------------------------------------------------------------------------------
 // FileProcessingDlgStatusPage property page
 //-------------------------------------------------------------------------------------------------
@@ -459,7 +462,7 @@ void FileProcessingDlgStatusPage::OnBtnClickedProgressDetails()
 		// If the progress details dialog has not yet been created, create the object
 		if (m_ipProgressStatusDialog == NULL)
 		{
-			m_ipProgressStatusDialog.CreateInstance(CLSID_ProgressStatusDialog);
+			m_ipProgressStatusDialog.CreateInstance(gzPROGRESS_STATUS_DIALOG_PROG_ID);
 			ASSERT_RESOURCE_ALLOCATION("ELI16257", m_ipProgressStatusDialog != NULL);
 		}
 
