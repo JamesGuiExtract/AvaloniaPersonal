@@ -15,6 +15,7 @@ PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 ExtractFlexCommonInstallFilesRootDir=P:\ExtractFlexCommon
 PDCommonDir=$(PDRootDir)\Common
 RCNETDir=$(EngineeringRootDirectory)\RC.Net
+StrongNameKeyDir=P:\StrongNameKey
 
 ExtractFlexCommonInstallDir=$(PDRootDir)\AttributeFinder\Installation\ExtractFlexCommon
 
@@ -41,40 +42,50 @@ CleanupExtractFlexCommonFiles:
 	@Deletefiles "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles\*.*"	
 	@Deletefiles "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles\*.*"	
 
-CopyExtractFlexCommonFiles: CleanupExtractFlexCommonFiles
+ObfuscateFiles: 
+	@ECHO Obfuscating .Net files...
+#	Copy the strong naming key to location dotfuscator xml file expects
+	@IF NOT EXIST "$(StrongNameKeyDir)" @MKDIR "$(StrongNameKeyDir)"
+	@COPY /V "$(RCNETDir)\Core\Code\ExtractInternalKey.snk" "$(StrongNameKeyDir)"
+	@IF NOT EXIST "$(BinariesFolder)\Obfuscated" @MKDIR "$(BinariesFolder)\Obfuscated"
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;C:\Program Files\Microsoft SDKs\Windows\v7.1\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages;C:\Program Files\PreEmptive Solutions\Dotfuscator Professional Edition 4.7
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Utilities.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Utilities.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Imaging.Forms.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Imaging.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Licensing.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Licensing.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Utilities.Forms.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Utilities.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Drawing.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Drawing.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Encryption.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Encryption.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Interop.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Interop.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Utilities.Parsers.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Utilities.Parsers.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Imaging.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Imaging.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated"  $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Imaging.Utilities.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Imaging.Utilities.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated"  $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Rules.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Rules.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	
+CopyExtractFlexCommonFiles: CleanupExtractFlexCommonFiles ObfuscateFiles
     @ECHO Copying the ExtractFlexCommon files to installation directory...
+	@COPY /v  "$(BinariesFolder)\Obfuscated\*.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
+	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Dotnet\Leadtools*.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
+	@COPY "$(RCNETDir)\APIs\Divelements\SandDock\bin\SandDock.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles" 
 	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Bin\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
 	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\pdf\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles\pdf" /v /s /e /y
     @XCOPY "$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Utilities.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Imaging.Forms.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Licensing.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Utilities.Forms.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Drawing.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Encryption.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Imaging.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Imaging.Utilities.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Interop.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Utilities.Parsers.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Rules.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_EXCEPTIONMGMTLib.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMUTILSLib.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_RASTERANDOCRMGMTLib.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_SSOCRLib.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"	
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMLMLib.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"	
-	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Dotnet\Leadtools*.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY "$(RCNETDir)\APIs\Divelements\SandDock\bin\SandDock.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles" 
-    @COPY /V "$(BinariesFolder)\UCLIDRasterAndOCRMgmt.dll" "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles"
-    @COPY /V "$(BinariesFolder)\UCLIDExceptionMgmt.dll" "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles"
-    @COPY /V "$(BinariesFolder)\UCLIDImageUtils.dll" "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles"
+	@COPY /V "$(BinariesFolder)\ZLibUtils.dll" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\TopoUtils.dll" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\leadutils.dll" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\UserLicense.exe" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\UEXViewer.exe" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"	
+	@COPY /V "$(BinariesFolder)\UCLIDExceptionMgmt.dll" "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles"
+	@COPY /V "$(BinariesFolder)\SSOCR2.Exe" "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles"
     @COPY /V "$(BinariesFolder)\SSOCR.dll" "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles"
-    @COPY /V "$(BinariesFolder)\ssocr2.Exe" "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles"
-    @COPY /V "$(BinariesFolder)\LeadUtils.dll" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
-    @COPY /V "$(BinariesFolder)\TopoUtils.dll" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
-    @COPY /V "$(BinariesFolder)\ZLibUtils.dll" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
-    @COPY /V "$(BinariesFolder)\UserLicense.Exe" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /v "$(BinariesFolder)\UEXViewer.exe" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
+    @COPY /V "$(BinariesFolder)\UCLIDImageUtils.dll" "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles"
+    @COPY /V "$(BinariesFolder)\UCLIDRasterAndOCRMgmt.dll" "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles"
+	
 
 # Create .rl files for registration
 	@DIR "$(ExtractFlexCommonInstallFilesRootDir)\SelfRegFiles\*.*" /b >"$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractFlexCommon.rl"
@@ -85,6 +96,6 @@ CopyExtractFlexCommonFiles: CleanupExtractFlexCommonFiles
 
 CreateExtractFlexCommonMergeModule: CopyExtractFlexCommonFiles
 	@ECHO Creating ExtractFlexCommon merge module...
-	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;C:\Program Files\Microsoft SDKs\Windows\v7.1\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(ExtractFlexCommonInstallDir)\ExtractFlexCommonMM.ism" "$(ReusableComponentsVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(ExtractFlexCommonInstallDir)\ExtractFlexCommonMM.ism"

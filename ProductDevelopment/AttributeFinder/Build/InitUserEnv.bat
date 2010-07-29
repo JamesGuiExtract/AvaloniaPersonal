@@ -8,11 +8,11 @@ IF DEFINED BUILD_LOCAL (
 SET BUILD_DIRECTORY=\temp
 SET PRODUCT_ROOT=Flex
 
-SET VISUAL_STUDIO=C:\Program Files\Microsoft Visual Studio 8
+SET VISUAL_STUDIO=C:\Program Files\Microsoft Visual Studio 10
 SET VB_DIR=%VISUAL_STUDIO%\VB
 SET VCPP_DIR=%VISUAL_STUDIO%\VC
 SET DevEnvDir=%VISUAL_STUDIO%\Common7\IDE
-SET VS_COMMON=C:\Program Files\Microsoft Visual Studio 8\Common7
+SET VS_COMMON=%VISUAL_STUDIO%\Common7
 SET VAULT_DIR=C:\Program Files\SourceGear\Vault Client
 
 SET INSTALL_SHIELD_DIR=C:\Program Files\InstallShield\InstallShield 5.5 Professional Edition

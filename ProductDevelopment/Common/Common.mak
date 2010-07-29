@@ -30,8 +30,8 @@ FXCopAppDirectory=C:\Program Files\Microsoft FxCop 1.36
 MergeModuleDir=C:\InstallShield 2010 Projects\MergeModules
 
 # Create macros for the Visual C++ include and lib directories
-VcppIncludeDirs=$(VCPP_DIR)\ATLMFC\INCLUDE;$(VCPP_DIR)\INCLUDE;$(VCPP_DIR)\PlatformSDK\include;$(VISUAL_STUDIO)\SDK\v2.0\include;
-VcppLibDirs=$(VCPP_DIR)\ATLMFC\LIB;$(VCPP_DIR)\LIB;$(VCPP_DIR)\PlatformSDK\lib;$(VISUAL_STUDIO)\SDK\v2.0\lib
+VcppIncludeDirs=$(VCPP_DIR)\ATLMFC\INCLUDE;$(VCPP_DIR)\INCLUDE;$(VCPP_DIR)\PlatformSDK\include;
+VcppLibDirs=$(VCPP_DIR)\ATLMFC\LIB;$(VCPP_DIR)\LIB;$(VCPP_DIR)\PlatformSDK\lib
 
 # Set the include and lib paths to the paths of all reusable components that 
 # are going to be used + the paths of VC++ itself
@@ -68,7 +68,7 @@ CommonEntryPoint:
 SetupBuildEnv:
 	@SET INCLUDE=$(IncludeDirs)
 	@SET LIB=$(LibDirs)
-	@SET LIBPATH=C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\ATLMFC\LIB
+	@SET LIBPATH=C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\ATLMFC\LIB
 	
 LabelCommonDir:
 	$(Label) $$/Engineering/ProductDevelopment/Common "$(FlexIndexVersion)"

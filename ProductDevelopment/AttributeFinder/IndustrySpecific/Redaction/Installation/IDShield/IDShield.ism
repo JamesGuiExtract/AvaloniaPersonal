@@ -317,10 +317,8 @@
 		<row><td>AllOtherFiles</td><td>{25F44821-B4A3-4899-8923-1DF407CD9581}</td><td>CommonAppDataFolder</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>AllOtherFiles1</td><td>{F6336EB2-D7C6-4A82-8F2B-9A769692C1A0}</td><td>EXTRACT_SYSTEMS1</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ExemptionCodes</td><td>{E5331F67-A907-472C-BC93-B4B8CAAD38BB}</td><td>EXEMPTION_CODES_DIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.Encryption.dll</td><td>{C40CB946-D860-425B-A9E1-66F19B0C15EC}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.encryption.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td>{DEC2B72C-0860-4D86-80E3-1D0DD6D14F94}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.verificati</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.dll</td><td>{BE1E239C-C3B7-4027-8488-645FC27F5851}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.Rules.dll</td><td>{1A392698-ACEB-43F5-9A89-24A6003D9C7D}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.rules.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FlexIndexComponents</td><td>{964AC833-306B-4B9B-9FFC-C7E885AB040B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td>This is for shortcuts to files installed with Flex Index Merge Module</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{D0D6E5DA-8D44-45F0-8FDD-325E3C7EE9D6}</td><td>HELP</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldComponents</td><td>{0B818341-9DC6-4923-B336-2FBC659BCF44}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -1160,10 +1158,8 @@
 		<row><td>Documentation</td><td>AllOtherFiles1</td></row>
 		<row><td>Documentation</td><td>Help</td></row>
 		<row><td>IDShieldMain</td><td>ExemptionCodes</td></row>
-		<row><td>IDShieldMain</td><td>Extract.Encryption.dll</td></row>
 		<row><td>IDShieldMain</td><td>Extract.Redaction.Verification.dll</td></row>
 		<row><td>IDShieldMain</td><td>Extract.Redaction.dll</td></row>
-		<row><td>IDShieldMain</td><td>Extract.Rules.dll</td></row>
 		<row><td>IDShieldMain</td><td>FlexIndexComponents</td></row>
 		<row><td>IDShieldMain</td><td>IDShieldComponents</td></row>
 		<row><td>IDShieldMain</td><td>IDShieldReports</td></row>
@@ -1189,10 +1185,8 @@
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
 		<row><td>RedactionCC.dll</td><td>RedactionCC.dll</td><td>REDACT~1.DLL|RedactionCC.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGIDSHIELD_FILES&gt;\RedactionCC.dll</td><td>17</td><td/></row>
-		<row><td>extract.encryption.dll</td><td>Extract.Encryption.dll</td><td>EXTRAC~1.DLL|Extract.Encryption.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Encryption.dll</td><td>17</td><td/></row>
 		<row><td>extract.redaction.dll</td><td>Extract.Redaction.dll</td><td>EXTRAC~1.DLL|Extract.Redaction.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Redaction.dll</td><td>17</td><td/></row>
 		<row><td>extract.redaction.verificati</td><td>Extract.Redaction.Verification.dll</td><td>EXTRAC~1.DLL|Extract.Redaction.Verification.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Redaction.Verification.dll</td><td>17</td><td/></row>
-		<row><td>extract.rules.dll</td><td>Extract.Rules.dll</td><td>EXTRAC~1.DLL|Extract.Rules.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Rules.dll</td><td>17</td><td/></row>
 		<row><td>idshieldstatisticsreporter.e</td><td>IDShieldStatisticsReporter.exe</td><td>IDSHIE~1.EXE|IDShieldStatisticsReporter.exe</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_DOTNETGAC_FILES&gt;\IDShieldStatisticsReporter.exe</td><td>17</td><td/></row>
 		<row><td>interop.extractredactiontest</td><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>INTERO~1.DLL|Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_DOTNETGAC_FILES&gt;\Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>17</td><td/></row>
 		<row><td>interop.uclid_redactioncusto</td><td>Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>INTERO~1.DLL|Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>17</td><td/></row>
@@ -1451,10 +1445,8 @@
 		<row><td>AllOtherFiles</td><td/><td/><td>_4B5C452A_C152_488C_AEBC_AA2C8F474299_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>AllOtherFiles1</td><td/><td/><td>_F6B99F40_CB08_48C8_8206_995C08B31EA3_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ExemptionCodes</td><td/><td/><td>_DC4F41A0_2184_486F_85BC_827E04CF07BD_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Extract.Encryption.dll</td><td/><td/><td>_151FC60A_1FF5_4B21_8F6B_616776C2930F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td/><td/><td>_9455B052_64C2_4C44_BABF_F480528B2F4B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.dll</td><td/><td/><td>_B4448636_A587_4E5B_B2D0_3EC1207C1F4A_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Extract.Rules.dll</td><td/><td/><td>_46519FBD_05FD_4D9D_9473_D960534F3EB3_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FlexIndexComponents</td><td/><td/><td>_CF3653D1_3395_4E45_AEBD_D8C55EF5394F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Help</td><td/><td/><td>_3ACFFCEB_AE1A_434B_9D94_435E77C7116E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IDShieldComponents</td><td/><td/><td>_7BA39CA3_0BE0_42F1_BA2D_6E291210E2AD_FILTER</td><td/><td/><td/><td/></row>

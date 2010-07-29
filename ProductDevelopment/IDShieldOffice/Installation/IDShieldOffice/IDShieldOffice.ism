@@ -1531,6 +1531,8 @@
 		<col key="yes" def="s255">ISMergeModule_</col>
 		<col key="yes" def="i2">Language_</col>
 		<row><td>DefaultFeature</td><td>VC_User_ATL71.15ACF2F5_9BDB_4FFF_9C85_9814946343FF</td><td>0</td></row>
+		<row><td>DefaultFeature</td><td>VC_User_CRT71.07D8793C_DC93_47EF_8FDA_3517BC941A0F</td><td>0</td></row>
+		<row><td>DefaultFeature</td><td>VC_User_STL71.09528776_2EA8_4A65_AA88_693146381D7D</td><td>0</td></row>
 		<row><td>Shortcuts</td><td>ExtractFlexCommonMM.BCD531AF_AE91_4ED0_8B2F_F7EA7D90E806</td><td>0</td></row>
 	</table>
 
@@ -1655,8 +1657,13 @@
 		<col def="s255">Name</col>
 		<col def="S255">Destination</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>ExtractFlexCommonMM.BCD531AF_AE91_4ED0_8B2F_F7EA7D90E806</td><td>0</td><td>Extract Flex Common Merge Module</td><td/><td/></row>
+		<row><td>ATL.97F81AF1_0E47_DC99_FF1F_C8B3B9A1E18E</td><td>0</td><td>Visual C++ 8.0 ATL (x86) WinSXS MSM</td><td/><td/></row>
+		<row><td>CRT.98CB24AD_52FB_DB5F_FF1F_C8B3B9A1E18E</td><td>0</td><td>Visual C++ 8.0 CRT (x86) WinSXS MSM</td><td/><td/></row>
+		<row><td>ExtractFlexCommonMM.BCD531AF_AE91_4ED0_8B2F_F7EA7D90E806</td><td>0</td><td>Extract Flex Common</td><td/><td/></row>
+		<row><td>MFC.9BAE13A2_E7AF_D6C3_FF1F_C8B3B9A1E18E</td><td>0</td><td>Visual C++ 8.0 MFC (x86) WinSXS MSM</td><td/><td/></row>
 		<row><td>VC_User_ATL71.15ACF2F5_9BDB_4FFF_9C85_9814946343FF</td><td>0</td><td>VC User ATL71 RTL X86 ---</td><td>[COMMONCOMPONENTS]</td><td/></row>
+		<row><td>VC_User_CRT71.07D8793C_DC93_47EF_8FDA_3517BC941A0F</td><td>0</td><td>VC User CRT71 RTL X86 ---</td><td>[COMMONCOMPONENTS]</td><td/></row>
+		<row><td>VC_User_STL71.09528776_2EA8_4A65_AA88_693146381D7D</td><td>0</td><td>VC User STL71 RTL X86 ---</td><td>[COMMONCOMPONENTS]</td><td/></row>
 	</table>
 
 	<table name="ISMergeModuleCfgValues">

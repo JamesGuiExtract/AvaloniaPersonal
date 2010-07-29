@@ -51,9 +51,9 @@
 	
 	<summary>
 		<codepage>1252</codepage>
-		<title>Installation Database</title>
-		<subject>Blank Merge Module Project Template</subject>
-		<author>InstallShield</author>
+		<title>##ID_STRING1##</title>
+		<subject>##ID_STRING2##</subject>
+		<author>##ID_STRING3##</author>
 		<keywords>MergeModule,MSI,Database</keywords>
 		<comments>Contact:  Your local administrator</comments>
 		<template>Intel;1033</template>
@@ -1001,6 +1001,9 @@
 		<col def="I2">Encoded</col>
 		<col def="S0">Comment</col>
 		<col def="I4">TimeStamp</col>
+		<row><td>ID_STRING1</td><td>1033</td><td>Extract Flex Common Merge Module</td><td>0</td><td/><td>-341940051</td></row>
+		<row><td>ID_STRING2</td><td>1033</td><td>Extract Flex Common</td><td>0</td><td/><td>-341923667</td></row>
+		<row><td>ID_STRING3</td><td>1033</td><td>Extract Systems, LLC</td><td>0</td><td/><td>-341913427</td></row>
 	</table>
 
 	<table name="ISVirtualDirectory">
@@ -1249,7 +1252,7 @@ QwBEAFIATwBNAAEATQBlAGQAaQBhAA==
 		<col key="yes" def="s255">RequiredID</col>
 		<col key="yes" def="i2">RequiredLanguage</col>
 		<col def="S32">RequiredVersion</col>
-		<row><td>ExtractFlexCommonMM.BCD531AF_AE91_4ED0_8B2F_F7EA7D90E806</td><td>0</td><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>8.1.0.54</td></row>
+		<row><td>ExtractFlexCommonMM.BCD531AF_AE91_4ED0_8B2F_F7EA7D90E806</td><td>0</td><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>1.0.0.0</td></row>
 	</table>
 
 	<table name="ModuleExclusion">
