@@ -54,7 +54,7 @@ IF "%BUILD_FROM_SVN%"=="YES" (
 	CD ..\..\Common
 	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$/Engineering/ProductDevelopment/Common" %1
 	CD ..\AttributeFinder\Build
-	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0" "$/Engineering/ProductDevelopment/AttributeFinder/Build" %1
+	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\" "$/Engineering/ProductDevelopment/AttributeFinder/Build" %1
 )
 
 Rem Remove previous build directory if it exists
