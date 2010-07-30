@@ -14,7 +14,7 @@ SET VCPP_DIR=%VISUAL_STUDIO%\VC
 SET DevEnvDir=%VISUAL_STUDIO%\Common7\IDE
 SET VS_COMMON=%VISUAL_STUDIO%\Common7
 SET VAULT_DIR=C:\Program Files\SourceGear\Vault Client
-SET WINDOWS_SDK=C:\C:\Program Files\Microsoft SDKs\Windows\v7.1
+SET WINDOWS_SDK=C:\Program Files\Microsoft SDKs\Windows\v7.1
 
 SET INSTALL_SHIELD_DIR=C:\Program Files\InstallShield\InstallShield 5.5 Professional Edition
 SET WINZIP_DIR=C:\Program Files\WinZip
