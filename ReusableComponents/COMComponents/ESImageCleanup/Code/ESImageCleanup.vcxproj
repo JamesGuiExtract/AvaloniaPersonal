@@ -94,7 +94,7 @@
     <Link>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltann_u.lib;ltimgefx_u.lib;Ltimgclr_u.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\..\..\..\binaries\debug/ESImageCleanup.dll</OutputFile>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\APIs\LeadTools_16.5\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\ESImageCleanup.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -135,7 +135,7 @@
     <Link>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltann_u.lib;ltimgefx_u.lib;Ltimgclr_u.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\..\..\..\binaries\release/ESImageCleanup.dll</OutputFile>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\APIs\LeadTools_16.5\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\ESImageCleanup.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -144,6 +144,11 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
