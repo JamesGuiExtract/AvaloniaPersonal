@@ -46,6 +46,7 @@ ClearImageInstallFilesDir=P:\AttributeFinder\ClearImageFiles
 
 InternalUseBuildFilesArchive=P:\AttributeFinder\Archive\InternalUseBuildFiles\InternalBuilds\$(FlexIndexVersion)
 
+StrongNameKeyDir=P:\StrongNameKey
 
 # determine the name of the release output directory based upon the build
 # configuration that is being built
@@ -121,7 +122,7 @@ EncryptAndCopyComponentDataFiles:
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
     @ECHO $(FKBVersion) > "$(AFCoreInstallFilesRootDir)\ComponentData\FKBVersion.txt"
 
-CopyFilesToInstallFolder: BuildPDUtils CleanupPreviousBuildFolders ObfuscateFiles
+CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @ECHO Copying the AttributeFinderCore files to installation directory...
 	@COPY /v  "$(BinariesFolder)\UCLIDAFConditions.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @COPY /v  "$(BinariesFolder)\UCLIDAFCore.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
@@ -232,7 +233,7 @@ CopyFilesToInstallFolder: BuildPDUtils CleanupPreviousBuildFolders ObfuscateFile
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\mssccprj.scc"
 	@DeleteFiles "$(ClearImageInstallFilesDir)\vssver.scc"
 	
-CleanupPreviousBuildFolders:
+CleanupPreviousBuildFolders: CleanUpMergeModulesFromPreviousBuilds
 	@ECHO Removing files from previous builds...
 	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\SelfRegFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\SelfRegFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
@@ -257,7 +258,7 @@ CleanupPreviousBuildFolders:
 	@Deletefiles "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\*.*"
 	@Deletefiles "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles\*.*"	
 	
-CleanUpMergeModulesFromPreviousBuilds:
+CleanUpMergeModulesFromPreviousBuilds: 
 	@ECHO Deleting old merge modules....
 	@DeleteFiles "$(MergeModuleDir)\DataEntry.msm"
 	@DeleteFiles "$(MergeModuleDir)\UCLIDFlexIndex.msm"
@@ -280,7 +281,7 @@ MakeExtractFlexCommonMergeModule: MakeExtractCommonMergeModule
     @CD "$(AFRootDirectory)\Build
     @nmake /F ExtractFlexCommon.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" CreateExtractFlexCommonMergeModule
 	
-BuildAFCoreMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles MakeExtractFlexCommonMergeModule 
+BuildAFCoreMergeModule: CreateVersionISImportFile CleanupPreviousBuildFolders MakeExtractFlexCommonMergeModule CopyFilesToInstallFolder EncryptAndCopyComponentDataFiles  
     @ECHO Buliding the UCLIDFlexIndex Merge Module installation...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\bin;;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(WINDOWS_SDK)\BIN;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(AFCoreMergeModuleInstallRoot)\UCLID FlexIndex.ism" "$(FlexIndexVersion)"
