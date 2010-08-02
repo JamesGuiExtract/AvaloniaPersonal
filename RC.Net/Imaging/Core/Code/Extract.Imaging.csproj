@@ -230,7 +230,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"
-$(FrameworkDir)$(FrameworkVersion)\RegAsm "$(TargetPath)" /tlb:"$(ProjectDir)$(TargetName).tlb"</PostBuildEvent>
+    <PostBuildEvent>$(FrameworkDir)$(FrameworkVersion)\RegAsm "$(TargetPath)" /tlb:"$(ProjectDir)$(TargetName).tlb"
+CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
