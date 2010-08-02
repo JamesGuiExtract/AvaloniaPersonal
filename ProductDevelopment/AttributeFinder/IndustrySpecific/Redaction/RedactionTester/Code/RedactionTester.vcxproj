@@ -136,7 +136,7 @@
     <Link>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>comsvcs.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\..\..\..\..\..\Binaries\Release/RedactionTester.dll</OutputFile>
+      <OutputFile>..\..\..\..\..\..\Binaries\$(Configuration)\$(TargetFileName)</OutputFile>
       <ModuleDefinitionFile>.\RedactionTester.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
