@@ -299,10 +299,6 @@
       <Project>{7f591058-6dc9-4787-ae25-5a45ae78e3fa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.vcxproj">
-      <Project>{b1376860-a6f2-432f-aa51-c14aec90afcf}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
