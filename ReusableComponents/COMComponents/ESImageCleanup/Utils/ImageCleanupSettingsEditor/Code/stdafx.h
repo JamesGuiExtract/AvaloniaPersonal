@@ -35,9 +35,6 @@ using namespace UCLID_COMUTILSLib;
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 
-#import "..\..\..\..\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb" named_guids
-using namespace UCLID_FILEPROCESSINGLib;
-
 #import "..\..\..\Code\ESImageCleanup.tlb" named_guids
 using namespace ESImageCleanupLib;
 
