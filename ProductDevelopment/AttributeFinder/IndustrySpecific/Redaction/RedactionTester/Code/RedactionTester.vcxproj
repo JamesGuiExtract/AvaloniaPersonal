@@ -92,7 +92,7 @@
     <Link>
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>mfcs100d.lib;MSVCRTD.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\..\..\..\..\..\Binaries\Debug/RedactionTester.dll</OutputFile>
+      <OutputFile>..\..\..\..\..\..\Binaries\$(Configuration)\$(TargetFileName)</OutputFile>
       <IgnoreSpecificDefaultLibraries>MSVCRTD.lib;mfcs100d.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ModuleDefinitionFile>.\RedactionTester.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
