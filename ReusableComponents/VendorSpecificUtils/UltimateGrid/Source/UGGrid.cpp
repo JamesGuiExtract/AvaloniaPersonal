@@ -447,7 +447,9 @@ void CUGGrid::DrawCellsIntern(CDC *dc,CDC *db_dc)
 				CopyRect(&tempRect,&cellRect);
 				if(row == m_GI->m_currentRow && ( col == m_GI->m_currentCol || m_GI->m_highlightRowFlag))
 				{
-					if(m_GI->m_multiSelect->IsSelected(col,row,&selectBlock))
+					// 8/3/2010 SNK
+					// In the hybrid theme, support the selection state for cells that are also current.
+					if(UGXPThemes::UseHybridThemes() && m_GI->m_multiSelect->IsSelected(col,row,&selectBlock))
 						cellType->OnDraw(dc,&cellRect,col,row,&cell,selectBlock+1,1);
 					else
 						cellType->OnDraw(dc,&cellRect,col,row,&cell,0,1);

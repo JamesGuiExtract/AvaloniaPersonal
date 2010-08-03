@@ -417,7 +417,11 @@ void CUGCTDropGrid::OnDraw(CDC *dc,RECT *rect,int col,long row,CUGCell *cell,int
 		DrawBorder(dc,rect,&rectout,cell);
 	}
 
-	if (!m_useThemes || !UGXPThemes::DrawBackground(NULL, *dc, L"COMBOBOX", 1, 0, &rectout, NULL))
+	// 8/3/2010 SNK
+	// When using hybrid themes, we still want the borders drawn since we are not going to be
+	// drawing the funny bubble interiors of full themes.
+	if (!m_useThemes || UGXPThemes::UseHybridThemes() ||
+		!UGXPThemes::DrawBackground(NULL, *dc, L"COMBOBOX", 1, 0, &rectout, NULL))
 	{
 		//fill the border in
 		dc->FillRect(&rectout,&m_brush);

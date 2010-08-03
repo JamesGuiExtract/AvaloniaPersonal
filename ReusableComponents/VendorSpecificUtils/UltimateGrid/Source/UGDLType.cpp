@@ -555,10 +555,22 @@ void CUGDropListType::OnDraw(CDC *dc,RECT *rect,int col,long row,CUGCell *cell,i
 			}
 		}
 	}
+	else if (UGXPThemes::UseHybridThemes())
+	{
+		// 8/3/2010 SNK
+		// The hybrid theme should continue to draw the normal cell borders to achieve normal
+		// gridlines.
+		DrawBorder(dc,rect,rect,cell);
+	}
 
 	//draw the text in using the default drawing routine
 	rect->left = left;
-	rect->right -= (int) (fScale * m_btnWidth+1);
+
+	// 8/3/2010 SNK
+	// The adjustment here is accounting for the funny border that is drawn in cell when full
+	// themes are enabled. If hybrid themes are enabled, the text needs to drawn a pixel
+	// further instead to obscure the area where the funny border would have been.
+	rect->right -= (int) (fScale * m_btnWidth + (UGXPThemes::UseHybridThemes() ? -1 : 1));
 
 	DrawText(dc,rect,0,col,row,cell,selected,current);
 }
@@ -657,7 +669,12 @@ int CUGDropListType::StartDropList()
 	len = (int)list.GetCount();
 	if(len >15)
 		len = 15;
-	rect.bottom += lf.lfHeight * len + 6;
+
+	// 8/3/2010 SNK
+	// I can't figure out why, but after the len gets > 4, the box seems to be drawn one row shorter
+	// that it should be. Showing an extra row is less of an issue that not showing a big enough
+	// list box, so pad an extra row here.
+	rect.bottom += lf.lfHeight * (len + 1) + 6;
 	
 	m_ctrl->m_CUGGrid->GetClientRect(&clientRect);
 	if(rect.bottom > clientRect.bottom){

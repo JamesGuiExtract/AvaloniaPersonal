@@ -1039,7 +1039,9 @@ void CUGCellType::DrawBackground(CDC *dc,RECT *rect,COLORREF backcolor, int row,
 	{
 		UGXPThemeState state = UGXPThemes::GetState(selected, current);
 
-		if (m_useThemes)
+		// 8/3/2010 SNK
+		// The hybrid theme doesn't include UG's silly bubble background for cells.
+		if (m_useThemes && !UGXPThemes::UseHybridThemes())
 		{
 			RECT rcTheme = *rect;
 

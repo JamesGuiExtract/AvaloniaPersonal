@@ -90,15 +90,17 @@ void CQueueGrid::OnSetup()
 
 	try
 	{
-		UGXPThemes::UseThemes(true);
-		UGXPThemes::SetGridStyle(Style2);
+		UGXPThemes::UseHybridThemes(true);
+		UGXPThemes::SetGridStyle(Style1);
 	
 		CHECK_UG_RETURN_VALUE("ELI30444", SetHighlightRow(TRUE));
 		CHECK_UG_RETURN_VALUE("ELI30445", SetSH_Width(0));
 		CHECK_UG_RETURN_VALUE("ELI30446", SetNumberCols(5));
 
 		CUGCell cell;
-		cell.UseThemes(true);
+		// As it stands, the header theme looks quite different from the standard XP theme.
+		// For now, disable themes in the header.
+		cell.UseThemes(false);
 		CHECK_UG_RETURN_VALUE("ELI30447", cell.CopyInfoFrom(m_GI->m_hdgDefaults));
 		cell.SetXPStyle(XPCellTypeTopCol);
 		CHECK_UG_RETURN_VALUE("ELI30449", cell.SetFont(&m_font));
@@ -1389,22 +1391,21 @@ void CQueueGrid::InsertRow(int index)
 		CUGCell cell;
 		cell.UseThemes(true);
 		CHECK_UG_RETURN_VALUE("ELI30490", cell.CopyInfoFrom(m_GI->m_gridDefaults));
-		cell.SetXPStyle(XPCellTypeData);
 		CHECK_UG_RETURN_VALUE("ELI30474", cell.SetFont(&m_font));
 
 		// Enabled
+		cell.SetXPStyle(XPCellTypeButton);
 		CHECK_UG_RETURN_VALUE("ELI30475", cell.SetCellType(UGCT_CHECKBOX));
 		CHECK_UG_RETURN_VALUE("ELI30476",
-			cell.SetCellTypeEx(UGCT_CHECKBOX3DRECESS | UGCT_CHECKBOXCHECKMARK));
+			cell.SetCellTypeEx(UGCT_CHECKBOX3DRECESS | UGCT_CHECKBOXCHECKMARK | UGCT_CHECKBOXUSEALIGN));
+		CHECK_UG_RETURN_VALUE("ELI30510", cell.SetAlignment(UG_ALIGNCENTER|UG_ALIGNVCENTER));
 		CHECK_UG_RETURN_VALUE("ELI30477", SetCell(0, index, &cell));
 
 		// Force Processing
-		CHECK_UG_RETURN_VALUE("ELI30478", cell.SetCellTypeEx(UGCT_CHECKBOX));
-		CHECK_UG_RETURN_VALUE("ELI30479",
-			cell.SetCellTypeEx(UGCT_CHECKBOX3DRECESS | UGCT_CHECKBOXCHECKMARK));
 		CHECK_UG_RETURN_VALUE("ELI30480", SetCell(1, index, &cell));
 
 		// Priority
+		cell.SetXPStyle(XPCellTypeData);
 		CHECK_UG_RETURN_VALUE("ELI30481", cell.SetCellType(UGCT_DROPLIST));
 		CHECK_UG_RETURN_VALUE("ELI30482", cell.SetLabelText(m_strPriorities.c_str()));
 		CHECK_UG_RETURN_VALUE("ELI30483", SetCell(2, index, &cell));

@@ -365,6 +365,15 @@ LookupThemeData
 
 		UGThemeData * td = m_themeData[type | state];
 
+		// 8/3/2010 SNK
+		// The theme data doesn't always include info for selection states (since the original UG
+		// grid didn't really support a selection state). Falling back on the normal state seems to
+		// work okay.
+		if (td == NULL && UGXPThemes::UseHybridThemes())
+		{
+			td = m_themeData[type | ThemeStateNormal];
+		}
+
 		return td;
 	}
 
@@ -373,6 +382,7 @@ LookupThemeData
 // Initialise static variables.
 HMODULE UGXPThemes::m_huxtheme = NULL;
 bool UGXPThemes::useThemes = false;
+bool UGXPThemes::useHybridThemes = false;
 bool UGXPThemes::drawEdgeBorder = true;
 UGXPThemeStyles UGXPThemes::m_style = Style1;
 
@@ -1151,7 +1161,9 @@ bool UGXPThemes::DrawEdge(HWND hwnd, HDC hdc, UGXPCellType type, UGXPThemeState 
 {
 	bool success = false;
 
-	if (useThemes)
+	// 8/3/2010 SNK
+	// The UG theme's cell edging is not included in the hybrid theme.
+	if (useThemes && !useHybridThemes)
 	{
 		UGThemeData * td = LookupThemeData(type, state);
 
@@ -1296,7 +1308,9 @@ bool UGXPThemes::DrawEdge(HWND hwnd, HDC hdc, LPCWSTR theme, int partID, int sta
 {
 	bool success = false;
 
-	if (useThemes)
+	// 8/3/2010 SNK
+	// The UG theme's cell edging is not included in the hybrid theme.
+	if (useThemes && !useHybridThemes)
 	{
 		HANDLE themeHandle = OpenThemeData(hwnd, theme);
 

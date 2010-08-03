@@ -34,6 +34,7 @@ private:
 	static UGXPThemeStyles m_style;
 	static HMODULE m_huxtheme;
 	static bool useThemes;
+	static bool useHybridThemes;
 	static bool drawEdgeBorder;
 public:
 	virtual ~UGXPThemes();
@@ -102,6 +103,19 @@ public:
 
 	static bool UseThemes() { return useThemes; }
 	static void UseThemes(bool use) { useThemes = use; }
+
+	// 8/3/2010 SNK
+	// UG's idea of themes seems to be manually drawing stuff that shares traits with the true XP
+	// theme in that things are drawn "bubbly", but the final result really isn't a direct
+	// application of the XP theme. In particular, the most marked departure from the standard XP
+	// theme is the use of bubble-like borders around each cell rather than a standard grid.
+	// The presentation of these appear to not even be standardized accross different types of
+	// UG cells.
+	// Therefore, I have created a "Hybrid" theme state which will still take advantage of controls
+	// elements that are drawn fairly true to the XP theme versions (such as checkboxes and buttons)
+	// but which uses the non-themed grid lines and cell borders/backgrounds.
+	static bool UseHybridThemes() { return useHybridThemes && useThemes; }
+	static void UseHybridThemes(bool use) { useHybridThemes = useThemes = use; }
 
 	static void DrawBorderEdges(bool draw) { drawEdgeBorder = draw; }
 	static bool DrawBorderEdges() { return drawEdgeBorder; }
