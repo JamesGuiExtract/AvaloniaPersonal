@@ -9,7 +9,6 @@
 #include <UCLIDException.h>
 #include <TemporaryResourceOverride.h>
 #include <RegistryPersistenceMgr.h>
-#include <FileDialogEx.h>
 #include <cpputil.h>
 
 #include <RegConstants.h>
@@ -268,7 +267,7 @@ void CTestHarnessDlg::OnBtnBrowse()
 			zFileType = "ITC files (*.itc)|*.itc||";
 		}
 
-		CFileDialogEx openDialog(TRUE, NULL, NULL, OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		CFileDialog openDialog(TRUE, NULL, NULL, OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			zFileType, this);
 		
 		// Pass the pointer of dialog to create ThreadDataStruct object

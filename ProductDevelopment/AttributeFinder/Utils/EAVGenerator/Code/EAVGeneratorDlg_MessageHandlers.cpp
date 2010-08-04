@@ -7,7 +7,6 @@
 #include <UCLIDException.h>
 #include <RequiredInterfaces.h>
 #include <AFCategories.h>
-#include <FileDialogEx.h>
 #include <cpputil.h>
 #include <comutils.h>
 #include <LicenseMgmt.h>
@@ -585,7 +584,7 @@ void CEAVGeneratorDlg::OnBtnSaveas()
 		strEAVFileName = getFileNameWithoutExtension( strEAVFileName );
 		
 		// save file dialog
-		CFileDialogEx saveFileDlg(FALSE, "eav", strEAVFileName.c_str(), 
+		CFileDialog saveFileDlg(FALSE, "eav", strEAVFileName.c_str(), 
 			OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR, gstrSAVE_FILE_FILTER.c_str(), NULL);
 		while(true)
 		{
@@ -664,7 +663,7 @@ void CEAVGeneratorDlg::OnBtnOpen()
 		}
 
 		// show open file dialog
-		CFileDialogEx openFileDlg( TRUE, NULL, NULL, 
+		CFileDialog openFileDlg( TRUE, NULL, NULL, 
 			OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gstrOPEN_FILE_FILTER.c_str(), NULL);
 		if (openFileDlg.DoModal() == IDOK)

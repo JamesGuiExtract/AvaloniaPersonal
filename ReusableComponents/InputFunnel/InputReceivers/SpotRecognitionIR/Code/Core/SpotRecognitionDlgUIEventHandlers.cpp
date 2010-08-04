@@ -13,7 +13,6 @@
 #include <TemporaryResourceOverride.h>
 #include <MRUList.h>
 #include <CursorToolTipCtrl.h>
-#include <FileDialogEx.h>
 #include <Win32Util.h>
 #include <MiscLeadUtils.h>
 #include <COMUtils.h>
@@ -287,7 +286,7 @@ void SpotRecognitionDlg::OnBTNOpenImage()
 		string strDefaultDir = (ma_pSRIRCfgMgr->getLastFileOpenDirectory()).c_str();
 
 		// bring up the open dialog box here....
-		CFileDialogEx openDialog(TRUE, NULL, NULL, OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		CFileDialog openDialog(TRUE, NULL, NULL, OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			"All image files|*.bmp*;*.rle*;*.dib*;*.rst*;*.gp4*;*.mil*;*.cal*;*.cg4*;*.flc*;*.fli*;*.gif*;*.jpg*;*.pcx*;*.pct*;*.png*;*.tga*;*.tif*;*.pdf*|"
 			"GDD files|*.gdd|"
 			"BMP files (*.bmp;*.rle;*.dib)|*.bmp*;*.rle*;*.dib*|"
@@ -337,7 +336,7 @@ void SpotRecognitionDlg::OnBTNSave()
 		deleteTemporaryHighlight();
 
 		// bring up the save dialog box here....
-		CFileDialogEx saveDialog
+		CFileDialog saveDialog
 			(FALSE, 
 			"gdd", 
 			strDefaultFileName.c_str(), 

@@ -32,7 +32,6 @@
 #include <MRUList.h>
 #include <ComUtils.h>
 #include <PromptDlg.h>
-#include <FileDialogEx.h>
 
 using namespace std;
 
@@ -182,7 +181,7 @@ void CRuleSetEditor::OnFileSaveas()
 		validateRuleSetCanBeSaved();
 
 		// ask user to select file to save to
-		CFileDialogEx fileDlg(FALSE, ".rsd", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(FALSE, ".rsd", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
 			"Ruleset definition files (*.rsd)|*.rsd|All Files (*.*)|*.*||", this);
 

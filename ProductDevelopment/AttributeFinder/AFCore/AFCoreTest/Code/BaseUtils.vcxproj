@@ -208,7 +208,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="FileDateTimeRestorer.cpp" />
-    <ClCompile Include="FileDialogEx.cpp" />
     <ClCompile Include="FileDirectorySearcher.cpp" />
     <ClCompile Include="FileIterator.cpp" />
     <ClCompile Include="FileRecoveryManager.cpp" />
@@ -392,7 +391,6 @@
     <ClInclude Include="FailureDetectionAndReportingConstants.h" />
     <ClInclude Include="FailureDetectionAndReportingMgr.h" />
     <ClInclude Include="FileDateTimeRestorer.h" />
-    <ClInclude Include="FileDialogEx.h" />
     <ClInclude Include="FileDirectorySearcher.h" />
     <ClInclude Include="FileIterator.h" />
     <ClInclude Include="FileRecoveryManager.h" />

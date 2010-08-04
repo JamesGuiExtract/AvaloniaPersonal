@@ -22,7 +22,6 @@
 #include <COMUtils.h>
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
-#include <FileDialogEx.h>
 #include <ICCategories.h>
 #include <Win32Util.h>
 #include <Misc.h>
@@ -747,7 +746,7 @@ void CImageCleanupSettingsEditorDlg::OnFileSaveas()
 		}
 		
 		// ask user to select file to save to
-		CFileDialogEx fileDlg(FALSE, gstrICS_FILE_SAVE_TYPES.c_str(), NULL, 
+		CFileDialog fileDlg(FALSE, gstrICS_FILE_SAVE_TYPES.c_str(), NULL, 
 			OFN_ENABLESIZING | OFN_EXPLORER | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST 
 			| OFN_OVERWRITEPROMPT, gstrICS_FILE_SAVE_FILTER.c_str(), this);
 
@@ -974,7 +973,7 @@ void CImageCleanupSettingsEditorDlg::OnBtnBrowseInFile()
 	try
 	{
 		// create a dialog box that will allow the user to browse for an image file
-		CFileDialogEx dlg(TRUE, NULL, NULL, 
+		CFileDialog dlg(TRUE, NULL, NULL, 
 			OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gstrICS_FILE_TEST_FILTER.c_str(), NULL);
 
@@ -1009,7 +1008,7 @@ void CImageCleanupSettingsEditorDlg::OnBtnBrowseOutFile()
 
 	try
 	{
-		CFileDialogEx dlg(TRUE, NULL, NULL, OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		CFileDialog dlg(TRUE, NULL, NULL, OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gstrICS_FILE_TEST_FILTER.c_str(), NULL);
 
 		// display the file dialog
@@ -2130,7 +2129,7 @@ void CImageCleanupSettingsEditorDlg::openFile(string strFileName)
 		if (strFileName == "")
 		{
 			// ask user to select file to load
-			CFileDialogEx fileDlg(TRUE, gstrICS_FILE_OPEN_TYPES.c_str(), m_strLastFileOpened.c_str(), 
+			CFileDialog fileDlg(TRUE, gstrICS_FILE_OPEN_TYPES.c_str(), m_strLastFileOpened.c_str(), 
 				OFN_ENABLESIZING | OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, 
 				gstrICS_FILE_OPEN_FILTER.c_str(), this);
 			

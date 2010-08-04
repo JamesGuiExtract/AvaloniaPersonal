@@ -5,7 +5,6 @@
 #include "AFEngineFileProcessorPP.h"
 #include "Common.h"
 
-#include <FileDialogEx.h>
 #include <ComUtils.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
@@ -252,7 +251,7 @@ LRESULT CAFEngineFileProcessorPP::OnClickedBtnBrowse(WORD wNotifyCode,
 	try
 	{	
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, ".rsd", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(TRUE, ".rsd", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			 OFN_PATHMUSTEXIST, gstrRSD_FILE_OPEN_FILTER.c_str(), CWnd::FromHandle(m_hWnd));
 		
 		// Pass the pointer of dialog to create ThreadFileDlg object

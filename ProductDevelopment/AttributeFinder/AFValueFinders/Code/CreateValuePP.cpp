@@ -4,7 +4,6 @@
 #include "CreateValuePP.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <cpputil.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>

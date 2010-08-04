@@ -5,7 +5,6 @@
 #include "RedactionCCUtils.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <LoadFileDlgThread.h>
 #include <ComUtils.h>
 
@@ -127,7 +126,7 @@ LRESULT CSelectTargetFileUIDlg::OnBnClickedBtnBrowseFile(WORD wNotifyCode, WORD 
 	try
 	{
 		// Initialize open file dialog
-		CFileDialogEx fileDlg(TRUE, m_strDefaultExtension.c_str(), NULL, OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST,
+		CFileDialog fileDlg(TRUE, m_strDefaultExtension.c_str(), NULL, OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST,
 			m_strFileTypes.c_str(), NULL);
 		
 		// Pass the pointer of dialog to create ThreadDataStruct object

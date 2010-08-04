@@ -12,7 +12,6 @@
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <Win32Util.h>
-#include <FileDialogEx.h>
 #include <ComUtils.h>
 #include <LicenseMgmt.h>
 
@@ -267,7 +266,7 @@ void TesterDlgInputPage::OnBrowse()
 	
 		// Show the file dialog to select the file to be opened
 		string strTemp = m_pTesterConfigMgr->getLastFileName();
-		CFileDialogEx fileDlg( TRUE, NULL, strTemp.c_str(), OFN_READONLY | OFN_HIDEREADONLY, 
+		CFileDialog fileDlg( TRUE, NULL, strTemp.c_str(), OFN_READONLY | OFN_HIDEREADONLY, 
 			pszStrFilter, this );
 			
 		// Modify the initial directory

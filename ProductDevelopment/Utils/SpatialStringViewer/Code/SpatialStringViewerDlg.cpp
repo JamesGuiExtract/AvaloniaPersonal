@@ -15,7 +15,6 @@
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <RegistryPersistenceMgr.h>
-#include <FileDialogEx.h>
 #include <cpputil.h>
 #include <LoadFileDlgThread.h>
 #include <TemporaryResourceOverride.h>
@@ -485,7 +484,7 @@ void CSpatialStringViewerDlg::OnFileOpen()
 	try
 	{
 		// ask user to select file to load
-		CFileDialogEx fileDlg(TRUE, ".uss", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(TRUE, ".uss", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST,
 			"UCLID Spatial String Files (*.uss)|*.uss|All Files (*.*)|*.*||", this);
 

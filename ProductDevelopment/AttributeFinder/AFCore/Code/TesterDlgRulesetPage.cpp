@@ -5,7 +5,6 @@
 #include "afcore.h"
 #include "TesterDlgRulesetPage.h"
 
-#include "FileDialogEx.h"
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include "Common.h"
@@ -74,7 +73,7 @@ void TesterDlgRulesetPage::OnBtnBrowseRsd()
 	string strFileName = getRulesFileName();
 
 	// ask user to select file to load
-	CFileDialogEx fileDlg(TRUE, ".rsd;.etf", strFileName.c_str(), 
+	CFileDialog fileDlg(TRUE, ".rsd;.etf", strFileName.c_str(), 
 		OFN_ENABLESIZING | OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST,
 		gstrRSD_FILE_OPEN_FILTER.c_str(), this);
 	

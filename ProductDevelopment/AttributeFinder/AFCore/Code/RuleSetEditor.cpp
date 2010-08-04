@@ -26,7 +26,6 @@
 #include <MRUList.h>
 #include <ComUtils.h>
 #include <PromptDlg.h>
-#include <FileDialogEx.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 
@@ -305,7 +304,7 @@ void CRuleSetEditor::openFile(string strFileName)
 		if (strFileName == "")
 		{
 			// ask user to select file to load
-			CFileDialogEx fileDlg(TRUE, ".rsd;.etf", m_strLastFileOpened.c_str(), 
+			CFileDialog fileDlg(TRUE, ".rsd;.etf", m_strLastFileOpened.c_str(), 
 				OFN_ENABLESIZING | OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST,
 				gstrRSD_FILE_OPEN_FILTER.c_str(), this);
 			

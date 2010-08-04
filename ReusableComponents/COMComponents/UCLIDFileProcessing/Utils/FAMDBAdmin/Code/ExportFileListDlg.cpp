@@ -7,7 +7,6 @@
 #include "SelectFilesDlg.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <cpputil.h>
 #include <ComUtils.h>
 #include <LoadFileDlgThread.h>
@@ -95,7 +94,7 @@ void CExportFileListDlg::OnClickedBrowseFile()
 		const static string s_strAllFiles = "Text files (*.txt)|*.txt|All files (*.*)|*.*||";
 
 		// Bring open file dialog
-		CFileDialogEx fileDlg(FALSE, ".txt", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(FALSE, ".txt", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_NOREADONLYRETURN | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
 			s_strAllFiles.c_str(), this);
 

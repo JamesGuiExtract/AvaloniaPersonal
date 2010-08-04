@@ -6,7 +6,6 @@
 #include "FileProcessorsUtils.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <LoadFileDlgThread.h>
 #include <ComponentLicenseIDs.h>
 #include <LicenseMgmt.h>
@@ -244,7 +243,7 @@ LRESULT CConvertToPDFTaskPP::OnClickedBtnInputImageBrowse(WORD wNotifyCode, WORD
 	try
 	{
 		// create the input image file dialog
-		CFileDialogEx fileDlg(TRUE, NULL, "", OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		CFileDialog fileDlg(TRUE, NULL, "", OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gpszPDF_FILE_EXTS, CWnd::FromHandle(m_hWnd));
 	
 		// prompt the user to select an input image file

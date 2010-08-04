@@ -25,7 +25,6 @@
 #include "TemporaryResourceOverride.h"
 #include "NamedValueTypePair.h"
 #include "LoadFileDlgThread.h"
-#include "FileDialogEx.h"
 #include "LicenseUtils.h"
 #include "EncryptionEngine.h"
 #include "ByteStream.h"
@@ -198,7 +197,7 @@ void UCLIDExceptionDetailsDlg::OnButtonSaveAs()
 		//open File dialog and get the file name selected by user
 		//default extension is .uex ie uclid exception file
 		CString zFileName;
-		CFileDialogEx fileSaveAsDlg(FALSE,"uex" , zFileName ,(OFN_OVERWRITEPROMPT | OFN_EXTENSIONDIFFERENT  |  
+		CFileDialog fileSaveAsDlg(FALSE,"uex" , zFileName ,(OFN_OVERWRITEPROMPT | OFN_EXTENSIONDIFFERENT  |  
 			OFN_LONGNAMES | OFN_NOREADONLYRETURN) ,"UCLID Exception files(*.uex)|*.uex||");
 		fileSaveAsDlg.m_ofn.lpstrTitle = "Save exception file as";
 		

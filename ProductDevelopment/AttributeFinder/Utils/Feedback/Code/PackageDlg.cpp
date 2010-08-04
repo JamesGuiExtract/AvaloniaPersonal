@@ -6,7 +6,6 @@
 #include "PackageDlg.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <RegistryPersistenceMgr.h>
 #include <StringTokenizer.h>
 #include <cpputil.h>
@@ -138,7 +137,7 @@ void CPackageDlg::OnBtnBrowse()
 			"All Files (*.*)|*.*||";
 
 		// Show the file dialog to select the feedback package file
-		CFileDialogEx fileDlg( TRUE, NULL, m_zFile, 
+		CFileDialog fileDlg( TRUE, NULL, m_zFile, 
 			OFN_READONLY | OFN_HIDEREADONLY, 
 			pszStrFilter, this );
 

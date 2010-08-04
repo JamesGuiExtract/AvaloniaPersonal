@@ -6,7 +6,6 @@
 
 #include <UCLIDException.h>
 #include <comutils.h>
-#include <FileDialogEx.h>
 #include <Common.h>
 
 //--------------------------------------------------------------------------------------------------
@@ -181,7 +180,7 @@ void CRedactionSettingsPP::OnBnClickedBtnBrowse()
 
 	try
 	{
-		CFileDialogEx fileDlg(TRUE, NULL, m_zMasterRSD.GetString(), 
+		CFileDialog fileDlg(TRUE, NULL, m_zMasterRSD.GetString(), 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gstrRSD_FILE_OPEN_FILTER.c_str(), NULL);
 		

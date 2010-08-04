@@ -7,7 +7,6 @@
 #include "ExceptionListControlHelper.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <string>
 #include <set>
 #include <algorithm>
@@ -177,7 +176,7 @@ void CExportDebugDataDlg::OnBnClickedButtonBrowse()
 		UpdateData(TRUE);
 
 		// Open the file selection dialog
-		CFileDialogEx fileDlg(TRUE, "*.txt", m_zExportfile, 
+		CFileDialog fileDlg(TRUE, "*.txt", m_zExportfile, 
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			"Text Files (*.txt)|*.txt|All Files (*.*)|*.*||", NULL);
 		

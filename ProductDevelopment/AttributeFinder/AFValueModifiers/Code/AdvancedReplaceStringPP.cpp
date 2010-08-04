@@ -3,7 +3,6 @@
 #include "AFValueModifiers.h"
 #include "AdvancedReplaceStringPP.h"
 
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
@@ -320,7 +319,7 @@ LRESULT CAdvancedReplaceStringPP::OnClickedBrowseFindFile(WORD wNotifyCode, WORD
 
 		string strFileExtension(s_strAllFiles);
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, NULL, "", 
+		CFileDialog fileDlg(TRUE, NULL, "", 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			strFileExtension.c_str(), NULL);
 		
@@ -349,7 +348,7 @@ LRESULT CAdvancedReplaceStringPP::OnClickedBrowseReplaceFile(WORD wNotifyCode, W
 
 		string strFileExtension(s_strAllFiles);
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, NULL, "", 
+		CFileDialog fileDlg(TRUE, NULL, "", 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			strFileExtension.c_str(), NULL);
 		

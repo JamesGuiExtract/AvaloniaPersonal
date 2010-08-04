@@ -1,9 +1,7 @@
 #pragma once
 
 #include "BaseUtils.h"
-#include "FileDialogEx.h"
 #include "Win32Event.h"
-
 
 // Class that wrap a separate thread which will load
 // the CFileDialogEx object. This CFileDialogEx class have 
@@ -15,15 +13,15 @@ class EXPORT_BaseUtils ThreadFileDlg
 {
 public:
 	// Constructor
-	ThreadFileDlg(CFileDialogEx* pFileDlg);
+	ThreadFileDlg(CFileDialog* pFileDlg);
 
-	// The method that will call DoModal of CFileDialogEx
+	// The method that will call DoModal of CFileDialog
 	// in an separate thread
 	UINT doModal();
 
 private:
 	// A pointer to the open file dialog
-	CFileDialogEx * m_pFileDlg;
+	CFileDialog * m_pFileDlg;
 
 	// the result from the DoModal of the file dialog
 	UINT m_uiDlgResult;

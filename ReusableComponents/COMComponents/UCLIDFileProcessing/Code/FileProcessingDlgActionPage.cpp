@@ -9,7 +9,6 @@
 
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <ComUtils.h>
 #include <cpputil.h>
 

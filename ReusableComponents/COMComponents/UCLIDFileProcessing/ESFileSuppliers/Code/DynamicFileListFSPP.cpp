@@ -4,7 +4,6 @@
 #include "DynamicFileListFSPP.h"
 #include "FileSupplierUtils.h"
 
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
@@ -154,7 +153,7 @@ LRESULT CDynamicFileListFSPP::OnBnClickedBtnBrowseFile(WORD wNotifyCode, WORD wI
 		// Bring open file dialog
 		string strFileExtension( s_strTypes );
 
-		CFileDialogEx fileDlg(TRUE, NULL, "", 
+		CFileDialog fileDlg(TRUE, NULL, "", 
 			OFN_HIDEREADONLY, strFileExtension.c_str(), CWnd::FromHandle(m_hWnd));
 		
 		// Pass the pointer of dialog to create ThreadDataStruct object

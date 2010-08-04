@@ -7,7 +7,6 @@
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <cpputil.h>
-#include <FileDialogEx.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
@@ -490,7 +489,7 @@ const std::string CCopyMoveDeleteFileProcessorPP::chooseFile(bool bIsSource)
 	string strFileExtension(s_strAllFiles);
 
 	// bring open file dialog (if browse for source then require file to exist) [FlexIDSCore #4254]
-	CFileDialogEx fileDlg(TRUE, NULL, strDefFile.c_str(), 
+	CFileDialog fileDlg(TRUE, NULL, strDefFile.c_str(), 
 		OFN_HIDEREADONLY | (bIsSource ? OFN_FILEMUSTEXIST : 0)
 		| OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 		s_strAllFiles.c_str(), CWnd::FromHandle(m_hWnd));

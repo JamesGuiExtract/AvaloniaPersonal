@@ -25,7 +25,6 @@
 #include "MCRView.h"
 #include "msword9.h"
 
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <io.h>
 #include <math.h>
@@ -495,7 +494,7 @@ void CUCLIDMCRTextViewerCtrl::save()
 		else
 		{
 			// Open SAVE AS file dialog
-			CFileDialogEx fileDlg( FALSE, "*.txt", NULL, OFN_READONLY | OFN_HIDEREADONLY,
+			CFileDialog fileDlg( FALSE, "*.txt", NULL, OFN_READONLY | OFN_HIDEREADONLY,
 				"Text Files (*.txt)|*.txt||", this );
 
 			if (fileDlg.DoModal() == IDOK)

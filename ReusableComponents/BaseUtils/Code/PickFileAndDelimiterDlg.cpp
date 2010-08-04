@@ -3,7 +3,6 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "PickFileAndDelimiterDlg.h"
-#include "FileDialogEx.h"
 #include "TemporaryResourceOverride.h"
 #include "UCLIDException.h"
 #include "cpputil.h"
@@ -105,7 +104,7 @@ void PickFileAndDelimiterDlg::OnBtnBrowse()
 	{	
 		UpdateData(TRUE);
 
-		CFileDialogEx openDialog(m_bOpenFile, NULL, NULL, OFN_HIDEREADONLY 
+		CFileDialog openDialog(m_bOpenFile, NULL, NULL, OFN_HIDEREADONLY 
 			| (m_bOpenFile ? OFN_FILEMUSTEXIST : OFN_OVERWRITEPROMPT)
 			| OFN_PATHMUSTEXIST 
 			| OFN_NOCHANGEDIR,

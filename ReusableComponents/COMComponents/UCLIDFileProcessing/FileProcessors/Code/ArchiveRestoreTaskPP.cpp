@@ -17,7 +17,6 @@
 #include "FileProcessorsUtils.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <LoadFileDlgThread.h>
 #include <ComponentLicenseIDs.h>
 #include <LicenseMgmt.h>
@@ -336,7 +335,7 @@ LRESULT CArchiveRestoreTaskPP::OnClickedBtnFileBrowse(WORD wNotifyCode, WORD wID
 	try
 	{
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, NULL, "",
+		CFileDialog fileDlg(TRUE, NULL, "",
 			OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gstrALL_FILES_FILTER.c_str(), CWnd::FromHandle(m_hWnd));
 

@@ -6,7 +6,6 @@
 #include "RedactionCCConstants.h"
 
 #include <Common.h>
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <LicenseMgmt.h>
@@ -345,7 +344,7 @@ LRESULT CRedactionTaskPP::OnClickedBtnBrowseOutput(WORD wNotifyCode, WORD wID, H
 		const static string s_strAllFiles = "TIF Files (*.tif)|*.tif|PDF files (*.pdf)|*.pdf||";
 
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, ".tif", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(TRUE, ".tif", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_HIDEREADONLY, s_strAllFiles.c_str(), CWnd::FromHandle(m_hWnd));
 		
 		// Pass the pointer of dialog to create ThreadDataStruct object

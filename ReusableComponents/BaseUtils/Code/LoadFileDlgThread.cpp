@@ -7,7 +7,7 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // ThreadFileDlg class
 //-------------------------------------------------------------------------------------------------
-ThreadFileDlg::ThreadFileDlg(CFileDialogEx* pFileDlg)
+ThreadFileDlg::ThreadFileDlg(CFileDialog* pFileDlg)
 : m_pFileDlg(pFileDlg),
 m_uiDlgResult(IDCANCEL)
 {
@@ -41,7 +41,7 @@ UINT ThreadFileDlg::LoadFileDlgThread(void* pData)
 		ASSERT_ARGUMENT("ELI15482", pTD != NULL);
 
 		// Get the file dialog pointer inside it
-		CFileDialogEx* pFileDlg = pTD->m_pFileDlg;
+		CFileDialog* pFileDlg = pTD->m_pFileDlg;
 		ASSERT_ARGUMENT("ELI15483", pFileDlg != NULL);
 
 		// Set the flag to true if OK is clicked

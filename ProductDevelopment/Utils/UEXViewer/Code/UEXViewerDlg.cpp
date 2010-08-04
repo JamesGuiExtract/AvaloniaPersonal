@@ -27,7 +27,6 @@
 #include <RegistryPersistenceMgr.h>
 #include <cpputil.h>
 #include <RegConstants.h>
-#include <FileDialogEx.h>
 #include <ClipboardManager.h>
 #include <SuspendWindowUpdates.h>
 #include <TemporaryFileName.h>
@@ -572,7 +571,7 @@ void CUEXViewerDlg::OnFileOpen()
 	try
 	{
 		// Show File Open dialog
-		CFileDialogEx openFileDlg( TRUE, NULL, NULL, 
+		CFileDialog openFileDlg( TRUE, NULL, NULL, 
 			OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, 
 		"UEX files (*.uex)|*.uex"
 		"||", NULL );

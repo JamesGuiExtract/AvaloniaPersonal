@@ -4,7 +4,6 @@
 #include "FileExistencePP.h"
 #include "SkipConditionUtils.h"
 
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
@@ -160,7 +159,7 @@ LRESULT CFileExistencePP::OnBnClickedBtnBrowseFile(WORD wNotifyCode, WORD wID, H
 
 		// bring open file dialog
 		string strFileExtension(s_strAllFiles);
-		CFileDialogEx fileDlg(TRUE, NULL, "", 
+		CFileDialog fileDlg(TRUE, NULL, "", 
 			OFN_HIDEREADONLY, strFileExtension.c_str(), CWnd::FromHandle(m_hWnd));
 		
 		// Pass the pointer of dialog to create ThreadDataStruct object

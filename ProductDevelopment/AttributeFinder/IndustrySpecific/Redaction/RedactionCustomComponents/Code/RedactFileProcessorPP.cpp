@@ -6,7 +6,6 @@
 #include "RedactionCCConstants.h"
 #include "..\..\..\..\AFCore\Code\Common.h"
 
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <LicenseMgmt.h>
@@ -352,7 +351,7 @@ LRESULT CRedactFileProcessorPP::OnClickedBtnBrowseRules(WORD wNotifyCode,
 	try
 	{
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, ".rsd", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(TRUE, ".rsd", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST, gstrRSD_FILE_OPEN_FILTER.c_str(), CWnd::FromHandle(m_hWnd));
 		
 		// Pass the pointer of dialog to create ThreadDataStruct object
@@ -381,7 +380,7 @@ LRESULT CRedactFileProcessorPP::OnClickedBtnBrowseOutput(WORD wNotifyCode,
 		const static string s_strAllFiles = "TIF Files (*.tif)|*.tif||";
 
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, ".tif", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(TRUE, ".tif", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_HIDEREADONLY, s_strAllFiles.c_str(), CWnd::FromHandle(m_hWnd));
 		
 		// Pass the pointer of dialog to create ThreadDataStruct object
@@ -533,7 +532,7 @@ LRESULT CRedactFileProcessorPP::OnClickedBtnBrowseVOAFile(WORD wNotifyCode,
 		const static string s_strAllFiles = "VOA Files (*.voa)|*.voa||";
 
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, ".voa", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(TRUE, ".voa", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_HIDEREADONLY, s_strAllFiles.c_str(), CWnd::FromHandle(m_hWnd));
 		
 		// Pass the pointer of dialog to create ThreadDataStruct object

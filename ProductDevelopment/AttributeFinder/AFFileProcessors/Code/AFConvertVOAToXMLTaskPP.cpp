@@ -5,7 +5,6 @@
 #include "AFFileProcessorsUtils.h"
 #include "Common.h"
 
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
@@ -166,7 +165,7 @@ LRESULT CAFConvertVOAToXMLTaskPP::OnClickedBtnBrowse(WORD wNotifyCode,
 	try
 	{	
 		// Create open file dialog to choose a VOA file
-		CFileDialogEx fileDlg(TRUE, ".voa", NULL,
+		CFileDialog fileDlg(TRUE, ".voa", NULL,
 			OFN_ENABLESIZING | OFN_EXPLORER | OFN_PATHMUSTEXIST,
 			gstrVOA_FILE_FILTER.c_str(), CWnd::FromHandle(m_hWnd));
 		

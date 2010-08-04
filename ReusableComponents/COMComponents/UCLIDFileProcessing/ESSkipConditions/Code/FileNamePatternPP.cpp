@@ -4,7 +4,6 @@
 #include "FileNamePatternPP.h"
 #include "SkipConditionUtils.h"
 
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
@@ -216,7 +215,7 @@ LRESULT CFileNamePatternPP::OnBnClickedBtnBrowseFile(WORD wNotifyCode, WORD wID,
 
 		// Bring open file dialog
 		string strFileExtension(s_strAllFiles);
-		CFileDialogEx fileDlg(TRUE, NULL, "", 
+		CFileDialog fileDlg(TRUE, NULL, "", 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			strFileExtension.c_str(), CWnd::FromHandle(m_hWnd));
 		

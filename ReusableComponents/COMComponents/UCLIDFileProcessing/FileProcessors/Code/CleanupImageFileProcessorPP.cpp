@@ -3,7 +3,6 @@
 #include "FileProcessorsUtils.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <LoadFileDlgThread.h>
 #include <ComUtils.h>
 
@@ -155,7 +154,7 @@ LRESULT CCleanupImageFileProcessorPP::OnClickedBtnBrowseFile(WORD wNotifyCode, W
 	try
 	{
 		// create open file dialog
-		CFileDialogEx fileDlg(TRUE, NULL, NULL, OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		CFileDialog fileDlg(TRUE, NULL, NULL, OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gstrFILE_FILTER.c_str(), CWnd::FromHandle(m_hWnd));
 
 		// pass the dialog to ThreadFileDlg object

@@ -19,7 +19,6 @@
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
 #include <cpputil.h>
-#include <FileDialogEx.h>
 #include <COMUtils.h>
 #include <LicenseMgmt.h>
 
@@ -585,7 +584,7 @@ void FileProcessingDlgTaskPage::OnBtnBrowseErrorLog()
 		CString zFileType("UEX files (*.uex)|*.uex||");
 
 		// Display the browse dialog and handle the result
-		CFileDialogEx dlg(TRUE, ".uex", NULL, OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		CFileDialog dlg(TRUE, ".uex", NULL, OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			zFileType, this);
 		if (dlg.DoModal() == IDOK)
 		{

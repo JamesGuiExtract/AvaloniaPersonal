@@ -5,7 +5,6 @@
 #include "..\..\AFUtils\Code\Helper.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 
@@ -207,7 +206,7 @@ LRESULT CValueFromListPP::OnClickedBtnLoadFromFile(WORD wNotifyCode, WORD wID, H
 		}
 		
 		// show pick file dialog, do not show delimiter related windows
-		CFileDialogEx openDialog( TRUE, ".txt", NULL, 
+		CFileDialog openDialog( TRUE, ".txt", NULL, 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			"Text files (*.txt)|*.txt|All files (*.*)|*.*||", NULL);
 		
@@ -248,7 +247,7 @@ LRESULT CValueFromListPP::OnClickedBtnSaveToFile(WORD wNotifyCode, WORD wID, HWN
 		// bring the pick file dialog and use it as a save dialog
 		static CString zFileName("");
 		// show pick file dialog
-		CFileDialogEx openDialog(FALSE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
+		CFileDialog openDialog(FALSE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			"All files (*.*)|*.*||", NULL);
 		
 		if (openDialog.DoModal() == IDOK)

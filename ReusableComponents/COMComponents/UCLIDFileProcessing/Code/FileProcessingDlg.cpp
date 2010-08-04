@@ -14,7 +14,6 @@
 #include <TemporaryResourceOverride.h>
 #include <cpputil.h>
 #include <ComUtils.h>
-#include <FileDialogEx.h>
 #include <Win32Util.h>
 #include <RegConstants.h>
 #include <LoadFileDlgThread.h>
@@ -2080,7 +2079,7 @@ void FileProcessingDlg::openFile(string strFileName)
 			const static string strFilter = "File Processing Specifications (*.fps)|*.fps|"
 											"All Files (*.*)|*.*||";
 			// ask user to select file to load
-			CFileDialogEx fileDlg(TRUE, gstrFILE_PROCESSING_SPECIFICATION_EXT.c_str(), NULL, 
+			CFileDialog fileDlg(TRUE, gstrFILE_PROCESSING_SPECIFICATION_EXT.c_str(), NULL, 
 				OFN_ENABLESIZING | OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST,
 				strFilter.c_str(), this);
 			
@@ -2135,7 +2134,7 @@ bool FileProcessingDlg::saveFile(std::string strFileName)
 											"All Files (*.*)|*.*||";
 		
 		// ask user to select file to load
-		CFileDialogEx fileDlg(FALSE, gstrFILE_PROCESSING_SPECIFICATION_EXT.c_str(), m_strCurrFPSFilename.c_str(), 
+		CFileDialog fileDlg(FALSE, gstrFILE_PROCESSING_SPECIFICATION_EXT.c_str(), m_strCurrFPSFilename.c_str(), 
 			OFN_ENABLESIZING | OFN_EXPLORER | OFN_NOREADONLYRETURN | OFN_PATHMUSTEXIST,
 			strFilter.c_str(), this);
 		

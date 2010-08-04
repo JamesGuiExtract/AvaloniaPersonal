@@ -24,7 +24,6 @@
 #include <cpputil.h>
 #include <CommentedTextFileReader.h>
 #include <MRUList.h>
-#include <FileDialogEx.h>
 #include <RegConstants.h>
 
 #include <afxcmn.h>				// For CToolTipCtrl
@@ -1360,7 +1359,7 @@ void HighlightedTextDlg::OnFileOpen()
 		}
 		
 		// Show the file dialog to select the file to be opened
-		CFileDialogEx fileDlg( TRUE, NULL, NULL, OFN_READONLY | OFN_HIDEREADONLY, 
+		CFileDialog fileDlg( TRUE, NULL, NULL, OFN_READONLY | OFN_HIDEREADONLY, 
 			pszStrFilter, this );
 		
 		// Modify the initial directory
@@ -1429,7 +1428,7 @@ void HighlightedTextDlg::OnFileSave()
 
 		// Create the SAVE AS file dialog
 		// with existing file name, do not allow read-only files to be chosen
-		CFileDialogEx fileDlg
+		CFileDialog fileDlg
 			( FALSE, 
 			"*.txt", 
 			zFilePath.operator LPCTSTR(), 

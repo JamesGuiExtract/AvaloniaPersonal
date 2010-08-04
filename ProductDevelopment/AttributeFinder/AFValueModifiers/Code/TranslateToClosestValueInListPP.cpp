@@ -4,7 +4,6 @@
 #include "TranslateToClosestValueInListPP.h"
 #include "..\..\AFUtils\Code\Helper.h"
 
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
@@ -195,7 +194,7 @@ LRESULT CTranslateToClosestValueInListPP::OnClickedBtnLoadFileValues(WORD wNotif
 
 		CString zFileName("");
 		// show file dialog
-		CFileDialogEx fileDlg( TRUE, ".txt", zFileName, 
+		CFileDialog fileDlg( TRUE, ".txt", zFileName, 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			"Text files (*.txt)|*.txt|All files (*.*)|*.*||", NULL );
 		
@@ -379,7 +378,7 @@ LRESULT CTranslateToClosestValueInListPP::OnClickedBtnSaveFile(WORD wNotifyCode,
 		// bring the pick file dialog and use it as a save dialog
 		static CString zFileName("");
 		// show file dialog
-		CFileDialogEx fileDlg(FALSE, NULL, zFileName, 
+		CFileDialog fileDlg(FALSE, NULL, zFileName, 
 			OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
 			"All files (*.*)|*.*||", NULL);
 		if (fileDlg.DoModal() == IDOK)

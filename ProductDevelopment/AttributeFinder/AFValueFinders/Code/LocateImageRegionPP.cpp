@@ -9,7 +9,6 @@
 #include <comutils.h>
 #include <cpputil.h>
 #include <CommentedTextFileReader.h>
-#include <FileDialogEx.h>
 #include <ComponentLicenseIDs.h>
 
 const int NUM_OF_CHARS = 4096;
@@ -689,7 +688,7 @@ LRESULT CLocateImageRegionPP::OnBnClickedBtnLoadList(WORD wNotifyCode, WORD wID,
 		}
 		
 		// show pick file dialog, do not show delimiter related windows
-		CFileDialogEx openDialog( TRUE, ".txt", NULL, 
+		CFileDialog openDialog( TRUE, ".txt", NULL, 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			"Text files (*.txt;*.dat)|*.txt;*.dat|All files (*.*)|*.*||", NULL);
 		
@@ -744,7 +743,7 @@ LRESULT CLocateImageRegionPP::OnBnClickedBtnSaveList(WORD wNotifyCode, WORD wID,
 	{
 	
 		// show pick file dialog, do not show delimiter related windows
-		CFileDialogEx openDialog( TRUE, ".txt", NULL, 
+		CFileDialog openDialog( TRUE, ".txt", NULL, 
 			OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			"Text files (*.txt)|*.txt;*.dat|All files (*.*)|*.*||", NULL);
 		

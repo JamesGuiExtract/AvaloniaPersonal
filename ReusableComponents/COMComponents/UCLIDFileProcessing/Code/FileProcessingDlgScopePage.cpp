@@ -11,7 +11,6 @@
 #include <FileProcessingConfigMgr.h>
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <XBrowseForFolder.h>
 #include <cpputil.h>
 #include <CommentedTextFileReader.h>

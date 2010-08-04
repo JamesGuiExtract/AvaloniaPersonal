@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "StaticFileListFSPP.h"
 
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <cpputil.h>
@@ -157,7 +156,7 @@ LRESULT CStaticFileListFSPP::OnBnClickedBtnAdd(WORD /*wNotifyCode*/, WORD /*wID*
 		// bring open file dialog
 		string strFileExtension( s_strTypes );
 
-		CFileDialogEx fileDlg(TRUE, NULL, NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(TRUE, NULL, NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_ALLOWMULTISELECT ,
 			strFileExtension.c_str(), CWnd::FromHandle(m_hWnd));
 
@@ -367,7 +366,7 @@ void CStaticFileListFSPP::addListOfFiles()
 	// bring open file dialog
 	string strFileExtension( s_strTypes );
 
-	CFileDialogEx fileDlg(TRUE, NULL, "", 
+	CFileDialog fileDlg(TRUE, NULL, "", 
 		OFN_HIDEREADONLY, strFileExtension.c_str(), CWnd::FromHandle(m_hWnd));
 	
 	// Pass the pointer of dialog to create ThreadDataStruct object

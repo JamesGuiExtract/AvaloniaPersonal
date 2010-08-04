@@ -5,7 +5,6 @@
 
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <cpputil.h>
 #include <LicenseMgmt.h>
 #include <EditorLicenseID.h>
@@ -98,7 +97,7 @@ LRESULT CFindFromRSDPP::OnClickedBtnBrowse(WORD wNotifyCode, WORD wID, HWND hWnd
 	try
 	{
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, NULL, "", 
+		CFileDialog fileDlg(TRUE, NULL, "", 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gstrRSD_FILE_OPEN_FILTER.c_str(), NULL);
 		

@@ -5,7 +5,6 @@
 #include "RedactionCCUtils.h"
 #include "..\..\..\..\AFCore\Code\Common.h"
 
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <LicenseMgmt.h>
@@ -228,7 +227,7 @@ LRESULT CFilterIDShieldDataFileTaskPP::OnClickedButtonInputBrowse(WORD wNotifyCo
 	try
 	{
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, 0, NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(TRUE, 0, NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_PATHMUSTEXIST, gstrVOAFILE_FILTER.c_str() , CWnd::FromHandle(m_hWnd));
 		
 		// Pass the pointer of dialog to create ThreadDataStruct object
@@ -276,7 +275,7 @@ LRESULT CFilterIDShieldDataFileTaskPP::OnClickedButtonOutputBrowse(WORD wNotifyC
 	try
 	{
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, 0, NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(TRUE, 0, NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_PATHMUSTEXIST, gstrVOAFILE_FILTER.c_str() , CWnd::FromHandle(m_hWnd));
 		
 		// Pass the pointer of dialog to create ThreadDataStruct object

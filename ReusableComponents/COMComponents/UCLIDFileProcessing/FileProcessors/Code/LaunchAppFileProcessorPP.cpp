@@ -8,7 +8,6 @@
 
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
-#include <FileDialogEx.h>
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
 
@@ -346,7 +345,7 @@ const string CLaunchAppFileProcessorPP::chooseFile()
 	string strFileExtension(s_strAllFiles);
 
 	// bring open file dialog
-	CFileDialogEx fileDlg(TRUE, NULL, "", 
+	CFileDialog fileDlg(TRUE, NULL, "", 
 		OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 		s_strAllFiles.c_str(), CWnd::FromHandle(m_hWnd));
 	

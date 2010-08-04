@@ -17,7 +17,6 @@
 #include "FileProcessorsUtils.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <LoadFileDlgThread.h>
 #include <ComponentLicenseIDs.h>
 #include <LicenseMgmt.h>
@@ -369,7 +368,7 @@ LRESULT CAddWatermarkTaskPP::OnClickedBtnInputImageBrowse(WORD wNotifyCode, WORD
 	try
 	{
 		// create the input image file dialog
-		CFileDialogEx fileDlg(TRUE, NULL, "", 
+		CFileDialog fileDlg(TRUE, NULL, "", 
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gstrFILE_FILTER.c_str(), CWnd::FromHandle(m_hWnd));
 	
@@ -419,7 +418,7 @@ LRESULT CAddWatermarkTaskPP::OnClickedBtnStampImageBrowse(WORD wNotifyCode, WORD
 	try
 	{
 		// create the stamp image file dialog
-		CFileDialogEx fileDlg(TRUE, NULL, "", 
+		CFileDialog fileDlg(TRUE, NULL, "", 
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gstrFILE_FILTER.c_str(), CWnd::FromHandle(m_hWnd));
 	

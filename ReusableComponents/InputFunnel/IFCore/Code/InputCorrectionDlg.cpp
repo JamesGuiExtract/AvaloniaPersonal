@@ -7,7 +7,6 @@
 
 #include <UCLIDException.h>
 #include <TemporaryResourceOverride.h>
-#include <FileDialogEx.h>
 
 #include <memory>
 
@@ -232,7 +231,7 @@ void InputCorrectionDlg::OnBTNSaveImageAs()
 	try
 	{
 		// open save as dialog
-		CFileDialogEx saveDialog
+		CFileDialog saveDialog
 			(FALSE, 
 			"bmp", 
 			NULL, 

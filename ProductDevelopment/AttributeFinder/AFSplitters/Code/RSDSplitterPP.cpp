@@ -5,7 +5,6 @@
 #include "..\..\AFCore\Code\Common.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <cpputil.h>
 #include <LicenseMgmt.h>
 #include <AFTagManager.h>
@@ -149,7 +148,7 @@ LRESULT CRSDSplitterPP::OnClickedBtnBrowse(WORD wNotifyCode, WORD wID, HWND hWnd
 		static CString zFileName("");
 
 		// bring the file open dialog
-		CFileDialogEx openDlg(TRUE, ".rsd", zFileName,
+		CFileDialog openDlg(TRUE, ".rsd", zFileName,
 			OFN_HIDEREADONLY|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
 			gstrRSD_FILE_OPEN_FILTER.c_str());
 

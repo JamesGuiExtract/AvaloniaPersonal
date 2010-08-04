@@ -8,7 +8,6 @@
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <COMUtils.h>
-#include <FileDialogEx.h>
 #include <AFTagManager.h>
 
 #include <io.h>
@@ -120,7 +119,7 @@ LRESULT CRSDFileConditionPP::OnClickedBtnBrowse(WORD wNotifyCode,
 	try
 	{
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, NULL, "", 
+		CFileDialog fileDlg(TRUE, NULL, "", 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gstrRSD_FILE_OPEN_FILTER.c_str(), NULL);
 		

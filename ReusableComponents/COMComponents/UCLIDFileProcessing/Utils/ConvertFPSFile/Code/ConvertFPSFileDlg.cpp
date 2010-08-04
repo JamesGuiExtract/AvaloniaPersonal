@@ -7,7 +7,6 @@
 #include "..\..\..\Code\HelperFunctions.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <ComUtils.h>
 #include <cpputil.h>
 #include <ByteStream.h>
@@ -117,7 +116,7 @@ void CConvertFPSFileDlg::OnBnClickedBtnInput()
 
 		// Create File Open dialog
 		string strFileExtension( s_strAllFiles );
-		CFileDialogEx fileDlg(TRUE, ".fps", NULL, OFN_ENABLESIZING | 
+		CFileDialog fileDlg(TRUE, ".fps", NULL, OFN_ENABLESIZING | 
 			OFN_EXPLORER | OFN_PATHMUSTEXIST,
 			strFileExtension.c_str(), this);
 
@@ -145,7 +144,7 @@ void CConvertFPSFileDlg::OnBnClickedBtnOutput()
 
 		// Create File Save dialog
 		string strFileExtension( s_strAllFiles );	
-		CFileDialogEx fileDlg(FALSE, ".fps", NULL, OFN_ENABLESIZING | 
+		CFileDialog fileDlg(FALSE, ".fps", NULL, OFN_ENABLESIZING | 
 			OFN_EXPLORER | OFN_PATHMUSTEXIST,
 			strFileExtension.c_str(), NULL);
 

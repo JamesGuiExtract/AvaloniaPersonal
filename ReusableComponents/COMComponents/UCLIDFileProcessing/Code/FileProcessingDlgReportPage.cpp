@@ -13,8 +13,6 @@
 #include <LoadFileDlgThread.h>
 #include <SuspendWindowUpdates.h>
 
-#include <FileDialogEx.h>
-
 #include <cpputil.h>
 
 using namespace std;
@@ -287,7 +285,7 @@ void FileProcessingDlgReportPage::OnBnClickedBtnExport()
 
 		// bring open file dialog
 		string strFileExtension(s_strAllFiles);		
-		CFileDialogEx fileDlg(FALSE, 0, NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(FALSE, 0, NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
 			strFileExtension.c_str(), CWnd::FromHandle(m_hWnd));
 

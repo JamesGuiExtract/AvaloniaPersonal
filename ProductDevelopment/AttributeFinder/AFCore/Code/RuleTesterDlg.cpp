@@ -14,7 +14,6 @@
 #include <FileRecoveryManager.h>
 #include <cpputil.h>
 #include <Win32Util.h>
-#include <FileDialogEx.h>
 #include <ComUtils.h>
 
 #ifdef _DEBUG
@@ -677,7 +676,7 @@ void RuleTesterDlg::OnButtonVoa()
 	try
 	{
 		// Create a File - Save dialog
-		CFileDialogEx dlgSave( FALSE, ".voa", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog dlgSave( FALSE, ".voa", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
 			"VOA files (*.voa)|*.voa||", this );
 

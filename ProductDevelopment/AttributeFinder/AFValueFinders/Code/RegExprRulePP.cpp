@@ -4,7 +4,6 @@
 #include "RegExprRulePP.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <cpputil.h>
 #include <comutils.h>
 #include <LicenseMgmt.h>
@@ -199,7 +198,7 @@ LRESULT CRegExprRulePP::OnClickedBtnBrowse(WORD wNotifyCode, WORD wID, HWND hWnd
 
 		string strFileExtension(s_strAllFiles);
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, NULL, "", 
+		CFileDialog fileDlg(TRUE, NULL, "", 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			strFileExtension.c_str(), NULL);
 		

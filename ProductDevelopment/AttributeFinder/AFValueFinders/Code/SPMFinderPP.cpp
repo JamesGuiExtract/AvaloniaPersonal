@@ -6,7 +6,6 @@
 #include "..\..\AFUtils\Code\Helper.h"
 
 #include <UCLIDException.h>
-#include <FileDialogEx.h>
 #include <cpputil.h>
 #include <comutils.h>
 #include <LicenseMgmt.h>
@@ -363,7 +362,7 @@ LRESULT CSPMFinderPP::OnClickedBtnBrowse(WORD wNotifyCode, WORD wID, HWND hWndCt
 		}
 
 		// bring open file dialog
-		CFileDialogEx fileDlg(TRUE, NULL, "", 
+		CFileDialog fileDlg(TRUE, NULL, "", 
 			OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			strFileExtension.c_str(), NULL);
 		

@@ -6,7 +6,6 @@
 #include "IndexConverterDlg.h"
 
 #include <cpputil.h>
-#include <FileDialogEx.h>
 #include <UCLIDException.h>
 #include <XBrowseForFolder.h>
 #include <StringTokenizer.h>
@@ -387,7 +386,7 @@ void CIndexConverterDlg::OnButtonIndex()
 	try
 	{
 		// Ask user to select the index file
-		CFileDialogEx fileDlg( TRUE, ".txt", NULL, 
+		CFileDialog fileDlg( TRUE, ".txt", NULL, 
 			OFN_ENABLESIZING | OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST,
 			"Text files (*.txt)|*.txt|All Files (*.*)|*.*||", this);
 		

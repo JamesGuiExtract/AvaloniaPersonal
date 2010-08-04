@@ -4,7 +4,6 @@
 #include "OutputToXMLPP.h"
 #include "..\..\AFCore\Code\EditorLicenseID.h"
 
-#include <FileDialogEx.h>
 #include <LicenseMgmt.h>
 #include <UCLIDException.h>
 #include <AFTagManager.h>
@@ -226,7 +225,7 @@ LRESULT COutputToXMLPP::OnClickedBtnBrowseFile(WORD wNotifyCode,
 
 		// bring open file dialog
 		string strFileExtension(s_strAllFiles);
-		CFileDialogEx fileDlg(FALSE, ".xml", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(FALSE, ".xml", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
 			strFileExtension.c_str(), NULL);
 		
