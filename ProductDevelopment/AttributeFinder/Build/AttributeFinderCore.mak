@@ -26,6 +26,8 @@ AFRootDirectory=$(PDRootDir)\AttributeFinder
 RCNETDir=$(EngineeringRootDirectory)\RC.Net
 RulesDir=$(EngineeringRootDirectory)\Rules
 ExtractFlexCommonInstallDir=$(PDRootDir)\AttributeFinder\Installation\ExtractFlexCommon
+ExtractFlexCommonInstallFilesRootDir=P:\ExtractFlexCommon
+
 
 AFCoreInstallFilesRootDir=P:\AttributeFinder\CoreInstallation\Files
 LMInstallFilesRootDir=P:\LicenseManager\Files
