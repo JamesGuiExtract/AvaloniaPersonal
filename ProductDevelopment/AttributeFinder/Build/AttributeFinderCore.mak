@@ -127,7 +127,7 @@ EncryptAndCopyComponentDataFiles:
 
 CopyCommonFiles:
 	@ECHO Copying common .NET files to installation build folders...
-	@XCOPY "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@XCOPY "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /Y/E
 	
 CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @ECHO Copying the AttributeFinderCore files to installation directory...
