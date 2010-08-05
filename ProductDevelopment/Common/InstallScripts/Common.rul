@@ -33,8 +33,8 @@
     #define EXCEPTION_FILE_NAME "ExtractException.uex"
     #define UCLID_EXCEPTION_FILE_NAME "UCLIDException.uex"
     #define SQL_CE_DATABASE_VIEWER_AND_EDITOR_CODE "{0EACBFA9-5D4F-4D7E-8FB2-5C9E66FB6632}"
-    #define REG_PATH_DOT_NET_35_INSTALL "\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v3.5" 
-    #define INSTALL_UTIL_PATH "C:\\WINDOWS\\Microsoft.NET\\Framework\\v2.0.50727\\InstallUtil.exe"
+    #define REG_PATH_DOT_NET_40_INSTALL "\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full"  
+    #define INSTALL_UTIL_PATH "C:\\WINDOWS\\Microsoft.NET\\Framework\\v4.0.30319\\InstallUtil.exe"
     
 //////////////////// installation declarations ///////////////////
 
@@ -75,7 +75,7 @@
     prototype UninstallCrystalReports12();
     prototype BOOL CheckProductKeyInstalled(STRING, STRING, BYREF STRING, BOOL);
     prototype InstallSQLCE();
-    prototype DetectDotNET_35();
+    prototype DetectDotNET_40();
     prototype UninstallInstallSQLCE();
     prototype InstallDotNetService(STRING);
     prototype UninstallDotNetService(STRING);    
@@ -222,7 +222,7 @@ begin
 	//		abort;
 	//	endif;
 	//endif;
-    DetectDotNET_35();
+    DetectDotNET_40();
 end;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -520,12 +520,12 @@ end;
             
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  FUNCTION:   DetectDotNET_35
+//  FUNCTION:   DetectDotNET_40
 //
 //  EVENT:      Aborts with message if .NET 3.5 is not installed
 //
 ///////////////////////////////////////////////////////////////////////////////
-function DetectDotNET_35()
+function DetectDotNET_40()
 STRING szProgram, svValue;
 int nResult, svServiceState;       
 NUMBER nvType, nvSize;
@@ -534,11 +534,11 @@ begin
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
  
  	svValue = "";   
-	RegDBGetKeyValueEx (REG_PATH_DOT_NET_35_INSTALL, "Install", nvType, svValue, nvSize);
+	RegDBGetKeyValueEx (REG_PATH_DOT_NET_40_INSTALL, "Install", nvType, svValue, nvSize);
 	
 	if ( svValue != "1") then
 		gbInstalled  = FALSE;
-		MessageBox("Microsoft .NET 3.5 is must be installed before running this install.", MB_OK);
+		MessageBox("Microsoft .NET 4.0 is must be installed before running this install.", MB_OK);
 		abort;
 	endif; 
 end;
