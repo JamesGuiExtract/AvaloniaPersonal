@@ -1253,6 +1253,7 @@ QwBEAFIATwBNAAEATQBlAGQAaQBhAA==
 		<col key="yes" def="i2">RequiredLanguage</col>
 		<col def="S32">RequiredVersion</col>
 		<row><td>ExtractFlexCommonMM.BCD531AF_AE91_4ED0_8B2F_F7EA7D90E806</td><td>0</td><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>1.0.0.0</td></row>
+		<row><td>ExtractFlexCommonMM.BCD531AF_AE91_4ED0_8B2F_F7EA7D90E806</td><td>0</td><td>ExtractCommonMM.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>0</td><td>8.1.0.69</td></row>
 	</table>
 
 	<table name="ModuleExclusion">

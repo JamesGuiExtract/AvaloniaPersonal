@@ -1759,12 +1759,10 @@
 		<row><td>PATH_TO_COMMON_INSTALL_SCRIPTS</td><td>&lt;ISProjectFolder&gt;..\..\..\Common\InstallScripts</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CRYSTAL_REPORTS12</td><td>P:\AttributeFinder\RequiredInstalls\CrystalReports12</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DATABASEFILES_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DatabaseFiles</td><td/><td>2</td></row>
-		<row><td>PATH_TO_DOTNET 2.0 FRAM_FILES</td><td>P:\AttributeFinder\RequiredInstalls\DotNet 2.0 Framework</td><td/><td>2</td></row>
 		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITEKEYINSTAL_FILES</td><td>P:\AttributeFinder\RequiredInstalls\InliteKeyInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGSDKCO_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\NonSelfRegSDKComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_REDIST_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\Redist</td><td/><td>2</td></row>
-		<row><td>PATH_TO_RULEDEVELOPMENT_FILES</td><td>D:\Source\Engineering\ProductDevelopment\AttributeFinder\Installation\RuleDevelopmentKit</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGCORECOMP_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\SelfRegCoreComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL COMPACT EDI_FI</td><td>P:\AttributeFinder\RequiredInstalls\SQL Compact Edition Editor</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQLCOMPACT EDIT_FI</td><td>P:\AttributeFinder\RequiredInstalls\SQLCompact Edition</td><td/><td>2</td></row>
@@ -2059,8 +2057,6 @@
 		<row><td>SetupFile2</td><td>license.txt</td><td/><td>0</td><td>0</td><td>&lt;ISProjectDataFolder&gt;\support files\license.txt</td></row>
 		<row><td>SetupFile3</td><td>sqlncli.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli.msi</td></row>
 		<row><td>SetupFile4</td><td>sqlncli_x64.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli_x64.msi</td></row>
-		<row><td>SetupFile5</td><td>dotnetfx.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_DOTNET 2.0 FRAM_FILES&gt;\dotnetfx.exe</td></row>
-		<row><td>SetupFile6</td><td>NetFx64.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_DOTNET 2.0 FRAM_FILES&gt;\NetFx64.exe</td></row>
 		<row><td>SetupFile7</td><td>CBUSetup.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITEKEYINSTAL_FILES&gt;\CBUSetup.exe</td></row>
 		<row><td>SetupFile8</td><td>CRRuntime_12_1_mlb.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_CRYSTAL_REPORTS12&gt;\CRRuntime_12_1_mlb.msi</td></row>
 		<row><td>SetupFile9</td><td>SqlCeEditorSetup.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQL COMPACT EDI_FI&gt;\SqlCeEditorSetup.msi</td></row>

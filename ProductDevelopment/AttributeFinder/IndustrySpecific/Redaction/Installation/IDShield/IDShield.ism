@@ -245,7 +245,6 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
-		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\i386\ISLockPermissions.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 		<row><td>ISSetupFilesHelper</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\SFHelper.dll</td></row>
 	</table>
@@ -314,8 +313,6 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>AllOtherFiles</td><td>{25F44821-B4A3-4899-8923-1DF407CD9581}</td><td>CommonAppDataFolder</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AllOtherFiles1</td><td>{F6336EB2-D7C6-4A82-8F2B-9A769692C1A0}</td><td>EXTRACT_SYSTEMS1</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ExemptionCodes</td><td>{E5331F67-A907-472C-BC93-B4B8CAAD38BB}</td><td>EXEMPTION_CODES_DIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td>{DEC2B72C-0860-4D86-80E3-1D0DD6D14F94}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.verificati</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.dll</td><td>{BE1E239C-C3B7-4027-8488-645FC27F5851}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -381,8 +378,6 @@
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>COMMON_COMPONENTS</td><td>FlexIndexComponents</td></row>
-		<row><td>CommonAppDataFolder</td><td>AllOtherFiles</td></row>
-		<row><td>EXTRACT_SYSTEMS1</td><td>AllOtherFiles1</td></row>
 		<row><td>INSTALLDIR</td><td>ISRegistryComponent</td></row>
 		<row><td>INSTALLDIR</td><td>UtilitiesShortCuts</td></row>
 	</table>
@@ -394,8 +389,6 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
-		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
-		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td>257</td><td>ISSetupFilesHelper</td><td>SFCleanupEx</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td>257</td><td>ISSetupFilesHelper</td><td>SFStartupEx</td><td/><td/></row>
 		<row><td>ISVerifyScriptingRuntime</td><td>19</td><td/><td>[STANDARD_USE_SETUPEXE]</td><td/><td>Required for installations using InstallScript.</td></row>
@@ -1154,8 +1147,6 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>Documentation</td><td>AllOtherFiles</td></row>
-		<row><td>Documentation</td><td>AllOtherFiles1</td></row>
 		<row><td>Documentation</td><td>Help</td></row>
 		<row><td>IDShieldMain</td><td>ExemptionCodes</td></row>
 		<row><td>IDShieldMain</td><td>Extract.Redaction.Verification.dll</td></row>
@@ -1187,8 +1178,8 @@
 		<row><td>RedactionCC.dll</td><td>RedactionCC.dll</td><td>REDACT~1.DLL|RedactionCC.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGIDSHIELD_FILES&gt;\RedactionCC.dll</td><td>17</td><td/></row>
 		<row><td>extract.redaction.dll</td><td>Extract.Redaction.dll</td><td>EXTRAC~1.DLL|Extract.Redaction.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Redaction.dll</td><td>17</td><td/></row>
 		<row><td>extract.redaction.verificati</td><td>Extract.Redaction.Verification.dll</td><td>EXTRAC~1.DLL|Extract.Redaction.Verification.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Redaction.Verification.dll</td><td>17</td><td/></row>
-		<row><td>idshieldstatisticsreporter.e</td><td>IDShieldStatisticsReporter.exe</td><td>IDSHIE~1.EXE|IDShieldStatisticsReporter.exe</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_DOTNETGAC_FILES&gt;\IDShieldStatisticsReporter.exe</td><td>17</td><td/></row>
-		<row><td>interop.extractredactiontest</td><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>INTERO~1.DLL|Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_DOTNETGAC_FILES&gt;\Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>17</td><td/></row>
+		<row><td>idshieldstatisticsreporter.e</td><td>IDShieldStatisticsReporter.exe</td><td>IDSHIE~1.EXE|IDShieldStatisticsReporter.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\IDShieldStatisticsReporter.exe</td><td>1</td><td/></row>
+		<row><td>interop.extractredactiontest</td><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>INTERO~1.DLL|Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>1</td><td/></row>
 		<row><td>interop.uclid_redactioncusto</td><td>Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>INTERO~1.DLL|Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>17</td><td/></row>
 		<row><td>redactiontester.dll</td><td>RedactionTester.dll</td><td>REDACT~1.DLL|RedactionTester.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGIDSHIELD_FILES&gt;\RedactionTester.dll</td><td>17</td><td/></row>
 	</table>
@@ -1442,8 +1433,6 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
-		<row><td>AllOtherFiles</td><td/><td/><td>_4B5C452A_C152_488C_AEBC_AA2C8F474299_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>AllOtherFiles1</td><td/><td/><td>_F6B99F40_CB08_48C8_8206_995C08B31EA3_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ExemptionCodes</td><td/><td/><td>_DC4F41A0_2184_486F_85BC_827E04CF07BD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td/><td/><td>_9455B052_64C2_4C44_BABF_F480528B2F4B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.dll</td><td/><td/><td>_B4448636_A587_4E5B_B2D0_3EC1207C1F4A_FILTER</td><td/><td/><td/><td/></row>
@@ -1649,7 +1638,6 @@
 		<col key="yes" def="s255">User</col>
 		<col def="I4">Permission</col>
 		<col def="I4">Attributes</col>
-		<row><td>EXTRACT_SYSTEMS1</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Users</td><td>1610809791</td><td>0</td></row>
 	</table>
 
 	<table name="ISLogicalDisk">
@@ -1785,17 +1773,12 @@
 		<row><td>PATH_TO_COMMON_INSTALL_SCRIPTS</td><td>&lt;ISProjectFolder&gt;\..\..\..\..\..\Common\InstallScripts</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CORE_DOTNET</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CRYSTAL_REPORTS12</td><td>P:\AttributeFinder\RequiredInstalls\CrystalReports12</td><td/><td>2</td></row>
-		<row><td>PATH_TO_DOTNET 2.0 FRAM_FILES</td><td>P:\AttributeFinder\RequiredInstalls\DotNet 2.0 Framework</td><td/><td>2</td></row>
-		<row><td>PATH_TO_DOTNETGAC_FILES</td><td>I:\Common\Engineering\ProductDevelopment\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_EXEMPTIONCODES_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\ExemptionCodes</td><td/><td>2</td></row>
 		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITEKEYINSTAL_FILES</td><td>P:\AttributeFinder\RequiredInstalls\InliteKeyInstall</td><td/><td>2</td></row>
-		<row><td>PATH_TO_NONSELFREGCOMMO_FI</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegCommonComponents</td><td/><td>2</td></row>
-		<row><td>PATH_TO_NONSELFREGCOMPO_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\NonSelfRegComponents</td><td/><td>2</td></row>
+		<row><td>PATH_TO_NONSELFREGCOMPO_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_REPORTS_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\Reports</td><td/><td>2</td></row>
-		<row><td>PATH_TO_SELFREGCOMMONCO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\SelfRegCommonComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGIDSHIELD_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\SelfRegIDShieldComponents</td><td/><td>2</td></row>
-		<row><td>PATH_TO_SELFREGRDTCOMPO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\SelfRegRDTComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL COMPACT EDI_FI</td><td>P:\AttributeFinder\RequiredInstalls\SQL Compact Edition Editor</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQLCOMPACT EDIT_FI</td><td>P:\AttributeFinder\RequiredInstalls\SQLCompact Edition</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQLSERVEREXPRES_FILES</td><td>P:\AttributeFinder\RequiredInstalls\SQLServerExpress2008</td><td/><td>2</td></row>
@@ -2087,8 +2070,6 @@
 		<row><td>SetupFile2</td><td>Setup.bmp</td><td/><td>0</td><td>1</td><td>&lt;ISProjectDataFolder&gt;\support files\Setup.bmp</td></row>
 		<row><td>SetupFile3</td><td>sqlncli.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli.msi</td></row>
 		<row><td>SetupFile4</td><td>sqlncli_x64.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli_x64.msi</td></row>
-		<row><td>SetupFile5</td><td>dotnetfx.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_DOTNET 2.0 FRAM_FILES&gt;\dotnetfx.exe</td></row>
-		<row><td>SetupFile6</td><td>NetFx64.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_DOTNET 2.0 FRAM_FILES&gt;\NetFx64.exe</td></row>
 		<row><td>SetupFile7</td><td>CBUSetup.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITEKEYINSTAL_FILES&gt;\CBUSetup.exe</td></row>
 		<row><td>SetupFile8</td><td>CRRuntime_12_1_mlb.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_CRYSTAL_REPORTS12&gt;\CRRuntime_12_1_mlb.msi</td></row>
 		<row><td>SetupFile9</td><td>SSCERuntime-ENU-x64.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLCOMPACT EDIT_FI&gt;\SSCERuntime-ENU-x64.msi</td></row>
@@ -3391,8 +3372,6 @@
 		<row><td>DuplicateFiles</td><td/><td>4210</td><td>DuplicateFiles</td><td/></row>
 		<row><td>FileCost</td><td/><td>900</td><td>FileCost</td><td/></row>
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
-		<row><td>ISLockPermissionsCost</td><td/><td>1401</td><td/><td/></row>
-		<row><td>ISLockPermissionsInstall</td><td/><td>5901</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td/><td>6606</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td/><td>3</td><td/><td/></row>
 		<row><td>InstallFiles</td><td/><td>4000</td><td>InstallFiles</td><td/></row>

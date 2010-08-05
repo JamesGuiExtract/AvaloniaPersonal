@@ -722,8 +722,8 @@
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
 		<row><td>PATH_TO_LEADTOOLS_DOTNETDLLS</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
-		<row><td>PATH_TO_NONSELFREGISTER_FI</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegCommonComponents</td><td/><td>2</td></row>
-		<row><td>PATH_TO_NONSELFREGISTER_FI1</td><td>P:\DataEntry\CoreInstallation\Files\NonSelfRegisteredFiles</td><td/><td>2</td></row>
+		<row><td>PATH_TO_NONSELFREGISTER_FI</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
+		<row><td>PATH_TO_NONSELFREGISTER_FI1</td><td>P:\DataEntry\CoreInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
 		<row><td>WindowsFolder</td><td/><td/><td>1</td></row>
