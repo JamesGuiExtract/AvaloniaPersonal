@@ -30,7 +30,7 @@ namespace Extract.Utilities.Forms
         /// The <see cref="Color"/> to draw the percentage text in when it overlays the
         /// progress bar.
         /// </summary>
-        Color _overlayColor = Color.Black;
+        Color _overlayColor = Color.White;
 
         /// <summary>
         /// The format for the percentage string.
@@ -66,7 +66,10 @@ namespace Extract.Utilities.Forms
                 }
 
                 InitializeComponent();
+
                 _textFormat.LineAlignment = StringAlignment.Center;
+                _textFormat.Alignment = StringAlignment.Center;
+                Style = ProgressBarStyle.Continuous;
             }
             catch (Exception ex)
             {
@@ -77,43 +80,110 @@ namespace Extract.Utilities.Forms
         #endregion Constructors
 
         /// <summary>
-        /// Raises the <see cref="Control.Paint"/> event.
+        /// Raises the <see cref="Control.CreateControl"/> event.
         /// </summary>
-        /// <param name="e">The data associated with the event.</param>
-        protected override void OnPaint(PaintEventArgs e)
+        protected override void OnCreateControl()
         {
-            base.OnPaint(e);
-            if (_displayPercentage && (Value > 0 || _displayZeroPercent))
+            try
             {
-                Region clipRegion = e.Graphics.Clip;
-                try
+                base.OnCreateControl();
+
+                // In order to display the progress status bar as continuous, themes need to be diabled
+                // (see MSDN documentation).
+                if (Style == ProgressBarStyle.Continuous)
                 {
-                    int percentage = Value / Maximum;
-                    string text = percentage.ToString("G%", CultureInfo.CurrentCulture);
-                    Rectangle bar = ClientRectangle;
-                    bar.Width = (int)(bar.Width * (Value / Maximum));
-                    using (Region regionLeft = new Region(bar),
-                        regionRight = new Region(ClientRectangle))
+                    int result = NativeMethods.SetWindowTheme(Handle, "", "");
+                    if (result != 0)
                     {
-                        regionRight.Exclude(regionLeft);
-                        e.Graphics.Clip = regionLeft;
-                        e.Graphics.DrawString(text, base.Font,
-                            ExtractBrushes.GetSolidBrush(_overlayColor),
-                            ClientRectangle, _textFormat);
-                        e.Graphics.Clip = regionRight;
-                        e.Graphics.DrawString(text, base.Font,
-                            ExtractBrushes.GetSolidBrush(_textColor),
-                            ClientRectangle, _textFormat);
+                        ExtractException ee = new ExtractException("ELI30513",
+                            "Failed to modify theme to allow for continuous progress bar style.");
+                        ee.AddDebugData("HRESULT", result, false);
+                        ee.Log();
                     }
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30511", ex);
+            }
+        }
+
+        /// <summary>
+        /// Processes windows messages.
+        /// </summary>
+        /// <param name="m">The Windows <see cref="Message"/> to process.</param>
+        protected override void WndProc(ref Message m)
+        {
+            try
+            {
+                base.WndProc(ref m);
+
+                // Handle the paint message in WndProc to draw the percentage text. Overriding
+                // OnPaint is not a good option since either OnPaint is not called or
+                // ControlStyles.UserPaint is used which does allow OnPaint to be called but
+                // prevents base.OnPaint from drawing the progress bars.
+                if (m.Msg == WindowsMessage.Paint)
                 {
-                    throw ExtractException.AsExtractException("ELI30353", ex);
+                    if (_displayPercentage && (Value > 0 || _displayZeroPercent))
+                    {
+                        using (var graphics = Graphics.FromHwnd(Handle))
+                        {
+                            int percentage = 100 * Value / Maximum;
+                            string text = percentage.ToString("G", CultureInfo.CurrentCulture) + "%";
+
+                            // Draw the text so that _overlayColor is used for the portion of the
+                            // text over the progress bar and _textColor is used for the portion
+                            // that is not.
+                            if (Style == ProgressBarStyle.Continuous)
+                            {
+                                Rectangle bar = ClientRectangle;
+                                // Calculate the width the progress bar should be. I have
+                                // unscientifically found that about 2 pixels should be added to
+                                // this value... I'm not clear on why.
+                                bar.Width = 2 + (bar.Width * percentage / 100);
+                            
+                                using (Region regionLeft = new Region(bar),
+                                    regionRight = new Region(ClientRectangle))
+                                {
+                                    graphics.Clip = regionRight;
+                                        
+                                    regionRight.Exclude(regionLeft);
+                                    graphics.Clip = regionLeft;
+                                    graphics.DrawString(text, base.Font,
+                                        ExtractBrushes.GetSolidBrush(_overlayColor),
+                                        ClientRectangle, _textFormat);
+                                    graphics.Clip = regionRight;
+                                    graphics.DrawString(text, base.Font,
+                                        ExtractBrushes.GetSolidBrush(_textColor),
+                                        ClientRectangle, _textFormat);
+                                }
+                            }
+                            // Draw text in _textColor on top of a solid rectangle of _overlayColor
+                            // since with the block progress bar style it is not very readable to
+                            // just alternate the font color.
+                            else
+                            {
+                                SizeF textSize = graphics.MeasureString(text, base.Font,
+                                    ClientRectangle.Size, _textFormat);
+                                Rectangle backgroundRect = new Rectangle(
+                                    (ClientRectangle.Width / 2) - ((int)textSize.Width / 2),
+                                    (ClientRectangle.Height / 2) - ((int)textSize.Height / 2),
+                                    (int)textSize.Width, (int)textSize.Height);
+
+                                graphics.FillRectangle(
+                                    ExtractBrushes.GetSolidBrush(_overlayColor), backgroundRect);
+
+                                graphics.DrawString(text, base.Font,
+                                    ExtractBrushes.GetSolidBrush(_textColor),
+                                    ClientRectangle, _textFormat);
+                            }
+                        }
+                    }
                 }
-                finally
-                {
-                    e.Graphics.Clip = clipRegion;
-                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30512", ex);
             }
         }
 

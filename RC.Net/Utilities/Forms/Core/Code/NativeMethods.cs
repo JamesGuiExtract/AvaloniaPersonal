@@ -193,6 +193,22 @@ namespace Extract.Utilities.Forms
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool SetEvent(IntPtr hEvent);
 
+        /// <summary>
+        /// Causes a window to use a different set of visual style information than its class
+        /// normally uses.
+        /// </summary>
+        /// <param name="hWnd">Handle to the window whose visual style information is to be
+        /// changed.</param>
+        /// <param name="pszSubAppName">A string that contains the application name to use in
+        /// place of the calling application's name. If this parameter is NULL, the calling
+        /// application's name is used.</param>
+        /// <param name="pszSubIdList">A string that contains a semicolon-separated
+        /// list of CLSID names to use in place of the actual list passed by the window's class.
+        /// If this parameter is NULL, the ID list from the calling class is used.</param>
+        /// <returns>0 if the call was successful.</returns>
+        [DllImport("uxtheme.dll", ExactSpelling = true, CharSet = CharSet.Unicode)]
+        public static extern int SetWindowTheme(IntPtr hWnd, String pszSubAppName, String pszSubIdList);
+
         #endregion P/Invokes
 
         #region Constants

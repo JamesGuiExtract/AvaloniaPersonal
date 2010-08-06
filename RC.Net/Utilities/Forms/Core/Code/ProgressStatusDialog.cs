@@ -128,14 +128,17 @@ namespace Extract.Utilities.Forms
 
                 if (_statusForm == null)
                 {
-                    _statusForm = new ProgressStatusDialogForm(hWndParent, nNumProgressLevels,
+                    _statusForm = new ProgressStatusDialogForm(nNumProgressLevels,
                         nDelayBetweenRefreshes, bShowCloseButton, hStopEvent);
                 }
 
                 _statusForm.UpdateTitle(strWindowTitle);
                 _statusForm.ProgressStatus = pProgressStatus;
 
-                _statusForm.Show();
+                if (!_statusForm.Visible)
+                {
+                    _statusForm.Show(new WindowWrapper(hWndParent));
+                }
 
                 return HResult.Ok;
             }

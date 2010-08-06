@@ -106,6 +106,7 @@
     <Compile Include="BrowseButton.Designer.cs">
       <DependentUpon>BrowseButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="WindowWrapper.cs" />
     <Compile Include="ControlInvoker.cs" />
     <Compile Include="ExtractCursors.cs" />
     <Compile Include="CustomizableMessageBox.cs" />

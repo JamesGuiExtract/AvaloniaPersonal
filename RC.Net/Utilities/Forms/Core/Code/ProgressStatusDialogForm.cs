@@ -58,11 +58,6 @@ namespace Extract.Utilities.Forms
         bool _stopped;
 
         /// <summary>
-        /// The parent window handle.
-        /// </summary>
-        IntPtr _parentWindow;
-
-        /// <summary>
         /// The number of progress levels to display in the dialog.
         /// </summary>
         int _progressLevels;
@@ -98,15 +93,13 @@ namespace Extract.Utilities.Forms
         /// Initializes a new instance of the <see cref="ProgressStatusDialogForm"/> class.
         /// </summary>
         public ProgressStatusDialogForm()
-            : this(IntPtr.Zero, 3, 100, true, IntPtr.Zero)
+            : this(3, 100, true, IntPtr.Zero)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProgressStatusDialogForm"/> class.
         /// </summary>
-        /// <param name="parentWindow">The parent window handle. This may be
-        /// <see cref="IntPtr.Zero"/>.</param>
         /// <param name="progressLevels">The number of progress levels to display.</param>
         /// <param name="delayBetweenRefreshes">The amount of time to delay between
         /// status refreshes.
@@ -117,8 +110,8 @@ namespace Extract.Utilities.Forms
         /// or not.</param>
         /// <param name="stopEvent">The event handle that should be signaled
         /// when the stop button is pressed. This may be <see cref="IntPtr.Zero"/></param>
-        public ProgressStatusDialogForm(IntPtr parentWindow, int progressLevels,
-            int delayBetweenRefreshes, bool showCloseButton, IntPtr stopEvent)
+        public ProgressStatusDialogForm(int progressLevels, int delayBetweenRefreshes,
+            bool showCloseButton, IntPtr stopEvent)
         {
             try
             {
@@ -136,7 +129,6 @@ namespace Extract.Utilities.Forms
                     ControlBox = true;
                 }
 
-                _parentWindow = parentWindow;
                 _progressLevels = progressLevels;
                 _stopEventHandle = stopEvent;
 
@@ -287,12 +279,12 @@ namespace Extract.Utilities.Forms
             for (int i = 0; i < _progressLevels; i++)
             {
                 var label = new Label();
+                label.Width = width - label.Margin.Horizontal;
                 _labels.Add(label);
                 AddControlToPanel(label, ref nextControlLocation);
 
                 var bar = new BetterProgressBar();
-                bar.Style = ProgressBarStyle.Continuous;
-                bar.Width = width;
+                bar.Width = width - bar.Margin.Horizontal;
                 bar.DisplayZeroPercent = false;
                 _progressBars.Add(bar);
                 AddControlToPanel(bar, ref nextControlLocation);
@@ -348,7 +340,7 @@ namespace Extract.Utilities.Forms
             _topPanel.Controls.Add(control);
 
             // Update the next control location
-            nextControlLocation.Offset(0, control.Height + control.Margin.Bottom);
+            nextControlLocation.Offset(0, control.Height + control.Margin.Vertical);
         }
 
         /// <summary>

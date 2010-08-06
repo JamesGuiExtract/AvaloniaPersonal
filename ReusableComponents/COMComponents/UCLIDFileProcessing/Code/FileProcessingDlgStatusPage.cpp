@@ -469,7 +469,15 @@ void FileProcessingDlgStatusPage::OnBtnClickedProgressDetails()
 		// Show the progress details as a modeless dialog
 		const long nNUM_PROGRESS_LEVELS = 3; // TODO: in the future make this a registy setting
 		const long nDELAY_BETWEEN_PROGRESS_REFRESHES = 100; // In milliseconds; TODO: in the future make this a registry setting
-		m_ipProgressStatusDialog->ShowModelessDialog(NULL, "", NULL, 
+
+		HWND hParent = NULL;
+		CWnd *pWnd = AfxGetMainWnd();
+		if (pWnd)
+		{
+			hParent = pWnd->GetSafeHwnd();
+		}
+
+		m_ipProgressStatusDialog->ShowModelessDialog(hParent, "", NULL, 
 			nNUM_PROGRESS_LEVELS, nDELAY_BETWEEN_PROGRESS_REFRESHES, VARIANT_TRUE, NULL);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16603")

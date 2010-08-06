@@ -12,6 +12,12 @@ namespace Extract.Utilities.Forms
         public const int SetRedraw = 0x000B;
 
         /// <summary>
+        /// Sent when the system or another application makes a request to paint a portion of an
+        /// application's window.
+        /// </summary>
+        public const int Paint = 0x000F;
+
+        /// <summary>
         /// Key down message
         /// </summary>
         public const int KeyDown = 0x0100;
