@@ -13,6 +13,10 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SandboxedSolution>False</SandboxedSolution>
+    <SccProjectName>Extract.SharePoint</SccProjectName>
+    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
+    <SccAuxPath>http://white/VaultService</SccAuxPath>
+    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,9 +43,10 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -97,7 +102,6 @@
     <None Include="Images\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{d79d4b40-0169-46cf-bb79-a4210f8f9c93}</SharePointProjectItemId>
     </None>
-    <None Include="key.snk" />
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{84798fb0-f659-4a88-8f59-f8d3c5e1b37e}</SharePointProjectItemId>
     </None>
@@ -115,7 +119,9 @@
     <Content Include="Features\Extract.SharePoint.Redaction\Extract.SharePoint.Redaction.Template.xml">
       <DependentUpon>Extract.SharePoint.Redaction.feature</DependentUpon>
     </Content>
-    <Content Include="IdShieldFileListener\Elements.xml" />
+    <Content Include="IdShieldFileListener\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="IdShieldRibbon\Elements.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -123,12 +129,13 @@
     <Content Include="Images\IdShieldImages\IdShieldConfiguration32x32.png" />
     <Content Include="Images\IdShieldImages\IDSO16x16.gif" />
     <Content Include="Images\IdShieldImages\IDSO32x32.gif" />
-    <Content Include="Images\IdShieldImages\ProcessFolder16x16.png" />
-    <Content Include="Images\IdShieldImages\ProcessFolder32x32.png" />
+    <Content Include="Images\IdShieldImages\WatchFolder16x16.png" />
+    <Content Include="Images\IdShieldImages\WatchFolder32x32.png" />
     <Content Include="Images\IdShieldImages\ProcessSelected16x16.png" />
     <Content Include="Images\IdShieldImages\ProcessSelected32x32.png" />
-    <Content Include="Images\IdShieldImages\UnprocessFolder16x16.png" />
-    <Content Include="Images\IdShieldImages\UnprocessFolder32x32.png" />
+    <Content Include="Images\IdShieldImages\UnwatchFolder16x16.png" />
+    <Content Include="Images\IdShieldImages\UnwatchFolder32x32.png" />
+    <Content Include="Layouts\Extract.SharePoint.Redaction\RedactionHelpers.js" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -138,6 +145,7 @@
     <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="Layouts\Extract.SharePoint\EnableHelpers.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" />

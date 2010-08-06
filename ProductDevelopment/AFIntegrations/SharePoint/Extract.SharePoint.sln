@@ -4,6 +4,13 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.SharePoint", "Extract.SharePoint\Core\Code\Extract.SharePoint.csproj", "{FD2116EC-79B1-48BB-B658-5064D91FF51A}"
 EndProject
 Global
+	GlobalSection(VaultVsipSolution-v2) = preSolution
+		VaultHost = http://white/VaultService
+		VaultRepositoryID = 2
+		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
+		ProjectCount = 1
+		ProjectRelativeDiskPath1 = Extract.SharePoint\Core\Code\Extract.SharePoint.csproj
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
