@@ -26,7 +26,7 @@ for /R .\ %%r in (*.rl,*.nl) do (
 			if not [%1]==[/s] (
 				echo Registering %%~dpr%%i...
 			)
-			"%WINDIR%\Microsoft.NET\Framework\v2.0.50727\regasm" "%%~dpr%%i" /silent
+			"%WINDIR%\Microsoft.NET\Framework\v4.0.30319\regasm" "%%~dpr%%i" /silent
 		)
 	)
 )
