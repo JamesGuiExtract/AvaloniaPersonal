@@ -563,34 +563,9 @@ void CUGGrid::DrawCellsIntern(CDC *dc,CDC *db_dc)
 		dc->BitBlt(0,0,m_GI->m_gridWidth,m_GI->m_gridHeight,db_dc,0,0,SRCCOPY);
 	}	
 	
-	//draw the focus rect, if the flag was set above
-	if(!m_tempDisableFocusRect){
-		if((m_hasFocus || m_ctrl->m_findDialogRunning) && !m_ctrl->m_editInProgress)		
-		{
-			if(m_GI->m_highlightRowFlag)
-			{
-				focusRect.left = 0;
-
-				if(rect.right < m_GI->m_gridWidth)
-					focusRect.right = rect.right;
-				else
-				{
-					if( m_GI->m_bExtend )
-						focusRect.right = m_GI->m_gridWidth;
-					else
-					{
-						int iStartCol = m_ctrl->GetLeftCol(), iEndCol = m_ctrl->GetNumberCols() - 1;
-						int iWidth = 0;
-						for( int iLoop = iStartCol ; iLoop <= iEndCol ; iLoop++ )
-							iWidth += m_ctrl->GetColWidth( iLoop );
-
-						focusRect.right = iWidth;
-					}
-				}
-			}
-			m_ctrl->OnDrawFocusRect(dc,&focusRect);
-		}
-	}
+	// [LegacyRCAndUtils:5869]
+	// Since the selected row is clearly designated with a colored background, the focus rect is
+	// not needed. Previously, it had been drawn here.
 
 	//reset temporary flags
 	m_tempDisableFocusRect = FALSE;

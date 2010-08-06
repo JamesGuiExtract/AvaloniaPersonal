@@ -73,6 +73,8 @@ FileProcessingDlgScopePage::~FileProcessingDlgScopePage()
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgScopePage::refresh()
 {
+	int nSelectedRow = m_wndGrid.GetCurrentRow();
+
 	// Clear listed File Suppliers and the FAM Condition
 	while (m_wndGrid.GetNumberRows() > 0)
 	{
@@ -96,6 +98,11 @@ void FileProcessingDlgScopePage::refresh()
 		updateList( i, ipFSD );
 	}
 
+	if (nSelectedRow >= 0 && nSelectedRow < m_wndGrid.GetNumberRows())
+	{
+		m_wndGrid.SelectRange(0, nSelectedRow, 4, nSelectedRow);
+	}
+
 	// Update the FAM Condition
 	IObjectWithDescriptionPtr ipConditionObjWithDesc = getFSMgmtRole()->FAMCondition;
 	if (ipConditionObjWithDesc->Object != NULL)
@@ -104,6 +111,8 @@ void FileProcessingDlgScopePage::refresh()
 		_bstr_t _bstrText = ipConditionObjWithDesc->GetDescription();
 		m_zConditionDescription = (const char*)_bstrText;
 	}
+
+	setButtonStates();
 
 	UpdateData( FALSE );
 }
@@ -162,10 +171,10 @@ void FileProcessingDlgScopePage::updateSupplierStatus(WPARAM wParam, LPARAM lPar
 				break;
 			}
 		}
-	}
 
-	// Update action buttons
-	setButtonStates();
+		// Update action buttons
+		setButtonStates();
+	}
 }
 //-------------------------------------------------------------------------------------------------
 BOOL FileProcessingDlgScopePage::PreTranslateMessage(MSG* pMsg) 
@@ -380,9 +389,6 @@ void FileProcessingDlgScopePage::OnBtnRemove()
 			{
 				// Remove this FSD object from the collection
 				getFileSuppliersData()->Remove(iSelectedRow);
-
-				// Refresh the display
-				refresh();
 
 				// Select next or last File Supplier
 				int iSize = m_wndGrid.GetNumberRows();
@@ -759,7 +765,7 @@ LRESULT FileProcessingDlgScopePage::OnCellValueChange(WPARAM wParam, LPARAM lPar
 			ASSERT_RESOURCE_ALLOCATION("ELI30503", ipFSD != NULL);
 
 			// Get the new value from the grid
-			string strValue = (LPCTSTR)m_wndGrid.QuickGetText(nCol, nRow);
+			CString zValue(m_wndGrid.QuickGetText(nCol, nRow));
 			
 			switch (nCol)
 			{
@@ -771,20 +777,20 @@ LRESULT FileProcessingDlgScopePage::OnCellValueChange(WPARAM wParam, LPARAM lPar
 						ASSERT_RESOURCE_ALLOCATION("ELI30504", ipObjWD != NULL);
 
 						// Update the Enabled flag
-						ipObjWD->Enabled = asVariantBool(strValue == "1");
+						ipObjWD->Enabled = asVariantBool(zValue == "1");
 						
 					}
 					break;
 				// Force Processing
 				case 1:
 					{
-						ipFSD->ForceProcessing = asVariantBool(strValue == "1");
+						ipFSD->ForceProcessing = asVariantBool(zValue == "1");
 					}
 					break;
 				// Priority
 				case 2:
 					{
-						ipFSD->Priority = getPriorityFromString(strValue);
+						ipFSD->Priority = getPriorityFromString((LPCTSTR)zValue);
 					}
 					break;
 			}

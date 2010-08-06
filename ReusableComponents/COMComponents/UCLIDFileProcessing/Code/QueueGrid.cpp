@@ -266,7 +266,9 @@ void CQueueGrid::OnColSized(int col,int *width)
 int CQueueGrid::OnCanSizeRow(long row)
 {
 	UNREFERENCED_PARAMETER(row);
-	return TRUE;
+
+	// [LegacyRCAndUtils:5871]
+	return FALSE;
 }
 //--------------------------------------------------------------------------------------------------
 //	OnRowSizing
@@ -344,7 +346,8 @@ int CQueueGrid::OnSideHdgSized(int *width)
 //		FALSE - to prevent sizing
 int CQueueGrid::OnCanSizeTopHdg()
 {
-	return TRUE;
+	// [LegacyRCAndUtils:5871]
+	return FALSE;
 }
 //--------------------------------------------------------------------------------------------------
 //	OnTopHdgSizing
@@ -834,8 +837,11 @@ void CQueueGrid::OnSetCell(int col,long row,CUGCell *cell)
 	{
 		UNREFERENCED_PARAMETER(*cell);
 
-		GetParent()->PostMessage(WM_QUEUE_GRID_CELL_VALUE_CHANGE, ::GetDlgCtrlID(m_hWnd),
-			MAKELPARAM(row, col));
+		if (m_enableUpdate)
+		{
+			GetParent()->PostMessage(WM_QUEUE_GRID_CELL_VALUE_CHANGE, ::GetDlgCtrlID(m_hWnd),
+				MAKELPARAM(row, col));
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30437");
 }
@@ -1397,7 +1403,7 @@ void CQueueGrid::InsertRow(int index)
 		cell.SetXPStyle(XPCellTypeButton);
 		CHECK_UG_RETURN_VALUE("ELI30475", cell.SetCellType(UGCT_CHECKBOX));
 		CHECK_UG_RETURN_VALUE("ELI30476",
-			cell.SetCellTypeEx(UGCT_CHECKBOX3DRECESS | UGCT_CHECKBOXCHECKMARK | UGCT_CHECKBOXUSEALIGN));
+			cell.SetCellTypeEx(UGCT_CHECKBOXCHECKMARK | UGCT_CHECKBOXUSEALIGN));
 		CHECK_UG_RETURN_VALUE("ELI30510", cell.SetAlignment(UG_ALIGNCENTER|UG_ALIGNVCENTER));
 		CHECK_UG_RETURN_VALUE("ELI30477", SetCell(0, index, &cell));
 
@@ -1434,12 +1440,12 @@ void CQueueGrid::SetRowInfo(int nRow, bool bEnabled, bool bForceProcessing,
 
 	try
 	{
-		CHECK_UG_RETURN_VALUE("ELI30491", EnableUpdate(FALSE));
-
 		if (nRow >= GetNumberRows())
 		{
 			InsertRow(nRow);
 		}
+
+		CHECK_UG_RETURN_VALUE("ELI30491", EnableUpdate(FALSE));
 
 		CHECK_UG_RETURN_VALUE("ELI30492", QuickSetText(0, nRow, bEnabled ? "1" : "0"));
 		CHECK_UG_RETURN_VALUE("ELI30493", QuickSetText(1, nRow, bForceProcessing ? "1" : "0"));
