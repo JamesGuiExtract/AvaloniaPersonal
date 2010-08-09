@@ -849,6 +849,31 @@ HRESULT UGXPThemes::DrawThemeText(HANDLE hTheme, HDC hdc, int iPartID, int iStat
 
 }
 
+/********************************************
+DrawThemeTextEx
+	Purpose
+		Directly maps to the function in the dll.
+	Params
+		Check MSDN for more in depth info.
+	Return
+		A HRESULT to indicate success or failure.
+*********************************************/
+HRESULT UGXPThemes::DrawThemeTextEx(HANDLE hTheme, HDC hdc, int iPartID, int iStateID, LPCWSTR pszText,
+		int iCharCount, DWORD dwTextFlags, const RECT * pRect, DTTOPTS *pOptions)
+{
+	if (!LoadLibrary()) return E_FAIL;
+	
+	DRAWTHEMETEXTEX pDrawThemeTextEx = 
+		(DRAWTHEMETEXTEX)GetProcAddress(m_huxtheme, "DrawThemeTextEx");
+
+	if(pDrawThemeTextEx)
+	{		
+		return (*pDrawThemeTextEx)(hTheme, hdc, iPartID, iStateID, pszText, iCharCount, dwTextFlags, pRect, pOptions);
+	}
+
+	return E_FAIL;
+}
+
 BOOL UGXPThemes::IsThemeBackgroundPartiallyTransparent(HANDLE hTheme, int iPartId, int iStateId)
 {
 	if (!LoadLibrary()) return E_FAIL;
@@ -1081,9 +1106,25 @@ bool UGXPThemes::WriteText(HWND hwnd, HDC hdc, UGXPCellType type,
 		{
 			USES_CONVERSION;
 
-			success = SUCCEEDED(DrawThemeText(hTheme, hdc, td->GetPartID(), td->GetStateID(), T2W((LPTSTR)text), textLength, textFlags, 0, pRect));
+			// If using hybrid themes, the background will be drawn manually and to ensure text
+			// visibility we want to use the corresponding text color rather that the theme's text
+			// color.
+			if (useHybridThemes)
+			{
+				DTTOPTS options;
+				ZeroMemory(&options, sizeof(options));
+				options.dwFlags = DTT_TEXTCOLOR;
+				options.crText = ::GetTextColor(hdc);
+			
+				success = SUCCEEDED(DrawThemeTextEx(hTheme, hdc, td->GetPartID(), td->GetStateID(), T2W((LPTSTR)text), textLength, textFlags, pRect, &options));
+			}
+			else
+			{
+				success = SUCCEEDED(DrawThemeText(hTheme, hdc, td->GetPartID(), td->GetStateID(), T2W((LPTSTR)text), textLength, textFlags, 0, pRect));
+			}
+
+
 	//		CloseThemeData(hTheme);
-			success = true;
 		}
 	}
 	
@@ -1273,6 +1314,38 @@ void UGXPThemes::SetXPTheme(UGXPCellType type, UGXPThemeState state, LPCWSTR typ
 	m_themeData[type | state] = new UGThemeData(typeName, iPartId, iStateId);
 }
 
+/********************************************
+UseHybridThemes
+	Purpose
+		Specifies whether the "Hybrid" theme state is being used which will still take advantage
+		of control elements that are drawn fairly true to the XP theme versions (such as
+		checkboxes and buttons) but which uses the non-themed grid lines and cell
+		borders/backgrounds.
+	Return
+		true if hybrid themes are being used
+*********************************************/
+bool UGXPThemes::UseHybridThemes() 
+{ 
+	return (useHybridThemes && useThemes && IsThemed());
+}
+/********************************************
+UseHybridThemes
+	Purpose
+		Specifies whether to use the "Hybrid" theme state which will still take advantage
+		of control elements that are drawn fairly true to the XP theme versions (such as
+		checkboxes and buttons) but which uses the non-themed grid lines and cell
+		borders/backgrounds.
+	Params
+		use - true to use hybrid themes.
+	Return
+		Nothing
+*********************************************/
+void UGXPThemes::UseHybridThemes(bool use)
+{ 
+	useHybridThemes = use;
+	useThemes = use;
+}
+
 /***********************************************
 GetState
 	Purpose
@@ -1301,7 +1374,6 @@ UGXPThemeState UGXPThemes::GetState(bool selected, bool current)
 
 	return state;
 }
-
 
 bool UGXPThemes::DrawEdge(HWND hwnd, HDC hdc, LPCWSTR theme, int partID, int stateID, 
 		const RECT *pRect, UINT uEdge, UINT uFlags, RECT *pContentRect)

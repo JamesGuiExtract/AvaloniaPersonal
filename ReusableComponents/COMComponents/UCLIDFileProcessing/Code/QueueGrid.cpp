@@ -404,8 +404,26 @@ void CQueueGrid::OnRowChange(long oldrow,long newrow)
 	{
 		UNREFERENCED_PARAMETER(oldrow);
 
-		CHECK_UG_RETURN_VALUE("ELI30467", ClearSelections());
-		CHECK_UG_RETURN_VALUE("ELI30468", Select(-1, newrow));
+		m_currentRow = newrow;
+		
+		if (newrow >= 0 && newrow < GetNumberRows())
+		{
+			// Sets the "current" row so that the current row always matches the selected row. If current
+			// and selected row are not in sync, OnRowChangeevents may not be received and the clicked
+			// row may not be highlighted.
+			CHECK_UG_RETURN_VALUE("ELI30516", GotoRow(newrow));
+			CHECK_UG_RETURN_VALUE("ELI30467", ClearSelections());
+
+			CHECK_UG_RETURN_VALUE("ELI30468", Select(-1, newrow));
+		}
+		else
+		{
+			CHECK_UG_RETURN_VALUE("ELI30518", HideCurrentCell());
+		}
+
+		Invalidate();
+
+		GetParent()->PostMessage(WM_QUEUE_GRID_SELCHANGE, ::GetDlgCtrlID(m_hWnd), (LPARAM)newrow);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30466");
 }
@@ -490,10 +508,15 @@ void CQueueGrid::OnViewMoved( int nScrolDir, long oldPos, long newPos )
 void CQueueGrid::OnSelectionChanged(int startCol,long startRow,int endCol,long endRow,int blockNum)
 {
 	UNREFERENCED_PARAMETER(startCol);
-	UNREFERENCED_PARAMETER(startRow);
 	UNREFERENCED_PARAMETER(endCol);
 	UNREFERENCED_PARAMETER(endRow);
 	UNREFERENCED_PARAMETER(blockNum);
+
+	// Ensure the current row is always selected.
+	if (startRow != m_currentRow)
+	{
+		OnRowChange(m_currentRow, startRow);
+	}
 }
 //--------------------------------------------------------------------------------------------------
 //	OnLClicked

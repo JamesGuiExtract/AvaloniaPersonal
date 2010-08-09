@@ -448,8 +448,8 @@ void CUGGrid::DrawCellsIntern(CDC *dc,CDC *db_dc)
 				if(row == m_GI->m_currentRow && ( col == m_GI->m_currentCol || m_GI->m_highlightRowFlag))
 				{
 					// 8/3/2010 SNK
-					// In the hybrid theme, support the selection state for cells that are also current.
-					if(UGXPThemes::UseHybridThemes() && m_GI->m_multiSelect->IsSelected(col,row,&selectBlock))
+					// Support the selection state for cells that are also current.
+					if(m_GI->m_multiSelect->IsSelected(col,row,&selectBlock))
 						cellType->OnDraw(dc,&cellRect,col,row,&cell,selectBlock+1,1);
 					else
 						cellType->OnDraw(dc,&cellRect,col,row,&cell,0,1);
@@ -1038,6 +1038,14 @@ void CUGGrid::OnLButtonDown(UINT nFlags, CPoint point)
 
 		if(processed)
 			m_cellTypeCapture = TRUE;
+	}
+	else
+	{
+		// If the click was not in a cell, clear both the current cell and selection.
+		m_ctrl->GotoCell(-1, -1); // So that OnSelectionChange is called.
+		m_ctrl->HideCurrentCell();
+
+		Invalidate();
 	}
 
 	m_ctrl->OnLClicked(col,row,1,&rect,&point,processed);

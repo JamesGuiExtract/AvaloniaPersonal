@@ -11,6 +11,7 @@ using namespace std;
 
 const int WM_QUEUE_GRID_CELL_VALUE_CHANGE	= WM_USER + 101;
 const int WM_QUEUE_GRID_DBLCLICK			= WM_USER + 102;
+const int WM_QUEUE_GRID_SELCHANGE			= WM_USER + 103;
 
 class CQueueGrid:public CUGCtrl
 {
@@ -163,4 +164,6 @@ private:
 	set<int> m_setInitializedRows;
 	
 	static string m_strPriorities;
+
+	int m_currentRow;
 };

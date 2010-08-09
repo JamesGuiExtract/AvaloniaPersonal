@@ -84,6 +84,7 @@ protected:
 	afx_msg void OnContextDelete();
 	afx_msg LRESULT OnCellValueChange(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnGridDblClick(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnGridSelChange(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 
 	DECLARE_MESSAGE_MAP()

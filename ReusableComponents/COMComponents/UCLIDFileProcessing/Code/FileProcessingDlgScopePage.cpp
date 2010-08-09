@@ -100,7 +100,8 @@ void FileProcessingDlgScopePage::refresh()
 
 	if (nSelectedRow >= 0 && nSelectedRow < m_wndGrid.GetNumberRows())
 	{
-		m_wndGrid.SelectRange(0, nSelectedRow, 4, nSelectedRow);
+		m_wndGrid.ClearSelections();
+		m_wndGrid.Select(-1, nSelectedRow);
 	}
 
 	// Update the FAM Condition
@@ -236,6 +237,7 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgScopePage, CPropertyPage)
 	ON_BN_CLICKED(IDC_BTN_FAMCONDITION, OnBtnSelectCondition)
 	ON_MESSAGE(WM_QUEUE_GRID_CELL_VALUE_CHANGE, OnCellValueChange)
 	ON_MESSAGE(WM_QUEUE_GRID_DBLCLICK, OnGridDblClick)
+	ON_MESSAGE(WM_QUEUE_GRID_SELCHANGE, OnGridSelChange)
 	ON_WM_LBUTTONDBLCLK()
 END_MESSAGE_MAP()
 
@@ -322,7 +324,7 @@ void FileProcessingDlgScopePage::OnBtnAdd()
 
 			// Determine index of new row
 			// Insert position is after the first selected item (P13 #4732)
-			int iNewIndex = (iSelectedRow >= 0) ? iSelectedRow : iCount;
+			int iNewIndex = (iSelectedRow >= 0) ? iSelectedRow + 1 : iCount;
 
 			// Insert or append a new row
 			m_wndGrid.InsertRow(iNewIndex);
@@ -343,7 +345,8 @@ void FileProcessingDlgScopePage::OnBtnAdd()
 			getFileSuppliersData()->Insert( iNewIndex, ipFSD );
 
 			// Select the new entry
-			m_wndGrid.SelectRange(0, iNewIndex, 4, iNewIndex);
+			m_wndGrid.ClearSelections();
+			m_wndGrid.Select(-1, iNewIndex);
 
 			// Update the display
 			UpdateData( FALSE );
@@ -450,7 +453,8 @@ void FileProcessingDlgScopePage::OnBtnConfigure()
 				refresh();
 
 				// Retain selection
-				m_wndGrid.SelectRange(0, iSelectedRow, 4, iSelectedRow);
+				m_wndGrid.ClearSelections();
+				m_wndGrid.Select(-1, iSelectedRow);
 			}
 		}
 	}
@@ -806,6 +810,8 @@ LRESULT FileProcessingDlgScopePage::OnCellValueChange(WPARAM wParam, LPARAM lPar
 //-------------------------------------------------------------------------------------------------
 LRESULT FileProcessingDlgScopePage::OnGridDblClick(WPARAM wParam, LPARAM lParam)
 {
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
 	try
 	{
 		// Check ID - the message is only sent by the drop down column so no need to
@@ -842,11 +848,30 @@ LRESULT FileProcessingDlgScopePage::OnGridDblClick(WPARAM wParam, LPARAM lParam)
 				refresh();
 
 				// Retain selection
-				m_wndGrid.SelectRange(0, nRow, 4, nRow);
+				m_wndGrid.ClearSelections();
+				m_wndGrid.Select(-1, nRow);
 			}
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30505");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT FileProcessingDlgScopePage::OnGridSelChange(WPARAM wParam, LPARAM lParam)
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		// Check ID - the message is only sent by the drop down column so no need to
+		// check the column ID, just get the cell value
+		if (wParam == IDC_GRID)
+		{
+			setButtonStates();
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30517");
 
 	return 0;
 }
@@ -904,7 +929,7 @@ UCLID_FILEPROCESSINGLib::IFileSupplierPtr FileProcessingDlgScopePage::getFileSup
 	}
 
 	// Validate row number
-	if (iRow < 1 || iRow > ipFileSuppliersData->Size())
+	if (iRow < 0 || iRow >= ipFileSuppliersData->Size())
 	{
 		return NULL;
 	}
@@ -1004,6 +1029,7 @@ void FileProcessingDlgScopePage::setStatus(int iRow,
 
 	// Set the new status value
 	m_wndGrid.QuickSetText(4, iRow, strNewStatus.c_str());
+	m_wndGrid.Invalidate();
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgScopePage::updateList(int nRow, 

@@ -53,7 +53,10 @@ private:
 	static HRESULT CloseThemeData(HANDLE hTheme);
 	static HRESULT DrawThemeText(HANDLE hTheme, HDC hdc, int iPartId, 
 		int iStateId, LPCWSTR pszText, int iCharCount, DWORD dwTextFlags, 
-		DWORD dwTextFlags2, const RECT *pRect);	
+		DWORD dwTextFlags2, const RECT *pRect);
+	static HRESULT DrawThemeTextEx(HANDLE hTheme, HDC hdc, int iPartId, 
+		int iStateId, LPCWSTR pszText, int iCharCount, DWORD dwTextFlags, 
+		const RECT *pRect, DTTOPTS *pOptions);	
 	static HRESULT DrawThemeEdge(HANDLE hTheme, HDC hdc, 
 		int iPartId, int iStateId, const RECT *pRect, UINT uEdge, UINT uFlags, RECT *pContentRect);
 	static HRESULT GetThemeMargins(HANDLE hTheme,  HDC hdc, int iPartId, 
@@ -114,8 +117,8 @@ public:
 	// Therefore, I have created a "Hybrid" theme state which will still take advantage of controls
 	// elements that are drawn fairly true to the XP theme versions (such as checkboxes and buttons)
 	// but which uses the non-themed grid lines and cell borders/backgrounds.
-	static bool UseHybridThemes() { return useHybridThemes && useThemes; }
-	static void UseHybridThemes(bool use) { useHybridThemes = useThemes = use; }
+	static bool UseHybridThemes();
+	static void UseHybridThemes(bool use);
 
 	static void DrawBorderEdges(bool draw) { drawEdgeBorder = draw; }
 	static bool DrawBorderEdges() { return drawEdgeBorder; }
@@ -146,6 +149,9 @@ private:
 	typedef HRESULT (__stdcall *DRAWTHEMETEXT)(HANDLE hTheme, HDC hdc, int iPartId, 
 		int iStateId, LPCWSTR pszText, int iCharCount, DWORD dwTextFlags, 
 		DWORD dwTextFlags2, const RECT *pRect);
+	typedef HRESULT (__stdcall *DRAWTHEMETEXTEX)(HANDLE hTheme, HDC hdc, int iPartId, 
+		int iStateId, LPCWSTR pszText, int iCharCount, DWORD dwTextFlags, 
+		const RECT *pRect, DTTOPTS *pOptions);
 	typedef HRESULT (__stdcall *DRAWTHEMEEDGE)(HANDLE hTheme, HDC hdc, int iPartId, int iStateId, 
 		const RECT *pDestRect, UINT uEdge, UINT uFlags,   RECT *pContentRect);
 	typedef HRESULT (__stdcall *GETTHEMEMARGINS)(HANDLE hTheme,  HDC hdc, int iPartId, 
