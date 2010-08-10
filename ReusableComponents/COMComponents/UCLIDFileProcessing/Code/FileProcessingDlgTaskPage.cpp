@@ -1462,6 +1462,12 @@ void FileProcessingDlgTaskPage::OnLButtonDblClk(UINT nFlags, CPoint point)
 		// of having the different methods for the controls, to fix the issue with double click 
 		// copying the label contents to the clipboard FlexIDSCore #4227
 
+		// [LegacyRCAndUtils:5879]
+		if (!m_bEnabled)
+		{
+			return;
+		}
+
 		// Get the child window the mouse was double clicked in
 		CWnd *tmpChild = ChildWindowFromPoint(point, CWP_SKIPTRANSPARENT);
 
