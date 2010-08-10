@@ -36,6 +36,20 @@ namespace Extract.FileActionManager.Forms
         /// </summary>
         static readonly Color _INACTIVE_COLOR = Color.White;
 
+        /// <summary>
+        /// The color to display for selected, inactive cells.
+        /// </summary>
+        static readonly Color _SELECTED_COLOR = Color.DarkBlue;
+
+        /// <summary>
+        /// The color to display for selected, active cells.
+        /// </summary>
+        static Color _ACTIVE_SELECTED_COLOR =
+            Color.FromArgb((_ACTIVE_COLOR.A + _SELECTED_COLOR.A) / 2,
+                            (_ACTIVE_COLOR.R + _SELECTED_COLOR.R) / 2,
+                            (_ACTIVE_COLOR.G + _SELECTED_COLOR.G) / 2,
+                            (_ACTIVE_COLOR.B + _SELECTED_COLOR.B) / 2);
+
         #endregion Constants
 
         #region Fields
@@ -78,7 +92,9 @@ namespace Extract.FileActionManager.Forms
                     new List<bool>(SetProcessingSchedule._NUMBER_OF_HOURS_IN_WEEK);
 
                 _activeStyle.BackColor = _ACTIVE_COLOR;
+                _activeStyle.SelectionBackColor = _ACTIVE_SELECTED_COLOR;
                 _inactiveStyle.BackColor = _INACTIVE_COLOR;
+                _inactiveStyle.SelectionBackColor = _SELECTED_COLOR;
             }
             catch (Exception ex)
             {

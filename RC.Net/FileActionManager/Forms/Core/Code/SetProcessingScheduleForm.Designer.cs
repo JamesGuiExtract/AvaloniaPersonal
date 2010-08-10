@@ -147,6 +147,7 @@
             this._thursday.Name = "_thursday";
             this._thursday.ReadOnly = true;
             this._thursday.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this._thursday.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // _friday
             // 
@@ -155,6 +156,7 @@
             this._friday.Name = "_friday";
             this._friday.ReadOnly = true;
             this._friday.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this._friday.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // _saturday
             // 
@@ -172,7 +174,7 @@
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 2;
-            this._okButton.Text = "Ok";
+            this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             // 
             // _cancelButton
@@ -218,6 +220,8 @@
             this.Controls.Add(label1);
             this.Controls.Add(this._scheduleGrid);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "SetProcessingScheduleForm";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
