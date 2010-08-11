@@ -221,19 +221,20 @@ namespace Extract.SharePoint.Redaction
         /// <param name="fullPath">The full path to the .processed file.</param>
         /// <param name="folderSettings">The settings collection to use to
         /// build the destination file name.</param>
+        /// <param name="watchPath">The watch folder that is being monitored for
+        /// processed documents.</param>
         /// <returns>The destination for the file within the SP document library.</returns>
-        static string GetDestinationFileName(string fullPath,
+        static string GetDestinationFileName(string fullPath, string watchPath,
             Dictionary<string, FolderProcessingSettings> folderSettings)
         {
             string destination = string.Empty;
-            string watchPath = string.Empty;
             string path = fullPath;
             string fileName = Path.GetFileNameWithoutExtension(fullPath);
             string folder = Path.GetDirectoryName(path);
             string folderUpOne = Path.GetDirectoryName(folder);
-            string topFolder = folder.Replace(folderUpOne, "");
-            folder = folder.Replace(watchPath, "/").Replace("/", "\\");
-            folderUpOne = folderUpOne.Replace(watchPath, "/").Replace("/", "\\");
+            string topFolder = folder.Replace(folderUpOne, "").Replace("\\", "");
+            folder = folder.Replace(watchPath, "/").Replace("\\", "/");
+            folderUpOne = folderUpOne.Replace(watchPath, "/").Replace("\\", "/");
 
             // Attempt to get the folder settings
             FolderProcessingSettings settings = null;
@@ -375,34 +376,32 @@ namespace Extract.SharePoint.Redaction
                             // Build path to redacted file
                             string redactedFile = Path.Combine(Path.GetDirectoryName(fileName),
                                 Path.GetFileNameWithoutExtension(fileName)) + ".redacted";
+
+                            // Build the destination file name
                             string destinationFileName = GetDestinationFileName(fileName,
-                                _folderSettings);
+                                _outputFolder + "\\", _folderSettings);
+
+                            // Ensure the redacted file exists and the destination
+                            // file name is not null or empty
                             if (File.Exists(redactedFile)
                                 && !string.IsNullOrEmpty(destinationFileName))
                             {
                                 string destFolder = destinationFileName.Substring(0,
                                     destinationFileName.LastIndexOf("/"));
 
-                                SPFolder folder = web.GetFolder(destFolder);
-                                if (!folder.Exists)
-                                {
-                                    folder = web.RootFolder;
-                                    foreach (string subFolder in destFolder.Split('/'))
-                                    {
-                                        if (!folder.SubFolders[subFolder].Exists)
-                                        {
-                                            folder = folder.SubFolders.Add(subFolder);
-                                        }
-                                        else
-                                        {
-                                            folder = folder.SubFolders[subFolder];
-                                        }
-                                    }
-                                }
+                                // Create the destination folder if necessary
+                                EnsureDestinationFolderExists(web, destFolder);
 
+                                // Read the redacted file from the disk
                                 byte[] bytes = File.ReadAllBytes(redactedFile);
+
+                                // Upload the redacted file into SharePoint
+                                // NOTE: Need to turn off event firing while the file is
+                                // added to prevent inifinte looping
+                                EventFiringEnabled = false;
                                 web.Files.Add(destinationFileName, bytes, true);
                                 web.Update();
+                                EventFiringEnabled = true;
                             }
                         }
                     }
@@ -413,6 +412,63 @@ namespace Extract.SharePoint.Redaction
                 ExtractSharePointLoggingService.LogError(ErrorCategoyId.IdShieldFileReceiver,
                     ex);
             }
+        }
+
+        /// <summary>
+        /// Attempts to open the destination folder and if it doesn't exist will attempt
+        /// to create it.
+        /// </summary>
+        /// <param name="web">The SP web to create the folder on.</param>
+        /// <param name="destFolder">The web relative path to the destination folder.</param>
+        void EnsureDestinationFolderExists(SPWeb web, string destFolder)
+        {
+            try
+            {
+                SPFolder folder = web.GetFolder(destFolder);
+                if (!folder.Exists)
+                {
+                    string[] folders = destFolder.Split(new char[] { '/' },
+                        StringSplitOptions.RemoveEmptyEntries);
+                    string rootFolder = folders[0];
+                    SPList list = GetDocumentList(web, rootFolder);
+                    for (int i = 1; i < folders.Length; i++)
+                    {
+                        string tempFolder = folders[i];
+                        string newRootFolder = rootFolder + "/"
+                            + tempFolder;
+                        if (!web.GetFolder(newRootFolder).Exists)
+                        {
+                            SPListItem item = list.AddItem(rootFolder,
+                                SPFileSystemObjectType.Folder, tempFolder);
+                            item.Update();
+                        }
+                        rootFolder = newRootFolder;
+                    }
+                    web.Update();
+                }
+            }
+            catch (Exception ex)
+            {
+                SPException exception = new SPException("Unable to create destination folder.",
+                    ex);
+                exception.Data.Add("Destination Folder", destFolder);
+                throw exception;
+            }
+        }
+
+        private SPList GetDocumentList(SPWeb web, string folderName)
+        {
+            SPList rootList = web.Lists[folderName];
+            if (rootList == null)
+            {
+                web.AllowUnsafeUpdates = true;
+                web.Lists.Add(folderName, "Redacted Documents", SPListTemplateType.DocumentLibrary);
+                web.Update();
+                web.AllowUnsafeUpdates = false;
+            }
+
+            rootList = web.Lists[folderName];
+            return rootList;
         }
 
         #endregion Methods
