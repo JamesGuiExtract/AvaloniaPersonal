@@ -17,6 +17,7 @@
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccAuxPath>http://white/VaultService</SccAuxPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
+    <ActiveDeploymentConfiguration>No Activation</ActiveDeploymentConfiguration>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -61,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtractSharePointHelper.cs" />
+    <Compile Include="ExtractSharePointLoggingService.cs" />
     <Compile Include="Features\Extract.SharePoint.Redaction\Extract.SharePoint.Redaction.EventReceiver.cs">
       <DependentUpon>Extract.SharePoint.Redaction.feature</DependentUpon>
     </Compile>
@@ -87,6 +89,7 @@
     <Compile Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx.designer.cs">
       <DependentUpon>WatchFolderWithIdShield.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="LockFileManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -136,15 +139,9 @@
     <Content Include="Images\IdShieldImages\UnwatchFolder16x16.png" />
     <Content Include="Images\IdShieldImages\UnwatchFolder32x32.png" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\RedactionHelpers.js" />
-    <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx" />
+    <Content Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx" />
+    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx" />
     <Content Include="Layouts\Extract.SharePoint\EnableHelpers.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

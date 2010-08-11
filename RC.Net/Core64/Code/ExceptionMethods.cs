@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -8,6 +7,9 @@ using System.Text;
 
 namespace Extract64.Core
 {
+    /// <summary>
+    /// Static helper methods for managing exceptions from 64 bit applications.
+    /// </summary>
     public static class ExceptionMethods
     {
         /// <summary>
