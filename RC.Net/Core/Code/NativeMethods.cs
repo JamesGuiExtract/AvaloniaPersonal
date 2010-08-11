@@ -18,7 +18,8 @@ namespace Extract
         //          the mangled name of the function followed by a space and '='.
         [DllImport("BaseUtils.dll",
             EntryPoint = "?externManipulator@@YAPAEPBDPAK@Z", CharSet = CharSet.Ansi,
-            BestFitMapping = false, ThrowOnUnmappableChar = true)]
+            BestFitMapping = false, ThrowOnUnmappableChar = true,
+            CallingConvention = CallingConvention.Cdecl)]
 #if DEBUG
         // Need to suppress the AvoidUncalledPrivateCode message in DEBUG builds because
         // these methods (currently) are only accessed when the code is built in Release mode.
@@ -32,7 +33,8 @@ namespace Extract
         //          either cannot be created or it throws an exception in the process of logging
         //          an exception.
         [DllImport("BaseUtils.dll", EntryPoint = "?externLogException@@YAXPAD0@Z",
-            CharSet = CharSet.Ansi, BestFitMapping=false, ThrowOnUnmappableChar=true)]
+            CharSet = CharSet.Ansi, BestFitMapping=false, ThrowOnUnmappableChar=true,
+            CallingConvention = CallingConvention.Cdecl)]
 #if DEBUG
         // Need to suppress the AvoidUncalledPrivateCode message in DEBUG builds because
         // these methods (currently) are only accessed when the code is built in Release mode.
