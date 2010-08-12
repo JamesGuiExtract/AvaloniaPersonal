@@ -69,7 +69,13 @@ namespace Extract.SharePoint.Layouts.Extract.SharePoint.Redaction
                     + "</script>";
             try
             {
+                // Remove trailing '\'
                 string folder = txtFolder.Text;
+                if (folder.EndsWith("\\", StringComparison.Ordinal))
+                {
+                    folder = folder.Substring(0, folder.Length - 1);
+                }
+
                 SPFeature feature = Web.Features[ExtractSharePointHelper._IDSHIELD_FEATURE_GUID];
                 if (feature != null)
                 {

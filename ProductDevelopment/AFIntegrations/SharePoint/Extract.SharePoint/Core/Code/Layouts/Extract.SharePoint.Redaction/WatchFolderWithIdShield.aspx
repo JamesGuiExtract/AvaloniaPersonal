@@ -50,7 +50,7 @@
     <br />
     <br />
     <asp:RadioButton ID="radSubFolder" runat="server" GroupName="RadioOutputPath"
-        Text="Use parallel folder called "
+        Text="Use sub folder called "
         OnCheckedChanged="RadioButtonChanged"
         AutoPostBack="true"
     />

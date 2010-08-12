@@ -65,7 +65,7 @@ function getFolderFromUrl(url)
         {
             var temp = url.substring(0, index);
             index = temp.lastIndexOf('/');
-            folder = temp.substr(index + 1);
+            folder = temp.substr(index);
         }
     }
 

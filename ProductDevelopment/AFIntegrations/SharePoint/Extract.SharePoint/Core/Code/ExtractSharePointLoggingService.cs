@@ -65,7 +65,7 @@ namespace Extract.SharePoint
         public static void LogError(ErrorCategoyId categoryId, string errorMessage)
         {
             SPDiagnosticsCategory category = ExtractSharePointLoggingService.Current[categoryId];
-            ExtractSharePointLoggingService.Current.WriteTrace(0, category, TraceSeverity.Unexpected,
+            ExtractSharePointLoggingService.Current.WriteTrace(42, category, TraceSeverity.Unexpected,
                 errorMessage);
         }
 
@@ -77,7 +77,7 @@ namespace Extract.SharePoint
         public static void LogError(ErrorCategoyId categoryId, Exception ex)
         {
             SPDiagnosticsCategory category = ExtractSharePointLoggingService.Current[categoryId];
-            ExtractSharePointLoggingService.Current.WriteTrace(0,
+            ExtractSharePointLoggingService.Current.WriteTrace(42,
                 category, TraceSeverity.Unexpected, ex.Message, ex.StackTrace);
         }
 

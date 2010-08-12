@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 
 namespace Extract.SharePoint.Redaction
@@ -227,14 +228,13 @@ namespace Extract.SharePoint.Redaction
         static string GetDestinationFileName(string fullPath, string watchPath,
             Dictionary<string, FolderProcessingSettings> folderSettings)
         {
-            string destination = string.Empty;
+            StringBuilder destination = new StringBuilder();
             string path = fullPath;
             string fileName = Path.GetFileNameWithoutExtension(fullPath);
             string folder = Path.GetDirectoryName(path);
-            string folderUpOne = Path.GetDirectoryName(folder);
-            string topFolder = folder.Replace(folderUpOne, "").Replace("\\", "");
+            string folderUpOne = Path.GetDirectoryName(folder) + "\\";
+            string topFolder = folder.Replace(folderUpOne, "");
             folder = folder.Replace(watchPath, "/").Replace("\\", "/");
-            folderUpOne = folderUpOne.Replace(watchPath, "/").Replace("\\", "/");
 
             // Attempt to get the folder settings
             FolderProcessingSettings settings = null;
@@ -244,40 +244,72 @@ namespace Extract.SharePoint.Redaction
                 switch (settings.OutputLocation)
                 {
                     case IdShieldOutputLocation.ParallelFolderPrefix:
-                        destination = folderUpOne + "/" + settings.OutputLocationString
-                            + "_" + topFolder + "/" + fileName;
-                        break;
-
                     case IdShieldOutputLocation.ParallelFolderSuffix:
-                        destination = folderUpOne + "/" + topFolder + "_"
-                            + settings.OutputLocationString + "/" + fileName;
+                        // Need to configure the folderUpOne name properly
+                        // for file/folder access in SP
+                        folderUpOne = folderUpOne.Replace(watchPath, "/");
+                        folderUpOne = folderUpOne.Remove(folderUpOne.Length - 1).Replace("\\", "/");
+
+                        destination.Append(folderUpOne);
+                        destination.Append("/");
+                        if (settings.OutputLocation == IdShieldOutputLocation.ParallelFolderPrefix)
+                        {
+                            destination.Append(settings.OutputLocationString);
+                            destination.Append("_");
+                            destination.Append(topFolder);
+                        }
+                        else
+                        {
+                            destination.Append(topFolder);
+                            destination.Append("_");
+                            destination.Append(settings.OutputLocationString);
+                        }
+
+                        destination.Append("/");
+                        destination.Append(fileName);
                         break;
 
                     case IdShieldOutputLocation.SubFolder:
-                        destination = folderUpOne + "/" + settings.OutputLocationString
-                            + "/" + fileName;
+                        destination.Append(folder);
+                        destination.Append("/");
+                        destination.Append(settings.OutputLocationString);
+                        destination.Append("/");
+                        destination.Append(fileName);
                         break;
 
                     case IdShieldOutputLocation.PrefixFilename:
                     case IdShieldOutputLocation.SuffixFilename:
-                        destination = folder + "/";
+                        destination.Append(folder);
+                        destination.Append("/");
                         if (settings.OutputLocation == IdShieldOutputLocation.PrefixFilename)
                         {
-                            destination += settings.OutputLocationString + "_"
-                                + fileName;
+                            destination.Append(settings.OutputLocationString);
+                            destination.Append("_");
+                            destination.Append(fileName);
                         }
                         else
                         {
-                            destination += fileName + "_" + settings.OutputLocationString;
+                            string extension = Path.GetExtension(fileName);
+                            string name = Path.GetFileNameWithoutExtension(fileName);
+                            destination.Append(name);
+                            destination.Append("_");
+                            destination.Append(settings.OutputLocationString);
+                            destination.Append(extension);
                         }
                         break;
 
                     case IdShieldOutputLocation.CustomOutputLocation:
+                        destination.Append(settings.OutputLocationString);
+                        if (!settings.OutputLocationString.EndsWith("/", StringComparison.Ordinal))
+                        {
+                            destination.Append("/");
+                        }
+                        destination.Append(fileName);
                         break;
                 }
             }
 
-            return destination;
+            return destination.ToString();
         }
 
         /// <summary>
@@ -373,9 +405,12 @@ namespace Extract.SharePoint.Redaction
                     {
                         foreach (string fileName in fileNames)
                         {
+                            string directory = Path.GetDirectoryName(fileName);
+                            string fileWithoutExtension =
+                                Path.GetFileNameWithoutExtension(fileName);
                             // Build path to redacted file
-                            string redactedFile = Path.Combine(Path.GetDirectoryName(fileName),
-                                Path.GetFileNameWithoutExtension(fileName)) + ".redacted";
+                            string redactedFile = Path.Combine(directory, fileWithoutExtension)
+                                + ".redacted";
 
                             // Build the destination file name
                             string destinationFileName = GetDestinationFileName(fileName,
@@ -403,6 +438,9 @@ namespace Extract.SharePoint.Redaction
                                 web.Update();
                                 EventFiringEnabled = true;
                             }
+
+                            // Cleanup all files related to this file
+                            CleanupLocalFiles(fileWithoutExtension, directory);
                         }
                     }
                 }
@@ -411,6 +449,34 @@ namespace Extract.SharePoint.Redaction
             {
                 ExtractSharePointLoggingService.LogError(ErrorCategoyId.IdShieldFileReceiver,
                     ex);
+            }
+        }
+
+        /// <summary>
+        /// Cleans up all files for the current processed file, deleting empty directories
+        /// as it goes.
+        /// </summary>
+        /// <param name="sourceFile">The file that finished processing (ex. 123.tif)</param>
+        /// <param name="directory">The directory containing the file.</param>
+        void CleanupLocalFiles(string sourceFile, string directory)
+        {
+            string baseFileName = Path.GetFileNameWithoutExtension(sourceFile);
+
+            // Search for and delete any files related to the base file in the directory.
+            string[] files = Directory.GetFiles(directory, baseFileName + ".*");
+            foreach (string file in files)
+            {
+                File.Delete(file);
+            }
+
+            // Check for empty directory
+            while (!directory.Equals(_outputFolder, StringComparison.OrdinalIgnoreCase)
+                && Directory.Exists(directory)
+                && Directory.GetFiles(directory).Length == 0
+                && Directory.GetDirectories(directory).Length == 0)
+            {
+                Directory.Delete(directory);
+                directory = Path.GetDirectoryName(directory);
             }
         }
 
@@ -458,7 +524,7 @@ namespace Extract.SharePoint.Redaction
 
         private SPList GetDocumentList(SPWeb web, string folderName)
         {
-            SPList rootList = web.Lists[folderName];
+            SPList rootList = web.Lists.TryGetList(folderName);
             if (rootList == null)
             {
                 web.AllowUnsafeUpdates = true;
