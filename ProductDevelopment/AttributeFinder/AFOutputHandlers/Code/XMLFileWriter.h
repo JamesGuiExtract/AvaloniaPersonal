@@ -11,7 +11,7 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // NOTE: The import is being done here instead of stdafx.h because the derived classes are 
 // the only ones that need the XML support
-#import <msxml.dll> named_guids
+#import <msxml.tlb> named_guids
 
 class XMLFileWriter
 {

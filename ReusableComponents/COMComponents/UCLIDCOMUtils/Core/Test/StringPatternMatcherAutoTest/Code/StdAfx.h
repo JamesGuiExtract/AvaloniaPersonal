@@ -29,7 +29,7 @@ using namespace UCLID_COMUTILSLib;
 #import "..\..\..\..\..\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" named_guids
 using namespace UCLID_TESTINGFRAMEWORKINTERFACESLib;
 
-#import <msxml.dll> named_guids
+#import <msxml.tlb> named_guids
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

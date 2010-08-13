@@ -26,8 +26,6 @@ extern CComModule _Module;
 #include "..\..\..\..\..\..\ReusableComponents\APIs\Microsoft Visual Studio\VC98\ATL\Include\atlcontrols.h"
 #include <afxmt.h>
 
-#import <msxml.dll> named_guids
-
 #import "..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
 using namespace UCLID_COMLMLib;
 
