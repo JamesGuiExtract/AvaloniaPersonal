@@ -71,6 +71,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnchoredFlowLayoutPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="AnchoredFlowLayoutPanel.Designer.cs">
+      <DependentUpon>AnchoredFlowLayoutPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="GenericPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -100,6 +106,10 @@
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
+      <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
