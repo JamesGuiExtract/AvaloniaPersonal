@@ -163,7 +163,7 @@ namespace Extract.DataEntry.DEP.Generic
             this._field2.Name = "_field2";
             this._field2.PersistAttribute = false;
             this._field2.Size = new System.Drawing.Size(452, 20);
-            this._field2.TabIndex = 13;
+            this._field2.TabIndex = 11;
             this._field2.ValidationErrorMessage = "Invalid value";
             // 
             // _label3
@@ -183,7 +183,7 @@ namespace Extract.DataEntry.DEP.Generic
             this._field3.Name = "_field3";
             this._field3.PersistAttribute = false;
             this._field3.Size = new System.Drawing.Size(452, 20);
-            this._field3.TabIndex = 13;
+            this._field3.TabIndex = 12;
             this._field3.ValidationErrorMessage = "Invalid value";
             // 
             // _label4
