@@ -81,6 +81,12 @@
     <Compile Include="AnchorAlignmentControl.Designer.cs">
       <DependentUpon>AnchorAlignmentControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="AnchoredFlowLayoutPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="AnchoredFlowLayoutPanel.Designer.cs">
+      <DependentUpon>AnchoredFlowLayoutPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="ApplicationCommand.cs" />
     <Compile Include="BetterComboBox.cs">
       <SubType>Component</SubType>

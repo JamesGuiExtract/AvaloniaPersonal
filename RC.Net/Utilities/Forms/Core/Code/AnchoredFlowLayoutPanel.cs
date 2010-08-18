@@ -1,12 +1,12 @@
 ﻿using Extract.Licensing;
-using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
-namespace Extract.DataEntry.DEP.Generic
+namespace Extract.Utilities.Forms
 {
     /// <summary>
     /// An extension of <see cref="FlowLayoutPanel"/> intended to make control sizing more
@@ -302,7 +302,7 @@ namespace Extract.DataEntry.DEP.Generic
         /// <returns></returns>
         static bool IsAutoSize(AnchorStyles anchor, bool horizontal)
         {
-            AnchorStyles autoSizeFlags = (horizontal ? (AnchorStyles.Left | AnchorStyles.Right) :
+            var autoSizeFlags = (horizontal ? (AnchorStyles.Left | AnchorStyles.Right) :
                 (AnchorStyles.Top | AnchorStyles.Bottom));
 
             return ((anchor & autoSizeFlags) == autoSizeFlags);
@@ -343,33 +343,27 @@ namespace Extract.DataEntry.DEP.Generic
                 SuspendLayout();
 
                 // Identify the columns created by the initial base.OnLayout call.
-                List<Column> columns = GetColumns();
-                List<Column> autoSizeColumns = new List<Column>();
+                var columns = GetColumns();
 
                 // Determine how much thickness is available on the control for the columns to make
                 // use of.
                 int remainingThickness = GetThickness(Size);
 
-                // Subtract the layout control's padding.
+                // Subtract padding and margins
                 remainingThickness -=
                     (Horizontal ? _originalPadding.Vertical : _originalPadding.Horizontal);
+                remainingThickness -= columns
+                    .Select(c => Horizontal ? c.Margin.Vertical : c.Margin.Horizontal)
+                    .Sum();
 
-                foreach (Column column in columns)
-                {
-                    // Subtract the column margins
-                    remainingThickness -=
-                        Horizontal ? column.Margin.Vertical : column.Margin.Horizontal;
+                // Subtract the sum of the fixed size columns
+                remainingThickness -= columns
+                    .Where(c => !c.AutoSize)
+                    .Select(c => c.MinThickness)
+                    .Sum();
 
-                    if (column.AutoSize)
-                    {
-                        autoSizeColumns.Add(column);
-                    }
-                    else
-                    {
-                        // Subtract the size of the fixed size columns
-                        remainingThickness -= column.MinThickness;
-                    }
-                }
+                // Find columns that are to be autosized.
+                var autoSizeColumns = new HashSet<Column>(columns.Where(c => c.AutoSize).ToArray());
 
                 // If there are any columns to be auto-sized, size the columns to take up the
                 // remainingThickness on the form.
@@ -383,7 +377,7 @@ namespace Extract.DataEntry.DEP.Generic
                         (_internalAnchor & AnchorStyles.Bottom) != 0 &&
                         (_internalAnchor & AnchorStyles.Top) == 0)
                 {
-                    Padding newPadding = Padding;
+                    var newPadding = Padding;
                     newPadding.Top = _originalPadding.Top + remainingThickness;
                     Padding = newPadding;
                 }
@@ -391,7 +385,7 @@ namespace Extract.DataEntry.DEP.Generic
                         (_internalAnchor & AnchorStyles.Right) != 0 &&
                         (_internalAnchor & AnchorStyles.Left) == 0)
                 {
-                    Padding newPadding = Padding;
+                    var newPadding = Padding;
                     newPadding.Left = _originalPadding.Left + remainingThickness;
                     Padding = newPadding;
                 }
@@ -415,11 +409,11 @@ namespace Extract.DataEntry.DEP.Generic
         /// <param name="columns">The <see cref="Column"/>s to be auto-sized.</param>
         /// <param name="remainingThickness">The number of pixels available for the provided
         /// <see cref="Column"/>s to occupy.</param>
-        void AutoSizeColumns(List<Column> columns, int remainingThickness)
+        void AutoSizeColumns(HashSet<Column> columns, int remainingThickness)
         {
             int autoColumnThickness = 0;
 
-            List<Column> autoSizeColumns = new List<Column>(columns);
+            var autoSizeColumns = new HashSet<Column>(columns);
 
             do
             {
@@ -428,28 +422,22 @@ namespace Extract.DataEntry.DEP.Generic
 
                 // Account for any auto-size columns whose minimum size is bigger than
                 // autoColumnThickness. No longer treat these columns as auto-sized.
-                List<Column> oversizedColumns = new List<Column>();
-                foreach (Column column in autoSizeColumns)
-                {
-                    if (column.MinThickness > autoColumnThickness)
-                    {
-                        oversizedColumns.Add(column);
-                    }
-                }
+                var oversizedColumns = new HashSet<Column>(autoSizeColumns
+                    .Where(c => c.MinThickness > autoColumnThickness)
+                    .ToArray());
 
                 if (oversizedColumns.Count == 0)
                 {
                     break;
                 }
 
-                foreach (Column column in oversizedColumns)
-                {
-                    autoSizeColumns.Remove(column);
+                autoSizeColumns.RemoveWhere(c => oversizedColumns.Contains(c));
 
-                    // Adjust remainingThickness and autoColumnThickness to account for the
-                    // oversized columns.
-                    remainingThickness -= column.MinThickness;
-                }
+                // Adjust remainingThickness and autoColumnThickness to account for the
+                // oversized columns.
+                remainingThickness = oversizedColumns
+                    .Select(c => c.MinThickness)
+                    .Sum();
 
                 // Repeat loop to ensure additional columns don't qualify as auto-sized using the
                 // new autoColumnThickness value.
@@ -464,15 +452,9 @@ namespace Extract.DataEntry.DEP.Generic
 
                 // Identify the control to use to set the column thickness (other autosize controls
                 // in the column will match this control in thickness.
-                Control masterControl = null;
-                foreach (Control control in column.Controls)
-                {
-                    if (IsAutoSize(control.Anchor, !Horizontal))
-                    {
-                        masterControl = control;
-                        break;
-                    }
-                }
+                var masterControl = column.Controls
+                    .Where(c => IsAutoSize(c.Anchor, !Horizontal))
+                    .First();
 
                 if (Horizontal)
                 {
@@ -536,7 +518,7 @@ namespace Extract.DataEntry.DEP.Generic
         /// <returns>A list of the <see cref="Column"/>s.</returns>
         List<Column> GetColumns()
         {
-            List<Column> columns = new List<Column>();
+            var columns = new List<Column>();
             Column currentColumn = null;
             int currentPosition = 0;
 
