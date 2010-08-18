@@ -2,7 +2,7 @@ using Microsoft.SharePoint;
 using System;
 using System.Runtime.InteropServices;
 
-namespace Extract.SharePoint.Features.Extract.SharePoint.Redaction
+namespace Extract.SharePoint.Redaction.Features
 {
     /// <summary>
     /// This class handles events raised during feature activation, deactivation, installation, uninstallation, and upgrade.
@@ -21,12 +21,12 @@ namespace Extract.SharePoint.Features.Extract.SharePoint.Redaction
         {
             try
             {
-                ExtractSharePointHelper.LoadFeatureSettings(properties.Feature);
+                IdShieldSettings.LoadIdShieldSettings(properties.Feature);
                 base.FeatureActivated(properties);
             }
             catch (Exception ex)
             {
-                ExtractSharePointLoggingService.LogError(ErrorCategoyId.Feature, ex);
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex);
             }
         }
 
@@ -39,12 +39,29 @@ namespace Extract.SharePoint.Features.Extract.SharePoint.Redaction
         {
             try
             {
-                ExtractSharePointHelper.SaveFeatureSettings(properties.Feature);
+                IdShieldSettings.StoreIdShieldSettings(properties.Feature);
                 base.FeatureDeactivating(properties);
             }
             catch (Exception ex)
             {
-                ExtractSharePointLoggingService.LogError(ErrorCategoyId.Feature, ex);
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex);
+            }
+        }
+
+        /// <summary>
+        /// Raises the feature uninstalling event.
+        /// </summary>
+        /// <param name="properties">The properties for the feature being uninstalled.</param>
+        public override void FeatureUninstalling(SPFeatureReceiverProperties properties)
+        {
+            try
+            {
+                IdShieldSettings.RemoveIdShieldSettings();
+                base.FeatureUninstalling(properties);
+            }
+            catch (Exception ex)
+            {
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex);
             }
         }
     }

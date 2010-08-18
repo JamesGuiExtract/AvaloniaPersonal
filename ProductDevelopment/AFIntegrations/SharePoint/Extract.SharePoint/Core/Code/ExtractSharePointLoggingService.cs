@@ -7,12 +7,31 @@ namespace Extract.SharePoint
     /// <summary>
     /// Error category enum for indicating where the error message is logged from.
     /// </summary>
-    public enum ErrorCategoyId
+    public enum ErrorCategoryId
     {
+        /// <summary>
+        /// No category for the error
+        /// </summary>
         None = 0,
+
+        /// <summary>
+        /// Error occurred in a feature
+        /// </summary>
         Feature = 1,
+
+        /// <summary>
+        /// Error occurred in custom action
+        /// </summary>
         CustomAction = 2,
+
+        /// <summary>
+        /// Error occurred in a webpart
+        /// </summary>
         WebPart = 3,
+
+        /// <summary>
+        /// Error occurred in the ID Shield file receiver
+        /// </summary>
         IdShieldFileReceiver = 4
     }
 
@@ -47,9 +66,9 @@ namespace Extract.SharePoint
         protected override IEnumerable<SPDiagnosticsArea> ProvideAreas()
         {
             List<SPDiagnosticsCategory> categories = new List<SPDiagnosticsCategory>();
-            foreach(string catName in Enum.GetNames(typeof(ErrorCategoyId)))
+            foreach(string catName in Enum.GetNames(typeof(ErrorCategoryId)))
             {
-                uint catId = (uint)(int)Enum.Parse(typeof(ErrorCategoyId), catName);
+                uint catId = (uint)(int)Enum.Parse(typeof(ErrorCategoryId), catName);
                 categories.Add(new SPDiagnosticsCategory(catName, TraceSeverity.Unexpected,
                     EventSeverity.Error, 0, catId));
             }
@@ -62,7 +81,7 @@ namespace Extract.SharePoint
         /// </summary>
         /// <param name="categoryId">The category for the error.</param>
         /// <param name="errorMessage">The text for the message to log.</param>
-        public static void LogError(ErrorCategoyId categoryId, string errorMessage)
+        public static void LogError(ErrorCategoryId categoryId, string errorMessage)
         {
             SPDiagnosticsCategory category = ExtractSharePointLoggingService.Current[categoryId];
             ExtractSharePointLoggingService.Current.WriteTrace(42, category, TraceSeverity.Unexpected,
@@ -74,7 +93,7 @@ namespace Extract.SharePoint
         /// </summary>
         /// <param name="categoryId">The category for the exception to log.</param>
         /// <param name="ex">The exception to log.</param>
-        public static void LogError(ErrorCategoyId categoryId, Exception ex)
+        public static void LogError(ErrorCategoryId categoryId, Exception ex)
         {
             SPDiagnosticsCategory category = ExtractSharePointLoggingService.Current[categoryId];
             ExtractSharePointLoggingService.Current.WriteTrace(42,
@@ -106,7 +125,7 @@ namespace Extract.SharePoint
         /// </summary>
         /// <param name="id">The category to get the diagnostic category for.</param>
         /// <returns>The specified diagnostic category.</returns>
-        public SPDiagnosticsCategory this[ErrorCategoyId id]
+        public SPDiagnosticsCategory this[ErrorCategoryId id]
         {
             get
             {

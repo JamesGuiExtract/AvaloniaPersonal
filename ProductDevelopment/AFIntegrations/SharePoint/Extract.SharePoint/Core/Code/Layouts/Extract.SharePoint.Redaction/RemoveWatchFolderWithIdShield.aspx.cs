@@ -1,10 +1,10 @@
-﻿using System;
-using Microsoft.SharePoint;
+﻿using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Extract.SharePoint.Layouts.Extract.SharePoint.Redaction
+namespace Extract.SharePoint.Redaction.Layouts
 {
     /// <summary>
     /// Code behind for the remove folder watching page.
@@ -25,10 +25,10 @@ namespace Extract.SharePoint.Layouts.Extract.SharePoint.Redaction
 
                 if (!string.IsNullOrEmpty(currentFolder))
                 {
-                    txtFolder.Text = currentFolder;
-                    SPFeature feature = Web.Features[ExtractSharePointHelper._IDSHIELD_FEATURE_GUID];
+                    textFolder.Text = currentFolder;
+                    SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
                     SPFeatureProperty property =
-                        feature.Properties[ExtractSharePointHelper._FOLDERS_TO_PROCESS];
+                        feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
                     if (property != null)
                     {
                         Dictionary<string, FolderProcessingSettings> folderSettings =
@@ -37,15 +37,15 @@ namespace Extract.SharePoint.Layouts.Extract.SharePoint.Redaction
                         if (folderSettings.ContainsKey(currentFolder))
                         {
                             message = "Remove the watching for this folder?";
-                            btnOk.Text = "Yes";
-                            btnCancel.Text = "No";
+                            buttonOk.Text = "Yes";
+                            buttonCancel.Text = "No";
                         }
                         else
                         {
                             message = "This folder is not currently being watched.";
                         }
 
-                        lblMessage.Text = message;
+                        labelMessage.Text = message;
                     }
                 }
 
@@ -58,17 +58,17 @@ namespace Extract.SharePoint.Layouts.Extract.SharePoint.Redaction
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        protected void btnOkClick(object sender, EventArgs e)
+        protected void HandleOkButtonClick(object sender, EventArgs e)
         {
             bool watchRemoved = false;
-            SPFeature feature = Web.Features[ExtractSharePointHelper._IDSHIELD_FEATURE_GUID];
+            SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
             SPFeatureProperty property =
-                feature.Properties[ExtractSharePointHelper._FOLDERS_TO_PROCESS];
+                feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
             if (property != null)
             {
                 Dictionary<string, FolderProcessingSettings> folderSettings =
                     FolderProcessingSettings.DeserializeFolderSettings(property.Value);
-                watchRemoved = folderSettings.Remove(txtFolder.Text);
+                watchRemoved = folderSettings.Remove(textFolder.Text);
                 property.Value = FolderProcessingSettings.SerializeFolderSettings(
                     folderSettings);
                 feature.Properties.Update();
@@ -78,7 +78,7 @@ namespace Extract.SharePoint.Layouts.Extract.SharePoint.Redaction
             if (watchRemoved)
             {
                 sb.Append("alert('Folder: ");
-                sb.Append(txtFolder.Text);
+                sb.Append(textFolder.Text);
                 sb.Append(" will no longer be watched'); ");
             }
             sb.Append("window.frameElement.commitPopup();");
@@ -94,7 +94,7 @@ namespace Extract.SharePoint.Layouts.Extract.SharePoint.Redaction
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        protected void btnCancelClick(object sender, EventArgs e)
+        protected void HandleCancelButtonClick(object sender, EventArgs e)
         {
             Context.Response.Clear();
             Context.Response.Write("<script type=\"text/javascript\">"

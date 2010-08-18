@@ -5,7 +5,7 @@
 <%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RemoveWatchFolderWithIdShield.aspx.cs" Inherits="Extract.SharePoint.Layouts.Extract.SharePoint.Redaction.RemoveWatchFolderWithIdShield" DynamicMasterPageFile="~masterurl/default.master" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RemoveWatchFolderWithIdShield.aspx.cs" Inherits="Extract.SharePoint.Redaction.Layouts.RemoveWatchFolderWithIdShield" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
@@ -13,16 +13,16 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     <asp:HiddenField ID="hiddenLoaded" runat="server" />
-    <asp:Label ID="lblFolder" runat="server" Text="Current folder:" />
+    <asp:Label ID="labelFolder" runat="server" Text="Current folder:" />
     <br />
-    <asp:TextBox ID="txtFolder" runat="server" ReadOnly="true" />
-    <br />
-    <br />
-    <asp:Label ID="lblMessage" runat="server" />
+    <asp:TextBox ID="textFolder" runat="server" ReadOnly="true" />
     <br />
     <br />
-    <asp:Button ID="btnOk" runat="server" Text="OK" onclick="btnOkClick"/>
-    <asp:Button ID="btnCancel" runat="server" Text="Cancel" OnClick="btnCancelClick" />
+    <asp:Label ID="labelMessage" runat="server" />
+    <br />
+    <br />
+    <asp:Button ID="buttonOk" runat="server" Text="OK" onclick="HandleOkButtonClick"/>
+    <asp:Button ID="buttonCancel" runat="server" Text="Cancel" OnClick="HandleCancelButtonClick" />
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

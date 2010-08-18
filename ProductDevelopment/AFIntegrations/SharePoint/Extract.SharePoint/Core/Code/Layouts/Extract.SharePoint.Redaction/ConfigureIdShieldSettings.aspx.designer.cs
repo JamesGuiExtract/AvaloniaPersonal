@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Extract.SharePoint.Layouts.Extract.SharePoint.Redaction {
+namespace Extract.SharePoint.Redaction.Layouts {
     
     
     public partial class ConfigureIdShieldSettings {
@@ -22,13 +22,13 @@ namespace Extract.SharePoint.Layouts.Extract.SharePoint.Redaction {
         protected global::System.Web.UI.WebControls.Label Label1;
         
         /// <summary>
-        /// txtFolder control.
+        /// textFolder control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtFolder;
+        protected global::System.Web.UI.WebControls.TextBox textFolder;
         
         /// <summary>
         /// hiddenLoaded control.
@@ -40,21 +40,21 @@ namespace Extract.SharePoint.Layouts.Extract.SharePoint.Redaction {
         protected global::System.Web.UI.WebControls.HiddenField hiddenLoaded;
         
         /// <summary>
-        /// btnOk control.
+        /// buttonOk control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnOk;
+        protected global::System.Web.UI.WebControls.Button buttonOk;
         
         /// <summary>
-        /// btnCancel control.
+        /// buttonCancel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCancel;
+        protected global::System.Web.UI.WebControls.Button buttonCancel;
     }
 }

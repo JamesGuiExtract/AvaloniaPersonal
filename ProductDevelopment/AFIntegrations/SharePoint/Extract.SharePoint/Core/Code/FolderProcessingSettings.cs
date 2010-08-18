@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.CompilerServices;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Extract.SharePoint
 {
@@ -16,7 +14,7 @@ namespace Extract.SharePoint
     {
         ParallelFolderPrefix = 0,
         ParallelFolderSuffix = 1,
-        SubFolder = 2,
+        Subfolder = 2,
         PrefixFilename = 3,
         SuffixFilename = 4,
         CustomOutputLocation = 5
@@ -186,17 +184,13 @@ namespace Extract.SharePoint
         }
 
         /// <summary>
-        /// Gets/sets whether subfolders should be recursively searched.
+        /// Gets whether subfolders should be recursively searched.
         /// </summary>
         public bool RecurseSubfolders
         {
             get
             {
                 return _recurse;
-            }
-            set
-            {
-                _recurse = value;
             }
         }
 
@@ -245,7 +239,7 @@ namespace Extract.SharePoint
         }
 
         /// <summary>
-        /// Gets/sets the output location for the for the redacted file.
+        /// Gets the output location for the for the redacted file.
         /// </summary>
         public IdShieldOutputLocation OutputLocation
         {
@@ -253,14 +247,10 @@ namespace Extract.SharePoint
             {
                 return _outputLocation;
             }
-            set
-            {
-                _outputLocation = value;
-            }
         }
 
         /// <summary>
-        /// Gets/sets the output location string for the redacted file. This values
+        /// Gets the output location string for the redacted file. This values
         /// meaning is based on the value of <see cref="OutputLocation"/>.
         /// </summary>
         public string OutputLocationString
@@ -268,10 +258,6 @@ namespace Extract.SharePoint
             get
             {
                 return _outputLocationString;
-            }
-            set
-            {
-                _outputLocationString = value ?? string.Empty;
             }
         }
 

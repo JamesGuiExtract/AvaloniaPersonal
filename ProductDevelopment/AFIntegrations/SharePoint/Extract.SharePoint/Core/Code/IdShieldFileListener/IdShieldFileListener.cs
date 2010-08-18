@@ -67,7 +67,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                ExtractSharePointLoggingService.LogError(ErrorCategoyId.IdShieldFileReceiver,
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.IdShieldFileReceiver,
                     ex);
             }
         }
@@ -88,7 +88,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                ExtractSharePointLoggingService.LogError(ErrorCategoyId.IdShieldFileReceiver, ex);
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.IdShieldFileReceiver, ex);
             }
         }
 
@@ -104,7 +104,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                ExtractSharePointLoggingService.LogError(ErrorCategoyId.IdShieldFileReceiver, ex);
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.IdShieldFileReceiver, ex);
             }
         }
 
@@ -175,7 +175,7 @@ namespace Extract.SharePoint.Redaction
                 {
                     // Get the folder settings from the feature
                     SPFeatureProperty property =
-                        feature.Properties[ExtractSharePointHelper._FOLDERS_TO_PROCESS];
+                        feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
                     if (property != null)
                     {
                         string temp = property.Value;
@@ -190,7 +190,7 @@ namespace Extract.SharePoint.Redaction
 
                     // Get the processing folder setting
                     property =
-                        feature.Properties[ExtractSharePointHelper._ID_SHIELD_LOCAL_FOLDER];
+                        feature.Properties[IdShieldSettings._LOCAL_WORKING_FOLDER_SETTING_STRING];
                     if (property != null)
                     {
                         _outputFolder = property.Value;
@@ -211,9 +211,16 @@ namespace Extract.SharePoint.Redaction
         /// <param name="web">The web to search for the feature.</param>
         /// <returns>The ID Shield feature (or <see langword="null"/> if it is
         /// not installed.</returns>
-        SPFeature GetIdShieldFeature(SPWeb web)
+        static SPFeature GetIdShieldFeature(SPWeb web)
         {
-            return web.Features[ExtractSharePointHelper._IDSHIELD_FEATURE_GUID];
+            try
+            {
+                return web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -269,7 +276,7 @@ namespace Extract.SharePoint.Redaction
                         destination.Append(fileName);
                         break;
 
-                    case IdShieldOutputLocation.SubFolder:
+                    case IdShieldOutputLocation.Subfolder:
                         destination.Append(folder);
                         destination.Append("/");
                         destination.Append(settings.OutputLocationString);
@@ -422,7 +429,7 @@ namespace Extract.SharePoint.Redaction
                                 && !string.IsNullOrEmpty(destinationFileName))
                             {
                                 string destFolder = destinationFileName.Substring(0,
-                                    destinationFileName.LastIndexOf("/"));
+                                    destinationFileName.LastIndexOf("/", StringComparison.Ordinal));
 
                                 // Create the destination folder if necessary
                                 EnsureDestinationFolderExists(web, destFolder);
@@ -447,7 +454,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                ExtractSharePointLoggingService.LogError(ErrorCategoyId.IdShieldFileReceiver,
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.IdShieldFileReceiver,
                     ex);
             }
         }
@@ -486,7 +493,7 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         /// <param name="web">The SP web to create the folder on.</param>
         /// <param name="destFolder">The web relative path to the destination folder.</param>
-        void EnsureDestinationFolderExists(SPWeb web, string destFolder)
+        static void EnsureDestinationFolderExists(SPWeb web, string destFolder)
         {
             try
             {
@@ -522,7 +529,7 @@ namespace Extract.SharePoint.Redaction
             }
         }
 
-        private SPList GetDocumentList(SPWeb web, string folderName)
+        static SPList GetDocumentList(SPWeb web, string folderName)
         {
             SPList rootList = web.Lists.TryGetList(folderName);
             if (rootList == null)
