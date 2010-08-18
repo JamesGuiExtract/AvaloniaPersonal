@@ -77,6 +77,18 @@ RuleTesterDlg::~RuleTesterDlg()
 {
 	try
 	{
+		// [FlexIDSCore:4266]
+		// Since a couple tester pages pages use ma_pCfgTesterMgr and message handlers triggered in
+		// the chain of events set off by this destructor could reference ma_pCfgTesterMgr after it
+		// has been destroyed, first destory this window ensure no message handlers are called after
+		// ma_pCfgTesterMgr's destruction.
+		if (::IsWindow(GetSafeHwnd()))
+		{
+			DestroyWindow();
+		}
+
+		ma_pCfgTesterMgr.reset(NULL);
+
 		// if we have successfully connected to the input manager,
 		// release the reference and also destroy all currently open input receivers.
 		if (getInputManager())
