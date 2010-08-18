@@ -210,7 +210,7 @@ static const string gstrCREATE_INPUT_EVENT_INDEX = "CREATE UNIQUE NONCLUSTERED I
 	"[IX_Input_Event] ON [InputEvent]([TimeStamp], [ActionID], [MachineID], [FAMUserID], [PID])";
 
 static const string gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX = 
-	"CREATE UNIQUE NONCLUSTERED INDEX "
+	"CREATE NONCLUSTERED INDEX "
 	"[IX_FileActionStatus_ActionID_ActionStatus] ON [dbo].[FileActionStatus] "
 	"([ActionID] ASC, [ActionStatus] ASC)";
 

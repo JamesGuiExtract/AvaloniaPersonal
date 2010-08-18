@@ -689,14 +689,18 @@ private:
 	// function includes attempting to auto-revert locked files, recording appropriate entries in
 	// the FAST table and adding an appropriate entry to the locked file table.
 	// REQUIRE:	The query must return the following columns from the FAMFile table:
-	//			SELECT ID, FileName, Pages, FileSize, Priority and the "ASC_" action column for the
-	//			current action.
+	//			SELECT ID, FileName, Pages, FileSize, Priority and the action status for the
+	//			current action from the FileActionStatus table.
 	// RETURNS: A vector of IFileRecords for the files that were set to processing.
 	IIUnknownVectorPtr setFilesToProcessing(const _ConnectionPtr &ipConnection,
 		const string& strSelectSQL, long nActionID);
 
 	// Gets a set containing the File ID's for all files that are skipped for the specified action
 	set<long> getSkippedFilesForAction(const _ConnectionPtr& ipConnection, long nActionId);
+
+	// Returns recordset opened as static containing the status record the file with nFileID and 
+	// action nActionID. If the status is unattempted the recordset will be empty
+	_RecordsetPtr getFileActionStatusSet(_ConnectionPtr& ipConnection, long nFileID, long nActionID);
 
 	void validateLicense();
 
@@ -765,6 +769,8 @@ private:
 	IIUnknownVectorPtr setFilesToProcessing2(const _ConnectionPtr &ipConnection,
 														   const string& strSelectSQL,
 														   long nActionID);
+	long addActionToRecordset2(_ConnectionPtr ipConnection, _RecordsetPtr ipRecordset, 
+		const string &strAction);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

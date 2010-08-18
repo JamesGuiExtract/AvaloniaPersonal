@@ -228,7 +228,7 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction, long* pnID)
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
 
-		*pnID = defineNewAction(ipConnection, strActionName);
+		*pnID = getKeyID(ipConnection, "Action", "ASCName", strActionName);
 
 		// Commit this transaction
 		tg.CommitTrans();
@@ -297,9 +297,6 @@ STDMETHODIMP CFileProcessingDB::DeleteAction(BSTR strAction)
 
 			// Delete the record 
 			ipActionSet->Delete(adAffectCurrent);
-
-			// Remove column from FAMFile
-			removeActionColumn(ipConnection, strActionName);
 
 			// Commit the change to the database
 			tg.CommitTrans();
@@ -425,14 +422,17 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 		long nActionID = getActionID(ipConnection, strActionName);
 		_lastCodePos = "45";
 
-		// Action Column to update
-		string strActionCol = "ASC_" + strActionName;
+		// if the file is in the FAMFile table get the ID
+		if (asCppBool(*pbAlreadyExists))
+		{
+			nID = getLongField(ipFileSet->Fields, "ID");
+		}
 
-		// Get the previous status (if there was no previous record then the previous status
-		// is always unattempted
-		*pPrevStatus = *pbAlreadyExists == VARIANT_TRUE ?
-			asEActionStatus(getStringField(ipFileSet->Fields, strActionCol)) : kActionUnattempted;
-		_lastCodePos = "48";
+		// Get the FileActionStatus recordset with the status of the file for the action
+		// NOTE: if nID = 0 or File status is unattempted for the action the recordset will be empty
+		_RecordsetPtr ipFileActionStatusSet = getFileActionStatusSet(ipConnection, nID, nActionID);
+		*pPrevStatus = (asCppBool(!ipFileActionStatusSet->adoEOF)) ?
+			asEActionStatus(getStringField(ipFileActionStatusSet->Fields, "ActionStatus")) : kActionUnattempted;
 
 		// Only update file size and page count if the previous status is unattempted
 		// or force status change is true
@@ -488,9 +488,6 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 			// Set the fields from the new file record
 			setFieldsFromFileRecord(ipFields, ipNewFileRecord);
 
-			// set the initial Action state to pending
-			setStringField(ipFields, strActionCol, strNewStatus);
-
 			_lastCodePos = "60";
 
 			// Add the record
@@ -500,6 +497,13 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 
 			// get the new records ID to return
 			nID = getLastTableID(ipConnection, "FAMFile");
+
+			// Create a record in the FileActionStatus table for the status of the new record
+			string strStatusSQL = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus)  VALUES( " + 
+				asString(nID) + ", " + asString(nActionID) + ", '" + strNewStatus + "')";
+			
+			// Execute query to insert the new FileActionStatus record
+			executeCmdQuery(ipConnection, strStatusSQL);
 
 			// update the statistics
 			updateStats(ipConnection, nActionID, *pPrevStatus, eNewStatus, ipNewFileRecord, NULL);
@@ -536,14 +540,17 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 						revertTimedOutProcessingFAMs(ipConnection);
 						
 						// Requery to see if the attempt had an effect on the file in question.
-						ipFileSet->Requery(adOptionUnspecified);
+						ipFileActionStatusSet->Requery(adOptionUnspecified);
 
-						// Update the action status to reflect the attempt.
-						*pPrevStatus = asEActionStatus(getStringField(ipFields, strActionCol));
+						if (!asCppBool(ipFileActionStatusSet->adoEOF))
+						{
+							// Update the action status to reflect the attempt.
+							*pPrevStatus = asEActionStatus(getStringField(ipFileActionStatusSet->Fields, "ActionStatus"));
 
-						// Re-test to see if the record is still marked as processing.
-						bAttemptedRevert = true;
-						continue;
+							// Re-test to see if the record is still marked as processing.
+							bAttemptedRevert = true;
+							continue;
+						}
 					}
 
 					UCLIDException ue("ELI30364", "Cannot force status from Processing.");
@@ -556,15 +563,28 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 				// (only update the priority if force processing)
 				setFieldsFromFileRecord(ipFields, ipNewFileRecord, asCppBool(bForceStatusChange));
 
-				// set the Action state to the new status
-				setStringField(ipFields, strActionCol, strNewStatus);
-
 				_lastCodePos = "110";
 
 				// Update the record
 				ipFileSet->Update();
 
 				_lastCodePos = "120";
+
+				// Update the FileActionStatus record to have the new status
+				string strStatusSQL;
+				if ( *pPrevStatus == kActionUnattempted)
+				{
+					strStatusSQL = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus)  VALUES( " + 
+						asString(nID) + ", " + asString(nActionID) + ", '" + strNewStatus + "')";
+				}
+				else
+				{
+					strStatusSQL = "UPDATE FileActionStatus SET ActionStatus = " + strNewStatus +
+						" WHERE FileID = " + asString(nID) + " AND ActionID = " + asString(nActionID);
+				}
+
+				// Update or insert the status
+				executeCmdQuery(ipConnection, strStatusSQL);	
 
 				// If the previous status was skipped, remove the record from the skipped file table
 				if (*pPrevStatus == kActionSkipped)
@@ -666,7 +686,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 
 		// Open a recordset that contain only the record (if it exists) with the given filename
 		string strFileSQL = "SELECT * FROM FAMFile WHERE FileName = '" + strFileName + "'";
-		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 			adLockOptimistic, adCmdText);
 
 		// Begin a transaction
@@ -687,39 +707,48 @@ STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord;
 			ipOldRecord = getFileRecordFromFields(ipFields);
 
-			// Action Column to change
-			string strActionCol = "ASC_" + strActionName;
-
 			// Get the file ID
 			long nFileID = ipOldRecord->FileID;
 
-			// Get the Previous file state
-			string strActionState = getStringField(ipFields, strActionCol);
+			// Get the FileActionStatus record for the file id and action id
+			_RecordsetPtr ipFileActionStatusSet = getFileActionStatusSet(ipConnection, nFileID, nActionID);
 
-			// only change the state if the current state is pending
-			if (strActionState == "P")
+			// Check for empty ipFileActionStatusSet, since this will indicate that the current state is unattempted
+			if (!asCppBool(ipFileActionStatusSet->adoEOF))
 			{
-				// change state to unattempted
-				setStringField(ipFields, strActionCol, "U");
+				// only need to look at the fields for the action status
+				ipFields = ipFileActionStatusSet->Fields;
 
-				ipFileSet->Update();
+				// Get the Previous file state
+				string strActionState = getStringField(ipFields, "ActionStatus");
 
-				// Only update FileActionStateTransition Table if required
-				if (m_bUpdateFASTTable)
+				// only change the state if the current state is pending
+				if (strActionState == "P")
 				{
-					// Add a ActionStateTransition record for the state change
-					addFileActionStateTransition(ipConnection, nFileID, nActionID, strActionState, "U", "", "Removed");
+					// To set to unattempted just need to delete the record from the FileActionStatus table
+					string strSQLDeleteFileActionStatus = "DELETE FROM FileActionStatus WHERE FileID = " + asString(nFileID) 
+						+ " AND ActionID = " + asString(nActionID);
+
+					// Execute query to delete the FileActionStatus record for the file and action
+					executeCmdQuery(ipConnection, strSQLDeleteFileActionStatus);
+
+					// Only update FileActionStateTransition Table if required
+					if (m_bUpdateFASTTable)
+					{
+						// Add a ActionStateTransition record for the state change
+						addFileActionStateTransition(ipConnection, nFileID, nActionID, strActionState, "U", "", "Removed");
+					}
+
+					// update the statistics
+					updateStats(ipConnection, nActionID, asEActionStatus(strActionState), kActionUnattempted, NULL, ipOldRecord); 
 				}
 
-				// update the statistics
-				updateStats(ipConnection, nActionID, asEActionStatus(strActionState), kActionUnattempted, NULL, ipOldRecord); 
-			}
-
-			// Update QueueEvent table if enabled
-			if (m_bUpdateQueueEventTable)
-			{
-				// add record the QueueEvent table to indicate that the file was deleted
-				addQueueEventRecord(ipConnection, nFileID, nActionID, asString(strFile), "D");
+				// Update QueueEvent table if enabled
+				if (m_bUpdateQueueEventTable)
+				{
+					// add record the QueueEvent table to indicate that the file was deleted
+					addQueueEventRecord(ipConnection, nFileID, nActionID, asString(strFile), "D");
+				}
 			}
 		}
 
@@ -918,24 +947,25 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI30369", ipFileSet != NULL);
 
-		// Open Recordset that contains only the record with the given ID
-		string strFileSQL = "SELECT * FROM FAMFile WHERE ID = " + asString (nFileID);
-		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockOptimistic, adCmdText);
-
 		// Set the action name from the parameter
 		string strActionName = asString(strAction);
 		
 		// Get the action ID and update the strActionName to stored value
 		long nActionID = getActionID(ipConnection, strActionName);
 
-		// Action Column to update
-		string strActionCol = "ASC_" + strActionName;
+		// Open Recordset that contains only the record with the given ID
+		string strFileSQL = "SELECT FAMFile.ID, COALESCE(ActionStatus, 'U') AS ActionStatus "
+			"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
+			" AND FileActionStatus.ActionID = " + asString(nActionID) + " WHERE FAMFile.ID = " 
+			+ asString (nFileID);
+		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockOptimistic, adCmdText);
+
 		// if the file exists should not be at the end of the file
 		if (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
 			// Set return value to the current Action Status
-			string strStatus = getStringField(ipFileSet->Fields, strActionCol);
+			string strStatus = getStringField(ipFileSet->Fields, "ActionStatus");
 			*pStatus = asEActionStatus(strStatus);
 
 			// If the file status is processing and the caller would like to check if it is a
@@ -956,7 +986,7 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
 				ipFileSet->Requery(adOptionUnspecified);
 
 				// Get the updated status
-				string strStatus = getStringField(ipFileSet->Fields, strActionCol);
+				string strStatus = getStringField(ipFileSet->Fields, "ActionStatus");
 				*pStatus = asEActionStatus(strStatus);
 			}
 		}
@@ -1027,38 +1057,26 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus(long nWhereActionID,  
 		validateDBSchemaVersion();
 
 		string strToAction = getActionName(ipConnection, nToActionID);
-		string strWhereAction = getActionName(ipConnection, nWhereActionID);
-		string strFromActionCol;
-		if (nFromActionID > 0)
-		{
-			strFromActionCol = "ASC_" + getActionName(ipConnection, nFromActionID);
-		}
 
-		// Action column to search
-		string strWhereActionCol = "ASC_" + strWhereAction;
-
-		// Action Column to change
-		string strToActionCol = "ASC_" + strToAction;
+		// Create string to use for Where action ID
+		string strWhereActionID = asString(nWhereActionID);
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
 
-		string strSQL = "SELECT FAMFile.ID AS FAMFileID";
-		if (!strFromActionCol.empty())
-		{
-			strSQL += ", FAMFile." + strFromActionCol;
-		}
+		string strSQL = "SELECT FAMFile.ID AS FAMFileID, COALESCE(ActionStatus, 'U') AS WhereActionStatus ";
 
-		strSQL += " FROM FAMFile";
+		strSQL += " FROM FAMFile LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID"
+			" AND ActionID = " + strWhereActionID;
 
-		string strWhere = " WHERE (FAMFile." + strWhereActionCol + " = '"
+		string strWhere = " WHERE (WhereActionStatus = '"
 			+ asStatusString(eWhereStatus) + "'";
 
 		// Where status is skipped, need to add inner join to skip file table
 		if (eWhereStatus == kActionSkipped)
 		{
 			strSQL += " INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID ";
-			strWhere += " AND SkippedFile.ActionID = " + asString(nWhereActionID);
+			strWhere += " AND SkippedFile.ActionID = " + strWhereActionID;
 			string strUser = asString(bstrSkippedFromUserName);
 			if (!strUser.empty())
 			{
@@ -1089,7 +1107,7 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus(long nWhereActionID,  
 			long nFileID = getLongField(ipFields, "FAMFileID");
 			if (nFromActionID > 0)
 			{
-				strToStatus = getStringField(ipFields, strFromActionCol);
+				strToStatus = getStringField(ipFields, "WhereActionStatus");
 			}
 
 			setFileActionState(ipConnection, nFileID, strToAction, strToStatus, "",
@@ -1160,17 +1178,10 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 		// Get the action ID and update the strActionName to stored value
 		long nActionID = getActionID(ipConnection, strActionName);
 
-		// Action Column to change
-		string strActionCol = "ASC_" + strActionName;
+		string strActionStatus = asStatusString(eStatus);
 
 		// Only want to change the status that is different from status that is being changed to
-		string strWhere = " WHERE " + strActionCol + " <> '" + asStatusString(eStatus) + "'";
-
-		// Set the from statement
-		string strFrom = "FROM FAMFile " + strWhere;
-
-		// Create the query to update the file status for all files
-		string strUpdateSQL = "UPDATE FAMFile SET " + strActionCol + " = '" + asStatusString(eStatus) + "' " + strFrom;
+		string strWhere = " WHERE ActionStatus  <> '" + strActionStatus + "'";
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
@@ -1200,11 +1211,35 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 		}
 
 		// Add the transition records
-		addASTransFromSelect(ipConnection, strActionName, nActionID, asStatusString(eStatus),
+		addASTransFromSelect(ipConnection, strActionName, nActionID, strActionStatus,
 			"", "", strWhere, "");
 
-		// Update the FAMFiles table
-		executeCmdQuery(ipConnection, strUpdateSQL);
+
+		// if the new status is Unattempted
+		if (eStatus == kActionUnattempted)
+		{
+			string strDeleteStatus = "DELETE FROM FileActionStatus "
+				" WHERE ActionID = " + strActionID;
+			executeCmdQuery(ipConnection, strDeleteStatus);
+		}
+		else
+		{
+			// Update status of existing records
+			string strUpdateStatus = "UPDATE FileActionStatus SET ActionStatus = '" + 
+				strActionStatus + "' "
+				"FROM FileActionStatus INNER JOIN FAMFile ON FileID = FAMFile.ID AND "
+				"FileActionStatus.ActionID = " + strActionID;
+			executeCmdQuery(ipConnection, strUpdateStatus);
+
+			// Insert new records where previous status was 'U'
+			string strInsertStatus = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus)"
+				" SELECT FAMFile.ID, " + strActionID + " as ActionID, '" +
+				strActionStatus + "' as ActionStatus FROM FAMFile "
+				" LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID AND "
+				" FileActionStatus.ActionID = " + strActionID +
+				" WHERE FileActionStatus.ActionID IS NULL ";
+			executeCmdQuery(ipConnection, strInsertStatus);
+		}
 
 		// If going to complete status and AutoDeleteFileActionComments == true then
 		// clear the file action comments
@@ -1279,16 +1314,12 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 		
 		string strUPIID = asString(m_nUPIID);
 
-		// Action Column to change
-		string strActionCol = "ASC_" + strActionName;
-
 		string strWhere = "";
 		string strTop = "TOP (" + asString(nMaxFiles) + ") ";
 		if (bGetSkippedFiles == VARIANT_TRUE)
 		{
-			strWhere = " INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID "
-				"WHERE (SkippedFile.ActionID = " + strActionIDPlaceHolder
-				+ " AND FAMFile." + strActionCol + " = 'S'";
+			strWhere = " INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID AND  "
+				"SkippedFile.ActionID = <ActionIDPlaceHolder> WHERE (ActionStatus = 'S'";
 
 			string strUserName = asString(bstrSkippedForUserName);
 			if(!strUserName.empty())
@@ -1305,18 +1336,20 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 		}
 		else
 		{
-			strWhere = "WHERE (" + strActionCol + " = 'P')";
+			strWhere = "WHERE (ActionStatus = 'P')";
 		}
 
 		// Order by priority [LRCAU #5438]
 		strWhere += " ORDER BY [FAMFile].[Priority] DESC, [FAMFile].[ID] ASC ";
 
 		// Build the from clause
-		string strFrom = "FROM FAMFile " + strWhere;
+		string strFrom = "FROM FAMFile INNER JOIN FileActionStatus "
+			"ON FileActionStatus.FileID = FAMFile.ID AND FileActionStatus.ActionID = <ActionIDPlaceHolder> "
+			+ strWhere;
 			
 		// create query to select top records;
 		string strSelectSQL = "SELECT " + strTop
-			+ " FAMFile.ID, FileName, Pages, FileSize, Priority, " + strActionCol + " " + strFrom;
+			+ " FAMFile.ID, FileName, Pages, FileSize, Priority, ActionStatus " + strFrom;
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
@@ -1385,24 +1418,25 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder(BSTR strFolder, BSTR strAction)
 		// Get the action ID and update the strActionName to stored value
 		long nActionID = getActionID(ipConnection, strActionName);
 
-		// Action Column to change
-		string strActionCol = "ASC_" + strActionName;
-
 		// Replace any occurences of ' with '' this is because SQL Server use the ' to indicate the beginning and end of a string
 		string strFolderName = asString(strFolder);
 		replaceVariable(strFolderName, "'", "''");
 
 		// set up the where clause to find the pending records that the filename begins with the folder name
-		string strWhere = "WHERE (" + strActionCol + " = 'P') AND (FileName LIKE '" + strFolderName + "%')";
+		string strWhere = "WHERE (ActionStatus = 'P') AND (FileName LIKE '" + strFolderName + "%')";
 		string strFrom = "FROM FAMFile " + strWhere;
 
-		// Set up the SQL to update the FAMFile
-		string strUpdateSQL = "UPDATE FAMFile SET " + strActionCol + " = 'U' " + strFrom;
+		// Set up the SQL to delete the records in the FileActionStatus table 
+		string strDeleteSQL = "DELETE FROM FileActionStatus"
+			" WHERE ActionID = " + asString(nActionID) + " AND FileID IN ("
+			" SELECT FAMFile.ID FROM FileActionStatus RIGHT JOIN FAMFile "
+			" ON FileActionStatus.FileID = FAMFile.ID " + 
+			strWhere;
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
 
-		// add transition records to the databse
+		// add transition records to the database
 		addASTransFromSelect(ipConnection, strActionName, nActionID, "U", "", "", strWhere, "");
 
 		// Only update the QueueEvent table if update is enabled
@@ -1412,15 +1446,15 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder(BSTR strFolder, BSTR strAction)
 			string strInsertQueueRecords = "INSERT INTO QueueEvent (FileID, DateTimeStamp, QueueEventCode, FAMUserID, MachineID) ";
 
 			// Add the Select query to get the records to insert 
-			strInsertQueueRecords += "SELECT ID, GETDATE(), 'F', "
+			strInsertQueueRecords += "SELECT FAMFile.ID, GETDATE(), 'F', "
 				+ asString(getFAMUserID(ipConnection)) + ", " + asString(getMachineID(ipConnection)) + " " + strFrom;
 
 			// Add the QueueEvent records to the database
 			executeCmdQuery(ipConnection, strInsertQueueRecords);
 		}
 
-		// Update the status in the FAMFile table
-		executeCmdQuery(ipConnection, strUpdateSQL);
+		// Remove the FileActionStatus records for the deleted folder
+		executeCmdQuery(ipConnection, strDeleteSQL);
 
 		// Commit the changes to the database
 		tg.CommitTrans();
@@ -1559,18 +1593,9 @@ STDMETHODIMP CFileProcessingDB::RenameAction(long nActionID, BSTR strNewActionNa
 
 		TransactionGuard tg(ipConnection);
 
-		// Add a new column to the FMPFile table
-		addActionColumn(ipConnection, strNew);
-
-		// Copy status from the old column without transition records (and without update skipped table)
-		copyActionStatus(ipConnection, strOld, strNew, false);
-
 		// Change the name of the action in the action table
 		string strSQL = "UPDATE Action SET ASCName = '" + strNew + "' WHERE ID = " + asString(nActionID);
 		executeCmdQuery(ipConnection, strSQL);
-
-		// Remove the old action column from FMPFile table
-		removeActionColumn(ipConnection, strOld);
 
 		// Commit the transaction
 		tg.CommitTrans();
@@ -2676,20 +2701,6 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 
 		validateLicense();
 
-		// Determine the source of the new status
-		string strFromAction = asString(bstrFromAction);
-		bool bFromSpecified = !strFromAction.empty();
-		string strStatus = "";
-		if (bFromSpecified)
-		{
-			strFromAction = "ASC_" + strFromAction;
-		}
-		else
-		{
-			// Get the new status as a string
-			strStatus = asStatusString(eaStatus);
-		}
-
 		// Wrap the random condition (if there is one, in a smart pointer)
 		UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition(pRandomCondition);
 
@@ -2700,6 +2711,21 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 
 		// Get the connection for the thread and save it locally.
 		ipConnection = getDBConnection();
+
+		// Determine the source of the new status
+		string strFromAction = asString(bstrFromAction);
+		bool bFromSpecified = !strFromAction.empty();
+		string strStatus = "";
+		long nFromActionID = 0;
+		if (bFromSpecified)
+		{
+			nFromActionID = getActionID(ipConnection, strFromAction);
+		}
+		else
+		{
+			// Get the new status as a string
+			strStatus = asStatusString(eaStatus);
+		}
 
 		// Lock the database
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
@@ -2734,16 +2760,35 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 		}
 		ipFileSet->Close();
 
-		// The action column to change
-		string strToActionCol = "ASC_" + strToAction;
+		// Action id to change
+		long nToActionID = getActionID(ipConnection, strToAction);
+		string strToActionID = asString(nToActionID);
 
 		// Loop through the file Ids to change in groups of 10000 populating the SetFileActionData
 		map<string, vector<SetFileActionData>> mapFromStatusToId;
 		size_t count = vecFileIds.size();
 		size_t i = 0;
+		string strSelectQuery;
+		if (!bFromSpecified)
+		{
+			strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, Priority, "
+				"COALESCE(ToFAS.ActionStatus, 'U') AS ToActionStatus "
+				"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
+				"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID;
+		}
+		else
+		{
+			strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, Priority, "
+				"COALESCE(ToFAS.ActionStatus, 'U') AS ToActionStatus, "
+				"COALESCE(FromFAS.ActionStatus, 'U') AS FromActionStatus "
+				"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
+				"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID +
+				" LEFT JOIN FileActionStatus as FromFAS ON FAMFile.ID = FromFAS.FileID AND "
+				"FromFAS.ActionID = " + asString(nFromActionID);
+		}
 		while (i < count)
 		{
-			string strQuery = "SELECT * FROM FAMFile WHERE FAMFile.ID IN (";
+			string strQuery = strSelectQuery + " WHERE FAMFile.ID IN (";
 			string strFileIds = asString(vecFileIds[i++]);
 			for (int j=1; i < count && j < 10000; j++)
 			{
@@ -2761,16 +2806,16 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 				ASSERT_RESOURCE_ALLOCATION("ELI30383", ipFields != NULL);
 
 				long nFileID = getLongField(ipFields, "ID");
-				EActionStatus fromStatus = asEActionStatus(getStringField(ipFields, strToActionCol));
+				EActionStatus oldStatus = asEActionStatus(getStringField(ipFields, "ToActionStatus"));
 
 				// If copying from an action, get the status for the action
 				if (bFromSpecified)
 				{
-					strStatus = getStringField(ipFields, strFromAction);
+					strStatus = getStringField(ipFields, "FromActionStatus");
 				}
 
 				mapFromStatusToId[strStatus].push_back(SetFileActionData(nFileID,
-					getFileRecordFromFields(ipFields, false), fromStatus));
+					getFileRecordFromFields(ipFields, false), oldStatus));
 
 				ipFileSet->MoveNext();
 			}
@@ -3696,13 +3741,16 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTa
 		string strFromAction = "";
 		if (bFromAction)
 		{
-			strFromAction = "ASC_" + getActionName(ipConnection, nFromActionID);
 			replaceVariable(strQuery, gstrTAG_QUERY_SELECT,
-				"[FAMFile].[ID], [FAMFile]." + strFromAction);
+				"[FAMFile].[ID], COALESCE(ActionStatus, 'U' AS ActionStatus");
+			replaceVariable(strQuery, "<ActionStatusJoin>", 
+				"LEFT JOIN FileActionStatus ON FileTag.FileID = FileActionStatus.FileID "
+				"AND FileActionStatus.ActionID = " + asString(nFromActionID));
 		}
 		else
 		{
 			replaceVariable(strQuery, gstrTAG_QUERY_SELECT, "[FAMFile].[ID]");
+			replaceVariable(strQuery, "<ActionStatusJoin>", "");
 
 			// Get the new status as a string
 			strStatus = asStatusString(eaNewStatus);
@@ -3733,7 +3781,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTa
 			// If copying from an action, get the status for the action
 			if (bFromAction)
 			{
-				strStatus = getStringField(ipFields, strFromAction);
+				strStatus = getStringField(ipFields, "ActionStatus");
 			}
 
 			// Set the file action state
@@ -5298,11 +5346,11 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToProcessing(long nFileId, long nAc
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
-		// Action column to update
-		string strActionCol = "ASC_" + getActionName(ipConnection, nActionID);
 
-		string strSelectSQL = "SELECT ID, FileName, Pages, FileSize, Priority, " +
-			strActionCol + " FROM FAMFile WHERE ID = " + asString(nFileId);
+		string strSelectSQL = "SELECT FAMFile.ID, FileName, Pages, FileSize, Priority, "
+			"COALESCE(ActionStatus, 'U') AS ActionStatus FROM FAMFile LEFT JOIN FileActionStatus ON "
+			"FAMFile.ID = FileID AND ActionID = " + asString(nActionID) +
+			" WHERE FAMFile.ID = " + asString(nFileId);
 
 		// Perform all processing related to setting a file as processing.
 		setFilesToProcessing(ipConnection, strSelectSQL, nActionID);

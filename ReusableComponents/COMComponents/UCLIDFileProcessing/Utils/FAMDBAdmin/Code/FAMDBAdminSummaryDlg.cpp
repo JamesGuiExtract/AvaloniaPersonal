@@ -298,6 +298,141 @@ void CFAMDBAdminSummaryDlg::populatePage()
 	try
 	{
 		// ensure we have a database object
+		ASSERT_ARGUMENT("ELI30520", m_ipFAMDB != NULL);
+
+		if (m_ipFAMDB->DBSchemaVersion < 100 )
+		{
+			populatePage2();
+			return;
+		}
+
+		// Set the wait cursor
+		CWaitCursor wait;
+
+		// clear the list control first
+		m_listActions.DeleteAllItems();
+
+		// get the list of actions from the database
+		IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
+		ASSERT_RESOURCE_ALLOCATION("ELI30521", ipMapActions != NULL);
+
+		IVariantVectorPtr ipActionKeys = ipMapActions->GetKeys();
+		ASSERT_RESOURCE_ALLOCATION("ELI30522", ipActionKeys != NULL);
+
+		// loop through each action and add the data to the list control
+		long lNumActions = ipActionKeys->Size;
+		for (long i=0; i < lNumActions; i++)
+		{
+			// get the key from the variant vector (this is the action name)
+			string strActionName = asString(ipActionKeys->Item[i].bstrVal);
+			string strActionID = ipMapActions->GetValue(strActionName.c_str());
+
+			// insert the action name into the list control
+			int nItem = m_listActions.InsertItem(i, strActionName.c_str());
+
+			string strSQL = "SELECT COUNT(FAMFile.ID) as Total, COALESCE(ActionStatus, 'U') AS ActionStatus "
+				" FROM FileActionStatus RIGHT JOIN FAMFile ON FileActionStatus.FileID = "
+				" FAMFile.ID AND FileActionStatus.ActionID = " + strActionID + " GROUP BY ActionStatus"; 
+
+			// get a recordset for the action from the database
+			_RecordsetPtr ipRecordset = m_ipFAMDB->GetResultsForQuery(strSQL.c_str());
+			ASSERT_RESOURCE_ALLOCATION("ELI30523", ipRecordset != NULL);
+
+			long lUnattempted = 0;
+			long lPending = 0;
+			long lProcessing = 0;
+			long lCompleted = 0;
+			long lSkipped = 0;
+			long lFailed = 0;
+
+			// check that there is at least 1 record
+			while (!asCppBool(ipRecordset->adoEOF))
+			{
+				// get the count and the status from the recordset
+				long lCount = getLongField(ipRecordset->Fields, "Total");
+				string strStatus = getStringField(ipRecordset->Fields, "ActionStatus");
+
+				switch (m_ipFAMDB->AsEActionStatus(strStatus.c_str()))
+				{
+				case kActionUnattempted:
+					lUnattempted = lCount;
+					break;
+
+				case kActionPending:
+					lPending = lCount;
+					break;
+
+				case kActionProcessing:
+					lProcessing = lCount;
+					break;
+
+				case kActionCompleted:
+					lCompleted = lCount;
+					break;
+
+				case kActionSkipped:
+					lSkipped = lCount;
+					break;
+
+				case kActionFailed:
+					lFailed = lCount;
+					break;
+
+				default:
+					THROW_LOGIC_ERROR_EXCEPTION("ELI30524");
+					break;
+				}
+
+				ipRecordset->MoveNext();
+			}
+
+			// fill in the grid row
+			m_listActions.SetItemText(nItem, giUNATTEMPTED_COLUMN, 
+				commaFormatNumber((long long) lUnattempted).c_str());
+			m_listActions.SetItemText(nItem, giPENDING_COLUMN,
+				commaFormatNumber((long long) lPending).c_str());
+			m_listActions.SetItemText(nItem, giPROCESSING_COLUMN,
+				commaFormatNumber((long long) lProcessing).c_str());
+			m_listActions.SetItemText(nItem, giCOMPLETED_COLUMN,
+				commaFormatNumber((long long) lCompleted).c_str());
+			m_listActions.SetItemText(nItem, giSKIPPED_COLUMN,
+				commaFormatNumber((long long) lSkipped).c_str());
+			m_listActions.SetItemText(nItem, giFAILED_COLUMN,
+				commaFormatNumber((long long) lFailed).c_str());
+
+			// fill in the total column (sum of all files except Unattempted)
+			m_listActions.SetItemText(nItem, giTOTALS_COLUMN,
+				commaFormatNumber((long long) (lPending+lProcessing+lCompleted+lSkipped+lFailed)).c_str());
+		}
+
+		// query database for total number of files in the FAMFile table
+		_RecordsetPtr ipRecordSet = m_ipFAMDB->GetResultsForQuery(gstrTOTAL_FAMFILE_QUERY.c_str());
+		ASSERT_RESOURCE_ALLOCATION("ELI30525", ipRecordSet != NULL);
+
+		// there should only be 1 record returned
+		if (ipRecordSet->RecordCount == 1)
+		{
+			// get the file count
+			long long llFileCount = 
+				(long long)getLongField(ipRecordSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
+
+			m_editFileTotal.SetWindowText(commaFormatNumber(llFileCount).c_str());
+		}
+		else
+		{
+			THROW_LOGIC_ERROR_EXCEPTION("ELI30526");
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30527");
+}
+//--------------------------------------------------------------------------------------------------
+// Code to be removed after DB Normalization has been fully tested
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::populatePage2()
+{
+	try
+	{
+		// ensure we have a database object
 		ASSERT_ARGUMENT("ELI19806", m_ipFAMDB != NULL);
 
 		// Set the wait cursor

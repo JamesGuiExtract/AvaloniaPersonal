@@ -135,8 +135,21 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 				// Get the status as a string
 				string strStatus = ipFAMDB->AsStatusString((EActionStatus)m_nStatus);
 
-				strQueryPart2 += "WHERE (ASC_" + m_strAction + " = '"
-					+ strStatus + "')";
+				// if the schema is 100 or higher the database is using the FileActionStatus table
+				// instead of columns in the FAMFile table.
+				// TODO: Remove if statement when it is no longer required to support columns in FAMFile table
+				if (ipFAMDB->DBSchemaVersion >= 100 )
+				{
+					strQueryPart2 += " LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
+						" AND FileActionStatus.ActionID = " + asString(m_nActionID);
+					strQueryPart2 += " WHERE (FileActionStatus.ActionStatus = '"
+						+ strStatus + "')";
+				}
+				else
+				{
+					strQueryPart2 += "WHERE (ASC_" + m_strAction + " = '"
+						+ strStatus + "')";
+				}
 			}
 		}
 		break;
@@ -168,9 +181,6 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 
 			string strMainQueryTemp = gstrQUERY_FILES_WITH_TAGS;
 
-			replaceVariable(strMainQueryTemp, gstrTAG_QUERY_SELECT,
-				strSelect);
-
 			// Get the conjunction for the where clause (want the "any" behavior for
 			// both the "any" and "none" case - to achieve none just negate the any)
 			string strConjunction =
@@ -180,8 +190,20 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			if (m_eTagType == eNoneTag)
 			{
 				strQueryPart2 =
-					"(SELECT [ID] FROM [FAMFile] WHERE [FAMFile].[ID] NOT IN ";
+					"(SELECT " + strSelect + " FROM [FAMFile] WHERE [FAMFile].[ID] NOT IN ";
+
+				// The strMainQueryTemp will be used to select the file ids so it needs to 
+				// just return File ID's
+				replaceVariable(strMainQueryTemp, gstrTAG_QUERY_SELECT,
+					"FAMFile.[ID]");
 			}
+			else
+			{
+				// The strMainQueryTemp is the section so it needs to return FileName's
+				replaceVariable(strMainQueryTemp, gstrTAG_QUERY_SELECT,
+					strSelect);
+			}
+
 			strQueryPart2 += "(" + strMainQueryTemp;
 			replaceVariable(strQueryPart2, gstrTAG_NAME_VALUE, m_vecTags[0]);
 

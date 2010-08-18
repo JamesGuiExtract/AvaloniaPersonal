@@ -2123,3 +2123,28 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing2(const _ConnectionPtr
 		throw ue;
 	}
 }
+//--------------------------------------------------------------------------------------------------
+long CFileProcessingDB::addActionToRecordset2(_ConnectionPtr ipConnection, 
+											 _RecordsetPtr ipRecordset, const string &strAction)
+{
+	try
+	{
+		// Add a new record
+		ipRecordset->AddNew();
+
+		// Set the values of the ASCName field
+		setStringField(ipRecordset->Fields, "ASCName", strAction);
+
+		// Add the record to the Action Table
+		ipRecordset->Update();
+
+		// Get the ID of the new Action
+		long lActionId = getLastTableID(ipConnection, "Action");
+
+		// Add column to the FAMFile table
+		addActionColumn(ipConnection, strAction);
+
+		return lActionId;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29158")
+}
