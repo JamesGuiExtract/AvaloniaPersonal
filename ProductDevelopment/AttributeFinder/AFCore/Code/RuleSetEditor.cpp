@@ -1098,7 +1098,7 @@ void CRuleSetEditor::refreshFileMRU()
 	{
 		CMenu* pMainMenu = GetMenu();
 		CMenu* pFileMenu = pMainMenu->GetSubMenu(0);
-		m_pMRUFilesMenu = pFileMenu->GetSubMenu(9);
+		m_pMRUFilesMenu = pFileMenu->GetSubMenu(6);
 		if (m_pMRUFilesMenu == NULL)
 		{
 			throw UCLIDException("ELI09645", "Unable to get MRU File menu.");
