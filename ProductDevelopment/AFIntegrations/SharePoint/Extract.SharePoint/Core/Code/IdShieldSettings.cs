@@ -38,6 +38,11 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         internal static readonly string _FOLDER_PROCESSING_SETTINGS_STRING = "FolderSettings";
 
+        /// <summary>
+        /// The exception service server ip address setting string for the feature properties
+        /// </summary>
+        internal static string _IP_ADDRESS_SETTING_STRING = "ExceptionServerIpAddress";
+
         #endregion Constants
 
         #region Fields
@@ -53,6 +58,12 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         [Persisted]
         string _folderSettings;
+
+        /// <summary>
+        /// The ip address of the server running the Extract exception service
+        /// </summary>
+        [Persisted]
+        string _exceptionServiceIPAddress;
 
         #endregion Fields
 
@@ -92,7 +103,7 @@ namespace Extract.SharePoint.Redaction
         /// Loads the ID Shield settings from persisted storage into the specified feature.
         /// </summary>
         /// <param name="feature">The feature to add the loaded settings to.</param>
-        public static void LoadIdShieldSettings(SPFeature feature)
+        internal static void LoadIdShieldSettings(SPFeature feature)
         {
             IdShieldSettings settings =
                 SPFarm.Local.GetChild<IdShieldSettings>(_ID_SHIELD_SETTINGS_NAME);
@@ -126,8 +137,21 @@ namespace Extract.SharePoint.Redaction
                         settings.FolderSettings);
                     properties.Add(property);
                 }
+                property = null;
 
-                // Cal update to push the settings into the feature
+                property = properties[_IP_ADDRESS_SETTING_STRING];
+                if (property != null)
+                {
+                    property.Value = settings.ExceptionServiceIPAddress;
+                }
+                else
+                {
+                    property = new SPFeatureProperty(_IP_ADDRESS_SETTING_STRING,
+                        settings.ExceptionServiceIPAddress);
+                    properties.Add(property);
+                }
+
+                // Call update to push the settings into the feature
                 properties.Update();
             }
         }
@@ -137,7 +161,7 @@ namespace Extract.SharePoint.Redaction
         /// persisted store.
         /// </summary>
         /// <param name="feature">The feature to store the settings for.</param>
-        public static void StoreIdShieldSettings(SPFeature feature)
+        internal static void StoreIdShieldSettings(SPFeature feature)
         {
             SPFeaturePropertyCollection properties = feature.Properties;
             IdShieldSettings settings =
@@ -153,6 +177,11 @@ namespace Extract.SharePoint.Redaction
             {
                 settings.FolderSettings = property.Value;
             }
+            property = properties[_IP_ADDRESS_SETTING_STRING];
+            if (property != null)
+            {
+                settings.ExceptionServiceIPAddress = property.Value;
+            }
 
             // Call update to push the settings into the farm
             settings.Update();
@@ -161,7 +190,7 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// Removes the ID Shield settings from the persisted store. 
         /// </summary>
-        public static void RemoveIdShieldSettings()
+        internal static void RemoveIdShieldSettings()
         {
             IdShieldSettings settings =
                 SPFarm.Local.GetChild<IdShieldSettings>(_ID_SHIELD_SETTINGS_NAME);
@@ -202,6 +231,21 @@ namespace Extract.SharePoint.Redaction
             set
             {
                 _folderSettings = value ?? string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets the ip address for the Extract exception service.
+        /// </summary>
+        public string ExceptionServiceIPAddress
+        {
+            get
+            {
+                return _exceptionServiceIPAddress;
+            }
+            set
+            {
+                _exceptionServiceIPAddress = value ?? string.Empty;
             }
         }
 

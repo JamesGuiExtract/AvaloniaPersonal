@@ -13,13 +13,13 @@ namespace Extract.SharePoint.Redaction.Layouts {
     public partial class RemoveWatchFolderWithIdShield {
         
         /// <summary>
-        /// hiddenLoaded control.
+        /// panelTop control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hiddenLoaded;
+        protected global::System.Web.UI.WebControls.Panel panelTop;
         
         /// <summary>
         /// labelFolder control.
@@ -49,21 +49,30 @@ namespace Extract.SharePoint.Redaction.Layouts {
         protected global::System.Web.UI.WebControls.Label labelMessage;
         
         /// <summary>
-        /// buttonOk control.
+        /// panelButtons control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button buttonOk;
+        protected global::System.Web.UI.WebControls.Panel panelButtons;
         
         /// <summary>
-        /// buttonCancel control.
+        /// buttonYes control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button buttonCancel;
+        protected global::System.Web.UI.WebControls.Button buttonYes;
+        
+        /// <summary>
+        /// buttonNo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button buttonNo;
     }
 }

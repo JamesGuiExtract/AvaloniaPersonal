@@ -16,12 +16,8 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// <param name="e">The data associated with the event.</param>
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Check whether the page has been loaded already
-            // (Note: in ASP land, when a serverside button handler
-            // is called, step 1 is to reload the page posting the click event
-            // so a hidden field is used to indicate whether the settings have
-            // already been loaded for the session of not.
-            if (string.IsNullOrEmpty(hiddenLoaded.Value))
+            // Check whether this is a postback or not
+            if (!IsPostBack)
             {
                 SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
                 if (feature != null)
@@ -32,27 +28,15 @@ namespace Extract.SharePoint.Redaction.Layouts
                     {
                         textFolder.Text = localFolder.Value;
                     }
+
+                    SPFeatureProperty ipAddress =
+                        feature.Properties[IdShieldSettings._IP_ADDRESS_SETTING_STRING];
+                    if (ipAddress != null)
+                    {
+                        textExceptionIpAddress.Text = ipAddress.Value;
+                    }
                 }
-
-                hiddenLoaded.Value = "Loaded";
             }
-        }
-
-        /// <summary>
-        /// Handles the cancel button click from the configuration page.
-        /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
-        protected void HandleCancelButtonClick(object sender, EventArgs e)
-        {
-            // Send the response to close the dialog.
-            Context.Response.Write(
-                "<script type=\"text/javascript\">"
-                + "window.frameElement.commitPopup();"
-                + "</script>"
-                );
-            Context.Response.Flush();
-            Context.Response.End();
         }
 
         /// <summary>
@@ -62,52 +46,69 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// <param name="e">The data associated with the event.</param>
         protected void HandleOkButtonClick(object sender, EventArgs e)
         {
-            string response = "<script type=\"text/javascript\">"
-                + " <==REPLACEME==> "
-                    + "</script>";
-            try
+            if (IsValid)
             {
-                // Remove trailing '\'
-                string folder = textFolder.Text;
-                if (folder.EndsWith("\\", StringComparison.Ordinal))
+                string response = "<script type=\"text/javascript\">"
+                    + " <==REPLACEME==> "
+                        + "</script>";
+                try
                 {
-                    folder = folder.Substring(0, folder.Length - 1);
-                }
-
-                SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
-                if (feature != null)
-                {
-                    SPFeatureProperty localFolder =
-                        feature.Properties[IdShieldSettings._LOCAL_WORKING_FOLDER_SETTING_STRING];
-                    if (localFolder != null)
+                    // Remove trailing '\'
+                    string folder = textFolder.Text;
+                    if (folder.EndsWith("\\", StringComparison.Ordinal))
                     {
-                        localFolder.Value = folder;
-                    }
-                    else
-                    {
-                        localFolder = new SPFeatureProperty(
-                            IdShieldSettings._LOCAL_WORKING_FOLDER_SETTING_STRING, folder);
-                        feature.Properties.Add(localFolder);
+                        folder = folder.Substring(0, folder.Length - 1);
                     }
 
-                    feature.Properties.Update();
-                }
+                    SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
+                    if (feature != null)
+                    {
+                        SPFeatureProperty localFolder =
+                            feature.Properties[IdShieldSettings._LOCAL_WORKING_FOLDER_SETTING_STRING];
+                        if (localFolder != null)
+                        {
+                            localFolder.Value = folder;
+                        }
+                        else
+                        {
+                            localFolder = new SPFeatureProperty(
+                                IdShieldSettings._LOCAL_WORKING_FOLDER_SETTING_STRING, folder);
+                            feature.Properties.Add(localFolder);
+                        }
 
-                response = response.Replace("<==REPLACEME==>",
-                    "window.frameElement.commitPopup();");
-            }
-            catch (Exception ex)
-            {
-                response = response.Replace("<==REPLACEME==>",
-                    "alert('" + ex.Message
-                    + "'); window.frameElement.commitPopup();");
-            }
-            finally
-            {
-                // Send the response to close the dialog
-                Context.Response.Write(response);
-                Context.Response.Flush();
-                Context.Response.End();
+                        SPFeatureProperty ipAddress =
+                            feature.Properties[IdShieldSettings._IP_ADDRESS_SETTING_STRING];
+                        if (ipAddress != null)
+                        {
+                            ipAddress.Value = textExceptionIpAddress.Text;
+                        }
+                        else
+                        {
+                            ipAddress = new SPFeatureProperty(
+                                IdShieldSettings._IP_ADDRESS_SETTING_STRING,
+                                textExceptionIpAddress.Text);
+                            feature.Properties.Add(ipAddress);
+                        }
+
+                        feature.Properties.Update();
+                    }
+
+                    response = response.Replace("<==REPLACEME==>",
+                        "window.frameElement.commitPopup();");
+                }
+                catch (Exception ex)
+                {
+                    response = response.Replace("<==REPLACEME==>",
+                        "alert('" + ex.Message
+                        + "'); window.frameElement.commitPopup();");
+                }
+                finally
+                {
+                    // Send the response to close the dialog
+                    Context.Response.Write(response);
+                    Context.Response.Flush();
+                    Context.Response.End();
+                }
             }
         }
     }

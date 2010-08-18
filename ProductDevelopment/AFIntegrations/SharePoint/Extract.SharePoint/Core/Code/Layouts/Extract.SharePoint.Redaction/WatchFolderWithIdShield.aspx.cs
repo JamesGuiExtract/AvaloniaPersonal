@@ -17,8 +17,7 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// <param name="e">The data associated with the event.</param>
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Check if the page has been loaded or not yet
-            if (string.IsNullOrEmpty(hiddenLoaded.Value))
+            if (!IsPostBack)
             {
                 string currentFolder = Request.QueryString["folder"];
                 textCurrentFolderName.Text = currentFolder;
@@ -31,8 +30,18 @@ namespace Extract.SharePoint.Redaction.Layouts
                     Dictionary<string, FolderProcessingSettings> folderSettings =
                         FolderProcessingSettings.DeserializeFolderSettings(property.Value);
 
-                    FolderProcessingSettings temp;
-                    if (folderSettings.TryGetValue(currentFolder, out temp))
+                    string rootKey = string.Empty;
+                    FolderProcessingSettings temp = null;
+                    foreach (string folderName in folderSettings.Keys)
+                    {
+                        if (currentFolder.StartsWith(folderName, StringComparison.Ordinal))
+                        {
+                            rootKey = folderName;
+                            temp = folderSettings[rootKey];
+                            break;
+                        }
+                    }
+                    if (rootKey.Equals(currentFolder, StringComparison.Ordinal))
                     {
                         textFileExtension.Text = temp.FileExtensions;
                         checkRecursively.Checked = temp.RecurseSubfolders;
@@ -70,6 +79,18 @@ namespace Extract.SharePoint.Redaction.Layouts
                                 break;
                         }
                     }
+                    else
+                    {
+                        if (temp.RecurseSubfolders)
+                        {
+                            // Hide the unnecessary controls
+                            HideNormalControls();
+                            panelCannotWatch.Visible = true;
+                            labelCannotWatch.Text = "Cannot add watch to this folder since "
+                                + "this folder is watched recursively by the settings for "
+                                + rootKey;
+                        }
+                    }
                 }
                 else
                 {
@@ -80,9 +101,6 @@ namespace Extract.SharePoint.Redaction.Layouts
                 ToggleSubfolder(radioSubfolder.Checked);
                 ToggleSameFolder(radioSameFolder.Checked);
                 ToggleCustom(radioCustomOutput.Checked);
-
-                // Page is loaded, set the loaded value
-                hiddenLoaded.Value = "Loaded";
             }
         }
 
@@ -119,91 +137,77 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// <param name="e">The data associated with the event.</param>
         protected void HandleOkButtonClick(object sender, EventArgs e)
         {
-            string locationString = string.Empty;
-            IdShieldOutputLocation location = (IdShieldOutputLocation)
-                Enum.Parse(typeof(IdShieldOutputLocation), hiddenOutputLocation.Value);
-            switch(location)
+            if (IsValid)
             {
-                case IdShieldOutputLocation.ParallelFolderPrefix:
-                case IdShieldOutputLocation.ParallelFolderSuffix:
-                    locationString = textParallel.Text;
-                    break;
+                string locationString = string.Empty;
+                IdShieldOutputLocation location = (IdShieldOutputLocation)
+                    Enum.Parse(typeof(IdShieldOutputLocation), hiddenOutputLocation.Value);
+                switch (location)
+                {
+                    case IdShieldOutputLocation.ParallelFolderPrefix:
+                    case IdShieldOutputLocation.ParallelFolderSuffix:
+                        locationString = textParallel.Text;
+                        break;
 
-                case IdShieldOutputLocation.Subfolder:
-                    locationString = textSubfolder.Text;
-                    break;
+                    case IdShieldOutputLocation.Subfolder:
+                        locationString = textSubfolder.Text;
+                        break;
 
-                case IdShieldOutputLocation.PrefixFilename:
-                case IdShieldOutputLocation.SuffixFilename:
-                    locationString = textPreSuffix.Text;
-                    break;
+                    case IdShieldOutputLocation.PrefixFilename:
+                    case IdShieldOutputLocation.SuffixFilename:
+                        locationString = textPreSuffix.Text;
+                        break;
 
-                case IdShieldOutputLocation.CustomOutputLocation:
-                    locationString = textCustomOut.Text;
-                    break;
+                    case IdShieldOutputLocation.CustomOutputLocation:
+                        locationString = textCustomOut.Text;
+                        break;
+                }
+
+                FolderProcessingSettings currentFolderSettings = new FolderProcessingSettings(
+                    textCurrentFolderName.Text, textFileExtension.Text, checkRecursively.Checked,
+                    checkAdded.Checked, checkModified.Checked, location, locationString);
+
+                Dictionary<string, FolderProcessingSettings> folderSettings;
+
+                // Get the ID Shield feature
+                SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
+                SPFeatureProperty property =
+                    feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
+                if (property != null)
+                {
+                    folderSettings =
+                        FolderProcessingSettings.DeserializeFolderSettings(property.Value);
+                }
+                else
+                {
+                    folderSettings = new Dictionary<string, FolderProcessingSettings>();
+                }
+                folderSettings[textCurrentFolderName.Text] = currentFolderSettings;
+
+                string value = FolderProcessingSettings.SerializeFolderSettings(folderSettings);
+                if (property == null)
+                {
+                    property = new SPFeatureProperty(
+                        IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING, value);
+                    feature.Properties.Add(property);
+                }
+                else
+                {
+                    property.Value = value;
+                }
+
+                // Update the properties
+                feature.Properties.Update();
+
+                // Send a response to close the dialog
+                Context.Response.Write(
+                    "<script type=\"text/javascript\">"
+                    + "window.frameElement.commitPopup();"
+                    + "</script>"
+                    );
+                Context.Response.Flush();
+                Context.Response.End();
             }
-
-            FolderProcessingSettings currentFolderSettings = new FolderProcessingSettings(
-                textCurrentFolderName.Text, textFileExtension.Text, checkRecursively.Checked,
-                checkAdded.Checked, checkModified.Checked, location, locationString);
-
-            Dictionary<string, FolderProcessingSettings> folderSettings;
-
-            // Get the ID Shield feature
-            SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
-            SPFeatureProperty property =
-                feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
-            if (property != null)
-            {
-                folderSettings =
-                    FolderProcessingSettings.DeserializeFolderSettings(property.Value);
-            }
-            else
-            {
-                folderSettings = new Dictionary<string, FolderProcessingSettings>();
-            }
-            folderSettings[textCurrentFolderName.Text] = currentFolderSettings;
-
-            string value = FolderProcessingSettings.SerializeFolderSettings(folderSettings);
-            if (property == null)
-            {
-                property = new SPFeatureProperty(
-                    IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING, value);
-                feature.Properties.Add(property);
-            }
-            else
-            {
-                property.Value = value;
-            }
-
-            // Update the properties
-            feature.Properties.Update();
-
-            // Send a response to close the dialog
-            Context.Response.Write(
-                "<script type=\"text/javascript\">"
-                + "window.frameElement.commitPopup();"
-                + "</script>"
-                );
-            Context.Response.Flush();
-            Context.Response.End();
-        }
-
-        /// <summary>
-        /// Handles the cancel button click for the configuration page.
-        /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
-        protected void HandleCancelButtonClick(object sender, EventArgs e)
-        {
-            // Send a response to close the dialog
-            Context.Response.Write(
-                "<script type=\"text/javascript\">"
-                + "window.frameElement.commitPopup();"
-                + "</script>"
-                );
-            Context.Response.Flush();
-            Context.Response.End();
         }
 
         /// <summary>
@@ -285,6 +289,22 @@ namespace Extract.SharePoint.Redaction.Layouts
                 hiddenOutputLocation.Value =
                     IdShieldOutputLocation.CustomOutputLocation.ToString("G");
             }
+        }
+
+        /// <summary>
+        /// Hides the regular set of controls and renames the cancel button
+        /// to OK so that the cannot add label can be displayed.
+        /// </summary>
+        void HideNormalControls()
+        {
+            panelFileSpecification.Visible = false;
+            panelFolderSettings.Visible = false;
+            panelOutputSettings.Visible = false;
+            Form.Controls.Remove(panelFileSpecification);
+            Form.Controls.Remove(panelFolderSettings);
+            Form.Controls.Remove(panelOutputSettings);
+            buttonOk.Visible = false;
+            buttonCancel.Text = "OK";
         }
     }
 }

@@ -13,15 +13,6 @@ namespace Extract.SharePoint.Redaction.Layouts {
     public partial class WatchFolderWithIdShield {
         
         /// <summary>
-        /// hiddenLoaded control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hiddenLoaded;
-        
-        /// <summary>
         /// hiddenOutputLocation control.
         /// </summary>
         /// <remarks>
@@ -29,6 +20,33 @@ namespace Extract.SharePoint.Redaction.Layouts {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField hiddenOutputLocation;
+        
+        /// <summary>
+        /// panelCannotWatch control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panelCannotWatch;
+        
+        /// <summary>
+        /// labelCannotWatch control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labelCannotWatch;
+        
+        /// <summary>
+        /// panelFileSpecification control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panelFileSpecification;
         
         /// <summary>
         /// labelFolderName control.
@@ -49,13 +67,13 @@ namespace Extract.SharePoint.Redaction.Layouts {
         protected global::System.Web.UI.WebControls.TextBox textCurrentFolderName;
         
         /// <summary>
-        /// Label1 control.
+        /// labelFileExtension control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label Label1;
+        protected global::System.Web.UI.WebControls.Label labelFileExtension;
         
         /// <summary>
         /// textFileExtension control.
@@ -65,6 +83,15 @@ namespace Extract.SharePoint.Redaction.Layouts {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox textFileExtension;
+        
+        /// <summary>
+        /// panelFolderSettings control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panelFolderSettings;
         
         /// <summary>
         /// checkRecursively control.
@@ -92,6 +119,15 @@ namespace Extract.SharePoint.Redaction.Layouts {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox checkModified;
+        
+        /// <summary>
+        /// panelOutputSettings control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panelOutputSettings;
         
         /// <summary>
         /// radioParallel control.
@@ -191,6 +227,15 @@ namespace Extract.SharePoint.Redaction.Layouts {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox textCustomOut;
+        
+        /// <summary>
+        /// panelButtons control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panelButtons;
         
         /// <summary>
         /// buttonOk control.

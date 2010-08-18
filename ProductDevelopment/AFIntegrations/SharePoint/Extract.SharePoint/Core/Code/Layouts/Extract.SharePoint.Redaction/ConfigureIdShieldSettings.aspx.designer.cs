@@ -13,6 +13,15 @@ namespace Extract.SharePoint.Redaction.Layouts {
     public partial class ConfigureIdShieldSettings {
         
         /// <summary>
+        /// panelSettings control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panelSettings;
+        
+        /// <summary>
         /// Label1 control.
         /// </summary>
         /// <remarks>
@@ -31,13 +40,31 @@ namespace Extract.SharePoint.Redaction.Layouts {
         protected global::System.Web.UI.WebControls.TextBox textFolder;
         
         /// <summary>
-        /// hiddenLoaded control.
+        /// labelExceptionServer control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hiddenLoaded;
+        protected global::System.Web.UI.WebControls.Label labelExceptionServer;
+        
+        /// <summary>
+        /// textExceptionIpAddress control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox textExceptionIpAddress;
+        
+        /// <summary>
+        /// panelButtons control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panelButtons;
         
         /// <summary>
         /// buttonOk control.

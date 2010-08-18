@@ -19,7 +19,7 @@ namespace Extract.SharePoint.Redaction.Layouts
         protected void Page_Load(object sender, EventArgs e)
         {
             // Check if the page has been loaded yet
-            if (string.IsNullOrEmpty(hiddenLoaded.Value))
+            if (!IsPostBack)
             {
                 string currentFolder = Request.Params["folder"];
 
@@ -37,19 +37,18 @@ namespace Extract.SharePoint.Redaction.Layouts
                         if (folderSettings.ContainsKey(currentFolder))
                         {
                             message = "Remove the watching for this folder?";
-                            buttonOk.Text = "Yes";
-                            buttonCancel.Text = "No";
                         }
                         else
                         {
+                            // Hide the yes button and change the No button to OK
+                            buttonYes.Visible = false;
+                            buttonNo.Text = "OK";
                             message = "This folder is not currently being watched.";
                         }
 
                         labelMessage.Text = message;
                     }
                 }
-
-                hiddenLoaded.Value = "Loaded";
             }
         }
 
@@ -58,7 +57,7 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        protected void HandleOkButtonClick(object sender, EventArgs e)
+        protected void HandleYesButtonClick(object sender, EventArgs e)
         {
             bool watchRemoved = false;
             SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
@@ -85,20 +84,6 @@ namespace Extract.SharePoint.Redaction.Layouts
             sb.Append("</script>");
             Context.Response.Clear();
             Context.Response.Write(sb.ToString());
-            Context.Response.Flush();
-            Context.Response.End();
-        }
-
-        /// <summary>
-        /// Handles the cancel button click for the remove folder watching page.
-        /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
-        protected void HandleCancelButtonClick(object sender, EventArgs e)
-        {
-            Context.Response.Clear();
-            Context.Response.Write("<script type=\"text/javascript\">"
-                + "window.frameElement.commitPopup(); </script>");
             Context.Response.Flush();
             Context.Response.End();
         }

@@ -9,20 +9,42 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+<script type="text/javascript">
+    function HandleNoClicked()
+    {
+        SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel,
+        'Cancel clicked');
+    }
+</script>
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <asp:HiddenField ID="hiddenLoaded" runat="server" />
-    <asp:Label ID="labelFolder" runat="server" Text="Current folder:" />
-    <br />
-    <asp:TextBox ID="textFolder" runat="server" ReadOnly="true" />
-    <br />
-    <br />
-    <asp:Label ID="labelMessage" runat="server" />
-    <br />
-    <br />
-    <asp:Button ID="buttonOk" runat="server" Text="OK" onclick="HandleOkButtonClick"/>
-    <asp:Button ID="buttonCancel" runat="server" Text="Cancel" OnClick="HandleCancelButtonClick" />
+<asp:Panel ID="panelTop" runat="server" GroupingText="Folder settings" ForeColor="Black">
+<table>
+    <tr>
+        <td>
+            <asp:Label ID="labelFolder" runat="server" ForeColor="Black" Text="Current folder:" />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <asp:TextBox ID="textFolder" runat="server" ReadOnly="true" />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <asp:Label ID="labelMessage" runat="server" ForeColor="Black" />
+        </td>
+    </tr>
+    <tr><td /></tr>
+</table>
+</asp:Panel>
+<br />
+<asp:Panel ID="panelButtons" runat="server" HorizontalAlign="Right">
+    <asp:Button ID="buttonYes" runat="server" Text="Yes" onclick="HandleYesButtonClick"/>
+    <asp:Button ID="buttonNo" runat="server" Text="No" OnClientClick="HandleNoClicked()" />
+</asp:Panel>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
