@@ -21,9 +21,7 @@ namespace Extract.SharePoint.Redaction.Features
         {
             try
             {
-#if !DEBUG
                 IdShieldSettings.LoadIdShieldSettings(properties.Feature);
-#endif
                 base.FeatureActivated(properties);
             }
             catch (Exception ex)
@@ -58,7 +56,9 @@ namespace Extract.SharePoint.Redaction.Features
         {
             try
             {
-                //IdShieldSettings.RemoveIdShieldSettings();
+#if !DEBUG
+                IdShieldSettings.RemoveIdShieldSettings();
+#endif
                 base.FeatureUninstalling(properties);
             }
             catch (Exception ex)

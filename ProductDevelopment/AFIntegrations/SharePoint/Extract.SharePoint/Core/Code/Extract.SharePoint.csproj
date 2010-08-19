@@ -152,9 +152,7 @@
     <Content Include="Layouts\Extract.SharePoint.Redaction\RedactionHelpers.js" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx" />
-    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx" />
     <Content Include="Layouts\Extract.SharePoint\EnableHelpers.js" />
   </ItemGroup>
   <ItemGroup>

@@ -23,8 +23,8 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// Collection to manage the current folder watch settings.
         /// </summary>
-        Dictionary<string, FolderProcessingSettings> _folderSettings =
-            new Dictionary<string, FolderProcessingSettings>();
+        SortedDictionary<string, FolderProcessingSettings> _folderSettings =
+            new SortedDictionary<string, FolderProcessingSettings>();
 
         /// <summary>
         /// Holds the folder serialization string so that it can be compared
@@ -136,18 +136,25 @@ namespace Extract.SharePoint.Redaction
             {
                 // Get the folder name for the item
                 string folder = item.File.Url;
-                folder = folder.Replace("/" + item.File.Name, "");
+                folder = (folder[0] != '/' ?
+                    folder.Insert(0, "/") : folder).Replace("/" + item.File.Name, "");
 
                 // Attempt to get the settings for the folder
-                FolderProcessingSettings settings = null;
-                if (_folderSettings.TryGetValue("/" + folder, out settings))
+                foreach(KeyValuePair<string, FolderProcessingSettings> pair in _folderSettings)
                 {
-                    // Check if the event and file match the settings
-                    if ((settings.EventTypes & eventType) != 0
-                        && settings.DoesFileMatchPattern(item.File.Name))
+                    // Export the file if:
+                    // 1. This folder is being watched
+                    // 2. The folder is being watched for the specified event
+                    // 3. The file matches the watch pattern
+                    if ((folder.Equals(pair.Key, StringComparison.Ordinal)
+                        || (folder.StartsWith(pair.Key, StringComparison.Ordinal)
+                        && pair.Value.RecurseSubfolders))
+                        && (pair.Value.EventTypes & eventType) != 0
+                        && pair.Value.DoesFileMatchPattern(item.File.Name))
                     {
-                        // Ensure the processing folder exists
-                        folder = folder.Replace('/', '\\');
+                        // get the folder name without the leading '/' and
+                        // convert all other '/' to '\'
+                        folder = folder.Substring(1).Replace('/', '\\');
                         string outputFolder = Path.Combine(_outputFolder, folder);
                         if (!Directory.Exists(outputFolder))
                         {
@@ -158,8 +165,11 @@ namespace Extract.SharePoint.Redaction
                         string fileName = Path.Combine(outputFolder, item.File.Name);
                         byte[] bytes = item.File.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
                         File.WriteAllBytes(fileName, bytes);
+
+                        // File was exported, break from foreach loop
+                        break;
                     }
-                }
+                } // End foreach loop
             }
         }
 
@@ -233,7 +243,7 @@ namespace Extract.SharePoint.Redaction
         /// processed documents.</param>
         /// <returns>The destination for the file within the SP document library.</returns>
         static string GetDestinationFileName(string fullPath, string watchPath,
-            Dictionary<string, FolderProcessingSettings> folderSettings)
+            SortedDictionary<string, FolderProcessingSettings> folderSettings)
         {
             StringBuilder destination = new StringBuilder();
             string path = fullPath;
@@ -243,76 +253,82 @@ namespace Extract.SharePoint.Redaction
             string topFolder = folder.Replace(folderUpOne, "");
             folder = folder.Replace(watchPath, "/").Replace("\\", "/");
 
-            // Attempt to get the folder settings
-            FolderProcessingSettings settings = null;
-            if (folderSettings.TryGetValue(folder, out settings))
+            // Find the folder settings
+            foreach (KeyValuePair<string, FolderProcessingSettings> pair in folderSettings)
             {
-                // Compute the destination setting
-                switch (settings.OutputLocation)
+                FolderProcessingSettings settings = pair.Value;
+                if (folder.Equals(pair.Key, StringComparison.Ordinal)
+                    || (folder.StartsWith(pair.Key, StringComparison.Ordinal)
+                    && settings.RecurseSubfolders))
                 {
-                    case IdShieldOutputLocation.ParallelFolderPrefix:
-                    case IdShieldOutputLocation.ParallelFolderSuffix:
-                        // Need to configure the folderUpOne name properly
-                        // for file/folder access in SP
-                        folderUpOne = folderUpOne.Replace(watchPath, "/");
-                        folderUpOne = folderUpOne.Remove(folderUpOne.Length - 1).Replace("\\", "/");
+                    // Compute the destination setting
+                    switch (settings.OutputLocation)
+                    {
+                        case IdShieldOutputLocation.ParallelFolderPrefix:
+                        case IdShieldOutputLocation.ParallelFolderSuffix:
+                            // Need to configure the folderUpOne name properly
+                            // for file/folder access in SP
+                            folderUpOne = folderUpOne.Replace(watchPath, "/");
+                            folderUpOne = folderUpOne.Remove(folderUpOne.Length - 1).Replace("\\", "/");
 
-                        destination.Append(folderUpOne);
-                        destination.Append("/");
-                        if (settings.OutputLocation == IdShieldOutputLocation.ParallelFolderPrefix)
-                        {
-                            destination.Append(settings.OutputLocationString);
-                            destination.Append("_");
-                            destination.Append(topFolder);
-                        }
-                        else
-                        {
-                            destination.Append(topFolder);
-                            destination.Append("_");
-                            destination.Append(settings.OutputLocationString);
-                        }
-
-                        destination.Append("/");
-                        destination.Append(fileName);
-                        break;
-
-                    case IdShieldOutputLocation.Subfolder:
-                        destination.Append(folder);
-                        destination.Append("/");
-                        destination.Append(settings.OutputLocationString);
-                        destination.Append("/");
-                        destination.Append(fileName);
-                        break;
-
-                    case IdShieldOutputLocation.PrefixFilename:
-                    case IdShieldOutputLocation.SuffixFilename:
-                        destination.Append(folder);
-                        destination.Append("/");
-                        if (settings.OutputLocation == IdShieldOutputLocation.PrefixFilename)
-                        {
-                            destination.Append(settings.OutputLocationString);
-                            destination.Append("_");
-                            destination.Append(fileName);
-                        }
-                        else
-                        {
-                            string extension = Path.GetExtension(fileName);
-                            string name = Path.GetFileNameWithoutExtension(fileName);
-                            destination.Append(name);
-                            destination.Append("_");
-                            destination.Append(settings.OutputLocationString);
-                            destination.Append(extension);
-                        }
-                        break;
-
-                    case IdShieldOutputLocation.CustomOutputLocation:
-                        destination.Append(settings.OutputLocationString);
-                        if (!settings.OutputLocationString.EndsWith("/", StringComparison.Ordinal))
-                        {
+                            destination.Append(folderUpOne);
                             destination.Append("/");
-                        }
-                        destination.Append(fileName);
-                        break;
+                            if (settings.OutputLocation == IdShieldOutputLocation.ParallelFolderPrefix)
+                            {
+                                destination.Append(settings.OutputLocationString);
+                                destination.Append("_");
+                                destination.Append(topFolder);
+                            }
+                            else
+                            {
+                                destination.Append(topFolder);
+                                destination.Append("_");
+                                destination.Append(settings.OutputLocationString);
+                            }
+
+                            destination.Append("/");
+                            destination.Append(fileName);
+                            break;
+
+                        case IdShieldOutputLocation.Subfolder:
+                            destination.Append(folder);
+                            destination.Append("/");
+                            destination.Append(settings.OutputLocationString);
+                            destination.Append("/");
+                            destination.Append(fileName);
+                            break;
+
+                        case IdShieldOutputLocation.PrefixFilename:
+                        case IdShieldOutputLocation.SuffixFilename:
+                            destination.Append(folder);
+                            destination.Append("/");
+                            if (settings.OutputLocation == IdShieldOutputLocation.PrefixFilename)
+                            {
+                                destination.Append(settings.OutputLocationString);
+                                destination.Append("_");
+                                destination.Append(fileName);
+                            }
+                            else
+                            {
+                                string extension = Path.GetExtension(fileName);
+                                string name = Path.GetFileNameWithoutExtension(fileName);
+                                destination.Append(name);
+                                destination.Append("_");
+                                destination.Append(settings.OutputLocationString);
+                                destination.Append(extension);
+                            }
+                            break;
+
+                        case IdShieldOutputLocation.CustomOutputLocation:
+                            destination.Append(settings.OutputLocationString);
+                            if (!settings.OutputLocationString.EndsWith("/", StringComparison.Ordinal))
+                            {
+                                destination.Append("/");
+                            }
+                            destination.Append(fileName);
+                            break;
+                    }
+                    break;
                 }
             }
 

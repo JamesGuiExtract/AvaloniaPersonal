@@ -31,7 +31,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                         feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
                     if (property != null)
                     {
-                        Dictionary<string, FolderProcessingSettings> folderSettings =
+                        SortedDictionary<string, FolderProcessingSettings> folderSettings =
                             FolderProcessingSettings.DeserializeFolderSettings(property.Value);
                         string message = string.Empty;
                         if (folderSettings.ContainsKey(currentFolder))
@@ -65,7 +65,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                 feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
             if (property != null)
             {
-                Dictionary<string, FolderProcessingSettings> folderSettings =
+                SortedDictionary<string, FolderProcessingSettings> folderSettings =
                     FolderProcessingSettings.DeserializeFolderSettings(property.Value);
                 watchRemoved = folderSettings.Remove(textFolder.Text);
                 property.Value = FolderProcessingSettings.SerializeFolderSettings(

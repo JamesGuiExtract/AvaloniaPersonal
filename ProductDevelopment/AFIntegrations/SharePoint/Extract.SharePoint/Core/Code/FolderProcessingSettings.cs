@@ -152,21 +152,6 @@ namespace Extract.SharePoint
         #region Properties
 
         /// <summary>
-        /// Gets/sets the folder path to watch.
-        /// </summary>
-        public string FolderPath
-        {
-            get
-            {
-                return _folderPath;
-            }
-            set
-            {
-                _folderPath = value ?? string.Empty;
-            }
-        }
-
-        /// <summary>
         /// Gets/sets the file extensions to watch for.
         /// </summary>
         public string FileExtensions
@@ -337,9 +322,15 @@ namespace Extract.SharePoint
         /// of a collection of <see cref="FolderProcessingSettings"/>.</param>
         /// <returns>The deserialized collection of <see cref="FolderProcessingSettings"/>.
         /// </returns>
-        internal static Dictionary<string, FolderProcessingSettings> DeserializeFolderSettings(
+        internal static SortedDictionary<string, FolderProcessingSettings> DeserializeFolderSettings(
             string settings)
         {
+            // If the string is empty just return an empty dictionary
+            if (string.IsNullOrEmpty(settings))
+            {
+                return new SortedDictionary<string,FolderProcessingSettings>();
+            }
+
             int length = settings.Length;
             byte[] bytes = new byte[length / 2];
             for (int i = 0; i < length; i += 2)
@@ -350,8 +341,8 @@ namespace Extract.SharePoint
             using (MemoryStream stream = new MemoryStream(bytes))
             {
                 BinaryFormatter serializer = new BinaryFormatter();
-                Dictionary<string, FolderProcessingSettings> folderSettings =
-                    (Dictionary<string, FolderProcessingSettings>)serializer.Deserialize(stream);
+                SortedDictionary<string, FolderProcessingSettings> folderSettings =
+                    (SortedDictionary<string, FolderProcessingSettings>)serializer.Deserialize(stream);
 
                 return folderSettings;
             }
