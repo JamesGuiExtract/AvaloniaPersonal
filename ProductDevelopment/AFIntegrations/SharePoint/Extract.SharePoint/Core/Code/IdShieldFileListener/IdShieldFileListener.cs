@@ -88,7 +88,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                ExtractSharePointLoggingService.LogError(ErrorCategoryId.IdShieldFileReceiver, ex);
+                IdShieldHelper.LogException(properties.Web, ex);
             }
         }
 
@@ -104,7 +104,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                ExtractSharePointLoggingService.LogError(ErrorCategoryId.IdShieldFileReceiver, ex);
+                IdShieldHelper.LogException(properties.Web, ex);
             }
         }
 
@@ -129,7 +129,7 @@ namespace Extract.SharePoint.Redaction
             }
 
             // Update the settings
-            UpdateSettings(GetIdShieldFeature(properties.Web));
+            UpdateSettings(IdShieldHelper.GetIdShieldFeature(properties.Web));
 
             // Check for an output folder (if none is configured then do nothing)
             if (!string.IsNullOrEmpty(_outputFolder))
@@ -212,24 +212,6 @@ namespace Extract.SharePoint.Redaction
                     _folderSettings = null;
                     _folderSettingsSerializationString = string.Empty;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Gets the ID Shield feature from the specified SharePoint web.
-        /// </summary>
-        /// <param name="web">The web to search for the feature.</param>
-        /// <returns>The ID Shield feature (or <see langword="null"/> if it is
-        /// not installed.</returns>
-        static SPFeature GetIdShieldFeature(SPWeb web)
-        {
-            try
-            {
-                return web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
-            }
-            catch
-            {
-                return null;
             }
         }
 
@@ -340,63 +322,70 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         void FolderWatcherThread()
         {
-            using (LockFileManager lockFile = new LockFileManager())
-            using (FileSystemWatcher watcher = new FileSystemWatcher())
+            try
             {
-                SPFeature feature = null;
-                while (string.IsNullOrEmpty(_outputFolder))
+                using (LockFileManager lockFile = new LockFileManager())
+                using (FileSystemWatcher watcher = new FileSystemWatcher())
                 {
-                    // Sleep to give the web a chance to populate the activated feature
-                    Thread.Sleep(1000);
-
-                    using (SPSite site = new SPSite(_url))
-                    using (SPWeb web = site.OpenWeb())
+                    SPFeature feature = null;
+                    while (string.IsNullOrEmpty(_outputFolder))
                     {
-                        feature = GetIdShieldFeature(web);
-                        if (feature == null)
+                        // Sleep to give the web a chance to populate the activated feature
+                        Thread.Sleep(1000);
+
+                        using (SPSite site = new SPSite(_url))
+                        using (SPWeb web = site.OpenWeb())
                         {
-                            // If the feature is null it is not activated
-                            // just return to exit thread
-                            return;
+                            feature = IdShieldHelper.GetIdShieldFeature(web);
+                            if (feature == null)
+                            {
+                                // If the feature is null it is not activated
+                                // just return to exit thread
+                                return;
+                            }
+
+                            // Update the settings
+                            UpdateSettings(feature);
                         }
-
-                        // Update the settings
-                        UpdateSettings(feature);
                     }
-                }
 
-                // Attempt to place a lock file (singleton thread helper)
-                if (!lockFile.TryCreateLockFile(Path.Combine(_outputFolder, _LOCK_FILE_NAME)))
-                {
-                    // Lock file exists, just return to exit thread
-                    return;
-                }
-
-                // Search for any existing .processed files
-                SearchAndHandleProcessedFiles();
-
-                // Watch for new files
-                watcher.Path = _outputFolder;
-                watcher.Filter = "*.processed";
-                watcher.NotifyFilter = NotifyFilters.FileName;
-                watcher.Created += HandleFileCreated;
-                watcher.IncludeSubdirectories = true;
-                watcher.EnableRaisingEvents = true;
-
-                do
-                {
-                    // Wait for the feature to deactivate
-                    Thread.Sleep(5000);
-                    using (SPSite site = new SPSite(_url))
-                    using (SPWeb web = site.OpenWeb())
+                    // Attempt to place a lock file (singleton thread helper)
+                    if (!lockFile.TryCreateLockFile(Path.Combine(_outputFolder, _LOCK_FILE_NAME)))
                     {
-                        feature = GetIdShieldFeature(web);
+                        // Lock file exists, just return to exit thread
+                        return;
                     }
-                }
-                while (feature != null);
 
-                // Feature deactivated, stop watching for processed files
-                watcher.EnableRaisingEvents = false;
+                    // Search for any existing .processed files
+                    SearchAndHandleProcessedFiles();
+
+                    // Watch for new files
+                    watcher.Path = _outputFolder;
+                    watcher.Filter = "*.processed";
+                    watcher.NotifyFilter = NotifyFilters.FileName;
+                    watcher.Created += HandleFileCreated;
+                    watcher.IncludeSubdirectories = true;
+                    watcher.EnableRaisingEvents = true;
+
+                    do
+                    {
+                        // Wait for the feature to deactivate
+                        Thread.Sleep(5000);
+                        using (SPSite site = new SPSite(_url))
+                        using (SPWeb web = site.OpenWeb())
+                        {
+                            feature = IdShieldHelper.GetIdShieldFeature(web);
+                        }
+                    }
+                    while (feature != null);
+
+                    // Feature deactivated, stop watching for processed files
+                    watcher.EnableRaisingEvents = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogExceptions(ex);
             }
         }
 
@@ -423,7 +412,7 @@ namespace Extract.SharePoint.Redaction
                 using (SPSite site = new SPSite(_url))
                 using (SPWeb web = site.OpenWeb())
                 {
-                    UpdateSettings(GetIdShieldFeature(web));
+                    UpdateSettings(IdShieldHelper.GetIdShieldFeature(web));
                     if (_folderSettings != null)
                     {
                         foreach (string fileName in fileNames)
@@ -470,8 +459,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                ExtractSharePointLoggingService.LogError(ErrorCategoryId.IdShieldFileReceiver,
-                    ex);
+                LogExceptions(ex);
             }
         }
 
@@ -483,23 +471,30 @@ namespace Extract.SharePoint.Redaction
         /// <param name="directory">The directory containing the file.</param>
         void CleanupLocalFiles(string sourceFile, string directory)
         {
-            string baseFileName = Path.GetFileNameWithoutExtension(sourceFile);
-
-            // Search for and delete any files related to the base file in the directory.
-            string[] files = Directory.GetFiles(directory, baseFileName + ".*");
-            foreach (string file in files)
+            try
             {
-                File.Delete(file);
+                string baseFileName = Path.GetFileNameWithoutExtension(sourceFile);
+
+                // Search for and delete any files related to the base file in the directory.
+                string[] files = Directory.GetFiles(directory, baseFileName + ".*");
+                foreach (string file in files)
+                {
+                    File.Delete(file);
+                }
+
+                // Check for empty directory
+                while (!directory.Equals(_outputFolder, StringComparison.OrdinalIgnoreCase)
+                    && Directory.Exists(directory)
+                    && Directory.GetFiles(directory).Length == 0
+                    && Directory.GetDirectories(directory).Length == 0)
+                {
+                    Directory.Delete(directory);
+                    directory = Path.GetDirectoryName(directory);
+                }
             }
-
-            // Check for empty directory
-            while (!directory.Equals(_outputFolder, StringComparison.OrdinalIgnoreCase)
-                && Directory.Exists(directory)
-                && Directory.GetFiles(directory).Length == 0
-                && Directory.GetDirectories(directory).Length == 0)
+            catch (Exception ex)
             {
-                Directory.Delete(directory);
-                directory = Path.GetDirectoryName(directory);
+                LogExceptions(ex);
             }
         }
 
@@ -545,6 +540,13 @@ namespace Extract.SharePoint.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets the root list from the SharePoint web (will create the list
+        /// if it does not exist).
+        /// </summary>
+        /// <param name="web">The web to get the list from.</param>
+        /// <param name="folderName">The folder name to find/create.</param>
+        /// <returns>The root list for the item.</returns>
         static SPList GetDocumentList(SPWeb web, string folderName)
         {
             SPList rootList = web.Lists.TryGetList(folderName);
@@ -558,6 +560,25 @@ namespace Extract.SharePoint.Redaction
 
             rootList = web.Lists[folderName];
             return rootList;
+        }
+
+        /// <summary>
+        /// Attempts to logs exceptions to the exception logging service.
+        /// </summary>
+        /// <param name="ex">The exception to log.</param>
+        void LogExceptions(Exception ex)
+        {
+            try
+            {
+                using (SPSite site = new SPSite(_url))
+                using (SPWeb web = site.OpenWeb())
+                {
+                    IdShieldHelper.LogException(web, ex);
+                }
+            }
+            catch
+            {
+            }
         }
 
         #endregion Methods

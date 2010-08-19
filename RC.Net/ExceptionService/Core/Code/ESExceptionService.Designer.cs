@@ -17,9 +17,7 @@
             {
                 if (_host != null)
                 {
-                    _host.Close();
-                    (_host as System.IDisposable).Dispose();
-                    _host = null;
+                    CloseHost();
                 }
 
                 if (components != null)

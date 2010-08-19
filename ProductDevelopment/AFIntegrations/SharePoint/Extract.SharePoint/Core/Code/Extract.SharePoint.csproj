@@ -23,24 +23,24 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\binaries\SharePoint\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\binaries\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <PlatformTarget>x64</PlatformTarget>
-    <DocumentationFile>..\..\..\..\..\..\binaries\SharePoint\Debug\Extract.SharePoint.XML</DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>..\..\..\..\..\..\binaries\Debug\Extract.SharePoint.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\..\binaries\SharePoint\Release\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\binaries\Release\</OutputPath>
     <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <PlatformTarget>x64</PlatformTarget>
-    <DocumentationFile>..\..\..\..\..\..\binaries\SharePoint\Release\Extract.SharePoint.XML</DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>..\..\..\..\..\..\binaries\Release\Extract.SharePoint.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -78,6 +78,7 @@
     </Compile>
     <Compile Include="FolderProcessingSettings.cs" />
     <Compile Include="IdShieldFileListener\IdShieldFileListener.cs" />
+    <Compile Include="IdShieldHelper.cs" />
     <Compile Include="IdShieldSettings.cs" />
     <Compile Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx.cs">
       <DependentUpon>RemoveWatchFolderWithIdShield.aspx</DependentUpon>
@@ -152,7 +153,9 @@
     <Content Include="Layouts\Extract.SharePoint.Redaction\RedactionHelpers.js" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx" />
-    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx" />
+    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\Extract.SharePoint\EnableHelpers.js" />
   </ItemGroup>
   <ItemGroup>

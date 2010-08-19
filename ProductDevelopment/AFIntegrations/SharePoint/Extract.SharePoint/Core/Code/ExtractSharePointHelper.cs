@@ -1,7 +1,7 @@
 ﻿using Extract.ExceptionService;
-using Microsoft.SharePoint;
 using System;
 using System.ServiceModel;
+using System.Text;
 
 namespace Extract.SharePoint
 {
@@ -17,16 +17,41 @@ namespace Extract.SharePoint
         /// <param name="ex">The exception to log.</param>
         internal static void LogExceptionTcp(string ipAddress, Exception ex)
         {
+            ChannelFactory<IExtractExceptionLogger> factory = null;
             try
             {
-                var factory = new ChannelFactory<IExtractExceptionLogger>(new NetTcpBinding(),
-                    new EndpointAddress("net.tcp://" + ipAddress + "/TcpExceptionLog"));
-                IExtractExceptionLogger logger = SPChannelFactoryOperations.CreateChannelAsProcess(
-                    factory);
-                logger.LogException(new ExceptionLoggerData(ex));
+                if (!string.IsNullOrEmpty(ipAddress))
+                {
+                    // Build the url
+                    StringBuilder url = new StringBuilder("net.tcp://");
+                    url.Append(ipAddress);
+                    url.Append("/");
+                    url.Append(ExceptionLoggerData._WCF_TCP_END_POINT);
+
+                    factory = new ChannelFactory<IExtractExceptionLogger>(new NetTcpBinding(),
+                        new EndpointAddress(url.ToString()));
+
+                    IExtractExceptionLogger logger = factory.CreateChannel();
+                    logger.LogException(new ExceptionLoggerData(ex));
+
+                    factory.Close();
+                }
+                else
+                {
+                    ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex);
+                }
             }
-            catch
+            catch (Exception ex2)
             {
+                if (factory != null)
+                {
+                    factory.Abort();
+                    factory = null;
+                }
+
+                // Unable to use logging service, send the error to the sharepoint log
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex);
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex2);
             }
         }
 

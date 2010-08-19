@@ -15,6 +15,14 @@ namespace Extract.ExceptionService
     {
         #region Constants
 
+        /// <summary>
+        /// Constant for the endpoint of the TCP/IP channel for the service.
+        /// </summary>
+        public static readonly string _WCF_TCP_END_POINT = "TcpESExceptionLogger";
+
+        /// <summary>
+        /// Current version of the exception logger data class.
+        /// </summary>
         readonly static int _CURRENT_VERSION = 1;
 
         #endregion Constants

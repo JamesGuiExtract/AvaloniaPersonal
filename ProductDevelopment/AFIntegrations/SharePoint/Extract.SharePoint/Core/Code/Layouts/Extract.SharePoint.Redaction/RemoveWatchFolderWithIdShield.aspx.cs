@@ -18,9 +18,13 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// <param name="e">The data associated with the event.</param>
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Check if the page has been loaded yet
-            if (!IsPostBack)
+            try
             {
+                if (IsPostBack)
+                {
+                    return;
+                }
+
                 string currentFolder = Request.Params["folder"];
 
                 if (!string.IsNullOrEmpty(currentFolder))
@@ -50,6 +54,11 @@ namespace Extract.SharePoint.Redaction.Layouts
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                IdShieldHelper.LogException(Web, ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -59,33 +68,46 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// <param name="e">The data associated with the event.</param>
         protected void HandleYesButtonClick(object sender, EventArgs e)
         {
-            bool watchRemoved = false;
-            SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
-            SPFeatureProperty property =
-                feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
-            if (property != null)
+            try
             {
-                SortedDictionary<string, FolderProcessingSettings> folderSettings =
-                    FolderProcessingSettings.DeserializeFolderSettings(property.Value);
-                watchRemoved = folderSettings.Remove(textFolder.Text);
-                property.Value = FolderProcessingSettings.SerializeFolderSettings(
-                    folderSettings);
-                feature.Properties.Update();
-            }
+                bool watchRemoved = false;
+                SPFeature feature = IdShieldHelper.GetIdShieldFeature(Web);
+                if (feature == null)
+                {
+                    return;
+                }
 
-            StringBuilder sb = new StringBuilder("<script type=\"text/javascript\">");
-            if (watchRemoved)
-            {
-                sb.Append("alert('Folder: ");
-                sb.Append(textFolder.Text);
-                sb.Append(" will no longer be watched'); ");
+                SPFeatureProperty property =
+                    feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
+                if (property != null)
+                {
+                    SortedDictionary<string, FolderProcessingSettings> folderSettings =
+                        FolderProcessingSettings.DeserializeFolderSettings(property.Value);
+                    watchRemoved = folderSettings.Remove(textFolder.Text);
+                    property.Value = FolderProcessingSettings.SerializeFolderSettings(
+                        folderSettings);
+                    feature.Properties.Update();
+                }
+
+                StringBuilder sb = new StringBuilder("<script type=\"text/javascript\">");
+                if (watchRemoved)
+                {
+                    sb.Append("alert('Folder: ");
+                    sb.Append(textFolder.Text);
+                    sb.Append(" will no longer be watched'); ");
+                }
+                sb.Append("window.frameElement.commitPopup();");
+                sb.Append("</script>");
+                Context.Response.Clear();
+                Context.Response.Write(sb.ToString());
+                Context.Response.Flush();
+                Context.Response.End();
             }
-            sb.Append("window.frameElement.commitPopup();");
-            sb.Append("</script>");
-            Context.Response.Clear();
-            Context.Response.Write(sb.ToString());
-            Context.Response.Flush();
-            Context.Response.End();
+            catch (Exception ex)
+            {
+                IdShieldHelper.LogException(Web, ex);
+                throw;
+            }
         }
     }
 }

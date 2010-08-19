@@ -16,10 +16,15 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// <param name="e">The data associated with the event.</param>
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Check whether this is a postback or not
-            if (!IsPostBack)
+            try
             {
-                SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
+                // Check whether this is a postback or not
+                if (IsPostBack)
+                {
+                    return;
+                }
+
+                SPFeature feature = IdShieldHelper.GetIdShieldFeature(Web);
                 if (feature != null)
                 {
                     SPFeatureProperty localFolder =
@@ -36,6 +41,11 @@ namespace Extract.SharePoint.Redaction.Layouts
                         textExceptionIpAddress.Text = ipAddress.Value;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                IdShieldHelper.LogException(Web, ex);
+                throw;
             }
         }
 
@@ -80,7 +90,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                             feature.Properties[IdShieldSettings._IP_ADDRESS_SETTING_STRING];
                         if (ipAddress != null)
                         {
-                            ipAddress.Value = textExceptionIpAddress.Text;
+                            ipAddress.Value = textExceptionIpAddress.Text.Trim();
                         }
                         else
                         {

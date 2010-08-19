@@ -215,7 +215,7 @@ namespace Extract.SharePoint.Redaction
             }
             set
             {
-                _localWorkingFolder = value ?? string.Empty;
+                _localWorkingFolder = (value ?? string.Empty).Trim();
             }
         }
 
@@ -245,7 +245,7 @@ namespace Extract.SharePoint.Redaction
             }
             set
             {
-                _exceptionServiceIPAddress = value ?? string.Empty;
+                _exceptionServiceIPAddress = (value ?? string.Empty).Trim();
             }
         }
 
