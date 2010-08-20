@@ -54,7 +54,8 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// Initializes a new instance of the <see cref="IdShieldFileListener"/> class.
         /// </summary>
-        public IdShieldFileListener() : base()
+        public IdShieldFileListener()
+            : base()
         {
             try
             {
@@ -140,7 +141,7 @@ namespace Extract.SharePoint.Redaction
                     folder.Insert(0, "/") : folder).Replace("/" + item.File.Name, "");
 
                 // Attempt to get the settings for the folder
-                foreach(KeyValuePair<string, FolderProcessingSettings> pair in _folderSettings)
+                foreach (KeyValuePair<string, FolderProcessingSettings> pair in _folderSettings)
                 {
                     // Export the file if:
                     // 1. This folder is being watched
@@ -325,7 +326,8 @@ namespace Extract.SharePoint.Redaction
             try
             {
                 using (LockFileManager lockFile = new LockFileManager())
-                using (FileSystemWatcher watcher = new FileSystemWatcher())
+                using (FileSystemWatcher processedWatcher = new FileSystemWatcher())
+                using (FileSystemWatcher failedWatcher = new FileSystemWatcher())
                 {
                     SPFeature feature = null;
                     while (string.IsNullOrEmpty(_outputFolder))
@@ -357,15 +359,22 @@ namespace Extract.SharePoint.Redaction
                     }
 
                     // Search for any existing .processed files
-                    SearchAndHandleProcessedFiles();
+                    SearchAndHandleExistingFiles();
 
                     // Watch for new files
-                    watcher.Path = _outputFolder;
-                    watcher.Filter = "*.processed";
-                    watcher.NotifyFilter = NotifyFilters.FileName;
-                    watcher.Created += HandleFileCreated;
-                    watcher.IncludeSubdirectories = true;
-                    watcher.EnableRaisingEvents = true;
+                    processedWatcher.Path = _outputFolder;
+                    processedWatcher.Filter = "*.processed";
+                    processedWatcher.NotifyFilter = NotifyFilters.FileName;
+                    processedWatcher.Created += HandleFileCreated;
+                    processedWatcher.IncludeSubdirectories = true;
+                    failedWatcher.Path = _outputFolder;
+                    failedWatcher.Filter = "*.failed";
+                    failedWatcher.NotifyFilter = NotifyFilters.FileName;
+                    failedWatcher.Created += HandleFileFailed;
+                    failedWatcher.IncludeSubdirectories = true;
+
+                    processedWatcher.EnableRaisingEvents = true;
+                    failedWatcher.EnableRaisingEvents = true;
 
                     do
                     {
@@ -380,7 +389,8 @@ namespace Extract.SharePoint.Redaction
                     while (feature != null);
 
                     // Feature deactivated, stop watching for processed files
-                    watcher.EnableRaisingEvents = false;
+                    processedWatcher.EnableRaisingEvents = false;
+                    failedWatcher.EnableRaisingEvents = false;
                 }
             }
             catch (Exception ex)
@@ -392,12 +402,49 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// Searches for existing processed files and calls the file handler on them.
         /// </summary>
-        void SearchAndHandleProcessedFiles()
+        void SearchAndHandleExistingFiles()
         {
             string[] fileNames = Directory.GetFiles(_outputFolder,
                 "*.processed", SearchOption.AllDirectories);
 
             HandleProcessedFiles(fileNames);
+
+            fileNames = Directory.GetFiles(_outputFolder,
+                "*.failed", SearchOption.AllDirectories);
+
+            HandleFailedFiles(fileNames);
+        }
+
+        /// <summary>
+        /// Handles a collection of files that have failed to process.
+        /// </summary>
+        /// <param name="fileNames">The failed files to handle.</param>
+        void HandleFailedFiles(string[] fileNames)
+        {
+            foreach (string fileName in fileNames)
+            {
+                try
+                {
+                    string directory = Path.GetDirectoryName(fileName);
+                    string fileWithoutExtension =
+                        Path.GetFileNameWithoutExtension(fileName);
+                    string folder = directory.Replace(_outputFolder, "").Replace("\\", "/");
+                    string spFileName = folder + "/" + fileWithoutExtension;
+
+                    // Log a file failed exception to the exception service
+                    SPException exception = new SPException("Failed processing file: "
+                        + spFileName);
+                    exception.Data.Add("SP Failed File", spFileName);
+                    LogExceptions(exception);
+
+                    // Cleanup all files related to this file
+                    CleanupLocalFiles(fileWithoutExtension, directory);
+                }
+                catch (Exception ex)
+                {
+                    LogExceptions(ex);
+                }
+            }
         }
 
         /// <summary>
@@ -586,13 +633,23 @@ namespace Extract.SharePoint.Redaction
         #region File Watcher Event Handlers
 
         /// <summary>
-        /// Handles the file created event.
+        /// Handles the file created event for the processed file watcher.
         /// </summary>
         /// <param name="source">The object which triggered the event.</param>
         /// <param name="e">The file data associated with the event.</param>
         void HandleFileCreated(object source, FileSystemEventArgs e)
         {
-            HandleProcessedFiles(new string[] {e.FullPath});
+            HandleProcessedFiles(new string[] { e.FullPath });
+        }
+
+        /// <summary>
+        /// Handles the file created event for the failed file watcher.
+        /// </summary>
+        /// <param name="source">The object which triggered the event.</param>
+        /// <param name="e">The file data associated with the event.</param>
+        void HandleFileFailed(object source, FileSystemEventArgs e)
+        {
+            HandleFailedFiles(new string[] { e.FullPath });
         }
 
         #endregion File Watcher Event Handlers

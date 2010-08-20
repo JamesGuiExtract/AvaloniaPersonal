@@ -25,11 +25,7 @@
     <tr>
         <td>
             <asp:Label ID="labelFolder" runat="server" ForeColor="Black" Text="Current folder:" />
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <asp:TextBox ID="textFolder" runat="server" ReadOnly="true" />
+            <asp:TextBox ID="textFolder" runat="server" ReadOnly="true" Width="300" BorderStyle="None" />
         </td>
     </tr>
     <tr>

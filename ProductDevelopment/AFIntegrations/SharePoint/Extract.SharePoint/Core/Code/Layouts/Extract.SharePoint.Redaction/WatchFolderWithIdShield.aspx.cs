@@ -44,8 +44,8 @@ namespace Extract.SharePoint.Redaction.Layouts
                     // Search the collection of all folders being watched
                     string rootKey = string.Empty;
                     FolderProcessingSettings temp = null;
+                    bool watchingSubfolders = false;
                     bool watchingCurrentFolder = false;
-                    bool watchingSubFolderRecursively = false;
                     bool watchingParentRecursively = false;
                     foreach (KeyValuePair<string, FolderProcessingSettings> pair in folderSettings)
                     {
@@ -66,14 +66,10 @@ namespace Extract.SharePoint.Redaction.Layouts
                                 break;
                             }
                         }
-                        else if (!watchingSubFolderRecursively
+                        else if (!watchingSubfolders
                             && key.StartsWith(currentFolder, StringComparison.Ordinal))
                         {
-                            if (pair.Value.RecurseSubfolders)
-                            {
-                                watchingSubFolderRecursively = true;
-                                rootKey = key;
-                            }
+                            watchingSubfolders = true;
                         }
                     }
 
@@ -88,15 +84,16 @@ namespace Extract.SharePoint.Redaction.Layouts
 
                         return;
                     }
-                    if (watchingSubFolderRecursively)
+                    if (watchingSubfolders)
                     {
                         checkRecursively.Enabled = false;
-                        checkRecursively.Text = "Subfolder '"
-                            + rootKey + "' is being watched recursively";
                     }
                     if (watchingCurrentFolder)
                     {
-                        checkRecursively.Checked = temp.RecurseSubfolders;
+                        if (checkRecursively.Enabled)
+                        {
+                            checkRecursively.Checked = temp.RecurseSubfolders;
+                        }
                         textFileExtension.Text = temp.FileExtensions;
                         checkAdded.Checked = temp.ProcessAddedFiles;
                         checkModified.Checked = temp.ProcessModifiedFiles;
