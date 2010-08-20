@@ -165,12 +165,12 @@
 				<CommandUIHandler
 					Command="Extract.Command.LaunchIdShieldOffice"
 					CommandAction=""
-					EnabledScript="javascript: singleSelectEnabled();"
+					EnabledScript="javascript: singleDocSelectEnabled();"
 				/>
 				<CommandUIHandler
 					Command="Extract.Command.ProcessSelectedFiles"
 					CommandAction=""
-					EnabledScript="javascript: atLeastOneSelectEnabled();"
+					EnabledScript="javascript: atLeastOneDocSelectEnabled();"
 				/>
 				<CommandUIHandler
 					Command="Extract.Command.ConfigureFolderToWatch"
