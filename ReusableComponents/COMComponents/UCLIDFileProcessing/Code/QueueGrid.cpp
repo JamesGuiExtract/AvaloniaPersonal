@@ -75,7 +75,6 @@ CQueueGrid::~CQueueGrid()
 {
 	try
 	{
-		UGXPThemes::CleanUp();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI30498");
 }
@@ -90,19 +89,12 @@ void CQueueGrid::OnSetup()
 
 	try
 	{
-		UGXPThemes::UseHybridThemes(true);
-		UGXPThemes::SetGridStyle(Style1);
-	
 		CHECK_UG_RETURN_VALUE("ELI30444", SetHighlightRow(TRUE));
 		CHECK_UG_RETURN_VALUE("ELI30445", SetSH_Width(0));
 		CHECK_UG_RETURN_VALUE("ELI30446", SetNumberCols(5));
 
 		CUGCell cell;
-		// As it stands, the header theme looks quite different from the standard XP theme.
-		// For now, disable themes in the header.
-		cell.UseThemes(false);
 		CHECK_UG_RETURN_VALUE("ELI30447", cell.CopyInfoFrom(m_GI->m_hdgDefaults));
-		cell.SetXPStyle(XPCellTypeTopCol);
 		CHECK_UG_RETURN_VALUE("ELI30449", cell.SetFont(&m_font));
 
 		CHECK_UG_RETURN_VALUE("ELI30450", cell.SetText("Enabled"));
@@ -1418,12 +1410,10 @@ void CQueueGrid::InsertRow(int index)
 		CHECK_UG_RETURN_VALUE("ELI30489", CUGCtrl::InsertRow(index));
 
 		CUGCell cell;
-		cell.UseThemes(true);
 		CHECK_UG_RETURN_VALUE("ELI30490", cell.CopyInfoFrom(m_GI->m_gridDefaults));
 		CHECK_UG_RETURN_VALUE("ELI30474", cell.SetFont(&m_font));
 
 		// Enabled
-		cell.SetXPStyle(XPCellTypeButton);
 		CHECK_UG_RETURN_VALUE("ELI30475", cell.SetCellType(UGCT_CHECKBOX));
 		CHECK_UG_RETURN_VALUE("ELI30476",
 			cell.SetCellTypeEx(UGCT_CHECKBOXCHECKMARK | UGCT_CHECKBOXUSEALIGN));
@@ -1434,7 +1424,6 @@ void CQueueGrid::InsertRow(int index)
 		CHECK_UG_RETURN_VALUE("ELI30480", SetCell(1, index, &cell));
 
 		// Priority
-		cell.SetXPStyle(XPCellTypeData);
 		CHECK_UG_RETURN_VALUE("ELI30481", cell.SetCellType(UGCT_DROPLIST));
 		CHECK_UG_RETURN_VALUE("ELI30482", cell.SetLabelText(m_strPriorities.c_str()));
 		CHECK_UG_RETURN_VALUE("ELI30483", SetCell(2, index, &cell));
