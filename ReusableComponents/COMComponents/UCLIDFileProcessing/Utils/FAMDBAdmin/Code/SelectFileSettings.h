@@ -110,7 +110,7 @@ public:
 	// example strSelect = "FAMFile.ID, FAMFile.FileName" or
 	// strSelect = "FAMFile.ID, FAMFile.Priority", etc
 	// NOTE2: It can be assumed that the FAMFile table will be included in the query.
-	string buildQuery(const IFileProcessingDBPtr& ipFAMDB, const string& strSelect);
+	string buildQuery(const IFileProcessingDBPtr& ipFAMDB, const string& strSelect, const string& strOrderByClause);
 
 	IRandomMathConditionPtr getRandomCondition();
 };

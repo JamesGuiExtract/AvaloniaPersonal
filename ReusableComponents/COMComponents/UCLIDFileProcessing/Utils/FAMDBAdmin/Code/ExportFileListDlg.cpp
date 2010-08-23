@@ -20,7 +20,7 @@ static char THIS_FILE[] = __FILE__;
 
 //-------------------------------------------------------------------------------------------------
 // Constant
-const string gstrSQL_SELECT_VALUES = "FAMFile.FileName";
+const string gstrSQL_SELECT_VALUES = "FAMFile.FileName, FAMFile.ID";
 
 //-------------------------------------------------------------------------------------------------
 // CExportFileListDlg dialog
@@ -184,14 +184,14 @@ void CExportFileListDlg::OnClickedOK()
 		CWaitCursor wait;
 
 		// Build the query from the settings
-		string strQuery = m_settings.buildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUES)
-			+ " ORDER BY [FAMFile].[ID]";
+		string strQuery = m_settings.buildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUES, 
+			" ORDER BY [FAMFile].[ID]");
 
 		// Call ExportFileList() to export the file list and get a count of exported files
 		long lNumFilesExported = m_ipFAMDB->ExportFileList(strQuery.c_str(), _bstrFileName,
 			m_settings.getRandomCondition());
 
-		// Prompt the users that epxorting files is finished and
+		// Prompt the users that exporting files is finished and
 		// if they want to open the file contains the file list
 		CString zPrompt;
 		zPrompt.Format("A list of %ld files were\n\rexported to the selected output file.",

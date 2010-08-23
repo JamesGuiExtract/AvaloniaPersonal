@@ -163,7 +163,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			strInsertIntoFAS = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus) "
 				"SELECT FAMFile.ID, " + strActionID + " AS ActionID, '" + strState + "' AS ActionStatus " +
 				"FROM FAMFile LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
-				"AND ActionID = " + strActionID + " WHERE ActionID IS NULL AND FileID IN (";
+				"AND ActionID = " + strActionID + " WHERE ActionID IS NULL AND FAMFile.ID IN (";
 		}
 		string strDeleteLockedFile = "DELETE FROM LockedFile WHERE ActionID = "
 			+ strActionID + " AND UPIID = " + asString(m_nUPIID)

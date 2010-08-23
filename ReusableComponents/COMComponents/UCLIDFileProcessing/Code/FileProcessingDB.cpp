@@ -579,8 +579,8 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 				}
 				else
 				{
-					strStatusSQL = "UPDATE FileActionStatus SET ActionStatus = " + strNewStatus +
-						" WHERE FileID = " + asString(nID) + " AND ActionID = " + asString(nActionID);
+					strStatusSQL = "UPDATE FileActionStatus SET ActionStatus = '" + strNewStatus +
+						"' WHERE FileID = " + asString(nID) + " AND ActionID = " + asString(nActionID);
 				}
 
 				// Update or insert the status

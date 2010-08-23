@@ -104,7 +104,8 @@ string SelectFileSettings::getSummaryString()
 	return strSummary;
 }
 //--------------------------------------------------------------------------------------------------
-string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const string& strSelect)
+string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const string& strSelect, 
+	const string& strOrderByClause)
 {
 	ASSERT_ARGUMENT("ELI27722", ipFAMDB != NULL);
 	
@@ -290,7 +291,9 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			// in random order since I can't come up with a good way of respecting any specified
 			// order by clause.
 			"IF @queryHasIdentityColumn = 1\r\n"
-			"	SELECT TOP (@rowsToReturn) * FROM #OriginalResults AS FAMFile ORDER BY NEWID()\r\n"
+			"	SELECT " + strSelect + 
+			" FROM (SELECT TOP (@rowsToReturn) * FROM #OriginalResults AS FAMFile ORDER BY NEWID()) AS FAMFile " +
+			strOrderByClause + "\r\n"
 			// If the original query doesn't have an identity column, we can select the rows
 			// randomly into a table variable, then use the random row selection to select them
 			// out of the #OriginalResults in the order they were inserted.
@@ -345,7 +348,7 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 	{
 		// We don't need to return a sized randomized subset-- simply combine the query parts and
 		// return;
-		return strQueryPart1 + strQueryPart2;
+		return strQueryPart1 + strQueryPart2 + strOrderByClause;
 	}
 }
 //--------------------------------------------------------------------------------------------------

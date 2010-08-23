@@ -124,7 +124,7 @@ void CSetFilePriorityDlg::OnClickedOK()
 		CWaitCursor wait;
 
 		// Build the query for setting priority
-		string strQuery = m_settings.buildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUE);
+		string strQuery = m_settings.buildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUE, "");
 
 		// Get the priority string
 		CString zPriority;
