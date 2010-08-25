@@ -1,8 +1,7 @@
-using Extract;
+using Extract.DataEntry.Utilities.DataEntryApplication.Properties;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Reflection;
@@ -36,9 +35,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// Initializes a new instance of <see cref="AboutForm"/> class.
         /// </summary>
-        /// <param name="dataEntryControlHost">The <see cref="DataEntryControlHost"/> which contains the
-        /// product information.</param>
-        public AboutForm(DataEntryControlHost dataEntryControlHost)
+        /// <param name="applicationConfig">The product information.</param>
+        /// <param name="dataEntryControlHost">The <see cref="DataEntryControlHost"/> to be
+        /// used as the source of the product version.</param>
+        public AboutForm(ConfigSettings<Settings> applicationConfig, 
+            DataEntryControlHost dataEntryControlHost)
         {
             try
             {
@@ -46,17 +47,24 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI26960", _OBJECT_NAME);
 
+                ExtractException.Assert("ELI30538", "Null argument exception!",
+                    applicationConfig != null);
                 ExtractException.Assert("ELI27009", "Null argument exception!",
                     dataEntryControlHost != null);
 
                 InitializeComponent();
 
-                // Initialize product info from the dataEntryControlHost passed in.
-                _logoImage.Image = dataEntryControlHost.AboutLogo;
-                _labelProductName.Text = dataEntryControlHost.ApplicationTitle;
-                _textBoxDescription.Text = dataEntryControlHost.ApplicationDescription;
+                // Initialize product info from the applicationConfig passed in.
+                if (!string.IsNullOrEmpty(applicationConfig.Settings.AboutLogo))
+                {
+                    string logoFilename =
+                        DataEntryMethods.ResolvePath(applicationConfig.Settings.AboutLogo);
+                    _logoImage.Image = Bitmap.FromFile(logoFilename);
+                }
+                _labelProductName.Text = applicationConfig.Settings.ApplicationTitle;
+                _textBoxDescription.Text = applicationConfig.Settings.ApplicationDescription;
                 Text = String.Format(CultureInfo.CurrentCulture, "About {0}",
-                    dataEntryControlHost.ApplicationTitle);
+                    applicationConfig.Settings.ApplicationTitle);
 
                 // Extract the product version from the dataEntryControlHost's assembly.
                 Assembly controlHostAssembly = Assembly.GetAssembly(dataEntryControlHost.GetType());

@@ -1712,11 +1712,14 @@ namespace Extract.DataEntry
 
                     // [DataEntry:263]
                     // If the TabOrderPlaceholderAttribute has not yet been added, do it now.
-                    if (!_tabOrderPlaceholderAttributes.ContainsKey(sourceAttributes) &&
-                        TabOrderPlaceholderAttribute != null)
+                    if (!_tabOrderPlaceholderAttributes.ContainsKey(sourceAttributes))
                     {
-                        DataEntryMethods.ReorderAttributes(_sourceAttributes,
-                            DataEntryMethods.AttributeAsVector(TabOrderPlaceholderAttribute));
+                        IAttribute attribute = TabOrderPlaceholderAttribute;
+                        if (attribute != null)
+                        {
+                            DataEntryMethods.ReorderAttributes(_sourceAttributes,
+                                    DataEntryMethods.AttributeAsVector(attribute));
+                        }
                     }
                 }
 

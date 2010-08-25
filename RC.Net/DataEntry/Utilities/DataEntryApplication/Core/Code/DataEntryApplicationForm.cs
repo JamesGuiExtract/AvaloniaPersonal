@@ -1,6 +1,6 @@
 using Extract.DataEntry.Utilities.DataEntryApplication.Properties;
-using Extract.Imaging.Forms;
 using Extract.FileActionManager.Forms;
+using Extract.Imaging.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -12,7 +12,6 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Security.Permissions;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_DATAENTRYCUSTOMCOMPONENTSLib;
@@ -58,7 +57,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// The settings for this application.
         /// </summary>
-        readonly ConfigSettings<Settings> _config;
+        readonly ConfigSettings<Settings> _applicationConfig;
+
+        /// <summary>
+        /// The settings for the active data entry configuration
+        /// </summary>
+        ConfigSettings<Extract.DataEntry.Properties.Settings> _dataEntryConfig;
 
         /// <summary>
         /// The data entry panel control host implementation to be used by the application.
@@ -334,8 +338,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI23668", _OBJECT_NAME);
 
-                // Initialize the configuration settings.
-                _config = new ConfigSettings<Settings>(configFileName, false, false);
+                // Initialize the application settings.
+                _applicationConfig = new ConfigSettings<Settings>(configFileName, false, false);
 
                 // Initialize the root directory the DataEntry framework should use when resolving
                 // relative paths.
@@ -376,6 +380,25 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 
                 InitializeComponent();
 
+                if (!string.IsNullOrEmpty(_applicationConfig.Settings.ApplicationIcon))
+                {
+                    string iconFilename =
+                        DataEntryMethods.ResolvePath(_applicationConfig.Settings.ApplicationIcon);
+                    Icon = new Icon(iconFilename);
+                }
+
+                if (string.IsNullOrEmpty(_applicationConfig.Settings.HelpFile))
+                {
+                    _appHelpMenuItem.Visible = false;
+                }
+                else
+                {
+                    _appHelpMenuItem.Text = _applicationConfig.Settings.ApplicationTitle + " &help...";
+                }
+
+                _aboutMenuItem.Text = "&About " + _applicationConfig.Settings.ApplicationTitle + "...";
+
+
                 // Need to hide _openFileToolStripButton in FAM mode by searching for it.
                 if (!_standAloneMode)
                 {
@@ -398,6 +421,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Add the file tool strip items
                 AddFileToolStripItems(_fileToolStripMenuItem.DropDownItems);
 
+                // Read the user preferences object from the registry
+                _userPreferences = UserPreferences.FromRegistry();
+
+                LoadDataEntryConfiguration(configFileName);
+
                 // Change the text on certain controls if not running in stand alone mode or running
                 // without a _fileProcessingDb
                 if (!_standAloneMode && _fileProcessingDb != null)
@@ -405,7 +433,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _exitToolStripMenuItem.Text = "Stop processing";
                     _imageViewer.DefaultStatusMessage = "Waiting for next document...";
 
-                    if (_config.Settings.PreventSave)
+                    if (_dataEntryConfig.Settings.PreventSave)
                     {
                         _saveAndCommitMenuItem.Text = _COMMIT_WITHOUT_SAVING;
                         _saveAndCommitButton.Text = _COMMIT_WITHOUT_SAVING;
@@ -418,32 +446,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _saveAndCommitButton.ToolTipText = "Save and commit (Ctrl+S)";
                     }
                 }
-
-                // Read the user preferences object from the registry
-                _userPreferences = UserPreferences.FromRegistry();
-
-                // Retrieve the name of the DEP assembly
-                string dataEntryPanelFileName =
-                    DataEntryMethods.ResolvePath(_config.Settings.DataEntryPanelFileName);
-
-                // Create the data entry control host from the specified assembly
-                DataEntryControlHost = CreateDataEntryControlHost(dataEntryPanelFileName);
-
-                // Apply settings from the config file that pertain to the DEP.
-                _config.ApplyObjectSettings(DataEntryControlHost);
-
-                // If there's a database available, let the control host know about it.
-                if (TryOpenDatabaseConnection())
-                {
-                    DataEntryControlHost.DatabaseConnection = _dbConnection;
-                }
-
-                DataEntryControlHost.AutoZoomMode = _userPreferences.AutoZoomMode;
-                DataEntryControlHost.AutoZoomContext = _userPreferences.AutoZoomContext;
-
-                Icon = _dataEntryControlHost.ApplicationIcon;
-                _appHelpMenuItem.Text = DataEntryControlHost.ApplicationTitle + " &help...";
-                _aboutMenuItem.Text = "&About " + DataEntryControlHost.ApplicationTitle + "...";
 
                 _invoker = new ControlInvoker(this);
             }
@@ -723,12 +725,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Set the application name
                 if (string.IsNullOrEmpty(_actionName))
                 {
-                    base.Text = _dataEntryControlHost.ApplicationTitle;
+                    base.Text = _applicationConfig.Settings.ApplicationTitle;
                 }
                 else
                 {
                     // [DataEntry:740] Show the name of the current action in the title bar.
-                    base.Text = "Waiting - " + _dataEntryControlHost.ApplicationTitle +
+                    base.Text = "Waiting - " + _applicationConfig.Settings.ApplicationTitle +
                         " (" + _actionName + ")";
                 }
 
@@ -1100,7 +1102,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     MessageBox.Show(this, "If you are intending to stop processing, " +
                         "press the stop button in the File Action Manager.",
-                        _dataEntryControlHost.ApplicationTitle, MessageBoxButtons.OK,
+                        _applicationConfig.Settings.ApplicationTitle, MessageBoxButtons.OK,
                         MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
 
                     return;
@@ -1283,7 +1285,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 ExtractException.Assert("ELI29142", "Saving is disabled!",
-                    !_config.Settings.PreventSave);
+                    !_dataEntryConfig.Settings.PreventSave);
 
                 SaveData(false);
             }
@@ -1306,7 +1308,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// not.</returns>
         bool SaveData(bool validateData)
         {
-            if (_config.Settings.PreventSave)
+            if (_dataEntryConfig.Settings.PreventSave)
             {
                 return false;
             }
@@ -1369,7 +1371,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 // If in standalone mode and prevent save is active, no need to enable
                 // _saveAndCommitFileCommand
-                if (!_config.Settings.PreventSave || !_standAloneMode)
+                if (!_dataEntryConfig.Settings.PreventSave || !_standAloneMode)
                 {
                     // Saving or closing the document or hiding of tooltips should be allowed as long as
                     // a document is available.
@@ -1382,7 +1384,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     _saveMenuItem.Enabled = _imageViewer.IsImageAvailable &&
-                        !_config.Settings.PreventSave;
+                        !_dataEntryConfig.Settings.PreventSave;
                     _tagFileToolStripButton.Enabled = _imageViewer.IsImageAvailable;
                 }
 
@@ -1408,11 +1410,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _selectRectangularHighlightCommand.Enabled = false;
                 }
 
-                base.Text = _dataEntryControlHost.ApplicationTitle;
+                base.Text = _applicationConfig.Settings.ApplicationTitle;
                 if (_imageViewerForm != null)
                 {
                     _imageViewerForm.Text =
-                        _dataEntryControlHost.ApplicationTitle + " Image Window";
+                        _applicationConfig.Settings.ApplicationTitle + " Image Window";
                 }
                 if (_imageViewer.IsImageAvailable)
                 {
@@ -1423,8 +1425,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // particularily GDI objects) do not seem to be cleaned up and eventually 
                     // "Error creating window handle" exceptions will result. Calling GC.Collect
                     // cleans up these resources. (GCFrequency default == 1)
-                    if (_imageViewer.IsImageAvailable && _config.Settings.GCFrequency > 0 &&
-                        _documentLoadCount % _config.Settings.GCFrequency == 0)
+                    if (_imageViewer.IsImageAvailable && _dataEntryConfig.Settings.GCFrequency > 0 &&
+                        _documentLoadCount % _dataEntryConfig.Settings.GCFrequency == 0)
                     {
                         GC.Collect();
                     }
@@ -1511,7 +1513,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Set the application title to reflect the name of the document being opened.
-                base.Text = "Loading document - " + _dataEntryControlHost.ApplicationTitle;
+                base.Text = "Loading document - " + _applicationConfig.Settings.ApplicationTitle;
                 if (!string.IsNullOrEmpty(_actionName))
                 {
                     // [DataEntry:740] Show the name of the current action in the title bar.
@@ -1843,11 +1845,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 Help.ShowHelp(this,
-                    DataEntryMethods.ResolvePath(_config.Settings.HelpFile));
+                    DataEntryMethods.ResolvePath(_applicationConfig.Settings.HelpFile));
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI26958", "The help file is not available!", ex);
+                ExtractException ee =
+                    new ExtractException("ELI26958", "The help file faile to load!", ex);
+                ee.AddDebugData("Help file", _applicationConfig.Settings.HelpFile, false);
+                ee.Display();
             }
         }
 
@@ -1863,7 +1868,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Show the about dialog
-                using (AboutForm aboutForm = new AboutForm(_dataEntryControlHost))
+                using (AboutForm aboutForm = new AboutForm(_applicationConfig, _dataEntryControlHost))
                 {
                     aboutForm.ShowDialog();
                 }
@@ -1889,7 +1894,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _userPreferencesDialog = new PropertyPageForm("Options",
                         (IPropertyPage)_userPreferences.PropertyPage);
 
-                    _userPreferencesDialog.Icon = _dataEntryControlHost.ApplicationIcon;
+                    _userPreferencesDialog.Icon = Icon;
                 }
 
                 // Display the dialog
@@ -2164,7 +2169,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             // If preventing save, don't save, but also return "Yes" so the application behaves as
             // if it did save correctly.
-            if (_config.Settings.PreventSave)
+            if (_dataEntryConfig.Settings.PreventSave)
             {
                 return response;
             }
@@ -2178,13 +2183,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // Turn off commitData if an applied tag matches the SkipValidationIfDocTaggedAs
                     // setting (and save without prompting)
                     if (!_standAloneMode && _fileProcessingDb != null &&
-                        !string.IsNullOrEmpty(_config.Settings.SkipValidationIfDocTaggedAs))
+                        !string.IsNullOrEmpty(_dataEntryConfig.Settings.SkipValidationIfDocTaggedAs))
                     {
                         VariantVector appliedTags = _fileProcessingDb.GetTagsOnFile(_fileId);
                         int tagCount = appliedTags.Size;
                         for (int i = 0; i < tagCount; i++)
                         {
-                            if (_config.Settings.SkipValidationIfDocTaggedAs.Equals(
+                            if (_dataEntryConfig.Settings.SkipValidationIfDocTaggedAs.Equals(
                                     (string)appliedTags[i], StringComparison.OrdinalIgnoreCase))
                             {
                                 commitData = false;
@@ -2230,6 +2235,47 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Loads the data entry configuration defined by the specified config file.
+        /// </summary>
+        /// <param name="configFileName">The configuration file that defines the configuration to
+        /// be loaded.</param>
+        void LoadDataEntryConfiguration(string configFileName)
+        {
+            try
+            {
+                _dataEntryConfig = new ConfigSettings<Extract.DataEntry.Properties.Settings>(configFileName, false, false);
+
+                // Retrieve the name of the DEP assembly
+                string dataEntryPanelFileName =
+                    DataEntryMethods.ResolvePath(_dataEntryConfig.Settings.DataEntryPanelFileName);
+
+                // Create the data entry control host from the specified assembly
+                DataEntryControlHost = CreateDataEntryControlHost(dataEntryPanelFileName);
+
+                DataEntryControlHost.ApplicationTitle = _applicationConfig.Settings.ApplicationTitle;
+
+                // Apply settings from the config file that pertain to the DEP.
+                _dataEntryConfig.ApplyObjectSettings(DataEntryControlHost);
+
+                // If there's a database available, let the control host know about it.
+                if (TryOpenDatabaseConnection())
+                {
+                    DataEntryControlHost.DatabaseConnection = _dbConnection;
+                }
+
+                DataEntryControlHost.AutoZoomMode = _userPreferences.AutoZoomMode;
+                DataEntryControlHost.AutoZoomContext = _userPreferences.AutoZoomContext;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI30539",
+                    "Failed to load data entry configuration", ex);
+                ee.AddDebugData("Config file", configFileName, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
         /// Instantiates the one and only <see cref="DataEntryControlHost"/> implemented by the
         /// specified assembly.
         /// </summary>
@@ -2272,11 +2318,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // If HighlightConfidenceBoundary settings has been specified in the config file and
                 // the controlHost has exactly two confidence tiers, use the provided value as the
                 // minimum OCR confidence value in order to highlight text as confidently OCR'd
-                if (!string.IsNullOrEmpty(_config.Settings.HighlightConfidenceBoundary) &&
+                if (!string.IsNullOrEmpty(_dataEntryConfig.Settings.HighlightConfidenceBoundary) &&
                     controlHost.HighlightColors.Length == 2)
                 {
                     int confidenceBoundary = Convert.ToInt32(
-                        _config.Settings.HighlightConfidenceBoundary,
+                        _dataEntryConfig.Settings.HighlightConfidenceBoundary,
                         CultureInfo.CurrentCulture);
 
                     ExtractException.Assert("ELI25684", "HighlightConfidenceBoundary settings must " +
@@ -2288,9 +2334,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     controlHost.HighlightColors = highlightColors;
                 }
 
-                controlHost.DisabledControls = _config.Settings.DisabledControls;
+                controlHost.DisabledControls = _dataEntryConfig.Settings.DisabledControls;
                 controlHost.DisabledValidationControls =
-                    _config.Settings.DisabledValidationControls;
+                    _dataEntryConfig.Settings.DisabledValidationControls;
 
                 return controlHost;
             }
@@ -2362,7 +2408,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 // Create the form.
                 _imageViewerForm = new Form();
-                _imageViewerForm.Text = _dataEntryControlHost.ApplicationTitle + " Image Window";
+                _imageViewerForm.Text =
+                    _applicationConfig.Settings.ApplicationTitle + " Image Window";
                 _imageViewerForm.Icon = Icon;
 
                 // Create a shortcut filter to handle shortcuts when the image viewer is displayed
@@ -2564,28 +2611,28 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (!string.IsNullOrEmpty(_config.Settings.DatabaseType))
+                if (!string.IsNullOrEmpty(_dataEntryConfig.Settings.DatabaseType))
                 {
                     string connectionString = "";
 
                     // A full connection string has been provided.
-                    if (!string.IsNullOrEmpty(_config.Settings.DatabaseConnectionString))
+                    if (!string.IsNullOrEmpty(_dataEntryConfig.Settings.DatabaseConnectionString))
                     {
                         ExtractException.Assert("ELI26157", "Either a database connection string " +
                             "can be specified, or a local datasource-- not both.",
-                            string.IsNullOrEmpty(_config.Settings.LocalDataSource));
+                            string.IsNullOrEmpty(_dataEntryConfig.Settings.LocalDataSource));
 
-                        connectionString = _config.Settings.DatabaseConnectionString;
+                        connectionString = _dataEntryConfig.Settings.DatabaseConnectionString;
                     }
                     // A local datasource has been specfied; compute the connection string.
-                    else if (!string.IsNullOrEmpty(_config.Settings.LocalDataSource))
+                    else if (!string.IsNullOrEmpty(_dataEntryConfig.Settings.LocalDataSource))
                     {
                         ExtractException.Assert("ELI26158", "Either a database connection string " +
                             "can be specified, or a local datasource-- not both.",
-                            string.IsNullOrEmpty(_config.Settings.DatabaseConnectionString));
+                            string.IsNullOrEmpty(_dataEntryConfig.Settings.DatabaseConnectionString));
 
                         _dataSourcePath =
-                            DataEntryMethods.ResolvePath(_config.Settings.LocalDataSource);
+                            DataEntryMethods.ResolvePath(_dataEntryConfig.Settings.LocalDataSource);
                         _lastDbModificationTime = File.GetLastWriteTime(_dataSourcePath);
 
                         // [DataEntry:399, 688, 986]
@@ -2610,7 +2657,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             _dbConnection.Dispose();
                         }
 
-                        Type dbType = Type.GetType(_config.Settings.DatabaseType);
+                        Type dbType = Type.GetType(_dataEntryConfig.Settings.DatabaseType);
                         _dbConnection = (DbConnection)Activator.CreateInstance(dbType);
                         _dbConnection.ConnectionString = connectionString;
                         _dbConnection.Open();
@@ -2625,10 +2672,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 ExtractException ee = new ExtractException("ELI26159",
                     "Failed to open database connection!", ex);
-                ee.AddDebugData("Database type", _config.Settings.DatabaseType, false);
-                ee.AddDebugData("Local datasource", _config.Settings.LocalDataSource, false);
+                ee.AddDebugData("Database type", _dataEntryConfig.Settings.DatabaseType, false);
+                ee.AddDebugData("Local datasource",
+                    _dataEntryConfig.Settings.LocalDataSource, false);
                 ee.AddDebugData("Connection string",
-                    _config.Settings.DatabaseConnectionString, false);
+                    _dataEntryConfig.Settings.DatabaseConnectionString, false);
 
                 throw ee;
             }

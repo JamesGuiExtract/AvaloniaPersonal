@@ -25,70 +25,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Extract.DataEntry.Utilities.SampleDataEntryPanel1.dll")]
-        public string DataEntryPanelFileName {
-            get {
-                return ((string)(this["DataEntryPanelFileName"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string HighlightConfidenceBoundary {
-            get {
-                return ((string)(this["HighlightConfidenceBoundary"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("System.Data.SqlServerCe.SqlCeConnection, System.Data.SqlServerCe, Version=3.5.1.0" +
-            ", Culture=neutral, PublicKeyToken=89845dcd8080cc91")]
-        public string DatabaseType {
-            get {
-                return ((string)(this["DatabaseType"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string LocalDataSource {
-            get {
-                return ((string)(this["LocalDataSource"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string DatabaseConnectionString {
-            get {
-                return ((string)(this["DatabaseConnectionString"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string DisabledControls {
-            get {
-                return ((string)(this["DisabledControls"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string DisabledValidationControls {
-            get {
-                return ((string)(this["DisabledValidationControls"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string HelpFile {
             get {
@@ -98,28 +34,37 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Extract Systems")]
+        public string ApplicationTitle {
+            get {
+                return ((string)(this["ApplicationTitle"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string SkipValidationIfDocTaggedAs {
+        public string ApplicationIcon {
             get {
-                return ((string)(this["SkipValidationIfDocTaggedAs"]));
+                return ((string)(this["ApplicationIcon"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool PreventSave {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AboutLogo {
             get {
-                return ((bool)(this["PreventSave"]));
+                return ((string)(this["AboutLogo"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public uint GCFrequency {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ApplicationDescription {
             get {
-                return ((uint)(this["GCFrequency"]));
+                return ((string)(this["ApplicationDescription"]));
             }
         }
     }

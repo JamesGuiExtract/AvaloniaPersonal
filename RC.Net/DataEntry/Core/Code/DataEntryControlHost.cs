@@ -11,18 +11,16 @@ using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Drawing.Design;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Security.Permissions;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
-using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 using ESpatialStringMode = UCLID_RASTERANDOCRMGMTLib.ESpatialStringMode;
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
 namespace Extract.DataEntry
 {
@@ -550,21 +548,6 @@ namespace Extract.DataEntry
         readonly bool _inDesignMode;
 
         /// <summary>
-        /// A description of the current DataEntry application.
-        /// </summary>
-        string _applicationDescription;
-
-        /// <summary>
-        /// The logo for the current DataEntry application.
-        /// </summary>
-        Image _aboutLogo;
-
-        /// <summary>
-        /// The icon for the current DataEntry application.
-        /// </summary>
-        Icon _applicationIcon;
-
-        /// <summary>
         /// A control that should be used to display change the file comment for a FAM task.
         /// </summary>
         Control _commentControl;
@@ -1053,46 +1036,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// The logo for the current DataEntry application.
-        /// </summary>
-        /// <value>An <see cref="Image"/> of the logo for the current application.</value>
-        /// <returns>An <see cref="Image"/> of the logo for the current application.</returns>
-        [Category("Data Entry Control Host")]
-        public virtual Image AboutLogo
-        {
-            get
-            {
-                return _aboutLogo;
-            }
-
-            set
-            {
-                _aboutLogo = value;
-            }
-        }
-
-        /// <summary>
-        /// The icon for the current DataEntry application.
-        /// </summary>
-        /// <value>An <see cref="Image"/> of the logo for the current application.</value>
-        /// <returns>An <see cref="Image"/> of the logo for the current application.</returns>
-        [Category("Data Entry Control Host")]
-        [TypeConverter(typeof(IconConverter))]
-        [Editor("System.Drawing.Design.IconEditor, System.Design", typeof(UITypeEditor))]
-        public virtual Icon ApplicationIcon
-        {
-            get
-            {
-                return _applicationIcon;
-            }
-
-            set
-            {
-                _applicationIcon = value;
-            }
-        }
-
-        /// <summary>
         /// Gets or sets <see cref="Control"/> that should be used to display change the file
         /// comment for a FAM task.
         /// </summary>
@@ -1139,7 +1082,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <value>The title of the current DataEntry application.</value>
         /// <returns>The title of the current DataEntry application.</returns>
-        [Category("Data Entry Control Host")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string ApplicationTitle
         {
             get
@@ -1150,25 +1093,6 @@ namespace Extract.DataEntry
             set
             {
                 _applicationTitle = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a description of the current DataEntry application.
-        /// </summary>
-        /// <value>A description of the current DataEntry application.</value>
-        /// <returns>A description of the current DataEntry application.</returns>
-        [Category("Data Entry Control Host")]
-        public string ApplicationDescription
-        {
-            get
-            {
-                return _applicationDescription;
-            }
-
-            set
-            {
-                _applicationDescription = value;
             }
         }
 

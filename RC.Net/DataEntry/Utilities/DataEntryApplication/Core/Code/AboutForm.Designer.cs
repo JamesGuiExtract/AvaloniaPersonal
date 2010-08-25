@@ -14,6 +14,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             if (disposing && (components != null))
             {
+                if (_logoImage.Image != null)
+                {
+                    _logoImage.Image.Dispose();
+                    _logoImage.Image = null;
+                }
+
                 components.Dispose();
             }
             base.Dispose(disposing);

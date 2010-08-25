@@ -150,8 +150,6 @@ namespace Extract.DataEntry.DEP.TEReceipts
             // 
             // TEReceiptsPanel
             // 
-            this.ApplicationDescription = "Travel and Expense Receipts";
-            this.ApplicationTitle = "Travel and Expense Receipts";
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this._expensesLabel);

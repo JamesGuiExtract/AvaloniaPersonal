@@ -1580,9 +1580,12 @@ namespace Extract.DataEntry
             if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
                     ref autoCompleteSource, ref autoCompleteCollection, out autoCompleteValues))
             {
-                AutoCompleteMode = autoCompleteMode;
-                AutoCompleteSource = autoCompleteSource;
-                AutoCompleteCustomSource = autoCompleteCollection;
+                if (DropDownStyle != ComboBoxStyle.DropDownList)
+                {
+                    AutoCompleteMode = autoCompleteMode;
+                    AutoCompleteSource = autoCompleteSource;
+                    AutoCompleteCustomSource = autoCompleteCollection;
+                }
 
                 Items.Clear();
                 Items.AddRange(autoCompleteValues);
