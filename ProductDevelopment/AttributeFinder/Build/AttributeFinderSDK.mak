@@ -135,6 +135,7 @@ CreateFlexDataEntryInstallDir:
 CreateDemoShieldInstall:
 	@ECHO Copying Required installs
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 4.0 Framework" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 4.0 Framework"
+	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework"
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008"
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008Mgr" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008Mgr"
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell"
@@ -158,6 +159,7 @@ CreateDemoShieldInstall:
 	@COPY "$(BinariesFolder)\OSSI.EXE" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller"
 	@COPY "$(BinariesFolder)\OSSI.EXE" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008"
 	@COPY "$(BinariesFolder)\OSSI.EXE" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008Mgr"
+	@COPY "$(BinariesFolder)\OSSI.EXE" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework"
 	@ECHO Copying DemoShield Files
 	@IF NOT EXIST "$(FlexIndexInstallDir)" MKDIR "$(FlexIndexInstallDir)"
 	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(FlexIndexInstallDir)" /v /s /e /y
