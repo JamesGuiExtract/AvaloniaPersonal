@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="fe8ccab9-99d5-4c24-a19f-d08e31acaa26" solutionId="fe8ccab9-99d5-4c24-a19f-d08e31acaa26" resetWebServer="false" name="ID Shield For SharePoint" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
   <assemblies>
-    <projectOutputAssembly location="Extract.ExceptionService.WCFInterface.dll" deploymentTarget="GlobalAssemblyCache" projectPath="..\..\..\..\..\..\RC.Net\ExceptionService\WCFInterface\Core\Code\Extract.ExceptionService.WCFInterface.csproj" />
+    <projectOutputAssembly location="Extract.ExceptionService.WCFInterface.dll" deploymentTarget="GlobalAssemblyCache" projectPath="..\..\..\..\..\..\RC.Net\ExceptionService\WCFInterface\Core\Code\Extract.ExceptionService.WcfInterface.csproj" />
   </assemblies>
   <features>
     <featureReference itemId="4081877d-4627-4254-8cb6-353e1179c198" />

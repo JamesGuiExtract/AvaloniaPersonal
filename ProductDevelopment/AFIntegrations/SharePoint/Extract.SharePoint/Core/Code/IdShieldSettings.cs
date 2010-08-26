@@ -1,5 +1,4 @@
-﻿using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration;
+﻿using Microsoft.SharePoint.Administration;
 using System;
 
 namespace Extract.SharePoint.Redaction
@@ -27,21 +26,6 @@ namespace Extract.SharePoint.Redaction
         /// The name for this SPPersisted settings object
         /// </summary>
         internal static readonly string _ID_SHIELD_SETTINGS_NAME = "ESIdShieldSettings";
-
-        /// <summary>
-        /// The local working folder setting string for the feature properties
-        /// </summary>
-        internal static readonly string _LOCAL_WORKING_FOLDER_SETTING_STRING = "IdShieldWorkingFolder";
-
-        /// <summary>
-        /// The folder processing setting string for the feature properties
-        /// </summary>
-        internal static readonly string _FOLDER_PROCESSING_SETTINGS_STRING = "FolderSettings";
-
-        /// <summary>
-        /// The exception service server ip address setting string for the feature properties
-        /// </summary>
-        internal static string _IP_ADDRESS_SETTING_STRING = "ExceptionServerIpAddress";
 
         #endregion Constants
 
@@ -100,104 +84,39 @@ namespace Extract.SharePoint.Redaction
         }
 
         /// <summary>
-        /// Loads the ID Shield settings from persisted storage into the specified feature.
-        /// </summary>
-        /// <param name="feature">The feature to add the loaded settings to.</param>
-        internal static void LoadIdShieldSettings(SPFeature feature)
-        {
-            IdShieldSettings settings =
-                SPFarm.Local.GetChild<IdShieldSettings>(_ID_SHIELD_SETTINGS_NAME);
-            if (settings != null)
-            {
-                SPFeaturePropertyCollection properties = feature.Properties;
-
-                // Get the local folder setting, if it does not exist create it
-                SPFeatureProperty property = properties[_LOCAL_WORKING_FOLDER_SETTING_STRING];
-                if (property != null)
-                {
-                    property.Value = settings.LocalWorkingFolder;
-                }
-                else
-                {
-                    property = new SPFeatureProperty(_LOCAL_WORKING_FOLDER_SETTING_STRING,
-                        settings.LocalWorkingFolder);
-                    properties.Add(property);
-                }
-                property = null;
-
-                // Get the folder processing setting, if it does not exist create it
-                property = properties[_FOLDER_PROCESSING_SETTINGS_STRING];
-                if (property != null)
-                {
-                    property.Value = settings.FolderSettings;
-                }
-                else
-                {
-                    property = new SPFeatureProperty(_FOLDER_PROCESSING_SETTINGS_STRING,
-                        settings.FolderSettings);
-                    properties.Add(property);
-                }
-                property = null;
-
-                property = properties[_IP_ADDRESS_SETTING_STRING];
-                if (property != null)
-                {
-                    property.Value = settings.ExceptionServiceIPAddress;
-                }
-                else
-                {
-                    property = new SPFeatureProperty(_IP_ADDRESS_SETTING_STRING,
-                        settings.ExceptionServiceIPAddress);
-                    properties.Add(property);
-                }
-
-                // Call update to push the settings into the feature
-                properties.Update();
-            }
-        }
-
-        /// <summary>
-        /// Stores the current ID Shield settings for the specified feature into the
-        /// persisted store.
-        /// </summary>
-        /// <param name="feature">The feature to store the settings for.</param>
-        internal static void StoreIdShieldSettings(SPFeature feature)
-        {
-            SPFeaturePropertyCollection properties = feature.Properties;
-            IdShieldSettings settings =
-                SPFarm.Local.GetChild<IdShieldSettings>(_ID_SHIELD_SETTINGS_NAME)
-                ?? new IdShieldSettings(SPFarm.Local);
-            SPFeatureProperty property = properties[_LOCAL_WORKING_FOLDER_SETTING_STRING];
-            if (property != null)
-            {
-                settings.LocalWorkingFolder = property.Value;
-            }
-            property = properties[_FOLDER_PROCESSING_SETTINGS_STRING];
-            if (property != null)
-            {
-                settings.FolderSettings = property.Value;
-            }
-            property = properties[_IP_ADDRESS_SETTING_STRING];
-            if (property != null)
-            {
-                settings.ExceptionServiceIPAddress = property.Value;
-            }
-
-            // Call update to push the settings into the farm
-            settings.Update();
-        }
-
-        /// <summary>
         /// Removes the ID Shield settings from the persisted store. 
         /// </summary>
         internal static void RemoveIdShieldSettings()
         {
-            IdShieldSettings settings =
-                SPFarm.Local.GetChild<IdShieldSettings>(_ID_SHIELD_SETTINGS_NAME);
+            IdShieldSettings settings = GetIdShieldSettings(false);
             if (settings != null)
             {
                 settings.Delete();
             }
+        }
+
+        /// <summary>
+        /// Gets the persisted <see cref="IdShieldSettings"/> object. If
+        /// <paramref name="createNew"/> is <see langword="true"/> then
+        /// will create a new instance of the <see cref="IdShieldSettings"/>
+        /// if no object has been persisted to SharePoint yet. If
+        /// <paramref name="createNew"/> is <see langword="false"/> and
+        /// no settings have been created yet, this method will return
+        /// <see langword="null"/>.
+        /// </summary>
+        /// <param name="createNew">Whether a new settings object should be
+        /// created or not if there is not an existing one in the SharePoint farm.</param>
+        /// <returns>The persisted <see cref="IdShieldSettings"/> object.</returns>
+        internal static IdShieldSettings GetIdShieldSettings(bool createNew)
+        {
+            IdShieldSettings settings =
+                SPFarm.Local.GetChild<IdShieldSettings>(_ID_SHIELD_SETTINGS_NAME);
+            if (settings == null && createNew)
+            {
+                settings = new IdShieldSettings(SPFarm.Local);
+            }
+
+            return settings;
         }
 
         #endregion Methods
@@ -226,7 +145,7 @@ namespace Extract.SharePoint.Redaction
         {
             get
             {
-                return _folderSettings;
+                return _folderSettings ?? string.Empty;
             }
             set
             {
@@ -241,7 +160,7 @@ namespace Extract.SharePoint.Redaction
         {
             get
             {
-                return _exceptionServiceIPAddress;
+                return _exceptionServiceIPAddress ?? string.Empty;
             }
             set
             {

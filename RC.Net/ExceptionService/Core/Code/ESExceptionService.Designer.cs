@@ -15,6 +15,11 @@
         {
             if (disposing)
             {
+                if (_endService != null)
+                {
+                    _endService.Dispose();
+                    _endService = null;
+                }
                 if (_host != null)
                 {
                     CloseHost();

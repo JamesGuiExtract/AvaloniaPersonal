@@ -36,6 +36,12 @@ namespace Extract.SharePoint
         {
             try
             {
+                string directory = Path.GetDirectoryName(fileName);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
                 if (!File.Exists(fileName))
                 {
                     _lockedFile = new FileStream(fileName, FileMode.CreateNew,
@@ -46,7 +52,9 @@ namespace Extract.SharePoint
 
                 return false;
             }
-            catch
+            // If the exception is an IO exception, just eat it, this indicates
+            // the file already exists
+            catch (IOException)
             {
                 return false;
             }

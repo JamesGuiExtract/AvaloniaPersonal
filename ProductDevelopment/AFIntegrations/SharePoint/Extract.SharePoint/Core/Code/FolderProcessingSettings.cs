@@ -300,7 +300,7 @@ namespace Extract.SharePoint
         /// <returns>A string of hex digits representing a binary serialization of
         /// the collection passed in.</returns>
         internal static string SerializeFolderSettings(
-            IDictionary<string,FolderProcessingSettings> settings)
+            IDictionary<string,SortedDictionary<string, FolderProcessingSettings>> settings)
         {
             BinaryFormatter serializer = new BinaryFormatter();
             using (MemoryStream stream = new MemoryStream())
@@ -322,13 +322,13 @@ namespace Extract.SharePoint
         /// of a collection of <see cref="FolderProcessingSettings"/>.</param>
         /// <returns>The deserialized collection of <see cref="FolderProcessingSettings"/>.
         /// </returns>
-        internal static SortedDictionary<string, FolderProcessingSettings> DeserializeFolderSettings(
-            string settings)
+        internal static Dictionary<string, SortedDictionary<string, FolderProcessingSettings>>
+            DeserializeFolderSettings(string settings)
         {
             // If the string is empty just return an empty dictionary
             if (string.IsNullOrEmpty(settings))
             {
-                return new SortedDictionary<string,FolderProcessingSettings>();
+                return new Dictionary<string, SortedDictionary<string,FolderProcessingSettings>>();
             }
 
             int length = settings.Length;
@@ -341,11 +341,34 @@ namespace Extract.SharePoint
             using (MemoryStream stream = new MemoryStream(bytes))
             {
                 BinaryFormatter serializer = new BinaryFormatter();
-                SortedDictionary<string, FolderProcessingSettings> folderSettings =
-                    (SortedDictionary<string, FolderProcessingSettings>)serializer.Deserialize(stream);
+                Dictionary<string, SortedDictionary<string, FolderProcessingSettings>> folderSettings =
+                    (Dictionary<string, SortedDictionary<string, FolderProcessingSettings>>)serializer.Deserialize(stream);
 
                 return folderSettings;
             }
+        }
+
+        /// <summary>
+        /// Deserializes the folder settings collection and returns the folder settings
+        /// collection for the specified site.
+        /// </summary>
+        /// <param name="settings">The settings string to deserialize.</param>
+        /// <param name="site">The server relative site path used to restrict which
+        /// folder settings are returned.</param>
+        /// <returns>The folder settings collection for the specified server relative site
+        /// location.</returns>
+        internal static SortedDictionary<string, FolderProcessingSettings>
+            DeserializeFolderSettings(string settings, string site)
+        {
+            Dictionary<string, SortedDictionary<string, FolderProcessingSettings>> value =
+                DeserializeFolderSettings(settings);
+            SortedDictionary<string, FolderProcessingSettings> result;
+            if (value.TryGetValue(site, out result))
+            {
+                return result;
+            }
+
+            return new SortedDictionary<string, FolderProcessingSettings>();
         }
 
         #endregion Methods

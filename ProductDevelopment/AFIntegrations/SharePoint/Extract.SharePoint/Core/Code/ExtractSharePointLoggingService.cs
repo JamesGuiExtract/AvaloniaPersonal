@@ -32,7 +32,27 @@ namespace Extract.SharePoint
         /// <summary>
         /// Error occurred in the ID Shield file receiver
         /// </summary>
-        IdShieldFileReceiver = 4
+        IdShieldFileReceiver = 4,
+
+        /// <summary>
+        /// Error occurred in the exception logging calls
+        /// </summary>
+        ExceptionLogger = 5,
+
+        /// <summary>
+        /// Error occurred in the ID Shield settings configuration
+        /// </summary>
+        IdShieldSettingsConfiguration = 6,
+
+        /// <summary>
+        /// Error occurred in the watch folder configuration
+        /// </summary>
+        IdShieldWatchFolderConfiguration = 7,
+
+        /// <summary>
+        /// Error occurred in the remove folder watch configuration
+        /// </summary>
+        IdShieldRemoveFolderWatch = 8
     }
 
     /// <summary>

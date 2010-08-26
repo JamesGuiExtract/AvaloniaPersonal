@@ -26,7 +26,7 @@ namespace Extract.SharePoint
                     StringBuilder url = new StringBuilder("net.tcp://");
                     url.Append(ipAddress);
                     url.Append("/");
-                    url.Append(ExceptionLoggerData._WCF_TCP_END_POINT);
+                    url.Append(ExceptionLoggerData.WcfTcpEndPoint);
 
                     factory = new ChannelFactory<IExtractExceptionLogger>(new NetTcpBinding(),
                         new EndpointAddress(url.ToString()));
@@ -36,10 +36,9 @@ namespace Extract.SharePoint
 
                     factory.Close();
                 }
-                else
-                {
-                    ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex);
-                }
+
+                // Always log to SharePoint log
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex);
             }
             catch (Exception ex2)
             {
@@ -51,7 +50,7 @@ namespace Extract.SharePoint
 
                 // Unable to use logging service, send the error to the sharepoint log
                 ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex);
-                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex2);
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.ExceptionLogger, ex2);
             }
         }
 

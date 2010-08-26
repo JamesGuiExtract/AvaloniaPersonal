@@ -1,4 +1,5 @@
 ﻿using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using System;
 using System.Collections.Generic;
@@ -25,40 +26,51 @@ namespace Extract.SharePoint.Redaction.Layouts
                     return;
                 }
 
+                string siteRoot = Request.Params["siteroot"];
                 string currentFolder = Request.Params["folder"];
+                hiddenSiteLocation.Value = siteRoot;
 
-                if (!string.IsNullOrEmpty(currentFolder))
+                // If no current folder just return
+                if (string.IsNullOrEmpty(currentFolder))
                 {
-                    textFolder.Text = currentFolder;
-                    SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
-                    SPFeatureProperty property =
-                        feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
-                    if (property != null)
-                    {
-                        SortedDictionary<string, FolderProcessingSettings> folderSettings =
-                            FolderProcessingSettings.DeserializeFolderSettings(property.Value);
-                        string message = string.Empty;
-                        if (folderSettings.ContainsKey(currentFolder))
-                        {
-                            message = "Remove the watching for this folder?";
-                        }
-                        else
-                        {
-                            // Hide the yes button and change the No button to OK
-                            buttonYes.Visible = false;
-                            buttonNo.Text = "OK";
-                            message = "This folder is not currently being watched.";
-                        }
-
-                        labelMessage.Text = message;
-                    }
+                    SetUIToIndicateNoFolderWatching();
                 }
+
+                textFolder.Text = currentFolder;
+                IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
+                if (settings == null)
+                {
+                    SetUIToIndicateNoFolderWatching();
+                    return;
+                }
+
+                SortedDictionary<string, FolderProcessingSettings> folderSettings =
+                    FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings,
+                    siteRoot);
+                if (!folderSettings.ContainsKey(currentFolder))
+                {
+                    SetUIToIndicateNoFolderWatching();
+                    return;
+                }
+
+                labelMessage.Text = "Remove the watching for this folder?";
             }
             catch (Exception ex)
             {
-                IdShieldHelper.LogException(Web, ex);
+                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldRemoveFolderWatch);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Sets the UI to indicate to the user that there is no watching
+        /// currently configured for this folder
+        /// </summary>
+        void SetUIToIndicateNoFolderWatching()
+        {
+            buttonYes.Visible = false;
+            buttonNo.Text = "OK";
+            labelMessage.Text = "This folder is not currently being watched.";
         }
 
         /// <summary>
@@ -71,23 +83,24 @@ namespace Extract.SharePoint.Redaction.Layouts
             try
             {
                 bool watchRemoved = false;
-                SPFeature feature = IdShieldHelper.GetIdShieldFeature(Web);
-                if (feature == null)
+                SPUtility.ValidateFormDigest();
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    return;
-                }
-
-                SPFeatureProperty property =
-                    feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
-                if (property != null)
-                {
-                    SortedDictionary<string, FolderProcessingSettings> folderSettings =
-                        FolderProcessingSettings.DeserializeFolderSettings(property.Value);
-                    watchRemoved = folderSettings.Remove(textFolder.Text);
-                    property.Value = FolderProcessingSettings.SerializeFolderSettings(
-                        folderSettings);
-                    feature.Properties.Update();
-                }
+                    IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
+                    if (settings != null)
+                    {
+                        Dictionary<string, SortedDictionary<string, FolderProcessingSettings>> siteSettings
+                            = FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
+                        SortedDictionary<string, FolderProcessingSettings> folderSettings;
+                        if (siteSettings.TryGetValue(hiddenSiteLocation.Value, out folderSettings))
+                        {
+                            watchRemoved = folderSettings.Remove(textFolder.Text);
+                            settings.FolderSettings =
+                                FolderProcessingSettings.SerializeFolderSettings(siteSettings);
+                            settings.Update();
+                        }
+                    }
+                });
 
                 StringBuilder sb = new StringBuilder("<script type=\"text/javascript\">");
                 if (watchRemoved)
@@ -105,7 +118,7 @@ namespace Extract.SharePoint.Redaction.Layouts
             }
             catch (Exception ex)
             {
-                IdShieldHelper.LogException(Web, ex);
+                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldRemoveFolderWatch);
                 throw;
             }
         }

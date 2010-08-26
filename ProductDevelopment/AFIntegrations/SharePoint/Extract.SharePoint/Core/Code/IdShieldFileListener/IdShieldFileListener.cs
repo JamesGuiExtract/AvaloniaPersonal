@@ -43,6 +43,16 @@ namespace Extract.SharePoint.Redaction
         string _url;
 
         /// <summary>
+        /// Url relative to the server for the site
+        /// </summary>
+        string _serverRelativeUrl;
+
+        /// <summary>
+        /// The id for the site.
+        /// </summary>
+        Guid _siteId;
+
+        /// <summary>
         /// Mutex used to serialize access to the UpdateSettings calls.
         /// </summary>
         object _lock = new object();
@@ -59,8 +69,10 @@ namespace Extract.SharePoint.Redaction
         {
             try
             {
-                // Store the URL
-                _url = SPContext.Current.Web.Url;
+                // Store the URLs and the site ID
+                _url = SPContext.Current.Site.Url;
+                _serverRelativeUrl = SPContext.Current.Site.ServerRelativeUrl;
+                _siteId = SPContext.Current.Site.ID;
 
                 // Launch the folder watcher thread
                 Thread folderWatcher = new Thread(FolderWatcherThread);
@@ -68,8 +80,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                ExtractSharePointLoggingService.LogError(ErrorCategoryId.IdShieldFileReceiver,
-                    ex);
+                LogException(ex);
             }
         }
 
@@ -89,7 +100,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                IdShieldHelper.LogException(properties.Web, ex);
+                LogException(ex);
             }
         }
 
@@ -105,7 +116,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                IdShieldHelper.LogException(properties.Web, ex);
+                LogException(ex);
             }
         }
 
@@ -130,7 +141,7 @@ namespace Extract.SharePoint.Redaction
             }
 
             // Update the settings
-            UpdateSettings(IdShieldHelper.GetIdShieldFeature(properties.Web));
+            UpdateSettings();
 
             // Check for an output folder (if none is configured then do nothing)
             if (!string.IsNullOrEmpty(_outputFolder))
@@ -177,41 +188,31 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// Checks the feature and ensures the settings are updated.
         /// </summary>
-        /// <param name="feature">The feature to get the settings from.</param>
-        void UpdateSettings(SPFeature feature)
+        void UpdateSettings()
         {
             lock (_lock)
             {
-                if (feature != null)
-                {
-                    // Get the folder settings from the feature
-                    SPFeatureProperty property =
-                        feature.Properties[IdShieldSettings._FOLDER_PROCESSING_SETTINGS_STRING];
-                    if (property != null)
-                    {
-                        string temp = property.Value;
-                        if (temp.Length != _folderSettingsSerializationString.Length
-                            || !temp.Equals(_folderSettingsSerializationString, StringComparison.Ordinal))
-                        {
-                            _folderSettings =
-                                FolderProcessingSettings.DeserializeFolderSettings(temp);
-                            _folderSettingsSerializationString = temp;
-                        }
-                    }
-
-                    // Get the processing folder setting
-                    property =
-                        feature.Properties[IdShieldSettings._LOCAL_WORKING_FOLDER_SETTING_STRING];
-                    if (property != null)
-                    {
-                        _outputFolder = property.Value;
-                    }
-                }
-                else
+                IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
+                if (settings == null)
                 {
                     _outputFolder = string.Empty;
                     _folderSettings = null;
                     _folderSettingsSerializationString = string.Empty;
+                    return;
+                }
+                string temp = settings.FolderSettings;
+                if (temp.Length != _folderSettingsSerializationString.Length
+                    || !temp.Equals(_folderSettingsSerializationString, StringComparison.Ordinal))
+                {
+                    _folderSettings =
+                        FolderProcessingSettings.DeserializeFolderSettings(temp, _serverRelativeUrl);
+                    _folderSettingsSerializationString = temp;
+                }
+
+                if (!string.IsNullOrEmpty(settings.LocalWorkingFolder))
+                {
+                    _outputFolder = Path.Combine(settings.LocalWorkingFolder,
+                        _serverRelativeUrl.Substring(1).Replace('/', '\\'));
                 }
             }
         }
@@ -329,16 +330,14 @@ namespace Extract.SharePoint.Redaction
                 using (FileSystemWatcher processedWatcher = new FileSystemWatcher())
                 using (FileSystemWatcher failedWatcher = new FileSystemWatcher())
                 {
-                    SPFeature feature = null;
                     while (string.IsNullOrEmpty(_outputFolder))
                     {
                         // Sleep to give the web a chance to populate the activated feature
                         Thread.Sleep(1000);
 
                         using (SPSite site = new SPSite(_url))
-                        using (SPWeb web = site.OpenWeb())
                         {
-                            feature = IdShieldHelper.GetIdShieldFeature(web);
+                            SPFeature feature = IdShieldHelper.GetIdShieldFeature(site);
                             if (feature == null)
                             {
                                 // If the feature is null it is not activated
@@ -347,7 +346,7 @@ namespace Extract.SharePoint.Redaction
                             }
 
                             // Update the settings
-                            UpdateSettings(feature);
+                            UpdateSettings();
                         }
                     }
 
@@ -358,44 +357,89 @@ namespace Extract.SharePoint.Redaction
                         return;
                     }
 
-                    // Search for any existing .processed files
-                    SearchAndHandleExistingFiles();
-
-                    // Watch for new files
-                    processedWatcher.Path = _outputFolder;
-                    processedWatcher.Filter = "*.processed";
-                    processedWatcher.NotifyFilter = NotifyFilters.FileName;
-                    processedWatcher.Created += HandleFileCreated;
-                    processedWatcher.IncludeSubdirectories = true;
-                    failedWatcher.Path = _outputFolder;
-                    failedWatcher.Filter = "*.failed";
-                    failedWatcher.NotifyFilter = NotifyFilters.FileName;
-                    failedWatcher.Created += HandleFileFailed;
-                    failedWatcher.IncludeSubdirectories = true;
-
-                    processedWatcher.EnableRaisingEvents = true;
-                    failedWatcher.EnableRaisingEvents = true;
-
-                    do
+                    try
                     {
-                        // Wait for the feature to deactivate
-                        Thread.Sleep(5000);
-                        using (SPSite site = new SPSite(_url))
-                        using (SPWeb web = site.OpenWeb())
-                        {
-                            feature = IdShieldHelper.GetIdShieldFeature(web);
-                        }
-                    }
-                    while (feature != null);
+                        LogThreadStart();
 
-                    // Feature deactivated, stop watching for processed files
-                    processedWatcher.EnableRaisingEvents = false;
-                    failedWatcher.EnableRaisingEvents = false;
+                        // Search for any existing .processed files
+                        SearchAndHandleExistingFiles();
+
+                        // Watch for new files
+                        processedWatcher.Path = _outputFolder;
+                        processedWatcher.Filter = "*.processed";
+                        processedWatcher.NotifyFilter = NotifyFilters.FileName;
+                        processedWatcher.Created += HandleFileCreated;
+                        processedWatcher.IncludeSubdirectories = true;
+                        failedWatcher.Path = _outputFolder;
+                        failedWatcher.Filter = "*.failed";
+                        failedWatcher.NotifyFilter = NotifyFilters.FileName;
+                        failedWatcher.Created += HandleFileFailed;
+                        failedWatcher.IncludeSubdirectories = true;
+
+                        processedWatcher.EnableRaisingEvents = true;
+                        failedWatcher.EnableRaisingEvents = true;
+
+                        SPFeature featureTemp;
+                        do
+                        {
+                            // Wait for the feature to deactivate
+                            Thread.Sleep(5000);
+                            using (SPSite site = new SPSite(_url))
+                            {
+                                featureTemp = IdShieldHelper.GetIdShieldFeature(site);
+                            }
+                        }
+                        while (featureTemp != null);
+
+                        // Feature deactivated, stop watching for processed files
+                        processedWatcher.EnableRaisingEvents = false;
+                        failedWatcher.EnableRaisingEvents = false;
+                    }
+                    finally
+                    {
+                        LogThreadExit();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                LogExceptions(ex);
+                LogException(ex);
+            }
+        }
+
+        /// <summary>
+        /// Logs an application trace indicating that the folder watching has started
+        /// </summary>
+        void LogThreadStart()
+        {
+            try
+            {
+                SPException ee = new SPException(
+                    "Application Trace: ID Shield feature folder watching thread started.");
+                ee.Data.Add("Current Site Id", _siteId.ToString());
+                ee.Data.Add("Current Site Url", _serverRelativeUrl);
+                LogException(ee);
+            }
+            catch
+            {
+            }
+        }
+
+        /// <summary>
+        /// Logs an application trace indicating that folder watching has ended
+        /// </summary>
+        void LogThreadExit()
+        {
+            try
+            {
+                SPException ee = new SPException(
+                    "Application Trace: ID Shield feature folder watching thread exited.");
+                ee.Data.Add("Current Site Id", _siteId.ToString());
+                ee.Data.Add("Current Site Url", _serverRelativeUrl);
+                LogException(ee);
+            }
+            catch
+            {
             }
         }
 
@@ -435,14 +479,14 @@ namespace Extract.SharePoint.Redaction
                     SPException exception = new SPException("Failed processing file: "
                         + spFileName);
                     exception.Data.Add("SP Failed File", spFileName);
-                    LogExceptions(exception);
+                    LogException(exception);
 
                     // Cleanup all files related to this file
                     CleanupLocalFiles(fileWithoutExtension, directory);
                 }
                 catch (Exception ex)
                 {
-                    LogExceptions(ex);
+                    LogException(ex);
                 }
             }
         }
@@ -459,7 +503,7 @@ namespace Extract.SharePoint.Redaction
                 using (SPSite site = new SPSite(_url))
                 using (SPWeb web = site.OpenWeb())
                 {
-                    UpdateSettings(IdShieldHelper.GetIdShieldFeature(web));
+                    UpdateSettings();
                     if (_folderSettings != null)
                     {
                         foreach (string fileName in fileNames)
@@ -506,7 +550,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                LogExceptions(ex);
+                LogException(ex);
             }
         }
 
@@ -541,7 +585,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                LogExceptions(ex);
+                LogException(ex);
             }
         }
 
@@ -613,19 +657,9 @@ namespace Extract.SharePoint.Redaction
         /// Attempts to logs exceptions to the exception logging service.
         /// </summary>
         /// <param name="ex">The exception to log.</param>
-        void LogExceptions(Exception ex)
+        static void LogException(Exception ex)
         {
-            try
-            {
-                using (SPSite site = new SPSite(_url))
-                using (SPWeb web = site.OpenWeb())
-                {
-                    IdShieldHelper.LogException(web, ex);
-                }
-            }
-            catch
-            {
-            }
+            IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldFileReceiver);
         }
 
         #endregion Methods

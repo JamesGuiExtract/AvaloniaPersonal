@@ -13,6 +13,15 @@ namespace Extract.SharePoint.Redaction.Layouts {
     public partial class RemoveWatchFolderWithIdShield {
         
         /// <summary>
+        /// hiddenSiteLocation control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hiddenSiteLocation;
+        
+        /// <summary>
         /// panelTop control.
         /// </summary>
         /// <remarks>

@@ -12,6 +12,12 @@ namespace Extract.ExceptionService
     {
         #region Fields
 
+#if DEBUG
+        /// <summary>
+        /// Path to the exception helper application.
+        /// </summary>
+        static readonly string _EXCEPTION_HELPER_APP = @"D:\Engineering\Binaries\Debug\ExceptionHelper.exe";
+#else
         /// <summary>
         /// Path to the Extract systems folder in the program files directory.
         /// </summary>
@@ -25,18 +31,13 @@ namespace Extract.ExceptionService
         static readonly string _COMMON_COMPONENTS =
             Path.Combine(_EXTRACT_FOLDER, "CommonComponents");
 
-#if DEBUG
-        /// <summary>
-        /// Path to the exception helper application.
-        /// </summary>
-        static readonly string _EXCEPTION_HELPER_APP = @"D:\Engineering\Binaries\Debug\ExceptionHelper.exe";
-#else
         /// <summary>
         /// Path to the exception helper application.
         /// </summary>
         static readonly string _EXCEPTION_HELPER_APP = Path.Combine(_COMMON_COMPONENTS,
             "ExceptionHelper.exe");
 #endif
+
         #endregion
 
         #region Methods
@@ -96,7 +97,7 @@ namespace Extract.ExceptionService
             try
             {
                 // Serialize the exception as a hex string and write to temp file
-                string hexException = SerializeExceptionToHexString(exceptionData._data);
+                string hexException = SerializeExceptionToHexString(exceptionData.ExceptionData);
                 tempFile = Path.GetTempFileName();
                 File.WriteAllText(tempFile, hexException);
 

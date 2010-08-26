@@ -17,7 +17,7 @@
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccAuxPath>http://white/VaultService</SccAuxPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
-    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <ActiveDeploymentConfiguration>No Activation</ActiveDeploymentConfiguration>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -151,17 +151,21 @@
     <Content Include="Images\IdShieldImages\UnwatchFolder16x16.png" />
     <Content Include="Images\IdShieldImages\UnwatchFolder32x32.png" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\RedactionHelpers.js" />
-    <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx" />
-    <Content Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx" />
+    <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="Layouts\Extract.SharePoint\EnableHelpers.js" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\RC.Net\ExceptionService\WCFInterface\Core\Code\Extract.ExceptionService.WCFInterface.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\ExceptionService\WCFInterface\Core\Code\Extract.ExceptionService.WcfInterface.csproj">
       <Project>{E2701E73-4D37-477B-8359-5614136DFA09}</Project>
-      <Name>Extract.ExceptionService.WCFInterface</Name>
+      <Name>Extract.ExceptionService.WcfInterface</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

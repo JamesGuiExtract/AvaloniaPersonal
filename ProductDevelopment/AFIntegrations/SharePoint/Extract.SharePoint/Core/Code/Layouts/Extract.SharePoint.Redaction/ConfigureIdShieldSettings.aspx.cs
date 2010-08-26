@@ -1,4 +1,5 @@
 ﻿using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using System;
 
@@ -24,27 +25,16 @@ namespace Extract.SharePoint.Redaction.Layouts
                     return;
                 }
 
-                SPFeature feature = IdShieldHelper.GetIdShieldFeature(Web);
-                if (feature != null)
+                IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
+                if (settings != null)
                 {
-                    SPFeatureProperty localFolder =
-                        feature.Properties[IdShieldSettings._LOCAL_WORKING_FOLDER_SETTING_STRING];
-                    if (localFolder != null)
-                    {
-                        textFolder.Text = localFolder.Value;
-                    }
-
-                    SPFeatureProperty ipAddress =
-                        feature.Properties[IdShieldSettings._IP_ADDRESS_SETTING_STRING];
-                    if (ipAddress != null)
-                    {
-                        textExceptionIpAddress.Text = ipAddress.Value;
-                    }
+                    textFolder.Text = settings.LocalWorkingFolder;
+                    textExceptionIpAddress.Text = settings.ExceptionServiceIPAddress;
                 }
             }
             catch (Exception ex)
             {
-                IdShieldHelper.LogException(Web, ex);
+                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldSettingsConfiguration);
                 throw;
             }
         }
@@ -56,69 +46,41 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// <param name="e">The data associated with the event.</param>
         protected void HandleOkButtonClick(object sender, EventArgs e)
         {
-            if (IsValid)
+            if (!IsValid)
             {
-                string response = "<script type=\"text/javascript\">"
-                    + " <==REPLACEME==> "
-                        + "</script>";
-                try
+                return;
+            }
+
+            try
+            {
+                SPUtility.ValidateFormDigest();
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     // Remove trailing '\'
-                    string folder = textFolder.Text;
+                    string folder = textFolder.Text.Trim();
                     if (folder.EndsWith("\\", StringComparison.Ordinal))
                     {
                         folder = folder.Substring(0, folder.Length - 1);
                     }
 
-                    SPFeature feature = Web.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
-                    if (feature != null)
-                    {
-                        SPFeatureProperty localFolder =
-                            feature.Properties[IdShieldSettings._LOCAL_WORKING_FOLDER_SETTING_STRING];
-                        if (localFolder != null)
-                        {
-                            localFolder.Value = folder;
-                        }
-                        else
-                        {
-                            localFolder = new SPFeatureProperty(
-                                IdShieldSettings._LOCAL_WORKING_FOLDER_SETTING_STRING, folder);
-                            feature.Properties.Add(localFolder);
-                        }
+                    IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(true);
+                    settings.LocalWorkingFolder = folder;
+                    settings.ExceptionServiceIPAddress = textExceptionIpAddress.Text.Trim();
+                    settings.Update();
+                });
 
-                        SPFeatureProperty ipAddress =
-                            feature.Properties[IdShieldSettings._IP_ADDRESS_SETTING_STRING];
-                        if (ipAddress != null)
-                        {
-                            ipAddress.Value = textExceptionIpAddress.Text.Trim();
-                        }
-                        else
-                        {
-                            ipAddress = new SPFeatureProperty(
-                                IdShieldSettings._IP_ADDRESS_SETTING_STRING,
-                                textExceptionIpAddress.Text);
-                            feature.Properties.Add(ipAddress);
-                        }
-
-                        feature.Properties.Update();
-                    }
-
-                    response = response.Replace("<==REPLACEME==>",
-                        "window.frameElement.commitPopup();");
-                }
-                catch (Exception ex)
-                {
-                    response = response.Replace("<==REPLACEME==>",
-                        "alert('" + ex.Message
-                        + "'); window.frameElement.commitPopup();");
-                }
-                finally
-                {
-                    // Send the response to close the dialog
-                    Context.Response.Write(response);
-                    Context.Response.Flush();
-                    Context.Response.End();
-                }
+                string response = "<script type=\"text/javascript\">"
+                    + " window.frameElement.commitPopup(); "
+                        + "</script>";
+                // Send the response to close the dialog
+                Context.Response.Write(response);
+                Context.Response.Flush();
+                Context.Response.End();
+            }
+            catch (Exception ex)
+            {
+                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldSettingsConfiguration);
+                throw;
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Permissions;
 using System.Text;
 
 namespace Extract.ExceptionService
@@ -11,14 +12,14 @@ namespace Extract.ExceptionService
     /// Helper class containing the data to be serialized across the WCF wire
     /// </summary>
     [Serializable]
-    public class ExceptionLoggerData : ISerializable
+    public sealed class ExceptionLoggerData : ISerializable
     {
         #region Constants
 
         /// <summary>
         /// Constant for the endpoint of the TCP/IP channel for the service.
         /// </summary>
-        public static readonly string _WCF_TCP_END_POINT = "TcpESExceptionLogger";
+        public static readonly string WcfTcpEndPoint = "TcpESExceptionLogger";
 
         /// <summary>
         /// Current version of the exception logger data class.
@@ -32,7 +33,7 @@ namespace Extract.ExceptionService
         /// <summary>
         /// The exception data to serialize
         /// </summary>
-        public Exception _data;
+        Exception _data;
 
         #endregion Fields
 
@@ -52,7 +53,7 @@ namespace Extract.ExceptionService
         /// </summary>
         /// <param name="info">The serialization info collection.</param>
         /// <param name="context">The context for the the serialization.</param>
-        public ExceptionLoggerData(SerializationInfo info, StreamingContext context)
+        ExceptionLoggerData(SerializationInfo info, StreamingContext context)
         {
             int version = info.GetInt32("CurrentVersion");
             if (version > _CURRENT_VERSION)
@@ -76,6 +77,7 @@ namespace Extract.ExceptionService
         /// </summary>
         /// <param name="info">The serialization info collection.</param>
         /// <param name="context">The context for the the serialization.</param>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("CurrentVersion", _CURRENT_VERSION);
@@ -189,5 +191,20 @@ namespace Extract.ExceptionService
         }
 
         #endregion Methods
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the <see cref="Exception"/> associated with this class.
+        /// </summary>
+        public Exception ExceptionData
+        {
+            get
+            {
+                return _data;
+            }
+        }
+
+        #endregion Properties
     }
 }

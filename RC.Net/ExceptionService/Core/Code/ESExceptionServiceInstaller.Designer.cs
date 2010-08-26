@@ -45,6 +45,8 @@
             this.esServiceInstaller.Description = "Extract Systems exception logging service";
             this.esServiceInstaller.DisplayName = "Extract Systems Exception Service";
             this.esServiceInstaller.ServiceName = "ESExceptionService";
+            this.esServiceInstaller.ServicesDependedOn = new string[] {
+        "NetTcpPortSharing"};
             this.esServiceInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ESExceptionServiceInstaller

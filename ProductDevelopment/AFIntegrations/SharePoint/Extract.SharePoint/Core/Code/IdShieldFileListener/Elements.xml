@@ -1,20 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
-  <Receivers ListTemplateId="101">
-      <Receiver>
-        <Name>IdShieldFileListenerItemAdded</Name>
-        <Type>ItemAdded</Type>
-        <Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
-        <Class>Extract.SharePoint.Redaction.IdShieldFileListener</Class>
-        <SequenceNumber>10000</SequenceNumber>
-      </Receiver>
-      <Receiver>
-        <Name>IdShieldFileListenerItemUpdated</Name>
-        <Type>ItemUpdated</Type>
-        <Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
-        <Class>Extract.SharePoint.Redaction.IdShieldFileListener</Class>
-        <SequenceNumber>10000</SequenceNumber>
-      </Receiver>
+	<Receivers ListTemplateId="101">
+		<Receiver>
+			<Name>IdShieldFileListenerItemAdded</Name>
+			<Type>ItemAdded</Type>
+			<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+			<Class>Extract.SharePoint.Redaction.IdShieldFileListener</Class>
+			<SequenceNumber>10000</SequenceNumber>
+			<Synchronization>Synchronous</Synchronization>
+		</Receiver>
+		<Receiver>
+			<Name>IdShieldFileListenerItemUpdated</Name>
+			<Type>ItemUpdated</Type>
+			<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+			<Class>Extract.SharePoint.Redaction.IdShieldFileListener</Class>
+			<SequenceNumber>10000</SequenceNumber>
+			<Synchronization>Synchronous</Synchronization>
+		</Receiver>
 
-  </Receivers>
+	</Receivers>
 </Elements>
