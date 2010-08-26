@@ -1,0 +1,8 @@
+<Solutions>
+	<Solution Path="ID Shield For SharePoint.wsp" CASPolicies="false" GACDeployment="true">
+		<Features>
+			<Feature>Extract.SharePoint.Redaction</Feature>
+		</Features>
+		<WebApplications />
+	</Solution>
+</Solutions>
