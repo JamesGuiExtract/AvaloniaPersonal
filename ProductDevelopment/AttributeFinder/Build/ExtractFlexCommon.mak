@@ -94,7 +94,6 @@ CopyExtractFlexCommonFiles: CleanupExtractFlexCommonFiles ObfuscateFiles
 	@DIR "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles\Extract.Utilities.Parsers.dll" /b >"$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractFlexCommon.nl
 	@DIR "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles\Extract.Imaging.dll" /b >>"$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractFlexCommon.nl
 	@DIR "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles\Extract.Utilities.Forms.dll" /b >>"$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractFlexCommon.nl
-	@DIR "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles\Extract.Imaging.dll" /b >>"$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractFlexCommon.nl
 
 CreateExtractFlexCommonMergeModule: CopyExtractFlexCommonFiles
 	@ECHO Creating ExtractFlexCommon merge module...
