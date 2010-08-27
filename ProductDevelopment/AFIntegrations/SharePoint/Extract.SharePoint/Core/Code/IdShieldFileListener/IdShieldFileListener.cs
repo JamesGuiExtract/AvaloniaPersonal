@@ -530,16 +530,26 @@ namespace Extract.SharePoint.Redaction
                                 // Create the destination folder if necessary
                                 EnsureDestinationFolderExists(web, destFolder);
 
-                                // Read the redacted file from the disk
-                                byte[] bytes = File.ReadAllBytes(redactedFile);
+                                string destinationUrl = web.Url + destinationFileName;
+                                try
+                                {
+                                    // Read the redacted file from the disk
+                                    byte[] bytes = File.ReadAllBytes(redactedFile);
 
-                                // Upload the redacted file into SharePoint
-                                // NOTE: Need to turn off event firing while the file is
-                                // added to prevent inifinte looping
-                                EventFiringEnabled = false;
-                                web.Files.Add(destinationFileName, bytes, true);
-                                web.Update();
-                                EventFiringEnabled = true;
+                                    // Upload the redacted file into SharePoint
+                                    // NOTE: Need to turn off event firing while the file is
+                                    // added to prevent inifinte looping
+                                    EventFiringEnabled = false;
+                                    web.Files.Add(destinationUrl, bytes, true);
+                                    web.Update();
+                                    EventFiringEnabled = true;
+                                }
+                                catch (Exception ex)
+                                {
+                                    ex.Data.Add("File To Add", fileName);
+                                    ex.Data.Add("Destination Url", destinationUrl);
+                                    throw;
+                                }
                             }
 
                             // Cleanup all files related to this file
@@ -597,9 +607,11 @@ namespace Extract.SharePoint.Redaction
         /// <param name="destFolder">The web relative path to the destination folder.</param>
         static void EnsureDestinationFolderExists(SPWeb web, string destFolder)
         {
+            string url = string.Empty;
             try
             {
-                SPFolder folder = web.GetFolder(destFolder);
+                url = web.Url + destFolder;
+                SPFolder folder = web.GetFolder(url);
                 if (!folder.Exists)
                 {
                     string[] folders = destFolder.Split(new char[] { '/' },
@@ -627,6 +639,7 @@ namespace Extract.SharePoint.Redaction
                 SPException exception = new SPException("Unable to create destination folder.",
                     ex);
                 exception.Data.Add("Destination Folder", destFolder);
+                exception.Data.Add("Web Url", url);
                 throw exception;
             }
         }

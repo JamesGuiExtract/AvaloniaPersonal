@@ -151,15 +151,9 @@
     <Content Include="Images\IdShieldImages\UnwatchFolder16x16.png" />
     <Content Include="Images\IdShieldImages\UnwatchFolder32x32.png" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\RedactionHelpers.js" />
-    <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx" />
+    <Content Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx" />
+    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx" />
     <Content Include="Layouts\Extract.SharePoint\EnableHelpers.js" />
   </ItemGroup>
   <ItemGroup>
