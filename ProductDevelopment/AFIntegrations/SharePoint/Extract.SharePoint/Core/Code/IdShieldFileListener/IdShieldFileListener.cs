@@ -40,12 +40,12 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// The url for the SPWeb that the event listener is attached to
         /// </summary>
-        string _url;
+        string _url = string.Empty;
 
         /// <summary>
         /// Url relative to the server for the site
         /// </summary>
-        string _serverRelativeUrl;
+        string _serverRelativeUrl = string.Empty;
 
         /// <summary>
         /// The id for the site.
@@ -69,14 +69,17 @@ namespace Extract.SharePoint.Redaction
         {
             try
             {
-                // Store the URLs and the site ID
-                _url = SPContext.Current.Site.Url;
-                _serverRelativeUrl = SPContext.Current.Site.ServerRelativeUrl;
-                _siteId = SPContext.Current.Site.ID;
+                if (SPContext.Current != null && SPContext.Current.Site != null)
+                {
+                    // Store the URLs and the site ID
+                    _url = SPContext.Current.Site.Url;
+                    _serverRelativeUrl = SPContext.Current.Site.ServerRelativeUrl;
+                    _siteId = SPContext.Current.Site.ID;
 
-                // Launch the folder watcher thread
-                Thread folderWatcher = new Thread(FolderWatcherThread);
-                folderWatcher.Start();
+                    // Launch the folder watcher thread
+                    Thread folderWatcher = new Thread(FolderWatcherThread);
+                    folderWatcher.Start();
+                }
             }
             catch (Exception ex)
             {
@@ -141,7 +144,8 @@ namespace Extract.SharePoint.Redaction
             }
 
             // Update the settings
-            UpdateSettings();
+            SPSite site = item.Web.Site;
+            UpdateSettings(site.ServerRelativeUrl, site.ID);
 
             // Check for an output folder (if none is configured then do nothing)
             if (!string.IsNullOrEmpty(_outputFolder))
@@ -190,6 +194,14 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         void UpdateSettings()
         {
+            UpdateSettings(_serverRelativeUrl, _siteId);
+        }
+
+        /// <summary>
+        /// Checks the feature and ensures the settings are updated.
+        /// </summary>
+        void UpdateSettings(string serverRelativeUrl, Guid siteId)
+        {
             lock (_lock)
             {
                 IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
@@ -205,14 +217,13 @@ namespace Extract.SharePoint.Redaction
                     || !temp.Equals(_folderSettingsSerializationString, StringComparison.Ordinal))
                 {
                     _folderSettings =
-                        FolderProcessingSettings.DeserializeFolderSettings(temp, _serverRelativeUrl);
+                        FolderProcessingSettings.DeserializeFolderSettings(temp, serverRelativeUrl);
                     _folderSettingsSerializationString = temp;
                 }
 
                 if (!string.IsNullOrEmpty(settings.LocalWorkingFolder))
                 {
-                    _outputFolder = Path.Combine(settings.LocalWorkingFolder,
-                        _serverRelativeUrl.Substring(1).Replace('/', '\\'));
+                    _outputFolder = Path.Combine(settings.LocalWorkingFolder, siteId.ToString());
                 }
             }
         }
@@ -539,6 +550,8 @@ namespace Extract.SharePoint.Redaction
                                     // Upload the redacted file into SharePoint
                                     // NOTE: Need to turn off event firing while the file is
                                     // added to prevent inifinte looping
+                                    // TODO: FlexIDSIntegration #181 - May be fixed by
+                                    // creating a new SPSite and SPWeb object here
                                     EventFiringEnabled = false;
                                     web.Files.Add(destinationUrl, bytes, true);
                                     web.Update();
@@ -672,6 +685,15 @@ namespace Extract.SharePoint.Redaction
         /// <param name="ex">The exception to log.</param>
         static void LogException(Exception ex)
         {
+            ex.Data.Add("User Name", Environment.UserName);
+            try
+            {
+                ex.Data.Add("User Domain Name", Environment.UserDomainName);
+            }
+            catch
+            {
+            }
+
             IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldFileReceiver);
         }
 

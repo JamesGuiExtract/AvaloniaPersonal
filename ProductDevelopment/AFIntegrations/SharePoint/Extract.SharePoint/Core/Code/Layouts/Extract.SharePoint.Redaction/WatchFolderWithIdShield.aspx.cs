@@ -29,11 +29,11 @@ namespace Extract.SharePoint.Redaction.Layouts
                 hiddenSiteLocation.Value = siteRoot;
                 string currentFolder = Request.QueryString["folder"];
                 textCurrentFolderName.Text = currentFolder;
-                radioParallel.Checked = true;
 
                 IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
                 if (settings == null)
                 {
+                    radioParallel.Checked = true;
                     ToggleAllOutputLocations();
                     return;
                 }
@@ -129,6 +129,10 @@ namespace Extract.SharePoint.Redaction.Layouts
                             textCustomOut.Text = temp.OutputLocationString;
                             break;
                     }
+                }
+                else
+                {
+                    radioParallel.Checked = true;
                 }
 
                 ToggleAllOutputLocations();

@@ -11,7 +11,6 @@ function OnFailure(sender, args)
 // Displays the configure ID Shield page in a SP modal dialog box
 function showConfigureIdShield()
 {
-    var siteId = this.site.get_id();
     var options =
     {
         url: '/_layouts/Extract.SharePoint.Redaction/ConfigureIdShieldSettings.aspx',
