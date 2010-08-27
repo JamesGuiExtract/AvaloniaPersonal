@@ -1044,10 +1044,6 @@ namespace Extract.DataEntry.DEP.StandardLabDE
             // 
             // StandardLabDEPanel
             // 
-            this.AboutLogo = global::Extract.DataEntry.DEP.StandardLabDE.Properties.Resources._labDELogo;
-            this.ApplicationDescription = "A powerful productivity tool for your lab, hospital or clinic.";
-            this.ApplicationIcon = ((System.Drawing.Icon)(resources.GetObject("$this.ApplicationIcon")));
-            this.ApplicationTitle = "LabDE";
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.CommentControl = this._operatorComments;

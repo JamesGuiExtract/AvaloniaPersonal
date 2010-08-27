@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Diagnostics.CodeAnalysis;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -39,3 +40,7 @@ using System.Runtime.InteropServices;
 // Mark as not CLS compliant. (since this assembly will be practically unusable without 
 // CLS-incompliant methods)
 [assembly: CLSCompliant(false)]
+
+// Allow "misspellings" in assembly resources so that warnings are not generated for filepaths
+// (among other things).
+[module: SuppressMessage("Microsoft.Naming", "CA1703:ResourceStringsShouldBeSpelledCorrectly", Scope = "resource", Target = "Extract.DataEntry.Utilities.DataEntryApplication.BrandingResources.LabDE.resources")]

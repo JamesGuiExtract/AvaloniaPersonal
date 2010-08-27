@@ -26,45 +26,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string HelpFile {
+        public string ApplicationResourceFile {
             get {
-                return ((string)(this["HelpFile"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Extract Systems")]
-        public string ApplicationTitle {
-            get {
-                return ((string)(this["ApplicationTitle"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ApplicationIcon {
-            get {
-                return ((string)(this["ApplicationIcon"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string AboutLogo {
-            get {
-                return ((string)(this["AboutLogo"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ApplicationDescription {
-            get {
-                return ((string)(this["ApplicationDescription"]));
+                return ((string)(this["ApplicationResourceFile"]));
             }
         }
     }

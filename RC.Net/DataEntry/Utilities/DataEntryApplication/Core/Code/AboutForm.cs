@@ -35,11 +35,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// Initializes a new instance of <see cref="AboutForm"/> class.
         /// </summary>
-        /// <param name="applicationConfig">The product information.</param>
-        /// <param name="dataEntryControlHost">The <see cref="DataEntryControlHost"/> to be
-        /// used as the source of the product version.</param>
-        public AboutForm(ConfigSettings<Settings> applicationConfig, 
-            DataEntryControlHost dataEntryControlHost)
+        /// <param name="brandingResources">The product information.</param>
+        public AboutForm(BrandingResourceManager brandingResources)
         {
             try
             {
@@ -48,33 +45,25 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     LicenseIdName.DataEntryCoreComponents, "ELI26960", _OBJECT_NAME);
 
                 ExtractException.Assert("ELI30538", "Null argument exception!",
-                    applicationConfig != null);
-                ExtractException.Assert("ELI27009", "Null argument exception!",
-                    dataEntryControlHost != null);
+                    brandingResources != null);
 
                 InitializeComponent();
 
                 // Initialize product info from the applicationConfig passed in.
-                if (!string.IsNullOrEmpty(applicationConfig.Settings.AboutLogo))
+                if (brandingResources.AboutLogo != null)
                 {
-                    string logoFilename =
-                        DataEntryMethods.ResolvePath(applicationConfig.Settings.AboutLogo);
-                    _logoImage.Image = Bitmap.FromFile(logoFilename);
+                    _logoImage.Image = (Image)brandingResources.AboutLogo.Clone();
                 }
-                _labelProductName.Text = applicationConfig.Settings.ApplicationTitle;
-                _textBoxDescription.Text = applicationConfig.Settings.ApplicationDescription;
+                _labelProductName.Text = brandingResources.ApplicationTitle;
+                _textBoxDescription.Text = brandingResources.ApplicationDescription;
                 Text = String.Format(CultureInfo.CurrentCulture, "About {0}",
-                    applicationConfig.Settings.ApplicationTitle);
-
-                // Extract the product version from the dataEntryControlHost's assembly.
-                Assembly controlHostAssembly = Assembly.GetAssembly(dataEntryControlHost.GetType());
-                _labelProductVersion.Text = String.Format(CultureInfo.CurrentCulture,
-                    "Version {0}", controlHostAssembly.GetName().Version.ToString());
+                    brandingResources.ApplicationTitle);
 
                 //  Initialize framework version and company info from the assembly information.
                 //  Change assembly information settings for your application through either:
                 //  - Project->Properties->Application->Assembly Information
                 //  - AssemblyInfo.cs
+                _labelProductVersion.Text = brandingResources.Version;
                 _labelFrameworkVersion.Text = String.Format(CultureInfo.CurrentCulture,
                     "Framework version {0}", AssemblyVersion);
                 _labelCopyright.Text = AssemblyCopyright;

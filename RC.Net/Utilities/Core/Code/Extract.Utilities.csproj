@@ -92,6 +92,7 @@
     <Compile Include="StreamMethods.cs" />
     <Compile Include="SystemMethods.cs" />
     <Compile Include="TemporaryFile.cs" />
+    <Compile Include="TemporaryFileCopyManager.cs" />
     <Compile Include="ThreadingMethods.cs" />
     <Compile Include="TimeInterval.cs" />
     <Compile Include="UtilityMethods.cs" />

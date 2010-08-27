@@ -163,7 +163,8 @@ STDMETHODIMP CSpatialString::ConsolidateChars(BSTR strChars, VARIANT_BOOL bCaseS
 			long nStartDeletePos = nFoundPos + 1;
 			long nEndDeletePos = nFoundPos + 1;
 			bool bDelete = false;
-			while (stdstrChars.find(strTempCurrentString[nEndDeletePos]) != string::npos)
+			while (nEndDeletePos + 1 < strTempCurrentString.length() &&
+				   stdstrChars.find(strTempCurrentString[nEndDeletePos]) != string::npos)
 			{
 				nEndDeletePos++;
 				bDelete = true;

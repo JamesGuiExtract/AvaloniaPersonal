@@ -57,7 +57,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// The settings for this application.
         /// </summary>
-        readonly ConfigSettings<Settings> _applicationConfig;
+        static ConfigSettings<Settings> _applicationConfig;
+
+        /// <summary>
+        /// Provides the resources used to brand the DataEntryApplication as a specific product.
+        /// </summary>
+        static BrandingResourceManager _brandingResources;
 
         /// <summary>
         /// The settings for the active data entry configuration
@@ -227,6 +232,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         string _dataSourcePath;
 
         /// <summary>
+        /// The path of the currently open local database connection.
+        /// </summary>
+        string _currentDataSourcePath;
+
+        /// <summary>
+        /// The connection string used to open the current database connection.
+        /// </summary>
+        string _currentDbConnectionString;
+
+        /// <summary>
         /// The user-specified settings for the data entry application.
         /// </summary>
         readonly UserPreferences _userPreferences;
@@ -338,12 +353,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI23668", _OBJECT_NAME);
 
-                // Initialize the application settings.
-                _applicationConfig = new ConfigSettings<Settings>(configFileName, false, false);
-
                 // Initialize the root directory the DataEntry framework should use when resolving
                 // relative paths.
                 DataEntryMethods.SolutionRootDirectory = Path.GetDirectoryName(configFileName);
+
+                // Initialize the application settings.
+                _applicationConfig = new ConfigSettings<Settings>(configFileName, false, false);
+
+                _brandingResources = new BrandingResourceManager(
+                    DataEntryMethods.ResolvePath(_applicationConfig.Settings.ApplicationResourceFile));
 
                 // Since SpotIR compatibility is not required for data entry applications, avoid the
                 // performance hit it exacts.
@@ -380,23 +398,21 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 
                 InitializeComponent();
 
-                if (!string.IsNullOrEmpty(_applicationConfig.Settings.ApplicationIcon))
+                if (_brandingResources.ApplicationIcon != null)
                 {
-                    string iconFilename =
-                        DataEntryMethods.ResolvePath(_applicationConfig.Settings.ApplicationIcon);
-                    Icon = new Icon(iconFilename);
+                    Icon = (Icon)_brandingResources.ApplicationIcon.Clone();
                 }
 
-                if (string.IsNullOrEmpty(_applicationConfig.Settings.HelpFile))
+                if (string.IsNullOrEmpty(_brandingResources.HelpFilePath))
                 {
                     _appHelpMenuItem.Visible = false;
                 }
                 else
                 {
-                    _appHelpMenuItem.Text = _applicationConfig.Settings.ApplicationTitle + " &help...";
+                    _appHelpMenuItem.Text = _brandingResources.ApplicationTitle + " &help...";
                 }
 
-                _aboutMenuItem.Text = "&About " + _applicationConfig.Settings.ApplicationTitle + "...";
+                _aboutMenuItem.Text = "&About " + _brandingResources.ApplicationTitle + "...";
 
 
                 // Need to hide _openFileToolStripButton in FAM mode by searching for it.
@@ -681,16 +697,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // If using a local cached copy of the database, check to see if the database has
                 // been updated since the last time it was cached.
-                if (_localDbCopy != null)
-                {
-                    if (File.GetLastWriteTime(_dataSourcePath) > _lastDbModificationTime)
-                    {
-                        if (TryOpenDatabaseConnection())
-                        {
-                            DataEntryControlHost.DatabaseConnection = _dbConnection;
-                        }
-                    }
-                }
+                DataEntryControlHost.DatabaseConnection = GetDatabaseConnection();
 
                 _imageViewer.OpenImage(fileName, false);
 
@@ -725,12 +732,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Set the application name
                 if (string.IsNullOrEmpty(_actionName))
                 {
-                    base.Text = _applicationConfig.Settings.ApplicationTitle;
+                    base.Text = _brandingResources.ApplicationTitle;
                 }
                 else
                 {
                     // [DataEntry:740] Show the name of the current action in the title bar.
-                    base.Text = "Waiting - " + _applicationConfig.Settings.ApplicationTitle +
+                    base.Text = "Waiting - " + _brandingResources.ApplicationTitle +
                         " (" + _actionName + ")";
                 }
 
@@ -1102,7 +1109,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     MessageBox.Show(this, "If you are intending to stop processing, " +
                         "press the stop button in the File Action Manager.",
-                        _applicationConfig.Settings.ApplicationTitle, MessageBoxButtons.OK,
+                        _brandingResources.ApplicationTitle, MessageBoxButtons.OK,
                         MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
 
                     return;
@@ -1410,11 +1417,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _selectRectangularHighlightCommand.Enabled = false;
                 }
 
-                base.Text = _applicationConfig.Settings.ApplicationTitle;
+                base.Text = _brandingResources.ApplicationTitle;
                 if (_imageViewerForm != null)
                 {
-                    _imageViewerForm.Text =
-                        _applicationConfig.Settings.ApplicationTitle + " Image Window";
+                    _imageViewerForm.Text = _brandingResources.ApplicationTitle + " Image Window";
                 }
                 if (_imageViewer.IsImageAvailable)
                 {
@@ -1513,7 +1519,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Set the application title to reflect the name of the document being opened.
-                base.Text = "Loading document - " + _applicationConfig.Settings.ApplicationTitle;
+                base.Text = "Loading document - " + _brandingResources.ApplicationTitle;
                 if (!string.IsNullOrEmpty(_actionName))
                 {
                     // [DataEntry:740] Show the name of the current action in the title bar.
@@ -1845,13 +1851,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 Help.ShowHelp(this,
-                    DataEntryMethods.ResolvePath(_applicationConfig.Settings.HelpFile));
+                    DataEntryMethods.ResolvePath(_brandingResources.HelpFilePath));
             }
             catch (Exception ex)
             {
                 ExtractException ee =
-                    new ExtractException("ELI26958", "The help file faile to load!", ex);
-                ee.AddDebugData("Help file", _applicationConfig.Settings.HelpFile, false);
+                    new ExtractException("ELI26958", "The help file failed to load!", ex);
+                ee.AddDebugData("Help file", _brandingResources.HelpFilePath, false);
                 ee.Display();
             }
         }
@@ -1868,7 +1874,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Show the about dialog
-                using (AboutForm aboutForm = new AboutForm(_applicationConfig, _dataEntryControlHost))
+                using (AboutForm aboutForm = new AboutForm(_brandingResources))
                 {
                     aboutForm.ShowDialog();
                 }
@@ -2252,16 +2258,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Create the data entry control host from the specified assembly
                 DataEntryControlHost = CreateDataEntryControlHost(dataEntryPanelFileName);
 
-                DataEntryControlHost.ApplicationTitle = _applicationConfig.Settings.ApplicationTitle;
+                DataEntryControlHost.ApplicationTitle = _brandingResources.ApplicationTitle;
 
                 // Apply settings from the config file that pertain to the DEP.
                 _dataEntryConfig.ApplyObjectSettings(DataEntryControlHost);
 
                 // If there's a database available, let the control host know about it.
-                if (TryOpenDatabaseConnection())
-                {
-                    DataEntryControlHost.DatabaseConnection = _dbConnection;
-                }
+                DataEntryControlHost.DatabaseConnection = GetDatabaseConnection();
 
                 DataEntryControlHost.AutoZoomMode = _userPreferences.AutoZoomMode;
                 DataEntryControlHost.AutoZoomContext = _userPreferences.AutoZoomContext;
@@ -2408,8 +2411,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 // Create the form.
                 _imageViewerForm = new Form();
-                _imageViewerForm.Text =
-                    _applicationConfig.Settings.ApplicationTitle + " Image Window";
+                _imageViewerForm.Text = _brandingResources.ApplicationTitle + " Image Window";
                 _imageViewerForm.Icon = Icon;
 
                 // Create a shortcut filter to handle shortcuts when the image viewer is displayed
@@ -2604,17 +2606,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Attempts to open a database connection for use by the DEP for validation and
         /// auto-updates if connection information is specfied in the config settings.
         /// </summary>
-        /// <returns><see langword="true"/> if connection information was provided in the
-        /// config file and the connection was successfully opened, <see langword="false"/> if
-        /// connection information was not provided and no connection was attempted.</returns>
-        bool TryOpenDatabaseConnection()
+        /// <returns>The <see cref="DbConnection"/>. If no database connection is currently
+        /// configured, any open connection will be closed and <see langword="null"/> will returned.
+        /// </returns>
+        DbConnection GetDatabaseConnection()
         {
             try
             {
+                string connectionString = "";
+
                 if (!string.IsNullOrEmpty(_dataEntryConfig.Settings.DatabaseType))
                 {
-                    string connectionString = "";
-
                     // A full connection string has been provided.
                     if (!string.IsNullOrEmpty(_dataEntryConfig.Settings.DatabaseConnectionString))
                     {
@@ -2633,7 +2635,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         _dataSourcePath =
                             DataEntryMethods.ResolvePath(_dataEntryConfig.Settings.LocalDataSource);
-                        _lastDbModificationTime = File.GetLastWriteTime(_dataSourcePath);
 
                         // [DataEntry:399, 688, 986]
                         // Whether or not the file is accessed via a network share, create and use a
@@ -2643,30 +2644,46 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         {
                             _localDbCopy = new TemporaryFile();
                         }
+                        // Create a new connection string (and, thus, connection) if referencing a
+                        // different database path or the source database has been updated.
+                        else if (_currentDataSourcePath != _dataSourcePath ||
+                                 File.GetLastWriteTime(_dataSourcePath) > _lastDbModificationTime)
+                        {
+                            TemporaryFile oldDbCopy = _localDbCopy;
+                            _localDbCopy = new TemporaryFile();
+                            oldDbCopy.Dispose();
+                        }
+
+                        _lastDbModificationTime = File.GetLastWriteTime(_dataSourcePath);
+                        
                         File.Copy(_dataSourcePath, _localDbCopy.FileName, true);
 
                         connectionString = "Data Source='" + _localDbCopy.FileName + "';";
                     }
-
-                    // As long as connection information was provieded one way or another,
-                    // create and open the database connection.
-                    if (!string.IsNullOrEmpty(connectionString))
-                    {
-                        if (_dbConnection != null)
-                        {
-                            _dbConnection.Dispose();
-                        }
-
-                        Type dbType = Type.GetType(_dataEntryConfig.Settings.DatabaseType);
-                        _dbConnection = (DbConnection)Activator.CreateInstance(dbType);
-                        _dbConnection.ConnectionString = connectionString;
-                        _dbConnection.Open();
-
-                        return true;
-                    }
                 }
 
-                return false;
+                // If a DB connection is open but the connectionString has changed, close
+                // the current connection.
+                if (_dbConnection != null && _currentDbConnectionString != connectionString)
+                {
+                    _dbConnection.Dispose();
+                    _dbConnection = null;
+                }
+
+                _currentDataSourcePath = _dataSourcePath;
+                _currentDbConnectionString = connectionString;
+
+                // As long as connection information was provieded one way or another,
+                // create and open the database connection.
+                if (_dbConnection == null && !string.IsNullOrEmpty(connectionString))
+                {
+                    Type dbType = Type.GetType(_dataEntryConfig.Settings.DatabaseType);
+                    _dbConnection = (DbConnection)Activator.CreateInstance(dbType);
+                    _dbConnection.ConnectionString = connectionString;
+                    _dbConnection.Open();
+                }
+
+                return _dbConnection;
             }
             catch (Exception ex)
             {

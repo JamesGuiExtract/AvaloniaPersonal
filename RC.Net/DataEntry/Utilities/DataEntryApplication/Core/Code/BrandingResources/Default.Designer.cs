@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Extract.DataEntry.DEP.StandardLabDE.Properties {
+namespace Extract.DataEntry.Utilities.DataEntryApplication.BrandingResources {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Extract.DataEntry.DEP.StandardLabDE.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    internal class Default {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal Default() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Extract.DataEntry.DEP.StandardLabDE.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Extract.DataEntry.DEP.StandardLabDE.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Extract.DataEntry.Utilities.DataEntryApplication.BrandingResources.Default", typeof(Default).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,10 +60,53 @@ namespace Extract.DataEntry.DEP.StandardLabDE.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap _labDELogo {
+        internal static System.Drawing.Bitmap AboutLogo {
             get {
-                object obj = ResourceManager.GetObject("_labDELogo", resourceCulture);
+                object obj = ResourceManager.GetObject("AboutLogo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string ApplicationDescription {
+            get {
+                return ResourceManager.GetString("ApplicationDescription", resourceCulture);
+            }
+        }
+        
+        internal static System.Drawing.Icon ApplicationIcon {
+            get {
+                object obj = ResourceManager.GetObject("ApplicationIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extract Systems.
+        /// </summary>
+        internal static string ApplicationTitle {
+            get {
+                return ResourceManager.GetString("ApplicationTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string HelpFile {
+            get {
+                return ResourceManager.GetString("HelpFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;unknown version&gt;.
+        /// </summary>
+        internal static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
             }
         }
     }
