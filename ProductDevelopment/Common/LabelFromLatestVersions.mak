@@ -7,6 +7,7 @@ LabelCommonDir:
 	$(Label) $$/Engineering/ProductDevelopment/AttributeFinder "$(FlexIndexVersion)"
 	$(Label) $$/Engineering/ProductDevelopment/IcoMapESRI "$(IcoMapESRIVersion)" 
 	$(Label) $$/Engineering/ProductDevelopment/AFIntegrations/Laserfiche "$(LaserficheVersion)"
+	$(Label) $$/Engineering/ProductDevelopment/AFIntegrations/SharePoint "$(FlexIDSSPVersion)"
 	$(Label) "$$/Engineering/ProductDevelopment/IDShieldOffice" "$(IDShieldOfficeVersion)"
 	$(Label) "$$/Engineering/ProductDevelopment/LabDE" "$(LabDEVersion)"
 	$(Label) $$/Engineering/ProductDevelopment/IcoMapCore "$(IcoMapCoreVersion)"
@@ -19,6 +20,7 @@ LabelCommonDir:
 	$(Label) $$/Engineering/ProductDevelopment/Common "$(FlexIndexVersion)"
 	$(Label) $$/Engineering/ProductDevelopment/Common "$(IcoMapESRIVersion)" 
 	$(Label) $$/Engineering/ProductDevelopment/Common "$(LaserficheVersion)"
+	$(Label) $$/Engineering/ProductDevelopment/Common "$(FlexIDSSPVersion)"
 	$(Label) $$/Engineering/ProductDevelopment/Common "$(IDShieldOfficeVersion)"
 	$(Label) $$/Engineering/ProductDevelopment/Common "$(LabDEVersion)"
 	
