@@ -1,0 +1,154 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.45 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.45 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    <ul>
+  	   	<LI><b>[LegacyRC #5492, #5860, #5861]</b> DB Admin
+        <ul>
+            <li>Confirm that the select files dialog allows you to select files tagged with "none"
+            of a set of tags.
+        <p>
+            <li>Confirm that setting file action status in a large (>10000 file) database does not
+            take an inordinately long time, even when the list of files to change is the result of
+            a selection requiring a SQL query.
+        </ul>
+<p>
+        <li><b>[LegacyRC #5811]</b> Queueing from disconnected folder
+        <OL>
+            <li>Configure a FAM to queue existing files (with listening enabled—not sure if this
+            affects anything) from folder on a remote machine
+            <li>Disconnect the remote machine from the network
+            <li>Press play in the FAM
+            <li>A "...does not exist!" exception will appear, press enter to make it go away
+            <li>Initiate reconnection of the remote machine
+            <li>Press play in the FAM
+            <li>You may get an "...does not exist!" exception, press enter to make it go away
+        </OL>
+        <ul>
+            <li>Repeat steps 6 and 7 until either the FAM starts queuing or you are satisfied that
+            "Unexpected exception caught" exceptions will not be displayed. If the former, go to 
+            step 2.
+        </ul>
+<p>        
+        <li><b>[LegacyRC #5818]</b> USS File Viewer deskew number
+        <ul>
+            <li>Open the .uss file for a slightly skewed image.
+            <li>In properties, confirm that the deskew number seems reasonable.
+        </ul>
+<p>        
+        <li><b>[LegacyRC #5826]</b> Scheduled processing
+        <ul>
+            <li>Configure an .fps file to process on a schedule.
+            <li>Run that .fps file as a service.
+            <li>Confirm that application traces are logged when processing starts and stops per
+            schedule.
+        </ul>
+<p>        
+        <li><b>[LegacyRC #5836]</b> Opening .fps file via relative path
+        <ul>
+            <li>From the command line, open an .fps file using a relative path.
+            <li>Go to File > Save or press ctrl+s.
+            <li>Confirm that no errors are displayed.
+        </ul>
+<p>        
+        <li><b>[LegacyRC #5852]</b> Confirm that under the UEX viewer file menu, "Open next log
+        file" and "Start new log file..." have different shortcuts associated with them.
+<p>
+        <li><b>[LegacyRC #5854]</b> VOA File Viewer
+        <ul>
+            <li>Open a .voa file that contains spatial attributes.
+            <li>Save the file as an .eav file.
+            <li>Confirm that the "Spatial" column has been updated.
+            <li>Confirm that double-clicking on an attribute does not highlight the attribute in the
+            associated image.
+        </ul>
+<p>
+        <li><b>[DotNetRC #489, #498, #499, #511, #512]</b> ExtractImageViewer
+        <ul>
+            <li>Open an image.
+            <li>While selecting a region with the subimage tool, right-click to cancel.
+            <li>Confirm that the subimage box is not still visible on the image.
+        <p>
+            <li>Confirm that angular swipes of jpeg-compressed .tif images can be OCRed without
+            error
+        <p>
+            <li>Zoom into an image as far as possible.
+            <li>Select the subimage tool and select a region that is less than one pixel on a side.
+            <li>Confirm that no subimage is drawn and no exception is displayed.
+        <p>
+            <li>Open an image and select a highlight tool.
+            <li>Start to draw a highlight. Before releasing the mouse button...
+            <li>... hit alt.
+            <li>Confirm that you cannot now navigate the menu bar.
+        <p>
+            <li>Confirm that there is no exception running from the command line with the /u flag.
+        <p>
+            <li>Run Extract image viewer with the Script_HideButtons_OpenSubImage.txt script from 
+            the image viewer interactive tests.
+            <li>Confirm that it works.
+        </ul>
+<p>
+        <li><b>[DotNetRC #508]</b> Service database
+        <ul>
+            <li>Open a service database with an empty FPSFile table.
+            <li>In the FPSFile table, click on the autostart checkbox to add a new row to the table.
+            <li>Click in the FileName column header.
+            <li>Confirm that no error is displayed.
+        </ul>
+    </ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    <ul>
+            <li>Date, Test Machine, Number of Failures
+	      	<li>Notes
+       	</ul>
+		<LI>National Ruleset : Document Classification
+       	<ul>
+      		<li>Date, Test Machine, Number of Failures
+      		<li>Notes
+       	</ul>
+		<LI>National Ruleset : Redaction
+       	<ul>
+      		<li>Date, Test Machine, Number of Failures
+      		<li>Notes
+       	</ul>
+		<LI>National Ruleset : Indexing
+       	<ul>
+      		<li>Date, Test Machine, Number of Failures
+      		<li>Notes
+       	</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      		<li>Date, Tester, Test Machine
+      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      		<li>Date, Tester, Test Machine
+      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

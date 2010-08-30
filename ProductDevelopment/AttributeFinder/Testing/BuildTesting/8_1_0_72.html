@@ -1,0 +1,172 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.72 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.72 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    <ul>
+  	   	<LI><b>[LegacyRC #5814, #5815, #5838, #5853, #5867, #5868, #5879]</b> FAM - misc
+        <ul>
+            <li>Confirm that the hint for the FileID modulus mathematical condition reads, "Use this
+            option only as a processing condition".
+        <p>
+            <li>Confirm that the description above the task dropdown in the task condition property
+            page reads, "The condition will be considered met if the following task completes with
+            no exceptions".
+        <p>
+            <li>On a test machine with UAC enabled, log on as the local administrator.
+            <li>Run the FAM and kill it ungracefully. Confirm that the $RecoveryFile$ is located in
+            the user's locat AppData folder (<b>not</b> in CommonComponents).
+        <p>
+            <li>Log in to a test machine as a domain user.
+            <li>Verify some files; skip some.
+            <li>Log out and log back in as the local admin. Configure the .fps file to process all
+            files skipped by any user.
+            <li>Reverify the skipped files; skip them again.
+            <li>Modify the .fps file to process all files skipped by the current user; hit play.
+            <li>Confirm that the files are presented for verification.
+        <p>
+            <li>Confirm that the progress status dialog (in the processing log tab) is displayed
+            correctly.
+        <p>
+            <li>Confirm that the File > Open menu works as expected.
+        <p>
+            <li>Open an .fps file with a file supplier defined.
+            <li>Start processing.
+            <li>Double-click on the edit box for the skip condition.
+            <li>Confirm that the config dialog does not come up while the FAM is running.
+        </ul>
+<p>
+        <li><b>[LegacyRC #5866]</b> Database schema
+        <ul>
+            <li>Confirm the presence of a registry key <b>HKCU\Software\Extract Systems\ReusableComponents\COMComponents\UCLIDFileProcesing\FileProcessingDB\UsePreNormalized</b>
+            <li>Confirm that with that key set to 0, the database schema is set to 100 and all
+            newly-created databases include a FileActionStatus table.
+            <li>Set the key back to 1.
+            <li>Confirm that the schema now matches that of the 8.0 release.
+        </ul>
+<p>
+        <li><b>[LegacyRC #5869, #5870, #5871, #5872, #5878, #5880, #5881]</b> Queue setup tab
+        <ul>
+            <li>Confirm that the checkboxes do not appear to be disabled.
+            <li>Confirm that when columns are resized, they are displayed correctly.
+            <li>Confirm that the height of column headers cannot be changed.
+        <p>
+            <li>Open an .fps file with one file supplier defined.
+            <li>Close the .fps file without making changes. Confirm that you are not prompted to
+            save.
+            <li>Reopen it.
+            <li>In the queue setup tab, confirm that when that supplier is selected, the Remove and
+            Commands&gt; buttons are both enabled.
+            <li>Add another supplier.
+            <li>Select the first supplier and remove it.
+            <li>Confirm that no errors are displayed.
+        <p>
+            <li>Run an .fps file that has both file suppliers and processing tasks defined.
+            <li>Confirm that the status column in the queue setup tab is appropriately updated.
+            <li>Confirm that no unusual exceptions are logged when the file supplier starts and
+            stops.
+        </ul>
+<p>        
+        <li><b>[LegacyRC #5873, #5874, #5875, #5876, #5877]</b> FAM - processing schedule
+        <ul>
+            <li>Open the Set Processing Schedule dialog.
+            <li>Confirm that nothing unexpected when you click in column headers.
+            <li>Confirm that both letters in the OK button are capitalized.
+            <li>Confirm that the dialog cannot be maximized.
+        <p>
+            <li>Select multiple cells. Make sure that some are set to be active and some are
+            inactive.
+            <li>Confirm that the selected active and inactive cells are displayed with contrasting
+            colors.
+        </ul>
+<p>        
+        <li><b>[FlexIDSCore #4283]</b> Verification
+        <ul>
+            <li>Open the Find or redact text dialog in ID Shield verification.
+            <li>Enter a search that will cause an exception (e.g., a single backslash with regex
+            search enabled).
+            <li>Hit the Find next button.
+            <li>Dismiss the error.
+            <li>Confirm that the search term edit box is enabled.
+        </ul>
+<p>        
+        <li><b>[FlexIDSCore #4290]</b> SRICA
+        <ul>
+            <li>Run the .rsd file at <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4290</b> on the
+            image in the same folder.
+            <li>Confirm that no subattribute is generated.
+        </ul>
+<p>
+        <li><b>[FlexIDSCore #4320]</b> Install
+        <ul>
+            <li>Confirm that the following files are installed:
+            <ul>
+                <li>SSOCR2.exe
+                <li>UCLIDDistanceConverter.dll
+                <li>UCLIDExceptionMgmt.dll
+                <li>UCLIDImageUtils.dll
+                <li>SpotRecognitionIR.dll
+                <li>GeneralIV.dll
+                <li>RegExprIV.dll
+                <li>SubImageHandlers.dll
+                <li>ImageEdit.ocx
+                <li>UCLIDGenericDisplay2.ocx 
+            </ul>
+            <li>Confirm that the install can install .NET 4.0
+            <li>Confirm that the DB Admin can be opened without error.
+        </ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    <ul>
+            <li>Date, Test Machine, Number of Failures
+	      	<li>Notes
+       	</ul>
+		<LI>National Ruleset : Document Classification
+       	<ul>
+      		<li>Date, Test Machine, Number of Failures
+      		<li>Notes
+       	</ul>
+		<LI>National Ruleset : Redaction
+       	<ul>
+      		<li>Date, Test Machine, Number of Failures
+      		<li>Notes
+       	</ul>
+		<LI>National Ruleset : Indexing
+       	<ul>
+      		<li>Date, Test Machine, Number of Failures
+      		<li>Notes
+       	</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      		<li>Date, Tester, Test Machine
+      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      		<li>Date, Tester, Test Machine
+      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

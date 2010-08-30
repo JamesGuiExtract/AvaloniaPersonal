@@ -1,0 +1,285 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.37 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.37 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    <ul>
+  	   	<LI><b>[LegacyRC #5191, #5839]</b> UEX Viewer
+        <ul>
+            <li>Confirm that when a new .uex log is created because the old one was filled, the old
+            log is given a name that begins with a zero-padded date.
+            <li>Confirm that when a new .uex log is created because Extract software was installed
+            or uninstalled, the old log is given a name that begins with a zero-padded date.
+            <li>Confirm that when a new .uex log is created by the user via File>Start New Log File,
+            the old log is given a name that begins with a zero-padded date.
+        <p>
+            <li>Open the log file at <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5839</b>.
+            <li>Check extractexception.uex and confirm that no errors were logged reading bad.uex.
+        </ul>
+<p>
+        <li><b>[LegacyRC #5842]</b> DB Admin
+        <ul>
+            <li>Confirm that when you export a list of all files in the database, the list is
+            sorted by file ID.
+        </ul>
+<p>        
+        <li><b>[LegacyRC #5855]</b> Unnecessary errors logged on OCR failure
+        <ul>
+            <li>Open the image at <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5855</b>
+            <li>Attempt to OCR the image. Note that it should fail.
+            <li>Confirm that only a reasonable number of errors are logged.
+        </ul>
+<p>        
+        <li><b>[LegacyRC #5857]</b> FAM About box
+        <ul>
+            <li>Install LabDE under windows user A (administrative rights).
+            <li>Log onto the machine under a different user (with or without administrative rights)
+            <li>Open the FAM.
+            <li>Select Help | About File Action Manager...
+            <li>Confirm that no exception is seen.
+        </ul>
+<p>        
+        <li><b>[LegacyRC #5859]</b> ImageFormatConverter PDF output
+        <ul>
+            <li>Use ImageFormatConverter.exe to convert a file to PDF format.
+            <li>Confirm that the output PDF uses Group 4 compression.
+        </ul>
+<p>        
+        <li><b>[FlexIDSCore #3899]</b> Unsupported OS dialog
+        <ul>
+            <li>Don't bother to test this.
+        </ul>
+<p>        
+        <li><b>[DotNetRC #441]</b> ESFAMService
+        <ul>
+            <li>Open the FAM service database.
+            <li>Confirm that the FPS file table includes a setting for the number of files to
+            process per instance.
+            <li>Confirm that the FPS file setting, if specified, overrides the global setting.
+            <li>Confirm that if the FPS file setting is not specified, the global setting is used.
+        </ul>
+<p>
+        <li><b>[DotNetRC #456]</b> ExtractImageViewer - scripting
+        <ul>
+            <li>Exercise the scripting portion of the Image Viewer testing checklist.
+        </ul>
+<p>
+        <li><b>[DotNetRC #457, #465, #473, #474, #475, #476, #477, #480, #481, #493]</b>
+        ExtractImageViewer - command-line options
+        <ul>
+            <li>Confirm that ExtractImageViewer.exe supports the following 
+            command-line options:
+            <ul>
+                <li>/r - register the .tif extension
+                <li>/u - unregister the .tif extension
+                <li>/o &lt;ocrfile&gt; - OCRed text is written to the specified file
+                <li>/c - OCRed text is written to the clipboard
+                <li>/s - display the search window
+                <li>/l - reuse the current image viewer window if one exists
+                <li>/e &lt;scriptfile&gt; - execute the script
+                <li>/script? - display help for scripting
+                <li>/ctrlid? - lists toolbar control ID numbers
+                <li>/? - displays usage message
+                <li>/xml - must be used with either /c or /o; writes out swipe in XML format
+                including full text as well as zone coordinates.
+                <li>/reset - resets the positions of all toolstrips and the thumbnail viewer.
+            </ul>
+        <p>
+            <li>Open an image in the image viewer.
+            <li>Minimize the image viewer.
+            <li>On the command line, try to open another image using the /l switch.
+            <li>Confirm that the image opens and no exceptions are displayed.
+        <p>
+            <li>Open an image using the /c flag.
+            <li>Swipe a blank area of the image.
+            <li>Confirm that no exception is displayed.
+        <p>
+            <li>Open an image viewer.
+            <li>Open another instance of the image viewer.
+            <li>Rearrange the toolstrips in the second instance.
+            <li>Use the /closeall flag on the command line to close all instances of the image
+            viewer.
+            <li>Confirm that no exception is displayed.
+        <p>
+            <li>On the command line, try to run the image viewer with an invalid
+            argument (e.g., /z).
+            <li>Confirm that an "Invalid Argument!" exception is displayed.
+        <p>
+            <li>Use the /e flag on the command line and specify a script file that
+            does not exist.
+            <li>Confirm that an exception is displayed and the image viewer does not open.
+        <p>
+            <li>Open an image viewer window.
+            <li>From the command line, open another image in the image viewer using the /l switch.
+            <li>Confirm that the thumbnail viewer is correctly displaying thumbnails.
+        </ul>
+<p>
+        <li><b>[DotNetRC #458, #459, #461, #462, #463, #467, #468, #487, #491]</b>
+        ExtractImageViewer - Swiping and OCR
+        <ul>
+            <li>Open a document in the image viewer.
+            <li>Click on the arrow by the Highlight button in the toolstrip to select the
+            rectangular highlight tool.
+            <li>Press H to switch to the angular highlight tool.
+            <li>Click on the highlight button on the toolstrip.
+            <li>Confirm that the angular highlight tool remains selected.
+        <p>
+            <li>Select the angular highlight tool.
+            <li>Swipe a blank region of an image.
+            <li>Confirm that no exception is displayed.
+            <li>Rotate the image ninety degrees.
+            <li>Select the rectangular highlight tool.
+            <li>Swipe a blank region.
+            <li>Confirm that no exception is displayed.
+            <li>Draw a highlight over a large area, including some text.
+            <li>After dismissing the OCR results, confirm that the highlight does not shrink
+            dramatically.
+        <p>
+            <li>Confirm that highlights cannot be rotated or moved.
+        <p>
+            <li>Select the angular highlight tool.
+            <li>Start to draw a highlight; don't release the mouse button.
+            <li>Use the mouse wheel or the - button to adjust the height of the highlight. Confirm
+            that the minimum height is five pixels.
+            <li>Confirm that no exception is seen after drawing a highlight with the smallest
+            possible height.
+        <p>
+            <li>Open an image.
+            <li>Swipe some text.
+            <li>Confirm that the ESC key can be used to close the OCR result dialog.  
+        <p>
+            <li>Confirm that a rectangular highlight covering the entire page does
+            not result in an exception.
+        </ul>
+<p>
+        <li><b>[DotNetRC #469, #470, #471, #472, #478, #486, #490, #494, #497]</b>
+        ExtractImageViewer - other
+        <ul>
+            <li>Open the .xps file attached to the DotNetRC #469. Confirm that it is displayed
+            appropriately.
+        <p>
+            <li>Confirm that the thumbnail viewer exists.
+        <p>
+            <li>Arrange the toolstrips so they're all in one row. Note what order you've arranged
+            them in.
+            <li>Close and reopen the image viewer.
+            <li>Confirm that the toolstrips are arranged in the same order.
+        <p>
+            <li>Confirm that the tooltip text for the thumbnail viewer button reads, "Show/Hide 
+            thumbnails".
+        <p>
+            <li>In the image viewer, use the File > Open dialog to select a .uss file that has an
+            associated image.
+            <li>Confirm that the image is opened.
+        <p>
+            <li>Confirm that the delete objects tool cursor has color.
+        <p>
+            <li>Confirm that this image can be opened: <b>I:\Common\Engineering\ProductTesting\UniqueImageTypes\repub.pdf</b>
+        <p>
+            <li>Confirm that .tif annotations are displayed or not according to the registry key
+            at <b>HKCU\Software\Extract Systems\ReusableComponents\OcxAndDlls\ImageEdit\Annotation
+            </b>
+        <p>
+            <li>Open the image viewer.
+            <li>Resize the window so that only the toolbars are visible.
+            <li>Open an image.
+            <li>Confirm that no error is displayed.
+        </ul>
+<p>
+        <li><b>[DotNetRC #479, #483, #485, #488, #495, #496]</b> ExtractImageViewer - sub-image
+        handling
+        <ul>
+            <li>Confirm that a tool exists for opening subimages.
+        <p>
+            <li>Open an image.
+            <li>Zoom out so that there is grey area visible outside of the image.
+            <li>Select the subimage tool.
+            <li>Confirm that you cannot select a region outside the bounds of the image.
+        <p>
+            <li>With the subimage tool still selected, click in the image.
+            <li>Confirm that no error is seen.
+        <p>
+            <li>Open an image.
+            <li>Create a subimage (subimage1).
+            <li>Rotate subimage1 ninety degrees.
+            <li>Take a subimage of subimage1 (subimage2).
+            <li>Take a subimage of subimage2.
+            <li>Confirm that the third subimage shows the correct area.
+        <p>
+            <li>Use the subimage tool to select a region on a .pdf.
+            <li>Confirm that the correct region is displayed.
+            <li>Repeat the above test with <b>I:\Common\Engineering\ProductTesting\UniqueImageTypes\200505867-0001.tif</b>.
+            <li>Repeat the above test with <b>I:\Common\Engineering\ProductTesting\UniqueImageTypes\200505005-0001.tif</b>.
+        <p>
+            <li>Remove the image viewer .config file. On Windows 7, the path to the file is 
+            <b>C:\Users\&lt;Username&gt;\AppData\Local\Extract_Systems_LLC\&lt;ExtractImageViewerStrongName&gt;\&lt;VersionNumber&gt;\user.config</b>
+            <li>Open the image viewer with the /reset flag.
+            <li>Using that same instance of the image viewer, open an image, then open a subimage
+            thereof.
+            <li>Confirm that no error is seen.
+        <p>
+            <li>Confirm that the clickable hotspot for the subimage cursor is at the point where the
+            crosshairs align.
+        </ul>
+<p>        
+        <li><b>[DotNetRC #482, #492]</b> Install-related
+        <ul>
+            <li>Confirm that Leadtools.Codecs.xps.dll is installed.
+            <li>Confirm that Leadtools.ColorConversion.dll is installed.
+        </ul>
+    </ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    <ul>
+            <li>Date, Test Machine, Number of Failures
+	      	<li>Notes
+       	</ul>
+		<LI>National Ruleset : Document Classification
+       	<ul>
+      		<li>Date, Test Machine, Number of Failures
+      		<li>Notes
+       	</ul>
+		<LI>National Ruleset : Redaction
+       	<ul>
+      		<li>Date, Test Machine, Number of Failures
+      		<li>Notes
+       	</ul>
+		<LI>National Ruleset : Indexing
+       	<ul>
+      		<li>Date, Test Machine, Number of Failures
+      		<li>Notes
+       	</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      		<li>Date, Tester, Test Machine
+      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      		<li>Date, Tester, Test Machine
+      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

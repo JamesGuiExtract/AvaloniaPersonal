@@ -1,0 +1,184 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.17 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.17 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently Fixed SCRs</h3>
+    <ul>
+  	   	<LI><b>[LegacyRC #5608, #5637, #5801]</b> DB Admin
+        <ul>
+            <li>Confirm that each of the following DB Admin dialogs can be dismissed by pressing
+            the Esc key:
+            <ul>
+                <li>Manage counters
+                <li>Manage tags
+                <li>Manage actions
+                <li>Manage users
+            </ul>
+        <p>
+            <li>Confirm that when the Add new users button is clicked in the Manage users dialog,
+            a dialog box is displayed that is prepopulated with the name of the user who is
+            currently logged in.
+        <p>
+            <li>Open the Manage tags dialog.
+            <li>Add a tag.
+            <li>Press enter.
+            <li>Confirm that the tag is created.
+        </ul>
+<p>
+        <li><b>[LegacyRC #5610]</b> FAM processing threads must grab file before stopping
+        <ul>
+            <li>Create a database and enqueue a small (~20) number of files.
+            <li>Configure an .fps file with a verification task. Set it up to use a large number
+            of threads to processing (at least twice as many threads as there are files to
+            process).
+            <li>Start processing, then immediately stop.
+            <li>Confirm that processing stops immediately and that the initially idle threads do
+            not have to grab files first.
+        </ul>
+<p>        
+        <li><b>[LegacyRC #5830, #5845, #5846]</b> CreateMultiPageImage.exe
+        <ul>
+            <li>Get some many-paged files. Examples can be found at "I:\Common\Engineering\
+            ProductTesting\ManyPage Images". Split them into single-page images with
+            SplitMultiPageImage.exe
+            <li>Run CreateMultiPageImage.exe on the newly-split images while simultaneously using
+            the computer for other tasks (e.g., processing documents, copying files, etc).
+            <li>Confirm that the output images have the correct number of pages.
+        <p>
+            <li>Confirm that CreateMultiPageImage works correctly to combine documents with four-
+            and five-digit extensions (e.g., a.0001, a.0002).
+        <p>
+            <li>Confirm that the utility correctly reports the number of files that process
+            successfully and the number that fail.
+        </ul>
+<p>        
+        <li><b>[LegacyRC #5840]</b> FAM switchs /fc and /c
+        <ul>
+            <li>Create an .fps file configured to stop processing once the queue is empty.
+            <li>Run the command "Processfiles.exe &lt;fpsfile&gt; /s /fc".
+            <li>Confirm that when the files are finished processing, the FAM exits after stopping.
+        </ul>
+<p>        
+        <li><b>[FlexIDSCore #1073]</b> Loading lists dynamically from files
+        <ul>
+            <li>Confirm that the following rule objects support dynamic reading from lists:
+            <ul>
+                <li>ValueFromList value finder
+                <li>ReplaceStrings value modifier
+                <li>TranslateToClosestValueInList value modifier
+                <li>TranslateValueOrTypes value modifier
+                <li>RemoveEntriesFromList output handler
+            </ul>
+            <li>Confirm that both .dat and .dat.etf files can be loaded.
+            <li>Confirm that list files can be autoencrypted as appropriate.
+        </ul>
+<p>        
+        <li><b>[FlexIDSCore #2363]</b> DocTypeCondition should allow multiply-classified documents
+        <ul>
+            <li>Exercise the document type condition on multiply-classified documents.
+            <li>Confirm that works as expected with documents that have been classified as multiple
+            document types.
+        </ul>
+<p>        
+        <li><b>[FlexIDSCore #3080]</b> Copying an attributes value to another attribute
+        <ul>
+            <li>Execute LegalDescription.rsd from I:\Common\Testing\PVCS_Testing\FlexIDSCore\3080
+            on the image in that folder.
+            <li>Confirm that any existing sibling subattributes Section and XSection have identical
+            spatial information.
+        </ul>
+<p>
+        <li><b>[FlexIDSCore #3296]</b> ID Shield verification
+        <ul>
+            <li>Open verification.
+            <li>Draw a large redaction that covers some text and the whitespace surrounding it.
+            <li>Select the new redaction, then right-click and select Block Fit from the context
+            menu.
+            <li>Confirm that the redaction shrinks to cover all of the black pixels in the area.
+        </ul>
+<p>
+        <li><b>[FlexIDSCore #4112]</b> Autoencrypt
+        <ul>
+            <li>Exercise the ruleset at I:\Common\Testing\PVCS_Testing\FlexIDSCore\4112 on 
+            sampleText.txt.
+            <li>Confirm that each of the related .txt files is correctly autoencrypted.
+        </ul>
+<p>
+        <li><b>[FlexIDSCore #4234]</b> ID Shield metadata
+        <ul>
+            <li>Run the following tasks on a sample image:
+            <ul>
+                <li>Execute rules (with .voa output)
+                <li>Create redacted image
+                <li>Surround context
+                <li>Create redacted image
+                <li>Create metadata xml
+            </ul>
+            <li>Open the .xml file
+            <li>Confirm that the .xml file nodes appear in the order that the tasks were performed
+            (i.e., it's possible to tell which tasks were performed when).
+        </ul>
+<p>
+        <li><b>[FlexIDSCore #4263]</b> Merge attributes output handler
+        <ul>
+            <li>Configure a Merge attributes output handler, specifying a blank type for the
+            result.
+            <li>Click okay.
+            <li>Confirm that no exception is seen.
+        </ul>
+	</ul>
+<p>	
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

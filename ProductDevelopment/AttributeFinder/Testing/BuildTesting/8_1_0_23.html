@@ -1,0 +1,148 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.23 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.23 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    <ul>
+  	   	<LI><b>[LegacyRC #5639, #5671, #5829, FlexIDSCore #4281]</b> VOA File Viewer
+        <ul>
+            <li>In the VOA File Viewer, create a new <b>.eav</b> file.
+            <li>Create an attribute with a second-level subattribute (do not include a first-level
+            subattribute). The format should be:
+            <ul>
+                <p>
+                Name|Macadamia<br>
+                ..InvalidSubattribute|Gazebo
+                <p>
+            </ul>
+            <li>Confirm that you cannot save the .eav file.
+        <p>
+            <li>Open a .voa file <b>TestImage001.tif.voa</b> that exists in the same directory as
+            TestImage001.tif
+            <li>Click the "Save As" button.
+            <li>Note that the default file name is <b>TestImage001.tif</b> and the default save as
+            type is <b>EAV files (*.eav)</b>.
+            <li>Press the save button. Confirm that no confirmation dialog is displayed.
+        <p>
+            <li>Open the .voa file at <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\5829</b>.
+            <li>Confirm that it contains three top-level attributes, and that the first and third
+            have subattributes.
+            <li>Select the first and third top-level attributes and press the <b>Merge
+            Attributes</b> button.
+            <li>Confirm that the merged attribute has all of the subattributes from both of the
+            original attributes.
+        <p>
+            <li>Confirm that the file at <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4281</b> can
+            be opened by the VOA File Viewer.
+        </ul>
+<p>
+        <li><b>[LegacyRC #5835]</b> FAM pause button
+        <ul>
+            <li>Set up an .fps file with at least one processing task and a number of files already
+            queued.
+            <li>Press the play button and then (as quickly as possible) hit the pause button.
+            <li>Confirm that processing is correctly paused.
+        </ul>
+<p>        
+        <li><b>[FlexIDSCore #2256]</b> RDTConfig crash
+        <ul>
+            <li>Open RDT Config and make a change.
+            <li>Close RDT Config.
+            <li>Confirm that no crash is seen.
+        </ul>
+<p>        
+        <li><b>[FlexIDSCore #3099]</b> Legal description splitter
+        <ul>
+            <li>Run the legal description splitter on the following block of text:
+                <p>
+                LOT 10, BLOCK 6, UNIVERSITY HILLS NO. 3, FILING NO. 1, CITY AND COUNTY OF DENVER,
+                STATE OF COLORADO.
+                <p>
+            <li>Confirm that "UNIVERSITY" is not changed to "UNITERSITY".
+        </ul>
+<p>        
+        <li><b>[FlexIDSCore #3564]</b> Idle processing threads with busy database
+        <ul>
+            <li>During an endurance test, confirm that processing threads do not take an inordinate
+            amount of time to grab new files once the currently processing files reach 100%.
+        </ul>
+<p>        
+        <li><b>[FlexIDSCore #4278]</b> Copying an attributes value to another attribute
+        <ul>
+            <li>Exercise <b>Test1</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4278</b>
+            <br><b>Note:</b> This test requires that the <b>RDT</b> be installed and licensed.
+            <ul>
+                <li>Run <b>Enable gflags.bat</b>.
+                <li>Use the ruletester to run <b>Test.rsd</b> on <b>1848657.tif</b>.
+                <li>Confirm that no exceptions are displayed or logged.
+                <li>Run <b>Disable gflags.bat</b>.
+            </ul>
+            <p>
+            <li>Exercise <b>Test1</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4278</b>
+            <br><b>Note:</b> This test requires that the <b>RDT</b> be installed and licensed. It
+            also requires that you have the <b>Demo_IDShield</b> database on the local machine.
+            <ul>
+                <li>Unzip the contents of <b>Test2.zip</b> to your processing location.
+                <li>Run <b>CopyFileSets.bat</b>. Note that you will need around <b>5GB</b> of free
+                space for the copied files.
+                <li>Clear the database and run <b>ComputeRedactions.fps</b>
+                <li>After the test completes (~2 days), confirm that no exceptions were displayed
+                or logged.
+            </ul>
+        </ul>
+    </ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

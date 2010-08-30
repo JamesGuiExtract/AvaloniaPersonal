@@ -1,0 +1,365 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.12 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.12 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    <ul>
+  	   	<LI><b>[LegacyRC #5319]</b> Confirm that the text of the usage message reads "If this
+        application is run and the SMTP server has not been set up, the UI for entering the SMTP
+        server will be displayed."
+<p>
+		<li><b>[LegacyRC #5493]</b> Confirm that with the <b>Windows Classic</b> theme, all text
+        is  visible in the mathematical condition configuration dialog.
+<p>
+		<li><b>[LegacyRC #5566, FlexIDSCore #3024, #3125]</b> Text function expander
+        <ul>
+            <li>Using TestTextFunctionExpander.exe, confirm proper behavior for the following
+            functions:
+            <ul>
+                <li>$Mid("Hello World",4,4) should output "lo W"
+                <li>$Mid("Hello World",4,-1) should output "lo World"
+            </ul>
+        <p>
+            <li>Confirm that all of the TextFunctionExpander interactive tests pass.
+        <p>
+            <li>Confirm proper behavior for the $ChangeExtension() function.
+        </ul>
+<p>
+		<li><b>[LegacyRC #5684, #5690]</b> FAM/DBAdmin User Authentication
+        <ul>
+            <li>Using a database configured to require authentication before running, create a
+            user with an undefined password.
+            <li>In the FAM, press play.
+            <li>When prompted, fill in a password. Before pressing okay, use the DB Admin to
+            delete the user.
+            <li>Hit okay in the FAM.
+            <li>Confirm that processing does not start.
+        <p>
+            <li>Using a database configured to require authentication before running, create a
+            user with an undefined password.
+            <li>In the FAM, press play.
+            <li>When the password prompt comes up, use the DB Admin to delete the user.
+            <li>In the FAM, leave the password edit box blank and hit okay.
+            <li>Confirm that processing does not start.
+        </ul>
+<p>
+		<li><b>[LegacyRC #5784]</b> Confirm that the text of the RunFPSFile.exe usage message is
+        correct.
+<p>
+		<li><b>[LegacyRC #5799, #5828]</b> UEX Viewer
+        <ul>
+            <li>Open the UEX Viewer.
+            <li>Select Find from the Edit menu.
+            <li>Enter some text that <b>does not appear</b> in the log and click the Find button.
+            <li>Click OK in the "No Match Found" window.
+            <li>Confirm that focus remains with the Find dialog.
+            <li>Repeat the above test, this time searching for text that <b>does</b> appear in the
+            log.
+            <li>Confirm that focus remains with the Find dialog.
+        <p>
+            <li>Open the current exception log on a machine that has multiple logs.
+            <li>Confirm that File>Start new log file is enabled.
+            <li>Navigate to an earlier log file.
+            <li>Confirm that File>Start new log file is disabled.
+        </ul>
+<p>
+  	   	<LI><b>[LegacyRC #5831]</b> Confirm that the test harness runs without exception.
+<p>
+  	   	<LI><b>[LegacyRC #5832]</b> PDF loading
+	    <ul>
+	      		<li>Confirm the absence of the PDFResolution registry key.
+                <li>Open and verify the images at <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4248</b>
+                <li>Confirm that all pages load without error
+	    </ul>
+<p>
+		<li><b>[FlexIDSCore #2881]</b> "file://" syntax support
+        <ul>
+            <li>For each of the following rule objects, confirm that it is possible to load clue
+            lists using a combination of "file://" file(s) and other clues:
+            <ul>
+                <li>Locate Image Region
+                <li>Advanced Replace String
+                <li>Replace String
+                <li>Box Finder
+            </ul>
+        </ul>
+<p>
+		<li><b>[FlexIDSCore #2979]</b> String pattern matcher settings
+        <ul>
+            <li>Open the configuration page for a string pattern matcher rule.
+            <li>Add some patterns.
+            <li>Select an entity name data scorer.
+            <li>Set the minimum match to something >1
+            <li>Select the "Return first match >=" radio button.
+            <li>Set the related edit box to something greater than the minimum match.
+            <li>Click okay.
+            <li>Reopen the config page.
+            <li>Set the "First match >=" edit box to something smaller than the minimum match.
+            <li>Click okay.
+            <li>Dismiss the exception that appears and click cancel.
+            <li>Reopen the config page again and confirm that the bad setting was not saved.
+        </ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3024]</b> Confirm that all of the TextFunctionExpander interactive
+        tests pass.
+<p>
+  	   	<LI><b>[FlexIDSCore #3025]</b> Find SSN in image area
+	    <ul>
+	      		<li>Execute the .rsd file at I:\Common\Testing\PVCS_Testing\FlexIDSCore\3025
+                against the image in the same folder.
+                <li>Confirm that appropriate results are seen (i.e., the modifier does not find
+                results outside of the initial image area).
+	    </ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3075]</b> Confirm that the Regular Expression Input Validator
+        configuration page does not have an edit box labeled "Please specify the input type".
+<p>
+  	   	<LI><b>[FlexIDSCore #3658]</b> Run object on query
+	    <ul>
+            <li>Confirm that the following output handlers work properly when run only on
+            certain attributes specified via a Run object on query output handler.
+            <ul>
+                <li>Move and modify attributes
+                <li>Merge attributes
+                <li>Remove attributes
+                <li>Eliminate duplicates
+                <li>Remove entries from list
+                <li>Remove invalid entries
+            </ul>
+            <li>Ensure that the above output handlers are testing using all possible attribute
+            selectors.
+	    </ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3884, #4205, #4223, #4237, #4248, #4261, #4262, #4267]</b> ID Shield
+        verification
+        <ul>
+            <li>In verification, make a change to a document.
+            <li>Stop processing. A save prompt will come up.
+            <li>Confirm that the Tab key cannot be used to navigate the save prompt.
+        <p>
+            <li>In the save prompt, hit cancel.
+            <li>Create many enough manual redactions that they are not all simultaneously
+            visible in the data grid.
+            <li>In the image viewer, select one of the redactions that is not currently 
+            visible in the data grid.
+            <li>Confirm that the data grid item scrolls into view.
+            <li>Select multiple redactions with the Select redactions tool.
+            <li>Confirm that the <b>first</b> selected redaction scrolls into view only if
+            necessary.
+        <p>
+            <li>Stop processing.
+            <li>Reconfigure verification to require exemption codes for redactions.
+            <li>Begin verifying.
+            <li>Confirm that exemption codes are not required for items that are not being
+            redacted (e.g., clues).
+        <p>
+            <li>Verify all files in the queue, adding a comment for each.
+            <li>Requeue the files and reverify them.
+            <li>Confirm that the comment was saved for all files in the queue.
+        <p>
+            <li>Confirm that all pages of the images in I:\Common\Testing\PVCS_Testing\Flex
+            IDSCore\4248 are visible in verification.
+        <p>
+            <li>Enable terminal services (Note: a server OS is required for this test).
+            <li>Create an .fps file to run as a service executing rules and setting files to
+            pending for a verification action.
+            <li>Create an .fps file to verify images.
+            <li>Confirm that multiple users can log on remotely and verify at the same time.
+            <li>Confirm that multiple users can log on remotely and open the following utilities:
+            <ul>
+                <li>DB Admin
+                <li>UEX Viewer
+                <li>USS Viewer
+                <li>VOA Viewer
+            </ul>
+        <p>
+            <li>In verification, press ctrl+o.
+            <li>Confirm that the file>open dialog <b>does not</b> appear.
+        <p>
+            <li>Close verification.
+            <li>Configure the .ini file not to warn on redactions/nonredactions.
+            <li>Open a document for verification that contains more than one redaction.
+            <li>Use the mouse to select a redaction in the data grid and click in the checkbox to
+            change its redacted state.
+            <li>Press ctrl+a to select all redactions.
+            <li>Press the space bar. Note that now everything is toggled on.
+            <li>Press the space bar again and immediately click in the image viewer.
+            <li>Confirm that the state of all redactions changes appropriately.
+        </ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4193]</b> PDF security property page
+	    <ul>
+            <li>For both the Create redacted image task andthe Convert to searchable PDF task,
+            confirm that all text in the property page is completely visible when using the
+            Windows Classic theme.
+	    </ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4227, #4257]</b> Double-clicking read-only text boxes
+	    <ul>
+            <li>On Server 2008, Server 2008R2, or Windows 7, confirm the following behavior:
+            <ul>
+                <li>In the FAM, configure a skip condition. Give it a label, then click OK.
+                <li>Double-click on the skip condition to reopen the property page.
+                <li>Confirm that the text of the label has not been copied to the clipboard.
+                <li>Confirm that the same is true off the following read-only text boxes:
+                <ul>
+                    <li>FAM - Execute the following task
+                    <li>Conditionally execute task - Evaluate the following condition
+                    <li>Loop finder/preprocessor config pages
+                </ul>
+            </ul>
+        </ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4240]</b> Value Before/After Clue validation messages
+        <ul>
+            <li>Open the config page for a VAC or VBC rule. 
+            <li>Select the "Up to X number of words..." radio button.
+            <li>Uncheck both boxes under 3) ("Other:" and "Space, Tab, Carriage Return...").
+            <li>Enter a positive number in the 1) edit box and make sure that there is at least
+            one clue in the clue list box.
+            <li>Hit okay.
+            <li>Confirm that all words in the validation message are spelled correctly.
+            <li>Confirm that the validation message has a sensible caption.
+            <li>Hit okay, then reopen the configuration page.
+            <li>Uncheck the "Space, Tab,..." checkbox.
+            <li>Check the "Other:" checkbox but do not enter anything in the associated text box.
+            <li>Hit okay and confirm that all words in the validation message are spelled
+            correctly.
+        </ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4254]</b> Copy, move, delete browse button error
+      	<ul>
+     		<li>Open a Copy, move, or delete task.
+            <li>Press the Browse button associated with the To: field.
+            <li>Specify a file that does not exist.
+            <li>Hit OK.
+            <li>Confirm that no error is seen.
+      	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4259, #4260]</b> Loop finder/preprocessor
+       	<ul>
+      		<li>In the property page for the loop finder or preprocessor:
+            <ul>
+                <li>Click on the Do loop option with the mouse.
+                <li>Move the cursor straight down and click on the While option.
+                <li>Move the mouse down and click on the For loop option.
+                <li>Confirm that only one radio button appears selected at a time.
+            <p>
+                <li>Close and reopen the property page.
+                <li>Hit tab until the Do loop option has the focus box.
+                <li>Press the down arrow.
+                <li>Confirm that the loop setup groupbox and loop type groupbox remain in sync
+                as you hit the arrow keys.
+            </ul>
+	   	</ul>
+<p>
+        <li><b>[FlexIDSCore #4265]</b> DataEntry.nl
+        <ul>
+            <li>Run RegisterAll.bat
+            <li>Confirm that everything registers successfully without error.
+        </ul>
+<p>        
+        <li><b>[FlexIDSCore #4269]</b> Confirm that the tests located at I:\Common\Testing\PVCS
+        _Testing\FlexIDSCore\4269 work as expected.
+<p>        
+        <li><b>[FlexIDSCore #4275]</b> Confirm that RegisterAll.bat recurses from the
+        CommonComponents directory.
+<p>
+        <li><b>[DotNetRCAndUtils #431, #432, #444, #452, #453, #454]</b> ESFAMService
+        <ul>
+            <li>In the service database, specify an existing dependent service.
+            <li>Confirm that the service starts or doesn't as appropriate.
+        <p>
+            <li>Configure the service to respawn every n files.
+            <li>Configure the service to run 12 instances of the FAM.
+            <li>Start the service.
+            <li>Manually kill 3 instances of FAMProcess.exe.
+            <li>Stop the service.
+            <li>Confirm that appropriate exceptions/application traces were logged.
+        <p>
+            <li>Restart the service.
+            <li>Reboot the computer from the start menu.
+            <li>Confirm that <b>ELI28497</b> is not seen in the exception log.
+        <p>
+            <li>Configure the service to process a limited number of files per FAM instance.
+            <li>Configure an FPS file to stop processing once the queue is empty.
+            <li>Use FAMDBAdmin to ensure that there are no files to process.
+            <li>Launch the service.
+            <li>Confirm in the task manager that new instances of FAMProcess.exe are not being
+            rapidly respawned.
+        <p>
+            <li>Configure the service to process a limited number of files per instance.
+            <li>Configure the service to launch 2 FPS files. Limit the number of threads in each
+            FPS file to 1/2 the available cores on the machine.
+            <li>Start the service. Ensure that there are enough files queued to keep the service
+            busy for a while.
+            <li>Let the service run for a while. Confirm that there are no orphaned instances of
+            FAMProcess.exe.
+        <p>
+            <li>Configure the service to respawn every 10 files.
+            <li>Configure an FPS file such that it will fail some documents.
+            <li>Start the service.
+            <li>Confirm that new FAM processes are respawned even for instances that failed some
+            files.
+        </ul>
+<p>
+        <li><b>[DotNetRCAndUtils #449, #450]</b> Licensing et cetera
+        <ul>
+            <li>SQLServerInfoApp and SqlDatabaseMethods should be licensed; not sure how to test.
+        </ul>
+    </ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
