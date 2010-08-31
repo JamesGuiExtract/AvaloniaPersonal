@@ -1,5 +1,7 @@
 ﻿using Microsoft.SharePoint.Administration;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Extract.SharePoint.Redaction
 {
@@ -48,6 +50,13 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         [Persisted]
         string _exceptionServiceIPAddress;
+
+        /// <summary>
+        /// Collection of file Ids that were seen in the added event, but were
+        /// 0 bytes at the time.
+        /// </summary>
+        [Persisted]
+        List<Guid> _addedZeroByteFiles;
 
         #endregion Fields
 
@@ -119,6 +128,69 @@ namespace Extract.SharePoint.Redaction
             return settings;
         }
 
+        /// <summary>
+        /// Adds the unique file id to the list of files that were seen in the
+        /// file added event but were 0 bytes.
+        /// </summary>
+        /// <param name="fileId">The unique file id for the file to add to the list.</param>
+        internal static void AddZeroByteFileId(Guid fileId)
+        {
+            IdShieldSettings settings = GetIdShieldSettings(true);
+            settings.InternalAddZeroByteFileId(fileId);
+            settings.Update();
+        }
+
+        /// <summary>
+        /// Removes the unique file id from the list of files that were seen in the
+        /// file added event but were 0 bytes.
+        /// </summary>
+        /// <param name="fileId">The unique file id for the file to remove from the list.</param>
+        internal static void RemoveZeroByteFileId(Guid fileId)
+        {
+            IdShieldSettings settings = GetIdShieldSettings(false);
+            if (settings != null)
+            {
+                settings.InternalRemoveZeroByteFileId(fileId);
+                settings.Update();
+            }
+        }
+
+        /// <summary>
+        /// Adds the specified unique file id to the collection of zero byte file ids.
+        /// </summary>
+        /// <param name="fileId">The file id to add.</param>
+        void InternalAddZeroByteFileId(Guid fileId)
+        {
+            if (_addedZeroByteFiles == null)
+            {
+                _addedZeroByteFiles = new List<System.Guid>();
+            }
+
+            // Search for the item id
+            int index = _addedZeroByteFiles.BinarySearch(fileId);
+            if (index < 0)
+            {
+                // The item was not found, insert it in the proper sorted location
+                _addedZeroByteFiles.Insert(~index, fileId);
+            }
+        }
+
+        /// <summary>
+        /// Removes the specified unique file id from the collection of zero byte file ids.
+        /// </summary>
+        /// <param name="fileId">The file id to remove.</param>
+        void InternalRemoveZeroByteFileId(Guid fileId)
+        {
+            if (_addedZeroByteFiles != null)
+            {
+                int index = _addedZeroByteFiles.BinarySearch(fileId);
+                if (index >= 0)
+                {
+                    _addedZeroByteFiles.RemoveAt(index);
+                }
+            }
+        }
+
         #endregion Methods
 
         #region Properties
@@ -165,6 +237,21 @@ namespace Extract.SharePoint.Redaction
             set
             {
                 _exceptionServiceIPAddress = (value ?? string.Empty).Trim();
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of zero byte files that were seen during the add event.
+        /// </summary>
+        public ReadOnlyCollection<Guid> AddedZeroByteFiles
+        {
+            get
+            {
+                if (_addedZeroByteFiles == null)
+                {
+                    _addedZeroByteFiles = new List<Guid>();
+                }
+                return _addedZeroByteFiles.AsReadOnly();
             }
         }
 

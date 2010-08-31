@@ -53,6 +53,11 @@ namespace Extract.SharePoint.Redaction
         Guid _siteId;
 
         /// <summary>
+        /// Collection of zero byte files from the add event
+        /// </summary>
+        HashSet<Guid> _zeroByteFiles = new HashSet<Guid>();
+
+        /// <summary>
         /// Mutex used to serialize access to the UpdateSettings calls.
         /// </summary>
         object _lock = new object();
@@ -159,34 +164,68 @@ namespace Extract.SharePoint.Redaction
                 foreach (KeyValuePair<string, FolderProcessingSettings> pair in _folderSettings)
                 {
                     // Export the file if:
-                    // 1. This folder is being watched
-                    // 2. The folder is being watched for the specified event
+                    // 1. This is a modified event and the file id is contained in the
+                    //      zero byte file list
+                    // OR
+                    // 1. The folder is being watched for the specified event
+                    // 2. This folder is being watched
                     // 3. The file matches the watch pattern
-                    if ((folder.Equals(pair.Key, StringComparison.Ordinal)
-                        || (folder.StartsWith(pair.Key, StringComparison.Ordinal)
-                        && pair.Value.RecurseSubfolders))
-                        && (pair.Value.EventTypes & eventType) != 0
-                        && pair.Value.DoesFileMatchPattern(item.File.Name))
+                    if  ((eventType == FileEventType.FileModified
+                            && _zeroByteFiles.Contains(item.File.UniqueId))
+                        || ((pair.Value.EventTypes & eventType) != 0
+                            && IsFolderBeingWatched(folder, pair.Key, pair.Value.RecurseSubfolders)
+                            && pair.Value.DoesFileMatchPattern(item.File.Name)
+                        ))
                     {
-                        // get the folder name without the leading '/' and
-                        // convert all other '/' to '\'
-                        folder = folder.Substring(1).Replace('/', '\\');
-                        string outputFolder = Path.Combine(_outputFolder, folder);
-                        if (!Directory.Exists(outputFolder))
+                        byte[] bytes = item.File.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
+                        if (bytes.Length == 0 && eventType == FileEventType.FileAdded)
                         {
-                            Directory.CreateDirectory(outputFolder);
+                            // Add this file ID to a list of pending ID's to be
+                            // handled in the update method
+                            IdShieldSettings.AddZeroByteFileId(item.File.UniqueId);
+                        }
+                        else if (bytes.Length > 0)
+                        {
+                            // get the folder name without the leading '/' and
+                            // convert all other '/' to '\'
+                            folder = folder.Substring(1).Replace('/', '\\');
+                            string outputFolder = Path.Combine(_outputFolder, folder);
+                            if (!Directory.Exists(outputFolder))
+                            {
+                                Directory.CreateDirectory(outputFolder);
+                            }
+
+                            // Write the file to the processing folder
+                            string fileName = Path.Combine(outputFolder, item.File.Name);
+                            File.WriteAllBytes(fileName, bytes);
+
+                            if (_zeroByteFiles.Contains(item.File.UniqueId))
+                            {
+                                IdShieldSettings.RemoveZeroByteFileId(item.File.UniqueId);
+                            }
                         }
 
-                        // Write the file to the processing folder
-                        string fileName = Path.Combine(outputFolder, item.File.Name);
-                        byte[] bytes = item.File.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
-                        File.WriteAllBytes(fileName, bytes);
-
-                        // File was exported, break from foreach loop
+                        // File was exported OR placed in the zero byte list,
+                        // break from foreach loop
                         break;
                     }
                 } // End foreach loop
             }
+        }
+
+        /// <summary>
+        /// Checks whether the specified folder is being watched based on the 
+        /// specified watch path and recursion settings.
+        /// </summary>
+        /// <param name="folder">The folder to check.</param>
+        /// <param name="watchPath">The root watch path to compare.</param>
+        /// <param name="recurseSubFolders">Whether sub folders are recursively watched.</param>
+        /// <returns><see langword="true"/> if the folder is being watched and
+        /// <see langword="false"/> otherwise.</returns>
+        static bool IsFolderBeingWatched(string folder, string watchPath, bool recurseSubFolders)
+        {
+            return folder.Equals(watchPath, StringComparison.Ordinal)
+                || (recurseSubFolders && folder.StartsWith(watchPath, StringComparison.Ordinal));
         }
 
         /// <summary>
@@ -225,6 +264,8 @@ namespace Extract.SharePoint.Redaction
                 {
                     _outputFolder = Path.Combine(settings.LocalWorkingFolder, siteId.ToString());
                 }
+
+                _zeroByteFiles = new HashSet<Guid>(settings.AddedZeroByteFiles);
             }
         }
 
