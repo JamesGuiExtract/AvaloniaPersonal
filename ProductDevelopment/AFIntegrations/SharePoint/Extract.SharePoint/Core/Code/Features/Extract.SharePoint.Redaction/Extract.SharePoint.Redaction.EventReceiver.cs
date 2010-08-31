@@ -26,7 +26,7 @@ namespace Extract.SharePoint.Redaction.Features
             }
             catch (Exception ex)
             {
-                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex);
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex, "ELI30551");
             }
         }
     }

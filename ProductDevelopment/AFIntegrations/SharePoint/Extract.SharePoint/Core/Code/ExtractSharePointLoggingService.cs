@@ -113,11 +113,12 @@ namespace Extract.SharePoint
         /// </summary>
         /// <param name="categoryId">The category for the exception to log.</param>
         /// <param name="ex">The exception to log.</param>
-        public static void LogError(ErrorCategoryId categoryId, Exception ex)
+        /// <param name="eliCode">The ELI code for this exception.</param>
+        public static void LogError(ErrorCategoryId categoryId, Exception ex, string eliCode)
         {
             SPDiagnosticsCategory category = ExtractSharePointLoggingService.Current[categoryId];
             ExtractSharePointLoggingService.Current.WriteTrace(42,
-                category, TraceSeverity.Unexpected, ex.Message, ex.StackTrace);
+                category, TraceSeverity.Unexpected, eliCode + ": " + ex.Message, ex.StackTrace);
         }
 
         #endregion Methods

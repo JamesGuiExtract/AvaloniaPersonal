@@ -15,7 +15,8 @@ namespace Extract.SharePoint
         /// </summary>
         /// <param name="ipAddress">The ip address to log to.</param>
         /// <param name="ex">The exception to log.</param>
-        internal static void LogExceptionTcp(string ipAddress, Exception ex)
+        /// <param name="eliCode">The ELI code for this exception.</param>
+        internal static void LogExceptionTcp(string ipAddress, Exception ex, string eliCode)
         {
             ChannelFactory<IExtractExceptionLogger> factory = null;
             try
@@ -32,13 +33,13 @@ namespace Extract.SharePoint
                         new EndpointAddress(url.ToString()));
 
                     IExtractExceptionLogger logger = factory.CreateChannel();
-                    logger.LogException(new ExceptionLoggerData(ex));
+                    logger.LogException(new ExceptionLoggerData(ex, eliCode));
 
                     factory.Close();
                 }
 
                 // Always log to SharePoint log
-                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex);
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex, eliCode);
             }
             catch (Exception ex2)
             {
@@ -49,8 +50,9 @@ namespace Extract.SharePoint
                 }
 
                 // Unable to use logging service, send the error to the sharepoint log
-                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex);
-                ExtractSharePointLoggingService.LogError(ErrorCategoryId.ExceptionLogger, ex2);
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex, eliCode);
+                ExtractSharePointLoggingService.LogError(ErrorCategoryId.ExceptionLogger, ex2,
+                    "ELI30548");
             }
         }
 

@@ -88,7 +88,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                LogException(ex);
+                LogException(ex, "ELI30567");
             }
         }
 
@@ -108,7 +108,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                LogException(ex);
+                LogException(ex, "ELI30568");
             }
         }
 
@@ -124,7 +124,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                LogException(ex);
+                LogException(ex, "ELI30569");
             }
         }
 
@@ -455,7 +455,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                LogException(ex);
+                LogException(ex, "ELI30570");
             }
         }
 
@@ -470,7 +470,7 @@ namespace Extract.SharePoint.Redaction
                     "Application Trace: ID Shield feature folder watching thread started.");
                 ee.Data.Add("Current Site Id", _siteId.ToString());
                 ee.Data.Add("Current Site Url", _serverRelativeUrl);
-                LogException(ee);
+                LogException(ee, "ELI30549");
             }
             catch
             {
@@ -488,7 +488,7 @@ namespace Extract.SharePoint.Redaction
                     "Application Trace: ID Shield feature folder watching thread exited.");
                 ee.Data.Add("Current Site Id", _siteId.ToString());
                 ee.Data.Add("Current Site Url", _serverRelativeUrl);
-                LogException(ee);
+                LogException(ee, "ELI30571");
             }
             catch
             {
@@ -531,14 +531,14 @@ namespace Extract.SharePoint.Redaction
                     SPException exception = new SPException("Failed processing file: "
                         + spFileName);
                     exception.Data.Add("SP Failed File", spFileName);
-                    LogException(exception);
+                    LogException(exception, "ELI30572");
 
                     // Cleanup all files related to this file
                     CleanupLocalFiles(fileWithoutExtension, directory);
                 }
                 catch (Exception ex)
                 {
-                    LogException(ex);
+                    LogException(ex, "ELI30573");
                 }
             }
         }
@@ -614,7 +614,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                LogException(ex);
+                LogException(ex, "ELI30574");
             }
         }
 
@@ -649,7 +649,7 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
-                LogException(ex);
+                LogException(ex, "ELI30575");
             }
         }
 
@@ -724,7 +724,8 @@ namespace Extract.SharePoint.Redaction
         /// Attempts to logs exceptions to the exception logging service.
         /// </summary>
         /// <param name="ex">The exception to log.</param>
-        static void LogException(Exception ex)
+        /// <param name="eliCode">The ELI code to associate with the exception.</param>
+        static void LogException(Exception ex, string eliCode)
         {
             ex.Data.Add("User Name", Environment.UserName);
             try
@@ -735,7 +736,8 @@ namespace Extract.SharePoint.Redaction
             {
             }
 
-            IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldFileReceiver);
+            IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldFileReceiver,
+                eliCode);
         }
 
         #endregion Methods

@@ -34,7 +34,8 @@ namespace Extract.SharePoint.Redaction.Layouts
             }
             catch (Exception ex)
             {
-                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldSettingsConfiguration);
+                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldSettingsConfiguration,
+                    "ELI30552");
                 throw;
             }
         }
@@ -79,7 +80,8 @@ namespace Extract.SharePoint.Redaction.Layouts
             }
             catch (Exception ex)
             {
-                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldSettingsConfiguration);
+                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldSettingsConfiguration,
+                    "ELI30553");
                 throw;
             }
         }

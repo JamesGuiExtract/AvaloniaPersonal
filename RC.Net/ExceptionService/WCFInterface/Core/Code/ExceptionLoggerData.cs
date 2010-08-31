@@ -23,8 +23,9 @@ namespace Extract.ExceptionService
 
         /// <summary>
         /// Current version of the exception logger data class.
+        /// Version 2: Added ELI code value
         /// </summary>
-        readonly static int _CURRENT_VERSION = 1;
+        readonly static int _CURRENT_VERSION = 2;
 
         #endregion Constants
 
@@ -35,6 +36,11 @@ namespace Extract.ExceptionService
         /// </summary>
         Exception _data;
 
+        /// <summary>
+        /// The ELI code associated with the exception
+        /// </summary>
+        string _eliCode;
+
         #endregion Fields
 
         #region Constructors
@@ -42,10 +48,27 @@ namespace Extract.ExceptionService
         /// <summary>
         /// Initializes a new instance of the <see cref="ExceptionLoggerData"/> class.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">The exception to be logged.</param>
         public ExceptionLoggerData(Exception data)
+            : this(data, string.Empty)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExceptionLoggerData"/> class.
+        /// </summary>
+        /// <param name="data">The exception to be logged.</param>
+        /// <param name="eliCode">The ELI code to add to the exception data. This
+        /// may not be <see langword="null"/></param>
+        public ExceptionLoggerData(Exception data, string eliCode)
+        {
+            if (eliCode == null)
+            {
+                throw new ArgumentException("Value must not be null", "eliCode");
+            }
+
             _data = data;
+            _eliCode = eliCode;
         }
 
         /// <summary>
@@ -66,6 +89,11 @@ namespace Extract.ExceptionService
 
             string data = info.GetString("ExceptionString");
             _data = DeserializeExceptionFromHexString(data);
+
+            if (version > 1)
+            {
+                _eliCode = info.GetString("EliCode");
+            }
         }
 
         #endregion Constructors
@@ -82,6 +110,7 @@ namespace Extract.ExceptionService
         {
             info.AddValue("CurrentVersion", _CURRENT_VERSION);
             info.AddValue("ExceptionString", SerializeExceptionToHexString(_data));
+            info.AddValue("EliCode", _eliCode);
         }
 
         #endregion
@@ -202,6 +231,17 @@ namespace Extract.ExceptionService
             get
             {
                 return _data;
+            }
+        }
+
+        /// <summary>
+        /// Gets the ELI code for this exception (may be <see cref="String.Empty"/>).
+        /// </summary>
+        public string EliCode
+        {
+            get
+            {
+                return _eliCode;
             }
         }
 

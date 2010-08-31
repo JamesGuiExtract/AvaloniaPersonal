@@ -46,6 +46,9 @@ namespace Extract.ExceptionService
         /// Raised when the service is starting.
         /// </summary>
         /// <param name="args">Arguments associated with starting the service.</param>
+        // Not raising the application exception, just creating a trace, there is
+        // not a more specific exception type to use here.
+        [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
         protected override void OnStart(string[] args)
         {
             try
@@ -56,23 +59,25 @@ namespace Extract.ExceptionService
                 _endService.Reset();
 
                 ResetHost();
+
+                // Request additional time for the application trace to log
+                this.RequestAdditionalTime(30000);
+
+                LogException(new ApplicationException(
+                    "Application Trace: Exception service started."), "ELI30558");
             }
             catch (Exception ex)
             {
-                try
-                {
-                    var logger = new ExtractExceptionLogger();
-                    logger.LogException(new ExceptionLoggerData(ex));
-                }
-                catch
-                {
-                }
+                LogException(ex, "ELI30559");
             }
         }
 
         /// <summary>
         /// Raised when the service is stopped.
         /// </summary>
+        // Not raising the application exception, just creating a trace, there is
+        // not a more specific exception type to use here.
+        [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
         protected override void OnStop()
         {
             try
@@ -82,10 +87,41 @@ namespace Extract.ExceptionService
                 CloseHost();
 
                 base.OnStop();
+
+                // Request additional time for the application trace to log
+                this.RequestAdditionalTime(30000);
+
+                LogException(new ApplicationException(
+                    "Application Trace: Exception service stopped."), "ELI30560");
             }
             catch (Exception ex)
             {
-                LogException(ex);
+                LogException(ex, "ELI30561");
+            }
+        }
+
+        /// <summary>
+        /// Raises the shutdown event.
+        /// </summary>
+        // Not raising the application exception, just creating a trace, there is
+        // not a more specific exception type to use here.
+        [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
+        protected override void OnShutdown()
+        {
+            try
+            {
+                _endService.Set();
+
+                CloseHost();
+
+                base.OnShutdown();
+
+                LogException(new ApplicationException(
+                    "Application Trace: Exception service was shutdown."), "ELI30565");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, "ELI30566");
             }
         }
 
@@ -107,6 +143,8 @@ namespace Extract.ExceptionService
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
+        // Not raising the application exception, just creating a trace, there is
+        // not a more specific exception type to use here.
         [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
         void HandleHostClosed(object sender, EventArgs e)
         {
@@ -124,15 +162,15 @@ namespace Extract.ExceptionService
                     if (!_endService.WaitOne(0))
                     {
                         ResetHost();
-                        ApplicationException ee =
-                            new ApplicationException("Application Trace: Exception service host was closed and was restarted.");
-                        LogException(ee);
+                        LogException(new ApplicationException(
+                            "Application Trace: Exception service host was closed and restarted."),
+                            "ELI30562");
                     }
                 }
             }
             catch (Exception ex)
             {
-                LogException(ex);
+                LogException(ex, "ELI30563");
             }
         }
 
@@ -175,14 +213,7 @@ namespace Extract.ExceptionService
             }
             catch (Exception ex)
             {
-                try
-                {
-                    var logger = new ExtractExceptionLogger();
-                    logger.LogException(new ExceptionLoggerData(ex));
-                }
-                catch
-                {
-                }
+                LogException(ex, "ELI30564");
             }
         }
 
@@ -222,12 +253,13 @@ namespace Extract.ExceptionService
         /// Attempts to log the specified <see cref="Exception"/> to the Extract exception log.
         /// </summary>
         /// <param name="ex">The <see cref="Exception"/> to log.</param>
-        static void LogException(Exception ex)
+        /// <param name="eliCode">The ELI code to associate with the exception.</param>
+        static void LogException(Exception ex, string eliCode)
         {
             try
             {
                 var logger = new ExtractExceptionLogger();
-                logger.LogException(new ExceptionLoggerData(ex));
+                logger.LogException(new ExceptionLoggerData(ex, eliCode));
             }
             catch
             {
