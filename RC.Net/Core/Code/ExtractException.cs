@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
+using System.Collections.ObjectModel;
 
 namespace Extract
 {
@@ -1387,32 +1388,88 @@ namespace Extract
                     !string.IsNullOrEmpty(fileName) && File.Exists(fileName));
 
                 string[] lines = File.ReadAllLines(fileName);
-                if (line < 0 || line > lines.Length)
+                return LoadFromFile(eliCode, lines, line, fileName);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30279", ex);
+            }
+        }
+
+        /// <summary>
+        /// Loads all exceptions from an exception log file.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to associate with the loaded exceptions.</param>
+        /// <param name="fileName">The name of the exception file
+        /// to load the exception from.</param>
+        /// <returns>A <see cref="ReadOnlyCollection{T}"/> of <see cref="ExtractException"/>s from the
+        /// file.</returns>
+        public static IEnumerable<ExtractException> LoadAllFromFile(string eliCode, string fileName)
+        {
+            string[] lines;
+
+            try
+            {
+                Assert("ELI30594", "Filename cannot be null or empty and must exist.",
+                    !string.IsNullOrEmpty(fileName) && File.Exists(fileName));
+
+                lines = File.ReadAllLines(fileName);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = AsExtractException("ELI30593", ex);
+                ee.AddDebugData("File Name", fileName, false);
+                throw ee;
+            }
+
+            for (int i = 1; i <= lines.Length; i++)
+            {
+                yield return LoadFromFile(eliCode, lines, i, fileName);
+            }
+        }
+
+        /// <summary>
+        /// Loads the specified extract exception from an exception log file.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to associate with the loaded exception.</param>
+        /// <param name="lines">The array of strings defining the exceptions in a file.</param>
+        /// <param name="lineNumber">The 1-based line number in the file to load.</param>
+        /// <param name="fileName">The name of the exception file the lines were loaded from
+        /// (for debug purposes).</param>
+        /// <exception cref="ExtractException">If <paramref name="lineNumber"/> is &lt; 1 or
+        /// &gt; the number of lines in <paramref name="lines"/>.
+        /// </exception>
+        static ExtractException LoadFromFile(string eliCode, string[] lines, int lineNumber,
+            string fileName)
+        {
+            try
+            {
+                if (lineNumber < 0 || lineNumber > lines.Length)
                 {
                     ExtractException ee = new ExtractException("ELI30276",
                         "Invalid line specification.");
-                    ee.AddDebugData("Line", line, false);
+                    ee.AddDebugData("Line", lineNumber, false);
                     ee.AddDebugData("Total Lines In File", lines.Length, false);
                     throw ee;
                 }
 
-                string[] tokens = lines[line-1].Split(',');
+                string[] tokens = lines[lineNumber - 1].Split(',');
                 if (tokens.Length != 7)
                 {
                     ExtractException ee = new ExtractException("ELI30277",
                         "Invalid number of tokens in the exception file.");
                     ee.AddDebugData("Number of tokens", tokens.Length, false);
-                    ee.AddDebugData("Line Parsed", lines[line-1], false);
+                    ee.AddDebugData("Line Parsed", lines[lineNumber - 1], false);
                     throw ee;
                 }
 
                 // The exception is the last token
                 string exception = tokens[tokens.Length - 1];
-                return new ExtractException(eliCode, exception);
+                return ExtractException.FromStringizedByteStream(eliCode, exception);
             }
             catch (Exception ex)
             {
-                ExtractException ee = AsExtractException("ELI30279", ex);
+                ExtractException ee = AsExtractException("ELI30595", ex);
                 ee.AddDebugData("File Name", fileName, false);
                 throw ee;
             }

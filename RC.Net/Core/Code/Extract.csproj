@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="AssemblyCompanyUrlAttribute.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="ExtractExceptionQuery.cs" />
     <Compile Include="ExtractExceptionEventArgs.cs" />
     <Compile Include="ExtractException.cs" />
     <Compile Include="ArgumentRequirement.cs" />
