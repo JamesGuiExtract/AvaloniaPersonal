@@ -11,6 +11,10 @@ UL {
 	list-style: url(box.gif) disc;
 }
 
+OL {
+    list-style: decimal;
+}
+
 h1 {
 	text-align: center;
 	font-size: 22;
