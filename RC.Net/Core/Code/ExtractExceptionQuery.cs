@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace Extract
@@ -15,11 +16,6 @@ namespace Extract
         /// Indicates whether this instance includes or excludes matching exceptions.
         /// </summary>
         bool _inclusionQuery;
-
-        /// <summary>
-        /// Indicates whether the exception itself should be returned as output.
-        /// </summary>
-        bool _isOutput;
 
         /// <summary>
         /// If > 0, the lowest matching exception generation where 1 is top-level
@@ -40,6 +36,11 @@ namespace Extract
         /// The regex the exception message will need to match to be a match.
         /// </summary>
         string _messageFilter;
+
+        /// <summary>
+        /// The regex a debug data item name and associated value will need to match to be a match.
+        /// </summary>
+        Dictionary<string, string> _debugDataFilter = new Dictionary<string, string>();
 
         /// <summary>
         /// The debug data items from matching exceptions that are to be output.
@@ -71,6 +72,7 @@ namespace Extract
         /// Initializes a new <see cref="ExtractExceptionQuery"/> instance.
         /// </summary>
         /// <param name="specifications">The specifications for the query.</param>
+        [SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults", MessageId = "System.Text.RegularExpressions.Regex")]
         private ExtractExceptionQuery(List<string> specifications)
         {
             try
@@ -78,9 +80,25 @@ namespace Extract
                 ExtractException.Assert("ELI30597", "Missing query specifications.",
                     specifications != null && specifications.Count > 0);
 
-                // For now, it is not possible for ExceptionQueries to return exceptions. However,
-                // this class is designed. with this possibility in mind.
-                _isOutput = false;
+                string[] fields = null;
+
+                // All exclusion queries (which are to be and'd) are to be processed first so that
+                // the spec file is order-independent.
+                for (int i = 0; i < specifications.Count; i++)
+                {
+                    if (specifications[i].StartsWith("E", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fields = specifications[i].Split(',');
+                        specifications.RemoveAt(i);
+                        break;
+                    }
+                }
+
+                if (fields == null)
+                {
+                    fields = specifications[0].Split(',');
+                    specifications.RemoveAt(0);
+                }
 
                 // Parameter 0: "I" for include, or "E" for exclude.
                 // Parameter 1: "T" for top level exception, "I" for inner exception, blank for
@@ -91,7 +109,7 @@ namespace Extract
                 // Parameter 4: Name of debug data item whose value should be extracted, or blank
                 //              to match any debug data item for an inclusion, or nothing for an
                 //              exclusion.
-                string[] fields = specifications[0].Split(',');
+                // Parameter 5: (future) Regex the debug data value should match to be considered a match.
                 if (fields.Length != 5)
                 {
                     ExtractException ee = new ExtractException("ELI30596",
@@ -99,8 +117,6 @@ namespace Extract
                     ee.AddDebugData("Specification", specifications[0], false);
                     throw ee;
                 }
-
-                specifications.RemoveAt(0);
 
                 // Parse the specification parameters.
                 if (fields[0].Equals("I", StringComparison.OrdinalIgnoreCase))
@@ -145,24 +161,32 @@ namespace Extract
                     new Regex(_messageFilter);
                 }
 
-                if (!string.IsNullOrEmpty(fields[4]))
+                string debugDataFilter = fields[4];
+                if (_inclusionQuery && string.IsNullOrEmpty(debugDataFilter))
                 {
-                    _outputDebugData.Add(fields[4]);
+                    // An inclusion filter with no debug data filter specified should be
+                    // interpreted as a filter that will match any debug data item.
+                    debugDataFilter = "\\S";
                 }
+                if (!string.IsNullOrEmpty(debugDataFilter))
+                {
+                    _outputDebugData.Add(debugDataFilter);
 
+                    _debugDataFilter[debugDataFilter] = fields.Length > 5 ? fields[5] : null;
+                }
 
                 // If there are sub-queries specified, create them.
                 if (specifications.Count > 0)
                 {
-                    // In this format, if a debug type was not specified, allow that to mean
-                    // subsequent queries are to be and'd rather than or'd with this one.
-                    if (_outputDebugData.Count == 0)
+                    // In this format, inclusion queries are to be or'd while exclusion queries are
+                    // to be and'd.
+                    if (_inclusionQuery)
                     {
-                        _andQuery = new ExtractExceptionQuery(specifications);
+                        _orQuery = new ExtractExceptionQuery(specifications);
                     }
                     else
                     {
-                        _orQuery = new ExtractExceptionQuery(specifications);
+                        _andQuery = new ExtractExceptionQuery(specifications);                        
                     }
                 }
             }
@@ -183,19 +207,39 @@ namespace Extract
         /// performed.</param>
         /// <returns>The matching data elements from the specified
         /// <see cref="ExtractException"/>.</returns>
-        public ReadOnlyCollection<string> GetResults(ExtractException ee)
+        public ReadOnlyCollection<string> GetDebugData(ExtractException ee)
         {
             try
             {
                 List<string> results = new List<string>();
 
-                GetResults(ee, 1, true, null, results);
+                GetResults(ee, 1, true, results);
 
                 return results.AsReadOnly();
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI30587", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the specified and all inner exceptions (if they exist) are specifically
+        /// excluded by the query (as opposed to simply not being included).
+        /// </summary>
+        /// <param name="ee">The <see cref="ExtractException"/> to test.</param>
+        /// <returns><see langword="true"/> if this exception and all inner exceptions are
+        /// specifically excluded, <see langword="false"/> if either this exception or one of its
+        /// inner exceptions are not specifically excluced.</returns>
+        public bool GetIsEntirelyExcluded(ExtractException ee)
+        {
+            try
+            {
+                return GetIsEntirelyExcluded(ee, 1);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30602", ex);
             }
         }
 
@@ -211,19 +255,17 @@ namespace Extract
         /// performed.</param>
         /// <param name="generation">The generation of the current exception where 1 is a top level
         /// exception.</param>
-        /// <param name="includeDecendents">Whether results should be gathered from the decendents
+        /// <param name="includeDescendents">Whether results should be gathered from the descendents
         /// of this exception as well.</param>
-        /// <param name="exceptions">Any <see cref="ExtractException"/> results will be added to
-        /// this list if non-<see langword="null"/>.</param>
         /// <param name="strings">Any <see langword="string"/> results will be added to this list if
         /// non-<see langword="null"/>.
         /// </param>
-        void GetResults(ExtractException ee, int generation, bool includeDecendents,
-            List<ExtractException> exceptions, List<string> strings)
+        bool GetResults(ExtractException ee, int generation, bool includeDescendents,
+            List<string> strings)
         {
             if (ee == null)
             {
-                return;
+                return false;
             }
 
             // The exception is included if the query matches for an inclusion query or the query
@@ -232,28 +274,28 @@ namespace Extract
 
             if (include)
             {
-                // Add exception output if requested.
-                if (_isOutput && exceptions != null)
-                {
-                    exceptions.Add(ee);
-                }
-
                 // Add debug data if requested.
                 if (strings != null)
                 {
-                    foreach (string debugDataItem in _outputDebugData)
+                    foreach (KeyValuePair<string, string> debugDataItem in _debugDataFilter)
                     {
+                        // Attempt to find a matching debug data item.
                         foreach (DictionaryEntry entry in ee.Data)
                         {
-                            if (entry.Key != null &&
-                                Regex.IsMatch(entry.Key.ToString(), debugDataItem,
+                            if (Regex.IsMatch(entry.Key.ToString(), debugDataItem.Key,
                                     RegexOptions.IgnoreCase))
                             {
-                                string value =
-                                    (entry.Value == null ? "null" : entry.Value.ToString());
-                                // TODO: Decrypt value if necessary?
+                                // If a value filter has been specifed, does the value match?
+                                if (string.IsNullOrEmpty(debugDataItem.Value) ||
+                                    Regex.IsMatch(entry.Value.ToString(), debugDataItem.Value,
+                                        RegexOptions.IgnoreCase))
+                                {
+                                    string value =
+                                        (entry.Value == null ? "null" : entry.Value.ToString());
+                                    // TODO: Decrypt value if necessary?
 
-                                strings.Add(value);
+                                    strings.Add(value);
+                                }
                             }
                         }
                     }
@@ -263,20 +305,58 @@ namespace Extract
             // Retrieve the results of the subqueries against this exception.
             if (include && _andQuery != null)
             {
-                _andQuery.GetResults(ee, generation, false, exceptions, strings);
+                _andQuery.GetResults(ee, generation, false, strings);
             }
             
             if (_orQuery != null)
             {
-                _orQuery.GetResults(ee, generation, false, exceptions, strings);
+                include |= _orQuery.GetResults(ee, generation, false, strings);
             }
 
-            if (includeDecendents)
+            if (includeDescendents)
             {
                 // Retrieve the results of this query on the inner exceptions.
-                GetResults(ee.InnerException as ExtractException, generation + 1, true,
-                    exceptions, strings);
+                include |= GetResults(ee.InnerException as ExtractException, generation + 1, true,
+                    strings);
             }
+
+            return include;
+        }
+
+        /// <summary>
+        /// Gets whether the specified and all inner exceptions (if they exist) are specifically
+        /// excluded by the query (as opposed to simply not being included).
+        /// </summary>
+        /// <param name="ee">The <see cref="ExtractException"/> to test.</param>
+        /// <param name="generation">The generation of <paramref name="ee"/> where 1 is top-level.
+        /// </param>
+        /// <returns><see langword="true"/> if this exception and all inner exceptions are
+        /// specifically excluded, <see langword="false"/> if either this exception or one of its
+        /// inner exceptions are not specifically excluced.</returns>
+        bool GetIsEntirelyExcluded(ExtractException ee, int generation)
+        {
+            if (ee == null)
+            {
+                return true;
+            }
+
+            // Test to see if this exception is exluded by either this query element or one of the
+            // and query elements. Or elements need not be considered since once an or element is
+            // present, we cannot say that the exception is entirely excluded.
+            bool excluded = !_inclusionQuery && GetIsMatch(ee, generation);
+            
+            for (ExtractExceptionQuery andQuery = _andQuery;
+                 !excluded && andQuery != null;
+                 andQuery = andQuery._andQuery)
+            {
+                excluded = !andQuery._inclusionQuery && andQuery.GetIsMatch(ee, generation);
+            }
+
+            // Return true only if excluded == true and GetIsEntirelyExcluded returns true for all
+            // inner exceptions as well.
+            excluded &= GetIsEntirelyExcluded(ee.InnerException as ExtractException, generation + 1);
+
+            return excluded;
         }
 
         /// <summary>
@@ -310,6 +390,37 @@ namespace Extract
                 !Regex.IsMatch(ee.Message, _messageFilter, RegexOptions.IgnoreCase))
             {
                 return false;
+            }
+
+            if (_debugDataFilter.Count > 0)
+            {
+                foreach (KeyValuePair<string, string> debugDataItem in _debugDataFilter)
+                {
+                    bool foundMatch = false;
+
+                    // Attempt to find a matching debug data item.
+                    foreach (DictionaryEntry entry in ee.Data)
+                    {
+                        if (Regex.IsMatch(entry.Key.ToString(), debugDataItem.Key,
+                                RegexOptions.IgnoreCase))
+                        {
+                            // If a value filter has been specifed, does the value match?
+                            if (string.IsNullOrEmpty(debugDataItem.Value) ||
+                                Regex.IsMatch(entry.Value.ToString(), debugDataItem.Key,
+                                    RegexOptions.IgnoreCase))
+
+                            {
+                                foundMatch = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!foundMatch)
+                    {
+                        return false;
+                    }
+                }
             }
 
             return true;

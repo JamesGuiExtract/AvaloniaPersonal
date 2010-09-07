@@ -1,5 +1,5 @@
-﻿using Extract;
-using Extract.Licensing;
+﻿using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,9 +7,9 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace Extract.UEXExtractor
+namespace Extract.ExtractDebugData
 {
-    class UEXExtractorMain
+    class ExtractDebugDataMain
     {
         /// <summary>
         /// The settings that dictate how to extract the exception data
@@ -43,6 +43,17 @@ namespace Extract.UEXExtractor
             public string OutputFile;
 
             /// <summary>
+            /// Specifies whether unselected exceptions should be output.
+            /// </summary>
+            public bool OutputUnselectedExceptions;
+
+            /// <summary>
+            /// The uex file that should be written to if selected or unselected exceptions are to
+            /// be written to disk.
+            /// </summary>
+            public string ExceptionOutputFile;
+
+            /// <summary>
             /// Initializes a new <see cref="Settings"/> instance.
             /// </summary>
             /// <param name="args">The command-line arguments the application was launched with.
@@ -64,6 +75,10 @@ namespace Extract.UEXExtractor
                     else if (arg.Equals("/a", StringComparison.OrdinalIgnoreCase))
                     {
                         Append = true;
+                    }
+                    else if (arg.Equals("/u", StringComparison.OrdinalIgnoreCase))
+                    {
+                        OutputUnselectedExceptions = true;
                     }
                     else if (string.IsNullOrEmpty(uexPath))
                     {
@@ -91,6 +106,17 @@ namespace Extract.UEXExtractor
                 FindUexFiles(uexPath);
                 ExtractException.Assert("ELI30582", 
                     "No UEX files were found at the specified path.", UexFiles.Count > 0);
+
+                if (OutputUnselectedExceptions)
+                {
+                    // GetFullPathWithoutExtension will get a path relative to the application, not
+                    // the working directory-- ensure we get a path relative to the current working
+                    // directory.
+                    string outputFile = FileSystemMethods.GetAbsolutePath(OutputFile,
+                        Environment.CurrentDirectory);
+                    ExceptionOutputFile = FileSystemMethods.GetFullPathWithoutExtension(outputFile);
+                    ExceptionOutputFile += ".Unselected.uex";
+                }
             }
 
             /// <summary>
@@ -133,7 +159,7 @@ namespace Extract.UEXExtractor
 
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI30589", "UEXExtractor");
+                    "ELI30589", "ExtractDebugData");
 
                 // Attempt to load the settings from the command-line argument.  If unsuccessful, 
                 // log the problem, print usage, then return.
@@ -162,10 +188,7 @@ namespace Extract.UEXExtractor
             {
                 // If appending to the results of an existing file, first load the existing results.
                 List<string> results = new List<string>();
-                if (settings.Append && File.Exists(settings.OutputFile))
-                {
-                    results.AddRange(File.ReadAllLines(settings.OutputFile));
-                }
+                List<string> unselectedExceptions = new List<string>();
 
                 // Process each UEX file.
                 int fileIndex = 1;
@@ -185,25 +208,81 @@ namespace Extract.UEXExtractor
                     // Iterate through all exceptions in the file, collecting the query results
                     // along the way.
                     int resultCount = 0;
+                    int lineNumber = 0;
+                    string[] exceptionFileLines = null;
+                    if (settings.OutputUnselectedExceptions)
+                    {
+                        // For efficiency, if we are going to be writing exceptions out to file,
+                        // rather than use the "Log" function on the exception COM object, just
+                        // write the corresponding line from the source uex file.
+                        exceptionFileLines = File.ReadAllLines(uexFilePath);
+                    }
+
                     IEnumerable<ExtractException> fileExceptions =
-                        ExtractException.LoadAllFromFile("ELI30580", uexFilePath);
+                        ExtractException.LoadAllFromFile("ELI30580", uexFilePath, true);
                     Console.Write("\rFound 0 items...");
+                    
                     foreach (ExtractException ee in fileExceptions)
                     {
-                        ReadOnlyCollection<string> tempResults = query.GetResults(ee);
-                        if (tempResults.Count > 0)
+                        if (ee.EliCode.Equals("ELI30603", StringComparison.Ordinal))
+                        {
+                            Console.Write("\r");
+                            Console.WriteLine(ee.Message);
+                            Console.Write("\rFound " + resultCount.ToString(CultureInfo.CurrentCulture)
+                                + " items...");
+                            lineNumber++;
+                            continue;
+                        }
+
+                        ReadOnlyCollection<string> tempResults = query.GetDebugData(ee);
+                        int dataItemCount = tempResults.Count;
+                        if (dataItemCount > 0)
                         {
                             results.AddRange(tempResults);
-                            resultCount += tempResults.Count;
+                            resultCount += dataItemCount;
                             Console.Write("\rFound " + resultCount.ToString(CultureInfo.CurrentCulture)
                                 + " items...");
                         }
+
+                        // If writing "unselected" exceptions, write out any exception where both
+                        // the following conditions are true:
+                        // (1)  No debug data item contained within the original UEX line (which
+                        //      could represent a hierarchy of exceptions when displayed) was
+                        //      exported to the output file.
+                        // (2)  Either the top level exception associated with the original UEX line
+                        //      or one of the inner exceptions associated with the original UEX line
+                        //      was not excluded according to the specs.
+                        if (settings.OutputUnselectedExceptions && 
+                            dataItemCount == 0 && !query.GetIsEntirelyExcluded(ee))
+                        {
+                            unselectedExceptions.Add(exceptionFileLines[lineNumber]);
+                        }
+
+                        lineNumber++;
                     }
 
                     Console.WriteLine();
                 }
 
-                File.WriteAllLines(settings.OutputFile, results.ToArray());
+                if (settings.Append)
+                {
+                    File.AppendAllLines(settings.OutputFile, results.ToArray());
+                    if (settings.OutputUnselectedExceptions)
+                    {
+                        File.AppendAllLines(settings.ExceptionOutputFile,
+                            unselectedExceptions.ToArray());
+                    }
+                }
+                else
+                {
+                    File.WriteAllLines(settings.OutputFile, results.ToArray());
+                    if (settings.OutputUnselectedExceptions)
+                    {
+                        File.WriteAllLines(settings.ExceptionOutputFile,
+                            unselectedExceptions.ToArray());
+                    }
+                }
+
                 Console.WriteLine("Complete.");
             }
             catch (Exception ex)
@@ -229,6 +308,10 @@ namespace Extract.UEXExtractor
             Console.WriteLine();
             Console.WriteLine("/r: Process folder recursively. Only valid when FolderName is specified");
             Console.WriteLine();
+            Console.WriteLine("/u: Outputs to [OutputFileName].Unselected.uex exceptions in which ");
+            Console.WriteLine("no debug data was selected and either the top-level exception or");
+            Console.WriteLine("one of its inner exceptions were not excluded.");
+            Console.WriteLine();
             Console.WriteLine("ExtractSpecsFileName: The file containing the query specification.");
             Console.WriteLine("Each comma delimited line has 5 parameters:");
             Console.WriteLine("Parameter 1: \"I\" for include, or \"E\" for exclude.");
@@ -237,8 +320,9 @@ namespace Extract.UEXExtractor
             Console.WriteLine("Parameter 3: Regex that should match the ELI code, or blank for any ELI code.");
             Console.WriteLine("Parameter 4: Regex that should match the exception's text, or blank to match ");
             Console.WriteLine("any exception's text.");
-            Console.WriteLine("Parameter 5: Name of debug data item whose value should be extracted, or blank");
-            Console.WriteLine("to match any debug data item for an inclusion, or nothing for an exclusion.");
+            Console.WriteLine("Parameter 5: Regex matching the name of any debug data item whose value ");
+            Console.WriteLine("should be extracted, or blank to match any debug data item for an inclusion,");
+            Console.WriteLine("or nothing for an exclusion.");
             Console.WriteLine();
             Console.WriteLine("OutputFileName: The name of the file to which the results should be written.");
             Console.WriteLine();

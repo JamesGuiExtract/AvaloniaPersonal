@@ -1396,6 +1396,9 @@ namespace Extract
             }
         }
 
+        /// <overloads>
+        /// Loads all exceptions from an exception log file.
+        /// </overloads>
         /// <summary>
         /// Loads all exceptions from an exception log file.
         /// </summary>
@@ -1405,6 +1408,25 @@ namespace Extract
         /// <returns>A <see cref="ReadOnlyCollection{T}"/> of <see cref="ExtractException"/>s from the
         /// file.</returns>
         public static IEnumerable<ExtractException> LoadAllFromFile(string eliCode, string fileName)
+        {
+            return LoadAllFromFile(eliCode, fileName, false);
+        }
+
+        /// <summary>
+        /// Loads all exceptions from an exception log file.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to associate with the loaded exceptions.</param>
+        /// <param name="fileName">The name of the exception file
+        /// to load the exception from.</param>
+        /// <param name="includeErrorsInOutput">If <see langword="true"/>, when an exception is
+        /// generated due to an error while trying to parse an exception, the generated exception
+        /// (which will have the ELI code "ELI30603") will be returned as if it were one of the
+        /// exceptions that was read from the file. If <see langword="false"/>, the exception will
+        /// be thrown.</param>
+        /// <returns>A <see cref="ReadOnlyCollection{T}"/> of <see cref="ExtractException"/>s from the
+        /// file.</returns>
+        public static IEnumerable<ExtractException> LoadAllFromFile(string eliCode, string fileName,
+            bool includeErrorsInOutput)
         {
             string[] lines;
 
@@ -1424,7 +1446,26 @@ namespace Extract
 
             for (int i = 1; i <= lines.Length; i++)
             {
-                yield return LoadFromFile(eliCode, lines, i, fileName);
+                ExtractException ee;
+
+                try
+                {
+                    ee = LoadFromFile(eliCode, lines, i, fileName);
+                }
+                catch (Exception ex)
+                {
+                    if (includeErrorsInOutput)
+                    {
+                        ee = new ExtractException("ELI30603", "Error reading exception from file.", ex);
+                        ee.Log();
+                    }
+                    else
+                    {
+                        throw ExtractException.AsExtractException("ELI30604", ex);
+                    }
+                }
+
+                yield return ee;
             }
         }
 

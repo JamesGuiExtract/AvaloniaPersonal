@@ -8,8 +8,8 @@
     <ProjectGuid>{457DF429-E7EB-47EE-99FA-DD7ACC2A9ACF}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.UEXExtractor</RootNamespace>
-    <AssemblyName>UEXExtractor</AssemblyName>
+    <RootNamespace>Extract.ExtractDebugData</RootNamespace>
+    <AssemblyName>ExtractDebugData</AssemblyName>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
@@ -31,7 +31,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\..\..\..\..\binaries\debug\UEXExtractor.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\debug\ExtractDebugData.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -43,7 +43,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>..\..\..\..\..\..\binaries\release\UEXExtractor.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\..\binaries\release\ExtractDebugData.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
@@ -62,7 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UEXExtractorMain.cs" />
+    <Compile Include="ExtractDebugDataMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +73,10 @@
     <ProjectReference Include="..\..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
