@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
 	<CustomAction
-		Id="Extract.Ribbon.IdShieldTabExample"
+		Id="Extract.Ribbon.IdShieldTab"
 		Location="CommandUI.Ribbon.ListView"
 		RegistrationType="List"
 		RegistrationId="101"

@@ -14,6 +14,50 @@ namespace Extract.SharePoint.Redaction.Features
     public class ExtractEventReceiver : SPFeatureReceiver
     {
         /// <summary>
+        /// Raises the feature activated event.
+        /// </summary>
+        /// <param name="properties">The properties for the feature being activated.</param>
+        public override void FeatureActivated(SPFeatureReceiverProperties properties)
+        {
+            try
+            {
+                SPSite site = properties.Feature.Parent as SPSite;
+                if (site != null)
+                {
+                    IdShieldSettings.AddActiveFeatureSiteId(site.ID);
+                }
+            }
+            catch (Exception ex)
+            {
+                IdShieldHelper.LogException(ex, ErrorCategoryId.Feature, "ELI30591");
+            }
+
+            base.FeatureActivated(properties);
+        }
+
+        /// <summary>
+        /// Raises the feature deactivating event.
+        /// </summary>
+        /// <param name="properties">The properties for the feature being deactivated.</param>
+        public override void FeatureDeactivating(SPFeatureReceiverProperties properties)
+        {
+            try
+            {
+                SPSite site = properties.Feature.Parent as SPSite;
+                if (site != null)
+                {
+                    IdShieldSettings.RemoveActiveFeatureSiteId(site.ID);
+                }
+            }
+            catch (Exception ex)
+            {
+                IdShieldHelper.LogException(ex, ErrorCategoryId.Feature, "ELI30592");
+            }
+
+            base.FeatureDeactivating(properties);
+        }
+
+        /// <summary>
         /// Raises the feature uninstalling event.
         /// </summary>
         /// <param name="properties">The properties for the feature being uninstalled.</param>

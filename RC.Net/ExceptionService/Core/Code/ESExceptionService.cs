@@ -61,7 +61,7 @@ namespace Extract.ExceptionService
                 ResetHost();
 
                 // Request additional time for the application trace to log
-                this.RequestAdditionalTime(30000);
+                this.RequestAdditionalTime(60000);
 
                 LogException(new ApplicationException(
                     "Application Trace: Exception service started."), "ELI30558");
@@ -89,7 +89,7 @@ namespace Extract.ExceptionService
                 base.OnStop();
 
                 // Request additional time for the application trace to log
-                this.RequestAdditionalTime(30000);
+                this.RequestAdditionalTime(60000);
 
                 LogException(new ApplicationException(
                     "Application Trace: Exception service stopped."), "ELI30560");

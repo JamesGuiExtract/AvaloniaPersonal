@@ -7,24 +7,6 @@ namespace Extract.SharePoint.Redaction
     internal static class IdShieldHelper
     {
         /// <summary>
-        /// Gets the ID Shield feature from the specified SharePoint web.
-        /// </summary>
-        /// <param name="site">The site to search for the feature.</param>
-        /// <returns>The ID Shield feature (or <see langword="null"/> if it is
-        /// not installed.</returns>
-        internal static SPFeature GetIdShieldFeature(SPSite site)
-        {
-            try
-            {
-                return site.Features[IdShieldSettings._IDSHIELD_FEATURE_GUID];
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
         /// Handles logging the specified exception to the exception service
         /// and to the SharePoint log.
         /// </summary>

@@ -25,6 +25,15 @@
             return;
         }
 
+        System.Collections.Generic.List<char> invalidCharacters =
+            new System.Collections.Generic.List<char>();
+        invalidCharacters.AddRange(new char[] { '"', '#', '%', '&', '*', ':', '<', '>', '?',
+                '{', '|', '}', '~'});
+        if (!radioCustomOutput.Checked)
+        {
+            invalidCharacters.AddRange(new char[] { '\\', '/' });
+        }
+        
         string text = string.Empty;
         if (radioSubfolder.Checked)
         {
@@ -38,8 +47,17 @@
         {
             text = textParallel.Text;
         }
+        else if (radioCustomOutput.Checked)
+        {
+            text = textCustomOut.Text;
+        }
 
-        e.IsValid = !string.IsNullOrEmpty(text) && text.IndexOfAny(new char[] { '/', '\\' }) == -1;
+        // Check for invalid characters in the folder name
+        e.IsValid = !string.IsNullOrEmpty(text)
+            && !text.StartsWith(".", StringComparison.Ordinal)
+            && !text.EndsWith(".", StringComparison.Ordinal)
+            && text.IndexOfAny(invalidCharacters.ToArray()) == -1
+            && text.IndexOf("..", StringComparison.Ordinal) == -1;
     }
     
 </script>
@@ -55,7 +73,7 @@
 </asp:Content>
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     <asp:HiddenField ID="hiddenOutputLocation" runat="server" />
-    <asp:HiddenField ID="hiddenSiteLocation" runat="server" />
+    <asp:HiddenField ID="hiddenSiteId" runat="server" />
     <asp:Panel ID="panelCannotWatch" runat="server" Visible="false">
         <asp:Label ID="labelCannotWatch" runat="server" ForeColor="Black" />
     </asp:Panel>
@@ -194,7 +212,8 @@
             </tr>
             <tr>
                 <td>
-                    <asp:CustomValidator runat="server" ControlToValidate="textCurrentFolderName" ErrorMessage="Output setting must not be blank or contain either '/' or '\' (unless using custom location)"
+                    <asp:CustomValidator runat="server" ControlToValidate="textCurrentFolderName"
+                    ErrorMessage="Output location cannot be blank and cannot contain an invalid folder name"
                         OnServerValidate="CheckOutputOptions" />
                 </td>
             </tr>

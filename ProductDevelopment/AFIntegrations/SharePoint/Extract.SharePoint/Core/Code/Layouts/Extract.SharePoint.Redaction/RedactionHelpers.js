@@ -30,7 +30,7 @@ function showWatchFolderConfiguration()
     // Get the current context, web, site and folder
     this.context = new SP.ClientContext.get_current();
     this.site = context.get_site();
-    context.load(this.site);
+    context.load(this.site, "Id");
 
     // Execute the asynch query to get the data from SP
     context.executeQueryAsync(Function.createDelegate(this, this.OnShowWatchSuccess),
@@ -41,12 +41,12 @@ function showWatchFolderConfiguration()
 // Watch folder configuration page in a SP modal dialog box
 function OnShowWatchSuccess(sender, args)
 {
-    var siteRoot = this.site.get_serverRelativeUrl();
-    var folderUrl = getFolderFromUrl(location.href);
+    var siteId = this.site.get_id();
+    var folder = getFolderFromUrl(location.href);
     var options =
     {
         url: '/_layouts/Extract.SharePoint.Redaction/WatchFolderWithIdShield.aspx?'
-            + 'folder=' + folderUrl + '&siteroot=' + siteRoot,
+            + 'folder=' + folder + '&siteid=' + siteId,
         title: 'Watch Current Folder',
         allowMaximize: false,
         showClose: true
@@ -62,7 +62,7 @@ function unwatchFolder()
     // Get the current context, web, site and folder
     this.context = new SP.ClientContext.get_current();
     this.site = context.get_site();
-    context.load(this.site);
+    context.load(this.site, "Id");
 
     // Execute the asynch query to get the data from SP
     context.executeQueryAsync(Function.createDelegate(this, this.OnShowUnwatchSuccess),
@@ -73,13 +73,12 @@ function unwatchFolder()
 // Unwatch folder configuration page in a SP modal dialog box
 function OnShowUnwatchSuccess(sender, args)
 {
-    var siteRoot = this.site.get_serverRelativeUrl();
-    var folderUrl = getFolderFromUrl(location.href);
-
+    var siteId = this.site.get_id();
+    var folder = getFolderFromUrl(location.href);
     var options =
     {
         url: '/_layouts/Extract.SharePoint.Redaction/RemoveWatchFolderWithIdShield.aspx?'
-            + 'folder=' + folderUrl + '&siteroot=' + siteRoot,
+            + 'folder=' + folder + '&siteid=' + siteId,
         title: 'Unwatch Current Folder',
         allowMaximize: false,
         showClose: true
@@ -88,9 +87,8 @@ function OnShowUnwatchSuccess(sender, args)
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
-
 // Builds the server relative folder path for the folder url
-function getFolderFromUrl(url)
+function getFolderFromUrl(url, siteRoot)
 {
     // Look for ?RootFolder=
     var index = url.indexOf('?RootFolder=');

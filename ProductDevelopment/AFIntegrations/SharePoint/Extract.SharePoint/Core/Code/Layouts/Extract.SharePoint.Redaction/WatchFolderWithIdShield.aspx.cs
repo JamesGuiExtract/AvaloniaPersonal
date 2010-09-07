@@ -4,6 +4,12 @@ using Microsoft.SharePoint.WebControls;
 using System;
 using System.Collections.Generic;
 
+// Using statements to make dealing with folder settings more readable
+using SiteFolderSettingsCollection =
+System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>;
+using IdShieldFolderSettingsCollection =
+System.Collections.Generic.Dictionary<System.Guid, System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>>;
+
 namespace Extract.SharePoint.Redaction.Layouts
 {
     /// <summary>
@@ -25,9 +31,21 @@ namespace Extract.SharePoint.Redaction.Layouts
             }
             try
             {
-                string siteRoot = Request.QueryString["siteroot"];
-                hiddenSiteLocation.Value = siteRoot;
+                string siteId = Request.QueryString["siteid"];
+                hiddenSiteId.Value = siteId;
+                Guid siteGuid = new Guid(siteId);
                 string currentFolder = Request.QueryString["folder"];
+                using (SPSite site = new SPSite(siteGuid))
+                {
+                    string siteUrl = site.ServerRelativeUrl;
+                    int index = currentFolder.IndexOf(siteUrl, StringComparison.OrdinalIgnoreCase);
+                    if (index >= 0)
+                    {
+                        currentFolder = currentFolder.Substring(
+                            index + siteUrl.Length);
+                    }
+                }
+
                 textCurrentFolderName.Text = currentFolder;
 
                 IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
@@ -40,7 +58,7 @@ namespace Extract.SharePoint.Redaction.Layouts
 
                 SortedDictionary<string, FolderProcessingSettings> folderSettings =
                     FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings,
-                    siteRoot);
+                    siteGuid);
 
                 // Search the collection of all folders being watched
                 string rootKey = string.Empty;
@@ -214,19 +232,22 @@ namespace Extract.SharePoint.Redaction.Layouts
                     checkAdded.Checked, checkModified.Checked, location, locationString);
 
 
+                // Need to run with elevated privileges in order to update the
+                // ID Shield settings object
                 SPUtility.ValidateFormDigest();
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(true);
-                    Dictionary<string, SortedDictionary<string, FolderProcessingSettings>> siteSettings =
+                    IdShieldFolderSettingsCollection siteSettings =
                                 FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
-                    SortedDictionary<string, FolderProcessingSettings> folderSettings;
-                    if (!siteSettings.TryGetValue(hiddenSiteLocation.Value, out folderSettings))
+                    SiteFolderSettingsCollection folderSettings;
+                    Guid siteId = new Guid(hiddenSiteId.Value);
+                    if (!siteSettings.TryGetValue(siteId, out folderSettings))
                     {
-                        folderSettings = new SortedDictionary<string, FolderProcessingSettings>();
+                        folderSettings = new SiteFolderSettingsCollection();
                     }
                     folderSettings[textCurrentFolderName.Text] = currentFolderSettings;
-                    siteSettings[hiddenSiteLocation.Value] = folderSettings;
+                    siteSettings[siteId] = folderSettings;
 
                     settings.FolderSettings =
                         FolderProcessingSettings.SerializeFolderSettings(siteSettings);

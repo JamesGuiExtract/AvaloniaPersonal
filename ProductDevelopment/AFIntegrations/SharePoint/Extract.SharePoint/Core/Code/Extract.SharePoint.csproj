@@ -78,6 +78,7 @@
     </Compile>
     <Compile Include="FolderProcessingSettings.cs" />
     <Compile Include="IdShieldFileListener\IdShieldFileListener.cs" />
+    <Compile Include="IdShieldFolderSweeper.cs" />
     <Compile Include="IdShieldHelper.cs" />
     <Compile Include="IdShieldSettings.cs" />
     <Compile Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx.cs">
@@ -101,7 +102,6 @@
     <Compile Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx.designer.cs">
       <DependentUpon>WatchFolderWithIdShield.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="LockFileManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -151,7 +151,9 @@
     <Content Include="Images\IdShieldImages\UnwatchFolder16x16.png" />
     <Content Include="Images\IdShieldImages\UnwatchFolder32x32.png" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\RedactionHelpers.js" />
-    <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx" />
+    <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx" />
     <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx">
       <SubType>ASPXCodeBehind</SubType>

@@ -52,7 +52,12 @@ namespace Extract.SharePoint
         /// <summary>
         /// Error occurred in the remove folder watch configuration
         /// </summary>
-        IdShieldRemoveFolderWatch = 8
+        IdShieldRemoveFolderWatch = 8,
+
+        /// <summary>
+        /// Error occurred in the timer job folder sweeper
+        /// </summary>
+        IdShieldFolderSweeper = 9
     }
 
     /// <summary>
@@ -116,9 +121,12 @@ namespace Extract.SharePoint
         /// <param name="eliCode">The ELI code for this exception.</param>
         public static void LogError(ErrorCategoryId categoryId, Exception ex, string eliCode)
         {
+            string message = ex.Message;
+            TraceSeverity severity = message.Contains("Application Trace:") ?
+                TraceSeverity.None : TraceSeverity.Unexpected;
             SPDiagnosticsCategory category = ExtractSharePointLoggingService.Current[categoryId];
             ExtractSharePointLoggingService.Current.WriteTrace(42,
-                category, TraceSeverity.Unexpected, eliCode + ": " + ex.Message, ex.StackTrace);
+                category, severity, eliCode + ": " + message, ex.StackTrace);
         }
 
         #endregion Methods

@@ -21,13 +21,13 @@ function Load-Assembly([string]$assemblyName)
 {
 	if (!(Check-AssemblyLoaded $assemblyName))
 	{
-		# This method is supposedly depricated, but I don't know another way to load a generic
+		# This method is supposedly deprecated, but I don't know another way to load a generic
 		# assembly into the app domain without having its particular version number, etc
-		[Reflection.Assembly]::LoadWithPartialName($assemblyName)
+		[void][Reflection.Assembly]::LoadWithPartialName($assemblyName)
 	}
 }
 
-
+# Builds the absolute path to the specified file name
 function Get-AbsolutePathToFile([string]$fileName)
 {
 		if (![System.IO.Path]::IsPathRooted($fileName))
@@ -40,11 +40,13 @@ function Get-AbsolutePathToFile([string]$fileName)
 		$fileName
 }
 
-function Delete-TimerJob([string] $jobName)
+# Attempts to delete the specified timer job from all webapplications
+# in the SharePoint farm
+function Delete-TimerJob([string] $jobname)
 {
 	Get-SPWebApplication | ForEach-Object {
 		$_.JobDefinitions | ForEach-Object {
-			if ($_.Name -eq $jobName)
+			if ($_.Name -eq $jobname)
 			{
 				$_.Delete()
 			}
@@ -52,17 +54,29 @@ function Delete-TimerJob([string] $jobName)
 	}
 }
 
-function Create-NewTimerJob([string]$assemblyName, [string]$timerJobClass, [string]$jobName )
+# Attempts to add the specified timer job to all webapplications in the
+# SharePoint farm.
+# Note: This will create the job with a schedule that runs every minute
+# this could be extended in the future to take schedule information
+# so that the schedule can be customized for each job being created
+# ARGS:
+# assemblyName - The simple name for the assembly that contains the timer job
+#	This is vital since we must create an instance of the job to add it to the
+#	SP content database
+# timerJobClass - The full name for the class (including namespace) so that the
+#	proper timer class is created
+# jobname - The name to assign to the timer job
+function Create-NewTimerJob([string]$assemblyName, [string]$timerJobClass, [string]$jobname )
 {
 	Load-Assembly("Microsoft.SharePoint")
 	Load-Assembly($assemblyName)
 	
 	Stop-Service "SPTimerV4"
 	
-	Delete-TimerJob($jobName)
+	Delete-TimerJob $jobname
 	
 	Get-SPWebApplication | ForEach-Object {
-		$job = New-Object $timerJobClass -arg $jobName,$_
+		$job = New-Object $timerJobClass -arg $jobname,$_
 		$sched = New-Object Microsoft.SharePoint.SPMinuteSchedule
 		$sched.BeginSecond = 0
 		$sched.EndSecond = 59
@@ -100,11 +114,8 @@ function Uninstall-Solution([string]$name, [string[]]$features = @(), $timerJobs
 				$features |
 					ForEach-Object {
 					Write-Host "Deactivating feature $_..."
-					Get-SPSite | Get-SPWeb -Limit ALL |
-						ForEach-Object -Begin {$featurename=$_} {
-							If ((Get-SPFeature -Identity $featurename -Web $_ -ErrorAction SilentlyContinue) -ne $null) {
-								Disable-SPFeature -Identity (Get-SPFeature -Identity $featurename -Web $_ -ErrorAction SilentlyContinue).ID -URL $_.URL -Confirm:$false
-							}
+					Get-SPSite | ForEach-Object -Begin {$featurename=$_} {
+						Disable-SPFeature -Identity $featurename -Url $_.Url -ErrorAction SilentlyContinue -Confirm:$false
 						}
 					}
 				}

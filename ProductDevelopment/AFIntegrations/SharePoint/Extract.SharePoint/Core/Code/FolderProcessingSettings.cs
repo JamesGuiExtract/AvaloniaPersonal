@@ -5,6 +5,12 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
+// Using statements to make dealing with folder settings more readable
+using SiteFolderSettingsCollection =
+System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>;
+using IdShieldFolderSettingsCollection =
+System.Collections.Generic.Dictionary<System.Guid, System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>>;
+
 namespace Extract.SharePoint
 {
     /// <summary>
@@ -299,8 +305,7 @@ namespace Extract.SharePoint
         /// <param name="settings">The collection to serialize.</param>
         /// <returns>A string of hex digits representing a binary serialization of
         /// the collection passed in.</returns>
-        internal static string SerializeFolderSettings(
-            IDictionary<string,SortedDictionary<string, FolderProcessingSettings>> settings)
+        internal static string SerializeFolderSettings(IdShieldFolderSettingsCollection settings)
         {
             BinaryFormatter serializer = new BinaryFormatter();
             using (MemoryStream stream = new MemoryStream())
@@ -322,13 +327,13 @@ namespace Extract.SharePoint
         /// of a collection of <see cref="FolderProcessingSettings"/>.</param>
         /// <returns>The deserialized collection of <see cref="FolderProcessingSettings"/>.
         /// </returns>
-        internal static Dictionary<string, SortedDictionary<string, FolderProcessingSettings>>
+        internal static IdShieldFolderSettingsCollection
             DeserializeFolderSettings(string settings)
         {
             // If the string is empty just return an empty dictionary
             if (string.IsNullOrEmpty(settings))
             {
-                return new Dictionary<string, SortedDictionary<string,FolderProcessingSettings>>();
+                return new IdShieldFolderSettingsCollection();
             }
 
             int length = settings.Length;
@@ -341,8 +346,8 @@ namespace Extract.SharePoint
             using (MemoryStream stream = new MemoryStream(bytes))
             {
                 BinaryFormatter serializer = new BinaryFormatter();
-                Dictionary<string, SortedDictionary<string, FolderProcessingSettings>> folderSettings =
-                    (Dictionary<string, SortedDictionary<string, FolderProcessingSettings>>)serializer.Deserialize(stream);
+                IdShieldFolderSettingsCollection folderSettings =
+                    (IdShieldFolderSettingsCollection)serializer.Deserialize(stream);
 
                 return folderSettings;
             }
@@ -353,22 +358,20 @@ namespace Extract.SharePoint
         /// collection for the specified site.
         /// </summary>
         /// <param name="settings">The settings string to deserialize.</param>
-        /// <param name="site">The server relative site path used to restrict which
-        /// folder settings are returned.</param>
+        /// <param name="siteId">The site ID to get settings for..</param>
         /// <returns>The folder settings collection for the specified server relative site
         /// location.</returns>
-        internal static SortedDictionary<string, FolderProcessingSettings>
-            DeserializeFolderSettings(string settings, string site)
+        internal static SiteFolderSettingsCollection
+            DeserializeFolderSettings(string settings, Guid siteId)
         {
-            Dictionary<string, SortedDictionary<string, FolderProcessingSettings>> value =
-                DeserializeFolderSettings(settings);
-            SortedDictionary<string, FolderProcessingSettings> result;
-            if (value.TryGetValue(site, out result))
+            IdShieldFolderSettingsCollection value = DeserializeFolderSettings(settings);
+            SiteFolderSettingsCollection result;
+            if (value.TryGetValue(siteId, out result))
             {
                 return result;
             }
 
-            return new SortedDictionary<string, FolderProcessingSettings>();
+            return new SiteFolderSettingsCollection();
         }
 
         #endregion Methods

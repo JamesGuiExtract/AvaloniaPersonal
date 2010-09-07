@@ -5,6 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+// Using statements to make dealing with folder settings more readable
+using SiteFolderSettingsCollection =
+System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>;
+using IdShieldFolderSettingsCollection =
+System.Collections.Generic.Dictionary<System.Guid, System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>>;
+
 namespace Extract.SharePoint.Redaction.Layouts
 {
     /// <summary>
@@ -26,9 +32,9 @@ namespace Extract.SharePoint.Redaction.Layouts
                     return;
                 }
 
-                string siteRoot = Request.Params["siteroot"];
+                string siteId = Request.Params["siteid"];
                 string currentFolder = Request.Params["folder"];
-                hiddenSiteLocation.Value = siteRoot;
+                hiddenSiteId.Value = siteId;
 
                 // If no current folder just return
                 if (string.IsNullOrEmpty(currentFolder))
@@ -44,9 +50,9 @@ namespace Extract.SharePoint.Redaction.Layouts
                     return;
                 }
 
-                SortedDictionary<string, FolderProcessingSettings> folderSettings =
+                SiteFolderSettingsCollection folderSettings =
                     FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings,
-                    siteRoot);
+                    new Guid(siteId));
                 if (!folderSettings.ContainsKey(currentFolder))
                 {
                     SetUIToIndicateNoFolderWatching();
@@ -90,10 +96,11 @@ namespace Extract.SharePoint.Redaction.Layouts
                     IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
                     if (settings != null)
                     {
-                        Dictionary<string, SortedDictionary<string, FolderProcessingSettings>> siteSettings
+                        IdShieldFolderSettingsCollection siteSettings
                             = FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
-                        SortedDictionary<string, FolderProcessingSettings> folderSettings;
-                        if (siteSettings.TryGetValue(hiddenSiteLocation.Value, out folderSettings))
+                        SiteFolderSettingsCollection folderSettings;
+                        Guid siteId = new Guid(hiddenSiteId.Value);
+                        if (siteSettings.TryGetValue(siteId, out folderSettings))
                         {
                             watchRemoved = folderSettings.Remove(textFolder.Text);
                             settings.FolderSettings =
