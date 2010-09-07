@@ -58,10 +58,10 @@ namespace Extract.ExceptionService
                 // Ensure the end service event is reset
                 _endService.Reset();
 
-                ResetHost();
-
                 // Request additional time for the application trace to log
                 this.RequestAdditionalTime(60000);
+
+                ResetHost();
 
                 LogException(new ApplicationException(
                     "Application Trace: Exception service started."), "ELI30558");
@@ -84,15 +84,16 @@ namespace Extract.ExceptionService
             {
                 _endService.Set();
 
-                CloseHost();
-
-                base.OnStop();
 
                 // Request additional time for the application trace to log
                 this.RequestAdditionalTime(60000);
 
+                CloseHost();
+
                 LogException(new ApplicationException(
                     "Application Trace: Exception service stopped."), "ELI30560");
+
+                base.OnStop();
             }
             catch (Exception ex)
             {
