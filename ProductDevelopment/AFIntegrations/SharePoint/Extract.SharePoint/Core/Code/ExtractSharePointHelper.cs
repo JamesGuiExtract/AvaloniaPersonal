@@ -2,6 +2,7 @@
 using System;
 using System.ServiceModel;
 using System.Text;
+using Microsoft.SharePoint;
 
 namespace Extract.SharePoint
 {
@@ -54,6 +55,38 @@ namespace Extract.SharePoint
                 ExtractSharePointLoggingService.LogError(ErrorCategoryId.ExceptionLogger, ex2,
                     "ELI30548");
             }
+        }
+
+        /// <summary>
+        /// Gets the site relative path for the specified folder and the site Id
+        /// </summary>
+        /// <param name="folderUrl">The server relative url for the folder.</param>
+        /// <param name="siteId">The id for the site to compute the relative folder for.</param>
+        /// <returns>The site relative path to the specified folder.</returns>
+        internal static string GetSiteRelativeFolderPath(string folderUrl, Guid siteId)
+        {
+            string folder = string.Empty;
+            using (SPSite site = new SPSite(siteId))
+            {
+                string siteUrl = site.ServerRelativeUrl;
+                int index = folderUrl.IndexOf(siteUrl, StringComparison.OrdinalIgnoreCase);
+                if (index >= 0)
+                {
+                    folder = folderUrl.Substring(index + siteUrl.Length);
+                }
+                else
+                {
+                    folder = folderUrl;
+                }
+            }
+
+            // Ensure the folder starts with a '/'
+            if (!folder.StartsWith("/", StringComparison.Ordinal))
+            {
+                folder = "/" + folder;
+            }
+
+            return folder;
         }
 
         #endregion Methods

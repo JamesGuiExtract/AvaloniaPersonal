@@ -40,6 +40,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                 if (string.IsNullOrEmpty(currentFolder))
                 {
                     SetUIToIndicateNoFolderWatching();
+                    return;
                 }
 
                 textFolder.Text = currentFolder;
@@ -50,9 +51,14 @@ namespace Extract.SharePoint.Redaction.Layouts
                     return;
                 }
 
+                Guid siteGuid = new Guid(siteId);
+                currentFolder = ExtractSharePointHelper.GetSiteRelativeFolderPath(currentFolder,
+                    siteGuid);
+
                 SiteFolderSettingsCollection folderSettings =
                     FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings,
-                    new Guid(siteId));
+                    siteGuid);
+                    
                 if (!folderSettings.ContainsKey(currentFolder))
                 {
                     SetUIToIndicateNoFolderWatching();

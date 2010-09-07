@@ -34,17 +34,8 @@ namespace Extract.SharePoint.Redaction.Layouts
                 string siteId = Request.QueryString["siteid"];
                 hiddenSiteId.Value = siteId;
                 Guid siteGuid = new Guid(siteId);
-                string currentFolder = Request.QueryString["folder"];
-                using (SPSite site = new SPSite(siteGuid))
-                {
-                    string siteUrl = site.ServerRelativeUrl;
-                    int index = currentFolder.IndexOf(siteUrl, StringComparison.OrdinalIgnoreCase);
-                    if (index >= 0)
-                    {
-                        currentFolder = currentFolder.Substring(
-                            index + siteUrl.Length);
-                    }
-                }
+                string currentFolder = ExtractSharePointHelper.GetSiteRelativeFolderPath(
+                    Request.QueryString["folder"], siteGuid);
 
                 textCurrentFolderName.Text = currentFolder;
 
