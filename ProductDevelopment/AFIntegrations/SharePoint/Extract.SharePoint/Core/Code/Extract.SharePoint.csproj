@@ -55,6 +55,9 @@
     <Reference Include="Microsoft.SharePoint">
       <HintPath>..\..\..\..\..\..\RC.Net\APIs\SharePoint\2010\bin\Microsoft.SharePoint.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.SharePoint.ApplicationPages.Administration">
+      <HintPath>..\..\..\..\..\..\RC.Net\APIs\SharePoint\2010\bin\Microsoft.SharePoint.ApplicationPages.Administration.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.SharePoint.Security">
       <HintPath>..\..\..\..\..\..\RC.Net\APIs\SharePoint\2010\bin\Microsoft.SharePoint.Security.dll</HintPath>
     </Reference>
@@ -88,11 +91,11 @@
     <Compile Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx.designer.cs">
       <DependentUpon>RemoveWatchFolderWithIdShield.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx.cs">
+    <Compile Include="ADMIN\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx.cs">
       <DependentUpon>ConfigureIdShieldSettings.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx.designer.cs">
+    <Compile Include="ADMIN\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx.designer.cs">
       <DependentUpon>ConfigureIdShieldSettings.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx.cs">
@@ -105,8 +108,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ADMIN\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{a693273c-ffa1-440c-83f4-caf5c4e769f1}</SharePointProjectItemId>
+    </None>
     <None Include="Features\Extract.SharePoint.Redaction\Extract.SharePoint.Redaction.feature">
       <FeatureId>{4081877d-4627-4254-8cb6-353e1179c198}</FeatureId>
+    </None>
+    <None Include="Features\Extract.SharePoint.Redaction.Administration\Extract.SharePoint.Redaction.Administration.feature">
+      <FeatureId>{57ec95a1-d579-46b7-8c72-70dc64798174}</FeatureId>
+    </None>
+    <None Include="IdShieldAdminConfiguration\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{6a665b71-9eea-4665-bf27-47b82193c609}</SharePointProjectItemId>
     </None>
     <None Include="IdShieldFileListener\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{5ff7d3da-10f2-4d8e-af18-7e61752ca733}</SharePointProjectItemId>
@@ -134,6 +146,12 @@
     <Content Include="Features\Extract.SharePoint.Redaction\Extract.SharePoint.Redaction.Template.xml">
       <DependentUpon>Extract.SharePoint.Redaction.feature</DependentUpon>
     </Content>
+    <Content Include="Features\Extract.SharePoint.Redaction.Administration\Extract.SharePoint.Redaction.Administration.Template.xml">
+      <DependentUpon>Extract.SharePoint.Redaction.Administration.feature</DependentUpon>
+    </Content>
+    <Content Include="IdShieldAdminConfiguration\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="IdShieldFileListener\Elements.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -154,7 +172,9 @@
     <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx" />
+    <Content Include="ADMIN\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
