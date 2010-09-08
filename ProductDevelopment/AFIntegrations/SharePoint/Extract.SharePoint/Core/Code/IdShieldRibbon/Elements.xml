@@ -24,7 +24,7 @@
 							/>
 							<MaxSize Id="Extract.Ribbon.IdShieldTab.IdShieldSettingsGroup.MaxSize"
 									 GroupId="Extract.Ribbon.IdShieldTab.Groups.IdShieldSettingsGroup"
-									 Size="ThreeLarge"
+									 Size="TwoLarge"
 							/>
 							<Scale Id="Extract.Ribbon.IdShieldTab.IdShieldOfficeGroup.Scaling.IdShieldTabScaling"
 								   GroupId="Extract.Ribbon.IdShieldTab.Groups.IdShieldOfficeGroup"
@@ -32,7 +32,7 @@
 							/>
 							<Scale Id="Extract.Ribbon.IdShieldTab.IdShieldSettingsGroup.Scaling.IdShieldTabScaling"
 								   GroupId="Extract.Ribbon.IdShieldTab.Groups.IdShieldSettingsGroup"
-								   Size="ThreeLarge"
+								   Size="TwoLarge"
 							/>
 						</Scaling>
 						<Groups
@@ -52,11 +52,11 @@
 										Id="Extract.Ribbon.IdShieldTab.Groups.IdShieldOfficeGroup.IdShieldOfficeButton"
 										Command="Extract.Command.LaunchIdShieldOffice"
 										Sequence="11"
-										Image16by16="/_layouts/images/IdShieldImages/IDSO16x16.gif"
+										Image16by16="/_layouts/images/IdShieldImages/idsbutton16x16.gif"
 										Image32by32="/_layouts/images/IdShieldImages/IDSO32x32.gif"
 										Description="Launches ID Shield Office to redact the current document."
 										LabelText="Redact now"
-										TemplateAlias="idso1"
+										TemplateAlias="idsbutton1"
 									/>
 									<Button
 										Id="Extract.Ribbon.IdShieldTab.Group.IdShieldOfficeGroup.IdShieldProcessSelectedButton"
@@ -66,7 +66,7 @@
 										Image32by32="/_layouts/images/IdShieldImages/ProcessSelected32x32.png"
 										Description="Processes the selected files."
 										LabelText="Process selected"
-										TemplateAlias="idso2"
+										TemplateAlias="idsbutton2"
 									/>
 								</Controls>
 							</Group>
@@ -75,7 +75,7 @@
 								Description="Configures ID Shield"
 								Title="Configure ID Shield"
 								Sequence="49"
-								Template="Ribbon.Templates.ThreeLargeExample"
+								Template="Ribbon.Templates.TwoLargeExample"
 							>
 								<Controls
 									Id="Extract.Ribbon.IdShieldTab.Groups.IdShieldSettingsGroup.Controls"
@@ -88,7 +88,7 @@
 										Image32by32="/_layouts/images/IdShieldImages/WatchFolder32x32.png"
 										Description="Launches the ID Shield configuration dialog for the current folder."
 										LabelText="Watch folder"
-										TemplateAlias="idsConfig1"
+										TemplateAlias="idsbutton1"
 									/>
 									<Button
 										Id="Extract.Ribbon.IdShieldTab.Groups.IdShieldSettingsGroup.UnprocessWithIdShieldButton"
@@ -98,17 +98,7 @@
 										Image32by32="/_layouts/images/IdShieldImages/UnwatchFolder32x32.png"
 										Description="Removes the configuration to watch this folder with ID Shield."
 										LabelText="Unwatch folder"
-										TemplateAlias="idsUnconfig1"
-									/>
-									<Button
-										Id="Extract.Ribbon.IdShieldTab.Groups.IdShieldSettingsGroup.IdShieldSettingsButton"
-										Command="Extract.Command.ConfigureIdShieldSettings"
-										Sequence="17"
-										Image16by16="/_layouts/images/IdShieldImages/IdShieldConfiguration16x16.png"
-										Image32by32="/_layouts/images/IdShieldImages/IdShieldConfiguration32x32.png"
-										Description="Launches the ID Shield configuration for the overall ID Shield process."
-										LabelText="Settings"
-										TemplateAlias="idsConfig2"
+										TemplateAlias="idsbutton2"
 									/>
 								</Controls>
 							</Group>
@@ -130,31 +120,8 @@
 								Type="OneRow"
 							>
 								<Row>
-									<ControlRef DisplayMode="Large" TemplateAlias="idso1" />
-									<ControlRef DisplayMode="Large" TemplateAlias="idso2" />
-								</Row>
-							</Section>
-						</Layout>
-					</GroupTemplate>
-				</CommandUIDefinition>
-				<CommandUIDefinition
-					Location="Ribbon.Templates._children"
-				>
-					<GroupTemplate
-						Id="Ribbon.Templates.ThreeLargeExample"
-					>
-						<Layout
-							Title="ThreeLarge"
-							LayoutTitle="ThreeLarge"
-						>
-							<Section
-								Alignment="Top"
-								Type="OneRow"
-							>
-								<Row>
-									<ControlRef DisplayMode="Large" TemplateAlias="idsConfig1" />
-									<ControlRef DisplayMode="Large" TemplateAlias="idsUnconfig1" />
-									<ControlRef DisplayMode="Large" TemplateAlias="idsConfig2" />
+									<ControlRef DisplayMode="Large" TemplateAlias="idsbutton1" />
+									<ControlRef DisplayMode="Large" TemplateAlias="idsbutton2" />
 								</Row>
 							</Section>
 						</Layout>
@@ -180,11 +147,6 @@
 				<CommandUIHandler
 					Command="Extract.Command.UnconfigureFolderToProcess"
 					CommandAction="javascript: unwatchFolder();"
-					EnabledScript="javascript: noSelectionEnabled();"
-				/>
-				<CommandUIHandler
-					Command="Extract.Command.ConfigureIdShieldSettings"
-					CommandAction="javascript: showConfigureIdShield();"
 					EnabledScript="javascript: noSelectionEnabled();"
 				/>
 			</CommandUIHandlers>
