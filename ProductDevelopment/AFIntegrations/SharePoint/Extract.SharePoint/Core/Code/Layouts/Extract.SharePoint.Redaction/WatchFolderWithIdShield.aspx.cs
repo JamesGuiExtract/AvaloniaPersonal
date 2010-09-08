@@ -66,7 +66,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                         watchingCurrentFolder = true;
                         temp = pair.Value;
                     }
-                    else if (currentFolder.StartsWith(key, StringComparison.Ordinal))
+                    else if (currentFolder.StartsWith(key + "/", StringComparison.Ordinal))
                     {
                         if (pair.Value.RecurseSubfolders)
                         {

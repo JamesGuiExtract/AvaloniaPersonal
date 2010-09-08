@@ -214,7 +214,7 @@ namespace Extract.SharePoint.Redaction
         static bool IsFolderBeingWatched(string folder, string watchPath, bool recurseSubFolders)
         {
             return folder.Equals(watchPath, StringComparison.Ordinal)
-                || (recurseSubFolders && folder.StartsWith(watchPath, StringComparison.Ordinal));
+                || (recurseSubFolders && folder.StartsWith(watchPath + "/", StringComparison.Ordinal));
         }
 
         /// <summary>

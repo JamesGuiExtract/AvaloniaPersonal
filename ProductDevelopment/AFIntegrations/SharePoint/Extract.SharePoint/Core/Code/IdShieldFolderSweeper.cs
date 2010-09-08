@@ -454,7 +454,7 @@ namespace Extract.SharePoint.Redaction
             {
                 FolderProcessingSettings settings = pair.Value;
                 if (folder.Equals(pair.Key, StringComparison.Ordinal)
-                    || (folder.StartsWith(pair.Key, StringComparison.Ordinal)
+                    || (folder.StartsWith(pair.Key + "/", StringComparison.Ordinal)
                     && settings.RecurseSubfolders))
                 {
                     // Compute the destination setting
