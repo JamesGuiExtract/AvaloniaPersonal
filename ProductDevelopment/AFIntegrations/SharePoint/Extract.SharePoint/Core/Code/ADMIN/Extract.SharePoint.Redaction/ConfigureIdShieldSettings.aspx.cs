@@ -67,9 +67,6 @@ namespace Extract.SharePoint.Redaction.Layouts
                 settings.LocalWorkingFolder = folder;
                 settings.ExceptionServiceIPAddress = textExceptionIpAddress.Text.Trim();
                 settings.Update();
-
-                // Redirect back to the application management page
-                SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Default, this.Context);
             }
             catch (Exception ex)
             {
@@ -77,6 +74,11 @@ namespace Extract.SharePoint.Redaction.Layouts
                     "ELI30553");
                 throw;
             }
+
+            // Redirect back to the application management page
+            // This method raises a thread aborted exception (by design) and so should not
+            // be wrapped in a try catch
+            SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Default, this.Context);
         }
 
         /// <summary>
@@ -86,16 +88,10 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// <param name="e">The data associated with the event.</param>
         protected void HandleCancelButtonClick(object sender, EventArgs e)
         {
-            try
-            {
-                SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Default, this.Context);
-            }
-            catch (Exception ex)
-            {
-                IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldSettingsConfiguration,
-                    "ELI30605");
-                throw;
-            }
+            // Redirect back to the application management page
+            // This method raises a thread aborted exception (by design) and so should not
+            // be wrapped in a try catch
+            SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Default, this.Context);
         }
     }
 }
