@@ -144,15 +144,16 @@ namespace Extract.SharePoint.Redaction
                 return;
             }
 
+            // Handle failed files first [FIDSI #194]
             string[] fileNames = Directory.GetFiles(path,
-                "*.processed", SearchOption.AllDirectories);
-
-            HandleProcessedFiles(fileNames, path, site);
-
-            fileNames = Directory.GetFiles(path,
                 "*.failed", SearchOption.AllDirectories);
 
             HandleFailedFiles(fileNames, path, site.ServerRelativeUrl);
+
+            fileNames = Directory.GetFiles(path,
+                "*.processed", SearchOption.AllDirectories);
+
+            HandleProcessedFiles(fileNames, path, site);
         }
 
         /// <summary>

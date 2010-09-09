@@ -43,6 +43,10 @@ namespace Extract.SharePoint.Redaction.Layouts
                     return;
                 }
 
+                Guid siteGuid = new Guid(siteId);
+                currentFolder = ExtractSharePointHelper.GetSiteRelativeFolderPath(currentFolder,
+                    siteGuid);
+
                 textFolder.Text = currentFolder;
                 IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
                 if (settings == null)
@@ -50,10 +54,6 @@ namespace Extract.SharePoint.Redaction.Layouts
                     SetUIToIndicateNoFolderWatching();
                     return;
                 }
-
-                Guid siteGuid = new Guid(siteId);
-                currentFolder = ExtractSharePointHelper.GetSiteRelativeFolderPath(currentFolder,
-                    siteGuid);
 
                 SiteFolderSettingsCollection folderSettings =
                     FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings,
