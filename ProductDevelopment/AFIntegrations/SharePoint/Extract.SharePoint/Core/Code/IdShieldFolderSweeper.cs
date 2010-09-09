@@ -245,9 +245,18 @@ namespace Extract.SharePoint.Redaction
 
                             // Ensure the redacted file exists and the destination
                             // file name is not null or empty
-                            if (File.Exists(redactedFile)
-                                && !string.IsNullOrEmpty(destinationFileName))
+                            if (File.Exists(redactedFile))
                             {
+                                if (string.IsNullOrEmpty(destinationFileName))
+                                {
+                                    SPException ee2 = new SPException(
+                                        "Redacted file was found, but could not compute a "
+                                    + "destination folder in SharePoint.");
+                                    ee2.Data.Add("Processed File Name", Path.Combine(
+                                        directory, fileWithoutExtension));
+                                    throw ee2;
+                                }
+
                                 string destFolder = destinationFileName.Substring(0,
                                     destinationFileName.LastIndexOf("/", StringComparison.Ordinal));
 

@@ -115,85 +115,106 @@ namespace Extract.SharePoint.Redaction
         void HandleSharePointFileEvent(SPItemEventProperties properties,
             FileEventType eventType)
         {
-            // Get the item and check that it is a file item
-            SPListItem item = properties.ListItem;
-            if (item.FileSystemObjectType != SPFileSystemObjectType.File
-                || item.File == null)
+            SPSite site = null;
+            try
             {
-                return;
-            }
-
-            // Update the settings
-            SPSite site = item.Web.Site;
-            UpdateSettings(site.ID);
-
-            // Build full url for file being exported
-            string fullFileUrl = site.Url + "/" + item.File.Url;
-
-            // Check if this file should be ignored
-            if (IgnoreFile(site, fullFileUrl))
-            {
-                return;
-            }
-
-            // Check for an output folder (if none is configured then do nothing)
-            if (!string.IsNullOrEmpty(_outputFolder))
-            {
-                // Get the folder name for the item
-                string folder = item.File.Url;
-                folder = (folder[0] != '/' ?
-                    folder.Insert(0, "/") : folder).Replace("/" + item.File.Name, "");
-
-                // Attempt to get the settings for the folder
-                foreach (KeyValuePair<string, FolderProcessingSettings> pair in _folderSettings)
+                // Get the item and check that it is a file item
+                SPListItem item = properties.ListItem;
+                if (item.FileSystemObjectType != SPFileSystemObjectType.File
+                    || item.File == null)
                 {
-                    // Export the file if:
-                    // 1. This is a modified event and the file id is contained in the
-                    //      zero byte file list
-                    // OR
-                    // 1. The folder is being watched for the specified event
-                    // 2. This folder is being watched
-                    // 3. The file matches the watch pattern
-                    if  ((eventType == FileEventType.FileModified
-                            && _zeroByteFiles.Contains(item.File.UniqueId))
-                        || ((pair.Value.EventTypes & eventType) != 0
-                            && IsFolderBeingWatched(folder, pair.Key, pair.Value.RecurseSubfolders)
-                            && pair.Value.DoesFileMatchPattern(item.File.Name)
-                        ))
+                    return;
+                }
+
+                // Update the settings
+                site = item.Web.Site;
+                UpdateSettings(site.ID);
+
+                // Build full url for file being exported
+                string fullFileUrl = site.Url + "/" + item.File.Url;
+
+                // Check if this file should be ignored
+                if (IgnoreFile(site, fullFileUrl))
+                {
+                    return;
+                }
+
+                // Check for an output folder (if none is configured then do nothing)
+                if (!string.IsNullOrEmpty(_outputFolder))
+                {
+                    // Get the folder name for the item
+                    string folder = item.File.Url;
+                    folder = (folder[0] != '/' ?
+                        folder.Insert(0, "/") : folder).Replace("/" + item.File.Name, "");
+
+                    // Attempt to get the settings for the folder
+                    foreach (KeyValuePair<string, FolderProcessingSettings> pair in _folderSettings)
                     {
-                        byte[] bytes = item.File.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
-                        if (bytes.Length == 0 && eventType == FileEventType.FileAdded)
+                        // Export the file if:
+                        // 1. This is a modified event and the file id is contained in the
+                        //      zero byte file list
+                        // OR
+                        // 1. The folder is being watched for the specified event
+                        // 2. This folder is being watched
+                        // 3. The file matches the watch pattern
+                        if ((eventType == FileEventType.FileModified
+                                && _zeroByteFiles.Contains(item.File.UniqueId))
+                            || ((pair.Value.EventTypes & eventType) != 0
+                                && IsFolderBeingWatched(folder, pair.Key, pair.Value.RecurseSubfolders)
+                                && pair.Value.DoesFileMatchPattern(item.File.Name)
+                            ))
                         {
-                            // Add this file ID to a list of pending ID's to be
-                            // handled in the update method
-                            IdShieldSettings.AddZeroByteFileId(item.File.UniqueId);
-                        }
-                        else if (bytes.Length > 0)
-                        {
-                            // get the folder name without the leading '/' and
-                            // convert all other '/' to '\'
-                            folder = folder.Substring(1).Replace('/', '\\');
-                            string outputFolder = Path.Combine(_outputFolder, folder);
-                            if (!Directory.Exists(outputFolder))
+                            byte[] bytes = item.File.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
+                            if (bytes.Length == 0 && eventType == FileEventType.FileAdded)
                             {
-                                Directory.CreateDirectory(outputFolder);
+                                // Add this file ID to a list of pending ID's to be
+                                // handled in the update method
+                                IdShieldSettings.AddZeroByteFileId(item.File.UniqueId);
+                            }
+                            else if (bytes.Length > 0)
+                            {
+                                // get the folder name without the leading '/' and
+                                // convert all other '/' to '\'
+                                folder = folder.Substring(1).Replace('/', '\\');
+                                string outputFolder = Path.Combine(_outputFolder, folder);
+                                if (!Directory.Exists(outputFolder))
+                                {
+                                    Directory.CreateDirectory(outputFolder);
+                                }
+
+                                // Write the file to the processing folder
+                                string fileName = Path.Combine(outputFolder, item.File.Name);
+                                File.WriteAllBytes(fileName, bytes);
+
+                                if (_zeroByteFiles.Contains(item.File.UniqueId))
+                                {
+                                    IdShieldSettings.RemoveZeroByteFileId(item.File.UniqueId);
+                                }
                             }
 
-                            // Write the file to the processing folder
-                            string fileName = Path.Combine(outputFolder, item.File.Name);
-                            File.WriteAllBytes(fileName, bytes);
-
-                            if (_zeroByteFiles.Contains(item.File.UniqueId))
-                            {
-                                IdShieldSettings.RemoveZeroByteFileId(item.File.UniqueId);
-                            }
+                            // File was exported OR placed in the zero byte list,
+                            // break from foreach loop
+                            break;
                         }
-
-                        // File was exported OR placed in the zero byte list,
-                        // break from foreach loop
-                        break;
+                    } // End foreach loop
+                }
+            }
+            catch (Exception ex)
+            {
+                if (site != null)
+                {
+                    try
+                    {
+                        // Attempt to add additional site debug data [FIDSI #189]
+                        ex.Data["Current Site Url"] = site.ServerRelativeUrl;
+                        ex.Data["Current Site Id"] = site.ID.ToString();
                     }
-                } // End foreach loop
+                    catch
+                    {
+                    }
+                }
+
+                throw;
             }
         }
 
