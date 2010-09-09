@@ -50,12 +50,6 @@ namespace Extract.SharePoint.Redaction
         List<Guid> _addedZeroByteFiles;
 
         /// <summary>
-        /// Colection of file Ids for files added by the folder sweeper.
-        /// </summary>
-        [Persisted]
-        List<string> _filesToIgnore;
-
-        /// <summary>
         /// Collection of site ids that currently have the ID Shield feature activated.
         /// </summary>
         [Persisted]
@@ -159,42 +153,6 @@ namespace Extract.SharePoint.Redaction
         }
 
         /// <summary>
-        /// Adds the collection of file urls to the collection of files to ignore.
-        /// </summary>
-        /// <param name="fileUrls">The collection of file urls to add.</param>
-        internal static void AddFilesToIgnore(IEnumerable<string> fileUrls)
-        {
-            IdShieldSettings settings = GetIdShieldSettings(true);
-            settings.InternalAddFilesToIgnore(fileUrls);
-            settings.Update();
-        }
-
-        /// <summary>
-        /// Adds the file url to the list of files to ignore the add event for.
-        /// </summary>
-        /// <param name="fileUrl">The file url for the file to add to the list.</param>
-        internal static void AddFileToIgnore(string fileUrl)
-        {
-            IdShieldSettings settings = GetIdShieldSettings(true);
-            settings.InternalAddFileToIgnore(fileUrl);
-            settings.Update();
-        }
-
-        /// <summary>
-        /// Removes the file url from the list of file to ignore the add event for.
-        /// </summary>
-        /// <param name="fileUrl">The file url for the file to remove from the list.</param>
-        internal static void RemoveFileToIgnore(string fileUrl)
-        {
-            IdShieldSettings settings = GetIdShieldSettings(false);
-            if (settings != null)
-            {
-                settings.InternalRemoveFileToIgnore(fileUrl);
-                settings.Update();
-            }
-        }
-
-        /// <summary>
         /// Adds the specified unique file id to the collection of zero byte file ids.
         /// </summary>
         /// <param name="fileId">The file id to add.</param>
@@ -226,54 +184,6 @@ namespace Extract.SharePoint.Redaction
                 if (index >= 0)
                 {
                     _addedZeroByteFiles.RemoveAt(index);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds the collection of file urls to the collection of files to ignore.
-        /// </summary>
-        /// <param name="fileUrls">The collection of file urls to add.</param>
-        void InternalAddFilesToIgnore(IEnumerable<string> fileUrls)
-        {
-            foreach (string fileUrl in fileUrls)
-            {
-                InternalAddFileToIgnore(fileUrl);
-            }
-        }
-
-        /// <summary>
-        /// Adds the specified file url to the collection of files to ignore.
-        /// </summary>
-        /// <param name="fileUrl">The file url to add.</param>
-        void InternalAddFileToIgnore(string fileUrl)
-        {
-            if (_filesToIgnore == null)
-            {
-               _filesToIgnore = new List<string>();
-            }
-
-            // Search for the item id
-            int index =_filesToIgnore.BinarySearch(fileUrl, StringComparer.Ordinal);
-            if (index < 0)
-            {
-                // The item was not found, insert it in the proper sorted location
-               _filesToIgnore.Insert(~index, fileUrl);
-            }
-        }
-
-        /// <summary>
-        /// Removes the specified file url from the collection of files to ignore.
-        /// </summary>
-        /// <param name="fileUrl">The file url to remove.</param>
-        void InternalRemoveFileToIgnore(string fileUrl)
-        {
-            if (_filesToIgnore != null)
-            {
-                int index = _filesToIgnore.BinarySearch(fileUrl, StringComparer.Ordinal);
-                if (index >= 0)
-                {
-                    _filesToIgnore.RemoveAt(index);
                 }
             }
         }
@@ -400,21 +310,6 @@ namespace Extract.SharePoint.Redaction
                     _addedZeroByteFiles = new List<Guid>();
                 }
                 return _addedZeroByteFiles.AsReadOnly();
-            }
-        }
-
-        /// <summary>
-        /// Gets the sorted list of files to ignore in the event receiver.
-        /// </summary>
-        public ReadOnlyCollection<string> FilesToIgnore
-        {
-            get
-            {
-                if (_filesToIgnore == null)
-                {
-                    _filesToIgnore = new List<string>();
-                }
-                return _filesToIgnore.AsReadOnly();
             }
         }
 

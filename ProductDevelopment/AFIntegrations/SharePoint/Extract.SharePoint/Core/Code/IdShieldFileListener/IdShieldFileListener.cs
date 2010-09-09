@@ -43,11 +43,6 @@ namespace Extract.SharePoint.Redaction
         HashSet<Guid> _zeroByteFiles = new HashSet<Guid>();
 
         /// <summary>
-        /// Collection of files to ignore in the event listener
-        /// </summary>
-        HashSet<string> _ignoreFiles = new HashSet<string>();
-
-        /// <summary>
         /// Mutex used to serialize access to the UpdateSettings calls.
         /// </summary>
         object _lock = new object();
@@ -122,7 +117,8 @@ namespace Extract.SharePoint.Redaction
         {
             // Get the item and check that it is a file item
             SPListItem item = properties.ListItem;
-            if (item.FileSystemObjectType != SPFileSystemObjectType.File)
+            if (item.FileSystemObjectType != SPFileSystemObjectType.File
+                || item.File == null)
             {
                 return;
             }
@@ -135,9 +131,8 @@ namespace Extract.SharePoint.Redaction
             string fullFileUrl = site.Url + "/" + item.File.Url;
 
             // Check if this file should be ignored
-            if (_ignoreFiles.Contains(fullFileUrl))
+            if (IgnoreFile(site, fullFileUrl))
             {
-                IdShieldSettings.RemoveFileToIgnore(fullFileUrl);
                 return;
             }
 
@@ -203,6 +198,44 @@ namespace Extract.SharePoint.Redaction
         }
 
         /// <summary>
+        /// Checks whether the specified file should be ignored. If it is in the ignore
+        /// list this method will return <see langword="true"/>, it also has the side
+        /// effect that the item will be removed from the ignore list.
+        /// </summary>
+        /// <param name="site">The site containing the list of files to ignore.</param>
+        /// <param name="fullFileUrl">The full URL to the file (this is the value
+        /// that will be in the hidden list if the file should be ignored).</param>
+        /// <returns><see langword="true"/> if the file should be ignored and
+        /// <see langword="false"/> otherwise.</returns>
+        static bool IgnoreFile(SPSite site, string fullFileUrl)
+        {
+            bool result = false;
+            SPWeb web = site.RootWeb;
+            SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
+            if (list != null)
+            {
+                SPQuery q = new SPQuery();
+                q.Query = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>"
+                    + fullFileUrl + "</Value></Eq></Where>";
+                SPListItemCollection items = list.GetItems(q);
+                if (items != null && items.Count > 0)
+                {
+                    result = true;
+                    for (int i = 0; i < items.Count; i++)
+                    {
+                        SPListItem item = items[i];
+                        item.Delete();
+                    }
+
+                    list.Update();
+                    web.Update();
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Checks whether the specified folder is being watched based on the 
         /// specified watch path and recursion settings.
         /// </summary>
@@ -247,7 +280,6 @@ namespace Extract.SharePoint.Redaction
                 }
 
                 _zeroByteFiles = new HashSet<Guid>(settings.AddedZeroByteFiles);
-                _ignoreFiles = new HashSet<string>(settings.FilesToIgnore);
             }
         }
 

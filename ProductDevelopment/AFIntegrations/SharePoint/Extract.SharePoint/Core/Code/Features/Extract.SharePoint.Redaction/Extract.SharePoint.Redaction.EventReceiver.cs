@@ -25,6 +25,24 @@ namespace Extract.SharePoint.Redaction.Features
                 if (site != null)
                 {
                     IdShieldSettings.AddActiveFeatureSiteId(site.ID);
+
+                    // Add hidden list to site (if it does not exist)
+                    SPWeb web = site.RootWeb;
+                    SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
+                    if (list == null)
+                    {
+                        web.AllowUnsafeUpdates = true;
+                        Guid listId = web.Lists.Add(IdShieldHelper._HIDDEN_LIST_NAME, "",
+                            SPListTemplateType.GenericList);
+                        web.Update();
+                        list = web.Lists[listId];
+                        if (list != null)
+                        {
+                            list.Hidden = true;
+                            list.Update();
+                        }
+                        web.AllowUnsafeUpdates = false;
+                    }
                 }
             }
             catch (Exception ex)
@@ -47,6 +65,17 @@ namespace Extract.SharePoint.Redaction.Features
                 if (site != null)
                 {
                     IdShieldSettings.RemoveActiveFeatureSiteId(site.ID);
+
+                    // Remove the hidden list if it exists
+                    SPWeb web = site.RootWeb;
+                    SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
+                    if (list != null)
+                    {
+                        web.AllowUnsafeUpdates = true;
+                        web.Lists.Delete(list.ID);
+                        web.Update();
+                        web.AllowUnsafeUpdates = false;
+                    }
                 }
             }
             catch (Exception ex)

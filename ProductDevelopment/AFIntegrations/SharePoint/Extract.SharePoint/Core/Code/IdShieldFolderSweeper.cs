@@ -284,11 +284,9 @@ namespace Extract.SharePoint.Redaction
         static void UploadFilesToSharePoint(Dictionary<string, string> filesToAdd, string url)
         {
             // Add the list of files to ignore
-            IdShieldSettings.AddFilesToIgnore(filesToAdd.Keys);
+            AddFilesToIgnore(filesToAdd.Keys, url);
 
             // Upload the redacted file into SharePoint
-            // TODO: FlexIDSIntegration #181 - May be fixed by
-            // creating a new SPSite and SPWeb object here
             using (SPSite tempSite = new SPSite(url))
             using (SPWeb tempWeb = tempSite.OpenWeb())
             {
@@ -546,6 +544,36 @@ namespace Extract.SharePoint.Redaction
             _folderSettings = FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
             _localWorkingFolder = settings.LocalWorkingFolder;
             _activeSites = new HashSet<Guid>(settings.ActiveSites);
+        }
+
+        /// <summary>
+        /// Adds the list of file urls to the hidden list of files to ignore when they
+        /// are seen in the add event handler.
+        /// </summary>
+        /// <param name="fileUrls">The file urls to add to the list.</param>
+        /// <param name="siteUrl">The url for the site containing the hidden list.</param>
+        static void AddFilesToIgnore(IEnumerable<string> fileUrls, string siteUrl)
+        {
+            using (SPSite tempSite = new SPSite(siteUrl))
+            {
+                SPWeb web = tempSite.RootWeb;
+                if (web != null)
+                {
+                    SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
+                    if (list != null)
+                    {
+                        foreach (string fileUrl in fileUrls)
+                        {
+                            SPListItem item = list.AddItem();
+                            item["Title"] = fileUrl;
+                            item.Update();
+                        }
+
+                        list.Update();
+                    }
+                    web.Update();
+                }
+            }
         }
 
         #endregion Methods

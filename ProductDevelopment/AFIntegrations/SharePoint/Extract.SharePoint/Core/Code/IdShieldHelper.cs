@@ -7,6 +7,13 @@ namespace Extract.SharePoint.Redaction
     internal static class IdShieldHelper
     {
         /// <summary>
+        /// Name for the hidden list that is created to handle tracking files to ignore in
+        /// the add event receiver
+        /// </summary>
+        internal static readonly string _HIDDEN_LIST_NAME =
+            "C888293C-0DC0-4F3E-8B3F-4151929E5CE0";
+
+        /// <summary>
         /// Handles logging the specified exception to the exception service
         /// and to the SharePoint log.
         /// </summary>
