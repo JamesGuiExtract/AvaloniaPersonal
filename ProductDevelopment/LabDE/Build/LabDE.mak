@@ -105,6 +105,7 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\Misc" @MKDIR "$(DataEntryCoreInstallFilesDir)\DotNet\Misc" 
 	@IF NOT EXIST "$(InternalUseBuildFilesArchive)" @MKDIR "$(InternalUseBuildFilesArchive)" 
 	@IF NOT EXIST "$(LabDEInstallFiles)\Reports" @MKDIR "$(LabDEInstallFiles)\Reports"
+	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles" @MKDIR "$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles"
 	
 	@DeleteFiles  "$(DataEntryCoreInstallFilesDir)\DotNet\*.*" /S
 	@DeleteFiles "$(LabDEInstallFiles)\Reports\*.*" /S
@@ -123,10 +124,10 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@COPY  "$(BinariesFolder)\Obfuscated\*.pdb" "$(InternalUseBuildFilesArchive)" 
 	@COPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)" 
 # Make .nl files to register the COM .NET files
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\DataEntry.nl"
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.DataEntry.dll" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\DataEntry.nl"
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\DataEntryApplication.exe" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\DataEntry.nl"
-	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\DataEntryCC.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegisteredFiles\DataEntry.rl"
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.nl"
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.DataEntry.dll" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.nl"
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\DataEntryApplication.exe" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.nl"
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\DataEntryCC.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.rl"
 
 CopyFilesForLabDEInstall: CopyFilesToInstallFolder 
 	@ECHO Copying files for the LabDE Install
