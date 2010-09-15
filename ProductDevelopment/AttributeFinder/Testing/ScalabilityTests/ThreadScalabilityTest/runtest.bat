@@ -8,6 +8,7 @@ set cd=%~dp0
 set cd=%cd:~0,-1%
 set initdir=%cd%\initialfiles
 set workdir=%cd%\workingfiles
+set backupdir=%cd%\backupfiles
 set dbname=ThreadScalabilityTest
 
 :: Processing time
@@ -33,9 +34,21 @@ echo sp_detach_db ThreadScalabilityTest > "%workdir%\sql.sql"
 sqlcmd -i "%workdir%\sql.sql"
 del "%workdir%\sql.sql"
 
-:: delete old files
-if exist "%workdir%\%dbname%.mdf" del "%workdir%\%dbname%.mdf"
-if exist "%workdir%\%dbname%_log.LDF" del "%workdir%\%dbname%_log.LDF"
+
+:: move old files to backup location
+
+:: get current date and time for folder name
+for /f "tokens=1,2,3,4 delims=/ " %%a in ('DATE /T') do set date=%%d-%%b-%%c
+for /f "tokens=1,2,3 delims=: " %%a in ('TIME /T') do set time=%%a.%%b%%c
+
+:: make dir
+set dest=%backupdir%\%date%_%time%
+md "%dest%"
+
+:: move the files
+if exist "%workdir%\%dbname%.mdf" move "%workdir%\%dbname%.mdf" "%dest%"
+if exist "%workdir%\%dbname%_log.LDF" move "%workdir%\%dbname%_log.LDF" "%dest%"
+
 
 :: copy blank files
 copy "%initdir%\%dbname%.mdf" "%workdir%"
