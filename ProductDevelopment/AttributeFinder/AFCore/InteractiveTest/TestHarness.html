@@ -1,0 +1,59 @@
+<HTML>
+
+<HEAD>
+<TITLE>Test Harness Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Test Harness Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<ol>
+	<li><h2>Bug Fixes</h2>
+    <ul>
+        <li><b>[FlexIDSCore #2742]</b> ID Shield Tester : Expected VOAs With Newlines  
+        <!-- fixed v 6.0.0.47 -->
+        <UL>
+            <li>Navigate to I:\Common\Testing\PVCS_Testing\FlexIDSCore\2742.</li>
+            <li>Start the Test Harness application and load <b>IDShieldTester.tcl</b>.</li>
+            <li>Click the <b>Run Automated Tests</b> button and confirm that all the test cases 
+            complete successfully.</li>
+        </UL></li>
+    <p>
+        <li><b>[FlexIDSCore #3093]</b> Order of attributes within Automated Ruleset Tester
+        <!-- fixed v 7.0.0.5 -->
+        <ul>
+            <li>Exercise the zip file contents from 
+            <b>I:\Common\Testing\PVCS_Test\FlexIDSCore\3093</b>
+            <ul>
+                <li>Exercise the TCL file from <b>Tests.zip</b> using TestHarness.exe.</li>
+                <li>Confirm that the actual results match the expected results. Note that it will not
+                be a collection of perfect matches.</li>
+                <li>Exercise the TCL file from <b>Tests2.zip</b> using TestHarness.exe</li>
+                <li>Confirm that the actual results match the expected results. Note that it will not
+                be a collection of perfect matches.</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #3193]</b> Color display when extra attributes are found by Automated 
+        Ruleset Tester
+        <!-- fixed v 6.2.0.30 -->
+        <ul>
+            <li>Exercise the TCL file attached to SCR #3093</li>
+            <li>Confirm that the <b>Summary of Attribute Statistics</b> node is red.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #3244]</b> AutomatedRuleTest - allow relative path to EAV file
+        <!-- fixed v 7.0.0.4 -->
+        <ul>
+            <li>Exercise the DAT file attached to the SCR.</li>
+            <li>Confirm that the relative path is supported.</li>
+        </ul></li>
+    </ul></li>
+</OL>
+</BODY>
+</HTML>
