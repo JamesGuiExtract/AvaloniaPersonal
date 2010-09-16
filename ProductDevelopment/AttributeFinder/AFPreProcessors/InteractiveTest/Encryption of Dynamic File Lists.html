@@ -11,58 +11,70 @@
 
 <body>
 <h1>Ruleset Editor - Encryption of Dynamic File Lists<br />
-	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+    <IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
 
-    	<h2><b>Encryption of Dynamic File Lists</b></h2>
-    	<ul>
-		<li>Start with a ghosted test machine. 
-		<li><b>[LegacyRC #4926]</b> Open the Extract Systems <b>RDT Configuration</b> utility.  
-		Confirm that the <b>Automatically re-encrypt out-of-date ETF files</b> checkbox 
-		is checked.
+        <h2><b>Encryption of Dynamic File Lists</b></h2>
+        <ul>
+        <li>Start with a ghosted test machine. 
+        <li><b>[LegacyRC #4926]</b> Open the Extract Systems <b>RDT Configuration</b> utility.  
+        Confirm that the <b>Automatically re-encrypt out-of-date ETF files</b> checkbox 
+        is checked.
 <p>	
-		<li>Enter the directory <b>AFPreprocessors/InteractiveTest/DynamicFileListEncryptionTest</b> 
-		and run the file <b>SetupEncryptionTest.bat</b>.
-		<li>Confirm the presence of the files:
-		<ul>
-			<li><b>List1.txt</b>
-			<li><b>List1.txt.etf</b>
-			<li><b>List2.txt</b>
-			<li><b>List3.txt</b>
-			<li><b>List4.txt</b>
-			<li><b>List5.txt</b>
-			<li><b>List6.txt</b>
-			<li><b>List7.txt</b>
-		</ul>
-		<li>Confirm that the <b>Date Modified</b> file attribute of <b>List1.txt</b> is 
-		more recent than that of <b>List1.txt.etf</b>.
-		<li>Confirm that the following files do not exist:
-		<ul>
-			<li><b>List2.txt.etf</b>
-			<li><b>List3.txt.etf</b>
-			<li><b>List4.txt.etf</b>
-			<li><b>List5.txt.etf</b>
-			<li><b>List6.txt.etf</b>
-			<li><b>List7.txt.etf</b>
-		</ul>
+        <li>Enter the directory <b>AFPreprocessors/InteractiveTest/DynamicFileListEncryptionTest</b> 
+        and run the file <b>SetupEncryptionTest.bat</b>.
+        <li>Confirm the presence of the files:
+        <ul>
+            <li><b>List1.txt</b>
+            <li><b>List1.txt.etf</b>
+            <li><b>List2.txt</b>
+            <li><b>List3.txt</b>
+            <li><b>List4.txt</b>
+            <li><b>List5.txt</b>
+            <li><b>List6.txt</b>
+            <li><b>List7.txt</b>
+        </ul>
+        <li>Confirm that the <b>Date Modified</b> file attribute of <b>List1.txt</b> is 
+        more recent than that of <b>List1.txt.etf</b>.
+        <li>Confirm that the following files do not exist:
+        <ul>
+            <li><b>List2.txt.etf</b>
+            <li><b>List3.txt.etf</b>
+            <li><b>List4.txt.etf</b>
+            <li><b>List5.txt.etf</b>
+            <li><b>List6.txt.etf</b>
+            <li><b>List7.txt.etf</b>
+        </ul>
 <p>
-		<li>Open <b>TestListEncryption.rsd</b>.
-		<li>Open <b>Image1.tif</b> in the Rule Tester.
-		<li>Execute the rules. 
-		<li>Confirm the presence of the files:
-		<ul>
-			<li><b>List1.txt.etf</b>
-			<li><b>List2.txt.etf</b>
-			<li><b>List3.txt.etf</b>
-			<li><b>List4.txt.etf</b>
-			<li><b>List5.txt.etf</b>
-			<li><b>List6.txt.etf</b>
-			<li><b>List7.txt.etf</b>
-		</ul>
-		<li>Confirm that the <b>Date Modified</b> file attribute of <b>List1.txt.etf</b> 
-		has changed to the current date and time.
-		<li>Confirm that the value of <b>Test</b> in the Rule Tester output is 
-		<b>3600 Athena Lane</b>.
+        <li>Open <b>TestListEncryption.rsd</b>.
+        <li>Open <b>Image1.tif</b> in the Rule Tester.
+        <li>Execute the rules. 
+        <li>Confirm the presence of the files:
+        <ul>
+            <li><b>List1.txt.etf</b>
+            <li><b>List2.txt.etf</b>
+            <li><b>List3.txt.etf</b>
+            <li><b>List4.txt.etf</b>
+            <li><b>List5.txt.etf</b>
+            <li><b>List6.txt.etf</b>
+            <li><b>List7.txt.etf</b>
+        </ul>
+        <li>Confirm that the <b>Date Modified</b> file attribute of <b>List1.txt.etf</b> 
+        has changed to the current date and time.
+        <li>Confirm that the value of <b>Test</b> in the Rule Tester output is 
+        <b>3600 Athena Lane</b>.
+    </ul>    
+<p>
+    <h2><b>Auto-Encryption of .dat Files</b></h2>
+    <ul>
+        <li><b>[FlexIDSCore #4112]</b> Autoencrypt
+        <!-- fixed v 8.1.0.13 -->
+            <ul>
+                <li>Exercise the ruleset at I:\Common\Testing\PVCS_Testing\FlexIDSCore\4112 on 
+                sampleText.txt.
+                <li>Confirm that each of the related .txt files is correctly autoencrypted.
+            </ul>
+    </ul>
 </body>
 </html>

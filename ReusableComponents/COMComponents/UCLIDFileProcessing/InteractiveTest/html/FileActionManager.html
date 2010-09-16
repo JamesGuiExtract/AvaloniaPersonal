@@ -1,819 +1,796 @@
 <html>
 
 <HEAD>
-<TITLE>File Action Manager UI</TITLE>
-<link type="text/css" rel="stylesheet" href="../../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
+    <TITLE>File Action Manager UI</TITLE>
+    <link type="text/css" rel="stylesheet" href="../../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 <body>
 <h1>File Action Manager UI<br>
-         <IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+    <IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>	
 <hr>
 <h3><u>Basic User Interface</u></h3>
 <b>Command-Line Options</b>
 <ul>
-    	<li>Confirm that <b>ProcessFiles.exe /?</b> on the command line results in display 
-	of a usage message. 
-    	<li>Confirm that <b>ProcessFiles.exe /r</b> on the command line registers FPS 
-	files to open by default with ProcessFiles.exe.
-    	<li>Confirm that <b>ProcessFiles.exe /u</b> on the command line unregisters FPS 
-	files to open by default with ProcessFiles.exe.
-    	<li>Confirm that <b>ProcessFiles.exe /sd &lt;Server name&gt; &lt;Database name&gt;</b> 
-	on the command line opens the File Action Manager with the specified <b>Server</b> 
-	and <b>Database</b>.
-	<li>Confirm that additional command-line options cannot be used with <b>/sd</b>.
-    	<li>Confirm that <b>ProcessFiles.exe <i>filename.fps</i> /d &lt;Directory name&gt;</b> 
-	on the command line opens the File Action Manager and changes the scope from that 
-	specified in the FPS file to the specified <b>directory</b>.
-    	<li>Confirm that <b>ProcessFiles.exe <i>filename.fps</i> /l &lt;List filename&gt;</b> 
-	on the command line opens the File Action Manager and changes the scope from that 
-	specified in the FPS file to the specified <b>list</b>.
-	<li>Confirm that the <b>/l</b> command-line option cannot be used with <b>/d</b>.
-	<li>Exercise the /service switch
-	<ul>
-	    	<li>Confirm that <b>ProcessFiles.exe <i>filename.fps</i> /service</b> 
-		on the command line opens the File Action Manager and loads the specified FPS file.
-		<li>Confirm that the FPS file is not automatically saved.
-		<li>Confirm that the FPS file stops processing and automatically closes if 
-		it receives a close message.
-		<li>Confirm that the FPS file automatically closes after processing is complete.
-	</ul>
+    <li>Confirm that <b>ProcessFiles.exe /?</b> on the command line results in display of a usage 
+    message.</li>
+    <li>Confirm that <b>ProcessFiles.exe /r</b> on the command line registers FPS files to open by 
+    default with ProcessFiles.exe.</li>
+    <li>Confirm that <b>ProcessFiles.exe /u</b> on the command line unregisters FPS files to open 
+    by default with ProcessFiles.exe.</li>
+    <li>Confirm that <b>ProcessFiles.exe /sd &lt;Server name&gt; &lt;Database name&gt;</b> on the 
+    command line opens the File Action Manager with the specified <b>Server</b> and 
+    <b>Database</b>.
+    <li>Confirm that additional command-line options cannot be used with <b>/sd</b>.
+    <li>Confirm that <b>ProcessFiles.exe <i>filename.fps</i> /d &lt;Directory name&gt;</b> on the
+    command line opens the File Action Manager and changes the scope from that specified in the FPS
+    file to the specified <b>directory</b>.
+    <li>Confirm that <b>ProcessFiles.exe <i>filename.fps</i> /l &lt;List filename&gt;</b> on the 
+    command line opens the File Action Manager and changes the scope from that specified in the FPS
+    file to the specified <b>list</b>.
+    <li>Confirm that the <b>/l</b> command-line option cannot be used with <b>/d</b>.
+    <li>Exercise the /service switch
+    <ul>
+        <li>Confirm that <b>ProcessFiles.exe <i>filename.fps</i> /service</b> on the command line
+        opens the File Action Manager and loads the specified FPS file.
+        <li>Confirm that the FPS file is not automatically saved.
+        <li>Confirm that the FPS file stops processing and automatically closes if it receives a 
+        close message.
+        <li>Confirm that the FPS file automatically closes after processing is complete.
+    </ul>
 <p>
-    	<li><b>[LegacyRC #4821]</b> Confirm that <b>ProcessFiles.exe <i>filename.fps</i> 
-	/sleep:5000</b> on the command line results in a 5-second wait before 
-	<i>filename.fps</i> opens. 
-    	<li><b>[LegacyRC #3722]</b> Test <b>ProcessFiles.exe <i>filename.fps</i> /s /fc /l 
-	&lt;listfile&gt;</b> on the command line where <i>listfile</i> is empty.  Confirm that 
-	a usage message is presented.
-    	<li><b>[LegacyRC #4858]</b> Test <b>ProcessFiles.exe <i>filename.fps</i> /c /fc</b> 
-	on the command line.  Confirm that the File Action Manager displays the usage message 
-	and exits.
-    	<li><b>[LegacyRC #4857]</b> Test <b>ProcessFiles.exe <i>filename.fps</i> /s /fc /m:4</b> 
-	on the command line.  Confirm that the File Action Manager processes 4 files and closes.  
-	Run the same command-line options again.  Confirm that 4 more files are processed.
+    <li><b>[LegacyRC #4821]</b> Confirm that <b>ProcessFiles.exe <i>filename.fps</i> 
+    /sleep:5000</b> on the command line results in a 5-second wait before <i>filename.fps</i> 
+    opens. 
+    <li><b>[LegacyRC #3722]</b> Test <b>ProcessFiles.exe <i>filename.fps</i> /s /fc /l 
+    &lt;listfile&gt;</b> on the command line where <i>listfile</i> is empty.  Confirm that a usage
+    message is presented.
+    <li><b>[LegacyRC #4858]</b> Test <b>ProcessFiles.exe <i>filename.fps</i> /c /fc</b> on the 
+    command line.  Confirm that the File Action Manager displays the usage message and exits.
+    <li><b>[LegacyRC #4857]</b> Test <b>ProcessFiles.exe <i>filename.fps</i> /s /fc /m:4</b> on the
+    command line.  Confirm that the File Action Manager processes 4 files and closes. Run the same
+    command-line options again.  Confirm that 4 more files are processed.
 <p>
-   	<LI><b>[LegacyRC #5485]</b> ProcessFiles usage message
-	<ul>
-		<li>Confirm that the <b>/d</b> switch notes that the FPS file must include 
-		exactly one <b>Files from folder</b> file supplier.
-		<li>Confirm that the <b>/l</b> switch notes that the FPS file must include 
-		exactly one <b>Files from dynamic list</b> file supplier.
-	</ul>
+    <li><b>[LegacyRC #5836]</b> Opening .fps file via relative path
+    <!-- fixed v 8.1.0.44 -->
+    <ul>
+        <li>From the command line, open an .fps file using a relative path.
+        <li>Go to File > Save or press ctrl+s.
+        <li>Confirm that no errors are displayed.
+    </ul>
+<p>        
+    <LI><b>[LegacyRC #5485]</b> ProcessFiles usage message
+    <ul>
+        <li>Confirm that the <b>/d</b> switch notes that the FPS file must include exactly one 
+        <b>Files from folder</b> file supplier.
+        <li>Confirm that the <b>/l</b> switch notes that the FPS file must include exactly one
+        <b>Files from dynamic list</b> file supplier.
+    </ul>
 <p>
-   	<LI><b>[LegacyRC #5573, #5575]</b> FAM
-       	<ul>
-		<li>Confirm that a <b>File Action Manager is stopping</b> message is 
-		logged when the user stops processing.
-		<li>Confirm that a <b>File Action Manager is stopping</b> message is 
-		logged when the FAM finishes processing on its own.
-		<li>Confirm that a <b>File Action Manager is stopping</b> message is 
-		logged when the ESFAMProcess service finishes processing.
-		<li>Confirm that the ProcessFiles usage message includes <b>will 
-		process &lt;nnn&gt; documents and stop</b> for the <b>/m:&lt;nnn&gt;</b> 
-		switch.
-       	</ul>
+    <LI><b>[LegacyRC #5573, #5575]</b> FAM
+    <ul>
+        <li>Confirm that a <b>File Action Manager is stopping</b> message is logged when the user 
+        stops processing.
+        <li>Confirm that a <b>File Action Manager is stopping</b> message is logged when the FAM 
+        finishes processing on its own.
+        <li>Confirm that a <b>File Action Manager is stopping</b> message is logged when the 
+        ESFAMProcess service finishes processing.
+        <li>Confirm that the ProcessFiles usage message includes <b>will process &lt;nnn&gt; 
+        documents and stop</b> for the <b>/m:&lt;nnn&gt;</b> switch.
+    </ul>
 </ul>
 <b>File Menu</b>
 <ul>
-	<li>Confirm that the <b>File Action Manager</b> menu bar has a <b>File</b> menu and 
-       	the initial state is enabled.</li>
-    	<li>Confirm that the File menu has a <b>New</b> item and the initial state is enabled.</li> 
-    	<li>Double-click an <b>FPS</b> file to activate the File Action Manager.</li>
-       	<li><b>[LegacyRC #4513]</b> Confirm that the <b>FPS</b> filename shows up on the title 
-	bar next to “File Action Manager”.</li>   
-    	<li>Drag and drop any <b>FPS</b> file into File Action Manager.</li>
-    	<ul> 
-       		<li>Confirm that the <b>FPS</b> filename shows up on the title bar next to 
-		<b>File Action Manager</b>.</li>   
-       		<li>Confirm that selecting <b>File - New</b> resets the existing instance of 
-           	File Action Manager to a blank state.</li> 
-       		<li>Drag and drop any .fps file into File Action Manager again, 
-           	then make some arbitrary changes to the settings.</li> 
-       		<li>Confirm that selecting <b>File - New</b> brings up a <b>Save Changes?</b> 
-		dialog.</li>
-       		<ul> 
-          		<li>Confirm if user clicks <b>Yes</b>, the changes are saved and 
-              		the existing instance of  File Action Manager is reset to a 
-              		blank state.</li>   
-          		<li>Confirm if user clicks <b>No</b>, the changes are not saved and the 
-              		existing instance of File Action Manager is reset to a blank state.</li>
-       		</ul>
-       		<li>Start a blank File Action Manager, then add some settings.</li> 
-       		<li>Confirm that selecting <b>File - New</b> displays a <b>Save As</b> dialog to 
-		the user to enter a filename.</li>
-       		<ul> 
-          		<li>Confirm clicking <b>Save</b> after entering a filename saves the 
-			settings to the file, and the existing instance of File Action Manager 
-              		is reset to a blank state.</li>                                    
-          		<li>Confirm clicking <b>Cancel</b> button exits the Save As dialog and 
-              		the existing instance of File Action Manager remains unchanged.</li> 
-       		</ul>
-	   	<li>Confirm that shortcut key <b>Ctrl+N</b> performs the same function as selecting 
-            	File - New.</li>
-      		<li><b>[FlexIDSCore #3275]</b> Dragging FPS file onto processing FAM window</li>
-      		<ul>
-      			<li>Create and save an FPS file.</li>
-      			<li>Open a new instance of the FAM and start some files processing.</li>
-      			<li>Drag the saved FPS file onto the FAM window that has files processing.</li>
-      			<li>Confirm that the original FPS file continues to process.</li>
-      		</ul>
-      		<li><b>[LegacyRCAndUtils #5135]</b> Confirm that a meaningful error message is 
-		displayed if multiple FPS files are dropped onto an open FAM instance.</li>
-    	</ul>   
+    <li>Confirm that the <b>File Action Manager</b> menu bar has a <b>File</b> menu and the initial
+    state is enabled.</li>
+    <li>Confirm that the File menu has a <b>New</b> item and the initial state is enabled.</li> 
+    <li>Double-click an <b>FPS</b> file to activate the File Action Manager.</li>
+    <li><b>[LegacyRC #4513]</b> Confirm that the <b>FPS</b> filename shows up on the title bar next
+    to “File Action Manager”.</li>   
+    <li>Drag and drop any <b>FPS</b> file into File Action Manager.</li>
+    <ul> 
+        <li>Confirm that the <b>FPS</b> filename shows up on the title bar next to <b>File Action 
+        Manager</b>.</li>   
+        <li>Confirm that selecting <b>File - New</b> resets the existing instance of File Action 
+        Manager to a blank state.</li> 
+        <li>Drag and drop any .fps file into File Action Manager again, then make some arbitrary 
+        changes to the settings.</li> 
+        <li>Confirm that selecting <b>File - New</b> brings up a <b>Save Changes?</b> dialog.</li>
+        <ul> 
+            <li>Confirm if user clicks <b>Yes</b>, the changes are saved and the existing instance
+            of  File Action Manager is reset to a blank state.</li>   
+            <li>Confirm if user clicks <b>No</b>, the changes are not saved and the existing 
+            instance of File Action Manager is reset to a blank state.</li>
+        </ul>
+        <li>Start a blank File Action Manager, then add some settings.</li> 
+        <li>Confirm that selecting <b>File - New</b> displays a <b>Save As</b> dialog to the user 
+        to enter a filename.</li>
+        <ul> 
+            <li>Confirm clicking <b>Save</b> after entering a filename saves the settings to the 
+            file, and the existing instance of File Action Manager is reset to a blank state.</li>                                    
+            <li>Confirm clicking <b>Cancel</b> button exits the Save As dialog and the existing 
+            instance of File Action Manager remains unchanged.</li> 
+        </ul>
+        <li>Confirm that shortcut key <b>Ctrl+N</b> performs the same function as selecting File - 
+        New.</li>
+        <li><b>[FlexIDSCore #3275]</b> Dragging FPS file onto processing FAM window</li>
+        <ul>
+            <li>Create and save an FPS file.</li>
+            <li>Open a new instance of the FAM and start some files processing.</li>
+            <li>Drag the saved FPS file onto the FAM window that has files processing.</li>
+            <li>Confirm that the original FPS file continues to process.</li>
+        </ul>
+        <li><b>[LegacyRCAndUtils #5135]</b> Confirm that a meaningful error message is displayed if
+        multiple FPS files are dropped onto an open FAM instance.</li>
+    </ul>   
 <p>
-    	<li>Confirm that the File menu has an <b>Open</b> item and the initial state is enabled.</li>
-    	<ul>  
-       		<li>Confirm selecting <b>File - Open</b> brings up an Open File dialog with .fps 
-		files as the default type.</li> 
-       		<li>Confirm that selecting an <b>FPS</b> file from the Open File dialog opens it.</li> 
-       		<li>Confirm that if any settings have changed since the last time the settings 
-           	were saved, opening a file (by any means) brings up a <b>Save Changes?</b> dialog.</li>
-       		<ul>  
-          		<li>Confirm that if the user clicks <b>Yes</b>, and if settings have previously 
-              		been saved (i.e. there is a filename shown in the title bar), the settings 
-			are saved and an <b>Open</b> dialog prompts user to choose an FPS file to open.</li> 
-          		<li>Confirm that if the user clicks <b>Yes</b>, and if settings have not 
-              		previously been saved, a <b>Save As</b> dialog is displayed to the user.</li>
-          		<li>If the user chooses a filename the settings are saved to that file 
-              		and an <b>Open</b> dialog prompts the user to choose an FPS file to open.</li> 
-          		<li>If the <b>Save As</b> dialog is cancelled, settings are not saved and no 
-              		file is opened.</li> 
-          		<li>Confirm if the user clicks <b>Yes</b>, but the Save and 
-              		Save As options in the File menu are disabled (this can be done by 
-              		removing File suppliers in Queue Setup tab) it brings up a 
-              		<b>Save Failed</b> message, the settings are not saved and no file is opened.</li> 
-          		<li>Confirm if the user clicks <b>No</b>, the settings are not saved, and 
-			an <b>Open</b> dialog prompts the user to choose an FPS file to open.</li> 
-          		<li>Confirm if the user clicks <b>Cancel</b>, the settings are not saved, 
-			and no file is opened.</li>
-        	</ul> 
-        	<li>Confirm that shortcut key <b>Ctrl+O</b> performs the same function as selecting 
-            	File - Open.</li>
+    <li>Confirm that the File menu has an <b>Open</b> item and the initial state is enabled.</li>
+    <ul>  
+        <li>Confirm selecting <b>File - Open</b> brings up an Open File dialog with .fps files as 
+        the default type.</li> 
+        <li>Confirm that selecting an <b>FPS</b> file from the Open File dialog opens it.</li> 
+        <li>Confirm that if any settings have changed since the last time the settings were saved,
+        opening a file (by any means) brings up a <b>Save Changes?</b> dialog.</li>
+        <ul>  
+            <li>Confirm that if the user clicks <b>Yes</b>, and if settings have previously been 
+            saved (i.e. there is a filename shown in the title bar), the settings are saved and an
+            <b>Open</b> dialog prompts user to choose an FPS file to open.</li> 
+            <li>Confirm that if the user clicks <b>Yes</b>, and if settings have not previously
+            been saved, a <b>Save As</b> dialog is displayed to the user.</li>
+            <li>If the user chooses a filename the settings are saved to that file and an 
+            <b>Open</b> dialog prompts the user to choose an FPS file to open.</li> 
+            <li>If the <b>Save As</b> dialog is cancelled, settings are not saved and no file is 
+            opened.</li> 
+            <li>Confirm if the user clicks <b>Yes</b>, but the Save and Save As options in the File
+            menu are disabled (this can be done by removing File suppliers in Queue Setup tab) it
+            brings up a <b>Save Failed</b> message, the settings are not saved and no file is
+            opened.</li> 
+            <li>Confirm if the user clicks <b>No</b>, the settings are not saved, and an 
+            <b>Open</b> dialog prompts the user to choose an FPS file to open.</li> 
+            <li>Confirm if the user clicks <b>Cancel</b>, the settings are not saved, and no file
+            is opened.</li>
+        </ul> 
+        <li>Confirm that shortcut key <b>Ctrl+O</b> performs the same function as selecting File -
+        Open.</li>
 <p>
-		<li><b>[LegacyRC #4825]</b> Multiple prompts for missing action.
-		<ul>
-			<li>Create and save a valid <b>FPS</b> file.  Close the FAM.
-			<li>Use <b>DB Admin</b> to remove the action used in the above FPS file.
-			<li>Double-click on the FPS file to open it.
-			<li>Confirm that only one <b>Action not found</b> message is displayed.
-		</ul>
-    	</ul>    
+        <li><b>[LegacyRC #4825]</b> Multiple prompts for missing action.
+        <ul>
+            <li>Create and save a valid <b>FPS</b> file.  Close the FAM.
+            <li>Use <b>DB Admin</b> to remove the action used in the above FPS file.
+            <li>Double-click on the FPS file to open it.
+            <li>Confirm that only one <b>Action not found</b> message is displayed.
+        </ul>
+    </ul>    
 <p>
-    	<li>Confirm that the File menu has a <b>Save</b> item and a <b>Save As...</b> item and the 
-        initial state of each is disabled.</li>
-    	<ul> 
-       		<li>Confirm that dragging and dropping an FPS file into File Action Manager enables 
-           	both <b>Save</b> and <b>Save As...</b> items.</li> 
-       		<li>Confirm that if any settings have changed, <b>Save</b> saves new settings 
-           	to the FPS file.</li> 
-       		<li>Confirm that <b>Save As...</b> brings up a Save As dialog.</li> 
-       		<li>Confirm that specifying an FPS file in the <b>Save As</b> dialog saves the 
-		current settings to the FPS file.</li> 
-       		<li>Confirm if the FPS file specified in the <b>Save As</b> dialog already exists, 
-		the user is asked if they would like to overwrite the currently existing file.</li> 
-       		<li>Confirm a currently existing FPS file is only overwritten if the user indicates 
-           	that they want it to be.</li> 
-       		<li>Confirm that both <b>Save</b> and <b>Save As...</b> are disabled if none of the 
-           	checkboxes in the Action tab are checked.</li> 
-       		<li>Confirm that shortcut key <b>Ctrl+S</b> performs the same function as selecting 
-           	File - Save.</li>
+    <li>Confirm that the File menu has a <b>Save</b> item and a <b>Save As...</b> item and the 
+    initial state of each is disabled.</li>
+    <ul> 
+        <li>Confirm that dragging and dropping an FPS file into File Action Manager enables both
+        <b>Save</b> and <b>Save As...</b> items.</li> 
+        <li>Confirm that if any settings have changed, <b>Save</b> saves new settings to the FPS
+        file.</li> 
+        <li>Confirm that <b>Save As...</b> brings up a Save As dialog.</li> 
+        <li>Confirm that specifying an FPS file in the <b>Save As</b> dialog saves the current 
+        settings to the FPS file.</li> 
+        <li>Confirm if the FPS file specified in the <b>Save As</b> dialog already exists, the user
+        is asked if they would like to overwrite the currently existing file.</li> 
+        <li>Confirm a currently existing FPS file is only overwritten if the user indicates that
+        they want it to be.</li> 
+        <li>Confirm that both <b>Save</b> and <b>Save As...</b> are disabled if none of the 
+        checkboxes in the Action tab are checked.</li> 
+        <li>Confirm that shortcut key <b>Ctrl+S</b> performs the same function as selecting File -
+        Save.</li>
 <p>
-  	   	<LI><b>[LegacyRC #5278]</b> Saving when disabled
-	       	<ul>
-	      		<li>Open a previously saved FPS file.
-	      		<li>Uncheck all checkboxes on the <b>Action</b> tab.
-	      		<li>Confirm that <b>File - Save</b> and <b>File - Save As</b> 
-			are disabled.
-	      		<li>Confirm that <b>Ctrl+S</b> does not save the FPS file.
-	       	</ul>
-    	</ul>  
+        <LI><b>[LegacyRC #5278]</b> Saving when disabled
+        <ul>
+            <li>Open a previously saved FPS file.
+            <li>Uncheck all checkboxes on the <b>Action</b> tab.
+            <li>Confirm that <b>File - Save</b> and <b>File - Save As</b> are disabled.
+            <li>Confirm that <b>Ctrl+S</b> does not save the FPS file.
+        </ul>
+    </ul>  
 <p>
-    	<li>Confirm that the File menu has an <b>Exit</b> item and the initial state is enabled.</li>
-    	<ul> 
-       		<li>Confirm if current settings have not been saved, <b>File - Exit</b> brings up
-           	a <b>Save Changes?</b> dialog.
-       		<ul> 
-          		<li>Confirm the user cannot make any settings changes such as check/uncheck 
-			of checkboxes while the <b>Save Changes?</b> dialog is still open.
-          		<li>Confirm if the user clicks <b>Yes</b> and if the settings have 
-              		previously been saved (i.e. there is a filename shown in the title bar) 
-              		the settings are saved and the application is terminated.</li> 
-          		<li>Confirm if the user clicks <b>Yes</b> and the settings have not previously 
-              		been saved a <b>Save As...</b> dialog is displayed to the user. 
-              		<li>Confirm that clicking <b>Save</b> after entering a filename saves the 
-			settings to the file.</li>
-          		<li>Confirm if the user clicks <b>Cancel</b>, the Save Changes? dialog is 
-              		cancelled, and the application does not terminate.</li> 
-          		<li>Confirm if the user clicks <b>No</b>, settings are not saved and the 
-              		application terminates.</li>
-        	</ul>
-    	</ul>
+    <li>Confirm that the File menu has an <b>Exit</b> item and the initial state is enabled.</li>
+    <ul> 
+        <li>Confirm if current settings have not been saved, <b>File - Exit</b> brings up a <b>Save
+        Changes?</b> dialog.
+        <ul> 
+            <li>Confirm the user cannot make any settings changes such as check/uncheck of 
+            checkboxes while the <b>Save Changes?</b> dialog is still open.
+            <li>Confirm if the user clicks <b>Yes</b> and if the settings have previously been
+            saved (i.e. there is a filename shown in the title bar) the settings are saved and the
+            application is terminated.</li> 
+            <li>Confirm if the user clicks <b>Yes</b> and the settings have not previously been 
+            saved a <b>Save As...</b> dialog is displayed to the user. 
+            <li>Confirm that clicking <b>Save</b> after entering a filename saves the settings to
+            the file.</li>
+            <li>Confirm if the user clicks <b>Cancel</b>, the Save Changes? dialog is cancelled,
+            and the application does not terminate.</li> 
+            <li>Confirm if the user clicks <b>No</b>, settings are not saved and the application
+            terminates.</li>
+        </ul>   
+    </ul>
 </ul>  
 <b>Process Menu</b>
 <ul>
-	<li>Confirm that the <b>File Action Manager</b> menu bar has a <b>Process</b> menu and the 
-	initial state is enabled.</li> 
-    	<li>Confirm the Process menu has <b>Start Processing</b>, <b>Pause Processing</b>, 
-        and <b>Stop Processing</b> items, and the initial state of each is disabled.
-    	<ul> 
-       		<li>Drag and drop any <b>FPS</b> file into File Action Manager. </li>
-       		<li>Confirm that selecting <b>Process - Start Processing</b> starts supplying 
-           	and/or processing files using the current configuration settings.</li> 
-       		<li>Confirm that once processing starts, <b>Process - Start Processing</b> 
-		is disabled.</li> 
-       		<li>Confirm that once processing starts, the <b>File</b> and <b>Tools</b> menus 
-		are disabled.</li> 
-       		<li>Confirm that selecting <b>Process - Pause Processing</b> stops processing once 
-		all currently executing tasks have completed.</li> 
-       		<li>Confirm that a check mark is placed next to <b>Process - Pause Processing</b> 
-		after it is selected.</li> 
-       		<li>Confirm that after Pause Processing is selected,  the <b>Add</b>, <b>Remove</b>, 
-		and <b>Commands &gt;</b> buttons plus the <b>Commands &gt;</b> button for skip 
-		conditions on the <b>Queue Setup</b> tab are all disabled.</li> 
-       		<li>Confirm that after Pause Processing is selected,  the <b>Add</b>, <b>Remove</b>, 
-           	<b>Commands &gt;</b>, <b>Up</b> and <b>Down</b> buttons and other controls 
-           	on the <b>Processing Setup</b> tab are all disabled.</li> 
-       		<li>Confirm that both <b>Process - Start Processing</b> and <b>Process - Stop 
-		Processing</b> are disabled after <b>Process - Pause Processing</b> is selected.</li> 
-       		<li>Confirm that selecting <b>Process - Pause Processing</b> again after there is 
-		a check mark next to it resumes the processing.</li> 
-       		<li>Confirm that after processing starts, <b>Process - Stop Processing</b> is enabled.</li> 
-       		<li>Confirm that <b>Process - Stop Processing</b> stops processing once all currently 
-		executing tasks have completed.</li> 
-       		<li>Confirm that in the time period between <b>Process - Stop Processing</b> being 
-		selected and processing actually stopping, the <b>Process</b> menu is disabled.</li> 
+    <li>Confirm that the <b>File Action Manager</b> menu bar has a <b>Process</b> menu and the 
+    initial state is enabled.</li> 
+    <li>Confirm the Process menu has <b>Start Processing</b>, <b>Pause Processing</b>, and <b>Stop
+    Processing</b> items, and the initial state of each is disabled.
+    <ul> 
+        <li>Drag and drop any <b>FPS</b> file into File Action Manager. </li>
+        <li>Confirm that selecting <b>Process - Start Processing</b> starts supplying and/or
+        processing files using the current configuration settings.</li> 
+        <li>Confirm that once processing starts, <b>Process - Start Processing</b> is 
+        disabled.</li> 
+        <li>Confirm that once processing starts, the <b>File</b> and <b>Tools</b> menus are 
+        disabled.</li> 
+        <li>Confirm that selecting <b>Process - Pause Processing</b> stops processing once all 
+        currently executing tasks have completed.</li> 
+        <li>Confirm that a check mark is placed next to <b>Process - Pause Processing</b> after it
+        is selected.</li> 
+        <li>Confirm that after Pause Processing is selected,  the <b>Add</b>, <b>Remove</b>, and
+        <b>Commands &gt;</b> buttons plus the <b>Commands &gt;</b> button for skip conditions on
+        the <b>Queue Setup</b> tab are all disabled.</li> 
+        <li>Confirm that after Pause Processing is selected,  the <b>Add</b>, <b>Remove</b>, 
+        <b>Commands &gt;</b>, <b>Up</b> and <b>Down</b> buttons and other controls on the
+        <b>Processing Setup</b> tab are all disabled.</li> 
+        <li>Confirm that both <b>Process - Start Processing</b> and <b>Process - Stop 
+        Processing</b> are disabled after <b>Process - Pause Processing</b> is selected.</li> 
+        <li>Confirm that selecting <b>Process - Pause Processing</b> again after there is a check
+        mark next to it resumes the processing.</li> 
+        <li>Confirm that after processing starts, <b>Process - Stop Processing</b> is enabled.</li> 
+        <li>Confirm that <b>Process - Stop Processing</b> stops processing once all currently 
+        executing tasks have completed.</li> 
+        <li>Confirm that in the time period between <b>Process - Stop Processing</b> being selected
+        and processing actually stopping, the <b>Process</b> menu is disabled.</li> 
 <p>
-		<li><b>[FlexIDSCore #3581]</b> Log entries
-		<ul>
-			<li>Confirm that the exception log is updated each time processing 
-			<b>starts</b> or <b>stops</b>.
-			<li>Confirm that the logged exception includes the full path to the FPS file.
-		</ul>
-    	</ul>
+        <li><b>[FlexIDSCore #3581]</b> Log entries
+        <ul>
+            <li>Confirm that the exception log is updated each time processing <b>starts</b> or
+            <b>stops</b>.
+            <li>Confirm that the logged exception includes the full path to the FPS file.
+        </ul>
+    </ul>
 </ul> 
 <b>Tools Menu</b> 
 <ul>
-	<li>Confirm the <b>File Action Manager</b> menu bar has a <b>Tools</b> menu and that 
-        the initial state is enabled.</li>    
-    	<li>Confirm the Tools menu has a <b>Check for new components</b> item and that 
-        the initial state is enabled.</li>
-    	<ul> 
-       		<li>Open file <b>UCLID File Processors.lst</b> in C:\Program Files\Extract 
-           	Systems\CommonComponents and delete the contents of the file 
-           	but not the file itself.</li> 
-       		<li>Confirm that adding a task in <b>Processing Setup</b> tab causes an exception.</li> 
-       		<li>Run <b>Check for new components</b>.</li>
-       		<li>Confirm that adding a task now works.</li>
-       		<li>Confirm that all the original tasks are available again.</li>
-		<li><b>[LegacyRC #4758]</b> Confirm that the <b>UCLID Input Funnel Input Receivers.lst</b> 
-		file is updated.
-		<li><b>[LegacyRC #4962]</b> Confirm that the <b>Extract FAM Product Specific DB 
-		Managers.lst</b> file is updated.
-    	</ul> 
-    	<li>Confirm that the Tools menu has an <b>Enable/disable auto-scrolling</b> item.
-    	<ul>  
-       		<li>Confirm once Enable/disable auto-scrolling option is selected, 
-           	the <b>Enable/disable auto-scrolling</b> button on the toolBar is depressed 
-		(enabled).</li> 
-       		<li>With the toolbar button enabled, confirm that all the scroll bars in both the 
-           	<b>Queue Log</b> and <b>Processing Log</b> pages scroll down to the bottom once 
-		processing starts.</li>
-       		<li>Confirm the auto-scroll state is persistent across sessions of the File Action Manager.
-    	</ul>  
-    	<li>Confirm that the Tools menu has an <b>Database Administration Utility</b> item and that 
-	the initial state is enabled.
-    	<ul>
-       		<li>Start the FAM and <b>do not select</b> a Database Server and Database Name.
-       		<li>Select the menu item and confirm that a <b>Select database to administer</b> 
-		dialog is presented.
-		<li>Close the DB Admin utility.
-  	   	<LI><b>[LegacyRC #5522]</b> Confirm that <b>Ctrl+D</b> launches DB Admin.
-       		<li>Close the FAM.
+    <li>Confirm the <b>File Action Manager</b> menu bar has a <b>Tools</b> menu and that the
+    initial state is enabled.</li>    
+    <li>Confirm the Tools menu has a <b>Check for new components</b> item and that the initial
+    state is enabled.</li>
+    <ul> 
+        <li>Open file <b>UCLID File Processors.lst</b> in C:\Program Files\Extract 
+        Systems\CommonComponents and delete the contents of the file but not the file itself.</li> 
+        <li>Confirm that adding a task in <b>Processing Setup</b> tab causes an exception.</li> 
+        <li>Run <b>Check for new components</b>.</li>
+        <li>Confirm that adding a task now works.</li>
+        <li>Confirm that all the original tasks are available again.</li>
+        <li><b>[LegacyRC #4758]</b> Confirm that the <b>UCLID Input Funnel Input Receivers.lst</b> 
+        file is updated.
+        <li><b>[LegacyRC #4962]</b> Confirm that the <b>Extract FAM Product Specific DB 
+        Managers.lst</b> file is updated.
+    </ul> 
+    <li>Confirm that the Tools menu has an <b>Enable/disable auto-scrolling</b> item.
+    <ul>  
+        <li>Confirm once Enable/disable auto-scrolling option is selected, the <b>Enable/disable
+        auto-scrolling</b> button on the toolBar is depressed (enabled).</li> 
+        <li>With the toolbar button enabled, confirm that all the scroll bars in both the <b>Queue
+        Log</b> and <b>Processing Log</b> pages scroll down to the bottom once processing 
+        starts.</li>
+        <li>Confirm the auto-scroll state is persistent across sessions of the File Action Manager.
+    </ul>  
+    <li>Confirm that the Tools menu has an <b>Database Administration Utility</b> item and that the
+    initial state is enabled.
+    <ul>
+        <li>Start the FAM and <b>do not select</b> a Database Server and Database Name.
+        <li>Select the menu item and confirm that a <b>Select database to administer</b> dialog is
+        presented.
+        <li>Close the DB Admin utility.
+        <LI><b>[LegacyRC #5522]</b> Confirm that <b>Ctrl+D</b> launches DB Admin.
+        <li>Close the FAM.
 <p>
-       		<li>Start the FAM and <b>select</b> a Database Server and Database Name.
-       		<li>Select the menu item and confirm that a <b>Login</b> dialog is presented.
-       		<li>Provide the password and confirm that the <b>File Action Manager Database 
-		Administration</b> application starts.
-		<li>Confirm that the Database Server and Database Name items specified in FAM 
-		are retained.
-    	</ul>  
-    	<li>Confirm that the Tools menu has an <b>Options...</b> selection and that the initial state 
-	is enabled.</li>
-    	<ul> 
-       		<li>Confirm choosing the <b>Options...</b> selection opens the Options dialog.</li> 
-       		<li>Confirm that the default value is <b>1000</b> records for display of status.</li> 
-       		<li>Set the <b>Only display status for the last completed records</b> to 3, then 
-           	process a set of more than 3 files that all complete successfully.</li> 
-       		<li>Confirm than no more than 3 files at a time are displayed in the <b>Files that 
-           	completed processing recently</b> grid in the Processing Log tab.</li> 
-       		<li>Process a set of more than 3 files that all fail.</li> 
-       		<li>Confirm that no more than 3 files at a time are displayed in the <b>Files that 
-		failed processing recently</b> grid.</li>
-    	</ul>
+        <li>Start the FAM and <b>select</b> a Database Server and Database Name.
+        <li>Select the menu item and confirm that a <b>Login</b> dialog is presented.
+        <li>Provide the password and confirm that the <b>File Action Manager Database 
+        Administration</b> application starts.
+        <li>Confirm that the Database Server and Database Name items specified in FAM are 
+        retained.
+    </ul>  
+    <li>Confirm that the Tools menu has an <b>Options...</b> selection and that the initial state 
+    is enabled.</li>
+    <ul> 
+        <li>Confirm choosing the <b>Options...</b> selection opens the Options dialog.</li> 
+        <li>Confirm that the default value is <b>1000</b> records for display of status.</li> 
+        <li>Set the <b>Only display status for the last completed records</b> to 3, then process a
+        set of more than 3 files that all complete successfully.</li> 
+        <li>Confirm than no more than 3 files at a time are displayed in the <b>Files that 
+        completed processing recently</b> grid in the Processing Log tab.</li> 
+        <li>Process a set of more than 3 files that all fail.</li> 
+        <li>Confirm that no more than 3 files at a time are displayed in the <b>Files that failed
+        processing recently</b> grid.</li>
+    </ul>
 </ul> 
 <b>Help Menu</b> 
 <ul>
-    	<li>Confirm the <b>File Action Manager</b> menu bar has a <b>Help</b> menu and that 
-	the initial state is enabled.</li>    
-    	<li>Confirm that the <b>Help</b> menu has a <b>File Action Manager Help</b> item and the 
-	initial state is enabled.</li>
-    	<li>Confirm that selecting the <b>File Action Manager Help</b> item brings up 
-        FLEX Index Help or ID Shield Help or LabDE Help.</li>
-	<li><b>[LegacyRC #5487]</b> Opening Help from FPS file
-	<ul>
-		<li>Double-click on a FPS file to open it.
-		<li>Select <b>Help - File Action manager Help</b>.
-		<li>Confirm that the appropriate Help file is opened.
-	</ul>
-    	<li>Confirm that the <b>Help</b> menu has an <b>About File Action Manager</b> item and 
-	the initial state is enabled.</li>
-    	<li>Confirm that selecting <b>About File Action Manager</b> brings up a window that 
-	shows correct FAM version, FKB version and copyright information for <b>File Action 
-	Manager</b>.</li>
+    <li>Confirm the <b>File Action Manager</b> menu bar has a <b>Help</b> menu and that the initial
+    state is enabled.</li>    
+    <li>Confirm that the <b>Help</b> menu has a <b>File Action Manager Help</b> item and the 
+    initial state is enabled.</li>
+    <li>Confirm that selecting the <b>File Action Manager Help</b> item brings up FLEX Index Help
+    or ID Shield Help or LabDE Help.</li>
+    <li><b>[LegacyRC #5487]</b> Opening Help from FPS file
+    <ul>
+        <li>Double-click on a FPS file to open it.
+        <li>Select <b>Help - File Action manager Help</b>.
+        <li>Confirm that the appropriate Help file is opened.
+    </ul>
+    <li>Confirm that the <b>Help</b> menu has an <b>About File Action Manager</b> item and the
+    initial state is enabled.</li>
+    <li>Confirm that selecting <b>About File Action Manager</b> brings up a window that shows
+    correct FAM version, FKB version and copyright information for <b>File Action Manager</b>.</li>
 </ul>
 <p>
 <b>Open FPS Button</b> 
 <ul>
-    	<li><b>[LegacyRC #3307]</b> Confirm the <b>File Action Manager</b> toolbar has a <b>Open 
-	FPS file</b> toolbar button.
-	<li>Confirm that the toolbar button includes a drop-down menu allowing the user to open 
-	recent FPS files.
-	<li>Confirm that clicking on the button portion of the toolbar button displays a 
-	<b>File Open</b> dialog defaulting to <b>*.FPS</b> files.
-	<li>Confirm that the selected file is opened.
+    <li><b>[LegacyRC #3307]</b> Confirm the <b>File Action Manager</b> toolbar has a <b>Open FPS
+    file</b> toolbar button.
+    <li>Confirm that the toolbar button includes a drop-down menu allowing the user to open recent
+    FPS files.
+    <li>Confirm that clicking on the button portion of the toolbar button displays a <b>File 
+    Open</b> dialog defaulting to <b>*.FPS</b> files.
+    <li>Confirm that the selected file is opened.
 </ul>
 <p>
 <b>Start Processing Button</b> 
 <ul>
-    	<li>Confirm the <b>File Action Manager</b> toolbar has a <b>Start Processing</b> 
-  	button and the initial color is gray and the initial state is disabled.</li> 
-    	<li>Drag and drop an <b>FPS</b> file into File Action Manager.</li> 
-    	<li>Confirm that the <b>Start Processing</b> button turns green when enabled.</li> 
-    	<li>Confirm that the <b>Start Processing</b> button performs the same function 
-  	as selecting <b>Process - Start Processing</b>.</li>
-    	<li>Select an FPS file with all the tabs visible and click the <b>Start Processing</b> 
-	button. </li>
-    	<ul> 
-       		<li>Confirm that the <b>Queue</b> and <b>Process</b> check boxes on the 
-        	<b>Action</b> tab are disabled and the <b>Display</b> check box is still 
-		enabled.</li>
-       		<li>Uncheck the <b>Display</b> check box and confirm that the Statistics tab 
-		disappears.</li> 
-       		<li>Check the <b>Display</b> check box and confirm that the Statistics tab 
-		reappears and all the data on the Statistics tab reflects the current running 
-		information.</li> 
-    	</ul>
+    <li>Confirm the <b>File Action Manager</b> toolbar has a <b>Start Processing</b> button and the
+    initial color is gray and the initial state is disabled.</li> 
+    <li>Drag and drop an <b>FPS</b> file into File Action Manager.</li> 
+    <li>Confirm that the <b>Start Processing</b> button turns green when enabled.</li> 
+    <li>Confirm that the <b>Start Processing</b> button performs the same function as selecting
+    <b>Process - Start Processing</b>.</li>
+    <li>Select an FPS file with all the tabs visible and click the <b>Start Processing</b> 
+    button. </li>
+    <ul> 
+        <li>Confirm that the <b>Queue</b> and <b>Process</b> check boxes on the <b>Action</b> tab
+        are disabled and the <b>Display</b> check box is still enabled.</li>
+        <li>Uncheck the <b>Display</b> check box and confirm that the Statistics tab 
+        disappears.</li> 
+        <li>Check the <b>Display</b> check box and confirm that the Statistics tab reappears and
+        all the data on the Statistics tab reflects the current running information.</li> 
+    </ul>
 <p>
-    	<li>Select an FPS file with only the <b>Statistics</b> tab visible and start processing.</li>
-    	<li>Confirm that the <b>Display</b> check box is disabled while running.</li>
+    <li>Select an FPS file with only the <b>Statistics</b> tab visible and start processing.</li>
+    <li>Confirm that the <b>Display</b> check box is disabled while running.</li>
 </ul>
 <p>
 <b>Pause Processing Button</b> 
 <ul>
-    	<li>Confirm the <b>File Action Manager</b> toolbar has a <b>Pause Processing</b> 
- 	button and the initial color is gray and the initial state is disabled.</li> 
-    	<li>Confirm that the <b>Pause Processing</b> button turns blue when enabled.</li> 
-    	<li>Confirm that the <b>Pause Processing</b> button performs the same function 
- 	as selecting <b>Process - Pause Processing</b>.</li>
+    <li>Confirm the <b>File Action Manager</b> toolbar has a <b>Pause Processing</b> button and the
+    initial color is gray and the initial state is disabled.</li> 
+    <li>Confirm that the <b>Pause Processing</b> button turns blue when enabled.</li> 
+    <li>Confirm that the <b>Pause Processing</b> button performs the same function as selecting
+    <b>Process - Pause Processing</b>.</li>
 </ul>
 <p>
 <b>Stop Processing Button</b>
 <ul>
-    	<li>Confirm the <b>File Action Manager</b> toolbar has a <b>Stop Processing</b> 
- 	button and the initial color is gray and the initial state is disabled.</li> 
-    	<li>Confirm that the <b>Stop Processing</b> button turns black when enabled.</li> 
-    	<li>Confirm that the Stop Processing button performs the same function 
- 	as selecting the Stop Processing item in the <b>Process</b> menu./li>
+    <li>Confirm the <b>File Action Manager</b> toolbar has a <b>Stop Processing</b> button and the
+    initial color is gray and the initial state is disabled.</li> 
+    <li>Confirm that the <b>Stop Processing</b> button turns black when enabled.</li> 
+    <li>Confirm that the Stop Processing button performs the same function as selecting the Stop
+    Processing item in the <b>Process</b> menu./li>
 </ul>
 <p>
 <b>Enable/Disable Auto-Scrolling of the Report Grid Button</b>
 <ul>
-	<li>Confirm if the AutoScrolling registry entry (<b>HKCU/Software/Extract
-	Systems/ReusableComponents/ComComponents/UCLIDFileProcessing/FileProcessingDlg</b>)
-	is removed, the Auto-scrolling button is depressed (i.e. enabled) when a blank
-	FAM is brought up.  
-    	<li>Confirm that <b>Enable/Disable Auto-Scrolling of the Report</b> button performs 
-	the same function as selecting the Enable/Disable Auto-Scrolling item in the Tools menu.         
+    <li>Confirm if the AutoScrolling registry entry (<b>HKCU/Software/Extract
+    Systems/ReusableComponents/ComComponents/UCLIDFileProcessing/FileProcessingDlg</b>) is removed,
+    the Auto-scrolling button is depressed (i.e. enabled) when a blank FAM is brought up.  
+    <li>Confirm that <b>Enable/Disable Auto-Scrolling of the Report</b> button performs the same 
+    function as selecting the Enable/Disable Auto-Scrolling item in the Tools menu.         
 </ul>
 <p>
 <h3><u>Property Pages</u></h3>   
 <b>Database Tab</b>
 <ul>
-	<li>Start a blank File Action Manager.  Confirm that the only visible tab is the 
-	<b>Database</b> tab.
-    	<li>Confirm that the <b>...</b> ( Browse ) button associated with the Database Server 
-	edit box is enabled.
-    	<li>Confirm that the <b>...</b> ( Browse ) button associated with the Database Name 
-	edit box is enabled.
-    	<li>Confirm that the default text in the <b>Connection Status</b> edit box is <b>Not 
-	Connected</b>.
-    	<li>Confirm that the associated <b>Refresh</b> button is enabled.
-    	<li>Confirm that the <b>Connect to last used database</b> button is enabled.
-    	<li><b>[LegacyRC #4734]</b> Confirm that the <b>Connect to last used database</b> connects 
-	to the previously used Database Server and Database Name.
-    	<li>Error Conditions:
-	<ul>
-	    	<li>Modify the HKCU\Software\Extract 
-		Systems\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMDBAdmin 
-		registry entries.
-	    	<li><b>[LegacyRC #4855]</b> With both <b>LastGoodDatabase</b> and <b>LastGoodServer</b> 
-		empty, confirm that the <b>Connect to last used database</b> button is disabled.
-	    	<li><b>[LegacyRC #4856]</b> With the <b>LastGoodServer</b> set to <b>(local)</b>
-		and <b>LastGoodDatabase</b> set to <b>ABC123</b>, confirm that an error message 
-		box is displayed.
-		<li>Also confirm that a connection-related error message is displayed in the 
-		connection status edit box. 
-		<li>Confirm that <b>(local)</b> and <b>ABC123</b> are populated in the read-only 
-		edit boxes.
-	</ul>
+    <li>Start a blank File Action Manager.  Confirm that the only visible tab is the 
+    <b>Database</b> tab.
+    <li>Confirm that the <b>...</b> ( Browse ) button associated with the Database Server edit box
+    is enabled.
+    <li>Confirm that the <b>...</b> ( Browse ) button associated with the Database Name edit box is
+    enabled.
+    <li>Confirm that the default text in the <b>Connection Status</b> edit box is <b>Not 
+    Connected</b>.
+    <li>Confirm that the associated <b>Refresh</b> button is enabled.
+    <li>Confirm that the <b>Connect to last used database</b> button is enabled.
+    <li><b>[LegacyRC #4734]</b> Confirm that the <b>Connect to last used database</b> connects to
+    the previously used Database Server and Database Name.
+    <li>Error Conditions:
+    <ul>
+        <li>Modify the <b>HKCU\Software\Extract 
+        Systems\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMDBAdmin</b> registry 
+        entries.
+        <li><b>[LegacyRC #4855]</b> With both <b>LastGoodDatabase</b> and <b>LastGoodServer</b> 
+        empty, confirm that the <b>Connect to last used database</b> button is disabled.
+        <li><b>[LegacyRC #4856]</b> With the <b>LastGoodServer</b> set to <b>(local)</b> and 
+        <b>LastGoodDatabase</b> set to <b>ABC123</b>, confirm that an error message box is 
+        displayed.
+        <li>Also confirm that a connection-related error message is displayed in the connection 
+        status edit box. 
+        <li>Confirm that <b>(local)</b> and <b>ABC123</b> are populated in the read-only edit 
+        boxes.
+    </ul>
 <p>
-    	<li>Confirm that clicking the Database Server browse button displays 
-	a <b>Select Database Server</b> dialog.
-	<li><b>[LegacyRC #4805]</b> Confirm that the combo box includes <b>(local)</b> as a option 
-	if SQL Server Express 2005 is installed in the local host.
-	<li>Confirm that the combo box includes <b>(local)</b> as a option 
-	if SQL Server Express 2008 is installed in the local host.
-	<li>If neither SQL Server Express 2005 nor SQL Server Express 2008 are installed in the 
-	local host, confirm that the <b>(local)</b> option is not included in the combo box.
-	<li>If SQL Server Express 2005 or SQL Server Express 2008 are installed in local host by 
-	specifying a named instance, confirm that the <b>(local)\&lt;instanceName&gt;</b> option 
-	is included in the combo box.
-    	<li>Confirm that the combo box includes <b>&lt;Browse...&gt;</b> as a option.
-    	<li>Confirm that selecting <b>&lt;Browse...&gt;</b> populates the combo box with a 
-	collection of machines on the local domain that are available and have SQL Server 
-	installed.
-    	<li>Confirm that while <b>LISA</b> is visible on the domain, SQL Server is not installed 
-	and so LISA is not included in the combo box items.
+    <li>Confirm that clicking the Database Server browse button displays a <b>Select Database 
+    Server</b> dialog.
+    <li><b>[LegacyRC #4805]</b> Confirm that the combo box includes <b>(local)</b> as a option if 
+    SQL Server Express 2005 is installed in the local host.
+    <li>Confirm that the combo box includes <b>(local)</b> as a option if SQL Server Express 2008
+    is installed in the local host.
+    <li>If neither SQL Server Express 2005 nor SQL Server Express 2008 are installed in the local
+    host, confirm that the <b>(local)</b> option is not included in the combo box.
+    <li>If SQL Server Express 2005 or SQL Server Express 2008 are installed in local host by 
+    specifying a named instance, confirm that the <b>(local)\&lt;instanceName&gt;</b> option is 
+    included in the combo box.
+    <li>Confirm that the combo box includes <b>&lt;Browse...&gt;</b> as a option.
+    <li>Confirm that selecting <b>&lt;Browse...&gt;</b> populates the combo box with a collection
+    of machines on the local domain that are available and have SQL Server installed.
+    <li>Confirm that while <b>LISA</b> is visible on the domain, SQL Server is not installed and so
+    LISA is not included in the combo box items.
 <p>
-    	<li>Select <b>(local)</b> as the Database Server.  Confirm that clicking the Database 
-	Name browse button displays a <b>Select Database Name</b> dialog.
-    	<li>Confirm that the combo box includes <b>&lt;Browse...&gt;</b> as a option.
-    	<li>Confirm that selecting <b>&lt;Browse...&gt;</b> populates the combo box with a 
-	list of Extract Systems databases on the machine.
-    	<li>Confirm via SQL Server Management Studio that while <b>master</b> is included in 
-	the group of System Databases, it is not an Extract Systems database and so master is not 
-	included in the combo box items.
-    	<li><b>[LegacyRC #4921]</b> Confirm that on Vista, the drop-down list can show more 
-	than two names.
-    	<li>Select a database. Confirm that the <b>Connection Status</b> text changes to 
-	<b>Connection successfully established</b>.
-    	<li>Confirm that once a successful database connection has been made, the <b>Action</b>
-	tab is visible.
+    <li>Select <b>(local)</b> as the Database Server.  Confirm that clicking the Database Name
+    browse button displays a <b>Select Database Name</b> dialog.
+    <li>Confirm that the combo box includes <b>&lt;Browse...&gt;</b> as a option.
+    <li>Confirm that selecting <b>&lt;Browse...&gt;</b> populates the combo box with a list of
+    Extract Systems databases on the machine.
+    <li>Confirm via SQL Server Management Studio that while <b>master</b> is included in the group
+    of System Databases, it is not an Extract Systems database and so master is not included in the
+    combo box items.
+    <li><b>[LegacyRC #4921]</b> Confirm that on Vista, the drop-down list can show more than two
+    names.
+    <li>Select a database. Confirm that the <b>Connection Status</b> text changes to <b>Connection 
+    successfully established</b>.
+    <li>Confirm that once a successful database connection has been made, the <b>Action</b> tab is
+    visible.
 <p>
-	<li><b>[LegacyRCAndUtils #5165]</b> FAM - shouldn't be able to change database while processing
-	<ul>
-		<li>Configure an FPS file and start it processing.
-		<li>Confirm that while it is processing, it is not possible to change the database 
-		using the <b>&lt;...&gt;</b> buttons on the <b>Database</b> tab.
-	</ul>
+    <li><b>[LegacyRCAndUtils #5165]</b> FAM - shouldn't be able to change database while processing
+    <ul>
+        <li>Configure an FPS file and start it processing.
+        <li>Confirm that while it is processing, it is not possible to change the database using 
+        the <b>&lt;...&gt;</b> buttons on the <b>Database</b> tab.
+    </ul>
 </ul>
 <p>
 <b>Action Tab</b>
 <ul>
-    	<li>Confirm that in the Action tab there is an enabled <b>Select...</b> button.
-       	<ul>
-          	<li>Confirm that clicking on the <b>Select...</b> button brings up the 
-		<b>Select Action</b> dialog.
-          	<li>Confirm that the Select Action dialog has a combo box with a list of 
-		available actions.
-		<li>Confirm that the <b>Select Action</b> dialog includes a 
-		<b>Tag Selector</b> button allowing the user to choose an action 
-		including a $ function.
-		<li>Confirm that <b>&lt;SourceDocName&gt;</b> does not appear in the 
-		<b>Select Action</b> dialog.
-		<li>Confirm that such an action can be saved and reloaded.
-          	<li>Confirm that an Action selected by pressing the <b>OK</b> button in 
-		the Select Action dialog is placed in the <b>Select action</b> edit box on 
-		the Action tab.
-       	</ul>
-   	<LI><b>[LegacyRC #5650, #5653]</b> Select action with empty database
-       	<ul>
-  	   	<LI>Create a new database.
-		<LI>Confirm that <b>AutoCreateAction=0</b> within DBInfo.
-  	   	<LI>Confirm that an error message is displayed when trying to select an action.
-		<li>Close the FAM.
-		<LI>Modify DBInfo so that <b>AutoCreateAction=1</b>.
-		<li>Open a FAM instance pointing to the same new, empty database.
-  	   	<LI>Confirm that no error message is displayed when trying to select an action.
-		<li>Confirm that an error message is displayed if a non-existent action 
-		is selected that <b>does not</b> include a valid $ function.
-		<li>Confirm that no error message is displayed if a non-existent action 
-		is selected that <b>does</b> include a valid $ function.
+    <li>Confirm that in the Action tab there is an enabled <b>Select...</b> button.
+    <ul>
+        <li>Confirm that clicking on the <b>Select...</b> button brings up the <b>Select Action</b>
+        dialog.
+        <li>Confirm that the Select Action dialog has a combo box with a list of available
+        actions.
+        <li>Confirm that the <b>Select Action</b> dialog includes a <b>Tag Selector</b> button 
+        allowing the user to choose an action including a $ function.
+        <li>Confirm that <b>&lt;SourceDocName&gt;</b> does not appear in the <b>Select Action</b>
+        dialog.
+        <li>Confirm that such an action can be saved and reloaded.
+        <li>Confirm that an Action selected by pressing the <b>OK</b> button in the Select Action
+        dialog is placed in the <b>Select action</b> edit box on the Action tab.
+    </ul>
+    <LI><b>[LegacyRC #5650, #5653]</b> Select action with empty database
+    <ul>
+        <LI>Create a new database.
+        <LI>Confirm that <b>AutoCreateAction=0</b> within DBInfo.
+        <LI>Confirm that an error message is displayed when trying to select an action.
+        <li>Close the FAM.
+        <LI>Modify DBInfo so that <b>AutoCreateAction=1</b>.
+        <li>Open a FAM instance pointing to the same new, empty database.
+        <LI>Confirm that no error message is displayed when trying to select an action.
+        <li>Confirm that an error message is displayed if a non-existent action is selected that
+        <b>does not</b> include a valid $ function.
+        <li>Confirm that no error message is displayed if a non-existent action is selected that
+        <b>does</b> include a valid $ function.
 <p>
-		<LI>Confirm that <b>AutoCreateAction=0</b> within DBInfo.
-		<li>Create and save an FPS file using a defined action.
-		<li>Close the FAM.
-		<li>Delete the action from the database.
-		<li>Open the FPS file.
-		<li>Confirm that after dismissing the error messages, the user is unable 
-		to start processing.
-       	</ul>
+        <LI>Confirm that <b>AutoCreateAction=0</b> within DBInfo.
+        <li>Create and save an FPS file using a defined action.
+        <li>Close the FAM.
+        <li>Delete the action from the database.
+        <li>Open the FPS file.
+        <li>Confirm that after dismissing the error messages, the user is unable to start 
+        processing.
+    </ul>
 <p>
-   	<LI><b>[LegacyRC #5688]</b> Long action names in Select Action
-       	<ul>
-		<LI>Confirm that the <b>Select Action</b> dialog has enough space for 
-		50 lower-case characters without scrolling.
-		<LI>Confirm that the <b>Select Action</b> dialog has enough space for 
-		50 upper-case characters with scrolling.
-       	</ul>
+    <LI><b>[LegacyRC #5688]</b> Long action names in Select Action
+    <ul>
+        <LI>Confirm that the <b>Select Action</b> dialog has enough space for 50 lower-case 
+        characters without scrolling.
+        <LI>Confirm that the <b>Select Action</b> dialog has enough space for 50 upper-case 
+        characters with scrolling.
+    </ul>
 <p>
-       	<li>Confirm that on the Action tab there is a <b>Queue files for this action</b> checkbox 
-	and that the initial state is disabled.
-       	<li>Confirm that on the Action tab there is a <b>Process files in the queue for this action</b> 
-	checkbox and that the initial state is disabled.
-       	<li>Confirm that on the Action tab there is a <b>Display real-time status of files for this 
-	action</b> checkbox and that the initial state is disabled.
-       	<li>Select an action using the <b>Select...</b> button.
-      	<ul> 
-          	<li>Confirm that the <b>Queue files for this action</b> checkbox is enabled.
-             	<li>Confirm that when only this checkbox on the Action tab is checked and a 
-		file supplier is defined and configured, the <b>Start processing</b> button 
-		is enabled.
+    <li>Confirm that on the Action tab there is a <b>Queue files for this action</b> checkbox and 
+    that the initial state is disabled.
+    <li>Confirm that on the Action tab there is a <b>Process files in the queue for this action</b> 
+    checkbox and that the initial state is disabled.
+    <li>Confirm that on the Action tab there is a <b>Display real-time status of files for this 
+    action</b> checkbox and that the initial state is disabled.
+    <li>Select an action using the <b>Select...</b> button.
+    <ul> 
+        <li>Confirm that the <b>Queue files for this action</b> checkbox is enabled.
+        <li>Confirm that when only this checkbox on the Action tab is checked and a file supplier
+        is defined and configured, the <b>Start processing</b> button is enabled.
 <p>
-       		<li>Confirm that the <b>Process files in the queue for this action</b> 
-		checkbox is enabled.
-             	<li>Confirm that when only this checkbox on the Action tab is checked and a 
-		task is defined and configured, the <b>Start processing</b> button is enabled.  
+        <li>Confirm that the <b>Process files in the queue for this action</b> checkbox is 
+        enabled.
+        <li>Confirm that when only this checkbox on the Action tab is checked and a task is defined
+        and configured, the <b>Start processing</b> button is enabled.  
 <p>
-          	<li>Confirm that the <b>Display real-time status of files for this action</b> 
-		checkbox is enabled.
-             	<li>Confirm that when only this checkbox on the Action tab is checked it 
-		displays the <b>Statistics</b> tab, and the <b>Start processing</b> button 
-		is also enabled.  
-       </ul>
-       <li>Confirm that once processing starts, the <b>File Action Manager</b> always switches 
-	to the leftmost tab among <b>Queue Log</b>, <b>Processing Log</b> and <b>Statistics</b>. 
+        <li>Confirm that the <b>Display real-time status of files for this action</b> checkbox is
+        enabled.
+        <li>Confirm that when only this checkbox on the Action tab is checked it displays the
+        <b>Statistics</b> tab, and the <b>Start processing</b> button is also enabled.  
+    </ul>
+    <li>Confirm that once processing starts, the <b>File Action Manager</b> always switches to the
+    leftmost tab among <b>Queue Log</b>, <b>Processing Log</b> and <b>Statistics</b>. 
 <p>
-    	<li>Perform the following steps to confirm that the database can have more than one action.</li>
-    	<ul>
-       		<li>Clear the database and then add an action. Prepare an appropriate file 
-		supplier and one or more tasks (e.g. OCR document).  Confirm that the action 
-		can process the files.
-       		<li>Add another action then prepare a file supplier and one or more tasks 
-		again. Confirm that the second action can also process the files.
-    	</ul>
+    <li>Perform the following steps to confirm that the database can have more than one action.</li>
+    <ul>
+        <li>Clear the database and then add an action. Prepare an appropriate file supplier and one
+        or more tasks (e.g. OCR document).  Confirm that the action can process the files.
+        <li>Add another action then prepare a file supplier and one or more tasks again. Confirm
+        that the second action can also process the files.
+    </ul>
 </ul>
 <p>
 <b>Statistics Tab</b> 
 <ul>
-	<li>Confirm that when the checkbox for <b>Display real-time status of files for this 
-	action</b> is checked on the Action tab, it creates the Statistics tab.</li>
-	<li>Confirm that when the checkbox is unchecked, the <b>Statistics</b> tab disappears.</li> 
-	<li>Confirm that the Statistics Tab has a display area for <b>Combined statistics from all 
-	processes</b>, a display area for <b>Statistics from this run</b>, and an <b>Export...</b> 
-	button whose initial state is enabled.</li> 
-	<li>Confirm that the <b>Combined statistics from all processes</b> display area has entries 
-	for <b>Bytes Processed:</b>, <b>Pages Processed:</b>, <b>Documents Processed:</b>, 
-      	<b>Estimated Time Remaining:</b> and <b>Estimated Completion Time:</b>.</li> 
-	<li>Confirm the Statistics from this run display area has entries for <b>Bytes 
-	Processed:</b>, <b>Pages Processed:</b>, <b>Documents Processed:</b>, <b>Total Processing 
-	Time:</b> and <b>Total Run Time:</b>.</li> 
-	<li>Confirm that when the <b>Export...</b> button is pressed, it brings up a <b>Save 
-	As</b> dialog with .xml as the default file type.</li> 
-	<li>Confirm that a file with a <b>.xml</b> file extension is created regardless of 
-	whether or not the extension is specified in the File name edit box of the Save As 
-	dialog.</li>
+    <li>Confirm that when the checkbox for <b>Display real-time status of files for this action</b>
+    is checked on the Action tab, it creates the Statistics tab.</li>
+    <li>Confirm that when the checkbox is unchecked, the <b>Statistics</b> tab disappears.</li> 
+    <li>Confirm that the Statistics Tab has a display area for <b>Combined statistics from all 
+    processes</b>, a display area for <b>Statistics from this run</b>, and an <b>Export...</b> 
+    button whose initial state is enabled.</li> 
+    <li>Confirm that the <b>Combined statistics from all processes</b> display area has entries for
+    <b>Bytes Processed:</b>, <b>Pages Processed:</b>, <b>Documents Processed:</b>, 
+    <b>Estimated Time Remaining:</b> and <b>Estimated Completion Time:</b>.</li> 
+    <li>Confirm the Statistics from this run display area has entries for <b>Bytes Processed:</b>,
+    <b>Pages Processed:</b>, <b>Documents Processed:</b>, <b>Total Processing Time:</b> and 
+    <b>Total Run Time:</b>.</li> 
+    <li>Confirm that when the <b>Export...</b> button is pressed, it brings up a <b>Save As</b>
+    dialog with .xml as the default file type.</li> 
+    <li>Confirm that a file with a <b>.xml</b> file extension is created regardless of whether or
+    not the extension is specified in the File name edit box of the Save As dialog.</li>
 <p>
-	<li>Prepare an instance of the <b>File Action Manager</b> with any appropriate file 
-	suppliers and tasks - referenced below as <b>FAM1</b>.
-	<li>Start a blank FAM then select the action used in FAM1.  Enable only the 
-	<b>Statistics</b> tab by checking the checkbox for <b>Display real-time status of files 
-	for this action</b> - referenced below as <b>FAM2</b>. 
-       <li>Click Start Processing for <b>both</b> FAM instances.
-       <li>Confirm that the display area for <b>Combined statistics from all processes</b> on the 
-	Statistics tab of FAM2 shows the processing data of FAM1.
-       <li>Confirm that data in the <b>Status Bar</b> of FAM2 also shows the processing data 
-	of FAM1.  Note that the processing count will remain at 0.
-	<li><b>[LegacyRCAndUtils #5099]</b> Confirm that clicking the <b>Stop Processing</b> 
-	button in FAM2 can stop processing.
-	<li>Confirm that the <b>Start processing</b> button in FAM2 is disabled until its 
-	<b>Stop processing</b> button is pressed.
-       	<li><b>[LegacyRC #4226]</b> Confirm that the <b>Statistics</b> page can be disabled and 
-	enabled during active processing in FAM1.
+    <li>Prepare an instance of the <b>File Action Manager</b> with any appropriate file suppliers
+    and tasks - referenced below as <b>FAM1</b>.
+    <li>Start a blank FAM then select the action used in FAM1.  Enable only the <b>Statistics</b>
+    tab by checking the checkbox for <b>Display real-time status of files for this action</b> -
+    referenced below as <b>FAM2</b>. 
+    <li>Click Start Processing for <b>both</b> FAM instances.
+    <li>Confirm that the display area for <b>Combined statistics from all processes</b> on the 
+    Statistics tab of FAM2 shows the processing data of FAM1.
+    <li>Confirm that data in the <b>Status Bar</b> of FAM2 also shows the processing data of FAM1.
+    Note that the processing count will remain at 0.
+    <li><b>[LegacyRCAndUtils #5099]</b> Confirm that clicking the <b>Stop Processing</b> button in
+    FAM2 can stop processing.
+    <li>Confirm that the <b>Start processing</b> button in FAM2 is disabled until its <b>Stop 
+    processing</b> button is pressed.
+    <li><b>[LegacyRC #4226]</b> Confirm that the <b>Statistics</b> page can be disabled and enabled
+    during active processing in FAM1.
 <p>
- 	<li><b>[LegacyRC #4842]</b> Estimated times not displayed.
-	<ul>
-		<li>Run the <b>File Action Manager</b> to queue and process ( via OCR ) 
-		approximately 200 documents.
-		<li>Navigate to the <b>Statistics</b> tab after processing begins.
-		<li>Confirm that estimated remaining and completion times appear after a 
-		few seconds of processing.
-	</ul>
+    <li><b>[LegacyRC #4842]</b> Estimated times not displayed.
+    <ul>
+        <li>Run the <b>File Action Manager</b> to queue and process (via OCR) approximately 200 
+        documents.
+        <li>Navigate to the <b>Statistics</b> tab after processing begins.
+        <li>Confirm that estimated remaining and completion times appear after a few seconds of
+        processing.
+    </ul>
 <p>
-       	<li><b>[LegacyRC #4908, 4922]</b> Scroll bars on Windows Server 2008 and Vista.
-	<ul>
-		<li>Run the <b>File Action Manager</b> to queue and process ( via OCR ) 
-		approximately 200 documents on a machine running Server 2008.
-		<li>Navigate to the <b>Statistics</b> tab after processing begins.
-		<li>Confirm that scrollbars are <b>not</b> required to display all rows in 
-		the list boxes.
-		<li>Repeat this test on a machine running Vista.
-	</ul>
+    <li><b>[LegacyRC #4908, 4922]</b> Scroll bars on Windows Server 2008 and Vista.
+    <ul>
+        <li>Run the <b>File Action Manager</b> to queue and process (via OCR) approximately 200
+        documents on a machine running Server 2008.
+        <li>Navigate to the <b>Statistics</b> tab after processing begins.
+        <li>Confirm that scrollbars are <b>not</b> required to display all rows in the list boxes.
+        <li>Repeat this test on a machine running Vista.
+    </ul>
 <p>
-   	<LI><b>[LegacyRC #5302]</b> Logging FAM Stop time
-       	<ul>
-      		<li>Start processing for an FPS file with only <b>Display real-time 
-		status</b> active.
-      		<li>Stop processing.
-      		<li>Confirm that both the start time and the stop time are logged.
-       	</ul>
+    <LI><b>[LegacyRC #5302]</b> Logging FAM Stop time
+    <ul>
+        <li>Start processing for an FPS file with only <b>Display real-time status</b> active.
+        <li>Stop processing.
+        <li>Confirm that both the start time and the stop time are logged.
+    </ul>
 </ul>
 <p>
 <h3><u>Status Bar</u></h3> 
 <ul>
-	<li>Start a blank <b>File Action Manager</b>.
-   	<li>Maximize the File Action Manager window and confirm that the left most pane of the 
-	Status bar displays the message: <b>Unable to connect to the database!</b>
-   	<li>Confirm that the following panes are empty: <b>Total:</b>, <b>Completed:</b>, 
-	<b>Processing:</b>, <b>Pending:</b>, <b>Skipped:</b> and <b>Failed:</b>.
-    	<li>Confirm that the Database Connection and Status icon is a yellow cylinder in a 
-	red background.
-	<li>Click the <b>Connect to last used database</b> button.
-	<ul>
-	    	<li>Confirm that the Database Connection and Status icon changes to a yellow 
-		cylinder in a green background.
-	    	<li>Confirm that the <b>Action</b> tab appears behind the Database tab.
-	    	<li>Confirm that the left pane of the Status bar displays the message: <b>An action 
-		should be specified in action tab!</b>
-	</ul>
+    <li>Start a blank <b>File Action Manager</b>.
+    <li>Maximize the File Action Manager window and confirm that the left most pane of the Status 
+    bar displays the message: <b>Unable to connect to the database!</b>
+    <li>Confirm that the following panes are empty: <b>Total:</b>, <b>Completed:</b>, 
+    <b>Processing:</b>, <b>Pending:</b>, <b>Skipped:</b> and <b>Failed:</b>.
+    <li>Confirm that the Database Connection and Status icon is a yellow cylinder in a red 
+    background.
+    <li>Click the <b>Connect to last used database</b> button.
+    <ul>
+        <li>Confirm that the Database Connection and Status icon changes to a yellow cylinder in a
+        green background.
+        <li>Confirm that the <b>Action</b> tab appears behind the Database tab.
+        <li>Confirm that the left pane of the Status bar displays the message: <b>An action should
+        be specified in action tab!</b>
+    </ul>
 <p>
-    	<li>Disconnect the database connection by modifying the <b>Database Name</b> field to a 
-	nonsense value.
-    	<ul>
-       		<li>Confirm that an informative error message is displayed.
-       		<li>Confirm that the Database Connection and Status icon is a yellow cylinder on 
-		a red background.
-       		<li>Confirm that the Status bar displays the message <b>Unable to connect to 
-		the database!</b>
-       		<li>Confirm that a <b>Save Changes?</b> message is displayed when the FAM is closed.
-	    	<ul>
-	       		<li>Confirm that <b>Cancel</b> leaves the FAM open.
-	       		<li>Confirm that <b>Yes</b> displays a <b>Save failed</b> message.
-	       		<li>Confirm that <b>No</b> exits the FAM without further error.
-	    	</ul>
-    	</ul> 
+    <li>Disconnect the database connection by modifying the <b>Database Name</b> field to a 
+    nonsense value.
+    <ul>
+        <li>Confirm that an informative error message is displayed.
+        <li>Confirm that the Database Connection and Status icon is a yellow cylinder on a red
+        background.
+        <li>Confirm that the Status bar displays the message <b>Unable to connect to the 
+        database!</b>
+        <li>Confirm that a <b>Save Changes?</b> message is displayed when the FAM is closed.
+        <ul>
+            <li>Confirm that <b>Cancel</b> leaves the FAM open.
+            <li>Confirm that <b>Yes</b> displays a <b>Save failed</b> message.
+            <li>Confirm that <b>No</b> exits the FAM without further error.
+        </ul>
+    </ul> 
 <p>
-    	<li>Reestablish a database connection and select an <b>Action</b>.
-    	<ul>
- 		<li>Confirm that the left corner of the Status bar displays the message: <b>At 
-		least one check box should be checked in action tab!</b> 
-        	<li>Confirm that the Database Connection and Status icon is a yellow cylinder 
-		in a green background.
-	    	<li>Confirm that the following panes display <b>0</b>: <b>Total:</b>, 
-		<b>Completed:</b>, <b>Processing:</b>, <b>Pending:</b>, <b>Skipped:</b> and  
-		<b>Failed:</b>.
+    <li>Reestablish a database connection and select an <b>Action</b>.
+    <ul>
+        <li>Confirm that the left corner of the Status bar displays the message: <b>At least one
+        check box should be checked in action tab!</b> 
+        <li>Confirm that the Database Connection and Status icon is a yellow cylinder in a green
+        background.
+        <li>Confirm that the following panes display <b>0</b>: <b>Total:</b>, <b>Completed:</b>,
+        <b>Processing:</b>, <b>Pending:</b>, <b>Skipped:</b> and  <b>Failed:</b>.
 <p>
-    		<li>Confirm that when the checkbox for <b>Queue files for this action</b> is 
-		checked, the Status bar displays the message: <b>At least one file supplier should 
-		be specified and be enabled!</b>.  Confirm that the remaining settings are 
-		unchanged.
-    		<li>Confirm that when a file supplier is specified, the Status bar displays the 
-		message: <b>Ready</b>. Confirm that the remaining settings are unchanged.
-    		<li>Press the <b>Start processing</b> button.
-    		<ul> 
-       			<li>Confirm that the Database Connection and Status icon changes to a yellow 
-			background with a flickering hour glass. 
-       			<li>Confirm that the Status bar displays the message: <b>Waiting</b>.
-       			<li>Confirm that the message changes to <b>Ready</b> when the queueing stops.
-    		</ul> 
+        <li>Confirm that when the checkbox for <b>Queue files for this action</b> is checked, the
+        Status bar displays the message: <b>At least one file supplier should be specified and be
+        enabled!</b>.  Confirm that the remaining settings are unchanged.
+        <li>Confirm that when a file supplier is specified, the Status bar displays the message: 
+        <b>Ready</b>. Confirm that the remaining settings are unchanged.
+        <li>Press the <b>Start processing</b> button.
+        <ul> 
+            <li>Confirm that the Database Connection and Status icon changes to a yellow background
+            with a flickering hour glass. 
+            <li>Confirm that the Status bar displays the message: <b>Waiting</b>.
+            <li>Confirm that the message changes to <b>Ready</b> when the queueing stops.
+        </ul> 
 <p>
-    		<li>Confirm that when the checkbox for <b>Process files in the queue for this action</b> 
-        	is checked, the Status bar displays the message: <b>At least one task should be 
-		specified</b>.
-    		<li>Configure a task in the <b>Processing Setup</b> tab, then press the <b>Start 
-		processing</b> button.
-    		<ul> 
-       			<li>Confirm that the message in the Status bar changes from <b>Ready</b> 
-			to <b>Waiting</b> to <b>Processing</b>, then back to <b>Ready</b> when 
-			the processing is finished.
-       			<li>Confirm that the <b>Total</b> pane displays the number of files 
-			processed or attempted in the run.  The total should equal the sum of all 
-			the other boxes.
-          		<li>Confirm that the text inside the <b>Total:</b> pane only takes up about 
-			one quarter of the pane space.
-       			<li>Confirm that the <b>Completed</b> pane displays the number of files 
-			that have completed all defined tasks.
-          		<li>Confirm that the text inside the <b>Completed:</b> pane only takes 
-			up about one third of the pane space.
-       			<li>Confirm that the <b>Processing</b> pane displays the number of files 
-			currently being processed.
-          		<li>Confirm that the text inside the <b>Processing:</b> pane takes up 
-			less than half of the pane space.
-       			<li>Confirm that the <b>Pending</b> pane displays the number of files 
-			in queue and ready for processing.
-          		<li>Confirm that the text inside the <b>Pending:</b> pane only takes up 
-			about one third of the pane space.
-			<li>Confirm that the <b>Skipped</b> pane displays the number of files 
-			that have been skipped in the database.
-			<li>Confirm that the text inside the <b>Skipped:</b> pane only takes up 
-			about half of the pane space.
-       			<li>Confirm that the <b>Failed</b> pane displays the number of files that 
-			failed to process a defined task.
-          		<li>Confirm that the text inside the <b>Failed:</b> pane only takes up about 
-			a quarter of the pane space.
-			<li>Confirm that each pane is enclosed by an identical horizontal border.
-    		</ul>
-	</ul>
+        <li>Confirm that when the checkbox for <b>Process files in the queue for this action</b> is
+        checked, the Status bar displays the message: <b>At least one task should be specified</b>.
+        <li>Configure a task in the <b>Processing Setup</b> tab, then press the <b>Start 
+        processing</b> button.
+        <ul> 
+            <li>Confirm that the message in the Status bar changes from <b>Ready</b> to 
+            <b>Waiting</b> to <b>Processing</b>, then back to <b>Ready</b> when the processing is
+            finished.
+            <li>Confirm that the <b>Total</b> pane displays the number of files processed or
+            attempted in the run.  The total should equal the sum of all the other boxes.
+            <li>Confirm that the text inside the <b>Total:</b> pane only takes up about one quarter
+            of the pane space.
+            <li>Confirm that the <b>Completed</b> pane displays the number of files that have
+            completed all defined tasks.
+            <li>Confirm that the text inside the <b>Completed:</b> pane only takes up about one
+            third of the pane space.
+            <li>Confirm that the <b>Processing</b> pane displays the number of files currently
+            being processed.
+            <li>Confirm that the text inside the <b>Processing:</b> pane takes up less than half of
+            the pane space.
+            <li>Confirm that the <b>Pending</b> pane displays the number of files in queue and 
+            ready for processing.
+            <li>Confirm that the text inside the <b>Pending:</b> pane only takes up about one third
+            of the pane space.
+            <li>Confirm that the <b>Skipped</b> pane displays the number of files that have been
+            skipped in the database.
+            <li>Confirm that the text inside the <b>Skipped:</b> pane only takes up about half of
+            the pane space.
+            <li>Confirm that the <b>Failed</b> pane displays the number of files that failed to
+            process a defined task.
+            <li>Confirm that the text inside the <b>Failed:</b> pane only takes up about a quarter
+            of the pane space.
+            <li>Confirm that each pane is enclosed by an identical horizontal border.
+        </ul>
+    </ul>
 <p>
-    	<li>Clear the database.
-    	<ul>
-       		<li>Set up two instances of the FAM to <b>supply</b> files. 
-       		<li>Set up another FAM instance to <b>process</b> files (e.g. Copy &ltSoureDocName&gt).
-           	<li>All three instances should use the <b>same</b> action name.
-       		<li>Stop the two file supplier FAM instances after a few hundred files have been queued.
-       		<li>Confirm that after the third FAM instance has finished processing (i.e. the <b>Start 
-		processing</b> button turns green), the value in the <b>Pending</b> pane is 0.
-    	</ul>  
+    <li>Clear the database.
+    <ul>
+        <li>Set up two instances of the FAM to <b>supply</b> files. 
+        <li>Set up another FAM instance to <b>process</b> files (e.g. Copy &ltSoureDocName&gt).
+        <li>All three instances should use the <b>same</b> action name.
+        <li>Stop the two file supplier FAM instances after a few hundred files have been queued.
+        <li>Confirm that after the third FAM instance has finished processing (i.e. the <b>Start 
+        processing</b> button turns green), the value in the <b>Pending</b> pane is 0.
+    </ul>  
 <p>
-   	<LI><b>[LegacyRC #5397]</b> FAM status bar problems with skipped files
-       	<ul>
-      		<li>Create an FPS file with a file supplier configured to <b>force 
-		processing</b>.
-      		<li>Use a task that supports skipping files.
-      		<li>Start processing and skip all the files. 
-      		<li>Confirm that the status bar shows correct numbers for skipped, 
-		pending and processing.
-      		<li>Start processing again and skip all the files again. 
-      		<li>Confirm that the status bar shows correct numbers for skipped, 
-		pending and processing.
-      		<li>Close the FAM instance. 
-      		<li>Reopen the FPS file and start processing. 
-      		<li>Confirm that the status bar shows correct numbers for skipped, 
-		pending and processing.
-       	</ul>
+    <LI><b>[LegacyRC #5397]</b> FAM status bar problems with skipped files
+    <ul>
+        <li>Create an FPS file with a file supplier configured to <b>force processing</b>.
+        <li>Use a task that supports skipping files.
+        <li>Start processing and skip all the files. 
+        <li>Confirm that the status bar shows correct numbers for skipped, pending and processing.
+        <li>Start processing again and skip all the files again. 
+        <li>Confirm that the status bar shows correct numbers for skipped, pending and processing.
+        <li>Close the FAM instance. 
+        <li>Reopen the FPS file and start processing. 
+        <li>Confirm that the status bar shows correct numbers for skipped, pending and processing.
+    </ul>
 </ul>
 <p>
 <h3><u>Miscellaneous</u></h3>
 <ul>
-	<li>Double-click any <b>FPS</b> file, then maximize the FAM.
-       	<li>Confirm when the <b>FPS</b> file is opened again, the FAM instance is maximized.
+    <li>Double-click any <b>FPS</b> file, then maximize the FAM.
+    <li>Confirm when the <b>FPS</b> file is opened again, the FAM instance is maximized.
 <p>
-    	<li>Follow the steps below to test the <b>crash recovery capability</b> of File Action Manager.
-    	<ul>
-       		<li>Start a blank FAM, then select an action and set up a queue.  Do not save 
-		the settings. Press the <b>Start processing</b> button.
-       		<li>Use the Windows <b>Task Manager</b> to kill the FAM instance.
-       		<li>Start another blank FAM.
-       		<li>Confirm that a <b>Recovery</b> dialog appears that asks about 
-           	recovery of <b>File Action Manager</b> settings from the previous session.
-       		<li>Confirm that a FAM hang condition which is caused by database lock occurs
-           	if the <b>Yes</b> button is pressed.
-       		<li>Confirm that if <b>Reset lock</b> in the DB Administration utility is 
-		selected, the new FAM instance is successfully recovered.  
-       		<li>Confirm that a blank instance of the FAM is brought up if the <b>No</b> 
-		button is pressed.
-    	</ul>
+    <li>Follow the steps below to test the <b>crash recovery capability</b> of File Action Manager.
+    <ul>
+        <li>Start a blank FAM, then select an action and set up a queue.  Do not save the settings.
+        Press the <b>Start processing</b> button.
+        <li>Use the Windows <b>Task Manager</b> to kill the FAM instance.
+        <li>Confirm the presence of a $RecoveryFile$ in the current user's local AppData folder.
+        <li>Start another blank FAM.
+        <li>Confirm that a <b>Recovery</b> dialog appears that asks about recovery of 
+        <b>File Action Manager</b> settings from the previous session.
+        <li>Confirm that a FAM hang condition which is caused by database lock occurs if the 
+        <b>Yes</b> button is pressed.
+        <li>Confirm that if <b>Reset lock</b> in the DB Administration utility is selected, the 
+        new FAM instance is successfully recovered.  
+        <li>Confirm that a blank instance of the FAM is brought up if the <b>No</b> button is 
+        pressed.
+    </ul>
 <p>
-    	<li>Confirm that when the FAM window is resized, the <b>Status bar</b> counts stay constant
-        and do not flicker between their current values and 88888.
-    	<li><b>[LegacyRC #4766]</b> Start a blank FAM and wait for one minute without making any changes.  
-	Close the FAM and confirm that no prompt to save changes is presented.  Also confirm that no 
-	error on exit is seen.
+    <li>Confirm that when the FAM window is resized, the <b>Status bar</b> counts stay constant and
+    do not flicker between their current values and 88888.
+    <li><b>[LegacyRC #4766]</b> Start a blank FAM and wait for one minute without making any 
+    changes. Close the FAM and confirm that no prompt to save changes is presented.  Also confirm 
+    that no error on exit is seen.
 <p>
-	<li><b>[FlexIDSCore #3173, #3186]</b> Registry option to cache RSD files</li>
-	<ul>
-		<li>Confirm that the HKCU/Software/Extract Systems/AttributeFinder/Settings/CacheRSD 
-		key is <b>1</b> by default.</li>
-		<li>Make a local copy of the latest rules delivery for <b>VA - York - Unity 
-		Business Systems Day Forward redaction</b> and the associated images.</li>
-		<li>Allow the rules to run for a non-trivial length of time.</li>
-		<li>Confirm that there are no unexpected exceptions logged.</li>
-		<li>Turn off caching and repeat the above exercise.</li>
-		<li>Verify that there are still no exceptions logged.</li>
-	</ul>
+    <li><b>[FlexIDSCore #3173, #3186]</b> Registry option to cache RSD files</li>
+    <ul>
+        <li>Confirm that the <b>HKCU/Software/Extract Systems/AttributeFinder/Settings/CacheRSD </b>
+        key is <b>1</b> by default.</li>
+        <li>Make a local copy of the latest rules delivery for <b>VA - York - Unity Business 
+        Systems Day Forward redaction</b> and the associated images.</li>
+        <li>Allow the rules to run for a non-trivial length of time.</li>
+        <li>Confirm that there are no unexpected exceptions logged.</li>
+        <li>Turn off caching and repeat the above exercise.</li>
+        <li>Verify that there are still no exceptions logged.</li>
+    </ul>
 <p>
-	<LI><b>[LegacyRC #5618]</b> FAM allows action name expressions
-	<ul>
-		<li>Create a new database.
-		<li>Confirm that the <b>AutoCreateActions</b> field in the <b>DBInfo</b> 
-		table is set to <b>0</b>.
-		<li>Add a <b>Test_&lt;user_name&gt;</b> action with your user name 
-		inserted in the appropriate location.
-		<li>Add a <b>Test</b> action to the database.
-		<li>Create and save a <b>UserName.fps</b> file that uses 
-		<b>Test_$UserName()</b> as the action.
-		<li>Create and save a <b>Test.fps</b> file that uses <b>Test</b> as 
-		the action.
-		<li>Confirm that files can be supplied and processed using each FPS file.
-		<li>Delete or rename the <b>Test</b> action.
-		<li>Confirm that opening <b>Test.fps</b> displays an error about the 
-		undefined action name.
-		<li>Delete or rename the <b>Test_&lt;user_name&gt;</b> action.
-		<li>Exercise <b>UserName.fps</b>
-		<ul>
-			<li>Confirm that opening the FPS file does not display an error 
-			about the undefined action name.
-			<li>Confirm that exercising the FPS file displays an exception 
-			indicating that the specified action name is invalid.
-			<li>Close the FPS file.
-			<li>Set the <b>AutoCreateActions</b> field in the <b>DBInfo</b> 
-			table to <b>1</b>.
-			<li>Exercise the FPS file.
-			<li>Confirm that the action is automatically created and that 
-			processing works without error.
-		</ul>
-       	</ul>
-	</LI>
-<ul> 
+    <LI><b>[LegacyRC #5618]</b> FAM allows action name expressions
+    <ul>
+        <li>Create a new database.
+        <li>Confirm that the <b>AutoCreateActions</b> field in the <b>DBInfo</b> table is set to 
+        <b>0</b>.
+        <li>Add a <b>Test_&lt;user_name&gt;</b> action with your user name inserted in the 
+        appropriate location.
+        <li>Add a <b>Test</b> action to the database.
+        <li>Create and save a <b>UserName.fps</b> file that uses <b>Test_$UserName()</b> as the 
+        action.
+        <li>Create and save a <b>Test.fps</b> file that uses <b>Test</b> as the action.
+        <li>Confirm that files can be supplied and processed using each FPS file.
+        <li>Delete or rename the <b>Test</b> action.
+        <li>Confirm that opening <b>Test.fps</b> displays an error about the undefined action name.
+        <li>Delete or rename the <b>Test_&lt;user_name&gt;</b> action.
+        <li>Exercise <b>UserName.fps</b>
+        <ul>
+            <li>Confirm that opening the FPS file does not display an error about the undefined 
+            action name.
+            <li>Confirm that exercising the FPS file displays an exception indicating that the 
+            specified action name is invalid.
+            <li>Close the FPS file.
+            <li>Set the <b>AutoCreateActions</b> field in the <b>DBInfo</b> table to <b>1</b>.
+            <li>Exercise the FPS file.
+            <li>Confirm that the action is automatically created and that processing works without
+            error.
+        </ul>
+    </ul>
+    </LI>
+</ul> 
 </body> 
 </html>

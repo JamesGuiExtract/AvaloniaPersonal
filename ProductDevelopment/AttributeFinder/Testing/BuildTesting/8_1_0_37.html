@@ -56,11 +56,6 @@
             <li>Confirm that the output PDF uses Group 4 compression.
         </ul>
 <p>        
-        <li><b>[FlexIDSCore #3899]</b> Unsupported OS dialog
-        <ul>
-            <li>Don't bother to test this.
-        </ul>
-<p>        
         <li><b>[DotNetRC #441]</b> ESFAMService
         <ul>
             <li>Open the FAM service database.
@@ -81,18 +76,19 @@
             <li>Confirm that ExtractImageViewer.exe supports the following 
             command-line options:
             <ul>
+                <li>/? - displays usage message
                 <li>/r - register the .tif extension
                 <li>/u - unregister the .tif extension
                 <li>/o &lt;ocrfile&gt; - OCRed text is written to the specified file
                 <li>/c - OCRed text is written to the clipboard
+                <li>/xml - must be used with either /c or /o; writes out swipe in XML format
+                including full text as well as zone coordinates.
                 <li>/s - display the search window
                 <li>/l - reuse the current image viewer window if one exists
+                <li>/closeall - close all open instances of the image viewer
                 <li>/e &lt;scriptfile&gt; - execute the script
                 <li>/script? - display help for scripting
                 <li>/ctrlid? - lists toolbar control ID numbers
-                <li>/? - displays usage message
-                <li>/xml - must be used with either /c or /o; writes out swipe in XML format
-                including full text as well as zone coordinates.
                 <li>/reset - resets the positions of all toolstrips and the thumbnail viewer.
             </ul>
         <p>

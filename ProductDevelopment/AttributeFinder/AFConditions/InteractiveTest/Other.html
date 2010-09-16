@@ -6,174 +6,157 @@
  
 <body>
 <h1>Ruleset Editor - AF Conditions<br>
-	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+    <IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
 
 <ol>
-    	<li><h2>Character confidence condition</h2>
-      	<ul>
-      		<li>Confirm that the property page includes a combo box for 
-		treating the condition as <b>met</b> or <b>not met</b>.
-		<li>Confirm that the combo box defaults to <b>met</b>.
-      		<li>Confirm that the property page includes a combo box for 
-		the type of character confidence as <b>average</b>, <b>minimum</b> 
-		or <b>maximum</b>.
-		<li>Confirm that the combo box defaults to <b>average</b>.
-      		<li>Confirm that the property page includes a mathematical operator 
-		combo box for <b>&lt;</b>, <b>&gt;</b>, <b>&lt;=</b>, <b>&gt;=</b>, 
-		<b>!=</b>,  or <b>=</b>.
-      		<li>Confirm that the property page includes an associated edit box 
-		for the actual character confidence. 
-		<li>Confirm that the edit box is <b>0</b> by default.
-		<li>Confirm that the edit box accepts values from <b>0</b> to 
-		<b>100</b> inclusive.
-      		<li>Confirm that the property page includes a check box for 
-		allowing specification of a second character confidence.
-		<li>Confirm that the associated controls (two combo boxes and an 
-		edit box) are enabled only when the check box is checked.
-      		<li>Confirm that the first combo box describes how the two confidence 
-		levels should be combined as <b>and</b> or <b>or</b>.
-      		<li>Confirm that the second combo box is for mathematical operators
-		and includes <b>&lt;</b>, <b>&gt;</b>, <b>&lt;=</b>, <b>&gt;=</b>, 
-		<b>!=</b>,  or <b>=</b>.
-      		<li>Confirm that the associated edit box is for the actual character 
-		confidence. 
-		<li>Confirm that the edit box is <b>0</b> by default.
-		<li>Confirm that the edit box accepts values from <b>0</b> to 
-		<b>100</b> inclusive.
-		<li>Confirm that the object settings are persistent.
+    <li><h2>Character confidence condition</h2>
+    <ul>
+        <li>Confirm that the property page includes a combo box for  treating the condition as 
+        <b>met</b> or <b>not met</b>.
+        <li>Confirm that the combo box defaults to <b>met</b>.
+        <li>Confirm that the property page includes a combo box for the type of character
+        confidence as <b>average</b>, <b>minimum</b> or <b>maximum</b>.
+        <li>Confirm that the combo box defaults to <b>average</b>.
+        <li>Confirm that the property page includes a mathematical operator combo box for 
+        <b>&lt;</b>, <b>&gt;</b>, <b>&lt;=</b>, <b>&gt;=</b>, <b>!=</b>,  or <b>=</b>.
+        <li>Confirm that the property page includes an associated edit box for the actual character
+        confidence. 
+        <li>Confirm that the edit box is <b>0</b> by default.
+        <li>Confirm that the edit box accepts values from <b>0</b> to <b>100</b> inclusive.
+        <li>Confirm that the property page includes a check box for allowing specification of a
+        second character confidence.
+        <li>Confirm that the associated controls (two combo boxes and an edit box) are enabled only
+        when the check box is checked.
+        <li>Confirm that the first combo box describes how the two confidence levels should be
+        combined as <b>and</b> or <b>or</b>.
+        <li>Confirm that the second combo box is for mathematical operators and includes 
+        <b>&lt;</b>, <b>&gt;</b>, <b>&lt;=</b>, <b>&gt;=</b>, <b>!=</b>,  or <b>=</b>.
+        <li>Confirm that the associated edit box is for the actual character confidence. 
+        <li>Confirm that the edit box is <b>0</b> by default.
+        <li>Confirm that the edit box accepts values from <b>0</b> to <b>100</b> inclusive.
+        <li>Confirm that the object settings are persistent.
 <p>
-		<li>Confirm that the following scenarios can be successfully tested
-		<ul>
-			<li>Single-sided condition with average confidence met.
-			<li>Single-sided condition with average confidence not met.
-			<li>Single-sided condition with maximum confidence met.
-			<li>Single-sided condition with maximum confidence not met.
-			<li>Single-sided condition with minimum confidence met.
-			<li>Single-sided condition with minimum confidence not met.
-			<li>Double-sided condition with average confidence met.
-			<li>Double-sided condition with average confidence not met.
-			<li>Double-sided condition with maximum confidence met.
-			<li>Double-sided condition with maximum confidence not met.
-			<li>Double-sided condition with minimum confidence met.
-			<li>Double-sided condition with minimum confidence not met.
-		</ul>
+        <li>Confirm that the following scenarios can be successfully tested
+        <ul>
+            <li>Single-sided condition with average confidence met.
+            <li>Single-sided condition with average confidence not met.
+            <li>Single-sided condition with maximum confidence met.
+            <li>Single-sided condition with maximum confidence not met.
+            <li>Single-sided condition with minimum confidence met.
+            <li>Single-sided condition with minimum confidence not met.
+            <li>Double-sided condition with average confidence met.
+            <li>Double-sided condition with average confidence not met.
+            <li>Double-sided condition with maximum confidence met.
+            <li>Double-sided condition with maximum confidence not met.
+            <li>Double-sided condition with minimum confidence met.
+            <li>Double-sided condition with minimum confidence not met.
+        </ul>
 <p>
-		<li>Exercise various double-sided conditions and confirm that 
-		invalid settings cannot be saved
-		<ul>
-			<li><b>&lt; 50</b> and <b>&gt; 90</b>.
-			<li><b>= 50</b> and <b>&lt; 40</b>.
-		</ul>
-      	</ul>
-  	</li>
+        <li>Exercise various double-sided conditions and confirm that invalid settings cannot be
+        saved
+        <ul>
+            <li><b>&lt; 50</b> and <b>&gt; 90</b>.
+            <li><b>= 50</b> and <b>&lt; 40</b>.
+        </ul>
+    </ul>
 <p>
-    	<li><h2>Document type condition</h2>
-      	<ul>
-      		<li>Confirm that the property page includes a combo box for 
-		the document type to <b>match</b> or <b>not match</b> one of the 
-		following types.
-      		<li>Confirm that the property page includes a list box for 
-		the selected document types. 
-      		<li>Confirm that the property page includes a <b>Select...</b> button.
-      		<li>Confirm that the <b>Select...</b> button is always enabled.
-      		<li>Confirm that clicking the <b>Select...</b> button displays a 
-		<b>Select Document Types</b> dialog.
+    <li><h2>Document type condition</h2>
+    <ul>
+        <li>Confirm that the property page includes a combo box for the document type to
+        <b>match</b> or <b>not match</b> one of the following types.
+        <li>Confirm that the property page includes a list box for the selected document types. 
+        <li>Confirm that the property page includes a <b>Select...</b> button.
+        <li>Confirm that the <b>Select...</b> button is always enabled.
+        <li>Confirm that clicking the <b>Select...</b> button displays a <b>Select Document
+        Types</b> dialog.
 <p>
-		<li>Confirm that the <b>Select Document Types</b> dialog includes a 
-		disabled <b>Document Category</b> combo box.
-		<li>Confirm that the <b>Document Category</b> combo box has <b>County 
-		Document</b> selected by default.
-		<li>Confirm that the <b>Select Document Types</b> dialog includes a 
-		<b>Select one or more of the following types:</b> list box.
-		<li>Confirm that the list box includes <b>Any Unique</b> and 
-		<b>Unclassified</b> at the top of the list.
-		<li>Confirm that the list box includes each document type as included in 
-		the <b>.\ComponentData\DocumentClassifiers\County Document\DocTypes.idx</b> 
-		file.
-		<li>Confirm that the list box supports selection of multiple document types.
-		<li>Confirm that the selected document types replace the document types 
-		currently specified in the <b>Document type condition</b> property page.
+        <li>Confirm that the <b>Select Document Types</b> dialog includes a disabled <b>Document
+        Category</b> combo box.
+        <li>Confirm that the <b>Document Category</b> combo box has <b>County Document</b> selected
+        by default.
+        <li>Confirm that the <b>Select Document Types</b> dialog includes a <b>Select one or more
+        of the following types:</b> list box.
+        <li>Confirm that the list box includes <b>Any Unique</b>, <b>Unclassified</b>, and
+        <b>Multiply Classified</b> at the top of the list.
+        <li>Confirm that the list box includes each document type as included in the 
+        <b>.\ComponentData\DocumentClassifiers\County Document\DocTypes.idx</b> file.
+        <li>Confirm that the list box supports selection of multiple document types.
+        <li>Confirm that the selected document types replace the document types currently specified
+        in the <b>Document type condition</b> property page.
 <p>
-		<li>Confirm that the property page includes a <b>Remove</b> button.
-		<li>Confirm that the <b>Remove</b> button is enabled only when one or more 
-		document types are selected.
-		<li>Confirm that the selected document types are removed without confirmation.
+        <li>Confirm that the property page includes a <b>Remove</b> button.
+        <li>Confirm that the <b>Remove</b> button is enabled only when one or more document types 
+        are selected.
+        <li>Confirm that the selected document types are removed without confirmation.
 <p>
-		<li>Confirm that the property page includes a <b>Clear</b> button.
-		<li>Confirm that the <b>Clear</b> button is enabled only when one or more 
-		document types are defined.
-		<li>Confirm that the defined document types are removed without confirmation.
+        <li>Confirm that the property page includes a <b>Clear</b> button.
+        <li>Confirm that the <b>Clear</b> button is enabled only when one or more document types
+        are defined.
+        <li>Confirm that the defined document types are removed without confirmation.
 <p>
-		<li>Confirm that the property page includes a combo box to specify the minimum 
-		probability of the classification.
-		<li>Confirm that the combo box includes entries for <b>maybe</b>, 
-		<b>probable</b> and <b>sure</b>.
-		<li>Confirm that the default selection in the combo box is <b>maybe</b>.
+        <li>Confirm that the property page includes a combo box to specify the minimum probability
+        of the classification.
+        <li>Confirm that the combo box includes entries for <b>maybe</b>, <b>probable</b> and
+        <b>sure</b>.
+        <li>Confirm that the default selection in the combo box is <b>maybe</b>.
 <p>
-		<li>Confirm that settings are persistent.
-      	</ul>
-  	</li>
+        <li>Confirm that settings are persistent.
+    </ul>
 <p>
-    	<li><h2>Finding rule condition</h2>
-      	<ul>
-      		<li>Confirm that the property page includes a combo box for 
-		selection of an <b>attribute finding rule</b>.
-		<li>Confirm that the property page includes a <b>Configure...</b> button.
-		<li>Confirm that the <b>Configure...</b> button is disabled if the selected 
-		finding rule does not have a property page.
-		<li>Confirm that the <b>Configure...</b> button is enabled if the selected 
-		finding rule does have a property page.
-		<li>Confirm that <b>The rule must be configured</b> also appears if the selected 
-		finding rule has a property page.
-		<li>Confirm that settings are persistent.
-      	</ul>
-  	</li>
+    <li><h2>Finding rule condition</h2>
+    <ul>
+        <li>Confirm that the property page includes a combo box for selection of an <b>attribute
+        finding rule</b>.
+        <li>Confirm that the property page includes a <b>Configure...</b> button.
+        <li>Confirm that the <b>Configure...</b> button is disabled if the selected finding rule
+        does not have a property page.
+        <li>Confirm that the <b>Configure...</b> button is enabled if the selected finding rule
+        does have a property page.
+        <li>Confirm that <b>The rule must be configured</b> also appears if the selected finding
+        rule has a property page.
+        <li>Confirm that settings are persistent.
+    </ul>
 <p>
-    	<li><h2>RSD file condition</h2>
-      	<ul>
-      		<li>Confirm that the property page includes an edit box for 
-		specification of a <b>rule set</b>.
-		<li>Confirm that the property page includes an associated <b>tag selector</b> 
-		button.
-		<li>Confirm that clicking the <b>tag selector</b> button displays the following 
-		items
-		<ul>
-			<li>&lt;RSDFileDir&gt;
-			<li>&lt;DocType&gt;
-			<li>&lt;ComponentDataDir&gt;
-			<li>&lt;SourceDocName&gt;
-			<li>&lt;RuleExecutionID&gt;
-			<li>various $ functions
-		</ul>
-		<li>Confirm that the property page includes an associated browse <b>...</b> 
-		button.
-		<li>Confirm that clicking the browse button displays a <b>File - Open</b> dialog.
-		<li>Confirm that the fully qualified path to the selected file is displayed in 
-		the edit box.
-		<li>Confirm that settings are persistent.
-      	</ul>
-  	</li>
+    <li><h2>RSD file condition</h2>
+    <ul>
+        <li>Confirm that the property page includes an edit box for specification of a <b>rule 
+        set</b>.
+        <li>Confirm that the property page includes an associated <b>tag selector</b> button.
+        <li>Confirm that clicking the <b>tag selector</b> button displays the following items
+        <ul>
+            <li>&lt;RSDFileDir&gt;
+            <li>&lt;DocType&gt;
+            <li>&lt;ComponentDataDir&gt;
+            <li>&lt;SourceDocName&gt;
+            <li>&lt;RuleExecutionID&gt;
+            <li>various $ functions
+        </ul>
+        <li>Confirm that the property page includes an associated browse <b>...</b> button.
+        <li>Confirm that clicking the browse button displays a <b>File - Open</b> dialog.
+        <li>Confirm that the fully qualified path to the selected file is displayed in the edit 
+        box.
+        <li>Confirm that settings are persistent.
+    </ul>
 </ol>
 <p>
 <ul>
-    	<li><h2>Use of condition objects</h2>
-      	<ul>
-      		<li>Confirm that the above condition objects can be used in a <b>Conditionally 
-		preprocess</b> document preprocessor.
-      		<li>Confirm that the above condition objects can be used in a <b>Conditionally 
-		find value</b> value finder.
-      		<li>Confirm that the above condition objects can be used in a <b>Conditionally 
-		handle output</b> output handler.
-      	</ul>
-  	</li>
+    <li><h2>Use of condition objects</h2>
+    <ul>
+        <li>Confirm that the above condition objects can be used in a <b>Conditionally 
+        preprocess</b> document preprocessor.
+        <li>Confirm that the above condition objects can be used in a <b>Conditionally find 
+        value</b> value finder.
+        <li>Confirm that the above condition objects can be used in a <b>Conditionally handle
+        output</b> output handler.
+    </ul>
 <p>
-    	<li><h2>Miscellaneous</h2>
-      	<ul>
-  	   	<LI><b>[FlexIDSCore #4009]</b> Confirm that an empty string scores <b>0</b> for 
-		the <b>Character Confidence Data Scorer</b>.
-      	</ul>
+    <li><h2>Miscellaneous</h2>
+    <ul>
+        <LI><b>[FlexIDSCore #4009]</b> Confirm that an empty string scores <b>0</b> for the
+        <b>Character Confidence Data Scorer</b>.
+    </ul>
 </ul>
 </body>
 </html>

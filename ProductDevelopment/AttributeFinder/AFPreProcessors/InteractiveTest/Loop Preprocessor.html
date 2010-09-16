@@ -335,6 +335,35 @@
 		<li>Confirm that double-clicking on them while holding the <b>&lt;Alt&gt;</b> key 
 		opens the corresponding <b>Configure Description</b> dialog.</li>
 	</ul>
+<p>
+    <LI><b>[FlexIDSCore #4227, #4257]</b> Double-clicking read-only text boxes
+    <!-- fixed v 8.1.0.5 -->
+    <ul>
+        <li>On Server 2008, Server 2008R2, or Windows 7, confirm the following behavior:
+        <ul>
+            <li>In the Ruleset Editor, configure a loop preprocessor. Click OK.
+            <li>Double-click on the preprocessor to reopen the property page.
+            <li>Double-click on one of the read-only text boxes in the property page.
+            <li>Confirm that the text of the read-only label has not been copied to the clipboard.
+        </ul>
+    </ul>
+    <LI><b>[FlexIDSCore #4259, #4260]</b>
+    <!-- fixed v 8.1.0.6 -->
+    <ul>
+        <li>In the property page for the loop preprocessor:
+        <ul>
+            <li>Click on the Do loop option with the mouse.
+            <li>Move the cursor straight down and click on the While option.
+            <li>Move the mouse down and click on the For loop option.
+            <li>Confirm that only one radio button appears selected at a time.
+        <p>
+            <li>Close and reopen the property page.
+            <li>Hit tab until the Do loop option has the focus box.
+            <li>Press the down arrow.
+            <li>Confirm that the loop setup groupbox and loop type groupbox remain in sync as you
+            hit the arrow keys.
+        </ul>
+    </ul>      
 </ul>
 </body>
 </html>

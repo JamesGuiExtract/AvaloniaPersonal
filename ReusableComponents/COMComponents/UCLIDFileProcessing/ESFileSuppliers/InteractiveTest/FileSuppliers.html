@@ -10,483 +10,525 @@
 <hr>
 <b>Setup</b>
 <ul>
-   	<li>Confirm Queue Setup and Queue Log tabs are created after the checkbox for 
-       	Queue files for this action in Action tab is checked.</li>
-   	<li>Confirm when the Queue files for this action checkbox is cleared, 
-      	Queue Setup and Queue Log tabs disappear.</li> 
-   	<li>Confirm that the setting of the checkbox is persistent.</li>
+   <li>Confirm Queue Setup and Queue Log tabs are created after the checkbox for Queue files for 
+   this action in Action tab is checked.</li>
+   <li>Confirm when the Queue files for this action checkbox is cleared, Queue Setup and Queue Log
+   tabs disappear.</li> 
+   <li>Confirm that the setting of the checkbox is persistent.</li>
 </ul> 
 <p>
 <b>Queue Setup Tab</b>
 <ul> 
-   	<li>Confirm that the Queue Setup tab includes a <b>Select file suppliers</b> list box. 
-   	<li>Confirm that the list box includes the following columns: 
-   	<ul> 
-      		<li>Enabled</li> 
-      		<li>Force Processing</li> 
-      		<li>Priority</li> 
-      		<li>Description</li> 
-      		<li>Status</li> 
-   	</ul> 
-   	<li>Confirm that the Queue Setup tab includes a <b>Select skip condition</b> edit box. 
-   	<li>Confirm that in Queue Setup tab, the initial states of <b>Add</b> button is enabled, 
-       	<b>Remove</b> and <b>Configure</b> buttons are disabled.  <b>Commands &gt;</b> button for Select 
-	skip condition is enabled.</li> 
-   	<li>Confirm once processing starts, the <b>Add</b>, <b>Remove</b> and <b>Configure</b> buttons,    
-       	and <b>Commands &gt;</b> button for Select FAM condition are all disabled in Queue Setup tab.</li>
-   	<li>Press the <b>Add</b> button in Queue Setup tab.
-   	<ul> 
-      		<li>Confirm it brings up <b>Select File Suppliers</b> dialog.</li> 
-      		<li>Confirm the dialog has <b>Configure</b>, <b>OK</b>, and <b>Cancel</b> buttons 
-          	and all are enabled.</li> 
-      		<li>Confirm the dialog has a droplist and it has three selections which 
-          	includes <b>File from dynamic list</b>, <b>File from folder</b>, and <b>File 
-		from static list</b>.</li> 
-      		<li>Confirm that clicking on a file supplier to highlight it then pressing the <b>Remove</b> 
-          	button in the Queue Setup tab deletes it.</li> 
-      		<li>Confirm that the <b>Enabled</b> checkbox for a file supplier can be checked 
-          	and cleared, and the settings are persistent.</li> 
-      		<li>Confirm the <b>Force Processing</b> checkbox for a file supplier can be checked 
-          	and cleared and the setting is persistent.</li>
-      		<li>Confirm that the default setting for <b>Priority</b> is <b>Normal</b>.</li> 
-      		<li>Confirm that the following <b>Priority</b> settings are available: 
-		<ul>
-			<li>Low
-			<li>Below Normal
-			<li>Normal
-			<li>Above Normal
-			<li>High
-		</ul>
-   		<li><b>[LegacyRC #4732]</b> Confirm that adding suppliers adds the new suppliers 
-		below the first selected file supplier.</li> 
-   		<li><b>[LegacyRC #4732]</b> Confirm that adding suppliers adds the new suppliers 
-		at the bottom of the list if no file suppliers are selected.</li> 
-   	</ul>
-   	<li>Press the <b>Commands &gt;</b> button in Queue Setup tab.
-   	<ul> 
-      		<li>Confirm it brings up a drop-down menu.</li> 
-      		<li>Confirm that <b>Select Condition...</b> is enabled.</li> 
-      		<li>Confirm that <b>Configure Condition...</b> is disabled.</li> 
-      		<li>Confirm that <b>Configure description...</b> is disabled.</li> 
-      		<li>Confirm that <b>Cancel</b> is enabled.</li> 
-   	</ul>
+    <li>Confirm that the Queue Setup tab includes a <b>Select file suppliers</b> list box.</li>
+    <li>Confirm that the list box includes the following columns: 
+    <ul> 
+        <li>Enabled</li> 
+        <li>Force Processing</li> 
+        <li>Priority</li> 
+        <li>Description</li> 
+        <li>Status</li> 
+    </ul></li>
+    <li>Confirm that the Queue Setup tab includes a <b>Select skip condition</b> edit box.</li>
+    <LI><b>[FlexIDSCore #4227, #4257]</b> Double-clicking read-only text boxes
+    <ul>
+        <li>On Server 2008, Server 2008R2, or Windows 7, confirm the following behavior:
+        <ul>
+            <li>In the FAM, configure a skip condition. Give it a label, then click OK.</li>
+            <li>Double-click on the skip condition to reopen the property page.</li>
+            <li>Confirm that the text of the label has not been copied to the clipboard.</li>
+        </ul></li>
+    </ul></li>
+    <li>Confirm that in Queue Setup tab, the initial states of <b>Add</b> button is enabled, 
+    <b>Remove</b> and <b>Configure</b> buttons are disabled.  <b>Commands &gt;</b> button for 
+    Select skip condition is enabled.</li> 
+    <li>Confirm once processing starts, the <b>Add</b>, <b>Remove</b> and <b>Configure</b> buttons,
+    and <b>Commands &gt;</b> button for Select FAM condition are all disabled in Queue Setup 
+    tab.</li>
+    <li>Press the <b>Add</b> button in Queue Setup tab.
+    <ul> 
+        <li>Confirm it brings up <b>Select File Suppliers</b> dialog.</li> 
+        <li>Confirm the dialog has <b>Configure</b>, <b>OK</b>, and <b>Cancel</b> buttons and all
+        are enabled.</li> 
+        <li>Confirm the dialog has a droplist and it has three selections which includes <b>File 
+        from dynamic list</b>, <b>File from folder</b>, and <b>File from static list</b>.</li> 
+        <li>Confirm that clicking on a file supplier to highlight it then pressing the 
+        <b>Remove</b> button in the Queue Setup tab deletes it.</li> 
+        <li>Confirm that the <b>Enabled</b> checkbox for a file supplier can be checked and 
+        cleared, and the settings are persistent.</li> 
+        <li>Confirm the <b>Force Processing</b> checkbox for a file supplier can be checked and
+        cleared and the setting is persistent.</li>
+        <li>Confirm that the default setting for <b>Priority</b> is <b>Normal</b>.</li> 
+        <li>Confirm that the following <b>Priority</b> settings are available: 
+        <ul>
+            <li>Low</li>
+            <li>Below Normal</li>
+            <li>Normal</li>
+            <li>Above Normal</li>
+            <li>High</li>
+        </ul></li>
+        <li><b>[LegacyRC #4732]</b> Confirm that adding suppliers adds the new suppliers below the
+        first selected file supplier.</li> 
+        <li><b>[LegacyRC #4732]</b> Confirm that adding suppliers adds the new suppliers at the 
+        bottom of the list if no file suppliers are selected.</li> 
+    </ul></li>
+    <li>Press the <b>Commands &gt;</b> button in Queue Setup tab.
+    <ul> 
+        <li>Confirm it brings up a drop-down menu.</li> 
+        <li>Confirm that <b>Select Condition...</b> is enabled.</li> 
+        <li>Confirm that <b>Configure Condition...</b> is disabled.</li> 
+        <li>Confirm that <b>Configure description...</b> is disabled.</li> 
+        <li>Confirm that <b>Cancel</b> is enabled.</li> 
+    </ul></li>
 <p>
-   	<LI><b>[LegacyRC #4923]</b> File supplier context menu
-       	<ul>
-      		<li>Confirm that a context menu is available for file suppliers.
-      		<li>Confirm that the context menu supports <b>Cut</b>, <b>Copy</b>, <b>Paste</b>, 
-		<b>Delete</b> and <b>Cancel</b>.
-		<li>Confirm proper behavior for <b>Cut</b>.
-		<li>Confirm proper behavior for <b>Copy</b>.
-		<li>Confirm proper behavior for <b>Paste</b>.
-		<li>Confirm proper behavior for <b>Delete</b>.
-		<li>Confirm proper behavior for <b>Cancel</b>.
-       	</ul>
+    <LI><b>[LegacyRC #4923]</b> File supplier context menu
+    <ul>
+        <li>Confirm that a context menu is available for file suppliers.</li>
+        <li>Confirm that the context menu supports <b>Cut</b>, <b>Copy</b>, <b>Paste</b>, 
+        <b>Delete</b> and <b>Cancel</b>.</li>
+        <li>Confirm proper behavior for <b>Cut</b>.</li>
+        <li>Confirm proper behavior for <b>Copy</b>.</li>
+        <li>Confirm proper behavior for <b>Paste</b>.</li>
+        <li>Confirm proper behavior for <b>Delete</b>.</li>
+        <li>Confirm proper behavior for <b>Cancel</b>.</li>
+    </ul></li>
 <p>
-   	<LI><b>[LegacyRC #5312]</b> Modifying skip conditions
-       	<ul>
-      		<li>Exercise an FPS file with a supply condition that is queuing a large 
-		number of images.
-      		<li>Confirm that the condition <b>cannot</b> be modified while 
-		queuing continues.
-       	</ul>
+    <LI><b>[LegacyRC #5312]</b> Modifying skip conditions
+    <ul>
+        <li>Exercise an FPS file with a supply condition that is queuing a large number of 
+        images.</li>
+        <li>Confirm that the condition <b>cannot</b> be modified while queuing continues.</li>
+    </ul></li>
 <p>
-   	<LI><b>[LegacyRC #5770]</b> Tag condition
-	<ul>
-		<li>Create an FPS file to supply files that are not already in the database.
-		<li>Add a <b>Tag condition</b> to the Queue Setup tab.
-		<li>Confirm that all of the files are successfully queued.
-	</ul>
+    <LI><b>[LegacyRC #5770]</b> Tag condition
+    <ul>
+        <li>Create an FPS file to supply files that are not already in the database.</li>
+        <li>Add a <b>Tag condition</b> to the Queue Setup tab.</li>
+        <li>Confirm that all of the files are successfully queued.</li>
+    </ul></li>
 <p>
-   	<LI><b>[LegacyRC #5772]</b> Confirm that the following tasks can be configured from 
-	both the Conditional task and the Task condition property pages
-	<ul>
-		<li>Core: Apply Bates number
-		<li>Core: Modify PDF file
-		<li>Redaction: Create metadata XML
-		<li>Redaction: Extend redactions to surround context
-	</ul>
+    <LI><b>[LegacyRC #5772]</b> Confirm that the following tasks can be configured from both the 
+    Conditional task and the Task condition property pages
+    <ul>
+        <li>Core: Apply Bates number</li>
+        <li>Core: Modify PDF file</li>
+        <li>Redaction: Create metadata XML</li>
+        <li>Redaction: Extend redactions to surround context</li>
+    </ul></li>
 </ul>
 <p>
 <b>Queue Log Tab</b>
 <ul> 
-   	<li>Confirm the Queue Log tab has a <b>Recent Queue Events</b> display area.</li>
-   	<ul> 
-      		<li>Confirm it has one row for each file being supplied before it is added to the 
-          	queue.</li> 
-      		<li>Confirm it has columns for Date, Time, Queue Event, Name, File Supplier, 
-          	Priority and Folder.</li> 
-      		<li>Confirm the Date and Time columns display the date and time of the 
-          	current Queue events.</li> 
-      		<li>Confirm there are entries for Queue Event column.</li> 
-      		<li>Confirm the Name column displays the names of the files being added to the 
-          	queue.</li> 
-      		<li>Confirm the File Supplier column displays the file supplier(s) that supply the 
-          	files to the queue.</li> 
-      		<li>Confirm the Folder column displays the path of the files being added to the 
-          	queue.</li>
-   	</ul> 
-   	<li>Confirm the Queue Log tab has a <b>Files added or updated in the queue recently</b> 
-       	display area.</li>
-   	<ul> 
-      		<li>Confirm it has one row for each file being added to the queue.</li> 
-      		<li>Confirm it has columns for Date, Time, Queue Event, Name, FileID, Pages, 
-          	Already Existed, Previous Status, Comments, File Supplier, Priority and Folder.</li> 
-      		<li>Confirm the Date and Time columns display the date and time of the files 
-          	that are being added to the queue.</li> 
-      		<li>Confirm there are entries for Queue Event column.</li> 
-      		<li>Confirm the Name column displays the names of the files that are being 
-          	added to the queue.</li> 
-      		<li>Confirm the FileID column displays the IDs of the files.</li> 
-      		<li>Confirm the Page column displays the number of pages of the files.</li> 
-      		<li>Confirm the entries for Already Existed column can be either Yes or No.</li> 
-      		<li>Confirm the entries for Previous Status column can be one of five states: 
-          	Unattempted, Pending, Processing, Completed, and Failed.</li> 
-      		<li>Confirm the File Supplier column specifies the file suppliers for the queue.</li> 
-      		<li>Confirm the Folder column specifies the path of the files.</li>
-   	</ul> 
-   	<li>Confirm Queue Log has a <b>Queue events that failed recently</b> display area.</li>
-   	<ul>   
-      		<li>Confirm it has one row for each file that failed to be added to the queue.</li> 
-      		<li>Confirm the area has columns for Date, Time, Queue, Name, Error, 
-          	File Supplier, Priority and Folder.</li> 
-      		<li>Confirm that double clicking on an Error entry brings up a exception dialog 
-          	with information about the Error of that row.</li>
-      		<li><b>[LegacyRC #4880]</b> Confirm that double clicking on an <b>empty</b> 
-		Error row does nothing.</li> 
-   	</ul>
-   	<li>Perform the following steps to confirm that the setting of Already Existed flag in
-       	a file rename event is updated based on whether the new name of the file already
-       	exists in the database or not.
-   	<ul>
-      		<li>Clear the database.</li>
-      		<li>Create temporary folder C:\Temp\F1.
-      		<li>Place five randomly created files named from file1.tif to file5.tif 
-		under C:\Temp\F1.
-      		<li>Add an Action <b>abc</b> ( any name is OK ).
-      		<li>Bring up a blank FAM, then select the newly added action. Select
-          	<u>Files from folders</u> as the file supplier. Specify
-          	C:\Temp\F1 as the folder to supply files; select *.tif as the file 
-          	extension. Leave the remaining checkboxes unchecked.
-      		<li>Click the Start Processing button.
-      		<li>After the Start Processing button returns to green, Remove file1.tif, 
-		file2.tif, file3.tif from C:\Temp\F1, then add a randomly created file 
-		called file6.tif to the folder. Use the Commands &gt; button in the Queue 
-		Setup tab to bring up the Configure Files from folder dialog for C:\Temp\F1. 
-		Check the checkboxes for <u>Continuously supply any files that are</u>, 
-		<u>Added</u>, <u>Modified</u>, <u>Target files for a rename/move operation</u>.
-      		<li>Click the Start Processing button.
-      		<li>After the queue log has been populated, rename <b>file6.tif</b> to <b>file1.tif</b>.
-      		<li>Confirm that a new row of data is added to the <u>Files added or updated in 
-		the queue recently</u> display area of the Queue Log tab, and the Queue Event column 
-		has the entry <u>File Renamed</u>, Already Existed column of that new row has the 
-		entry <u>Yes</u>.
-    	</ul> 
-    	<li>Perform the following steps to confirm that the Queue Log's previous status column should
-        not always be populated.
-    	<ul> 
-       		<li>Clear the database.</li>
-       		<li>Add an action <b>abc</b> ( any name is OK ).
-       		<li>Set up the queue to point to C:\Temp\F1. Ensure the folder has file1.tif 
-           	to file5.tif only. 
-       		<li>Click the Start Processing button.
-       		<li>Confirm the Previous Status column in Queue Log is empty.
-       		<li>Add file6.tif to F1 folder, then click the Start Processing button again.
-       		<li>Confirm the Previous Status column entries for file1.tif to file5.tif
-           	is Pending, and there is no entry for file6.tif in the Previous Status column.
-     	</ul>
-     	<li>Perform the following steps to confirm that two suppliers will not cause
-      	FAM to stop when either one is finished.
-     	<ul>
-        	<li>Clear the database.</li>
-        	<li>Add an action <b>abc</b> ( any name is OK ).
-        	<li>Create two suppliers A and B. <b>A</b> supplies only one file, <b>B</b> 
-		supplies a lot of files.
-        	<li>click the Start Processing button.
-        	<li>Stop FAM, then click the Start Processing button again.
-        	<li>Confirm the Start Processing button is disabled until the both suppliers have
-            	finished supplying files to the queue.
-     	</ul>
+    <li>Confirm the Queue Log tab has a <b>Recent Queue Events</b> display area.
+    <ul> 
+        <li>Confirm it has one row for each file being supplied before it is added to the 
+        queue.</li> 
+        <li>Confirm it has columns for Date, Time, Queue Event, Name, File Supplier, Priority and
+        Folder.</li> 
+        <li>Confirm the Date and Time columns display the date and time of the current Queue 
+        events.</li> 
+        <li>Confirm there are entries for Queue Event column.</li> 
+        <li>Confirm the Name column displays the names of the files being added to the queue.</li> 
+        <li>Confirm the File Supplier column displays the file supplier(s) that supply the files to
+        the queue.</li> 
+        <li>Confirm the Folder column displays the path of the files being added to the queue.</li>
+    </ul></li>
+    <li>Confirm the Queue Log tab has a <b>Files added or updated in the queue recently</b> display
+    area.
+    <ul> 
+        <li>Confirm it has one row for each file being added to the queue.</li> 
+        <li>Confirm it has columns for Date, Time, Queue Event, Name, FileID, Pages, Already 
+        Existed, Previous Status, Comments, File Supplier, Priority and Folder.</li> 
+        <li>Confirm the Date and Time columns display the date and time of the files that are being
+        added to the queue.</li> 
+        <li>Confirm there are entries for Queue Event column.</li> 
+        <li>Confirm the Name column displays the names of the files that are being added to the 
+        queue.</li> 
+        <li>Confirm the FileID column displays the IDs of the files.</li> 
+        <li>Confirm the Page column displays the number of pages of the files.</li> 
+        <li>Confirm the entries for Already Existed column can be either Yes or No.</li> 
+        <li>Confirm the entries for Previous Status column can be one of six states: Unattempted, 
+        Pending, Processing, Completed, Skipped, or Failed.</li> 
+        <li>Confirm the File Supplier column specifies the file suppliers for the queue.</li> 
+        <li>Confirm the Folder column specifies the path of the files.</li>
+    </ul></li> 
+    <li>Confirm Queue Log has a <b>Queue events that failed recently</b> display area.
+    <ul>   
+        <li>Confirm it has one row for each file that failed to be added to the queue.</li> 
+        <li>Confirm the area has columns for Date, Time, Queue, Name, Error, File Supplier, 
+        Priority and Folder.</li> 
+        <li>Confirm that double clicking on an Error entry brings up a exception dialog with 
+        information about the Error of that row.</li>
+        <li><b>[LegacyRC #4880]</b> Confirm that double clicking on an <b>empty</b> Error row does
+        nothing.</li> 
+    </ul></li>
+    <li>Confirm that the setting of Already Existed flag in a file rename event is updated based on
+    whether the new name of the file already exists in the database or not.
+    <ul>
+        <li>Clear the database.</li>
+        <li>Create temporary folder C:\Temp\F1.</li>
+        <li>Place five randomly created files with names from file1.tif to file5.tif under 
+        C:\Temp\F1.</li>
+        <li>Add an Action.</li>
+        <li>Configure a new FAM to supply .tif images from the <b>C:\Temp\F1</b> folder.</li>
+        <li>Click the Start Processing button.</li>
+        <li>After the FAM stops, remove file1.tif, file2.tif, and file3.tif from C:\Temp\F1</li>
+        <li>Add a randomly created file called file6.tif to the folder.</li>
+        <li>Reconfigure the file supplier to listen for files that are <b>added</b>, 
+        <b>modified</b>, or <b>targets for a rename/move operation</b>.</li>
+        <li>Click the Start Processing button.</li>
+        <li>After the queue log has been populated, rename <b>file6.tif</b> to 
+        <b>file1.tif</b>.</li>
+        <li>Confirm that a new row of data is added to the <b>Files added or updated in the queue 
+        recently</b> grid in the Queue Log tab in which the Queue Event column has the entry <b>File 
+        Renamed</b> and the Already Existed column has the entry <b>Yes</b>.</li>
+    </ul></li>
+    <li>Confirm that the Queue Log's previous status column is not always populated.
+    <ul> 
+        <li>Clear the database from the previous test.</li>
+        <li>Confirm that C:\Temp\F1 contains only files with names from file1.tif to file5.tif.</li> 
+        <li>Click the Start Processing button.</li>
+        <li>Confirm the Previous Status column in Queue Log is empty.</li>
+        <li>Add file6.tif to F1 folder, then click the Start Processing button again.</li>
+        <li>Confirm the Previous Status column entries for file1.tif to file5.tif is Pending, and 
+        there is no entry for file6.tif in the Previous Status column.</li>
+    </ul></li>
+    <li>Confirm that two suppliers will not cause the FAM to stop when either one is finished.
+    <ul>
+        <li>Clear the database from the previous test.</li>
+        <li>Add an action <b>abc</b>.</li>
+        <li>Create two suppliers A and B. <b>A</b> should supply only one file and <b>B</b> 
+        should supply many.</li>
+        <li>Click the Start Processing button.</li>
+        <li>Stop the FAM, then click the Start Processing button again.</li>
+        <li>Confirm that the FAM does not stop until the both suppliers have finished supplying 
+        files to the queue.</li>
+    </ul></li>
 <p>
-   	<LI><b>[FlexIDSCore #3734]</b> Page number checking when queuing
-       	<ul>
-  	   	<LI>Create a list of PDF files to be supplied to a new database via 
-		<b>Files from dynamic list</b>.
-		<li>Queue the files and confirm that page count information is provided.
-		<li>Add new files to the end of the list.
-		<li>Queue the files again, without using the <b>Force processing</b> option.
-		<li>Confirm that page counts <b>are not</b> recomputed for the listed 
-		files that were queued previously.
-		<li>Add new files to the end of the list.
-		<li>Queue the files again, using the <b>Force processing</b> option.
-		<li>Confirm that page counts <b>are</b> recomputed for the listed 
-		files that were queued previously.
-       	</ul>
+    <LI><b>[FlexIDSCore #3734]</b> Page number checking when queuing
+    <ul>
+        <LI>Create a list of PDF files to be supplied to a new database via <b>Files from dynamic 
+        list</b>.</li>
+        <li>Queue the files and confirm that page count information is provided.</li>
+        <li>Add new files to the end of the list.</li>
+        <li>Queue the files again, without using the <b>Force processing</b> option.</li>
+        <li>Confirm that page counts <b>are not</b> recomputed for the listed files that were
+        queued previously.</li>
+        <li>Add new files to the end of the list.</li>
+        <li>Queue the files again, using the <b>Force processing</b> option.</li>
+        <li>Confirm that page counts <b>are</b> recomputed for the listed files that were queued 
+        previously.</li>
+    </ul></li>
 <p>
-   	<LI><b>[FlexIDSCore #3737]</b> Confirm by starting a couple of memory leak tests that 
-	a file will not be queued twice.
+    <LI><b>[FlexIDSCore #3737]</b> Confirm by starting a couple of memory leak tests that a file 
+    will not be queued twice.</li>
 <p>
-   	<LI><b>[LegacyRC #5117]</b> Faster queuing of PDFs
-       	<ul>
-      		<li>Select a folder of PDF images for queuing and processing.
-      		<li>Start queuing and processing.
-      		<li>Confirm that queuing of PDFs now takes less than 7 seconds each.
-       	</ul>
+    <LI><b>[LegacyRC #5117]</b> Faster queuing of PDFs
+    <ul>
+        <li>Select a folder of PDF images for queuing and processing.</li>
+        <li>Start queuing and processing.</li>
+        <li>Confirm that queuing of PDFs does not take an inordinate amount of time.</li>
+    </ul></li>
 </ul>
 <p>
 <b>File Suppliers</b>
 <ol> 
-   	<li>Select <b>Files from dynamic list</b> as the file supplier in Select File Supplier 
-      	dialog, then press the Configure button.</li>
-   	<ul> 
-      		<li>Confirm it brings up <b>Configure Files from dynamic list</b> dialog.</li> 
-      		<li>Confirm the dialog has an edit box for <b>Dynamic list file name:</b>, 
-          	a <b>Tag Selector</b> button and a <b>Browse</b> button to the right of the 
-		edit box and that both are enabled.</li> 
-      		<li>Confirm that the dialog has <b>OK</b> and <b>Cancel</b> buttons and that 
-		both are enabled.</li> 
-      		<li>Confirm that the <b>Tag Selector</b> button opens a <b>Tags and Functions</b> 
-		context menu to the immediate right of the button.</li>
-      		<li>Confirm the items in <b>Tags and Functions</b> context menu include
-          	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with <b>$</b>.  
-      		<li>Confirm that when an item is chosen it either inserts text at the current cursor 
-          	position or replaces selected text in the edit box.</li> 
-      		<li>Confirm that pressing the <b>Browse</b> button brings up an <b>Open file</b> 
-		dialog with default file type <b>*.txt</b>.</li> 
-      		<li>Confirm that when a file is chosen it replaces the text in the edit box 
-          	of the <b>Configure files from dynamic list</b> dialog.</li>
-      		<li>Confirm that if the file name and/or folder name(s) in the editbox contain
-          	the dollar sign $ and/or the two parentheses (), they can be processed
-          	without causing any exception. E.g. Valid$(file), Valid$(folder).    
-      		<li>Confirm that pressing the OK button in Select File Supplier dialog adds a 
-          	new item to the Queue Setup tab with initial state of Enabled checkbox 
-          	checked, Force Processing checkbox unchecked and Status inactive.</li>
-         	<ul>
-            		<li>Confirm clearing the checkbox for <b>Enabled</b> prevents the file 
-			supplier from queuing files.</li>
-            		<li>Confirm checking the checkbox for <b>Enabled</b> allows the file supplier 
-                	to queue files.</li>
-            		<li>Confirm once processing starts, the <b>Status</b> value changes from Inactive 
-			to active.</li>
-            		<li>Confirm when Processing is paused, the <b>Status</b> value is set to Paused.</li>
-            		<li>Confirm when Processing is stopped, the <b>Status</b> value is set to Stopped.</li>
-            		<li>Confirm that the <b>Status</b> value is set to Done when the file supplier 
-			finishes supplying files.</li>
-         	</ul>       
-   	</ul> 
+    <li>Select <b>Files from dynamic list</b> as the file supplier in Select File Supplier dialog, 
+    then press the Configure button.
+    <ul> 
+        <li>Confirm it brings up <b>Configure Files from dynamic list</b> dialog.</li> 
+        <li>Confirm the dialog has an edit box for <b>Dynamic list file name:</b>, a <b>Tag 
+        Selector</b> button and a <b>Browse</b> button to the right of the edit box and that both
+        are enabled.</li> 
+        <li>Confirm that the dialog has <b>OK</b> and <b>Cancel</b> buttons and that both are 
+        enabled.</li> 
+        <li>Confirm that the <b>Tag Selector</b> button opens a <b>Tags and Functions</b> context
+        menu to the immediate right of the button.</li>
+        <li>Confirm the items in <b>Tags and Functions</b> context menu include 
+        <b>&lt;FPSFileDir&gt;</b>, and a set of functions that start with <b>$</b>.</li>
+        <li>Confirm that when an item is chosen it either inserts text at the current cursor 
+        position or replaces selected text in the edit box.</li> 
+        <li>Confirm that pressing the <b>Browse</b> button brings up an <b>Open file</b> 
+        dialog with default file type <b>*.txt</b>.</li> 
+        <li>Confirm that when a file is chosen it replaces the text in the edit box of the 
+        <b>Configure files from dynamic list</b> dialog.</li>
+        <li>Confirm that if the file name and/or folder name(s) in the editbox contain the dollar
+        sign $ and/or the two parentheses (), they can be processed without causing any exception. 
+        E.g. Valid$(file), Valid$(folder).</li>  
+        <li>Confirm that pressing the OK button in Select File Supplier dialog adds a new item to
+        the Queue Setup tab with initial state of Enabled checkbox checked, Force Processing 
+        checkbox unchecked and Status inactive.
+        <ul>
+            <li>Confirm clearing the checkbox for <b>Enabled</b> prevents the file supplier from
+            queuing files.</li>
+            <li>Confirm checking the checkbox for <b>Enabled</b> allows the file supplier to queue
+            files.</li>
+            <li>Confirm once processing starts, the <b>Status</b> value changes from Inactive to
+            active.</li>
+            <li>Confirm when Processing is paused, the <b>Status</b> value is set to Paused.</li>
+            <li>Confirm when Processing is stopped, the <b>Status</b> value is set to Stopped.</li>
+            <li>Confirm that the <b>Status</b> value is set to Done when the file supplier finishes
+            supplying files.</li>
+        </ul></li>
+    </ul> 
 <p>
-   	<li>Select <b>Files from folder</b> as the file supplier in Select File Supplier dialog, 
-       	then press the Configure button.</li>
-   	<ul> 
-      		<li>Confirm it brings up the <b>Configure Files from folder</b> dialog.</li> 
-      		<li>Confirm that there is a combo box associated with <b>Specify folder from which 
-          	to supply files</b>.</li> 
-      		<li>Confirm that the combo box includes an edit box, a <b>Tag Selector</b> button, 
-          	and a <b>Browse</b> button. The initial states of all of them are enabled.</li> 
-      		<li>Confirm the droplist of the <b>Folder Name</b> combo box maintains a history 
-          	of the last eight folders that were used.</li> 
-      		<li>Confirm the <b>Folder Name</b> history is updated when the settings are saved 
-          	to an FPS file.</li> 
-      		<li>Confirm that the <b>Folder Name</b> history persists across File Action 
-          	Manager sessions.</li> 
-      		<li>Confirm that <b>Folder Name</b> history does not duplicate entries.</li> 
-      		<li>Confirm the <b>Tag Selector</b> button opens a Tag and Functions 
-          	context menu to the immediate right of the button.
-      		<li>Confirm the items in Tags and Functions context menu include
-          	&ltFPSFileDir&gt, and a set of functions that start with $.  
-      		<li>Confirm when an item is chosen it either inserts at the current cursor 
-          	position or replaces selected text in the edit box.</li>                        
-      		<li>Confirm that the <b>Browse</b> button opens a <b>Browse For Folder</b> dialog.</li> 
-      		<li>Confirm when a folder is chosen from the Browse For Folder dialog 
-          	its path is placed in the <b>Folder Name</b> edit box.</li> 
-      		<li>Confirm when the <b>Browse For Folder</b> dialog opens, it  defaults to 
-          	the location of the last chosen folder.</li> 
-      		<li>Confirm there is a File extension specification box under the 
-          	Specify folder from which to supply files combo box.</li> 
-      		<li>Confirm the File Extension specification box is editable.</li> 
-      		<li>Confirm the droplist of the <b>File Extension</b> specification box maintains a 
-		history of all of the extensions that have previously been used.</li> 
-      		<li>Confirm that the <b>File Extension</b> history is updated when the settings are 
-          	saved to an FPS file.</li> 
-      		<li>Confirm that the <b>File Extension</b> history persists across File Action 
-          	Manager sessions.</li> 
-      		<li>Confirm that there is a <b>Recursively supply files from any sub-folder</b> 
-          	checkbox under the File extension combo box.</li> 
-      		<li>Confirm that the <b>Recursive</b> checkbox can be checked or unchecked.</li> 
-      		<li>Confirm that the <b>Recursive</b> checkbox setting is persistent.</li> 
-      		<li>Confirm there is a <b>Continuously supply any files that are</b> checkbox 
-          	under the Recursive checkbox.</li> 
-      		<li>Confirm once the <b>Continuously</b> checkbox is checked, it enables four 
-          	more checkboxes under it: <b>Added</b>, <b>Modified</b>, <b>Target files 
-          	for a rename/move action</b>, and <b>Do not supply existing files</b>.</li> 
-      		<li>Confirm the checkbox settings for listening (Added, Modified, Target files) 
-          	are persistent.</li> 
-      		<li>Confirm the checkbox for <b>Do not supply existing files</b> can be checked 
-		and unchecked.</li> 
-      		<li>Confirm the setting for <b>Do not supply existing files</b> is persistent.</li> 
-      		<li>Confirm checking <b>Continuously</b> checkbox without checking any of 
-          	the Added, Modified, Target Files checkboxes causes an exception when the 
-          	<b>OK</b> button is pressed.</li> 
-      		<li>Confirm a folder selected as the file supplier is added to Queue Setup 
-          	tab with initial state of Enabled checkbox checked, Force Processing 
-          	checkbox enabled but unchecked, and Status as inactive.</li>
-         	<ul>
-            		<li>Confirm clearing the checkbox for Enabled prevents the file supplier
-                	from queuing files.</li>
-            		<li>Confirm checking the checkbox for Enabled allows the file supplier to 
-                	queue files.</li>
-         	</ul>
-		<li><b>[FlexIDSCore #3507]</b> Confirm that queuing PDFs <b>is not</b> unusually slow.
-		<li><b>[FlexIDSCore #3508]</b> Confirm that processing the queued PDFs <b>does not</b> 
-		show processing threads idle for an extended period.
-		<li><b>[LegacyRC #5779]</b> Added files not being queued
-		<ul>
-			<li>Prepare a folder file supplier that is listening for all types of events.
-			<li>Drop several collections of files into the folder.
-			<li>Confirm that each dropped file is queued exactly once.
-		</ul>
-   	</ul>
+    <li>Select <b>Files from folder</b> as the file supplier in Select File Supplier dialog, then
+    press the Configure button.
+    <ul> 
+        <li>Confirm it brings up the <b>Configure Files from folder</b> dialog.</li> 
+        <li>Confirm that there is a combo box associated with <b>Specify folder from which to 
+        supply files</b>.</li> 
+        <li>Confirm that the combo box includes an edit box, a <b>Tag Selector</b> button, and a
+        <b>Browse</b> button. The initial states of all of them are enabled.</li> 
+        <li>Confirm the droplist of the <b>Folder Name</b> combo box maintains a history of the
+        last eight folders that were used.</li> 
+        <li>Confirm the <b>Folder Name</b> history is updated when the settings are saved to an FPS
+        file.</li> 
+        <li>Confirm that the <b>Folder Name</b> history persists across File Action Manager 
+        sessions.</li> 
+        <li>Confirm that <b>Folder Name</b> history does not duplicate entries.</li> 
+        <li>Confirm the <b>Tag Selector</b> button opens a Tag and Functions context menu to the 
+        immediate right of the button.</li>
+        <li>Confirm the items in Tags and Functions context menu include &lt;FPSFileDir&gt;, and a
+        set of functions that start with $.</li>  
+        <li>Confirm when an item is chosen it either inserts at the current cursor position or 
+        replaces selected text in the edit box.</li>                        
+        <li>Confirm that the <b>Browse</b> button opens a <b>Browse For Folder</b> dialog.</li> 
+        <li>Confirm when a folder is chosen from the Browse For Folder dialog its path is placed in
+        the <b>Folder Name</b> edit box.</li> 
+        <li>Confirm when the <b>Browse For Folder</b> dialog opens, it  defaults to the location of
+        the last chosen folder.</li> 
+        <li>Confirm there is a File extension specification box under the Specify folder from which
+        to supply files combo box.</li> 
+        <li>Confirm the File Extension specification box is editable.</li> 
+        <li>Confirm the droplist of the <b>File Extension</b> specification box maintains a history
+        of all of the extensions that have previously been used.</li> 
+        <li>Confirm that the <b>File Extension</b> history is updated when the settings are saved 
+        to an FPS file.</li> 
+        <li>Confirm that the <b>File Extension</b> history persists across File Action Manager 
+        sessions.</li> 
+        <li>Confirm that there is a <b>Recursively supply files from any sub-folder</b> checkbox
+        under the File extension combo box.</li> 
+        <li>Confirm that the <b>Recursive</b> checkbox can be checked or unchecked.</li> 
+        <li>Confirm that the <b>Recursive</b> checkbox setting is persistent.</li> 
+        <li>Confirm there is a <b>Continuously supply any files that are</b> checkbox under the
+        Recursive checkbox.</li> 
+        <li>Confirm once the <b>Continuously</b> checkbox is checked, it enables four more 
+        checkboxes under it: <b>Added</b>, <b>Modified</b>, <b>Target files for a rename/move
+        action</b>, and <b>Do not supply existing files</b>.</li> 
+        <li>Confirm the checkbox settings for listening (Added, Modified, Target files) are 
+        persistent.</li> 
+        <li>Confirm the checkbox for <b>Do not supply existing files</b> can be checked and 
+        unchecked.</li> 
+        <li>Confirm the setting for <b>Do not supply existing files</b> is persistent.</li> 
+        <li>Confirm checking <b>Continuously</b> checkbox without checking any of the Added, 
+        Modified, Target Files checkboxes causes an exception when the <b>OK</b> button is 
+        pressed.</li> 
+        <li>Confirm a folder selected as the file supplier is added to Queue Setup tab with initial
+        state of Enabled checkbox checked, Force Processing checkbox enabled but unchecked, and 
+        Status as inactive.
+        <ul>
+            <li>Confirm clearing the checkbox for Enabled prevents the file supplier from queuing 
+            files.</li>
+            <li>Confirm checking the checkbox for Enabled allows the file supplier to queue 
+            files.</li>
+        </ul></li>
+        <li><b>[FlexIDSCore #3507]</b> Confirm that queuing PDFs <b>is not</b> unusually slow.</li>
+        <li><b>[FlexIDSCore #3508]</b> Confirm that processing the queued PDFs <b>does not</b> 
+        show processing threads idle for an extended period.</li>
+        <li><b>[LegacyRC #5779]</b> Added files not being queued
+        <ul>
+            <li>Prepare a folder file supplier that is listening for all types of events.</li>
+            <li>Drop several collections of files into the folder.</li>
+            <li>Confirm that each dropped file is queued exactly once.</li>
+        </ul></li>
+        <li><b>[LegacyRC #5751]</b>
+        <ul>
+            <li>Prepare a folder of .pdf files for queueing.</li>
+            <li>Add an additional <b>*.pdf1</b> image to the folder.</li>
+            <li>Prepare an .fps file to queue the .pdf images.</li>
+            <li>Confirm that the *.pdf1 image is not queued.</li>
+            <li>Confirm the same correct behavior for *.tif and *.tif1 files.</li>
+        </ul></li>
+    </ul></li>
 <p>
-   	<li>Select <b>Files from static list</b> as the file supplier in Select File 
-       	Supplier dialog, then press the Configure button.</li>
-   	<ul> 
-      		<li>Confirm it brings up the Configure Files from static list dialog.</li> 
-      		<li>Confirm there is an <b>Add</b> button in Configure Files from static list 
-          	dialog and the initial state is active.</li> 
-      		<li>Confirm that the <b>Add</b> button brings up the Open file dialog.</li> 
-      		<li>Confirm the Open file dialog allows for the selection of multiple files 
-          	for opening.</li> 
-      		<li>Confirm each file selected for opening in the Open File dialog is added 
-          	to the file list.</li> 
-      		<li>Confirm that if the Open File dialog is cancelled no files are added to the 
-          	file list.</li> 
-      		<li>Confirm that there is a <b>Remove</b> button in Configure Files from static list 
-          	dialog and the initial state is disabled.</li> 
-      		<li>Confirm that the <b>Remove</b> button is only enabled if at least one item in the 
-          	file list is selected.</li> 
-      		<li>Confirm that when an item is selected in File List,  pressing the <b>Remove</b> 
-		button removes it from the file list.</li> 
-      		<li>Confirm that there is a <b>Clear</b> button in Configure Files from static list dialog 
-          	and the initial state is disabled.</li> 
-      		<li>Confirm the <b>Clear</b> button is only enabled if at least one item exists in the 
-          	file list.</li> 
-      		<li>Confirm that when the <b>Clear</b> button is pressed all files are removed from the 
-          	file list.</li> 
-      		<li>Confirm that there is a <b>Load List</b> button in the Configure Files from static 
-          	list dialog.</li> 
-      		<li>Confirm the initial state of the <b>Load List</b> button is enabled.</li> 
-      		<li>Confirm that when the <b>Load List</b> button is pressed it brings up an Open File 
-          	dialog.</li> 
-      		<li>Confirm Open file dialog allows the selection of a text file for loading.</li> 
-      		<li>Confirm each filename specified in the text file (one per line) is added to 
-          	the file list.</li> 
-      		<li>Confirm a Files from static list selected as the file supplier is added 
-          	to Queue Setup tab with initial state of Enabled checkbox checked, 
-          	Force Processing checkbox enabled but unchecked, and Status 
-          	as inactive.</li>
-          	<ul>
-            		<li>Confirm that clearing the checkbox for <b>Enabled</b> prevents the file 
-			supplier from being queued.</li>
-            		<li>Confirm checking the checkbox for <b>Enabled</b> allows the files to 
-                	be queued.</li>
-          	</ul> 
-      		<li>Confirm the persistence of files in the static list.</li>
-   	</ul> 
-   	</ol>
+    <li>Select <b>Files from static list</b> as the file supplier in Select File Supplier dialog, 
+    then press the Configure button.
+    <ul> 
+        <li>Confirm it brings up the Configure Files from static list dialog.</li> 
+        <li>Confirm there is an <b>Add</b> button in Configure Files from static list dialog and 
+        the initial state is active.</li> 
+        <li>Confirm that the <b>Add</b> button brings up the Open file dialog.</li> 
+        <li>Confirm the Open file dialog allows for the selection of multiple files for 
+        opening.</li> 
+        <li>Confirm each file selected for opening in the Open File dialog is added to the file 
+        list.</li> 
+        <li>Confirm that if the Open File dialog is cancelled no files are added to the file 
+        list.</li> 
+        <li>Confirm that there is a <b>Remove</b> button in Configure Files from static list dialog 
+        and the initial state is disabled.</li> 
+        <li>Confirm that the <b>Remove</b> button is only enabled if at least one item in the file 
+        list is selected.</li> 
+        <li>Confirm that when an item is selected in File List,  pressing the <b>Remove</b> button 
+        removes it from the file list.</li> 
+        <li>Confirm that there is a <b>Clear</b> button in Configure Files from static list dialog 
+        and the initial state is disabled.</li> 
+        <li>Confirm the <b>Clear</b> button is only enabled if at least one item exists in the file 
+        list.</li> 
+        <li>Confirm that when the <b>Clear</b> button is pressed all files are removed from the 
+        file list.</li> 
+        <li>Confirm that there is a <b>Load List</b> button in the Configure Files from static list 
+        dialog.</li> 
+        <li>Confirm the initial state of the <b>Load List</b> button is enabled.</li> 
+        <li>Confirm that when the <b>Load List</b> button is pressed it brings up an Open File 
+        dialog.</li> 
+        <li>Confirm Open file dialog allows the selection of a text file for loading.</li> 
+        <li>Confirm each filename specified in the text file (one per line) is added to the file 
+        list.</li> 
+        <li>Confirm a Files from static list selected as the file supplier is added to Queue Setup 
+        tab with initial state of Enabled checkbox checked, Force Processing checkbox enabled but 
+        unchecked, and Status as inactive.
+        <ul>
+            <li>Confirm that clearing the checkbox for <b>Enabled</b> prevents the file supplier 
+            from being queued.</li>
+            <li>Confirm checking the checkbox for <b>Enabled</b> allows the files to be queued.</li>
+        </ul></li>
+        <li>Confirm the persistence of files in the static list.</li>
+    </ul></li>
+</ol>
 <p>
-<b>Miscellaneous</b>
+<b>Miscellaneous/Bug Fixes</b>
 <ul>
-	<li><b>[LegacyRC #5157]</b> Write-caching errors for file supplying
-	<ul>
-		<li>Run a small memory leak test for file supplying.
-		<ul>
-			<li>Use files on FNP2.
-			<li>Enable listening for new files.
-			<li>Add more files at least once while the test is running.
-		</ul>
-		<li>Confirm that <b>file access</b> or other caching-related erros are not seen 
-		in the exception log.
-	</ul>
+    <li><b>[LegacyRC #5157]</b> Write-caching errors for file supplying
+    <ul>
+        <li>Run a small memory leak test for file supplying.
+        <ul>
+            <li>Use files on FNP2.</li>
+            <li>Enable listening for new files.</li>
+            <li>Add more files at least once while the test is running.</li>
+        </ul></li>
+        <li>Confirm that <b>file access</b> or other caching-related erros are not seen in the 
+        exception log.</li>
+    </ul></li>
 <p>
-	<li><b>[LegacyRC #5168]</b> Queueing should stop if action name is changed
-	<ul>
-		<li>Configure an instance of the FAM to queue and process files.
-		<li>Use the <b>DBAdmin</b> to change the name of the relevant action within the database.
-		<li>Confirm that the FAM stops trying to queue more files reasonably quickly.
-	</ul>
+    <li><b>[LegacyRC #5168]</b> Queueing should stop if action name is changed
+    <ul>
+        <li>Configure an instance of the FAM to queue and process files.</li>
+        <li>Use the <b>DBAdmin</b> to change the name of the relevant action within the 
+        database.</li>
+        <li>Confirm that the FAM stops trying to queue more files reasonably quickly.</li>
+    </ul></li>
 <p>
-	<li><b>[LegacyRC #5623]</b> Robust folder listening
-	<ul>
-		<li>Exercise the following scenarios.  Confirm that graceful behavior is 
-		noted and that appropriate exceptions are logged with useful debug data
-		<ol>
-			<li><u>File supplier watching a disconnected machine</u>
-			<ul>
-				<li>Prepare an FPS file with a file supplier that is 
-				listening to a folder on a different machine where 
-				the different machine is <b>not connected</b> to the network.
-				<li>Start processing and confirm that no files are queued.
-				<li>Connect the second machine to the network.
-				<li>Confirm that within no more than a few minutes, files 
-				are being queued from the remote machine.
-				<li>Add more files to the folder that is being watched.
-				<li>Confirm that the new files are also queued.
-			</ul>
-			<li><u>File supplier watching a connected machine</u>
-			<ul>
-				<li>Prepare an FPS file with a file supplier that is 
-				listening to a folder on a different machine where 
-				the different machine is <b>connected</b> to the network.
-				<li>Start processing and confirm that files are queued.
-				<li>Disconnect the remote machine from the network.
-				<li>Add more files to the folder that is being watched.
-				<li>Reconnect the remote machine to the network while 
-				the FAM is still running.
-				<li>Check whether or not the files added while disconnected 
-				are queued by the file supplier.
-				<li>Previous test notes
-				<ul>
-					<li>New files were not added, as expected
-				</ul>
-				<li>Add more files to the folder that is being watched after 
-				the remote machine has been reconnected.
-				<li>Confirm that within no more than a few minutes, files 
-				are being queued from the remote machine.
-				<li>Previous test notes
-				<ul>
-					<li>Noticed <b>ELI13017: Error getting file changes</b>
-				</ul>
-			</ul>
-			<li><u>File supplier watching a machine that gets rebooted</u>
-			<ul>
-				<li>Prepare an FPS file with a file supplier that is 
-				listening to a folder on a different machine where 
-				the different machine is <b>connected</b> to the network.
-				<li>Start processing and confirm that files are queued.
-				<li>Reboot the remote machine.
-				<li>Add more files to the folder that is being watched.
-				<li>Confirm that within no more than a few minutes, files 
-				are being queued from the remote machine.
-				<li>Previous test notes
-				<ul>
-					<li>Noticed <b>ELI13017: Error getting file changes</b>
-					<li>Noticed <b>ELI13086: Invalid directory handle</b>
-				</ul>
-			</ul>
-			<li><u>Stop supplying from a disconnected machine</u>
-			<ul>
-				<li>Prepare an FPS file with a file supplier that is 
-				listening to a folder on a different machine where 
-				the different machine is <b>connected</b> to the network.
-				<li>Start processing and confirm that files are queued.
-				<li>Disconnect the remote machine from the network.
-				<li>Confirm that files are no longer being queued.
-				<li>Stop processing and confirm that the FAM stops 
-				gracefully.
-			</ul>
-		</ol>
-	</ul>
+    <li><b>[LegacyRC #5623]</b> Robust folder listening
+    <ul>
+        <li>Exercise the following scenarios.  Confirm that graceful behavior is noted and that 
+        appropriate exceptions are logged with useful debug data.
+        <ol>
+            <li><u>File supplier watching a disconnected machine</u>
+            <ul>
+                <li>Prepare an FPS file with a file supplier that is listening to a folder on a
+                different machine where the different machine is <b>not connected</b> to the 
+                network.</li>
+                <li>Start processing and confirm that no files are queued.</li>
+                <li>Connect the second machine to the network.</li>
+                <li>Confirm that within no more than a few minutes, files 
+                are being queued from the remote machine.</li>
+                <li>Add more files to the folder that is being watched.</li>
+                <li>Confirm that the new files are also queued.</li>
+            </ul></li>
+            <li><u>File supplier watching a connected machine</u>
+            <ul>
+                <li>Prepare an FPS file with a file supplier that is listening to a folder on a 
+                different machine where the different machine is <b>connected</b> to the 
+                network.</li>
+                <li>Start processing and confirm that files are queued.</li>
+                <li>Disconnect the remote machine from the network.</li>
+                <li>Add more files to the folder that is being watched.</li>
+                <li>Reconnect the remote machine to the network while the FAM is still 
+                running.</li>
+                <li>Check whether or not the files added while disconnected are queued by the file 
+                supplier.</li>
+                <li>Previous test notes
+                <ul>
+                    <li>New files were not added, as expected</li>
+                </ul></li>
+                <li>Add more files to the folder that is being watched after the remote machine has
+                been reconnected.</li>
+                <li>Confirm that within no more than a few minutes, files are being queued from the
+                remote machine.</li>
+                <li>Previous test notes
+                <ul>
+                    <li>Noticed <b>ELI13017: Error getting file changes</b></li>
+                </ul></li>
+            </ul></li>
+            <li><u>File supplier watching a machine that gets rebooted</u>
+            <ul>
+                <li>Prepare an FPS file with a file supplier that is listening to a folder on a 
+                different machine where the different machine is <b>connected</b> to the 
+                network.</li>
+                <li>Start processing and confirm that files are queued.</li>
+                <li>Reboot the remote machine.</li>
+                <li>Add more files to the folder that is being watched.</li>
+                <li>Confirm that within no more than a few minutes, files are being queued from the 
+                remote machine.</li>
+                <li>Previous test notes
+                <ul>
+                    <li>Noticed <b>ELI13017: Error getting file changes</b></li>
+                    <li>Noticed <b>ELI13086: Invalid directory handle</b></li>
+                </ul></li>
+            </ul></li>
+            <li><u>Stop supplying from a disconnected machine</u>
+            <ul>
+                <li>Prepare an FPS file with a file supplier that is listening to a folder on a 
+                different machine where the different machine is <b>connected</b> to the 
+                network.</li>
+                <li>Start processing and confirm that files are queued.</li>
+                <li>Disconnect the remote machine from the network.</li>
+                <li>Confirm that files are no longer being queued.</li>
+                <li>Stop processing and confirm that the FAM stops gracefully.</li>
+            </ul></li>
+            <li><b>[LegacyRC #5811]</b> Queueing from disconnected folder
+            <!-- fixed v 8.1.0.44 -->
+            <ol>
+                <li>Configure a FAM to queue existing files (with listening enabled—not sure if
+                this affects anything) from folder on a remote machine</li>
+                <li>Disconnect the remote machine from the network</li>
+                <li>Press play in the FAM</li>
+                <li>A "...does not exist!" exception will appear, press enter to make it go 
+                away</li>
+                <li>Initiate reconnection of the remote machine</li>
+                <li>Press play in the FAM</li>
+                <li>You may get a "...does not exist!" exception, press enter to make it go away</li>
+            </ol>
+            <ul>
+                <li>Repeat steps 6 and 7 until either the FAM starts queuing or you are satisfied
+                that "Unexpected exception caught" exceptions will not be displayed. If the former, 
+                go to step 2.</li>
+            </ul></li>
+        </ol></li>
+    </ul></li>
+<p>
+    <li><b>[LegacyRC #5869, #5870, #5871, #5872, #5878, #5880, #5881]</b> Queue setup tab
+    <!-- fixed v 8.1.0.72 -->
+    <ul>
+        <li>Confirm that the checkboxes do not appear to be disabled.
+        <li>Confirm that when columns are resized, they are displayed correctly.
+        <li>Confirm that the height of column headers cannot be changed.
+    <p>
+        <li>Open an .fps file with one file supplier defined.
+        <li>Close the .fps file without making changes. Confirm that you are not prompted to
+        save.
+        <li>Reopen it.
+        <li>In the queue setup tab, confirm that when that supplier is selected, the Remove and
+        Commands&gt; buttons are both enabled.
+        <li>Add another supplier.
+        <li>Select the first supplier and remove it.
+        <li>Confirm that no errors are displayed.
+    <p>
+        <li>Run an .fps file that has both file suppliers and processing tasks defined.
+        <li>Confirm that the status column in the queue setup tab is appropriately updated.
+        <li>Confirm that no unusual exceptions are logged when the file supplier starts and
+        stops.
+    </ul>
 </ul>
-
 </body>
 </html>

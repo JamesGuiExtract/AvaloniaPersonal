@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>FAM Bug Fixes Testing Checklist</title>
-	<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+    <link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </head>
 
 <body>
@@ -12,172 +12,205 @@
 <hr>
 
 <ul>
-	<li><h2>[LegacyRC #3473] - Thread exits with exception</h2>
-	<ul>
-		<LI><b>Test #1</b> - Invalid task id
-		<ul>
-			<li>Create a <b>Queuing</b> FPS file to listen to a specific folder.
-			<li>Create a <b>Processing</b> FPS file to OCR images and execute rules 
-			for the supplied images.
-			<li>Set the size of the <b>History</b> to 10 files.
-			<li>Supply and Process <b>2</b> files.
-			<li>Supply and Process <b>6</b> more files.
-			<li>Supply and Process the original <b>2</b> files again.
-			<li>Supply and Process <b>15</b> new files.
-			<li>Errors are expected as the second processing instances of the original 2 files 
-			are removed from the history queue.  This should happen as the 9th and 10th of 
-			the new files are going through processing.
+    <LI><b>[FlexIDSCore #3073]</b> Running rule set causes FAM to crash
+    <!-- fixed v 6.0.0.77c -->
+    <ul>
+        <li>Prepare a test database
+        <li>Modify the associated Crash.fps
+        <li>Queue the associated MTG image
+        <li>Exercise the associated RSD file
+        <li>Confirm that the FAM <b>does not</b> crash.
+    </ul>
 <p>
-			<li>Exercise the scenario on a stock <b>7.0.0.39</b> installation.
-			<li>Confirm that <b>ELI24633</b> exceptions were seen with Debug information 
-			as <b>LastCodePos = MLI02389.520</b>.
-			<li>Exercise the scenario on a <b>7.0.0.39 + Hotfix #3</b> installation.
-			<li>Confirm that processing finishes without error.  An Application Trace 
-			exception should be logged for <b>ELI25353 - Task id not found in map.</b>
-       		</ul>
-   		</LI>
+    <li><h2>[LegacyRC #3473] - Thread exits with exception</h2>
+    <ul>
+        <LI><b>Test #1</b> - Invalid task id
+        <ul>
+            <li>Create a <b>Queuing</b> FPS file to listen to a specific folder.
+            <li>Create a <b>Processing</b> FPS file to OCR images and execute rules for the
+            supplied images.
+            <li>Set the size of the <b>History</b> to 10 files.
+            <li>Supply and Process <b>2</b> files.
+            <li>Supply and Process <b>6</b> more files.
+            <li>Supply and Process the original <b>2</b> files again.
+            <li>Supply and Process <b>15</b> new files.
+            <li>Errors are expected as the second processing instances of the original 2 files are
+            removed from the history queue.  This should happen as the 9th and 10th of the new
+            files are going through processing.
 <p>
-		<LI><b>Test #2</b> - File removed from history list while being processed
-		<ul>
-			<li>Create a <b>Queuing</b> FPS file to listen to a specific folder.
-			<li>Create a <b>Processing</b> FPS file to OCR images and execute rules 
-			for the supplied images.
-			<li>Set the size of the <b>History</b> to 10 files.
-			<li>Supply and Process <b>9</b> small files plus <b>1</b> relatively large file.
-			<li>Supply and Process <b>9</b> new files.  This causes the slow file to be 
-			the next file to be removed from the <b>History</b> collection.
-			<li>Resupply and reprocess the same large file <b>1</b> more time.
-			<li>While the large file is processing, supply <b>4</b> more files from the 
-			original set.
-			<li>As the first of these original files finishes processing, the history 
-			record for the large file will be removed.  Errors will be logged (frequently) 
-			each time status updates are attempted.
+            <li>Exercise the scenario on a stock <b>7.0.0.39</b> installation.
+            <li>Confirm that <b>ELI24633</b> exceptions were seen with Debug information as 
+            <b>LastCodePos = MLI02389.520</b>.
+            <li>Exercise the scenario on a <b>7.0.0.39 + Hotfix #3</b> installation.
+            <li>Confirm that processing finishes without error.  An Application Trace exception
+            should be logged for <b>ELI25353 - Task id not found in map.</b>
+        </ul>
 <p>
-			<li>Exercise the scenario on a stock <b>7.0.0.39</b> installation.
-			<li>Confirm that lots of <b>Invalid task id</b> exceptions were seen.
-			<li>Exercise the scenario on a <b>7.0.0.39 + Hotfix #3</b> installation.
-			<li>Confirm that processing finishes without error.  An Application Trace 
-			exception should be logged for <b>ELI25355 - Task cannot be removed.</b>
-       		</ul>
-   		</LI>
+        <LI><b>Test #2</b> - File removed from history list while being processed
+        <ul>
+            <li>Create a <b>Queuing</b> FPS file to listen to a specific folder.
+            <li>Create a <b>Processing</b> FPS file to OCR images and execute rules for the
+            supplied images.
+            <li>Set the size of the <b>History</b> to 10 files.
+            <li>Supply and Process <b>9</b> small files plus <b>1</b> relatively large file.
+            <li>Supply and Process <b>9</b> new files.  This causes the slow file to be the next
+            file to be removed from the <b>History</b> collection.
+            <li>Resupply and reprocess the same large file <b>1</b> more time.
+            <li>While the large file is processing, supply <b>4</b> more files from the original
+            set.
+            <li>As the first of these original files finishes processing, the history record for
+            the large file will be removed.  Errors will be logged (frequently) each time status
+            updates are attempted.
 <p>
-		<LI><b>Test #3</b> - File removed from history list while in Pending state
-		<ul>
-			<li>Create a <b>Queuing</b> FPS file to listen to a specific folder.
-			<li>Create a <b>Processing</b> FPS file to OCR images and execute rules 
-			for the supplied images.
-			<li>Set the size of the <b>History</b> to 10 files.
-			<li>Supply and Process <b>4</b> files.
-			<li>Supply and Process <b>5</b> different files.
-			<li>Resupply and reprocess the same <b>5</b> files.  This will finish filling 
-			the history collection and remove the first four files from the history.
-			<li>Supply and Process <b>4</b> relatively large files where OCR and rule 
-			execution take about one minute.
-			<li>While the slow files are processing, resupply and reprocess the previous 
-			<b>9</b> files.  This is expected to cause the first four files to begin 
-			processing first since those have smaller file IDs.  
-			<li>As the first four files finish processing, they will push history entries 
-			off for the next five files.  Since these files are in <b>Pending</b> state, 
-			each thread will try and fail to transition the file to <b>Processing</b>.
-			<li>Note that this scenario is difficult to set up due to files being provided 
-			for processing in an uncertain order.
+            <li>Exercise the scenario on a stock <b>7.0.0.39</b> installation.
+            <li>Confirm that lots of <b>Invalid task id</b> exceptions were seen.
+            <li>Exercise the scenario on a <b>7.0.0.39 + Hotfix #3</b> installation.
+            <li>Confirm that processing finishes without error.  An Application Trace exception
+            should be logged for <b>ELI25355 - Task cannot be removed.</b>
+        </ul>
 <p>
-			<li>Exercise the scenario on a stock <b>7.0.0.39</b> installation.
-			<li>Confirm that each thread fails and stops processing.
-			<li>Exercise the scenario on a <b>7.0.0.39 + Hotfix #3</b> installation.
-			<li>Confirm that processing finishes without error. 
-	       	</ul>
-   		</LI>
-	</ul>
+        <LI><b>Test #3</b> - File removed from history list while in Pending state
+        <ul>
+            <li>Create a <b>Queuing</b> FPS file to listen to a specific folder.
+            <li>Create a <b>Processing</b> FPS file to OCR images and execute rules for the
+            supplied images.
+            <li>Set the size of the <b>History</b> to 10 files.
+            <li>Supply and Process <b>4</b> files.
+            <li>Supply and Process <b>5</b> different files.
+            <li>Resupply and reprocess the same <b>5</b> files.  This will finish filling the
+            history collection and remove the first four files from the history.
+            <li>Supply and Process <b>4</b> relatively large files where OCR and rule execution
+            take about one minute.
+            <li>While the slow files are processing, resupply and reprocess the previous <b>9</b>
+            files.  This is expected to cause the first four files to begin processing first since
+            those have smaller file IDs.  
+            <li>As the first four files finish processing, they will push history entries off for 
+            the next five files.  Since these files are in <b>Pending</b> state, each thread will
+            try and fail to transition the file to <b>Processing</b>.
+            <li>Note that this scenario is difficult to set up due to files being provided for
+            processing in an uncertain order.
 <p>
-   	<LI><b>[LegacyRC #5478]</b> Processing all skipped files when only queuing
-       	<ul>
-      		<li>Prepare an FPS file to queue files and to process files skipped by 
-		<b>all users</b>.
-		<li>Uncheck the <b>Process files</b> box on the <b>Action</b> tab.
-		<li>Start queuing files.
-		<li>Confirm that the <b>DB Login</b> dialog <b>is not</b> presented.
-		<li>Confirm that queuing files is allowed.
-       	</ul>
+            <li>Exercise the scenario on a stock <b>7.0.0.39</b> installation.
+            <li>Confirm that each thread fails and stops processing.
+            <li>Exercise the scenario on a <b>7.0.0.39 + Hotfix #3</b> installation.
+            <li>Confirm that processing finishes without error. 
+        </ul>
+    </ul>
 <p>
-   	<LI><b>[LegacyRC #5508, #5514]</b> Process files after crash
-       	<ul>
-      		<li>Create an FPS file to process some files.
-		<li>Kill <b>ProcessFiles.exe</b> from the Task Manager.
-		<li>Reset the <b>Processing</b> files to <b>Pending</b> 
-		using DB Admin.
-		<li>Reopen the FPS file and continue processing images.
-		<li>Confirm that processing continues without error.
-       	</ul>
+    <LI><b>[FlexIDSCore #3983, LegacyRC #5741]</b> Stop processing after Pause and Unpause
+    <ul>
+        <li>Configure a verification FPS file.
+        <li>Confirm that processing can be paused.
+        <li>Confirm that processing can be unpaused.
+        <li>Confirm that processing can be stopped from the FAM.
+        <li>Confirm that FAM toolbar buttons are properly enabled and disabled 
+        during this test.
+    </ul>
 <p>
-   	<LI><b>[LegacyRC #5584, #5596, #5675]</b> Related Vista O/S problems
-       	<ul>
-  	   	<LI>Confirm that a <b>GetFullUserName.exe</b> application is available in 
-		the CommonComponents folder.
-		<LI>Exercise OCR for the sample image in 
-		<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5584</b>.  Confirm that an 
-		<b>SSOCR2 Module has stopped working</b> message is not displayed.
-		<li>Exercise the <b>Convert to searchable PDF</b> task on a document 
-		that does not exist such as <b>&lt;SourceDocName&gt;.noexist</b>.
-		<li>Confirm that an <b>ELI18550: Invalid filename.  Input file must be 
-		readable</b> expection is not seen.
-       	</ul>
+    <LI><b>[LegacyRC #5478]</b> Processing all skipped files when only queuing
+    <ul>
+        <li>Prepare an FPS file to queue files and to process files skipped by <b>all users</b>.
+        <li>Uncheck the <b>Process files</b> box on the <b>Action</b> tab.
+        <li>Start queuing files.
+        <li>Confirm that the <b>DB Login</b> dialog <b>is not</b> presented.
+        <li>Confirm that queuing files is allowed.
+    </ul>
 <p>
-   	<LI><b>[LegacyRC #5628]</b> Creating very long tags
-       	<ul>
-		<LI>Confirm that <b>AutoDynamicTagCreation=1</b> within DBInfo.
-		<li>Verify an image.
-  	   	<LI>Confirm that a long tag can be created and applied.
-		<LI>Confirm that the tag length is limited to <b>100</b> characters.
-		<li>Confirm that the tag description is limited to <b>255</b> characters.
-       	</ul>
+    <LI><b>[LegacyRC #5508, #5514]</b> Process files after crash
+    <ul>
+        <li>Create an FPS file to process some files.
+        <li>Kill <b>ProcessFiles.exe</b> from the Task Manager.
+        <li>Reset the <b>Processing</b> files to <b>Pending</b> using DB Admin.
+        <li>Reopen the FPS file and continue processing images.
+        <li>Confirm that processing continues without error.
+    </ul>
 <p>
-   	<LI><b>[LegacyRC #5649, #5656]</b> Deleting automatically created actions
-       	<ul>
-		<li>Execute an FPS file such that an action is automatically created.
-		<li>Process some files using the automatically created action.
-		<li>Confirm that the action can be deleted.
-       	</ul>
+    <LI><b>[LegacyRC #5584, #5596, #5675]</b> Related Vista O/S problems
+    <ul>
+        <LI>Confirm that a <b>GetFullUserName.exe</b> application is available in the
+        CommonComponents folder.
+        <LI>Exercise OCR for the sample image in 
+        <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5584</b>.  Confirm that an <b>SSOCR2 Module has
+        stopped working</b> message is not displayed.
+        <li>Exercise the <b>Convert to searchable PDF</b> task on a document that does not exist
+        such as <b>&lt;SourceDocName&gt;.noexist</b>.
+        <li>Confirm that an <b>ELI18550: Invalid filename.  Input file must be readable</b> 
+        exception is not seen.
+    </ul>
 <p>
-   	<LI><b>[LegacyRC #5660]</b> Failure in Core: Convert to searchable PDF
-       	<ul>
-		<LI>Exercise the task for the sample image in 
-		<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5660</b>.  
-		<li>Confirm that the file cannot be converted to a searchable PDF.
-		<li>Confirm that the exception log can be opened in the <b>UEX Viewer</b>.
-       	</ul>
+    <LI><b>[LegacyRC #5628]</b> Creating very long tags
+    <ul>
+        <LI>Confirm that <b>AutoDynamicTagCreation=1</b> within DBInfo.
+        <li>Verify an image.
+        <LI>Confirm that a long tag can be created and applied.
+        <LI>Confirm that the tag length is limited to <b>100</b> characters.
+        <li>Confirm that the tag description is limited to <b>255</b> characters.
+    </ul>
 <p>
-   	<LI><b>[LegacyRC #5661]</b> Simultaneous queuing and processing
-       	<ul>
-		<LI>Create an FPS file to both queue and process files.
-  	   	<LI>Confirm that the <b>Recent queue events</b> grid displays all of 
-		the files.
-  	   	<LI>Confirm that the <b>Files added or updated in the queue</b> grid 
-		displays all of the files.
-       	</ul>
+    <LI><b>[LegacyRC #5649, #5656]</b> Deleting automatically created actions
+    <ul>
+        <li>Execute an FPS file such that an action is automatically created.
+        <li>Process some files using the automatically created action.
+        <li>Confirm that the action can be deleted.
+    </ul>
 <p>
-   	<LI><b>[LegacyRC #5687]</b> Set file action status on pre-queued files
-       	<ul>
-		<li>Queue some files.
-      		<li>Prepare an FPS file to set file action status.
-		<li>Confirm that <b>ELI14775: Unable to obtain DB schema version</b> is not 
-		seen for the first file.
-       	</ul>
+    <LI><b>[LegacyRC #5660]</b> Failure in Core: Convert to searchable PDF
+    <ul>
+        <LI>Exercise the task for the sample image in 
+        <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5660</b>.  
+        <li>Confirm that the file cannot be converted to a searchable PDF.
+        <li>Confirm that the exception log can be opened in the <b>UEX Viewer</b>.
+    </ul>
 <p>
-   	<LI><b>[LegacyRC #5715]</b> Cancellable tasks and scheduled processing
-       	<ul>
-		<li>Configure an FPS file with a sleep task and a set file action status task.
-		<li>Also configure the FPS file to use scheduled processing.
-		<li>Confirm that if processing transitions to inactive during a sleep task, 
-		that the associated set file action status task is <b>not</b> executed.
-		<li>Confirm that processing transitions back to active as expected.
-       	</ul>
+    <LI><b>[LegacyRC #5661]</b> Simultaneous queuing and processing
+    <ul>
+        <LI>Create an FPS file to both queue and process files.
+        <LI>Confirm that the <b>Recent queue events</b> grid displays all of the files.
+        <LI>Confirm that the <b>Files added or updated in the queue</b> grid displays all of the
+        files.
+    </ul>
 <p>
-   	<LI><b>[FlexIDSCore #4113]</b> Queuing and processing
-       	<ul>
-		<li>Create an FPS file that both queues and processes files.
-		<li>Confirm that the first file queued is displayed in the <b>Queue Log</b>.
-       	</ul>
+    <LI><b>[LegacyRC #5687]</b> Set file action status on pre-queued files
+    <ul>
+        <li>Queue some files.
+        <li>Prepare an FPS file to set file action status.
+        <li>Confirm that <b>ELI14775: Unable to obtain DB schema version</b> is not seen for the 
+        first file.
+    </ul>
+<p>
+    <LI><b>[LegacyRC #5715]</b> Cancellable tasks and scheduled processing
+    <ul>
+        <li>Configure an FPS file with a sleep task and a set file action status task.
+        <li>Also configure the FPS file to use scheduled processing.
+        <li>Confirm that if processing transitions to inactive during a sleep task, that the 
+        associated set file action status task is <b>not</b> executed.
+        <li>Confirm that processing transitions back to active as expected.
+    </ul>
+<p>
+    <LI><b>[FlexIDSCore #4113]</b> Queuing and processing
+    <ul>
+        <li>Create an FPS file that both queues and processes files.
+        <li>Confirm that the first file queued is displayed in the <b>Queue Log</b>.
+    </ul>
+<p>        
+    <li><b>[LegacyRC #5610]</b> FAM processing threads must grab file before stopping
+    <ul>
+        <li>Create a database and enqueue a small (~20) number of files.
+        <li>Configure an .fps file with a verification task. Set it up to use a large number of
+        threads to processing (at least twice as many threads as there are files to process).
+        <li>Start processing, then immediately stop.
+        <li>Confirm that processing stops immediately and that the initially idle threads do not
+        have to grab files first.
+    </ul>
+<p>    
+    <li><b>[LegacyRC #5835]</b> FAM pause button
+    <!-- fixed v 8.1.0.18 -->
+    <ul>
+        <li>Set up an .fps file with at least one processing task and a number of files already
+        queued.
+        <li>Press the play button and then (as quickly as possible) hit the pause button.
+        <li>Confirm that processing is correctly paused.
+    </ul>    
 </ul>
 </body> 
 </html>

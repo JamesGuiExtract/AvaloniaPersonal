@@ -159,8 +159,11 @@
 		<ul>
 			<li>Processing failures listed on the <b>Processing Log</b> page.
 			<li>Memory usage via <b>Task Manager</b>.
-			<li>Use xcopy to copy a set of images into a subfolder under <b>Images2</b>.
-			This will exercise the file supplier that is listening for new files.
+			<li>Use xcopy to copy a set of images into a subfolder under <b>Images2</b>. This will
+            exercise the file supplier that is listening for new files.
+            <li><b>[FlexIDSCore #3564]</b> <!-- fixed v 8.1.0.18 --> Watch the processing log tab
+            for a while and confirm that it does not take an inordinate amount of time for threads
+            to grab new files once the currently-processing files reach 100%.
 		</ul>
 <p>
 		<li>The following items should be checked when processing finishes or is stopped.

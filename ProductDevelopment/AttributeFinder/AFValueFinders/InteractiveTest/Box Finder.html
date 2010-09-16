@@ -17,179 +17,143 @@
 <h2>Box Finder Rule</h2>
 <ul>
 	<li>Confirm that <b>Configure...</b> button displays the <b>Configure Box
-       	Finder</b> dialog.
+    Finder</b> dialog.
 	<li><b>Clues</b> group box
-      	<ul>
-       		<li>Confirm that a list box for <b>Clues to find box</b> is provided.
-          	<li>Confirm that <b>Add...</b>, <b>Remove</b> and <b>Modify...</b> 
-		buttons are provided next to the list box.
-          	<li>Confirm that the <b>Add...</b> button is always enabled.
-          	<li>Confirm that the <b>Remove</b> button is enabled only if one or more 
-		clues is selected.
-          	<li>Confirm that the <b>Modify...</b> button is enabled only if exactly 
-		one clue is selected.
-		<li>Confirm that the <b>Modify...</b> button displays a pre-populated 
-		<b>Text</b> dialog.
- 		<ul>
-       			<li>Changes made are persistent.</li>
-       		</ul>
-		</li>
-		<li>Graphical <b>UP</b> arrow button moves the selected item
-       		up in the list box.</li>
-		<li>Graphical <b>DOWN</b> arrow button moves the selected item
-       		down in the list box.</li>
-		<li>Graphical <b>UP</b> and <b>DOWN</b> arrow
-       		buttons become inactive when reaching top or bottom of the list.</li>
-          	<li><b>[FlexIDSCore #2875]</b> Confirm that double-clicking on a list box entry 
-		displays a pre-populated <b>Text</b> dialog.
-<p>
-          	<li>Confirm that the <b>Case sensitive</b> checkbox is always enabled.
-          	<li>Confirm that the <b>Case sensitive</b> checkbox is unchecked by default.
-          	<li>Confirm that the <b>Above clue is a regular expression</b> checkbox is 
-		always enabled.
-          	<li>Confirm that the <b>Above clue is a regular expression</b> checkbox is 
-		unchecked by default.
-<p>
-          	<li>Confirm that the <b>Select location of clue relative to box</b> image is 
-		next to the buttons.
-          	<li>Confirm that the image includes <b>Clue</b> in red text and <b>Data</b> 
-		in blue text.
-          	<li>Confirm that the default position of the red <b>Clue</b> text is in the 
-		center cell.
-          	<li>Confirm that checking in each of the nine grid cells moves the red 
-		<b>Clue</b> text to the associated cell.
-          	<li>Confirm that group box settings are persistent.
-<p>
-          	<li><b>[FlexIDSCore #2876]</b> Refresh and z-order.
-	        <ul>
-	        	<li>Add a clue to the list and make sure that it is selected.
-	        	<li>Use <b>Alt+Tab</b> to activate a different application.
-	        	<li>Use <b>Alt+Tab</b> to reactivate the RuleSet Editor.
-	        	<li>Confirm that the balloon help icon <b>does not</b> obscure the 
-			selected clue.
-	        </ul>
-<p>
-          	<li><b>[FlexIDSCore #2878]</b> Support for clues from file via <b>file://</b>.
-	        <ul>
-          		<li>Clear the <b>Clues to find box:</b> list box and specify a file
-            		name beginning with <b>file://</b> inside the <b>Text</b> dialog and click 
-			the <b>OK</b> button.
-            		<ul>
-              			<li>Confirm that the <b>Add...</b> button is disabled.</li>
-              			<li>Confirm that the <b>Remove</b> button is enabled while 
-				the entry is selected.</li>
-              			<li>Confirm that the <b>Modify...</b> button is enabled while 
-				the entry is selected.</li>
-              			<li>Confirm that all three buttons are disabled while the 
-				entry is not selected.</li>
-              			<li>Click <b>Remove</b> to delete the current file name entry 
-				and confirm that the <b>Add...</b> button is enabled.</li>
-            		</ul>
-			</li>
-          		<li>Add several entries inside the <b>Clues to find box:</b> list box 
-			(do not include a file name entry) and double click one of the entries 
-	 		to bring up the <b>Text</b> dialog. Modify the text in the edit box to a 
-			file name (including the file:// header) and click the <b>OK</b> button.
-            		<ul>
-              			<li>Confirm that a message box is displayed to remind the user 
-				that a file name must be the only entry inside the list box.
-                		<ul>
-	                  		<li>Confirm that clicking <b>NO</b> on the message box 
-					returns to the <b>Text</b> dialog and does nothing to 
-					the list box.</li>
-                			<li>Confirm that clicking <b>YES</b> on the message 
-					box will clear all the other entries inside the list box 
-					and display the newly modified file name as the first 
-					entry in the list box.</li>
-                		</ul>
-              			</li>
-            		</ul>
-          		</li>
-	        </ul>
-        </ul>
-<p>
-      	<li><b>Search Scope</b> group box
+    <ul>
+        <li>Confirm that a list box for <b>Clues to find box</b> is provided.
+        <li>Confirm that <b>Add...</b>, <b>Remove</b> and <b>Modify...</b> buttons are provided
+        next to the list box.
+        <li>Confirm that the <b>Add...</b> button is always enabled.
+        <li>Confirm that the <b>Remove</b> button is enabled only if one or more clues is selected.
+        <li>Confirm that the <b>Modify...</b> button is enabled only if exactly one clue is
+        selected.
+        <li>Confirm that the <b>Modify...</b> button displays a pre-populated <b>Text</b> dialog.
         <ul>
-        	<li>Confirm that a radio button exists for <b>All pages</b>.
-        	<li>Confirm that the <b>All pages</b> radio button is the default selection.
+            <li>Changes made are persistent.
+        </ul>
+        <li>Graphical <b>UP</b> arrow button moves the selected item up in the list box.
+        <li>Graphical <b>DOWN</b> arrow button moves the selected item down in the list box.
+		<li>Graphical <b>UP</b> and <b>DOWN</b> arrow buttons become inactive when reaching top 
+        or bottom of the list.</li>
+        <li><b>[FlexIDSCore #2875]</b> Confirm that double-clicking on a list box entry displays a
+        pre-populated <b>Text</b> dialog.
 <p>
-        	<li>Confirm that a radio button exists for <b>First pages</b>.
-        	<li>Confirm that an associated edit box exists for the <b>First pages</b> 
-		radio button.
-        	<li>Confirm that the associated edit box is enabled only if the radio button 
-		is selected.
-        	<li>Confirm that the associated edit box accepts only numeric characters.
+        <li>Confirm that the <b>Case sensitive</b> checkbox is always enabled.
+        <li>Confirm that the <b>Case sensitive</b> checkbox is unchecked by default.
+        <li>Confirm that the <b>Above clue is a regular expression</b> checkbox is always enabled.
+        <li>Confirm that the <b>Above clue is a regular expression</b> checkbox is unchecked by 
+        default.
 <p>
-          	<li>Confirm that a radio button exists for <b>Last pages</b>.
-          	<li>Confirm that an associated edit box exists for the <b>Last pages</b> 
-		radio button.
-          	<li>Confirm that the associated edit box is enabled only if the radio button 
-		is selected.
-          	<li>Confirm that the associated edit box accepts only numeric characters.
+        <li>Confirm that the <b>Select location of clue relative to box</b> image is next to the
+        buttons.
+        <li>Confirm that the image includes <b>Clue</b> in red text and <b>Data</b> in blue text.
+        <li>Confirm that the default position of the red <b>Clue</b> text is in the center cell.
+        <li>Confirm that checking in each of the nine grid cells moves the red <b>Clue</b> text to
+        the associated cell.
+        <li>Confirm that group box settings are persistent.
 <p>
-          	<li>Confirm that a radio button exists for <b>Specified pages</b>.
-          	<li>Confirm that an associated edit box exists for the <b>Selected pages</b> 
-		radio button.
-        	<li>Confirm that the associated edit box is enabled only if the radio button 
-		is selected.
-        	<li>Confirm that the associated edit box accepts comma-delimited page numbers 
-		and page ranges.
-        	<li>Confirm that a validation error is displayed if alphabetic characters are 
-		typed in the associated edit box.
-<p>
-          	<li>Confirm that group box settings are persistent.
+        <li><b>[FlexIDSCore #2876]</b> Refresh and z-order.
+        <ul>
+            <li>Add a clue to the list and make sure that it is selected.
+            <li>Use <b>Alt+Tab</b> to activate a different application.
+            <li>Use <b>Alt+Tab</b> to reactivate the RuleSet Editor.
+            <li>Confirm that the balloon help icon <b>does not</b> obscure the selected clue.
         </ul>
 <p>
-	<li><b>Expected size of box</b> group box
-       	<ul>
-        	<li>Confirm that an edit box exists for minimum page width.
-        	<li>Confirm that an edit box exists for maximum page width.
-        	<li>Confirm that an edit box exists for minimum page height.
-        	<li>Confirm that an edit box exists for maximum page height.
-<p>
-       		<li>Confirm that each edit box accepts only numeric characters for input.
-       		<li>Confirm that the limits for each edit box are <b>0</b> and <b>100</b>.
-       		<li>Confirm that an error message is displayed if the minimum width is 
-		greater than the maximum width.
-          	<li>Confirm that an error message is displayed if the minimum height is 
-		greater than the maximum height.
-          	<li>Confirm that group box settings are persistent.
-<p>
-        	<li><b>[FlexIDSCore #2874]</b> Maximum page width.
-	       	<ul>
-	       		<li>Exercise the <b>RSD</b> file and the image associated with the SCR.
-	       		<li>Confirm that no box is found.
-	       		<li>Modify the maximum width to <b>12</b> percent and confirm that 
-			one box <b>is</b> found.
-	       	</ul>
+        <li><b>[FlexIDSCore #2878]</b> Support for clues from file via <b>file://</b>.
+        <ul>
+            <li>Clear the <b>Clues to find box:</b> list box and specify a file name beginning
+            with <b>file://</b> inside the <b>Text</b> dialog and click the <b>OK</b> button.
+            <ul>
+                <li>Confirm that the <b>Add...</b> button is still enabled.
+                <li>Confirm that the <b>Remove</b> button is enabled while the entry is selected.
+                <li>Confirm that the <b>Modify...</b> button is enabled while the entry is
+                selected.
+                <li>Confirm that the <b>Remove</b> and <b>Modify...</b> buttons are disabled while
+                the entry is not selected.
+            </ul>
+            <li>Add several entries inside the <b>Clues to find box:</b> list box (do not include a
+            file name entry) and double click one of the entries to bring up the <b>Text</b> 
+            dialog. Modify the text in the edit box to a file name (including the file:// header) 
+            and click the <b>OK</b> button.
+            <li>Confirm that the entry is added to the list.
         </ul>
+    </ul>
 <p>
-	<li><b>Return Value</b> group box
-       	<ul>
-        	<li>Confirm that a radio button exists for <b>Return spatial information of found 
-		box and artificially associated the spatial area with the following text</b>.
-        	<li>Confirm that this radio button is selected by default.
-        	<li>Confirm that an associated edit box exists for specifying text.
-        	<li>Confirm that the default text is <b>000-00-0000</b>.
-        	<li>Confirm that an associated check box exists for <b>Exclude vertical spatial 
-		area of clue from box</b>.
-        	<li>Confirm that the check box is unchecked by default.
-        	<li>Confirm that the edit box and check box are enabled only when the radio 
-		button is selected.
+    <li><b>Search Scope</b> group box
+    <ul>
+        <li>Confirm that a radio button exists for <b>All pages</b>.
+        <li>Confirm that the <b>All pages</b> radio button is the default selection.
 <p>
-       		<li>Confirm that a radio button exists for <b>Return text found within the 
-		box</b>.
-        	<li>Confirm that an associated check box exists for <b>Include clue text 
-		as part of the return value</b>.
-        	<li>Confirm that the check box is enabled only when the radio button is 
-		selected.
+        <li>Confirm that a radio button exists for <b>First pages</b>.
+        <li>Confirm that an associated edit box exists for the <b>First pages</b> radio button.
+        <li>Confirm that the associated edit box is enabled only if the radio button is selected.
+        <li>Confirm that the associated edit box accepts only numeric characters.
 <p>
-       		<li>Confirm that a separate check box is available for <b>Include all lines 
-		that are found in the output</b>.
-       		<li>Confirm that the check box is unchecked by default.
+        <li>Confirm that a radio button exists for <b>Last pages</b>.
+        <li>Confirm that an associated edit box exists for the <b>Last pages</b> radio button.
+        <li>Confirm that the associated edit box is enabled only if the radio button is selected.
+        <li>Confirm that the associated edit box accepts only numeric characters.
 <p>
-       		<li>Confirm that group box settings are persistent.
-       	</ul>
+        <li>Confirm that a radio button exists for <b>Specified pages</b>.
+        <li>Confirm that an associated edit box exists for the <b>Selected pages</b> radio button.
+        <li>Confirm that the associated edit box is enabled only if the radio button is selected.
+        <li>Confirm that the associated edit box accepts comma-delimited page numbers and page 
+        ranges.
+        <li>Confirm that a validation error is displayed if alphabetic characters are typed in the
+        associated edit box.
+<p>
+        <li>Confirm that group box settings are persistent.
+    </ul>
+<p>
+    <li><b>Expected size of box</b> group box
+    <ul>
+        <li>Confirm that an edit box exists for minimum page width.
+        <li>Confirm that an edit box exists for maximum page width.
+        <li>Confirm that an edit box exists for minimum page height.
+        <li>Confirm that an edit box exists for maximum page height.
+<p>
+        <li>Confirm that each edit box accepts only numeric characters for input.
+        <li>Confirm that the limits for each edit box are <b>0</b> and <b>100</b>.
+        <li>Confirm that an error message is displayed if the minimum width is greater than the
+        maximum width.
+        <li>Confirm that an error message is displayed if the minimum height is greater than the
+        maximum height.
+        <li>Confirm that group box settings are persistent.
+<p>
+        <li><b>[FlexIDSCore #2874]</b> Maximum page width.
+        <ul>
+            <li>Exercise the <b>RSD</b> file and the image associated with the SCR.
+            <li>Confirm that no box is found.
+            <li>Modify the maximum width to <b>12</b> percent and confirm that one box <b>is</b> 
+            found.
+        </ul>
+    </ul>
+<p>
+    <li><b>Return Value</b> group box
+    <ul>
+        <li>Confirm that a radio button exists for <b>Return spatial information of found box and
+        artificially associated the spatial area with the following text</b>.
+        <li>Confirm that this radio button is selected by default.
+        <li>Confirm that an associated edit box exists for specifying text.
+        <li>Confirm that the default text is <b>000-00-0000</b>.
+        <li>Confirm that an associated check box exists for <b>Exclude vertical spatial area of 
+        clue from box</b>.
+        <li>Confirm that the check box is unchecked by default.
+        <li>Confirm that the edit box and check box are enabled only when the radio button is 
+        selected.
+<p>
+        <li>Confirm that a radio button exists for <b>Return text found within the box</b>.
+        <li>Confirm that an associated check box exists for <b>Include clue text as part of the 
+        return value</b>.
+        <li>Confirm that the check box is enabled only when the radio button is selected.
+<p>
+        <li>Confirm that a separate check box is available for <b>Include all lines that are found
+        in the output</b>.
+        <li>Confirm that the check box is unchecked by default.
+<p>
+        <li>Confirm that group box settings are persistent.
+    </ul>
 </ul>
 <h2>Miscellaneous</h2>
 <ul>

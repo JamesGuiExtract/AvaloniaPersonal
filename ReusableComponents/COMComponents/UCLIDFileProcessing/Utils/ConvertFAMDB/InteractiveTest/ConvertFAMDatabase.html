@@ -13,118 +13,118 @@
 <hr>
 
 <ol>
-  	<li><h2>Database Setup</h2></li>
-  	<ul>
-    		<li>Get a local copy of each database from <b>I:\Common\Testing\Product 
-		Testing\FAM_Databases</b>.</li>
-		<ul>
-			<li>.\50_Database\ID_Shield50.bak
-			<li>.\60_Database\Demo_IDShield60.bak
-			<li>.\60_Large_Database\nysos_esprocess6.bak
-			<li>.\70_Database\Test70.bak
-		</ul>
-    		<li>Restore the databases using <b>SQL Server Management Studio</b> from the 
-		above backup files.  Note that you must select <b>Overwrite existing database</b> 
-		from the Restore options.</li>
-    		<li>Confirm that <b>DB Admin</b> opens each database but displays a <b>Database 
-		found, but schema version is not compatible with this application!</b> error 
-		message in the <b>Connection Status</b> edit box.  The password is <b>a</b> for 
-		each database.
-  	</ul>
+    <li><h2>Database Setup</h2>
+    <ul>
+        <li>Get a local copy of each database from <b>I:\Common\Testing\Product 
+        Testing\FAM_Databases</b>.</li>
+        <ul>
+            <li>.\50_Database\ID_Shield50.bak</li>
+            <li>.\60_Database\Demo_IDShield60.bak</li>
+            <li>.\60_Large_Database\nysos_esprocess6.bak</li>
+            <li>.\70_Database\Test70.bak</li>
+        </ul>
+        <li>Restore the databases using <b>SQL Server Management Studio</b> from the 
+        above backup files.  Note that you must select <b>Overwrite existing database</b> 
+        from the Restore options.</li>
+        <li>Confirm that <b>DB Admin</b> opens each database but displays a <b>Database 
+        found, but schema version is not compatible with this application!</b> error 
+        message in the <b>Connection Status</b> edit box.  The password is <b>a</b> for 
+        each database.</li>
+      </ul></li>
 <p>
-  	<li><h2>User Interface</h2></li>
-  	<ul>
-		<li>Confirm that a <b>Convert from 6.0 or 7.0 database</b> group box is defined.
-		<li>Confirm that the group box contains a <b>Server</b> combo box.
-		<li>Confirm that the combo box contains <b>(local)</b>.
-		<li>Confirm that the combo box contains <b>&lt;Browse...&gt;</b>.
-		<li>Confirm that selecting <b>&lt;Browse...&gt;</b> updates the combo box with 
-		all visible SQL Server instances.
-		<li>Confirm that the group box contains a <b>Database</b> combo box.
-		<li>Confirm that the combo box contains <b>&lt;Browse...&gt;</b>.
-		<li>Confirm that selecting <b>&lt;Browse...&gt;</b> updates the combo box with 
-		all <b>Extract Systems</b> databases available on the selected server.
+      <li><h2>User Interface</h2><
+      <ul>
+        <li>Confirm that a <b>Convert from 6.0 or 7.0 database</b> group box is defined.</li>
+        <li>Confirm that the group box contains a <b>Server</b> combo box.</li>
+        <li>Confirm that the combo box contains <b>(local)</b>.</li>
+        <li>Confirm that the combo box contains <b>&lt;Browse...&gt;</b>.</li>
+        <li>Confirm that selecting <b>&lt;Browse...&gt;</b> updates the combo box with 
+        all visible SQL Server instances.</li>
+        <li>Confirm that the group box contains a <b>Database</b> combo box.</li>
+        <li>Confirm that the combo box contains <b>&lt;Browse...&gt;</b>.</li>
+        <li>Confirm that selecting <b>&lt;Browse...&gt;</b> updates the combo box with 
+        all <b>Extract Systems</b> databases available on the selected server.</li>
 <p>
-		<li>Confirm that a <b>Convert to 8.0 database</b> group box is defined.
-		<li>Confirm that the group box contains a <b>Server</b> combo box.
-		<li>Confirm that the combo box contains <b>(local)</b>.
-		<li>Confirm that the combo box contains <b>&lt;Browse...&gt;</b>.
-    		<li>Confirm that the output <b>Server</b> defaults to the selected input Server.</li>
-		<li>Confirm that the group box contains a <b>Database</b> combo box.
-		<li>Confirm that the combo box contains <b>&lt;Browse...&gt;</b>.
-    		<li>Confirm that the output <b>Database</b> defaults to the selected input Database 
-		with an appended <b>_8_0</b>.</li>
+        <li>Confirm that a <b>Convert to 8.0 database</b> group box is defined.</li>
+        <li>Confirm that the group box contains a <b>Server</b> combo box.</li>
+        <li>Confirm that the combo box contains <b>(local)</b>.</li>
+        <li>Confirm that the combo box contains <b>&lt;Browse...&gt;</b>.</li>
+        <li>Confirm that the output <b>Server</b> defaults to the selected input Server.</li>
+        <li>Confirm that the group box contains a <b>Database</b> combo box.</li>
+        <li>Confirm that the combo box contains <b>&lt;Browse...&gt;</b>.</li>
+        <li>Confirm that the output <b>Database</b> defaults to the selected input Database 
+        with an appended <b>_8_0</b>.</li>
 <p>
-    		<li><b>[LegacyRCAndUtils #5526]</b> Confirm that a <b>Retain transition and queue 
-		history data</b> checkbox is provided.</li>
-		<li>Confirm that the default state of the check box is <b>checked</b>.
-    		<li><b>[LegacyRCAndUtils #5524]</b> Confirm that a progress bar is provided below 
-		the check box.</li>
-		<li>Confirm that a <b>Start</b> button is provided.
-		<li>Confirm that a <b>Close</b> button is provided.
-    		<li>Confirm that clicking <b>Close</b> exits without converting the database.</li>
-  	</ul>
+        <li><b>[LegacyRCAndUtils #5526]</b> Confirm that a <b>Retain transition and queue 
+        history data</b> checkbox is provided.</li>
+        <li>Confirm that the default state of the check box is <b>checked</b>.</li>
+        <li><b>[LegacyRCAndUtils #5524]</b> Confirm that a progress bar is provided below 
+        the check box.</li>
+        <li>Confirm that a <b>Start</b> button is provided.</li>
+        <li>Confirm that a <b>Close</b> button is provided.</li>
+        <li>Confirm that clicking <b>Close</b> exits without converting the database.</li>
+      </ul></li>
 <p>
-  	<li><h2>Basic Operation and Error Conditions</h2></li>
-  	<ul>
-    		<li><b>[LegacyRCAndUtils #4901, #5277]</b> Confirm that <b>ConvertFAMDB</b> requires 
-		a license file (else error message displayed at startup).</li>
-    		<li><b>[LegacyRCAndUtils #4798]</b> Confirm that the application uses a non-MFC icon.</li>
+      <li><h2>Basic Operation and Error Conditions</h2>
+      <ul>
+        <li><b>[LegacyRCAndUtils #4901, #5277, #5783]</b> Confirm that <b>ConvertFAMDB</b> requires 
+        a server license file (else error message displayed at startup).</li>
+        <li><b>[LegacyRCAndUtils #4798]</b> Confirm that the application uses a non-MFC icon.</li>
 <p>
-    		<li>Confirm that an error message is displayed if only an input Server is defined.</li>
-    		<li>Confirm that an error message is displayed if a non-existent input database 
-		is defined.</li>
-    		<li>Confirm that an error message is displayed if the defined input database is 
-		from 8.0.</li>
+        <li>Confirm that an error message is displayed if only an input Server is defined.</li>
+        <li>Confirm that an error message is displayed if a non-existent input database 
+        is defined.</li>
+        <li>Confirm that an error message is displayed if the defined input database is 
+        from 8.0.</li>
 <p>
-    		<li>Confirm that clicking <b>Start</b> displays a confirmation dialog that 
-		presents a benchmark conversion time for a large database.</li>
-	  	<ul>
-	    		<li>Confirm that clicking <b>No</b> returns to the main window.</li>
-	    		<li>Confirm that clicking <b>Yes</b> does not convert the 5.0 database but 
-			provides a meaningful error message.</li>
-	    		<li>Confirm that clicking <b>Yes</b> converts the 6.0 database.</li>
-			<ul>
-				<li>Confirm that progress information is provided during the 
-				conversion process.
-		    		<li><b>[LegacyRCAndUtils #5527]</b> Confirm that an <b>Application 
-				Trace:</b> exception is logged before database conversion starts.</li>
-    				<li><b>[LegacyRCAndUtils #5527]</b> Confirm that an <b>Application 
-				Trace:</b> exception is logged after database conversion ends.</li>
-			</ul>
-	    		<li>Confirm that clicking <b>Yes</b> converts the 7.0 database.</li>
-			<ul>
-				<li>Confirm that progress information is provided during the 
-				conversion process.
-		    		<li><b>[LegacyRCAndUtils #5527]</b> Confirm that an <b>Application 
-				Trace:</b> exception is logged before database conversion starts.</li>
-    				<li><b>[LegacyRCAndUtils #5527]</b> Confirm that an <b>Application 
-				Trace:</b> exception is logged after database conversion ends.</li>
-			</ul>
-	    		<li>Confirm that a success message is presented after the conversion 
-			has finished.</li>
-	  	</ul>
-  	</ul>
+        <li>Confirm that clicking <b>Start</b> displays a confirmation dialog that 
+        presents a benchmark conversion time for a large database.
+        <ul>
+            <li>Confirm that clicking <b>No</b> returns to the main window.</li>
+            <li>Confirm that clicking <b>Yes</b> does not convert the 5.0 database but 
+            provides a meaningful error message.</li>
+            <li>Confirm that clicking <b>Yes</b> converts the 6.0 database.
+            <ul>
+                <li>Confirm that progress information is provided during the 
+                conversion process.</li>
+                <li><b>[LegacyRCAndUtils #5527]</b> Confirm that an <b>Application 
+                Trace:</b> exception is logged before database conversion starts.</li>
+                <li><b>[LegacyRCAndUtils #5527]</b> Confirm that an <b>Application 
+                Trace:</b> exception is logged after database conversion ends.</li>
+            </ul></li>
+            <li>Confirm that clicking <b>Yes</b> converts the 7.0 database.
+            <ul>
+                <li>Confirm that progress information is provided during the 
+                conversion process.</li>
+                <li><b>[LegacyRCAndUtils #5527]</b> Confirm that an <b>Application 
+                Trace:</b> exception is logged before database conversion starts.</li>
+                <li><b>[LegacyRCAndUtils #5527]</b> Confirm that an <b>Application 
+                Trace:</b> exception is logged after database conversion ends.</li>
+            </ul></li>
+            <li>Confirm that a success message is presented after the conversion 
+            has finished.</li>
+        </ul></li>
+    </ul></li>
 <p>
-  	<li><h2>Test of Large Database</h2></li>
-  	<ul>
-    		<li>Exercise the <b>6.0 Large Database</b></li>
-		<ul>
-			<li>Confirm that the status bar is updated during database conversion.
-			<li>Confirm that cancelling the conversion displays a confirmation 
-			dialog.
-			<li>Confirm that cancelling the conversion deletes the output 
-			database.
-			<li><b>Overnight or Weekend Test</b>: 
-			<ul>
-				<li>Confirm that the conversion finishes successfully.
-				<li>Confirm that the <b>FAMFile</b> table exists in the 
-				new database.
-				<li>Confirm that the <b>FileActionStateTransition</b> table 
-				exists in the new database.
-			</ul>
-		</ul>
-  	</ul>
+    <li><h2>Test of Large Database</h2>
+    <ul>
+        <li>Exercise the <b>6.0 Large Database</b>
+        <ul>
+            <li>Confirm that the status bar is updated during database conversion.</li>
+            <li>Confirm that cancelling the conversion displays a confirmation 
+            dialog.</li>
+            <li>Confirm that cancelling the conversion deletes the output 
+            database.</li>
+            <li><b>Overnight or Weekend Test</b>: 
+            <ul>
+                <li>Confirm that the conversion finishes successfully.</li>
+                <li>Confirm that the <b>FAMFile</b> table exists in the 
+                new database.</li>
+                <li>Confirm that the <b>FileActionStateTransition</b> table 
+                exists in the new database.</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
 </ol>
 </body>
 </html>

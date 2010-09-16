@@ -123,8 +123,8 @@
        	name beginning with <b>file://</b> inside the <b>Text</b> dialog and click 
 	the <b>OK</b> button.
        	<ul>
-       		<li>Confirm that the <b>Add</b> button is disabled.</li>
-       		<li>Confirm that the <b>Save List...</b> button is disabled.</li>
+       		<li>Confirm that the <b>Add</b> button is still enabled.</li>
+       		<li>Confirm that the <b>Save List...</b> button is still enabled.</li>
        		<li>Click <b>Remove</b> to delete the current file name entry and 
 		confirm that the <b>Add</b> and <b>Save List...</b> buttons 
 		are enabled.</li>
@@ -134,20 +134,7 @@
 	(do not include a file name entry) and double click one of the entries 
 	to bring up the <b>Text</b> dialog. Modify the text in the edit box to a 
 	file name (including the file:// header) and click the <b>OK</b> button.
-        <ul>
-        	<li>Confirm that a message box is displayed to remind the user 
-		that a file name must be the only entry inside the list box.
-               	<ul>
-               		<li>Confirm that clicking <b>YES</b> on the message 
-			box will clear all the other entries inside the list box 
-			and display the newly modified file name as the first 
-			entry in the list box.</li>
-               		<li>Confirm that clicking <b>NO</b> on the message box 
-			will do nothing to the list box.</li>
-               	</ul>
-        	</li>
-        </ul>
-        </li>
+        <li>Confirm that the entry is added to the list.
       	<li>Confirm that the <b>Modify</b> button displays a pre-populated 
 	<b>Text</b> dialog.
         <ul>
@@ -363,6 +350,13 @@
       		<li>Re-open the object property page and confirm that the valid settings 
 		are presented. 
        	</ul>
+<p>
+    <li><b>[FlexIDSCore #3083]</b> Load list out of memory exception
+    <!-- fixed v 8.1.0.4 -->
+    <ul>
+        <li>Confirm that the contents of the .dat file located at 
+        <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3083</b> can be loaded without error.
+    </ul>
 </ul>
 </body>
 </html>

@@ -11,177 +11,195 @@
 
 <body>
 <h1>Rule Set Editor - Menu Items<br>
-	<img src="../../../../reusablecomponents/comcomponents/uclidtestingframework/misc/testingchecklistheader.gif">
+    <img src="../../../../reusablecomponents/comcomponents/uclidtestingframework/misc/testingchecklistheader.gif">
 </h1>
 <hr>
 
 <h3>Window Form:</h3>
 <ul>
-	<li><b>Ruleset Editor</b> text appears in title bar.</li>
-	<li><b>RSD</b> filename appears in title bar when loaded.</li>
-	<li><b>_</b> - Minimizes window and child windows (including Ruleset Tester).</li>
-	<li><b>X</b> - Closes window.
-	<li>Click on <b>X</b> displays <b>Save Changes</b> dialog when changes have 
-	not been saved.</li>
-  	<li><b>ALT+F4</b> closes window and child windows (including Ruleset Tester)
-	<li><b>ALT+F4</b> displays <b>Save Changes</b> dialog when changes have 
-	not been saved.</li>
-	<li><b>[FlexIDSCore #2505, #2506]</b> Confirm that neither a memory error nor a Windows error 
-	are seen at application exit.
+    <li><b>Ruleset Editor</b> text appears in title bar.</li>
+    <li><b>RSD</b> filename appears in title bar when loaded.</li>
+    <li><b>_</b> - Minimizes window and child windows (including Ruleset Tester).</li>
+    <li><b>X</b> - Closes window.
+    <li>Click on <b>X</b> displays <b>Save Changes</b> dialog when changes have 
+    not been saved.</li>
+    <li><b>ALT+F4</b> closes window and child windows (including Ruleset Tester)
+    <li><b>ALT+F4</b> displays <b>Save Changes</b> dialog when changes have 
+    not been saved.</li>
+    <li><b>[FlexIDSCore #2505, #2506]</b> Confirm that neither a memory error nor a Windows error 
+    are seen at application exit.
 </ul>
 <p>
 <h3>Menu Items:</h3>
 <ol>
-<li><h2>File Menu</h2>
-	<h2>New</h2>
-	<ul>
-		<li>Click on <b>New</b> clears current rules.</li>
-		<li>Click displays <b>Save Changes</b> dialog when changes have not been saved.</li>
-       		<li><b>CTRL+N</b> clears current rules.</li>
-  	</ul>
-  	<h2>Open</h2>
-   	<ul>
-		<li>Click on <b>Open</b> displays File - Open dialog.</li>
-		<li>Click displays <b>Save Changes</b> dialog when changes have not been saved.</li>
-		<li><b>CTRL + O</b> displays dialog.</li>
-		<li>Opens <b>RSD</b> files.</li>
-		<li>Opens <b>RSD.ETF</b> files.</li>
-		<li>When opened, <b>RSD.ETF</b> files are not editable or viewable.</li>
-	</ul>
-	<h2>Import</h2>
-	<ul>
-		<li>Click on <b>Import</b> displays dialog.</li>
-		<li><b>CTRL + I</b> displays dialog.</li>
-		<li><b>RSD</b> files can be imported successfully.</li>
-		<li>Files imported with attributes of the same name are imported with 
-		<b>_#</b> appended to the name.</li>
-	</ul>
-	<h2>Export</h2>
-	<ul>
-   		<li>Click displays <b>Export Attribute Rules</b> dialog.</li>
-   		<li><b>CTRL + E</b> displays dialog.</li>
-   		<li><b>RSD</b> files can be exported successfully.
-   		<h2>Export Attribute Rules Dialog</h2>
-   		<ul>
-   			<li><b>OK</b> - Exports attributes successfully.</li>
-   			<li><b>Cancel</b> - Does not export attributes and closes dialog.</li>
-   			<li>Only <b>Checked</b> attributes are exported.</li>
-   			<li><b>Changing the name</b> of the exported attribute changes the name 
-			in the exported file.</li>
-   		</ul>
+    <li><h2>File Menu</h2>
+    <h2>New</h2>
+    <ul>
+        <li>Click on <b>New</b> clears current rules.</li>
+        <li>Click displays <b>Save Changes</b> dialog when changes have not been saved.</li>
+        <li><b>CTRL+N</b> clears current rules.</li>
+    </ul>
+    <h2>Open</h2>
+    <ul>
+        <li>Click on <b>Open</b> displays File - Open dialog.</li>
+        <li>Click displays <b>Save Changes</b> dialog when changes have not been saved.</li>
+        <li><b>CTRL + O</b> displays dialog.</li>
+        <li>Opens <b>RSD</b> files.</li>
+        <li>Opens <b>RSD.ETF</b> files.</li>
+        <li>When opened, <b>RSD.ETF</b> files are not editable or viewable.</li>
+    </ul>
+    <h2>Import</h2>
+    <ul>
+        <li>Click on <b>Import</b> displays dialog.</li>
+        <li><b>CTRL + I</b> displays dialog.</li>
+        <li><b>RSD</b> files can be imported successfully.</li>
+        <li>Files imported with attributes of the same name are imported with 
+        <b>_#</b> appended to the name.</li>
+    </ul>
+    <h2>Export</h2>
+    <ul>
+        <li>Click displays <b>Export Attribute Rules</b> dialog.</li>
+        <li><b>CTRL + E</b> displays dialog.</li>
+        <li><b>RSD</b> files can be exported successfully.
+        <h2>Export Attribute Rules Dialog</h2>
+        <ul>
+            <li><b>OK</b> - Exports attributes successfully.</li>
+            <li><b>Cancel</b> - Does not export attributes and closes dialog.</li>
+            <li>Only <b>Checked</b> attributes are exported.</li>
+            <li><b>Changing the name</b> of the exported attribute changes the name 
+            in the exported file.</li>
+        </ul>
         </li>
-  	</ul>
-  	<h2>Save</h2>
-	<ul>
-   		<li>Click on <b>Save</b> saves file if has previously been saved.</li>
-   		<li>Click on <b>Save</b> displays <b>Save As</b> dialog, if file has never 
-		been saved.</li>
-   		<li><b>CTRL+S</b> saves changes to the file.</li>
-   		<li><b>CTRL+S</b> opens <b>Save As</b> dialog if file has never been saved.</li>
-	</ul>
-	<h2>Save As</h2>
-	<ul>
-   		<li>Click on <b>Save As</b> displays <b>Save As</b> dialog.</li>
-	</ul>
-	<h2>Recent Files</h2>
-  	<ul>
-   		<li>Selecting <b>Recent Files</b> displays submenu file list of recently 
-		opened files.</li>
-   		<li>Click on <b>Recent Files -&gt; Submenu Item</b> opens the file.</li>
-   		<li>Click on <b>Recent Files -&gt; Submenu Item</b> displays <b>Save Changes</b> 
-		dialog when changes have not been saved.</li>
-   		<li>Newly opened files get added to this list</li>
-	</ul>
-  	<h2><b>Properties</b></h2>
-  	<ul>
-    		<li> Selecting <b>Properties</b> opens <b>Ruleset Properties</b> dialog.</li>
-		<b>Ruleset Properties Dialog</b>
-      		<li><b>FlexIndex - Indexing</b> check box is checkable.
-       		<li>When checked, <b>Indexing</b> appears on status bar.</li>
-      		</li>
-      		<li><b>FlexIndex - Pagination</b> check box is checkable.
-		<li>When checked, <b>Pagination</b> appears on status bar.</li>
-      		<li><b>IDShield - Redaction (By Page)</b> check box is checkable.
-        	<ul>
-          		<li>When checked, <b>Redaction (pages)</b> appears on status bar.</li>
-          		<li>When checked using the mouse, <b>Redaction (By Document)</b> is 
-			automatically unchecked.</li>
-          		<li><b>[FlexIDSCore #2973]</b> When checked using the space bar, 
-			<b>Redaction (By Document)</b> is automatically unchecked.</li>
-        	</ul>
-      		</li>
-      		<li><b>IDShield - Redaction (By Document)</b> check box is checkable.
-        	<ul>
-          		<li>When checked, <b>Redaction (docs)</b> appears on status bar.</li>
-          		<li>When checked using the mouse, <b>Redaction (By Page)</b> is 
-			automatically unchecked.</li>
-          		<li><b>[FlexIDSCore #2973]</b> When checked using the space bar, 
-			<b>Redaction (By Page)</b> is automatically unchecked.</li>
-        	</ul>
-      		</li>
-      		<li><b>[FlexIDSCore #2973]</b> Only one of the check boxes: <b>IDShield - 
-		Redaction (By Page)</b> or <b>IDShield - Redaction (By Document)</b> may be 
-		checked at one time.
-      		<li><b>Key Serial #s:</b> edit box is editable.
-      		<li>When entered, the value entered is displayed on status bar.</li>
-      		<li><b>Ruleset can be executed only internally</b> check box
-        	is checkable.
-      		<li>When checked, <b>InternalUseOnly = Yes</b> is displayed on status bar.</li>
-      		<li>When unchecked, <b>InternalUseOnly = No</b> is displayed on status bar.</li>
-      		<li><b>This is a swiping rule</b> check box is checkable.
-      		<li><b>[FlexIDSCore #3714]</b> When checked, <b>SwipingRule = Yes</b> is 
-		displayed on the status bar.</li>
-      		<li><b>[FlexIDSCore #3714]</b> When unchecked, <b>SwipingRule = No</b> is 
-		displayed on the status bar.</li>
+    </ul>
+    <h2>Save</h2>
+    <ul>
+        <li>Click on <b>Save</b> saves file if has previously been saved.</li>
+        <li>Click on <b>Save</b> displays <b>Save As</b> dialog, if file has never 
+        been saved.</li>
+        <li><b>CTRL+S</b> saves changes to the file.</li>
+        <li><b>CTRL+S</b> opens <b>Save As</b> dialog if file has never been saved.</li>
+    </ul>
+    <h2>Save As</h2>
+    <ul>
+        <li>Click on <b>Save As</b> displays <b>Save As</b> dialog.</li>
+    </ul>
+    <h2>Recent Files</h2>
+    <ul>
+        <li>Selecting <b>Recent Files</b> displays submenu file list of recently 
+        opened files.</li>
+        <li>Click on <b>Recent Files -&gt; Submenu Item</b> opens the file.</li>
+        <li>Click on <b>Recent Files -&gt; Submenu Item</b> displays <b>Save Changes</b> 
+        dialog when changes have not been saved.</li>
+        <li>Newly opened files get added to this list</li>
+    </ul>
+    <h2><b>Properties</b></h2>
+    <ul>
+        <li> Selecting <b>Properties</b> opens the <b>Ruleset Properties</b> dialog.</li>
+        <li><b>Ruleset Properties Dialog</b>
+        <ul>
+            <li><b>FlexIndex - Indexing</b> check box is checkable.</li>
+            <ul>
+                <li>When checked, <b>Indexing</b> appears on status bar.</li>
+            </ul>
+
+            <li><b>FlexIndex - Pagination</b> check box is checkable.</li>
+            <ul>
+                <li>When checked, <b>Pagination</b> appears on status bar.</li>
+            </ul>
+            <li><b>IDShield - Redaction (By Page)</b> check box is checkable.
+            <ul>
+                <li>When checked, <b>Redaction (pages)</b> appears on status bar.</li>
+                <li>When checked using the mouse, <b>Redaction (By Document)</b> is 
+                automatically unchecked.</li>
+                <li><b>[FlexIDSCore #2973]</b> When checked using the space bar, 
+                <b>Redaction (By Document)</b> is automatically unchecked.</li>
+            </ul></li>
+            <li><b>IDShield - Redaction (By Document)</b> check box is checkable.
+            <ul>
+                <li>When checked, <b>Redaction (docs)</b> appears on status bar.</li>
+                <li>When checked using the mouse, <b>Redaction (By Page)</b> is 
+                automatically unchecked.</li>
+                <li><b>[FlexIDSCore #2973]</b> When checked using the space bar, 
+                <b>Redaction (By Page)</b> is automatically unchecked.</li>
+            </ul></li>
+            <li><b>[FlexIDSCore #2973]</b> Only one of the check boxes: <b>IDShield - 
+            Redaction (By Page)</b> or <b>IDShield - Redaction (By Document)</b> may be 
+            checked at one time.
+            <li><b>Key Serial #s:</b> edit box is editable.
+            <ul>
+                <li>When entered, the value entered is displayed on status bar.</li>
+            </ul></li>
+            <li><b>Ruleset can be executed only internally</b> check box
+            is checkable.
+            <ul>
+                <li>When checked, <b>InternalUseOnly = Yes</b> is displayed on status bar.</li>
+                <li>When unchecked, <b>InternalUseOnly = No</b> is displayed on status bar.</li>
+            </ul></li>
+            <li><b>This is a swiping rule</b> check box is checkable.
+            <ul>
+                <li><b>[FlexIDSCore #3714]</b> When checked, <b>SwipingRule = Yes</b> is 
+                displayed on the status bar.</li>
+                <li><b>[FlexIDSCore #3714]</b> When unchecked, <b>SwipingRule = No</b> is 
+                displayed on the status bar.</li>
+            </ul></li>
 <p>
-   		<li><b>OK</b> - Save changes and exits dialog.</li>
-   		<li><b>Cancel</b> - Cancels changes and exits</li>
-        	<li><b>X</b> button ignores changes and exits dialog.</li>
-    	</ul>
-  	<h2>Exit</h2>
-  	<ul>
-   		<li><b>[FlexIDSCore #2452]</b> Click on <b>Exit</b> - exits program successfully 
-		( without an exception or error message ).</li>
-   		<li>Click displays <b>Save Changes</b> dialog when changes have not been saved.
-   		<h2>Save Changes Dialog</h2>
-   		<ul>
-   			<li><b>Yes</b> - Saves changes and exits program.</li>
-   			<li><b>No</b> - Does not save changes and exits program.</li>
-   			<li><b>Cancel</b> - Does not exit program, but does exit menu and 
-			does not save changes.</li>
-			<li>Clicking <b>X</b> - Does not exit program, but does exit menu 
-			and does not save changes.</li>
-   		</ul>
-   		</li>
-   	</ul>
+           <li><b>OK</b> - Save changes and exits dialog.</li>
+           <li><b>Cancel</b> - Cancels changes and exits</li>
+            <li><b>X</b> button ignores changes and exits dialog.</li>
+        </ul></li>
+    </ul>
 <p>
-<li><h2>Tools Menu</h2></li>
-<ul>
-   	<li>Click on <b>Open Rule Tester</b> opens Rule Tester dialog.</li>
-	<ul>
-		<li> Works on <b>RSD</b> files.</li>
-		<li> Works on <b>RSD.ETF</b> files.</li>
-	</ul>
-   	<li><b>CTRL + T</b> opens Rule Tester dialog.</li>
-   	<li>Click on <b>Execute Test Harness</b> starts an instance of the Test Harness.</li>
-	<li>Click on <b>Check for New Components</b> works.</li>
-	<ul>
-		<li>A list of objects found is provided.</li>
-		<li><b>[FlexIDSCore #2710]</b> The number of Input Receivers is included in the list.</li>
-	</ul>
-</ul>
+    <h2>Exit</h2>
+    <ul>
+        <li><b>[FlexIDSCore #2452]</b> Click on <b>Exit</b> - exits program successfully 
+        (without an exception or error message).</li>
+        <li>Click displays <b>Save Changes</b> dialog when changes have not been saved.
+        <h2>Save Changes Dialog</h2>
+        <ul>
+            <li><b>Yes</b> - Saves changes and exits program.</li>
+            <li><b>No</b> - Does not save changes and exits program.</li>
+            <li><b>Cancel</b> - Does not exit program, but does exit menu and 
+            does not save changes.</li>
+            <li>Clicking <b>X</b> - Does not exit program, but does exit menu 
+            and does not save changes.</li>
+        </ul></li>
+    </ul></li>
 <p>
-<li><h2>Help - Menu</h2></li>
-<ul>
-   	<li>Click on <b>Attribute Finder Help</b> opens <b>Flex Index RDT</b> help file.</li>
-	<li>Click on <b>About Attribute Finder</b> brings up about <b>About Attribute 
-	Finder</b> dialog box.
-      	<ul>
-        	<li>Dialog displays the correct version number - including Patch if appropriate.</li>
-        	<li>Dialog displays the current FKB Update version number.</li>
-      	</ul>
-	</li>
-</ul>
+    <li><h2>Tools Menu</h2>
+    <ul>
+        <li>Click on <b>Open Rule Tester</b> opens Rule Tester dialog.
+        <ul>
+            <li> Works on <b>RSD</b> files.</li>
+            <li> Works on <b>RSD.ETF</b> files.</li>
+            <li><b>[FlexIDSCore #4266]</b> Unexpected exception
+            <!-- fixed v 8.0.0.73 -->
+            <ul>
+                <li>Open the RuleSet Editor.</li>
+                <li>Press <b>ctrl+t</b> to open the rule tester.</li>
+                <li>Type something into the filename edit box of the rule tester.</li>
+                <li>Close the RuleSet Editor.</li>
+                <li>Confirm that no exceptions are seen.</li>
+            </ul></li>
+        </ul></li>
+        <li><b>CTRL + T</b> opens Rule Tester dialog.</li>
+        <li>Click on <b>Execute Test Harness</b> starts an instance of the Test Harness.</li>
+        <li>Click on <b>Check for New Components</b> works.
+        <ul>
+            <li>A list of objects found is provided.</li>
+            <li><b>[FlexIDSCore #2710]</b> The number of Input Receivers is included in the list.</li>
+        </ul></li>
+    </ul></li>
+<p>
+    <li><h2>Help - Menu</h2>
+    <ul>
+        <li>Click on <b>Attribute Finder Help</b> opens <b>Flex Index RDT</b> help file.</li>
+        <li>Click on <b>About Attribute Finder</b> brings up about <b>About Attribute 
+        Finder</b> dialog box.
+        <ul>
+            <li>Dialog displays the correct version number - including Patch if appropriate.</li>
+            <li>Dialog displays the current FKB Update version number.</li>
+        </ul></li>
+    </ul></li>
 </ol>
 </body>
 </html>

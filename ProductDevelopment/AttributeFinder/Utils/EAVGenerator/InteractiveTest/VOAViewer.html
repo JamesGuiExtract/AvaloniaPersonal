@@ -15,354 +15,409 @@
 <OL>
 
 <!-- *********************************************** -->
-	<li><h2>Toolbar</h2>
-	<ul>
-		<li>Confirm that the <b>Create new EAV file</b> button clears the current data and
-		creates a new EAV file.</li>
-		<ul>
-			<li>Click the <b>Open a new Image Viewer</b> toolbar button.
-			<li>Open an image file.
-			<li>Click the <b>Recognize text and process</b> button.
-			<li><b>[FlexIDSCore #2651]</b> Confirm that no drop-down menu appears.
-		</ul>
-		<li>Confirm that the <b>Open an EAV file</b> button displays a standard Windows open 
-		file dialog box.</li>
-		<ul>
-			<li>Confirm that the default file extensions are <b>.eav</b> and <b>.voa</b>.</li>
-			<li>Confirm that the contents of the opened file are displayed in the list box.</li>
-			<li>Confirm that the window caption shows <b>Filename - VOA File Viewer</b>.</li>
-			<li><b>[FlexIDSCore #2669]</b> Drop extension before VOA for image files
-			<ul>
-				<li>Open a <b>VOA</b> file.
-				<li>Confirm that double-clicking a sensitive data item opens the associated 
-				image and highlights the appropriate text.
-				<li>Close the image window and the VOA file.
-				<li>Rename the VOA file to <b>Filename.tif.test.voa</b>.
-				<li>Open the renamed VOA file.
-				<li>Confirm that double-clicking a sensitive data item opens the associated 
-				image and highlights the appropriate text.
-			</ul>
-			<li><b>[FlexIDSCore #2648]</b> Exception raised when not necessary
-			<ul>
-				<li>Open a <b>VOA</b> file containing two or more sensitive data items.
-				<li>Confirm that double-clicking a sensitive data item highlights the item 
-				in the Image Viewer.
-				<li>Rename the image file.
-				<li>Double-click on a different sensitive data item.
-				<li>Confirm that the sensitive data item is still highlighted in the 
-				Image Viewer.
-			</ul>
-			<li><b>[FlexIDSCore #2649]</b> Exception raised for missing image file
-			<ul>
-				<li>Open a <b>VOA</b> file.
-				<li>Rename or delete the associated image file.
-				<li>Confirm that double-clicking a sensitive data item displays a <b>Cannot 
-				locate source image</b> error message.
-				<li>Confirm that the error includes the filename as part of the 
-				debug information.
-			</ul>
-		</ul>
-		<li>Confirm that the <b>Save file</b> button is inactive by default.</li>
-		<li>Confirm that the <b>Save file</b> button becomes active when the attributes have 
-		been modified.</li>
-		<ul>
-			<li>Confirm that the <b>Save file</b> button displays a Windows <b>Save as</b> 
-			dialog if the application was started with a new file.</li>
-			<li>Confirm that the <b>Save file</b> button just saves changes and overwrites the 
-			existing file if the application was started with a previously existing file.</li> 
-			<li><b>[FlexIDSCore #2861]</b> Open a <b>VOA</b> file that contains sub-attributes.  
-			Save the file to a different <b>VOA</b> file.  Confirm that the new file has the 
-			same contents as the original file.</li> 
-			<li><b>[FlexIDSCore #2860]</b> Open an <b>EAV</b> file containing C++ escaped 
-			characters (i.e. backslash r backslash n).  Save it to another temporary <b>EAV</b> 
-			file.  Open the new file and confirm that the escaped characters have not been modified.
-			<li><b>[FlexIDSCore #2848]</b> Open an <b>EAV</b> file from the National Ruleset 
-			that contains sub-attributes.  	I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\GrantorGranteeFinder\Images\Abstract of Support Judgment\Grantee\0002.tif.eav<br>
-			Confirm that the file opens without an <b>Invalid Identifier</b> exception.</li> 
-		</ul>
-		<li>Confirm that the <b>Save file as...</b> button displays a Windows <b>Save as</b> 
-		dialog.</li>
-		<ul>
-			<li>Confirm that the <b>Save as</b> dialog allows a file to be saved in text 
-			format as an <b>EAV</b> file.</li>
-			<li>Confirm that the <b>Save as</b> dialog allows a file to be saved in binary 
-			format as a <b>VOA</b> file.</li>
-			<li><b>[FlexIDSCore #2711]</b> Confirm that an empty <b>EAV</b> file can be saved 
-			and that the file size is 0 bytes.</li>
-			<li><b>[FlexIDSCore #2711]</b> Confirm that an empty <b>VOA</b> file can be saved 
-			and that the file size is 2560 bytes.</li>
-		</ul>
-		<li>Confirm that the <b>Open a new Image Viewer</b> button runs the <b>Image Viewer</b> 
-		application.</li>
-		<li>Confirm that the <b>Highlight the current attribute in the image window</b> button 
-		will open corresponding image and highlight text in the <b>Image Viewer</b>.</li>
-	</ul>
+    <li><h2>Toolbar</h2>
+    <ul>
+        <li>Confirm that the <b>Create new EAV file</b> button clears the current data and
+        creates a new EAV file.</li>
+        <ul>
+            <li>Click the <b>Open a new Image Viewer</b> toolbar button.
+            <li>Open an image file.
+            <li>Click the <b>Recognize text and process</b> button.
+            <li><b>[FlexIDSCore #2651]</b> Confirm that no drop-down menu appears.
+        </ul>
+        <li>Confirm that the <b>Open an EAV file</b> button displays a standard Windows open 
+        file dialog box.</li>
+        <ul>
+            <li>Confirm that the default file extensions are <b>.eav</b> and <b>.voa</b>.</li>
+            <li>Confirm that the contents of the opened file are displayed in the list box.</li>
+            <li>Confirm that the window caption shows <b>Filename - VOA File Viewer</b>.</li>
+            <li><b>[FlexIDSCore #2669]</b> Drop extension before VOA for image files
+            <ul>
+                <li>Open a <b>VOA</b> file.
+                <li>Confirm that double-clicking a sensitive data item opens the associated 
+                image and highlights the appropriate text.
+                <li>Close the image window and the VOA file.
+                <li>Rename the VOA file to <b>Filename.tif.test.voa</b>.
+                <li>Open the renamed VOA file.
+                <li>Confirm that double-clicking a sensitive data item opens the associated 
+                image and highlights the appropriate text.
+            </ul>
+            <li><b>[FlexIDSCore #2648]</b> Exception raised when not necessary
+            <ul>
+                <li>Open a <b>VOA</b> file containing two or more sensitive data items.
+                <li>Confirm that double-clicking a sensitive data item highlights the item 
+                in the Image Viewer.
+                <li>Rename the image file.
+                <li>Double-click on a different sensitive data item.
+                <li>Confirm that the sensitive data item is still highlighted in the 
+                Image Viewer.
+            </ul>
+            <li><b>[FlexIDSCore #2649]</b> Exception raised for missing image file
+            <ul>
+                <li>Open a <b>VOA</b> file.
+                <li>Rename or delete the associated image file.
+                <li>Confirm that double-clicking a sensitive data item displays a <b>Cannot 
+                locate source image</b> error message.
+                <li>Confirm that the error includes the filename as part of the 
+                debug information.
+            </ul>
+        </ul>
+        <li>Confirm that the <b>Save file</b> button is inactive by default.</li>
+        <li>Confirm that the <b>Save file</b> button becomes active when the attributes have 
+        been modified.</li>
+        <ul>
+            <li>Confirm that the <b>Save file</b> button displays a Windows <b>Save as</b> 
+            dialog if the application was started with a new file.</li>
+            <li>Confirm that the <b>Save file</b> button just saves changes and overwrites the 
+            existing file if the application was started with a previously existing file.</li> 
+            <li><b>[FlexIDSCore #2861]</b> Open a <b>VOA</b> file that contains sub-attributes.  
+            Save the file to a different <b>VOA</b> file.  Confirm that the new file has the 
+            same contents as the original file.</li> 
+            <li><b>[FlexIDSCore #2860]</b> Open an <b>EAV</b> file containing C++ escaped 
+            characters (i.e. backslash r backslash n).  Save it to another temporary <b>EAV</b> 
+            file.  Open the new file and confirm that the escaped characters have not been modified.
+            <li><b>[FlexIDSCore #2848]</b> Open an <b>EAV</b> file from the National Ruleset 
+            that contains sub-attributes.  	I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\GrantorGranteeFinder\Images\Abstract of Support Judgment\Grantee\0002.tif.eav<br>
+            Confirm that the file opens without an <b>Invalid Identifier</b> exception.</li> 
+        </ul>
+        <li>Confirm that the <b>Save file as...</b> button displays a Windows <b>Save as</b> 
+        dialog.</li>
+        <ul>
+            <li>Confirm that the <b>Save as</b> dialog allows a file to be saved in text 
+            format as an <b>EAV</b> file.</li>
+            <li>Confirm that the <b>Save as</b> dialog allows a file to be saved in binary 
+            format as a <b>VOA</b> file.</li>
+            <li><b>[FlexIDSCore #2711]</b> Confirm that an empty <b>EAV</b> file can be saved 
+            and that the file size is 0 bytes.</li>
+            <li><b>[FlexIDSCore #2711]</b> Confirm that an empty <b>VOA</b> file can be saved 
+            and that the file size is 2560 bytes.</li>
+        </ul>
+        <li>Confirm that the <b>Open a new Image Viewer</b> button runs the <b>Image Viewer</b> 
+        application.</li>
+        <li>Confirm that the <b>Highlight the current attribute in the image window</b> button 
+        will open corresponding image and highlight text in the <b>Image Viewer</b>.</li>
+    </ul>
 <p>
 <!-- *********************************************** -->
-	<li><h2>Drag and Drop</h2>
-	<ul>
-		<li>Confirm that dropping a <b>.voa</b> file on the main dialog opens the .voa file.</li>
-		<li>Confirm that dropping an <b>.eav</b> file on the main dialog opens the .eav file.</li>
-		<li><b>[FlexIDSCore #2887]</b> Confirm that double-clicking on an <b>.eav</b> file opens 
-		the file in the VOA Viewer.</li>
-		<li><b>[FlexIDSCore #3111]</b> Confirm that dropping (or double clicking) an <b>.evoa</b> 
-		file on the main dialog opens the .evoa file.</li>
-	</ul>
+    <li><h2>Drag and Drop</h2>
+    <ul>
+        <li>Confirm that dropping a <b>.voa</b> file on the main dialog opens the .voa file.</li>
+        <li>Confirm that dropping an <b>.eav</b> file on the main dialog opens the .eav file.</li>
+        <li><b>[FlexIDSCore #2887]</b> Confirm that double-clicking on an <b>.eav</b> file opens 
+        the file in the VOA Viewer.</li>
+        <li><b>[FlexIDSCore #3111]</b> Confirm that dropping (or double clicking) an <b>.evoa</b> 
+        file on the main dialog opens the .evoa file.</li>
+    </ul>
 <p>
 <!-- *********************************************** -->
-	<li><h2>Main Dialog</h2>
-	<ul>
-		<li>Confirm that the <b>New Attribute</b> button adds a new blank attribute 
-		to the list control.</li>
-		<li><b>[FlexIDSCore #2727]</b> Create a new attribute and add an Attribute Name.  Tab to 
-		the Attribute Value field.  Confirm that text can be added for the value.
-		<li><b>[FlexIDSCore #3169]</b> Create a new attribute and highlight something.  Confirm 
-		that the highlight stays visible after creation.
+    <li><h2>Main Dialog</h2>
+    <ul>
+        <li>Confirm that the <b>New Attribute</b> button adds a new blank attribute 
+        to the list control.</li>
+        <li><b>[FlexIDSCore #2727]</b> Create a new attribute and add an Attribute Name.  Tab to 
+        the Attribute Value field.  Confirm that text can be added for the value.
+        <li><b>[FlexIDSCore #3169]</b> Create a new attribute and highlight something.  Confirm 
+        that the highlight stays visible after creation.
 <p>
-		<li>Confirm that the <b>Copy Attribute</b> button is inactive by default.</li>
-		<li>Confirm that the <b>Copy Attribute</b> button becomes active when a non-blank 
-		attribute is selected.</li>
-		<li>Confirm that <b>Copy Attribute</b> places a copy of the selected attribute at the
-		bottom of the list.
+        <li>Confirm that the <b>Copy Attribute</b> button is inactive by default.</li>
+        <li>Confirm that the <b>Copy Attribute</b> button becomes active when a non-blank 
+        attribute is selected.</li>
+        <li>Confirm that <b>Copy Attribute</b> places a copy of the selected attribute at the
+        bottom of the list.
 <p>
-		<li>Confirm that the <b>Delete Attribute</b> button is inactive by default.
-		<li>Confirm that the <b>Delete Attribute</b> button becomes active when an attribute 
-		is selected.
-		<li>Confirm that <b>Delete Attribute</b> removes the currently selected attribute from
-		the list.
-  	   	<LI><b>[FlexIDSCore #3512]</b> Confirm that the confirmation dialog is modal.
+        <li>Confirm that the <b>Delete Attribute</b> button is inactive by default.
+        <li>Confirm that the <b>Delete Attribute</b> button becomes active when an attribute 
+        is selected.
+        <li>Confirm that <b>Delete Attribute</b> removes the currently selected attribute from
+        the list.
+             <LI><b>[FlexIDSCore #3512]</b> Confirm that the confirmation dialog is modal.
 <p>
-		<li>Confirm that the <b>Split Attribute...</b> button is inactive by default.
-		<li>Confirm that the <b>Split Attribute..."</b> button becomes active when an 
-		attribute is selected.
-		<li>Confirm that <b>Split Attribute...</b> displays the <b>Select Attribute 
-		Splitter</b> dialog.
-		<li><b>[FlexIDSCore #2863]</b> Configure an attribute splitter and confirm that the selected 
-		attribute is now split and that the sub-attributes have been added underneath the 
-		currently selected attribute.
+        <li>Confirm that the <b>Split Attribute...</b> button is inactive by default.
+        <li>Confirm that the <b>Split Attribute..."</b> button becomes active when an 
+        attribute is selected.
+        <li>Confirm that <b>Split Attribute...</b> displays the <b>Select Attribute 
+        Splitter</b> dialog.
+        <li><b>[FlexIDSCore #2863]</b> Configure an attribute splitter and confirm that the selected 
+        attribute is now split and that the sub-attributes have been added underneath the 
+        currently selected attribute.
 <p>
-		<li>Confirm that the <b>Merge Attributes</b> button is inactive by default.
-		<li>Confirm that the <b>Merge Attributes</b> button becomes active when there are at 
-		least two attributes selected in the list at the same level.
-		<li>Confirm that the new attribute <b>Name</b> is a combination of the original 
-		Names.
-		<li>Confirm that the new attribute <b>Value</b> is a combination of the original 
-		Values.
-		<li>Confirm that merging attributes prompts a <b>Save File?</b> message when the 
-		application is closed.
-  	   	<LI><b>[FlexIDSCore #3493]</b> Merge attributes
-	       	<ul>
-	      		<li>Open the <b>VOA Viewer</b> and a VOA file with multiple spatial attributes.
-	      		<li>Select two of the attributes and merge them.
-	      		<li>Confirm that the merged attribute shows only the combined spatial 
-			areas and not a large bounding rectangle.
-	       	</ul>
-  	   	<LI><b>[FlexIDSCore #3497]</b> Merge attributes
-	       	<ul>
-	      		<li>Move an existing VOA file and its image to a new folder.
-	      		<li>Open the VOA file.
-	      		<li>Swipe text to create a new attribute in the VOA Viewer.
-	      		<li>Merge one old attribute with the new attribute.
-	      		<li>Confirm that merge works properly.
-	       	</ul>
-  	   	<LI><b>[FlexIDSCore #3668]</b> Merge attributes
-	       	<ul>
-	      		<li>Exercise the RSD file and image in 
-			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3668</b>.
-	      		<li>Open the resulting VOA file.
-	      		<li>Merge all of the found attributes.
-			<li>Double-click on the created attribute.
-	      		<li>Confirm that a large bounding box is not displayed.  Note that 
-			<b>cr1957815fk.pdf.correct.voa</b> displays the expected result.
-	       	</ul>
+        <li>Confirm that the <b>Merge Attributes</b> button is inactive by default.
+        <li>Confirm that the <b>Merge Attributes</b> button becomes active when there are at 
+        least two attributes selected in the list at the same level.
+        <li>Confirm that the new attribute <b>Name</b> is a combination of the original 
+        Names.
+        <li>Confirm that the new attribute <b>Value</b> is a combination of the original 
+        Values.
+        <li>Confirm that merging attributes prompts a <b>Save File?</b> message when the 
+        application is closed.
+             <LI><b>[FlexIDSCore #3493]</b> Merge attributes
+               <ul>
+                  <li>Open the <b>VOA Viewer</b> and a VOA file with multiple spatial attributes.
+                  <li>Select two of the attributes and merge them.
+                  <li>Confirm that the merged attribute shows only the combined spatial 
+            areas and not a large bounding rectangle.
+               </ul>
+             <LI><b>[FlexIDSCore #3497]</b> Merge attributes
+               <ul>
+                  <li>Move an existing VOA file and its image to a new folder.
+                  <li>Open the VOA file.
+                  <li>Swipe text to create a new attribute in the VOA Viewer.
+                  <li>Merge one old attribute with the new attribute.
+                  <li>Confirm that merge works properly.
+               </ul>
+             <LI><b>[FlexIDSCore #3668]</b> Merge attributes
+               <ul>
+                  <li>Exercise the RSD file and image in 
+            <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3668</b>.
+                  <li>Open the resulting VOA file.
+                  <li>Merge all of the found attributes.
+            <li>Double-click on the created attribute.
+                  <li>Confirm that a large bounding box is not displayed.  Note that 
+            <b>cr1957815fk.pdf.correct.voa</b> displays the expected result.
+               </ul>
 <p>
-		<li>Confirm that the <b>Up Arrow</b> button is inactive by default.
-		<li>Confirm that the <b>Up Arrow</b> button becomes active when an attribute that 
-		is not the top attribute in the list is selected.
-		<li>Confirm that the <b>Up Arrow</b> button becomes inactive when the top attribute 
-		in the list is selected.
-		<li>Confirm that the <b>Up Arrow</b> moves the currently selected attribute up one 
-		spot in the list.
+        <li>Confirm that the <b>Up Arrow</b> button is inactive by default.
+        <li>Confirm that the <b>Up Arrow</b> button becomes active when an attribute that 
+        is not the top attribute in the list is selected.
+        <li>Confirm that the <b>Up Arrow</b> button becomes inactive when the top attribute 
+        in the list is selected.
+        <li>Confirm that the <b>Up Arrow</b> moves the currently selected attribute up one 
+        spot in the list.
 <p>
-		<li>Confirm that the <b>Down Arrow</b> button is inactive by default.
-		<li>Confirm that the <b>Down Arrow</b> button becomes active when an attribute that 
-		is not the bottom attribute in the list is selected.
-		<li>Confirm that the <b>Down Arrow</b> button becomes inactive when the bottom 
-		attribute in the list is selected.
-		<li>Confirm that the <b>Down Arrow</b> moves the currently selected attribute down 
-		one spot in the list.
+        <li>Confirm that the <b>Down Arrow</b> button is inactive by default.
+        <li>Confirm that the <b>Down Arrow</b> button becomes active when an attribute that 
+        is not the bottom attribute in the list is selected.
+        <li>Confirm that the <b>Down Arrow</b> button becomes inactive when the bottom 
+        attribute in the list is selected.
+        <li>Confirm that the <b>Down Arrow</b> moves the currently selected attribute down 
+        one spot in the list.
 <p>
-		<li>Confirm that the <b>Name</b> edit box is disabled by default.
-		<li>Confirm that the <b>Name</b> edit box is enabled when an attribute is selected.
-		<li>Confirm that the <b>Name</b> edit box contains the current name data from the 
-		list control when an attribute is selected.
-		<li>Confirm that when data is entered in the <b>Name</b> edit box the change is
-		reflected in the value field of the list control.
+        <li>Confirm that the <b>Name</b> edit box is disabled by default.
+        <li>Confirm that the <b>Name</b> edit box is enabled when an attribute is selected.
+        <li>Confirm that the <b>Name</b> edit box contains the current name data from the 
+        list control when an attribute is selected.
+        <li>Confirm that when data is entered in the <b>Name</b> edit box the change is
+        reflected in the value field of the list control.
 <p>
-		<li>Confirm that the <b>Value</b> edit box is disabled by default.
-		<li>Confirm that the <b>Value</b> edit box is enabled when an attribute is selected.
-		<li>Confirm that the <b>Value</b> edit box contains the current value data from 
-		the list control when an attribute is selected.
-		<li>Confirm that when data is entered in the <b>Value</b> edit box the change is
-		reflected in the value column of the list control.
+        <li>Confirm that the <b>Value</b> edit box is disabled by default.
+        <li>Confirm that the <b>Value</b> edit box is enabled when an attribute is selected.
+        <li>Confirm that the <b>Value</b> edit box contains the current value data from 
+        the list control when an attribute is selected.
+        <li>Confirm that when data is entered in the <b>Value</b> edit box the change is
+        reflected in the value column of the list control.
 <p>
-		<li>Confirm that the <b>Type</b> edit box is disabled by default.
-		<li>Confirm that the <b>Type</b> edit box is enabled when an attribute is selected.
-		<li>Confirm that the <b>Type</b> edit box contains the current type data from 
-		the list control when an attribute is selected.
-		<li>Confirm that when data is entered in the <b>Type</b> edit box the change is
-		reflected in the type field of the list control.
+        <li>Confirm that the <b>Type</b> edit box is disabled by default.
+        <li>Confirm that the <b>Type</b> edit box is enabled when an attribute is selected.
+        <li>Confirm that the <b>Type</b> edit box contains the current type data from 
+        the list control when an attribute is selected.
+        <li>Confirm that when data is entered in the <b>Type</b> edit box the change is
+        reflected in the type field of the list control.
 <p>
-		<li><b>Value Text</b>
-		<ul>
-			<li>Confirm that <b>Replace</b> is enabled by default.
-			<li>Confirm that only <b>Replace</b> or <b>Append</b> can be selected, not both.
-			<li>Select <b>Replace</b>
-			<ul>
-				<li>Open <b>Image Viewer</b> from the toolbar.
-				<li>Open an image in <b>Image Viewer</b>.
-				<li>Create a new attribute.
-				<li>Select the new attribute and make a swipe in the <b>Image Viewer</b>.
-				<li>Confirm that the swiped text appears in the <b>Value</b> edit box.
-				<li>Confirm that the <b>Name</b> edit box contains <b>Manual</b>.
-				<li>Select the attribute again and make a different swipe.
-				<li>Confirm that the text from the new swipe replaced the text from 
-				the old swipe.
+        <li><b>Value Text</b>
+        <ul>
+            <li>Confirm that <b>Replace</b> is enabled by default.
+            <li>Confirm that only <b>Replace</b> or <b>Append</b> can be selected, not both.
+            <li>Select <b>Replace</b>
+            <ul>
+                <li>Open <b>Image Viewer</b> from the toolbar.
+                <li>Open an image in <b>Image Viewer</b>.
+                <li>Create a new attribute.
+                <li>Select the new attribute and make a swipe in the <b>Image Viewer</b>.
+                <li>Confirm that the swiped text appears in the <b>Value</b> edit box.
+                <li>Confirm that the <b>Name</b> edit box contains <b>Manual</b>.
+                <li>Select the attribute again and make a different swipe.
+                <li>Confirm that the text from the new swipe replaced the text from 
+                the old swipe.
 <p>
-				<li>Create another new attribute.
-				<li>From the <b>Image Viewer</b>, click the <b>Recognize 
-				text and process</b> button.
-				<li><b>[FlexIDSCore #2652]</b> Confirm that the drop-down menu includes 
-				items to <b>Send text to the VOA File Viewer window</b>.
-			</ul>
+                <li>Create another new attribute.
+                <li>From the <b>Image Viewer</b>, click the <b>Recognize 
+                text and process</b> button.
+                <li><b>[FlexIDSCore #2652]</b> Confirm that the drop-down menu includes 
+                items to <b>Send text to the VOA File Viewer window</b>.
+            </ul>
 <p>
-			<li>Select <b>Append</b>
-			<ul>
-				<li>Open <b>Image Viewer</b> from toolbar.
-				<li>Open an image in <b>Image Viewer</b>.
-				<li>Create a new attribute.
-				<li>Select the new attribute and make a swipe in the <b>Image Viewer</b>.
-				<li>Select the attribute again and make a different swipe.
-				<li>Confirm that the text from the new swipe is appended to the text 
-				from the old swipe.
-				<li>Open a different image in <b>Image Viewer</b></li>
-				<li>Select the same attribute and make a swipe from the new image.
-				<li>Confirm that an error is shown explaining that you cannot 
-				append swipes from different files.
-			</ul>
-		</ul>
-	</ul>
-<p>
-<!-- *********************************************** -->
-	<li><h2>Auto Open Registry Feature</h2>
-	<ul>
-		<li>Run <b>RDT Config</b> and set <b>Automatically open image in VOA File Viewer</b> 
-		to on.</li>
-		<li>Open <b>VOA Viewer</b> with a VOA file (either from command line or by 
-		double-clicking	on a <b>.voa</b> file.</li>
-		<li>Confirm that the <b>Image Viewer</b> automatically opens.
-		<li>Confirm that the <b>Image Viewer</b> opens with the corresponding image
-		for the given VOA file.</li>
-		<li>Confirm that if the first attribute in the list has spatial information that
-		it is highlighted in the <b>Image Viewer</b>.</li>
-	</ul>
+            <li>Select <b>Append</b>
+            <ul>
+                <li>Open <b>Image Viewer</b> from toolbar.
+                <li>Open an image in <b>Image Viewer</b>.
+                <li>Create a new attribute.
+                <li>Select the new attribute and make a swipe in the <b>Image Viewer</b>.
+                <li>Select the attribute again and make a different swipe.
+                <li>Confirm that the text from the new swipe is appended to the text 
+                from the old swipe.
+                <li>Open a different image in <b>Image Viewer</b></li>
+                <li>Select the same attribute and make a swipe from the new image.
+                <li>Confirm that an error is shown explaining that you cannot 
+                append swipes from different files.
+            </ul>
+        </ul>
+    </ul>
 <p>
 <!-- *********************************************** -->
-	<li><h2>Miscellaneous</h2>
-	<ul>
-   		<LI><b>[LegacyRC #5071]</b> Disable Auto-Fitting for VOA Viewer
-		<ul>
-			<li>Confirm that highlighting multi-line text while holding the 
-			<b>Ctrl</b> key does not create a multi-zone attribute in the VOA 
-			Viewer application.
-		</ul>
+    <li><h2>Auto Open Registry Feature</h2>
+    <ul>
+        <li>Run <b>RDT Config</b> and set <b>Automatically open image in VOA File Viewer</b> 
+        to on.</li>
+        <li>Open <b>VOA Viewer</b> with a VOA file (either from command line or by 
+        double-clicking	on a <b>.voa</b> file.</li>
+        <li>Confirm that the <b>Image Viewer</b> automatically opens.
+        <li>Confirm that the <b>Image Viewer</b> opens with the corresponding image
+        for the given VOA file.</li>
+        <li>Confirm that if the first attribute in the list has spatial information that
+        it is highlighted in the <b>Image Viewer</b>.</li>
+    </ul>
 <p>
-  	   	<LI><b>[FlexIDSCore #3038]</b> VOA Viewer displays multiple selected highlights
-	       	<ul>
-	      		<li>Open a VOA file that contains multiple attributes from a single page.
-			<li>Confirm that more than one of the attributes can be selected at 
-			one time.
-			<li>Confirm that the group of selected attributes is highlighted in 
-			the Image Viewer.
-	       	</ul>
+<!-- *********************************************** -->
+    <li><h2>Miscellaneous</h2>
+    <ul>
+           <LI><b>[LegacyRC #5071]</b> Disable Auto-Fitting for VOA Viewer
+        <ul>
+            <li>Confirm that highlighting multi-line text while holding the 
+            <b>Ctrl</b> key does not create a multi-zone attribute in the VOA 
+            Viewer application.
+        </ul>
 <p>
-		<li><b>[FlexIDSCore #3336]</b> Changing names of subattributes
-		<ul>
-			<li>Use the <b>VOA Viewer</b> to open any EAV or VOA that has subattributes.
-			<li>Choose a subattribute and append a letter to the end of the name.
-			<li>Confirm that no exception is thrown.
-		</ul>
+             <LI><b>[FlexIDSCore #3038]</b> VOA Viewer displays multiple selected highlights
+               <ul>
+                  <li>Open a VOA file that contains multiple attributes from a single page.
+            <li>Confirm that more than one of the attributes can be selected at 
+            one time.
+            <li>Confirm that the group of selected attributes is highlighted in 
+            the Image Viewer.
+               </ul>
 <p>
-      		<li><b>[FlexIDSCore #3669, #3708]</b> Spatialness column
-		<ul>
-			<li>Confirm that the attribute list in the <b>VOA Viewer</b> includes a 
-			<b>Spatialness</b> column.
-			<li>Confirm that <b>Spatial</b> attributes are properly displayed and copied.
-			<li>Confirm that <b>Hybrid</b> attributes are properly displayed and copied.
-			<li>Confirm that <b>Non-spatial</b> attributes are properly displayed 
-			and copied.
-			<li>Open a VOA file and create a new attribute.
-			<li>Confirm that the <b>Spatialness</b> column is populated 
-			immediately.
-		</ul>
+        <li><b>[FlexIDSCore #3336]</b> Changing names of subattributes
+        <ul>
+            <li>Use the <b>VOA Viewer</b> to open any EAV or VOA that has subattributes.
+            <li>Choose a subattribute and append a letter to the end of the name.
+            <li>Confirm that no exception is thrown.
+        </ul>
 <p>
-  	   	<LI><b>[FlexIDSCore #3690]</b> Attribute Name and Type should each be 
-		valid identifiers
-	       	<ul>
-	  	   	<LI>Open a VOA file in the <b>VOA Viewer</b>.
-      			<li>Modify a <b>Name</b> entry and confirm that the text must match the 
-			following regular expression
-			<ul>
-				<li><b>[_A-Za-z][_A-Za-z0-9]*</b>
-			</ul>
-      			<li>Modify a <b>Type</b> entry and confirm that the text must match the 
-			following regular expression
-			<ul>
-				<li><b>[_A-Za-z][_A-Za-z0-9]*</b>
-			</ul>
-	       	</ul>
+              <li><b>[FlexIDSCore #3669, #3708]</b> Spatialness column
+        <ul>
+            <li>Confirm that the attribute list in the <b>VOA Viewer</b> includes a 
+            <b>Spatialness</b> column.
+            <li>Confirm that <b>Spatial</b> attributes are properly displayed and copied.
+            <li>Confirm that <b>Hybrid</b> attributes are properly displayed and copied.
+            <li>Confirm that <b>Non-spatial</b> attributes are properly displayed 
+            and copied.
+            <li>Open a VOA file and create a new attribute.
+            <li>Confirm that the <b>Spatialness</b> column is populated 
+            immediately.
+        </ul>
 <p>
-      		<li><b>[FlexIDSCore #3709, #3710]</b> Various tweaks
-		<ul>
-			<li>Open a VOA file and create a new attribute with a <b>Name</b> and 
-			a <b>Type</b> but without a <b>Value</b>.
-			<li>Confirm that the results can be saved to a <b>VOA</b> file and that 
-			the new attribute is included.
-			<li>Confirm that the results can be saved to an <b>EAV</b> file and that 
-			the new attribute is included.
-			<li>Open a VOA file and select the <b>Name</b> edit box.
-			<li>Confirm that ENTER does not create a new attribute.
-			<li>Select the <b>Type</b> edit box.
-			<li>Confirm that ENTER does not create a new attribute.
-		</ul>
+             <LI><b>[FlexIDSCore #3690]</b> Attribute Name and Type should each be 
+        valid identifiers
+               <ul>
+                 <LI>Open a VOA file in the <b>VOA Viewer</b>.
+                  <li>Modify a <b>Name</b> entry and confirm that the text must match the 
+            following regular expression
+            <ul>
+                <li><b>[_A-Za-z][_A-Za-z0-9]*</b>
+            </ul>
+                  <li>Modify a <b>Type</b> entry and confirm that the text must match the 
+            following regular expression
+            <ul>
+                <li><b>[_A-Za-z][_A-Za-z0-9]*</b>
+            </ul>
+               </ul>
 <p>
-  	   	<LI><b>[LegacyRC #5361]</b> VOA Viewer
-		<ul>
-			<li>Open the VOA file from <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5361</b>.
-			<li>Select the <b>..First</b> subattribute.
-			<li>Click the <b>Up</b> arrow.
-			<li>Confirm that no exception is thrown.
-		</ul>
+              <li><b>[FlexIDSCore #3709, #3710]</b> Various tweaks
+        <ul>
+            <li>Open a VOA file and create a new attribute with a <b>Name</b> and 
+            a <b>Type</b> but without a <b>Value</b>.
+            <li>Confirm that the results can be saved to a <b>VOA</b> file and that 
+            the new attribute is included.
+            <li>Confirm that the results can be saved to an <b>EAV</b> file and that 
+            the new attribute is included.
+            <li>Open a VOA file and select the <b>Name</b> edit box.
+            <li>Confirm that ENTER does not create a new attribute.
+            <li>Select the <b>Type</b> edit box.
+            <li>Confirm that ENTER does not create a new attribute.
+        </ul>
 <p>
-  	   	<LI><b>[LegacyRC #5501]</b> VOA Viewer
-		<ul>
-			<li>Open the VOA file from <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5501</b>.
-			<li>Review the attributes.
-			<li>Confirm that the multi-page highlight can be displayed.
-		</ul>
+             <LI><b>[LegacyRC #5361]</b> VOA Viewer
+        <ul>
+            <li>Open the VOA file from <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5361</b>.
+            <li>Select the <b>..First</b> subattribute.
+            <li>Click the <b>Up</b> arrow.
+            <li>Confirm that no exception is thrown.
+        </ul>
 <p>
-  	   	<LI><b>[LegacyRC #5677]</b> VOA Viewer
-		<ul>
-			<li>Open the <b>before</b> VOA file from 
-			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5677</b>.
-			<li>Select the <b>Grantee</b> at the top and change it to <b>Grantee1</b>.
-			<li>Save the file.
-			<li>Change <b>Grantee1</b> to <b>Grantee12</b>.
-			<li>Save the file again.
-			<li>Close and reopen the file.
-			<li>Confirm that the subattributes have not been duplicated.
-		</ul>
-	</ul>		
+        <LI><b>[LegacyRC #5501]</b> VOA Viewer
+        <ul>
+            <li>Open the VOA file from <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5501</b>.
+            <li>Review the attributes.
+            <li>Confirm that the multi-page highlight can be displayed.
+        </ul>
+<p>
+        <LI><b>[LegacyRC #5677]</b> VOA Viewer
+        <ul>
+            <li>Open the <b>before</b> VOA file from 
+            <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5677</b>.
+            <li>Select the <b>Grantee</b> at the top and change it to <b>Grantee1</b>.
+            <li>Save the file.
+            <li>Change <b>Grantee1</b> to <b>Grantee12</b>.
+            <li>Save the file again.
+            <li>Close and reopen the file.
+            <li>Confirm that the subattributes have not been duplicated.
+        </ul>
+<p>
+  	   	<LI><b>[LegacyRC #5639]</b> Validating .eavs on save
+        <!-- fixed v 8.1.0.19 -->
+        <ul>
+            <li>In the VOA File Viewer, create a new <b>.eav</b> file.
+            <li>Create an attribute with a second-level subattribute (do not include a first-level
+            subattribute). The format should be:
+            <ul>
+                <p>
+                Name|Macadamia<br>
+                ..InvalidSubattribute|Gazebo
+                <p>
+            </ul>
+            <li>Confirm that you cannot save the .eav file.
+        </ul>
+<p>
+        <LI><b>[LegacyRC #5671]</b> Inappropriate confirmation dialog on save
+        <!-- fixed v 8.1.0.19 -->
+        <ul>
+            <li>Open a .voa file <b>TestImage001.tif.voa</b> that exists in the same directory as
+            TestImage001.tif
+            <li>Click the "Save As" button.
+            <li>Note that the default file name is <b>TestImage001.tif</b> and the default save as
+            type is <b>EAV files (*.eav)</b>.
+            <li>Press the save button. Confirm that no confirmation dialog is displayed.
+        </ul>
+<p>
+        <LI><b>[LegacyRC #5829]</b> Merging attributes that have subs
+        <!-- fixed v 8.1.0.18 -->
+        <ul>
+            <li>Open the .voa file at <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\5829</b>.
+            <li>Confirm that it contains three top-level attributes, and that the first and third
+            have subattributes.
+            <li>Select the first and third top-level attributes and press the <b>Merge
+            Attributes</b> button.
+            <li>Confirm that the merged attribute has all of the subattributes from both of the
+            original attributes.
+        </ul>
+<p>
+        <LI><b>[FlexIDSCore #4281]</b> Loading older .voa files
+        <!-- fixed v 8.1.0.20 -->
+        <ul>
+            <li>Confirm that the file at <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4281</b> can
+            be opened by the VOA File Viewer.
+        </ul> 
+<p>
+        <li><b>[LegacyRC #5854]</b> Misleading behavior saving as .eav
+        <!-- fixed v 8.1.0.44 -->
+        <ul>
+            <li>Open a .voa file that contains spatial attributes.
+            <li>Save the file as an .eav file.
+            <li>Confirm that the "Spatial" column has been updated.
+            <li>Confirm that double-clicking on an attribute does not highlight the attribute in the
+            associated image.
+        </ul>        
+    </ul>		
 </OL>
 </BODY>
 </HTML>

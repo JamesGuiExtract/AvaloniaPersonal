@@ -18,66 +18,67 @@
 	<LI><h2>Install Options</h2>
 	<p>
 	<UL>
-	  	<LI>Confirm that <b>not agreeing</b> with the terms of the license agreement halts 
-		the installation with no files copied to the system.
-  		<LI>Confirm that a <b>Custom</b> SDK installation allows installation of the 
-		<b>SDK Redistribution Components</b>.
+	  	<LI>Confirm that <b>not agreeing</b> with the terms of the license agreement halts the
+        installation with no files copied to the system.
+  		<LI>Confirm that a <b>Custom</b> SDK installation allows installation of the <b>SDK 
+        Redistribution Components</b>.
 		<ul>
-  			<LI>Confirm that Merge Modules for <b>FlexIndexSDK</b> and <b>InputFunnel</b> 
-			are copied to the \FlexIndex\Redist folder.
-            	</ul>
-	  	<LI>Confirm that a <b>Compact</b> SDK installation does not install <b>Tutorials</b> 
-		or <b>Help</b>.
-	  	<LI><b>[FlexIDSCore #2892]</b> Confirm that installing FLEX Index provides a meaningful 
-		splash screen.
+            <LI>Confirm that Merge Modules for <b>FlexIndexSDK</b> and <b>InputFunnel</b> are 
+            copied to the \FlexIndex\Redist folder.
+        </ul>
+	  	<LI>Confirm that a <b>Compact</b> SDK installation does not install <b>Tutorials</b> or
+        <b>Help</b>.
+        <LI><b>[FlexIDSCore #2892]</b> Confirm that installing FLEX Index provides a meaningful 
+        splash screen.
+        <!-- Pretty sure as of 8.1, this is no longer accurate
 <p>
 	  	<LI><b>[FlexIDSCore #2521]</b> Confirm that installing FLEX Index on a freshly ghosted test machine 
 		does not first require installation of .NET.
 	  	<LI><b>[FlexIDSCore #2522]</b> Confirm that installing ID Shield on a freshly ghosted test machine 
 		does not first require installation of .NET.
+        -->
 <p>
-	  	<LI><b>[FlexIDSCore #2856]</b> Confirm that a newer version of FLEX Index cannot be installed 
-		on a test machine with an older version of Extract Systems LM.
-	  	<LI><b>[FlexIDSCore #2856]</b> Confirm that a newer version of ID Shield cannot be installed 
-		on a test machine with an older version of Extract Systems LM.
+	  	<LI><b>[FlexIDSCore #2856]</b> Confirm that a newer version of FLEX Index cannot be
+        installed on a test machine with an older version of Extract Systems LM.
+	  	<LI><b>[FlexIDSCore #2856]</b> Confirm that a newer version of ID Shield cannot be
+        installed on a test machine with an older version of Extract Systems LM.
 	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of FLEX Index cannot be installed 
 		on a test machine with an older version of ID Shield.
-	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of Extract Systems LM cannot be installed 
-		on a test machine with an older version of ID Shield.
+	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of Extract Systems LM cannot be
+        installed on a test machine with an older version of ID Shield.
 	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of ID Shield cannot be installed 
 		on a test machine with an older version of FLEX Index.
-	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of Extract Systems LM cannot be installed 
-		on a test machine with an older version of FLEX Index.
+	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of Extract Systems LM cannot be
+        installed on a test machine with an older version of FLEX Index.
 <p>
-	  	<LI>*Confirm that an upgrade installation of <b>FLEX Index</b> is available and 
-		effective after installation of the previous version.
-	  	<LI>*Confirm that an upgrade installation of <b>ID Shield</b> is available and 
-		effective after installation of the previous version.
+	  	<LI>*Confirm that an upgrade installation of <b>FLEX Index</b> is available and effective
+        after installation of the previous version.
+	  	<LI>*Confirm that an upgrade installation of <b>ID Shield</b> is available and effective 
+        after installation of the previous version.
 <p>
   	   	<LI><b>[FlexIDSCore #3151]</b> Cannot Install Software If Not Administrator
-	       	<ul>
-	      		<li>Confirm that the installation process exits gracefully if the 
-			logged in user is not a member of the Administrators group.
-	       	</ul>
+        <ul>
+            <li>Confirm that the installation process exits gracefully if the logged in user is not
+            a member of the Administrators group.
+        </ul>
 <p>
   	   	<LI><b>[FlexIDSCore #3514]</b> Competing versions
-	       	<ul>
-	      		<li>Prepare a test machine with a current installation of <b>ID Shield Office</b> 
-			or <b>ID Shield for Laserfiche</b>.
+        <ul>
+            <li>Prepare a test machine with a current installation of <b>ID Shield Office</b> or
+            <b>ID Shield for Laserfiche</b>.
 			<li>Confirm that <b>FLEX Index</b> cannot be installed.
 			<li>Confirm that <b>ID Shield</b> cannot be installed.
 			<li>Confirm that <b>Extract Systems LM</b> cannot be installed.
-	       	</ul>
+        </ul>
 <p>
-  	   	<LI><b>[FlexIDSCore #3573]</b> Windows version &gt;= XP
-	       	<ul>
-	      		<li>Prepare a test machine with an unsupported operating system such 
-			as Windows 2000.
+  	   	<LI><b>[FlexIDSCore #3573]</b> Windows version &lt;= XP
+	    <ul>
+            <li>Prepare a test machine with an unsupported operating system such as Windows 2000.
 			<li>Confirm that <b>FLEX Index</b> cannot be installed.
 			<li>Confirm that <b>ID Shield</b> cannot be installed.
 			<li>Confirm that <b>Extract Systems LM</b> cannot be installed.
-	       	</ul>
-	</UL>
+        </ul>
+    </ul>
 <p>
 	<LI><h2>Product-Level Licensing</h2>
 	<UL>
@@ -89,15 +90,13 @@
 		steps below.
 		<p>
 		<ul>
-			<li>Create the license file using the <b>COM License 
-			Generator</b> utility. Copy this file to the 
-			CommonComponents folder.  Remove any other <b>.lic</b> 
-			files from the CommonComponents folder.</li>
+			<li>Create the license file using the <b>COM License Generator</b> utility. Copy this
+            file to the CommonComponents folder.  Remove any other <b>.lic</b> files from the 
+            CommonComponents folder.</li>
 			<li>Open the <b>Extract Systems</b> start menu.</li>
-			<li>Confirm that the items marked <b>Yes</b> on the 
-			table are on the Start menu and are licensed.</li>
-			<li>Confirm that the items marked <b>No</b> on the 
-			table are not licensed.</li>
+			<li>Confirm that the items marked <b>Yes</b> on the table are on the Start menu and are
+            licensed.</li>
+			<li>Confirm that the items marked <b>No</b> on the table are not licensed.</li>
 		</ul>
 <p>
 		<table border=1 cellpadding="5" cellspacing="0">
@@ -249,22 +248,21 @@
 <p>
 	<LI><h2>File Processors</h2></li>
 <p>
-	Below is a table indicating which file processors that each license type should 
-	be able to access.
-	For each license type, confirm that only the appropriate file processors can be 
-	accessed by following the steps below. (The <b>Simple Rule Writing</b> license should 
-	not have access to the <b>File Action Manager</b>, and thus should have no file 
-	processors.)
+	Below is a table indicating which file processors that each license type should be able to 
+    access.
+	For each license type, confirm that only the appropriate file processors can be accessed by
+    following the steps below. (The <b>Simple Rule Writing</b> license should not have access to
+    the <b>File Action Manager</b>, and thus should have no file processors.)
 <p>
 	<ul>
-		<li>Create the license file using the <b>COM License Generator</b> utility. 
-		Copy this file to the CommonComponents folder.  Remove any other 
-		<b>.lic</b> files from the CommonComponents folder.</li>
-		<li>Open the <b>File Action Manager</b>.  Select any action from the 
-		current database and then click <i>Process files in the queue for this 
-		action</i>. Click on the Processing Setup tab and then click <i>Add...</i>
-		<li>Confirm that <b>only</b> the file processors marked as "Yes" in 
-		the table below are contained in the drop down menu labeled <i>Select Task</i>.
+		<li>Create the license file using the <b>COM License Generator</b> utility. Copy this file
+        to the CommonComponents folder.  Remove any other <b>.lic</b> files from the
+        CommonComponents folder.</li>
+		<li>Open the <b>File Action Manager</b>.  Select any action from the current database and
+        then click <i>Process files in the queue for this action</i>. Click on the Processing Setup
+        tab and then click <i>Add...</i>
+		<li>Confirm that <b>only</b> the file processors marked as "Yes" in the table below are
+        contained in the drop down menu labeled <i>Select Task</i>.
 		<li>Close the <b>File Action Manager</b>.
 <p>
 		<table border=1 cellpadding="5" cellspacing="0">
@@ -488,11 +486,11 @@
 <p>
 		<li><u>Testing Specially Licensed Tasks</u>
 		<ul>
-			<li>For the tasks noted above that contain a specific entry in the 
-			<b>Special License</b> column, create a separate specific license file 
-			and copy it to the <b>CommonComponents</b> folder.
-			<li>Update the collection of supported tasks via <b>Tools - Check 
-			for new components</b>.
+			<li>For the tasks noted above that contain a specific entry in the <b>Special
+            License</b> column, create a separate specific license file and copy it to the
+            <b>CommonComponents</b> folder.
+			<li>Update the collection of supported tasks via <b>Tools - Check for new 
+            components</b>.
 			<li>Confirm that the special task is now licensed.
 		</ul>
 	</ul>
@@ -501,19 +499,18 @@
 <p>
 	<li><h2>Other Utilities</h2>
 <p>
-	Below is a table indicating which additional utilities that each license type 
-	should be able to access.  For each license type, confirm that only the appropriate 
-	utilities can be accessed by following the steps below. 
+	Below is a table indicating which additional utilities that each license type should be able to
+    access. For each license type, confirm that only the appropriate utilities can be accessed by
+    following the steps below. 
 <p>
 	<ul>
-		<li>Create the license file using the <b>COM License Generator</b> utility. 
-		Copy this file to the CommonComponents folder.  Remove any other <b>.lic</b> 
-		files from the CommonComponents folder.</li>
-		<li>Confirm that each of the utilities marked with <b>Yes</b> are licensed 
-		and can be run. Confirm that each of the utilities marked with <b>No</b> are 
-		not licensed.  The paths to the utilities, or applicable instructions, have 
-		been included in the table below.  All the paths are located under 
-		<b>C:\Program Files\Extract Systems</b> (for a 32-bit system).
+		<li>Create the license file using the <b>COM License Generator</b> utility. Copy this file
+        to the CommonComponents folder.  Remove any other <b>.lic</b> files from the
+        CommonComponents folder.</li>
+		<li>Confirm that each of the utilities marked with <b>Yes</b> are licensed and can be run.
+        Confirm that each of the utilities marked with <b>No</b> are not licensed.  The paths to
+        the utilities, or applicable instructions, have been included in the table below.  All the
+        paths are located under <b>C:\Program Files\Extract Systems</b> (for a 32-bit system).
 <p>
 		<table border=1 cellpadding="5" cellspacing="0">
 		<tr>

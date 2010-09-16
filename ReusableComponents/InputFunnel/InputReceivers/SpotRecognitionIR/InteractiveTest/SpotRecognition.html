@@ -14,531 +14,900 @@
 <ol>
 
 <!-- *********************************************** -->
+
+<li><h3>UI</h3>
+<ul>
+    <li><b>File menu</b>
+    <ul>
+        <li>Confirm that the File menu contains the following items:
+        <ul>
+            <li>Open image
+            <li>Search for images...
+            <li>Print
+            <li>Recent images
+            <li>Exit
+        </ul>
+        <li>Confirm that all except Print are initially enabled.
+    <p>
+        <li>Confirm that <b>Open image</b> brings up an <b>Open Image File</b> dialog and that it
+        works as expected.
+        <li>Confirm that <b>Ctrl+O</b> performs the same function.
+    <p>
+        <li>Confirm that <b>Search for images</b> brings up the Image Search Form.
+        <ul>
+            <li>Confirm the presence of a <b>Select root folder</b> text box and an associated
+            browse button.
+            <li>Confirm that clicking on the browse button brings up a Browse for Folder dialog.
+            <li>Confirm the presence of a combo box to specify the image extension.
+            <li>Confirm the presence of a text box to specify the end of the filename.
+            <li>Specify a root folder that contains some images.
+            <li>Specify an image name end that should be unique to one image in the folder.
+            <li>Confirm that the image is opened in the image viewer.
+            <li>Specify an image name end that is not unique.
+            <li>Confirm that a list of qualifying images is provided.
+            <li>Do not specify an image name end.
+            <li>Confirm that a list is provided of all files with the specified extension.
+            <li>Do not specify an extension.
+            <li>Confirm that an error is shown.
+        </ul>
+    <p>
+        <li>Confirm that <b>Print</b> brings up the print dialog.
+        <li>Confirm that <b>Ctrl+P</b> performs the same function.
+    <p>
+        <li>Confirm that hovering over the <b>Recent images</b> item shows a list of recently 
+        opened images if applicable.
+    <p>
+        <li>Confirm that <b>Exit</b> closes the application.
+    </ul>
+<p>
+    <li><b>Tools menu</b>
+    <ul>
+        <li>Confirm that the Tools menu contains the following items:
+        <ul>
+            <li>Zoom window
+            <li>Pan
+            <li>Highlighter
+            <li>Delete highlights
+        </ul>
+        <li>Confirm that all are initially disabled.
+        <li>Open an image.
+    <p>
+        <li>Confirm that <b>Zoom window</b> brings up the zoom tool.
+        <li>Confirm that <b>Z</b> performs the same function.
+        <li>Confirm that the zoom tool works as expected.
+    <p>
+        <li>Confirm that <b>Pan</b> brings up the pan tool.
+        <li>Confirm that <b>P</b> performs the same function.
+        <li>Confirm that the pan tool works as expected.
+    <p>
+        <li>Confirm that <b>Highlighter</b> brings up the highlight tool.
+        <li>Confirm that selecting Highlighter again switches to the other highlight tool.
+        <li>Confirm that <b>H</b> performs the same function.
+        <li>Confirm that the angular and rectangular highlight tools work as expected.
+    <p>
+        <li>Confirm that <b>Delete highlights</b> brings up the delete tool.
+        <li>Confirm that <b>D</b> performs the same function.
+        <li>Confirm that the delete tool works as expected.
+    </ul>
+<p>
+    <li><b>View menu</b>
+    <ul>
+        <li>Confirm that the View menu contains the following items:
+        <ul>
+            <li>Zoom in
+            <li>Zoom out
+            <li>Zoom previous
+            <li>Zoom next
+            <li>Previous tile
+            <li>Next tile
+            <li>Fit to width
+            <li>Fit to page
+            <li>Rotate counterclockwise
+            <li>Rotate clockwise
+            <li>First page
+            <li>Previous page
+            <li>Next page
+            <li>Last page
+        </ul>
+        <li>Confirm that with no image open, only Fit to width and Fit to page are enabled.
+        <li>Open an image.
+    <p>
+        <li>Confirm that the <b>Zoom in</b> menu item, <b>F7</b>, and <b>Ctrl++</b> all zoom in on
+        the document.
+        <li>Confirm that there is a limit on how far in you can zoom.
+    <p>
+        <li>Confirm that the <b>Zoom ou</b> menu item, <b>F8</b>, and <b>Ctrl+-</b> all zoom out on
+        the document.
+        <li>Confirm that there is a limit on how far out you can zoom.
+    <p>
+        <li>Confirm that the <b>Zoom previous</b> menu item, <b>R</b>, and <b>Alt+Left</b> all
+        return you to the previous zoom level.
+        <li>Confirm that the <b>Zoom next</b> menu item, <b>T</b>, and <b>Alt+Right</b> all take
+        you to a more recent zoom level if you have already used the Zoom previous tool
+    <p>
+        <li>While zoomed in on the image, confirm that the <b>Previous tile</b> menu item and
+        <b>,</b> both take you to the previous tile.
+        <li>Confirm that the <b>Next tile</b> menu item and <b>.</b> both advance you to the next
+        tile.
+        <li>On a multi-page document, confirm that once you reach the end of a page, the 
+        next/previous tile tools move on to the next/previous page.
+    <p>
+        <li>Confirm that the <b>Fit to width</b> menu item and <b>W</b> both adjust the zoom to fit
+        to width.
+        <li>Confirm that the <b>Fit to page</b> menu item and <b>P</b> both adjust the zoom to fit
+        to page.
+    <p>
+        <li>Confirm that the <b>Rotate counterclockwise</b> menu item and <b>Ctrl+Shift+R</b> both
+        rotate the image counterclockwise.
+        <li>Confirm that the <b>Rotate clockwise</b> menu item and <b>Ctrl+R</b> both rotate the
+        image clockwise.
+    <p>
+        <li>Confirm that <b>First page/Ctrl+Home</b>, <b>Previous page/PgUp</b>, <b>Next 
+        page/PgDn</b>, and <b>Last page/Ctrl+End</b> all function as expected.
+    </ul>
+<p>
+    <li><b>Toolstrips</b>
+    <ul>
+        <li>Confirm that each of the following toolstrips exist, that they contain the listed
+        buttons, and that the tooltip text for each button contains the name of the tool and the
+        appropriate keyboard shortcut:
+        <ul>
+            <li>Open toolstrip:
+            <ul>
+                <li>Open image
+                <li>Print image
+            </ul>
+            <li>Tools toolstrip:
+            <ul>
+                <li>Zoom window
+                <li>Pan
+                <li>Highlighter
+                <li>Delete objects
+                <li>Open subimage in new ImageViewer
+                <li>Show/Hide thumbnails
+            </ul>
+            <li>Page navigation toolstrip:
+            <ul>
+                <li>Go to first page
+                <li>Go to previous page
+                <li>Page number text box
+                <li>Go to next page
+                <li>Go to last page
+            </ul>
+            <li>Zoom toolstrip:
+            <ul>
+                <li>Zoom in
+                <li>Zoom out
+                <li>Zoom previous
+                <li>Zoom next
+                <li>Fit to page
+                <li>Fit to width
+                <li>Previous tile
+                <li>Next tile
+                <li>Rotate counterclockwise
+                <li>Rotate clockwise
+            </ul>
+        <p>
+            <li>Confirm that the various buttons are enabled only at appropriate times.
+            <li>Confirm that toolstrip items with analogs in the File/Tools/View menus function as
+            expected.
+            <li>Confirm that clicking on the arrow in the <b>Open</b> button brings up a most
+            recently used file list.
+            <li>Confirm that clicking on the arrown in the <b>Highlighter</b> button allows you to
+            select which highlighter tool to use.
+        <p>
+            <li>Confirm that toolstrips can be rearranged by clicking and dragging on them.
+            <li>Confirm that toolstrip locations are persisted.
+            <li>Confirm that toolstrip locations can be reset using the /reset flag on the command
+            line.
+        </ul>
+    <p>
+        <li>Subimages
+        <ul>
+            <li>Select the subimage tool.
+            <li>Confirm that the tool can be used to select a region of an image to be displayed in
+            a new instance of the image viewer.
+            <li>Confirm that the title bar of the new instance of the image viewer contains the 
+            original filename followed by " - Portion".
+            <li>Confirm that in the new instance of the image viewer, the <b>highlight</b> tools
+            are disabled.
+            <li>Confirm that in the new instance of the image viewer, the <b>Page navigation</b>
+            toolstrip is not present.
+            <li>Confirm that the new instance of the image viewer is always on top of the old one.
+            <li>Confirm that subimages of subimages may be opened.
+            <li>Confirm that closing a parent instance of the image viewer also closes all child
+            instances.
+        </ul>
+    <p>
+        <li>Thumbnails
+        <ul>
+            <li>Confirm that when the image viewer is initally opened, the thumbnail viewer is
+            visible.
+            <li>Confirm that the <b>Show/Hide thumbnails</b> button toggles the state of the
+            thumbnail viewer.
+            <li>Confirm that by clicking on the pin in the thumbnail viewer, the viewer can be
+            pinned and unpinned.
+            <li>Confirm that the thumbnail viewer can be moved by clicking and dragging.
+            <li>Confirm that the thumbnail viewer's location is persisted.
+            <li>Confirm that the thumbnail viewer's location can be reset using the /reset flag on
+            the command line.
+            <li>Confirm that the thumbnail viewer correctly displays thumbnails for each page of
+            the image.
+            <li>Confirm that clicking on a page in the thumbnail viewer navigates to that page in
+            the image viewer.
+        </ul>
+    </ul>
+<p>
+    <li><b>Other</b>
+    <ul>
+        <li>Right-click in the image viewer and confirm that the context menu contains the
+        following items:
+        <ul>
+            <li>Zoom window
+            <li>Pan
+            <li>Zoom previous
+            <li>Zoom next
+            <li>Highlighter
+        </ul>
+        <li>Confirm that they work as expected.
+    <p>
+        <li>Display page percentage in status bar.  
+        <ul>
+            <li>Use <b>RegEdit</b> to remove the <b>DisplayPercentageEnabled</b> key under 
+            HKEY_CURRENT_USER/Software/Extract Systems/InputFunnel/InputReceivers/SpotRecIR. 
+            <li>Open an image file in the Image Viewer and confirm that the rightmost pane in the
+            status bar displays the current coordinate location of the cursor in the format 
+            <b>X : <i>nn</i></b> and <b>Y : <i>nn</i></b>.
+            <li>Using <b>RDTConfig</b>, check the <b>Display image window percentages</b> checkbox.
+            <li>Open an image file and confirm that the rightmost pane in the status bar displays
+            the current location of the cursor in both coordinates and percentages in the format
+            <b>X : <i>nn</i>, <i>pp</i>%</b> and <b>Y : <i>nn</i>, <i>pp</i>%</b>.
+            <li>Close the Image Viewer.
+            <li>Using <b>RDTConfig</b>, uncheck the <b>Display image window percentages</b> checkbox.
+            <li>Open an image file and confirm that percentages are no longer displayed 
+            in the status bar.
+        </ul>
+    <p>
+        <li>Annotation display
+        <ul>
+            <li>Confirm that .tif annotations are displayed or not according to the registry key
+            at <b>HKCU\Software\Extract Systems\ReusableComponents\OcxAndDlls\ImageEdit\Annotation</b>
+            <li>Note that annotations will not be displayed in the thumbnail viewer.
+        </ul>
+    <p>
+        <li>Anti-aliasing
+        <ul>
+            <li>Confirm that anti-aliasing is used or not according to the registry key at
+            <b>HKCU\Software\Extract Systems\ReusableComponents\OcxAndDlls\ImageEdit\AntiAliasing</b>
+        </ul>        
+    <p>
+        <li>Ignore shortcut keys during click + drag   
+        <ul>
+            <li>Open a multi-page image. 
+            <li>Select one of the highlight tools. 
+            <li>Click and hold the mouse button while dragging the mouse in order to create a 
+            highlight. 
+            <li>Press <b>[PageDown]</b> before releasing the mouse button. 
+            <li>Confirm that <b>[PageDown]</b> is ignored and the swipe can continue.
+        <p> 
+            <li>Select the angular highlight tool. 
+            <li>Click and hold the mouse button while dragging the mouse in order to create 
+            another highlight. 
+            <li>Press <b>+</b> or <b>-</b> several times before releasing the mouse button to 
+            change the height of the highlight. 
+            <li>Confirm that the height changes during the swipe.
+        </ul>
+    </ul>
+</ul>
+
+<!-- *********************************************** -->
 <li><h3>Command-line options</h3>
 <ul>
-   	<li><b>[LegacyRC #5342] /c</b> option - Send OCR text to Clipboard
-	<ul>
-		<li>Run <b>ImageViewer.exe /c &lt;image_file&gt;</b> from a command window.
-		<li>Confirm that the image opens in ImageViewer.exe.
-		<li>Use <b>Recognize text and process</b> to select some text for OCR.
-		<li>Confirm that the recognized text <b>is not displayed</b> in a message box.
-		<li>Confirm that the recognized text <b>is</b> available in the Clipboard.
-	</ul>
+    <li>Confirm that ExtractImageViewer.exe supports the following command-line options:
+    <ul>
+        <li>/? - display usage message
+        <li>/r - register the .tif extension
+        <li>/u - unregister the .tif extension
+        <li>/o &lt;ocrfile&gt; - OCRed text is written to the specified file
+        <li>/c - OCRed text is written to the clipboard
+        <li>/xml - must be used with either /c or /o; writes out swipe in XML format including full
+        text as well as zone coordinates.
+        <li>/s - display the search window
+        <li>/l - reuse the current image viewer window if one exists
+        <li>/closeall - close all open instances of the image viewer
+        <li>/e &lt;scriptfile&gt; - execute the script
+        <li>/script? - display help for scripting
+        <li>/ctrlid? - lists toolbar control ID numbers
+        <li>/reset - resets the positions of all toolstrips and the thumbnail viewer.
+    </ul>
+    <li>Confirm that all options work as expected (note that this checklist contains a section to
+    test scripting functionality).
 <p>
-   	<li><b>[LegacyRC #3462, #5341] /closeall</b> option - Close all open instances
-	<ul>
-		<li>Run <b>ImageViewer.exe &lt;image_file_one&gt;</b> from a command window.
-		<li>Run <b>ImageViewer.exe &lt;image_file_two&gt;</b> from a command window.
-		<li>Confirm that each image is displayed in a separate Image Viewer.
-		<li>Run <b>ImageViewer.exe /closeall</b> from a command window.
-		<li>Confirm that both open instances are closed.
-	</ul>
-<p>
-   	<li><b>[LegacyRC #5347] /ctrlid?</b> option - Display button IDs
-	<ul>
-		<li>Run <b>ImageViewer.exe /ctrlid?</b> from a command window.
-		<li>Confirm that a message box is displayed with button ID usage information 
-		for use during scripting.
-	</ul>
-<p>
-   	<li><b>[LegacyRC #3665] /e</b> option - Script file in usage message
-	<ul>
-		<li>Run <b>ImageViewer.exe /?</b> from a command window.
-		<li>Confirm that the usage statement includes a <b>/e</b> option to specify 
-		a script file.
-	</ul>
-<p>
-   	<li><b>[FlexIDSCore #2930] /l</b> option - Reuse current Image Viewer
-	<ul>
-		<li>Open an image file with the Image Viewer.
-		<li>Run <b>ImageViewer.exe /l &lt;second_image&gt;</b> from a command 
-		window where <b>&lt;second_image&gt;</b> is a different image file.
-		<li>Confirm that the new image is opened in the existing image window.
-<p>
-		<li>Close the image window.
-		<li>Run <b>ImageViewer.exe /l &lt;second_image&gt;</b> from a command window.
-		<li>Confirm that the image is opened in an image window.
-	</ul>
-<p>
-   	<li><b>/o</b> option - Send OCR text to file
-	<ul>
-		<li>Run <b>ImageViewer.exe /o &lt;ocr_file.txt&gt; &lt;image_file&gt;</b> 
-		from a command window.
-		<li>Confirm that the image opens in ImageViewer.exe.
-		<li>Use <b>Recognize text and process</b> to select some text for OCR.
-		<li>Confirm that the recognized text <b>is not displayed</b> in a message box.
-		<li>Confirm that the recognized text <b>is</b> stored in <b>&lt;ocr_file.txt&gt;</b>.
-	</ul>
-<p>
-   	<li><b>/r</b> option - Register TIF extension
-	<ul>
-		<li>Run <b>ImageViewer.exe /r</b> from a command window.
-		<li>Double-click on a <b>TIF</b> image file.
-		<li>Confirm that the image <b>does</b> open in ImageViewer.exe.
-	</ul>
-<p>
-   	<li><b>[LegacyRC #3418] /s</b> option - Search for image files
-	<ul>
-		<li>Run <b>ImageViewer.exe /s</b> from a command window.
-		<li>Confirm that the <b>Extract Image Viewer</b> dialog appears on top of 
-		an empty Image Viewer.
-		<li>Browse to an image folder such as <b>C:\RedactionDemo\Images</b>.
-		<li>Select a file extension such as <b>tif</b>.
-		<li>Select a file name end such as <b>02</b>.
-		<li>Confirm that an appropriate image opens in the Image Viewer.
-		<li>Confirm that closing the search dialog closes the Image Viewer.
-	</ul>
-<p>
-   	<li><b>[LegacyRC #5340] /script?</b> option - Display script usage
-	<ul>
-		<li>Run <b>ImageViewer.exe /script?</b> from a command window.
-		<li>Confirm that a message box is displayed with usage information 
-		for scripting.
-	</ul>
-<p>
-   	<li><b>/u</b> option - Unregister TIF extension
-	<ul>
-		<li>Run <b>ImageViewer.exe /u</b> from a command window.
-		<li>Double-click on a <b>TIF</b> image file.
-		<li>Confirm that the image <b>does not</b> open in ImageViewer.exe.
-	</ul>
-<p>
-   	<li><b>[LegacyRC #3667] /z</b> option - Invalid command-line argument
-	<ul>
-		<li>Run <b>ImageViewer.exe /z</b> from a command window.
-		<li>Confirm that an <b>Invalid Argument</b> exception is displayed.
-	</ul>
-<p>
-   	<li><b>[LegacyRC #3419] /?</b> option - Display usage
-	<ul>
-		<li>Run <b>ImageViewer.exe /?</b> from a command window.
-		<li>Confirm that a message box is displayed with usage information.
-	</ul>
-<p>
-   	<LI><b>[LegacyRC #5343]</b> Image Viewer and relative path
-       	<ul>
-      		<li>Exercise <b>"C:\Program Files\Extract 
-		Systems\CommonComponents\ImageViewer.exe" 003.tif</b> from a command window in a 
-		folder that contains 003.tif.
-      		<li>Confirm that the image opens successfully.
-      		<li>Confirm that <b>Recognize text and process</b> successfully OCRs the image.
-       	</ul>
+    <li>Opening an image via relative path:
+    <ul>
+        <li>From the command line, use a relative path to specify an image to open.
+        <li>Confirm that all OCR functionality works as expected.
+        <li>Confirm that the subimage handler works as expected.
+        <li>Open another image; confirm that the first image correctly appears in the MRU list.
+    </ul>
 </ul>
 <p>
+<!-- *********************************************** -->
+
+<li><h3>Image handling</h3>
+<ul>
+    <li>Image formats
+    <ul>
+        <li>Open the images located at <b>I:\Common\Engineering\ProductTesting\UniqueImageTypes</b>
+        and confirm that all valid images can be opened, rotated, and OCRed in the image viewer.
+    </ul>
+<p>
+    <li><b>[LegacyRC #3897]</b> Version 1.5 PDFs
+    <ul>
+        <li>Confirm that Image Viewer can open each image in the following folder:
+        <br>
+        <b>I:\Common\Testing\PVCS_Testing\LegacyRC\3897</b>
+    </ul>
+<p>
+    <li><b>[FlexIDSCore #2693]</b> Searchable PDFs
+    <ul>
+        <li>Confirm that Image Viewer can open and display each image in the following folder:
+        <br>
+        <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2693</b>
+    </ul>
+<p>
+    <li><b>[LegacyRCAndUtils #5102]</b> Unable to open PDF - Unable to initialize PDF engine
+    <ul>
+        <li>Use <b>regedit</b> to modify the <b>GS_LIB</b> registry key located at
+        <br>
+        <b>HKEY_CURRENT_USER\SOFTWARE\LEAD Technologies, Inc.\Pdf</b>
+        <br> to point to different folder.
+        <li>Confirm that the Image Viewer can still open PDF images.
+        <li>Restore the original setting for the <b>GS_LIB</b> environment variable.
+    </ul>
+<p>
+    <li><b>[LegacyRCAndUtils #4777]</b> SRW does not open a particular image.
+    <ul>
+        <li>Open the image attached to SCR #4745 in the Image Viewer.
+        <li>Confirm that the image opens correctly.
+    </ul>
+<p>
+    <li><b>[LegacyRCAndUtils #5832]</b>
+    <!-- fixed v 8.1.0.6 -->
+    <ul>
+        <li>Open a PDF in the Image Viewer.
+        <li>Confirm that the following registry key does not exist:
+        <br>
+        HKCU\Software\Extract Systems\ReusableComponents\OcxAndDlls\ImageEdit\PDFResolution
+    </ul>
+<p>
+    <li>Handling corrupt images
+    <ul>
+        <li>Save local copies of <b>B03307AABMB.TIF</b> (Image A) and <b>00002.tif</b> (Image B)
+        from the <b>BadImages</b> subfolder of the folder mentioned above.
+        <li>Try to open <b>Image A</b> with the Extract Image Viewer.
+        <li>Verify that Image Viewer displays an exception showing that it failed to load the file.
+        <li>Verify that Image Viewer will allow you to open a non-corrupt image.
+        <li>Repeat the above steps for <b>Image B</b>.
+<p>
+        <li>Open Image Viewer.
+        <li>Open <b>Image A</b>.
+        <li>Verify that Image Viewer displays an exception showing that it failed to load the file.
+        <li>Verify that Image Viewer will allow you to open a non-corrupt image.
+        <li>Repeat the above steps for <b>Image B</b>.
+<p>
+        <li>Open Image Viewer.
+        <li>Open a known <b>non-corrupt</b> image.
+        <li>Open <b>Image A</b>.
+        <li>Verify that Image Viewer displays an exception showing that it failed to load the file.
+        <li>Verify that Image Viewer will allow you to open a non-corrupt image.
+        <li>Repeat the above steps for <b>Image B</b>.
+    </ul>
+</ul>
+
 <!-- *********************************************** -->
 <li><h3>Scripting options</h3>
 <ul>
-   	<li><b>Test Setup</b>
-	<ul>
-		<li>Navigate to the
-		<b>ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\InteractiveTest</b> 
-		folder.
-		<li>Confirm that various <b>Script_&lt;Description&gt;.txt</b> files are present.
-		<li>Copy the first image from the RDT automated tests to
-		<b>D:\Engineering\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif</b>.  
-		Without copying this file, all of the following script tests will fail.
-	</ul>
+    <li><b>Test Setup</b>
+    <ul>
+        <li>Make a local copy of the
+        <b>ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\InteractiveTest</b> 
+        folder from SourceVault.
+        <li>Confirm that various <b>Script_&lt;Description&gt;.txt</b> files are present.
+    </ul>
 <p>
-   	<li><b>Test Execution</b> - Confirm that each of the following tests works as expected via 
-	<b>ImageViewer.exe /e &lt;script_file&gt;</b>
-	<ul>
-		<li><b>[LegacyRC #3476]</b> Script_SetCurrentPageNumber_2.txt
-		<li><b>[LegacyRC #3476]</b> Script_ZoomExtents.txt
-		<li><b>[LegacyRC #3476]</b> Script_ZoomIn.txt
-		<li><b>[LegacyRC #3476]</b> Script_ZoomOut.txt
-		<li><b>[LegacyRC #3476]</b> Script_ClearImage.txt
+    <li><b>Test Execution</b> - Confirm that each of the following tests works as expected via 
+    <b>ExtractImageViewer.exe /e &lt;script_file&gt;</b>
+    <ul>
+        <li>Script_SetCurrentPageNumber_2.txt
+        <li>Script_ZoomExtents.txt
+        <li>Script_ZoomIn.txt
+        <li>Script_ZoomOut.txt
+        <li>Script_ClearImage.txt
 <p>
-		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Top.txt
-		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Left.txt
-		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Bottom.txt
-		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Right.txt
-		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Full.txt
-		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Specified.txt
+        <li>Script_SetWindowPos_Top.txt
+        <li>Script_SetWindowPos_Left.txt
+        <li>Script_SetWindowPos_Bottom.txt
+        <li>Script_SetWindowPos_Right.txt
+        <li>Script_SetWindowPos_Full.txt
+        <li>Script_SetWindowPos_Specified.txt
 <p>
-		<li><b>[LegacyRC #5348]</b> Script_HideButtons_GoToFirstPage.txt
-		<li><b>[LegacyRC #5348]</b> Script_HideButtons_GoToPreviousPage.txt
+        <li>Script_HideButtons_GoToFirstPage.txt
+        <li>Script_HideButtons_GoToPreviousPage.txt
 <p>
-		<li>Script_HideButtons_OpenSavePrint.txt
-		<li>Script_HideButtons_ZoomZoomInZoomOut.txt
-		<li>Script_HideButtons_ZoomPreviousZoomNext.txt
-		<li>Script_HideButtons_FitToPageFitToWidth.txt
-		<li>Script_HideButtons_PanSelectHighlight.txt
-		<li>Script_HideButtons_HighlightText.txt
-		<li>Script_HideButtons_SetHighlightHeight.txt
-		<li>Script_HideButtons_EditHighlightText.txt
-		<li>Script_HideButtons_DeleteHighlights.txt
-		<li>Script_HideButtons_RecognizeText.txt
-		<li>Script_HideButtons_OpenSubImage.txt
-		<li>Script_HideButtons_Rotate.txt
-		<li>Script_HideButtons_PageNavigation.txt
-      		<li><b>[LegacyRC #5348]</b> For each of the above <b>HideButtons</b> tests, 
-		confirm proper behavior and appearance of the go to page edit box.
+        <li>Script_HideButtons_OpenPrint.txt
+        <li>Script_HideButtons_ZoomZoomInZoomOut.txt
+        <li>Script_HideButtons_ZoomPreviousZoomNext.txt
+        <li>Script_HideButtons_FitToPageFitToWidth.txt
+        <li>Script_HideButtons_PanSelectHighlight.txt
+        <li>Script_HideButtons_HighlightText.txt
+        <!-- <li>Script_HideButtons_SetHighlightHeight.txt -->
+        <!-- <li>Script_HideButtons_EditHighlightText.txt -->
+        <li>Script_HideButtons_DeleteHighlights.txt
+        <!-- <li>Script_HideButtons_RecognizeText.txt -->
+        <li>Script_HideButtons_OpenSubImage.txt
+        <li>Script_HideButtons_Rotate.txt
+        <li>Script_HideButtons_PageNavigation.txt
+        <li>Script_HideButtons_HideAll.txt
 <p>
-		<li>Script_AddTempHighlights.txt
-		<li>Script_ClearTempHighlights.txt
-		<li><b>[LegacyRC #3493]</b> Script_ZoomToTempHighlight.txt
-		<li>Script_CenterOnTempHighlight.txt
-	</ul>
+        <li>Script_AddTempHighlights.txt
+        <li>Script_ClearTempHighlights.txt
+        <li>Script_ZoomToTempHighlight.txt
+        <li>Script_CenterOnTempHighlight.txt
+    </ul>
 <p>
-   	<li><b>Miscellaneous</b>
-	<ul>
-  	   	<LI><b>[LegacyRC #5359]</b> Image Viewer scripting and subimages
-		<ul>
-			<li>Confirm that a meaningful exception is logged if a specified script 
-			file does not exist.
-		</ul>
-	</ul>
+    <li>Confirm that a meaningful error is presented if a nonexistant script file is specified.
+    <li>Confirm that a meaningful error is presented if a script attempts to hide an invalid 
+    control id.
 </ul>
 <p>
 <!-- *********************************************** -->
+<!--
 <li><h3>Miscellaneous</h3>
 <ul>
-   	<li><b>[LegacyRC #3688]</b> Display page percentage in status bar.  
-	<ul>
-		<li>Use <b>RegEdit</b> to remove the <b>DisplayPercentageEnabled</b> key under 
-                    HKEY_CURRENT_USER/Software/Extract Systems/InputFunnel/InputReceivers/SpotRecIR.</li> 
-		<li>Open an image file in the Image Viewer and confirm that the rightmost 
-                    two panes in the status bar display <b>X : <i>nn</i></b> and <b>Y : <i>nn</i></b> 
-                    where <i>nn</i> is a numeric value that changes as the mouse moves.</li> 
-		<li><b>[LegacyRC #4590]</b> Close the Image Viewer and confirm that the 
-		application closes without a significant delay.</li>
-		<li>Using <b>RDTConfig</b>, check the <b>Display image window percentages</b> checkbox.</li>
-		<li>Open an image file and confirm that the rightmost 
-                    two panes in the status bar display <b>X : <i>nn</i>, <i>pp</i>%</b> and 
-                    <b>Y : <i>nn</i>, <i>pp</i>%</b> where <i>nn</i> 
-                    and <i>pp</i> are numeric values that change as the mouse moves.</li> 
-		<li>Close the Image Viewer.</li>
-		<li>Using <b>RDTConfig</b>, uncheck the <b>Display image window percentages</b> checkbox.</li>
-		<li>Open an image file and confirm that percentages are no longer displayed 
-                    in the status bar.</li>
-	</ul>
-<p>
-   	<li><b>[LegacyRC #4073]</b> Use shortcut key <b>H</b> to toggle highlighting mode.
-	<ul>
-		<li>Open an image file in the Image Viewer, zoom in to a portion of the 
-                    image, and select <b>Pan</b> mode.</li> 
-		<li>Type an <b>H</b> and confirm that the current highlighting tool is now active with 
-                    the appropriate cursor.</li> 
-		<li>Type another <b>H</b> and confirm that the highlighting tool toggles and the 
-                    cursor also changes.</li> 
-	</ul>
-<p>
-	<li><b>[LegacyRC #4475, #4477]</b> Highlights offset for images with small deskew angle.</li>   
-	<ul>
-		<li>Open <b>PoBox.rsd</b> and start the Rule Tester utility.</li> 
-		<li>Open <b>Small_Deskew.tif</b> in the Rule Tester.</li> 
-		<li>Execute the rules from the <b>Rule Tester</b>.</li> 
-		<li>Review the two found attributes and confirm that the highlights are 
-		    properly aligned with the text.</li> 
-	</ul>
-<p>
-	<li><b>[LegacyRC #4478]</b> Highlights off image page throw an exception.</li>   
-	<ul>
-		<li>Open <b>OffPage.rsd</b> and start the Rule Tester utility.</li> 
-		<li>Open <b>Off_Page.tif</b>  in the Rule Tester.</li> 
-		<li>Execute the rules from the <b>Rule Tester</b>.</li> 
-		<li>Review the found attributes and confirm that each highlight is displayed
-		    without error.</li> 
-	</ul>
-<p>
-	<li><b>[LegacyRC #4480]</b> Incorrect deskew stored for small deskew angles.</li>   
-	<ul>
-		<li>Open <b>Patricia.rsd</b> and start the Rule Tester utility.</li> 
-		<li>Open <b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\Document Classification\County Document\Affidavit of Death\0002.tif</b> and recognize all of the text in the image.</li> 
-		<li>Execute the rules from the <b>Rule Tester</b>.</li> 
-		<li>Review the found attributes and confirm that the highlights are 
-		properly aligned with the text.</li> 
-	</ul>
-<p>
-   	<LI><b>[LegacyRC #5043]</b> Image Viewer highlights
-	<ul>
-		<li>Open an image in the Image Viewer.
-		<li>Create a highlight.
-		<li>Click on the <b>Select highlight</b> tool.
-		<li>Confirm that the highlight can be dragged off each edge of the image
-		<ul>
-			<li>top
-			<li>bottom
-			<li>left
-			<li>right
-		</ul>
-	</ul>
-<p>
-   	<LI><b>[LegacyRC #5712]</b> Confirm that a selected sub-image can be extracted and displayed 
-	in a new <b>Image Viewer</b> window.
-<p>
-   	<LI><b>[LegacyRC #5743]</b> Image Viewer subimages
-	<ul>
-		<li>Open an image in the Image Viewer.
-		<li>Open one or more subimages.
-		<li>Confirm that the parent <b>Image Viewer</b> can be closed without error.
-	</ul>
-<p>
-   	<LI><b>[LegacyRC #5822]</b> ImageViewer swipes on PDF documents
-       	<ul>
-		<li>Use <b>ImageViewer.exe</b> to open a PDF.
-		<li>Confirm that swiping with the angular highlight tool produces OCR output.
-		<li>Confirm that swiping with the rectangular highlight tool produces OCR output.
-       	</ul>
-<p>
-   	<li><b>[FlexIDSCore #2994]</b> Right-to-left highlighting
-	<ul>
-		<li>Open an image file with the Image Viewer.
-		<li>Use the rectangular highlight tool to highlight some text swiping from 
-		left-to-right.  Confirm that the OCR result is reasonable.
-		<li>Use the rectangular highlight tool to highlight some text swiping from 
-		right-to-left.  Confirm that the OCR result is reasonable.
-		<li>Use the angular highlight tool to highlight some text swiping from 
-		left-to-right.  Confirm that the OCR result is reasonable.
-		<li>Use the angular highlight tool to highlight some text swiping from 
-		right-to-left.  Confirm that the OCR result is reasonable.
-	</ul>
-<p>
-   	<li><b>[FlexIDSCore #3079]</b> Confirm that the <b>Up</b> and <b>Down</b> scrollbar 
-	buttons work.
-<p>
-	<li><b>[LegacyRC #4621, #4627]</b> Image Viewer does not properly handle corrupt images.
-	<ul>
-		<li>Save <b>(#4621) B03307AABMB.TIF (Image A)</b> and <b>(#4627) 00002.tif (Image B)</b> locally.
-		<li>Right-click on <b>Image A</b> and <b>Open With Image Viewer</b>.
-		<li>Verify that Image Viewer <b>displays</b> an exception showing that 
-		it failed to load the file.
-		<li>Verify that Image Viewer will allow you to open a non-corrupt image.
-		<li>Repeat the above steps for <b>Image B</b>.
-<p>
-		<li>Open Image Viewer.
-		<li>Open <b>Image A</b>.
-		<li>Verify that Image Viewer <b>displays</b> an exception showing that
-		it failed to load the file.
-		<li>Verify that Image Viewer will allow you to open a non-corrupt image.
-		<li>Repeat the above steps for <b>Image B</b>.
-<p>
-		<li>Open Image Viewer.
-		<li>Open a known <b>non-corrupt</b> image.
-		<li>Open <b>Image A</b>.
-		<li>Verify that Image Viewer <b>displays</b> an exception showing that
-		it failed to load the file.
-		<li>Verify that Image Viewer will allow you to open a non-corrupt image.
-		<li>Repeat the above steps for <b>Image B</b>.
-	</ul>
-<p>
-	<li><b>[LegacyRC #4726, #5307]</b> OCR Rectangular Area.</li>   
-	<ul>
-		<li>Open an image in the Image Viewer.</li> 
-		<li>Zoom out so that a gray area is visible both below and to the right of 
-		the image.</li> 
-		<li>Confirm that OCRing a rectangular region that includes text and runs off the 
-		bottom of the page is successful. Note: alternatively, confirm that it is not 
-		possible to select a region that runs off the page.</li> 
-		<li>Confirm that OCRing a rectangular region that includes text and runs off the 
-		right side of the page is successful. Note: alternatively, confirm that it is not 
-		possible to select a region that runs off the page.</li> 
-<p>
-      		<li>Open an image in the Image Viewer.
-      		<li>Select a highlight tool.
-      		<li>Select <b>Recognize text and process to OCR a rectangular area</b>.
-      		<li>Click on the image after the OCR results appear.
-      		<li>Click OK in the OCR results.
-      		<li>Confirm that the OCR results close and that no exception is logged.
-	</ul>
-<p>
-	<li><b>[LegacyRC #4416]</b> Open image from USS.</li>   
-	<ul>
-		<li>From the File - Open dialog within Image Viewer, select a USS file 
-		where the corresponding image file is also present in the folder.</li> 
-		<li>Confirm that the image opens successfully.</li> 
-	</ul>
-<p>
-   	<li><b>[LegacyRC #4859]</b> Problem with toolbar display.  
-	<ul>
-		<li>Open an image in <b>Image Viewer</b>.
-		<li>Lock the workstation via <b>Ctrl+Alt+Del</b>.
-		<li>Log back in to the workstation.
-		<li>Confirm that the toolbar remains completely visible above the client area.
-	</ul>
-<p>
-	<li><b>[LegacyRC #4935]</b> Up / Down scrollbar buttons do not work.</li>   
-	<ul>
-		<li>Open an image and zoom in so that the vertical scrollbar is active.</li> 
-		<li>Scroll partway down the image.</li> 
-		<li>Confirm that the <b>Up arrow</b> in the scrollbar scrolls the 
-		image upward.</li> 
-		<li>Confirm that the <b>Down arrow</b> in the scrollbar scrolls the 
-		image downward.</li> 
-	</ul>
-<p>
-	<li><b>[LegacyRC #5032]</b> Ignore shortcut keys during click + drag</li>   
-	<ul>
-		<li>Open a multi-page image.</li> 
-		<li>Select one of the highlight tools.</li> 
-		<li>Click and hold the mouse button while dragging the mouse in order to 
-		create a highlight.</li> 
-		<li>Press <b>[PageDown]</b> before releasing the mouse button.</li> 
-		<li>Confirm that <b>[PageDown]</b> is ignored and the swipe can continue.
-<p> 
-		<li>Select the angular highlight tool.</li> 
-		<li>Click and hold the mouse button while dragging the mouse in order to 
-		create another highlight.</li> 
-		<li>Press <b>+</b> or <b>-</b> several times before releasing the mouse button to 
-		change the height of the highlight.</li> 
-		<li>Confirm that the height changes during the swipe.
-	</ul>
-<p>
-	<li><b>[FlexIDSCore #3037]</b> OCR of first page of image does not appear in .uss file</li>
-	<ul>
-		<li>Open this image: K:\Common\Engineering\Sample Files\OH - Montgomery 
-County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.TIF</li>
-		<li>OCR entire document.</li>
-		<li>Confirm that the results of the OCR include the first page of the image.</li>
-	</ul>
-<p>
-	<li><b>[LegacyRCAndUtils #5149]</b> Change Image Viewer title
-	<ul>
-		<li>Confirm that the name of the utility is <b>Extract Image Viewer</b>.
-	</ul>
-</ul>
-</li>
-<br />
 
-<li><h3>Image Display in Image Viewer</h3>
+    <li><b>[LegacyRC #4475, #4477]</b> Highlights offset for images with small deskew angle.   
+    <ul>
+        <li>Open <b>PoBox.rsd</b> and start the Rule Tester utility. 
+        <li>Open <b>Small_Deskew.tif</b> in the Rule Tester. 
+        <li>Execute the rules from the <b>Rule Tester</b>. 
+        <li>Review the two found attributes and confirm that the highlights are 
+        properly aligned with the text. 
+    </ul>
+<p>
+    <li><b>[LegacyRC #4478]</b> Highlights off image page throw an exception.   
+    <ul>
+        <li>Open <b>OffPage.rsd</b> and start the Rule Tester utility. 
+        <li>Open <b>Off_Page.tif</b>  in the Rule Tester. 
+        <li>Execute the rules from the <b>Rule Tester</b>. 
+        <li>Review the found attributes and confirm that each highlight is displayed
+        without error. 
+    </ul>
+<p>
+    <li><b>[LegacyRC #4480]</b> Incorrect deskew stored for small deskew angles.   
+    <ul>
+        <li>Open <b>Patricia.rsd</b> and start the Rule Tester utility. 
+        <li>Open <b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\Document Classification\County Document\Affidavit of Death\0002.tif</b> and recognize all of the text in the image. 
+        <li>Execute the rules from the <b>Rule Tester</b>. 
+        <li>Review the found attributes and confirm that the highlights are 
+        properly aligned with the text. 
+    </ul>
+<p>
+
+    <li><b>[FlexIDSCore #2994]</b> Right-to-left highlighting
+    <ul>
+        <li>Open an image file with the Image Viewer.
+        <li>Use the rectangular highlight tool to highlight some text swiping from 
+        left-to-right.  Confirm that the OCR result is reasonable.
+        <li>Use the rectangular highlight tool to highlight some text swiping from 
+        right-to-left.  Confirm that the OCR result is reasonable.
+        <li>Use the angular highlight tool to highlight some text swiping from 
+        left-to-right.  Confirm that the OCR result is reasonable.
+        <li>Use the angular highlight tool to highlight some text swiping from 
+        right-to-left.  Confirm that the OCR result is reasonable.
+    </ul>
+<p>
+
+    <li><b>[LegacyRC #4621, #4627]</b> Image Viewer does not properly handle corrupt images.
+    <ul>
+        <li>Save <b>(#4621) B03307AABMB.TIF (Image A)</b> and <b>(#4627) 00002.tif (Image B)</b> locally.
+        <li>Right-click on <b>Image A</b> and <b>Open With Image Viewer</b>.
+        <li>Verify that Image Viewer <b>displays</b> an exception showing that 
+        it failed to load the file.
+        <li>Verify that Image Viewer will allow you to open a non-corrupt image.
+        <li>Repeat the above steps for <b>Image B</b>.
+<p>
+        <li>Open Image Viewer.
+        <li>Open <b>Image A</b>.
+        <li>Verify that Image Viewer <b>displays</b> an exception showing that
+        it failed to load the file.
+        <li>Verify that Image Viewer will allow you to open a non-corrupt image.
+        <li>Repeat the above steps for <b>Image B</b>.
+<p>
+        <li>Open Image Viewer.
+        <li>Open a known <b>non-corrupt</b> image.
+        <li>Open <b>Image A</b>.
+        <li>Verify that Image Viewer <b>displays</b> an exception showing that
+        it failed to load the file.
+        <li>Verify that Image Viewer will allow you to open a non-corrupt image.
+        <li>Repeat the above steps for <b>Image B</b>.
+    </ul>
+<p>
+
+    <li><b>[FlexIDSCore #3037]</b> OCR of first page of image does not appear in .uss file
+    <ul>
+        <li>Open this image: K:\Common\Engineering\Sample Files\OH - Montgomery 
+County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.TIF
+        <li>OCR entire document.
+        <li>Confirm that the results of the OCR include the first page of the image.
+    </ul>
+
+</ul>
+
+<br />
+-->
+
+<!-- *********************************************** -->
+
+<li><h3>Bug fixes</h3>
 <ul>
-   	<li><b>[LegacyRC #3897]</b> Version 1.5 PDFs
-	<ul>
-		<li>Confirm that Image Viewer can open each image in the following folder.  		I:\Common\Testing\PVCS_Testing\LegacyRC\3897
-	</ul>
-   	<li><b>[FlexIDSCore #2693]</b> Searchable PDFs
-	<ul>
-		<li>Confirm that Image Viewer can open and display each image in the following folder.  		I:\Common\Testing\PVCS_Testing\FlexIDSCore\2693
-	</ul>
-	<li><b>[LegacyRCAndUtils #5102]</b> Unable to open PDF - Unable to initialize PDF engine</li>
-	<ul>
-		<li>Use <b>regedit</b> to modify the <b>GS_LIB</b> registry key, which is located under <i>HKEY_CURRENT_USER\SOFTWARE\LEAD Technologies, Inc.\Pdf</i>, to point to different folder.</li>
-		<li>Confirm that the <b>Image Viewer</b> can still open PDF images.</li>
-		<li>Restore the original setting for the <b>GS_LIB</b> environment variable.</li>
-	</ul>
-	<li><b>[LegacyRCAndUtils #4777]</b> SRW does not open a particular image.
-	<ul>
-		<li>Open the image attached to SCR #4745 in the Image Viewer.
-		<li>Confirm that the image opens correctly.
-	</ul>
+    <li><b>Command-line related:</b>
+    <ul>
+        <li><b>[DotNet #465]</b>
+        <!-- fixed v 8.1.0.28 -->
+        <ul>
+            <li>Open an image in the image viewer.
+            <li>Minimize the image viewer.
+            <li>On the command line, try to open another image using the /l switch.
+            <li>Confirm that the image opens and no exceptions are displayed.
+        </ul>
+    <p>
+        <li><b>[DotNet #473]</b>
+        <!-- fixed v 8.1.0.27 -->
+        <ul>    
+            <li>Open an image using the /c flag.
+            <li>Swipe a blank area of the image.
+            <li>Confirm that no exception is displayed.
+        </ul>
+    <p>
+        <li><b>[DotNet #474]</b>
+        <!-- fixed v 8.1.0.27 -->
+        <ul>    
+            <li>Open an image viewer.
+            <li>Open another instance of the image viewer.
+            <li>Rearrange the toolstrips in the second instance.
+            <li>Use the /closeall flag on the command line to close all instances of the image
+            viewer.
+            <li>Confirm that no exception is displayed.
+        </ul>
+    <p>
+        <li><b>[DotNet #476]</b>
+        <!-- fixed v 8.1.0.28 -->
+        <ul>
+            <li>On the command line, try to run the image viewer with an invalid
+            argument (e.g., /z).
+            <li>Confirm that an "Invalid Argument!" exception is displayed.
+        </ul>
+    <p>
+        <li><b>[DotNet #480]</b>
+        <!-- fixed v 8.1.0.28 -->
+        <ul>
+            <li>Open an image viewer window.
+            <li>From the command line, open another image in the image viewer using the /l switch.
+            <li>Confirm that the thumbnail viewer is correctly displaying thumbnails.
+        </ul>
+    </ul>
+<p>
+    <li><b>Swiping and OCR</b>
+    <ul>
+        <li><b>[DotNet #458]</b>
+        <!-- fixed v 8.1.0.26 -->
+        <ul>
+            <li>Open a document in the image viewer.
+            <li>Click on the arrow by the Highlight button in the toolstrip to select the
+            rectangular highlight tool.
+            <li>Press H to switch to the angular highlight tool.
+            <li>Click on the highlight button on the toolstrip.
+            <li>Confirm that the angular highlight tool remains selected.
+        </ul>
+    <p>
+        <li><b>[DotNet #459]</b>
+        <!-- fixed v 8.1.0.27 -->
+        <ul>
+            <li>Select the angular highlight tool.
+            <li>Swipe a blank region of an image.
+            <li>Confirm that no exception is displayed.
+            <li>Rotate the image ninety degrees.
+            <li>Select the rectangular highlight tool.
+            <li>Swipe a blank region.
+            <li>Confirm that no exception is displayed.
+        </ul>
+    <p>
+        <li><b>[DotNet #487]</b>
+        <!-- fixed v 8.1.0.30 -->
+        <ul>
+            <li>Draw a highlight over a large area, including some text.
+            <li>After dismissing the OCR results, confirm that the highlight does not shrink
+            dramatically.
+        </ul>
+    <p>
+        <li><b>[DotNet #461, others]</b>
+        <!-- fixed v 8.1.0.27 -->
+        <ul>    
+            <li>Confirm that highlights cannot be rotated or moved.
+        </ul>
+    <p>
+        <li><b>[DotNet #462]</b>
+        <!-- fixed v 8.1.0.27 -->
+        <ul>    
+            <li>Select the angular highlight tool.
+            <li>Start to draw a highlight; don't release the mouse button.
+            <li>Use the mouse wheel or the - button to adjust the height of the highlight. Confirm
+            that the minimum height is five pixels.
+            <li>Confirm that no exception is seen after drawing a highlight with the smallest
+            possible height.
+        </ul>
+    <p>
+        <li><b>[DotNet #467]</b>
+        <!-- fixed v 8.1.0.27 -->
+        <ul>
+            <li>Open an image.
+            <li>Swipe some text.
+            <li>Confirm that the ESC key can be used to close the OCR result dialog.
+        </ul>
+    <p>
+        <li><b>[DotNet #468]</b>
+        <!-- fixed v 8.1.0.27 -->
+        <ul>    
+            <li>Confirm that a rectangular highlight covering the entire page does
+            not result in an exception.
+        </ul>
+    <p>
+        <li><b>[DotNet #498]</b>
+        <!-- fixed v 8.1.0.39 -->
+        <ul>
+            <li>Confirm that angular swipes of jpeg-compressed .tif images can be OCRed without
+            error
+        </ul>
+    </ul>
+<p>
+    <li><b>Sub-image handling</b>
+    <ul>
+        <li><b>[DotNet #483]</b>
+        <!-- fixed v 8.1.0.29 -->
+        <ul>
+            <li>Open an image.
+            <li>Zoom out so that there is grey area visible outside of the image.
+            <li>Select the subimage tool.
+            <li>Confirm that you cannot select a region outside the bounds of the image.
+        </ul>
+    <p>
+        <li><b>[DotNet #484]</b>
+        <!-- fixed v 8.1.0.30 -->
+        <ul>
+            <li>With the subimage tool still selected, click in the image.
+            <li>Confirm that no error is seen.
+        </ul>
+    <p>
+        <li><b>[DotNet #485]</b>
+        <!-- fixed v 8.1.0.31 -->
+        <ul>
+            <li>Open an image.
+            <li>Create a subimage (subimage1).
+            <li>Rotate subimage1 ninety degrees.
+            <li>Take a subimage of subimage1 (subimage2).
+            <li>Take a subimage of subimage2.
+            <li>Confirm that the third subimage shows the correct area.
+        </ul>
+    <p>
+        <li><b>[DotNet #488]</b>
+        <!-- fixed v 8.1.0.31 -->
+        <ul>
+            <li>Use the subimage tool to select a region on a .pdf.
+            <li>Confirm that the correct region is displayed.
+            <li>Repeat the above test with <b>I:\Common\Engineering\ProductTesting\UniqueImageTypes\200505867-0001.tif</b>.
+            <li>Repeat the above test with <b>I:\Common\Engineering\ProductTesting\UniqueImageTypes\200505005-0001.tif</b>.
+        </ul>
+    <p>
+        <li><b>[DotNet #489]</b>
+        <!-- fixed v 8.1.0.39 -->
+        <ul>
+            <li>Open an image.
+            <li>While selecting a region with the subimage tool, right-click to cancel.
+            <li>Confirm that the subimage box is not still visible on the image.
+        </ul>
+    <p>
+        <li><b>[DotNet #495]</b>
+        <!-- fixed v 8.1.0.33 -->
+        <ul>
+            <li>Remove the image viewer .config file. On Windows 7, the path to the file is 
+            <b>C:\Users\&lt;Username&gt;\AppData\Local\Extract_Systems_LLC\&lt;ExtractImageViewerStrongName&gt;\&lt;VersionNumber&gt;\user.config</b>
+            <li>Open the image viewer with the /reset flag.
+            <li>Using that same instance of the image viewer, open an image, then open a subimage
+            thereof.
+            <li>Confirm that no error is seen.
+        </ul>
+    <p>
+        <li><b>[DotNet #496]</b>
+        <!-- fixed v 8.1.0.33 -->
+        <ul>
+            <li>Confirm that the clickable hotspot for the subimage cursor is at the point where the
+            crosshairs align.
+        </ul>
+    <p>
+        <li><b>[DotNet #499]</b>
+        <!-- fixed v 8.1.0.39 -->
+        <ul>
+            <li>Zoom into an image as far as possible.
+            <li>Select the subimage tool and select a region that is less than one pixel on a side.
+            <li>Confirm that no subimage is drawn and no exception is displayed.
+        </ul>
+    </ul>
+<p>            
+    <li><b>Other</b>
+    <ul>
+        <li><b>[DotNet #469]</b>
+        <!-- fixed v 8.1.0.26 -->
+        <ul>
+            <li>Open the .xps file attached to the DotNetRC #469. Confirm that it is displayed
+            appropriately.
+        </ul>
+    <p>
+        <li><b>[DotNet #478]</b>
+        <!-- fixed v 8.1.0.30 -->
+        <ul>
+            <li>In the image viewer, use the File > Open dialog to select a .uss file that has an
+            associated image.
+            <li>Confirm that the image is opened.
+        </ul>
+    <p>
+        <li><b>[DotNet #486]</b>
+        <!-- fixed v 8.1.0.33 -->
+        <ul>
+            <li>Confirm that the delete objects tool cursor has color.
+        </ul>
+    <p>
+        <li><b>[DotNet #490]</b>
+        <!-- fixed v 8.1.0.34 -->
+        <ul>
+            <li>Confirm that this image can be opened: <b>I:\Common\Engineering\ProductTesting\UniqueImageTypes\repub.pdf</b>
+        </ul>
+
+    <p>
+        <li><b>[DotNet #497]</b>
+        <!-- fixed v 8.1.0.33 -->
+        <ul>
+            <li>Open the image viewer.
+            <li>Resize the window so that only the toolbars are visible.
+            <li>Open an image.
+            <li>Confirm that no error is displayed.
+        </ul>
+    </ul>    
 </ul>
-</li>
-<br />
 
 <!-- *********************************************** -->
+
+<!-- 
+    THIS PORTION SHOULD PERHAPS BE MOVED TO A DIFFERENT CHECKLIST, AS IT IS NOT VERY CLOSELY
+    RELATED TO VIEWING IMAGES
+    
 <li><h3>Manual Rotation Testing</h3>
-	<ul>
-		<li>Copy all of the images in <b>I:/Common/Testing/Rotated_Images</b> to the local machine.</li>
-		<li>OCR each of the images to create a .uss file.</li>
-		<li><b>FOR EACH IMAGE:</b>
-		<ul>
-			<li>Whole Document Testing:
-			<ul>
-				<li>Open the image in the <b>Rule Tester</b>.  Make sure that the 
-				text in the .uss file is properly OCRed.
-				<ul>
-					<li><b>PLEASE NOTE:</b>  Any image whose file name ends in 
-					<b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly 
-					because it is mirrored.</li>
-				</ul>
-				</li>
-				<li>Run <b>ExtractLines.rsd</b>, which is located in SourceGear under 
-				<b>$\Engineering\ProductDevelopment\AttributeFinder\Testing\RotationTesting</b>, 
-				on the image.
-				<ul>
-					<li>Double click on one of the found items.  This will open the 
-					image in the Image Viewer.</li>
-					<li>Make sure that the highlights created by the rules are in 
-					the correct orientation.</li>
-				</ul>
-				</li>
-			</ul>
-			</li>
+    <ul>
+        <li>Copy all of the images in <b>I:/Common/Testing/Rotated_Images</b> to the local machine.
+        <li>OCR each of the images to create a .uss file.
+        <li><b>FOR EACH IMAGE:</b>
+        <ul>
+            <li>Whole Document Testing:
+            <ul>
+                <li>Open the image in the <b>Rule Tester</b>.  Make sure that the 
+                text in the .uss file is properly OCRed.
+                <ul>
+                    <li><b>PLEASE NOTE:</b>  Any image whose file name ends in 
+                    <b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly 
+                    because it is mirrored.
+                </ul>
+                
+                <li>Run <b>ExtractLines.rsd</b>, which is located in SourceGear under 
+                <b>$\Engineering\ProductDevelopment\AttributeFinder\Testing\RotationTesting</b>, 
+                on the image.
+                <ul>
+                    <li>Double click on one of the found items.  This will open the 
+                    image in the Image Viewer.
+                    <li>Make sure that the highlights created by the rules are in 
+                    the correct orientation.
+                </ul>
+                
+            </ul>
+            
 <p>
-			<li>Current Page Testing:
-			<ul>
-				<li>While the image is still open in the Image Viewer, use the Image 
-				Viewer's <b>Send text to Rule Tester window (Process Current Page)</b> 
-				tool to OCR the first page of the document and send the results to the 
-				Rule Tester.</li>
-				<ul>
-					<li>Make sure that the text that is sent to the rule tester 
-					is OCRed properly.
-					<ul>
-						<li><b>PLEASE NOTE:</b>  Any image whose file name ends in 
-						<b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly 
-						because it is mirrored.</li>
-					</ul>
-					</li>
-					<li>Run <b>ExtractLines.rsd</b> again and make sure that the 
-					highlights created by the rules are in the correct orientation.</li>
-				</ul>
-				</li>
-			</ul>
-			</li>
+            <li>Current Page Testing:
+            <ul>
+                <li>While the image is still open in the Image Viewer, use the Image 
+                Viewer's <b>Send text to Rule Tester window (Process Current Page)</b> 
+                tool to OCR the first page of the document and send the results to the 
+                Rule Tester.
+                <ul>
+                    <li>Make sure that the text that is sent to the rule tester 
+                    is OCRed properly.
+                    <ul>
+                        <li><b>PLEASE NOTE:</b>  Any image whose file name ends in 
+                        <b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly 
+                        because it is mirrored.
+                    </ul>
+                    
+                    <li>Run <b>ExtractLines.rsd</b> again and make sure that the 
+                    highlights created by the rules are in the correct orientation.
+                </ul>
+                
+            </ul>
+            
 <p>
-			<li>Rectangular Area Testing:
-			<ul>
-				<li>While the image is still open in the Image Viewer, use the Image 
-				Viewer's <b>Send text to Rule Tester window (Process Rectangular Area)</b> 
-				tool to OCR a rectangular region of the document and send the results to 
-				the Rule Tester.</li>
-				<ul>
-					<li>Make sure that the text that is sent to the rule tester is 
-					OCRed properly.
-					<ul>
-						<li><b>PLEASE NOTE:</b>  Any image whose file name ends in 
-						<b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly 
-						because it is mirrored.</li>
-					</ul>
-					</li>
-					<li>Run <b>ExtractLines.rsd</b> again and make sure that the 
-					highlights created by the rules are in the correct orientation.</li>
-				</ul>
-				</li>
-			</ul>
-			</li>
+            <li>Rectangular Area Testing:
+            <ul>
+                <li>While the image is still open in the Image Viewer, use the Image 
+                Viewer's <b>Send text to Rule Tester window (Process Rectangular Area)</b> 
+                tool to OCR a rectangular region of the document and send the results to 
+                the Rule Tester.
+                <ul>
+                    <li>Make sure that the text that is sent to the rule tester is 
+                    OCRed properly.
+                    <ul>
+                        <li><b>PLEASE NOTE:</b>  Any image whose file name ends in 
+                        <b>VP2</b>, <b>VP5</b>, or <b>VP7</b> will NOT OCR properly 
+                        because it is mirrored.
+                    </ul>
+                    
+                    <li>Run <b>ExtractLines.rsd</b> again and make sure that the 
+                    highlights created by the rules are in the correct orientation.
+                </ul>
+                
+            </ul>
+            
 <p>
-			<li>Miscellaneous:
-			<ul>
-	  		   	<LI><b>[FlexIDSCore #3525]</b> Spatial String Searcher and rotated rectangles
-		       		<ul>
-			      		<li>Exercise the RSD file and image from 
-					<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3525</b>.
-					<li>Also exercise <b>Image087_VP5.tif</b>.
-					<li>Also exercise <b>Image087_VP8.tif</b>.
-					<li>Also exercise <b>Image960_VP3.tif</b>.
-					<li>Also exercise <b>Image23_VP7.tif</b>.
-					<li>Also exercise <b>Image152_VP6.tif</b>.
-	      				<li>Confirm that the rules run without error. 
-			       	</ul>
-			</ul>
-			</li>
-		</ul>
-		</li>
-	</ul>
-</li>
+            <li>Miscellaneous:
+            <ul>
+                <LI><b>[FlexIDSCore #3525]</b> Spatial String Searcher and rotated rectangles
+                <ul>
+                    <li>Exercise the RSD file and image from 
+                    <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3525</b>.
+                    <li>Also exercise <b>Image087_VP5.tif</b>.
+                    <li>Also exercise <b>Image087_VP8.tif</b>.
+                    <li>Also exercise <b>Image960_VP3.tif</b>.
+                    <li>Also exercise <b>Image23_VP7.tif</b>.
+                    <li>Also exercise <b>Image152_VP6.tif</b>.
+                    <li>Confirm that the rules run without error. 
+                </ul>
+            </ul>
+            
+        </ul>
+        
+    </ul>
+
 
 <p>
+-->
 <!-- *********************************************** -->
+<!--
+    DITTO
 <li><h3>Automated Rotation Testing</h3>
 <ul>
-	<li>Make a local copy of the image files from <b>I:/Common/Testing/Rotated_Images</b>.</li> 
-	<li>Using the <b>File Action Manager</b>, queue all of the images.</li>
-	<li>Configure a <b>Core: Execute rules</b> task to run the demo rules against the rotated 
-	images.
-	<ul>
-		<li>The demo rules can be found in <b>.\Demo_IDShield\Rules\Master.rsd.etf</b></li>
-	</ul>
-	<li>Configure a <b>Redaction: Create redacted image</b> task to create an output image that 
-	contains all of the found redactions.
-	<li>Run these tasks on the queued images.</li>
-	<li>Confirm that each image processes without error.</li> 
-	<li>Confirm that each image has an associated VOA file.</li> 
-	<li>Review each output image using the <b>Windows Fax Viewer</b> and confirm the redactions 
-	are in the correct locations.</li> 
+    <li>Make a local copy of the image files from <b>I:/Common/Testing/Rotated_Images</b>. 
+    <li>Using the <b>File Action Manager</b>, queue all of the images.
+    <li>Configure a <b>Core: Execute rules</b> task to run the demo rules against the rotated 
+    images.
+    <ul>
+        <li>The demo rules can be found in <b>.\Demo_IDShield\Rules\Master.rsd.etf</b>
+    </ul>
+    <li>Configure a <b>Redaction: Create redacted image</b> task to create an output image that 
+    contains all of the found redactions.
+    <li>Run these tasks on the queued images.
+    <li>Confirm that each image processes without error. 
+    <li>Confirm that each image has an associated VOA file. 
+    <li>Review each output image using the <b>Windows Fax Viewer</b> and confirm the redactions 
+    are in the correct locations. 
 </ul>
-</li>
+-->
+
 </ol>
 </body>
 </html>

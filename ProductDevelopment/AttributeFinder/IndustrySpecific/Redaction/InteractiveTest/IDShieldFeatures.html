@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>ID Shield Features Testing Checklist</title>
-	<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+    <link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </head>
 
 <body>
@@ -12,726 +12,682 @@
 <hr>
 
 <ul>
-	<li><h2>Redacting Fixed Locations On Document</h2>
-	<ul>
-      		<li><u><b>Execute Rules</b></u>
-	       	<ul>
-	      		<li>Confirm presence of a <b>Use previously saved OCR 
-			results if available</b> checkbox.
-	      		<li>Confirm presence of an <b>If previous OCR results are 
-			not available</b> group box.
-	      		<li>Confirm presence of a radio button for <b>OCR all 
-			pages of the image</b>.
-	      		<li>Confirm presence of a radio button for <b>OCR specific 
-			pages</b>.
-	      		<li>Confirm presence of an associated edit box to specify 
-			page numbers.
-	      		<li>Confirm presence of a radio button for <b>Do not OCR any 
-			of the pages (Use this option only if you're sure the rules 
-			don't require OCR results)</b>.
-	      		<li>Confirm presence of a <b>Save OCR results to speed up 
-			re-processing in the future</b> checkbox.
-	      		<li>Confirm presence of a <b>Use cleaned image if available</b> 
-			checkbox.
+    <li><h2>Redacting Fixed Locations On Document</h2>
+    <ul>
+        <li><u><b>Execute Rules</b></u>
+        <ul>
+            <li>Confirm presence of a <b>Use previously saved OCR results if available</b>
+            checkbox.</li>
+            <li>Confirm presence of an <b>If previous OCR results are not available</b> group 
+            box.</li>
+            <li>Confirm presence of a radio button for <b>OCR all pages of the image</b>.</li>
+            <li>Confirm presence of a radio button for <b>OCR specific pages</b>.</li>
+            <li>Confirm presence of an associated edit box to specify page numbers.</li>
+            <li>Confirm presence of a radio button for <b>Do not OCR any of the pages (Use this 
+            option only if you're sure the rules don't require OCR results)</b>.</li>
+            <li>Confirm presence of a <b>Save OCR results to speed up re-processing in the
+            future</b> checkbox.</li>
+            <li>Confirm presence of a <b>Use cleaned image if available</b> checkbox.</li>
 <p>
-	      		<li>Confirm that settings are persistent.
-	      		<li>Confirm that a previous version of <b>Execute Rules</b> 
-			that was saved with <b>Extract data from USS file if the input 
-			file is an image and a corresponding USS file exists</b> opens and 
-			is properly configured with <b>Use previously saved OCR results 
-			if available</b>.
-	      		<li>Confirm that a previous version of <b>Execute Rules</b> 
-			that was saved with <b>If input file is an image, but no 
-			corresponding USS file exists, create a USS file, and then extract 
-			data from the USS file</b> plus <b>OCR all pages of the image</b> 
-			opens and is properly configured with <b>OCR all pages of the 
-			image</b>.
-	      		<li>Confirm that a previous version of <b>Execute Rules</b> 
-			that was saved with <b>If input file is an image, but no 
-			corresponding USS file exists, create a USS file, and then extract 
-			data from the USS file</b> plus <b>OCR specific pages</b> 
-			opens and is properly configured with <b>OCR specific pages</b>.
+            <li>Confirm that settings are persistent.</li>
+            <li>Confirm that a previous version of <b>Execute Rules</b> that was saved with
+            <b>Extract data from USS file if the input file is an image and a corresponding USS
+            file exists</b> opens and is properly configured with <b>Use previously saved OCR 
+            results if available</b>.</li>
+            <li>Confirm that a previous version of <b>Execute Rules</b> that was saved with <b>If
+            input file is an image, but no corresponding USS file exists, create a USS file, and 
+            then extract data from the USS file</b> plus <b>OCR all pages of the image</b> opens
+            and is properly configured with <b>OCR all pages of the image</b>.</li>
+            <li>Confirm that a previous version of <b>Execute Rules</b> that was saved with <b>If
+            input file is an image, but no corresponding USS file exists, create a USS file, and
+            then extract data from the USS file</b> plus <b>OCR specific pages</b> opens and is
+            properly configured with <b>OCR specific pages</b>.</li>
 <p>
-	      		<li>Create a basic rule set that does not require full OCR of 
-			an image.
-	      		<li>Exercise the rule set with the <b>Do not OCR any pages</b> 
-			option and confirm that rules execute as desired.
-	       	</ul>
+            <li>Create a basic rule set that does not require full OCR of an image.</li>
+            <li>Exercise the rule set with the <b>Do not OCR any pages</b> option and confirm that
+            rules execute as desired.</li>
+        </ul></li>
 <p>
-      		<li><u><b>Select Page Region</b></u>
-	       	<ul>
-	      		<li>Confirm the text change for label 3) to <b>Select what should 
-			be returned</b>.
-	      		<li>Confirm presence of a radio button for <b>Return text</b>.
-	      		<li>Confirm presence of an associated combo box with <b>Include</b> 
-			and <b>Exclude</b>.
-	      		<li>Confirm presence of an associated combo box with <b>characters</b>, 
-			<b>words</b> and <b>lines</b>.
-	      		<li>Confirm presence of a radio button for <b>Re-OCR and return text</b>.
-	      		<li>Confirm presence of an associated edit box to define <b>the 
-			number of degrees of clockwise rotation</b>.
-	      		<li>Confirm presence of a radio button for <b>Return image region</b>.
-	      		<li>Confirm presence of an associated edit box for <b>the 
-			assigned text</b>.
+        <li><u><b>Select Page Region</b></u>
+        <ul>
+            <li>Confirm the text change for label 3) to <b>Select what should be returned</b>.</li>
+            <li>Confirm presence of a radio button for <b>Return text</b>.</li>
+            <li>Confirm presence of an associated combo box with <b>Include</b> and 
+            <b>Exclude</b>.</li>
+            <li>Confirm presence of an associated combo box with <b>characters</b>, <b>words</b>
+            and <b>lines</b>.</li>
+            <li>Confirm presence of a radio button for <b>Re-OCR and return text</b>.</li>
+            <li>Confirm presence of an associated edit box to define <b>the number of degrees of
+            clockwise rotation</b>.</li>
+            <li>Confirm presence of a radio button for <b>Return image region</b>.</li>
+            <li>Confirm presence of an associated edit box for <b>the assigned text</b>.</li>
 <p>
-	      		<li>Confirm that settings are persistent.
-	      		<li>Confirm that a previous version of <b>Select Page Region</b> 
-			that was saved without <b>OCR the included text</b> opens and 
-			is properly configured with <b>Return text</b> plus <b>Include 
-			characters</b>.
-	      		<li>Confirm that a previous version of <b>Select Page Region</b> 
-			that was saved with <b>OCR the included text</b> without rotation 
-			opens and is properly configured with <b>Re-OCR and return text</b> plus 
-			an empty rotation edit box.
-	      		<li>Confirm that a previous version of <b>Select Page Region</b> 
-			that was saved with <b>OCR the included text</b> with rotation 
-			opens and is properly configured with <b>Re-OCR and return text</b> plus 
-			the appropriate rotation setting.
+            <li>Confirm that settings are persistent.</li>
+            <li>Confirm that a previous version of <b>Select Page Region</b> that was saved without
+            <b>OCR the included text</b> opens and is properly configured with <b>Return text</b> 
+            plus <b>Include characters</b>.</li>
+            <li>Confirm that a previous version of <b>Select Page Region</b> that was saved with
+            <b>OCR the included text</b> without rotation opens and is properly configured with 
+            <b>Re-OCR and return text</b> plus an empty rotation edit box.</li>
+            <li>Confirm that a previous version of <b>Select Page Region</b> that was saved with
+            <b>OCR the included text</b> with rotation opens and is properly configured with 
+            <b>Re-OCR and return text</b> plus the appropriate rotation setting.</li>
 <p>
-	      		<li>Confirm proper behavior of a basic rule set
-			<ul>
-		      		<li>to <b>Return text</b> with inclusion of <b>characters</b>.
-		      		<li>to <b>Return text</b> with inclusion of <b>words</b>.
-		      		<li>to <b>Return text</b> with inclusion of <b>lines</b>.
-		      		<li>to <b>Return image region</b> with <b>assigned text</b>.
-		       	</ul>
-	      		<li>Confirm that this combination of rule object enhancements can 
-			successfully redact a fixed location on a document without any 
-			OCR operation.
-	       	</ul>
-	</ul>
+            <li>Confirm proper behavior of a basic rule set
+            <ul>
+                <li>to <b>Return text</b> with inclusion of <b>characters</b>.</li>
+                <li>to <b>Return text</b> with inclusion of <b>words</b>.</li>
+                <li>to <b>Return text</b> with inclusion of <b>lines</b>.</li>
+                <li>to <b>Return image region</b> with <b>assigned text</b>.</li>
+            </ul></li>
+            <li>Confirm that this combination of rule object enhancements can successfully redact a
+            fixed location on a document without any OCR operation.</li>
+        </ul></li>
+    </ul>
 <p>
-	<li><h2>ID Shield Statistics Reporter</h2>
-	<ul>
-      		<li><u><b>User Interface</b></u>
-	       	<ul>
-	      		<li>Confirm that the <b>ID Shield Statistics Reporter</b> includes 
-			tabs for <b>Feedback data</b>, <b>Analyze</b> and <b>Review</b>.
-	      		<li>Confirm that the <b>Feedback data</b> tab includes a group box 
-			for <b>File and folder options</b>.
-	      		<li>Confirm that the group box includes an edit box for <b>Select 
-			feedback data folder from which to analyze results</b>.
-			<li>Confirm that the edit box can be modified manually.
-			<li>Confirm that the group box includes a <b>...</b> (browse) 
-			button.
-			<li>Confirm that clicking the browse button displays a <b>Folder</b> 
-			browser dialog.
-			<li>Confirm that the folder selected in the dialog is displayed 
-			in the edit box.
-			<li>Confirm that cancelling the folder browser dialog retains 
-			the previous text in the edit box.
+    <li><h2>ID Shield Statistics Reporter</h2>
+    <ul>
+        <li><u><b>User Interface</b></u>
+        <ul>
+            <li>Confirm that the <b>ID Shield Statistics Reporter</b> includes tabs for <b>Feedback
+            data</b>, <b>Analyze</b> and <b>Review</b>.</li>
+            <li>Confirm that the <b>Feedback data</b> tab includes a group box for <b>File and
+            folder options</b>.</li>
+            <li>Confirm that the group box includes an edit box for <b>Select feedback data folder
+            from which to analyze results</b>.</li>
+            <li>Confirm that the edit box can be modified manually.</li>
+            <li>Confirm that the group box includes a <b>...</b> (browse) button.</li>
+            <li>Confirm that clicking the browse button displays a <b>Folder</b> browser 
+            dialog.</li>
+            <li>Confirm that the folder selected in the dialog is displayed in the edit box.</li>
+            <li>Confirm that cancelling the folder browser dialog retains the previous text in the
+            edit box.</li>
 <p>
-	      		<li>Confirm that the <b>Analyze</b> tab includes a group box 
-			for <b>Analysis options</b>.
-	      		<li>Confirm that the group box includes a combo box for <b>Select 
-			analysis type</b>.
-	      		<li>Confirm that the following combo box options are supported:
-			<ul>
-				<li>Automated redaction
-				<li>Hybrid
-				<li>Standard verification
-			</ul>
-	      		<li>Confirm that the group box includes a check box for <b>Limit 
-			data types to be tested to</b>.
-	      		<li>Confirm that the group box includes an associated edit box.
-	      		<li>Confirm that the group box includes the following <b>Redact 
-			the following in fully automated redaction mode</b> check boxes:
-			<ul>
-				<li>High confidence sensitive data
-				<li>Medium confidence sensitive data
-				<li>Low confidence sensitive data
-			</ul>
-	      		<li>Confirm that the check boxes are enabled only if Analysis 
-			Type is <b>Automated redaction</b> or <b>Hybrid</b>.
-	      		<li>Confirm that the group box includes an <b>Automated file 
-			selection condition...</b> button.
-			<li>Confirm that clicking the <b>Automated file selection 
-			condition...</b> button displays a <b>Configure ID Shield data 
-			file contents condition</b> dialog.
-			<li>Confirm that condition settings are persistent.
-	      		<li>Confirm that the group box includes an <b>Verification file 
-			selection condition...</b> button.
-			<li>Confirm that clicking the <b>Verification file selection 
-			condition...</b> button displays a <b>Configure ID Shield data 
-			file contents condition</b> dialog.
-			<li>Confirm that condition settings are persistent.
-	      		<li>Confirm that the <b>Analyze</b> tab includes an <b>Analyze</b> 
-			button.
-			<li>Confirm that an hourglass cursor is displayed while the 
-			analysis process is executing.
-	      		<li>Confirm that the <b>Analyze</b> tab includes a <b>Close</b> 
-			button.
-	      		<li>Confirm that the <b>Close</b> button closes the application.
+            <li>Confirm that the <b>Analyze</b> tab includes a group box for <b>Analysis 
+            options</b>.</li>
+            <li>Confirm that the group box includes a combo box for <b>Select analysis 
+            type</b>.</li>
+            <li>Confirm that the following combo box options are supported:
+            <ul>
+                <li>Automated redaction</li>
+                <li>Hybrid</li>
+                <li>Standard verification</li>
+            </ul></li>
+            <li>Confirm that the group box includes a check box for <b>Limit data types to be 
+            tested to</b>.</li>
+            <li>Confirm that the group box includes an associated edit box.</li>
+            <li>Confirm that the group box includes the following <b>Redact the following in fully
+            automated redaction mode</b> check boxes:
+            <ul>
+                <li>High confidence sensitive data</li>
+                <li>Medium confidence sensitive data</li>
+                <li>Low confidence sensitive data</li>
+            </ul></li>
+            <li>Confirm that the check boxes are enabled only if Analysis Type is <b>Automated
+            redaction</b> or <b>Hybrid</b>.</li>
+            <li>Confirm that the group box includes an <b>Automated file selection condition...</b>
+            button.</li>
+            <li>Confirm that clicking the <b>Automated file selection condition...</b> button
+            displays a <b>Configure ID Shield data file contents condition</b> dialog.</li>
+            <li>Confirm that condition settings are persistent.</li>
+            <li>Confirm that the group box includes an <b>Verification file selection 
+            condition...</b> button.</li>
+            <li>Confirm that clicking the <b>Verification file selection condition...</b> button
+            displays a <b>Configure ID Shield data file contents condition</b> dialog.</li>
+            <li>Confirm that condition settings are persistent.</li>
+            <li>Confirm that the <b>Analyze</b> tab includes an <b>Analyze</b> button.</li>
+            <li>Confirm that an hourglass cursor is displayed while the analysis process is 
+            executing.</li>
+            <li>Confirm that the <b>Analyze</b> tab includes a <b>Close</b> button.</li>
+            <li>Confirm that the <b>Close</b> button closes the application.</li>
 <p>
-	      		<li>Confirm that the <b>Review</b> tab includes a combo box 
-			for <b>Review analysis from</b>.
-	      		<li>Confirm that the combo box contains one entry for each 
-			previously executed analysis.
-	      		<li>Confirm that the analysis entries are separate folders under 
-			the previously defined feedback data folder.
-			<li>Confirm that the format of the folder names is <b>Analysis - 
-			MM-DD-YYYY - HH.MM.SS</b>.
-			<li>Confirm that the combo box entries have removed the 
-			<b>Analysis -</b> text.
-	      		<li>Confirm that the <b>Review</b> tab includes a 
-			<b>Statistics</b> tab.
-			<li>Confirm that the <b>Statistics</b> tab includes a multi-line 
-			edit box that includes the following information:
-			<ul>
-				<li>Number of files tested
-				<li>Number of pages tested
-				<li>Number of files containing sensitive data
-				<li>Number of pages containing sensitive data
-				<li>Number of sensitive data items
-				<li>Number of documents with overlapping sensitive data items
-				<li>Analysis type
-				<li>Manually review... (Standard or Hybrid only)
-				<li>Automatically redact... (Automated or Hybrid only)
-				<li>Default to redacting the following...
-                                <li>Number of sensitive data items redacted after processing
-                                <li>Number of false positives in redacted images (Automated or Hybrid only)
-                                <li>Ratio of correctly redacted items to false positives (Automated or Hybrid only)
-				<li>Automated redaction efficiency:
-				<ul>
-					<li>Number of automatically redacted files
-					<li>Number of sensitive data items in automatically redacted files
-					<li>Number of correct redactions
-					<li>Number of over-redactions
-					<li>Number of under-redactions
-					<li>Number of false positives
-					<li>Ratio of correctly redacted items to false positives
-				</ul>
-				<li><b>OR</b> Verification efficiency: (If standard work-flow is selected)
-				<ul>
-                                        <li>Number of files selected for review
-                                        <li>Number of correct redactions presented to reviewers
-                                        <li>Number of over-redactions presented to reviewers
-                                        <li>Number of under-redactions presented to reviewers
-                                        <li>Number of false positives presented to reviewers
-					<li>Ratio of correctly redacted items to false positives
-
-				</ul>
-				<li><b>OR</b> (If hybrid work-flow is selected) Verification efficiency:
-				<ul>
-                                        <li>Number of files selected for review
-                                        <li>Number of sensitive data items in files presented for review
-                                        <li>Number of correct redactions presented to reviewers
-                                        <li>Number of over-redactions presented to reviewers
-                                        <li>Number of under-redactions presented to reviewers
-                                        <li>Number of false positives presented to reviewers
-					<li>Ratio of correctly redacted items to false positives
-				</ul>
-				<li><b>AND</b> Automated redaction efficiency:
-				<ul>
-					<li>Number of automatically redacted files
-					<li>Number of sensitive data items in automatically redacted files
-					<li>Number of correct redactions
-					<li>Number of over-redactions
-					<li>Number of under-redactions
-					<li>Number of false positives
-					<li>Ratio of correctly redacted items to false positives
-				</ul>
-				<li>Counts of documents for each found document type
-			</ul>
-	      		<li>Confirm that the <b>Review</b> tab includes a 
-			<b>File lists</b> tab.
-			<li>Confirm that the <b>File lists</b> tab includes a <b>Select 
-			file list</b> combo box with the following choices:
-			<ul>
-				<li>Various DocType_*.txt
-                                <li>Files_AtLeastOneFalsePositive.txt
-                                <li>Files_AtLeastOneFoundRedaction.txt
-                                <li>Files_NoFoundRedactions.txt
-                                <li>InsensitiveFiles_All.txt
-                                <li>InsensitiveFiles_AutomaticallyRedacted.txt (Automated or Hybrid only)
-                                <li>InsensitiveFiles_SelectedForReview.txt (Standard or Hybrid only)
-                                <li>SensitiveFiles_All.txt
-                                <li>SensitiveFiles_AtLeastOneCorrectRedaction.txt
-                                <li>SensitiveFiles_AtLeastOneMissedRedaction.txt
-                                <li>SensitiveFiles_AtLeastOneOverRedaction.txt
-                                <li>SensitiveFiles_AtLeastOneUnderRedaction.txt
-                                <li>SensitiveFiles_AutomaticallyRedacted.txt (Automated or Hybrid only)
-                                <li>SensitiveFiles_NotSelectedForReview.txt (Standard or Hybrid only)
-                                <li>SensitiveFiles_NotSelectedForRedaction.txt (Automated only)
-                                <li>SensitiveFiles_SelectedForReview.txt (Standard or Hybrid only)
-			</ul>
-			<li>Confirm that the <b>File lists</b> tab includes a multi-line 
-			edit box for <b>Entries in selected file list</b>.
-			<li>Confirm that double-clicking on a line in the edit box 
-			displays the selected image in the <b>Image Viewer</b> plus 
-			the associated TestOutput VOA file in the <b>VOA Viewer</b>.
-	       	</ul>
+            <li>Confirm that the <b>Review</b> tab includes a combo box for <b>Review analysis 
+            from</b>.</li>
+            <li>Confirm that the combo box contains one entry for each previously executed 
+            analysis.</li>
+            <li>Confirm that the analysis entries are separate folders under the previously defined
+            feedback data folder.</li>
+            <li>Confirm that the format of the folder names is <b>Analysis - MM-DD-YYYY - 
+            HH.MM.SS</b>.</li>
+            <li>Confirm that the combo box entries have removed the <b>Analysis -</b> text.</li>
+            <li>Confirm that the <b>Review</b> tab includes a <b>Statistics</b> tab.</li>
+            <li>Confirm that the <b>Statistics</b> tab includes a multi-line edit box that includes
+            the following information:
+            <ul>
+                <li>Number of files tested</li>
+                <li>Number of pages tested</li>
+                <li>Number of files containing sensitive data</li>
+                <li>Number of pages containing sensitive data</li>
+                <li>Number of sensitive data items</li>
+                <li>Number of documents with overlapping sensitive data items</li>
+                <li>Analysis type</li>
+                <li>Manually review... (Standard or Hybrid only)</li>
+                <li>Automatically redact... (Automated or Hybrid only)</li>
+                <li>Default to redacting the following...</li>
+                <li>Number of sensitive data items redacted after processing</li>
+                <li>Number of false positives in redacted images (Automated or Hybrid only)</li>
+                <li>Ratio of correctly redacted items to false positives (Automated or Hybrid 
+                only)</li>
+                <li>Automated redaction efficiency:
+                <ul>
+                    <li>Number of automatically redacted files</li>
+                    <li>Number of sensitive data items in automatically redacted files</li>
+                    <li>Number of correct redactions</li>
+                    <li>Number of over-redactions</li>
+                    <li>Number of under-redactions</li>
+                    <li>Number of false positives</li>
+                    <li>Ratio of correctly redacted items to false positives</li>
+                </ul></li>
+                <li><b>OR</b> Verification efficiency: (If standard work-flow is selected)
+                <ul>
+                    <li>Number of files selected for review</li>
+                    <li>Number of correct redactions presented to reviewers</li>
+                    <li>Number of over-redactions presented to reviewers</li>
+                    <li>Number of under-redactions presented to reviewers</li>
+                    <li>Number of false positives presented to reviewers</li>
+                    <li>Ratio of correctly redacted items to false positives</li>
+                </ul></li>
+                <li><b>OR</b> (If hybrid work-flow is selected) Verification efficiency:
+                <ul>
+                    <li>Number of files selected for review</li>
+                    <li>Number of sensitive data items in files presented for review</li>
+                    <li>Number of correct redactions presented to reviewers</li>
+                    <li>Number of over-redactions presented to reviewers</li>
+                    <li>Number of under-redactions presented to reviewers</li>
+                    <li>Number of false positives presented to reviewers</li>
+                    <li>Ratio of correctly redacted items to false positives</li>
+                </ul></li>
+                <li><b>AND</b> Automated redaction efficiency:
+                <ul>
+                    <li>Number of automatically redacted files</li>
+                    <li>Number of sensitive data items in automatically redacted files</li>
+                    <li>Number of correct redactions</li>
+                    <li>Number of over-redactions</li>
+                    <li>Number of under-redactions</li>
+                    <li>Number of false positives</li>
+                    <li>Ratio of correctly redacted items to false positives</li>
+                </ul></li>
+                <li>Counts of documents for each found document type</li>
+            </ul></li>
+            <li>Confirm that the <b>Review</b> tab includes a <b>File lists</b> tab.</li>
+            <li>Confirm that the <b>File lists</b> tab includes a <b>Select file list</b> combo box
+            with the following choices:
+            <ul>
+                <li>Various DocType_*.txt</li>
+                <li>Files_AtLeastOneFalsePositive.txt</li>
+                <li>Files_AtLeastOneFoundRedaction.txt</li>
+                <li>Files_NoFoundRedactions.txt</li>
+                <li>InsensitiveFiles_All.txt</li>
+                <li>InsensitiveFiles_AutomaticallyRedacted.txt (Automated or Hybrid only)</li>
+                <li>InsensitiveFiles_SelectedForReview.txt (Standard or Hybrid only)</li>
+                <li>SensitiveFiles_All.txt</li>
+                <li>SensitiveFiles_AtLeastOneCorrectRedaction.txt</li>
+                <li>SensitiveFiles_AtLeastOneMissedRedaction.txt</li>
+                <li>SensitiveFiles_AtLeastOneOverRedaction.txt</li>
+                <li>SensitiveFiles_AtLeastOneUnderRedaction.txt</li>
+                <li>SensitiveFiles_AutomaticallyRedacted.txt (Automated or Hybrid only)</li>
+                <li>SensitiveFiles_NotSelectedForReview.txt (Standard or Hybrid only)</li>
+                <li>SensitiveFiles_NotSelectedForRedaction.txt (Automated only)</li>
+                <li>SensitiveFiles_SelectedForReview.txt (Standard or Hybrid only)</li>
+            </ul></li>
+            <li>Confirm that the <b>File lists</b> tab includes a multi-line edit box for 
+            <b>Entries in selected file list</b>.</li>
+            <li>Confirm that double-clicking on a line in the edit box displays the selected image
+            in the <b>Image Viewer</b> plus the associated TestOutput VOA file in the <b>VOA 
+            Viewer</b>.</li>
+        </ul></li>
 <p>
-  	   	<LI><b>Miscellaneous</b>
-	       	<ul>
-	  	   	<LI><b>[FlexIDSCore #3752, #3796, #3797, #3798, #3904, #3910, #3912, 
-			#3959, #3980]</b> ID Shield Statistics Reporter
-	       		<ul>
-		  	   	<LI>Confirm that a <b>complete and correct</b> set of statistics 
-				is provided for hybrid processing in one pass.
-				<li>Check that the output closely matches the external statistics 
-				template.
-				<li>Confirm that the output statistics files use the standard 
-				<b>\r\n</b> characters as line separators.
-				<li>Confirm that the <b>Configure automated condition</b> dialog 
-				displays more than one at a time of { only, any, none } when the 
-				combo box drops down.
-				<li>Confirm that the <b>Configure verification condition</b> dialog 
-				displays more than one at a time of { only, any, none } when the 
-				combo box drops down.
-				<li>Confirm that the label for <b>Number of automated redactions</b> is 
-				clear for both automated and overall statistics.
-				<li>Confirm that the <b>Summary statistics</b> file reports the 
-				<b>DocTypesToVerify</b> setting when specified.
-				<li>Confirm that the <b>Summary statistics</b> file reports the 
-				<b>DocTypesToRedact</b> setting when specified.
-				<li>Confirm that IDSSR honors the <b>DocTypesToRedact</b> setting.
-				<li>Confirm that IDSSR allows limiting by single <b>type</b> without 
-				an error.
-				<li>Confirm that IDSSR allows limiting by multiple <b>types</b> 
-				without an error.
-				<li>Confirm that IDSSR reports the <b>number of pages processed</b>.
-				<li>Confirm that IDSSR reports the <b>number of pages with expected 
-				redactions</b>.
-	       		</ul>
+        <LI><b>Miscellaneous</b>
+        <ul>
+            <LI><b>[FlexIDSCore #3752, #3796, #3797, #3798, #3904, #3910, #3912, #3959, #3980]</b>
+            ID Shield Statistics Reporter
+            <ul>
+                <LI>Confirm that a <b>complete and correct</b> set of statistics is provided for
+                hybrid processing in one pass.</li>
+                <li>Check that the output closely matches the external statistics template.</li>
+                <li>Confirm that the output statistics files use the standard <b>\r\n</b> 
+                characters as line separators.</li>
+                <li>Confirm that the <b>Configure automated condition</b> dialog displays more than
+                one at a time of { only, any, none } when the combo box drops down.</li>
+                <li>Confirm that the <b>Configure verification condition</b> dialog displays more 
+                than one at a time of { only, any, none } when the combo box drops down.</li>
+                <li>Confirm that the label for <b>Number of automated redactions</b> is clear for 
+                both automated and overall statistics.</li>
+                <li>Confirm that the <b>Summary statistics</b> file reports the 
+                <b>DocTypesToVerify</b> setting when specified.</li>
+                <li>Confirm that the <b>Summary statistics</b> file reports the 
+                <b>DocTypesToRedact</b> setting when specified.</li>
+                <li>Confirm that IDSSR honors the <b>DocTypesToRedact</b> setting.</li>
+                <li>Confirm that IDSSR allows limiting by single <b>type</b> without an error.</li>
+                <li>Confirm that IDSSR allows limiting by multiple <b>types</b> without an 
+                error.</li>
+                <li>Confirm that IDSSR reports the <b>number of pages processed</b>.</li>
+                <li>Confirm that IDSSR reports the <b>number of pages with expected 
+                redactions</b>.</li>
+            </ul></li>
 <p>
-	  	   	<LI><b>[FlexIDSCore #3894]</b> Confirm that an <b>ID Shield Client</b> 
-			license is sufficient to run the utility.
+            <LI><b>[FlexIDSCore #3894]</b> Confirm that an <b>ID Shield Client</b> license is 
+            sufficient to run the utility.</li>
 <p>
-	  	   	<LI><b>[FlexIDSCore #3907, #3909, #3911, #3913]</b> ID Shield Statistics Reporter
-		       	<ul>
-				<li>Exercise verification on a set of images.
-				<li>Evaluate the results using IDSSR for standard analysis, automated 
-				analysis and hybrid analysis.
-		  	   	<LI>Confirm that the results are appropriate for the document set.
-				<li>Confirm that the <b>TCL</b> file created in the temp directory 
-				to be used by IDSSR also runs in the <b>Test Harness</b>.
-				<li>Confirm that the combo box entries in the IDSSR Review tab 
-				include only dates and times, not a preceding <b>Analysis -</b>.
+            <LI><b>[FlexIDSCore #3907, #3909, #3911, #3913]</b> ID Shield Statistics Reporter
+            <ul>
+                <li>Exercise verification on a set of images.</li>
+                <li>Evaluate the results using IDSSR for standard analysis, automated analysis and
+                hybrid analysis.</li>
+                <LI>Confirm that the results are appropriate for the document set.</li>
+                <li>Confirm that the <b>TCL</b> file created in the temp directory to be used by
+                IDSSR also runs in the <b>Test Harness</b>.</li>
+                <li>Confirm that the combo box entries in the IDSSR Review tab include only dates
+                and times, not a preceding <b>Analysis -</b>.</li>
 <p>
-				<li>Open a file list (with 5 or fewer entries) in the IDSSR Review tab.
-				<li>Confirm that whitespace is present in the <b>Entries ...</b> 
-				list box.
-				<li>Double-click in the whitespace.
-				<li>Confirm that no error is seen.
-	       		</ul>
+                <li>Open a file list (with 5 or fewer entries) in the IDSSR Review tab.</li>
+                <li>Confirm that whitespace is present in the <b>Entries ...</b> list box.</li>
+                <li>Double-click in the whitespace.</li>
+                <li>Confirm that no error is seen.</li>
+            </ul></li>
 <p>
-	  	   	<LI><b>[FlexIDSCore #3908, #3978, #4012, #4048, #4131, #4140]</b> ID Shield 
-			Statistics Reporter
-	       		<ul>
-				<li>Confirm that the application opens properly after a clean installation.
-				<li>Confirm that <b>ID Shield Statistics Reporter</b> has a non-trivial icon.
-		  	   	<LI>Confirm that the default data types for the <b>Verification condition</b> 
-				include HCData, MCData, LCData and Clues.
-				<li>Confirm that an output file is now created listing the images with 
-				overlapping expected redactions.
-				<li>Configure the verification condition to include some of the pre-defined 
-				data types.
-				<li>Reopen the property page and unselect the data type check boxes.  Leave 
-				the <b>ID Shield data file</b> check box checked.
-				<li>Click OK and close the exception.
-				<li>Cancel the changes and reopen the configuration page.
-				<li>Confirm that the originally selected data types are checked.
-		       	</ul>
+            <LI><b>[FlexIDSCore #3908, #3978, #4012, #4048, #4131, #4140]</b> ID Shield Statistics
+            Reporter
+            <ul>
+                <li>Confirm that the application opens properly after a clean installation.</li>
+                <li>Confirm that <b>ID Shield Statistics Reporter</b> has a non-trivial icon.</li>
+                <LI>Confirm that the default data types for the <b>Verification condition</b>
+                include HCData, MCData, LCData and Clues.</li>
+                <li>Confirm that an output file is now created listing the images with overlapping
+                expected redactions.</li>
+                <li>Configure the verification condition to include some of the pre-defined data
+                types.</li>
+                <li>Reopen the property page and unselect the data type check boxes.  Leave the
+                <b>ID Shield data file</b> check box checked.</li>
+                <li>Click OK and close the exception.</li>
+                <li>Cancel the changes and reopen the configuration page.</li>
+                <li>Confirm that the originally selected data types are checked.</li>
+            </ul></li>
 <p>
-			<li><b>[FlexIDSCore #4016]</b> Confirm that the window size and location are 
-			persisted.
+            <li><b>[FlexIDSCore #4016]</b> Confirm that the window size and location are 
+            persisted.</li>
 <p>
-	  	   	<LI><b>[FlexIDSCore #4015, #4017, #4018, #4022, #4023, #4036, #4047, #4054, #4055, 
-			#4056, #4057, #4058, #4060, #4065, LegacyRC #5735]</b> ID Shield Statistics Reporter
-	       		<ul>
-	  	   		<LI>Confirm that the <b>ID Shield Statistics Reporter</b> window is 
-				resizeable.
-				<li>Confirm that the <b>Advanced Options</b> dialog is not resizeable.
-				<li>Confirm that the feedback folder is persisted.
-				<li>Confirm that unclassified documents are presented as <b>Unknown</b>.
-				<li>Confirm that <b>TypesToBeTested</b> accepts the following delimiters
-				<ul>
-					<li>Commas
-					<li>Pipe characters
-				</ul>
-				<li>Confirm that the <b>source VOA file</b> is indicated in the 
-				attribute type
-				<ul>
-					<li><b>Expected</b> - Misses and Correct
-					<li><b>Found</b> - Over-redactions, Under-redactions and 
-					False positives
-				</ul>
-				<li>Confirm that a single found redaction is not counted as both an 
-				over-redaction and an under-redaction for the same expected attribute. 
-				<li>Confirm that the final results label is: <b>Final results of 
-				above workflow</b>.
-				<li>Confirm that a <b>Document type distribution</b> section header is 
-				provided.
-				<li>Confirm that the statistics no longer include specific counts for 
-				<b>missed</b> redactions.
-				<li>Confirm that the <b>Detailed workflow statistic</b> section always 
-				outputs the same statistics, regardless of workflow.
-				<li>Confirm that the <b>Summary statistics</b> file reports the number of 
-				<b>sensitive data items</b>.
-				<li>Confirm that the following statistics are reported for a single 
-				sensitive data item
-				<ul>
-					<li>1 redaction, too large = 1 correct, 1over-redaction
-					<li>2 redactions, 1 too large = 1 correct, 1 over-redaction
-					<li>2 redactions, both too large = 1 correct, 2 over-redactions
-					<li>2 redactions, both correct = 1 correct
-					<li>2 redactions, 1 too little = 1 correct, 1 under-redaction
-				</ul>
-				<li>Confirm that the following statistics are reported for a page with 
-				two sensitive data items and one redaction covering the entire page
-				<ul>
-					<li>2 correct, 2 over-redactions
-				</ul>
+            <LI><b>[FlexIDSCore #4015, #4017, #4018, #4022, #4023, #4036, #4047, #4054, #4055, 
+            #4056, #4057, #4058, #4060, #4065, LegacyRC #5735]</b> ID Shield Statistics Reporter
+            <ul>
+                <LI>Confirm that the <b>ID Shield Statistics Reporter</b> window is 
+                resizeable.</li>
+                <li>Confirm that the <b>Advanced Options</b> dialog is not resizeable.</li>
+                <li>Confirm that the feedback folder is persisted.</li>
+                <li>Confirm that unclassified documents are presented as <b>Unknown</b>.</li>
+                <li>Confirm that <b>TypesToBeTested</b> accepts the following delimiters:
+                <ul>
+                    <li>Commas</li>
+                    <li>Pipe characters</li>
+                </ul></li>
+                <li>Confirm that the <b>source VOA file</b> is indicated in the attribute type
+                <ul>
+                    <li><b>Expected</b> - Misses and Correct</li>
+                    <li><b>Found</b> - Over-redactions, Under-redactions and False positives</li>
+                </ul></li>
+                <li>Confirm that a single found redaction is not counted as both an over-redaction
+                and an under-redaction for the same expected attribute. </li>
+                <li>Confirm that the final results label is: <b>Final results of above 
+                workflow</b>.</li>
+                <li>Confirm that a <b>Document type distribution</b> section header is 
+                provided.</li>
+                <li>Confirm that the statistics no longer include specific counts for <b>missed</b>
+                redactions.</li>
+                <li>Confirm that the <b>Detailed workflow statistic</b> section always outputs the
+                same statistics, regardless of workflow.</li>
+                <li>Confirm that the <b>Summary statistics</b> file reports the number of 
+                <b>sensitive data items</b>.</li>
+                <li>Confirm that the following statistics are reported for a single sensitive data
+                item:
+                <ul>
+                    <li>1 redaction, too large = 1 correct, 1over-redaction</li>
+                    <li>2 redactions, 1 too large = 1 correct, 1 over-redaction</li>
+                    <li>2 redactions, both too large = 1 correct, 2 over-redactions</li>
+                    <li>2 redactions, both correct = 1 correct</li>
+                    <li>2 redactions, 1 too little = 1 correct, 1 under-redaction</li>
+                </ul></li>
+                <li>Confirm that the following statistics are reported for a page with two 
+                sensitive data items and one redaction covering the entire page:
+                <ul>
+                    <li>2 correct, 2 over-redactions</li>
+                </ul></li>
 <p>
-				<li>Prepare several thousand files for processing.
-				<li>Configure <b>IDSSR</b> incorrectly so that an error is generated for 
-				each test.  One example is to look for a non-existent VOA file.
-				<li>Exercise <b>IDSSR</b>.
-				<li>Confirm that the <b>FailedTestCases.uex</b> file fills up and is 
-				properly renamed as expected.  <b>ELI14818</b> is expected to be 
-				included at the end of each full UEX file.
-		       	</ul>
-	       	</ul>
-	</ul>
+                <li>Prepare several thousand files for processing.</li>
+                <li>Configure <b>IDSSR</b> incorrectly so that an error is generated for each test.
+                One example is to look for a non-existent VOA file.</li>
+                <li>Exercise <b>IDSSR</b>.</li>
+                <li>Confirm that the <b>FailedTestCases.uex</b> file fills up and is properly 
+                renamed as expected.  <b>ELI14818</b> is expected to be included at the end of each
+                full UEX file.</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
 <p>
-	<li><h2>Find And Redact Text Or Regular Expression</h2>
-	<ul>
-      		<li><u>User Interface</u>
-		<ul>
-			<li>Confirm that a <b>Find or redact</b> button is available 
-			on the image window toolbar.
-			<li>Confirm that clicking the <b>Find or redact</b> button 
-			displays a <b>Find or redact text</b> dialog.
-			<li>Confirm that <b>Ctrl+F</b> displays a <b>Find or redact 
-			text</b> dialog.
-			<li>Confirm that a multi-line edit box is provided for 
-			<b>Words/patterns (one per line)</b>.
-			<li>Confirm that the edit box has initial focus.
-			<li>Confirm that the edit box is empty.
-			<li>Confirm that checkboxes are included for: <b>Match case</b>
-			and <b>Treat as regular expressions</b>.
-			<li>Confirm that a help link label next to the <b>Treat as regular 
-			expressions</b> checkbox is provided.
-			<li>Confirm that the checkboxes are <b>unchecked</b>.
-			<li>Confirm that buttons are provided next to the edit box for 
-			<b>Import...</b> and <b>Export...</b>.
-			<li>Confirm that buttons are provided below the checkboxes for 
-			<b>Reset search</b>, <b>Find next</b>, <b>Redact</b>, <b>Redact 
-			all</b>, and <b>Close</b>.
-			<li>Confirm that a <b>Results</b> grid is provided.
-			<li>Confirm that a status bar is provided.
-			<li>Confirm that tab order is correct.
-			<li>Confirm that only the <b>Import...</b> and <b>Close</b> 
-			buttons are enabled.
-			<li>Confirm that the <b>Close</b> button closes the dialog.
-			<li>Confirm that after closing the dialog, focus returns to the 
-			verification window.
-			<li>Reopen the dialog.
-			<li>Add a word or pattern to the edit box.
-			<li>Confirm that the <b>Export...</b>, <b>Find next</b> and 
-			<b>Redact all</b> buttons are also enabled.
-			<li>Confirm that tab order is still correct.
-			<li>Close and reopen the dialog.
-			<li>Confirm that the same word or pattern is present in the edit box.
-			<li>Modify the checkbox settings.
-			<li>Add additional lines of text to fill up the edit box.
-			<li>Confirm that a horizontal scroll bar is displayed when needed.
-			<li>Confirm that a vertical scroll bar is displayed when needed.
-			<li>Close and reopen the <b>Find and redact text</b> dialog.
-			<li>Confirm that the edit box contents are retained.
-			<li>Confirm that the checkbox settings are retained.
-			<li>Stop processing and close <b>File Action Manager</b>.
-			<li>Reopen the FAM and start processing.
-			<li>Reopen the <b>Find and redact text</b> dialog.
-			<li>Confirm that the edit box is empty.
-			<li>Confirm that the <b>Export...</b> button is disabled.
-			<li>Add several entries to the edit box.
-			<li>Confirm that the <b>Export...</b> button is enabled.
-			<li>Confirm that the entries can be <b>exported</b> to a text file.
-			<li>Confirm that the entries can be <b>exported</b> to a file with 
-			a non-TXT file extension.
-			<li>Confirm that Export... defaults to <b>TXT</b> file extension.
-			<li>Stop processing and close the FAM.
-			<li>Reopen the FAM and start processing.
-			<li>Reopen the <b>Find and redact text</b> dialog.
-			<li>Confirm that <b>Import...</b> defaults to <b>TXT</b> file 
-			extension.
-			<li>Confirm that the previously saved entries can be <b>imported</b> 
-			from the text file.
-			<li>Delete an entry and export the remaining items to the same 
-			text file.
-			<li>Confirm that a confirmation dialog is presented before file 
-			contents are overwritten.
-			<li>Confirm that the new contents were saved to the text file.
-		</ul>
+    <li><h2>Find And Redact Text Or Regular Expression</h2>
+    <ul>
+        <li><u>User Interface</u>
+        <ul>
+            <li>Confirm that a <b>Find or redact</b> button is available on the image window 
+            toolbar.</li>
+            <li>Confirm that clicking the <b>Find or redact</b> button displays a <b>Find or redact
+            text</b> dialog.</li>
+            <li>Confirm that <b>Ctrl+F</b> displays a <b>Find or redact text</b> dialog.</li>
+            <li>Confirm that a multi-line edit box is provided for <b>Words/patterns (one per 
+            line)</b>.</li>
+            <li>Confirm that the edit box has initial focus.</li>
+            <li>Confirm that the edit box is empty.</li>
+            <li>Confirm that checkboxes are included for: <b>Match case</b> and <b>Treat as regular
+            expressions</b>.</li>
+            <li>Confirm that a help link label next to the <b>Treat as regular expressions</b>
+            checkbox is provided.</li>
+            <li>Confirm that the checkboxes are <b>unchecked</b>.</li>
+            <li>Confirm that buttons are provided next to the edit box for <b>Import...</b> and 
+            <b>Export...</b>.</li>
+            <li>Confirm that buttons are provided below the checkboxes for <b>Reset search</b>, 
+            <b>Find next</b>, <b>Redact</b>, <b>Redact all</b>, and <b>Close</b>.</li>
+            <li>Confirm that a <b>Results</b> grid is provided.</li>
+            <li>Confirm that a status bar is provided.</li>
+            <li>Confirm that tab order is correct.</li>
+            <li>Confirm that only the <b>Import...</b> and <b>Close</b> buttons are enabled.</li>
+            <li>Confirm that the <b>Close</b> button closes the dialog.</li>
+            <li>Confirm that after closing the dialog, focus returns to the verification 
+            window.</li>
+            <li>Reopen the dialog.</li>
+            <li>Add a word or pattern to the edit box.</li>
+            <li>Confirm that the <b>Export...</b>, <b>Find next</b> and <b>Redact all</b> buttons
+            are also enabled.</li>
+            <li>Confirm that tab order is still correct.</li>
+            <li>Close and reopen the dialog.</li>
+            <li>Confirm that the same word or pattern is present in the edit box.</li>
+            <li>Modify the checkbox settings.</li>
+            <li>Add additional lines of text to fill up the edit box.</li>
+            <li>Confirm that a horizontal scroll bar is displayed when needed.</li>
+            <li>Confirm that a vertical scroll bar is displayed when needed.</li>
+            <li>Close and reopen the <b>Find and redact text</b> dialog.</li>
+            <li>Confirm that the edit box contents are retained.</li>
+            <li>Confirm that the checkbox settings are retained.</li>
+            <li>Stop processing and close <b>File Action Manager</b>.</li>
+            <li>Reopen the FAM and start processing.</li>
+            <li>Reopen the <b>Find and redact text</b> dialog.</li>
+            <li>Confirm that the edit box is empty.</li>
+            <li>Confirm that the <b>Export...</b> button is disabled.</li>
+            <li>Add several entries to the edit box.</li>
+            <li>Confirm that the <b>Export...</b> button is enabled.</li>
+            <li>Confirm that the entries can be <b>exported</b> to a text file.</li>
+            <li>Confirm that the entries can be <b>exported</b> to a file with a non-TXT file 
+            extension.</li>
+            <li>Confirm that Export... defaults to <b>TXT</b> file extension.</li>
+            <li>Stop processing and close the FAM.</li>
+            <li>Reopen the FAM and start processing.</li>
+            <li>Reopen the <b>Find and redact text</b> dialog.</li>
+            <li>Confirm that <b>Import...</b> defaults to <b>TXT</b> file extension.</li>
+            <li>Confirm that the previously saved entries can be <b>imported</b> from the text 
+            file.</li>
+            <li>Delete an entry and export the remaining items to the same text file.</li>
+            <li>Confirm that a confirmation dialog is presented before file contents are 
+            overwritten.</li>
+            <li>Confirm that the new contents were saved to the text file.</li>
+        </ul></li>
 <p>
-      		<li><u>Functionality</u>
-		<ul>
-			<li>Prepare the <b>Demo_IDShield</b> images for verification.
-			<li>Verify <b>TestImage001.tif</b>.
-			<li>Open the <b>Find and redact text</b> dialog.
-			<li>Add separate entries for <b>Jane</b> and <b>The</b>.
-			<li>Click the <b>Find next</b> button.
-			<li>Confirm that the list box, check boxes and the Import/Export 
-			buttons are disabled.
-			<li>Confirm that the word <b>THE</b> has a dotted line highlight.
-			<li>Confirm that the <b>Results</b> grid notes 17 matches.
-			<li>Confirm that the status bar includes <b>Displaying match 1 
-			of 17</b>.
-			<li>Click the <b>Redact</b> button.
-			<li>Confirm that the highlight changes to a redaction and that 
-			the word <b>JANE</b> is now highlighted.
-			<li><b>[FlexIDSCore #3960]</b> Confirm that a new entry has appeared 
-			in the Grid view with <b>THE</b> as Text.
-			<li>Click the <b>Redact</b> button.
-			<li>Confirm that the highlight changes to a redaction and that 
-			the word <b>the</b> is now highlighted.
-			<li>Confirm that a new entry has appeared in the Grid view with 
-			<b>JANE</b> as Text.
-			<li>Click the <b>Find next</b> button repeatedly.
-			<li>Confirm that the highlight changes appropriately.
-			<li>Confirm that the status bar text changes appropriately.
+        <li><u>Functionality</u>
+        <ul>
+            <li>Prepare the <b>Demo_IDShield</b> images for verification.</li>
+            <li>Verify <b>TestImage001.tif</b>.</li>
+            <li>Open the <b>Find and redact text</b> dialog.</li>
+            <li>Add separate entries for <b>Jane</b> and <b>The</b>.</li>
+            <li>Click the <b>Find next</b> button.</li>
+            <li>Confirm that the list box, check boxes and the Import/Export buttons are 
+            disabled.</li>
+            <li>Confirm that the word <b>THE</b> has a dotted line highlight.</li>
+            <li>Confirm that the <b>Results</b> grid notes 17 matches.</li>
+            <li>Confirm that the status bar includes <b>Displaying match 1 of 17</b>.</li>
+            <li>Click the <b>Redact</b> button.</li>
+            <li>Confirm that the highlight changes to a redaction and that the word <b>JANE</b> is
+            now highlighted.</li>
+            <li><b>[FlexIDSCore #3960]</b> Confirm that a new entry has appeared in the Grid view
+            with <b>THE</b> as Text.</li>
+            <li>Click the <b>Redact</b> button.</li>
+            <li>Confirm that the highlight changes to a redaction and that the word <b>the</b> is
+            now highlighted.</li>
+            <li>Confirm that a new entry has appeared in the Grid view with <b>JANE</b> as 
+            Text.</li>
+            <li>Click the <b>Find next</b> button repeatedly.</li>
+            <li>Confirm that the highlight changes appropriately.</li>
+            <li>Confirm that the status bar text changes appropriately.</li>
 <p>
-			<li>Click the <b>Reset search</b> button.
-			<li>Confirm that the dotted-line highlight disappears and that 
-			the status bar text is cleared.
-			<li>Confirm that the list box, check boxes and the Import/Export 
-			buttons are enabled.
-			<li>Confirm that list box contents are retained.
-			<li>Confirm that each found item that was <b>Redact</b>ed is 
-			still present in both the grid view and the image window.
-			<li>Remove <b>the</b> from the list box and click the <b>Find 
-			next</b> button.
-			<li>Confirm that no dotted-line highlight is displayed since 
-			the first <b>JANE</b> text is still a redaction.
-			<li>Click the <b>Redact all</b> button.
-			<li><b>[FlexIDSCore #3956]</b> Confirm that <b>one</b> additional 
-			redaction is added since only one more <b>Jane</b> text string is 
-			present in the document.
-			<li>Click the <b>Redact all</b> button again.
-			<li><b>[FlexIDSCore #3956]</b> Confirm that <b>no</b> additional 
-			redactions are added since no more unredacted <b>Jane</b> strings 
-			are present in the document.
+            <li>Click the <b>Reset search</b> button.</li>
+            <li>Confirm that the dotted-line highlight disappears and that the status bar text is
+            cleared.</li>
+            <li>Confirm that the list box, check boxes and the Import/Export buttons are 
+            enabled.</li>
+            <li>Confirm that list box contents are retained.</li>
+            <li>Confirm that each found item that was <b>Redact</b>ed is still present in both the
+            grid view and the image window.</li>
+            <li>Remove <b>the</b> from the list box and click the <b>Find next</b> button.</li>
+            <li>Confirm that no dotted-line highlight is displayed since the first <b>JANE</b> text
+            is still a redaction.</li>
+            <li>Click the <b>Redact all</b> button.</li>
+            <li><b>[FlexIDSCore #3956]</b> Confirm that <b>one</b> additional redaction is added
+            since only one more <b>Jane</b> text string is present in the document.</li>
+            <li>Click the <b>Redact all</b> button again.</li>
+            <li><b>[FlexIDSCore #3956]</b> Confirm that <b>no</b> additional redactions are added
+            since no more unredacted <b>Jane</b> strings are present in the document.</li>
 <p>
-			<li>Click the <b>Reset search</b> button.
-			<li>Change the search to look for <b>The</b>.
-			<li>Click the <b>Find next</b> button and confirm that <b>15</b> 
-			matches are found.
-			<li>Click the <b>Reset search</b> button and then check the 
-			<b>Match case</b> button.
-			<li>Click the <b>Find next</b> button and confirm that <b>1</b> 
-			match is correctly found.
+            <li>Click the <b>Reset search</b> button.</li>
+            <li>Change the search to look for <b>The</b>.</li>
+            <li>Click the <b>Find next</b> button and confirm that <b>15</b> matches are 
+            found.</li>
+            <li>Click the <b>Reset search</b> button and then check the <b>Match case</b> 
+            button.</li>
+            <li>Click the <b>Find next</b> button and confirm that <b>1</b> match is correctly 
+            found.</li>
 <p>
-			<li>Click the <b>Reset search</b> button.
-			<li>Uncheck the <b>Match case</b> button.
-			<li>Change the search to look for <b>1{3,}</b>.
-			<li>Click the <b>Find next</b> button.
-			<li>Confirm that a <b>No matches found!</b> message is displayed.
-			<li>Check the <b>Treat as regular expressions</b> button.
-			<li>Click the <b>Find next</b> button.
-			<li>Click the <b>Find next</b> button and confirm that <b>1</b> 
-			match is correctly found.
-			<li>Click the <b>Redact</b> button.
-			<li>Confirm that the appropriate entry is added to the grid view.
-			<li>Confirm that the dotted-line highlight changes to a redaction.
-		</ul>
+            <li>Click the <b>Reset search</b> button.</li>
+            <li>Uncheck the <b>Match case</b> button.</li>
+            <li>Change the search to look for <b>1{3,}</b>.</li>
+            <li>Click the <b>Find next</b> button.</li>
+            <li>Confirm that a <b>No matches found!</b> message is displayed.</li>
+            <li>Check the <b>Treat as regular expressions</b> button.</li>
+            <li>Click the <b>Find next</b> button.</li>
+            <li>Click the <b>Find next</b> button and confirm that <b>1</b> match is correctly 
+            found.</li>
+            <li>Click the <b>Redact</b> button.</li>
+            <li>Confirm that the appropriate entry is added to the grid view.</li>
+            <li>Confirm that the dotted-line highlight changes to a redaction.</li>
+        </ul></li>
 <p>
-      		<li><u>Miscellaneous</u>
-		<ul>
-			<li>Confirm that an <b>ID Shield Client</b> license is sufficient.
-			<li><b>[FlexIDSCore #3955]</b> Message if USS file not available
-			<ul>
-				<li>Verify an image that does not have a corresponding USS 
-				file.
-				<li>Click the <b>Find and redact text</b> toolbar button.
-				<li>Confirm that a meaningful message is presented 
-				about how find or redact cannot be used without OCR data.
-				<li>Click the <b>Edit - Find or redact...</b> menu item.
-				<li>Confirm that a meaningful message is presented 
-				about how find or redact cannot be used without OCR data.
-			</ul>
+        <li><u>Miscellaneous</u>
+        <ul>
+            <li>Confirm that an <b>ID Shield Client</b> license is sufficient.</li>
+            <li><b>[FlexIDSCore #3955]</b> Message if USS file not available
+            <ul>
+                <li>Verify an image that does not have a corresponding USS file.</li>
+                <li>Click the <b>Find and redact text</b> toolbar button.</li>
+                <li>Confirm that a meaningful message is presented about how find or redact cannot
+                be used without OCR data.</li>
+                <li>Click the <b>Edit - Find or redact...</b> menu item.</li>
+                <li>Confirm that a meaningful message is presented about how find or redact cannot
+                be used without OCR data.</li>
+            </ul></li>
 <p>
-			<li><b>[FlexIDSCore #4002]</b> Prompt for non-redact
-			<ul>
-				<li>Verify a document.
-				<li>Confirm that the page already contains at least one redaction.
-				<li>Select the redaction.
-				<li>Press <b>Ctrl+F</b> and use the Find or Redact feature to find some 
-				text.
-				<li>Click <b>Find next</b>.
-				<li>Confirm that no confirmation message is presented about wanting to 
-				unredact the selected item.
-			</ul>
+            <li><b>[FlexIDSCore #4002]</b> Prompt for non-redact
+            <ul>
+                <li>Verify a document.</li>
+                <li>Confirm that the page already contains at least one redaction.</li>
+                <li>Select the redaction.</li>
+                <li>Press <b>Ctrl+F</b> and use the Find or Redact feature to find some text.</li>
+                <li>Click <b>Find next</b>.</li>
+                <li>Confirm that no confirmation message is presented about wanting to unredact the
+                selected item.</li>
+            </ul></li>
 <p>
-			<li><b>[FlexIDSCore #4020]</b> Window focus after failed search
-			<ul>
-				<li>Verify a document.
-				<li>Press <b>Ctrl+F</b> and use the Find or Redact feature to search 
-				for some text that will not be found.
-				<li>Click <b>Close</b>.
-				<li>Confirm that focus returns to the verification window.
-			</ul>
+            <li><b>[FlexIDSCore #4020]</b> Window focus after failed search
+            <ul>
+                <li>Verify a document.</li>
+                <li>Press <b>Ctrl+F</b> and use the Find or Redact feature to search for some text
+                that will not be found.</li>
+                <li>Click <b>Close</b>.</li>
+                <li>Confirm that focus returns to the verification window.</li>
+            </ul></li>
 <p>
-	  	   	<LI><b>[FlexIDSCore #4129]</b> Confirm that the redacted areas from <b>Find or 
-			redact text</b> are no larger than necessary to cover the found text.
+            <LI><b>[FlexIDSCore #4129]</b> Confirm that the redacted areas from <b>Find or redact
+            text</b> are no larger than necessary to cover the found text.</li>
 <p>
-	  	   	<LI><b>[FlexIDSCore #4143]</b> Confirm that closing the <b>Find or redact text</b> 
-			window returns focus to the verification UI.
-		</ul>
-	</ul>
+            <LI><b>[FlexIDSCore #4143]</b> Confirm that closing the <b>Find or redact text</b> 
+            window returns focus to the verification UI.</li>
 <p>
-	<li><h2>Printing Viewable Area During Verification</h2>
-	<ul>
-		<li><u>User Interface</u>
-		<ul>
-			<li>Verify an image.
-	      		<li>Confirm that a <b>Print view...</b> item is present in the 
-			<b>File</b> menu.
-			<li>Confirm that a toolbar button <b>is not</b> provided.
-			<li>Confirm that selecting <b>File - Print view...</b> displays 
-			a Print dialog
-			<ul>
-				<li>Confirm that the normal options are available in the 
-				<b>Select Printer</b> group box.
-				<li>Confirm that the only <b>Page Range</b> option is 
-				<b>All</b>.
-				<li>Confirm that the <b>Number of copies</b> can be 
-				selected and ddefaults to <b>1</b>.
-			</ul>
-		</ul>
+            <li><b>[FlexIDSCore #4283]</b> Verification
+            <!-- fixed v 8.1.0.46 -->
+            <ul>
+                <li>Open the Find or redact text dialog in ID Shield verification.</li>
+                <li>Enter a search that will cause an exception (e.g., a single backslash with 
+                regex search enabled).</li>
+                <li>Hit the Find next button.</li>
+                <li>Dismiss the error.</li>
+                <li>Confirm that the search term edit box is enabled.</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
 <p>
-		<li><u>Functionality</u>
-		<ul>
-			<li>Verify an image with fit mode set to <b>Fit-To-Page</b>.
-			<li>Modify the width of the <b>Data window</b> so that some of 
-			the viewing area is wasted.
-			<li>Confirm that the entire page is printed without wasting space.
-			<li>Zoom in to a portion of the image.
-			<li>Confirm that the exact viewing area is printed.
+    <li><h2>Printing Viewable Area During Verification</h2>
+    <ul>
+        <li><u>User Interface</u>
+        <ul>
+            <li>Verify an image.</li>
+            <li>Confirm that a <b>Print view...</b> item is present in the <b>File</b> menu.</li>
+            <li>Confirm that a toolbar button <b>is not</b> provided.</li>
+            <li>Confirm that selecting <b>File - Print view...</b> displays a Print dialog
+            <ul>
+                <li>Confirm that the normal options are available in the <b>Select Printer</b>
+                group box.</li>
+                <li>Confirm that the only <b>Page Range</b> option is <b>All</b>.</li>
+                <li>Confirm that the <b>Number of copies</b> can be selected and defaults to
+                <b>1</b>.</li>
+            </ul></li>
+        </ul></li>
 <p>
-			<li>Confirm that unredacted highlights are not printed as 
-			highlights.
-			<li>Confirm that redactions are printed in <b>black</b> if the 
-			task settings are set for <b>black</b>.
-			<li>Confirm that redactions are printed in <b>white</b> if the 
-			task settings are set for <b>white</b>.
-			<li>Confirm that redaction text is correctly printed.
-			<li>Confirm that exemption codes are correctly printed.
-		</ul>
-	</ul>
+        <li><u>Functionality</u>
+        <ul>
+            <li>Verify an image with fit mode set to <b>Fit-To-Page</b>.</li>
+            <li>Modify the width of the <b>Data window</b> so that some of the viewing area is 
+            wasted.</li>
+            <li>Confirm that the entire page is printed without wasting space.</li>
+            <li>Zoom in to a portion of the image.</li>
+            <li>Confirm that the exact viewing area is printed.</li>
 <p>
-	<li><h2>Input Event Tracking</h2>
-	<ul>
-		<li><u>Functionality</u>
-		<ul>
-			<li>Confirm that <b>EnableInputEventTracking</b> in the <b>DBInfo</b> 
-			table works in tandem with the configuration setting for <b>Redaction: 
-			Verify sensitive data</b>.
-			<li>Confirm that the following activities count as input events during 
-			<b>Redaction: Verify sensitive data</b>.
-			<ul>
-				<li>Mouse clicks in the image window
-				<li>Image window scrolling
-				<li>Image window shortcuts
-				<li>Clicking a button in the data window
-				<li>Selection of an item in the data window
-				<li>Selection of a menu item in the data window
-				<li>Modification of an item type in the data window
-			</ul>
-			<li>Confirm that the <b>Detailed usage report for specific user for 
-			specific day</b> report provides appropriate information from <b>Redaction: 
-			Verify sensitive data</b> activities.
-		</ul>
+            <li>Confirm that unredacted highlights are not printed as highlights.</li>
+            <li>Confirm that redactions are printed in <b>black</b> if the task settings are set
+            for <b>black</b>.</li>
+            <li>Confirm that redactions are printed in <b>white</b> if the task settings are set
+            for <b>white</b>.</li>
+            <li>Confirm that redaction text is correctly printed.</li>
+            <li>Confirm that exemption codes are correctly printed.
+        </ul>
+    </ul>
 <p>
-		<li><u>Miscellaneous</u>
-		<ul>
-			<LI><b>[DotNet #378, LegacyRC #5626]</b> Input Event Tracking
-       			<ul>
-				<li>Enable Input Event Tracking for verification
-				<li>Verify a document and click only one button.
-				<li>Close the verification UI.
-				<li>Reopen the verification UI.
-				<li>Create, move and modify redactions until near the end of the minute.
-				<li>Close the verification UI.
-				<li>Confirm that an <b>ELI14382: Cannot insert duplicate key row...</b> 
-				exception is not seen.
-				<li>Confirm that the input event table shows activity for more than one second 
-				in the relevant minute.
-	       		</ul>
-		   	</LI>
+    <li><h2>Input Event Tracking</h2>
+    <ul>
+        <li><u>Functionality</u>
+        <ul>
+            <li>Confirm that <b>EnableInputEventTracking</b> in the <b>DBInfo</b> table works in
+            tandem with the configuration setting for <b>Redaction: Verify sensitive data</b>.
+            <li>Confirm that the following activities count as input events during <b>Redaction: 
+            Verify sensitive data</b>.
+            <ul>
+                <li>Mouse clicks in the image window
+                <li>Image window scrolling
+                <li>Image window shortcuts
+                <li>Clicking a button in the data window
+                <li>Selection of an item in the data window
+                <li>Selection of a menu item in the data window
+                <li>Modification of an item type in the data window
+            </ul>
+            <li>Confirm that the <b>Detailed usage report for specific user for specific day</b>
+            report provides appropriate information from <b>Redaction: Verify sensitive data</b>
+            activities.
+        </ul>
 <p>
-	  	   	<LI><b>[LegacyRC #5717]</b> Confirm that <b>ALT</b> keys are now handled 
-			as input events.
-		</ul>
-	</ul>
+        <li><u>Miscellaneous</u>
+        <ul>
+            <LI><b>[DotNet #378, LegacyRC #5626]</b> Input Event Tracking
+            <ul>
+                <li>Enable Input Event Tracking for verification
+                <li>Verify a document and click only one button.
+                <li>Close the verification UI.
+                <li>Reopen the verification UI.
+                <li>Create, move and modify redactions until near the end of the minute.
+                <li>Close the verification UI.
+                <li>Confirm that an <b>ELI14382: Cannot insert duplicate key row...</b> exception 
+                is not seen.
+                <li>Confirm that the input event table shows activity for more than one second in
+                the relevant minute.
+            </ul></LI>
 <p>
-	<li><h2>Redact From XML</h2>
-	<ul>
-		<li><u>Functionality</u>
-		<ul>
-	  	   	<LI>Verify some images, making additions and changes to the found redactions.
-			<li>Create the metadata XML files after verification is complete.
-			<li>Confirm that the <b>RedactFromXml</b> application creates proper 
-			redacted images
-			<ul>
-				<li>Check redaction placement
-				<li>Confirm that deleted redactions are not applied
-				<li>Check that disabled redactions are not applied
-				<li>Check proper redaction color
-				<li>Check redaction text and exemption codes
-				<li>Check annotation settings
-			</ul>
-			<li>Confirm that <b>RedactFromXml</b> command-line parameters can 
-			override the annotation settings in the VOA file.
-			<ul>
-				<li><b>/a</b> - for apply as annotations
-				<li><b>/r</b> - for retain existing annotations
-			</ul>
-		</ul>
-		<li><u>Old Versions</u> - see .\Testing\PVCS_Testing\FlexIDSCore\3975
-		<ul>
-			<li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 1</b> 
-			metadata.
-			<li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 2</b> 
-			metadata.
-			<li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 3</b> 
-			metadata.
-		</ul>
+            <LI><b>[LegacyRC #5717]</b> Confirm that <b>ALT</b> keys are now handled as input 
+            events.
+        </ul>
+    </ul>
 <p>
-		<li><u>Miscellaneous</u>
-		<ul>
-	  	   	<LI><b>[FlexIDSCore #4032]</b> Confirm that <b>Redact From XML</b> outputs 
-			redaction text.
-		</ul>
-	</ul>
+    <li><h2>Redact From XML</h2>
+    <ul>
+        <li><u>Functionality</u>
+        <ul>
+            <LI>Verify some images, making additions and changes to the found redactions.
+            <li>Create the metadata XML files after verification is complete.
+            <li>Confirm that the <b>RedactFromXml</b> application creates proper redacted images
+            <ul>
+                <li>Check redaction placement
+                <li>Confirm that deleted redactions are not applied
+                <li>Check that disabled redactions are not applied
+                <li>Check proper redaction color
+                <li>Check redaction text and exemption codes
+                <li>Check annotation settings
+            </ul>
+            <li>Confirm that <b>RedactFromXml</b> command-line parameters can override the 
+            annotation settings in the VOA file.
+            <ul>
+                <li><b>/a</b> - for apply as annotations
+                <li><b>/r</b> - for retain existing annotations
+            </ul>
+        </ul>
+        <li><u>Old Versions</u> - see .\Testing\PVCS_Testing\FlexIDSCore\3975
+        <ul>
+            <li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 1</b> metadata.
+            <li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 2</b> metadata.
+            <li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 3</b> metadata.
+        </ul>
 <p>
-	<li><h2>Support for Multiple Monitors</h2>
-	<ul>
-		<li><u>Functionality</u>
-		<ul>
-			<li>Confirm that the <b>Data window</b> and the <b>Image window</b> can be 
-			docked separately and displayed on separate monitors.
-			<li>Confirm that docked window position is persistent.
-			<li>Confirm that undocked window position is persistent.
-			<li>Confirm that a maximized window on a separate monitor persists across 
-			verification sessions.
-			<li>Exercise changing monitor orientation between verification sessions.  
-			Confirm that appropriate behavior is seen.
-			<li>Confirm that removing the second monitor between verification sessions 
-			is supported by having the user interface display the windows on the single 
-			monitor.
+        <li><u>Miscellaneous</u>
+        <ul>
+            <LI><b>[FlexIDSCore #4032]</b> Confirm that <b>Redact From XML</b> outputs redaction 
+            text.
+        </ul>
+    </ul>
 <p>
-	  	   	<LI><b>[FlexIDSCore #4161]</b> Multi-monitor support
-		       	<ul>
-				<li>Run verification on a multiple monitors.
-				<li>Maximize the verification window on the secondary monitor.
-				<li>Close and restart verification.
-				<li>Confirm that the verification window is maximized on the 
-				secondary monitor.
-	       		</ul>
-		</ul>
-	</ul>
+    <li><h2>Support for Multiple Monitors</h2>
+    <ul>
+        <li><u>Functionality</u>
+        <ul>
+            <li>Confirm that the <b>Data window</b> and the <b>Image window</b> can be docked 
+            separately and displayed on separate monitors.
+            <li>Confirm that docked window position is persistent.
+            <li>Confirm that undocked window position is persistent.
+            <li>Confirm that a maximized window on a separate monitor persists across verification 
+            sessions.
+            <li>Exercise changing monitor orientation between verification sessions. Confirm that 
+            appropriate behavior is seen.
+            <li>Confirm that removing the second monitor between verification sessions is supported
+            by having the user interface display the windows on the single monitor.
+<p>
+            <LI><b>[FlexIDSCore #4161]</b> Multi-monitor support
+            <ul>
+                <li>Run verification on a multiple monitors.
+                <li>Maximize the verification window on the secondary monitor.
+                <li>Close and restart verification.
+                <li>Confirm that the verification window is maximized on the secondary monitor.
+            </ul>
+        </ul>
+    </ul>
 </ul>
 </body> 
 </html>
